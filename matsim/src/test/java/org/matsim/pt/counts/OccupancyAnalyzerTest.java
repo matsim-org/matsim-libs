@@ -155,23 +155,23 @@ public class OccupancyAnalyzerTest {
 
 			// setup: network
 			Network network = this.scenario.getNetwork();
-			Node node1 = network.getFactory().createNode(this.scenario.createId("1"), this.scenario.createCoord(   0, 0));
-			Node node2 = network.getFactory().createNode(this.scenario.createId("2"), this.scenario.createCoord(1000, 0));
-			Node node3 = network.getFactory().createNode(this.scenario.createId("3"), this.scenario.createCoord(2000, 0));
-			Node node4 = network.getFactory().createNode(this.scenario.createId("4"), this.scenario.createCoord(3000, 0));
-			Node node5 = network.getFactory().createNode(this.scenario.createId("5"), this.scenario.createCoord(4000, 0));
-			Node node6 = network.getFactory().createNode(this.scenario.createId("6"), this.scenario.createCoord(5000, 0));
+			Node node1 = network.getFactory().createNode(Id.create("1", Node.class), this.scenario.createCoord(   0, 0));
+			Node node2 = network.getFactory().createNode(Id.create("2", Node.class), this.scenario.createCoord(1000, 0));
+			Node node3 = network.getFactory().createNode(Id.create("3", Node.class), this.scenario.createCoord(2000, 0));
+			Node node4 = network.getFactory().createNode(Id.create("4", Node.class), this.scenario.createCoord(3000, 0));
+			Node node5 = network.getFactory().createNode(Id.create("5", Node.class), this.scenario.createCoord(4000, 0));
+			Node node6 = network.getFactory().createNode(Id.create("6", Node.class), this.scenario.createCoord(5000, 0));
 			network.addNode(node1);
 			network.addNode(node2);
 			network.addNode(node3);
 			network.addNode(node4);
 			network.addNode(node5);
 			network.addNode(node6);
-			Link link1 = network.getFactory().createLink(this.scenario.createId("1"), node1, node2);
-			Link link2 = network.getFactory().createLink(this.scenario.createId("2"), node2, node3);
-			Link link3 = network.getFactory().createLink(this.scenario.createId("3"), node3, node4);
-			Link link4 = network.getFactory().createLink(this.scenario.createId("4"), node4, node5);
-			Link link5 = network.getFactory().createLink(this.scenario.createId("5"), node5, node6);
+			Link link1 = network.getFactory().createLink(Id.create("1", Link.class), node1, node2);
+			Link link2 = network.getFactory().createLink(Id.create("2", Link.class), node2, node3);
+			Link link3 = network.getFactory().createLink(Id.create("3", Link.class), node3, node4);
+			Link link4 = network.getFactory().createLink(Id.create("4", Link.class), node4, node5);
+			Link link5 = network.getFactory().createLink(Id.create("5", Link.class), node5, node6);
 			setDefaultLinkAttributes(link1);
 			setDefaultLinkAttributes(link2);
 			setDefaultLinkAttributes(link3);

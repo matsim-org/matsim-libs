@@ -28,8 +28,10 @@ import java.util.List;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
@@ -40,6 +42,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -75,16 +78,16 @@ public class FastTransitRouterImplTest {
 		assertEquals(TransportMode.transit_walk, legs.get(2).getMode());
 		assertTrue("expected TransitRoute in leg.", legs.get(1).getRoute() instanceof ExperimentalTransitRoute);
 		ExperimentalTransitRoute ptRoute = (ExperimentalTransitRoute) legs.get(1).getRoute();
-		assertEquals(f.scenario.createId("0"), ptRoute.getAccessStopId());
-		assertEquals(f.scenario.createId("6"), ptRoute.getEgressStopId());
+		assertEquals(Id.create("0", TransitStopFacility.class), ptRoute.getAccessStopId());
+		assertEquals(Id.create("6", TransitStopFacility.class), ptRoute.getEgressStopId());
 		assertEquals(f.blueLine.getId(), ptRoute.getLineId());
-		assertEquals(f.scenario.createId("blue A > I"), ptRoute.getRouteId());
+		assertEquals(Id.create("blue A > I", TransitRoute.class), ptRoute.getRouteId());
 		double actualTravelTime = 0.0;
 		for (Leg leg : legs) {
 			actualTravelTime += leg.getTravelTime();
 		}
 		double expectedTravelTime = 29.0 * 60 + // agent takes the *:06 course, arriving in D at *:29
-				CoordUtils.calcDistance(f.schedule.getFacilities().get(f.scenario.createId("6")).getCoord(), toCoord) / config.getBeelineWalkSpeed();
+				CoordUtils.calcDistance(f.schedule.getFacilities().get(Id.create("6", TransitStopFacility.class)).getCoord(), toCoord) / config.getBeelineWalkSpeed();
 		assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
 	}
 
@@ -172,22 +175,22 @@ public class FastTransitRouterImplTest {
 		assertEquals(TransportMode.transit_walk, legs.get(4).getMode());
 		assertTrue("expected TransitRoute in leg.", legs.get(1).getRoute() instanceof ExperimentalTransitRoute);
 		ExperimentalTransitRoute ptRoute = (ExperimentalTransitRoute) legs.get(1).getRoute();
-		assertEquals(f.scenario.createId("0"), ptRoute.getAccessStopId());
-		assertEquals(f.scenario.createId("4"), ptRoute.getEgressStopId());
+		assertEquals(Id.create("0", TransitStopFacility.class), ptRoute.getAccessStopId());
+		assertEquals(Id.create("4", TransitStopFacility.class), ptRoute.getEgressStopId());
 		assertEquals(f.blueLine.getId(), ptRoute.getLineId());
-		assertEquals(f.scenario.createId("blue A > I"), ptRoute.getRouteId());
+		assertEquals(Id.create("blue A > I", TransitRoute.class), ptRoute.getRouteId());
 		assertTrue("expected TransitRoute in leg.", legs.get(3).getRoute() instanceof ExperimentalTransitRoute);
 		ptRoute = (ExperimentalTransitRoute) legs.get(3).getRoute();
-		assertEquals(f.scenario.createId("18"), ptRoute.getAccessStopId());
-		assertEquals(f.scenario.createId("19"), ptRoute.getEgressStopId());
+		assertEquals(Id.create("18", TransitStopFacility.class), ptRoute.getAccessStopId());
+		assertEquals(Id.create("19", TransitStopFacility.class), ptRoute.getEgressStopId());
 		assertEquals(f.greenLine.getId(), ptRoute.getLineId());
-		assertEquals(f.scenario.createId("green clockwise"), ptRoute.getRouteId());
+		assertEquals(Id.create("green clockwise", TransitRoute.class), ptRoute.getRouteId());
 		double actualTravelTime = 0.0;
 		for (Leg leg : legs) {
 			actualTravelTime += leg.getTravelTime();
 		}
 		double expectedTravelTime = 31.0 * 60 + // agent takes the *:06 course, arriving in C at *:18, departing at *:21, arriving in K at*:31
-				CoordUtils.calcDistance(f.schedule.getFacilities().get(f.scenario.createId("19")).getCoord(), toCoord) / config.getBeelineWalkSpeed();
+				CoordUtils.calcDistance(f.schedule.getFacilities().get(Id.create("19", TransitStopFacility.class)).getCoord(), toCoord) / config.getBeelineWalkSpeed();
 		assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
 	}
 
@@ -208,22 +211,22 @@ public class FastTransitRouterImplTest {
 		assertEquals(TransportMode.transit_walk, legs.get(3).getMode());
 		assertTrue("expected TransitRoute in leg.", legs.get(1).getRoute() instanceof ExperimentalTransitRoute);
 		ExperimentalTransitRoute ptRoute = (ExperimentalTransitRoute) legs.get(1).getRoute();
-		assertEquals(f.scenario.createId("0"), ptRoute.getAccessStopId());
-		assertEquals(f.scenario.createId("4"), ptRoute.getEgressStopId());
+		assertEquals(Id.create("0", TransitStopFacility.class), ptRoute.getAccessStopId());
+		assertEquals(Id.create("4", TransitStopFacility.class), ptRoute.getEgressStopId());
 		assertEquals(f.blueLine.getId(), ptRoute.getLineId());
-		assertEquals(f.scenario.createId("blue A > I"), ptRoute.getRouteId());
+		assertEquals(Id.create("blue A > I", TransitRoute.class), ptRoute.getRouteId());
 		assertTrue("expected TransitRoute in leg.", legs.get(2).getRoute() instanceof ExperimentalTransitRoute);
 		ptRoute = (ExperimentalTransitRoute) legs.get(2).getRoute();
-		assertEquals(f.scenario.createId("4"), ptRoute.getAccessStopId());
-		assertEquals(f.scenario.createId("12"), ptRoute.getEgressStopId());
+		assertEquals(Id.create("4", TransitStopFacility.class), ptRoute.getAccessStopId());
+		assertEquals(Id.create("12", TransitStopFacility.class), ptRoute.getEgressStopId());
 		assertEquals(f.redLine.getId(), ptRoute.getLineId());
-		assertEquals(f.scenario.createId("red C > G"), ptRoute.getRouteId());
+		assertEquals(Id.create("red C > G", TransitRoute.class), ptRoute.getRouteId());
 		double actualTravelTime = 0.0;
 		for (Leg leg : legs) {
 			actualTravelTime += leg.getTravelTime();
 		}
 		double expectedTravelTime = 29.0 * 60 + // agent takes the *:46 course, arriving in C at *:58, departing at *:00, arriving in G at*:09
-				CoordUtils.calcDistance(f.schedule.getFacilities().get(f.scenario.createId("12")).getCoord(), toCoord) / config.getBeelineWalkSpeed();
+				CoordUtils.calcDistance(f.schedule.getFacilities().get(Id.create("12", TransitStopFacility.class)).getCoord(), toCoord) / config.getBeelineWalkSpeed();
 		assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
 	}
 
@@ -316,16 +319,16 @@ public class FastTransitRouterImplTest {
 		assertEquals(TransportMode.transit_walk, legs.get(2).getMode());
 		assertTrue("expected TransitRoute in leg.", legs.get(1).getRoute() instanceof ExperimentalTransitRoute);
 		ExperimentalTransitRoute ptRoute = (ExperimentalTransitRoute) legs.get(1).getRoute();
-		assertEquals(f.scenario.createId("0"), ptRoute.getAccessStopId());
-		assertEquals(f.scenario.createId("6"), ptRoute.getEgressStopId());
+		assertEquals(Id.create("0", TransitStopFacility.class), ptRoute.getAccessStopId());
+		assertEquals(Id.create("6", TransitStopFacility.class), ptRoute.getEgressStopId());
 		assertEquals(f.blueLine.getId(), ptRoute.getLineId());
-		assertEquals(f.scenario.createId("blue A > I"), ptRoute.getRouteId());
+		assertEquals(Id.create("blue A > I", TransitRoute.class), ptRoute.getRouteId());
 		double actualTravelTime = 0.0;
 		for (Leg leg : legs) {
 			actualTravelTime += leg.getTravelTime();
 		}
 		double expectedTravelTime = 4*3600 + 29.0 * 60 + // arrival at 05:29 at D
-				CoordUtils.calcDistance(f.schedule.getFacilities().get(f.scenario.createId("6")).getCoord(), toCoord) / config.getBeelineWalkSpeed();
+				CoordUtils.calcDistance(f.schedule.getFacilities().get(Id.create("6", TransitStopFacility.class)).getCoord(), toCoord) / config.getBeelineWalkSpeed();
 		assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
 	}
 
@@ -343,10 +346,10 @@ public class FastTransitRouterImplTest {
 		assertEquals(TransportMode.transit_walk, legs.get(2).getMode());
 		assertTrue("expected TransitRoute in leg.", legs.get(1).getRoute() instanceof ExperimentalTransitRoute);
 		ExperimentalTransitRoute ptRoute = (ExperimentalTransitRoute) legs.get(1).getRoute();
-		assertEquals(f.scenario.createId("0"), ptRoute.getAccessStopId());
-		assertEquals(f.scenario.createId("16"), ptRoute.getEgressStopId());
+		assertEquals(Id.create("0", TransitStopFacility.class), ptRoute.getAccessStopId());
+		assertEquals(Id.create("16", TransitStopFacility.class), ptRoute.getEgressStopId());
 		assertEquals(f.blueLine.getId(), ptRoute.getLineId());
-		assertEquals(f.scenario.createId("blue A > I"), ptRoute.getRouteId());
+		assertEquals(Id.create("blue A > I", TransitRoute.class), ptRoute.getRouteId());
 	}
 
 	/**
@@ -476,13 +479,13 @@ public class FastTransitRouterImplTest {
 
 			// network
 			NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
-			NodeImpl node1 = network.getFactory().createNode(this.scenario.createId("1"), this.coord1);
-			NodeImpl node2 = network.getFactory().createNode(this.scenario.createId("2"), this.coord2);
-			NodeImpl node3 = network.getFactory().createNode(this.scenario.createId("3"), this.coord3);
-			NodeImpl node4 = network.getFactory().createNode(this.scenario.createId("4"), this.coord4);
-			NodeImpl node5 = network.getFactory().createNode(this.scenario.createId("5"), this.coord5);
-			NodeImpl node6 = network.getFactory().createNode(this.scenario.createId("6"), this.coord6);
-			NodeImpl node7 = network.getFactory().createNode(this.scenario.createId("7"), this.coord7);
+			NodeImpl node1 = network.getFactory().createNode(Id.create("1", Node.class), this.coord1);
+			NodeImpl node2 = network.getFactory().createNode(Id.create("2", Node.class), this.coord2);
+			NodeImpl node3 = network.getFactory().createNode(Id.create("3", Node.class), this.coord3);
+			NodeImpl node4 = network.getFactory().createNode(Id.create("4", Node.class), this.coord4);
+			NodeImpl node5 = network.getFactory().createNode(Id.create("5", Node.class), this.coord5);
+			NodeImpl node6 = network.getFactory().createNode(Id.create("6", Node.class), this.coord6);
+			NodeImpl node7 = network.getFactory().createNode(Id.create("7", Node.class), this.coord7);
 			network.addNode(node1);
 			network.addNode(node2);
 			network.addNode(node3);
@@ -490,10 +493,10 @@ public class FastTransitRouterImplTest {
 			network.addNode(node5);
 			network.addNode(node6);
 			network.addNode(node7);
-			Link link1 = network.getFactory().createLink(this.scenario.createId("1"), node1, node2);
-			Link link2 = network.getFactory().createLink(this.scenario.createId("2"), node3, node4);
-			Link link3 = network.getFactory().createLink(this.scenario.createId("3"), node4, node5);
-			Link link4 = network.getFactory().createLink(this.scenario.createId("4"), node6, node7);
+			Link link1 = network.getFactory().createLink(Id.create("1", Link.class), node1, node2);
+			Link link2 = network.getFactory().createLink(Id.create("2", Link.class), node3, node4);
+			Link link3 = network.getFactory().createLink(Id.create("3", Link.class), node4, node5);
+			Link link4 = network.getFactory().createLink(Id.create("4", Link.class), node6, node7);
 			network.addLink(link1);
 			network.addLink(link2);
 			network.addLink(link3);
@@ -503,13 +506,13 @@ public class FastTransitRouterImplTest {
 			this.schedule = this.scenario.getTransitSchedule();
 			TransitScheduleFactory sb = this.schedule.getFactory();
 
-			this.stop1 = sb.createTransitStopFacility(this.scenario.createId("1"), this.coord1, false);
-			this.stop2 = sb.createTransitStopFacility(this.scenario.createId("2"), this.coord2, false);
-			this.stop3 = sb.createTransitStopFacility(this.scenario.createId("3"), this.coord3, false);
-			this.stop4 = sb.createTransitStopFacility(this.scenario.createId("4"), this.coord4, false);
-			this.stop5 = sb.createTransitStopFacility(this.scenario.createId("5"), this.coord5, false);
-			this.stop6 = sb.createTransitStopFacility(this.scenario.createId("6"), this.coord6, false);
-			this.stop7 = sb.createTransitStopFacility(this.scenario.createId("7"), this.coord7, false);
+			this.stop1 = sb.createTransitStopFacility(Id.create("1", TransitStopFacility.class), this.coord1, false);
+			this.stop2 = sb.createTransitStopFacility(Id.create("2", TransitStopFacility.class), this.coord2, false);
+			this.stop3 = sb.createTransitStopFacility(Id.create("3", TransitStopFacility.class), this.coord3, false);
+			this.stop4 = sb.createTransitStopFacility(Id.create("4", TransitStopFacility.class), this.coord4, false);
+			this.stop5 = sb.createTransitStopFacility(Id.create("5", TransitStopFacility.class), this.coord5, false);
+			this.stop6 = sb.createTransitStopFacility(Id.create("6", TransitStopFacility.class), this.coord6, false);
+			this.stop7 = sb.createTransitStopFacility(Id.create("7", TransitStopFacility.class), this.coord7, false);
 			this.stop1.setLinkId(link1.getId());
 			this.stop2.setLinkId(link1.getId());
 			this.stop3.setLinkId(link2.getId());
@@ -519,43 +522,43 @@ public class FastTransitRouterImplTest {
 			this.stop7.setLinkId(link4.getId());
 
 			{ // line 1
-				TransitLine tLine = sb.createTransitLine(this.scenario.createId("1"));
+				TransitLine tLine = sb.createTransitLine(Id.create("1", TransitLine.class));
 				{
 					NetworkRoute netRoute = new LinkNetworkRouteImpl(link1.getId(), link1.getId());
 					List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(2);
 					stops.add(sb.createTransitRouteStop(this.stop1, 0, 0));
 					stops.add(sb.createTransitRouteStop(this.stop2, 50, 50));
-					TransitRoute tRoute = sb.createTransitRoute(this.scenario.createId("1a"), netRoute, stops, "bus");
-					tRoute.addDeparture(sb.createDeparture(this.scenario.createId("1a1"), 1000));
+					TransitRoute tRoute = sb.createTransitRoute(Id.create("1a", TransitRoute.class), netRoute, stops, "bus");
+					tRoute.addDeparture(sb.createDeparture(Id.create("1a1", Departure.class), 1000));
 					tLine.addRoute(tRoute);
 				}
 				this.schedule.addTransitLine(tLine);
 			}
 
 			{ // line 2
-				TransitLine tLine = sb.createTransitLine(this.scenario.createId("2"));
+				TransitLine tLine = sb.createTransitLine(Id.create("2", TransitLine.class));
 				{
 					NetworkRoute netRoute = new LinkNetworkRouteImpl(link2.getId(), link3.getId());
 					List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(3);
 					stops.add(sb.createTransitRouteStop(this.stop3, 0, 0));
 					stops.add(sb.createTransitRouteStop(this.stop4, 50, 50));
 					stops.add(sb.createTransitRouteStop(this.stop5, 100, 100));
-					TransitRoute tRoute = sb.createTransitRoute(this.scenario.createId("2a"), netRoute, stops, "bus");
-					tRoute.addDeparture(sb.createDeparture(this.scenario.createId("2a1"), 1000));
+					TransitRoute tRoute = sb.createTransitRoute(Id.create("2a", TransitRoute.class), netRoute, stops, "bus");
+					tRoute.addDeparture(sb.createDeparture(Id.create("2a1", Departure.class), 1000));
 					tLine.addRoute(tRoute);
 				}
 				this.schedule.addTransitLine(tLine);
 			}
 
 			{ // line 3
-				TransitLine tLine = sb.createTransitLine(this.scenario.createId("3"));
+				TransitLine tLine = sb.createTransitLine(Id.create("3", TransitLine.class));
 				{
 					NetworkRoute netRoute = new LinkNetworkRouteImpl(link4.getId(), link4.getId());
 					List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(2);
 					stops.add(sb.createTransitRouteStop(this.stop6, 0, 0));
 					stops.add(sb.createTransitRouteStop(this.stop7, 50, 50));
-					TransitRoute tRoute = sb.createTransitRoute(this.scenario.createId("3a"), netRoute, stops, "train");
-					tRoute.addDeparture(sb.createDeparture(this.scenario.createId("3a1"), 1070));
+					TransitRoute tRoute = sb.createTransitRoute(Id.create("3a", TransitRoute.class), netRoute, stops, "train");
+					tRoute.addDeparture(sb.createDeparture(Id.create("3a1", Departure.class), 1070));
 					tLine.addRoute(tRoute);
 				}
 				this.schedule.addTransitLine(tLine);

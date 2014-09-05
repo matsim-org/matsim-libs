@@ -22,6 +22,7 @@ package org.matsim.pt.analysis;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -62,10 +63,10 @@ public class TransitLoadIntegrationTest {
 		c.setDumpDataAtEnd(false);
 		c.run();
 
-		TransitLine line = s.getTransitSchedule().getTransitLines().get(s.createId("Blue Line"));
-		TransitRoute route = line.getRoutes().get(s.createId("1to3"));
-		TransitStopFacility stopFacility = s.getTransitSchedule().getFacilities().get(s.createId("2a"));
-		Departure departure = route.getDepartures().get(s.createId("07"));
+		TransitLine line = s.getTransitSchedule().getTransitLines().get(Id.create("Blue Line", TransitLine.class));
+		TransitRoute route = line.getRoutes().get(Id.create("1to3", TransitRoute.class));
+		TransitStopFacility stopFacility = s.getTransitSchedule().getFacilities().get(Id.create("2a", TransitStopFacility.class));
+		Departure departure = route.getDepartures().get(Id.create("07", Departure.class));
 		int load = transitload.getLoadAtDeparture(line, route, stopFacility, departure);
 
 		Assert.assertEquals("wrong number of passengers.", 4, load);

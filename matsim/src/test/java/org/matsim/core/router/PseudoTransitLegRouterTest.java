@@ -21,6 +21,7 @@ package org.matsim.core.router;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
