@@ -37,9 +37,9 @@ import playground.andreas.bvgScoringFunction.BvgScoringFunctionFactory;
  * 
  * @author aneumann
  */
-public class PControler{
+public class PControlerBVG{
 
-	private final static Logger log = Logger.getLogger(PControler.class);
+	private final static Logger log = Logger.getLogger(PControlerBVG.class);
 
 	public static void main(final String[] args) {
 		
@@ -60,6 +60,7 @@ public class PControler{
 		
 		PHook pHook = new PHook(controler);
 		controler.addControlerListener(pHook);		
+		controler.setScoringFunctionFactory(new BvgScoringFunctionFactory(controler.getConfig().planCalcScore(), new BvgScoringFunctionConfigGroup(controler.getConfig()), controler.getNetwork()));
 
 		controler.run();
 	}		
