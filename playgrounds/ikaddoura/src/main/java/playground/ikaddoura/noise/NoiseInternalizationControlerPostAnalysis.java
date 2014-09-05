@@ -25,6 +25,8 @@ package playground.ikaddoura.noise;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -38,9 +40,11 @@ public class NoiseInternalizationControlerPostAnalysis {
 	private static final Logger log = Logger.getLogger(NoiseInternalizationControlerPostAnalysis.class);
 	
 	static String configFile = null;
+	
+	String outputFolder = "/Users/Lars/workspace2/baseCaseCtd_8_250/output/x2";
 
 	public static void main(String[] args) throws IOException {
-		
+//		configFile = "/Users/Lars/Desktop/VERSUCH/Berlin/Berlin_config.xml";
 		configFile = "/Users/Lars/workspace2/baseCaseCtd_8_250/config2.xml";
 		
 		NoiseInternalizationControlerPostAnalysis noiseInternalizationControlerPostAnalysis = new NoiseInternalizationControlerPostAnalysis();
@@ -50,11 +54,13 @@ public class NoiseInternalizationControlerPostAnalysis {
 	}
 
 	private void runPostCalculation(String configFile) {
+//		String eventsFile = "/Users/Lars/Desktop/VERSUCH/Berlin/100.events.xml.gz";
 		String eventsFile = "/Users/Lars/workspace2/baseCaseCtd_8_250/ITERS/it.250/250.events.xml.gz";
 		
 		Config config = ConfigUtils.loadConfig(configFile);
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+//		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		
@@ -77,6 +83,9 @@ public class NoiseInternalizationControlerPostAnalysis {
 		
 		events.addHandler(tollHandler);
 		
+		ExtCostEventHandlerNoise extCostTripHandler = new ExtCostEventHandlerNoise(scenario, false);
+		events.addHandler(extCostTripHandler);
+		
 //		TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
 //		events.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
 		
@@ -85,6 +94,8 @@ public class NoiseInternalizationControlerPostAnalysis {
 		log.info("Read events file ...");
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventsFile);
+		
+		log.info((tollHandler.getInterval2departures()));
 		
 		log.info("calculateFinalNoiseEmissions...");
 		// calculate the final noise emissions per link per time interval (Map<Id,Map<Double,Double>> linkId2timeInterval2noiseEmission)
@@ -95,15 +106,21 @@ public class NoiseInternalizationControlerPostAnalysis {
 		tollHandler.calculateImmissionSharesPerReceiverPointPerTimeInterval();
 		log.info("calculateFinalNoiseImmissions...");
 		tollHandler.calculateFinalNoiseImmissions();
-		log.info("calculateDurationOfStay...");
+
+		log.info("agent-based L_den calculation...");
+		tollHandler.calculatePersonId2Lden();
+		
+//+++++++++++++++++++++++		
+		
+//		log.info("calculateDurationOfStay...");
 		// calculate damage per ReceiverPoint,
 		// at first calculate the duration of stay for each agent at each receiver Point and sum up for each time interval (Map<Id,Map<Double,Double>> receiverPointId2timeInterval2affectedAgentUnits)
 		// then calculate the damage (Map<Id,Map<Double,Double>> receiverPointId2timeInterval2damageCost)
-		tollHandler.calculateDurationOfStay();
-		log.info("calculateDamagePerReceiverPoint...");
+//		tollHandler.calculateDurationOfStay();
+//		log.info("calculateDamagePerReceiverPoint...");
 //		noiseHandler.calculateDurationOfStayOnlyHomeActivity();
-		tollHandler.calculateDamagePerReceiverPoint();
-		log.info("calculateCostSharesPerLinkPerTimeInterval...");
+//		tollHandler.calculateDamagePerReceiverPoint();
+//		log.info("calculateCostSharesPerLinkPerTimeInterval...");
 				
 		// Only the next two commands should not be applied during the base case run
 		// because the damage costs should be considered for the base case welfare calculation, too.
@@ -111,7 +128,34 @@ public class NoiseInternalizationControlerPostAnalysis {
 				
 		// apply the formula for calculating the cost shares of the links,
 		// use the saved data of the isolated immissions
-		tollHandler.calculateCostSharesPerLinkPerTimeInterval();
+		tollHandler.calculateCostSharesPerLinkPerTimeIntervalAgentBased();
+		
+		log.info("total toll (second approach L_den)"+(tollHandler.getTotalTollAffectedAgentBasedCalculation()));
+		log.info("control value: "+(tollHandler.getTotalTollAffectedAgentBasedCalculationControl()));
+		log.info("total toll (first approach): "+(tollHandler.getTotalToll()));
+		log.info("total toll affected (first approach): "+(tollHandler.getTotalTollAffected()));
+
+//++++++++++++++++++++++++++		
+		
+		log.info("calculateDurationOfStay...");
+		// at first calculate the duration of stay for each agent at each receiver Point and sum up for each time interval (Map<Id,Map<Double,Double>> receiverPointId2timeInterval2affectedAgentUnits)
+		// then calculate the damage (Map<Id,Map<Double,Double>> receiverPointId2timeInterval2damageCost)
+		tollHandler.calculateDurationOfStay();
+		// calculate damage per ReceiverPoint,
+		log.info("calculateDamagePerReceiverPoint...");
+//		noiseHandler.calculateDurationOfStayOnlyHomeActivity();
+		tollHandler.calculateDamagePerReceiverPoint();
+		log.info("calculateCostSharesPerLinkPerTimeInterval...");
+				
+//+++++++++++++++++++++++++++		
+		
+		// Only the next two commands should not be applied during the base case run
+		// because the damage costs should be considered for the base case welfare calculation, too.
+		// There is the difference between congestion (and partially accidents) on the one side and noise and emissions as real external effects on the other side
+				
+		// apply the formula for calculating the cost shares of the links,
+		// use the saved data of the isolated immissions
+//		tollHandler.calculateCostSharesPerLinkPerTimeInterval();
 		log.info("calculateCostsPerVehiclePerLinkPerTimeInterval...");
 		tollHandler.calculateCostsPerVehiclePerLinkPerTimeInterval();
 		log.info("throwNoiseEvents...");
@@ -124,6 +168,11 @@ public class NoiseInternalizationControlerPostAnalysis {
 		tollHandler.setLinkId2timeBin2avgToll();
 		tollHandler.setLinkId2timeBin2avgTollCar();
 		tollHandler.setLinkId2timeBin2avgTollHdv();
+		
+		log.info("total toll (second approach L_den)"+(tollHandler.getTotalTollAffectedAgentBasedCalculation()));
+		log.info("control value: "+(tollHandler.getTotalTollAffectedAgentBasedCalculationControl()));
+		log.info("total toll (first approach): "+(tollHandler.getTotalToll()));
+		log.info("total toll affected (first approach): "+(tollHandler.getTotalTollAffected()));
 		
 		log.info("Write toll stats");
 		String filenameToll = "noise_tollstats.csv";
@@ -157,5 +206,15 @@ public class NoiseInternalizationControlerPostAnalysis {
 		String filenameNoiseImmission = "noiseImmissionStats.csv";
 		
 		tollHandler.writeNoiseImmissionStats(config.controler().getOutputDirectory()+"/postAnalysis/"+filenameNoiseImmission);
+
+		TripInfoWriterNoise writer = new TripInfoWriterNoise(extCostTripHandler, config.controler().getOutputDirectory()+"/postAnalysis/personId2sum");
+		writer.writeDetailedResults(TransportMode.car);
+		writer.writeAvgTollPerDistance(TransportMode.car);
+		writer.writeAvgTollPerTimeBin(TransportMode.car);
+//		writer.writeDetailedResults(TransportMode.pt);
+//		writer.writeAvgTollPerDistance(TransportMode.pt);
+//		writer.writeAvgTollPerTimeBin(TransportMode.pt);
+		writer.writePersonId2totalAmount();
+		writer.writePersonId2totalAmountAffected();
 	}
 }

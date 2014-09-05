@@ -25,7 +25,7 @@ package playground.ikaddoura.noise;
 import java.util.ArrayList;
 import java.util.List;
 
-//import org.apache.log4j.Logger;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.Scenario;
 
 public class NoiseImmissionCalculator {
 	
-//	private static final Logger log = Logger.getLogger(NoiseImmissionCalculator.class);
+	private static final Logger log = Logger.getLogger(NoiseImmissionCalculator.class);
 	
 	private SpatialInfo spatialInfo;
 	
@@ -89,28 +89,48 @@ public class NoiseImmissionCalculator {
 		double NoiseImmission = 0.;
 		
 		Id receiverPointId = spatialInfo.getCoord2receiverPointId().get(coord);
+	
 		NoiseImmission = NoiseEmission
 				+ spatialInfo.getReceiverPointId2RelevantLinkIds2Ds().get(receiverPointId).get(linkId)
 				+ spatialInfo.getReceiverPointId2RelevantLinkIds2AngleImmissionCorrection().get(receiverPointId).get(linkId)
 				+ spatialInfo.getReceiverPointId2RelevantLinkIds2Drefl().get(receiverPointId).get(linkId)
-				+ spatialInfo.getReceiverPointId2RelevantLinkIds2DbmDz().get(receiverPointId).get(linkId);
+				+ spatialInfo.getReceiverPointId2RelevantLinkIds2DbmDz().get(receiverPointId).get(linkId)
+				;
+		
 		if(NoiseImmission<0) {
 			NoiseImmission = 0.;
 		}
 		return NoiseImmission;
 	}
 	
-	public double calculateNoiseImmission2(Scenario scenario , Id receiverPointId , Id linkId , double noiseEmission){
+	public double calculateNoiseImmissionParts(Scenario scenario , Id receiverPointId , Id linkId , double noiseEmission , double densityValue, double additionalValue){
 		double noiseImmission = 0.;
 		double sumTmp = 0.;
 		
+//		double lengthOfTheParts = spatialInfo.getReceiverPoint2RelevantlinkIds2lengthOfPartOfLinks().get(receiverPointId).get(linkId);
+		
 		for(int i : spatialInfo.getReceiverPointId2RelevantLinkIds2partOfLinks2distance().get(receiverPointId).get(linkId).keySet()) {
 			double noiseImmissionTmp = 0.;
-			noiseImmissionTmp = noiseEmission + calculateDl2(spatialInfo.getReceiverPoint2RelevantlinkIds2lengthOfPartOfLinks().get(receiverPointId).get(linkId)) - calculateDs2(spatialInfo.getReceiverPointId2RelevantLinkIds2partOfLinks2distance().get(receiverPointId).get(linkId).get(i));
-			sumTmp = sumTmp + Math.pow(10, 0.1*noiseImmissionTmp); 
+//			double distanceToRoad = spatialInfo.getReceiverPointId2RelevantLinkIds2partOfLinks2distance().get(receiverPointId).get(linkId).get(i);
+		
+			noiseImmissionTmp = noiseEmission 
+					+ spatialInfo.getReceiverPointId2RelevantLinkIds2PartOfLinks2DlParts().get(receiverPointId).get(linkId).get(i)
+//					+ calculateDlParts(lengthOfTheParts)
+					- spatialInfo.getReceiverPointId2RelevantLinkIds2PartOfLinks2DsParts().get(receiverPointId).get(linkId).get(i)
+//					- calculateDsParts(distanceToRoad)
+					- spatialInfo.getReceiverPointId2RelevantLinkIds2PartOfLinks2DbmDzParts().get(receiverPointId).get(linkId).get(i)
+//					- calculateDbmDzParts(distanceToRoad,densityValue,additionalValue)
+//					+ calculateDmeteorologyParts()
+					+ spatialInfo.getReceiverPointId2RelevantLinkIds2PartOfLinks2DreflParts().get(receiverPointId).get(linkId).get(i)
+//					+ calculateDreflectionParts(scenario , spatialInfo.getReceiverPointId2Coord().get(receiverPointId) , linkId)
+					;
+
+			sumTmp = sumTmp + Math.pow(10, 0.1*noiseImmissionTmp);
+
 		}
 		
 		noiseImmission = 10*Math.log10(sumTmp);
+
 		
 		if(noiseImmission<0) {
 			noiseImmission = 0.;
@@ -119,7 +139,7 @@ public class NoiseImmissionCalculator {
 		return noiseImmission;
 	}
 	
-//	public double calculateDreflection (Scenario scenario , Coord coord , Id linkId) {
+//	public double calculateDreflectionParts (Scenario scenario , Coord coord , Id linkId) {
 //		double Dreflection = 0.;	
 //		double densityValue = 0.;
 //		if(spatialInfo.getActivityCoords2densityValue().containsKey(coord)) {
@@ -134,68 +154,108 @@ public class NoiseImmissionCalculator {
 //			Dreflection = 3.2;
 //		}
 //		
+//		Dreflection = Dreflection*1.5;
+//		
+//		// For the consideration of the singualar-reflection-effects,
+//		// in dependence of the streetWdith, the height of the buildings
+//		// and the structure (in particular the gaps between the buildings),
+//		// and also the distance to the emission-source
+//		// an additional effect of 0-3 dB(A) ispossible,
+//		// effectively much smaller than 3 dB(A).
+//		// Therefore the reflection-effect calculated for the multiple reflection effects is multiplied by 1.5
+//		
+//		// Potential absorbing properties of the buildings are not considered here
+//		
 //		return Dreflection;
 //	}
 	
-//	public double calculateDbmDz (Scenario scenario , double distanceToRoad , Coord coord) {
-//		double DbmDz = 0.;
-//		if(distanceToRoad==0.) {
-//			distanceToRoad = 0.00000001;
-//			// dividing by zero is not possible
-//		}
-//		
-//		double densityValue = 0.;
-//		
-//		if(spatialInfo.getActivityCoords2densityValue().containsKey(coord)) {
-//			densityValue = spatialInfo.getActivityCoords2densityValue().get(coord);
-//		}
-//		
-//		// D_BM is relevant if there are no buildings which provoke shielding effects
-//		// The height is chosen to be dependent from the activity locations density
-////		double Dbm = -4.8* Math.exp((-1)*(Math.pow((10*(densityValue*0.01)/distanceToRoad)*(8.5+(100/distanceToRoad)),1.3)));
-//		double Dbm = -4.8* Math.exp((-1)*(Math.pow((((2+(densityValue*0.1)/distanceToRoad)*(8.5+(100/distanceToRoad)))),1.3)));
-//		
-//		double Dz = 0.;
-//		double z = (distanceToRoad/3)*(densityValue*0.01)/100;
-//		z = z - 1./30.;
-//		Dz = -10*Math.log10(3+60*z);
-//		
-//		if((Math.abs(Dbm))>(Math.abs(Dz))) {
-//			DbmDz = Dbm;
-//		} else {
-//			DbmDz = Dz;	
-//		}
-//		return DbmDz;
-//	}
+	public double calculateDmeteorologyParts (double distanceToRoad , String DayEveningOrNight) {
+		double Dmeteorology = 0.;
+		if(distanceToRoad <= 45.) {
+			Dmeteorology = 0.;
+		} else {
+			double factor = 1. - (45./distanceToRoad);
+			double C0 = 0.;
+			if(DayEveningOrNight.equals("Day")) {
+				C0 = 2.;
+			} else if(DayEveningOrNight.equals("EVENING")) {
+				C0 = 1.;
+			}
+		}		
+		return Dmeteorology;
+	}
 	
-//	public double calculateDs (double distanceToRoad){
+//	public double calculateDsParts (double distanceToRoad){
 //		double Ds = 0.;
 //		
-//		Ds = 15.8 - (10 * Math.log10(distanceToRoad)) - (0.0142*(Math.pow(distanceToRoad,0.9)));
-////		Ds = 15.8 - (12*(distanceToRoad/400)) - (10 * Math.log10(distanceToRoad)) - (0.0142*(Math.pow(distanceToRoad,0.9)));
-////		Ds = 15.8 + 2 - (12*(distanceToRoad/400)) - (10 * Math.log10(distanceToRoad)) - (0.0142*(Math.pow(distanceToRoad,0.9)));
+//		Ds = (20*Math.log10(distanceToRoad)) + (distanceToRoad/200) - 11.2;
 //		
 //		// TODO: Gebaeudemodell approximieren;
 //		
 //		return Ds;
 //	}
 	
-	public double calculateDs2 (double distanceToRoad){
-		double Ds = 0.;
-		
-		Ds = (20*Math.log10(distanceToRoad)) + (distanceToRoad/200) - 11.2;
-		
-		// TODO: Gebaeudemodell approximieren;
-		
-		return Ds;
-	}
+//	public double calculateDlParts (double length) {
+//		double Dl = 0.;
+//		
+//		Dl = 10*(Math.log10(length));
+//		
+//		return Dl;
+//	}
 	
-	public double calculateDl2 (double length) {
-		double Dl = 0.;
-		
-		Dl = 10*Math.log10(length);
-		
-		return Dl;
-	}
+//	public double calculateDbmDzParts (double distanceToRoad , double densityValue , double additionalValue) {
+//		double DbmDz = 0.;
+//		
+//		double Dbm = calculateDbmParts(distanceToRoad);
+//		double Dz = calculateDzParts(distanceToRoad,densityValue,additionalValue);
+//		
+//		if((Math.abs(Dbm))>(Math.abs(Dz))) {
+//			DbmDz = Dbm;
+//		} else {
+//			DbmDz = Dz;
+//		}
+//		
+//		return DbmDz;
+//	}
+//	
+//	public double calculateDbmParts (double distanceToRoad) {
+//		double Dbm = 0.;
+//		
+//		Dbm = 4.8 - ((2.25/distanceToRoad)*(34 + (600/distanceToRoad)));
+//		
+//		if(Dbm<0.) {
+//			Dbm=0.;
+//		}
+//		
+//		return Dbm;
+//	}
+//	
+//	public double calculateDzParts (double distanceToRoad , double densityValue , double additionalValue) {
+//		double Dz = 0.;
+//		
+//		double z = 0.;
+//		
+//		if(distanceToRoad<=(30.+additionalValue)) {
+//			z = 0.;
+//		} else if (distanceToRoad<=(130.+additionalValue)) {
+//			z = (Math.sqrt(Math.random())) * ((Math.log10(distanceToRoad-(29.+additionalValue)))/2.) * (4. + 26.*(densityValue/100.));			
+//		} else {
+//			z = (Math.sqrt(Math.random())) * (4. + 26.*(densityValue/100.));	
+//		}
+//		
+//		// for the correct calculation of the height correction
+////		double gamma = 1000.;
+////		if(distanceToRoad>125.) {
+////			gamma = distanceToRoad*8.;
+////		}
+//		
+//		if(distanceToRoad<(30.+additionalValue)) {
+//			Dz = 0.;
+//		} else {
+//			Dz = 10*(Math.log10(3+(60*z)));
+//		}
+//				
+//		return Dz;
+//	}
 	
 }

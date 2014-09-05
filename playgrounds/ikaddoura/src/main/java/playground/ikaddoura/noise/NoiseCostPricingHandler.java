@@ -25,7 +25,7 @@ package playground.ikaddoura.noise;
 import java.util.ArrayList;
 import java.util.List;
 
-//import org.apache.log4j.Logger;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 
@@ -37,7 +37,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
  */
 public class NoiseCostPricingHandler implements NoiseEventHandler {
 
-//	private final static Logger log = Logger.getLogger(NoiseCostPricingHandler.class);
+	private final static Logger log = Logger.getLogger(NoiseCostPricingHandler.class);
 
 	private final EventsManager events;
 	private List<PersonMoneyEvent> moneyEvents = new ArrayList<PersonMoneyEvent>();
@@ -62,6 +62,7 @@ public class NoiseCostPricingHandler implements NoiseEventHandler {
 		double amount = event.getAmount() *(-1);
 		PersonMoneyEvent moneyEvent = new PersonMoneyEvent(event.getTime(), event.getVehicleId(), amount);
 		this.events.processEvent(moneyEvent);
+//		log.info("+++++++++++++++++++++");
 		moneyEvents.add(moneyEvent);
 		
 		amountSum = amountSum + amount;

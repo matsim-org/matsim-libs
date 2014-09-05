@@ -52,13 +52,16 @@ public class SpatialInfo {
 	
 	private static final Logger log = Logger.getLogger(SpatialInfo.class);
 	
-	private double receiverPointGap = 100.; // distance between two receiver points along x- and y-axes
+//	private double receiverPointGap = 100.; // distance between two receiver points along x- and y-axes
+//	private double relevantRadius = 500.; // radius around a receiver point in which all links are considered as relevant
+	private double receiverPointGap = 250.; // distance between two receiver points along x- and y-axes
 	private double relevantRadius = 500.; // radius around a receiver point in which all links are considered as relevant
 	
-	private ScenarioImpl scenario;
+	private Scenario scenario;
 	private Map<Id,Coord> receiverPointId2Coord = new HashMap<Id,Coord>();
 	private Map<Coord,Id> coord2receiverPointId = new HashMap<Coord,Id>();
 	private Map<Tuple<Integer,Integer>,List<Id>> zoneTuple2listOfReceiverPointIds = new HashMap<Tuple<Integer,Integer>, List<Id>>();
+	private Map<Tuple<Integer,Integer>,List<Coord>> zoneTuple2listOfActivityCoords = new HashMap<Tuple<Integer,Integer>, List<Coord>>();
 	private Map<Tuple<Integer,Integer>,List<Id>> zoneTuple2listOfLinkIds = new HashMap<Tuple<Integer,Integer>, List<Id>>();
 	
 	private Map<Id,List<Id>> receiverPointId2relevantLinkIds = new HashMap<Id, List<Id>>();
@@ -66,9 +69,15 @@ public class SpatialInfo {
 	private Map<Id, Map<Id,Double>> receiverPointId2RelevantLinkIds2Drefl = new HashMap<Id, Map<Id,Double>>();
 	private Map<Id, Map<Id,Double>> receiverPointId2RelevantLinkIds2DbmDz = new HashMap<Id, Map<Id,Double>>();
 	private Map<Id, Map<Id,Double>> receiverPointId2RelevantLinkIds2Ds = new HashMap<Id, Map<Id,Double>>();
+	private Map<Id, Map<Id, Map<Integer,Double>>> receiverPointId2RelevantLinkIds2PartOfLinks2DreflParts = new HashMap<Id, Map<Id,Map<Integer,Double>>>();
+	private Map<Id, Map<Id, Map<Integer,Double>>> receiverPointId2RelevantLinkIds2PartOfLinks2DbmDzParts = new HashMap<Id, Map<Id,Map<Integer,Double>>>();
+	private Map<Id, Map<Id, Map<Integer,Double>>> receiverPointId2RelevantLinkIds2PartOfLinks2DsParts = new HashMap<Id, Map<Id,Map<Integer,Double>>>();
+	private Map<Id, Map<Id, Map<Integer,Double>>> receiverPointId2RelevantLinkIds2PartOfLinks2DlParts = new HashMap<Id, Map<Id,Map<Integer,Double>>>();
+
 	private Map<Id, Map<Id,Double>> receiverPointId2RelevantLinkIds2AngleImmissionCorrection = new HashMap<Id, Map<Id,Double>>();
+	private Map<Id, Map<Id,Double>> receiverPointId2RelevantLinkIds2AdditionalValue = new HashMap<Id, Map<Id,Double>>();
 	private Map<Coord,Id> activityCoord2receiverPointId = new HashMap<Coord,Id>();
-		
+	
 	private List <Coord> allActivityCoords = new ArrayList <Coord>();
 	private Map <Coord,Double> activityCoords2densityValue = new HashMap<Coord, Double>();
 	private Map<Id,Double> linkId2streetWidth = new HashMap<Id, Double>();
@@ -79,11 +88,13 @@ public class SpatialInfo {
 	
 	private Map<Id , Coord> allReceiverPointIds2Coord = new HashMap<Id, Coord>();
 
+	private List<Id> ListOfLinksWithOppositeLink = new ArrayList<Id>();
+	
 	// additional info required for (RLS-Teilstueckverfahren)
 	private Map<Id, Map<Id,Double>> receiverPoint2RelevantlinkIds2lengthOfPartOfLinks = new HashMap<Id, Map<Id,Double>>();
 	private Map<Id, Map<Id, Map<Integer, Double>>> receiverPointId2RelevantLinkIds2partOfLinks2distance = new HashMap<Id, Map<Id,Map<Integer,Double>>>();	
 	
-	public SpatialInfo(ScenarioImpl scenario) {
+	public SpatialInfo(Scenario scenario) {
 		this.scenario = scenario;
 	}
 
@@ -100,10 +111,10 @@ public class SpatialInfo {
 	public void setActivityCoords () {
 		// first of all, list all activity-coordinates
 		// and assign all coordinates of a plan to a person
-//		log.info("a");
 		for(Person person: scenario.getPopulation().getPersons().values()) {
 	
 			personId2coordsOfActivities.put(person.getId(), new LinkedList<Coord>());
+			Map<Coord,String> tmpMapCoord2Activity = new HashMap<Coord, String>();
 			
 			for(PlanElement planElement: person.getSelectedPlan().getPlanElements()) {
 				if(planElement instanceof Activity) {
@@ -118,12 +129,21 @@ public class SpatialInfo {
 						Coord coordTmp = currentActivity.getCoord();
 						listTmp.add(coordTmp);
 						personId2listOfCoords.put(person.getId(), listTmp);
-						allActivityCoords.add(currentActivity.getCoord());
+						
+						if(tmpMapCoord2Activity.containsKey(currentActivity.getCoord())) {
+							if(tmpMapCoord2Activity.get(currentActivity.getCoord())==currentActivity.getType().toString()) {
+							} else {
+								allActivityCoords.add(currentActivity.getCoord());
+								tmpMapCoord2Activity.put(currentActivity.getCoord(), currentActivity.getType().toString());
+							}
+						}else {
+							allActivityCoords.add(currentActivity.getCoord());
+							tmpMapCoord2Activity.put(currentActivity.getCoord(), currentActivity.getType().toString());
+						}
 					}
 				}
 			}
 		}
-//		log.info("b");
 //		classify the activityCoords on the basis of the density
 		for(Coord coord : allActivityCoords) {
 			if(coord.getX()<xCoordMin) {
@@ -137,47 +157,81 @@ public class SpatialInfo {
 			}
 			if(coord.getY()>yCoordMax) {
 				yCoordMax = coord.getY();
-			}	
+			}
 		}
-//		log.info("c");
-//		for(Id coordId : this.receiverPointId2Coord.keySet()) {
-//			Coord coord = this.receiverPointId2Coord.get(coordId);
-//			if(coord.getX()<xCoordMin) {
-//				xCoordMin = coord.getX();
-//			}
-//			if(coord.getX()>xCoordMax) {
-//				xCoordMax = coord.getX();
-//			}
-//			if(coord.getY()<yCoordMin) {
-//				yCoordMin = coord.getY();
-//			}
-//			if(coord.getY()>yCoordMax) {
-//				yCoordMax = coord.getY();
-//			}	
-//		}
 		
-//		log.info("d");
-		
+		for(Coord coord : allActivityCoords) {
+			Tuple<Integer,Integer> zoneTuple = getZoneTupleDensityZones(coord);
+			if(!(zoneTuple2listOfActivityCoords.containsKey(zoneTuple))) {
+				List<Coord> activityCoords = new ArrayList<Coord>();
+				activityCoords.add(coord);
+				zoneTuple2listOfActivityCoords.put(zoneTuple, activityCoords);
+			} else {
+				List<Coord> activityCoords = zoneTuple2listOfActivityCoords.get(zoneTuple);
+				activityCoords.add(coord);
+				zoneTuple2listOfActivityCoords.put(zoneTuple, activityCoords);
+			}
+		}
 	}
 	
 	public void setDensityAndStreetWidth() {
+		
 		for(double y = yCoordMax+100. ; y > yCoordMin-100.-316.225  ; y = y-316.225) {
-	//		log.info("aa");
 			for(double x = xCoordMin-100. ; x < xCoordMax+100.+316.225  ; x = x+316.225) {
-				
 				double xMinTmp = x;
 				double xMaxTmp = x+316.225;
 				double yMaxTmp = y;
 				double yMinTmp = y-316.225;
 				
+				double xCoord = x+(316.225/2.);
+				double yCoord = y-(316.225/2.);
+				Coord actCoord = new CoordImpl(xCoord,yCoord);
+				
 				List<Coord> listTmp = new ArrayList<Coord>();
+				
+				Tuple<Integer,Integer> zoneTupleActCoord = getZoneTupleDensityZones(actCoord);
+				List<Coord> relevantCoords = new ArrayList<Coord>();
+				if(zoneTuple2listOfActivityCoords.containsKey(zoneTupleActCoord)) {
+					relevantCoords.addAll(zoneTuple2listOfActivityCoords.get(zoneTupleActCoord));
+				}
+				int xInt = zoneTupleActCoord.getFirst();
+				int yInt = zoneTupleActCoord.getSecond();
+				Tuple<Integer,Integer> TupleNW = new Tuple<Integer, Integer>(xInt-1, yInt-1);
+				if(zoneTuple2listOfActivityCoords.containsKey(TupleNW)) {
+					relevantCoords.addAll(zoneTuple2listOfActivityCoords.get(TupleNW));
+				}
+				Tuple<Integer,Integer> TupleN = new Tuple<Integer, Integer>(xInt, yInt-1);
+				if(zoneTuple2listOfActivityCoords.containsKey(TupleN)) {
+					relevantCoords.addAll(zoneTuple2listOfActivityCoords.get(TupleN));
+				}
+				Tuple<Integer,Integer> TupleNO = new Tuple<Integer, Integer>(xInt+1, yInt-1);
+				if(zoneTuple2listOfActivityCoords.containsKey(TupleNO)) {
+					relevantCoords.addAll(zoneTuple2listOfActivityCoords.get(TupleNO));
+				}
+				Tuple<Integer,Integer> TupleW = new Tuple<Integer, Integer>(xInt-1, yInt);
+				if(zoneTuple2listOfActivityCoords.containsKey(TupleW)) {
+					relevantCoords.addAll(zoneTuple2listOfActivityCoords.get(TupleW));
+				}
+				Tuple<Integer,Integer> TupleO = new Tuple<Integer, Integer>(xInt+1, yInt);
+				if(zoneTuple2listOfActivityCoords.containsKey(TupleO)) {
+					relevantCoords.addAll(zoneTuple2listOfActivityCoords.get(TupleO));
+				}
+				Tuple<Integer,Integer> TupleSW = new Tuple<Integer, Integer>(xInt-1, yInt+1);
+				if(zoneTuple2listOfActivityCoords.containsKey(TupleSW)) {
+					relevantCoords.addAll(zoneTuple2listOfActivityCoords.get(TupleSW));
+				}
+				Tuple<Integer,Integer> TupleS = new Tuple<Integer, Integer>(xInt, yInt+1);
+				if(zoneTuple2listOfActivityCoords.containsKey(TupleS)) {
+					relevantCoords.addAll(zoneTuple2listOfActivityCoords.get(TupleS));
+				}
+				Tuple<Integer,Integer> TupleSO = new Tuple<Integer, Integer>(xInt+1, yInt+1);
+				if(zoneTuple2listOfActivityCoords.containsKey(TupleSO)) {
+					relevantCoords.addAll(zoneTuple2listOfActivityCoords.get(TupleSO));
+				}
+				
 				int counterCoords = 0;
 				
-				for(Coord coord : allActivityCoords) {
-	//				if((coord.getX()>=xMinTmp)&&(coord.getX()<xMaxTmp)&&(coord.getY()>=yMinTmp)&&(coord.getY()<yMaxTmp)) {	
-	//					listTmp.add(coord);
-	//					counterCoords++;
-	//				} // clearer but slower!?
+				for(Coord coord : relevantCoords) {
 					if(coord.getX()>=xMinTmp) {
 						if(coord.getX()<xMaxTmp) {
 							if(coord.getY()>=yMinTmp) {
@@ -189,20 +243,25 @@ public class SpatialInfo {
 						}
 					}
 				}
-			
+					
 				counterCoords = (int) (counterCoords*NoiseConfig.getScaleFactor());
+					
 				int counter = counterCoords;
-				
-				double densityValue = counter/10.;
-				// a value of 100 is high (high density of activity locations: 10000/square kilometre)
-	
+				double densityValue = counter/25.;
+					
+//				if(densityValue>10.) {
+//					log.info("densityValue: "+densityValue);
+//					log.info(xCoord);
+//					log.info(yCoord);
+//				}
+				// a value of 100 is high (high density of activity locations: 25000/square kilometre)
+					
 				for(Coord coordTmp : listTmp) {
 					activityCoords2densityValue.put(coordTmp, densityValue);
-					for(Id coordId : this.receiverPointId2Coord.keySet()) {
-						Coord receiverPointCoord = this.receiverPointId2Coord.get(coordId);
-	//					if((receiverPointCoord.getX()>=xMinTmp)&&(receiverPointCoord.getX()<xMaxTmp)&&(receiverPointCoord.getY()>=yMinTmp)&&(receiverPointCoord.getY()<yMaxTmp)) {
-	//						activityCoords2densityValue.put(receiverPointCoord, densityValue);
-	//					} // clearer but slower!?
+				}
+				for(Id coordId : this.receiverPointId2Coord.keySet()) {
+					Coord receiverPointCoord = this.receiverPointId2Coord.get(coordId);
+					if(!(activityCoords2densityValue.containsKey(coordId))) {
 						if(receiverPointCoord.getX()>=xMinTmp) {
 							if(receiverPointCoord.getX()<xMaxTmp) {
 								if(receiverPointCoord.getY()>=yMinTmp) {
@@ -214,109 +273,55 @@ public class SpatialInfo {
 						}
 					}
 				}
-				
 			}
 		}
-//		log.info("e");
 		for(Id linkId : scenario.getNetwork().getLinks().keySet()) {
 			double streetWidth = getStreetWidth(scenario,linkId);
 			linkId2streetWidth.put(linkId, streetWidth);
 		}
+		
+//TODO: Writing a csv-File...		
+//		HashMap<Id,Double> id2xCoord = new HashMap<Id, Double>();
+//		HashMap<Id,Double> id2yCoord = new HashMap<Id, Double>();
+//		HashMap<Id,Double> id2density = new HashMap<Id, Double>();
+//		for(Coord coord : activityCoords2densityValue.keySet()) {
+//			Id id = new IdImpl(coord.toString());
+//			double x = coord.getX();
+//			double y = coord.getY();
+//			double density = activityCoords2densityValue.get(coord);
+//			id2xCoord.put(id,x);
+//			id2yCoord.put(id,y);
+//			id2density.put(id,density);
+//		}
+//		List<String> headers = new ArrayList<String>();
+//		headers.add("actCoordId");
+//		headers.add("xCoord");
+//		headers.add("yCoord");
+//		headers.add("densityValue");
+//		
+//		List<HashMap<Id,Double>> values = new ArrayList<HashMap<Id,Double>>();
+//		values.add(id2xCoord);
+//		values.add(id2yCoord);
+//		values.add(id2density);
+//		LKCsvWriterId2DoubleMaps writer = new LKCsvWriterId2DoubleMaps("/Users/Lars/Desktop/VERSUCH/densityZonesSiouxFalls.csv", 4, headers, values);
+//		writer.write();
 	}
 	
 	public void setReceiverPoints() {
-//		double xMin = Double.MAX_VALUE;
-//		double xMax = Double.MIN_VALUE;
-//		double yMin = Double.MAX_VALUE;
-//		double yMax = Double.MIN_VALUE;
-//		
-//		for(Id linkId : scenario.getNetwork().getLinks().keySet()) {
-//			Link link = scenario.getNetwork().getLinks().get(linkId);
-//			Coord fromNodeCoord = link.getFromNode().getCoord();
-//			Coord toNodeCoord = link.getToNode().getCoord();
-//			
-//			if(fromNodeCoord.getX()<xMin) {
-//				xMin = fromNodeCoord.getX();
-//			}
-//			if(toNodeCoord.getX()<xMin) {
-//				xMin = toNodeCoord.getX();
-//			}
-//			if(fromNodeCoord.getY()<yMin) {
-//				yMin = fromNodeCoord.getY();
-//			}
-//			if(toNodeCoord.getY()<yMin) {
-//				yMin = toNodeCoord.getY();
-//			}
-//			
-//			if(fromNodeCoord.getX()>xMax) {
-//				xMax = fromNodeCoord.getX();
-//			}
-//			if(toNodeCoord.getX()>xMax) {
-//				xMax = toNodeCoord.getX();
-//			}
-//			if(fromNodeCoord.getY()>yMax) {
-//				yMax = fromNodeCoord.getY();
-//			}
-//			if(toNodeCoord.getY()>yMax) {
-//				yMax = toNodeCoord.getY();
-//			}
-//		}
 		
+		// for a 
+		HashMap<Id,Double> pointId2counter = new HashMap<Id, Double>();
+
 		int counter = 0;
 		
-		//TODO: Optional, the receiver points can be set on basis of the activity coords
-//		for(Coord actCoord : allActivityCoords) {
-////			log.info(actCoord);
-//			Tuple<Integer,Integer> zoneTupleActCoord = getZoneTuple(actCoord);
-//			
-//			List<Tuple<Integer,Integer>> tuples = new ArrayList<Tuple<Integer,Integer>>();
-//			List<Id> relevantReceiverPointIds = new ArrayList<Id>();
-//			if(zoneTuple2listOfReceiverPointIds.containsKey(zoneTupleActCoord)) {
-//				relevantReceiverPointIds.addAll(zoneTuple2listOfReceiverPointIds.get(zoneTupleActCoord));
-//			}
-//			
-//			int x = zoneTupleActCoord.getFirst();
-//			int y = zoneTupleActCoord.getSecond();
-//			Tuple<Integer,Integer> TupleNW = new Tuple<Integer, Integer>(x-1, y-1);
-//			if(zoneTuple2listOfReceiverPointIds.containsKey(TupleNW)) {
-//				relevantReceiverPointIds.addAll(zoneTuple2listOfReceiverPointIds.get(TupleNW));
-//			}
-//			Tuple<Integer,Integer> TupleN = new Tuple<Integer, Integer>(x, y-1);
-//			if(zoneTuple2listOfReceiverPointIds.containsKey(TupleN)) {
-//				relevantReceiverPointIds.addAll(zoneTuple2listOfReceiverPointIds.get(TupleN));
-//			}
-//			Tuple<Integer,Integer> TupleNO = new Tuple<Integer, Integer>(x+1, y-1);
-//			if(zoneTuple2listOfReceiverPointIds.containsKey(TupleNO)) {
-//				relevantReceiverPointIds.addAll(zoneTuple2listOfReceiverPointIds.get(TupleNO));
-//			}
-//			Tuple<Integer,Integer> TupleW = new Tuple<Integer, Integer>(x-1, y);
-//			if(zoneTuple2listOfReceiverPointIds.containsKey(TupleW)) {
-//				relevantReceiverPointIds.addAll(zoneTuple2listOfReceiverPointIds.get(TupleW));
-//			}
-//			Tuple<Integer,Integer> TupleO = new Tuple<Integer, Integer>(x+1, y);
-//			if(zoneTuple2listOfReceiverPointIds.containsKey(TupleO)) {
-//				relevantReceiverPointIds.addAll(zoneTuple2listOfReceiverPointIds.get(TupleO));
-//			}
-//			Tuple<Integer,Integer> TupleSW = new Tuple<Integer, Integer>(x-1, y+1);
-//			if(zoneTuple2listOfReceiverPointIds.containsKey(TupleSW)) {
-//				relevantReceiverPointIds.addAll(zoneTuple2listOfReceiverPointIds.get(TupleSW));
-//			}
-//			Tuple<Integer,Integer> TupleS = new Tuple<Integer, Integer>(x, y+1);
-//			if(zoneTuple2listOfReceiverPointIds.containsKey(TupleS)) {
-//				relevantReceiverPointIds.addAll(zoneTuple2listOfReceiverPointIds.get(TupleS));
-//			}
-//			Tuple<Integer,Integer> TupleSO = new Tuple<Integer, Integer>(x+1, y+1);
-//			if(zoneTuple2listOfReceiverPointIds.containsKey(TupleSO)) {
-//				relevantReceiverPointIds.addAll(zoneTuple2listOfReceiverPointIds.get(TupleSO));
-//			}
-////			log.info(relevantReceiverPointIds.size());
-//			if(relevantReceiverPointIds.size()==0) {
-////				log.info("aa");
-//				Coord newCoord = new CoordImpl(actCoord.getX(), actCoord.getY());
+//		//TODO: First possibility: a grid of receiver points
+//		for(double y = yCoordMax + 100. ; y > yCoordMin - 100. - receiverPointGap ; y = y - receiverPointGap) {
+//			for(double x = xCoordMin - 100. ; x < xCoordMax + 100. + receiverPointGap ; x = x + receiverPointGap) {
+//				Coord newCoord = new CoordImpl(x, y);
 //				Id newId = new IdImpl("coordId"+counter);
 //				receiverPointId2Coord.put(newId, newCoord);
 //				counter++;
-//				
+//							
 //				Tuple<Integer,Integer> zoneTuple = getZoneTuple(newCoord);
 //				List<Id> listOfCoords = new ArrayList<Id>();
 //				if(zoneTuple2listOfReceiverPointIds.containsKey(zoneTuple)) {
@@ -324,50 +329,62 @@ public class SpatialInfo {
 //				}
 //				listOfCoords.add(newId);
 //				zoneTuple2listOfReceiverPointIds.put(zoneTuple,listOfCoords);
-//			}else{
-//			
-//				boolean newCoordNecessary = true;
-//				for(Id id : relevantReceiverPointIds) {
-//
-//					double distance = 0.;
-//					double x1 = actCoord.getX();
-//					double x2 = receiverPointId2Coord.get(id).getX();
-//					double y1 = actCoord.getY();
-//					double y2 = receiverPointId2Coord.get(id).getY();
-//					
-//					distance = Math.sqrt((Math.pow(x2-x1, 2))+(Math.pow(y2-y1, 2)));
-//					
-//					if(distance <= 20.) {
-//						newCoordNecessary = false;
-//						
-//					}
-//				}
-//				
-//				if (newCoordNecessary == true) {
-//					Coord newCoord = new CoordImpl(actCoord.getX(), actCoord.getY());
-//					Id newId = new IdImpl("coordId"+counter);
-//					receiverPointId2Coord.put(newId, newCoord);
-//					counter++;
-//					
-//					Tuple<Integer,Integer> zoneTuple = getZoneTuple(newCoord);
-//					List<Id> listOfCoords = new ArrayList<Id>();
-//					if(zoneTuple2listOfReceiverPointIds.containsKey(zoneTuple)) {
-//						listOfCoords = zoneTuple2listOfReceiverPointIds.get(zoneTuple);
-//					}
-//					listOfCoords.add(newId);
-//					zoneTuple2listOfReceiverPointIds.put(zoneTuple,listOfCoords);
-//				}
 //			}
 //		}
 		
-		//TODO: Normally a grid of receiver points is set, the distance in x- and y-direction has to be set above
-		for(double y = yCoordMax + 100. ; y > yCoordMin - 100. - receiverPointGap ; y = y - receiverPointGap) {
-			for(double x = xCoordMin - 100. ; x < xCoordMax + 100. + receiverPointGap ; x = x + receiverPointGap) {
-				Coord newCoord = new CoordImpl(x, y);
+		//TODO: Optional, the receiver points can be set on basis of the activity coords
+		for(Coord actCoord : allActivityCoords) {
+			if(counter%20000. == 0.) {
+				log.info("activity coords ... "+counter);
+			}
+			Tuple<Integer,Integer> zoneTupleActCoord = getZoneTuple(actCoord);
+			
+//			List<Tuple<Integer,Integer>> tuples = new ArrayList<Tuple<Integer,Integer>>();
+			List<Id> relevantReceiverPointIds = new ArrayList<Id>();
+			if(zoneTuple2listOfReceiverPointIds.containsKey(zoneTupleActCoord)) {
+				relevantReceiverPointIds.addAll(zoneTuple2listOfReceiverPointIds.get(zoneTupleActCoord));
+			}
+			
+			int x = zoneTupleActCoord.getFirst();
+			int y = zoneTupleActCoord.getSecond();
+			Tuple<Integer,Integer> TupleNW = new Tuple<Integer, Integer>(x-1, y-1);
+			if(zoneTuple2listOfReceiverPointIds.containsKey(TupleNW)) {
+				relevantReceiverPointIds.addAll(zoneTuple2listOfReceiverPointIds.get(TupleNW));
+			}
+			Tuple<Integer,Integer> TupleN = new Tuple<Integer, Integer>(x, y-1);
+			if(zoneTuple2listOfReceiverPointIds.containsKey(TupleN)) {
+				relevantReceiverPointIds.addAll(zoneTuple2listOfReceiverPointIds.get(TupleN));
+			}
+			Tuple<Integer,Integer> TupleNO = new Tuple<Integer, Integer>(x+1, y-1);
+			if(zoneTuple2listOfReceiverPointIds.containsKey(TupleNO)) {
+				relevantReceiverPointIds.addAll(zoneTuple2listOfReceiverPointIds.get(TupleNO));
+			}
+			Tuple<Integer,Integer> TupleW = new Tuple<Integer, Integer>(x-1, y);
+			if(zoneTuple2listOfReceiverPointIds.containsKey(TupleW)) {
+				relevantReceiverPointIds.addAll(zoneTuple2listOfReceiverPointIds.get(TupleW));
+			}
+			Tuple<Integer,Integer> TupleO = new Tuple<Integer, Integer>(x+1, y);
+			if(zoneTuple2listOfReceiverPointIds.containsKey(TupleO)) {
+				relevantReceiverPointIds.addAll(zoneTuple2listOfReceiverPointIds.get(TupleO));
+			}
+			Tuple<Integer,Integer> TupleSW = new Tuple<Integer, Integer>(x-1, y+1);
+			if(zoneTuple2listOfReceiverPointIds.containsKey(TupleSW)) {
+				relevantReceiverPointIds.addAll(zoneTuple2listOfReceiverPointIds.get(TupleSW));
+			}
+			Tuple<Integer,Integer> TupleS = new Tuple<Integer, Integer>(x, y+1);
+			if(zoneTuple2listOfReceiverPointIds.containsKey(TupleS)) {
+				relevantReceiverPointIds.addAll(zoneTuple2listOfReceiverPointIds.get(TupleS));
+			}
+			Tuple<Integer,Integer> TupleSO = new Tuple<Integer, Integer>(x+1, y+1);
+			if(zoneTuple2listOfReceiverPointIds.containsKey(TupleSO)) {
+				relevantReceiverPointIds.addAll(zoneTuple2listOfReceiverPointIds.get(TupleSO));
+			}
+			if(relevantReceiverPointIds.size()==0) {
+				Coord newCoord = new CoordImpl(actCoord.getX(), actCoord.getY());
 				Id newId = new IdImpl("coordId"+counter);
 				receiverPointId2Coord.put(newId, newCoord);
 				counter++;
-							
+				
 				Tuple<Integer,Integer> zoneTuple = getZoneTuple(newCoord);
 				List<Id> listOfCoords = new ArrayList<Id>();
 				if(zoneTuple2listOfReceiverPointIds.containsKey(zoneTuple)) {
@@ -375,55 +392,79 @@ public class SpatialInfo {
 				}
 				listOfCoords.add(newId);
 				zoneTuple2listOfReceiverPointIds.put(zoneTuple,listOfCoords);
+			}else{
+			
+				boolean newCoordNecessary = true;
+				for(Id id : relevantReceiverPointIds) {
+
+					double distance = 0.;
+					double x1 = actCoord.getX();
+					double x2 = receiverPointId2Coord.get(id).getX();
+					double y1 = actCoord.getY();
+					double y2 = receiverPointId2Coord.get(id).getY();
+					
+					distance = Math.sqrt((Math.pow(x2-x1, 2))+(Math.pow(y2-y1, 2)));
+					
+					if(distance <= 25.) {
+						newCoordNecessary = false;
+						if(pointId2counter.containsKey(id)) {
+							pointId2counter.put(id, pointId2counter.get(id)+1.0);
+						} else {
+							pointId2counter.put(id, 1.0);
+						}
+					}
+				}
+				
+				if (newCoordNecessary == true) {
+					Coord newCoord = new CoordImpl(actCoord.getX(), actCoord.getY());
+					Id newId = new IdImpl("coordId"+counter);
+					receiverPointId2Coord.put(newId, newCoord);
+					counter++;
+					
+					Tuple<Integer,Integer> zoneTuple = getZoneTuple(newCoord);
+					List<Id> listOfCoords = new ArrayList<Id>();
+					if(zoneTuple2listOfReceiverPointIds.containsKey(zoneTuple)) {
+						listOfCoords = zoneTuple2listOfReceiverPointIds.get(zoneTuple);
+					}
+					listOfCoords.add(newId);
+					zoneTuple2listOfReceiverPointIds.put(zoneTuple,listOfCoords);
+				}
 			}
 		}
 		log.info("number of receiver points: "+receiverPointId2Coord.size());
-		
-//		System.out.println(receiverPointId2Coord.toString());
-		
-		// Alternative approach: Use the spatial distribution of the activity location to define the receiver points instead of regular grid.
-//		for(Coord newCoord : GetActivityCoords.allActivityCoords) {
-//			int b = 0;
-//			int c = 0;
-//			int d = 0;
-//			for (Id coordId : receiverPoints.keySet()) {
-//				double x1 = receiverPoints.get(coordId).getX();
-//				double y1 = receiverPoints.get(coordId).getY();
-//				double x2 = newCoord.getX();
-//				double y2 = newCoord.getY();
-//				double distance = (Math.sqrt((Math.pow((x1-x2),2)+Math.pow((y1-y2),2))));
-//				
-//				if(distance<50.0) {
-//					b = 1;
-//				}else if(distance<150.0) {
-//					c = 1;
-//				}else if(distance<250.0) {
-//					d = 1;
-//				}
-//			}
-//			if ((b==0)&&(c==0)&&(d==0)) {
-//				receiverPoints.put(new IdImpl("coordId"+counter+"_"+newCoord.getX()+"_"+newCoord.getY()), newCoord);
-//				counter++;
-//				System.out.println("receiverPointCounter: "+counter);
-//			} else if ((b==0)&&(c==1)) {
-//				double random = Math.random();
-//				if(random<0.02) {
-//					receiverPoints.put(new IdImpl("coordId"+counter+"_"+newCoord.getX()+"_"+newCoord.getY()), newCoord);
-//					counter++;
-//					System.out.println("receiverPointCounter: "+counter);
-//				}
-//			} else if ((b==0)&&(c==0)&&(d==1)) {
-//				double random = Math.random();
-//				if(random<0.005) {
-//					receiverPoints.put(new IdImpl("coordId"+counter+"_"+newCoord.getX()+"_"+newCoord.getY()), newCoord);
-//					counter++;
-//					System.out.println("receiverPointCounter: "+counter);
-//				}
-//			}
-//		}
+		HashMap<Id,Double> id2xCoord = new HashMap<Id, Double>();
+		HashMap<Id,Double> id2yCoord = new HashMap<Id, Double>();
+		int c = 0;
+		for(Id id : receiverPointId2Coord.keySet()) {
+			c++;
+			if(c%1000 == 0) {
+				log.info("receiver points "+c);
+			}
+			id2xCoord.put(id, receiverPointId2Coord.get(id).getX());
+			id2yCoord.put(id, receiverPointId2Coord.get(id).getY());
+		}
+		List<String> headers = new ArrayList<String>();
+		headers.add("pointId");
+		headers.add("xCoord");
+		headers.add("yCoord");
+		headers.add("counter");
+		for(Id id : id2xCoord.keySet()) {
+			if(!(pointId2counter.containsKey(id))) {
+				pointId2counter.put(id,0.);
+			}
+		}
+		List<HashMap<Id,Double>> values = new ArrayList<HashMap<Id,Double>>();
+		values.add(id2xCoord);
+		values.add(id2yCoord);
+		values.add(pointId2counter);
+//		LKCsvWriterId2DoubleMaps writer = new LKCsvWriterId2DoubleMaps("/Users/Lars/Desktop/VERSUCH/BerlinCoords90.csv", 4, headers, values);
+		LKCsvWriterId2DoubleMaps writer = new LKCsvWriterId2DoubleMaps("/Users/Lars/Desktop/VERSUCH/Sioux250.csv", 4, headers, values);
+		writer.write();
+		// For a post-analysis of the events-file the real locations of the ceiver points should be known!
 	}
 	
-//	public double getActivityDensityValue (Scenario scenario , Coord coord) {
+//	//TODO: Alternatively, a grid is used
+//	public double setActivityDensityValueFromRadius (Scenario scenario , Coord coord) {
 //		double radius = 178.41; // one square kilometre/10
 //		
 //		double densityValue = 0.;
@@ -473,44 +514,53 @@ public class SpatialInfo {
 		// a post-analysis is necessary then
 		// or the unused receiver Points are added back for the final x iterations
 		// x is dependent from the number of iterations used for the averaged analysis
-		log.info("aa");
 		List<Id> receiverPointsToRemove = new ArrayList<Id>();
 		if(removeUnusedReceiverPoints == true) {
 			for(Id id : receiverPointId2Coord.keySet()) {
 				receiverPointsToRemove.add(id);
 			}
 		}
-		log.info("bb");
 		int xi = 0;
 		
 		for(Coord coord : allActivityCoords) {
 			xi++;
-			if(xi%10000 == 0) {
-				log.info(xi);
+			if(xi%20000 == 0) {
+				log.info("activity coordinates "+xi+" ...");
 			}
-			// A pre-fixing of zones to consider would be helpful for reducing the computational time
-			Id receiverPointId = this.getNearestReceiverPoint(coord);
-			activityCoord2receiverPointId.put(coord, receiverPointId);
 			
-			if(removeUnusedReceiverPoints == true) {
-//				log.info("xxx");
-				if(receiverPointsToRemove.contains(receiverPointId)) {
-					receiverPointsToRemove.remove(receiverPointId);
-				} else {
-					// receiver pointId already removed from list
+			if (!(activityCoord2receiverPointId.containsKey(coord))) {
+			
+				// A pre-fixing of zones to consider would be helpful for reducing the computational time
+				Id receiverPointId = this.getNearestReceiverPoint(coord);
+				
+				activityCoord2receiverPointId.put(coord, receiverPointId);
+				
+				if(removeUnusedReceiverPoints == true) {
+					if(receiverPointsToRemove.contains(receiverPointId)) {
+						receiverPointsToRemove.remove(receiverPointId);
+					} else {
+						// receiver pointId already removed from list
+					}
 				}
-			}	
+			} else {
+			}
 		}
-//		log.info("cc");
 		if(removeUnusedReceiverPoints == true) {
 			for(Id id : receiverPointsToRemove) {
+				xi++;
+				if(xi%20000 == 0) {
+					log.info("receiver point "+xi+" ...");
+				}
 				UnusedReceiverPointId2Coord.put(id, receiverPointId2Coord.get(id));
 				receiverPointId2Coord.remove(id);
 			}
 		}
-		log.info("receiverPointId2Coord: "+receiverPointId2Coord.size());
-//		log.info("dd");
+		log.info("number of receiver points: "+receiverPointId2Coord.size());
 		for(Id id : receiverPointId2Coord.keySet()) {
+			xi++;
+			if(xi%20000 == 0) {
+				log.info("receiver point "+xi+" ...");
+			}
 			coord2receiverPointId.put(receiverPointId2Coord.get(id), id);
 		}
 	}
@@ -523,7 +573,7 @@ public class SpatialInfo {
 			}
 		}
 	}
-	
+
 //	public void setInitialAssignment () {
 //		for(Id personId : personId2coordsOfActivities.keySet()) {
 //			
@@ -618,8 +668,17 @@ public class SpatialInfo {
 		
 		setLinksToZones();
 		
+		setListLinksWithOppositeLink();
+		
+		int linknumber = 0;
+		
 		// for faster computation, for noise immission-calculation, not all network links are considered.
 		for(Id pointId : receiverPointId2Coord.keySet()) {
+
+			linknumber++;
+			if(linknumber%1000. == 0.) {
+				log.info("receiver point ... "+linknumber);
+			}
 			double pointCoordX = receiverPointId2Coord.get(pointId).getX();
 			double pointCoordY = receiverPointId2Coord.get(pointId).getY();
 			List<Id> relevantLinkIds = new ArrayList<Id>();
@@ -669,7 +728,6 @@ public class SpatialInfo {
 			if(zoneTuple2listOfLinkIds.containsKey(TupleSO)) {
 				potentialLinks.addAll(zoneTuple2listOfLinkIds.get(TupleSO));
 			}
-			
 			for (Id linkId : potentialLinks){
 				if(!(relevantLinkIds.contains(linkId))) {
 					double fromCoordX = scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getX();
@@ -731,26 +789,124 @@ public class SpatialInfo {
 						}
 					}
 					
+					//TODO: The reason for the following adaption depends on the scenario,
+					//for the Sioux-Falls-scenario, it is relevant
+					// activityCoords are set in the centre point of the buildings,
+					// the relevant noise measurement has to be done on the facade.
+//					distance = distance - (5. + (Math.random()*5.));
+					distance = distance - 7.5;
 					
+					// in direction or in opposite direction or a one-way-street
+					boolean oneWayStreet = false;
+					if(!(ListOfLinksWithOppositeLink.contains(linkId))) {
+						oneWayStreet = true;
+					}
 					
-					if(distance <= relevantRadius){
+					boolean oppositeDirection = true;
+					if(oneWayStreet == false) {
+						oppositeDirection = true;
+						
+						double lotVectorX = lotPointX - pointCoordX;
+						double lotVectorY = lotPointY - pointCoordY;
+						double linkVectorX = toCoordX - fromCoordX;
+						double linkVectorY = toCoordY - fromCoordY;
+						
+						if(lotVectorX<0.){
+							if(lotVectorY<0.) {
+								if(linkVectorX<0.) {
+									oppositeDirection = false;
+								}
+							} else if(lotVectorY>0.) {
+								if(linkVectorX>0.) {
+									oppositeDirection = false;
+								}
+							} else if(lotVectorY==0.) {
+								if((linkVectorX==0.)&&(linkVectorY>0.)) {
+									oppositeDirection = false;
+								}
+							} 
+						} else if (lotVectorX>0.){
+							if(lotVectorY<0.) {
+								if(linkVectorX<0.) {
+									oppositeDirection = false;
+								}
+							} else if(lotVectorY>0.) {
+								if(linkVectorX>0.) {
+									oppositeDirection = false;
+								}
+							} else if(lotVectorY==0.) {
+								if((linkVectorX==0.)&&(linkVectorY<0.)) {
+									oppositeDirection = false;
+								}
+							}
+						} else if (lotVectorX==0.){
+							if(lotVectorY<0.) {
+								if(linkVectorX<0.) {
+									oppositeDirection = false;
+								}
+							} else if(lotVectorY>0.) {
+								if(linkVectorX>0.) {
+									oppositeDirection = false;
+								}
+							} 
+						}
+						
+						if(oppositeDirection == true) {
+							distance = distance + (0.3*(getStreetWidth(scenario, linkId)));
+						} else {
+							distance = distance - (0.3*(getStreetWidth(scenario, linkId)));
+						}
+					}
+					
+					if(distance < relevantRadius){
+						
 						relevantLinkIds.add(linkId);
+						
 						double minDistance = (getStreetWidth(scenario, linkId))/3;
-						if(distance<minDistance) {
-							distance = minDistance;
+						
+						double additionalValue = 0.;
+						if(oneWayStreet == true) {
+							additionalValue = (linkId2streetWidth.get(linkId)/6.);
+						} else if(oppositeDirection == true) {
+							additionalValue = (linkId2streetWidth.get(linkId)/3.);
+						}
+						
+						if(receiverPointId2RelevantLinkIds2AdditionalValue.containsKey(pointId)) {
+							Map<Id,Double> relevantLinkIds2AdditionalValue = receiverPointId2RelevantLinkIds2AdditionalValue.get(pointId);
+							relevantLinkIds2AdditionalValue.put(linkId, additionalValue);
+							receiverPointId2RelevantLinkIds2AdditionalValue.put(pointId, relevantLinkIds2AdditionalValue);
+						} else {
+							Map<Id,Double> relevantLinkIds2AdditionalValue = new HashMap<Id, Double>();
+							relevantLinkIds2AdditionalValue.put(linkId, additionalValue);
+							receiverPointId2RelevantLinkIds2AdditionalValue.put(pointId, relevantLinkIds2AdditionalValue);
+						}
+						
+						if(distance<(minDistance+additionalValue)) {
+							distance = (minDistance+additionalValue);
+						}
+						
+						String direction = null;
+						
+						if(oneWayStreet==true) {
+							direction = "oneWay";
+						} else if(oppositeDirection==true) {
+							direction = "oppositeDirection";
+						} else {
+							direction = "inDirection";
 						}
 						
 						relevantLinkIds2distance.put(linkId, distance);
 						
 						// the following calculations for the correction terms of the noise immission calculation
 						double Drefl = calculateDreflection(receiverPointId2Coord.get(pointId), linkId);
-						double DbmDz = calculateDbmDz(distance, receiverPointId2Coord.get(pointId));
+						double DbmDz = calculateDbmDz(distance, receiverPointId2Coord.get(pointId), pointId, linkId, direction);
 						double Ds = calculateDs (distance);
 						double angleImmissionCorrection = calculateAngleImmissionCorrection(receiverPointId2Coord.get(pointId), scenario.getNetwork().getLinks().get(linkId));
 						relevantLinkIds2Drefl.put(linkId, Drefl);
 						relevantLinkIds2DbmDz.put(linkId, DbmDz);
 						relevantLinkIds2Ds.put(linkId, Ds);
 						relevantLinkIds2angleImmissionCorrection.put(linkId, angleImmissionCorrection);
+
 					}
 				}
 			}
@@ -761,10 +917,67 @@ public class SpatialInfo {
 			receiverPointId2RelevantLinkIds2Ds.put(pointId,relevantLinkIds2Ds);
 			receiverPointId2RelevantLinkIds2AngleImmissionCorrection.put(pointId,relevantLinkIds2angleImmissionCorrection);
 		}
+		
 		if (NoiseConfig.getRLSMethod().equals("parts")){
-			getDistancesToPartsOfLink(scenario,receiverPointId2RelevantLinkIds2Distances);
+			getCorrectionTermsForPartsOfLink(scenario,receiverPointId2RelevantLinkIds2Distances);
 		} else {
 			// no additional computation
+		}
+	}
+	
+	public void setListLinksWithOppositeLink() {
+		for(Id linkId : scenario.getNetwork().getLinks().keySet()) {
+			Coord fromCoord = scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord();
+			Coord toCoord = scenario.getNetwork().getLinks().get(linkId).getToNode().getCoord();
+			
+			Tuple<Integer,Integer> tupleOfPointCoords = getZoneTupleForLinks(fromCoord);
+			
+			List<Id> potentialLinks = new ArrayList<Id>();
+			if(zoneTuple2listOfLinkIds.containsKey(tupleOfPointCoords)) {
+				potentialLinks.addAll(zoneTuple2listOfLinkIds.get(tupleOfPointCoords));
+			}
+			int x = tupleOfPointCoords.getFirst();
+			int y = tupleOfPointCoords.getSecond();
+			Tuple<Integer,Integer> TupleNW = new Tuple<Integer, Integer>(x-1, y-1);
+			if(zoneTuple2listOfLinkIds.containsKey(TupleNW)) {
+				potentialLinks.addAll(zoneTuple2listOfLinkIds.get(TupleNW));
+			}
+			Tuple<Integer,Integer> TupleN = new Tuple<Integer, Integer>(x, y-1);
+			if(zoneTuple2listOfLinkIds.containsKey(TupleN)) {
+				potentialLinks.addAll(zoneTuple2listOfLinkIds.get(TupleN));
+			}
+			Tuple<Integer,Integer> TupleNO = new Tuple<Integer, Integer>(x+1, y-1);
+			if(zoneTuple2listOfLinkIds.containsKey(TupleNO)) {
+				potentialLinks.addAll(zoneTuple2listOfLinkIds.get(TupleNO));
+			}
+			Tuple<Integer,Integer> TupleW = new Tuple<Integer, Integer>(x-1, y);
+			if(zoneTuple2listOfLinkIds.containsKey(TupleW)) {
+				potentialLinks.addAll(zoneTuple2listOfLinkIds.get(TupleW));
+			}
+			Tuple<Integer,Integer> TupleO = new Tuple<Integer, Integer>(x+1, y);
+			if(zoneTuple2listOfLinkIds.containsKey(TupleO)) {
+				potentialLinks.addAll(zoneTuple2listOfLinkIds.get(TupleO));
+			}
+			Tuple<Integer,Integer> TupleSW = new Tuple<Integer, Integer>(x-1, y+1);
+			if(zoneTuple2listOfLinkIds.containsKey(TupleSW)) {
+				potentialLinks.addAll(zoneTuple2listOfLinkIds.get(TupleSW));
+			}
+			Tuple<Integer,Integer> TupleS = new Tuple<Integer, Integer>(x, y+1);
+			if(zoneTuple2listOfLinkIds.containsKey(TupleS)) {
+				potentialLinks.addAll(zoneTuple2listOfLinkIds.get(TupleS));
+			}
+			Tuple<Integer,Integer> TupleSO = new Tuple<Integer, Integer>(x+1, y+1);
+			if(zoneTuple2listOfLinkIds.containsKey(TupleSO)) {
+				potentialLinks.addAll(zoneTuple2listOfLinkIds.get(TupleSO));
+			}
+			
+			for(Id possibleOppositeLinkId : potentialLinks) {
+				Coord fromCoord2 = scenario.getNetwork().getLinks().get(possibleOppositeLinkId).getFromNode().getCoord();
+				Coord toCoord2 = scenario.getNetwork().getLinks().get(possibleOppositeLinkId).getToNode().getCoord();
+				if((fromCoord == toCoord2)&&(toCoord==fromCoord2)) {
+					ListOfLinksWithOppositeLink.add(linkId);
+				}
+			}
 		}
 	}
 	
@@ -783,31 +996,74 @@ public class SpatialInfo {
 			Dreflection = 3.2;
 		}
 		
+		Dreflection = Dreflection*1.5;
+		
+		// For the consideration of the singualar-reflection-effects,
+		// in dependence of the streetWdith, the height of the buildings
+		// and the structure (in particular the gaps between the buildings),
+		// and also the distance to the emission-source
+		// an additional effect of 0-3 dB(A) ispossible,
+		// effectively much smaller than 3 dB(A).
+		// Therefore the reflection-effect calculated for the multiple reflection effects is multiplied by 1.5
+		
+		// Potential absorbing properties of the buildings are not considered here
+		
 		return Dreflection;
 	}
 	
-	public double calculateDbmDz (double distanceToRoad , Coord coord) {
+	public double calculateDbmDz (double distanceToRoad , Coord coord, Id coordId, Id linkId, String direction) {
 		double DbmDz = 0.;
 		if(distanceToRoad==0.) {
 			distanceToRoad = 0.00000001;
 			// dividing by zero is not possible
 		}
-		
+
 		double densityValue = 0.;
-		
 		if(activityCoords2densityValue.containsKey(coord)) {
 			densityValue = activityCoords2densityValue.get(coord);
 		}
+//		double averagedHeight = 1. + ((densityValue*0.1)*(Math.random()*2.));
+		double averagedHeight = 4.; // For the noise immission calculation the receiver points shall be set in a height of 4 metres.
+		double s = Math.sqrt((Math.pow(distanceToRoad, 2))+(Math.pow(averagedHeight, 2)));
+		//Kw between (0.95 and 1.0 for high and low densities, approximated)
+		double Kw = 1.0 - (0.05*(densityValue/100.));
+		double z = 0.;
+		// structure of buildings is necessary to calculate		}
+//		if(distanceToRoad<=20.) {
+//			z = 0.;
+//		} else if (distanceToRoad<=119.) {
+//			z = ((Math.log10(distanceToRoad-19.))/2.) * (((Math.sqrt(densityValue))*10.)/100.) * 40.;
+//		} else {
+//			z = ((Math.log10(100.))/2.) * (((Math.sqrt(densityValue))*10.)/100.) * 40.;
+//		}
+		double additionalValue = receiverPointId2RelevantLinkIds2AdditionalValue.get(coordId).get(linkId); 
+		
+		if(distanceToRoad<=(30.+additionalValue)) {
+			z = 0.;
+		} else if (distanceToRoad<=(129.+additionalValue)) {
+//			z = (Math.sqrt(Math.random())) * ((Math.log10(distanceToRoad-(29.+additionalValue)))/2.) * (((Math.sqrt(densityValue))*10.)/100.) * 40.;
+			z = ((Math.log10(distanceToRoad-(29.+additionalValue)))/2.) * (((Math.sqrt(densityValue))*10.)/100.) * 40.;
+		} else {
+//			z = (Math.sqrt(Math.random())) * ((Math.random() * ((Math.log10(100.))/2.) * (((Math.sqrt(densityValue))*10.)/100.) * 40.));
+			z = ((Math.log10(100.))/2.) * (((Math.sqrt(densityValue))*10.)/100.) * 40.;
+		}
 		
 		// D_BM is relevant if there are no buildings which provoke shielding effects
-		// The height is chosen to be dependent from the activity locations density
 //		double Dbm = -4.8* Math.exp((-1)*(Math.pow((10*(densityValue*0.01)/distanceToRoad)*(8.5+(100/distanceToRoad)),1.3)));
-		double Dbm = -4.8* Math.exp((-1)*(Math.pow((((2+(densityValue*0.1)/distanceToRoad)*(8.5+(100/distanceToRoad)))),1.3)));
-		
+//		double Dbm = -4.8* Math.exp((-1)*(Math.pow(((2+(densityValue*0.1)/distanceToRoad)*(8.5+(100/distanceToRoad))),1.3)));
+		double Dbm = -4.8* Math.exp((-1)*(Math.pow((((2+(averagedHeight))/distanceToRoad)*(8.5+(100./distanceToRoad))),1.3)));
+//		log.info("");log.info("++++++++++++++");
+//		log.info("Dbm: "+Dbm);
 		double Dz = 0.;
-		double z = (distanceToRoad/3)*(densityValue*0.01)/100;
-		z = z - 1./30.;
-		Dz = -10*Math.log10(3+60*z);
+		double z2 = (distanceToRoad/3)*(densityValue*0.01)/100;
+//		z = z - 1./30.;
+//		Dz = -10*Math.log10(3+(60*z));
+		
+		if(distanceToRoad<=(30.+additionalValue)) {
+			Dz = 0.;
+		} else {
+			Dz = -7 * Math.log10(5+(((70+(0.25*s))/(1+(0.2*z)))*z*Kw));
+		}
 		
 		if((Math.abs(Dbm))>(Math.abs(Dz))) {
 			DbmDz = Dbm;
@@ -921,24 +1177,27 @@ public class SpatialInfo {
 		} else {
 			angle = Math.abs(angle1 - angle2);
 		}
-		
 		immissionCorrection = 10*Math.log10((angle)/(180));
-		
 		return immissionCorrection;
 	}
 	
-	public Map<Id, Map<Id, Map<Integer, Double>>> getDistancesToPartsOfLink (Scenario scenario , Map<Id, Map<Id,Double>> receiverpointId2RelevantlinkIds2Distances) {
+	public void getCorrectionTermsForPartsOfLink (Scenario scenario , Map<Id, Map<Id,Double>> receiverpointId2RelevantlinkIds2Distances) {
 		
 		for(Id pointId : receiverPointId2RelevantLinkIds2Distances.keySet()) {
 		
 			Map<Id,Map<Integer,Double>> relevantLinkIds2partOfLinks2distance = new HashMap<Id, Map<Integer,Double>>();
 			Map<Id,Double> relevantLinkIds2lengthOfPartOfLinks = new HashMap<Id, Double>();
+			Map<Id,Map<Integer,Double>> relevantLinkIds2PartOfLinks2DreflParts = new HashMap<Id, Map<Integer,Double>>();
+			Map<Id,Map<Integer,Double>> relevantLinkIds2PartOfLinks2DbmDzParts = new HashMap<Id, Map<Integer,Double>>();
+			Map<Id,Map<Integer,Double>> relevantLinkIds2PartOfLinks2DsParts = new HashMap<Id, Map<Integer,Double>>();
+			Map<Id,Map<Integer,Double>> relevantLinkIds2PartOfLinks2DlParts = new HashMap<Id, Map<Integer,Double>>();
 			
 			for(Id linkId : receiverPointId2RelevantLinkIds2Distances.get(pointId).keySet()) {
 				
-				double shortestDistance = receiverPointId2RelevantLinkIds2Distances.get(pointId).get(linkId);
+//				double shortestDistance = receiverPointId2RelevantLinkIds2Distances.get(pointId).get(linkId);
 				double geoLinkLength = Math.sqrt((Math.pow(scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getX() - scenario.getNetwork().getLinks().get(linkId).getToNode().getCoord().getX(), 2))+(Math.pow(scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getY() - scenario.getNetwork().getLinks().get(linkId).getToNode().getCoord().getY(), 2))); 
-				double maxPartLinkLength = shortestDistance/4;
+//				double maxPartLinkLength = shortestDistance/4;
+				double maxPartLinkLength = 5.;
 				
 				int numberOfParts = (int) (geoLinkLength/maxPartLinkLength);
 				numberOfParts = numberOfParts + 1;
@@ -959,6 +1218,10 @@ public class SpatialInfo {
 				double yValue = receiverPointId2Coord.get(pointId).getY();
 				
 				Map<Integer,Double> partOfLink2distance = new HashMap<Integer, Double>();
+				Map<Integer,Double> partOfLinks2DreflParts = new HashMap<Integer, Double>();
+				Map<Integer,Double> partOfLinks2DbmDzParts = new HashMap<Integer, Double>();
+				Map<Integer,Double> partOfLinks2DsParts = new HashMap<Integer, Double>();
+				Map<Integer,Double> partOfLinks2DlParts = new HashMap<Integer, Double>();
 				
 				for(int i = 0 ; i < numberOfParts ; i++) {
 					double relevantX = fromCoordX + (i+0.5)*vectorX;
@@ -967,13 +1230,123 @@ public class SpatialInfo {
 					double distance = Math.sqrt((Math.pow(xValue - relevantX, 2))+(Math.pow(yValue - relevantY, 2)));
 				
 					partOfLink2distance.put(i, distance);
+					
+					//+++++++++++++++++++++++++++++++++++++
+					//calculate partOfLinks2DreflParts
+					
+					double Dreflection = 0.;	
+					double densityValue = 0.;
+					if(activityCoords2densityValue.containsKey(receiverPointId2Coord.get(pointId))) {
+						densityValue = activityCoords2densityValue.get(receiverPointId2Coord.get(pointId));
+					}
+					
+					double streetWidth = linkId2streetWidth.get(linkId);
+					
+					Dreflection = densityValue/streetWidth;
+					
+					if(Dreflection>3.2) {
+						Dreflection = 3.2;
+					}
+					
+					Dreflection = Dreflection*1.5;
+					
+					// For the consideration of the singualar-reflection-effects,
+					// in dependence of the streetWdith, the height of the buildings
+					// and the structure (in particular the gaps between the buildings),
+					// and also the distance to the emission-source
+					// an additional effect of 0-3 dB(A) ispossible,
+					// effectively much smaller than 3 dB(A).
+					// Therefore the reflection-effect calculated for the multiple reflection effects is multiplied by 1.5
+					
+					// Potential absorbing properties of the buildings are not considered here
+					
+					partOfLinks2DreflParts.put(i,Dreflection);
+					
+					//+++++++++++++++++++++++++++++++++++++
+					//calculate partOfLinks2DbmDzParts
+					
+					double Dbm = 0.;
+					
+					Dbm = 4.8 - ((2.25/distance)*(34 + (600/distance)));
+					
+					if(Dbm<0.) {
+						Dbm=0.;
+					}
+					
+					double Dz = 0.;
+					
+					double z = 0.;
+					
+					if(distance<=(30.+receiverPointId2RelevantLinkIds2AdditionalValue.get(pointId).get(linkId))) {
+//						log.info("111");
+						z = 0.;
+					} else if (distance<=(130.+receiverPointId2RelevantLinkIds2AdditionalValue.get(pointId).get(linkId))) {
+//						log.info("222");
+//						z = (Math.sqrt(Math.random())) * ((Math.log10(distance-(29.+receiverPointId2RelevantLinkIds2AdditionalValue.get(pointId).get(linkId))))/2.) * (4. + 26.*(activityCoords2densityValue.get(receiverPointId2Coord.get(pointId))/100.));
+						z = ((Math.log10(distance-(29.+receiverPointId2RelevantLinkIds2AdditionalValue.get(pointId).get(linkId))))/2.) * (4. + 26.*(activityCoords2densityValue.get(receiverPointId2Coord.get(pointId))/100.));
+					} else {
+//						log.info("333");
+//						log.info(pointId);
+//						log.info(activityCoords2densityValue);
+//						log.info(activityCoords2densityValue.get(pointId));
+//						z = (Math.sqrt(Math.random())) * (4. + 26.*(activityCoords2densityValue.get(receiverPointId2Coord.get(pointId))/100.));
+						z = (4. + 26.*(activityCoords2densityValue.get(receiverPointId2Coord.get(pointId))/100.));
+					}
+					
+					// for the correct calculation of the height correction
+//					double gamma = 1000.;
+//					if(distanceToRoad>125.) {
+//						gamma = distanceToRoad*8.;
+//					}
+					
+					if(distance<(30.+receiverPointId2RelevantLinkIds2AdditionalValue.get(pointId).get(linkId))) {
+						Dz = 0.;
+					} else {
+						Dz = 10*(Math.log10(3+(60*z)));
+					}
+					
+					double DbmDz = 0.;
+					
+					if((Math.abs(Dbm))>(Math.abs(Dz))) {
+						DbmDz = Dbm;
+					} else {
+						DbmDz = Dz;
+					}
+					
+					partOfLinks2DbmDzParts.put(i, DbmDz);
+					
+					//+++++++++++++++++++++++++++++++++++++
+					//calculate partOfLinks2DsParts
+					
+					double Ds = 0.;
+					
+					Ds = (20*Math.log10(distance)) + (distance/200.) - 11.2;
+					
+					partOfLinks2DsParts.put(i,Ds);
+					
+					//+++++++++++++++++++++++++++++++++++++
+					//calculate partOfLinks2DlParts
+					
+					double Dl = 0.;
+					
+					Dl = 10*(Math.log10(lengthOfParts));
+					
+					partOfLinks2DlParts.put(i,Dl);
 				}
 				relevantLinkIds2partOfLinks2distance.put(linkId, partOfLink2distance);
+				relevantLinkIds2PartOfLinks2DreflParts.put(linkId,partOfLinks2DreflParts);
+				relevantLinkIds2PartOfLinks2DbmDzParts.put(linkId,partOfLinks2DbmDzParts);
+				relevantLinkIds2PartOfLinks2DsParts.put(linkId,partOfLinks2DsParts);
+				relevantLinkIds2PartOfLinks2DlParts.put(linkId,partOfLinks2DlParts);
 			}		
+			receiverPointId2RelevantLinkIds2PartOfLinks2DreflParts.put(pointId, relevantLinkIds2PartOfLinks2DreflParts);
+			receiverPointId2RelevantLinkIds2PartOfLinks2DbmDzParts.put(pointId, relevantLinkIds2PartOfLinks2DbmDzParts);
+			receiverPointId2RelevantLinkIds2PartOfLinks2DsParts.put(pointId, relevantLinkIds2PartOfLinks2DsParts);
+			receiverPointId2RelevantLinkIds2PartOfLinks2DlParts.put(pointId, relevantLinkIds2PartOfLinks2DlParts);
 			receiverPointId2RelevantLinkIds2partOfLinks2distance.put(pointId, relevantLinkIds2partOfLinks2distance);
 			receiverPoint2RelevantlinkIds2lengthOfPartOfLinks.put(pointId, relevantLinkIds2lengthOfPartOfLinks);
+
 		}
-		return receiverPointId2RelevantLinkIds2partOfLinks2distance;
 	}
 	
 	public Tuple<Integer,Integer> getZoneTuple(Coord coord) {
@@ -988,9 +1361,22 @@ public class SpatialInfo {
 		return zoneDefinition;
 	}
 	
+	public Tuple<Integer,Integer> getZoneTupleDensityZones(Coord coord) {
+		
+		double xCoord = coord.getX();
+		double yCoord = coord.getY();
+		
+		int xDirection = (int) ((xCoord-xCoordMin)/(400./1.));	
+		int yDirection = (int) ((yCoordMax-yCoord)/(400./1.));
+		
+		Tuple<Integer,Integer> zoneDefinition = new Tuple<Integer, Integer>(xDirection, yDirection);
+		
+		return zoneDefinition;
+	}
+	
 	public Id getNearestReceiverPoint (Coord coord) {
 		Id nearestReceiverPointId = null;
-//		
+
 		double xCoord = coord.getX();
 		double yCoord = coord.getY();
 		double distance = Double.MAX_VALUE;
@@ -1042,25 +1428,7 @@ public class SpatialInfo {
 			} else {
 			}
 		}
-		
-		// The following version is previous/older version
-		// The distance to all receiver points is compared
-		// Much more computational time (the factor is depending on the scenario)
-//		for(Id receiverPointId : receiverPointId2Coord.keySet()) {
-//			double xValue = receiverPointId2Coord.get(receiverPointId).getX();
-//			double yValue = receiverPointId2Coord.get(receiverPointId).getY();
-//			
-//			double a = xCoord - xValue;
-//			double b = yCoord - yValue;
-//			
-//			double distanceTmp = Math.sqrt((Math.pow(a, 2))+(Math.pow(b, 2)));
-//			if(distanceTmp < distance) {
-//				// update the nearest receiver point
-//				distance = distanceTmp;
-//				nearestReceiverPointId = receiverPointId;
-//			} else {
-//			}
-//		}
+
 		return nearestReceiverPointId;
 	}
 
@@ -1103,6 +1471,10 @@ public class SpatialInfo {
 	public Map<Coord, Double> getActivityCoords2densityValue() {
 		return activityCoords2densityValue;
 	}
+	
+	public Map<Id,Map<Id,Double>> getReceiverPointId2RelevantLinkIds2AdditionalValue() {
+		return receiverPointId2RelevantLinkIds2AdditionalValue;
+	}
 
 	public Map<Id, Double> getLinkId2streetWidth() {
 		return linkId2streetWidth;
@@ -1132,12 +1504,28 @@ public class SpatialInfo {
 		return receiverPointId2RelevantLinkIds2Drefl;
 	}
 	
+	public Map<Id, Map<Id, Map<Integer,Double>>> getReceiverPointId2RelevantLinkIds2PartOfLinks2DreflParts() {
+		return receiverPointId2RelevantLinkIds2PartOfLinks2DreflParts;
+	}
+	
 	public Map<Id, Map<Id, Double>> getReceiverPointId2RelevantLinkIds2DbmDz() {
 		return receiverPointId2RelevantLinkIds2DbmDz;
 	}
 	
+	public Map<Id, Map<Id, Map<Integer,Double>>> getReceiverPointId2RelevantLinkIds2PartOfLinks2DbmDzParts() {
+		return receiverPointId2RelevantLinkIds2PartOfLinks2DbmDzParts;
+	}
+	
 	public Map<Id, Map<Id, Double>> getReceiverPointId2RelevantLinkIds2Ds() {
 		return receiverPointId2RelevantLinkIds2Ds;
+	}
+	
+	public Map<Id, Map<Id, Map<Integer,Double>>> getReceiverPointId2RelevantLinkIds2PartOfLinks2DsParts() {
+		return receiverPointId2RelevantLinkIds2PartOfLinks2DsParts;
+	}
+	
+	public Map<Id, Map<Id, Map<Integer,Double>>> getReceiverPointId2RelevantLinkIds2PartOfLinks2DlParts() {
+		return receiverPointId2RelevantLinkIds2PartOfLinks2DlParts;
 	}
 	
 	public Map<Id, Map<Id, Double>> getReceiverPointId2RelevantLinkIds2AngleImmissionCorrection() {

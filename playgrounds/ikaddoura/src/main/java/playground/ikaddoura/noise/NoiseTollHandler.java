@@ -102,9 +102,9 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 	
 	private Map<Id,Map<Double,Map<Id,Double>>> receiverPointIds2timeIntervals2noiseLinks2costShare = new HashMap<Id, Map<Double,Map<Id,Double>>>();
 	
-	private List<LinkLeaveEvent> linkLeaveEvents = new ArrayList<LinkLeaveEvent>();
-	private List<LinkLeaveEvent> linkLeaveEventsCar = new ArrayList<LinkLeaveEvent>();
-	private List<LinkLeaveEvent> linkLeaveEventsHdv = new ArrayList<LinkLeaveEvent>();
+	private List<LinkEnterEvent> linkLeaveEvents = new ArrayList<LinkEnterEvent>();
+	private List<LinkEnterEvent> linkLeaveEventsCar = new ArrayList<LinkEnterEvent>();
+	private List<LinkEnterEvent> linkLeaveEventsHdv = new ArrayList<LinkEnterEvent>();
 	
 	private Map<Id,Map<Id,Map<Integer,Tuple<Double,Double>>>> receiverPointId2personId2actNumber2activityStartAndActivityEnd = new HashMap<Id,Map<Id,Map<Integer,Tuple<Double,Double>>>>();
 	private Map<Id,Map<Integer,Map<Id,Tuple<Double, Double>>>> personId2actNumber2receiverPointId2activityStartAndActivityEnd = new HashMap<Id,Map<Integer,Map<Id,Tuple<Double, Double>>>>();
@@ -115,22 +115,29 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 	private Map<Id,List<Id>> receiverPointId2ListOfHomeAgents = new HashMap<Id, List<Id>>();
 	
 	private Map<Id,Map<Double,Double>> receiverPointId2timeInterval2damageCost = new HashMap<Id, Map<Double,Double>>();
+	private Map<Id,Map<Double,Double>> receiverPointId2timeInterval2damageCostAgentBased = new HashMap<Id, Map<Double,Double>>();
 	private Map<Id,Map<Double,Double>> receiverPointId2timeInterval2damageCostPerAffectedAgentUnit = new HashMap<Id, Map<Double,Double>>();
 	private Map<Id,Map<Double,Double>> linkId2timeInterval2noiseEmission = new HashMap<Id, Map<Double,Double>>();
 	private Map<Id,Map<Double,Double>> receiverPointId2timeInterval2noiseImmission = new HashMap<Id, Map<Double,Double>>();
 	private Map<Id,Map<Double,Map<Id,Double>>> receiverPointIds2timeIntervals2noiseLinks2isolatedImmission = new HashMap<Id, Map<Double,Map<Id,Double>>>();
 	
+	private List<Id> tunnelLinks = new ArrayList<Id>();
 	private List<Id> hdvVehicles = new ArrayList<Id>();
-	private Map<Id,List<LinkLeaveEvent>> linkId2linkLeaveEvents = new HashMap<Id, List<LinkLeaveEvent>>();
-	private Map<Id,List<LinkLeaveEvent>> linkId2linkLeaveEventsCar = new HashMap<Id, List<LinkLeaveEvent>>();
-	private Map<Id,List<LinkLeaveEvent>> linkId2linkLeaveEventsHdv = new HashMap<Id, List<LinkLeaveEvent>>();
-	private Map<Id, Map<Double,List<LinkLeaveEvent>>> linkId2timeInterval2linkLeaveEvents = new HashMap<Id, Map<Double,List<LinkLeaveEvent>>>();
-	private Map<Id, Map<Double,List<LinkLeaveEvent>>> linkId2timeInterval2linkLeaveEventsCar = new HashMap<Id, Map<Double,List<LinkLeaveEvent>>>();
-	private Map<Id, Map<Double,List<LinkLeaveEvent>>> linkId2timeInterval2linkLeaveEventsHdv = new HashMap<Id, Map<Double,List<LinkLeaveEvent>>>();
+	private Map<Id,List<LinkEnterEvent>> linkId2linkLeaveEvents = new HashMap<Id, List<LinkEnterEvent>>();
+	private Map<Id,List<LinkEnterEvent>> linkId2linkLeaveEventsCar = new HashMap<Id, List<LinkEnterEvent>>();
+	private Map<Id,List<LinkEnterEvent>> linkId2linkLeaveEventsHdv = new HashMap<Id, List<LinkEnterEvent>>();
+	private Map<Id, Map<Double,List<LinkEnterEvent>>> linkId2timeInterval2linkLeaveEvents = new HashMap<Id, Map<Double,List<LinkEnterEvent>>>();
+	private Map<Id, Map<Double,List<LinkEnterEvent>>> linkId2timeInterval2linkLeaveEventsCar = new HashMap<Id, Map<Double,List<LinkEnterEvent>>>();
+	private Map<Id, Map<Double,List<LinkEnterEvent>>> linkId2timeInterval2linkLeaveEventsHdv = new HashMap<Id, Map<Double,List<LinkEnterEvent>>>();
+	
+	Map<Double,Integer> interval2departures = new HashMap<Double, Integer>();
 	
 	private double totalToll = 0.;
 	private double totalTollAffected = 0.;
 	private double totalTollAffectedAgentBasedCalculation = 0.;
+	private double totalTollAffectedAgentBasedCalculationControl = 0.;
+	
+	Map<Id,Map<Id,Map<Double,Double>>> personId2receiverPointId2timeInterval2costs = new HashMap<Id, Map<Id,Map<Double,Double>>>();
 	
 	private Map<Integer,Double> iteration2tollSum = new HashMap<Integer, Double>();
 	private Map<Integer,Double> iteration2tollSumCar = new HashMap<Integer, Double>();
@@ -142,6 +149,8 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 	private double annualCostRate;
 	
 	private double vtts_car;
+	
+	double nGesamt = 0.;
 	
 	public NoiseTollHandler (Scenario scenario , EventsManager events, SpatialInfo spatialInfo, double annualCostRate) {
 		this.scenario = scenario;
@@ -210,6 +219,7 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 		personId2actualActNumber.clear();
 		receiverPointId2timeInterval2affectedAgentUnits.clear();
 		receiverPointId2timeInterval2damageCost.clear();
+		receiverPointId2timeInterval2damageCostAgentBased.clear();
 		receiverPointId2timeInterval2damageCostPerAffectedAgentUnit.clear();
 		linkId2timeInterval2noiseEmission.clear();
 		receiverPointId2timeInterval2noiseImmission.clear();
@@ -225,12 +235,68 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 		linkId2timeInterval2linkLeaveEventsCar.clear();
 		linkId2timeInterval2linkLeaveEventsHdv.clear();
 
+		personId2receiverPointId2timeInterval2costs.clear();
+		
 		log.info("totalTollAffectedAgentBasedCalculation: "+totalTollAffectedAgentBasedCalculation);
 		totalTollAffectedAgentBasedCalculation = 0.;
+		log.info("totalTollAffectedAgentBasedCalculationControl: "+totalTollAffectedAgentBasedCalculationControl);
+		totalTollAffectedAgentBasedCalculationControl = 0.;
 		log.info("totalToll in previous iteration: "+totalToll);
 		totalToll = 0.;
 		log.info("totalTollAffected in previous iteration: "+totalTollAffected);
 		totalTollAffected = 0.;
+	}
+	
+	public void setTunnelLinks() {
+		for(Id linkId : scenario.getNetwork().getLinks().keySet()) {
+			String linkIdString = scenario.getNetwork().getLinks().get(linkId).toString();
+			if(
+					(StringUtils.endsWithIgnoreCase(linkIdString, "test"))
+//					(StringUtils.endsWithIgnoreCase(linkIdString, "tunnelLink")) ||
+//					(StringUtils.endsWithIgnoreCase(linkIdString, "1"))
+			) {
+						tunnelLinks.add(linkId);
+			} else {
+				// do nothing: no tunnel link
+			}
+		}
+	}
+	
+	public void setRailLinks() {
+		// Railroad tracks and especially subays/undergrounds shpuld be excluded from the noise calculation
+		// A list of the Ids should be saved
+		// When setting the relevant linkIds for the receiver-points, the Ids from the list can be excluded then,
+		// This can be done by a query of the allowed modes of the links
+		// The bus vehicles should be considered for the calculation of the noise emissions from links,
+		// for trams it is not so clear
+		// The non-paid part of the noise costs, caused by pt-vehicles should be calculated later on
+		
+		for(Id linkId : scenario.getNetwork().getLinks().keySet()) {
+			String linkIdString = scenario.getNetwork().getLinks().get(linkId).toString();
+			if(
+					(StringUtils.endsWithIgnoreCase(linkIdString, "test"))
+//					(StringUtils.endsWithIgnoreCase(linkIdString, "railLink")) ||
+//					(StringUtils.endsWithIgnoreCase(linkIdString, "1"))
+			) {
+						tunnelLinks.add(linkId);
+			} else {
+				// do nothing: no tunnel link
+			}
+		}
+	}
+	
+	public void setNoiseBarrierLinks() {
+		// TODO: not implemented yet,
+		// but if tunnels are considered, it would make sense, too.
+		//
+		// A double calculation of barrier effects (buildings and barriers should be 
+		//
+		// The definition of links with noise-barriers can be set here
+		// In a map, the links may be saved with the information of the height of the noise barrier
+		// Map<Id,Double> linkId2noiseBarrierHeight
+		// The resulting noise barrier effect depends then on the height of the receiver point and the height of the noise barrier
+		// dependent from the density of activity-locations
+		// but also from the difference to the link (and by this to the already given shielding term due to the existence of other buildings
 	}
 	
 	public void setHdvVehicles() {
@@ -269,21 +335,17 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 	
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-	}
-	
-	@Override
-	public void handleEvent(LinkLeaveEvent event) {
 		if(!(scenario.getPopulation().getPersons().containsKey(event.getVehicleId()))) {
 		} else {
 		
 		if(hdvVehicles.contains(event.getVehicleId())) {
 			// hdv vehicle
 			if (linkId2linkLeaveEventsHdv.containsKey(event.getLinkId())) {
-				List<LinkLeaveEvent> listTmp = linkId2linkLeaveEventsHdv.get(event.getLinkId());
+				List<LinkEnterEvent> listTmp = linkId2linkLeaveEventsHdv.get(event.getLinkId());
 				listTmp.add(event);
 				linkId2linkLeaveEventsHdv.put(event.getLinkId(), listTmp);
 			} else {
-				List<LinkLeaveEvent> listTmp = new ArrayList<LinkLeaveEvent>();
+				List<LinkEnterEvent> listTmp = new ArrayList<LinkEnterEvent>();
 				listTmp.add(event);
 				linkId2linkLeaveEventsHdv.put(event.getLinkId(), listTmp);
 			}
@@ -291,11 +353,11 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 		} else {
 			// car
 			if (linkId2linkLeaveEventsCar.containsKey(event.getLinkId())) {
-				List<LinkLeaveEvent> listTmp = linkId2linkLeaveEventsCar.get(event.getLinkId());
+				List<LinkEnterEvent> listTmp = linkId2linkLeaveEventsCar.get(event.getLinkId());
 				listTmp.add(event);
 				linkId2linkLeaveEventsCar.put(event.getLinkId(), listTmp);
 			} else {
-				List<LinkLeaveEvent> listTmp = new ArrayList<LinkLeaveEvent>();
+				List<LinkEnterEvent> listTmp = new ArrayList<LinkEnterEvent>();
 				listTmp.add(event);
 				linkId2linkLeaveEventsCar.put(event.getLinkId(), listTmp);
 			}
@@ -303,16 +365,64 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 		}
 		
 		if (linkId2linkLeaveEvents.containsKey(event.getLinkId())) {
-			List<LinkLeaveEvent> listTmp = linkId2linkLeaveEvents.get(event.getLinkId());
+			List<LinkEnterEvent> listTmp = linkId2linkLeaveEvents.get(event.getLinkId());
 			listTmp.add(event);
 			linkId2linkLeaveEvents.put(event.getLinkId(), listTmp);
 		} else {
-			List<LinkLeaveEvent> listTmp = new ArrayList<LinkLeaveEvent>();
+			List<LinkEnterEvent> listTmp = new ArrayList<LinkEnterEvent>();
 			listTmp.add(event);
 			linkId2linkLeaveEvents.put(event.getLinkId(), listTmp);
 		}
 		linkLeaveEvents.add(event);
 		}
+	}
+	
+	@Override
+	public void handleEvent(LinkLeaveEvent event) {
+		
+		// Instead of the linkLeave-based implementation,
+		// the linkEnterEvents are used now
+		
+//		if(!(scenario.getPopulation().getPersons().containsKey(event.getVehicleId()))) {
+//		} else {
+//		
+//		if(hdvVehicles.contains(event.getVehicleId())) {
+//			// hdv vehicle
+//			if (linkId2linkLeaveEventsHdv.containsKey(event.getLinkId())) {
+//				List<LinkLeaveEvent> listTmp = linkId2linkLeaveEventsHdv.get(event.getLinkId());
+//				listTmp.add(event);
+//				linkId2linkLeaveEventsHdv.put(event.getLinkId(), listTmp);
+//			} else {
+//				List<LinkLeaveEvent> listTmp = new ArrayList<LinkLeaveEvent>();
+//				listTmp.add(event);
+//				linkId2linkLeaveEventsHdv.put(event.getLinkId(), listTmp);
+//			}
+//			linkLeaveEventsHdv.add(event);
+//		} else {
+//			// car
+//			if (linkId2linkLeaveEventsCar.containsKey(event.getLinkId())) {
+//				List<LinkLeaveEvent> listTmp = linkId2linkLeaveEventsCar.get(event.getLinkId());
+//				listTmp.add(event);
+//				linkId2linkLeaveEventsCar.put(event.getLinkId(), listTmp);
+//			} else {
+//				List<LinkLeaveEvent> listTmp = new ArrayList<LinkLeaveEvent>();
+//				listTmp.add(event);
+//				linkId2linkLeaveEventsCar.put(event.getLinkId(), listTmp);
+//			}
+//			linkLeaveEventsCar.add(event);
+//		}
+//		
+//		if (linkId2linkLeaveEvents.containsKey(event.getLinkId())) {
+//			List<LinkLeaveEvent> listTmp = linkId2linkLeaveEvents.get(event.getLinkId());
+//			listTmp.add(event);
+//			linkId2linkLeaveEvents.put(event.getLinkId(), listTmp);
+//		} else {
+//			List<LinkLeaveEvent> listTmp = new ArrayList<LinkLeaveEvent>();
+//			listTmp.add(event);
+//			linkId2linkLeaveEvents.put(event.getLinkId(), listTmp);
+//		}
+//		linkLeaveEvents.add(event);
+//		}
 	}
 	
 	@Override
@@ -378,6 +488,14 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 	public void handleEvent(ActivityEndEvent event) {
 		if(!(scenario.getPopulation().getPersons().containsKey(event.getPersonId()))) {
 		} else {
+			
+			double interval = ((((int) (event.getTime()/3600.))*3600.)+3600.);
+			int newValue = 1;
+			if(interval2departures.containsKey(interval)) {
+				int valueBefore = interval2departures.get(interval);
+				newValue = valueBefore + 1;
+			}
+			interval2departures.put(interval, newValue);
 			
 		if(!event.getActType().toString().equals("pt_interaction")) {
 			Id personId = event.getPersonId();
@@ -484,20 +602,20 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 		
 		// initializing the maps
 		for(Id linkId : scenario.getNetwork().getLinks().keySet()) {
-			Map<Double,List<LinkLeaveEvent>> timeInterval2linkLeaveEvents = new HashMap<Double, List<LinkLeaveEvent>>();
-			Map<Double,List<LinkLeaveEvent>> timeInterval2linkLeaveEventsCar = new HashMap<Double, List<LinkLeaveEvent>>();
-			Map<Double,List<LinkLeaveEvent>> timeInterval2linkLeaveEventsHdv = new HashMap<Double, List<LinkLeaveEvent>>();
+			Map<Double,List<LinkEnterEvent>> timeInterval2linkLeaveEvents = new HashMap<Double, List<LinkEnterEvent>>();
+			Map<Double,List<LinkEnterEvent>> timeInterval2linkLeaveEventsCar = new HashMap<Double, List<LinkEnterEvent>>();
+			Map<Double,List<LinkEnterEvent>> timeInterval2linkLeaveEventsHdv = new HashMap<Double, List<LinkEnterEvent>>();
 			for(double timeInterval = NoiseConfig.getIntervalLength() ; timeInterval<=30*3600 ; timeInterval = timeInterval + NoiseConfig.getIntervalLength()) {
-				List<LinkLeaveEvent> listLinkLeaveEvents = new ArrayList<LinkLeaveEvent>();
-				List<LinkLeaveEvent> listLinkLeaveEventsCar = new ArrayList<LinkLeaveEvent>();
-				List<LinkLeaveEvent> listLinkLeaveEventsHdv = new ArrayList<LinkLeaveEvent>();
+				List<LinkEnterEvent> listLinkLeaveEvents = new ArrayList<LinkEnterEvent>();
+				List<LinkEnterEvent> listLinkLeaveEventsCar = new ArrayList<LinkEnterEvent>();
+				List<LinkEnterEvent> listLinkLeaveEventsHdv = new ArrayList<LinkEnterEvent>();
 				timeInterval2linkLeaveEvents.put(timeInterval, listLinkLeaveEvents);
 				timeInterval2linkLeaveEventsCar.put(timeInterval, listLinkLeaveEventsCar);
 				timeInterval2linkLeaveEventsHdv.put(timeInterval, listLinkLeaveEventsHdv);
 			}
 			// sort the linkLeaveEvents by linkIds and timeIntervals
 			if(linkId2linkLeaveEvents.containsKey(linkId)) {
-				for(LinkLeaveEvent linkLeaveEvent : linkId2linkLeaveEvents.get(linkId)) {
+				for(LinkEnterEvent linkLeaveEvent : linkId2linkLeaveEvents.get(linkId)) {
 					double time = linkLeaveEvent.getTime();
 					double timeInterval = 0.;
 					if((time % NoiseConfig.getIntervalLength()) == 0) {
@@ -505,13 +623,13 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 					} else {
 						timeInterval = (((int)(time/NoiseConfig.getIntervalLength()))*NoiseConfig.getIntervalLength()) + NoiseConfig.getIntervalLength();
 					}
-					List<LinkLeaveEvent> linkLeaveEvents = timeInterval2linkLeaveEvents.get(timeInterval);
+					List<LinkEnterEvent> linkLeaveEvents = timeInterval2linkLeaveEvents.get(timeInterval);
 					linkLeaveEvents.add(linkLeaveEvent);
 					timeInterval2linkLeaveEvents.put(timeInterval, linkLeaveEvents);
 				}
 			}
 			if(linkId2linkLeaveEventsCar.containsKey(linkId)) {
-				for(LinkLeaveEvent linkLeaveEventCar : linkId2linkLeaveEventsCar.get(linkId)) {
+				for(LinkEnterEvent linkLeaveEventCar : linkId2linkLeaveEventsCar.get(linkId)) {
 					double time = linkLeaveEventCar.getTime();
 					double timeInterval = 0.;
 					if((time % NoiseConfig.getIntervalLength()) == 0) {
@@ -519,13 +637,13 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 					} else {
 						timeInterval = (((int)(time/NoiseConfig.getIntervalLength()))*NoiseConfig.getIntervalLength()) + NoiseConfig.getIntervalLength();
 					}
-					List<LinkLeaveEvent> linkLeaveEventsCar = timeInterval2linkLeaveEventsCar.get(timeInterval);
+					List<LinkEnterEvent> linkLeaveEventsCar = timeInterval2linkLeaveEventsCar.get(timeInterval);
 					linkLeaveEventsCar.add(linkLeaveEventCar);
 					timeInterval2linkLeaveEventsCar.put(timeInterval, linkLeaveEventsCar);
 				}
 			}
 			if(linkId2linkLeaveEventsHdv.containsKey(linkId)) {
-				for(LinkLeaveEvent linkLeaveEventHdv : linkId2linkLeaveEventsHdv.get(linkId)) {
+				for(LinkEnterEvent linkLeaveEventHdv : linkId2linkLeaveEventsHdv.get(linkId)) {
 					double time = linkLeaveEventHdv.getTime();
 					double timeInterval = 0.;
 					if((time % NoiseConfig.getIntervalLength()) == 0) {
@@ -533,7 +651,7 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 					} else {
 						timeInterval = (((int)(time/NoiseConfig.getIntervalLength()))*NoiseConfig.getIntervalLength()) + NoiseConfig.getIntervalLength();
 					}
-					List<LinkLeaveEvent> linkLeaveEventsHdv = timeInterval2linkLeaveEventsHdv.get(timeInterval);
+					List<LinkEnterEvent> linkLeaveEventsHdv = timeInterval2linkLeaveEventsHdv.get(timeInterval);
 					linkLeaveEventsHdv.add(linkLeaveEventHdv);
 					timeInterval2linkLeaveEventsHdv.put(timeInterval, linkLeaveEventsHdv);
 				}
@@ -565,16 +683,11 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 					N = (int) (N * (NoiseConfig.getScaleFactor()));
 					// correction for intervals unequal to 3600 seconds (= one hour)
 					N = (int) (N * (3600./NoiseConfig.getIntervalLength()));
-//					log.info("N: "+N);
-//					log.info("N_car: "+N_car);
-//					log.info("N_hdv: "+N_hdv);
-//					log.info("p: "+p);
 					noiseEmission = noiseEmissionCalculator.calculateEmissionspegel(N, p, vCar, vHdv);
 				}	
 				timeInterval2NoiseEmission.put(timeInterval, noiseEmission);
 			}
 			linkId2timeInterval2noiseEmission.put(linkId , timeInterval2NoiseEmission);
-//			log.info(linkId2timeInterval2noiseEmission.get(linkId));
 		}
 	}
 
@@ -583,15 +696,31 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 			Map<Double,Map<Id,Double>> timeIntervals2noiseLinks2isolatedImmission = new HashMap<Double, Map<Id,Double>>();
 			for(double timeInterval = NoiseConfig.getIntervalLength() ; timeInterval<=30*3600 ; timeInterval = timeInterval + NoiseConfig.getIntervalLength()) {
 			 	Map<Id,Double> noiseLinks2isolatedImmission = new HashMap<Id, Double>();
-				for(Id linkId : spatialInfo.getReceiverPointId2relevantLinkIds().get(coordId)) {
-					double noiseEmission = linkId2timeInterval2noiseEmission.get(linkId).get(timeInterval);
-					double noiseImmission = 0.;
-					if(!(noiseEmission == 0.)) {
-						noiseImmission = noiseImmissionCalculator.calculateNoiseImmission(scenario , linkId , noiseEmission , spatialInfo.getReceiverPoints().get(coordId));
+//				if(!(spatialInfo.getReceiverPointId2relevantLinkIds().get(coordId)==null)) {
+					for(Id linkId : spatialInfo.getReceiverPointId2relevantLinkIds().get(coordId)) {
+						double noiseEmission = linkId2timeInterval2noiseEmission.get(linkId).get(timeInterval);
+						double noiseImmission = 0.;
+						Coord coord = spatialInfo.getReceiverPoints().get(coordId);
+						if(!(noiseEmission == 0.)) {
+							if(NoiseConfig.getRLSMethod().toString().equals("straights")) {
+								noiseImmission = noiseImmissionCalculator.calculateNoiseImmission(scenario , linkId , noiseEmission , coord);						
+//								log.info("Coords1: "+spatialInfo.getReceiverPoints().get(coordId));
+							} else if(NoiseConfig.getRLSMethod().toString().equals("parts")) {
+								noiseImmission = noiseImmissionCalculator.calculateNoiseImmissionParts(scenario , coordId , linkId , noiseEmission, spatialInfo.getActivityCoords2densityValue().get(coord), spatialInfo.getReceiverPointId2RelevantLinkIds2AdditionalValue().get(coordId).get(linkId));
+							} else {
+								log.warn("unknown RLS-method");
+							}
+						} else {
+//							log.info("emission is 0");
+						}
+						noiseLinks2isolatedImmission.put(linkId,noiseImmission);
 					}
-					noiseLinks2isolatedImmission.put(linkId,noiseImmission);
-			 	}
-				timeIntervals2noiseLinks2isolatedImmission.put(timeInterval, noiseLinks2isolatedImmission);
+					timeIntervals2noiseLinks2isolatedImmission.put(timeInterval, noiseLinks2isolatedImmission);
+//				}
+//				else {
+//					// if no link has to to be considered for the calculation due to too long distances
+//					timeIntervals2noiseLinks2isolatedImmission.put(timeInterval, noiseLinks2isolatedImmission);
+//				}
 			}
 			receiverPointIds2timeIntervals2noiseLinks2isolatedImmission.put(coordId, timeIntervals2noiseLinks2isolatedImmission);
 		}
@@ -602,20 +731,34 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 			Map<Double,Double> timeInterval2noiseImmission = new HashMap<Double, Double>();
 			for(double timeInterval = NoiseConfig.getIntervalLength() ; timeInterval<=30*3600 ; timeInterval = timeInterval + NoiseConfig.getIntervalLength()) {
 				List<Double> noiseImmissions = new ArrayList<Double>();
-				for(Id linkId : receiverPointIds2timeIntervals2noiseLinks2isolatedImmission.get(coordId).get(timeInterval).keySet()) {
-					if(!(linkId2timeInterval2linkLeaveEvents.get(linkId).get(timeInterval).size()==0.)) {
-						noiseImmissions.add(receiverPointIds2timeIntervals2noiseLinks2isolatedImmission.get(coordId).get(timeInterval).get(linkId));
-					}
-				}	
-				double resultingNoiseImmission = noiseImmissionCalculator.calculateResultingNoiseImmission(noiseImmissions);
-				timeInterval2noiseImmission.put(timeInterval, resultingNoiseImmission);
+				if(!(receiverPointIds2timeIntervals2noiseLinks2isolatedImmission.get(coordId).get(timeInterval)==null)) {
+					for(Id linkId : receiverPointIds2timeIntervals2noiseLinks2isolatedImmission.get(coordId).get(timeInterval).keySet()) {
+						if(!(linkId2timeInterval2linkLeaveEvents.get(linkId).get(timeInterval).size()==0.)) {
+							noiseImmissions.add(receiverPointIds2timeIntervals2noiseLinks2isolatedImmission.get(coordId).get(timeInterval).get(linkId));
+						}
+					}	
+					double resultingNoiseImmission = noiseImmissionCalculator.calculateResultingNoiseImmission(noiseImmissions);
+					timeInterval2noiseImmission.put(timeInterval, resultingNoiseImmission);
+				} else {
+					// if no link has to to be considered for the calculation due to too long distances
+					timeInterval2noiseImmission.put(timeInterval, 0.);
+				}
 			}
 			receiverPointId2timeInterval2noiseImmission.put(coordId, timeInterval2noiseImmission);
 		}
 	}
 	
+	int ldenCounter = 0;
+	
 	public void calculatePersonId2Lden() {
+		
+		Map<Id,Double> personId2Lden = new HashMap<Id, Double>();
+		
 		for(Id personId : scenario.getPopulation().getPersons().keySet()) {
+			ldenCounter++;
+			if(ldenCounter%10000. == 0) {
+				log.info(ldenCounter);
+			}
 			Map<Integer,Map<Id,Tuple<Double,Double>>> actNumber2receiverPointId2actStartAndActEnd = new HashMap<Integer, Map<Id,Tuple<Double,Double>>>();
 			actNumber2receiverPointId2actStartAndActEnd = personId2actNumber2receiverPointId2activityStartAndActivityEnd.get(personId);
 			Map<Id,Map<Double,Tuple<Double,Double>>> receiverPointId2timeInterval2durationOfStayAndNoiseImmission = new HashMap<Id, Map<Double,Tuple<Double,Double>>>();
@@ -631,20 +774,30 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 				double actEnd = actNumber2receiverPointId2actStartAndActEnd.get(actNumber).get(receiverPointId).getSecond();
 				Map<Double,Tuple<Double,Double>> timeInterval2durationOfStayAndNoiseImmission = new HashMap<Double, Tuple<Double,Double>>();
 				for(double timeInterval = NoiseConfig.getIntervalLength() ; timeInterval<=24*3600 ; timeInterval = timeInterval + NoiseConfig.getIntervalLength()) {
-					if(!(actStart>timeInterval)) {
-						if(actEnd>timeInterval) {
-							double factor = (timeInterval - actStart)/NoiseConfig.getIntervalLength();
-							timeInterval2durationOfStayAndNoiseImmission.put(timeInterval, new Tuple<Double,Double>(factor, timeInterval2noiseImmission.get(timeInterval)));
+					if(!(actStart>(timeInterval-NoiseConfig.getIntervalLength()))) {
+						if(actStart<(timeInterval-NoiseConfig.getIntervalLength())) {
+							if(actEnd>timeInterval) {
+								double factor = 1.;
+								timeInterval2durationOfStayAndNoiseImmission.put(timeInterval, new Tuple<Double,Double>(factor, timeInterval2noiseImmission.get(timeInterval)));
+							} else if (actEnd<(timeInterval-NoiseConfig.getIntervalLength())){
+								double factor = 0.;
+								timeInterval2durationOfStayAndNoiseImmission.put(timeInterval, new Tuple<Double,Double>(factor, timeInterval2noiseImmission.get(timeInterval)));
+							} else {
+								double factor = (actEnd - (timeInterval-NoiseConfig.getIntervalLength()))/NoiseConfig.getIntervalLength();
+								timeInterval2durationOfStayAndNoiseImmission.put(timeInterval, new Tuple<Double,Double>(factor, timeInterval2noiseImmission.get(timeInterval)));
+							}
+						} else if(actStart < timeInterval) {	
+							if(actEnd>timeInterval) {
+								double factor = (timeInterval - actStart)/NoiseConfig.getIntervalLength();
+								timeInterval2durationOfStayAndNoiseImmission.put(timeInterval, new Tuple<Double,Double>(factor, timeInterval2noiseImmission.get(timeInterval)));
+							} else {
+								double factor = (actEnd - actStart)/NoiseConfig.getIntervalLength();
+								timeInterval2durationOfStayAndNoiseImmission.put(timeInterval, new Tuple<Double,Double>(factor, timeInterval2noiseImmission.get(timeInterval)));
+							}
 						} else {
-							double factor = (actEnd - actStart)/NoiseConfig.getIntervalLength();
+							double factor = 0.;
 							timeInterval2durationOfStayAndNoiseImmission.put(timeInterval, new Tuple<Double,Double>(factor, timeInterval2noiseImmission.get(timeInterval)));
 						}
-					} else if (actEnd>timeInterval) {
-						double factor = 1.;
-						timeInterval2durationOfStayAndNoiseImmission.put(timeInterval, new Tuple<Double,Double>(factor, timeInterval2noiseImmission.get(timeInterval)));
-					} else if (actEnd<timeInterval) {
-						double factor = ((timeInterval-actEnd)-(timeInterval-NoiseConfig.getIntervalLength()))/NoiseConfig.getIntervalLength();
-						timeInterval2durationOfStayAndNoiseImmission.put(timeInterval, new Tuple<Double,Double>(factor, timeInterval2noiseImmission.get(timeInterval)));
 					}
 				}
 				if(receiverPointId2timeInterval2durationOfStayAndNoiseImmission.containsKey(receiverPointId)) {
@@ -673,25 +826,138 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 					double factor = receiverPointId2timeInterval2durationOfStayAndNoiseImmission.get(receiverPointId).get(timeInterval).getFirst();
 					double immission = receiverPointId2timeInterval2durationOfStayAndNoiseImmission.get(receiverPointId).get(timeInterval).getSecond();
 					if(timeInterval<=6*3600) {
-						immission = immission + 10;
+						immission = immission + 10.;
 					} else if(timeInterval>6*3600 && timeInterval<=22*3600) {
 					} else if(timeInterval>18*3600 && timeInterval<=22*3600) {
-						immission = immission + 5;
+						immission = immission + 5.;
 					} else if(timeInterval>22*3600 && timeInterval<=24*3600) {
-						immission = immission + 10;
+						immission = immission + 10.;
 					}
+
 					n = n + factor;
 					sum = sum + (factor*(Math.pow(10,0.1*immission)));
 				}
 			}
-			double Lden = 10 * Math.log10((1./n)*(sum));
+			double differenceTo24Hours = 24. - n;
+//			sum = sum + (differenceTo24Hours*1.); // 10.^(0.1*0.) = 1.
+//			double Lden = 10 * Math.log10((1./24.)*(sum));
+			double Lden = 10 * Math.log10((1./n)*(sum)); //
+			
+			nGesamt = nGesamt + n;
+			
+			personId2Lden.put(personId, Lden);
 			
 			double tabularCostPerYear = calculateCostPerYearCorrespondingToLdenValue(Lden);
 			double costPerDay = tabularCostPerYear/365.;
-			double costPerAgent = (n/24.)*costPerDay;
-			
+			double costPerAgent = costPerDay;
+//			double costPerAgent = (n/24.)*costPerDay;
+
 			totalTollAffectedAgentBasedCalculation = totalTollAffectedAgentBasedCalculation + costPerAgent;
+			
+			double LForCalculation = 10 * Math.log10(sum-(differenceTo24Hours*1.));
+			
+			// assignCostPerAgentToLinksAndIntervals(costPerAgent, receiverPointId2timeInterval2durationOfStayAndNoiseImmission);
+			
+			// calculate costSharesPerTimeInterval
+			for(Id receiverPointId : receiverPointId2timeInterval2durationOfStayAndNoiseImmission.keySet()) {
+				for(double timeInterval : receiverPointId2timeInterval2durationOfStayAndNoiseImmission.get(receiverPointId).keySet()) {
+					double factor = receiverPointId2timeInterval2durationOfStayAndNoiseImmission.get(receiverPointId).get(timeInterval).getFirst();
+					double noiseImmission = receiverPointId2timeInterval2durationOfStayAndNoiseImmission.get(receiverPointId).get(timeInterval).getSecond();
+					double effectiveNoiseImmission = noiseImmission;
+					if(timeInterval<=6*3600) {
+						effectiveNoiseImmission = effectiveNoiseImmission + 10.;
+					} else if(timeInterval>6*3600 && timeInterval<=22*3600) {
+					} else if(timeInterval>18*3600 && timeInterval<=22*3600) {
+						effectiveNoiseImmission = effectiveNoiseImmission + 5.;
+					} else if(timeInterval>22*3600 && timeInterval<=24*3600) {
+						effectiveNoiseImmission = effectiveNoiseImmission + 10.;
+					}
+					double sharePerHour = Math.pow((Math.pow(10,0.05*effectiveNoiseImmission))/(Math.pow(10,0.05*LForCalculation)), 2);
+					double costs = factor*sharePerHour*costPerAgent;
+					
+					totalTollAffectedAgentBasedCalculationControl = totalTollAffectedAgentBasedCalculationControl + costs;
+					
+					if(receiverPointId2timeInterval2damageCostAgentBased.containsKey(receiverPointId)) {
+						Map<Double,Double> timeInterval2damageCostAgentBased = receiverPointId2timeInterval2damageCostAgentBased.get(receiverPointId);
+						if(receiverPointId2timeInterval2damageCostAgentBased.get(receiverPointId).containsKey(timeInterval)) {
+							double valueBefore = timeInterval2damageCostAgentBased.get(timeInterval);
+							double newValue = valueBefore + costs;
+							timeInterval2damageCostAgentBased.put(timeInterval, newValue);
+						} else {
+							timeInterval2damageCostAgentBased.put(timeInterval, costs);
+						}
+						receiverPointId2timeInterval2damageCostAgentBased.put(receiverPointId, timeInterval2damageCostAgentBased);
+					} else {
+						Map<Double,Double> timeInterval2damageCostAgentBased = new HashMap<Double, Double>();
+						timeInterval2damageCostAgentBased.put(timeInterval, costs);
+						receiverPointId2timeInterval2damageCostAgentBased.put(receiverPointId, timeInterval2damageCostAgentBased);
+					}
+					if(personId2receiverPointId2timeInterval2costs.containsKey(personId)){
+						Map<Id,Map<Double,Double>> receiverPointId2timeInterval2costs = personId2receiverPointId2timeInterval2costs.get(personId);
+						if(receiverPointId2timeInterval2costs.containsKey(receiverPointId)){
+							Map<Double,Double> timeInterval2costs = receiverPointId2timeInterval2costs.get(receiverPointId);
+							timeInterval2costs.put(timeInterval, costs);
+							receiverPointId2timeInterval2costs.put(receiverPointId, timeInterval2costs);
+						} else {
+							Map<Double,Double> timeInterval2costs = new HashMap<Double, Double>();
+							timeInterval2costs.put(timeInterval, costs);
+							receiverPointId2timeInterval2costs.put(receiverPointId, timeInterval2costs);
+						}
+						personId2receiverPointId2timeInterval2costs.put(personId,receiverPointId2timeInterval2costs);
+					} else {
+						Map<Id,Map<Double,Double>> receiverPointId2timeInterval2costs =  new HashMap<Id, Map<Double,Double>>();
+						Map<Double,Double> timeInterval2costs = new HashMap<Double, Double>();
+						timeInterval2costs.put(timeInterval, costs);
+						receiverPointId2timeInterval2costs.put(receiverPointId, timeInterval2costs);
+						personId2receiverPointId2timeInterval2costs.put(personId,receiverPointId2timeInterval2costs);
+					}
+				}
+			}
 		}
+		
+		//TODO: The following is for comparing the immission values to real-world-scenarios
+		int countersub40 = 0;
+		int counter4045 = 0;
+		int counter4550 = 0;
+		int counter5055 = 0;
+		int counter5560 = 0;
+		int counter6065 = 0;
+		int counter6570 = 0;
+		int counterover70 = 0;
+		int summe = 0;
+		for(Id pId : personId2Lden.keySet()) {
+			double lden =personId2Lden.get(pId);
+			if(lden<=40.) {
+				countersub40++;
+			} else if(lden<=45.) {
+				counter4045++;
+			} else if(lden<=50.) {
+				counter4550++;
+			} else if(lden<=55.) {
+				counter5055++;
+			} else if(lden<=60.) {
+				counter5560++;
+			} else if(lden<=65.) {
+				counter6065++;
+			} else if(lden<=70.) {
+				counter6570++;
+			} else {
+				counterover70++;
+			}
+			summe++;
+		}
+		log.info("statistics...");
+		log.info("unter 40: "+countersub40+" Anteil: "+((countersub40/1.0/summe/1.0)));
+		log.info("40-45: "+counter4045+" Anteil: "+((counter4045/1.0/summe/1.0)));
+		log.info("45-50: "+counter4550+" Anteil: "+((counter4550/1.0/summe/1.0)));
+		log.info("50-55: "+counter5055+" Anteil: "+((counter5055/1.0/summe/1.0)));
+		log.info("55-60: "+counter5560+" Anteil: "+((counter5560/1.0/summe/1.0)));
+		log.info("60-65: "+counter6065+" Anteil: "+((counter6065/1.0/summe/1.0)));
+		log.info("65-70: "+counter6570+" Anteil: "+((counter6570/1.0/summe/1.0)));
+		log.info("ueber 70: "+counterover70+" Anteil: "+((counterover70/1.0/summe/1.0)));
+		
+		log.info(nGesamt);
+		log.info((nGesamt/(scenario.getPopulation().getPersons().size())));
 	}
 
 	public void calculateDurationOfStay() {
@@ -737,33 +1003,23 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 						// list for all receiver points and all time intervals for each agent the time, ...
 						Map <Double , Map <Id,Map<Integer,Tuple<Double,String>>>> timeInterval2personId2actNumber2affectedAgentUnitsAndActType = new HashMap <Double , Map <Id,Map<Integer,Tuple<Double,String>>>>();
 						if(receiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType.containsKey(receiverPointId)) {
-//							log.info("AA");
 							timeInterval2personId2actNumber2affectedAgentUnitsAndActType = receiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType.get(receiverPointId);
 						} else {
-//							log.info("BB");
 						}
 						Map <Id,Map<Integer,Tuple<Double,String>>> personId2actNumber2affectedAgentUnitsAndActType = new HashMap <Id,Map<Integer,Tuple<Double,String>>>();
 						if(timeInterval2personId2actNumber2affectedAgentUnitsAndActType.containsKey(intervalEnd)) {
-//							log.info("CC");
 							personId2actNumber2affectedAgentUnitsAndActType = timeInterval2personId2actNumber2affectedAgentUnitsAndActType.get(intervalEnd);
 						} else {
-//							log.info("DD");
 						}
 						Map<Integer,Tuple<Double,String>> actNumber2affectedAgentUnitsAndActType = new HashMap <Integer,Tuple<Double,String>>();
 						if(personId2actNumber2affectedAgentUnitsAndActType.containsKey(personId)) {
-//							log.info("EE");
 							actNumber2affectedAgentUnitsAndActType = personId2actNumber2affectedAgentUnitsAndActType.get(personId);
 						} else {
-//							log.info("FF");
 						}
 						Tuple <Double,String> affectedAgentUnitsAndActType = new Tuple<Double, String>((durationOfStay/3600.), actType);
-//						log.info("GG :"+affectedAgentUnitsAndActType);
 						actNumber2affectedAgentUnitsAndActType.put(actNumber,affectedAgentUnitsAndActType);
-//						log.info("HH :"+actNumber2affectedAgentUnitsAndActType);
 						personId2actNumber2affectedAgentUnitsAndActType.put(personId,actNumber2affectedAgentUnitsAndActType);
-//						log.info("II :"+personId2actNumber2affectedAgentUnitsAndActType);
 						timeInterval2personId2actNumber2affectedAgentUnitsAndActType.put(intervalEnd,personId2actNumber2affectedAgentUnitsAndActType);
-//						log.info("JJ :"+timeInterval2personId2actNumber2affectedAgentUnitsAndActType);
 						receiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType.put(receiverPointId,timeInterval2personId2actNumber2affectedAgentUnitsAndActType);
 						
 						// calculation for the individual noiseEventsAffected (home-based-oriented)
@@ -772,7 +1028,6 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 						// calculation for the damage
 						// the adaption of the intervalLength is considered here implicitly,
 						// a further correction is not necessary
-//						double affectedAgentUnits = (durationOfStay/3600.);
 						double affectedAgentUnits = (NoiseConfig.getScaleFactor())* (durationOfStay/3600.);
 						if(receiverPointId2timeInterval2affectedAgentUnits.containsKey(receiverPointId)) {
 							if(receiverPointId2timeInterval2affectedAgentUnits.get(receiverPointId).containsKey(intervalEnd)) {
@@ -867,7 +1122,6 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 						// calculation for the individual noiseEventsAffected (home-based-oriented)
 						
 						// calculation for the damage
-//						double affectedAgentUnits = (durationOfStay/3600.);
 						double affectedAgentUnits = (NoiseConfig.getScaleFactor())* (durationOfStay/3600.);
 						if(receiverPointId2timeInterval2affectedAgentUnits.containsKey(receiverPointId)) {
 							if(receiverPointId2timeInterval2affectedAgentUnits.get(receiverPointId).containsKey(intervalEnd)) {
@@ -926,7 +1180,7 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 		
 		// dayOrNight must be "DAY" because the noiseImmission values are already adapted above
 		double lautheitsgewicht = calculateLautheitsgewicht(Lden, "DAY");
-		// Calculation for each agent separately, therefore no calculation aof affectedAgentUnits
+		// Calculation for each agent separately, therefore no calculation of affectedAgentUnits
 		
 		damageCosts = annualCostRate * lautheitsgewicht;
 		
@@ -937,10 +1191,9 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 		String dayOrNight = "NIGHT";
 		if(timeInterval>6*3600 && timeInterval<=22*3600) {
 			dayOrNight = "DAY";
+		} else if(timeInterval>18*3600 && timeInterval<=22*3600) {
+			dayOrNight = "EVENING";
 		}
-//		if(timeInterval>18*3600 && timeInterval<=22*3600) {
-//			dayOrNight = "EVENING";
-//		}
 		
 		double lautheitsgewicht = calculateLautheitsgewicht(noiseImmission, dayOrNight);  
 		
@@ -949,8 +1202,8 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 		double damageCosts = 0.;
 		if(dayOrNight == "DAY"){
 			damageCosts = (annualCostRate*laermEinwohnerGleichwert/(365))*(1.0/24.0);
-//		}else if(dayOrNight == "EVENING"){
-//			damageCosts = (annualCostRate*laermEinwohnerGleichwert/(365))*(1.0/24.0);
+		}else if(dayOrNight == "EVENING"){
+			damageCosts = (annualCostRate*laermEinwohnerGleichwert/(365))*(1.0/24.0);
 		}else if(dayOrNight == "NIGHT"){
 			damageCosts = (annualCostRate*laermEinwohnerGleichwert/(365))*(1.0/24.0);
 		}else{
@@ -962,20 +1215,16 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 	private double calculateLautheitsgewicht (double noiseImmission , String dayOrNight){
 		double lautheitsgewicht = 0;
 		
-		// TODO: Case differentiation for time intervals which overlap the boundaries
-		// TODO: examine, if a fluid boundary instead of a hard boundary can improve the welfare
-		// TODO: To depict the L_den value correctly, a consideration of an additional evening value is necessary (between 6 p.m. and 10 p.m.)
-		
 		if(dayOrNight == "DAY"){
 			if(noiseImmission<50){
 			}else{
 				lautheitsgewicht = Math.pow(2.0 , 0.1 * (noiseImmission - 50));
 			}
-//		}else if(dayOrNight == "EVENING"){
-//			if(noiseImmission<45){
-//			}else{
-//				lautheitsgewicht = Math.pow(2.0 , 0.1 * (noiseImmission - 45));
-//			}
+		}else if(dayOrNight == "EVENING"){
+			if(noiseImmission<45){
+			}else{
+				lautheitsgewicht = Math.pow(2.0 , 0.1 * (noiseImmission - 45));
+			}
 		}else if(dayOrNight == "NIGHT"){
 			if(noiseImmission<40){
 			}else{
@@ -991,19 +1240,15 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 
 	public void calculateCostSharesPerLinkPerTimeInterval() {
 		// preparation
-//		log.info("a");
 		for(Id coordId : receiverPointIds2timeIntervals2noiseLinks2isolatedImmission.keySet()) {
-//			log.info("aa");
 			Map<Double,Map<Id,Double>> timeIntervals2noiseLinks2isolatedImmission = receiverPointIds2timeIntervals2noiseLinks2isolatedImmission.get(coordId);
 			Map<Double,Map<Id,Double>> timeIntervals2noiseLinks2costShare = new HashMap<Double, Map<Id,Double>>();
 			for(double timeInterval = NoiseConfig.getIntervalLength() ; timeInterval<=30*3600 ; timeInterval = timeInterval + NoiseConfig.getIntervalLength()) {
-//				log.info("bb");
 				Map<Id,Double> noiseLinks2isolatedImmission = timeIntervals2noiseLinks2isolatedImmission.get(timeInterval);
 				Map<Id,Double> noiseLinks2costShare = new HashMap<Id, Double>();
 				double resultingNoiseImmission = receiverPointId2timeInterval2noiseImmission.get(coordId).get(timeInterval);
 				if(!((receiverPointId2timeInterval2damageCost.get(coordId).get(timeInterval))==0.)) {
 					for(Id linkId : noiseLinks2isolatedImmission.keySet()) {
-	//					log.info("cc");
 						double noiseImmission = noiseLinks2isolatedImmission.get(linkId);
 						double costs = 0.;
 						if(!(noiseImmission==0.)) {
@@ -1011,12 +1256,6 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 							costs = costShare * receiverPointId2timeInterval2damageCost.get(coordId).get(timeInterval);
 							
 						}
-	//					if((receiverPointId2timeInterval2damageCost.get(coordId).get(timeInterval))>0) {
-	//						log.info("noiseImmission: "+noiseImmission);
-	//						log.info("costShare: "+costShare);
-	//						log.info("costs: "+costs);
-	//						log.info("++++++++++++");
-//						}
 						noiseLinks2costShare.put(linkId, costs);
 					}
 				}
@@ -1027,9 +1266,7 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 		
 		//summing up the link-based-costs
 		//initializing the map:
-//		log.info("b");
 		for(Id linkId : scenario.getNetwork().getLinks().keySet()) {
-//			log.info("cc");
 			Map<Double,Double> timeInterval2damageCost = new HashMap<Double, Double>();
 			for(double timeInterval = NoiseConfig.getIntervalLength() ; timeInterval<=30*3600 ; timeInterval = timeInterval + NoiseConfig.getIntervalLength()) {
 				timeInterval2damageCost.put(timeInterval, 0.);
@@ -1037,7 +1274,6 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 			linkId2timeInterval2damageCost.put(linkId,timeInterval2damageCost);
 		}
 
-//		log.info("c");
 		for(Id coordId : spatialInfo.getReceiverPoints().keySet()) {
 			for(Id linkId : spatialInfo.getReceiverPointId2relevantLinkIds().get(coordId)) {
 				for(double timeInterval = NoiseConfig.getIntervalLength() ; timeInterval<=30*3600 ; timeInterval = timeInterval + NoiseConfig.getIntervalLength()) {
@@ -1050,7 +1286,65 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 				}
 			}
 		}
-//		log.info("d");
+	}
+	
+	public void calculateCostSharesPerLinkPerTimeIntervalAgentBased() {
+		// preparation
+		for(Id coordId : receiverPointIds2timeIntervals2noiseLinks2isolatedImmission.keySet()) {
+			Map<Double,Map<Id,Double>> timeIntervals2noiseLinks2isolatedImmission = receiverPointIds2timeIntervals2noiseLinks2isolatedImmission.get(coordId);
+			Map<Double,Map<Id,Double>> timeIntervals2noiseLinks2costShare = new HashMap<Double, Map<Id,Double>>();
+			for(double timeInterval = NoiseConfig.getIntervalLength() ; timeInterval<=30*3600 ; timeInterval = timeInterval + NoiseConfig.getIntervalLength()) {
+				Map<Id,Double> noiseLinks2isolatedImmission = timeIntervals2noiseLinks2isolatedImmission.get(timeInterval);
+				Map<Id,Double> noiseLinks2costShare = new HashMap<Id, Double>();
+				double resultingNoiseImmission = receiverPointId2timeInterval2noiseImmission.get(coordId).get(timeInterval);
+				if(receiverPointId2timeInterval2damageCostAgentBased.containsKey(coordId)) {
+					if(receiverPointId2timeInterval2damageCostAgentBased.get(coordId).containsKey(timeInterval)) {
+						if(!((receiverPointId2timeInterval2damageCostAgentBased.get(coordId).get(timeInterval))==0.)) {
+							for(Id linkId : noiseLinks2isolatedImmission.keySet()) {
+								double noiseImmission = noiseLinks2isolatedImmission.get(linkId);
+								double costs = 0.;
+								if(!(noiseImmission==0.)) {
+									double costShare = noiseImmissionCalculator.calculateShareOfResultingNoiseImmission(noiseImmission, resultingNoiseImmission);
+									costs = costShare * receiverPointId2timeInterval2damageCostAgentBased.get(coordId).get(timeInterval);
+									
+								}
+								noiseLinks2costShare.put(linkId, costs);
+							}
+						}
+					}
+				}
+				
+				timeIntervals2noiseLinks2costShare.put(timeInterval, noiseLinks2costShare);
+			}
+			receiverPointIds2timeIntervals2noiseLinks2costShare.put(coordId, timeIntervals2noiseLinks2costShare);
+		}
+		
+		//summing up the link-based-costs
+		//initializing the map:
+		for(Id linkId : scenario.getNetwork().getLinks().keySet()) {
+			Map<Double,Double> timeInterval2damageCost = new HashMap<Double, Double>();
+			for(double timeInterval = NoiseConfig.getIntervalLength() ; timeInterval<=30*3600 ; timeInterval = timeInterval + NoiseConfig.getIntervalLength()) {
+				timeInterval2damageCost.put(timeInterval, 0.);
+			}
+			linkId2timeInterval2damageCost.put(linkId,timeInterval2damageCost);
+		}
+
+		for(Id coordId : spatialInfo.getReceiverPoints().keySet()) {
+			for(Id linkId : spatialInfo.getReceiverPointId2relevantLinkIds().get(coordId)) {
+				for(double timeInterval = NoiseConfig.getIntervalLength() ; timeInterval<=30*3600 ; timeInterval = timeInterval + NoiseConfig.getIntervalLength()) {
+					if(receiverPointId2timeInterval2damageCostAgentBased.containsKey(coordId)) {
+						if(receiverPointId2timeInterval2damageCostAgentBased.get(coordId).containsKey(timeInterval)) {
+							if(!((receiverPointId2timeInterval2damageCostAgentBased.get(coordId).get(timeInterval))==0.)) {
+								double costs = receiverPointIds2timeIntervals2noiseLinks2costShare.get(coordId).get(timeInterval).get(linkId);
+								double sumBefore = linkId2timeInterval2damageCost.get(linkId).get(timeInterval);
+								double sumNew = sumBefore + costs;
+								linkId2timeInterval2damageCost.get(linkId).put(timeInterval, sumNew);
+							}
+						}
+					}					
+				}
+			}
+		}
 	}
 
 	public void calculateCostsPerVehiclePerLinkPerTimeInterval() {
@@ -1064,12 +1358,8 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 				if(linkId2timeInterval2damageCost.containsKey(linkId)) {
 					if(linkId2timeInterval2damageCost.get(linkId).containsKey(timeInterval)) {
 						damageCostSum = linkId2timeInterval2damageCost.get(linkId).get(timeInterval);
-//						log.info(damageCostSum);
-//						log.info("+++");
 					}
 				}
-				
-//				log.info("damageCostSum: "+damageCostSum);
 				
 				int nCar = linkId2timeInterval2linkLeaveEventsCar.get(linkId).get(timeInterval).size();
 				int nHdv = linkId2timeInterval2linkLeaveEventsHdv.get(linkId).get(timeInterval).size();
@@ -1093,13 +1383,8 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 						log.warn("The sum of shareCar and shareHdv is not equal to 1.0! The value is "+(shareCar+shareHdv));
 					}
 				}
-//				log.info((shareCar+shareHdv));
-				
 				double damageCostSumCar = shareCar * damageCostSum;
 				double damageCostSumHdv = shareHdv * damageCostSum;
-				
-//				log.info("damageCostSumCar: "+damageCostSumCar);
-//				log.info("damageCostSumHdv: "+damageCostSumHdv);
 				
 				double damageCostPerCar = 0.;
 				if(!(nCar == 0)) {
@@ -1120,6 +1405,7 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 	
 	@Override
 	public void handleEvent(NoiseEvent event) {
+//		log.info("+++++++++++++++++++++");
 //		double amount = event.getAmount() *(-1);
 //		PersonMoneyEvent moneyEvent = new PersonMoneyEvent(event.getTime(), event.getVehicleId(), amount);
 // MoneyEvents processed separately in the NoiseCostPricingHandler
@@ -1143,12 +1429,12 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 //				log.info(amountCar+" - amountCar");
 //				log.info(amountHdv+" - amountHdv");
 				
-				List<LinkLeaveEvent> listLinkLeaveEventsTmp = linkId2timeInterval2linkLeaveEvents.get(linkId).get(timeInterval);
+				List<LinkEnterEvent> listLinkLeaveEventsTmp = linkId2timeInterval2linkLeaveEvents.get(linkId).get(timeInterval);
 				List<Id>  listIdsTmp = new ArrayList<Id>();
 				
 				// calculate shares for the affected Agents
 
-				for(LinkLeaveEvent event : listLinkLeaveEventsTmp) {
+				for(LinkEnterEvent event : listLinkLeaveEventsTmp) {
 					listIdsTmp.add(event.getVehicleId());
 				}
 				for(Id vehicleId : listIdsTmp) {
@@ -1208,7 +1494,6 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 //					double actEnd = receiverPointId2personId2actNumber2activityStartAndActivityEnd.get(receiverPointId).get(personId).get(actNumber).getSecond();
 					
 					for(double timeInterval = NoiseConfig.getIntervalLength() ; timeInterval <= 30*3600 ; timeInterval = timeInterval + NoiseConfig.getIntervalLength()) {
-//						log.info(receiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType.get(receiverPointId).get(timeInterval).get(personId).get(actNumber).getFirst());
 						double factor = receiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType.get(receiverPointId).get(timeInterval).get(personId).get(actNumber).getFirst();
 						
 						if(!(factor==0.)) {
@@ -1217,7 +1502,6 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 							String actType = receiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType.get(receiverPointId).get(timeInterval).get(personId).get(actNumber).getSecond();
 							
 							double costPerUnit = receiverPointId2timeInterval2damageCostPerAffectedAgentUnit.get(receiverPointId).get(timeInterval);
-	//						log.info("costPerUnit: "+costPerUnit);
 							double amount = factor * costPerUnit;
 							
 							NoiseEventAffected noiseEventAffected = new NoiseEventAffected(time,agentId,amount,receiverPointId,actType);
@@ -1240,7 +1524,6 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 			}
 		}
 		
-//		log.info(NoiseHandler.receiverPointId2ListOfHomeAgents);
 		//for comparison the home-based-oriented calculation
 		for(Id receiverPointId : receiverPointId2ListOfHomeAgents.keySet()) {
 			for(Id personId : receiverPointId2ListOfHomeAgents.get(receiverPointId)) {
@@ -1294,9 +1577,7 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 					if (tollSum == 0.) {
 						// avg toll is zero for this time bin on that link
 					} else {
-//						log.info(linkId2timeBin2leavingAgents);
 						int leavingAgents = 0;
-//						log.info(linkId2timeBin2leavingAgents);
 						if(linkId2timeBin2leavingAgents.get(linkId).containsKey(timeBin)) {
 							leavingAgents = linkId2timeBin2leavingAgents.get(linkId).get(timeBin);
 								if(!(this.linkId2timeBin2leavingAgents.get(linkId).get(timeBin) == null)) {
@@ -1315,11 +1596,6 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 				}
 				linkId2timeBin2avgToll.put(linkId , timeBin2avgToll);
 			}
-			
-			// TODO: Hier noch einmal enter- und leave-times vergleichen und Durchschnittswerte zuordnen
-			// for each link and time interval
-			// Agenten mit Preisen aufsummieren und dann teilen
-			// !! entfaellt fuer die enter-based-analysis
 		}
 	}
 	
@@ -1353,9 +1629,7 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 					if (tollSum == 0.) {
 						// avg toll is zero for this time bin on that link
 					} else {
-//						log.info(linkId2timeBin2leavingAgentsCar);
 						int leavingAgentsCar = 0;
-//						log.info(linkId2timeBin2leavingAgents);
 						if(linkId2timeBin2leavingAgentsCar.get(linkId).containsKey(timeBin)) {
 							leavingAgentsCar = linkId2timeBin2leavingAgentsCar.get(linkId).get(timeBin);
 								if(!(this.linkId2timeBin2leavingAgentsCar.get(linkId).get(timeBin) == null)) {
@@ -1374,11 +1648,6 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 				}
 				linkId2timeBin2avgTollCar.put(linkId , timeBin2avgTollCar);
 			}
-			
-			// TODO: Hier noch einmal enter- und leave-times vergleichen und Durchschnittswerte zuordnen
-			// for each link and time interval
-			// Agenten mit Preisen aufsummieren und dann teilen
-			// !! entfaellt fuer die enter-based-analysis
 		}
 	}
 	
@@ -1412,10 +1681,7 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 					if (tollSum == 0.) {
 						// avg toll is zero for this time bin on that link
 					} else {
-//						log.info(linkId2timeBin2leavingAgents);
 						int leavingAgentsHdv = 0;
-//						log.info(linkId2timeBin2leavingAgentsHdv);
-//						log.info(linkId2timeBin2leavingAgentsHdv.get(linkId));
 						if(linkId2timeBin2leavingAgentsHdv.get(linkId).containsKey(timeBin)) {
 							leavingAgentsHdv = linkId2timeBin2leavingAgentsHdv.get(linkId).get(timeBin);
 								if(!(this.linkId2timeBin2leavingAgentsHdv.get(linkId).get(timeBin) == null)) {
@@ -1434,16 +1700,11 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 				}
 				linkId2timeBin2avgTollHdv.put(linkId , timeBin2avgTollHdv);
 			}
-			
-			// TODO: Hier noch einmal enter- und leave-times vergleichen und Durchschnittswerte zuordnen
-			// for each link and time interval
-			// Agenten mit Preisen aufsummieren und dann teilen
-			// !! entfaellt fuer die enter-based-analysis
 		}
 	}
 	
 	private void setlinkId2timeBin2leavingAgents() {
-		for (LinkLeaveEvent event : this.linkLeaveEvents){
+		for (LinkEnterEvent event : this.linkLeaveEvents){
 			
 			if (this.linkId2timeBin2tollSum.containsKey(event.getLinkId())){
 				// Tolls paid on this link.
@@ -1507,7 +1768,7 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 			linkId2timeBin2leavingAgentsCar.put(linkId, timeBin2leavingAgentsCar);
 		}
 		
-		for (LinkLeaveEvent event : this.linkLeaveEventsCar){
+		for (LinkEnterEvent event : this.linkLeaveEventsCar){
 //			log.info("vehicle Id: "+event.getVehicleId());
 //			
 //			log.info("000");
@@ -1574,7 +1835,7 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 			linkId2timeBin2leavingAgentsHdv.put(linkId, timeBin2leavingAgentsHdv);
 		}
 		
-		for (LinkLeaveEvent event : this.linkLeaveEventsHdv){
+		for (LinkEnterEvent event : this.linkLeaveEventsHdv){
 		
 //			log.info(linkId2timeBin2tollSumHdv);
 			if (this.linkId2timeBin2tollSumHdv.containsKey(event.getLinkId())){
@@ -1630,10 +1891,8 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 	}
 	
 	private void setlinkId2timeBin2tollSum() {
-//		log.info("noiseEvents: "+noiseEvents);
 		for (NoiseEvent event : this.noiseEvents) {
-			Map<Double, Double> timeBin2tollSum = new HashMap<Double, Double>();		
-//			log.info(event.getAmount());
+			Map<Double, Double> timeBin2tollSum = new HashMap<Double, Double>();	
 			double amount = 0.0;
 			
 			if (this.linkId2timeBin2tollSum.containsKey(event.getLinkId())) {
@@ -1688,11 +1947,9 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 	}
 	
 	private void setlinkId2timeBin2tollSumCar() {
-//		log.info("noiseEvents: "+noiseEvents);
 		for (NoiseEvent event : this.noiseEventsCar) {
 	
 			Map<Double, Double> timeBin2tollSumCar = new HashMap<Double, Double>();		
-	//		log.info(event.getAmount());
 			double amount = 0.0;
 				
 			if (this.linkId2timeBin2tollSumCar.containsKey(event.getLinkId())) {
@@ -1772,7 +2029,6 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 	}
 	
 	private void setlinkId2timeBin2tollSumHdv() {
-//		log.info("noiseEvents: "+noiseEvents);
 		for (NoiseEvent event : this.noiseEventsHdv) {
 			
 			Map<Double, Double> timeBin2tollSumHdv = new HashMap<Double, Double>();		
@@ -1854,8 +2110,8 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 	
 	public double getAvgToll(Id linkId, double time) {
 		double avgToll = 0.;
-		if (this.linkId2timeBin2avgTollOldValue.containsKey(linkId)){
-			Map<Double, Double> timeBin2avgToll = this.linkId2timeBin2avgTollOldValue.get(linkId);
+		if (this.linkId2timeBin2avgToll.containsKey(linkId)){
+			Map<Double, Double> timeBin2avgToll = this.linkId2timeBin2avgToll.get(linkId);
 			for (Double timeBin : timeBin2avgToll.keySet()) {
 				if (time < timeBin && time >= timeBin - this.timeBinSize){
 					avgToll = timeBin2avgToll.get(timeBin);
@@ -1864,11 +2120,24 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 		}
 		return avgToll;
 	}
+	
+	public double getAvgTollOldValue(Id linkId, double time) {
+		double avgTollOldValue = 0.;
+		if (this.linkId2timeBin2avgTollOldValue.containsKey(linkId)){
+			Map<Double, Double> timeBin2avgTollOldValue = this.linkId2timeBin2avgTollOldValue.get(linkId);
+			for (Double timeBin : timeBin2avgTollOldValue.keySet()) {
+				if (time < timeBin && time >= timeBin - this.timeBinSize){
+					avgTollOldValue = timeBin2avgTollOldValue.get(timeBin);
+				}
+			}
+		}
+		return avgTollOldValue;
+	}
 
 	public double getAvgTollCar(Id linkId, double time) {
 		double avgTollCar = 0.;
-		if (this.linkId2timeBin2avgTollCarOldValue.containsKey(linkId)){
-			Map<Double, Double> timeBin2avgToll = this.linkId2timeBin2avgTollCarOldValue.get(linkId);
+		if (this.linkId2timeBin2avgTollCar.containsKey(linkId)){
+			Map<Double, Double> timeBin2avgToll = this.linkId2timeBin2avgTollCar.get(linkId);
 			for (Double timeBin : timeBin2avgToll.keySet()) {
 				if (time < timeBin && time >= timeBin - this.timeBinSize){
 					avgTollCar = timeBin2avgToll.get(timeBin);
@@ -1878,10 +2147,23 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 		return avgTollCar;
 	}
 	
+	public double getAvgTollCarOldValue(Id linkId, double time) {
+		double avgTollCarOldValue = 0.;
+		if (this.linkId2timeBin2avgTollCarOldValue.containsKey(linkId)){
+			Map<Double, Double> timeBin2avgTollOldValue = this.linkId2timeBin2avgTollCarOldValue.get(linkId);
+			for (Double timeBin : timeBin2avgTollOldValue.keySet()) {
+				if (time < timeBin && time >= timeBin - this.timeBinSize){
+					avgTollCarOldValue = timeBin2avgTollOldValue.get(timeBin);
+				}
+			}
+		}
+		return avgTollCarOldValue;
+	}
+	
 	public double getAvgTollHdv(Id linkId, double time) {
 		double avgTollHdv = 0.;
-		if (this.linkId2timeBin2avgTollHdvOldValue.containsKey(linkId)){
-			Map<Double, Double> timeBin2avgToll = this.linkId2timeBin2avgTollHdvOldValue.get(linkId);
+		if (this.linkId2timeBin2avgTollHdv.containsKey(linkId)){
+			Map<Double, Double> timeBin2avgToll = this.linkId2timeBin2avgTollHdv.get(linkId);
 			for (Double timeBin : timeBin2avgToll.keySet()) {
 				if (time < timeBin && time >= timeBin - this.timeBinSize){
 					avgTollHdv = timeBin2avgToll.get(timeBin);
@@ -1889,6 +2171,19 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 			}
 		}
 		return avgTollHdv;
+	}
+	
+	public double getAvgTollHdvOldValue(Id linkId, double time) {
+		double avgTollHdvOldValue = 0.;
+		if (this.linkId2timeBin2avgTollHdvOldValue.containsKey(linkId)){
+			Map<Double, Double> timeBin2avgTollOldValue = this.linkId2timeBin2avgTollHdvOldValue.get(linkId);
+			for (Double timeBin : timeBin2avgTollOldValue.keySet()) {
+				if (time < timeBin && time >= timeBin - this.timeBinSize){
+					avgTollHdvOldValue = timeBin2avgTollOldValue.get(timeBin);
+				}
+			}
+		}
+		return avgTollHdvOldValue;
 	}
 
 	public Map<Id,Double> getPersonId2tollSum(String fileName) {
@@ -3047,15 +3342,15 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 		return receiverPointIds2timeIntervals2noiseLinks2isolatedImmission;
 	}
 
-	public List<LinkLeaveEvent> getLinkLeaveEvents() {
+	public List<LinkEnterEvent> getLinkLeaveEvents() {
 		return linkLeaveEvents;
 	}
 
-	public List<LinkLeaveEvent> getLinkLeaveEventsCar() {
+	public List<LinkEnterEvent> getLinkLeaveEventsCar() {
 		return linkLeaveEventsCar;
 	}
 
-	public List<LinkLeaveEvent> getLinkLeaveEventsHdv() {
+	public List<LinkEnterEvent> getLinkLeaveEventsHdv() {
 		return linkLeaveEventsHdv;
 	}
 
@@ -3063,31 +3358,51 @@ public class NoiseTollHandler implements NoiseEventHandler , NoiseEventAffectedH
 		return hdvVehicles;
 	}
 
-	public Map<Id, List<LinkLeaveEvent>> getLinkId2linkLeaveEvents() {
+	public Map<Id, List<LinkEnterEvent>> getLinkId2linkLeaveEvents() {
 		return linkId2linkLeaveEvents;
 	}
 
-	public Map<Id, List<LinkLeaveEvent>> getLinkId2linkLeaveEventsCar() {
+	public Map<Id, List<LinkEnterEvent>> getLinkId2linkLeaveEventsCar() {
 		return linkId2linkLeaveEventsCar;
 	}
 
-	public Map<Id, List<LinkLeaveEvent>> getLinkId2linkLeaveEventsHdv() {
+	public Map<Id, List<LinkEnterEvent>> getLinkId2linkLeaveEventsHdv() {
 		return linkId2linkLeaveEventsHdv;
 	}
 
-	public Map<Id, Map<Double, List<LinkLeaveEvent>>> getLinkId2timeInterval2linkLeaveEvents() {
+	public Map<Id, Map<Double, List<LinkEnterEvent>>> getLinkId2timeInterval2linkLeaveEvents() {
 		return linkId2timeInterval2linkLeaveEvents;
 	}
 
-	public Map<Id, Map<Double, List<LinkLeaveEvent>>> getLinkId2timeInterval2linkLeaveEventsCar() {
+	public Map<Id, Map<Double, List<LinkEnterEvent>>> getLinkId2timeInterval2linkLeaveEventsCar() {
 		return linkId2timeInterval2linkLeaveEventsCar;
 	}
 
-	public Map<Id, Map<Double, List<LinkLeaveEvent>>> getLinkId2timeInterval2linkLeaveEventsHdv() {
+	public Map<Id, Map<Double, List<LinkEnterEvent>>> getLinkId2timeInterval2linkLeaveEventsHdv() {
 		return linkId2timeInterval2linkLeaveEventsHdv;
 	}
 
 	public SpatialInfo getSpatialInfo() {
 		return spatialInfo;
+	}
+	
+	public double getTotalTollAffectedAgentBasedCalculation() {
+		return totalTollAffectedAgentBasedCalculation;
+	}
+	
+	public double getTotalTollAffectedAgentBasedCalculationControl() {
+		return totalTollAffectedAgentBasedCalculationControl;
+	}
+	
+	public double getTotalToll() {
+		return totalToll;
+	}
+	
+	public double getTotalTollAffected() {
+		return totalTollAffected;
+	}
+	
+	public Map <Double,Integer> getInterval2departures() {
+		return interval2departures;
 	}
 }

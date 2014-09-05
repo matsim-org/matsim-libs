@@ -46,7 +46,7 @@ public class NoiseConfig {
 	}
 	
 	public static double getScaleFactor(){
-		double scaleFactor = 1.0;
+		double scaleFactor = 1.;
 		return scaleFactor;
 	}
 }

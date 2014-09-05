@@ -76,7 +76,9 @@ public class NoiseInternalizationControler {
 		NoiseTollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new NoiseTollDisutilityCalculatorFactory(tollHandler);
 		controler.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
 		
-		controler.addControlerListener(new NoiseInternalizationControlerListener( (ScenarioImpl) controler.getScenario(), tollHandler, pricingHandler, spatialInfo ));
+		ExtCostEventHandlerNoise extCostEventHandler = new ExtCostEventHandlerNoise(controler.getScenario(), false);
+		
+		controler.addControlerListener(new NoiseInternalizationControlerListener( (ScenarioImpl) controler.getScenario(), tollHandler, pricingHandler, spatialInfo,  extCostEventHandler));
 //		controler.addControlerListener(new NoiseInternalizationControlerListenerWithoutPricing( (ScenarioImpl) controler.getScenario(), tollHandler, noiseHandler, spatialInfo ));
 		
 // 		adapt the WelfareAnalysisControlerListener for the noise damage

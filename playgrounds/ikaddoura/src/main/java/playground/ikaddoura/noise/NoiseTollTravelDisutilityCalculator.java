@@ -45,6 +45,8 @@ public class NoiseTollTravelDisutilityCalculator implements TravelDisutility{
 	private double marginalUtlOfTravelTime;
 	private NoiseTollHandler tollHandler;
 	
+	private final double blendFactor = 0.1;
+	
 	public NoiseTollTravelDisutilityCalculator(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, NoiseTollHandler tollHandler) {
 		this.timeCalculator = timeCalculator;
 		this.marginalUtlOfMoney = cnScoringGroup.getMarginalUtilityOfMoney();
@@ -66,14 +68,6 @@ public class NoiseTollTravelDisutilityCalculator implements TravelDisutility{
 		double linkExpectedTollDisutility = calculateExpectedTollDisutility(link, time, person);
 		
 		double linkTravelDisutility = linkTravelTimeDisutility + linkDistanceDisutility + linkExpectedTollDisutility;
-//		log.info("++ ++++ ++++ ++");
-//		log.info(link.getId());
-//		log.info("linkTravelDisutility: "+linkTravelDisutility);
-//		log.info("linkTravelTimeDisutility: "+linkTravelTimeDisutility);
-//		log.info("linkDistanceDisutility: "+linkDistanceDisutility);
-//		log.info("linkExpectedTollDisutility: "+linkExpectedTollDisutility);
-//		log.info("+++ +++ +++ +++");
-		
 		
 		return linkTravelDisutility;
 	}
@@ -90,12 +84,24 @@ public class NoiseTollTravelDisutilityCalculator implements TravelDisutility{
 		boolean isHdvVehicle = false;
 		if(tollHandler.getHdvVehicles().contains(person.getId())) {
 			// hdv vehicle
-			linkExpectedToll = this.tollHandler.getAvgTollHdv(link.getId(), time);
+			double linkExpectedTollNewValueHdv = this.tollHandler.getAvgTollHdv(link.getId(), time);
+			double linkExpectedTollOldValueHdv = this.tollHandler.getAvgTollHdvOldValue(link.getId(), time);
+			
+			double blendedOldValueHdv = (1 - blendFactor) * linkExpectedTollOldValueHdv;
+			double blendedNewValueHdv = blendFactor * linkExpectedTollNewValueHdv;
+			
+			linkExpectedToll = blendedOldValueHdv + blendedNewValueHdv;
 			isHdvVehicle = true;
 			hdvCounter++;
 		} else {
 			// car
-			linkExpectedToll = this.tollHandler.getAvgTollCar(link.getId(), time);
+			double linkExpectedTollNewValueCar = this.tollHandler.getAvgTollCar(link.getId(), time);
+			double linkExpectedTollOldValueCar = this.tollHandler.getAvgTollCarOldValue(link.getId(), time);
+			
+			double blendedOldValueCar = (1 - blendFactor) * linkExpectedTollOldValueCar;
+			double blendedNewValueCar = blendFactor * linkExpectedTollNewValueCar;
+			
+			linkExpectedToll = blendedOldValueCar + blendedNewValueCar;
 			carCounter++;
 		}
 		
