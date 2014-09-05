@@ -36,6 +36,7 @@ import playground.ikaddoura.internalizationCar.MarginalCostPricing;
 import playground.ikaddoura.internalizationCar.TollDisutilityCalculatorFactory;
 import playground.ikaddoura.internalizationCar.TollHandler;
 import playground.ikaddoura.internalizationCar.WelfareAnalysisControlerListener;
+import playground.ikaddoura.noise.ExtCostEventHandlerNoise;
 import playground.ikaddoura.noise.NoiseCostPricingHandler;
 import playground.ikaddoura.noise.NoiseInternalizationControlerListener;
 import playground.ikaddoura.noise.NoiseInternalizationControlerListenerWithoutPricing;
@@ -89,11 +90,13 @@ public class CongestionNoisePricingControler {
 			SpatialInfo spatialInfo = new SpatialInfo( (ScenarioImpl) controler.getScenario());		
 			NoiseTollHandler noiseTollHandler = new NoiseTollHandler(controler.getScenario(), controler.getEvents(), spatialInfo, annualCostRate);
 		
+			ExtCostEventHandlerNoise extCostEventHandlerNoise = new ExtCostEventHandlerNoise(controler.getScenario(), false);
+			
 			TollHandler tollHandler = new TollHandler(controler.getScenario());
 			TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
 			controler.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
 			controler.addControlerListener(new MarginalCostPricing( (ScenarioImpl) controler.getScenario(), tollHandler ));
-			controler.addControlerListener(new NoiseInternalizationControlerListenerWithoutPricing((ScenarioImpl) controler.getScenario(), noiseTollHandler, spatialInfo));
+			controler.addControlerListener(new NoiseInternalizationControlerListenerWithoutPricing((ScenarioImpl) controler.getScenario(), noiseTollHandler, spatialInfo, extCostEventHandlerNoise));
 			
 		} else if(runId.equalsIgnoreCase("noise")) {
 			
@@ -109,7 +112,9 @@ public class CongestionNoisePricingControler {
 			NoiseTollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new NoiseTollDisutilityCalculatorFactory(noiseTollHandler);
 			controler.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
 			
-			controler.addControlerListener(new NoiseInternalizationControlerListener( (ScenarioImpl) controler.getScenario(), noiseTollHandler, pricingHandler, spatialInfo ));
+			ExtCostEventHandlerNoise extCostEventHandlerNoise = new ExtCostEventHandlerNoise(controler.getScenario(), false);
+			
+			controler.addControlerListener(new NoiseInternalizationControlerListener( (ScenarioImpl) controler.getScenario(), noiseTollHandler, pricingHandler, spatialInfo , extCostEventHandlerNoise));
 			
 		} else if(runId.equalsIgnoreCase("congestionNoise")) {
 			
@@ -127,17 +132,21 @@ public class CongestionNoisePricingControler {
 			CongestionNoiseTollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new CongestionNoiseTollDisutilityCalculatorFactory(congestionTollHandler, noiseTollHandler);
 			controler.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
 			
+			ExtCostEventHandlerNoise extCostEventHandlerNoise = new ExtCostEventHandlerNoise(controler.getScenario(), false);
+			
 			controler.addControlerListener(new MarginalCostPricing( (ScenarioImpl) controler.getScenario(), congestionTollHandler ));
-			controler.addControlerListener(new NoiseInternalizationControlerListener( (ScenarioImpl) controler.getScenario(), noiseTollHandler, pricingHandler , spatialInfo ));
+			controler.addControlerListener(new NoiseInternalizationControlerListener( (ScenarioImpl) controler.getScenario(), noiseTollHandler, pricingHandler , spatialInfo , extCostEventHandlerNoise ));
 			
 		} else if(runId.equalsIgnoreCase("baseCase")) {
 			log.info("Internalization of congestion/noise cost disabled.");
 			
 			SpatialInfo spatialInfo = new SpatialInfo( (ScenarioImpl) controler.getScenario());
 			
+			ExtCostEventHandlerNoise extCostEventHandlerNoise = new ExtCostEventHandlerNoise(controler.getScenario(), false);
+			
 			NoiseTollHandler noiseTollHandler = new NoiseTollHandler(controler.getScenario(), controler.getEvents(), spatialInfo, annualCostRate);
 			
-			controler.addControlerListener(new NoiseInternalizationControlerListenerWithoutPricing( (ScenarioImpl) controler.getScenario(), noiseTollHandler, spatialInfo ));
+			controler.addControlerListener(new NoiseInternalizationControlerListenerWithoutPricing( (ScenarioImpl) controler.getScenario(), noiseTollHandler, spatialInfo, extCostEventHandlerNoise ));
 		 
 		} else {
 			throw new RuntimeException("Run Id " + runId + " unknown. Aborting...");
