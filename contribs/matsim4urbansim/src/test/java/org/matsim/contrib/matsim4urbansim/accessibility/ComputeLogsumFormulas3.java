@@ -42,6 +42,7 @@ public class ComputeLogsumFormulas3  extends MatsimTestCase{
 	 * 						 \
 	 *						  cjk3	 
 	 */
+	@SuppressWarnings("static-method")
 	@Test	
 	public void testLogsumFormulas(){
 		double betaWalkTT = -10. / 3600.0;	// [util/sec]
@@ -107,7 +108,7 @@ public class ComputeLogsumFormulas3  extends MatsimTestCase{
 		double dummyExp1 = Math.exp( dummyVijCar + dummyVhiWalk );
 		double dummyExp2 = Math.exp( dummyVijCar ) * Math.exp( dummyVhiWalk );
 		
-		Assert.assertTrue(dummyExp1 == dummyExp2);	// exp(VijCar + VijWalk) == exp(VijCar) * exp(VijWalk)
+		Assert.assertEquals(dummyExp1,dummyExp2,1.e-10);	// exp(VijCar + VijWalk) == exp(VijCar) * exp(VijWalk)
 	}
 
 }
