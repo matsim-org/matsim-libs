@@ -38,22 +38,22 @@ public class NetworkCreationTest extends MatsimTestCase {
 	public void testCreateNetwork() {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		Id id1 = sc.createId("1");
-		Id id2 = sc.createId("2");
+		Id<Node> nodeId1 = Id.create("1", Node.class);
+		Id<Node> nodeId2 = Id.create("2", Node.class);
 		Coord coord = sc.createCoord(0.0, 0.0);
 		Network network = sc.getNetwork();
 		//test default capacity period
 		assertEquals(3600.0, network.getCapacityPeriod());
 		//have to cast to NetworkFactory because coord is needed otherwise null pointer exception
 		NetworkFactory nb = network.getFactory();
-		Node n1 = nb.createNode(id1, coord);
+		Node n1 = nb.createNode(nodeId1, coord);
 		assertNotNull(n1);
-		Node n2 = nb.createNode(id2, coord);
+		Node n2 = nb.createNode(nodeId2, coord);
 		assertNotNull(n2);
 		//add before link creation really needed? I don't think so dg 09/09
 		network.addNode(n1);
 		network.addNode(n2);
-		Link l1 = nb.createLink(id1, n1, n2);
+		Link l1 = nb.createLink(Id.create(1, Link.class), n1, n2);
 		//test defaults
 		assertEquals(1.0, l1.getLength());
 		assertEquals(1.0, l1.getCapacity());
