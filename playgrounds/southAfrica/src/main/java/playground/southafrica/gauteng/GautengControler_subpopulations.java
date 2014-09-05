@@ -132,7 +132,7 @@ public class GautengControler_subpopulations {
 		// ===========================================
 
 		/* Set some other config parameters. */
-		config.plans().setSubpopulationAttributeName("subpopulation");
+//		config.plans().setSubpopulationAttributeName("subpopulation"); // is the default
 		config.global().setCoordinateSystem("WGS84_SA_Albers");
 
 		String[] modes ={"car","commercial"};
@@ -144,12 +144,11 @@ public class GautengControler_subpopulations {
 		}
 
 		config.qsim().setLinkDynamics( LinkDynamics.PassingQ.toString() );
-		// yy is the mobsim really assigning the vehicles from the vehicles file?
+		// yy is the mobsim really assigning the vehicles from the vehicles file?  (In fact I think it is. kai, sep'14)
 
 		GautengUtils.assignSubpopulationStrategies(config);
 		config.strategy().setPlanSelectorForRemoval(DIVERSITY_GENERATING_PLANS_REMOVER);
 
-//		config.planCalcScore().setBrainExpBeta(1.0); // is now default
 		config.controler().setWritePlansInterval(100);
 
 		config.timeAllocationMutator().setMutationRange(7200.);
@@ -161,22 +160,12 @@ public class GautengControler_subpopulations {
 		}
 		
 		final double sampleFactor = 0.01 ;
-
-
 		config.qsim().setFlowCapFactor(sampleFactor);
-//		config.qsim().setStorageCapFactor(Math.pow(sampleFactor, -0.25)); // interpolates between 0.03 @ 0.01 and 1 @ 1
-		// yyyyyy was wrong!! Corrected version is
 		config.qsim().setStorageCapFactor(sampleFactor * Math.pow(sampleFactor, -0.25)); // interpolates between 0.03 @ 0.01 and 1 @ 1
-
 		config.counts().setCountsScaleFactor(1./sampleFactor);
 		config.counts().setOutputFormat("all");
 
 		config.qsim().setEndTime(36.*3600.);
-
-		config.qsim().setStuckTime(10.);
-//		config.qsim().setRemoveStuckVehicles(false); // this is now default
-
-//		config.qsim().setInsertingWaitingVehiclesBeforeDrivingVehicles(true); // test.  I don't think that this is needed. kai, aug'14
 
 		config.controler().setWriteSnapshotsInterval(0);
 		
@@ -191,8 +180,8 @@ public class GautengControler_subpopulations {
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspExperimentalConfigGroup.ABORT ) ;
 		config.vspExperimental().setWritingOutputEvents(true);
 		
-		// This should (in theory) allow you to add a second config file, overwriting config entries.  Meant for work with jars on the server,
-		// where you don't want to re-create the jar if you just want to change a config option.   Currently untested. kai, feb'14
+		// This allows you to add a second config file, overwriting config entries.  Meant for work with jars on the server,
+		// where you don't want to re-create the jar if you just want to change a config option.   kai, feb & sep'14
 		if(args.length > 11 && args[11] != null && args[11].length() > 0 && !args[11].equals("null") ) {
 			ConfigUtils.loadConfig(config, args[11]);
 		}
@@ -205,8 +194,6 @@ public class GautengControler_subpopulations {
 
 		final Scenario sc = ScenarioUtils.loadScenario(config);
 
-		((ScenarioImpl)sc).createVehicleContainer() ;
-		
 		/* CREATE VEHICLES. */
 		createVehiclePerPerson(sc);
 
@@ -241,18 +228,16 @@ public class GautengControler_subpopulations {
 		});
 
 		// SCORING:
-		controler.setScoringFunctionFactory(new GautengScoringFunctionFactory( 
-				sc, baseValueOfTime, valueOfTimeMultiplier 
-				) );
+		controler.setScoringFunctionFactory(new GautengScoringFunctionFactory( sc, baseValueOfTime, valueOfTimeMultiplier ) );
 		
 		// ROAD PRICING:
 		final RoadPricingConfigGroup roadPricingConfig = ConfigUtils.addOrGetModule(
 				sc.getConfig(), RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class
 				);
+		roadPricingConfig.setRoutingRandomness(3.);
 		RoadPricing roadPricing = new RoadPricing( new RoadPricingSchemeUsingTollFactor(
 				roadPricingConfig.getTollLinksFile(), new SanralTollFactor_Subpopulation(sc)
 				) );
-		roadPricing.setSigma(3.) ;
 		controler.addControlerListener( roadPricing ) ;
 		
 		// PLANS REMOVAL
@@ -269,7 +254,6 @@ public class GautengControler_subpopulations {
 		controler.addControlerListener(new KaiAnalysisListener());
 
 		// RUN:
-
 		controler.run();
 
 		Header.printFooter();
@@ -279,8 +263,9 @@ public class GautengControler_subpopulations {
 	/**
 	 * @param sc
 	 */
-	public static void createVehiclePerPerson(final Scenario sc) {
-		// (public:  access for analysis. kai, feb'14)
+	private static void createVehiclePerPerson(final Scenario sc) {
+
+		((ScenarioImpl)sc).createVehicleContainer() ;
 		
 		/* Create vehicle types. */
 		VehiclesFactory vf = VehicleUtils.getFactory();
@@ -313,11 +298,11 @@ public class GautengControler_subpopulations {
 			/* Create the vehicle. */
 			Vehicle v = null;
 			if (vehicleType.equalsIgnoreCase("A2")) {
-				v = vf.createVehicle(p.getId(), vehicle_A2);
+				v = vf.createVehicle( createVehicleIdFrom(p.getId()), vehicle_A2);
 			} else if (vehicleType.equalsIgnoreCase("B")) {
-				v = vf.createVehicle(p.getId(), vehicle_B);
+				v = vf.createVehicle( createVehicleIdFrom(p.getId()), vehicle_B);
 			} else if (vehicleType.equalsIgnoreCase("C")) {
-				v = vf.createVehicle(p.getId(), vehicle_C);
+				v = vf.createVehicle( createVehicleIdFrom(p.getId()), vehicle_C);
 			} else {
 				throw new RuntimeException("Unknown vehicle toll class: "
 						+ vehicleType);
@@ -328,6 +313,10 @@ public class GautengControler_subpopulations {
 
 			sc.getPopulation().getPersonAttributes().putAttribute( p.getId().toString(), VEH_ID, v.getId() );
 		}
+	}
+	@SuppressWarnings({ "cast", "unchecked", "rawtypes" })
+	private static Id<Vehicle> createVehicleIdFrom( Id<Person> id ) {
+		return (Id<Vehicle>) (Id) id ; // weird.
 	}
 
 	/**
@@ -382,20 +371,19 @@ public class GautengControler_subpopulations {
 			config.counts().setCountsFileName(countsFilename);
 		}
 	}
-
+	
 	private static final class SetVehicleInAllNetworkRoutes implements PlanStrategyModule {
 		private final Scenario scenario;
 
 		private SetVehicleInAllNetworkRoutes(Scenario scenario) {
 			this.scenario = scenario;
 		}
-
 		@Override
 		public void prepareReplanning(ReplanningContext replanningContext) {}
-
 		@Override
 		public void handlePlan(Plan plan) {
-			Id vehId = (Id) scenario.getPopulation().getPersonAttributes()
+			@SuppressWarnings("unchecked")
+			Id<Vehicle> vehId = (Id<Vehicle>) scenario.getPopulation().getPersonAttributes()
 					.getAttribute(plan.getPerson().getId().toString(), VEH_ID ) ;
 			for ( Leg leg : PopulationUtils.getLegs(plan) ) {
 				if ( leg.getRoute()!=null && leg.getRoute() instanceof NetworkRoute ) {
@@ -403,7 +391,6 @@ public class GautengControler_subpopulations {
 				}
 			}
 		}
-
 		@Override
 		public void finishReplanning() {}
 	}

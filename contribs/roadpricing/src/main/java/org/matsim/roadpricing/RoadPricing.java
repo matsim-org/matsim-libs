@@ -63,13 +63,18 @@ IterationEndsListener, ShutdownListener {
 
 	final static private Logger log = Logger.getLogger(RoadPricing.class);
     private RoadPricingConfigGroup rpConfig;
-	private double sigma = 0. ;
 
+    /**
+     * This constructor will pull the road pricing scheme from the file in the config.
+     */
     public RoadPricing() {
     	// public is needed (for obvious reasons: this is the entry point). kai, sep'14
 		Gbl.printBuildInfo("RoadPricing", "/org.matsim.contrib/roadpricing/revision.txt");
 	}
     
+    /**
+     * This constructor will take the road pricing scheme given to it.
+     */
     public RoadPricing( RoadPricingScheme scheme ) {
     	this() ;
     	this.scheme = scheme ;
@@ -103,16 +108,16 @@ IterationEndsListener, ShutdownListener {
 
             // replace the travelCostCalculator with a toll-dependent one if required
             if (RoadPricingScheme.TOLL_TYPE_DISTANCE.equals(this.scheme.getType()) 
-            		|| RoadPricingScheme.TOLL_TYPE_CORDON.equals(this.scheme.getType())) {
-                // (area-toll requires a regular TravelCost, no toll-specific one.)
-
-            	final TravelDisutilityFactory previousTravelDisutilityFactory = controler.getTravelDisutilityFactory();
-            	
-            	TravelDisutilityIncludingToll.Builder travelDisutilityFactory = new TravelDisutilityIncludingToll.Builder(
-            			previousTravelDisutilityFactory, scheme, controler.getConfig().planCalcScore().getMarginalUtilityOfMoney()
-            					) ;
-            	travelDisutilityFactory.setSigma( this.sigma );
-
+            		|| RoadPricingScheme.TOLL_TYPE_CORDON.equals(this.scheme.getType())
+            		|| RoadPricingScheme.TOLL_TYPE_LINK.equals(this.scheme.getType()) )
+            	// yy this is hostorically without area toll but it might be better to do it also with area toll
+            	// when the randomizing router is used.  I do think, however, that the current specification
+            	// of the area toll disutility will not work in that way.  kai, sep'14
+            {
+                TravelDisutilityIncludingToll.Builder travelDisutilityFactory = new TravelDisutilityIncludingToll.Builder(
+                		controler.getTravelDisutilityFactory(), scheme, controler.getConfig().planCalcScore().getMarginalUtilityOfMoney()
+                		) ;
+            	travelDisutilityFactory.setSigma( rpConfig.getRoutingRandomness() );
                 controler.setTravelDisutilityFactory(travelDisutilityFactory);
             }
 
@@ -138,38 +143,27 @@ IterationEndsListener, ShutdownListener {
 //        }
 	}
 
-	public RoadPricingScheme getRoadPricingScheme() {
-		// public currently not needed, but seems to make sense. kai, sep'14
-		
-		return this.scheme;
-	}
+//	public RoadPricingScheme getRoadPricingScheme() {
+//		return this.scheme;
+//	}
+	// it is actually as top-level container in scenario. kai, sep'14
 
-	public double getAllAgentsToll() {
-		// public currently not needed, but seems to make sense. kai, sep'14
-
-		return this.calcPaidToll.getAllAgentsToll();
-	}
-
-	public int getDraweesNr() {
-		// public currently not needed, but seems to make sense. kai, sep'14
-
-		return this.calcPaidToll.getDraweesNr();
-	}
-
-	public double getAvgPaidTripLength() {
-		// public currently not needed, but seems to make sense. kai, sep'14
-
-		return this.cattl.getAverageTripLength();
-	}
+//	public double getAllAgentsToll() {
+//		return this.calcPaidToll.getAllAgentsToll();
+//	}
+//
+//	public int getDraweesNr() {
+//		return this.calcPaidToll.getDraweesNr();
+//	}
+//
+//	public double getAvgPaidTripLength() {
+//		return this.cattl.getAverageTripLength();
+//	}
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		String filename = event.getControler().getControlerIO().getOutputFilename("output_toll.xml.gz") ;
 		new RoadPricingWriterXMLv1(this.scheme).writeFile(filename);
-	}
-
-	public void setSigma(double d) {
-		this.sigma = d ;
 	}
 
 }
