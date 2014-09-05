@@ -181,7 +181,7 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 		@Override
 		public double getSimValue(final Link link, final int startTime_s, final int endTime_s, final TYPE type) { // stopFacility or link
 
-			Id linkId = link.getId();
+			Id<Link> linkId = link.getId();
 			double[] values = volumesAnalyzer.getVolumesPerHourForLink(linkId);
 			
 			if (values == null) {
@@ -189,8 +189,11 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 			}
 			
 			int startHour = startTime_s / 3600;
-			int endHour = (endTime_s-3600)/3600 ;
+			int endHour = (endTime_s-3599)/3600 ;
+			// (The javadoc specifies that endTime_s should be _exclusive_.  However, in practice I find 7199 instead of 7200.  So
+			// we are giving it an extra second, which should not do any damage if it is not used.) 
 			if (endHour < startHour) {
+				System.err.println(" startTime_s: " + startTime_s + "; endTime_s: " + endTime_s + "; startHour: " + startHour + "; endHour: " + endHour );
 				throw new RuntimeException("this should not happen; check code") ;
 			}
 			double sum = 0. ;
