@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
@@ -97,13 +98,13 @@ public class ZPopulationGenerator {
 			/*
 			 * Get id of the person from the censusEntry.
 			 */
-			int id_person = entry.id_person;
+			int idPerson = entry.id_person;
 
 			/*
 			 * Create new person and add it to the population.
 			 * Use scenario.createId(String id) to create the Person's Id.
 			 */
-			Person person = populationFactory.createPerson(scenario.createId(String.valueOf(id_person)));
+			Person person = populationFactory.createPerson(Id.create(idPerson, Person.class));
 			population.addPerson(person);
 
 

@@ -25,6 +25,7 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.simple.SimpleFeatureSource;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
@@ -147,7 +148,7 @@ public class DemandGenerator {
 		Population pop = scenario.getPopulation();
 		PopulationFactory pb = pop.getFactory();
 		for (; number > 0; number--) {
-			Person pers = pb.createPerson(scenario.createId(Integer.toString(ID++)));
+			Person pers = pb.createPerson(Id.create(ID++, Person.class));
 			pop.addPerson( pers ) ;
 			Plan plan = pb.createPlan();
 			Point p = getRandomPointInFeature(rnd, ft);
