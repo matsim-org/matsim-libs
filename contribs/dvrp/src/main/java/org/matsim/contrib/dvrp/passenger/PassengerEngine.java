@@ -113,8 +113,8 @@ public class PassengerEngine
             throw new IllegalStateException("This is not a call ahead");
         }
 
-        Id fromLinkId = leg.getRoute().getStartLinkId();
-        Id toLinkId = leg.getRoute().getEndLinkId();
+        Id<Link> fromLinkId = leg.getRoute().getStartLinkId();
+        Id<Link> toLinkId = leg.getRoute().getEndLinkId();
         double departureTime = leg.getDepartureTime();
 
         PassengerRequest request = createRequest(passenger, fromLinkId, toLinkId, departureTime,
@@ -135,7 +135,7 @@ public class PassengerEngine
 
         MobsimPassengerAgent passenger = (MobsimPassengerAgent)agent;
 
-        Id toLinkId = passenger.getDestinationLinkId();
+        Id<Link> toLinkId = passenger.getDestinationLinkId();
         double departureTime = now;
 
         internalInterface.registerAdditionalAgentOnLink(passenger);
@@ -165,13 +165,13 @@ public class PassengerEngine
     private int nextId = 0;
 
 
-    private PassengerRequest createRequest(MobsimPassengerAgent passenger, Id fromLinkId,
-            Id toLinkId, double departureTime, double now)
+    private PassengerRequest createRequest(MobsimPassengerAgent passenger, Id<Link> fromLinkId,
+            Id<Link> toLinkId, double departureTime, double now)
     {
         Map<Id<Link>, ? extends Link> links = context.getScenario().getNetwork().getLinks();
         Link fromLink = links.get(fromLinkId);
         Link toLink = links.get(toLinkId);
-        Id id = context.getScenario().createId(mode + "_" + nextId++);
+        Id<PassengerRequest> id = Id.create(mode + "_" + nextId++, PassengerRequest.class);
 
         PassengerRequest request = requestCreator.createRequest(id, passenger, fromLink, toLink,
                 departureTime, departureTime, now);

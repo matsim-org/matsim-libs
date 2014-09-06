@@ -100,7 +100,7 @@ public class AccessibilityIntegrationTest {
 		// creating test opportunities (facilities)
 		ActivityFacilities opportunities = sc.getActivityFacilities();
 		for ( Link link : sc.getNetwork().getLinks().values() ) {
-			Id id = sc.createId( link.getId().toString());
+			Id<ActivityFacility> id = Id.create(link.getId(), ActivityFacility.class);
 			Coord coord = link.getCoord();
 			ActivityFacility facility = opportunities.getFactory().createActivityFacility(id, coord);
 			opportunities.addActivityFacility(facility);
@@ -165,7 +165,7 @@ public class AccessibilityIntegrationTest {
 		// creating test opportunities (facilities)
 		ActivityFacilities opportunities = sc.getActivityFacilities();
 		for ( Link link : sc.getNetwork().getLinks().values() ) {
-			Id id = sc.createId( link.getId().toString());
+			Id<ActivityFacility> id = Id.create(link.getId(), ActivityFacility.class);
 			Coord coord = link.getCoord();
 			ActivityFacility facility = opportunities.getFactory().createActivityFacility(id, coord);
 			opportunities.addActivityFacility(facility);
@@ -239,7 +239,7 @@ public class AccessibilityIntegrationTest {
 		// creating test opportunities (facilities)
 		ActivityFacilities opportunities = sc.getActivityFacilities();
 		for ( Link link : sc.getNetwork().getLinks().values() ) {
-			Id id = sc.createId( link.getId().toString());
+			Id<ActivityFacility> id = Id.create(link.getId(), ActivityFacility.class);
 			Coord coord = link.getCoord();
 			ActivityFacility facility = opportunities.getFactory().createActivityFacility(id, coord);
 			opportunities.addActivityFacility(facility);

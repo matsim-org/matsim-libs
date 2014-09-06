@@ -48,7 +48,6 @@ public class EvacuationNetworkGenerator {
 
 	private static final Logger log = Logger.getLogger(EvacuationNetworkGenerator.class);
 
-	private final Scenario sc;
 	private final Geometry evacuationArea;
 	private final Network network;
 
@@ -56,18 +55,17 @@ public class EvacuationNetworkGenerator {
 	private final HashSet<Node> safeNodes = new HashSet<Node>();
 	private final HashSet<Node> redundantNodes = new HashSet<Node>();
 
-	private final Id safeNodeAId;
+	private final Id<Node> safeNodeAId;
 
-	private final Id safeNodeBId;
+	private final Id<Node> safeNodeBId;
 
-	private final Id safeLinkId;
+	private final Id<Link> safeLinkId;
 
-	public EvacuationNetworkGenerator(Scenario sc, Geometry evavcuationArea, Id safeLinkId){
-		this.sc = sc;
+	public EvacuationNetworkGenerator(Scenario sc, Geometry evavcuationArea, Id<Link> safeLinkId){
 		this.evacuationArea = evavcuationArea;//.buffer(4000);
 		this.network = sc.getNetwork();
-		this.safeNodeAId = this.sc.createId("en1");
-		this.safeNodeBId = this.sc.createId("en2");
+		this.safeNodeAId = Id.create("en1", Node.class);
+		this.safeNodeBId = Id.create("en2", Node.class);
 		this.safeLinkId = safeLinkId;
 	}
 
@@ -113,7 +111,7 @@ public class EvacuationNetworkGenerator {
 			if (this.safeNodes.contains(node)){// && !nodeId.equals(this.safeNodeAId) && !nodeId.equals(this.safeNodeBId)) {
 				linkId++;
 				String sLinkID = "el" + Integer.toString(linkId);
-				Link l2 = this.network.getFactory().createLink(this.sc.createId(sLinkID), node, safeNodeA);
+				Link l2 = this.network.getFactory().createLink(Id.create(sLinkID, Link.class), node, safeNodeA);
 				l2.setLength(10);
 				l2.setFreespeed(100000);
 				l2.setCapacity(capacity);
@@ -219,7 +217,7 @@ public class EvacuationNetworkGenerator {
 		for (Node n : this.network.getNodes().values()) {
 			if (!this.safeNodes.contains(n) && !this.redundantNodes.contains(n)) {
 				NetworkFactory fac = this.network.getFactory();
-				Link l = fac.createLink(this.sc.createId("dummy"+dCnt++), this.network.getNodes().get(this.safeNodeBId), n);
+				Link l = fac.createLink(Id.create("dummy"+dCnt++, Link.class), this.network.getNodes().get(this.safeNodeBId), n);
 				this.network.addLink(l);
 				dummies.add(l);
 			}

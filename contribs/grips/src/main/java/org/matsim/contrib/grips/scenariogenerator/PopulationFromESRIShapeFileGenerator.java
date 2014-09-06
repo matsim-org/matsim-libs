@@ -179,7 +179,7 @@ public class PopulationFromESRIShapeFileGenerator {
 		PopulationFactory pb = pop.getFactory();
 		long number = (Long)ft.getAttribute("persons");
 		for (; number > 0; number--) {
-			Person pers = pb.createPerson(this.scenario.createId(Integer.toString(this.id++)));
+			Person pers = pb.createPerson(Id.create(this.id++, Person.class));
 			pop.addPerson(pers);
 			Plan plan = pb.createPlan();
 			Coord c = getRandomCoordInsideFeature(this.rnd, ft);
@@ -189,7 +189,7 @@ public class PopulationFromESRIShapeFileGenerator {
 			((ActivityImpl)act).setCoord(c);
 			double departureTime = getDepartureTime();
 			act.setEndTime(departureTime); 
-			// hier wird die Departur Time gesetzt
+			// hier wird die Departure Time gesetzt
 			plan.addActivity(act);
 			Leg leg = pb.createLeg("car");
 			plan.addLeg(leg);

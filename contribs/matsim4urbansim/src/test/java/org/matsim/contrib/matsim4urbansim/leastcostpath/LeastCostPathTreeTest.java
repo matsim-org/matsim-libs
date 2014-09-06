@@ -1,4 +1,4 @@
-package org.matsim.contrib.matsim4urbansim.leasetcostpath;
+package org.matsim.contrib.matsim4urbansim.leastcostpath;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -59,7 +59,7 @@ public class LeastCostPathTreeTest extends MatsimTestCase{
 		printResults(arrivalTime, travelTime); // travel time = cost = (50s+50s) = 100s
 		// check route (visited nodes should be 1,2,4)
 		List<Id> spTimeVisitedNodes = getVisitedNodes(lcptTime, destination, "Travel Time");
-		Assert.assertTrue( containsNode(spTimeVisitedNodes, this.scenario.createId("2")));
+		Assert.assertTrue( containsNode(spTimeVisitedNodes, Id.create("2", Node.class)));
 		// check travel duration
 		Assert.assertTrue( travelTime == 100 );
 		// check travel time
@@ -71,7 +71,7 @@ public class LeastCostPathTreeTest extends MatsimTestCase{
 		printResults(arrivalTimeTD, travelDistance); // travel time = 1000s, cost = (50m+50m) = 100m
 		// check route ( visited nodes should be 1,3,4)
 		List<Id> spDistenceVisitedNodes = getVisitedNodes(lcptDistance, destination, "Travel Distance");
-		Assert.assertTrue( containsNode(spDistenceVisitedNodes, this.scenario.createId("3")));
+		Assert.assertTrue( containsNode(spDistenceVisitedNodes, Id.create("3", Node.class)));
 		// check travel distance
 		Assert.assertTrue( travelDistance == 100 );
 		// check travel time

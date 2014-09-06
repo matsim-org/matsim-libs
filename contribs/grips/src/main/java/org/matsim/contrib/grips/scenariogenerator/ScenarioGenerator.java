@@ -27,6 +27,7 @@ import org.geotools.data.FeatureSource;
 import org.geotools.feature.IllegalAttributeException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.grips.control.algorithms.FeatureTransformer;
 import org.matsim.contrib.grips.experimental.CustomizedOsmNetworkReader;
@@ -132,7 +133,7 @@ public class ScenarioGenerator {
 		qsim.setEndTime(30 * 3600);
 		this.matsimConfig.timeAllocationMutator().setMutationRange(0.);
 		this.matsimScenario = ScenarioUtils.createScenario(this.matsimConfig);
-		this.safeLinkId = this.matsimScenario.createId("el1");
+		this.safeLinkId = Id.create("el1", Link.class);
 
 		File outputDirFile = new File(outdir);
 		if (!outputDirFile.exists()) {

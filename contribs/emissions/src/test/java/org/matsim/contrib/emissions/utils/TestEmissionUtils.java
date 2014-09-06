@@ -1,4 +1,4 @@
-/* *********************************************************************** *
+/* *******i**************************************************************** *
  * project: org.matsim.*                                                   *
  * TestHbefaVehicleAttributesEmission.java                                 *
  *                                                                         *
@@ -39,7 +39,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.emissions.types.ColdPollutant;
 import org.matsim.contrib.emissions.types.WarmPollutant;
-import org.matsim.contrib.emissions.utils.EmissionUtils;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -777,7 +776,7 @@ public class TestEmissionUtils {
 		//each link of the network and each type of emission
 		for(Link link: network.getLinks().values()){
 			
-			Id linkId = sc.createId(link.getId().toString());
+			Id<Link> linkId = link.getId();
 
 				Assert.assertTrue(totalEmissionsFilled.containsKey(linkId));
 				SortedMap<String, Double> emissionMapForLink = totalEmissionsFilled.get(linkId);
@@ -843,17 +842,17 @@ public class TestEmissionUtils {
 	private void addLinksToNetwork(Network nw, Scenario sc) {
 		//intern method to set up a network with nodes and links
 		NetworkImpl network = (NetworkImpl) sc.getNetwork();
-		Node node1 = network.createAndAddNode(sc.createId("node1"), sc.createCoord(.0, .0));
-		Node node2 = network.createAndAddNode(sc.createId("node2"), sc.createCoord(.0, 1000.));
-		Node node3 = network.createAndAddNode(sc.createId("node3"), sc.createCoord(1000., .0));
-		Node node4 = network.createAndAddNode(sc.createId("node4"), sc.createCoord(1000., 1000.));
+		Node node1 = network.createAndAddNode(Id.create("node1", Node.class), sc.createCoord(.0, .0));
+		Node node2 = network.createAndAddNode(Id.create("node2", Node.class), sc.createCoord(.0, 1000.));
+		Node node3 = network.createAndAddNode(Id.create("node3", Node.class), sc.createCoord(1000., .0));
+		Node node4 = network.createAndAddNode(Id.create("node4", Node.class), sc.createCoord(1000., 1000.));
 		
-		network.createAndAddLink(sc.createId("link12"), node1, node2, 1000., 20., 3600, 2); //w/o orig id and type
-		network.createAndAddLink(sc.createId("link13"), node1, node3, 1000., 20., 3600, 2); //w/o orig id and type
-		network.createAndAddLink(sc.createId("link14"), node1, node4, 1000., 20., 3600, 2); //w/o orig id and type
-		network.createAndAddLink(sc.createId("link23"), node2, node3, 1000., 20., 3600, 2); //w/o orig id and type
-		network.createAndAddLink(sc.createId("link24"), node2, node4, 1000., 20., 3600, 2); //w/o orig id and type
-		network.createAndAddLink(sc.createId("link34"), node3, node4, 1000., 20., 3600, 2); //w/o orig id and type
+		network.createAndAddLink(Id.create("link12", Link.class), node1, node2, 1000., 20., 3600, 2); //w/o orig id and type
+		network.createAndAddLink(Id.create("link13", Link.class), node1, node3, 1000., 20., 3600, 2); //w/o orig id and type
+		network.createAndAddLink(Id.create("link14", Link.class), node1, node4, 1000., 20., 3600, 2); //w/o orig id and type
+		network.createAndAddLink(Id.create("link23", Link.class), node2, node3, 1000., 20., 3600, 2); //w/o orig id and type
+		network.createAndAddLink(Id.create("link24", Link.class), node2, node4, 1000., 20., 3600, 2); //w/o orig id and type
+		network.createAndAddLink(Id.create("link34", Link.class), node3, node4, 1000., 20., 3600, 2); //w/o orig id and type
 	}
 
 	@Test

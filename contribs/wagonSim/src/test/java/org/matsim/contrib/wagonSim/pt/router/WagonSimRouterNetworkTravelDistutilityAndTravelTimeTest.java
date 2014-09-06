@@ -38,7 +38,6 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.wagonSim.WagonSimConstants;
 import org.matsim.contrib.wagonSim.mobsim.qsim.framework.listeners.WagonSimVehicleLoadListener;
 import org.matsim.contrib.wagonSim.mobsim.qsim.framework.listeners.WagonSimVehicleLoadListener.VehicleLoad;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -109,7 +108,7 @@ public class WagonSimRouterNetworkTravelDistutilityAndTravelTimeTest extends Mat
 											sc.getPopulation().getPersonAttributes());
 		TransitRouterNetwork network = WagonSimRouterFactoryImpl.createRouterNetwork(sc.getTransitSchedule(), 0);
 		TransitRouter router = new TransitRouterImpl(routerConfig, prepSchedule, network, tt, tt);
-		Person p = sc.getPopulation().getPersons().get(new IdImpl("1"));
+		Person p = sc.getPopulation().getPersons().get(Id.create("1", Person.class));
 		
 		// calc the first best route without any congestion
 		List<Leg> legs = router.calcRoute(new CoordImpl(0,0), new CoordImpl(100, 100), 0, p);
@@ -218,7 +217,7 @@ public class WagonSimRouterNetworkTravelDistutilityAndTravelTimeTest extends Mat
 		home.setEndTime(0);
 		plan.addActivity(home);
 		Leg l = factory.createLeg(TransportMode.pt);
-		Person p = factory.createPerson(sc.createId(String.valueOf(1)));
+		Person p = factory.createPerson(Id.create(1, Person.class));
 		plan.addLeg(l);
 		plan.addActivity(factory.createActivityFromCoord("w", sc.createCoord(100, 100)));
 		p.addPlan(plan);
@@ -239,14 +238,14 @@ public class WagonSimRouterNetworkTravelDistutilityAndTravelTimeTest extends Mat
 	private void createNetwork(Scenario sc) {
 		NetworkFactory factory =  sc.getNetwork().getFactory();
 		Node one, two, three;
-		one = factory.createNode(sc.createId("n1"), sc.createCoord(-100, -100));
-		two = factory.createNode(sc.createId("n2"), sc.createCoord(0, 0));
-		three = factory.createNode(sc.createId("n3"), sc.createCoord(100, 100));
+		one = factory.createNode(Id.create("n1", Node.class), sc.createCoord(-100, -100));
+		two = factory.createNode(Id.create("n2", Node.class), sc.createCoord(0, 0));
+		three = factory.createNode(Id.create("n3", Node.class), sc.createCoord(100, 100));
 		sc.getNetwork().addNode(one);
 		sc.getNetwork().addNode(two);
 		sc.getNetwork().addNode(three);
-		sc.getNetwork().addLink(factory.createLink(sc.createId("l1"), one, two));
-		sc.getNetwork().addLink(factory.createLink(sc.createId("l2"), two, three));
+		sc.getNetwork().addLink(factory.createLink(Id.create("l1", Link.class), one, two));
+		sc.getNetwork().addLink(factory.createLink(Id.create("l2", Link.class), two, three));
 		sc.getConfig().scenario().setUseTransit(true);
 		sc.getConfig().scenario().setUseVehicles(true);
 	}
@@ -257,12 +256,12 @@ public class WagonSimRouterNetworkTravelDistutilityAndTravelTimeTest extends Mat
 	private void createSchedule(Scenario sc) {
 		TransitSchedule sched = sc.getTransitSchedule();
 		TransitScheduleFactory schedFactory = sched.getFactory();
-		TransitLine line = schedFactory.createTransitLine(sc.createId("wagonLine"));
+		TransitLine line = schedFactory.createTransitLine(Id.create("wagonLine", TransitLine.class));
 		
-		TransitStopFacility f1 = schedFactory.createTransitStopFacility(sc.createId("f1"), sc.createCoord(0, 0), false);
-		f1.setLinkId(sc.createId("l1"));
-		TransitStopFacility f2 = schedFactory.createTransitStopFacility(sc.createId("f2"), sc.createCoord(100, 100), false);
-		f2.setLinkId(sc.createId("l2"));
+		TransitStopFacility f1 = schedFactory.createTransitStopFacility(Id.create("f1", TransitStopFacility.class), sc.createCoord(0, 0), false);
+		f1.setLinkId(Id.create("l1", Link.class));
+		TransitStopFacility f2 = schedFactory.createTransitStopFacility(Id.create("f2", TransitStopFacility.class), sc.createCoord(100, 100), false);
+		f2.setLinkId(Id.create("l2", Link.class));
 		sched.addStopFacility(f1);
 		sched.addStopFacility(f2);
 		
@@ -275,18 +274,18 @@ public class WagonSimRouterNetworkTravelDistutilityAndTravelTimeTest extends Mat
 		stops.add(s1);
 		stops.add(s2);
 		
-		NetworkRoute networkRoute = new LinkNetworkRouteImpl(new IdImpl("l1"), new ArrayList<Id<Link>>(), new IdImpl("l2")); 
-		TransitRoute route = schedFactory.createTransitRoute(sc.createId("wagonRoute"), networkRoute, stops, TransportMode.pt);
-		Departure d = schedFactory.createDeparture(sc.createId("d1"), 100);
-		d.setVehicleId(sc.createId("v1"));
+		NetworkRoute networkRoute = new LinkNetworkRouteImpl(Id.create("l1", Link.class), new ArrayList<Id<Link>>(), Id.create("l2", Link.class)); 
+		TransitRoute route = schedFactory.createTransitRoute(Id.create("wagonRoute", TransitRoute.class), networkRoute, stops, TransportMode.pt);
+		Departure d = schedFactory.createDeparture(Id.create("d1", Departure.class), 100);
+		d.setVehicleId(Id.create("v1", Vehicle.class));
 		route.addDeparture(d);
 		
-		d = schedFactory.createDeparture(sc.createId("d2"), 400);
-		d.setVehicleId(sc.createId("v2"));
+		d = schedFactory.createDeparture(Id.create("d2", Departure.class), 400);
+		d.setVehicleId(Id.create("v2", Vehicle.class));
 		route.addDeparture(d);
 		
-		d = schedFactory.createDeparture(sc.createId("d3"), 700);
-		d.setVehicleId(sc.createId("v3"));
+		d = schedFactory.createDeparture(Id.create("d3", Departure.class), 700);
+		d.setVehicleId(Id.create("v3", Vehicle.class));
 		route.addDeparture(d);
 		
 		line.addRoute(route);
@@ -305,19 +304,19 @@ public class WagonSimRouterNetworkTravelDistutilityAndTravelTimeTest extends Mat
 		vc.setSeats(100);
 		vc.setStandingRoom(0);
 		
-		VehicleType vt1 = factory.createVehicleType(sc.createId("vt1"));
+		VehicleType vt1 = factory.createVehicleType(Id.create("vt1", VehicleType.class));
 		vt1.setAccessTime(10);
 		vt1.setCapacity(vc);
 		
 		veh.addVehicleType(vt1);
 		
-		Vehicle v = factory.createVehicle(sc.createId("v1"), vt1);
+		Vehicle v = factory.createVehicle(Id.create("v1", Vehicle.class), vt1);
 		veh.addVehicle( v);
 		
-		v = factory.createVehicle(sc.createId("v2"), vt1);
+		v = factory.createVehicle(Id.create("v2", Vehicle.class), vt1);
 		veh.addVehicle( v);
 		
-		v = factory.createVehicle(sc.createId("v3"), vt1);
+		v = factory.createVehicle(Id.create("v3", Vehicle.class), vt1);
 		veh.addVehicle( v);
 	}
 
@@ -329,8 +328,8 @@ public class WagonSimRouterNetworkTravelDistutilityAndTravelTimeTest extends Mat
 	 */
 	private ObjectAttributes createVehicleLinkSpeedAttributes(Scenario sc) {
 		ObjectAttributes oa = new ObjectAttributes();
-		for(Id v: ((ScenarioImpl)sc).getVehicles().getVehicles().keySet()){
-			for(Id l: sc.getNetwork().getLinks().keySet()){
+		for(Id<Vehicle> v: ((ScenarioImpl)sc).getVehicles().getVehicles().keySet()){
+			for(Id<Link> l: sc.getNetwork().getLinks().keySet()){
 				oa.putAttribute(v.toString(), l.toString(), 10000.);
 			}
 			oa.putAttribute(v.toString(), WagonSimConstants.TRAIN_MAX_LENGTH, 1000.);

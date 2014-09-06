@@ -25,6 +25,7 @@ import java.util.Stack;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.data.VehicleImpl;
 import org.matsim.contrib.dvrp.data.VrpData;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -36,14 +37,12 @@ public class VehicleReader
 {
     private final static String VEHICLE = "vehicle";
 
-    private Scenario scenario;
     private VrpData data;
     private Map<Id<Link>, ? extends Link> links;
 
 
     public VehicleReader(Scenario scenario, VrpData data)
     {
-        this.scenario = scenario;
         this.data = data;
 
         links = scenario.getNetwork().getLinks();
@@ -66,9 +65,9 @@ public class VehicleReader
 
     private void startVehicle(Attributes atts)
     {
-        Id id = scenario.createId(atts.getValue("id"));
+        Id<Vehicle> id = Id.create(atts.getValue("id"), Vehicle.class);
 
-        Id startLinkId = scenario.createId(atts.getValue("start_link"));
+        Id<Link> startLinkId = Id.create(atts.getValue("start_link"), Link.class);
         Link startLink = links.get(startLinkId);
 
         double capacity = ReaderUtils.getDouble(atts, "capacity", 1);
