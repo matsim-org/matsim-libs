@@ -713,8 +713,8 @@ public class RblMerger {
 		vehType.setCapacity(vehCap);
 		vehicles.addVehicleType(vehType);
 		
-		Map<Id, Vehicle> vehMap = vehicles.getVehicles();
-		for (Id vehId : vehIds) {
+		Map<Id<Vehicle>, Vehicle> vehMap = vehicles.getVehicles();
+		for (Id<Vehicle> vehId : vehIds) {
 			Vehicle veh = vehicles.getFactory().createVehicle(vehId, vehType);
 			vehMap.put(vehId, veh);
 		}

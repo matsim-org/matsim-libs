@@ -45,7 +45,7 @@ public class VehId2LoadMap implements PersonEntersVehicleEventHandler, PersonLea
 	private final Level logLevel = Level.DEBUG;
 	
 	private VehId2OccupancyHandler vehId2OccupancyHandler;
-	private Map<Id, Vehicle> vehiclesMap;
+	private Map<Id<Vehicle>, Vehicle> vehiclesMap;
 	
 	public VehId2LoadMap(Vehicles vehicles){
 		this.log.setLevel(this.logLevel);
@@ -56,7 +56,7 @@ public class VehId2LoadMap implements PersonEntersVehicleEventHandler, PersonLea
 	/**
 	 * @return Returns the load for a given vehicle id and time.
 	 */
-	public double getVehLoadByTime(Id vehId, double time){
+	public double getVehLoadByTime(Id<Vehicle> vehId, double time){
 		double occupancy = this.vehId2OccupancyHandler.getVehicleLoad(vehId, time);
 		double capacity = this.vehiclesMap.get(vehId).getType().getCapacity().getSeats().intValue()
 						+ this.vehiclesMap.get(vehId).getType().getCapacity().getStandingRoom().intValue();

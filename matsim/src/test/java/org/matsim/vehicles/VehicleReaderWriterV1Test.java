@@ -70,8 +70,8 @@ public class VehicleReaderWriterV1Test extends MatsimTestCase {
 	}
 
 	private void checkContent(Vehicles vehdef) {
-		Map<Id, VehicleType> vehicleTypes = vehdef.getVehicleTypes();
-		Map<Id, Vehicle> vehicles = vehdef.getVehicles();
+		Map<Id<VehicleType>, VehicleType> vehicleTypes = vehdef.getVehicleTypes();
+		Map<Id<Vehicle>, Vehicle> vehicles = vehdef.getVehicles();
 			
 		assertNotNull(vehicleTypes);
 		assertEquals(2, vehicleTypes.size());

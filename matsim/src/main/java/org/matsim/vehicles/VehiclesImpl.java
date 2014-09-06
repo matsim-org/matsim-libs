@@ -33,8 +33,8 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  * @author jwjoubert
  */
 class VehiclesImpl implements Vehicles {
-	private final Map<Id, VehicleType> vehicleTypes;
-	private final LinkedHashMap<Id, Vehicle> vehicles;
+	private final Map<Id<VehicleType>, VehicleType> vehicleTypes;
+	private final LinkedHashMap<Id<Vehicle>, Vehicle> vehicles;
 	private final VehiclesFactoryImpl builder;
 	private final ObjectAttributes vehicleAttributes = new ObjectAttributes();
 
@@ -44,9 +44,9 @@ class VehiclesImpl implements Vehicles {
 	 * deliberately non-public since there is a factory.  kai, nov'11
 	 */
 	VehiclesImpl(){
-		this.vehicleTypes = new LinkedHashMap<Id, VehicleType>();
+		this.vehicleTypes = new LinkedHashMap<>();
 		this.builder = new VehiclesFactoryImpl() ;
-		this.vehicles = new LinkedHashMap<Id, Vehicle>();
+		this.vehicles = new LinkedHashMap<>();
 	}
 
 
@@ -56,13 +56,13 @@ class VehiclesImpl implements Vehicles {
 	}
 
 	@Override
-	public final Map<Id, Vehicle> getVehicles() {
+	public final Map<Id<Vehicle>, Vehicle> getVehicles() {
 		return Collections.unmodifiableMap(this.vehicles);
 	}
 
 
 	@Override
-	public Map<Id, VehicleType> getVehicleTypes() {
+	public Map<Id<VehicleType>, VehicleType> getVehicleTypes() {
 		return Collections.unmodifiableMap(this.vehicleTypes);
 	}
 

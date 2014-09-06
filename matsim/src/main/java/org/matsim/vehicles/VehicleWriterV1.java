@@ -38,8 +38,8 @@ public class VehicleWriterV1 extends MatsimXmlWriter {
 	private static final Logger log = Logger.getLogger(VehicleWriterV1.class);
 	
 	private List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
-	private Map<Id, VehicleType> vehicleTypes;
-	private Map<Id, Vehicle> vehicles;
+	private Map<Id<VehicleType>, VehicleType> vehicleTypes;
+	private Map<Id<Vehicle>, Vehicle> vehicles;
 
 	
 	public VehicleWriterV1(Vehicles vehicles) {
@@ -66,7 +66,7 @@ public class VehicleWriterV1 extends MatsimXmlWriter {
 		this.writeEndTag(VehicleSchemaV1Names.VEHICLEDEFINITIONS);
 	}
 
-	private void writeVehicles(Map<Id, Vehicle> veh) throws UncheckedIOException {
+	private void writeVehicles(Map<Id<Vehicle>, Vehicle> veh) throws UncheckedIOException {
 		for (Vehicle v : veh.values()) {
 			atts.clear();
 			atts.add(this.createTuple(VehicleSchemaV1Names.ID, v.getId().toString()));
@@ -75,7 +75,7 @@ public class VehicleWriterV1 extends MatsimXmlWriter {
 		}
 	}
 
-	private void writeVehicleTypes(Map<Id, VehicleType> vts) throws UncheckedIOException {
+	private void writeVehicleTypes(Map<Id<VehicleType>, VehicleType> vts) throws UncheckedIOException {
 		for (VehicleType vt : vts.values()) {
 			atts.clear();
 			atts.add(this.createTuple(VehicleSchemaV1Names.ID, vt.getId().toString()));
