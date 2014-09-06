@@ -22,6 +22,7 @@ package org.matsim.integration;
 
 import java.util.Arrays;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.Event;
@@ -34,7 +35,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -81,25 +81,25 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		config.scenario().setUseVehicles(true);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
-		Node node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(0, 0));
-		Node node2 = network.getFactory().createNode(scenario.createId("2"), scenario.createCoord(100, 0));
-		Node node3 = network.getFactory().createNode(scenario.createId("3"), scenario.createCoord(1100, 0));
-		Node node4 = network.getFactory().createNode(scenario.createId("4"), scenario.createCoord(1200, 0));
+		Node node1 = network.getFactory().createNode(Id.create("1", Node.class), scenario.createCoord(0, 0));
+		Node node2 = network.getFactory().createNode(Id.create("2", Node.class), scenario.createCoord(100, 0));
+		Node node3 = network.getFactory().createNode(Id.create("3", Node.class), scenario.createCoord(1100, 0));
+		Node node4 = network.getFactory().createNode(Id.create("4", Node.class), scenario.createCoord(1200, 0));
 		network.addNode(node1);
 		network.addNode(node2);
 		network.addNode(node3);
 		network.addNode(node4);
-		Link link1 = network.getFactory().createLink(scenario.createId("1"), node1, node2);
+		Link link1 = network.getFactory().createLink(Id.create("1", Link.class), node1, node2);
 		link1.setLength(100);
 		link1.setFreespeed(100);
 		link1.setCapacity(60000);
 		link1.setNumberOfLanes(9);
-		Link link2 = network.getFactory().createLink(scenario.createId("2"), node2, node3);
+		Link link2 = network.getFactory().createLink(Id.create("2", Link.class), node2, node3);
 		link2.setLength(1000);
 		link2.setFreespeed(100);
 		link2.setCapacity(6000);
 		link2.setNumberOfLanes(2);
-		Link link3 = network.getFactory().createLink(scenario.createId("3"), node3, node4);
+		Link link3 = network.getFactory().createLink(Id.create("3", Link.class), node3, node4);
 		link3.setLength(100);
 		link3.setFreespeed(100);
 		link3.setCapacity(60000);
@@ -111,32 +111,32 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 
 
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
-		TransitStopFacility stop1 = builder.createTransitStopFacility(scenario.createId("1"), scenario.createCoord(100, 0), false);
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), scenario.createCoord(100, 0), false);
 		stop1.setLinkId(link1.getId());
-		TransitStopFacility stop2 = builder.createTransitStopFacility(scenario.createId("2"), scenario.createCoord(1100, 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), scenario.createCoord(1100, 0), false);
 		stop2.setLinkId(link2.getId());
-		TransitStopFacility stop3 = builder.createTransitStopFacility(scenario.createId("3"), scenario.createCoord(1200, 0), false);
+		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("3", TransitStopFacility.class), scenario.createCoord(1200, 0), false);
 		stop3.setLinkId(link3.getId());
 
 
-		TransitLine line1 = builder.createTransitLine(scenario.createId("L1"));
+		TransitLine line1 = builder.createTransitLine(Id.create("L1", TransitLine.class));
 		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(link1.getId(), link3.getId());
 		route.setLinkIds(link1.getId(), Arrays.asList(link2.getId()), link3.getId());
-		TransitRoute route1 = builder.createTransitRoute(new IdImpl("R1"), route, Arrays.asList( builder.createTransitRouteStop(stop1,0,10), builder.createTransitRouteStop(stop2,0,20), builder.createTransitRouteStop(stop3,0,30)), TransportMode.car);
+		TransitRoute route1 = builder.createTransitRoute(Id.create("R1", TransitRoute.class), route, Arrays.asList( builder.createTransitRouteStop(stop1,0,10), builder.createTransitRouteStop(stop2,0,20), builder.createTransitRouteStop(stop3,0,30)), TransportMode.car);
 		line1.addRoute(route1);
-		Departure d1 = builder.createDeparture(new IdImpl("D1"), 100);
-		d1.setVehicleId(new IdImpl("V1"));
+		Departure d1 = builder.createDeparture(Id.create("D1", Departure.class), 100);
+		d1.setVehicleId(Id.create("V1", Vehicle.class));
 		route1.addDeparture(d1);
 
 		Vehicles vehicles = ((ScenarioImpl) scenario).getVehicles();
-		VehicleType vehicleType = vehicles.getFactory().createVehicleType(new IdImpl("VT1"));
+		VehicleType vehicleType = vehicles.getFactory().createVehicleType(Id.create("VT1", VehicleType.class));
 		VehicleCapacity vehicleCapacity = vehicles.getFactory().createVehicleCapacity();
 		vehicleCapacity.setSeats(30);
 		vehicleCapacity.setStandingRoom(70);
 		vehicleType.setCapacity(vehicleCapacity);
 		vehicles.addVehicleType(vehicleType);
 		
-		Vehicle vehicle = vehicles.getFactory().createVehicle(new IdImpl("V1"), vehicleType);
+		Vehicle vehicle = vehicles.getFactory().createVehicle(Id.create("V1", Vehicle.class), vehicleType);
 		vehicles.addVehicle(vehicle);
 
 		TransitSchedule transitSchedule = scenario.getTransitSchedule();
@@ -146,7 +146,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		transitSchedule.addTransitLine(line1);
 
 		PopulationFactoryImpl populationFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
-		Person person = populationFactory.createPerson(new IdImpl("0"));
+		Person person = populationFactory.createPerson(Id.create("0", Person.class));
 		Plan plan = populationFactory.createPlan();
 		Activity a1 = populationFactory.createActivityFromCoord("h", link1.getCoord());
 		((ActivityImpl) a1).setLinkId(link1.getId());
@@ -231,22 +231,22 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 	public void testTeleportationScore() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
-		Node node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(0, 0));
-		Node node2 = network.getFactory().createNode(scenario.createId("2"), scenario.createCoord(100, 0));
-		Node node3 = network.getFactory().createNode(scenario.createId("3"), scenario.createCoord(1100, 0));
-		Node node4 = network.getFactory().createNode(scenario.createId("4"), scenario.createCoord(1200, 0));
+		Node node1 = network.getFactory().createNode(Id.create("1", Node.class), scenario.createCoord(0, 0));
+		Node node2 = network.getFactory().createNode(Id.create("2", Node.class), scenario.createCoord(100, 0));
+		Node node3 = network.getFactory().createNode(Id.create("3", Node.class), scenario.createCoord(1100, 0));
+		Node node4 = network.getFactory().createNode(Id.create("4", Node.class), scenario.createCoord(1200, 0));
 		network.addNode(node1);
 		network.addNode(node2);
 		network.addNode(node3);
 		network.addNode(node4);
-		Link link1 = network.getFactory().createLink(scenario.createId("1"), node1, node2);
-		Link link2 = network.getFactory().createLink(scenario.createId("2"), node2, node3);
-		Link link3 = network.getFactory().createLink(scenario.createId("3"), node3, node4);
+		Link link1 = network.getFactory().createLink(Id.create("1", Link.class), node1, node2);
+		Link link2 = network.getFactory().createLink(Id.create("2", Link.class), node2, node3);
+		Link link3 = network.getFactory().createLink(Id.create("3", Link.class), node3, node4);
 		network.addLink(link1);
 		network.addLink(link2);
 		network.addLink(link3);
 		PopulationFactoryImpl populationFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
-		Person person = populationFactory.createPerson(new IdImpl("0"));
+		Person person = populationFactory.createPerson(Id.create("0", Person.class));
 		Plan plan = populationFactory.createPlan();
 		Activity a1 = populationFactory.createActivityFromLinkId("h", link1.getId());
 		a1.setEndTime(6*3600);

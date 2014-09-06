@@ -50,9 +50,6 @@ import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.vis.vecmathutils.VectorUtils;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-
 import playground.dgrether.koehlerstrehlersignal.data.DgCrossing;
 import playground.dgrether.koehlerstrehlersignal.data.DgCrossingNode;
 import playground.dgrether.koehlerstrehlersignal.data.DgGreen;
@@ -61,6 +58,9 @@ import playground.dgrether.koehlerstrehlersignal.data.DgProgram;
 import playground.dgrether.koehlerstrehlersignal.data.DgStreet;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdConverter;
 import playground.dgrether.signalsystems.utils.DgSignalsUtils;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * Class to convert a MATSim network into a KS-model network with crossings and streets.
@@ -82,7 +82,7 @@ public class M2KS2010NetworkConverter {
 
 	private DgIdConverter idConverter;
 
-	private Set<Id> signalizedLinks;
+	private Set<Id<Link>> signalizedLinks;
 	
 	private Envelope signalsBoundingBox;
 	
@@ -416,7 +416,7 @@ public class M2KS2010NetworkConverter {
 			log.debug("    signal: " + signal.getId() + " system: " + system.getId());
 			Id lightId = null;
 			if (l2l == null) {
-				Set<Id> outLinkIds = new HashSet<Id>();
+				Set<Id<Link>> outLinkIds = new HashSet<>();
 				if (signals4Link.size() > 1 && (signal.getTurningMoveRestrictions() == null || signal.getTurningMoveRestrictions().isEmpty())){
 					throw new IllegalStateException("more than one signal on one link but no lanes and no turning move restrictions is not allowed");
 				}
@@ -492,8 +492,8 @@ public class M2KS2010NetworkConverter {
 //			throw new IllegalStateException("Default program must exist at not signalized crossing: " + crossing.getId());
 //		}
 		if (l2l == null){ // create lights for link without lanes
-			List<Id> toLinks = this.getTurningMoves4LinkWoLanes(link);
-			for (Id outLinkId : toLinks){
+			List<Id<Link>> toLinks = this.getTurningMoves4LinkWoLanes(link);
+			for (Id<Link> outLinkId : toLinks){
 				Id lightId = this.createLights(link.getId(), null, outLinkId, backLinkId, inLinkToNode, crossing);
 //				if (lightId != null){
 //					this.createAndAddAllTimeGreen(lightId, program);
@@ -577,8 +577,8 @@ public class M2KS2010NetworkConverter {
 	}
 	
 	
-	private List<Id> getTurningMoves4LinkWoLanes(Link link){
-		List<Id> outLinks = new ArrayList<Id>();
+	private List<Id<Link>> getTurningMoves4LinkWoLanes(Link link){
+		List<Id<Link>> outLinks = new ArrayList<>();
 		for (Link outLink : link.getToNode().getOutLinks().values()){
 			if (!link.getFromNode().equals(outLink.getToNode())){
 				outLinks.add(outLink.getId());
@@ -587,10 +587,10 @@ public class M2KS2010NetworkConverter {
 		return outLinks;
 	}
 	
-	private Set<Id> getSignalizedLinkIds(SignalSystemsData signals){
-		Map<Id, Set<Id>> signalizedLinksPerSystem = DgSignalsUtils.calculateSignalizedLinksPerSystem(signals);
-		Set<Id> signalizedLinks = new HashSet<Id>();
-		for (Set<Id> signalizedLinksOfSystem : signalizedLinksPerSystem.values()){
+	private Set<Id<Link>> getSignalizedLinkIds(SignalSystemsData signals){
+		Map<Id, Set<Id<Link>>> signalizedLinksPerSystem = DgSignalsUtils.calculateSignalizedLinksPerSystem(signals);
+		Set<Id<Link>> signalizedLinks = new HashSet<>();
+		for (Set<Id<Link>> signalizedLinksOfSystem : signalizedLinksPerSystem.values()){
 			signalizedLinks.addAll(signalizedLinksOfSystem);
 		}
 		return signalizedLinks;

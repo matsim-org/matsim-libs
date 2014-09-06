@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
@@ -91,7 +92,7 @@ public class NetLanesSignalsShrinker {
 	 */
 	public void shrinkScenario(String outputDirectory, String shapeFileDirectory, double cuttingBoundingBoxOffset, double freeSpeedFilter, boolean useFreeSpeedTravelTime) throws IOException{
 		//Some initialization
-		Set<Id> signalizedNodes = this.getSignalizedNodeIds(((SignalsData) this.fullScenario.getScenarioElement(SignalsData.ELEMENT_NAME)).getSignalSystemsData(), this.fullScenario.getNetwork());
+		Set<Id<Node>> signalizedNodes = this.getSignalizedNodeIds(((SignalsData) this.fullScenario.getScenarioElement(SignalsData.ELEMENT_NAME)).getSignalSystemsData(), this.fullScenario.getNetwork());
 		DgNetworkUtils.writeNetwork2Shape(fullScenario.getNetwork(), crs, shapeFileDirectory + "network_full");
 		
 		// create the boundary envelope
@@ -162,10 +163,10 @@ public class NetLanesSignalsShrinker {
 	}
 	
 
-	private Set<Id> getSignalizedNodeIds(SignalSystemsData signals, Network network){
-		Map<Id, Set<Id>> signalizedNodesPerSystem = DgSignalsUtils.calculateSignalizedNodesPerSystem(signals, network);
-		Set<Id> signalizedNodes = new HashSet<Id>();
-		for (Set<Id> signalizedNodesOfSystem : signalizedNodesPerSystem.values()){
+	private Set<Id<Node>> getSignalizedNodeIds(SignalSystemsData signals, Network network){
+		Map<Id, Set<Id<Node>>> signalizedNodesPerSystem = DgSignalsUtils.calculateSignalizedNodesPerSystem(signals, network);
+		Set<Id<Node>> signalizedNodes = new HashSet<>();
+		for (Set<Id<Node>> signalizedNodesOfSystem : signalizedNodesPerSystem.values()){
 			signalizedNodes.addAll(signalizedNodesOfSystem);
 		}
 		return signalizedNodes;

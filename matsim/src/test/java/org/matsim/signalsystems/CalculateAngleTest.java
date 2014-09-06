@@ -1,7 +1,5 @@
 package org.matsim.signalsystems;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
@@ -16,7 +14,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -46,22 +43,22 @@ public class CalculateAngleTest {
 		loader.loadNetwork();
 
 		Assert.assertEquals("Has to be 'null', since there is no other way back but Link 11.",
-				null, CalculateAngle.getLeftLane(scenario.getNetwork().getLinks().get(new IdImpl("1"))));
+				null, CalculateAngle.getLeftLane(scenario.getNetwork().getLinks().get(Id.create("1", Link.class))));
 
 		Assert.assertEquals(
-				scenario.getNetwork().getLinks().get(scenario.createId("2")), CalculateAngle.getLeftLane(scenario.getNetwork().getLinks().get(scenario.createId("11"))));
+				scenario.getNetwork().getLinks().get(Id.create("2", Link.class)), CalculateAngle.getLeftLane(scenario.getNetwork().getLinks().get(Id.create("11", Link.class))));
 
 		Assert.assertEquals(
-				scenario.getNetwork().getLinks().get(scenario.createId("3")), CalculateAngle.getLeftLane(scenario.getNetwork().getLinks().get(scenario.createId("22"))));
+				scenario.getNetwork().getLinks().get(Id.create("3", Link.class)), CalculateAngle.getLeftLane(scenario.getNetwork().getLinks().get(Id.create("22", Link.class))));
 		
 		Assert.assertEquals(
-				scenario.getNetwork().getLinks().get(scenario.createId("4")), CalculateAngle.getLeftLane(scenario.getNetwork().getLinks().get(scenario.createId("33"))));
+				scenario.getNetwork().getLinks().get(Id.create("4", Link.class)), CalculateAngle.getLeftLane(scenario.getNetwork().getLinks().get(Id.create("33", Link.class))));
 		
 		Assert.assertEquals(
-				scenario.getNetwork().getLinks().get(scenario.createId("1")), CalculateAngle.getLeftLane(scenario.getNetwork().getLinks().get(scenario.createId("44"))));
+				scenario.getNetwork().getLinks().get(Id.create("1", Link.class)), CalculateAngle.getLeftLane(scenario.getNetwork().getLinks().get(Id.create("44", Link.class))));
 		
 		Assert.assertEquals(
-				scenario.getNetwork().getLinks().get(scenario.createId("5")), CalculateAngle.getLeftLane(scenario.getNetwork().getLinks().get(scenario.createId("3"))));
+				scenario.getNetwork().getLinks().get(Id.create("5", Link.class)), CalculateAngle.getLeftLane(scenario.getNetwork().getLinks().get(Id.create("3", Link.class))));
 				
 	}
 	
@@ -70,28 +67,23 @@ public class CalculateAngleTest {
 	 */
 	@Test
 	public void testGetOutLinksSortedByAngle(){
-		//create the ids
-		List<Id> ids = new ArrayList<Id>();
-		for (int i = 0; i <= 5; i++){
-			ids.add(i, new IdImpl(Integer.toString(i)));
-		}
 		Scenario scenario;
 		double twicePi = Math.PI * 2;
 		double piStep = Math.PI / 180.0;
 		for (double angle = 0.0; angle < twicePi; angle = angle + piStep){
 			scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-			createNetwork(scenario, angle, ids);
+			createNetwork(scenario, angle);
 			Network net = scenario.getNetwork();
-			TreeMap<Double, Link> m = CalculateAngle.getOutLinksSortedByAngle(net.getLinks().get(ids.get(1)));
+			TreeMap<Double, Link> m = CalculateAngle.getOutLinksSortedByAngle(net.getLinks().get(Id.create(1, Link.class)));
 			Entry<Double, Link> entry = m.firstEntry();
-			Assert.assertEquals("For angle " + angle + "CalculateAngle returns not the correct order of outlinks", ids.get(2), entry.getValue().getId());
+			Assert.assertEquals("For angle " + angle + "CalculateAngle returns not the correct order of outlinks", Id.create(2, Link.class), entry.getValue().getId());
 			entry = m.higherEntry(entry.getKey());
-			Assert.assertEquals("For angle " + angle + "CalculateAngle returns not the correct order of outlinks", ids.get(3), entry.getValue().getId());
+			Assert.assertEquals("For angle " + angle + "CalculateAngle returns not the correct order of outlinks", Id.create(3, Link.class), entry.getValue().getId());
 			entry = m.higherEntry(entry.getKey());
-			Assert.assertEquals("For angle " + angle + "CalculateAngle returns not the correct order of outlinks", ids.get(4), entry.getValue().getId());
+			Assert.assertEquals("For angle " + angle + "CalculateAngle returns not the correct order of outlinks", Id.create(4, Link.class), entry.getValue().getId());
 			
-			Link leftLane = CalculateAngle.getLeftLane(net.getLinks().get(ids.get(1)));
-			Assert.assertEquals(ids.get(2), leftLane.getId());
+			Link leftLane = CalculateAngle.getLeftLane(net.getLinks().get(Id.create(1, Link.class)));
+			Assert.assertEquals(Id.create(2, Link.class), leftLane.getId());
 			
 		}
 	}
@@ -107,7 +99,7 @@ public class CalculateAngleTest {
 	 * @param sc
 	 * @param ids 
 	 */
-	private void createNetwork(Scenario sc, double alpha, List<Id> ids){
+	private void createNetwork(Scenario sc, double alpha){
 		Network net = sc.getNetwork();
 		NetworkFactory netfac = net.getFactory();
 		//create the coordinates
@@ -125,24 +117,24 @@ public class CalculateAngleTest {
 		Coord coord4 = sc.createCoord(x4, y4);
 		Coord coord5 = sc.createCoord(0, 0);
 		//the nodes
-		Node node = netfac.createNode(sc.createId("1"), coord1);
-		net.addNode(node);
-		node = netfac.createNode(sc.createId("2"), coord2);
-		net.addNode(node);
-		node = netfac.createNode(sc.createId("3"), coord3);
-		net.addNode(node);
-		node = netfac.createNode(sc.createId("4"), coord4);
-		net.addNode(node);
-		node = netfac.createNode(sc.createId("5"), coord5);
-		net.addNode(node);
+		Node node1 = netfac.createNode(Id.create("1", Node.class), coord1);
+		net.addNode(node1);
+		Node node2 = netfac.createNode(Id.create("2", Node.class), coord2);
+		net.addNode(node2);
+		Node node3 = netfac.createNode(Id.create("3", Node.class), coord3);
+		net.addNode(node3);
+		Node node4 = netfac.createNode(Id.create("4", Node.class), coord4);
+		net.addNode(node4);
+		Node node5 = netfac.createNode(Id.create("5", Node.class), coord5);
+		net.addNode(node5);
 		//the links
-		Link link = netfac.createLink(ids.get(1), ids.get(1), ids.get(5));
+		Link link = netfac.createLink(Id.create(1, Link.class), node1, node5);
 		net.addLink(link);
-		link = netfac.createLink(ids.get(2), ids.get(5), ids.get(2));
+		link = netfac.createLink(Id.create(2, Link.class), node5, node2);
 		net.addLink(link);
-		link = netfac.createLink(ids.get(3), ids.get(5), ids.get(3));
+		link = netfac.createLink(Id.create(3, Link.class), node5, node3);
 		net.addLink(link);
-		link = netfac.createLink(ids.get(4), ids.get(5), ids.get(4));
+		link = netfac.createLink(Id.create(4, Link.class), node5, node4);
 		net.addLink(link);
 	}
 	

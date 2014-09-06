@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
@@ -50,7 +51,7 @@ public class TtSignalizedNodeShortestPath {
 	 * if true, dijkstra will use the free speed travel time, if false, dijkstra will use the travel distance as cost function
 	 * @return
 	 */
-	public Set<Id> calcShortestPathLinkIdsBetweenSignalizedNodes(Network network, Set<Id> signalizedNodes, boolean useFreeSpeedTravelTime){
+	public Set<Id<Link>> calcShortestPathLinkIdsBetweenSignalizedNodes(Network network, Set<Id<Node>> signalizedNodes, boolean useFreeSpeedTravelTime){
 		//create commodities between all signal-pairs
 		DgCommodities signalCommodities = new DgCommodities();
 		for (Id fromSignalId : signalizedNodes){
@@ -79,7 +80,7 @@ public class TtSignalizedNodeShortestPath {
 		if (invalidSignalCommodities.size() != 0) 
 			log.warn("There is no valid path between some signals.");
 		
-		Set<Id> linkIds = new HashSet<Id>();
+		Set<Id<Link>> linkIds = new HashSet<>();
 		for (Path path : shortestPaths){
 			for (Link link : path.links)
 				linkIds.add(link.getId());

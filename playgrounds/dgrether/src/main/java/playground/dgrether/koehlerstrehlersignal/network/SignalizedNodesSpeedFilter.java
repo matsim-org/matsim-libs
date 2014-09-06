@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.filter.NetworkLinkFilter;
 
 
@@ -32,11 +33,11 @@ import org.matsim.core.network.filter.NetworkLinkFilter;
  */
 public class SignalizedNodesSpeedFilter implements NetworkLinkFilter {
 
-	private Set<Id> signalizedNodes;
-	private Set<Id> shortestPathLinkIds;
+	private Set<Id<Node>> signalizedNodes;
+	private Set<Id<Link>> shortestPathLinkIds;
 	private double freeSpeedFilter;
 	
-	public SignalizedNodesSpeedFilter(Set<Id> signalizedNodes, Set<Id> shortestPathLinkIds, double freeSpeedFilter) {
+	public SignalizedNodesSpeedFilter(Set<Id<Node>> signalizedNodes, Set<Id<Link>> shortestPathLinkIds, double freeSpeedFilter) {
 		this.signalizedNodes = signalizedNodes;
 		this.shortestPathLinkIds = shortestPathLinkIds;
 		this.freeSpeedFilter = freeSpeedFilter;
@@ -47,8 +48,8 @@ public class SignalizedNodesSpeedFilter implements NetworkLinkFilter {
 		if (this.shortestPathLinkIds.contains(l.getId())){
 			return true;
 		}
-		Id fromNodeId = l.getFromNode().getId();
-		Id toNodeId = l.getToNode().getId();
+		Id<Node> fromNodeId = l.getFromNode().getId();
+		Id<Node> toNodeId = l.getToNode().getId();
 		if (this.signalizedNodes.contains(fromNodeId) || this.signalizedNodes.contains(toNodeId)) {
 			return true;
 		}

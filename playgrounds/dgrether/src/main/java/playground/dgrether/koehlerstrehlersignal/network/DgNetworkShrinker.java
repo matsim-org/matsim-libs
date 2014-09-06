@@ -22,7 +22,9 @@ package playground.dgrether.koehlerstrehlersignal.network;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.filter.NetworkFilterManager;
 
 import playground.dgrether.EnvelopeLinkStartEndFilter;
@@ -38,7 +40,7 @@ import com.vividsolutions.jts.geom.Envelope;
 public class DgNetworkShrinker {
 
 
-	private Set<Id> signalizedNodes;
+	private Set<Id<Node>> signalizedNodes;
 
 	/**
 	 * reduce the network size: delete all edges outside the envelope
@@ -73,14 +75,14 @@ public class DgNetworkShrinker {
 		NetworkFilterManager filterManager = new NetworkFilterManager(net);
 		
 		//interior link filter - deletes all edges that are not on a shortest path (according to travel time) between signalized nodes
-		Set<Id> shortestPathLinkIds = new TtSignalizedNodeShortestPath().calcShortestPathLinkIdsBetweenSignalizedNodes(net, signalizedNodes, useFreeSpeedTravelTime);
+		Set<Id<Link>> shortestPathLinkIds = new TtSignalizedNodeShortestPath().calcShortestPathLinkIdsBetweenSignalizedNodes(net, signalizedNodes, useFreeSpeedTravelTime);
 		filterManager.addLinkFilter(new SignalizedNodesSpeedFilter(this.signalizedNodes, shortestPathLinkIds, freeSpeedFilter));
 				
 		Network newNetwork = filterManager.applyFilters();
 		return newNetwork;
 	}
 
-	public void setSignalizedNodes(Set<Id> signalizedNodes) {
+	public void setSignalizedNodes(Set<Id<Node>> signalizedNodes) {
 		this.signalizedNodes = signalizedNodes;
 	}
 }

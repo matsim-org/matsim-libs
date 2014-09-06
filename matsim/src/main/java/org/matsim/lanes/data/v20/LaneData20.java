@@ -21,6 +21,7 @@ package org.matsim.lanes.data.v20;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 
 /**
  * Models a lane on a link. 
@@ -51,14 +52,14 @@ public interface LaneData20 {
 	
 	public void setCapacityVehiclesPerHour(double capacity);
 	
-	public void addToLinkId(Id id);
+	public void addToLinkId(Id<Link> id);
 	
 	public void addToLaneId(Id id);
 	/**
 	 * 
 	 * @return List may be null if nothing is set
 	 */
-	public List<Id> getToLinkIds();
+	public List<Id<Link>> getToLinkIds();
 	/**
 	 * 
 	 * @return List may be null if nothing is set

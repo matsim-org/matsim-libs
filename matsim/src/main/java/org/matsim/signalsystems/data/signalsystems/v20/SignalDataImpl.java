@@ -23,6 +23,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.signalsystems.model.Signal;
 
 
 /**
@@ -31,15 +33,15 @@ import org.matsim.api.core.v01.Id;
  */
 public class SignalDataImpl implements SignalData {
 
-	private Id id;
+	private Id<Signal> id;
 	
-	private Id linkId;
+	private Id<Link> linkId;
 	
 	private Set<Id> laneIds = null;
 	
-	private Set<Id> turningMoveRestrictions = null;
+	private Set<Id<Link>> turningMoveRestrictions = null;
 
-	SignalDataImpl(Id id) {
+	SignalDataImpl(Id<Signal> id) {
 		this.id = id;
 	}
 
@@ -52,9 +54,9 @@ public class SignalDataImpl implements SignalData {
 	}
 
 	@Override
-	public void addTurningMoveRestriction(Id linkId) {
+	public void addTurningMoveRestriction(Id<Link> linkId) {
 		if (this.turningMoveRestrictions == null){
-			this.turningMoveRestrictions = new HashSet<Id>();
+			this.turningMoveRestrictions = new HashSet<>();
 		}
 		this.turningMoveRestrictions.add(linkId);
 	}
@@ -70,17 +72,17 @@ public class SignalDataImpl implements SignalData {
 	}
 
 	@Override
-	public Set<Id> getTurningMoveRestrictions() {
+	public Set<Id<Link>> getTurningMoveRestrictions() {
 		return this.turningMoveRestrictions;
 	}
 
 	@Override
-	public void setLinkId(Id id) {
+	public void setLinkId(Id<Link> id) {
 		this.linkId = id;
 	}
 
 	@Override
-	public Id getId() {
+	public Id<Signal> getId() {
 		return this.id;
 	}
 

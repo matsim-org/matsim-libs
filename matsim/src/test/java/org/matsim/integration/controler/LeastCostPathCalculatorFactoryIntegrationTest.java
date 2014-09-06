@@ -26,6 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -94,7 +95,7 @@ public class LeastCostPathCalculatorFactoryIntegrationTest {
 		private final Node node1;
 
 		public DummyRoutingAlgorithmFactory(final Scenario s) {
-			this.node1 = s.getNetwork().getNodes().get(s.createId("1"));
+			this.node1 = s.getNetwork().getNodes().get(Id.create("1", Node.class));
 		}
 
 		@Override

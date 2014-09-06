@@ -41,9 +41,9 @@ public class DgSignalizedLinksNetwork {
 
 	
 	public Network createSmallNetwork(Network net, SignalSystemsData data) {
-		Map<Id, Set<Id>> signalsToLinks = DgSignalsUtils.calculateSignalizedLinksPerSystem(data);
-		final Set<Id> signalizedLinks = new HashSet<Id>();
-		for (Set<Id> linkSet : signalsToLinks.values()){
+		Map<Id, Set<Id<Link>>> signalsToLinks = DgSignalsUtils.calculateSignalizedLinksPerSystem(data);
+		final Set<Id<Link>> signalizedLinks = new HashSet<>();
+		for (Set<Id<Link>> linkSet : signalsToLinks.values()){
 			signalizedLinks.addAll(linkSet);
 		}
 		NetworkFilterManager filterManager = new NetworkFilterManager(net);

@@ -62,7 +62,7 @@ public class NetworkLanesSignalsSimplifier {
 	private Map<Id, Id> originalToSimplifiedLinkIdMatching = new HashMap<Id, Id>();
 	private Map<Id, List<Id>> simplifiedToOriginalLinkIdMatching = new HashMap<Id, List<Id>>();
 
-	private Set<Id> nodeIdsToRemove = new HashSet<Id>();
+	private Set<Id<Node>> nodeIdsToRemove = new HashSet<>();
 	private boolean simplifySignalizedNodes;
 
 	private Id createId(Id inLink, Id outLink) {
@@ -114,8 +114,8 @@ public class NetworkLanesSignalsSimplifier {
 					List<Link> outLinks = new ArrayList<Link>(node.getOutLinks().values());
 
 					for (Link oL : outLinks) {
-						Map<Id, Set<Id>> signalizedNodesBySystem = DgSignalsUtils.calculateSignalizedNodesPerSystem(signalsData.getSignalSystemsData(), network);
-						Map<Id, Set<Id>> signalizedLinksBySystemId = DgSignalsUtils.calculateSignalizedLinksPerSystem(signalsData.getSignalSystemsData());
+						Map<Id, Set<Id<Node>>> signalizedNodesBySystem = DgSignalsUtils.calculateSignalizedNodesPerSystem(signalsData.getSignalSystemsData(), network);
+						Map<Id, Set<Id<Link>>> signalizedLinksBySystemId = DgSignalsUtils.calculateSignalizedLinksPerSystem(signalsData.getSignalSystemsData());
 					
 						Link  outLink = oL;
 						if (inLink != null && outLink != null) {
@@ -124,7 +124,7 @@ public class NetworkLanesSignalsSimplifier {
 								
 								if (! this.simplifySignalizedNodes) {
 									boolean stop = false;
-									for (Entry<Id, Set<Id>> entry : signalizedNodesBySystem.entrySet()){
+									for (Entry<Id, Set<Id<Node>>> entry : signalizedNodesBySystem.entrySet()){
 										if (entry.getValue().contains(removedNode.getId())){
 											stop = true;
 											break;
@@ -176,7 +176,7 @@ public class NetworkLanesSignalsSimplifier {
 									}
 									
 									//correct signal systems at outLink
-									for (Entry<Id, Set<Id>> entry : signalizedLinksBySystemId.entrySet()){
+									for (Entry<Id, Set<Id<Link>>> entry : signalizedLinksBySystemId.entrySet()){
 										if (entry.getValue().contains(outLink.getId())){
 											Id signalSystemId = entry.getKey();
 											SignalSystemData system = signalsData.getSignalSystemsData().getSignalSystemData().get(signalSystemId);
@@ -189,7 +189,7 @@ public class NetworkLanesSignalsSimplifier {
 									}
 									
 									//delete signal system at removedNode if one exists
-									for (Entry<Id, Set<Id>> entry : signalizedNodesBySystem.entrySet()){
+									for (Entry<Id, Set<Id<Node>>> entry : signalizedNodesBySystem.entrySet()){
 										if (entry.getValue().contains(removedNode.getId())){
 											Id signalSystemId = entry.getKey();
 											signalsData.getSignalSystemsData().getSignalSystemData().remove(signalSystemId);
@@ -205,7 +205,7 @@ public class NetworkLanesSignalsSimplifier {
 			}
 		}
 
-		for (Id nodeId : nodeIdsToRemove) {
+		for (Id<Node> nodeId : nodeIdsToRemove) {
 			network.removeNode(nodeId);
 		}
 
@@ -217,7 +217,7 @@ public class NetworkLanesSignalsSimplifier {
 		log.info("done.");
 	}
 
-	public Set<Id> getRemovedNodeIds() {
+	public Set<Id<Node>> getRemovedNodeIds() {
 		return this.nodeIdsToRemove;
 	}
 	

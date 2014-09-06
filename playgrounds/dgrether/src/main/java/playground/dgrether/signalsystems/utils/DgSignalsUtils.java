@@ -68,16 +68,16 @@ public class DgSignalsUtils {
 	/**
 	 * @return Map with the signal system Id as key and a List with Node Ids as values
 	 */
-	public static Map<Id, Set<Id>>calculateSignalizedNodesPerSystem(SignalSystemsData signalSystemsData, Network net){
-		Map<Id, Set<Id>> signalizedNodesPerSystem = new HashMap<Id, Set<Id>>();
-		Set<Id> nodes;
+	public static Map<Id, Set<Id<Node>>>calculateSignalizedNodesPerSystem(SignalSystemsData signalSystemsData, Network net){
+		Map<Id, Set<Id<Node>>> signalizedNodesPerSystem = new HashMap<>();
+		Set<Id<Node>> nodes;
 		Link link;
 		Node node;
 		for (SignalSystemData ss : signalSystemsData.getSignalSystemData().values()){
-			nodes = new HashSet<Id>();
+			nodes = new HashSet<>();
 			signalizedNodesPerSystem.put(ss.getId(), nodes);
 			for (SignalData signal : ss.getSignalData().values()){
-				Id linkId = signal.getLinkId();
+				Id<Link> linkId = signal.getLinkId();
 				link = net.getLinks().get(linkId);
 				node = link.getToNode();
 				nodes.add(node.getId());
@@ -89,9 +89,9 @@ public class DgSignalsUtils {
 	/**
 	 * @return a Set containing the Ids of all signalized Nodes in the network
 	 */
-	public static Set<Id> calculateSignalizedNodes(SignalSystemsData signalSystemsData, Network net) {
-		Set<Id> signalizedNodeIds = new HashSet<Id>();
-		for (Set<Id> set : DgSignalsUtils.calculateSignalizedNodesPerSystem(signalSystemsData, net).values()){
+	public static Set<Id<Node>> calculateSignalizedNodes(SignalSystemsData signalSystemsData, Network net) {
+		Set<Id<Node>> signalizedNodeIds = new HashSet<>();
+		for (Set<Id<Node>> set : DgSignalsUtils.calculateSignalizedNodesPerSystem(signalSystemsData, net).values()){
 			signalizedNodeIds.addAll(set);
 		}
 		return signalizedNodeIds;
@@ -153,14 +153,14 @@ public class DgSignalsUtils {
 	 * @param signalSystemsData 
 	 * @return Map with the signal system Id as key and a List with Node Ids as values
 	 */
-	public static Map<Id, Set<Id>>calculateSignalizedLinksPerSystem(SignalSystemsData signalSystemsData){
-		Map<Id, Set<Id>> signalizedLinksPerSystem = new HashMap<Id, Set<Id>>();
-		Set<Id> links;
+	public static Map<Id, Set<Id<Link>>>calculateSignalizedLinksPerSystem(SignalSystemsData signalSystemsData){
+		Map<Id, Set<Id<Link>>> signalizedLinksPerSystem = new HashMap<>();
+		Set<Id<Link>> links;
 		for (SignalSystemData ss : signalSystemsData.getSignalSystemData().values()){
-			links = new HashSet<Id>();
+			links = new HashSet<>();
 			signalizedLinksPerSystem.put(ss.getId(), links);
 			for (SignalData signal : ss.getSignalData().values()){
-				Id linkId = signal.getLinkId();
+				Id<Link> linkId = signal.getLinkId();
 				links.add(linkId);
 			}
 		}

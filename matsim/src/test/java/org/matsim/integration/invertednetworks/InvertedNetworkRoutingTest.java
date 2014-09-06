@@ -19,13 +19,8 @@
  * *********************************************************************** */
 package org.matsim.integration.invertednetworks;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-
-import org.matsim.lanes.data.v20.LaneDefinitions20Impl;
-import org.matsim.signalsystems.data.SignalsDataImpl;
 
 import junit.framework.Assert;
 
@@ -45,7 +40,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -59,9 +53,11 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.v20.LaneData20;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.LaneDefinitions20Impl;
 import org.matsim.lanes.data.v20.LaneDefinitionsFactory20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 import org.matsim.signalsystems.data.SignalsData;
+import org.matsim.signalsystems.data.SignalsDataImpl;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlDataFactory;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalGroupSettingsData;
@@ -75,6 +71,10 @@ import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsDataFactory;
 import org.matsim.signalsystems.model.DefaultPlanbasedSignalSystemController;
+import org.matsim.signalsystems.model.Signal;
+import org.matsim.signalsystems.model.SignalGroup;
+import org.matsim.signalsystems.model.SignalPlan;
+import org.matsim.signalsystems.model.SignalSystem;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class InvertedNetworkRoutingTest {
@@ -124,12 +124,12 @@ public class InvertedNetworkRoutingTest {
 		f.scenario.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory());
 		f.scenario.getConfig().controler().setLastIteration(1);
 		SignalsData signalsData = (SignalsData) f.scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
-		SignalPlanData signalPlan = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(f.getId(2)).getSignalPlanData().get(f.getId(1));
+		SignalPlanData signalPlan = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(Id.create(2, SignalSystem.class)).getSignalPlanData().get(Id.create(1, SignalPlan.class));
 		signalPlan.setCycleTime(500);
-		signalPlan.getSignalGroupSettingsDataByGroupId().get(f.getId(2)).setOnset(0);
-		signalPlan.getSignalGroupSettingsDataByGroupId().get(f.getId(2)).setDropping(5);
-		SignalData sd = signalsData.getSignalSystemsData().getSignalSystemData().get(f.getId(2)).getSignalData().get(f.getId(1));
-		sd.addTurningMoveRestriction(f.getId(23));
+		signalPlan.getSignalGroupSettingsDataByGroupId().get(Id.create(2, SignalGroup.class)).setOnset(0);
+		signalPlan.getSignalGroupSettingsDataByGroupId().get(Id.create(2, SignalGroup.class)).setDropping(5);
+		SignalData sd = signalsData.getSignalSystemsData().getSignalSystemData().get(Id.create(2, SignalSystem.class)).getSignalData().get(Id.create(1, Signal.class));
+		sd.addTurningMoveRestriction(Id.create(23, Link.class));
 		Controler c = new Controler(f.scenario);
 		c.setDumpDataAtEnd(false);
 		c.setCreateGraphs(false);
@@ -195,7 +195,7 @@ public class InvertedNetworkRoutingTest {
 
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
-			if (event.getLinkId().equals(new IdImpl("25"))) {
+			if (event.getLinkId().equals(Id.create("25", Link.class))) {
 				this.hadTrafficOnLink25 = true;
 			}
 		}
@@ -230,7 +230,6 @@ public class InvertedNetworkRoutingTest {
 	 */
 	private static class Fixture {
 		public final ScenarioImpl scenario;
-		private Map<Integer, Id> ids = new HashMap<Integer, Id>();
 
 		public Fixture(boolean doCreateModes, boolean doCreateLanes, boolean doCreateSignals) {
 			Config config = ConfigUtils.createConfig();
@@ -243,7 +242,7 @@ public class InvertedNetworkRoutingTest {
 			config.qsim().setStuckTime(10000.0);
 			config.qsim().setStartTime(0.0);
 			config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.ONLY_USE_STARTTIME);
-			StrategySettings stratSets = new StrategySettings(new IdImpl(1));
+			StrategySettings stratSets = new StrategySettings(Id.create(1, StrategySettings.class));
 			stratSets.setModuleName(PlanStrategyRegistrar.Names.ReRoute.toString());
 			stratSets.setProbability(1.0);
 			config.strategy().addStrategySettings(stratSets);
@@ -275,28 +274,28 @@ public class InvertedNetworkRoutingTest {
 			this.scenario.addScenarioElement(SignalsData.ELEMENT_NAME, signalsData);
 			SignalSystemsData ssd = signalsData.getSignalSystemsData();
 			SignalSystemsDataFactory f = ssd.getFactory();
-			SignalSystemData system = f.createSignalSystemData(getId(2));
+			SignalSystemData system = f.createSignalSystemData(Id.create(2, SignalSystemData.class));
 			ssd.addSignalSystemData(system);
-			SignalData signal = f.createSignalData(getId(1));
-			signal.setLinkId(getId(12));
-			signal.addTurningMoveRestriction(getId(25));
+			SignalData signal = f.createSignalData(Id.create(1, SignalData.class));
+			signal.setLinkId(Id.create(12, Link.class));
+			signal.addTurningMoveRestriction(Id.create(25, Link.class));
 			system.addSignalData(signal);
 			SignalGroupsData sgd = signalsData.getSignalGroupsData();
 			SignalGroupsDataFactory fsg = sgd.getFactory();
-			SignalGroupData sg = fsg.createSignalGroupData(getId(2), getId(2));
-			sg.addSignalId(getId(1));
+			SignalGroupData sg = fsg.createSignalGroupData(Id.create(2, SignalSystem.class), Id.create(2, SignalGroup.class));
+			sg.addSignalId(Id.create(1, Signal.class));
 			sgd.addSignalGroupData(sg);
 			SignalControlData scd = signalsData.getSignalControlData();
 			SignalControlDataFactory fsc = scd.getFactory();
-			SignalSystemControllerData controller = fsc.createSignalSystemControllerData(getId(2));
+			SignalSystemControllerData controller = fsc.createSignalSystemControllerData(Id.create(2, SignalSystem.class));
 			controller.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
 			scd.addSignalSystemControllerData(controller);
-			SignalPlanData plan = fsc.createSignalPlanData(getId(1));
+			SignalPlanData plan = fsc.createSignalPlanData(Id.create(1, SignalPlan.class));
 			plan.setStartTime(0.0);
 			plan.setEndTime(23 * 3600.0);
 			plan.setCycleTime(100);
 			controller.addSignalPlanData(plan);
-			SignalGroupSettingsData group = fsc.createSignalGroupSettingsData(getId(2));
+			SignalGroupSettingsData group = fsc.createSignalGroupSettingsData(Id.create(2, SignalGroup.class));
 			group.setOnset(0);
 			group.setDropping(100);
 			plan.addSignalGroupSettings(group);
@@ -306,15 +305,15 @@ public class InvertedNetworkRoutingTest {
 			LaneDefinitions20 ld = new LaneDefinitions20Impl();
 			scenario.addScenarioElement(LaneDefinitions20.ELEMENT_NAME, ld);
 			LaneDefinitionsFactory20 f = ld.getFactory();
-			LanesToLinkAssignment20 l2l = f.createLanesToLinkAssignment(getId(12));
+			LanesToLinkAssignment20 l2l = f.createLanesToLinkAssignment(Id.create(12, Link.class));
 			ld.addLanesToLinkAssignment(l2l);
-			LaneData20 l = f.createLane(getId(121));
+			LaneData20 l = f.createLane(Id.create(121, Object.class));
 			l.setStartsAtMeterFromLinkEnd(300);
-			l.addToLaneId(getId(122));
+			l.addToLaneId(Id.create(122, Object.class));
 			l2l.addLane(l);
-			l = f.createLane(getId(122));
+			l = f.createLane(Id.create(122, Object.class));
 			l.setStartsAtMeterFromLinkEnd(150);
-			l.addToLinkId(getId(25));
+			l.addToLinkId(Id.create(25, Link.class));
 			l2l.addLane(l);
 		}
 
@@ -325,12 +324,12 @@ public class InvertedNetworkRoutingTest {
 			Set<String> carPt = new HashSet<String>();
 			carPt.add(TransportMode.car);
 			carPt.add(TransportMode.pt);
-			network.getLinks().get(getId(12)).setAllowedModes(carPt);
-			network.getLinks().get(getId(23)).setAllowedModes(ptOnly);
-			network.getLinks().get(getId(34)).setAllowedModes(carPt);
-			network.getLinks().get(getId(25)).setAllowedModes(carPt);
-			network.getLinks().get(getId(56)).setAllowedModes(carPt);
-			network.getLinks().get(getId(63)).setAllowedModes(carPt);
+			network.getLinks().get(Id.create(12, Link.class)).setAllowedModes(carPt);
+			network.getLinks().get(Id.create(23, Link.class)).setAllowedModes(ptOnly);
+			network.getLinks().get(Id.create(34, Link.class)).setAllowedModes(carPt);
+			network.getLinks().get(Id.create(25, Link.class)).setAllowedModes(carPt);
+			network.getLinks().get(Id.create(56, Link.class)).setAllowedModes(carPt);
+			network.getLinks().get(Id.create(63, Link.class)).setAllowedModes(carPt);
 		}
 
 		private void createNetwork() {
@@ -338,51 +337,51 @@ public class InvertedNetworkRoutingTest {
 			NetworkFactory f = network.getFactory();
 			Node n;
 			Link l;
-			n = f.createNode(getId(0), scenario.createCoord(0, -300));
+			n = f.createNode(Id.create(0, Node.class), scenario.createCoord(0, -300));
 			network.addNode(n);
-			n = f.createNode(getId(1), scenario.createCoord(0, 0));
+			n = f.createNode(Id.create(1, Node.class), scenario.createCoord(0, 0));
 			network.addNode(n);
-			n = f.createNode(getId(2), scenario.createCoord(0, 300));
+			n = f.createNode(Id.create(2, Node.class), scenario.createCoord(0, 300));
 			network.addNode(n);
-			n = f.createNode(getId(3), scenario.createCoord(0, 600));
+			n = f.createNode(Id.create(3, Node.class), scenario.createCoord(0, 600));
 			network.addNode(n);
-			n = f.createNode(getId(4), scenario.createCoord(0, 900));
+			n = f.createNode(Id.create(4, Node.class), scenario.createCoord(0, 900));
 			network.addNode(n);
-			n = f.createNode(getId(5), scenario.createCoord(0, 300));
+			n = f.createNode(Id.create(5, Node.class), scenario.createCoord(0, 300));
 			network.addNode(n);
-			n = f.createNode(getId(6), scenario.createCoord(0, 600));
+			n = f.createNode(Id.create(6, Node.class), scenario.createCoord(0, 600));
 			network.addNode(n);
-			l = f.createLink(getId(01), network.getNodes().get(getId(0)), network.getNodes().get(getId(1)));
+			l = f.createLink(Id.create(01, Link.class), network.getNodes().get(Id.create(0, Node.class)), network.getNodes().get(Id.create(1, Node.class)));
 			l.setLength(300.0);
 			l.setFreespeed(10.0);
 			l.setCapacity(3600.0);
 			network.addLink(l);
-			l = f.createLink(getId(12), network.getNodes().get(getId(1)), network.getNodes().get(getId(2)));
+			l = f.createLink(Id.create(12, Link.class), network.getNodes().get(Id.create(1, Node.class)), network.getNodes().get(Id.create(2, Node.class)));
 			l.setLength(300.0);
 			l.setFreespeed(10.0);
 			l.setCapacity(3600.0);
 			network.addLink(l);
-			l = f.createLink(getId(23), network.getNodes().get(getId(2)), network.getNodes().get(getId(3)));
+			l = f.createLink(Id.create(23, Link.class), network.getNodes().get(Id.create(2, Node.class)), network.getNodes().get(Id.create(3, Node.class)));
 			l.setLength(300.0);
 			l.setFreespeed(20.0);
 			l.setCapacity(3600.0);
 			network.addLink(l);
-			l = f.createLink(getId(34), network.getNodes().get(getId(3)), network.getNodes().get(getId(4)));
+			l = f.createLink(Id.create(34, Link.class), network.getNodes().get(Id.create(3, Node.class)), network.getNodes().get(Id.create(4, Node.class)));
 			l.setLength(300.0);
 			l.setFreespeed(10.0);
 			l.setCapacity(3600.0);
 			network.addLink(l);
-			l = f.createLink(getId(25), network.getNodes().get(getId(2)), network.getNodes().get(getId(5)));
+			l = f.createLink(Id.create(25, Link.class), network.getNodes().get(Id.create(2, Node.class)), network.getNodes().get(Id.create(5, Node.class)));
 			l.setLength(300.0);
 			l.setFreespeed(10.0);
 			l.setCapacity(3600.0);
 			network.addLink(l);
-			l = f.createLink(getId(56), network.getNodes().get(getId(5)), network.getNodes().get(getId(6)));
+			l = f.createLink(Id.create(56, Link.class), network.getNodes().get(Id.create(5, Node.class)), network.getNodes().get(Id.create(6, Node.class)));
 			l.setLength(300.0);
 			l.setFreespeed(10.0);
 			l.setCapacity(3600.0);
 			network.addLink(l);
-			l = f.createLink(getId(63), network.getNodes().get(getId(6)), network.getNodes().get(getId(3)));
+			l = f.createLink(Id.create(63, Link.class), network.getNodes().get(Id.create(6, Node.class)), network.getNodes().get(Id.create(3, Node.class)));
 			l.setLength(300.0);
 			l.setFreespeed(10.0);
 			l.setCapacity(3600.0);
@@ -392,27 +391,17 @@ public class InvertedNetworkRoutingTest {
 		private void createPopulation() {
 			Population pop = this.scenario.getPopulation();
 			PopulationFactory f = pop.getFactory();
-			Person p = f.createPerson(getId(1));
+			Person p = f.createPerson(Id.create(1, Person.class));
 			pop.addPerson(p);
 			Plan plan = f.createPlan();
 			p.addPlan(plan);
-			Activity act = f.createActivityFromLinkId("home", getId(01));
+			Activity act = f.createActivityFromLinkId("home", Id.create(1, Link.class));
 			act.setEndTime(2000.0);
 			plan.addActivity(act);
 			Leg leg = f.createLeg(TransportMode.car);
 			plan.addLeg(leg);
-			act = f.createActivityFromLinkId("home", getId(34));
+			act = f.createActivityFromLinkId("home", Id.create(34, Link.class));
 			plan.addActivity(act);
-		}
-
-
-		public Id getId(int i){
-			if (this.ids.containsKey(i)){
-				return this.ids.get(i);
-			}
-			Id id = this.scenario.createId(Integer.toString(i));			
-			this.ids.put(i, id);
-			return id;
 		}
 
 

@@ -59,18 +59,18 @@ public class DgSignalsBoundingBox {
 	
 	public Envelope calculateBoundingBoxForSignals(Network net, SignalSystemsData signalSystemsData, double offset){
 		//get all signalized link ids
-		Set<Id> signalizedNodeIds = DgSignalsUtils.calculateSignalizedNodes(signalSystemsData, net);
+		Set<Id<Node>> signalizedNodeIds = DgSignalsUtils.calculateSignalizedNodes(signalSystemsData, net);
 		calcBoundingBox(net, signalizedNodeIds, offset);
 		return this.boundingBox;
 	}
 	
-	private void calcBoundingBox(Network net, Set<Id> signalizedNodeIds, double offset) {
+	private void calcBoundingBox(Network net, Set<Id<Node>> signalizedNodeIds, double offset) {
 		Node n = null;
 		double minX = Double.POSITIVE_INFINITY;
 		double minY = Double.POSITIVE_INFINITY;
 		double maxX = Double.NEGATIVE_INFINITY;
 		double maxY = Double.NEGATIVE_INFINITY;
-		for (Id nodeId : signalizedNodeIds){
+		for (Id<Node> nodeId : signalizedNodeIds){
 			n = net.getNodes().get(nodeId);
 			if (n.getCoord().getX() < minX) {
 				minX = n.getCoord().getX();
