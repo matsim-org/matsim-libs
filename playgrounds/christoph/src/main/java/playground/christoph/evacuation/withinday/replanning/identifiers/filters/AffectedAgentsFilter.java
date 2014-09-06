@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
@@ -65,17 +66,17 @@ public class AffectedAgentsFilter implements AgentFilter {
 	}
 		
 	@Override
-	public void applyAgentFilter(Set<Id> set, double time) {
+	public void applyAgentFilter(Set<Id<Person>> set, double time) {
 		
-		Iterator<Id> iter = set.iterator();
+		Iterator<Id<Person>> iter = set.iterator();
 		while (iter.hasNext()) {
-			Id id = iter.next();
+			Id<Person> id = iter.next();
 			if (!this.applyAgentFilter(id, time)) iter.remove();
 		}
 	}
 	
 	@Override
-	public boolean applyAgentFilter(Id id, double time) {
+	public boolean applyAgentFilter(Id<Person> id, double time) {
 		AgentPosition agentPosition = this.agentsTracker.getAgentPosition(id);
 		Position positionType = agentPosition.getPositionType();
 

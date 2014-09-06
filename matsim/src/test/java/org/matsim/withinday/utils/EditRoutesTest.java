@@ -34,8 +34,8 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -116,9 +116,9 @@ public class EditRoutesTest extends MatsimTestCase {
 		legWH.setRoute(networkRouteWH);
 		
 		// move the location of the activities - check whether the start and end Links of the routes are updated
-		activityH1.setLinkId(scenario.createId("l4"));
-		activityW1.setLinkId(scenario.createId("l2"));
-		activityH2.setLinkId(scenario.createId("l4"));
+		activityH1.setLinkId(Id.create("l4", Link.class));
+		activityW1.setLinkId(Id.create("l2", Link.class));
+		activityH2.setLinkId(Id.create("l4", Link.class));
 		
 		// relocate the legs to recreate the routes
 		assertEquals(true, ed.relocateFutureLegRoute((Leg) plan.getPlanElements().get(1), activityH1.getLinkId(), activityW1.getLinkId(), plan.getPerson(), scenario.getNetwork(), tripRouter));
@@ -135,10 +135,10 @@ public class EditRoutesTest extends MatsimTestCase {
 		assertEquals(3, networkRouteWH.getLinkIds().size());	// l1, l5, l3
 		
 		// check whether the start and end Links have been updated
-		assertEquals(scenario.createId("l4"), networkRouteHW.getStartLinkId());
-		assertEquals(scenario.createId("l2"), networkRouteHW.getEndLinkId());
-		assertEquals(scenario.createId("l2"), networkRouteWH.getStartLinkId());
-		assertEquals(scenario.createId("l4"), networkRouteWH.getEndLinkId());
+		assertEquals(Id.create("l4", Link.class), networkRouteHW.getStartLinkId());
+		assertEquals(Id.create("l2", Link.class), networkRouteHW.getEndLinkId());
+		assertEquals(Id.create("l2", Link.class), networkRouteWH.getStartLinkId());
+		assertEquals(Id.create("l4", Link.class), networkRouteWH.getEndLinkId());
 		
 		// check whether non-car routes are also generated
 		legHW.setRoute(null);
@@ -193,50 +193,50 @@ public class EditRoutesTest extends MatsimTestCase {
 		// create new routes for HW-trip
 		createScenario();	// reset scenario
 		activityW1 = (ActivityImpl) plan.getPlanElements().get(2);
-		activityW1.setLinkId(scenario.createId("l2"));	// move Activity location		
+		activityW1.setLinkId(Id.create("l2", Link.class));	// move Activity location		
 		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(1), plan.getPerson(), 0, 8.0*3600, scenario.getNetwork(), tripRouter)); // HW, start Link
 		assertEquals(true, checkRouteValidity((NetworkRoute)((Leg)plan.getPlanElements().get(1)).getRoute()));
 		
 		createScenario();	// reset scenario
 		activityW1 = (ActivityImpl) plan.getPlanElements().get(2);
-		activityW1.setLinkId(scenario.createId("l2"));	// move Activity location
+		activityW1.setLinkId(Id.create("l2", Link.class));	// move Activity location
 		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(1), plan.getPerson(), 1, 8.0*3600, scenario.getNetwork(), tripRouter));	// HW, en-route
 		assertEquals(true, checkRouteValidity((NetworkRoute)((Leg)plan.getPlanElements().get(1)).getRoute()));
 		
 		createScenario();	// reset scenario
 		activityW1 = (ActivityImpl) plan.getPlanElements().get(2);
-		activityW1.setLinkId(scenario.createId("l2"));	// move Activity location
+		activityW1.setLinkId(Id.create("l2", Link.class));	// move Activity location
 		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(1), plan.getPerson(), 2, 8.0*3600, scenario.getNetwork(), tripRouter));	// HW, end Link
 		assertEquals(true, checkRouteValidity((NetworkRoute)((Leg)plan.getPlanElements().get(1)).getRoute()));
 		
 		// create new routes for WH-trip
 		createScenario();	// reset scenario
 		activityH2 = (ActivityImpl) plan.getPlanElements().get(4);
-		activityH2.setLinkId(scenario.createId("l4"));	// move Activity location
+		activityH2.setLinkId(Id.create("l4", Link.class));	// move Activity location
 		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(3), plan.getPerson(), 0, 8.0*3600, scenario.getNetwork(), tripRouter));	// WH, start Link
 		assertEquals(true, checkRouteValidity((NetworkRoute)((Leg)plan.getPlanElements().get(3)).getRoute()));
 		
 		createScenario();	// reset scenario
 		activityH2 = (ActivityImpl) plan.getPlanElements().get(4);
-		activityH2.setLinkId(scenario.createId("l4"));	// move Activity location
+		activityH2.setLinkId(Id.create("l4", Link.class));	// move Activity location
 		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(3), plan.getPerson(), 1, 8.0*3600, scenario.getNetwork(), tripRouter));	// WH, en-route
 		assertEquals(true, checkRouteValidity((NetworkRoute)((Leg)plan.getPlanElements().get(3)).getRoute()));
 		
 		createScenario();	// reset scenario
 		activityH2 = (ActivityImpl) plan.getPlanElements().get(4);
-		activityH2.setLinkId(scenario.createId("l4"));	// move Activity location
+		activityH2.setLinkId(Id.create("l4", Link.class));	// move Activity location
 		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(3), plan.getPerson(), 2, 8.0*3600, scenario.getNetwork(), tripRouter));	// WH, en-route
 		assertEquals(true, checkRouteValidity((NetworkRoute)((Leg)plan.getPlanElements().get(3)).getRoute()));
 		
 		createScenario();	// reset scenario
 		activityH2 = (ActivityImpl) plan.getPlanElements().get(4);
-		activityH2.setLinkId(scenario.createId("l4"));	// move Activity location
+		activityH2.setLinkId(Id.create("l4", Link.class));	// move Activity location
 		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(3), plan.getPerson(), 3, 8.0*3600, scenario.getNetwork(), tripRouter));	// WH, en-route
 		assertEquals(true, checkRouteValidity((NetworkRoute)((Leg)plan.getPlanElements().get(3)).getRoute()));
 
 		createScenario();	// reset scenario
 		activityH2 = (ActivityImpl) plan.getPlanElements().get(4);
-		activityH2.setLinkId(scenario.createId("l4"));	// move Activity location
+		activityH2.setLinkId(Id.create("l4", Link.class));	// move Activity location
 		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(3), plan.getPerson(), 4, 8.0*3600, scenario.getNetwork(), tripRouter));	// WH, end Link
 		assertEquals(true, checkRouteValidity((NetworkRoute)((Leg)plan.getPlanElements().get(3)).getRoute()));
 		
@@ -270,7 +270,6 @@ public class EditRoutesTest extends MatsimTestCase {
 		Network network = scenario.getNetwork();
 		NetworkFactory networkFactory = network.getFactory();
 		
-		Id id = null;
 		Coord coord = null;
 		Node node1 = null;
 		Node node2 = null;
@@ -281,47 +280,38 @@ public class EditRoutesTest extends MatsimTestCase {
 		/*
 		 * create Nodes
 		 */
-		id = scenario.createId("n1");
 		coord = scenario.createCoord(0, 0);
-		node1 = networkFactory.createNode(id, coord);
+		node1 = networkFactory.createNode(Id.create("n1", Node.class), coord);
 		network.addNode(node1);
 		
-		id = scenario.createId("n2");
 		coord = scenario.createCoord(1, 0);
-		node2 = networkFactory.createNode(id, coord);
+		node2 = networkFactory.createNode(Id.create("n2", Node.class), coord);
 		network.addNode(node2);
 
-		id = scenario.createId("n3");
 		coord = scenario.createCoord(1, 1);
-		node3 = networkFactory.createNode(id, coord);
+		node3 = networkFactory.createNode(Id.create("n3", Node.class), coord);
 		network.addNode(node3);
 
-		id = scenario.createId("n4");
 		coord = scenario.createCoord(0, 1);
-		node4 = networkFactory.createNode(id, coord);
+		node4 = networkFactory.createNode(Id.create("n4", Node.class), coord);
 		network.addNode(node4);
 
 		/*
 		 * create Links
 		 */
-		id = scenario.createId("l1");
-		link = networkFactory.createLink(id, node2, node1);
+		link = networkFactory.createLink(Id.create("l1", Link.class), node2, node1);
 		network.addLink(link);
 		
-		id = scenario.createId("l2");
-		link = networkFactory.createLink(id, node3, node2);
+		link = networkFactory.createLink(Id.create("l2", Link.class), node3, node2);
 		network.addLink(link);
 		
-		id = scenario.createId("l3");
-		link = networkFactory.createLink(id, node3, node4);
+		link = networkFactory.createLink(Id.create("l3", Link.class), node3, node4);
 		network.addLink(link);
 		
-		id = scenario.createId("l4");
-		link = networkFactory.createLink(id, node4, node1);
+		link = networkFactory.createLink(Id.create("l4", Link.class), node4, node1);
 		network.addLink(link);
 		
-		id = scenario.createId("l5");
-		link = networkFactory.createLink(id, node1, node3);
+		link = networkFactory.createLink(Id.create("l5", Link.class), node1, node3);
 		network.addLink(link);
 	}
 	
@@ -329,13 +319,13 @@ public class EditRoutesTest extends MatsimTestCase {
 	 * @author cdobler
 	 */
 	private void createSamplePlan() {
-		plan = new PlanImpl(new PersonImpl(new IdImpl(1)));
+		plan = new PlanImpl(new PersonImpl(Id.create(1, Person.class)));
 		
-		Activity activityH1 = ((PlanImpl) plan).createAndAddActivity("h", scenario.createId("l1"));
+		Activity activityH1 = ((PlanImpl) plan).createAndAddActivity("h", Id.create("l1", Link.class));
 		((PlanImpl) plan).createAndAddLeg(TransportMode.car);
-		Activity activityW1 = ((PlanImpl) plan).createAndAddActivity("w", scenario.createId("l3"));
+		Activity activityW1 = ((PlanImpl) plan).createAndAddActivity("w", Id.create("l3", Link.class));
 		((PlanImpl) plan).createAndAddLeg(TransportMode.car);
-		Activity activityH2 = ((PlanImpl) plan).createAndAddActivity("h", scenario.createId("l1"));
+		Activity activityH2 = ((PlanImpl) plan).createAndAddActivity("h", Id.create("l1", Link.class));
 		
 		/*
 		 * set activity start times and durations

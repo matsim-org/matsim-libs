@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
@@ -77,7 +78,7 @@ public class ActivityReplanningMap implements PersonStuckEventHandler,
 	 * remove the agent from the activityPerformingAgents we need to know its original
 	 * activity end time.
 	 */
-	private final Map<Id, Double> activityEndTimes;	// scheduled activity end times
+	private final Map<Id<Person>, Double> activityEndTimes;	// scheduled activity end times
 	
 	/*
 	 * Contains a map for each time bin (a bin equals a time step in the mobility simulation).
@@ -94,8 +95,8 @@ public class ActivityReplanningMap implements PersonStuckEventHandler,
 		
 		this.mobsimDataProvider = mobsimDataProvider;
 
-		this.startingAgents = new HashMap<Id, MobsimAgent>();
-		this.activityEndTimes = new HashMap<Id, Double>();
+		this.startingAgents = new HashMap<>();
+		this.activityEndTimes = new HashMap<>();
 		
 		this.activityPerformingAgents = new ConcurrentHashMap<Integer, Map<Id, MobsimAgent>>();
 	}
@@ -265,7 +266,7 @@ public class ActivityReplanningMap implements PersonStuckEventHandler,
 	/**
 	 * Returns a set containing the Ids of all agents that are currently performing an activity.
 	 */
-	public Set<Id> getActivityPerformingAgents() {
+	public Set<Id<Person>> getActivityPerformingAgents() {
 		return Collections.unmodifiableSet(this.activityEndTimes.keySet());
 	}
 	

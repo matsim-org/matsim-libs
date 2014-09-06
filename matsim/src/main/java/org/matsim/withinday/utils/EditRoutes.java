@@ -50,7 +50,7 @@ public class EditRoutes {
 	 * 
 	 * @return true when replacing the route worked, false when something went wrong
 	 */
-	public static boolean relocateFutureLegRoute(Leg leg, Id fromLinkId, Id toLinkId, Person person, Network network, TripRouter tripRouter) {
+	public static boolean relocateFutureLegRoute(Leg leg, Id<Link> fromLinkId, Id<Link> toLinkId, Person person, Network network, TripRouter tripRouter) {
 				
 		Link fromLink = network.getLinks().get(fromLinkId);
 		Link toLink = network.getLinks().get(toLinkId);

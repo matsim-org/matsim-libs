@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
@@ -41,7 +42,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
  */
 public class MobsimDataProvider implements MobsimInitializedListener {
 
-	private final Map<Id, MobsimAgent> agents = new HashMap<Id, MobsimAgent>(); 
+	private final Map<Id<Person>, MobsimAgent> agents = new HashMap<>(); 
 	private final Map<Id, MobsimVehicle> vehicles = new HashMap<Id, MobsimVehicle>();
 
 	private NetsimNetwork netsimNetwork;
@@ -66,12 +67,12 @@ public class MobsimDataProvider implements MobsimInitializedListener {
 			}
 		}
 	}
-	
-	public Map<Id, MobsimAgent> getAgents() {
+
+	public Map<Id<Person>, MobsimAgent> getAgents() {
 		return this.agents;
 	}
 	
-	public MobsimAgent getAgent(Id agentId) {
+	public MobsimAgent getAgent(Id<Person> agentId) {
 		return this.agents.get(agentId);
 	}
 	

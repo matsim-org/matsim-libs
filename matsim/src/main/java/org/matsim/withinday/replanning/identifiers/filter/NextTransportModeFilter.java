@@ -27,6 +27,7 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
@@ -43,27 +44,27 @@ import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilter;
  */
 public class NextTransportModeFilter implements AgentFilter {
 
-	private final Map<Id, MobsimAgent> agents;
+	private final Map<Id<Person>, MobsimAgent> agents;
 	private final Set<String> modes;
 	
 	// use the factory
-	/*package*/ NextTransportModeFilter(Map<Id, MobsimAgent> agents, Set<String> modes) {
+	/*package*/ NextTransportModeFilter(Map<Id<Person>, MobsimAgent> agents, Set<String> modes) {
 		this.agents = agents;
 		this.modes = modes;
 	}
 	
 	@Override
-	public void applyAgentFilter(Set<Id> set, double time) {
-		Iterator<Id> iter = set.iterator();
+	public void applyAgentFilter(Set<Id<Person>> set, double time) {
+		Iterator<Id<Person>> iter = set.iterator();
 		
 		while (iter.hasNext()) {
-			Id id = iter.next();
+			Id<Person> id = iter.next();
 			if (!this.applyAgentFilter(id, time)) iter.remove();
 		}
 	}
 
 	@Override
-	public boolean applyAgentFilter(Id id, double time) {
+	public boolean applyAgentFilter(Id<Person> id, double time) {
 		MobsimAgent agent = this.agents.get(id);
 		
 		if (!(agent.getState() == MobsimAgent.State.ACTIVITY)) return false;

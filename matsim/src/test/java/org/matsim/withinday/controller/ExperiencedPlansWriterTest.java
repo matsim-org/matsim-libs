@@ -44,7 +44,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -135,8 +134,8 @@ private static final Logger log = Logger.getLogger(ExperiencedPlansWriterTest.cl
 		
 		Scenario experiencedScenario = ScenarioUtils.loadScenario(experiencedConfig);
 		
-		Person p01 = experiencedScenario.getPopulation().getPersons().get(scenario.createId("p01"));
-		Person p02 = experiencedScenario.getPopulation().getPersons().get(scenario.createId("p02"));
+		Person p01 = experiencedScenario.getPopulation().getPersons().get(Id.create("p01", Person.class));
+		Person p02 = experiencedScenario.getPopulation().getPersons().get(Id.create("p02", Person.class));
 		
 		Leg leg01 = (Leg) p01.getSelectedPlan().getPlanElements().get(1);
 		Leg leg02 = (Leg) p02.getSelectedPlan().getPlanElements().get(1);
@@ -180,21 +179,21 @@ private static final Logger log = Logger.getLogger(ExperiencedPlansWriterTest.cl
 
 	private static class Filter implements AgentFilter {
 
-		private final Id id = new IdImpl("p02");
+		private final Id<Person> id = Id.create("p02", Person.class);
 		
 		// Agents that do not match the filter criteria are removed from the set.
 		@Override
-		public void applyAgentFilter(Set<Id> set, double time) {
-			Iterator<Id> iter = set.iterator();
+		public void applyAgentFilter(Set<Id<Person>> set, double time) {
+			Iterator<Id<Person>> iter = set.iterator();
 			while (iter.hasNext()) {
-				Id id = iter.next();
+				Id<Person> id = iter.next();
 				if (!this.applyAgentFilter(id, time)) iter.remove();
 			}
 		}
 
 		// Returns true if the agent matches the filter criteria, otherwise returns false.
 		@Override
-		public boolean applyAgentFilter(Id id, double time) {
+		public boolean applyAgentFilter(Id<Person> id, double time) {
 			if (id.equals(this.id)) return true;
 			return false;
 		}
@@ -227,12 +226,12 @@ private static final Logger log = Logger.getLogger(ExperiencedPlansWriterTest.cl
 			Leg leg = (Leg) plan.getPlanElements().get(1);
 			NetworkRoute route = (NetworkRoute) leg.getRoute();
 			
-			Id startLinkId = scenario.createId("l0");
-			Id endLinkId = scenario.createId("l2");
+			Id<Link> startLinkId = Id.create("l0", Link.class);
+			Id<Link> endLinkId = Id.create("l2", Link.class);
 			List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
-			linkIds.add(scenario.createId("l3"));
-			linkIds.add(scenario.createId("l4"));
-			linkIds.add(scenario.createId("l5"));
+			linkIds.add(Id.create("l3", Link.class));
+			linkIds.add(Id.create("l4", Link.class));
+			linkIds.add(Id.create("l5", Link.class));
 			route.setLinkIds(startLinkId, linkIds, endLinkId);
 			
 			return true;
@@ -269,19 +268,19 @@ private static final Logger log = Logger.getLogger(ExperiencedPlansWriterTest.cl
 		Network network = scenario.getNetwork();
 		NetworkFactory networkFactory = network.getFactory();
 		
-		Node node0 = networkFactory.createNode(scenario.createId("n0"), scenario.createCoord(0.0, 0.0));
-		Node node1 = networkFactory.createNode(scenario.createId("n1"), scenario.createCoord(1.0, 0.0));
-		Node node2 = networkFactory.createNode(scenario.createId("n2"), scenario.createCoord(2.0, 0.0));
-		Node node3 = networkFactory.createNode(scenario.createId("n3"), scenario.createCoord(3.0, 0.0));
-		Node node4 = networkFactory.createNode(scenario.createId("n4"), scenario.createCoord(1.0, 1.0));
-		Node node5 = networkFactory.createNode(scenario.createId("n5"), scenario.createCoord(2.0, 1.0));
+		Node node0 = networkFactory.createNode(Id.create("n0", Node.class), scenario.createCoord(0.0, 0.0));
+		Node node1 = networkFactory.createNode(Id.create("n1", Node.class), scenario.createCoord(1.0, 0.0));
+		Node node2 = networkFactory.createNode(Id.create("n2", Node.class), scenario.createCoord(2.0, 0.0));
+		Node node3 = networkFactory.createNode(Id.create("n3", Node.class), scenario.createCoord(3.0, 0.0));
+		Node node4 = networkFactory.createNode(Id.create("n4", Node.class), scenario.createCoord(1.0, 1.0));
+		Node node5 = networkFactory.createNode(Id.create("n5", Node.class), scenario.createCoord(2.0, 1.0));
 		
-		Link link0 = networkFactory.createLink(scenario.createId("l0"), node0, node1);
-		Link link1 = networkFactory.createLink(scenario.createId("l1"), node1, node2);
-		Link link2 = networkFactory.createLink(scenario.createId("l2"), node2, node3);
-		Link link3 = networkFactory.createLink(scenario.createId("l3"), node1, node4);
-		Link link4 = networkFactory.createLink(scenario.createId("l4"), node4, node5);
-		Link link5 = networkFactory.createLink(scenario.createId("l5"), node5, node2);
+		Link link0 = networkFactory.createLink(Id.create("l0", Link.class), node0, node1);
+		Link link1 = networkFactory.createLink(Id.create("l1", Link.class), node1, node2);
+		Link link2 = networkFactory.createLink(Id.create("l2", Link.class), node2, node3);
+		Link link3 = networkFactory.createLink(Id.create("l3", Link.class), node1, node4);
+		Link link4 = networkFactory.createLink(Id.create("l4", Link.class), node4, node5);
+		Link link5 = networkFactory.createLink(Id.create("l5", Link.class), node5, node2);
 		
 		link0.setLength(1000.0);
 		link1.setLength(1000.0);
@@ -309,24 +308,21 @@ private static final Logger log = Logger.getLogger(ExperiencedPlansWriterTest.cl
 	 */
 	private Person createPerson(Scenario scenario, String id) {
 		
-		PersonImpl person = (PersonImpl) scenario.getPopulation().getFactory().createPerson(scenario.createId(id));
+		PersonImpl person = (PersonImpl) scenario.getPopulation().getFactory().createPerson(Id.create(id, Person.class));
 		
-		person.setAge(20);
-		person.setSex("m");
-
-		Activity from = scenario.getPopulation().getFactory().createActivityFromLinkId("home", scenario.createId("l0"));
+		Activity from = scenario.getPopulation().getFactory().createActivityFromLinkId("home", Id.create("l0", Link.class));
 		Leg leg = scenario.getPopulation().getFactory().createLeg(TransportMode.car);
-		Activity to = scenario.getPopulation().getFactory().createActivityFromLinkId("home", scenario.createId("l2"));
+		Activity to = scenario.getPopulation().getFactory().createActivityFromLinkId("home", Id.create("l2", Link.class));
 
 		from.setEndTime(8*3600);
 		leg.setDepartureTime(8*3600);
 		
 		RouteFactory routeFactory = new LinkNetworkRouteFactory();
-		Id startLinkId = scenario.createId("l0");
-		Id endLinkId = scenario.createId("l2");
+		Id<Link> startLinkId = Id.create("l0", Link.class);
+		Id<Link> endLinkId = Id.create("l2", Link.class);
 		NetworkRoute route = (NetworkRoute) routeFactory.createRoute(startLinkId, endLinkId);
 		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
-		linkIds.add(scenario.createId("l1"));
+		linkIds.add(Id.create("l1", Link.class));
 		route.setLinkIds(startLinkId, linkIds, endLinkId);
 		leg.setRoute(route);
 		

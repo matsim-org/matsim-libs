@@ -27,7 +27,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.Controler;
 
 public class RCControler extends Controler {
@@ -43,14 +43,14 @@ public class RCControler extends Controler {
 				controler.getConfig().planCalcScore(), controler.getScenario()));
 			
 		if (Boolean.parseBoolean(controler.getConfig().findParam("rc", "withinday"))) {
-			Set<Id> links = controler.createTunnelLinks();
+			Set<Id<Link>> links = controler.createTunnelLinks();
 			controler.addControlerListener(new WithindayListener(controler, links));
 		}		
     	controler.run();
     }
 	
-	public Set<Id> createTunnelLinks() {
-		Set<Id> links = new HashSet<Id>();
+	public Set<Id<Link>> createTunnelLinks() {
+		Set<Id<Link>> links = new HashSet<>();
 		String tunnellinksfile = this.config.findParam("rc", "tunnellinksfile");
 		
 		 try {
@@ -59,7 +59,7 @@ public class RCControler extends Controler {
 	          int cnt = 0;
 	          String curr_line = in.readLine(); // Skip header
 	          while ((curr_line = in.readLine()) != null) {
-	        	  links.add(new IdImpl(curr_line));
+	        	  links.add(Id.create(curr_line, Link.class));
 		          cnt++;
 	          }
 	          in.close();

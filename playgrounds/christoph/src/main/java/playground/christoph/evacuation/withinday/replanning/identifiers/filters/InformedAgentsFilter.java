@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilter;
 
 import playground.christoph.evacuation.mobsim.InformedAgentsTracker;
@@ -51,7 +52,7 @@ public class InformedAgentsFilter implements AgentFilter {
 	}
 	
 	@Override
-	public void applyAgentFilter(Set<Id> set, double time) {
+	public void applyAgentFilter(Set<Id<Person>> set, double time) {
 	
 		/*
 		 * If all agents have been informed, filtering can be shortened.
@@ -84,26 +85,26 @@ public class InformedAgentsFilter implements AgentFilter {
 	 * 
 	 * @param set of MobsimAgent
 	 */
-	/*package*/ void applyNotInitialReplanningFilter(Set<Id> set) {
+	/*package*/ void applyNotInitialReplanningFilter(Set<Id<Person>> set) {
 		
-		Set<Id> alreadyInitiallyReplannedAgents = this.replanningTracker.getInformedAndInitiallyReplannedAgents();
+		Set<Id<Person>> alreadyInitiallyReplannedAgents = this.replanningTracker.getInformedAndInitiallyReplannedAgents();
 		if (alreadyInitiallyReplannedAgents.size() < set.size()) {
-			Set<Id> agents = new HashSet<Id>();
-			for(Id agentId : alreadyInitiallyReplannedAgents) {
+			Set<Id<Person>> agents = new HashSet<>();
+			for(Id<Person> agentId : alreadyInitiallyReplannedAgents) {
 				if(set.contains(agentId)) agents.add(agentId);
 			}
 			set.clear();
 			set.addAll(agents);
 		} else {
-			Iterator<Id> iter = set.iterator();
+			Iterator<Id<Person>> iter = set.iterator();
 			while (iter.hasNext()) {
-				Id agentId = iter.next();
+				Id<Person> agentId = iter.next();
 				if (!alreadyInitiallyReplannedAgents.contains(agentId)) iter.remove();
 			}			
 		}
 	}
 	
-	/*package*/ boolean applyNotInitialReplanningFilter(Id id) {
+	/*package*/ boolean applyNotInitialReplanningFilter(Id<Person> id) {
 		if (this.replanningTracker.hasAgentBeenInitiallyReplanned(id)) return true;
 		else return false;
 	}
@@ -115,33 +116,33 @@ public class InformedAgentsFilter implements AgentFilter {
 	 * 
 	 * @param set of PlanBasedWithinDayAgent
 	 */
-	/*package*/ void applyInitialReplanningFilter(Set<Id> set) {
+	/*package*/ void applyInitialReplanningFilter(Set<Id<Person>> set) {
 		
-		Set<Id> initialReplanningRequiringAgents = this.replanningTracker.getInformedButNotInitiallyReplannedAgents();
+		Set<Id<Person>> initialReplanningRequiringAgents = this.replanningTracker.getInformedButNotInitiallyReplannedAgents();
 		if (initialReplanningRequiringAgents.size() < set.size()) {
-			Set<Id> agents = new HashSet<Id>();
-			for(Id agentId : initialReplanningRequiringAgents) {
+			Set<Id<Person>> agents = new HashSet<>();
+			for(Id<Person> agentId : initialReplanningRequiringAgents) {
 				if(set.contains(agentId)) agents.add(agentId);
 			}
 			set.clear();
 			set.addAll(agents);
 		} else {
-			Iterator<Id> iter = set.iterator();
+			Iterator<Id<Person>> iter = set.iterator();
 			while (iter.hasNext()) {
-				Id agentId = iter.next();
+				Id<Person> agentId = iter.next();
 				if (!initialReplanningRequiringAgents.contains(agentId)) iter.remove();
 			}			
 		}
 	}
 	
-	/*package*/ boolean applyInitialReplanningFilter(Id id) {
-		final Set<Id> initialReplanningRequiringAgents = this.replanningTracker.getInformedButNotInitiallyReplannedAgents();
+	/*package*/ boolean applyInitialReplanningFilter(Id<Person> id) {
+		final Set<Id<Person>> initialReplanningRequiringAgents = this.replanningTracker.getInformedButNotInitiallyReplannedAgents();
 		if (initialReplanningRequiringAgents.contains(id)) return true;
 		else return false;
 	}
 	
 	@Override
-	public boolean applyAgentFilter(Id id, double time) {
+	public boolean applyAgentFilter(Id<Person> id, double time) {
 		/*
 		 * If all agents have been informed, filtering can be shortened.
 		 * Either no agents are filtered (FilterType.NotInitialReplanning)

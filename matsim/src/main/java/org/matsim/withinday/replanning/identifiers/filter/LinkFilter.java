@@ -25,6 +25,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilter;
 
@@ -36,27 +38,27 @@ import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilter;
  */
 public class LinkFilter implements AgentFilter {
 
-	private final Map<Id, MobsimAgent> agents;
-	private final Set<Id> links;
+	private final Map<Id<Person>, MobsimAgent> agents;
+	private final Set<Id<Link>> links;
 	
 	// use the factory
-	/*package*/ LinkFilter(Map<Id, MobsimAgent> agents, Set<Id> links) {
+	/*package*/ LinkFilter(Map<Id<Person>, MobsimAgent> agents, Set<Id<Link>> links) {
 		this.agents = agents;
 		this.links = links;
 	}
 	
 	@Override
-	public void applyAgentFilter(Set<Id> set, double time) {
-		Iterator<Id> iter = set.iterator();
+	public void applyAgentFilter(Set<Id<Person>> set, double time) {
+		Iterator<Id<Person>> iter = set.iterator();
 		
 		while (iter.hasNext()) {
-			Id id = iter.next();
+			Id<Person> id = iter.next();
 			if (!this.applyAgentFilter(id, time)) iter.remove();
 		}
 	}
 
 	@Override
-	public boolean applyAgentFilter(Id id, double time) {
+	public boolean applyAgentFilter(Id<Person> id, double time) {
 		MobsimAgent agent = this.agents.get(id);
 		
 		if (!(links.contains(agent.getCurrentLinkId()))) return false;

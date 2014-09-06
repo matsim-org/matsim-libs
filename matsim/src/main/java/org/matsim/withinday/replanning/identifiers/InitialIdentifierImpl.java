@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
@@ -46,8 +47,8 @@ public class InitialIdentifierImpl extends InitialIdentifier {
 		/*
 		 * Apply filter to remove agents that should not be replanned.
 		 */
-		for (Entry<Id, MobsimAgent> entry : this.mobsimDataProvider.getAgents().entrySet()) {
-			Id agentId = entry.getKey();
+		for (Entry<Id<Person>, MobsimAgent> entry : this.mobsimDataProvider.getAgents().entrySet()) {
+			Id<Person> agentId = entry.getKey();
 			if (this.applyFilters(agentId, time))  agentsToReplan.add(entry.getValue());
 		}
 		

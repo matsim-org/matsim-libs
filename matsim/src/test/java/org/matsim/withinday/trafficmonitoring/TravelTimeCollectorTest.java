@@ -88,7 +88,7 @@ public class TravelTimeCollectorTest extends MatsimTestCase {
 			fosl.addSimulationListener(listener);
 			controler.getMobsimListeners().add(fosl);
 			
-			Id id = scenario.createId("6");
+			Id<Link> id = Id.create("6", Link.class);
 			Link link = scenario.getNetwork().getLinks().get(id);
 			link.setCapacity(500.0);	// reduce capacity
 			
@@ -121,7 +121,7 @@ public class TravelTimeCollectorTest extends MatsimTestCase {
 		public MobsimListenerForTests(Scenario scenario, TravelTime travelTime) {
 			this.travelTime = travelTime;
 			
-			Id id = scenario.createId("6");
+			Id<Link> id = Id.create("6", Link.class);
 			link = scenario.getNetwork().getLinks().get(id);
 		}
 		

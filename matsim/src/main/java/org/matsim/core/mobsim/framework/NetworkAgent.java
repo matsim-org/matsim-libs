@@ -21,6 +21,7 @@
 package org.matsim.core.mobsim.framework;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 
 /**
  * This was separated out since there were some commonalities between "MobsimAgent" and "DriverAgent".
@@ -29,11 +30,11 @@ import org.matsim.api.core.v01.Id;
  */
 public interface NetworkAgent extends MobsimAgentMarkerInterface {
 	
-	public Id getCurrentLinkId();
+	public Id<Link> getCurrentLinkId();
 
 	/**
 	 * @return Id of destination link.  May be null (e.g. for cruising taxi drivers)
 	 */
-	public Id getDestinationLinkId();
+	public Id<Link> getDestinationLinkId();
 
 }

@@ -29,9 +29,9 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityFactory;
@@ -46,10 +46,10 @@ public class WithindayListener implements StartupListener {
 	
 	protected Scenario scenario;
 	protected WithinDayControlerListener withinDayControlerListener;
-	private Set<Id> links;
+	private Set<Id<Link>> links;
 	private static final Logger log = Logger.getLogger(WithindayListener.class);
 
-	public WithindayListener(Controler controler, Set<Id> links) {
+	public WithindayListener(Controler controler, Set<Id<Link>> links) {
 		this.links = links;
 		
 		this.scenario = controler.getScenario();
@@ -93,12 +93,12 @@ public class WithindayListener implements StartupListener {
 		withinDayControlerListener.getWithinDayEngine().addTimedDuringLegReplannerFactory(duringLegReplannerFactory, 15.5*3600.0, Double.MAX_VALUE);
 	}
 	
-	public void addNetworkChange(Controler controler, Set<Id> links) {
+	public void addNetworkChange(Controler controler, Set<Id<Link>> links) {
 		NetworkImpl network = (NetworkImpl) controler.getNetwork();
 		NetworkChangeEvent networkChangeEvent0;
 		networkChangeEvent0 = network.getFactory().createNetworkChangeEvent(15.49 * 3600.0);		
 		
-		for (Id id : links) {
+		for (Id<Link> id : links) {
 			Link link = network.getLinks().get(id);
 			networkChangeEvent0.addLink(link);
 		}		

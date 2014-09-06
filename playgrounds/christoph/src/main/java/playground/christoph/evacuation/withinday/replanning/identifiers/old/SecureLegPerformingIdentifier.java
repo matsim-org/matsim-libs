@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -58,10 +59,11 @@ public class SecureLegPerformingIdentifier extends DuringLegIdentifier {
 		this.secureDistance = secureDistance;
 	}
 	
+	@Override
 	public Set<MobsimAgent> getAgentsToReplan(double time) {
 		
-		Set<Id> legPerformingAgents = new HashSet<Id>(this.linkReplanningMap.getLegPerformingAgents());
-		Map<Id, MobsimAgent> mapping = this.mobsimDataProvider.getAgents();
+		Set<Id<Person>> legPerformingAgents = new HashSet<>(this.linkReplanningMap.getLegPerformingAgents());
+		Map<Id<Person>, MobsimAgent> mapping = this.mobsimDataProvider.getAgents();
 		
 		
 		// apply filter to remove agents that should not be replanned

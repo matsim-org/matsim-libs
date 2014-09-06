@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
@@ -55,16 +56,17 @@ public class InsecureLegPerformingIdentifier extends DuringLegIdentifier {
 		this.coordAnalyzer = coordAnalyzer;
 	}
 	
+	@Override
 	public Set<MobsimAgent> getAgentsToReplan(double time) {
 		
-		Set<Id> legPerformingAgents = new HashSet<Id>(this.linkReplanningMap.getLegPerformingAgents());
-		Map<Id, MobsimAgent> mapping = this.mobsimDataProvider.getAgents();
+		Set<Id<Person>> legPerformingAgents = new HashSet<>(this.linkReplanningMap.getLegPerformingAgents());
+		Map<Id<Person>, MobsimAgent> mapping = this.mobsimDataProvider.getAgents();
 		
 		// apply filter to remove agents that should not be replanned
 		this.applyFilters(legPerformingAgents, time);
 		
 		Set<MobsimAgent> agentsToReplan = new TreeSet<MobsimAgent>(new PersonAgentComparator());		
-		for (Id id : legPerformingAgents) {
+		for (Id<Person> id : legPerformingAgents) {
 			
 			MobsimAgent agent = mapping.get(id);
 			

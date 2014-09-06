@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
@@ -127,11 +128,11 @@ public class LinkReplanningMap implements PersonStuckEventHandler, ActivityStart
 	 * @param time
 	 * @return a list of agents who might need a replanning
 	 */
-	public Set<Id> getReplanningAgents(final double time) {
+	public Set<Id<Person>> getReplanningAgents(final double time) {
 		
-		Set<Id> set = this.earliestLinkExitTimeProvider.getEarliestLinkExitTimesPerTimeStep(time);
+		Set<Id<Person>> set = this.earliestLinkExitTimeProvider.getEarliestLinkExitTimesPerTimeStep(time);
 		if (set != null) return Collections.unmodifiableSet(set);
-		else return new HashSet<Id>();
+		else return new HashSet<>();
 	}
 
 	/**
@@ -154,9 +155,9 @@ public class LinkReplanningMap implements PersonStuckEventHandler, ActivityStart
 		
 		Set<Id> set = new HashSet<Id>();
 		
-		Set<Entry<Double, Set<Id>>> entries = this.earliestLinkExitTimeProvider.getEarliestLinkExitTimesPerTimeStep().entrySet();
+		Set<Entry<Double, Set<Id<Person>>>> entries = this.earliestLinkExitTimeProvider.getEarliestLinkExitTimesPerTimeStep().entrySet();
 		
-		for (Entry<Double, Set<Id>> entry : entries) {
+		for (Entry<Double, Set<Id<Person>>> entry : entries) {
 			double earliestLinkExitTime = entry.getKey();
 			
 			// check time
@@ -179,7 +180,7 @@ public class LinkReplanningMap implements PersonStuckEventHandler, ActivityStart
 	 * @return A list of all agents that are currently performing a leg. Note that
 	 * some of them might be limited in the available replanning operations! 
 	 */
-	public Set<Id> getLegPerformingAgents() {
+	public Set<Id<Person>> getLegPerformingAgents() {
 		return Collections.unmodifiableSet(this.earliestLinkExitTimeProvider.getEarliestLinkExitTimes().keySet());
 	}
 

@@ -25,13 +25,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilter;
@@ -44,8 +43,8 @@ import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilter;
  */
 public class TunnelLinksFilter implements AgentFilter {
 
-	private final Map<Id, MobsimAgent> agents;
-	private final Set<Id> links;
+	private final Map<Id<Person>, MobsimAgent> agents;
+	private final Set<Id<Link>> links;
 	private final Set<Link> entryLinks = new HashSet<Link>();
 	private static final Logger log = Logger.getLogger(TunnelLinksFilter.class);
 	private Network network;
@@ -55,21 +54,21 @@ public class TunnelLinksFilter implements AgentFilter {
 	Node portalNodeNorth;
 	
 	// use the factory
-	/*package*/ TunnelLinksFilter(Map<Id, MobsimAgent> agents, Set<Id> links, Network network) {
+	/*package*/ TunnelLinksFilter(Map<Id<Person>, MobsimAgent> agents, Set<Id<Link>> links, Network network) {
 		this.agents = agents;
 		this.links = links;
 		this.network = network;
 		
 		
-		middleNode = this.network.getNodes().get(new IdImpl("17560200462218"));
-		portalNodeSouth = this.network.getNodes().get(new IdImpl("17560200470368"));
-		portalNodeNorth = this.network.getNodes().get(new IdImpl("17560200134734"));
+		middleNode = this.network.getNodes().get(Id.create("17560200462218", Node.class));
+		portalNodeSouth = this.network.getNodes().get(Id.create("17560200470368", Node.class));
+		portalNodeNorth = this.network.getNodes().get(Id.create("17560200134734", Node.class));
 		
 		this.createEntryLinks();		
 	}
 	
 	private void createEntryLinks() {
-		for (Id id : links) {
+		for (Id<Link> id : links) {
 			Node fromNode = this.network.getLinks().get(id).getFromNode();
 			this.entryLinks.addAll(fromNode.getInLinks().values());
 		}
@@ -81,12 +80,12 @@ public class TunnelLinksFilter implements AgentFilter {
 	}
 	
 	@Override
-	public void applyAgentFilter(Set<Id> set, double time) {
+	public void applyAgentFilter(Set<Id<Person>> set, double time) {
 		log.info("this one is not used anymore ...");	
 	}
 
 	@Override
-	public boolean applyAgentFilter(Id id, double time) {
+	public boolean applyAgentFilter(Id<Person> id, double time) {
 		MobsimAgent agent = this.agents.get(id);
 		Link currentLinkAgent = this.network.getLinks().get(agent.getCurrentLinkId());
 		

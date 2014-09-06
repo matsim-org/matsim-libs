@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author cdobler
@@ -33,9 +34,13 @@ public class ReplanningEvent extends Event {
 	public static final String EVENT_TYPE = "replanning";
 	public static final String ATTRIBUTE_REPLANNERTYPE = "replanner";
 	
+	public static final String ATTRIBUTE_PERSON = "person";
+	
+	private final Id<Person> personId;
+	
 	private final String replannerType;
 	
-	public ReplanningEvent(final double time, final Id personId, final String replannerType) {
+	public ReplanningEvent(final double time, final Id<Person> personId, final String replannerType) {
 		super(time);
 		this.personId = personId;
 		this.replannerType = replannerType;
@@ -60,13 +65,7 @@ public class ReplanningEvent extends Event {
 		return EVENT_TYPE;
 	}
 	
-
-	public static final String ATTRIBUTE_PERSON = "person";
-
-	private final Id personId;
-
-
-	public Id getPersonId() {
+	public Id<Person> getPersonId() {
 		return this.personId;
 	}
 

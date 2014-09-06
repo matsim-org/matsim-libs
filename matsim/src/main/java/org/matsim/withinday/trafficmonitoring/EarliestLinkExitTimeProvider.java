@@ -69,8 +69,8 @@ public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, Link
 	private final Map<String, TravelTime> multiModalTravelTimes;
 	private final TravelTime freeSpeedTravelTime;
 
-	private final Map<Id, Double> earliestLinkExitTimes = new ConcurrentHashMap<Id, Double>();
-	private final Map<Double, Set<Id>> earliestLinkExitTimesPerTimeStep = new ConcurrentHashMap<Double, Set<Id>>();
+	private final Map<Id<Person>, Double> earliestLinkExitTimes = new ConcurrentHashMap<>();
+	private final Map<Double, Set<Id<Person>>> earliestLinkExitTimesPerTimeStep = new ConcurrentHashMap<>();
 
 	public EarliestLinkExitTimeProvider(Scenario scenario) {
 		this(scenario, null);
@@ -89,23 +89,23 @@ public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, Link
 		return this.transportModeProvider;
 	}
 
-	public double getEarliestLinkExitTime(Id agentId) {
+	public double getEarliestLinkExitTime(Id<Person> agentId) {
 		Double earliestExitTime = this.earliestLinkExitTimes.get(agentId);
 		if (earliestExitTime == null) return Time.UNDEFINED_TIME;
 		else return earliestExitTime;
 	}
 
-	public Map<Id, Double> getEarliestLinkExitTimes() {
+	public Map<Id<Person>, Double> getEarliestLinkExitTimes() {
 		return Collections.unmodifiableMap(this.earliestLinkExitTimes);
 	}
 
-	public Set<Id> getEarliestLinkExitTimesPerTimeStep(double time) {
-		Set<Id> set = this.earliestLinkExitTimesPerTimeStep.get(time);
+	public Set<Id<Person>> getEarliestLinkExitTimesPerTimeStep(double time) {
+		Set<Id<Person>> set = this.earliestLinkExitTimesPerTimeStep.get(time);
 		if (set != null) return Collections.unmodifiableSet(set);
 		else return null;
 	}
 
-	public Map<Double, Set<Id>> getEarliestLinkExitTimesPerTimeStep() {
+	public Map<Double, Set<Id<Person>>> getEarliestLinkExitTimesPerTimeStep() {
 		return Collections.unmodifiableMap(this.earliestLinkExitTimesPerTimeStep);
 	}
 
@@ -167,24 +167,24 @@ public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, Link
 		this.removeEarliestLinkExitTimesAtTime(event.getPersonId());
 	}
 
-	private void handleAddEarliestLinkExitTime(Id agentId, double earliestExitTime) {
+	private void handleAddEarliestLinkExitTime(Id<Person> agentId, double earliestExitTime) {
 
 		this.earliestLinkExitTimes.put(agentId, earliestExitTime);
 
-		Set<Id> earliestLinkExitTimesAtTime = this.earliestLinkExitTimesPerTimeStep.get(earliestExitTime);
+		Set<Id<Person>> earliestLinkExitTimesAtTime = this.earliestLinkExitTimesPerTimeStep.get(earliestExitTime);
 		if (earliestLinkExitTimesAtTime == null) {
-			earliestLinkExitTimesAtTime = new HashSet<Id>();
+			earliestLinkExitTimesAtTime = new HashSet<>();
 			this.earliestLinkExitTimesPerTimeStep.put(earliestExitTime, earliestLinkExitTimesAtTime);
 		}
 		earliestLinkExitTimesAtTime.add(agentId);
 	}
 
-	private void removeEarliestLinkExitTimesAtTime(Id agentId) {
+	private void removeEarliestLinkExitTimesAtTime(Id<Person> agentId) {
 
 		Double earliestExitTime = this.earliestLinkExitTimes.remove(agentId);
 
 		if (earliestExitTime != null) {
-			Set<Id> earliestLinkExitTimesAtTime = this.earliestLinkExitTimesPerTimeStep.get(earliestExitTime);
+			Set<Id<Person>> earliestLinkExitTimesAtTime = this.earliestLinkExitTimesPerTimeStep.get(earliestExitTime);
 			if (earliestLinkExitTimesAtTime != null) {
 				earliestLinkExitTimesAtTime.remove(agentId);
 				if (earliestLinkExitTimesAtTime.isEmpty()) {

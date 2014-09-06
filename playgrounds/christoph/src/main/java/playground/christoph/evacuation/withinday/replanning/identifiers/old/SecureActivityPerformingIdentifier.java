@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
@@ -59,15 +60,16 @@ public class SecureActivityPerformingIdentifier extends DuringActivityIdentifier
 		this.withinDayAgentUtils = new WithinDayAgentUtils();
 	}
 	
+	@Override
 	public Set<MobsimAgent> getAgentsToReplan(double time) {
-		Set<Id> activityPerformingAgents = this.activityReplanningMap.getActivityPerformingAgents();
-		Map<Id, MobsimAgent> mapping = this.mobsimDataProvider.getAgents();
+		Set<Id<Person>> activityPerformingAgents = this.activityReplanningMap.getActivityPerformingAgents();
+		Map<Id<Person>, MobsimAgent> mapping = this.mobsimDataProvider.getAgents();
 		
 		// apply filter to remove agents that should not be replanned
 		this.applyFilters(activityPerformingAgents, time);
 		
 		Set<MobsimAgent> agentsToReplan = new TreeSet<MobsimAgent>(new PersonAgentComparator());
-		for (Id id : activityPerformingAgents) {
+		for (Id<Person> id : activityPerformingAgents) {
 			
 			MobsimAgent agent = mapping.get(id);
 			

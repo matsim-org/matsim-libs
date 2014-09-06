@@ -23,15 +23,16 @@ package org.matsim.withinday.replanning.identifiers.filter;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilterFactory;
 
 public class LinkFilterFactory implements AgentFilterFactory {
 
-	private final Set<Id> links;
+	private final Set<Id<Link>> links;
 	private final MobsimDataProvider mobsimDataProvider;
 	
-	public LinkFilterFactory(Set<Id> links, MobsimDataProvider mobsimDataProvider) {
+	public LinkFilterFactory(Set<Id<Link >> links, MobsimDataProvider mobsimDataProvider) {
 		this.links = links;
 		this.mobsimDataProvider = mobsimDataProvider;
 	}

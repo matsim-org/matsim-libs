@@ -24,11 +24,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.vehicles.Vehicle;
 
 public class HouseholdModeAssignment {
 
 	private Map<Id, String> transportModeMap = new HashMap<Id, String>();
-	private Map<Id, Id> driverVehicleMap = new HashMap<Id, Id>();
+	private Map<Id<Person>, Id<Vehicle>> driverVehicleMap = new HashMap<>();
 	private Map<Id, Id> passengerVehicleMap = new HashMap<Id, Id>();
 	
 	public void addTransportModeMapping(Id personId, String transportMode) {
@@ -47,7 +49,7 @@ public class HouseholdModeAssignment {
 		return this.transportModeMap;
 	}
 	
-	public Map<Id, Id> getDriverVehicleMap() {
+	public Map<Id<Person>, Id<Vehicle>> getDriverVehicleMap() {
 		return this.driverVehicleMap;
 	}
 	

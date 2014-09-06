@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.withinday.events.ReplanningEvent;
 import org.matsim.withinday.events.handler.ReplanningEventHandler;
@@ -40,14 +41,14 @@ import playground.christoph.evacuation.events.handler.PersonInformationEventHand
 public class ReplanningTracker implements ReplanningEventHandler, PersonInformationEventHandler {
 
 	private final InformedAgentsTracker informedAgentsTracker;
-	private final Set<Id> replannedAgents = new HashSet<Id>();
-	private final Set<Id> informedButNotInitiallyReplannedAgents = new HashSet<Id>();
+	private final Set<Id<Person>> replannedAgents = new HashSet<>();
+	private final Set<Id<Person>> informedButNotInitiallyReplannedAgents = new HashSet<>();
 	
 	public ReplanningTracker(InformedAgentsTracker informedAgentsTracker) {
 		this.informedAgentsTracker = informedAgentsTracker;
 	}
 	
-	public boolean hasAgentBeenInitiallyReplanned(Id agentId) {
+	public boolean hasAgentBeenInitiallyReplanned(Id<Person> agentId) {
 		return this.replannedAgents.contains(agentId);
 	}
 
@@ -55,11 +56,11 @@ public class ReplanningTracker implements ReplanningEventHandler, PersonInformat
 		return this.replannedAgents.size() == this.informedAgentsTracker.totalAgents;
 	}
 	
-	public Set<Id> getInformedButNotInitiallyReplannedAgents() {
+	public Set<Id<Person>> getInformedButNotInitiallyReplannedAgents() {
 		return this.informedButNotInitiallyReplannedAgents;
 	}
 
-	public Set<Id> getInformedAndInitiallyReplannedAgents() {
+	public Set<Id<Person>> getInformedAndInitiallyReplannedAgents() {
 		return this.replannedAgents;
 	}
 	

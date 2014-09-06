@@ -21,6 +21,7 @@
 package playground.christoph.evacuation.events;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author cdobler
@@ -30,6 +31,6 @@ public interface PersonInformationEvent extends InformationEvent {
 	public static final String EVENT_TYPE = "person informed";
 	public static final String ATTRIBUTE_PERSON = "person";
 	
-	public Id getPersonId();
+	public Id<Person> getPersonId();
 
 }

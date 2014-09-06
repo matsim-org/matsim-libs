@@ -26,6 +26,7 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
@@ -134,8 +135,8 @@ public class BurgdorfRunner implements StartupListener {
 			networkChangeEvent.setFlowCapacityChange(changeValue);
 			changeValue = new ChangeValue(ChangeType.ABSOLUTE, 1);
 			networkChangeEvent.setLanesChange(changeValue);
-			networkChangeEvent.addLink(network.getLinks().get(event.getControler().getScenario().createId(BurgdorfRoutes.burgdorfToBernUpstream)));
-			networkChangeEvent.addLink(network.getLinks().get(event.getControler().getScenario().createId(BurgdorfRoutes.burgdorfToZurichUpstream)));
+			networkChangeEvent.addLink(network.getLinks().get(Id.create(BurgdorfRoutes.burgdorfToBernUpstream, Link.class)));
+			networkChangeEvent.addLink(network.getLinks().get(Id.create(BurgdorfRoutes.burgdorfToZurichUpstream, Link.class)));
 			network.addNetworkChangeEvent(networkChangeEvent);
 			
 			// reset capacity
@@ -145,8 +146,8 @@ public class BurgdorfRunner implements StartupListener {
 			networkChangeEvent.setFlowCapacityChange(changeValue);
 			changeValue = new ChangeValue(ChangeType.ABSOLUTE, 2);
 			networkChangeEvent.setLanesChange(changeValue);
-			networkChangeEvent.addLink(network.getLinks().get(event.getControler().getScenario().createId(BurgdorfRoutes.burgdorfToBernUpstream)));
-			networkChangeEvent.addLink(network.getLinks().get(event.getControler().getScenario().createId(BurgdorfRoutes.burgdorfToZurichUpstream)));
+			networkChangeEvent.addLink(network.getLinks().get(Id.create(BurgdorfRoutes.burgdorfToBernUpstream, Link.class)));
+			networkChangeEvent.addLink(network.getLinks().get(Id.create(BurgdorfRoutes.burgdorfToZurichUpstream, Link.class)));
 			network.addNetworkChangeEvent(networkChangeEvent);
 		}
 	}
@@ -159,7 +160,7 @@ public class BurgdorfRunner implements StartupListener {
 		Set<String> duringLegRerouteTransportModes = new HashSet<String>();
 		duringLegRerouteTransportModes.add(TransportMode.car);
 
-		Set<Id> visitorAgents = new HashSet<Id>();
+		Set<Id> visitorAgents = new HashSet<>();
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			if (person.getId().toString().toLowerCase().contains("visitor")) visitorAgents.add(person.getId());
 		}
@@ -168,8 +169,8 @@ public class BurgdorfRunner implements StartupListener {
 		carLegAgentsFilterFactory = new TransportModeFilterFactory(duringLegRerouteTransportModes, 
 				this.withinDayControlerListener.getMobsimDataProvider());
 
-		Set<Id> parkingDecisionLinks = new HashSet<Id>();
-		for (String string : ParkingInfrastructure.parkingDecisionLinks) parkingDecisionLinks.add(scenario.createId(string));
+		Set<Id<Link>> parkingDecisionLinks = new HashSet<>();
+		for (String string : ParkingInfrastructure.parkingDecisionLinks) parkingDecisionLinks.add(Id.create(string, Link.class));
 		linkFilterFactory = new LinkFilterFactory(parkingDecisionLinks, this.withinDayControlerListener.getMobsimDataProvider());
 		
 		duringLegFactory = new ParkingIdentifierFactory(this.withinDayControlerListener.getLinkReplanningMap(),

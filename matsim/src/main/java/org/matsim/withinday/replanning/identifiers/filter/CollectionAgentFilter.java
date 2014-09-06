@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilter;
 
 public class CollectionAgentFilter implements AgentFilter {
@@ -38,17 +39,17 @@ public class CollectionAgentFilter implements AgentFilter {
 	}
 	
 	@Override
-	public void applyAgentFilter(Set<Id> set, double time) {
-		Iterator<Id> iter = set.iterator();
+	public void applyAgentFilter(Set<Id<Person>> set, double time) {
+		Iterator<Id<Person>> iter = set.iterator();
 		
 		while (iter.hasNext()) {
-			Id id = iter.next();
+			Id<Person> id = iter.next();
 			if (!this.applyAgentFilter(id, time)) iter.remove();
 		}
 	}
 	
 	@Override
-	public boolean applyAgentFilter(Id id, double time) {
+	public boolean applyAgentFilter(Id<Person> id, double time) {
 		if (!includedAgents.contains(id)) return false;
 		else return true;
 	}

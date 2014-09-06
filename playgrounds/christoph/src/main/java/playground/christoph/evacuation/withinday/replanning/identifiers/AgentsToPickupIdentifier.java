@@ -103,6 +103,7 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier {
 		this.jointDepartures = new ConcurrentHashMap<Id, JointDeparture>();
 	}
 	
+	@Override
 	public Set<MobsimAgent> getAgentsToReplan(double time) {
 		
 		Set<MobsimAgent> agentsToReplan = new TreeSet<MobsimAgent>(new PersonAgentComparator());
@@ -112,17 +113,17 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier {
 		 * can leave its current link, null is returned. As a result, the empty agentsToReplan
 		 * set is returned.
 		 */
-		Set<Id> set = this.earliestLinkExitTimeProvider.getEarliestLinkExitTimesPerTimeStep(time);
+		Set<Id<Person>> set = this.earliestLinkExitTimeProvider.getEarliestLinkExitTimesPerTimeStep(time);
 		if (set == null) return agentsToReplan;
 //		Set<Id> possibleLinkExitAgents = new HashSet<Id>(set);
 
 //		// Apply filter to remove agents that should not be replanned.
 //		this.applyFilters(possibleLinkExitAgents, time);
 		
-		Map<Id, PlannedDeparture> plannedDepartures = new HashMap<Id, PlannedDeparture>();
+		Map<Id<Person>, PlannedDeparture> plannedDepartures = new HashMap<>();
 		
 //		for (Id agentId : possibleLinkExitAgents) {
-		for (Id agentId : set) {
+		for (Id<Person> agentId : set) {
 		
 			// if the filters do not include the agent skip it
 			if (!this.applyFilters(agentId, time)) continue;
@@ -137,7 +138,7 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier {
 			 * Check whether there are vehicle available on the link.
 			 * If vehicles are found, check whether one of them has free capacity.
 			 */
-			Id linkId = passenger.getCurrentLinkId();
+			Id<Link> linkId = passenger.getCurrentLinkId();
 			Collection<MobsimVehicle> vehicles = this.mobsimDataProvider.getEnrouteVehiclesOnLink(linkId);
 			for (MobsimVehicle vehicle : vehicles) {
 				
@@ -177,7 +178,7 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier {
 				 */
 				if (!this.informedAgentsTracker.isAgentInformed(driverId)) continue;
 				
-				Id driversDestinationLinkId = driver.getDestinationLinkId();
+				Id<Link> driversDestinationLinkId = driver.getDestinationLinkId();
 				
 				/*
 				 * Check whether the driver will stop its trip on the current link. Skip such drivers

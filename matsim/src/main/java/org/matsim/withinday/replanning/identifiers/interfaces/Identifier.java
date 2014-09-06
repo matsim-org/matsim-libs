@@ -25,6 +25,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 
 /**
@@ -51,11 +52,11 @@ public abstract class Identifier {
 		return Collections.unmodifiableSet(agentFilters);
 	}
 	
-	public final void applyFilters(Set<Id> set, double time) {
+	public final void applyFilters(Set<Id<Person>> set, double time) {
 		for (AgentFilter agentFilter : agentFilters) agentFilter.applyAgentFilter(set, time);
 	}
 	
-	public final boolean applyFilters(Id id, double time) {
+	public final boolean applyFilters(Id<Person> id, double time) {
 		for (AgentFilter agentFilter : agentFilters) {
 			if(!agentFilter.applyAgentFilter(id, time)) return false;
 		}
