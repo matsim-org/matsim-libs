@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
@@ -120,9 +121,9 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
 		NetworkImpl network = createNetwork(scenario);
-		Link link1 = network.getLinks().get(new IdImpl("1"));
-		Link link2 = network.getLinks().get(new IdImpl("2"));
-		Link link3 = network.getLinks().get(new IdImpl("3"));
+		Link link1 = network.getLinks().get(Id.create("1", Link.class));
+		Link link2 = network.getLinks().get(Id.create("2", Link.class));
+		Link link3 = network.getLinks().get(Id.create("3", Link.class));
 		/*
 		 * Create a network change event that reduces the capacity.
 		 */
@@ -188,9 +189,9 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
 		NetworkImpl network = createNetwork(scenario);
-		final Id id1 = scenario.createId("1");
-		final Id id2 = scenario.createId("2");
-		final Id id3 = scenario.createId("3");
+		final Id<Link> id1 = Id.create("1", Link.class);
+		final Id<Link> id2 = Id.create("2", Link.class);
+		final Id<Link> id3 = Id.create("3", Link.class);
 		
 		Link link1 = network.getLinks().get(id1);
 		Link link2 = network.getLinks().get(id2);
@@ -207,7 +208,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		 */
 		Population plans = scenario.getPopulation();
 		List<PersonImpl> persons1 = createPersons(0, link1, link3, network, 1);
-		final Id personId = persons1.get(0).getId();
+		final Id<Person> personId = persons1.get(0).getId();
 		for(PersonImpl p : persons1) {
 			plans.addPerson(p);
 		}
@@ -219,8 +220,10 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(new EventsLogger());
 		events.addHandler(new LinkEnterEventHandler(){
+			@Override
 			public void reset(int iteration) {}
 
+			@Override
 			public void handleEvent(LinkEnterEvent event) {
 				if (id2.equals(event.getLinkId()))
 					Assert.assertEquals(1.0, event.getTime());
@@ -230,8 +233,10 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		});
 		
 		events.addHandler(new PersonStuckEventHandler() {
+			@Override
 			public void reset(int iteration) {}
 			
+			@Override
 			public void handleEvent(PersonStuckEvent event) {
 				Assert.assertEquals(id2, event.getLinkId());
 				Assert.assertEquals(simEndTime, event.getTime());
@@ -263,13 +268,13 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		network.setCapacityPeriod(3600.0);
 
 		// the network has 4 nodes and 3 links, each link by default 100 long and freespeed = 10 --> freespeed travel time = 10.0
-		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100, 0));
-		Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(200, 0));
-		Node node4 = network.createAndAddNode(new IdImpl("4"), new CoordImpl(300, 0));
-		network.createAndAddLink(new IdImpl("1"), node1, node2, 100, 10, 3600, 1);
-		network.createAndAddLink(new IdImpl("2"), node2, node3, 100, 10, 3600, 1);
-		network.createAndAddLink(new IdImpl("3"), node3, node4, 100, 10, 3600, 1);
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(0, 0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(100, 0));
+		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new CoordImpl(200, 0));
+		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new CoordImpl(300, 0));
+		network.createAndAddLink(Id.create("1", Link.class), node1, node2, 100, 10, 3600, 1);
+		network.createAndAddLink(Id.create("2", Link.class), node2, node3, 100, 10, 3600, 1);
+		network.createAndAddLink(Id.create("3", Link.class), node3, node4, 100, 10, 3600, 1);
 
 		return network;
 	}
@@ -290,7 +295,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		double departureTime = depTime;
 		List<PersonImpl> persons = new ArrayList<PersonImpl>(count);
 		for(int i = 0; i < count; i++) {
-			PersonImpl person = new PersonImpl(new IdImpl(i + (int)departureTime));
+			PersonImpl person = new PersonImpl(Id.create(i + (int)departureTime, Person.class));
 			PlanImpl plan1 = person.createAndAddPlan(true);
 			ActivityImpl a1 = plan1.createAndAddActivity("h", depLink.getId());
 			a1.setEndTime(departureTime);
@@ -317,13 +322,13 @@ public class QSimIntegrationTest extends MatsimTestCase {
 
 		private final PersonImpl person1;
 		private final PersonImpl person2;
-		private final Id linkId;
+		private final Id<Link> linkId;
 		protected double person1enterTime = Time.UNDEFINED_TIME;
 		protected double person1leaveTime = Time.UNDEFINED_TIME;
 		protected double person2enterTime = Time.UNDEFINED_TIME;
 		protected double person2leaveTime = Time.UNDEFINED_TIME;
 
-		protected TestTravelTimeCalculator(final PersonImpl person1, final PersonImpl person2, final Id linkId) {
+		protected TestTravelTimeCalculator(final PersonImpl person1, final PersonImpl person2, final Id<Link> linkId) {
 			this.person1 = person1;
 			this.person2 = person2;
 			this.linkId = linkId;

@@ -22,7 +22,7 @@ package org.matsim.matrices;
 
 import java.util.Stack;
 
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -32,19 +32,17 @@ import org.xml.sax.Attributes;
  * @author mrieser
  * @author balmermi
  */
-public class MatricesReaderMatsimV1 extends MatsimXmlParser {
+public class MatricesReaderMatsimV1<T> extends MatsimXmlParser {
 
 	private final static String MATRICES = "matrices";
 	private final static String MATRIX = "matrix";
 	private final static String ENTRY = "entry";
 
-	private final Scenario scenario;
 	private Matrices matrices;
 	private Matrix currMatrix = null;
 
-	public MatricesReaderMatsimV1(final Matrices matrices, final Scenario scenario) {
+	public MatricesReaderMatsimV1(final Matrices matrices) {
 		this.matrices = matrices;
-		this.scenario = scenario;
 	}
 
 	@Override
@@ -79,7 +77,7 @@ public class MatricesReaderMatsimV1 extends MatsimXmlParser {
 	}
 
 	private void startEntry(final Attributes  atts) {
-		this.currMatrix.createEntry(scenario.createId(atts.getValue("from_id")), scenario.createId(atts.getValue("to_id")), Double.parseDouble(atts.getValue("value")));
+		this.currMatrix.createEntry(new IdImpl(atts.getValue("from_id")), new IdImpl(atts.getValue("to_id")), Double.parseDouble(atts.getValue("value")));
 	}
 
 }

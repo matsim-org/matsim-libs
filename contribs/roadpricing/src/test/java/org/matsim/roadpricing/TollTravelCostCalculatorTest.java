@@ -20,23 +20,23 @@
 
 package org.matsim.roadpricing;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.RoutingContextImpl;
@@ -53,9 +53,6 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.PersonAlgorithm;
-import org.matsim.roadpricing.RoadPricingScheme;
-import org.matsim.roadpricing.RoadPricingSchemeImpl;
-import org.matsim.roadpricing.TravelDisutilityIncludingToll;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -78,11 +75,10 @@ public class TollTravelCostCalculatorTest {
 		// a basic toll where only the morning hours are tolled
 		RoadPricingSchemeImpl toll = new RoadPricingSchemeImpl();
 		toll.setType(RoadPricingScheme.TOLL_TYPE_DISTANCE);
-		toll.addLink(scenario.createId("5"));
-		toll.addLink(scenario.createId("11"));
+		toll.addLink(Id.create("5", Link.class));
+		toll.addLink(Id.create("11", Link.class));
 		Fixture.createPopulation2(scenario);
 		Population population = scenario.getPopulation();
-		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) population.getFactory()).getModeRouteFactory();
 		TravelTime timeCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
 		// yy note: this returns a combined TravelTime and TravelDisutility object.  The TravelDisutility object is used in the next three lines to be wrapped, 
 		// and then never again.  Would be nice to be able to get them separately ...  kai, oct'13
@@ -94,7 +90,7 @@ public class TollTravelCostCalculatorTest {
 		PreProcessLandmarks commonRouterData = new PreProcessLandmarks((TravelDisutility)timeCalc);
 		commonRouterData.run(network);
 
-		Person person1 = population.getPersons().get(new IdImpl("1"));
+		Person person1 = population.getPersons().get(Id.create("1", Person.class));
 		// 1st case: without toll, agent chooses shortest path
 		routePopulation(
 				scenario,
@@ -159,11 +155,10 @@ public class TollTravelCostCalculatorTest {
 		// a basic toll where only the morning hours are tolled
 		RoadPricingSchemeImpl toll = new RoadPricingSchemeImpl();
 		toll.setType(RoadPricingScheme.TOLL_TYPE_LINK);
-		toll.addLink(scenario.createId("5"));
-		toll.addLink(scenario.createId("11"));
+		toll.addLink(Id.create("5", Link.class));
+		toll.addLink(Id.create("11", Link.class));
 		Fixture.createPopulation2(scenario);
 		Population population = scenario.getPopulation();
-		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) population.getFactory()).getModeRouteFactory();
 		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
 		TravelDisutility costCalc = new TravelDisutilityIncludingToll(timeCostCalc, toll, config); // we use freespeedTravelCosts as base costs
 
@@ -172,7 +167,7 @@ public class TollTravelCostCalculatorTest {
 		PreProcessLandmarks commonRouterData = new PreProcessLandmarks(timeCostCalc);
 		commonRouterData.run(network);
 
-		Person person1 = population.getPersons().get(new IdImpl("1"));
+		Person person1 = population.getPersons().get(Id.create("1", Person.class));
 		// 1st case: without toll, agent chooses shortest path
 		routePopulation(
 				scenario,
@@ -237,17 +232,16 @@ public class TollTravelCostCalculatorTest {
 		// a basic toll where only the morning hours are tolled
 		RoadPricingSchemeImpl toll = new RoadPricingSchemeImpl();
 		toll.setType(RoadPricingScheme.TOLL_TYPE_CORDON);
-		toll.addLink(scenario.createId("5"));
-		toll.addLink(scenario.createId("11"));
+		toll.addLink(Id.create("5", Link.class));
+		toll.addLink(Id.create("11", Link.class));
 		Fixture.createPopulation2(scenario);
 		Population population = scenario.getPopulation();
-		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) population.getFactory()).getModeRouteFactory();
 		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
 		TravelDisutility costCalc = new TravelDisutilityIncludingToll(timeCostCalc, toll, config); // we use freespeedTravelCosts as base costs
 
 		AStarLandmarksFactory routerFactory = new AStarLandmarksFactory(network, timeCostCalc);
 
-		Person person1 = population.getPersons().get(new IdImpl("1"));
+		Person person1 = population.getPersons().get(Id.create("1", Person.class));
 		// 1st case: without toll, agent chooses shortest path
 		routePopulation(
 				scenario,

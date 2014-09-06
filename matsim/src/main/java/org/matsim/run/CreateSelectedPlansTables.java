@@ -352,7 +352,7 @@ public class CreateSelectedPlansTables {
 
 		@Override
 		public Id createId(String string) {
-			return this.scenario.createId(string);
+			throw new UnsupportedOperationException();
 		}
 
 		@Override

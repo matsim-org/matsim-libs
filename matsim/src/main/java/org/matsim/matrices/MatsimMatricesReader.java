@@ -78,7 +78,7 @@ public class MatsimMatricesReader extends MatsimXmlParser {
 		super.setDoctype(doctype);
 		// Currently the only matrices-type is v1
 		if (MATRICES_V1.equals(doctype)) {
-			this.delegate = new MatricesReaderMatsimV1(this.matrices, this.scenario);
+			this.delegate = new MatricesReaderMatsimV1(this.matrices);
 			log.info("using matrices_v1-reader.");
 		} else {
 			throw new IllegalArgumentException("Doctype \"" + doctype + "\" not known.");

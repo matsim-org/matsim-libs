@@ -24,6 +24,7 @@ import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -53,16 +54,16 @@ public class PersonPrepareForSimTest {
 		{
 			NetworkFactory nf = net.getFactory();
 			Set<String> modes = new HashSet<String>();
-			Node n1 = nf.createNode(sc.createId("1"), sc.createCoord(0, 0));
-			Node n2 = nf.createNode(sc.createId("2"), sc.createCoord(1000, 0));
-			Node n3 = nf.createNode(sc.createId("3"), sc.createCoord(2000, 0));
+			Node n1 = nf.createNode(Id.create("1", Node.class), sc.createCoord(0, 0));
+			Node n2 = nf.createNode(Id.create("2", Node.class), sc.createCoord(1000, 0));
+			Node n3 = nf.createNode(Id.create("3", Node.class), sc.createCoord(2000, 0));
 			net.addNode(n1);
 			net.addNode(n2);
 			net.addNode(n3);
-			l1 = nf.createLink(sc.createId("1"), n1, n2);
+			l1 = nf.createLink(Id.create("1", Link.class), n1, n2);
 			modes.add(TransportMode.car);
 			l1.setAllowedModes(modes);
-			Link l2 = nf.createLink(sc.createId("2"), n2, n3);
+			Link l2 = nf.createLink(Id.create("2", Link.class), n2, n3);
 			modes.clear();
 			modes.add(TransportMode.pt);
 			l2.setAllowedModes(modes);
@@ -76,7 +77,7 @@ public class PersonPrepareForSimTest {
 		Activity a2;
 		{
 			PopulationFactory pf = pop.getFactory();
-			person = pf.createPerson(sc.createId("1"));
+			person = pf.createPerson(Id.create("1", Person.class));
 			Plan p = pf.createPlan();
 			a1 = pf.createActivityFromCoord("h", sc.createCoord(10, -10));
 			Leg l = pf.createLeg(TransportMode.walk);
@@ -103,16 +104,16 @@ public class PersonPrepareForSimTest {
 		{
 			NetworkFactory nf = net.getFactory();
 			Set<String> modes = new HashSet<String>();
-			Node n1 = nf.createNode(sc.createId("1"), sc.createCoord(0, 0));
-			Node n2 = nf.createNode(sc.createId("2"), sc.createCoord(1000, 0));
-			Node n3 = nf.createNode(sc.createId("3"), sc.createCoord(2000, 0));
+			Node n1 = nf.createNode(Id.create("1", Node.class), sc.createCoord(0, 0));
+			Node n2 = nf.createNode(Id.create("2", Node.class), sc.createCoord(1000, 0));
+			Node n3 = nf.createNode(Id.create("3", Node.class), sc.createCoord(2000, 0));
 			net.addNode(n1);
 			net.addNode(n2);
 			net.addNode(n3);
-			l1 = nf.createLink(sc.createId("1"), n1, n2);
+			l1 = nf.createLink(Id.create("1", Link.class), n1, n2);
 			modes.add(TransportMode.car);
 			l1.setAllowedModes(modes);
-			Link l2 = nf.createLink(sc.createId("2"), n2, n3);
+			Link l2 = nf.createLink(Id.create("2", Link.class), n2, n3);
 			modes.clear();
 			modes.add(TransportMode.pt);
 			l2.setAllowedModes(modes);
@@ -126,7 +127,7 @@ public class PersonPrepareForSimTest {
 		Activity a2;
 		{
 			PopulationFactory pf = pop.getFactory();
-			person = pf.createPerson(sc.createId("1"));
+			person = pf.createPerson(Id.create("1", Person.class));
 			Plan p = pf.createPlan();
 			a1 = pf.createActivityFromCoord("h", sc.createCoord(10, -10));
 			Leg l = pf.createLeg(TransportMode.walk);

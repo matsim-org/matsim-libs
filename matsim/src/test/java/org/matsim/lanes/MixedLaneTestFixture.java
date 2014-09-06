@@ -56,20 +56,20 @@ import org.matsim.lanes.data.v20.LaneDefinitions20;
 public class MixedLaneTestFixture {
 
 	public final ScenarioImpl sc;
-	public final Id id0, id1, id2, id3, id4;
-	public final Id link1FirstLaneId;
+	public final Id<Link> id0, id1, id2, id3, id4;
+	public final Id<Object> link1FirstLaneId;
 	
 	public MixedLaneTestFixture(){
 		Config config = ConfigUtils.createConfig();
 		config.scenario().setUseLanes(true);
 
 		sc = (ScenarioImpl) ScenarioUtils.createScenario(config);
-		id0 = sc.createId("0");
-		id1 = sc.createId("1");
-		id2 = sc.createId("2");
-		id3 = sc.createId("3");
-		id4 = sc.createId("4");
-		link1FirstLaneId = sc.createId("1.ol");
+		id0 = Id.create("0", Link.class);
+		id1 = Id.create("1", Link.class);
+		id2 = Id.create("2", Link.class);
+		id3 = Id.create("3", Link.class);
+		id4 = Id.create("4", Link.class);
+		link1FirstLaneId = Id.create("1.ol", Object.class);
 
 		init();
 	}
@@ -81,12 +81,12 @@ public class MixedLaneTestFixture {
 		config.qsim().setTimeStepSize(timeStepSize); 
 
 		sc = (ScenarioImpl) ScenarioUtils.createScenario(config);
-		id0 = sc.createId("0");
-		id1 = sc.createId("1");
-		id2 = sc.createId("2");
-		id3 = sc.createId("3");
-		id4 = sc.createId("4");
-		link1FirstLaneId = sc.createId("1.ol");
+		id0 = Id.create("0", Link.class);
+		id1 = Id.create("1", Link.class);
+		id2 = Id.create("2", Link.class);
+		id3 = Id.create("3", Link.class);
+		id4 = Id.create("4", Link.class);
+		link1FirstLaneId = Id.create("1.ol", Object.class);
 
 		init();
 	}
