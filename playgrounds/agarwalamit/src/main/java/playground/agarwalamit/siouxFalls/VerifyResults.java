@@ -26,12 +26,9 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.LoadMyScenarios;
@@ -43,7 +40,6 @@ import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
  * @author amit
  */
 public class VerifyResults {
-	/*Values taken from IMPACT (Maibach et al.(2008))*/
 	private static final Logger log = Logger.getLogger(VerifyResults.class);
 
 	private static final double marginal_Utl_money=/*0.0789942;//*/0.062; //(for SiouxFalls =0.062 and for Munich =0.0789942);
