@@ -48,7 +48,7 @@ public class LoadMyScenarios {
 	/**
 	 * Returns scenario by creating new config and inserting location of plans and network file.
 	 */
-	public static Scenario loadScenarioFromNetworkAndPlans(String populationFile, String networkFile) {
+	public static Scenario loadScenarioFromPlansAndNetwork(String populationFile, String networkFile) {
 		Config config = new Config();
 		config.addCoreModules();
 		config.plans().setInputFile(populationFile);

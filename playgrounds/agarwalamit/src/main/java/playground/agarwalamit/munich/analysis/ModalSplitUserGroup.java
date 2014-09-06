@@ -44,7 +44,7 @@ public class ModalSplitUserGroup {
 	private void run(){
 		ModalShareGenerator msg = new ModalShareGenerator();
 		PersonFilter pf = new PersonFilter();
-		Scenario sc = LoadMyScenarios.loadScenarioFromNetworkAndPlans(networkFile, populationFile);
+		Scenario sc = LoadMyScenarios.loadScenarioFromPlansAndNetwork(networkFile, populationFile);
 		
 		SortedMap<String, double[]> modalSplit = msg.getModalShareFromPlans(sc.getPopulation());
 		
