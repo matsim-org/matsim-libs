@@ -24,6 +24,7 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.multimodal.router.util.WalkTravelTime;
 import org.matsim.contrib.parking.PC2.infrastructure.PPRestrictedToFacilities;
@@ -35,20 +36,16 @@ import org.matsim.contrib.parking.PC2.scoring.ParkingScoringFunctionFactory;
 import org.matsim.contrib.parking.PC2.scoring.RandomErrorTermManager;
 import org.matsim.contrib.parking.PC2.simulation.ParkingInfrastructureManager;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
-import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingModuleWithFreeFloatingCarSharing;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 import playground.wrashid.parkingChoice.infrastructure.PrivateParking;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingLoader;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
 
 public class SetupParkingForZHScenario {
 
@@ -174,12 +171,12 @@ public class SetupParkingForZHScenario {
 	
 	
 	private static WalkTravelTime getWalkTravelTime(Controler controler){
-		Map<Id, Double> linkSlopes=new HashMap<Id, Double>();
+		Map<Id<Link>, Double> linkSlopes=new HashMap<>();
 		String linkSlopeAttributeFile = controler.getConfig().getParam("parkingChoice.ZH", "networkLinkSlopes");
 		ObjectAttributes lp = new ObjectAttributes();
 		new ObjectAttributesXmlReader(lp).parse(linkSlopeAttributeFile);
 
-		for (Id linkId : controler.getNetwork().getLinks().keySet()) {
+		for (Id<Link> linkId : controler.getNetwork().getLinks().keySet()) {
 			linkSlopes.put(linkId, (Double) lp.getAttribute(linkId.toString(), "slope"));
 		}
 		

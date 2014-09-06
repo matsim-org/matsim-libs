@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -46,9 +45,9 @@ public class BikeTravelTimeTest extends MatsimTestCase {
 	public void testLinkTravelTimeCalculation() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
-		Node node1 = scenario.getNetwork().getFactory().createNode(scenario.createId("n1"), new CoordImpl(0.0, 0.0));
-		Node node2 = scenario.getNetwork().getFactory().createNode(scenario.createId("n2"), new CoordImpl(1.0, 0.0));
-		Link link = scenario.getNetwork().getFactory().createLink(scenario.createId("l1"), node1, node2);
+		Node node1 = scenario.getNetwork().getFactory().createNode(Id.create("n1", Node.class), new CoordImpl(0.0, 0.0));
+		Node node2 = scenario.getNetwork().getFactory().createNode(Id.create("n2", Node.class), new CoordImpl(1.0, 0.0));
+		Link link = scenario.getNetwork().getFactory().createLink(Id.create("l1", Link.class), node1, node2);
 		link.setLength(1.0);
 		scenario.getNetwork().addNode(node1);
 		scenario.getNetwork().addNode(node2);
@@ -56,11 +55,11 @@ public class BikeTravelTimeTest extends MatsimTestCase {
 		
 		double h1 = 0.0;
 		double h2 = 0.0;
-		Map<Id, Double> linkSlopes = new HashMap<Id, Double>();
+		Map<Id<Link>, Double> linkSlopes = new HashMap<>();
 		double slope = 100 * (h2 - h1) / link.getLength();
 		linkSlopes.put(link.getId(), slope);
 
-		PersonImpl person = (PersonImpl) scenario.getPopulation().getFactory().createPerson(scenario.createId("p1"));
+		PersonImpl person = (PersonImpl) scenario.getPopulation().getFactory().createPerson(Id.create("p1", Person.class));
 		person.setAge(20);
 		person.setSex("m");
 		
@@ -188,9 +187,9 @@ public class BikeTravelTimeTest extends MatsimTestCase {
 		p2.setAge(20);
 		p2.setSex("m");
 		
-		Node node1 = scenario.getNetwork().getFactory().createNode(scenario.createId("n1"), new CoordImpl(0.0, 0.0));
-		Node node2 = scenario.getNetwork().getFactory().createNode(scenario.createId("n2"), new CoordImpl(1.0, 0.0));
-		Link link = scenario.getNetwork().getFactory().createLink(scenario.createId("l1"), node1, node2);
+		Node node1 = scenario.getNetwork().getFactory().createNode(Id.create("n1", Node.class), new CoordImpl(0.0, 0.0));
+		Node node2 = scenario.getNetwork().getFactory().createNode(Id.create("n2", Node.class), new CoordImpl(1.0, 0.0));
+		Link link = scenario.getNetwork().getFactory().createLink(Id.create("l1", Link.class), node1, node2);
 		link.setLength(1.0);
 		scenario.getNetwork().addNode(node1);
 		scenario.getNetwork().addNode(node2);
@@ -198,7 +197,7 @@ public class BikeTravelTimeTest extends MatsimTestCase {
 		
 		double h1 = 0.0;
 		double h2 = 0.0;
-		Map<Id, Double> linkSlopes = new HashMap<Id, Double>();
+		Map<Id<Link>, Double> linkSlopes = new HashMap<Id<Link>, Double>();
 		double slope = 100 * (h2 - h1) / link.getLength();
 		linkSlopes.put(link.getId(), slope);
 

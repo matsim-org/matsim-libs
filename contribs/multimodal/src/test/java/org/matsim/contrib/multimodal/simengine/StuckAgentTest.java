@@ -1,4 +1,4 @@
-/* *********************************************************************** *
+/* *********************t************************************************** *
  * project: org.matsim.*
  * MultiModalQLinkExtensionTest.java
  *                                                                         *
@@ -67,6 +67,7 @@ public class StuckAgentTest {
 	@Test
 	public void testStuckEvents() {
 		Config config = ConfigUtils.createConfig();
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		
 		config.qsim().setEndTime(24*3600);
 		
@@ -95,16 +96,16 @@ public class StuckAgentTest {
 		
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
-		Node node0 = scenario.getNetwork().getFactory().createNode(scenario.createId("n0"), new CoordImpl(0.0, 0.0));
-		Node node1 = scenario.getNetwork().getFactory().createNode(scenario.createId("n1"), new CoordImpl(1.0, 0.0));
-		Node node2 = scenario.getNetwork().getFactory().createNode(scenario.createId("n2"), new CoordImpl(2.0, 0.0));
-		Node node3 = scenario.getNetwork().getFactory().createNode(scenario.createId("n3"), new CoordImpl(3.0, 0.0));
-		Node node4 = scenario.getNetwork().getFactory().createNode(scenario.createId("n4"), new CoordImpl(4.0, 0.0));
+		Node node0 = scenario.getNetwork().getFactory().createNode(Id.create("n0", Node.class), new CoordImpl(0.0, 0.0));
+		Node node1 = scenario.getNetwork().getFactory().createNode(Id.create("n1", Node.class), new CoordImpl(1.0, 0.0));
+		Node node2 = scenario.getNetwork().getFactory().createNode(Id.create("n2", Node.class), new CoordImpl(2.0, 0.0));
+		Node node3 = scenario.getNetwork().getFactory().createNode(Id.create("n3", Node.class), new CoordImpl(3.0, 0.0));
+		Node node4 = scenario.getNetwork().getFactory().createNode(Id.create("n4", Node.class), new CoordImpl(4.0, 0.0));
 		
-		Link link0 = scenario.getNetwork().getFactory().createLink(scenario.createId("l0"), node0, node1);
-		Link link1 = scenario.getNetwork().getFactory().createLink(scenario.createId("l1"), node1, node2);
-		Link link2 = scenario.getNetwork().getFactory().createLink(scenario.createId("l2"), node2, node3);
-		Link link3 = scenario.getNetwork().getFactory().createLink(scenario.createId("l3"), node3, node4);
+		Link link0 = scenario.getNetwork().getFactory().createLink(Id.create("l0", Link.class), node0, node1);
+		Link link1 = scenario.getNetwork().getFactory().createLink(Id.create("l1", Link.class), node1, node2);
+		Link link2 = scenario.getNetwork().getFactory().createLink(Id.create("l2", Link.class), node2, node3);
+		Link link3 = scenario.getNetwork().getFactory().createLink(Id.create("l3", Link.class), node3, node4);
 		
 		link0.setLength(10000.0);
 		link1.setLength(10000.0);
@@ -127,11 +128,11 @@ public class StuckAgentTest {
 		scenario.getNetwork().addLink(link3);
 		
 		RouteFactory routeFactory = new LinkNetworkRouteFactory();
-		Route route0 = routeFactory.createRoute(scenario.createId("l0"), scenario.createId("l3"));	// missing l1 & l2
-		Route route1 = routeFactory.createRoute(scenario.createId("l0"), scenario.createId("l3"));	// missing l2
+		Route route0 = routeFactory.createRoute(Id.create("l0", Link.class), Id.create("l3", Link.class));	// missing l1 & l2
+		Route route1 = routeFactory.createRoute(Id.create("l0", Link.class), Id.create("l3", Link.class));	// missing l2
 		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
-		linkIds.add(scenario.createId("l0"));
-		((NetworkRoute) route1).setLinkIds(scenario.createId("l0"), linkIds, scenario.createId("l3"));
+		linkIds.add(Id.create("l0", Link.class));
+		((NetworkRoute) route1).setLinkIds(Id.create("l0", Link.class), linkIds, Id.create("l3", Link.class));
 
 		scenario.getPopulation().addPerson(createPerson(scenario, "p0", "bike", route0, 6.5*3600));	// stuck
 		scenario.getPopulation().addPerson(createPerson(scenario, "p1", "walk", route1, 7.5*3600));	// stuck
@@ -143,7 +144,6 @@ public class StuckAgentTest {
 		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.setOverwriteFiles(true);
 		
 		// controler listener that initializes the multi-modal simulation
 		MultiModalControlerListener listener = new MultiModalControlerListener();
@@ -170,15 +170,15 @@ public class StuckAgentTest {
 	}
 	
 	private Person createPerson(Scenario scenario, String id, String mode, Route route, double departureTime) {
-		PersonImpl person = (PersonImpl) scenario.getPopulation().getFactory().createPerson(scenario.createId(id));
+		PersonImpl person = (PersonImpl) scenario.getPopulation().getFactory().createPerson(Id.create(id, Person.class));
 		
 		person.setAge(20);
 		person.setSex("m");
 
-		Activity from = scenario.getPopulation().getFactory().createActivityFromLinkId("home", scenario.createId("l0"));
+		Activity from = scenario.getPopulation().getFactory().createActivityFromLinkId("home", Id.create("l0", Link.class));
 		Leg leg = scenario.getPopulation().getFactory().createLeg(mode);
 		leg.setRoute(route);
-		Activity to = scenario.getPopulation().getFactory().createActivityFromLinkId("home", scenario.createId("l3"));
+		Activity to = scenario.getPopulation().getFactory().createActivityFromLinkId("home", Id.create("l3", Link.class));
 
 		from.setEndTime(departureTime);
 		leg.setDepartureTime(departureTime);

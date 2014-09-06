@@ -51,6 +51,7 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
@@ -140,9 +141,9 @@ import org.matsim.vehicles.VehiclesFactory;
 	}
 
 	protected void buildStops() {
-		this.stopFacilities[0] = this.builder.createTransitStopFacility(this.scenario.createId( "0"), this.scenario.createCoord( 4000,  5002), true);
-		this.stopFacilities[1] = this.builder.createTransitStopFacility(this.scenario.createId( "1"), this.scenario.createCoord( 8000,  4998), true);
-		this.stopFacilities[2] = this.builder.createTransitStopFacility(this.scenario.createId( "2"), this.scenario.createCoord(12000,  5002), true);
+		this.stopFacilities[0] = this.builder.createTransitStopFacility(Id.create( "0", TransitStopFacility.class), this.scenario.createCoord( 4000,  5002), true);
+		this.stopFacilities[1] = this.builder.createTransitStopFacility(Id.create( "1", TransitStopFacility.class), this.scenario.createCoord( 8000,  4998), true);
+		this.stopFacilities[2] = this.builder.createTransitStopFacility(Id.create( "2", TransitStopFacility.class), this.scenario.createCoord(12000,  5002), true);
 		this.stopFacilities[0].setName("A");
 		this.stopFacilities[1].setName("B");
 		this.stopFacilities[2].setName("C");
@@ -158,22 +159,22 @@ import org.matsim.vehicles.VehiclesFactory;
 	protected void buildVehicles() {
 		Vehicles vehicles = scenario.getVehicles();
         VehiclesFactory vb = vehicles.getFactory();
-        VehicleType vehicleType = vb.createVehicleType(scenario.createId("transitVehicleType"));
+        VehicleType vehicleType = vb.createVehicleType(Id.create("transitVehicleType", VehicleType.class));
         VehicleCapacity capacity = vb.createVehicleCapacity();
         capacity.setSeats(Integer.valueOf(101));
         capacity.setStandingRoom(Integer.valueOf(0));
         vehicleType.setCapacity(capacity);
         vehicles.addVehicleType(vehicleType);
-        vehicles.addVehicle( vb.createVehicle(this.scenario.createId("veh1"), vehicleType));
-        vehicles.addVehicle( vb.createVehicle(this.scenario.createId("veh2"), vehicleType));
-        vehicles.addVehicle( vb.createVehicle(this.scenario.createId("veh3"), vehicleType));
-        vehicles.addVehicle( vb.createVehicle(this.scenario.createId("veh4"), vehicleType));
-        vehicles.addVehicle( vb.createVehicle(this.scenario.createId("veh5"), vehicleType));
-        vehicles.addVehicle( vb.createVehicle(this.scenario.createId("veh6"), vehicleType));
+        vehicles.addVehicle( vb.createVehicle(Id.create("veh1", Vehicle.class), vehicleType));
+        vehicles.addVehicle( vb.createVehicle(Id.create("veh2", Vehicle.class), vehicleType));
+        vehicles.addVehicle( vb.createVehicle(Id.create("veh3", Vehicle.class), vehicleType));
+        vehicles.addVehicle( vb.createVehicle(Id.create("veh4", Vehicle.class), vehicleType));
+        vehicles.addVehicle( vb.createVehicle(Id.create("veh5", Vehicle.class), vehicleType));
+        vehicles.addVehicle( vb.createVehicle(Id.create("veh6", Vehicle.class), vehicleType));
 	}
 	
 	protected void buildBlueLine() {
-		this.blueLine = this.builder.createTransitLine(this.scenario.createId("blue"));
+		this.blueLine = this.builder.createTransitLine(Id.create("blue", TransitLine.class));
 		this.schedule.addTransitLine(this.blueLine);
 		{ // route from left to right
 			NetworkRoute netRoute = new LinkNetworkRouteImpl(this.links[0].getId(), this.links[2].getId());
@@ -191,27 +192,27 @@ import org.matsim.vehicles.VehiclesFactory;
 			stop = this.builder.createTransitRouteStop(this.stopFacilities[2], 12.0 * 60, 16.0*60);
 			stop.setAwaitDepartureTime(true);
 			stops.add(stop);
-			TransitRoute route = this.builder.createTransitRoute(this.scenario.createId("blue A > C"), netRoute, stops, "train");
+			TransitRoute route = this.builder.createTransitRoute(Id.create("blue A > C", TransitRoute.class), netRoute, stops, "train");
 			this.blueLine.addRoute(route);
 
 			Departure dep;
-			dep = this.builder.createDeparture(this.scenario.createId("b>10"), 8.0*3600 +  6.0*60);
-			dep.setVehicleId(this.scenario.createId("veh1"));
+			dep = this.builder.createDeparture(Id.create("b>10", Departure.class), 8.0*3600 +  6.0*60);
+			dep.setVehicleId(Id.create("veh1", Vehicle.class));
 			route.addDeparture(dep);
-			dep = this.builder.createDeparture(this.scenario.createId("b>11"), 8.0*3600 + 26.0*60);
-			dep.setVehicleId(this.scenario.createId("veh2"));
+			dep = this.builder.createDeparture(Id.create("b>11", Departure.class), 8.0*3600 + 26.0*60);
+			dep.setVehicleId(Id.create("veh2", Vehicle.class));
 			route.addDeparture(dep);
-			dep = this.builder.createDeparture(this.scenario.createId("b>12"), 8.0*3600 + 46.0*60);
-			dep.setVehicleId(this.scenario.createId("veh3"));
+			dep = this.builder.createDeparture(Id.create("b>12", Departure.class), 8.0*3600 + 46.0*60);
+			dep.setVehicleId(Id.create("veh3", Vehicle.class));
 			route.addDeparture(dep);
-			dep = this.builder.createDeparture(this.scenario.createId("b>13"), 9.0*3600 +  6.0*60);
-			dep.setVehicleId(this.scenario.createId("veh4"));
+			dep = this.builder.createDeparture(Id.create("b>13", Departure.class), 9.0*3600 +  6.0*60);
+			dep.setVehicleId(Id.create("veh4", Vehicle.class));
 			route.addDeparture(dep);
-			dep = this.builder.createDeparture(this.scenario.createId("b>14"), 9.0*3600 + 26.0*60);
-			dep.setVehicleId(this.scenario.createId("veh5"));
+			dep = this.builder.createDeparture(Id.create("b>14", Departure.class), 9.0*3600 + 26.0*60);
+			dep.setVehicleId(Id.create("veh5", Vehicle.class));
 			route.addDeparture(dep);
-			dep = this.builder.createDeparture(this.scenario.createId("b>15"), 9.0*3600 + 46.0*60);
-			dep.setVehicleId(this.scenario.createId("veh6"));
+			dep = this.builder.createDeparture(Id.create("b>15", Departure.class), 9.0*3600 + 46.0*60);
+			dep.setVehicleId(Id.create("veh6", Vehicle.class));
 			route.addDeparture(dep);
 		}
 	}
@@ -222,15 +223,12 @@ import org.matsim.vehicles.VehiclesFactory;
 	}
 	
 	private Person createPerson(Scenario scenario, String id, String mode) {
-		PersonImpl person = (PersonImpl) scenario.getPopulation().getFactory().createPerson(scenario.createId(id));
-		
-		person.setAge(50);
-		person.setSex("m");
+		PersonImpl person = (PersonImpl) scenario.getPopulation().getFactory().createPerson(Id.create(id, Person.class));
 
-		Activity from = scenario.getPopulation().getFactory().createActivityFromLinkId("home", scenario.createId("0"));
+		Activity from = scenario.getPopulation().getFactory().createActivityFromLinkId("home", Id.create("0", Link.class));
 		((ActivityImpl) from).setCoord(this.nodes[0].getCoord());
 		Leg leg = scenario.getPopulation().getFactory().createLeg(mode);
-		Activity to = scenario.getPopulation().getFactory().createActivityFromLinkId("home", scenario.createId("3"));
+		Activity to = scenario.getPopulation().getFactory().createActivityFromLinkId("home", Id.create("3", Link.class));
 		((ActivityImpl) to).setCoord(this.nodes[4].getCoord());
 		
 		from.setEndTime(8*3600);

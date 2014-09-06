@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.multimodal.MultiModalControlerListener;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
@@ -64,6 +65,7 @@ public class MultiModalPTCombinationTest {
 		
 		Scenario scenario = f.scenario;
 		Config config = scenario.getConfig();
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		
 		MultiModalConfigGroup mmcg = new MultiModalConfigGroup();
 		mmcg.setMultiModalSimulationEnabled(true);
@@ -90,7 +92,7 @@ public class MultiModalPTCombinationTest {
 		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.setOverwriteFiles(true);
+//		controler.setOverwriteFiles(true);
 		
 		// controler listener that initializes the multi-modal simulation
 		MultiModalControlerListener listener = new MultiModalControlerListener();
@@ -128,12 +130,9 @@ public class MultiModalPTCombinationTest {
 	private static class LinkModeChecker implements BasicEventHandler, LinkLeaveEventHandler, PersonDepartureEventHandler,
 			PersonArrivalEventHandler {
 
-		int arrivalCount = 0;
-		int linkLeftCount = 0;
-		
 		private final Network network;
-		private final Map<Id, String> modes = new HashMap<Id, String>();
-		private final Map<Id, Double> departures = new HashMap<Id, Double>();
+		private final Map<Id<Person>, String> modes = new HashMap<>();
+		private final Map<Id<Person>, Double> departures = new HashMap<>();
 		final Map<String, Integer> leftCountPerMode = new HashMap<String, Integer>();
 		final Map<String, Double> travelTimesPerMode = new HashMap<String, Double>();
 		
@@ -173,8 +172,6 @@ public class MultiModalPTCombinationTest {
 			// assume that the agent is allowed to travel on the link
 			Assert.assertEquals(true, link.getAllowedModes().contains(this.modes.get(event.getPersonId())));
 			
-			this.linkLeftCount++;
-			
 			String mode = this.modes.get(event.getPersonId());
 			int count = this.leftCountPerMode.get(mode);
 			this.leftCountPerMode.put(mode, count + 1);
@@ -182,7 +179,6 @@ public class MultiModalPTCombinationTest {
 
 		@Override
 		public void handleEvent(PersonArrivalEvent event) {
-			this.arrivalCount++;
 			String mode = this.modes.remove(event.getPersonId());
 			
 			double tripTravelTime = event.getTime() - this.departures.remove(event.getPersonId());

@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.TravelTimeFactory;
@@ -31,14 +32,14 @@ import org.matsim.core.router.util.TravelTimeFactory;
 public class BikeTravelTimeFactory implements TravelTimeFactory {
 
 	private final PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
-	private final Map<Id, Double> linkSlopes;	// slope information in %
+	private final Map<Id<Link>, Double> linkSlopes;	// slope information in %
 	
 	public BikeTravelTimeFactory(PlansCalcRouteConfigGroup plansCalcRouteConfigGroup) {
 		this(plansCalcRouteConfigGroup, null);
 	}
 	
 	public BikeTravelTimeFactory(PlansCalcRouteConfigGroup plansCalcRouteConfigGroup,
-			Map<Id, Double> linkSlopes) {
+			Map<Id<Link>, Double> linkSlopes) {
 		this.plansCalcRouteConfigGroup = plansCalcRouteConfigGroup;
 		this.linkSlopes = linkSlopes;
 		

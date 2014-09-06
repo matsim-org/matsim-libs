@@ -29,6 +29,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.config.Config;
@@ -43,17 +44,17 @@ public class MultiModalTravelTimeFactory implements MatsimFactory {
 	
 	private final Map<String, TravelTimeFactory> factories;
 	private final Map<String, TravelTimeFactory> additionalFactories;
-	private final Map<Id, Double> linkSlopes;
+	private final Map<Id<Link>, Double> linkSlopes;
 	
 	public MultiModalTravelTimeFactory(Config config) {
 		this(config, null, null);
 	}
 
-	public MultiModalTravelTimeFactory(Config config, Map<Id, Double> linkSlopes) {
+	public MultiModalTravelTimeFactory(Config config, Map<Id<Link>, Double> linkSlopes) {
 		this(config, linkSlopes, null);
 	}
 	
-	public MultiModalTravelTimeFactory(Config config, Map<Id, Double> linkSlopes, Map<String, TravelTimeFactory> additionalFactories) {
+	public MultiModalTravelTimeFactory(Config config, Map<Id<Link>, Double> linkSlopes, Map<String, TravelTimeFactory> additionalFactories) {
 		this.linkSlopes = linkSlopes;
 		this.factories = new LinkedHashMap<String, TravelTimeFactory>();
 		this.additionalFactories = additionalFactories;

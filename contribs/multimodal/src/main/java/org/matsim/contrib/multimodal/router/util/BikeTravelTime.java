@@ -62,7 +62,7 @@ public class BikeTravelTime extends WalkTravelTime {
 	private final double downhillFactor = 0.2379;	// 0%..-15%
 	private final double uphillFactor = -0.4002;	// 0%..12%
 	
-	public BikeTravelTime(PlansCalcRouteConfigGroup plansCalcGroup, Map<Id, Double> linkSlopes) {
+	public BikeTravelTime(PlansCalcRouteConfigGroup plansCalcGroup, Map<Id<Link>, Double> linkSlopes) {
 		super(plansCalcGroup, linkSlopes);
 		
 		this.referenceBikeSpeed = plansCalcGroup.getTeleportedModeSpeeds().get(TransportMode.bike);
@@ -108,6 +108,7 @@ public class BikeTravelTime extends WalkTravelTime {
 		else return this.personDownhillFactorCache.get() * slope;
 	}
 	
+	@Override
 	protected void setPerson(Person person) {
 		/* 
 		 * Only recalculate the person's speed factor if the person has 

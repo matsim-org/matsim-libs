@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.router.DefaultDelegateFactory;
 import org.matsim.contrib.multimodal.router.MultimodalTripRouterFactory;
@@ -70,7 +71,7 @@ public class MultiModalControlerListener implements StartupListener {
 		
 		MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) controler.getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
 		
-		Map<Id, Double> linkSlopes = new LinkSlopesReader().getLinkSlopes(multiModalConfigGroup, controler.getNetwork());
+		Map<Id<Link>, Double> linkSlopes = new LinkSlopesReader().getLinkSlopes(multiModalConfigGroup, controler.getNetwork());
 		MultiModalTravelTimeFactory multiModalTravelTimeFactory = new MultiModalTravelTimeFactory(controler.getConfig(), linkSlopes, 
 				this.additionalTravelTimeFactories);
 		this.multiModalTravelTimes = multiModalTravelTimeFactory.createTravelTimes();	

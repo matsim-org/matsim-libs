@@ -27,10 +27,10 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -38,20 +38,14 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
-import playground.wrashid.parkingChoice.scoring.ParkingInfo;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.threads.RerouteThread;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.threads.RerouteThreadDuringSim;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSearchStrategy;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingWithIllegalParkingAndLawEnforcement;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomGarageParkingSearch;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingSearch;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.analysis.ComparisonGarageCounts;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.analysis.ParkingEventDetails;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.analysis.StrategyStats;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.manager.ParkingStrategyManager;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.score.ParkingScoreEvaluator;
 import playground.wrashid.parkingSearch.ppSim.ttmatrix.TTMatrix;
-import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
 
 public class ZHScenarioGlobal {
 
@@ -76,7 +70,7 @@ public class ZHScenarioGlobal {
 	public static String plansFile;
 	public static RerouteThreadDuringSim[] rerouteThreadsDuringSim;
 	public static Scenario scenario;
-	public static Map<Id, Double> linkSlopes;
+	public static Map<Id<Link>, Double> linkSlopes;
 	public static TTMatrix ttMatrix;
 
 	public static String getItersFolderPath() {
@@ -235,7 +229,7 @@ public class ZHScenarioGlobal {
 	}
 
 	public static void initNetworkLinkSlopes() {
-		linkSlopes = new HashMap<Id, Double>();
+		linkSlopes = new HashMap<>();
 		if (!paramterExists("networkLinkSlopes")) {
 			linkSlopes = null;
 		} else {
@@ -243,7 +237,7 @@ public class ZHScenarioGlobal {
 			ObjectAttributes lp = new ObjectAttributes();
 			new ObjectAttributesXmlReader(lp).parse(linkSlopeAttributeFile);
 
-			for (Id linkId : scenario.getNetwork().getLinks().keySet()) {
+			for (Id<Link> linkId : scenario.getNetwork().getLinks().keySet()) {
 				linkSlopes.put(linkId, (Double) lp.getAttribute(linkId.toString(), "slope"));
 			}
 		}

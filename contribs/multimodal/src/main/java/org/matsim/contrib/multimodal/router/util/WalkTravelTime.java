@@ -105,9 +105,9 @@ public class WalkTravelTime implements TravelTime {
 	private final AtomicInteger slopeNotFoundWarnCount = new AtomicInteger(0);
 	private final AtomicInteger ageWarnCount = new AtomicInteger(0);
 	
-	private final Map<Id, Double> linkSlopes;
+	private final Map<Id<Link>, Double> linkSlopes;
 	
-	public WalkTravelTime(PlansCalcRouteConfigGroup plansCalcGroup, Map<Id, Double> linkSlopes) {
+	public WalkTravelTime(PlansCalcRouteConfigGroup plansCalcGroup, Map<Id<Link>, Double> linkSlopes) {
 		this.referenceWalkSpeed = plansCalcGroup.getTeleportedModeSpeeds().get(TransportMode.walk);
 		this.personCache = new ThreadLocal<Person>();
 		this.personFactorCache = new ThreadLocal<Double>();
@@ -118,7 +118,7 @@ public class WalkTravelTime implements TravelTime {
 	}
 	
 	// when used for transit_walk
-	/*package*/ WalkTravelTime(double referenceWalkSpeed, Map<Id, Double> linkSlopes) {
+	/*package*/ WalkTravelTime(double referenceWalkSpeed, Map<Id<Link>, Double> linkSlopes) {
 		this.referenceWalkSpeed = referenceWalkSpeed;
 		this.personCache = new ThreadLocal<Person>();
 		this.personFactorCache = new ThreadLocal<Double>();

@@ -41,7 +41,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -194,16 +193,16 @@ public class PrepareEvacuationScenarioListener {
 			 * Create and add the pickup and drop off facility and add activity options ("pickup", "dropoff")
 			 */
 			String idString = link.getId().toString() + EvacuationConstants.PICKUP_DROP_OFF_FACILITY_SUFFIX;
-			ActivityFacility pickupDropOffFacility = ((ActivityFacilitiesImpl) facilities).createAndAddFacility(scenario.createId(idString), link.getCoord());
+			ActivityFacility pickupDropOffFacility = ((ActivityFacilitiesImpl) facilities).createAndAddFacility(Id.create(idString, ActivityFacility.class), link.getCoord());
 			((ActivityFacilityImpl) pickupDropOffFacility).setLinkId(((LinkImpl)link).getId());
 			
 			ActivityOption activityOption;
 			activityOption = ((ActivityFacilityImpl) pickupDropOffFacility).createActivityOption(EvacuationConstants.PICKUP_ACTIVITY);
-			activityOption.addOpeningTime(new OpeningTimeImpl(OpeningTime.DayType.wk, 0*3600, 24*3600));
+			activityOption.addOpeningTime(new OpeningTimeImpl(0*3600, 24*3600));
 			activityOption.setCapacity(Double.MAX_VALUE);
 			
 			activityOption = ((ActivityFacilityImpl) pickupDropOffFacility).createActivityOption(EvacuationConstants.DROP_OFF_ACTIVITY);
-			activityOption.addOpeningTime(new OpeningTimeImpl(OpeningTime.DayType.wk, 0*3600, 24*3600));
+			activityOption.addOpeningTime(new OpeningTimeImpl(0*3600, 24*3600));
 			activityOption.setCapacity(Double.MAX_VALUE);
 		}
 	}
@@ -265,7 +264,7 @@ public class PrepareEvacuationScenarioListener {
 	private void createTripRouterFactory(Scenario scenario) {
 		
 		MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) scenario.getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);		
-		Map<Id, Double> linkSlopes = new LinkSlopesReader().getLinkSlopes(multiModalConfigGroup, scenario.getNetwork());
+		Map<Id<Link>, Double> linkSlopes = new LinkSlopesReader().getLinkSlopes(multiModalConfigGroup, scenario.getNetwork());
 		MultiModalTravelTimeFactory multiModalTravelTimeFactory = new MultiModalTravelTimeFactory(scenario.getConfig(), linkSlopes);
 		Map<String, TravelTime> multiModalTravelTimes = multiModalTravelTimeFactory.createTravelTimes();
 		

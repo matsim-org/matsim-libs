@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -45,13 +46,13 @@ public class LinkSlopesReader {
 	 * 
 	 * @return Map<LinkId, Slope in %> or null, if no slopes file has been set in the config group.
 	 */
-	public Map<Id, Double> getLinkSlopes(MultiModalConfigGroup configGroup, Network network) {
+	public Map<Id<Link>, Double> getLinkSlopes(MultiModalConfigGroup configGroup, Network network) {
 		
 		ObjectAttributes slopeInformation = this.getSlopeInformation(configGroup);
 		
 		if (slopeInformation == null) return null;
 		
-		Map<Id, Double> linkSlopes = this.getLinkSlopes(network, slopeInformation);
+		Map<Id<Link>, Double> linkSlopes = this.getLinkSlopes(network, slopeInformation);
 		
 		int found = linkSlopes.size();
 		int total = network.getLinks().size();
@@ -78,11 +79,11 @@ public class LinkSlopesReader {
 		}
 	}
 	
-	private Map<Id, Double> getLinkSlopes(Network network, ObjectAttributes slopeInformation) {
+	private Map<Id<Link>, Double> getLinkSlopes(Network network, ObjectAttributes slopeInformation) {
 		
-		Map<Id, Double> linkSlopes = new HashMap<Id, Double>();
+		Map<Id<Link>, Double> linkSlopes = new HashMap<>();
 		
-		for (Id linkId : network.getLinks().keySet()) {
+		for (Id<Link> linkId : network.getLinks().keySet()) {
 			Object slope = slopeInformation.getAttribute(linkId.toString(), ATTRIBUTE_NAME);
 			if (slope != null) linkSlopes.put(linkId, Double.valueOf(slope.toString()));
 		}

@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.multimodal.router.util.WalkTravelTimeFactory;
 import org.matsim.core.api.internal.MatsimComparator;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -51,21 +50,21 @@ public class WalkSpeedComparator implements Comparator<Id>, Serializable, Matsim
 	
 	private final TravelTime travelTime;
 	private final Link link; 
-	private final Map<Id, Double> travelTimesMap;
+	private final Map<Id<Person>, Double> travelTimesMap;
 	
 	public WalkSpeedComparator() {
 				
 		NetworkFactory factory = new NetworkFactoryImpl(NetworkImpl.createNetwork());
-		Node startNode = factory.createNode(new IdImpl("startNode"), new CoordImpl(0.0, 0.0));
-		Node endNode = factory.createNode(new IdImpl("endNode"), new CoordImpl(1.0, 0.0));
-		link = factory.createLink(new IdImpl("link"), startNode, endNode);
+		Node startNode = factory.createNode(Id.create("startNode", Node.class), new CoordImpl(0.0, 0.0));
+		Node endNode = factory.createNode(Id.create("endNode", Node.class), new CoordImpl(1.0, 0.0));
+		link = factory.createLink(Id.create("link", Link.class), startNode, endNode);
 		link.setLength(1.0);
 		
-		Map<Id, Double> linkSlopes = new HashMap<Id, Double>();
+		Map<Id<Link>, Double> linkSlopes = new HashMap<>();
 		linkSlopes.put(link.getId(), 0.0);
 		travelTime = new WalkTravelTimeFactory(new PlansCalcRouteConfigGroup(), linkSlopes).createTravelTime();
 		
-		travelTimesMap = new HashMap<Id, Double>();
+		travelTimesMap = new HashMap<>();
 	}
 	
 	public void calcTravelTimes(Population population) {
@@ -78,7 +77,7 @@ public class WalkSpeedComparator implements Comparator<Id>, Serializable, Matsim
 	}
 	
 	// for a test case
-	/*package*/ Map<Id, Double> getTravelTimesMap() {
+	/*package*/ Map<Id<Person>, Double> getTravelTimesMap() {
 		return Collections.unmodifiableMap(this.travelTimesMap);
 	}
 		

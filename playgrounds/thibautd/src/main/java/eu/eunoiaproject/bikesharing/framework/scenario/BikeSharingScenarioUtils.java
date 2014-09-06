@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.router.util.LinkSlopesReader;
 import org.matsim.contrib.multimodal.router.util.MultiModalTravelTimeFactory;
@@ -139,7 +140,7 @@ public class BikeSharingScenarioUtils {
 			((PopulationFactoryImpl) scenario.getPopulation().getFactory()).setRouteFactory(mode, factory);
 		}
 
-		final Map<Id, Double> linkSlopes =
+		final Map<Id<Link>, Double> linkSlopes =
 			new LinkSlopesReader().getLinkSlopes(
 					multimodalConfigGroup,
 					scenario.getNetwork());
