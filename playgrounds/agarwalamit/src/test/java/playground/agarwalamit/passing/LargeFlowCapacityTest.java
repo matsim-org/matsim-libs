@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
@@ -77,8 +78,9 @@ public class LargeFlowCapacityTest {
 		//=== build plans; two persons with cars enter and leaves one link at the same time and should have the same travel time.
 
 		for(int i=0;i<2;i++){
-			PersonImpl p = new PersonImpl(new IdImpl(i));
-			PlanImpl plan = p.createAndAddPlan(true);
+			Id<Person> id = Id.create(i, Person.class);
+			Person p = net.population.getFactory().createPerson(id);
+			PlanImpl plan = ((PersonImpl)p).createAndAddPlan(true);
 			ActivityImpl a1 = plan.createAndAddActivity("h",net.link1.getId());
 			a1.setEndTime(8*3600);
 			LegImpl leg=plan.createAndAddLeg(TransportMode.car);
@@ -90,7 +92,7 @@ public class LargeFlowCapacityTest {
 			net.population.addPerson(p);
 		}
 
-		Map<Id, Map<Id, double[]>> personLinkTravelTimes = new HashMap<Id, Map<Id, double[]>>();
+		Map<Id<Person>, Map<Id<Link>, double[]>> personLinkTravelTimes = new HashMap<Id<Person>, Map<Id<Link>, double[]>>();
 
 		EventsManager manager = EventsUtils.createEventsManager();
 		manager.addHandler(new PersonLinkTravelTimeEventHandler(personLinkTravelTimes));
@@ -98,14 +100,14 @@ public class LargeFlowCapacityTest {
 		QSim qSim = createQSim(net,manager);
 		qSim.run();
 
-		Map<Id, double[]> times1 = personLinkTravelTimes.get(new IdImpl("0"));
-		Map<Id, double[]> times2 = personLinkTravelTimes.get(new IdImpl("1"));
+		Map<Id<Link>, double[]> times1 = personLinkTravelTimes.get(Id.create("0", Person.class));
+		Map<Id<Link>, double[]> times2 = personLinkTravelTimes.get(Id.create("1", Person.class));
 
-		int linkEnterTime1 = (int)times1.get(new IdImpl("2"))[0]; 
-		int linkEnterTime2 = (int)times2.get(new IdImpl("2"))[0];
+		int linkEnterTime1 = (int)times1.get(Id.create("2", Link.class))[0]; 
+		int linkEnterTime2 = (int)times2.get(Id.create("2", Link.class))[0];
 
-		int linkLeaveTime1 = (int)times1.get(new IdImpl("2"))[1]; 
-		int linkLeaveTime2 = (int)times2.get(new IdImpl("2"))[1];
+		int linkLeaveTime1 = (int)times1.get(Id.create("2", Link.class))[1]; 
+		int linkLeaveTime2 = (int)times2.get(Id.create("2", Link.class))[1];
 		
 		Assert.assertEquals("Vehicles Entered at different time", 0, linkEnterTime1-linkEnterTime2);
 		Assert.assertEquals("Vehicles Entered at same time but not leaving the link at the same time.", 0, linkLeaveTime1-linkLeaveTime2);
@@ -152,16 +154,16 @@ public class LargeFlowCapacityTest {
 
 			network = (NetworkImpl) scenario.getNetwork();
 			this.network.setCapacityPeriod(Time.parseTime("1:00:00"));
-			Node node1 = network.createAndAddNode(scenario.createId("1"), scenario.createCoord(-100.0,0.0));
-			Node node2 = network.createAndAddNode(scenario.createId("2"), scenario.createCoord( 0.0,  0.0));
-			Node node3 = network.createAndAddNode(scenario.createId("3"), scenario.createCoord( 0.0,1000.0));
-			Node node4 = network.createAndAddNode(scenario.createId("4"), scenario.createCoord( 0.0,1100.0));
+			Node node1 = network.createAndAddNode(Id.create("1", Node.class), scenario.createCoord(-100.0,0.0));
+			Node node2 = network.createAndAddNode(Id.create("2", Node.class), scenario.createCoord( 0.0,  0.0));
+			Node node3 = network.createAndAddNode(Id.create("3", Node.class), scenario.createCoord( 0.0,1000.0));
+			Node node4 = network.createAndAddNode(Id.create("4", Node.class), scenario.createCoord( 0.0,1100.0));
 
 			Set<String> allowedModes = new HashSet<String>(); allowedModes.addAll(Arrays.asList("car","bike"));
 
-			link1 = network.createAndAddLink(scenario.createId("1"), node1, node2, 100, 25, 3601, 1, null, "22"); //capacity is 1 PCU per min.
-			link2 = network.createAndAddLink(scenario.createId("2"), node2, node3, 1000, 25, 3601, 1, null, "22");	
-			link3 = network.createAndAddLink(scenario.createId("3"), node3, node4, 100, 25, 3600, 1, null, "22");
+			link1 = network.createAndAddLink(Id.create("1", Link.class), node1, node2, 100, 25, 3601, 1, null, "22"); //capacity is 1 PCU per min.
+			link2 = network.createAndAddLink(Id.create("2", Link.class), node2, node3, 1000, 25, 3601, 1, null, "22");	
+			link3 = network.createAndAddLink(Id.create("3", Link.class), node3, node4, 100, 25, 3600, 1, null, "22");
 
 			population = scenario.getPopulation();
 		}
@@ -169,18 +171,18 @@ public class LargeFlowCapacityTest {
 
 	private static class PersonLinkTravelTimeEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
 
-		private final Map<Id, Map<Id, double[]>> personLinkEnterLeaveTimes;
+		private final Map<Id<Person>, Map<Id<Link>, double[]>> personLinkEnterLeaveTimes;
 
-		public PersonLinkTravelTimeEventHandler(Map<Id, Map<Id, double[]>> agentLinkEnterLeaveTimes) {
+		public PersonLinkTravelTimeEventHandler(Map<Id<Person>, Map<Id<Link>, double[]>> agentLinkEnterLeaveTimes) {
 			this.personLinkEnterLeaveTimes = agentLinkEnterLeaveTimes;
 		}
 
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
 			Logger.getLogger(PersonLinkTravelTimeEventHandler.class).info(event.toString());
-			Map<Id, double[]> times = this.personLinkEnterLeaveTimes.get(event.getPersonId());
+			Map<Id<Link>, double[]> times = this.personLinkEnterLeaveTimes.get(event.getPersonId());
 			if (times == null) {
-				times = new HashMap<Id, double[]>();
+				times = new HashMap<Id<Link>, double[]>();
 				double [] linkEnterLeaveTime = {Double.POSITIVE_INFINITY,Double.POSITIVE_INFINITY};
 				times.put(event.getLinkId(), linkEnterLeaveTime);
 				this.personLinkEnterLeaveTimes.put(event.getPersonId(), times);
@@ -197,7 +199,7 @@ public class LargeFlowCapacityTest {
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
 			Logger.getLogger(PersonLinkTravelTimeEventHandler.class).info(event.toString());
-			Map<Id, double[]> times = this.personLinkEnterLeaveTimes.get(event.getPersonId());
+			Map<Id<Link>, double[]> times = this.personLinkEnterLeaveTimes.get(event.getPersonId());
 			if (times != null) {
 				double linkEnterTime = times.get(event.getLinkId())[0];
 				double [] linkEnterLeaveTime = {linkEnterTime,event.getTime()};
