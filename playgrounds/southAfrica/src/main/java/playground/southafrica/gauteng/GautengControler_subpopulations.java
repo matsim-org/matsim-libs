@@ -22,6 +22,7 @@
  */
 package playground.southafrica.gauteng;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.apache.log4j.Logger;
@@ -39,6 +40,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -160,7 +162,10 @@ public class GautengControler_subpopulations {
 			config.controler().setLastIteration(100);
 		}
 		
-		final double sampleFactor = 0.01 ;
+		double sampleFactor = 0.01 ;
+		if ( user==User.kai ) {
+			sampleFactor = 0.1 ;
+		}
 		config.qsim().setFlowCapFactor(sampleFactor);
 		config.qsim().setStorageCapFactor(sampleFactor * Math.pow(sampleFactor, -0.25)); // interpolates between 0.03 @ 0.01 and 1 @ 1
 		config.counts().setCountsScaleFactor(1./sampleFactor);
@@ -173,6 +178,15 @@ public class GautengControler_subpopulations {
 		if ( user==User.kai ) {
 			config.parallelEventHandling().setNumberOfThreads(1); // I don't think that it helps to have more than one here.  
 			config.qsim().setNumberOfThreads(6);
+			config.qsim().setTrafficDynamics(QSimConfigGroup.TRAFF_DYN_W_HOLES);
+			
+			config.controler().setSnapshotFormat( Arrays.asList( "otfvis" ) );
+			config.controler().setWriteSnapshotsInterval(100);
+			
+			config.qsim().setSnapshotPeriod(900);
+			config.qsim().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_EQUI_DIST);
+			
+//			config.global().setRandomSeed(4713);
 		} else if(user == User.johan){
 			config.parallelEventHandling().setNumberOfThreads(1); 
 		}
