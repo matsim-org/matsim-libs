@@ -166,6 +166,7 @@ public class OnTheFlyServer implements OTFLiveServer {
 
 	private VisMobsim visMobsim;
 
+	@SuppressWarnings("rawtypes") // should work with arbitrary "agent" types. kai, sep'14
 	private Map<Id, AgentSnapshotInfo> snapshots = new LinkedHashMap<Id, AgentSnapshotInfo>();
 
 	private final VisData visData = new VisData() {

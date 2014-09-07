@@ -77,7 +77,7 @@ public class OTFVis {
 		System.out.println("usage 1: OTFVis mvi-file");
 		System.out.println("usage 2: OTFVis config-file");
 		System.out.println("usage 3: OTFVis network-file");
-		System.out.println("usage 4: OTFVis -convert event-file network-file mvi-file [snapshot-period]");
+		System.out.println("usage 4: OTFVis -(-)convert event-file network-file mvi-file [snapshot-period]");
 		System.out.println();
 		System.out.println("Usages 1-3: Starts the Visualizer");
 		System.out.println("mvi-file:      A MATSim visualizer file that contains a pre-recorder state");
@@ -101,7 +101,9 @@ public class OTFVis {
 		if (args2.length == 0) {
 			String filename = chooseFile();
 			play(filename);
-		} else if (args2[0].equalsIgnoreCase("-convert")) {
+		} else if ( args2[0].equalsIgnoreCase("-convert") || args2[0].equalsIgnoreCase("--convert") ) {
+			convert(args2);
+		} else if (args2[0].equalsIgnoreCase("-help") || args2[0].equalsIgnoreCase("--help") || args2[0].equalsIgnoreCase("-?") ) {
 			convert(args2);
 		} else if (args2.length == 1) {
 			String filename = args2[0];

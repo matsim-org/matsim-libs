@@ -120,7 +120,7 @@ public class OTFLinkAgentsHandler extends OTFDataReader {
 			}
 		}
 
-		private void writeAgent(AgentSnapshotInfo pos, ByteBuffer out) {
+		private static void writeAgent(AgentSnapshotInfo pos, ByteBuffer out) {
 			String id = pos.getId().toString();
 			ByteBufferUtils.putString(out, id);
 			Point2D.Double point = OTFServerQuadTree.transform(new CoordImpl(pos.getEasting(), pos.getNorthing()));
