@@ -130,8 +130,8 @@ public final class CadytsBuilder {
 								"; endTimeOfBin_s: " + endTimeOfBin_s + "; cadytsConfigEndTime: " + cadytsConfig.getEndTime() );
 					} else { //add volumes for each bin to calibrator
 						numberOfAddedMeasurements++ ;
-						matsimCalibrator.addMeasurement(item, startTimeOfBin_s, endTimeOfBin_s, count/multiple, SingleLinkMeasurement.TYPE.FLOW_VEH_H);
-//						matsimCalibrator.addMeasurement(item, startTimeOfBin_s, endTimeOfBin_s, count, SingleLinkMeasurement.TYPE.COUNT_VEH );
+//						matsimCalibrator.addMeasurement(item, startTimeOfBin_s, endTimeOfBin_s, count/multiple, SingleLinkMeasurement.TYPE.FLOW_VEH_H);
+						matsimCalibrator.addMeasurement(item, startTimeOfBin_s, endTimeOfBin_s, count, SingleLinkMeasurement.TYPE.COUNT_VEH );
 
 						// changed this from FLOW_VEH_H to COUNT_VEH on 30/jul/2012 since this is no longer "hourly".  
 						// kai/manuel, jul'12
@@ -149,6 +149,9 @@ public final class CadytsBuilder {
 			log.warn("No measurements were added.");
         }
 		
+        if ( matsimCalibrator.getProportionalAssignment() ) {
+        	throw new RuntimeException("Gunnar says that this may not work so do not set to true. kai, sep'14") ;
+        }
 		return matsimCalibrator;
 	}
 }

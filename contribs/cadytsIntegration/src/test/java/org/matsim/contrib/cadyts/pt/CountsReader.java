@@ -30,8 +30,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.misc.StringUtils;
 
-/**parses a output text file containing counts comparisons*/
-public class CountsReader {
+/**
+ * parses a output text file containing counts comparisons
+ * 
+ * this class is only there in order to read the column-oriented output back in for testing. 
+ * It should not be used elsewhere without further thinking. kai, sep'14
+ * */
+final class CountsReader {
 
 	private final static Logger log = Logger.getLogger(CountsReader.class);
 
@@ -42,7 +47,7 @@ public class CountsReader {
 	String countsTextFile;
 	Map<Id, Map<String, double[]>> count = new TreeMap<Id, Map<String, double[]>>();
 
-	public CountsReader(final String countsTextFile){
+	CountsReader(final String countsTextFile){
 		this.countsTextFile = countsTextFile;
 		readValues();
 	}
@@ -80,19 +85,31 @@ public class CountsReader {
 		}
 	}
 
-	public double[]getSimulatedValues(final Id stopId) {
+	/**
+	 * I am reasonably sure that the first entry (hour 1) is at array-position 0. kai, sep'14
+	 */
+	double[]getSimulatedValues(final Id stopId) {
 		return this.getCountValues(stopId, 0);
 	}
 
-	public double[]getSimulatedScaled(final Id stopId) {
+	/**
+	 * I am reasonably sure that the first entry (hour 1) is at array-position 0. kai, sep'14
+	 */
+	double[]getSimulatedScaled(final Id stopId) {
 		return this.getCountValues(stopId, 1);
 	}
 
-	public double[]getRealValues(final Id stopId) {
+	/**
+	 * I am reasonably sure that the first entry (hour 1) is at array-position 0. kai, sep'14
+	 */
+	double[]getRealValues(final Id stopId) {
 		return this.getCountValues(stopId, 2);
 	}
 
-	private double[]getCountValues(final Id stopId, final int col) {
+	/**
+	 * I am reasonably sure that the first entry (hour 1) is at array-position 0. kai, sep'14
+	 */
+	double[]getCountValues(final Id stopId, final int col) {
 		double[] valueArray = new double[24];
 		for (byte i= 0; i<24 ; i++) {
 			String hour = String.valueOf(i+1);
@@ -113,7 +130,7 @@ public class CountsReader {
 	/**
 	 * @return returns a id set of stops listed in the text file
 	 */
-	public Set<Id> getStopsIds(){
+	Set<Id> getStopsIds(){
 		return this.count.keySet();
 	}
 

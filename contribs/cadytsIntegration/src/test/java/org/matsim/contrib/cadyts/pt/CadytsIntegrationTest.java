@@ -69,7 +69,7 @@ import cadyts.utilities.io.tabularFileParser.TabularFileParser;
 import cadyts.utilities.misc.DynamicData;
 
 public class CadytsIntegrationTest {
-	
+
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 
@@ -83,7 +83,7 @@ public class CadytsIntegrationTest {
 		stratSets.setModuleName("ccc") ;
 		stratSets.setProbability(1.) ;
 		config.strategy().addStrategySettings(stratSets) ;
-		
+
 		Scenario scenario = ScenarioUtils.loadScenario(config) ;
 		final Controler controler = new Controler(scenario);
 		final CadytsPtContext context = new CadytsPtContext( config, controler.getEvents()  ) ;
@@ -94,13 +94,13 @@ public class CadytsIntegrationTest {
 			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
 				return new PlanStrategyImpl(new CadytsPlanChanger<TransitStopFacility>(scenario2, context));
 			}} ) ;
-		
+
 		controler.setCreateGraphs(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setDumpDataAtEnd(true);
 		controler.setMobsimFactory(new DummyMobsimFactory());
 		controler.run();
-		
+
 		//test calibration settings
 		Assert.assertEquals(true, context.getCalibrator().getBruteForce());
 		Assert.assertEquals(false, context.getCalibrator().getCenterRegression());
@@ -117,41 +117,41 @@ public class CadytsIntegrationTest {
 	public final void testCalibrationAsScoring() throws IOException {
 		final double beta=30. ;
 		final int lastIteration = 20 ;
-		
+
 		String inputDir = this.utils.getClassInputDirectory();
 		String outputDir = this.utils.getOutputDirectory();
 
 		final Config config = createTestConfig(inputDir, outputDir);
-		
+
 		config.controler().setLastIteration(lastIteration) ;
-		
+
 		config.planCalcScore().setBrainExpBeta(beta) ;
-		
+
 		StrategySettings stratSets = new StrategySettings(new IdImpl("1")) ;
-//		stratSets.setModuleName("ChangeExpBeta") ;
+		//		stratSets.setModuleName("ChangeExpBeta") ;
 		stratSets.setModuleName("ccc") ;
 		stratSets.setProbability(1.0) ;
 		config.strategy().addStrategySettings(stratSets) ;
-		
+
 		// ===
 
 		final Controler controler = new Controler(config);
 		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(true);
 		controler.setOverwriteFiles(true) ;
-		
+
 		final CadytsPtContext cContext = new CadytsPtContext( config, controler.getEvents()  ) ;
 		controler.addControlerListener(cContext) ;
-		
+
 		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
-				 final CadytsPlanChanger<TransitStopFacility> planSelector = new CadytsPlanChanger<TransitStopFacility>(scenario, cContext);
-				 planSelector.setCadytsWeight(0.) ;
-				 // weight 0 is correct: this is only in order to use getCalibrator().addToDemand.
-				 // would certainly be cleaner (and less confusing) to write a separate method for this.  (But how?)
-				 // kai, may'13
-				 //				final PlanSelector planSelector = new ExpBetaPlanChangerWithCadytsPlanRegistration<TransitStopFacility>(beta, cContext) ;
+				final CadytsPlanChanger<TransitStopFacility> planSelector = new CadytsPlanChanger<TransitStopFacility>(scenario, cContext);
+				planSelector.setCadytsWeight(0.) ;
+				// weight 0 is correct: this is only in order to use getCalibrator().addToDemand.
+				// would certainly be cleaner (and less confusing) to write a separate method for this.  (But how?)
+				// kai, may'13
+				//				final PlanSelector planSelector = new ExpBetaPlanChangerWithCadytsPlanRegistration<TransitStopFacility>(beta, cContext) ;
 				return new PlanStrategyImpl(planSelector);
 			} 
 		} ) ;
@@ -173,11 +173,11 @@ public class CadytsIntegrationTest {
 				return scoringFunctionAccumulator;
 			}
 		}) ;
-		
-		
+
+
 		controler.run();
-		
-		
+
+
 		//scenario data  test
 		Assert.assertNotNull("config is null" , controler.getConfig());
 		Assert.assertEquals("Different number of links in network.", controler.getNetwork().getLinks().size() , 23 );
@@ -188,8 +188,8 @@ public class CadytsIntegrationTest {
 		Assert.assertNotNull("Population is null.", controler.getScenario().getPopulation());
 		Assert.assertEquals("Num. of persons in population is wrong.", controler.getPopulation().getPersons().size() , 4);
 		Assert.assertEquals("Scale factor is wrong.", controler.getScenario().getConfig().ptCounts().getCountsScaleFactor(), 1.0, MatsimTestUtils.EPSILON);
-//		Assert.assertEquals("Distance filter is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilter() , 30000.0, MatsimTestUtils.EPSILON);
-//		Assert.assertEquals("DistanceFilterCenterNode is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilterCenterNode(), "7");
+		//		Assert.assertEquals("Distance filter is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilter() , 30000.0, MatsimTestUtils.EPSILON);
+		//		Assert.assertEquals("DistanceFilterCenterNode is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilterCenterNode(), "7");
 		//counts
 		Assert.assertEquals("Occupancy count file is wrong.", controler.getScenario().getConfig().ptCounts().getOccupancyCountsFileName(), inputDir + "counts/counts_occupancy.xml");
 		Counts occupCounts = new Counts();
@@ -239,24 +239,24 @@ public class CadytsIntegrationTest {
 			CalibrationStatReader.StatisticsData outStatData= calibrationStatReader.getCalStatMap().get(lastIteration);
 			Assert.assertEquals("different Count_ll", "-0.046875", outStatData.getCount_ll() );
 			Assert.assertEquals("different Count_ll_pred_err",  "0.01836234363152515" , outStatData.getCount_ll_pred_err() );
-//			Assert.assertEquals("different Link_lambda_avg", "-2.2604922388914356E-10", outStatData.getLink_lambda_avg() );
-//			Assert.assertEquals("different Link_lambda_max", "0.0" , outStatData.getLink_lambda_max() );
-//			Assert.assertEquals("different Link_lambda_min", "-7.233575164452593E-9", outStatData.getLink_lambda_min() );
-//			Assert.assertEquals("different Link_lambda_stddev", "1.261054219517188E-9", outStatData.getLink_lambda_stddev());
-//			Assert.assertEquals("different P2p_ll", "--" , outStatData.getP2p_ll());
-//			Assert.assertEquals("different Plan_lambda_avg", "-7.233575164452594E-9", outStatData.getPlan_lambda_avg() );
-//			Assert.assertEquals("different Plan_lambda_max", "-7.233575164452593E-9" , outStatData.getPlan_lambda_max() );
-//			Assert.assertEquals("different Plan_lambda_min", "-7.233575164452593E-9" , outStatData.getPlan_lambda_min() );
-//			Assert.assertEquals("different Plan_lambda_stddev", "0.0" , outStatData.getPlan_lambda_stddev());
+			//			Assert.assertEquals("different Link_lambda_avg", "-2.2604922388914356E-10", outStatData.getLink_lambda_avg() );
+			//			Assert.assertEquals("different Link_lambda_max", "0.0" , outStatData.getLink_lambda_max() );
+			//			Assert.assertEquals("different Link_lambda_min", "-7.233575164452593E-9", outStatData.getLink_lambda_min() );
+			//			Assert.assertEquals("different Link_lambda_stddev", "1.261054219517188E-9", outStatData.getLink_lambda_stddev());
+			//			Assert.assertEquals("different P2p_ll", "--" , outStatData.getP2p_ll());
+			//			Assert.assertEquals("different Plan_lambda_avg", "-7.233575164452594E-9", outStatData.getPlan_lambda_avg() );
+			//			Assert.assertEquals("different Plan_lambda_max", "-7.233575164452593E-9" , outStatData.getPlan_lambda_max() );
+			//			Assert.assertEquals("different Plan_lambda_min", "-7.233575164452593E-9" , outStatData.getPlan_lambda_min() );
+			//			Assert.assertEquals("different Plan_lambda_stddev", "0.0" , outStatData.getPlan_lambda_stddev());
 			Assert.assertEquals("different Total_ll", "-0.046875", outStatData.getTotal_ll() );
 
 
 			//test link offsets
 			final TransitSchedule schedule = controler.getScenario().getTransitSchedule();
 			String linkOffsetFile = outputDir + "ITERS/it." + lastIteration + "/" + lastIteration + ".linkCostOffsets.xml";
-//			CadytsPtLinkCostOffsetsXMLFileIO offsetReader = new CadytsPtLinkCostOffsetsXMLFileIO (schedule);
+			//			CadytsPtLinkCostOffsetsXMLFileIO offsetReader = new CadytsPtLinkCostOffsetsXMLFileIO (schedule);
 			CadytsCostOffsetsXMLFileIO<TransitStopFacility> offsetReader 
-			   = new CadytsCostOffsetsXMLFileIO<TransitStopFacility> (new TransitStopFacilityLookUp(controler.getScenario()));
+			= new CadytsCostOffsetsXMLFileIO<TransitStopFacility> (new TransitStopFacilityLookUp(controler.getScenario()));
 			DynamicData<TransitStopFacility> stopOffsets = offsetReader.read(linkOffsetFile);
 
 			TransitStopFacility stop2 = schedule.getFacilities().get(stopId2);
@@ -280,33 +280,33 @@ public class CadytsIntegrationTest {
 	public final void testCalibration() throws IOException {
 		final double beta = 30. ;
 		final int lastIteration = 20 ;
-		
+
 		String inputDir = this.utils.getClassInputDirectory();
 		String outputDir = this.utils.getOutputDirectory();
 
 		Config config = createTestConfig(inputDir, outputDir) ;
-		
+
 		config.controler().setWriteEventsInterval(0) ;
 		config.controler().setLastIteration(lastIteration) ;
 		// seems to need 15 iterations as "warm-up"; at least the cadyts corrections are much smaller until then.
-		
+
 		config.planCalcScore().setBrainExpBeta(beta) ;
 
 		StrategySettings stratSets = new StrategySettings(new IdImpl(1));
 		stratSets.setModuleName("ccc") ;
 		stratSets.setProbability(1.) ;
 		config.strategy().addStrategySettings(stratSets) ;
-		
+
 		Scenario scenario = ScenarioUtils.loadScenario(config) ;
-		
+
 		final Controler controler = new Controler( scenario );
 		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(true);
 		controler.setOverwriteFiles(true) ;
-		
+
 		final CadytsPtContext context = new CadytsPtContext( config, controler.getEvents()  ) ;
 		controler.addControlerListener(context) ;
-		
+
 		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
@@ -314,10 +314,10 @@ public class CadytsIntegrationTest {
 				planSelector.setCadytsWeight(beta*30.) ;
 				return new PlanStrategyImpl(planSelector);
 			}} ) ;
-		
+
 		controler.run();
-		
-		
+
+
 		//scenario data  test
 		Assert.assertNotNull("config is null" , controler.getConfig());
 		Assert.assertEquals("Different number of links in network.", controler.getNetwork().getLinks().size() , 23 );
@@ -328,8 +328,8 @@ public class CadytsIntegrationTest {
 		Assert.assertNotNull("Population is null.", controler.getScenario().getPopulation());
 		Assert.assertEquals("Num. of persons in population is wrong.", controler.getPopulation().getPersons().size() , 4);
 		Assert.assertEquals("Scale factor is wrong.", controler.getScenario().getConfig().ptCounts().getCountsScaleFactor(), 1.0, MatsimTestUtils.EPSILON);
-//		Assert.assertEquals("Distance filter is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilter() , 30000.0, MatsimTestUtils.EPSILON);
-//		Assert.assertEquals("DistanceFilterCenterNode is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilterCenterNode(), "7");
+		//		Assert.assertEquals("Distance filter is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilter() , 30000.0, MatsimTestUtils.EPSILON);
+		//		Assert.assertEquals("DistanceFilterCenterNode is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilterCenterNode(), "7");
 		//counts
 		Assert.assertEquals("Occupancy count file is wrong.", controler.getScenario().getConfig().ptCounts().getOccupancyCountsFileName(), inputDir + "counts/counts_occupancy.xml");
 		Counts occupCounts = new Counts();
@@ -394,9 +394,9 @@ public class CadytsIntegrationTest {
 			//test link offsets
 			final TransitSchedule schedule = controler.getScenario().getTransitSchedule();
 			String linkOffsetFile = outputDir + "ITERS/it." + lastIteration + "/" + lastIteration + ".linkCostOffsets.xml";
-//			CadytsPtLinkCostOffsetsXMLFileIO offsetReader = new CadytsPtLinkCostOffsetsXMLFileIO (schedule);
+			//			CadytsPtLinkCostOffsetsXMLFileIO offsetReader = new CadytsPtLinkCostOffsetsXMLFileIO (schedule);
 			CadytsCostOffsetsXMLFileIO<TransitStopFacility> offsetReader 
-			   = new CadytsCostOffsetsXMLFileIO<TransitStopFacility> (new TransitStopFacilityLookUp(controler.getScenario()));
+			= new CadytsCostOffsetsXMLFileIO<TransitStopFacility> (new TransitStopFacilityLookUp(controler.getScenario()));
 			DynamicData<TransitStopFacility> stopOffsets = offsetReader.read(linkOffsetFile);
 
 			TransitStopFacility stop2 = schedule.getFacilities().get(stopId2);
@@ -416,7 +416,7 @@ public class CadytsIntegrationTest {
 		}
 	}
 
-	
+
 	/**
 	 * @author mmoyo
 	 */
@@ -425,31 +425,31 @@ public class CadytsIntegrationTest {
 		// yyyy I cannot fully certify that this test is doing something reasonable, since simCountComparisonOccupancy.txt and 
 		// cadytsSimCountComparisonOccupancy.txt are returning different results.  kai, feb'13
 		// There is a comment in CadytsContext that the "cadyts" version may be wrong for time bins different from one hour. kai, dec'13
-		
+
 		final double beta = 30. ;
 		final int lastIteration = 20 ;
-		
+
 		String inputDir = this.utils.getClassInputDirectory();
 		String outputDir = this.utils.getOutputDirectory();
 
 		Config config = createTestConfig(inputDir, this.utils.getOutputDirectory());
-		
+
 		config.controler().setLastIteration(lastIteration) ;
 		config.controler().setWritePlansInterval(1) ;
 		config.controler().setWriteEventsInterval(1) ;
-		
+
 		config.ptCounts().setPtCountsInterval(1) ;
-		
+
 		StrategySettings stratSets = new StrategySettings(new IdImpl(1));
 		stratSets.setModuleName("ccc") ;
 		stratSets.setProbability(1.) ;
 		config.strategy().addStrategySettings(stratSets) ;
-		
+
 		CadytsConfigGroup cConfig = (CadytsConfigGroup) config.getModule(CadytsConfigGroup.GROUP_NAME) ;
 		cConfig.setTimeBinSize(7200) ;
-		
+
 		// ---
-		
+
 		final Controler controler = new Controler(config);
 		final CadytsPtContext context = new CadytsPtContext( config, controler.getEvents()  ) ;
 		controler.addControlerListener(context) ;
@@ -461,14 +461,14 @@ public class CadytsIntegrationTest {
 				planSelector.setCadytsWeight(beta*30.) ;
 				return new PlanStrategyImpl(planSelector);
 			}} ) ;
-		
+
 		controler.setCreateGraphs(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setDumpDataAtEnd(true);
 		controler.run();
-		
+
 		// ====================================
-		
+
 		//scenario data  test
 		Assert.assertNotNull("config is null" , controler.getConfig());
 		Assert.assertEquals("Different number of links in network.", controler.getNetwork().getLinks().size() , 23 );
@@ -479,8 +479,8 @@ public class CadytsIntegrationTest {
 		Assert.assertNotNull("Population is null.", controler.getScenario().getPopulation());
 		Assert.assertEquals("Num. of persons in population is wrong.", controler.getPopulation().getPersons().size() , 4);
 		Assert.assertEquals("Scale factor is wrong.", controler.getScenario().getConfig().ptCounts().getCountsScaleFactor(), 1.0, MatsimTestUtils.EPSILON);
-//		Assert.assertEquals("Distance filter is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilter() , 30000.0, MatsimTestUtils.EPSILON);
-//		Assert.assertEquals("DistanceFilterCenterNode is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilterCenterNode(), "7");
+		//		Assert.assertEquals("Distance filter is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilter() , 30000.0, MatsimTestUtils.EPSILON);
+		//		Assert.assertEquals("DistanceFilterCenterNode is wrong.", controler.getScenario().getConfig().ptCounts().getDistanceFilterCenterNode(), "7");
 		//counts
 		Assert.assertEquals("Occupancy count file is wrong.", controler.getScenario().getConfig().ptCounts().getOccupancyCountsFileName(), inputDir + "counts/counts_occupancy.xml");
 		Counts occupCounts = new Counts();
@@ -488,73 +488,88 @@ public class CadytsIntegrationTest {
 		Count count =  occupCounts.getCount(new IdImpl("stop1"));
 		Assert.assertEquals("Occupancy counts description is wrong", occupCounts.getDescription(), "counts values for equil net");
 		Assert.assertEquals("CsId is wrong.", count.getCsId() , "stop1");
+
 		Assert.assertEquals("Volume of hour 4 is wrong", count.getVolume(7).getValue(), 4.0 , MatsimTestUtils.EPSILON);
+		// yy I don't know why it says "hour 4" but "getVolume(7)". kai, sep'14
+		
 		Assert.assertEquals("Max count volume is wrong.", count.getMaxVolume().getValue(), 4.0 , MatsimTestUtils.EPSILON);
 
 		// test resulting simulation volumes
-			String outCounts = outputDir + "ITERS/it." + lastIteration + "/" + lastIteration + ".simCountCompareOccupancy.txt";
-			CountsReader reader = new CountsReader(outCounts);
-			double[] simValues;
-			double[] realValues;
-
-			Id stopId1 = new IdImpl("stop1");
-			simValues = reader.getSimulatedValues(stopId1);
-			realValues= reader.getRealValues(stopId1);
-			Assert.assertEquals("Volume of hour 6 is wrong", 4.0, simValues[6], MatsimTestUtils.EPSILON);
-			Assert.assertEquals("Volume of hour 6 is wrong", 4.0, realValues[6], MatsimTestUtils.EPSILON);
-
-			Id stopId2 = new IdImpl("stop2");
-			simValues = reader.getSimulatedValues(stopId2);
-			realValues= reader.getRealValues(stopId2);
-			Assert.assertEquals("Volume of hour 6 is wrong", 0.0, simValues[6], MatsimTestUtils.EPSILON);
-			Assert.assertEquals("Volume of hour 6 is wrong", 1.0, realValues[6] , MatsimTestUtils.EPSILON);
-
-			Id stopId6 = new IdImpl("stop6");
-			simValues = reader.getSimulatedValues(stopId6);
-			realValues= reader.getRealValues(stopId6);
-			Assert.assertEquals("Volume of hour 6 is wrong", 0.0, simValues[6], MatsimTestUtils.EPSILON);
-			Assert.assertEquals("Volume of hour 6 is wrong", 2.0, realValues[6], MatsimTestUtils.EPSILON);
-
-			Id stopId10 = new IdImpl("stop10");
-			simValues = reader.getSimulatedValues(stopId10);
-			realValues= reader.getRealValues(stopId10);
-			Assert.assertEquals("Volume of hour 6 is wrong", 4.0, simValues[6], MatsimTestUtils.EPSILON);
-			Assert.assertEquals("Volume of hour 6 is wrong", 5.0, realValues[6], MatsimTestUtils.EPSILON);
-	
+		String outCounts = outputDir + "ITERS/it." + lastIteration + "/" + lastIteration + ".simCountCompareOccupancy.txt";
+		CountsReader reader = new CountsReader(outCounts);
+		Id stopId1 = new IdImpl("stop1");
+		{
+			double[] simValues = reader.getSimulatedValues(stopId1);
+			double[] realValues= reader.getRealValues(stopId1);
+			Assert.assertEquals("Volume of hour 6 (probably: 7) is wrong", 4.0, simValues[6], MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Volume of hour 6 (probably: 7) is wrong", 4.0, realValues[6], MatsimTestUtils.EPSILON);
+		}
+		Id stopId2 = new IdImpl("stop2");
+		{
+			double[] simValues = reader.getSimulatedValues(stopId2);
+			double[] realValues= reader.getRealValues(stopId2);
+			Assert.assertEquals("Volume of hour 6 (probably: 7) is wrong", 0.0, simValues[6], MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Volume of hour 6 (probably: 7) is wrong", 1.0, realValues[6] , MatsimTestUtils.EPSILON);
+		}
+		Id stopId6 = new IdImpl("stop6");
+		{
+			double[] simValues = reader.getSimulatedValues(stopId6);
+			double[] realValues= reader.getRealValues(stopId6);
+			Assert.assertEquals("Volume of hour 6 (probably: 7) is wrong", 0.0, simValues[6], MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Volume of hour 6 (probably: 7) is wrong", 2.0, realValues[6], MatsimTestUtils.EPSILON);
+		}
+		Id stopId10 = new IdImpl("stop10");
+		{
+			double[] simValues = reader.getSimulatedValues(stopId10);
+			double[] realValues= reader.getRealValues(stopId10);
+			Assert.assertEquals("Volume of hour 6 (probably: 7) is wrong", 4.0, simValues[6], MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Volume of hour 6 (probably: 7) is wrong", 5.0, realValues[6], MatsimTestUtils.EPSILON);
+		}
+		// 2 bus lines, one using stops 1, 2, 12, the other using 1, 10, 12.  Counts say:
+		// stop1: 4 (should always be satisfied)
+		// stop2: 1 (should be possible to satisfy bus see below)
+		// stop6: 2 (not possible to satisfy (no line going there))
+		// stop10: 5 (not possible to satisfy (we have not enough plans) but see below)
+		// and they say this at h=7 (which may, or may not, be the entry "6" in the counts array, but then the error messages are wrong).
+		//
+		// stop2 and stop10 are pulling in different directions; would need 7 plans to satisfy but have only 4.  Satisfying the higher
+		// volume station better is the cadyts-conforming solution.
 
 		// test calibration statistics
-			String testCalibStatPath = outputDir + "calibration-stats.txt";
-			CalibrationStatReader calibrationStatReader = new CalibrationStatReader();
-			new TabularFileParser().parse(testCalibStatPath, calibrationStatReader);
+		String testCalibStatPath = outputDir + "calibration-stats.txt";
+		CalibrationStatReader calibrationStatReader = new CalibrationStatReader();
+		new TabularFileParser().parse(testCalibStatPath, calibrationStatReader);
 
-			CalibrationStatReader.StatisticsData outStatData= calibrationStatReader.getCalStatMap().get(lastIteration);
-			Assert.assertEquals("different Count_ll", "-0.01171875", outStatData.getCount_ll() );
-			Assert.assertEquals("different Count_ll_pred_err",  "0.004590585907794875" , outStatData.getCount_ll_pred_err() );
-//			Assert.assertEquals("different Link_lambda_avg", "-1.8081427328702926E-9", outStatData.getLink_lambda_avg() );
-//			Assert.assertEquals("different Link_lambda_max", "0.0" , outStatData.getLink_lambda_max() );
-//			Assert.assertEquals("different Link_lambda_min", "-1.4465142715757458E-8", outStatData.getLink_lambda_min() );
-//			Assert.assertEquals("different Link_lambda_stddev", "4.501584893410135E-9" , outStatData.getLink_lambda_stddev());
-//			Assert.assertEquals("different P2p_ll", "--" , outStatData.getP2p_ll());
-//			Assert.assertEquals("different Plan_lambda_avg", "-2.5313998260184097E-8", outStatData.getPlan_lambda_avg() );
-//			Assert.assertEquals("different Plan_lambda_max", "-2.5313998260184097E-8" , outStatData.getPlan_lambda_max() );
-//			Assert.assertEquals("different Plan_lambda_min", "-2.5313998260184097E-8" , outStatData.getPlan_lambda_min() );
-//			Assert.assertEquals("different Plan_lambda_stddev", "NaN" , outStatData.getPlan_lambda_stddev());
-			Assert.assertEquals("different Total_ll", "-0.01171875", outStatData.getTotal_ll() );
-		
-			
+		CalibrationStatReader.StatisticsData outStatData= calibrationStatReader.getCalStatMap().get(lastIteration);
+		//		Assert.assertEquals("different Count_ll", "-0.01171875", outStatData.getCount_ll() );
+		//		Assert.assertEquals("different Count_ll_pred_err",  "0.004590585907794875" , outStatData.getCount_ll_pred_err() );
+		//			Assert.assertEquals("different Link_lambda_avg", "-1.8081427328702926E-9", outStatData.getLink_lambda_avg() );
+		//			Assert.assertEquals("different Link_lambda_max", "0.0" , outStatData.getLink_lambda_max() );
+		//			Assert.assertEquals("different Link_lambda_min", "-1.4465142715757458E-8", outStatData.getLink_lambda_min() );
+		//			Assert.assertEquals("different Link_lambda_stddev", "4.501584893410135E-9" , outStatData.getLink_lambda_stddev());
+		//			Assert.assertEquals("different P2p_ll", "--" , outStatData.getP2p_ll());
+		//			Assert.assertEquals("different Plan_lambda_avg", "-2.5313998260184097E-8", outStatData.getPlan_lambda_avg() );
+		//			Assert.assertEquals("different Plan_lambda_max", "-2.5313998260184097E-8" , outStatData.getPlan_lambda_max() );
+		//			Assert.assertEquals("different Plan_lambda_min", "-2.5313998260184097E-8" , outStatData.getPlan_lambda_min() );
+		//			Assert.assertEquals("different Plan_lambda_stddev", "NaN" , outStatData.getPlan_lambda_stddev());
+		//		Assert.assertEquals("different Total_ll", "-0.01171875", outStatData.getTotal_ll() );
+		//
+		// I think that the above quantities change when changing between FLOW_VEH_H and COUNT_VEH.  The calibration result, though,
+		// seems the same.
+
+
 		//test link offsets
 		final TransitSchedule schedule = controler.getScenario().getTransitSchedule();
-		String linkOffsetFile = outputDir + "ITERS/it." + lastIteration + "/" + lastIteration + ".linkCostOffsets.xml";
-//		CadytsPtLinkCostOffsetsXMLFileIO offsetReader = new CadytsPtLinkCostOffsetsXMLFileIO (schedule);
-		CadytsCostOffsetsXMLFileIO<TransitStopFacility> offsetReader 
-		   = new CadytsCostOffsetsXMLFileIO<TransitStopFacility> (new TransitStopFacilityLookUp(controler.getScenario()));
-		DynamicData<TransitStopFacility> stopOffsets = offsetReader.read(linkOffsetFile);
-	
+		CadytsCostOffsetsXMLFileIO<TransitStopFacility> offsetReader = 
+				new CadytsCostOffsetsXMLFileIO<TransitStopFacility> (new TransitStopFacilityLookUp(controler.getScenario()));
+		DynamicData<TransitStopFacility> stopOffsets = 
+				offsetReader.read(outputDir + "ITERS/it." + lastIteration + "/" + lastIteration + ".linkCostOffsets.xml");
+
 		TransitStopFacility stop1 = schedule.getFacilities().get(stopId1);
 		TransitStopFacility stop2 = schedule.getFacilities().get(stopId2);
 		//TransitStopFacility stop6 = schedule.getFacilities().get(stopId6);
 		TransitStopFacility stop10 = schedule.getFacilities().get(stopId10);
-	
+
 		//find first offset value different from zero to compare. Useful to test with different time bin sizes
 		int binIndex=-1;
 		boolean isZero;
@@ -562,11 +577,14 @@ public class CadytsIntegrationTest {
 			binIndex++;
 			isZero = (Math.abs(stopOffsets.getBinValue(stop2 , binIndex) - 0.0) < MatsimTestUtils.EPSILON);
 		}while (isZero && binIndex<86400);
-		
+
 		Assert.assertEquals("Wrong Bin index for first link offset", 3, binIndex); // bin size = 3600; fix!   //done manuel jul.2012
 		Assert.assertEquals("Wrong link offset of stop 1", 0.0, stopOffsets.getBinValue(stop1 , binIndex), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong link offset of stop 2", -0.0028383120802772956, stopOffsets.getBinValue(stop2 , binIndex), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Wrong link offset of stop 10", 0.00878939456017082, stopOffsets.getBinValue(stop10 , binIndex), MatsimTestUtils.EPSILON);
+//		Assert.assertEquals("Wrong link offset of stop 2", -0.0028383120802772956, stopOffsets.getBinValue(stop2 , binIndex), MatsimTestUtils.EPSILON);
+//		Assert.assertEquals("Wrong link offset of stop 10", 0.00878939456017082, stopOffsets.getBinValue(stop10 , binIndex), MatsimTestUtils.EPSILON);
+		
+		Assert.assertTrue("Offset at stop 2 has wrong sign.", stopOffsets.getBinValue(stop2, binIndex) < 0. ) ;
+		Assert.assertTrue("Offset at stop 10 has wrong sign.", stopOffsets.getBinValue(stop10, binIndex) > 0. ) ;
 	}
 
 
@@ -589,7 +607,7 @@ public class CadytsIntegrationTest {
 		config.controler().setWriteEventsInterval(1) ;
 		config.controler().setMobsim(MobsimType.qsim.toString()) ;
 		// ---
-		
+
 		config.qsim().setFlowCapFactor(0.02) ;
 		config.qsim().setStorageCapFactor(0.06) ;
 		config.qsim().setStuckTime(10.) ;
@@ -612,7 +630,7 @@ public class CadytsIntegrationTest {
 		}
 		// ---
 		Module cadytsPtConfig = config.createModule(CadytsConfigGroup.GROUP_NAME ) ;
-		
+
 		cadytsPtConfig.addParam(CadytsConfigGroup.START_TIME, "04:00:00") ;
 		cadytsPtConfig.addParam(CadytsConfigGroup.END_TIME, "20:00:00" ) ;
 		cadytsPtConfig.addParam(CadytsConfigGroup.REGRESSION_INERTIA, "0.95") ;
@@ -621,17 +639,17 @@ public class CadytsIntegrationTest {
 		cadytsPtConfig.addParam(CadytsConfigGroup.PREPARATORY_ITERATIONS, "1") ;
 		cadytsPtConfig.addParam(CadytsConfigGroup.TIME_BIN_SIZE, "3600") ;
 		cadytsPtConfig.addParam(CadytsConfigGroup.CALIBRATED_LINES, "M44,M43") ;
-		
+
 		CadytsConfigGroup ccc = new CadytsConfigGroup() ;
 		config.addModule(ccc) ;
-		
-		
+
+
 		// ---
 		config.ptCounts().setOccupancyCountsFileName(inputDir + "counts/counts_occupancy.xml") ;
 		config.ptCounts().setBoardCountsFileName(inputDir + "counts/counts_boarding.xml") ;
 		config.ptCounts().setAlightCountsFileName(inputDir + "counts/counts_alighting.xml") ;
-//		config.ptCounts().setDistanceFilter(30000.) ; // why?
-//		config.ptCounts().setDistanceFilterCenterNode("7") ; // why?
+		//		config.ptCounts().setDistanceFilter(30000.) ; // why?
+		//		config.ptCounts().setDistanceFilterCenterNode("7") ; // why?
 		config.ptCounts().setOutputFormat("txt");
 		config.ptCounts().setCountsScaleFactor(1.) ;
 		// ---

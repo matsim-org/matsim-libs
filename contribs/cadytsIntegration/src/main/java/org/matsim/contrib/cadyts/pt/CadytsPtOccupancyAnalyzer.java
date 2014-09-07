@@ -250,16 +250,26 @@ class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandler, Pers
 
 	@Override
 	public double getSimValue(TransitStopFacility link, int startTimeS, int endTimeS, TYPE type) {
-		return this.getOccupancyVolumeForStopAndTime(link.getId(), startTimeS) ;
+		final int tmp = (endTimeS - startTimeS) % 3600;
+		if ( tmp != 0  || tmp != 1 ){ // the specification is that it should go from, say, 3600(inc.) to 7200(excl.), but I am finding 7199 as well. kai, sep'14
+			throw new RuntimeException("this only works for time spans that are multiples of hours. kai, sep'14") ;
+		}
+		double sum = 0. ;
+		int cnt = 0 ;
+		for ( int sec = startTimeS ; sec < endTimeS ; sec += 3600 ) { // no second contribution both for endTimeS=7199 and 7200
+			sum += this.getOccupancyVolumeForStopAndTime(link.getId(), startTimeS) ;
+			cnt++ ;
+		}
+		switch (type){
+		case COUNT_VEH:
+			return sum ;
+		case FLOW_VEH_H:
+			return sum / cnt ; 
+		default:
+			throw new RuntimeException("not implemented") ;
+		}
 	}
 
-//	public void run(final String eventFileName) {
-//		EventsManager events = EventsUtils.createEventsManager();
-//		events.addHandler(this);
-//		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-//		reader.parse(eventFileName);
-//	}
-	
 	@Override
 	public String toString() {
 		final StringBuffer stringBuffer2 = new StringBuffer();

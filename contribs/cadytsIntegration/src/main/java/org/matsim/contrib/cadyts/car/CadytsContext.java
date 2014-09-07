@@ -68,7 +68,7 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 	private PlanToPlanStepBasedOnEvents ptStep;
 	private SimResultsContainerImpl simResults;
 	
-	public CadytsContext(Config config) {
+	public CadytsContext(Config config, Counts counts ) {
 		
 		this.countsScaleFactor = config.counts().getCountsScaleFactor();
 		
@@ -77,34 +77,26 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 		// addModule() also initializes the config group with the values read from the config file
 		cadytsConfig.setWriteAnalysisFile(true);
 		
-		this.counts = new Counts();
-		String occupancyCountsFilename = config.counts().getCountsFileName();
-		new MatsimCountsReader(this.counts).readFile(occupancyCountsFilename);
+		if ( counts==null ) {
+			this.counts = new Counts();
+			String occupancyCountsFilename = config.counts().getCountsFileName();
+			new MatsimCountsReader(this.counts).readFile(occupancyCountsFilename);
+		} else {
+			this.counts = counts ;
+		}
 		
 		Set<Id> countedLinks = new TreeSet<Id>();
-		for (Id id : this.counts.getCounts().keySet()) countedLinks.add(id);
+		for (Id id : this.counts.getCounts().keySet()) {
+			countedLinks.add(id);
+		}
 		
 		cadytsConfig.setCalibratedItems(countedLinks);
 		
 		this.writeAnalysisFile = cadytsConfig.isWriteAnalysisFile();
 	}
 	
-	public CadytsContext(Config config, Counts counts) {
-		this.countsScaleFactor = config.counts().getCountsScaleFactor();
-		
-		this.cadytsConfig = new CadytsConfigGroup();
-		config.addModule(cadytsConfig);
-		// addModule() also initializes the config group with the values read from the config file
-		cadytsConfig.setWriteAnalysisFile(true);
-		
-		this.counts = counts;
-		
-		Set<Id> countedLinks = new TreeSet<Id>();
-		for (Id id : this.counts.getCounts().keySet()) countedLinks.add(id);
-		
-		cadytsConfig.setCalibratedItems(countedLinks);
-		
-		this.writeAnalysisFile = cadytsConfig.isWriteAnalysisFile();
+	public CadytsContext(Config config ) {
+		this( config, null ) ;
 	}
 
 	@Override
@@ -163,6 +155,7 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 	// ===========================================================================================================================
 	// private methods & pure delegate methods only below this line
 
+	@SuppressWarnings("static-method")
 	private boolean isActiveInThisIteration(final int iter, final Controler controler) {
 		return (iter > 0 && iter % controler.getConfig().counts().getWriteCountsInterval() == 0);
 //		return (iter % controler.getConfig().counts().getWriteCountsInterval() == 0);

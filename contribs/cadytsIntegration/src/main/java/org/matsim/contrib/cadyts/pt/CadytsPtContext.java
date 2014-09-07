@@ -82,10 +82,7 @@ CadytsContextI<TransitStopFacility> {
 
 	private CadytsConfigGroup cadytsConfig;
 
-	private final Config config;
-
 	public CadytsPtContext(final Config config, EventsManager events) {
-		this.config = config;
 		cadytsConfig = (CadytsConfigGroup) config.getModule(CadytsConfigGroup.GROUP_NAME);
 
 		// === prepare the structure which extracts the measurements from the simulation:
@@ -128,7 +125,7 @@ CadytsContextI<TransitStopFacility> {
 		EventsManager events = event.getControler().getEvents();
 
 		// === prepare the calibrator by giving measurements to it:
-		String occupancyCountsFilename = config.ptCounts().getOccupancyCountsFileName();
+		String occupancyCountsFilename = event.getControler().getConfig().ptCounts().getOccupancyCountsFileName();
 		new MatsimCountsReader(this.occupCounts).readFile(occupancyCountsFilename);
 
 		// build the calibrator. This is a static method, and in consequence has no side effects
