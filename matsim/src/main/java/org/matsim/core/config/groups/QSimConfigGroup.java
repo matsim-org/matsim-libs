@@ -81,6 +81,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	private static final String SNAPSHOT_STYLE = "snapshotStyle";
 	public static final String SNAPSHOT_EQUI_DIST = "equiDist";
 	public static final String SNAPSHOT_AS_QUEUE = "queue";
+	public static final String SNAPSHOT_WITH_HOLES = "withHolesExperimental" ;
 	private String snapshotStyle = SNAPSHOT_EQUI_DIST;
 	
 	// ---
@@ -191,8 +192,13 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	@Override
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
-		map.put(SNAPSHOT_STYLE,"snapshotStyle: `equiDist' (vehicles equidistant on link) or `queue' (vehicles queued at end of link) or `withHolesExperimental' (experimental!!)");
-		map.put(NUMBER_OF_THREADS, "Use number of threads > 1 for parallel version using the specified number of threads");
+		map.put(SNAPSHOT_STYLE,"snapshotStyle. One of: " 
+				+ SNAPSHOT_EQUI_DIST + " (vehicles equidistant on link) or " 
+				+ SNAPSHOT_AS_QUEUE + " (vehicles queued at end of link) or "
+				+ SNAPSHOT_WITH_HOLES + " (experimental!!)" );
+		map.put(NUMBER_OF_THREADS, "Number of threads used for the QSim.  "
+				+ "Note that this setting is independent from the \"global\" threads setting.  "
+				+ "In contrast to earlier versions, the non-parallel special version is no longer there." ) ;
 		map.put(REMOVE_STUCK_VEHICLES, REMOVE_STUCK_VEHICLES_STRING );
 		map.put(STUCK_TIME, STUCK_TIME_STRING );
 		map.put(TRAFFIC_DYNAMICS, "`"
@@ -319,7 +325,8 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 
 	public void setTrafficDynamics(final String str) {
 		this.trafficDynamics = str;
-		if ( !TRAFF_DYN_QUEUE.equals(this.trafficDynamics) && !TRAFF_DYN_W_HOLES.equals(this.trafficDynamics) ) {
+		if ( !TRAFF_DYN_QUEUE.equals(this.trafficDynamics) && !TRAFF_DYN_W_HOLES.equals(this.trafficDynamics) 
+				&& !"withHolesExperimental".equals(this.snapshotStyle) ) {
 			log.warn("The trafficDynamics \"" + str + "\" is ot one of the known ones. "
 					+ "See comment in config dump in log file for allowed styles." );
 		}

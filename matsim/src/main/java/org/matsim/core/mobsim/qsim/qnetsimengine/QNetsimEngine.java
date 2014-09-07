@@ -96,7 +96,8 @@ public class QNetsimEngine implements MobsimEngine {
 	public QNetsimEngine(final QSim sim, NetsimNetworkFactory<QNode, ? extends QLinkInternalI> netsimNetworkFactory ) {
 		this.qsim = sim;
 
-		this.stucktimeCache = sim.getScenario().getConfig().qsim().getStuckTime();
+		final QSimConfigGroup qsimConfigGroup = sim.getScenario().getConfig().qsim();
+		this.stucktimeCache = qsimConfigGroup.getStuckTime();
 
 		// configuring the car departure hander (including the vehicle behavior)
 		QSimConfigGroup qSimConfigGroup = this.qsim.getScenario().getConfig().qsim();
@@ -112,14 +113,16 @@ public class QNetsimEngine implements MobsimEngine {
 		}
 		dpHandler = new VehicularDepartureHandler(this, vehicleBehavior);
 
-		// yyyyyy I am quite sceptic if the following should stay since it does not work.  kai, feb'11
-		if ( "queue".equals( sim.getScenario().getConfig().qsim().getTrafficDynamics() ) ) {
+		if ( QSimConfigGroup.TRAFF_DYN_QUEUE.equals( qsimConfigGroup.getTrafficDynamics() ) ) {
 			QueueWithBuffer.HOLES=false ;
-		} else if ( "withHolesExperimental".equals( sim.getScenario().getConfig().qsim().getTrafficDynamics() ) ) {
+		} else if ( QSimConfigGroup.TRAFF_DYN_W_HOLES.equals( qsimConfigGroup.getTrafficDynamics() ) ) {
 			QueueWithBuffer.HOLES = true ;
 		} else {
 			throw new RuntimeException("trafficDynamics defined in config that does not exist: "
-					+ sim.getScenario().getConfig().qsim().getTrafficDynamics() ) ;
+					+ qsimConfigGroup.getTrafficDynamics() ) ;
+		}
+		if ( QSimConfigGroup.SNAPSHOT_WITH_HOLES.equals( qsimConfigGroup.getSnapshotStyle() ) ) {
+			QueueWithBuffer.VIS_HOLES = true ;
 		}
 
 		// the following is so confused because I can't separate it out, the reason being that ctor calls need to be the 
@@ -142,7 +145,7 @@ public class QNetsimEngine implements MobsimEngine {
 											LaneDefinitions20.ELEMENT_NAME)));
 		} else if ( netsimNetworkFactory != null ){
 			network = new QNetwork( sim.getScenario().getNetwork(), netsimNetworkFactory ) ;
-		} else if (QSimConfigGroup.LinkDynamics.valueOf(sim.getScenario().getConfig().qsim().getLinkDynamics()) == QSimConfigGroup.LinkDynamics.PassingQ) {
+		} else if (QSimConfigGroup.LinkDynamics.valueOf(qsimConfigGroup.getLinkDynamics()) == QSimConfigGroup.LinkDynamics.PassingQ) {
 			network = new QNetwork(sim.getScenario().getNetwork(), new NetsimNetworkFactory<QNode, QLinkImpl>() {
 				@Override
 				public QLinkImpl createNetsimLink(final Link link, final QNetwork network, final QNode toQueueNode) {
@@ -156,7 +159,7 @@ public class QNetsimEngine implements MobsimEngine {
 		} else {
 			network = new QNetwork(sim.getScenario().getNetwork(), new DefaultQNetworkFactory());
 		}
-		network.getLinkWidthCalculator().setLinkWidth(sim.getScenario().getConfig().qsim().getLinkWidth());
+		network.getLinkWidthCalculator().setLinkWidth(qsimConfigGroup.getLinkWidth());
 		network.initialize(this);
 
 		this.positionInfoBuilder = this.createAgentSnapshotInfoBuilder( sim.getScenario() );
@@ -180,13 +183,9 @@ public class QNetsimEngine implements MobsimEngine {
 		if ("queue".equalsIgnoreCase(snapshotStyle)){
 			return new QueueAgentSnapshotInfoBuilder(scenario, this.network.getAgentSnapshotInfoFactory());
 		}
-		else  if ("equiDist".equalsIgnoreCase(snapshotStyle)){
+		else  if ("equiDist".equalsIgnoreCase(snapshotStyle) || "withHolesExperimental".equalsIgnoreCase(snapshotStyle) ){
+			// the difference is not in the spacing, thus cannot be differentiated by using different classes.  kai, sep'14
 			return new EquiDistAgentSnapshotInfoBuilder(scenario, this.network.getAgentSnapshotInfoFactory());
-		}
-		else if ("withHolesExperimental".equalsIgnoreCase(snapshotStyle)){
-			log.warn("The snapshot style \"withHolesExperimental\" is no longer supported, using \"queue\" instead. ");
-//			return new QueueAgentSnapshotInfoBuilder(scenario, this.network.getAgentSnapshotInfoFactory());
-			return new WithHolesAgentSnapshotInfoBuilder(scenario, this.network.getAgentSnapshotInfoFactory());
 		}
 		else {
 			log.warn("The snapshotStyle \"" + snapshotStyle + "\" is not supported. Using equiDist");

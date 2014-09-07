@@ -91,7 +91,7 @@ public class MatsimPopulationReader extends MatsimXmlParser implements Populatio
 			this.delegate = new PopulationReaderMatsimV0(this.scenario);
 			log.info("using plans_v0-reader.");
 		} else {
-			throw new IllegalArgumentException("Doctype \"" + doctype + "\" not known.");
+			throw new IllegalArgumentException("No population reader available for doctype \"" + doctype + "\".");
 		}
 	}
 

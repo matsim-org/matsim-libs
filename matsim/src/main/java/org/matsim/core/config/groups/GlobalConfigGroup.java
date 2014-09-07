@@ -20,6 +20,7 @@
 
 package org.matsim.core.config.groups;
 
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -41,6 +42,15 @@ public class GlobalConfigGroup extends Module {
 	private long randomSeed = 4711L;
 	private int numberOfThreads = 2;
 	private String coordinateSystem = "Atlantis";
+	
+	@Override
+	public Map<String, String> getComments() {
+		Map<String,String> map = super.getComments();
+		map.put(NUMBER_OF_THREADS, "\"global\" number of threads.  "
+				+ "This number is used, e.g., for replanning, but NOT in the mobsim.  "
+				+ "This can typically be set to as many cores as you have available, or possibly even slightly more.") ;
+		return map ;
+	}
 
 	@Override
 	public String getValue(final String key) {
