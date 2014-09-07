@@ -21,15 +21,9 @@ package playground.agarwalamit.patnaIndia;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehicleWriterV1;
@@ -46,32 +40,32 @@ public class CreateVehiclesForPatna {
 
 		Config config = ConfigUtils.createConfig();
 		config.plans().setInputFile(inputPlans);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+//		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 
 		Map<String, VehicleType> modesType = new HashMap<String, VehicleType>(); 
-		VehicleType car = VehicleUtils.getFactory().createVehicleType(new IdImpl("car"));
+		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car",VehicleType.class));
 		car.setMaximumVelocity(60.0/3.6);
 		car.setPcuEquivalents(1.0);
 		modesType.put("car", car);
 
-		VehicleType motorcycle = VehicleUtils.getFactory().createVehicleType(new IdImpl("motorbike"));
+		VehicleType motorcycle = VehicleUtils.getFactory().createVehicleType(Id.create("motorbike",VehicleType.class));
 		motorcycle.setMaximumVelocity(60.0/3.6);
 		motorcycle.setPcuEquivalents(0.25);
 		modesType.put("motorbike", motorcycle);
 
-		VehicleType bicycle = VehicleUtils.getFactory().createVehicleType(new IdImpl("bike"));
+		VehicleType bicycle = VehicleUtils.getFactory().createVehicleType(Id.create("bike",VehicleType.class));
 		bicycle.setMaximumVelocity(15.0/3.6);
 		bicycle.setPcuEquivalents(0.25);
 		modesType.put("bike", bicycle);
 
-		VehicleType walk = VehicleUtils.getFactory().createVehicleType(new IdImpl("walk"));
+		VehicleType walk = VehicleUtils.getFactory().createVehicleType(Id.create("walk",VehicleType.class));
 		walk.setMaximumVelocity(1.5);
 		walk.setPcuEquivalents(0.10);  			// assumed pcu for walks is 0.1
 		modesType.put("walk",walk);
 
-		VehicleType pt = VehicleUtils.getFactory().createVehicleType(new IdImpl("pt"));
+		VehicleType pt = VehicleUtils.getFactory().createVehicleType(Id.create("pt",VehicleType.class));
 		pt.setMaximumVelocity(40/3.6);
 		pt.setPcuEquivalents(5);  			// assumed pcu for walks is 0.1
 		modesType.put("pt",pt);

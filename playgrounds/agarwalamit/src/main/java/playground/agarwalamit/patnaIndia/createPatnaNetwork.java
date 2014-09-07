@@ -86,7 +86,7 @@ public class createPatnaNetwork {
 				String toNodeXCoord = row [11];
 				String toNodeYCoord = row [13];
 
-				Id fromNodeId = scenario.createId(FromNodeId);
+				Id<Node> fromNodeId = Id.create(FromNodeId,Node.class);
 				Node fromNode;
 
 				if (network.getNodes().containsKey(fromNodeId)) {     
@@ -100,7 +100,7 @@ public class createPatnaNetwork {
 					network.addNode(fromNode);
 				}
 
-				Id toNodeId = scenario.createId(ToNodeId);
+				Id<Node> toNodeId = Id.create(ToNodeId,Node.class);
 				Node toNode;
 				if (network.getNodes().containsKey(toNodeId)) {     		   
 					toNode = network.getNodes().get(toNodeId);
@@ -113,8 +113,8 @@ public class createPatnaNetwork {
 					network.addNode(toNode);
 				}
 
-				Link link1 = network.getFactory().createLink(scenario.createId(linkId), fromNode, toNode); 
-				Link link2 = network.getFactory().createLink(scenario.createId(linkId + "10000"), toNode, fromNode);   
+				Link link1 = network.getFactory().createLink(Id.create(linkId,Link.class), fromNode, toNode); 
+				Link link2 = network.getFactory().createLink(Id.create(linkId + "10000",Link.class), toNode, fromNode);   
 				
 //				int streamSpeed = Integer.parseInt(speedInKmph);
 //				double freeSpeed = 0;

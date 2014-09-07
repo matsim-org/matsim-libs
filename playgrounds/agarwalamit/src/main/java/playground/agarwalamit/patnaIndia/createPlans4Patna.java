@@ -27,6 +27,7 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 import org.geotools.data.FeatureSource;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -82,8 +83,6 @@ public class createPlans4Patna {
 		logger.info("Writing Plan file is finished.");
 
 	}
-	// TODO [AA] what are these suppressWarnings? 
-	@SuppressWarnings({ "unchecked", "unused", "resource", "deprecation", "rawtypes" })
 	private static void filesReader (String planFile, String zoneFile, Scenario scenario, int startId) throws IOException 	{
 
 		FeatureSource featureSource = ShapeFileReader.readDataFile(zoneFile);
@@ -172,7 +171,7 @@ Oct 11, 2013 4:04:22 PM org.geotools.data.shapefile.ShpFiles logCurrentLockers
 				}
 			}
 			//			for (int j=0; j<1; j++){ //run with 1% sample
-			Person person = factory.createPerson(scenario.createId(Integer.toString(startId++)));
+			Person person = factory.createPerson(Id.create(Integer.toString(startId++),Person.class));
 			System.out.println(person.getId().toString());
 			population.addPerson(person);
 			Plan plan = factory.createPlan();

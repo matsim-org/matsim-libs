@@ -1,16 +1,17 @@
 package playground.agarwalamit.patnaIndia;
 
-import org.matsim.core.basic.v01.IdImpl;
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-import playground.agarwalamit.patnaIndia.mixedTraffic.VehiclesConfigGroup;
 
-import java.util.Arrays;
-import java.util.Collection;
+import playground.agarwalamit.patnaIndia.mixedTraffic.VehiclesConfigGroup;
 
 public class WriteConfig {
 	/**
@@ -70,19 +71,19 @@ public class WriteConfig {
 		config.qsim().setMainModes(mainModes);
 		config.qsim().setTrafficDynamics("queue");
 
-		StrategySettings expChangeBeta = new StrategySettings(new IdImpl("1"));
+		StrategySettings expChangeBeta = new StrategySettings(Id.create("1",StrategySettings.class));
 		expChangeBeta.setModuleName("ChangeExpBeta");
 		expChangeBeta.setProbability(0.9);
 
-		StrategySettings reRoute = new StrategySettings(new IdImpl("2"));
+		StrategySettings reRoute = new StrategySettings(Id.create("2",StrategySettings.class));
 		reRoute.setModuleName("ReRoute");
 		reRoute.setProbability(0.1);
 
-		StrategySettings modeChoice = new StrategySettings(new IdImpl("4"));
+		StrategySettings modeChoice = new StrategySettings(Id.create("4",StrategySettings.class));
 		modeChoice.setModuleName("ChangeLegMode");
 		modeChoice.setProbability(0.05);
 
-		StrategySettings timeAllocationMutator	= new StrategySettings(new IdImpl("3"));
+		StrategySettings timeAllocationMutator	= new StrategySettings(Id.create("3",StrategySettings.class));
 		timeAllocationMutator.setModuleName("TimeAllocationMutator");
 		timeAllocationMutator.setProbability(0.05);
 

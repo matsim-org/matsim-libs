@@ -27,8 +27,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.internal.MatsimReader;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -103,7 +101,7 @@ public class PatnaQSimFactory implements MobsimFactory {
 		VehicleReaderV1 reader = new VehicleReaderV1(vehicles);
 		reader.readFile("./patnaOutput/vehiclesPatna.xml");
 		vehicles.getVehicleTypes();
-		for(Id id:vehicles.getVehicleTypes().keySet()){
+		for(Id<VehicleType> id:vehicles.getVehicleTypes().keySet()){
 			modeVehicleTypes.put(id.toString(), vehicles.getVehicleTypes().get(id));
 		}
 		//===
