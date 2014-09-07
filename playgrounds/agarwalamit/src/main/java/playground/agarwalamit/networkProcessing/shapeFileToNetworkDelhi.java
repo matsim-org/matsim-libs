@@ -26,10 +26,10 @@ import org.geotools.feature.simple.SimpleFeatureTypeImpl;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.network.NetworkWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
@@ -46,8 +46,8 @@ import org.opengis.feature.simple.SimpleFeature;
 public class shapeFileToNetworkDelhi {
 
 	private final static String networkShapeFile = "./input/sarojini/abc.shp";
-	private static String matsimNetwork = "./input/sarojini/matsimNetwork.xml";
-	final static CoordinateTransformation ct =TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,"EPSG:24378");
+	private final static String matsimNetwork = "./input/sarojini/matsimNetwork.xml";
+	final  static CoordinateTransformation ct =TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,"EPSG:24378");
 	private static Map<Coord, String> coordId = new HashMap<Coord, String>();
 
 	public static void main(String[] args) {
@@ -75,7 +75,7 @@ public class shapeFileToNetworkDelhi {
 					coordId.put(fromCoord, fNodeIdStr);
 				}
 
-				Id fromNodeId = scenario.createId(fNodeIdStr);
+				Id<Node> fromNodeId = Id.create(fNodeIdStr,Node.class);
 				Node node1;
 
 				if(!network.getNodes().containsKey((fromNodeId))){
@@ -98,7 +98,7 @@ public class shapeFileToNetworkDelhi {
 					coordId.put(toCoord, tNodeIdStr);
 				}
 
-				Id toNodeId = scenario.createId(tNodeIdStr);
+				Id<Node> toNodeId = Id.create(tNodeIdStr,Node.class);
 
 				Node node2;
 
@@ -109,8 +109,8 @@ public class shapeFileToNetworkDelhi {
 				}
 
 				// matsim have one way links thus create two links for both directions
-				Id linkId1 = new IdImpl(node1.getId().toString()+"_"+node2.getId().toString());
-				Id linkId2 = new IdImpl(node2.getId().toString()+"_"+node1.getId().toString());
+				Id<Link> linkId1 = Id.create(node1.getId().toString()+"_"+node2.getId().toString(),Link.class);
+				Id<Link> linkId2 =Id.create(node2.getId().toString()+"_"+node1.getId().toString(),Link.class);
 
 				if(node1.equals(node2)){
 					//					throw new RuntimeException();

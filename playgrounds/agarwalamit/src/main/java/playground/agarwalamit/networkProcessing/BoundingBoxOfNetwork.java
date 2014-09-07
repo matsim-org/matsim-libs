@@ -30,24 +30,24 @@ import org.matsim.core.scenario.ScenarioUtils;
  * @author amit
  */
 public class BoundingBoxOfNetwork {
-	String networkFile;
-	double minX;
-	double maxX;
-	double minY;
-	double maxY;
+	private String networkFile;
+	private double minX;
+	private double maxX;
+	private double minY;
+	private double maxY;
 
 	public BoundingBoxOfNetwork(String networkFile) {
 		this.networkFile  = networkFile;
-		minX=99999990.; 
-		maxX=0.;
-		minY=99999990.;
-		maxY=0.;
+		this.minX=99999990.; 
+		this.maxX=0.;
+		this.minY=99999990.;
+		this.maxY=0.;
 		run();
 	}
 
 	private void run() {
 		Config config = ConfigUtils.createConfig();
-		config.network().setInputFile(networkFile);
+		config.network().setInputFile(this.networkFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Network network = scenario.getNetwork();
 
@@ -55,27 +55,27 @@ public class BoundingBoxOfNetwork {
 			Coord coord = node.getCoord();
 			double xcoord = coord.getX();
 			double ycoord = coord.getY();
-			minX = Math.min(xcoord, minX);
-			minY = Math.min(ycoord, minY);
-			maxX = Math.max(xcoord, maxX);
-			maxY = Math.max(ycoord, maxY);
+			this.minX = Math.min(xcoord, this.minX);
+			this.minY = Math.min(ycoord, this.minY);
+			this.maxX = Math.max(xcoord, this.maxX);
+			this.maxY = Math.max(ycoord, this.maxY);
 		}
 	}
 
 	public double getMinX() {
-		return minX;
+		return this.minX;
 	}
 
 	public double getMaxX() {
-		return maxX;
+		return this.maxX;
 	}
 
 	public double getMinY() {
-		return minY;
+		return this.minY;
 	}
 
 	public double getMaxY() {
-		return maxY;
+		return this.maxY;
 	}
 	public static void main(String[] args) {
 		BoundingBoxOfNetwork bbx = new BoundingBoxOfNetwork("./input/baseCase/SiouxFalls_networkWithRoadType.xml.gz");

@@ -44,10 +44,10 @@ import com.vividsolutions.jts.geom.Coordinate;
  */
 public class MatsimNetwork2Shape {
 
-	private static String clusterPathDesktop = "/Users/aagarwal/Desktop/ils/agarwal/siouxFalls/";
+	private static final String clusterPathDesktop = "/Users/aagarwal/Desktop/ils/agarwal/siouxFalls/";
 	
-	private static String matsimNetwork = clusterPathDesktop+"/output/run0/output_network.xml.gz";
-	private static String outShapeLocation = "./clusterOutput/networkShape/";
+	private static final String matsimNetwork = clusterPathDesktop+"/output/run0/output_network.xml.gz";
+	private static final String outShapeLocation = "./clusterOutput/networkShape/";
 	
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
