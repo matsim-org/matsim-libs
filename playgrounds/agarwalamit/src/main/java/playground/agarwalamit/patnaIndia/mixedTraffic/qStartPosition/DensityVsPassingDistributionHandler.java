@@ -29,6 +29,8 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author amit
@@ -36,19 +38,19 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
  */
 public class DensityVsPassingDistributionHandler implements PersonDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler {
 
-	private Map<Id, String> personId2LegMode;
+	private Map<Id<Person>, String> personId2LegMode;
 	private final Map<String, Double> legMode2PCU;
 	private Map<Double, Double> density2TotalOvertakenBicycles;
 	private Map<Double, Double> density2AverageOvertakenBicycles;
 	private double localDensity = 0.;
-	private Map<Id, Double> personId2LinkEnterTime;
-	private final Id linkId;
+	private Map<Id<Person>, Double> personId2LinkEnterTime;
+	private final Id<Link> linkId;
 
-	public DensityVsPassingDistributionHandler(Id linkId) {
-		this.personId2LegMode = new HashMap<Id, String>();
+	public DensityVsPassingDistributionHandler(Id<Link> linkId) {
+		this.personId2LegMode = new HashMap<Id<Person>, String>();
 		this.density2TotalOvertakenBicycles = new HashMap<Double, Double>();
 		this.density2AverageOvertakenBicycles=new HashMap<Double, Double>();
-		this.personId2LinkEnterTime = new HashMap<Id, Double>();
+		this.personId2LinkEnterTime = new HashMap<Id<Person>, Double>();
 		this.legMode2PCU = new HashMap<String, Double>();
 		this.linkId = linkId;
 
@@ -72,7 +74,7 @@ public class DensityVsPassingDistributionHandler implements PersonDepartureEvent
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		Id personId = event.getPersonId();
+		Id<Person> personId = event.getPersonId();
 		if(event.getLinkId().equals(this.linkId)){
 
 			this.localDensity -=this.legMode2PCU.get(this.personId2LegMode.get(personId));
@@ -86,7 +88,7 @@ public class DensityVsPassingDistributionHandler implements PersonDepartureEvent
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		Id personId = event.getPersonId();
+		Id<Person> personId = event.getPersonId();
 
 		if(event.getLinkId().equals(this.linkId)){
 			this.personId2LinkEnterTime.put(personId, event.getTime());
@@ -97,7 +99,7 @@ public class DensityVsPassingDistributionHandler implements PersonDepartureEvent
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		personId2LegMode.put(event.getPersonId(),event.getLegMode());
+		this.personId2LegMode.put(event.getPersonId(),event.getLegMode());
 	}
 
 	private void updateDensity2OvertakenBicycleCount(double localDensity, LinkLeaveEvent event){
@@ -110,7 +112,7 @@ public class DensityVsPassingDistributionHandler implements PersonDepartureEvent
 	private double getNumberOfBicycleOvertaken(LinkLeaveEvent event) {
 		double overtakenBicycles =0;
 
-		for(Id personId:this.personId2LinkEnterTime.keySet()){
+		for(Id<Person> personId:this.personId2LinkEnterTime.keySet()){
 			if(this.personId2LinkEnterTime.get(event.getPersonId())>this.personId2LinkEnterTime.get(personId)){
 				overtakenBicycles++;
 			}

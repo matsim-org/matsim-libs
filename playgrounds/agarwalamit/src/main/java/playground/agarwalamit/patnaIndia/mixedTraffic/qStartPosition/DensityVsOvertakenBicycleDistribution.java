@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
@@ -44,7 +44,7 @@ public class DensityVsOvertakenBicycleDistribution extends AbstractAnalyisModule
 
 	public DensityVsOvertakenBicycleDistribution(String eventFile) {
 		super(DensityVsOvertakenBicycleDistribution.class.getSimpleName());
-		Id linkId = new IdImpl("1");
+		Id<Link> linkId = Id.create("1",Link.class);
 		this.dpd = new DensityVsPassingDistributionHandler(linkId);
 		this.dfsv = new DensityVsFractionOfStoppedVehiclesHandler(linkId, 1000);
 		this.eventFile = eventFile;

@@ -38,17 +38,17 @@ public class PersonOnLinkInformation {
 
 	public double getFreeSpeedLinkTravelTime() {
 		setFreeSpeedLinkTravelTime();
-		return freeSpeedLinkTravelTime;
+		return this.freeSpeedLinkTravelTime;
 	}
 
 	private void setFreeSpeedLinkTravelTime() {
 		//		double tt = getLinkLength() / Math.min(link.getFreespeed(), getVehicleSpeed(this.legMode));
-		double tt = availableLinkSpace / Math.min(link.getFreespeed(), getVehicleSpeed(this.legMode));
+		double tt = this.availableLinkSpace / Math.min(this.link.getFreespeed(), getVehicleSpeed(this.legMode));
 		this.freeSpeedLinkTravelTime = tt;
 	}
 
 	public double getLinkEnterTime() {
-		return linkEnterTime;
+		return this.linkEnterTime;
 	}
 
 	public void setLinkEnterTime(double linkEnterTime) {
@@ -56,7 +56,7 @@ public class PersonOnLinkInformation {
 	}
 
 	public double getLinkLeaveTime() {
-		return linkLeaveTime;
+		return this.linkLeaveTime;
 	}
 
 	public void setLinkLeaveTime(double linkLeaveTime) {
@@ -64,7 +64,7 @@ public class PersonOnLinkInformation {
 	}
 
 	public String getLegMode() {
-		return legMode;
+		return this.legMode;
 	}
 
 	public void setLegMode(String legMode) {
@@ -82,11 +82,11 @@ public class PersonOnLinkInformation {
 
 	private double getVehicleSpeed(String travelMode) {
 		double vehicleSpeed =0;
-		if(travelMode.equals(travelModes[0])||travelMode.equals("fast")) {
+		if(travelMode.equals(this.travelModes[0])||travelMode.equals("fast")) {
 			vehicleSpeed= 16.67;
-		} else if(travelMode.equals(travelModes[1])||travelMode.equals("med")) {
+		} else if(travelMode.equals(this.travelModes[1])||travelMode.equals("med")) {
 			vehicleSpeed = 16.67;
-		} else if(travelMode.equals(travelModes[2])||travelMode.equals("truck")){
+		} else if(travelMode.equals(this.travelModes[2])||travelMode.equals("truck")){
 			vehicleSpeed= 4.167;
 		}
 		return vehicleSpeed;
@@ -100,7 +100,7 @@ public class PersonOnLinkInformation {
 	}
 
 	public boolean addVehicleInQ() {
-		return addVehicleInQ;
+		return this.addVehicleInQ;
 	}
 
 	public void setAvailableLinkSpace(double availableLinkSpace) {
@@ -112,6 +112,6 @@ public class PersonOnLinkInformation {
 	}
 	public void setQueuingTime(double availableSpaceSoFar){
 		// to set actual queuing time (45.56) not like earlier (45.0).
-		this.queuingTime = linkEnterTime + availableSpaceSoFar / Math.min(link.getFreespeed(), getVehicleSpeed(this.legMode));
+		this.queuingTime = this.linkEnterTime + availableSpaceSoFar / Math.min(this.link.getFreespeed(), getVehicleSpeed(this.legMode));
 	}
 }

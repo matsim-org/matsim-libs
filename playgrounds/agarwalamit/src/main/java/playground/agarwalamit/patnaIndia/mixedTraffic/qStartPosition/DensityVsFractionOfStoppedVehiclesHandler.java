@@ -28,26 +28,28 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author amit
  */
 public class DensityVsFractionOfStoppedVehiclesHandler implements PersonDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler {
 
-	private final Id linkId ;
+	private final Id<Link> linkId ;
 	private Map<Double, Double> densityVsFractionOfStoppedVehicles;
 	private final Map<String, Double> legMode2PCU;
-	private Map<Id, String> personId2LegMode;
+	private Map<Id<Person>, String> personId2LegMode;
 	private double localDensity = 0.;
-	private Map<Id, Double> personId2LinkEnterTime;
+	private Map<Id<Person>, Double> personId2LinkEnterTime;
 	private Map<String, Double> legMode2FreeSpeddTravelTime;
 
-	public DensityVsFractionOfStoppedVehiclesHandler(Id linkId, double linkLength) {
+	public DensityVsFractionOfStoppedVehiclesHandler(Id<Link> linkId, double linkLength) {
 		this.linkId = linkId;
 
 		this.densityVsFractionOfStoppedVehicles = new HashMap<Double, Double>();
-		this.personId2LegMode = new HashMap<Id, String>();
-		this.personId2LinkEnterTime = new HashMap<Id, Double>();
+		this.personId2LegMode = new HashMap<Id<Person>, String>();
+		this.personId2LinkEnterTime = new HashMap<Id<Person>, Double>();
 		this.legMode2PCU = new HashMap<String, Double>();
 		this.legMode2FreeSpeddTravelTime = new HashMap<String, Double>();
 
@@ -74,7 +76,7 @@ public class DensityVsFractionOfStoppedVehiclesHandler implements PersonDepartur
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		Id personId = event.getPersonId();
+		Id<Person> personId = event.getPersonId();
 		if(event.getLinkId().equals(this.linkId)){
 
 			this.localDensity -=this.legMode2PCU.get(this.personId2LegMode.get(personId));
@@ -98,7 +100,7 @@ public class DensityVsFractionOfStoppedVehiclesHandler implements PersonDepartur
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		Id personId = event.getPersonId();
+		Id<Person> personId = event.getPersonId();
 
 		if(event.getLinkId().equals(this.linkId)){
 			this.personId2LinkEnterTime.put(personId, event.getTime());
@@ -109,7 +111,7 @@ public class DensityVsFractionOfStoppedVehiclesHandler implements PersonDepartur
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		personId2LegMode.put(event.getPersonId(),event.getLegMode());
+		this.personId2LegMode.put(event.getPersonId(),event.getLegMode());
 	}
 	
 	public Map<Double, Double> getDensityVsFractionOfStoppedVehicles(){
