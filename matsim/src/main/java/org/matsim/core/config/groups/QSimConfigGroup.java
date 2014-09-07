@@ -52,7 +52,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	private static final String VEHICLE_BEHAVIOR = "vehicleBehavior";
 
 	public static final String TRAFF_DYN_QUEUE = "queue";
-	public static final String TRAFF_DYN_W_HOLES = "withHolesExperimental";
+	public static final String TRAFF_DYN_W_HOLES = "withHoles";
 
 	public static final String MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END = "maxOfStarttimeAndEarliestActivityEnd";
 	public static final String ONLY_USE_STARTTIME = "onlyUseStarttime";
@@ -81,7 +81,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	private static final String SNAPSHOT_STYLE = "snapshotStyle";
 	public static final String SNAPSHOT_EQUI_DIST = "equiDist";
 	public static final String SNAPSHOT_AS_QUEUE = "queue";
-	public static final String SNAPSHOT_WITH_HOLES = "withHolesExperimental" ;
+	public static final String SNAPSHOT_WITH_HOLES = "withHoles" ;
 	private String snapshotStyle = SNAPSHOT_EQUI_DIST;
 	
 	// ---
