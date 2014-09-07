@@ -20,6 +20,7 @@
 package playground.andreas.P2.hook;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ScoringEvent;
@@ -38,16 +39,15 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
-
 import playground.andreas.P2.helper.PConfigGroup;
-import playground.andreas.P2.helper.PScenarioImpl;
 import playground.andreas.P2.pbox.PBox;
-import playground.andreas.P2.schedule.PTransitScheduleImpl;
 import playground.andreas.P2.stats.StatsManager;
 import playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter.PtMode2LineSetter;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Hook to register paratransit black box with MATSim
@@ -58,12 +58,6 @@ public class PHook implements IterationStartsListener, StartupListener, ScoringL
 	
 	private final static Logger log = Logger.getLogger(PHook.class);
 
-	private TransitSchedule baseSchedule;
-	private Vehicles baseVehicles;
-	
-	private TransitSchedule schedule;
-	private Vehicles vehicles;
-	
 	private PTransitRouterFactory pTransitRouterFactory = null;
 	private PVehiclesFactory pVehiclesFactory = null;
 	
@@ -74,7 +68,7 @@ public class PHook implements IterationStartsListener, StartupListener, ScoringL
 
 	private PersonReRouteStuckFactory stuckFactory;
 
-	public PHook(Controler controler) {
+    public PHook(Controler controler) {
 		this(controler, null, null, null, null);
 	}
 	
@@ -107,15 +101,11 @@ public class PHook implements IterationStartsListener, StartupListener, ScoringL
 	public void notifyStartup(StartupEvent event) {
 		this.statsManager.notifyStartup(event);
 		this.pBox.notifyStartup(event);
-		this.baseSchedule = event.getControler().getScenario().getTransitSchedule();
-		this.baseVehicles = ((ScenarioImpl) event.getControler().getScenario()).getVehicles();
-		this.schedule = addPTransitScheduleToOriginalOne(this.baseSchedule, this.pBox.getpTransitSchedule());
-		((PScenarioImpl) event.getControler().getScenario()).setTransitSchedule(this.schedule);
-		this.vehicles = this.addPVehiclesToOriginalOnes(this.baseVehicles, this.pVehiclesFactory.createVehicles(this.pBox.getpTransitSchedule()));
-		((PScenarioImpl) event.getControler().getScenario()).setVehicles(this.vehicles);
-		
+        addPTransitScheduleToOriginalOne(event.getControler().getScenario().getTransitSchedule(), this.pBox.getpTransitSchedule());
+		addPVehiclesToOriginalOnes(event.getControler().getScenario().getVehicles(), this.pVehiclesFactory.createVehicles(this.pBox.getpTransitSchedule()));
+
 		this.pTransitRouterFactory.createTransitRouterConfig(event.getControler().getConfig());
-		this.pTransitRouterFactory.updateTransitSchedule(this.schedule);
+		this.pTransitRouterFactory.updateTransitSchedule(event.getControler().getScenario().getTransitSchedule());
 		
 		if(this.agentsStuckHandler != null){
 			event.getControler().getEvents().addHandler(this.agentsStuckHandler);
@@ -129,12 +119,12 @@ public class PHook implements IterationStartsListener, StartupListener, ScoringL
 			log.info("This is the first iteration. All lines were added by notifyStartup event.");
 		} else {
 			this.pBox.notifyIterationStarts(event);
-			this.schedule = addPTransitScheduleToOriginalOne(this.baseSchedule, this.pBox.getpTransitSchedule());
-			((PScenarioImpl) event.getControler().getScenario()).setTransitSchedule(this.schedule);
-			this.vehicles = this.addPVehiclesToOriginalOnes(this.baseVehicles, this.pVehiclesFactory.createVehicles(this.pBox.getpTransitSchedule()));
-			((PScenarioImpl) event.getControler().getScenario()).setVehicles(this.vehicles);
-			
-			this.pTransitRouterFactory.updateTransitSchedule(this.schedule);
+            removePreviousPTransitScheduleFromOriginalOne(event.getControler().getScenario().getTransitSchedule());
+			addPTransitScheduleToOriginalOne(event.getControler().getScenario().getTransitSchedule(), this.pBox.getpTransitSchedule());
+			removePreviousPVehiclesFromScenario(event.getControler().getScenario().getVehicles());
+            addPVehiclesToOriginalOnes(event.getControler().getScenario().getVehicles(), this.pVehiclesFactory.createVehicles(this.pBox.getpTransitSchedule()));
+
+			this.pTransitRouterFactory.updateTransitSchedule(event.getControler().getScenario().getTransitSchedule());
 			
 			if(this.agentsStuckHandler != null){
 				ParallelPersonAlgorithmRunner.run(controler.getPopulation(), controler.getConfig().global().getNumberOfThreads(), new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
@@ -150,61 +140,77 @@ public class PHook implements IterationStartsListener, StartupListener, ScoringL
 		}
 		this.dumpTransitScheduleAndVehicles(event.getControler(), event.getIteration());
 	}
-	
-	@Override
+
+    @Override
 	public void notifyScoring(ScoringEvent event) {
 		this.pBox.notifyScoring(event);	
 	}
 
-	private TransitSchedule addPTransitScheduleToOriginalOne(TransitSchedule baseSchedule, TransitSchedule pSchedule) {
-		TransitSchedule schedule = new PTransitScheduleImpl(baseSchedule.getFactory());
-		
+    private Set<Id<TransitStopFacility>> currentPFacilityIDs = new HashSet<>();
+    private Set<Id<TransitLine>> currentPTransitLineIDs = new HashSet<>();
+
+	private void addPTransitScheduleToOriginalOne(TransitSchedule baseSchedule, TransitSchedule pSchedule) {
 		if(pSchedule == null){
-			log.info("pSchedule does not exist, returning non modified one");
-			return baseSchedule;
-		}
-		
-		for (TransitStopFacility pStop : baseSchedule.getFacilities().values()) {
-			schedule.addStopFacility(pStop);
+			log.info("pSchedule does not exist, doing nothing");
+            return;
 		}
 		for (TransitStopFacility pStop : pSchedule.getFacilities().values()) {
-			schedule.addStopFacility(pStop);
-		}
-		
-		for (TransitLine pLine : baseSchedule.getTransitLines().values()) {
-			schedule.addTransitLine(pLine);
+            if (!baseSchedule.getFacilities().containsKey(pStop.getId())) {
+                baseSchedule.addStopFacility(pStop);
+                currentPFacilityIDs.add(pStop.getId());
+            }
 		}
 		for (TransitLine pLine : pSchedule.getTransitLines().values()) {
-			schedule.addTransitLine(pLine);
+            if (!baseSchedule.getTransitLines().containsKey(pLine.getId())) {
+                baseSchedule.addTransitLine(pLine);
+                currentPTransitLineIDs.add(pLine.getId());
+            }
 		}
-		
-		return schedule;
 	}
-	
-	private Vehicles addPVehiclesToOriginalOnes(Vehicles baseVehicles, Vehicles pVehicles){
-		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
-		
-		for ( VehicleType t : baseVehicles.getVehicleTypes().values() ) {
-			vehicles.addVehicleType( t );
+
+    private void removePreviousPTransitScheduleFromOriginalOne(TransitSchedule transitSchedule) {
+        for (Id<TransitLine> transitLineId : currentPTransitLineIDs) {
+            transitSchedule.removeTransitLine(transitSchedule.getTransitLines().get(transitLineId));
+        }
+        currentPTransitLineIDs.clear();
+        for (Id<TransitStopFacility> facilityId : currentPFacilityIDs) {
+            transitSchedule.removeStopFacility(transitSchedule.getFacilities().get(facilityId));
+        }
+        currentPFacilityIDs.clear();
+    }
+
+    private Set<Id<VehicleType>> currentPVehicleTypeIDs = new HashSet<>();
+    private Set<Id<Vehicle>> currentPVehicleIDs = new HashSet<>();
+
+	private void addPVehiclesToOriginalOnes(Vehicles baseVehicles, Vehicles pVehicles){
+		for (VehicleType t : pVehicles.getVehicleTypes().values()) {
+            if (!baseVehicles.getVehicleTypes().containsKey(t.getId())) {
+                baseVehicles.addVehicleType(t);
+                currentPVehicleTypeIDs.add(t.getId());
+            }
 		}
-		for ( Vehicle v : baseVehicles.getVehicles().values() ) {
-			vehicles.addVehicle( v );
+		for (Vehicle v : pVehicles.getVehicles().values()) {
+            if (!baseVehicles.getVehicles().containsKey(v.getId())) {
+                baseVehicles.addVehicle(v);
+                currentPVehicleIDs.add(v.getId());
+            }
 		}
-		
-		
-		for ( VehicleType t : pVehicles.getVehicleTypes().values() ) {
-			vehicles.addVehicleType( t );
-		}
-		for ( Vehicle v : pVehicles.getVehicles().values() ) {
-			vehicles.addVehicle( v );
-		}
-		
-		return vehicles;
 	}
+
+    private void removePreviousPVehiclesFromScenario(Vehicles vehicles) {
+        for (Id<Vehicle> vehicleId : currentPVehicleIDs) {
+            vehicles.removeVehicle(vehicleId);
+        }
+        currentPVehicleIDs.clear();
+        for (Id<VehicleType> vehicleTypeId : currentPVehicleTypeIDs) {
+            vehicles.removeVehicleType(vehicleTypeId);
+        }
+        currentPVehicleTypeIDs.clear();
+    }
 	
 	private void dumpTransitScheduleAndVehicles(Controler controler, int iteration){
-		TransitScheduleWriterV1 writer = new TransitScheduleWriterV1(this.schedule);
-		VehicleWriterV1 writer2 = new VehicleWriterV1(((ScenarioImpl) controler.getScenario()).getVehicles());
+		TransitScheduleWriterV1 writer = new TransitScheduleWriterV1(controler.getScenario().getTransitSchedule());
+		VehicleWriterV1 writer2 = new VehicleWriterV1(controler.getScenario().getVehicles());
 		writer.write(controler.getControlerIO().getIterationFilename(iteration, "transitSchedule.xml.gz"));
 		writer2.writeFile(controler.getControlerIO().getIterationFilename(iteration, "vehicles.xml.gz"));
 	}

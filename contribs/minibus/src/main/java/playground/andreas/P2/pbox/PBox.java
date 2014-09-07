@@ -19,10 +19,6 @@
 
 package playground.andreas.P2.pbox;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -31,10 +27,10 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PConstants.CoopState;
 import playground.andreas.P2.operator.Cooperative;
@@ -42,13 +38,16 @@ import playground.andreas.P2.replanning.OperatorInitializer;
 import playground.andreas.P2.replanning.PStrategyManager;
 import playground.andreas.P2.replanning.TimeProvider;
 import playground.andreas.P2.schedule.PStopsFactory;
-import playground.andreas.P2.schedule.PTransitScheduleImpl;
-import playground.andreas.P2.scoring.StageContainer2AgentMoneyEvent;
 import playground.andreas.P2.scoring.ScoreContainer;
 import playground.andreas.P2.scoring.ScorePlansHandler;
+import playground.andreas.P2.scoring.StageContainer2AgentMoneyEvent;
 import playground.andreas.P2.scoring.fare.StageContainerCreator;
 import playground.andreas.P2.scoring.fare.TicketMachine;
 import playground.andreas.P2.scoring.operator.OperatorCostCollectorHandler;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.TreeMap;
 
 /**
  * Black box for paratransit
@@ -130,7 +129,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		this.cooperatives.addAll(initialCoops);
 		
 		// collect the transit schedules from all cooperatives
-		this.pTransitSchedule = new PTransitScheduleImpl(this.pStopsOnly.getFactory());
+		this.pTransitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		for (TransitStopFacility stop : this.pStopsOnly.getFacilities().values()) {
 			this.pTransitSchedule.addStopFacility(stop);
 		}
@@ -156,7 +155,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		}
 		
 		// Collect current lines offered
-		this.pTransitSchedule = new PTransitScheduleImpl(this.pStopsOnly.getFactory());
+		this.pTransitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		for (TransitStopFacility stop : this.pStopsOnly.getFacilities().values()) {
 			this.pTransitSchedule.addStopFacility(stop);
 		}
@@ -175,7 +174,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 			cooperative.score(driverId2ScoreMap);
 		}
 		
-		this.pTransitSchedule = new PTransitScheduleImpl(this.pStopsOnly.getFactory());
+		this.pTransitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		for (TransitStopFacility stop : this.pStopsOnly.getFacilities().values()) {
 			this.pTransitSchedule.addStopFacility(stop);
 		}

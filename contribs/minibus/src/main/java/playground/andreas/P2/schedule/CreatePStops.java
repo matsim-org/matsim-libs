@@ -19,17 +19,7 @@
 
 package playground.andreas.P2.schedule;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
+import com.vividsolutions.jts.geom.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -44,15 +34,13 @@ import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.opengis.feature.simple.SimpleFeature;
-
 import playground.andreas.P2.helper.PConfigGroup;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * Create one TransitStopFacility for each car mode link of the network
@@ -256,7 +244,7 @@ public class CreatePStops{
 	}
 
 	private void run(){
-		this.transitSchedule = new PTransitScheduleImpl(new TransitScheduleFactoryImpl());
+		this.transitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		int stopsAdded = 0;
 		
 		for (Link link : this.net.getLinks().values()) {

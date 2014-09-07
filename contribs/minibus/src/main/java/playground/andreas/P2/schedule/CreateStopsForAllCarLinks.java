@@ -19,10 +19,6 @@
 
 package playground.andreas.P2.schedule;
 
-import java.util.LinkedHashMap;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -33,8 +29,11 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
 import playground.andreas.P2.helper.PConfigGroup;
+
+import java.util.LinkedHashMap;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Create one TransitStopFacility for each car mode link of the network
@@ -90,7 +89,7 @@ public class CreateStopsForAllCarLinks {
 	}
 
 	private void run(){
-		this.transitSchedule = new PTransitScheduleImpl(new TransitScheduleFactoryImpl());
+		this.transitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		int stopsAdded = 0;
 		
 		for (Link link : this.net.getLinks().values()) {
