@@ -124,12 +124,12 @@ public class VehiclesConfigGroup extends Module {
 			VehicleReaderV1 reader = new VehicleReaderV1(vehicles);
 			reader.readFile(this.inputFile);
 			vehicles.getVehicleTypes();
-			for(Id id:vehicles.getVehicleTypes().keySet()){
-				modes2VehicleTypes.put(id.toString(), vehicles.getVehicleTypes().get(id));
+			for(Id<VehicleType> id:vehicles.getVehicleTypes().keySet()){
+				this.modes2VehicleTypes.put(id.toString(), vehicles.getVehicleTypes().get(id));
 			}
 		} else {
 			for(String mode:this.travelModes) {
-				modes2VehicleTypes.put(mode, VehicleUtils.getDefaultVehicleType());
+				this.modes2VehicleTypes.put(mode, VehicleUtils.getDefaultVehicleType());
 			}
 		}
 		return this.modes2VehicleTypes; 
