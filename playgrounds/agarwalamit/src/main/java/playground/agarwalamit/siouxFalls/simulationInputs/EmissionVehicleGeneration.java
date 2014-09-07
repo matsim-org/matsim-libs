@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.types.HbefaVehicleAttributes;
 import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -76,7 +75,7 @@ public class EmissionVehicleGeneration {
 		HbefaVehicleAttributes vehicleAttributes;
 
 		for(Person person : this.scenario.getPopulation().getPersons().values()){
-			Id personId = person.getId();
+			Id<Person> personId = person.getId();
 
 			if(personId.toString().startsWith("gv")){
 				vehicleCategory = HbefaVehicleCategory.HEAVY_GOODS_VEHICLE;
@@ -85,10 +84,10 @@ public class EmissionVehicleGeneration {
 			}
 			vehicleAttributes = new HbefaVehicleAttributes();
 
-			Id vehTypeId = new IdImpl(vehicleCategory + ";" + 
+			Id<VehicleType> vehTypeId = Id.create(vehicleCategory + ";" + 
 					vehicleAttributes.getHbefaTechnology() + ";" + 
 					vehicleAttributes.getHbefaSizeClass() + ";" + 
-					vehicleAttributes.getHbefaEmConcept());
+					vehicleAttributes.getHbefaEmConcept(),VehicleType.class);
 			VehicleType vehicleType = VehicleUtils.getFactory().createVehicleType(vehTypeId);
 			if(!(outputVehicles.getVehicleTypes().containsKey(vehTypeId))){//getVehicles().containsKey(vehTypeId))){
 				outputVehicles.addVehicleType(vehicleType);

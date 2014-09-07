@@ -26,7 +26,6 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -93,7 +92,7 @@ public class SamplingPlans {
 	}
 
 	private void getAndWriteRandomPlansFromSubPopulation(){
-		log.info("Extracting "+this.samplingRatio*100+"% persons from each sub population randomly...");
+		this.log.info("Extracting "+this.samplingRatio*100+"% persons from each sub population randomly...");
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.samplePopulation = sc.getPopulation();
 		for(String str:this.binToPopulation.keySet()){
@@ -101,28 +100,28 @@ public class SamplingPlans {
 			if(noOfPersons!=0){
 				double requiredPersons = Math.ceil(this.samplingRatio*noOfPersons);
 				double addedPersons =0;
-				List<Id> personIds = new ArrayList<Id>(this.binToPopulation.get(str).getPersons().keySet());
+				List<Person> persons = new ArrayList<Person>();
+				persons.addAll(this.binToPopulation.get(str).getPersons().values());
 				do{
-					Id id = personIds.get(MatsimRandom.getRandom().nextInt(personIds.size()));
-					Person p = this.binToPopulation.get(str).getPersons().get(id);
+					Person p = persons.get(MatsimRandom.getRandom().nextInt(persons.size()));
 					this.samplePopulation.addPerson(p);
-					personIds.remove(id);
+					persons.remove(p);
 					addedPersons++;
 				} while (addedPersons!=requiredPersons);
 			}
 		}
 		double finalSamplingRatio = this.samplePopulation.getPersons().size()/this.totalNoOfPersons;
-		log.info("Total number of persons in sample population are "+this.samplePopulation.getPersons().size()+". Thus final sample population ratio is "+finalSamplingRatio);
+		this.log.info("Total number of persons in sample population are "+this.samplePopulation.getPersons().size()+". Thus final sample population ratio is "+finalSamplingRatio);
 		new PopulationWriter(this.samplePopulation,sc.getNetwork()).write(this.outputPlans);
 	}
 
 	private void readInputPlansAndCreateSubPopulation(){
-		log.info("Reading input plans and creating sub populations...");
+		this.log.info("Reading input plans and creating sub populations...");
 		Config config = ConfigUtils.createConfig();
 		config.plans().setInputFile(this.inputPlans);
 		Scenario sc= ScenarioUtils.loadScenario(config);
 		this.initialPopulation = sc.getPopulation();
-		totalNoOfPersons = this.initialPopulation.getPersons().size();
+		this.totalNoOfPersons = this.initialPopulation.getPersons().size();
 		initiateBinsPopulationMap();
 
 		for(Person p : this.initialPopulation.getPersons().values()){
@@ -142,27 +141,27 @@ public class SamplingPlans {
 	}
 
 	private void initiateBinsPopulationMap(){
-		log.info("Initializing binId2Population Map...");
-		binToPopulation = new TreeMap<String, Population>();
+		this.log.info("Initializing binId2Population Map...");
+		this.binToPopulation = new TreeMap<String, Population>();
 		for(int x=0;x<this.noOfXbins;x++){
 			for(int y =0;y<this.noOfYbins;y++){
 				Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 				Population pop = sc.getPopulation();
 				String binString = "x".concat(String.valueOf(x)).concat("y").concat(String.valueOf(y));
-				if(binToPopulation.containsKey(binString)) throw new RuntimeException("Bin identification "+binString+"already exists. Please check.");
-				else binToPopulation.put(binString, pop);
+				if(this.binToPopulation.containsKey(binString)) throw new RuntimeException("Bin identification "+binString+"already exists. Please check.");
+				else this.binToPopulation.put(binString, pop);
 			}
 		}
 	}
 
 	private String getBinIdentificationFromCoord(Coord coord){
-		int relativePositionY = (int) ((coord.getY() - yMin) / (yMax - yMin) * noOfYbins);
-		int relativePositionX = (int) ((coord.getX() -xMin)/(xMax - xMin)*noOfXbins);
+		int relativePositionY = (int) ((coord.getY() - this.yMin) / (this.yMax - this.yMin) * this.noOfYbins);
+		int relativePositionX = (int) ((coord.getX() -this.xMin)/(this.xMax - this.xMin)*this.noOfXbins);
 		return "x".concat(String.valueOf(relativePositionX)).concat("y").concat(String.valueOf(relativePositionY));
 	}
 
 	private void checkForNumberOfPersonInSubPopulation(){
-		log.info("Checking if all plans are included in sub populations...");
+		this.log.info("Checking if all plans are included in sub populations...");
 		double sumOfPersonsInSubPop =0;
 		for(String str:this.binToPopulation.keySet()){
 			//			System.out.println(this.binToPopulation.get(str).getPersons());
@@ -171,16 +170,16 @@ public class SamplingPlans {
 		if(sumOfPersonsInSubPop<this.totalNoOfPersons) throw new RuntimeException("Total Number of pesons in initial plans are "+this.totalNoOfPersons
 				+" and sum of persons in sub populations are "+sumOfPersonsInSubPop+". Thus, division is inconsistent.");
 
-		log.info("Checking finished. Total number of sub population groups are "+this.binToPopulation.size()+" and total number of persons are "+sumOfPersonsInSubPop);
+		this.log.info("Checking finished. Total number of sub population groups are "+this.binToPopulation.size()+" and total number of persons are "+sumOfPersonsInSubPop);
 	}
 
 	private void compareModeShare(){
 		SortedMap<String, Double> initialModalShare = calculateModeShare(calculateMode2LegCount(this.initialPopulation));
 		SortedMap< String, Double> sampleModalShare = calculateModeShare(calculateMode2LegCount(this.samplePopulation));
-		log.info("The modal shares for initial population and sample population respectively are ...");
-		log.info("Travel Mode \t  initial \t sample ");
+		this.log.info("The modal shares for initial population and sample population respectively are ...");
+		this.log.info("Travel Mode \t  initial \t sample ");
 		for(String mode :initialModalShare.keySet()){
-			log.warn(mode+" \t "+initialModalShare.get(mode)+" \t "+sampleModalShare.get(mode));
+			this.log.warn(mode+" \t "+initialModalShare.get(mode)+" \t "+sampleModalShare.get(mode));
 		}
 	}
 
