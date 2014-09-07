@@ -60,20 +60,20 @@ public class FacilitiesFromPopulationTest {
 		
 		Assert.assertEquals(3, f.scenario.getActivityFacilities().getFacilities().size());
 		
-		Assert.assertEquals("bc", f.scenario.getActivityFacilities().getFacilities().get(f.scenario.createId("bc")).getLinkId().toString());
-		Assert.assertEquals("ca", f.scenario.getActivityFacilities().getFacilities().get(f.scenario.createId("ca")).getLinkId().toString());
-		Assert.assertEquals("ab", f.scenario.getActivityFacilities().getFacilities().get(f.scenario.createId("ab")).getLinkId().toString());
+		Assert.assertEquals("bc", f.scenario.getActivityFacilities().getFacilities().get(Id.create("bc", ActivityFacility.class)).getLinkId().toString());
+		Assert.assertEquals("ca", f.scenario.getActivityFacilities().getFacilities().get(Id.create("ca", ActivityFacility.class)).getLinkId().toString());
+		Assert.assertEquals("ab", f.scenario.getActivityFacilities().getFacilities().get(Id.create("ab", ActivityFacility.class)).getLinkId().toString());
 		
-		assertPlan(f.scenario.getPopulation().getPersons().get(f.scenario.createId("1")).getSelectedPlan(), "ab", "bc", true);
-		assertPlan(f.scenario.getPopulation().getPersons().get(f.scenario.createId("2")).getSelectedPlan(), "ab", "bc", true);
-		assertPlan(f.scenario.getPopulation().getPersons().get(f.scenario.createId("3")).getSelectedPlan(), "ab", "bc", true);
-		assertPlan(f.scenario.getPopulation().getPersons().get(f.scenario.createId("4")).getSelectedPlan(), "bc", "ca", true);
-		assertPlan(f.scenario.getPopulation().getPersons().get(f.scenario.createId("5")).getSelectedPlan(), "bc", "ca", true);
-		assertPlan(f.scenario.getPopulation().getPersons().get(f.scenario.createId("6")).getSelectedPlan(), "bc", "ca", true);
-		assertPlan(f.scenario.getPopulation().getPersons().get(f.scenario.createId("7")).getSelectedPlan(), "bc", "ca", true);
-		assertPlan(f.scenario.getPopulation().getPersons().get(f.scenario.createId("8")).getSelectedPlan(), "ca", "ab", true);
-		assertPlan(f.scenario.getPopulation().getPersons().get(f.scenario.createId("9")).getSelectedPlan(), "ca", "ab", true);
-		assertPlan(f.scenario.getPopulation().getPersons().get(f.scenario.createId("0")).getSelectedPlan(), "ca", "ab", true);
+		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("1", Person.class)).getSelectedPlan(), "ab", "bc", true);
+		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("2", Person.class)).getSelectedPlan(), "ab", "bc", true);
+		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("3", Person.class)).getSelectedPlan(), "ab", "bc", true);
+		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("4", Person.class)).getSelectedPlan(), "bc", "ca", true);
+		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("5", Person.class)).getSelectedPlan(), "bc", "ca", true);
+		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("6", Person.class)).getSelectedPlan(), "bc", "ca", true);
+		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("7", Person.class)).getSelectedPlan(), "bc", "ca", true);
+		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("8", Person.class)).getSelectedPlan(), "ca", "ab", true);
+		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("9", Person.class)).getSelectedPlan(), "ca", "ab", true);
+		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("0", Person.class)).getSelectedPlan(), "ca", "ab", true);
 	}
 
 	@Test @Ignore
@@ -96,19 +96,19 @@ public class FacilitiesFromPopulationTest {
 		Assert.assertEquals(3, f.scenario.getActivityFacilities().getFacilities().size());
 		
 		Map<Id<ActivityFacility>, ? extends ActivityFacility> ffs = f.scenario.getActivityFacilities().getFacilities();
-		Assert.assertEquals(7*3600, ffs.get(f.scenario.createId("ab")).getActivityOptions().get("work").getOpeningTimes());
-		Assert.assertEquals(19*3600, ffs.get(f.scenario.createId("ab")).getActivityOptions().get("work").getOpeningTimes());
+		Assert.assertEquals(7*3600, ffs.get(Id.create("ab", ActivityFacility.class)).getActivityOptions().get("work").getOpeningTimes());
+		Assert.assertEquals(19*3600, ffs.get(Id.create("ab", ActivityFacility.class)).getActivityOptions().get("work").getOpeningTimes());
 		
-		assertPlan(f.scenario.getPopulation().getPersons().get(f.scenario.createId("1")).getSelectedPlan(), "ab", "bc", true);
-		assertPlan(f.scenario.getPopulation().getPersons().get(f.scenario.createId("2")).getSelectedPlan(), "ab", "bc", true);
-		assertPlan(f.scenario.getPopulation().getPersons().get(f.scenario.createId("3")).getSelectedPlan(), "ab", "bc", true);
-		assertPlan(f.scenario.getPopulation().getPersons().get(f.scenario.createId("4")).getSelectedPlan(), "bc", "ca", true);
-		assertPlan(f.scenario.getPopulation().getPersons().get(f.scenario.createId("5")).getSelectedPlan(), "bc", "ca", true);
-		assertPlan(f.scenario.getPopulation().getPersons().get(f.scenario.createId("6")).getSelectedPlan(), "bc", "ca", true);
-		assertPlan(f.scenario.getPopulation().getPersons().get(f.scenario.createId("7")).getSelectedPlan(), "bc", "ca", true);
-		assertPlan(f.scenario.getPopulation().getPersons().get(f.scenario.createId("8")).getSelectedPlan(), "ca", "ab", true);
-		assertPlan(f.scenario.getPopulation().getPersons().get(f.scenario.createId("9")).getSelectedPlan(), "ca", "ab", true);
-		assertPlan(f.scenario.getPopulation().getPersons().get(f.scenario.createId("0")).getSelectedPlan(), "ca", "ab", true);
+		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("1", Person.class)).getSelectedPlan(), "ab", "bc", true);
+		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("2", Person.class)).getSelectedPlan(), "ab", "bc", true);
+		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("3", Person.class)).getSelectedPlan(), "ab", "bc", true);
+		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("4", Person.class)).getSelectedPlan(), "bc", "ca", true);
+		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("5", Person.class)).getSelectedPlan(), "bc", "ca", true);
+		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("6", Person.class)).getSelectedPlan(), "bc", "ca", true);
+		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("7", Person.class)).getSelectedPlan(), "bc", "ca", true);
+		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("8", Person.class)).getSelectedPlan(), "ca", "ab", true);
+		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("9", Person.class)).getSelectedPlan(), "ca", "ab", true);
+		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("0", Person.class)).getSelectedPlan(), "ca", "ab", true);
 	}
 
 	@Test
@@ -127,30 +127,30 @@ public class FacilitiesFromPopulationTest {
 		Assert.assertEquals(13, f.scenario.getActivityFacilities().getFacilities().size());
 
 		Map<Id<ActivityFacility>, ? extends ActivityFacility> ffs = f.scenario.getActivityFacilities().getFacilities();
-		Assert.assertEquals("ab", ffs.get(f.scenario.createId("0")).getLinkId().toString()); // home of agent 1
-		Assert.assertEquals("bc", ffs.get(f.scenario.createId("1")).getLinkId().toString()); // work of agent 1-3
-		Assert.assertEquals("ab", ffs.get(f.scenario.createId("2")).getLinkId().toString()); // home of agent 2
-		Assert.assertEquals("ab", ffs.get(f.scenario.createId("3")).getLinkId().toString()); // home of agent 3
-		Assert.assertEquals("bc", ffs.get(f.scenario.createId("4")).getLinkId().toString()); // home of agent 4
-		Assert.assertEquals("ca", ffs.get(f.scenario.createId("5")).getLinkId().toString()); // work of agent 4-7
-		Assert.assertEquals("bc", ffs.get(f.scenario.createId("6")).getLinkId().toString()); // home of agent 5
-		Assert.assertEquals("bc", ffs.get(f.scenario.createId("7")).getLinkId().toString()); // home of agent 6
-		Assert.assertEquals("bc", ffs.get(f.scenario.createId("8")).getLinkId().toString()); // home of agent 7
-		Assert.assertEquals("ca", ffs.get(f.scenario.createId("9")).getLinkId().toString()); // home of agent 8
-		Assert.assertEquals("ab", ffs.get(f.scenario.createId("10")).getLinkId().toString()); // work of agent 8-10
-		Assert.assertEquals("ca", ffs.get(f.scenario.createId("11")).getLinkId().toString()); // home of agent 9
-		Assert.assertEquals("ca", ffs.get(f.scenario.createId("12")).getLinkId().toString()); // home of agent 10
+		Assert.assertEquals("ab", ffs.get(Id.create("0", Link.class)).getLinkId().toString()); // home of agent 1
+		Assert.assertEquals("bc", ffs.get(Id.create("1", Link.class)).getLinkId().toString()); // work of agent 1-3
+		Assert.assertEquals("ab", ffs.get(Id.create("2", Link.class)).getLinkId().toString()); // home of agent 2
+		Assert.assertEquals("ab", ffs.get(Id.create("3", Link.class)).getLinkId().toString()); // home of agent 3
+		Assert.assertEquals("bc", ffs.get(Id.create("4", Link.class)).getLinkId().toString()); // home of agent 4
+		Assert.assertEquals("ca", ffs.get(Id.create("5", Link.class)).getLinkId().toString()); // work of agent 4-7
+		Assert.assertEquals("bc", ffs.get(Id.create("6", Link.class)).getLinkId().toString()); // home of agent 5
+		Assert.assertEquals("bc", ffs.get(Id.create("7", Link.class)).getLinkId().toString()); // home of agent 6
+		Assert.assertEquals("bc", ffs.get(Id.create("8", Link.class)).getLinkId().toString()); // home of agent 7
+		Assert.assertEquals("ca", ffs.get(Id.create("9", Link.class)).getLinkId().toString()); // home of agent 8
+		Assert.assertEquals("ab", ffs.get(Id.create("10", Link.class)).getLinkId().toString()); // work of agent 8-10
+		Assert.assertEquals("ca", ffs.get(Id.create("11", Link.class)).getLinkId().toString()); // home of agent 9
+		Assert.assertEquals("ca", ffs.get(Id.create("12", Link.class)).getLinkId().toString()); // home of agent 10
 		
-		assertPlan(f.scenario.getPopulation().getPersons().get(f.scenario.createId("1")).getSelectedPlan(), "0", "1", true);
-		assertPlan(f.scenario.getPopulation().getPersons().get(f.scenario.createId("2")).getSelectedPlan(), "2", "1", true);
-		assertPlan(f.scenario.getPopulation().getPersons().get(f.scenario.createId("3")).getSelectedPlan(), "3", "1", true);
-		assertPlan(f.scenario.getPopulation().getPersons().get(f.scenario.createId("4")).getSelectedPlan(), "4", "5", true);
-		assertPlan(f.scenario.getPopulation().getPersons().get(f.scenario.createId("5")).getSelectedPlan(), "6", "5", true);
-		assertPlan(f.scenario.getPopulation().getPersons().get(f.scenario.createId("6")).getSelectedPlan(), "7", "5", true);
-		assertPlan(f.scenario.getPopulation().getPersons().get(f.scenario.createId("7")).getSelectedPlan(), "8", "5", true);
-		assertPlan(f.scenario.getPopulation().getPersons().get(f.scenario.createId("8")).getSelectedPlan(), "9", "10", true);
-		assertPlan(f.scenario.getPopulation().getPersons().get(f.scenario.createId("9")).getSelectedPlan(), "11", "10", true);
-		assertPlan(f.scenario.getPopulation().getPersons().get(f.scenario.createId("0")).getSelectedPlan(), "12", "10", true);
+		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("1", Person.class)).getSelectedPlan(), "0", "1", true);
+		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("2", Person.class)).getSelectedPlan(), "2", "1", true);
+		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("3", Person.class)).getSelectedPlan(), "3", "1", true);
+		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("4", Person.class)).getSelectedPlan(), "4", "5", true);
+		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("5", Person.class)).getSelectedPlan(), "6", "5", true);
+		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("6", Person.class)).getSelectedPlan(), "7", "5", true);
+		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("7", Person.class)).getSelectedPlan(), "8", "5", true);
+		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("8", Person.class)).getSelectedPlan(), "9", "10", true);
+		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("9", Person.class)).getSelectedPlan(), "11", "10", true);
+		assertPlan(f.scenario.getPopulation().getPersons().get(Id.create("0", Person.class)).getSelectedPlan(), "12", "10", true);
 	}
 	
 	private void assertPlan(Plan plan, String homeFacilityId, String workFacilityId, boolean linkCoordMustBeNull) {
@@ -206,17 +206,17 @@ public class FacilitiesFromPopulationTest {
 			Network network = this.scenario.getNetwork();
 			NetworkFactory factory = network.getFactory();
 			
-			Node a = factory.createNode(this.scenario.createId("A"), this.scenario.createCoord(0, 0));
-			Node b = factory.createNode(this.scenario.createId("B"), this.scenario.createCoord(1000, 0));
-			Node c = factory.createNode(this.scenario.createId("C"), this.scenario.createCoord(500, 600));
+			Node a = factory.createNode(Id.create("A", Node.class), this.scenario.createCoord(0, 0));
+			Node b = factory.createNode(Id.create("B", Node.class), this.scenario.createCoord(1000, 0));
+			Node c = factory.createNode(Id.create("C", Node.class), this.scenario.createCoord(500, 600));
 			
 			network.addNode(a);
 			network.addNode(b);
 			network.addNode(c);
 			
-			Link ab = factory.createLink(this.scenario.createId("ab"), a, b);
-			Link bc = factory.createLink(this.scenario.createId("bc"), b, c);
-			Link ca = factory.createLink(this.scenario.createId("ca"), c, a);
+			Link ab = factory.createLink(Id.create("ab", Link.class), a, b);
+			Link bc = factory.createLink(Id.create("bc", Link.class), b, c);
+			Link ca = factory.createLink(Id.create("ca", Link.class), c, a);
 			
 			Set<String> modes = new HashSet<String>();
 			modes.add("car");
@@ -248,7 +248,7 @@ public class FacilitiesFromPopulationTest {
 		}
 		
 		private Person createPersonWithPlan(PopulationFactory factory, String id, double homeX, double homeY, double workX, double workY) {
-			Person person = factory.createPerson(scenario.createId(id));
+			Person person = factory.createPerson(Id.create(id, Person.class));
 			Plan plan = factory.createPlan();
 			person.addPlan(plan);
 			Activity home1 = factory.createActivityFromCoord("home", scenario.createCoord(homeX, homeY));

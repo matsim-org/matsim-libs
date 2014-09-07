@@ -27,11 +27,11 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -54,6 +54,7 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
@@ -78,13 +79,6 @@ public class AccessEgressDemo {
 	private static final boolean stopsBlockLane = true;
 
 	private final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	public final Id[] ids = new Id[Math.max(nOfLinks + 1, nOfBuses)];
-
-	private void createIds() {
-		for (int i = 0; i < this.ids.length; i++) {
-			this.ids[i] = this.scenario.createId(Integer.toString(i));
-		}
-	}
 
 	private void prepareConfig() {
 		Config config = this.scenario.getConfig();
@@ -99,11 +93,11 @@ public class AccessEgressDemo {
 //		network.setCapacityPeriod(3600.0);
 		Node[] nodes = new Node[nOfLinks + 1];
 		for (int i = 0; i <= nOfLinks; i++) {
-			nodes[i] = network.getFactory().createNode(this.ids[i], this.scenario.createCoord(i * 500, 0));
+			nodes[i] = network.getFactory().createNode(Id.create(i, Node.class), this.scenario.createCoord(i * 500, 0));
 			network.addNode(nodes[i]);
 		}
 		for (int i = 0; i < nOfLinks; i++) {
-			Link l = network.getFactory().createLink(this.ids[i], nodes[i], nodes[i+1]);
+			Link l = network.getFactory().createLink(Id.create(i, Link.class), nodes[i], nodes[i+1]);
 			l.setLength(500.0);
 			l.setFreespeed(10.0);
 			l.setCapacity(1000.0);
@@ -118,29 +112,29 @@ public class AccessEgressDemo {
 		TransitStopFacility[] stops = new TransitStopFacility[nOfLinks];
 		ArrayList<TransitRouteStop> stopList = new ArrayList<TransitRouteStop>(nOfLinks);
 		for (int i = 0; i < nOfLinks; i++) {
-			stops[i] = builder.createTransitStopFacility(this.ids[i], this.scenario.createCoord((i+1)*500, 0), stopsBlockLane);
-			stops[i].setLinkId(this.ids[i]);
+			stops[i] = builder.createTransitStopFacility(Id.create(i, TransitStopFacility.class), this.scenario.createCoord((i+1)*500, 0), stopsBlockLane);
+			stops[i].setLinkId(Id.create(i, Link.class));
 			schedule.addStopFacility(stops[i]);
 			TransitRouteStop stop = builder.createTransitRouteStop(stops[i], i * 50, i * 50 + 10);
 			stopList.add(stop);
 		}
-		Link startLink = this.scenario.getNetwork().getLinks().get(this.ids[0]);
-		Link endLink = this.scenario.getNetwork().getLinks().get(this.ids[nOfLinks - 1]);
+		Link startLink = this.scenario.getNetwork().getLinks().get(Id.create(0, Link.class));
+		Link endLink = this.scenario.getNetwork().getLinks().get(Id.create(nOfLinks - 1, Link.class));
 		NetworkRoute networkRoute = (NetworkRoute) ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, startLink.getId(), endLink.getId());
 		ArrayList<Id<Link>> linkList = new ArrayList<Id<Link>>(nOfLinks - 2);
 		for (int i = 1; i < nOfLinks -1; i++) {
-			linkList.add(this.ids[i]);
+			linkList.add(Id.create(i, Link.class));
 		}
 		networkRoute.setLinkIds(startLink.getId(), linkList, endLink.getId());
-		TransitRoute tRoute = builder.createTransitRoute(this.ids[1], networkRoute, stopList, "bus");
+		TransitRoute tRoute = builder.createTransitRoute(Id.create(1, TransitRoute.class), networkRoute, stopList, "bus");
 
-		TransitLine tLine = builder.createTransitLine(this.ids[1]);
+		TransitLine tLine = builder.createTransitLine(Id.create(1, TransitLine.class));
 		tLine.addRoute(tRoute);
 		schedule.addTransitLine(tLine);
 
 		for (int i = 0; i < nOfBuses; i++	) {
-			Departure dep = builder.createDeparture(this.ids[i], departureTime + i*heading + (i == delayedBus ? delay : 0));
-			dep.setVehicleId(this.ids[i]);
+			Departure dep = builder.createDeparture(Id.create(i, Departure.class), departureTime + i*heading + (i == delayedBus ? delay : 0));
+			dep.setVehicleId(Id.create(i, Vehicle.class));
 			tRoute.addDeparture(dep);
 		}
 	}
@@ -148,13 +142,13 @@ public class AccessEgressDemo {
 	private void createVehicles() {
 		Vehicles vehicles = this.scenario.getVehicles();
 		VehiclesFactory vb = vehicles.getFactory();
-		VehicleType vehicleType = vb.createVehicleType(new IdImpl("transitVehicleType"));
+		VehicleType vehicleType = vb.createVehicleType(Id.create("transitVehicleType", VehicleType.class));
 		VehicleCapacity capacity = vb.createVehicleCapacity();
 		capacity.setSeats(Integer.valueOf(101));
 		capacity.setStandingRoom(Integer.valueOf(0));
 		vehicleType.setCapacity(capacity);
 		for (int i = 0; i < nOfBuses; i++) {
-			vehicles.addVehicle( vb.createVehicle(this.ids[i], vehicleType));
+			vehicles.addVehicle( vb.createVehicle(Id.create(i, Vehicle.class), vehicleType));
 		}
 	}
 
@@ -163,23 +157,23 @@ public class AccessEgressDemo {
 		Population population = this.scenario.getPopulation();
 		PopulationFactory pb = population.getFactory();
 		TransitStopFacility[] stops = schedule.getFacilities().values().toArray(new TransitStopFacility[schedule.getFacilities().size()]);
-		TransitLine tLine = schedule.getTransitLines().get(this.ids[1]);
-		TransitRoute tRoute = tLine.getRoutes().get(this.ids[1]);
+		TransitLine tLine = schedule.getTransitLines().get(Id.create(1, TransitLine.class));
+		TransitRoute tRoute = tLine.getRoutes().get(Id.create(1, TransitRoute.class));
 
-		TransitStopFacility lastStop = schedule.getFacilities().get(this.ids[stops.length - 1]);
+		TransitStopFacility lastStop = schedule.getFacilities().get(Id.create(stops.length - 1, TransitStopFacility.class));
 		for (int i = 0; i < stops.length; i++) {
 			TransitStopFacility stop = stops[i];
 			if (stop == lastStop) {
 				continue;
 			}
 			for (int j = 0; j < nOfAgentsPerStop; j++) {
-				PersonImpl person = (PersonImpl) pb.createPerson(this.scenario.createId(Integer.toString(i * nOfAgentsPerStop + j)));
+				PersonImpl person = (PersonImpl) pb.createPerson(Id.create(Integer.toString(i * nOfAgentsPerStop + j), Person.class));
 				PlanImpl plan = (PlanImpl) pb.createPlan();
 				ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", stop.getLinkId());
 				act1.setEndTime(departureTime + j * agentInterval);
 				LegImpl leg = (LegImpl) pb.createLeg(TransportMode.pt);
 				leg.setRoute(new ExperimentalTransitRoute(stop, tLine, tRoute, lastStop));
-				ActivityImpl act2 = (ActivityImpl) pb.createActivityFromLinkId("work", this.ids[nOfLinks - 1]);
+				ActivityImpl act2 = (ActivityImpl) pb.createActivityFromLinkId("work", Id.create(nOfLinks - 1, Link.class));
 
 				population.addPerson(person);
 				person.addPlan(plan);
@@ -194,7 +188,7 @@ public class AccessEgressDemo {
 	private void runSim() {
 		EventsManager events = EventsUtils.createEventsManager();
 
-		TransitRoute route = this.scenario.getTransitSchedule().getTransitLines().get(this.ids[1]).getRoutes().get(this.ids[1]);
+		TransitRoute route = this.scenario.getTransitSchedule().getTransitLines().get(Id.create(1, TransitLine.class)).getRoutes().get(Id.create(1, TransitRoute.class));
 		VehicleTracker vehTracker = new VehicleTracker();
 		events.addHandler(vehTracker);
 		TransitRouteAccessEgressAnalysis analysis = new TransitRouteAccessEgressAnalysis(route, vehTracker);
@@ -220,7 +214,6 @@ public class AccessEgressDemo {
 	}
 
 	public void run() {
-		createIds();
 		prepareConfig();
 		createNetwork();
 		createTransitSchedule();
