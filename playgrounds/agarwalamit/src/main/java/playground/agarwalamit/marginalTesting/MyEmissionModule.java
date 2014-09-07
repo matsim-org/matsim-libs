@@ -54,112 +54,111 @@ import playground.agarwalamit.marginalTesting.WarmEmissionAnalysisModuleImplV2.W
  * @author amit
  */
 public class MyEmissionModule {
-	
-	private static final Logger logger = Logger.getLogger(MyEmissionModule.class);
-	
-	final Scenario scenario;
-	WarmEmissionHandlerImplV2 warmEmissionHandler;
-	ColdEmissionHandler coldEmissionHandler;
-	public EventsManager emissionEventsManager;
-	Double emissionEfficiencyFactor;
+
+	private final Logger logger = Logger.getLogger(MyEmissionModule.class);
+
+	private final Scenario scenario;
+	private WarmEmissionHandlerImplV2 warmEmissionHandler;
+	private ColdEmissionHandler coldEmissionHandler;
+	private EventsManager emissionEventsManager;
+	private Double emissionEfficiencyFactor;
 
 	//===
-	static String roadTypeMappingFile;
-	static String emissionVehicleFile;
-	
-	static String averageFleetColdEmissionFactorsFile;
-	static String averageFleetWarmEmissionFactorsFile;
+	private  String roadTypeMappingFile;
+	private  String emissionVehicleFile;
 
-	static String detailedWarmEmissionFactorsFile;
-	static String detailedColdEmissionFactorsFile;
-	
+	private  String averageFleetColdEmissionFactorsFile;
+	private  String averageFleetWarmEmissionFactorsFile;
+
+	private  String detailedWarmEmissionFactorsFile;
+	private  String detailedColdEmissionFactorsFile;
+
 	//===
-	Map<Integer, String> roadTypeMapping;
-	Vehicles emissionVehicles;
-	
-	Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
-	Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable;
+	private Map<Integer, String> roadTypeMapping;
+	private Vehicles emissionVehicles;
 
-	Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
-	Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable;
+	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
+	private Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable;
+
+	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
+	private Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable;
 
 
 	public MyEmissionModule(Scenario scenario) {
 		this.scenario = scenario;
 	}
-	
+
 	public MyEmissionModule(Scenario scenario, Vehicles emissionVehicles) {
 		this.scenario = scenario;
 		this.emissionVehicles = emissionVehicles;
 	}
 
 	public void createLookupTables() {
-		logger.info("entering createLookupTables");
-		
+		this.logger.info("entering createLookupTables");
+
 		getInputFiles();
-		
-		roadTypeMapping = createRoadTypeMapping(roadTypeMappingFile);
+
+		this.roadTypeMapping = createRoadTypeMapping(this.roadTypeMappingFile);
 		if(this.emissionVehicles == null){
-			emissionVehicles = createEmissionVehicles(emissionVehicleFile);
+			this.emissionVehicles = createEmissionVehicles(this.emissionVehicleFile);
 		}
 
-		avgHbefaWarmTable = createAvgHbefaWarmTable(averageFleetWarmEmissionFactorsFile);
-		avgHbefaColdTable = createAvgHbefaColdTable(averageFleetColdEmissionFactorsFile);
-		EmissionsConfigGroup ecg = (EmissionsConfigGroup)scenario.getConfig().getModule("emissions");
+		this.avgHbefaWarmTable = createAvgHbefaWarmTable(this.averageFleetWarmEmissionFactorsFile);
+		this.avgHbefaColdTable = createAvgHbefaColdTable(this.averageFleetColdEmissionFactorsFile);
+		EmissionsConfigGroup ecg = (EmissionsConfigGroup)this.scenario.getConfig().getModule("emissions");
 		if(ecg.isUsingDetailedEmissionCalculation()){
-			detailedHbefaWarmTable = createDetailedHbefaWarmTable(detailedWarmEmissionFactorsFile);
-			detailedHbefaColdTable = createDetailedHbefaColdTable(detailedColdEmissionFactorsFile);
+			this.detailedHbefaWarmTable = createDetailedHbefaWarmTable(this.detailedWarmEmissionFactorsFile);
+			this.detailedHbefaColdTable = createDetailedHbefaColdTable(this.detailedColdEmissionFactorsFile);
 		}
 		else{
-			logger.warn("Detailed emission calculation is switched off in " + VspExperimentalConfigGroup.GROUP_NAME + " config group; Using fleet average values for all vehicles.");
+			this.logger.warn("Detailed emission calculation is switched off in " + VspExperimentalConfigGroup.GROUP_NAME + " config group; Using fleet average values for all vehicles.");
 		}
-		logger.info("leaving createLookupTables");
+		this.logger.info("leaving createLookupTables");
 	}
 
 	private void getInputFiles() {
-	      EmissionsConfigGroup ecg = (EmissionsConfigGroup)scenario.getConfig().getModule("emissions");
+		EmissionsConfigGroup ecg = (EmissionsConfigGroup)scenario.getConfig().getModule("emissions");
 
-		roadTypeMappingFile = ecg.getEmissionRoadTypeMappingFile();
-		emissionVehicleFile = ecg.getEmissionVehicleFile();
-	
-		averageFleetWarmEmissionFactorsFile = ecg.getAverageWarmEmissionFactorsFile();
-		averageFleetColdEmissionFactorsFile = ecg.getAverageColdEmissionFactorsFile();
-		
-		
-		detailedWarmEmissionFactorsFile = ecg.getDetailedWarmEmissionFactorsFile();
-		detailedColdEmissionFactorsFile = ecg.getDetailedColdEmissionFactorsFile();
+		this.roadTypeMappingFile = ecg.getEmissionRoadTypeMappingFile();
+		this.emissionVehicleFile = ecg.getEmissionVehicleFile();
+
+		this.averageFleetWarmEmissionFactorsFile = ecg.getAverageWarmEmissionFactorsFile();
+		this.averageFleetColdEmissionFactorsFile = ecg.getAverageColdEmissionFactorsFile();
+
+		this.detailedWarmEmissionFactorsFile = ecg.getDetailedWarmEmissionFactorsFile();
+		this.detailedColdEmissionFactorsFile = ecg.getDetailedColdEmissionFactorsFile();
 	}
 
 	public void createEmissionHandler() {
-		logger.info("entering createEmissionHandler");
-		
-		emissionEventsManager = EventsUtils.createEventsManager();
-		Network network = scenario.getNetwork() ;
+		this.logger.info("entering createEmissionHandler");
+
+		this.emissionEventsManager = EventsUtils.createEventsManager();
+		Network network = this.scenario.getNetwork() ;
 
 		WarmEmissionAnalysisModuleParameter parameterObject = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, detailedHbefaWarmTable);
 		ColdEmissionAnalysisModuleParameter parameterObject2 = new ColdEmissionAnalysisModuleParameter(avgHbefaColdTable, detailedHbefaColdTable);
-		
-		warmEmissionHandler = new WarmEmissionHandlerImplV2(emissionVehicles, parameterObject, emissionEventsManager, emissionEfficiencyFactor,(ScenarioImpl)scenario);
-		coldEmissionHandler = new ColdEmissionHandler(emissionVehicles, network, parameterObject2, emissionEventsManager, emissionEfficiencyFactor);
-		logger.info("leaving createEmissionHandler");
+
+		this.warmEmissionHandler = new WarmEmissionHandlerImplV2(this.emissionVehicles, parameterObject, this.emissionEventsManager, this.emissionEfficiencyFactor,(ScenarioImpl)this.scenario);
+		this.coldEmissionHandler = new ColdEmissionHandler(this.emissionVehicles, network, parameterObject2, this.emissionEventsManager, this.emissionEfficiencyFactor);
+		this.logger.info("leaving createEmissionHandler");
 	}
 
 	private Map<Integer, String> createRoadTypeMapping(String filename){
-		logger.info("entering createRoadTypeMapping ...") ;
-		
+		this.logger.info("entering createRoadTypeMapping ...") ;
+
 		Map<Integer, String> mapping = new HashMap<Integer, String>();
 		try{
 			BufferedReader br = IOUtils.getBufferedReader(filename);
 			String strLine = br.readLine();
 			Map<String, Integer> indexFromKey = createIndexFromKey(strLine, ";");
-			
+
 			while ((strLine = br.readLine()) != null){
 				if ( strLine.contains("\"")) throw new RuntimeException("cannot handle this character in parsing") ;
-				
+
 				String[] inputArray = strLine.split(";");
 				Integer visumRtNr = Integer.parseInt(inputArray[indexFromKey.get("VISUM_RT_NR")]);
 				String hbefaRtName = (inputArray[indexFromKey.get("HBEFA_RT_NAME")]);
-				
+
 				mapping.put(visumRtNr, hbefaRtName);
 			}
 		} catch (FileNotFoundException e) {
@@ -167,43 +166,43 @@ public class MyEmissionModule {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		logger.info("leaving createRoadTypeMapping ...") ;
+		this.logger.info("leaving createRoadTypeMapping ...") ;
 		return mapping;
 	}
-	
+
 	private Vehicles createEmissionVehicles(String emissionVehicleFilename) {
-		logger.info("entering createEmissionVehicles ...") ;
-		emissionVehicles = VehicleUtils.createVehiclesContainer();
-		VehicleReaderV1 vehicleReader = new VehicleReaderV1(emissionVehicles);
+		this.logger.info("entering createEmissionVehicles ...") ;
+		this.emissionVehicles = VehicleUtils.createVehiclesContainer();
+		VehicleReaderV1 vehicleReader = new VehicleReaderV1(this.emissionVehicles);
 		vehicleReader.readFile(emissionVehicleFilename);
-		logger.info("leaving createEmissionVehicles ...") ;
-		return emissionVehicles;
+		this.logger.info("leaving createEmissionVehicles ...") ;
+		return this.emissionVehicles;
 	}
 
 	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> createAvgHbefaWarmTable(String filename){
-		logger.info("entering createAvgHbefaWarmTable ...");
-		
+		this.logger.info("entering createAvgHbefaWarmTable ...");
+
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgWarmTable = new HashMap<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor>();
-		
+
 		try{
 			BufferedReader br = IOUtils.getBufferedReader(filename);
 			String strLine = br.readLine();
 			Map<String, Integer> indexFromKey = createIndexFromKey(strLine, ";");
-			
+
 			while ((strLine = br.readLine()) != null) {
 				String[] array = strLine.split(";");
-				
+
 				HbefaWarmEmissionFactorKey key = new HbefaWarmEmissionFactorKey();
 				key.setHbefaVehicleCategory(mapString2HbefaVehicleCategory(array[indexFromKey.get("VehCat")]));
 				key.setHbefaComponent(mapComponent2WarmPollutant(array[indexFromKey.get("Component")]));
 				key.setHbefaRoadCategory(mapString2HbefaRoadCategory(array[indexFromKey.get("TrafficSit")]));
 				key.setHbefaTrafficSituation(mapString2HbefaTrafficSituation(array[indexFromKey.get("TrafficSit")]));
 				key.setHbefaVehicleAttributes(new HbefaVehicleAttributes());
-				
+
 				HbefaWarmEmissionFactor value = new HbefaWarmEmissionFactor();
 				value.setSpeed(Double.parseDouble(array[indexFromKey.get("V_weighted")]));
 				value.setWarmEmissionFactor(Double.parseDouble(array[indexFromKey.get("EFA_weighted")]));
-				
+
 				avgWarmTable.put(key, value);
 			}
 		} catch (FileNotFoundException e) {
@@ -212,22 +211,22 @@ public class MyEmissionModule {
 			e.printStackTrace();
 		}
 
-		logger.info("leaving createAvgHbefaWarmTable ...");
+		this.logger.info("leaving createAvgHbefaWarmTable ...");
 		return avgWarmTable;
 	}
-	
+
 	private Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> createAvgHbefaColdTable(String filename){
-		logger.info("entering createAvgHbefaColdTable ...");
-		
+		this.logger.info("entering createAvgHbefaColdTable ...");
+
 		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgColdTable = new HashMap<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor>();
 		try{
 			BufferedReader br = IOUtils.getBufferedReader(filename);
 			String strLine = br.readLine();
 			Map<String, Integer> indexFromKey = createIndexFromKey(strLine, ";");
-			
+
 			while ((strLine = br.readLine()) != null)   {
 				String[] array = strLine.split(";");
-				
+
 				HbefaColdEmissionFactorKey key = new HbefaColdEmissionFactorKey();
 				key.setHbefaVehicleCategory(mapString2HbefaVehicleCategory(array[indexFromKey.get("VehCat")]));
 				key.setHbefaComponent(mapComponent2ColdPollutant(array[indexFromKey.get("Component")]));
@@ -237,7 +236,7 @@ public class MyEmissionModule {
 
 				HbefaColdEmissionFactor value = new HbefaColdEmissionFactor();
 				value.setColdEmissionFactor(Double.parseDouble(array[indexFromKey.get("EFA_weighted")]));
-				
+
 				avgColdTable.put(key, value);
 			}
 		} catch (FileNotFoundException e) {
@@ -245,12 +244,12 @@ public class MyEmissionModule {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		logger.info("leaving createAvgHbefaColdTable ...");
+		this.logger.info("leaving createAvgHbefaColdTable ...");
 		return avgColdTable;
 	}
-	
+
 	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> createDetailedHbefaWarmTable(String filename){
-		logger.info("entering createDetailedHbefaWarmTable ...");
+		this.logger.info("entering createDetailedHbefaWarmTable ...");
 
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> hbefaWarmTableDetailed = new HashMap<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor>() ;
 		try{
@@ -284,22 +283,22 @@ public class MyEmissionModule {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		logger.info("entering createDetailedHbefaWarmTable ...");
+		this.logger.info("entering createDetailedHbefaWarmTable ...");
 		return hbefaWarmTableDetailed;
 	}
-	
+
 	private Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> createDetailedHbefaColdTable(String filename) {
-		logger.info("entering createDetailedHbefaColdTable ...");
-		
+		this.logger.info("entering createDetailedHbefaColdTable ...");
+
 		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> hbefaColdTableDetailed = new HashMap<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor>();
 		try{
 			BufferedReader br = IOUtils.getBufferedReader(filename);
 			String strLine = br.readLine();
 			Map<String, Integer> indexFromKey = createIndexFromKey(strLine, ";");
-			
+
 			while ((strLine = br.readLine()) != null)   {
 				String[] array = strLine.split(";");
-				
+
 				HbefaColdEmissionFactorKey key = new HbefaColdEmissionFactorKey();
 				key.setHbefaVehicleCategory(mapString2HbefaVehicleCategory(array[indexFromKey.get("VehCat")]));
 				key.setHbefaComponent(mapComponent2ColdPollutant(array[indexFromKey.get("Component")]));
@@ -313,7 +312,7 @@ public class MyEmissionModule {
 
 				HbefaColdEmissionFactor value = new HbefaColdEmissionFactor();
 				value.setColdEmissionFactor(Double.parseDouble(array[indexFromKey.get("EFA")]));
-				
+
 				hbefaColdTableDetailed.put(key, value);
 			}
 		} catch (FileNotFoundException e) {
@@ -321,7 +320,7 @@ public class MyEmissionModule {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		logger.info("leaving createDetailedHbefaColdTable ...");
+		this.logger.info("leaving createDetailedHbefaColdTable ...");
 		return hbefaColdTableDetailed;
 	}
 
@@ -354,7 +353,7 @@ public class MyEmissionModule {
 		}
 		return parkingTime;
 	}
-	
+
 	private WarmPollutant mapComponent2WarmPollutant(String string) {
 		WarmPollutant warmPollutant = null;
 		for(WarmPollutant wp : WarmPollutant.values()){
@@ -363,7 +362,7 @@ public class MyEmissionModule {
 		}
 		return warmPollutant;
 	}
-	
+
 	private ColdPollutant mapComponent2ColdPollutant(String string) {
 		ColdPollutant coldPollutant = null;
 		for(ColdPollutant cp : ColdPollutant.values()){
@@ -385,7 +384,7 @@ public class MyEmissionModule {
 		if(string.contains("pass. car")) hbefaVehicleCategory = HbefaVehicleCategory.PASSENGER_CAR;
 		else if(string.contains("HGV")) hbefaVehicleCategory = HbefaVehicleCategory.HEAVY_GOODS_VEHICLE;
 		else{
-			logger.warn("Could not map String " + string + " to any HbefaVehicleCategory; please check syntax in file " + averageFleetWarmEmissionFactorsFile);
+			this.logger.warn("Could not map String " + string + " to any HbefaVehicleCategory; please check syntax in file " + this.averageFleetWarmEmissionFactorsFile);
 			throw new RuntimeException();
 		}
 		return hbefaVehicleCategory;
@@ -398,73 +397,73 @@ public class MyEmissionModule {
 		else if(string.endsWith("Satur.")) hbefaTrafficSituation = HbefaTrafficSituation.SATURATED;
 		else if(string.endsWith("St+Go")) hbefaTrafficSituation = HbefaTrafficSituation.STOPANDGO;
 		else {
-			logger.warn("Could not map String " + string + " to any HbefaTrafficSituation; please check syntax in file " + averageFleetWarmEmissionFactorsFile);
+			this.logger.warn("Could not map String " + string + " to any HbefaTrafficSituation; please check syntax in file " + this.averageFleetWarmEmissionFactorsFile);
 			throw new RuntimeException();
 		}
 		return hbefaTrafficSituation;
 	}
 
 	public WarmEmissionHandlerImplV2 getWarmEmissionHandler() {
-		return warmEmissionHandler;	
+		return this.warmEmissionHandler;	
 	}
-	
+
 	public ColdEmissionHandler getColdEmissionHandler() {
-		return coldEmissionHandler;
+		return this.coldEmissionHandler;
 	}
-	
+
 	public EventsManager getEmissionEventsManager() {
-		return emissionEventsManager;
+		return this.emissionEventsManager;
 	}
 
 	public Vehicles getEmissionVehicles() {
-		return emissionVehicles;
+		return this.emissionVehicles;
 	}
 
 	public double getTotalDelaysInHours(){
 		return this.warmEmissionHandler.getTotalDelaysInSecs()/3600;
 	}
-	
+
 	public Double getEmissionEfficiencyFactor() {
-		return emissionEfficiencyFactor;
+		return this.emissionEfficiencyFactor;
 	}
 
 	public void setEmissionEfficiencyFactor(Double emissionEfficiencyFactor) {
 		this.emissionEfficiencyFactor = emissionEfficiencyFactor;
-		logger.info("Emission efficiency for the whole fleet is globally set to " + this.emissionEfficiencyFactor);
-//		logger.warn("Emission efficiency for the whole fleet is globally set to " + this.emissionEfficiencyFactor);
+		this.logger.info("Emission efficiency for the whole fleet is globally set to " + this.emissionEfficiencyFactor);
+		//		logger.warn("Emission efficiency for the whole fleet is globally set to " + this.emissionEfficiencyFactor);
 	}
 
 	public void writeEmissionInformation(String emissionEventOutputFile) {
-		logger.info("Warm emissions were not calculated for " + warmEmissionHandler.getLinkLeaveWarnCnt() + " of " +
-				warmEmissionHandler.getLinkLeaveCnt() + " link leave events (no corresponding link enter event).");
-		
+		this.logger.info("Warm emissions were not calculated for " + this.warmEmissionHandler.getLinkLeaveWarnCnt() + " of " +
+				this.warmEmissionHandler.getLinkLeaveCnt() + " link leave events (no corresponding link enter event).");
+
 		WarmEmissionAnalysisModuleImplV2 wam = warmEmissionHandler.getWarmEmissionAnalysisModule();
-//		ColdEmissionAnalysisModule cam = coldEmissionHandler.getColdEmissionAnalysisModule();
-		
-//		logger.info("Average speed was calculated to 0.0 or a negative value for " + wam.getAverageSpeedNegativeCnt() + " of " + 
-//				wam.getWarmEmissionEventCounter() + " warm emission events.");
-//		logger.info("Average speed was calculated greater than free flow speed for " + wam.getAverageSpeedTooHighCnt() + " of " +
-//				wam.getWarmEmissionEventCounter() + " warm emission events.");
-		
-		logger.info("Emission calculation based on `Free flow only' occured for " + wam.getFreeFlowOccurences() + " of " +
+		//		ColdEmissionAnalysisModule cam = coldEmissionHandler.getColdEmissionAnalysisModule();
+
+		//		logger.info("Average speed was calculated to 0.0 or a negative value for " + wam.getAverageSpeedNegativeCnt() + " of " + 
+		//				wam.getWarmEmissionEventCounter() + " warm emission events.");
+		//		logger.info("Average speed was calculated greater than free flow speed for " + wam.getAverageSpeedTooHighCnt() + " of " +
+		//				wam.getWarmEmissionEventCounter() + " warm emission events.");
+
+		this.logger.info("Emission calculation based on `Free flow only' occured for " + wam.getFreeFlowOccurences() + " of " +
 				wam.getWarmEmissionEventCounter() + " warm emission events.");
-		logger.info("Emission calculation based on `Stop&Go only' occured for " + wam.getStopGoOccurences() + " of " +
+		this.logger.info("Emission calculation based on `Stop&Go only' occured for " + wam.getStopGoOccurences() + " of " +
 				wam.getWarmEmissionEventCounter() + " warm emission events.");
-		logger.info("Emission calculation based on `Fractions' occured for " + wam.getFractionOccurences() + " of " +
+		this.logger.info("Emission calculation based on `Fractions' occured for " + wam.getFractionOccurences() + " of " +
 				wam.getWarmEmissionEventCounter() + " warm emission events.");
-		
-		logger.info("Free flow occured on " + wam.getFreeFlowKmCounter() + " km of total " + 
+
+		this.logger.info("Free flow occured on " + wam.getFreeFlowKmCounter() + " km of total " + 
 				wam.getKmCounter() + " km, where emissions were calculated.");
-		logger.info("Stop&Go occured on " + wam.getStopGoKmCounter() + " km of total " +
+		this.logger.info("Stop&Go occured on " + wam.getStopGoKmCounter() + " km of total " +
 				wam.getKmCounter() + " km, where emissions were calculated.");
-		
-//		logger.info("Detailed vehicle attributes for warm emission calculation were not specified correctly for "
-//				+ wam.getVehAttributesNotSpecified().size() + " of "
-//				+ wam.getVehicleIdSet().size() + " vehicles.");
-//		logger.info("Detailed vehicle attributes for cold emission calculation were not specified correctly for "
-//				+ cam.getVehAttributesNotSpecified().size() + " of "
-//				+ cam.getVehicleIdSet().size() + " vehicles.");
-		
-		logger.info("Emission calculation terminated. Output can be found in " + emissionEventOutputFile);
+
+		//		logger.info("Detailed vehicle attributes for warm emission calculation were not specified correctly for "
+		//				+ wam.getVehAttributesNotSpecified().size() + " of "
+		//				+ wam.getVehicleIdSet().size() + " vehicles.");
+		//		logger.info("Detailed vehicle attributes for cold emission calculation were not specified correctly for "
+		//				+ cam.getVehAttributesNotSpecified().size() + " of "
+		//				+ cam.getVehicleIdSet().size() + " vehicles.");
+
+		this.logger.info("Emission calculation terminated. Output can be found in " + emissionEventOutputFile);
 	}
 }

@@ -44,7 +44,7 @@ import playground.ikaddoura.internalizationCar.TollHandler;
  */
 
 public class MarginalCostPricingControlerListner implements StartupListener, IterationEndsListener {
-	private static final Logger log = Logger.getLogger(MarginalCostPricingControlerListner.class);
+	private final Logger log = Logger.getLogger(MarginalCostPricingControlerListner.class);
 
 	private final ScenarioImpl scenario;
 	private TollHandler tollHandler;
@@ -62,27 +62,27 @@ public class MarginalCostPricingControlerListner implements StartupListener, Ite
 		
 		EventsManager eventsManager = event.getControler().getEvents();
 		
-		congestionHandler = new MarginalCongestionHandlerImplV4(eventsManager, scenario);
-		pricingHandler = new MarginalCostPricingCarHandler(eventsManager, scenario);
-		extCostHandler = new ExtCostEventHandler(this.scenario, true);
+		this.congestionHandler = new MarginalCongestionHandlerImplV4(eventsManager, this.scenario);
+		this.pricingHandler = new MarginalCostPricingCarHandler(eventsManager, this.scenario);
+		this.extCostHandler = new ExtCostEventHandler(this.scenario, true);
 		
-		eventsManager.addHandler(congestionHandler);
-		eventsManager.addHandler(pricingHandler);
-		eventsManager.addHandler(tollHandler);
-		eventsManager.addHandler(extCostHandler);
+		eventsManager.addHandler(this.congestionHandler);
+		eventsManager.addHandler(this.pricingHandler);
+		eventsManager.addHandler(this.tollHandler);
+		eventsManager.addHandler(this.extCostHandler);
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		
-		log.info("Set average tolls for each link Id and time bin...");
-		tollHandler.setLinkId2timeBin2avgToll();
-		log.info("Set average tolls for each link Id and time bin... Done.");
+		this.log.info("Set average tolls for each link Id and time bin...");
+		this.tollHandler.setLinkId2timeBin2avgToll();
+		this.log.info("Set average tolls for each link Id and time bin... Done.");
 		
 		// write out analysis every iteration
-		tollHandler.writeTollStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/tollStats.csv");
-		congestionHandler.writeCongestionStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/congestionStats.csv");
-		TripInfoWriter writerCar = new TripInfoWriter(extCostHandler, event.getControler().getControlerIO().getIterationPath(event.getIteration()));
+		this.tollHandler.writeTollStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/tollStats.csv");
+		this.congestionHandler.writeCongestionStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/congestionStats.csv");
+		TripInfoWriter writerCar = new TripInfoWriter(this.extCostHandler, event.getControler().getControlerIO().getIterationPath(event.getIteration()));
 		writerCar.writeDetailedResults(TransportMode.car);
 		writerCar.writeAvgTollPerDistance(TransportMode.car);
 		writerCar.writeAvgTollPerTimeBin(TransportMode.car);

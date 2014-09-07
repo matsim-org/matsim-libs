@@ -32,62 +32,56 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.algorithms.EventWriterXML;
 
-
 /**
  * @author amit
  */
 public class MyEmissionControlerListner  implements StartupListener, IterationStartsListener, ShutdownListener, IterationEndsListener {
-	private static final Logger logger = Logger.getLogger(MyEmissionControlerListner.class);
+	private final Logger logger = Logger.getLogger(MyEmissionControlerListner.class);
 
-	Controler controler;
-	String emissionEventOutputFile;
-	Integer lastIteration;
-	MyEmissionModule emissionModule;
-	EventWriterXML emissionEventWriter;
-
-	public MyEmissionControlerListner() {
-
-	}
+	private Controler controler;
+	private String emissionEventOutputFile;
+	private Integer lastIteration;
+	private MyEmissionModule emissionModule;
+	private EventWriterXML emissionEventWriter;
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		controler = event.getControler();
-		lastIteration = controler.getConfig().controler().getLastIteration();
-		logger.info("emissions will be calculated for iteration " + lastIteration);
+		this.controler = event.getControler();
+		this.lastIteration = this.controler.getConfig().controler().getLastIteration();
+		this.logger.info("emissions will be calculated for iteration " + this.lastIteration);
 
-		Scenario scenario = controler.getScenario() ;
-		emissionModule = new MyEmissionModule(scenario);
-		emissionModule.createLookupTables();
-		emissionModule.createEmissionHandler();
+		Scenario scenario = this.controler.getScenario() ;
+		this.emissionModule = new MyEmissionModule(scenario);
+		this.emissionModule.createLookupTables();
+		this.emissionModule.createEmissionHandler();
 
-		EventsManager eventsManager = controler.getEvents();
-		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
-		eventsManager.addHandler(emissionModule.getColdEmissionHandler());
+		EventsManager eventsManager = this.controler.getEvents();
+		eventsManager.addHandler(this.emissionModule.getWarmEmissionHandler());
+		eventsManager.addHandler(this.emissionModule.getColdEmissionHandler());
 	}
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		Integer iteration = event.getIteration();
-
-		if(lastIteration.equals(iteration)){
-			emissionEventOutputFile = controler.getControlerIO().getIterationFilename(iteration, "emission.events.xml.gz");
-			logger.info("creating new emission events writer...");
-			emissionEventWriter = new EventWriterXML(emissionEventOutputFile);
-			logger.info("adding emission events writer to emission events stream...");
-			emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);
+		if(this.lastIteration.equals(iteration)){
+			this.emissionEventOutputFile = this.controler.getControlerIO().getIterationFilename(iteration, "emission.events.xml.gz");
+			this.logger.info("creating new emission events writer...");
+			this.emissionEventWriter = new EventWriterXML(this.emissionEventOutputFile);
+			this.logger.info("adding emission events writer to emission events stream...");
+			this.emissionModule.getEmissionEventsManager().addHandler(this.emissionEventWriter);
 		}
 	}
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-		logger.info("closing emission events file...");
-		emissionEventWriter.closeFile();
-		emissionModule.writeEmissionInformation(emissionEventOutputFile);
+		this.logger.info("closing emission events file...");
+		this.emissionEventWriter.closeFile();
+		this.emissionModule.writeEmissionInformation(this.emissionEventOutputFile);
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		logger.info("\n \n \t \t Total Delays in hours is "+emissionModule.getTotalDelaysInHours()+"\n \n");
+		this.logger.info("\n \n \t \t Total Delays in hours is "+this.emissionModule.getTotalDelaysInHours()+"\n \n");
 		
 	}
 }
