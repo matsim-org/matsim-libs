@@ -45,7 +45,7 @@ public class NoiseTollTravelDisutilityCalculator implements TravelDisutility{
 	private double marginalUtlOfTravelTime;
 	private NoiseTollHandler tollHandler;
 	
-	private final double blendFactor = 0.1;
+	private final double blendFactor = 0.5;
 	
 	public NoiseTollTravelDisutilityCalculator(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, NoiseTollHandler tollHandler) {
 		this.timeCalculator = timeCalculator;
