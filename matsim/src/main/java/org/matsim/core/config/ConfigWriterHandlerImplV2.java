@@ -107,7 +107,6 @@ public class ConfigWriterHandlerImplV2 implements ConfigWriterHandler {
 		try {
 			out.write("<"+CONFIG+">");
 			out.write( this.newline );
-			out.write( this.newline );
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -118,6 +117,7 @@ public class ConfigWriterHandlerImplV2 implements ConfigWriterHandler {
 	public void endConfig(
 			final BufferedWriter out) {
 		try {
+			out.write( this.newline );
 			out.write("</"+CONFIG+">");
 			out.write( this.newline );
 		} catch (IOException e) {
@@ -141,8 +141,8 @@ public class ConfigWriterHandlerImplV2 implements ConfigWriterHandler {
 	@Override
 	public void writeSeparator(final BufferedWriter out) {
 		try {
-			out.write("<!-- ====================================================================== -->");
 			out.write( this.newline );
+			out.write("<!-- ====================================================================== -->");
 			out.write( this.newline );
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
