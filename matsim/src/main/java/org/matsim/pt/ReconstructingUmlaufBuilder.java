@@ -19,17 +19,9 @@
 
 package org.matsim.pt;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -37,9 +29,10 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
+import java.util.*;
+
 public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 	private static final Logger log = Logger.getLogger(ReconstructingUmlaufBuilder.class);
-
 
 	private static final Comparator<UmlaufStueck> departureTimeComparator = new Comparator<UmlaufStueck>() {
 
@@ -54,32 +47,23 @@ public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 	private Vehicles vehicles;
 	private Map<Id,Umlauf> umlaeufe = null;
 	private ArrayList<UmlaufStueck> umlaufStuecke;
-
 	private UmlaufInterpolator umlaufInterpolator;
-
-
 	private Map<Id, Id> umlaufIdsByVehicleId;
-
 
 	public ReconstructingUmlaufBuilder(Network network, Collection<TransitLine> transitLines,
 			Vehicles basicVehicles, PlanCalcScoreConfigGroup config) {
-		super();
 		this.umlaufInterpolator = new UmlaufInterpolator(network, config);
 		this.transitLines = transitLines;
 		this.vehicles = basicVehicles;
-		this.umlaufIdsByVehicleId = new HashMap<Id, Id>();
+		this.umlaufIdsByVehicleId = new HashMap<>();
 	}
 
 	@Override
 	public Collection<Umlauf> build() {
-		if ( umlaeufe != null ) {
-			log.warn("Found `umlaeufe != null' thus re-using existing umlaufe.  This should be ok but it is not systematically tested." );
-		} else {
-			umlaeufe = new HashMap<Id,Umlauf>();
-			createEmptyUmlaeufe();
-			createUmlaufStuecke();
-			createUmlaeufe();
-		}
+		umlaeufe = new HashMap<>();
+		createEmptyUmlaeufe();
+		createUmlaufStuecke();
+		createUmlaeufe();
 		return umlaeufe.values();
 	}
 	
@@ -105,7 +89,7 @@ public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 	}
 	
 	private Id createUmlaufIdFromVehicle(Vehicle vehicle){
-		Id id = new IdImpl(vehicle.getId().toString() + "_" + vehicle.getType().getId());
+		Id<Umlauf> id = Id.create(vehicle.getId().toString() + "_" + vehicle.getType().getId().toString(), Umlauf.class);
 		this.umlaufIdsByVehicleId.put(vehicle.getId(), id);
 		return id;
 	}
@@ -119,7 +103,7 @@ public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 	}
 
 	private void createUmlaufStuecke() {
-		this.umlaufStuecke = new ArrayList<UmlaufStueck>();
+		this.umlaufStuecke = new ArrayList<>();
 		log.info("Generating UmlaufStuecke");
 		int cnt = 0;
 		for (TransitLine line : transitLines) {
