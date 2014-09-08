@@ -23,6 +23,7 @@ package playground.singapore.typesPopulation.population;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 /**
@@ -33,13 +34,13 @@ public class PersonImplPops extends PersonImpl {
 	public static final String DEFAULT_POP = "-1";
 	public static final Id DEFAULT_POP_ID = new IdImpl(DEFAULT_POP);
 	
-	private Id populationId;
+	private Id<Population> populationId;
 
 	public PersonImplPops(Id id) {
 		super(id);
 		this.populationId = new IdImpl(DEFAULT_POP);
 	}
-	public PersonImplPops(Id id, Id populationId) {
+	public PersonImplPops(Id id, Id<Population> populationId) {
 		super(id);
 		this.populationId = populationId==null?new IdImpl(DEFAULT_POP):populationId;
 	}
@@ -55,11 +56,11 @@ public class PersonImplPops extends PersonImpl {
 			addPlan(plan);
 		setSelectedPlan(person.getSelectedPlan());
 	}
-	public Id getPopulationId() {
+	public Id<Population> getPopulationId() {
 		return populationId;
 	}
 
-	public void setPopulationId(Id populationId) {
+	public void setPopulationId(Id<Population> populationId) {
 		this.populationId = populationId;
 	}
 
