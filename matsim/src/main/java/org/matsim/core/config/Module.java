@@ -151,6 +151,13 @@ public class Module {
 		parameterSets.add( set );
 	}
 
+	public boolean removeParameterSet( final Module set ) {
+		final Collection<Module> parameterSets = parameterSetsPerType.get( set.getName() );
+		return parameterSets != null ?
+			parameterSets.remove( set ) :
+			false;
+	}
+
 	/**
 	 * Method called on parameter sets added by the add methods.
 	 * Can be extended if there are consistency checks to makes,
