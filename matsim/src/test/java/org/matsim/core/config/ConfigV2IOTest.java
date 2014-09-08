@@ -87,16 +87,16 @@ public class ConfigV2IOTest {
 				inModule.getParameterSets().keySet() );
 
 		for ( String type : outModule.getParameterSets().keySet() ) {
-			final Collection<Module> outSets = outModule.getParameterSets( type );
-			final Collection<Module> inSets = inModule.getParameterSets( type );
+			final Collection<? extends Module> outSets = outModule.getParameterSets( type );
+			final Collection<? extends Module> inSets = inModule.getParameterSets( type );
 
 			Assert.assertEquals(
 					"different number of sets for type "+type,
 					outSets.size(),
 					inSets.size() );
 
-			final Iterator<Module> outIter = outSets.iterator();
-			final Iterator<Module> inIter = inSets.iterator();
+			final Iterator<? extends Module> outIter = outSets.iterator();
+			final Iterator<? extends Module> inIter = inSets.iterator();
 
 			while ( outIter.hasNext() ) {
 				assertTheSame(

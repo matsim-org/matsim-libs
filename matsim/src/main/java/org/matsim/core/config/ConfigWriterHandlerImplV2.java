@@ -30,6 +30,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.matsim.core.utils.io.UncheckedIOException;
 
@@ -78,7 +79,7 @@ public class ConfigWriterHandlerImplV2 implements ConfigWriterHandler {
 				writer.write( this.newline );
 			}
 
-			for ( Map.Entry<String, Collection<Module>> entry : module.getParameterSets().entrySet() ) {
+			for ( Entry<String, ? extends Collection<? extends Module>> entry : module.getParameterSets().entrySet() ) {
 				for ( Module pSet : entry.getValue() ) {
 					writeModule(
 							writer,

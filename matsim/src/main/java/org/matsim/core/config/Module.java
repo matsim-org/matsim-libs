@@ -82,14 +82,17 @@ public class Module {
 	 * and (optionally) a RuntimeException being thrown.
 	 */
 	protected void checkConsistency() {
-		/* nothing to do in default */
+		// default: just call this method on parameter sets
+		for ( Collection<? extends Module> sets : getParameterSets().values() ) {
+			for ( Module set : sets ) set.checkConsistency();
+		}
 	}
 
 	public String getValue(final String paramName) {
 		return this.params.get(paramName);
 	}
 
-	protected final String getName() {
+	public final String getName() {
 		return this.name;
 	}
 
@@ -111,6 +114,12 @@ public class Module {
 				"[nOfParams=" + this.params.size() + "]";
 	}
 
+	// /////////////////////////////////////////////////////////////////////////
+	// "Parameter sets" are nested sub-modules.
+	// They have a "type", which is the equivalent of the name of a Module,
+	// except that an arbitrary number of parameter sets per type is allowed.
+	// TODO: find a way to associate a type with a specific java type/class
+	// /////////////////////////////////////////////////////////////////////////
 	/**
 	 * Override if parameter sets of a certain type need a special implementation
 	 */
@@ -118,31 +127,48 @@ public class Module {
 		return new Module( type );
 	}
 
-	public Module createAndAddParameterSet(final String type) {
+	public final Module createAndAddParameterSet(final String type) {
 		final Module m = createParameterSet( type );
-		addParameterSet( type , m );
+
+		if ( !m.getName().equals( type ) ) {
+			throw new IllegalArgumentException( "the \"name\" of parameter sets should correspond to their type."+
+					" type \""+type+"\" is different from name \""+m.getName()+"\" " );
+		}
+
+		addParameterSet( m );
 		return m;
 	}
 
-	public void addParameterSet(final String type, final Module set) {
-		Collection<Module> parameterSets = parameterSetsPerType.get( type );
+	public final void addParameterSet(final Module set) {
+		checkParameterSet( set );
+		Collection<Module> parameterSets = parameterSetsPerType.get( set.getName() );
 
 		if ( parameterSets == null ) {
 			parameterSets = new ArrayList<Module>();
-			parameterSetsPerType.put( type ,  parameterSets );
+			parameterSetsPerType.put( set.getName() ,  parameterSets );
 		}
 
 		parameterSets.add( set );
 	}
 
-	public Collection<Module> getParameterSets(final String type) {
+	/**
+	 * Method called on parameter sets added by the add methods.
+	 * Can be extended if there are consistency checks to makes,
+	 * for instance if parameter sets of a given type should be
+	 * instances of a particular class.
+	 */
+	protected void checkParameterSet(final Module set) {
+		// empty for inheritance
+	}
+
+	public final Collection<? extends Module> getParameterSets(final String type) {
 		final Collection<Module> sets = parameterSetsPerType.get( type );
 		return sets == null ?
 			Collections.<Module>emptySet() :
 			Collections.unmodifiableCollection( sets );
 	}
 
-	public Map<String, Collection<Module>> getParameterSets() {
+	public final Map<String, ? extends Collection<? extends Module>> getParameterSets() {
 		// TODO: immutabilize (including lists)
 		return parameterSetsPerType;
 	}
