@@ -24,12 +24,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.Module;
+import org.matsim.core.config.experimental.ReflectiveModule;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
@@ -103,49 +103,26 @@ public class PlanCalcScoreConfigGroup extends Module {
 	
 	private static final String SCORING_THIS_ACTIVITY_AT_ALL = "scoringThisActivityAtAll_" ;
 
+	private final ReflectiveDelegate delegate = new ReflectiveDelegate();
+	private final Map<String, ActivityParams> activityTypesByNumber = new HashMap< >();
+
+
 	public PlanCalcScoreConfigGroup() {
 		super(GROUP_NAME);
+
+		this.addParameterSet( new ModeParams( TransportMode.car ) );
+		this.addParameterSet( new ModeParams( TransportMode.pt ) );
+		this.addParameterSet( new ModeParams( TransportMode.walk ) );
+		this.addParameterSet( new ModeParams( TransportMode.bike ) );
+		this.addParameterSet( new ModeParams( TransportMode.other ) );
 	}
 
-	private double learningRate = 1.0;
-	private double brainExpBeta = 1.0;
-	private double pathSizeLogitBeta = 1.0;
-	private double lateArrival = -18.0;
-	private double earlyDeparture = -0.0;
-	private double performing = +6.0;
-
-	private final HashMap<String, ModeParams> modes = new LinkedHashMap<String, ModeParams>();
-
-	{
-		ModeParams car = new ModeParams();
-		modes.put(TransportMode.car, car);
-		ModeParams pt = new ModeParams();
-		modes.put(TransportMode.pt, pt);
-		ModeParams walk = new ModeParams();
-		modes.put(TransportMode.walk, walk);
-		ModeParams bike = new ModeParams();
-		modes.put(TransportMode.bike, bike);
-		ModeParams other = new ModeParams();
-		modes.put(TransportMode.other, other);
-	}
-
-	private double waiting = -0.0;
 
 	private Double waitingPt = null ;  // if not actively set by user, it will later be set to "travelingPt".
-
-	private double marginalUtilityOfMoney = 1.0 ;
-
-	private double utilityOfLineSwitch = - 1 ;
-
-	private final HashMap<String, ActivityParams> activityTypes = new LinkedHashMap<String, ActivityParams>();
-	private final HashMap<String, ActivityParams> activityTypesByNumber = new HashMap<String, ActivityParams>();
-
-	private boolean writeExperiencedPlans = false;
 
 	// ---
 	
 	private static final String USING_OLD_SCORING_BELOW_ZERO_UTILITY_DURATION = "usingOldScoringBelowZeroUtilityDuration" ;
-	private boolean usingOldScoringBelowZeroUtilityDuration = false ;
 
 	/**
 	 * can't set this from outside java since for the time being it is not useful there. kai, dec'13
@@ -166,650 +143,901 @@ public class PlanCalcScoreConfigGroup extends Module {
 
 	@Override
 	public void addParam(final String key, final String value) {
-		if ( USING_OLD_SCORING_BELOW_ZERO_UTILITY_DURATION.equals(key)) {
-			this.setUsingOldScoringBelowZeroUtilityDuration(Boolean.parseBoolean(value));
-		} else if (LEARNING_RATE.equals(key)) {
-			setLearningRate(Double.parseDouble(value));
-		} else if (BRAIN_EXP_BETA.equals(key)) {
-			setBrainExpBeta(Double.parseDouble(value));
-		} else if (PATH_SIZE_LOGIT_BETA.equals(key)) {
-			setPathSizeLogitBeta(Double.parseDouble(value));
-		} else if (LATE_ARRIVAL.equals(key)) {
-			setLateArrival_utils_hr(Double.parseDouble(value));
-		} else if (EARLY_DEPARTURE.equals(key)) {
-			setEarlyDeparture_utils_hr(Double.parseDouble(value));
-		} else if (PERFORMING.equals(key)) {
-			setPerforming_utils_hr(Double.parseDouble(value));
-		} else if (TRAVELING_CAR.equals(key)) {
+		// backward compatibility: underscored
+		if (key.startsWith(ACTIVITY_TYPE)) {
+			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_TYPE.length()), true);
+			
+			actParams.setType(value);
+			addActivityParams( actParams );
+		}
+		else if (key.startsWith(ACTIVITY_PRIORITY)) {
+			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_PRIORITY.length()), true);
+			actParams.setPriority(Double.parseDouble(value));
+		}
+		else if (key.startsWith(ACTIVITY_TYPICAL_DURATION)) {
+			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_TYPICAL_DURATION.length()), true);
+			actParams.setTypicalDuration(Time.parseTime(value));
+		}
+		else if (key.startsWith(ACTIVITY_MINIMAL_DURATION)) {
+			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_MINIMAL_DURATION.length()), true);
+			actParams.setMinimalDuration(Time.parseTime(value));
+		}
+		else if (key.startsWith(ACTIVITY_OPENING_TIME)) {
+			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_OPENING_TIME.length()), true);
+			actParams.setOpeningTime(Time.parseTime(value));
+		}
+		else if (key.startsWith(ACTIVITY_LATEST_START_TIME)) {
+			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_LATEST_START_TIME.length()), true);
+			actParams.setLatestStartTime(Time.parseTime(value));
+		}
+		else if (key.startsWith(ACTIVITY_EARLIEST_END_TIME)) {
+			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_EARLIEST_END_TIME.length()), true);
+			actParams.setEarliestEndTime(Time.parseTime(value));
+		}
+		else if (key.startsWith(ACTIVITY_CLOSING_TIME)) {
+			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_CLOSING_TIME.length()), true);
+			actParams.setClosingTime(Time.parseTime(value));
+		}
+		else if (key.startsWith(SCORING_THIS_ACTIVITY_AT_ALL)) {
+			ActivityParams actParams = getActivityTypeByNumber(key.substring(SCORING_THIS_ACTIVITY_AT_ALL.length()), true);
+			actParams.setScoringThisActivityAtAll( Boolean.parseBoolean(value) );
+		}
+		else if (key.startsWith(TRAVELING)) {
+			ModeParams modeParams = getOrCreateModeParams(key.substring(TRAVELING.length()));
+			modeParams.setMarginalUtilityOfTraveling(Double.parseDouble(value));
+		}
+		else if (key.startsWith(MARGINAL_UTL_OF_DISTANCE)) {
+			ModeParams modeParams = getOrCreateModeParams(key.substring(MARGINAL_UTL_OF_DISTANCE.length()));
+			modeParams.setMarginalUtilityOfDistance(Double.parseDouble(value));
+		}
+		else if (key.startsWith(MONETARY_DISTANCE_COST_RATE)) {
+			ModeParams modeParams = getOrCreateModeParams(key.substring(MONETARY_DISTANCE_COST_RATE.length()));
+			modeParams.setMonetaryDistanceCostRate(Double.parseDouble(value));
+		}
+		else if (key.startsWith(CONSTANT)) {
+			ModeParams modeParams = getOrCreateModeParams(key.substring(CONSTANT.length()));
+			modeParams.setConstant(Double.parseDouble(value));
+		}
+
+		// backward compatibility: "typed" traveling
+		else if (TRAVELING_CAR.equals(key)) {
 			setTraveling_utils_hr(Double.parseDouble(value));
-		} else if (TRAVELING_PT.equals(key)) {
+		}
+		else if (TRAVELING_PT.equals(key)) {
 			setTravelingPt_utils_hr(Double.parseDouble(value));
-		} else if (TRAVELING_WALK.equals(key)) {
+		}
+		else if (TRAVELING_WALK.equals(key)) {
 			setTravelingWalk_utils_hr(Double.parseDouble(value));
-		} else if (TRAVELING_OTHER.equals(key)) {
+		}
+		else if (TRAVELING_OTHER.equals(key)) {
 			setTravelingOther_utils_hr(Double.parseDouble(value));
-		} else if (TRAVELING_BIKE.equals(key)) {
+		}
+		else if (TRAVELING_BIKE.equals(key)) {
 			setTravelingBike_utils_hr(Double.parseDouble(value));
-		} else if (MARGINAL_UTL_OF_DISTANCE_CAR.equals(key)){
+		}
+
+		// backward compatibility: "typed" util of distance
+		else if (MARGINAL_UTL_OF_DISTANCE_CAR.equals(key)){
 			setMarginalUtlOfDistanceCar(Double.parseDouble(value));
-		} else if (MARGINAL_UTL_OF_DISTANCE_PT.equals(key)){
+		}
+		else if (MARGINAL_UTL_OF_DISTANCE_PT.equals(key)){
 			setMarginalUtlOfDistancePt(Double.parseDouble(value));
-		} else if (MARGINAL_UTL_OF_DISTANCE_WALK.equals(key)){
+		}
+		else if (MARGINAL_UTL_OF_DISTANCE_WALK.equals(key)){
 			setMarginalUtlOfDistanceWalk(Double.parseDouble(value));
-		} else if (MARGINAL_UTL_OF_DISTANCE_OTHER.equals(key)){
+		}
+		else if (MARGINAL_UTL_OF_DISTANCE_OTHER.equals(key)){
 			setMarginalUtlOfDistanceOther(Double.parseDouble(value));
-		} else if ( MARGINAL_UTL_OF_MONEY.equals(key) ) {
-			setMarginalUtilityOfMoney( Double.parseDouble(value) ) ;
-		} else if ( MONETARY_DISTANCE_COST_RATE_CAR.equals(key) ) {
+		}
+
+		// backward compatibility: "typed" constants
+		else if ( CONSTANT_CAR.equals(key)) {
+			this.setConstantCar(Double.parseDouble(value)) ;
+		}
+		else if ( CONSTANT_WALK.equals(key)) {
+			this.setConstantWalk(Double.parseDouble(value)) ;
+		}
+		else if ( CONSTANT_OTHER.equals(key)) {
+			this.setConstantOther(Double.parseDouble(value)) ;
+		}
+		else if ( CONSTANT_PT.equals(key)) {
+			this.setConstantPt(Double.parseDouble(value)) ;
+		}
+		else if ( CONSTANT_BIKE.equals(key)) {
+			this.setConstantBike(Double.parseDouble(value)) ;
+		}
+
+		// backward compatibility: "typed" monetary cost rate
+		else if ( MONETARY_DISTANCE_COST_RATE_CAR.equals(key) ) {
 			setMonetaryDistanceCostRateCar( Double.parseDouble(value) );
 		} else if ( MONETARY_DISTANCE_COST_RATE_PT.equals(key) ) {
 			setMonetaryDistanceCostRatePt( Double.parseDouble(value) ) ;
-		} else if (WAITING.equals(key)) {
-			setMarginalUtlOfWaiting_utils_hr(Double.parseDouble(value));
-		} else if (WAITING_PT.equals(key)) {
-			setMarginalUtlOfWaitingPt_utils_hr(Double.parseDouble(value));
-		} else if (UTL_OF_LINE_SWITCH.equals(key)) {
-			setUtilityOfLineSwitch(Double.parseDouble(value)) ;
-		} else if ( CONSTANT_CAR.equals(key)) {
-			this.setConstantCar(Double.parseDouble(value)) ;
-		} else if ( CONSTANT_WALK.equals(key)) {
-			this.setConstantWalk(Double.parseDouble(value)) ;
-		} else if ( CONSTANT_OTHER.equals(key)) {
-			this.setConstantOther(Double.parseDouble(value)) ;
-		} else if ( CONSTANT_PT.equals(key)) {
-			this.setConstantPt(Double.parseDouble(value)) ;
-		} else if ( CONSTANT_BIKE.equals(key)) {
-			this.setConstantBike(Double.parseDouble(value)) ;
-		} else if ( WRITE_EXPERIENCED_PLANS.equals(key)) {
-			this.setWriteExperiencedPlans(Boolean.parseBoolean(value));
-		} else if (key.startsWith(ACTIVITY_TYPE)) {
-			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_TYPE.length()), true);
-			this.activityTypes.remove(actParams.getType());
-			actParams.setType(value);
-			this.activityTypes.put(value, actParams);
-		} else if (key.startsWith(ACTIVITY_PRIORITY)) {
-			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_PRIORITY.length()), true);
-			actParams.setPriority(Double.parseDouble(value));
-		} else if (key.startsWith(ACTIVITY_TYPICAL_DURATION)) {
-			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_TYPICAL_DURATION.length()), true);
-			actParams.setTypicalDuration(Time.parseTime(value));
-		} else if (key.startsWith(ACTIVITY_MINIMAL_DURATION)) {
-			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_MINIMAL_DURATION.length()), true);
-			actParams.setMinimalDuration(Time.parseTime(value));
-		} else if (key.startsWith(ACTIVITY_OPENING_TIME)) {
-			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_OPENING_TIME.length()), true);
-			actParams.setOpeningTime(Time.parseTime(value));
-		} else if (key.startsWith(ACTIVITY_LATEST_START_TIME)) {
-			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_LATEST_START_TIME.length()), true);
-			actParams.setLatestStartTime(Time.parseTime(value));
-		} else if (key.startsWith(ACTIVITY_EARLIEST_END_TIME)) {
-			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_EARLIEST_END_TIME.length()), true);
-			actParams.setEarliestEndTime(Time.parseTime(value));
-		} else if (key.startsWith(ACTIVITY_CLOSING_TIME)) {
-			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_CLOSING_TIME.length()), true);
-			actParams.setClosingTime(Time.parseTime(value));
-		} else if (key.startsWith(SCORING_THIS_ACTIVITY_AT_ALL)) {
-			ActivityParams actParams = getActivityTypeByNumber(key.substring(SCORING_THIS_ACTIVITY_AT_ALL.length()), true);
-			actParams.setScoringThisActivityAtAll( Boolean.parseBoolean(value) );
-		} else if (key.startsWith(TRAVELING)) {
-			ModeParams modeParams = getOrCreateModeParams(key.substring(TRAVELING.length()));
-			modeParams.setMarginalUtilityOfTraveling(Double.parseDouble(value));
-		} else if (key.startsWith(MARGINAL_UTL_OF_DISTANCE)) {
-			ModeParams modeParams = getOrCreateModeParams(key.substring(MARGINAL_UTL_OF_DISTANCE.length()));
-			modeParams.setMarginalUtilityOfDistance(Double.parseDouble(value));
-		} else if (key.startsWith(MONETARY_DISTANCE_COST_RATE)) {
-			ModeParams modeParams = getOrCreateModeParams(key.substring(MONETARY_DISTANCE_COST_RATE.length()));
-			modeParams.setMonetaryDistanceCostRate(Double.parseDouble(value));
-		} else if (key.startsWith(CONSTANT)) {
-			ModeParams modeParams = getOrCreateModeParams(key.substring(CONSTANT.length()));
-			modeParams.setConstant(Double.parseDouble(value));
-		} else {
-			throw new IllegalArgumentException(key);
 		}
-}
+
+		else if ( WAITING_PT.equals( key ) ) {
+			setMarginalUtlOfWaitingPt_utils_hr( Double.parseDouble( value ) );
+		}
+
+		else {
+			delegate.addParam( key , value );
+		}
+	}
 
 	public ModeParams getOrCreateModeParams(String modeName) {
-		ModeParams modeParams = modes.get(modeName);
+		ModeParams modeParams = getModes().get(modeName);
 		if (modeParams == null) {
-			modeParams = new ModeParams();
-			modes.put(modeName, modeParams);
+			modeParams = new ModeParams( modeName );
+			addParameterSet( modeParams );
 		}
 		return modeParams;
 	}
 
-@Override
-public Map<String, String> getParams() {
-	LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
-
-	map.put(USING_OLD_SCORING_BELOW_ZERO_UTILITY_DURATION, Boolean.toString(this.usingOldScoringBelowZeroUtilityDuration )) ;
-	map.put(LEARNING_RATE, Double.toString(this.getLearningRate()) );
-	map.put(BRAIN_EXP_BETA, Double.toString(this.getBrainExpBeta()) );
-	map.put(PATH_SIZE_LOGIT_BETA, Double.toString(this.getPathSizeLogitBeta()) );
-	map.put(LATE_ARRIVAL, Double.toString(this.getLateArrival_utils_hr()) );
-	map.put(EARLY_DEPARTURE, Double.toString(this.getEarlyDeparture_utils_hr()) );
-	map.put(PERFORMING, Double.toString(this.getPerforming_utils_hr()) );
-	map.put(WAITING, Double.toString(this.getMarginalUtlOfWaiting_utils_hr()));
-	map.put(WAITING_PT, Double.toString(this.getMarginalUtlOfWaitingPt_utils_hr()));
-	map.put(MARGINAL_UTL_OF_MONEY, Double.toString( this.getMarginalUtilityOfMoney() ) ) ;
-	map.put(UTL_OF_LINE_SWITCH, Double.toString( this.getUtilityOfLineSwitch() )) ;
-	map.put(WRITE_EXPERIENCED_PLANS, Boolean.toString(this.writeExperiencedPlans));
-	int index = 0;
-	for(ActivityParams params : this.activityTypes.values()) {
-		String key = Integer.toString(index);
-		index++;
-		map.put(ACTIVITY_TYPE + key, params.type);
-		map.put(ACTIVITY_PRIORITY + key, Double.toString(params.priority));
-		map.put(ACTIVITY_TYPICAL_DURATION + key, Time.writeTime(params.typicalDuration));
-		map.put(ACTIVITY_MINIMAL_DURATION + key, Time.writeTime(params.minimalDuration));
-		map.put(ACTIVITY_OPENING_TIME + key, Time.writeTime(params.openingTime));
-		map.put(ACTIVITY_LATEST_START_TIME + key, Time.writeTime(params.latestStartTime));
-		map.put(ACTIVITY_EARLIEST_END_TIME + key, Time.writeTime(params.earliestEndTime));
-		map.put(ACTIVITY_CLOSING_TIME + key, Time.writeTime(params.closingTime));
-		map.put(SCORING_THIS_ACTIVITY_AT_ALL + key, Boolean.toString( params.scoringThisActivityAtAll ) ) ;
+	@Override
+	public Map<String, String> getParams() {
+		final Map<String, String> params = delegate.getParams();
+		if ( waitingPt != null ) {
+			params.put( WAITING_PT , waitingPt.toString() );
+		}
+		return params;
 	}
-	for (Entry<String, ModeParams> params : this.modes.entrySet()) {
-		String mode = params.getKey();
-		map.put(TRAVELING + mode, Double.toString(params.getValue().getMarginalUtilityOfTraveling()));
-		map.put(MARGINAL_UTL_OF_DISTANCE + mode, Double.toString(params.getValue().getMarginalUtilityOfDistance()));
-		map.put(MONETARY_DISTANCE_COST_RATE + mode, Double.toString(params.getValue().getMonetaryDistanceCostRate()));
-		map.put(CONSTANT + mode, Double.toString(params.getValue().getConstant()));
+
+	@Override
+	public final Map<String, String> getComments() {
+		Map<String,String> map = super.getComments();
+		map.put(USING_OLD_SCORING_BELOW_ZERO_UTILITY_DURATION, "There used to be a plateau between duration=0 and duration=zeroUtilityDuration. "
+				+ "This caused durations to evolve to zero once they were below zeroUtilityDuration, causing problems.  Only use this switch if you need to be "
+				+ "backwards compatible with some old results.  (changed nov'13)") ;
+		map.put(PERFORMING,"[utils/hr] marginal utility of doing an activity.  normally positive.  also the opportunity cost of " +
+				"time if agent is doing nothing.  MATSim separates the resource value of time from the direct (dis)utility of travel time, see, e.g., "
+				+ "Boerjesson and Eliasson, TR-A 59 (2014) 144-158.");
+		map.put(LATE_ARRIVAL, "[utils/hr] utility for arriving late (i.e. after the latest start time).  normally negative") ;
+		map.put(EARLY_DEPARTURE, "[utils/hr] utility for departing early (i.e. before the earliest end time).  Normally negative.  Probably " +
+				"implemented correctly, but not tested." );
+		map.put(WAITING, "[utils/hr] additional marginal utility for waiting. normally negative. this comes on top of the opportunity cost of time.  Probably " +
+				"implemented correctly, but not tested.") ;
+		map.put(WAITING_PT, "[utils/hr] additional marginal utility for waiting for a pt vehicle. normally negative. this comes on top of the opportunity cost " +
+				"of time. Default: if not set explicitly, it is equal to traveling_pt!!!" ) ;
+		map.put(BRAIN_EXP_BETA, "logit model scale parameter. default: 2.  Has name and default value for historical reasons " +
+				"(see Bryan Raney's phd thesis).") ;
+		map.put(LEARNING_RATE, "new_score = (1-learningRate)*old_score + learningRate * score_from_mobsim.  learning rates " +
+				"close to zero emulate score averaging, but slow down initial convergence") ;
+		map.put(UTL_OF_LINE_SWITCH, "[utils] utility of switching a line (= transfer penalty).  Normally negative") ;
+		map.put(MARGINAL_UTL_OF_MONEY, "[utils/unit_of_money] conversion of money (e.g. toll, distance cost) into utils. Normall positive (i.e. toll/cost/fare are processed as negative amounts of money)." ) ;
+		map.put(WRITE_EXPERIENCED_PLANS, "write a plans file in each iteration directory which contains what each agent actually did, and the score it received.");
+
+		return map;
 	}
-	return map;
-}
 
-@Override
-public final Map<String, String> getComments() {
-	Map<String,String> map = super.getComments();
-	map.put(USING_OLD_SCORING_BELOW_ZERO_UTILITY_DURATION, "There used to be a plateau between duration=0 and duration=zeroUtilityDuration. "
-			+ "This caused durations to evolve to zero once they were below zeroUtilityDuration, causing problems.  Only use this switch if you need to be "
-			+ "backwards compatible with some old results.  (changed nov'13)") ;
-	map.put(PERFORMING,"[utils/hr] marginal utility of doing an activity.  normally positive.  also the opportunity cost of " +
-			"time if agent is doing nothing.  MATSim separates the resource value of time from the direct (dis)utility of travel time, see, e.g., "
-			+ "Boerjesson and Eliasson, TR-A 59 (2014) 144-158.");
-	map.put(LATE_ARRIVAL, "[utils/hr] utility for arriving late (i.e. after the latest start time).  normally negative") ;
-	map.put(EARLY_DEPARTURE, "[utils/hr] utility for departing early (i.e. before the earliest end time).  Normally negative.  Probably " +
-			"implemented correctly, but not tested." );
-	map.put(WAITING, "[utils/hr] additional marginal utility for waiting. normally negative. this comes on top of the opportunity cost of time.  Probably " +
-			"implemented correctly, but not tested.") ;
-	map.put(WAITING_PT, "[utils/hr] additional marginal utility for waiting for a pt vehicle. normally negative. this comes on top of the opportunity cost " +
-			"of time. Default: if not set explicitly, it is equal to traveling_pt!!!" ) ;
-	map.put(BRAIN_EXP_BETA, "logit model scale parameter. default: 2.  Has name and default value for historical reasons " +
-			"(see Bryan Raney's phd thesis).") ;
-	map.put(LEARNING_RATE, "new_score = (1-learningRate)*old_score + learningRate * score_from_mobsim.  learning rates " +
-			"close to zero emulate score averaging, but slow down initial convergence") ;
-	map.put(UTL_OF_LINE_SWITCH, "[utils] utility of switching a line (= transfer penalty).  Normally negative") ;
-	map.put(MARGINAL_UTL_OF_MONEY, "[utils/unit_of_money] conversion of money (e.g. toll, distance cost) into utils. Normall positive (i.e. toll/cost/fare are processed as negative amounts of money)." ) ;
-	map.put(WRITE_EXPERIENCED_PLANS, "write a plans file in each iteration directory which contains what each agent actually did, and the score it received.");
-	for (int index = 0; index < this.activityTypes.size(); index++) {
-		String key = Integer.toString(index);
-		map.put(ACTIVITY_TYPE + key, Gbl.SEPARATOR );
+	private ActivityParams getActivityTypeByNumber(final String number, final boolean createIfMissing) {
+		ActivityParams actType = this.activityTypesByNumber.get(number);
+		if ((actType == null) && createIfMissing) {
+			// not sure what this means, but I found it so...
+			// TD, sep'14
+			actType = new ActivityParams(number);
+			this.activityTypesByNumber.put(number, actType);
+			addParameterSet( actType );
+		}
+		return actType;
 	}
-	for (Entry<String, ModeParams> entry : modes.entrySet()) {
-		map.put(TRAVELING + entry.getKey(), "[utils/hr] additional marginal utility of traveling.  normally negative.  this comes on top " +
-				"of the opportunity cost of time");
-		map.put(MARGINAL_UTL_OF_DISTANCE + entry.getKey(), "[utils/m] utility of walking per m, normally negative.  this is " +
-				"on top of the time (dis)utility.") ;
-		map.put(MONETARY_DISTANCE_COST_RATE + entry.getKey(), "[unit_of_money/m] conversion of distance into money. Probably needs to be negative to work." ) ;
-		map.put(CONSTANT + entry.getKey(), "[utils] alternative-specific constant.  no guarantee that this is used anywhere. " +
-				"default=0 to be backwards compatible for the time being" ) ;
+
+	public Collection<String> getActivityTypes() {
+		return this.getActivityParamsPerType().keySet();
 	}
-	return map;
-}
 
-private ActivityParams getActivityTypeByNumber(final String number, final boolean createIfMissing) {
-	ActivityParams actType = this.activityTypesByNumber.get(number);
-	if ((actType == null) && createIfMissing) {
-		actType = new ActivityParams(number);
-		this.activityTypesByNumber.put(number, actType);
-		this.activityTypes.put(number, actType);
+	public Collection<ActivityParams> getActivityParams() {
+		return (Collection<ActivityParams>) getParameterSets( ActivityParams.SET_TYPE );
 	}
-	return actType;
-}
 
-public Collection<String> getActivityTypes() {
-	return this.activityTypes.keySet();
-}
+	public Map<String, ActivityParams> getActivityParamsPerType() {
+		final Map<String, ActivityParams> map = new LinkedHashMap< >();
 
-public Collection<ActivityParams> getActivityParams() {
-	return this.activityTypes.values();
-}
+		for ( ActivityParams pars : getActivityParams() ) {
+			map.put( pars.getType() , pars );
+		}
 
-public Map<String, ModeParams> getModes() {
-	return this.modes;
-}
+		return map;
+	}
+
+	public Map<String, ModeParams> getModes() {
+		final Collection<ModeParams> modes = (Collection<ModeParams>) getParameterSets( ModeParams.SET_TYPE );
+		final Map<String, ModeParams> map = new LinkedHashMap< >();
+
+		for ( ModeParams pars : modes ) {
+			map.put( pars.getMode() , pars );
+		}
+
+		return map;
+	}
 
 
-/** Checks whether all the settings make sense or if there are some problems with the parameters
- * currently set. Currently, this checks that for at least one activity type opening AND closing
- * times are defined. */
-@Override
-public void checkConsistency() {
-	boolean hasOpeningAndClosingTime = false;
-	boolean hasOpeningTimeAndLatePenalty = false ;
+	/** Checks whether all the settings make sense or if there are some problems with the parameters
+	 * currently set. Currently, this checks that for at least one activity type opening AND closing
+	 * times are defined. */
+	@Override
+	public void checkConsistency() {
+		super.checkConsistency();
+		boolean hasOpeningAndClosingTime = false;
+		boolean hasOpeningTimeAndLatePenalty = false ;
 
-	for (ActivityParams actType : this.activityTypes.values()) {
-		if ( actType.isScoringThisActivityAtAll() ) {
-			// (checking consistency only if activity is scored at all)
+		// This cannot be done in ActivityParams (where it would make more sense),
+		// because some global properties are also checked
+		for ( ActivityParams actType : this.getActivityParams() ) {
+			if ( actType.isScoringThisActivityAtAll() ) {
+				// (checking consistency only if activity is scored at all)
+
+				if ((actType.getOpeningTime() != Time.UNDEFINED_TIME) && (actType.getClosingTime() != Time.UNDEFINED_TIME)) {
+					hasOpeningAndClosingTime = true;
+				}
+				if ((actType.getOpeningTime() != Time.UNDEFINED_TIME) && (getLateArrival_utils_hr() < -0.001)) {
+					hasOpeningTimeAndLatePenalty = true;
+				}
+				if ( actType.getOpeningTime()==0. && actType.getClosingTime()>24.*3600-1 ) {
+					log.error("it looks like you have an activity type with opening time set to 0:00 and closing " +
+							"time set to 24:00. This is most probably not the same as not setting them at all.  " +
+							"In particular, activities which extend past midnight may not accumulate scores.") ;
+				}
+			}
+		}
+		if (!hasOpeningAndClosingTime && !hasOpeningTimeAndLatePenalty) {
+			log.info("NO OPENING OR CLOSING TIMES DEFINED!\n\n\n"
+					+"There is no activity type that has an opening *and* closing time (or opening time and late penalty) defined.\n"
+					+"This usually means that the activity chains can be shifted by an arbitrary\n"
+					+"number of hours without having an effect on the score of the plans, and thus\n"
+					+"resulting in wrong results / traffic patterns.\n"
+					+"If you are using MATSim without time adaptation, you can ignore this warning.\n\n\n");
+		}
+		if ( this.getMarginalUtlOfWaiting_utils_hr() != 0.0 ) {
+			log.warn( "marginal utl of wait set to: " + this.getMarginalUtlOfWaiting_utils_hr() + ". Setting this different from zero is " +
+					"discouraged. The parameter was also abused for pt routing; if you did that, consider setting the new " +
+					"parameter waitingPt instead.");
+		}
+	}
+
+	/* direct access */
+
+	public double getMarginalUtlOfWaitingPt_utils_hr() {
+	   return this.waitingPt == null ?
+		   this.getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling() :
+		   this.waitingPt ;
+	}
+
+
+	public double getTraveling_utils_hr() {
+		return this.getModes().get(TransportMode.car).getMarginalUtilityOfTraveling();
+	}
+	public void setTraveling_utils_hr(final double traveling) {
+		this.getModes().get(TransportMode.car).setMarginalUtilityOfTraveling(traveling);
+	}
+
+	public double getTravelingPt_utils_hr() {
+		return this.getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling();
+	}
+	public void setTravelingPt_utils_hr(final double travelingPt) {
+		this.getModes().get(TransportMode.pt).setMarginalUtilityOfTraveling(travelingPt);
+	}
+
+	public double getTravelingBike_utils_hr() {
+		return this.getModes().get(TransportMode.bike).getMarginalUtilityOfTraveling();
+	}
+	public void setTravelingBike_utils_hr(final double travelingBike) {
+		this.getModes().get(TransportMode.bike).setMarginalUtilityOfTraveling(travelingBike);
+	}
+
+	public double getTravelingWalk_utils_hr() {
+		return this.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling();
+	}
+	public void setTravelingWalk_utils_hr(final double travelingWalk) {
+		this.getModes().get(TransportMode.walk).setMarginalUtilityOfTraveling(travelingWalk);
+	}
+	/**
+	 * @return the marginal utility of distance for mode walk per meter
+	 * <p/>
+	 * This was discouraged for some time but currently I think this makes sense. kai, mar'12
+	 */
+	public double getMarginalUtlOfDistanceWalk() {
+		return this.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
+	}
+	/**
+	 * @param marginalUtlOfDistanceWalk the marginal utility of distance for mode walk per meter
+	 * <p/>
+	 * This was discouraged for some time but currently I think this makes sense. kai, mar'12
+	 */
+	public void setMarginalUtlOfDistanceWalk(final double marginalUtlOfDistanceWalk) {
+		this.getModes().get(TransportMode.walk).setMarginalUtilityOfDistance(marginalUtlOfDistanceWalk);
+	}
+
+	/**
+	 * @param marginalUtlOfDistancePt the marginal utility of distance for mode pt per meter
+	 */
+	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
+	private void setMarginalUtlOfDistancePt(final double marginalUtlOfDistancePt) {
+		this.getModes().get(TransportMode.pt).setMarginalUtilityOfDistance(marginalUtlOfDistancePt);
+	}
+
+	/**
+	 * @param marginalUtlOfDistanceCar the marginal utility of distance for mode car per meter
+	 */
+	@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
+	private void setMarginalUtlOfDistanceCar(final double marginalUtlOfDistanceCar) {
+		this.getModes().get(TransportMode.car).setMarginalUtilityOfDistance(marginalUtlOfDistanceCar);
+	}
+
+
+	public void setMarginalUtlOfWaitingPt_utils_hr(double val) {
+		this.waitingPt = val ;
+	}
+
+	public ActivityParams getActivityParams(final String actType) {
+		return this.getActivityParamsPerType().get(actType);
+	}
+
+	public void addActivityParams(final ActivityParams params) {
+		final ActivityParams previous = this.getActivityParams( params.getType() );
+		
+		if ( previous != null ) {
+			if ( previous.getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
+				log.error("ERROR: Activity parameters for activity type " + previous.getType() + " were just overwritten. This happens most " +
+						"likely because you defined them in the config file and the Controler overwrites them.  Or the other way " +
+						"round.  pt interaction has problems, but doing what you are doing here will just cause " +
+						"other (less visible) problem. Please take the effort to discuss with the core team " +
+						"what needs to be done.  kai, nov'12") ;
+			} else {
+				log.info("activity parameters for activity type " + previous.getType() + " were just overwritten.") ;
+			}
 			
-			if ((actType.getOpeningTime() != Time.UNDEFINED_TIME) && (actType.getClosingTime() != Time.UNDEFINED_TIME)) {
-				hasOpeningAndClosingTime = true;
+			final boolean removed = removeParameterSet( previous );
+			if ( !removed ) throw new RuntimeException( "problem replacing activity params " );
+		}
+		
+		addParameterSet( params );
+	}
+
+	/* complex classes */
+
+	public static class ActivityParams extends ReflectiveModule implements MatsimParameters {
+		final static String SET_TYPE = "activityParams";
+		private String type;
+		private double priority = 1.0;
+		private double typicalDuration = Time.UNDEFINED_TIME;
+		private double minimalDuration = Time.UNDEFINED_TIME;
+		private double openingTime = Time.UNDEFINED_TIME;
+		private double latestStartTime = Time.UNDEFINED_TIME;
+		private double earliestEndTime = Time.UNDEFINED_TIME;
+		private double closingTime = Time.UNDEFINED_TIME;
+		private boolean scoringThisActivityAtAll = true ;
+
+		public ActivityParams() {
+			super( SET_TYPE );
+		}
+
+		public ActivityParams(final String type) {
+			super( SET_TYPE );
+			this.type = type;
+		}
+
+		@StringGetter( "type" )
+		public String getType() {
+			return this.type;
+		}
+		@StringSetter( "type" )
+		public void setType(final String type) {
+			this.type = type;
+		}
+
+		@StringGetter( "priority" )
+		public double getPriority() {
+			return this.priority;
+		}
+		@StringSetter( "priority" )
+		public void setPriority(final double priority) {
+			this.priority = priority;
+		}
+
+		@StringGetter( "typicalDuration" )
+		public double getTypicalDuration() {
+			return this.typicalDuration;
+		}
+		@StringSetter( "typicalDuration" )
+		public void setTypicalDuration(final double typicalDuration) {
+			this.typicalDuration = typicalDuration;
+		}
+
+		@StringGetter( "minimalDuration" )
+		public double getMinimalDuration() {
+			return this.minimalDuration;
+		}
+
+		private static int minDurCnt=0 ;
+		@StringSetter( "minimalDuration" )
+		public void setMinimalDuration(final double minimalDuration) {
+			if ((minimalDuration != Time.UNDEFINED_TIME) && (minDurCnt<1) ) {
+				minDurCnt++ ;
+				log.warn("Setting minimalDuration different from zero is discouraged.  It is probably implemented correctly, " +
+						"but there is as of now no indication that it makes the results more realistic.  KN, Sep'08" + Gbl.ONLYONCE );
 			}
-			if ((actType.getOpeningTime() != Time.UNDEFINED_TIME) && (getLateArrival_utils_hr() < -0.001)) {
-				hasOpeningTimeAndLatePenalty = true;
-			}
-			if ( actType.getOpeningTime()==0. && actType.getClosingTime()>24.*3600-1 ) {
-				log.error("it looks like you have an activity type with opening time set to 0:00 and closing " +
-						"time set to 24:00. This is most probably not the same as not setting them at all.  " +
-						"In particular, activities which extend past midnight may not accumulate scores.") ;
-			}
+			this.minimalDuration = minimalDuration;
+		}
+
+		@StringGetter( "openingTime" )
+		public double getOpeningTime() {
+			return this.openingTime;
+		}
+		@StringSetter( "openingTime" )
+		public void setOpeningTime(final double openingTime) {
+			this.openingTime = openingTime;
+		}
+
+		@StringGetter( "latestStartTime" )
+		public double getLatestStartTime() {
+			return this.latestStartTime;
+		}
+		@StringSetter( "latestStartTime" )
+		public void setLatestStartTime(final double latestStartTime) {
+			this.latestStartTime = latestStartTime;
+		}
+
+		@StringGetter( "earliestEndTime" )
+		public double getEarliestEndTime() {
+			return this.earliestEndTime;
+		}
+		@StringSetter( "earliestEndTime" )
+		public void setEarliestEndTime(final double earliestEndTime) {
+			this.earliestEndTime = earliestEndTime;
+		}
+
+		@StringGetter( "closingTime" )
+		public double getClosingTime() {
+			return this.closingTime;
+		}
+		@StringSetter( "closingTime" )
+		public void setClosingTime(final double closingTime) {
+			this.closingTime = closingTime;
+		}
+
+		@StringGetter( "scoringThisActivityAtAll" )
+		public boolean isScoringThisActivityAtAll() {
+			return scoringThisActivityAtAll;
+		}
+
+		@StringSetter( "scoringThisActivityAtAll" )
+		public void setScoringThisActivityAtAll(boolean scoringThisActivityAtAll) {
+			this.scoringThisActivityAtAll = scoringThisActivityAtAll;
 		}
 	}
-	if (!hasOpeningAndClosingTime && !hasOpeningTimeAndLatePenalty) {
-		log.info("NO OPENING OR CLOSING TIMES DEFINED!\n\n\n"
-				+"There is no activity type that has an opening *and* closing time (or opening time and late penalty) defined.\n"
-				+"This usually means that the activity chains can be shifted by an arbitrary\n"
-				+"number of hours without having an effect on the score of the plans, and thus\n"
-				+"resulting in wrong results / traffic patterns.\n"
-				+"If you are using MATSim without time adaptation, you can ignore this warning.\n\n\n");
+
+	public static class ModeParams extends ReflectiveModule implements MatsimParameters {
+		final static String SET_TYPE = "modeParams";
+
+		private String mode = null;
+		private double traveling = -6.0;
+		private double distance = 0.0;
+		private double monetaryDistanceCostRate = 0.0;
+		private double constant = 0.0;
+
+		ModeParams(final String mode) {
+			super( SET_TYPE );
+			setMode( mode );
+		}
+
+		ModeParams() {
+			super( SET_TYPE );
+		}
+
+		@Override
+		public Map<String, String> getComments() {
+			final Map<String, String> map = super.getComments();
+			map.put( "marginalUtilityOfTraveling_util_hr", "[utils/hr] additional marginal utility of traveling.  normally negative.  this comes on top " +
+					"of the opportunity cost of time");
+			map.put( "marginalUtilityOfDistance_util_m", "[utils/m] utility of walking per m, normally negative.  this is " +
+					"on top of the time (dis)utility.") ;
+			map.put("monetaryDistanceCostRate", "[unit_of_money/m] conversion of distance into money. Probably needs to be negative to work." ) ;
+			map.put("constant",  "[utils] alternative-specific constant.  no guarantee that this is used anywhere. " +
+					"default=0 to be backwards compatible for the time being" ) ;
+			return map;
+		}
+
+		@StringSetter( "mode" )
+		public void setMode( final String mode ) {
+			this.mode = mode;
+		}
+
+		@StringGetter( "mode" )
+		public String getMode() {
+			return mode;
+		}
+
+		@StringSetter( "marginalUtilityOfTraveling_util_hr" )
+		public void setMarginalUtilityOfTraveling(double traveling) {
+			this.traveling = traveling;
+		}
+
+		@StringGetter( "marginalUtilityOfTraveling_util_hr" )
+		public double getMarginalUtilityOfTraveling() {
+			return this.traveling;
+		}
+
+		@StringGetter( "marginalUtilityOfDistance_util_m" )
+		public double getMarginalUtilityOfDistance() {
+			return distance;
+		}
+
+		@StringSetter( "marginalUtilityOfDistance_util_m" )
+		public void setMarginalUtilityOfDistance(double distance) {
+			this.distance = distance;
+		}
+
+		@StringGetter( "constant" )
+		public double getConstant() {
+			return this.constant;
+		}
+
+		@StringSetter( "constant" )
+		public void setConstant(double constant) {
+			this.constant = constant;
+		}
+
+		@StringGetter( "monetaryDistanceCostRate" )
+		public double getMonetaryDistanceCostRate() {
+			return this.monetaryDistanceCostRate;
+		}
+
+		@StringSetter( "monetaryDistanceCostRate" )
+		public void setMonetaryDistanceCostRate(double monetaryDistanceCostRateCar) {
+			this.monetaryDistanceCostRate = monetaryDistanceCostRateCar;
+		}
+
 	}
-	if ( this.getMarginalUtlOfWaiting_utils_hr() != 0.0 ) {
-		log.warn( "marginal utl of wait set to: " + this.getMarginalUtlOfWaiting_utils_hr() + ". Setting this different from zero is " +
-				"discouraged. The parameter was also abused for pt routing; if you did that, consider setting the new " +
-				"parameter waitingPt instead.");
-	}
-}
 
-/* direct access */
-
-public double getLearningRate() {
-	return this.learningRate;
-}
-public void setLearningRate(final double learningRate) {
-	this.learningRate = learningRate;
-}
-
-public double getBrainExpBeta() {
-	return this.brainExpBeta;
-}
-public void setBrainExpBeta(final double beta) {
-	this.brainExpBeta = beta;
-}
-
-public double getPathSizeLogitBeta() {
-	return this.pathSizeLogitBeta;
-}
-public void setPathSizeLogitBeta(final double beta) {
-	if ( beta != 0. ) {
-		log.warn("Setting pathSizeLogitBeta different from zero is experimental.  KN, Sep'08") ;
-	}
-	this.pathSizeLogitBeta = beta;
-}
-public double getLateArrival_utils_hr() {
-	return this.lateArrival;
-}
-public void setLateArrival_utils_hr(final double lateArrival) {
-	this.lateArrival = lateArrival;
-}
-
-public double getEarlyDeparture_utils_hr() {
-	return this.earlyDeparture;
-}
-public void setEarlyDeparture_utils_hr(final double earlyDeparture) {
-	this.earlyDeparture = earlyDeparture;
-}
-
-public double getPerforming_utils_hr() {
-	return this.performing;
-}
-public void setPerforming_utils_hr(final double performing) {
-	this.performing = performing;
-}
-
-public double getTraveling_utils_hr() {
-	return this.modes.get(TransportMode.car).getMarginalUtilityOfTraveling();
-}
-public void setTraveling_utils_hr(final double traveling) {
-	this.modes.get(TransportMode.car).setMarginalUtilityOfTraveling(traveling);
-}
-
-public double getTravelingPt_utils_hr() {
-	return this.modes.get(TransportMode.pt).getMarginalUtilityOfTraveling();
-}
-public void setTravelingPt_utils_hr(final double travelingPt) {
-	this.modes.get(TransportMode.pt).setMarginalUtilityOfTraveling(travelingPt);
-}
-
-public double getTravelingBike_utils_hr() {
-	return this.modes.get(TransportMode.bike).getMarginalUtilityOfTraveling();
-}
-public void setTravelingBike_utils_hr(final double travelingBike) {
-	this.modes.get(TransportMode.bike).setMarginalUtilityOfTraveling(travelingBike);
-}
-
-public double getTravelingWalk_utils_hr() {
-	return this.modes.get(TransportMode.walk).getMarginalUtilityOfTraveling();
-}
-public void setTravelingWalk_utils_hr(final double travelingWalk) {
-	this.modes.get(TransportMode.walk).setMarginalUtilityOfTraveling(travelingWalk);
-}
-/**
- * @return the marginal utility of distance for mode walk per meter
- * <p/>
- * This was discouraged for some time but currently I think this makes sense. kai, mar'12
- */
-public double getMarginalUtlOfDistanceWalk() {
-	return this.modes.get(TransportMode.walk).getMarginalUtilityOfDistance();
-}
-/**
- * @param marginalUtlOfDistanceWalk the marginal utility of distance for mode walk per meter
- * <p/>
- * This was discouraged for some time but currently I think this makes sense. kai, mar'12
- */
-public void setMarginalUtlOfDistanceWalk(final double marginalUtlOfDistanceWalk) {
-	this.modes.get(TransportMode.walk).setMarginalUtilityOfDistance(marginalUtlOfDistanceWalk);
-}
-
-/**
- * @param marginalUtlOfDistancePt the marginal utility of distance for mode pt per meter
- */
-@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
-private void setMarginalUtlOfDistancePt(final double marginalUtlOfDistancePt) {
-	this.modes.get(TransportMode.pt).setMarginalUtilityOfDistance(marginalUtlOfDistancePt);
-}
-
-/**
- * @param marginalUtlOfDistanceCar the marginal utility of distance for mode car per meter
- */
-@Deprecated // this will eventually be removed from core matsim; please find other ways to use this.  kai/benjamin, oct/10
-private void setMarginalUtlOfDistanceCar(final double marginalUtlOfDistanceCar) {
-	this.modes.get(TransportMode.car).setMarginalUtilityOfDistance(marginalUtlOfDistanceCar);
-}
-
-public double getMarginalUtlOfWaiting_utils_hr() {
-	return this.waiting;
-}
-public void setMarginalUtlOfWaitingPt_utils_hr(double val) {
-	this.waitingPt = val ;
-}
-
-public double getMarginalUtlOfWaitingPt_utils_hr() {
-	if ( this.waitingPt==null ) {
-		return this.modes.get(TransportMode.pt).getMarginalUtilityOfTraveling();
-	} else {
-		return this.waitingPt ;
-	}
-}
-
-private static int setWaitingCnt=0 ;
-
-public void setMarginalUtlOfWaiting_utils_hr(final double waiting) {
-	if ( (waiting != 0.) && (setWaitingCnt<1) ) {
-		setWaitingCnt++ ;
-		log.warn("Setting betaWaiting different from zero is discouraged.  It is probably implemented correctly, " +
-				"but there is as of now no indication that it makes the results more realistic." + Gbl.ONLYONCE );
-	}
-	this.waiting = waiting;
-}
-
-public ActivityParams getActivityParams(final String actType) {
-	return this.activityTypes.get(actType);
-}
-
-public void addActivityParams(final ActivityParams params) {
-	ActivityParams result = this.activityTypes.put(params.getType(), params);
-	if ( result != null ) {
-		if ( result.getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
-			log.error("ERROR: Activity parameters for activity type " + result.getType() + " were just overwritten. This happens most " +
-					"likely because you defined them in the config file and the Controler overwrites them.  Or the other way " +
-					"round.  pt interaction has problems, but doing what you are doing here will just cause " +
-					"other (less visible) problem. Please take the effort to discuss with the core team " +
-					"what needs to be done.  kai, nov'12") ;
-		} else {
-			log.info("activity parameters for activity type " + result.getType() + " were just overwritten.") ;
+	/* parameter set handling */
+	@Override
+	public Module createParameterSet(final String type) {
+		switch ( type ) {
+			case ActivityParams.SET_TYPE:
+				return new ActivityParams();
+			case ModeParams.SET_TYPE:
+				return new ModeParams();
+			default:
+				throw new IllegalArgumentException( type );
 		}
 	}
-}
 
-/* complex classes */
-
-public static class ActivityParams implements MatsimParameters {
-	private String type;
-	private double priority = 1.0;
-	private double typicalDuration = Time.UNDEFINED_TIME;
-	private double minimalDuration = Time.UNDEFINED_TIME;
-	private double openingTime = Time.UNDEFINED_TIME;
-	private double latestStartTime = Time.UNDEFINED_TIME;
-	private double earliestEndTime = Time.UNDEFINED_TIME;
-	private double closingTime = Time.UNDEFINED_TIME;
-	private boolean scoringThisActivityAtAll = true ;
-
-	public ActivityParams(final String type) {
-		this.type = type;
-	}
-
-	public String getType() {
-		return this.type;
-	}
-	public void setType(final String type) {
-		this.type = type;
-	}
-
-	public double getPriority() {
-		return this.priority;
-	}
-	public void setPriority(final double priority) {
-		this.priority = priority;
-	}
-
-	public double getTypicalDuration() {
-		return this.typicalDuration;
-	}
-	public void setTypicalDuration(final double typicalDuration) {
-		this.typicalDuration = typicalDuration;
-	}
-
-	public double getMinimalDuration() {
-		return this.minimalDuration;
-	}
-
-	private static int minDurCnt=0 ;
-	public void setMinimalDuration(final double minimalDuration) {
-		if ((minimalDuration != Time.UNDEFINED_TIME) && (minDurCnt<1) ) {
-			minDurCnt++ ;
-			log.warn("Setting minimalDuration different from zero is discouraged.  It is probably implemented correctly, " +
-					"but there is as of now no indication that it makes the results more realistic.  KN, Sep'08" + Gbl.ONLYONCE );
+	@Override
+	protected void checkParameterSet( final Module module ) {
+		switch ( module.getName() ) {
+			case ActivityParams.SET_TYPE:
+				if ( !(module instanceof ActivityParams) ) {
+					throw new RuntimeException( "wrong class for "+module );
+				}
+				final String t = ((ActivityParams) module).getType();
+				if ( getActivityParams( t  ) != null ) {
+					throw new IllegalStateException( "already a parameter set for activity type "+t );
+				}
+				break;
+			case ModeParams.SET_TYPE:
+				if ( !(module instanceof ModeParams) ) {
+					throw new RuntimeException( "wrong class for "+module );
+				}
+				final String m = ((ModeParams) module).getMode();
+				if ( getModes().get( m ) != null ) {
+					throw new IllegalStateException( "already a parameter set for mode "+m );
+				}
+				break;
+			default:
+				throw new IllegalArgumentException( module.getName() );
 		}
-		this.minimalDuration = minimalDuration;
 	}
 
-	public double getOpeningTime() {
-		return this.openingTime;
-	}
-	public void setOpeningTime(final double openingTime) {
-		this.openingTime = openingTime;
+	public double getMonetaryDistanceCostRateCar() {
+		return this.getModes().get(TransportMode.car).getMonetaryDistanceCostRate();
 	}
 
-	public double getLatestStartTime() {
-		return this.latestStartTime;
-	}
-	public void setLatestStartTime(final double latestStartTime) {
-		this.latestStartTime = latestStartTime;
+	public void setMonetaryDistanceCostRateCar(double monetaryDistanceCostRateCar) {
+		this.getModes().get(TransportMode.car).setMonetaryDistanceCostRate(monetaryDistanceCostRateCar);
 	}
 
-	public double getEarliestEndTime() {
-		return this.earliestEndTime;
-	}
-	public void setEarliestEndTime(final double earliestEndTime) {
-		this.earliestEndTime = earliestEndTime;
+	public double getMonetaryDistanceCostRatePt() {
+		return this.getModes().get(TransportMode.pt).getMonetaryDistanceCostRate();
 	}
 
-	public double getClosingTime() {
-		return this.closingTime;
-	}
-	public void setClosingTime(final double closingTime) {
-		this.closingTime = closingTime;
+	public void setMonetaryDistanceCostRatePt(double monetaryDistanceCostRatePt) {
+		this.getModes().get(TransportMode.pt).setMonetaryDistanceCostRate(monetaryDistanceCostRatePt);
 	}
 
-	public boolean isScoringThisActivityAtAll() {
-		return scoringThisActivityAtAll;
+	public double getConstantCar() {
+		return getModes().get(TransportMode.car).getConstant();
 	}
 
-	public void setScoringThisActivityAtAll(boolean scoringThisActivityAtAll) {
-		this.scoringThisActivityAtAll = scoringThisActivityAtAll;
-	}
-}
-
-public static class ModeParams implements MatsimParameters {
-
-	private double traveling = -6.0;
-	private double distance = 0.0;
-	private double monetaryDistanceCostRate = 0.0;
-	private double constant = 0.0;
-
-	public void setMarginalUtilityOfTraveling(double traveling) {
-		this.traveling = traveling;
+	public void setConstantCar(double constantCar) {
+		getModes().get(TransportMode.car).setConstant(constantCar);
 	}
 
-	public double getMarginalUtilityOfTraveling() {
-		return this.traveling;
+	public double getConstantWalk() {
+		return getModes().get(TransportMode.walk).getConstant();
 	}
 
-	public double getMarginalUtilityOfDistance() {
-		return distance;
+	public void setConstantWalk(double constantWalk) {
+		getModes().get(TransportMode.walk).setConstant(constantWalk);
 	}
 
-	public void setMarginalUtilityOfDistance(double distance) {
-		this.distance = distance;
+	public double getConstantPt() {
+		return getModes().get(TransportMode.pt).getConstant();
 	}
 
-	public double getConstant() {
-		return this.constant;
+	public void setConstantPt(double constantPt) {
+		getModes().get(TransportMode.pt).setConstant(constantPt);
 	}
 
-	public void setConstant(double constant) {
-		this.constant = constant;
+	public double getConstantBike() {
+		return getModes().get(TransportMode.bike).getConstant();
 	}
 
-	public double getMonetaryDistanceCostRate() {
-		return this.monetaryDistanceCostRate;
+	public void setConstantBike(double constantBike) {
+		getModes().get(TransportMode.bike).setConstant(constantBike);
 	}
 
-	public void setMonetaryDistanceCostRate(double monetaryDistanceCostRateCar) {
-		this.monetaryDistanceCostRate = monetaryDistanceCostRateCar;
+	public double getTravelingOther_utils_hr() {
+		return getModes().get(TransportMode.other).getMarginalUtilityOfTraveling();
 	}
 
-}
+	public double getConstantOther() {
+		return getModes().get(TransportMode.other).getConstant();
+	}
 
-public double getMarginalUtilityOfMoney() {
-	return marginalUtilityOfMoney;
-}
+	public double getMarginalUtlOfDistanceOther() {
+		return getModes().get(TransportMode.other).getMarginalUtilityOfDistance();
+	}
 
-public void setMarginalUtilityOfMoney(double marginalUtilityOfMoney) {
-	this.marginalUtilityOfMoney = marginalUtilityOfMoney;
-}
+	public void setMarginalUtlOfDistanceOther(double marginalUtlOfDistanceOther) {
+		this.getModes().get(TransportMode.other).setMarginalUtilityOfDistance(marginalUtlOfDistanceOther);
+	}
 
-public double getMonetaryDistanceCostRateCar() {
-	return this.modes.get(TransportMode.car).getMonetaryDistanceCostRate();
-}
+	public void setConstantOther(double constantOther) {
+		getModes().get(TransportMode.other).setConstant(constantOther);
+	}
 
-public void setMonetaryDistanceCostRateCar(double monetaryDistanceCostRateCar) {
-	this.modes.get(TransportMode.car).setMonetaryDistanceCostRate(monetaryDistanceCostRateCar);
-}
+	public void setTravelingOther_utils_hr(double travelingOtherUtilsHr) {
+		this.getModes().get(TransportMode.other).setMarginalUtilityOfTraveling(travelingOtherUtilsHr);
+	}
 
-public double getMonetaryDistanceCostRatePt() {
-	return this.modes.get(TransportMode.pt).getMonetaryDistanceCostRate();
-}
+	public boolean isMemorizingExperiencedPlans() {
+		return this.memorizingExperiencedPlans ;
+	}
 
-public void setMonetaryDistanceCostRatePt(double monetaryDistanceCostRatePt) {
-	this.modes.get(TransportMode.pt).setMonetaryDistanceCostRate(monetaryDistanceCostRatePt);
-}
+	public void setMemorizingExperiencedPlans(boolean memorizingExperiencedPlans) {
+		this.memorizingExperiencedPlans = memorizingExperiencedPlans;
+	}
 
-public Double getUtilityOfLineSwitch() {
-	return utilityOfLineSwitch;
-}
+	private static class ReflectiveDelegate extends ReflectiveModule {
+		private ReflectiveDelegate() {
+			super( PlanCalcScoreConfigGroup.GROUP_NAME );
+		}
 
-public void setUtilityOfLineSwitch(double utilityOfLineSwitch) {
-	this.utilityOfLineSwitch = utilityOfLineSwitch;
-}
+		private double learningRate = 1.0;
+		private double brainExpBeta = 1.0;
+		private double pathSizeLogitBeta = 1.0;
+		private double lateArrival = -18.0;
+		private double earlyDeparture = -0.0;
+		private double performing = +6.0;
 
-public double getConstantCar() {
-	return modes.get(TransportMode.car).getConstant();
-}
+		private double waiting = -0.0;
 
-public void setConstantCar(double constantCar) {
-	modes.get(TransportMode.car).setConstant(constantCar);
-}
 
-public double getConstantWalk() {
-	return modes.get(TransportMode.walk).getConstant();
-}
+		private double marginalUtilityOfMoney = 1.0 ;
 
-public void setConstantWalk(double constantWalk) {
-	modes.get(TransportMode.walk).setConstant(constantWalk);
-}
+		private double utilityOfLineSwitch = - 1 ;
 
-public double getConstantPt() {
-	return modes.get(TransportMode.pt).getConstant();
-}
+		private boolean usingOldScoringBelowZeroUtilityDuration = false ;
 
-public void setConstantPt(double constantPt) {
-	modes.get(TransportMode.pt).setConstant(constantPt);
-}
+		private boolean writeExperiencedPlans = false;
 
-public double getConstantBike() {
-	return modes.get(TransportMode.bike).getConstant();
-}
+		@StringGetter( LEARNING_RATE )
+		public double getLearningRate() {
+			return learningRate;
+		}
 
-public void setConstantBike(double constantBike) {
-	modes.get(TransportMode.bike).setConstant(constantBike);
-}
+		@StringSetter( LEARNING_RATE )
+		public void setLearningRate(double learningRate) {
+			this.learningRate = learningRate;
+		}
 
-public double getTravelingOther_utils_hr() {
-	return modes.get(TransportMode.other).getMarginalUtilityOfTraveling();
-}
+		@StringGetter( BRAIN_EXP_BETA )
+		public double getBrainExpBeta() {
+			return brainExpBeta;
+		}
 
-public double getConstantOther() {
-	return modes.get(TransportMode.other).getConstant();
-}
+		@StringSetter( BRAIN_EXP_BETA )
+		public void setBrainExpBeta(double brainExpBeta) {
+			this.brainExpBeta = brainExpBeta;
+		}
 
-public double getMarginalUtlOfDistanceOther() {
-	return modes.get(TransportMode.other).getMarginalUtilityOfDistance();
-}
+		@StringGetter( PATH_SIZE_LOGIT_BETA )
+		public double getPathSizeLogitBeta() {
+			return pathSizeLogitBeta;
+		}
 
-public void setMarginalUtlOfDistanceOther(double marginalUtlOfDistanceOther) {
-	this.modes.get(TransportMode.other).setMarginalUtilityOfDistance(marginalUtlOfDistanceOther);
-}
+		@StringSetter( PATH_SIZE_LOGIT_BETA )
+		public void setPathSizeLogitBeta(double beta) {
+			if ( beta != 0. ) {
+				log.warn("Setting pathSizeLogitBeta different from zero is experimental.  KN, Sep'08") ;
+			}
+			this.pathSizeLogitBeta = beta;
+		}
 
-public void setConstantOther(double constantOther) {
-	modes.get(TransportMode.other).setConstant(constantOther);
-}
+		@StringGetter( LATE_ARRIVAL )
+		public double getLateArrival_utils_hr() {
+			return lateArrival;
+		}
 
-public void setTravelingOther_utils_hr(double travelingOtherUtilsHr) {
-	this.modes.get(TransportMode.other).setMarginalUtilityOfTraveling(travelingOtherUtilsHr);
-}
+		@StringSetter( LATE_ARRIVAL )
+		public void setLateArrival_utils_hr(double lateArrival) {
+			this.lateArrival = lateArrival;
+		}
 
-public boolean isWriteExperiencedPlans() {
-	return writeExperiencedPlans;
-}
+		@StringGetter( EARLY_DEPARTURE )
+		public double getEarlyDeparture_utils_hr() {
+			return earlyDeparture;
+		}
 
-public void setWriteExperiencedPlans(boolean outputExperience) {
-	this.writeExperiencedPlans = outputExperience;
-}
+		@StringSetter( EARLY_DEPARTURE )
+		public void setEarlyDeparture_utils_hr(double earlyDeparture) {
+			this.earlyDeparture = earlyDeparture;
+		}
 
-public boolean isUsingOldScoringBelowZeroUtilityDuration() {
-	return this.usingOldScoringBelowZeroUtilityDuration ;
-}
+		@StringGetter( PERFORMING )
+		public double getPerforming_utils_hr() {
+			return performing;
+		}
 
-public void setUsingOldScoringBelowZeroUtilityDuration(boolean usingOldScoringBelowZeroUtilityDuration) {
-	this.usingOldScoringBelowZeroUtilityDuration = usingOldScoringBelowZeroUtilityDuration;
-}
+		@StringSetter( PERFORMING )
+		public void setPerforming_utils_hr(double performing) {
+			this.performing = performing;
+		}
 
-public boolean isMemorizingExperiencedPlans() {
-	return this.memorizingExperiencedPlans ;
-}
+		@StringGetter( MARGINAL_UTL_OF_MONEY )
+		public double getMarginalUtilityOfMoney() {
+			return marginalUtilityOfMoney;
+		}
 
-public void setMemorizingExperiencedPlans(boolean memorizingExperiencedPlans) {
-	this.memorizingExperiencedPlans = memorizingExperiencedPlans;
-}
+		@StringSetter( MARGINAL_UTL_OF_MONEY )
+		public void setMarginalUtilityOfMoney(double marginalUtilityOfMoney) {
+			this.marginalUtilityOfMoney = marginalUtilityOfMoney;
+		}
 
+		@StringGetter( UTL_OF_LINE_SWITCH )
+		public double getUtilityOfLineSwitch() {
+			return utilityOfLineSwitch;
+		}
+
+		@StringSetter( UTL_OF_LINE_SWITCH )
+		public void setUtilityOfLineSwitch(double utilityOfLineSwitch) {
+			this.utilityOfLineSwitch = utilityOfLineSwitch;
+		}
+
+		@StringGetter( USING_OLD_SCORING_BELOW_ZERO_UTILITY_DURATION )
+		public boolean isUsingOldScoringBelowZeroUtilityDuration() {
+			return usingOldScoringBelowZeroUtilityDuration;
+		}
+
+		@StringSetter( USING_OLD_SCORING_BELOW_ZERO_UTILITY_DURATION )
+		public void setUsingOldScoringBelowZeroUtilityDuration(
+				boolean usingOldScoringBelowZeroUtilityDuration) {
+			this.usingOldScoringBelowZeroUtilityDuration = usingOldScoringBelowZeroUtilityDuration;
+		}
+
+		@StringGetter( WRITE_EXPERIENCED_PLANS )
+		public boolean isWriteExperiencedPlans() {
+			return writeExperiencedPlans;
+		}
+
+		@StringSetter( WRITE_EXPERIENCED_PLANS )
+		public void setWriteExperiencedPlans(boolean writeExperiencedPlans) {
+			this.writeExperiencedPlans = writeExperiencedPlans;
+		}
+
+		private static int setWaitingCnt=0 ;
+
+		@StringGetter( WAITING )
+		public double getMarginalUtlOfWaiting_utils_hr() {
+			return this.waiting;
+		}
+
+		@StringSetter( WAITING )
+		public void setMarginalUtlOfWaiting_utils_hr(final double waiting) {
+			if ( (waiting != 0.) && (setWaitingCnt<1) ) {
+				setWaitingCnt++ ;
+				log.warn("Setting betaWaiting different from zero is discouraged.  It is probably implemented correctly, " +
+						"but there is as of now no indication that it makes the results more realistic." + Gbl.ONLYONCE );
+			}
+			this.waiting = waiting;
+		}
+	}
+
+	public double getLearningRate() {
+		return delegate.getLearningRate();
+	}
+
+	public void setLearningRate(double learningRate) {
+		delegate.setLearningRate(learningRate);
+	}
+
+	public double getBrainExpBeta() {
+		return delegate.getBrainExpBeta();
+	}
+
+	public void setBrainExpBeta(double brainExpBeta) {
+		delegate.setBrainExpBeta(brainExpBeta);
+	}
+
+	public double getPathSizeLogitBeta() {
+		return delegate.getPathSizeLogitBeta();
+	}
+
+	public void setPathSizeLogitBeta(double beta) {
+		delegate.setPathSizeLogitBeta(beta);
+	}
+
+	public double getLateArrival_utils_hr() {
+		return delegate.getLateArrival_utils_hr();
+	}
+
+	public void setLateArrival_utils_hr(double lateArrival) {
+		delegate.setLateArrival_utils_hr(lateArrival);
+	}
+
+	public double getEarlyDeparture_utils_hr() {
+		return delegate.getEarlyDeparture_utils_hr();
+	}
+
+	public void setEarlyDeparture_utils_hr(double earlyDeparture) {
+		delegate.setEarlyDeparture_utils_hr(earlyDeparture);
+	}
+
+	public double getPerforming_utils_hr() {
+		return delegate.getPerforming_utils_hr();
+	}
+
+	public void setPerforming_utils_hr(double performing) {
+		delegate.setPerforming_utils_hr(performing);
+	}
+
+	public double getMarginalUtilityOfMoney() {
+		return delegate.getMarginalUtilityOfMoney();
+	}
+
+	public void setMarginalUtilityOfMoney(double marginalUtilityOfMoney) {
+		delegate.setMarginalUtilityOfMoney(marginalUtilityOfMoney);
+	}
+
+	public double getUtilityOfLineSwitch() {
+		return delegate.getUtilityOfLineSwitch();
+	}
+
+	public void setUtilityOfLineSwitch(double utilityOfLineSwitch) {
+		delegate.setUtilityOfLineSwitch(utilityOfLineSwitch);
+	}
+
+	public boolean isUsingOldScoringBelowZeroUtilityDuration() {
+		return delegate.isUsingOldScoringBelowZeroUtilityDuration();
+	}
+
+	public void setUsingOldScoringBelowZeroUtilityDuration(
+			boolean usingOldScoringBelowZeroUtilityDuration) {
+		delegate.setUsingOldScoringBelowZeroUtilityDuration(usingOldScoringBelowZeroUtilityDuration);
+	}
+
+	public boolean isWriteExperiencedPlans() {
+		return delegate.isWriteExperiencedPlans();
+	}
+
+	public void setWriteExperiencedPlans(boolean writeExperiencedPlans) {
+		delegate.setWriteExperiencedPlans(writeExperiencedPlans);
+	}
+
+	public double getMarginalUtlOfWaiting_utils_hr() {
+		return delegate.getMarginalUtlOfWaiting_utils_hr();
+	}
+
+	public void setMarginalUtlOfWaiting_utils_hr(double waiting) {
+		delegate.setMarginalUtlOfWaiting_utils_hr(waiting);
+	}
 }
