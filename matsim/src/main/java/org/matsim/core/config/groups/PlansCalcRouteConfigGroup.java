@@ -19,9 +19,15 @@
  * *********************************************************************** */
 package org.matsim.core.config.groups;
 
-import org.apache.log4j.Logger;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.Module;
+import org.matsim.core.config.experimental.ReflectiveModule;
 import org.matsim.core.utils.collections.CollectionUtils;
 
 import java.util.*;
@@ -57,15 +63,89 @@ public class PlansCalcRouteConfigGroup extends Module {
 	
 	private double beelineDistanceFactor = 1.3;
 	private Collection<String> networkModes = Arrays.asList(TransportMode.car, TransportMode.ride); 
-	private Map<String, Double> teleportedModeSpeeds = new HashMap<>();
-	private Map<String, Double> teleportedModeFreespeedFactors = new HashMap<>();
 
-	private boolean defaultsCleared = false;
+	private boolean acceptModeParamsWithoutClearing = false;
+
+	public static class ModeRoutingParams extends ReflectiveModule implements MatsimParameters {
+		public static final String SET_TYPE = "teleportedModeParameters";
+
+		private String mode = null;
+		private Double teleportedModeSpeed = null;
+		private Double teleportedModeFreespeedFactor = null;
+
+		public ModeRoutingParams(final String mode) {
+			super( SET_TYPE );
+			setMode( mode );
+		}
+
+		public ModeRoutingParams() {
+			super( SET_TYPE );
+		}
+
+		@Override
+		public Map<String, String> getComments() {
+			final Map<String, String> map = super.getComments();
+
+			map.put( "teleportedModeSpeed" ,
+					"Speed for a teleported mode. " +
+					"Travel time = (<beeline distance> * beelineDistanceFactor) / teleportedModeSpeed. Insert a line like this for every such mode.");
+			map.put( "teleportedModeFreespeedFactor",
+					"Free-speed factor for a teleported mode. " +
+					"Travel time = teleportedModeFreespeedFactor * <freespeed car travel time>. Insert a line like this for every such mode. " +
+					"Please do not set teleportedModeFreespeedFactor as well as teleportedModeSpeed for the same mode, but if you do, +" +
+					"teleportedModeFreespeedFactor wins over teleportedModeSpeed.");
+
+			return map;
+		}
+
+		@StringGetter( "mode" )
+		public String getMode() {
+			return mode;
+		}
+
+		@StringSetter( "mode" )
+		public void setMode(String mode) {
+			this.mode = mode;
+		}
+
+		@StringGetter( "teleportedModeSpeed" )
+		public Double getTeleportedModeSpeed() {
+			return teleportedModeSpeed;
+		}
+
+		@StringSetter( "teleportedModeSpeed" )
+		public void setTeleportedModeSpeed(Double teleportedModeSpeed) {
+			this.teleportedModeSpeed = teleportedModeSpeed;
+		}
+
+		@StringGetter( "teleportedModeFreespeedFactor" )
+		public Double getTeleportedModeFreespeedFactor() {
+			return teleportedModeFreespeedFactor;
+		}
+
+		@StringSetter( "teleportedModeFreespeedFactor" )
+		public void setTeleportedModeFreespeedFactor(
+				Double teleportedModeFreespeedFactor) {
+			this.teleportedModeFreespeedFactor = teleportedModeFreespeedFactor;
+		}
+	}
 	
 	public PlansCalcRouteConfigGroup() {
 		super(GROUP_NAME);
-		teleportedModeSpeeds.put(TransportMode.bike, 15.0 / 3.6); // 15.0 km/h --> m/s
-		teleportedModeSpeeds.put(TransportMode.walk, 3.0 / 3.6); // 3.0 km/h --> m/s
+
+		acceptModeParamsWithoutClearing = true;
+		{
+			final ModeRoutingParams bike = new ModeRoutingParams( TransportMode.bike );
+			bike.setTeleportedModeSpeed( 15.0 / 3.6 ); // 15.0 km/h --> m/s
+			addParameterSet( bike );
+		}
+
+		{
+			final ModeRoutingParams walk = new ModeRoutingParams( TransportMode.walk );
+			walk.setTeleportedModeSpeed( 3.0 / 3.6 ); // 3.0 km/h --> m/s
+			addParameterSet( walk );
+		}
+
 		// I'm not sure if anyone needs the "undefined" mode. In particular, it doesn't do anything for modes which are
 		// really unknown, it is just a mode called "undefined". michaz 02-2012
 		//
@@ -73,8 +153,76 @@ public class PlansCalcRouteConfigGroup extends Module {
 		// for any modes, and the simulation would teleport all those modes it does not know anything about.
 		// With the travel times and travel distances given by the mode.  In practice, it seems that people can live better
 		// with the concept that mobsim figures it out by itself.  Although it is a much less flexible design.  kai, jun'2012
-		teleportedModeSpeeds.put(UNDEFINED, 50.0 / 3.6); 
-		teleportedModeFreespeedFactors.put(TransportMode.pt, 2.0);
+		{
+			final ModeRoutingParams undefined = new ModeRoutingParams( UNDEFINED );
+			undefined.setTeleportedModeSpeed( 50. / 3.6 ); // 50.0 km/h --> m/s
+			addParameterSet( undefined );
+		}
+
+		{
+			final ModeRoutingParams pt = new ModeRoutingParams( TransportMode.pt );
+			pt.setTeleportedModeFreespeedFactor( 2.0 );
+			addParameterSet( pt );
+		}
+		this.acceptModeParamsWithoutClearing = false;
+	}
+
+	@Override
+	public Module createParameterSet( final String type ) {
+		switch ( type ) {
+			case ModeRoutingParams.SET_TYPE:
+				return new ModeRoutingParams();
+			default:
+				throw new IllegalArgumentException( type );
+		}
+	}
+
+	@Override
+	protected void checkParameterSet( final Module module ) {
+		switch ( module.getName() ) {
+			case ModeRoutingParams.SET_TYPE:
+				if ( !(module instanceof ModeRoutingParams) ) {
+					throw new RuntimeException( "unexpected class for module "+module );
+				}
+				break;
+			default:
+				throw new IllegalArgumentException( module.getName() );
+		}
+	}
+
+	@Override
+	public void addParameterSet(final Module set) {
+		if ( set.getName().equals( ModeRoutingParams.SET_TYPE ) && !this.acceptModeParamsWithoutClearing ) {
+			clearParameterSetsForType( set.getName() );
+			this.acceptModeParamsWithoutClearing = true;
+		}
+		super.addParameterSet( set );
+	}
+
+	public void addModeRoutingParams(final ModeRoutingParams pars) {
+		addParameterSet( pars );
+	}
+
+	public Map<String, ModeRoutingParams> getModeRoutingParams() {
+		final Map<String, ModeRoutingParams> map = new LinkedHashMap< >();
+
+		for ( Module pars : getParameterSets( ModeRoutingParams.SET_TYPE ) ) {
+			map.put( ((ModeRoutingParams) pars).getMode() ,
+				(ModeRoutingParams)	pars );
+		}
+
+		return map;
+	}
+
+	public ModeRoutingParams getOrCreateModeRoutingParams(final String mode) {
+		ModeRoutingParams pars = getModeRoutingParams().get( mode );
+
+		if ( pars == null ) {
+			pars = (ModeRoutingParams) createAndAddParameterSet( ModeRoutingParams.SET_TYPE );
+			pars.setMode( mode );
+		}
+
+		return pars;
 	}
 
 	@Override
@@ -99,23 +247,11 @@ public class PlansCalcRouteConfigGroup extends Module {
 		} else if (NETWORK_MODES.equals(key)) {
 			setNetworkModes(Arrays.asList(CollectionUtils.stringToArray(value)));
 		} else if (key.startsWith(TELEPORTED_MODE_SPEEDS)) {
-			clearDefaults();
 			setTeleportedModeSpeed(key.substring(TELEPORTED_MODE_SPEEDS.length()), Double.parseDouble(value));
 		} else if (key.startsWith(TELEPORTED_MODE_FREESPEED_FACTORS)) {
-			clearDefaults();
 			setTeleportedModeFreespeedFactor(key.substring(TELEPORTED_MODE_FREESPEED_FACTORS.length()), Double.parseDouble(value));
 		} else {
 			throw new IllegalArgumentException(key);
-		}
-	}
-
-	private void clearDefaults() {
-		if (!defaultsCleared) {
-			Logger.getLogger(this.getClass()).warn("setting any of the teleported mode speed parameters clears ALL default values; " +
-					"make sure this is what you want.") ;
-			teleportedModeSpeeds.clear();
-			teleportedModeFreespeedFactors.clear();
-			defaultsCleared = true;
 		}
 	}
 
@@ -124,31 +260,17 @@ public class PlansCalcRouteConfigGroup extends Module {
 		Map<String, String> map = super.getParams();
 		map.put( BEELINE_DISTANCE_FACTOR, Double.toString(this.getBeelineDistanceFactor()) );
 		map.put( NETWORK_MODES, CollectionUtils.arrayToString(this.networkModes.toArray(new String[this.networkModes.size()])));
-		for (Entry<String, Double> entry : teleportedModeSpeeds.entrySet()) {
-			map.put( TELEPORTED_MODE_SPEEDS + entry.getKey(), String.valueOf(entry.getValue()));
-		}
-		for (Entry<String, Double> entry : teleportedModeFreespeedFactors.entrySet()) {
-			map.put( TELEPORTED_MODE_FREESPEED_FACTORS + entry.getKey(), String.valueOf(entry.getValue()));
-		}
 		return map;
 	}
 
 	@Override
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
+
 		map.put(BEELINE_DISTANCE_FACTOR, "factor with which beeline distances (and therefore times) " +
 				"are multiplied in order to obtain an estimate of the network distances/times.  Default is something like 1.3") ;
 		map.put(NETWORK_MODES, "All the modes for which the router is supposed to generate network routes (like car)") ;
-		for (Entry<String, Double> entry : teleportedModeSpeeds.entrySet()) { 
-			map.put(TELEPORTED_MODE_SPEEDS + entry.getKey(), "Speed for a teleported mode. " +
-					"Travel time = (<beeline distance> * beelineDistanceFactor) / teleportedModeSpeed. Insert a line like this for every such mode.");
-		}
-		for (Entry<String, Double> entry : teleportedModeFreespeedFactors.entrySet()) { 
-			map.put(TELEPORTED_MODE_FREESPEED_FACTORS + entry.getKey(), "Free-speed factor for a teleported mode. " +
-					"Travel time = teleportedModeFreespeedFactor * <freespeed car travel time>. Insert a line like this for every such mode. " +
-					"Please do not set teleportedModeFreespeedFactor as well as teleportedModeSpeed for the same mode, but if you do, +" +
-					"teleportedModeFreespeedFactor wins over teleportedModeSpeed.");
-		}
+
 		return map;
 	}
 
@@ -169,21 +291,32 @@ public class PlansCalcRouteConfigGroup extends Module {
 	}
 
 	public Map<String, Double> getTeleportedModeSpeeds() {
-		return Collections.unmodifiableMap(this.teleportedModeSpeeds);
+		final Map<String, Double> map = new LinkedHashMap< >();
+		for ( ModeRoutingParams pars :
+				(Collection<ModeRoutingParams>) getParameterSets( ModeRoutingParams.SET_TYPE ) ) {
+			final Double speed = pars.getTeleportedModeSpeed();
+			if ( speed != null ) map.put( pars.getMode() , speed );
+		}
+		return map;
 	}
 
 	public Map<String, Double> getTeleportedModeFreespeedFactors() {
-		return teleportedModeFreespeedFactors;
+		final Map<String, Double> map = new LinkedHashMap< >();
+		for ( ModeRoutingParams pars :
+				(Collection<ModeRoutingParams>) getParameterSets( ModeRoutingParams.SET_TYPE ) ) {
+			final Double speed = pars.getTeleportedModeSpeed();
+			if ( speed != null ) map.put( pars.getMode() , speed );
+		}
+		return map;
+
 	}
 
 	public void setTeleportedModeFreespeedFactor(String mode, double freespeedFactor) {
-		clearDefaults();
-		teleportedModeFreespeedFactors.put(mode, freespeedFactor);
+		getOrCreateModeRoutingParams( mode ).setTeleportedModeFreespeedFactor( freespeedFactor );
 	}
 
 	public void setTeleportedModeSpeed(String mode, double speed) {
-		clearDefaults();
-		teleportedModeSpeeds.put(mode, speed);
+		getOrCreateModeRoutingParams( mode ).setTeleportedModeSpeed( speed );
 	}
 
 }
