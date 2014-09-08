@@ -69,7 +69,7 @@ public class CharyparNagelOpenTimesAndDesiresScoringFunctionFactory implements S
 		 */
 		this.originalTypicalDurations = new HashMap<String, Double>();
 		for (ActivityParams params : config.getActivityParams()) {
-			originalTypicalDurations.put(params.getType(), params.getTypicalDuration());
+			originalTypicalDurations.put(params.getActivityType(), params.getTypicalDuration());
 		}
 	}
 
@@ -88,7 +88,7 @@ public class CharyparNagelOpenTimesAndDesiresScoringFunctionFactory implements S
 				
 				// replace typical durations in config - quite an ugly hack...
 				for (ActivityParams activityParams : config.getActivityParams()) {
-					double typicalDuration = desires.getActivityDuration(activityParams.getType());
+					double typicalDuration = desires.getActivityDuration(activityParams.getActivityType());
 					if (typicalDuration != Time.UNDEFINED_TIME) activityParams.setTypicalDuration(typicalDuration);
 				}
 				
@@ -98,7 +98,7 @@ public class CharyparNagelOpenTimesAndDesiresScoringFunctionFactory implements S
 				
 				// reset original typical durations
 				for (ActivityParams activityParams : config.getActivityParams()) {
-					activityParams.setTypicalDuration(this.originalTypicalDurations.get(activityParams.getType()));
+					activityParams.setTypicalDuration(this.originalTypicalDurations.get(activityParams.getActivityType()));
 				}
 			}
 		}

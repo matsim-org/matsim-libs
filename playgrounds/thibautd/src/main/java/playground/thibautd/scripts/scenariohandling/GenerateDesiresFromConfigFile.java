@@ -49,7 +49,7 @@ public class GenerateDesiresFromConfigFile {
 			final Desires d = new Desires( null );
 			for ( ActivityParams params : config.planCalcScore().getActivityParams() ) {
 				d.putActivityDuration(
-						params.getType(),
+						params.getActivityType(),
 						params.getTypicalDuration() );
 			}
 			desires.putAttribute(

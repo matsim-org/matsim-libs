@@ -74,7 +74,7 @@ public class RCScoringFunctionFactory implements ScoringFunctionFactory {
 		log.info("reading prefs ...");
 		this.prefs = new ObjectAttributes();
 		for (ActivityParams activityParams : scenario.getConfig().planCalcScore().getActivityParams()) {
-			log.info("activity param:" + activityParams.getType());
+			log.info("activity param:" + activityParams.getActivityType());
 			int counter = 0;
 			int nextMsg = 1;
 			for (Person p : scenario.getPopulation().getPersons().values()) {
@@ -87,14 +87,14 @@ public class RCScoringFunctionFactory implements ScoringFunctionFactory {
 				Desires desires = person.getDesires();					
 				if (desires != null) {
 					// hä? in the desires, only the typical duration can be specified. need to get the rest from the config anyway, or from where else?
-					prefs.putAttribute(p.getId().toString(), "typicalDuration_" + activityParams.getType(), desires.getActivityDuration(activityParams.getType()));
+					prefs.putAttribute(p.getId().toString(), "typicalDuration_" + activityParams.getActivityType(), desires.getActivityDuration(activityParams.getActivityType()));
 				} else {				
-					prefs.putAttribute(p.getId().toString(), "typicalDuration_" + activityParams.getType(), activityParams.getTypicalDuration());
+					prefs.putAttribute(p.getId().toString(), "typicalDuration_" + activityParams.getActivityType(), activityParams.getTypicalDuration());
 					log.error("there should be desires!");
 				}
-				prefs.putAttribute(p.getId().toString(), "latestStartTime_" + activityParams.getType(), activityParams.getLatestStartTime());
-				prefs.putAttribute(p.getId().toString(), "earliestEndTime_" + activityParams.getType(), activityParams.getEarliestEndTime());
-				prefs.putAttribute(p.getId().toString(), "minimalDuration_" + activityParams.getType(), activityParams.getMinimalDuration());
+				prefs.putAttribute(p.getId().toString(), "latestStartTime_" + activityParams.getActivityType(), activityParams.getLatestStartTime());
+				prefs.putAttribute(p.getId().toString(), "earliestEndTime_" + activityParams.getActivityType(), activityParams.getEarliestEndTime());
+				prefs.putAttribute(p.getId().toString(), "minimalDuration_" + activityParams.getActivityType(), activityParams.getMinimalDuration());
 			}
 		}
 		log.info("Reading prefs finished");

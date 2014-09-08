@@ -312,9 +312,9 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 		// tnicolai: times and durations in testExternalConfig are given as String, so they are not comparable with double values
 		ActivityParams homeActivity = config.planCalcScore().getActivityParams(externalTestConfig.activityType_0);
 		ActivityParams workActivity = config.planCalcScore().getActivityParams(externalTestConfig.activityType_1);
-		Assert.assertTrue(homeActivity.getType().equalsIgnoreCase( externalTestConfig.activityType_0 ));
+		Assert.assertTrue(homeActivity.getActivityType().equalsIgnoreCase( externalTestConfig.activityType_0 ));
 		// Assert.assertTrue(homeActivity.getTypicalDuration() == testExternalConfig.homeActivityTypicalDuration.intValue());
-		Assert.assertTrue(workActivity.getType().equalsIgnoreCase( externalTestConfig.activityType_1 ));
+		Assert.assertTrue(workActivity.getActivityType().equalsIgnoreCase( externalTestConfig.activityType_1 ));
 		// Assert.assertTrue(workActivity.getOpeningTime() == testExternalConfig.workActivityOpeningTime.intValue());
 		// Assert.assertTrue(workActivity.getLatestStartTime() == testExternalConfig.workActivityLatestStartTime.intValue());
 
@@ -389,9 +389,9 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 
 		ActivityParams homeActivity = config.planCalcScore().getActivityParams(testConfig.activityType_0);
 		ActivityParams workActivity = config.planCalcScore().getActivityParams(testConfig.activityType_1);
-		Assert.assertTrue(homeActivity.getType().equalsIgnoreCase( testConfig.activityType_0 ));
+		Assert.assertTrue(homeActivity.getActivityType().equalsIgnoreCase( testConfig.activityType_0 ));
 		Assert.assertTrue(homeActivity.getTypicalDuration() == testConfig.homeActivityTypicalDuration.intValue());
-		Assert.assertTrue(workActivity.getType().equalsIgnoreCase( testConfig.activityType_1 ));
+		Assert.assertTrue(workActivity.getActivityType().equalsIgnoreCase( testConfig.activityType_1 ));
 		Assert.assertTrue(workActivity.getOpeningTime() == testConfig.workActivityOpeningTime.intValue());
 		Assert.assertTrue(workActivity.getLatestStartTime() == testConfig.workActivityLatestStartTime.intValue());
 	}

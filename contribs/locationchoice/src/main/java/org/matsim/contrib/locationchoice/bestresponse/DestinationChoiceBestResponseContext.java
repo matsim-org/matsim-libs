@@ -154,14 +154,14 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 					Desires desires = person.getDesires();					
 					if (desires != null) {
 						// hä? in the desires, only the typical duration can be specified. need to get the rest from the config anyway, or from where else?
-						prefsAttributes.putAttribute(p.getId().toString(), "typicalDuration_" + activityParams.getType(), desires.getActivityDuration(activityParams.getType()));
+						prefsAttributes.putAttribute(p.getId().toString(), "typicalDuration_" + activityParams.getActivityType(), desires.getActivityDuration(activityParams.getActivityType()));
 					} else {				
-						prefsAttributes.putAttribute(p.getId().toString(), "typicalDuration_" + activityParams.getType(), activityParams.getTypicalDuration());
+						prefsAttributes.putAttribute(p.getId().toString(), "typicalDuration_" + activityParams.getActivityType(), activityParams.getTypicalDuration());
 						
 					}
-					prefsAttributes.putAttribute(p.getId().toString(), "latestStartTime_" + activityParams.getType(), activityParams.getLatestStartTime());
-					prefsAttributes.putAttribute(p.getId().toString(), "earliestEndTime_" + activityParams.getType(), activityParams.getEarliestEndTime());
-					prefsAttributes.putAttribute(p.getId().toString(), "minimalDuration_" + activityParams.getType(), activityParams.getMinimalDuration());
+					prefsAttributes.putAttribute(p.getId().toString(), "latestStartTime_" + activityParams.getActivityType(), activityParams.getLatestStartTime());
+					prefsAttributes.putAttribute(p.getId().toString(), "earliestEndTime_" + activityParams.getActivityType(), activityParams.getEarliestEndTime());
+					prefsAttributes.putAttribute(p.getId().toString(), "minimalDuration_" + activityParams.getActivityType(), activityParams.getMinimalDuration());
 				}
 			}
 		}

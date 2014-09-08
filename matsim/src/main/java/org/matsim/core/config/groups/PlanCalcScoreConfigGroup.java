@@ -147,7 +147,7 @@ public class PlanCalcScoreConfigGroup extends Module {
 		if (key.startsWith(ACTIVITY_TYPE)) {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_TYPE.length()), true);
 			
-			actParams.setType(value);
+			actParams.setActivityType(value);
 			addActivityParams( actParams );
 		}
 		else if (key.startsWith(ACTIVITY_PRIORITY)) {
@@ -332,7 +332,7 @@ public class PlanCalcScoreConfigGroup extends Module {
 		final Map<String, ActivityParams> map = new LinkedHashMap< >();
 
 		for ( ActivityParams pars : getActivityParams() ) {
-			map.put( pars.getType() , pars );
+			map.put( pars.getActivityType() , pars );
 		}
 
 		return map;
@@ -472,17 +472,17 @@ public class PlanCalcScoreConfigGroup extends Module {
 	}
 
 	public void addActivityParams(final ActivityParams params) {
-		final ActivityParams previous = this.getActivityParams( params.getType() );
+		final ActivityParams previous = this.getActivityParams( params.getActivityType() );
 		
 		if ( previous != null ) {
-			if ( previous.getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
-				log.error("ERROR: Activity parameters for activity type " + previous.getType() + " were just overwritten. This happens most " +
+			if ( previous.getActivityType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
+				log.error("ERROR: Activity parameters for activity type " + previous.getActivityType() + " were just overwritten. This happens most " +
 						"likely because you defined them in the config file and the Controler overwrites them.  Or the other way " +
 						"round.  pt interaction has problems, but doing what you are doing here will just cause " +
 						"other (less visible) problem. Please take the effort to discuss with the core team " +
 						"what needs to be done.  kai, nov'12") ;
 			} else {
-				log.info("activity parameters for activity type " + previous.getType() + " were just overwritten.") ;
+				log.info("activity parameters for activity type " + previous.getActivityType() + " were just overwritten.") ;
 			}
 			
 			final boolean removed = removeParameterSet( previous );
@@ -515,12 +515,12 @@ public class PlanCalcScoreConfigGroup extends Module {
 			this.type = type;
 		}
 
-		@StringGetter( "type" )
-		public String getType() {
+		@StringGetter( "activityType" )
+		public String getActivityType() {
 			return this.type;
 		}
-		@StringSetter( "type" )
-		public void setType(final String type) {
+		@StringSetter( "activityType" )
+		public void setActivityType(final String type) {
 			this.type = type;
 		}
 
@@ -708,7 +708,7 @@ public class PlanCalcScoreConfigGroup extends Module {
 				if ( !(module instanceof ActivityParams) ) {
 					throw new RuntimeException( "wrong class for "+module );
 				}
-				final String t = ((ActivityParams) module).getType();
+				final String t = ((ActivityParams) module).getActivityType();
 				if ( getActivityParams( t  ) != null ) {
 					throw new IllegalStateException( "already a parameter set for activity type "+t );
 				}

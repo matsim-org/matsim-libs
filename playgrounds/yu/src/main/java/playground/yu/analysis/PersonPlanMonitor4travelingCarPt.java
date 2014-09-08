@@ -148,7 +148,7 @@ public class PersonPlanMonitor4travelingCarPt {
 	}
 
 	private double calcActDuration_h(ActivityParams actParams) {
-		String actType = actParams.getType();
+		String actType = actParams.getActivityType();
 		if (this.idx == 0/* fist act */&& actType.startsWith("h")) {
 			this.firstActEndTime = this.actEndTime + 3600.0 * 24.0;
 			return 0.0;

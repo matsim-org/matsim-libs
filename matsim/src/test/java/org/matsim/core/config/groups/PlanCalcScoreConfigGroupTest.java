@@ -165,11 +165,11 @@ public class PlanCalcScoreConfigGroupTest {
 		for ( ActivityParams initialSettings : initialGroup.getActivityParams() ) {
 			final ActivityParams inputSettings =
 				inputConfigGroup.getActivityParams(
-						initialSettings.getType() );
+						initialSettings.getActivityType() );
 			Assert.assertEquals(
 					"wrong type "+msg,
-					initialSettings.getType(),
-					inputSettings.getType() );
+					initialSettings.getActivityType(),
+					inputSettings.getActivityType() );
 			Assert.assertEquals(
 					"wrong closingTime "+msg,
 					initialSettings.getClosingTime(),
@@ -235,10 +235,10 @@ public class PlanCalcScoreConfigGroupTest {
 		final Random r = new Random( 456 );
 		int ca = 0;
 		for ( ActivityParams settings : initialGroup.getActivityParams() ) {
-			final String suffix = r.nextBoolean() ? ""+ca++ : settings.getType();
+			final String suffix = r.nextBoolean() ? ""+ca++ : settings.getActivityType();
 
-			if ( !suffix.equals( settings.getType() ) ) {
-				module.addParam( "activityType_"+suffix , ""+settings.getType() );
+			if ( !suffix.equals( settings.getActivityType() ) ) {
+				module.addParam( "activityType_"+suffix , ""+settings.getActivityType() );
 			}
 			module.addParam( "activityClosingTime_"+suffix , ""+settings.getClosingTime() );
 			module.addParam( "activityEarliestEndTime_"+suffix , ""+settings.getEarliestEndTime() );
@@ -291,7 +291,7 @@ public class PlanCalcScoreConfigGroupTest {
 		final Random random = new Random( 925 );
 		for ( int i=0; i < 10; i++ ) {
 			final ActivityParams settings = new ActivityParams();
-			settings.setType( "activity-type-"+i );
+			settings.setActivityType( "activity-type-"+i );
 			settings.setClosingTime( random.nextDouble()*24*3600 );
 			settings.setEarliestEndTime( random.nextDouble()*24*3600 );
 			settings.setLatestStartTime( random.nextDouble()*24*3600 );

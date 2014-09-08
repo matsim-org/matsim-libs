@@ -65,7 +65,7 @@ public class ActivityUtilityParameters implements MatsimParameters {
 		 * Convenience constructor for main use case
 		 */
 		public Factory(ActivityParams ppp ) {
-			this.type = ppp.getType() ;
+			this.type = ppp.getActivityType() ;
 			this.priority = ppp.getPriority() ;
 			this.typicalDuration_s = ppp.getTypicalDuration() ;
 			this.closingTime = ppp.getClosingTime() ;

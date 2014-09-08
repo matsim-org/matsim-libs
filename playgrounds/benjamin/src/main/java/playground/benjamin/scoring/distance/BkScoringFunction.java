@@ -364,10 +364,10 @@ public class BkScoringFunction extends ScoringFunctionAdapter {
 //			utilParams.put(type, actParams);
 			
 			ActivityUtilityParameters.Factory factory = new ActivityUtilityParameters.Factory(params) ;
-			if (params.getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
+			if (params.getActivityType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
 				factory.setScoreAtAll(false) ;
 			}
-			utilParams.put(params.getType(), factory.create() ) ;
+			utilParams.put(params.getActivityType(), factory.create() ) ;
 
 		}
 	}

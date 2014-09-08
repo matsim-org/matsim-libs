@@ -291,7 +291,7 @@ class MultiRateRunResource {
     private void runContinuedBasePlans(Scenario baseScenario) {
         Config config = phoneConfig();
         for (ActivityParams params : baseScenario.getConfig().planCalcScore().getActivityParams()) {
-            ActivityParams zero = new ActivityParams(params.getType());
+            ActivityParams zero = new ActivityParams(params.getActivityType());
             zero.setScoringThisActivityAtAll(false);
             config.planCalcScore().addActivityParams(zero);
         }

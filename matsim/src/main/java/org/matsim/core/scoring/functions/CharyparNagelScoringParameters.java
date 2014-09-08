@@ -82,10 +82,10 @@ public class CharyparNagelScoringParameters implements MatsimParameters {
 		for (ActivityParams params : config.getActivityParams()) {
 			ActivityUtilityParameters.Factory factory = new ActivityUtilityParameters.Factory(params) ;
 			// the following was introduced in nov'12.  Also see setupTransitSimulation in Controler.  kai, nov'12
-			if (params.getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
+			if (params.getActivityType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
 				factory.setScoreAtAll(false) ;
 			}
-			tmpUtlParams.put(params.getType(), factory.create() ) ;
+			tmpUtlParams.put(params.getActivityType(), factory.create() ) ;
 		}
 		utilParams = Collections.unmodifiableMap(tmpUtlParams );
 		
