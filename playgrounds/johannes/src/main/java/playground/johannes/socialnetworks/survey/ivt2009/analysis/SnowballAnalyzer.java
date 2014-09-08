@@ -25,8 +25,8 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigReaderMatsimV1;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -81,7 +81,7 @@ public class SnowballAnalyzer {
 	
 	public static void main(String args[]) {
 		Config config = new Config();
-		ConfigReaderMatsimV1 reader = new ConfigReaderMatsimV1(config);
+		MatsimConfigReader reader = new MatsimConfigReader(config);
 		reader.readFile(args[0]);
 		
 		new SnowballAnalyzer(config);

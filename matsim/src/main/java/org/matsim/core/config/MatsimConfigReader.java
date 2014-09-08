@@ -42,6 +42,7 @@ public class MatsimConfigReader extends MatsimXmlParser implements MatsimSomeRea
 	private final static Logger log = Logger.getLogger(MatsimConfigReader.class);
 
 	private final static String CONFIG_V1 = "config_v1.dtd";
+	private final static String CONFIG_V2 = "config_v2.dtd";
 
 	private final Config config;
 	private MatsimXmlParser delegate = null;
@@ -103,7 +104,12 @@ public class MatsimConfigReader extends MatsimXmlParser implements MatsimSomeRea
 		if (CONFIG_V1.equals(doctype)) {
 			this.delegate = new ConfigReaderMatsimV1(this.config);
 			log.info("using config_v1-reader.");
-		} else {
+		}
+		else if ( CONFIG_V2.equals( doctype ) ) {
+			this.delegate = new ConfigReaderMatsimV2( this.config );
+			log.info( "using config_v2-reader" );
+		}
+		else {
 			throw new IllegalArgumentException("Doctype \"" + doctype + "\" not known.");
 		}
 	}

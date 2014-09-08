@@ -36,7 +36,7 @@ import org.xml.sax.Attributes;
 /**
  * @author thibautd
  */
-public class ConfigReaderMatsimV2 extends MatsimXmlParser {
+ public class ConfigReaderMatsimV2 extends MatsimXmlParser {
 	private final Config config;
 
 	private final Deque<Module> moduleStack = new ArrayDeque<Module>();
