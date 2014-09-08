@@ -7,7 +7,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -23,7 +22,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationWriter;
@@ -32,8 +30,6 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
-import playground.mkillat.pt_test.CompleteTransitRoute;
-import playground.mkillat.pt_test.MyEventFileReaderPt;
 import playground.mkillat.tmc.StringTimeToDouble;
 
 
@@ -512,7 +508,7 @@ public class Analyse implements Runnable {
 			String  bla =String.valueOf(Math.random());
 			String id = entry.getKey() +  bla;
 			
-			Person person = factory.createPerson(scenario.createId(id));
+			Person person = factory.createPerson(Id.create(id, Person.class));
 			population.addPerson(person);
 			Plan plan = factory.createPlan();
 			Activity home = factory.createActivityFromCoord("home",  ct.transform(scenario.createCoord (coordReinX, coordReinY)));
