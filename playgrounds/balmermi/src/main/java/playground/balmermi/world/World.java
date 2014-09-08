@@ -31,7 +31,7 @@ public class World {
 	private final Map<Id, Layer> layers = new TreeMap<Id, Layer>();
 
 	@Deprecated
-	public final Layer createLayer(final Id type) {
+	public final Layer createLayer(final Id<Layer> type) {
 		if (this.layers.containsKey(type)) {
 			throw new IllegalArgumentException("Layer type=" + type + " already exixts.");
 		}

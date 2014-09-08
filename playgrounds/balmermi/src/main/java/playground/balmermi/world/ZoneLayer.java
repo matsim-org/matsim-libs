@@ -25,7 +25,6 @@ import java.util.Map;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
@@ -35,9 +34,9 @@ import org.matsim.core.utils.geometry.CoordImpl;
  */
 public class ZoneLayer extends LayerImpl {
 
-	public final Zone createZone(final Id id, final String center_x, final String center_y,
+	public final Zone createZone(final Id<Zone> id, final String center_x, final String center_y,
 	                             final String min_x, final String min_y, final String max_x, final String max_y) {
-		Id i = id;
+		Id<Zone> i = id;
 		if (this.getLocations().containsKey(i)) { throw new RuntimeException(this.toString() + "[zone id=" + id + " already exists]"); }
 		Coord center = null;
 		Coord min = null;

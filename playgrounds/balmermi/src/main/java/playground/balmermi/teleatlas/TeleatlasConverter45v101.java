@@ -39,7 +39,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkWriteAsTable;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -438,8 +437,8 @@ public class TeleatlasConverter45v101 {
 		} else {
 			throw new IllegalArgumentException("direction must be FT or TF.");
 		}
-		Id fromId = this.scenario.createId(Long.toString(fromJunction.id));
-		Id toId = this.scenario.createId(Long.toString(toJunction.id));
+		Id<Node> fromId = Id.create(fromJunction.id, Node.class);
+		Id<Node> toId = Id.create(toJunction.id, Node.class);
 		Node fromNode = this.network.getNodes().get(fromId);
 		if (fromNode == null) {
 			fromNode = this.network.getFactory().createNode(fromId, convertCoordinate(fromJunction.c));
@@ -452,8 +451,8 @@ public class TeleatlasConverter45v101 {
 			this.nodeCounter.incCounter();
 			this.network.addNode(toNode);
 		}
-		Id linkId = this.scenario.createId(Long.toString(nwElement.id) + direction);
-		Link link = this.network.getFactory().createLink(linkId, fromId, toId);
+		Id<Link> linkId = Id.create(Long.toString(nwElement.id) + direction, Link.class);
+		Link link = this.network.getFactory().createLink(linkId, fromNode, toNode);
 		this.linkCounter.incCounter();
 		this.network.addLink(link);
 		return link;
@@ -489,7 +488,7 @@ public class TeleatlasConverter45v101 {
 		Gbl.printMemoryUsage();
 
 		log.info("start conversion...");
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		TeleatlasConverter45v101 converter = new TeleatlasConverter45v101(scenario, data);
 		converter.setCoordinateTransformation(new WGS84toCH1903LV03());
 		converter.convertToNetwork();
