@@ -458,7 +458,8 @@ public class SpatialInfo {
 		values.add(id2yCoord);
 		values.add(pointId2counter);
 //		LKCsvWriterId2DoubleMaps writer = new LKCsvWriterId2DoubleMaps("/Users/Lars/Desktop/VERSUCH/BerlinCoords90.csv", 4, headers, values);
-		LKCsvWriterId2DoubleMaps writer = new LKCsvWriterId2DoubleMaps("/Users/Lars/Desktop/VERSUCH/Sioux250.csv", 4, headers, values);
+//		LKCsvWriterId2DoubleMaps writer = new LKCsvWriterId2DoubleMaps("/Users/Lars/Desktop/VERSUCH/Sioux250.csv", 4, headers, values);
+		LKCsvWriterId2DoubleMaps writer = new LKCsvWriterId2DoubleMaps(scenario.getConfig().controler().getOutputDirectory()+"/receiverPoints/receiverPoints.csv", 4, headers, values);
 		writer.write();
 		// For a post-analysis of the events-file the real locations of the ceiver points should be known!
 	}
