@@ -26,10 +26,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.NonFlatConfigWriter;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.scenario.ScenarioImpl;
 
-import playground.thibautd.config.NonFlatConfigWriter;
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.cliques.config.CliquesConfigGroup;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;

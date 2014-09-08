@@ -17,22 +17,20 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.config;
+package org.matsim.core.config;
 
-import static playground.thibautd.config.NonFlatConfigXmlNames.CONFIG;
-import static playground.thibautd.config.NonFlatConfigXmlNames.MODULE;
-import static playground.thibautd.config.NonFlatConfigXmlNames.NAME;
-import static playground.thibautd.config.NonFlatConfigXmlNames.PARAMETER;
-import static playground.thibautd.config.NonFlatConfigXmlNames.PARAMETER_SET;
-import static playground.thibautd.config.NonFlatConfigXmlNames.TYPE;
+import static org.matsim.core.config.NonFlatConfigXmlNames.CONFIG;
+import static org.matsim.core.config.NonFlatConfigXmlNames.MODULE;
+import static org.matsim.core.config.NonFlatConfigXmlNames.NAME;
+import static org.matsim.core.config.NonFlatConfigXmlNames.PARAMETER;
+import static org.matsim.core.config.NonFlatConfigXmlNames.PARAMETER_SET;
+import static org.matsim.core.config.NonFlatConfigXmlNames.TYPE;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
-import org.matsim.core.config.Config;
-import org.matsim.core.config.Module;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.io.UncheckedIOException;

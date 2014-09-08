@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.NonFlatConfigReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
@@ -34,7 +35,6 @@ import org.matsim.population.Desires;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
-import playground.thibautd.config.NonFlatConfigReader;
 import playground.thibautd.pseudoqsim.PseudoSimConfigGroup;
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.PlanLinkConfigGroup;

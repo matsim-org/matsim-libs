@@ -40,6 +40,7 @@ import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.NonFlatConfigWriter;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.HouseholdsConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
@@ -61,7 +62,6 @@ import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsWriterV10;
 
-import playground.thibautd.config.NonFlatConfigWriter;
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup.StrategyParameterSet;
 import playground.thibautd.utils.UniqueIdFactory;

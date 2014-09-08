@@ -28,6 +28,8 @@ import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.Module;
+import org.matsim.core.config.NonFlatConfigReader;
+import org.matsim.core.config.NonFlatConfigWriter;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
