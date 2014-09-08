@@ -21,14 +21,15 @@ package playground.fhuelsmann.airpollution.testroad;
 
 
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -36,7 +37,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
@@ -93,7 +93,7 @@ public class DemandCreatorFromCounts {
 
 		List<Integer> inflowTimes = getTestVehicleInflowTimes(inflowTimesFile);
 		for(int time : inflowTimes){
-			Id personId = sc.createId(time + "testVehicle");
+			Id personId = Id.create(time + "testVehicle", Person.class);
 
 			System.out.println(time);
 
@@ -103,8 +103,8 @@ public class DemandCreatorFromCounts {
 
 			String actTypeHome = "h";
 			String actTypeWork = "h";
-			Id linkIdHome = sc.createId("52799702");
-			Id linkIdWork = sc.createId("52799758");
+			Id linkIdHome = Id.create("52799702", Link.class);
+			Id linkIdWork = Id.create("52799758", Link.class);
 
 			Activity home = population.getFactory().createActivityFromLinkId(actTypeHome, linkIdHome);
 			// endTime needs to be set as follows (if my calculation is right :))
@@ -183,15 +183,15 @@ public class DemandCreatorFromCounts {
 			for(int i=0; i < vehicelesTotal; i++){
 
 				int j = i+1;
-				Id personId = sc.createId(endTimeInSeconds + "_" + j);
+				Id<Person> personId = Id.create(endTimeInSeconds + "_" + j, Person.class);
 				Person person = population.getFactory().createPerson(personId);
 				Plan plan = population.getFactory().createPlan();
 				person.addPlan(plan);
 
 				String actTypeHome = "h";
 				String actTypeWork = "h";
-				Id linkIdHome = sc.createId("586886120");
-				Id linkIdWork = sc.createId("589958577");
+				Id<Link> linkIdHome = Id.create("586886120", Link.class);
+				Id<Link> linkIdWork = Id.create("589958577", Link.class);
 
 				Activity home = population.getFactory().createActivityFromLinkId(actTypeHome, linkIdHome);
 				home.setEndTime(endTimeInSeconds);
@@ -214,15 +214,15 @@ public class DemandCreatorFromCounts {
 			for(int i=0; i < freightTotal; i++){
 
 				int j = i+1;
-				Id personId = sc.createId("gv_"+endTimeInSeconds + "_" + j);
+				Id<Person> personId = Id.create("gv_"+endTimeInSeconds + "_" + j, Person.class);
 				Person person = population.getFactory().createPerson(personId);
 				Plan plan = population.getFactory().createPlan();
 				person.addPlan(plan);
 
 				String actTypeHome = "h";
 				String actTypeWork = "h";
-				Id linkIdHome = sc.createId("586886120");
-				Id linkIdWork = sc.createId("589958577");
+				Id<Link> linkIdHome = Id.create("586886120", Link.class);
+				Id<Link> linkIdWork = Id.create("589958577", Link.class);
 
 				Activity home = population.getFactory().createActivityFromLinkId(actTypeHome, linkIdHome);
 				home.setEndTime(endTimeInSeconds);
@@ -310,7 +310,8 @@ public class DemandCreatorFromCounts {
             private static final int ENDTIME = 0;
             private static final int NUMBER = 20;
 
-            public void startRow(String[] row) {
+            @Override
+						public void startRow(String[] row) {
                 first = false;
                 numColumns = row.length;
                 check(row);
@@ -343,7 +344,8 @@ public class DemandCreatorFromCounts {
             private static final int ENDTIME = 0;
             private static final int NUMBER = 21;
 
-            public void startRow(String[] row) {
+            @Override
+						public void startRow(String[] row) {
                 first = false;
                 numColumns = row.length;
                 check(row);
