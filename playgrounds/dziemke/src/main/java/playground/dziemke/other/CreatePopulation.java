@@ -1,6 +1,8 @@
 package playground.dziemke.other;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -8,7 +10,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.internal.MatsimWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -28,24 +29,24 @@ public class CreatePopulation {
 		Network network = scenario.getNetwork();
 		
 		for(Integer i = 1; i <= 5; i++) {
-			Person person = population.getFactory().createPerson(scenario.createId(i.toString()));
+			Person person = population.getFactory().createPerson(Id.create(i.toString(), Person.class));
 			Plan plan = population.getFactory().createPlan();
 			
-			Activity homeActivity = population.getFactory().createActivityFromLinkId("h", new IdImpl(1));
+			Activity homeActivity = population.getFactory().createActivityFromLinkId("h", Id.create(1, Link.class));
 			homeActivity.setEndTime(6*60*60);
 			plan.addActivity(homeActivity);
 			
 			Leg home2workLeg = population.getFactory().createLeg("car");
 			plan.addLeg(home2workLeg);
 			
-			Activity workActivity = population.getFactory().createActivityFromLinkId("w", new IdImpl(20));
+			Activity workActivity = population.getFactory().createActivityFromLinkId("w", Id.create(20, Link.class));
 			workActivity.setMaximumDuration(30*60);
 			plan.addActivity(workActivity);
 			
 			Leg work2homeLeg = population.getFactory().createLeg("car");
 			plan.addLeg(work2homeLeg);
 			
-			Activity homeActivity2 = population.getFactory().createActivityFromLinkId("h", new IdImpl(1));
+			Activity homeActivity2 = population.getFactory().createActivityFromLinkId("h", Id.create(1, Link.class));
 			plan.addActivity(homeActivity2);
 			
 			person.addPlan(plan);

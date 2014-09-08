@@ -96,7 +96,7 @@ public class CemdapStopsParser {
 				
 				Integer householdId = Integer.parseInt(entries[HH_ID]);
 				Integer personId = Integer.parseInt(entries[P_ID]);
-				Id agentId = scenario.createId(householdId+"_"+personId);
+				Id<Person> agentId = Id.create(householdId+"_"+personId, Person.class);
 		
 				// create a person if a person with that agentId does not already exist
 				Person person = population.getPersons().get(agentId);
@@ -202,7 +202,7 @@ public class CemdapStopsParser {
 	// called at the very end
 	// private final void cleanUp(Population population) {
 	private final void cleanUp(Population population, int planNumber) {
-		Set<Id> pidsToRemove = new HashSet<Id>();
+		Set<Id<Person>> pidsToRemove = new HashSet<>();
 		for (Person person : population.getPersons().values()) {
 			// Activity firstActivity = (Activity)person.getSelectedPlan().getPlanElements().get(0);
 			if (person.getPlans().size() > planNumber) {
@@ -216,7 +216,7 @@ public class CemdapStopsParser {
 				pidsToRemove.add(person.getId());
 			}
 		}
-		for (Id pid : pidsToRemove) {
+		for (Id<Person> pid : pidsToRemove) {
 			population.getPersons().remove(pid);
 		}
 		log.info("in total "+pidsToRemove.size()+" removed from the population.");
