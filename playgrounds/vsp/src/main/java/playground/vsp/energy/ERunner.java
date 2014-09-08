@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.vsp.energy;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationFactory;
@@ -66,7 +67,7 @@ public class ERunner {
 			new MatsimPopulationReader(sc).readFile(additionalPlansFile);
 			Person newPerson;
 			for(Person p: sc.getPopulation().getPersons().values()){
-				newPerson = f.createPerson(this.sc.createId(identifier + p.getId().toString()));
+				newPerson = f.createPerson(Id.create(identifier + p.getId().toString(), Person.class));
 				newPerson.addPlan(p.getSelectedPlan());
 				this.sc.getPopulation().addPerson(newPerson);
 			}

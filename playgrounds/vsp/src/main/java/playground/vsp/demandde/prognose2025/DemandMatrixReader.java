@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.accessibility.gis.Zone;
 import org.matsim.core.api.experimental.facilities.ActivityFacilitiesFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.facilities.Facility;
@@ -75,10 +76,10 @@ public class DemandMatrixReader {
 
 	private final Scenario sc ;
 
-	private final Map<Id, NodesAndDistances> zoneToConnectorsMap = new HashMap<Id,NodesAndDistances>();
+	private final Map<Id<Zone>, NodesAndDistances> zoneToConnectorsMap = new HashMap<>();
 
 	class NodesAndDistances {
-		private final Map<Id,Double> nodesAndDistances = new HashMap<Id,Double>();
+		private final Map<Id,Double> nodesAndDistances = new HashMap<>();
 		Map<Id,Double> getNodesAndDistances() {
 			return this.nodesAndDistances ;
 		}
@@ -115,11 +116,11 @@ public class DemandMatrixReader {
 					if ( pvgv==1 ) { // "1" means "Anbindung f. PV"
 						return ;
 					}
-					Id zoneId = DemandMatrixReader.this.sc.createId(row[1]);
+					Id<Zone> zoneId = Id.create(row[1], Zone.class);
 					int anzahl = Integer.parseInt(row[2]);
 					NodesAndDistances nodeToDistanceMap = new NodesAndDistances();
 					for ( int ii=0 ; ii<anzahl ; ii++ ) {
-						Id nodeId = DemandMatrixReader.this.sc.createId( row[3+2*ii]);
+						Id<Node> nodeId = Id.create( row[3+2*ii], Node.class);
 						double distance = Double.parseDouble(row[3+2*ii+1]);
 						nodeToDistanceMap.getNodesAndDistances().put( nodeId, distance);
 					}
@@ -146,7 +147,7 @@ public class DemandMatrixReader {
 					}
 					double x = Double.parseDouble(row[2]);
 					double y = Double.parseDouble(row[3]);
-					Node node = DemandMatrixReader.this.sc.getNetwork().getFactory().createNode(DemandMatrixReader.this.sc.createId(row[5]),
+					Node node = DemandMatrixReader.this.sc.getNetwork().getFactory().createNode(Id.create(row[5], Node.class),
 							coordinateTransformation.transform(DemandMatrixReader.this.sc.createCoord(x, y) ));
 					DemandMatrixReader.this.sc.getNetwork().addNode(node);
 				}
@@ -216,8 +217,8 @@ public class DemandMatrixReader {
 				if (filename.equals(GV_MATRIX)){
 					try {
 						int idx = 0 ;
-						Id quellZonenId = DemandMatrixReader.this.sc.createId(row[idx]); idx++ ;
-						Id zielZonenId = DemandMatrixReader.this.sc.createId(row[idx]); idx++ ;
+						Id<Zone> quellZonenId = Id.create(row[idx], Zone.class); idx++ ;
+						Id<Zone> zielZonenId = Id.create(row[idx], Zone.class); idx++ ;
 
 						Verkehrsmittel vm = Verkehrsmittel.values()[idx] ; idx++ ;
 						Guetergruppe gg = Guetergruppe.values()[idx] ; idx++ ;
@@ -238,14 +239,14 @@ public class DemandMatrixReader {
 		});
 	}
 
-	private void process(Id quellZonenId, Id zielZonenId, Verkehrsmittel vm, Guetergruppe gg, double tons) {
+	private void process(Id<Zone> quellZonenId, Id<Zone> zielZonenId, Verkehrsmittel vm, Guetergruppe gg, double tons) {
 		getCoordFromZone(quellZonenId);
 	}
 
-	private Coord getCoordFromZone(Id zoneId) {
+	private Coord getCoordFromZone(Id<Zone> zoneId) {
 		NodesAndDistances connectors = this.zoneToConnectorsMap.get(zoneId);
 		Node node = null ;
-		for ( Id nodeId : connectors.getNodesAndDistances().keySet() ) {
+		for ( Id<Node> nodeId : connectors.getNodesAndDistances().keySet() ) {
 			node = this.sc.getNetwork().getNodes().get( nodeId);
 			break ;
 		}
