@@ -115,6 +115,9 @@ public class PlansCalcRouteConfigGroup extends Module {
 
 		@StringSetter( "teleportedModeSpeed" )
 		public void setTeleportedModeSpeed(Double teleportedModeSpeed) {
+			if ( getTeleportedModeFreespeedFactor() != null ) {
+				throw new IllegalStateException( "cannot set both speed and freespeed factor for "+getMode() );
+			}
 			this.teleportedModeSpeed = teleportedModeSpeed;
 		}
 
@@ -126,6 +129,9 @@ public class PlansCalcRouteConfigGroup extends Module {
 		@StringSetter( "teleportedModeFreespeedFactor" )
 		public void setTeleportedModeFreespeedFactor(
 				Double teleportedModeFreespeedFactor) {
+			if ( getTeleportedModeSpeed() != null ) {
+				throw new IllegalStateException( "cannot set both speed and freespeed factor for "+getMode() );
+			}
 			this.teleportedModeFreespeedFactor = teleportedModeFreespeedFactor;
 		}
 	}
@@ -296,8 +302,7 @@ public class PlansCalcRouteConfigGroup extends Module {
 
 	public Map<String, Double> getTeleportedModeSpeeds() {
 		final Map<String, Double> map = new LinkedHashMap< >();
-		for ( ModeRoutingParams pars :
-				(Collection<ModeRoutingParams>) getParameterSets( ModeRoutingParams.SET_TYPE ) ) {
+		for ( ModeRoutingParams pars : getModeRoutingParams().values() ) {
 			final Double speed = pars.getTeleportedModeSpeed();
 			if ( speed != null ) map.put( pars.getMode() , speed );
 		}
@@ -306,9 +311,8 @@ public class PlansCalcRouteConfigGroup extends Module {
 
 	public Map<String, Double> getTeleportedModeFreespeedFactors() {
 		final Map<String, Double> map = new LinkedHashMap< >();
-		for ( ModeRoutingParams pars :
-				(Collection<ModeRoutingParams>) getParameterSets( ModeRoutingParams.SET_TYPE ) ) {
-			final Double speed = pars.getTeleportedModeSpeed();
+		for ( ModeRoutingParams pars : getModeRoutingParams().values() ) {
+			final Double speed = pars.getTeleportedModeFreespeedFactor();
 			if ( speed != null ) map.put( pars.getMode() , speed );
 		}
 		return map;
@@ -316,11 +320,17 @@ public class PlansCalcRouteConfigGroup extends Module {
 	}
 
 	public void setTeleportedModeFreespeedFactor(String mode, double freespeedFactor) {
-		getOrCreateModeRoutingParams( mode ).setTeleportedModeFreespeedFactor( freespeedFactor );
+		// re-create, to trigger erasing of defaults
+		final ModeRoutingParams pars = new ModeRoutingParams( mode );
+		pars.setTeleportedModeFreespeedFactor( freespeedFactor );
+		addParameterSet( pars );
 	}
 
 	public void setTeleportedModeSpeed(String mode, double speed) {
-		getOrCreateModeRoutingParams( mode ).setTeleportedModeSpeed( speed );
+		// re-create, to trigger erasing of defaults
+		final ModeRoutingParams pars = new ModeRoutingParams( mode );
+		pars.setTeleportedModeSpeed( speed );
+		addParameterSet( pars );
 	}
 
 }
