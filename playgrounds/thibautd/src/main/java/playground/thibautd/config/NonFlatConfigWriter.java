@@ -108,16 +108,14 @@ public class NonFlatConfigWriter extends MatsimXmlWriter {
 				writer.newLine();
 			}
 
-			if ( module instanceof NonFlatModule ) {
-				for ( Map.Entry<String, Collection<Module>> entry : module.getParameterSets().entrySet() ) {
-					for ( Module pSet : entry.getValue() ) {
-						writeModule(
-								indent+"\t",
-								PARAMETER_SET,
-								TYPE,
-								entry.getKey(),
-								pSet );
-					}
+			for ( Map.Entry<String, Collection<Module>> entry : module.getParameterSets().entrySet() ) {
+				for ( Module pSet : entry.getValue() ) {
+					writeModule(
+							indent+"\t",
+							PARAMETER_SET,
+							TYPE,
+							entry.getKey(),
+							pSet );
 				}
 			}
 

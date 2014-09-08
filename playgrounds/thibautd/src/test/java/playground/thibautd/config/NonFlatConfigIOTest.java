@@ -46,9 +46,6 @@ public class NonFlatConfigIOTest {
 		new NonFlatConfigWriter( outConfig ).write( file );
 
 		final Config inConfig = ConfigUtils.createConfig();
-		// for the moment, non flat modules are non-standard,
-		// so one has to set them explicitly.
-		inConfig.addModule( new NonFlatModule( "thisAintNoFlat" ) );
 		new NonFlatConfigReader( inConfig ).parse( file );
 
 		assertTheSame( outConfig , inConfig );
@@ -110,7 +107,7 @@ public class NonFlatConfigIOTest {
 	private Config createTestConfig() {
 		final Config c = ConfigUtils.createConfig();
 
-		final Module module = new NonFlatModule( "thisAintNoFlat" );
+		final Module module = new Module( "thisAintNoFlat" );
 		module.addParam( "someParam" , "someValue" );
 		module.addParam( "anotherParam" , "anotherValue" );
 
