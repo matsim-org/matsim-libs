@@ -156,7 +156,7 @@ public class TripInfoWriterNoise {
 	
 	public void writePersonId2totalAmount() {
 		
-		String fileName = this.outputFolder + "/personId2totalAmount.csv";
+		String fileName = this.outputFolder + "personId2totalAmount.csv";
 		File file = new File(fileName);
 			
 		try {
@@ -183,7 +183,7 @@ public class TripInfoWriterNoise {
 				}
 				
 				if (Math.abs(amountSumFromList - totalAmount) >= 0.001) {
-					log.warn("Inconsistent data: Total amount from trip-based analysis: " + amountSumFromList + " // total amount from person-based analysis: " + totalAmount);
+//					log.warn("Inconsistent data: Total amount from trip-based analysis: " + amountSumFromList + " // total amount from person-based analysis: " + totalAmount);
 				}
 				
 				bw.write(id + ";" + totalAmount);
@@ -200,7 +200,7 @@ public class TripInfoWriterNoise {
 	
 	public void writePersonId2totalAmountAffected() {
 		
-		String fileName = this.outputFolder + "/personId2totalAmountAffected.csv";
+		String fileName = this.outputFolder + "personId2totalAmountAffected.csv";
 		File file = new File(fileName);
 			
 		try {

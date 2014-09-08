@@ -144,36 +144,36 @@ public class NoiseInternalizationControlerListener implements AfterMobsimListene
 		String filenameToll = "noise_tollstats.csv";
 		String filenameTollCar = "noise_tollstatsCar.csv";
 		String filenameTollHdv = "noise_tollstatsHdv.csv";
-		tollHandler.writeTollStats(scenario.getConfig().controler().getOutputDirectory()+"/postAnalysis/"+filenameToll);
-		tollHandler.writeTollStatsCar(scenario.getConfig().controler().getOutputDirectory()+"/postAnalysis/"+filenameTollCar);
-		tollHandler.writeTollStatsHdv(scenario.getConfig().controler().getOutputDirectory()+"/postAnalysis/"+filenameTollHdv);
+		tollHandler.writeTollStats(scenario.getConfig().controler().getOutputDirectory()+"/postAnalysis_it."+event.getIteration()+"/"+filenameToll);
+		tollHandler.writeTollStatsCar(scenario.getConfig().controler().getOutputDirectory()+"/postAnalysis_it."+event.getIteration()+"/"+filenameTollCar);
+		tollHandler.writeTollStatsHdv(scenario.getConfig().controler().getOutputDirectory()+"/postAnalysis_it."+event.getIteration()+"/"+filenameTollHdv);
 		
 		log.info("Write toll stats per hour");
 		String filenameTollPerHour = "tollstatsPerHour.csv";
 		String filenameTollPerHourCar = "tollstatsPerHourCar.csv";
 		String filenameTollPerHourHdv = "tollstatsPerHourHdv.csv";
-		tollHandler.writeTollStatsPerHour(scenario.getConfig().controler().getOutputDirectory()+"/postAnalysis/"+filenameTollPerHour);
-		tollHandler.writeTollStatsPerHourCar(scenario.getConfig().controler().getOutputDirectory()+"/postAnalysis/"+filenameTollPerHourCar);
-		tollHandler.writeTollStatsPerHourHdv(scenario.getConfig().controler().getOutputDirectory()+"/postAnalysis/"+filenameTollPerHourHdv);
+		tollHandler.writeTollStatsPerHour(scenario.getConfig().controler().getOutputDirectory()+"/postAnalysis_it."+event.getIteration()+"/"+filenameTollPerHour);
+		tollHandler.writeTollStatsPerHourCar(scenario.getConfig().controler().getOutputDirectory()+"/postAnalysis_it."+event.getIteration()+"/"+filenameTollPerHourCar);
+		tollHandler.writeTollStatsPerHourHdv(scenario.getConfig().controler().getOutputDirectory()+"/postAnalysis_it."+event.getIteration()+"/"+filenameTollPerHourHdv);
 		
 		log.info("Write toll stats per activity");
 		String filenameTollPerActivity = "tollstatsPerActivity.csv";
-		tollHandler.writeTollStatsPerActivity(scenario.getConfig().controler().getOutputDirectory()+"/postAnalysis/"+filenameTollPerActivity);
+		tollHandler.writeTollStatsPerActivity(scenario.getConfig().controler().getOutputDirectory()+"/postAnalysis_it."+event.getIteration()+"/"+filenameTollPerActivity);
 		
 		log.info("Write toll stats for comparing home-based vs. activity-based");
 		String filenameTollCompareHomeVsActivityBased = "tollstatsCompareHomeVsActivityBased.csv";
-		tollHandler.writeTollStatsCompareHomeVsActivityBased(scenario.getConfig().controler().getOutputDirectory()+"/postAnalysis/"+filenameTollCompareHomeVsActivityBased);
+		tollHandler.writeTollStatsCompareHomeVsActivityBased(scenario.getConfig().controler().getOutputDirectory()+"/postAnalysis_it."+event.getIteration()+"/"+filenameTollCompareHomeVsActivityBased);
 		
 		log.info("Write noise emission stats");
 		String filenameNoiseEmission = "noiseEmissionStats.csv";
-		tollHandler.writeNoiseEmissionStats(scenario.getConfig().controler().getOutputDirectory()+"/postAnalysis/"+filenameNoiseEmission);
+		tollHandler.writeNoiseEmissionStats(scenario.getConfig().controler().getOutputDirectory()+"/postAnalysis_it."+event.getIteration()+"/"+filenameNoiseEmission);
 		
 		log.info("Write noise immission stats");
 		String filenameNoiseImmission = "noiseImmissionStats.csv";
 		
-		tollHandler.writeNoiseImmissionStats(scenario.getConfig().controler().getOutputDirectory()+"/postAnalysis/"+filenameNoiseImmission);
+		tollHandler.writeNoiseImmissionStats(scenario.getConfig().controler().getOutputDirectory()+"/postAnalysis_it."+event.getIteration()+"/"+filenameNoiseImmission);
 
-		TripInfoWriterNoise writer = new TripInfoWriterNoise(extCostTripHandler, scenario.getConfig().controler().getOutputDirectory()+"/postAnalysis/personId2sum/");
+		TripInfoWriterNoise writer = new TripInfoWriterNoise(extCostTripHandler, scenario.getConfig().controler().getOutputDirectory()+"/postAnalysis_it."+event.getIteration()+"/personId2sum/");
 		writer.writeDetailedResults(TransportMode.car);
 		writer.writeAvgTollPerDistance(TransportMode.car);
 		writer.writeAvgTollPerTimeBin(TransportMode.car);
