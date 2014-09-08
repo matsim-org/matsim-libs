@@ -25,11 +25,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -60,6 +61,7 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
@@ -85,13 +87,6 @@ public class AccessEgressDemoSimple {
 	private static final boolean stopsBlockLane = true;
 
 	private final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-	public final Id[] ids = new Id[10];
-
-	private void createIds() {
-		for (int i = 0; i < this.ids.length; i++) {
-			this.ids[i] = this.scenario.createId(Integer.toString(i));
-		}
-	}
 
 	private void prepareConfig() {
 		Config config = this.scenario.getConfig();
@@ -105,32 +100,32 @@ public class AccessEgressDemoSimple {
 		Network network = this.scenario.getNetwork();
 		((NetworkImpl) network).setCapacityPeriod(3600.0);
 		
-		network.addNode(network.getFactory().createNode(new IdImpl("01"), this.scenario.createCoord(-500, 0)));
-		network.addNode(network.getFactory().createNode(new IdImpl("10"), this.scenario.createCoord(0, 0)));
-		network.addNode(network.getFactory().createNode(new IdImpl("11"), this.scenario.createCoord(500, 0)));
-		network.addNode(network.getFactory().createNode(new IdImpl("12"), this.scenario.createCoord(1000, 0)));
-		network.addNode(network.getFactory().createNode(new IdImpl("13"), this.scenario.createCoord(1500, 0)));
-		network.addNode(network.getFactory().createNode(new IdImpl("14"), this.scenario.createCoord(2000, 0)));
+		network.addNode(network.getFactory().createNode(Id.create("01", Node.class), this.scenario.createCoord(-500, 0)));
+		network.addNode(network.getFactory().createNode(Id.create("10", Node.class), this.scenario.createCoord(0, 0)));
+		network.addNode(network.getFactory().createNode(Id.create("11", Node.class), this.scenario.createCoord(500, 0)));
+		network.addNode(network.getFactory().createNode(Id.create("12", Node.class), this.scenario.createCoord(1000, 0)));
+		network.addNode(network.getFactory().createNode(Id.create("13", Node.class), this.scenario.createCoord(1500, 0)));
+		network.addNode(network.getFactory().createNode(Id.create("14", Node.class), this.scenario.createCoord(2000, 0)));
 		
-		network.addNode(network.getFactory().createNode(new IdImpl("02"), this.scenario.createCoord(-500, -500)));
-		network.addNode(network.getFactory().createNode(new IdImpl("20"), this.scenario.createCoord(0, -500)));
-		network.addNode(network.getFactory().createNode(new IdImpl("21"), this.scenario.createCoord(500, -500)));
-		network.addNode(network.getFactory().createNode(new IdImpl("22"), this.scenario.createCoord(1000, -500)));
-		network.addNode(network.getFactory().createNode(new IdImpl("23"), this.scenario.createCoord(1500, -500)));
-		network.addNode(network.getFactory().createNode(new IdImpl("24"), this.scenario.createCoord(2000, -500)));
+		network.addNode(network.getFactory().createNode(Id.create("02", Node.class), this.scenario.createCoord(-500, -500)));
+		network.addNode(network.getFactory().createNode(Id.create("20", Node.class), this.scenario.createCoord(0, -500)));
+		network.addNode(network.getFactory().createNode(Id.create("21", Node.class), this.scenario.createCoord(500, -500)));
+		network.addNode(network.getFactory().createNode(Id.create("22", Node.class), this.scenario.createCoord(1000, -500)));
+		network.addNode(network.getFactory().createNode(Id.create("23", Node.class), this.scenario.createCoord(1500, -500)));
+		network.addNode(network.getFactory().createNode(Id.create("24", Node.class), this.scenario.createCoord(2000, -500)));
 		
 		Link l;
-		l = network.getFactory().createLink(new IdImpl("0110"), new IdImpl("01"), new IdImpl("10")); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
-		l = network.getFactory().createLink(new IdImpl("1011"), new IdImpl("10"), new IdImpl("11")); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
-		l = network.getFactory().createLink(new IdImpl("1112"), new IdImpl("11"), new IdImpl("12")); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
-		l = network.getFactory().createLink(new IdImpl("1213"), new IdImpl("12"), new IdImpl("13")); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
-		l = network.getFactory().createLink(new IdImpl("1314"), new IdImpl("13"), new IdImpl("14")); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
+		l = network.getFactory().createLink(Id.create("0110", Link.class), Id.create("01", Node.class), Id.create("10", Node.class)); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
+		l = network.getFactory().createLink(Id.create("1011", Link.class), Id.create("10", Node.class), Id.create("11", Node.class)); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
+		l = network.getFactory().createLink(Id.create("1112", Link.class), Id.create("11", Node.class), Id.create("12", Node.class)); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
+		l = network.getFactory().createLink(Id.create("1213", Link.class), Id.create("12", Node.class), Id.create("13", Node.class)); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
+		l = network.getFactory().createLink(Id.create("1314", Link.class), Id.create("13", Node.class), Id.create("14", Node.class)); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
 		
-		l = network.getFactory().createLink(new IdImpl("0220"), new IdImpl("02"), new IdImpl("20")); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
-		l = network.getFactory().createLink(new IdImpl("2021"), new IdImpl("20"), new IdImpl("21")); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
-		l = network.getFactory().createLink(new IdImpl("2122"), new IdImpl("21"), new IdImpl("22")); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
-		l = network.getFactory().createLink(new IdImpl("2223"), new IdImpl("22"), new IdImpl("23")); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
-		l = network.getFactory().createLink(new IdImpl("2324"), new IdImpl("23"), new IdImpl("24")); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
+		l = network.getFactory().createLink(Id.create("0220", Link.class), Id.create("02", Node.class), Id.create("20", Node.class)); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
+		l = network.getFactory().createLink(Id.create("2021", Link.class), Id.create("20", Node.class), Id.create("21", Node.class)); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
+		l = network.getFactory().createLink(Id.create("2122", Link.class), Id.create("21", Node.class), Id.create("22", Node.class)); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
+		l = network.getFactory().createLink(Id.create("2223", Link.class), Id.create("22", Node.class), Id.create("23", Node.class)); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
+		l = network.getFactory().createLink(Id.create("2324", Link.class), Id.create("23", Node.class), Id.create("24", Node.class)); l.setLength(500.0); l.setFreespeed(10.0);	l.setCapacity(1000.0); l.setNumberOfLanes(1); network.addLink(l);
 		
 	}
 
@@ -145,19 +140,19 @@ public class AccessEgressDemoSimple {
 		TransitStopFacility stopFac;
 		TransitRouteStop stop;
 		
-		stopFac = builder.createTransitStopFacility(new IdImpl("11"), this.scenario.createCoord(500, 0), stopsBlockLane); stopFac.setLinkId(new IdImpl("1011")); schedule.addStopFacility(stopFac);
+		stopFac = builder.createTransitStopFacility(Id.create("11", TransitStopFacility.class), this.scenario.createCoord(500, 0), stopsBlockLane); stopFac.setLinkId(Id.create("1011", Link.class)); schedule.addStopFacility(stopFac);
 		stop = builder.createTransitRouteStop(stopFac, 0, 10); stopListA.add(stop);		
-		stopFac = builder.createTransitStopFacility(new IdImpl("13"), this.scenario.createCoord(1500, 0), stopsBlockLane); stopFac.setLinkId(new IdImpl("1213")); schedule.addStopFacility(stopFac);
+		stopFac = builder.createTransitStopFacility(Id.create("13", TransitStopFacility.class), this.scenario.createCoord(1500, 0), stopsBlockLane); stopFac.setLinkId(Id.create("1213", Link.class)); schedule.addStopFacility(stopFac);
 		stop = builder.createTransitRouteStop(stopFac, 50, 60); stopListA.add(stop);
 		
-		stopFac = builder.createTransitStopFacility(new IdImpl("21"), this.scenario.createCoord(500, -500), stopsBlockLane); stopFac.setLinkId(new IdImpl("2021")); schedule.addStopFacility(stopFac);
+		stopFac = builder.createTransitStopFacility(Id.create("21", TransitStopFacility.class), this.scenario.createCoord(500, -500), stopsBlockLane); stopFac.setLinkId(Id.create("2021", Link.class)); schedule.addStopFacility(stopFac);
 		stop = builder.createTransitRouteStop(stopFac, 0, 10); stopListB.add(stop);
-		stopFac = builder.createTransitStopFacility(new IdImpl("23"), this.scenario.createCoord(1500, -500), stopsBlockLane); stopFac.setLinkId(new IdImpl("2223")); schedule.addStopFacility(stopFac);
+		stopFac = builder.createTransitStopFacility(Id.create("23", TransitStopFacility.class), this.scenario.createCoord(1500, -500), stopsBlockLane); stopFac.setLinkId(Id.create("2223", Link.class)); schedule.addStopFacility(stopFac);
 		stop = builder.createTransitRouteStop(stopFac, 50, 60); stopListB.add(stop);
 
 		// transit line A		
-		Link startLinkA = this.scenario.getNetwork().getLinks().get(new IdImpl("0110"));
-		Link endLinkA = this.scenario.getNetwork().getLinks().get(new IdImpl("1314"));
+		Link startLinkA = this.scenario.getNetwork().getLinks().get(Id.create("0110", Link.class));
+		Link endLinkA = this.scenario.getNetwork().getLinks().get(Id.create("1314", Link.class));
 		NetworkRoute networkRouteA = (NetworkRoute) ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, startLinkA.getId(), endLinkA.getId());
 		
 		ArrayList<Id<Link>> linkListA = new ArrayList<Id<Link>>(); 
@@ -166,18 +161,18 @@ public class AccessEgressDemoSimple {
 		linkListA.add(Id.create("1213", Link.class));
 		
 		networkRouteA.setLinkIds(startLinkA.getId(), linkListA, endLinkA.getId());
-		TransitRoute tRouteA = builder.createTransitRoute(new IdImpl("A"), networkRouteA, stopListA, "bus");
-		TransitLine tLineA = builder.createTransitLine(new IdImpl("line A")); tLineA.addRoute(tRouteA); schedule.addTransitLine(tLineA);
+		TransitRoute tRouteA = builder.createTransitRoute(Id.create("A", TransitRoute.class), networkRouteA, stopListA, "bus");
+		TransitLine tLineA = builder.createTransitLine(Id.create("line A", TransitLine.class)); tLineA.addRoute(tRouteA); schedule.addTransitLine(tLineA);
 
 		for (int i = 0; i < nOfBuses; i++	) {
-			Departure dep = builder.createDeparture(new IdImpl(i), departureTime + i*heading + (i == delayedBus ? delay : 0));
-			dep.setVehicleId(new IdImpl(i));
+			Departure dep = builder.createDeparture(Id.create(i, Departure.class), departureTime + i*heading + (i == delayedBus ? delay : 0));
+			dep.setVehicleId(Id.create(i, Vehicle.class));
 			tRouteA.addDeparture(dep);
 		}
 		
 		// transit line B		
-		Link startLinkB = this.scenario.getNetwork().getLinks().get(new IdImpl("0220"));
-		Link endLinkB = this.scenario.getNetwork().getLinks().get(new IdImpl("2324"));
+		Link startLinkB = this.scenario.getNetwork().getLinks().get(Id.create("0220", Link.class));
+		Link endLinkB = this.scenario.getNetwork().getLinks().get(Id.create("2324", Link.class));
 		NetworkRoute networkRouteB = (NetworkRoute) ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, startLinkB.getId(), endLinkB.getId());
 		
 		ArrayList<Id<Link>> linkListB = new ArrayList<Id<Link>>();
@@ -186,12 +181,12 @@ public class AccessEgressDemoSimple {
 		linkListB.add(Id.create("2223", Link.class));
 		
 		networkRouteB.setLinkIds(startLinkB.getId(), linkListB, endLinkB.getId());
-		TransitRoute tRouteB = builder.createTransitRoute(new IdImpl("B"), networkRouteB, stopListB, "bus");
-		TransitLine tLineB = builder.createTransitLine(new IdImpl("line B")); tLineB.addRoute(tRouteB); schedule.addTransitLine(tLineB);
+		TransitRoute tRouteB = builder.createTransitRoute(Id.create("B", TransitRoute.class), networkRouteB, stopListB, "bus");
+		TransitLine tLineB = builder.createTransitLine(Id.create("line B", TransitLine.class)); tLineB.addRoute(tRouteB); schedule.addTransitLine(tLineB);
 
 		for (int i = 0; i < nOfBuses; i++) {
-			Departure dep = builder.createDeparture(new IdImpl(i + nOfBuses), departureTime + i*heading + (i == delayedBus ? delay : 0));
-			dep.setVehicleId(new IdImpl(i + nOfBuses));
+			Departure dep = builder.createDeparture(Id.create(i + nOfBuses, Departure.class), departureTime + i*heading + (i == delayedBus ? delay : 0));
+			dep.setVehicleId(Id.create(i + nOfBuses, Vehicle.class));
 			tRouteB.addDeparture(dep);
 		}
 	}
@@ -201,7 +196,7 @@ public class AccessEgressDemoSimple {
 		VehiclesFactory vb = vehicles.getFactory();
 		
 		// bus like
-		VehicleType busType = vb.createVehicleType(new IdImpl("bus"));
+		VehicleType busType = vb.createVehicleType(Id.create("bus", VehicleType.class));
 		VehicleCapacity capacity = vb.createVehicleCapacity();
 		capacity.setSeats(Integer.valueOf(9999));
 		capacity.setStandingRoom(Integer.valueOf(0));
@@ -210,7 +205,7 @@ public class AccessEgressDemoSimple {
 		busType.setEgressTime(1.0);
 		
 		// train like
-		VehicleType trainType = vb.createVehicleType(new IdImpl("train"));
+		VehicleType trainType = vb.createVehicleType(Id.create("train", VehicleType.class));
 		capacity = vb.createVehicleCapacity();
 		capacity.setSeats(Integer.valueOf(9999));
 		capacity.setStandingRoom(Integer.valueOf(0));
@@ -219,15 +214,15 @@ public class AccessEgressDemoSimple {
 		trainType.setEgressTime(0.1);
 		
 		for (int i = 0; i < nOfBuses/2; i++) {
-			vehicles.addVehicle( vb.createVehicle(new IdImpl(i), busType));
+			vehicles.addVehicle( vb.createVehicle(Id.create(i, Vehicle.class), busType));
 		}
 		
 		for (int i = nOfBuses/2; i < nOfBuses; i++) {
-			vehicles.addVehicle( vb.createVehicle(new IdImpl(i), trainType));
+			vehicles.addVehicle( vb.createVehicle(Id.create(i, Vehicle.class), trainType));
 		}		
 		
 		for (int i = 0; i < nOfBuses; i++) {
-			vehicles.addVehicle( vb.createVehicle(new IdImpl(i + nOfBuses), busType));
+			vehicles.addVehicle( vb.createVehicle(Id.create(i + nOfBuses, Vehicle.class), busType));
 		}
 	}
 
@@ -237,16 +232,16 @@ public class AccessEgressDemoSimple {
 		PopulationFactory pb = population.getFactory();
 		
 		// line A
-		TransitLine tLine = schedule.getTransitLines().get(new IdImpl("line A"));
-		TransitRoute tRoute = tLine.getRoutes().get(new IdImpl("A"));
+		TransitLine tLine = schedule.getTransitLines().get(Id.create("line A", TransitLine.class));
+		TransitRoute tRoute = tLine.getRoutes().get(Id.create("A", TransitRoute.class));
 		for (int j = 0; j < nOfAgentsPerStopTrain; j++) {
-			PersonImpl person = (PersonImpl) pb.createPerson(this.scenario.createId("A - " + j));
+			PersonImpl person = (PersonImpl) pb.createPerson(Id.create("A - " + j, Person.class));
 			PlanImpl plan = (PlanImpl) pb.createPlan();
-			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", schedule.getFacilities().get(new IdImpl("11")).getLinkId());
+			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", schedule.getFacilities().get(Id.create("11", TransitStopFacility.class)).getLinkId());
 			act1.setEndTime(departureTime + j * agentIntervalTrain);
 			LegImpl leg = (LegImpl) pb.createLeg(TransportMode.pt);
-			leg.setRoute(new ExperimentalTransitRoute(schedule.getFacilities().get(new IdImpl("11")), tLine, tRoute, schedule.getFacilities().get(new IdImpl("13"))));
-			ActivityImpl act2 = (ActivityImpl) pb.createActivityFromLinkId("work", schedule.getFacilities().get(new IdImpl("13")).getLinkId());
+			leg.setRoute(new ExperimentalTransitRoute(schedule.getFacilities().get(Id.create("11", TransitStopFacility.class)), tLine, tRoute, schedule.getFacilities().get(Id.create("13", TransitStopFacility.class))));
+			ActivityImpl act2 = (ActivityImpl) pb.createActivityFromLinkId("work", schedule.getFacilities().get(Id.create("13", TransitStopFacility.class)).getLinkId());
 
 			population.addPerson(person);
 			person.addPlan(plan);
@@ -257,16 +252,16 @@ public class AccessEgressDemoSimple {
 		}	
 		
 		// line B
-		tLine = schedule.getTransitLines().get(new IdImpl("line B"));
-		tRoute = tLine.getRoutes().get(new IdImpl("B"));
+		tLine = schedule.getTransitLines().get(Id.create("line B", TransitLine.class));
+		tRoute = tLine.getRoutes().get(Id.create("B", TransitRoute.class));
 		for (int j = 0; j < nOfAgentsPerStopBus; j++) {
-			PersonImpl person = (PersonImpl) pb.createPerson(this.scenario.createId("B - " + j));
+			PersonImpl person = (PersonImpl) pb.createPerson(Id.create("B - " + j, Person.class));
 			PlanImpl plan = (PlanImpl) pb.createPlan();
-			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", schedule.getFacilities().get(new IdImpl("21")).getLinkId());
+			ActivityImpl act1 = (ActivityImpl) pb.createActivityFromLinkId("home", schedule.getFacilities().get(Id.create("21", TransitStopFacility.class)).getLinkId());
 			act1.setEndTime(departureTime + j * agentIntervalBus);
 			LegImpl leg = (LegImpl) pb.createLeg(TransportMode.pt);
-			leg.setRoute(new ExperimentalTransitRoute(schedule.getFacilities().get(new IdImpl("21")), tLine, tRoute, schedule.getFacilities().get(new IdImpl("23"))));
-			ActivityImpl act2 = (ActivityImpl) pb.createActivityFromLinkId("work", schedule.getFacilities().get(new IdImpl("23")).getLinkId());
+			leg.setRoute(new ExperimentalTransitRoute(schedule.getFacilities().get(Id.create("21", TransitStopFacility.class)), tLine, tRoute, schedule.getFacilities().get(Id.create("23", TransitStopFacility.class))));
+			ActivityImpl act2 = (ActivityImpl) pb.createActivityFromLinkId("work", schedule.getFacilities().get(Id.create("23", TransitStopFacility.class)).getLinkId());
 
 			population.addPerson(person);
 			person.addPlan(plan);
@@ -282,7 +277,7 @@ public class AccessEgressDemoSimple {
 	private void runSim() {
 		EventsManager events = EventsUtils.createEventsManager();
 
-		TransitRoute route = this.scenario.getTransitSchedule().getTransitLines().get(new IdImpl("line A")).getRoutes().get(new IdImpl("A"));
+		TransitRoute route = this.scenario.getTransitSchedule().getTransitLines().get(Id.create("line A", TransitLine.class)).getRoutes().get(Id.create("A", TransitRoute.class));
 		VehicleTracker vehTracker = new VehicleTracker();
 		events.addHandler(vehTracker);
 		TransitRouteAccessEgressAnalysis analysis = new TransitRouteAccessEgressAnalysis(route, vehTracker);
@@ -334,7 +329,6 @@ public class AccessEgressDemoSimple {
 	}
 
 	public void run() {
-		createIds();
 		prepareConfig();
 		createNetwork();
 		createTransitSchedule();
