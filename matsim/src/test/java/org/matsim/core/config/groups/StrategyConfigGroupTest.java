@@ -21,14 +21,15 @@
 package org.matsim.core.config.groups;
 
 import org.apache.log4j.Logger;
-import org.matsim.testcases.MatsimTestCase;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  * Test for {@link StrategyConfigGroup}.
  *
  * @author mrieser
  */
-public class StrategyConfigGroupTest extends MatsimTestCase {
+public class StrategyConfigGroupTest {
 
 	private static final Logger log = Logger.getLogger(StrategyConfigGroupTest.class);
 
@@ -37,6 +38,7 @@ public class StrategyConfigGroupTest extends MatsimTestCase {
 	 *
 	 * @author mrieser
 	 */
+	@Test
 	public void testParamNames() {
 		StrategyConfigGroup configGroup = new StrategyConfigGroup();
 		configGroup.addParam("maxAgentPlanMemorySize", "3");
@@ -50,6 +52,10 @@ public class StrategyConfigGroupTest extends MatsimTestCase {
 		catch (IllegalArgumentException e) {
 			log.info("Catched IllegalArgumentException, as expected: "  + e.getMessage());
 		}
+		assertEquals( 
+				"unexpected number of strategy settings",
+				1,
+				configGroup.getStrategySettings().size() );
 	}
 
 	/**
@@ -58,6 +64,7 @@ public class StrategyConfigGroupTest extends MatsimTestCase {
 	 *
 	 * @author mrieser
 	 */
+	@Test
 	public void testCheckConsistency() {
 		// start with a simple configuration with exactly one module defined
 		StrategyConfigGroup configGroup = new StrategyConfigGroup();
@@ -73,14 +80,15 @@ public class StrategyConfigGroupTest extends MatsimTestCase {
 		configGroup.checkConsistency();
 
 		// add a 3rd module, but inconsistent with the enumeration
-		configGroup.addParam("Module_4", "SelectRandom");
-		configGroup.addParam("ModuleProbability_4", "0.3");
-		try {
-			configGroup.checkConsistency();
-			fail("Expected to fail consistency check with missing Module_3, but did not fail.");
-		} catch (RuntimeException e) {
-			log.info("Catched RuntimeException, as expected: " + e.getMessage());
-		}
+		// --- no restrictions on indices anymore. td, sep'14
+		//configGroup.addParam("Module_4", "SelectRandom");
+		//configGroup.addParam("ModuleProbability_4", "0.3");
+		//try {
+		//	configGroup.checkConsistency();
+		//	fail("Expected to fail consistency check with missing Module_3, but did not fail.");
+		//} catch (RuntimeException e) {
+		//	log.info("Catched RuntimeException, as expected: " + e.getMessage());
+		//}
 
 		// fix the configuration by adding the missing module
 		configGroup.addParam("Module_3", "KeepLastSelected");
@@ -114,14 +122,15 @@ public class StrategyConfigGroupTest extends MatsimTestCase {
 		configGroup.checkConsistency();
 
 		// add forbidden Module_0
-		configGroup.addParam("Module_0", "ChangeExpBeta");
-		configGroup.addParam("ModuleProbability_0", "0.6");
-		try {
-			configGroup.checkConsistency();
-			fail("Expected to fail consistency check with Module_0, but did not fail.");
-		} catch (RuntimeException e) {
-			log.info("Catched RuntimeException, as expected: " + e.getMessage());
-		}
+		// --- no restrictions on indices anymore. td, sep'14
+		//configGroup.addParam("Module_0", "ChangeExpBeta");
+		//configGroup.addParam("ModuleProbability_0", "0.6");
+		//try {
+		//	configGroup.checkConsistency();
+		//	fail("Expected to fail consistency check with Module_0, but did not fail.");
+		//} catch (RuntimeException e) {
+		//	log.info("Catched RuntimeException, as expected: " + e.getMessage());
+		//}
 	}
 
 }
