@@ -82,31 +82,27 @@ public class NonFlatConfigIOTest {
 				outModule.getParams(),
 				inModule.getParams() );
 
-		if ( outModule instanceof NonFlatModule ) {
-			final NonFlatModule outNonFlat = (NonFlatModule) outModule;
-			final NonFlatModule inNonFlat = (NonFlatModule) inModule;
+		Assert.assertEquals(
+				"different parameterset types",
+				outModule.getParameterSets().keySet(),
+				inModule.getParameterSets().keySet() );
+
+		for ( String type : outModule.getParameterSets().keySet() ) {
+			final Collection<Module> outSets = outModule.getParameterSets( type );
+			final Collection<Module> inSets = inModule.getParameterSets( type );
+
 			Assert.assertEquals(
-					"different parameterset types",
-					outNonFlat.getParameterSets().keySet(),
-					inNonFlat.getParameterSets().keySet() );
+					"different number of sets for type "+type,
+					outSets.size(),
+					inSets.size() );
 
-			for ( String type : outNonFlat.getParameterSets().keySet() ) {
-				final Collection<Module> outSets = outNonFlat.getParameterSets( type );
-				final Collection<Module> inSets = inNonFlat.getParameterSets( type );
+			final Iterator<Module> outIter = outSets.iterator();
+			final Iterator<Module> inIter = inSets.iterator();
 
-				Assert.assertEquals(
-						"different number of sets for type "+type,
-						outSets.size(),
-						inSets.size() );
-
-				final Iterator<Module> outIter = outSets.iterator();
-				final Iterator<Module> inIter = inSets.iterator();
-
-				while ( outIter.hasNext() ) {
-					assertTheSame(
-							outIter.next(),
-							inIter.next() );
-				}
+			while ( outIter.hasNext() ) {
+				assertTheSame(
+						outIter.next(),
+						inIter.next() );
 			}
 		}
 	}
@@ -114,7 +110,7 @@ public class NonFlatConfigIOTest {
 	private Config createTestConfig() {
 		final Config c = ConfigUtils.createConfig();
 
-		final NonFlatModule module = new NonFlatModule( "thisAintNoFlat" );
+		final Module module = new NonFlatModule( "thisAintNoFlat" );
 		module.addParam( "someParam" , "someValue" );
 		module.addParam( "anotherParam" , "anotherValue" );
 

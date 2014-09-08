@@ -20,6 +20,9 @@
 
 package org.matsim.core.config;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -40,6 +43,7 @@ public class Module {
 
 	private final String name;
 	private final TreeMap<String,String> params;
+	private final Map<String, Collection<Module>> parameterSetsPerType = new HashMap<String, Collection<Module>>();
 
 	private final static Logger log = Logger.getLogger(Module.class);
 
@@ -105,5 +109,41 @@ public class Module {
 	public final String toString() {
 		return "[name=" + this.name + "]" +
 				"[nOfParams=" + this.params.size() + "]";
+	}
+
+	/**
+	 * Override if parameter sets of a certain type need a special implementation
+	 */
+	public Module createParameterSet(final String type) {
+		return new Module( type );
+	}
+
+	public Module createAndAddParameterSet(final String type) {
+		final Module m = createParameterSet( type );
+		addParameterSet( type , m );
+		return m;
+	}
+
+	public void addParameterSet(final String type, final Module set) {
+		Collection<Module> parameterSets = parameterSetsPerType.get( type );
+
+		if ( parameterSets == null ) {
+			parameterSets = new ArrayList<Module>();
+			parameterSetsPerType.put( type ,  parameterSets );
+		}
+
+		parameterSets.add( set );
+	}
+
+	public Collection<Module> getParameterSets(final String type) {
+		final Collection<Module> sets = parameterSetsPerType.get( type );
+		return sets == null ?
+			Collections.<Module>emptySet() :
+			Collections.unmodifiableCollection( sets );
+	}
+
+	public Map<String, Collection<Module>> getParameterSets() {
+		// TODO: immutabilize (including lists)
+		return parameterSetsPerType;
 	}
 }
