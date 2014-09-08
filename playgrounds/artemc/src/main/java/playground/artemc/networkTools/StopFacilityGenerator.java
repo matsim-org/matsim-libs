@@ -207,9 +207,9 @@ public class StopFacilityGenerator {
 
 	private void generateNewTransitLine(String transitLineName, String mode,  String[] routeLinks) {	
 
-		List<Id> routeLinkIds = new ArrayList<Id>();
+		List<Id<Link>> routeLinkIds = new ArrayList<Id<Link>>();
 		for(String linkID:routeLinks){
-			routeLinkIds.add(sc.createId(linkID));
+			routeLinkIds.add(Id.create(linkID, Link.class));
 		}
 
 		double arrival = Time.parseTime("00:00:00");
@@ -221,7 +221,7 @@ public class StopFacilityGenerator {
 
 		Double stopOffset = initialStopOffset;
 
-		TransitLine transitLine = transitScheduleFactory.createTransitLine(new IdImpl(transitLineName));
+		TransitLine transitLine = transitScheduleFactory.createTransitLine(Id.create(transitLineName, TransitLine.class));
 		transitSchedule.addTransitLine(transitLine);
 
 		List<Node> nodes = new ArrayList<Node>();
@@ -232,8 +232,8 @@ public class StopFacilityGenerator {
 
 		/*Check if there is already a stop in the opposite direction for the first link and place first stop of the route opposite to it*/	
 		if(lastStopFacility!=null){
-			Id lastStopLink = lastStopFacility.getLinkId();
-			Id toNode = network.getLinks().get(lastStopLink).getToNode().getId();
+			Id<Link> lastStopLink = lastStopFacility.getLinkId();
+			Id<Node> toNode = network.getLinks().get(lastStopLink).getToNode().getId();
 			
 			double x_diff = (network.getLinks().get(lastStopLink).getToNode().getCoord().getX() - network.getLinks().get(lastStopLink).getFromNode().getCoord().getX());
 			double y_diff = (network.getLinks().get(lastStopLink).getToNode().getCoord().getY() - network.getLinks().get(lastStopLink).getFromNode().getCoord().getY());
@@ -302,7 +302,7 @@ public class StopFacilityGenerator {
 					System.out.println("    Link length: "+linkToEdit.getLength()+"   Distance on Map: "+totalLinkLengthOnMap);
 					
 					CoordImpl newNodeXY = null;
-					Id newLinkId = null;
+					Id<Link> newLinkId = null;
 
 					nodes.add(linkToEdit.getFromNode());
 					//newNumberOfLinks = (int) Math.ceil(_(originalLink.getLength() - stopOffset)/stopDistance);
@@ -321,9 +321,9 @@ public class StopFacilityGenerator {
 
 								//Create new node
 								int c=0;
-								Id newNodeId = null;
+								Id<Node> newNodeId = null;
 								do{
-									newNodeId = sc.createId(linkToEdit.getFromNode().getId().toString()+"_"+(nodes.size()+c));
+									newNodeId = Id.create(linkToEdit.getFromNode().getId().toString()+"_"+(nodes.size()+c), Node.class);
 									c++;
 								}while(network.getNodes().containsKey(newNodeId));
 
@@ -332,7 +332,7 @@ public class StopFacilityGenerator {
 								nodes.add(network.getNodes().get(newNodeId));
 
 								//Create new Link
-								newLinkId = sc.createId(linkToEdit.getId().toString()+"_"+(nodes.size()-1));									
+								newLinkId = Id.create(linkToEdit.getId().toString()+"_"+(nodes.size()-1), Link.class);									
 								network.createAndAddLink(newLinkId, nodes.get(nodes.size()-2), nodes.get(nodes.size()-1), stopDistance, linkToEdit.getFreespeed(), linkToEdit.getCapacity(), linkToEdit.getNumberOfLanes());
 								network.getLinks().get(newLinkId).setAllowedModes(allowedModes);
 								links.add(network.getLinks().get(newLinkId));
@@ -344,7 +344,7 @@ public class StopFacilityGenerator {
 								//Check if new links have been created
 								if(nodes.size()>1){
 									//Create last new Link
-									newLinkId = sc.createId(linkToEdit.getId().toString()+"_"+(nodes.size()));									
+									newLinkId = Id.create(linkToEdit.getId().toString()+"_"+(nodes.size()), Link.class);									
 									network.createAndAddLink(newLinkId, nodes.get(nodes.size()-1), linkToEdit.getToNode(), restLinkLengthFromStop, linkToEdit.getFreespeed(), linkToEdit.getCapacity(), linkToEdit.getNumberOfLanes());
 									network.getLinks().get(newLinkId).setAllowedModes(allowedModes);									
 									links.add(network.getLinks().get(newLinkId));	
@@ -415,14 +415,14 @@ public class StopFacilityGenerator {
 		/*Create transitRoute*/
 		NetworkRoute networkRoute = new LinkNetworkRouteImpl(newRouteLinkIds.get(0), newRouteLinkIds.subList(1, links.size()-1), newRouteLinkIds.get(links.size()-1));				
 		String routeName = transitRouteStops.get(0).getStopFacility().getLinkId().toString()+"to"+transitRouteStops.get(transitRouteStops.size()-1).getStopFacility().getLinkId().toString();
-		TransitRoute transitRoute = transitScheduleFactory.createTransitRoute(new IdImpl(routeName), networkRoute, transitRouteStops, "bus");
+		TransitRoute transitRoute = transitScheduleFactory.createTransitRoute(Id.create(routeName, TransitRoute.class), networkRoute, transitRouteStops, "bus");
 		transitRoute.setTransportMode(mode);
 		transitLine.addRoute(transitRoute);
 
 		int id = 1;
 		for(Double time = startTime; time<endTime; time=time+frequency){
-			Departure vehicleDeparture = transitScheduleFactory.createDeparture(new IdImpl(id), time);
-			vehicleDeparture.setVehicleId(new IdImpl(mode+"_"+transitLineName+"_"+id));
+			Departure vehicleDeparture = transitScheduleFactory.createDeparture(Id.create(id, Departure.class), time);
+			vehicleDeparture.setVehicleId(Id.create(mode+"_"+transitLineName+"_"+id, Vehicle.class));
 			transitRoute.addDeparture(vehicleDeparture);
 			id++;
 		}

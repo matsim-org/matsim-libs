@@ -7,20 +7,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -85,14 +80,14 @@ public class NetworkSplitter {
 
 			while (count < newNumberOfLinks) {
 				// Create new Link
-				newLinkId = scenario.createId(linkToEdit.getId().toString() + "_" + (count + 1));
+				newLinkId = Id.create(linkToEdit.getId().toString() + "_" + (count + 1), Link.class);
 				linkMap.get(link.toString()).add(newLinkId.toString());
 
 				if (newNumberOfLinks.intValue() == (count.intValue() + 1)) {
 					nodes.add(linkToEdit.getToNode());
 				} else {
-					newNodeId = scenario.createId(originNode.getId().toString() + "_" + linkToEdit.getId().toString()
-							+ (count + 1));
+					newNodeId = Id.create(originNode.getId().toString() + "_" + linkToEdit.getId().toString()
+							+ (count + 1), Node.class);
 					newNodeXY = convertDistanceToCoordinates(linkToEdit, nodeDistanceOnMap);
 					network.createAndAddNode(newNodeId, newNodeXY);
 					nodes.add(network.getNodes().get(newNodeId));
