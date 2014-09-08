@@ -19,12 +19,12 @@
  * *********************************************************************** */
 package org.matsim.core.config;
 
-import static org.matsim.core.config.NonFlatConfigXmlNames.CONFIG;
-import static org.matsim.core.config.NonFlatConfigXmlNames.MODULE;
-import static org.matsim.core.config.NonFlatConfigXmlNames.NAME;
-import static org.matsim.core.config.NonFlatConfigXmlNames.PARAMETER;
-import static org.matsim.core.config.NonFlatConfigXmlNames.PARAMETER_SET;
-import static org.matsim.core.config.NonFlatConfigXmlNames.TYPE;
+import static org.matsim.core.config.ConfigV2XmlNames.CONFIG;
+import static org.matsim.core.config.ConfigV2XmlNames.MODULE;
+import static org.matsim.core.config.ConfigV2XmlNames.NAME;
+import static org.matsim.core.config.ConfigV2XmlNames.PARAMETER;
+import static org.matsim.core.config.ConfigV2XmlNames.PARAMETER_SET;
+import static org.matsim.core.config.ConfigV2XmlNames.TYPE;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

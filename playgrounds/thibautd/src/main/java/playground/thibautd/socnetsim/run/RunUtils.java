@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.NonFlatConfigReader;
+import org.matsim.core.config.ConfigReaderMatsimV2;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -686,7 +686,7 @@ public class RunUtils {
 	public static Config loadConfig(final String configFile) {
 		final Config config = JointScenarioUtils.createConfig();
 		addConfigGroups( config );
-		new NonFlatConfigReader( config ).parse( configFile );
+		new ConfigReaderMatsimV2( config ).parse( configFile );
 		return config;
 	}
 

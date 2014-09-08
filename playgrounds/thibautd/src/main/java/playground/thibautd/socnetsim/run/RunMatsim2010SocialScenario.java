@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.NonFlatConfigReader;
+import org.matsim.core.config.ConfigReaderMatsimV2;
 import org.matsim.core.config.experimental.ReflectiveModule;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.router.StageActivityTypesImpl;
@@ -159,7 +159,7 @@ public class RunMatsim2010SocialScenario {
 		//Matsim2030Utils.addDefaultGroups( config );
 		config.addModule( new ScenarioMergingConfigGroup() );
 		config.addModule( new SocialDilutionConfigGroup() );
-		new NonFlatConfigReader( config ).parse( configFile );
+		new ConfigReaderMatsimV2( config ).parse( configFile );
 		return config;
 	}
 

@@ -22,8 +22,8 @@ package org.matsim.core.config;
 /**
  * @author thibautd
  */
-class NonFlatConfigXmlNames {
-	private NonFlatConfigXmlNames() {}
+class ConfigV2XmlNames {
+	private ConfigV2XmlNames() {}
 
 	public static String CONFIG = "config";
 	public static String PARAMETER = "param";

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.config;
+package org.matsim.core.config;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -29,13 +29,13 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.Module;
-import org.matsim.core.config.NonFlatConfigReader;
+import org.matsim.core.config.ConfigReaderMatsimV2;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author thibautd
  */
-public class NonFlatConfigIOTest {
+public class ConfigV2IOTest {
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 
@@ -48,7 +48,7 @@ public class NonFlatConfigIOTest {
 		new ConfigWriter( outConfig ).writeFileV2( file );
 
 		final Config inConfig = ConfigUtils.createConfig();
-		new NonFlatConfigReader( inConfig ).parse( file );
+		new ConfigReaderMatsimV2( inConfig ).parse( file );
 
 		assertTheSame( outConfig , inConfig );
 	}

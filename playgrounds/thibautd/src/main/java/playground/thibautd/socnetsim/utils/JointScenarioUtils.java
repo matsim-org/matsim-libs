@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.NonFlatConfigReader;
+import org.matsim.core.config.ConfigReaderMatsimV2;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
@@ -173,7 +173,7 @@ public class JointScenarioUtils {
 
 	public static Config loadConfig(final String configFile) {
 		final Config config = createConfig();
-		new NonFlatConfigReader( config ).parse( configFile );
+		new ConfigReaderMatsimV2( config ).parse( configFile );
 		return config;
 	}
 }

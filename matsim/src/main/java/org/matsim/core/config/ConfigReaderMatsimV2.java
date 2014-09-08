@@ -19,12 +19,12 @@
  * *********************************************************************** */
 package org.matsim.core.config;
 
-import static org.matsim.core.config.NonFlatConfigXmlNames.MODULE;
-import static org.matsim.core.config.NonFlatConfigXmlNames.NAME;
-import static org.matsim.core.config.NonFlatConfigXmlNames.PARAMETER;
-import static org.matsim.core.config.NonFlatConfigXmlNames.PARAMETER_SET;
-import static org.matsim.core.config.NonFlatConfigXmlNames.TYPE;
-import static org.matsim.core.config.NonFlatConfigXmlNames.VALUE;
+import static org.matsim.core.config.ConfigV2XmlNames.MODULE;
+import static org.matsim.core.config.ConfigV2XmlNames.NAME;
+import static org.matsim.core.config.ConfigV2XmlNames.PARAMETER;
+import static org.matsim.core.config.ConfigV2XmlNames.PARAMETER_SET;
+import static org.matsim.core.config.ConfigV2XmlNames.TYPE;
+import static org.matsim.core.config.ConfigV2XmlNames.VALUE;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -36,12 +36,12 @@ import org.xml.sax.Attributes;
 /**
  * @author thibautd
  */
-public class NonFlatConfigReader extends MatsimXmlParser {
+public class ConfigReaderMatsimV2 extends MatsimXmlParser {
 	private final Config config;
 
 	private final Deque<Module> moduleStack = new ArrayDeque<Module>();
 
-	public NonFlatConfigReader(
+	public ConfigReaderMatsimV2(
 			final Config config) {
 		this.config = config;
 	}
