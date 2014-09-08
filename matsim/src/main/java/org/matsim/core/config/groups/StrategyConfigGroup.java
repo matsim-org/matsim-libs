@@ -48,92 +48,7 @@ public class StrategyConfigGroup extends Module {
 	private static final String MODULE_EXE_PATH = "ModuleExePath_";
 	private static final String MODULE_SUBPOPULATION = "ModuleSubpopulation_";
 
-	private final NonFlatStrategyConfigGroup delegate = new NonFlatStrategyConfigGroup();
-	
-	public StrategyConfigGroup() {
-		super(GROUP_NAME);
-	}
-
-	@Override
-	public String getValue(final String key) {
-		// first check if the parameter is in "underscored" form
-		if ( key.startsWith(MODULE)
-				|| key.startsWith(MODULE_PROBABILITY)
-				|| key.startsWith(MODULE_DISABLE_AFTER_ITERATION)
-				|| key.startsWith(MODULE_EXE_PATH)
-				|| key.startsWith(MODULE_SUBPOPULATION) ) {
-			throw new IllegalArgumentException( "getting underscored parameter "+key+" is not allowed anymore. The supported way to get those parameters is via parameter sets." );
-		}
-
-		// if not, ask delegate.
-		return delegate.getValue( key );
-	}
-
-	@Override
-	public void addParam(final String key, final String value) {
-		// adding underscore parameters is still supported for backward compatibility.
-		if (key != null && key.startsWith(MODULE)) {
-			StrategySettings settings = getStrategySettings(new IdImpl(key.substring(MODULE.length())), true);
-			settings.setModuleName(value);
-		}
-		else if (key != null && key.startsWith(MODULE_PROBABILITY)) {
-			StrategySettings settings = getStrategySettings(new IdImpl(key.substring(MODULE_PROBABILITY.length())), true);
-			settings.setProbability(Double.parseDouble(value));
-		}
-		else if (key != null && key.startsWith(MODULE_DISABLE_AFTER_ITERATION)) {
-			StrategySettings settings = getStrategySettings(new IdImpl(key.substring(MODULE_DISABLE_AFTER_ITERATION.length())), true);
-			settings.setDisableAfter(Integer.parseInt(value));
-		}
-		else if (key != null && key.startsWith(MODULE_EXE_PATH)) {
-			StrategySettings settings = getStrategySettings(new IdImpl(key.substring(MODULE_EXE_PATH.length())), true);
-			settings.setExePath(value);
-		}
-		else if (key != null && key.startsWith(MODULE_SUBPOPULATION)) {
-			StrategySettings settings = getStrategySettings(new IdImpl(key.substring(MODULE_SUBPOPULATION.length())), true);
-			settings.setSubpopulation(value);
-		}
-		else {
-			delegate.addParam( key , value );
-		}
-	}
-
-	@Override
-	protected void checkConsistency() {
-		delegate.checkConsistency();
-	}
-
-	/**
-	 * Adds the StrategySettings given as parameter to the map storing the settings for the strategies.
-	 * An IllegalArgumentException is thrown, if a StrategySEttings instance with the id of the parameter
-	 * already exists in the map.
-	 * @param stratSets
-	 */
-	public void addStrategySettings(final StrategySettings stratSets) {
-		this.delegate.addStrategySettings( stratSets );
-	}
-
-	public Collection<StrategySettings> getStrategySettings() {
-		return this.delegate.getStrategySettings();
-	}
-
-	private StrategySettings getStrategySettings(final Id index, final boolean createIfMissing) {
-		StrategySettings settings = null;
-
-		// should be in a map, but it is difficult to keep consistency with the
-		// delegate...
-		for ( StrategySettings s : getStrategySettings() ) {
-			if ( !s.getId().equals( index ) ) continue;
-			if ( settings != null ) throw new IllegalStateException( "several settings with id "+index );
-			settings = s;
-		}
-
-		if (settings == null && createIfMissing) {
-			settings = new StrategySettings(index);
-			addStrategySettings( settings );
-		}
-
-		return settings;
-	}
+	private final ReflectiveDelegate delegate = new ReflectiveDelegate();
 
 	public static class StrategySettings extends ReflectiveModule implements MatsimParameters {
 		public static final String SET_NAME = "strategysettings";
@@ -239,21 +154,136 @@ public class StrategyConfigGroup extends Module {
 		}
 	}
 
-	// ///////////////////////////////////////////////////////////
-	// pure delegation
-	@Override
-	public Map<String, String> getParams() {
-		return delegate.getParams();
+	public StrategyConfigGroup() {
+		super(GROUP_NAME);
 	}
 
+	@Override
+	public String getValue(final String key) {
+		// first check if the parameter is in "underscored" form
+		if ( key.startsWith(MODULE)
+				|| key.startsWith(MODULE_PROBABILITY)
+				|| key.startsWith(MODULE_DISABLE_AFTER_ITERATION)
+				|| key.startsWith(MODULE_EXE_PATH)
+				|| key.startsWith(MODULE_SUBPOPULATION) ) {
+			throw new IllegalArgumentException( "getting underscored parameter "+key+" is not allowed anymore. The supported way to get those parameters is via parameter sets." );
+		}
+
+		return delegate.getValue( key );
+	}
+
+	@Override
+	public void addParam(final String key, final String value) {
+		// adding underscore parameters is still supported for backward compatibility.
+		if (key != null && key.startsWith(MODULE)) {
+			StrategySettings settings = getStrategySettings(new IdImpl(key.substring(MODULE.length())), true);
+			settings.setModuleName(value);
+		}
+		else if (key != null && key.startsWith(MODULE_PROBABILITY)) {
+			StrategySettings settings = getStrategySettings(new IdImpl(key.substring(MODULE_PROBABILITY.length())), true);
+			settings.setProbability(Double.parseDouble(value));
+		}
+		else if (key != null && key.startsWith(MODULE_DISABLE_AFTER_ITERATION)) {
+			StrategySettings settings = getStrategySettings(new IdImpl(key.substring(MODULE_DISABLE_AFTER_ITERATION.length())), true);
+			settings.setDisableAfter(Integer.parseInt(value));
+		}
+		else if (key != null && key.startsWith(MODULE_EXE_PATH)) {
+			StrategySettings settings = getStrategySettings(new IdImpl(key.substring(MODULE_EXE_PATH.length())), true);
+			settings.setExePath(value);
+		}
+		else if (key != null && key.startsWith(MODULE_SUBPOPULATION)) {
+			StrategySettings settings = getStrategySettings(new IdImpl(key.substring(MODULE_SUBPOPULATION.length())), true);
+			settings.setSubpopulation(value);
+		}
+		else {
+			delegate.addParam( key , value );
+		}
+	}
+
+	private StrategySettings getStrategySettings(final Id index, final boolean createIfMissing) {
+		StrategySettings settings = null;
+
+		// should be in a map, but it is difficult to keep consistency with the
+		// delegate...
+		for ( StrategySettings s : getStrategySettings() ) {
+			if ( !s.getId().equals( index ) ) continue;
+			if ( settings != null ) throw new IllegalStateException( "several settings with id "+index );
+			settings = s;
+		}
+
+		if (settings == null && createIfMissing) {
+			settings = new StrategySettings(index);
+			addStrategySettings( settings );
+		}
+
+		return settings;
+	}
+
+
+	/////////////////////////////////
 	@Override
 	public final Map<String, String> getComments() {
-		return delegate.getComments();
+		Map<String,String> map = super.getComments();
+		map.put(ReflectiveDelegate.ITERATION_FRACTION_TO_DISABLE_INNOVATION, "fraction of iterations where innovative strategies are switched off.  Something link 0.8 should be good.  E.g. if you run from iteration 400 to iteration 500, innovation is switched off at iteration 480" ) ;
+		map.put(ReflectiveDelegate.MAX_AGENT_PLAN_MEMORY_SIZE, "maximum number of plans per agent.  ``0'' means ``infinity''.  Currently (2010), ``5'' is a good number");
+		map.put(ReflectiveDelegate.PLAN_SELECTOR_FOR_REMOVAL,"name of PlanSelector for plans removal.  If not full class name, resolved in " +
+				"StrategyManagerConfigLoader.  default is `null', which eventually calls SelectWorstPlan. This is not a good " +
+				"choice from a discrete choice theoretical perspective. Alternatives, however, have not been systematically " +
+				"tested. kai, feb'12") ;
+		map.put(ReflectiveDelegate.EXTERNAL_EXE_CONFIG_TEMPLATE,"the external executable will be called with a config file as argument.  This is the pathname to a possible "
+				+ "skeleton config, to which additional information will be added.  Can be null.");
+		map.put(ReflectiveDelegate.EXTERNAL_EXE_TMP_FILE_ROOT_DIR, "root directory for temporary files generated by the external executable. Provided as a service; "
+				+ "I don't think this is used by MATSim.") ;
+		map.put(ReflectiveDelegate.EXTERNAL_EXE_TIME_OUT, "time out value (in seconds) after which matsim will consider the external module as failed") ;
+		return map ;
 	}
 
+	@Override
+	protected void checkParameterSet(final Module set) {
+		switch ( set.getName() ) {
+			case StrategySettings.SET_NAME:
+				if ( !(set instanceof StrategySettings) ) {
+					throw new RuntimeException( set+" is not an instance of StrategySettings" );
+				}
+				break;
+			default:
+				throw new IllegalArgumentException( "unknown set type "+set.getName() );
+		}
+	}
 
-	public Module createParameterSet(String type) {
-		return delegate.createParameterSet(type);
+	@Override
+	public Module createParameterSet(final String type) {
+		switch ( type ) {
+			case StrategySettings.SET_NAME:
+				return new StrategySettings( );
+			default:
+				throw new IllegalArgumentException( "unknown set type "+type );
+		}
+	}
+
+	// the two next method are just convenience methods
+	/**
+	 * Adds the StrategySettings given as parameter to the map storing the settings for the strategies.
+	 * An IllegalArgumentException is thrown, if a StrategySEttings instance with the id of the parameter
+	 * already exists in the map.
+	 * @param stratSets
+	 */
+	public void addStrategySettings(final StrategySettings stratSets) {
+		addParameterSet( stratSets );
+	}
+
+	public Collection<StrategySettings> getStrategySettings() {
+		// This does look pretty wrong, but is actually OK,
+		// as the checkParameterSet method checks that strategy settings
+		// parameter sets which are added have the proper type.
+		// A cleaner solution would be nice, though... td, sep'14
+		return (Collection<StrategySettings>) getParameterSets(StrategySettings.SET_NAME);
+	}
+
+	@Override
+	protected void checkConsistency() {
+		// to make available to tests
+		super.checkConsistency();
 	}
 
 	public void setMaxAgentPlanMemorySize(int maxAgentPlanMemorySize) {
@@ -303,15 +333,19 @@ public class StrategyConfigGroup extends Module {
 	public void setFractionOfIterationsToDisableInnovation(double fraction) {
 		delegate.setFractionOfIterationsToDisableInnovation(fraction);
 	}
+
+	public final Map<String, String> getParams() {
+		return delegate.getParams();
+	}
 }
 
-class NonFlatStrategyConfigGroup extends ReflectiveModule {
-	private static final String MAX_AGENT_PLAN_MEMORY_SIZE = "maxAgentPlanMemorySize";
-	private static final String EXTERNAL_EXE_CONFIG_TEMPLATE = "ExternalExeConfigTemplate";
-	private static final String EXTERNAL_EXE_TMP_FILE_ROOT_DIR = "ExternalExeTmpFileRootDir";
-	private static final String EXTERNAL_EXE_TIME_OUT = "ExternalExeTimeOut";
-	private static final String ITERATION_FRACTION_TO_DISABLE_INNOVATION = "fractionOfIterationsToDisableInnovation" ;
-	private static final String PLAN_SELECTOR_FOR_REMOVAL = "planSelectorForRemoval" ;
+class ReflectiveDelegate extends ReflectiveModule {
+	 static final String MAX_AGENT_PLAN_MEMORY_SIZE = "maxAgentPlanMemorySize";
+	 static final String EXTERNAL_EXE_CONFIG_TEMPLATE = "ExternalExeConfigTemplate";
+	 static final String EXTERNAL_EXE_TMP_FILE_ROOT_DIR = "ExternalExeTmpFileRootDir";
+	 static final String EXTERNAL_EXE_TIME_OUT = "ExternalExeTimeOut";
+	 static final String ITERATION_FRACTION_TO_DISABLE_INNOVATION = "fractionOfIterationsToDisableInnovation" ;
+	 static final String PLAN_SELECTOR_FOR_REMOVAL = "planSelectorForRemoval" ;
 
 	private int maxAgentPlanMemorySize = 5;
 	private String externalExeConfigTemplate = null;
@@ -325,133 +359,68 @@ class NonFlatStrategyConfigGroup extends ReflectiveModule {
 	private double fraction = Double.POSITIVE_INFINITY ;
 	//---
 
-
-	public NonFlatStrategyConfigGroup() {
+	public ReflectiveDelegate() {
 		super( StrategyConfigGroup.GROUP_NAME );
 	}
 
-	@Override
-	public final Map<String, String> getComments() {
-		Map<String,String> map = super.getComments();
-		map.put(ITERATION_FRACTION_TO_DISABLE_INNOVATION, "fraction of iterations where innovative strategies are switched off.  Something link 0.8 should be good.  E.g. if you run from iteration 400 to iteration 500, innovation is switched off at iteration 480" ) ;
-		map.put(MAX_AGENT_PLAN_MEMORY_SIZE, "maximum number of plans per agent.  ``0'' means ``infinity''.  Currently (2010), ``5'' is a good number");
-		map.put(PLAN_SELECTOR_FOR_REMOVAL,"name of PlanSelector for plans removal.  If not full class name, resolved in " +
-				"StrategyManagerConfigLoader.  default is `null', which eventually calls SelectWorstPlan. This is not a good " +
-				"choice from a discrete choice theoretical perspective. Alternatives, however, have not been systematically " +
-				"tested. kai, feb'12") ;
-		map.put(EXTERNAL_EXE_CONFIG_TEMPLATE,"the external executable will be called with a config file as argument.  This is the pathname to a possible "
-				+ "skeleton config, to which additional information will be added.  Can be null.");
-		map.put(EXTERNAL_EXE_TMP_FILE_ROOT_DIR, "root directory for temporary files generated by the external executable. Provided as a service; "
-				+ "I don't think this is used by MATSim.") ;
-		map.put(EXTERNAL_EXE_TIME_OUT, "time out value (in seconds) after which matsim will consider the external module as failed") ;
-		return map ;
-	}
 
-	@Override
-	protected void checkParameterSet(final Module set) {
-		switch ( set.getName() ) {
-			case StrategySettings.SET_NAME:
-				if ( !(set instanceof StrategySettings) ) {
-					throw new RuntimeException( set+" is not an instance of StrategySettings" );
-				}
-				break;
-			default:
-				throw new IllegalArgumentException( "unknown set type "+set.getName() );
-		}
-	}
-
-	@Override
-	public Module createParameterSet(final String type) {
-		switch ( type ) {
-			case StrategySettings.SET_NAME:
-				return new StrategySettings( );
-			default:
-				throw new IllegalArgumentException( "unknown set type "+type );
-		}
-	}
-
-	// the two next method are just convenience methods
-	/**
-	 * Adds the StrategySettings given as parameter to the map storing the settings for the strategies.
-	 * An IllegalArgumentException is thrown, if a StrategySEttings instance with the id of the parameter
-	 * already exists in the map.
-	 * @param stratSets
-	 */
-	public void addStrategySettings(final StrategySettings stratSets) {
-		addParameterSet( stratSets );
-	}
-
-	public Collection<StrategySettings> getStrategySettings() {
-		// This does look pretty wrong, but is actually OK,
-		// as the checkParameterSet method checks that strategy settings
-		// parameter sets which are added have the proper type.
-		// A cleaner solution would be nice, though... td, sep'14
-		return (Collection<StrategySettings>) getParameterSets(StrategySettings.SET_NAME);
-	}
-
-	@StringSetter( "maxAgentPlanMemorySize" )
+	@StringSetter( MAX_AGENT_PLAN_MEMORY_SIZE )
 	public void setMaxAgentPlanMemorySize(final int maxAgentPlanMemorySize) {
 		this.maxAgentPlanMemorySize = maxAgentPlanMemorySize;
 	}
 
-	@StringGetter( "maxAgentPlanMemorySize" )
+	@StringGetter( MAX_AGENT_PLAN_MEMORY_SIZE )
 	public int getMaxAgentPlanMemorySize() {
 		return this.maxAgentPlanMemorySize;
 	}
 
-	@StringSetter( "externalExeConfigTemplate" )
+	@StringSetter( EXTERNAL_EXE_CONFIG_TEMPLATE )
 	public void setExternalExeConfigTemplate(final String externalExeConfigTemplate) {
 		this.externalExeConfigTemplate = externalExeConfigTemplate;
 	}
 
-	@StringGetter( "externalExeConfigTemplate" )
+	@StringGetter( EXTERNAL_EXE_CONFIG_TEMPLATE )
 	public String getExternalExeConfigTemplate() {
 		return this.externalExeConfigTemplate;
 	}
 
-	@StringSetter( "externalExeTmpFileRootDir" )
+	@StringSetter( EXTERNAL_EXE_TMP_FILE_ROOT_DIR )
 	public void setExternalExeTmpFileRootDir(final String externalExeTmpFileRootDir) {
 		this.externalExeTmpFileRootDir = externalExeTmpFileRootDir;
 	}
 
-	@StringGetter( "externalExeTmpFileRootDir" )
+	@StringGetter( EXTERNAL_EXE_TMP_FILE_ROOT_DIR )
 	public String getExternalExeTmpFileRootDir() {
 		return this.externalExeTmpFileRootDir;
 	}
 
-	@StringSetter( "externalExeTimeOut" )
+	@StringSetter( EXTERNAL_EXE_TIME_OUT )
 	public void setExternalExeTimeOut(final long externalExeTimeOut) {
 		this.externalExeTimeOut = externalExeTimeOut;
 	}
 
-	@StringGetter( "externalExeTimeOut" )
+	@StringGetter( EXTERNAL_EXE_TIME_OUT )
 	public long getExternalExeTimeOut() {
 		return this.externalExeTimeOut;
 	}
 
-	@StringGetter( "planSelectorForRemoval" )
+	@StringGetter( PLAN_SELECTOR_FOR_REMOVAL )
 	public String getPlanSelectorForRemoval() {
 		return planSelectorForRemoval;
 	}
 
-	@StringSetter( "planSelectorForRemoval" )
+	@StringSetter( PLAN_SELECTOR_FOR_REMOVAL )
 	public void setPlanSelectorForRemoval(String planSelectorForRemoval) {
 		this.planSelectorForRemoval = planSelectorForRemoval;
 	}
 
-	@StringGetter( "fractionOfIterationsToDisableInnovation" )
+	@StringGetter( ITERATION_FRACTION_TO_DISABLE_INNOVATION )
 	public double getFractionOfIterationsToDisableInnovation() {
 		return fraction;
 	}
 
-	@StringSetter( "fractionOfIterationsToDisableInnovation" )
+	@StringSetter( ITERATION_FRACTION_TO_DISABLE_INNOVATION )
 	public void setFractionOfIterationsToDisableInnovation(double fraction) {
 		this.fraction = fraction;
-	}
-
-	@Override
-	protected void checkConsistency() {
-		// to make available to StrategyConfigGroup (not visible otherwise)
-		super.checkConsistency();
 	}
 }

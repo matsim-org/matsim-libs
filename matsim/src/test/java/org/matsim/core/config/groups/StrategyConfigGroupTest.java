@@ -20,9 +20,22 @@
 
 package org.matsim.core.config.groups;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
+import java.util.Map;
+
 import org.apache.log4j.Logger;
+import org.junit.Rule;
 import org.junit.Test;
-import static org.junit.Assert.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.Module;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * Test for {@link StrategyConfigGroup}.
@@ -31,7 +44,10 @@ import static org.junit.Assert.*;
  */
 public class StrategyConfigGroupTest {
 
-	private static final Logger log = Logger.getLogger(StrategyConfigGroupTest.class);
+	private static final Logger log = Logger
+			.getLogger(StrategyConfigGroupTest.class);
+	@Rule
+	public final MatsimTestUtils utils = new MatsimTestUtils();
 
 	/**
 	 * Tests that only the known param-names are accepted, and no others.
@@ -48,14 +64,12 @@ public class StrategyConfigGroupTest {
 		try {
 			configGroup.addParam("ModuleWrong_1", "should fail");
 			fail("Expected to get an IllegalArgumentException, but got none.");
+		} catch (IllegalArgumentException e) {
+			log.info("Catched IllegalArgumentException, as expected: "
+					+ e.getMessage());
 		}
-		catch (IllegalArgumentException e) {
-			log.info("Catched IllegalArgumentException, as expected: "  + e.getMessage());
-		}
-		assertEquals( 
-				"unexpected number of strategy settings",
-				1,
-				configGroup.getStrategySettings().size() );
+		assertEquals("unexpected number of strategy settings", 1, configGroup
+				.getStrategySettings().size());
 	}
 
 	/**
@@ -133,4 +147,118 @@ public class StrategyConfigGroupTest {
 		//}
 	}
 
+	@Test
+	public void testIOWithFormatChange() {
+		final StrategyConfigGroup initialGroup = createTestConfigGroup();
+
+		final String v1path = utils.getOutputDirectory() + "/configv1_out.xml";
+		final Config configV1 = new Config();
+		configV1.addModule(toUnderscoredModule(initialGroup));
+
+		new ConfigWriter( configV1 ).writeFileV1( v1path );
+
+		final Config configV1In = ConfigUtils.createConfig();
+		new MatsimConfigReader( configV1In ).readFile( v1path );
+
+		assertIdentical("re-read v1", initialGroup, configV1In.strategy());
+
+		final String v2path = utils.getOutputDirectory() + "/configv2_out.xml";
+
+		new ConfigWriter( configV1In ).writeFileV2( v2path );
+
+		final Config configV2 = ConfigUtils.createConfig();
+		new MatsimConfigReader( configV2 ).readFile( v2path );
+
+		assertIdentical("re-read v2", initialGroup, configV2.strategy());
+	}
+
+	private void assertIdentical(
+			final String msg,
+			final StrategyConfigGroup initialGroup,
+			final StrategyConfigGroup inputConfigGroup) {
+		assertEquals(
+				"wrong config template for "+msg,
+				initialGroup.getExternalExeConfigTemplate(),
+				inputConfigGroup.getExternalExeConfigTemplate() );
+
+		assertEquals(
+				"wrong ExternalExeTimeOut for "+msg,
+				initialGroup.getExternalExeTimeOut(),
+				inputConfigGroup.getExternalExeTimeOut() );
+
+		assertEquals(
+				"wrong ExternalExeTmpFileRootDir for "+msg,
+				initialGroup.getExternalExeTmpFileRootDir(),
+				inputConfigGroup.getExternalExeTmpFileRootDir() );
+
+		assertEquals(
+				"wrong FractionOfIterationsToDisableInnovation for "+msg,
+				initialGroup.getFractionOfIterationsToDisableInnovation(),
+				inputConfigGroup.getFractionOfIterationsToDisableInnovation(),
+				MatsimTestUtils.EPSILON );
+
+		assertEquals(
+				"wrong MaxAgentPlanMemorySize for "+msg,
+				initialGroup.getMaxAgentPlanMemorySize(),
+				inputConfigGroup.getMaxAgentPlanMemorySize() );
+
+		assertEquals(
+				"wrong PlanSelectorForRemoval for "+msg,
+				initialGroup.getPlanSelectorForRemoval(),
+				inputConfigGroup.getPlanSelectorForRemoval() );
+
+		assertEquals(
+				"wrong number of StrategySettings for "+msg,
+				initialGroup.getStrategySettings().size(),
+				inputConfigGroup.getStrategySettings().size() );
+	}
+
+	private Module toUnderscoredModule(final StrategyConfigGroup initialGroup) {
+		final Module module = new Module( initialGroup.getName() );
+
+		for ( Map.Entry<String, String> e : initialGroup.getParams().entrySet() ) {
+			log.info( "add param "+e.getKey() );
+			module.addParam( e.getKey() , e.getValue() );
+		}
+
+		for ( StrategySettings settings : initialGroup.getStrategySettings() ) {
+			final Id id = settings.getId();
+			module.addParam( "Module_"+id , settings.getModuleName() );
+			module.addParam( "ModuleProbability_"+id , ""+settings.getProbability() );
+			module.addParam( "ModuleDisableAfterIteration_"+id , ""+settings.getDisableAfter() );
+			module.addParam( "ModuleExePath_"+id , settings.getExePath() );
+			module.addParam( "ModuleSubpopulation_"+id , settings.getSubpopulation() );
+		}
+
+		return module;
+	}
+
+	private StrategyConfigGroup createTestConfigGroup() {
+		final StrategyConfigGroup group = new StrategyConfigGroup();
+		group.setExternalExeConfigTemplate( "bwark" );
+		group.setExternalExeTimeOut( 999 );
+		group.setExternalExeTmpFileRootDir( "some/random/location" );
+		group.setFractionOfIterationsToDisableInnovation( 8 );
+		group.setMaxAgentPlanMemorySize( 999999 );
+		group.setPlanSelectorForRemoval( "SelectSomeArbitraryPlan" );
+
+		/* scope of settings: minimal */ {
+			final StrategySettings settings = new StrategySettings();
+			settings.setModuleName( "MyModule" );
+			settings.setProbability( 10. );
+			group.addStrategySettings( settings );
+		}
+
+		/* scope of settings: all options */ {
+			final StrategySettings settings = new StrategySettings();
+			settings.setModuleName( "YourModule" );
+			settings.setProbability( 0 );
+			settings.setDisableAfter( 10 );
+			settings.setExePath( "path/to/nowhere/" );
+			settings.setSubpopulation( "sushi_eaters" );
+			group.addStrategySettings( settings );
+		}
+
+		return group;
+	}
 }
