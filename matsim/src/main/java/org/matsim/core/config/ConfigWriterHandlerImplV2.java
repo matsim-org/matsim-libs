@@ -81,6 +81,7 @@ public class ConfigWriterHandlerImplV2 implements ConfigWriterHandler {
 
 			for ( Entry<String, ? extends Collection<? extends Module>> entry : module.getParameterSets().entrySet() ) {
 				for ( Module pSet : entry.getValue() ) {
+					// TODO: write comments only for the first parameter set of a given type?
 					writeModule(
 							writer,
 							indent+"\t",
