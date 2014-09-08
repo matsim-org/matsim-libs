@@ -30,13 +30,11 @@ import org.matsim.core.utils.io.UncheckedIOException;
 
 	private String newline = "\n";
 
-	/**
-	 * Sets the string to be used as newline separator (see <code>System.getProperty("line.separator");</code>)
-	 *
-	 * @param newline
-	 */
-	public void setNewline(final String newline) {
+	@Override
+	public String setNewline(final String newline) {
+		String former = this.newline;
 		this.newline = newline;
+		return former;
 	}
 
 	//////////////////////////////////////////////////////////////////////

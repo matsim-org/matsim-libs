@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.NonFlatConfigReader;
-import org.matsim.core.config.NonFlatConfigWriter;
 import org.matsim.core.config.experimental.ReflectiveModule;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.router.StageActivityTypesImpl;
@@ -87,7 +86,6 @@ public class RunMatsim2010SocialScenario {
 			controller.run();
 		}
 		finally {
-			new NonFlatConfigWriter( config ).write( controller.getControlerIO().getOutputFilename( "output_config.xml.gz" ) );
 			new SocialNetworkWriter( (SocialNetwork) scenario.getScenarioElement( SocialNetwork.ELEMENT_NAME ) ).write( controller.getControlerIO().getOutputFilename( "output_socialnetwork.xml.gz" ) );
 		}
 	}

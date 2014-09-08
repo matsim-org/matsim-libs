@@ -26,51 +26,23 @@ import static org.matsim.core.config.NonFlatConfigXmlNames.PARAMETER;
 import static org.matsim.core.config.NonFlatConfigXmlNames.PARAMETER_SET;
 import static org.matsim.core.config.NonFlatConfigXmlNames.TYPE;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 
-import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
 
 /**
  * @author thibautd
  */
-public class NonFlatConfigWriter extends MatsimXmlWriter {
-	private final Config config;
+public class ConfigWriterHandlerImplV2 implements ConfigWriterHandler {
 
-	public NonFlatConfigWriter(final Config config) {
-		this.config = config;
-	}
+	private String newline = "\n";
 
-	public void write(final String file) {
-		openFile( file );
-
-		writeXmlHead();
-		writeDoctype( CONFIG , "nonflatconfig_v1.dtd" );
-		writeStartTag(
-				CONFIG,
-				Collections.<Tuple<String,String>>emptyList() );
-		writeModules();
-		writeEndTag( CONFIG );
-
-		close();
-	}
-
-	private void writeModules() {
-		for ( Map.Entry<String, Module> module : config.getModules().entrySet() ) {
-			writeModule(
-					"",
-					MODULE,
-					NAME,
-					module.getKey(),
-					module.getValue() );
-		}
-	}
 
 	public void writeModule(
+			final BufferedWriter writer,
 			final String indent,
 			final String moduleTag,
 			final String moduleNameAtt,
@@ -80,35 +52,36 @@ public class NonFlatConfigWriter extends MatsimXmlWriter {
 		Map<String, String> comments = module.getComments();
 
 		try {
-			writer.newLine();
+			writer.write( this.newline );
 			writer.write( indent );
 			writer.write("\t<"+moduleTag);
 			writer.write(" "+moduleNameAtt+"=\"" + moduleName + "\" >");
-			writer.newLine();
+			writer.write( this.newline );
 			
 			boolean lastHadComment = false;
 
 			for (Map.Entry<String, String> entry : params.entrySet()) {
 				if (comments.get(entry.getKey()) != null) {
-					writer.newLine();
+					writer.write( this.newline );
 					writer.write( indent );
 					writer.write( "\t\t<!-- " + comments.get(entry.getKey()) + " -->");
-					writer.newLine();
+					writer.write( this.newline );
 					lastHadComment = true;
 				} else {
 					if (lastHadComment) {
-						writer.newLine();
+						writer.write( this.newline );
 					}
 					lastHadComment = false;
 				}
 				writer.write( indent );
 				writer.write("\t\t<"+PARAMETER+" name=\"" + entry.getKey() + "\" value=\"" + entry.getValue() + "\" />");
-				writer.newLine();
+				writer.write( this.newline );
 			}
 
 			for ( Map.Entry<String, Collection<Module>> entry : module.getParameterSets().entrySet() ) {
 				for ( Module pSet : entry.getValue() ) {
 					writeModule(
+							writer,
 							indent+"\t",
 							PARAMETER_SET,
 							TYPE,
@@ -119,11 +92,69 @@ public class NonFlatConfigWriter extends MatsimXmlWriter {
 
 			writer.write( indent );
 			writer.write("\t</"+moduleTag+">");
-			writer.newLine();
+			writer.write( this.newline );
 
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
 	}
+
+	@Override
+	public void startConfig(
+			final Config config,
+			final BufferedWriter out) {
+		try {
+			out.write("<"+CONFIG+">");
+			out.write( this.newline );
+			out.write( this.newline );
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+		
+	}
+
+	@Override
+	public void endConfig(
+			final BufferedWriter out) {
+		try {
+			out.write("</"+CONFIG+">");
+			out.write( this.newline );
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}	
+	}
+
+	@Override
+	public void writeModule(
+			final Module module,
+			final BufferedWriter out) {
+		writeModule(
+				out,
+				"",
+				MODULE,
+				NAME,
+				module.getName(),
+				module );
+	}
+
+	@Override
+	public void writeSeparator(final BufferedWriter out) {
+		try {
+			out.write("<!-- ====================================================================== -->");
+			out.write( this.newline );
+			out.write( this.newline );
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}	
+	}
+
+
+	@Override
+	public String setNewline(final String newline) {
+		String former = this.newline;
+		this.newline  = newline;
+		return former;
+	}
+
 }
 

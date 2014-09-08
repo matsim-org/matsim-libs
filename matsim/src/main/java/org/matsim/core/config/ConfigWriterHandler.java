@@ -31,4 +31,16 @@ import java.io.BufferedWriter;
 	public void writeModule(final Module module, final BufferedWriter out);
 	
 	public void writeSeparator(final BufferedWriter out);
+	
+	/**
+	 * Sets the string to be used as newline separator (see <code>System.getProperty("line.separator");</code>).
+	 * The idea behind this is that by default, "\n" should be used,
+	 * so that files generated on different OSes can be compared by checksum.
+	 * Using the System property is however necessary for proper display
+	 * of the config dump in the console...
+	 *
+	 * @param newline the newline separator
+	 * @return the former newline separator
+	 */
+	public String setNewline(final String newline);
 }

@@ -35,7 +35,7 @@ public class ConfigWriter extends MatsimXmlWriter implements MatsimWriter {
 	//////////////////////////////////////////////////////////////////////
 
 	private final Config config;
-	private ConfigWriterHandlerImplV1 handler = null;
+	private ConfigWriterHandler handler = null;
 	private String dtd = null;
 
 	//////////////////////////////////////////////////////////////////////
@@ -45,8 +45,8 @@ public class ConfigWriter extends MatsimXmlWriter implements MatsimWriter {
 	public ConfigWriter(final Config config) {
 		this.config = config;
 		// always write the latest version, currently v1
-		this.dtd = "http://www.matsim.org/files/dtd/config_v1.dtd";
-		this.handler = new ConfigWriterHandlerImplV1();
+		this.dtd = "http://www.matsim.org/files/dtd/config_v2.dtd";
+		this.handler = new ConfigWriterHandlerImplV2();
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -66,11 +66,12 @@ public class ConfigWriter extends MatsimXmlWriter implements MatsimWriter {
 
 	public final void writeStream(final java.io.Writer writer, final String newline) {
 		try {
-			this.handler.setNewline(newline);
+			final String formerNewLine = this.handler.setNewline(newline);
 			this.writer = new BufferedWriter(writer);
 			write();
 			this.writer.flush();
 			this.writer = null;
+			this.handler.setNewline( formerNewLine );
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
@@ -81,6 +82,18 @@ public class ConfigWriter extends MatsimXmlWriter implements MatsimWriter {
 		openFile(filename);
 		write();
 		close();
+	}
+
+	public final void writeFileV1(final String filename) {
+		this.dtd = "http://www.matsim.org/files/dtd/config_v1.dtd";
+		this.handler = new ConfigWriterHandlerImplV1();
+		write( filename );
+	}
+	
+	public final void writeFileV2(final String filename) {
+		this.dtd = "http://www.matsim.org/files/dtd/config_v2.dtd";
+		this.handler = new ConfigWriterHandlerImplV2();
+		write( filename );
 	}
 
 	private final void write() {

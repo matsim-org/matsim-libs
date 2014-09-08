@@ -27,9 +27,9 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.NonFlatConfigReader;
-import org.matsim.core.config.NonFlatConfigWriter;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -45,7 +45,7 @@ public class NonFlatConfigIOTest {
 
 		final Config outConfig = createTestConfig();
 
-		new NonFlatConfigWriter( outConfig ).write( file );
+		new ConfigWriter( outConfig ).writeFileV2( file );
 
 		final Config inConfig = ConfigUtils.createConfig();
 		new NonFlatConfigReader( inConfig ).parse( file );

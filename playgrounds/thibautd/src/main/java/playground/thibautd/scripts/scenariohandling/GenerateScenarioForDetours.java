@@ -40,7 +40,7 @@ import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.NonFlatConfigWriter;
+import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.HouseholdsConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
@@ -106,7 +106,7 @@ public class GenerateScenarioForDetours {
 		new PopulationWriter( sc.getPopulation() , sc.getNetwork() ).write( outputPopulation );
 		new HouseholdsWriterV10( sc.getHouseholds() ).writeFile( outputHouseholds );
 		new NetworkWriter( sc.getNetwork() ).write( outputNetwork );
-		new NonFlatConfigWriter( config ).write( outputConfig );
+		new ConfigWriter( config ).write( outputConfig );
 	}
 
 	private static void createConfig(

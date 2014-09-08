@@ -26,7 +26,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.NonFlatConfigWriter;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.scenario.ScenarioImpl;
 
@@ -88,14 +87,8 @@ public class RunCliquesWithModularStrategies {
 		}
 		RunUtils.addDistanceFillerListener( controller );
 
-		try { 
-			// run it
-			controller.run();
-		}
-		finally {
-			// dump non flat config
-			new NonFlatConfigWriter( config ).write( controller.getControlerIO().getOutputFilename( "output_config.xml.gz" ) );
-		}
+		// run it
+		controller.run();
 	}
 
 	private static SocialNetwork toSocialNetwork(
