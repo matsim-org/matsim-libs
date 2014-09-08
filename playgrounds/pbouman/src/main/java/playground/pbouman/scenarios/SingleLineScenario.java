@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -90,16 +91,16 @@ public class SingleLineScenario
 		Network net = scen.getNetwork();
 		NetworkFactory nw = net.getFactory();
 		
-		Node a = nw.createNode(scen.createId("NodeA"), scen.createCoord(100, 100));
-		Node b = nw.createNode(scen.createId("NodeB"), scen.createCoord(5000, 5000));
-		Node u = nw.createNode(scen.createId("NodeU"), scen.createCoord(99, 99));
-		Node v = nw.createNode(scen.createId("NodeV"), scen.createCoord(5001, 5001));
-		Link ab = nw.createLink(scen.createId("LinkAB"),a,b);
-		Link ua = nw.createLink(scen.createId("LinkUA"),u,a);
-		Link bv = nw.createLink(scen.createId("LinkBV"),b,v);
-		Link ba = nw.createLink(scen.createId("LinkBA"),b,a);
-		Link au = nw.createLink(scen.createId("LinkAU"),a,u);
-		Link vb = nw.createLink(scen.createId("LinkVB"),v,b);
+		Node a = nw.createNode(Id.create("NodeA", Node.class), scen.createCoord(100, 100));
+		Node b = nw.createNode(Id.create("NodeB", Node.class), scen.createCoord(5000, 5000));
+		Node u = nw.createNode(Id.create("NodeU", Node.class), scen.createCoord(99, 99));
+		Node v = nw.createNode(Id.create("NodeV", Node.class), scen.createCoord(5001, 5001));
+		Link ab = nw.createLink(Id.create("LinkAB", Link.class),a,b);
+		Link ua = nw.createLink(Id.create("LinkUA", Link.class),u,a);
+		Link bv = nw.createLink(Id.create("LinkBV", Link.class),b,v);
+		Link ba = nw.createLink(Id.create("LinkBA", Link.class),b,a);
+		Link au = nw.createLink(Id.create("LinkAU", Link.class),a,u);
+		Link vb = nw.createLink(Id.create("LinkVB", Link.class),v,b);
 		
 		ab.setLength(5000);
 		ba.setLength(5000);
@@ -133,11 +134,11 @@ public class SingleLineScenario
 		TransitSchedule schedule = scen.getTransitSchedule();
 		TransitScheduleFactory sFac = schedule.getFactory();
 		
-		TransitStopFacility aStop = sFac.createTransitStopFacility(scen.createId("AStop"), ua.getCoord(), blockLane);
+		TransitStopFacility aStop = sFac.createTransitStopFacility(Id.create("AStop", TransitStopFacility.class), ua.getCoord(), blockLane);
 		aStop.setLinkId(ua.getId());
-		TransitStopFacility iStop = sFac.createTransitStopFacility(scen.createId("IStop"), ab.getCoord(), blockLane);
+		TransitStopFacility iStop = sFac.createTransitStopFacility(Id.create("IStop", TransitStopFacility.class), ab.getCoord(), blockLane);
 		iStop.setLinkId(ab.getId());
-		TransitStopFacility bStop = sFac.createTransitStopFacility(scen.createId("BStop"), bv.getCoord(), blockLane);
+		TransitStopFacility bStop = sFac.createTransitStopFacility(Id.create("BStop", TransitStopFacility.class), bv.getCoord(), blockLane);
 		bStop.setLinkId(bv.getId());
 		
 		
@@ -145,7 +146,7 @@ public class SingleLineScenario
 		schedule.addStopFacility(bStop);
 		schedule.addStopFacility(iStop);
 		
-		TransitLine line1 = sFac.createTransitLine(scen.createId("Line1"));
+		TransitLine line1 = sFac.createTransitLine(Id.create("Line1", TransitLine.class));
 		
 		List<Id<Link>> routeIds1 = new LinkedList<Id<Link>>();
 		routeIds1.add(ua.getId());
@@ -160,19 +161,19 @@ public class SingleLineScenario
 		VehiclesFactory vFac = scen.getVehicles().getFactory();
 		
 		NetworkRoute route1 = RouteUtils.createNetworkRoute(routeIds1, net);
-		TransitRoute transitRoute1 = sFac.createTransitRoute(scen.createId("l1r1"), route1, stops1, "pt");
+		TransitRoute transitRoute1 = sFac.createTransitRoute(Id.create("l1r1", TransitRoute.class), route1, stops1, "pt");
 		for (int t=1; t <= 20; t++)
 		{
-			Departure dep = sFac.createDeparture(scen.createId("r1dep"+t), 3600 * t);
+			Departure dep = sFac.createDeparture(Id.create("r1dep"+t, Departure.class), 3600 * t);
 			
 			VehicleCapacity cap = vFac.createVehicleCapacity();
 			cap.setSeats(10);
 			cap.setStandingRoom(20);
-			VehicleType type = vFac.createVehicleType(scen.createId("r1dep"+t+"type"));
+			VehicleType type = vFac.createVehicleType(Id.create("r1dep"+t+"type", VehicleType.class));
 			type.setCapacity(cap);
 			type.setMaximumVelocity(20);
 			scen.getVehicles().addVehicleType(type);
-			Vehicle veh = vFac.createVehicle(scen.createId("r1dep"+t+"veh"), type);
+			Vehicle veh = vFac.createVehicle(Id.create("r1dep"+t+"veh", Vehicle.class), type);
 			scen.getVehicles().addVehicle( veh);
 			dep.setVehicleId(veh.getId());
 			
@@ -202,7 +203,7 @@ public class SingleLineScenario
 		
 		for (int t=0; t < numAgents; t++)
 		{
-			Person p = popFac.createPerson(scen.createId("Agent"+t));
+			Person p = popFac.createPerson(Id.create("Agent"+t, Person.class));
 			Plan plan = popFac.createPlan();
 			plan.addActivity(homeBegin);
 			plan.addLeg(popFac.createLeg("pt"));
@@ -225,12 +226,12 @@ public class SingleLineScenario
 		 * Initialize Strategy *
 		 * ******************* */
 		
-		StrategySettings stratSets = new StrategySettings(scen.createId("1"));
+		StrategySettings stratSets = new StrategySettings(new IdImpl("1"));
 		//stratSets.setModuleName("BestScore");
 		stratSets.setModuleName("SelectExpBeta");
 		stratSets.setProbability(0.9);
 		config.strategy().addStrategySettings(stratSets);
-		stratSets = new StrategySettings(scen.createId("2"));
+		stratSets = new StrategySettings(new IdImpl("2"));
 		stratSets.setModuleName("TransitTimeAllocationMutator");
 		stratSets.setProbability(0.1);
 		config.strategy().addStrategySettings(stratSets);

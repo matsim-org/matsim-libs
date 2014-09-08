@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -132,13 +133,13 @@ public class ElFarolTrainScenario
 		Node a, b, c, u, v, w;
 		
 		Node [] nodes = new Node [] {
-				a = nw.createNode(scen.createId("a"), scen.createCoord(boxSize/2 , boxSize / 2 - ySpan)),
-				b = nw.createNode(scen.createId("b"), scen.createCoord(boxSize/2 , boxSize / 2 + ySpan)),
-				c = nw.createNode(scen.createId("c"), scen.createCoord(boxSize/2, boxSize / 2)),
+				a = nw.createNode(Id.create("a", Node.class), scen.createCoord(boxSize/2 , boxSize / 2 - ySpan)),
+				b = nw.createNode(Id.create("b", Node.class), scen.createCoord(boxSize/2 , boxSize / 2 + ySpan)),
+				c = nw.createNode(Id.create("c", Node.class), scen.createCoord(boxSize/2, boxSize / 2)),
 		
-				u = nw.createNode(scen.createId("u"), scen.createCoord(longDist + boxSize / 2, boxSize / 2 - ySpan)),
-				v = nw.createNode(scen.createId("v"), scen.createCoord(longDist + boxSize / 2, boxSize / 2 + ySpan)),
-				w = nw.createNode(scen.createId("w"), scen.createCoord(longDist + boxSize / 2, boxSize / 2)),
+				u = nw.createNode(Id.create("u", Node.class), scen.createCoord(longDist + boxSize / 2, boxSize / 2 - ySpan)),
+				v = nw.createNode(Id.create("v", Node.class), scen.createCoord(longDist + boxSize / 2, boxSize / 2 + ySpan)),
+				w = nw.createNode(Id.create("w", Node.class), scen.createCoord(longDist + boxSize / 2, boxSize / 2)),
 		};
 		
 		for (Node n : nodes)
@@ -149,18 +150,18 @@ public class ElFarolTrainScenario
 		Link ac, ca, cb, bc, uw, wu, vw, wv, wc, cw;
 		
 		Link [] links = new Link [] {
-				ac = nw.createLink(scen.createId("ac"), a, c),
-				ca = nw.createLink(scen.createId("ca"), c, a),
-				cb = nw.createLink(scen.createId("cb"), c, b),
-				bc = nw.createLink(scen.createId("bc"), b, c),
+				ac = nw.createLink(Id.create("ac", Link.class), a, c),
+				ca = nw.createLink(Id.create("ca", Link.class), c, a),
+				cb = nw.createLink(Id.create("cb", Link.class), c, b),
+				bc = nw.createLink(Id.create("bc", Link.class), b, c),
 		
-				uw = nw.createLink(scen.createId("uw"), u, w),
-				wu = nw.createLink(scen.createId("wu"), w, u),
-				vw = nw.createLink(scen.createId("vw"), v, w),
-				wv = nw.createLink(scen.createId("wv"), w, v),
+				uw = nw.createLink(Id.create("uw", Link.class), u, w),
+				wu = nw.createLink(Id.create("wu", Link.class), w, u),
+				vw = nw.createLink(Id.create("vw", Link.class), v, w),
+				wv = nw.createLink(Id.create("wv", Link.class), w, v),
 		
-				wc = nw.createLink(scen.createId("wc"), w, c),
-				cw = nw.createLink(scen.createId("cw"), c, w),
+				wc = nw.createLink(Id.create("wc", Link.class), w, c),
+				cw = nw.createLink(Id.create("cw", Link.class), c, w),
 		};
 		
 		for (Link l : links)
@@ -179,10 +180,10 @@ public class ElFarolTrainScenario
 		TransitScheduleFactory sFac = schedule.getFactory();
 				
 		TransitStopFacility [] stops = new TransitStopFacility [] {
-				sFac.createTransitStopFacility(scen.createId("stop1"), cb.getCoord(), blockLane),
-				sFac.createTransitStopFacility(scen.createId("stop2"), wv.getCoord(), blockLane),
-				sFac.createTransitStopFacility(scen.createId("stop3"), uw.getCoord(), blockLane),
-				sFac.createTransitStopFacility(scen.createId("stop4"), ca.getCoord(), blockLane)
+				sFac.createTransitStopFacility(Id.create("stop1", TransitStopFacility.class), cb.getCoord(), blockLane),
+				sFac.createTransitStopFacility(Id.create("stop2", TransitStopFacility.class), wv.getCoord(), blockLane),
+				sFac.createTransitStopFacility(Id.create("stop3", TransitStopFacility.class), uw.getCoord(), blockLane),
+				sFac.createTransitStopFacility(Id.create("stop4", TransitStopFacility.class), ca.getCoord(), blockLane)
 		};
 		
 		stops[0].setLinkId(cb.getId());
@@ -195,7 +196,7 @@ public class ElFarolTrainScenario
 			schedule.addStopFacility(stop);
 		}
 		
-		TransitLine line = sFac.createTransitLine(scen.createId("Line1"));
+		TransitLine line = sFac.createTransitLine(Id.create("Line1", TransitLine.class));
 		
 		List<Id<Link>> routeIds = Arrays.asList(
 				ac.getId(),
@@ -228,21 +229,21 @@ public class ElFarolTrainScenario
 			VehicleCapacity cap = vFac.createVehicleCapacity();
 			cap.setSeats(seatCap);
 			cap.setStandingRoom(standCap);
-			VehicleType type = vFac.createVehicleType(scen.createId("vtype"+t));
+			VehicleType type = vFac.createVehicleType(Id.create("vtype"+t, VehicleType.class));
 			type.setCapacity(cap);
 			type.setMaximumVelocity(speed);
 			scen.getVehicles().addVehicleType( type);
-			Vehicle veh = vFac.createVehicle(scen.createId("vehicle"+t), type);
+			Vehicle veh = vFac.createVehicle(Id.create("vehicle"+t, Vehicle.class), type);
 			scen.getVehicles().addVehicle( veh);
 			vehicles[t] = veh;
 		}
 		
 		NetworkRoute route = RouteUtils.createNetworkRoute(routeIds, net);
-		TransitRoute transitRoute = sFac.createTransitRoute(scen.createId("route"), route, stopList, "pt");
+		TransitRoute transitRoute = sFac.createTransitRoute(Id.create("route", TransitRoute.class), route, stopList, "pt");
 		
 		for (int t=0; t < departures; t++)
 		{
-			Departure dep = sFac.createDeparture(scen.createId("dep"+t), startTime + t*headWay);
+			Departure dep = sFac.createDeparture(Id.create("dep"+t, Departure.class), startTime + t*headWay);
 			dep.setVehicleId(vehicles[t % vehicles.length].getId());
 			transitRoute.addDeparture(dep);
 		}
@@ -279,7 +280,7 @@ public class ElFarolTrainScenario
 			int index = ran.nextInt(workP.length);
 			String mode = ran.nextDouble() < ptChance ? "pt" : "car";
 			
-			Person p = popFac.createPerson(scen.createId("Agent"+t));
+			Person p = popFac.createPerson(Id.create("Agent"+t, Person.class));
 			Plan plan = popFac.createPlan();
 			
 			ActivityImpl homeAct = (ActivityImpl) popFac.createActivityFromCoord("home", scen.createCoord(ran.nextDouble() * boxSize, ran.nextDouble() * boxSize));
@@ -304,16 +305,16 @@ public class ElFarolTrainScenario
 		 * Setup Strategy *
 		 * ************** */
 		
-		StrategySettings stratSets = new StrategySettings(scen.createId("1"));
+		StrategySettings stratSets = new StrategySettings(new IdImpl("1"));
 		//stratSets.setModuleName("BestScore");
 		stratSets.setModuleName("SelectExpBeta");
 		stratSets.setProbability(0.8);
 		config.strategy().addStrategySettings(stratSets);
-		stratSets = new StrategySettings(scen.createId("2"));
+		stratSets = new StrategySettings(new IdImpl("2"));
 		stratSets.setModuleName("TransitTimeAllocationMutator");
 		stratSets.setProbability(0.2);
 		config.strategy().addStrategySettings(stratSets);
-		//stratSets = new StrategySettings(scen.createId("3"));
+		//stratSets = new StrategySettings(Id.create("3"));
 		//stratSets.setModuleName("ChangeLegMode");
 		//stratSets.setProbability(0.025);
 		//config.strategy().addStrategySettings(stratSets);
