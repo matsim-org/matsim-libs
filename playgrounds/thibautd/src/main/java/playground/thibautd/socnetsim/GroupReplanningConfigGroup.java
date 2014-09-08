@@ -22,18 +22,15 @@ package playground.thibautd.socnetsim;
 import java.util.Collection;
 
 import org.matsim.core.config.Module;
-import org.matsim.core.config.experimental.ReflectiveModule.StringGetter;
-import org.matsim.core.config.experimental.ReflectiveModule.StringSetter;
-
-import playground.thibautd.config.ReflectiveNonFlatModule;
+import org.matsim.core.config.experimental.ReflectiveModule;
 
 /**
  * @author thibautd
  */
-public class GroupReplanningConfigGroup extends ReflectiveNonFlatModule {
+public class GroupReplanningConfigGroup extends ReflectiveModule {
 	public static final String GROUP_NAME = "groupStrategy";
 
-	public static class StrategyParameterSet extends ReflectiveNonFlatModule {
+	public static class StrategyParameterSet extends ReflectiveModule {
 		public static final String SET_NAME = "strategy";
 
 		private String strategyName = null;
