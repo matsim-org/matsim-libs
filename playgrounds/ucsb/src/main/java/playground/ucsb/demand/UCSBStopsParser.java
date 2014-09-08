@@ -150,7 +150,7 @@ public class UCSBStopsParser {
 	}
 	
 	private final void cleanUp(Population population) {
-		Set<Id> pidsToRemove = new HashSet<Id>();
+		Set<Id<Person>> pidsToRemove = new HashSet<>();
 		for (Person person : population.getPersons().values()) {
 			Activity firstActivity = (Activity)person.getSelectedPlan().getPlanElements().get(0);
 			if (firstActivity.getEndTime() < 0.0) {
@@ -158,7 +158,7 @@ public class UCSBStopsParser {
 				log.info("pid="+person.getId()+": first departure before 00:00:00. Will be removed from the population");
 			}
 		}
-		for (Id pid : pidsToRemove) {
+		for (Id<Person> pid : pidsToRemove) {
 			population.getPersons().remove(pid);
 		}
 		log.info("in totoal "+pidsToRemove.size()+" removed from the population.");
@@ -177,7 +177,7 @@ public class UCSBStopsParser {
 			Map<String,Integer> column = new LinkedHashMap<String,Integer>(heads.length);
 			for (int i=0; i<heads.length; i++) { column.put(heads[i],i); }
 			
-			Id currPid = null;
+			Id<Person> currPid = null;
 			boolean storePerson = false;
 
 			// data
@@ -193,7 +193,7 @@ public class UCSBStopsParser {
 				// household id / person id
 				Integer hid = new Double(entries[column.get(HID)]).intValue();
 				Integer id = new Double(entries[column.get(PID)]).intValue();
-				Id pid = scenario.createId(hid+"_"+id);
+				Id<Person> pid = Id.create(hid+"_"+id, Person.class);
 				
 				if (!pid.equals(currPid)) {
 					currPid = pid;
