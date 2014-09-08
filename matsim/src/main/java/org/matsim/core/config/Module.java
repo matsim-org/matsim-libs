@@ -139,7 +139,7 @@ public class Module {
 		return m;
 	}
 
-	public final void addParameterSet(final Module set) {
+	public void addParameterSet(final Module set) {
 		checkParameterSet( set );
 		Collection<Module> parameterSets = parameterSetsPerType.get( set.getName() );
 
@@ -159,6 +159,14 @@ public class Module {
 	 */
 	protected void checkParameterSet(final Module set) {
 		// empty for inheritance
+	}
+	
+	/**
+	 * Useful for instance if default values are provided but should be cleared if
+	 * user provides values.
+	 */
+	protected final Collection<? extends Module> clearParameterSetsForType( final String type ) {
+		return parameterSetsPerType.remove( type );
 	}
 
 	public final Collection<? extends Module> getParameterSets(final String type) {
