@@ -79,7 +79,7 @@ import org.xml.sax.Attributes;
 	}
 
 	private void startParameterSet(final Attributes atts) {
-		final Module m = moduleStack.getFirst().createAndAddParameterSet( atts.getValue( TYPE ) );
+		final Module m = moduleStack.getFirst().createParameterSet( atts.getValue( TYPE ) );
 		moduleStack.addFirst( m );
 	}
 
@@ -97,7 +97,9 @@ import org.xml.sax.Attributes;
 			final String content,
 			final Stack<String> context) {
 		if ( name.equals( MODULE ) || name.equals( PARAMETER_SET ) ) {
-			moduleStack.removeFirst();
+			final Module head = moduleStack.removeFirst();
+			
+			if ( !moduleStack.isEmpty() ) moduleStack.getFirst().addParameterSet( head );
 		}
 	}
 }

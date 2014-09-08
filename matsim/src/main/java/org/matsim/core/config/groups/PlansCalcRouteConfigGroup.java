@@ -207,8 +207,11 @@ public class PlansCalcRouteConfigGroup extends Module {
 		final Map<String, ModeRoutingParams> map = new LinkedHashMap< >();
 
 		for ( Module pars : getParameterSets( ModeRoutingParams.SET_TYPE ) ) {
-			map.put( ((ModeRoutingParams) pars).getMode() ,
-				(ModeRoutingParams)	pars );
+			final String mode = ((ModeRoutingParams) pars).getMode();
+			final ModeRoutingParams old =
+				map.put( mode ,
+					(ModeRoutingParams)	pars );
+			if ( old != null ) throw new IllegalStateException( "several parameter sets for mode "+mode );
 		}
 
 		return map;
@@ -218,8 +221,9 @@ public class PlansCalcRouteConfigGroup extends Module {
 		ModeRoutingParams pars = getModeRoutingParams().get( mode );
 
 		if ( pars == null ) {
-			pars = (ModeRoutingParams) createAndAddParameterSet( ModeRoutingParams.SET_TYPE );
+			pars = (ModeRoutingParams) createParameterSet( ModeRoutingParams.SET_TYPE );
 			pars.setMode( mode );
+			addParameterSet( pars );
 		}
 
 		return pars;

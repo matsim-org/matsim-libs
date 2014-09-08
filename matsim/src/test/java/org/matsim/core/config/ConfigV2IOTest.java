@@ -113,14 +113,17 @@ public class ConfigV2IOTest {
 		module.addParam( "someParam" , "someValue" );
 		module.addParam( "anotherParam" , "anotherValue" );
 
-		final Module paramSet1 = module.createAndAddParameterSet( "oneType" );
+		final Module paramSet1 = module.createParameterSet( "oneType" );
+		module.addParameterSet( paramSet1 );
 		paramSet1.addParam( "something" , "gloups" );
 
-		final Module paramSet2 = module.createAndAddParameterSet( "oneType" );
+		final Module paramSet2 = module.createParameterSet( "oneType" );
+		module.addParameterSet( paramSet2 );
 		paramSet2.addParam( "something" , "gloups" );
 		paramSet2.addParam( "something_else" , "glips" );
 
-		final Module paramSet3 = module.createAndAddParameterSet( "anotherType" );
+		final Module paramSet3 = module.createParameterSet( "anotherType" );
+		module.addParameterSet( paramSet3 );
 		paramSet3.addParam( "niark" , "niourk" );
 
 		c.addModule( module );

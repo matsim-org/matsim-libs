@@ -127,17 +127,17 @@ public class Module {
 		return new Module( type );
 	}
 
-	public final Module createAndAddParameterSet(final String type) {
-		final Module m = createParameterSet( type );
+	//public final Module createAndAddParameterSet(final String type) {
+	//	final Module m = createParameterSet( type );
 
-		if ( !m.getName().equals( type ) ) {
-			throw new IllegalArgumentException( "the \"name\" of parameter sets should correspond to their type."+
-					" type \""+type+"\" is different from name \""+m.getName()+"\" " );
-		}
+	//	if ( !m.getName().equals( type ) ) {
+	//		throw new IllegalArgumentException( "the \"name\" of parameter sets should correspond to their type."+
+	//				" type \""+type+"\" is different from name \""+m.getName()+"\" " );
+	//	}
 
-		addParameterSet( m );
-		return m;
-	}
+	//	addParameterSet( m );
+	//	return m;
+	//}
 
 	public void addParameterSet(final Module set) {
 		checkParameterSet( set );

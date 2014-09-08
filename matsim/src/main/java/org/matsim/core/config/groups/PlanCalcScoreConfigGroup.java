@@ -106,6 +106,8 @@ public class PlanCalcScoreConfigGroup extends Module {
 	private final ReflectiveDelegate delegate = new ReflectiveDelegate();
 	private final Map<String, ActivityParams> activityTypesByNumber = new HashMap< >();
 
+	// erase defaults if parametes for one mode are added
+	private boolean clearDefaultsBeforeAddingMode = false;
 
 	public PlanCalcScoreConfigGroup() {
 		super(GROUP_NAME);
@@ -115,6 +117,7 @@ public class PlanCalcScoreConfigGroup extends Module {
 		this.addParameterSet( new ModeParams( TransportMode.walk ) );
 		this.addParameterSet( new ModeParams( TransportMode.bike ) );
 		this.addParameterSet( new ModeParams( TransportMode.other ) );
+		this.clearDefaultsBeforeAddingMode = true;
 	}
 
 
@@ -471,6 +474,32 @@ public class PlanCalcScoreConfigGroup extends Module {
 		return this.getActivityParamsPerType().get(actType);
 	}
 
+	public void addParameterSet( final Module set ) {
+		switch ( set.getName() ) {
+			case ActivityParams.SET_TYPE:
+				addActivityParams( (ActivityParams) set );
+				break;
+			case ModeParams.SET_TYPE:
+				addModeParams( (ModeParams) set );
+				break;
+			default:
+				throw new IllegalArgumentException( set.getName() );
+		}
+	}
+
+	public void addModeParams(final ModeParams params) {
+		final ModeParams previous = this.getModes().get( params.getMode() );
+		
+		if ( previous != null ) {
+			log.info("mode parameters for mode " + previous.getMode() + " were just overwritten.") ;
+			
+			final boolean removed = removeParameterSet( previous );
+			if ( !removed ) throw new RuntimeException( "problem replacing mode params " );
+		}
+		
+		super.addParameterSet( params );
+	}
+
 	public void addActivityParams(final ActivityParams params) {
 		final ActivityParams previous = this.getActivityParams( params.getActivityType() );
 		
@@ -489,7 +518,7 @@ public class PlanCalcScoreConfigGroup extends Module {
 			if ( !removed ) throw new RuntimeException( "problem replacing activity params " );
 		}
 		
-		addParameterSet( params );
+		super.addParameterSet( params );
 	}
 
 	/* complex classes */
