@@ -50,7 +50,6 @@ import java.util.List;
  * 
  * @author aneumann
  */
-@Ignore("See MATSIM-266")
 public class PControlerTest implements TabularFileHandler{
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
@@ -82,11 +81,6 @@ public class PControlerTest implements TabularFileHandler{
 		controler.setCreateGraphs(false);
 		
 		// manipulate config
-		// add "pt interaction" cause controler.init() is called too late and in a protected way
-		ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
-		transitActivityParams.setTypicalDuration(120.0);
-		scenario.getConfig().planCalcScore().addActivityParams(transitActivityParams);
-		
 		PHook pHook = new PHook(controler);
 		controler.addControlerListener(pHook);		
 		controler.setScoringFunctionFactory(new BvgScoringFunctionFactory(controler.getConfig().planCalcScore(), new BvgScoringFunctionConfigGroup(controler.getConfig()), controler.getNetwork()));
