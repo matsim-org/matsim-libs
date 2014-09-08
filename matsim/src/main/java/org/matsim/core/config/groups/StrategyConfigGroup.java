@@ -334,93 +334,95 @@ public class StrategyConfigGroup extends Module {
 		delegate.setFractionOfIterationsToDisableInnovation(fraction);
 	}
 
+	@Override
 	public final Map<String, String> getParams() {
 		return delegate.getParams();
 	}
+
+	private static class ReflectiveDelegate extends ReflectiveModule {
+		 static final String MAX_AGENT_PLAN_MEMORY_SIZE = "maxAgentPlanMemorySize";
+		 static final String EXTERNAL_EXE_CONFIG_TEMPLATE = "ExternalExeConfigTemplate";
+		 static final String EXTERNAL_EXE_TMP_FILE_ROOT_DIR = "ExternalExeTmpFileRootDir";
+		 static final String EXTERNAL_EXE_TIME_OUT = "ExternalExeTimeOut";
+		 static final String ITERATION_FRACTION_TO_DISABLE_INNOVATION = "fractionOfIterationsToDisableInnovation" ;
+		 static final String PLAN_SELECTOR_FOR_REMOVAL = "planSelectorForRemoval" ;
+
+		private int maxAgentPlanMemorySize = 5;
+		private String externalExeConfigTemplate = null;
+		private String externalExeTmpFileRootDir = null;
+		private long externalExeTimeOut = 3600;
+
+		private String planSelectorForRemoval = null ; 
+		// default is configured in StrategyManager; one may wish to change where the default is defined.  kai, feb'12
+		
+		//---
+		private double fraction = Double.POSITIVE_INFINITY ;
+		//---
+
+		public ReflectiveDelegate() {
+			super( StrategyConfigGroup.GROUP_NAME );
+		}
+
+
+		@StringSetter( MAX_AGENT_PLAN_MEMORY_SIZE )
+		public void setMaxAgentPlanMemorySize(final int maxAgentPlanMemorySize) {
+			this.maxAgentPlanMemorySize = maxAgentPlanMemorySize;
+		}
+
+		@StringGetter( MAX_AGENT_PLAN_MEMORY_SIZE )
+		public int getMaxAgentPlanMemorySize() {
+			return this.maxAgentPlanMemorySize;
+		}
+
+		@StringSetter( EXTERNAL_EXE_CONFIG_TEMPLATE )
+		public void setExternalExeConfigTemplate(final String externalExeConfigTemplate) {
+			this.externalExeConfigTemplate = externalExeConfigTemplate;
+		}
+
+		@StringGetter( EXTERNAL_EXE_CONFIG_TEMPLATE )
+		public String getExternalExeConfigTemplate() {
+			return this.externalExeConfigTemplate;
+		}
+
+		@StringSetter( EXTERNAL_EXE_TMP_FILE_ROOT_DIR )
+		public void setExternalExeTmpFileRootDir(final String externalExeTmpFileRootDir) {
+			this.externalExeTmpFileRootDir = externalExeTmpFileRootDir;
+		}
+
+		@StringGetter( EXTERNAL_EXE_TMP_FILE_ROOT_DIR )
+		public String getExternalExeTmpFileRootDir() {
+			return this.externalExeTmpFileRootDir;
+		}
+
+		@StringSetter( EXTERNAL_EXE_TIME_OUT )
+		public void setExternalExeTimeOut(final long externalExeTimeOut) {
+			this.externalExeTimeOut = externalExeTimeOut;
+		}
+
+		@StringGetter( EXTERNAL_EXE_TIME_OUT )
+		public long getExternalExeTimeOut() {
+			return this.externalExeTimeOut;
+		}
+
+		@StringGetter( PLAN_SELECTOR_FOR_REMOVAL )
+		public String getPlanSelectorForRemoval() {
+			return planSelectorForRemoval;
+		}
+
+		@StringSetter( PLAN_SELECTOR_FOR_REMOVAL )
+		public void setPlanSelectorForRemoval(String planSelectorForRemoval) {
+			this.planSelectorForRemoval = planSelectorForRemoval;
+		}
+
+		@StringGetter( ITERATION_FRACTION_TO_DISABLE_INNOVATION )
+		public double getFractionOfIterationsToDisableInnovation() {
+			return fraction;
+		}
+
+		@StringSetter( ITERATION_FRACTION_TO_DISABLE_INNOVATION )
+		public void setFractionOfIterationsToDisableInnovation(double fraction) {
+			this.fraction = fraction;
+		}
+	}
 }
 
-class ReflectiveDelegate extends ReflectiveModule {
-	 static final String MAX_AGENT_PLAN_MEMORY_SIZE = "maxAgentPlanMemorySize";
-	 static final String EXTERNAL_EXE_CONFIG_TEMPLATE = "ExternalExeConfigTemplate";
-	 static final String EXTERNAL_EXE_TMP_FILE_ROOT_DIR = "ExternalExeTmpFileRootDir";
-	 static final String EXTERNAL_EXE_TIME_OUT = "ExternalExeTimeOut";
-	 static final String ITERATION_FRACTION_TO_DISABLE_INNOVATION = "fractionOfIterationsToDisableInnovation" ;
-	 static final String PLAN_SELECTOR_FOR_REMOVAL = "planSelectorForRemoval" ;
-
-	private int maxAgentPlanMemorySize = 5;
-	private String externalExeConfigTemplate = null;
-	private String externalExeTmpFileRootDir = null;
-	private long externalExeTimeOut = 3600;
-
-	private String planSelectorForRemoval = null ; 
-	// default is configured in StrategyManager; one may wish to change where the default is defined.  kai, feb'12
-	
-	//---
-	private double fraction = Double.POSITIVE_INFINITY ;
-	//---
-
-	public ReflectiveDelegate() {
-		super( StrategyConfigGroup.GROUP_NAME );
-	}
-
-
-	@StringSetter( MAX_AGENT_PLAN_MEMORY_SIZE )
-	public void setMaxAgentPlanMemorySize(final int maxAgentPlanMemorySize) {
-		this.maxAgentPlanMemorySize = maxAgentPlanMemorySize;
-	}
-
-	@StringGetter( MAX_AGENT_PLAN_MEMORY_SIZE )
-	public int getMaxAgentPlanMemorySize() {
-		return this.maxAgentPlanMemorySize;
-	}
-
-	@StringSetter( EXTERNAL_EXE_CONFIG_TEMPLATE )
-	public void setExternalExeConfigTemplate(final String externalExeConfigTemplate) {
-		this.externalExeConfigTemplate = externalExeConfigTemplate;
-	}
-
-	@StringGetter( EXTERNAL_EXE_CONFIG_TEMPLATE )
-	public String getExternalExeConfigTemplate() {
-		return this.externalExeConfigTemplate;
-	}
-
-	@StringSetter( EXTERNAL_EXE_TMP_FILE_ROOT_DIR )
-	public void setExternalExeTmpFileRootDir(final String externalExeTmpFileRootDir) {
-		this.externalExeTmpFileRootDir = externalExeTmpFileRootDir;
-	}
-
-	@StringGetter( EXTERNAL_EXE_TMP_FILE_ROOT_DIR )
-	public String getExternalExeTmpFileRootDir() {
-		return this.externalExeTmpFileRootDir;
-	}
-
-	@StringSetter( EXTERNAL_EXE_TIME_OUT )
-	public void setExternalExeTimeOut(final long externalExeTimeOut) {
-		this.externalExeTimeOut = externalExeTimeOut;
-	}
-
-	@StringGetter( EXTERNAL_EXE_TIME_OUT )
-	public long getExternalExeTimeOut() {
-		return this.externalExeTimeOut;
-	}
-
-	@StringGetter( PLAN_SELECTOR_FOR_REMOVAL )
-	public String getPlanSelectorForRemoval() {
-		return planSelectorForRemoval;
-	}
-
-	@StringSetter( PLAN_SELECTOR_FOR_REMOVAL )
-	public void setPlanSelectorForRemoval(String planSelectorForRemoval) {
-		this.planSelectorForRemoval = planSelectorForRemoval;
-	}
-
-	@StringGetter( ITERATION_FRACTION_TO_DISABLE_INNOVATION )
-	public double getFractionOfIterationsToDisableInnovation() {
-		return fraction;
-	}
-
-	@StringSetter( ITERATION_FRACTION_TO_DISABLE_INNOVATION )
-	public void setFractionOfIterationsToDisableInnovation(double fraction) {
-		this.fraction = fraction;
-	}
-}
