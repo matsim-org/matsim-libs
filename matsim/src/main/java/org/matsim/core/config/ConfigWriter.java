@@ -44,7 +44,7 @@ public class ConfigWriter extends MatsimXmlWriter implements MatsimWriter {
 
 	public ConfigWriter(final Config config) {
 		this.config = config;
-		// always write the latest version, currently v1
+		// always write the latest version, currently v2
 		this.dtd = "http://www.matsim.org/files/dtd/config_v2.dtd";
 		this.handler = new ConfigWriterHandlerImplV2();
 	}
