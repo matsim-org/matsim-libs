@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.router.TransitRouterNetwork;
@@ -110,10 +109,10 @@ public class TransitRouterNetworkReaderMatsimV1 extends MatsimXmlParser {
 	@SuppressWarnings("unchecked")
 	private void startNode(final Attributes atts) {	
 		
-		Id nodeId = this.scenario.createId(atts.getValue("id"));
-		Id stopId = this.scenario.createId(atts.getValue("stopfacility"));
-		Id routeId = this.scenario.createId(atts.getValue("route"));
-		Id lineId = this.scenario.createId(atts.getValue("line"));
+		Id<Node> nodeId = Id.create(atts.getValue("id"), Node.class);
+		Id<TransitStopFacility> stopId = Id.create(atts.getValue("stopfacility"), TransitStopFacility.class);
+		Id<TransitRoute> routeId = Id.create(atts.getValue("route"), TransitRoute.class);
+		Id<TransitLine> lineId = Id.create(atts.getValue("line"), TransitLine.class);
 		
 		TransitLine line = this.transitSchedule.getTransitLines().get(lineId);
 		TransitRoute route = line.getRoutes().get(routeId);
@@ -130,21 +129,21 @@ public class TransitRouterNetworkReaderMatsimV1 extends MatsimXmlParser {
 //		Id linkId = this.scenario.createId(atts.getValue("id"));
 //		Id fromId = this.scenario.createId(atts.getValue("from"));
 //		Id toId = this.scenario.createId(atts.getValue("to"));
-		Id linkId = new IdImpl(atts.getValue("id"));
-		Id fromId = new IdImpl(atts.getValue("from"));
-		Id toId = new IdImpl(atts.getValue("to"));
+		Id<Link> linkId = Id.create(atts.getValue("id"), Link.class);
+		Id<Node> fromId = Id.create(atts.getValue("from"), Node.class);
+		Id<Node> toId = Id.create(atts.getValue("to"), Node.class);
 		
 		String string = null;
-		Id routeId = null;
-		Id lineId = null;
+		Id<TransitRoute> routeId = null;
+		Id<TransitLine> lineId = null;
 		
 		string = atts.getValue("route");
 //		if (string != null) routeId = this.scenario.createId(string);
-		if (string != null) routeId = new IdImpl(string);
+		if (string != null) routeId = Id.create(string, TransitRoute.class);
 		
 		string = atts.getValue("line");
 //		if (string != null) lineId = this.scenario.createId(string);
-		if (string != null) lineId = new IdImpl(string);
+		if (string != null) lineId = Id.create(string, TransitLine.class);
 		
 		TransitLine line = null;
 		TransitRoute route = null;
