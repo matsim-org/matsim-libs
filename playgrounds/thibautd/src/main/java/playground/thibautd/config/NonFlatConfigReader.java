@@ -54,27 +54,43 @@ public class NonFlatConfigReader extends MatsimXmlParser {
 			final Attributes atts,
 			final Stack<String> context) {
 		if ( name.equals( MODULE ) ) {
-			final Module m = config.getModule( atts.getValue( NAME ) );
-			moduleStack.addFirst(
-					m == null ?
-					config.createModule( atts.getValue( NAME ) ) :
-					m );
+			startModule(atts);
 		}
 		else if ( name.equals( PARAMETER_SET ) ) {
-			final Module m = moduleStack.getFirst().createAndAddParameterSet( atts.getValue( TYPE ) );
-			moduleStack.addFirst( m );
+			startParameterSet(atts);
 		}
 		else if ( name.equals( PARAMETER ) ) {
-			if ( !atts.getValue( VALUE ).equalsIgnoreCase( "null" ) ) {
-				moduleStack.getFirst().addParam(
-						atts.getValue( NAME ),
-						atts.getValue( VALUE ) );
-			}
+			startParameter(atts);
 		}
 		else if ( !name.equals( "config" ) ) {
-			// XXX this is the job of a dtd!
+			// this is the job of the dtd validation,
+			// but better too much safety than too little...
 			throw new IllegalArgumentException( "unkown tag "+name );
 		}
+	}
+
+	private void startParameter(final Attributes atts) {
+		// TODO check if necessary for some default modules
+		// (it is the job of the Module to decide on the meaning of the
+		// "null" string, not the reader...
+		if ( !atts.getValue( VALUE ).equalsIgnoreCase( "null" ) ) {
+			moduleStack.getFirst().addParam(
+					atts.getValue( NAME ),
+					atts.getValue( VALUE ) );
+		}
+	}
+
+	private void startParameterSet(final Attributes atts) {
+		final Module m = moduleStack.getFirst().createAndAddParameterSet( atts.getValue( TYPE ) );
+		moduleStack.addFirst( m );
+	}
+
+	private void startModule(final Attributes atts) {
+		final Module m = config.getModule( atts.getValue( NAME ) );
+		moduleStack.addFirst(
+				m == null ?
+				config.createModule( atts.getValue( NAME ) ) :
+				m );
 	}
 
 	@Override
