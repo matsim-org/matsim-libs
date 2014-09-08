@@ -23,6 +23,10 @@ package org.matsim.api.core.v01;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
+
 
 /**
  * Represents a unique identifier.
@@ -117,6 +121,35 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 		public String toString() {
 			return this.id;
 		}
-	}	
+	}
+
+	// helper classes for some common cases:
+	public static Id<Person> createPersonId( final long key ) {
+		return create( key, Person.class ) ;
+	}
+	public static Id<Person> createPersonId( final Id<?> id ) {
+		return create( id, Person.class ) ;
+	}
+	public static Id<Person> createPersonId( final String str ) {
+		return create( str, Person.class ) ;
+	}
+	public static Id<Link> createLinkId( final long key ) {
+		return create( key, Link.class ) ;
+	}
+	public static Id<Link> createLinkId( final Id<?> id ) {
+		return create( id, Link.class ) ;
+	}
+	public static Id<Link> createLinkId( final String str ) {
+		return create( str, Link.class ) ;
+	}
+	public static Id<Node> createNodeId( final long key ) {
+		return create( key, Node.class ) ;
+	}
+	public static Id<Node> createNodeId( final Id<?> id ) {
+		return create( id, Node.class ) ;
+	}
+	public static Id<Node> createNodeId( final String str ) {
+		return create( str, Node.class ) ;
+	}
 	
 }
