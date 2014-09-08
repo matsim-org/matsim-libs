@@ -153,8 +153,9 @@ public class PlansCalcRouteConfigGroupTest {
 		group.setTeleportedModeSpeed( "ice skates" , 10 );
 
 		// one mode with both speeds
-		group.setTeleportedModeFreespeedFactor( "overboard" , 100 );
-		group.setTeleportedModeSpeed( "overboard" , 999 );
+		// Was made illegal: do not test
+		//group.setTeleportedModeFreespeedFactor( "overboard" , 100 );
+		//group.setTeleportedModeSpeed( "overboard" , 999 );
 
 		return group;
 	}
