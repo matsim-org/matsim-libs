@@ -89,7 +89,7 @@ public class ReduceStopsToBeServed extends AbstractPStrategyModule implements Tr
 		}
 		
 		// profitable route, change startTime
-		PPlan newPlan = new PPlan(cooperative.getNewRouteId(), this.getName());
+		PPlan newPlan = new PPlan(cooperative.getNewPlanId(), this.getName());
 		newPlan.setNVehicles(1);
 		newPlan.setStopsToBeServed(stopsToBeServed);
 		newPlan.setStartTime(cooperative.getBestPlan().getStartTime());

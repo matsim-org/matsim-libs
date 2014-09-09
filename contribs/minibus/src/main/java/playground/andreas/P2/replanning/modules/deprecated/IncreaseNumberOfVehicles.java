@@ -51,7 +51,7 @@ public class IncreaseNumberOfVehicles extends AbstractPStrategyModule {
 	public PPlan run(Operator cooperative) {
 		// sufficient founds, so buy one
 		PPlan oldPlan = cooperative.getBestPlan();
-		PPlan plan = new PPlan(cooperative.getNewRouteId(), this.getName());
+		PPlan plan = new PPlan(cooperative.getNewPlanId(), this.getName());
 		plan.setStopsToBeServed(oldPlan.getStopsToBeServed());
 		plan.setStartTime(oldPlan.getStartTime());
 		plan.setEndTime(oldPlan.getEndTime());

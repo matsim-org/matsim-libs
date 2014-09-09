@@ -46,32 +46,32 @@ public class CreateNew24hPlan extends AbstractPStrategyModule {
 	}
 	
 	@Override
-	public PPlan run(Operator cooperative) {
+	public PPlan run(Operator operator) {
 		PPlan newPlan;		
 		
 		do {
 			double startTime = 0.0;
 			double endTime = 24 * 3600.0;
 			
-			TransitStopFacility stop1 = cooperative.getRouteProvider().getRandomTransitStop(cooperative.getCurrentIteration());
-			TransitStopFacility stop2 = cooperative.getRouteProvider().getRandomTransitStop(cooperative.getCurrentIteration());
+			TransitStopFacility stop1 = operator.getRouteProvider().getRandomTransitStop(operator.getCurrentIteration());
+			TransitStopFacility stop2 = operator.getRouteProvider().getRandomTransitStop(operator.getCurrentIteration());
 			while(stop1.getId() == stop2.getId()){
-				stop2 = cooperative.getRouteProvider().getRandomTransitStop(cooperative.getCurrentIteration());
+				stop2 = operator.getRouteProvider().getRandomTransitStop(operator.getCurrentIteration());
 			}
 			
 			ArrayList<TransitStopFacility> stopsToBeServed = new ArrayList<TransitStopFacility>();
 			stopsToBeServed.add(stop1);
 			stopsToBeServed.add(stop2);
 			
-			newPlan = new PPlan(cooperative.getNewRouteId(), this.getName());
+			newPlan = new PPlan(operator.getNewPlanId(), this.getName());
 			newPlan.setStopsToBeServed(stopsToBeServed);
 			newPlan.setStartTime(startTime);
 			newPlan.setEndTime(endTime);
 			newPlan.setNVehicles(1);
 			newPlan.setStopsToBeServed(stopsToBeServed);
 			
-			newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan));
-		} while (cooperative.getFranchise().planRejected(newPlan));		
+			newPlan.setLine(operator.getRouteProvider().createTransitLine(operator.getId(), newPlan));
+		} while (operator.getFranchise().planRejected(newPlan));		
 
 		return newPlan;
 	}

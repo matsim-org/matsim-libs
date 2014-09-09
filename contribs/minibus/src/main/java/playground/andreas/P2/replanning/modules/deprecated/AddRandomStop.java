@@ -90,7 +90,7 @@ public class AddRandomStop extends AbstractPStrategyModule {
 		}
 						
 		// profitable route, change startTime
-		PPlan newPlan = new PPlan(cooperative.getNewRouteId(), this.getName());
+		PPlan newPlan = new PPlan(cooperative.getNewPlanId(), this.getName());
 		newPlan.setNVehicles(1);
 		newPlan.setStopsToBeServed(newStopsToBeServed);
 		newPlan.setStartTime(cooperative.getBestPlan().getStartTime());

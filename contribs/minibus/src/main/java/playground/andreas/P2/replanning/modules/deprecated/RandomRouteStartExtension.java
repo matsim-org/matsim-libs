@@ -85,7 +85,7 @@ public class RandomRouteStartExtension extends AbstractPStrategyModule {
 	public PPlan run(Operator cooperative) {
 		this.initQuadTree(cooperative);
 		PPlan oldPlan = cooperative.getBestPlan();
-		PPlan newPlan = new PPlan(cooperative.getNewRouteId(), this.getName());
+		PPlan newPlan = new PPlan(cooperative.getNewPlanId(), this.getName());
 		newPlan.setNVehicles(1);
 		newPlan.setStartTime(oldPlan.getStartTime());
 		newPlan.setEndTime(oldPlan.getEndTime());

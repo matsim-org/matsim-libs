@@ -62,7 +62,7 @@ public class CreateNewPlan extends AbstractPStrategyModule {
 	}
 	
 	@Override
-	public PPlan run(Operator cooperative) {
+	public PPlan run(Operator operator) {
 		PPlan newPlan;		
 		
 		int triesPerformed = 0;
@@ -71,54 +71,48 @@ public class CreateNewPlan extends AbstractPStrategyModule {
 			triesPerformed++;
 			
 			// get a valid start time
-			double startTime = this.timeProvider.getRandomTimeInInterval(0 * 3600.0, 24 * 3600.0 - cooperative.getMinOperationTime());
-			double endTime = this.timeProvider.getRandomTimeInInterval(startTime + cooperative.getMinOperationTime(), 24 * 3600.0);
-			
-//			double startTime = MatsimRandom.getRandom().nextDouble() * (24.0 * 3600.0 - cooperative.getMinOperationTime());
-//			startTime = TimeProvider.getSlotForTime(startTime, this.timeSlotSize) * this.timeSlotSize;
-//			
-//			double endTime = startTime + cooperative.getMinOperationTime() + MatsimRandom.getRandom().nextDouble() * (24.0 * 3600.0 - cooperative.getMinOperationTime() - startTime);
-//			endTime = TimeProvider.getSlotForTime(endTime, this.timeSlotSize) * this.timeSlotSize;
+			double startTime = this.timeProvider.getRandomTimeInInterval(0 * 3600.0, 24 * 3600.0 - operator.getMinOperationTime());
+			double endTime = this.timeProvider.getRandomTimeInInterval(startTime + operator.getMinOperationTime(), 24 * 3600.0);
 			
 			if (startTime == endTime) {
 				endTime += this.timeSlotSize;
 			}
 			
-			while (startTime + cooperative.getMinOperationTime() > endTime) {
+			while (startTime + operator.getMinOperationTime() > endTime) {
 				endTime += this.timeSlotSize;
 			}
 			
-			if (startTime + cooperative.getMinOperationTime() > endTime) {
-				log.warn("Already increased the time of operation by one time slot in order to meet the minimum time of operation criteria of " + cooperative.getMinOperationTime());
+			if (startTime + operator.getMinOperationTime() > endTime) {
+				log.warn("Already increased the time of operation by one time slot in order to meet the minimum time of operation criteria of " + operator.getMinOperationTime());
 				log.warn("Start time is: " + startTime);
 				log.warn("End time is: " + endTime);
 				log.warn("Will continue anyway...");
 			}
 			
-			TransitStopFacility stop1 = cooperative.getRouteProvider().getRandomTransitStop(cooperative.getCurrentIteration());
-			TransitStopFacility stop2 = cooperative.getRouteProvider().getRandomTransitStop(cooperative.getCurrentIteration());
+			TransitStopFacility stop1 = operator.getRouteProvider().getRandomTransitStop(operator.getCurrentIteration());
+			TransitStopFacility stop2 = operator.getRouteProvider().getRandomTransitStop(operator.getCurrentIteration());
 
 			while (CoordUtils.calcDistance(stop1.getCoord(), stop2.getCoord()) < this.minInitialStopDistance) {
-				stop2 = cooperative.getRouteProvider().getRandomTransitStop(cooperative.getCurrentIteration());
+				stop2 = operator.getRouteProvider().getRandomTransitStop(operator.getCurrentIteration());
 			}
 			
 			ArrayList<TransitStopFacility> stopsToBeServed = new ArrayList<TransitStopFacility>();
 			stopsToBeServed.add(stop1);
 			stopsToBeServed.add(stop2);
 			
-			newPlan = new PPlan(cooperative.getNewRouteId(), this.getName());
+			newPlan = new PPlan(operator.getNewPlanId(), this.getName());
 			newPlan.setStopsToBeServed(stopsToBeServed);
 			newPlan.setStartTime(startTime);
 			newPlan.setEndTime(endTime);
 			newPlan.setNVehicles(1);
 			newPlan.setStopsToBeServed(stopsToBeServed);
 			
-			newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan));
+			newPlan.setLine(operator.getRouteProvider().createTransitLine(operator.getId(), newPlan));
 
-		} while (cooperative.getFranchise().planRejected(newPlan) && triesPerformed < this.maxNumberOfTries);		
+		} while (operator.getFranchise().planRejected(newPlan) && triesPerformed < this.maxNumberOfTries);		
 
 		if(!(triesPerformed < this.maxNumberOfTries)){
-			log.warn("Exceeded the maximum number of tries (" + this.maxNumberOfTries + ") to find a new plan for operator " + cooperative.getId() + ". Returning null");
+			log.warn("Exceeded the maximum number of tries (" + this.maxNumberOfTries + ") to find a new plan for operator " + operator.getId() + ". Returning null");
 			return null;
 		}
 		

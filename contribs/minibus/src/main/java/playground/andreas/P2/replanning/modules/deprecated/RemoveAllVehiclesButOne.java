@@ -51,7 +51,7 @@ public class RemoveAllVehiclesButOne extends AbstractPStrategyModule {
 		// profitable route, change startTime
 		PPlan oldPlan = cooperative.getBestPlan();
 		
-		PPlan newPlan = new PPlan(cooperative.getNewRouteId(), this.getName());
+		PPlan newPlan = new PPlan(cooperative.getNewPlanId(), this.getName());
 		newPlan.setNVehicles(oldPlan.getNVehicles());
 		newPlan.setStopsToBeServed(oldPlan.getStopsToBeServed());
 		newPlan.setStartTime(oldPlan.getStartTime());

@@ -156,10 +156,10 @@ public abstract class AbstractOperator implements Operator{
 		return this.id;
 	}
 	
-	public Id getNewRouteId() {
-		Id routeId = new IdImpl(this.currentIteration + "_" + numberOfPlansTried);
+	public Id<PPlan> getNewPlanId() {
+		Id<PPlan> planId = Id.create(this.currentIteration + "_" + numberOfPlansTried, PPlan.class);
 		this.numberOfPlansTried++;
-		return routeId;
+		return planId;
 	}
 	
 	public PFranchise getFranchise(){

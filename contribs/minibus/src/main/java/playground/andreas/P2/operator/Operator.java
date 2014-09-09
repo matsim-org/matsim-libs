@@ -62,7 +62,7 @@ public interface Operator {
 
 	public Id<Operator> getId();
 	
-	public Id getNewRouteId();
+	public Id<PPlan> getNewPlanId();
 
 	public PPlan getBestPlan();
 	

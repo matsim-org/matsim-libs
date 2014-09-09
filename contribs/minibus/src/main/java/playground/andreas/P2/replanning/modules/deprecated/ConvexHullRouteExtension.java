@@ -85,7 +85,7 @@ public class ConvexHullRouteExtension extends AbstractPStrategyModule {
 		}else{
 			// create a new plan 
 			PPlan oldPlan = cooperative.getBestPlan();
-			PPlan newPlan = new PPlan(cooperative.getNewRouteId(), this.getName());
+			PPlan newPlan = new PPlan(cooperative.getNewPlanId(), this.getName());
 			newPlan.setNVehicles(1);
 			newPlan.setStartTime(oldPlan.getStartTime());
 			newPlan.setEndTime(oldPlan.getEndTime());

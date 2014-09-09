@@ -28,7 +28,6 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -39,6 +38,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.operator.Operator;
@@ -55,17 +55,17 @@ import playground.andreas.P2.routeProvider.PRouteProvider;
 public class CreateOperatorFromTransitSchedule implements PStrategy{
 	
 	private final static Logger log = Logger.getLogger(CreateOperatorFromTransitSchedule.class);
-	public static final String STRATEGY_NAME = "CreateCooperativeFromSchedule";
+	public static final String STRATEGY_NAME = "CreateOperatorFromSchedule";
 
-	private OperatorFactory cooperativeFactory;
+	private OperatorFactory operatorFactory;
 	private PRouteProvider routeProvider;
 	private PConfigGroup pConfig;
 	private LinkedHashMap<String, TransitStopFacility> originalStops;
 	
-	private LinkedHashMap<Id<Operator>, PPlan> lineId2PlanMap = new LinkedHashMap<>();
+	private LinkedHashMap<Id<Operator>, PPlan> operatorId2PlanMap = new LinkedHashMap<>();
 
-	public CreateOperatorFromTransitSchedule(OperatorFactory cooperativeFactory, PRouteProvider routeProvider, PConfigGroup pConfig, TransitSchedule originalSchedule) {
-		this.cooperativeFactory = cooperativeFactory;
+	public CreateOperatorFromTransitSchedule(OperatorFactory operatorFactory, PRouteProvider routeProvider, PConfigGroup pConfig, TransitSchedule originalSchedule) {
+		this.operatorFactory = operatorFactory;
 		this.routeProvider = routeProvider;
 		this.pConfig = pConfig;
 		
@@ -76,36 +76,36 @@ public class CreateOperatorFromTransitSchedule implements PStrategy{
 	}
 
 	public LinkedList<Operator> run() {
-		LinkedList<Operator> coopsToReturn = new LinkedList<Operator>();
+		LinkedList<Operator> operatorsToReturn = new LinkedList<Operator>();
 		
 		if (pConfig.getTransitScheduleToStartWith() != null) {
 			TransitSchedule tS = readTransitSchedule(pConfig.getTransitScheduleToStartWith());
 
 			for (Entry<Id<TransitLine>, TransitLine> lineEntry : tS.getTransitLines().entrySet()) {
-				Operator coop = this.cooperativeFactory.createNewOperator(new IdImpl(this.pConfig.getPIdentifier() + lineEntry.getKey()));
+				Operator operator = this.operatorFactory.createNewOperator(Id.create(this.pConfig.getPIdentifier() + lineEntry.getKey(), Operator.class));
 
 				PPlan plan = createPlan(lineEntry.getValue());
-				this.lineId2PlanMap.put(coop.getId(), plan);			
+				this.operatorId2PlanMap.put(operator.getId(), plan);			
 
 				double initialBudget = this.pConfig.getInitialBudget() % pConfig.getPricePerVehicleBought();			
-				coop.init(this.routeProvider, this, 0, initialBudget);
-				coopsToReturn.add(coop);
+				operator.init(this.routeProvider, this, 0, initialBudget);
+				operatorsToReturn.add(operator);
 			}
 		}
 		
-		this.lineId2PlanMap = null;
-		log.info("Returning " + coopsToReturn.size() + " cooperative created from transit schedule file " + pConfig.getTransitScheduleToStartWith());
-		return coopsToReturn;
+		this.operatorId2PlanMap = null;
+		log.info("Returning " + operatorsToReturn.size() + " operators created from transit schedule file " + pConfig.getTransitScheduleToStartWith());
+		return operatorsToReturn;
 	}
 
 	private PPlan createPlan(TransitLine line) {
-		Id id = new IdImpl(0);
+		Id<PPlan> id = Id.create(0, PPlan.class);
 		TransitRoute longestRouteH = null;
 		TransitRoute longestRouteR = null;
 		
 		double startTime = Double.MAX_VALUE;
 		double endTime = Double.MIN_VALUE;
-		Set<Id> vehicleIds = new TreeSet<Id>();
+		Set<Id<Vehicle>> vehicleIds = new TreeSet<>();
 		
 		for (TransitRoute route : line.getRoutes().values()) {
 			if(route.getId().toString().endsWith(".H")){
@@ -205,9 +205,9 @@ public class CreateOperatorFromTransitSchedule implements PStrategy{
 
 
 	@Override
-	public PPlan run(Operator cooperative) {
-		PPlan newPlan = this.lineId2PlanMap.get(cooperative.getId());		
-		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan));
+	public PPlan run(Operator operator) {
+		PPlan newPlan = this.operatorId2PlanMap.get(operator.getId());		
+		newPlan.setLine(operator.getRouteProvider().createTransitLine(operator.getId(), newPlan));
 		return newPlan;
 	}
 

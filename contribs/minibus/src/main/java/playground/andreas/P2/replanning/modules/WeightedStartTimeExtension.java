@@ -57,7 +57,7 @@ public class WeightedStartTimeExtension extends AbstractPStrategyModule {
 	@Override
 	public PPlan run(Operator cooperative) {
 		// change startTime
-		PPlan newPlan = new PPlan(cooperative.getNewRouteId(), this.getName());
+		PPlan newPlan = new PPlan(cooperative.getNewPlanId(), this.getName());
 		newPlan.setNVehicles(1);
 		newPlan.setStopsToBeServed(cooperative.getBestPlan().getStopsToBeServed());
 		

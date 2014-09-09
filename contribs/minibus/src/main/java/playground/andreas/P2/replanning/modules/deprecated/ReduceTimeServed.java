@@ -87,7 +87,7 @@ public class ReduceTimeServed extends AbstractPStrategyModule implements Transit
 		}
 		
 		// profitable route, change startTime
-		PPlan newPlan = new PPlan(cooperative.getNewRouteId(), this.getName());
+		PPlan newPlan = new PPlan(cooperative.getNewPlanId(), this.getName());
 		newPlan.setNVehicles(1);
 		newPlan.setStopsToBeServed(cooperative.getBestPlan().getStopsToBeServed());
 		

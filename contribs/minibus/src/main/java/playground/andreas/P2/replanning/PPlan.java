@@ -42,7 +42,7 @@ public class PPlan implements Comparable<PPlan>{
 	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(PPlan.class);
 	
-	private final Id planId;
+	private final Id<PPlan> planId;
 	private final String creator;
 
 	private TransitLine line;
@@ -57,7 +57,7 @@ public class PPlan implements Comparable<PPlan>{
 
 	private Set<Id> vehicleIds;
 	
-	public PPlan(Id planId, String creator) {
+	public PPlan(Id<PPlan> planId, String creator) {
 		this.planId = planId;
 		this.creator = creator;
 	}
@@ -93,7 +93,7 @@ public class PPlan implements Comparable<PPlan>{
 		return  sB.toString();
 	}
 
-	public Id getId() {
+	public Id<PPlan> getId() {
 		return this.planId;
 	}
 	
