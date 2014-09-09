@@ -15,7 +15,7 @@ xml:lang="en">
   <xs:complexType>
     <xs:sequence>
       <xs:element name="vehicleType" type="vehicleTypeType" minOccurs="1" maxOccurs="unbounded" />
-      <xs:element name="vehicle" type="vehicleDefType" minOccurs="1" maxOccurs="unbounded" />
+      <xs:element name="vehicle" type="vehicleDefType" minOccurs="0" maxOccurs="unbounded" />
     </xs:sequence>
   </xs:complexType>
 </xs:element>
