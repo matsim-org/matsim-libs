@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityOption;
@@ -49,7 +50,7 @@ import playground.ivt.utils.MapUtils.Factory;
  */
 public class BeingTogetherScoring {
 	private final Id ego;
-	private final Set<Id> alters;
+	private final Set<Id<Person>> alters;
 
 	private final ActivityFacilities facilities;
 
@@ -76,7 +77,7 @@ public class BeingTogetherScoring {
 			final ActivityFacilities facilities,
 			final double marginalUtilityOfTime,
 			final Id ego,
-			final Collection<Id> alters) {
+			final Collection<Id<Person>> alters) {
 		this( facilities,
 				Double.NEGATIVE_INFINITY,
 				Double.POSITIVE_INFINITY,
@@ -91,7 +92,7 @@ public class BeingTogetherScoring {
 			final double endActiveWindow,
 			final double marginalUtilityOfTime,
 			final Id ego,
-			final Collection<Id> alters) {
+			final Collection<Id<Person>> alters) {
 		this( facilities,
 				startActiveWindow,
 				endActiveWindow,
@@ -108,7 +109,7 @@ public class BeingTogetherScoring {
 			final Filter modeFilter,
 			final double marginalUtilityOfTime,
 			final Id ego,
-			final Collection<Id> alters) {
+			final Collection<Id<Person>> alters) {
 		this( facilities,
 				Double.NEGATIVE_INFINITY,
 				Double.POSITIVE_INFINITY,
@@ -125,7 +126,7 @@ public class BeingTogetherScoring {
 			final Filter modeFilter,
 			final PersonOverlapScorer scorer,
 			final Id ego,
-			final Collection<Id> alters) {
+			final Collection<Id<Person>> alters) {
 		this( facilities,
 				Double.NEGATIVE_INFINITY,
 				Double.POSITIVE_INFINITY,
@@ -145,7 +146,7 @@ public class BeingTogetherScoring {
 			final Filter modeFilter,
 			final double marginalUtilityOfTime,
 			final Id ego,
-			final Collection<Id> alters) {
+			final Collection<Id<Person>> alters) {
 		this(
 			facilities,
 			startActiveWindow,
@@ -165,14 +166,14 @@ public class BeingTogetherScoring {
 			final Filter modeFilter,
 			final PersonOverlapScorer overlapScorer,
 			final Id ego,
-			final Collection<Id> alters) {
+			final Collection<Id<Person>> alters) {
 		this.facilities = facilities;
 		this.actTypeFilter = actTypeFilter;
 		this.modeFilter = modeFilter;
 		this.activeTimeWindow = new Interval( startActiveWindow , endActiveWindow );
 		this.overlapScorer = overlapScorer;
 		this.ego = ego;
-		this.alters = Collections.unmodifiableSet( new HashSet<Id>( alters ) );
+		this.alters = Collections.unmodifiableSet( new HashSet<Id<Person>>( alters ) );
 	}
 
 	// /////////////////////////////////////////////////////////////////////////

@@ -63,6 +63,7 @@ public class ControlerListenerAgenda implements StartupListener, IterationStarts
 
 	//Methods
 	//@Override
+	@Override
 	public void notifyStartup(StartupEvent event) {
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(event.getControler().getNetwork());
 		NetworkImpl net = NetworkImpl.createNetwork();
@@ -71,7 +72,7 @@ public class ControlerListenerAgenda implements StartupListener, IterationStarts
 		filter.filter(net, modes);
 		for(ActivityFacility facility:((ScenarioImpl)event.getControler().getScenario()).getActivityFacilities().getFacilities().values())
 			((ActivityFacilityImpl)facility).setLinkId(net.getNearestLinkExactly(facility.getCoord()).getId());
-		Map<Id, ? extends Person> persons = event.getControler().getPopulation().getPersons();
+		Map<Id<Person>, ? extends Person> persons = event.getControler().getPopulation().getPersons();
 		Collection<Person> toBeAdded = new ArrayList<Person>();
 		for(Person person: persons.values())
 			toBeAdded.add(BasePersonImpl.convertToBasePerson((PersonImpl) person));

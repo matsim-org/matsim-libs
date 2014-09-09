@@ -27,9 +27,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.misc.Counter;
 
 import playground.thibautd.socnetsim.population.SocialNetwork;
@@ -41,7 +41,7 @@ public class LockedSocialNetwork implements SocialNetwork {
 	private static final Logger log =
 		Logger.getLogger(LockedSocialNetwork.class);
 
-	private final Map<Id, Set<Id>> alterEgoMap;
+	private final Map<Id, Set<Id<Person>>> alterEgoMap;
 	private final boolean failOnUnknownEgo;
 	private boolean locked = false;
 	
@@ -51,10 +51,10 @@ public class LockedSocialNetwork implements SocialNetwork {
 	// mainly to simplify writing tests
 	public LockedSocialNetwork( final boolean failOnUnknownEgo ) {
 		this( failOnUnknownEgo,
-				new LinkedHashMap<Id, Set<Id>>() );
+				new LinkedHashMap<Id, Set<Id<Person>>>() );
 	}
 
-	private LockedSocialNetwork( final boolean failOnUnknownEgo , final Map<Id, Set<Id>> map ) {
+	private LockedSocialNetwork( final boolean failOnUnknownEgo , final Map<Id, Set<Id<Person>>> map ) {
 		this.failOnUnknownEgo = failOnUnknownEgo;
 		this.alterEgoMap = map;
 	}
@@ -62,7 +62,7 @@ public class LockedSocialNetwork implements SocialNetwork {
 	private LockedSocialNetwork(
 			final int initialCap,
 			final float loadFactor) {
-		this( true , new LinkedHashMap<Id, Set<Id>>( initialCap , loadFactor ) );
+		this( true , new LinkedHashMap<Id, Set<Id<Person>>>( initialCap , loadFactor ) );
 	}
 
 	public LockedSocialNetwork() {
@@ -75,7 +75,7 @@ public class LockedSocialNetwork implements SocialNetwork {
 
 	public LockedSocialNetwork(final LockedSocialNetwork toCopy) {
 		this( toCopy.failOnUnknownEgo,
-			new LinkedHashMap<Id, Set<Id>>( toCopy.alterEgoMap ) );
+			new LinkedHashMap<Id, Set<Id<Person>>>( toCopy.alterEgoMap ) );
 	}
 
 	public LockedSocialNetwork(final Collection<? extends Identifiable> egos) {
@@ -113,21 +113,21 @@ public class LockedSocialNetwork implements SocialNetwork {
 	public void addEgo(final Id id) {
 		if ( locked ) throw new IllegalStateException();
 		if ( !alterEgoMap.containsKey( id ) ) {
-			alterEgoMap.put( id , new HashSet<Id>() );
+			alterEgoMap.put( id , new HashSet<Id<Person>>() );
 		}
 	}
 
 	private void addAlter(
 			final Id ego,
-			final Id alter) {
+			final Id<Person> alter) {
 		if ( locked ) throw new IllegalStateException();
-		Set<Id> alters = alterEgoMap.get( ego );
+		Set<Id<Person>> alters = alterEgoMap.get( ego );
 
 		if ( alters == null ) {
 			if (failOnUnknownEgo) {
 				throw new IllegalArgumentException( "ego "+ego+" is unknown" );
 			}
-			alters = new HashSet<Id>();
+			alters = new HashSet<Id<Person>>();
 			alterEgoMap.put( ego , alters );
 		}
 
@@ -135,12 +135,12 @@ public class LockedSocialNetwork implements SocialNetwork {
 	}
 
 	@Override
-	public Set<Id> getAlters(final Id ego) {
-		final Set<Id> alters = alterEgoMap.get( ego );
+	public Set<Id<Person>> getAlters(final Id ego) {
+		final Set<Id<Person>> alters = alterEgoMap.get( ego );
 
 		return alters != null ?
 			Collections.unmodifiableSet( alters ) :
-			Collections.<Id>emptySet();
+			Collections.<Id<Person>>emptySet();
 	}
 
 	@Override
@@ -165,11 +165,11 @@ public class LockedSocialNetwork implements SocialNetwork {
 		secondaryNetwork.addEgos( getEgos() );
 
 		for ( Id ego : getEgos() ) {
-			final Set<Id> alters = getAlters( ego );
+			final Set<Id<Person>> alters = getAlters( ego );
 			counter.incCounter();
 
 			for ( Id alter : alters ) {
-				final Set<Id> altersOfAlter = getAlters( alter );
+				final Set<Id<Person>> altersOfAlter = getAlters( alter );
 				
 				for ( Id alterOfAlter : altersOfAlter ) {
 					// is the ego?
@@ -197,7 +197,7 @@ public class LockedSocialNetwork implements SocialNetwork {
 	}
 
 	@Override
-	public Map<Id, Set<Id>> getMapRepresentation() {
+	public Map<Id, Set<Id<Person>>> getMapRepresentation() {
 		throw new UnsupportedOperationException();
 	}
 

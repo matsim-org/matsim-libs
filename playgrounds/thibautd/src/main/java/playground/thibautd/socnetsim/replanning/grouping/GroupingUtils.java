@@ -59,7 +59,7 @@ public class GroupingUtils {
 		}
 
 		final Map<Id, Set<Id>> jpTies = getJointPlanLinks( groupPlans );
-		final Map<Id, Set<Id>> subnet =
+		final Map<Id, Set<Id<Person>>> subnet =
 			SocialNetworkUtils.getSubnetwork(
 					socialNetwork,
 					planPerPerson.keySet() );
@@ -105,7 +105,7 @@ public class GroupingUtils {
 			final SocialNetwork socialNetwork) {
 
 		final Map<Id, Set<Id>> jpTies = getJointPlanNetwork( population , jointPlans );
-		final Map<Id, Set<Id>> netmap = new LinkedHashMap<Id, Set<Id>>( socialNetwork.getMapRepresentation() );
+		final Map<Id, Set<Id<Person>>> netmap = new LinkedHashMap<>( socialNetwork.getMapRepresentation() );
 
 		final Collection<ReplanningGroup> groups = new ArrayList<ReplanningGroup>();
 		while ( !netmap.isEmpty() ) {
@@ -149,7 +149,7 @@ public class GroupingUtils {
 	private static Set<Id> getRandomGroup(
 			final Random random,
 			final double probActivationTie,
-			final Map<Id, Set<Id>> subnet,
+			final Map<Id, Set<Id<Person>>> subnet,
 			final double probBreakingJointPlan,
 			final Map<Id, Set<Id>> jpTies) {
 		final Set<Id> group = new LinkedHashSet<Id>();
@@ -159,7 +159,7 @@ public class GroupingUtils {
 
 		while ( !egoStack.isEmpty() ) {
 			final Id ego = egoStack.remove();
-			final Set<Id> alters = subnet.remove( ego );
+			final Set<Id<Person>> alters = subnet.remove( ego );
 			if ( alters == null ) continue;
 			group.add( ego );
 

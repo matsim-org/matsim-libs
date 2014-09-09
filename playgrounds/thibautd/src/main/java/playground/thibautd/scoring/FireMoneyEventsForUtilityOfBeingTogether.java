@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.internal.HasPersonId;
@@ -128,7 +129,7 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 	private <T extends Event & HasPersonId> void transmitEventToRelevantPersons( final T event ) {
 		final Id ego = event.getPersonId();
 		if ( !socialNetwork.getEgos().contains( ego ) ) return;
-		for ( Id id : cat( ego , socialNetwork.getAlters( ego ) ) ) {
+		for ( Id<Person> id : cat( ego , socialNetwork.getAlters( ego ) ) ) {
 			final Id finalId = id;
 			final BeingTogetherScoring scoring =
 				MapUtils.getArbitraryObject(
@@ -150,8 +151,8 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 		}
 	}
 
-	private Iterable<Id> cat(final Id ego, final Set<Id> alters) {
-		final Set<Id> ids = new HashSet<Id>( alters );
+	private Iterable<Id<Person>> cat(final Id ego, final Set<Id<Person>> alters) {
+		final Set<Id<Person>> ids = new HashSet<>( alters );
 		ids.add( ego );
 		return ids;
 	}

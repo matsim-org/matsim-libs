@@ -226,7 +226,6 @@ public class Matsim2030Utils {
 			final Scenario scenario,
 			final Coord center,
 			final double radius) {
-		// TODO Auto-generated method stub
 		final Map<Id, Link> areaOfInterest = new HashMap<Id, Link>();
 
 		for (Link link : scenario.getNetwork().getLinks().values()) {
@@ -237,7 +236,7 @@ public class Matsim2030Utils {
 			}
 		}
 
-		final Set<Id> idsToKeep = new HashSet<Id>();
+		final Set<Id<Person>> idsToKeep = new HashSet<>();
 		final PersonIntersectAreaFilter filter =
 			new PersonIntersectAreaFilter(
 					new PersonAlgorithm() {
@@ -253,10 +252,10 @@ public class Matsim2030Utils {
 		filter.run( scenario.getPopulation() );
 
 		// XXX this should actually not be allowed. Should we add a remove method to population?
-		final Iterator<Id> it = scenario.getPopulation().getPersons().keySet().iterator();
+		final Iterator<Id<Person>> it = scenario.getPopulation().getPersons().keySet().iterator();
 		final int initialSize = scenario.getPopulation().getPersons().size();
 		while ( it.hasNext() ) {
-			final Id current = it.next();
+			final Id<Person> current = it.next();
 			if ( !idsToKeep.contains( current ) ) {
 				it.remove();
 				scenario.getPopulation().getPersonAttributes().removeAllAttributes( current.toString() );

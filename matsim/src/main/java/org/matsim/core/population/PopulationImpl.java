@@ -20,6 +20,10 @@
 
 package org.matsim.core.population;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -28,10 +32,6 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.utils.objectattributes.ObjectAttributes;
-
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * Root class of the population description (previously also called "plans file")
@@ -47,7 +47,7 @@ public final class PopulationImpl implements Population {
 	private long nextMsg = 1;
 	private boolean isStreaming = false;
 	
-	private Map<Id, PersonImpl> persons = new LinkedHashMap<Id, PersonImpl>();
+	private Map<Id<Person>, PersonImpl> persons = new LinkedHashMap<Id<Person>, PersonImpl>();
 
 	// algorithms over plans
 	private final ArrayList<PersonAlgorithm> personAlgos = new ArrayList<PersonAlgorithm>();
@@ -140,7 +140,7 @@ public final class PopulationImpl implements Population {
 
 
 	@Override
-	public final Map<Id, ? extends Person> getPersons() {
+	public final Map<Id<Person>, ? extends Person> getPersons() {
 		return persons ;
 	}
 

@@ -21,13 +21,13 @@ package playground.thibautd.socnetsim.analysis.scripts;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-
 import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -63,7 +63,7 @@ public class ConvertSocialNetworkToGDF {
 			final Map<Id, Coord> coords,
 			final BufferedWriter writer) throws IOException {
 		writer.write( "nodedef>name VARCHAR,x DOUBLE,y DOUBLE" );
-		for ( Id ego : sn.getEgos() ) {
+		for ( Id<Person> ego : sn.getEgos() ) {
 			final Coord c = coords.get( ego );
 			writer.newLine();
 			writer.write( ego+","+c.getX()+","+c.getY() );
@@ -75,7 +75,7 @@ public class ConvertSocialNetworkToGDF {
 			final BufferedWriter writer) throws IOException {
 		writer.newLine();
 		writer.write( "edgedef>node1 VARCHAR,node2 VARCHAR" );
-		for ( Map.Entry<Id, Set<Id>> e : sn.getMapRepresentation().entrySet() ) {
+		for ( Map.Entry<Id, Set<Id<Person>>> e : sn.getMapRepresentation().entrySet() ) {
 			for ( Id alter : e.getValue() ) {
 				writer.newLine();
 				writer.write( e.getKey()+","+alter );

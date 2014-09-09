@@ -33,11 +33,9 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.XY2Links;
 
@@ -115,9 +113,8 @@ public class MyPlanMerger {
 		mpr.parse(baseFile);
 		nr.parse(networkFile);
 		log.info("Successfully created the base scenario with plans and network.");
-		this.xy2Links = new XY2Links((ScenarioImpl) sc);
-		for(Id id : sc.getPopulation().getPersons().keySet()){
-			Person p = sc.getPopulation().getPersons().get(id);
+		this.xy2Links = new XY2Links(sc);
+		for(Person p : sc.getPopulation().getPersons().values()){
 			this.xy2Links.run(p.getSelectedPlan());
 		}
 	}
@@ -138,9 +135,9 @@ public class MyPlanMerger {
 		MatsimPopulationReader mprAdd = new MatsimPopulationReader(scAdd);
 		
 		mprAdd.parse(addFile);
-		Map<Id, ? extends Person> peopleToAdd = scAdd.getPopulation().getPersons();
-		for (Id idToAdd : peopleToAdd.keySet()) {
-			Person p = pf.createPerson(new IdImpl(nextId));
+		Map<Id<Person>, ? extends Person> peopleToAdd = scAdd.getPopulation().getPersons();
+		for (Id<Person> idToAdd : peopleToAdd.keySet()) {
+			Person p = pf.createPerson(Id.create(nextId, Person.class));
 			Plan plan = peopleToAdd.get(idToAdd).getSelectedPlan();
 			this.xy2Links.run(plan);
 			p.addPlan(plan);

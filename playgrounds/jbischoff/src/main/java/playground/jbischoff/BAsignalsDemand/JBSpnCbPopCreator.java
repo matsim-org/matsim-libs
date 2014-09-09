@@ -15,7 +15,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -111,11 +110,11 @@ public class JBSpnCbPopCreator implements Runnable {
 
 	@Override
 	public void run() {
-		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		population = scenario.getPopulation();
 		
-		scenariocb = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenariospn = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		scenariocb = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		scenariospn = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		spnfbpopulation = scenariospn.getPopulation();
 		cbfbpopulation = scenariocb.getPopulation();
 		
@@ -136,10 +135,10 @@ public class JBSpnCbPopCreator implements Runnable {
 		System.out.println("cbs ");
 		double scale = 0.05;
 		do {
-			Scenario fanscen = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+			Scenario fanscen = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			Population fanpop = fanscen.getPopulation();
 			//CB
-			Map<Id,Person> cbpersons = (Map<Id, Person>) cbfbpopulation.getPersons(); 
+			Map<Id<Person>,Person> cbpersons = (Map<Id<Person>, Person>) cbfbpopulation.getPersons(); 
 
 			for (int pc = 1; pc<=cbpersons.size()*scale;pc++){
 				boolean b = true;
@@ -156,7 +155,7 @@ public class JBSpnCbPopCreator implements Runnable {
 				} while (b);
 			}
 			//SPN
-			Map<Id,Person> spnpersons = (Map<Id, Person>) this.spnfbpopulation.getPersons(); 
+			Map<Id<Person>,Person> spnpersons = (Map<Id<Person>, Person>) this.spnfbpopulation.getPersons(); 
 			for (double pc = 1.0; pc<=spnpersons.size()*scale;pc++){
 				boolean b = true;
 				do {

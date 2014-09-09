@@ -23,17 +23,13 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-
-import playground.staheale.preprocess.TakeSamplePopulation;
 
 public class AdvancedPopulationGenerator {
 
@@ -62,7 +58,7 @@ public class AdvancedPopulationGenerator {
 	}
 
 	public void run(String[] args) throws Exception {
-		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population mz_population = sc.getPopulation();
 
 		//////////////////////////////////////////////////////////////////////
@@ -428,15 +424,15 @@ public class AdvancedPopulationGenerator {
 	}
 
 	public static void removePersonsWithWeekendPlan(Population population) {
-		final Map<Id, ? extends Person> persons = population.getPersons();
-		ArrayList<Id> toRemove = new ArrayList<Id>(persons.size());
+		final Map<Id<Person>, ? extends Person> persons = population.getPersons();
+		ArrayList<Id<Person>> toRemove = new ArrayList<>(persons.size());
 
-		for (Id id : persons.keySet()) {
+		for (Id<Person> id : persons.keySet()) {
 			if(weekendList.contains(id))
 				toRemove.add(id);
 		}
 
-		for (Id id : toRemove)
+		for (Id<Person> id : toRemove)
 			persons.remove(id);
 
 		log.info("Removed " + toRemove.size() + " persons with weekend plan.");

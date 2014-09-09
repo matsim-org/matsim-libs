@@ -19,6 +19,8 @@
 
 package playground.mmoyo.taste_variations;
 
+import java.util.Map.Entry;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -30,8 +32,6 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import playground.mmoyo.io.TextFileWriter;
 
@@ -118,7 +118,7 @@ public class CadytsUtlCorrectionsCollecter implements IterationEndsListener{
 			sBuff.append("\twWALK\twTIME\twDIST\twCHNG");
 			
 			//fill data data
-			for(Entry<Id, ? extends Person> entry: pop.getPersons().entrySet()) {
+			for(Entry<Id<Person>, ? extends Person> entry: pop.getPersons().entrySet()) {
 				String strId = entry.getKey().toString() ;
 				Person person = entry.getValue();				
 				

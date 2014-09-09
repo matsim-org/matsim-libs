@@ -20,11 +20,11 @@
 
 package playground.wrashid.PSF2.chargingSchemes;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
 import org.matsim.core.basic.v01.IdImpl;
 
@@ -36,13 +36,13 @@ import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 public class ChargingFleetInitializer implements FleetInitializer {
 
 	@Override
-	public LinkedListValueHashMap<Id, Vehicle> getVehicles(Set<Id> personIds, EnergyStateMaintainer energyStateMaintainer) {
+	public LinkedListValueHashMap<Id, Vehicle> getVehicles(Set<Id<Person>> personIds, EnergyStateMaintainer energyStateMaintainer) {
 		LinkedListValueHashMap<Id, Vehicle> result = new LinkedListValueHashMap<Id, Vehicle>();
 
-		Iterator<Id> iter = personIds.iterator();
+		Iterator<Id<Person>> iter = personIds.iterator();
 
 		while (iter.hasNext()) {
-			Id personId = iter.next();
+			Id<Person> personId = iter.next();
 
 			PlugInHybridElectricVehicle phev = getInitializedPHEV(energyStateMaintainer);
 

@@ -72,8 +72,8 @@ public class PlanValidator {
 	private void detectDiffTypePlans(final Population population){
 		final String WARNING = "Different type of initial and last activity of agent: ";
 		int dif =0;
-		for(Entry<Id, ? extends Person> entry: population.getPersons().entrySet() ){
-			Id id = entry.getKey();
+		for(Entry<Id<Person>, ? extends Person> entry: population.getPersons().entrySet() ){
+			Id<Person> id = entry.getKey();
 			PersonImpl value = (PersonImpl)entry.getValue();
 			for (Plan plan: value.getPlans()){
 				if(!hasSameActType (plan)){

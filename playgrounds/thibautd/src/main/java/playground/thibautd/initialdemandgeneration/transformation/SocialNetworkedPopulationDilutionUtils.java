@@ -26,14 +26,13 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -81,7 +80,7 @@ public class SocialNetworkedPopulationDilutionUtils {
 			final Coord center,
 			final double radius ) {
 		log.info( "Start dilution with center "+center+" and radius "+radius );
-		final Set<Id> personsToKeep = new HashSet<Id>();
+		final Set<Id<Person>> personsToKeep = new HashSet<>();
 		fillSetWithIntersectingPersons(
 				personsToKeep,
 				scenario,
@@ -90,7 +89,7 @@ public class SocialNetworkedPopulationDilutionUtils {
 		fillSetWithAltersOfSet(
 				personsToKeep,
 				scenario );
-		final Collection<Id> pruned =
+		final Collection<Id<Person>> pruned =
 			prunePopulation(
 				scenario,
 				personsToKeep );
@@ -109,7 +108,7 @@ public class SocialNetworkedPopulationDilutionUtils {
 			final Coord center,
 			final double radius ) {
 		log.info( "Start dilution with center "+center+" and radius "+radius );
-		final Set<Id> personsToKeep = new HashSet<Id>();
+		final Set<Id<Person>> personsToKeep = new HashSet<>();
 		fillSetWithIntersectingPersons(
 				personsToKeep,
 				scenario,
@@ -118,7 +117,7 @@ public class SocialNetworkedPopulationDilutionUtils {
 		fillSetWithLeisureAltersOfSet(
 				personsToKeep,
 				scenario );
-		final Collection<Id> pruned =
+		final Collection<Id<Person>> pruned =
 			prunePopulation(
 				scenario,
 				personsToKeep );
@@ -135,13 +134,13 @@ public class SocialNetworkedPopulationDilutionUtils {
 			final Coord center,
 			final double radius ) {
 		log.info( "Start dilution with center "+center+" and radius "+radius );
-		final Set<Id> personsToKeep = new HashSet<Id>();
+		final Set<Id<Person>> personsToKeep = new HashSet<>();
 		fillSetWithIntersectingPersons(
 				personsToKeep,
 				scenario,
 				center,
 				radius );
-		final Collection<Id> pruned =
+		final Collection<Id<Person>> pruned =
 			prunePopulation(
 				scenario,
 				personsToKeep );
@@ -150,7 +149,7 @@ public class SocialNetworkedPopulationDilutionUtils {
 	}
 
 	private static void pruneSocialNetwork(
-			final Collection<Id> toPrune,
+			final Collection<Id<Person>> toPrune,
 			final Scenario scenario) {
 		final SocialNetworkImpl sn = (SocialNetworkImpl)
 			scenario.getScenarioElement( SocialNetwork.ELEMENT_NAME );
@@ -164,19 +163,19 @@ public class SocialNetworkedPopulationDilutionUtils {
 		log.info( sn.getEgos().size()+" egos remaining." );
 	}
 
-	private static Collection<Id> prunePopulation(
+	private static Collection<Id<Person>> prunePopulation(
 			final Scenario scenario,
-			final Set<Id> personsToKeep) {
+			final Set<Id<Person>> personsToKeep) {
 		final Population population = scenario.getPopulation();
 		log.info( "Actual pruning of the population begins." );
 		log.info( "Population size: "+population.getPersons().size() );
 		log.info( "Remaining persons to keep: "+personsToKeep.size() );
 
 		// XXX this is not guaranteed to remain feasible...
-		final Iterator<Id> popit = population.getPersons().keySet().iterator();
-		final Collection<Id> pruned = new ArrayList<Id>();
+		final Iterator<Id<Person>> popit = population.getPersons().keySet().iterator();
+		final Collection<Id<Person>> pruned = new ArrayList<>();
 		while ( popit.hasNext() ) {
-			final Id curr = popit.next();
+			final Id<Person> curr = popit.next();
 			if ( !personsToKeep.remove( curr ) ) {
 				popit.remove();
 				pruned.add( curr );
@@ -192,7 +191,7 @@ public class SocialNetworkedPopulationDilutionUtils {
 	}
 
 	private static void fillSetWithAltersOfSet(
-			final Set<Id> personsToKeep,
+			final Set<Id<Person>> personsToKeep,
 			final Scenario scenario) {
 		log.info( "Search for alters of identified persons" ); 
 
@@ -200,8 +199,8 @@ public class SocialNetworkedPopulationDilutionUtils {
 			scenario.getScenarioElement( SocialNetwork.ELEMENT_NAME );
 		if ( !sn.isReflective() ) throw new IllegalArgumentException( "results undefined with unreflexive network." );
 
-		final Collection<Id> alters = new ArrayList<Id>();
-		for ( Id ego : personsToKeep ) alters.addAll( sn.getAlters( ego ) );
+		final Collection<Id<Person>> alters = new ArrayList<>();
+		for ( Id<Person> ego : personsToKeep ) alters.addAll( sn.getAlters( ego ) );
 
 		personsToKeep.addAll( alters );
 
@@ -210,7 +209,7 @@ public class SocialNetworkedPopulationDilutionUtils {
 	}
 
 	private static void fillSetWithLeisureAltersOfSet(
-			final Set<Id> personsToKeep,
+			final Set<Id<Person>> personsToKeep,
 			final Scenario scenario) {
 		log.info( "Search for LEISURE alters of identified persons" ); 
 
@@ -218,13 +217,13 @@ public class SocialNetworkedPopulationDilutionUtils {
 			scenario.getScenarioElement( SocialNetwork.ELEMENT_NAME );
 		if ( !sn.isReflective() ) throw new IllegalArgumentException( "results undefined with unreflexive network." );
 
-		final Set<Id> withLeisure = identifyAgentsWithLeisure( scenario );
+		final Set<Id<Person>> withLeisure = identifyAgentsWithLeisure( scenario );
 
-		final Collection<Id> alters = new ArrayList<Id>();
-		for ( Id ego : personsToKeep ) {
+		final Collection<Id<Person>> alters = new ArrayList<>();
+		for ( Id<Person> ego : personsToKeep ) {
 			if ( !withLeisure.contains( ego ) ) continue; // only consider ties potentially activated
 
-			for ( Id alter : sn.getAlters( ego ) ) {
+			for ( Id<Person> alter : sn.getAlters( ego ) ) {
 				if ( !withLeisure.contains( alter ) ) continue; // only consider ties potentially activated
 				alters.add( alter );
 			}
@@ -236,8 +235,8 @@ public class SocialNetworkedPopulationDilutionUtils {
 		log.info( personsToKeep.size()+" agents identified in total over "+scenario.getPopulation().getPersons().size() );
 	}
 
-	private static Set<Id> identifyAgentsWithLeisure(final Scenario scenario) {
-		final Set<Id> agents = new HashSet<Id>();
+	private static Set<Id<Person>> identifyAgentsWithLeisure(final Scenario scenario) {
+		final Set<Id<Person>> agents = new HashSet<>();
 		for ( Person person : scenario.getPopulation().getPersons().values() ) {
 			final Plan plan = person.getSelectedPlan();
 			assert plan != null : person.getId();
@@ -255,7 +254,7 @@ public class SocialNetworkedPopulationDilutionUtils {
 	}
 
 	private static void fillSetWithIntersectingPersons(
-			final Set<Id> personsToKeep,
+			final Set<Id<Person>> personsToKeep,
 			final Scenario scenario,
 			final Coord center,
 			final double radius) {

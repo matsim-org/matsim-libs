@@ -20,6 +20,9 @@
 
 package playground.mmoyo.utils;
 
+import java.util.List;
+import java.util.Set;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -31,11 +34,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioImpl;
+
 import playground.mmoyo.algorithms.PopulationSecFilter;
 import playground.mmoyo.io.PopSecReader;
-
-import java.util.List;
-import java.util.Set;
 
 public class RouteDiversityVizComparer {
 
@@ -104,7 +105,7 @@ public class RouteDiversityVizComparer {
 		configWriter.write(outConfig);
 		
 		//set all objects to null, the OTFVis may need that memory space
-		Set<Id> personsIds = newPop.getPersons().keySet();
+		Set<Id<Person>> personsIds = newPop.getPersons().keySet();
 		pop= null;
 		dataLoader = null;
 		net= null;

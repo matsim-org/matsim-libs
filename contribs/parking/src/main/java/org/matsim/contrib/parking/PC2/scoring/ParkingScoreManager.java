@@ -18,8 +18,6 @@
  * *********************************************************************** */
 package org.matsim.contrib.parking.PC2.scoring;
 
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
@@ -31,12 +29,9 @@ import org.matsim.contrib.parking.PC2.infrastructure.Parking;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.utils.objectattributes.ObjectAttributes;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 public class ParkingScoreManager {
 
@@ -55,7 +50,7 @@ public class ParkingScoreManager {
 	}
 
 	public double calcWalkScore(Coord destCoord, Parking parking, Id personId, double parkingDurationInSeconds) {
-		Map<Id, ? extends Person> persons = controler.getPopulation().getPersons();
+		Map<Id<Person>, ? extends Person> persons = controler.getPopulation().getPersons();
 		PersonImpl person = (PersonImpl) persons.get(personId);
 
 		double parkingWalkBeta = getParkingBetas().getParkingWalkBeta(person, parkingDurationInSeconds);
@@ -80,7 +75,7 @@ public class ParkingScoreManager {
 	}
 
 	public double calcCostScore(double arrivalTime, double parkingDurationInSeconds, Parking parking, Id personId) {
-		Map<Id, ? extends Person> persons = controler.getPopulation().getPersons();
+		Map<Id<Person>, ? extends Person> persons = controler.getPopulation().getPersons();
 		PersonImpl person = (PersonImpl) persons.get(personId);
 		double parkingCostBeta = getParkingBetas().getParkingCostBeta(person);
 

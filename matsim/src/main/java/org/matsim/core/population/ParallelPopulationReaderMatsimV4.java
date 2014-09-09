@@ -243,7 +243,7 @@ public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 		}
 
 		@Override
-		public Map<Id, ? extends Person> getPersons() {
+		public Map<Id<Person>, ? extends Person> getPersons() {
 			throw new RuntimeException("Calls to this method are not expected to happen...");
 		}
 

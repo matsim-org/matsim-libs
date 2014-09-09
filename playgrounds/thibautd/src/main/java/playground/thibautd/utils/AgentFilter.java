@@ -56,7 +56,7 @@ public class AgentFilter {
 		(new MatsimPopulationReader(scenario)).readFile(fileName);
 		Population population = scenario.getPopulation();
 
-		Map<Id, ? extends Person> persons = population.getPersons();
+		Map<Id<Person>, ? extends Person> persons = population.getPersons();
 		Map<Id, Person> personsToKeep = new HashMap<Id, Person>(toGet.length);
 
 		for (Id id : toGetIds) {

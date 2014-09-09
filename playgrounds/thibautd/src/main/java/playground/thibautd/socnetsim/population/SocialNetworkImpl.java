@@ -27,8 +27,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.misc.Counter;
 
 /**
@@ -39,7 +39,7 @@ public class SocialNetworkImpl implements SocialNetwork {
 		Logger.getLogger(SocialNetworkImpl.class);
 
 	private final Counter tieCounter = new Counter( "SocialNetwork: (Monodirectional) Tie # " );
-	private final Map<Id, Set<Id>> map = new HashMap<Id, Set<Id>>();
+	private final Map<Id, Set<Id<Person>>> map = new HashMap<Id, Set<Id<Person>>>();
 
 	private final boolean isReflective;
 
@@ -51,8 +51,8 @@ public class SocialNetworkImpl implements SocialNetwork {
 
 	public SocialNetworkImpl(final SocialNetwork socialNetwork) {
 		this( socialNetwork.isReflective() );
-		for ( Id ego : socialNetwork.getEgos() ) {
-			for ( Id alter : socialNetwork.getAlters( ego ) ) {
+		for ( Id<Person> ego : socialNetwork.getEgos() ) {
+			for ( Id<Person> alter : socialNetwork.getAlters( ego ) ) {
 				addTieInternal( ego , alter );
 			}
 		}
@@ -69,28 +69,19 @@ public class SocialNetworkImpl implements SocialNetwork {
 		this.isReflective = isReflective;
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.thibautd.socnetsim.population.SocialNetworkI#addEgo(org.matsim.api.core.v01.Id)
-	 */
 	@Override
 	public void addEgo(final Id id) {
-		final Set<Id> alters = map.put( id , new HashSet<Id>() );
+		final Set<Id<Person>> alters = map.put( id , new HashSet<Id<Person>>() );
 		if ( alters != null ) {
 			throw new IllegalStateException( "network already contains ego "+id );
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.thibautd.socnetsim.population.SocialNetworkI#addEgos(java.lang.Iterable)
-	 */
 	@Override
 	public void addEgos( final Iterable<? extends Id> ids ) {
 		for ( Id id : ids ) addEgo( id );
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.thibautd.socnetsim.population.SocialNetworkI#addBidirectionalTie(org.matsim.api.core.v01.Id, org.matsim.api.core.v01.Id)
-	 */
 	@Override
 	public void addBidirectionalTie(final Id id1, final Id id2) {
 		addTieInternal( id1 , id2 );
@@ -102,9 +93,6 @@ public class SocialNetworkImpl implements SocialNetwork {
 		removeTieInternal( id2 , id1 );
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.thibautd.socnetsim.population.SocialNetworkI#addMonodirectionalTie(org.matsim.api.core.v01.Id, org.matsim.api.core.v01.Id)
-	 */
 	@Override
 	public void addMonodirectionalTie(
 			final Id ego,
@@ -127,7 +115,7 @@ public class SocialNetworkImpl implements SocialNetwork {
 	private void addTieInternal(
 			final Id ego,
 			final Id alter) {
-		final Set<Id> alters = map.get( ego );
+		final Set<Id<Person>> alters = map.get( ego );
 		if ( alters == null ) throw new IllegalArgumentException(  "ego "+ego+" unknown" );
 		final boolean added = alters.add( alter );
 		if ( added ) tieCounter.incCounter();
@@ -136,35 +124,26 @@ public class SocialNetworkImpl implements SocialNetwork {
 	private void removeTieInternal(
 			final Id ego,
 			final Id alter) {
-		final Set<Id> alters = map.get( ego );
+		final Set<Id<Person>> alters = map.get( ego );
 		if ( alters == null ) throw new IllegalArgumentException(  "ego "+ego+" unknown" );
 		final boolean rem = alters.remove( alter );
 		if ( !rem ) throw new RuntimeException( alter+" not alter of ego "+ego );
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.thibautd.socnetsim.population.SocialNetworkI#getAlters(org.matsim.api.core.v01.Id)
-	 */
 	@Override
-	public Set<Id> getAlters(final Id ego) {
-		final Set<Id> alters = map.get( ego );
+	public Set<Id<Person>> getAlters(final Id ego) {
+		final Set<Id<Person>> alters = map.get( ego );
 		if ( alters == null ) throw new IllegalArgumentException( "unknown ego "+ego );
 		return Collections.unmodifiableSet( alters );
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.thibautd.socnetsim.population.SocialNetworkI#getEgos()
-	 */
 	@Override
 	public Set<Id> getEgos() {
 		return Collections.unmodifiableSet( map.keySet() );
 	}
 
-	/* (non-Javadoc)
-	 * @see playground.thibautd.socnetsim.population.SocialNetworkI#getMapRepresentation()
-	 */
 	@Override
-	public Map<Id, Set<Id>> getMapRepresentation() {
+	public Map<Id, Set<Id<Person>>> getMapRepresentation() {
 		return Collections.unmodifiableMap( map );
 	}
 
@@ -190,11 +169,11 @@ public class SocialNetworkImpl implements SocialNetwork {
 	public void removeEgo(final Id ego) {
 		if ( !isReflective() ) throw new IllegalStateException( "Cannot remove an ego in a non reflective network." );
 
-		final Set<Id> alters = map.remove( ego );
+		final Set<Id<Person>> alters = map.remove( ego );
 
 		// this requires the network to be reflective to be correct.
-		for ( Id alter : alters ) {
-			final Set<Id> altersOfAlter = map.get( alter );
+		for ( Id<Person> alter : alters ) {
+			final Set<Id<Person>> altersOfAlter = map.get( alter );
 			altersOfAlter.remove( ego );
 		}
 	}

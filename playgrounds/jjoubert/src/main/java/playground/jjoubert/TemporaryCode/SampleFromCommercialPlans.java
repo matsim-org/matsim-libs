@@ -32,13 +32,11 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.population.algorithms.XY2Links;
 
 public class SampleFromCommercialPlans {
@@ -88,7 +86,7 @@ public class SampleFromCommercialPlans {
 		// Network.
 		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sNew);
 		nr.parse(networkFile);
-		XY2Links xy = new XY2Links((NetworkImpl) sNew.getNetwork());
+		XY2Links xy = new XY2Links(sNew.getNetwork());
 
 		int id = Integer.parseInt(firstId);
 		
@@ -110,14 +108,14 @@ public class SampleFromCommercialPlans {
 			// Pick
 			int rList = (int) Math.round(r.nextDouble()*9);
 			
-			List<Id> agentIds = new ArrayList<Id>();
-			Set<Id> Ids = listSc.get(rList).getPopulation().getPersons().keySet();
-			for (Id id2 : Ids) {
+			List<Id<Person>> agentIds = new ArrayList<>();
+			Set<Id<Person>> Ids = listSc.get(rList).getPopulation().getPersons().keySet();
+			for (Id<Person> id2 : Ids) {
 				agentIds.add(id2);
 			}
 			int rId = (int) Math.floor(r.nextDouble()*agentIds.size());
 			
-			Person p = pf.createPerson(new IdImpl(id));
+			Person p = pf.createPerson(Id.create(id, Person.class));
 			Plan plan = listSc.get(rList).getPopulation().getPersons().get(agentIds.get(rId)).getSelectedPlan();
 			xy.run(plan);
 			p.addPlan(plan);
@@ -128,8 +126,8 @@ public class SampleFromCommercialPlans {
 		log.info("Created " + counter + " commercial vehicles (Done)");
 		
 		// Check that no Ids are duplicated.
-		List<Id> listIds = new ArrayList<Id>();
-		for(Id i : sNew.getPopulation().getPersons().keySet()){
+		List<Id<Person>> listIds = new ArrayList<>();
+		for(Id<Person> i : sNew.getPopulation().getPersons().keySet()){
 			if(listIds.contains(i)){
 				log.error("The Id " + i.toString() + " already exists!");
 			} else{

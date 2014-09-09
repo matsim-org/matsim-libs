@@ -35,8 +35,8 @@ import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
 import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
-import org.matsim.contrib.parking.lib.obj.Pair;
 import org.matsim.contrib.parking.lib.obj.Matrix;
+import org.matsim.contrib.parking.lib.obj.Pair;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 
@@ -554,7 +554,7 @@ public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 
 	@Override
 	public void printShareOfCarUsers() {
-		Map<Id, ? extends Person> persons = controler.getPopulation().getPersons();
+		Map<Id<Person>, ? extends Person> persons = controler.getPopulation().getPersons();
 		int numberOfPerson = persons.size();
 		int numberOfCarUsers = 0;
 		for (Person person : persons.values()) {

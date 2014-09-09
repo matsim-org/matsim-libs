@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 
 public interface SocialNetwork {
 
@@ -44,11 +45,11 @@ public interface SocialNetwork {
 
 	public void addMonodirectionalTie(Id ego, Id alter);
 
-	public Set<Id> getAlters(Id ego);
+	public Set<Id<Person>> getAlters(Id ego);
 
 	public Set<Id> getEgos();
 
-	public Map<Id, Set<Id>> getMapRepresentation();
+	public Map<Id, Set<Id<Person>>> getMapRepresentation();
 
 	public boolean isReflective();
 

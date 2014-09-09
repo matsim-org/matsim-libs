@@ -124,7 +124,7 @@ public class VrpLauncherUtils
 
     public static void convertLegModes(List<String> passengerIds, String mode, Scenario scenario)
     {
-        Map<Id, ? extends Person> persons = scenario.getPopulation().getPersons();
+        Map<Id<Person>, ? extends Person> persons = scenario.getPopulation().getPersons();
 
         for (String id : passengerIds) {
             Person person = persons.get(Id.create(id, Person.class));
@@ -140,7 +140,7 @@ public class VrpLauncherUtils
 
     public static void removeNonPassengers(String mode, Scenario scenario)
     {
-        Map<Id, ? extends Person> persons = scenario.getPopulation().getPersons();
+        Map<Id<Person>, ? extends Person> persons = scenario.getPopulation().getPersons();
         Iterator<? extends Person> personIter = persons.values().iterator();
 
         while (personIter.hasNext()) {

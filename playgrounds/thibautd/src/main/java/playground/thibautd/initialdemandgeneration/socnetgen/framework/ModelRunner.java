@@ -28,8 +28,8 @@ import java.util.Random;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.misc.Counter;
 
 /**
@@ -206,7 +206,7 @@ public class ModelRunner<T extends Agent> {
 			final T ego,
 			final LockedSocialNetwork network,
 			final Map<Id, T> remainingAgents) {
-		final Set<Id> allSecondary = network.getNetworkOfUnknownFriendsOfFriends().getAlters( ego.getId() );
+		final Set<Id<Person>> allSecondary = network.getNetworkOfUnknownFriendsOfFriends().getAlters( ego.getId() );
 		final List<T> list = new ArrayList<T>( allSecondary.size() );
 
 		for ( Id alterOfAlter : allSecondary ) {

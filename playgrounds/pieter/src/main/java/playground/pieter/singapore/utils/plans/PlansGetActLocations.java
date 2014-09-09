@@ -1,8 +1,14 @@
 package playground.pieter.singapore.utils.plans;
 
+import java.io.File;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Iterator;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
@@ -12,13 +18,9 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+
 import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;
-
-import java.io.File;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Iterator;
 
 public class PlansGetActLocations {
 	public void run(Population plans, DataBaseAdmin dba, String tableName) {
@@ -30,9 +32,9 @@ public class PlansGetActLocations {
 			dba.executeStatement("create table "
 					+ tableName
 					+ "(full_pop_pid varchar(45),facility_id varchar(45), activity varchar(45)) ");
-			Iterator<Id> pid_it = plans.getPersons().keySet().iterator();
+			Iterator<Id<Person>> pid_it = plans.getPersons().keySet().iterator();
 			while (pid_it.hasNext()) {
-				Id personId = pid_it.next();
+				Id<Person> personId = pid_it.next();
 				PersonImpl person = (PersonImpl) plans.getPersons().get(
 						personId);
 

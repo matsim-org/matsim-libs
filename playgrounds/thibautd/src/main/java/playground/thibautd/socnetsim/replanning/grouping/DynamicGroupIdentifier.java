@@ -31,12 +31,11 @@ import java.util.Random;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.gbl.MatsimRandom;
 
 import playground.thibautd.socnetsim.population.JointPlan;
@@ -139,12 +138,12 @@ public class DynamicGroupIdentifier implements GroupIdentifier {
 			final Set<Id> allowedPersonIds) {
 		final List<Id> groupAlters = new ArrayList<Id>();
 
-		final Set<Id> groupIds = new HashSet<Id>( g.getPersons().size() * 2 );
+		final Set<Id<Person>> groupIds = new HashSet<>( g.getPersons().size() * 2 );
 		for ( Person p : g.getPersons() ) groupIds.add( p.getId() );
 
 		for ( Person p : g.getPersons() ) {
-			final Set<Id> alters = socialNetwork.getAlters( p.getId() );
-			for ( Id alter : alters ) {
+			final Set<Id<Person>> alters = socialNetwork.getAlters( p.getId() );
+			for ( Id<Person> alter : alters ) {
 				// group alters are agents which are not in the group but alters
 				// of a member of the group.
 				// Alters are added several times if they are alters of several egos

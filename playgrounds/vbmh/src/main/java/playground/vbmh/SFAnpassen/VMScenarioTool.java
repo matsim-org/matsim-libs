@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
@@ -19,7 +18,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
@@ -27,7 +25,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.households.Household;
 
 import playground.vbmh.vmEV.EV;
 import playground.vbmh.vmEV.EVList;
@@ -102,8 +99,8 @@ public class VMScenarioTool {
 		Random zufall = new Random();
 		int i = 0;
 		double wkeit = anzahl_agents/scenario.getPopulation().getPersons().size();
-		Map<Id, ? extends Person> personMap = scenario.getPopulation().getPersons();
-		LinkedList <Id> personsNotUsed = new LinkedList <Id>();
+		Map<Id<Person>, ? extends Person> personMap = scenario.getPopulation().getPersons();
+		LinkedList <Id<Person>> personsNotUsed = new LinkedList <Id<Person>>();
 		for (Person p : scenario.getPopulation().getPersons().values()) {
 			PersonImpl pa = (PersonImpl) p;
 			System.out.println(pa.getCarAvail());

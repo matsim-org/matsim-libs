@@ -4,10 +4,7 @@ import java.util.Iterator;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.population.LegImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 
@@ -21,10 +18,10 @@ public class PlansExtractSingleMode {
 		System.out.println("    running " + this.getClass().getName()
 				+ " algorithm...");
 		
-		Iterator<Id> pid_it = plans.getPersons().keySet().iterator();
+		Iterator<Id<Person>> pid_it = plans.getPersons().keySet().iterator();
 		int countCarPlans = 0;
 		while (pid_it.hasNext()) {
-			Id personId = pid_it.next();
+			Id<Person> personId = pid_it.next();
 			PersonImpl person = (PersonImpl) plans.getPersons().get(personId);
 
 			for (int i = person.getPlans().size() - 1; i >= 0; i--) {

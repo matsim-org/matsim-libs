@@ -27,9 +27,9 @@ import java.util.Set;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -83,8 +83,8 @@ public class SocialNetworkIOTest {
 		final Counter c = new Counter( "Test alters of ego # " );
 		for ( Id ego : output.getEgos() ) {
 			c.incCounter();
-			final Set<Id> expectedAlters = output.getAlters( ego );
-			final Set<Id> actualAlters = input.getAlters( ego );
+			final Set<Id<Person>> expectedAlters = output.getAlters( ego );
+			final Set<Id<Person>> actualAlters = input.getAlters( ego );
 
 			Assert.assertEquals(
 					"unexpected number of alters for ego "+ego,

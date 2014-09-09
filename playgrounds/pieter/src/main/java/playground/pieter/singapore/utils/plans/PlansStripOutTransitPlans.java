@@ -20,10 +20,10 @@ public class PlansStripOutTransitPlans {
 		System.out.println("    running " + this.getClass().getName()
 				+ " algorithm...");
 
-		TreeSet<Id> pid_set = new TreeSet<Id>(); // ids of persons to remove
-		Iterator<Id> pid_it = plans.getPersons().keySet().iterator();
+		TreeSet<Id<Person>> pid_set = new TreeSet<Id<Person>>(); // ids of persons to remove
+		Iterator<Id<Person>> pid_it = plans.getPersons().keySet().iterator();
 		while (pid_it.hasNext()) {
-			Id personId = pid_it.next();
+			Id<Person> personId = pid_it.next();
 			Person person = plans.getPersons().get(personId);
 
 			for (int i = person.getPlans().size() - 1; i >= 0; i--) {
@@ -58,7 +58,7 @@ public class PlansStripOutTransitPlans {
 		// okay, now remove in a 2nd step all persons we do no longer need
 		pid_it = pid_set.iterator();
 		while (pid_it.hasNext()) {
-			Id pid = pid_it.next();
+			Id<Person> pid = pid_it.next();
 			plans.getPersons().remove(pid);
 		}
 

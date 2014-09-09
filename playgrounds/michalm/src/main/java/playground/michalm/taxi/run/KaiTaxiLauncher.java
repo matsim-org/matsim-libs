@@ -22,8 +22,10 @@ package playground.michalm.taxi.run;
 import java.io.IOException;
 import java.util.Map;
 
-import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
 
 import playground.michalm.taxi.TaxiRequestCreator;
@@ -50,7 +52,7 @@ class KaiTaxiLauncher
 
     private static void setEndTimeForFirstActivities(Scenario scenario, double time)
     {
-        Map<Id, ? extends Person> persons = scenario.getPopulation().getPersons();
+        Map<Id<Person>, ? extends Person> persons = scenario.getPopulation().getPersons();
         for (Person p : persons.values()) {
             Activity activity = (Activity)p.getSelectedPlan().getPlanElements().get(0);
             activity.setEndTime(time);

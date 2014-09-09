@@ -8,14 +8,12 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.commons.collections.map.HashedMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -26,13 +24,10 @@ import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.mobsim.qsim.QSimFactory;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.pieter.pseudosimulation.util.CollectionUtils;
-import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTime;
 import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTimeCalculator;
-import playground.singapore.transitRouterEventsBased.waitTimes.WaitTime;
 import playground.singapore.transitRouterEventsBased.waitTimes.WaitTimeStuckCalculator;
 
 public class MasterControler implements AfterMobsimListener, ShutdownListener {
@@ -103,12 +98,12 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
 		matsimControler.setMobsimFactory(new QSimFactory());
 		int size = matsimControler.getScenario().getPopulation().getPersons()
 				.size();
-		Set<Id> ids = matsimControler.getScenario().getPopulation()
+		Set<Id<Person>> ids = matsimControler.getScenario().getPopulation()
 				.getPersons().keySet();
 		ServerSocket server = new ServerSocket(Integer.parseInt(args[1]));
 		int numSlaves = Integer.parseInt(args[2]);
 		slaves = new Slave[numSlaves];
-		List<Id>[] split = CollectionUtils.split(ids, numSlaves);
+		List<Id<Person>>[] split = CollectionUtils.split(ids, numSlaves);
 		for (int i = 0; i < numSlaves; i++) {
 			Socket s = server.accept();
 			slaves[i] = new Slave(s);

@@ -8,12 +8,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeSet;
 
-import org.apache.xalan.lib.sql.SQLQueryParser;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 
 import others.sergioo.util.dataBase.DataBaseAdmin;
@@ -58,14 +55,13 @@ public class PlanExtractorFix {
 			System.out.println("    running " + this.getClass().getName()
 					+ " algorithm...");
 
-			TreeSet<Id> pid_set = new TreeSet<Id>(); // ids of persons to remove
-			Iterator<Id> pid_it = plans.getPersons().keySet().iterator();
+			TreeSet<Id<Person>> pid_set = new TreeSet<>(); // ids of persons to remove
+			Iterator<Id<Person>> pid_it = plans.getPersons().keySet().iterator();
 			boolean removePerson = false;
 			while (pid_it.hasNext()) {
 				
-				Id personId = pid_it.next();
-				PersonImpl person = (PersonImpl) plans.getPersons().get(
-						personId);
+				Id<Person> personId = pid_it.next();
+				PersonImpl person = (PersonImpl) plans.getPersons().get(personId);
 
 				String assignedMode = person.getCarAvail().equals("always")?"car":"pt";
 				if(assignedMode.equals("car"))

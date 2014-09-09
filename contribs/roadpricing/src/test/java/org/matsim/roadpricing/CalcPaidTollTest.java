@@ -20,6 +20,8 @@
 
 package org.matsim.roadpricing;
 
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -39,8 +41,6 @@ import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
-
-import java.util.Map;
 
 /**
  * Tests that {@link CalcPaidToll} calculates the correct tolls
@@ -62,8 +62,8 @@ public class CalcPaidTollTest extends MatsimTestCase {
 		Id id4 = new IdImpl("4");
 		Id id5 = new IdImpl("5");
 
-		Map<Id, ? extends Person> referencePopulation = Fixture.createReferencePopulation1(config.planCalcScore()).getPersons();
-		Map<Id, ? extends Person> population = runTollSimulation(tollFile, "distance", config.planCalcScore()).getPersons();
+		Map<Id<Person>, ? extends Person> referencePopulation = Fixture.createReferencePopulation1(config.planCalcScore()).getPersons();
+		Map<Id<Person>, ? extends Person> population = runTollSimulation(tollFile, "distance", config.planCalcScore()).getPersons();
 
 		compareScores(
 				referencePopulation.get(id1).getPlans().get(0).getScore().doubleValue(),
@@ -100,8 +100,8 @@ public class CalcPaidTollTest extends MatsimTestCase {
 		Id id8 = new IdImpl("8");
 		Id id10 = new IdImpl("10");
 
-		Map<Id, ? extends Person> referencePopulation = Fixture.createReferencePopulation1(config.planCalcScore()).getPersons();
-		Map<Id, ? extends Person> population = runTollSimulation(tollFile, "area", config.planCalcScore()).getPersons();
+		Map<Id<Person>, ? extends Person> referencePopulation = Fixture.createReferencePopulation1(config.planCalcScore()).getPersons();
+		Map<Id<Person>, ? extends Person> population = runTollSimulation(tollFile, "area", config.planCalcScore()).getPersons();
 
 		compareScores(
 				referencePopulation.get(id1).getPlans().get(0).getScore().doubleValue(),
@@ -149,8 +149,8 @@ public class CalcPaidTollTest extends MatsimTestCase {
 		Id id7 = new IdImpl("7");
 		Id id8 = new IdImpl("8");
 
-		Map<Id, ? extends Person> referencePopulation = Fixture.createReferencePopulation1(config.planCalcScore()).getPersons();
-		Map<Id, ? extends Person> population = runTollSimulation(tollFile, "cordon", config.planCalcScore()).getPersons();
+		Map<Id<Person>, ? extends Person> referencePopulation = Fixture.createReferencePopulation1(config.planCalcScore()).getPersons();
+		Map<Id<Person>, ? extends Person> population = runTollSimulation(tollFile, "cordon", config.planCalcScore()).getPersons();
 
 		compareScores(
 				referencePopulation.get(id1).getPlans().get(0).getScore().doubleValue(),

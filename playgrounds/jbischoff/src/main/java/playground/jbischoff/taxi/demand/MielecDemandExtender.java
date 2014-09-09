@@ -19,19 +19,27 @@
 
 package playground.jbischoff.taxi.demand;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map.Entry;
+import java.util.Random;
+import java.util.TreeSet;
 
-import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.michalm.demand.*;
 import playground.michalm.demand.taxi.PersonCreatorWithRandomTaxiMode;
 
 
@@ -87,7 +95,7 @@ public class MielecDemandExtender
         currentPercentage++;
         for (; currentPercentage <= MAXIMUMDEMANDINPERCENT; currentPercentage++) {
             long amountOfPlans = Math
-                    .round( ( ((double)currentPercentage / 100.) * agentIds.size()));
+                    .round( ( (currentPercentage / 100.) * agentIds.size()));
             System.out.println(amountOfPlans);
             for (long i = customerIds.size(); i <= amountOfPlans; i++) {
                 addCustomer(r);
@@ -150,8 +158,8 @@ public class MielecDemandExtender
         new MatsimNetworkReader(sc).readFile(inputNetFile);
         new MatsimPopulationReader(sc).readFile(inputPlansFile);
         agentIds = new HashSet<Id>();
-        for (Entry<Id, ? extends Person> e : sc.getPopulation().getPersons().entrySet()) {
-            if (e.getKey().equals(sc.createId("1398")))
+        for (Entry<Id<Person>, ? extends Person> e : sc.getPopulation().getPersons().entrySet()) {
+            if (e.getKey().equals(Id.create("1398", Person.class)))
                 continue;
             Activity a = (Activity)e.getValue().getSelectedPlan().getPlanElements().get(0);
             Coord coorda = sc.getNetwork().getLinks().get(a.getLinkId()).getCoord();

@@ -38,7 +38,7 @@ public interface Population extends MatsimToplevelContainer {
 
 	public void setName(String name);
 
-	public Map<Id,? extends Person> getPersons();
+	public Map<Id<Person>,? extends Person> getPersons();
 
 	public void addPerson(final Person p);
 	

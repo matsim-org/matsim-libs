@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
@@ -49,7 +50,7 @@ public class BeingTogetherScoringTest {
 	@Test
 	public void testOvelapsOfActivities() throws Exception {
 		final Id ego = new IdImpl( "ego" );
-		final Id alter = new IdImpl( "alter" );
+		final Id<Person> alter = new IdImpl( "alter" );
 		
 		final Id linkId = new IdImpl( 1 );
 		final String type = "type";
@@ -87,7 +88,7 @@ public class BeingTogetherScoringTest {
 	@Test
 	public void testWrapAround() throws Exception {
 		final Id ego = new IdImpl( "ego" );
-		final Id alter = new IdImpl( "alter" );
+		final Id<Person> alter = new IdImpl( "alter" );
 		
 		final Id linkId = new IdImpl( 1 );
 		final String type = "type";
@@ -119,7 +120,7 @@ public class BeingTogetherScoringTest {
 	@Test
 	public void testWrapAroundAfter24h() throws Exception {
 		final Id ego = new IdImpl( "ego" );
-		final Id alter = new IdImpl( "alter" );
+		final Id<Person> alter = new IdImpl( "alter" );
 		
 		final Id linkId = new IdImpl( 1 );
 		final String type = "type";
@@ -151,7 +152,7 @@ public class BeingTogetherScoringTest {
 	@Test
 	public void testNoOverlapIfDifferentActTypes() throws Exception {
 		final Id ego = new IdImpl( "ego" );
-		final Id alter = new IdImpl( "alter" );
+		final Id<Person> alter = new IdImpl( "alter" );
 		
 		final Id linkId = new IdImpl( 1 );
 		final String type = "type";
@@ -184,7 +185,7 @@ public class BeingTogetherScoringTest {
 	@Test
 	public void testNoOverlapIfDifferentLocations() throws Exception {
 		final Id ego = new IdImpl( "ego" );
-		final Id alter = new IdImpl( "alter" );
+		final Id<Person> alter = new IdImpl( "alter" );
 		
 		final Id linkId = new IdImpl( 1 );
 		final Id linkId2 = new IdImpl( 2 );
@@ -217,7 +218,7 @@ public class BeingTogetherScoringTest {
 	@Test
 	public void testNoOverlapIfRejectedActivity() throws Exception {
 		final Id ego = new IdImpl( "ego" );
-		final Id alter = new IdImpl( "alter" );
+		final Id<Person> alter = new IdImpl( "alter" );
 		
 		final Id linkId = new IdImpl( 1 );
 		final String type = "type";
@@ -251,7 +252,7 @@ public class BeingTogetherScoringTest {
 	@Test
 	public void testNoOverlapIfPlanDoesNotComplete() throws Exception {
 		final Id ego = new IdImpl( "ego" );
-		final Id alter = new IdImpl( "alter" );
+		final Id<Person> alter = new IdImpl( "alter" );
 		
 		final Id linkId = new IdImpl( 1 );
 		final String type1 = "type1";
@@ -298,7 +299,7 @@ public class BeingTogetherScoringTest {
 	@Test
 	public void testNoOverlapIfWrongAgent() throws Exception {
 		final Id ego = new IdImpl( "ego" );
-		final Id alter = new IdImpl( "alter" );
+		final Id<Person> alter = new IdImpl( "alter" );
 		final Id other = new IdImpl( "tonny montana" );
 		
 		final Id linkId = new IdImpl( 1 );
@@ -333,7 +334,7 @@ public class BeingTogetherScoringTest {
 	@Test
 	public void testOvelapsOfLegs() throws Exception {
 		final Id ego = new IdImpl( "ego" );
-		final Id alter = new IdImpl( "alter" );
+		final Id<Person> alter = new IdImpl( "alter" );
 		
 		final Id vehId = new IdImpl( 1 );
 		
@@ -370,7 +371,7 @@ public class BeingTogetherScoringTest {
 	@Test
 	public void testNoOvelapIfDifferentVehicles() throws Exception {
 		final Id ego = new IdImpl( "ego" );
-		final Id alter = new IdImpl( "alter" );
+		final Id<Person> alter = new IdImpl( "alter" );
 		
 		final Id vehId = new IdImpl( 1 );
 		final Id vehId2 = new IdImpl( 2 );
@@ -408,7 +409,7 @@ public class BeingTogetherScoringTest {
 	@Test
 	public void testNoOvelapIfRejectedMode() throws Exception {
 		final Id ego = new IdImpl( "ego" );
-		final Id alter = new IdImpl( "alter" );
+		final Id<Person> alter = new IdImpl( "alter" );
 		
 		final Id vehId = new IdImpl( 1 );
 		
@@ -428,11 +429,11 @@ public class BeingTogetherScoringTest {
 						ego,
 						Collections.singleton( alter ) );
 			testee.handleEvent(
-					new PersonDepartureEvent(0, new IdImpl( 1 ), ego, "mode") );
+					new PersonDepartureEvent(0, ego, new IdImpl( 1 ), "mode") );
 			testee.handleEvent(
 					new PersonEntersVehicleEvent(os.startEgo, ego, vehId) );
 			testee.handleEvent(
-					new PersonDepartureEvent(0, new IdImpl( 1 ), alter, "mode") );
+					new PersonDepartureEvent(0, alter, new IdImpl( 1 ), "mode") );
 			testee.handleEvent(
 					new PersonEntersVehicleEvent(os.startAlter, alter, vehId) );
 			testee.handleEvent(
@@ -451,7 +452,7 @@ public class BeingTogetherScoringTest {
 	@Test
 	public void testOvelapsOfActivitiesInActiveTimeWindow() throws Exception {
 		final Id ego = new IdImpl( "ego" );
-		final Id alter = new IdImpl( "alter" );
+		final Id<Person> alter = new IdImpl( "alter" );
 		
 		final Id linkId = new IdImpl( 1 );
 		final String type = "type";
@@ -505,7 +506,7 @@ public class BeingTogetherScoringTest {
 	@Test
 	public void testOvelapsOfActivitiesWithOpeningTimes() {
 		final Id ego = new IdImpl( "ego" );
-		final Id alter = new IdImpl( "alter" );
+		final Id<Person> alter = new IdImpl( "alter" );
 		
 		final Id linkId = new IdImpl( 1 );
 		final String type = "type";
@@ -588,7 +589,7 @@ public class BeingTogetherScoringTest {
 	@Test
 	public void testOvelapsOfActivitiesWithUndefinedOpeningTime() {
 		final Id ego = new IdImpl( "ego" );
-		final Id alter = new IdImpl( "alter" );
+		final Id<Person> alter = new IdImpl( "alter" );
 		
 		final Id linkId = new IdImpl( 1 );
 		final String type = "type";

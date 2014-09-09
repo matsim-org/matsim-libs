@@ -44,11 +44,9 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -703,7 +701,7 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 						String sland = (String) wegeAttributes.getAttribute(wid,MZConstants.START_COUNTRY);
 						String zland = (String) wegeAttributes.getAttribute(wid,MZConstants.END_COUNTRY);
 						if((!sland.equals(MZConstants.SWISS_CODE) && !zland.equals(MZConstants.SWISS_CODE))){
-						elements.add((PlanElement) leg);
+						elements.add(leg);
 						if(act.getType().contains(MZConstants.AIRPORT)){
 							for(int j=i-1;j==0;j-=2){
 								PlanElement pel = plan.getPlanElements().get(j);
@@ -713,7 +711,7 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 							}
 							}
 						}
-						elements.add((PlanElement) act);
+						elements.add(act);
 						}
 						
 					}
@@ -878,10 +876,10 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 
 
 	public static void removePersonsWithoutPlan(Population population) {
-		final Map<Id, ? extends Person> persons = population.getPersons();
-		ArrayList<Id> toRemove = new ArrayList<Id>(persons.size());
+		final Map<Id<Person>, ? extends Person> persons = population.getPersons();
+		ArrayList<Id<Person>> toRemove = new ArrayList<>(persons.size());
 		
-		for (Id id : persons.keySet()) {
+		for (Id<Person> id : persons.keySet()) {
 			Person person = persons.get(id);
 			Plan plan = person.getSelectedPlan();
 
@@ -889,7 +887,7 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 				toRemove.add(id);
 		}
 
-		for (Id id : toRemove)
+		for (Id<Person> id : toRemove)
 			persons.remove(id);
 		
 		log.info("Removed " + toRemove.size() + " persons without plan.");

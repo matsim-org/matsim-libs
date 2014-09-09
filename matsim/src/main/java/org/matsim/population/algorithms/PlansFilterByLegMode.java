@@ -71,8 +71,8 @@ public class PlansFilterByLegMode {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 		String never = "never";
 
-		TreeSet<Id> pid_set = new TreeSet<Id>();	// ids of persons to remove
-		Iterator<Id> pid_it = plans.getPersons().keySet().iterator();
+		TreeSet<Id<Person>> pid_set = new TreeSet<>();	// ids of persons to remove
+		Iterator<Id<Person>> pid_it = plans.getPersons().keySet().iterator();
 		while (pid_it.hasNext()) {
 			Id personId = pid_it.next();
 			Person person = plans.getPersons().get(personId);

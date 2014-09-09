@@ -12,7 +12,6 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 
-import playground.vbmh.util.CSVWriter;
 import playground.vbmh.util.VMCharts;
 
 /**
@@ -134,7 +133,7 @@ public class ParkControlerListener implements StartupListener, IterationEndsList
 		
 		
 		//VM_Score_Keeper Zuruecksetzen:
-		Map<Id, ? extends Person> population = event.getControler().getPopulation().getPersons();
+		Map<Id<Person>, ? extends Person> population = event.getControler().getPopulation().getPersons();
 		for (Person person : population.values()){
 			//person.getCustomAttributes().put("VMScoreKeeper", null);
 			person.getCustomAttributes().remove("VMScoreKeeper");

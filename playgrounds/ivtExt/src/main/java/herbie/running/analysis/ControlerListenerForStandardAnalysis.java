@@ -1,9 +1,12 @@
 package herbie.running.analysis;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
-import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -12,23 +15,17 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.*;
-import org.matsim.core.controler.listener.*;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.ShutdownEvent;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.charts.XYLineChart;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.Counts;
-import org.matsim.counts.MatsimCountsReader;
-import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
-import org.matsim.counts.algorithms.CountSimComparisonTableWriter;
-import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
-import org.matsim.counts.algorithms.CountsHtmlAndGraphsWriter;
-import org.matsim.counts.algorithms.graphs.CountsErrorGraphCreator;
-import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraphCreator;
-import org.matsim.counts.algorithms.graphs.CountsSimReal24GraphCreator;
-import org.matsim.counts.algorithms.graphs.CountsSimRealPerHourGraphCreator;
 
 import utils.Bins;
 
@@ -216,9 +213,9 @@ public class ControlerListenerForStandardAnalysis implements StartupListener, It
 		
 		travelDistanceDistributionByMode = new TreeMap<String, Bins>();
 		
-		Map<Id, ? extends Person> persons = controler.getPopulation().getPersons();
+		Map<Id<Person>, ? extends Person> persons = controler.getPopulation().getPersons();
 		
-		for (Id id : persons.keySet()) {
+		for (Id<Person> id : persons.keySet()) {
 			run(persons.get(id).getSelectedPlan());
 		}
 	}

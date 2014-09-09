@@ -23,25 +23,20 @@ package playground.pieter.singapore.utils.plans;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.TreeSet;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import others.sergioo.util.dataBase.DataBaseAdmin;
@@ -80,10 +75,10 @@ public class PlansFilterNoRoute {
 			dba.executeStatement("drop table if exists unrouteable_plans;");
 			dba.executeStatement("create table unrouteable_plans (pid int default null, act varchar(45) default null, x_utm48n double default null, y_utm48n double default null);");
 
-			TreeSet<Id> pid_set = new TreeSet<Id>(); // ids of persons to remove
-			Iterator<Id> pid_it = plans.getPersons().keySet().iterator();
+			TreeSet<Id<Person>> pid_set = new TreeSet<>(); // ids of persons to remove
+			Iterator<Id<Person>> pid_it = plans.getPersons().keySet().iterator();
 			while (pid_it.hasNext()) {
-				Id personId = pid_it.next();
+				Id<Person> personId = pid_it.next();
 				Person person = plans.getPersons().get(personId);
 
 				for (int i = person.getPlans().size() - 1; i >= 0; i--) {

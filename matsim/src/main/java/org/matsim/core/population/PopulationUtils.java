@@ -20,24 +20,41 @@
 
 package org.matsim.core.population;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.population.routes.*;
+import org.matsim.core.population.routes.CompressedNetworkRouteFactory;
+import org.matsim.core.population.routes.LinkNetworkRouteFactory;
+import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteFactory;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.util.*;
 
 /**
  * @author nagel, ikaddoura
@@ -299,11 +316,11 @@ public final class PopulationUtils {
 	 */
 	@SuppressWarnings("unchecked")
 	public static void sortPersons(final Population population) {
-		Map<Id, Person> map = (Map<Id, Person>) population.getPersons();
+		Map<Id<Person>, Person> map = (Map<Id<Person>, Person>) population.getPersons();
 		
 		if (map instanceof SortedMap) return;
 		
-		Map<Id, Person> treeMap = new TreeMap<Id, Person>(map);
+		Map<Id<Person>, Person> treeMap = new TreeMap<>(map);
 		map.clear();
 		map.putAll(treeMap);
 	}
@@ -463,6 +480,7 @@ public final class PopulationUtils {
 			final PipedInputStream in = new PipedInputStream();
 			final PipedOutputStream out = new PipedOutputStream(in);
 			new Thread(new Runnable() {
+				@Override
 				public void run() {
 					final PopulationWriter writer = new PopulationWriter(s1);
 					try {

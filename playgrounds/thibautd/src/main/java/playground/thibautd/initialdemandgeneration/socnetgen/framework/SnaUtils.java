@@ -30,6 +30,7 @@ import java.util.Queue;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.utils.CollectionUtils;
@@ -45,12 +46,12 @@ public class SnaUtils {
 			final SocialNetwork socialNetwork) {
 		int nTriples = 0;
 		int nTriangles = 0;
-		for ( Id ego : socialNetwork.getEgos() ) {
-			final Set<Id> alterSet = socialNetwork.getAlters( ego );
-			final Id[] alters = alterSet.toArray( new Id[ alterSet.size() ] ); 
+		for ( Id<Person> ego : socialNetwork.getEgos() ) {
+			final Set<Id<Person>> alterSet = socialNetwork.getAlters( ego );
+			final Id<Person>[] alters = alterSet.toArray( new Id[ alterSet.size() ] ); 
 
 			for ( int alter1index = 0; alter1index < alters.length; alter1index++ ) {
-				final Set<Id> altersOfAlter1 = socialNetwork.getAlters( alters[ alter1index ] );
+				final Set<Id<Person>> altersOfAlter1 = socialNetwork.getAlters( alters[ alter1index ] );
 				for ( int alter2index = alter1index + 1; alter2index < alters.length; alter2index++ ) {
 					// this is a new triple
 					nTriples++;
@@ -84,26 +85,26 @@ public class SnaUtils {
 		if ( !sn.isReflective() ) {
 			throw new IllegalArgumentException( "the algorithm is valid only with reflective networks" );
 		}
-		final Map<Id, Set<Id>> altersMap = new LinkedHashMap<Id, Set<Id>>( sn.getMapRepresentation() );
+		final Map<Id, Set<Id<Person>>> altersMap = new LinkedHashMap<>( sn.getMapRepresentation() );
 		final Collection< Set<Id> > components = new ArrayList< Set<Id> >();
 	
 		while ( !altersMap.isEmpty() ) {
 			// DFS implemented as a loop (recursion results in a stackoverflow on
 			// big networks)
-			final Id seed = CollectionUtils.getElement( 0 , altersMap.keySet() );
+			final Id<Person> seed = CollectionUtils.getElement( 0 , altersMap.keySet() );
 	
 			final Set<Id> component = new HashSet<Id>();
 			components.add( component );
 			component.add( seed );
 	
-			final Queue<Id> stack = Collections.asLifoQueue( new ArrayDeque<Id>( altersMap.size() ) );
+			final Queue<Id<Person>> stack = Collections.asLifoQueue( new ArrayDeque<Id<Person>>( altersMap.size() ) );
 			stack.add( seed );
 	
 			while ( !stack.isEmpty() ) {
 				final Id current = stack.remove();
-				final Set<Id> alters = altersMap.remove( current );
+				final Set<Id<Person>> alters = altersMap.remove( current );
 	
-				for ( Id alter : alters ) {
+				for ( Id<Person> alter : alters ) {
 					if ( component.add( alter ) ) {
 						stack.add( alter );
 					}

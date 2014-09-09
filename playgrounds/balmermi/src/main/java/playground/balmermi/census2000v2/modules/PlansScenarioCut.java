@@ -69,8 +69,8 @@ public class PlansScenarioCut {
 
 	public final void run(Population plans) {
 		log.info("    running " + this.getClass().getName() + " module...");
-		Set<Id> removeids = new TreeSet<Id>();
-		Map<Id, ? extends Person> persons = plans.getPersons();
+		Set<Id<Person>> removeids = new TreeSet<>();
+		Map<Id<Person>, ? extends Person> persons = plans.getPersons();
 		for (Person p : persons.values()) {
 			Plan plan = p.getSelectedPlan();
 			for (int i=0; i<plan.getPlanElements().size(); i=i+2) {

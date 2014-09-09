@@ -16,7 +16,6 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -79,14 +78,14 @@ public class SlaveControler implements IterationStartsListener {
 	}
 
 	private void removeNonSimulatedAgents(List<String> idStrings) {
-		Set<Id> noIds = new HashSet<>(matsimControler.getPopulation().getPersons().keySet());
+		Set<Id<Person>> noIds = new HashSet<>(matsimControler.getPopulation().getPersons().keySet());
 		Set<String> noIdStrings = new HashSet<>();
-		for(Id id:noIds)
+		for(Id<Person> id:noIds)
 			noIdStrings.add(id.toString());
 		noIdStrings.removeAll(idStrings);
 		
 		for(String idString:noIdStrings){
-			matsimControler.getPopulation().getPersons().remove(new IdImpl(idString));
+			matsimControler.getPopulation().getPersons().remove(Id.create(idString, Person.class));
 		}
 		
 	}

@@ -24,9 +24,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.misc.Counter;
 
-import playground.thibautd.socnetsim.population.SocialNetworkUtils;
 import playground.thibautd.utils.CollectionUtils;
 
 /**
@@ -40,13 +40,13 @@ public final class SocialNetworkUtils {
 		final SocialNetwork secondaryNetwork = new SocialNetworkImpl( );
 
 		for ( Id ego : socialNetwork.getEgos() ) {
-			final Set<Id> alters = socialNetwork.getAlters( ego );
+			final Set<Id<Person>> alters = socialNetwork.getAlters( ego );
 			counter.incCounter();
 
-			for ( Id alter : alters ) {
-				final Set<Id> altersOfAlter = socialNetwork.getAlters( alter );
+			for ( Id<Person> alter : alters ) {
+				final Set<Id<Person>> altersOfAlter = socialNetwork.getAlters( alter );
 				
-				for ( Id alterOfAlter : altersOfAlter ) {
+				for ( Id<Person> alterOfAlter : altersOfAlter ) {
 					// is the ego?
 					if ( alterOfAlter.equals( ego ) ) continue;
 					// already a friend?
@@ -61,13 +61,13 @@ public final class SocialNetworkUtils {
 		return secondaryNetwork;
 	}
 
-	public static Map<Id, Set<Id>> getSubnetwork(
+	public static Map<Id, Set<Id<Person>>> getSubnetwork(
 			final SocialNetwork network,
 			final Set<Id> egos ) {
-		final Map<Id, Set<Id>> subnet = new LinkedHashMap<Id, Set<Id>>();
+		final Map<Id, Set<Id<Person>>> subnet = new LinkedHashMap<>();
 
 		for ( Id ego : egos ) {
-			final Set<Id> alters = network.getAlters( ego );
+			final Set<Id<Person>> alters = network.getAlters( ego );
 			subnet.put( ego , CollectionUtils.intersectSorted( egos , alters ) );
 		}
 

@@ -31,7 +31,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 
 public class FilteredPopulation implements Population {
 
-	Map<Id, Person> persons = new LinkedHashMap<Id, Person>();
+	Map<Id<Person>, Person> persons = new LinkedHashMap<>();
 	
 	@Override
 	public PopulationFactory getFactory() {
@@ -48,7 +48,7 @@ public class FilteredPopulation implements Population {
 	}
 
 	@Override
-	public Map<Id, ? extends Person> getPersons() {
+	public Map<Id<Person>, ? extends Person> getPersons() {
 		return this.persons;
 	}
 

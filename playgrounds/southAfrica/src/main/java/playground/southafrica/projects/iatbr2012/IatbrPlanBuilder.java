@@ -30,8 +30,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -230,10 +232,10 @@ public class IatbrPlanBuilder {
 		double workAtAmenityThreshold = 20;
 		double workAtShoppingThreshold = 500;
 		
-		List<Id> agentsToRemove = new ArrayList<Id>();
-		Iterator<Id> iterator = population.getPersons().keySet().iterator();
+		List<Id<Person>> agentsToRemove = new ArrayList<>();
+		Iterator<Id<Person>> iterator = population.getPersons().keySet().iterator();
 		while(iterator.hasNext()){
-			Id id = iterator.next();
+			Id<Person> id = iterator.next();
 			PersonImpl person = (PersonImpl) population.getPersons().get(id);
 			ActivityImpl firstActivity = ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(0));
 			ActivityImpl lastActivity = ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(person.getSelectedPlan().getPlanElements().size()-1));
@@ -243,7 +245,7 @@ public class IatbrPlanBuilder {
 				ActivityFacilityImpl home = null;
 				Coord closestBuilding = spot5QT.get(firstActivity.getCoord().getX(), firstActivity.getCoord().getY());
 				if(!facilityIdMap.containsKey(closestBuilding)){
-					Id newFacility = new IdImpl("spot_" + spotId++);
+					Id<ActivityFacility> newFacility = Id.create("spot_" + spotId++, ActivityFacility.class);
 					home = activityFacilities.createAndAddFacility(newFacility, closestBuilding);
 					home.createActivityOption("h");
 					/* This should not be necessary, but is inconsistent with other containers. */

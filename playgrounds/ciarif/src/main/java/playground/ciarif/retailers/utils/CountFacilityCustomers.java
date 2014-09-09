@@ -31,9 +31,9 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 
 public class CountFacilityCustomers {
 
-	private Map<Id,? extends Person> persons;
+	private Map<Id<Person>,? extends Person> persons;
 
-	public CountFacilityCustomers(Map<Id,? extends Person> persons) {
+	public CountFacilityCustomers(Map<Id<Person>,? extends Person> persons) {
 		this.persons=persons;
 	}
 

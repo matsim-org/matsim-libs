@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
@@ -31,9 +32,9 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
  * Parses a ObjectAttributes file with svd values and returns a tree map with them
  */
 public class SVDValuesAsObjAttrReader {
-	 private Set<Id> personIds;
+	 private Set<Id<Person>> personIds;
 	
-	public SVDValuesAsObjAttrReader(final Set<Id> personIds) {
+	public SVDValuesAsObjAttrReader(final Set<Id<Person>> personIds) {
 		this.personIds = personIds;
 	}
 	

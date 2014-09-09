@@ -3,17 +3,10 @@ package playground.pieter.pseudosimulation.controler.listeners;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ScoringEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.population.PersonImpl;
 
@@ -56,7 +49,7 @@ public class AfterScoringSelectedPlanScoreRestoreListener implements
 	private void restoreScores() {
 		HashMap<IdImpl, Double> nSASS = c
 				.getNonSimulatedAgentSelectedPlanScores();
-		Map<Id, ? extends Person> persons = c.getMATSimControler().getPopulation().getPersons();
+		Map<Id<Person>, ? extends Person> persons = c.getMATSimControler().getPopulation().getPersons();
 		// double selectedPlanScoreAvg = 0;
 		// int i = 0;
 		for (IdImpl id : nSASS.keySet()) {

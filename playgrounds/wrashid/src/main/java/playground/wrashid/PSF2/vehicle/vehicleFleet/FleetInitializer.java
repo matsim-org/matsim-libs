@@ -20,10 +20,10 @@
 
 package playground.wrashid.PSF2.vehicle.vehicleFleet;
 
-import java.util.HashMap;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
 
 import playground.wrashid.PSF2.vehicle.energyStateMaintainance.EnergyStateMaintainer;
@@ -36,6 +36,6 @@ public interface FleetInitializer {
 	 * @param energyStateMaintainer
 	 * @return
 	 */
-	public LinkedListValueHashMap<Id, Vehicle> getVehicles(Set<Id> personIds, EnergyStateMaintainer energyStateMaintainer);
+	public LinkedListValueHashMap<Id, Vehicle> getVehicles(Set<Id<Person>> personIds, EnergyStateMaintainer energyStateMaintainer);
 	
 }

@@ -431,8 +431,8 @@ public class Analyse implements Runnable {
 		
 		
 		for (int i = 0; i < populations.size(); i++) {
-			Map<Id, ? extends Person> temp = populations.get(i).getPersons();
-			for (Entry<Id, ? extends Person> entry : temp.entrySet()) {
+			Map<Id<Person>, ? extends Person> temp = populations.get(i).getPersons();
+			for (Entry<Id<Person>, ? extends Person> entry : temp.entrySet()) {
 				population.addPerson(entry.getValue());
 			}
 		}
