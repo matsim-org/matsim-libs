@@ -151,6 +151,7 @@ public class PlanCalcScoreConfigGroup extends Module {
 			ActivityParams actParams = getActivityTypeByNumber(key.substring(ACTIVITY_TYPE.length()), true);
 			
 			actParams.setActivityType(value);
+			this.removeParameterSet( actParams );
 			addActivityParams( actParams );
 		}
 		else if (key.startsWith(ACTIVITY_PRIORITY)) {
@@ -474,6 +475,7 @@ public class PlanCalcScoreConfigGroup extends Module {
 		return this.getActivityParamsPerType().get(actType);
 	}
 
+	@Override
 	public void addParameterSet( final Module set ) {
 		switch ( set.getName() ) {
 			case ActivityParams.SET_TYPE:
