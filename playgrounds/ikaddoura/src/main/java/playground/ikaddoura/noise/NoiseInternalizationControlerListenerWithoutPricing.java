@@ -110,8 +110,8 @@ public class NoiseInternalizationControlerListenerWithoutPricing implements Afte
 		
 		// apply the formula for calculating the cost shares of the links,
 		// use the saved data of the isolated immissions
-		log.info("calculateCostSharesPerLinkPerTimeInterval...");
-		tollHandler.calculateCostSharesPerLinkPerTimeInterval();
+//		log.info("calculateCostSharesPerLinkPerTimeInterval...");
+//		tollHandler.calculateCostSharesPerLinkPerTimeInterval();
 		log.info("calculateCostsPerVehiclePerLinkPerTimeInterval...");
 		tollHandler.calculateCostsPerVehiclePerLinkPerTimeInterval();
 		log.info("throwNoiseEvents...");
