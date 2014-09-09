@@ -56,22 +56,22 @@ import playground.vsp.analysis.modules.AbstractAnalyisModule;
  * @author amit
  */
 public class LegModeRouteDistanceDistributionHandler extends AbstractAnalyisModule{
-	private final static Logger log = Logger.getLogger(LegModeRouteDistanceDistributionHandler.class);
+	private final Logger log = Logger.getLogger(LegModeRouteDistanceDistributionHandler.class);
 
 	private Scenario scenario;
 	private final List<Integer> distanceClasses;
 	private final SortedSet<String> usedModes;
 
 	private SortedMap<String, SortedMap<Integer, Integer>> mode2DistanceClass2LegCount ;
-	private SortedMap<String, Map<Id, List<Double>>> mode2PersonId2dist;
+	private SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2dist;
 
 	public LegModeRouteDistanceDistributionHandler(){
 		super(LegModeRouteDistanceDistributionHandler.class.getSimpleName());
-		log.info("enabled");
+		this.log.info("enabled");
 
 		this.distanceClasses = new ArrayList<Integer>();
 		this.usedModes = new TreeSet<String>();
-		this.mode2PersonId2dist = new TreeMap<String, Map<Id,List<Double>>>();
+		this.mode2PersonId2dist = new TreeMap<String, Map<Id<Person>,List<Double>>>();
 		this.mode2DistanceClass2LegCount = new TreeMap<String, SortedMap<Integer,Integer>>();
 	}
 
@@ -81,12 +81,12 @@ public class LegModeRouteDistanceDistributionHandler extends AbstractAnalyisModu
 		initializeUsedModes(this.scenario.getPopulation());
 
 		for(String mode:this.usedModes){
-			mode2PersonId2dist.put(mode, new HashMap<Id, List<Double>>());
+			this.mode2PersonId2dist.put(mode, new HashMap<Id<Person>, List<Double>>());
 			SortedMap<Integer, Integer> distClass2Legs = new TreeMap<Integer, Integer>();
 			for(int i: this.distanceClasses){
 				distClass2Legs.put(i, 0);
 			}
-			mode2DistanceClass2LegCount.put(mode, distClass2Legs);
+			this.mode2DistanceClass2LegCount.put(mode, distClass2Legs);
 		}
 	}
 
@@ -98,8 +98,8 @@ public class LegModeRouteDistanceDistributionHandler extends AbstractAnalyisModu
 	@Override
 	public void preProcessData() {
 
-		log.info("Checking if the plans file that will be analyzed is based on a run with simulated public transport.");
-		log.info("Transit activities and belonging transit walk legs will be removed from the plan.");
+		this.log.info("Checking if the plans file that will be analyzed is based on a run with simulated public transport.");
+		this.log.info("Transit activities and belonging transit walk legs will be removed from the plan.");
 
 		for (Person person : this.scenario.getPopulation().getPersons().values()){
 			for (Plan plan : person.getPlans()){
@@ -158,9 +158,9 @@ public class LegModeRouteDistanceDistributionHandler extends AbstractAnalyisModu
 				writer1.write("\n");
 			}
 			writer1.close();
-			log.info("Finished writing output to " + outFile);
+			this.log.info("Finished writing output to " + outFile);
 		}catch (Exception e){
-			log.error("Data is not written. Reason " + e.getMessage());
+			this.log.error("Data is not written. Reason " + e.getMessage());
 		}
 	}
 
@@ -176,7 +176,7 @@ public class LegModeRouteDistanceDistributionHandler extends AbstractAnalyisModu
 					double distance = route.getDistance();
 					for(int i=0;i<this.distanceClasses.size()-1;i++){
 						if(distance > this.distanceClasses.get(i) && distance <= this.distanceClasses.get(i + 1)){
-							SortedMap<Integer, Integer> distanceClass2NoOfLegs = mode2DistanceClass2LegCount.get(leg.getMode());	
+							SortedMap<Integer, Integer> distanceClass2NoOfLegs = this.mode2DistanceClass2LegCount.get(leg.getMode());	
 							int oldLeg = distanceClass2NoOfLegs.get(this.distanceClasses.get(i+1));
 							int newLeg = oldLeg+1;
 							distanceClass2NoOfLegs.put(this.distanceClasses.get(i+1), newLeg);
@@ -197,7 +197,7 @@ public class LegModeRouteDistanceDistributionHandler extends AbstractAnalyisModu
 					Leg leg = (Leg)pe;
 					Route route = ((Route)((Leg)pe).getRoute());
 					double distance = route.getDistance();
-					Map<Id, List<Double>> personId2dist = this.mode2PersonId2dist.get(leg.getMode());
+					Map<Id<Person>, List<Double>> personId2dist = this.mode2PersonId2dist.get(leg.getMode());
 					if(personId2dist.containsKey(person.getId())){
 						List<Double> dists = personId2dist.get(person.getId());
 						dists.add(distance);
@@ -227,7 +227,7 @@ public class LegModeRouteDistanceDistributionHandler extends AbstractAnalyisModu
 				}
 			}
 		}
-		log.info("The longest distance is found to be: " + longestDistance);
+		this.log.info("The longest distance is found to be: " + longestDistance);
 		return longestDistance;
 	}
 
@@ -242,7 +242,7 @@ public class LegModeRouteDistanceDistributionHandler extends AbstractAnalyisModu
 			classCounter++;
 			this.distanceClasses.add(endOfDistanceClass);
 		}
-		log.info("The following distance classes were defined: " + this.distanceClasses);
+		this.log.info("The following distance classes were defined: " + this.distanceClasses);
 	}
 
 	private void initializeUsedModes(Population pop) {
@@ -254,21 +254,21 @@ public class LegModeRouteDistanceDistributionHandler extends AbstractAnalyisModu
 				}
 			}
 		}
-		log.info("The following transport modes are considered: " + this.usedModes);
+		this.log.info("The following transport modes are considered: " + this.usedModes);
 	}
 
 	public SortedMap<String, SortedMap<Integer, Integer>> getMode2DistanceClass2LegCount() {
 		return this.mode2DistanceClass2LegCount;
 	}
 
-	public SortedMap<String, Map<Id, List<Double>>> getMode2PersonId2RouteDistances(){
+	public SortedMap<String, Map<Id<Person>, List<Double>>> getMode2PersonId2RouteDistances(){
 		return this.mode2PersonId2dist;
 	}
-	public SortedMap<String, Map<Id, Double>> getMode2PersonId2TotalRouteDistance(){
-		SortedMap<String, Map<Id, Double>> mode2PersonId2TotalRouteDist = new TreeMap<String, Map<Id,Double>>();
+	public SortedMap<String, Map<Id<Person>, Double>> getMode2PersonId2TotalRouteDistance(){
+		SortedMap<String, Map<Id<Person>, Double>> mode2PersonId2TotalRouteDist = new TreeMap<String, Map<Id<Person>,Double>>();
 		for(String str:this.mode2PersonId2dist.keySet()){
-			Map<Id, Double> personIdeRouteDist = new HashMap<Id, Double>();
-			for(Id id:this.mode2PersonId2dist.get(str).keySet()){
+			Map<Id<Person>, Double> personIdeRouteDist = new HashMap<Id<Person>, Double>();
+			for(Id<Person> id:this.mode2PersonId2dist.get(str).keySet()){
 				double sum=0;
 				for(double d:this.mode2PersonId2dist.get(str).get(id)){
 					sum +=d;

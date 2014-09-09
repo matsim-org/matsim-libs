@@ -37,13 +37,13 @@ import playground.agarwalamit.analysis.congestion.CongestionLinkAnalyzer;
  *
  */
 public class PerLinkCongestionData {
-	private Logger logger = Logger.getLogger(PerLinkCongestionData.class);
-	private static String outputDir = "/Users/aagarwal/Desktop/ils/agarwal/siouxFalls/output/run1/";/*"./output/run2/";*/
-	private static String networkFile =outputDir+ "/output_network.xml.gz";//"/network.xml";
-	private static String configFile = outputDir+"/output_config.xml";//"/config.xml";//
-	private static String eventFile = outputDir+"/ITERS/it.100/100.events.xml.gz";//"/events.xml";//
+	private final Logger logger = Logger.getLogger(PerLinkCongestionData.class);
+	private  String outputDir = "/Users/aagarwal/Desktop/ils/agarwal/siouxFalls/output/run1/";/*"./output/run2/";*/
+	private  String networkFile =outputDir+ "/output_network.xml.gz";//"/network.xml";
+	private  String configFile = outputDir+"/output_config.xml";//"/config.xml";//
+	private  String eventFile = outputDir+"/ITERS/it.100/100.events.xml.gz";//"/events.xml";//
 
-	 Network network;
+	private Network network;
 
 	public static void main(String[] args) throws IOException {
 		PerLinkCongestionData data = new PerLinkCongestionData();
@@ -52,12 +52,12 @@ public class PerLinkCongestionData {
 
 	private void run() throws IOException {
 		
-		BufferedWriter writer1 = IOUtils.getBufferedWriter(outputDir+"/ITERS/it.100/100.timeLinkIdTotalCongestion.txt");//
+		BufferedWriter writer1 = IOUtils.getBufferedWriter(this.outputDir+"/ITERS/it.100/100.timeLinkIdTotalCongestion.txt");//
 
-		Scenario scenario = LoadMyScenarios.loadScenarioFromNetwork(networkFile);
+		Scenario scenario = LoadMyScenarios.loadScenarioFromNetwork(this.networkFile);
 		this.network = scenario.getNetwork();
-		double simulationEndTime = LoadMyScenarios.getSimulationEndTime(configFile);
-		CongestionLinkAnalyzer linkAnalyzer = new CongestionLinkAnalyzer(simulationEndTime, eventFile,1);
+		double simulationEndTime = LoadMyScenarios.getSimulationEndTime(this.configFile);
+		CongestionLinkAnalyzer linkAnalyzer = new CongestionLinkAnalyzer(simulationEndTime, this.eventFile,1);
 		linkAnalyzer.init(scenario);
 		linkAnalyzer.preProcessData();
 		linkAnalyzer.postProcessData();
@@ -66,7 +66,7 @@ public class PerLinkCongestionData {
 		
 		writer1.write("time \t linkId \t delay(in sec) \n");
 		for(double time : time2linkIdDelays.keySet()){
-			for(Link link : network.getLinks().values()){
+			for(Link link : this.network.getLinks().values()){
 				double delay;
 				if(time2linkIdDelays.get(time).get(link.getId())==null) delay = 0.0;
 				else delay = time2linkIdDelays.get(time).get(link.getId());
@@ -75,6 +75,6 @@ public class PerLinkCongestionData {
 			}
 		} 
 		writer1.close();
-		logger.info("Finished Writing files.");
+		this.logger.info("Finished Writing files.");
 	}
 }

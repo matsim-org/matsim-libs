@@ -44,17 +44,17 @@ public class ModalSplitUserGroup {
 	private void run(){
 		ModalShareGenerator msg = new ModalShareGenerator();
 		PersonFilter pf = new PersonFilter();
-		Scenario sc = LoadMyScenarios.loadScenarioFromPlansAndNetwork(networkFile, populationFile);
+		Scenario sc = LoadMyScenarios.loadScenarioFromPlansAndNetwork(this.networkFile, this.populationFile);
 		
 		SortedMap<String, double[]> modalSplit = msg.getModalShareFromPlans(sc.getPopulation());
 		
 		for(UserGroup ug:UserGroup.values()){
 			Population usrGrpPop = pf.getPopulation(sc.getPopulation(), ug);
 			SortedMap<String, double[]> modalSplitPop = msg.getModalShareFromPlans(usrGrpPop);
-			userGrp2ModalSplit.put(ug, modalSplitPop);
+			this.userGrp2ModalSplit.put(ug, modalSplitPop);
 		}
 
-		BufferedWriter writer = IOUtils.getBufferedWriter(outputDir+"/analysis/usrGrpToModalShare.txt");
+		BufferedWriter writer = IOUtils.getBufferedWriter(this.outputDir+"/analysis/usrGrpToModalShare.txt");
 		try {
 			writer.write("UserGroup \t");
 			
@@ -70,19 +70,19 @@ public class ModalSplitUserGroup {
 				writer.write(modalSplit.get(str)[1]+"\t");
 			}
 			writer.newLine();
-			for(UserGroup ug:userGrp2ModalSplit.keySet()){
+			for(UserGroup ug:this.userGrp2ModalSplit.keySet()){
 				writer.write(ug+"\t");
 				for(String str:modalSplit.keySet()){
-					if(userGrp2ModalSplit.get(ug).get(str)!=null){
-						writer.write(userGrp2ModalSplit.get(ug).get(str)[0]+"\t");
+					if(this.userGrp2ModalSplit.get(ug).get(str)!=null){
+						writer.write(this.userGrp2ModalSplit.get(ug).get(str)[0]+"\t");
 					} else
 					writer.write(0.0+"\t");
 				}
 				writer.newLine();
 				writer.write(ug+"\t");
 				for(String str:modalSplit.keySet()){
-					if(userGrp2ModalSplit.get(ug).get(str)!=null){
-						writer.write(userGrp2ModalSplit.get(ug).get(str)[1]+"\t");
+					if(this.userGrp2ModalSplit.get(ug).get(str)!=null){
+						writer.write(this.userGrp2ModalSplit.get(ug).get(str)[1]+"\t");
 					} else
 					writer.write(0.0+"\t");
 				}

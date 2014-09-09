@@ -64,10 +64,10 @@ public class EmissionLinkAnalyzer extends AbstractAnalyisModule {
 	}
 
 	public void init(ScenarioImpl scenario) {
-		this.logger.info("Aggregating emissions for each "+this.simulationEndTime/noOfTimeBins+" sec time bin.");
+		this.logger.info("Aggregating emissions for each "+this.simulationEndTime/this.noOfTimeBins+" sec time bin.");
 		this.emissionUtils = new EmissionUtils();
-		this.warmHandler = new EmissionsPerLinkWarmEventHandler(simulationEndTime, noOfTimeBins);
-		this.coldHandler = new EmissionsPerLinkColdEventHandler(simulationEndTime, noOfTimeBins);
+		this.warmHandler = new EmissionsPerLinkWarmEventHandler(this.simulationEndTime, this.noOfTimeBins);
+		this.coldHandler = new EmissionsPerLinkColdEventHandler(this.simulationEndTime, this.noOfTimeBins);
 	}
 	
 	@Override
@@ -91,7 +91,7 @@ public class EmissionLinkAnalyzer extends AbstractAnalyisModule {
 	public void postProcessData() {
 		this.link2WarmEmissions = this.warmHandler.getWarmEmissionsPerLinkAndTimeInterval();
 		this.link2ColdEmissions = this.coldHandler.getColdEmissionsPerLinkAndTimeInterval();
-		this.link2TotalEmissions = sumUpEmissionsPerTimeInterval(link2WarmEmissions, link2ColdEmissions);
+		this.link2TotalEmissions = sumUpEmissionsPerTimeInterval(this.link2WarmEmissions, this.link2ColdEmissions);
 	}
 
 	@Override

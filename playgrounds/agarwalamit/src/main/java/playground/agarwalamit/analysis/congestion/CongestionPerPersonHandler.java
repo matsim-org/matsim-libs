@@ -43,10 +43,10 @@ public class CongestionPerPersonHandler implements LinkEnterEventHandler, LinkLe
 PersonDepartureEventHandler, PersonArrivalEventHandler {
 	private final Logger logger = Logger.getLogger(CongestionPerPersonHandler.class);
 
-	private Map<Double, Map<Id, Double>> personId2DelaysPerTimeBin = new HashMap<Double, Map<Id, Double>>();
-	private Map<Id, Map<Id, Double>> linkId2PersonIdLinkEnterTime = new HashMap<Id, Map<Id,Double>>();
-	private Map<Id, Double> linkId2FreeSpeedLinkTravelTime = new HashMap<Id, Double>();
-	private Map<Double, Map<Id, Double>> time2linkIdLeaveCount = new HashMap<Double, Map<Id,Double>>();
+	private Map<Double, Map<Id<Person>, Double>> personId2DelaysPerTimeBin = new HashMap<Double, Map<Id<Person>, Double>>();
+	private Map<Id<Link>, Map<Id<Person>, Double>> linkId2PersonIdLinkEnterTime = new HashMap<Id<Link>, Map<Id<Person>,Double>>();
+	private Map<Id<Link>, Double> linkId2FreeSpeedLinkTravelTime = new HashMap<Id<Link>, Double>();
+	private Map<Double, Map<Id<Link>, Double>> time2linkIdLeaveCount = new HashMap<Double, Map<Id<Link>,Double>>();
 	private double totalDelay;
 
 	private final double timeBinSize;
@@ -55,23 +55,23 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 
 		this.timeBinSize = simulationEndTime / noOfTimeBins;
 		for (Link link : scenario.getNetwork().getLinks().values()) {
-			this.linkId2PersonIdLinkEnterTime.put(link.getId(), new HashMap<Id, Double>());
+			this.linkId2PersonIdLinkEnterTime.put(link.getId(), new HashMap<Id<Person>, Double>());
 			Double freeSpeedLinkTravelTime = Double.valueOf(Math.floor(link.getLength()/link.getFreespeed())+1);
 			this.linkId2FreeSpeedLinkTravelTime.put(link.getId(), freeSpeedLinkTravelTime);
 		}
 
 		for(int i =0;i<noOfTimeBins;i++){
-			this.personId2DelaysPerTimeBin.put(this.timeBinSize*(i+1), new HashMap<Id, Double>());
-			this.time2linkIdLeaveCount.put(this.timeBinSize*(i+1), new HashMap<Id, Double>());
-			this.personId2DelaysPerTimeBin.put(this.timeBinSize*(i+1), new HashMap<Id,Double>());
+			this.personId2DelaysPerTimeBin.put(this.timeBinSize*(i+1), new HashMap<Id<Person>, Double>());
+			this.time2linkIdLeaveCount.put(this.timeBinSize*(i+1), new HashMap<Id<Link>, Double>());
+			this.personId2DelaysPerTimeBin.put(this.timeBinSize*(i+1), new HashMap<Id<Person>,Double>());
 
 			for(Person person : scenario.getPopulation().getPersons().values()){
-				Map<Id, Double>	delayForPerson = this.personId2DelaysPerTimeBin.get(this.timeBinSize*(i+1));
+				Map<Id<Person>, Double>	delayForPerson = this.personId2DelaysPerTimeBin.get(this.timeBinSize*(i+1));
 				delayForPerson.put(person.getId(), Double.valueOf(0.));
 			}
 			
 			for(Link link : scenario.getNetwork().getLinks().values()) {
-				Map<Id, Double> countOnLink = this.time2linkIdLeaveCount.get(this.timeBinSize*(i+1));
+				Map<Id<Link>, Double> countOnLink = this.time2linkIdLeaveCount.get(this.timeBinSize*(i+1));
 				countOnLink.put(link.getId(), Double.valueOf(0.));
 			}
 		}
@@ -80,22 +80,22 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 	@Override
 	public void reset(int iteration) {
 		this.personId2DelaysPerTimeBin.clear();
-		logger.info("Resetting person delays to   " + this.personId2DelaysPerTimeBin);
+		this.logger.info("Resetting person delays to   " + this.personId2DelaysPerTimeBin);
 		this.linkId2PersonIdLinkEnterTime.clear();
 		this.linkId2FreeSpeedLinkTravelTime.clear();
 		this.time2linkIdLeaveCount.clear();
-		logger.info("Resetting linkLeave counter to " + this.time2linkIdLeaveCount);
+		this.logger.info("Resetting linkLeave counter to " + this.time2linkIdLeaveCount);
 	}
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		Id linkId = event.getLinkId();
-		Id personId = event.getPersonId();
+		Id<Link> linkId = event.getLinkId();
+		Id<Person> personId = event.getPersonId();
 		if(this.linkId2PersonIdLinkEnterTime.get(linkId).containsKey(personId)){
 			throw new RuntimeException("Person is alread on link. Can not depart from the same link without leaving the link.");
 		} 
 
-		Map<Id, Double> personId2LinkEnterTime = this.linkId2PersonIdLinkEnterTime.get(linkId);
+		Map<Id<Person>, Double> personId2LinkEnterTime = this.linkId2PersonIdLinkEnterTime.get(linkId);
 		double derivedLinkEnterTime = event.getTime()+1-this.linkId2FreeSpeedLinkTravelTime.get(linkId);
 		personId2LinkEnterTime.put(personId, derivedLinkEnterTime);
 		this.linkId2PersonIdLinkEnterTime.put(linkId, personId2LinkEnterTime);
@@ -109,17 +109,17 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 		endOfTimeInterval = Math.ceil(time/this.timeBinSize)*this.timeBinSize;
 		if(endOfTimeInterval<=0.0)endOfTimeInterval=this.timeBinSize;
 
-		Id linkId = event.getLinkId();
-		Id personId = event.getPersonId();
+		Id<Link> linkId = event.getLinkId();
+		Id<Person> personId = event.getPersonId();
 
 		double actualTravelTime = event.getTime()-this.linkId2PersonIdLinkEnterTime.get(linkId).get(personId);
 		this.linkId2PersonIdLinkEnterTime.get(linkId).remove(personId);
 		double freeSpeedTime = this.linkId2FreeSpeedLinkTravelTime.get(linkId);
 		double currentDelay =	actualTravelTime-freeSpeedTime;
 
-		Map<Id, Double> delayForPerson = this.personId2DelaysPerTimeBin.get(endOfTimeInterval);
+		Map<Id<Person>, Double> delayForPerson = this.personId2DelaysPerTimeBin.get(endOfTimeInterval);
 		
-		Map<Id, Double> countTotal = this.time2linkIdLeaveCount.get(endOfTimeInterval);
+		Map<Id<Link>, Double> countTotal = this.time2linkIdLeaveCount.get(endOfTimeInterval);
 
 		double delaySoFar = delayForPerson.get(personId);
 
@@ -138,20 +138,10 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		double time = event.getTime();
-		Id linkId = event.getLinkId();
-		Id personId = event.getPersonId();
+		Id<Link> linkId = event.getLinkId();
+		Id<Person> personId = event.getPersonId();
 
-//		if(this.linkId2PersonIdLinkEnterTime.get(linkId).containsKey(personId)){
-//			// Person is already on the link. Cannot happen.
-//			logger.info("Person "+personId+" is entering on link "+linkId+" two times without leaving from the same. Link enter times are "+
-//			this.linkId2PersonIdLinkEnterTime.get(linkId).get(personId)+" and "+time+ "\n Reason might be :"+
-//					" \n There is at least one teleport activity departing on a link ( and thus derived link enter time)"
-//					+ " and later person is entering the link with main mode."+
-//			"\n Replacing the old value. ");
-////			throw new RuntimeException();
-//		}
-
-		Map<Id, Double> personId2LinkEnterTime = this.linkId2PersonIdLinkEnterTime.get(linkId);
+		Map<Id<Person>, Double> personId2LinkEnterTime = this.linkId2PersonIdLinkEnterTime.get(linkId);
 		personId2LinkEnterTime.put(personId, time);
 		this.linkId2PersonIdLinkEnterTime.put(linkId, personId2LinkEnterTime);
 	}
@@ -161,14 +151,14 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 		this.linkId2PersonIdLinkEnterTime.get(event.getLinkId()).remove(event.getPersonId());
 	}
 
-	public Map<Double, Map<Id, Double>> getDelayPerPersonAndTimeInterval(){
+	public Map<Double, Map<Id<Person>, Double>> getDelayPerPersonAndTimeInterval(){
 		return this.personId2DelaysPerTimeBin;
 	}
 
 	public double getTotalDelayInHours(){
 		return totalDelay/3600;
 	}
-	public Map<Double, Map<Id, Double>> getTime2linkIdLeaveCount() {
+	public Map<Double, Map<Id<Link>, Double>> getTime2linkIdLeaveCount() {
 		return this.time2linkIdLeaveCount;
 	}
 }

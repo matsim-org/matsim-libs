@@ -43,16 +43,16 @@ public class ModalShareGenerator {
 	
 	private final Logger logger = Logger.getLogger(ModalShareGenerator.class);
 	
-	private void getModalShareFromEvents(){
-		
+	public void getModalShareFromEvents(){
+		// TODO [AA] should get modal share from events as well.
 	}
 	
 	public SortedMap<String, double []> getModalShareFromPlans (Population population){
 		SortedMap<String , double[]> mode2NoOfLegsAndPctShare = new TreeMap<String, double[]>();
-		logger.info("=====Modal split is calculated using input plans file.=====");
+		this.logger.info("=====Modal split is calculated using input plans file.=====");
 		SortedSet<String> usedModes = getUsedModes(population);
 		getMode2NoOfLegs(population, usedModes);
-		logger.info("=====The following transport modes are are used: " + usedModes+".=====");
+		this.logger.info("=====The following transport modes are are used: " + usedModes+".=====");
 		Map<String, Integer> mode2NoOfLegs = getMode2NoOfLegs(population, usedModes);
 		int totalNoOfLegs = getTotalNoOfLegs(mode2NoOfLegs);
 		

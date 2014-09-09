@@ -24,18 +24,14 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.emissions.events.EmissionEventsReader;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.agarwalamit.analysis.LoadMyScenarios;
 import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkWarmEventHandler;
 
 /**
@@ -49,7 +45,7 @@ public class DemandFromEmissionEvents {
 	private double simulationEndTime;
 	private String configFile ="/Users/aagarwal/Desktop/ils4/agarwal/munich/input/config_munich_1pct_baseCaseCtd.xml";
 
-	private static String [] runNumber =  {"baseCaseCtd","ei"};
+	private String [] runNumber =  {"baseCaseCtd","ei"};
 	private final String netFile1 = "/Users/aagarwal/Desktop/ils4/agarwal/munich/input/network-86-85-87-84_simplifiedWithStrongLinkMerge---withLanes.xml";
 	private Network network;
 
@@ -59,19 +55,19 @@ public class DemandFromEmissionEvents {
 
 	private void writeDemandData(){
 
-		network = loadScenario(netFile1).getNetwork();
+		this.network = LoadMyScenarios.loadScenarioFromNetwork(this.netFile1).getNetwork();
 
-		this.simulationEndTime = getEndTime(configFile);
+		this.simulationEndTime = LoadMyScenarios.getSimulationEndTime(this.configFile);
 
 		Map<Double, Map<Id, Double>> demandBAU = filterLinks(processEmissionsAndReturnDemand(runNumber[0])); 
 		//		Map<Double, Map<Id, Double>> demandPolicy = filterLinks(processEmissionsAndReturnDemand(runNumber[1]));
 
-		writeAbsoluteDemand(runDir+runNumber[0]+"/analysis/emissionVsCongestion/hourlyNetworkDemand.txt", demandBAU);
+		writeAbsoluteDemand(this.runDir+this.runNumber[0]+"/analysis/emissionVsCongestion/hourlyNetworkDemand.txt", demandBAU);
 		//		writeAbsoluteDemand(runDir+runNumber[1]+"/analysis/emissionVsCongestion/hourlyNetworkDemand.txt", demandPolicy);
 
 		//		writeChangeInDemand(runDir+runNumber[1]+"/analysis/emissionVsCongestion/hourlyChangeInNetworkDemandWRTBAU.txt", demandBAU, demandPolicy);
 
-		logger.info("Writing file(s) is finished.");
+		this.logger.info("Writing file(s) is finished.");
 	}
 
 	private void writeAbsoluteDemand(String outputFolder,Map<Double, Map<Id, Double>> linkCountMap ){
@@ -126,7 +122,7 @@ public class DemandFromEmissionEvents {
 			Map<Id,  Double> linksData = time2LinksData.get(endOfTimeInterval);
 			Map<Id, Double> linksDataFiltered = new HashMap<Id,  Double>();
 
-			for(Link link : network.getLinks().values()){
+			for(Link link : this.network.getLinks().values()){
 				Id linkId = link.getId();
 
 				if(linksData.get(linkId) == null){
@@ -140,34 +136,19 @@ public class DemandFromEmissionEvents {
 		return time2LinksDataFiltered;
 	}
 	private Map<Double, Map<Id, Double>> processEmissionsAndReturnDemand(String runNumber){
-		String emissionFileBAU = runDir+runNumber+"/ITERS/it.1500/1500.emission.events.xml.gz";
+		String emissionFileBAU = this.runDir+runNumber+"/ITERS/it.1500/1500.emission.events.xml.gz";
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);
 
-		EmissionsPerLinkWarmEventHandler warmHandler = new EmissionsPerLinkWarmEventHandler(this.simulationEndTime, noOfTimeBins);
+		EmissionsPerLinkWarmEventHandler warmHandler = new EmissionsPerLinkWarmEventHandler(this.simulationEndTime, this.noOfTimeBins);
 		eventsManager.addHandler(warmHandler);
 		emissionReader.parse(emissionFileBAU);
 		return warmHandler.getTime2linkIdLeaveCount();
 	}
 
-	private Double getEndTime(String configfile) {
-		Config config = ConfigUtils.createConfig();
-		MatsimConfigReader configReader = new MatsimConfigReader(config);
-		configReader.readFile(configfile);
-		Double endTime = config.qsim().getEndTime();
-		logger.info("Simulation end time is: " + endTime / 3600 + " hours.");
-		logger.info("Aggregating emissions for " + (int) (endTime / 3600 / noOfTimeBins) + " hour time bins.");
-		return endTime;
-	}
 	private double percentageChange(double firstNr, double secondNr){
 		if(firstNr!=0) return (secondNr-firstNr)*100/firstNr;
 		else return 0.;
-	}
-	private Scenario loadScenario(String netFile) {
-		Config config = ConfigUtils.createConfig();
-		config.network().setInputFile(netFile);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		return scenario;
 	}
 }

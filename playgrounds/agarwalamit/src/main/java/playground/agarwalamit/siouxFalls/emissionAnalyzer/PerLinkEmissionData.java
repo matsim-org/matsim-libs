@@ -46,11 +46,11 @@ import playground.agarwalamit.analysis.emission.EmissionUtilsExtended;
  *
  */
 public class PerLinkEmissionData {
-	private Logger logger = Logger.getLogger(PerLinkEmissionData.class);
-	private String outputDir = "/Users/aagarwal/Desktop/ils/agarwal/siouxFalls/output/run1/";
-	private String networkFile =outputDir+ "/output_network.xml.gz";
-	private String configFile = outputDir+"/output_config.xml";
-	private String emissionEventFile = outputDir+"/ITERS/it.100/100.emission.events.xml";
+	private final Logger logger = Logger.getLogger(PerLinkEmissionData.class);
+	private final String outputDir = "/Users/aagarwal/Desktop/ils/agarwal/siouxFalls/output/run1/";
+	private final String networkFile =outputDir+ "/output_network.xml.gz";
+	private final String configFile = outputDir+"/output_config.xml";
+	private final String emissionEventFile = outputDir+"/ITERS/it.100/100.emission.events.xml";
 	private EmissionUtils emissionUtils;
 
 	private Network network;
@@ -62,20 +62,20 @@ public class PerLinkEmissionData {
 
 	private void run() throws IOException {
 
-		BufferedWriter writer1 = IOUtils.getBufferedWriter(outputDir+"/ITERS/it.100/100.timeLinkIdTotalEmissions.txt");
-		BufferedWriter writer2 = IOUtils.getBufferedWriter(outputDir+"/ITERS/it.100/100.timeLinkIdWarmEmissions.txt");
-		BufferedWriter writer3 = IOUtils.getBufferedWriter(outputDir+"/ITERS/it.100/100.timeLinkIdColdEmissions.txt");
+		BufferedWriter writer1 = IOUtils.getBufferedWriter(this.outputDir+"/ITERS/it.100/100.timeLinkIdTotalEmissions.txt");
+		BufferedWriter writer2 = IOUtils.getBufferedWriter(this.outputDir+"/ITERS/it.100/100.timeLinkIdWarmEmissions.txt");
+		BufferedWriter writer3 = IOUtils.getBufferedWriter(this.outputDir+"/ITERS/it.100/100.timeLinkIdColdEmissions.txt");
 
-		Scenario scenario = LoadMyScenarios.loadScenarioFromNetwork(networkFile);
+		Scenario scenario = LoadMyScenarios.loadScenarioFromNetwork(this.networkFile);
 		this.network = scenario.getNetwork();
 		int noOfTimeBin =1;
 		double simulationEndTime = LoadMyScenarios.getSimulationEndTime(this.configFile);
-		EmissionLinkAnalyzer linkAnalyzer = new EmissionLinkAnalyzer(simulationEndTime, emissionEventFile,noOfTimeBin);
+		EmissionLinkAnalyzer linkAnalyzer = new EmissionLinkAnalyzer(simulationEndTime, this.emissionEventFile,noOfTimeBin);
 		linkAnalyzer.init(null);
 		linkAnalyzer.preProcessData();
 		linkAnalyzer.postProcessData();
 
-		emissionUtils = new EmissionUtils();
+		this.emissionUtils = new EmissionUtils();
 		EmissionUtilsExtended emissionUtilsExtended = new EmissionUtilsExtended();
 
 		Map<Double, Map<Id, Map<WarmPollutant, Double>>> time2warmEmissionsTotal = linkAnalyzer.getLink2WarmEmissions();
@@ -90,7 +90,7 @@ public class PerLinkEmissionData {
 		writer2.write("time"+"\t"+"linkId"+"\t"+"CO"+"\t"+"CO2_Total"+"\t"+"FC"+"\t"+"HC"+"\t"+"NMHC"+"\t"+"NO2"+"\t"+"NOX"+"\t"+"PM"+"\t"+"SO2"+"\n");
 		writer3.write("time"+"\t"+"linkId"+"\t"+"CO"+"\t"+"CO2_Total"+"\t"+"FC"+"\t"+"HC"+"\t"+"NMHC"+"\t"+"NO2"+"\t"+"NOX"+"\t"+"PM"+"\t"+"SO2"+"\n");
 		for(double time : time2ColdEmissionsTotalFilled.keySet()){
-			for(Link link : network.getLinks().values()){
+			for(Link link : this.network.getLinks().values()){
 				writer1.write(link.getId().toString()+"\t");
 				writer2.write(/*time+"\t"+*/link.getId().toString()+"\t");
 				writer3.write(/*time+"\t"+*/link.getId().toString()+"\t");
@@ -103,8 +103,8 @@ public class PerLinkEmissionData {
 					double d = time2EmissionsTotalFilled.get(time).get(link.getId()).get(str) - time2ColdEmissionsTotalFilled.get(time).get(link.getId()).get(str)-time2WarmEmissionsTotalFilled.get(time).get(link.getId()).get(str);
 					if(d<-1||d>1){
 						System.out.println(d);
-						logger.warn("Total Emissions per link per time interval is not sum of cold and warm emissions per link per time interval");
-						logger.info("time = "+time+"link = "+link.getId()+"pollutant = "+str+"total emission = "+time2EmissionsTotalFilled.get(time).get(link.getId()).get(str)+"cold emission = "
+						this.logger.warn("Total Emissions per link per time interval is not sum of cold and warm emissions per link per time interval");
+						this.logger.info("time = "+time+"link = "+link.getId()+"pollutant = "+str+"total emission = "+time2EmissionsTotalFilled.get(time).get(link.getId()).get(str)+"cold emission = "
 								+ time2ColdEmissionsTotalFilled.get(time).get(link.getId()).get(str)+"warm emissions = "+time2WarmEmissionsTotalFilled.get(time).get(link.getId()).get(str));
 					}
 				} 
@@ -116,7 +116,7 @@ public class PerLinkEmissionData {
 		writer1.close();
 		writer2.close();
 		writer3.close();
-		logger.info("Finished Writing files.");
+		this.logger.info("Finished Writing files.");
 	}
 
 	private Map<Double, Map<Id, SortedMap<String, Double>>> setNonCalculatedEmissions(Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotal) {
@@ -136,7 +136,7 @@ public class PerLinkEmissionData {
 			FileWriter fstream = new FileWriter(outFile);			
 			BufferedWriter out = new BufferedWriter(fstream);
 			out.append("linkId\txLink\tyLink\t");
-			for (String pollutant : emissionUtils.getListOfPollutants()){
+			for (String pollutant : this.emissionUtils.getListOfPollutants()){
 				out.append(pollutant + "[g]\t");
 			}
 			out.append("\n");
@@ -150,14 +150,14 @@ public class PerLinkEmissionData {
 				out.append(linkId + "\t" + xLink + "\t" + yLink + "\t");
 
 				Map<String, Double> emissionType2Value = map.get(linkId);
-				for(String pollutant : emissionUtils.getListOfPollutants()){
+				for(String pollutant : this.emissionUtils.getListOfPollutants()){
 					out.append(emissionType2Value.get(pollutant) + "\t");
 				}
 				out.append("\n");
 			}
 			//Close the output stream
 			out.close();
-			logger.info("Finished writing output to " + outFile);
+			this.logger.info("Finished writing output to " + outFile);
 		} catch (Exception e){
 			throw new RuntimeException(e);
 		}

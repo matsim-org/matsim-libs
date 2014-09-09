@@ -29,6 +29,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
@@ -49,11 +50,7 @@ import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
  */
 public class UserBenefitsAndTotalWelfarePerUserGroup {
 
-	public UserBenefitsAndTotalWelfarePerUserGroup() {
-		
-	}
-
-	private final static Logger logger = Logger.getLogger(UserBenefitsAndTotalWelfarePerUserGroup.class);
+	private final Logger logger = Logger.getLogger(UserBenefitsAndTotalWelfarePerUserGroup.class);
 	private int lastIteration;
 	private  String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/ci/";/*"./output/run2/";*/
 	private  String populationFile =outputDir+ "/output_plans.xml.gz";//"/network.xml";
@@ -74,16 +71,16 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 	}
 
 	private void run(){
-		scenario = LoadMyScenarios.loadScenarioFromNetworkPlansAndConfig(populationFile, networkFile,configFile);
-		lastIteration = scenario.getConfig().controler().getLastIteration();
+		this.scenario = LoadMyScenarios.loadScenarioFromNetworkPlansAndConfig(this.populationFile, this.networkFile,this.configFile);
+		this.lastIteration = LoadMyScenarios.getLastIteration(this.configFile);
 		getPopulationPerUserGroup();
-		getAllUserBenefits((ScenarioImpl)scenario);
-		getMonetaryPayment((ScenarioImpl)scenario);
-		SortedMap<UserGroup, Double> userGroupToUserWelfare_utils = getParametersPerUserGroup(personId2UserWelfare_utils);
-		SortedMap<UserGroup, Double> userGroupToUserWelfare_money = getParametersPerUserGroup(personId2MonetarizedUserWelfare);
-		SortedMap<UserGroup, Double> userGroupToTotalPayment = getParametersPerUserGroup(personId2MonetaryPayments);
+		getAllUserBenefits((ScenarioImpl)this.scenario);
+		getMonetaryPayment((ScenarioImpl)this.scenario);
+		SortedMap<UserGroup, Double> userGroupToUserWelfare_utils = getParametersPerUserGroup(this.personId2UserWelfare_utils);
+		SortedMap<UserGroup, Double> userGroupToUserWelfare_money = getParametersPerUserGroup(this.personId2MonetarizedUserWelfare);
+		SortedMap<UserGroup, Double> userGroupToTotalPayment = getParametersPerUserGroup(this.personId2MonetaryPayments);
 
-		String outputFile = outputDir+"/analysis/userGrpWelfareAndTollPayments.txt";
+		String outputFile = this.outputDir+"/analysis/userGrpWelfareAndTollPayments.txt";
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
 		try {
 			writer.write("UserGroup \t userWelfareUtils \t userWelfareMoney \t tollPayments \n");
@@ -94,7 +91,7 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 		} catch (IOException e) {
 			throw new RuntimeException("Data is not written into a File. Reason : "+e);
 		}
-		logger.info("Finished Writing data to file "+outputFile);		
+		this.logger.info("Finished Writing data to file "+outputFile);		
 	}
 
 	private SortedMap<UserGroup, Double> getParametersPerUserGroup(Map<Id, Double> inputMap){
@@ -114,14 +111,14 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 	}
 
 	private void getAllUserBenefits(ScenarioImpl scenarioImpl){
-		logger.info("User welfare will be calculated using welfare measure as "+wm.toString());
+		this.logger.info("User welfare will be calculated using welfare measure as "+wm.toString());
 		UserBenefitsAnalyzerAA userBenefitsAnalyzer = new UserBenefitsAnalyzerAA();
-		userBenefitsAnalyzer.init(scenarioImpl, wm);
+		userBenefitsAnalyzer.init(scenarioImpl, this.wm);
 		userBenefitsAnalyzer.preProcessData();
 		userBenefitsAnalyzer.postProcessData();
-		userBenefitsAnalyzer.writeResults(outputDir+"/analysis/");
-		personId2UserWelfare_utils = userBenefitsAnalyzer.getPersonId2UserWelfare_utils();
-		personId2MonetarizedUserWelfare = userBenefitsAnalyzer.getPersonId2MonetarizedUserWelfare();
+		userBenefitsAnalyzer.writeResults(this.outputDir+"/analysis/");
+		this.personId2UserWelfare_utils = userBenefitsAnalyzer.getPersonId2UserWelfare_utils();
+		this.personId2MonetarizedUserWelfare = userBenefitsAnalyzer.getPersonId2MonetarizedUserWelfare();
 	}
 
 	private void getMonetaryPayment(ScenarioImpl scenarioImpl){
@@ -137,25 +134,25 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 		}
 
 		MatsimEventsReader reader = new MatsimEventsReader(events);
-		reader.readFile(outputDir+"/ITERS/it."+lastIteration+"/"+lastIteration+".events.xml.gz");
+		reader.readFile(this.outputDir+"/ITERS/it."+this.lastIteration+"/"+this.lastIteration+".events.xml.gz");
 
 		paymentsAnalyzer.postProcessData();
-		paymentsAnalyzer.writeResults(outputDir+"/analysis/");
-		personId2MonetaryPayments = paymentsAnalyzer.getPersonId2amount();
+		paymentsAnalyzer.writeResults(this.outputDir+"/analysis/");
+		this.personId2MonetaryPayments = paymentsAnalyzer.getPersonId2amount();
 	}
 
 	private SortedMap<UserGroup, Population> getPopulationPerUserGroup(){
 		PersonFilter pf = new PersonFilter();
 		for(UserGroup ug : UserGroup.values()){
-			userGrpToPopulation.put(ug, pf.getPopulation(scenario.getPopulation(), ug));
+			this.userGrpToPopulation.put(ug, pf.getPopulation(this.scenario.getPopulation(), ug));
 		}
-		return userGrpToPopulation;
+		return this.userGrpToPopulation;
 	}
 
 	private UserGroup getUserGroupFromPersonId(Id personId){
 		UserGroup usrgrp = null;
-		for(UserGroup ug:userGrpToPopulation.keySet()){
-			if(userGrpToPopulation.get(ug).getPersons().get(personId)!=null) {
+		for(UserGroup ug:this.userGrpToPopulation.keySet()){
+			if(this.userGrpToPopulation.get(ug).getPersons().get(personId)!=null) {
 				usrgrp = ug;
 				break;
 			}

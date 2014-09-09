@@ -49,7 +49,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
@@ -447,7 +446,7 @@ PersonStuckEventHandler{
 		}  else {
 			if (this.allowForStorageCapacityConstraint) {
 				if (this.calculateStorageCapacityConstraints) {
-					Id furtherChargingLinkId = new IdImpl("NA");
+					Id furtherChargingLinkId = Id.create("NA",Link.class);
 					if(reverseList.isEmpty()){ 
 						Id causingLinkId = getNextLinkInRoute(event.getPersonId(),event.getLinkId(), event.getTime());
 						linkInfo.getPersonId2CausingLinkId().put(event.getVehicleId(), causingLinkId); 
@@ -485,7 +484,7 @@ PersonStuckEventHandler{
 	}
 
 	private Id getCausedPersonsListAndChargeThem(Id causingLinkId, LinkLeaveEvent event){
-		Id chargeFurtherPersonsOnLinkId= new IdImpl("NA"); 
+		Id chargeFurtherPersonsOnLinkId= Id.create("NA",Link.class);
 		double delayToPayFor = this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2DelaysToPayFor().get(event.getVehicleId());
 		LinkCongestionInfoExtended linkInfoForCausingLink = linkId2congestionInfo.get(causingLinkId);
 		
@@ -542,7 +541,7 @@ PersonStuckEventHandler{
 			}
 		}
 
-		Id nextLinkInRoute =  new IdImpl("NA");
+		Id nextLinkInRoute =  Id.create("NA",Link.class);
 		List<Id> nextLinksInRoutes = new ArrayList<Id>();
 		
 		for(NetworkRoute nr:nRoutesAndLinkIds.keySet()){

@@ -51,7 +51,7 @@ public class EmissionCongestionTravelDisutilityCalculatorFactory implements Trav
 
 	@Override
 	public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup){
-		final EmissionCongestionTravelDisutilityCalculator ectdc = new EmissionCongestionTravelDisutilityCalculator(timeCalculator, cnScoringGroup, emissionModule, emissionCostModule, hotspotLinks, tollHandler);
+		final EmissionCongestionTravelDisutilityCalculator ectdc = new EmissionCongestionTravelDisutilityCalculator(timeCalculator, cnScoringGroup, this.emissionModule, this.emissionCostModule, this.hotspotLinks, this.tollHandler);
 
 		return new TravelDisutility(){
 

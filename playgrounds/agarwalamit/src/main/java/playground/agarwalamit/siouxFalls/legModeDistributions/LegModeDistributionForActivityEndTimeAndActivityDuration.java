@@ -30,6 +30,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -48,8 +49,8 @@ public class LegModeDistributionForActivityEndTimeAndActivityDuration extends Ab
 
 	private final Logger logger = Logger.getLogger(LegModeDistributionForActivityEndTimeAndActivityDuration.class);
 	private LegModeActivityEndTimeAndActDurationHandler actStrEndur;
-	private SortedMap<String, Map<Id, List<Double>>> mode2PersonId2ActEndTimes;
-	private SortedMap<String, Map<Id, List<Double>>> mode2PersonId2ActDurations;
+	private SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2ActEndTimes;
+	private SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2ActDurations;
 	private List<Integer> timeStepClasses;
 	private List<String> travelModes;
 	private SortedMap<String, Map<Integer, Integer>> mode2ActEndTimeClasses2LegCount;
@@ -110,7 +111,7 @@ public class LegModeDistributionForActivityEndTimeAndActivityDuration extends Ab
 		this.mode2ActDurationClasses2LegCount = calculateMode2ActTimeClases2LegCount(mode2PersonId2ActDurations);
 	}
 
-	private SortedMap<String, Map<Integer, Integer>> calculateMode2ActTimeClases2LegCount (SortedMap<String,Map<Id,List<Double>>> mode2PersonId2ActEndTimes2) {
+	private SortedMap<String, Map<Integer, Integer>> calculateMode2ActTimeClases2LegCount (SortedMap<String,Map<Id<Person>,List<Double>>> mode2PersonId2ActEndTimes2) {
 		SortedMap<String, Map<Integer, Integer>> mode2ActEndTime2LegCount= new TreeMap<String, Map<Integer,Integer>>();
 
 		for(String mode:mode2PersonId2ActEndTimes2.keySet()){
@@ -121,12 +122,12 @@ public class LegModeDistributionForActivityEndTimeAndActivityDuration extends Ab
 			}
 			mode2ActEndTime2LegCount.put(mode, timeClasses2LegCount);
 
-			for(Id personId:mode2PersonId2ActEndTimes2.get(mode).keySet()){
+			for(Id<Person> personId:mode2PersonId2ActEndTimes2.get(mode).keySet()){
 				List<Double> actTimes = mode2PersonId2ActEndTimes2.get(mode).get(personId);
 				for(double time : actTimes){
 					time = time/(1*3600);
 					for(int j=0; j< this.timeStepClasses.size()-1;j++){
-						if(time>=this.timeStepClasses.get(j) && time<timeStepClasses.get(j+1)){
+						if(time>=this.timeStepClasses.get(j) && time<this.timeStepClasses.get(j+1)){
 							Integer countSoFar = timeClasses2LegCount.get(j);
 							Integer newCount = countSoFar+1;
 							timeClasses2LegCount.put(this.timeStepClasses.get(j), newCount);
@@ -167,7 +168,7 @@ public class LegModeDistributionForActivityEndTimeAndActivityDuration extends Ab
 			}
 			writer.close();
 
-			logger.info("Data file is writted at "+outputFolder+"legModeActEndTimeDistribution.txt");
+			this.logger.info("Data file is writted at "+outputFolder+"legModeActEndTimeDistribution.txt");
 		} catch (Exception e) {
 			throw new RuntimeException("Data is not written in File. Reason : "+e);
 		}
@@ -179,12 +180,11 @@ public class LegModeDistributionForActivityEndTimeAndActivityDuration extends Ab
 		for(int endOfTimeStep =0; endOfTimeStep<=(int)simulationEndTime/(1*3600);endOfTimeStep++){
 			this.timeStepClasses.add(endOfTimeStep);
 		}
-
-		logger.info("The following time classes were defined: " + this.timeStepClasses);
+		this.logger.info("The following time classes were defined: " + this.timeStepClasses);
 	}
 
 	private void getTravelModes(){
-		travelModes = new ArrayList<String>(this.mode2PersonId2ActEndTimes.keySet());
-		logger.info("Travel modes are "+this.travelModes.toString());
+		this.travelModes = new ArrayList<String>(this.mode2PersonId2ActEndTimes.keySet());
+		this.logger.info("Travel modes are "+this.travelModes.toString());
 	}
 }

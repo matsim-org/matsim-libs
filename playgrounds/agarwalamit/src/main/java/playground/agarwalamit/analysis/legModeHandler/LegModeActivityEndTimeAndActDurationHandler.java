@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
 
 /**
@@ -47,27 +48,28 @@ public class LegModeActivityEndTimeAndActDurationHandler implements PersonDepart
 ActivityEndEventHandler, ActivityStartEventHandler, PersonStuckEventHandler {
 
 	private final Logger logger = Logger.getLogger(LegModeActivityEndTimeAndActDurationHandler.class);
-	private SortedMap<String, Map<Id, List<Double>>> mode2PersonId2ActEndTimes;
-	private SortedMap<String, Map<Id, List<Double>>> mode2PersonId2ActDurations;
-	private Map<Id, SortedMap<String, Double>> personId2ActEndTimes;
-	private Map<Id, SortedMap<String, Double>> personId2ActStartTimes;
-	private Map<Id, String> personId2LegModes;
+	private SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2ActEndTimes;
+	private SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2ActDurations;
+	private Map<Id<Person>, SortedMap<String, Double>> personId2ActEndTimes;
+	private Map<Id<Person>, SortedMap<String, Double>> personId2ActStartTimes;
+	private Map<Id<Person>, String> personId2LegModes;
 	private Scenario sc;
 	private final int maxStuckAndAbortWarnCount=5;
 	private int warnCount = 0;
 	private double simEndTime;
 
 	public LegModeActivityEndTimeAndActDurationHandler(Scenario scenario) {
-		logger.warn("This will work fine if all trips of a person are made by same travel mode.");
+		this.logger.warn("This will work fine if all trips of a person are made by same travel mode.");
 		this.sc = scenario;
 		this.simEndTime = sc.getConfig().qsim().getEndTime();
-		this.mode2PersonId2ActEndTimes = new TreeMap<String, Map<Id,List<Double>>>();
-		this.mode2PersonId2ActDurations = new TreeMap<String, Map<Id,List<Double>>>();
-		this.personId2ActEndTimes = new HashMap<Id, SortedMap<String,Double>>();
-		this.personId2LegModes = new HashMap<Id, String>();
-		this.personId2ActStartTimes = new HashMap<Id, SortedMap<String,Double>>();
+		this.mode2PersonId2ActEndTimes = new TreeMap<String, Map<Id<Person>,List<Double>>>();
+		this.mode2PersonId2ActDurations = new TreeMap<String, Map<Id<Person>,List<Double>>>();
+		this.personId2ActEndTimes = new HashMap<Id<Person>, SortedMap<String,Double>>();
+		this.personId2LegModes = new HashMap<Id<Person>, String>();
+		this.personId2ActStartTimes = new HashMap<Id<Person>, SortedMap<String,Double>>();
 
-		for(Id id:this.sc.getPopulation().getPersons().keySet()){
+		for(Person p:this.sc.getPopulation().getPersons().values()){
+			Id<Person> id = p.getId();
 			this.personId2ActEndTimes.put(id, new TreeMap<String, Double>());
 			this.personId2ActStartTimes.put(id, new TreeMap<String, Double>());
 		}
@@ -84,7 +86,7 @@ ActivityEndEventHandler, ActivityStartEventHandler, PersonStuckEventHandler {
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		Id personId = event.getPersonId();
+		Id<Person> personId = event.getPersonId();
 		double actEndTime = event.getTime();
 
 		SortedMap<String,Double> actEndTimes = this.personId2ActEndTimes.get(personId);
@@ -93,7 +95,7 @@ ActivityEndEventHandler, ActivityStartEventHandler, PersonStuckEventHandler {
 
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
-		Id personId = event.getPersonId();
+		Id<Person> personId = event.getPersonId();
 		double actStartTime = event.getTime();
 
 		SortedMap<String, Double>  actStartTimes = this.personId2ActStartTimes.get(personId);
@@ -101,43 +103,42 @@ ActivityEndEventHandler, ActivityStartEventHandler, PersonStuckEventHandler {
 	}
 
 	@Override
-
 	public void handleEvent(PersonDepartureEvent event) {
 		this.personId2LegModes.put(event.getPersonId(), event.getLegMode());
 	}
 
 	@Override
 	public void handleEvent(PersonStuckEvent event) {
-		warnCount++;
-		if(warnCount<=maxStuckAndAbortWarnCount){
-			logger.warn("'StuckAndAbort' event is thrown for person "+event.getPersonId()+" on link "+event.getLinkId()+" at time "+event.getTime()+
+		this.warnCount++;
+		if(this.warnCount<=this.maxStuckAndAbortWarnCount){
+			this.logger.warn("'StuckAndAbort' event is thrown for person "+event.getPersonId().toString()+" on link "+event.getLinkId().toString()+" at time "+event.getTime()+
 					". \n Correctness of travel durations for such persons can not be guaranteed.");
-			if(warnCount==maxStuckAndAbortWarnCount) logger.warn(Gbl.FUTURE_SUPPRESSED);
+			if(this.warnCount==this.maxStuckAndAbortWarnCount) this.logger.warn(Gbl.FUTURE_SUPPRESSED);
 		}
 	}
-	private SortedMap<String, Map<Id, List<Double>>> sortingPersonWRTMode(Map<Id, SortedMap<String,Double>> pId2Times){
-		SortedMap<String, Map<Id, List<Double>>> mode2PersonId2Times = new TreeMap<String, Map<Id,List<Double>>>();
+	private SortedMap<String, Map<Id<Person>, List<Double>>> sortingPersonWRTMode(Map<Id<Person>, SortedMap<String,Double>> pId2Times){
+		SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2Times = new TreeMap<String, Map<Id<Person>,List<Double>>>();
 
 		for(String travelMode :this.personId2LegModes.values()){
-			Map<Id, List<Double>> localPId2times = new HashMap<Id, List<Double>>();
+			Map<Id<Person>, List<Double>> localPId2times = new HashMap<Id<Person>, List<Double>>();
 			mode2PersonId2Times.put(travelMode, localPId2times);
 		}
 
-		for(Id id:pId2Times.keySet()){
+		for(Id<Person> id:pId2Times.keySet()){
 			String mode = this.personId2LegModes.get(id);
-			Map<Id, List<Double>> localPersonId2ActTimes = mode2PersonId2Times.get(mode);
+			Map<Id<Person>, List<Double>> localPersonId2ActTimes = mode2PersonId2Times.get(mode);
 			localPersonId2ActTimes.put(id, new ArrayList<Double>(pId2Times.get(id).values()));
 		}
 		return mode2PersonId2Times;
 	}
 
-	public SortedMap<String, Map<Id, List<Double>>> getLegMode2PesonId2ActEndTimes (){
+	public SortedMap<String, Map<Id<Person>, List<Double>>> getLegMode2PesonId2ActEndTimes (){
 		this.mode2PersonId2ActEndTimes= sortingPersonWRTMode(this.personId2ActEndTimes);
 		return this.mode2PersonId2ActEndTimes;
 	}
 
-	public SortedMap<String, Map<Id, List<Double>>> getLegMode2PesonId2ActDurations (){
-		Map<Id, SortedMap<String,Double>> personId2ActDurations = calculatePersonId2Durations();
+	public SortedMap<String, Map<Id<Person>, List<Double>>> getLegMode2PesonId2ActDurations (){
+		Map<Id<Person>, SortedMap<String,Double>> personId2ActDurations = calculatePersonId2Durations();
 		this.mode2PersonId2ActDurations = sortingPersonWRTMode(personId2ActDurations);
 		return this.mode2PersonId2ActDurations;
 	}
@@ -145,15 +146,15 @@ ActivityEndEventHandler, ActivityStartEventHandler, PersonStuckEventHandler {
 	private void checkForActivityDuration(SortedMap<String,Double> actDurations){
 		for(double d :actDurations.values()){
 			if(d<0) throw new RuntimeException("Activity duration is negative. Aborting...");
-			else if(d==0) logger.warn("Activity duration is zero, it means activity start and end times are same. Do check for consistency.");
-			else if(d>=simEndTime) logger.warn("Activity duration is more than simulation end time. Do check for consistency.");
+			else if(d==0) this.logger.warn("Activity duration is zero, it means activity start and end times are same. Do check for consistency.");
+			else if(d>=this.simEndTime) this.logger.warn("Activity duration is more than simulation end time. Do check for consistency.");
 		}
 	}
-	private Map<Id, SortedMap<String,Double>> calculatePersonId2Durations(){
-		if(warnCount>0) logger.warn(warnCount+" 'StuckAndAbort' events are thrown. "
+	private Map<Id<Person>, SortedMap<String,Double>> calculatePersonId2Durations(){
+		if(this.warnCount>0) this.logger.warn(this.warnCount+" 'StuckAndAbort' events are thrown. "
 				+ "Correctness of travel durations for stuck persons can not be guaranteed.");
-		Map<Id, SortedMap<String,Double>> personId2Durations = new HashMap<Id, SortedMap<String,Double>>();
-		for(Id id:this.personId2ActEndTimes.keySet()){
+		Map<Id<Person>, SortedMap<String,Double>> personId2Durations = new HashMap<Id<Person>, SortedMap<String,Double>>();
+		for(Id<Person> id:this.personId2ActEndTimes.keySet()){
 			SortedMap<String,Double> actEndTimes = this.personId2ActEndTimes.get(id);
 			SortedMap<String,Double> actStartTimes = this.personId2ActStartTimes.get(id);
 			SortedMap<String,Double> actDurations = new TreeMap<String, Double>();

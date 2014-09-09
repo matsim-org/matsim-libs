@@ -77,7 +77,7 @@ public class PlansChoiceSetDistributions {
 	 *  similarly 153 persons have more than 0% and less than or equal to 20% cars in their choice set and pt is leg in selected plan.
 	 */
 	private void writeLegsDistributionWRTSelectedPlan(String plansFile, String outputFile){
-		SortedMap<Id, List<String>> personId2legs = getLegsForAllPlansInChoiceSet(plansFile);
+		SortedMap<Id<Person>, List<String>> personId2legs = getLegsForAllPlansInChoiceSet(plansFile);
 		SortedMap<Double, Double> selectedCar2OtherLegs = new TreeMap<Double, Double>();
 		SortedMap<Double, Double> selectedPt2OtherLegs = new TreeMap<Double, Double>();;
 
@@ -89,7 +89,7 @@ public class PlansChoiceSetDistributions {
 		}
 
 
-		for(Id pId: personId2legs.keySet()){
+		for(Id<Person> pId: personId2legs.keySet()){
 			List<String> legs = personId2legs.get(pId);
 			double carCounter = 0;
 			if(legs.get(0).equals("car")){
@@ -143,8 +143,8 @@ public class PlansChoiceSetDistributions {
 	 * indicates that 16699 persons have 0 car in their choice set and 66564 persons have 0 pt in their choice set.
 	 */
 	private void writeLegsDistribution(String plansFile, String outputFile){
-		Map<Id, List<String>> personId2legs = getLegsForAllPlansInChoiceSet(plansFile);
-		Map<Id, double[]> personId2LegsCounts = getPersonId2LegsCountInChoiceSet(personId2legs);
+		Map<Id<Person>, List<String>> personId2legs = getLegsForAllPlansInChoiceSet(plansFile);
+		Map<Id<Person>, double[]> personId2LegsCounts = getPersonId2LegsCountInChoiceSet(personId2legs);
 
 		int carIndex =0;
 		int ptIndex =1;
@@ -159,7 +159,7 @@ public class PlansChoiceSetDistributions {
 		}
 
 
-		for(Id id:personId2LegsCounts.keySet()){
+		for(Id<Person> id:personId2LegsCounts.keySet()){
 			double carLegs = personId2LegsCounts.get(id)[carIndex];
 			double ptLegs = personId2LegsCounts.get(id)[ptIndex];
 
@@ -204,21 +204,21 @@ public class PlansChoiceSetDistributions {
 
 	private SortedMap<Double, Double> plansFile2DifferenceClassCounts(String initialPlans, String laterPlans){
 
-		Map<Id, List<String>> personId2legsInitial = getLegsForAllPlansInChoiceSet(initialPlans);
-		Map<Id, List<String>> personId2legsLater = getLegsForAllPlansInChoiceSet(laterPlans);
+		Map<Id<Person>, List<String>> personId2legsInitial = getLegsForAllPlansInChoiceSet(initialPlans);
+		Map<Id<Person>, List<String>> personId2legsLater = getLegsForAllPlansInChoiceSet(laterPlans);
 
 
-		Map<Id, double[]> personId2LegsCountsInitial = getPersonId2LegsCountInChoiceSet(personId2legsInitial);
-		Map<Id, double[]> personId2LegsCountsLater = getPersonId2LegsCountInChoiceSet(personId2legsLater);
+		Map<Id<Person>, double[]> personId2LegsCountsInitial = getPersonId2LegsCountInChoiceSet(personId2legsInitial);
+		Map<Id<Person>, double[]> personId2LegsCountsLater = getPersonId2LegsCountInChoiceSet(personId2legsLater);
 
-		Map<Id, Double>  personId2ChangeInCars = getChangeInLegs(personId2LegsCountsInitial, personId2LegsCountsLater);
+		Map<Id<Person>, Double>  personId2ChangeInCars = getChangeInLegs(personId2LegsCountsInitial, personId2LegsCountsLater);
 		SortedMap<Double, Double> changeInCarsDistribution =  getChangeInCarDistribution(personId2ChangeInCars);
 
 		return changeInCarsDistribution;
 	}
 
-	private Map<Id, List<String>> getScoresForAllPlansInChoiceSet(String plansFile){
-		Map<Id, List<String>> personId2ScoresInChoiceSet = new HashMap<Id, List<String>>();
+	private Map<Id<Person>, List<String>> getScoresForAllPlansInChoiceSet(String plansFile){
+		Map<Id<Person>, List<String>> personId2ScoresInChoiceSet = new HashMap<Id<Person>, List<String>>();
 		Population population = loadPopulation(plansFile);
 		for(Person p : population.getPersons().values()){
 			List<String> scoresChoiceSet = new ArrayList<String>();
@@ -243,8 +243,8 @@ public class PlansChoiceSetDistributions {
 	/**
 	 * read plan file and return list of travel legs for complete choice set for each person
 	 */
-	private SortedMap<Id, List<String>> getLegsForAllPlansInChoiceSet (String plansFile){
-		SortedMap<Id, List<String>> personId2LegsInChoiceSet = new TreeMap<Id, List<String>>();
+	private SortedMap<Id<Person>, List<String>> getLegsForAllPlansInChoiceSet (String plansFile){
+		SortedMap<Id<Person>, List<String>> personId2LegsInChoiceSet = new TreeMap<Id<Person>, List<String>>();
 		Population population = loadPopulation(plansFile);
 		for(Person p : population.getPersons().values()){
 			List<String> legsChoiceSet = new ArrayList<String>();
@@ -271,10 +271,10 @@ public class PlansChoiceSetDistributions {
 		return personId2LegsInChoiceSet;
 	}
 
-	private void writeMap2TxtFile (Map<Id, List<String>> personId2legs, String outputFile){
+	private void writeMap2TxtFile (Map<Id<Person>, List<String>> personId2legs, String outputFile){
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
 		try {
-			for(Id id : personId2legs.keySet()){
+			for(Id<Person> id : personId2legs.keySet()){
 				writer.write(id.toString()+"\t");
 				for(Object o:personId2legs.get(id)){
 					writer.write(o.toString()+"\t");
@@ -297,10 +297,10 @@ public class PlansChoiceSetDistributions {
 	/**
 	 * return number of car/pt in choice set for each person
 	 */
-	private Map<Id, double[]> getPersonId2LegsCountInChoiceSet (Map<Id, List<String>> personId2legs){
+	private Map<Id<Person>, double[]> getPersonId2LegsCountInChoiceSet (Map<Id<Person>, List<String>> personId2legs){
 
-		Map<Id, double[]> personId2LegsInChoiceSet = new HashMap<Id, double[]>();
-		for(Id personId : personId2legs.keySet()){
+		Map<Id<Person>, double[]> personId2LegsInChoiceSet = new HashMap<Id<Person>, double[]>();
+		for(Id<Person> personId : personId2legs.keySet()){
 			List<String> initialLegs = personId2legs.get(personId);
 			int carCounter =0;
 			int ptCounter =0;
@@ -313,14 +313,14 @@ public class PlansChoiceSetDistributions {
 		return personId2LegsInChoiceSet;
 	}
 
-	private Map<Id, Double> getChangeInLegs(Map<Id, double[]> personId2legsInitialPlans, Map<Id, double[]> personId2LegsLaterPlans){
+	private Map<Id<Person>, Double> getChangeInLegs(Map<Id<Person>, double[]> personId2legsInitialPlans, Map<Id<Person>, double[]> personId2LegsLaterPlans){
 		//  change = number of legs as car in later choice set - number of legs as car in former ChoiceSet
-		Map<Id, Double> personId2ChangeInCars = new HashMap<Id, Double>();
+		Map<Id<Person>, Double> personId2ChangeInCars = new HashMap<Id<Person>, Double>();
 
 		int carIndex=0;
 		int ptIndex =1;
 
-		for(Id personId:personId2legsInitialPlans.keySet()){
+		for(Id<Person> personId:personId2legsInitialPlans.keySet()){
 			if(!personId2LegsLaterPlans.containsKey(personId)) throw new RuntimeException("Person id "+personId+" does not exist in later plans.");
 			double diff = personId2LegsLaterPlans.get(personId)[carIndex]- personId2legsInitialPlans.get(personId)[carIndex] ;
 			personId2ChangeInCars.put(personId, Double.valueOf(diff));
@@ -328,12 +328,12 @@ public class PlansChoiceSetDistributions {
 		return personId2ChangeInCars;
 	}
 
-	private SortedMap<Double, Double> getChangeInCarDistribution (Map<Id, Double> personId2ChangeInCars){
+	private SortedMap<Double, Double> getChangeInCarDistribution (Map<Id<Person>, Double> personId2ChangeInCars){
 
 		double min=999;
 		double max=-999;
 
-		for(Id pId : personId2ChangeInCars.keySet()){
+		for(Id<Person> pId : personId2ChangeInCars.keySet()){
 			double d=personId2ChangeInCars.get(pId);
 			if (d<min) min =d ;
 			else if(d>max) max=d;
@@ -349,7 +349,7 @@ public class PlansChoiceSetDistributions {
 		}
 
 		for(int j=(int) min; j<diffClasses.length;j++){
-			for(Id pId:personId2ChangeInCars.keySet()){
+			for(Id<Person> pId:personId2ChangeInCars.keySet()){
 				double d = (double) personId2ChangeInCars.get(pId);
 				if((double)d==j){
 					double classCounter = ((double) differenceClass2PersonCounter.get(d))+1;

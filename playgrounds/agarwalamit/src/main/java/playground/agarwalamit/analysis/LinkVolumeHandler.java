@@ -23,11 +23,9 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 
 /**
  * @author amit
@@ -35,7 +33,7 @@ import org.matsim.api.core.v01.network.Network;
 public class LinkVolumeHandler implements LinkEnterEventHandler {
 
 	private final Logger logger = Logger.getLogger(LinkVolumeHandler.class);
-	private Map<Id, Map<Integer,Double>> linkId2Time2Volume = new HashMap<Id, Map<Integer,Double>>();
+	private Map<Id<Link>, Map<Integer,Double>> linkId2Time2Volume = new HashMap<Id<Link>, Map<Integer,Double>>();
 
 	public LinkVolumeHandler () {
 		this.logger.info("Starting volume count on links.");
@@ -72,7 +70,7 @@ public class LinkVolumeHandler implements LinkEnterEventHandler {
 		}
 	}
 
-	public Map<Id, Map<Integer, Double>> getLinkId2TimeSlot2LinkVolume(){
+	public Map<Id<Link>, Map<Integer, Double>> getLinkId2TimeSlot2LinkVolume(){
 		return this.linkId2Time2Volume;
 	}
 }

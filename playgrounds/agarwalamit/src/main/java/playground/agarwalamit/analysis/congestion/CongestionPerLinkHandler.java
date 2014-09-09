@@ -73,11 +73,11 @@ public class CongestionPerLinkHandler implements LinkEnterEventHandler, LinkLeav
 	@Override
 	public void reset(int iteration) {
 		this.linkId2DelaysPerTimeBin.clear();
-		logger.info("Resetting link delays to   " + this.linkId2DelaysPerTimeBin);
+		this.logger.info("Resetting link delays to   " + this.linkId2DelaysPerTimeBin);
 		this.linkId2PersonIdLinkEnterTime.clear();
 		this.linkId2FreeSpeedLinkTravelTime.clear();
 		this.time2linkIdLeaveCount.clear();
-		logger.info("Resetting linkLeave counter to " + this.time2linkIdLeaveCount);
+		this.logger.info("Resetting linkLeave counter to " + this.time2linkIdLeaveCount);
 	}
 
 	@Override
@@ -159,7 +159,7 @@ public class CongestionPerLinkHandler implements LinkEnterEventHandler, LinkLeav
 	}
 
 	public double getTotalDelayInHours(){
-		return totalDelay/3600;
+		return this.totalDelay/3600;
 	}
 	public Map<Double, Map<Id, Double>> getTime2linkIdLeaveCount() {
 		return this.time2linkIdLeaveCount;

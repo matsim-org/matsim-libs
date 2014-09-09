@@ -42,7 +42,7 @@ import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
  * @author amit after ikaddoura and benjamin
  */
 public class UserBenefitsAndTotalWelfare {
-	private final static Logger logger = Logger.getLogger(UserBenefitsAndTotalWelfare.class);
+	private final Logger logger = Logger.getLogger(UserBenefitsAndTotalWelfare.class);
 
 	private static String clusterPathDesktop = "/Users/aagarwal/Desktop/ils4/agarwal/munich/";
 	private final static String networkFile = "/Users/aagarwal/Desktop/ils4/agarwal/munich/input/network-86-85-87-84_simplifiedWithStrongLinkMerge---withLanes.xml";

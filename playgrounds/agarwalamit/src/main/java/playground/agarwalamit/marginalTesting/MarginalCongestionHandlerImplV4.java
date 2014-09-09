@@ -55,7 +55,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -343,7 +342,7 @@ PersonStuckEventHandler
 	 * @return adjacent link, who caused spill back delays.
 	 */
 	private Id identifySpillBackCausingLink(Id personOnThisLink, Id thisPerson) {
-		Id spillBackCausingLink = new IdImpl("NA");
+		Id spillBackCausingLink = Id.create("NA",Link.class);
 		LinkCongestionInfoExtended linkInfo = this.linkId2congestionInfo.get(personOnThisLink);
 		if(linkInfo.getPersonId2CausingLinkId().containsKey(thisPerson)){//leaving agents list was empty
 			spillBackCausingLink = linkInfo.getPersonId2CausingLinkId().get(thisPerson);
@@ -356,7 +355,7 @@ PersonStuckEventHandler
 					break;
 				}
 			}
-			if (spillBackCausingLink.equals(new IdImpl("NA"))) throw new RuntimeException("Spill back causing link is not identified. Somethign went wrong.");
+			if (spillBackCausingLink.equals(Id.create("NA",Link.class))) throw new RuntimeException("Spill back causing link is not identified. Somethign went wrong.");
 		}
 		return spillBackCausingLink;
 	}
@@ -427,7 +426,7 @@ PersonStuckEventHandler
 			}
 		}
 
-		Id nextLinkInRoute =  new IdImpl("NA");
+		Id nextLinkInRoute =  Id.create("NA",Link.class);
 		List<Id> nextLinksInRoutes = new ArrayList<Id>();
 
 		for(NetworkRoute nr:nRoutesAndLinkIds.keySet()){

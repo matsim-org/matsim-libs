@@ -27,6 +27,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -44,7 +45,7 @@ public class LegModeTravelTimeDistribution extends AbstractAnalyisModule {
 
 	private final Logger logger = Logger.getLogger(LegModeTravelTimeDistribution.class);
 	private LegModeTravelTimeHandler lmth;
-	private Map<String, Map<Id, Double>> mode2PersonId2TravelTime;
+	private Map<String, Map<Id<Person>, Double>> mode2PersonId2TravelTime;
 	private List<Integer> travelTimeClasses;
 	private List<String> travelModes;
 	private SortedMap<String, SortedMap<Integer, Integer>> mode2TravelTimeClasses2LegCount;
@@ -106,7 +107,7 @@ public class LegModeTravelTimeDistribution extends AbstractAnalyisModule {
 			SortedMap<Integer, Integer> travelTimeClasses2LegCount = new TreeMap<Integer, Integer>();
 			for(int i=0;i<this.travelTimeClasses.size()-1;i++){
 				int legCount =0;
-				for(Id id:this.mode2PersonId2TravelTime.get(mode).keySet()){
+				for(Id<Person> id:this.mode2PersonId2TravelTime.get(mode).keySet()){
 					double tt = this.mode2PersonId2TravelTime.get(mode).get(id);
 					if(tt>this.travelTimeClasses.get(i)&&tt<this.travelTimeClasses.get(i+1)){
 						legCount++;
@@ -140,7 +141,7 @@ public class LegModeTravelTimeDistribution extends AbstractAnalyisModule {
 		} catch (Exception e) {
 			throw new RuntimeException("Data is not written in File. Reason : "+e);
 		}
-		logger.info("Files have been written to " + outputFile);
+		this.logger.info("Files have been written to " + outputFile);
 	}
 	private void initializeTravelTimeClasses() {
 		double highestTravelTime = getHighestTravelTime();
@@ -153,19 +154,19 @@ public class LegModeTravelTimeDistribution extends AbstractAnalyisModule {
 			classCounter++;
 			this.travelTimeClasses.add(endOfTravelTimeClass);
 		}
-		logger.info("The following travel time classes were defined: " + this.travelTimeClasses);
+		this.logger.info("The following travel time classes were defined: " + this.travelTimeClasses);
 	}
 
 	private double getHighestTravelTime(){
 		double highestTravelTime = Double.NEGATIVE_INFINITY;
 		for(String mode : this.mode2PersonId2TravelTime.keySet()){
-			for(Id id : this.mode2PersonId2TravelTime.get(mode).keySet()){
+			for(Id<Person> id : this.mode2PersonId2TravelTime.get(mode).keySet()){
 				if(highestTravelTime<this.mode2PersonId2TravelTime.get(mode).get(id)){
 					highestTravelTime = this.mode2PersonId2TravelTime.get(mode).get(id);
 				}
 			}
 		}
-		logger.info("Highest travel time is "+ highestTravelTime+" sec.");
+		this.logger.info("Highest travel time is "+ highestTravelTime+" sec.");
 		return highestTravelTime;
 	}
 	private void getTravelModes(){

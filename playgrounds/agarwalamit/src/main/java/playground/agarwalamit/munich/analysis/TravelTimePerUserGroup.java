@@ -27,6 +27,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
@@ -48,9 +49,9 @@ public class TravelTimePerUserGroup extends AbstractAnalyisModule {
 	public TravelTimePerUserGroup() {
 		super(TravelTimePerUserGroup.class.getSimpleName());
 		this.travelTimeHandler = new LegModeTravelTimeHandler();
-		sc = LoadMyScenarios.loadScenarioFromNetworkPlansAndConfig(populationFile, networkFile, configFile);
-		lastIteration = sc.getConfig().controler().getLastIteration();
-		this.eventsFile = 	outputDir+"/ITERS/it."+lastIteration+"/"+lastIteration+".events.xml.gz";
+		this.sc = LoadMyScenarios.loadScenarioFromNetworkPlansAndConfig(this.populationFile, this.networkFile, this.configFile);
+		this.lastIteration = LoadMyScenarios.getLastIteration(this.configFile);
+		this.eventsFile = this.outputDir+"/ITERS/it."+this.lastIteration+"/"+this.lastIteration+".events.xml.gz";
 		this.usrGrpExtended = new UserGroupUtilsExtended();
 	}
 
@@ -58,7 +59,7 @@ public class TravelTimePerUserGroup extends AbstractAnalyisModule {
 	private Scenario sc; 
 	private int lastIteration;
 	private Logger logger = Logger.getLogger(TravelTimePerUserGroup.class);
-	private Map<String, Map<Id, List<Double>>> mode2PersonId2TravelTimes;
+	private Map<String, Map<Id<Person>, List<Double>>> mode2PersonId2TravelTimes;
 	private String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/eci/";/*"./output/run2/";*/
 	private String populationFile =outputDir+ "/output_plans.xml.gz";//"/network.xml";
 	private String networkFile =outputDir+ "/output_network.xml.gz";//"/network.xml";
@@ -77,7 +78,7 @@ public class TravelTimePerUserGroup extends AbstractAnalyisModule {
 	private void run(){
 		preProcessData();
 		postProcessData();
-		writeResults(outputDir+"/analysis/");
+		writeResults(this.outputDir+"/analysis/");
 	}
 
 	@Override
@@ -95,7 +96,7 @@ public class TravelTimePerUserGroup extends AbstractAnalyisModule {
 
 	@Override
 	public void postProcessData() {
-		mode2PersonId2TravelTimes = travelTimeHandler.getLegMode2PesonId2TripTimes();
+		this.mode2PersonId2TravelTimes = this.travelTimeHandler.getLegMode2PesonId2TripTimes();
 		getUserGroupTravelMeanAndMeadian();
 	}
 
@@ -104,16 +105,16 @@ public class TravelTimePerUserGroup extends AbstractAnalyisModule {
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/usrGrp2TravelMode2MeanAndMedianTravelTime.txt");
 		try {
 			writer.write("UserGroup \t travelMode \t MeanTravelTime \t MedianTravelTime \n");
-			for(UserGroup ug:usrGrp2Mode2MeanTime.keySet()){
-				for(String travelMode:usrGrp2Mode2MeanTime.get(ug).keySet()){
-					writer.write(ug+"\t"+travelMode+"\t"+usrGrp2Mode2MeanTime.get(ug).get(travelMode)+"\t"+usrGrp2Mode2MedianTime.get(ug).get(travelMode)+"\n");
+			for(UserGroup ug:this.usrGrp2Mode2MeanTime.keySet()){
+				for(String travelMode:this.usrGrp2Mode2MeanTime.get(ug).keySet()){
+					writer.write(ug+"\t"+travelMode+"\t"+this.usrGrp2Mode2MeanTime.get(ug).get(travelMode)+"\t"+this.usrGrp2Mode2MedianTime.get(ug).get(travelMode)+"\n");
 				}
 			}
 			writer.close();
 		} catch (Exception e) {
 			throw new RuntimeException("Data is not written to a file.");
 		}
-		logger.info("Data writing is finished.");
+		this.logger.info("Data writing is finished.");
 	}
 
 	
@@ -121,8 +122,8 @@ public class TravelTimePerUserGroup extends AbstractAnalyisModule {
 		PersonFilter pf = new PersonFilter();
 		for(UserGroup ug:UserGroup.values()){
 			Population pop = pf.getPopulation(sc.getPopulation(), ug);
-			usrGrp2Mode2MeanTime.put(ug, this.usrGrpExtended.calculateTravelMode2MeanFromLists(mode2PersonId2TravelTimes, pop));
-			usrGrp2Mode2MedianTime.put(ug, this.usrGrpExtended.calculateTravelMode2MedianFromLists(mode2PersonId2TravelTimes, pop));
+			this.usrGrp2Mode2MeanTime.put(ug, this.usrGrpExtended.calculateTravelMode2MeanFromLists(this.mode2PersonId2TravelTimes, pop));
+			this.usrGrp2Mode2MedianTime.put(ug, this.usrGrpExtended.calculateTravelMode2MedianFromLists(this.mode2PersonId2TravelTimes, pop));
 		}
 	}
 }

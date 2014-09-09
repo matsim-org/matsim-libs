@@ -43,7 +43,7 @@ import playground.ikaddoura.internalizationCar.TollHandler;
  */
 public class EmissionCongestionTravelDisutilityCalculator implements TravelDisutility{
 
-	private static final Logger logger = Logger.getLogger(EmissionCongestionTravelDisutilityCalculator.class);
+	private final Logger logger = Logger.getLogger(EmissionCongestionTravelDisutilityCalculator.class);
 	
 	/*
 	 * Blur the Social Cost to speed up the relaxation process. Values between
@@ -51,12 +51,12 @@ public class EmissionCongestionTravelDisutilityCalculator implements TravelDisut
 	 * the old value will be totally overwritten.
 	 */
 	private final double blendFactor = 0.1;
-	TravelTime timeCalculator;
-	double marginalUtlOfMoney;
-	double distanceCostRateCar;
-	double marginalUtlOfTravelTime;
-	EmissionModule emissionModule;
-	EmissionCostModule emissionCostModule;
+	private TravelTime timeCalculator;
+	private double marginalUtlOfMoney;
+	private double distanceCostRateCar;
+	private double marginalUtlOfTravelTime;
+	private EmissionModule emissionModule;
+	private EmissionCostModule emissionCostModule;
 	private final Set<Id> hotspotLinks;
 	private TollHandler tollHandler;
 
@@ -71,7 +71,7 @@ public class EmissionCongestionTravelDisutilityCalculator implements TravelDisut
 		this.hotspotLinks = hotspotLinks;
 		
 		this.tollHandler = tollHandler;
-		logger.info("The 'blend factor' which is used for the calculation of the expected tolls in the next iteration is set to " + this.blendFactor);
+		this.logger.info("The 'blend factor' which is used for the calculation of the expected tolls in the next iteration is set to " + this.blendFactor);
 		
 	}
 
@@ -88,12 +88,12 @@ public class EmissionCongestionTravelDisutilityCalculator implements TravelDisut
 
 		double linkExpectedEmissionDisutility;
 
-		if(hotspotLinks == null){
+		if(this.hotspotLinks == null){
 			// pricing applies for all links
 			linkExpectedEmissionDisutility = calculateExpectedEmissionDisutility(person, link, distance, linkTravelTime);
 		} else {
 			// pricing applies for the current link
-			if(hotspotLinks.contains(link.getId())) linkExpectedEmissionDisutility = calculateExpectedEmissionDisutility(person, link, distance, linkTravelTime);
+			if(this.hotspotLinks.contains(link.getId())) linkExpectedEmissionDisutility = calculateExpectedEmissionDisutility(person, link, distance, linkTravelTime);
 			// pricing applies not for the current link
 			else linkExpectedEmissionDisutility = 0.0;
 		}
@@ -142,8 +142,8 @@ public class EmissionCongestionTravelDisutilityCalculator implements TravelDisut
 		double linkExpectedTollNewValue = this.tollHandler.getAvgToll(link.getId(), time);
 		double linkExpectedTollOldValue = this.tollHandler.getAvgTollOldValue(link.getId(), time);
 
-		double blendedOldValue = (1 - blendFactor) * linkExpectedTollOldValue;
-		double blendedNewValue = blendFactor * linkExpectedTollNewValue;	
+		double blendedOldValue = (1 - this.blendFactor) * linkExpectedTollOldValue;
+		double blendedNewValue = this.blendFactor * linkExpectedTollNewValue;	
 		
 //		if (linkExpectedTollNewValue != 0 || linkExpectedTollOldValue != 0) {
 //			log.info("-----------> Person " + person.getId() + ": Expected toll (new value) on link " + link.getId() + " at " + Time.writeTime(time, Time.TIMEFORMAT_HHMMSS) + ": " + linkExpectedTollNewValue);

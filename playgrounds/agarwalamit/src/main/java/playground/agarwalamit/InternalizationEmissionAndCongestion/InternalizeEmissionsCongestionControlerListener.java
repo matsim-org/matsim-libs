@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
@@ -46,15 +47,15 @@ import playground.ikaddoura.internalizationCar.TollHandler;
  * @author amit after Benjamin and Ihab
  */
 public class InternalizeEmissionsCongestionControlerListener implements StartupListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
-	private static final Logger logger = Logger.getLogger(InternalizeEmissionsCongestionControlerListener.class);
+	private final Logger logger = Logger.getLogger(InternalizeEmissionsCongestionControlerListener.class);
 
-	Controler controler;
-	EmissionModule emissionModule;
-	EmissionCostModule emissionCostModule;
-	String emissionEventOutputFile;
-	EventWriterXML emissionEventWriter;
-	EmissionInternalizationHandler emissionInternalizationHandler;
-	Set<Id> hotspotLinks;
+	private Controler controler;
+	private EmissionModule emissionModule;
+	private EmissionCostModule emissionCostModule;
+	private String emissionEventOutputFile;
+	private EventWriterXML emissionEventWriter;
+	private EmissionInternalizationHandler emissionInternalizationHandler;
+	private Set<Id> hotspotLinks;
 
 	int iteration;
 	int firstIt;
@@ -74,68 +75,66 @@ public class InternalizeEmissionsCongestionControlerListener implements StartupL
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		controler = event.getControler();
+		this.controler = event.getControler();
 
-		EventsManager eventsManager = controler.getEvents();
-		congestionHandler = new MarginalCongestionHandlerImplV3(eventsManager, scenario);
+		EventsManager eventsManager = this.controler.getEvents();
+		this.congestionHandler = new MarginalCongestionHandlerImplV3(eventsManager, this.scenario);
 
-		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
-		eventsManager.addHandler(emissionModule.getColdEmissionHandler());
+		eventsManager.addHandler(this.emissionModule.getWarmEmissionHandler());
+		eventsManager.addHandler(this.emissionModule.getColdEmissionHandler());
 
-		eventsManager.addHandler(congestionHandler);
+		eventsManager.addHandler(this.congestionHandler);
 		eventsManager.addHandler(new MarginalCostPricingCarHandler(eventsManager, scenario));
-		eventsManager.addHandler(tollHandler);
+		eventsManager.addHandler(this.tollHandler);
 
-		firstIt = controler.getConfig().controler().getFirstIteration();
-		lastIt = controler.getConfig().controler().getLastIteration();
+		this.firstIt = this.controler.getConfig().controler().getFirstIteration();
+		this.lastIt = this.controler.getConfig().controler().getLastIteration();
 	}
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		iteration = event.getIteration();
+		this.iteration = event.getIteration();
 
-		logger.info("creating new emission internalization handler...");
-		emissionInternalizationHandler = new EmissionInternalizationHandler(controler, emissionCostModule, hotspotLinks);
-		logger.info("adding emission internalization module to emission events stream...");
-		emissionModule.getEmissionEventsManager().addHandler(emissionInternalizationHandler);
+		this.logger.info("creating new emission internalization handler...");
+		this.emissionInternalizationHandler = new EmissionInternalizationHandler(this.controler, this.emissionCostModule, this.hotspotLinks);
+		this.logger.info("adding emission internalization module to emission events stream...");
+		this.emissionModule.getEmissionEventsManager().addHandler(this.emissionInternalizationHandler);
 
-		if(iteration == firstIt || iteration == lastIt){
-			emissionEventOutputFile = controler.getControlerIO().getIterationFilename(iteration, "emission.events.xml.gz");
-			logger.info("creating new emission events writer...");
-			emissionEventWriter = new EventWriterXML(emissionEventOutputFile);
-			logger.info("adding emission events writer to emission events stream...");
-			emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);
+		if(this.iteration == this.firstIt || this.iteration == this.lastIt){
+			this.emissionEventOutputFile = this.controler.getControlerIO().getIterationFilename(this.iteration, "emission.events.xml.gz");
+			this.logger.info("creating new emission events writer...");
+			this.emissionEventWriter = new EventWriterXML(this.emissionEventOutputFile);
+			this.logger.info("adding emission events writer to emission events stream...");
+			this.emissionModule.getEmissionEventsManager().addHandler(this.emissionEventWriter);
 		}
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 
-		logger.info("removing emission internalization module from emission events stream...");
+		this.logger.info("removing emission internalization module from emission events stream...");
+		this.logger.info("Set average tolls for each link Id and time bin.");
+		this.tollHandler.setLinkId2timeBin2avgToll();
+		this.emissionModule.getEmissionEventsManager().removeHandler(this.emissionInternalizationHandler);
 
-		logger.info("Set average tolls for each link Id and time bin.");
-		tollHandler.setLinkId2timeBin2avgToll();
-
-		emissionModule.getEmissionEventsManager().removeHandler(emissionInternalizationHandler);
-
-		if(iteration == firstIt || iteration == lastIt){
-			logger.info("removing emission events writer from emission events stream...");
-			emissionModule.getEmissionEventsManager().removeHandler(emissionEventWriter);
-			logger.info("closing emission events file...");
-			emissionEventWriter.closeFile();
+		if(this.iteration == this.firstIt || this.iteration == this.lastIt){
+			this.logger.info("removing emission events writer from emission events stream...");
+			this.emissionModule.getEmissionEventsManager().removeHandler(this.emissionEventWriter);
+			this.logger.info("closing emission events file...");
+			this.emissionEventWriter.closeFile();
 		}
 
 		// write out toll statistics every iteration
-		tollHandler.writeTollStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/tollStats.csv");
+		this.tollHandler.writeTollStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/tollStats.csv");
 
 		// write out congestion statistics every iteration
-		congestionHandler.writeCongestionStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/congestionStats.csv");
+		this.congestionHandler.writeCongestionStats(this.scenario.getConfig().controler().getOutputDirectory() + "/ITERS/it." + event.getIteration() + "/congestionStats.csv");
 
 	}
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-		emissionModule.writeEmissionInformation(emissionEventOutputFile);
+		this.emissionModule.writeEmissionInformation(this.emissionEventOutputFile);
 	}
 
 	public void setHotspotLinks(Set<Id> hotspotLinks) {

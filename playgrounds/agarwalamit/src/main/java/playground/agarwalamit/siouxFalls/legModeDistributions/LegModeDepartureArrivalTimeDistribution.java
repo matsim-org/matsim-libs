@@ -28,6 +28,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -37,6 +38,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.agarwalamit.analysis.LoadMyScenarios;
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
 
 
@@ -45,10 +47,10 @@ import playground.vsp.analysis.modules.AbstractAnalyisModule;
  */
 public class LegModeDepartureArrivalTimeDistribution extends AbstractAnalyisModule {
 
-	private static final Logger logger = Logger.getLogger(LegModeDepartureArrivalTimeDistribution.class);
+	private final Logger logger = Logger.getLogger(LegModeDepartureArrivalTimeDistribution.class);
 	private LegModeDepartureArrivalTimeHandler lmdah;
-	private Map<String, Map<Id, double[]>> mode2PersonId2DepartureTime;
-	private Map<String, Map<Id, double[]>> mode2PersonId2ArrivalTime;
+	private Map<String, Map<Id<Person>, double[]>> mode2PersonId2DepartureTime;
+	private Map<String, Map<Id<Person>, double[]>> mode2PersonId2ArrivalTime;
 	private List<Integer> timeStepClasses;
 	private List<String> travelModes;
 	private SortedMap<String, Map<Integer, Integer>> mode2DepartureTimeClasses2LegCount;
@@ -74,7 +76,7 @@ public class LegModeDepartureArrivalTimeDistribution extends AbstractAnalyisModu
 
 		for(String run:runs){
 			final String configFile = runDir+run+"/output_config.xml.gz";
-			int lastItr = (int)getLastIteration(configFile);
+			int lastItr = LoadMyScenarios.getLastIteration(configFile);
 			String eventsFile = runDir+run+"/ITERS/it."+lastItr+"/"+lastItr+".events.xml.gz";
 
 			LegModeDepartureArrivalTimeDistribution lmdatd = new LegModeDepartureArrivalTimeDistribution(eventsFile, configFile);
@@ -109,13 +111,13 @@ public class LegModeDepartureArrivalTimeDistribution extends AbstractAnalyisModu
 		this.mode2ArrivalTimeClasses2LegCount = calculateMode2DepOrArrTimeClases2LegCount(this.mode2PersonId2ArrivalTime);
 	}
 
-	private SortedMap<String, Map<Integer, Integer>> calculateMode2DepOrArrTimeClases2LegCount (Map<String, Map<Id, double[]>> mode2personId2DepOrArrTime) {
+	private SortedMap<String, Map<Integer, Integer>> calculateMode2DepOrArrTimeClases2LegCount (Map<String, Map<Id<Person>, double[]>> mode2personId2DepOrArrTime) {
 		SortedMap<String, Map<Integer, Integer>> mode2DepOrArrTime2LegCount= new TreeMap<String, Map<Integer,Integer>>();
 		for(String mode:this.travelModes){
 			SortedMap<Integer, Integer> travelTimeClasses2LegCount = new TreeMap<Integer, Integer>();
 			for(int i=0;i<this.timeStepClasses.size()-1;i++){
 				int legCount =0;
-				for(Id id:mode2personId2DepOrArrTime.get(mode).keySet()){
+				for(Id<Person> id:mode2personId2DepOrArrTime.get(mode).keySet()){
 					double tt [] = mode2personId2DepOrArrTime.get(mode).get(id);
 					for(double d:tt){
 						d=d/(3600);
@@ -159,33 +161,20 @@ public class LegModeDepartureArrivalTimeDistribution extends AbstractAnalyisModu
 		} catch (Exception e) {
 			throw new RuntimeException("Data is not written in File. Reason : "+e);
 		}
-		logger.info("Data is written at "+outputFolder+".rLegMode"+depOrArr+"TimeDistribution.txt");
+		this.logger.info("Data is written at "+outputFolder+".rLegMode"+depOrArr+"TimeDistribution.txt");
 	}
 
-
 	private void initializeTimeStepClasses() {
-		double simulationEndTime = getSimulationEndTime();
+		double simulationEndTime = LoadMyScenarios.getSimulationEndTime(this.configFile);
 
 		for(int endOfTimeStep =0; endOfTimeStep<=(int)simulationEndTime/(2*3600);endOfTimeStep++){
 			this.timeStepClasses.add(endOfTimeStep*2);
 		}
-		logger.info("The following time classes were defined: " + this.timeStepClasses);
+		this.logger.info("The following time classes were defined: " + this.timeStepClasses);
 	}
 
-	private double getSimulationEndTime(){
-		Config config = ConfigUtils.createConfig();
-		MatsimConfigReader reader= new MatsimConfigReader(config);
-		reader.readFile(this.configFile);
-		return config.qsim().getEndTime();
-	}
 	private void getTravelModes(){
 		this.travelModes.addAll(this.mode2PersonId2DepartureTime.keySet());
-		logger.info("Travel modes are "+this.travelModes.toString());
-	}
-	private static double getLastIteration(String configFile){
-		Config config = ConfigUtils.createConfig();
-		MatsimConfigReader reader= new MatsimConfigReader(config);
-		reader.readFile(configFile);
-		return config.controler().getLastIteration();
+		this.logger.info("Travel modes are "+this.travelModes.toString());
 	}
 }

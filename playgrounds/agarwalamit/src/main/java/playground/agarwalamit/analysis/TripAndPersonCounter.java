@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.jfree.util.Log;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
@@ -44,6 +44,7 @@ public class TripAndPersonCounter implements PersonDepartureEventHandler, Person
 
 	private Map<Id<Person>,Integer> personId2TripCounter;
 	private List<Id<Person>> departureList;
+	private final Logger logger = Logger.getLogger(TripAndPersonCounter.class);
 
 	@Override
 	public void reset(int iteration) {
@@ -90,7 +91,7 @@ public class TripAndPersonCounter implements PersonDepartureEventHandler, Person
 	
 	private void checkPersonNotArrived(){
 		if(this.departureList.size()>0){
-			Log.warn(this.departureList.size() +" persons are not arrived to activites. Reasons could be \n "
+			logger.warn(this.departureList.size() +" persons are not arrived to activites. Reasons could be \n "
 					+ "1) Person is `StuckAndAbort' 2) Person is enroute at simulation end time.");
 		}
 	}

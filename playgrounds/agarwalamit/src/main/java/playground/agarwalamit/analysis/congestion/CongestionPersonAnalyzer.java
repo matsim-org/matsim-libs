@@ -25,6 +25,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
@@ -40,12 +41,12 @@ import playground.vsp.analysis.modules.AbstractAnalyisModule;
  * @author amit
  */
 public class CongestionPersonAnalyzer extends AbstractAnalyisModule {
-	private final static Logger logger = Logger.getLogger(CongestionPersonAnalyzer.class);
+	private final Logger logger = Logger.getLogger(CongestionPersonAnalyzer.class);
 	private final String eventsFile;
 	private CongestionPerPersonHandler congestionPerPersonHandler;
 	private final int noOfTimeBins;
 	private final String configFile;
-	private Map<Double, Map<Id, Double>> congestionPerPersonTimeInterval;
+	private Map<Double, Map<Id<Person>, Double>> congestionPerPersonTimeInterval;
 	private EventsManager eventsManager;
 	private Scenario scenario;
 
@@ -88,18 +89,18 @@ public class CongestionPersonAnalyzer extends AbstractAnalyisModule {
 		MatsimConfigReader configReader = new MatsimConfigReader(config);
 		configReader.readFile(configfile);
 		Double endTime = config.qsim().getEndTime();
-		logger.info("Simulation end time is: " + endTime / 3600 + " hours.");
-		logger.info("Aggregating delays for " + (int) (endTime / 3600 / this.noOfTimeBins) + " hour time bins.");
+		this.logger.info("Simulation end time is: " + endTime / 3600 + " hours.");
+		this.logger.info("Aggregating delays for " + (int) (endTime / 3600 / this.noOfTimeBins) + " hour time bins.");
 		return endTime;
 	}
 
-	public Map<Double, Map<Id, Double>> getCongestionPerPersonTimeInterval() {
+	public Map<Double, Map<Id<Person>, Double>> getCongestionPerPersonTimeInterval() {
 		return this.congestionPerPersonTimeInterval;
 	}
 	
 	public void checkTotalDelayUsingAlternativeMethod(){
 		EventsManager em = EventsUtils.createEventsManager();
-		MarginalCongestionHandlerImplV3 implV3 = new MarginalCongestionHandlerImplV3(em, (ScenarioImpl) scenario);
+		MarginalCongestionHandlerImplV3 implV3 = new MarginalCongestionHandlerImplV3(em, (ScenarioImpl) this.scenario);
 		MatsimEventsReader eventsReader = new MatsimEventsReader(em);
 		em.addHandler(implV3);
 		eventsReader.readFile(this.eventsFile);

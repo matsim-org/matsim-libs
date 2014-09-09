@@ -27,9 +27,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.handler.EventHandler;
@@ -44,8 +45,8 @@ import playground.vsp.analysis.modules.AbstractAnalyisModule;
 public class CountData extends AbstractAnalyisModule {
 
 	private LinkVolumeHandler lvh;
-	private SortedMap<Id, Double> linkId2Vol;
-	private Map<Id, Map<Integer, Double>> linkId2TimeSlot2Vol;
+	private SortedMap<Id<Link>, Double> linkId2Vol;
+	private Map<Id<Link>, Map<Integer, Double>> linkId2TimeSlot2Vol;
 	private double countScaleFactor;
 
 	private final String [] linkIds = {
@@ -95,10 +96,11 @@ public class CountData extends AbstractAnalyisModule {
 	public void init(){
 		this.lvh = new LinkVolumeHandler();
 		this.lvh.reset(0);
-		linkId2Vol = new TreeMap<Id, Double>();
-		linkId2TimeSlot2Vol = new HashMap<Id, Map<Integer,Double>>();
-		for(String str :linkIds){
-			linkId2Vol.put(new IdImpl(str), 0.0);
+		this.linkId2Vol = new TreeMap<Id<Link>, Double>();
+		this.linkId2TimeSlot2Vol = new HashMap<Id<Link>, Map<Integer,Double>>();
+		for(String str :this.linkIds){
+			Id<Link> id = Id.create(str, Link.class);
+			this.linkId2Vol.put(id, 0.0);
 		}
 	}
 
@@ -126,7 +128,7 @@ public class CountData extends AbstractAnalyisModule {
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
 		try {
 			writer.write("linkId \t vol \n");
-			for(Id id:this.linkId2Vol.keySet()){
+			for(Id<Link> id:this.linkId2Vol.keySet()){
 				writer.write(id.toString()+"\t"+this.linkId2Vol.get(id)+"\n");
 			}
 			writer.close();
@@ -136,7 +138,7 @@ public class CountData extends AbstractAnalyisModule {
 	}
 
 	private void getDesiredLinkVolumes (){
-		for(Id id :this.linkId2Vol.keySet()){
+		for(Id<Link> id :this.linkId2Vol.keySet()){
 			if(this.linkId2TimeSlot2Vol.containsKey(id)) this.linkId2Vol.put(id, this.countScaleFactor*sumMap(this.linkId2TimeSlot2Vol.get(id)));
 			else this.linkId2Vol.put(id, 0.0);
 		}

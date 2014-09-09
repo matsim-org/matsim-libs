@@ -27,6 +27,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -42,7 +43,7 @@ public class RouteDistancePerUserGroup {
 
 	public RouteDistancePerUserGroup() {
 		super();
-		sc = LoadMyScenarios.loadScenarioFromPlansAndNetwork(populationFile, networkFile);
+		this.sc = LoadMyScenarios.loadScenarioFromPlansAndNetwork(this.populationFile, this.networkFile);
 		this.usrGrpExtended = new UserGroupUtilsExtended();
 	}
 
@@ -54,8 +55,8 @@ public class RouteDistancePerUserGroup {
 	private UserGroupUtilsExtended usrGrpExtended;
 	private SortedMap<UserGroup, SortedMap<String, Double>> usrGrp2Mode2MeanDistance = new TreeMap<UserGroup, SortedMap<String,Double>>();
 	private SortedMap<UserGroup, SortedMap<String, Double>> usrGrp2Mode2MedianDistance = new TreeMap<UserGroup, SortedMap<String,Double>>();
-	private SortedMap<String, Map<Id, List<Double>>> mode2PersonId2RouteDist;
-	private SortedMap<String, Map<Id, Double>> mode2PersonId2TotalRouteDist;
+	private SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2RouteDist;
+	private SortedMap<String, Map<Id<Person>, Double>> mode2PersonId2TotalRouteDist;
 
 	public static void main(String[] args) {
 		RouteDistancePerUserGroup routeDistUG = new RouteDistancePerUserGroup();
@@ -64,38 +65,38 @@ public class RouteDistancePerUserGroup {
 
 	private void run(){
 		LegModeRouteDistanceDistributionHandler	lmdfed = new LegModeRouteDistanceDistributionHandler();
-		lmdfed.init(sc);
+		lmdfed.init(this.sc);
 		lmdfed.preProcessData();
 		lmdfed.postProcessData();
-		lmdfed.writeResults(outputDir+"/analysis/");
-		mode2PersonId2RouteDist = lmdfed.getMode2PersonId2RouteDistances();
-		mode2PersonId2TotalRouteDist = lmdfed.getMode2PersonId2TotalRouteDistance();
+		lmdfed.writeResults(this.outputDir+"/analysis/");
+		this.mode2PersonId2RouteDist = lmdfed.getMode2PersonId2RouteDistances();
+		this.mode2PersonId2TotalRouteDist = lmdfed.getMode2PersonId2TotalRouteDistance();
 		getUserGroupDistanceMeanAndMeadian();
-		writeResults(outputDir+"/analysis/");
+		writeResults(this.outputDir+"/analysis/");
 	}
 
 	public void writeResults(String outputFolder) {
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/usrGrp2TravelMode2MeanAndMedianRouteDistance.txt");
 		try {
 			writer.write("UserGroup \t travelMode \t MeanRouteDistance \t MedianRouteDistance \n");
-			for(UserGroup ug:usrGrp2Mode2MeanDistance.keySet()){
-				for(String travelMode:usrGrp2Mode2MeanDistance.get(ug).keySet()){
-					writer.write(ug+"\t"+travelMode+"\t"+usrGrp2Mode2MeanDistance.get(ug).get(travelMode)+"\t"+usrGrp2Mode2MedianDistance.get(ug).get(travelMode)+"\n");
+			for(UserGroup ug:this.usrGrp2Mode2MeanDistance.keySet()){
+				for(String travelMode:this.usrGrp2Mode2MeanDistance.get(ug).keySet()){
+					writer.write(ug+"\t"+travelMode+"\t"+this.usrGrp2Mode2MeanDistance.get(ug).get(travelMode)+"\t"+this.usrGrp2Mode2MedianDistance.get(ug).get(travelMode)+"\n");
 				}
 			}
 			writer.close();
 		} catch (Exception e) {
 			throw new RuntimeException("Data is not written to a file.");
 		}
-		logger.info("Data writing is finished.");
+		this.logger.info("Data writing is finished.");
 	}
 
 	private void getUserGroupDistanceMeanAndMeadian(){
 		PersonFilter pf = new PersonFilter();
 		for(UserGroup ug:UserGroup.values()){
 			Population pop = pf.getPopulation(sc.getPopulation(), ug);
-			usrGrp2Mode2MeanDistance.put(ug, this.usrGrpExtended.calculateTravelMode2MeanFromLists(mode2PersonId2RouteDist, pop));
-			usrGrp2Mode2MedianDistance.put(ug, this.usrGrpExtended.calculateTravelMode2MedianFromLists(mode2PersonId2RouteDist, pop));
+			this.usrGrp2Mode2MeanDistance.put(ug, this.usrGrpExtended.calculateTravelMode2MeanFromLists(mode2PersonId2RouteDist, pop));
+			this.usrGrp2Mode2MedianDistance.put(ug, this.usrGrpExtended.calculateTravelMode2MedianFromLists(mode2PersonId2RouteDist, pop));
 //			usrGrp2Mode2MeanDistance.put(ug, this.usrGrpExtended.calculateTravelMode2Mean(mode2PersonId2TotalRouteDist, pop));
 //			usrGrp2Mode2MedianDistance.put(ug, this.usrGrpExtended.calculateTravelMode2Median(mode2PersonId2TotalRouteDist, pop));
 		}

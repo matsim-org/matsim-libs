@@ -23,14 +23,12 @@ import java.io.IOException;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.agarwalamit.analysis.LoadMyScenarios;
 import playground.ikaddoura.internalizationCar.MarginalCongestionHandlerImplV3;
 
 /**
@@ -40,7 +38,7 @@ public class AbsoluteDelays {
 
 	private static String clusterPathDesktop = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/";
 	private static String [] runCase =  {"baseCaseCtd","ei","ci","eci"};//{"run201","run202","run203","run204"};
-	private final static String networkFile = "/Users/aagarwal/Desktop/ils4/agarwal/munich/input/network-86-85-87-84_simplifiedWithStrongLinkMerge---withLanes.xml";
+//	private final static String networkFile = "/Users/aagarwal/Desktop/ils4/agarwal/munich/input/network-86-85-87-84_simplifiedWithStrongLinkMerge---withLanes.xml";
 
 	public static void main(String[] args) {
 		
@@ -67,9 +65,11 @@ public class AbsoluteDelays {
 
 	private static double totalDelayInHoursFromEventsFile(String runNumber) {
 		EventsManager eventManager = EventsUtils.createEventsManager();
-		ScenarioImpl sc = loadScenario(runNumber);
-		int lastIteration = 1500;
-		MarginalCongestionHandlerImplV3 congestionHandlerImplV3= new MarginalCongestionHandlerImplV3(eventManager, sc);
+		String configFile = runNumber+"output_config.xml";
+		int lastIteration = LoadMyScenarios.getLastIteration(configFile);
+		String networkFile = runNumber+"output_network.xml.gz";
+		Scenario sc =  LoadMyScenarios.loadScenarioFromNetwork(networkFile);
+		MarginalCongestionHandlerImplV3 congestionHandlerImplV3= new MarginalCongestionHandlerImplV3(eventManager,(ScenarioImpl) sc);
 
 		eventManager.addHandler(congestionHandlerImplV3);
 
@@ -79,12 +79,5 @@ public class AbsoluteDelays {
 		eventsReader.readFile(inputEventsFile);
 
 		return congestionHandlerImplV3.getTotalDelay()/3600;
-	}
-	
-	private static ScenarioImpl loadScenario(String runNumber) {
-		Config config = ConfigUtils.createConfig();
-		config.network().setInputFile(networkFile); //clusterPathDesktop+"/input/SiouxFalls_networkWithRoadType.xml.gz"
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		return (ScenarioImpl) scenario;
 	}
 }

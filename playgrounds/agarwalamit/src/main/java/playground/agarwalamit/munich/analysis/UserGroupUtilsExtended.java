@@ -27,6 +27,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 
 /**
@@ -35,13 +36,13 @@ import org.matsim.api.core.v01.population.Population;
 public class UserGroupUtilsExtended {
 	private final Logger logger = Logger.getLogger(UserGroupUtilsExtended.class);
 	
-	public SortedMap<String, Double> calculateTravelMode2Mean(Map<String, Map<Id, Double>> inputMap, Population relavantPop){	
-		logger.info("Calculating mean(average) travel time for all travel modes.");
+	public SortedMap<String, Double> calculateTravelMode2Mean(Map<String, Map<Id<Person>, Double>> inputMap, Population relavantPop){	
+		this.logger.info("Calculating mean(average) travel time for all travel modes.");
 		SortedMap<String, Double> mode2Mean = new TreeMap<String, Double>();
 		List<Double> allTravelTimes = new ArrayList<Double>();
 		for(String mode : inputMap.keySet()){
 			List<Double> travelTimes = new ArrayList<Double>();
-			for(Id id:inputMap.get(mode).keySet()){
+			for(Id<Person> id:inputMap.get(mode).keySet()){
 				if(relavantPop.getPersons().keySet().contains(id)){
 					travelTimes.add(inputMap.get(mode).get(id));
 					allTravelTimes.add(inputMap.get(mode).get(id));
@@ -53,13 +54,13 @@ public class UserGroupUtilsExtended {
 		return mode2Mean;
 	}
 	
-	public SortedMap<String, Double> calculateTravelMode2MeanFromLists(Map<String, Map<Id, List<Double>>> inputMap, Population relavantPop){	
-		logger.info("Calculating mean(average) travel time for all travel modes.");
+	public SortedMap<String, Double> calculateTravelMode2MeanFromLists(Map<String, Map<Id<Person>, List<Double>>> inputMap, Population relavantPop){	
+		this.logger.info("Calculating mean(average) travel time for all travel modes.");
 		SortedMap<String, Double> mode2Mean = new TreeMap<String, Double>();
 		List<Double> allTravelTimes = new ArrayList<Double>();
 		for(String mode : inputMap.keySet()){
 			List<Double> travelTimes = new ArrayList<Double>();
-			for(Id id:inputMap.get(mode).keySet()){
+			for(Id<Person> id:inputMap.get(mode).keySet()){
 				if(relavantPop.getPersons().keySet().contains(id)){
 					travelTimes.addAll(inputMap.get(mode).get(id));
 					allTravelTimes.addAll(inputMap.get(mode).get(id));
@@ -71,13 +72,13 @@ public class UserGroupUtilsExtended {
 		return mode2Mean;
 	}
 
-	public SortedMap<String, Double> calculateTravelMode2Median(Map<String, Map<Id, Double>> inputMap, Population relavantPop){
-		logger.info("Calculating median travel time for all travel modes.");
+	public SortedMap<String, Double> calculateTravelMode2Median(Map<String, Map<Id<Person>, Double>> inputMap, Population relavantPop){
+		this.logger.info("Calculating median travel time for all travel modes.");
 		SortedMap<String, Double> mode2Median = new TreeMap<String, Double>();
 		List<Double> allTravelTimes = new ArrayList<Double>();
 		for(String mode : inputMap.keySet()){
 			List<Double> travelTimes = new ArrayList<Double>();
-			for(Id id:inputMap.get(mode).keySet()){
+			for(Id<Person> id:inputMap.get(mode).keySet()){
 				if(relavantPop.getPersons().keySet().contains(id)){
 					travelTimes.add(inputMap.get(mode).get(id));
 					allTravelTimes.add(inputMap.get(mode).get(id));
@@ -89,13 +90,13 @@ public class UserGroupUtilsExtended {
 		return mode2Median;
 	}
 	
-	public SortedMap<String, Double> calculateTravelMode2MedianFromLists(Map<String, Map<Id, List<Double>>> inputMap, Population relavantPop){
-		logger.info("Calculating median travel time for all travel modes.");
+	public SortedMap<String, Double> calculateTravelMode2MedianFromLists(Map<String, Map<Id<Person>, List<Double>>> inputMap, Population relavantPop){
+		this.logger.info("Calculating median travel time for all travel modes.");
 		SortedMap<String, Double> mode2Median = new TreeMap<String, Double>();
 		List<Double> allTravelTimes = new ArrayList<Double>();
 		for(String mode : inputMap.keySet()){
 			List<Double> travelTimes = new ArrayList<Double>();
-			for(Id id:inputMap.get(mode).keySet()){
+			for(Id<Person> id:inputMap.get(mode).keySet()){
 				if(relavantPop.getPersons().keySet().contains(id)){
 					travelTimes.addAll(inputMap.get(mode).get(id));
 					allTravelTimes.addAll(inputMap.get(mode).get(id));
