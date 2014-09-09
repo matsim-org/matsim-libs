@@ -51,7 +51,7 @@ public class IncreaseNumberOfVehicles extends AbstractPStrategyModule {
 	public PPlan run(Operator cooperative) {
 		// sufficient founds, so buy one
 		PPlan oldPlan = cooperative.getBestPlan();
-		PPlan plan = new PPlan(cooperative.getNewPlanId(), this.getName());
+		PPlan plan = new PPlan(cooperative.getNewPlanId(), this.getStrategyName());
 		plan.setStopsToBeServed(oldPlan.getStopsToBeServed());
 		plan.setStartTime(oldPlan.getStartTime());
 		plan.setEndTime(oldPlan.getEndTime());
@@ -62,7 +62,7 @@ public class IncreaseNumberOfVehicles extends AbstractPStrategyModule {
 	}
 
 	@Override
-	public String getName() {
+	public String getStrategyName() {
 		return IncreaseNumberOfVehicles.STRATEGY_NAME;
 	}
 

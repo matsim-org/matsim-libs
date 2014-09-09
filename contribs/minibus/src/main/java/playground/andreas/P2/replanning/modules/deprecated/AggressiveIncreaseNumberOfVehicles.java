@@ -67,7 +67,7 @@ public class AggressiveIncreaseNumberOfVehicles extends AbstractPStrategyModule 
 			
 		// vehicles were bought - create plan
 		PPlan oldPlan = cooperative.getBestPlan();
-		PPlan plan = new PPlan(cooperative.getNewPlanId(), this.getName());
+		PPlan plan = new PPlan(cooperative.getNewPlanId(), this.getStrategyName());
 		plan.setStopsToBeServed(oldPlan.getStopsToBeServed());
 		plan.setStartTime(oldPlan.getStartTime());
 		plan.setEndTime(oldPlan.getEndTime());
@@ -81,7 +81,7 @@ public class AggressiveIncreaseNumberOfVehicles extends AbstractPStrategyModule 
 	}
 
 	@Override
-	public String getName() {
+	public String getStrategyName() {
 		return AggressiveIncreaseNumberOfVehicles.STRATEGY_NAME;
 	}
 }

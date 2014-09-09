@@ -97,7 +97,7 @@ public class SidewaysRouteExtension extends AbstractPStrategyModule {
 		ArrayList<TransitStopFacility> newStopsToBeServed = this.addStopToExistingStops(baseStop, remoteStop, currentStopsToBeServed, newStop);
 		
 		// create new plan
-		PPlan newPlan = new PPlan(cooperative.getNewPlanId(), this.getName());
+		PPlan newPlan = new PPlan(cooperative.getNewPlanId(), this.getStrategyName());
 		newPlan.setNVehicles(1);
 		newPlan.setStartTime(oldPlan.getStartTime());
 		newPlan.setEndTime(oldPlan.getEndTime());
@@ -270,7 +270,7 @@ public class SidewaysRouteExtension extends AbstractPStrategyModule {
 
 
 	@Override
-	public String getName() {
+	public String getStrategyName() {
 		return SidewaysRouteExtension.STRATEGY_NAME;
 	}
 }

@@ -98,7 +98,7 @@ public class TimeReduceDemand extends AbstractPStrategyModule implements Transit
 		}
 				
 		// create new plan
-		PPlan newPlan = new PPlan(cooperative.getNewPlanId(), this.getName());
+		PPlan newPlan = new PPlan(cooperative.getNewPlanId(), this.getStrategyName());
 		newPlan.setNVehicles(1);
 		newPlan.setStopsToBeServed(cooperative.getBestPlan().getStopsToBeServed());
 		newPlan.setStartTime(startTime);
@@ -110,7 +110,7 @@ public class TimeReduceDemand extends AbstractPStrategyModule implements Transit
 	}
 
 	@Override
-	public String getName() {
+	public String getStrategyName() {
 		return TimeReduceDemand.STRATEGY_NAME;
 	}
 

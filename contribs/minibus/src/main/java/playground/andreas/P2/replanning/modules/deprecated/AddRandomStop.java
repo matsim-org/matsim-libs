@@ -90,7 +90,7 @@ public class AddRandomStop extends AbstractPStrategyModule {
 		}
 						
 		// profitable route, change startTime
-		PPlan newPlan = new PPlan(cooperative.getNewPlanId(), this.getName());
+		PPlan newPlan = new PPlan(cooperative.getNewPlanId(), this.getStrategyName());
 		newPlan.setNVehicles(1);
 		newPlan.setStopsToBeServed(newStopsToBeServed);
 		newPlan.setStartTime(cooperative.getBestPlan().getStartTime());
@@ -102,7 +102,7 @@ public class AddRandomStop extends AbstractPStrategyModule {
 	}
 
 	@Override
-	public String getName() {
+	public String getStrategyName() {
 		return AddRandomStop.STRATEGY_NAME;
 	}
 }

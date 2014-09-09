@@ -25,10 +25,14 @@ public interface PStrategy {
 
 	/**
 	 * 
-	 * @param cooperative
+	 * @param operator
 	 * @return the plan found or null if there is no better plan 
 	 */
-	public PPlan run(Operator cooperative);
+	public PPlan run(Operator operator);
 	
-	public String getName();
+	/**
+	 * 
+	 * @return The name of the strategy
+	 */
+	public String getStrategyName();
 }

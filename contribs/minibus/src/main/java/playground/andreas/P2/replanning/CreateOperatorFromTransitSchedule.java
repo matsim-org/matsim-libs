@@ -173,7 +173,7 @@ public class CreateOperatorFromTransitSchedule implements PStrategy{
 			}
 		}
 		
-		PPlan plan = new PPlan(id, this.getName());
+		PPlan plan = new PPlan(id, this.getStrategyName());
 		plan.setStopsToBeServed(stopsToBeServed);
 		plan.setStartTime(startTime);
 		plan.setEndTime(endTime);
@@ -212,7 +212,7 @@ public class CreateOperatorFromTransitSchedule implements PStrategy{
 	}
 
 	@Override
-	public String getName() {
+	public String getStrategyName() {
 		return CreateOperatorFromTransitSchedule.STRATEGY_NAME;
 	}
 }

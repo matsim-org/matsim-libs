@@ -30,9 +30,10 @@ import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 
 /**
- * Paratransit plan
+ * The operator's plan
  * 
  * @author aneumann
  *
@@ -55,7 +56,7 @@ public class PPlan implements Comparable<PPlan>{
 	
 	private ArrayList<TransitStopFacility> stopsToBeServed;
 
-	private Set<Id> vehicleIds;
+	private Set<Id<Vehicle>> vehicleIds;
 	
 	public PPlan(Id<PPlan> planId, String creator) {
 		this.planId = planId;
@@ -107,7 +108,7 @@ public class PPlan implements Comparable<PPlan>{
 
 	public void setLine(TransitLine line) {
 		this.line = line;
-		this.vehicleIds = new TreeSet<Id>();
+		this.vehicleIds = new TreeSet<>();
 		for (TransitRoute route : this.line.getRoutes().values()) {
 			for (Departure departure : route.getDepartures().values()) {
 				this.vehicleIds.add(departure.getVehicleId());
@@ -168,7 +169,7 @@ public class PPlan implements Comparable<PPlan>{
 		}
 	}
 
-	public Set<Id> getVehicleIds() {
+	public Set<Id<Vehicle>> getVehicleIds() {
 		return vehicleIds;
 	}
 

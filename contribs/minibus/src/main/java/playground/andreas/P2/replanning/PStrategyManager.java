@@ -102,41 +102,41 @@ public class PStrategyManager {
 		
 		if (name.equals(RemoveAllVehiclesButOne.STRATEGY_NAME)) {
 			strategy = new RemoveAllVehiclesButOne(settings.getParametersAsArrayList());
-			log.warn(strategy.getName() + " is deprecated. It may not be maintained anymore.");
+			log.warn(strategy.getStrategyName() + " is deprecated. It may not be maintained anymore.");
 		} else if (name.equals(RandomStartTimeAllocator.STRATEGY_NAME)) {
 			strategy = new RandomStartTimeAllocator(settings.getParametersAsArrayList());
-			log.warn(strategy.getName() + " is deprecated. It may not be maintained anymore.");
+			log.warn(strategy.getStrategyName() + " is deprecated. It may not be maintained anymore.");
 		} else if (name.equals(RandomEndTimeAllocator.STRATEGY_NAME)) {
 			strategy = new RandomEndTimeAllocator(settings.getParametersAsArrayList());
-			log.warn(strategy.getName() + " is deprecated. It may not be maintained anymore.");
+			log.warn(strategy.getStrategyName() + " is deprecated. It may not be maintained anymore.");
 		} else if (name.equals(MaxRandomStartTimeAllocator.STRATEGY_NAME)) {
 			strategy = new MaxRandomStartTimeAllocator(settings.getParametersAsArrayList());
 		} else if (name.equals(MaxRandomEndTimeAllocator.STRATEGY_NAME)) {
 			strategy = new MaxRandomEndTimeAllocator(settings.getParametersAsArrayList());
 		} else if (name.equals(IncreaseNumberOfVehicles.STRATEGY_NAME)) {
 			strategy = new IncreaseNumberOfVehicles(settings.getParametersAsArrayList());
-			log.warn(strategy.getName() + " is deprecated. It may not be maintained anymore.");
+			log.warn(strategy.getStrategyName() + " is deprecated. It may not be maintained anymore.");
 		} else if (name.equals(AddRandomStop.STRATEGY_NAME)) {
 			strategy = new AddRandomStop(settings.getParametersAsArrayList());
-			log.warn(strategy.getName() + " is deprecated. It may not be maintained anymore.");
+			log.warn(strategy.getStrategyName() + " is deprecated. It may not be maintained anymore.");
 		} else if (name.equals(AggressiveIncreaseNumberOfVehicles.STRATEGY_NAME)) {
 			strategy = new AggressiveIncreaseNumberOfVehicles(settings.getParametersAsArrayList());
-			log.warn(strategy.getName() + " is deprecated. It may not be maintained anymore.");
+			log.warn(strategy.getStrategyName() + " is deprecated. It may not be maintained anymore.");
 		} else if(name.equals(ConvexHullRouteExtension.STRATEGY_NAME)){
 			strategy = new ConvexHullRouteExtension(settings.getParametersAsArrayList());
-			log.warn(strategy.getName() + " is deprecated. It may not be maintained anymore.");
+			log.warn(strategy.getStrategyName() + " is deprecated. It may not be maintained anymore.");
 		} else if(name.equals(RectangleHullRouteExtension.STRATEGY_NAME)){
 			strategy = new RectangleHullRouteExtension(settings.getParametersAsArrayList());
-			log.warn(strategy.getName() + " is deprecated. It may not be maintained anymore.");
+			log.warn(strategy.getStrategyName() + " is deprecated. It may not be maintained anymore.");
 		} else if(name.equals(RandomRouteEndExtension.STRATEGY_NAME)){
 			strategy = new RandomRouteEndExtension(settings.getParametersAsArrayList());
-			log.warn(strategy.getName() + " is deprecated. It may not be maintained anymore.");
+			log.warn(strategy.getStrategyName() + " is deprecated. It may not be maintained anymore.");
 		} else if(name.equals(RandomRouteStartExtension.STRATEGY_NAME)){
 			strategy = new RandomRouteStartExtension(settings.getParametersAsArrayList());
-			log.warn(strategy.getName() + " is deprecated. It may not be maintained anymore.");
+			log.warn(strategy.getStrategyName() + " is deprecated. It may not be maintained anymore.");
 		} else if(name.equals(RouteEnvelopeExtension.STRATEGY_NAME)){
 			strategy = new RouteEnvelopeExtension(settings.getParametersAsArrayList());
-			log.warn(strategy.getName() + " is deprecated. It may not be maintained anymore.");
+			log.warn(strategy.getStrategyName() + " is deprecated. It may not be maintained anymore.");
 		} else if(name.equals(SidewaysRouteExtension.STRATEGY_NAME)){
 			strategy = new SidewaysRouteExtension(settings.getParametersAsArrayList());
 		} else if(name.equals(EndRouteExtension.STRATEGY_NAME)){
@@ -146,20 +146,20 @@ public class PStrategyManager {
 			strat.setPIdentifier(this.pIdentifier);
 			eventsManager.addHandler(strat);
 			strategy = strat;
-			log.warn(strategy.getName() + " is deprecated. It may not be maintained anymore.");
+			log.warn(strategy.getStrategyName() + " is deprecated. It may not be maintained anymore.");
 		} else if (name.equals(ReduceTimeServed.STRATEGY_NAME)) {
 			ReduceTimeServed strat = new ReduceTimeServed(settings.getParametersAsArrayList());
 			strat.setPIdentifier(this.pIdentifier);
 			eventsManager.addHandler(strat);
 			strategy = strat;
-			log.warn(strategy.getName() + " is deprecated. It may not be maintained anymore.");
+			log.warn(strategy.getStrategyName() + " is deprecated. It may not be maintained anymore.");
 			this.reduceTimeServed = strat;
 		} else if (name.equals(ReduceTimeServedR.STRATEGY_NAME)) {
 			ReduceTimeServedR strat = new ReduceTimeServedR(settings.getParametersAsArrayList());
 			strat.setPIdentifier(this.pIdentifier);
 			eventsManager.addHandler(strat);
 			strategy = strat;
-			log.warn(strategy.getName() + " is deprecated. It may not be maintained anymore.");
+			log.warn(strategy.getStrategyName() + " is deprecated. It may not be maintained anymore.");
 		} else if (name.equals(ReduceTimeServedRFare.STRATEGY_NAME)) {
 			ReduceTimeServedRFare strat = new ReduceTimeServedRFare(settings.getParametersAsArrayList());
 			strat.setTicketMachine(ticketMachine);
@@ -170,20 +170,20 @@ public class PStrategyManager {
 			strat.setPIdentifier(this.pIdentifier);
 			eventsManager.addHandler(strat);
 			strategy = strat;
-			log.warn(strategy.getName() + " is deprecated. It may not be maintained anymore.");
+			log.warn(strategy.getStrategyName() + " is deprecated. It may not be maintained anymore.");
 		} else if (name.equals(ReduceStopsToBeServed.STRATEGY_NAME)) {
 			ReduceStopsToBeServed strat = new ReduceStopsToBeServed(settings.getParametersAsArrayList());
 			strat.setPIdentifier(this.pIdentifier);
 			eventsManager.addHandler(strat);
 			strategy = strat;
-			log.warn(strategy.getName() + " is deprecated. It may not be maintained anymore.");
+			log.warn(strategy.getStrategyName() + " is deprecated. It may not be maintained anymore.");
 			this.reduceStopsToBeServed = strat;
 		} else if (name.equals(ReduceStopsToBeServedR.STRATEGY_NAME)) {
 			ReduceStopsToBeServedR strat = new ReduceStopsToBeServedR(settings.getParametersAsArrayList());
 			strat.setPIdentifier(this.pIdentifier);
 			eventsManager.addHandler(strat);
 			strategy = strat;
-			log.warn(strategy.getName() + " is deprecated. It may not be maintained anymore.");
+			log.warn(strategy.getStrategyName() + " is deprecated. It may not be maintained anymore.");
 		} else if (name.equals(ReduceStopsToBeServedRFare.STRATEGY_NAME)) {
 			ReduceStopsToBeServedRFare strat = new ReduceStopsToBeServedRFare(settings.getParametersAsArrayList());
 			strat.setTicketMachine(ticketMachine);
@@ -239,7 +239,7 @@ public class PStrategyManager {
 				return this.strategies.get(i);
 			}
 		}
-		// This line should not be reachable
+		log.error("This line should not be reachable. Check it.");
 		return null;
 	}
 
@@ -247,10 +247,10 @@ public class PStrategyManager {
 	public String toString() {
 		StringBuffer strBuffer = new StringBuffer();
 		strBuffer.append("Strategies: ");
-		strBuffer.append(this.strategies.get(0).getName()); strBuffer.append(" ("); strBuffer.append(this.weights.get(0)); strBuffer.append(")");
+		strBuffer.append(this.strategies.get(0).getStrategyName()); strBuffer.append(" ("); strBuffer.append(this.weights.get(0)); strBuffer.append(")");
 		
 		for (int i = 1; i < this.strategies.size(); i++) {
-			strBuffer.append(", "); strBuffer.append(this.strategies.get(i).getName()); strBuffer.append(" ("); strBuffer.append(this.weights.get(i)); strBuffer.append(")");
+			strBuffer.append(", "); strBuffer.append(this.strategies.get(i).getStrategyName()); strBuffer.append(" ("); strBuffer.append(this.weights.get(i)); strBuffer.append(")");
 		}
 		return strBuffer.toString();
 	}

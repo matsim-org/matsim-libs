@@ -100,7 +100,7 @@ public class CreateNewPlan extends AbstractPStrategyModule {
 			stopsToBeServed.add(stop1);
 			stopsToBeServed.add(stop2);
 			
-			newPlan = new PPlan(operator.getNewPlanId(), this.getName());
+			newPlan = new PPlan(operator.getNewPlanId(), this.getStrategyName());
 			newPlan.setStopsToBeServed(stopsToBeServed);
 			newPlan.setStartTime(startTime);
 			newPlan.setEndTime(endTime);
@@ -120,7 +120,7 @@ public class CreateNewPlan extends AbstractPStrategyModule {
 	}
 
 	@Override
-	public String getName() {
+	public String getStrategyName() {
 		return CreateNewPlan.STRATEGY_NAME;
 	}
 

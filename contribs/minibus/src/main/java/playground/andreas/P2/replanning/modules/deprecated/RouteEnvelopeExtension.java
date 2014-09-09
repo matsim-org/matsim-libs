@@ -88,7 +88,7 @@ public class RouteEnvelopeExtension extends AbstractPStrategyModule {
 		}else{
 			// create a new plan 
 			PPlan oldPlan = cooperative.getBestPlan();
-			PPlan newPlan = new PPlan(cooperative.getNewPlanId(), this.getName());
+			PPlan newPlan = new PPlan(cooperative.getNewPlanId(), this.getStrategyName());
 			newPlan.setNVehicles(1);
 			newPlan.setStartTime(oldPlan.getStartTime());
 			newPlan.setEndTime(oldPlan.getEndTime());
@@ -285,7 +285,7 @@ public class RouteEnvelopeExtension extends AbstractPStrategyModule {
 	 * @see playground.andreas.P2.replanning.PStrategy#getName()
 	 */
 	@Override
-	public String getName() {
+	public String getStrategyName() {
 		return STRATEGY_NAME;
 	}
 

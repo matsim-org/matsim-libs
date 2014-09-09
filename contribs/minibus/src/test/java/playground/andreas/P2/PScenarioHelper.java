@@ -415,7 +415,7 @@ class Route2111to2333 implements PStrategy{
 	public PPlan run(Operator cooperative) {
 		Id routeId = new IdImpl(cooperative.getCurrentIteration());
 		
-		PPlan newPlan = new PPlan(routeId, this.getName());
+		PPlan newPlan = new PPlan(routeId, this.getStrategyName());
 		newPlan.setNVehicles(1);
 		newPlan.setStartTime(8.0 * 3600.0);
 		newPlan.setEndTime(16.0 * 3600.0);
@@ -433,7 +433,7 @@ class Route2111to2333 implements PStrategy{
 	 * @see playground.andreas.P2.replanning.PStrategy#getName()
 	 */
 	@Override
-	public String getName() {
+	public String getStrategyName() {
 		return "Route2111to2333";
 	}
 }
@@ -452,7 +452,7 @@ class Route2333to2111 implements PStrategy{
 	public PPlan run(Operator cooperative) {
 		Id routeId = new IdImpl(cooperative.getCurrentIteration());
 		
-		PPlan newPlan = new PPlan(routeId, this.getName());
+		PPlan newPlan = new PPlan(routeId, this.getStrategyName());
 		newPlan.setNVehicles(1);
 		newPlan.setStartTime(8.0 * 3600.0);
 		newPlan.setEndTime(16.0 * 3600.0);
@@ -470,7 +470,7 @@ class Route2333to2111 implements PStrategy{
 	 * @see playground.andreas.P2.replanning.PStrategy#getName()
 	 */
 	@Override
-	public String getName() {
+	public String getStrategyName() {
 		return "Route2333to2111";
 	}
 }
@@ -488,7 +488,7 @@ class Route2414to3444 implements PStrategy{
 	@Override
 	public PPlan run(Operator cooperative) {
 		Id routeId = new IdImpl(cooperative.getCurrentIteration());
-		PPlan newPlan = new PPlan(routeId, this.getName());
+		PPlan newPlan = new PPlan(routeId, this.getStrategyName());
 		newPlan.setNVehicles(1);
 		newPlan.setStartTime(8.0 * 3600.0);
 		newPlan.setEndTime(16.0 * 3600.0);
@@ -506,7 +506,7 @@ class Route2414to3444 implements PStrategy{
 	 * @see playground.andreas.P2.replanning.PStrategy#getName()
 	 */
 	@Override
-	public String getName() {
+	public String getStrategyName() {
 		return "Route2414to3444";
 	}
 }
@@ -525,7 +525,7 @@ class Route2111to1314to4443 implements PStrategy{
 	@Override
 	public PPlan run(Operator cooperative) {
 		Id routeId = new IdImpl(cooperative.getCurrentIteration());
-		PPlan newPlan = new PPlan(routeId, this.getName());
+		PPlan newPlan = new PPlan(routeId, this.getStrategyName());
 		newPlan.setNVehicles(1);
 		newPlan.setStartTime(8.0 * 3600.0);
 		newPlan.setEndTime(16.0 * 3600.0);
@@ -545,7 +545,7 @@ class Route2111to1314to4443 implements PStrategy{
 	 * @see playground.andreas.P2.replanning.PStrategy#getName()
 	 */
 	@Override
-	public String getName() {
+	public String getStrategyName() {
 		return "Route2111to1314to4443";
 	}
 }

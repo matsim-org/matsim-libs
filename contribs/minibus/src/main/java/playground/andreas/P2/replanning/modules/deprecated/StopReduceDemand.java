@@ -94,7 +94,7 @@ public class StopReduceDemand extends AbstractPStrategyModule implements Vehicle
 		}
 				
 		// profitable route, change startTime
-		PPlan newPlan = new PPlan(cooperative.getNewPlanId(), this.getName());
+		PPlan newPlan = new PPlan(cooperative.getNewPlanId(), this.getStrategyName());
 		newPlan.setNVehicles(1);
 		newPlan.setStopsToBeServed(stopsToBeServed);
 		newPlan.setStartTime(cooperative.getBestPlan().getStartTime());
@@ -106,7 +106,7 @@ public class StopReduceDemand extends AbstractPStrategyModule implements Vehicle
 	}
 
 	@Override
-	public String getName() {
+	public String getStrategyName() {
 		return StopReduceDemand.STRATEGY_NAME;
 	}
 

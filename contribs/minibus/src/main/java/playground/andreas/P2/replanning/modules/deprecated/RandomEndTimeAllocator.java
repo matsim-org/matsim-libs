@@ -55,7 +55,7 @@ public class RandomEndTimeAllocator extends AbstractPStrategyModule {
 	@Override
 	public PPlan run(Operator cooperative) {
 		// profitable route, change startTime
-		PPlan newPlan = new PPlan(cooperative.getNewPlanId(), this.getName());
+		PPlan newPlan = new PPlan(cooperative.getNewPlanId(), this.getStrategyName());
 		newPlan.setNVehicles(1);
 		newPlan.setStopsToBeServed(cooperative.getBestPlan().getStopsToBeServed());
 		newPlan.setStartTime(cooperative.getBestPlan().getStartTime());
@@ -71,7 +71,7 @@ public class RandomEndTimeAllocator extends AbstractPStrategyModule {
 	}
 
 	@Override
-	public String getName() {
+	public String getStrategyName() {
 		return RandomEndTimeAllocator.STRATEGY_NAME;
 	}
 

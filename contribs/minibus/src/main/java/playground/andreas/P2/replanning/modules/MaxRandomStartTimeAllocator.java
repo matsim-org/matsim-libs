@@ -60,7 +60,7 @@ public class MaxRandomStartTimeAllocator extends AbstractPStrategyModule {
 	@Override
 	public PPlan run(Operator cooperative) {
 		// change startTime
-		PPlan newPlan = new PPlan(cooperative.getNewPlanId(), this.getName());
+		PPlan newPlan = new PPlan(cooperative.getNewPlanId(), this.getStrategyName());
 		newPlan.setNVehicles(1);
 		newPlan.setStopsToBeServed(cooperative.getBestPlan().getStopsToBeServed());
 		
@@ -96,7 +96,7 @@ public class MaxRandomStartTimeAllocator extends AbstractPStrategyModule {
 	}
 	
 	@Override
-	public String getName() {
+	public String getStrategyName() {
 		return MaxRandomStartTimeAllocator.STRATEGY_NAME;
 	}
 }

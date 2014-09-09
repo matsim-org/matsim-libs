@@ -102,7 +102,7 @@ public class ReduceTimeServedRFare extends AbstractPStrategyModule implements St
 		}
 		
 		// profitable route, change startTime
-		PPlan newPlan = new PPlan(cooperative.getNewPlanId(), this.getName());
+		PPlan newPlan = new PPlan(cooperative.getNewPlanId(), this.getStrategyName());
 		newPlan.setNVehicles(1);
 		newPlan.setStopsToBeServed(cooperative.getBestPlan().getStopsToBeServed());
 		
@@ -239,7 +239,7 @@ public class ReduceTimeServedRFare extends AbstractPStrategyModule implements St
 	}
 
 	@Override
-	public String getName() {
+	public String getStrategyName() {
 		return ReduceTimeServedRFare.STRATEGY_NAME;
 	}
 	

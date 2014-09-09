@@ -126,8 +126,8 @@ public class ExtendAndReduceOperator extends AbstractOperator{
 			PPlan p = s.run(this);
 
 			if(!(p == null)){
-				if(this.reduceStopsAfter.contains(s.getName()) || this.reduceTimeAfter.contains(s.getName())){
-					this.lastStrategy = s.getName();
+				if(this.reduceStopsAfter.contains(s.getStrategyName()) || this.reduceTimeAfter.contains(s.getStrategyName())){
+					this.lastStrategy = s.getStrategyName();
 					this.inProgress = true;
 				}
 				this.testPlan = p;
