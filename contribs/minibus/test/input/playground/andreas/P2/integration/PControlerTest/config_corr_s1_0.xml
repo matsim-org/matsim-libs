@@ -320,9 +320,11 @@
  		<param name="ModuleProbability_1" value="0.0" />
 		<param name="Module_1" value="ChangeExpBeta" />
 
+		<!-- <param name="ModuleProbability_2" value="1.0" />
+		<param name="Module_2" value="ReRoute" /> -->
+		
 		<param name="ModuleProbability_2" value="1.0" />
-		<param name="Module_2" value="ReRoute" />
-
+		<param name="Module_2" value="playground.andreas.P2.performance.PReRoute" />
 	</module>
 
 	<module name="transit">
