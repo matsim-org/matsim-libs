@@ -125,7 +125,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		this.cooperatives.addAll(coopsFromSchedule);
 		
 		// init initial set of cooperatives - reduced by the number of preset coops
-		LinkedList<Operator> initialCoops = this.operatorInitializer.createAdditionalCooperatives(this.strategyManager, event.getControler().getConfig().controler().getFirstIteration(), (this.pConfig.getNumberOfCooperatives() - coopsFromSchedule.size()));
+		LinkedList<Operator> initialCoops = this.operatorInitializer.createAdditionalOperators(this.strategyManager, event.getControler().getConfig().controler().getFirstIteration(), (this.pConfig.getNumberOfCooperatives() - coopsFromSchedule.size()));
 		this.cooperatives.addAll(initialCoops);
 		
 		// collect the transit schedules from all cooperatives
@@ -232,16 +232,16 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		
 		if (this.pConfig.getDisableCreationOfNewCooperativesInIteration() > iteration) {
 			// recreate all other
-			LinkedList<Operator> newCoops1 = this.operatorInitializer.createAdditionalCooperatives(this.strategyManager, iteration, numberOfNewCoopertives);
+			LinkedList<Operator> newCoops1 = this.operatorInitializer.createAdditionalOperators(this.strategyManager, iteration, numberOfNewCoopertives);
 			this.cooperatives.addAll(newCoops1);
 			
 			// too few cooperatives in play, increase to the minimum specified in the config
-			LinkedList<Operator> newCoops2 = this.operatorInitializer.createAdditionalCooperatives(this.strategyManager, iteration, (this.pConfig.getNumberOfCooperatives() - this.cooperatives.size()));
+			LinkedList<Operator> newCoops2 = this.operatorInitializer.createAdditionalOperators(this.strategyManager, iteration, (this.pConfig.getNumberOfCooperatives() - this.cooperatives.size()));
 			this.cooperatives.addAll(newCoops2);
 			
 			// all coops are in business, increase by one to ensure minimal mutation
 			if (this.cooperatives.size() == coopsInBusiness) {
-				LinkedList<Operator> newCoops3 = this.operatorInitializer.createAdditionalCooperatives(this.strategyManager, iteration, 1);
+				LinkedList<Operator> newCoops3 = this.operatorInitializer.createAdditionalOperators(this.strategyManager, iteration, 1);
 				this.cooperatives.addAll(newCoops3);
 			}
 		}

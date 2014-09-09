@@ -60,7 +60,7 @@ public interface Operator {
 
 	public PFranchise getFranchise();
 
-	public Id getId();
+	public Id<Operator> getId();
 	
 	public Id getNewRouteId();
 

@@ -36,22 +36,22 @@ import playground.andreas.P2.routeProvider.PRouteProvider;
 /**
  * This cooperative has multiple plans. Each is weighted by the number of vehicles associated with.
  * The number of vehicles depends on the score per vehicle and plan. In the end, each plan should have approximately the same score.
- * In contrast to {@link MultiPlanCooperative}, this cooperative accepts all plans as blueprints for replanning, again picking one is a weighted random draw.
+ * In contrast to {@link MultiPlanOperator}, this cooperative accepts all plans as blueprints for replanning, again picking one is a weighted random draw.
  * Vehicle are shifted away from plans instantly, i.e. if a plan scored negative at least one vehicle is removed.
  * Vehicles are distributed to positive plans and new plans.
  * 
  * @author aneumann
  *
  */
-public class CarefulMultiPlanCooperative extends AbstractCooperative{
+public class CarefulMultiPlanOperator extends AbstractOperator{
 	
-	public static final String COOP_NAME = "CarefulMultiPlanCooperative";
+	public static final String OPERATOR_NAME = "CarefulMultiPlanOperator";
 	
 	private final int tryouts = 10;
 	
 	private List<PPlan> plans;
 
-	public CarefulMultiPlanCooperative(Id id, PConfigGroup pConfig, PFranchise franchise){
+	public CarefulMultiPlanOperator(Id id, PConfigGroup pConfig, PFranchise franchise){
 		super(id, pConfig, franchise);
 		this.plans = new LinkedList<PPlan>();
 	}

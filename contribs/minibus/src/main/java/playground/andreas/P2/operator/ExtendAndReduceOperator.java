@@ -45,12 +45,12 @@ import playground.andreas.P2.replanning.modules.deprecated.RouteEnvelopeExtensio
  * @author droeder
  *
  */
-public class ExtendAndReduceCooperative extends AbstractCooperative{
-	public static final String COOP_NAME = "ExtendAndReduceCooperative"; 
+public class ExtendAndReduceOperator extends AbstractOperator{
+	public static final String OPERATOR_NAME = "ExtendAndReduceOperator"; 
 
 	private String lastStrategy = null;
 	private static final Logger log = Logger
-			.getLogger(ExtendAndReduceCooperative.class);
+			.getLogger(ExtendAndReduceOperator.class);
 	
 	private final List<String> reduceStopsAfter = new ArrayList<String>(){{
 		add(RandomRouteStartExtension.STRATEGY_NAME);
@@ -75,7 +75,7 @@ public class ExtendAndReduceCooperative extends AbstractCooperative{
 	 * @param pConfig
 	 * @param franchise
 	 */
-	public ExtendAndReduceCooperative(Id id, PConfigGroup pConfig, PFranchise franchise) {
+	public ExtendAndReduceOperator(Id id, PConfigGroup pConfig, PFranchise franchise) {
 		super(id, pConfig, franchise);
 	}
 

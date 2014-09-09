@@ -37,16 +37,16 @@ import playground.andreas.P2.replanning.modules.deprecated.AggressiveIncreaseNum
  * @author aneumann
  *
  */
-public class InitCooperative extends AbstractCooperative{
+public class InitOperator extends AbstractOperator{
 	
-	private final static Logger log = Logger.getLogger(InitCooperative.class);
-	public static final String COOP_NAME = "InitCooperative"; 
+	private final static Logger log = Logger.getLogger(InitOperator.class);
+	public static final String OPERATOR_NAME = "InitOperator"; 
 	
 	boolean firstIteration = true;
 	boolean needToReduceRoute = true;
 	boolean needToReduceTime = true;
 
-	public InitCooperative(Id id, PConfigGroup pConfig, PFranchise franchise){
+	public InitOperator(Id id, PConfigGroup pConfig, PFranchise franchise){
 		super(id, pConfig, franchise);
 	}
 

@@ -13,7 +13,7 @@
 
 	<module name="p" >
 		<param name="pIdentifier" value="para_" />
-		<param name="coopType" value="CarefulMultiPlanCooperative" />
+		<param name="operatorType" value="CarefulMultiPlanOperator" />
 		<param name="numberOfCooperatives" value="1" />
 		<param name="numberOfIterationsForProspecting" value="10" />
 		<param name="initialBudget" value="201.0" />

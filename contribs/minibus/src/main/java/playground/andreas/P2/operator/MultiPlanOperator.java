@@ -39,13 +39,13 @@ import playground.andreas.P2.routeProvider.PRouteProvider;
  * @author aneumann
  *
  */
-public class MultiPlanCooperative extends AbstractCooperative{
+public class MultiPlanOperator extends AbstractOperator{
 	
-	public static final String COOP_NAME = "MultiPlanCooperative";
+	public static final String OPERATOR_NAME = "MultiPlanOperator";
 	
 	private List<PPlan> plans;
 
-	public MultiPlanCooperative(Id id, PConfigGroup pConfig, PFranchise franchise){
+	public MultiPlanOperator(Id id, PConfigGroup pConfig, PFranchise franchise){
 		super(id, pConfig, franchise);
 		this.plans = new LinkedList<PPlan>();
 	}

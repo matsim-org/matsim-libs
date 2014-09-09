@@ -30,31 +30,31 @@ import playground.andreas.P2.pbox.PFranchise;
  * @author aneumann
  *
  */
-public class CooperativeFactory {
+public class OperatorFactory {
 	
-	private final static Logger log = Logger.getLogger(CooperativeFactory.class);
+	private final static Logger log = Logger.getLogger(OperatorFactory.class);
 	
 	private final PConfigGroup pConfig;
 	private final PFranchise franchise;
 	
-	public CooperativeFactory(PConfigGroup pConfig, PFranchise franchise){
+	public OperatorFactory(PConfigGroup pConfig, PFranchise franchise){
 		this.pConfig = pConfig;
 		this.franchise = franchise;
 	}
 	
-	public Operator createNewCooperative(Id id){
-		if(this.pConfig.getCoopType().equalsIgnoreCase(BasicCooperative.COOP_NAME)){
-			return new BasicCooperative(id, this.pConfig, this.franchise);
-		} else if(this.pConfig.getCoopType().equalsIgnoreCase(InitCooperative.COOP_NAME)){
-			return new InitCooperative(id, this.pConfig, this.franchise);
-		} else if(this.pConfig.getCoopType().equalsIgnoreCase(ExtendAndReduceCooperative.COOP_NAME)){
-			return new ExtendAndReduceCooperative(id, this.pConfig, this.franchise);
-		} else if(this.pConfig.getCoopType().equalsIgnoreCase(MultiPlanCooperative.COOP_NAME)){
-			return new MultiPlanCooperative(id, this.pConfig, this.franchise);
-		} else if(this.pConfig.getCoopType().equalsIgnoreCase(CarefulMultiPlanCooperative.COOP_NAME)){
-			return new CarefulMultiPlanCooperative(id, this.pConfig, this.franchise);
+	public Operator createNewOperator(Id<Operator> id){
+		if(this.pConfig.getOperatorType().equalsIgnoreCase(BasicOperator.OPERATOR_NAME)){
+			return new BasicOperator(id, this.pConfig, this.franchise);
+		} else if(this.pConfig.getOperatorType().equalsIgnoreCase(InitOperator.OPERATOR_NAME)){
+			return new InitOperator(id, this.pConfig, this.franchise);
+		} else if(this.pConfig.getOperatorType().equalsIgnoreCase(ExtendAndReduceOperator.OPERATOR_NAME)){
+			return new ExtendAndReduceOperator(id, this.pConfig, this.franchise);
+		} else if(this.pConfig.getOperatorType().equalsIgnoreCase(MultiPlanOperator.OPERATOR_NAME)){
+			return new MultiPlanOperator(id, this.pConfig, this.franchise);
+		} else if(this.pConfig.getOperatorType().equalsIgnoreCase(CarefulMultiPlanOperator.OPERATOR_NAME)){
+			return new CarefulMultiPlanOperator(id, this.pConfig, this.franchise);
 		} else {
-			log.error("There is no coop type specified. " + this.pConfig.getCoopType() + " unknown");
+			log.error("There is no operator type specified. " + this.pConfig.getOperatorType() + " unknown");
 			return null;
 		}
 	}

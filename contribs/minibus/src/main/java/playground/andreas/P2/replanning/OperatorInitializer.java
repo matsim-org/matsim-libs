@@ -24,13 +24,12 @@ import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.operator.Operator;
-import playground.andreas.P2.operator.CooperativeFactory;
+import playground.andreas.P2.operator.OperatorFactory;
 import playground.andreas.P2.pbox.PFranchise;
 import playground.andreas.P2.routeProvider.PRouteProvider;
 import playground.andreas.P2.routeProvider.PRouteProviderFactory;
@@ -44,7 +43,7 @@ public class OperatorInitializer {
 	
 	private final static Logger log = Logger.getLogger(OperatorInitializer.class);
 	private PConfigGroup pConfig;
-	private CooperativeFactory cooperativeFactory;
+	private OperatorFactory operatorFactory;
 	private PRouteProvider routeProvider;
 	private PStrategy initialStrategy;
 	private int counter;
@@ -52,7 +51,7 @@ public class OperatorInitializer {
 	
 	public OperatorInitializer(PConfigGroup pConfig, PFranchise franchise, TransitSchedule pStopsOnly, Controler controler, TimeProvider timeProvider) {
 		this.pConfig = pConfig;
-		this.cooperativeFactory = new CooperativeFactory(this.pConfig, franchise);
+		this.operatorFactory = new OperatorFactory(this.pConfig, franchise);
 		this.routeProvider = PRouteProviderFactory.createRouteProvider(controler.getNetwork(), controler.getPopulation(), this.pConfig, pStopsOnly, controler.getControlerIO().getOutputPath(), controler.getEvents());
 		
 		if (this.pConfig.getStartWith24Hours()) {
@@ -73,7 +72,7 @@ public class OperatorInitializer {
 	 * @return A list containing the operators created
 	 */
 	public LinkedList<Operator> createOperatorsFromSchedule(TransitSchedule originalSchedule){
-		return new CreateCooperativeFromSchedule(this.cooperativeFactory, this.routeProvider, this.pConfig, originalSchedule).run();
+		return new CreateOperatorFromTransitSchedule(this.operatorFactory, this.routeProvider, this.pConfig, originalSchedule).run();
 	}
 	
 	/**
@@ -81,37 +80,37 @@ public class OperatorInitializer {
 	 * 
 	 * @param pStrategyManager
 	 * @param iteration
-	 * @param numberOfNewCooperatives
+	 * @param numberOfNewOperators
 	 * @return
 	 */
-	public LinkedList<Operator> createAdditionalCooperatives(PStrategyManager pStrategyManager, int iteration, int numberOfNewCooperatives) {
-		LinkedList<Operator> emptyCoops = new LinkedList<Operator>();
-		for (int i = 0; i < numberOfNewCooperatives; i++) {
-			Operator cooperative = this.cooperativeFactory.createNewCooperative(this.createNewIdForCooperative(iteration));
-			emptyCoops.add(cooperative);
+	public LinkedList<Operator> createAdditionalOperators(PStrategyManager pStrategyManager, int iteration, int numberOfNewOperators) {
+		LinkedList<Operator> emptyOperators = new LinkedList<Operator>();
+		for (int i = 0; i < numberOfNewOperators; i++) {
+			Operator operator = this.operatorFactory.createNewOperator(this.createNewIdForOperator(iteration));
+			emptyOperators.add(operator);
 		}
 		
-		LinkedList<Operator> initializedCoops = new LinkedList<Operator>();
-		int numberOfCoopsFailedToBeInitialized = 0;
-		for (Operator cooperative : emptyCoops) {
-			boolean initComplete = cooperative.init(this.routeProvider, this.initialStrategy, iteration, this.pConfig.getInitialBudget());
+		LinkedList<Operator> initializedOperator = new LinkedList<Operator>();
+		int numberOfOperatorsFailedToBeInitialized = 0;
+		for (Operator operator : emptyOperators) {
+			boolean initComplete = operator.init(this.routeProvider, this.initialStrategy, iteration, this.pConfig.getInitialBudget());
 			if (initComplete) {
-				cooperative.replan(pStrategyManager, iteration);
-				initializedCoops.add(cooperative);
+				operator.replan(pStrategyManager, iteration);
+				initializedOperator.add(operator);
 			} else {
-				numberOfCoopsFailedToBeInitialized++;
+				numberOfOperatorsFailedToBeInitialized++;
 			}
 		}
 		
-		if (numberOfCoopsFailedToBeInitialized > 0) {
-			log.warn(numberOfCoopsFailedToBeInitialized + " out of " + numberOfNewCooperatives + " operators could no be initialized. Proceeding with " + initializedCoops.size() + " new operators.");
+		if (numberOfOperatorsFailedToBeInitialized > 0) {
+			log.warn(numberOfOperatorsFailedToBeInitialized + " out of " + numberOfNewOperators + " operators could no be initialized. Proceeding with " + initializedOperator.size() + " new operators.");
 		}
 		
-		return initializedCoops;
+		return initializedOperator;
 	}
 	
-	private Id createNewIdForCooperative(int iteration){
+	private Id<Operator> createNewIdForOperator(int iteration){
 		this.counter++;
-		return new IdImpl(this.pConfig.getPIdentifier() + iteration + "_" + this.counter);
+		return Id.create(this.pConfig.getPIdentifier() + iteration + "_" + this.counter, Operator.class);
 	}
 }

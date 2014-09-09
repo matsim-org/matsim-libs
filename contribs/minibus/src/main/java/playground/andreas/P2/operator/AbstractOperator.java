@@ -44,9 +44,9 @@ import playground.andreas.P2.scoring.ScoreContainer;
  * @author aneumann
  *
  */
-public abstract class AbstractCooperative implements Operator{
+public abstract class AbstractOperator implements Operator{
 	
-	protected final static Logger log = Logger.getLogger(AbstractCooperative.class);
+	protected final static Logger log = Logger.getLogger(AbstractOperator.class);
 	
 	protected final Id id;
 	
@@ -74,7 +74,7 @@ public abstract class AbstractCooperative implements Operator{
 	protected PRouteProvider routeProvider;
 	protected int currentIteration;
 
-	public AbstractCooperative(Id id, PConfigGroup pConfig, PFranchise franchise){
+	public AbstractOperator(Id id, PConfigGroup pConfig, PFranchise franchise){
 		this.id = id;
 		this.numberOfIterationsForProspecting = pConfig.getNumberOfIterationsForProspecting();
 		this.costPerVehicleBuy = pConfig.getPricePerVehicleBought();

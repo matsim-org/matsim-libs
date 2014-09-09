@@ -36,11 +36,11 @@ import playground.andreas.P2.replanning.modules.deprecated.AggressiveIncreaseNum
  * @author aneumann
  *
  */
-public class BasicCooperative extends AbstractCooperative{
+public class BasicOperator extends AbstractOperator{
 	
-	public static final String COOP_NAME = "BasicCooperative"; 
+	public static final String OPERATOR_NAME = "BasicOperator"; 
 
-	public BasicCooperative(Id id, PConfigGroup pConfig, PFranchise franchise){
+	public BasicOperator(Id id, PConfigGroup pConfig, PFranchise franchise){
 		super(id, pConfig, franchise);
 	}
 

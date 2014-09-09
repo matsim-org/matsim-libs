@@ -42,7 +42,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.operator.Operator;
-import playground.andreas.P2.operator.CooperativeFactory;
+import playground.andreas.P2.operator.OperatorFactory;
 import playground.andreas.P2.routeProvider.PRouteProvider;
 
 /**
@@ -52,19 +52,19 @@ import playground.andreas.P2.routeProvider.PRouteProvider;
  * @author aneumann
  *
  */
-public class CreateCooperativeFromSchedule implements PStrategy{
+public class CreateOperatorFromTransitSchedule implements PStrategy{
 	
-	private final static Logger log = Logger.getLogger(CreateCooperativeFromSchedule.class);
+	private final static Logger log = Logger.getLogger(CreateOperatorFromTransitSchedule.class);
 	public static final String STRATEGY_NAME = "CreateCooperativeFromSchedule";
 
-	private CooperativeFactory cooperativeFactory;
+	private OperatorFactory cooperativeFactory;
 	private PRouteProvider routeProvider;
 	private PConfigGroup pConfig;
 	private LinkedHashMap<String, TransitStopFacility> originalStops;
 	
-	private LinkedHashMap<Id, PPlan> lineId2PlanMap = new LinkedHashMap<Id, PPlan>();
+	private LinkedHashMap<Id<Operator>, PPlan> lineId2PlanMap = new LinkedHashMap<>();
 
-	public CreateCooperativeFromSchedule(CooperativeFactory cooperativeFactory, PRouteProvider routeProvider, PConfigGroup pConfig, TransitSchedule originalSchedule) {
+	public CreateOperatorFromTransitSchedule(OperatorFactory cooperativeFactory, PRouteProvider routeProvider, PConfigGroup pConfig, TransitSchedule originalSchedule) {
 		this.cooperativeFactory = cooperativeFactory;
 		this.routeProvider = routeProvider;
 		this.pConfig = pConfig;
@@ -82,7 +82,7 @@ public class CreateCooperativeFromSchedule implements PStrategy{
 			TransitSchedule tS = readTransitSchedule(pConfig.getTransitScheduleToStartWith());
 
 			for (Entry<Id<TransitLine>, TransitLine> lineEntry : tS.getTransitLines().entrySet()) {
-				Operator coop = this.cooperativeFactory.createNewCooperative(new IdImpl(this.pConfig.getPIdentifier() + lineEntry.getKey()));
+				Operator coop = this.cooperativeFactory.createNewOperator(new IdImpl(this.pConfig.getPIdentifier() + lineEntry.getKey()));
 
 				PPlan plan = createPlan(lineEntry.getValue());
 				this.lineId2PlanMap.put(coop.getId(), plan);			
@@ -213,6 +213,6 @@ public class CreateCooperativeFromSchedule implements PStrategy{
 
 	@Override
 	public String getName() {
-		return CreateCooperativeFromSchedule.STRATEGY_NAME;
+		return CreateOperatorFromTransitSchedule.STRATEGY_NAME;
 	}
 }
