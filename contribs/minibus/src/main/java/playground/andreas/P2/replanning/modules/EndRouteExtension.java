@@ -35,7 +35,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import playground.andreas.P2.operator.Cooperative;
+import playground.andreas.P2.operator.Operator;
 import playground.andreas.P2.replanning.AbstractPStrategyModule;
 import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.routeProvider.PRouteProvider;
@@ -72,7 +72,7 @@ public class EndRouteExtension extends AbstractPStrategyModule {
 	}
 
 	@Override
-	public PPlan run(Cooperative cooperative) {
+	public PPlan run(Operator cooperative) {
 
 		PPlan oldPlan = cooperative.getBestPlan();
 		ArrayList<TransitStopFacility> currentStopsToBeServed = oldPlan.getStopsToBeServed();

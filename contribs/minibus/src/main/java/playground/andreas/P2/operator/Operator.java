@@ -38,7 +38,7 @@ import playground.andreas.P2.scoring.ScoreContainer;
  * @author aneumann
  *
  */
-public interface Cooperative {
+public interface Operator {
 	
 	public boolean init(PRouteProvider pRouteProvider, PStrategy initialStrategy, int iteration, double initialBudget);
 	

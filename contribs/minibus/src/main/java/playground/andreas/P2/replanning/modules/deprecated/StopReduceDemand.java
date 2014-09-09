@@ -35,7 +35,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import playground.andreas.P2.operator.Cooperative;
+import playground.andreas.P2.operator.Operator;
 import playground.andreas.P2.replanning.AbstractPStrategyModule;
 import playground.andreas.P2.replanning.PPlan;
 
@@ -67,7 +67,7 @@ public class StopReduceDemand extends AbstractPStrategyModule implements Vehicle
 	}
 	
 	@Override
-	public PPlan run(Cooperative cooperative) {
+	public PPlan run(Operator cooperative) {
 		
 		ArrayList<TransitStopFacility> stopsToBeServed = new ArrayList<TransitStopFacility>();
 		LinkedHashMap<Id, int[]> stop2DemandMap = this.lineId2stopId2DemandBoardingAlighting.get(cooperative.getId());

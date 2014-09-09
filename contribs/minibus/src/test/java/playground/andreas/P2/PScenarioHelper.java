@@ -49,7 +49,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.operator.BasicCooperative;
-import playground.andreas.P2.operator.Cooperative;
+import playground.andreas.P2.operator.Operator;
 import playground.andreas.P2.pbox.PFranchise;
 import playground.andreas.P2.replanning.CreateNewPlan;
 import playground.andreas.P2.replanning.PPlan;
@@ -69,11 +69,11 @@ import playground.andreas.P2.schedule.CreateStopsForAllCarLinks;
  */
 public class PScenarioHelper {
 	
-	public static Cooperative createTestCooperative(String testOutPutDir){
+	public static Operator createTestCooperative(String testOutPutDir){
 		Scenario sC = PScenarioHelper.createTestNetwork();
 		
 		PConfigGroup pC = new PConfigGroup();
-		Cooperative coop = new BasicCooperative(new IdImpl(pC.getPIdentifier() + 1), pC, new PFranchise(pC.getUseFranchise(), pC.getGridSize()));
+		Operator coop = new BasicCooperative(new IdImpl(pC.getPIdentifier() + 1), pC, new PFranchise(pC.getUseFranchise(), pC.getGridSize()));
 		TransitSchedule sched = CreatePStops.createPStops(sC.getNetwork(), pC);
 		RandomStopProvider randomStopProvider = new RandomStopProvider(pC, sC.getPopulation(), sched, null);
 		
@@ -341,7 +341,7 @@ public class PScenarioHelper {
 		return scenario;
 	}
 	
-	public static Cooperative createCoop2111to2333(){
+	public static Operator createCoop2111to2333(){
 		
 		Scenario sc= PScenarioHelper.createTestNetwork();
 		
@@ -350,13 +350,13 @@ public class PScenarioHelper {
 		RandomStopProvider randomStopProvider = new RandomStopProvider(conf, sc.getPopulation(), sched, null);
 		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(sched, sc.getNetwork(), randomStopProvider, 10, conf.getVehicleMaximumVelocity(), conf.getPlanningSpeedFactor(), conf.getMode());
 	
-		Cooperative coop = new BasicCooperative(new IdImpl(conf.getPIdentifier() + 1), conf, new PFranchise(conf.getUseFranchise(), conf.getGridSize()));
+		Operator coop = new BasicCooperative(new IdImpl(conf.getPIdentifier() + 1), conf, new PFranchise(conf.getUseFranchise(), conf.getGridSize()));
 		coop.init(prov, new Route2111to2333(sched, conf.getPIdentifier()), 0, 0.0);
 		
 		return coop;
 	}
 	
-	public static Cooperative createCoop2333to2111(){
+	public static Operator createCoop2333to2111(){
 		
 		Scenario sc= PScenarioHelper.createTestNetwork();
 		
@@ -365,13 +365,13 @@ public class PScenarioHelper {
 		RandomStopProvider randomStopProvider = new RandomStopProvider(conf, sc.getPopulation(), sched, null);
 		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(sched, sc.getNetwork(), randomStopProvider, 10, conf.getVehicleMaximumVelocity(), conf.getPlanningSpeedFactor(), conf.getMode());
 	
-		Cooperative coop = new BasicCooperative(new IdImpl(conf.getPIdentifier() + 1), conf, new PFranchise(conf.getUseFranchise(), conf.getGridSize()));
+		Operator coop = new BasicCooperative(new IdImpl(conf.getPIdentifier() + 1), conf, new PFranchise(conf.getUseFranchise(), conf.getGridSize()));
 		coop.init(prov, new Route2333to2111(sched, conf.getPIdentifier()), 0, 0.0);
 		
 		return coop;
 	}
 	
-	public static Cooperative createCoop2414to3444(){
+	public static Operator createCoop2414to3444(){
 		
 		Scenario sc= PScenarioHelper.createTestNetwork();
 		
@@ -379,13 +379,13 @@ public class PScenarioHelper {
 		TransitSchedule sched = CreateStopsForAllCarLinks.createStopsForAllCarLinks(sc.getNetwork(), conf);
 		RandomStopProvider randomStopProvider = new RandomStopProvider(conf, sc.getPopulation(), sched, null);
 		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(sched, sc.getNetwork(), randomStopProvider, 10, conf.getVehicleMaximumVelocity(), conf.getPlanningSpeedFactor(), conf.getMode());
-		Cooperative coop = new BasicCooperative(new IdImpl(conf.getPIdentifier() + 1), conf, new PFranchise(conf.getUseFranchise(), conf.getGridSize()));
+		Operator coop = new BasicCooperative(new IdImpl(conf.getPIdentifier() + 1), conf, new PFranchise(conf.getUseFranchise(), conf.getGridSize()));
 		coop.init(prov, new Route2414to3444(sched, conf.getPIdentifier()), 0, 0.0);
 		
 		return coop;
 	}
 	
-	public static Cooperative createCoop2111to1314to4443(){
+	public static Operator createCoop2111to1314to4443(){
 		
 		Scenario sc= PScenarioHelper.createTestNetwork();
 		
@@ -393,7 +393,7 @@ public class PScenarioHelper {
 		TransitSchedule sched = CreateStopsForAllCarLinks.createStopsForAllCarLinks(sc.getNetwork(), conf);
 		RandomStopProvider randomStopProvider = new RandomStopProvider(conf, sc.getPopulation(), sched, null);
 		ComplexCircleScheduleProvider prov = new ComplexCircleScheduleProvider(sched, sc.getNetwork(), randomStopProvider, 10, conf.getVehicleMaximumVelocity(), conf.getPlanningSpeedFactor(), conf.getMode());
-		Cooperative coop = new BasicCooperative(new IdImpl(conf.getPIdentifier() + 1), conf, new PFranchise(conf.getUseFranchise(), conf.getGridSize()));
+		Operator coop = new BasicCooperative(new IdImpl(conf.getPIdentifier() + 1), conf, new PFranchise(conf.getUseFranchise(), conf.getGridSize()));
 		coop.init(prov, new Route2111to1314to4443(sched, conf.getPIdentifier()), 0, 0.0);
 		
 		return coop;
@@ -412,7 +412,7 @@ class Route2111to2333 implements PStrategy{
 	}
 
 	@Override
-	public PPlan run(Cooperative cooperative) {
+	public PPlan run(Operator cooperative) {
 		Id routeId = new IdImpl(cooperative.getCurrentIteration());
 		
 		PPlan newPlan = new PPlan(routeId, this.getName());
@@ -449,7 +449,7 @@ class Route2333to2111 implements PStrategy{
 	}
 
 	@Override
-	public PPlan run(Cooperative cooperative) {
+	public PPlan run(Operator cooperative) {
 		Id routeId = new IdImpl(cooperative.getCurrentIteration());
 		
 		PPlan newPlan = new PPlan(routeId, this.getName());
@@ -486,7 +486,7 @@ class Route2414to3444 implements PStrategy{
 	}
 
 	@Override
-	public PPlan run(Cooperative cooperative) {
+	public PPlan run(Operator cooperative) {
 		Id routeId = new IdImpl(cooperative.getCurrentIteration());
 		PPlan newPlan = new PPlan(routeId, this.getName());
 		newPlan.setNVehicles(1);
@@ -523,7 +523,7 @@ class Route2111to1314to4443 implements PStrategy{
 	}
 
 	@Override
-	public PPlan run(Cooperative cooperative) {
+	public PPlan run(Operator cooperative) {
 		Id routeId = new IdImpl(cooperative.getCurrentIteration());
 		PPlan newPlan = new PPlan(routeId, this.getName());
 		newPlan.setNVehicles(1);

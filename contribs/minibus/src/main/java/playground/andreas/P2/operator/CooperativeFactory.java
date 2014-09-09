@@ -42,7 +42,7 @@ public class CooperativeFactory {
 		this.franchise = franchise;
 	}
 	
-	public Cooperative createNewCooperative(Id id){
+	public Operator createNewCooperative(Id id){
 		if(this.pConfig.getCoopType().equalsIgnoreCase(BasicCooperative.COOP_NAME)){
 			return new BasicCooperative(id, this.pConfig, this.franchise);
 		} else if(this.pConfig.getCoopType().equalsIgnoreCase(InitCooperative.COOP_NAME)){

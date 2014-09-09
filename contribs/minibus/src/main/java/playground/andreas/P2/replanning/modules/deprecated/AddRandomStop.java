@@ -29,7 +29,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import playground.andreas.P2.operator.Cooperative;
+import playground.andreas.P2.operator.Operator;
 import playground.andreas.P2.replanning.AbstractPStrategyModule;
 import playground.andreas.P2.replanning.PPlan;
 
@@ -56,7 +56,7 @@ public class AddRandomStop extends AbstractPStrategyModule {
 	}
 	
 	@Override
-	public PPlan run(Cooperative cooperative) {
+	public PPlan run(Operator cooperative) {
 		
 		Set<Id> stopsInService = new TreeSet<Id>();
 		for (TransitRoute route : cooperative.getBestPlan().getLine().getRoutes().values()) {

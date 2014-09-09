@@ -25,7 +25,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import playground.andreas.P2.operator.Cooperative;
+import playground.andreas.P2.operator.Operator;
 
 /**
  * 
@@ -62,7 +62,7 @@ public class CreateNewPlan extends AbstractPStrategyModule {
 	}
 	
 	@Override
-	public PPlan run(Cooperative cooperative) {
+	public PPlan run(Operator cooperative) {
 		PPlan newPlan;		
 		
 		int triesPerformed = 0;

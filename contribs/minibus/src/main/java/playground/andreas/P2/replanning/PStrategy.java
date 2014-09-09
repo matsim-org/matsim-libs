@@ -19,7 +19,7 @@
 
 package playground.andreas.P2.replanning;
 
-import playground.andreas.P2.operator.Cooperative;
+import playground.andreas.P2.operator.Operator;
 
 public interface PStrategy {
 
@@ -28,7 +28,7 @@ public interface PStrategy {
 	 * @param cooperative
 	 * @return the plan found or null if there is no better plan 
 	 */
-	public PPlan run(Cooperative cooperative);
+	public PPlan run(Operator cooperative);
 	
 	public String getName();
 }

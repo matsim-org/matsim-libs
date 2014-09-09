@@ -32,7 +32,7 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.andreas.P2.genericUtils.RecursiveStatsContainer;
-import playground.andreas.P2.operator.Cooperative;
+import playground.andreas.P2.operator.Operator;
 import playground.andreas.P2.replanning.AbstractPStrategyModule;
 import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.scoring.fare.StageContainer;
@@ -73,7 +73,7 @@ public class ReduceStopsToBeServedRFare extends AbstractPStrategyModule implemen
 	}
 	
 	@Override
-	public PPlan run(Cooperative cooperative) {
+	public PPlan run(Operator cooperative) {
 		// get best plans route id
 		TransitRoute routeToOptimize = null;
 		if (cooperative.getBestPlan().getLine().getRoutes().size() != 1) {

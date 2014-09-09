@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 
-import playground.andreas.P2.operator.Cooperative;
+import playground.andreas.P2.operator.Operator;
 import playground.andreas.P2.replanning.AbstractPStrategyModule;
 import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.modules.ReduceTimeServedRFare;
@@ -68,7 +68,7 @@ public class TimeReduceDemand extends AbstractPStrategyModule implements Transit
 	}
 	
 	@Override
-	public PPlan run(Cooperative cooperative) {
+	public PPlan run(Operator cooperative) {
 		// get start Time
 		
 		int[] boardingDemand = this.lineId2BoardingDemand.get(cooperative.getId().toString());

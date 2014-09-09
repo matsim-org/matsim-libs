@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 
-import playground.andreas.P2.operator.Cooperative;
+import playground.andreas.P2.operator.Operator;
 import playground.andreas.P2.replanning.AbstractPStrategyModule;
 import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.modules.ReduceTimeServedRFare;
@@ -80,7 +80,7 @@ public class ReduceTimeServedR extends AbstractPStrategyModule implements Transi
 	}
 	
 	@Override
-	public PPlan run(Cooperative cooperative) {
+	public PPlan run(Operator cooperative) {
 		
 		if (cooperative.getBestPlan().getNVehicles() <= 1) {
 			return null;

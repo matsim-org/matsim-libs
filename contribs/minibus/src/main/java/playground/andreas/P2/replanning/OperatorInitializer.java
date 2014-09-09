@@ -29,7 +29,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.andreas.P2.helper.PConfigGroup;
-import playground.andreas.P2.operator.Cooperative;
+import playground.andreas.P2.operator.Operator;
 import playground.andreas.P2.operator.CooperativeFactory;
 import playground.andreas.P2.pbox.PFranchise;
 import playground.andreas.P2.routeProvider.PRouteProvider;
@@ -72,7 +72,7 @@ public class OperatorInitializer {
 	 * @param originalSchedule The transit schedule given
 	 * @return A list containing the operators created
 	 */
-	public LinkedList<Cooperative> createOperatorsFromSchedule(TransitSchedule originalSchedule){
+	public LinkedList<Operator> createOperatorsFromSchedule(TransitSchedule originalSchedule){
 		return new CreateCooperativeFromSchedule(this.cooperativeFactory, this.routeProvider, this.pConfig, originalSchedule).run();
 	}
 	
@@ -84,16 +84,16 @@ public class OperatorInitializer {
 	 * @param numberOfNewCooperatives
 	 * @return
 	 */
-	public LinkedList<Cooperative> createAdditionalCooperatives(PStrategyManager pStrategyManager, int iteration, int numberOfNewCooperatives) {
-		LinkedList<Cooperative> emptyCoops = new LinkedList<Cooperative>();
+	public LinkedList<Operator> createAdditionalCooperatives(PStrategyManager pStrategyManager, int iteration, int numberOfNewCooperatives) {
+		LinkedList<Operator> emptyCoops = new LinkedList<Operator>();
 		for (int i = 0; i < numberOfNewCooperatives; i++) {
-			Cooperative cooperative = this.cooperativeFactory.createNewCooperative(this.createNewIdForCooperative(iteration));
+			Operator cooperative = this.cooperativeFactory.createNewCooperative(this.createNewIdForCooperative(iteration));
 			emptyCoops.add(cooperative);
 		}
 		
-		LinkedList<Cooperative> initializedCoops = new LinkedList<Cooperative>();
+		LinkedList<Operator> initializedCoops = new LinkedList<Operator>();
 		int numberOfCoopsFailedToBeInitialized = 0;
-		for (Cooperative cooperative : emptyCoops) {
+		for (Operator cooperative : emptyCoops) {
 			boolean initComplete = cooperative.init(this.routeProvider, this.initialStrategy, iteration, this.pConfig.getInitialBudget());
 			if (initComplete) {
 				cooperative.replan(pStrategyManager, iteration);

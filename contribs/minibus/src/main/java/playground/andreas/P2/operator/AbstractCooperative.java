@@ -44,7 +44,7 @@ import playground.andreas.P2.scoring.ScoreContainer;
  * @author aneumann
  *
  */
-public abstract class AbstractCooperative implements Cooperative{
+public abstract class AbstractCooperative implements Operator{
 	
 	protected final static Logger log = Logger.getLogger(AbstractCooperative.class);
 	

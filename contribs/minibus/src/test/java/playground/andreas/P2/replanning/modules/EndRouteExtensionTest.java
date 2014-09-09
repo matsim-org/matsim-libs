@@ -29,7 +29,7 @@ import org.matsim.testcases.MatsimTestUtils;
 
 import playground.andreas.P2.PScenarioHelper;
 import playground.andreas.P2.helper.PConstants;
-import playground.andreas.P2.operator.Cooperative;
+import playground.andreas.P2.operator.Operator;
 import playground.andreas.P2.replanning.PPlan;
 
 
@@ -39,7 +39,7 @@ public class EndRouteExtensionTest {
 	@Test
     public final void testRun() {
 	
-		Cooperative coop = PScenarioHelper.createCoop2111to2333();
+		Operator coop = PScenarioHelper.createCoop2111to2333();
 		
 		new File(utils.getOutputDirectory() + PConstants.statsOutputFolder).mkdir();
 

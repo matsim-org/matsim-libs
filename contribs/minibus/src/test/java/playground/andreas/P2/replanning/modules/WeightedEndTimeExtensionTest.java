@@ -33,7 +33,7 @@ import org.matsim.testcases.MatsimTestUtils;
 import playground.andreas.P2.PScenarioHelper;
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PConstants;
-import playground.andreas.P2.operator.Cooperative;
+import playground.andreas.P2.operator.Operator;
 import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.TimeProvider;
 
@@ -44,7 +44,7 @@ public class WeightedEndTimeExtensionTest {
 	@Test
     public final void testRun() {
 	
-		Cooperative coop = PScenarioHelper.createTestCooperative(utils.getOutputDirectory());
+		Operator coop = PScenarioHelper.createTestCooperative(utils.getOutputDirectory());
 		
 		new File(utils.getOutputDirectory() + PConstants.statsOutputFolder).mkdir();
 		

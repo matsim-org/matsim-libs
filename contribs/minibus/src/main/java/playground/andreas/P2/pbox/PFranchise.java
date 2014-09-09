@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.andreas.P2.genericUtils.GridNode;
-import playground.andreas.P2.operator.Cooperative;
+import playground.andreas.P2.operator.Operator;
 import playground.andreas.P2.replanning.PPlan;
 
 /**
@@ -74,12 +74,12 @@ public class PFranchise {
 	 * 
 	 * @param cooperatives
 	 */
-	public void reset(LinkedList<Cooperative> cooperatives) {
+	public void reset(LinkedList<Operator> cooperatives) {
 		
 		if(this.activated){
 			this.routeHashes = new TreeSet<String>();
 
-			for (Cooperative cooperative : cooperatives) {
+			for (Operator cooperative : cooperatives) {
 				Set<String> routesHashesOfCooperative = new TreeSet<String>();
 				for (PPlan plan : cooperative.getAllPlans()) {
 					String routeHash = generateRouteHash(plan);				

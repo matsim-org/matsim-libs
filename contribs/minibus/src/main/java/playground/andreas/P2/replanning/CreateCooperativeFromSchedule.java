@@ -41,7 +41,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.andreas.P2.helper.PConfigGroup;
-import playground.andreas.P2.operator.Cooperative;
+import playground.andreas.P2.operator.Operator;
 import playground.andreas.P2.operator.CooperativeFactory;
 import playground.andreas.P2.routeProvider.PRouteProvider;
 
@@ -75,14 +75,14 @@ public class CreateCooperativeFromSchedule implements PStrategy{
 		}
 	}
 
-	public LinkedList<Cooperative> run() {
-		LinkedList<Cooperative> coopsToReturn = new LinkedList<Cooperative>();
+	public LinkedList<Operator> run() {
+		LinkedList<Operator> coopsToReturn = new LinkedList<Operator>();
 		
 		if (pConfig.getTransitScheduleToStartWith() != null) {
 			TransitSchedule tS = readTransitSchedule(pConfig.getTransitScheduleToStartWith());
 
 			for (Entry<Id<TransitLine>, TransitLine> lineEntry : tS.getTransitLines().entrySet()) {
-				Cooperative coop = this.cooperativeFactory.createNewCooperative(new IdImpl(this.pConfig.getPIdentifier() + lineEntry.getKey()));
+				Operator coop = this.cooperativeFactory.createNewCooperative(new IdImpl(this.pConfig.getPIdentifier() + lineEntry.getKey()));
 
 				PPlan plan = createPlan(lineEntry.getValue());
 				this.lineId2PlanMap.put(coop.getId(), plan);			
@@ -205,7 +205,7 @@ public class CreateCooperativeFromSchedule implements PStrategy{
 
 
 	@Override
-	public PPlan run(Cooperative cooperative) {
+	public PPlan run(Operator cooperative) {
 		PPlan newPlan = this.lineId2PlanMap.get(cooperative.getId());		
 		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan));
 		return newPlan;

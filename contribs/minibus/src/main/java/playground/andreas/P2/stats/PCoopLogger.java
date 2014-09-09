@@ -40,7 +40,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.andreas.P2.helper.PConfigGroup;
-import playground.andreas.P2.operator.Cooperative;
+import playground.andreas.P2.operator.Operator;
 import playground.andreas.P2.pbox.PBox;
 import playground.andreas.P2.replanning.PPlan;
 
@@ -95,7 +95,7 @@ public class PCoopLogger implements StartupListener, IterationEndsListener, Shut
 		if(this.pConfig.getLogCoops()){
 			
 			// get cooperatives
-			for (Cooperative cooperative : this.pBox.getCooperatives()) {
+			for (Operator cooperative : this.pBox.getCooperatives()) {
 				// get all plans
 				List<PPlan> plans = cooperative.getAllPlans();
 				

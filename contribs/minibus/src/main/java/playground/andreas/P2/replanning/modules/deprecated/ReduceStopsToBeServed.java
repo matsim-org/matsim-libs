@@ -40,7 +40,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import playground.andreas.P2.operator.Cooperative;
+import playground.andreas.P2.operator.Operator;
 import playground.andreas.P2.replanning.AbstractPStrategyModule;
 import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.modules.ReduceStopsToBeServedRFare;
@@ -80,7 +80,7 @@ public class ReduceStopsToBeServed extends AbstractPStrategyModule implements Tr
 	}
 	
 	@Override
-	public PPlan run(Cooperative cooperative) {
+	public PPlan run(Operator cooperative) {
 		ArrayList<TransitStopFacility> stopsToBeServed = getStopsToBeServed(this.line2StartStop2EndStop2TripsMap.get(cooperative.getId()), cooperative.getBestPlan().getLine());
 		
 		if (stopsToBeServed.size() < 2) {

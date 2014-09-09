@@ -33,7 +33,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PConstants.CoopState;
-import playground.andreas.P2.operator.Cooperative;
+import playground.andreas.P2.operator.Operator;
 import playground.andreas.P2.replanning.OperatorInitializer;
 import playground.andreas.P2.replanning.PStrategyManager;
 import playground.andreas.P2.replanning.TimeProvider;
@@ -60,7 +60,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(PBox.class);
 	
-	private LinkedList<Cooperative> cooperatives;
+	private LinkedList<Operator> cooperatives;
 	
 	private final PConfigGroup pConfig;
 	private PFranchise franchise;
@@ -117,15 +117,15 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		// init possible paratransit stops
 		this.pStopsOnly = PStopsFactory.createPStops(event.getControler().getNetwork(), this.pConfig, event.getControler().getScenario().getTransitSchedule());
 		
-		this.cooperatives = new LinkedList<Cooperative>();
+		this.cooperatives = new LinkedList<Operator>();
 		this.operatorInitializer = new OperatorInitializer(this.pConfig, this.franchise, this.pStopsOnly, event.getControler(), this.timeProvider);
 		
 		// init additional cooperatives from a given transit schedule file
-		LinkedList<Cooperative> coopsFromSchedule = this.operatorInitializer.createOperatorsFromSchedule(event.getControler().getScenario().getTransitSchedule());
+		LinkedList<Operator> coopsFromSchedule = this.operatorInitializer.createOperatorsFromSchedule(event.getControler().getScenario().getTransitSchedule());
 		this.cooperatives.addAll(coopsFromSchedule);
 		
 		// init initial set of cooperatives - reduced by the number of preset coops
-		LinkedList<Cooperative> initialCoops = this.operatorInitializer.createAdditionalCooperatives(this.strategyManager, event.getControler().getConfig().controler().getFirstIteration(), (this.pConfig.getNumberOfCooperatives() - coopsFromSchedule.size()));
+		LinkedList<Operator> initialCoops = this.operatorInitializer.createAdditionalCooperatives(this.strategyManager, event.getControler().getConfig().controler().getFirstIteration(), (this.pConfig.getNumberOfCooperatives() - coopsFromSchedule.size()));
 		this.cooperatives.addAll(initialCoops);
 		
 		// collect the transit schedules from all cooperatives
@@ -133,7 +133,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		for (TransitStopFacility stop : this.pStopsOnly.getFacilities().values()) {
 			this.pTransitSchedule.addStopFacility(stop);
 		}
-		for (Cooperative cooperative : this.cooperatives) {
+		for (Operator cooperative : this.cooperatives) {
 			this.pTransitSchedule.addTransitLine(cooperative.getCurrentTransitLine());
 		}
 		
@@ -150,7 +150,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		this.handleBankruptCopperatives(event.getIteration());
 		
 		// Replan all cooperatives
-		for (Cooperative cooperative : this.cooperatives) {
+		for (Operator cooperative : this.cooperatives) {
 			cooperative.replan(this.strategyManager, event.getIteration());
 		}
 		
@@ -159,7 +159,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		for (TransitStopFacility stop : this.pStopsOnly.getFacilities().values()) {
 			this.pTransitSchedule.addStopFacility(stop);
 		}
-		for (Cooperative cooperative : this.cooperatives) {
+		for (Operator cooperative : this.cooperatives) {
 			this.pTransitSchedule.addTransitLine(cooperative.getCurrentTransitLine());
 		}
 		
@@ -170,7 +170,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 	@Override
 	public void notifyScoring(ScoringEvent event) {
 		TreeMap<Id, ScoreContainer> driverId2ScoreMap = this.scorePlansHandler.getDriverId2ScoreMap();
-		for (Cooperative cooperative : this.cooperatives) {
+		for (Operator cooperative : this.cooperatives) {
 			cooperative.score(driverId2ScoreMap);
 		}
 		
@@ -179,7 +179,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 			this.pTransitSchedule.addStopFacility(stop);
 		}
 		
-		for (Cooperative cooperative : this.cooperatives) {
+		for (Operator cooperative : this.cooperatives) {
 			this.pTransitSchedule.addTransitLine(cooperative.getCurrentTransitLine());
 		}
 		
@@ -188,13 +188,13 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 
 	private void handleBankruptCopperatives(int iteration) {
 		
-		LinkedList<Cooperative> cooperativesToKeep = new LinkedList<Cooperative>();
+		LinkedList<Operator> cooperativesToKeep = new LinkedList<Operator>();
 		int coopsProspecting = 0;
 		int coopsInBusiness = 0;
 		int coopsBankrupt = 0;
 		
 		// Get cooperatives with positive budget
-		for (Cooperative cooperative : this.cooperatives) {
+		for (Operator cooperative : this.cooperatives) {
 			if(cooperative.getCoopState().equals(CoopState.PROSPECTING)){
 				cooperativesToKeep.add(cooperative);
 				coopsProspecting++;
@@ -232,16 +232,16 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		
 		if (this.pConfig.getDisableCreationOfNewCooperativesInIteration() > iteration) {
 			// recreate all other
-			LinkedList<Cooperative> newCoops1 = this.operatorInitializer.createAdditionalCooperatives(this.strategyManager, iteration, numberOfNewCoopertives);
+			LinkedList<Operator> newCoops1 = this.operatorInitializer.createAdditionalCooperatives(this.strategyManager, iteration, numberOfNewCoopertives);
 			this.cooperatives.addAll(newCoops1);
 			
 			// too few cooperatives in play, increase to the minimum specified in the config
-			LinkedList<Cooperative> newCoops2 = this.operatorInitializer.createAdditionalCooperatives(this.strategyManager, iteration, (this.pConfig.getNumberOfCooperatives() - this.cooperatives.size()));
+			LinkedList<Operator> newCoops2 = this.operatorInitializer.createAdditionalCooperatives(this.strategyManager, iteration, (this.pConfig.getNumberOfCooperatives() - this.cooperatives.size()));
 			this.cooperatives.addAll(newCoops2);
 			
 			// all coops are in business, increase by one to ensure minimal mutation
 			if (this.cooperatives.size() == coopsInBusiness) {
-				LinkedList<Cooperative> newCoops3 = this.operatorInitializer.createAdditionalCooperatives(this.strategyManager, iteration, 1);
+				LinkedList<Operator> newCoops3 = this.operatorInitializer.createAdditionalCooperatives(this.strategyManager, iteration, 1);
 				this.cooperatives.addAll(newCoops3);
 			}
 		}
@@ -251,7 +251,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		return this.pTransitSchedule;
 	}
 
-	public List<Cooperative> getCooperatives() {
+	public List<Operator> getCooperatives() {
 		return cooperatives;
 	}
 

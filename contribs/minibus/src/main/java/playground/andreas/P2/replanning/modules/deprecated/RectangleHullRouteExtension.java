@@ -30,7 +30,7 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import playground.andreas.P2.operator.Cooperative;
+import playground.andreas.P2.operator.Operator;
 import playground.andreas.P2.replanning.AbstractPStrategyModule;
 import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.modules.SidewaysRouteExtension;
@@ -74,7 +74,7 @@ public class RectangleHullRouteExtension extends AbstractPStrategyModule {
 	 * @see playground.andreas.P2.replanning.PStrategy#run(playground.andreas.P2.pbox.Cooperative)
 	 */
 	@Override
-	public PPlan run(Cooperative cooperative) {
+	public PPlan run(Operator cooperative) {
 		// get a List of served stop-facilities in the sequence they are served
 		List<TransitStopFacility> currentlyUsedStops = this.getUsedFacilities(cooperative);
 		// create the rectangle
@@ -115,7 +115,7 @@ public class RectangleHullRouteExtension extends AbstractPStrategyModule {
 	 * @param newStop
 	 * @return
 	 */
-	private ArrayList<TransitStopFacility> createNewStopsToServe(Cooperative cooperative, TransitStopFacility newStop) {
+	private ArrayList<TransitStopFacility> createNewStopsToServe(Operator cooperative, TransitStopFacility newStop) {
 		// find the subroutes, between the stops to be served
 		List<List<TransitStopFacility>> subrouteFacilities = this.findSubroutes(cooperative, newStop);
 		List<Double> avDist = calcAvDist(subrouteFacilities, newStop);
@@ -169,7 +169,7 @@ public class RectangleHullRouteExtension extends AbstractPStrategyModule {
 	 * @param newStop
 	 * @return
 	 */
-	private List<List<TransitStopFacility>> findSubroutes(Cooperative cooperative, TransitStopFacility newStop) {
+	private List<List<TransitStopFacility>> findSubroutes(Operator cooperative, TransitStopFacility newStop) {
 		List<List<TransitStopFacility>> subroutes = new ArrayList<List<TransitStopFacility>>();
 		ArrayList<TransitStopFacility> temp = null;
 		TransitStopFacility fac;
@@ -196,7 +196,7 @@ public class RectangleHullRouteExtension extends AbstractPStrategyModule {
 	 * @param cooperative
 	 * @return
 	 */
-	private List<TransitStopFacility> getUsedFacilities(Cooperative cooperative) {
+	private List<TransitStopFacility> getUsedFacilities(Operator cooperative) {
 		List<TransitStopFacility> currentlyUsedStops = new ArrayList<TransitStopFacility>();
 		
 		for (TransitRouteStop stop : cooperative.getBestPlan().getLine().getRoutes().values().iterator().next().getStops()) {

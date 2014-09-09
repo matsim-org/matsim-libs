@@ -22,7 +22,7 @@ package playground.andreas.P2.replanning.modules.deprecated;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import playground.andreas.P2.operator.Cooperative;
+import playground.andreas.P2.operator.Operator;
 import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.AbstractPStrategyModule;
 
@@ -47,7 +47,7 @@ public class RemoveAllVehiclesButOne extends AbstractPStrategyModule {
 	}
 
 	@Override
-	public PPlan run(Cooperative cooperative) {
+	public PPlan run(Operator cooperative) {
 		// profitable route, change startTime
 		PPlan oldPlan = cooperative.getBestPlan();
 		

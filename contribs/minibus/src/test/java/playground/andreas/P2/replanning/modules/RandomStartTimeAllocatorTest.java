@@ -27,7 +27,7 @@ import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.andreas.P2.PScenarioHelper;
-import playground.andreas.P2.operator.Cooperative;
+import playground.andreas.P2.operator.Operator;
 import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.modules.deprecated.RandomStartTimeAllocator;
 
@@ -38,7 +38,7 @@ public class RandomStartTimeAllocatorTest {
 	@Test
     public final void testRun() {
 	
-		Cooperative coop = PScenarioHelper.createTestCooperative(utils.getOutputDirectory());
+		Operator coop = PScenarioHelper.createTestCooperative(utils.getOutputDirectory());
 		ArrayList<String> params = new ArrayList<String>();
 		params.add("900");
 		RandomStartTimeAllocator strat = new RandomStartTimeAllocator(params);

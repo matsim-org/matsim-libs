@@ -29,7 +29,7 @@ import org.matsim.testcases.MatsimTestUtils;
 
 import playground.andreas.P2.PScenarioHelper;
 import playground.andreas.P2.helper.PConfigGroup;
-import playground.andreas.P2.operator.Cooperative;
+import playground.andreas.P2.operator.Operator;
 import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.PStrategy;
 import playground.andreas.P2.replanning.modules.deprecated.RectangleHullRouteExtension;
@@ -44,7 +44,7 @@ public class RectangleHullRouteExtensionTest {
     public final void testRun() {
 		MatsimRandom.reset();
 		PConfigGroup c = new PConfigGroup();
-		Cooperative coop = PScenarioHelper.createCoop2414to3444();
+		Operator coop = PScenarioHelper.createCoop2414to3444();
 		PPlan plan = coop.getBestPlan();
 		//check the initial plan
 		Assert.assertEquals(2, plan.getStopsToBeServed().size(), MatsimTestUtils.EPSILON);

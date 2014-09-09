@@ -32,7 +32,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import playground.andreas.P2.operator.Cooperative;
+import playground.andreas.P2.operator.Operator;
 import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.AbstractPStrategyModule;
 import playground.andreas.P2.replanning.modules.EndRouteExtension;
@@ -82,7 +82,7 @@ public class RandomRouteStartExtension extends AbstractPStrategyModule {
 	 * @see playground.andreas.P2.replanning.PStrategy#run(playground.andreas.P2.pbox.Cooperative)
 	 */
 	@Override
-	public PPlan run(Cooperative cooperative) {
+	public PPlan run(Operator cooperative) {
 		this.initQuadTree(cooperative);
 		PPlan oldPlan = cooperative.getBestPlan();
 		PPlan newPlan = new PPlan(cooperative.getNewRouteId(), this.getName());
@@ -106,7 +106,7 @@ public class RandomRouteStartExtension extends AbstractPStrategyModule {
 	 * @param tree 
 	 * @return
 	 */
-	private ArrayList<TransitStopFacility> createNewStopsToServe(Cooperative cooperative, QuadTree<TransitStopFacility> tree) {
+	private ArrayList<TransitStopFacility> createNewStopsToServe(Operator cooperative, QuadTree<TransitStopFacility> tree) {
 		ArrayList<TransitStopFacility> stops2serve = new ArrayList<TransitStopFacility>();
 		stops2serve.addAll(cooperative.getBestPlan().getStopsToBeServed());
 		// get already served stops in the correct order
@@ -288,7 +288,7 @@ public class RandomRouteStartExtension extends AbstractPStrategyModule {
 	/**
 	 * @param cooperative
 	 */
-	private void initQuadTree(Cooperative cooperative) {
+	private void initQuadTree(Operator cooperative) {
 		//init only once
 		if(this.tree != null) return;
 		//find bounding box
