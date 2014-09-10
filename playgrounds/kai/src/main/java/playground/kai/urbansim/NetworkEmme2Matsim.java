@@ -90,12 +90,12 @@ public class NetworkEmme2Matsim {
 						String idStr = parts[1] ;
 						String xxStr = parts[2] ;
 						String yyStr = parts[3] ;
-						Node node = network.getFactory().createNode( sc.createId(idStr), 
+						Node node = network.getFactory().createNode( Id.create(idStr, Node.class), 
 								sc.createCoord(Double.parseDouble(xxStr),Double.parseDouble(yyStr)) ) ;
 						network.addNode( node ) ;
 					} else {
-						Node fromNode = network.getNodes().get(sc.createId(parts[1]) ) ;
-						Node toNode = network.getNodes().get(sc.createId(parts[2]));
+						Node fromNode = network.getNodes().get(Id.create(parts[1], Node.class) ) ;
+						Node toNode = network.getNodes().get(Id.create(parts[2], Node.class));
 						if ( fromNode==null || toNode==null ) {
 //							log.info("fromNode or toNode ==null; probably connector link; skipping it ...") ;
 							continue ;
@@ -131,7 +131,7 @@ public class NetworkEmme2Matsim {
 							System.exit(-1);
 						}
 
-						Id id = sc.createId( Long.toString(linkCnt) ) ; linkCnt++ ;
+						Id<Link> id = Id.create( linkCnt, Link.class ) ; linkCnt++ ;
 
 						Link link = network.getFactory().createLink(id, fromNode, toNode ) ;
 						link.setLength(length) ;

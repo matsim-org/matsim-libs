@@ -11,7 +11,10 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
 public class Mobsim {
 	private static final Logger log = Logger.getLogger(Mobsim.class);
@@ -31,9 +34,9 @@ public class Mobsim {
 
 		// the following tests the events generation
 
-		Id agentId = sc.createId("agentId");
-		Id linkId = sc.createId("linkId");
-		Id facilityId = sc.createId("facilityId");
+		Id<Person> agentId = Id.create("agentId", Person.class);
+		Id<Link> linkId = Id.create("linkId", Link.class);
+		Id<ActivityFacility> facilityId = Id.create("facilityId", ActivityFacility.class);
 		String legMode = TransportMode.car;
 		double time = 1. ;
 

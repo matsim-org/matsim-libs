@@ -73,7 +73,7 @@ public class PersWirtVConvert {
 				Coord fromCoord = createCoordFromPOINT(sc, parts[idxFromKey.get("\"source_geom\"")]);
 				Coord toCoord = createCoordFromPOINT(sc, parts[idxFromKey.get("\"dest_geom\"")]);
 				
-				Id personId = sc.createId( parts[idxFromKey.get("\"logbook_id\"")] ) ;
+				Id<Person> personId = Id.create( parts[idxFromKey.get("\"logbook_id\"")], Person.class ) ;
 				if ( personId != lastId ) {
 					lastId = personId ;
 					newPerson = pop.getFactory().createPerson(personId) ;
