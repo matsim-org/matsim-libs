@@ -55,8 +55,9 @@ public class ZoneCompleteness {
 		Header.printHeader(ZoneCompleteness.class.toString(), args);
 
 		String sourceFolder = args[0];
-		int numberOfThreads = Integer.parseInt(args[1]);
-		Double hexWidth = Double.parseDouble(args[2]);
+		String outputFolder =args[1];
+		int numberOfThreads = Integer.parseInt(args[2]);
+		Double hexWidth = Double.parseDouble(args[3]);
 
 		Id zone1 = new IdImpl(1);
 		Id zone2 = new IdImpl(2);
@@ -72,7 +73,7 @@ public class ZoneCompleteness {
 
 
 		QuadTree<Tuple<Id, Polygon>> qt = buildZoneQuadTree(idList, hexWidth);
-		getZoneCompleteness(numberOfThreads, sourceFolder, qt, hexWidth, idList);
+		getZoneCompleteness(numberOfThreads, sourceFolder, outputFolder, qt, hexWidth, idList);
 
 		Header.printFooter();
 
@@ -132,7 +133,7 @@ public class ZoneCompleteness {
 		return zoneQT;
 	}
 
-	public static void getZoneCompleteness(int numberOfThreads, String sourceFolder, QuadTree<Tuple<Id, Polygon>> qt, double hexWidth, Id[] idList) {
+	public static void getZoneCompleteness(int numberOfThreads, String sourceFolder, String outputFolder, QuadTree<Tuple<Id, Polygon>> qt, double hexWidth, Id[] idList) {
 
 
 				double[] radii = {1, 5, 10, 15, 20, 25, 30, 35, 40};
@@ -151,7 +152,7 @@ public class ZoneCompleteness {
 			for(int thisPmin : pmins){
 				/* Set configuration-specific filenames */
 				String vehicleFolder = String.format("%s/%.0f_%d/xml2/", sourceFolder, thisRadius, thisPmin);
-				String outputFile = String.format("%s%.0f_%d/%.0f_%d_zonePercentageActivities.csv", sourceFolder, thisRadius, thisPmin, thisRadius, thisPmin);
+				String outputFile = String.format("%s%.0f_%d/%.0f_%d_zonePercentageActivities.csv", outputFolder, thisRadius, thisPmin, thisRadius, thisPmin);
 
 				LOG.info("================================================================================");
 				LOG.info("Performing percentage-facility-id analysis for radius " + thisRadius + ", and pmin of " + thisPmin);
