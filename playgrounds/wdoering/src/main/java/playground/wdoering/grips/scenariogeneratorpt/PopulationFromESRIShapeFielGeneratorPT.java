@@ -84,7 +84,7 @@ public class PopulationFromESRIShapeFielGeneratorPT extends
 	}
 
 	private void createCAR(PopulationFactory pb, Population pop, SimpleFeature ft) {
-		Person pers = pb.createPerson(this.scenario.createId(Integer.toString(this.id++)));
+		Person pers = pb.createPerson(Id.create(Integer.toString(this.id++), Person.class));
 		pop.addPerson(pers);
 		Plan plan = pb.createPlan();
 		Coord c = getRandomCoordInsideFeature(this.rnd, ft);
@@ -119,7 +119,7 @@ public class PopulationFromESRIShapeFielGeneratorPT extends
 	}
 
 	private void createPT(PopulationFactory pb, Population pop, SimpleFeature ft) {
-		Person pers = pb.createPerson(this.scenario.createId(Integer.toString(this.id++)));
+		Person pers = pb.createPerson(Id.create(Integer.toString(this.id++), Person.class));
 		pop.addPerson(pers);
 		Plan plan = pb.createPlan();
 		Coord c = getRandomCoordInsideFeature(this.rnd, ft);

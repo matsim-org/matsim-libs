@@ -105,7 +105,7 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 		this.matsimConfig.global().setCoordinateSystem("EPSG:3395");
 		this.matsimConfig.controler().setOutputDirectory(getGripsConfig(this.matsimConfig).getOutputDir()+"/output");
 		this.matsimScenario = ScenarioUtils.createScenario(this.matsimConfig);
-		this.safeLinkId = this.matsimScenario.createId("el1");
+		this.safeLinkId = Id.create("el1", Link.class);
 
 		log.info("generating network file");
 		e = new InfoEvent(System.currentTimeMillis(), "generating network file");

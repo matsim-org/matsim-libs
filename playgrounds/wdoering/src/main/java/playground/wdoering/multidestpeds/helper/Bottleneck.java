@@ -150,7 +150,7 @@ public class Bottleneck
 	private static Person createPerson(PopulationFactory populationFactory, CoordImpl coordImpl, Link clink, List<Link> links, double time, Scenario sc)
 	{
 		//create person
-		Person pers = populationFactory.createPerson(sc.createId("g"+Integer.toString(persId ++)));
+		Person pers = populationFactory.createPerson(Id.create("g"+Integer.toString(persId ++), Person.class));
 
 		//set plan
 		Plan plan = populationFactory.createPlan();
