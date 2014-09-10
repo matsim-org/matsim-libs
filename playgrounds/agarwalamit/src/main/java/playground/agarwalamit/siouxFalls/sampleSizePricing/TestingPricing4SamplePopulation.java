@@ -88,7 +88,7 @@ public class TestingPricing4SamplePopulation {
 
 		for(double d:samplePopulation){
 			log.info("Running sample Population "+d+".");
-			String outputDir = outputFolder+"/3f/f"+d+"/";
+			String outputDir = outputFolder+"/f/f"+d+"/";
 			new File(outputDir).mkdir();
 			String samplePlansFile = outputDir+"/plans"+d+".xml";
 			//			SamplingPlans samplePlans = new SamplingPlans(d,samplePlansFile);
