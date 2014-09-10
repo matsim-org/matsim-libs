@@ -21,6 +21,7 @@ package playground.andreas.P2.scoring;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.vehicles.Vehicle;
 
 import playground.andreas.P2.scoring.fare.StageContainer;
 import playground.andreas.P2.scoring.fare.TicketMachine;
@@ -37,7 +38,7 @@ public class ScoreContainer {
 	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(ScoreContainer.class);
 
-	private final Id vehicleId;
+	private final Id<Vehicle> vehicleId;
 	private final TicketMachine ticketMachine;
 	private boolean isFirstTour = true;
 	
@@ -45,7 +46,7 @@ public class ScoreContainer {
 	private double costs = 0;
 	private double earnings = 0;
 	
-	public ScoreContainer(Id vehicleId, TicketMachine ticketMachine) {
+	public ScoreContainer(Id<Vehicle> vehicleId, TicketMachine ticketMachine) {
 		this.vehicleId = vehicleId;
 		this.ticketMachine = ticketMachine;
 	}

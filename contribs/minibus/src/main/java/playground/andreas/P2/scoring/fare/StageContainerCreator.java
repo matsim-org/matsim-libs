@@ -34,10 +34,12 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * 
@@ -55,10 +57,10 @@ public class StageContainerCreator implements TransitDriverStartsEventHandler, V
 	private String pIdentifier;
 	
 	private List<StageContainerHandler> stageContainerHandlerList = new LinkedList<StageContainerHandler>();
-	private HashMap<Id, TransitDriverStartsEvent> vehId2TransitDriverStartsE = new HashMap<Id, TransitDriverStartsEvent>();
-	private HashMap<Id, VehicleArrivesAtFacilityEvent> vehId2VehArrivesAtFacilityE = new HashMap<Id, VehicleArrivesAtFacilityEvent>();
-	private HashMap<Id, LinkedList<StageContainer>> vehId2StageContainerListMap = new HashMap<Id, LinkedList<StageContainer>>();
-	private HashMap<Id, StageContainer> personId2StageContainer = new HashMap<Id, StageContainer>();
+	private HashMap<Id<Vehicle>, TransitDriverStartsEvent> vehId2TransitDriverStartsE = new HashMap<>();
+	private HashMap<Id<Vehicle>, VehicleArrivesAtFacilityEvent> vehId2VehArrivesAtFacilityE = new HashMap<>();
+	private HashMap<Id<Vehicle>, LinkedList<StageContainer>> vehId2StageContainerListMap = new HashMap<>();
+	private HashMap<Id<Person>, StageContainer> personId2StageContainer = new HashMap<>();
 
 	public StageContainerCreator(String pIdentifier){
 		this.pIdentifier = pIdentifier;
@@ -75,10 +77,10 @@ public class StageContainerCreator implements TransitDriverStartsEventHandler, V
 	
 	@Override
 	public void reset(int iteration) {
-		this.vehId2TransitDriverStartsE = new HashMap<Id, TransitDriverStartsEvent>();
-		this.vehId2VehArrivesAtFacilityE = new HashMap<Id, VehicleArrivesAtFacilityEvent>();
-		this.vehId2StageContainerListMap = new HashMap<Id, LinkedList<StageContainer>>();
-		this.personId2StageContainer = new HashMap<Id, StageContainer>();
+		this.vehId2TransitDriverStartsE = new HashMap<>();
+		this.vehId2VehArrivesAtFacilityE = new HashMap<>();
+		this.vehId2StageContainerListMap = new HashMap<>();
+		this.personId2StageContainer = new HashMap<>();
 		
 		for (StageContainerHandler stageContainerHandler : this.stageContainerHandlerList) {
 			stageContainerHandler.reset(iteration);

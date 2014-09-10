@@ -22,6 +22,7 @@ package playground.andreas.P2.scoring.deprecated;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Simple container class holding scoring information for one vehicle
@@ -35,7 +36,7 @@ public class ScoreContainer {
 	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(ScoreContainer.class);
 
-	private final Id vehicleId;
+	private final Id<Vehicle> vehicleId;
 	private double earningsPerBoardingPassenger;
 	private final double earningsPerMeterAndPassenger;
 	private final double expensesPerMeter;
@@ -47,7 +48,7 @@ public class ScoreContainer {
 	int passengersCurrentlyInVeh = 0;
 
 	
-	public ScoreContainer(Id vehicleId, double earningsPerBoardingPassenger, double earningsPerMeterAndPassenger, double expensesPerMeter, double costPerVehicleAndDay){
+	public ScoreContainer(Id<Vehicle> vehicleId, double earningsPerBoardingPassenger, double earningsPerMeterAndPassenger, double expensesPerMeter, double costPerVehicleAndDay){
 		this.vehicleId = vehicleId;
 		this.earningsPerBoardingPassenger = earningsPerBoardingPassenger;
 		this.earningsPerMeterAndPassenger = earningsPerMeterAndPassenger;

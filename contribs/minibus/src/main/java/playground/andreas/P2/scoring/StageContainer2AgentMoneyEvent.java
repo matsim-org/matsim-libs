@@ -26,6 +26,7 @@ import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -45,7 +46,7 @@ public class StageContainer2AgentMoneyEvent implements StageContainerHandler, Af
 
 	private EventsManager eventsManager;
 	private double mobsimShutdownTime;
-	private HashMap<Id, List<StageContainer>> agentId2stageContainerListMap = new HashMap<Id, List<StageContainer>>();
+	private HashMap<Id<Person>, List<StageContainer>> agentId2stageContainerListMap = new HashMap<>();
 	private final TicketMachine ticketMachine;
 
 	public StageContainer2AgentMoneyEvent(Controler controler, TicketMachine ticketMachine) {
@@ -58,7 +59,7 @@ public class StageContainer2AgentMoneyEvent implements StageContainerHandler, Af
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		// TODO[AN] This can be used to hook in a Farebox
-		for (Entry<Id, List<StageContainer>> agentId2stageContainersEntry : this.agentId2stageContainerListMap.entrySet()) {
+		for (Entry<Id<Person>, List<StageContainer>> agentId2stageContainersEntry : this.agentId2stageContainerListMap.entrySet()) {
 			double totalFareOfAgent = 0.0;
 			for (StageContainer stageContainer : agentId2stageContainersEntry.getValue()) {
 				totalFareOfAgent += this.ticketMachine.getFare(stageContainer);
@@ -78,6 +79,6 @@ public class StageContainer2AgentMoneyEvent implements StageContainerHandler, Af
 
 	@Override
 	public void reset(int iteration) {
-		this.agentId2stageContainerListMap = new HashMap<Id, List<StageContainer>>();
+		this.agentId2stageContainerListMap = new HashMap<>();
 	}
 }

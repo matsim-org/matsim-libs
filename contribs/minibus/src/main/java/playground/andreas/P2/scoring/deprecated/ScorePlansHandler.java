@@ -32,6 +32,8 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.vehicles.Vehicle;
 
 import playground.andreas.P2.helper.PConfigGroup;
 
@@ -55,8 +57,8 @@ public class ScorePlansHandler implements TransitDriverStartsEventHandler, Perso
 	
 	private Network net;
 	
-	TreeMap<Id, Id> driverId2VehIdMap = new TreeMap<Id, Id>();
-	TreeMap<Id, ScoreContainer> vehicleId2ScoreMap = new TreeMap<Id, ScoreContainer>();
+	TreeMap<Id<Person>, Id<Vehicle>> driverId2VehIdMap = new TreeMap<>();
+	TreeMap<Id<Vehicle>, ScoreContainer> vehicleId2ScoreMap = new TreeMap<>();
 
 
 	public ScorePlansHandler(PConfigGroup pConfig){
@@ -71,7 +73,7 @@ public class ScorePlansHandler implements TransitDriverStartsEventHandler, Perso
 		this.net = net;
 	}
 
-	public TreeMap<Id, ScoreContainer> getDriverId2ScoreMap() {
+	public TreeMap<Id<Vehicle>, ScoreContainer> getDriverId2ScoreMap() {
 		return this.vehicleId2ScoreMap;
 	}
 
@@ -87,8 +89,8 @@ public class ScorePlansHandler implements TransitDriverStartsEventHandler, Perso
 
 	@Override
 	public void reset(int iteration) {
-		this.driverId2VehIdMap = new TreeMap<Id, Id>();
-		this.vehicleId2ScoreMap = new TreeMap<Id, ScoreContainer>();
+		this.driverId2VehIdMap = new TreeMap<>();
+		this.vehicleId2ScoreMap = new TreeMap<>();
 	}
 
 	@Override

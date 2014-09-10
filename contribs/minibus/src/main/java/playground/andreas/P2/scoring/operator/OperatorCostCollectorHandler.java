@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * 
@@ -53,7 +54,7 @@ public class OperatorCostCollectorHandler implements TransitDriverStartsEventHan
 	private double expensesPerSecond;
 	
 	private List<OperatorCostContainerHandler> operatorCostContainerHandlerList = new LinkedList<OperatorCostContainerHandler>();
-	private HashMap<Id, OperatorCostContainer> vehId2OperatorCostContainer = new HashMap<Id, OperatorCostContainer>();
+	private HashMap<Id<Vehicle>, OperatorCostContainer> vehId2OperatorCostContainer = new HashMap<>();
 	
 	public OperatorCostCollectorHandler(String pIdentifier, double costPerVehicleAndDay, double expensesPerMeter, double expensesPerSecond){
 		this.pIdentifier = pIdentifier;
@@ -73,7 +74,7 @@ public class OperatorCostCollectorHandler implements TransitDriverStartsEventHan
 	
 	@Override
 	public void reset(int iteration) {
-		this.vehId2OperatorCostContainer = new HashMap<Id, OperatorCostContainer>();
+		this.vehId2OperatorCostContainer = new HashMap<>();
 		
 		for (OperatorCostContainerHandler operatorCostContainerHandler : this.operatorCostContainerHandlerList) {
 			operatorCostContainerHandler.reset(iteration);
