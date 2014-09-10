@@ -54,13 +54,6 @@
 	</module>
 	 
   <!-- ====================================================================== -->
-  
-  	<module name="scenario" >
-		<!-- Set this parameter to true if knowledge should be used, false if not. -->
-		<param name="useKnowledge" value="false" />
-	</module>
-		
-	<!-- ====================================================================== -->
 
  <module name="strategy">
           <param name="maxAgentPlanMemorySize" value="5" />
