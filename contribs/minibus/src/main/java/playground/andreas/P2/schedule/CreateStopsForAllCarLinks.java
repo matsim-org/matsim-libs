@@ -19,21 +19,21 @@
 
 package playground.andreas.P2.schedule;
 
+import java.util.LinkedHashMap;
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import playground.andreas.P2.helper.PConfigGroup;
 
-import java.util.LinkedHashMap;
-import java.util.Set;
-import java.util.TreeSet;
+import playground.andreas.P2.helper.PConfigGroup;
 
 /**
  * Create one TransitStopFacility for each car mode link of the network
@@ -49,7 +49,7 @@ public class CreateStopsForAllCarLinks {
 	private final PConfigGroup pConfigGroup;
 	private TransitSchedule transitSchedule;
 
-	private LinkedHashMap<Id, TransitStopFacility> linkId2StopFacilityMap;
+	private LinkedHashMap<Id<Link>, TransitStopFacility> linkId2StopFacilityMap;
 	
 	public static TransitSchedule createStopsForAllCarLinks(Network network, PConfigGroup pConfigGroup){
 		return createStopsForAllCarLinks(network, pConfigGroup, null);
@@ -65,15 +65,16 @@ public class CreateStopsForAllCarLinks {
 		this.net = net;
 		this.pConfigGroup = pConfigGroup;
 		
-		this.linkId2StopFacilityMap = new LinkedHashMap<Id, TransitStopFacility>();
+		this.linkId2StopFacilityMap = new LinkedHashMap<>();
 		
-		Set<Id> stopsWithoutLinkIds = new TreeSet<Id>();
+		Set<Id<TransitStopFacility>> stopsWithoutLinkIds = new TreeSet<>();
 		
 		if (realTransitSchedule != null) {
 			for (TransitStopFacility stopFacility : realTransitSchedule.getFacilities().values()) {
 				if (stopFacility.getLinkId() != null) {
 					if (this.linkId2StopFacilityMap.get(stopFacility.getLinkId()) != null) {
-						log.error("The link " + stopFacility.getLinkId() + " has more than one transit stop faciltity registered on. This should not be allowed. Ignoring that stop.");
+						log.error("There is more than one stop registered on link " + stopFacility.getLinkId() + ". "
+								+ this.linkId2StopFacilityMap.get(stopFacility.getLinkId()).getId() + " stays registered as paratransit stop. Will ignore stop " + stopFacility.getId());
 					} else {
 						this.linkId2StopFacilityMap.put(stopFacility.getLinkId(), stopFacility);
 					}
@@ -123,7 +124,8 @@ public class CreateStopsForAllCarLinks {
 			return 0;
 		}
 
-		TransitStopFacility stop = this.transitSchedule.getFactory().createTransitStopFacility(new IdImpl(this.pConfigGroup.getPIdentifier() + link.getId()), link.getToNode().getCoord(), false);
+		Id<TransitStopFacility> stopId = Id.create(this.pConfigGroup.getPIdentifier() + link.getId(), TransitStopFacility.class);
+		TransitStopFacility stop = this.transitSchedule.getFactory().createTransitStopFacility(stopId, link.getToNode().getCoord(), false);
 		stop.setLinkId(link.getId());
 		this.transitSchedule.addStopFacility(stop);
 		return 1;		

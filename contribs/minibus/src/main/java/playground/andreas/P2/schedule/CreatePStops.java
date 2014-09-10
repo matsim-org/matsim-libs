@@ -19,13 +19,22 @@
 
 package playground.andreas.P2.schedule;
 
-import com.vividsolutions.jts.geom.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -34,18 +43,20 @@ import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.opengis.feature.simple.SimpleFeature;
+
 import playground.andreas.P2.helper.PConfigGroup;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.*;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * Create one TransitStopFacility for each car mode link of the network
  * 
- * @author droeder
+ * @author aneumann, droeder
  *
  */
 public class CreatePStops{
@@ -60,7 +71,7 @@ public class CreatePStops{
 	private Geometry exclude;
 	private GeometryFactory factory;
 
-	private LinkedHashMap<Id, TransitStopFacility> linkId2StopFacilityMap;
+	private LinkedHashMap<Id<Link>, TransitStopFacility> linkId2StopFacilityMap;
 
 	private List<Integer> topoTypesForStops = null;
 
@@ -96,15 +107,16 @@ public class CreatePStops{
 		this.pConfigGroup = pConfigGroup;
 		this.factory = new GeometryFactory();
 		
-		this.linkId2StopFacilityMap = new LinkedHashMap<Id, TransitStopFacility>();
+		this.linkId2StopFacilityMap = new LinkedHashMap<>();
 		
-		Set<Id> stopsWithoutLinkIds = new TreeSet<Id>();
+		Set<Id<TransitStopFacility>> stopsWithoutLinkIds = new TreeSet<>();
 		
 		if (realTransitSchedule != null) {
 			for (TransitStopFacility stopFacility : realTransitSchedule.getFacilities().values()) {
 				if (stopFacility.getLinkId() != null) {
 					if (this.linkId2StopFacilityMap.get(stopFacility.getLinkId()) != null) {
-						log.error("The link " + stopFacility.getLinkId() + " has more than one transit stop faciltity registered on. This should not be allowed. Ignoring that stop.");
+						log.error("There is more than one stop registered on link " + stopFacility.getLinkId() + ". "
+								+ this.linkId2StopFacilityMap.get(stopFacility.getLinkId()).getId() + " stays registered as paratransit stop. Will ignore stop " + stopFacility.getId());
 					} else {
 						this.linkId2StopFacilityMap.put(stopFacility.getLinkId(), stopFacility);
 					}
@@ -116,15 +128,15 @@ public class CreatePStops{
 		
 		this.exclude = this.factory.buildGeometry(new ArrayList<Geometry>());
 		if(!new File(pConfigGroup.getServiceAreaFile()).exists()){
-			log.warn("file " + this.pConfigGroup.getServiceAreaFile() + " not found. using min/max serviceArea...");
+			log.warn("file " + this.pConfigGroup.getServiceAreaFile() + " not found. Falling back to min/max serviceArea parameters.");
 			createServiceArea(pConfigGroup.getMinX(), pConfigGroup.getMaxX(), pConfigGroup.getMinY(), pConfigGroup.getMaxY());
 		}else{
-			log.warn("using " + this.pConfigGroup.getServiceAreaFile() + " for servicearea. x/y-values defined in the config are not used...");
+			log.warn("using " + this.pConfigGroup.getServiceAreaFile() + " for servicearea. x/y-values defined in the config are not used.");
 			createServiceArea(pConfigGroup.getServiceAreaFile());
 		}
 		
 		if (stopsWithoutLinkIds.size() > 0) {
-			log.warn("There are " + stopsWithoutLinkIds.size() + " stop facilities without link id, namely: " + stopsWithoutLinkIds.toString());
+			log.warn("There are " + stopsWithoutLinkIds.size() + " stop facilities without a link id, namely: " + stopsWithoutLinkIds.toString());
 		}
 		this.topoTypesForStops = this.pConfigGroup.getTopoTypesForStops();
 		if(!(this.topoTypesForStops == null)){
@@ -282,7 +294,8 @@ public class CreatePStops{
 			return 0;
 		}
 		
-		TransitStopFacility stop = this.transitSchedule.getFactory().createTransitStopFacility(new IdImpl(this.pConfigGroup.getPIdentifier() + link.getId()), link.getToNode().getCoord(), false);
+		Id<TransitStopFacility> stopId = Id.create(this.pConfigGroup.getPIdentifier() + link.getId(), TransitStopFacility.class);
+		TransitStopFacility stop = this.transitSchedule.getFactory().createTransitStopFacility(stopId, link.getToNode().getCoord(), false);
 		stop.setLinkId(link.getId());
 		this.transitSchedule.addStopFacility(stop);
 		return 1;		
