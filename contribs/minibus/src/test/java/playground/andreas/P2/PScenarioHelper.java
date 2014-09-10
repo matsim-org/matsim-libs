@@ -425,7 +425,7 @@ class Route2111to2333 implements PStrategy{
 		stops.add(startStop);
 		stops.add(endStop);
 		newPlan.setStopsToBeServed(stops);
-		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan));
+		newPlan.setLine(cooperative.getRouteProvider().createTransitLineFromOperatorPlan(cooperative.getId(), newPlan));
 		return newPlan;
 	}
 
@@ -462,7 +462,7 @@ class Route2333to2111 implements PStrategy{
 		stops.add(startStop);
 		stops.add(endStop);
 		newPlan.setStopsToBeServed(stops);
-		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan));
+		newPlan.setLine(cooperative.getRouteProvider().createTransitLineFromOperatorPlan(cooperative.getId(), newPlan));
 		return newPlan;
 	}
 
@@ -498,7 +498,7 @@ class Route2414to3444 implements PStrategy{
 		stops.add(startStop);
 		stops.add(endStop);
 		newPlan.setStopsToBeServed(stops);
-		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan));
+		newPlan.setLine(cooperative.getRouteProvider().createTransitLineFromOperatorPlan(cooperative.getId(), newPlan));
 		return newPlan;
 	}
 
@@ -537,7 +537,7 @@ class Route2111to1314to4443 implements PStrategy{
 		stops.add(middleStop);
 		stops.add(endStop);
 		newPlan.setStopsToBeServed(stops);
-		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan));
+		newPlan.setLine(cooperative.getRouteProvider().createTransitLineFromOperatorPlan(cooperative.getId(), newPlan));
 		return newPlan;
 	}
 

@@ -42,6 +42,7 @@ import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PConstants;
 
 /**
+ * Provides random draws of transit stops facilities. The draw is weighted by the number of activities within the stops proximity.
  * 
  * @author aneumann
  *

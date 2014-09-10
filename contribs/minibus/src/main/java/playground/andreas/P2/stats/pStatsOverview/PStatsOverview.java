@@ -36,7 +36,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
 import playground.andreas.P2.helper.PConfigGroup;
-import playground.andreas.P2.helper.PConstants.CoopState;
+import playground.andreas.P2.helper.PConstants.OperatorState;
 import playground.andreas.P2.operator.Operator;
 import playground.andreas.P2.pbox.PBox;
 import playground.andreas.P2.replanning.PPlan;
@@ -171,7 +171,7 @@ public class PStatsOverview implements StartupListener, IterationEndsListener, S
 				score += coopScore;				
 				
 				// statistics for each coop in business
-				if(cooperative.getCoopState().equals(CoopState.INBUSINESS)){
+				if(cooperative.getOperatorState().equals(OperatorState.INBUSINESS)){
 					coopPos++;
 					routesPos += coopRoutes;
 					paxPos += coopPax;

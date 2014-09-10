@@ -31,8 +31,10 @@ import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
+
 import playground.andreas.P2.helper.PConfigGroup;
-import playground.andreas.P2.helper.PConstants.CoopState;
+import playground.andreas.P2.helper.PConstants.OperatorState;
 import playground.andreas.P2.operator.Operator;
 import playground.andreas.P2.replanning.OperatorInitializer;
 import playground.andreas.P2.replanning.PStrategyManager;
@@ -169,7 +171,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 
 	@Override
 	public void notifyScoring(ScoringEvent event) {
-		TreeMap<Id, ScoreContainer> driverId2ScoreMap = this.scorePlansHandler.getDriverId2ScoreMap();
+		TreeMap<Id<Vehicle>, ScoreContainer> driverId2ScoreMap = this.scorePlansHandler.getDriverId2ScoreMap();
 		for (Operator cooperative : this.cooperatives) {
 			cooperative.score(driverId2ScoreMap);
 		}
@@ -195,17 +197,17 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		
 		// Get cooperatives with positive budget
 		for (Operator cooperative : this.cooperatives) {
-			if(cooperative.getCoopState().equals(CoopState.PROSPECTING)){
+			if(cooperative.getOperatorState().equals(OperatorState.PROSPECTING)){
 				cooperativesToKeep.add(cooperative);
 				coopsProspecting++;
 			}
 			
-			if(cooperative.getCoopState().equals(CoopState.INBUSINESS)){
+			if(cooperative.getOperatorState().equals(OperatorState.INBUSINESS)){
 				cooperativesToKeep.add(cooperative);
 				coopsInBusiness++;
 			}
 			
-			if(cooperative.getCoopState().equals(CoopState.BANKRUPT)){
+			if(cooperative.getOperatorState().equals(OperatorState.BANKRUPT)){
 				coopsBankrupt++;
 			}
 		}

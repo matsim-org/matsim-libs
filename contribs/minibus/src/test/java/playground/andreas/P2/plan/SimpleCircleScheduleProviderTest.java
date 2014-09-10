@@ -77,7 +77,7 @@ public class SimpleCircleScheduleProviderTest {
 		refIds.add(new IdImpl("3424")); refIds.add(new IdImpl("2414"));
 		refIds.add(new IdImpl("1424"));
 		
-		TransitLine line = prov.createTransitLine(lineId, plan);
+		TransitLine line = prov.createTransitLineFromOperatorPlan(lineId, plan);
 		
 		Assert.assertEquals("Transit line ids have to be the same", lineId, line.getId());
 		
@@ -130,7 +130,7 @@ public class SimpleCircleScheduleProviderTest {
 		Id lineId = new IdImpl("1");
 		
 		SimpleCircleScheduleProvider prov = new SimpleCircleScheduleProvider(pC.getPIdentifier(), scenario.getTransitSchedule(), scenario.getNetwork(), null, 10, pC.getVehicleMaximumVelocity(), pC.getMode());
-		TransitLine line = prov.createEmptyLine(lineId);
+		TransitLine line = prov.createEmptyLineFromOperator(lineId);
 		
 		Assert.assertEquals("Transit line ids have to be the same", lineId, line.getId());
 	}

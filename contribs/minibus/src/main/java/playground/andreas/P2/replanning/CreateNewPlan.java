@@ -107,7 +107,7 @@ public class CreateNewPlan extends AbstractPStrategyModule {
 			newPlan.setNVehicles(1);
 			newPlan.setStopsToBeServed(stopsToBeServed);
 			
-			newPlan.setLine(operator.getRouteProvider().createTransitLine(operator.getId(), newPlan));
+			newPlan.setLine(operator.getRouteProvider().createTransitLineFromOperatorPlan(operator.getId(), newPlan));
 
 		} while (operator.getFranchise().planRejected(newPlan) && triesPerformed < this.maxNumberOfTries);		
 

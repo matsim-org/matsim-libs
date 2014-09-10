@@ -65,7 +65,7 @@ public class ReadCoopLoggerFileAndReturnCoopsInBusiness implements TabularFileHa
 					this.coopIdInBusiness = new TreeSet<String>();
 				}
 				
-				if (row[2].trim().equalsIgnoreCase(PConstants.CoopState.INBUSINESS.toString())) {
+				if (row[2].trim().equalsIgnoreCase(PConstants.OperatorState.INBUSINESS.toString())) {
 					String coopId = row[1].trim();
 					sink.process(coopId);
 				}

@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.router.Dijkstra;
@@ -45,7 +44,9 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 
+import playground.andreas.P2.operator.Operator;
 import playground.andreas.P2.replanning.PPlan;
 
 
@@ -64,7 +65,7 @@ public class ComplexCircleScheduleProvider implements PRouteProvider {
 	private LeastCostPathCalculator routingAlgo;
 	private TransitSchedule scheduleWithStopsOnly;
 	private RandomStopProvider randomStopProvider;
-	private LinkedHashMap<Id, TransitStopFacility> linkId2StopFacilityMap;
+	private LinkedHashMap<Id<Link>, TransitStopFacility> linkId2StopFacilityMap;
 	private double vehicleMaximumVelocity;
 	private double planningSpeedFactor;
 	private String transportMode;
@@ -82,7 +83,7 @@ public class ComplexCircleScheduleProvider implements PRouteProvider {
 		((Dijkstra)this.routingAlgo).setModeRestriction(modes);
 		
 		// register all stops by their corresponding link id
-		this.linkId2StopFacilityMap = new LinkedHashMap<Id, TransitStopFacility>();
+		this.linkId2StopFacilityMap = new LinkedHashMap<>();
 		for (TransitStopFacility stop : this.scheduleWithStopsOnly.getFacilities().values()) {
 			if (stop.getLinkId() == null) {
 				log.warn("There is a potential paratransit stop without a corresponding link id. Shouldn't be possible. Check stop " + stop.getId());
@@ -98,15 +99,15 @@ public class ComplexCircleScheduleProvider implements PRouteProvider {
 	}
 
 	@Override
-	public TransitLine createTransitLine(Id lineId, PPlan plan){
-		return this.createTransitLine(lineId, plan.getStartTime(), plan.getEndTime(), plan.getNVehicles(), plan.getStopsToBeServed(), plan.getId());
+	public TransitLine createTransitLineFromOperatorPlan(Id<Operator> operatorId, PPlan plan){
+		return this.createTransitLine(Id.create(operatorId, TransitLine.class), plan.getStartTime(), plan.getEndTime(), plan.getNVehicles(), plan.getStopsToBeServed(), Id.create(plan.getId(), TransitRoute.class));
 	}
 	
-	private TransitLine createTransitLine(Id pLineId, double startTime, double endTime, int numberOfVehicles, ArrayList<TransitStopFacility> stopsToBeServed, Id routeId){
+	private TransitLine createTransitLine(Id<TransitLine> lineId, double startTime, double endTime, int numberOfVehicles, ArrayList<TransitStopFacility> stopsToBeServed, Id<TransitRoute> routeId){
 		
 		// initialize
-		TransitLine line = this.scheduleWithStopsOnly.getFactory().createTransitLine(pLineId);			
-		routeId = new IdImpl(pLineId + "-" + routeId);
+		TransitLine line = this.scheduleWithStopsOnly.getFactory().createTransitLine(lineId);			
+		routeId = Id.create(lineId + "-" + routeId, TransitRoute.class);
 		TransitRoute transitRoute = createRoute(routeId, stopsToBeServed, startTime);
 		
 		// register route
@@ -117,8 +118,8 @@ public class ComplexCircleScheduleProvider implements PRouteProvider {
 		int headway = (int) (transitRoute.getStops().get(transitRoute.getStops().size() - 1).getDepartureOffset()) / numberOfVehicles;
 		for (int i = 0; i < numberOfVehicles; i++) {
 			for (double j = startTime + i * headway; j <= endTime; ) {
-				Departure departure = this.scheduleWithStopsOnly.getFactory().createDeparture(new IdImpl(n), j);
-				departure.setVehicleId(new IdImpl(transitRoute.getId().toString() + "-" + i));
+				Departure departure = this.scheduleWithStopsOnly.getFactory().createDeparture(Id.create(n, Departure.class), j);
+				departure.setVehicleId(Id.create(transitRoute.getId().toString() + "-" + i, Vehicle.class));
 				transitRoute.addDeparture(departure);
 				j += transitRoute.getStops().get(transitRoute.getStops().size() - 1).getDepartureOffset() + 1 *60;
 				n++;
@@ -129,7 +130,7 @@ public class ComplexCircleScheduleProvider implements PRouteProvider {
 		return line;
 	}
 
-	private TransitRoute createRoute(Id routeID, ArrayList<TransitStopFacility> stopsToBeServed, double startTime){
+	private TransitRoute createRoute(Id<TransitRoute> routeID, ArrayList<TransitStopFacility> stopsToBeServed, double startTime){
 		
 		ArrayList<TransitStopFacility> tempStopsToBeServed = new ArrayList<TransitStopFacility>();
 		for (TransitStopFacility transitStopFacility : stopsToBeServed) {
@@ -138,8 +139,8 @@ public class ComplexCircleScheduleProvider implements PRouteProvider {
 		tempStopsToBeServed.add(stopsToBeServed.get(0));
 		
 		// create links - network route		
-		Id startLinkId = null;
-		Id lastLinkId = null;
+		Id<Link> startLinkId = null;
+		Id<Link> lastLinkId = null;
 		
 		List<Link> links = new LinkedList<Link>();				
 		
@@ -204,8 +205,8 @@ public class ComplexCircleScheduleProvider implements PRouteProvider {
 	}
 
 	@Override
-	public TransitLine createEmptyLine(Id id) {
-		return this.scheduleWithStopsOnly.getFactory().createTransitLine(id);
+	public TransitLine createEmptyLineFromOperator(Id<Operator> id) {
+		return this.scheduleWithStopsOnly.getFactory().createTransitLine(Id.create(id, TransitLine.class));
 	}
 
 	@Override

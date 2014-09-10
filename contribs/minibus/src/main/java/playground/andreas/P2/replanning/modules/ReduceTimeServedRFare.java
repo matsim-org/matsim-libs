@@ -108,7 +108,7 @@ public class ReduceTimeServedRFare extends AbstractPStrategyModule implements St
 		newPlan.setStartTime(timeToBeServed.getFirst());
 		newPlan.setEndTime(timeToBeServed.getSecond());
 		
-		newPlan.setLine(operator.getRouteProvider().createTransitLine(operator.getId(), newPlan));
+		newPlan.setLine(operator.getRouteProvider().createTransitLineFromOperatorPlan(operator.getId(), newPlan));
 		
 		return newPlan;
 	}

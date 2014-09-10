@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -46,7 +45,9 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 
+import playground.andreas.P2.operator.Operator;
 import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.routeProvider.PRouteProvider;
 import playground.andreas.P2.routeProvider.RandomStopProvider;
@@ -80,11 +81,11 @@ public class SimpleBackAndForthScheduleProvider implements PRouteProvider{
 	}
 	
 	@Override
-	public TransitLine createTransitLine(Id lineId, PPlan plan){
-		return this.createTransitLine(lineId, plan.getStartTime(), plan.getEndTime(), plan.getNVehicles(), plan.getStopsToBeServed(), plan.getId());
+	public TransitLine createTransitLineFromOperatorPlan(Id<Operator> operatorId, PPlan plan){
+		return this.createTransitLine(Id.create(operatorId, TransitLine.class), plan.getStartTime(), plan.getEndTime(), plan.getNVehicles(), plan.getStopsToBeServed(), Id.create(plan.getId(), TransitRoute.class));
 	}
 
-	private TransitLine createTransitLine(Id pLineId, double startTime, double endTime, int numberOfVehicles, ArrayList<TransitStopFacility> stopsToBeServed, Id routeId){
+	private TransitLine createTransitLine(Id<TransitLine> pLineId, double startTime, double endTime, int numberOfVehicles, ArrayList<TransitStopFacility> stopsToBeServed, Id<TransitRoute> routeId){
 		if (stopsToBeServed.size() != 2) {
 			log.warn("This route provider can only handle as much as to stops. Please use a different route provider.");
 			return null;
@@ -96,8 +97,8 @@ public class SimpleBackAndForthScheduleProvider implements PRouteProvider{
 		// initialize
 		TransitLine line = this.scheduleWithStopsOnly.getFactory().createTransitLine(pLineId);			
 		
-		TransitRoute transitRoute_H = createRoute(new IdImpl(pLineId + "_" + routeId + "_H"), startStop, endStop);
-		TransitRoute transitRoute_R = createRoute(new IdImpl(pLineId + "_" + routeId + "_R"), endStop, startStop);
+		TransitRoute transitRoute_H = createRoute(Id.create(pLineId + "_" + routeId + "_H", TransitRoute.class), startStop, endStop);
+		TransitRoute transitRoute_R = createRoute(Id.create(pLineId + "_" + routeId + "_R", TransitRoute.class), endStop, startStop);
 		
 		// register route
 		line.addRoute(transitRoute_H);
@@ -108,14 +109,14 @@ public class SimpleBackAndForthScheduleProvider implements PRouteProvider{
 		int headway = (int) (transitRoute_H.getStop(endStop).getDepartureOffset() + transitRoute_R.getStop(startStop).getDepartureOffset()) / numberOfVehicles;
 		for (int i = 0; i < numberOfVehicles; i++) {
 			for (double j = startTime + i * headway; j < endTime; ) {
-				Departure departure = this.scheduleWithStopsOnly.getFactory().createDeparture(new IdImpl(n), j);
-				departure.setVehicleId(new IdImpl(pLineId.toString() + "-" + i));
+				Departure departure = this.scheduleWithStopsOnly.getFactory().createDeparture(Id.create(n, Departure.class), j);
+				departure.setVehicleId(Id.create(pLineId.toString() + "-" + i, Vehicle.class));
 				transitRoute_H.addDeparture(departure);
 				j += transitRoute_H.getStop(endStop).getDepartureOffset() + 1 *60;
 				n++;
 
-				departure = this.scheduleWithStopsOnly.getFactory().createDeparture(new IdImpl(n), j);
-				departure.setVehicleId(new IdImpl(pLineId.toString() + "-" + i));
+				departure = this.scheduleWithStopsOnly.getFactory().createDeparture(Id.create(n, Departure.class), j);
+				departure.setVehicleId(Id.create(pLineId.toString() + "-" + i, Vehicle.class));
 				transitRoute_R.addDeparture(departure);
 				j += transitRoute_R.getStop(startStop).getDepartureOffset() + 1 *60;
 				n++;
@@ -126,7 +127,7 @@ public class SimpleBackAndForthScheduleProvider implements PRouteProvider{
 		return line;
 	}
 
-	private TransitRoute createRoute(Id routeID, TransitStopFacility startStop, TransitStopFacility endStop){
+	private TransitRoute createRoute(Id<TransitRoute> routeID, TransitStopFacility startStop, TransitStopFacility endStop){
 		
 		FreespeedTravelTimeAndDisutility tC = new FreespeedTravelTimeAndDisutility(-6.0, 0.0, 0.0);
 		LeastCostPathCalculator routingAlgo = new Dijkstra(this.net, tC, tC);
@@ -157,10 +158,10 @@ public class SimpleBackAndForthScheduleProvider implements PRouteProvider{
 		// additional stops
 		for (Link link : path.links) {
 			startTime += link.getLength() / Math.min(this.vehicleMaximumVelocity, link.getFreespeed());
-			if(this.scheduleWithStopsOnly.getFacilities().get(new IdImpl(this.pIdentifier + link.getId())) == null){
+			if(this.scheduleWithStopsOnly.getFacilities().get(Id.create(this.pIdentifier + link.getId(), TransitStopFacility.class)) == null){
 				continue;
 			}
-			routeStop = this.scheduleWithStopsOnly.getFactory().createTransitRouteStop(this.scheduleWithStopsOnly.getFacilities().get(new IdImpl(this.pIdentifier + link.getId())), startTime, startTime);
+			routeStop = this.scheduleWithStopsOnly.getFactory().createTransitRouteStop(this.scheduleWithStopsOnly.getFacilities().get(Id.create(this.pIdentifier + link.getId(), TransitStopFacility.class)), startTime, startTime);
 			stops.add(routeStop);
 		}
 		
@@ -186,8 +187,8 @@ public class SimpleBackAndForthScheduleProvider implements PRouteProvider{
 	}
 
 	@Override
-	public TransitLine createEmptyLine(Id id) {
-		return this.scheduleWithStopsOnly.getFactory().createTransitLine(id);
+	public TransitLine createEmptyLineFromOperator(Id<Operator> id) {
+		return this.scheduleWithStopsOnly.getFactory().createTransitLine(Id.create(id, TransitLine.class));
 	}
 	
 	@Override

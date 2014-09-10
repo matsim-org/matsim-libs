@@ -24,8 +24,9 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.vehicles.Vehicle;
 
-import playground.andreas.P2.helper.PConstants.CoopState;
+import playground.andreas.P2.helper.PConstants.OperatorState;
 import playground.andreas.P2.pbox.PFranchise;
 import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.PStrategy;
@@ -42,7 +43,7 @@ public interface Operator {
 	
 	public boolean init(PRouteProvider pRouteProvider, PStrategy initialStrategy, int iteration, double initialBudget);
 	
-	public void score(TreeMap<Id, ScoreContainer> driverId2ScoreMap);
+	public void score(TreeMap<Id<Vehicle>, ScoreContainer> driverId2ScoreMap);
 	
 	public void replan(PStrategyManager pStrategyManager, int iteration);
 
@@ -72,7 +73,7 @@ public interface Operator {
 
 	public double getCostPerVehicleSell();
 	
-	public CoopState getCoopState();
+	public OperatorState getOperatorState();
 
 	public void setBudget(double budget);
 

@@ -200,7 +200,7 @@ public class MultiPlanOperator extends AbstractOperator{
 		
 		// Fifth, reinitialize all plans
 		for (PPlan plan : this.plans) {
-			plan.setLine(this.routeProvider.createTransitLine(this.id, plan));
+			plan.setLine(this.routeProvider.createTransitLineFromOperatorPlan(this.id, plan));
 		}
 		
 		this.updateCurrentTransitLine();

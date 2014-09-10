@@ -97,7 +97,7 @@ public class SidewaysRouteExtensionTest {
 		Assert.assertEquals("Compare end stop", "p_2223", testPlan.getStopsToBeServed().get(3).getId().toString());
 		
 		coop.getBestPlan().setStopsToBeServed(testPlan.getStopsToBeServed());
-		coop.getBestPlan().setLine(coop.getRouteProvider().createTransitLine(coop.getId(), testPlan));
+		coop.getBestPlan().setLine(coop.getRouteProvider().createTransitLineFromOperatorPlan(coop.getId(), testPlan));
 		
 		testPlan = strat.run(coop);
 		

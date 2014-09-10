@@ -26,7 +26,7 @@ public class PConstants {
 
 	public static final String statsOutputFolder = "/pStats/";
 	
-	public enum CoopState {
+	public enum OperatorState {
 	    PROSPECTING, INBUSINESS, BANKRUPT
 	}
 	

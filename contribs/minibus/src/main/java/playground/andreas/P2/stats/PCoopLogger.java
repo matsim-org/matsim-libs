@@ -131,7 +131,7 @@ public class PCoopLogger implements StartupListener, IterationEndsListener, Shut
 					}
 					
 					try {
-						this.pCoopLoggerWriter.write(event.getIteration() + "\t" + cooperative.getId() + "\t" + cooperative.getCoopState() + "\t" + plan.getId() + "\t" 
+						this.pCoopLoggerWriter.write(event.getIteration() + "\t" + cooperative.getId() + "\t" + cooperative.getOperatorState() + "\t" + plan.getId() + "\t" 
 								+ plan.getCreator() + "\t" + (int) planVeh + "\t" + (int) planPax + "\t" + planScore + "\t" + cooperative.getBudget() + "\t" 
 								+ startTime + "\t" + endTime + "\t" + stopsServed + "\t" + linksServed + "\n");
 					} catch (IOException e) {
@@ -141,7 +141,7 @@ public class PCoopLogger implements StartupListener, IterationEndsListener, Shut
 				}
 				
 				try {
-					this.pCoopLoggerWriter.write(event.getIteration() + "\t" + cooperative.getId() + "\t" + cooperative.getCoopState() + "\t" + "===" + "\t" 
+					this.pCoopLoggerWriter.write(event.getIteration() + "\t" + cooperative.getId() + "\t" + cooperative.getOperatorState() + "\t" + "===" + "\t" 
 							+ "TOTAL" + "\t" + (int) cooperative.getNumberOfVehiclesOwned() + "\t" + (int) coopPax + "\t" + coopScore + "\t" + cooperative.getBudget() + "\t" 
 							+ "===" + "\t" + "===" + "\t" + "===" + "\t" + "===" + "\n");
 				} catch (IOException e) {

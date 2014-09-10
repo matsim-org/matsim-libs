@@ -22,6 +22,7 @@ package playground.andreas.P2.scoring.operator;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.vehicles.Vehicle;
 
 /**
  *
@@ -79,7 +80,7 @@ public class OperatorCostContainer {
 		return this.expensesPerSecond * timeInService;
 	}
 	
-	public Id getVehicleId(){
+	public Id<Vehicle> getVehicleId(){
 		return this.transitDriverStartsE.getVehicleId();
 	}
 

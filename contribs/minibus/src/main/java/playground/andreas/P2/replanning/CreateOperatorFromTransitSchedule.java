@@ -207,7 +207,7 @@ public class CreateOperatorFromTransitSchedule implements PStrategy{
 	@Override
 	public PPlan run(Operator operator) {
 		PPlan newPlan = this.operatorId2PlanMap.get(operator.getId());		
-		newPlan.setLine(operator.getRouteProvider().createTransitLine(operator.getId(), newPlan));
+		newPlan.setLine(operator.getRouteProvider().createTransitLineFromOperatorPlan(operator.getId(), newPlan));
 		return newPlan;
 	}
 

@@ -28,6 +28,8 @@ import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author aneumann
@@ -38,9 +40,9 @@ public class TimeAwareComplexCircleScheduleProviderHandler implements TransitDri
 	private final static Logger log = Logger.getLogger(TimeAwareComplexCircleScheduleProviderHandler.class);
 	
 	private String pIdentifier;
-	private LinkedHashMap<Id, TransitDriverStartsEvent> vehId2StartsEvent = new LinkedHashMap<Id, TransitDriverStartsEvent>();
-	private LinkedHashMap<Id, ArrayList<Double>> vehId2Offset = new LinkedHashMap<Id, ArrayList<Double>>();
-	private LinkedHashMap<Id, ArrayList<TinyStatsContainer>> routeId2StatsContrainerMap = new LinkedHashMap<Id, ArrayList<TinyStatsContainer>>();
+	private LinkedHashMap<Id<Vehicle>, TransitDriverStartsEvent> vehId2StartsEvent = new LinkedHashMap<>();
+	private LinkedHashMap<Id<Vehicle>, ArrayList<Double>> vehId2Offset = new LinkedHashMap<>();
+	private LinkedHashMap<Id<TransitRoute>, ArrayList<TinyStatsContainer>> routeId2StatsContrainerMap = new LinkedHashMap<>();
 
 	
 	public TimeAwareComplexCircleScheduleProviderHandler(String pIdentifier) {
@@ -49,9 +51,9 @@ public class TimeAwareComplexCircleScheduleProviderHandler implements TransitDri
 
 	@Override
 	public void reset(int iteration) {
-		this.vehId2StartsEvent = new LinkedHashMap<Id, TransitDriverStartsEvent>();
-		this.vehId2Offset = new LinkedHashMap<Id, ArrayList<Double>>();
-		this.routeId2StatsContrainerMap = new LinkedHashMap<Id, ArrayList<TinyStatsContainer>>();
+		this.vehId2StartsEvent = new LinkedHashMap<>();
+		this.vehId2Offset = new LinkedHashMap<>();
+		this.routeId2StatsContrainerMap = new LinkedHashMap<>();
 	}
 
 	@Override
@@ -114,7 +116,7 @@ public class TimeAwareComplexCircleScheduleProviderHandler implements TransitDri
 		}
 	}
 
-	public double getOffsetForRouteAndStopNumber(Id routeID, int stopIndex) {
+	public double getOffsetForRouteAndStopNumber(Id<TransitRoute> routeID, int stopIndex) {
 		if (this.routeId2StatsContrainerMap.get(routeID) == null) {
 			return -Double.MAX_VALUE;
 		}

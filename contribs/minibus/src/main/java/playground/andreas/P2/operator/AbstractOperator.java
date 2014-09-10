@@ -25,12 +25,12 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.vehicles.Vehicle;
 
 import playground.andreas.P2.helper.PConfigGroup;
-import playground.andreas.P2.helper.PConstants.CoopState;
+import playground.andreas.P2.helper.PConstants.OperatorState;
 import playground.andreas.P2.pbox.PFranchise;
 import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.PStrategy;
@@ -48,7 +48,7 @@ public abstract class AbstractOperator implements Operator{
 	
 	protected final static Logger log = Logger.getLogger(AbstractOperator.class);
 	
-	protected final Id id;
+	protected final Id<Operator> id;
 	
 	private int numberOfPlansTried;
 	
@@ -58,7 +58,7 @@ public abstract class AbstractOperator implements Operator{
 	private final double costPerVehicleAndDay;
 	private final double minOperationTime;
 	
-	protected CoopState coopState;
+	protected OperatorState operatorState;
 
 	protected PPlan bestPlan;
 	protected PPlan testPlan;
@@ -74,7 +74,7 @@ public abstract class AbstractOperator implements Operator{
 	protected PRouteProvider routeProvider;
 	protected int currentIteration;
 
-	public AbstractOperator(Id id, PConfigGroup pConfig, PFranchise franchise){
+	public AbstractOperator(Id<Operator> id, PConfigGroup pConfig, PFranchise franchise){
 		this.id = id;
 		this.numberOfIterationsForProspecting = pConfig.getNumberOfIterationsForProspecting();
 		this.costPerVehicleBuy = pConfig.getPricePerVehicleBought();
@@ -85,7 +85,7 @@ public abstract class AbstractOperator implements Operator{
 	}
 
 	public boolean init(PRouteProvider pRouteProvider, PStrategy initialStrategy, int iteration, double initialBudget) {
-		this.coopState = CoopState.PROSPECTING;
+		this.operatorState = OperatorState.PROSPECTING;
 		this.budget = initialBudget;
 		this.currentIteration = iteration;
 		this.routeProvider = pRouteProvider;
@@ -104,7 +104,7 @@ public abstract class AbstractOperator implements Operator{
 		return true;
 	}
 
-	public void score(TreeMap<Id, ScoreContainer> driverId2ScoreMap) {
+	public void score(TreeMap<Id<Vehicle>, ScoreContainer> driverId2ScoreMap) {
 		this.scoreLastIteration = this.score;
 		this.score = 0;
 		
@@ -121,14 +121,14 @@ public abstract class AbstractOperator implements Operator{
 		score -= this.numberOfVehiclesInReserve * this.costPerVehicleAndDay;
 		
 		if (this.score > 0.0) {
-			this.coopState = CoopState.INBUSINESS;
+			this.operatorState = OperatorState.INBUSINESS;
 		}
 		
-		if (this.coopState.equals(CoopState.PROSPECTING)) {
+		if (this.operatorState.equals(OperatorState.PROSPECTING)) {
 			if(this.numberOfIterationsForProspecting == 0){
 				if (this.score < 0.0) {
 					// no iterations for prospecting left and score still negative - terminate
-					this.coopState = CoopState.BANKRUPT;
+					this.operatorState = OperatorState.BANKRUPT;
 				}
 			}
 			this.numberOfIterationsForProspecting--;
@@ -145,14 +145,14 @@ public abstract class AbstractOperator implements Operator{
 			
 			if(numberOfVehiclesOwned - numberOfVehiclesToSell < 1){
 				// can not balance the budget by selling vehicles, bankrupt
-				this.coopState = CoopState.BANKRUPT;
+				this.operatorState = OperatorState.BANKRUPT;
 			}
 		}
 	}
 	
 	abstract public void replan(PStrategyManager pStrategyManager, int iteration);
 	
-	public Id getId() {
+	public Id<Operator> getId() {
 		return this.id;
 	}
 	
@@ -223,8 +223,8 @@ public abstract class AbstractOperator implements Operator{
 	}
 
 	@Override
-	public CoopState getCoopState() {
-		return this.coopState;
+	public OperatorState getOperatorState() {
+		return this.operatorState;
 	}
 
 	public void setBudget(double budget) {
@@ -232,7 +232,7 @@ public abstract class AbstractOperator implements Operator{
 	}
 	
 	protected void updateCurrentTransitLine(){
-		this.currentTransitLine = this.routeProvider.createEmptyLine(id);
+		this.currentTransitLine = this.routeProvider.createEmptyLineFromOperator(id);
 		for (PPlan plan : this.getAllPlans()) {
 			for (TransitRoute route : plan.getLine().getRoutes().values()) {
 				this.currentTransitLine.addRoute(route);
@@ -240,11 +240,11 @@ public abstract class AbstractOperator implements Operator{
 		}
 	}
 
-	private void scorePlan(TreeMap<Id, ScoreContainer> driverId2ScoreMap, PPlan plan) {
+	private void scorePlan(TreeMap<Id<Vehicle>, ScoreContainer> driverId2ScoreMap, PPlan plan) {
 		double totalLineScore = 0.0;
 		int totalTripsServed = 0;
 		
-		for (Id vehId : plan.getVehicleIds()) {
+		for (Id<Vehicle> vehId : plan.getVehicleIds()) {
 			totalLineScore += driverId2ScoreMap.get(vehId).getTotalRevenue();
 			totalTripsServed += driverId2ScoreMap.get(vehId).getTripsServed();
 		}

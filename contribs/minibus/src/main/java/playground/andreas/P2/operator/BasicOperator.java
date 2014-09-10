@@ -22,7 +22,7 @@ package playground.andreas.P2.operator;
 import org.matsim.api.core.v01.Id;
 
 import playground.andreas.P2.helper.PConfigGroup;
-import playground.andreas.P2.helper.PConstants.CoopState;
+import playground.andreas.P2.helper.PConstants.OperatorState;
 import playground.andreas.P2.pbox.PFranchise;
 import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.PStrategy;
@@ -66,7 +66,7 @@ public class BasicOperator extends AbstractOperator{
 			if(this.bestPlan.getNVehicles() - numberOfVehiclesToSell < 1){
 				// can not balance the budget by selling vehicles, bankrupt
 				log.error("This should not be possible at this time.");
-				this.coopState = CoopState.BANKRUPT;
+				this.operatorState = OperatorState.BANKRUPT;
 				return;
 			}
 
@@ -100,7 +100,7 @@ public class BasicOperator extends AbstractOperator{
 		
 		plan.setNVehicles(vehicleBought);
 		
-		plan.setLine(this.getRouteProvider().createTransitLine(this.getId(), plan));
+		plan.setLine(this.getRouteProvider().createTransitLineFromOperatorPlan(this.getId(), plan));
 		
 		this.testPlan = plan;
 		// END OF COPY
@@ -118,7 +118,7 @@ public class BasicOperator extends AbstractOperator{
 		}
 		
 		// reinitialize the plan
-		this.bestPlan.setLine(this.routeProvider.createTransitLine(this.id, this.bestPlan));
+		this.bestPlan.setLine(this.routeProvider.createTransitLineFromOperatorPlan(this.id, this.bestPlan));
 		
 		this.updateCurrentTransitLine();
 	}

@@ -70,7 +70,7 @@ public class WeightedEndTimeExtension extends AbstractPStrategyModule {
 			return null;
 		}
 		
-		newPlan.setLine(operator.getRouteProvider().createTransitLine(operator.getId(), newPlan));
+		newPlan.setLine(operator.getRouteProvider().createTransitLineFromOperatorPlan(operator.getId(), newPlan));
 		
 		return newPlan;
 	}

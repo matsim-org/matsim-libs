@@ -26,11 +26,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
+import playground.andreas.P2.operator.Operator;
 import playground.andreas.P2.replanning.PPlan;
 
 public interface PRouteProvider {
 	
-	public TransitLine createTransitLine(Id lineId, PPlan plan);
+	public TransitLine createTransitLineFromOperatorPlan(Id<Operator> operatorId, PPlan plan);
 
 	public TransitStopFacility getRandomTransitStop(int currentIteration);
 	
@@ -38,6 +39,6 @@ public interface PRouteProvider {
 	
 	public Collection<TransitStopFacility> getAllPStops();
 
-	public TransitLine createEmptyLine(Id id);
+	public TransitLine createEmptyLineFromOperator(Id<Operator> id);
 
 }

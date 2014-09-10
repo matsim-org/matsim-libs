@@ -51,7 +51,7 @@ public class CarefulMultiPlanOperator extends AbstractOperator{
 	
 	private List<PPlan> plans;
 
-	public CarefulMultiPlanOperator(Id id, PConfigGroup pConfig, PFranchise franchise){
+	public CarefulMultiPlanOperator(Id<Operator> id, PConfigGroup pConfig, PFranchise franchise){
 		super(id, pConfig, franchise);
 		this.plans = new LinkedList<PPlan>();
 	}
@@ -169,7 +169,7 @@ public class CarefulMultiPlanOperator extends AbstractOperator{
 		
 		// Fifth, reinitialize all plans
 		for (PPlan plan : this.plans) {
-			plan.setLine(this.routeProvider.createTransitLine(this.id, plan));
+			plan.setLine(this.routeProvider.createTransitLineFromOperatorPlan(this.id, plan));
 		}
 		
 		this.updateCurrentTransitLine();
