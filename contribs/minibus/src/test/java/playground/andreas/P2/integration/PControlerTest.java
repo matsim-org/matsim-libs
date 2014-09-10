@@ -90,7 +90,7 @@ public class PControlerTest implements TabularFileHandler{
 		// Check standard output files	
 		List<String> filesToCheckFor = new LinkedList<String>();
 		filesToCheckFor.add(outputPath + scenarioName + ".0.actsFromParatransitUsers.txt");
-		filesToCheckFor.add(outputPath + scenarioName + ".pCoopLogger.txt");
+		filesToCheckFor.add(outputPath + scenarioName + ".pOperatorLogger.txt");
 		filesToCheckFor.add(outputPath + scenarioName + ".pStats.txt");
 		filesToCheckFor.add(outputPath + scenarioName + ".scorestats.txt");
 		filesToCheckFor.add(outputPath + scenarioName + ".stopwatch.txt");

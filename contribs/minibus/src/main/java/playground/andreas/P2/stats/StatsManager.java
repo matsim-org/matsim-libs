@@ -46,7 +46,7 @@ public class StatsManager implements StartupListener{
 	public StatsManager(Controler controler, PConfigGroup pConfig, PBox pBox, PtMode2LineSetter lineSetter){
 		// register all modules
 		controler.addControlerListener(new PStatsOverview(pBox, pConfig));
-		controler.addControlerListener(new PCoopLogger(pBox, pConfig));
+		controler.addControlerListener(new POperatorLogger(pBox, pConfig));
 		controler.addControlerListener(new GexfPStat(pConfig, false));
 //		controler.addControlerListener(new GexfPStat(pConfig, true));
 		controler.addControlerListener(new GexfPStatLight(pConfig));

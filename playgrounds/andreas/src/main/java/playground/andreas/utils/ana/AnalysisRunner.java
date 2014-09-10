@@ -206,7 +206,7 @@ public class AnalysisRunner {
 class MyPtCount extends AbstractAnalyisModule{
 
 	PtPaxVolumesHandler handler;
-	private ArrayList<Id> links;
+	private ArrayList<Id<Link>> links;
 	private Network network;
 	/**
 	 * @param zones 
@@ -228,7 +228,7 @@ class MyPtCount extends AbstractAnalyisModule{
 
 	@Override
 	public void preProcessData() {
-		this.links = new ArrayList<Id>();
+		this.links = new ArrayList<>();
 		for (Link link : this.network.getLinks().values()) {
 			links.add(link.getId());
 		}
@@ -251,7 +251,7 @@ class MyPtCount extends AbstractAnalyisModule{
 			}
 			writer.newLine();
 			//content
-			for(Id id: this.links){
+			for(Id<Link> id: this.links){
 				writer.write(id.toString() + ";");
 				writer.write(this.handler.getPaxCountForLinkId(id) + ";");
 				for(int i = 0; i < this.handler.getMaxInterval() + 1; i++){

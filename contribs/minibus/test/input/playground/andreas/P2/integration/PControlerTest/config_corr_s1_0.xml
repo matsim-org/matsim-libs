@@ -41,7 +41,7 @@
 		
 		<param name="useFranchise" value="true" />
 		<param name="writeStatsInterval" value="100" />
-		<param name="logCoops" value="true" />
+		<param name="logOperators" value="true" />
 		<param name="writeGexfStatsInterval" value="100" />
 		<param name="routeProvider" value="TimeAwareComplexCircleScheduleProvider" />
 		<param name="speedLimitForStops" value="0.0" />

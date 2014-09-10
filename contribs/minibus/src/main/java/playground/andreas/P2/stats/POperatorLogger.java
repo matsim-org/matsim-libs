@@ -46,7 +46,7 @@ import playground.andreas.P2.pbox.PBox;
 import playground.andreas.P2.replanning.PPlan;
 
 /**
- * Calculates at the end of each iteration the following statistics for each cooperative:
+ * Calculates at the end of each iteration the following statistics for each operator:
  * <ul>
  * <li>number of vehicles</li>
  * <li>number of trips served</li>
@@ -56,20 +56,20 @@ import playground.andreas.P2.replanning.PPlan;
  * <li>end time of operation</li>
  * <li>links served starting from terminus</li>
  * </ul>
- * The calculated values are written to a file, sorted by iteration number and ids of the cooperatives.
+ * The calculated values are written to a file, sorted by iteration number and ids of the operators.
  *
  * @author aneumann
  */
-public class PCoopLogger implements StartupListener, IterationEndsListener, ShutdownListener {
+public class POperatorLogger implements StartupListener, IterationEndsListener, ShutdownListener {
 
-	private final static Logger log = Logger.getLogger(PCoopLogger.class);
+	private final static Logger log = Logger.getLogger(POperatorLogger.class);
 	
-	private BufferedWriter pCoopLoggerWriter;
+	private BufferedWriter pOperatorLoggerWriter;
 
 	private PBox pBox;
 	private PConfigGroup pConfig;
 
-	public PCoopLogger(PBox pBox, PConfigGroup pConfig) throws UncheckedIOException {
+	public POperatorLogger(PBox pBox, PConfigGroup pConfig) throws UncheckedIOException {
 		this.pBox = pBox;
 		this.pConfig = pConfig;
 	}
@@ -78,22 +78,22 @@ public class PCoopLogger implements StartupListener, IterationEndsListener, Shut
 	public void notifyStartup(final StartupEvent event) {
 		Controler controler = event.getControler();
 		
-		if(this.pConfig.getLogCoops()){
+		if(this.pConfig.getLogOperators()){
 			log.info("enabled");
-			this.pCoopLoggerWriter = IOUtils.getBufferedWriter(controler.getControlerIO().getOutputFilename("pCoopLogger.txt"));
+			this.pOperatorLoggerWriter = IOUtils.getBufferedWriter(controler.getControlerIO().getOutputFilename("pOperatorLogger.txt"));
 			try {
-				this.pCoopLoggerWriter.write("iter\tcoop\tstatus\tplan\tcreator\tveh\tpax\tscore\tbudget\tstart\tend\tstopsToBeServed\tlinks\t\n");
+				this.pOperatorLoggerWriter.write("iter\tcoop\tstatus\tplan\tcreator\tveh\tpax\tscore\tbudget\tstart\tend\tstopsToBeServed\tlinks\t\n");
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
 		} else {
-			this.pCoopLoggerWriter = null;
+			this.pOperatorLoggerWriter = null;
 		}		
 	}
 
 	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
-		if(this.pConfig.getLogCoops()){
+		if(this.pConfig.getLogOperators()){
 			
 			// get cooperatives
 			for (Operator cooperative : this.pBox.getCooperatives()) {
@@ -132,7 +132,7 @@ public class PCoopLogger implements StartupListener, IterationEndsListener, Shut
 					}
 					
 					try {
-						this.pCoopLoggerWriter.write(event.getIteration() + "\t" + cooperative.getId() + "\t" + cooperative.getOperatorState() + "\t" + plan.getId() + "\t" 
+						this.pOperatorLoggerWriter.write(event.getIteration() + "\t" + cooperative.getId() + "\t" + cooperative.getOperatorState() + "\t" + plan.getId() + "\t" 
 								+ plan.getCreator() + "\t" + (int) planVeh + "\t" + (int) planPax + "\t" + planScore + "\t" + cooperative.getBudget() + "\t" 
 								+ startTime + "\t" + endTime + "\t" + stopsServed + "\t" + linksServed + "\n");
 					} catch (IOException e) {
@@ -142,7 +142,7 @@ public class PCoopLogger implements StartupListener, IterationEndsListener, Shut
 				}
 				
 				try {
-					this.pCoopLoggerWriter.write(event.getIteration() + "\t" + cooperative.getId() + "\t" + cooperative.getOperatorState() + "\t" + "===" + "\t" 
+					this.pOperatorLoggerWriter.write(event.getIteration() + "\t" + cooperative.getId() + "\t" + cooperative.getOperatorState() + "\t" + "===" + "\t" 
 							+ "TOTAL" + "\t" + (int) cooperative.getNumberOfVehiclesOwned() + "\t" + (int) coopPax + "\t" + coopScore + "\t" + cooperative.getBudget() + "\t" 
 							+ "===" + "\t" + "===" + "\t" + "===" + "\t" + "===" + "\n");
 				} catch (IOException e) {
@@ -153,7 +153,7 @@ public class PCoopLogger implements StartupListener, IterationEndsListener, Shut
 			}
 			
 			try {
-				this.pCoopLoggerWriter.flush();
+				this.pOperatorLoggerWriter.flush();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -163,9 +163,9 @@ public class PCoopLogger implements StartupListener, IterationEndsListener, Shut
 	@Override
 	public void notifyShutdown(final ShutdownEvent controlerShudownEvent) {
 		// check if logging is activated. Otherwise you run into a null-pointer here \\DR aug'13
-		if(this.pConfig.getLogCoops()){
+		if(this.pConfig.getLogOperators()){
 			try {
-				this.pCoopLoggerWriter.close();
+				this.pOperatorLoggerWriter.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

@@ -56,11 +56,11 @@ public class TagLinesInTransitSchedule {
 		return transitSchedule;
 	}
 	
-	public static void tagLinesInTransitSchedule(TransitSchedule transitSchedule, HashMap<Id, String> lineId2ptModeMap) {
+	public static void tagLinesInTransitSchedule(TransitSchedule transitSchedule, HashMap<Id<TransitLine>, String> lineId2ptModeMap) {
 		int routesTagged = 0;
 		int linesTagged = 0;
 		
-		for (Entry<Id, String> lineId2ptModeEntry : lineId2ptModeMap.entrySet()) {
+		for (Entry<Id<TransitLine>, String> lineId2ptModeEntry : lineId2ptModeMap.entrySet()) {
 			TransitLine transitLine = transitSchedule.getTransitLines().get(lineId2ptModeEntry.getKey());
 			linesTagged++;
 			
