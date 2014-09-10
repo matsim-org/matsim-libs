@@ -37,10 +37,11 @@ import java.util.Set;
 import org.apache.commons.math.stat.StatUtils;
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 
@@ -79,7 +80,7 @@ public class GraphBuilder {
 	private SpatialSampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> projBuilder
 		= new SpatialSampledGraphProjectionBuilder<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge>();
 	
-	private Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	private Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	
 	private GeometryFactory geoFacotry = new GeometryFactory();
 
@@ -218,7 +219,7 @@ public class GraphBuilder {
 	}
 	
 	private SocialPerson createPerson(VertexRecord record, SQLDumpReader sqlData) {
-		PersonImpl matsimPerson = new PersonImpl(scenario.createId(record.id));
+		PersonImpl matsimPerson = new PersonImpl(Id.create(record.id, Person.class));
 		SocialPerson person = new SocialPerson(matsimPerson);
 		
 		int age;
@@ -471,6 +472,7 @@ public class GraphBuilder {
 				noAlterSex++;
 		}
 		
+		@Override
 		public String toString() {
 			StringBuilder builder = new StringBuilder();
 			builder.append("The following warnings occurred:\n");

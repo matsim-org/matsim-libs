@@ -127,7 +127,7 @@ public class RawDataToPopulation {
 		/*
 		 * create a person and a plan
 		 */
-		PersonImpl person = new PersonImpl(scenario.createId(trips.get(0).personId));
+		PersonImpl person = new PersonImpl(Id.create(trips.get(0).personId, Person.class));
 		person.setAge(container.age);
 		Plan plan = new PlanImpl(person);
 		/*

@@ -26,11 +26,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.graph.spatial.io.KMLIconVertexStyle;
@@ -66,7 +67,7 @@ public class GraphBuilderTXT {
 	
 	private GeometryFactory geoFactory = new GeometryFactory();
 	
-	private Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	private Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	
 	public SampledGraphProjection<SocialSparseGraph, SocialSparseVertex, SocialSparseEdge> buildGraph(String egoTableFile, String alterTableFile, String surveyData) throws IOException {
 		EgoAlterTableReader tableReader = new EgoAlterTableReader();
@@ -173,7 +174,7 @@ public class GraphBuilderTXT {
 	}
 	
 	private SocialPerson createPerson(RespondentData data) {
-		PersonImpl matsimPerson = new PersonImpl(scenario.createId(data.id.toString()));
+		PersonImpl matsimPerson = new PersonImpl(Id.create(data.id, Person.class));
 		SocialPerson person = new SocialPerson(matsimPerson);
 		return person;
 	}
