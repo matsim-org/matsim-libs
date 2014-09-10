@@ -21,10 +21,16 @@
 
 package playground.boescpa.lib.tools.eventFilter;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.config.ConfigUtils;
@@ -37,11 +43,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Given a list of agents, this class filters all events related to those agents from a given events file.
@@ -112,7 +113,7 @@ public class EventFilterAgents {
 				BufferedReader in = IOUtils.getBufferedReader(interestingAgents);
 				String newLine = in.readLine();
 				while (newLine != null) {
-					this.interestingAgents.add(scenarioUtils.createId(newLine));
+					this.interestingAgents.add(Id.create(newLine, Person.class));
 					newLine = in.readLine();
 				}
 				in.close();

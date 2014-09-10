@@ -21,15 +21,14 @@
 
 package playground.boescpa.lib.tools.tripReader;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioUtils;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * Provides a representation of trips.
@@ -101,7 +100,6 @@ public class Trip {
 	 */
 	public static HashMap<Long,Trip> createTripCollection(String sourceTripFile) {
 		HashMap<Long,Trip> tripCollection = new HashMap<Long, Trip>();
-		Scenario scenarioUtils = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		FileReader reader;
 		try {
 			reader = new FileReader(sourceTripFile);
@@ -111,13 +109,13 @@ public class Trip {
 			while (newLine != null) {
 				String[] tripLine = newLine.split("\t");
 				Trip trip = new Trip(
-						scenarioUtils.createId(tripLine[0]), //agentId
+						Id.create(tripLine[0], Person.class), //agentId
 						Double.parseDouble(tripLine[1]), // startTime
-						scenarioUtils.createId(tripLine[2]), // startLinkId
+						Id.create(tripLine[2], Link.class), // startLinkId
 						Double.parseDouble(tripLine[3]), // startXCoord
 						Double.parseDouble(tripLine[4]), // startYCoord
 						Double.parseDouble(tripLine[5]), // endTime
-						scenarioUtils.createId(tripLine[6]), // endLinkId
+						Id.create(tripLine[6], Link.class), // endLinkId
 						Double.parseDouble(tripLine[7]), // endXCoord
 						Double.parseDouble(tripLine[8]), // endYCoord
 						tripLine[9], // mode
