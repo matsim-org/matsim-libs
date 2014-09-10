@@ -75,9 +75,9 @@ public class SidewaysRouteExtension extends AbstractPStrategyModule {
 	}
 
 	@Override
-	public PPlan run(Operator cooperative) {
+	public PPlan run(Operator operator) {
 
-		PPlan oldPlan = cooperative.getBestPlan();
+		PPlan oldPlan = operator.getBestPlan();
 		ArrayList<TransitStopFacility> currentStopsToBeServed = oldPlan.getStopsToBeServed();
 		
 		TransitStopFacility baseStop = currentStopsToBeServed.get(0);
@@ -87,8 +87,8 @@ public class SidewaysRouteExtension extends AbstractPStrategyModule {
 		List<Geometry> lineStrings = this.createGeometryFromStops(currentStopsToBeServed, remoteStop);
 		Geometry buffer = this.createBuffer(lineStrings, Math.max(this.bufferSize, bufferSizeBasedOnRatio), this.excludeTermini);
 		
-		Set<Id> stopsUsed = this.getStopsUsed(oldPlan.getLine().getRoutes().values());
-		TransitStopFacility newStop = this.drawRandomStop(buffer, cooperative.getRouteProvider(), stopsUsed);
+		Set<Id<TransitStopFacility>> stopsUsed = this.getStopsUsed(oldPlan.getLine().getRoutes().values());
+		TransitStopFacility newStop = this.drawRandomStop(buffer, operator.getRouteProvider(), stopsUsed);
 		
 		if (newStop == null) {
 			return null;
@@ -97,13 +97,13 @@ public class SidewaysRouteExtension extends AbstractPStrategyModule {
 		ArrayList<TransitStopFacility> newStopsToBeServed = this.addStopToExistingStops(baseStop, remoteStop, currentStopsToBeServed, newStop);
 		
 		// create new plan
-		PPlan newPlan = new PPlan(cooperative.getNewPlanId(), this.getStrategyName());
+		PPlan newPlan = new PPlan(operator.getNewPlanId(), this.getStrategyName());
 		newPlan.setNVehicles(1);
 		newPlan.setStartTime(oldPlan.getStartTime());
 		newPlan.setEndTime(oldPlan.getEndTime());
 		newPlan.setStopsToBeServed(newStopsToBeServed);
 		
-		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan));
+		newPlan.setLine(operator.getRouteProvider().createTransitLine(operator.getId(), newPlan));
 		
 		return newPlan;
 	}
@@ -116,7 +116,7 @@ public class SidewaysRouteExtension extends AbstractPStrategyModule {
 		
 		List<ArrayList<TransitStopFacility>> subRoutes = this.cutRouteIntoSubRoutes(markerStops, currentStopsToBeServed);
 		for (ArrayList<TransitStopFacility> subRoute : subRoutes) {
-			this.addNewStopBetweenTwoNearestExistingStop(subRoute, newStop);
+			this.addNewStopBetweenTwoNearestExistingStops(subRoute, newStop);
 		}
 		
 		// merger sub routes
@@ -130,7 +130,7 @@ public class SidewaysRouteExtension extends AbstractPStrategyModule {
 	}
 
 
-	private void addNewStopBetweenTwoNearestExistingStop(ArrayList<TransitStopFacility> stops, TransitStopFacility stop) {
+	private void addNewStopBetweenTwoNearestExistingStops(ArrayList<TransitStopFacility> stops, TransitStopFacility stop) {
 		// find nearest stop
 		double smallestDistance = Double.MAX_VALUE;
 		TransitStopFacility stopWithSmallestDistance = stops.get(0);
@@ -191,8 +191,8 @@ public class SidewaysRouteExtension extends AbstractPStrategyModule {
 		return stopWithLargestDistance;
 	}
 
-	private Set<Id> getStopsUsed(Collection<TransitRoute> routes) {
-		Set<Id> stopsUsed = new TreeSet<Id>();
+	private Set<Id<TransitStopFacility>> getStopsUsed(Collection<TransitRoute> routes) {
+		Set<Id<TransitStopFacility>> stopsUsed = new TreeSet<>();
 		for (TransitRoute route : routes) {
 			for (TransitRouteStop stop : route.getStops()) {
 				stopsUsed.add(stop.getStopFacility().getId());
@@ -201,7 +201,7 @@ public class SidewaysRouteExtension extends AbstractPStrategyModule {
 		return stopsUsed;
 	}
 
-	private TransitStopFacility drawRandomStop(Geometry buffer, PRouteProvider pRouteProvider, Set<Id> stopsUsed) {
+	private TransitStopFacility drawRandomStop(Geometry buffer, PRouteProvider pRouteProvider, Set<Id<TransitStopFacility>> stopsUsed) {
 		List<TransitStopFacility> choiceSet = new LinkedList<TransitStopFacility>();
 		
 		// find choice-set

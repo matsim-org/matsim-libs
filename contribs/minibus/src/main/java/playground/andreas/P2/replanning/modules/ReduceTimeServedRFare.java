@@ -45,8 +45,7 @@ import playground.andreas.P2.scoring.fare.TicketMachine;
 /**
  * 
  * Restricts the time of operation to temporal relations higher than a certain threshold.
- * Threshold is standard deviation of number of trips of all relations twice a scaling factor.
- * based on route and fare
+ * Threshold is standard deviation of number of trips or collected fare of all relations twice a scaling factor.
  * 
  * @author aneumann
  *
@@ -62,7 +61,7 @@ public class ReduceTimeServedRFare extends AbstractPStrategyModule implements St
 	private final boolean useFareAsWeight;
 	private boolean allowForSplitting;
 	
-	private LinkedHashMap<Id,LinkedHashMap<Integer,LinkedHashMap<Integer,Double>>> route2StartTimeSlot2EndTimeSlot2WeightMap = new LinkedHashMap<Id, LinkedHashMap<Integer,LinkedHashMap<Integer,Double>>>();
+	private LinkedHashMap<Id<TransitRoute>,LinkedHashMap<Integer,LinkedHashMap<Integer,Double>>> route2StartTimeSlot2EndTimeSlot2WeightMap = new LinkedHashMap<>();
 	private TicketMachine ticketMachine;
 
 
@@ -83,14 +82,14 @@ public class ReduceTimeServedRFare extends AbstractPStrategyModule implements St
 	}
 	
 	@Override
-	public PPlan run(Operator cooperative) {
+	public PPlan run(Operator operator) {
 		// get best plans route id
 		TransitRoute routeToOptimize = null;
 		
-		if (cooperative.getBestPlan().getLine().getRoutes().size() != 1) {
+		if (operator.getBestPlan().getLine().getRoutes().size() != 1) {
 			log.error("There should be only one route at this time - Please check");
 		}
-		for (TransitRoute route : cooperative.getBestPlan().getLine().getRoutes().values()) {
+		for (TransitRoute route : operator.getBestPlan().getLine().getRoutes().values()) {
 			routeToOptimize = route;
 		}
 		
@@ -102,14 +101,14 @@ public class ReduceTimeServedRFare extends AbstractPStrategyModule implements St
 		}
 		
 		// profitable route, change startTime
-		PPlan newPlan = new PPlan(cooperative.getNewPlanId(), this.getStrategyName());
+		PPlan newPlan = new PPlan(operator.getNewPlanId(), this.getStrategyName());
 		newPlan.setNVehicles(1);
-		newPlan.setStopsToBeServed(cooperative.getBestPlan().getStopsToBeServed());
+		newPlan.setStopsToBeServed(operator.getBestPlan().getStopsToBeServed());
 		
 		newPlan.setStartTime(timeToBeServed.getFirst());
 		newPlan.setEndTime(timeToBeServed.getSecond());
 		
-		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan));
+		newPlan.setLine(operator.getRouteProvider().createTransitLine(operator.getId(), newPlan));
 		
 		return newPlan;
 	}
@@ -245,12 +244,12 @@ public class ReduceTimeServedRFare extends AbstractPStrategyModule implements St
 	
 	@Override
 	public void reset(int iteration) {
-		this.route2StartTimeSlot2EndTimeSlot2WeightMap = new LinkedHashMap<Id, LinkedHashMap<Integer,LinkedHashMap<Integer,Double>>>();
+		this.route2StartTimeSlot2EndTimeSlot2WeightMap = new LinkedHashMap<>();
 	}
 
 	@Override
 	public void handleFareContainer(StageContainer stageContainer) {
-		Id routeId = stageContainer.getRouteId();
+		Id<TransitRoute> routeId = stageContainer.getRouteId();
 		Integer startTimeSlot = this.getTimeSlotForTime(stageContainer.getTimeEntered());
 		Integer endTimeSlot = this.getTimeSlotForTime(stageContainer.getTimeLeft());
 		

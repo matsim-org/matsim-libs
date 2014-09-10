@@ -58,12 +58,12 @@ public class MaxRandomEndTimeAllocator extends AbstractPStrategyModule {
 	}
 	
 	@Override
-	public PPlan run(Operator cooperative) {
+	public PPlan run(Operator operator) {
 		// change endTime
-		PPlan newPlan = new PPlan(cooperative.getNewPlanId(), this.getStrategyName());
+		PPlan newPlan = new PPlan(operator.getNewPlanId(), this.getStrategyName());
 		newPlan.setNVehicles(1);
-		newPlan.setStopsToBeServed(cooperative.getBestPlan().getStopsToBeServed());
-		newPlan.setStartTime(cooperative.getBestPlan().getStartTime());
+		newPlan.setStopsToBeServed(operator.getBestPlan().getStopsToBeServed());
+		newPlan.setStartTime(operator.getBestPlan().getStartTime());
 		
 		// get a valid new end time
 		double timeMutation;
@@ -73,13 +73,13 @@ public class MaxRandomEndTimeAllocator extends AbstractPStrategyModule {
 			timeMutation = MatsimRandom.getRandom().nextDouble() * this.mutationRange;
 		}
 		
-		double newEndTime = Math.min(24 * 3600.0, cooperative.getBestPlan().getEndTime() + timeMutation);
+		double newEndTime = Math.min(24 * 3600.0, operator.getBestPlan().getEndTime() + timeMutation);
 				
 		// cast time to time bin size
 		newEndTime = TimeProvider.getSlotForTime(newEndTime, this.timeBinSize) * this.timeBinSize;
 		
 		// increase to match min operation time
-		while (newEndTime < cooperative.getBestPlan().getStartTime() + cooperative.getMinOperationTime()) {
+		while (newEndTime < operator.getBestPlan().getStartTime() + operator.getMinOperationTime()) {
 			newEndTime += this.timeBinSize;
 		}
 		
@@ -90,7 +90,7 @@ public class MaxRandomEndTimeAllocator extends AbstractPStrategyModule {
 			return null;
 		}
 		
-		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan));
+		newPlan.setLine(operator.getRouteProvider().createTransitLine(operator.getId(), newPlan));
 		
 		return newPlan;
 	}

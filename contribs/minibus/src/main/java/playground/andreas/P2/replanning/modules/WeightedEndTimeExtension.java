@@ -54,15 +54,15 @@ public class WeightedEndTimeExtension extends AbstractPStrategyModule {
 	}
 	
 	@Override
-	public PPlan run(Operator cooperative) {
+	public PPlan run(Operator operator) {
 		// change endTime
-		PPlan newPlan = new PPlan(cooperative.getNewPlanId(), this.getStrategyName());
+		PPlan newPlan = new PPlan(operator.getNewPlanId(), this.getStrategyName());
 		newPlan.setNVehicles(1);
-		newPlan.setStopsToBeServed(cooperative.getBestPlan().getStopsToBeServed());
-		newPlan.setStartTime(cooperative.getBestPlan().getStartTime());
+		newPlan.setStopsToBeServed(operator.getBestPlan().getStopsToBeServed());
+		newPlan.setStartTime(operator.getBestPlan().getStartTime());
 		
 		// get a valid new end time
-		double newEndTime = this.timeProvider.getRandomTimeInInterval(cooperative.getBestPlan().getEndTime(), 24 * 3600.0);
+		double newEndTime = this.timeProvider.getRandomTimeInInterval(operator.getBestPlan().getEndTime(), 24 * 3600.0);
 		newPlan.setEndTime(newEndTime);
 		
 		if(newPlan.getEndTime() <= newPlan.getStartTime()){
@@ -70,7 +70,7 @@ public class WeightedEndTimeExtension extends AbstractPStrategyModule {
 			return null;
 		}
 		
-		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan));
+		newPlan.setLine(operator.getRouteProvider().createTransitLine(operator.getId(), newPlan));
 		
 		return newPlan;
 	}

@@ -58,11 +58,11 @@ public class MaxRandomStartTimeAllocator extends AbstractPStrategyModule {
 	}
 
 	@Override
-	public PPlan run(Operator cooperative) {
+	public PPlan run(Operator operator) {
 		// change startTime
-		PPlan newPlan = new PPlan(cooperative.getNewPlanId(), this.getStrategyName());
+		PPlan newPlan = new PPlan(operator.getNewPlanId(), this.getStrategyName());
 		newPlan.setNVehicles(1);
-		newPlan.setStopsToBeServed(cooperative.getBestPlan().getStopsToBeServed());
+		newPlan.setStopsToBeServed(operator.getBestPlan().getStopsToBeServed());
 		
 		// get a valid new start time
 		double timeMutation;
@@ -72,25 +72,25 @@ public class MaxRandomStartTimeAllocator extends AbstractPStrategyModule {
 			timeMutation = MatsimRandom.getRandom().nextDouble() * this.mutationRange;
 		}
 		
-		double newStartTime = Math.max(0.0, cooperative.getBestPlan().getStartTime() - timeMutation);
+		double newStartTime = Math.max(0.0, operator.getBestPlan().getStartTime() - timeMutation);
 		
 		// cast time to time bin size
 		newStartTime = TimeProvider.getSlotForTime(newStartTime, this.timeBinSize) * this.timeBinSize;
 
 		// decrease to match min operation time
-		while (newStartTime > cooperative.getBestPlan().getEndTime() - cooperative.getMinOperationTime()) {
+		while (newStartTime > operator.getBestPlan().getEndTime() - operator.getMinOperationTime()) {
 			newStartTime -= this.timeBinSize;
 		}
 		
 		newPlan.setStartTime(newStartTime);
-		newPlan.setEndTime(cooperative.getBestPlan().getEndTime());
+		newPlan.setEndTime(operator.getBestPlan().getEndTime());
 		
 		if(newPlan.getEndTime() <= newPlan.getStartTime()){
 			// Could not find a valid new plan
 			return null;
 		}
 		
-		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan));
+		newPlan.setLine(operator.getRouteProvider().createTransitLine(operator.getId(), newPlan));
 		
 		return newPlan;
 	}

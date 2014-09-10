@@ -23,7 +23,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * 
@@ -56,11 +60,11 @@ public class StageContainer {
 		this.meterTravelled  += meterTravelled;
 	}
 
-	public Id getStopEntered() {
+	public Id<TransitStopFacility> getStopEntered() {
 		return this.vehArrivesAtFacilityEEntered.getFacilityId();
 	}
 
-	public Id getStopLeft() {
+	public Id<TransitStopFacility> getStopLeft() {
 		return this.vehArrivesAtFacilityELeft.getFacilityId();
 	}
 	
@@ -72,7 +76,7 @@ public class StageContainer {
 		return this.personLeavesVehE.getTime();
 	}
 	
-	public Id getRouteId() {
+	public Id<TransitRoute> getRouteId() {
 		return this.transitDriverStartsE.getTransitRouteId();
 	}
 	
@@ -80,11 +84,11 @@ public class StageContainer {
 		return this.meterTravelled;
 	}
 	
-	public Id getVehicleId(){
+	public Id<Vehicle> getVehicleId(){
 		return this.transitDriverStartsE.getVehicleId();
 	}
 	
-	public Id getAgentId(){
+	public Id<Person> getAgentId(){
 		return this.personLeavesVehE.getPersonId();
 	}
 }

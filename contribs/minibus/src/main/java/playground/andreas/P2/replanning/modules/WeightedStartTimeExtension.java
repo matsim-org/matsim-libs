@@ -55,23 +55,23 @@ public class WeightedStartTimeExtension extends AbstractPStrategyModule {
 	}
 
 	@Override
-	public PPlan run(Operator cooperative) {
+	public PPlan run(Operator operator) {
 		// change startTime
-		PPlan newPlan = new PPlan(cooperative.getNewPlanId(), this.getStrategyName());
+		PPlan newPlan = new PPlan(operator.getNewPlanId(), this.getStrategyName());
 		newPlan.setNVehicles(1);
-		newPlan.setStopsToBeServed(cooperative.getBestPlan().getStopsToBeServed());
+		newPlan.setStopsToBeServed(operator.getBestPlan().getStopsToBeServed());
 		
 		// get a valid new start time
-		double newStartTime = this.timeProvider.getRandomTimeInInterval(0.0, cooperative.getBestPlan().getStartTime());
+		double newStartTime = this.timeProvider.getRandomTimeInInterval(0.0, operator.getBestPlan().getStartTime());
 		newPlan.setStartTime(newStartTime);
-		newPlan.setEndTime(cooperative.getBestPlan().getEndTime());
+		newPlan.setEndTime(operator.getBestPlan().getEndTime());
 		
 		if(newPlan.getEndTime() <= newPlan.getStartTime()){
 			// Could not find a valid new plan
 			return null;
 		}
 		
-		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan));
+		newPlan.setLine(operator.getRouteProvider().createTransitLine(operator.getId(), newPlan));
 		
 		return newPlan;
 	}

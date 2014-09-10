@@ -42,8 +42,7 @@ import playground.andreas.P2.scoring.fare.TicketMachine;
 /**
  * 
  * Removes all stops belonging to a demand relation with trips below a certain threshold.
- * Threshold is standard deviation of number of trips of all relations twice a scaling factor.
- * based on route and fare
+ * Threshold is standard deviation of number of trips or collected fare of all relations twice a scaling factor.
  * 
  * @author aneumann
  *
@@ -58,7 +57,7 @@ public class ReduceStopsToBeServedRFare extends AbstractPStrategyModule implemen
 	private final boolean useFareAsWeight;
 
 	private TicketMachine ticketMachine;
-	private LinkedHashMap<Id,LinkedHashMap<Id,LinkedHashMap<Id,Double>>> route2StartStop2EndStop2WeightMap = new LinkedHashMap<Id, LinkedHashMap<Id,LinkedHashMap<Id,Double>>>();
+	private LinkedHashMap<Id<TransitRoute>, LinkedHashMap<Id<TransitStopFacility>, LinkedHashMap<Id<TransitStopFacility>, Double>>> route2StartStop2EndStop2WeightMap = new LinkedHashMap<>();
 	
 	public ReduceStopsToBeServedRFare(ArrayList<String> parameter) {
 		super(parameter);
@@ -73,13 +72,13 @@ public class ReduceStopsToBeServedRFare extends AbstractPStrategyModule implemen
 	}
 	
 	@Override
-	public PPlan run(Operator cooperative) {
+	public PPlan run(Operator operator) {
 		// get best plans route id
 		TransitRoute routeToOptimize = null;
-		if (cooperative.getBestPlan().getLine().getRoutes().size() != 1) {
+		if (operator.getBestPlan().getLine().getRoutes().size() != 1) {
 			log.error("There should be only one route at this time - Please check");
 		}
-		for (TransitRoute route : cooperative.getBestPlan().getLine().getRoutes().values()) {
+		for (TransitRoute route : operator.getBestPlan().getLine().getRoutes().values()) {
 			routeToOptimize = route;
 		}
 		
@@ -91,18 +90,18 @@ public class ReduceStopsToBeServedRFare extends AbstractPStrategyModule implemen
 		}
 		
 		// profitable route, change startTime
-		PPlan newPlan = new PPlan(cooperative.getNewPlanId(), this.getStrategyName());
+		PPlan newPlan = new PPlan(operator.getNewPlanId(), this.getStrategyName());
 		newPlan.setNVehicles(1);
 		newPlan.setStopsToBeServed(stopsToBeServed);
-		newPlan.setStartTime(cooperative.getBestPlan().getStartTime());
-		newPlan.setEndTime(cooperative.getBestPlan().getEndTime());
+		newPlan.setStartTime(operator.getBestPlan().getStartTime());
+		newPlan.setEndTime(operator.getBestPlan().getEndTime());
 		
-		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan));
+		newPlan.setLine(operator.getRouteProvider().createTransitLine(operator.getId(), newPlan));
 		
 		return newPlan;
 	}
 
-	private ArrayList<TransitStopFacility> getStopsToBeServed(LinkedHashMap<Id,LinkedHashMap<Id,Double>> startStop2EndStop2WeightMap, TransitRoute routeToOptimize) {
+	private ArrayList<TransitStopFacility> getStopsToBeServed(LinkedHashMap<Id<TransitStopFacility>, LinkedHashMap<Id<TransitStopFacility>, Double>> startStop2EndStop2WeightMap, TransitRoute routeToOptimize) {
 		ArrayList<TransitStopFacility> tempStopsToBeServed = new ArrayList<TransitStopFacility>();
 		RecursiveStatsContainer stats = new RecursiveStatsContainer();
 		
@@ -112,7 +111,7 @@ public class ReduceStopsToBeServedRFare extends AbstractPStrategyModule implemen
 		}
 		
 		// calculate standard deviation
-		for (LinkedHashMap<Id, Double> endStop2TripsMap : startStop2EndStop2WeightMap.values()) {
+		for (LinkedHashMap<Id<TransitStopFacility>, Double> endStop2TripsMap : startStop2EndStop2WeightMap.values()) {
 			for (Double trips : endStop2TripsMap.values()) {
 				stats.handleNewEntry(trips.doubleValue());
 			}
@@ -124,11 +123,11 @@ public class ReduceStopsToBeServedRFare extends AbstractPStrategyModule implemen
 		}
 		
 		double sigmaTreshold = stats.getStdDev() * this.sigmaScale;
-		Set<Id> stopIdsAboveTreshold = new TreeSet<Id>();
+		Set<Id<TransitStopFacility>> stopIdsAboveTreshold = new TreeSet<>();
 		
 		// Get all stops serving a demand above threshold
-		for (Entry<Id, LinkedHashMap<Id, Double>> endStop2TripsMapEntry : startStop2EndStop2WeightMap.entrySet()) {
-			for (Entry<Id, Double> tripEntry : endStop2TripsMapEntry.getValue().entrySet()) {
+		for (Entry<Id<TransitStopFacility>, LinkedHashMap<Id<TransitStopFacility>, Double>> endStop2TripsMapEntry : startStop2EndStop2WeightMap.entrySet()) {
+			for (Entry<Id<TransitStopFacility>, Double> tripEntry : endStop2TripsMapEntry.getValue().entrySet()) {
 				if (tripEntry.getValue().doubleValue() > sigmaTreshold) {
 					// ok - add the corresponding stops to the set
 					stopIdsAboveTreshold.add(endStop2TripsMapEntry.getKey());
@@ -174,21 +173,21 @@ public class ReduceStopsToBeServedRFare extends AbstractPStrategyModule implemen
 	
 	@Override
 	public void reset(int iteration) {
-		this.route2StartStop2EndStop2WeightMap = new LinkedHashMap<Id, LinkedHashMap<Id,LinkedHashMap<Id,Double>>>();
+		this.route2StartStop2EndStop2WeightMap = new LinkedHashMap<>();
 	}
 
 	@Override
 	public void handleFareContainer(StageContainer stageContainer) {
-		Id routeId = stageContainer.getRouteId();
-		Id startStopId = stageContainer.getStopEntered();
-		Id endStopId = stageContainer.getStopLeft();
+		Id<TransitRoute> routeId = stageContainer.getRouteId();
+		Id<TransitStopFacility> startStopId = stageContainer.getStopEntered();
+		Id<TransitStopFacility> endStopId = stageContainer.getStopLeft();
 		
 		if (this.route2StartStop2EndStop2WeightMap.get(routeId) == null) {
-			this.route2StartStop2EndStop2WeightMap.put(routeId, new LinkedHashMap<Id, LinkedHashMap<Id,Double>>());
+			this.route2StartStop2EndStop2WeightMap.put(routeId, new LinkedHashMap<Id<TransitStopFacility>, LinkedHashMap<Id<TransitStopFacility>, Double>>());
 		}
 
 		if (this.route2StartStop2EndStop2WeightMap.get(routeId).get(startStopId) == null) {
-			this.route2StartStop2EndStop2WeightMap.get(routeId).put(startStopId, new LinkedHashMap<Id,Double>());
+			this.route2StartStop2EndStop2WeightMap.get(routeId).put(startStopId, new LinkedHashMap<Id<TransitStopFacility>, Double>());
 		}
 
 		if (this.route2StartStop2EndStop2WeightMap.get(routeId).get(startStopId).get(endStopId) == null) {

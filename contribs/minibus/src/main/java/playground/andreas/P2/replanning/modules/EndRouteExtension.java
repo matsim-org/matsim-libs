@@ -48,7 +48,7 @@ import com.vividsolutions.jts.operation.buffer.BufferParameters;
 
 /**
  * Takes the route transformed into a lineString to calculate a buffer around it.
- * Exludes the part of the buffer going parallel/along the actual route, so only the end caps remain.
+ * Excludes the part of the buffer going parallel/along the actual route, so only the end caps remain.
  * Chooses then randomly a new stop within the buffer and inserts it after the nearest existing stop.
  * 
  * @author aneumann
@@ -72,9 +72,9 @@ public class EndRouteExtension extends AbstractPStrategyModule {
 	}
 
 	@Override
-	public PPlan run(Operator cooperative) {
+	public PPlan run(Operator operator) {
 
-		PPlan oldPlan = cooperative.getBestPlan();
+		PPlan oldPlan = operator.getBestPlan();
 		ArrayList<TransitStopFacility> currentStopsToBeServed = oldPlan.getStopsToBeServed();
 		
 		TransitStopFacility baseStop = currentStopsToBeServed.get(0);
@@ -86,8 +86,8 @@ public class EndRouteExtension extends AbstractPStrategyModule {
 		Geometry bufferWithEndCaps = this.createBuffer(lineStrings, Math.max(this.bufferSize, bufferSizeBasedOnRatio), false);
 		Geometry buffer = bufferWithEndCaps.difference(bufferWithoutEndCaps);
 		
-		Set<Id> stopsUsed = this.getStopsUsed(oldPlan.getLine().getRoutes().values());
-		TransitStopFacility newStop = this.drawRandomStop(buffer, cooperative.getRouteProvider(), stopsUsed);
+		Set<Id<TransitStopFacility>> stopsUsed = this.getStopsUsed(oldPlan.getLine().getRoutes().values());
+		TransitStopFacility newStop = this.drawRandomStop(buffer, operator.getRouteProvider(), stopsUsed);
 		
 		if (newStop == null) {
 			return null;
@@ -96,13 +96,13 @@ public class EndRouteExtension extends AbstractPStrategyModule {
 		ArrayList<TransitStopFacility> newStopsToBeServed = this.addStopToExistingStops(baseStop, remoteStop, currentStopsToBeServed, newStop);
 		
 		// create new plan
-		PPlan newPlan = new PPlan(cooperative.getNewPlanId(), this.getStrategyName());
+		PPlan newPlan = new PPlan(operator.getNewPlanId(), this.getStrategyName());
 		newPlan.setNVehicles(1);
 		newPlan.setStartTime(oldPlan.getStartTime());
 		newPlan.setEndTime(oldPlan.getEndTime());
 		newPlan.setStopsToBeServed(newStopsToBeServed);
 		
-		newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan));
+		newPlan.setLine(operator.getRouteProvider().createTransitLine(operator.getId(), newPlan));
 		
 		return newPlan;
 	}
@@ -137,8 +137,8 @@ public class EndRouteExtension extends AbstractPStrategyModule {
 		return stopWithLargestDistance;
 	}
 
-	private Set<Id> getStopsUsed(Collection<TransitRoute> routes) {
-		Set<Id> stopsUsed = new TreeSet<Id>();
+	private Set<Id<TransitStopFacility>> getStopsUsed(Collection<TransitRoute> routes) {
+		Set<Id<TransitStopFacility>> stopsUsed = new TreeSet<>();
 		for (TransitRoute route : routes) {
 			for (TransitRouteStop stop : route.getStops()) {
 				stopsUsed.add(stop.getStopFacility().getId());
@@ -147,7 +147,7 @@ public class EndRouteExtension extends AbstractPStrategyModule {
 		return stopsUsed;
 	}
 
-	private TransitStopFacility drawRandomStop(Geometry buffer, PRouteProvider pRouteProvider, Set<Id> stopsUsed) {
+	private TransitStopFacility drawRandomStop(Geometry buffer, PRouteProvider pRouteProvider, Set<Id<TransitStopFacility>> stopsUsed) {
 		List<TransitStopFacility> choiceSet = new LinkedList<TransitStopFacility>();
 		
 		// find choice-set
