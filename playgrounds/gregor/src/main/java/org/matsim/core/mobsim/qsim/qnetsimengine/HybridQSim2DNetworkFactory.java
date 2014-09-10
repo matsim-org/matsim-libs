@@ -84,9 +84,9 @@ public final class HybridQSim2DNetworkFactory implements NetsimNetworkFactory<QN
 			return hiResLink ;
 		} 
 		if (sim2DQTransitionLink) {
-			Sim2DQTransitionLink lowResLink = new Sim2DQTransitionLink(qLink);
+			Sim2DQAdapterLink lowResLink = new Sim2DQAdapterLink(qLink);
 			this.hybridEngine.registerLowResLink(lowResLink);
-			return lowResLink;
+			return qLink;
 		}
 		return qLink;
 	}

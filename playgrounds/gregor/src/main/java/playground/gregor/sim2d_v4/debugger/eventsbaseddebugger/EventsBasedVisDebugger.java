@@ -95,7 +95,7 @@ public class EventsBasedVisDebugger extends PApplet {
 		this.init();
 		frameRate(90);
 		//				size(1024, 768);
-		size(1024, 768);
+//		size(1024, 768);
 		this.fr.setVisible(true);
 	}
 

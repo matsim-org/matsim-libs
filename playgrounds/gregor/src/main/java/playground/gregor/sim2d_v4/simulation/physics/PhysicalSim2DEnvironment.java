@@ -35,11 +35,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QSim2DTransitionLink;
-import org.matsim.core.mobsim.qsim.qnetsimengine.Sim2DQTransitionLink;
+import org.matsim.core.mobsim.qsim.qnetsimengine.Sim2DQAdapterLink;
 
 import playground.gregor.sim2d_v4.cgal.LineSegment;
 import playground.gregor.sim2d_v4.cgal.VoronoiDiagramCells;
@@ -76,7 +77,7 @@ public class PhysicalSim2DEnvironment implements MobsimBeforeCleanupListener{
 	private final Sim2DScenario sim2dsc;
 
 
-	private Map<Id, Sim2DQTransitionLink> lowResLinks;
+	private Map<Id<Link>, Sim2DQAdapterLink> lowResLinks;
 
 	private final EventsManager eventsManager;
 
@@ -342,12 +343,12 @@ public class PhysicalSim2DEnvironment implements MobsimBeforeCleanupListener{
 		return this.env;
 	}
 
-	public void registerLowResLinks(Map<Id, Sim2DQTransitionLink> lowResLinks2) {
+	public void registerLowResLinks(Map<Id<Link>, Sim2DQAdapterLink> lowResLinks2) {
 		this.lowResLinks = lowResLinks2;
 
 	}
 
-	/*package*/ Sim2DQTransitionLink getLowResLink(Id nextLinkId) {
+	/*package*/ Sim2DQAdapterLink getLowResLink(Id nextLinkId) {
 		return this.lowResLinks.get(nextLinkId);
 	}
 

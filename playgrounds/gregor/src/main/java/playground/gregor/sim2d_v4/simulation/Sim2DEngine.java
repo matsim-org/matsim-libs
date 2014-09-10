@@ -28,11 +28,12 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QSim2DTransitionLink;
-import org.matsim.core.mobsim.qsim.qnetsimengine.Sim2DQTransitionLink;
+import org.matsim.core.mobsim.qsim.qnetsimengine.Sim2DQAdapterLink;
 
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.scenario.Sim2DEnvironment;
@@ -58,7 +59,7 @@ public class Sim2DEngine implements MobsimEngine {
 
 	private final List<QSim2DTransitionLink> hiResLinks = new ArrayList<QSim2DTransitionLink>();
 
-	private final Map<Id,Sim2DQTransitionLink> lowResLinks = new HashMap<Id,Sim2DQTransitionLink>();
+	private final Map<Id<Link>,Sim2DQAdapterLink> lowResLinks = new HashMap<Id<Link>,Sim2DQAdapterLink>();
 
 //	private VisDebugger debugger;
 
@@ -148,8 +149,9 @@ public class Sim2DEngine implements MobsimEngine {
 	}
 
 
-	public void registerLowResLink(Sim2DQTransitionLink lowResLink) {
-		this.lowResLinks.put(lowResLink.getLink().getId(),lowResLink);
+	public void registerLowResLink(Sim2DQAdapterLink qLink) {
+		
+		this.lowResLinks.put(qLink.getLink().getId(),qLink);
 	}
 
 //	public void debug(VisDebugger debugger) {

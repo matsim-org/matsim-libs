@@ -78,7 +78,7 @@ public class Experiments {
 
 	private static final int nrAgents = 200;
 
-	public static final double MAX_FLOW =1.2*3600;//1.2;//1.2;
+	public static final double MAX_FLOW =.2*3600;//1.2;//1.2;
 	private static final int DPETH = 0;
 	
 
@@ -331,15 +331,15 @@ public class Experiments {
 	private static void createNetwork(Scenario sc) {
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
-		Node n0 = fac.createNode(new IdImpl("n0"), new CoordImpl(-20,-Bcor1/2));
-		Node n1 = fac.createNode(new IdImpl("n1"), new CoordImpl(-10,-Bcor1/2));
+		Node n0 = fac.createNode(new IdImpl("n0"), new CoordImpl(-40,-Bcor1/2));
+		Node n1 = fac.createNode(new IdImpl("n1"), new CoordImpl(-10,-Bcor1/2+0.001));
 		Node n2 = fac.createNode(new IdImpl("n2"), new CoordImpl(-5,-Bcor1/2));
 		Node n4 = fac.createNode(new IdImpl("n4"), new CoordImpl(4,-Bcor1/2));
-		Node n6 = fac.createNode(new IdImpl("n6"), new CoordImpl(9,-Bcor1/2));
-		Node n7 = fac.createNode(new IdImpl("n7"), new CoordImpl(19,-Bcor1/2));
+		Node n6 = fac.createNode(new IdImpl("n6"), new CoordImpl(9,-Bcor1/2-0.001));
+		Node n7 = fac.createNode(new IdImpl("n7"), new CoordImpl(39,-Bcor1/2));
 		Node n5 = fac.createNode(new IdImpl("n5"), new CoordImpl(-Bcor2/2,4));
-		Node n8 = fac.createNode(new IdImpl("n8"), new CoordImpl(-Bcor2/2,9));
-		Node n9 = fac.createNode(new IdImpl("n9"), new CoordImpl(-Bcor2/2,19));
+		Node n8 = fac.createNode(new IdImpl("n8"), new CoordImpl(-Bcor2/2+0.001,9));
+		Node n9 = fac.createNode(new IdImpl("n9"), new CoordImpl(-Bcor2/2,39));
 		net.addNode(n0);
 		net.addNode(n1);
 		net.addNode(n2);
@@ -413,15 +413,15 @@ public class Experiments {
 		l1.setCapacity(flow);
 		l2.setCapacity(flow);
 		l3.setCapacity(flow);
-		l7.setCapacity(flow*10);
-		l8.setCapacity(flow*10);
+		l7.setCapacity(flow);
+		l8.setCapacity(flow);
 
 		l0Rev.setCapacity(flow);
 		l1Rev.setCapacity(flow);
 		l2Rev.setCapacity(flow);
 		l3Rev.setCapacity(flow);
-		l7Rev.setCapacity(flow*10);
-		l8Rev.setCapacity(flow*10);
+		l7Rev.setCapacity(flow);
+		l8Rev.setCapacity(flow);
 		
 		double lanes = Bentr/0.71;
 		l0.setNumberOfLanes(lanes);

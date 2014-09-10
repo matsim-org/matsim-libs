@@ -22,7 +22,6 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -42,7 +41,7 @@ import playground.gregor.sim2d_v4.simulation.Sim2DEngine;
 import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
 import playground.gregor.sim2d_v4.simulation.physics.TransitionAreaI;
 
-public class QSim2DTransitionLink extends QLinkInternalI {
+public class QSim2DTransitionLink extends AbstractQLink {
 
 	private static final Logger log = Logger.getLogger(QSim2DTransitionLink.class);
 
@@ -71,6 +70,7 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 	private final QLinkInternalI qPred;
 
 	QSim2DTransitionLink(Link link, QNetwork network, QNode toQueueNode, Sim2DEngine hybridEngine, QLinkInternalI qLinkImpl, Sim2DEnvironment env, Sim2DAgentFactory builder) {
+		super(link,network);
 		this.link = link;
 		this.qNetwork = network;
 		this.toQueueNode = toQueueNode;
@@ -126,16 +126,6 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 	}
 
 	@Override
-	void addParkedVehicle(MobsimVehicle vehicle) {
-		if (!this.transferToSim2D) {
-			this.qLinkDelegate.addParkedVehicle(vehicle);
-		} else {
-			this.qLinkDelegate.addParkedVehicle(vehicle);
-//			throw new UnsupportedOperationException() ;
-		}
-	}
-
-	@Override
 	void clearVehicles() {
 		if (!this.transferToSim2D) {
 			this.qLinkDelegate.clearVehicles();
@@ -184,15 +174,6 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		}
 	}
 
-	@Override
-	void letVehicleDepart(QVehicle vehicle, double now) {
-		if (!this.transferToSim2D) {
-			this.qLinkDelegate.letVehicleDepart(vehicle, now);
-		} else {
-			this.qLinkDelegate.letVehicleDepart(vehicle, now);
-//			throw new UnsupportedOperationException() ;
-		}
-	}
 
 	@Override
 	void registerAdditionalAgentOnLink(MobsimAgent planAgent) {
@@ -214,15 +195,6 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		}
 	}
 
-	@Override
-	QVehicle removeParkedVehicle(Id vehicleId) {
-		if (!this.transferToSim2D) {
-			return this.qLinkDelegate.removeParkedVehicle(vehicleId);
-		} else {
-			return this.qLinkDelegate.removeParkedVehicle(vehicleId);
-//			throw new UnsupportedOperationException() ;
-		}
-	}
 
 	@Override
 	MobsimAgent unregisterAdditionalAgentOnLink(Id mobsimAgentId) {
@@ -304,15 +276,6 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		}
 	}
 
-	@Override
-	public Collection<MobsimVehicle> getAllDrivingVehicles() {
-		if (!this.transferToSim2D) {
-			return this.qLinkDelegate.getAllDrivingVehicles();
-		} else {
-
-			throw new UnsupportedOperationException() ;
-		}
-	}
 
 	@Override
 	public Link getLink() {
@@ -333,15 +296,6 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		}
 	}
 
-	@Override
-	public Map<String, Object> getCustomAttributes() {
-		if (!this.transferToSim2D) {
-			return this.qLinkDelegate.getCustomAttributes();
-		} else {
-
-			throw new UnsupportedOperationException() ;
-		}
-	}
 
 	@Override
 	public VisData getVisData() {
@@ -357,17 +311,6 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 	QVehicle getParkedVehicle(Id vehicleId) {
 		if (!this.transferToSim2D) {
 			return this.qLinkDelegate.getParkedVehicle(vehicleId);
-		} else {
-
-			throw new UnsupportedOperationException() ;
-		}
-	}
-
-	@Override
-	boolean insertPassengerIntoVehicle(MobsimAgent passenger, Id vehicleId,
-			double now) {
-		if (!this.transferToSim2D) {
-			return this.qLinkDelegate.insertPassengerIntoVehicle(passenger, vehicleId, now);
 		} else {
 
 			throw new UnsupportedOperationException() ;

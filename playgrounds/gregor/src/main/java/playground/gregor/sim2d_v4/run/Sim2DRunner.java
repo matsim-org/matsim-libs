@@ -32,7 +32,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimDensityDrawer;
-import playground.gregor.sim2d_v4.experimental.QuadTreePath;
+import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimInfoBoxDrawer;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
@@ -132,8 +132,8 @@ public class Sim2DRunner implements IterationStartsListener{
 //			VDPath vdp = new VDPath(controller.getEvents());
 //			controller.getEvents().addHandler(vdp);
 //			
-			QuadTreePath qdp = new QuadTreePath(controller.getEvents());
-			controller.getEvents().addHandler(qdp);
+//			QuadTreePath qdp = new QuadTreePath(controller.getEvents());
+//			controller.getEvents().addHandler(qdp);
 			
 //			Sim2DRunner runner = new Sim2DRunner();
 //			runner.test = new EventBasedVisDebuggerEngine(sc);
@@ -163,21 +163,21 @@ public class Sim2DRunner implements IterationStartsListener{
 //			VoronoiDiagramDrawer v = new VoronoiDiagramDrawer();
 //			VoronoiFNDDrawer vFND = new VoronoiFNDDrawer(new Envelope(-3,3,-197.5,-192.5));
 //			VoronoiFNDDrawer vFND1 = new VoronoiFNDDrawer(10);
-//			dbg.addAdditionalDrawer(iBox÷);
+			dbg.addAdditionalDrawer(iBox);
 //			dbg.addAdditionalDrawer(new Branding());
 //			AgentTracker at2 = new AgentTracker(sc,new IdImpl("carblowup9445"));
 //			AgentTracker at = new AgentTracker(sc,new IdImpl("carblowup8888"));
 //			controller.getEvents().addHandler(at);
 //			controller.getEvents().addHandler(at2);
-			QSimDensityDrawer qDbg = new QSimDensityDrawer(sc);
+//			QSimDensityDrawer qDbg = new QSimDensityDrawer(sc);
 //			QSimVehiclesDrawer qDbgB = new QSimVehiclesDrawer(sc);
-//			QSimInfoBoxDrawer qDbg2 = new QSimInfoBoxDrawer(sc);
+			QSimInfoBoxDrawer qDbg2 = new QSimInfoBoxDrawer(sc);
 			
-			dbg.addAdditionalDrawer(qDbg);
+//			dbg.addAdditionalDrawer(qDbg);
 //			dbg.addAdditionalDrawer(at2);
 //			dbg.addAdditionalDrawer(at);
 //			dbg.addAdditionalDrawer(qDbgB);
-//			dbg.addAdditionalDrawer(qDbg2);
+			dbg.addAdditionalDrawer(qDbg2);
 			
 //			dbg.addAdditionalDrawer(vFND);
 //			dbg.addAdditionalDrawer(vFND1);
@@ -186,9 +186,9 @@ public class Sim2DRunner implements IterationStartsListener{
 //			dbg.addAdditionalDrawer(new GregorsOffice());
 //			dbg.addAdditionalDrawer(v);
 			controller.getEvents().addHandler(dbg);
-			controller.getEvents().addHandler(qDbg);
+//			controller.getEvents().addHandler(qDbg);
 //			controller.getEvents().addHandler(qDbgB);
-//			controller.getEvents().addHandler(qDbg2);
+			controller.getEvents().addHandler(qDbg2);
 //			VDTester vdt = new VDTester(new Envelope(-2.5,2.5,-50,-40),controller.getEvents());
 //			controller.getEvents().addHandler(vdt);
 //			controller.addControlerListener(vdt);
@@ -214,7 +214,7 @@ public class Sim2DRunner implements IterationStartsListener{
 //		TollDisutilityCalculatorFactory tollDisutilityCalculatorFactory = new TollDisutilityCalculatorFactory(tollHandler);
 //		controller.setTravelDisutilityFactory(tollDisutilityCalculatorFactory);
 //		controller.addControlerListener(new MarginalCostPricing( (ScenarioImpl) controller.getScenario(), tollHandler ));
-//		controller.run();
+		controller.run();
 	}
 
 	protected static void printUsage() {
