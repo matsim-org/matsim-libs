@@ -43,9 +43,9 @@ public class CountCapacityMeterPerMode extends AbstractPAnalyisModule implements
 	private final static Logger log = Logger.getLogger(CountCapacityMeterPerMode.class);
 	
 	private Network network;
-	private HashMap<Id, Double> vehId2VehicleCapacity = new HashMap<Id, Double>();
+	private HashMap<Id<Vehicle>, Double> vehId2VehicleCapacity = new HashMap<>();
 	
-	private HashMap<Id, String> vehId2ptModeMap;
+	private HashMap<Id<Vehicle>, String> vehId2ptModeMap;
 	private HashMap<String, Double> ptMode2CountMap;
 
 	
@@ -66,7 +66,7 @@ public class CountCapacityMeterPerMode extends AbstractPAnalyisModule implements
 	
 	@Override
 	public void updateVehicles(Vehicles vehicles) {
-		this.vehId2VehicleCapacity = new HashMap<Id, Double>();
+		this.vehId2VehicleCapacity = new HashMap<>();
 		for (Vehicle veh : vehicles.getVehicles().values()) {
 			Integer seats = veh.getType().getCapacity().getSeats();
 			Integer standing = veh.getType().getCapacity().getStandingRoom();
@@ -82,7 +82,7 @@ public class CountCapacityMeterPerMode extends AbstractPAnalyisModule implements
 	@Override
 	public void reset(int iteration) {
 		super.reset(iteration);
-		this.vehId2ptModeMap = new HashMap<Id, String>();
+		this.vehId2ptModeMap = new HashMap<>();
 		this.ptMode2CountMap = new HashMap<String, Double>();
 	}
 
@@ -91,7 +91,7 @@ public class CountCapacityMeterPerMode extends AbstractPAnalyisModule implements
 		super.handleEvent(event);
 		String ptMode = this.lineIds2ptModeMap.get(event.getTransitLineId());
 		if (ptMode == null) {
-			log.warn("Should not happen");
+			log.warn("Could not find a valid pt mode for transit line " + event.getTransitLineId());
 			ptMode = "no valid pt mode found";
 		}
 		this.vehId2ptModeMap.put(event.getVehicleId(), ptMode);

@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.vehicles.Vehicle;
 
 
 /**
@@ -39,7 +40,7 @@ public class CountVehPerMode extends AbstractPAnalyisModule implements TransitDr
 	
 	private final static Logger log = Logger.getLogger(CountVehPerMode.class);
 	
-	private HashMap<String, Set<Id>> ptMode2VehIdsMap;
+	private HashMap<String, Set<Id<Vehicle>>> ptMode2VehIdsMap;
 	
 	public CountVehPerMode(){
 		super(CountVehPerMode.class.getSimpleName());
@@ -57,18 +58,18 @@ public class CountVehPerMode extends AbstractPAnalyisModule implements TransitDr
 	
 	@Override
 	public void reset(int iteration) {
-		this.ptMode2VehIdsMap = new HashMap<String, Set<Id>>();
+		this.ptMode2VehIdsMap = new HashMap<>();
 	}
 
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
 		String ptMode = this.lineIds2ptModeMap.get(event.getTransitLineId());
 		if (ptMode == null) {
-			log.warn("Should not happen");
+			log.warn("Could not find a valid pt mode for transit line " + event.getTransitLineId());
 			ptMode = "no valid pt mode found";
 		}
 		if (this.ptMode2VehIdsMap.get(ptMode) == null) {
-			this.ptMode2VehIdsMap.put(ptMode, new TreeSet<Id>());
+			this.ptMode2VehIdsMap.put(ptMode, new TreeSet<Id<Vehicle>>());
 		}
 
 		this.ptMode2VehIdsMap.get(ptMode).add(event.getVehicleId());

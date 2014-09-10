@@ -22,6 +22,7 @@ package playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**
@@ -45,6 +46,6 @@ public interface PtMode2LineSetter {
 	 * 
 	 * @return Returns one public transit mode for each line id
 	 */
-	HashMap<Id, String> getLineId2ptModeMap();
+	HashMap<Id<TransitLine>, String> getLineId2ptModeMap();
 	
 }

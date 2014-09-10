@@ -29,8 +29,10 @@ import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
+import org.matsim.vehicles.Vehicle;
 
 
 /**
@@ -43,11 +45,10 @@ public class AverageNumberOfStopsPerMode extends AbstractPAnalyisModule implemen
 	
 	private final static Logger log = Logger.getLogger(AverageNumberOfStopsPerMode.class);
 	
-	private HashMap<Id, String> vehId2ptModeMap;
+	private HashMap<Id<Vehicle>, String> vehId2ptModeMap;
 	private HashMap<String, Integer> ptMode2NumberOfStopsTravelledMap;
 	private HashMap<String, Integer> ptMode2TripCountMap;
-	private HashMap<Id,HashMap<Id,Integer>> vehId2AgentId2StopCountMap = new HashMap<Id, HashMap<Id, Integer>>();
-
+	private HashMap<Id<Vehicle>, HashMap<Id<Person>, Integer>> vehId2AgentId2StopCountMap = new HashMap<>();
 	
 	public AverageNumberOfStopsPerMode(){
 		super(AverageNumberOfStopsPerMode.class.getSimpleName());
@@ -66,10 +67,10 @@ public class AverageNumberOfStopsPerMode extends AbstractPAnalyisModule implemen
 	@Override
 	public void reset(int iteration) {
 		super.reset(iteration);
-		this.vehId2ptModeMap = new HashMap<Id, String>();
+		this.vehId2ptModeMap = new HashMap<>();
 		this.ptMode2NumberOfStopsTravelledMap = new HashMap<String, Integer>();
 		this.ptMode2TripCountMap = new HashMap<String, Integer>();
-		this.vehId2AgentId2StopCountMap = new HashMap<Id, HashMap<Id, Integer>>();
+		this.vehId2AgentId2StopCountMap = new HashMap<>();
 		// avoid null-pointer in getResult() /dr
 		for (String ptMode : this.ptModes) {
 			this.ptMode2NumberOfStopsTravelledMap.put(ptMode, new Integer(0));
@@ -82,7 +83,7 @@ public class AverageNumberOfStopsPerMode extends AbstractPAnalyisModule implemen
 		super.handleEvent(event);
 		String ptMode = this.lineIds2ptModeMap.get(event.getTransitLineId());
 		if (ptMode == null) {
-			log.warn("Should not happen");
+			log.warn("Could not find a valid pt mode for transit line " + event.getTransitLineId());
 			ptMode = "no valid pt mode found";
 		}
 		this.vehId2ptModeMap.put(event.getVehicleId(), ptMode);
@@ -91,7 +92,7 @@ public class AverageNumberOfStopsPerMode extends AbstractPAnalyisModule implemen
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		if (this.vehId2AgentId2StopCountMap.get(event.getVehicleId()) == null) {
-			this.vehId2AgentId2StopCountMap.put(event.getVehicleId(), new HashMap<Id, Integer>());
+			this.vehId2AgentId2StopCountMap.put(event.getVehicleId(), new HashMap<Id<Person>, Integer>());
 		}
 		
 		if(!super.ptDriverIds.contains(event.getPersonId())){
@@ -121,7 +122,7 @@ public class AverageNumberOfStopsPerMode extends AbstractPAnalyisModule implemen
 
 	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-		for (Id agentId : this.vehId2AgentId2StopCountMap.get(event.getVehicleId()).keySet()) {
+		for (Id<Person> agentId : this.vehId2AgentId2StopCountMap.get(event.getVehicleId()).keySet()) {
 			int oldValue = this.vehId2AgentId2StopCountMap.get(event.getVehicleId()).get(agentId).intValue();
 			this.vehId2AgentId2StopCountMap.get(event.getVehicleId()).put(agentId, new Integer(oldValue + 1));
 		}

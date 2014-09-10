@@ -38,7 +38,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 public class BVGLines2PtModes implements PtMode2LineSetter{
 	
 	private final static Logger log = Logger.getLogger(BVGLines2PtModes.class);
-	private HashMap<Id, String> lineId2ptMode;
+	private HashMap<Id<TransitLine>, String> lineId2ptMode;
 	private String pIdentifier;
 	
 	public BVGLines2PtModes(){
@@ -46,7 +46,7 @@ public class BVGLines2PtModes implements PtMode2LineSetter{
 	}
 	
 	public void setPtModesForEachLine(TransitSchedule transitSchedule, String pIdentifier){
-		this.lineId2ptMode = new HashMap<Id, String>();
+		this.lineId2ptMode = new HashMap<>();
 		this.pIdentifier = pIdentifier;
 		
 		for (TransitLine transitLine : transitSchedule.getTransitLines().values()) {
@@ -67,11 +67,11 @@ public class BVGLines2PtModes implements PtMode2LineSetter{
 	}
 
 	
-	public HashMap<Id, String> getLineId2ptModeMap(){
+	public HashMap<Id<TransitLine>, String> getLineId2ptModeMap(){
 		return this.lineId2ptMode;
 	}
 	
-	public Color getColorForLine(Id lineId) {
+	public Color getColorForLine(Id<TransitLine> lineId) {
 		String lineType = this.lineId2ptMode.get(lineId);
 		Color color;
 		if (lineType != null) {

@@ -30,7 +30,9 @@ import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.pt.PtConstants;
+import org.matsim.vehicles.Vehicle;
 
 
 /**
@@ -44,9 +46,9 @@ public class CountTransfersPerModeModeCombination extends AbstractPAnalyisModule
 	private final static Logger log = Logger.getLogger(CountTransfersPerModeModeCombination.class);
 	
 	private LinkedList<String> ptModeCombinations = null;
-	private HashMap<Id, String> vehId2ptModeMap;
+	private HashMap<Id<Vehicle>, String> vehId2ptModeMap;
 	private HashMap<String, Integer> ptModeCombination2TripCountMap;
-	private HashMap<Id, String> agentId2LastPtModeUsed = new HashMap<Id, String>();
+	private HashMap<Id<Person>, String> agentId2LastPtModeUsed = new HashMap<>();
 	
 	public CountTransfersPerModeModeCombination(){
 		super(CountTransfersPerModeModeCombination.class.getSimpleName());
@@ -90,9 +92,9 @@ public class CountTransfersPerModeModeCombination extends AbstractPAnalyisModule
 	@Override
 	public void reset(int iteration) {
 		super.reset(iteration);
-		this.vehId2ptModeMap = new HashMap<Id, String>();
+		this.vehId2ptModeMap = new HashMap<>();
 		this.ptModeCombination2TripCountMap = new HashMap<String, Integer>();
-		this.agentId2LastPtModeUsed = new HashMap<Id, String>();
+		this.agentId2LastPtModeUsed = new HashMap<>();
 	}
 
 	@Override
@@ -100,7 +102,7 @@ public class CountTransfersPerModeModeCombination extends AbstractPAnalyisModule
 		super.handleEvent(event);
 		String ptMode = this.lineIds2ptModeMap.get(event.getTransitLineId());
 		if (ptMode == null) {
-			log.warn("Should not happen");
+			log.warn("Could not find a valid pt mode for transit line " + event.getTransitLineId());
 			ptMode = "no valid pt mode found";
 		}
 		this.vehId2ptModeMap.put(event.getVehicleId(), ptMode);

@@ -44,8 +44,6 @@ public class AverageLoadPerDistancePerMode extends AbstractPAnalyisModule {
 
 	@Override
 	public String getResult() {
-		
-		
 		StringBuffer strB = new StringBuffer();
 		for (String ptMode : this.ptModes) {
 			double averageLoadPerDistance = this.countPassengerMeterPerMode.getResults().get(ptMode) / this.countCapacityMeterPerMode.getResults().get(ptMode);

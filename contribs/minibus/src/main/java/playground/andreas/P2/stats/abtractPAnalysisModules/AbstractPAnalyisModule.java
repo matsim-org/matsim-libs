@@ -27,6 +27,8 @@ import java.util.TreeSet;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.vehicles.Vehicles;
 
 /**
@@ -40,8 +42,8 @@ public abstract class AbstractPAnalyisModule implements TransitDriverStartsEvent
 	
 	private final String name;
 	protected LinkedList<String> ptModes = null;
-	protected HashMap<Id,String> lineIds2ptModeMap;
-	protected Set<Id> ptDriverIds;
+	protected HashMap<Id<TransitLine>, String> lineIds2ptModeMap;
+	protected Set<Id<Person>> ptDriverIds;
 	
 	/**
 	 * 
@@ -50,7 +52,7 @@ public abstract class AbstractPAnalyisModule implements TransitDriverStartsEvent
 	 */
 	public AbstractPAnalyisModule(String name){
 		this.name = name;
-		this.ptDriverIds = new TreeSet<Id>();
+		this.ptDriverIds = new TreeSet<>();
 	}
 	
 	/**
@@ -63,9 +65,9 @@ public abstract class AbstractPAnalyisModule implements TransitDriverStartsEvent
 	
 	/**
 	 * 
-	 * @param lineIds2ptModeMap Is called at the beginning of each iteration. Contains on public transport mode for each line in the schedule. 
+	 * @param lineIds2ptModeMap Is called at the beginning of each iteration. Contains one public transport mode for each line in the schedule. 
 	 */
-	public void setLineId2ptModeMap(HashMap<Id, String> lineIds2ptModeMap) {
+	public void setLineId2ptModeMap(HashMap<Id<TransitLine>, String> lineIds2ptModeMap) {
 		this.lineIds2ptModeMap = lineIds2ptModeMap;
 		
 		if (this.ptModes == null) {
@@ -110,7 +112,7 @@ public abstract class AbstractPAnalyisModule implements TransitDriverStartsEvent
 	
 	@Override
 	public void reset(int iteration) {
-		this.ptDriverIds = new TreeSet<Id>();
+		this.ptDriverIds = new TreeSet<>();
 	}
 	
 	@Override

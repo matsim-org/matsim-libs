@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -114,15 +115,15 @@ public class PCoopLogger implements StartupListener, IterationEndsListener, Shut
 					String startTime = Time.writeTime(plan.getStartTime());
 					String endTime = Time.writeTime(plan.getEndTime());
 					
-					ArrayList<Id> stopsServed = new ArrayList<Id>();
+					ArrayList<Id<TransitStopFacility>> stopsServed = new ArrayList<>();
 					for (TransitStopFacility stop : plan.getStopsToBeServed()) {
 						stopsServed.add(stop.getId());
 					}
 					
-					ArrayList<Id> linksServed = new ArrayList<Id>();
+					ArrayList<Id<Link>> linksServed = new ArrayList<>();
 					for (TransitRoute route : plan.getLine().getRoutes().values()) {
 						linksServed.add(route.getRoute().getStartLinkId());
-						for (Id linkId : route.getRoute().getLinkIds()) {
+						for (Id<Link> linkId : route.getRoute().getLinkIds()) {
 							linksServed.add(linkId);
 						}
 						linksServed.add(route.getRoute().getEndLinkId());

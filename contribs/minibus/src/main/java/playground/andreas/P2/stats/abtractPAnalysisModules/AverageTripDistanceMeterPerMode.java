@@ -32,6 +32,8 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.vehicles.Vehicle;
 
 
 /**
@@ -45,10 +47,10 @@ public class AverageTripDistanceMeterPerMode extends AbstractPAnalyisModule impl
 	private final static Logger log = Logger.getLogger(AverageTripDistanceMeterPerMode.class);
 	
 	private Network network;
-	private HashMap<Id, String> vehId2ptModeMap;
+	private HashMap<Id<Vehicle>, String> vehId2ptModeMap;
 	private HashMap<String, Double> ptMode2MeterTravelledMap;
 	private HashMap<String, Integer> ptMode2TripCountMap;
-	private HashMap<Id,HashMap<Id,Double>> vehId2AgentId2DistanceTravelledInMeterMap = new HashMap<Id, HashMap<Id, Double>>();
+	private HashMap<Id<Vehicle>, HashMap<Id<Person>, Double>> vehId2AgentId2DistanceTravelledInMeterMap = new HashMap<>();
 
 	
 	public AverageTripDistanceMeterPerMode(Network network){
@@ -69,10 +71,10 @@ public class AverageTripDistanceMeterPerMode extends AbstractPAnalyisModule impl
 	@Override
 	public void reset(int iteration) {
 		super.reset(iteration);
-		this.vehId2ptModeMap = new HashMap<Id, String>();
+		this.vehId2ptModeMap = new HashMap<>();
 		this.ptMode2MeterTravelledMap = new HashMap<String, Double>();
 		this.ptMode2TripCountMap = new HashMap<String, Integer>();
-		this.vehId2AgentId2DistanceTravelledInMeterMap = new HashMap<Id, HashMap<Id,Double>>();
+		this.vehId2AgentId2DistanceTravelledInMeterMap = new HashMap<>();
 		// avoid null-pointer in getResult() /dr
 		for (String ptMode : this.ptModes) {
 			this.ptMode2MeterTravelledMap.put(ptMode, new Double(0.));
@@ -85,7 +87,7 @@ public class AverageTripDistanceMeterPerMode extends AbstractPAnalyisModule impl
 		super.handleEvent(event);
 		String ptMode = this.lineIds2ptModeMap.get(event.getTransitLineId());
 		if (ptMode == null) {
-			log.warn("Should not happen");
+			log.warn("Could not find a valid pt mode for transit line " + event.getTransitLineId());
 			ptMode = "no valid pt mode found";
 		}
 		this.vehId2ptModeMap.put(event.getVehicleId(), ptMode);
@@ -94,7 +96,7 @@ public class AverageTripDistanceMeterPerMode extends AbstractPAnalyisModule impl
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		if (this.vehId2AgentId2DistanceTravelledInMeterMap.get(event.getVehicleId()) == null) {
-			this.vehId2AgentId2DistanceTravelledInMeterMap.put(event.getVehicleId(), new HashMap<Id, Double>());
+			this.vehId2AgentId2DistanceTravelledInMeterMap.put(event.getVehicleId(), new HashMap<Id<Person>, Double>());
 		}
 		
 		if(!super.ptDriverIds.contains(event.getPersonId())){
@@ -126,7 +128,7 @@ public class AverageTripDistanceMeterPerMode extends AbstractPAnalyisModule impl
 	public void handleEvent(LinkEnterEvent event) {
 		double newValue = this.network.getLinks().get(event.getLinkId()).getLength();
 		
-		for (Id agentId : this.vehId2AgentId2DistanceTravelledInMeterMap.get(event.getVehicleId()).keySet()) {
+		for (Id<Person> agentId : this.vehId2AgentId2DistanceTravelledInMeterMap.get(event.getVehicleId()).keySet()) {
 			double oldValue = this.vehId2AgentId2DistanceTravelledInMeterMap.get(event.getVehicleId()).get(agentId).doubleValue();
 			this.vehId2AgentId2DistanceTravelledInMeterMap.get(event.getVehicleId()).put(agentId, new Double(oldValue + newValue));
 		}

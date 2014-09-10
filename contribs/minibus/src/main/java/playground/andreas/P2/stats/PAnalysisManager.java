@@ -36,6 +36,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicles;
 
@@ -159,7 +160,7 @@ public class PAnalysisManager implements StartupListener, IterationStartsListene
 
 	private void updateLineId2ptModeMap(TransitSchedule transitSchedule) {
 		this.lineSetter.setPtModesForEachLine(transitSchedule, this.pIdentifier);
-		HashMap<Id, String> lineIds2ptModeMap = this.lineSetter.getLineId2ptModeMap();
+		HashMap<Id<TransitLine>, String> lineIds2ptModeMap = this.lineSetter.getLineId2ptModeMap();
 		
 		for (AbstractPAnalyisModule ana : this.pAnalyzesList) {
 			ana.setLineId2ptModeMap(lineIds2ptModeMap);

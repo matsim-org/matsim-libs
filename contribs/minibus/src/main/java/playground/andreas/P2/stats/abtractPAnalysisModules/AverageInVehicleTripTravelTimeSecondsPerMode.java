@@ -29,6 +29,8 @@ import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.vehicles.Vehicle;
 
 
 /**
@@ -41,10 +43,10 @@ public class AverageInVehicleTripTravelTimeSecondsPerMode extends AbstractPAnaly
 	
 	private final static Logger log = Logger.getLogger(AverageInVehicleTripTravelTimeSecondsPerMode.class);
 	
-	private HashMap<Id, String> vehId2ptModeMap;
+	private HashMap<Id<Vehicle>, String> vehId2ptModeMap;
 	private HashMap<String, Double> ptMode2SecondsTravelledMap;
 	private HashMap<String, Integer> ptMode2TripCountMap;
-	private HashMap<Id, Double> agentId2PersonEntersVehicleEventTime = new HashMap<Id, Double>();
+	private HashMap<Id<Person>, Double> agentId2PersonEntersVehicleEventTime = new HashMap<>();
 	
 	public AverageInVehicleTripTravelTimeSecondsPerMode(){
 		super(AverageInVehicleTripTravelTimeSecondsPerMode.class.getSimpleName());
@@ -63,10 +65,10 @@ public class AverageInVehicleTripTravelTimeSecondsPerMode extends AbstractPAnaly
 	@Override
 	public void reset(int iteration) {
 		super.reset(iteration);
-		this.vehId2ptModeMap = new HashMap<Id, String>();
+		this.vehId2ptModeMap = new HashMap<>();
 		this.ptMode2SecondsTravelledMap = new HashMap<String, Double>();
 		this.ptMode2TripCountMap = new HashMap<String, Integer>();
-		this.agentId2PersonEntersVehicleEventTime = new HashMap<Id, Double>();
+		this.agentId2PersonEntersVehicleEventTime = new HashMap<>();
 		// avoid null-pointer in getResult() /dr
 		for (String ptMode : this.ptModes) {
 			this.ptMode2SecondsTravelledMap.put(ptMode, new Double(0.));
@@ -79,7 +81,7 @@ public class AverageInVehicleTripTravelTimeSecondsPerMode extends AbstractPAnaly
 		super.handleEvent(event);
 		String ptMode = this.lineIds2ptModeMap.get(event.getTransitLineId());
 		if (ptMode == null) {
-			log.warn("Should not happen");
+			log.warn("Could not find a valid pt mode for transit line " + event.getTransitLineId());
 			ptMode = "no valid pt mode found";
 		}
 		

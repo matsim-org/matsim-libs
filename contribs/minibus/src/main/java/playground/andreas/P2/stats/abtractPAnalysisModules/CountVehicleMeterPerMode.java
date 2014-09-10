@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.vehicles.Vehicle;
 
 
 /**
@@ -41,7 +42,7 @@ public class CountVehicleMeterPerMode extends AbstractPAnalyisModule implements 
 	private final static Logger log = Logger.getLogger(CountVehicleMeterPerMode.class);
 	
 	private Network network;
-	private HashMap<Id, String> vehId2ptModeMap;
+	private HashMap<Id<Vehicle>, String> vehId2ptModeMap;
 	private HashMap<String, Double> ptMode2CountMap;
 	
 	public CountVehicleMeterPerMode(Network network){
@@ -62,7 +63,7 @@ public class CountVehicleMeterPerMode extends AbstractPAnalyisModule implements 
 	@Override
 	public void reset(int iteration) {
 		super.reset(iteration);
-		this.vehId2ptModeMap = new HashMap<Id, String>();
+		this.vehId2ptModeMap = new HashMap<>();
 		this.ptMode2CountMap = new HashMap<String, Double>();
 	}
 
@@ -71,7 +72,7 @@ public class CountVehicleMeterPerMode extends AbstractPAnalyisModule implements 
 		super.handleEvent(event);
 		String ptMode = this.lineIds2ptModeMap.get(event.getTransitLineId());
 		if (ptMode == null) {
-			log.warn("Should not happen");
+			log.warn("Could not find a valid pt mode for transit line " + event.getTransitLineId());
 			ptMode = "no valid pt mode found";
 		}
 		this.vehId2ptModeMap.put(event.getVehicleId(), ptMode);

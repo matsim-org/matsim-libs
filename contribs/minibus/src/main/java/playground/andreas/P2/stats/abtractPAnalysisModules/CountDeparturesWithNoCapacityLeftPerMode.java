@@ -45,10 +45,10 @@ public class CountDeparturesWithNoCapacityLeftPerMode extends AbstractPAnalyisMo
 	
 	private final static Logger log = Logger.getLogger(CountDeparturesWithNoCapacityLeftPerMode.class);
 	
-	private HashMap<Id, Integer> vehId2VehicleCapacity = new HashMap<Id, Integer>();
+	private HashMap<Id<Vehicle>, Integer> vehId2VehicleCapacity = new HashMap<>();
 	
-	private HashMap<Id, String> vehId2ptModeMap;
-	private HashMap<Id, Integer> vehId2PaxMap = new HashMap<Id, Integer>();
+	private HashMap<Id<Vehicle>, String> vehId2ptModeMap;
+	private HashMap<Id<Vehicle>, Integer> vehId2PaxMap = new HashMap<>();
 	private HashMap<String, Integer> ptMode2nOfDepartures = new HashMap<String, Integer>();
 
 	
@@ -68,7 +68,7 @@ public class CountDeparturesWithNoCapacityLeftPerMode extends AbstractPAnalyisMo
 	
 	@Override
 	public void updateVehicles(Vehicles vehicles) {
-		this.vehId2VehicleCapacity = new HashMap<Id, Integer>();
+		this.vehId2VehicleCapacity = new HashMap<>();
 		for (Vehicle veh : vehicles.getVehicles().values()) {
 			Integer seats = veh.getType().getCapacity().getSeats();
 			Integer standing = veh.getType().getCapacity().getStandingRoom();
@@ -83,8 +83,8 @@ public class CountDeparturesWithNoCapacityLeftPerMode extends AbstractPAnalyisMo
 	@Override
 	public void reset(int iteration) {
 		super.reset(iteration);
-		this.vehId2ptModeMap = new HashMap<Id, String>();
-		this.vehId2PaxMap = new HashMap<Id, Integer>();
+		this.vehId2ptModeMap = new HashMap<>();
+		this.vehId2PaxMap = new HashMap<>();
 		this.ptMode2nOfDepartures = new HashMap<String, Integer>();
 	}
 
@@ -93,7 +93,7 @@ public class CountDeparturesWithNoCapacityLeftPerMode extends AbstractPAnalyisMo
 		super.handleEvent(event);
 		String ptMode = this.lineIds2ptModeMap.get(event.getTransitLineId());
 		if (ptMode == null) {
-			log.warn("Should not happen");
+			log.warn("Could not find a valid pt mode for transit line " + event.getTransitLineId());
 			ptMode = "no valid pt mode found";
 		}
 		this.vehId2ptModeMap.put(event.getVehicleId(), ptMode);
