@@ -34,8 +34,7 @@ class APSRequestData
     final int dimension;
 
 
-    APSRequestData(TaxiOptimizerConfiguration optimConfig,
-            SortedSet<TaxiRequest> unplannedRequests)
+    APSRequestData(TaxiOptimizerConfiguration optimConfig, SortedSet<TaxiRequest> unplannedRequests)
     {
         dimension = unplannedRequests.size();//TODO - consider only awaiting and "soon-awaiting" reqs!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
