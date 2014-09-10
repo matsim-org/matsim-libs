@@ -35,23 +35,6 @@ import playground.andreas.P2.replanning.modules.ReduceTimeServedRFare;
 import playground.andreas.P2.replanning.modules.SidewaysRouteExtension;
 import playground.andreas.P2.replanning.modules.WeightedEndTimeExtension;
 import playground.andreas.P2.replanning.modules.WeightedStartTimeExtension;
-import playground.andreas.P2.replanning.modules.deprecated.AddRandomStop;
-import playground.andreas.P2.replanning.modules.deprecated.AggressiveIncreaseNumberOfVehicles;
-import playground.andreas.P2.replanning.modules.deprecated.ConvexHullRouteExtension;
-import playground.andreas.P2.replanning.modules.deprecated.IncreaseNumberOfVehicles;
-import playground.andreas.P2.replanning.modules.deprecated.RandomEndTimeAllocator;
-import playground.andreas.P2.replanning.modules.deprecated.RandomRouteEndExtension;
-import playground.andreas.P2.replanning.modules.deprecated.RandomRouteStartExtension;
-import playground.andreas.P2.replanning.modules.deprecated.RandomStartTimeAllocator;
-import playground.andreas.P2.replanning.modules.deprecated.RectangleHullRouteExtension;
-import playground.andreas.P2.replanning.modules.deprecated.ReduceStopsToBeServed;
-import playground.andreas.P2.replanning.modules.deprecated.ReduceStopsToBeServedR;
-import playground.andreas.P2.replanning.modules.deprecated.ReduceTimeServed;
-import playground.andreas.P2.replanning.modules.deprecated.ReduceTimeServedR;
-import playground.andreas.P2.replanning.modules.deprecated.RemoveAllVehiclesButOne;
-import playground.andreas.P2.replanning.modules.deprecated.RouteEnvelopeExtension;
-import playground.andreas.P2.replanning.modules.deprecated.StopReduceDemand;
-import playground.andreas.P2.replanning.modules.deprecated.TimeReduceDemand;
 import playground.andreas.P2.scoring.fare.StageContainerCreator;
 import playground.andreas.P2.scoring.fare.TicketMachine;
 
@@ -65,22 +48,11 @@ public class PStrategyManager {
 	
 	private final static Logger log = Logger.getLogger(PStrategyManager.class);
 	
-	private EventsManager eventsManager;
-	
 	private final ArrayList<PStrategy> strategies = new ArrayList<PStrategy>();
 	private final ArrayList<Double> weights = new ArrayList<Double>();
 	private final ArrayList<Integer> disableInIteration = new ArrayList<Integer>();
 	private double totalWeights = 0.0;
-	
-	private String pIdentifier;
-	private ReduceTimeServed reduceTimeServed = null;
-	private ReduceStopsToBeServed reduceStopsToBeServed = null;
 
-	public PStrategyManager(PConfigGroup pConfig){
-		this.pIdentifier = pConfig.getPIdentifier();
-	}
-	
-	// TODO[an] always initialize TimeReduceDemand
 	public void init(PConfigGroup pConfig, EventsManager eventsManager, StageContainerCreator stageContainerCreator, TicketMachine ticketMachine, TimeProvider timeProvider) {
 		for (PStrategySettings settings : pConfig.getStrategySettings()) {
 			String classname = settings.getModuleName();
@@ -97,93 +69,21 @@ public class PStrategyManager {
 	}
 
 	private PStrategy loadStrategy(final String name, final PStrategySettings settings, EventsManager eventsManager, StageContainerCreator stageContainerCreator, TicketMachine ticketMachine, TimeProvider timeProvider) {
-		this.eventsManager = eventsManager;
 		PStrategy strategy = null;
 		
-		if (name.equals(RemoveAllVehiclesButOne.STRATEGY_NAME)) {
-			strategy = new RemoveAllVehiclesButOne(settings.getParametersAsArrayList());
-			log.warn(strategy.getStrategyName() + " is deprecated. It may not be maintained anymore.");
-		} else if (name.equals(RandomStartTimeAllocator.STRATEGY_NAME)) {
-			strategy = new RandomStartTimeAllocator(settings.getParametersAsArrayList());
-			log.warn(strategy.getStrategyName() + " is deprecated. It may not be maintained anymore.");
-		} else if (name.equals(RandomEndTimeAllocator.STRATEGY_NAME)) {
-			strategy = new RandomEndTimeAllocator(settings.getParametersAsArrayList());
-			log.warn(strategy.getStrategyName() + " is deprecated. It may not be maintained anymore.");
-		} else if (name.equals(MaxRandomStartTimeAllocator.STRATEGY_NAME)) {
+		if (name.equals(MaxRandomStartTimeAllocator.STRATEGY_NAME)) {
 			strategy = new MaxRandomStartTimeAllocator(settings.getParametersAsArrayList());
 		} else if (name.equals(MaxRandomEndTimeAllocator.STRATEGY_NAME)) {
 			strategy = new MaxRandomEndTimeAllocator(settings.getParametersAsArrayList());
-		} else if (name.equals(IncreaseNumberOfVehicles.STRATEGY_NAME)) {
-			strategy = new IncreaseNumberOfVehicles(settings.getParametersAsArrayList());
-			log.warn(strategy.getStrategyName() + " is deprecated. It may not be maintained anymore.");
-		} else if (name.equals(AddRandomStop.STRATEGY_NAME)) {
-			strategy = new AddRandomStop(settings.getParametersAsArrayList());
-			log.warn(strategy.getStrategyName() + " is deprecated. It may not be maintained anymore.");
-		} else if (name.equals(AggressiveIncreaseNumberOfVehicles.STRATEGY_NAME)) {
-			strategy = new AggressiveIncreaseNumberOfVehicles(settings.getParametersAsArrayList());
-			log.warn(strategy.getStrategyName() + " is deprecated. It may not be maintained anymore.");
-		} else if(name.equals(ConvexHullRouteExtension.STRATEGY_NAME)){
-			strategy = new ConvexHullRouteExtension(settings.getParametersAsArrayList());
-			log.warn(strategy.getStrategyName() + " is deprecated. It may not be maintained anymore.");
-		} else if(name.equals(RectangleHullRouteExtension.STRATEGY_NAME)){
-			strategy = new RectangleHullRouteExtension(settings.getParametersAsArrayList());
-			log.warn(strategy.getStrategyName() + " is deprecated. It may not be maintained anymore.");
-		} else if(name.equals(RandomRouteEndExtension.STRATEGY_NAME)){
-			strategy = new RandomRouteEndExtension(settings.getParametersAsArrayList());
-			log.warn(strategy.getStrategyName() + " is deprecated. It may not be maintained anymore.");
-		} else if(name.equals(RandomRouteStartExtension.STRATEGY_NAME)){
-			strategy = new RandomRouteStartExtension(settings.getParametersAsArrayList());
-			log.warn(strategy.getStrategyName() + " is deprecated. It may not be maintained anymore.");
-		} else if(name.equals(RouteEnvelopeExtension.STRATEGY_NAME)){
-			strategy = new RouteEnvelopeExtension(settings.getParametersAsArrayList());
-			log.warn(strategy.getStrategyName() + " is deprecated. It may not be maintained anymore.");
 		} else if(name.equals(SidewaysRouteExtension.STRATEGY_NAME)){
 			strategy = new SidewaysRouteExtension(settings.getParametersAsArrayList());
 		} else if(name.equals(EndRouteExtension.STRATEGY_NAME)){
 			strategy = new EndRouteExtension(settings.getParametersAsArrayList());
-		} else if (name.equals(TimeReduceDemand.STRATEGY_NAME)) {
-			TimeReduceDemand strat = new TimeReduceDemand(settings.getParametersAsArrayList());
-			strat.setPIdentifier(this.pIdentifier);
-			eventsManager.addHandler(strat);
-			strategy = strat;
-			log.warn(strategy.getStrategyName() + " is deprecated. It may not be maintained anymore.");
-		} else if (name.equals(ReduceTimeServed.STRATEGY_NAME)) {
-			ReduceTimeServed strat = new ReduceTimeServed(settings.getParametersAsArrayList());
-			strat.setPIdentifier(this.pIdentifier);
-			eventsManager.addHandler(strat);
-			strategy = strat;
-			log.warn(strategy.getStrategyName() + " is deprecated. It may not be maintained anymore.");
-			this.reduceTimeServed = strat;
-		} else if (name.equals(ReduceTimeServedR.STRATEGY_NAME)) {
-			ReduceTimeServedR strat = new ReduceTimeServedR(settings.getParametersAsArrayList());
-			strat.setPIdentifier(this.pIdentifier);
-			eventsManager.addHandler(strat);
-			strategy = strat;
-			log.warn(strategy.getStrategyName() + " is deprecated. It may not be maintained anymore.");
 		} else if (name.equals(ReduceTimeServedRFare.STRATEGY_NAME)) {
 			ReduceTimeServedRFare strat = new ReduceTimeServedRFare(settings.getParametersAsArrayList());
 			strat.setTicketMachine(ticketMachine);
 			stageContainerCreator.addStageContainerHandler(strat);
 			strategy = strat;
-		} else if (name.equals(StopReduceDemand.STRATEGY_NAME)) {
-			StopReduceDemand strat = new StopReduceDemand(settings.getParametersAsArrayList());
-			strat.setPIdentifier(this.pIdentifier);
-			eventsManager.addHandler(strat);
-			strategy = strat;
-			log.warn(strategy.getStrategyName() + " is deprecated. It may not be maintained anymore.");
-		} else if (name.equals(ReduceStopsToBeServed.STRATEGY_NAME)) {
-			ReduceStopsToBeServed strat = new ReduceStopsToBeServed(settings.getParametersAsArrayList());
-			strat.setPIdentifier(this.pIdentifier);
-			eventsManager.addHandler(strat);
-			strategy = strat;
-			log.warn(strategy.getStrategyName() + " is deprecated. It may not be maintained anymore.");
-			this.reduceStopsToBeServed = strat;
-		} else if (name.equals(ReduceStopsToBeServedR.STRATEGY_NAME)) {
-			ReduceStopsToBeServedR strat = new ReduceStopsToBeServedR(settings.getParametersAsArrayList());
-			strat.setPIdentifier(this.pIdentifier);
-			eventsManager.addHandler(strat);
-			strategy = strat;
-			log.warn(strategy.getStrategyName() + " is deprecated. It may not be maintained anymore.");
 		} else if (name.equals(ReduceStopsToBeServedRFare.STRATEGY_NAME)) {
 			ReduceStopsToBeServedRFare strat = new ReduceStopsToBeServedRFare(settings.getParametersAsArrayList());
 			strat.setTicketMachine(ticketMachine);
@@ -229,6 +129,11 @@ public class PStrategyManager {
 		}
 	}
 
+	/**
+	 * Picks randomly one strategy from the set of available strategies. Strategies with a higher weight have a higher probability of being picked.
+	 *  
+	 * @return The strategy picked.
+	 */
 	public PStrategy chooseStrategy() {
 		double rnd = MatsimRandom.getRandom().nextDouble() * this.totalWeights;
 
@@ -254,31 +159,4 @@ public class PStrategyManager {
 		}
 		return strBuffer.toString();
 	}
-
-	public ReduceTimeServed getReduceTimeServed() {
-		if (this.reduceTimeServed == null) {
-			log.warn(ReduceTimeServed.STRATEGY_NAME + " not configuried in config file. Adding my own version of it with parameters: 1.0, 700");
-			ArrayList<String> param = new ArrayList<String>();
-			param.add("1.0");
-			param.add("700");
-			ReduceTimeServed strat = new ReduceTimeServed(param);
-			strat.setPIdentifier(this.pIdentifier);
-			this.eventsManager.addHandler(strat);
-			this.reduceTimeServed = strat;
-		}
-		return this.reduceTimeServed;
-	}
-	
-	public ReduceStopsToBeServed getReduceStopsToBeServed() {
-		if (this.reduceStopsToBeServed == null) {
-			log.warn(ReduceStopsToBeServed.STRATEGY_NAME + " not configuried in config file. Adding my own version of it with parameters: 1.0");
-			ArrayList<String> param = new ArrayList<String>();
-			param.add("1.0");
-			ReduceStopsToBeServed strat = new ReduceStopsToBeServed(param);
-			strat.setPIdentifier(this.pIdentifier);
-			this.eventsManager.addHandler(strat);
-			this.reduceStopsToBeServed = strat;
-		}
-		return this.reduceStopsToBeServed;
-	}	
 }

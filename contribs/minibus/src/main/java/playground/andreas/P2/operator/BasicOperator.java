@@ -19,16 +19,14 @@
 
 package playground.andreas.P2.operator;
 
-import java.util.ArrayList;
-
 import org.matsim.api.core.v01.Id;
 
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PConstants.CoopState;
 import playground.andreas.P2.pbox.PFranchise;
+import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.PStrategy;
 import playground.andreas.P2.replanning.PStrategyManager;
-import playground.andreas.P2.replanning.modules.deprecated.AggressiveIncreaseNumberOfVehicles;
 
 /**
  * Manages one paratransit line
@@ -78,13 +76,39 @@ public class BasicOperator extends AbstractOperator{
 //			log.info("Sold " + numberOfVehiclesToSell + " vehicle from line " + this.id + " - new budget is " + this.budget);
 		}
 
+		// THIS IS A COPY FROM playground.andreas.P2.replanning.modules.deprecated.AggressiveIncreaseNumberOfVehicles;
 		// First buy vehicles
-		PStrategy strategy = new AggressiveIncreaseNumberOfVehicles(new ArrayList<String>());
-		this.testPlan = strategy.run(this);
+		int vehicleBought = 0;
+		
+		while (this.getBudget() > this.getCostPerVehicleBuy()) {
+			// budget ok, buy one
+			this.setBudget(this.getBudget() - this.getCostPerVehicleBuy());
+			vehicleBought++;
+		}					
+		
+		if (vehicleBought == 0) {
+			this.testPlan = null;
+		}
+			
+		// vehicles were bought - create plan
+		PPlan oldPlan = this.getBestPlan();
+		PPlan plan = new PPlan(this.getNewPlanId(), "Copied code from AggressiveIncreaseNumberOfVehicles");
+		plan.setStopsToBeServed(oldPlan.getStopsToBeServed());
+		plan.setStartTime(oldPlan.getStartTime());
+		plan.setEndTime(oldPlan.getEndTime());
+		plan.setScore(this.getBestPlan().getScore());
+		
+		plan.setNVehicles(vehicleBought);
+		
+		plan.setLine(this.getRouteProvider().createTransitLine(this.getId(), plan));
+		
+		this.testPlan = plan;
+		// END OF COPY
+		
 		
 		// Second replan, if testplan null
 		if (this.testPlan == null) {
-			strategy = pStrategyManager.chooseStrategy();
+			PStrategy strategy = pStrategyManager.chooseStrategy();
 			if (strategy != null) {
 				this.testPlan = strategy.run(this);
 				if (this.testPlan != null) {

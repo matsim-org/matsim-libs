@@ -85,7 +85,6 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		this.stageCollectorHandler = new StageContainerCreator(this.pConfig.getPIdentifier());
 		this.operatorCostCollectorHandler = new OperatorCostCollectorHandler(this.pConfig.getPIdentifier(), this.pConfig.getCostPerVehicleAndDay(), this.pConfig.getCostPerKilometer() / 1000.0, this.pConfig.getCostPerHour() / 3600.0);
 		this.franchise = new PFranchise(this.pConfig.getUseFranchise(), pConfig.getGridSize());
-		this.strategyManager = new PStrategyManager(this.pConfig);
 	}
 
 	@Override
@@ -96,6 +95,7 @@ public class PBox implements StartupListener, IterationStartsListener, ScoringLi
 		event.getControler().getEvents().addHandler(this.timeProvider);
 		
 		// initialize strategy manager
+		this.strategyManager = new PStrategyManager();
 		this.strategyManager.init(this.pConfig, event.getControler().getEvents(), this.stageCollectorHandler, this.ticketMachine, this.timeProvider);
 		
 		// init fare collector
