@@ -23,6 +23,7 @@ package playground.sergioo.typesPopulation2013.population;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 /**
@@ -31,19 +32,19 @@ import org.matsim.core.population.PersonImpl;
 public class PersonImplPops extends PersonImpl {
 
 	public static final String DEFAULT_POP = "-1";
-	public static final Id DEFAULT_POP_ID = new IdImpl(DEFAULT_POP);
+	public static final Id<Population> DEFAULT_POP_ID = Id.create(DEFAULT_POP, Population.class);
 	
 	private Id populationId;
 
-	public PersonImplPops(Id id) {
+	public PersonImplPops(Id<Person> id) {
 		super(id);
-		this.populationId = new IdImpl(DEFAULT_POP);
+		this.populationId = DEFAULT_POP_ID;
 	}
-	public PersonImplPops(Id id, Id populationId) {
+	public PersonImplPops(Id<Person> id, Id<Population> populationId) {
 		super(id);
 		this.populationId = populationId==null?new IdImpl(DEFAULT_POP):populationId;
 	}
-	public PersonImplPops(PersonImpl person, Id populationId) {
+	public PersonImplPops(PersonImpl person, Id<Population> populationId) {
 		super(person.getId());
 		setAge(person.getAge());
 		setCarAvail(person.getCarAvail());
