@@ -2,11 +2,14 @@ package playground.balac.allcsmodestest.controler;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.analysis.christoph.TripsAnalyzer;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -49,6 +52,19 @@ public class CarsharingWithTaxiControler extends Controler{
 	  protected void loadControlerListeners() {  
 		  
 	    super.loadControlerListeners();   
+	    Set<String> modes = new TreeSet<String>();
+	    modes.add("freefloating");
+	    modes.add("twowaycarsharing");
+	    modes.add("car");
+	    modes.add("walk");
+	    modes.add("pt");
+	    modes.add("bike");
+	    modes.add("taxi");
+	    TripsAnalyzer tripsAnalyzer = new TripsAnalyzer(this.getConfig().getParam("controler", "outputDirectory")+ "/tripsFile", 
+	    		this.getConfig().getParam("controler", "outputDirectory") + "/durationsFile",
+	    		this.getConfig().getParam("controler", "outputDirectory") + "/distancesFile",
+	    		modes, true, this.getNetwork());
+	    this.addControlerListener(tripsAnalyzer);
 	    this.addControlerListener(new AllCSModesTestListener(this.getConfig().getModule("TwoWayCarsharing").getValue("statsFileName"),
 	    		this.getConfig().getModule("FreeFloating").getValue("statsFileName"),
 	    		this.getConfig().getModule("OneWayCarsharing").getValue("statsFileName"),

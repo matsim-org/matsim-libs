@@ -62,40 +62,41 @@ public class CarsharingWithTaxiLegScoringFunction extends org.matsim.core.scorin
 		double specialTime = 0.0;
 		if (!freefloatingRentals.isEmpty()) {
 			
-			double specialStartTime = Double.parseDouble(this.config.getModule("FreeFloating").getParams().get("specialStartTime"));
-			double specialEndTime = Double.parseDouble(this.config.getModule("FreeFloating").getParams().get("specialEndTime"));
+			double specialStartTime = Double.parseDouble(this.config.getModule("FreeFloating").getParams().get("specialTimeStart"));
+			double specialEndTime = Double.parseDouble(this.config.getModule("FreeFloating").getParams().get("specialTimeEnd"));
 
 			for(Stats s:freefloatingRentals) {
 			
 				distance += s.distance;
-				
-				if (s.startTime > specialEndTime || s.endTime < specialStartTime)
-				
-					time += (s.endTime - s.startTime);
-				else {
+				//if (specialStartTime != specialEndTime) {
+					if (s.startTime > specialEndTime || s.endTime < specialStartTime)
 					
-					boolean startBefore = s.startTime < specialStartTime;
-					boolean endBefore = s.endTime < specialEndTime;
-					
-					if (startBefore && endBefore) {
-						
-						specialTime += s.endTime - specialEndTime;
-						time += specialStartTime - s.startTime;
-					}
-					else if (!startBefore && endBefore) {
-						specialTime += s.endTime - s.startTime;
-					}
-					else if (!startBefore && !endBefore) {
-						
-						specialTime = specialEndTime - s.startTime;
-						time += s.endTime - specialEndTime;
-					}
+						time += (s.endTime - s.startTime);
 					else {
 						
-						specialTime += specialEndTime - specialStartTime;
-						time += specialStartTime - s.startTime;
-						time += s.endTime - specialEndTime;
-					}
+						boolean startBefore = s.startTime < specialStartTime;
+						boolean endBefore = s.endTime < specialEndTime;
+						
+						if (startBefore && endBefore) {
+							
+							specialTime += s.endTime - specialEndTime;
+							time += specialStartTime - s.startTime;
+						}
+						else if (!startBefore && endBefore) {
+							specialTime += s.endTime - s.startTime;
+						}
+						else if (!startBefore && !endBefore) {
+							
+							specialTime = specialEndTime - s.startTime;
+							time += s.endTime - specialEndTime;
+						}
+						else {
+							
+							specialTime += specialEndTime - specialStartTime;
+							time += specialStartTime - s.startTime;
+							time += s.endTime - specialEndTime;
+						}
+				//	}
 				}
 			}
 			

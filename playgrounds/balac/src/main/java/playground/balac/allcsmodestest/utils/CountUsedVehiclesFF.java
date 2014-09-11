@@ -12,7 +12,7 @@ import org.matsim.core.events.EventsUtils;
 
 
 
-public class CountUsedVehiclesFromEvents {
+public class CountUsedVehiclesFF {
 	EventsManager events = (EventsManager) EventsUtils.createEventsManager();
     EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
     public void run(String s) throws IOException{
@@ -41,7 +41,7 @@ public class CountUsedVehiclesFromEvents {
 		@Override
 		public void handleEvent(PersonEntersVehicleEvent event) {
 			// TODO Auto-generated method stub
-			if (event.getVehicleId().toString().startsWith("TW")) {
+			if (event.getVehicleId().toString().startsWith("FF")) {
 				
 				fahrzugIDs.add(event.getVehicleId().toString());
 				
@@ -52,7 +52,7 @@ public class CountUsedVehiclesFromEvents {
 	}
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
-		CountUsedVehiclesFromEvents c = new  CountUsedVehiclesFromEvents();
+		CountUsedVehiclesFF c = new  CountUsedVehiclesFF();
 		c.run(args[0]);
 	}
 

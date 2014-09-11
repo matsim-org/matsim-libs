@@ -12,9 +12,9 @@ public class UsersOfBothServices {
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 		
-		final BufferedReader readLink1 = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/STRC_Temp/CSOW_Stats.txt");
+		final BufferedReader readLink1 = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/STRC_Temp/FF_Stats.txt");
 
-		final BufferedReader readLink2 = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/STRC_Temp/CSOW_Stats.txt");
+		final BufferedReader readLink2 = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/STRC_Temp/CSTW_Stats.txt");
 
 		Set<String> bla = new HashSet<String>();
 

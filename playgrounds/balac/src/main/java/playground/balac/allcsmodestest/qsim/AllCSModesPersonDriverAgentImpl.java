@@ -34,8 +34,11 @@ import org.matsim.core.mobsim.qsim.agents.ActivityDurationUtils;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
+import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -44,7 +47,13 @@ import org.matsim.core.router.TripRouterFactoryInternal;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
+import playground.balac.allcsmodestest.events.NoVehicleCarSharingEvent;
 import playground.balac.freefloating.qsim.FreeFloatingStation;
 import playground.balac.freefloating.qsim.FreeFloatingVehiclesLocation;
 import playground.balac.onewaycarsharingredisgned.qsimparking.OneWayCarsharingRDWithParkingStation;
@@ -64,7 +73,7 @@ import playground.balac.twowaycarsharingredisigned.scenario.TwoWayCSFacilityImpl
  */
 
  
-public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassengerAgent, HasPerson, PlanAgent{
+public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassengerAgent, HasPerson, PlanAgent, PTPassengerAgent{
 
 	private static final Logger log = Logger.getLogger(PersonDriverAgentImpl.class);
 
@@ -129,8 +138,6 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 	double beelineFactor = 0.0;
 	
 	double walkSpeed = 0.0;
-	
-	private boolean switchToPtIfNoCar = false;  //TODO: pending implementation.
 
 	// ============================================================================================================================
 	// c'tor
@@ -145,11 +152,11 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		this.controler = controler;
 		this.plan = plan;
 		this.scenario = scenario;
+				
 		this.ffvehiclesLocation = ffvehiclesLocation;
 		this.owvehiclesLocation = owvehiclesLocation;
 		this.twvehiclesLocation = twvehiclesLocation;
 		
-		//this.switchToPtIfNoCar = switchToPtIfNoCar;
 		
 		beelineFactor = Double.parseDouble(controler.getConfig().getModule("planscalcroute").getParams().get("beelineDistanceFactor"));
 		walkSpeed = Double.parseDouble(controler.getConfig().getModule("planscalcroute").getParams().get("teleportedModeSpeed_walk"));
@@ -168,6 +175,7 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 
 	// -----------------------------------------------------------------------------------------------------------------------------
 
+	
 	@Override
 	public final void endActivityAndComputeNextState(final double now) {
 		Activity act = (Activity) this.getPlanElements().get(this.currentPlanElementIndex);
@@ -233,8 +241,6 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 	@Override
 	public final void notifyArrivalOnLinkByNonNetworkMode(final Id linkId) {
 		this.currentLinkId = linkId;
-		double distance = ((Leg) getCurrentPlanElement()).getRoute().getDistance();
-		this.simulation.getEventsManager().processEvent(new TeleportationArrivalEvent(this.simulation.getSimTimer().getTimeOfDay(), person.getId(), distance));
 	}
 
 	@Override
@@ -256,14 +262,14 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 	 */
 	@Override
 	public Id chooseNextLinkId() {
-		
+
 		// Please, let's try, amidst all checking and caching, to have this method return the same thing
 		// if it is called several times in a row. Otherwise, you get Heisenbugs.
 		// I just fixed a situation where this method would give a warning about a bad route and return null
 		// the first time it is called, and happily return a link id when called the second time.
-		
+
 		// michaz 2013-08
-		
+
 		if (this.cachedNextLinkId != null) {
 			return this.cachedNextLinkId;
 		}
@@ -283,6 +289,10 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 			// we have no more information for the route, so the next link should be the destination link
 			Link currentLink = this.simulation.getScenario().getNetwork().getLinks().get(this.currentLinkId);
 			Link destinationLink = this.simulation.getScenario().getNetwork().getLinks().get(this.cachedDestinationLinkId);
+			if (currentLink == destinationLink && this.currentLinkIdIndex > this.cachedRouteLinkIds.size()) {
+				// this can happen if the last link in a route is a loop link. Don't ask, it can happen in special transit simulation cases... mrieser/jan2014
+				return null;
+			}
 			if (currentLink.getToNode().equals(destinationLink.getFromNode())) {
 				this.cachedNextLinkId = destinationLink.getId();
 				return this.cachedNextLinkId;
@@ -308,6 +318,7 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		// yyyyyy personally, I would throw some kind of abort event here.  kai, aug'10
 		return null;
 	}
+
 
 
 	// ============================================================================================================================
@@ -349,10 +360,7 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 					
 				}
 				
-				//TODO:not sure if this is needed, probably leftover from some previous version
-				else
-					initializeLeg(leg);
-				
+								
 			}
 			else if (mode.equals("twowaycarsharing")) {
 				if (previousPlanElement instanceof Activity &&
@@ -372,7 +380,7 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 					
 					initializeTwoWayCarsharingEndCarLeg(startLinkTW, now);
 				else 
-					log.error("this should neevr happen");
+					log.error("this should never happen");
 				
 			}
 			else if (mode.equals( "walk_ff" )) {				
@@ -402,6 +410,8 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 				
 			}
 			else //end of added stuff
+				
+				
 				initializeLeg(leg);
 		} else {
 			throw new RuntimeException("Unknown PlanElement of type: " + pe.getClass().getName());
@@ -493,7 +503,8 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		TwoWayCSStation station = findClosestAvailableTWCar(route.getStartLinkId());
 		
 		if (station == null) {
-			this.state = MobsimAgent.State.ABORT ;
+			this.state = MobsimAgent.State.ABORT;
+			this.simulation.getEventsManager().processEvent(new NoVehicleCarSharingEvent(now, route.getStartLinkId(), "rt"));
 			return;
 			
 		}		
@@ -595,6 +606,8 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		
 		if (location == null) {
 			this.state = MobsimAgent.State.ABORT ;
+			this.simulation.getEventsManager().processEvent(new NoVehicleCarSharingEvent(now, route.getStartLinkId(), "ff"));
+
 			return;
 			
 		}
@@ -638,6 +651,8 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		
 		if (station == null) {
 			this.state = MobsimAgent.State.ABORT ;
+			this.simulation.getEventsManager().processEvent(new NoVehicleCarSharingEvent(now, route.getStartLinkId(), "ow"));
+
 			return;
 			
 		}
@@ -977,5 +992,65 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 	public final Plan getCurrentPlan() {
 		return plan;
 	}
+
+	@Override
+	public boolean getEnterTransitRoute(final TransitLine line, final TransitRoute transitRoute, final List<TransitRouteStop> stopsToCome, TransitVehicle transitVehicle) {
+		ExperimentalTransitRoute route = (ExperimentalTransitRoute) getCurrentLeg().getRoute();
+		if (line.getId().equals(route.getLineId())) {
+			return containsId(stopsToCome, route.getEgressStopId());
+		} else {
+			return false;
+		}
+	}
+
+	@Override
+	public boolean getExitAtStop(final TransitStopFacility stop) {
+		ExperimentalTransitRoute route = (ExperimentalTransitRoute) getCurrentLeg().getRoute();
+		return route.getEgressStopId().equals(stop.getId());
+	}
+
+	@Override
+	public double getWeight() {
+		return 1.0;
+	}
+
+	@Override
+	public Id getDesiredAccessStopId() {
+		Leg leg = getCurrentLeg();
+		if (!(leg.getRoute() instanceof ExperimentalTransitRoute)) {
+			log.error("pt-leg has no TransitRoute. Removing agent from simulation. Agent " + getId().toString());
+			log.info("route: "
+					+ leg.getRoute().getClass().getCanonicalName()
+					+ " "
+					+ (leg.getRoute() instanceof GenericRoute ? ((GenericRoute) leg.getRoute()).getRouteDescription() : ""));
+			return null;
+		} else {
+			ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
+			Id accessStopId = route.getAccessStopId();
+			return accessStopId;
+		}
+	}
+
+	@Override
+	public Id getDesiredDestinationStopId() {
+		ExperimentalTransitRoute route = (ExperimentalTransitRoute) getCurrentLeg().getRoute();
+		return route.getEgressStopId();
+	}
+	
+	protected Leg getCurrentLeg() {
+		PlanElement currentPlanElement = this.getCurrentPlanElement();
+		return (Leg) currentPlanElement;
+	}
+
+	protected boolean containsId(List<TransitRouteStop> stopsToCome,
+			Id egressStopId) {
+		for (TransitRouteStop stop : stopsToCome) {
+			if (egressStopId.equals(stop.getStopFacility().getId())) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 
 }

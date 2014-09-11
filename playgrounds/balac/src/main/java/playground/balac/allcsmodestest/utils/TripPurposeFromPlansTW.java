@@ -99,9 +99,9 @@ public class TripPurposeFromPlansTW {
 						else if (((Activity) pe).getType().startsWith("leisure")) {
 							countL++;
 						count++;}
-						else if (((Activity) pe).getType().startsWith("home")) {
+					/*	else if (((Activity) pe).getType().startsWith("home")) {
 							countH++;
-						count++;}
+						count++;}*/
 					}
 					
 					

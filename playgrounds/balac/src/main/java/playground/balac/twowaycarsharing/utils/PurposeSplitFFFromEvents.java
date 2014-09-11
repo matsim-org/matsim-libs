@@ -14,7 +14,7 @@ import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 
 
-public class PurposeCSFromEventsOW {
+public class PurposeSplitFFFromEvents {
 	
 	EventsManager events = (EventsManager) EventsUtils.createEventsManager();
     EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
@@ -96,7 +96,7 @@ public class PurposeCSFromEventsOW {
 		@Override
 		public void handleEvent(PersonArrivalEvent event) {
 
-			if (event.getLegMode().equals("onewaycarsharing") || event.getLegMode().equals("walk_ow_sb")) {
+			if (event.getLegMode().equals("freefloating")) {
 				
 				mapFix.put(event.getPersonId(), true);
 				
@@ -130,7 +130,7 @@ public class PurposeCSFromEventsOW {
 	
 	public static void main(String[] args) {
 
-		PurposeCSFromEventsOW cp = new PurposeCSFromEventsOW();
+		PurposeSplitFFFromEvents cp = new PurposeSplitFFFromEvents();
 		
 		String eventsFilePath = args[0]; 
 		

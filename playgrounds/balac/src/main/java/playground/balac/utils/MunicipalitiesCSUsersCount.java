@@ -19,7 +19,7 @@ public class MunicipalitiesCSUsersCount {
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
 		networkReader.readFile(args[0]);
 		final BufferedReader readLink1 = IOUtils.getBufferedReader(args[1]);
-		final BufferedWriter outLink = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/" + "matrix_nofreedist.txt");
+		final BufferedWriter outLink = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/" + "matrix_interval_peak_traffic.txt");
 
 		int[][] mat = new int[12][12];
 		
@@ -30,15 +30,16 @@ public class MunicipalitiesCSUsersCount {
 		double endX = centerX + 12000.0;
 		double originY = centerY + 12000.0;
 		double endY = centerY - 12000.0;
+		readLink1.readLine();
 		String s = readLink1.readLine();
 		int count = 0;
 		while( s != null) {
-			String[] arr = s.split("\t");
+			String[] arr = s.split("\\s");
 		
-			if (arr[1].contains("W")) {
+			if (true) {
 				
-				double x = scenario.getNetwork().getLinks().get(new IdImpl(arr[4])).getCoord().getX();
-				double y = scenario.getNetwork().getLinks().get(new IdImpl(arr[4])).getCoord().getY();
+				double x = scenario.getNetwork().getLinks().get(new IdImpl(arr[3])).getCoord().getX();
+				double y = scenario.getNetwork().getLinks().get(new IdImpl(arr[3])).getCoord().getY();
 				
 				if (x >= originX && y <= originY && x <= endX && y >= endY) {
 					

@@ -18,6 +18,8 @@ public class RentalTimesStatistics {
 		int[] distanceTraveled = new int[80];
 		int[] rentalStart = new int[35];
 		Set<Double> bla = new HashSet<Double>();
+		Set<String> usedCars = new HashSet<String>();
+
 		double[] timeBla = new double[30];
 		int[] countBla = new int[30];
 		//final BufferedReader readLink = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/coordinates.txt");
@@ -34,6 +36,7 @@ public class RentalTimesStatistics {
 				double time = Double.parseDouble(arr[6]);
 				distance[(int)(time*0.9/130.0)]++;
 				bla.add(Double.parseDouble(arr[0]));
+			//	usedCars.add(arr[8]);
 				double startTime = Double.parseDouble(arr[1]);
 				rentalStart[(int)((startTime) / 3600)]++;			
 
@@ -64,6 +67,8 @@ public class RentalTimesStatistics {
 		for (int i = 0; i < distance.length; i++) 
 			System.out.println((double)distance[i]/(double)count * 100.0);
 		System.out.println("Number of unique users is: " + bla.size());
+		System.out.println("Number of unique used cars is: " + usedCars.size());
+
 		for (int i = 0; i < rentalStart.length; i++) 
 			System.out.println((double)rentalStart[i]/(double)count * 100.0);
 		System.out.println();

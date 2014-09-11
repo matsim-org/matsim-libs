@@ -125,9 +125,9 @@ public class CarTravelTimes {
 		s = readLink.readLine();
 		while(s != null) {
 			String[] arr = s.split("\\t");
-			CoordImpl coordStart = new CoordImpl(arr[3], arr[4]);
+			CoordImpl coordStart = new CoordImpl(arr[4], arr[5]);
 			Link lStart = MyLinkUtils.getClosestLink(network, coordStart);
-			CoordImpl coordEnd = new CoordImpl(arr[5], arr[6]);
+			CoordImpl coordEnd = new CoordImpl(arr[6], arr[7]);
 			Link lEnd = MyLinkUtils.getClosestLink(network, coordEnd);
 			
 			PersonImpl person = new PersonImpl(new IdImpl(arr[0]));

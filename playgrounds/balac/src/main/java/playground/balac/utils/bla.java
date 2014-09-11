@@ -14,6 +14,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -28,11 +29,12 @@ public class bla {
 		networkReader.readFile(args[0]);
 		populationReader.readFile(args[1]);
 		
-final BufferedWriter outLink = IOUtils.getBufferedWriter("P:/_TEMP/sschmutz/routing_matsim/20140428_stage_car/output/details/outputStatistics_ettapen_7.txt");
+final BufferedWriter outLink = IOUtils.getBufferedWriter("P:/_TEMP/sschmutz/routing_matsim/20140428_stage_car/output/details/outputStatistics_ettapen_10.txt");
 
 		
 		for(Person per: sc.getPopulation().getPersons().values()) {
 			double time = 0.0;
+			double routeDistance = 0.0;
 			Plan p = per.getPlans().get(0);
 			Id linkId = null;
 			Id linkId2 = null;
@@ -51,12 +53,15 @@ final BufferedWriter outLink = IOUtils.getBufferedWriter("P:/_TEMP/sschmutz/rout
 					linkId = ((Leg) pe).getRoute().getStartLinkId();
 					linkId2 = ((Leg) pe).getRoute().getEndLinkId();
 					
+					routeDistance += ((LinkNetworkRouteImpl) ((Leg) pe).getRoute()).getDistance();
+					
 				}
 				
 			}
 			
 			outLink.write(per.getId() + " ");
 			outLink.write(Double.toString(time) + " ");
+			outLink.write(Double.toString(routeDistance) + " ");
 			outLink.write(String.valueOf(CoordUtils.calcDistance(((Activity)p.getPlanElements().get(0)).getCoord(), sc.getNetwork().getLinks().get(new IdImpl(linkId.toString())).getCoord())) + " ");
 			outLink.write(String.valueOf(CoordUtils.calcDistance(a.getCoord(), sc.getNetwork().getLinks().get(new IdImpl(linkId2.toString())).getCoord())));
 			outLink.newLine();

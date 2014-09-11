@@ -51,6 +51,20 @@ public class CSEventsHandler implements  PersonLeavesVehicleEventHandler, Person
 		if (event.getVehicleId().toString().startsWith("TW"))
 			personVehicles.put(event.getVehicleId(), event.getPersonId());
 	}
+	
+	@Override
+	public void handleEvent(LinkLeaveEvent event) {
+		// TODO Auto-generated method stub
+		if (event.getVehicleId().toString().startsWith("TW")) {
+			Id perid = personVehicles.get(event.getVehicleId());
+			
+			RentalInfo info = twRentalsStats.get(perid).get(twRentalsStats.get(perid).size() - 1);
+			info.vehId = event.getVehicleId();
+			info.distance += network.getLinks().get(event.getLinkId()).getLength();
+			
+		}
+				
+	}
 
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
@@ -137,24 +151,15 @@ public class CSEventsHandler implements  PersonLeavesVehicleEventHandler, Person
 		private double accessEndTime = 0.0;
 		private double egressStartTime = 0.0;
 		private double egressEndTime = 0.0;
+		private Id vehId = null;
 		public String toString() {
 			
 			return personId + " " + Double.toString(startTime) + " " + Double.toString(endTime) + " " +
-			startLinkId.toString() + " " + Double.toString(distance)+ " " + Double.toString(accessEndTime - accessStartTime)+ " " + Double.toString(egressEndTime - egressStartTime);
+			startLinkId.toString() + " " + Double.toString(distance)+ " " + Double.toString(accessEndTime - accessStartTime)
+			+ " " + Double.toString(egressEndTime - egressStartTime) + " " + null;
 		}
 	}
 
-	@Override
-	public void handleEvent(LinkLeaveEvent event) {
-		// TODO Auto-generated method stub
-		if (event.getVehicleId().toString().startsWith("TW")) {
-			Id perid = personVehicles.get(event.getVehicleId());
-			
-			RentalInfo info = twRentalsStats.get(perid).get(twRentalsStats.get(perid).size() - 1);
-			info.distance += network.getLinks().get(event.getLinkId()).getLength();
-			
-		}
-				
-	}
+	
 
 }

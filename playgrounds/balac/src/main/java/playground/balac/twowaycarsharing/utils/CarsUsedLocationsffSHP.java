@@ -36,8 +36,7 @@ public class CarsUsedLocationsffSHP {
 	        CoordinateReferenceSystem crs = MGC.getCRS("EPSG:21781");    // EPSG Code for Swiss CH1903_LV03 coordinate system
 	       
 	    	
-			final BufferedReader readLink1 = IOUtils.getBufferedReader(args[1]);
-			final BufferedReader readLink2 = IOUtils.getBufferedReader(args[2]);
+			final BufferedReader readLink2 = IOUtils.getBufferedReader(args[1]);
 
 			
 
@@ -56,37 +55,25 @@ public class CarsUsedLocationsffSHP {
 		                create();
 		        
 		      
-			String s = readLink1.readLine();
-			s = readLink1.readLine();
-			
-			while (s != null) {
-				
-				String[] arr = s.split("\\s");
-				mapa.put(arr[0].substring(4), arr[3]);
-				s = readLink1.readLine();
-				
-				
-			}
+		String s;
 			s = readLink2.readLine();
 			s = readLink2.readLine();
 			int i = 0;
 			while( s != null) {
-				String[] arr = s.split("\t");
+				String[] arr = s.split("\\s");
 			
-				if (arr[1].contains("W")) {
-					String b = arr[1].substring(0,4);
 					
-					SimpleFeature ft = nodeFactory.createPoint(network.getLinks().get(new IdImpl(arr[4])).getCoord(), new Object[] {Integer.toString(i)}, null);
+					SimpleFeature ft = nodeFactory.createPoint(network.getLinks().get(new IdImpl(arr[3])).getCoord(), new Object[] {Integer.toString(i)}, null);
 					featuresMovedIncrease.add(ft);
 					
 				
 					i++;
-					}
+					
 				
 				s = readLink2.readLine();
 			}
 	        
-	        ShapeFileWriter.writeGeometries(featuresMovedIncrease, "C:/Users/balacm/Desktop/SHP_files/used_ff_nofreedist_all.shp");
+	        ShapeFileWriter.writeGeometries(featuresMovedIncrease, "C:/Users/balacm/Desktop/SHP_files/used_ff_interval_peak.shp");
 	     
 
 	}

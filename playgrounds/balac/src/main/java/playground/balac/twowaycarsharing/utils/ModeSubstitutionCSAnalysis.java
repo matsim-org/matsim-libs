@@ -32,7 +32,7 @@ public class ModeSubstitutionCSAnalysis {
 		networkReader2.readFile(args[1]);
 		populationReader2.readFile(args[2]);	
 		
-		int[] bla = new int[5];
+		int[] bla = new int[6];
 		int count = 0;
 		int number = 0;
 		int countWalk = 0;
@@ -53,7 +53,7 @@ public class ModeSubstitutionCSAnalysis {
 					j++;
 				 if (pe instanceof Leg) {
 					
-					if (((Leg) pe).getMode().equals("onewaycarsharing")) {
+					if (((Leg) pe).getMode().equals("freefloating")) {
 						Leg s = null;
 						hadow = true;
 						
@@ -86,7 +86,11 @@ public class ModeSubstitutionCSAnalysis {
 							bla[4]++;
 							count++;
 						}
-						else 
+						else if (s.getMode().equals("taxi") ) {
+							
+							bla[5]++;
+							count++;
+						}
 							number++;
 						
 						
@@ -112,7 +116,7 @@ public class ModeSubstitutionCSAnalysis {
 			
 		}
 		
-		for (int i = 0; i < 5; i++) { 
+		for (int i = 0; i < 6; i++) { 
     		System.out.println((double)bla[i]/(double)count * 100.0);
 						
     	}

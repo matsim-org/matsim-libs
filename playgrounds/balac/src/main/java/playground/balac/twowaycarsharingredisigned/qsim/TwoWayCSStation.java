@@ -4,7 +4,9 @@ import java.util.ArrayList;
 
 import org.matsim.api.core.v01.network.Link;
 
-public class TwoWayCSStation  {
+import playground.balac.allcsmodestest.facilities.CarSharingStation;
+
+public class TwoWayCSStation implements CarSharingStation {
 
 	
 	private Link link;
