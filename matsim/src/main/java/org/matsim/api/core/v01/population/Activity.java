@@ -23,6 +23,7 @@ package org.matsim.api.core.v01.population;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
 /**
  * Specifies the kind of activity an agent performs during its day.
@@ -66,7 +67,7 @@ public interface Activity extends PlanElement {
 	 */
 	public Id<Link> getLinkId();
 
-	public Id getFacilityId();
+	public Id<ActivityFacility> getFacilityId();
 
 	// the following should not come back since they cause headaches without end.  use builder methods instead.
 

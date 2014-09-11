@@ -22,7 +22,9 @@ package org.matsim.core.population;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 
@@ -47,14 +49,14 @@ public class ActivityImpl implements Activity {
 
 	private String type;
 	private Coord coord = null;
-	protected Id linkId = null;
-	protected Id facilityId = null;
+	protected Id<Link> linkId = null;
+	protected Id<ActivityFacility> facilityId = null;
 
 	/*package*/ ActivityImpl(final String type) {
 		this.type = type.intern();
 	}
 
-	public ActivityImpl(final String type, final Id linkId) {
+	public ActivityImpl(final String type, final Id<Link> linkId) {
 		this(type);
 		this.setLinkId(linkId);
 	}
@@ -64,7 +66,7 @@ public class ActivityImpl implements Activity {
 		this.setCoord(coord);
 	}
 
-	public ActivityImpl(final String type, final Coord coord, final Id linkId) {
+	public ActivityImpl(final String type, final Coord coord, final Id<Link> linkId) {
 		this(type, linkId);
 		this.setCoord(coord);
 	}
@@ -127,20 +129,20 @@ public class ActivityImpl implements Activity {
 	}
 
 	@Override
-	public final Id getLinkId() {
+	public final Id<Link> getLinkId() {
 		return this.linkId;
 	}
 
 	@Override
-	public final Id getFacilityId() {
+	public final Id<ActivityFacility> getFacilityId() {
 		return this.facilityId;
 	}
 
-	public final void setFacilityId(final Id facilityId) {
+	public final void setFacilityId(final Id<ActivityFacility> facilityId) {
 		this.facilityId = facilityId;
 	}
 
-	public final void setLinkId(final Id linkId) {
+	public final void setLinkId(final Id<Link> linkId) {
 		this.linkId = linkId;
 	}
 

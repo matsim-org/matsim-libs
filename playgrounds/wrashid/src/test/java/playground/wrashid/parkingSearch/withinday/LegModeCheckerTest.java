@@ -20,6 +20,7 @@
 
 package playground.wrashid.parkingSearch.withinday;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -80,11 +81,11 @@ public class LegModeCheckerTest extends MatsimTestCase {
 				ActivityImpl activity = (ActivityImpl) planElement;
 				activity.setMaximumDuration(3600);
 				activity.setCoord(sc.getNetwork().getLinks().get(activity.getLinkId()).getCoord());
-				activity.setFacilityId(activity.getLinkId());
+				activity.setFacilityId(Id.create(activity.getLinkId(), ActivityFacility.class));
 				
 				ActivityFacility facility = facilities.getFacilities().get(activity.getLinkId());
 				if (facility == null) {
-					facility = ffactory.createActivityFacility(activity.getLinkId(), activity.getCoord());
+					facility = ffactory.createActivityFacility(Id.create(activity.getLinkId(), ActivityFacility.class), activity.getCoord());
 					facilities.addActivityFacility(facility);
 				}
 				ActivityOption activityOption = facility.getActivityOptions().get(activity.getType());
