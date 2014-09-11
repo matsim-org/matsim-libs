@@ -22,7 +22,7 @@ import java.util.AbstractQueue;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-public class FIFOVehicleQ extends AbstractQueue<QVehicle> implements VehicleQ<QVehicle>  {
+public final class FIFOVehicleQ extends AbstractQueue<QVehicle> implements VehicleQ<QVehicle>  {
 	
 	LinkedList<QVehicle> vehicleQueue = new LinkedList<QVehicle>();
 

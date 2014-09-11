@@ -41,6 +41,7 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.VehicularDepartureHandler.VehicleBehavior;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
@@ -88,6 +89,22 @@ public class QNetsimEngine implements MobsimEngine {
 	public void setInternalInterface( InternalInterface internalInterface) {
 		this.internalInterface = internalInterface;
 	}
+	
+//	/**
+//	 * A design thought to provide a configurable default factory that also allows to make the direct constructors non-public.
+//	 * 
+//	 * @author nagel
+//	 */
+//	public static final class Builder implements QNetsimEngineFactory {
+//		private NetsimNetworkFactory<QNode, ? extends QLinkInternalI> netsimNetworkFactory = null ;
+//		public void setNetworkFactory( NetsimNetworkFactory<QNode, ? extends QLinkInternalI> factory ) {
+//			this.netsimNetworkFactory = factory ;
+//		}
+//		@Override
+//		public QNetsimEngine createQSimEngine(Netsim sim) {
+//			return new QNetsimEngine( (QSim) sim, netsimNetworkFactory ) ;
+//		}
+//	}
 
 	public QNetsimEngine(final QSim sim) {
 		this(sim, null);

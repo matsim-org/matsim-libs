@@ -74,8 +74,11 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 	/**
 	 * Stores the accumulated fractional parts of the flow capacity. See also
 	 * flowCapFraction.
+	 * <p/>
+	 * I changed this into an internal class as a first step to look into acceleration (not having to keep this link active until
+	 * this has accumulated to one).  There is no need to keep it this way; it just seems to make it easier to keep track of
+	 * changes.  kai, sep'14
 	 */
-
 	class FlowcapAccumulate {
 		private double timeStep = Double.NEGATIVE_INFINITY ;
 		private double value = 0. ;
