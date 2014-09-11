@@ -1,5 +1,3 @@
-
-
 package playground.balac.aam.replanning;
 
 import java.util.ArrayList;
