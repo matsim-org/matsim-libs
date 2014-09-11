@@ -238,10 +238,10 @@ public class SpaceTimeProbability {
 
 	private void createAgent(Scenario scenario) {
 		PopulationFactoryImpl pFactory = (PopulationFactoryImpl) scenario.getPopulation().getFactory();
-		Person person = pFactory.createPerson(scenario.createId("worker"));
+		Person person = pFactory.createPerson(Id.create("worker", Person.class));
 		
-		Id homeLinkId = scenario.createId("1");
-		Id workLinkId = scenario.createId("4");
+		Id<Link> homeLinkId = Id.create("1", Link.class);
+		Id<Link> workLinkId = Id.create("4", Link.class);
 		
 		for(int i=0; i<3; i++){
 			Plan plan = pFactory.createPlan();
@@ -254,21 +254,21 @@ public class SpaceTimeProbability {
 			
 			List<Id<Link>> routeLinkIds = new LinkedList<Id<Link>>();
 			if(i == 0){
-				Id id2 = scenario.createId("2");
-				Id id3 = scenario.createId("3");
+				Id<Link> id2 = Id.create("2", Link.class);
+				Id<Link> id3 = Id.create("3", Link.class);
 				routeLinkIds.add(id2);
 				routeLinkIds.add(id3);
 			} else if(i == 1){
-				Id id2 = scenario.createId("2");
-				Id id8 = scenario.createId("8");
-				Id id9 = scenario.createId("9");
+				Id<Link> id2 = Id.create("2", Link.class);
+				Id<Link> id8 = Id.create("8", Link.class);
+				Id<Link> id9 = Id.create("9", Link.class);
 				routeLinkIds.add(id2);
 				routeLinkIds.add(id8);
 				routeLinkIds.add(id9);
 			} else if(i == 2){
-				Id id2 = scenario.createId("2");
-				Id id10 = scenario.createId("10");
-				Id id11 = scenario.createId("11");
+				Id<Link> id2 = Id.create("2", Link.class);
+				Id<Link> id10 = Id.create("10", Link.class);
+				Id<Link> id11 = Id.create("11", Link.class);
 				routeLinkIds.add(id2);
 				routeLinkIds.add(id10);
 				routeLinkIds.add(id11);
@@ -289,9 +289,9 @@ public class SpaceTimeProbability {
 			Leg leg2 = pFactory.createLeg(TransportMode.car);
 			
 			List<Id<Link>> routeLinkIds2 = new LinkedList<Id<Link>>();
-			Id id5 = scenario.createId("5");
-			Id id6 = scenario.createId("6");
-			Id id7 = scenario.createId("7");
+			Id<Link> id5 = Id.create("5", Link.class);
+			Id<Link> id6 = Id.create("6", Link.class);
+			Id<Link> id7 = Id.create("7", Link.class);
 			routeLinkIds2.add(id5);
 			routeLinkIds2.add(id6);
 			routeLinkIds2.add(id7);
@@ -312,36 +312,36 @@ public class SpaceTimeProbability {
 	private void createNetwork(Scenario scenario) {
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 
-		Node node1 = network.createAndAddNode(scenario.createId("1"), scenario.createCoord(-26000.0,     0.0));
-		Node node2 = network.createAndAddNode(scenario.createId("2"), scenario.createCoord(-25000.0,     0.0));
-		Node node3 = network.createAndAddNode(scenario.createId("3"), scenario.createCoord(-21000.0,     0.0));
-		Node node4 = network.createAndAddNode(scenario.createId("4"), scenario.createCoord( -1000.0,     0.0));
-		Node node5 = network.createAndAddNode(scenario.createId("5"), scenario.createCoord(     0.0,     0.0));
-		Node node6 = network.createAndAddNode(scenario.createId("6"), scenario.createCoord( -6500.0, -5000.0));
-		Node node7 = network.createAndAddNode(scenario.createId("7"), scenario.createCoord(-19500.0, -5000.0));
-		Node node8 = network.createAndAddNode(scenario.createId("8"), scenario.createCoord(-11000.0,  2500.0));
-		Node node9 = network.createAndAddNode(scenario.createId("9"), scenario.createCoord(-11000.0, -2500.0));
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), scenario.createCoord(-26000.0,     0.0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), scenario.createCoord(-25000.0,     0.0));
+		Node node3 = network.createAndAddNode(Id.create("3", Node.class), scenario.createCoord(-21000.0,     0.0));
+		Node node4 = network.createAndAddNode(Id.create("4", Node.class), scenario.createCoord( -1000.0,     0.0));
+		Node node5 = network.createAndAddNode(Id.create("5", Node.class), scenario.createCoord(     0.0,     0.0));
+		Node node6 = network.createAndAddNode(Id.create("6", Node.class), scenario.createCoord( -6500.0, -5000.0));
+		Node node7 = network.createAndAddNode(Id.create("7", Node.class), scenario.createCoord(-19500.0, -5000.0));
+		Node node8 = network.createAndAddNode(Id.create("8", Node.class), scenario.createCoord(-11000.0,  2500.0));
+		Node node9 = network.createAndAddNode(Id.create("9", Node.class), scenario.createCoord(-11000.0, -2500.0));
 		
 		//base distance to work 5km; travel time 6min
-		network.createAndAddLink(scenario.createId("2"), node2, node3, 4000, 13.89, 3600, 1, null, null);
-		network.createAndAddLink(scenario.createId("4"), node4, node5, 1000, 13.89, 3600, 1, null, null);
+		network.createAndAddLink(Id.create("2", Link.class), node2, node3, 4000, 13.89, 3600, 1, null, null);
+		network.createAndAddLink(Id.create("4", Link.class), node4, node5, 1000, 13.89, 3600, 1, null, null);
 
 		//additional distance to work 20km; travel time 24min
-		network.createAndAddLink(scenario.createId("3"), node3, node4, 20000, 13.89, 3600, 1, null, null);
+		network.createAndAddLink(Id.create("3", Link.class), node3, node4, 20000, 13.89, 3600, 1, null, null);
 		
 		//additional distance to work 45km; travel time 54min
-		network.createAndAddLink(scenario.createId("8"), node3, node8, 22500, 13.89, 3600, 1, null, null);
-		network.createAndAddLink(scenario.createId("9"), node8, node4, 22500, 13.89, 3600, 1, null, null);
+		network.createAndAddLink(Id.create("8", Link.class), node3, node8, 22500, 13.89, 3600, 1, null, null);
+		network.createAndAddLink(Id.create("9", Link.class), node8, node4, 22500, 13.89, 3600, 1, null, null);
 		
 		//additional distance to work 70km; travel time 84min
-		network.createAndAddLink(scenario.createId("10"), node3, node9, 35000, 13.89, 3600, 1, null, null);
-		network.createAndAddLink(scenario.createId("11"), node9, node4, 35000, 13.89, 3600, 1, null, null);
+		network.createAndAddLink(Id.create("10", Link.class), node3, node9, 35000, 13.89, 3600, 1, null, null);
+		network.createAndAddLink(Id.create("11", Link.class), node9, node4, 35000, 13.89, 3600, 1, null, null);
 		
 		//distance from work 5km; travel time 6min
-		network.createAndAddLink(scenario.createId("5"), node5, node6, 1000, 13.89, 3600, 1, null, null);
-		network.createAndAddLink(scenario.createId("6"), node6, node7, 2000, 13.89, 3600, 1, null, null);
-		network.createAndAddLink(scenario.createId("7"), node7, node1, 1000, 13.89, 3600, 1, null, null);
-		network.createAndAddLink(scenario.createId("1"), node1, node2, 1, 13.89, 3600, 1, null, null);
+		network.createAndAddLink(Id.create("5", Link.class), node5, node6, 1000, 13.89, 3600, 1, null, null);
+		network.createAndAddLink(Id.create("6", Link.class), node6, node7, 2000, 13.89, 3600, 1, null, null);
+		network.createAndAddLink(Id.create("7", Link.class), node7, node1, 1000, 13.89, 3600, 1, null, null);
+		network.createAndAddLink(Id.create("1", Link.class), node1, node2, 1, 13.89, 3600, 1, null, null);
 	}
 
 	public static void main(String[] args) {

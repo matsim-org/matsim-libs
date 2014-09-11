@@ -51,14 +51,14 @@ public class UpdateCapacityControlerListener implements StartupListener, Iterati
 	
 	private Scenario scenario;
 	private Integer capacity;
-	private Id enterLinkId;
-	private Id leaveLinkId;
+	private Id<Link> enterLinkId;
+	private Id<Link> leaveLinkId;
 	private Integer stepSize;
 
 	public UpdateCapacityControlerListener(Scenario scenario, String enterLinkId, String leaveLinkId, int startCapacity, int stepSize) {
 		this.scenario = scenario;
-		this.enterLinkId = scenario.createId(enterLinkId);
-		this.leaveLinkId = scenario.createId(leaveLinkId);
+		this.enterLinkId = Id.create(enterLinkId, Link.class);
+		this.leaveLinkId = Id.create(leaveLinkId, Link.class);
 		this.capacity = startCapacity;
 		this.stepSize = stepSize;
 	}

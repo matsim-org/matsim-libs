@@ -77,7 +77,7 @@ public class BkIncomeTestScenarioCreator {
 		PopulationFactory builder = pop.getFactory();
 
 		for (int i = 1; i <= 2000; i++) {
-			Person p = builder.createPerson(scenario.createId(Integer.toString(i)));
+			Person p = builder.createPerson(Id.create(i, Person.class));
 
 			//adding carPlan to person
 			Plan plan = builder.createPlan();

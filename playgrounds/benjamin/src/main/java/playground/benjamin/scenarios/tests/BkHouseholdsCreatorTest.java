@@ -25,6 +25,7 @@ import java.io.IOException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -51,8 +52,8 @@ public class BkHouseholdsCreatorTest {
 
 	public static void createHHForTestCase() throws FileNotFoundException, IOException {
     ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-    Id id1 = sc.createId("1");
-    Id id2 = sc.createId("2");
+    Id id1 = new IdImpl("1");
+    Id id2 = new IdImpl("2");
     Households hhs = sc.getHouseholds();
     HouseholdsFactory b = hhs.getFactory();
 
