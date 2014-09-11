@@ -116,19 +116,19 @@ class CreateTestScenario {
 		NetworkFactory factory = net.getFactory();
 		
 		Node n;
-		n = factory.createNode(sc.createId("A"), sc.createCoord(1000, 2000));
+		n = factory.createNode(Id.create("A", Node.class), sc.createCoord(1000, 2000));
 		net.addNode(n);
 		
-		n = factory.createNode(sc.createId("C"), sc.createCoord(11000, 2000));
+		n = factory.createNode(Id.create("C", Node.class), sc.createCoord(11000, 2000));
 		net.addNode(n);
 		
-		n = factory.createNode(sc.createId("B1"), sc.createCoord(6000, 4000));
+		n = factory.createNode(Id.create("B1", Node.class), sc.createCoord(6000, 4000));
 		net.addNode(n);
 		
-		n = factory.createNode(sc.createId("B2"), sc.createCoord(6000, 2000));
+		n = factory.createNode(Id.create("B2", Node.class), sc.createCoord(6000, 2000));
 		net.addNode(n);
 		
-		n = factory.createNode(sc.createId("B3"), sc.createCoord(6000, 1000));
+		n = factory.createNode(Id.create("B3", Node.class), sc.createCoord(6000, 1000));
 		net.addNode(n);
 	}
 	
@@ -339,7 +339,7 @@ class CreateTestScenario {
 		TransitScheduleFactory f = sc.getTransitSchedule().getFactory();
 		String mode = "train";
 		//  create vehicleType
-		VehicleType vType = ((ScenarioImpl) sc).getVehicles().getFactory().createVehicleType(sc.createId(mode));
+		VehicleType vType = ((ScenarioImpl) sc).getVehicles().getFactory().createVehicleType(Id.create(mode, VehicleType.class));
 		((ScenarioImpl) sc).getVehicles().addVehicleType(vType);
 		vType.setLength(45);
 		VehicleCapacity cap = new VehicleCapacityImpl();
@@ -347,14 +347,14 @@ class CreateTestScenario {
 		cap.setStandingRoom(0);
 		vType.setCapacity(cap);
 		//create Line and Route
-		TransitLine l = f.createTransitLine(sc.createId(mode));
-		NetworkRoute route = new LinkNetworkRouteImpl(sc.createId("B2-A"), sc.createId("B2-A"));
+		TransitLine l = f.createTransitLine(Id.create(mode, TransitLine.class));
+		NetworkRoute route = new LinkNetworkRouteImpl(Id.create("B2-A", Link.class), Id.create("B2-A", Link.class));
 		
 		@SuppressWarnings("serial")
 		List<Id<Link>> linkIds = new ArrayList<Id<Link>>(){{
-			add(new IdImpl("A-B2"));
-			add(new IdImpl("B2-C"));
-			add(new IdImpl("C-B2"));
+			add(Id.create("A-B2", Link.class));
+			add(Id.create("B2-C", Link.class));
+			add(Id.create("C-B2", Link.class));
 		}};
 		route.setLinkIds(route.getStartLinkId(), linkIds, route.getEndLinkId());
 		
@@ -450,13 +450,13 @@ class CreateTestScenario {
 			l = pFac.createLeg(mode);
 			
 			//TODO problems if loopLinks are used... maybe because of QLinkImpl line 306ff
-			h1 = pFac.createActivityFromLinkId("h", sc.createId("B3-A"));
+			h1 = pFac.createActivityFromLinkId("h", Id.create("B3-A", Link.class));
 			((ActivityImpl) h1).setCoord(sc.getNetwork().getLinks().get(h1.getLinkId()).getToNode().getCoord());
 			h1.setEndTime(end1);
-			w = pFac.createActivityFromLinkId("w", sc.createId("B3-C"));
+			w = pFac.createActivityFromLinkId("w", Id.create("B3-C", Link.class));
 			((ActivityImpl) w).setCoord(sc.getNetwork().getLinks().get(w.getLinkId()).getToNode().getCoord());
 			w.setEndTime(end2);
-			h2 = pFac.createActivityFromLinkId("h", sc.createId("B3-A"));
+			h2 = pFac.createActivityFromLinkId("h", Id.create("B3-A", Link.class));
 			((ActivityImpl) h2).setCoord(sc.getNetwork().getLinks().get(h2.getLinkId()).getToNode().getCoord());
 			
 			Plan plan = pFac.createPlan();
@@ -465,7 +465,7 @@ class CreateTestScenario {
 			plan.addActivity(w);
 			plan.addLeg(l);
 			plan.addActivity(h2);
-			Person person = pFac.createPerson(sc.createId(String.valueOf(i) + "_" + mode));
+			Person person = pFac.createPerson(Id.create(i + "_" + mode, Person.class));
 			person.addPlan(plan);
 			p.addPerson(person);
 			end1 += (2.*3600/numAgents);

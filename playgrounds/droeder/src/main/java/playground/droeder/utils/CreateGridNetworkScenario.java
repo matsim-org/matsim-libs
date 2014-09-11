@@ -111,7 +111,7 @@ class CreateGridNetworkScenario {
 		// creates nodes
 		for(int row = 1; row < (rows + 1); row++){
 			for(int column = 1; column < (columns + 1); column++){
-				n = nf.createNode(scenario.createId(String.valueOf(column) + "." + String.valueOf(row)), 
+				n = nf.createNode(Id.create(String.valueOf(column) + "." + String.valueOf(row), Node.class), 
 						scenario.createCoord(column * distanceFromNodeToNode, row * distanceFromNodeToNode));
 				network.addNode(n);
 			}
@@ -125,12 +125,12 @@ class CreateGridNetworkScenario {
 			from = null;
 			for(int col = 1; col < (columns + 1); col++){
 				if(from == null){
-					from = network.getNodes().get(scenario.createId(String.valueOf(col) + "." + String.valueOf(row)));
+					from = network.getNodes().get(Id.create(String.valueOf(col) + "." + String.valueOf(row), Node.class));
 				}else{
-					to = network.getNodes().get(scenario.createId(String.valueOf(col) + "." + String.valueOf(row)));
-					l = nf.createLink(scenario.createId(from.getId().toString() + "_" + to.getId().toString()), from, to);
+					to = network.getNodes().get(Id.create(String.valueOf(col) + "." + String.valueOf(row), Node.class));
+					l = nf.createLink(Id.create(from.getId().toString() + "_" + to.getId().toString(), Link.class), from, to);
 					network.addLink(l);
-					l = nf.createLink(scenario.createId(to.getId().toString() + "_" + from.getId().toString()), to, from);
+					l = nf.createLink(Id.create(to.getId().toString() + "_" + from.getId().toString(), Link.class), to, from);
 					network.addLink(l);
 					from = to;
 				}
@@ -142,12 +142,12 @@ class CreateGridNetworkScenario {
 			from = null;
 			for(int row = 1; row <(rows + 1); row++){
 				if(from == null){
-					from = network.getNodes().get(scenario.createId(String.valueOf(col) + "." + String.valueOf(row)));
+					from = network.getNodes().get(Id.create(String.valueOf(col) + "." + String.valueOf(row), Node.class));
 				}else{
-					to = network.getNodes().get(scenario.createId(String.valueOf(col) + "." + String.valueOf(row)));
-					l = nf.createLink(scenario.createId(from.getId().toString() + "_" + to.getId().toString()), from, to);
+					to = network.getNodes().get(Id.create(String.valueOf(col) + "." + String.valueOf(row), Node.class));
+					l = nf.createLink(Id.create(from.getId().toString() + "_" + to.getId().toString(), Link.class), from, to);
 					network.addLink(l);
-					l = nf.createLink(scenario.createId(to.getId().toString() + "_" + from.getId().toString()), to, from);
+					l = nf.createLink(Id.create(to.getId().toString() + "_" + from.getId().toString(), Link.class), to, from);
 					network.addLink(l);
 					from = to;
 				}
@@ -194,7 +194,7 @@ class CreateGridNetworkScenario {
 			
 			
 			for(int i = 0; i< r.getNrAgents(); i++){
-				per = pFac.createPerson(sc.createId(r.getOriginLinkId() + "_" + r.getDestinationLinkId() + "_" + i));
+				per = pFac.createPerson(Id.create(r.getOriginLinkId() + "_" + r.getDestinationLinkId() + "_" + i, Person.class));
 				plan =  pFac.createPlan();
 				
 				home = pFac.createActivityFromCoord("home", origin);

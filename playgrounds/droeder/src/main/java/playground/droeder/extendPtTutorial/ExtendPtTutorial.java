@@ -105,17 +105,17 @@ class ExtendPtTutorial {
 		NetworkRoute nRoute = new LinkNetworkRouteImpl(links.get(0), links.get(0));
 		nRoute.setLinkIds(nRoute.getStartLinkId(), links.subList(1, links.size()), nRoute.getEndLinkId());
 		Double delay = 0.;
-		for(Id linkId: links){
+		for(Id<Link> linkId: links){
 			l = sc.getNetwork().getLinks().get(linkId);
-			f = fac.createTransitStopFacility(linkId, l.getToNode().getCoord(), false);
+			f = fac.createTransitStopFacility(Id.create(linkId, TransitStopFacility.class), l.getToNode().getCoord(), false);
 			f.setLinkId(linkId);
 			schedule.addStopFacility(f);
 			delay += l.getLength() / (l.getFreespeed() * 0.8);
 			stops.add(fac.createTransitRouteStop(f, delay, delay + 10));
 		}
 		
-		TransitLine line = fac.createTransitLine(sc.createId("busline"));
-		TransitRoute route = fac.createTransitRoute(sc.createId("busroute"), nRoute, stops, "bus");
+		TransitLine line = fac.createTransitLine(Id.create("busline", TransitLine.class));
+		TransitRoute route = fac.createTransitRoute(Id.create("busroute", TransitRoute.class), nRoute, stops, "bus");
 		Departure d;
 		Vehicle v;
 		VehiclesFactory vFac = ((ScenarioImpl) sc).getVehicles().getFactory();
@@ -126,8 +126,8 @@ class ExtendPtTutorial {
 		type.setCapacity(vCap);
 		
 		for(int i = 0; i< 86400; i+= 600){
-			d = fac.createDeparture(sc.createId(String.valueOf(i)), i);
-			v = vFac.createVehicle(sc.createId(String.valueOf(i)), type);
+			d = fac.createDeparture(Id.create(i, Departure.class), i);
+			v = vFac.createVehicle(Id.create(i, Vehicle.class), type);
 			((ScenarioImpl) sc).getVehicles().addVehicle( v);
 			d.setVehicleId(v.getId());
 			route.addDeparture(d);

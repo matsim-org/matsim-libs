@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -132,7 +133,7 @@ class FareRoutingTestScenario {
 		Plan plan;
 		Leg leg ;
 		
-		person = factory.createPerson(scenario.createId("1"));
+		person = factory.createPerson(Id.create("1", Person.class));
 		plan = factory.createPlan();
 		plan.addActivity(factory.createActivityFromCoord("h", scenario.createCoord(0., 0.)));
 		leg = factory.createLeg("pt");
@@ -143,7 +144,7 @@ class FareRoutingTestScenario {
 		person.getCustomAttributes().put(MyTicketFactory.USEFLATRATE, new Boolean(true));
 		population.addPerson(person);
 		
-		person = factory.createPerson(scenario.createId("2"));
+		person = factory.createPerson(Id.create("2", Person.class));
 		plan = factory.createPlan();
 		plan.addActivity(factory.createActivityFromCoord("h", scenario.createCoord(0., 0.)));
 		leg = factory.createLeg("pt");
