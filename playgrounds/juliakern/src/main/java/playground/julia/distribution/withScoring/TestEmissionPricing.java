@@ -24,8 +24,10 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -263,29 +265,29 @@ public class TestEmissionPricing {
 	private static void createNetwork(Scenario scenario) {
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 
-		Node node1 = network.createAndAddNode(scenario.createId("1"), scenario.createCoord(1.0, 10000.0));
-		Node node2 = network.createAndAddNode(scenario.createId("2"), scenario.createCoord(2500.0, 10000.0));
-		Node node3 = network.createAndAddNode(scenario.createId("3"), scenario.createCoord(4500.0, 10000.0));
-		Node node4 = network.createAndAddNode(scenario.createId("4"), scenario.createCoord(17500.0, 10000.0));
-		Node node5 = network.createAndAddNode(scenario.createId("5"), scenario.createCoord(19999.0, 10000.0));
-		Node node6 = network.createAndAddNode(scenario.createId("6"), scenario.createCoord(19999.0, 1500.0));
-		Node node7 = network.createAndAddNode(scenario.createId("7"), scenario.createCoord(1.0, 1500.0));
-		Node node8 = network.createAndAddNode(scenario.createId("8"), scenario.createCoord(12500.0,  12499.0));
-		Node node9 = network.createAndAddNode(scenario.createId("9"), scenario.createCoord(12500.0, 7500.0));
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), scenario.createCoord(1.0, 10000.0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), scenario.createCoord(2500.0, 10000.0));
+		Node node3 = network.createAndAddNode(Id.create("3", Node.class), scenario.createCoord(4500.0, 10000.0));
+		Node node4 = network.createAndAddNode(Id.create("4", Node.class), scenario.createCoord(17500.0, 10000.0));
+		Node node5 = network.createAndAddNode(Id.create("5", Node.class), scenario.createCoord(19999.0, 10000.0));
+		Node node6 = network.createAndAddNode(Id.create("6", Node.class), scenario.createCoord(19999.0, 1500.0));
+		Node node7 = network.createAndAddNode(Id.create("7", Node.class), scenario.createCoord(1.0, 1500.0));
+		Node node8 = network.createAndAddNode(Id.create("8", Node.class), scenario.createCoord(12500.0,  12499.0));
+		Node node9 = network.createAndAddNode(Id.create("9", Node.class), scenario.createCoord(12500.0, 7500.0));
 
 
-		network.createAndAddLink(scenario.createId("12"), node1, node2, 1000, 60.00, 3600, 1, null, "22");
-		network.createAndAddLink(scenario.createId("23"), node2, node3, 2000, 60.00, 3600, 1, null, "22");
-		network.createAndAddLink(scenario.createId("45"), node4, node5, 2000, 60.00, 3600, 1, null, "22");
-		network.createAndAddLink(scenario.createId("56"), node5, node6, 1000, 60.00, 3600, 1, null, "22");
-		network.createAndAddLink(scenario.createId("67"), node6, node7, 1000, 60.00, 3600, 1, null, "22");
-		network.createAndAddLink(scenario.createId("71"), node7, node1, 1000, 60.00, 3600, 1, null, "22");
+		network.createAndAddLink(Id.create("12", Link.class), node1, node2, 1000, 60.00, 3600, 1, null, "22");
+		network.createAndAddLink(Id.create("23", Link.class), node2, node3, 2000, 60.00, 3600, 1, null, "22");
+		network.createAndAddLink(Id.create("45", Link.class), node4, node5, 2000, 60.00, 3600, 1, null, "22");
+		network.createAndAddLink(Id.create("56", Link.class), node5, node6, 1000, 60.00, 3600, 1, null, "22");
+		network.createAndAddLink(Id.create("67", Link.class), node6, node7, 1000, 60.00, 3600, 1, null, "22");
+		network.createAndAddLink(Id.create("71", Link.class), node7, node1, 1000, 60.00, 3600, 1, null, "22");
 		
 		// two similar path from node 3 to node 4 - north: route via node 8, south: route via node 9
-		network.createAndAddLink(scenario.createId("38"), node3, node8, 5000, 60.00, 3600, 1, null, "22");
-		network.createAndAddLink(scenario.createId("39"), node3, node9, 5000, 60.00, 3600, 1, null, "22");
-		network.createAndAddLink(scenario.createId("84"), node8, node4, 5000, 60.00, 3600, 1, null, "22");
-		network.createAndAddLink(scenario.createId("94"), node9, node4, 4999, 60.00, 3600, 1, null, "22");
+		network.createAndAddLink(Id.create("38", Link.class), node3, node8, 5000, 60.00, 3600, 1, null, "22");
+		network.createAndAddLink(Id.create("39", Link.class), node3, node9, 5000, 60.00, 3600, 1, null, "22");
+		network.createAndAddLink(Id.create("84", Link.class), node8, node4, 5000, 60.00, 3600, 1, null, "22");
+		network.createAndAddLink(Id.create("94", Link.class), node9, node4, 4999, 60.00, 3600, 1, null, "22");
 		
 		
 		for(Integer i=0; i<5; i++){ // x
@@ -296,9 +298,9 @@ public class TestEmissionPricing {
 				double yCoord = 7188. + (j-1)*625;
 				
 				// add a link for each person
-				Node nodeA = network.createAndAddNode(scenario.createId("node_"+idpart+"A"), scenario.createCoord(xCoord, yCoord));
-				Node nodeB = network.createAndAddNode(scenario.createId("node_"+idpart+"B"), scenario.createCoord(xCoord, yCoord+10.));
-				network.createAndAddLink(scenario.createId("link_p"+idpart), nodeA, nodeB, 10, 30.0, 3600, 1);
+				Node nodeA = network.createAndAddNode(Id.create("node_"+idpart+"A", Node.class), scenario.createCoord(xCoord, yCoord));
+				Node nodeB = network.createAndAddNode(Id.create("node_"+idpart+"B", Node.class), scenario.createCoord(xCoord, yCoord+10.));
+				network.createAndAddLink(Id.create("link_p"+idpart, Link.class), nodeA, nodeB, 10, 30.0, 3600, 1);
 
 			}
 		}
@@ -312,7 +314,7 @@ public class TestEmissionPricing {
 				
 				String idpart = i.toString()+j.toString();
 				
-				Person person = pFactory.createPerson(scenario.createId("passive_"+idpart)); //new PersonImpl (new IdImpl(i));
+				Person person = pFactory.createPerson(Id.create("passive_"+idpart, Person.class)); //new PersonImpl (new IdImpl(i));
 
 				double xCoord = 6563. + (i+1)*625;
 				double yCoord = 7188. + (j-1)*625;
@@ -336,24 +338,24 @@ public class TestEmissionPricing {
 	
 	private static void createActiveAgents(Scenario scenario) {
 		PopulationFactory pFactory = scenario.getPopulation().getFactory();
-		Person person = pFactory.createPerson(scenario.createId("567417.1#12424"));
+		Person person = pFactory.createPerson(Id.create("567417.1#12424", Person.class));
 		Plan plan = pFactory.createPlan();
 
-		Activity home = pFactory.createActivityFromLinkId("home", scenario.createId("12"));
+		Activity home = pFactory.createActivityFromLinkId("home", Id.create("12", Link.class));
 		home.setEndTime(6 * 3600);
 		plan.addActivity(home);
 
 		Leg leg1 = pFactory.createLeg(TransportMode.car);
 		plan.addLeg(leg1);
 
-		Activity work = pFactory.createActivityFromLinkId("work", scenario.createId("45"));
+		Activity work = pFactory.createActivityFromLinkId("work", Id.create("45", Link.class));
 		work.setEndTime(home.getEndTime() + 600 + 8 * 3600);
 		plan.addActivity(work);
 
 		Leg leg2 = pFactory.createLeg(TransportMode.car);
 		plan.addLeg(leg2);
 
-		home = pFactory.createActivityFromLinkId("home", scenario.createId("12"));
+		home = pFactory.createActivityFromLinkId("home", Id.create("12", Link.class));
 		plan.addActivity(home);
 
 		person.addPlan(plan);

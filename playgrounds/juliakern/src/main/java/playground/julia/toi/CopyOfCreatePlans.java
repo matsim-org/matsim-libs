@@ -24,7 +24,12 @@ package playground.julia.toi;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -79,7 +84,7 @@ public class CopyOfCreatePlans {
 			Population population = scenario.getPopulation();
 			
 			PopulationFactory populationFactory = population.getFactory();
-			Person person = populationFactory .createPerson(scenario.createId("1"));
+			Person person = populationFactory.createPerson(Id.create("1", Person.class));
 			population.addPerson(person);
 			
 			 Plan plan = populationFactory.createPlan();
