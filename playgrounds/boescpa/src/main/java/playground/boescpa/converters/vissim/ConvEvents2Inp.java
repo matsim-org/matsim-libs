@@ -55,17 +55,17 @@ public class ConvEvents2Inp extends ConvEvents {
 	public static void main(String[] args) {
 		// path2VissimZoneShp = args[0];
 		// path2MATSimNetwork = args[1];
-		// path2VissimNetwork = args[2];
+		// path2VissimInpFile = args[2];
 		// path2EventsFile = args[3];
-		// path2VissimRoutesFile = args[4];
-		// path2NewVissimRoutesFile = args[5];
+		// path2VissimInpFile = args[4];
+		// path2NewVissimInpFile = args[5];
 
-		ConvEvents2Anm convEvents2Anm = createDefaultConvEvents2Anm();
-		convEvents2Anm.convert(args);
+		ConvEvents convEvents = createDefaultConvEvents();
+		convEvents.convert(args);
 	}
 
-	public static ConvEvents2Anm createDefaultConvEvents2Anm() {
-		return new ConvEvents2Anm(new playground.boescpa.converters.vissim.tools.BaseGridCreator(), new MsNetworkMapper(), new InpNetworkMapper(),
+	public static ConvEvents2Inp createDefaultConvEvents() {
+		return new ConvEvents2Inp(new playground.boescpa.converters.vissim.tools.BaseGridCreator(), new MsNetworkMapper(), new InpNetworkMapper(),
 				new MsRouteConverter(), new InpRouteConverter(), new playground.boescpa.converters.vissim.tools.TripMatcher());
 	}
 

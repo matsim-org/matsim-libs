@@ -77,10 +77,10 @@ public abstract class ConvEvents {
 		int hourCounter = 0;
 		for (HashMap<Id, Long[]> msTrips : msTripsCol) {
 			for (HashMap<Id, Long[]> amTrips : amTripsCol) {
-				hourCounter++;
 				HashMap<Id, Integer> demandPerAnmTrip = this.tripMatcher.matchTrips(msTrips, amTrips);
 				String newPath2NewVissimRoutesFile = insertVersNumInFilepath(path2NewVissimRoutesFile, hourCounter);
 				writeRoutes(demandPerAnmTrip, path2VissimRoutesFile, newPath2NewVissimRoutesFile);
+				hourCounter++;
 			}
 		}
 	}

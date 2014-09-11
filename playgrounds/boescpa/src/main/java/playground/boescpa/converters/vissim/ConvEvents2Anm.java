@@ -48,8 +48,8 @@ public class ConvEvents2Anm extends ConvEvents {
 		// path2VissimRoutesFile = args[4];
 		// path2NewVissimRoutesFile = args[5];
 
-		ConvEvents2Anm convEvents2Anm = createDefaultConvEvents2Anm();
-		convEvents2Anm.convert(args);
+		ConvEvents convEvents = createDefaultConvEvents2Anm();
+		convEvents.convert(args);
 	}
 
 	public static ConvEvents2Anm createDefaultConvEvents2Anm() {
