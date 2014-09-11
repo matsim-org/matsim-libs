@@ -39,7 +39,7 @@ class Mode2LineSetterRSA implements PtMode2LineSetter {
 
 	private static final Logger log = Logger.getLogger(Mode2LineSetterRSA.class);
 	
-	private HashMap<Id, String> lineId2ptMode;
+	private HashMap<Id<TransitLine>, String> lineId2ptMode;
 
 	protected Mode2LineSetterRSA() {
 		log.info("enabled");
@@ -47,7 +47,7 @@ class Mode2LineSetterRSA implements PtMode2LineSetter {
 
 	@Override
 	public void setPtModesForEachLine(TransitSchedule transitSchedule, String pIdentifier){
-		this.lineId2ptMode = new HashMap<Id, String>();
+		this.lineId2ptMode = new HashMap<>();
 		
 		for (TransitLine line : transitSchedule.getTransitLines().values()) {
 			if(line.getRoutes().size() < 1){
@@ -65,7 +65,7 @@ class Mode2LineSetterRSA implements PtMode2LineSetter {
 	}
 
 	@Override
-	public HashMap<Id, String> getLineId2ptModeMap(){
+	public HashMap<Id<TransitLine>, String> getLineId2ptModeMap(){
 		return this.lineId2ptMode;
 	}
 	
