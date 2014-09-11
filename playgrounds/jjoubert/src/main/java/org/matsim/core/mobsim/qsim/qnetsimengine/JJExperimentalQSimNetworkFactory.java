@@ -4,7 +4,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl.LaneFactory;
 
-public final class AssignmentEmulatingQLaneNetworkFactory implements NetsimNetworkFactory<QNode, QLinkInternalI> {
+public final class JJExperimentalQSimNetworkFactory implements NetsimNetworkFactory<QNode, QLinkInternalI> {
 	@Override
 	public QNode createNetsimNode(Node node, QNetwork network) {
 		return new QNode(node, network);
@@ -12,13 +12,13 @@ public final class AssignmentEmulatingQLaneNetworkFactory implements NetsimNetwo
 
 	@Override
 	public QLinkInternalI createNetsimLink(Link link, QNetwork network, QNode queueNode) {
-		LaneFactory roadFactory = new LaneFactory() {
+		LaneFactory laneFactory = new LaneFactory() {
 			@Override
 			public QLaneInternalI createLane(QLinkImpl qLinkImpl) {
-				VehicleQ<QVehicle> vehicleQueue = new FIFOVehicleQ() ; 
-				return new AssignmentEmulatingQLane(qLinkImpl, vehicleQueue, qLinkImpl.getLink().getId() ) ;
+				VehicleQ<QVehicle> vehicleQueue = new JJExperimentalVehicleQ() ; 
+				return new QueueWithBuffer(qLinkImpl, vehicleQueue, qLinkImpl.getLink().getId() ) ;
 			}
 		} ;
-		return new QLinkImpl(link, network, queueNode, roadFactory) ;
+		return new QLinkImpl(link, network, queueNode, laneFactory) ;
 	}
 }

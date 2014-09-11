@@ -50,14 +50,14 @@ import java.util.Collection;
  */
 public final class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 
-	public interface RoadFactory {
+	public interface LaneFactory {
 
 		/**
 		 * If this QLinkImpl is passed an instance of this factory upon construction,
 		 * it will call back this factory within the constructor (!) to obtain a road and pass
 		 * itself to the creation method.
 		 */
-		public QLaneInternalI createRoad(QLinkImpl qLinkImpl);
+		public QLaneInternalI createLane(QLinkImpl qLinkImpl);
 
 	}
 
@@ -102,13 +102,13 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	 * This constructor allows inserting a custom vehicle queue proper, e.g. to implement passing.
 	 * 
 	 */
-	public QLinkImpl(final Link link2, QNetwork network, final QNode toNode, final RoadFactory roadFactory) {
+	public QLinkImpl(final Link link2, QNetwork network, final QNode toNode, final LaneFactory roadFactory) {
 		super(link2, network) ;
 		this.length = this.getLink().getLength();
 		// The next line must must by contract stay within the constructor,
 		// so that the caller can use references to the created roads to wire them together,
 		// if it must.
-		this.road = roadFactory.createRoad(this); 
+		this.road = roadFactory.createLane(this); 
 		this.toQueueNode = toNode;
 		this.visdata = this.new VisDataImpl() ; // instantiating this here and not earlier so we can cache some things
 	  super.transitQLink = new TransitQLink(this.road);
