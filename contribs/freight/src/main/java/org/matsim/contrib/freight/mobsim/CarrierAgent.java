@@ -278,7 +278,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 	}
 
 	private Vehicle createVehicle(Person driverPerson, CarrierVehicle carrierVehicle) {
-		return VehicleUtils.getFactory().createVehicle(driverPerson.getId(), carrierVehicle.getVehicleType());
+		return VehicleUtils.getFactory().createVehicle(Id.create(driverPerson.getId(), Vehicle.class), carrierVehicle.getVehicleType());
 	}
 
 	private void clear() {

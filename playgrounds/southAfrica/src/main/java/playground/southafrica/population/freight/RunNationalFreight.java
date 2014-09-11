@@ -25,6 +25,7 @@ package playground.southafrica.population.freight;
 import java.util.Arrays;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -153,7 +154,7 @@ public class RunNationalFreight {
 			sc.getPopulation().getPersonAttributes().putAttribute(person.getId().toString(), config.plans().getSubpopulationAttributeName(), "commercial");
 			
 			/* Vehicles */
-			Vehicle truck = VehicleUtils.getFactory().createVehicle(person.getId(), truckType);
+			Vehicle truck = VehicleUtils.getFactory().createVehicle(Id.create(person.getId(), Vehicle.class), truckType);
 			vehicles.addVehicle(truck);
 		}
 		

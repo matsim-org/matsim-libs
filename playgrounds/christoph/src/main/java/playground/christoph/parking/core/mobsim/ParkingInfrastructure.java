@@ -40,6 +40,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.vehicles.Vehicle;
 
 import playground.christoph.parking.core.interfaces.ParkingCostCalculator;
 
@@ -445,8 +446,8 @@ public class ParkingInfrastructure {
 	 * So far, use this simple approach. Later use a lookup map or something
 	 * similar.
 	 */
-	public Id getVehicleId(Person person) {
-		return person.getId();
+	public Id<Vehicle> getVehicleId(Person person) {
+		return Id.create(person.getId(), Vehicle.class);
 	}
 
 	public void printStatistics() {

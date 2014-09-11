@@ -186,7 +186,7 @@ public class BlockingStopDemo {
 	private void createVehicles() {
 		Vehicles vehicles = this.scenario.getVehicles();
 		VehiclesFactory vb = vehicles.getFactory();
-		VehicleType vehicleType = vb.createVehicleType(Id.create("transitVehicleType", Vehicle.class));
+		VehicleType vehicleType = vb.createVehicleType(Id.create("transitVehicleType", VehicleType.class));
 		VehicleCapacity capacity = vb.createVehicleCapacity();
 		capacity.setSeats(Integer.valueOf(101));
 		capacity.setStandingRoom(Integer.valueOf(0));

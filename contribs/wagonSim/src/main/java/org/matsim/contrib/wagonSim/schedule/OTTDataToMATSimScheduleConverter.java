@@ -188,12 +188,12 @@ public class OTTDataToMATSimScheduleConverter {
 					throw new RuntimeException("locomotive id="+locomotive.id+": type="+locomotive.type+" is not defined by the train type table. Bailing out.");
 				}
 				
-				TransitLine line = scheduleFactory.createTransitLine(locomotive.id);
+				TransitLine line = scheduleFactory.createTransitLine(Id.create(locomotive.id, TransitLine.class));
 				scenario.getTransitSchedule().addTransitLine(line);
 				TransitRoute route = scheduleFactory.createTransitRoute(Id.create(line.getId(), TransitRoute.class), null, transitRouteStops, TransportMode.pt);
 				line.addRoute(route);
 				
-				Vehicle vehicle = vehiclesFactory.createVehicle(route.getId(),vehicleType);
+				Vehicle vehicle = vehiclesFactory.createVehicle(Id.create(route.getId(), Vehicle.class), vehicleType);
 				((ScenarioImpl)scenario).getVehicles().addVehicle(vehicle);
 				departure.setVehicleId(vehicle.getId());
 				route.addDeparture(departure);

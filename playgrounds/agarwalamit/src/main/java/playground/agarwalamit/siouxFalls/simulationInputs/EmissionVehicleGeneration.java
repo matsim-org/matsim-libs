@@ -95,7 +95,7 @@ public class EmissionVehicleGeneration {
 				// do nothing
 			}
 
-			Vehicle vehicle = VehicleUtils.getFactory().createVehicle(personId, vehicleType);
+			Vehicle vehicle = VehicleUtils.getFactory().createVehicle(Id.create(personId, Vehicle.class), vehicleType);
 			outputVehicles.addVehicle(vehicle);//getVehicles().put(vehicle.getId(), vehicle);
 		}
 

@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -35,6 +36,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
@@ -71,8 +73,8 @@ public class PopulationAgentSource implements AgentSource {
 					Leg leg = (Leg) planElement;
 					if (this.mainModes.contains(leg.getMode())) { // only simulated modes get vehicles
 						if (!seenModes.contains(leg.getMode())) { // create one vehicle per simulated mode, put it on the home location
-							Id vehicleLink = findVehicleLink(p);
-							qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(p.getId(), modeVehicleTypes.get(leg.getMode())), vehicleLink);
+							Id<Link> vehicleLink = findVehicleLink(p);
+							qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create(p.getId(), Vehicle.class), modeVehicleTypes.get(leg.getMode())), vehicleLink);
 							seenModes.add(leg.getMode());
 						}
 					}
@@ -81,7 +83,7 @@ public class PopulationAgentSource implements AgentSource {
 		}
 	}
 
-	private Id findVehicleLink(Person p) {
+	private Id<Link> findVehicleLink(Person p) {
 		// A more careful way to decide where this agent should have its vehicles created
 		// than to ask agent.getCurrentLinkId() after creation.
 		for (PlanElement planElement : p.getSelectedPlan().getPlanElements()) {

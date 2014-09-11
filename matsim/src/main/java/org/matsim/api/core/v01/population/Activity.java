@@ -22,6 +22,7 @@ package org.matsim.api.core.v01.population;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 
 /**
  * Specifies the kind of activity an agent performs during its day.
@@ -63,7 +64,7 @@ public interface Activity extends PlanElement {
 	 * Note that there is deliberately no way to set the link id except at creation.  
 	 * We might consider something like moveActivityTo( linkid, coord ).  kai, aug'10 
 	 */
-	public Id getLinkId();
+	public Id<Link> getLinkId();
 
 	public Id getFacilityId();
 

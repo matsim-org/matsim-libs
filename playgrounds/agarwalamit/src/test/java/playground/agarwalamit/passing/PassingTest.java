@@ -57,7 +57,6 @@ import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
@@ -136,12 +135,12 @@ public class PassingTest {
 
 		Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
 
-		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car", Vehicle.class));
+		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car", VehicleType.class));
 		car.setMaximumVelocity(20);
 		car.setPcuEquivalents(1.0);
 		modeVehicleTypes.put("car", car);
 
-		VehicleType bike = VehicleUtils.getFactory().createVehicleType(Id.create("bike", Vehicle.class));
+		VehicleType bike = VehicleUtils.getFactory().createVehicleType(Id.create("bike", VehicleType.class));
 		bike.setMaximumVelocity(5);
 		bike.setPcuEquivalents(0.25);
 		modeVehicleTypes.put("bike", bike);

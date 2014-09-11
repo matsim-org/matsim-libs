@@ -115,7 +115,7 @@ public class ParkingAgentSource implements AgentSource {
 			if (planElement instanceof Activity) {
 				Activity activity = (Activity) planElement;
 				if (InsertParkingActivities.PARKINGACTIVITY.equals(activity.getType())) {
-					Id vehicleId = this.parkingInfrastructure.getVehicleId(plan.getPerson());
+					Id<Vehicle> vehicleId = this.parkingInfrastructure.getVehicleId(plan.getPerson());
 					
 //					log.info("Park car for agent " + plan.getPerson().getId() +
 //							" in facility " + activity.getFacilityId() +
@@ -123,7 +123,7 @@ public class ParkingAgentSource implements AgentSource {
 					
 					this.parkingInfrastructure.parkVehicle(vehicleId, activity.getFacilityId());
 					
-					Vehicle vehicle = VehicleUtils.getFactory().createVehicle(plan.getPerson().getId(), VehicleUtils.getDefaultVehicleType());
+					Vehicle vehicle = VehicleUtils.getFactory().createVehicle(Id.create(plan.getPerson().getId(), Vehicle.class), VehicleUtils.getDefaultVehicleType());
 					qsim.createAndParkVehicleOnLink(vehicle, activity.getLinkId());
 
 					return;

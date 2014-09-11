@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
 
@@ -59,7 +60,7 @@ public class RandomDynAgentSource
             DynAgent agent = new DynAgent(id, startLinkId, qSim, agentLogic);
 
             qSim.createAndParkVehicleOnLink(
-                    qSimVehicleFactory.createVehicle(id, VehicleUtils.getDefaultVehicleType()),
+                    qSimVehicleFactory.createVehicle(Id.create(id, Vehicle.class), VehicleUtils.getDefaultVehicleType()),
                     startLinkId);
             qSim.insertAgentIntoMobsim(agent);
         }

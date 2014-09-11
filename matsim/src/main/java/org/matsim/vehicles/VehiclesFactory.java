@@ -25,7 +25,7 @@ import org.matsim.vehicles.EngineInformation.FuelType;
 
 public interface VehiclesFactory extends MatsimFactory {
 
-	public VehicleType createVehicleType(Id type);
+	public VehicleType createVehicleType(Id<VehicleType> type);
 
 	public VehicleCapacity createVehicleCapacity();
 
@@ -34,6 +34,6 @@ public interface VehiclesFactory extends MatsimFactory {
 	public EngineInformation createEngineInformation(FuelType fuelType,
 			double gasConsumption);
 
-	public Vehicle createVehicle(Id id, VehicleType type);
+	public Vehicle createVehicle(Id<Vehicle> id, VehicleType type);
 
 }

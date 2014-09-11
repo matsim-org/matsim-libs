@@ -251,7 +251,7 @@ class CreateTestScenario {
 		TransitScheduleFactory f = sc.getTransitSchedule().getFactory();
 		String mode = "bus";
 		//  create vehicleType
-		VehicleType vType = ((ScenarioImpl) sc).getVehicles().getFactory().createVehicleType(Id.create(mode, Vehicle.class));
+		VehicleType vType = ((ScenarioImpl) sc).getVehicles().getFactory().createVehicleType(Id.create(mode, VehicleType.class));
 		((ScenarioImpl) sc).getVehicles().addVehicleType(vType);
 		vType.setLength(15);
 		VehicleCapacity cap = new VehicleCapacityImpl();
