@@ -38,8 +38,6 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import playground.andreas.P2.hook.PTransitAgent;
-
 /**
  * @author droeder
  * except of getEnterTransitRoute(...) c&p from {@link TransitAgent} and {@link PTransitAgent} 

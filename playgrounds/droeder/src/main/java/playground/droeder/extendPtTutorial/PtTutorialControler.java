@@ -30,8 +30,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
-import org.matsim.contrib.accessibility.AccessibilityControlerListenerImpl.Modes4Accessibility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -66,19 +64,19 @@ class PtTutorialControler {
 		Controler controler = new Controler(scenario);
 		
 		
-		ActivityFacilitiesImpl workLocations = createWorkFacilities(scenario.getPopulation());
-		Network net =  removeNonCarLinks(scenario.getNetwork());
-		
-		GridBasedAccessibilityControlerListenerV3 accessibilityListener = 
-				new GridBasedAccessibilityControlerListenerV3(
-						workLocations,//opportunities, 
-						null, // ptMatrix,
-						controler.getConfig(), 
-						net);
-		accessibilityListener.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true) ;
-		accessibilityListener.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
-		accessibilityListener.generateGridsAndMeasuringPointsByNetwork(251);
-		controler.addControlerListener(accessibilityListener);
+//		ActivityFacilitiesImpl workLocations = createWorkFacilities(scenario.getPopulation());
+//		Network net =  removeNonCarLinks(scenario.getNetwork());
+//		
+//		GridBasedAccessibilityControlerListenerV3 accessibilityListener = 
+//				new GridBasedAccessibilityControlerListenerV3(
+//						workLocations,//opportunities, 
+//						null, // ptMatrix,
+//						controler.getConfig(), 
+//						net);
+//		accessibilityListener.setComputingAccessibilityForMode(Modes4Accessibility.freeSpeed, true) ;
+//		accessibilityListener.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
+//		accessibilityListener.generateGridsAndMeasuringPointsByNetwork(251);
+//		controler.addControlerListener(accessibilityListener);
 		
 		controler.setOverwriteFiles(true);
 		controler.run();

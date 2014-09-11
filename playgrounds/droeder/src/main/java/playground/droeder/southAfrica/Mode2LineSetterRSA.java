@@ -18,15 +18,6 @@
  * *********************************************************************** */
 package playground.droeder.southAfrica;
 
-import java.util.HashMap;
-import java.util.Map.Entry;
-
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-
-import playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter.PtMode2LineSetter;
 
 
 /**
@@ -35,60 +26,60 @@ import playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter.PtMode2Lin
  * @author droeder
  *
  */
-class Mode2LineSetterRSA implements PtMode2LineSetter {
-
-	private static final Logger log = Logger.getLogger(Mode2LineSetterRSA.class);
-	
-	private HashMap<Id<TransitLine>, String> lineId2ptMode;
-
-	protected Mode2LineSetterRSA() {
-		log.info("enabled");
-	}
-
-	@Override
-	public void setPtModesForEachLine(TransitSchedule transitSchedule, String pIdentifier){
-		this.lineId2ptMode = new HashMap<>();
-		
-		for (TransitLine line : transitSchedule.getTransitLines().values()) {
-			if(line.getRoutes().size() < 1){
-				log.error("no routes for line " + line.getId());
-			}
-//			else{
-//				for(TransitRoute route: line.getRoutes().values()){
-//					log.info(route.getTransportMode());
-//				}
+class Mode2LineSetterRSA {// implements PtMode2LineSetter {
+//
+//	private static final Logger log = Logger.getLogger(Mode2LineSetterRSA.class);
+//	
+//	private HashMap<Id, String> lineId2ptMode;
+//
+//	protected Mode2LineSetterRSA() {
+//		log.info("enabled");
+//	}
+//
+//	@Override
+//	public void setPtModesForEachLine(TransitSchedule transitSchedule, String pIdentifier){
+//		this.lineId2ptMode = new HashMap<Id, String>();
+//		
+//		for (TransitLine line : transitSchedule.getTransitLines().values()) {
+//			if(line.getRoutes().size() < 1){
+//				log.error("no routes for line " + line.getId());
 //			}
-			// there should beat least one transitRoute and all routes should have the same mode (forced by router used for RSA-scenarios)
-			String mode =line.getRoutes().values().iterator().next().getTransportMode();
-			this.lineId2ptMode.put(line.getId(), mode);
-		}
-	}
-
-	@Override
-	public HashMap<Id<TransitLine>, String> getLineId2ptModeMap(){
-		return this.lineId2ptMode;
-	}
-	
-	@Override
-	public String toString() {
-		
-		HashMap<String, Integer> ptMode2CountMap = new HashMap<String, Integer>();
-		
-		for (String ptMode : this.lineId2ptMode.values()) {
-			if (ptMode2CountMap.get(ptMode) == null) {
-				ptMode2CountMap.put(ptMode, new Integer(0));
-			}
-			ptMode2CountMap.put(ptMode, new Integer(ptMode2CountMap.get(ptMode) + 1));
-		}
-		
-		StringBuffer strB = new StringBuffer();
-		strB.append("LineId2ptMode contains ");
-		
-		for (Entry<String, Integer> ptModeCountEntry : ptMode2CountMap.entrySet()) {
-			strB.append(ptModeCountEntry.getValue() + " " + ptModeCountEntry.getKey() + " entries, ");
-		}
-		
-		return strB.toString();
-	}
+////			else{
+////				for(TransitRoute route: line.getRoutes().values()){
+////					log.info(route.getTransportMode());
+////				}
+////			}
+//			// there should beat least one transitRoute and all routes should have the same mode (forced by router used for RSA-scenarios)
+//			String mode =line.getRoutes().values().iterator().next().getTransportMode();
+//			this.lineId2ptMode.put(line.getId(), mode);
+//		}
+//	}
+//
+//	@Override
+//	public HashMap<Id, String> getLineId2ptModeMap(){
+//		return this.lineId2ptMode;
+//	}
+//	
+//	@Override
+//	public String toString() {
+//		
+//		HashMap<String, Integer> ptMode2CountMap = new HashMap<String, Integer>();
+//		
+//		for (String ptMode : this.lineId2ptMode.values()) {
+//			if (ptMode2CountMap.get(ptMode) == null) {
+//				ptMode2CountMap.put(ptMode, new Integer(0));
+//			}
+//			ptMode2CountMap.put(ptMode, new Integer(ptMode2CountMap.get(ptMode) + 1));
+//		}
+//		
+//		StringBuffer strB = new StringBuffer();
+//		strB.append("LineId2ptMode contains ");
+//		
+//		for (Entry<String, Integer> ptModeCountEntry : ptMode2CountMap.entrySet()) {
+//			strB.append(ptModeCountEntry.getValue() + " " + ptModeCountEntry.getKey() + " entries, ");
+//		}
+//		
+//		return strB.toString();
+//	}
 }
 

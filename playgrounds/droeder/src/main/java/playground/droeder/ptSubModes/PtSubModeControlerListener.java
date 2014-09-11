@@ -18,52 +18,44 @@
  * *********************************************************************** */
 package playground.droeder.ptSubModes;
 
-import org.apache.log4j.Logger;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.StartupListener;
-
-import playground.droeder.ptSubModes.qSimHook.TransitSubModeQSimFactory;
-import playground.droeder.ptSubModes.routing.PtSubModeRouterFactory;
-import playground.droeder.ptSubModes.routing.PtSubModeTripRouterFactory;
 
 /**
  * @author droeder
  *
  */
-public class PtSubModeControlerListener implements StartupListener{
-
-	@SuppressWarnings("unused")
-	private static final Logger log = Logger
-			.getLogger(PtSubModeControlerListener.class);
-	private boolean routeOnSameMode;
-	private PtSubModeRouterFactory transitRouterFactory;
-
-	/**
-	 *  Registers the main classes of the package ptSubModes to the controler. The package provides the functionality
-	 *  to route pt-plans on a previously choosen submode (e.g. an agent plans to use a bus, but not
-	 *  any other part of the pt-system), will definitely use a bus  (if there is one) and not any other vehicle.
-	 *  
-	 * @param routeOnSameMode, allow to use the default behavior when false
-	 */
-	public PtSubModeControlerListener(boolean routeOnSameMode) {
-		this.routeOnSameMode = routeOnSameMode;
-	}
-
-	@Override
-	public void notifyStartup(StartupEvent event) {
-		Controler c = event.getControler();
-		c.setMobsimFactory(new TransitSubModeQSimFactory(this.routeOnSameMode));
-		this.transitRouterFactory = new PtSubModeRouterFactory(c, this.routeOnSameMode);
-		c.setTripRouterFactory(new PtSubModeTripRouterFactory(c, transitRouterFactory));
-		c.addControlerListener((PtSubModeRouterFactory) transitRouterFactory);
-	}
-
-	/**
-	 * @return
-	 */
-	public PtSubModeRouterFactory getTransitRouterFactory() {
-		return (PtSubModeRouterFactory) transitRouterFactory;
-	}
-}
+public class PtSubModeControlerListener {}//implements StartupListener{
+//
+//	@SuppressWarnings("unused")
+//	private static final Logger log = Logger
+//			.getLogger(PtSubModeControlerListener.class);
+//	private boolean routeOnSameMode;
+//	private PtSubModeRouterFactory transitRouterFactory;
+//
+//	/**
+//	 *  Registers the main classes of the package ptSubModes to the controler. The package provides the functionality
+//	 *  to route pt-plans on a previously choosen submode (e.g. an agent plans to use a bus, but not
+//	 *  any other part of the pt-system), will definitely use a bus  (if there is one) and not any other vehicle.
+//	 *  
+//	 * @param routeOnSameMode, allow to use the default behavior when false
+//	 */
+//	public PtSubModeControlerListener(boolean routeOnSameMode) {
+//		this.routeOnSameMode = routeOnSameMode;
+//	}
+//
+//	@Override
+//	public void notifyStartup(StartupEvent event) {
+//		Controler c = event.getControler();
+//		c.setMobsimFactory(new TransitSubModeQSimFactory(this.routeOnSameMode));
+//		this.transitRouterFactory = new PtSubModeRouterFactory(c, this.routeOnSameMode);
+//		c.setTripRouterFactory(new PtSubModeTripRouterFactory(c, transitRouterFactory));
+//		c.addControlerListener((PtSubModeRouterFactory) transitRouterFactory);
+//	}
+//
+//	/**
+//	 * @return
+//	 */
+//	public PtSubModeRouterFactory getTransitRouterFactory() {
+//		return (PtSubModeRouterFactory) transitRouterFactory;
+//	}
+//}
 
