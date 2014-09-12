@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
@@ -159,7 +160,7 @@ public class ExternalTripsCreator {
 			if (rand < decimal) numOfTrips ++;
 						
 			for (int i = 0; i < numOfTrips; i++) {
-				Id id = scenario.createId("tta_" + type + "_" + String.valueOf(counter.getCounter()));
+				Id<Person> id = Id.create("tta_" + type + "_" + String.valueOf(counter.getCounter()), Person.class);
 				PersonImpl person = (PersonImpl)populationFactory.createPerson(id);
 				
 				setBasicParameters(person);		
@@ -214,8 +215,8 @@ public class ExternalTripsCreator {
 		int originNode = externalTrip.originNodeId;
 		int destionationNode = externalTrip.destinationNodeId;
 		
-		Id originNodeId = scenario.createId(String.valueOf(originNode));
-		Id destinationNodeId = scenario.createId(String.valueOf(destionationNode));
+		Id<Node> originNodeId = Id.create(String.valueOf(originNode), Node.class);
+		Id<Node> destinationNodeId = Id.create(String.valueOf(destionationNode), Node.class);
 		
 		Id originLinkId = selectLinkByStartNode(originNodeId);
 		Id destinationLinkId = selectLinkByStartNode(destinationNodeId);

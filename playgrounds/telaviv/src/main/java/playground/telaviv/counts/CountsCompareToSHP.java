@@ -38,7 +38,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.gis.PointFeatureFactory;
@@ -60,7 +59,7 @@ public class CountsCompareToSHP {
 	private static String networkFile = "../../matsim/mysimulations/telaviv/input/network.xml";
 	private static String shpFile = "../../matsim/mysimulations/telaviv/output_JDEQSim/ITERS/it.100/100.countscompare.shp";
 	
-	private Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	private Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	private Map<String, List<Line>> counts;
 	
 	public static void main(String[] args) throws Exception {
@@ -142,7 +141,7 @@ public class CountsCompareToSHP {
 				create();
 		
 		for (List<Line> lines : counts.values()) {
-			Id linkId = scenario.createId(lines.get(0).Link_Id);
+			Id<Link> linkId = Id.create(lines.get(0).Link_Id, Link.class);
 			Link link = scenario.getNetwork().getLinks().get(linkId);
 			Coord transformedCoord = transformator.transform(link.getCoord());
 			

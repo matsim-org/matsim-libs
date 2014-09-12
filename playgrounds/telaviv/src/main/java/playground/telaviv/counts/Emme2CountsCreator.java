@@ -163,8 +163,8 @@ public class Emme2CountsCreator {
 		int searchTransformedLink = 0;
 		Counter counter = new Counter("Count stations mapped to MATSim network: #");
 		for (Emme2Count emme2Count : emme2Counts) {
-			Id fromNodeId = scenario.createId(String.valueOf(emme2Count.inode));
-			Id toNodeId = scenario.createId(String.valueOf(emme2Count.jnode));
+			Id<Node> fromNodeId = Id.create(String.valueOf(emme2Count.inode), Node.class);
+			Id<Node> toNodeId = Id.create(String.valueOf(emme2Count.jnode), Node.class);
 
 			Node fromNode = scenario.getNetwork().getNodes().get(fromNodeId);
 			Node toNode = scenario.getNetwork().getNodes().get(toNodeId);
@@ -259,7 +259,7 @@ public class Emme2CountsCreator {
 			 */
 			int i = 0;
 			while (true) {
-				Id nextId = scenario.createId(String.valueOf(emme2Count.inode) + "-" + i++);
+				Id<Node> nextId = Id.create(String.valueOf(emme2Count.inode) + "-" + i++, Node.class);
 				Node nextNode = scenario.getNetwork().getNodes().get(nextId);
 				if (nextNode == null && i > 20) break;
 				else if (nextNode == null) continue;
@@ -280,7 +280,7 @@ public class Emme2CountsCreator {
 			 */
 			int i = 0;
 			while (true) {
-				Id nextId = scenario.createId(String.valueOf(emme2Count.jnode) + "-" + i++);
+				Id<Node> nextId = Id.create(String.valueOf(emme2Count.jnode) + "-" + i++, Node.class);
 				Node nextNode = scenario.getNetwork().getNodes().get(nextId);
 				if (nextNode == null && i > 20) break;
 				else if (nextNode == null) continue;

@@ -43,7 +43,6 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -143,7 +142,7 @@ public class NetworkEmme2MATSim {
 		network.setEffectiveLaneWidth(3.75) ;
 //		network.setEffectiveCellSize(7.5) ;
 
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		// read emme2 network
 		try {
@@ -169,7 +168,7 @@ public class NetworkEmme2MATSim {
 				String carAssignStr = parts[3];
 				
 				if (useWGS84) {
-					Node node = network.createAndAddNode(scenario.createId(idStr), new CoordImpl(xxStrWGS84, yyStrWGS84));
+					Node node = network.createAndAddNode(Id.create(idStr, Node.class), new CoordImpl(xxStrWGS84, yyStrWGS84));
 				}
 				else {
 					double xx = Double.valueOf(xxStr);
@@ -183,7 +182,7 @@ public class NetworkEmme2MATSim {
 					xx = (xx + 50) * 1000;
 					yy = (yy + 500) * 1000;
 					
-					Node node = network.createAndAddNode(scenario.createId(idStr), new CoordImpl(xx, yy));
+					Node node = network.createAndAddNode(Id.create(idStr, Node.class), new CoordImpl(xx, yy));
 				}
 			}
 			
@@ -200,8 +199,8 @@ public class NetworkEmme2MATSim {
 			while ((line = reader.readLine()) != null) {
 				String[] parts = line.split(separator);
 
-				Node fromNode = network.getNodes().get(scenario.createId(parts[0]));
-				Node   toNode = network.getNodes().get(scenario.createId(parts[1]));
+				Node fromNode = network.getNodes().get(Id.create(parts[0], Node.class));
+				Node   toNode = network.getNodes().get(Id.create(parts[1], Node.class));
 				if ( fromNode==null || toNode==null ) {
 					log.info("fromNode or toNode == null; probably connector link; skipping it ...") ;
 					continue ;
@@ -248,7 +247,7 @@ public class NetworkEmme2MATSim {
 //					System.exit(-1);
 //				}
 
-				Id id = scenario.createId(String.valueOf(linkCnt));
+				Id<Link> id = Id.create(String.valueOf(linkCnt), Link.class);
 				linkCnt++;
 
 				network.createAndAddLink(id, fromNode, toNode, length, freespeed, capacity, permlanes, oridId, type);

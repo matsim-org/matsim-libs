@@ -38,7 +38,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -108,7 +107,7 @@ public class ZoneMapping {
 	}
 	
 	public ZoneMapping() throws Exception {
-		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 		CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation("EPSG:2039", "WGS84");
 			
@@ -245,7 +244,7 @@ public class ZoneMapping {
 		 */
 		for (Entry<Integer, SimpleFeature> entry : zonesMap.entrySet()) {
 			
-			Node node = network.getNodes().get(scenario.createId(entry.getKey().toString()));
+			Node node = network.getNodes().get(Id.create(entry.getKey().toString(), Node.class));
 			
 			if (node != null) {
 				for (Link link : node.getInLinks().values()) {

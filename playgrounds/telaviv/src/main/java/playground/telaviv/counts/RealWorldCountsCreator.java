@@ -132,8 +132,8 @@ public class RealWorldCountsCreator {
 		int searchTransformedLink = 0;
 		Counter counter = new Counter("Count stations mapped to MATSim network: #");
 		for (RealWorldCount realWorldCount : emme2Counts) {
-			Id fromNodeId = scenario.createId(String.valueOf(realWorldCount.inode));
-			Id toNodeId = scenario.createId(String.valueOf(realWorldCount.jnode));
+			Id<Node> fromNodeId = Id.create(String.valueOf(realWorldCount.inode), Node.class);
+			Id<Node> toNodeId = Id.create(String.valueOf(realWorldCount.jnode), Node.class);
 
 			Node fromNode = scenario.getNetwork().getNodes().get(fromNodeId);
 			Node toNode = scenario.getNetwork().getNodes().get(toNodeId);
@@ -209,7 +209,7 @@ public class RealWorldCountsCreator {
 			 */
 			int i = 0;
 			while (true) {
-				Id nextId = scenario.createId(String.valueOf(realWorldCount.inode) + "-" + i++);
+				Id<Node> nextId = Id.create(String.valueOf(realWorldCount.inode) + "-" + i++, Node.class);
 				Node nextNode = scenario.getNetwork().getNodes().get(nextId);
 				if (nextNode == null && i > 20) break;
 				else if (nextNode == null) continue;
@@ -230,7 +230,7 @@ public class RealWorldCountsCreator {
 			 */
 			int i = 0;
 			while (true) {
-				Id nextId = scenario.createId(String.valueOf(realWorldCount.jnode) + "-" + i++);
+				Id<Node> nextId = Id.create(String.valueOf(realWorldCount.jnode) + "-" + i++, Node.class);
 				Node nextNode = scenario.getNetwork().getNodes().get(nextId);
 				if (nextNode == null && i > 20) break;
 				else if (nextNode == null) continue;

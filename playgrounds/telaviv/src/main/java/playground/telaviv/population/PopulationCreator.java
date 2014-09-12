@@ -184,7 +184,7 @@ public class PopulationCreator {
 
 		Counter counter = new Counter ("People skipped because invalid plan information was found: #");
 		for (Entry<Integer, ParsedPerson> entry : personMap.entrySet()) {
-			Id id = scenario.createId(String.valueOf(entry.getKey()));
+			Id<Person> id = Id.create(String.valueOf(entry.getKey()), Person.class);
 			ParsedPerson emme2Person = entry.getValue();
 
 			PersonImpl person = (PersonImpl) populationFactory.createPerson(id);

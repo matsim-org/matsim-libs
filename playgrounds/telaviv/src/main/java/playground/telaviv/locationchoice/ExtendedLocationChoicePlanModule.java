@@ -29,6 +29,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.util.TravelTime;
@@ -187,7 +188,7 @@ public class ExtendedLocationChoicePlanModule extends AbstractMultithreadedModul
 			if (secondaryPostStop) index = index + 2;
 			
 			// Add Person Information to the Map
-			Id id = scenario.createId(String.valueOf(emme2Person.PERSONID));
+			Id<Person> id = Id.create(String.valueOf(emme2Person.PERSONID), Person.class);
 			
 			shoppingActivities.put(id, shoppingIndices);
 			otherActivities.put(id, otherIndices);

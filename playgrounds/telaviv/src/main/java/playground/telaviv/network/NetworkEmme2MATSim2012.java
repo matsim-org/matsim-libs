@@ -346,7 +346,7 @@ public class NetworkEmme2MATSim2012 {
 				xx = (xx + 50) * 1000;
 				yy = (yy + 500) * 1000;
 				
-				Node node = networkFactory.createNode(scenario.createId(idStr), transformation.transform(new CoordImpl(xx, yy)));
+				Node node = networkFactory.createNode(Id.create(idStr, Node.class), transformation.transform(new CoordImpl(xx, yy)));
 				network.addNode(node);
 			} else {
 				double xx = Double.valueOf(xxStr);
@@ -360,7 +360,7 @@ public class NetworkEmme2MATSim2012 {
 				xx = (xx + 50) * 1000;
 				yy = (yy + 500) * 1000;
 				
-				Node node = networkFactory.createNode(scenario.createId(idStr), new CoordImpl(xx, yy));
+				Node node = networkFactory.createNode(Id.create(idStr, Node.class), new CoordImpl(xx, yy));
 				network.addNode(node);
 			}
 		}
@@ -383,8 +383,8 @@ public class NetworkEmme2MATSim2012 {
 		while ((line = reader.readLine()) != null) {
 			String[] parts = line.split(separator);
 
-			Node fromNode = network.getNodes().get(scenario.createId(parts[0]));
-			Node   toNode = network.getNodes().get(scenario.createId(parts[1]));
+			Node fromNode = network.getNodes().get(Id.create(parts[0], Node.class));
+			Node   toNode = network.getNodes().get(Id.create(parts[1], Node.class));
 			if ( fromNode==null || toNode==null ) {
 				log.info("fromNode or toNode == null; probably connector link; skipping it ...") ;
 				continue ;
@@ -425,7 +425,7 @@ public class NetworkEmme2MATSim2012 {
 			
 			double freespeed = Double.valueOf(parts[18]);
 
-			Id id = scenario.createId(String.valueOf(linkCnt));
+			Id<Link> id = Id.create(String.valueOf(linkCnt), Link.class);
 			linkCnt++;
 
 			Link link = networkFactory.createLink(id, fromNode, toNode);

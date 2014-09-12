@@ -183,7 +183,7 @@ public class CreateODTravelTimeMatrices {
 	private void getConnectorNodes () {
 		nodeIds = new TreeSet<Id>();
 		for (Integer zoneId : zoneMapping.getParsedZones().keySet()) {
-			nodeIds.add(scenario.createId(zoneId.toString()));
+			nodeIds.add(Id.create(zoneId.toString(), Node.class));
 		}
 
 	}
