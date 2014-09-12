@@ -19,53 +19,80 @@
 
 package playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.agents.agenda;
 
-import java.util.Collection;
-import java.util.Set;
-
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.households.Household;
+import org.matsim.pt.PtConstants;
 
 import playground.sergioo.passivePlanning2012.api.population.BasePerson;
 import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.agents.PassivePlannerTransitAgent;
-import playground.sergioo.passivePlanning2012.core.population.agenda.Agenda;
+import playground.sergioo.passivePlanning2012.core.population.PlaceSharer;
 import playground.sergioo.passivePlanning2012.population.parallelPassivePlanning.PassivePlannerManager;
 
 public class PassivePlannerTransitAgendaAgent extends PassivePlannerTransitAgent  {
 
+	private double legBeginning = Time.UNDEFINED_TIME;
+	private Id prevFacilityId = null;
+	
 	//Constructors
-	public PassivePlannerTransitAgendaAgent(final BasePerson basePerson, final Netsim simulation, final PassivePlannerManager passivePlannerManager, final Household household, Set<String> modes, Agenda agenda) {
+	public PassivePlannerTransitAgendaAgent(final BasePerson basePerson, final Netsim simulation, final PassivePlannerManager passivePlannerManager) {
 		super(basePerson, simulation, passivePlannerManager);
-		boolean carAvailability = false;
-		Collection<String> mainModes = simulation.getScenario().getConfig().qsim().getMainModes();
-		for(PlanElement planElement:basePerson.getBasePlan().getPlanElements())
-			if(planElement instanceof Leg)
-				if(mainModes.contains(((Leg)planElement).getMode()))
-					carAvailability = true;
-		planner = new SinglePlannerAgendaAgent(simulation.getScenario(), carAvailability, modes, basePerson.getBasePlan(), this, agenda);
-		planner.setPlanElementIndex(0);
+		planner = new SinglePlannerAgendaAgent(this);
 	}
 	
 	@Override
 	public void endActivityAndComputeNextState(double now) {
 		Activity prevAct = (Activity)getCurrentPlanElement();
-		double time = 0;
-		for(PlanElement planElement:getBasePerson().getSelectedPlan().getPlanElements()) {
-			if(planElement == prevAct)
-				break;
-			if(planElement instanceof Activity)
-				if(((Activity)planElement).getEndTime()==Time.UNDEFINED_TIME)
-					time += ((Activity)planElement).getMaximumDuration();
+		if(!prevAct.getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
+			double time = 0;
+			for(PlanElement planElement:getBasePerson().getSelectedPlan().getPlanElements()) {
+				if(planElement == prevAct)
+					break;
+				if(planElement instanceof Activity)
+					if(((Activity)planElement).getEndTime()==Time.UNDEFINED_TIME)
+						time += ((Activity)planElement).getMaximumDuration();
+					else
+						time = ((Activity)planElement).getEndTime();
 				else
-					time = ((Activity)planElement).getEndTime();
-			else
-				time += ((Leg)planElement).getTravelTime();
+					time += ((Leg)planElement).getTravelTime();
+			}
+			if(prevAct.getFacilityId()!=null)
+				((SinglePlannerAgendaAgent)planner).shareKnownPlace(prevAct.getFacilityId(), time, prevAct.getType());
+			legBeginning = now;
+			prevFacilityId = prevAct.getFacilityId();
 		}
-		((SinglePlannerAgendaAgent)planner).shareKnownPlace(prevAct.getFacilityId(), time, prevAct.getType());
 		super.endActivityAndComputeNextState(now);
+	}
+	@Override
+	public void endLegAndComputeNextState(double now) {
+		Activity nextAct = ((Activity)getNextPlanElement());
+		if(!nextAct.getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE))
+			if(prevFacilityId!=null)
+				if(legBeginning==Time.UNDEFINED_TIME)
+					throw new RuntimeException("Leg finished with a previous valid activity time");
+				else {
+					String mode = ((Leg)getCurrentPlanElement()).getMode();
+					((SinglePlannerAgendaAgent)planner).getPlaceSharer().addKnownTravelTime(prevFacilityId,
+							nextAct.getFacilityId(),mode.equals(TransportMode.transit_walk)?"pt":mode, legBeginning,
+							now-legBeginning);
+					((SinglePlannerAgendaAgent)planner).shareKnownTravelTime(prevFacilityId, nextAct.getFacilityId(),
+							mode.equals(TransportMode.transit_walk)?"pt":mode, legBeginning, now-legBeginning);
+					legBeginning = Time.UNDEFINED_TIME;
+					prevFacilityId = null;
+				}
+			else
+				throw new RuntimeException("Leg finished with a previous valid activity facility");
+		super.endLegAndComputeNextState(now);
+	}
+	public PlaceSharer getPlaceSharer() {
+		return ((SinglePlannerAgendaAgent)planner).getPlaceSharer();
+	}
+	public void addKnownPerson(PlaceSharer placeSharer) {
+		((SinglePlannerAgendaAgent)planner).addKnownPerson(placeSharer);
 	}
 
 }

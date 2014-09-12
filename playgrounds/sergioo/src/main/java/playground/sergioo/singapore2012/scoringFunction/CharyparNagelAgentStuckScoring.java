@@ -20,8 +20,7 @@
 
 package playground.sergioo.singapore2012.scoringFunction;
 
-import org.matsim.core.scoring.ScoringFunctionAccumulator.AgentStuckScoring;
-import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
+import org.matsim.core.scoring.SumScoringFunction;
 
 /**
  * This is a re-implementation of the original CharyparNagel function, based on a
@@ -29,7 +28,7 @@ import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
  * @see <a href="http://www.matsim.org/node/263">http://www.matsim.org/node/263</a>
  * @author rashid_waraich
  */
-public class CharyparNagelAgentStuckScoring implements AgentStuckScoring, BasicScoring {
+public class CharyparNagelAgentStuckScoring implements SumScoringFunction.AgentStuckScoring {
 
 	protected double score;
 
@@ -40,11 +39,6 @@ public class CharyparNagelAgentStuckScoring implements AgentStuckScoring, BasicS
 
 	public CharyparNagelAgentStuckScoring(final CharyparNagelScoringParameters params) {
 		this.params = params;
-		this.reset();
-	}
-
-	@Override
-	public void reset() {
 		this.score = INITIAL_SCORE;
 	}
 

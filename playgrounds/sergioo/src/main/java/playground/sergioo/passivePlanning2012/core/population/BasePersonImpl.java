@@ -14,7 +14,6 @@ public class BasePersonImpl extends PersonImpl implements BasePerson {
 
 	//Attributes
 	private BasePlan basePlan = new BasePlanImpl(this);
-	private boolean isPlanning = false;
 	
 	//Constructors
 	public BasePersonImpl(Id id) {
@@ -55,16 +54,6 @@ public class BasePersonImpl extends PersonImpl implements BasePerson {
 	}
 	public void setBasePlan(BasePlan basePlan) {
 		this.basePlan = basePlan;
-	}
-	@Override
-	public boolean isPlanning() {
-		return isPlanning;
-	}
-	public void startPlanning() {
-		isPlanning = true;
-	}
-	public void finishPlanning() {
-		isPlanning = false;
 	}
 
 }

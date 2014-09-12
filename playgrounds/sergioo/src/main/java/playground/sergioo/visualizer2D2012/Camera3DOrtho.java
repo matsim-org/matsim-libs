@@ -28,6 +28,12 @@ public class Camera3DOrtho extends Camera2D implements Camera3D {
 	private Vector3D getCenterCamera() {
 		return l;
 	}
+	public void copyCamera(Camera camera) {
+		super.copyCamera(camera);
+		this.l = ((Camera3DOrtho)camera).l;
+		this.d = ((Camera3DOrtho)camera).d;
+		this.h = ((Camera3DOrtho)camera).h;
+	}
 	@Override
 	public double[] getCenter() {
 		Vector3D center = getCenterCamera();

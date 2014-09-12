@@ -1,9 +1,11 @@
-package playground.sergioo.cepasTransitSchedule2013;
+package playground.sergioo.transitScheduleTools2014;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
@@ -31,8 +33,14 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleReaderV1;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
+import org.matsim.vehicles.VehiclesImplTest;
 
 public class EventsToTransitSchedule implements TransitDriverStartsEventHandler, VehicleDepartsAtFacilityEventHandler {
 
@@ -40,7 +48,8 @@ public class EventsToTransitSchedule implements TransitDriverStartsEventHandler,
 	private TransitSchedule newSchedule;
 	private final TransitScheduleFactoryImpl factory = new TransitScheduleFactoryImpl();
 	private final Map<Id, Tuple<Id, Tuple<Id, Id>>> startDrivers = new HashMap<Id, Tuple<Id, Tuple<Id, Id>>>();
-	private final Queue<Id> vehicles = new PriorityQueue<Id>();
+	private final List<Tuple<Id, VehicleType>> vehicles = new ArrayList<Tuple<Id, VehicleType>>();
+	private final Set<Id> newVehicles = new HashSet<Id>();
 	
 	public EventsToTransitSchedule(TransitSchedule transitSchedule, Vehicles vehicles) {
 		existingSchedule = transitSchedule;
@@ -52,8 +61,8 @@ public class EventsToTransitSchedule implements TransitDriverStartsEventHandler,
 			newStop.setStopPostAreaId(stop.getStopPostAreaId());
 			newSchedule.addStopFacility(newStop);
 		}
-		for(Id id:vehicles.getVehicles().keySet())
-			this.vehicles.add(id);
+		for(Vehicle vehicle:vehicles.getVehicles().values())
+			this.vehicles.add(new Tuple<Id, VehicleType>(vehicle.getId(), vehicle.getType()));
 	}
 	public TransitSchedule getNewSchedule() {
 		return newSchedule;
@@ -92,9 +101,20 @@ public class EventsToTransitSchedule implements TransitDriverStartsEventHandler,
 				time-=existingRoute.getStop(existingSchedule.getFacilities().get(event.getFacilityId())).getDepartureOffset();
 			}
 			Departure departure = factory.createDeparture(new IdImpl(startStop.getFirst().toString()+","+time), time);
-			departure.setVehicleId(vehicles.poll());
+			departure.setVehicleId(event.getVehicleId());
+			newVehicles.add(event.getVehicleId());
 			route.addDeparture(departure);
 		}
+	}
+	public void printVehicles(String fileName) {
+		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
+		for(Tuple<Id, VehicleType> veh:this.vehicles) {
+			if(vehicles.getVehicleTypes().get(veh.getSecond().getId())==null)
+				vehicles.addVehicleType(veh.getSecond());
+		}
+		for(Id id:newVehicles)
+			vehicles.addVehicle(new VehicleImpl(id, this.vehicles.remove(0).getSecond()));
+		new VehicleWriterV1(vehicles).writeFile(fileName);
 	}
 	public static void main(String[] args) throws FileNotFoundException {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -109,6 +129,7 @@ public class EventsToTransitSchedule implements TransitDriverStartsEventHandler,
 		System.out.println(eventsToTransitSchedule.startDrivers.size());
 		TransitSchedule newTransitSchedule = eventsToTransitSchedule.getNewSchedule();
 		new TransitScheduleWriter(newTransitSchedule).writeFile(args[3]);
+		eventsToTransitSchedule.printVehicles(args[5]);
 		PrintWriter printWriter = new PrintWriter(args[4]);
 		Set<String> noLines = new HashSet<String>();
 		Set<String> noRoutes = new HashSet<String>();

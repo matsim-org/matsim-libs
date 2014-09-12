@@ -4,14 +4,17 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.router.TripRouter;
 
+import playground.sergioo.passivePlanning2012.population.parallelPassivePlanning.PassivePlannerManager.CurrentTime;
+import playground.sergioo.passivePlanning2012.population.parallelPassivePlanning.PassivePlannerManager.MobsimStatus;
+
 public interface SinglePlannerAgent {
 
 	//Methods
 	public Plan getPlan();
 	public int getPlanElementIndex();
-	public void setPlanElementIndex(int index);
+	public void incrementPlanElementIndex();
 	public void setRouter(TripRouter tripRouter);
-	public boolean planLegActivityLeg(double startTime, Id startFacilityId, double endTime, Id endFacilityId);
-	public void advanceToNextActivity(double now);
+	public int planLegActivityLeg(double startTime, CurrentTime now, Id startFacilityId, double endTime, Id endFacilityId, final MobsimStatus mobSimEnds);
+	public void advanceToNextActivity(double now, double penalty);
 
 }

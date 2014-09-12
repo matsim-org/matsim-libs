@@ -7,10 +7,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.utils.misc.Counter;
@@ -37,7 +42,16 @@ public class BasePlanStrategy implements PlanStrategy {
 		@Override
 		public void run() {
 			for(BasePerson person:persons) {
-				person.getBasePlan().getAndSelectPlan();
+				Plan plan = new PlanImpl(person);
+				for(int i=0; i<person.getBasePlan().getPlanElements().size(); i++) {
+					PlanElement planElement = person.getBasePlan().getPlanElements().get(i);
+					if(planElement instanceof Activity)
+						plan.addActivity((Activity) planElement);
+					else if(planElement instanceof Leg)
+						plan.addLeg((Leg) planElement);
+				}
+				if(person.addPlan(plan))
+					((PersonImpl)person).setSelectedPlan(plan);
 				counter.incCounter();
 			}
 		}
@@ -73,7 +87,7 @@ public class BasePlanStrategy implements PlanStrategy {
 
 	//Constructors
 	public BasePlanStrategy(Scenario scenario) {
-		basePlanThreads = new BasePlanThread[3];
+		basePlanThreads = new BasePlanThread[scenario.getConfig().global().getNumberOfThreads()];
 	}
 
 	//Methods
@@ -85,10 +99,8 @@ public class BasePlanStrategy implements PlanStrategy {
 	}
 	@Override
 	public void run(HasPlansAndId<Plan, Person> person) {
-		if(person instanceof BasePerson) {
-			basePlanThreads[count % basePlanThreads.length].addPerson((BasePerson)person);
-			count++;
-		}
+		if(person instanceof BasePerson)
+			basePlanThreads[count++ % basePlanThreads.length].addPerson((BasePerson)person);
 	}
 	@Override
 	public void init(ReplanningContext replanningContext) {
@@ -100,10 +112,10 @@ public class BasePlanStrategy implements PlanStrategy {
 	}
 	@Override
 	public void finish() {
-		for (Thread thread : this.basePlanThreads)
+		for(Thread thread : this.basePlanThreads)
 			thread.start();
 		try {
-			for (Thread thread : this.basePlanThreads)
+			for(Thread thread : this.basePlanThreads)
 				thread.join();
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
@@ -113,5 +125,5 @@ public class BasePlanStrategy implements PlanStrategy {
 			throw new RuntimeException("Some threads crashed, thus not all plans may have been handled.");
 		}
 	}
-
+	
 }

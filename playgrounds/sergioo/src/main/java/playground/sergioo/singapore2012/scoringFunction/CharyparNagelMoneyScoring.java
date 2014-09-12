@@ -20,8 +20,7 @@
 
 package playground.sergioo.singapore2012.scoringFunction;
 
-import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
-import org.matsim.core.scoring.ScoringFunctionAccumulator.MoneyScoring;
+import org.matsim.core.scoring.SumScoringFunction;
 
 /**
  * This is a re-implementation of the original CharyparNagel function, based on a
@@ -29,7 +28,7 @@ import org.matsim.core.scoring.ScoringFunctionAccumulator.MoneyScoring;
  * @see <a href="http://www.matsim.org/node/263">http://www.matsim.org/node/263</a>
  * @author rashid_waraich
  */
-public class CharyparNagelMoneyScoring implements MoneyScoring, BasicScoring {
+public class CharyparNagelMoneyScoring implements SumScoringFunction.MoneyScoring {
 
 	protected double score;
 
@@ -40,12 +39,6 @@ public class CharyparNagelMoneyScoring implements MoneyScoring, BasicScoring {
 
 	public CharyparNagelMoneyScoring(final CharyparNagelScoringParameters params) {
 		this.params = params;
-		this.reset();
-
-	}
-
-	@Override
-	public void reset() {
 		this.score = INITIAL_SCORE;
 	}
 

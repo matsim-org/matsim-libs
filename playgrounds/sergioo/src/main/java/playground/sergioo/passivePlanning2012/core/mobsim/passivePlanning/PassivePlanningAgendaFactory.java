@@ -18,10 +18,9 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 import org.matsim.core.router.TripRouter;
-import org.matsim.households.PersonHouseholdMapping;
 
+import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.agents.agenda.PassivePlannerAgendaAgentFactory;
 import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.agents.agenda.PassivePlannerTransitAgendaAgentFactory;
-import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.agents.social.PassivePlannerSocialAgentFactory;
 import playground.sergioo.passivePlanning2012.population.parallelPassivePlanning.PassivePlannerManager;
 
 public class PassivePlanningAgendaFactory implements MobsimFactory {
@@ -31,17 +30,15 @@ public class PassivePlanningAgendaFactory implements MobsimFactory {
 
 	//Attributes
 	private final PassivePlannerManager passivePlannerManager;
-	private final PersonHouseholdMapping personHouseholdMapping;
-	
+
 	//Constructors
 	/**
 	 * @param personHouseholdMapping
 	 * @param tripRouter
 	 * @param passivePlannerManager
 	 */
-	public PassivePlanningAgendaFactory(PassivePlannerManager passivePlannerManager, PersonHouseholdMapping personHouseholdMapping, TripRouter tripRouter) {
+	public PassivePlanningAgendaFactory(PassivePlannerManager passivePlannerManager, TripRouter tripRouter) {
 		this.passivePlannerManager = passivePlannerManager;
-		this.personHouseholdMapping = personHouseholdMapping;
 	}
 
 	//Methods
@@ -54,9 +51,7 @@ public class PassivePlanningAgendaFactory implements MobsimFactory {
         // Get number of parallel Threads
         int numOfThreads = conf.getNumberOfThreads();
         QNetsimEngineFactory netsimEngFactory;
-        boolean parallel = false;
         if (numOfThreads > 1) {
-        	parallel = true;
             eventsManager = new SynchronizedEventsManagerImpl(eventsManager);
             netsimEngFactory = new ParallelQNetsimEngineFactory();
             log.info("Using parallel QSim with " + numOfThreads + " threads.");
@@ -64,12 +59,13 @@ public class PassivePlanningAgendaFactory implements MobsimFactory {
             netsimEngFactory = new DefaultQNetsimEngineFactory();
         }
 		QSim qSim = new QSim(sc, eventsManager);
-		PlanningEngine planningEngine = new PlanningEngine(passivePlannerManager);
-		qSim.addMobsimEngine(planningEngine);
-		qSim.addDepartureHandler(planningEngine);
 		PassivePlanningActivityEngine activityEngine = new PassivePlanningActivityEngine();
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
+		PlanningEngine planningEngine = new PlanningEngine(qSim);
+		passivePlannerManager.setPlanningEngine(planningEngine);
+		qSim.addMobsimEngine(planningEngine);
+		qSim.addDepartureHandler(planningEngine);
 		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim);
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
@@ -77,7 +73,7 @@ public class PassivePlanningAgendaFactory implements MobsimFactory {
 		qSim.addMobsimEngine(teleportationEngine);
 		AgentFactory agentFactory;
 		if(sc.getConfig().scenario().isUseTransit()) {
-			agentFactory = new PassivePlannerTransitAgendaAgentFactory(qSim, passivePlannerManager, personHouseholdMapping);
+			agentFactory = new PassivePlannerTransitAgendaAgentFactory(qSim, passivePlannerManager);
 			TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
 			transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
 			qSim.addDepartureHandler(transitEngine);
@@ -85,7 +81,7 @@ public class PassivePlanningAgendaFactory implements MobsimFactory {
 			qSim.addMobsimEngine(transitEngine);
 		}
 		else
-			agentFactory = new PassivePlannerSocialAgentFactory(qSim, passivePlannerManager, personHouseholdMapping);
+			agentFactory = new PassivePlannerAgendaAgentFactory(qSim, passivePlannerManager);
 		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
 		qSim.addAgentSource(agentSource);
 		return qSim;

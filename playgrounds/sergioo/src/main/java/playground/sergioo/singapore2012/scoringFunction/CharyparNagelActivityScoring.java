@@ -22,8 +22,7 @@ package playground.sergioo.singapore2012.scoringFunction;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.core.scoring.ScoringFunctionAccumulator.ActivityScoring;
-import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
+import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.utils.misc.Time;
 
@@ -33,11 +32,11 @@ import org.matsim.core.utils.misc.Time;
  * @see <a href="http://www.matsim.org/node/263">http://www.matsim.org/node/263</a>
  * @author rashid_waraich
  */
-public class CharyparNagelActivityScoring implements ActivityScoring, BasicScoring {
+public class CharyparNagelActivityScoring implements SumScoringFunction.ActivityScoring {
 
 
 	protected double score;
-	private double currentActivityStartTime;
+	private double currentActivityStartTime = INITIAL_LAST_TIME;
 	private double firstActivityEndTime;
 
 	private static final double INITIAL_LAST_TIME = 0.0;
@@ -49,7 +48,6 @@ public class CharyparNagelActivityScoring implements ActivityScoring, BasicScori
 
 	private final CharyparNagelScoringParameters params;
 	private Activity currentActivity;
-	private boolean firstAct = true;
 
 	private Activity firstActivity;
 
@@ -57,36 +55,28 @@ public class CharyparNagelActivityScoring implements ActivityScoring, BasicScori
 
 	public CharyparNagelActivityScoring(final CharyparNagelScoringParameters params) {
 		this.params = params;
-		this.reset();
-	}
-
-	@Override
-	public void reset() {
-		this.firstAct = true;
 		this.currentActivityStartTime = INITIAL_LAST_TIME;
 		this.firstActivityEndTime = INITIAL_FIRST_ACT_TIME;
 		this.score = INITIAL_SCORE;
 	}
 
 	@Override
-	public void startActivity(final double time, final Activity act) {
+	public void handleFirstActivity(Activity act) {
 		assert act != null;
-		this.currentActivity = act;
-		this.currentActivityStartTime = time;
+		this.firstActivityEndTime = act.getEndTime();
+		this.firstActivity = act;
 	}
 
 	@Override
-	public void endActivity(final double time, final Activity act) {
-		assert act != null;
-		assert currentActivity == null || currentActivity.getType().equals(act.getType());
-		if (this.firstAct) {
-			this.firstActivityEndTime = time;
-			this.firstActivity = act;
-			this.firstAct = false;
-		} else {
-			this.score += calcActScore(this.currentActivityStartTime, time, act);
-		}
-		currentActivity = null;
+	public void handleActivity(Activity act) {
+		this.score += calcActScore(act.getStartTime(), act.getEndTime(), act);
+	}
+
+	@Override
+	public void handleLastActivity(Activity act) {
+		this.currentActivityStartTime = act.getStartTime();
+		this.handleOvernightActivity(act);
+		this.firstActivity = null;
 	}
 
 	@Override

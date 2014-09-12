@@ -6,7 +6,6 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.population.ActivityImpl;
@@ -14,22 +13,25 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.households.Household;
 
 import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.agents.PassivePlannerDriverAgent;
-import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.definitions.SinglePlannerAgentImpl;
+import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.agents.SinglePlannerAgentImpl;
+import playground.sergioo.passivePlanning2012.core.population.PlaceSharer;
 import playground.sergioo.passivePlanning2012.core.population.decisionMakers.SocialDecisionMaker;
 import playground.sergioo.passivePlanning2012.core.population.decisionMakers.types.DecisionMaker;
 import playground.sergioo.passivePlanning2012.core.router.TripUtils;
 import playground.sergioo.passivePlanning2012.core.scenario.ScenarioSimplerNetwork;
+import playground.sergioo.passivePlanning2012.population.parallelPassivePlanning.PassivePlannerManager.CurrentTime;
+import playground.sergioo.passivePlanning2012.population.parallelPassivePlanning.PassivePlannerManager.MobsimStatus;
 
 public class SinglePlannerSocialAgent extends SinglePlannerAgentImpl {
 
 	//Constructors
-	public SinglePlannerSocialAgent(ScenarioSimplerNetwork scenario, boolean carAvailability, Household household, Set<String> modes, Plan plan, PassivePlannerDriverAgent agent) {
-		super(new DecisionMaker[]{new SocialDecisionMaker(scenario, carAvailability, household, modes)}, plan, agent);
+	public SinglePlannerSocialAgent(ScenarioSimplerNetwork scenario, boolean carAvailability, Household household, Set<String> modes, PassivePlannerDriverAgent agent) {
+		super(new DecisionMaker[]{new SocialDecisionMaker(scenario, carAvailability, household, modes)}, agent);
 	}
 
 	//Methods
 	@Override
-	public List<? extends PlanElement> getLegActivityLeg(double startTime, Id startFacilityId, double endTime, Id endFacilityId) {
+	public List<? extends PlanElement> getLegActivityLeg(double startTime, CurrentTime now, Id startFacilityId, double endTime, Id endFacilityId, final MobsimStatus mobsimStatus) {
 		SocialDecisionMaker socialDecisionMaker = ((SocialDecisionMaker)decisionMakers[0]);
 		Tuple<String, Id> typeOfActivityFacility = socialDecisionMaker.decideTypeOfActivityFacility(startTime, startFacilityId);
 		if(typeOfActivityFacility==null)
@@ -53,8 +55,14 @@ public class SinglePlannerSocialAgent extends SinglePlannerAgentImpl {
 		tripActivityTrip.addAll(trip2);
 		return tripActivityTrip;
 	}
+	public void addKnownPerson(PlaceSharer sharer) {
+		((PlaceSharer)decisionMakers[0]).addKnownPerson(sharer);
+	}
 	public void shareKnownPlace(Id facilityId, double startTime, String type) {
-		((SocialDecisionMaker)decisionMakers[0]).shareKnownPlace(facilityId, startTime, type);
+		((PlaceSharer)decisionMakers[0]).shareKnownPlace(facilityId, startTime, type);
+	}
+	public PlaceSharer getPlaceSharer() {
+		return (PlaceSharer)decisionMakers[0];
 	}
 
 }

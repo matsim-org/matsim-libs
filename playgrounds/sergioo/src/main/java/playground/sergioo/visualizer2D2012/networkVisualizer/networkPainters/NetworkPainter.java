@@ -73,7 +73,7 @@ public class NetworkPainter extends Painter {
 				else
 					rails.add(link);
 			for(Link link:rails)
-				paintSimpleLink(g2, layersPanel, link, new BasicStroke(1), Color.DARK_GRAY);
+				paintSimpleLink(g2, layersPanel, link, new BasicStroke(((BasicStroke)networkStroke).getLineWidth()*2), Color.DARK_GRAY);
 			
 		} catch (Exception e) {
 			e.printStackTrace();

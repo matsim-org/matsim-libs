@@ -4,7 +4,6 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.router.TripRouter;
@@ -14,7 +13,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import playground.sergioo.passivePlanning2012.api.population.BasePlan;
 import playground.sergioo.passivePlanning2012.api.population.EmptyTime;
-import playground.sergioo.passivePlanning2012.api.population.FloatActivity;
 import playground.sergioo.singapore2012.transitLocationChoice.TransitActsRemover;
 
 import java.util.*;
@@ -27,23 +25,22 @@ public class BasePlanImpl implements BasePlan {
 	private final List<PlanElement> planElements = new ArrayList<PlanElement>();
 	private Double score;
 	private Person person;
-	private final Collection<FloatActivity> floatActivities = new ArrayList<FloatActivity>();
 
 	//Static methods
-	public static void createBasePlan(boolean fixedTypes, String[] types, BasePersonImpl newPerson, PlanImpl plan, TripRouter tripRouter, ActivityFacilities facilities) {
+	public static void createBasePlan(boolean fixedTypes, String[] types, BasePersonImpl newPerson, Plan plan, TripRouter tripRouter, ActivityFacilities facilities) {
 		PlanAlgorithm algorithm = new TransitActsRemover();
 		algorithm.run(plan);
 		BasePlanImpl newPlan = new BasePlanImpl(newPerson);
 		Collection<String> typesC = Arrays.asList(types);
-		Leg emptyActivity = null;
+		Leg emptyTime = null;
 		Leg toBeAdded = null;
 		double time = 0, prevTime = 0;
 		for(PlanElement planElement:plan.getPlanElements())
 			if(planElement instanceof Activity && fixedTypes==typesC.contains(((Activity)planElement).getType())) {
-				if(emptyActivity!=null) {
-					emptyActivity.setTravelTime(time-emptyActivity.getTravelTime());
-					newPlan.addLeg(emptyActivity);
-					emptyActivity = null;
+				if(emptyTime!=null) {
+					emptyTime.setTravelTime(time-emptyTime.getTravelTime());
+					newPlan.addLeg(emptyTime);
+					emptyTime = null;
 				}
 				else if(toBeAdded!=null) {
 					newPlan.addLeg(toBeAdded);
@@ -54,35 +51,33 @@ public class BasePlanImpl implements BasePlan {
 					time = ((Activity) planElement).getEndTime();
 				else if(((Activity) planElement).getMaximumDuration()!=Time.UNDEFINED_TIME)
 					time += ((Activity) planElement).getMaximumDuration();
-				else if(!planElement.equals(plan.getLastActivity()))
+				else if(!planElement.equals(((PlanImpl)plan).getLastActivity()))
 					throw new RuntimeException("Activity without time information");
 			}
 			else if(planElement instanceof Activity) {
-				if(emptyActivity==null) {
-					emptyActivity = new EmptyTimeImpl(toBeAdded.getRoute().getStartLinkId());
-					emptyActivity.setTravelTime(prevTime);
-				}
+				if(emptyTime==null)
+					emptyTime = new EmptyTimeImpl(toBeAdded.getRoute().getStartLinkId(), prevTime);
 				if(toBeAdded!=null)
 					toBeAdded = null;
 				if(((Activity) planElement).getEndTime()!=Time.UNDEFINED_TIME)
 					time = ((Activity) planElement).getEndTime();
 				else if(((Activity) planElement).getMaximumDuration()!=Time.UNDEFINED_TIME)
 					time += ((Activity) planElement).getMaximumDuration();
-				else if(!planElement.equals(plan.getLastActivity()))
+				else if(!planElement.equals(((PlanImpl)plan).getLastActivity()))
 					throw new RuntimeException("Activity without time information");
 			}
 			else {
-				toBeAdded = (Leg)planElement;
+				toBeAdded = new LegImpl((LegImpl)planElement);
 				prevTime = time;
 				if(((Leg)planElement).getTravelTime()!=Time.UNDEFINED_TIME)
 					time += ((Leg)planElement).getTravelTime();
 				else
 					throw new RuntimeException("Leg without time information");
 			}
-		if(emptyActivity!=null) {
-			emptyActivity.setTravelTime(time-emptyActivity.getTravelTime());
-			newPlan.addLeg(emptyActivity);
-			emptyActivity = null;
+		if(emptyTime!=null) {
+			emptyTime.setTravelTime(time-emptyTime.getTravelTime());
+			newPlan.addLeg(emptyTime);
+			emptyTime = null;
 		}
 		for(PlanElement planElement:plan.getPlanElements())
 			if(planElement instanceof Leg  && !(planElement instanceof EmptyTime) && /*TODO*/((Leg)planElement).getRoute() instanceof GenericRoute)
@@ -129,16 +124,22 @@ public class BasePlanImpl implements BasePlan {
 		newPerson.setBasePlan(copyPlan);
 	}
 	public static void convertToBasePlan(BasePersonImpl newPerson, Plan plan) {
-		BasePlanImpl newPlan = new BasePlanImpl(newPerson);
+		PlanImpl newPlan = new PlanImpl(newPerson);
+		EmptyTime time = null;
 		for(PlanElement planElement:plan.getPlanElements())
-			if(planElement instanceof Activity)
+			if(planElement instanceof Activity) {
 				newPlan.addActivity((Activity) planElement);
+				if(time!=null) {
+					time.getRoute().setEndLinkId(((Activity)planElement).getLinkId());
+					time = null;
+				}
+			}
 			else {
 				if(((Leg)planElement).getMode().equals(EMPTY)) {
 					double travelTime = ((Leg)planElement).getTravelTime();
-					planElement = new EmptyTimeImpl(((Leg)planElement).getRoute().getStartLinkId());
-					((Leg)planElement).setTravelTime(travelTime);
+					planElement = new EmptyTimeImpl(((Leg)planElement).getRoute().getStartLinkId(), travelTime);
 					((Leg)planElement).getRoute().setTravelTime(travelTime);
+					time = (EmptyTime) planElement;
 				}
 				newPlan.addLeg((Leg) planElement);
 			}
@@ -200,31 +201,6 @@ public class BasePlanImpl implements BasePlan {
 	public Map<String, Object> getCustomAttributes() {
 		return null;
 	}
-	@Override
-	public Collection<FloatActivity> getFloatActivities() {
-		return floatActivities ;
-	}
-	@Override
-	public void addFloatActivity(FloatActivity floatActivity) {
-		floatActivities.add(floatActivity);
-	}
-	@Override
-	public Plan getAndSelectPlan() {
-		Plan plan = new BasePlanImpl(person);
-		for(int i=0; i<planElements.size(); i++) {
-			PlanElement planElement = planElements.get(i);
-			if(planElement instanceof Activity)
-				plan.addActivity((Activity) planElement);
-			else if(planElement instanceof Leg)
-				plan.addLeg((Leg) planElement);
-		}
-		if(person.addPlan(plan)) {
-			((PersonImpl)person).setSelectedPlan(plan);
-			return plan;
-		}
-		else
-			return null;
-	}
 	public int getPlanElementIndex(double time) {
 		double timeRef = 0;
 		if(time>=0) {
@@ -244,29 +220,77 @@ public class BasePlanImpl implements BasePlan {
 		return -1;
 	}
 	public void copyFrom(final Plan in) {
-		for (PlanElement pe : in.getPlanElements()) {
+		for(PlanElement pe : in.getPlanElements()) {
 			if (pe instanceof Activity)
-				getPlanElements().add(new ActivityImpl((Activity) pe));
-			else if (pe instanceof Leg) {
-				Leg l = (Leg) pe;
-				LegImpl l2 = null;
-				if(l.getMode().equals(EMPTY))
-					l2 = new EmptyTimeImpl(l.getRoute().getStartLinkId());
+				addActivity(new ActivityImpl((Activity) pe));
+			else if (pe instanceof Leg)
+				if (pe instanceof EmptyTime || ((Leg)pe).getMode().equals(EMPTY)) {
+					EmptyTime emptyTime = new EmptyTimeImpl(((Leg)pe).getRoute().getStartLinkId(), ((EmptyTime)pe).getTravelTime());
+					addLeg(emptyTime);
+				}
 				else
-					l2 = new LegImpl(l.getMode());
-				addLeg(l2);
-				l2.setDepartureTime(l.getDepartureTime());
-				l2.setTravelTime(l.getTravelTime());
-				if (pe instanceof LegImpl) {
-					// get the arrival time information only if available
-					l2.setArrivalTime(((LegImpl) pe).getArrivalTime());
-				}
-				if (l.getRoute() != null) {
-					l2.setRoute(l.getRoute().clone());
-				}
-			} else {
+					addLeg(new LegImpl((LegImpl)pe));
+			else
 				throw new IllegalArgumentException("unrecognized plan element type discovered");
+		}
+	}
+	/**
+	 * Removes the specified act from the plan as well as a leg according to the following rule:
+	 * <ul>
+	 * <li>first act: removes the act and the following leg</li>
+	 * <li>last act: removes the act and the previous leg</li>
+	 * <li>in-between act: removes the act, removes the previous leg's route, and removes the following leg.
+	 * </ul>
+	 *
+	 * @param index
+	 */
+	public final void removeActivity(final int index) {
+		if ((index % 2 != 0) || (index < 0) || (index > getPlanElements().size()-1));
+		else if (getPlanElements().size() == 1);
+		else {
+			if (index == 0) {
+				// remove first act and first leg
+				getPlanElements().remove(index+1); // following leg
+				getPlanElements().remove(index); // act
 			}
+			else if (index == getPlanElements().size()-1) {
+				// remove last act and last leg
+				getPlanElements().remove(index); // act
+				getPlanElements().remove(index-1); // previous leg
+			}
+			else {
+				// remove an in-between act
+				LegImpl prev_leg = (LegImpl)getPlanElements().get(index-1); // prev leg;
+				prev_leg.setDepartureTime(Time.UNDEFINED_TIME);
+				prev_leg.setTravelTime(Time.UNDEFINED_TIME);
+				prev_leg.setArrivalTime(Time.UNDEFINED_TIME);
+				prev_leg.setRoute(null);
+
+				getPlanElements().remove(index+1); // following leg
+				getPlanElements().remove(index); // act
+			}
+		}
+	}
+
+	/**
+	 * Removes the specified leg <b>and</b> the following act, too! If the following act is not the last one,
+	 * the following leg will be emptied to keep consistency (i.e. for the route)
+	 *
+	 * @param index
+	 */
+	public final void removeLeg(final int index) {
+		if ((index % 2 == 0) || (index < 1) || (index >= getPlanElements().size()-1));
+		else {
+			if (index != getPlanElements().size()-2) {
+				// not the last leg
+				LegImpl next_leg = (LegImpl)getPlanElements().get(index+2);
+				next_leg.setDepartureTime(Time.UNDEFINED_TIME);
+				next_leg.setTravelTime(Time.UNDEFINED_TIME);
+				next_leg.setArrivalTime(Time.UNDEFINED_TIME);
+				next_leg.setRoute(null);
+			}
+			getPlanElements().remove(index+1); // following act
+			getPlanElements().remove(index); // leg
 		}
 	}
 

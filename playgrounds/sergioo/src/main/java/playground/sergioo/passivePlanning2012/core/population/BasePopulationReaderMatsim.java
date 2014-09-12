@@ -36,6 +36,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
@@ -93,7 +94,7 @@ public class BasePopulationReaderMatsim extends MatsimXmlParser implements Popul
 	private final Population plans;
 
 	private BasePersonImpl currperson = null;
-	private BasePlanImpl currplan = null;
+	private PlanImpl currplan = null;
 	private ActivityImpl curract = null;
 	private LegImpl currleg = null;
 	private Route currRoute = null;
@@ -193,7 +194,7 @@ public class BasePopulationReaderMatsim extends MatsimXmlParser implements Popul
 					"Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no'.");
 		}
 		this.routeDescription = null;
-		this.currplan = new BasePlanImpl(currperson); 
+		this.currplan = new PlanImpl(currperson); 
 		if(selected)
 			currperson.setSelectedPlan(currplan);
 		String scoreString = atts.getValue(ATTR_PLAN_SCORE);

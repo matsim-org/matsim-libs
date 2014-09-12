@@ -25,8 +25,7 @@ public class PassivePlannerSocialAgent extends PassivePlannerDriverAgent  {
 			if(planElement instanceof Leg)
 				if(mainModes.contains(((Leg)planElement).getMode()))
 					carAvailability = true;
-		planner = new SinglePlannerSocialAgent((ScenarioSimplerNetwork) simulation.getScenario(), carAvailability, household, modes, basePerson.getBasePlan(), this);
-		planner.setPlanElementIndex(0);
+		planner = new SinglePlannerSocialAgent((ScenarioSimplerNetwork) simulation.getScenario(), carAvailability, household, modes, this);
 	}
 	
 	//Methods

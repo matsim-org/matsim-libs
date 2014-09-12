@@ -54,9 +54,7 @@ public class PassivePlanningSocialFactory implements MobsimFactory {
         // Get number of parallel Threads
         int numOfThreads = conf.getNumberOfThreads();
         QNetsimEngineFactory netsimEngFactory;
-        boolean parallel = false;
         if (numOfThreads > 1) {
-        	parallel = true;
             eventsManager = new SynchronizedEventsManagerImpl(eventsManager);
             netsimEngFactory = new ParallelQNetsimEngineFactory();
             log.info("Using parallel QSim with " + numOfThreads + " threads.");
@@ -64,7 +62,8 @@ public class PassivePlanningSocialFactory implements MobsimFactory {
             netsimEngFactory = new DefaultQNetsimEngineFactory();
         }
 		QSim qSim = new QSim(sc, eventsManager);
-		PlanningEngine planningEngine = new PlanningEngine(passivePlannerManager);
+		PlanningEngine planningEngine = new PlanningEngine(qSim);
+		passivePlannerManager.setPlanningEngine(planningEngine);
 		qSim.addMobsimEngine(planningEngine);
 		qSim.addDepartureHandler(planningEngine);
 		PassivePlanningActivityEngine activityEngine = new PassivePlanningActivityEngine();

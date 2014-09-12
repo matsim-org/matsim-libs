@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionAccumulator;
+import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
 /**
@@ -54,7 +54,7 @@ public class CharyparNagelOpenTimesScoringFunctionFactory implements ScoringFunc
 			 */
 			this.params = new CharyparNagelScoringParameters(this.config);
 		}
-		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
+		SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelOpenTimesActivityScoring(person.getSelectedPlan(), params, ((ScenarioImpl) scenario).getActivityFacilities()));
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, scenario.getNetwork()));
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(params));

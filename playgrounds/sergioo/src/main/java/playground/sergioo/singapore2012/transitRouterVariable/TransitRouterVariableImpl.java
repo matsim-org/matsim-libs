@@ -116,7 +116,7 @@ public class TransitRouterVariableImpl implements TransitRouter {
 			return legs;
 		}
 
-		return convertPathToLegList( departureTime, p, fromCoord, toCoord, person ) ;
+		return convertPathToLegList( departureTime, p, fromCoord, toCoord, person );
 	}
 	
 	public Path calcPathRoute(final Coord fromCoord, final Coord toCoord, final double departureTime, final Person person) {

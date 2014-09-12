@@ -11,57 +11,25 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.gbl.MatsimRandom;
+
+import playground.sergioo.weeklySimulation.util.misc.Time;
 
 public abstract class PlaceSharer {
 	
-	protected enum Period {
-		
-		EARLY_MORNING(0, 7*3600),
-		MORNING_PEAK(7*3600, 10*3600),
-		BEFORE_LUNCH(10*3600, 13*3600),
-		AFTER_LUNCH(13*3600, 18*3600),
-		EVENING_PEAK(18*3600, 21*3600),
-		NIGHT(21*3600, 24*3600);
-		
-		//Constants
-		private static final double PERIODS_TIME = 24*3600;
-		
-		//Attributes
-		private final double startTime;
-		private final double endTime;
-	
-		//Constructors
-		private Period(double startTime, double endTime) {
-			this.startTime = startTime;
-			this.endTime = endTime;
-		}
-		public static Period getPeriod(double time) {
-			for(Period period:Period.values())
-				if(period.isPeriod(time))
-					return period;
-			return null;
-		}
-		protected boolean isPeriod(double time) {
-			time = time%PERIODS_TIME;
-			if(startTime<=time && time<endTime)
-				return true;
-			return false;
-		}
-	
-	}	
 	public class KnownPlace {
 		
 		//Attributes
 		private Id facilityId;
-		private SortedMap<Period, Set<String>> timeTypes = new TreeMap<Period, Set<String>>();
+		private SortedMap<Time.Period, Set<String>> timeTypes = new TreeMap<Time.Period, Set<String>>();
 		/*{
-			for(Period period:Period.values())
+			for(Period period:Time.Period.values())
 				timeTypes.put(period, new HashSet<String>());
 		}*/
-		protected Map<String, SortedMap<Period, Map<Id, Double>>> travelTimes = new HashMap<String, SortedMap<Period, Map<Id, Double>>>();
+		protected Map<String, SortedMap<Time.Period, Map<Id, Double>>> travelTimes = new HashMap<String, SortedMap<Time.Period, Map<Id, Double>>>();
 		
 		//Constructors
-		private KnownPlace(Id facilityId) {
+		KnownPlace(Id facilityId) {
 			this.facilityId = facilityId;
 		}
 		
@@ -69,12 +37,11 @@ public abstract class PlaceSharer {
 			return facilityId;
 		}
 		
-		
 		public Set<double[]> getTimes(String activityType) {
 			Set<double[]> times = new HashSet<double[]>();
-			for(Entry<Period, Set<String>> timeType: timeTypes.entrySet())
+			for(Entry<Time.Period, Set<String>> timeType: timeTypes.entrySet())
 				if(timeType.getValue().contains(activityType))
-					times.add(new double[]{timeType.getKey().startTime, timeType.getKey().endTime});
+					times.add(new double[]{timeType.getKey().getStartTime(), timeType.getKey().getEndTime()});
 			return times;
 		}
 		public Set<String> getActivityTypes() {
@@ -84,17 +51,17 @@ public abstract class PlaceSharer {
 			return activities;
 		}
 		public Set<String> getActivityTypes(double time) {
-			Set<String> types = timeTypes.get(Period.getPeriod(time));
+			Set<String> types = timeTypes.get(Time.Period.getPeriod(time));
 			if(types==null) {
 				types = new HashSet<String>();
-				timeTypes.put(Period.getPeriod(time), types);
+				timeTypes.put(Time.Period.getPeriod(time), types);
 			}
 			return types;
 		}
 		public double getTravelTime(String mode, double startTime, Id destinationId) {
-			SortedMap<Period, Map<Id, Double>> timess = travelTimes.get(mode);
+			SortedMap<Time.Period, Map<Id, Double>> timess = travelTimes.get(mode);
 			if(timess!=null) {
-				Map<Id, Double> times = timess.get(Period.getPeriod(startTime));
+				Map<Id, Double> times = timess.get(Time.Period.getPeriod(startTime));
 				if(times!=null) {
 					Double time = times.get(destinationId);
 					if(time!=null)
@@ -108,12 +75,24 @@ public abstract class PlaceSharer {
 	
 	protected final Set<PlaceSharer> knownPeople = new HashSet<PlaceSharer>();
 	protected final Map<Id, KnownPlace> knownPlaces = new HashMap<Id, KnownPlace>();
+	private double shareProbability = 1;
+	private boolean areKnownPlacesUsed = false;
 	
-	public Set<PlaceSharer> getKnownPeople() {
-		return knownPeople;
+	public PlaceSharer() {
+	}
+	
+	public void setShareProbability(double shareProbability) {
+		if(shareProbability>0 && shareProbability<=1)
+			this.shareProbability = shareProbability;
 	}
 	public void addKnownPerson(PlaceSharer placeSharer) {
 		knownPeople.add(placeSharer);
+	}
+	public boolean areKnownPlacesUsed() {
+		return areKnownPlacesUsed;
+	}
+	public void setAreKnownPlacesUsed(boolean areKnownPlacesUsed) {
+		this.areKnownPlacesUsed = areKnownPlacesUsed;
 	}
 	public Collection<KnownPlace> getKnownPlaces() {
 		return knownPlaces.values();
@@ -127,10 +106,10 @@ public abstract class PlaceSharer {
 			knownPlace = new KnownPlace(facilityId);
 			knownPlaces.put(facilityId, knownPlace);
 		}
-		Set<String> types = knownPlace.timeTypes.get(Period.getPeriod(startTime));
+		Set<String> types = knownPlace.timeTypes.get(Time.Period.getPeriod(startTime));
 		if(types==null) {
 			types = new HashSet<String>();
-			knownPlace.timeTypes.put(Period.getPeriod(startTime), types);
+			knownPlace.timeTypes.put(Time.Period.getPeriod(startTime), types);
 		}
 		types.add(typeOfActivity);
 	}
@@ -140,20 +119,35 @@ public abstract class PlaceSharer {
 			knownPlace = new KnownPlace(facilityId);
 			knownPlaces.put(facilityId, knownPlace);
 		}
-		Set<String> types = knownPlace.timeTypes.get(Period.getPeriod(startTime));
-		if(types==null) {
-			types = new HashSet<String>();
-			boolean add = false;
-			for(Period period:Period.values()) {
-				if(period.startTime<=startTime && period.endTime>=startTime)
-					add = true;
-				if(add)
+		boolean add = false;
+		for(Time.Period period:Time.Period.values()) {
+			if(period.getStartTime()<=startTime && period.getEndTime()>=startTime)
+				add = true;
+			if(add) {
+				Set<String> types = knownPlace.timeTypes.get(period);
+				if(types==null) {
+					types = new HashSet<String>();
 					knownPlace.timeTypes.put(period, types);
-				if(period.startTime<=endTime && period.endTime>=endTime)
-					add = false;
+				}
+				types.add(typeOfActivity);
 			}
+			if(period.getStartTime()<=endTime && period.getEndTime()>=endTime)
+				add = false;
 		}
-		types.add(typeOfActivity);
+	}
+	public void addKnownPlace(KnownPlace knownPlace) {
+		KnownPlace knownPlace2 = knownPlaces.get(knownPlace.getFacilityId());
+		if(knownPlace2==null)
+			knownPlaces.put(knownPlace.getFacilityId(), knownPlace);
+		else
+			for(Entry<Time.Period, Set<String>> entry:knownPlace.timeTypes.entrySet()) {
+				Set<String> acts = knownPlace2.timeTypes.get(entry.getKey());
+				if(acts == null)
+					knownPlace2.timeTypes.put(entry.getKey(), entry.getValue());
+				else
+					for(String act:entry.getValue())
+						acts.add(act);
+			}
 	}
 	public void addKnownTravelTime(Id oFacilityId, Id dFacilityId, String mode, double startTime, double travelTime) {
 		KnownPlace knownPlaceO = knownPlaces.get(oFacilityId);
@@ -166,21 +160,22 @@ public abstract class PlaceSharer {
 			knownPlaceD = new KnownPlace(dFacilityId);
 			knownPlaces.put(dFacilityId, knownPlaceD);
 		}
-		SortedMap<Period, Map<Id, Double>> timess = knownPlaceO.travelTimes.get(mode);
+		SortedMap<Time.Period, Map<Id, Double>> timess = knownPlaceO.travelTimes.get(mode);
 		if(timess==null) {
-			timess = new TreeMap<PlaceSharer.Period, Map<Id,Double>>();
+			timess = new TreeMap<Time.Period, Map<Id,Double>>();
 			knownPlaceO.travelTimes.put(mode, timess);
 		}
-		Map<Id, Double> times = timess.get(Period.getPeriod(startTime));
+		Map<Id, Double> times = timess.get(Time.Period.getPeriod(startTime));
 		if(times==null) {
 			times = new ConcurrentHashMap<Id, Double>();
-			timess.put(Period.getPeriod(startTime), times);
+			timess.put(Time.Period.getPeriod(startTime), times);
 		}
 		times.put(dFacilityId, travelTime);
 	}
 	public void shareKnownPlace(Id facilityId, double startTime, String type) {
 		for(PlaceSharer placeSharer:knownPeople)
-			placeSharer.addKnownPlace(facilityId, startTime, type);
+			if(MatsimRandom.getRandom().nextDouble()<shareProbability && !placeSharer.areKnownPlacesUsed)
+				placeSharer.addKnownPlace(facilityId, startTime, type);
 	}
 	public void shareKnownTravelTime(Id oFacilityId, Id dFacilityId, String mode, double startTime, double travelTime) {
 		for(PlaceSharer placeSharer:knownPeople)

@@ -105,7 +105,7 @@ public class LinesPainter3D extends Painter {
 		linesMap.clear();
 		for(Line line:lines)
 			addLine(line.pointA, line.pointB, line.color, line.stroke);
-		if(scale!=null)
+		if(scale!=null && camera!=null)
 			addLine(camera.getCenter(), camera.getCenter(), null, null);
 	}
 	@Override

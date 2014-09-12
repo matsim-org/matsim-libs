@@ -5,20 +5,20 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
-import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.agents.TransitAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 
 import playground.sergioo.passivePlanning2012.api.population.BasePerson;
@@ -27,7 +27,7 @@ import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.defini
 import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.definitions.SinglePlannerAgent;
 import playground.sergioo.passivePlanning2012.population.parallelPassivePlanning.PassivePlannerManager;
 
-public class PassivePlannerDriverAgent implements MobsimDriverAgent, HasBasePerson {
+public abstract class PassivePlannerDriverAgent implements MobsimDriverAgent, HasBasePerson, PlanAgent {
 
 	//Constants
 	private final static Logger log = Logger.getLogger(TransitAgent.class);
@@ -38,7 +38,7 @@ public class PassivePlannerDriverAgent implements MobsimDriverAgent, HasBasePers
 	private final PassivePlannerManager passivePlannerManager;
 	protected SinglePlannerAgent planner;
 	private MobsimVehicle vehicle;
-	protected State state;
+	protected boolean isAborted = false;
 	private double activityEndTime;
 	private int currentLinkIdIndex;
 	
@@ -49,7 +49,8 @@ public class PassivePlannerDriverAgent implements MobsimDriverAgent, HasBasePers
 		this.passivePlannerManager = passivePlannerManager;
 		if (basePerson.getSelectedPlan().getPlanElements().size() > 0) {
 			Activity firstAct = (Activity) basePerson.getSelectedPlan().getPlanElements().get(0);				
-			this.state = MobsimAgent.State.ACTIVITY ;
+			if(basePerson.getSelectedPlan().getPlanElements().size()==1)
+				firstAct.setEndTime(Double.POSITIVE_INFINITY);
 			activityEndTime = firstAct.getEndTime();
 		}
 	}
@@ -60,11 +61,14 @@ public class PassivePlannerDriverAgent implements MobsimDriverAgent, HasBasePers
 	}
 	@Override
 	public State getState() {
-		return state;
+		if(isAborted)
+			return State.ABORT;
+		else
+			return getCurrentPlanElement() instanceof Leg?State.LEG:State.ACTIVITY;
 	}
 	@Override
 	public double getActivityEndTime() {
-		if(state == State.ACTIVITY)
+		if(getState() == State.ACTIVITY)
 			return activityEndTime;
 		return Time.UNDEFINED_TIME;
 	}
@@ -72,25 +76,22 @@ public class PassivePlannerDriverAgent implements MobsimDriverAgent, HasBasePers
 	public void endActivityAndComputeNextState(double now) {
 		Activity prevAct = (Activity)getCurrentPlanElement();
 		simulation.getEventsManager().processEvent(new ActivityEndEvent(now, getId(), prevAct.getLinkId(), prevAct.getFacilityId(), prevAct.getType()));
-		planner.setPlanElementIndex(planner.getPlanElementIndex()+1);
+		planner.incrementPlanElementIndex();
 		if(planner.getPlanElementIndex()>=basePerson.getSelectedPlan().getPlanElements().size()) {
 			log.error("Agent "+getId()+" has not more elements after the activity "+prevAct.getType()+" at "+now+" seconds.");
 			setStateToAbort(now);
 			return;
 		}
-		if(getCurrentPlanElement() instanceof EmptyTime) {
-			if(passivePlannerManager.addPlanner(planner, prevAct.getFacilityId(), ((Activity)getNextPlanElement()).getFacilityId()))
-				advancePlan(now);
-		}
-		else
-			advancePlan(now);
+		if(getCurrentPlanElement() instanceof EmptyTime)
+			passivePlannerManager.addPlanner(planner, prevAct.getFacilityId(), ((Activity)getNextPlanElement()).getFacilityId(), now, this.getId());
+		advancePlan(now);
 	}
 	
 	@Override
 	public void endLegAndComputeNextState(double now) {
 		Leg prevLeg = (Leg)getCurrentPlanElement();
 		this.simulation.getEventsManager().processEvent(new PersonArrivalEvent(now, getId(), getDestinationLinkId(), prevLeg.getMode()));
-		planner.setPlanElementIndex(planner.getPlanElementIndex()+1);
+		planner.incrementPlanElementIndex();
 		if(planner.getPlanElementIndex()>=basePerson.getSelectedPlan().getPlanElements().size()) {
 			log.error("Agent "+getId()+" has not more elements after the leg "+prevLeg.getMode()+" at "+now+" seconds.");
 			setStateToAbort(now);
@@ -108,12 +109,13 @@ public class PassivePlannerDriverAgent implements MobsimDriverAgent, HasBasePers
 			throw new RuntimeException("Unknown PlanElement of type: " + pe.getClass().getName());
 	}
 	private void initializeActivity(Activity act, double now) {
-		this.state = MobsimAgent.State.ACTIVITY;
 		this.simulation.getEventsManager().processEvent(new ActivityStartEvent(now, this.getId(), act.getLinkId(), act.getFacilityId(), act.getType()));
 		activityEndTime = calculateDepartureTime(act, now);
 	}
+	public void initializeLastActivity(Activity act, double now) {
+		activityEndTime = calculateDepartureTime(act, now);
+	}
 	private void initializeLeg(Leg leg, double now) {
-		this.state = MobsimAgent.State.LEG ;			
 		Route route = leg.getRoute();
 		if (route == null) {
 			log.error("The agent " + getId() + " has no route in its leg.  Setting agent state to ABORT (but continuing the mobsim).");
@@ -140,15 +142,20 @@ public class PassivePlannerDriverAgent implements MobsimDriverAgent, HasBasePers
 			return departure;
 		}
 	}
+	public PlanElement getPreviousPlanElement() {
+		return basePerson.getSelectedPlan().getPlanElements().get(planner.getPlanElementIndex()-1);
+	}
+	@Override
 	public PlanElement getCurrentPlanElement() {
 		return basePerson.getSelectedPlan().getPlanElements().get(planner.getPlanElementIndex());
 	}
-	private PlanElement getNextPlanElement() {
+	@Override
+	public PlanElement getNextPlanElement() {
 		return basePerson.getSelectedPlan().getPlanElements().get(planner.getPlanElementIndex()+1);
 	}
 	@Override
 	public void setStateToAbort(double now) {
-		state = State.ABORT;
+		isAborted = true;
 	}
 	@Override
 	public Double getExpectedTravelTime() {
@@ -156,13 +163,11 @@ public class PassivePlannerDriverAgent implements MobsimDriverAgent, HasBasePers
 	}
 	@Override
 	public String getMode() {
-		return ((Leg)getCurrentPlanElement()).getMode();	
+		return ((Leg)getCurrentPlanElement()).getMode();
 	}
 	@Override
 	public void notifyArrivalOnLinkByNonNetworkMode(Id linkId) {
-		Link startLink = simulation.getScenario().getNetwork().getLinks().get(((Leg)getCurrentPlanElement()).getRoute().getStartLinkId());
-		Link endLink = simulation.getScenario().getNetwork().getLinks().get(((Leg)getCurrentPlanElement()).getRoute().getEndLinkId());
-		simulation.getEventsManager().processEvent(new TeleportationArrivalEvent(simulation.getSimTimer().getTimeOfDay(), getId(), CoordUtils.calcDistance(startLink.getCoord(), endLink.getCoord())));
+		
 	}
 	@Override
 	public Id getCurrentLinkId() {
@@ -251,9 +256,16 @@ public class PassivePlannerDriverAgent implements MobsimDriverAgent, HasBasePers
 	public double getWeight() {
 		return 1/simulation.getScenario().getConfig().qsim().getFlowCapFactor();
 	}
-	public void advanceToNextActivity(double now) {
-		//this.simulation.getEventsManager().processEvent(this.simulation.getEventsManager().getFactory().createAgentArrivalEvent(now, getId(), getDestinationLinkId(), "empty"));
+	public void advanceToNextActivity(double now, double penalty) {
+		this.simulation.getEventsManager().processEvent(new PersonDepartureEvent(now, getId(), ((Activity)getPreviousPlanElement()).getLinkId(), "empty"));
+		this.simulation.getEventsManager().processEvent(new TeleportationArrivalEvent(now+penalty, basePerson.getId(), 4000*24));
+		this.simulation.getEventsManager().processEvent(new PersonArrivalEvent(now+penalty, getId(), ((Activity)getNextPlanElement()).getLinkId(), "empty"));
 		initializeActivity((Activity) getNextPlanElement(), now);
+	}
+
+	@Override
+	public Plan getCurrentPlan() {
+		return basePerson.getSelectedPlan();
 	}
 
 }

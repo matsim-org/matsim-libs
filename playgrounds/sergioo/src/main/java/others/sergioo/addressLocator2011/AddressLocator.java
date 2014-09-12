@@ -111,6 +111,31 @@ public class AddressLocator {
 		}
 	}
 	/**
+	 * Locates the address
+	 * @throws URISyntaxException 
+	 * @throws IOException 
+	 * @throws ClientProtocolException 
+	 * @throws ParserConfigurationException 
+	 * @throws SAXException 
+	 * @throws IllegalStateException 
+	 * @throws BadAddressException 
+	 */
+	public Coord fastLocate(String address) throws URISyntaxException, ClientProtocolException, IOException, ParserConfigurationException, IllegalStateException, SAXException, BadAddressException {
+		Document response = getResponse(getRequest(address));
+		String status = ((Element)response.getElementsByTagName("status").item(0)).getChildNodes().item(0).getNodeValue();
+		if(!status.equals(ADDRESS_STATUS_OK))
+			throw new BadAddressException(status);
+		NodeList results = response.getElementsByTagName("result");
+		locations.clear();
+		if(results.getLength()>0) {
+			Element coords=((Element)((Element)((Element)results.item(0)).getElementsByTagName("geometry").item(0)).getElementsByTagName("location").item(0));
+			double latitude=Double.parseDouble(coords.getElementsByTagName("lat").item(0).getChildNodes().item(0).getNodeValue());
+			double longitude=Double.parseDouble(coords.getElementsByTagName("lng").item(0).getChildNodes().item(0).getNodeValue());
+			return new CoordImpl(longitude, latitude);
+		}
+		return null;
+	}
+	/**
 	 * @return The get HTTP protocol request
 	 * @throws URISyntaxException 
 	 */

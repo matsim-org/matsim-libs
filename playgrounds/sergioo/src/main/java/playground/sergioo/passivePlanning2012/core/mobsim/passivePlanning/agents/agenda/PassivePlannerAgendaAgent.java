@@ -1,31 +1,19 @@
 package playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.agents.agenda;
 
-import java.util.Collection;
-import java.util.Set;
-
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
 import playground.sergioo.passivePlanning2012.api.population.BasePerson;
 import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.agents.PassivePlannerDriverAgent;
-import playground.sergioo.passivePlanning2012.core.population.agenda.Agenda;
+import playground.sergioo.passivePlanning2012.core.population.PlaceSharer;
 import playground.sergioo.passivePlanning2012.population.parallelPassivePlanning.PassivePlannerManager;
 
 public class PassivePlannerAgendaAgent extends PassivePlannerDriverAgent  {
 
 	//Constructors
-	public PassivePlannerAgendaAgent(final BasePerson basePerson, final Netsim simulation, final PassivePlannerManager passivePlannerManager, Set<String> modes, Agenda agenda) {
+	public PassivePlannerAgendaAgent(final BasePerson basePerson, final Netsim simulation, final PassivePlannerManager passivePlannerManager) {
 		super(basePerson, simulation, passivePlannerManager);
-		boolean carAvailability = false;
-		Collection<String> mainModes = simulation.getScenario().getConfig().qsim().getMainModes();
-		for(PlanElement planElement:basePerson.getBasePlan().getPlanElements())
-			if(planElement instanceof Leg)
-				if(mainModes.contains(((Leg)planElement).getMode()))
-					carAvailability = true;
-		planner = new SinglePlannerAgendaAgent(simulation.getScenario(), carAvailability, modes, basePerson.getBasePlan(), this, agenda);
-		planner.setPlanElementIndex(0);
+		planner = new SinglePlannerAgendaAgent(this);
 	}
 	
 	//Methods
@@ -35,5 +23,10 @@ public class PassivePlannerAgendaAgent extends PassivePlannerDriverAgent  {
 		((SinglePlannerAgendaAgent)planner).shareKnownPlace(prevAct.getFacilityId(), prevAct.getStartTime(), prevAct.getType());
 		super.endActivityAndComputeNextState(now);
 	}
-	
+	public void addKnownPerson(PlaceSharer sharer) {
+		((SinglePlannerAgendaAgent)planner).addKnownPerson(sharer);
+	}
+	public PlaceSharer getPlaceSharer() {
+		return ((SinglePlannerAgendaAgent)planner).getPlaceSharer();
+	}
 }

@@ -11,9 +11,15 @@ public class EmptyTimeImpl extends LegImpl implements EmptyTime {
 	//Attributes
 
 	//Constructors
-	public EmptyTimeImpl(Id startLinkId) {
+	public EmptyTimeImpl(Id startLinkId, double duration) {
 		super("empty");
-		setRoute(new GenericRouteImpl(startLinkId, null));
+		setTravelTime(duration);
+		setRoute(new GenericRouteImpl(startLinkId, startLinkId));
+	}
+	public EmptyTimeImpl(EmptyTime emptyTime) {
+		super("empty");
+		setTravelTime(emptyTime.getTravelTime());
+		setRoute(new GenericRouteImpl(emptyTime.getRoute().getStartLinkId(), emptyTime.getRoute().getEndLinkId()));
 	}
 
 	//Methods

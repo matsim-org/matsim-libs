@@ -34,6 +34,7 @@ public final class Counter {
 	private final String prefix;
 	private AtomicInteger counter = new AtomicInteger(0);
 	private AtomicInteger nextCounter = new AtomicInteger(1);
+	private boolean logQ = false;
 	private static final Logger log = Logger.getLogger(Counter.class);
 
 	/**
@@ -42,22 +43,25 @@ public final class Counter {
 	public Counter(final String prefix) {
 		this.prefix = prefix;
 	}
+	public void setLogQ(boolean logQ) {
+		this.logQ = logQ;
+	}
 	public void incCounter() {
 		int i = this.counter.incrementAndGet();
-		int n = this.nextCounter.get();
-		if (i >= n) {
-			if (i>1 && this.nextCounter.compareAndSet(n, n*2)) {
-				log.info(this.prefix + n);
-			}
+		if(logQ) {
+			int n = this.nextCounter.get();
+			if (i >= n)
+				if (i>1 && this.nextCounter.compareAndSet(n, n*2))
+					log.info(this.prefix + n);
 		}
 	}
 	public void decCounter() {
 		int i = this.counter.decrementAndGet();
-		int n = this.nextCounter.get();
-		if (i <= n/2) {
-			if (i>1 && this.nextCounter.compareAndSet(n, n/2)) {
-				log.info(this.prefix + n);
-			}
+		if(logQ) {
+			int n = this.nextCounter.get();
+			if (i <= n/2)
+				if (i>1 && this.nextCounter.compareAndSet(n, n/2))
+					log.info(this.prefix + n);
 		}
 	}
 	public void printCounter() {

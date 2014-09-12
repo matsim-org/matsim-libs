@@ -8,9 +8,9 @@ import java.awt.Polygon;
 import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Rectangle2D;
 import java.text.NumberFormat;
 
-import org.jfree.ui.Drawable;
 import org.matsim.api.core.v01.Coord;
 
 
@@ -138,6 +138,20 @@ public abstract class Painter {
 			polygon.addPoint(screenPoint[0], screenPoint[1]);
 		}
 		g2.fill(polygon);
+	}
+	protected void paintRectangle(Graphics2D g2, LayersPanel layersPanel, Coord ldCorner, double width, double height, Color color) {
+		g2.setColor(color);
+		int[] screenPoint = layersPanel.getScreenXY(new double[]{ldCorner.getX(), ldCorner.getY()});
+		int[] sizePoint = layersPanel.getScreenXY(new double[]{ldCorner.getX()+width, ldCorner.getY()+height});
+		Rectangle2D rectangle = new Rectangle2D.Double(screenPoint[0], screenPoint[1], sizePoint[0]-screenPoint[0], screenPoint[1]-sizePoint[1]);
+		g2.fill(rectangle);
+	}
+	protected void paintRectangleBorder(Graphics2D g2, LayersPanel layersPanel, Coord ldCorner, double width, double height, Color color) {
+		g2.setColor(color);
+		int[] screenPoint = layersPanel.getScreenXY(new double[]{ldCorner.getX(), ldCorner.getY()});
+		int[] sizePoint = layersPanel.getScreenXY(new double[]{ldCorner.getX()+width, ldCorner.getY()+height});
+		Rectangle2D rectangle = new Rectangle2D.Double(screenPoint[0], screenPoint[1], sizePoint[0]-screenPoint[0]-1, screenPoint[1]-sizePoint[1]-1);
+		g2.draw(rectangle);
 	}
 	protected void paintPolygonBorder(Graphics2D g2, LayersPanel layersPanel, double[][] points, Color color) {
 		g2.setColor(color);

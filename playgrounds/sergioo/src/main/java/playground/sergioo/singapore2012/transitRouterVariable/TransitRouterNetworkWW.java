@@ -126,8 +126,8 @@ public final class TransitRouterNetworkWW implements Network {
 	 */
 	public static final class TransitRouterNetworkLink implements Link {
 
-		public final TransitRouterNetworkNode fromNode;
-		public final TransitRouterNetworkNode toNode;
+		final TransitRouterNetworkNode fromNode;
+		final TransitRouterNetworkNode toNode;
 		final TransitRoute route;
 		final TransitLine line;
 		final Id<Link> id;

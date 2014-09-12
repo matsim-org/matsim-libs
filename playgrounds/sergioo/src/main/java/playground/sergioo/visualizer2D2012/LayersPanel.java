@@ -181,17 +181,20 @@ public abstract class LayersPanel extends JPanel {
 		System.out.println("Image saved");
 	}
 	protected void saveImage(String type, File file, int width, int height) {
+		int prevWidth = this.getSize().width, prevHeight = this.getSize().height;
 		Image windowImage = this.createImage(width, height);
-		//Camera camera = new Camera2D();
-		//camera.copyCamera(this.camera);
+		Camera camera = new Camera3DPersp();
+		camera.copyCamera(this.camera);
 		this.setSize(new Dimension(width, height));
-		//this.camera.copyCamera(camera);
+		this.camera.copyCamera(camera);
 		this.paintComponent(windowImage.getGraphics());
 		try {
 			ImageIO.write((RenderedImage) windowImage, type, file);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		this.setSize(new Dimension(prevWidth, prevHeight));
+		this.camera.copyCamera(camera);
 		System.out.println("Image saved");
 	}
 	public void viewAll() {

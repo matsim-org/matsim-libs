@@ -16,7 +16,6 @@ import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.households.Household;
 
 import playground.sergioo.passivePlanning2012.api.population.BasePerson;
@@ -25,6 +24,7 @@ import playground.sergioo.passivePlanning2012.core.population.decisionMakers.typ
 import playground.sergioo.passivePlanning2012.core.population.decisionMakers.types.ModeRouteDecisionMaker;
 import playground.sergioo.passivePlanning2012.core.population.decisionMakers.types.TypeOfActivityFacilityDecisionMaker;
 import playground.sergioo.passivePlanning2012.core.scenario.ScenarioSimplerNetwork;
+import playground.sergioo.weeklySimulation.util.misc.Time;
 
 public class SocialDecisionMaker extends PlaceSharer implements EndTimeDecisionMaker, TypeOfActivityFacilityDecisionMaker, ModeRouteDecisionMaker {
 
@@ -39,6 +39,7 @@ public class SocialDecisionMaker extends PlaceSharer implements EndTimeDecisionM
 	
 	//Constructors
 	public SocialDecisionMaker(ScenarioSimplerNetwork scenario, boolean carAvailability, Household household, Set<String> modes) {
+		super();
 		this.scenario = scenario;
 		this.household = household;
 		this.carAvailability = carAvailability;
@@ -70,13 +71,13 @@ public class SocialDecisionMaker extends PlaceSharer implements EndTimeDecisionM
 			}
 		else {
 			//Activities of the household
-			Period period = Period.getPeriod(time);
+			Time.Period period = Time.Period.getPeriod(time);
 			for(Id memberID:household.getMemberIds()) {
 				Person member = scenario.getPopulation().getPersons().get(memberID); 
-				if(member instanceof BasePerson && !((BasePerson)member).isPlanning())
+				if(member instanceof BasePerson)
 					for(Plan plan:member.getPlans())
 						for(PlanElement planElement:plan.getPlanElements())
-							if(planElement instanceof Activity && ((Activity)planElement).getEndTime()!=Time.UNDEFINED_TIME && Period.getPeriod(((Activity)planElement).getEndTime()).equals(period))
+							if(planElement instanceof Activity && ((Activity)planElement).getEndTime()!=Time.UNDEFINED_TIME && Time.Period.getPeriod(((Activity)planElement).getEndTime()).equals(period))
 								options.add(new Tuple<String, Id>(((Activity)planElement).getType(), ((Activity)planElement).getFacilityId()));
 			}
 		}

@@ -6,17 +6,12 @@ import java.util.concurrent.PriorityBlockingQueue;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.PtConstants;
-
-import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.agents.PassivePlannerDriverAgent;
 
 public class PassivePlanningActivityEngine implements MobsimEngine, ActivityHandler {
 
@@ -29,20 +24,20 @@ public class PassivePlanningActivityEngine implements MobsimEngine, ActivityHand
 	 * in the mean time, it might be inserted at the wrong position.
 	 * cdobler, apr'12
 	 */
-	private static class AgentEntry {
+	public static class AgentEntry {
+		public MobsimAgent agent;
+		public double activityEndTime;
 		public AgentEntry(MobsimAgent agent, double activityEndTime) {
 			this.agent = agent;
 			this.activityEndTime = activityEndTime;
 		}
-		MobsimAgent agent;
-		double activityEndTime;
 	}
 
 	/**
 	 * This list needs to be a "blocking" queue since this is needed for
 	 * thread-safety in the parallel qsim. cdobler, oct'10
 	 */
-	private Queue<AgentEntry> activityEndsList = new PriorityBlockingQueue<AgentEntry>(500, new Comparator<AgentEntry>() {
+	public static Queue<AgentEntry> activityEndsList = new PriorityBlockingQueue<AgentEntry>(500, new Comparator<AgentEntry>() {
 
 		@Override
 		public int compare(AgentEntry arg0, AgentEntry arg1) {
@@ -76,16 +71,10 @@ public class PassivePlanningActivityEngine implements MobsimEngine, ActivityHand
 		while (activityEndsList.peek() != null) {
 			MobsimAgent agent = activityEndsList.peek().agent;
 			if (activityEndsList.peek().activityEndTime <= time) {
-				AgentEntry entry = activityEndsList.poll();
-				if(entry.agent instanceof PassivePlannerDriverAgent) {
-					PlanElement element = ((PassivePlannerDriverAgent)entry.agent).getCurrentPlanElement();
-					if(entry.agent.getActivityEndTime()==Time.UNDEFINED_TIME && element instanceof Activity && !((Activity)element).getType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE))
-						System.out.println();
-				}
+				activityEndsList.poll();
 				unregisterAgentAtActivityLocation(agent);
 				agent.endActivityAndComputeNextState(time);
-				if(!(agent instanceof PassivePlannerDriverAgent) || ((PassivePlannerDriverAgent)agent).isPlanned())
-					internalInterface.arrangeNextAgentState(agent);
+				internalInterface.arrangeNextAgentState(agent);
 			} else {
 				return;
 			}
@@ -119,6 +108,11 @@ public class PassivePlanningActivityEngine implements MobsimEngine, ActivityHand
 		 */
 		if (agent.getActivityEndTime() == Double.POSITIVE_INFINITY) {
 			internalInterface.getMobsim().getAgentCounter().decLiving();
+		} else if (agent.getActivityEndTime() <= internalInterface.getMobsim().getSimTimer().getTimeOfDay()) {
+			// This activity is already over (planned for 0 duration)
+			// So we proceed immediately.
+			agent.endActivityAndComputeNextState(internalInterface.getMobsim().getSimTimer().getTimeOfDay());
+			internalInterface.arrangeNextAgentState(agent);
 		} else {
 			activityEndsList.add(new AgentEntry(agent, agent.getActivityEndTime()));
 			internalInterface.registerAdditionalAgentOnLink(agent);			
