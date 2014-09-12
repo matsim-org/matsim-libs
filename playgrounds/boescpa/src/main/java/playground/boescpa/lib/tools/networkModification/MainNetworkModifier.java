@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -46,11 +47,12 @@ public class MainNetworkModifier {
 	public static void main(String[] args) {
 		String path2MATSimNetwork = args[0];
 		radius = Integer.parseInt(args[1]);
+		String path2NewMATSimNetwork = args[2];
 
 		// Read network
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader NetworkReader = new MatsimNetworkReader(scenario);
-		NetworkReader.readFile(path2MATSimNetwork);
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
+		networkReader.readFile(path2MATSimNetwork);
 		Network network = scenario.getNetwork();
 
 		// Identify and modify links in area.
@@ -60,5 +62,8 @@ public class MainNetworkModifier {
 				link.setFreespeed(0.000000000000001); // Very low free speed...
 			}
 		}
+
+		// Write network
+		new NetworkWriter(network).write(path2NewMATSimNetwork);
 	}
 }
