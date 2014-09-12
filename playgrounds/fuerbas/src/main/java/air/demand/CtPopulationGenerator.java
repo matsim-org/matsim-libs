@@ -124,7 +124,7 @@ public class CtPopulationGenerator {
 			}
 
 			String fromLinkIdString = od.getFromAirportCode();
-			Id fromLinkId = sc.createId(fromLinkIdString);
+			Id<Link> fromLinkId = Id.create(fromLinkIdString, Link.class);
 			Link fromLink = network.getLinks().get(fromLinkId);
 			if (fromLink == null) {
 				log.warn("Link id " + fromLinkIdString + " not found in network!");
@@ -135,7 +135,7 @@ public class CtPopulationGenerator {
 			
 			for ( int i=0; i< od.getNumberOfTrips(); i++){	
 				String toLinkIdString = od.getToAirportCode();
-				Id toLinkId = sc.createId(toLinkIdString);
+				Id<Link> toLinkId = Id.create(toLinkIdString, Link.class);
 				if (fromLinkIdString.compareTo(toLinkIdString) == 0) {
 					removedTripsCounter += od.getNumberOfTrips();
 					continue;
@@ -147,7 +147,7 @@ public class CtPopulationGenerator {
 					missingDestinationAirports.add(toLinkIdString);
 					continue;
 				}
-				Person person = populationFactory.createPerson(sc.createId(String.valueOf(personIdCounter)));	// ID für aktuellen Passagier
+				Person person = populationFactory.createPerson(Id.create(String.valueOf(personIdCounter), Person.class));	// ID für aktuellen Passagier
 				personIdCounter++;
 				population.addPerson(person);
 

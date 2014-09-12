@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -73,26 +74,26 @@ public class PathSizeLogitSelectorTest {
 
 		//Two plans with exactly same structure but a big difference in the scores
 		PathSizeLogitSelector psls = new PathSizeLogitSelector(1, 2, mainModes);
-		Plan plan = psls.selectPlan(sc.getPopulation().getPersons().get(sc.createId("555555")));
+		Plan plan = psls.selectPlan(sc.getPopulation().getPersons().get(Id.create("555555", Person.class)));
 		System.out.println(plan);
 		Assert.assertNotNull(plan);
 		Assert.assertEquals(10.0, plan.getScore(), MatsimTestUtils.EPSILON);
 
 		//Two plans with exactly same structure no difference in the scores
 		psls = new PathSizeLogitSelector(50, 2, mainModes);
-		plan = psls.selectPlan(sc.getPopulation().getPersons().get(sc.createId("666666")));
+		plan = psls.selectPlan(sc.getPopulation().getPersons().get(Id.create("666666", Person.class)));
 		System.out.println(plan);
 		Assert.assertNotNull(plan); //can't test more both are exactly equal
 
 		//Two exactly equal plans (structure + score) with a third pt plan that is not similar and worse 
-		plan = psls.selectPlan(sc.getPopulation().getPersons().get(sc.createId("777777")));
+		plan = psls.selectPlan(sc.getPopulation().getPersons().get(Id.create("777777", Person.class)));
 		System.out.println(plan);
 		Assert.assertNotNull(plan);
 		Leg leg = (Leg) plan.getPlanElements().get(3);
 		Assert.assertEquals("PT1===TXL===TXL_MUC_SBA===TXL_MUC_SBA23===MUC", ((GenericRoute)leg.getRoute()).getRouteDescription());
 
 		//Two equal pt plans and one train plan
-		plan = psls.selectPlan(sc.getPopulation().getPersons().get(sc.createId("888888")));
+		plan = psls.selectPlan(sc.getPopulation().getPersons().get(Id.create("888888", Person.class)));
 		System.out.println(plan);
 		Assert.assertNotNull(plan);
 		leg = (Leg) plan.getPlanElements().get(3);
@@ -100,7 +101,7 @@ public class PathSizeLogitSelectorTest {
 		
 		//Two equal train plans and one pt plan with less score
 		psls = new PathSizeLogitSelector(20, 2, mainModes);
-		plan = psls.selectPlan(sc.getPopulation().getPersons().get(sc.createId("999999")));
+		plan = psls.selectPlan(sc.getPopulation().getPersons().get(Id.create("999999", Person.class)));
 		System.out.println(plan);
 		Assert.assertNotNull(plan);
 		leg = (Leg) plan.getPlanElements().get(1);
@@ -108,7 +109,7 @@ public class PathSizeLogitSelectorTest {
 
 		//Same as last test but with lest ps logit beta
 		psls = new PathSizeLogitSelector(10, 2, mainModes);
-		plan = psls.selectPlan(sc.getPopulation().getPersons().get(sc.createId("999999")));
+		plan = psls.selectPlan(sc.getPopulation().getPersons().get(Id.create("999999", Person.class)));
 		System.out.println(plan);
 		Assert.assertNotNull(plan);
 		leg = (Leg) plan.getPlanElements().get(1);
