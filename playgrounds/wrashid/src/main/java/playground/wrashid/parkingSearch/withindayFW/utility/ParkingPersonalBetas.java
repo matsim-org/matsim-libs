@@ -37,7 +37,7 @@ public class ParkingPersonalBetas {
 	public ParkingPersonalBetas(Scenario scenario, HashMap<Id, Double> houseHoldIncome) {
 		this.scenario = scenario;
 
-		if (this.houseHoldIncome == null) {
+		if (houseHoldIncome == null) {
 			houseHoldIncome = new HashMap<Id, Double>();
 
 			for (Id personId : scenario.getPopulation().getPersons().keySet()) {
