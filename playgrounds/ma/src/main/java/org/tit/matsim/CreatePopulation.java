@@ -90,7 +90,7 @@ public class CreatePopulation {
 				/*
 				 * Create a person and add it to the population
 				 */
-				Person person = populationFactory.createPerson(this.scenario.createId(parts[index_personId]));
+				Person person = populationFactory.createPerson(Id.create(parts[index_personId], Person.class));
 				((PersonImpl)person).setAge(Integer.parseInt(parts[index_age]));
 				
 				boolean employed = true;

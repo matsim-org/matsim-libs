@@ -2,8 +2,8 @@ package org.tit.matsim;
 
 import java.io.IOException;
 
-import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -65,8 +65,7 @@ public class Tutorial {
 		
 		for (int i = 0; i < 1000; i++) {
 			Double rDouble = Math.random()*0.08;
-			Person person = populationFactory.createPerson(sc.createId("pid"
-					+ i));
+			Person person = populationFactory.createPerson(Id.create("pid" + i, Person.class));
 
 			population.addPerson(person);
 			//

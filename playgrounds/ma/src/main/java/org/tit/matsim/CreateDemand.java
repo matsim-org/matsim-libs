@@ -97,7 +97,7 @@ public class CreateDemand {
 				/*
 				 * Create a person and add it to the population
 				 */
-				Person person = populationFactory.createPerson(this.scenario.createId(parts[index_personId].trim()));
+				Person person = populationFactory.createPerson(Id.create(parts[index_personId].trim(), Person.class));
 				population.addPerson(person);
 				
 				((PersonImpl)person).createDesires("desired activity durations");
