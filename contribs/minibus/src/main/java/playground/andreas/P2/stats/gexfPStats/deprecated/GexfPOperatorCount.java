@@ -64,7 +64,8 @@ import playground.andreas.P2.genericUtils.gexf.XMLNodesContent;
 import playground.andreas.P2.genericUtils.gexf.XMLTimeformatType;
 import playground.andreas.P2.genericUtils.gexf.viz.PositionContent;
 import playground.andreas.P2.helper.PConfigGroup;
-import playground.andreas.P2.stats.gexfPStats.CountPCoopHandler;
+import playground.andreas.P2.operator.Operator;
+import playground.andreas.P2.stats.gexfPStats.CountPOperatorHandler;
 import playground.andreas.P2.stats.gexfPStats.CountPPaxHandler;
 
 /**
@@ -74,26 +75,26 @@ import playground.andreas.P2.stats.gexfPStats.CountPPaxHandler;
  *
  */
 @Deprecated
-public class GexfPCoopCount extends MatsimJaxbXmlWriter implements StartupListener, IterationEndsListener, ShutdownListener{
+public class GexfPOperatorCount extends MatsimJaxbXmlWriter implements StartupListener, IterationEndsListener, ShutdownListener{
 	
-	private static final Logger log = Logger.getLogger(GexfPCoopCount.class);
+	private static final Logger log = Logger.getLogger(GexfPOperatorCount.class);
 	
 	private final static String XSD_PATH = "http://www.gexf.net/1.2draft/gexf.xsd";
-	private final static String FILENAME = "pCoopCount.gexf.gz";
+	private final static String FILENAME = "pOperatorCount.gexf.gz";
 
 	private ObjectFactory gexfFactory;
 	private XMLGexfContent gexfContainer;
 
-	private CountPCoopHandler eventsHandler;
+	private CountPOperatorHandler eventsHandler;
 	private String pIdentifier;
 	private int getWriteGexfStatsInterval;
 
-	private HashMap<Id,XMLEdgeContent> edgeMap;
-	private HashMap<Id,XMLAttvaluesContent> attValueContentMap;
+	private HashMap<Id<Link>, XMLEdgeContent> edgeMap;
+	private HashMap<Id<Link> ,XMLAttvaluesContent> attValueContentMap;
 
-	private HashMap<Id, Set<Id>> linkId2CoopIdsFromLastIteration;
+	private HashMap<Id<Link>, Set<Id<Operator>>> linkId2OperatorIdsFromLastIteration;
 
-	public GexfPCoopCount(PConfigGroup pConfig){
+	public GexfPOperatorCount(PConfigGroup pConfig){
 		this.getWriteGexfStatsInterval = pConfig.getGexfInterval();
 		this.pIdentifier = pConfig.getPIdentifier();
 		
@@ -116,15 +117,15 @@ public class GexfPCoopCount extends MatsimJaxbXmlWriter implements StartupListen
 			
 			XMLAttributeContent attContent = new XMLAttributeContent();
 			attContent.setId("weight");
-			attContent.setTitle("Number of cooperatives per iteration");
+			attContent.setTitle("Number of operators per iteration");
 			attContent.setType(XMLAttrtypeType.FLOAT);
 			
 			attsContent.getAttribute().add(attContent);		
 			this.gexfContainer.getGraph().getAttributesOrNodesOrEdges().add(attsContent);
 			
 			attContent = new XMLAttributeContent();
-			attContent.setId("coopIds");
-			attContent.setTitle("Ids of the cooperatives iteration");
+			attContent.setId("operatorIds");
+			attContent.setTitle("Ids of the operators iteration");
 			attContent.setType(XMLAttrtypeType.STRING);
 			
 			attsContent.getAttribute().add(attContent);		
@@ -137,9 +138,9 @@ public class GexfPCoopCount extends MatsimJaxbXmlWriter implements StartupListen
 		if (this.getWriteGexfStatsInterval > 0) {
 			this.addNetworkAsLayer(event.getControler().getNetwork(), 0);
 			this.createAttValues();
-			this.eventsHandler = new CountPCoopHandler(this.pIdentifier);
+			this.eventsHandler = new CountPOperatorHandler(this.pIdentifier);
 			event.getControler().getEvents().addHandler(this.eventsHandler);
-			this.linkId2CoopIdsFromLastIteration = new HashMap<Id, Set<Id>>();
+			this.linkId2OperatorIdsFromLastIteration = new HashMap<>();
 		}
 	}
 
@@ -148,7 +149,7 @@ public class GexfPCoopCount extends MatsimJaxbXmlWriter implements StartupListen
 		if (this.getWriteGexfStatsInterval > 0) {
 			this.addValuesToGexf(event.getIteration(), this.eventsHandler);
 			if ((event.getIteration() % this.getWriteGexfStatsInterval == 0) ) {
-				this.write(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), GexfPCoopCount.FILENAME));
+				this.write(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), GexfPOperatorCount.FILENAME));
 			}			
 		}		
 	}
@@ -156,55 +157,55 @@ public class GexfPCoopCount extends MatsimJaxbXmlWriter implements StartupListen
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		if (this.getWriteGexfStatsInterval > 0) {
-			this.write(event.getControler().getControlerIO().getOutputFilename(GexfPCoopCount.FILENAME));
+			this.write(event.getControler().getControlerIO().getOutputFilename(GexfPOperatorCount.FILENAME));
 		}		
 	}
 
 	private void createAttValues() {
-		this.attValueContentMap = new HashMap<Id, XMLAttvaluesContent>();
+		this.attValueContentMap = new HashMap<>();
 		
-		for (Entry<Id, XMLEdgeContent> entry : this.edgeMap.entrySet()) {
+		for (Entry<Id<Link>, XMLEdgeContent> entry : this.edgeMap.entrySet()) {
 			XMLAttvaluesContent attValueContent = new XMLAttvaluesContent();
 			entry.getValue().getAttvaluesOrSpellsOrColor().add(attValueContent);
 			this.attValueContentMap.put(entry.getKey(), attValueContent);
 		}		
 	}
 
-	private void addValuesToGexf(int iteration, CountPCoopHandler handler) {
-		for (Entry<Id, XMLAttvaluesContent> entry : this.attValueContentMap.entrySet()) {
+	private void addValuesToGexf(int iteration, CountPOperatorHandler handler) {
+		for (Entry<Id<Link>, XMLAttvaluesContent> entry : this.attValueContentMap.entrySet()) {
 			
-			Set<Id> coopsForLink = handler.getCoopsForLinkId(entry.getKey());
+			Set<Id<Operator>> operatorsForLink = handler.getOperatorIdsForLinkId(entry.getKey());
 			
 			// Test, if something changed
-			if (this.linkId2CoopIdsFromLastIteration.get(entry.getKey()) != null){
+			if (this.linkId2OperatorIdsFromLastIteration.get(entry.getKey()) != null){
 				// There is already an entry
-				if (this.linkId2CoopIdsFromLastIteration.get(entry.getKey()).equals(coopsForLink)) {
+				if (this.linkId2OperatorIdsFromLastIteration.get(entry.getKey()).equals(operatorsForLink)) {
 					// same as last iteration - ignore
 					continue;
 				}
 			}
 			
 			// completely new or not the same
-			XMLAttvalue coopIdValue = new XMLAttvalue();
-			XMLAttvalue coopCountValue = new XMLAttvalue();
+			XMLAttvalue operatorIdValue = new XMLAttvalue();
+			XMLAttvalue operatorCountValue = new XMLAttvalue();
 			
-			coopIdValue.setFor("coopIds");
-			coopCountValue.setFor("weight");
+			operatorIdValue.setFor("coopIds");
+			operatorCountValue.setFor("weight");
 			
-			if (coopsForLink == null) {
-				coopIdValue.setValue("");
-				coopCountValue.setValue("0");
+			if (operatorsForLink == null) {
+				operatorIdValue.setValue("");
+				operatorCountValue.setValue("0");
 			} else {
-				coopIdValue.setValue(coopsForLink.toString());
-				coopCountValue.setValue(Integer.toString(coopsForLink.size()));
+				operatorIdValue.setValue(operatorsForLink.toString());
+				operatorCountValue.setValue(Integer.toString(operatorsForLink.size()));
 			}
 			
-			coopIdValue.setStart(Double.toString(iteration));
-			coopCountValue.setStart(Double.toString(iteration));			
+			operatorIdValue.setStart(Double.toString(iteration));
+			operatorCountValue.setStart(Double.toString(iteration));			
 
-			entry.getValue().getAttvalue().add(coopIdValue);
-			entry.getValue().getAttvalue().add(coopCountValue);
-			this.linkId2CoopIdsFromLastIteration.put(entry.getKey(), coopsForLink);
+			entry.getValue().getAttvalue().add(operatorIdValue);
+			entry.getValue().getAttvalue().add(operatorCountValue);
+			this.linkId2OperatorIdsFromLastIteration.put(entry.getKey(), operatorsForLink);
 		}
 	}
 
@@ -213,7 +214,7 @@ public class GexfPCoopCount extends MatsimJaxbXmlWriter implements StartupListen
 		try {
 			jc = JAXBContext.newInstance(playground.andreas.P2.genericUtils.gexf.ObjectFactory.class);
 			Marshaller m = jc.createMarshaller();
-			super.setMarshallerProperties(GexfPCoopCount.XSD_PATH, m);
+			super.setMarshallerProperties(GexfPOperatorCount.XSD_PATH, m);
 			BufferedWriter bufout = IOUtils.getBufferedWriter(filename);
 			m.marshal(this.gexfContainer, bufout);
 			bufout.close();
@@ -255,7 +256,7 @@ public class GexfPCoopCount extends MatsimJaxbXmlWriter implements StartupListen
 		attr.add(edges);
 		List<XMLEdgeContent> edgeList = edges.getEdge();
 		
-		this.edgeMap = new HashMap<Id, XMLEdgeContent>();
+		this.edgeMap = new HashMap<>();
 		
 		for (Link link : network.getLinks().values()) {
 			

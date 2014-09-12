@@ -86,10 +86,10 @@ public class GexfPPaxCount extends MatsimJaxbXmlWriter implements StartupListene
 	private String pIdentifier;
 	private int getWriteGexfStatsInterval;
 
-	private HashMap<Id,XMLEdgeContent> edgeMap;
-	private HashMap<Id,XMLAttvaluesContent> attValueContentMap;
+	private HashMap<Id<Link>, XMLEdgeContent> edgeMap;
+	private HashMap<Id<Link>, XMLAttvaluesContent> attValueContentMap;
 
-	private HashMap<Id, Integer> linkId2CountsFromLastIteration;
+	private HashMap<Id<Link>, Integer> linkId2CountsFromLastIteration;
 
 	public GexfPPaxCount(PConfigGroup pConfig){
 		this.getWriteGexfStatsInterval = pConfig.getGexfInterval();
@@ -129,7 +129,7 @@ public class GexfPPaxCount extends MatsimJaxbXmlWriter implements StartupListene
 			this.createAttValues();
 			this.eventsHandler = new CountPPaxHandler(this.pIdentifier);
 			event.getControler().getEvents().addHandler(this.eventsHandler);
-			this.linkId2CountsFromLastIteration = new HashMap<Id, Integer>();
+			this.linkId2CountsFromLastIteration = new HashMap<>();
 		}
 	}
 
@@ -151,9 +151,9 @@ public class GexfPPaxCount extends MatsimJaxbXmlWriter implements StartupListene
 	}
 
 	private void createAttValues() {
-		this.attValueContentMap = new HashMap<Id, XMLAttvaluesContent>();
+		this.attValueContentMap = new HashMap<>();
 		
-		for (Entry<Id, XMLEdgeContent> entry : this.edgeMap.entrySet()) {
+		for (Entry<Id<Link>, XMLEdgeContent> entry : this.edgeMap.entrySet()) {
 			XMLAttvaluesContent attValueContent = new XMLAttvaluesContent();
 			entry.getValue().getAttvaluesOrSpellsOrColor().add(attValueContent);
 			this.attValueContentMap.put(entry.getKey(), attValueContent);
@@ -161,7 +161,7 @@ public class GexfPPaxCount extends MatsimJaxbXmlWriter implements StartupListene
 	}
 
 	private void addValuesToGexf(int iteration, CountPPaxHandler handler) {
-		for (Entry<Id, XMLAttvaluesContent> entry : this.attValueContentMap.entrySet()) {
+		for (Entry<Id<Link>, XMLAttvaluesContent> entry : this.attValueContentMap.entrySet()) {
 			
 			int countForLink = handler.getPaxCountForLinkId(entry.getKey());
 			
@@ -231,7 +231,7 @@ public class GexfPPaxCount extends MatsimJaxbXmlWriter implements StartupListene
 		attr.add(edges);
 		List<XMLEdgeContent> edgeList = edges.getEdge();
 		
-		this.edgeMap = new HashMap<Id, XMLEdgeContent>();
+		this.edgeMap = new HashMap<>();
 		
 		for (Link link : network.getLinks().values()) {
 			

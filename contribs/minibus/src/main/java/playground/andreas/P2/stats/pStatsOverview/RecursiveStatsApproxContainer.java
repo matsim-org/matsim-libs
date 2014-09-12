@@ -22,7 +22,7 @@ package playground.andreas.P2.stats.pStatsOverview;
 import org.apache.log4j.Logger;
 
 /**
- * Collects average number of cooperatives, routes, passengers and vehicles and its variance in a recursive manner using exponential smoothing
+ * Collects average number of operators, routes, passengers and vehicles and its variance in a recursive manner using exponential smoothing
  *  
  * @author aneumann
  *
@@ -31,16 +31,16 @@ public class RecursiveStatsApproxContainer {
 	
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(RecursiveStatsApproxContainer.class);
-	static final String toStringHeader = "# ES mean Coops; ES std dev Coops; ES mean Routes; ES std dev Routes; ES mean Pax; ES std dev Pax; ES mean Veh, ES std dev Veh"; 
+	static final String toStringHeader = "# ES mean Operators; ES std dev Operators; ES mean Routes; ES std dev Routes; ES mean Pax; ES std dev Pax; ES mean Veh, ES std dev Veh"; 
 
 	private final double alpha;
 	private final int initNEntries;
 	
 	private double numberOfEntries = Double.NaN;
 	
-	private double arithmeticMeanCoops;
-	private double tempVarCoops;
-	private double stdDevCoops;
+	private double arithmeticMeanOperators;
+	private double tempVarOperators;
+	private double stdDevOperators;
 	
 	private double arithmeticMeanRoutes;
 	private double tempVarRoutes;
@@ -59,14 +59,14 @@ public class RecursiveStatsApproxContainer {
 		this.initNEntries = initNEntries;
 	}
 	
-	public void handleNewEntry(double coops, double routes, double pax, double veh){
+	public void handleNewEntry(double operators, double routes, double pax, double veh){
 		
 		if(Double.isNaN(this.numberOfEntries)){
 			// initialize
 			this.numberOfEntries = 0;
-			this.arithmeticMeanCoops = 0;
-			this.tempVarCoops = 0;
-			this.stdDevCoops = 0;
+			this.arithmeticMeanOperators = 0;
+			this.tempVarOperators = 0;
+			this.stdDevOperators = 0;
 			this.arithmeticMeanRoutes = 0;
 			this.tempVarRoutes = 0;
 			this.stdDevRoutes = 0;
@@ -80,8 +80,8 @@ public class RecursiveStatsApproxContainer {
 
 		if(this.numberOfEntries < initNEntries){
 			// new entries n + 1
-			double meanCoops_n_1;
-			double tempVarCoops_n_1;
+			double meanOperators_n_1;
+			double tempVarOperators_n_1;
 			double meanRoutes_n_1;
 			double tempVarRoutes_n_1;
 			double meanPax_n_1;
@@ -90,18 +90,18 @@ public class RecursiveStatsApproxContainer {
 			double tempVarVeh_n_1;
 			
 			// calculate the exact mean and variance
-			meanCoops_n_1 =  (this.numberOfEntries * this.arithmeticMeanCoops + coops) / (this.numberOfEntries + 1);
+			meanOperators_n_1 =  (this.numberOfEntries * this.arithmeticMeanOperators + operators) / (this.numberOfEntries + 1);
 			meanRoutes_n_1 =  (this.numberOfEntries * this.arithmeticMeanRoutes + routes) / (this.numberOfEntries + 1);
 			meanPax_n_1 =  (this.numberOfEntries * this.arithmeticMeanPax + pax) / (this.numberOfEntries + 1);
 			meanVeh_n_1 =  (this.numberOfEntries * this.arithmeticMeanVeh + veh) / (this.numberOfEntries + 1);
 
 			if (this.numberOfEntries == 0) {
-				tempVarCoops_n_1 = 0;
+				tempVarOperators_n_1 = 0;
 				tempVarRoutes_n_1 = 0;
 				tempVarPax_n_1 = 0;
 				tempVarVeh_n_1 = 0;
 			} else {
-				tempVarCoops_n_1 = this.tempVarCoops + (this.numberOfEntries + 1) / (this.numberOfEntries) * (meanCoops_n_1 - coops) * (meanCoops_n_1 - coops);
+				tempVarOperators_n_1 = this.tempVarOperators + (this.numberOfEntries + 1) / (this.numberOfEntries) * (meanOperators_n_1 - operators) * (meanOperators_n_1 - operators);
 				tempVarRoutes_n_1 = this.tempVarRoutes + (this.numberOfEntries + 1) / (this.numberOfEntries) * (meanRoutes_n_1 - routes) * (meanRoutes_n_1 - routes);
 				tempVarPax_n_1 = this.tempVarPax + (this.numberOfEntries + 1) / (this.numberOfEntries) * (meanPax_n_1 - pax) * (meanPax_n_1 - pax);
 				tempVarVeh_n_1 = this.tempVarVeh + (this.numberOfEntries + 1) / (this.numberOfEntries) * (meanVeh_n_1 - veh) * (meanVeh_n_1 - veh);
@@ -110,8 +110,8 @@ public class RecursiveStatsApproxContainer {
 			this.numberOfEntries++;
 			
 			// store em away
-			this.arithmeticMeanCoops = meanCoops_n_1;
-			this.tempVarCoops = tempVarCoops_n_1;
+			this.arithmeticMeanOperators = meanOperators_n_1;
+			this.tempVarOperators = tempVarOperators_n_1;
 			this.arithmeticMeanRoutes = meanRoutes_n_1;
 			this.tempVarRoutes = tempVarRoutes_n_1;
 			this.arithmeticMeanPax = meanPax_n_1;
@@ -119,15 +119,15 @@ public class RecursiveStatsApproxContainer {
 			this.arithmeticMeanVeh = meanVeh_n_1;
 			this.tempVarVeh = tempVarVeh_n_1;
 			
-			this.stdDevCoops = this.getStdDevCoop();
+			this.stdDevOperators = this.getStdDevOperators();
 			this.stdDevRoutes = this.getStdDevRoutes();
 			this.stdDevPax = this.getStdDevPax();
 			this.stdDevVeh = this.getStdDevVeh();
 			
 		} else {			
 			// new entries n + 1
-			double meanCoops_n_1;
-			double tempStdDevCoops_n_1;
+			double meanOperators_n_1;
+			double tempStdDevOperators_n_1;
 			double meanRoutes_n_1;
 			double tempStdDevRoutes_n_1;
 			double meanPax_n_1;
@@ -136,12 +136,12 @@ public class RecursiveStatsApproxContainer {
 			double tempStdDevVeh_n_1;
 			
 			// approximate the mean and variance			
-			meanCoops_n_1 = (1 - this.alpha) * this.arithmeticMeanCoops + this.alpha * coops;
+			meanOperators_n_1 = (1 - this.alpha) * this.arithmeticMeanOperators + this.alpha * operators;
 			meanRoutes_n_1 = (1 - this.alpha) * this.arithmeticMeanRoutes + this.alpha * routes;
 			meanPax_n_1 = (1 -  this.alpha) * this.arithmeticMeanPax + this.alpha * pax;
 			meanVeh_n_1 = (1 - this.alpha) * this.arithmeticMeanVeh + this.alpha * veh;
 			
-			tempStdDevCoops_n_1 = (1 - this.alpha) * this.stdDevCoops + this.alpha * Math.sqrt((meanCoops_n_1 - coops) * (meanCoops_n_1 - coops));
+			tempStdDevOperators_n_1 = (1 - this.alpha) * this.stdDevOperators + this.alpha * Math.sqrt((meanOperators_n_1 - operators) * (meanOperators_n_1 - operators));
 			tempStdDevRoutes_n_1 = (1 - this.alpha) * this.stdDevRoutes + this.alpha * Math.sqrt((meanRoutes_n_1 - routes) * (meanRoutes_n_1 - routes));
 			tempStdDevPax_n_1 = (1 - this.alpha) * this.stdDevPax + this.alpha * Math.sqrt((meanPax_n_1 - pax) * (meanPax_n_1 - pax));
 			tempStdDevVeh_n_1 = (1 - this.alpha) * this.stdDevVeh + this.alpha * Math.sqrt((meanVeh_n_1 - veh) * (meanVeh_n_1 - veh));
@@ -149,8 +149,8 @@ public class RecursiveStatsApproxContainer {
 			this.numberOfEntries++;
 			
 			// store em away
-			this.arithmeticMeanCoops = meanCoops_n_1;
-			this.stdDevCoops = tempStdDevCoops_n_1;
+			this.arithmeticMeanOperators = meanOperators_n_1;
+			this.stdDevOperators = tempStdDevOperators_n_1;
 			this.arithmeticMeanRoutes = meanRoutes_n_1;
 			this.stdDevRoutes = tempStdDevRoutes_n_1;
 			this.arithmeticMeanPax = meanPax_n_1;
@@ -160,17 +160,17 @@ public class RecursiveStatsApproxContainer {
 		}
 	}
 
-	public double getArithmeticMeanCoops() {
-		return this.arithmeticMeanCoops;
+	public double getArithmeticMeanOperators() {
+		return this.arithmeticMeanOperators;
 	}
 
-	public double getStdDevCoop() {
+	public double getStdDevOperators() {
 
 		if (this.numberOfEntries > 1){
 			if (this.numberOfEntries <= this.initNEntries) {
-				return Math.sqrt(1.0/(this.numberOfEntries - 1.0) * this.tempVarCoops);				
+				return Math.sqrt(1.0/(this.numberOfEntries - 1.0) * this.tempVarOperators);	
 			} else {
-				return this.stdDevCoops;
+				return this.stdDevOperators;
 			}			
 		}
 		
@@ -185,7 +185,7 @@ public class RecursiveStatsApproxContainer {
 
 		if (this.numberOfEntries > 1){
 			if (this.numberOfEntries <= this.initNEntries) {
-				return Math.sqrt(1.0/(this.numberOfEntries - 1.0) * this.tempVarRoutes);				
+				return Math.sqrt(1.0/(this.numberOfEntries - 1.0) * this.tempVarRoutes);
 			} else {
 				return this.stdDevRoutes;
 			}			
@@ -202,7 +202,7 @@ public class RecursiveStatsApproxContainer {
 
 		if (this.numberOfEntries > 1){
 			if (this.numberOfEntries <= this.initNEntries) {
-				return Math.sqrt(1.0/(this.numberOfEntries - 1.0) * this.tempVarPax);				
+				return Math.sqrt(1.0/(this.numberOfEntries - 1.0) * this.tempVarPax);
 			} else {
 				return this.stdDevPax;
 			}
@@ -219,7 +219,7 @@ public class RecursiveStatsApproxContainer {
 
 		if (this.numberOfEntries > 1){
 			if (this.numberOfEntries <= this.initNEntries) {
-				return Math.sqrt(1.0/(this.numberOfEntries - 1.0) * this.tempVarVeh);				
+				return Math.sqrt(1.0/(this.numberOfEntries - 1.0) * this.tempVarVeh);
 			} else {
 				return this.stdDevVeh;
 			}
@@ -231,8 +231,8 @@ public class RecursiveStatsApproxContainer {
 	@Override
 	public String toString() {
 		StringBuffer strBuffer = new StringBuffer();
-		strBuffer.append(this.getArithmeticMeanCoops()); strBuffer.append("; ");
-		strBuffer.append(this.getStdDevCoop()); strBuffer.append("; ");
+		strBuffer.append(this.getArithmeticMeanOperators()); strBuffer.append("; ");
+		strBuffer.append(this.getStdDevOperators()); strBuffer.append("; ");
 		strBuffer.append(this.getArithmeticMeanRoutes()); strBuffer.append("; ");
 		strBuffer.append(this.getStdDevRoutes()); strBuffer.append("; ");
 		strBuffer.append(this.getArithmeticMeanPax()); strBuffer.append("; ");

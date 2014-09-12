@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.network.Link;
 
 /**
  * Counts the number of paratransit vehicles per link
@@ -40,12 +41,13 @@ public class CountPVehHandler implements LinkEnterEventHandler{
 	private static final Logger log = Logger.getLogger(CountPVehHandler.class);
 	
 	private String pIdentifier;
-	private HashMap<Id, HashMap<String, Integer>> linkId2LineId2CountsMap;
+	private HashMap<Id<Link>, HashMap<String, Integer>> linkId2LineId2CountsMap;
+	// TODO [AN] Check if this can be replaced by Set<Id<TransitLine/Operator>> lineIds
 	private Set<String> lineIds;
 
 	public CountPVehHandler(String pIdentifier) {
 		this.pIdentifier = pIdentifier;
-		this.linkId2LineId2CountsMap = new HashMap<Id, HashMap<String, Integer>>();
+		this.linkId2LineId2CountsMap = new HashMap<>();
 		this.lineIds = new TreeSet<String>();
 	}
 	
@@ -53,7 +55,7 @@ public class CountPVehHandler implements LinkEnterEventHandler{
 		return this.lineIds;
 	}
 
-	public int getVehCountForLinkId(Id linkId){
+	public int getVehCountForLinkId(Id<Link> linkId){
 		int count = 0;
 		if (this.linkId2LineId2CountsMap.get(linkId) != null) {
 			for (Integer countEntryForLine : this.linkId2LineId2CountsMap.get(linkId).values()) {
@@ -63,7 +65,7 @@ public class CountPVehHandler implements LinkEnterEventHandler{
 		return count;
 	}
 	
-	public int getVehCountForLinkId(Id linkId, String lineId){
+	public int getVehCountForLinkId(Id<Link> linkId, String lineId){
 		if (this.linkId2LineId2CountsMap.get(linkId) != null) {
 			if (this.linkId2LineId2CountsMap.get(linkId).get(lineId) != null) {
 				return this.linkId2LineId2CountsMap.get(linkId).get(lineId).intValue();
@@ -74,7 +76,7 @@ public class CountPVehHandler implements LinkEnterEventHandler{
 
 	@Override
 	public void reset(int iteration) {
-		this.linkId2LineId2CountsMap = new HashMap<Id, HashMap<String, Integer>>();
+		this.linkId2LineId2CountsMap = new HashMap<>();
 		this.lineIds = new TreeSet<String>();
 	}
 

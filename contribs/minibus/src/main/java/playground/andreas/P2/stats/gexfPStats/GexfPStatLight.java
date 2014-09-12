@@ -85,11 +85,11 @@ public class GexfPStatLight extends MatsimJaxbXmlWriter implements StartupListen
 	private String pIdentifier;
 	private int getWriteGexfStatsInterval;
 
-	private HashMap<Id,XMLEdgeContent> edgeMap;
-	private HashMap<Id,XMLAttvaluesContent> linkAttributeValueContentMap;
+	private HashMap<Id<Link>, XMLEdgeContent> edgeMap;
+	private HashMap<Id<Link>, XMLAttvaluesContent> linkAttributeValueContentMap;
 
-	private HashMap<Id, Integer> linkId2TotalCountsFromLastIteration;
-	private HashMap<Id, Integer> linkId2VehCountsFromLastIteration;
+	private HashMap<Id<Link>, Integer> linkId2TotalCountsFromLastIteration;
+	private HashMap<Id<Link>, Integer> linkId2VehCountsFromLastIteration;
 
 
 	public GexfPStatLight(PConfigGroup pConfig){
@@ -136,10 +136,10 @@ public class GexfPStatLight extends MatsimJaxbXmlWriter implements StartupListen
 			this.createAttValues();
 			this.globalPaxHandler = new CountPPaxHandler(this.pIdentifier);
 			event.getControler().getEvents().addHandler(this.globalPaxHandler);
-			this.linkId2TotalCountsFromLastIteration = new HashMap<Id, Integer>();			
+			this.linkId2TotalCountsFromLastIteration = new HashMap<>();			
 			this.vehHandler = new CountPVehHandler(this.pIdentifier);
 			event.getControler().getEvents().addHandler(this.vehHandler);
-			this.linkId2VehCountsFromLastIteration = new HashMap<Id, Integer>();
+			this.linkId2VehCountsFromLastIteration = new HashMap<>();
 		}
 	}
 
@@ -161,9 +161,9 @@ public class GexfPStatLight extends MatsimJaxbXmlWriter implements StartupListen
 	}
 
 	private void createAttValues() {
-		this.linkAttributeValueContentMap = new HashMap<Id, XMLAttvaluesContent>();
+		this.linkAttributeValueContentMap = new HashMap<>();
 		
-		for (Entry<Id, XMLEdgeContent> entry : this.edgeMap.entrySet()) {
+		for (Entry<Id<Link>, XMLEdgeContent> entry : this.edgeMap.entrySet()) {
 			XMLAttvaluesContent attValueContent = new XMLAttvaluesContent();
 			entry.getValue().getAttvaluesOrSpellsOrColor().add(attValueContent);
 			this.linkAttributeValueContentMap.put(entry.getKey(), attValueContent);
@@ -171,7 +171,7 @@ public class GexfPStatLight extends MatsimJaxbXmlWriter implements StartupListen
 	}
 
 	private void addValuesToGexf(int iteration) {
-		for (Entry<Id, XMLAttvaluesContent> linkEntry : this.linkAttributeValueContentMap.entrySet()) {
+		for (Entry<Id<Link>, XMLAttvaluesContent> linkEntry : this.linkAttributeValueContentMap.entrySet()) {
 			
 			int countForLink = this.globalPaxHandler.getPaxCountForLinkId(linkEntry.getKey());
 			
@@ -192,7 +192,7 @@ public class GexfPStatLight extends MatsimJaxbXmlWriter implements StartupListen
 			this.linkId2TotalCountsFromLastIteration.put(linkEntry.getKey(), countForLink);
 		}		
 		
-		for (Entry<Id, XMLAttvaluesContent> linkEntry : this.linkAttributeValueContentMap.entrySet()) {
+		for (Entry<Id<Link>, XMLAttvaluesContent> linkEntry : this.linkAttributeValueContentMap.entrySet()) {
 			
 			int countForLink = this.vehHandler.getVehCountForLinkId(linkEntry.getKey());
 			
@@ -261,7 +261,7 @@ public class GexfPStatLight extends MatsimJaxbXmlWriter implements StartupListen
 		attr.add(edges);
 		List<XMLEdgeContent> edgeList = edges.getEdge();
 		
-		this.edgeMap = new HashMap<Id, XMLEdgeContent>();
+		this.edgeMap = new HashMap<>();
 		
 		for (Link link : network.getLinks().values()) {
 			

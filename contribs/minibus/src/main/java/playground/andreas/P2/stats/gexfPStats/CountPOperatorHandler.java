@@ -29,52 +29,58 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.vehicles.Vehicle;
+
+import playground.andreas.P2.operator.Operator;
 
 /**
- * Counts the number of cooperatives per link
+ * Counts the number of operators per link
  * 
  * @author aneumann
  *
  */
-public class CountPCoopHandler implements LinkEnterEventHandler, TransitDriverStartsEventHandler{
+public class CountPOperatorHandler implements LinkEnterEventHandler, TransitDriverStartsEventHandler{
 	
 	@SuppressWarnings("unused")
-	private static final Logger log = Logger.getLogger(CountPCoopHandler.class);
+	private static final Logger log = Logger.getLogger(CountPOperatorHandler.class);
 	
 	private String pIdentifier;
-	private HashMap<Id, Set<Id>> linkId2CoopIdsSetMap;
-	private HashMap<Id, Id> vehId2lineIdMap;
+	private HashMap<Id<Link>, Set<Id<Operator>>> linkId2OperatorIdsSetMap;
+	private HashMap<Id<Vehicle>, Id<TransitLine>> vehId2lineIdMap;
 
-	public CountPCoopHandler(String pIdentifier) {
+	public CountPOperatorHandler(String pIdentifier) {
 		this.pIdentifier = pIdentifier;
-		this.linkId2CoopIdsSetMap = new HashMap<Id, Set<Id>>();
-		this.vehId2lineIdMap = new HashMap<Id, Id>();
+		this.linkId2OperatorIdsSetMap = new HashMap<>();
+		this.vehId2lineIdMap = new HashMap<>();
 	}
 
-	public Set<Id> getCoopsForLinkId(Id linkId) {
-		Set<Id> lineIds = this.linkId2CoopIdsSetMap.get(linkId);
-		if(lineIds == null){
-			return new TreeSet<Id>();
+	public Set<Id<Operator>> getOperatorIdsForLinkId(Id<Link> linkId) {
+		Set<Id<Operator>> operatorIds = this.linkId2OperatorIdsSetMap.get(linkId);
+		if(operatorIds == null){
+			return new TreeSet<Id<Operator>>();
 		} else {
-			return lineIds;
+			return operatorIds;
 		}
 	}
 
 	@Override
 	public void reset(int iteration) {
-		this.linkId2CoopIdsSetMap = new HashMap<Id, Set<Id>>();
-		this.vehId2lineIdMap = new HashMap<Id, Id>();
+		this.linkId2OperatorIdsSetMap = new HashMap<>();
+		this.vehId2lineIdMap = new HashMap<>();
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		// add the id of the cooperative to the set of ids of the link
+		// add the id of the operator to the set of ids of the link
 		if(event.getVehicleId().toString().contains(this.pIdentifier)){
-			if (this.linkId2CoopIdsSetMap.get(event.getLinkId()) == null) {
-				this.linkId2CoopIdsSetMap.put(event.getLinkId(), new TreeSet<Id>());
+			if (this.linkId2OperatorIdsSetMap.get(event.getLinkId()) == null) {
+				this.linkId2OperatorIdsSetMap.put(event.getLinkId(), new TreeSet<Id<Operator>>());
 			}
 			
-			this.linkId2CoopIdsSetMap.get(event.getLinkId()).add(this.vehId2lineIdMap.get(event.getVehicleId()));
+			Id<Operator> operatorId = Id.create(this.vehId2lineIdMap.get(event.getVehicleId()), Operator.class);
+			this.linkId2OperatorIdsSetMap.get(event.getLinkId()).add(operatorId);
 		}		
 	}
 

@@ -31,6 +31,8 @@ import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Counts the number of passenger of paratransit vehicles per link
@@ -43,14 +45,15 @@ public class CountPPaxHandler implements LinkEnterEventHandler, PersonEntersVehi
 	private static final Logger log = Logger.getLogger(CountPPaxHandler.class);
 	
 	private String pIdentifier;
-	private HashMap<Id, HashMap<String, Integer>> linkId2LineId2CountsMap;
-	private HashMap<Id, Integer> vehId2CountsMap;
+	private HashMap<Id<Link>, HashMap<String, Integer>> linkId2LineId2CountsMap;
+	private HashMap<Id<Vehicle>, Integer> vehId2CountsMap;
+	// TODO [AN] Check if this can be replaced by Set<Id<TransitLine/Operator>> lineIds
 	private Set<String> lineIds;
 
 	public CountPPaxHandler(String pIdentifier) {
 		this.pIdentifier = pIdentifier;
-		this.linkId2LineId2CountsMap = new HashMap<Id, HashMap<String, Integer>>();
-		this.vehId2CountsMap =  new HashMap<Id, Integer>();
+		this.linkId2LineId2CountsMap = new HashMap<>();
+		this.vehId2CountsMap =  new HashMap<>();
 		this.lineIds = new TreeSet<String>();
 	}
 	
@@ -58,7 +61,7 @@ public class CountPPaxHandler implements LinkEnterEventHandler, PersonEntersVehi
 		return this.lineIds;
 	}
 
-	public int getPaxCountForLinkId(Id linkId){
+	public int getPaxCountForLinkId(Id<Link> linkId){
 		int count = 0;
 		if (this.linkId2LineId2CountsMap.get(linkId) != null) {
 			for (Integer countEntryForLine : this.linkId2LineId2CountsMap.get(linkId).values()) {
@@ -68,7 +71,7 @@ public class CountPPaxHandler implements LinkEnterEventHandler, PersonEntersVehi
 		return count;
 	}
 	
-	public int getPaxCountForLinkId(Id linkId, String lineId){
+	public int getPaxCountForLinkId(Id<Link> linkId, String lineId){
 		if (this.linkId2LineId2CountsMap.get(linkId) != null) {
 			if (this.linkId2LineId2CountsMap.get(linkId).get(lineId) != null) {
 				return this.linkId2LineId2CountsMap.get(linkId).get(lineId).intValue();
@@ -79,13 +82,13 @@ public class CountPPaxHandler implements LinkEnterEventHandler, PersonEntersVehi
 
 	@Override
 	public void reset(int iteration) {
-		this.linkId2LineId2CountsMap = new HashMap<Id, HashMap<String, Integer>>();
+		this.linkId2LineId2CountsMap = new HashMap<>();
 		for (Integer count : this.vehId2CountsMap.values()) {
 			if(count != 0){
 				log.warn("Should not have a count different zero " + count);
 			}
 		}
-		this.vehId2CountsMap = new HashMap<Id, Integer>();
+		this.vehId2CountsMap = new HashMap<>();
 		this.lineIds = new TreeSet<String>();
 	}
 

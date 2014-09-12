@@ -48,7 +48,7 @@ public class Line2GexfPStat implements StartupListener, IterationEndsListener, S
 	private String gexfOutputDir;
 	
 	private CountPPaxHandler globalPaxHandler;
-	private CountPCoopHandler coopHandler;
+	private CountPOperatorHandler operatorHandler;
 	private CountPVehHandler vehHandler;
 	
 	private PConfigGroup pConfig;
@@ -72,8 +72,8 @@ public class Line2GexfPStat implements StartupListener, IterationEndsListener, S
 			this.globalPaxHandler = new CountPPaxHandler(this.pConfig.getPIdentifier());
 			event.getControler().getEvents().addHandler(this.globalPaxHandler);
 
-			this.coopHandler = new CountPCoopHandler(this.pConfig.getPIdentifier());
-			event.getControler().getEvents().addHandler(this.coopHandler);
+			this.operatorHandler = new CountPOperatorHandler(this.pConfig.getPIdentifier());
+			event.getControler().getEvents().addHandler(this.operatorHandler);
 			
 			this.vehHandler = new CountPVehHandler(this.pConfig.getPIdentifier());
 			event.getControler().getEvents().addHandler(this.vehHandler);
@@ -96,7 +96,7 @@ public class Line2GexfPStat implements StartupListener, IterationEndsListener, S
 				if (this.lineId2GexfPStat.get(lineId) == null) {
 					// new line - create new gexf
 					SimpleGexfPStat gexf = new SimpleGexfPStat(this.pConfig, lineId, this.gexfOutputDir);
-					gexf.notifyStartup(event.getControler().getNetwork(), this.globalPaxHandler, this.coopHandler, this.vehHandler);
+					gexf.notifyStartup(event.getControler().getNetwork(), this.globalPaxHandler, this.operatorHandler, this.vehHandler);
 					this.lineId2GexfPStat.put(lineId, gexf);
 				}
 

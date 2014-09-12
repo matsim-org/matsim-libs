@@ -61,8 +61,8 @@ import playground.andreas.P2.genericUtils.gexf.viz.PositionContent;
 import playground.andreas.P2.helper.PConfigGroup;
 
 /**
- * Uses a {@link CountPPaxHandler} to count passengers per paratransit vehicle and link, {@link CountPCoopHandler} to count cooperatives and their ids and writes them to a gexf network as dynamic link attributes.
- * In addition, writes one column per link and cooperative with its number of passengers served.
+ * Uses a {@link CountPPaxHandler} to count passengers per paratransit vehicle and link, {@link CountPOperatorHandler} to count operators and their ids and writes them to a gexf network as dynamic link attributes.
+ * In addition, writes one column per link and operator with its number of passengers served.
  * 
  * @author aneumann
  *
@@ -79,15 +79,16 @@ public class SimpleGexfPStat extends MatsimJaxbXmlWriter implements IterationEnd
 	private XMLGexfContent gexfContainer;
 
 	private CountPPaxHandler globalPaxHandler;
-	private CountPCoopHandler coopHandler;
+	// TODO [AN] The operatorHandler is never used?
+	private CountPOperatorHandler operatorHandler;
 	private CountPVehHandler vehHandler;
 	private int getWriteGexfStatsInterval;
 
-	private HashMap<Id,XMLEdgeContent> edgeMap;
-	private HashMap<Id,XMLAttvaluesContent> linkAttributeValueContentMap;
+	private HashMap<Id<Link>, XMLEdgeContent> edgeMap;
+	private HashMap<Id<Link>, XMLAttvaluesContent> linkAttributeValueContentMap;
 
-	private HashMap<Id, Integer> linkId2TotalCountsFromLastIteration;
-	private HashMap<Id, Integer> linkId2VehCountsFromLastIteration;
+	private HashMap<Id<Link>, Integer> linkId2TotalCountsFromLastIteration;
+	private HashMap<Id<Link>, Integer> linkId2VehCountsFromLastIteration;
 
 	private String lineId;
 	private String outputFilename;
@@ -123,14 +124,14 @@ public class SimpleGexfPStat extends MatsimJaxbXmlWriter implements IterationEnd
 			edgeAttributeContentsContainer.getAttribute().add(attributeContent);		
 			
 			attributeContent = new XMLAttributeContent();
-			attributeContent.setId("nCoops");
-			attributeContent.setTitle("Number of cooperatives per iteration");
+			attributeContent.setId("nOperators");
+			attributeContent.setTitle("Number of operators per iteration");
 			attributeContent.setType(XMLAttrtypeType.FLOAT);
 			edgeAttributeContentsContainer.getAttribute().add(attributeContent);		
 			
 			attributeContent = new XMLAttributeContent();
-			attributeContent.setId("coopIds");
-			attributeContent.setTitle("Ids of the cooperatives iteration");
+			attributeContent.setId("operatorIds");
+			attributeContent.setTitle("Ids of the operators iteration");
 			attributeContent.setType(XMLAttrtypeType.STRING);
 			edgeAttributeContentsContainer.getAttribute().add(attributeContent);
 			
@@ -144,21 +145,21 @@ public class SimpleGexfPStat extends MatsimJaxbXmlWriter implements IterationEnd
 		}
 	}
 
-	public void notifyStartup(Network network, CountPPaxHandler globalPaxHandler, CountPCoopHandler coopHandler, CountPVehHandler vehHandler) {
+	public void notifyStartup(Network network, CountPPaxHandler globalPaxHandler, CountPOperatorHandler operatorHandler, CountPVehHandler vehHandler) {
 		this.globalPaxHandler = globalPaxHandler;
-		this.coopHandler = coopHandler;
+		this.operatorHandler = operatorHandler;
 		this.vehHandler = vehHandler;
 
 		this.addNetworkAsLayer(network, 0);
 		this.createAttValues();
-		this.linkId2TotalCountsFromLastIteration = new HashMap<Id, Integer>();			
-		this.linkId2VehCountsFromLastIteration = new HashMap<Id, Integer>();
+		this.linkId2TotalCountsFromLastIteration = new HashMap<>();			
+		this.linkId2VehCountsFromLastIteration = new HashMap<>();
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		if (this.getWriteGexfStatsInterval > 0) {
-			this.addValuesToGexf(event.getIteration(), this.globalPaxHandler, this.coopHandler);
+			this.addValuesToGexf(event.getIteration(), this.globalPaxHandler, this.operatorHandler);
 			if ((event.getIteration() % this.getWriteGexfStatsInterval == 0) ) {
 				this.write(this.outputFilename);
 			}			
@@ -166,22 +167,22 @@ public class SimpleGexfPStat extends MatsimJaxbXmlWriter implements IterationEnd
 	}
 
 	public void notifyShutdown(int iteration) {
-		this.addValuesToGexf(iteration, this.globalPaxHandler, this.coopHandler);
+		this.addValuesToGexf(iteration, this.globalPaxHandler, this.operatorHandler);
 		this.write(this.outputFilename);
 	}
 
 	private void createAttValues() {
-		this.linkAttributeValueContentMap = new HashMap<Id, XMLAttvaluesContent>();
+		this.linkAttributeValueContentMap = new HashMap<>();
 		
-		for (Entry<Id, XMLEdgeContent> entry : this.edgeMap.entrySet()) {
+		for (Entry<Id<Link>, XMLEdgeContent> entry : this.edgeMap.entrySet()) {
 			XMLAttvaluesContent attValueContent = new XMLAttvaluesContent();
 			entry.getValue().getAttvaluesOrSpellsOrColor().add(attValueContent);
 			this.linkAttributeValueContentMap.put(entry.getKey(), attValueContent);
 		}		
 	}
 
-	private void addValuesToGexf(int iteration, CountPPaxHandler paxHandler, CountPCoopHandler coopHandler) {
-		for (Entry<Id, XMLAttvaluesContent> linkEntry : this.linkAttributeValueContentMap.entrySet()) {
+	private void addValuesToGexf(int iteration, CountPPaxHandler paxHandler, CountPOperatorHandler operatorHandler) {
+		for (Entry<Id<Link>, XMLAttvaluesContent> linkEntry : this.linkAttributeValueContentMap.entrySet()) {
 			
 			int countForLink = paxHandler.getPaxCountForLinkId(linkEntry.getKey(), this.lineId);
 			
@@ -202,7 +203,7 @@ public class SimpleGexfPStat extends MatsimJaxbXmlWriter implements IterationEnd
 			this.linkId2TotalCountsFromLastIteration.put(linkEntry.getKey(), countForLink);
 		}
 			
-		for (Entry<Id, XMLAttvaluesContent> linkEntry : this.linkAttributeValueContentMap.entrySet()) {
+		for (Entry<Id<Link>, XMLAttvaluesContent> linkEntry : this.linkAttributeValueContentMap.entrySet()) {
 			
 			int countForLink = vehHandler.getVehCountForLinkId(linkEntry.getKey(), this.lineId);
 			
@@ -271,7 +272,7 @@ public class SimpleGexfPStat extends MatsimJaxbXmlWriter implements IterationEnd
 		attr.add(edges);
 		List<XMLEdgeContent> edgeList = edges.getEdge();
 		
-		this.edgeMap = new HashMap<Id, XMLEdgeContent>();
+		this.edgeMap = new HashMap<>();
 		
 		for (Link link : network.getLinks().values()) {
 			
