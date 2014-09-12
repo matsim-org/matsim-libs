@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
@@ -197,7 +198,7 @@ public class MyCommercialDemandGeneratorOld {
 
 				for (Plan pp : planList) {
 					// Create a truck agent
-					Id id = sc.createId(Long.toString(agentId));
+					Id<Person> id = Id.create(agentId, Person.class);
 					PersonImpl truck = (PersonImpl) pb.createPerson(id);
 					truck.addPlan(pp);
 					pp.setPerson(truck);
