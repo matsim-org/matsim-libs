@@ -125,9 +125,9 @@ public class CarTravelTimes {
 		s = readLink.readLine();
 		while(s != null) {
 			String[] arr = s.split("\\t");
-			CoordImpl coordStart = new CoordImpl(arr[4], arr[5]);
+			CoordImpl coordStart = new CoordImpl(arr[5], arr[6]);
 			Link lStart = MyLinkUtils.getClosestLink(network, coordStart);
-			CoordImpl coordEnd = new CoordImpl(arr[6], arr[7]);
+			CoordImpl coordEnd = new CoordImpl(arr[7], arr[8]);
 			Link lEnd = MyLinkUtils.getClosestLink(network, coordEnd);
 			
 			PersonImpl person = new PersonImpl(new IdImpl(arr[0]));
@@ -139,7 +139,7 @@ public class CarTravelTimes {
 			//double h = Double.parseDouble(arr2[0]);
 			//double m = Double.parseDouble(arr2[1]);
 			//act.setEndTime(h * 3600 + m * 60);
-			act.setEndTime(60.0 * Double.parseDouble(arr[2]));
+			act.setEndTime(60.0 * Double.parseDouble(arr[3]));
 			plan.addActivity(act);
 			
 			LegImpl leg = new LegImpl("car");
