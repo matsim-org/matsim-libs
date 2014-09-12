@@ -23,47 +23,35 @@ package playground.boescpa.lib.tools.networkModification;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
- * Identify links close to a given center and modify them.
- *
- * The present setting makes links close to Zurich HB untravelable...
+ * WHAT IS IT FOR?
+ * WHAT DOES IT?
  *
  * @author boescpa
  */
-public class MainNetworkModifier {
-
-	private static int radius;
-	private static final Coord center = new CoordImpl(682952.0,247797.0); // A bit south of HB Zurich...
+public class NetworkModifierOnlyCar extends AbstractNetworkModifier {
+	public NetworkModifierOnlyCar(Coord center) {
+		super(center);
+	}
 
 	public static void main(String[] args) {
-		String path2MATSimNetwork = args[0];
-		radius = Integer.parseInt(args[1]);
-		String path2NewMATSimNetwork = args[2];
+		AbstractNetworkModifier networkModifier = new NetworkModifierOnlyCar(new CoordImpl(682952.0,247797.0)); // A bit south of HB Zurich...);
+		networkModifier.run(args);
+	}
 
-		// Read network
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
-		networkReader.readFile(path2MATSimNetwork);
-		Network network = scenario.getNetwork();
-
-		// Identify and modify links in area.
-		for (Link link : network.getLinks().values()) {
-			if (CoordUtils.calcDistance(link.getCoord(), center) <= radius) {
-				link.setCapacity(100.0); // Very low capacity...
-				link.setFreespeed(0.000000000000001); // Very low free speed...
-			}
+	@Override
+	public boolean isLinkAffected(Link link) {
+		// Area:
+		boolean isAffected = CoordUtils.calcDistance(link.getFromNode().getCoord(), center) <= radius ||
+				CoordUtils.calcDistance(link.getToNode().getCoord(), center) <= radius ||
+				CoordUtils.calcDistance(link.getCoord(), center) <= radius;
+		// Mode:
+		if (isAffected) {
+			isAffected = link.getAllowedModes().contains("car");
 		}
-
-		// Write network
-		new NetworkWriter(network).write(path2NewMATSimNetwork);
+		return isAffected;
 	}
 }
