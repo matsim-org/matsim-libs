@@ -5,9 +5,9 @@
 
 \bigskip
 
-\begin{chapter-intro}
-Some chapter intro.
-\end{chapter-intro}
+%%\begin{chapter-intro}
+%%Some chapter intro.
+%%\end{chapter-intro}
 
 \section{Software}
 
@@ -47,7 +47,7 @@ The performance of MATSim depends on a lot of different factors:
 \begin{itemize}
 \item CPU-speed (although by far not always the limiting factor!)
 \item Memory-Bus / -Controller (we're moving huge amounts of memory, the faster the better)
-\item Java Virtual Machine (JVM 1.6 is usually faster than JVM 1.5), {\color{red} and we are now (September 2014) officially on Java 1.7}.
+\item Java Virtual Machine (JVM 1.7 is usually faster than JVM 1.6)%%, {\color{red} and we are now (September 2014) officially on Java 1.7}.
 \item File system (local Hard drive vs. RAID vs. NFS vs \ldots)
 \end{itemize}
 To get a better understanding, under which circumstances MATSim performs best, we created a simple benchmark (performance test) that runs 20 iterations of a sample scenario with different settings. If you run the benchmark on your machine, we would be happy if you could send us your results.
@@ -146,7 +146,7 @@ On the Lenovo Laptop, an OpenJDK 6u0 64-bit JVM was used.
 \caption{The average of two runs of the benchmark for laptops.}
 \label{fig:Benchmark03}
 \end{figure}
-Surprisingly, Apple pulled the trick to make their 64-bit Java 6 a lot faster than the older 32-bit Java 5—well, it could also mean that their Java 5 offering is just very slow\ldots The Mac-port of OpenJDK 6 (\emph{Soylatte}) is even a bit faster, but that may be likely due to the difference between 64-bit and 32-bit.
+Surprisingly, Apple pulled the trick to make their 64-bit Java 6 a lot faster than the older 32-bit Java 5—well, it could also mean that their Java 5 offering was just very slow\ldots The Mac-port of OpenJDK 6 (\emph{Soylatte}) is even a bit faster, but that may be likely due to the difference between 64-bit and 32-bit.
 
 Are you able to run the MATSim benchmark even faster? Please tell us so! We're very interested in your benchmark results.
 
@@ -166,10 +166,10 @@ It can be clearly seen that the 64-bit JVM uses the largest amount of memory, du
 So, by how much can you improve your MATSim simulation's performance?
 
 \section{Speeding up your own MATSim runs}
-There are a few things you can try to speed up your simulation runs. The following hints are not in any specific order {\color{red}(are they?)}.
+There are a few things you can try to speed up your simulation runs. The following hints are not in any specific order.%% {\color{red}(are they?)}.
 
 \subsection{Use an up-to-date Java version}
-Java 6 usually performs better than Java 5.
+Java 7 usually performs better than Java 6.
 
 \subsection{Use compressed object pointers in 64-bit JVM}
 
@@ -177,7 +177,7 @@ Since Sun Java 6, Update 14, if you use a 64-bit JVM and use at most 32 GB of RA
 \begin{lstlisting}{language=xml}
 -XX:+UseCompressedOops
 \end{lstlisting}
-This reduces the size of object pointers to 32 bit, making many pointer operations a lot faster than when they were 64 bit long, while still supporting heap sizes larger than 2 GB (what a regular 32-bit JVM would do). See the \href{http://www.oracle.com/technetwork/java/javase/6u14-137039.html}{Java SE 6 Update 14 Release Notes} for more details. In addition, we observed notable speed-ups in the region of 10\% in the run time of MATSim. Since Java SE 6 Update 23, this option is enabled by default.
+This reduces the size of object pointers to 32 bit, making many pointer operations a lot faster than when they were 64 bit long, while still supporting heap sizes larger than 2 GB (what a regular 32-bit JVM would do). See the \href{http://www.oracle.com/technetwork/java/javase/6u14-137039.html}{Java SE 6 Update 14 Release Notes} for more details. In addition, we observed notable speed-ups in the region of 10\% in the run time of MATSim. Since Java SE 6 Update 23 and in Java 7, this option is enabled by default.
 
 \subsection{Parallelization}
 When running a MATSim simulation, unused cores can be utilized to make the simulation faster. There are now three ways to improve performance using parallelization, and each can be switched on or off separately.
@@ -217,7 +217,7 @@ There is a parallel version of the qsim. Analysis of performance and structure o
 \item Within a timestep actions on nodes and links can be simulated on parallel threads with low additional synchronization effort.
 \end{itemize}
 
-The parallel qsim is based on the existing qsim and can be used by just adding a new parameter to a scenario configuration file (see ). First performance measurements show promising results, and a working paper will be published in Q2 2010. A structural description of the parallel qsim is shown in Figure~\ref{fig:ParllelQsim}.
+The parallel qsim is based on the existing qsim and can be used by just adding a new parameter to a scenario configuration file (see ). First performance measurements show promising results, and a working paper will be published in Q2 2010. A structural description of the parallel qsim is shown in Figure~\ref{fig:ParallelQsim}.
 \begin{figure}[htp]
 \includegraphics[width=\textwidth]{figures/qsimParallel/parallelqsim.png}
 \caption{Design of the parallel qsim.}\label{fig:ParallelQsim}

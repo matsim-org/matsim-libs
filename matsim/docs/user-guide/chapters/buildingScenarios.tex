@@ -14,6 +14,19 @@ data typically required for running a MATSim scenario, and then gives examples
 how such data is generated for existing scenarios.
 \end{chapter-intro}
 
+
+\section{A Minimum Example}
+
+In order to work, MATSim requires at least a network and a travel demand.
+Alone with these two inputs and a configuration, MATSim can already be run.
+
+The following section will describe these input data, along with other additional
+and optional input data.
+
+%% \todo{MR Expand this section} 
+
+
+
 \section{Typical Input Data Sets}
 MATSim uses multiple files to store the different types of data it uses for the
 simulation. Tab.~\ref{tab:BuildingScenarios:InputDataSets} gives an
@@ -584,10 +597,6 @@ This allows MATSim to work with your coordinates and convert them whenever
 needed.
 
 
-\section{A Minimum Example}
-
-\todo{MR} 
-
 
 \section{Reusing Existing Data}
 
@@ -597,10 +606,11 @@ Converting the network topology is often possible with little work. For Visum,
 exists} that converts the network into MATSim's format. But note that this only
 converts the network topology (location of nodes, and links with a limited set
 of attributes). Due to the different working of other modelling tools (e.g. the 
-use of capacity constraint functions to describe links), attributes might be 
+use of speed-flow curves to describe links, with the BPR function being one of
+the better knowns), attributes might be 
 differently interpreted by MATSim (e.g. link capacities are hard limits in MATSim, 
-vs. part of a CPR function in other tools), leading to manual edits being needed 
-after the initial conversion. \todo{MR: check CPR and capacity constraints}
+vs. part of a function in other tools), leading to manual edits being needed 
+after the initial conversion.
 
 Reusing demand data is typically more complex. If you have the output of an 
 agent-based and activity-based demand generation process, you might convert
