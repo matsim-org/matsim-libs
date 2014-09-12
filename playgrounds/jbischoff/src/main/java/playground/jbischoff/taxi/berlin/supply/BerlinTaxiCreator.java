@@ -19,15 +19,20 @@
 
 package playground.jbischoff.taxi.berlin.supply;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.VehicleImpl;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.utils.geometry.*;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 import pl.poznan.put.util.random.WeightedRandomSelection;
@@ -77,7 +82,7 @@ public class BerlinTaxiCreator
         if (RND.nextDouble() < evShare) {
             vehIdString = "e" + vehIdString;
         }
-        Id vehId = scenario.createId(vehIdString);
+        Id<Vehicle> vehId = Id.create(vehIdString, Vehicle.class);
 
         Link link = getRandomLinkInLor(lorId);
         Vehicle v = new VehicleImpl(vehId, link, PAXPERCAR, t0, t1);

@@ -26,6 +26,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -56,7 +57,7 @@ public class ChangeActivityTimesEasyTest {
 		Population population = sc.getPopulation();   
 		PopulationFactory populationFactory = population.getFactory();
 
-		Person person = populationFactory.createPerson(sc.createId("1"));
+		Person person = populationFactory.createPerson(Id.create("1", Person.class));
 		population.addPerson(person);
 
 

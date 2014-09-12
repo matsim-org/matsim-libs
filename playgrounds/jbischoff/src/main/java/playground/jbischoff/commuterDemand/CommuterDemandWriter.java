@@ -40,7 +40,6 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
-
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 /**
@@ -117,9 +116,9 @@ public class CommuterDemandWriter {
 	
 	private Person generatePerson(String home, String work, double workStart, double workEnd, int pnr, String mode){
 		Person p;
-		Id id;
+		Id<Person> id;
 		Plan plan;
-		id = scenario.createId(pnr+"_"+home.toString()+"_"+work.toString());
+		id = Id.create(pnr+"_"+home.toString()+"_"+work.toString(), Person.class);
 		p = population.getFactory().createPerson(id);
 		plan = generatePlan(home,work,workStart,workEnd,mode);
 		p.addPlan(plan);

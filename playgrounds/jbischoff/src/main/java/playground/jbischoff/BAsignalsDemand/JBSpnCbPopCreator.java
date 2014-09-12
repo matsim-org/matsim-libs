@@ -297,9 +297,9 @@ public class JBSpnCbPopCreator implements Runnable {
 	
 	private Person generatePerson(Zone home, Zone work, double workStart, double workEnd, int pnr){
 		Person p;
-		Id id;
+		Id<Person> id;
 		Plan plan;
-		id = scenario.createId(pnr+"_"+home.toString()+"_"+work.toString());
+		id = Id.create(pnr+"_"+home.toString()+"_"+work.toString(), Person.class);
 		p = population.getFactory().createPerson(id);
 		plan = generatePlan(home,work,workStart,workEnd);
 		p.addPlan(plan);

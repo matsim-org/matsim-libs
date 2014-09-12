@@ -11,17 +11,20 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.vehicles.Vehicle;
 
 public class ChangeableNetworkCreatorTest {
 
-	private Id id1, id2;
+	private Id<Node> id1, id2;
+	private Id<Link> linkId1;
+	private Id<Person> personId1;
 
 	@Before
 	public void setUp() throws Exception {
@@ -34,9 +37,11 @@ public class ChangeableNetworkCreatorTest {
 	 * 1 ---------- 2
 	 */
 	private Scenario createScenario(){
-		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		this.id1 = sc.createId("1");
-		this.id2 = sc.createId("2");
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		this.id1 = Id.create("1", Node.class);
+		this.id2 = Id.create("2", Node.class);
+		this.linkId1 = Id.create("1", Link.class);
+		this.personId1 = Id.create("1", Person.class);
 		Network net = sc.getNetwork();
 		NetworkFactory nf = sc.getNetwork().getFactory();
 		Node n1 = nf.createNode(id1, sc.createCoord(0, 0));
@@ -44,7 +49,7 @@ public class ChangeableNetworkCreatorTest {
 		Node n2 = nf.createNode(id2, sc.createCoord(500, 0));
 		net.addNode(n2);
 	
-		Link l = nf.createLink(id1, n1, n2);
+		Link l = nf.createLink(this.linkId1, n1, n2);
 		net.addLink(l);
 		l.setLength(600.0);
 		l.setCapacity(3600);
@@ -58,8 +63,8 @@ public class ChangeableNetworkCreatorTest {
 		Scenario sc = createScenario();
 		TravelTimeCalculatorConfigGroup ttccg = new TravelTimeCalculatorConfigGroup();
 		TravelTimeCalculator calc = new TravelTimeCalculator(sc.getNetwork(), ttccg);
-		LinkEnterEvent ev1 = new LinkEnterEvent(0, id1, id1, id1);
-		LinkLeaveEvent ev2 = new LinkLeaveEvent(200, id1, id1, id1);
+		LinkEnterEvent ev1 = new LinkEnterEvent(0, this.personId1, linkId1, Id.create(id1, Vehicle.class));
+		LinkLeaveEvent ev2 = new LinkLeaveEvent(200, this.personId1, linkId1, Id.create(id1, Vehicle.class));
 		calc.handleEvent(ev1);
 		calc.handleEvent(ev2);
 		double newTt=calc.getLinkTravelTimes().getLinkTravelTime(sc.getNetwork().getLinks().get(id1), 100, null, null);

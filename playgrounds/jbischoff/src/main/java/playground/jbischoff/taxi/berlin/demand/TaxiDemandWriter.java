@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -42,7 +41,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -253,8 +251,7 @@ public class TaxiDemandWriter
             amount = Math.floor(amount);
             for (int i = 0; i < amount; i++) {
                 Person p;
-                Id pId = scenario.createId("p" + tde.fromId + "_" + tde.toId + "_hr_" + hr + "_nr_"
-                        + i);
+                Id<Person> pId = Id.create("p" + tde.fromId + "_" + tde.toId + "_hr_" + hr + "_nr_" + i, Person.class);
                 p = generatePerson(tde.fromId, tde.toId, pId, hr);
                 if (p == null)
                     continue;
@@ -271,8 +268,8 @@ public class TaxiDemandWriter
             try {
                 TaxiDemandElement tde = hourlyTaxiDemand.get(i % 3);
                 Person p;
-                Id pId = scenario.createId("p" + tde.fromId + "_" + tde.toId + "_hr_" + hr
-                        + "_nr_x" + i);
+                Id<Person> pId = Id.create("p" + tde.fromId + "_" + tde.toId + "_hr_" + hr
+                        + "_nr_x" + i, Person.class);
                 p = generatePerson(tde.fromId, tde.toId, pId, hr);
                 if (p == null)
                     continue;

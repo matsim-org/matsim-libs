@@ -15,16 +15,16 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.config.ConfigUtils;
 
 public class ChangeActivityTimesAdvancedTest {
 
 	private ChangeActivityTimesAdvanced cata;
 	private Plan testplan;
-	private Id id1;
+	private Id<Person> id1;
 
 	
 	
@@ -44,7 +44,7 @@ public class ChangeActivityTimesAdvancedTest {
 	Config config = ConfigUtils.createConfig();
 	Scenario sc = ScenarioUtils.createScenario(config);
 
-	this.id1 = sc.createId("1");
+	this.id1 = Id.create("1", Person.class);
 
 	Population population = sc.getPopulation();   
 	PopulationFactory populationFactory = population.getFactory();

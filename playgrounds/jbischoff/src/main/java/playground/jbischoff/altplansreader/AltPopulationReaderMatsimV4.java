@@ -32,9 +32,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
@@ -175,7 +177,7 @@ public class AltPopulationReaderMatsimV4 implements PopulationReader{
 //					 log.info("encountered activity start el");
 					 Coord coord = null;
 					 if (xmlr.getAttributeValue(""	, "link") != null) {
-							Id linkId = this.scenario.createId(xmlr.getAttributeValue(""	, "link"));
+							Id<Link> linkId = Id.create(xmlr.getAttributeValue(""	, "link"), Link.class);
 							this.curract = this.currplan.createAndAddActivity(xmlr.getAttributeValue(""	, "type"), linkId);
 //							 log.info("created link act "+this.curract.getLinkId());
 
@@ -198,7 +200,7 @@ public class AltPopulationReaderMatsimV4 implements PopulationReader{
 					 this.curract.setEndTime(Time.parseTime(xmlr.getAttributeValue(""	, "end_time")));
 					String fId = xmlr.getAttributeValue(""	, "facility");
 						if (fId != null) {
-							this.curract.setFacilityId(this.scenario.createId(fId));
+							this.curract.setFacilityId(Id.create(fId, ActivityFacility.class));
 						}
 			 
 				}

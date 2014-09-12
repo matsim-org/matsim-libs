@@ -76,7 +76,7 @@ public class ElectricBerlinMain {
 		
 		Person newPerson;
 		for(Person p: s.getPopulation().getPersons().values()){
-			newPerson = f.createPerson(s.createId(identifier + p.getId().toString()));
+			newPerson = f.createPerson(Id.create(identifier + p.getId().toString(), Person.class));
 										
 			newPerson.addPlan(p.getSelectedPlan());
 			
