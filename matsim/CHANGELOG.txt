@@ -2,7 +2,31 @@ MATSim - Multi Agent Transport Simulation
 ===============================================================================
 
 
-Release "not yet released" (version 0.5.0)
+Release "unknown yet" (version 0.7.0)
+-------------------------------------------------------------------------------
+
+Changes:
+- Switch to Java 7
+- removed queueSimulation
+- removed single-threaded qsim. parallel qsim is now default mobsim.
+- made parallel eventshandling default, removed non-parallel option.
+- Use of typed Ids
+
+
+
+Release "Fall 2014" (version 0.6.0)
+-------------------------------------------------------------------------------
+
+This will be the last version of MATSim for Java 6.
+Future versions of MATSim will require Java 7.
+
+Changes:
+- a lot of internal changes to make MATSim more modular and more easily configurable
+
+
+
+
+Release "Spring 2013" (version 0.5.0)
 -------------------------------------------------------------------------------
 
 Changes:
