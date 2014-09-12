@@ -16,6 +16,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -96,7 +97,7 @@ public class Connections2PTNetwork {
 		log.info("Start line iteration through csv file");
 
 		// ------------------- create virtual vehicle type -----------------------
-		Id virtualVehicleID = sc.createId("901");
+		Id<VehicleType> virtualVehicleID = Id.create("901", VehicleType.class);
 		VehicleType virtualVehicleType = vehicleFactory.createVehicleType(virtualVehicleID);
 		virtualVehicleType.setDescription("Virtual urban vehicle");
 		int seats = 1000;
@@ -123,7 +124,7 @@ public class Connections2PTNetwork {
 			//		", BezirkXAchse = " +bezirkXAchse+ ", Knotennummer = "
 			//		+knotenNummer);
 
-			Id bezirkNodeId = sc.createId(bezirkNummer+knotenNummer);
+			Id bezirkNodeId = new IdImpl(bezirkNummer+knotenNummer);
 
 			// add district as a node to network
 			double x = Double.parseDouble(bezirkXAchse);
@@ -147,14 +148,14 @@ public class Connections2PTNetwork {
 			String linkType = "11";
 			double freeSpeed = 1.3888888888888888;
 			if (length != 0) {
-				Id existingNodeId = sc.createId(knotenNummer);
+				Id<Node> existingNodeId = Id.create(knotenNummer, Node.class);
 				//log.info("existingNodeId: " +existingNodeId.toString());
 				Node existingNode = PTnetwork.getNodes().get(existingNodeId);
 				
 				//only for connections:
 //				PTnetworkAnbindungen.addNode(existingNode);
 				
-				Id newLinkId1 = sc.createId(bezirkNummer+knotenNummer+1);
+				Id<Link> newLinkId1 = Id.create(bezirkNummer+knotenNummer+1, Link.class);
 				LinkImpl newLink1 = (LinkImpl) factory.createLink(newLinkId1, existingNode, bezirkNode);
 				newLink1.setLength(length);
 				newLink1.setCapacity(capLink);
@@ -163,7 +164,7 @@ public class Connections2PTNetwork {
 //				PTnetworkAnbindungen.addLink(newLink1);
 				//log.info("link1 " +newLink1.getId()+ " added to network");
 
-				Id newLinkId2 = sc.createId(bezirkNummer+knotenNummer+2);
+				Id<Link> newLinkId2 = Id.create(bezirkNummer+knotenNummer+2, Link.class);
 				LinkImpl newLink2 = (LinkImpl) factory.createLink(newLinkId2, bezirkNode, existingNode);
 				newLink2.setLength(length);
 				newLink2.setCapacity(capLink);
@@ -177,7 +178,7 @@ public class Connections2PTNetwork {
 				double xNode = Double.parseDouble(knotenXAchse);
 				double yNode = Double.parseDouble(knotenYAchse);
 				Coord coordsNode = sc.createCoord(xNode, yNode);
-				Id existingNodeId2 = sc.createId(knotenNummer+bezirkNummer);
+				Id<TransitStopFacility> existingNodeId2 = Id.create(knotenNummer+bezirkNummer, TransitStopFacility.class);
 				TransitStopFacility newNodeStop = scheduleFactory.createTransitStopFacility(existingNodeId2, coordsNode, false);
 				newNodeStop.setName(bezirkName+"_Anbindung");
 
@@ -196,20 +197,20 @@ public class Connections2PTNetwork {
 				NetworkRoute newNetworkRoute1 = RouteUtils.createNetworkRoute(routeLinkIds1, PTnetwork);
 				//				newNetworkRoute1.getLinkIds().remove(0);
 				//				newNetworkRoute1.getLinkIds().add(newLink1.getId());
-				Id newTransitRoute1Id = sc.createId("Anbindung" +bezirkNummer+knotenNummer+1);
+				Id<TransitRoute> newTransitRoute1Id = Id.create("Anbindung" +bezirkNummer+knotenNummer+1, TransitRoute.class);
 				TransitRoute newTransitRoute1 = scheduleFactory.createTransitRoute(newTransitRoute1Id, newNetworkRoute1, route1Stops, "pt");
 				log.info("transit route " +newTransitRoute1.getId()+ " has route stops: " +newTransitRoute1.getStops().toString());
 				for (int i = 0; i<163; i++) {
-					Id depId = sc.createId(i+knotenNummer+1);
+					Id<Departure> depId = Id.create(i+knotenNummer+1, Departure.class);
 					double time = (5*3600 + i*7*60);
 					Departure dep = scheduleFactory.createDeparture(depId, time);
-					Id vehID = sc.createId(bezirkNummer+knotenNummer+1+i);
+					Id<Vehicle> vehID = Id.create(bezirkNummer+knotenNummer+1+i, Vehicle.class);
 					Vehicle virtualVehicle = vehicleFactory.createVehicle(vehID, virtualVehicleType);
 					PTvehicles.addVehicle( virtualVehicle);
 					dep.setVehicleId(vehID);
 					newTransitRoute1.addDeparture(dep);
 				}
-				Id newTransitLineId = sc.createId("Anbindung" +bezirkNummer+knotenNummer+1);
+				Id<TransitLine> newTransitLineId = Id.create("Anbindung" +bezirkNummer+knotenNummer+1, TransitLine.class);
 				TransitLine newLine = scheduleFactory.createTransitLine(newTransitLineId);
 				newLine.addRoute(newTransitRoute1);
 //				PTscheduleAnbindungen.addTransitLine(newLine);
@@ -224,19 +225,19 @@ public class Connections2PTNetwork {
 				NetworkRoute newNetworkRoute2 = RouteUtils.createNetworkRoute(routeLinkIds2, PTnetwork);
 				//				newNetworkRoute2.getLinkIds().clear();
 				//				newNetworkRoute2.getLinkIds().add(newLink2.getId());
-				Id newTransitRoute2Id = sc.createId("Anbindung" +bezirkNummer+knotenNummer+2);
+				Id<TransitRoute> newTransitRoute2Id = Id.create("Anbindung" +bezirkNummer+knotenNummer+2, TransitRoute.class);
 				TransitRoute newTransitRoute2 = scheduleFactory.createTransitRoute(newTransitRoute2Id, newNetworkRoute2, route2Stops, "pt");
 				for (int i = 0; i<163; i++) {
-					Id depId2 = sc.createId(i+knotenNummer+2);
+					Id<Departure> depId2 = Id.create(i+knotenNummer+2, Departure.class);
 					double time = (5*3600 + i*7*60);
 					Departure dep2 = scheduleFactory.createDeparture(depId2, time);
-					Id vehID = sc.createId(bezirkNummer+knotenNummer+2+i);
+					Id<Vehicle> vehID = Id.create(bezirkNummer+knotenNummer+2+i, Vehicle.class);
 					Vehicle virtualVehicle = vehicleFactory.createVehicle(vehID, virtualVehicleType);
 					PTvehicles.addVehicle( virtualVehicle);
 					dep2.setVehicleId(vehID);
 					newTransitRoute2.addDeparture(dep2);
 				}
-				Id newTransitLineId2 = sc.createId("Anbindung" +bezirkNummer+knotenNummer+2);
+				Id<TransitLine> newTransitLineId2 = Id.create("Anbindung" +bezirkNummer+knotenNummer+2, TransitLine.class);
 				TransitLine newLine2 = scheduleFactory.createTransitLine(newTransitLineId2);
 				newLine.addRoute(newTransitRoute2);
 //				PTscheduleAnbindungen.addTransitLine(newLine2);
@@ -261,16 +262,16 @@ public class Connections2PTNetwork {
 		for (List<String> arr1 : bezirkList) {
 			doneList.add(arr1.get(0));
 			int n = 0;
-			Id currentNodeId1 = sc.createId(arr1.get(0));
+			Id<Node> currentNodeId1 = Id.create(arr1.get(0), Node.class);
 			for (List<String> arr2 : bezirkList) {
-				Id currentNodeId2 = sc.createId(arr2.get(0));
+				Id<Node> currentNodeId2 = Id.create(arr2.get(0), Node.class);
 				if (arr2.get(1).equals(arr1.get(1)) && doneList.contains(arr2.get(0)) == false){ //&& currentNodeId1 != currentNodeId2 
 					log.info("currentId1 is: " +currentNodeId1.toString()+ ", currentId2 is: " +currentNodeId2.toString());
 
 					// add links
 					Node currentNode1 = PTnetwork.getNodes().get(currentNodeId1);
 					Node currentNode2 = PTnetwork.getNodes().get(currentNodeId2);
-					Id nLinkId1 = sc.createId(arr1.get(0)+1+n);
+					Id<Link> nLinkId1 = Id.create(arr1.get(0)+1+n, Link.class);
 					LinkImpl nLink1 = (LinkImpl) factory.createLink(nLinkId1, currentNode1, currentNode2);
 					double dist = Math.round(CoordUtils.calcDistance(currentNode1.getCoord(), currentNode2.getCoord()));
 					double capLink = 99999.0;
@@ -284,7 +285,7 @@ public class Connections2PTNetwork {
 					PTnetwork.addLink(nLink1);
 					//log.info("link1 " +nLink1+ " added to network");
 
-					Id nLinkId2 = sc.createId(arr1.get(0)+2+n);
+					Id<Link> nLinkId2 = Id.create(arr1.get(0)+2+n, Link.class);
 					n += 1;
 					LinkImpl nLink2 = (LinkImpl) factory.createLink(nLinkId2, currentNode2, currentNode1);
 					nLink2.setLength(dist);
@@ -296,7 +297,7 @@ public class Connections2PTNetwork {
 
 					// add lines
 					TransitStopFacility currentStop1 = PTschedule.getFacilities().get(currentNodeId1);
-					Id nStopId1 = sc.createId(currentNodeId1.toString()+currentNodeId2.toString());
+					Id<TransitStopFacility> nStopId1 = Id.create(currentNodeId1.toString()+currentNodeId2.toString(), TransitStopFacility.class);
 					TransitStopFacility newddStop1 = scheduleFactory.createTransitStopFacility(nStopId1, currentNode1.getCoord(), false);
 					newddStop1.setName(nStopId1+"_Verbindung");
 					newddStop1.setLinkId(nLinkId1);
@@ -304,7 +305,7 @@ public class Connections2PTNetwork {
 					log.info("stop facility " +newddStop1+ " added to schedule");
 
 					TransitStopFacility currentStop2 = PTschedule.getFacilities().get(currentNodeId2);
-					Id nStopId2 = sc.createId(currentNodeId2.toString()+currentNodeId1.toString());
+					Id<TransitStopFacility> nStopId2 = Id.create(currentNodeId2.toString()+currentNodeId1.toString(), TransitStopFacility.class);
 					TransitStopFacility newddStop2 = scheduleFactory.createTransitStopFacility(nStopId2, currentNode2.getCoord(), false);
 					newddStop2.setName(nStopId2+"_Verbindung");
 					newddStop2.setLinkId(nLinkId2);
@@ -320,19 +321,19 @@ public class Connections2PTNetwork {
 					NetworkRoute nNetworkRoute1 = RouteUtils.createNetworkRoute(newRouteLinkIds1, PTnetwork);
 					//    				nNetworkRoute1.getLinkIds().clear();
 					//    				nNetworkRoute1.getLinkIds().add(nLink1.getId());
-					Id nTransitRoute1Id = sc.createId("Bezirkverbindung" +arr1.get(0)+arr2.get(0)+1);
+					Id<TransitRoute> nTransitRoute1Id = Id.create("Bezirkverbindung" +arr1.get(0)+arr2.get(0)+1, TransitRoute.class);
 					TransitRoute nTransitRoute1 = scheduleFactory.createTransitRoute(nTransitRoute1Id, nNetworkRoute1, currentRoute1Stops, "pt");
 					for (int i = 0; i<163; i++) {
-						Id depId = sc.createId(i+arr1.get(0)+arr2.get(0)+1);
+						Id<Departure> depId = Id.create(i+arr1.get(0)+arr2.get(0)+1, Departure.class);
 						double time = (5*3600 + i*7*60);
 						Departure dep = scheduleFactory.createDeparture(depId, time);
-						Id vehID = sc.createId(arr1.get(0)+arr2.get(0)+1+i);
+						Id<Vehicle> vehID = Id.create(arr1.get(0)+arr2.get(0)+1+i, Vehicle.class);
 						Vehicle virtualVehicle = vehicleFactory.createVehicle(vehID, virtualVehicleType);
 						PTvehicles.addVehicle( virtualVehicle);
 						dep.setVehicleId(vehID);
 						nTransitRoute1.addDeparture(dep);
 					}
-					Id nTransitLineId = sc.createId("Bezirksverbindung1" +arr1.get(0)+arr2.get(0));
+					Id<TransitLine> nTransitLineId = Id.create("Bezirksverbindung1" +arr1.get(0)+arr2.get(0), TransitLine.class);
 					TransitLine nLine = scheduleFactory.createTransitLine(nTransitLineId);
 					nLine.addRoute(nTransitRoute1);
 					PTschedule.addTransitLine(nLine);
@@ -345,19 +346,19 @@ public class Connections2PTNetwork {
 					NetworkRoute nNetworkRoute2 = RouteUtils.createNetworkRoute(newRouteLinkIds2, PTnetwork);
 					//    				nNetworkRoute2.getLinkIds().clear();
 					//    				nNetworkRoute2.getLinkIds().add(nLink2.getId());
-					Id nTransitRoute2Id = sc.createId("Bezirkverbindung" +arr1.get(0)+arr2.get(0)+2);
+					Id<TransitRoute> nTransitRoute2Id = Id.create("Bezirkverbindung" +arr1.get(0)+arr2.get(0)+2, TransitRoute.class);
 					TransitRoute nTransitRoute2 = scheduleFactory.createTransitRoute(nTransitRoute2Id, nNetworkRoute2, currentRoute2Stops, "pt");
 					for (int i = 0; i<163; i++) {
-						Id depId = sc.createId(i+arr1.get(0)+arr2.get(0)+2);
+						Id<Departure> depId = Id.create(i+arr1.get(0)+arr2.get(0)+2, Departure.class);
 						double time = (5*3600 + i*7*60);
 						Departure dep = scheduleFactory.createDeparture(depId, time);
-						Id vehID = sc.createId(arr1.get(0)+arr2.get(0)+2+i);
+						Id<Vehicle> vehID = Id.create(arr1.get(0)+arr2.get(0)+2+i, Vehicle.class);
 						Vehicle virtualVehicle = vehicleFactory.createVehicle(vehID, virtualVehicleType);
 						PTvehicles.addVehicle( virtualVehicle);
 						dep.setVehicleId(vehID);
 						nTransitRoute2.addDeparture(dep);
 					}
-					Id nTransitLine2Id = sc.createId("Bezirksverbindung2" +arr1.get(0)+arr2.get(0));
+					Id<TransitLine> nTransitLine2Id = Id.create("Bezirksverbindung2" +arr1.get(0)+arr2.get(0), TransitLine.class);
 					TransitLine nLine2 = scheduleFactory.createTransitLine(nTransitLine2Id);
 					nLine2.addRoute(nTransitRoute2);
 					PTschedule.addTransitLine(nLine2);

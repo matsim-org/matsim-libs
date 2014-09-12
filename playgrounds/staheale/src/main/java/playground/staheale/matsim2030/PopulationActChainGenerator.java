@@ -4,10 +4,8 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -19,22 +17,16 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 
 public class PopulationActChainGenerator {
 
@@ -69,10 +61,10 @@ public class PopulationActChainGenerator {
 	}
 
 	public void run() throws Exception {
-		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population mz_population = sc.getPopulation();
 
-		Scenario scWrite = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scWrite = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population popWrite = scWrite.getPopulation();
 
 		Coord sampleCoords = sc.createCoord(500000,150000);
@@ -124,7 +116,7 @@ public class PopulationActChainGenerator {
 			count += 1;
 			String[] entries = curr_line0.split(",");
 			String re10record = entries[0].trim();
-			Id id = sc.createId(Integer.toString(idCount));
+			Id<Person> id = Id.create(idCount, Person.class);
 			//String nr = entries[1].trim();
 			String homeX = entries[2].trim();
 			double homeCoordX = Double.parseDouble(homeX)-2000000; //change from CH1903+ to CH1903
@@ -133,7 +125,7 @@ public class PopulationActChainGenerator {
 			Coord coordsHome = sc.createCoord(homeCoordX, homeCoordY);
 			//String age = entries[4].trim();
 			String mzId = entries[5].trim();
-			Id MZid = sc.createId(mzId);
+			Id<Person> MZid = Id.create(mzId, Person.class);
 			String working = entries[6].trim();
 			int isWorking = Integer.parseInt(working);
 			String nrWorking = entries[7].trim();

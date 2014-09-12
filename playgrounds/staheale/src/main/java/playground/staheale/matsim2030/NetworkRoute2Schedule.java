@@ -104,7 +104,7 @@ public class NetworkRoute2Schedule {
 
 			int index = Integer.parseInt(count);
 			int istHP = Integer.parseInt(istHaltepunkt);
-			Id newRouteNodeId = sc.createId(knotenNr);
+			Id<TransitRoute> newRouteNodeId = Id.create(knotenNr, TransitRoute.class);
 
 			// -------- case 1: new route list --------
 			if (index == 1) {
@@ -132,7 +132,7 @@ public class NetworkRoute2Schedule {
 					// create stop
 					//log.info("oldIdStop: " +oldIdStop.getId());
 					if (oldIdStop.getLinkId() == null) {
-						Id newStopId = sc.createId(oldId.toString()+"_"+oldLinName+oldRouteName+oldIndex);
+						Id<TransitStopFacility> newStopId = Id.create(oldId.toString()+"_"+oldLinName+oldRouteName+oldIndex, TransitStopFacility.class);
 						TransitStopFacility newStop = scheduleFactory.createTransitStopFacility(newStopId, oldIdStop.getCoord(), false);
 						newStop.setName(oldIdStop.getName()+ " "+linName+linRouteName);
 						newStop.setLinkId(newRouteLinkId);
@@ -162,7 +162,7 @@ public class NetworkRoute2Schedule {
 						}
 					}
 					else if (oldIdStop.getLinkId().equals(newRouteLinkId) != true) {
-						Id newStopId = sc.createId(oldId.toString()+"_"+oldLinName+oldRouteName+oldIndex);
+						Id<TransitStopFacility> newStopId = Id.create(oldId.toString()+"_"+oldLinName+oldRouteName+oldIndex, TransitStopFacility.class);
 						TransitStopFacility newStop = scheduleFactory.createTransitStopFacility(newStopId, oldIdStop.getCoord(), false);
 						newStop.setName(oldIdStop.getName()+ " "+linName+linRouteName);
 						newStop.setLinkId(newRouteLinkId);
@@ -250,7 +250,7 @@ public class NetworkRoute2Schedule {
 					//log.info("oldId " +oldId);
 					// create stop
 					if (oldIdStop.getLinkId() == null) {
-						Id newStopId = sc.createId(oldId.toString()+"_"+linName+linRouteName+count+i);
+						Id<TransitStopFacility> newStopId = Id.create(oldId.toString()+"_"+linName+linRouteName+count+i, TransitStopFacility.class);
 						TransitStopFacility newStop = scheduleFactory.createTransitStopFacility(newStopId, oldIdStop.getCoord(), false);
 						newStop.setName(oldIdStop.getName()+ " "+linName+linRouteName);
 						newStop.setLinkId(newRouteLinkId);
@@ -280,7 +280,7 @@ public class NetworkRoute2Schedule {
 						}
 					}
 					else if (oldIdStop.getLinkId().equals(newRouteLinkId) != true) {
-						Id newStopId = sc.createId(oldId.toString()+"_"+linName+linRouteName+count);
+						Id<TransitStopFacility> newStopId = Id.create(oldId.toString()+"_"+linName+linRouteName+count, TransitStopFacility.class);
 						TransitStopFacility newStop = scheduleFactory.createTransitStopFacility(newStopId, oldIdStop.getCoord(), false);
 						newStop.setName(oldIdStop.getName()+ " "+linName+linRouteName);
 						newStop.setLinkId(newRouteLinkId);

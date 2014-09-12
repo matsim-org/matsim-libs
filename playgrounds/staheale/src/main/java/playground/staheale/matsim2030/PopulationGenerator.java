@@ -1,5 +1,10 @@
 package playground.staheale.matsim2030;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -9,14 +14,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
 
 public class PopulationGenerator {
 
@@ -40,7 +39,7 @@ public class PopulationGenerator {
 	}
 
 	public void run(String[] args) throws Exception {
-		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population population = sc.getPopulation();
 		
 		
@@ -82,7 +81,7 @@ public class PopulationGenerator {
 			String[] entries = curr_line.split(",");
 			String idCvs = entries[1].trim();
 			String idShort = idCvs.substring(1, 8);
-			Id id = sc.createId(idShort);
+			Id<Person> id = Id.create(idShort, Person.class);
 			String weight = entries[3].trim();
 			String weight10 = entries[4].trim();
 			int w = Integer.parseInt(weight);
@@ -107,7 +106,7 @@ public class PopulationGenerator {
 					Person p = population.getPersons().get(id);
 					//log.info("person p with old id is: " +p);
 					String nId = String.valueOf(idCounter+i);
-					Id newId = sc.createId(nId);
+					Id<Person> newId = Id.create(nId, Person.class);
                     ((PersonImpl) p).setId(newId);
                     //log.info("person p with new id is: " +p);
 					pw.writePerson(p);

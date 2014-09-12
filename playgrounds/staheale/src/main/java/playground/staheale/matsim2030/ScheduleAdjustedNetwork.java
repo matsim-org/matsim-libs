@@ -97,7 +97,7 @@ public class ScheduleAdjustedNetwork {
 		
 		log.info("Start adjusting network and schedule...");
 		for (TransitLine line : PTschedule.getTransitLines().values()){
-			Id newLineId = sc.createId(line.getId().toString().replaceAll("\\s",""));
+			Id<TransitLine> newLineId = Id.create(line.getId().toString().replaceAll("\\s",""), TransitLine.class);
 			TransitLine nLine = scheduleFactory.createTransitLine(newLineId);
 			for (TransitRoute route : line.getRoutes().values()) {
 				for (TransitRouteStop rStop : route.getStops()) {
@@ -117,7 +117,7 @@ public class ScheduleAdjustedNetwork {
 						
 						// create node and add it to network
 						nId += 1;
-						Id newNodeId = scWrite.createId(Integer.toString(nId));
+						Id<Node> newNodeId = Id.create(Integer.toString(nId), Node.class);
 						NodeImpl newNode = (NodeImpl) factory.createNode(newNodeId, firstFacCoords);
 						for (Node node : newPTnetwork.getNodes().values()) {
 							if ((Math.abs(newNode.getCoord().getX()-node.getCoord().getX())
@@ -135,7 +135,7 @@ public class ScheduleAdjustedNetwork {
 						nodeExisting = false;
 						
 						// create link and add it to network
-						Id nLinkId = sc.createId(newNodeId.toString()+newNodeId.toString()+Integer.toString(newId));
+						Id<Link> nLinkId = Id.create(newNodeId.toString()+newNodeId.toString()+Integer.toString(newId), Link.class);
 						LinkImpl nLink = (LinkImpl) factory.createLink(nLinkId, newNode, newNode);
 						double dist = 0.001;
 						double capLink = 99999.0;
@@ -181,7 +181,7 @@ public class ScheduleAdjustedNetwork {
 						}
 						// if not: create and add facility to schedule
 						if (facilityExisting != true) {
-							Id newFacId = sc.createId(firstFac.getId().toString()+Integer.toString(newCountId));
+							Id<TransitStopFacility> newFacId = Id.create(firstFac.getId().toString()+Integer.toString(newCountId), TransitStopFacility.class);
 							newCountId += 1;
 							TransitStopFacility firstFacnew = scheduleFactory.createTransitStopFacility(newFacId, firstFac.getCoord(), false);
 							firstFacnew.setName(firstFac.getName());
@@ -213,7 +213,7 @@ public class ScheduleAdjustedNetwork {
 						
 						// create node and add it to network
 						nId += 1;
-						Id newNodeId = scWrite.createId(Integer.toString(nId));
+						Id<Node> newNodeId = Id.create(Integer.toString(nId), Node.class);
 						NodeImpl newNode = (NodeImpl) factory.createNode(newNodeId, lastFacCoords);
 						for (Node node : newPTnetwork.getNodes().values()) {
 							if ((Math.abs(newNode.getCoord().getX()-node.getCoord().getX())
@@ -231,7 +231,7 @@ public class ScheduleAdjustedNetwork {
 						nodeExisting = false;
 						
 						// create link and add it to network
-						Id nLinkId = sc.createId(fromNode.getId().toString()+newNodeId.toString()+Integer.toString(newId));
+						Id<Link> nLinkId = Id.create(fromNode.getId().toString()+newNodeId.toString()+Integer.toString(newId), Link.class);
 						LinkImpl nLink = (LinkImpl) factory.createLink(nLinkId, fromNode, newNode);
 						double dist = Math.round(CoordUtils.calcDistance(fromNode.getCoord(), newNode.getCoord()));
 						double capLink = 99999.0;
@@ -277,7 +277,7 @@ public class ScheduleAdjustedNetwork {
 						}
 						// if not: create and add facility to schedule
 						if (facilityExisting != true) {
-							Id newFacId = sc.createId(lastFac.getId().toString()+Integer.toString(newCountId));
+							Id<TransitStopFacility> newFacId = Id.create(lastFac.getId().toString()+Integer.toString(newCountId), TransitStopFacility.class);
 							newCountId += 1;
 							TransitStopFacility lastFacnew = scheduleFactory.createTransitStopFacility(newFacId, lastFac.getCoord(), false);
 							lastFacnew.setName(lastFac.getName());
@@ -310,7 +310,7 @@ public class ScheduleAdjustedNetwork {
 						
 						// create node and add it to network
 						nId += 1;
-						Id newNodeId = scWrite.createId(Integer.toString(nId));
+						Id<Node> newNodeId = Id.create(Integer.toString(nId), Node.class);
 						NodeImpl newNode = (NodeImpl) factory.createNode(newNodeId, FacCoords);
 						for (Node node : newPTnetwork.getNodes().values()) {
 							if ((Math.abs(newNode.getCoord().getX()-node.getCoord().getX())
@@ -328,7 +328,7 @@ public class ScheduleAdjustedNetwork {
 						nodeExisting = false;
 						
 						// create link and add it to network
-						Id nLinkId = sc.createId(fromNode.getId().toString()+newNodeId.toString()+Integer.toString(newId));
+						Id<Link> nLinkId = Id.create(fromNode.getId().toString()+newNodeId.toString()+Integer.toString(newId), Link.class);
 						LinkImpl nLink = (LinkImpl) factory.createLink(nLinkId, fromNode, newNode);
 						double dist = Math.round(CoordUtils.calcDistance(fromNode.getCoord(), newNode.getCoord()));
 						double capLink = 99999.0;
@@ -374,7 +374,7 @@ public class ScheduleAdjustedNetwork {
 						}
 						// if not: create and add facility to schedule
 						if (facilityExisting != true) {
-							Id newFacId = sc.createId(betweenFac.getId().toString()+Integer.toString(newCountId));
+							Id<TransitStopFacility> newFacId = Id.create(betweenFac.getId().toString()+Integer.toString(newCountId), TransitStopFacility.class);
 							newCountId += 1;
 							TransitStopFacility betweenFacnew = scheduleFactory.createTransitStopFacility(newFacId, betweenFac.getCoord(), false);
 							betweenFacnew.setName(betweenFac.getName());
@@ -397,7 +397,7 @@ public class ScheduleAdjustedNetwork {
 				// create network route
 				NetworkRoute newNetworkRoute = RouteUtils.createNetworkRoute(newRouteLinkIds, newPTnetwork);
 				// create transit route
-				Id newRouteId = sc.createId(route.getId().toString().replaceAll("\\s",""));
+				Id<TransitRoute> newRouteId = Id.create(route.getId().toString().replaceAll("\\s",""), TransitRoute.class);
 				TransitRoute nTransitRoute = scheduleFactory.createTransitRoute(newRouteId, newNetworkRoute, routeStops, "pt");
 				// copy departures
 				for (Departure dep : route.getDepartures().values()) {

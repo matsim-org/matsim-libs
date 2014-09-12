@@ -176,7 +176,7 @@ public class AdaptPTNetwork {
 					if (rStop.equals(rFirstStop) && firstStop != true) {
 
 						firstStop = true;
-						Id newLinkId = sc.createId("000"+startLinkId.toString()+startLinkId.toString());
+						Id<Link> newLinkId = Id.create("000"+startLinkId.toString()+startLinkId.toString(), Link.class);
 						LinkImpl newLink = (LinkImpl) factory.createLink(newLinkId, startNode, startNode);
 						newLink.setAllowedModes(ptMode);
 						newLink.setLength(50);
@@ -227,7 +227,7 @@ public class AdaptPTNetwork {
 				int endKey = 0;
 				
 				for (int i = 1; i < (routeStops.size()); i++) {
-					Id lastLinkId = null;
+					Id<Link> lastLinkId = null;
 					int startKey = 0;
 					int vMem = 0;
 					TransitRouteStop precedingStop = routeStops.get(i-1);
@@ -244,7 +244,7 @@ public class AdaptPTNetwork {
 
 					// go through network route until precedingStop is reached
 					for (int v = endKey; v < newNetworkRoute.getLinkIds().size(); v++) {
-						Id linkId = newNetworkRoute.getLinkIds().get(v);
+						Id<Link> linkId = newNetworkRoute.getLinkIds().get(v);
 						Link link = this.network.getLinks().get(linkId);
 						Coord linkCoord = link.getFromNode().getCoord();
 						double xLink = linkCoord.getX();
@@ -266,7 +266,7 @@ public class AdaptPTNetwork {
 					}
 					// go through network route until currentStop is reached and memorize the id of the last link
 					for (int z = startKey; z < newNetworkRoute.getLinkIds().size(); z++) {
-						Id linkId2 = newNetworkRoute.getLinkIds().get(z);
+						Id<Link> linkId2 = newNetworkRoute.getLinkIds().get(z);
 						Link link2 = this.network.getLinks().get(linkId2);
 						Coord link2Coord = link2.getFromNode().getCoord();
 						Coord link2CoordTo = link2.getToNode().getCoord();
@@ -284,7 +284,7 @@ public class AdaptPTNetwork {
 					}
 					
 					if (i == (routeStops.size()-2)) {
-						Id lastLinkId2 = newNetworkRoute.getEndLinkId();
+						Id<Link> lastLinkId2 = newNetworkRoute.getEndLinkId();
 						Link lastLink2 = this.network.getLinks().get(lastLinkId2);
 						Coord lastLink2Coord = lastLink2.getFromNode().getCoord();
 						Coord lastLink2CoordTo = lastLink2.getToNode().getCoord();
@@ -359,7 +359,7 @@ public class AdaptPTNetwork {
 					
 					// search for facility with correct reference link
 					boolean foundStopFacility = false;
-					Id correctReferenceFacility = null;
+					Id<TransitStopFacility> correctReferenceFacility = null;
 					for (TransitStopFacility stopPoint : this.PTschedule.getFacilities().values()){
 						double xStop = stopPoint.getCoord().getX();
 						double yStop = stopPoint.getCoord().getY();					
@@ -387,7 +387,7 @@ public class AdaptPTNetwork {
 						Id oldStopId = currentStop.getStopFacility().getId();
 						String oldStopName = currentStop.getStopFacility().getName();
 						Coord oldStopCoord = currentStop.getStopFacility().getCoord();
-						Id newFacilityId = sc.createId("000" + oldStopId + route.getId());
+						Id<TransitStopFacility> newFacilityId = Id.create("000" + oldStopId + route.getId(), TransitStopFacility.class);
 						TransitStopFacility newStopFacility = builder.createTransitStopFacility(newFacilityId, oldStopCoord, false);
 						newStopFacility.setName(oldStopName);
 						newStopFacility.setLinkId(lastLinkId);
@@ -425,7 +425,7 @@ public class AdaptPTNetwork {
 							Id oldStopId = currentStop.getStopFacility().getId();
 							String oldStopName = currentStop.getStopFacility().getName();
 							Coord oldStopCoord = currentStop.getStopFacility().getCoord();
-							Id newFacilityId = sc.createId("020" + oldStopId + route.getId());
+							Id<TransitStopFacility> newFacilityId = Id.create("020" + oldStopId + route.getId(), TransitStopFacility.class);
 							TransitStopFacility newStopFacility = builder.createTransitStopFacility(newFacilityId, oldStopCoord, false);
 							newStopFacility.setName(oldStopName);
 							newStopFacility.setLinkId(nlinkId);

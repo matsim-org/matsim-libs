@@ -109,7 +109,7 @@ public class DwellTime2Schedule {
 						
 						// create node and add it to network
 						nId += 1;
-						Id newNodeId = scWrite.createId(Integer.toString(nId));
+						Id<Node> newNodeId = Id.create(Integer.toString(nId), Node.class);
 						NodeImpl newNode = (NodeImpl) factory.createNode(newNodeId, firstFacCoords);
 						for (Node node : newPTnetwork.getNodes().values()) {
 							if ((Math.abs(newNode.getCoord().getX()-node.getCoord().getX())
@@ -127,7 +127,7 @@ public class DwellTime2Schedule {
 						nodeExisting = false;
 						
 						// create link and add it to network
-						Id nLinkId = sc.createId(newNodeId.toString()+newNodeId.toString()+Integer.toString(newId));
+						Id<Link> nLinkId = Id.create(newNodeId.toString()+newNodeId.toString()+Integer.toString(newId), Link.class);
 						LinkImpl nLink = (LinkImpl) factory.createLink(nLinkId, newNode, newNode);
 						double dist = 0.001;
 						double capLink = 99999.0;
@@ -185,7 +185,7 @@ public class DwellTime2Schedule {
 						}
 						// if not: create and add facility to schedule
 						if (facilityExisting != true) {
-							Id newFacId = sc.createId(firstFac.getId().toString()+Integer.toString(newCountId));
+							Id<TransitStopFacility> newFacId = Id.create(firstFac.getId().toString()+Integer.toString(newCountId), TransitStopFacility.class);
 							newCountId += 1;
 							TransitStopFacility firstFacnew = scheduleFactory.createTransitStopFacility(newFacId, firstFac.getCoord(), false);
 							firstFacnew.setName(firstFac.getName());
@@ -231,7 +231,7 @@ public class DwellTime2Schedule {
 						
 						// create node and add it to network
 						nId += 1;
-						Id newNodeId = scWrite.createId(Integer.toString(nId));
+						Id<Node> newNodeId = Id.create(Integer.toString(nId), Node.class);
 						NodeImpl newNode = (NodeImpl) factory.createNode(newNodeId, lastFacCoords);
 						for (Node node : newPTnetwork.getNodes().values()) {
 							if ((Math.abs(newNode.getCoord().getX()-node.getCoord().getX())
@@ -249,7 +249,7 @@ public class DwellTime2Schedule {
 						nodeExisting = false;
 						
 						// create link and add it to network
-						Id nLinkId = sc.createId(fromNode.getId().toString()+newNodeId.toString()+Integer.toString(newId));
+						Id<Link> nLinkId = Id.create(fromNode.getId().toString()+newNodeId.toString()+Integer.toString(newId), Link.class);
 						LinkImpl nLink = (LinkImpl) factory.createLink(nLinkId, fromNode, newNode);
 						double dist = Math.round(CoordUtils.calcDistance(fromNode.getCoord(), newNode.getCoord()));
 						if (dist == 0) {
@@ -304,7 +304,7 @@ public class DwellTime2Schedule {
 						}
 						// if not: create and add facility to schedule
 						if (facilityExisting != true) {
-							Id newFacId = sc.createId(lastFac.getId().toString()+Integer.toString(newCountId));
+							Id<TransitStopFacility> newFacId = Id.create(lastFac.getId().toString()+Integer.toString(newCountId), TransitStopFacility.class);
 							newCountId += 1;
 							TransitStopFacility lastFacnew = scheduleFactory.createTransitStopFacility(newFacId, lastFac.getCoord(), false);
 							lastFacnew.setName(lastFac.getName());
@@ -358,7 +358,7 @@ public class DwellTime2Schedule {
 						
 						// create node and add it to network
 						nId += 1;
-						Id newNodeId = scWrite.createId(Integer.toString(nId));
+						Id<Node> newNodeId = Id.create(Integer.toString(nId), Node.class);
 						NodeImpl newNode = (NodeImpl) factory.createNode(newNodeId, FacCoords);
 						for (Node node : newPTnetwork.getNodes().values()) {
 							if ((Math.abs(newNode.getCoord().getX()-node.getCoord().getX())
@@ -376,7 +376,7 @@ public class DwellTime2Schedule {
 						nodeExisting = false;
 						
 						// create link and add it to network
-						Id nLinkId = sc.createId(fromNode.getId().toString()+newNodeId.toString()+Integer.toString(newId));
+						Id<Link> nLinkId = Id.create(fromNode.getId().toString()+newNodeId.toString()+Integer.toString(newId), Link.class);
 						LinkImpl nLink = (LinkImpl) factory.createLink(nLinkId, fromNode, newNode);
 						double dist = Math.round(CoordUtils.calcDistance(fromNode.getCoord(), newNode.getCoord()));
 						if (dist == 0) {
@@ -430,7 +430,7 @@ public class DwellTime2Schedule {
 						}
 						// if not: create and add facility to schedule
 						if (facilityExisting != true) {
-							Id newFacId = sc.createId(betweenFac.getId().toString()+Integer.toString(newCountId));
+							Id<TransitStopFacility> newFacId = Id.create(betweenFac.getId().toString()+Integer.toString(newCountId), TransitStopFacility.class);
 							newCountId += 1;
 							TransitStopFacility betweenFacnew = scheduleFactory.createTransitStopFacility(newFacId, betweenFac.getCoord(), false);
 							betweenFacnew.setName(betweenFac.getName());

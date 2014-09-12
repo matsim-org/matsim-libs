@@ -22,6 +22,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -122,7 +123,7 @@ public class AdvancedPopulationGenerator {
 			String[] entries = curr_line0.split(";");
 			String hhnr = entries[0].trim();
 			String zielpnr = entries[1].trim();
-			Id id = sc.createId(hhnr.concat(zielpnr));
+			Id id = new IdImpl(hhnr.concat(zielpnr));
 			String weight = entries[2].trim();
 			double mzWeight = Double.parseDouble(weight);
 			String weekend = entries[4].trim();
@@ -138,7 +139,7 @@ public class AdvancedPopulationGenerator {
 				educationList.add(id);
 			}
 			//set score value to weight
-			Id MZid = sc.createId(hhnr.concat(zielpnr));
+			Id MZid = new IdImpl(hhnr.concat(zielpnr));
 			if (mz_population.getPersons().containsKey(MZid)) {
 				Person p = mz_population.getPersons().get(MZid);
 				PersonImpl person = (PersonImpl) p;
@@ -181,7 +182,7 @@ public class AdvancedPopulationGenerator {
 			count += 1;
 			String[] entries = curr_line.split(",");
 			String recordId = entries[0].trim();
-			Id recId = sc.createId(recordId);
+			Id recId = new IdImpl(recordId);
 			//String nrHome = entries[1].trim();
 			String homeXcoord = entries[2].trim();
 			String homeYcoord = entries[3].trim();
@@ -200,7 +201,7 @@ public class AdvancedPopulationGenerator {
 			// assign activity chain
 
 			//read corresponding MZ person out of population file
-			Id MZid = sc.createId(hhnr.concat(zielpnr));
+			Id<Person> MZid = Id.create(hhnr.concat(zielpnr), Person.class);
 			Person p = mz_population.getPersons().get(MZid);
 			PersonImpl person = (PersonImpl) p;
 			if (mz_population.getPersons().get(MZid) == null) {
