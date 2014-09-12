@@ -19,8 +19,11 @@
 
 package playground.michalm.demand;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationFactory;
 
 import playground.michalm.zone.Zone;
 
@@ -54,7 +57,7 @@ public class DefaultPersonCreator
     {
         String strId = String.format(idFormat + "_%s_%s", currentAgentId++, fromZone.getId(),
                 toZone.getId());
-        Person person = pf.createPerson(scenario.createId(strId));
+        Person person = pf.createPerson(Id.create(strId, Person.class));
         return person;
     }
 }

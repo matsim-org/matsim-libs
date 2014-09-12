@@ -19,19 +19,29 @@
 
 package playground.michalm.taxi.optimizer.fifo;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.router.VrpPathCalculator;
+import org.matsim.core.basic.v01.IdImpl;
 
 import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.optimizer.*;
+import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration.Goal;
-import playground.michalm.taxi.scheduler.*;
-import playground.michalm.taxi.vehreqpath.*;
+import playground.michalm.taxi.scheduler.TaxiScheduler;
+import playground.michalm.taxi.scheduler.TaxiSchedulerParams;
+import playground.michalm.taxi.vehreqpath.VehicleRequestPath;
+import playground.michalm.taxi.vehreqpath.VehicleRequestPathCost;
+import playground.michalm.taxi.vehreqpath.VehicleRequestPathFinder;
 
 
 /**
@@ -91,7 +101,7 @@ public class TaxiOptimizerWithPreassignment
         Map<Id, Vehicle> reqIdToVehMap = new HashMap<Id, Vehicle>();
 
         while (scanner.hasNext()) {
-            Id reqId = scenario.createId(scanner.next());
+            Id reqId = new IdImpl(scanner.next());
             Vehicle veh = vehicles.get(scanner.nextInt());
             reqIdToVehMap.put(reqId, veh);
         }

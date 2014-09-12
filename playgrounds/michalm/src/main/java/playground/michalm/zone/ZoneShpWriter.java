@@ -19,11 +19,14 @@
 
 package playground.michalm.zone;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.*;
+import org.matsim.core.utils.gis.PolygonFeatureFactory;
+import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -32,11 +35,11 @@ public class ZoneShpWriter
 {
     public static final String ID_HEADER = "ID";
 
-    private final Map<Id, Zone> zones;
+    private final Map<Id<Zone>, Zone> zones;
     private final String coordinateSystem;
 
 
-    public ZoneShpWriter(Map<Id, Zone> zones, String coordinateSystem)
+    public ZoneShpWriter(Map<Id<Zone>, Zone> zones, String coordinateSystem)
     {
         this.zones = zones;
         this.coordinateSystem = coordinateSystem;

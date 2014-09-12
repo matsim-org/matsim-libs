@@ -70,9 +70,9 @@ public class ElectricVehicleReader
 
     private void startVehicle(Attributes atts)
     {
-        Id id = scenario.createId(atts.getValue("id"));
+        Id<ElectricVehicle> id = Id.create(atts.getValue("id"), ElectricVehicle.class);
 
-        Id startLinkId = scenario.createId(atts.getValue("start_link"));
+        Id<Link> startLinkId = Id.create(atts.getValue("start_link"), Link.class);
         Link startLink = links.get(startLinkId);
 
         double capacity = ReaderUtils.getDouble(atts, "capacity", 1);

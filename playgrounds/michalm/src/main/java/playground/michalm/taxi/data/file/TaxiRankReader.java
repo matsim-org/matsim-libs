@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.file.ReaderUtils;
 import org.matsim.contrib.dvrp.extensions.electric.ChargerImpl;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -75,10 +76,10 @@ public class TaxiRankReader
 
     private void startRank(Attributes atts)
     {
-        Id id = scenario.createId(atts.getValue("id"));
+        Id<TaxiRank> id = Id.create(atts.getValue("id"), TaxiRank.class);
         String name = atts.getValue("name");
 
-        Id linkId = scenario.createId(atts.getValue("link"));
+        Id<Link> linkId = Id.create(atts.getValue("link"), Link.class);
         Link link = links.get(linkId);
 
         currentRank = new TaxiRank(id, name, link);
@@ -88,7 +89,7 @@ public class TaxiRankReader
 
     private void startCharger(Attributes atts)
     {
-        Id id = scenario.createId(atts.getValue("id"));
+        Id id = new IdImpl(atts.getValue("id"));
         double powerInWatts = ReaderUtils.getDouble(atts, "power", 20) * 1000;
 
         data.addCharger(new ChargerImpl(id, powerInWatts, currentRank.getLink()));

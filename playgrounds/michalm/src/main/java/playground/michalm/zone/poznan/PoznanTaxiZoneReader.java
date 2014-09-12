@@ -19,19 +19,32 @@
 
 package playground.michalm.zone.poznan;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.TreeMap;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.*;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
-import playground.michalm.zone.*;
+import playground.michalm.zone.Zone;
+import playground.michalm.zone.Zones;
 
-import com.vividsolutions.jts.geom.*;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Polygon;
 
 
 public class PoznanTaxiZoneReader
@@ -40,7 +53,7 @@ public class PoznanTaxiZoneReader
     private GeometryFactory geometryFactory = new GeometryFactory();
 
     private final Scenario scenario;
-    private final Map<Id, Zone> zones = new TreeMap<Id, Zone>();
+    private final Map<Id<Zone>, Zone> zones = new TreeMap<Id<Zone>, Zone>();
 
 
     public PoznanTaxiZoneReader(Scenario scenario)
@@ -49,7 +62,7 @@ public class PoznanTaxiZoneReader
     }
 
 
-    public Map<Id, Zone> getZones()
+    public Map<Id<Zone>, Zone> getZones()
     {
         return zones;
     }
@@ -109,7 +122,7 @@ public class PoznanTaxiZoneReader
                 continue;// obsolete zone
             }
 
-            Id zoneId = scenario.createId(token);
+            Id<Zone> zoneId = Id.create(token, Zone.class);
             int count = st.countTokens();
             Coordinate[] ringCoords = new Coordinate[count + 1];
 
@@ -132,8 +145,8 @@ public class PoznanTaxiZoneReader
 
     private void removeInnerFromOuterZone(String innerId, String outerId)
     {
-        Zone inner = zones.get(scenario.createId(innerId));
-        Zone outer = zones.get(scenario.createId(outerId));
+        Zone inner = zones.get(Id.create(innerId, Zone.class));
+        Zone outer = zones.get(Id.create(outerId, Zone.class));
         Polygon polygon = (Polygon)outer.getMultiPolygon().difference(inner.getMultiPolygon());
         outer.setMultiPolygon(geometryFactory.createMultiPolygon(new Polygon[] { polygon }));
     }
@@ -149,7 +162,7 @@ public class PoznanTaxiZoneReader
         Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
         PoznanTaxiZoneReader zoneReader = new PoznanTaxiZoneReader(scenario);
         zoneReader.read(input);
-        Map<Id, Zone> zones = zoneReader.getZones();
+        Map<Id<Zone>, Zone> zones = zoneReader.getZones();
         Zones.writeZones(zones, TransformationFactory.WGS84_UTM33N, zonesXmlFile, zonesShpFile);
     }
 }

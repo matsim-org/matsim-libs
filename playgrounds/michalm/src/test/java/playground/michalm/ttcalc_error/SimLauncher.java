@@ -41,7 +41,7 @@ public class SimLauncher
         TravelTime travelTime = controler.getLinkTravelTimes();
 
         Map<Id<Link>, ? extends Link> links = controler.getNetwork().getLinks();
-        Id idB = controler.getScenario().createId("B");
+        Id<Link> idB = Id.create("B", Link.class);
         Link linkB = links.get(idB);
 
         System.out.println("\ndeparture time [min] : travel time [s]\n");

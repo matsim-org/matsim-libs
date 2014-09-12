@@ -1,6 +1,9 @@
 package playground.michalm.zone;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
@@ -10,10 +13,10 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
 public class ZoneXmlWriter
     extends MatsimXmlWriter
 {
-    private Map<Id, Zone> zones;
+    private Map<Id<Zone>, Zone> zones;
 
 
-    public ZoneXmlWriter(Map<Id, Zone> zones)
+    public ZoneXmlWriter(Map<Id<Zone>, Zone> zones)
     {
         this.zones = zones;
     }

@@ -71,7 +71,7 @@ public class BerlinBrandenburgShape2ZoneConverter
 
     private void writeZones()
     {
-        Map<Id, Zone> zoneMap = new HashMap<Id, Zone>();
+        Map<Id<Zone>, Zone> zoneMap = new HashMap<Id<Zone>, Zone>();
         for (Entry<String, MultiPolygon> e : polMap.entrySet()) {
             Id zoneId = new IdImpl(e.getKey());
             Zone zone = new Zone(zoneId, zoneId.toString(), e.getValue());

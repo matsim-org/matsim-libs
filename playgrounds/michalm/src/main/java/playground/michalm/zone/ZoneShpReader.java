@@ -19,9 +19,11 @@
 
 package playground.michalm.zone;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -59,7 +61,7 @@ public class ZoneShpReader
 
         for (SimpleFeature ft : features) {
             String id = ft.getAttribute(idHeader).toString();
-            Zone z = zones.get(scenario.createId(id));
+            Zone z = zones.get(Id.create(id, Zone.class));
             z.setMultiPolygon((MultiPolygon)ft.getDefaultGeometry());
         }
     }

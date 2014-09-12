@@ -19,16 +19,30 @@
 
 package playground.michalm.demand.poznan;
 
-import static playground.michalm.demand.poznan.PoznanLanduseDemandGeneration.ActivityType.*;
+import static playground.michalm.demand.poznan.PoznanLanduseDemandGeneration.ActivityType.EDUCATION;
+import static playground.michalm.demand.poznan.PoznanLanduseDemandGeneration.ActivityType.HOME;
+import static playground.michalm.demand.poznan.PoznanLanduseDemandGeneration.ActivityType.NON_HOME;
+import static playground.michalm.demand.poznan.PoznanLanduseDemandGeneration.ActivityType.OTHER;
+import static playground.michalm.demand.poznan.PoznanLanduseDemandGeneration.ActivityType.SHOPPING;
+import static playground.michalm.demand.poznan.PoznanLanduseDemandGeneration.ActivityType.WORK;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Scanner;
 
 import javax.naming.ConfigurationException;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -36,16 +50,24 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.matrices.Matrix;
 import org.xml.sax.SAXException;
 
-import pl.poznan.put.util.random.*;
-import playground.michalm.demand.*;
+import pl.poznan.put.util.random.RandomUtils;
+import pl.poznan.put.util.random.WeightedRandomSelectionTable;
+import playground.michalm.demand.ActivityCreator;
+import playground.michalm.demand.DefaultActivityCreator;
 import playground.michalm.demand.DefaultActivityCreator.GeometryProvider;
 import playground.michalm.demand.DefaultActivityCreator.PointAcceptor;
+import playground.michalm.demand.DefaultPersonCreator;
+import playground.michalm.demand.ODDemandGenerator;
+import playground.michalm.demand.PersonCreator;
 import playground.michalm.util.matrices.MatrixUtils;
 import playground.michalm.util.visum.VisumODMatrixReader;
-import playground.michalm.zone.*;
-import playground.michalm.zone.util.*;
+import playground.michalm.zone.Zone;
+import playground.michalm.zone.Zones;
+import playground.michalm.zone.util.SubzoneUtils;
 
-import com.vividsolutions.jts.geom.*;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 
 public class PoznanLanduseDemandGeneration
@@ -214,7 +236,7 @@ public class PoznanLanduseDemandGeneration
         scanner.nextLine();// skip the header
 
         while (scanner.hasNext()) {
-            Id zoneId = scenario.createId(scanner.next());
+            Id<Zone> zoneId = Id.create(scanner.next(), Zone.class);
             boolean residential = scanner.nextInt() != 0;
             boolean industrial = scanner.nextInt() != 0;
 

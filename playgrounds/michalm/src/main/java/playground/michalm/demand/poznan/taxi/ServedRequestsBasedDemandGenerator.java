@@ -19,10 +19,17 @@
 
 package playground.michalm.demand.poznan.taxi;
 
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -68,7 +75,7 @@ public class ServedRequestsBasedDemandGenerator
             plan.addActivity(pf.createActivityFromCoord("dummy", r.to));
 
             String strId = String.format("taxi_customer_%d", curentAgentId++);
-            Person person = pf.createPerson(scenario.createId(strId));
+            Person person = pf.createPerson(Id.create(strId, Person.class));
 
             person.addPlan(plan);
             scenario.getPopulation().addPerson(person);

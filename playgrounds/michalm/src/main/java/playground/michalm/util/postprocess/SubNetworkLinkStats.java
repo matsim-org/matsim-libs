@@ -70,7 +70,7 @@ public class SubNetworkLinkStats
         String line;
         while ( (line = br.readLine()) != null) {
             String linkId = new StringTokenizer(line).nextToken();// linkId - first column
-            Link link = linkMap.get(scenario.createId(linkId));
+            Link link = linkMap.get(Id.create(linkId, Link.class));
 
             if (linkInsidePolygonPredicate.apply(link)) {
                 pw.println(line);

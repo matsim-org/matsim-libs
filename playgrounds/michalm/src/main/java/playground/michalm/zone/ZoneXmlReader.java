@@ -19,9 +19,12 @@
 
 package playground.michalm.zone;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Stack;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -63,7 +66,7 @@ public class ZoneXmlReader
 
     private void startZone(Attributes atts)
     {
-        Id id = scenario.createId(atts.getValue("id"));
+        Id<Zone> id = Id.create(atts.getValue("id"), Zone.class);
         String type = atts.getValue("type");
         zones.put(id, new Zone(id, type));
     }

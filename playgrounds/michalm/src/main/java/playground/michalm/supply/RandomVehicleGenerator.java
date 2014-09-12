@@ -20,17 +20,22 @@
 package playground.michalm.supply;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.VehicleImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleWriter;
 import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import pl.poznan.put.util.random.*;
+import pl.poznan.put.util.random.RandomUtils;
+import pl.poznan.put.util.random.UniformRandom;
 
 
 public class RandomVehicleGenerator
@@ -49,7 +54,7 @@ public class RandomVehicleGenerator
 
         List<Vehicle> vehicles = new ArrayList<Vehicle>(count);
         for (int i = 0; i < count; i++) {
-            Id id = scenario.createId(i + "");
+            Id<Vehicle> id = Id.create(i + "", Vehicle.class);
             Link startLink = links[uniform.nextInt(0, links.length - 1)];
             Vehicle v = new VehicleImpl(id, startLink, 1, 0, t1);
             vehicles.add(v);

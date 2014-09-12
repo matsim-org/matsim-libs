@@ -19,17 +19,21 @@
 
 package playground.michalm.zone;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.*;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 
-import com.vividsolutions.jts.geom.*;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.util.PolygonExtracter;
 
 
@@ -48,7 +52,7 @@ public class Zones
     }
 
 
-    public static void writeZones(Map<Id, Zone> zones, String coordinateSystem,
+    public static void writeZones(Map<Id<Zone>, Zone> zones, String coordinateSystem,
             String zonesXmlFile, String zonesShpFile)
     {
         new ZoneXmlWriter(zones).write(zonesXmlFile);
@@ -96,6 +100,6 @@ public class Zones
     @SuppressWarnings("unchecked")
     public static List<Polygon> getPolygons(Zone zone)
     {
-        return (List<Polygon>)PolygonExtracter.getPolygons(zone.getMultiPolygon());
+        return PolygonExtracter.getPolygons(zone.getMultiPolygon());
     }
 }
