@@ -19,6 +19,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.UmlaufBuilder;
 import org.matsim.pt.UmlaufInterpolator;
+import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -30,17 +31,8 @@ public class GreedyUmlaufBuilderTest {
 
 	ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-	private final Id[] ids = new Id[25];
-
-	private void createIds() {
-		for (int i = 0; i < this.ids.length; i++) {
-			this.ids[i] = this.scenario.createId(Integer.toString(i));
-		}
-	}
-
 	@Test
 	public void testGreedyUmlaufBuilder() {
-		createIds();
 		Config config = this.scenario.getConfig();
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
@@ -56,35 +48,35 @@ public class GreedyUmlaufBuilderTest {
 	private void setupSchedule() {
 		TransitSchedule schedule = this.scenario.getTransitSchedule();
 		TransitScheduleFactory builder = schedule.getFactory();
-		TransitStopFacility stop1 = builder.createTransitStopFacility(this.ids[1], this.scenario.createCoord(-100, -50), false);
-		TransitStopFacility stop2 = builder.createTransitStopFacility(this.ids[2], this.scenario.createCoord(-100, 850), false);
-		TransitStopFacility stop3 = builder.createTransitStopFacility(this.ids[3], this.scenario.createCoord(1400, 450), false);
-		TransitStopFacility stop4 = builder.createTransitStopFacility(this.ids[4], this.scenario.createCoord(3400, 450), false);
-		TransitStopFacility stop5 = builder.createTransitStopFacility(this.ids[5], this.scenario.createCoord(3900, 50), false);
-		TransitStopFacility stop6 = builder.createTransitStopFacility(this.ids[6], this.scenario.createCoord(3900, 850), false);
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create(1, TransitStopFacility.class), this.scenario.createCoord(-100, -50), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create(2, TransitStopFacility.class), this.scenario.createCoord(-100, 850), false);
+		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create(3, TransitStopFacility.class), this.scenario.createCoord(1400, 450), false);
+		TransitStopFacility stop4 = builder.createTransitStopFacility(Id.create(4, TransitStopFacility.class), this.scenario.createCoord(3400, 450), false);
+		TransitStopFacility stop5 = builder.createTransitStopFacility(Id.create(5, TransitStopFacility.class), this.scenario.createCoord(3900, 50), false);
+		TransitStopFacility stop6 = builder.createTransitStopFacility(Id.create(6, TransitStopFacility.class), this.scenario.createCoord(3900, 850), false);
 
-		TransitStopFacility stop7 = builder.createTransitStopFacility(this.ids[7], this.scenario.createCoord(2600, 550), false);
-		TransitStopFacility stop8 = builder.createTransitStopFacility(this.ids[8], this.scenario.createCoord( 600, 550), false);
+		TransitStopFacility stop7 = builder.createTransitStopFacility(Id.create(7, TransitStopFacility.class), this.scenario.createCoord(2600, 550), false);
+		TransitStopFacility stop8 = builder.createTransitStopFacility(Id.create(8, TransitStopFacility.class), this.scenario.createCoord( 600, 550), false);
 
-		Link link1 = this.scenario.getNetwork().getLinks().get(this.ids[1]);
-		Link link2 = this.scenario.getNetwork().getLinks().get(this.ids[2]);
-		Link link3 = this.scenario.getNetwork().getLinks().get(this.ids[3]);
-		Link link4 = this.scenario.getNetwork().getLinks().get(this.ids[4]);
-		Link link5 = this.scenario.getNetwork().getLinks().get(this.ids[5]);
-		Link link6 = this.scenario.getNetwork().getLinks().get(this.ids[6]);
-		Link link7 = this.scenario.getNetwork().getLinks().get(this.ids[7]);
-		Link link8 = this.scenario.getNetwork().getLinks().get(this.ids[8]);
-		Link link9 = this.scenario.getNetwork().getLinks().get(this.ids[9]);
-		Link link10 = this.scenario.getNetwork().getLinks().get(this.ids[10]);
-		Link link11 = this.scenario.getNetwork().getLinks().get(this.ids[11]);
-		Link link12 = this.scenario.getNetwork().getLinks().get(this.ids[12]);
-		Link link13 = this.scenario.getNetwork().getLinks().get(this.ids[13]);
-		Link link14 = this.scenario.getNetwork().getLinks().get(this.ids[14]);
-		Link link15 = this.scenario.getNetwork().getLinks().get(this.ids[15]);
-		Link link16 = this.scenario.getNetwork().getLinks().get(this.ids[16]);
-		Link link17 = this.scenario.getNetwork().getLinks().get(this.ids[17]);
-		Link link18 = this.scenario.getNetwork().getLinks().get(this.ids[18]);
-		Link link19 = this.scenario.getNetwork().getLinks().get(this.ids[19]);
+		Link link1 = this.scenario.getNetwork().getLinks().get(Id.create(1, Link.class));
+		Link link2 = this.scenario.getNetwork().getLinks().get(Id.create(2, Link.class));
+		Link link3 = this.scenario.getNetwork().getLinks().get(Id.create(3, Link.class));
+		Link link4 = this.scenario.getNetwork().getLinks().get(Id.create(4, Link.class));
+		Link link5 = this.scenario.getNetwork().getLinks().get(Id.create(5, Link.class));
+		Link link6 = this.scenario.getNetwork().getLinks().get(Id.create(6, Link.class));
+		Link link7 = this.scenario.getNetwork().getLinks().get(Id.create(7, Link.class));
+		Link link8 = this.scenario.getNetwork().getLinks().get(Id.create(8, Link.class));
+		Link link9 = this.scenario.getNetwork().getLinks().get(Id.create(9, Link.class));
+		Link link10 = this.scenario.getNetwork().getLinks().get(Id.create(10, Link.class));
+		Link link11 = this.scenario.getNetwork().getLinks().get(Id.create(11, Link.class));
+		Link link12 = this.scenario.getNetwork().getLinks().get(Id.create(12, Link.class));
+		Link link13 = this.scenario.getNetwork().getLinks().get(Id.create(13, Link.class));
+		Link link14 = this.scenario.getNetwork().getLinks().get(Id.create(14, Link.class));
+		Link link15 = this.scenario.getNetwork().getLinks().get(Id.create(15, Link.class));
+		Link link16 = this.scenario.getNetwork().getLinks().get(Id.create(16, Link.class));
+		Link link17 = this.scenario.getNetwork().getLinks().get(Id.create(17, Link.class));
+		Link link18 = this.scenario.getNetwork().getLinks().get(Id.create(18, Link.class));
+		Link link19 = this.scenario.getNetwork().getLinks().get(Id.create(19, Link.class));
 
 		stop1.setLinkId(link3.getId());
 		stop2.setLinkId(link4.getId());
@@ -104,7 +96,7 @@ public class GreedyUmlaufBuilderTest {
 		schedule.addStopFacility(stop7);
 		schedule.addStopFacility(stop8);
 
-		TransitLine tLine2 = builder.createTransitLine(this.ids[2]);
+		TransitLine tLine2 = builder.createTransitLine(Id.create(2, TransitLine.class));
 		NetworkRoute networkRoute = new LinkNetworkRouteImpl(link2.getId(), link12.getId());
 		ArrayList<Id<Link>> linkIdList = new ArrayList<Id<Link>>(6);
 		Collections.addAll(linkIdList, link4.getId(), link6.getId(), link7.getId(), link8.getId(), link9.getId(), link10.getId());
@@ -114,11 +106,11 @@ public class GreedyUmlaufBuilderTest {
 		stopList.add(builder.createTransitRouteStop(stop3, 90, 100));
 		stopList.add(builder.createTransitRouteStop(stop4, 290, 300));
 		stopList.add(builder.createTransitRouteStop(stop6, 390, Time.UNDEFINED_TIME));
-		TransitRoute tRoute2 = builder.createTransitRoute(this.ids[1], networkRoute, stopList, "bus");
+		TransitRoute tRoute2 = builder.createTransitRoute(Id.create(1, TransitRoute.class), networkRoute, stopList, "bus");
 		tLine2.addRoute(tRoute2);
-		tRoute2.addDeparture(builder.createDeparture(this.ids[1], Time.parseTime("07:02:00")));
-		tRoute2.addDeparture(builder.createDeparture(this.ids[2], Time.parseTime("07:12:00")));
-		tRoute2.addDeparture(builder.createDeparture(this.ids[3], Time.parseTime("07:22:00")));
+		tRoute2.addDeparture(builder.createDeparture(Id.create(1, Departure.class), Time.parseTime("07:02:00")));
+		tRoute2.addDeparture(builder.createDeparture(Id.create(2, Departure.class), Time.parseTime("07:12:00")));
+		tRoute2.addDeparture(builder.createDeparture(Id.create(3, Departure.class), Time.parseTime("07:22:00")));
 
 		networkRoute = new LinkNetworkRouteImpl(link17.getId(), link19.getId());
 		linkIdList = new ArrayList<Id<Link>>(6);
@@ -129,11 +121,11 @@ public class GreedyUmlaufBuilderTest {
 		stopList.add(builder.createTransitRouteStop(stop4, 100, 110));
 		stopList.add(builder.createTransitRouteStop(stop3, 300, 310));
 		stopList.add(builder.createTransitRouteStop(stop2, 390, Time.UNDEFINED_TIME));
-		TransitRoute tRoute2a = builder.createTransitRoute(this.ids[2], networkRoute, stopList, "bus");
+		TransitRoute tRoute2a = builder.createTransitRoute(Id.create(2, TransitRoute.class), networkRoute, stopList, "bus");
 		tLine2.addRoute(tRoute2a);
-		tRoute2a.addDeparture(builder.createDeparture(this.ids[1], Time.parseTime("07:18:00")));
-		tRoute2a.addDeparture(builder.createDeparture(this.ids[2], Time.parseTime("07:28:00")));
-		tRoute2a.addDeparture(builder.createDeparture(this.ids[3], Time.parseTime("07:38:00")));
+		tRoute2a.addDeparture(builder.createDeparture(Id.create(1, Departure.class), Time.parseTime("07:18:00")));
+		tRoute2a.addDeparture(builder.createDeparture(Id.create(2, Departure.class), Time.parseTime("07:28:00")));
+		tRoute2a.addDeparture(builder.createDeparture(Id.create(3, Departure.class), Time.parseTime("07:38:00")));
 
 		schedule.addTransitLine(tLine2);
 	}
@@ -159,43 +151,43 @@ public class GreedyUmlaufBuilderTest {
 		 */
 		NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
-		Node node1 = network.createAndAddNode(this.ids[1], this.scenario.createCoord(-2000, 0));
-		Node node2 = network.createAndAddNode(this.ids[2], this.scenario.createCoord(-2000, 1000));
-		Node node3 = network.createAndAddNode(this.ids[3], this.scenario.createCoord(-1000, 0));
-		Node node4 = network.createAndAddNode(this.ids[4], this.scenario.createCoord(-1000, 1000));
-		Node node5 = network.createAndAddNode(this.ids[5], this.scenario.createCoord(0, 0));
-		Node node6 = network.createAndAddNode(this.ids[6], this.scenario.createCoord(0, 1000));
-		Node node7 = network.createAndAddNode(this.ids[7], this.scenario.createCoord(500, 500));
-		Node node8 = network.createAndAddNode(this.ids[8], this.scenario.createCoord(1500, 500));
-		Node node9 = network.createAndAddNode(this.ids[9], this.scenario.createCoord(2500, 500));
-		Node node10 = network.createAndAddNode(this.ids[10], this.scenario.createCoord(3500, 500));
-		Node node11 = network.createAndAddNode(this.ids[11], this.scenario.createCoord(4000, 0));
-		Node node12 = network.createAndAddNode(this.ids[12], this.scenario.createCoord(4000, 1000));
-		Node node13 = network.createAndAddNode(this.ids[13], this.scenario.createCoord(5000, 0));
-		Node node14 = network.createAndAddNode(this.ids[14], this.scenario.createCoord(5000, 1000));
+		Node node1 = network.createAndAddNode(Id.create(1, Node.class), this.scenario.createCoord(-2000, 0));
+		Node node2 = network.createAndAddNode(Id.create(2, Node.class), this.scenario.createCoord(-2000, 1000));
+		Node node3 = network.createAndAddNode(Id.create(3, Node.class), this.scenario.createCoord(-1000, 0));
+		Node node4 = network.createAndAddNode(Id.create(4, Node.class), this.scenario.createCoord(-1000, 1000));
+		Node node5 = network.createAndAddNode(Id.create(5, Node.class), this.scenario.createCoord(0, 0));
+		Node node6 = network.createAndAddNode(Id.create(6, Node.class), this.scenario.createCoord(0, 1000));
+		Node node7 = network.createAndAddNode(Id.create(7, Node.class), this.scenario.createCoord(500, 500));
+		Node node8 = network.createAndAddNode(Id.create(8, Node.class), this.scenario.createCoord(1500, 500));
+		Node node9 = network.createAndAddNode(Id.create(9, Node.class), this.scenario.createCoord(2500, 500));
+		Node node10 = network.createAndAddNode(Id.create(10, Node.class), this.scenario.createCoord(3500, 500));
+		Node node11 = network.createAndAddNode(Id.create(11, Node.class), this.scenario.createCoord(4000, 0));
+		Node node12 = network.createAndAddNode(Id.create(12, Node.class), this.scenario.createCoord(4000, 1000));
+		Node node13 = network.createAndAddNode(Id.create(13, Node.class), this.scenario.createCoord(5000, 0));
+		Node node14 = network.createAndAddNode(Id.create(14, Node.class), this.scenario.createCoord(5000, 1000));
 
-		network.createAndAddLink(this.ids[1], node1, node3, 1000.0, 10.0, 3600.0, 1);
-		network.createAndAddLink(this.ids[2], node2, node4, 1000.0, 10.0, 3600.0, 1);
-		network.createAndAddLink(this.ids[3], node3, node5, 1000.0, 10.0, 3600.0, 1);
-		network.createAndAddLink(this.ids[4], node4, node6, 1000.0, 10.0, 3600.0, 1);
-		network.createAndAddLink(this.ids[5], node5, node7, 1000.0, 10.0, 3600.0, 1);
-		network.createAndAddLink(this.ids[6], node6, node7, 1000.0, 10.0, 3600.0, 1);
-		network.createAndAddLink(this.ids[7], node7, node8, 1000.0, 10.0, 3600.0, 1);
-		network.createAndAddLink(this.ids[8], node8, node9, 1000.0, 10.0, 3600.0, 1);
-		network.createAndAddLink(this.ids[9], node9, node10, 1000.0, 10.0, 3600.0, 1);
-		network.createAndAddLink(this.ids[10], node10, node12, 1000.0, 10.0, 3600.0, 1);
-		network.createAndAddLink(this.ids[11], node10, node11, 1000.0, 10.0, 3600.0, 1);
-		network.createAndAddLink(this.ids[12], node12, node14, 1000.0, 10.0, 3600.0, 1);
-		network.createAndAddLink(this.ids[13], node11, node13, 1000.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(Id.create( 1, Link.class), node1, node3, 1000.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(Id.create( 2, Link.class), node2, node4, 1000.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(Id.create( 3, Link.class), node3, node5, 1000.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(Id.create( 4, Link.class), node4, node6, 1000.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(Id.create( 5, Link.class), node5, node7, 1000.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(Id.create( 6, Link.class), node6, node7, 1000.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(Id.create( 7, Link.class), node7, node8, 1000.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(Id.create( 8, Link.class), node8, node9, 1000.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(Id.create( 9, Link.class), node9, node10, 1000.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(Id.create(10, Link.class), node10, node12, 1000.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(Id.create(11, Link.class), node10, node11, 1000.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(Id.create(12, Link.class), node12, node14, 1000.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(Id.create(13, Link.class), node11, node13, 1000.0, 10.0, 3600.0, 1);
 
-		network.createAndAddLink(this.ids[14], node10, node9, 1000.0, 10.0, 3600.0, 1);
-		network.createAndAddLink(this.ids[15], node9, node8, 1000.0, 10.0, 3600.0, 1);
-		network.createAndAddLink(this.ids[16], node8, node7, 1000.0, 10.0, 3600.0, 1);
-		network.createAndAddLink(this.ids[17], node14, node12, 1000.0, 10.0, 3600.0, 1);
-		network.createAndAddLink(this.ids[18], node12, node10, 1000.0, 10.0, 3600.0, 1);
-		network.createAndAddLink(this.ids[19], node7, node6, 1000.0, 10.0, 3600.0, 1);
-		network.createAndAddLink(this.ids[20], node6, node4, 1000.0, 10.0, 3600.0, 1);
-		network.createAndAddLink(this.ids[21], node4, node2, 1000.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(Id.create(14, Link.class), node10, node9, 1000.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(Id.create(15, Link.class), node9, node8, 1000.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(Id.create(16, Link.class), node8, node7, 1000.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(Id.create(17, Link.class), node14, node12, 1000.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(Id.create(18, Link.class), node12, node10, 1000.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(Id.create(19, Link.class), node7, node6, 1000.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(Id.create(20, Link.class), node6, node4, 1000.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(Id.create(21, Link.class), node4, node2, 1000.0, 10.0, 3600.0, 1);
 	}
 
 }

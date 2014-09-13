@@ -36,14 +36,14 @@ public class GridCreator {
 	public void createGrid(int size) {
 		for (int i = 0; i <= size; i++) {
 			for (int j = 0; j <= size; j++) {
-				Node node = network.getFactory().createNode(makeId(i, j), makeCoord(i, j));
+				Node node = network.getFactory().createNode(makeId(i, j, Node.class), makeCoord(i, j));
 				network.addNode(node);
 				if (i != 0) {
-					Link iLink = network.getFactory().createLink(makeLinkId(i, j), makeId(i-1, j), makeId(i, j));
+					Link iLink = network.getFactory().createLink(makeLinkId(i, j), makeId(i-1, j, Node.class), makeId(i, j, Node.class));
 					iLink.setLength(1000);
 					iLink.setFreespeed(100);
 					iLink.setCapacity(1000);
-					Link iLinkR = network.getFactory().createLink(scenario.createId("i("+i+","+j+")"+"R"), makeId(i, j),makeId(i-1, j));
+					Link iLinkR = network.getFactory().createLink(Id.create("i("+i+","+j+")"+"R", Link.class), makeId(i, j, Node.class),makeId(i-1, j, Node.class));
 					iLinkR.setLength(1000);
 					iLinkR.setFreespeed(100);
 					iLinkR.setCapacity(1000);
@@ -51,11 +51,11 @@ public class GridCreator {
 					network.addLink(iLinkR);
 				}
 				if (j != 0) {
-					Link jLink = network.getFactory().createLink(scenario.createId("j("+i+","+j+")"), makeId(i, j-1), makeId(i, j));
+					Link jLink = network.getFactory().createLink(Id.create("j("+i+","+j+")", Link.class), makeId(i, j-1, Node.class), makeId(i, j, Node.class));
 					jLink.setLength(1000);
 					jLink.setFreespeed(100);
 					jLink.setCapacity(1000);
-					Link jLinkR = network.getFactory().createLink(scenario.createId("j("+i+","+j+")"+"R"), makeId(i, j), makeId(i, j-1));
+					Link jLinkR = network.getFactory().createLink(Id.create("j("+i+","+j+")"+"R", Link.class), makeId(i, j, Node.class), makeId(i, j-1, Node.class));
 					jLinkR.setLength(1000);
 					jLinkR.setFreespeed(100);
 					jLinkR.setCapacity(1000);
@@ -66,16 +66,16 @@ public class GridCreator {
 		}
 	}
 
-	private Id makeLinkId(int i, int j) {
-		return scenario.createId("i("+i+","+j+")");
+	private Id<Link> makeLinkId(int i, int j) {
+		return Id.create("i("+i+","+j+")", Link.class);
 	}
 
 	private Coord makeCoord(int i, int j) {
 		return scenario.createCoord(i * 1000, j * 1000);
 	}
 
-	private Id makeId(int i, int j) {
-		return scenario.createId("("+i+","+j+")");
+	private <T> Id<T> makeId(int i, int j, Class<T> type) {
+		return Id.create("("+i+","+j+")", type);
 	}
 	
 	private void writeNetwork() {

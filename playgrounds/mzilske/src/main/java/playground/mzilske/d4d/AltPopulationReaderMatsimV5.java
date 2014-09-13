@@ -19,14 +19,36 @@
 
 package playground.mzilske.d4d;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.events.XMLEvent;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.*;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -36,17 +58,6 @@ import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
-
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.events.XMLEvent;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
 
 
 
@@ -200,7 +211,7 @@ class AltPopulationReaderMatsimV5 implements PopulationReader {
 		ActivityImpl curract;
 		Coord coord;
 		if (xmlr.getAttributeValue("", "link") != null) {
-			Id linkId = this.scenario.createId(xmlr.getAttributeValue("", "link"));
+			Id<Link> linkId = Id.create(xmlr.getAttributeValue("", "link"), Link.class);
 			curract = (ActivityImpl) population.getFactory().createActivityFromLinkId(xmlr.getAttributeValue("", "type"), linkId);
 			if ((xmlr.getAttributeValue("", "x") != null) && (xmlr.getAttributeValue("", "y") != null)) {
 				coord = new CoordImpl(xmlr.getAttributeValue("", "x"), xmlr.getAttributeValue("", "y"));
@@ -217,7 +228,7 @@ class AltPopulationReaderMatsimV5 implements PopulationReader {
 		curract.setEndTime(Time.parseTime(xmlr.getAttributeValue("", "end_time")));
 		String fId = xmlr.getAttributeValue("", "facility");
 		if (fId != null) {
-			curract.setFacilityId(this.scenario.createId(fId));
+			curract.setFacilityId(Id.create(fId, ActivityFacility.class));
 		}
 		return curract;
 	}
@@ -260,8 +271,8 @@ class AltPopulationReaderMatsimV5 implements PopulationReader {
 		if ("links".equals(routeType)) {
 			LinkNetworkRouteImpl linkNetworkRoute = new LinkNetworkRouteImpl(null, null);
 			List<Id<Link>> linkIds = NetworkUtils.getLinkIds(routeDescription);
-			Id startLinkId = linkIds.get(0);
-			Id endLinkId = linkIds.get(linkIds.size()-1);
+			Id<Link> startLinkId = linkIds.get(0);
+			Id<Link> endLinkId = linkIds.get(linkIds.size()-1);
 			if (linkIds.size() > 0) {
 				linkIds.remove(0);
 			}
@@ -271,7 +282,7 @@ class AltPopulationReaderMatsimV5 implements PopulationReader {
 			linkNetworkRoute.setLinkIds(startLinkId, linkIds, endLinkId);
 			currRoute = linkNetworkRoute;
 		} else if ("generic".equals(routeType)) {
-			GenericRouteImpl genericRoute = new GenericRouteImpl(scenario.createId(startLink), scenario.createId(endLink));
+			GenericRouteImpl genericRoute = new GenericRouteImpl(Id.create(startLink, Link.class), Id.create(endLink, Link.class));
 			genericRoute.setRouteDescription(null, routeDescription.trim(), null);
 			currRoute = genericRoute;
 		} else if ("experimentalPt1".equals(routeType)) {

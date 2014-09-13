@@ -79,10 +79,10 @@ public class Run {
 		GridCreator gridCreator = new GridCreator(scenario);
 		gridCreator.createGrid(8);
 		
-		Person person = scenario.getPopulation().getFactory().createPerson(scenario.createId("1"));
+		Person person = scenario.getPopulation().getFactory().createPerson(Id.create("1", Link.class));
 		Plan plan = scenario.getPopulation().getFactory().createPlan();
 		
-		Activity activity1 = scenario.getPopulation().getFactory().createActivityFromLinkId("wurst", scenario.createId("i(1,1)"));
+		Activity activity1 = scenario.getPopulation().getFactory().createActivityFromLinkId("wurst", Id.create("i(1,1)", Link.class));
 		activity1.setEndTime(6*60*60);
 		plan.addActivity(activity1);
 		
@@ -90,8 +90,8 @@ public class Run {
 		
 		
 		Leg leg = scenario.getPopulation().getFactory().createLeg("car");
-		// GenericRouteImpl route = new GenericRouteImpl(scenario.createId("i(1,1)"), scenario.createId("i(8,8)"));
-		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(scenario.createId("i(1,1)"), scenario.createId("i(8,1)"));
+		// GenericRouteImpl route = new GenericRouteImpl(Id.create("i(1,1)"), Id.create("i(8,8)"));
+		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(Id.create("i(1,1)", Link.class), Id.create("i(8,1)", Link.class));
 		route.setLinkIds(Id.create("i(1,1)", Link.class), 
 				Arrays.asList(
 						Id.create("i(2,1)", Link.class), 
@@ -104,7 +104,7 @@ public class Run {
 		leg.setTravelTime(3600);
 		leg.setRoute(route);
 		plan.addLeg(leg);
-		plan.addActivity(scenario.getPopulation().getFactory().createActivityFromLinkId("wurst", scenario.createId("i(8,1)")));
+		plan.addActivity(scenario.getPopulation().getFactory().createActivityFromLinkId("wurst", Id.create("i(8,1)", Link.class)));
 		
 		
 		

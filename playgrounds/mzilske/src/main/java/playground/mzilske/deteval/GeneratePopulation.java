@@ -747,7 +747,7 @@ public class GeneratePopulation {
 
 	private Person copyPersonWithNewLocationsInSameCell(Coord homeCoord, Person person, String cloneId) {
 		PersonImpl oldPerson = (PersonImpl) person;
-		PersonImpl newPerson = (PersonImpl) scenario.getPopulation().getFactory().createPerson(scenario.createId(person.getId().toString() + "#" + cloneId));
+		PersonImpl newPerson = (PersonImpl) scenario.getPopulation().getFactory().createPerson(Id.create(person.getId().toString() + "#" + cloneId, Person.class));
 		newPerson.setAge(oldPerson.getAge());
 		newPerson.setSex(oldPerson.getSex());
 		for(Plan oldPlan : oldPerson.getPlans()) {
@@ -796,8 +796,8 @@ public class GeneratePopulation {
 		populationWriter.write(plansFile);
 	}
 
-	private Id createPersonId(String caseid, String pid) {
-		return scenario.createId(caseid + "." + pid);
+	private Id<Person> createPersonId(String caseid, String pid) {
+		return Id.create(caseid + "." + pid, Person.class);
 	}
 
 }
