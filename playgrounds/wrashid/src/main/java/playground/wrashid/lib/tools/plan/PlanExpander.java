@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -50,7 +51,7 @@ public class PlanExpander {
 				PersonImpl originPersonImpl=(PersonImpl) origPerson;
 				Desires originDesires = originPersonImpl.getDesires();
 				
-				Person newPerson = factory.createPerson(scenario.createId(String.valueOf(pCounter++)));
+				Person newPerson = factory.createPerson(Id.create(String.valueOf(pCounter++), Person.class));
 				newPerson.addPlan(originPersonImpl.createCopyOfSelectedPlanAndMakeSelected());
 				
 				Desires newDesires = ((PersonImpl) newPerson).createDesires(originDesires.getDesc());

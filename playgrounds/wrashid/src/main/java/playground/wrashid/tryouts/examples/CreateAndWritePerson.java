@@ -7,9 +7,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 
 public class CreateAndWritePerson {
 
@@ -21,21 +20,15 @@ public class CreateAndWritePerson {
 	*/
 
 	public static void main(String[] args) {
-		Scenario sc=(ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-
-
 		createAndWritePerson();
 	}
 
-	/*
-	 *
-	 */
 	public static void createAndWritePerson(){
-		Scenario sc=(ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		Id nodeId1= sc.createId("nodeId1");
-		Id nodeId2= sc.createId("nodeId2");
-		Id linkId= sc.createId("linkId");
-		Id personId = sc.createId("personId");
+		Scenario sc=ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Id<Node> nodeId1= Id.create("nodeId1", Node.class);
+		Id<Node> nodeId2= Id.create("nodeId2", Node.class);
+		Id<Link> linkId= Id.create("linkId", Link.class);
+		Id<Person> personId = Id.create("personId", Person.class);
 		Coord coord= sc.createCoord(1.0, 1.0);
 
 		Node node1= sc.getNetwork().getFactory().createNode(nodeId1,coord);
@@ -44,7 +37,7 @@ public class CreateAndWritePerson {
 		sc.getNetwork().addNode(node1);
 		sc.getNetwork().addNode(node2);
 
-		Link link= sc.getNetwork().getFactory().createLink(linkId,nodeId1,nodeId2);
+		Link link= sc.getNetwork().getFactory().createLink(linkId,node1,node2);
 		sc.getNetwork().addLink(link);
 
 		Person person=sc.getPopulation().getFactory().createPerson(personId);
@@ -56,7 +49,7 @@ public class CreateAndWritePerson {
 	}
 
 	public static void missingAPIFunctions(){
-		Scenario sc=(ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario sc=ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		// reader for population is missing
 		// reader, writer for network are missing

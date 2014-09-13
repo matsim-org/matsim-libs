@@ -102,19 +102,19 @@ public class MiniScenarioMultiRun {
 
 		NetworkFactory factory = scenario.getNetwork().getFactory();
 
-		Node n0 = factory.createNode(scenario.createId("n0"),
+		Node n0 = factory.createNode(Id.create("n0", Node.class),
 				scenario.createCoord(0.0, 0.0));
-		Node n1 = factory.createNode(scenario.createId("n1"),
+		Node n1 = factory.createNode(Id.create("n1", Node.class),
 				scenario.createCoord(200.0, 0.0));
-		Node n2 = factory.createNode(scenario.createId("n2"),
+		Node n2 = factory.createNode(Id.create("n2", Node.class),
 				scenario.createCoord(200.0, 200.0));
-		Node n3 = factory.createNode(scenario.createId("n3"),
+		Node n3 = factory.createNode(Id.create("n3", Node.class),
 				scenario.createCoord(0.0, 200.0));
 
-		Link l0 = factory.createLink(scenario.createId("l0"), n0, n1);
-		Link l1 = factory.createLink(scenario.createId("l1"), n1, n2);
-		Link l2 = factory.createLink(scenario.createId("l2"), n2, n3);
-		Link l3 = factory.createLink(scenario.createId("l3"), n3, n0);
+		Link l0 = factory.createLink(Id.create("l0", Link.class), n0, n1);
+		Link l1 = factory.createLink(Id.create("l1", Link.class), n1, n2);
+		Link l2 = factory.createLink(Id.create("l2", Link.class), n2, n3);
+		Link l3 = factory.createLink(Id.create("l3", Link.class), n3, n0);
 
 		l0.setFreespeed(80.0 / 3.6);
 		l1.setFreespeed(80.0 / 3.6);
@@ -150,30 +150,30 @@ public class MiniScenarioMultiRun {
 
 		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 		for (int i = 0; i < 1000; i++) {
-			linkIds.add(scenario.createId("l0"));
-			linkIds.add(scenario.createId("l1"));
-			linkIds.add(scenario.createId("l2"));
-			linkIds.add(scenario.createId("l3"));
+			linkIds.add(Id.create("l0", Link.class));
+			linkIds.add(Id.create("l1", Link.class));
+			linkIds.add(Id.create("l2", Link.class));
+			linkIds.add(Id.create("l3", Link.class));
 		}
 		NetworkRoute route = (NetworkRoute) new LinkNetworkRouteFactory()
-				.createRoute(scenario.createId("l3"), scenario.createId("l0"));
-		route.setLinkIds(scenario.createId("l3"), linkIds,
-				scenario.createId("l0"));
+				.createRoute(Id.create("l3", Link.class), Id.create("l0", Link.class));
+		route.setLinkIds(Id.create("l3", Link.class), linkIds,
+				Id.create("l0", Link.class));
 
 		Random random = MatsimRandom.getLocalInstance();
 		int p = 0;
 		for (int hour = 0; hour < 24; hour++) {
 			for (int pNum = 0; pNum < agentsPerHour; pNum++) {
-				Person person = factory.createPerson(scenario.createId(String
-						.valueOf(p++)));
+				Person person = factory.createPerson(Id.create(String
+						.valueOf(p++), Person.class));
 				Plan plan = factory.createPlan();
 				Activity from = factory.createActivityFromLinkId("home",
-						scenario.createId("l3"));
+						Id.create("l3", Link.class));
 				from.setEndTime(Math.round(3600 * (hour + random.nextDouble())));
 				Leg leg = factory.createLeg(TransportMode.car);
 				leg.setRoute(route);
 				Activity to = factory.createActivityFromLinkId("home",
-						scenario.createId("l3"));
+						Id.create("l3", Link.class));
 				plan.addActivity(from);
 				plan.addLeg(leg);
 				plan.addActivity(to);
@@ -197,14 +197,14 @@ public class MiniScenarioMultiRun {
 		eventsManager.addHandler(eventsWriter);
 
 		Map<Id<Link>, Link> links = new TreeMap<Id<Link>, Link>();
-		links.put(scenario.createId("l0"), scenario.getNetwork().getLinks()
-				.get(scenario.createId("l0")));
-		links.put(scenario.createId("l1"), scenario.getNetwork().getLinks()
-				.get(scenario.createId("l1")));
-		links.put(scenario.createId("l2"), scenario.getNetwork().getLinks()
-				.get(scenario.createId("l2")));
-		links.put(scenario.createId("l3"), scenario.getNetwork().getLinks()
-				.get(scenario.createId("l3")));
+		links.put(Id.create("l0", Link.class), scenario.getNetwork().getLinks()
+				.get(Id.create("l0", Link.class)));
+		links.put(Id.create("l1", Link.class), scenario.getNetwork().getLinks()
+				.get(Id.create("l1", Link.class)));
+		links.put(Id.create("l2", Link.class), scenario.getNetwork().getLinks()
+				.get(Id.create("l2", Link.class)));
+		links.put(Id.create("l3", Link.class), scenario.getNetwork().getLinks()
+				.get(Id.create("l3", Link.class)));
 
 		// 5 minute bins
 		InFlowInfoAcuumulatorWithPt inflowHandler = new InFlowInfoAcuumulatorWithPt(

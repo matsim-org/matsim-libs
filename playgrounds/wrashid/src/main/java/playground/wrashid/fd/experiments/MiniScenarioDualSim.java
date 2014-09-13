@@ -86,25 +86,25 @@ public class MiniScenarioDualSim {
 		
 		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 		for (int i = 0; i < 1000; i++) {
-			linkIds.add(scenario.createId("l0"));
-			linkIds.add(scenario.createId("l1"));
-			linkIds.add(scenario.createId("l2"));
-			linkIds.add(scenario.createId("l3"));
+			linkIds.add(Id.create("l0", Link.class));
+			linkIds.add(Id.create("l1", Link.class));
+			linkIds.add(Id.create("l2", Link.class));
+			linkIds.add(Id.create("l3", Link.class));
 		}
-		NetworkRoute route = (NetworkRoute) new LinkNetworkRouteFactory().createRoute(scenario.createId("l3"), scenario.createId("l0"));
-		route.setLinkIds(scenario.createId("l3"), linkIds, scenario.createId("l0"));
+		NetworkRoute route = (NetworkRoute) new LinkNetworkRouteFactory().createRoute(Id.create("l3", Link.class), Id.create("l0", Link.class));
+		route.setLinkIds(Id.create("l3", Link.class), linkIds, Id.create("l0", Link.class));
 		
 		Random random = MatsimRandom.getLocalInstance();
 		int p = 0;
 		for (int hour = 0; hour < 24; hour++) {
 			for (int pNum = 0; pNum < initialAgents+agentIncrementPerHour*hour; pNum++) {
-				Person person = factory.createPerson(scenario.createId(String.valueOf(p++)));
+				Person person = factory.createPerson(Id.create(String.valueOf(p++), Link.class));
 				Plan plan = factory.createPlan();
-				Activity from = factory.createActivityFromLinkId("home", scenario.createId("l3"));
+				Activity from = factory.createActivityFromLinkId("home", Id.create("l3", Link.class));
 				from.setEndTime(Math.round(3600*(hour + random.nextDouble())));
 				Leg leg = factory.createLeg(TransportMode.car);
 				leg.setRoute(route);
-				Activity to = factory.createActivityFromLinkId("home", scenario.createId("l3"));
+				Activity to = factory.createActivityFromLinkId("home", Id.create("l3", Link.class));
 				plan.addActivity(from);
 				plan.addLeg(leg);
 				plan.addActivity(to);
@@ -127,10 +127,10 @@ public class MiniScenarioDualSim {
 		eventsManager.addHandler(eventsWriter);
 		
 		Map<Id<Link>, Link> links = new TreeMap<Id<Link>, Link>();
-		links.put(scenario.createId("l0"), scenario.getNetwork().getLinks().get(scenario.createId("l0")));
-		links.put(scenario.createId("l1"), scenario.getNetwork().getLinks().get(scenario.createId("l1")));
-		links.put(scenario.createId("l2"), scenario.getNetwork().getLinks().get(scenario.createId("l2")));
-		links.put(scenario.createId("l3"), scenario.getNetwork().getLinks().get(scenario.createId("l3")));
+		links.put(Id.create("l0", Link.class), scenario.getNetwork().getLinks().get(Id.create("l0", Link.class)));
+		links.put(Id.create("l1", Link.class), scenario.getNetwork().getLinks().get(Id.create("l1", Link.class)));
+		links.put(Id.create("l2", Link.class), scenario.getNetwork().getLinks().get(Id.create("l2", Link.class)));
+		links.put(Id.create("l3", Link.class), scenario.getNetwork().getLinks().get(Id.create("l3", Link.class)));
 		
 		
 		

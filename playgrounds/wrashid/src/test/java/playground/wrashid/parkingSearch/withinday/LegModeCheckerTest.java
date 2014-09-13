@@ -59,18 +59,18 @@ public class LegModeCheckerTest extends MatsimTestCase {
 		PopulationFactory factory = sc.getPopulation().getFactory();
 		ActivityFacilities facilities = sc.getActivityFacilities();
 		
-		Person person = factory.createPerson(sc.createId("1"));
+		Person person = factory.createPerson(Id.create("1", Person.class));
 		Plan plan = factory.createPlan();
 		person.addPlan(plan);
 		
 		String[] modes = {TransportMode.car, TransportMode.walk, TransportMode.car};
-		plan.addActivity(factory.createActivityFromLinkId("home", sc.createId("l2")));
+		plan.addActivity(factory.createActivityFromLinkId("home", Id.create("l2", Link.class)));
 		plan.addLeg(factory.createLeg(modes[0]));
-		plan.addActivity(factory.createActivityFromLinkId("work", sc.createId("l4")));
+		plan.addActivity(factory.createActivityFromLinkId("work", Id.create("l4", Link.class)));
 		plan.addLeg(factory.createLeg(modes[1]));
-		plan.addActivity(factory.createActivityFromLinkId("shopping", sc.createId("l5")));
+		plan.addActivity(factory.createActivityFromLinkId("shopping", Id.create("l5", Link.class)));
 		plan.addLeg(factory.createLeg(modes[2]));
-		plan.addActivity(factory.createActivityFromLinkId("home", sc.createId("l2")));
+		plan.addActivity(factory.createActivityFromLinkId("home", Id.create("l2", Link.class)));
 		
 		/*
 		 * Set activity durations and coordinates and create facilities
@@ -181,13 +181,13 @@ public class LegModeCheckerTest extends MatsimTestCase {
 		Network network = sc.getNetwork();
 		NetworkFactory networkFactory = network.getFactory();
 		
-		Node n1 = networkFactory.createNode(sc.createId("n1"), sc.createCoord(0, 0));
-		Node n2 = networkFactory.createNode(sc.createId("n2"), sc.createCoord(10000, 0));
-		Node n3 = networkFactory.createNode(sc.createId("n3"), sc.createCoord(20000, 0));
-		Node n4 = networkFactory.createNode(sc.createId("n4"), sc.createCoord(30000, 0));
-		Node n5 = networkFactory.createNode(sc.createId("n5"), sc.createCoord(30000, 10000));
-		Node n6 = networkFactory.createNode(sc.createId("n6"), sc.createCoord(40000, 0));
-		Node n7 = networkFactory.createNode(sc.createId("n7"), sc.createCoord(30000, -10000));
+		Node n1 = networkFactory.createNode(Id.create("n1", Node.class), sc.createCoord(0, 0));
+		Node n2 = networkFactory.createNode(Id.create("n2", Node.class), sc.createCoord(10000, 0));
+		Node n3 = networkFactory.createNode(Id.create("n3", Node.class), sc.createCoord(20000, 0));
+		Node n4 = networkFactory.createNode(Id.create("n4", Node.class), sc.createCoord(30000, 0));
+		Node n5 = networkFactory.createNode(Id.create("n5", Node.class), sc.createCoord(30000, 10000));
+		Node n6 = networkFactory.createNode(Id.create("n6", Node.class), sc.createCoord(40000, 0));
+		Node n7 = networkFactory.createNode(Id.create("n7", Node.class), sc.createCoord(30000, -10000));
 		
 		network.addNode(n1);
 		network.addNode(n2);
@@ -197,15 +197,15 @@ public class LegModeCheckerTest extends MatsimTestCase {
 		network.addNode(n6);
 		network.addNode(n7);
 		
-		Link l1 = networkFactory.createLink(sc.createId("l1"), n1, n2);
-		Link l2 = networkFactory.createLink(sc.createId("l2"), n2, n3);
-		Link l3 = networkFactory.createLink(sc.createId("l3"), n3, n4);
-		Link l4 = networkFactory.createLink(sc.createId("l4"), n4, n5);
-		Link l5 = networkFactory.createLink(sc.createId("l5"), n4, n6);
-		Link l6 = networkFactory.createLink(sc.createId("l6"), n5, n7);
-		Link l7 = networkFactory.createLink(sc.createId("l7"), n5, n1);
-		Link l8 = networkFactory.createLink(sc.createId("l8"), n6, n1);
-		Link l9 = networkFactory.createLink(sc.createId("l9"), n7, n1);
+		Link l1 = networkFactory.createLink(Id.create("l1", Link.class), n1, n2);
+		Link l2 = networkFactory.createLink(Id.create("l2", Link.class), n2, n3);
+		Link l3 = networkFactory.createLink(Id.create("l3", Link.class), n3, n4);
+		Link l4 = networkFactory.createLink(Id.create("l4", Link.class), n4, n5);
+		Link l5 = networkFactory.createLink(Id.create("l5", Link.class), n4, n6);
+		Link l6 = networkFactory.createLink(Id.create("l6", Link.class), n5, n7);
+		Link l7 = networkFactory.createLink(Id.create("l7", Link.class), n5, n1);
+		Link l8 = networkFactory.createLink(Id.create("l8", Link.class), n6, n1);
+		Link l9 = networkFactory.createLink(Id.create("l9", Link.class), n7, n1);
 		
 		l1.setFreespeed(10.0);
 		l2.setFreespeed(10.0);

@@ -21,9 +21,6 @@ package playground.wrashid.parkingSearch.ppSim.jdepSim;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.LegHistogram;
@@ -39,13 +36,9 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
-import org.matsim.contrib.parking.lib.obj.network.EnclosingRectangle;
-import org.matsim.contrib.parking.lib.obj.network.QuadTreeInitializer;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -58,9 +51,6 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.population.Desires;
 
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 import playground.wrashid.parkingChoice.infrastructure.ActInfo;
@@ -71,16 +61,7 @@ import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.EditRoute;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.TTMatrixBasedTravelTime;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.TollAreaTravelDisutility;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingMemory;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.WaitAndRandomSearchAsBackup;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomGarageParkingSearch;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingSearchWithWaiting;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingWithIllegalParkingAndLawEnforcement;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSearchStrategy;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomParkingSearch;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingSearch;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomStreetParkingWithIllegalParkingAndNoLawEnforcement;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.analysis.ComparisonGarageCounts;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.axhausenPolak1989.AxPo1989_Strategy7;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.manager.ParkingStrategyManager;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.random.RandomNumbers;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.score.ParkingScoreEvaluator;
@@ -92,7 +73,6 @@ import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingStrategyScen
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
 import playground.wrashid.parkingSearch.ppSim.ttmatrix.TTMatrixFromStoredTable;
 import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
-import playground.wrashid.parkingSearch.withindayFW.zhCity.CityZones;
 
 public class MainPPSimZurich30km {
 
@@ -141,7 +121,7 @@ public class MainPPSimZurich30km {
 			addPrivateParkingAtEachActivityLocationWithCapacityZero(AgentWithParking.parkingManager);
 		}
 
-		ParkingPersonalBetas parkingPersonalBetas = new ParkingPersonalBetas((ScenarioImpl) scenario,
+		ParkingPersonalBetas parkingPersonalBetas = new ParkingPersonalBetas(scenario,
 				HouseHoldIncomeZH.getHouseHoldIncomeCantonZH((ScenarioImpl) scenario));
 
 		parkingPersonalBetas.externalWalkFactor = ZHScenarioGlobal.loadDoubleParam("ParkingPersonalBetas.externalWalkFactor");
@@ -491,7 +471,7 @@ public class MainPPSimZurich30km {
 			for (Person origPerson : originalAgents) {
 				PersonImpl originPersonImpl = (PersonImpl) origPerson;
 
-				PersonImpl newPerson = (PersonImpl) factory.createPerson(scenario.createId(String.valueOf(pCounter++)));
+				PersonImpl newPerson = (PersonImpl) factory.createPerson(Id.create(String.valueOf(pCounter++), Person.class));
 				newPerson.setAge(((PersonImpl) origPerson).getAge());
 				newPerson.setSex(((PersonImpl) origPerson).getSex());
 				newPerson.addPlan(originPersonImpl.createCopyOfSelectedPlanAndMakeSelected());

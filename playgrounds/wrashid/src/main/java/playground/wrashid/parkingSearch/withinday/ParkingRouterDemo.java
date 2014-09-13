@@ -63,14 +63,14 @@ public class ParkingRouterDemo {
 		
 		ParkingRouter parkingRouter = new ParkingRouter(scenario.getNetwork(), travelTime, travelDisutility, 3);
 		
-		NetworkRoute route = new LinkNetworkRouteImpl(scenario.createId("l0"), scenario.createId("l4"));
+		NetworkRoute route = new LinkNetworkRouteImpl(Id.create("l0", Link.class), Id.create("l4", Link.class));
 		List<Id<Link>> routeLinkIds = new ArrayList<Id<Link>>();
-		routeLinkIds.add(scenario.createId("l1"));
-		routeLinkIds.add(scenario.createId("l2"));
-		routeLinkIds.add(scenario.createId("l3"));
-		route.setLinkIds(scenario.createId("l0"), routeLinkIds, scenario.createId("l4"));
+		routeLinkIds.add(Id.create("l1", Link.class));
+		routeLinkIds.add(Id.create("l2", Link.class));
+		routeLinkIds.add(Id.create("l3", Link.class));
+		route.setLinkIds(Id.create("l0", Link.class), routeLinkIds, Id.create("l4", Link.class));
 		
-		Link startLink = scenario.getNetwork().getLinks().get(scenario.createId("l5"));
+		Link startLink = scenario.getNetwork().getLinks().get(Id.create("l5", Link.class));
 		double time = 100.0;
 		Person person = null;
 		Vehicle vehicle = null;
@@ -79,21 +79,21 @@ public class ParkingRouterDemo {
 		parkingRouter.adaptRoute(route, startLink, time, person, vehicle, dataManager);
 		
 		log.info(route.getStartLinkId());
-		for(Id linkId : route.getLinkIds()) log.info(linkId);
+		for(Id<Link> linkId : route.getLinkIds()) log.info(linkId);
 		log.info(route.getEndLinkId());
 	}
 	
 	private static void createNetwork(Scenario scenario) {
 		NetworkFactory networkFactory = scenario.getNetwork().getFactory();
 		
-		Node n0 = networkFactory.createNode(scenario.createId("n0"), scenario.createCoord(0.0, 0.0));
-		Node n1 = networkFactory.createNode(scenario.createId("n1"), scenario.createCoord(1000.0, 0.0));
-		Node n2 = networkFactory.createNode(scenario.createId("n2"), scenario.createCoord(2000.0, 0.0));
-		Node n3 = networkFactory.createNode(scenario.createId("n3"), scenario.createCoord(3000.0, 0.0));
-		Node n4 = networkFactory.createNode(scenario.createId("n4"), scenario.createCoord(4000.0, 0.0));
-		Node n5 = networkFactory.createNode(scenario.createId("n5"), scenario.createCoord(5000.0, 0.0));
-		Node n6 = networkFactory.createNode(scenario.createId("n6"), scenario.createCoord(2000.0, -1000.0));
-		Node n7 = networkFactory.createNode(scenario.createId("n7"), scenario.createCoord(2000.0, -2000.0));
+		Node n0 = networkFactory.createNode(Id.create("n0", Node.class), scenario.createCoord(0.0, 0.0));
+		Node n1 = networkFactory.createNode(Id.create("n1", Node.class), scenario.createCoord(1000.0, 0.0));
+		Node n2 = networkFactory.createNode(Id.create("n2", Node.class), scenario.createCoord(2000.0, 0.0));
+		Node n3 = networkFactory.createNode(Id.create("n3", Node.class), scenario.createCoord(3000.0, 0.0));
+		Node n4 = networkFactory.createNode(Id.create("n4", Node.class), scenario.createCoord(4000.0, 0.0));
+		Node n5 = networkFactory.createNode(Id.create("n5", Node.class), scenario.createCoord(5000.0, 0.0));
+		Node n6 = networkFactory.createNode(Id.create("n6", Node.class), scenario.createCoord(2000.0, -1000.0));
+		Node n7 = networkFactory.createNode(Id.create("n7", Node.class), scenario.createCoord(2000.0, -2000.0));
 		
 		scenario.getNetwork().addNode(n0);
 		scenario.getNetwork().addNode(n1);
@@ -104,43 +104,43 @@ public class ParkingRouterDemo {
 		scenario.getNetwork().addNode(n6);
 		scenario.getNetwork().addNode(n7);
 
-		Link l0 = networkFactory.createLink(scenario.createId("l0"), n0, n1);
+		Link l0 = networkFactory.createLink(Id.create("l0", Link.class), n0, n1);
 		l0.setLength(1000.0);
 		l0.setFreespeed(10.0);
 		
-		Link l1 = networkFactory.createLink(scenario.createId("l1"), n1, n2);
+		Link l1 = networkFactory.createLink(Id.create("l1", Link.class), n1, n2);
 		l1.setLength(1000.0);
 		l1.setFreespeed(10.0);
 		
-		Link l2 = networkFactory.createLink(scenario.createId("l2"), n2, n3);
+		Link l2 = networkFactory.createLink(Id.create("l2", Link.class), n2, n3);
 		l2.setLength(1000.0);
 		l2.setFreespeed(10.0);
 		
-		Link l3 = networkFactory.createLink(scenario.createId("l3"), n3, n4);
+		Link l3 = networkFactory.createLink(Id.create("l3", Link.class), n3, n4);
 		l3.setLength(1000.0);
 		l3.setFreespeed(10.0);
 
-		Link l4 = networkFactory.createLink(scenario.createId("l4"), n4, n5);
+		Link l4 = networkFactory.createLink(Id.create("l4", Link.class), n4, n5);
 		l4.setLength(1000.0);
 		l4.setFreespeed(10.0);
 
-		Link l5 = networkFactory.createLink(scenario.createId("l5"), n7, n6);
+		Link l5 = networkFactory.createLink(Id.create("l5", Link.class), n7, n6);
 		l5.setLength(1000.0);
 		l5.setFreespeed(10.0);
 		
-		Link l6 = networkFactory.createLink(scenario.createId("l6"), n6, n1);
+		Link l6 = networkFactory.createLink(Id.create("l6", Link.class), n6, n1);
 		l6.setLength(1415.0);
 		l6.setFreespeed(10.0);
 
-		Link l7 = networkFactory.createLink(scenario.createId("l7"), n6, n2);
+		Link l7 = networkFactory.createLink(Id.create("l7", Link.class), n6, n2);
 		l7.setLength(1000.0);
 		l7.setFreespeed(10.0);
 
-		Link l8 = networkFactory.createLink(scenario.createId("l8"), n6, n3);
+		Link l8 = networkFactory.createLink(Id.create("l8", Link.class), n6, n3);
 		l8.setLength(1415.0);
 		l8.setFreespeed(10.0);
 
-		Link l9 = networkFactory.createLink(scenario.createId("l9"), n6, n4);
+		Link l9 = networkFactory.createLink(Id.create("l9", Link.class), n6, n4);
 		l9.setLength(2237.0);
 		l9.setFreespeed(10.0);
 
