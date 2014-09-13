@@ -29,8 +29,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -42,6 +44,7 @@ import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
 
 import playground.sergioo.passivePlanning2012.core.population.BasePersonImpl;
@@ -166,7 +169,7 @@ public class PopulationReaderWeeklyMatsim extends MatsimXmlParser implements Pop
 		int age = Integer.MIN_VALUE;
 		if (ageString != null)
 			age = Integer.parseInt(ageString);
-		this.currperson = new BasePersonImpl(this.scenario.createId(atts.getValue(ATTR_PERSON_ID)));
+		this.currperson = new BasePersonImpl(Id.create(atts.getValue(ATTR_PERSON_ID), Person.class));
 		this.currperson.setSex(atts.getValue(ATTR_PERSON_SEX));
 		this.currperson.setAge(age);
 		this.currperson.setLicence(atts.getValue(ATTR_PERSON_LICENSE));
@@ -208,7 +211,7 @@ public class PopulationReaderWeeklyMatsim extends MatsimXmlParser implements Pop
 	private void startAct(final Attributes atts) {
 		Coord coord = null;
 		if (atts.getValue(ATTR_ACT_LINK) != null) {
-			Id linkId = this.scenario.createId(atts.getValue(ATTR_ACT_LINK));
+			Id<Link> linkId = Id.create(atts.getValue(ATTR_ACT_LINK), Link.class);
 			if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
 				coord = this.scenario.createCoord(Double.parseDouble(atts.getValue(ATTR_ACT_X)), Double.parseDouble(atts.getValue(ATTR_ACT_Y)));
 			}
@@ -226,7 +229,7 @@ public class PopulationReaderWeeklyMatsim extends MatsimXmlParser implements Pop
 		this.curract.setEndTime(Time.parseTime(atts.getValue(ATTR_ACT_ENDTIME)));
 		String fId = atts.getValue(ATTR_ACT_FACILITY);
 		if (fId != null) {
-			this.curract.setFacilityId(this.scenario.createId(fId));
+			this.curract.setFacilityId(Id.create(fId, ActivityFacility.class));
 		}
 		if (this.routeDescription != null) {
 			Id startLinkId = null;
@@ -273,7 +276,7 @@ public class PopulationReaderWeeklyMatsim extends MatsimXmlParser implements Pop
 		this.currleg.setRoute(this.currRoute);
 
 		if (atts.getValue("vehicleRefId") != null && this.currRoute instanceof NetworkRoute ) {
-			((NetworkRoute)this.currRoute).setVehicleId(this.scenario.createId(atts.getValue("vehicleRefId")));
+			((NetworkRoute)this.currRoute).setVehicleId(Id.create(atts.getValue("vehicleRefId"), Vehicle.class));
 		}
 
 	}

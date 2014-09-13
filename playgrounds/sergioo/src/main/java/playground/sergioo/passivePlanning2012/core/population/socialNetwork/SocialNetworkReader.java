@@ -2,7 +2,9 @@ package playground.sergioo.passivePlanning2012.core.population.socialNetwork;
 
 import java.util.Stack;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -38,9 +40,9 @@ public class SocialNetworkReader extends MatsimXmlParser {
 	private void startRelation(Attributes atts) {
 		String type = atts.getValue("type");
 		if(type==null)
-			socialNetwork.relate(this.scenario.createId(atts.getValue("id_ego")), this.scenario.createId(atts.getValue("id_alter")));
+			socialNetwork.relate(Id.create(atts.getValue("id_ego"), Person.class), Id.create(atts.getValue("id_alter"), Person.class));
 		else
-			socialNetwork.relate(this.scenario.createId(atts.getValue("id_ego")), this.scenario.createId(atts.getValue("id_alter")), type);
+			socialNetwork.relate(Id.create(atts.getValue("id_ego"), Person.class), Id.create(atts.getValue("id_alter"), Person.class), type);
 	}
 
 	@Override

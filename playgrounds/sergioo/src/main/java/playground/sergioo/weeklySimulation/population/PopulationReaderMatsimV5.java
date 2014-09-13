@@ -19,13 +19,20 @@
 
 package playground.sergioo.weeklySimulation.population;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Stack;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -39,14 +46,10 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
 
 import playground.sergioo.weeklySimulation.util.misc.Time;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Stack;
 
 /**
  * A reader for plans files of MATSim according to <code>population_v5.dtd</code>.
@@ -165,7 +168,7 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 		int age = Integer.MIN_VALUE;
 		if (ageString != null)
 			age = Integer.parseInt(ageString);
-		this.currperson = new PersonImpl(this.scenario.createId(atts.getValue(ATTR_PERSON_ID)));
+		this.currperson = new PersonImpl(Id.create(atts.getValue(ATTR_PERSON_ID), Person.class));
 		this.currperson.setSex(atts.getValue(ATTR_PERSON_SEX));
 		this.currperson.setAge(age);
 		this.currperson.setLicence(atts.getValue(ATTR_PERSON_LICENSE));
@@ -209,7 +212,7 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 	private void startAct(final Attributes atts) {
 		Coord coord = null;
 		if (atts.getValue(ATTR_ACT_LINK) != null) {
-			Id linkId = this.scenario.createId(atts.getValue(ATTR_ACT_LINK));
+			Id linkId = Id.create(atts.getValue(ATTR_ACT_LINK), Link.class);
 			this.curract = this.currplan.createAndAddActivity(atts.getValue(ATTR_ACT_TYPE), linkId);
 			if ((atts.getValue(ATTR_ACT_X) != null) && (atts.getValue(ATTR_ACT_Y) != null)) {
 				coord = this.scenario.createCoord(Double.parseDouble(atts.getValue(ATTR_ACT_X)), Double.parseDouble(atts.getValue(ATTR_ACT_Y)));
@@ -226,7 +229,7 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 		this.curract.setEndTime(Time.parseTime(atts.getValue(ATTR_ACT_ENDTIME)));
 		String fId = atts.getValue(ATTR_ACT_FACILITY);
 		if (fId != null) {
-			this.curract.setFacilityId(this.scenario.createId(fId));
+			this.curract.setFacilityId(Id.create(fId, ActivityFacility.class));
 		}
 		if (this.routeDescription != null) {
 			Id startLinkId = null;
@@ -311,8 +314,8 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 
 		this.currRoute = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).createRoute(
 				this.currleg.getMode(), 
-				startLinkId == null ? null : this.scenario.createId(startLinkId), 
-						endLinkId == null ? null : this.scenario.createId(endLinkId));
+				startLinkId == null ? null : Id.create(startLinkId, Link.class), 
+						endLinkId == null ? null : Id.create(endLinkId, Link.class));
 		this.currleg.setRoute(this.currRoute);
 
 		if (atts.getValue("trav_time") != null) {
@@ -322,7 +325,7 @@ public class PopulationReaderMatsimV5 extends MatsimXmlParser implements Populat
 			this.currRoute.setDistance(Double.parseDouble(atts.getValue("distance")));
 		}
 		if (atts.getValue("vehicleRefId") != null && this.currRoute instanceof NetworkRoute ) {
-			((NetworkRoute)this.currRoute).setVehicleId(this.scenario.createId(atts.getValue("vehicleRefId")));
+			((NetworkRoute)this.currRoute).setVehicleId(Id.create(atts.getValue("vehicleRefId"), Vehicle.class));
 		}
 
 	}
