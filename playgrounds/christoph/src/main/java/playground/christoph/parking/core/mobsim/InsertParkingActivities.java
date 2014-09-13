@@ -131,7 +131,7 @@ public class InsertParkingActivities implements PlanAlgorithm {
 			
 			String parkingFacilityIdString = (String) this.scenario.getPopulation().getPersonAttributes().getAttribute(personId.toString(), 
 					InitialParkingSelector.INITIALPARKINGFACILITY);
-			Id parkingFacilityId = this.scenario.createId(parkingFacilityIdString);
+			Id<ActivityFacility> parkingFacilityId = Id.create(parkingFacilityIdString, ActivityFacility.class);
 			
 			// get the closest free parking facility
 			parkingFacility = this.scenario.getActivityFacilities().getFacilities().get(parkingFacilityId);

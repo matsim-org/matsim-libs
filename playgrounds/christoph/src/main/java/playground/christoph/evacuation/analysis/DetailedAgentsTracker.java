@@ -205,7 +205,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 	public void handleEvent(GenericEvent event) {
 		if (event.getEventType().equals(PersonInformationEvent.EVENT_TYPE)) {
 			String personIdString = event.getAttributes().get(PersonInformationEvent.ATTRIBUTE_PERSON);
-			Id personId = scenario.createId(personIdString);
+			Id<Person> personId = Id.create(personIdString, Person.class);
 			handleEvent(new PersonInformationEventImpl(event.getTime(), personId));
 		}
 	}

@@ -44,7 +44,6 @@ import org.matsim.contrib.multimodal.router.util.WalkTravelTimeFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.Module;
@@ -143,9 +142,9 @@ public final class MarathonRunner implements StartupListener,
 	private Geometry affectedArea;
 	private CoordAnalyzer coordAnalyzer;
 	private CoordAnalyzer bufferedCoordAnalyzer;
-	private Set<Id> affectedNodes;
-	private Set<Id> affectedLinks;
-	private Set<Id> affectedFacilities;
+	private Set<Id<Node>> affectedNodes;
+	private Set<Id<Link>> affectedLinks;
+	private Set<Id<ActivityFacility>> affectedFacilities;
 	
 	private AgentsTracker agentsTracker;
 	private ReplanningTracker replanningTracker;
@@ -318,7 +317,7 @@ public final class MarathonRunner implements StartupListener,
 			String idString = node.getId().toString(); 
 			if (idString.contains("_shifted")) {
 				idString = idString.replace("_shifted", "");
-				Node node2 = this.scenario.getNetwork().getNodes().get(this.scenario.createId(idString));
+				Node node2 = this.scenario.getNetwork().getNodes().get(Id.create(idString, Node.class));
 				Coord3d coord2 = (Coord3d) node2.getCoord();
 				
 				Coord coord = node.getCoord();
@@ -514,9 +513,9 @@ public final class MarathonRunner implements StartupListener,
 	}
 	
 	private void identifyAffectedInfrastructure() {
-		affectedNodes = new HashSet<Id>();
-		affectedLinks = new HashSet<Id>();
-		affectedFacilities = new HashSet<Id>();
+		affectedNodes = new HashSet<>();
+		affectedLinks = new HashSet<>();
+		affectedFacilities = new HashSet<>();
 		
 		for (Node node : this.scenario.getNetwork().getNodes().values()) {
 			if (coordAnalyzer.isNodeAffected(node)) affectedNodes.add(node.getId());
@@ -524,7 +523,7 @@ public final class MarathonRunner implements StartupListener,
 		for (Link link : this.scenario.getNetwork().getLinks().values()) {
 			if (coordAnalyzer.isLinkAffected(link)) affectedLinks.add(link.getId());
 		}
-		for (Facility facility : ((ScenarioImpl) this.scenario).getActivityFacilities().getFacilities().values()) {
+		for (ActivityFacility facility : ((ScenarioImpl) this.scenario).getActivityFacilities().getFacilities().values()) {
 			if (coordAnalyzer.isFacilityAffected(facility)) affectedFacilities.add(facility.getId());
 		}
 	}
@@ -533,13 +532,13 @@ public final class MarathonRunner implements StartupListener,
 		
 		ActivityFacilities facilities = this.scenario.getActivityFacilities();
 		
-		Id startLinkId = this.scenario.createId(CreateMarathonPopulation.startLink);
-		Id endLinkId = this.scenario.createId(CreateMarathonPopulation.endLink);
+		Id<Link> startLinkId = Id.create(CreateMarathonPopulation.startLink, Link.class);
+		Id<Link> endLinkId = Id.create(CreateMarathonPopulation.endLink, Link.class);
 		
 		Link startLink = this.scenario.getNetwork().getLinks().get(startLinkId);
 		Link endLink = this.scenario.getNetwork().getLinks().get(endLinkId);
 		
-		Id preRunFacilityId = this.scenario.createId("preRunFacility");
+		Id<ActivityFacility> preRunFacilityId = Id.create("preRunFacility", ActivityFacility.class);
 		ActivityFacility preRunFacility = facilities.getFactory().createActivityFacility(preRunFacilityId, startLink.getCoord());
 		facilities.addActivityFacility(preRunFacility);
 		((ActivityFacilityImpl) preRunFacility).setLinkId(startLinkId);
@@ -547,7 +546,7 @@ public final class MarathonRunner implements StartupListener,
 		activityOption.addOpeningTime(new OpeningTimeImpl(OpeningTime.DayType.wk, 0*3600, 24*3600));
 		activityOption.setCapacity(Double.MAX_VALUE);
 				
-		Id postRunFacilityId = this.scenario.createId("postRunFacility");
+		Id<ActivityFacility> postRunFacilityId = Id.create("postRunFacility", ActivityFacility.class);
 		ActivityFacility postRunFacility = facilities.getFactory().createActivityFacility(postRunFacilityId, endLink.getCoord());
 		facilities.addActivityFacility(postRunFacility);
 		((ActivityFacilityImpl) postRunFacility).setLinkId(startLinkId);
@@ -595,7 +594,7 @@ public final class MarathonRunner implements StartupListener,
 		 * Otherwise the AStarLandmarks algorithm could be confused and loose some performance.
 		 */
 		Coord rescueNodeCoord = this.scenario.createCoord(683595.0, 244940.0); // somewhere in Lake Zurich
-		Id rescueNodeId = this.scenario.createId("rescueNode");
+		Id<Node> rescueNodeId = Id.create("rescueNode", Node.class);
 		Node rescueNode = this.scenario.getNetwork().getFactory().createNode(rescueNodeId, rescueNodeCoord);
 		this.scenario.getNetwork().addNode(rescueNode);
 
@@ -610,7 +609,7 @@ public final class MarathonRunner implements StartupListener,
 		int counter = 0;
 		for (Node node :exitNodes) {
 			counter++;
-			Id rescueLinkId = this.scenario.createId("rescueLink" + counter);
+			Id<Link> rescueLinkId = Id.create("rescueLink" + counter, Link.class);
 			Link rescueLink = this.scenario.getNetwork().getFactory().createLink(rescueLinkId, node, rescueNode);
 			rescueLink.setNumberOfLanes(10);
 			rescueLink.setLength(10);	// use short links for non-vehicular traffic
@@ -628,11 +627,11 @@ public final class MarathonRunner implements StartupListener,
 		 */
 		Coord rescueNodeCoord2 = this.scenario.createCoord(rescueNodeCoord.getX() + 1.0, 
 				rescueNodeCoord.getY() + 1.0);
-		Id rescueNodeId2 = this.scenario.createId("rescueNode2");
+		Id<Node> rescueNodeId2 = Id.create("rescueNode2", Node.class);
 		Node rescueNode2 = this.scenario.getNetwork().getFactory().createNode(rescueNodeId2, rescueNodeCoord2);
 		this.scenario.getNetwork().addNode(rescueNode2);
 		
-		Id rescueLinkId = this.scenario.createId("rescueLink");
+		Id<Link> rescueLinkId = Id.create("rescueLink", Link.class);
 		Link rescueLink = this.scenario.getNetwork().getFactory().createLink(rescueLinkId, rescueNode, rescueNode2);
 		rescueLink.setNumberOfLanes(10);
 		rescueLink.setLength(10);	// use short links for non-vehicular traffic
@@ -645,7 +644,7 @@ public final class MarathonRunner implements StartupListener,
 		/*
 		 * Create and add the rescue facility and an activity option ("rescue")
 		 */
-		Id rescueFacilityId = this.scenario.createId("rescueFacility");
+		Id<ActivityFacility> rescueFacilityId = Id.create("rescueFacility", ActivityFacility.class);
 		ActivityFacility rescueFacility = facilities.getFactory().createActivityFacility(rescueFacilityId, rescueLink.getCoord());
 		facilities.addActivityFacility(rescueFacility);
 		((ActivityFacilityImpl) rescueFacility).setLinkId(rescueLink.getId());
@@ -659,7 +658,7 @@ public final class MarathonRunner implements StartupListener,
 		 */
 		for (Node node :exitNodes) {
 			for (Link inLink : node.getInLinks().values()) {
-				rescueFacilityId = this.scenario.createId("rescueFacility" + inLink.getId().toString());
+				rescueFacilityId = Id.create("rescueFacility" + inLink.getId().toString(), ActivityFacility.class);
 				rescueFacility = facilities.getFactory().createActivityFacility(rescueFacilityId, inLink.getCoord());
 				facilities.addActivityFacility(rescueFacility);
 				((ActivityFacilityImpl) rescueFacility).setLinkId(rescueLink.getId());
@@ -677,10 +676,10 @@ public final class MarathonRunner implements StartupListener,
 		/*
 		 * Create and add mode switch facilities to all affected links
 		 */
-		for (Id affectedLinkId : this.affectedLinks) {
+		for (Id<Link> affectedLinkId : this.affectedLinks) {
 			
 			Link link = this.scenario.getNetwork().getLinks().get(affectedLinkId);
-			Id facilityId = this.scenario.createId("switchWalkModeFacility" + affectedLinkId.toString());
+			Id<ActivityFacility> facilityId = Id.create("switchWalkModeFacility" + affectedLinkId.toString(), ActivityFacility.class);
 			ActivityFacility facility = facilities.getFactory().createActivityFacility(facilityId, link.getToNode().getCoord());
 			facilities.addActivityFacility(facility);
 			((ActivityFacilityImpl) facility).setLinkId(link.getId());
@@ -697,7 +696,7 @@ public final class MarathonRunner implements StartupListener,
 	 */
 	private void updateTrackModes() {
 		for (String linkId : CreateMarathonPopulation.trackRelatedLinks) {
-			Id id = this.scenario.createId(linkId);
+			Id<Link> id = Id.create(linkId, Link.class);
 			Link link = this.scenario.getNetwork().getLinks().get(id);
 			Set<String> modes = new HashSet<String>(link.getAllowedModes());
 			modes.add(TransportMode.walk);

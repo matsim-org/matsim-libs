@@ -47,36 +47,36 @@ public class WalkSpeedComparatorTest {
 		
 		PopulationFactory factory = scenario.getPopulation().getFactory();
 		
-		scenario.getPopulation().addPerson(createPerson(factory, scenario.createId("p1"), 18, "m"));
-		scenario.getPopulation().addPerson(createPerson(factory, scenario.createId("p2"), 4, "f"));
-		scenario.getPopulation().addPerson(createPerson(factory, scenario.createId("p3"), 45, "m"));
-		scenario.getPopulation().addPerson(createPerson(factory, scenario.createId("p4"), 70, "f"));
-		scenario.getPopulation().addPerson(createPerson(factory, scenario.createId("p5"), 95, "f"));
+		scenario.getPopulation().addPerson(createPerson(factory, Id.create("p1", Person.class), 18, "m"));
+		scenario.getPopulation().addPerson(createPerson(factory, Id.create("p2", Person.class), 4, "f"));
+		scenario.getPopulation().addPerson(createPerson(factory, Id.create("p3", Person.class), 45, "m"));
+		scenario.getPopulation().addPerson(createPerson(factory, Id.create("p4", Person.class), 70, "f"));
+		scenario.getPopulation().addPerson(createPerson(factory, Id.create("p5", Person.class), 95, "f"));
 		
 		WalkSpeedComparator comparator = new WalkSpeedComparator();
 		comparator.calcTravelTimes(scenario.getPopulation());
 		
-		Queue<Id> queue = new PriorityQueue<Id>(5, comparator);
-		queue.add(scenario.createId("p1"));
-		queue.add(scenario.createId("p2"));
-		queue.add(scenario.createId("p3"));
-		queue.add(scenario.createId("p4"));
-		queue.add(scenario.createId("p5"));
+		Queue<Id<Person>> queue = new PriorityQueue<Id<Person>>(5, comparator);
+		queue.add(Id.create("p1", Person.class));
+		queue.add(Id.create("p2", Person.class));
+		queue.add(Id.create("p3", Person.class));
+		queue.add(Id.create("p4", Person.class));
+		queue.add(Id.create("p5", Person.class));
 				
-		log.info(comparator.getTravelTimesMap().get(scenario.createId("p5")));
-		log.info(comparator.getTravelTimesMap().get(scenario.createId("p2")));
-		log.info(comparator.getTravelTimesMap().get(scenario.createId("p4")));
-		log.info(comparator.getTravelTimesMap().get(scenario.createId("p3")));
-		log.info(comparator.getTravelTimesMap().get(scenario.createId("p1")));
+		log.info(comparator.getTravelTimesMap().get(Id.create("p5", Person.class)));
+		log.info(comparator.getTravelTimesMap().get(Id.create("p2", Person.class)));
+		log.info(comparator.getTravelTimesMap().get(Id.create("p4", Person.class)));
+		log.info(comparator.getTravelTimesMap().get(Id.create("p3", Person.class)));
+		log.info(comparator.getTravelTimesMap().get(Id.create("p1", Person.class)));
 		
-		Assert.assertEquals(scenario.createId("p5"), queue.poll());
-		Assert.assertEquals(scenario.createId("p2"), queue.poll());
-		Assert.assertEquals(scenario.createId("p4"), queue.poll());
-		Assert.assertEquals(scenario.createId("p3"), queue.poll());		
-		Assert.assertEquals(scenario.createId("p1"), queue.poll());
+		Assert.assertEquals(Id.create("p5", Person.class), queue.poll());
+		Assert.assertEquals(Id.create("p2", Person.class), queue.poll());
+		Assert.assertEquals(Id.create("p4", Person.class), queue.poll());
+		Assert.assertEquals(Id.create("p3", Person.class), queue.poll());		
+		Assert.assertEquals(Id.create("p1", Person.class), queue.poll());
 	}
 	
-	private Person createPerson(PopulationFactory factory, Id id, int age, String sex) {
+	private Person createPerson(PopulationFactory factory, Id<Person> id, int age, String sex) {
 		
 		PersonImpl person = (PersonImpl) factory.createPerson(id);
 		person.setAge(age);

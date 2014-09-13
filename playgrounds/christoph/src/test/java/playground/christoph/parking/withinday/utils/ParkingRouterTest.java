@@ -74,7 +74,7 @@ public class ParkingRouterTest extends MatsimTestCase {
 		ParkingRouter parkingRouter;
 		NetworkRoute route;
 		
-		Id startLinkId = scenario.createId("l5");
+		Id<Link> startLinkId = Id.create("l5", Link.class);
 		double time = 100.0;
 		Person person = null;
 		Vehicle vehicle = null;
@@ -112,31 +112,31 @@ public class ParkingRouterTest extends MatsimTestCase {
 		// now make the links more expensive
 		route = createRoute(scenario);
 		parkingRouter = createParkingRouter(scenario, testTimeCostFactory, 10);
-		testTimeCost.setData(scenario.createId("l9"), 10.0, 5.0);
+		testTimeCost.setData(Id.create("l9", Link.class), 10.0, 5.0);
 		parkingRouter.adaptStartOfCarRoute(route, startLinkId, time, person, vehicle);
 		assertEquals(true, checkRouteValidity(scenario, route));
 		assertEquals(3, route.getLinkIds().size());
 		
 		route = createRoute(scenario);
 		parkingRouter = createParkingRouter(scenario, testTimeCostFactory, 4);
-		testTimeCost.setData(scenario.createId("l9"), 10.0, 5.0);
+		testTimeCost.setData(Id.create("l9", Link.class), 10.0, 5.0);
 		parkingRouter.adaptStartOfCarRoute(route, startLinkId, time, person, vehicle);
 		assertEquals(true, checkRouteValidity(scenario, route));
 		assertEquals(3, route.getLinkIds().size());
 		
 		route = createRoute(scenario);
 		parkingRouter = createParkingRouter(scenario, testTimeCostFactory, 4);
-		testTimeCost.setData(scenario.createId("l8"), 10.0, 5.0);
-		testTimeCost.setData(scenario.createId("l9"), 10.0, 5.0);
+		testTimeCost.setData(Id.create("l8", Link.class), 10.0, 5.0);
+		testTimeCost.setData(Id.create("l9", Link.class), 10.0, 5.0);
 		parkingRouter.adaptStartOfCarRoute(route, startLinkId, time, person, vehicle);
 		assertEquals(true, checkRouteValidity(scenario, route));
 		assertEquals(4, route.getLinkIds().size());
 		
 		route = createRoute(scenario);
 		parkingRouter = createParkingRouter(scenario, testTimeCostFactory, 4);
-		testTimeCost.setData(scenario.createId("l7"), 10.0, 5.0);
-		testTimeCost.setData(scenario.createId("l8"), 10.0, 5.0);
-		testTimeCost.setData(scenario.createId("l9"), 10.0, 5.0);
+		testTimeCost.setData(Id.create("l7", Link.class), 10.0, 5.0);
+		testTimeCost.setData(Id.create("l8", Link.class), 10.0, 5.0);
+		testTimeCost.setData(Id.create("l9", Link.class), 10.0, 5.0);
 		parkingRouter.adaptStartOfCarRoute(route, startLinkId, time, person, vehicle);
 		assertEquals(true, checkRouteValidity(scenario, route));
 		assertEquals(5, route.getLinkIds().size());
@@ -144,10 +144,10 @@ public class ParkingRouterTest extends MatsimTestCase {
 		// now l6 .. l9 have all the same costs, therefore l9 should be chosen again
 		route = createRoute(scenario);
 		parkingRouter = createParkingRouter(scenario, testTimeCostFactory, 4);
-		testTimeCost.setData(scenario.createId("l6"), 10.0, 5.0);
-		testTimeCost.setData(scenario.createId("l7"), 10.0, 5.0);
-		testTimeCost.setData(scenario.createId("l8"), 10.0, 5.0);
-		testTimeCost.setData(scenario.createId("l9"), 10.0, 5.0);
+		testTimeCost.setData(Id.create("l6", Link.class), 10.0, 5.0);
+		testTimeCost.setData(Id.create("l7", Link.class), 10.0, 5.0);
+		testTimeCost.setData(Id.create("l8", Link.class), 10.0, 5.0);
+		testTimeCost.setData(Id.create("l9", Link.class), 10.0, 5.0);
 		parkingRouter.adaptStartOfCarRoute(route, startLinkId, time, person, vehicle);
 		assertEquals(true, checkRouteValidity(scenario, route));
 		assertEquals(2, route.getLinkIds().size());
@@ -167,7 +167,7 @@ public class ParkingRouterTest extends MatsimTestCase {
 		ParkingRouter parkingRouter;
 		NetworkRoute route;
 		
-		Id endLinkId = scenario.createId("l10");
+		Id<Link> endLinkId = Id.create("l10", Link.class);
 		double time = 100.0;
 		Person person = null;
 		Vehicle vehicle = null;
@@ -176,7 +176,7 @@ public class ParkingRouterTest extends MatsimTestCase {
 		parkingRouter = createParkingRouter(scenario, testTimeCostFactory, 1);
 		parkingRouter.adaptEndOfCarRoute(route, endLinkId, time, person, vehicle);
 		log.info(route.getStartLinkId());
-		for(Id linkId : route.getLinkIds()) log.info(linkId);
+		for(Id<Link> linkId : route.getLinkIds()) log.info(linkId);
 		log.info(route.getEndLinkId());
 		assertEquals(true, checkRouteValidity(scenario, route));
 		assertEquals(5, route.getLinkIds().size());
@@ -208,31 +208,31 @@ public class ParkingRouterTest extends MatsimTestCase {
 		// now make the links more expensive
 		route = createRoute(scenario);
 		parkingRouter = createParkingRouter(scenario, testTimeCostFactory, 10);
-		testTimeCost.setData(scenario.createId("l11"), 10.0, 5.0);
+		testTimeCost.setData(Id.create("l11", Link.class), 10.0, 5.0);
 		parkingRouter.adaptEndOfCarRoute(route, endLinkId, time, person, vehicle);
 		assertEquals(true, checkRouteValidity(scenario, route));
 		assertEquals(3, route.getLinkIds().size());
 
 		route = createRoute(scenario);
 		parkingRouter = createParkingRouter(scenario, testTimeCostFactory, 4);
-		testTimeCost.setData(scenario.createId("l11"), 10.0, 5.0);
+		testTimeCost.setData(Id.create("l11", Link.class), 10.0, 5.0);
 		parkingRouter.adaptEndOfCarRoute(route, endLinkId, time, person, vehicle);
 		assertEquals(true, checkRouteValidity(scenario, route));
 		assertEquals(3, route.getLinkIds().size());
 		
 		route = createRoute(scenario);
 		parkingRouter = createParkingRouter(scenario, testTimeCostFactory, 4);
-		testTimeCost.setData(scenario.createId("l11"), 10.0, 5.0);
-		testTimeCost.setData(scenario.createId("l12"), 10.0, 5.0);
+		testTimeCost.setData(Id.create("l11", Link.class), 10.0, 5.0);
+		testTimeCost.setData(Id.create("l12", Link.class), 10.0, 5.0);
 		parkingRouter.adaptEndOfCarRoute(route, endLinkId, time, person, vehicle);
 		assertEquals(true, checkRouteValidity(scenario, route));
 		assertEquals(4, route.getLinkIds().size());
 		
 		route = createRoute(scenario);
 		parkingRouter = createParkingRouter(scenario, testTimeCostFactory, 4);
-		testTimeCost.setData(scenario.createId("l11"), 10.0, 5.0);
-		testTimeCost.setData(scenario.createId("l12"), 10.0, 5.0);
-		testTimeCost.setData(scenario.createId("l13"), 10.0, 5.0);
+		testTimeCost.setData(Id.create("l11", Link.class), 10.0, 5.0);
+		testTimeCost.setData(Id.create("l12", Link.class), 10.0, 5.0);
+		testTimeCost.setData(Id.create("l13", Link.class), 10.0, 5.0);
 		parkingRouter.adaptEndOfCarRoute(route, endLinkId, time, person, vehicle);
 		assertEquals(true, checkRouteValidity(scenario, route));
 		assertEquals(5, route.getLinkIds().size());
@@ -240,10 +240,10 @@ public class ParkingRouterTest extends MatsimTestCase {
 		// now l11 .. l14 have all the same costs, therefore l11 should be chosen again
 		route = createRoute(scenario);
 		parkingRouter = createParkingRouter(scenario, testTimeCostFactory, 4);
-		testTimeCost.setData(scenario.createId("l11"), 10.0, 5.0);
-		testTimeCost.setData(scenario.createId("l12"), 10.0, 5.0);
-		testTimeCost.setData(scenario.createId("l13"), 10.0, 5.0);
-		testTimeCost.setData(scenario.createId("l14"), 10.0, 5.0);
+		testTimeCost.setData(Id.create("l11", Link.class), 10.0, 5.0);
+		testTimeCost.setData(Id.create("l12", Link.class), 10.0, 5.0);
+		testTimeCost.setData(Id.create("l13", Link.class), 10.0, 5.0);
+		testTimeCost.setData(Id.create("l14", Link.class), 10.0, 5.0);
 		parkingRouter.adaptEndOfCarRoute(route, endLinkId, time, person, vehicle);
 		assertEquals(true, checkRouteValidity(scenario, route));
 		assertEquals(2, route.getLinkIds().size());
@@ -258,8 +258,8 @@ public class ParkingRouterTest extends MatsimTestCase {
 		ParkingRouter parkingRouter;
 		NetworkRoute route;
 		
-		Id startLinkId = scenario.createId("l5");
-		Id endLinkId = scenario.createId("l10");
+		Id<Link> startLinkId = Id.create("l5", Link.class);
+		Id<Link> endLinkId = Id.create("l10", Link.class);
 		double time = 100.0;
 		Person person = null;
 		Vehicle vehicle = null;
@@ -301,12 +301,12 @@ public class ParkingRouterTest extends MatsimTestCase {
 		ParkingRouter parkingRouter;
 		NetworkRoute route;
 		
-		Id startLinkId = scenario.createId("l5");
+		Id<Link> startLinkId = Id.create("l5", Link.class);
 		double time = 100.0;
 		Person person = null;
 		Vehicle vehicle = null;
 				
-		route = new LinkNetworkRouteImpl(scenario.createId("l2"), scenario.createId("l2"));
+		route = new LinkNetworkRouteImpl(Id.create("l2", Link.class), Id.create("l2", Link.class));
 		parkingRouter = createParkingRouter(scenario, testTimeCostFactory, 4);
 		parkingRouter.adaptStartOfCarRoute(route, startLinkId, time, person, vehicle);
 		assertEquals(true, checkRouteValidity(scenario, route));
@@ -322,12 +322,12 @@ public class ParkingRouterTest extends MatsimTestCase {
 		ParkingRouter parkingRouter;
 		NetworkRoute route;
 		
-		Id endLinkId = scenario.createId("l10");
+		Id<Link> endLinkId = Id.create("l10", Link.class);
 		double time = 100.0;
 		Person person = null;
 		Vehicle vehicle = null;
 
-		route = new LinkNetworkRouteImpl(scenario.createId("l2"), scenario.createId("l2"));
+		route = new LinkNetworkRouteImpl(Id.create("l2", Link.class), Id.create("l2", Link.class));
 		parkingRouter = createParkingRouter(scenario, testTimeCostFactory, 4);
 		parkingRouter.adaptEndOfCarRoute(route, endLinkId, time, person, vehicle);
 		assertEquals(true, checkRouteValidity(scenario, route));
@@ -344,13 +344,13 @@ public class ParkingRouterTest extends MatsimTestCase {
 		NetworkRoute route;
 		
 		
-		Id startLinkId = scenario.createId("l5");
-		Id endLinkId = scenario.createId("l10");
+		Id<Link> startLinkId = Id.create("l5", Link.class);
+		Id<Link> endLinkId = Id.create("l10", Link.class);
 		double time = 100.0;
 		Person person = null;
 		Vehicle vehicle = null;
 
-		route = new LinkNetworkRouteImpl(scenario.createId("l2"), scenario.createId("l2"));
+		route = new LinkNetworkRouteImpl(Id.create("l2", Link.class), Id.create("l2", Link.class));
 		parkingRouter = createParkingRouter(scenario, testTimeCostFactory, 3);
 		parkingRouter.adaptStartAndEndOfRoute(route, startLinkId, endLinkId, time, person, vehicle, TransportMode.car);
 		assertEquals(true, checkRouteValidity(scenario, route));
@@ -364,14 +364,14 @@ public class ParkingRouterTest extends MatsimTestCase {
 			return route.getLinkIds().size() == 0;
 		}
 		
-		List<Id> linkIds = new ArrayList<Id>();
+		List<Id<Link>> linkIds = new ArrayList<>();
 		linkIds.add(route.getStartLinkId());
 		linkIds.addAll(route.getLinkIds());
 		linkIds.add(route.getEndLinkId());
 		
 		for (int i = 0; i < linkIds.size() - 1; i++) {
-			Id fromId = linkIds.get(i);
-			Id toId = linkIds.get(i + 1);
+			Id<Link> fromId = linkIds.get(i);
+			Id<Link> toId = linkIds.get(i + 1);
 			
 			Link fromLink = scenario.getNetwork().getLinks().get(fromId);
 			Link toLink = scenario.getNetwork().getLinks().get(toId);
@@ -387,21 +387,21 @@ public class ParkingRouterTest extends MatsimTestCase {
 		TestTimeCost testTimeCost = testTimeCostFactory.createTravelDisutility(null, null);
 		
 		// by default: 10s travel time, 1 monetary unit travel cost
-		testTimeCost.setData(scenario.createId("l0"), 10.0, 1.0);
-		testTimeCost.setData(scenario.createId("l1"), 10.0, 1.0);
-		testTimeCost.setData(scenario.createId("l2"), 10.0, 1.0);
-		testTimeCost.setData(scenario.createId("l3"), 10.0, 1.0);
-		testTimeCost.setData(scenario.createId("l4"), 10.0, 1.0);
-		testTimeCost.setData(scenario.createId("l5"), 10.0, 1.0);
-		testTimeCost.setData(scenario.createId("l6"), 10.0, 1.0);
-		testTimeCost.setData(scenario.createId("l7"), 10.0, 1.0);
-		testTimeCost.setData(scenario.createId("l8"), 10.0, 1.0);
-		testTimeCost.setData(scenario.createId("l9"), 10.0, 1.0);
-		testTimeCost.setData(scenario.createId("l10"), 10.0, 1.0);
-		testTimeCost.setData(scenario.createId("l11"), 10.0, 1.0);
-		testTimeCost.setData(scenario.createId("l12"), 10.0, 1.0);
-		testTimeCost.setData(scenario.createId("l13"), 10.0, 1.0);
-		testTimeCost.setData(scenario.createId("l14"), 10.0, 1.0);
+		testTimeCost.setData(Id.create("l0", Link.class), 10.0, 1.0);
+		testTimeCost.setData(Id.create("l1", Link.class), 10.0, 1.0);
+		testTimeCost.setData(Id.create("l2", Link.class), 10.0, 1.0);
+		testTimeCost.setData(Id.create("l3", Link.class), 10.0, 1.0);
+		testTimeCost.setData(Id.create("l4", Link.class), 10.0, 1.0);
+		testTimeCost.setData(Id.create("l5", Link.class), 10.0, 1.0);
+		testTimeCost.setData(Id.create("l6", Link.class), 10.0, 1.0);
+		testTimeCost.setData(Id.create("l7", Link.class), 10.0, 1.0);
+		testTimeCost.setData(Id.create("l8", Link.class), 10.0, 1.0);
+		testTimeCost.setData(Id.create("l9", Link.class), 10.0, 1.0);
+		testTimeCost.setData(Id.create("l10", Link.class), 10.0, 1.0);
+		testTimeCost.setData(Id.create("l11", Link.class), 10.0, 1.0);
+		testTimeCost.setData(Id.create("l12", Link.class), 10.0, 1.0);
+		testTimeCost.setData(Id.create("l13", Link.class), 10.0, 1.0);
+		testTimeCost.setData(Id.create("l14", Link.class), 10.0, 1.0);
 		
 		TravelTime carTravelTime = testTimeCost;
 		TravelTime walkTravelTime = null;
@@ -469,16 +469,16 @@ public class ParkingRouterTest extends MatsimTestCase {
 		
 		NetworkFactory networkFactory = scenario.getNetwork().getFactory();
 		
-		Node n0 = networkFactory.createNode(scenario.createId("n0"), scenario.createCoord(0.0, 0.0));
-		Node n1 = networkFactory.createNode(scenario.createId("n1"), scenario.createCoord(1000.0, 0.0));
-		Node n2 = networkFactory.createNode(scenario.createId("n2"), scenario.createCoord(2000.0, 0.0));
-		Node n3 = networkFactory.createNode(scenario.createId("n3"), scenario.createCoord(3000.0, 0.0));
-		Node n4 = networkFactory.createNode(scenario.createId("n4"), scenario.createCoord(4000.0, 0.0));
-		Node n5 = networkFactory.createNode(scenario.createId("n5"), scenario.createCoord(5000.0, 0.0));
-		Node n6 = networkFactory.createNode(scenario.createId("n6"), scenario.createCoord(1000.0, -1000.0));
-		Node n7 = networkFactory.createNode(scenario.createId("n7"), scenario.createCoord(1000.0, -2000.0));
-		Node n8 = networkFactory.createNode(scenario.createId("n8"), scenario.createCoord(4000.0, 1000.0));
-		Node n9 = networkFactory.createNode(scenario.createId("n9"), scenario.createCoord(4000.0, 2000.0));
+		Node n0 = networkFactory.createNode(Id.create("n0", Node.class), scenario.createCoord(0.0, 0.0));
+		Node n1 = networkFactory.createNode(Id.create("n1", Node.class), scenario.createCoord(1000.0, 0.0));
+		Node n2 = networkFactory.createNode(Id.create("n2", Node.class), scenario.createCoord(2000.0, 0.0));
+		Node n3 = networkFactory.createNode(Id.create("n3", Node.class), scenario.createCoord(3000.0, 0.0));
+		Node n4 = networkFactory.createNode(Id.create("n4", Node.class), scenario.createCoord(4000.0, 0.0));
+		Node n5 = networkFactory.createNode(Id.create("n5", Node.class), scenario.createCoord(5000.0, 0.0));
+		Node n6 = networkFactory.createNode(Id.create("n6", Node.class), scenario.createCoord(1000.0, -1000.0));
+		Node n7 = networkFactory.createNode(Id.create("n7", Node.class), scenario.createCoord(1000.0, -2000.0));
+		Node n8 = networkFactory.createNode(Id.create("n8", Node.class), scenario.createCoord(4000.0, 1000.0));
+		Node n9 = networkFactory.createNode(Id.create("n9", Node.class), scenario.createCoord(4000.0, 2000.0));
 		
 		scenario.getNetwork().addNode(n0);
 		scenario.getNetwork().addNode(n1);
@@ -491,63 +491,63 @@ public class ParkingRouterTest extends MatsimTestCase {
 		scenario.getNetwork().addNode(n8);
 		scenario.getNetwork().addNode(n9);
 
-		Link l0 = networkFactory.createLink(scenario.createId("l0"), n0, n1);
+		Link l0 = networkFactory.createLink(Id.create("l0", Link.class), n0, n1);
 		l0.setLength(1000.0);
 		l0.setFreespeed(10.0);
 		
-		Link l1 = networkFactory.createLink(scenario.createId("l1"), n1, n2);
+		Link l1 = networkFactory.createLink(Id.create("l1", Link.class), n1, n2);
 		l1.setLength(1000.0);
 		l1.setFreespeed(10.0);
 		
-		Link l2 = networkFactory.createLink(scenario.createId("l2"), n2, n3);
+		Link l2 = networkFactory.createLink(Id.create("l2", Link.class), n2, n3);
 		l2.setLength(1000.0);
 		l2.setFreespeed(10.0);
 		
-		Link l3 = networkFactory.createLink(scenario.createId("l3"), n3, n4);
+		Link l3 = networkFactory.createLink(Id.create("l3", Link.class), n3, n4);
 		l3.setLength(1000.0);
 		l3.setFreespeed(10.0);
 
-		Link l4 = networkFactory.createLink(scenario.createId("l4"), n4, n5);
+		Link l4 = networkFactory.createLink(Id.create("l4", Link.class), n4, n5);
 		l4.setLength(1000.0);
 		l4.setFreespeed(10.0);
 
-		Link l5 = networkFactory.createLink(scenario.createId("l5"), n7, n6);
+		Link l5 = networkFactory.createLink(Id.create("l5", Link.class), n7, n6);
 		l5.setLength(1000.0);
 		l5.setFreespeed(10.0);
 		
-		Link l6 = networkFactory.createLink(scenario.createId("l6"), n6, n0);
+		Link l6 = networkFactory.createLink(Id.create("l6", Link.class), n6, n0);
 		l6.setLength(1415.0);
 		l6.setFreespeed(10.0);
 
-		Link l7 = networkFactory.createLink(scenario.createId("l7"), n6, n1);
+		Link l7 = networkFactory.createLink(Id.create("l7", Link.class), n6, n1);
 		l7.setLength(1000.0);
 		l7.setFreespeed(10.0);
 
-		Link l8 = networkFactory.createLink(scenario.createId("l8"), n6, n2);
+		Link l8 = networkFactory.createLink(Id.create("l8", Link.class), n6, n2);
 		l8.setLength(1415.0);
 		l8.setFreespeed(10.0);
 
-		Link l9 = networkFactory.createLink(scenario.createId("l9"), n6, n3);
+		Link l9 = networkFactory.createLink(Id.create("l9", Link.class), n6, n3);
 		l9.setLength(2237.0);
 		l9.setFreespeed(10.0);
 
-		Link l10 = networkFactory.createLink(scenario.createId("l10"), n8, n9);
+		Link l10 = networkFactory.createLink(Id.create("l10", Link.class), n8, n9);
 		l10.setLength(1000.0);
 		l10.setFreespeed(10.0);
 
-		Link l11 = networkFactory.createLink(scenario.createId("l11"), n2, n8);
+		Link l11 = networkFactory.createLink(Id.create("l11", Link.class), n2, n8);
 		l11.setLength(2237.0);
 		l11.setFreespeed(10.0);
 
-		Link l12 = networkFactory.createLink(scenario.createId("l12"), n3, n8);
+		Link l12 = networkFactory.createLink(Id.create("l12", Link.class), n3, n8);
 		l12.setLength(1415.0);
 		l12.setFreespeed(10.0);
 
-		Link l13 = networkFactory.createLink(scenario.createId("l13"), n4, n8);
+		Link l13 = networkFactory.createLink(Id.create("l13", Link.class), n4, n8);
 		l13.setLength(1000.0);
 		l13.setFreespeed(10.0);
 
-		Link l14 = networkFactory.createLink(scenario.createId("l14"), n5, n8);
+		Link l14 = networkFactory.createLink(Id.create("l14", Link.class), n5, n8);
 		l14.setLength(1415.0);
 		l14.setFreespeed(10.0);
 		
@@ -570,12 +570,12 @@ public class ParkingRouterTest extends MatsimTestCase {
 	
 	private NetworkRoute createRoute(Scenario scenario) {
 		
-		NetworkRoute route = new LinkNetworkRouteImpl(scenario.createId("l0"), scenario.createId("l4"));
+		NetworkRoute route = new LinkNetworkRouteImpl(Id.create("l0", Link.class), Id.create("l4", Link.class));
 		List<Id<Link>> routeLinkIds = new ArrayList<Id<Link>>();
-		routeLinkIds.add(scenario.createId("l1"));
-		routeLinkIds.add(scenario.createId("l2"));
-		routeLinkIds.add(scenario.createId("l3"));
-		route.setLinkIds(scenario.createId("l0"), routeLinkIds, scenario.createId("l4"));
+		routeLinkIds.add(Id.create("l1", Link.class));
+		routeLinkIds.add(Id.create("l2", Link.class));
+		routeLinkIds.add(Id.create("l3", Link.class));
+		route.setLinkIds(Id.create("l0", Link.class), routeLinkIds, Id.create("l4", Link.class));
 		
 		return route;
 	}
@@ -595,10 +595,10 @@ public class ParkingRouterTest extends MatsimTestCase {
 	
 	/*package*/ static class TestTimeCost implements TravelTime, TravelDisutility {
 
-		private final Map<Id, Double> travelTimes = new HashMap<Id, Double>();
-		private final Map<Id, Double> travelCosts = new HashMap<Id, Double>();
+		private final Map<Id<Link>, Double> travelTimes = new HashMap<>();
+		private final Map<Id<Link>, Double> travelCosts = new HashMap<>();
 
-		public void setData(final Id id, final double travelTime, final double travelCost) {
+		public void setData(final Id<Link> id, final double travelTime, final double travelCost) {
 			this.travelTimes.put(id, Double.valueOf(travelTime));
 			this.travelCosts.put(id, Double.valueOf(travelCost));
 		}

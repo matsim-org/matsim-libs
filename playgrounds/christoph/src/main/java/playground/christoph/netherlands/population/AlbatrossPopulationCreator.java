@@ -22,18 +22,20 @@ package playground.christoph.netherlands.population;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Map.Entry;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.Facility;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
@@ -41,7 +43,6 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.population.Desires;
 
 import playground.christoph.netherlands.zones.GetZoneConnectors;
@@ -64,7 +65,7 @@ public class AlbatrossPopulationCreator {
 	private Random random = new Random(123456);
 
 	public static void main(String[] args) throws Exception {
-		new AlbatrossPopulationCreator(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())));
+		new AlbatrossPopulationCreator((ScenarioUtils.createScenario(ConfigUtils.createConfig())));
 	}
 
 	public AlbatrossPopulationCreator(Scenario scenario) throws Exception {
@@ -78,7 +79,7 @@ public class AlbatrossPopulationCreator {
 		log.info("done.");
 
 		log.info("Reading facilities file...");
-		new MatsimFacilitiesReader((ScenarioImpl)scenario).readFile(facilitiesFile);
+		new MatsimFacilitiesReader(scenario).readFile(facilitiesFile);
 		activityFacilities = ((ScenarioImpl)scenario).getActivityFacilities();
 		log.info("done.");
 
@@ -90,7 +91,7 @@ public class AlbatrossPopulationCreator {
 		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
 
 		for (Entry<String, AlbatrossPerson> entry : personMap.entrySet()) {
-			Id id = scenario.createId(entry.getKey());
+			Id<Person> id = Id.create(entry.getKey(), Person.class);
 			AlbatrossPerson albatrossPerson = entry.getValue();
 			
 			PersonImpl person = (PersonImpl)populationFactory.createPerson(id);

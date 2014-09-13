@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -100,14 +101,14 @@ public class EvacuationPopulationAgentSource implements AgentSource {
 				
 				// get household's home facility
 				String homeFacilityIdString = this.householdObjectAttributes.getAttribute(household.getId().toString(), EvacuationConstants.HOUSEHOLD_HOMEFACILITYID).toString();
-				Id homeFacilityId = this.scenario.createId(homeFacilityIdString);
+				Id<ActivityFacility> homeFacilityId = Id.create(homeFacilityIdString, ActivityFacility.class);
 				ActivityFacility homeFacility = this.scenario.getActivityFacilities().getFacilities().get(homeFacilityId);
 				
 				// get id of link where the home facility is attached to the network
-				Id homeLinkId = homeFacility.getLinkId();       	
+				Id<Link> homeLinkId = homeFacility.getLinkId();       	
 				
 				// add vehicles to QSim
-				for (Id vehicleId : household.getVehicleIds()) {
+				for (Id<Vehicle> vehicleId : household.getVehicleIds()) {
 					Vehicle veh = vehicles.getVehicles().get(vehicleId);
 					qsim.createAndParkVehicleOnLink(veh, homeLinkId);
 					
@@ -152,14 +153,14 @@ public class EvacuationPopulationAgentSource implements AgentSource {
 		}
 	}
 	
-	private Id checkVehicleId(Plan plan) {
-		Id agentsVehicleId = null;
+	private Id<Vehicle> checkVehicleId(Plan plan) {
+		Id<Vehicle> agentsVehicleId = null;
 		for (PlanElement planElement : plan.getPlanElements()) {
 			if (planElement instanceof Leg) {
 				Leg leg = (Leg) planElement;
 				if (leg.getMode().equals(TransportMode.car)) {
 					NetworkRoute route = (NetworkRoute) leg.getRoute();
-					Id vehicleId = route.getVehicleId();
+					Id<Vehicle> vehicleId = route.getVehicleId();
 					if (vehicleId == null) {
 						log.warn("Person " + plan.getPerson().getId().toString() + ": Vehicle Id is null!");
 					} else if(!vehicleId.toString().contains("_veh")) {

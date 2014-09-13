@@ -60,7 +60,7 @@ public class InitialParkingSelector implements PersonAlgorithm, PlanAlgorithm {
 		String parkingFacilityIdString = (String) this.scenario.getPopulation().getPersonAttributes().getAttribute(personId.toString(), 
 				INITIALPARKINGFACILITY);
 		if (parkingFacilityIdString != null) {
-			Id parkingFacilityId = scenario.createId(parkingFacilityIdString);
+			Id<ActivityFacility> parkingFacilityId = Id.create(parkingFacilityIdString, ActivityFacility.class);
 			Id vehicleId = this.parkingInfrastructure.getVehicleId(person);
 			this.parkingInfrastructure.reserveParking(vehicleId, parkingFacilityId);
 		} else {

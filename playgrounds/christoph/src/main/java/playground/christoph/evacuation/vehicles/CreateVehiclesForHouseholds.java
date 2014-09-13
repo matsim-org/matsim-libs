@@ -39,9 +39,9 @@ public class CreateVehiclesForHouseholds {
 
 	private final Counter counter3Plus;
 	private final Scenario scenario;
-	private final Map<Id, HouseholdVehiclesInfo> householdVehicles;
+	private final Map<Id<Household>, HouseholdVehiclesInfo> householdVehicles;
 
-	public CreateVehiclesForHouseholds(Scenario scenario, Map<Id, HouseholdVehiclesInfo> householdVehicles) {
+	public CreateVehiclesForHouseholds(Scenario scenario, Map<Id<Household>, HouseholdVehiclesInfo> householdVehicles) {
 		this.scenario = scenario;
 		this.householdVehicles = householdVehicles;
 		this.counter3Plus = new Counter("Created additional vehicles for households with three or more cars: ");
@@ -64,7 +64,7 @@ public class CreateVehiclesForHouseholds {
 		String idString = household.getId().toString();
 		List<Id<Vehicle>> vehicleIds = household.getVehicleIds();
 		if (numVehicles > 0) {
-			Vehicle veh = vehicles.getFactory().createVehicle(scenario.createId(idString + "_veh1"), VehicleUtils.getDefaultVehicleType());
+			Vehicle veh = vehicles.getFactory().createVehicle(Id.create(idString + "_veh1", Vehicle.class), VehicleUtils.getDefaultVehicleType());
 			VehicleCapacity cap = VehicleUtils.getFactory().createVehicleCapacity();
 			veh.getType().setCapacity(cap);
 			cap.setSeats(info.getFirstCapacity());
@@ -72,7 +72,7 @@ public class CreateVehiclesForHouseholds {
 			vehicles.addVehicle( veh);
 		}
 		if (numVehicles > 1) {
-			Vehicle veh = vehicles.getFactory().createVehicle(scenario.createId(idString + "_veh2"), VehicleUtils.getDefaultVehicleType());
+			Vehicle veh = vehicles.getFactory().createVehicle(Id.create(idString + "_veh2", Vehicle.class), VehicleUtils.getDefaultVehicleType());
 			VehicleCapacity cap = VehicleUtils.getFactory().createVehicleCapacity();
 			veh.getType().setCapacity(cap);
 			cap.setSeats(info.getSecondCapacity());
@@ -80,7 +80,7 @@ public class CreateVehiclesForHouseholds {
 			vehicles.addVehicle( veh);
 		}
 		if (numVehicles > 2) {
-			Vehicle veh = vehicles.getFactory().createVehicle(scenario.createId(idString + "_veh3"), VehicleUtils.getDefaultVehicleType());
+			Vehicle veh = vehicles.getFactory().createVehicle(Id.create(idString + "_veh3", Vehicle.class), VehicleUtils.getDefaultVehicleType());
 			VehicleCapacity cap = VehicleUtils.getFactory().createVehicleCapacity();
 			veh.getType().setCapacity(cap);
 			cap.setSeats(info.getThirdCapacity());
@@ -99,7 +99,7 @@ public class CreateVehiclesForHouseholds {
 			if (carAvailability != null && carAvailability.equals("always")) alwaysCarAvailable++;
 		}
 		for (int i = numVehicles + 1; i <= alwaysCarAvailable; i++) {
-			Vehicle veh = vehicles.getFactory().createVehicle(scenario.createId(idString + "_veh" + i), VehicleUtils.getDefaultVehicleType());
+			Vehicle veh = vehicles.getFactory().createVehicle(Id.create(idString + "_veh" + i, Vehicle.class), VehicleUtils.getDefaultVehicleType());
 			VehicleCapacity cap = VehicleUtils.getFactory().createVehicleCapacity();
 			veh.getType().setCapacity(cap);
 			cap.setSeats(5);

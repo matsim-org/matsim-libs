@@ -34,7 +34,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -49,7 +48,7 @@ public class HouseholdVehicleAssignmentReader {
 	
 	private final Scenario scenario;
 	
-	private final Map<Id, HouseholdVehiclesInfo> map;
+	private final Map<Id<Household>, HouseholdVehiclesInfo> map;
 	
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -59,10 +58,10 @@ public class HouseholdVehicleAssignmentReader {
 	
 	public HouseholdVehicleAssignmentReader(Scenario scenario) {
 		this.scenario = scenario;
-		this.map = new HashMap<Id, HouseholdVehiclesInfo>();
+		this.map = new HashMap<>();
 	}
 	
-	public Map<Id, HouseholdVehiclesInfo> getAssignedVehicles() {
+	public Map<Id<Household>, HouseholdVehiclesInfo> getAssignedVehicles() {
 		return Collections.unmodifiableMap(this.map);
 	}
 	
@@ -109,7 +108,7 @@ public class HouseholdVehicleAssignmentReader {
 		    while((line = br.readLine()) != null) { 
 		    	String[] cols = line.split(separator);
 		    	
-		    	Id id = scenario.createId(cols[1]);
+		    	Id<Household> id = Id.create(cols[1], Household.class);
 		    	
 		    	HouseholdVehiclesInfo info = new HouseholdVehiclesInfo();
 		    	

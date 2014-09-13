@@ -128,51 +128,51 @@ public class CreateCampingPopulation extends BurgdorfRoutes {
 		 */
 		routeFrom1ToCamping = new ArrayList<Id<Link>>();
 		if (!this.viaKriegstetten) {
-			for (String id : from1) routeFrom1ToCamping.add(scenario.createId(id));
-			for (String id : alternativeFromZurichCamping) routeFrom1ToCamping.add(scenario.createId(id));
+			for (String id : from1) routeFrom1ToCamping.add(Id.create(id, Link.class));
+			for (String id : alternativeFromZurichCamping) routeFrom1ToCamping.add(Id.create(id, Link.class));
 		} else {
-			for (String id : from1ToKriegstetten) routeFrom1ToCamping.add(scenario.createId(id));
-			for (String id : highwayFromZurichCamping) routeFrom1ToCamping.add(scenario.createId(id));
+			for (String id : from1ToKriegstetten) routeFrom1ToCamping.add(Id.create(id, Link.class));
+			for (String id : highwayFromZurichCamping) routeFrom1ToCamping.add(Id.create(id, Link.class));
 		}
 		checkRouteValidity(scenario, routeFrom1ToCamping);
 		
 		routeFrom2ToCamping = new ArrayList<Id<Link>>();
 		if (!this.viaKriegstetten) {
-			for (String id : from2) routeFrom2ToCamping.add(scenario.createId(id));
-			for (String id : alternativeFromZurichCamping) routeFrom2ToCamping.add(scenario.createId(id));
+			for (String id : from2) routeFrom2ToCamping.add(Id.create(id, Link.class));
+			for (String id : alternativeFromZurichCamping) routeFrom2ToCamping.add(Id.create(id, Link.class));
 		} else {
-			for (String id : from2ToKriegstetten) routeFrom2ToCamping.add(scenario.createId(id));
-			for (String id : highwayFromZurichCamping) routeFrom2ToCamping.add(scenario.createId(id));
+			for (String id : from2ToKriegstetten) routeFrom2ToCamping.add(Id.create(id, Link.class));
+			for (String id : highwayFromZurichCamping) routeFrom2ToCamping.add(Id.create(id, Link.class));
 		}
 		checkRouteValidity(scenario, routeFrom2ToCamping);
 		
 		routeFrom3ToCamping = new ArrayList<Id<Link>>();
 		if (!this.viaSchoenbuehl) {
-			for (String id : from3) routeFrom3ToCamping.add(scenario.createId(id));
-			for (String id : highwayFromBernCamping) routeFrom3ToCamping.add(scenario.createId(id));
+			for (String id : from3) routeFrom3ToCamping.add(Id.create(id, Link.class));
+			for (String id : highwayFromBernCamping) routeFrom3ToCamping.add(Id.create(id, Link.class));
 		} else {
-			for (String id : from3ToSchoenbuehl) routeFrom3ToCamping.add(scenario.createId(id));
-			for (String id : alternativeFromBernCamping) routeFrom3ToCamping.add(scenario.createId(id));
+			for (String id : from3ToSchoenbuehl) routeFrom3ToCamping.add(Id.create(id, Link.class));
+			for (String id : alternativeFromBernCamping) routeFrom3ToCamping.add(Id.create(id, Link.class));
 		}
 		checkRouteValidity(scenario, routeFrom3ToCamping);
 		
 		routeFrom4ToCamping = new ArrayList<Id<Link>>();
 		if (!this.viaSchoenbuehl) {
-			for (String id : from4) routeFrom4ToCamping.add(scenario.createId(id));
-			for (String id : highwayFromBernCamping) routeFrom4ToCamping.add(scenario.createId(id));
+			for (String id : from4) routeFrom4ToCamping.add(Id.create(id, Link.class));
+			for (String id : highwayFromBernCamping) routeFrom4ToCamping.add(Id.create(id, Link.class));
 		} else {
-			for (String id : from4ToSchoenbuehl) routeFrom4ToCamping.add(scenario.createId(id));
-			for (String id : alternativeFromBernCamping) routeFrom4ToCamping.add(scenario.createId(id));
+			for (String id : from4ToSchoenbuehl) routeFrom4ToCamping.add(Id.create(id, Link.class));
+			for (String id : alternativeFromBernCamping) routeFrom4ToCamping.add(Id.create(id, Link.class));
 		}
 		checkRouteValidity(scenario, routeFrom4ToCamping);
 		
 		routeFrom5ToCamping = new ArrayList<Id<Link>>();
 		if (!this.viaSchoenbuehl) {
-			for (String id : from5) routeFrom5ToCamping.add(scenario.createId(id));
-			for (String id : highwayFromBernCamping) routeFrom5ToCamping.add(scenario.createId(id));
+			for (String id : from5) routeFrom5ToCamping.add(Id.create(id, Link.class));
+			for (String id : highwayFromBernCamping) routeFrom5ToCamping.add(Id.create(id, Link.class));
 		} else {
-			for (String id : from5ToSchoenbuehl) routeFrom5ToCamping.add(scenario.createId(id));
-			for (String id : alternativeFromBernCamping) routeFrom5ToCamping.add(scenario.createId(id));
+			for (String id : from5ToSchoenbuehl) routeFrom5ToCamping.add(Id.create(id, Link.class));
+			for (String id : alternativeFromBernCamping) routeFrom5ToCamping.add(Id.create(id, Link.class));
 		}
 		checkRouteValidity(scenario, routeFrom5ToCamping);
 		
@@ -181,51 +181,51 @@ public class CreateCampingPopulation extends BurgdorfRoutes {
 		 */
 		routeFromCampingTo1 = new ArrayList<Id<Link>>();
 		if (!this.viaKriegstetten) {
-			for (String id : alternativeToZurichCamping) routeFromCampingTo1.add(scenario.createId(id));
-			for (String id : to1) routeFromCampingTo1.add(scenario.createId(id));
+			for (String id : alternativeToZurichCamping) routeFromCampingTo1.add(Id.create(id, Link.class));
+			for (String id : to1) routeFromCampingTo1.add(Id.create(id, Link.class));
 		} else {
-			for (String id : highwayToZurichCamping) routeFromCampingTo1.add(scenario.createId(id));
-			for (String id : to1FromKriegstetten) routeFromCampingTo1.add(scenario.createId(id));
+			for (String id : highwayToZurichCamping) routeFromCampingTo1.add(Id.create(id, Link.class));
+			for (String id : to1FromKriegstetten) routeFromCampingTo1.add(Id.create(id, Link.class));
 		}
 		checkRouteValidity(scenario, routeFromCampingTo1);
 		
 		routeFromCampingTo2 = new ArrayList<Id<Link>>();
 		if (!this.viaKriegstetten) {
-			for (String id : alternativeToZurichCamping) routeFromCampingTo2.add(scenario.createId(id));
-			for (String id : to2) routeFromCampingTo2.add(scenario.createId(id));
+			for (String id : alternativeToZurichCamping) routeFromCampingTo2.add(Id.create(id, Link.class));
+			for (String id : to2) routeFromCampingTo2.add(Id.create(id, Link.class));
 		} else {
-			for (String id : highwayToZurichCamping) routeFromCampingTo2.add(scenario.createId(id));
-			for (String id : to2FromKriegstetten) routeFromCampingTo2.add(scenario.createId(id));
+			for (String id : highwayToZurichCamping) routeFromCampingTo2.add(Id.create(id, Link.class));
+			for (String id : to2FromKriegstetten) routeFromCampingTo2.add(Id.create(id, Link.class));
 		}
 		checkRouteValidity(scenario, routeFromCampingTo2);
 		
 		routeFromCampingTo3 = new ArrayList<Id<Link>>();
 		if (!this.viaSchoenbuehl) {
-			for (String id : highwayToBernCamping) routeFromCampingTo3.add(scenario.createId(id));
-			for (String id : to3) routeFromCampingTo3.add(scenario.createId(id));
+			for (String id : highwayToBernCamping) routeFromCampingTo3.add(Id.create(id, Link.class));
+			for (String id : to3) routeFromCampingTo3.add(Id.create(id, Link.class));
 		} else {
-			for (String id : alternativeToBernCamping) routeFromCampingTo3.add(scenario.createId(id));
-			for (String id : to3FromSchoenbuehl) routeFromCampingTo3.add(scenario.createId(id));
+			for (String id : alternativeToBernCamping) routeFromCampingTo3.add(Id.create(id, Link.class));
+			for (String id : to3FromSchoenbuehl) routeFromCampingTo3.add(Id.create(id, Link.class));
 		}
 		checkRouteValidity(scenario, routeFromCampingTo3);
 		
 		routeFromCampingTo4 = new ArrayList<Id<Link>>();
 		if (!this.viaSchoenbuehl) {
-			for (String id : highwayToBernCamping) routeFromCampingTo4.add(scenario.createId(id));
-			for (String id : to4) routeFromCampingTo4.add(scenario.createId(id));
+			for (String id : highwayToBernCamping) routeFromCampingTo4.add(Id.create(id, Link.class));
+			for (String id : to4) routeFromCampingTo4.add(Id.create(id, Link.class));
 		} else {
-			for (String id : alternativeToBernCamping) routeFromCampingTo4.add(scenario.createId(id));
-			for (String id : to4FromSchoenbuehl) routeFromCampingTo4.add(scenario.createId(id));
+			for (String id : alternativeToBernCamping) routeFromCampingTo4.add(Id.create(id, Link.class));
+			for (String id : to4FromSchoenbuehl) routeFromCampingTo4.add(Id.create(id, Link.class));
 		}
 		checkRouteValidity(scenario, routeFromCampingTo4);
 		
 		routeFromCampingTo5 = new ArrayList<Id<Link>>();
 		if (!this.viaSchoenbuehl) {
-			for (String id : highwayToBernCamping) routeFromCampingTo5.add(scenario.createId(id));
-			for (String id : to5) routeFromCampingTo5.add(scenario.createId(id));
+			for (String id : highwayToBernCamping) routeFromCampingTo5.add(Id.create(id, Link.class));
+			for (String id : to5) routeFromCampingTo5.add(Id.create(id, Link.class));
 		} else {
-			for (String id : alternativeToBernCamping) routeFromCampingTo5.add(scenario.createId(id));
-			for (String id : to5FromSchoenbuehl) routeFromCampingTo5.add(scenario.createId(id));
+			for (String id : alternativeToBernCamping) routeFromCampingTo5.add(Id.create(id, Link.class));
+			for (String id : to5FromSchoenbuehl) routeFromCampingTo5.add(Id.create(id, Link.class));
 		}
 		checkRouteValidity(scenario, routeFromCampingTo5);
 	}
@@ -245,13 +245,13 @@ public class CreateCampingPopulation extends BurgdorfRoutes {
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) populationFactory).getModeRouteFactory();
 		
 		int bin = 1;
-		Id fromLinkId = routeFromToParkings.get(0);
-		Id toLinkId = routeFromToParkings.get(routeFromToParkings.size() - 1);
+		Id<Link> fromLinkId = routeFromToParkings.get(0);
+		Id<Link> toLinkId = routeFromToParkings.get(routeFromToParkings.size() - 1);
 		Route route = routeFactory.createRoute(TransportMode.car, fromLinkId, toLinkId);
 		((NetworkRoute) route).setLinkIds(fromLinkId, routeFromToParkings.subList(1, routeFromToParkings.size() - 1), toLinkId);		
 		for (int departures : fromDepartures) {
 			for (int hourCounter = 0; hourCounter < departures; hourCounter++) {
-				Person person = populationFactory.createPerson(scenario.createId("camping_" + campingCounter + "_" + hourCounter + "_" + from + "_" + bin));
+				Person person = populationFactory.createPerson(Id.create("camping_" + campingCounter + "_" + hourCounter + "_" + from + "_" + bin, Person.class));
 				
 				Plan plan = populationFactory.createPlan();
 				double departureTime = (bin - 1) * binSize + Math.round(MatsimRandom.getRandom().nextDouble() * binSize);
@@ -295,13 +295,13 @@ public class CreateCampingPopulation extends BurgdorfRoutes {
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) populationFactory).getModeRouteFactory();
 		
 		int bin = 1;
-		Id fromLinkId = routeFromToParkings.get(0);
-		Id toLinkId = routeFromToParkings.get(routeFromToParkings.size() - 1);
+		Id<Link> fromLinkId = routeFromToParkings.get(0);
+		Id<Link> toLinkId = routeFromToParkings.get(routeFromToParkings.size() - 1);
 		Route route = routeFactory.createRoute(TransportMode.car, fromLinkId, toLinkId);
 		((NetworkRoute) route).setLinkIds(fromLinkId, routeFromToParkings.subList(1, routeFromToParkings.size() - 1), toLinkId);		
 		for (int departures : fromDepartures) {
 			for (int hourCounter = 0; hourCounter < departures; hourCounter++) {
-				Person person = populationFactory.createPerson(scenario.createId("camping_" + campingCounter + "_" + hourCounter + "_" + from + "_" + bin));
+				Person person = populationFactory.createPerson(Id.create("camping_" + campingCounter + "_" + hourCounter + "_" + from + "_" + bin, Person.class));
 				
 				Plan plan = populationFactory.createPlan();
 				double departureTime = (bin - 1) * binSize + Math.round(MatsimRandom.getRandom().nextDouble() * binSize);

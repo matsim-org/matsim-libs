@@ -39,7 +39,6 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
@@ -72,8 +71,8 @@ final private static Logger log = Logger.getLogger(EnterpriseFacilitiesCreator.c
 	private Charset charset = Charset.forName("UTF-8");
 	private Random random = MatsimRandom.getLocalInstance();
 	
-	private Map<Id, Id> enterpriseToBuildingMapping;	// <EnterpriseId, BuildingId>
-	private Map<Id, Integer> enterpriseVAE;	// <EnterpriseId, Vollzeitaequivalente Arbeitsplaetze>
+	private Map<String, Id<ActivityFacility>> enterpriseToBuildingMapping;	// <EnterpriseId, BuildingId>
+	private Map<String, Integer> enterpriseVAE;	// <EnterpriseId, Vollzeitaequivalente Arbeitsplaetze>
 
 	private ActivityFacilities zhFacilities;
 	private ActivityFacilities existingFacilities;
@@ -221,7 +220,7 @@ final private static Logger log = Logger.getLogger(EnterpriseFacilitiesCreator.c
 		br = new BufferedReader(isr);
 		
 		Counter counter = new Counter("parsed enterprises to building mapping in ZH: ");
-		enterpriseToBuildingMapping = new HashMap<Id, Id>();
+		enterpriseToBuildingMapping = new HashMap<>();
 		
 		// skip first Line with the Header
 		br.readLine();
@@ -230,8 +229,8 @@ final private static Logger log = Logger.getLogger(EnterpriseFacilitiesCreator.c
 		while((line = br.readLine()) != null) {
 			String[] cols = line.split(delimiter2);
 			
-			Id enterpriseId = scenario.createId(cols[1]);
-			Id buildingId = scenario.createId("egid" + (int)Double.parseDouble(cols[cols.length - 1]));
+			String enterpriseId = cols[1];
+			Id<ActivityFacility> buildingId = Id.create("egid" + (int)Double.parseDouble(cols[cols.length - 1]), ActivityFacility.class);
 			
 			if ((int)Double.parseDouble(cols[cols.length - 1]) == 0) {
 				log.warn("Invalid enterprise to building mapping - skipp entry: " + line);
@@ -259,7 +258,7 @@ final private static Logger log = Logger.getLogger(EnterpriseFacilitiesCreator.c
 		br = new BufferedReader(isr);
 		
 		Counter counter = new Counter("parsed enterprise capacities in ZH: ");
-		enterpriseVAE = new HashMap<Id, Integer>();
+		enterpriseVAE = new HashMap<>();
 		
 		// skip first Line with the Header
 		br.readLine();
@@ -268,7 +267,7 @@ final private static Logger log = Logger.getLogger(EnterpriseFacilitiesCreator.c
 		while((line = br.readLine()) != null) {
 			String[] cols = line.split(delimiter2);
 			
-			Id enterpriseId = scenario.createId(cols[0]);
+			String enterpriseId = cols[0];
 			int vae = Integer.parseInt(cols[1]);
 			
 			enterpriseVAE.put(enterpriseId, vae);
@@ -383,8 +382,8 @@ final private static Logger log = Logger.getLogger(EnterpriseFacilitiesCreator.c
 			if (nogaSection <= 3) continue;
 			
 			EnterpriseData e = new EnterpriseData(cols);
-			Id enterpriseId = scenario.createId(cols[0]);		
-			Id facilityId = enterpriseToBuildingMapping.get(enterpriseId);
+			String enterpriseId = cols[0];		
+			Id<ActivityFacility> facilityId = enterpriseToBuildingMapping.get(enterpriseId);
 			
 			if (facilityId == null) {
 				log.warn("No mapping for enterprise Id " + enterpriseId.toString() + " found. Skip entry!");
@@ -794,7 +793,7 @@ final private static Logger log = Logger.getLogger(EnterpriseFacilitiesCreator.c
 	
 	public void writeFacilitiesFile(String outFacilitiesZHFile) {
 		log.info("Setting opening times...");
-		new FacilitiesWriter((ActivityFacilitiesImpl) zhFacilities).write(outFacilitiesZHFile);
+		new FacilitiesWriter(zhFacilities).write(outFacilitiesZHFile);
 		log.info("done.");
 	}
 	

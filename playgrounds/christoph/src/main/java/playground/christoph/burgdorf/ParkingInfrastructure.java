@@ -46,13 +46,13 @@ public class ParkingInfrastructure {
 	/*
 	 * Sub-routes from the parking decision links to the parkings.
 	 */
-	public static Map<Id, List<Id<Link>>> toParkingSubRoutes = new HashMap<Id, List<Id<Link>>>();
-	public static Map<Id, List<Id<Link>>> fromParkingSubRoutes = new HashMap<Id, List<Id<Link>>>();
+	public static Map<Id<Link>, List<Id<Link>>> toParkingSubRoutes = new HashMap<>();
+	public static Map<Id<Link>, List<Id<Link>>> fromParkingSubRoutes = new HashMap<>();
 	
 	/*
 	 * Parkings, that can be reached from a given decision link. 
 	 */
-	public static Map<Id, List<Id>> availableParkings = new HashMap<Id, List<Id>>();
+	public static Map<Id<Link>, List<Id<Link>>> availableParkings = new HashMap<>();
 	
 	/*
 	 * Stores for each agent which parking is used. Data is inserted by
@@ -60,21 +60,21 @@ public class ParkingInfrastructure {
 	 */
 	public static Map<Id, Id> selectedParkings = new ConcurrentHashMap<Id, Id>();
 	
-	public static Id selectParking(Id currentLinkId) {
+	public static Id<Link> selectParking(Id<Link> currentLinkId) {
 		
-		List<Id> list = availableParkings.get(currentLinkId);
+		List<Id<Link>> list = availableParkings.get(currentLinkId);
 		
 		return list.get(MatsimRandom.getRandom().nextInt(list.size()));
 	}
 	
 	static {
 		
-		List<Id> parkingList;
+		List<Id<Link>> parkingList;
 		
 		/*
 		 * Create data structure for available parkings.
 		 */
-		parkingList = new ArrayList<Id>();
+		parkingList = new ArrayList<Id<Link>>();
 		parkingList.add(new IdImpl("P01"));
 		parkingList.add(new IdImpl("P02"));
 		parkingList.add(new IdImpl("P03"));
@@ -83,7 +83,7 @@ public class ParkingInfrastructure {
 		parkingList.add(new IdImpl("P07a"));	// can be reached from both
 		availableParkings.put(new IdImpl("L30"), parkingList);
 
-		parkingList = new ArrayList<Id>();
+		parkingList = new ArrayList<Id<Link>>();
 		parkingList.add(new IdImpl("P06"));
 		parkingList.add(new IdImpl("P07"));
 		parkingList.add(new IdImpl("P08"));

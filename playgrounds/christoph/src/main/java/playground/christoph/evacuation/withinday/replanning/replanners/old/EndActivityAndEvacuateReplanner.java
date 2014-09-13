@@ -25,10 +25,12 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
 import org.matsim.core.mobsim.qsim.InternalInterface;
@@ -96,10 +98,10 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 		 * the simulation.
 		 */
 		Activity rescueActivity = factory.createActivityFromLinkId(EvacuationConstants.RESCUE_ACTIVITY, 
-				scenario.createId(EvacuationConstants.RESCUE_LINK));
-		((ActivityImpl)rescueActivity).setFacilityId(scenario.createId(EvacuationConstants.RESCUE_FACILITY));
+				Id.create(EvacuationConstants.RESCUE_LINK, Link.class));
+		((ActivityImpl)rescueActivity).setFacilityId(Id.create(EvacuationConstants.RESCUE_FACILITY, ActivityFacility.class));
 		
-		Coord rescueCoord = ((ScenarioImpl)scenario).getActivityFacilities().getFacilities().get(scenario.createId(EvacuationConstants.RESCUE_FACILITY)).getCoord();
+		Coord rescueCoord = ((ScenarioImpl)scenario).getActivityFacilities().getFacilities().get(Id.create(EvacuationConstants.RESCUE_FACILITY, ActivityFacility.class)).getCoord();
 		((ActivityImpl)rescueActivity).setCoord(rescueCoord);
 		
 		// create a leg using the identified transport mode
@@ -127,7 +129,7 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 		if (route.getLinkIds().size() > 1) {
 			endLinkId = route.getLinkIds().get(route.getLinkIds().size() - 2);			
 		} else endLinkId = route.getStartLinkId();
-		((ActivityImpl) rescueActivity).setFacilityId(scenario.createId(EvacuationConstants.RESCUE_FACILITY + endLinkId.toString()));
+		((ActivityImpl) rescueActivity).setFacilityId(Id.create(EvacuationConstants.RESCUE_FACILITY + endLinkId.toString(), ActivityFacility.class));
 		((ActivityImpl) rescueActivity).setLinkId(endLinkId);
 		NetworkRoute subRoute2 = route.getSubRoute(route.getStartLinkId(), endLinkId);
 		legToRescue.setRoute(subRoute2);

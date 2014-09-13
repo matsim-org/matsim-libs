@@ -30,6 +30,7 @@ import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -40,10 +41,10 @@ public class FacilitiesToRemoveFromZH {
 
 	private String separator = ";";
 	private Charset charset = Charset.forName("ISO-8859-1");
-	private Set<Id> facilitiesToRemove;
+	private Set<Id<ActivityFacility>> facilitiesToRemove;
 	
 	public FacilitiesToRemoveFromZH(String textFile) throws Exception {
-		facilitiesToRemove = new TreeSet<Id>();
+		facilitiesToRemove = new TreeSet<>();
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		FileInputStream fis = null;
@@ -62,7 +63,7 @@ public class FacilitiesToRemoveFromZH {
 		while((line = br.readLine()) != null) {
 			String[] cols = line.split(separator);
 			
-			Id id = scenario.createId(cols[1].replace("\"", ""));
+			Id<ActivityFacility> id = Id.create(cols[1].replace("\"", ""), ActivityFacility.class);
 			facilitiesToRemove.add(id);
 			counter.incCounter();
 		}
@@ -73,7 +74,7 @@ public class FacilitiesToRemoveFromZH {
 		fis.close();
 	}
 	
-	public Set<Id> getFacilitiesToRemove() {
+	public Set<Id<ActivityFacility>> getFacilitiesToRemove() {
 		return Collections.unmodifiableSet(this.facilitiesToRemove);
 	}
 }

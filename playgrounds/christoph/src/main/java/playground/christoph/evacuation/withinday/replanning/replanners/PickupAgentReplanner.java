@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
@@ -116,7 +117,7 @@ public class PickupAgentReplanner extends WithinDayDuringLegReplanner {
 		waitForPickupActivity.setMaximumDuration(duration);
 //		waitForPickupActivity.setEndTime(departureTime);
 		String idString = currentLinkId.toString() + EvacuationConstants.PICKUP_DROP_OFF_FACILITY_SUFFIX;
-		((ActivityImpl) waitForPickupActivity).setFacilityId(scenario.createId(idString));
+		((ActivityImpl) waitForPickupActivity).setFacilityId(Id.create(idString, ActivityFacility.class));
 		((ActivityImpl) waitForPickupActivity).setCoord(scenario.getNetwork().getLinks().get(currentLinkId).getCoord());
 		
 		/*
@@ -198,7 +199,7 @@ public class PickupAgentReplanner extends WithinDayDuringLegReplanner {
 		waitForPickupActivity.setStartTime(this.time);
 		waitForPickupActivity.setEndTime(departureTime);
 		String idString = currentLinkId.toString() + EvacuationConstants.PICKUP_DROP_OFF_FACILITY_SUFFIX;
-		((ActivityImpl) waitForPickupActivity).setFacilityId(scenario.createId(idString));
+		((ActivityImpl) waitForPickupActivity).setFacilityId(Id.create(idString, ActivityFacility.class));
 		((ActivityImpl) waitForPickupActivity).setCoord(scenario.getNetwork().getLinks().get(currentLinkId).getCoord());
 				
 		/*

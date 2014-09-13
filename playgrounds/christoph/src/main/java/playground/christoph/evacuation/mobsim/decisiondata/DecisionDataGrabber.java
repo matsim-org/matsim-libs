@@ -125,7 +125,7 @@ public class DecisionDataGrabber {
 
 			String homeFacilityIdString = this.householdObjectAttributes.getAttribute(household.getId().toString(), 
 					EvacuationConstants.HOUSEHOLD_HOMEFACILITYID).toString();
-			Id homeFacilityId = this.scenario.createId(homeFacilityIdString);
+			Id<ActivityFacility> homeFacilityId = Id.create(homeFacilityIdString, ActivityFacility.class);
 			ActivityFacility homeFacility = this.scenario.getActivityFacilities().getFacilities().get(homeFacilityId);
 			
 			HouseholdPosition householdPosition = this.householdsTracker.getHouseholdPosition(household.getId());

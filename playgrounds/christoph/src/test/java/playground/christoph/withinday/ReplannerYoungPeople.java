@@ -3,6 +3,7 @@ package playground.christoph.withinday;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -46,7 +47,7 @@ public class ReplannerYoungPeople extends WithinDayDuringLegReplanner {
 		// If it is not a car Leg we don't replan it.
 		if (!currentLeg.getMode().equals(TransportMode.car)) return false;
 		
-		Id linkId = this.scenario.createId("22");
+		Id<Link> linkId = Id.create("22", Link.class);
 		ActivityImpl newWorkAct = new ActivityImpl("w", linkId);
 		newWorkAct.setEndTime(nextActivity.getEndTime());
 

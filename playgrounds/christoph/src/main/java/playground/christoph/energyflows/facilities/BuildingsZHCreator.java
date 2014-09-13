@@ -63,8 +63,8 @@ public class BuildingsZHCreator {
 	private String delimiter = ",";
 	private Charset charset = Charset.forName("UTF-8");
 	private int totalResidentialArea;
-	private Set<Id> residentialBuildings;
-	private Map<Id, BuildingData> data;
+	private Set<Id<ActivityFacility>> residentialBuildings;
+	private Map<Id<ActivityFacility>, BuildingData> data;
 	private Config config;
 	private Scenario scenario;
 	
@@ -97,7 +97,7 @@ public class BuildingsZHCreator {
 	 */
 	public BuildingsZHCreator() throws Exception {
 		config = ConfigUtils.createConfig();
-		scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		scenario = ScenarioUtils.createScenario(config);
 	}
 	
 	public void parseBuildingFile(String buildingsTextFile) throws Exception {
@@ -109,7 +109,7 @@ public class BuildingsZHCreator {
 		isr = new InputStreamReader(fis, charset);
 		br = new BufferedReader(isr);
 		Counter counter = new Counter("parsed buildings in ZH: ");
-		data = new TreeMap<Id, BuildingData>();
+		data = new TreeMap<>();
 		
 		// skip first Line with the Header
 		br.readLine();
@@ -123,7 +123,7 @@ public class BuildingsZHCreator {
 //			BuildingData d = new BuildingData(cols, noFlats, toLargeFlats);
 			BuildingData d = new BuildingData(cols);
 			
-			data.put(scenario.createId("egid" + d.egid), d);
+			data.put(Id.create("egid" + d.egid, ActivityFacility.class), d);
 			counter.incCounter();
 			
 //			/*
@@ -148,7 +148,7 @@ public class BuildingsZHCreator {
 	
 	public void parseApartmentFile(String apartmentsTextFile) throws Exception {
 		
-		residentialBuildings = new HashSet<Id>();
+		residentialBuildings = new HashSet<>();
 		
 		FileInputStream fis = null;
 		InputStreamReader isr = null;
@@ -168,7 +168,7 @@ public class BuildingsZHCreator {
 			String[] cols = line.split(delimiter);
 			
 			ApartmentData a = new ApartmentData(cols);
-			Id id = scenario.createId("egid" + a.egid);
+			Id<ActivityFacility> id = Id.create("egid" + a.egid, ActivityFacility.class);
 			BuildingData d = data.get(id);
 			
 			if (d != null) {
@@ -232,8 +232,8 @@ public class BuildingsZHCreator {
 	public void createFacilities() {
 		ActivityFacilities facilities = scenario.getActivityFacilities();
 		ActivityFacilitiesFactory factory = facilities.getFactory();
-		for (Entry<Id, BuildingData> entry :data.entrySet()) {
-			Id id = entry.getKey();
+		for (Entry<Id<ActivityFacility>, BuildingData> entry :data.entrySet()) {
+			Id<ActivityFacility> id = entry.getKey();
 			BuildingData building = entry.getValue();
 			
 			Coord coord = scenario.createCoord(building.x, building.y);

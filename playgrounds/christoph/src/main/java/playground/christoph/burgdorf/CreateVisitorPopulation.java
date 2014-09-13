@@ -142,51 +142,51 @@ public class CreateVisitorPopulation extends BurgdorfRoutes {
 		 */
 		routeFrom1ToParkings = new ArrayList<Id<Link>>();
 		if (!this.viaKriegstetten) {
-			for (String id : from1) routeFrom1ToParkings.add(scenario.createId(id));
-			for (String id : highwayFromZurich) routeFrom1ToParkings.add(scenario.createId(id));
+			for (String id : from1) routeFrom1ToParkings.add(Id.create(id, Link.class));
+			for (String id : highwayFromZurich) routeFrom1ToParkings.add(Id.create(id, Link.class));
 		} else {
-			for (String id : from1ToKriegstetten) routeFrom1ToParkings.add(scenario.createId(id));
-			for (String id : alternativeFromZurich) routeFrom1ToParkings.add(scenario.createId(id));
+			for (String id : from1ToKriegstetten) routeFrom1ToParkings.add(Id.create(id, Link.class));
+			for (String id : alternativeFromZurich) routeFrom1ToParkings.add(Id.create(id, Link.class));
 		}
 		checkRouteValidity(scenario, routeFrom1ToParkings);
 	
 		routeFrom2ToParkings = new ArrayList<Id<Link>>();
 		if (!this.viaKriegstetten) {
-			for (String id : from2) routeFrom2ToParkings.add(scenario.createId(id));
-			for (String id : highwayFromZurich) routeFrom2ToParkings.add(scenario.createId(id));			
+			for (String id : from2) routeFrom2ToParkings.add(Id.create(id, Link.class));
+			for (String id : highwayFromZurich) routeFrom2ToParkings.add(Id.create(id, Link.class));			
 		} else {
-			for (String id : from1ToKriegstetten) routeFrom2ToParkings.add(scenario.createId(id));
-			for (String id : alternativeFromZurich) routeFrom2ToParkings.add(scenario.createId(id));
+			for (String id : from1ToKriegstetten) routeFrom2ToParkings.add(Id.create(id, Link.class));
+			for (String id : alternativeFromZurich) routeFrom2ToParkings.add(Id.create(id, Link.class));
 		}
 		checkRouteValidity(scenario, routeFrom2ToParkings);
 		
 		routeFrom3ToParkings = new ArrayList<Id<Link>>();
 		if (!this.viaSchoenbuehl) {
-			for (String id : from3) routeFrom3ToParkings.add(scenario.createId(id));
-			for (String id : highwayFromBern) routeFrom3ToParkings.add(scenario.createId(id));			
+			for (String id : from3) routeFrom3ToParkings.add(Id.create(id, Link.class));
+			for (String id : highwayFromBern) routeFrom3ToParkings.add(Id.create(id, Link.class));			
 		} else {
-			for (String id : from3ToSchoenbuehl) routeFrom3ToParkings.add(scenario.createId(id));
-			for (String id : alternativeFromBern) routeFrom3ToParkings.add(scenario.createId(id));
+			for (String id : from3ToSchoenbuehl) routeFrom3ToParkings.add(Id.create(id, Link.class));
+			for (String id : alternativeFromBern) routeFrom3ToParkings.add(Id.create(id, Link.class));
 		}
 		checkRouteValidity(scenario, routeFrom3ToParkings);
 		
 		routeFrom4ToParkings = new ArrayList<Id<Link>>();
 		if (!this.viaSchoenbuehl) {
-			for (String id : from4) routeFrom4ToParkings.add(scenario.createId(id));
-			for (String id : highwayFromBern) routeFrom4ToParkings.add(scenario.createId(id));
+			for (String id : from4) routeFrom4ToParkings.add(Id.create(id, Link.class));
+			for (String id : highwayFromBern) routeFrom4ToParkings.add(Id.create(id, Link.class));
 		} else {
-			for (String id : from4ToSchoenbuehl) routeFrom4ToParkings.add(scenario.createId(id));
-			for (String id : alternativeFromBern) routeFrom4ToParkings.add(scenario.createId(id));
+			for (String id : from4ToSchoenbuehl) routeFrom4ToParkings.add(Id.create(id, Link.class));
+			for (String id : alternativeFromBern) routeFrom4ToParkings.add(Id.create(id, Link.class));
 		}
 		checkRouteValidity(scenario, routeFrom4ToParkings);
 		
 		routeFrom5ToParkings = new ArrayList<Id<Link>>();
 		if (!this.viaSchoenbuehl) {
-			for (String id : from5) routeFrom5ToParkings.add(scenario.createId(id));
-			for (String id : highwayFromBern) routeFrom5ToParkings.add(scenario.createId(id));
+			for (String id : from5) routeFrom5ToParkings.add(Id.create(id, Link.class));
+			for (String id : highwayFromBern) routeFrom5ToParkings.add(Id.create(id, Link.class));
 		} else {
-			for (String id : from5ToSchoenbuehl) routeFrom5ToParkings.add(scenario.createId(id));
-			for (String id : alternativeFromBern) routeFrom5ToParkings.add(scenario.createId(id));
+			for (String id : from5ToSchoenbuehl) routeFrom5ToParkings.add(Id.create(id, Link.class));
+			for (String id : alternativeFromBern) routeFrom5ToParkings.add(Id.create(id, Link.class));
 		}
 		checkRouteValidity(scenario, routeFrom5ToParkings);
 		
@@ -195,53 +195,53 @@ public class CreateVisitorPopulation extends BurgdorfRoutes {
 		 */
 		routeFromParkingsTo1 = new ArrayList<Id<Link>>();
 		if (!this.viaKriegstetten) {
-			for (String id : parkingToHighwayToZurich) routeFromParkingsTo1.add(scenario.createId(id));
-			for (String id : to1) routeFromParkingsTo1.add(scenario.createId(id));
+			for (String id : parkingToHighwayToZurich) routeFromParkingsTo1.add(Id.create(id, Link.class));
+			for (String id : to1) routeFromParkingsTo1.add(Id.create(id, Link.class));
 		}
 		else {
-			for (String id : alternativeToZurich) routeFromParkingsTo1.add(scenario.createId(id));
-			for (String id : to1FromKriegstetten) routeFromParkingsTo1.add(scenario.createId(id));
+			for (String id : alternativeToZurich) routeFromParkingsTo1.add(Id.create(id, Link.class));
+			for (String id : to1FromKriegstetten) routeFromParkingsTo1.add(Id.create(id, Link.class));
 		}
 		checkRouteValidity(scenario, routeFromParkingsTo1);
 
 		routeFromParkingsTo2 = new ArrayList<Id<Link>>();
 		if (!this.viaKriegstetten) {
-			for (String id : parkingToHighwayToZurich) routeFromParkingsTo2.add(scenario.createId(id));
-			for (String id : to2) routeFromParkingsTo2.add(scenario.createId(id));
+			for (String id : parkingToHighwayToZurich) routeFromParkingsTo2.add(Id.create(id, Link.class));
+			for (String id : to2) routeFromParkingsTo2.add(Id.create(id, Link.class));
 		}
 		else {
-			for (String id : alternativeToZurich) routeFromParkingsTo2.add(scenario.createId(id));
-			for (String id : to2FromKriegstetten) routeFromParkingsTo2.add(scenario.createId(id));
+			for (String id : alternativeToZurich) routeFromParkingsTo2.add(Id.create(id, Link.class));
+			for (String id : to2FromKriegstetten) routeFromParkingsTo2.add(Id.create(id, Link.class));
 		}
 		checkRouteValidity(scenario, routeFromParkingsTo2);
 
 		routeFromParkingsTo3 = new ArrayList<Id<Link>>();
 		if (!this.viaSchoenbuehl) {
-			for (String id : parkingToHighwayToBern) routeFromParkingsTo3.add(scenario.createId(id));
-			for (String id : to3) routeFromParkingsTo3.add(scenario.createId(id));			
+			for (String id : parkingToHighwayToBern) routeFromParkingsTo3.add(Id.create(id, Link.class));
+			for (String id : to3) routeFromParkingsTo3.add(Id.create(id, Link.class));			
 		} else {
-			for (String id : alternativeToBern) routeFromParkingsTo3.add(scenario.createId(id));
-			for (String id : to3FromSchoenbuehl) routeFromParkingsTo3.add(scenario.createId(id));
+			for (String id : alternativeToBern) routeFromParkingsTo3.add(Id.create(id, Link.class));
+			for (String id : to3FromSchoenbuehl) routeFromParkingsTo3.add(Id.create(id, Link.class));
 		}
 		checkRouteValidity(scenario, routeFromParkingsTo3);
 		
 		routeFromParkingsTo4 = new ArrayList<Id<Link>>();
 		if (!this.viaSchoenbuehl) {
-			for (String id : parkingToHighwayToBern) routeFromParkingsTo4.add(scenario.createId(id));
-			for (String id : to4) routeFromParkingsTo4.add(scenario.createId(id));			
+			for (String id : parkingToHighwayToBern) routeFromParkingsTo4.add(Id.create(id, Link.class));
+			for (String id : to4) routeFromParkingsTo4.add(Id.create(id, Link.class));			
 		} else {
-			for (String id : alternativeToBern) routeFromParkingsTo4.add(scenario.createId(id));
-			for (String id : to4FromSchoenbuehl) routeFromParkingsTo4.add(scenario.createId(id));
+			for (String id : alternativeToBern) routeFromParkingsTo4.add(Id.create(id, Link.class));
+			for (String id : to4FromSchoenbuehl) routeFromParkingsTo4.add(Id.create(id, Link.class));
 		}
 		checkRouteValidity(scenario, routeFromParkingsTo4);
 		
 		routeFromParkingsTo5 = new ArrayList<Id<Link>>();
 		if (!this.viaSchoenbuehl) {
-			for (String id : parkingToHighwayToBern) routeFromParkingsTo5.add(scenario.createId(id));
-			for (String id : to5) routeFromParkingsTo5.add(scenario.createId(id));			
+			for (String id : parkingToHighwayToBern) routeFromParkingsTo5.add(Id.create(id, Link.class));
+			for (String id : to5) routeFromParkingsTo5.add(Id.create(id, Link.class));			
 		} else {
-			for (String id : alternativeToBern) routeFromParkingsTo5.add(scenario.createId(id));
-			for (String id : to5FromSchoenbuehl) routeFromParkingsTo5.add(scenario.createId(id));
+			for (String id : alternativeToBern) routeFromParkingsTo5.add(Id.create(id, Link.class));
+			for (String id : to5FromSchoenbuehl) routeFromParkingsTo5.add(Id.create(id, Link.class));
 		}
 		checkRouteValidity(scenario, routeFromParkingsTo5);
 	}
@@ -261,13 +261,13 @@ public class CreateVisitorPopulation extends BurgdorfRoutes {
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) populationFactory).getModeRouteFactory();
 		
 		int bin = 1;
-		Id fromLinkId = routeFromToParkings.get(0);
-		Id toLinkId = routeFromToParkings.get(routeFromToParkings.size() - 1);
+		Id<Link> fromLinkId = routeFromToParkings.get(0);
+		Id<Link> toLinkId = routeFromToParkings.get(routeFromToParkings.size() - 1);
 		Route route = routeFactory.createRoute(TransportMode.car, fromLinkId, toLinkId);
 		((NetworkRoute) route).setLinkIds(fromLinkId, routeFromToParkings.subList(1, routeFromToParkings.size() - 1), toLinkId);		
 		for (int departures : fromDepartures) {
 			for (int hourCounter = 0; hourCounter < departures; hourCounter++) {
-				Person person = populationFactory.createPerson(scenario.createId("visitor_ " + visitorCounter + "_" + hourCounter + "_" + from + "_" + bin));
+				Person person = populationFactory.createPerson(Id.create("visitor_ " + visitorCounter + "_" + hourCounter + "_" + from + "_" + bin, Person.class));
 				
 				Plan plan = populationFactory.createPlan();
 				double departureTime = (bin - 1) * binSize + Math.round(MatsimRandom.getRandom().nextDouble() * binSize);
@@ -298,8 +298,8 @@ public class CreateVisitorPopulation extends BurgdorfRoutes {
 	
 	// from Burgdorf
 	private void createFromPopulation(Scenario scenario) {
-		List<Id> toZurichParkings = ParkingInfrastructure.availableParkings.get(scenario.createId("L30"));
-		List<Id> toBernParkings = ParkingInfrastructure.availableParkings.get(scenario.createId("L01"));	
+		List<Id<Link>> toZurichParkings = ParkingInfrastructure.availableParkings.get(Id.create("L30", Link.class));
+		List<Id<Link>> toBernParkings = ParkingInfrastructure.availableParkings.get(Id.create("L01", Link.class));	
 		
 		createFromRoutePopulation(scenario, 1, to1Departures, routeFromParkingsTo1, toZurichParkings);
 		createFromRoutePopulation(scenario, 2, to2Departures, routeFromParkingsTo2, toZurichParkings);
@@ -309,7 +309,7 @@ public class CreateVisitorPopulation extends BurgdorfRoutes {
 	}
 	
 	private void createFromRoutePopulation(Scenario scenario, int to, int[] fromDepartures, List<Id<Link>> routeFromToParkings,
-			List<Id> possibleParkings) {
+			List<Id<Link>> possibleParkings) {
 		
 		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) populationFactory).getModeRouteFactory();
@@ -317,19 +317,19 @@ public class CreateVisitorPopulation extends BurgdorfRoutes {
 		int bin = 1;
 		for (int departures : fromDepartures) {
 			for (int hourCounter = 0; hourCounter < departures; hourCounter++) {
-				Id parkingId = possibleParkings.get(MatsimRandom.getRandom().nextInt(possibleParkings.size()));
+				Id<Link> parkingId = possibleParkings.get(MatsimRandom.getRandom().nextInt(possibleParkings.size()));
 				List<Id<Link>> fromParkingSubRoute = ParkingInfrastructure.fromParkingSubRoutes.get(parkingId);
 				
 				List<Id<Link>> routeLinkIds = new ArrayList<Id<Link>>();
 				routeLinkIds.addAll(fromParkingSubRoute);
 				routeLinkIds.addAll(routeFromToParkings);
 				
-				Id fromLinkId = routeLinkIds.get(0);
-				Id toLinkId = routeLinkIds.get(routeLinkIds.size() - 1);
+				Id<Link> fromLinkId = routeLinkIds.get(0);
+				Id<Link> toLinkId = routeLinkIds.get(routeLinkIds.size() - 1);
 				Route route = routeFactory.createRoute(TransportMode.car, fromLinkId, toLinkId);
 				((NetworkRoute) route).setLinkIds(fromLinkId, routeLinkIds.subList(1, routeLinkIds.size() - 1), toLinkId);		
 
-				Person person = populationFactory.createPerson(scenario.createId("visitor_ " + visitorCounter + "_" + hourCounter + "_" + to + "_" + bin));
+				Person person = populationFactory.createPerson(Id.create("visitor_ " + visitorCounter + "_" + hourCounter + "_" + to + "_" + bin, Person.class));
 				
 				Plan plan = populationFactory.createPlan();
 				double departureTime = (bin - 1) * binSize + Math.round(MatsimRandom.getRandom().nextDouble() * binSize);

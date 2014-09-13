@@ -95,17 +95,17 @@ public class CheckRouteCapacity {
 		List<Id<Link>> routeIdsSchoenbuehl = new ArrayList<Id<Link>>();
 		
 		if (toBurgdorf) {
-			for (String id : BurgdorfRoutes.alternativeFromZurich) routeIdsKriegstetten.add(scenario.createId(id));
-			for (String id : BurgdorfRoutes.alternativeFromBern) routeIdsSchoenbuehl.add(scenario.createId(id));
+			for (String id : BurgdorfRoutes.alternativeFromZurich) routeIdsKriegstetten.add(Id.create(id, Link.class));
+			for (String id : BurgdorfRoutes.alternativeFromBern) routeIdsSchoenbuehl.add(Id.create(id, Link.class));
 		} else {
-			for (String id : BurgdorfRoutes.alternativeToZurich) routeIdsKriegstetten.add(scenario.createId(id));
-			for (String id : BurgdorfRoutes.alternativeToBern) routeIdsSchoenbuehl.add(scenario.createId(id));		
+			for (String id : BurgdorfRoutes.alternativeToZurich) routeIdsKriegstetten.add(Id.create(id, Link.class));
+			for (String id : BurgdorfRoutes.alternativeToBern) routeIdsSchoenbuehl.add(Id.create(id, Link.class));
 		}
 
 		NetworkRoute routeKriegstetten;
 		NetworkRoute routeSchoenbuehl;
-		Id startLinkId;
-		Id endLinkId;
+		Id<Link> startLinkId;
+		Id<Link> endLinkId;
 		
 		startLinkId = routeIdsKriegstetten.get(0);
 		endLinkId = routeIdsKriegstetten.get(routeIdsKriegstetten.size() - 1);
@@ -131,8 +131,8 @@ public class CheckRouteCapacity {
 				Id toLinkId;
 				
 				// via Kriegstetten
-				person = populationFactory.createPerson(scenario.createId("Hour_" + hour + 
-						"_Agent_" + agent + "_Direction_Kriegstetten"));
+				person = populationFactory.createPerson(Id.create("Hour_" + hour + 
+						"_Agent_" + agent + "_Direction_Kriegstetten", Person.class));
 				
 				plan = populationFactory.createPlan();
 				fromLinkId = routeKriegstetten.getStartLinkId();
@@ -155,8 +155,8 @@ public class CheckRouteCapacity {
 				scenario.getPopulation().addPerson(person);
 				
 				// via Schoenbuehl
-				person = populationFactory.createPerson(scenario.createId("Hour_" + hour + 
-						"_Agent_" + agent + "_Direction_Schoenbuehl"));
+				person = populationFactory.createPerson(Id.create("Hour_" + hour + 
+						"_Agent_" + agent + "_Direction_Schoenbuehl", Person.class));
 				
 				plan = populationFactory.createPlan();
 				fromLinkId = routeSchoenbuehl.getStartLinkId();

@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.population.ActivityImpl;
@@ -85,14 +86,14 @@ public class SwitchToWalk2DLegReplanner extends WithinDayDuringLegReplanner {
 				currentLeg.setRoute(subRoute);
 				
 				Coord coord = currentLink.getToNode().getCoord();	// links toNode coordinate
-				XORShiftRandom xor = new XORShiftRandom((long) plan.getPerson().getId().hashCode());
+				XORShiftRandom xor = new XORShiftRandom(plan.getPerson().getId().hashCode());
 				double x = coord.getX() + xor.nextDouble() - 1.0;	// +/- 0.5m
 				double y = coord.getY() + xor.nextDouble() - 1.0;	// +/- 0.5m
 				ActivityImpl switchActivity = (ActivityImpl) scenario.getPopulation().getFactory().createActivityFromLinkId("switchWalkMode", currentLinkId);
 				switchActivity.setMaximumDuration(0.0);
 				switchActivity.setCoord(scenario.createCoord(x, y));
 				switchActivity.setEndTime(time);
-				Id facilityId = scenario.createId("switchWalkModeFacility" + currentLinkId.toString());
+				Id<ActivityFacility> facilityId = Id.create("switchWalkModeFacility" + currentLinkId.toString(), ActivityFacility.class);
 				switchActivity.setFacilityId(facilityId);
 
 				ActivityImpl nextActivity = (ActivityImpl) plan.getPlanElements().get(currentLegIndex + 1);
@@ -103,10 +104,10 @@ public class SwitchToWalk2DLegReplanner extends WithinDayDuringLegReplanner {
 				 * relocate it since it cannot be reached by walk2d. Therefore, we let
 				 * the leg end at the network's last non-rescue link.
 				 */
-				Id endLinkId = currentRoute.getEndLinkId();
-				if (nextFacilityId.equals(scenario.createId("rescueFacility"))) {
+				Id<Link> endLinkId = currentRoute.getEndLinkId();
+				if (nextFacilityId.equals(Id.create("rescueFacility", ActivityFacility.class))) {
 					endLinkId = currentRoute.getLinkIds().get(currentRoute.getLinkIds().size() - 2);
-					nextActivity.setFacilityId(scenario.createId("rescueFacility" + endLinkId.toString()));
+					nextActivity.setFacilityId(Id.create("rescueFacility" + endLinkId.toString(), ActivityFacility.class));
 					nextActivity.setLinkId(endLinkId);					
 				}
 				

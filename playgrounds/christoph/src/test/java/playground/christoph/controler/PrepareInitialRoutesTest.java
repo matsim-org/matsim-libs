@@ -147,18 +147,18 @@ public class PrepareInitialRoutesTest {
 		Network network = scenario.getNetwork();
 		NetworkFactory networkFactory = network.getFactory();
 		
-		Node node0 = networkFactory.createNode(scenario.createId("n0"), scenario.createCoord(0.0, 0.0));
-		Node node1 = networkFactory.createNode(scenario.createId("n1"), scenario.createCoord(1.0, 0.0));
-		Node node2 = networkFactory.createNode(scenario.createId("n2"), scenario.createCoord(2.0, 0.0));
-		Node node3 = networkFactory.createNode(scenario.createId("n3"), scenario.createCoord(3.0, 0.0));
-		Node node4 = networkFactory.createNode(scenario.createId("n4"), scenario.createCoord(4.0, 0.0));
-		Node node5 = networkFactory.createNode(scenario.createId("n5"), scenario.createCoord(5.0, 0.0));
+		Node node0 = networkFactory.createNode(Id.create("n0", Node.class), scenario.createCoord(0.0, 0.0));
+		Node node1 = networkFactory.createNode(Id.create("n1", Node.class), scenario.createCoord(1.0, 0.0));
+		Node node2 = networkFactory.createNode(Id.create("n2", Node.class), scenario.createCoord(2.0, 0.0));
+		Node node3 = networkFactory.createNode(Id.create("n3", Node.class), scenario.createCoord(3.0, 0.0));
+		Node node4 = networkFactory.createNode(Id.create("n4", Node.class), scenario.createCoord(4.0, 0.0));
+		Node node5 = networkFactory.createNode(Id.create("n5", Node.class), scenario.createCoord(5.0, 0.0));
 		
-		Link link0 = networkFactory.createLink(scenario.createId("l0"), node0, node1);
-		Link link1 = networkFactory.createLink(scenario.createId("l1"), node1, node2);
-		Link link2 = networkFactory.createLink(scenario.createId("l2"), node2, node3);
-		Link link3 = networkFactory.createLink(scenario.createId("l3"), node3, node4);
-		Link link4 = networkFactory.createLink(scenario.createId("l4"), node4, node5);
+		Link link0 = networkFactory.createLink(Id.create("l0", Link.class), node0, node1);
+		Link link1 = networkFactory.createLink(Id.create("l1", Link.class), node1, node2);
+		Link link2 = networkFactory.createLink(Id.create("l2", Link.class), node2, node3);
+		Link link3 = networkFactory.createLink(Id.create("l3", Link.class), node3, node4);
+		Link link4 = networkFactory.createLink(Id.create("l4", Link.class), node4, node5);
 		
 		link0.setLength(1000.0);
 		link1.setLength(1000.0);
@@ -184,26 +184,26 @@ public class PrepareInitialRoutesTest {
 	 */
 	private Person createPerson(Scenario scenario, String id) {
 		
-		PersonImpl person = (PersonImpl) scenario.getPopulation().getFactory().createPerson(scenario.createId(id));
+		PersonImpl person = (PersonImpl) scenario.getPopulation().getFactory().createPerson(Id.create(id, Person.class));
 		
 		person.setAge(20);
 		person.setSex("m");
 
-		Activity from = scenario.getPopulation().getFactory().createActivityFromLinkId("home", scenario.createId("l0"));
+		Activity from = scenario.getPopulation().getFactory().createActivityFromLinkId("home", Id.create("l0", Link.class));
 		Leg leg = scenario.getPopulation().getFactory().createLeg(TransportMode.car);
-		Activity to = scenario.getPopulation().getFactory().createActivityFromLinkId("home", scenario.createId("l4"));
+		Activity to = scenario.getPopulation().getFactory().createActivityFromLinkId("home", Id.create("l4", Link.class));
 
 		from.setEndTime(8*3600);
 		leg.setDepartureTime(8*3600);
 		
 		RouteFactory routeFactory = new LinkNetworkRouteFactory();
-		Id startLinkId = scenario.createId("l0");
-		Id endLinkId = scenario.createId("l4");
+		Id startLinkId = Id.create("l0", Link.class);
+		Id endLinkId = Id.create("l4", Link.class);
 		NetworkRoute route = (NetworkRoute) routeFactory.createRoute(startLinkId, endLinkId);
 		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
-		linkIds.add(scenario.createId("l1"));
-		linkIds.add(scenario.createId("l2"));
-		linkIds.add(scenario.createId("l3"));
+		linkIds.add(Id.create("l1", Link.class));
+		linkIds.add(Id.create("l2", Link.class));
+		linkIds.add(Id.create("l3", Link.class));
 		route.setLinkIds(startLinkId, linkIds, endLinkId);
 		leg.setRoute(route);
 		

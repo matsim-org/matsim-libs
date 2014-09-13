@@ -37,6 +37,7 @@ import net.opengis.kml._2.ObjectFactory;
 
 import org.apache.log4j.Logger;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
@@ -44,7 +45,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.gis.PointFeatureFactory;
@@ -168,7 +168,7 @@ public class CoordinatesToWorld {
 	private void writeKMZFile() throws Exception {
 		log.info("writing kmz network ...");
 		
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = NetworkImpl.createNetwork();
 		NetworkFactory factory = network.getFactory();
 		
@@ -181,7 +181,7 @@ public class CoordinatesToWorld {
 			} catch (NumberFormatException nfe) {
 				continue;
 			}
-			Node node = factory.createNode(scenario.createId(line.Alter_MergeParameter), scenario.createCoord(x, y));
+			Node node = factory.createNode(Id.create(line.Alter_MergeParameter, Node.class), scenario.createCoord(x, y));
 			network.addNode(node);
 		}
 		

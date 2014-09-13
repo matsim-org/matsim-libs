@@ -171,7 +171,7 @@ public class CreateParkingFacilities {
 			if (capacity <= 0) continue;
 			
 			Link link = network.getNearestRightEntryLink(coord);
-			Id facilityId = scenario.createId(ParkingTypes.PRIVATEINSIDEPARKING + "_" + nf.format(counter.getCounter()));
+			Id<ActivityFacility> facilityId = Id.create(ParkingTypes.PRIVATEINSIDEPARKING + "_" + nf.format(counter.getCounter()), ActivityFacility.class);
 			counter.incCounter();
 			ActivityFacility parkingFacility = createAndAddParkingFacility(scenario, coord, facilityId, link.getId());
 			((ActivityFacilityImpl) parkingFacility).setDesc(name);
@@ -206,7 +206,7 @@ public class CreateParkingFacilities {
 			if (capacity <= 0) continue;
 			
 			Link link = network.getNearestRightEntryLink(coord);
-			Id facilityId = scenario.createId(ParkingTypes.PRIVATEOUTSIDEPARKING + "_" + nf.format(counter.getCounter()));
+			Id<ActivityFacility> facilityId = Id.create(ParkingTypes.PRIVATEOUTSIDEPARKING + "_" + nf.format(counter.getCounter()), ActivityFacility.class);
 			counter.incCounter();
 			ActivityFacility parkingFacility = createAndAddParkingFacility(scenario, coord, facilityId, link.getId());
 			((ActivityFacilityImpl) parkingFacility).setDesc(name);
@@ -217,7 +217,7 @@ public class CreateParkingFacilities {
 			
 			if (capacity > 0) {
 				// so far: just assume that 10% of the parking capacity is available as waiting capacity
-				int waitingCapacity = (int) (((double) capacity) / 10);
+				int waitingCapacity = (int) ((capacity) / 10);
 				
 				activityOption = scenario.getActivityFacilities().getFactory().createActivityOption(ParkingFacility.WAITING);
 				activityOption.setCapacity(waitingCapacity);
@@ -249,7 +249,7 @@ public class CreateParkingFacilities {
 			if (capacity <= 0) continue;
 						
 			Link link = network.getNearestRightEntryLink(coord);
-			Id facilityId = scenario.createId(ParkingTypes.GARAGEPARKING + "_" + nf.format(counter.getCounter()));
+			Id<ActivityFacility> facilityId = Id.create(ParkingTypes.GARAGEPARKING + "_" + nf.format(counter.getCounter()), ActivityFacility.class);
 			counter.incCounter();
 			ActivityFacility parkingFacility = createAndAddParkingFacility(scenario, coord, facilityId, link.getId());
 			((ActivityFacilityImpl) parkingFacility).setDesc(name);
@@ -260,7 +260,7 @@ public class CreateParkingFacilities {
 			
 			if (capacity > 0) {
 				// so far: just assume that 10% of the parking capacity is available as waiting capacity
-				int waitingCapacity = (int) (((double) capacity) / 10);
+				int waitingCapacity = (int) ((capacity) / 10);
 				
 				activityOption = scenario.getActivityFacilities().getFactory().createActivityOption(ParkingFacility.WAITING);
 				activityOption.setCapacity(waitingCapacity);
@@ -273,7 +273,7 @@ public class CreateParkingFacilities {
 	private void createStreetParking(Scenario scenario) {
 		
 		// <LinkId, ParkingFacility on Link>
-		Map<Id, ActivityFacility> linkParkingFacilities = new HashMap<Id, ActivityFacility>();
+		Map<Id<Link>, ActivityFacility> linkParkingFacilities = new HashMap<>();
 		
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		
@@ -294,7 +294,7 @@ public class CreateParkingFacilities {
 			
 			ActivityFacility parkingFacility = linkParkingFacilities.get(link.getId());
 			if (parkingFacility == null) {
-				Id facilityId = scenario.createId(ParkingTypes.STREETPARKING + "_" + nf.format(counter.getCounter()));
+				Id<ActivityFacility> facilityId = Id.create(ParkingTypes.STREETPARKING + "_" + nf.format(counter.getCounter()), ActivityFacility.class);
 				counter.incCounter();
 				parkingFacility = createAndAddParkingFacility(scenario, coord, facilityId, link.getId());
 				((ActivityFacilityImpl) parkingFacility).setDesc(ParkingTypes.STREETPARKING);
@@ -335,7 +335,7 @@ public class CreateParkingFacilities {
 			if (geometry.contains(point)) continue;
 			
 			for (String parkingType : parkingTypes) {
-				Id facilityId = scenario.createId(parkingType + "_outside_" + link.getId().toString());
+				Id<ActivityFacility> facilityId = Id.create(parkingType + "_outside_" + link.getId().toString(), ActivityFacility.class);
 				ActivityFacility parkingFacility = createAndAddParkingFacility(scenario, coord, facilityId, link.getId());
 				((ActivityFacilityImpl) parkingFacility).setDesc(parkingType + "_for_link_" + link.getId().toString());
 				ActivityOption activityOption = scenario.getActivityFacilities().getFactory().createActivityOption(parkingType);

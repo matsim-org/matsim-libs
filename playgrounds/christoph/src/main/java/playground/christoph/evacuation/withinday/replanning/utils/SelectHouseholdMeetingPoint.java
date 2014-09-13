@@ -210,7 +210,7 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener,
 		else throw new RuntimeException("Households participation state is undefined: " + householdId.toString());
 		
 		if (householdParticipates) {
-			Id rescueMeetingPointId = scenario.createId("rescueFacility");
+			Id<ActivityFacility> rescueMeetingPointId = Id.create("rescueFacility", ActivityFacility.class);
 			hdd.setMeetingPointFacilityId(rescueMeetingPointId);
 			return rescueMeetingPointId;
 		}

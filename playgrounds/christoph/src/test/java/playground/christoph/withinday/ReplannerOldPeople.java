@@ -3,6 +3,7 @@ package playground.christoph.withinday;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -56,7 +57,7 @@ public class ReplannerOldPeople extends WithinDayDuringActivityReplanner {
 		Activity homeAct = executedPlan.getNextActivity(homeLeg);
 		int homeLegIndex = executedPlan.getActLegIndex(homeLeg);
 		
-		ActivityImpl newWorkAct = new ActivityImpl("w", this.scenario.createId("22"));
+		ActivityImpl newWorkAct = new ActivityImpl("w", Id.create("22", Link.class));
 		newWorkAct.setMaximumDuration(3600);
 		
 		LegImpl legToNewWork = new LegImpl(TransportMode.car);

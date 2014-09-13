@@ -110,10 +110,10 @@ public class TransitRouterNetworkReaderMatsimV1 extends MatsimXmlParser {
 	@SuppressWarnings("unchecked")
 	private void startNode(final Attributes atts) {	
 		
-		Id nodeId = this.scenario.createId(atts.getValue("id"));
-		Id stopId = this.scenario.createId(atts.getValue("stopfacility"));
-		Id routeId = this.scenario.createId(atts.getValue("route"));
-		Id lineId = this.scenario.createId(atts.getValue("line"));
+		Id<Node> nodeId = Id.create(atts.getValue("id"), Node.class);
+		Id<TransitStopFacility> stopId = Id.create(atts.getValue("stopfacility"), TransitStopFacility.class);
+		Id<TransitRoute> routeId = Id.create(atts.getValue("route"), TransitRoute.class);
+		Id<TransitLine> lineId = Id.create(atts.getValue("line"), TransitLine.class);
 		
 		TransitLine line = this.transitSchedule.getTransitLines().get(lineId);
 		TransitRoute route = line.getRoutes().get(routeId);
@@ -127,9 +127,9 @@ public class TransitRouterNetworkReaderMatsimV1 extends MatsimXmlParser {
 	@SuppressWarnings("unchecked")
 	private void startLink(final Attributes atts) {
 		
-//		Id linkId = this.scenario.createId(atts.getValue("id"));
-//		Id fromId = this.scenario.createId(atts.getValue("from"));
-//		Id toId = this.scenario.createId(atts.getValue("to"));
+//		Id linkId = Id.create(atts.getValue("id"));
+//		Id fromId = Id.create(atts.getValue("from"));
+//		Id toId = Id.create(atts.getValue("to"));
 		Id linkId = new IdImpl(atts.getValue("id"));
 		Id fromId = new IdImpl(atts.getValue("from"));
 		Id toId = new IdImpl(atts.getValue("to"));
@@ -139,11 +139,11 @@ public class TransitRouterNetworkReaderMatsimV1 extends MatsimXmlParser {
 		Id lineId = null;
 		
 		string = atts.getValue("route");
-//		if (string != null) routeId = this.scenario.createId(string);
+//		if (string != null) routeId = Id.create(string);
 		if (string != null) routeId = new IdImpl(string);
 		
 		string = atts.getValue("line");
-//		if (string != null) lineId = this.scenario.createId(string);
+//		if (string != null) lineId = Id.create(string);
 		if (string != null) lineId = new IdImpl(string);
 		
 		TransitLine line = null;

@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
@@ -119,7 +120,7 @@ public class DropOffAgentReplanner extends WithinDayDuringLegReplanner {
 		dropOffActivity.setMaximumDuration(duration);
 //		dropOffActivity.setEndTime(departureTime);
 		String idString = currentLinkId.toString() + EvacuationConstants.PICKUP_DROP_OFF_FACILITY_SUFFIX;
-		((ActivityImpl) dropOffActivity).setFacilityId(scenario.createId(idString));
+		((ActivityImpl) dropOffActivity).setFacilityId(Id.create(idString, ActivityFacility.class));
 		((ActivityImpl) dropOffActivity).setCoord(scenario.getNetwork().getLinks().get(currentLinkId).getCoord());
 			
 		/*
@@ -195,7 +196,7 @@ public class DropOffAgentReplanner extends WithinDayDuringLegReplanner {
 		 * current link is not updated. 
 		 */
 		PassengerAgent passenger = (PassengerAgent) withinDayAgent;
-		Id currentLinkId = passenger.getVehicle().getCurrentLink().getId();
+		Id<Link> currentLinkId = passenger.getVehicle().getCurrentLink().getId();
 		
 		/*
 		 * Create new drop off activity.
@@ -206,7 +207,7 @@ public class DropOffAgentReplanner extends WithinDayDuringLegReplanner {
 		dropOffActivity.setStartTime(this.time);
 		dropOffActivity.setEndTime(departureTime);
 		String idString = currentLinkId.toString() + EvacuationConstants.PICKUP_DROP_OFF_FACILITY_SUFFIX;
-		((ActivityImpl) dropOffActivity).setFacilityId(scenario.createId(idString));
+		((ActivityImpl) dropOffActivity).setFacilityId(Id.create(idString, ActivityFacility.class));
 		((ActivityImpl) dropOffActivity).setCoord(scenario.getNetwork().getLinks().get(currentLinkId).getCoord());
 				
 		/*

@@ -31,20 +31,21 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.misc.Counter;
 
 public class IdentifyAffectedAgents implements LinkEnterEventHandler, LinkLeaveEventHandler, 
@@ -53,7 +54,7 @@ public class IdentifyAffectedAgents implements LinkEnterEventHandler, LinkLeaveE
 	private static final Logger log = Logger.getLogger(IdentifyAffectedAgents.class);
 	
 	private Scenario scenario;
-	private Set<Id> affectedLinks;
+	private Set<Id<Link>> affectedLinks;
 	private Set<Id> inbetweenOnLinkAgents;
 	private Set<Id> beforeBeginOnLinkAgents;
 	private double begin;
@@ -92,15 +93,15 @@ public class IdentifyAffectedAgents implements LinkEnterEventHandler, LinkLeaveE
 		this.begin = begin;
 		this.end = end;
 		
-		inbetweenOnLinkAgents = new HashSet<Id>();
-		beforeBeginOnLinkAgents = new HashSet<Id>();
-		affectedLinks = new HashSet<Id>();
+		inbetweenOnLinkAgents = new HashSet<>();
+		beforeBeginOnLinkAgents = new HashSet<>();
+		affectedLinks = new HashSet<>();
 		
 		parseAffectedLinks(affectedLinksFile);
 	}
 	
 	public Set<Id> getAffectedAgents() {
-		Set<Id> agents = new HashSet<Id>();
+		Set<Id> agents = new HashSet<>();
 		agents.addAll(beforeBeginOnLinkAgents);
 		agents.addAll(inbetweenOnLinkAgents);
 		return agents;
@@ -173,7 +174,7 @@ public class IdentifyAffectedAgents implements LinkEnterEventHandler, LinkLeaveE
 	    	String line;
 	    	while((line = br.readLine()) != null) {
 	    		
-	    		affectedLinks.add(this.scenario.createId(line));
+	    		affectedLinks.add(Id.create(line, Link.class));
 	    		lineCounter.incCounter();
 	    	}	    	
 

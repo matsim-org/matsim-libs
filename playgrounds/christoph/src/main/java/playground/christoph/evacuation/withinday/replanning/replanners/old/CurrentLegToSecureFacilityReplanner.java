@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
@@ -111,10 +112,10 @@ public class CurrentLegToSecureFacilityReplanner extends WithinDayDuringLegRepla
 			 */
 			rescueActivity = scenario.getPopulation().getFactory().createActivityFromLinkId(EvacuationConstants.SECURE_ACTIVITY, nextLink.getId());
 			String idString = EvacuationConstants.SECURE_FACILITY + nextLink.getId();
-			((ActivityImpl)rescueActivity).setFacilityId(scenario.createId(idString));
+			((ActivityImpl)rescueActivity).setFacilityId(Id.create(idString, ActivityFacility.class));
 			rescueActivity.setEndTime(Time.UNDEFINED_TIME);
 			
-			Coord rescueCoord = ((ScenarioImpl)scenario).getActivityFacilities().getFacilities().get(scenario.createId(idString)).getCoord();
+			Coord rescueCoord = ((ScenarioImpl)scenario).getActivityFacilities().getFacilities().get(Id.create(idString, ActivityFacility.class)).getCoord();
 			((ActivityImpl)rescueActivity).setCoord(rescueCoord);
 			
 			new ReplacePlanElements().replaceActivity(executedPlan, nextActivity, rescueActivity);
@@ -169,10 +170,10 @@ public class CurrentLegToSecureFacilityReplanner extends WithinDayDuringLegRepla
 	private Activity nextActivityAtCurrentLink(Link currentLink, Plan selectedPlan, Activity nextActivity) {
 		Activity rescueActivity = scenario.getPopulation().getFactory().createActivityFromLinkId("secure", currentLink.getId());
 		String idString = "secureFacility" + currentLink.getId();
-		((ActivityImpl)rescueActivity).setFacilityId(scenario.createId(idString));
+		((ActivityImpl)rescueActivity).setFacilityId(Id.create(idString, ActivityFacility.class));
 		rescueActivity.setEndTime(Time.UNDEFINED_TIME);
 		
-		Coord rescueCoord = ((ScenarioImpl)scenario).getActivityFacilities().getFacilities().get(scenario.createId(idString)).getCoord();
+		Coord rescueCoord = ((ScenarioImpl)scenario).getActivityFacilities().getFacilities().get(Id.create(idString, ActivityFacility.class)).getCoord();
 		((ActivityImpl)rescueActivity).setCoord(rescueCoord);
 
 		new ReplacePlanElements().replaceActivity(selectedPlan, nextActivity, rescueActivity);

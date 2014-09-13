@@ -305,7 +305,7 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 					double delta = rand * 1800.0 + ratio * 1800.0;
 					
 					if (direct < fromHome - delta) {
-						hdd.setMeetingPointFacilityId(scenario.createId("rescueFacility"));
+						hdd.setMeetingPointFacilityId(Id.create("rescueFacility", ActivityFacility.class));
 					} else {
 						hdd.setMeetingPointFacilityId(hdd.getHomeFacilityId());
 					}

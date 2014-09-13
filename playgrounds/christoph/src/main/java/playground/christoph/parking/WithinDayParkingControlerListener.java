@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.multimodal.MultiModalControlerListener;
 import org.matsim.contrib.multimodal.MultimodalQSimFactory;
 import org.matsim.contrib.multimodal.router.util.WalkTravelTimeFactory;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -56,10 +57,10 @@ import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.withinday.controller.ExperiencedPlansWriter;
 import org.matsim.withinday.controller.WithinDayControlerListener;
 
@@ -229,8 +230,8 @@ public class WithinDayParkingControlerListener implements StartupListener, Repla
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			String idString = (String) this.scenario.getPopulation().getPersonAttributes().getAttribute(person.getId().toString(), 
 					InitialParkingSelector.INITIALPARKINGFACILITY);
-			Id facilityId = scenario.createId(idString);
-			Id vehicleId = this.parkingInfrastructure.getVehicleId(person);
+			Id<ActivityFacility> facilityId = Id.create(idString, ActivityFacility.class);
+			Id<Vehicle> vehicleId = this.parkingInfrastructure.getVehicleId(person);
 			this.parkingInfrastructure.unReserveParking(vehicleId, facilityId);
 		}
 		this.parkingInfrastructure.resetParkingFacilityForNewIteration();

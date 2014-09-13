@@ -146,9 +146,9 @@ public class CreateEvacuationAreaSubScenario {
 		NetworkFactory networkFactory = subNetwork.getFactory();
 		Coord exitNode1Coord = subScenario.createCoord(EvacuationConfig.centerCoord.getX() + 50000.0, EvacuationConfig.centerCoord.getY() + 50000.0); 
 		Coord exitNode2Coord = subScenario.createCoord(EvacuationConfig.centerCoord.getX() + 50001.0, EvacuationConfig.centerCoord.getY() + 50001.0);
-		Node exitNode1 = networkFactory.createNode(subScenario.createId(AddExitLinksToNetwork.exitNode + "1"), exitNode1Coord);
-		Node exitNode2 = networkFactory.createNode(subScenario.createId(AddExitLinksToNetwork.exitNode + "2"), exitNode2Coord);
-		Link exitLink = networkFactory.createLink(subScenario.createId(AddExitLinksToNetwork.exitLink), exitNode1, exitNode2);
+		Node exitNode1 = networkFactory.createNode(Id.create(AddExitLinksToNetwork.exitNode + "1", Node.class), exitNode1Coord);
+		Node exitNode2 = networkFactory.createNode(Id.create(AddExitLinksToNetwork.exitNode + "2", Node.class), exitNode2Coord);
+		Link exitLink = networkFactory.createLink(Id.create(AddExitLinksToNetwork.exitLink, Link.class), exitNode1, exitNode2);
 		exitLink.setAllowedModes(transportModes);
 		exitLink.setLength(1.0);
 		subNetwork.addNode(exitNode1);
@@ -161,7 +161,7 @@ public class CreateEvacuationAreaSubScenario {
 		int i = 0;
 		for (Id id : crossEvacuationLineNodes) {
 			Node node = subNetwork.getNodes().get(id);
-			Link link = networkFactory.createLink(subScenario.createId(AddExitLinksToNetwork.exitLink + i), node, exitNode1);
+			Link link = networkFactory.createLink(Id.create(AddExitLinksToNetwork.exitLink + i, Link.class), node, exitNode1);
 			link.setAllowedModes(transportModes);
 			link.setLength(1.0);
 			subNetwork.addLink(link);

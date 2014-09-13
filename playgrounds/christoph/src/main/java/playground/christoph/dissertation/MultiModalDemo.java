@@ -266,12 +266,12 @@ public class MultiModalDemo {
 	private static void createNetwork(Scenario scenario) {
 		NetworkFactory networkFactory = scenario.getNetwork().getFactory();
 		
-		Node n1 = networkFactory.createNode(scenario.createId("n1"), scenario.createCoord(0.0, 0.0));
-		Node n2 = networkFactory.createNode(scenario.createId("n2"), scenario.createCoord(100.0, 0.0));
-		Node n3 = networkFactory.createNode(scenario.createId("n3"), scenario.createCoord(100.0, 1000.0));
-		Node n4 = networkFactory.createNode(scenario.createId("n4"), scenario.createCoord(2100.0, 1000.0));
-		Node n5 = networkFactory.createNode(scenario.createId("n5"), scenario.createCoord(2100.0, 0.0));
-		Node n6 = networkFactory.createNode(scenario.createId("n6"), scenario.createCoord(2200.0, 0.0));
+		Node n1 = networkFactory.createNode(Id.create("n1", Node.class), scenario.createCoord(0.0, 0.0));
+		Node n2 = networkFactory.createNode(Id.create("n2", Node.class), scenario.createCoord(100.0, 0.0));
+		Node n3 = networkFactory.createNode(Id.create("n3", Node.class), scenario.createCoord(100.0, 1000.0));
+		Node n4 = networkFactory.createNode(Id.create("n4", Node.class), scenario.createCoord(2100.0, 1000.0));
+		Node n5 = networkFactory.createNode(Id.create("n5", Node.class), scenario.createCoord(2100.0, 0.0));
+		Node n6 = networkFactory.createNode(Id.create("n6", Node.class), scenario.createCoord(2200.0, 0.0));
 		
 		scenario.getNetwork().addNode(n1);
 		scenario.getNetwork().addNode(n2);
@@ -291,7 +291,7 @@ public class MultiModalDemo {
 		multiMode.add(TransportMode.bike);
 		multiMode.add(TransportMode.walk);
 	
-		Link l1 = networkFactory.createLink(scenario.createId("l1"), n1, n2);
+		Link l1 = networkFactory.createLink(Id.create("l1", Link.class), n1, n2);
 		l1.setLength(100.0);
 //		l1.setCapacity(capacity);
 		/*
@@ -302,35 +302,35 @@ public class MultiModalDemo {
 		l1.setFreespeed(referenceCarSpeed);
 		l1.setAllowedModes(multiMode);
 		
-		Link l2 = networkFactory.createLink(scenario.createId("l2"), n2, n3);
+		Link l2 = networkFactory.createLink(Id.create("l2", Link.class), n2, n3);
 		l2.setLength(1000.0);
 //		l2.setCapacity(capacity);
 		l2.setCapacity(Double.MAX_VALUE);
 		l2.setFreespeed(referenceCarSpeed);
 		l2.setAllowedModes(carMode);
 		
-		Link l3 = networkFactory.createLink(scenario.createId("l3"), n3, n4);
+		Link l3 = networkFactory.createLink(Id.create("l3", Link.class), n3, n4);
 //		l3.setLength(1000.0);
 		l3.setLength(2000.0);
 		l3.setCapacity(capacity);
 		l3.setFreespeed(referenceCarSpeed);
 		l3.setAllowedModes(carMode);
 
-		Link l4 = networkFactory.createLink(scenario.createId("l4"), n4, n5);
+		Link l4 = networkFactory.createLink(Id.create("l4", Link.class), n4, n5);
 		l4.setLength(1000.0);
 //		l4.setCapacity(capacity);
 		l4.setCapacity(Double.MAX_VALUE);
 		l4.setFreespeed(referenceCarSpeed);
 		l4.setAllowedModes(carMode);
 
-		Link l5 = networkFactory.createLink(scenario.createId("l5"), n2, n5);
+		Link l5 = networkFactory.createLink(Id.create("l5", Link.class), n2, n5);
 //		l5.setLength(1000.0);
 		l5.setLength(2000.0);
 		l5.setCapacity(capacity);
 		l5.setFreespeed(referenceCarSpeed);
 		l5.setAllowedModes(nonCarMode);
 		
-		Link l6 = networkFactory.createLink(scenario.createId("l6"), n5, n6);
+		Link l6 = networkFactory.createLink(Id.create("l6", Link.class), n5, n6);
 		l6.setLength(100.0);
 		l6.setCapacity(capacity);
 		l6.setFreespeed(referenceCarSpeed);
@@ -364,7 +364,7 @@ public class MultiModalDemo {
 	
 	private static void adaptLinkLength(Scenario scenario, double refNonCarTravelTime) {
 		double adaptiveLinkLength = calculateLinkLength(scenario, refNonCarTravelTime);
-		Link l3 = scenario.getNetwork().getLinks().get(scenario.createId("l3"));
+		Link l3 = scenario.getNetwork().getLinks().get(Id.create("l3", Link.class));
 		l3.setLength(adaptiveLinkLength);
 	}
 	
@@ -383,9 +383,9 @@ public class MultiModalDemo {
 		 * additional one second is needed because the agent is moved from the
 		 * buffer to the outgoing queue, which takes one second.
 		 */
-		Link l2 = scenario.getNetwork().getLinks().get(scenario.createId("l2"));
-		Link l4 = scenario.getNetwork().getLinks().get(scenario.createId("l4"));
-		Link l6 = scenario.getNetwork().getLinks().get(scenario.createId("l6"));
+		Link l2 = scenario.getNetwork().getLinks().get(Id.create("l2", Link.class));
+		Link l4 = scenario.getNetwork().getLinks().get(Id.create("l4", Link.class));
+		Link l6 = scenario.getNetwork().getLinks().get(Id.create("l6", Link.class));
  		double minCarTT = 1.0 + Math.floor(carTravelTime.getLinkTravelTime(l2, 0.0, null, null)) +
 			Math.floor(carTravelTime.getLinkTravelTime(l4, 0.0, null, null)) +
 			Math.floor(carTravelTime.getLinkTravelTime(l6, 0.0, null, null)) + 3.0;
@@ -413,7 +413,7 @@ public class MultiModalDemo {
 		adaptLinkLength(sc, refNonCarTravelTime);
 		
 		// create reference population
-		Person person = createPerson(sc, sc.createId("1"), referenceSex, referenceAge);
+		Person person = createPerson(sc, Id.create("1", Person.class), referenceSex, referenceAge);
 		Plan plan = createPlan(sc, 0.0, TransportMode.car);
 		person.addPlan(plan);
 		sc.getPopulation().addPerson(person);
@@ -453,7 +453,7 @@ public class MultiModalDemo {
 		
 		// create reference population
 		for (int i = 0; i < 5000; i++) {
-			Person person = createPerson(sc, sc.createId(String.valueOf(i)), referenceSex, referenceAge);
+			Person person = createPerson(sc, Id.create(String.valueOf(i), Person.class), referenceSex, referenceAge);
 			Plan plan = createPlan(sc, 0.0, nonCarMode);
 			person.addPlan(plan);
 			sc.getPopulation().addPerson(person);
@@ -505,7 +505,7 @@ public class MultiModalDemo {
 				
 				int age = 18 + random.nextInt(82);
 				
-				Id personId = scenario.createId(String.valueOf(hour * numPersonsPerHour + i));
+				Id<Person> personId = Id.create(String.valueOf(hour * numPersonsPerHour + i), Person.class);
 				
 				double departureTime = 8*3600 + hour*3600 + random.nextInt(3600);
 				departureTimes.put(personId, departureTime);
@@ -539,7 +539,7 @@ public class MultiModalDemo {
 		}
 	}
 	
-	private static Person createPerson(Scenario scenario, Id id, String sex, int age) {
+	private static Person createPerson(Scenario scenario, Id<Person> id, String sex, int age) {
 		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
 		
 		Person person = populationFactory.createPerson(id);
@@ -556,15 +556,15 @@ public class MultiModalDemo {
 				
 		Plan plan = populationFactory.createPlan();
 		
-		Activity a1 = populationFactory.createActivityFromLinkId("home", scenario.createId("l1"));
-		((ActivityImpl) a1).setCoord(scenario.getNetwork().getLinks().get(scenario.createId("l1")).getCoord());
+		Activity a1 = populationFactory.createActivityFromLinkId("home", Id.create("l1", Link.class));
+		((ActivityImpl) a1).setCoord(scenario.getNetwork().getLinks().get(Id.create("l1", Link.class)).getCoord());
 		a1.setEndTime(departureTime);
 		
 		Leg l1 = populationFactory.createLeg(legMode);
 		l1.setDepartureTime(departureTime);
 		
-		Activity a2 = populationFactory.createActivityFromLinkId("home", scenario.createId("l6"));
-		((ActivityImpl) a2).setCoord(scenario.getNetwork().getLinks().get(scenario.createId("l6")).getCoord());
+		Activity a2 = populationFactory.createActivityFromLinkId("home", Id.create("l6", Link.class));
+		((ActivityImpl) a2).setCoord(scenario.getNetwork().getLinks().get(Id.create("l6", Link.class)).getCoord());
 		
 		plan.addActivity(a1);
 		plan.addLeg(l1);
@@ -615,10 +615,10 @@ public class MultiModalDemo {
 		
 		NetworkFactory networkFactory = sc.getNetwork().getFactory();
 		
-		Node dummyNode1 = networkFactory.createNode(sc.createId("dummyNode1"), sc.createCoord(0.0, 0.0));
-		Node dummyNode2 = networkFactory.createNode(sc.createId("dummyNode2"), sc.createCoord(100.0, 0.0));
+		Node dummyNode1 = networkFactory.createNode(Id.create("dummyNode1", Node.class), sc.createCoord(0.0, 0.0));
+		Node dummyNode2 = networkFactory.createNode(Id.create("dummyNode2", Node.class), sc.createCoord(100.0, 0.0));
 		
-		Link dummyLink = networkFactory.createLink(sc.createId("dummyLink"), dummyNode1, dummyNode2);
+		Link dummyLink = networkFactory.createLink(Id.create("dummyLink", Link.class), dummyNode1, dummyNode2);
 		dummyLink.setLength(1000.0);
 		Set<String> modes = new HashSet<String>();
 		modes.add(nonCarMode);
@@ -628,7 +628,7 @@ public class MultiModalDemo {
 		double[] travelTimes = new double[numDraws];
 		
 		for (int i = 0; i < numDraws; i++) {
-			Id id = sc.createId(referenceSex + "_" + referenceAge + "_" + i);
+			Id<Person> id = Id.create(referenceSex + "_" + referenceAge + "_" + i, Person.class);
 			Person person = createPerson(sc, id, referenceSex, referenceAge);
 			Plan plan = createPlan(sc, 0.0, nonCarMode);
 			person.addPlan(plan);
@@ -646,7 +646,7 @@ public class MultiModalDemo {
 			for (String sex : sexes) {
 				travelTimes = new double[numDraws];
 				for (int i = 0; i < numDraws; i++) {
-					Id id = sc.createId(referenceSex + "_" + referenceAge + "_" + i);
+					Id<Person> id = Id.create(referenceSex + "_" + referenceAge + "_" + i, Person.class);
 					Person person = createPerson(sc, id, sex, age);
 					Plan plan = createPlan(sc, 0.0, nonCarMode);
 					person.addPlan(plan);

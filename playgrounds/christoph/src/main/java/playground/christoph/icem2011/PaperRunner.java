@@ -92,7 +92,7 @@ public class PaperRunner implements StartupListener, MobsimBeforeSimStepListener
 	/*package*/ String replanningLinksFile = "";
 	private Set<Id> affectedAgents;
 	private Set<Id> replanningAgents;
-	private Set<Id> replanningLinks;
+	private Set<Id<Link>> replanningLinks;
 	private Charset charset = Charset.forName("UTF-8");
 	
 	/*
@@ -231,7 +231,7 @@ public class PaperRunner implements StartupListener, MobsimBeforeSimStepListener
 	}
 	
 	private void parseReplanningLinks(String replanningLinksFile) {
-		replanningLinks = new HashSet<Id>();
+		replanningLinks = new HashSet<>();
 	    	    
 	    try {
 	    	Counter lineCounter = new Counter("Parsed replanning link ids ");
@@ -251,7 +251,7 @@ public class PaperRunner implements StartupListener, MobsimBeforeSimStepListener
 	    	String line;
 	    	while((line = br.readLine()) != null) {
 	    		
-	    		replanningLinks.add(this.scenario.createId(line));
+	    		replanningLinks.add(Id.create(line, Link.class));
 	    		lineCounter.incCounter();
 	    	}	    	
 
@@ -297,9 +297,9 @@ public class PaperRunner implements StartupListener, MobsimBeforeSimStepListener
 	private static class LinkFilteredDuringLegIdentifier extends DuringLegIdentifier {
 
 		private DuringLegIdentifier delegate;
-		private Set<Id> replanningLinks;
+		private Set<Id<Link>> replanningLinks;
 		
-		public LinkFilteredDuringLegIdentifier(DuringLegIdentifier identifier, Set<Id> replanningLinks) {
+		public LinkFilteredDuringLegIdentifier(DuringLegIdentifier identifier, Set<Id<Link>> replanningLinks) {
 			this.delegate = identifier;
 			this.replanningLinks = replanningLinks;
 		}	

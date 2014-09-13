@@ -42,7 +42,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -82,7 +81,7 @@ public class CreateZoneConnectors {
 	
 	public CreateZoneConnectors() throws Exception {
 		
-		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(networkInFile);
 		CoordinateTransformation coordinateTransformation = new IdentityTransformation();
 						
@@ -168,22 +167,22 @@ public class CreateZoneConnectors {
 			Coord wgs84Coord = scenario.createCoord(point.getCoordinate().x, point.getCoordinate().y);
 			Coord nodeCoord = ct.transform(wgs84Coord);
 			
-			Id nodeId = scenario.createId(String.valueOf(zoneId));
+			Id<Node> nodeId = Id.create(String.valueOf(zoneId), Node.class);
 			network.addNode(factory.createNode(nodeId, nodeCoord));
 			
 			Node networkConnectorNode = quadTree.get(nodeCoord.getX(), nodeCoord.getY());
-			Id networkConnectorNodeId = networkConnectorNode.getId();
+			Id<Node> networkConnectorNodeId = networkConnectorNode.getId();
 			
 			double length = CoordUtils.calcDistance(nodeCoord, networkConnectorNode.getCoord());
 			
-			Id linkFromId = scenario.createId(String.valueOf(zoneId) + "from");
+			Id<Link> linkFromId = Id.create(String.valueOf(zoneId) + "from", Link.class);
 			Link fromLink = factory.createLink(linkFromId, nodeId, networkConnectorNodeId);
 			fromLink.setLength(length);
 			fromLink.setCapacity(this.connectorCapacity);
 			fromLink.setFreespeed(this.connectorLinkFreeSpeed);
 			network.addLink(fromLink);
 			
-			Id linkToId = scenario.createId(String.valueOf(zoneId) + "to");
+			Id<Link> linkToId = Id.create(String.valueOf(zoneId) + "to", Link.class);
 			Link toLink = factory.createLink(linkToId, networkConnectorNodeId, nodeId);
 			toLink.setLength(length);
 			toLink.setCapacity(this.connectorCapacity);

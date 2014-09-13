@@ -24,9 +24,11 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
@@ -75,11 +77,11 @@ public class CurrentLegToRescueFacilityReplanner extends WithinDayDuringLegRepla
 		 * Create new Activity at the rescue facility.
 		 */
 		Activity rescueActivity = scenario.getPopulation().getFactory().createActivityFromLinkId(EvacuationConstants.RESCUE_ACTIVITY, 
-				scenario.createId(EvacuationConstants.RESCUE_LINK));
-		((ActivityImpl)rescueActivity).setFacilityId(scenario.createId(EvacuationConstants.RESCUE_FACILITY));
+				Id.create(EvacuationConstants.RESCUE_LINK, Link.class));
+		((ActivityImpl)rescueActivity).setFacilityId(Id.create(EvacuationConstants.RESCUE_FACILITY, ActivityFacility.class));
 		rescueActivity.setEndTime(Time.UNDEFINED_TIME);
 
-		Coord rescueCoord = ((ScenarioImpl)scenario).getActivityFacilities().getFacilities().get(scenario.createId(EvacuationConstants.RESCUE_FACILITY)).getCoord();
+		Coord rescueCoord = ((ScenarioImpl)scenario).getActivityFacilities().getFacilities().get(Id.create(EvacuationConstants.RESCUE_FACILITY, ActivityFacility.class)).getCoord();
 		((ActivityImpl)rescueActivity).setCoord(rescueCoord);
 		
 		/*

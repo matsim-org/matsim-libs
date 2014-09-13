@@ -85,7 +85,7 @@ public class CalculateTravelTimes {
 	private double startTime = 0.0;
 	
 	private double[][] travelTimes;
-	private Set<Id> nodeIds;
+	private Set<Id<Node>> nodeIds;
 	
 	private Scenario scenario;
 	private TravelTime travelTime;
@@ -185,13 +185,13 @@ public class CalculateTravelTimes {
 			((ParallelThread) thread).leastCostPathCalculator = new FullNetworkDijkstraFactory().createPathCalculator(scenario.getNetwork(), travelCost, travelTime);
 			((ParallelThread) thread).nodeIds = this.nodeIds;
 			((ParallelThread) thread).startTime = this.startTime;
-			((ParallelThread) thread).fromIds = new ArrayList<Id>();
+			((ParallelThread) thread).fromIds = new ArrayList<>();
 			((ParallelThread) thread).travelTimesList = new ArrayList<double[]>();
 			threads[j] = thread;
 		}        
 		
 		int i = 0;
-		for (Id fromId : nodeIds) {
+		for (Id<Node> fromId : nodeIds) {
 			double[] newArray = new double[nodeIds.size()];
 			travelTimes[i] = newArray;
 			
@@ -216,12 +216,12 @@ public class CalculateTravelTimes {
 	 */
 	private void getConnectorNodes() throws Exception {
 
-		nodeIds = new TreeSet<Id>();
+		nodeIds = new TreeSet<>();
 		
 		for (SimpleFeature zone : ShapeFileReader.getAllFeatures(shapeFile)) {
 			int zoneId = ((Long)zone.getAttribute(3)).intValue();	// PostCode
 			if (SpecialZones.skipZone(zoneId)) continue;	// skip zone if it is invalid
-			Id nodeId = scenario.createId(String.valueOf(zoneId));
+			Id<Node> nodeId = Id.create(String.valueOf(zoneId), Node.class);
 			nodeIds.add(nodeId);
 		}
 	}
@@ -237,13 +237,13 @@ public class CalculateTravelTimes {
 		
 		// write Header
 		String header = "";
-		for (Id id : nodeIds) {
+		for (Id<Node> id : nodeIds) {
 			header = header + separator + id.toString(); 
 		}
 		bw.write(header);
 		bw.write("\n");
 		
-		Iterator<Id> rows = nodeIds.iterator();
+		Iterator<Id<Node>> rows = nodeIds.iterator();
 		// write Values
 		for (double[] array : travelTimes) {	
 			bw.write(String.valueOf(rows.next()));
@@ -264,15 +264,15 @@ public class CalculateTravelTimes {
 		Scenario scenario;
 		Counter counter;
 		LeastCostPathCalculator leastCostPathCalculator;
-		Set<Id> nodeIds;
-		List<Id> fromIds;
+		Set<Id<Node>> nodeIds;
+		List<Id<Node>> fromIds;
 		List<double[]> travelTimesList;
 		double startTime;
 		
 		@Override
 		public void run() {
 			for (int index = 0; index < fromIds.size(); index++) {
-				Id fromId = fromIds.get(index);
+				Id<Node> fromId = fromIds.get(index);
 				Node fromNode = scenario.getNetwork().getNodes().get(fromId);
 				double[] travelTimes = travelTimesList.get(index);
 				
@@ -281,7 +281,7 @@ public class CalculateTravelTimes {
 				}
 				
 				int i = 0;
-				for (Id toId : nodeIds) {
+				for (Id<Node> toId : nodeIds) {
 					Node toNode = scenario.getNetwork().getNodes().get(toId);
 					Path path = leastCostPathCalculator.calcLeastCostPath(fromNode, toNode, startTime, null, null);
 					travelTimes[i] = path.travelCost;

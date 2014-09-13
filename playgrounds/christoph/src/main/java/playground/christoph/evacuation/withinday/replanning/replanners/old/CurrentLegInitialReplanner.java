@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
@@ -92,8 +93,8 @@ public class CurrentLegInitialReplanner extends WithinDayDuringLegReplanner {
 		 */
 		if (isAffected) {
 			nextActivity.setType(EvacuationConstants.RESCUE_ACTIVITY);
-			((ActivityImpl) nextActivity).setFacilityId(scenario.createId(EvacuationConstants.RESCUE_FACILITY));
-			((ActivityImpl) nextActivity).setLinkId(scenario.createId(EvacuationConstants.RESCUE_LINK));
+			((ActivityImpl) nextActivity).setFacilityId(Id.create(EvacuationConstants.RESCUE_FACILITY, ActivityFacility.class));
+			((ActivityImpl) nextActivity).setLinkId(Id.create(EvacuationConstants.RESCUE_LINK, Link.class));
 			
 			// for walk2d legs: switch mode to walk for routing
 			Leg currentLeg = WithinDayAgentUtils.getModifiableCurrentLeg(withinDayAgent);
@@ -106,7 +107,7 @@ public class CurrentLegInitialReplanner extends WithinDayDuringLegReplanner {
 
 			// new Route for current Leg
 			this.editRoutes.relocateCurrentLegRoute(currentLeg, executedPlan.getPerson(), currentLinkIndex, 
-					scenario.createId(EvacuationConstants.RESCUE_LINK), time, scenario.getNetwork(), tripRouter);
+					Id.create(EvacuationConstants.RESCUE_LINK, Link.class), time, scenario.getNetwork(), tripRouter);
 			
 			// switch back to walk2d
 			if (isWalk2d) {
@@ -118,7 +119,7 @@ public class CurrentLegInitialReplanner extends WithinDayDuringLegReplanner {
 			nextActivity.setType(EvacuationConstants.RESCUE_ACTIVITY);
 			NetworkRoute route = (NetworkRoute) currentLeg.getRoute();
 			Id endLinkId = route.getLinkIds().get(route.getLinkIds().size() - 2);
-			((ActivityImpl) nextActivity).setFacilityId(scenario.createId(EvacuationConstants.RESCUE_FACILITY + endLinkId.toString()));
+			((ActivityImpl) nextActivity).setFacilityId(Id.create(EvacuationConstants.RESCUE_FACILITY + endLinkId.toString(), ActivityFacility.class));
 			((ActivityImpl) nextActivity).setLinkId(endLinkId);
 			
 			// new Route for current Leg

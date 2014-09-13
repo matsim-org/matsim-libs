@@ -35,6 +35,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -106,44 +107,44 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 	}
 
 	protected void buildNetwork() {
-		this.nodes[0]  = this.network.getFactory().createNode(this.scenario.createId("0"),  this.scenario.createCoord(   0, 5000));
-		this.nodes[1]  = this.network.getFactory().createNode(this.scenario.createId("1"),  this.scenario.createCoord( 4000, 5000));
-		this.nodes[2]  = this.network.getFactory().createNode(this.scenario.createId("2"),  this.scenario.createCoord( 8000, 5000));
-		this.nodes[3]  = this.network.getFactory().createNode(this.scenario.createId("3"),  this.scenario.createCoord(12000, 5000));
-		this.nodes[4]  = this.network.getFactory().createNode(this.scenario.createId("4"),  this.scenario.createCoord(16000, 5000));
-		this.nodes[5]  = this.network.getFactory().createNode(this.scenario.createId("5"),  this.scenario.createCoord(20000, 5000));
-		this.nodes[6]  = this.network.getFactory().createNode(this.scenario.createId("6"),  this.scenario.createCoord(24000, 5000));
-		this.nodes[7]  = this.network.getFactory().createNode(this.scenario.createId("7"),  this.scenario.createCoord(28000, 5000));
-		this.nodes[8]  = this.network.getFactory().createNode(this.scenario.createId("8"),  this.scenario.createCoord(32000, 5000));
-		this.nodes[9]  = this.network.getFactory().createNode(this.scenario.createId("9"),  this.scenario.createCoord(36000, 5000));
-		this.nodes[10] = this.network.getFactory().createNode(this.scenario.createId("10"), this.scenario.createCoord(40000, 5000));
-		this.nodes[11] = this.network.getFactory().createNode(this.scenario.createId("11"), this.scenario.createCoord(12000, 5000));
-		this.nodes[12] = this.network.getFactory().createNode(this.scenario.createId("12"), this.scenario.createCoord(16000, 10000));
-		this.nodes[13] = this.network.getFactory().createNode(this.scenario.createId("13"), this.scenario.createCoord(24000, 10000));
-		this.nodes[14] = this.network.getFactory().createNode(this.scenario.createId("14"), this.scenario.createCoord(28000, 5000));
-		this.nodes[15] = this.network.getFactory().createNode(this.scenario.createId("15"), this.scenario.createCoord(24000, 0));
-		this.nodes[16] = this.network.getFactory().createNode(this.scenario.createId("16"), this.scenario.createCoord(16000, 0));
+		this.nodes[0]  = this.network.getFactory().createNode(Id.create( "0", Node.class),  this.scenario.createCoord(   0, 5000));
+		this.nodes[1]  = this.network.getFactory().createNode(Id.create( "1", Node.class),  this.scenario.createCoord( 4000, 5000));
+		this.nodes[2]  = this.network.getFactory().createNode(Id.create( "2", Node.class),  this.scenario.createCoord( 8000, 5000));
+		this.nodes[3]  = this.network.getFactory().createNode(Id.create( "3", Node.class),  this.scenario.createCoord(12000, 5000));
+		this.nodes[4]  = this.network.getFactory().createNode(Id.create( "4", Node.class),  this.scenario.createCoord(16000, 5000));
+		this.nodes[5]  = this.network.getFactory().createNode(Id.create( "5", Node.class),  this.scenario.createCoord(20000, 5000));
+		this.nodes[6]  = this.network.getFactory().createNode(Id.create( "6", Node.class),  this.scenario.createCoord(24000, 5000));
+		this.nodes[7]  = this.network.getFactory().createNode(Id.create( "7", Node.class),  this.scenario.createCoord(28000, 5000));
+		this.nodes[8]  = this.network.getFactory().createNode(Id.create( "8", Node.class),  this.scenario.createCoord(32000, 5000));
+		this.nodes[9]  = this.network.getFactory().createNode(Id.create( "9", Node.class),  this.scenario.createCoord(36000, 5000));
+		this.nodes[10] = this.network.getFactory().createNode(Id.create("10", Node.class), this.scenario.createCoord(40000, 5000));
+		this.nodes[11] = this.network.getFactory().createNode(Id.create("11", Node.class), this.scenario.createCoord(12000, 5000));
+		this.nodes[12] = this.network.getFactory().createNode(Id.create("12", Node.class), this.scenario.createCoord(16000, 10000));
+		this.nodes[13] = this.network.getFactory().createNode(Id.create("13", Node.class), this.scenario.createCoord(24000, 10000));
+		this.nodes[14] = this.network.getFactory().createNode(Id.create("14", Node.class), this.scenario.createCoord(28000, 5000));
+		this.nodes[15] = this.network.getFactory().createNode(Id.create("15", Node.class), this.scenario.createCoord(24000, 0));
+		this.nodes[16] = this.network.getFactory().createNode(Id.create("16", Node.class), this.scenario.createCoord(16000, 0));
 		for (int i = 0; i < 17; i++) {
 			this.network.addNode(this.nodes[i]);
 		}
-		this.links[0]  = this.network.getFactory().createLink(this.scenario.createId( "0"), this.nodes[ 0], this.nodes[ 1]);
-		this.links[1]  = this.network.getFactory().createLink(this.scenario.createId( "1"), this.nodes[ 1], this.nodes[ 2]);
-		this.links[2]  = this.network.getFactory().createLink(this.scenario.createId( "2"), this.nodes[ 2], this.nodes[ 3]);
-		this.links[3]  = this.network.getFactory().createLink(this.scenario.createId( "3"), this.nodes[ 3], this.nodes[ 4]);
-		this.links[4]  = this.network.getFactory().createLink(this.scenario.createId( "4"), this.nodes[ 4], this.nodes[ 5]);
-		this.links[5]  = this.network.getFactory().createLink(this.scenario.createId( "5"), this.nodes[ 5], this.nodes[ 6]);
-		this.links[6]  = this.network.getFactory().createLink(this.scenario.createId( "6"), this.nodes[ 6], this.nodes[ 7]);
-		this.links[7]  = this.network.getFactory().createLink(this.scenario.createId( "7"), this.nodes[ 7], this.nodes[ 8]);
-		this.links[8]  = this.network.getFactory().createLink(this.scenario.createId( "8"), this.nodes[ 8], this.nodes[ 9]);
-		this.links[9]  = this.network.getFactory().createLink(this.scenario.createId( "9"), this.nodes[10], this.nodes[ 9]);
-		this.links[10] = this.network.getFactory().createLink(this.scenario.createId("10"), this.nodes[ 9], this.nodes[ 8]);
-		this.links[11] = this.network.getFactory().createLink(this.scenario.createId("11"), this.nodes[ 8], this.nodes[ 7]);
-		this.links[12] = this.network.getFactory().createLink(this.scenario.createId("12"), this.nodes[ 7], this.nodes[ 6]);
-		this.links[13] = this.network.getFactory().createLink(this.scenario.createId("13"), this.nodes[ 6], this.nodes[ 5]);
-		this.links[14] = this.network.getFactory().createLink(this.scenario.createId("14"), this.nodes[ 5], this.nodes[ 4]);
-		this.links[15] = this.network.getFactory().createLink(this.scenario.createId("15"), this.nodes[ 4], this.nodes[ 3]);
-		this.links[16] = this.network.getFactory().createLink(this.scenario.createId("16"), this.nodes[ 3], this.nodes[ 2]);
-		this.links[17] = this.network.getFactory().createLink(this.scenario.createId("17"), this.nodes[ 2], this.nodes[ 1]);
+		this.links[0]  = this.network.getFactory().createLink(Id.create( "0", Link.class), this.nodes[ 0], this.nodes[ 1]);
+		this.links[1]  = this.network.getFactory().createLink(Id.create( "1", Link.class), this.nodes[ 1], this.nodes[ 2]);
+		this.links[2]  = this.network.getFactory().createLink(Id.create( "2", Link.class), this.nodes[ 2], this.nodes[ 3]);
+		this.links[3]  = this.network.getFactory().createLink(Id.create( "3", Link.class), this.nodes[ 3], this.nodes[ 4]);
+		this.links[4]  = this.network.getFactory().createLink(Id.create( "4", Link.class), this.nodes[ 4], this.nodes[ 5]);
+		this.links[5]  = this.network.getFactory().createLink(Id.create( "5", Link.class), this.nodes[ 5], this.nodes[ 6]);
+		this.links[6]  = this.network.getFactory().createLink(Id.create( "6", Link.class), this.nodes[ 6], this.nodes[ 7]);
+		this.links[7]  = this.network.getFactory().createLink(Id.create( "7", Link.class), this.nodes[ 7], this.nodes[ 8]);
+		this.links[8]  = this.network.getFactory().createLink(Id.create( "8", Link.class), this.nodes[ 8], this.nodes[ 9]);
+		this.links[9]  = this.network.getFactory().createLink(Id.create( "9", Link.class), this.nodes[10], this.nodes[ 9]);
+		this.links[10] = this.network.getFactory().createLink(Id.create("10", Link.class), this.nodes[ 9], this.nodes[ 8]);
+		this.links[11] = this.network.getFactory().createLink(Id.create("11", Link.class), this.nodes[ 8], this.nodes[ 7]);
+		this.links[12] = this.network.getFactory().createLink(Id.create("12", Link.class), this.nodes[ 7], this.nodes[ 6]);
+		this.links[13] = this.network.getFactory().createLink(Id.create("13", Link.class), this.nodes[ 6], this.nodes[ 5]);
+		this.links[14] = this.network.getFactory().createLink(Id.create("14", Link.class), this.nodes[ 5], this.nodes[ 4]);
+		this.links[15] = this.network.getFactory().createLink(Id.create("15", Link.class), this.nodes[ 4], this.nodes[ 3]);
+		this.links[16] = this.network.getFactory().createLink(Id.create("16", Link.class), this.nodes[ 3], this.nodes[ 2]);
+		this.links[17] = this.network.getFactory().createLink(Id.create("17", Link.class), this.nodes[ 2], this.nodes[ 1]);
 		for (int i = 0; i < 18; i++) {
 			this.links[i].setLength(5000.0);
 			this.links[i].setFreespeed(44.44);
@@ -153,12 +154,12 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 		}
 		this.links[18] = null;
 		this.links[19] = null;
-		this.links[20] = this.network.getFactory().createLink(this.scenario.createId("20"), this.nodes[11], this.nodes[12]);
-		this.links[21] = this.network.getFactory().createLink(this.scenario.createId("21"), this.nodes[12], this.nodes[13]);
-		this.links[22] = this.network.getFactory().createLink(this.scenario.createId("22"), this.nodes[13], this.nodes[14]);
-		this.links[23] = this.network.getFactory().createLink(this.scenario.createId("23"), this.nodes[14], this.nodes[15]);
-		this.links[24] = this.network.getFactory().createLink(this.scenario.createId("24"), this.nodes[15], this.nodes[16]);
-		this.links[25] = this.network.getFactory().createLink(this.scenario.createId("25"), this.nodes[16], this.nodes[11]);
+		this.links[20] = this.network.getFactory().createLink(Id.create("20", Link.class), this.nodes[11], this.nodes[12]);
+		this.links[21] = this.network.getFactory().createLink(Id.create("21", Link.class), this.nodes[12], this.nodes[13]);
+		this.links[22] = this.network.getFactory().createLink(Id.create("22", Link.class), this.nodes[13], this.nodes[14]);
+		this.links[23] = this.network.getFactory().createLink(Id.create("23", Link.class), this.nodes[14], this.nodes[15]);
+		this.links[24] = this.network.getFactory().createLink(Id.create("24", Link.class), this.nodes[15], this.nodes[16]);
+		this.links[25] = this.network.getFactory().createLink(Id.create("25", Link.class), this.nodes[16], this.nodes[11]);
 		for (int i = 20; i < 26; i++) {
 			this.links[i].setLength(10000.0);
 			this.links[i].setFreespeed(20.0);
@@ -169,30 +170,30 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 	}
 
 	protected void buildStops() {
-		this.stopFacilities[ 0] = this.builder.createTransitStopFacility(this.scenario.createId( "0"), this.scenario.createCoord( 4000,  5002), true);
-		this.stopFacilities[ 1] = this.builder.createTransitStopFacility(this.scenario.createId( "1"), this.scenario.createCoord( 4000,  4998), true);
-		this.stopFacilities[ 2] = this.builder.createTransitStopFacility(this.scenario.createId( "2"), this.scenario.createCoord( 8000,  5002), true);
-		this.stopFacilities[ 3] = this.builder.createTransitStopFacility(this.scenario.createId( "3"), this.scenario.createCoord( 8000,  4998), true);
-		this.stopFacilities[ 4] = this.builder.createTransitStopFacility(this.scenario.createId( "4"), this.scenario.createCoord(12000,  5002), true);
-		this.stopFacilities[ 5] = this.builder.createTransitStopFacility(this.scenario.createId( "5"), this.scenario.createCoord(12000,  4998), true);
-		this.stopFacilities[ 6] = this.builder.createTransitStopFacility(this.scenario.createId( "6"), this.scenario.createCoord(16000,  5002), true);
-		this.stopFacilities[ 7] = this.builder.createTransitStopFacility(this.scenario.createId( "7"), this.scenario.createCoord(16000,  4998), true);
-		this.stopFacilities[ 8] = this.builder.createTransitStopFacility(this.scenario.createId( "8"), this.scenario.createCoord(20000,  5002), true);
-		this.stopFacilities[ 9] = this.builder.createTransitStopFacility(this.scenario.createId( "9"), this.scenario.createCoord(20000,  4998), true);
-		this.stopFacilities[10] = this.builder.createTransitStopFacility(this.scenario.createId("10"), this.scenario.createCoord(24000,  5002), true);
-		this.stopFacilities[11] = this.builder.createTransitStopFacility(this.scenario.createId("11"), this.scenario.createCoord(24000,  4998), true);
-		this.stopFacilities[12] = this.builder.createTransitStopFacility(this.scenario.createId("12"), this.scenario.createCoord(28000,  5002), true);
-		this.stopFacilities[13] = this.builder.createTransitStopFacility(this.scenario.createId("13"), this.scenario.createCoord(28000,  4998), true);
-		this.stopFacilities[14] = this.builder.createTransitStopFacility(this.scenario.createId("14"), this.scenario.createCoord(32000,  5002), true);
-		this.stopFacilities[15] = this.builder.createTransitStopFacility(this.scenario.createId("15"), this.scenario.createCoord(32000,  4998), true);
-		this.stopFacilities[16] = this.builder.createTransitStopFacility(this.scenario.createId("16"), this.scenario.createCoord(36000,  5002), true);
-		this.stopFacilities[17] = this.builder.createTransitStopFacility(this.scenario.createId("17"), this.scenario.createCoord(36000,  4998), true);
-		this.stopFacilities[18] = this.builder.createTransitStopFacility(this.scenario.createId("18"), this.scenario.createCoord(12000,  5000), true);
-		this.stopFacilities[19] = this.builder.createTransitStopFacility(this.scenario.createId("19"), this.scenario.createCoord(16000, 10000), true);
-		this.stopFacilities[20] = this.builder.createTransitStopFacility(this.scenario.createId("20"), this.scenario.createCoord(24000, 10000), true);
-		this.stopFacilities[21] = this.builder.createTransitStopFacility(this.scenario.createId("21"), this.scenario.createCoord(28000,  5000), true);
-		this.stopFacilities[22] = this.builder.createTransitStopFacility(this.scenario.createId("22"), this.scenario.createCoord(24000,     0), true);
-		this.stopFacilities[23] = this.builder.createTransitStopFacility(this.scenario.createId("23"), this.scenario.createCoord(16000,     0), true);
+		this.stopFacilities[ 0] = this.builder.createTransitStopFacility(Id.create( "0", TransitStopFacility.class), this.scenario.createCoord( 4000,  5002), true);
+		this.stopFacilities[ 1] = this.builder.createTransitStopFacility(Id.create( "1", TransitStopFacility.class), this.scenario.createCoord( 4000,  4998), true);
+		this.stopFacilities[ 2] = this.builder.createTransitStopFacility(Id.create( "2", TransitStopFacility.class), this.scenario.createCoord( 8000,  5002), true);
+		this.stopFacilities[ 3] = this.builder.createTransitStopFacility(Id.create( "3", TransitStopFacility.class), this.scenario.createCoord( 8000,  4998), true);
+		this.stopFacilities[ 4] = this.builder.createTransitStopFacility(Id.create( "4", TransitStopFacility.class), this.scenario.createCoord(12000,  5002), true);
+		this.stopFacilities[ 5] = this.builder.createTransitStopFacility(Id.create( "5", TransitStopFacility.class), this.scenario.createCoord(12000,  4998), true);
+		this.stopFacilities[ 6] = this.builder.createTransitStopFacility(Id.create( "6", TransitStopFacility.class), this.scenario.createCoord(16000,  5002), true);
+		this.stopFacilities[ 7] = this.builder.createTransitStopFacility(Id.create( "7", TransitStopFacility.class), this.scenario.createCoord(16000,  4998), true);
+		this.stopFacilities[ 8] = this.builder.createTransitStopFacility(Id.create( "8", TransitStopFacility.class), this.scenario.createCoord(20000,  5002), true);
+		this.stopFacilities[ 9] = this.builder.createTransitStopFacility(Id.create( "9", TransitStopFacility.class), this.scenario.createCoord(20000,  4998), true);
+		this.stopFacilities[10] = this.builder.createTransitStopFacility(Id.create("10", TransitStopFacility.class), this.scenario.createCoord(24000,  5002), true);
+		this.stopFacilities[11] = this.builder.createTransitStopFacility(Id.create("11", TransitStopFacility.class), this.scenario.createCoord(24000,  4998), true);
+		this.stopFacilities[12] = this.builder.createTransitStopFacility(Id.create("12", TransitStopFacility.class), this.scenario.createCoord(28000,  5002), true);
+		this.stopFacilities[13] = this.builder.createTransitStopFacility(Id.create("13", TransitStopFacility.class), this.scenario.createCoord(28000,  4998), true);
+		this.stopFacilities[14] = this.builder.createTransitStopFacility(Id.create("14", TransitStopFacility.class), this.scenario.createCoord(32000,  5002), true);
+		this.stopFacilities[15] = this.builder.createTransitStopFacility(Id.create("15", TransitStopFacility.class), this.scenario.createCoord(32000,  4998), true);
+		this.stopFacilities[16] = this.builder.createTransitStopFacility(Id.create("16", TransitStopFacility.class), this.scenario.createCoord(36000,  5002), true);
+		this.stopFacilities[17] = this.builder.createTransitStopFacility(Id.create("17", TransitStopFacility.class), this.scenario.createCoord(36000,  4998), true);
+		this.stopFacilities[18] = this.builder.createTransitStopFacility(Id.create("18", TransitStopFacility.class), this.scenario.createCoord(12000,  5000), true);
+		this.stopFacilities[19] = this.builder.createTransitStopFacility(Id.create("19", TransitStopFacility.class), this.scenario.createCoord(16000, 10000), true);
+		this.stopFacilities[20] = this.builder.createTransitStopFacility(Id.create("20", TransitStopFacility.class), this.scenario.createCoord(24000, 10000), true);
+		this.stopFacilities[21] = this.builder.createTransitStopFacility(Id.create("21", TransitStopFacility.class), this.scenario.createCoord(28000,  5000), true);
+		this.stopFacilities[22] = this.builder.createTransitStopFacility(Id.create("22", TransitStopFacility.class), this.scenario.createCoord(24000,     0), true);
+		this.stopFacilities[23] = this.builder.createTransitStopFacility(Id.create("23", TransitStopFacility.class), this.scenario.createCoord(16000,     0), true);
 		this.stopFacilities[ 0].setName("A");
 		this.stopFacilities[ 1].setName("A");
 		this.stopFacilities[ 2].setName("B");
@@ -247,7 +248,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 	}
 
 	protected void buildRedLine() {
-		this.redLine = this.builder.createTransitLine(this.scenario.createId("red"));
+		this.redLine = this.builder.createTransitLine(Id.create("red", TransitLine.class));
 		this.schedule.addTransitLine(this.redLine);
 		{ // route from left to right
 			NetworkRoute netRoute = new LinkNetworkRouteImpl(this.links[2].getId(), this.links[6].getId());
@@ -257,13 +258,13 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 			List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 			stops.add(this.builder.createTransitRouteStop(this.stopFacilities[4], Time.UNDEFINED_TIME, 0.0));
 			stops.add(this.builder.createTransitRouteStop(this.stopFacilities[12], Time.UNDEFINED_TIME, 9.0*60));
-			TransitRoute route = this.builder.createTransitRoute(this.scenario.createId("red C > G"), netRoute, stops, "train");
+			TransitRoute route = this.builder.createTransitRoute(Id.create("red C > G", TransitRoute.class), netRoute, stops, "train");
 			this.redLine.addRoute(route);
 
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("r>01"), 6.0*3600));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("r>02"), 7.0*3600));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("r>03"), 8.0*3600));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("r>04"), 9.0*3600));
+			route.addDeparture(this.builder.createDeparture(Id.create("r>01", Departure.class), 6.0*3600));
+			route.addDeparture(this.builder.createDeparture(Id.create("r>02", Departure.class), 7.0*3600));
+			route.addDeparture(this.builder.createDeparture(Id.create("r>03", Departure.class), 8.0*3600));
+			route.addDeparture(this.builder.createDeparture(Id.create("r>04", Departure.class), 9.0*3600));
 		}
 		{ // route from right to left
 			NetworkRoute netRoute = new LinkNetworkRouteImpl(this.links[11].getId(), this.links[15].getId());
@@ -273,18 +274,18 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 			List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 			stops.add(this.builder.createTransitRouteStop(this.stopFacilities[13], Time.UNDEFINED_TIME, 0.0));
 			stops.add(this.builder.createTransitRouteStop(this.stopFacilities[5], Time.UNDEFINED_TIME, 9.0*60));
-			TransitRoute route = this.builder.createTransitRoute(this.scenario.createId("red G > C"), netRoute, stops, "train");
+			TransitRoute route = this.builder.createTransitRoute(Id.create("red G > C", TransitRoute.class), netRoute, stops, "train");
 			this.redLine.addRoute(route);
 
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("r<01"), 6.0*3600 + 10.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("r<02"), 7.0*3600 + 10.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("r<03"), 8.0*3600 + 10.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("r<04"), 9.0*3600 + 10.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("r<01", Departure.class), 6.0*3600 + 10.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("r<02", Departure.class), 7.0*3600 + 10.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("r<03", Departure.class), 8.0*3600 + 10.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("r<04", Departure.class), 9.0*3600 + 10.0*60));
 		}
 	}
 
 	protected void buildBlueLine() {
-		this.blueLine = this.builder.createTransitLine(this.scenario.createId("blue"));
+		this.blueLine = this.builder.createTransitLine(Id.create("blue", TransitLine.class));
 		this.schedule.addTransitLine(this.blueLine);
 		{ // route from left to right
 			NetworkRoute netRoute = new LinkNetworkRouteImpl(this.links[0].getId(), this.links[8].getId());
@@ -320,24 +321,24 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 			stop = this.builder.createTransitRouteStop(this.stopFacilities[16], 58.0 * 60, Time.UNDEFINED_TIME);
 			stop.setAwaitDepartureTime(true);
 			stops.add(stop);
-			TransitRoute route = this.builder.createTransitRoute(this.scenario.createId("blue A > I"), netRoute, stops, "train");
+			TransitRoute route = this.builder.createTransitRoute(Id.create("blue A > I", TransitRoute.class), netRoute, stops, "train");
 			this.blueLine.addRoute(route);
 
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b>01"), 5.0*3600 +  6.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b>02"), 5.0*3600 + 26.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b>03"), 5.0*3600 + 46.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b>04"), 6.0*3600 +  6.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b>05"), 6.0*3600 + 26.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b>06"), 6.0*3600 + 46.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b>07"), 7.0*3600 +  6.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b>08"), 7.0*3600 + 26.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b>09"), 7.0*3600 + 46.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b>10"), 8.0*3600 +  6.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b>11"), 8.0*3600 + 26.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b>12"), 8.0*3600 + 46.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b>13"), 9.0*3600 +  6.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b>14"), 9.0*3600 + 26.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b>15"), 9.0*3600 + 46.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("b>01", Departure.class), 5.0*3600 +  6.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("b>02", Departure.class), 5.0*3600 + 26.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("b>03", Departure.class), 5.0*3600 + 46.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("b>04", Departure.class), 6.0*3600 +  6.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("b>05", Departure.class), 6.0*3600 + 26.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("b>06", Departure.class), 6.0*3600 + 46.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("b>07", Departure.class), 7.0*3600 +  6.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("b>08", Departure.class), 7.0*3600 + 26.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("b>09", Departure.class), 7.0*3600 + 46.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("b>10", Departure.class), 8.0*3600 +  6.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("b>11", Departure.class), 8.0*3600 + 26.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("b>12", Departure.class), 8.0*3600 + 46.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("b>13", Departure.class), 9.0*3600 +  6.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("b>14", Departure.class), 9.0*3600 + 26.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("b>15", Departure.class), 9.0*3600 + 46.0*60));
 		}
 		{ // route from right to left
 			NetworkRoute netRoute = new LinkNetworkRouteImpl(this.links[9].getId(), this.links[17].getId());
@@ -373,29 +374,29 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 			stop = this.builder.createTransitRouteStop(this.stopFacilities[ 1], 58.0 * 60, Time.UNDEFINED_TIME);
 			stop.setAwaitDepartureTime(true);
 			stops.add(stop);
-			TransitRoute route = this.builder.createTransitRoute(this.scenario.createId("blue I > A"), netRoute, stops, "train");
+			TransitRoute route = this.builder.createTransitRoute(Id.create("blue I > A", TransitRoute.class), netRoute, stops, "train");
 			this.blueLine.addRoute(route);
 
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<01"), 5.0*3600 + 16.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<02"), 5.0*3600 + 36.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<03"), 5.0*3600 + 56.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<04"), 6.0*3600 + 16.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<05"), 6.0*3600 + 36.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<06"), 6.0*3600 + 56.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<07"), 7.0*3600 + 16.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<08"), 7.0*3600 + 36.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<09"), 7.0*3600 + 56.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<10"), 8.0*3600 + 16.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<11"), 8.0*3600 + 36.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<12"), 8.0*3600 + 56.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<13"), 9.0*3600 + 16.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<14"), 9.0*3600 + 36.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("b<15"), 9.0*3600 + 56.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("b<01", Departure.class), 5.0*3600 + 16.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("b<02", Departure.class), 5.0*3600 + 36.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("b<03", Departure.class), 5.0*3600 + 56.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("b<04", Departure.class), 6.0*3600 + 16.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("b<05", Departure.class), 6.0*3600 + 36.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("b<06", Departure.class), 6.0*3600 + 56.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("b<07", Departure.class), 7.0*3600 + 16.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("b<08", Departure.class), 7.0*3600 + 36.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("b<09", Departure.class), 7.0*3600 + 56.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("b<10", Departure.class), 8.0*3600 + 16.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("b<11", Departure.class), 8.0*3600 + 36.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("b<12", Departure.class), 8.0*3600 + 56.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("b<13", Departure.class), 9.0*3600 + 16.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("b<14", Departure.class), 9.0*3600 + 36.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("b<15", Departure.class), 9.0*3600 + 56.0*60));
 		}
 	}
 
 	protected void buildGreenLine() {
-		this.greenLine = this.builder.createTransitLine(this.scenario.createId("green"));
+		this.greenLine = this.builder.createTransitLine(Id.create("green", TransitLine.class));
 		this.schedule.addTransitLine(this.greenLine);
 		{ // route in circle in clockwise
 			NetworkRoute netRoute = new LinkNetworkRouteImpl(this.links[25].getId(), this.links[25].getId());
@@ -424,27 +425,27 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 			stops.add(stop);
 			stop = this.builder.createTransitRouteStop(this.stopFacilities[18], 59.0*60, Time.UNDEFINED_TIME);
 			stops.add(stop);
-			TransitRoute route = this.builder.createTransitRoute(this.scenario.createId("green clockwise"), netRoute, stops, "train");
+			TransitRoute route = this.builder.createTransitRoute(Id.create("green clockwise", TransitRoute.class), netRoute, stops, "train");
 			this.greenLine.addRoute(route);
 
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("g>01"), 5.0*3600 + 01.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("g>02"), 5.0*3600 + 11.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("g>03"), 5.0*3600 + 21.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("g>04"), 5.0*3600 + 31.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("g>05"), 5.0*3600 + 41.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("g>06"), 5.0*3600 + 51.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("g>07"), 6.0*3600 +  1.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("g>08"), 6.0*3600 + 11.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("g>09"), 6.0*3600 + 21.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("g>10"), 6.0*3600 + 31.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("g>11"), 6.0*3600 + 41.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("g>12"), 6.0*3600 + 51.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("g>13"), 7.0*3600 +  1.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("g>14"), 7.0*3600 + 11.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("g>15"), 7.0*3600 + 21.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("g>16"), 7.0*3600 + 31.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("g>17"), 7.0*3600 + 41.0*60));
-			route.addDeparture(this.builder.createDeparture(this.scenario.createId("g>18"), 7.0*3600 + 51.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("g>01", Departure.class), 5.0*3600 + 01.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("g>02", Departure.class), 5.0*3600 + 11.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("g>03", Departure.class), 5.0*3600 + 21.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("g>04", Departure.class), 5.0*3600 + 31.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("g>05", Departure.class), 5.0*3600 + 41.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("g>06", Departure.class), 5.0*3600 + 51.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("g>07", Departure.class), 6.0*3600 +  1.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("g>08", Departure.class), 6.0*3600 + 11.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("g>09", Departure.class), 6.0*3600 + 21.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("g>10", Departure.class), 6.0*3600 + 31.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("g>11", Departure.class), 6.0*3600 + 41.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("g>12", Departure.class), 6.0*3600 + 51.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("g>13", Departure.class), 7.0*3600 +  1.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("g>14", Departure.class), 7.0*3600 + 11.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("g>15", Departure.class), 7.0*3600 + 21.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("g>16", Departure.class), 7.0*3600 + 31.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("g>17", Departure.class), 7.0*3600 + 41.0*60));
+			route.addDeparture(this.builder.createDeparture(Id.create("g>18", Departure.class), 7.0*3600 + 51.0*60));
 		}
 	}
 }

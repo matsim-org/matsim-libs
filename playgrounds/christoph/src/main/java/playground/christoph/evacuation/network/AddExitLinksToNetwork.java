@@ -176,13 +176,13 @@ public class AddExitLinksToNetwork {
 //		Coord rescueCoord = scenario.createCoord(0.0, 0.0);
 //		Coord rescueCoord = scenario.createCoord(EvacuationConfig.centerCoord.getX() + 50000.0, EvacuationConfig.centerCoord.getY() + 50000.0);
 		Coord rescueCoord = EvacuationConfig.getRescueCoord();
-		Node rescueNode = network.getFactory().createNode(scenario.createId(AddExitLinksToNetwork.exitNode), rescueCoord);
+		Node rescueNode = network.getFactory().createNode(Id.create(AddExitLinksToNetwork.exitNode, Node.class), rescueCoord);
 		network.addNode(rescueNode);
 		
 		int counter = 0;
 		for (Node node : exitNodes.values()) {
 			counter++;
-			Link exitLink = network.getFactory().createLink(scenario.createId(AddExitLinksToNetwork.exitLink + counter), node, rescueNode);
+			Link exitLink = network.getFactory().createLink(Id.create(AddExitLinksToNetwork.exitLink + counter, Link.class), node, rescueNode);
 			exitLink.setLength(10);	// use short links for non-vehicular traffic
 			exitLink.setCapacity(1000000);
 			exitLink.setFreespeed(1000000);			
@@ -209,10 +209,10 @@ public class AddExitLinksToNetwork {
 //		Coord rescueCoord2 = scenario.createCoord(1.0, 1.0);
 //		Coord rescueCoord2 = scenario.createCoord(EvacuationConfig.centerCoord.getX() + 50001.0, EvacuationConfig.centerCoord.getY() + 50001.0);
 		Coord rescueCoord2 = scenario.createCoord(rescueCoord.getX() + 1.0, rescueCoord.getY() + 1.0);
-		Node rescueNode2 = network.getFactory().createNode(scenario.createId(AddExitLinksToNetwork.exitNode + "2"), rescueCoord2);
+		Node rescueNode2 = network.getFactory().createNode(Id.create(AddExitLinksToNetwork.exitNode + "2", Node.class), rescueCoord2);
 		network.addNode(rescueNode2);
 		
-		Link exitLink = network.getFactory().createLink(scenario.createId(AddExitLinksToNetwork.exitLink), rescueNode, rescueNode2);
+		Link exitLink = network.getFactory().createLink(Id.create(AddExitLinksToNetwork.exitLink, Link.class), rescueNode, rescueNode2);
 //		rescueLink.setLength(100000);
 //		rescueLink.setCapacity(Double.MAX_VALUE);
 //		rescueLink.setFreespeed(Double.MAX_VALUE);
@@ -232,7 +232,7 @@ public class AddExitLinksToNetwork {
 		/*
 		 * Create and add the rescue facility and an activity option ("rescue")
 		 */
-		ActivityFacility rescueFacility = scenario.getActivityFacilities().getFactory().createActivityFacility(scenario.createId("rescueFacility"), exitLink.getCoord());
+		ActivityFacility rescueFacility = scenario.getActivityFacilities().getFactory().createActivityFacility(Id.create("rescueFacility", ActivityFacility.class), exitLink.getCoord());
 		scenario.getActivityFacilities().addActivityFacility(rescueFacility);
 		((ActivityFacilityImpl)rescueFacility).setLinkId(((LinkImpl)exitLink).getId());
 		

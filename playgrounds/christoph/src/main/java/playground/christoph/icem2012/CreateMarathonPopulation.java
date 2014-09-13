@@ -45,6 +45,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.tools.MultiModalNetworkCreator;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
@@ -192,16 +193,16 @@ public class CreateMarathonPopulation {
 	
 	private void createRoute(Scenario scenario) {
 		
-		List<Id> nodeIds = new ArrayList<Id>();
+		List<Id<Node>> nodeIds = new ArrayList<>();
 		for (String nodeId : trackNodes) {
-			Id id = scenario.createId(nodeId);
+			Id<Node> id = Id.create(nodeId, Node.class);
 			nodeIds.add(id);
 		}
 		
 		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 		for (int i = 0; i < nodeIds.size() - 1; i++) {
-			Id fromId = nodeIds.get(i);
-			Id toId = nodeIds.get(i + 1);
+			Id<Node> fromId = nodeIds.get(i);
+			Id<Node> toId = nodeIds.get(i + 1);
 			
 			Node fromNode = scenario.getNetwork().getNodes().get(fromId);
 			for (Link link : fromNode.getOutLinks().values()) {
@@ -213,8 +214,8 @@ public class CreateMarathonPopulation {
 		}
 		
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
-		Id startLinkId = linkIds.remove(0);
-		Id endLinkId = linkIds.remove(linkIds.size() - 1);
+		Id<Link> startLinkId = linkIds.remove(0);
+		Id<Link> endLinkId = linkIds.remove(linkIds.size() - 1);
 		route = (NetworkRoute) routeFactory.createRoute(startLinkId, endLinkId);
 		route.setLinkIds(startLinkId, linkIds, endLinkId);
 	}
@@ -261,9 +262,9 @@ public class CreateMarathonPopulation {
 	}
 	
 	private void createShiftedNode(Scenario scenario, String nodeId, double dx, double dy) {
-		Node node = scenario.getNetwork().getNodes().get(scenario.createId(nodeId));
+		Node node = scenario.getNetwork().getNodes().get(Id.create(nodeId, Node.class));
 		Coord coord = scenario.createCoord(node.getCoord().getX() + dx, node.getCoord().getY() + dy);
-		Id id = scenario.createId(nodeId + "_shifted");
+		Id<Node> id = Id.create(nodeId + "_shifted", Node.class);
 		Node shiftedNode = scenario.getNetwork().getFactory().createNode(id, coord);
 		scenario.getNetwork().addNode(shiftedNode);
 	}
@@ -295,10 +296,10 @@ public class CreateMarathonPopulation {
 	}
 	
 	private void moveLink(Scenario scenario, String oldFrom, String oldTo, String newFrom, String newTo) {
-		Id oldFromId = scenario.createId(oldFrom);
-		Id oldToId = scenario.createId(oldTo);
-		Id newFromId = scenario.createId(newFrom);
-		Id newToId = scenario.createId(newTo);
+		Id<Node> oldFromId = Id.create(oldFrom, Node.class);
+		Id<Node> oldToId = Id.create(oldTo, Node.class);
+		Id<Node> newFromId = Id.create(newFrom, Node.class);
+		Id<Node> newToId = Id.create(newTo, Node.class);
 		
 		Node from = scenario.getNetwork().getNodes().get(oldFromId);
 		Node to = scenario.getNetwork().getNodes().get(oldToId);
@@ -328,15 +329,15 @@ public class CreateMarathonPopulation {
 		
 		String node1 = node;
 		String node2 = node + "_shifted";
-		Node n1 = scenario.getNetwork().getNodes().get(scenario.createId(node1));
-		Node n2 = scenario.getNetwork().getNodes().get(scenario.createId(node2));
-		Id linkId;
+		Node n1 = scenario.getNetwork().getNodes().get(Id.create(node1, Node.class));
+		Node n2 = scenario.getNetwork().getNodes().get(Id.create(node2, Node.class));
+		Id<Link> linkId;
 		Link link;
 		double width;
 		double cap;
 		double lanes;
 		
-		linkId = scenario.createId(node1 + "_" + node2);
+		linkId = Id.create(node1 + "_" + node2, Link.class);
 		link = scenario.getNetwork().getFactory().createLink(linkId, n1, n2);
 		link.setLength(CoordUtils.calcDistance(n1.getCoord(), n2.getCoord()));
 		width = 4;
@@ -347,7 +348,7 @@ public class CreateMarathonPopulation {
 		link.setAllowedModes(modes);
 		scenario.getNetwork().addLink(link);
 		
-		linkId = scenario.createId(node2 + "_" + node1);
+		linkId = Id.create(node2 + "_" + node1, Link.class);
 		link = scenario.getNetwork().getFactory().createLink(linkId, n2, n1);
 		link.setLength(CoordUtils.calcDistance(n1.getCoord(), n2.getCoord()));
 		width = 4;
@@ -367,11 +368,11 @@ public class CreateMarathonPopulation {
 		Set<String> modes = CollectionUtils.stringToSet("walk2d");
 		
 		// add a new link at the turning point
-		Id fromNodeId = scenario.createId("2521");
-		Id toNodeId = scenario.createId("4239");
+		Id<Node> fromNodeId = Id.create("2521", Node.class);
+		Id<Node> toNodeId = Id.create("4239", Node.class);
 		Node fromNode = scenario.getNetwork().getNodes().get(fromNodeId);
 		Node toNode = scenario.getNetwork().getNodes().get(toNodeId);
-		Id linkId = scenario.createId("2521_4239");
+		Id<Link> linkId = Id.create("2521_4239", Link.class);
 		Link link = scenario.getNetwork().getFactory().createLink(linkId, fromNode, toNode);
 		link.setLength(CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()));
 		double width = 8;
@@ -426,11 +427,11 @@ public class CreateMarathonPopulation {
 		double width = 8;
 		double cap = width * 1.33;
 		double lanes = 5.4*0.26 * width;
-		Set<Id> linksToAdapt = new HashSet<Id>();
+		Set<Id<Link>> linksToAdapt = new HashSet<>();
 		linksToAdapt.add(route.getStartLinkId());
 		linksToAdapt.add(route.getEndLinkId());
 		linksToAdapt.addAll(route.getLinkIds());
-		for (Id id : linksToAdapt) {
+		for (Id<Link> id : linksToAdapt) {
 			Link link = scenario.getNetwork().getLinks().get(id);			
 			link.setNumberOfLanes(lanes);
 			link.setCapacity(cap);
@@ -465,48 +466,48 @@ public class CreateMarathonPopulation {
 
 			// barrier between 4504 and 4505
 			barrier = new Coordinate[2];
-			c1 = scenario.getNetwork().getNodes().get(scenario.createId("4504")).getCoord();
-			c2 = scenario.getNetwork().getNodes().get(scenario.createId("4504_shifted")).getCoord();
+			c1 = scenario.getNetwork().getNodes().get(Id.create("4504", Node.class)).getCoord();
+			c2 = scenario.getNetwork().getNodes().get(Id.create("4504_shifted", Node.class)).getCoord();
 			barrier[0] = new Coordinate((c1.getX() + c2.getX()) * 0.5 - 0.3, (c1.getY() + c2.getY()) * 0.5 - 1.0);			
-			c1 = scenario.getNetwork().getNodes().get(scenario.createId("4505")).getCoord();
-			c2 = scenario.getNetwork().getNodes().get(scenario.createId("4505_shifted")).getCoord();
+			c1 = scenario.getNetwork().getNodes().get(Id.create("4505", Node.class)).getCoord();
+			c2 = scenario.getNetwork().getNodes().get(Id.create("4505_shifted", Node.class)).getCoord();
 			barrier[1] = new Coordinate((c1.getX() + c2.getX()) * 0.5 + 0.3, (c1.getY() + c2.getY()) * 0.5 + 1.0);
 			barriers.add(barrier);
 
 			// barrier between 4508 and 2951
 			barrier = new Coordinate[2];
-			c1 = scenario.getNetwork().getNodes().get(scenario.createId("4508")).getCoord();
-			c2 = scenario.getNetwork().getNodes().get(scenario.createId("4508_shifted")).getCoord();
+			c1 = scenario.getNetwork().getNodes().get(Id.create("4508", Node.class)).getCoord();
+			c2 = scenario.getNetwork().getNodes().get(Id.create("4508_shifted", Node.class)).getCoord();
 			barrier[0] = new Coordinate((c1.getX() + c2.getX()) * 0.5 + 0.3, (c1.getY() + c2.getY()) * 0.5 - 1.0);
-			c1 = scenario.getNetwork().getNodes().get(scenario.createId("2951_shifted")).getCoord();
-			c2 = scenario.getNetwork().getNodes().get(scenario.createId("2951_shifted_shifted")).getCoord();
+			c1 = scenario.getNetwork().getNodes().get(Id.create("2951_shifted", Node.class)).getCoord();
+			c2 = scenario.getNetwork().getNodes().get(Id.create("2951_shifted_shifted", Node.class)).getCoord();
 			barrier[1] = new Coordinate((c1.getX() + c2.getX()) * 0.5 - 0.3, (c1.getY() + c2.getY()) * 0.5 + 1.0);
 			barriers.add(barrier);
 
 			// barrier between 2951 and 2531
 			barrier = new Coordinate[2];
-			c1 = scenario.getNetwork().getNodes().get(scenario.createId("2951")).getCoord();
-			c2 = scenario.getNetwork().getNodes().get(scenario.createId("2951_shifted")).getCoord();
+			c1 = scenario.getNetwork().getNodes().get(Id.create("2951", Node.class)).getCoord();
+			c2 = scenario.getNetwork().getNodes().get(Id.create("2951_shifted", Node.class)).getCoord();
 			barrier[0] = new Coordinate((c1.getX() + c2.getX()) * 0.5 + 1.0, (c1.getY() + c2.getY()) * 0.5 + 0.3);
-			c1 = scenario.getNetwork().getNodes().get(scenario.createId("2531")).getCoord();
-			c2 = scenario.getNetwork().getNodes().get(scenario.createId("2531_shifted")).getCoord();
+			c1 = scenario.getNetwork().getNodes().get(Id.create("2531", Node.class)).getCoord();
+			c2 = scenario.getNetwork().getNodes().get(Id.create("2531_shifted", Node.class)).getCoord();
 			barrier[1] = new Coordinate((c1.getX() + c2.getX()) * 0.5 - 3.0, (c1.getY() + c2.getY()) * 0.5 - 0.9);
 			barriers.add(barrier);
 
 			// barrier between 2531 and 2530
 			barrier = new Coordinate[2];
-			c1 = scenario.getNetwork().getNodes().get(scenario.createId("2531")).getCoord();
-			c2 = scenario.getNetwork().getNodes().get(scenario.createId("2531_shifted")).getCoord();
+			c1 = scenario.getNetwork().getNodes().get(Id.create("2531", Node.class)).getCoord();
+			c2 = scenario.getNetwork().getNodes().get(Id.create("2531_shifted", Node.class)).getCoord();
 			barrier[0] = new Coordinate((c1.getX() + c2.getX()) * 0.5 + 1.0, (c1.getY() + c2.getY()) * 0.5 - 2.0);
-			c1 = scenario.getNetwork().getNodes().get(scenario.createId("2530")).getCoord();
-			c2 = scenario.getNetwork().getNodes().get(scenario.createId("2530_shifted")).getCoord();
+			c1 = scenario.getNetwork().getNodes().get(Id.create("2530", Node.class)).getCoord();
+			c2 = scenario.getNetwork().getNodes().get(Id.create("2530_shifted", Node.class)).getCoord();
 			barrier[1] = new Coordinate((c1.getX() + c2.getX()) * 0.5 - 0.5, (c1.getY() + c2.getY()) * 0.5 + 1.0);
 			barriers.add(barrier);
 
 			// barrier left and right the start/end link (2759 to 2952)
 			barrier = new Coordinate[2];
-			c1 = scenario.getNetwork().getNodes().get(scenario.createId("2759")).getCoord();
-			c2 = scenario.getNetwork().getNodes().get(scenario.createId("2952")).getCoord();
+			c1 = scenario.getNetwork().getNodes().get(Id.create("2759", Node.class)).getCoord();
+			c2 = scenario.getNetwork().getNodes().get(Id.create("2952", Node.class)).getCoord();
 			barrier[0] = new Coordinate(c1.getX() - 5.0, c1.getY() - 5.0);
 			barrier[1] = new Coordinate(c2.getX() - 5.0, c2.getY() + 100.0);
 			barriers.add(barrier);
@@ -541,7 +542,7 @@ public class CreateMarathonPopulation {
 			
 			int i = 0;
 			for (String nodeId : trackNodes) {
-				Id id = scenario.createId(nodeId);
+				Id<Node> id = Id.create(nodeId, Node.class);
 				Node node = scenario.getNetwork().getNodes().get(id);
 				track[i] = new Coordinate(node.getCoord().getX(), node.getCoord().getY());
 				i++;
@@ -580,7 +581,7 @@ public class CreateMarathonPopulation {
 					create();
 			
 			for (String linkId : trackRelatedLinks) {
-				Id id = scenario.createId(linkId);
+				Id<Link> id = Id.create(linkId, Link.class);
 				Link link = scenario.getNetwork().getLinks().get(id);
 				Coordinate[] line = new Coordinate[2];
 				line[0] = new Coordinate(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY());
@@ -610,7 +611,7 @@ public class CreateMarathonPopulation {
 		// includes track links and their counter links
 		Set<Id> trackRelatedLinks = new HashSet<Id>();
 		for (String linkId : CreateMarathonPopulation.trackRelatedLinks) {
-			Id id = scenario.createId(linkId);
+			Id<Link> id = Id.create(linkId, Link.class);
 			trackRelatedLinks.add(id);
 		}
 		
@@ -626,7 +627,7 @@ public class CreateMarathonPopulation {
 		Counter counterRemove = new Counter("persons to remove ");
 		Counter counterAdapt = new Counter("legs to adapt ");
 		
-		Set<Id> personsToRemove = new HashSet<Id>();
+		Set<Id<Person>> personsToRemove = new HashSet<>();
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			Plan plan = person.getSelectedPlan();
 			
@@ -682,7 +683,7 @@ public class CreateMarathonPopulation {
 						if (route instanceof NetworkRoute) {
 							NetworkRoute networkRoute = (NetworkRoute) route;
 							
-							for (Id linkId : networkRoute.getLinkIds()) {
+							for (Id<Link> linkId : networkRoute.getLinkIds()) {
 								if (trackRelatedLinks.contains(linkId)) {
 									needsRerouting = true;
 									break;
@@ -717,7 +718,7 @@ public class CreateMarathonPopulation {
 		counterAdapt.printCounter();
 		counterRemove.printCounter();
 		
-		for (Id personId : personsToRemove) {
+		for (Id<Person> personId : personsToRemove) {
 			scenario.getPopulation().getPersons().remove(personId);
 		}
 		
@@ -725,7 +726,7 @@ public class CreateMarathonPopulation {
 		 * Restore original track modes.
 		 */
 		modes = CollectionUtils.stringToSet(this.trackModes);
-		for (Id linkId : trackRelatedLinks) {
+		for (Id<Link> linkId : trackRelatedLinks) {
 			network.getLinks().get(linkId).setAllowedModes(modes);		
 		}
 	}
@@ -733,10 +734,10 @@ public class CreateMarathonPopulation {
 	private void createPopulation(Scenario scenario) {
 		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
 		
-		Id startLinkId = scenario.createId(startLink);
+		Id<Link> startLinkId = Id.create(startLink, Link.class);
 		Link startLink = scenario.getNetwork().getLinks().get(startLinkId);
 		
-		Id endLinkId = scenario.createId(endLink);
+		Id<Link> endLinkId = Id.create(endLink, Link.class);
 		
 		/*
 		 * We create a vector from the end to the start of the link since we
@@ -766,7 +767,7 @@ public class CreateMarathonPopulation {
 		
 		for (int personCount = 0; personCount < runners; personCount++) {
 			
-			PersonImpl person = (PersonImpl) populationFactory.createPerson(scenario.createId("runner_" + personCount));
+			PersonImpl person = (PersonImpl) populationFactory.createPerson(Id.create("runner_" + personCount, Person.class));
 
 			// set random age and gender
 			person.setAge((int)(18 + Math.round(random.nextDouble() * 47)));	// 18 .. 65 years old
@@ -805,7 +806,7 @@ public class CreateMarathonPopulation {
 			
 			Coord coord = scenario.createCoord(x, y);
 			activity = (ActivityImpl) populationFactory.createActivityFromLinkId("preRun", startLinkId);
-			activity.setFacilityId(scenario.createId("preRunFacility"));
+			activity.setFacilityId(Id.create("preRunFacility", ActivityFacility.class));
 			activity.setEndTime(9*3600);
 			activity.setCoord(coord);
 			plan.addActivity(activity);
@@ -815,7 +816,7 @@ public class CreateMarathonPopulation {
 			plan.addLeg(leg);
 			
 			activity = (ActivityImpl) populationFactory.createActivityFromLinkId("postRun", endLinkId);
-			activity.setFacilityId(scenario.createId("postRunFacility"));
+			activity.setFacilityId(Id.create("postRunFacility", ActivityFacility.class));
 			activity.setCoord(coord);
 			plan.addActivity(activity);
 			

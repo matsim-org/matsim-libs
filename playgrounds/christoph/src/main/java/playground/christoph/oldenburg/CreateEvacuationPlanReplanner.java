@@ -25,6 +25,7 @@ import java.util.Random;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -76,7 +77,7 @@ public class CreateEvacuationPlanReplanner extends WithinDayInitialReplanner {
 				
 		PopulationFactory factory = scenario.getPopulation().getFactory();
 		Leg leg = factory.createLeg(TransportMode.car);
-		Activity activity = factory.createActivityFromLinkId(DemoConfig.activityType, scenario.createId(DemoConfig.evacuationLink));
+		Activity activity = factory.createActivityFromLinkId(DemoConfig.activityType, Id.create(DemoConfig.evacuationLink, Link.class));
 		
 		executedPlan.addLeg(leg);
 		executedPlan.addActivity(activity);

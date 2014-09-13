@@ -105,7 +105,7 @@ public class PrepareBackgroundPopulation {
 			
 			for (Person person : scenario.getPopulation().getPersons().values())
 			for (int i = 1; i < scaleFactor; i++) {
-				Id id = scenario.createId(person.getId().toString() + "_clone_" + i);
+				Id<Person> id = Id.create(person.getId().toString() + "_clone_" + i, Person.class);
 				Person newPerson = factory.createPerson(id);
 			
 				Plan plan = factory.createPlan();

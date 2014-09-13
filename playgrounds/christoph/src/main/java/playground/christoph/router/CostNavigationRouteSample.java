@@ -97,7 +97,7 @@ public class CostNavigationRouteSample {
 		LeastCostPathCalculator leastCostPathCalculator = factory.createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime);
 		
 		for (int i = 1; i < 7; i++) {
-			calcRoute(scenario, leastCostPathCalculator, travelDisutility, scenario.getNetwork().getNodes().get(scenario.createId("n" + i)), scenario.getNetwork().getNodes().get(scenario.createId("n7")));			
+			calcRoute(scenario, leastCostPathCalculator, travelDisutility, scenario.getNetwork().getNodes().get(Id.create("n" + i, Node.class)), scenario.getNetwork().getNodes().get(Id.create("n7", Node.class)));			
 		}
 		
 		log.info("done");
@@ -108,13 +108,13 @@ public class CostNavigationRouteSample {
     	Network network = scenario.getNetwork();
     	NetworkFactory networkFactory = network.getFactory();
     	
-    	Node n1 = networkFactory.createNode(scenario.createId("n1"), scenario.createCoord(0.0, 0.0));
-    	Node n2 = networkFactory.createNode(scenario.createId("n2"), scenario.createCoord(0.0, 0.0));
-    	Node n3 = networkFactory.createNode(scenario.createId("n3"), scenario.createCoord(0.0, 0.0));
-    	Node n4 = networkFactory.createNode(scenario.createId("n4"), scenario.createCoord(0.0, 0.0));
-    	Node n5 = networkFactory.createNode(scenario.createId("n5"), scenario.createCoord(0.0, 0.0));
-    	Node n6 = networkFactory.createNode(scenario.createId("n6"), scenario.createCoord(0.0, 0.0));
-    	Node n7 = networkFactory.createNode(scenario.createId("n7"), scenario.createCoord(0.0, 0.0));
+    	Node n1 = networkFactory.createNode(Id.create("n1", Node.class), scenario.createCoord(0.0, 0.0));
+    	Node n2 = networkFactory.createNode(Id.create("n2", Node.class), scenario.createCoord(0.0, 0.0));
+    	Node n3 = networkFactory.createNode(Id.create("n3", Node.class), scenario.createCoord(0.0, 0.0));
+    	Node n4 = networkFactory.createNode(Id.create("n4", Node.class), scenario.createCoord(0.0, 0.0));
+    	Node n5 = networkFactory.createNode(Id.create("n5", Node.class), scenario.createCoord(0.0, 0.0));
+    	Node n6 = networkFactory.createNode(Id.create("n6", Node.class), scenario.createCoord(0.0, 0.0));
+    	Node n7 = networkFactory.createNode(Id.create("n7", Node.class), scenario.createCoord(0.0, 0.0));
     	
     	network.addNode(n1);
     	network.addNode(n2);
@@ -124,16 +124,16 @@ public class CostNavigationRouteSample {
     	network.addNode(n6);
     	network.addNode(n7);
     	    	
-        Link l1 = networkFactory.createLink(scenario.createId("l1"), n1, n2);
-        Link l2 = networkFactory.createLink(scenario.createId("l2"), n1, n3);
-        Link l3 = networkFactory.createLink(scenario.createId("l3"), n2, n4);
-        Link l4 = networkFactory.createLink(scenario.createId("l4"), n2, n6);
-        Link l5 = networkFactory.createLink(scenario.createId("l5"), n3, n4);
-        Link l6 = networkFactory.createLink(scenario.createId("l6"), n3, n5);
-        Link l7 = networkFactory.createLink(scenario.createId("l7"), n4, n5);
-        Link l8 = networkFactory.createLink(scenario.createId("l8"), n4, n6);
-        Link l9 = networkFactory.createLink(scenario.createId("l9"), n5, n7);
-        Link l10 = networkFactory.createLink(scenario.createId("l10"), n6, n7);
+        Link l1 = networkFactory.createLink(Id.create("l1", Link.class), n1, n2);
+        Link l2 = networkFactory.createLink(Id.create("l2", Link.class), n1, n3);
+        Link l3 = networkFactory.createLink(Id.create("l3", Link.class), n2, n4);
+        Link l4 = networkFactory.createLink(Id.create("l4", Link.class), n2, n6);
+        Link l5 = networkFactory.createLink(Id.create("l5", Link.class), n3, n4);
+        Link l6 = networkFactory.createLink(Id.create("l6", Link.class), n3, n5);
+        Link l7 = networkFactory.createLink(Id.create("l7", Link.class), n4, n5);
+        Link l8 = networkFactory.createLink(Id.create("l8", Link.class), n4, n6);
+        Link l9 = networkFactory.createLink(Id.create("l9", Link.class), n5, n7);
+        Link l10 = networkFactory.createLink(Id.create("l10", Link.class), n6, n7);
         
         // use link length field to store link travel costs
         l1.setLength(7.2);

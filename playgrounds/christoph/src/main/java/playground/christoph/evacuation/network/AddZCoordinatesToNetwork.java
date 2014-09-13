@@ -96,9 +96,9 @@ public class AddZCoordinatesToNetwork {
 	public void addZCoordinatesToNetwork() {
 		// read DHM25 shp file
 		log.info("reading dhm25 data...");
-		Map<Id, Double> dhm25Heights = new HashMap<Id, Double>();
+		Map<Id<Node>, Double> dhm25Heights = new HashMap<>();
 		for (SimpleFeature feature : ShapeFileReader.getAllFeatures(DHM25)) {
-			Id id = scenario.createId(String.valueOf(feature.getAttribute(1)));
+			Id<Node> id = Id.create(String.valueOf(feature.getAttribute(1)), Node.class);
 			double z = (Double) feature.getAttribute(4);
 			if (z != 0.0) dhm25Heights.put(id, z);
 		}
@@ -106,9 +106,9 @@ public class AddZCoordinatesToNetwork {
 		
 		// read DHM25 shp file
 		log.info("reading srtm data...");
-		Map<Id, Double> srtmHeights = new HashMap<Id, Double>();
+		Map<Id<Node>, Double> srtmHeights = new HashMap<>();
 		for (SimpleFeature feature : ShapeFileReader.getAllFeatures(SRTM)) {
-			Id id = scenario.createId(String.valueOf(feature.getAttribute(1)));
+			Id<Node> id = Id.create(String.valueOf(feature.getAttribute(1)), Node.class);
 			double z = (Double) feature.getAttribute(4);
 			if (z != 0.0) srtmHeights.put(id, z);
 		}
@@ -138,7 +138,7 @@ public class AddZCoordinatesToNetwork {
 		maxy += 1.0;
 		log.info("\t xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 		
-		QuadTree<Id> quadTree = new QuadTree<Id>(minx, miny, maxx, maxy);
+		QuadTree<Id<Node>> quadTree = new QuadTree<Id<Node>>(minx, miny, maxx, maxy);
 		for (Node node : network.getNodes().values()) {
 			
 			// add all nodes with a height coordinate in the srtm map
@@ -167,7 +167,7 @@ public class AddZCoordinatesToNetwork {
 			}
 			
 			// no height value found, therefore interpolate it...
-			Id neighbourId = quadTree.get(node.getCoord().getX(), node.getCoord().getY());
+			Id<Node> neighbourId = quadTree.get(node.getCoord().getX(), node.getCoord().getY());
 			addZCoord(node, srtmHeights.get(neighbourId));
 			extrapolateCount++;
 		}
