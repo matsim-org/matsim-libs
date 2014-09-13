@@ -43,7 +43,6 @@ import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.misc.Time;
@@ -131,13 +130,13 @@ public class CommuterDemandWriter {
 								new RoutingContextImpl(
 										timeCostCalc,
 										timeCostCalc ) ) );
-		this.pp4s = new PersonPrepareForSim(router, (ScenarioImpl) scenario);
+		this.pp4s = new PersonPrepareForSim(router, scenario);
 
 		int pnr = 0;
 		for (CommuterDataElement commuterDataElement : demand) {
 			for (int i = 0; i < commuterDataElement.getCommuters() * scalefactor; i++) {
-				Id id = scenario.createId(pnr + "_" + commuterDataElement.getFromId() + "_"
-						+ commuterDataElement.getToId());
+				Id<Person> id = Id.create(pnr + "_" + commuterDataElement.getFromId() + "_"
+						+ commuterDataElement.getToId(), Person.class);
 				Person p = scenario.getPopulation().getFactory().createPerson(id);
 				Plan plan = generateCommuterPlan(scenario, commuterDataElement.getFromId(),
 						commuterDataElement.getToId());

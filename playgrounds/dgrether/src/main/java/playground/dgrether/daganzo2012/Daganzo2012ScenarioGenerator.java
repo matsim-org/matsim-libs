@@ -23,7 +23,9 @@ package playground.dgrether.daganzo2012;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
@@ -67,10 +69,6 @@ public class Daganzo2012ScenarioGenerator {
 	
 	private boolean isUseReplanning = false;
 
-	private Id getId(int i){
-		return this.scenario.createId(Integer.toString(i));
-	}
-	
 	public void createScenario() {
 		this.config = ConfigUtils.createConfig();
 		config.network().setInputFile(NETWORK_INPUTFILE);
@@ -97,8 +95,7 @@ public class Daganzo2012ScenarioGenerator {
 		PopulationFactory factory = population.getFactory();
 
 		for (int i = 1; i <=  agents; i++) {
-			PersonImpl p = (PersonImpl) factory.createPerson(scenario.createId(Integer
-					.toString(i)));
+			PersonImpl p = (PersonImpl) factory.createPerson(Id.create(i, Person.class));
 			if ((i +1) % 2 == 0){
 				homeEndTime += 1;
 			}
@@ -123,24 +120,24 @@ public class Daganzo2012ScenarioGenerator {
 	    double homeEndTime, Network network){
     Plan plan = factory.createPlan();
     homeEndTime+= 1;
-    ActivityImpl act1 = (ActivityImpl) factory.createActivityFromLinkId("h", getId(1));
+    ActivityImpl act1 = (ActivityImpl) factory.createActivityFromLinkId("h", Id.create(1, Link.class));
     act1.setEndTime(homeEndTime);
     plan.addActivity(act1);
     // leg to home
     LegImpl leg = (LegImpl) factory.createLeg(TransportMode.car);
-    LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(getId(1), getId(7));
+    LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(Id.create(1, Link.class), Id.create(7, Link.class));
     if (useAlternativeRoute) {
-      route.setLinkIds(getId(1), NetworkUtils.getLinkIds("2 3 5 6"), getId(7));
+      route.setLinkIds(Id.create(1, Link.class), NetworkUtils.getLinkIds("2 3 5 6"), Id.create(7, Link.class));
     }
     else {
-      route.setLinkIds(getId(1), NetworkUtils.getLinkIds("2 4 6"), getId(7));
+      route.setLinkIds(Id.create(1, Link.class), NetworkUtils.getLinkIds("2 4 6"), Id.create(7, Link.class));
     }
     leg.setRoute(route);
 
     plan.addLeg(leg);
 
-    ActivityImpl act2 = (ActivityImpl) factory.createActivityFromLinkId("h", getId(7));
-    act2.setLinkId(getId(7));
+    ActivityImpl act2 = (ActivityImpl) factory.createActivityFromLinkId("h", Id.create(7, Link.class));
+    act2.setLinkId(Id.create(7, Link.class));
     plan.addActivity(act2);
     return plan;
 	}

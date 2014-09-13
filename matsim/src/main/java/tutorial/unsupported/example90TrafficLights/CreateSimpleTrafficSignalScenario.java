@@ -43,6 +43,8 @@ import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.signalsystems.model.DefaultPlanbasedSignalSystemController;
+import org.matsim.signalsystems.model.SignalGroup;
+import org.matsim.signalsystems.model.SignalPlan;
 
 
 /**
@@ -123,15 +125,15 @@ public class CreateSimpleTrafficSignalScenario {
 			SignalSystemControllerData controller = control.getFactory().createSignalSystemControllerData(id);
 			control.addSignalSystemControllerData(controller);
 			controller.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
-			SignalPlanData plan = control.getFactory().createSignalPlanData(Id.create("1", SignalPlanData.class));
+			SignalPlanData plan = control.getFactory().createSignalPlanData(Id.create("1", SignalPlan.class));
 			controller.addSignalPlanData(plan);
 			plan.setCycleTime(cycle);
 			plan.setOffset(0);
-			SignalGroupSettingsData settings1 = control.getFactory().createSignalGroupSettingsData(Id.create("1", SignalGroupSettingsData.class));
+			SignalGroupSettingsData settings1 = control.getFactory().createSignalGroupSettingsData(Id.create("1", SignalGroup.class));
 			plan.addSignalGroupSettings(settings1);
 			settings1.setOnset(0);
 			settings1.setDropping(55);
-			SignalGroupSettingsData settings2 = control.getFactory().createSignalGroupSettingsData(Id.create("2", SignalGroupSettingsData.class));
+			SignalGroupSettingsData settings2 = control.getFactory().createSignalGroupSettingsData(Id.create("2", SignalGroup.class));
 			plan.addSignalGroupSettings(settings2);
 			settings2.setOnset(0);
 			settings2.setDropping(55);
@@ -144,15 +146,15 @@ public class CreateSimpleTrafficSignalScenario {
 			SignalSystemControllerData controller = control.getFactory().createSignalSystemControllerData(id);
 			control.addSignalSystemControllerData(controller);
 			controller.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
-			SignalPlanData plan = control.getFactory().createSignalPlanData(Id.create("1", SignalPlanData.class));
+			SignalPlanData plan = control.getFactory().createSignalPlanData(Id.create("1", SignalPlan.class));
 			controller.addSignalPlanData(plan);
 			plan.setCycleTime(cycle);
 			plan.setOffset(0);
-			SignalGroupSettingsData settings1 = control.getFactory().createSignalGroupSettingsData(Id.create("1", SignalGroupSettingsData.class));
+			SignalGroupSettingsData settings1 = control.getFactory().createSignalGroupSettingsData(Id.create("1", SignalGroup.class));
 			plan.addSignalGroupSettings(settings1);
 			settings1.setOnset(0);
 			settings1.setDropping(55);
-			SignalGroupSettingsData settings2 = control.getFactory().createSignalGroupSettingsData(Id.create("2", SignalGroupSettingsData.class));
+			SignalGroupSettingsData settings2 = control.getFactory().createSignalGroupSettingsData(Id.create("2", SignalGroup.class));
 			plan.addSignalGroupSettings(settings2);
 			settings2.setOnset(0);
 			settings2.setDropping(55);

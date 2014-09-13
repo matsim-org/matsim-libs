@@ -33,6 +33,9 @@ import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.signalsystems.model.DefaultPlanbasedSignalSystemController;
+import org.matsim.signalsystems.model.SignalGroup;
+import org.matsim.signalsystems.model.SignalPlan;
+import org.matsim.signalsystems.model.SignalSystem;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import playground.dgrether.DgPaths;
@@ -56,71 +59,71 @@ public class SingleCrossingScenario {
 	private final double startTimeSeconds = 0.0;
 	private final double endTimeSeconds = startTimeSeconds + runtimeSeconds;
 	private int personIdInt = 1;
-	private Id linkN2N3Id;
-	private Id linkN3CId;
-	private Id linkCS3Id;
-	private Id linkS3S2Id;
-	private Id linkS2S1Id;
-	private Id linkN1N2Id;
-	private Id linkS1S2Id;
-	private Id linkS2S3Id;
-	private Id linkS3CId;
-	private Id linkCN3Id;
-	private Id linkN3N2Id;
-	private Id linkN2N1Id;
-	private Id linkE1E2Id;
-	private Id linkE2E3Id;
-	private Id linkE3CId;
-	private Id linkCW3Id;
-	private Id linkW3W2Id;
-	private Id linkW2W1Id;
-	private Id linkW1W2Id;
-	private Id linkW2W3Id;
-	private Id linkW3CId;
-	private Id linkCE3Id;
-	private Id linkE3E2Id;
-	private Id linkE2E1Id;
-	private Id systemId;
-	private Id sS;
-	private Id sN;
-	private Id sW;
-	private Id sE;
+	private Id<Link> linkN2N3Id;
+	private Id<Link> linkN3CId;
+	private Id<Link> linkCS3Id;
+	private Id<Link> linkS3S2Id;
+	private Id<Link> linkS2S1Id;
+	private Id<Link> linkN1N2Id;
+	private Id<Link> linkS1S2Id;
+	private Id<Link> linkS2S3Id;
+	private Id<Link> linkS3CId;
+	private Id<Link> linkCN3Id;
+	private Id<Link> linkN3N2Id;
+	private Id<Link> linkN2N1Id;
+	private Id<Link> linkE1E2Id;
+	private Id<Link> linkE2E3Id;
+	private Id<Link> linkE3CId;
+	private Id<Link> linkCW3Id;
+	private Id<Link> linkW3W2Id;
+	private Id<Link> linkW2W1Id;
+	private Id<Link> linkW1W2Id;
+	private Id<Link> linkW2W3Id;
+	private Id<Link> linkW3CId;
+	private Id<Link> linkCE3Id;
+	private Id<Link> linkE3E2Id;
+	private Id<Link> linkE2E1Id;
+	private Id<SignalSystem> systemId;
+	private Id<SignalGroup> sS;
+	private Id<SignalGroup> sN;
+	private Id<SignalGroup> sW;
+	private Id<SignalGroup> sE;
 	
 	
 	private void createIds(Scenario scenario){
-		this.linkN1N2Id = scenario.createId("N1N2");
-		this.linkN2N3Id = scenario.createId("N2N3");
-		this.linkN3CId = scenario.createId("N3C");
-		this.linkCS3Id = scenario.createId("CS3");
-		this.linkS3S2Id = scenario.createId("S3S2");
-		this.linkS2S1Id = scenario.createId("S2S1");
+		this.linkN1N2Id = Id.create("N1N2", Link.class);
+		this.linkN2N3Id = Id.create("N2N3", Link.class);
+		this.linkN3CId = Id.create("N3C", Link.class);
+		this.linkCS3Id = Id.create("CS3", Link.class);
+		this.linkS3S2Id = Id.create("S3S2", Link.class);
+		this.linkS2S1Id = Id.create("S2S1", Link.class);
 
-		this.linkS1S2Id = scenario.createId("S1S2");
-		this.linkS2S3Id = scenario.createId("S2S3");
-		this.linkS3CId = scenario.createId("S3C");
-		this.linkCN3Id = scenario.createId("CN3");
-		this.linkN3N2Id = scenario.createId("N3N2");
-		this.linkN2N1Id = scenario.createId("N2N1");
+		this.linkS1S2Id = Id.create("S1S2", Link.class);
+		this.linkS2S3Id = Id.create("S2S3", Link.class);
+		this.linkS3CId = Id.create("S3C", Link.class);
+		this.linkCN3Id = Id.create("CN3", Link.class);
+		this.linkN3N2Id = Id.create("N3N2", Link.class);
+		this.linkN2N1Id = Id.create("N2N1", Link.class);
 		
-		this.linkE1E2Id = scenario.createId("E1E2");
-		this.linkE2E3Id = scenario.createId("E2E3");
-		this.linkE3CId = scenario.createId("E3C");
-		this.linkCW3Id = scenario.createId("CW3");
-		this.linkW3W2Id = scenario.createId("W3W2");
-		this.linkW2W1Id = scenario.createId("W2W1");
+		this.linkE1E2Id = Id.create("E1E2", Link.class);
+		this.linkE2E3Id = Id.create("E2E3", Link.class);
+		this.linkE3CId = Id.create("E3C", Link.class);
+		this.linkCW3Id = Id.create("CW3", Link.class);
+		this.linkW3W2Id = Id.create("W3W2", Link.class);
+		this.linkW2W1Id = Id.create("W2W1", Link.class);
 
-		this.linkW1W2Id = scenario.createId("W1W2");
-		this.linkW2W3Id = scenario.createId("W2W3");
-		this.linkW3CId = scenario.createId("W3C");
-		this.linkCE3Id = scenario.createId("CE3");
-		this.linkE3E2Id = scenario.createId("E3E2");
-		this.linkE2E1Id = scenario.createId("E2E1");
+		this.linkW1W2Id = Id.create("W1W2", Link.class);
+		this.linkW2W3Id = Id.create("W2W3", Link.class);
+		this.linkW3CId = Id.create("W3C", Link.class);
+		this.linkCE3Id = Id.create("CE3", Link.class);
+		this.linkE3E2Id = Id.create("E3E2", Link.class);
+		this.linkE2E1Id = Id.create("E2E1", Link.class);
 		
-		this.sE = scenario.createId("sE");
-		this.sW = scenario.createId("sW");
-		this.sN = scenario.createId("sN");
-		this.sS = scenario.createId("sS");
-		this.systemId = scenario.createId("C");
+		this.sE = Id.create("sE", SignalGroup.class);
+		this.sW = Id.create("sW", SignalGroup.class);
+		this.sN = Id.create("sN", SignalGroup.class);
+		this.sS = Id.create("sS", SignalGroup.class);
+		this.systemId = Id.create("C", SignalSystem.class);
 	}
 
 	
@@ -159,7 +162,7 @@ public class SingleCrossingScenario {
 		control.addSignalSystemControllerData(controller);
 		controller.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
 		
-		SignalPlanData plan = fac.createSignalPlanData(systemId);
+		SignalPlanData plan = fac.createSignalPlanData(Id.create(systemId, SignalPlan.class));
 		plan.setCycleTime((int) this.tCycleSec);
 		controller.addSignalPlanData(plan);
 
@@ -328,7 +331,7 @@ public class SingleCrossingScenario {
 	}
 	
 	private Person createAndAddPerson(Scenario scenario){
-		Person person = scenario.getPopulation().getFactory().createPerson(scenario.createId(Integer.toString(personIdInt)));
+		Person person = scenario.getPopulation().getFactory().createPerson(Id.create(personIdInt, Person.class));
 		personIdInt++;
 		scenario.getPopulation().addPerson(person);
 		return person;

@@ -27,7 +27,9 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
@@ -49,8 +51,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.LaneDefinitionsV11ToV20Conversion;
 import org.matsim.lanes.data.v11.LaneData11;
 import org.matsim.lanes.data.v11.LaneDefinitions11;
-import org.matsim.lanes.data.v11.LaneDefinitionsFactory11;
 import org.matsim.lanes.data.v11.LaneDefinitions11Impl;
+import org.matsim.lanes.data.v11.LaneDefinitionsFactory11;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
@@ -151,8 +153,6 @@ public class DaganzoScenarioGenerator {
 
 	private int numberOfLanes = 3;
 
-	private Id id1, id2, id4, id5, id6, id7;
-
 	private String networkInputFile;
 
 	private String lanesInputFile;
@@ -172,7 +172,6 @@ public class DaganzoScenarioGenerator {
 	}
 
 	private void init() {
-		this.createIds(this.scenario);
 		String baseString = "daganzo4_";
 		if (isAlternativeRouteEnabled) {
 			baseString += "alternativeRoute_";
@@ -221,15 +220,6 @@ public class DaganzoScenarioGenerator {
 
 	}
 
-	private void createIds(ScenarioImpl sc){
-		id1 = sc.createId("1");
-		id2 = sc.createId("2");
-		id4 = sc.createId("4");
-		id5 = sc.createId("5");
-		id6 = sc.createId("6");
-		id7 = sc.createId("7");
-	}
-
 	public void createScenario() {
 		//get the config
 		Config config = scenario.getConfig();
@@ -237,8 +227,6 @@ public class DaganzoScenarioGenerator {
 		config.network().setInputFile(NETWORKFILE);
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);
 		loader.loadNetwork();
-		//create some ids as members of the class for convenience reasons
-		createIds(scenario);
 		//create the plans and write them
 //		createPlans(scenario);
 //		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(plansOut);
@@ -287,8 +275,7 @@ public class DaganzoScenarioGenerator {
 		PopulationFactory factory = population.getFactory();
 
 		for (int i = 1; i <= this.agents; i++) {
-			PersonImpl p = (PersonImpl) factory.createPerson(scenario.createId(Integer
-					.toString(i)));
+			PersonImpl p = (PersonImpl) factory.createPerson(Id.create(i, Person.class));
 			// home
 			// homeEndTime = homeEndTime + ((i - 1) % 3);
 			homeEndTime+= 1;
@@ -332,24 +319,24 @@ public class DaganzoScenarioGenerator {
 //    if ((i - 1) % 3 == 0) {
 //      homeEndTime++;
 //    }
-    ActivityImpl act1 = (ActivityImpl) factory.createActivityFromLinkId("h", id1);
+    ActivityImpl act1 = (ActivityImpl) factory.createActivityFromLinkId("h", Id.create(1, Link.class));
     act1.setEndTime(homeEndTime);
     plan.addActivity(act1);
     // leg to home
     LegImpl leg = (LegImpl) factory.createLeg(TransportMode.car);
-    LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(id1, id7);
+    LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(Id.create(1, Link.class), Id.create(7, Link.class));
     if (useAlternativeRoute) {
-      route.setLinkIds(id1, NetworkUtils.getLinkIds("2 3 5 6"), id7);
+      route.setLinkIds(Id.create(1, Link.class), NetworkUtils.getLinkIds("2 3 5 6"), Id.create(7, Link.class));
     }
     else {
-      route.setLinkIds(id1, NetworkUtils.getLinkIds("2 4 6"), id7);
+      route.setLinkIds(Id.create(1, Link.class), NetworkUtils.getLinkIds("2 4 6"), Id.create(7, Link.class));
     }
     leg.setRoute(route);
 
     plan.addLeg(leg);
 
-    ActivityImpl act2 = (ActivityImpl) factory.createActivityFromLinkId("h", id7);
-    act2.setLinkId(id7);
+    ActivityImpl act2 = (ActivityImpl) factory.createActivityFromLinkId("h", Id.create(7, Link.class));
+    act2.setLinkId(Id.create(7, Link.class));
     plan.addActivity(act2);
     return plan;
 	}
@@ -453,18 +440,18 @@ public class DaganzoScenarioGenerator {
 		LaneDefinitions11 lanes = new LaneDefinitions11Impl();
 		LaneDefinitionsFactory11 factory = lanes.getFactory();
 		//lanes for link 4
-		LanesToLinkAssignment11 lanesForLink4 = factory.createLanesToLinkAssignment(id4);
-		LaneData11 link4lane1 = factory.createLane(id1);
-		link4lane1.addToLinkId(id6);
+		LanesToLinkAssignment11 lanesForLink4 = factory.createLanesToLinkAssignment(Id.create(4, Link.class));
+		LaneData11 link4lane1 = factory.createLane(Id.create(1, Object.class));
+		link4lane1.addToLinkId(Id.create(6, Link.class));
 		link4lane1.setNumberOfRepresentedLanes(numberOfLanes);
 		link4lane1.setStartsAtMeterFromLinkEnd(100.0);
 		lanesForLink4.addLane(link4lane1);
 		lanes.addLanesToLinkAssignment(lanesForLink4);
 		//lanes for link 5
-		LanesToLinkAssignment11 lanesForLink5 = factory.createLanesToLinkAssignment(id5);
-		LaneData11 link5lane1 = factory.createLane(id1);
+		LanesToLinkAssignment11 lanesForLink5 = factory.createLanesToLinkAssignment(Id.create(5, Link.class));
+		LaneData11 link5lane1 = factory.createLane(Id.create(1, Object.class));
 		link5lane1.setNumberOfRepresentedLanes(numberOfLanes);
-		link5lane1.addToLinkId(id6);
+		link5lane1.addToLinkId(Id.create(6, Link.class));
 		link5lane1.setStartsAtMeterFromLinkEnd(7.5);
 		lanesForLink5.addLane(link5lane1);
 		lanes.addLanesToLinkAssignment(lanesForLink5);

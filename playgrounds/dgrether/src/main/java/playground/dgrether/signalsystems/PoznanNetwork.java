@@ -19,8 +19,7 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems;
 
-import java.io.IOException;
-
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -45,8 +44,8 @@ import org.matsim.lanes.data.LaneDefinitionsV11ToV20Conversion;
 import org.matsim.lanes.data.MatsimLaneDefinitionsWriter;
 import org.matsim.lanes.data.v11.LaneData11;
 import org.matsim.lanes.data.v11.LaneDefinitions11;
-import org.matsim.lanes.data.v11.LaneDefinitionsFactory11;
 import org.matsim.lanes.data.v11.LaneDefinitions11Impl;
+import org.matsim.lanes.data.v11.LaneDefinitionsFactory11;
 import org.matsim.lanes.data.v11.LaneDefinitionsWriter11;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
@@ -67,6 +66,10 @@ import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsDataFactory;
 import org.matsim.signalsystems.model.DefaultPlanbasedSignalSystemController;
+import org.matsim.signalsystems.model.Signal;
+import org.matsim.signalsystems.model.SignalGroup;
+import org.matsim.signalsystems.model.SignalPlan;
+import org.matsim.signalsystems.model.SignalSystem;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import playground.dgrether.DgOTFVis;
@@ -74,7 +77,6 @@ import playground.dgrether.lanes.LanesConsistencyChecker;
 import playground.dgrether.signalsystems.data.consistency.SignalControlDataConsistencyChecker;
 import playground.dgrether.signalsystems.data.consistency.SignalGroupsDataConsistencyChecker;
 import playground.dgrether.signalsystems.data.consistency.SignalSystemsDataConsistencyChecker;
-import playground.dgrether.xvis.XVis;
 
 
 /**
@@ -280,135 +282,135 @@ public class PoznanNetwork
         SignalSystemsDataFactory sf = signals.getFactory();
 
         // signals at node 10
-        SignalSystemData sys10 = sf.createSignalSystemData(scenario.createId("ss10"));
+        SignalSystemData sys10 = sf.createSignalSystemData(Id.create("ss10", SignalSystem.class));
         signals.addSignalSystemData(sys10);
 
-        SignalData signal = sf.createSignalData(scenario.createId("s12_10_1"));
-        signal.setLinkId(scenario.createId("12_10"));
-        signal.addLaneId(scenario.createId("12_10_1"));
+        SignalData signal = sf.createSignalData(Id.create("s12_10_1", Signal.class));
+        signal.setLinkId(Id.create("12_10", Link.class));
+        signal.addLaneId(Id.create("12_10_1", Object.class));
         sys10.addSignalData(signal);
 
-        signal = sf.createSignalData(scenario.createId("s12_10_2"));
-        signal.setLinkId(scenario.createId("12_10"));
-        signal.addLaneId(scenario.createId("12_10_2"));
-        signal.addLaneId(scenario.createId("12_10_3"));
+        signal = sf.createSignalData(Id.create("s12_10_2", Signal.class));
+        signal.setLinkId(Id.create("12_10", Link.class));
+        signal.addLaneId(Id.create("12_10_2", Object.class));
+        signal.addLaneId(Id.create("12_10_3", Object.class));
         sys10.addSignalData(signal);
 
-        signal = sf.createSignalData(scenario.createId("s12_10_3"));
-        signal.setLinkId(scenario.createId("12_10"));
-        signal.addLaneId(scenario.createId("12_10_3"));
-        signal.addTurningMoveRestriction(scenario.createId("10_11"));
+        signal = sf.createSignalData(Id.create("s12_10_3", Signal.class));
+        signal.setLinkId(Id.create("12_10", Link.class));
+        signal.addLaneId(Id.create("12_10_3", Object.class));
+        signal.addTurningMoveRestriction(Id.create("10_11", Link.class));
         sys10.addSignalData(signal);
 
-        signal = sf.createSignalData(scenario.createId("s11_10_1"));
-        signal.setLinkId(scenario.createId("11_10"));
-        signal.addLaneId(scenario.createId("11_10_1"));
+        signal = sf.createSignalData(Id.create("s11_10_1", Signal.class));
+        signal.setLinkId(Id.create("11_10", Link.class));
+        signal.addLaneId(Id.create("11_10_1", Object.class));
         sys10.addSignalData(signal);
 
-        signal = sf.createSignalData(scenario.createId("s11_10_2"));
-        signal.setLinkId(scenario.createId("11_10"));
-        signal.addLaneId(scenario.createId("11_10_2"));
+        signal = sf.createSignalData(Id.create("s11_10_2", Signal.class));
+        signal.setLinkId(Id.create("11_10", Link.class));
+        signal.addLaneId(Id.create("11_10_2", Object.class));
         sys10.addSignalData(signal);
 
-        signal = sf.createSignalData(scenario.createId("s11_10_3"));
-        signal.setLinkId(scenario.createId("11_10"));
-        signal.addLaneId(scenario.createId("11_10_3"));
+        signal = sf.createSignalData(Id.create("s11_10_3", Signal.class));
+        signal.setLinkId(Id.create("11_10", Link.class));
+        signal.addLaneId(Id.create("11_10_3", Object.class));
         sys10.addSignalData(signal);
 
-        signal = sf.createSignalData(scenario.createId("s30_10_1"));
-        signal.setLinkId(scenario.createId("30_10"));
-        signal.addLaneId(scenario.createId("30_10_1"));
+        signal = sf.createSignalData(Id.create("s30_10_1", Signal.class));
+        signal.setLinkId(Id.create("30_10", Link.class));
+        signal.addLaneId(Id.create("30_10_1", Object.class));
         sys10.addSignalData(signal);
 
-        signal = sf.createSignalData(scenario.createId("s30_10_2"));
-        signal.setLinkId(scenario.createId("30_10"));
-        signal.addLaneId(scenario.createId("30_10_2"));
+        signal = sf.createSignalData(Id.create("s30_10_2", Signal.class));
+        signal.setLinkId(Id.create("30_10", Link.class));
+        signal.addLaneId(Id.create("30_10_2", Object.class));
         sys10.addSignalData(signal);
 
-        signal = sf.createSignalData(scenario.createId("s30_10_3"));
-        signal.setLinkId(scenario.createId("30_10"));
-        signal.addLaneId(scenario.createId("30_10_3"));
+        signal = sf.createSignalData(Id.create("s30_10_3", Signal.class));
+        signal.setLinkId(Id.create("30_10", Link.class));
+        signal.addLaneId(Id.create("30_10_3", Object.class));
         sys10.addSignalData(signal);
 
-//        signal = sf.createSignalData(scenario.createId("s30_10_1"));
-//        signal.setLinkId(scenario.createId("30_10"));
-//        signal.addLaneId(scenario.createId("30_10_1"));
+//        signal = sf.createSignalData(Id.create("s30_10_1"));
+//        signal.setLinkId(Id.create("30_10"));
+//        signal.addLaneId(Id.create("30_10_1"));
 //        sys10.addSignalData(signal);
 //
-//        signal = sf.createSignalData(scenario.createId("s30_10_2"));
-//        signal.setLinkId(scenario.createId("30_10"));
-//        signal.addLaneId(scenario.createId("30_10_2"));
+//        signal = sf.createSignalData(Id.create("s30_10_2"));
+//        signal.setLinkId(Id.create("30_10"));
+//        signal.addLaneId(Id.create("30_10_2"));
 //        sys10.addSignalData(signal);
 //
-//        signal = sf.createSignalData(scenario.createId("s30_10_3"));
-//        signal.setLinkId(scenario.createId("30_10"));
-//        signal.addLaneId(scenario.createId("30_10_3"));
+//        signal = sf.createSignalData(Id.create("s30_10_3"));
+//        signal.setLinkId(Id.create("30_10"));
+//        signal.addLaneId(Id.create("30_10_3"));
 //        sys10.addSignalData(signal);
 
-        signal = sf.createSignalData(scenario.createId("s13_10_1"));
-        signal.setLinkId(scenario.createId("13_10"));
-        signal.addLaneId(scenario.createId("13_10_1"));
+        signal = sf.createSignalData(Id.create("s13_10_1", Signal.class));
+        signal.setLinkId(Id.create("13_10", Link.class));
+        signal.addLaneId(Id.create("13_10_1", Object.class));
         sys10.addSignalData(signal);
 
-        signal = sf.createSignalData(scenario.createId("s13_10_2"));
-        signal.setLinkId(scenario.createId("13_10"));
-        signal.addLaneId(scenario.createId("13_10_2"));
+        signal = sf.createSignalData(Id.create("s13_10_2", Signal.class));
+        signal.setLinkId(Id.create("13_10", Link.class));
+        signal.addLaneId(Id.create("13_10_2", Object.class));
         sys10.addSignalData(signal);
 
-        signal = sf.createSignalData(scenario.createId("s13_10_3"));
-        signal.setLinkId(scenario.createId("13_10"));
-        signal.addLaneId(scenario.createId("13_10_3"));
+        signal = sf.createSignalData(Id.create("s13_10_3", Signal.class));
+        signal.setLinkId(Id.create("13_10", Link.class));
+        signal.addLaneId(Id.create("13_10_3", Object.class));
         sys10.addSignalData(signal);
 
         // create SignalGroups
         groups = signalsData.getSignalGroupsData();
         gf = groups.getFactory();
 
-        SignalGroupData group = gf.createSignalGroupData(sys10.getId(), scenario.createId("sg_0"));
-        group.addSignalId(scenario.createId("s30_10_3"));
+        SignalGroupData group = gf.createSignalGroupData(sys10.getId(), Id.create("sg_0", SignalGroup.class));
+        group.addSignalId(Id.create("s30_10_3", Signal.class));
         groups.addSignalGroupData(group);
 
-        group = gf.createSignalGroupData(sys10.getId(), scenario.createId("sg_1"));
-        group.addSignalId(scenario.createId("s30_10_1"));
-        group.addSignalId(scenario.createId("s30_10_2"));
+        group = gf.createSignalGroupData(sys10.getId(), Id.create("sg_1", SignalGroup.class));
+        group.addSignalId(Id.create("s30_10_1", Signal.class));
+        group.addSignalId(Id.create("s30_10_2", Signal.class));
         groups.addSignalGroupData(group);
 
-        group = gf.createSignalGroupData(sys10.getId(), scenario.createId("sg_2"));
-        group.addSignalId(scenario.createId("s11_10_3"));
+        group = gf.createSignalGroupData(sys10.getId(), Id.create("sg_2", SignalGroup.class));
+        group.addSignalId(Id.create("s11_10_3", Signal.class));
         groups.addSignalGroupData(group);
 
-        group = gf.createSignalGroupData(sys10.getId(), scenario.createId("sg_3"));
-        group.addSignalId(scenario.createId("s11_10_1"));
-        group.addSignalId(scenario.createId("s11_10_2"));
+        group = gf.createSignalGroupData(sys10.getId(), Id.create("sg_3", SignalGroup.class));
+        group.addSignalId(Id.create("s11_10_1", Signal.class));
+        group.addSignalId(Id.create("s11_10_2", Signal.class));
         groups.addSignalGroupData(group);
 
-        group = gf.createSignalGroupData(sys10.getId(), scenario.createId("sg_4_1"));
-        group.addSignalId(scenario.createId("s12_10_3"));
+        group = gf.createSignalGroupData(sys10.getId(), Id.create("sg_4_1", SignalGroup.class));
+        group.addSignalId(Id.create("s12_10_3", Signal.class));
         groups.addSignalGroupData(group);
 
-        group = gf.createSignalGroupData(sys10.getId(), scenario.createId("sg_4_2"));
-        group.addSignalId(scenario.createId("s12_10_3"));
+        group = gf.createSignalGroupData(sys10.getId(), Id.create("sg_4_2", SignalGroup.class));
+        group.addSignalId(Id.create("s12_10_3", Signal.class));
         groups.addSignalGroupData(group);
 
-        group = gf.createSignalGroupData(sys10.getId(), scenario.createId("sg_5"));
-        group.addSignalId(scenario.createId("s12_10_1"));
-        group.addSignalId(scenario.createId("s12_10_2"));
+        group = gf.createSignalGroupData(sys10.getId(), Id.create("sg_5", SignalGroup.class));
+        group.addSignalId(Id.create("s12_10_1", Signal.class));
+        group.addSignalId(Id.create("s12_10_2", Signal.class));
         groups.addSignalGroupData(group);
 
-        group = gf.createSignalGroupData(sys10.getId(), scenario.createId("sg_6_1"));
-        group.addSignalId(scenario.createId("s13_10_3"));
+        group = gf.createSignalGroupData(sys10.getId(), Id.create("sg_6_1", SignalGroup.class));
+        group.addSignalId(Id.create("s13_10_3", Signal.class));
         groups.addSignalGroupData(group);
 
-        group = gf.createSignalGroupData(sys10.getId(), scenario.createId("sg_6_2"));
-        group.addSignalId(scenario.createId("s13_10_3"));
+        group = gf.createSignalGroupData(sys10.getId(), Id.create("sg_6_2", SignalGroup.class));
+        group.addSignalId(Id.create("s13_10_3", Signal.class));
         groups.addSignalGroupData(group);
 
-        group = gf.createSignalGroupData(sys10.getId(), scenario.createId("sg_7"));
-        group.addSignalId(scenario.createId("s13_10_2"));
+        group = gf.createSignalGroupData(sys10.getId(), Id.create("sg_7", SignalGroup.class));
+        group.addSignalId(Id.create("s13_10_2", Signal.class));
         groups.addSignalGroupData(group);
 
-        group = gf.createSignalGroupData(sys10.getId(), scenario.createId("sg_8"));
-        group.addSignalId(scenario.createId("s13_10_1"));
+        group = gf.createSignalGroupData(sys10.getId(), Id.create("sg_8", SignalGroup.class));
+        group.addSignalId(Id.create("s13_10_1", Signal.class));
         groups.addSignalGroupData(group);
 
         // TODO signal system for next node
@@ -418,7 +420,7 @@ public class PoznanNetwork
 
     private static Node createAndAddNode(String id, double x, double y)
     {
-        Node node = netFactory.createNode(scenario.createId(id), scenario.createCoord(x, y));
+        Node node = netFactory.createNode(Id.create(id, Node.class), scenario.createCoord(x, y));
         network.addNode(node);
         return node;
     }
@@ -427,7 +429,7 @@ public class PoznanNetwork
     private static Link createAndAddLink(Node n1, Node n2, double lanes)
     {
         String id = n1.getId() + "_" + n2.getId();
-        Link link = netFactory.createLink(scenario.createId(id), n1, n2);
+        Link link = netFactory.createLink(Id.create(id, Link.class), n1, n2);
 
         double diffX = n1.getCoord().getX() - n2.getCoord().getX();
         double diffY = n1.getCoord().getY() - n2.getCoord().getY();
@@ -452,7 +454,7 @@ public class PoznanNetwork
     private static void createAndAddLanes(LanesToLinkAssignment11 l2l, int id, double length,
             double noLanes, Link... toLinks)
     {
-    	LaneData11 lane = laneFactory.createLane(scenario.createId(l2l.getLinkId() + "_" + id));
+    	LaneData11 lane = laneFactory.createLane(Id.create(l2l.getLinkId() + "_" + id, Object.class));
 
         for (Link toLink : toLinks) {
             lane.addToLinkId(toLink.getId());
@@ -470,78 +472,76 @@ public class PoznanNetwork
         SignalControlData control = sd.getSignalControlData();
         SignalControlDataFactory scf = control.getFactory();
 
-        SignalSystemControllerData ssController = scf.createSignalSystemControllerData(scenario
-                .createId("ss10"));
+        SignalSystemControllerData ssController = scf.createSignalSystemControllerData(Id.create("ss10", SignalSystem.class));
         control.addSignalSystemControllerData(ssController);
         // fixed-time control
         ssController.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
-        SignalPlanData plan = scf.createSignalPlanData(scenario.createId("ss10_p1"));
+        SignalPlanData plan = scf.createSignalPlanData(Id.create("ss10_p1", SignalPlan.class));
         ssController.addSignalPlanData(plan);
         plan.setCycleTime(120);
         plan.setOffset(0); // coordination offset
         // now the single signals (signal groups)
-        SignalGroupSettingsData settings = scf.createSignalGroupSettingsData(scenario
-                .createId("sg_0"));
+        SignalGroupSettingsData settings = scf.createSignalGroupSettingsData(Id.create("sg_0", SignalGroup.class));
         // green from second 0 to 30 in cycle
         settings.setOnset(0);
         settings.setDropping(5);
         plan.addSignalGroupSettings(settings);
 
-        settings = scf.createSignalGroupSettingsData(scenario.createId("sg_1"));
+        settings = scf.createSignalGroupSettingsData(Id.create("sg_1", SignalGroup.class));
         // green from second 0 to 30 in cycle
         settings.setOnset(10);
         settings.setDropping(15);
          plan.addSignalGroupSettings(settings);
 
-        settings = scf.createSignalGroupSettingsData(scenario.createId("sg_2"));
+        settings = scf.createSignalGroupSettingsData(Id.create("sg_2", SignalGroup.class));
         // green from second 0 to 30 in cycle
         settings.setOnset(20);
         settings.setDropping(25);
         plan.addSignalGroupSettings(settings);
 
-        settings = scf.createSignalGroupSettingsData(scenario.createId("sg_3"));
+        settings = scf.createSignalGroupSettingsData(Id.create("sg_3", SignalGroup.class));
         // green from second 0 to 30 in cycle
         settings.setOnset(30);
         settings.setDropping(35);
         plan.addSignalGroupSettings(settings);
 
-        settings = scf.createSignalGroupSettingsData(scenario.createId("sg_4_1"));
+        settings = scf.createSignalGroupSettingsData(Id.create("sg_4_1", SignalGroup.class));
         // green from second 0 to 30 in cycle
         settings.setOnset(40);
         settings.setDropping(45);
         plan.addSignalGroupSettings(settings);
 
-        settings = scf.createSignalGroupSettingsData(scenario.createId("sg_4_2"));
+        settings = scf.createSignalGroupSettingsData(Id.create("sg_4_2", SignalGroup.class));
         // green from second 0 to 30 in cycle
         settings.setOnset(50);
         settings.setDropping(55);
         plan.addSignalGroupSettings(settings);
 
-        settings = scf.createSignalGroupSettingsData(scenario.createId("sg_5"));
+        settings = scf.createSignalGroupSettingsData(Id.create("sg_5", SignalGroup.class));
         // green from second 0 to 30 in cycle
         settings.setOnset(60);
         settings.setDropping(65);
         plan.addSignalGroupSettings(settings);
 
-        settings = scf.createSignalGroupSettingsData(scenario.createId("sg_6_1"));
+        settings = scf.createSignalGroupSettingsData(Id.create("sg_6_1", SignalGroup.class));
         // green from second 0 to 30 in cycle
         settings.setOnset(70);
         settings.setDropping(75);
         plan.addSignalGroupSettings(settings);
 
-        settings = scf.createSignalGroupSettingsData(scenario.createId("sg_6_2"));
+        settings = scf.createSignalGroupSettingsData(Id.create("sg_6_2", SignalGroup.class));
         // green from second 0 to 30 in cycle
         settings.setOnset(80);
         settings.setDropping(85);
         plan.addSignalGroupSettings(settings);
 
-        settings = scf.createSignalGroupSettingsData(scenario.createId("sg_7"));
+        settings = scf.createSignalGroupSettingsData(Id.create("sg_7", SignalGroup.class));
         // green from second 0 to 30 in cycle
         settings.setOnset(90);
         settings.setDropping(95);
         plan.addSignalGroupSettings(settings);
 
-        settings = scf.createSignalGroupSettingsData(scenario.createId("sg_8"));
+        settings = scf.createSignalGroupSettingsData(Id.create("sg_8", SignalGroup.class));
         // green from second 30 to 55 in cycle
         settings.setOnset(100);
         settings.setDropping(105);
@@ -562,16 +562,16 @@ public class PoznanNetwork
         Population pop = scenario.getPopulation();
         PopulationFactory pf = pop.getFactory();
         for (int i = 1; i <= 1000; i++) {
-            Person person = pf.createPerson(scenario.createId(Integer.toString(i)));
+            Person person = pf.createPerson(Id.create(Integer.toString(i), Person.class));
             pop.addPerson(person);
             Plan plan = pf.createPlan();
-            Activity homeAct = pf.createActivityFromLinkId("home", scenario.createId("91_90"));
+            Activity homeAct = pf.createActivityFromLinkId("home", Id.create("91_90", Link.class));
             homeAct.setEndTime(120 + i * 5);
             plan.addActivity(homeAct);
             Leg leg = pf.createLeg(TransportMode.car);
             leg.setRoute(null);
             plan.addLeg(leg);
-            homeAct = pf.createActivityFromLinkId("home", scenario.createId("10_12"));
+            homeAct = pf.createActivityFromLinkId("home", Id.create("10_12", Link.class));
             plan.addActivity(homeAct);
             person.addPlan(plan);
         }

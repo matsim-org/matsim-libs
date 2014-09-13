@@ -24,16 +24,16 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
@@ -43,23 +43,19 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class DgSensorTest {
 
-	private Id id1, id2;
-	
 	/**
 	 * Creates a Network with one 600 m link fs 6 -> fs_tt 100 s and flow_cap = 1 veh/s
 	 * 1 ---------- 2
 	 */
 	private Scenario createScenario(){
-		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		this.id1 = sc.createId("1");
-		this.id2 = sc.createId("2");
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = sc.getNetwork();
 		NetworkFactory nf = sc.getNetwork().getFactory();
-		Node n = nf.createNode(id1, sc.createCoord(0, 0));
-		net.addNode(n);
-		n = nf.createNode(id2, sc.createCoord(500, 0));
-		net.addNode(n);
-		Link l = nf.createLink(id1, id1, id2);
+		Node n1 = nf.createNode(Id.create(1, Node.class), sc.createCoord(0, 0));
+		net.addNode(n1);
+		Node n2 = nf.createNode(Id.create(2, Node.class), sc.createCoord(500, 0));
+		net.addNode(n2);
+		Link l = nf.createLink(Id.create(1, Link.class), n1, n2);
 		net.addLink(l);
 		l.setLength(600.0);
 		l.setCapacity(3600);
@@ -71,12 +67,12 @@ public class DgSensorTest {
 	@Test
 	public void testSensorNumberOfCarsMonitoring(){
 		Scenario sc = this.createScenario();
-		Link link = sc.getNetwork().getLinks().get(id1);
+		Link link = sc.getNetwork().getLinks().get(Id.create(1, Link.class));
 		DgSensor sensor = new DgSensor(link);
 		int numberOfCars = sensor.getNumberOfCarsOnLink();
 		Assert.assertEquals(0, numberOfCars);
 		
-		LinkEnterEvent enterEvent = new LinkEnterEvent(0.0, id1, id1, null);
+		LinkEnterEvent enterEvent = new LinkEnterEvent(0.0, Id.create(1, Person.class), Id.create(1, Link.class), null);
 		sensor.handleEvent(enterEvent);
 		numberOfCars = sensor.getNumberOfCarsOnLink();
 		Assert.assertEquals(1, numberOfCars);
@@ -90,27 +86,27 @@ public class DgSensorTest {
 		}
 		Assert.assertNotNull(e);
 
-		LinkEnterEvent enterEvent2 = new LinkEnterEvent(10.0, id2, id1, null);
+		LinkEnterEvent enterEvent2 = new LinkEnterEvent(10.0, Id.create(2, Person.class), Id.create(1, Link.class), null);
 		sensor.handleEvent(enterEvent2);
 		numberOfCars = sensor.getNumberOfCarsOnLink();
 		Assert.assertEquals(2, numberOfCars);
 		
-		LinkLeaveEvent leaveEvent = new LinkLeaveEvent(100.0, id1, id1, null);
+		LinkLeaveEvent leaveEvent = new LinkLeaveEvent(100.0, Id.create(1, Person.class), Id.create(1, Link.class), null);
 		sensor.handleEvent(leaveEvent);
 		numberOfCars = sensor.getNumberOfCarsOnLink();
 		Assert.assertEquals(1, numberOfCars);
 		
-		PersonArrivalEvent arrivalEvent = new PersonArrivalEvent(110.0, id2, id1, "car");
+		PersonArrivalEvent arrivalEvent = new PersonArrivalEvent(110.0, Id.create(2, Person.class), Id.create(1, Link.class), "car");
 		sensor.handleEvent(arrivalEvent);
 		numberOfCars = sensor.getNumberOfCarsOnLink();
 		Assert.assertEquals(0, numberOfCars);
 		
-		Wait2LinkEvent wait2LinkEvent = new Wait2LinkEvent(120.0, id2, id1, null);
+		Wait2LinkEvent wait2LinkEvent = new Wait2LinkEvent(120.0, Id.create(2, Person.class), Id.create(1, Link.class), null);
 		sensor.handleEvent(wait2LinkEvent);
 		numberOfCars = sensor.getNumberOfCarsOnLink();
 		Assert.assertEquals(1, numberOfCars);
 
-		leaveEvent = new LinkLeaveEvent(120.0, id2, id1, null);
+		leaveEvent = new LinkLeaveEvent(120.0, Id.create(2, Person.class), Id.create(1, Link.class), null);
 		sensor.handleEvent(leaveEvent);
 		numberOfCars = sensor.getNumberOfCarsOnLink();
 		Assert.assertEquals(0, numberOfCars);
@@ -119,7 +115,7 @@ public class DgSensorTest {
 	@Test
 	public void testSensorDistanceMonitoring(){
 		Scenario sc = this.createScenario();
-		Link link = sc.getNetwork().getLinks().get(id1);
+		Link link = sc.getNetwork().getLinks().get(Id.create(1, Link.class));
 		DgSensor sensor = new DgSensor(link);
 		sensor.registerDistanceToMonitor(100.0);
 		int numberOfCars = sensor.getNumberOfCarsOnLink();
@@ -127,12 +123,12 @@ public class DgSensorTest {
 		int numberOfCarsInDistance = sensor.getNumberOfCarsInDistance(100.0, 0.0);
 		Assert.assertEquals(0, numberOfCarsInDistance);
 		
-		LinkEnterEvent enterEvent = new LinkEnterEvent(0.0, id1, id1, null);
+		LinkEnterEvent enterEvent = new LinkEnterEvent(0.0, Id.create(1, Person.class), Id.create(1, Link.class), null);
 		sensor.handleEvent(enterEvent);
 		numberOfCars = sensor.getNumberOfCarsOnLink();
 		Assert.assertEquals(1, numberOfCars);
 
-		enterEvent = new LinkEnterEvent(1.0, id2, id1, null);
+		enterEvent = new LinkEnterEvent(1.0, Id.create(2, Person.class), Id.create(1, Link.class), null);
 		sensor.handleEvent(enterEvent);
 		numberOfCars = sensor.getNumberOfCarsOnLink();
 		Assert.assertEquals(2, numberOfCars);
@@ -159,25 +155,25 @@ public class DgSensorTest {
 		numberOfCarsInDistance = sensor.getNumberOfCarsInDistance(100.0, 85.0);
 		Assert.assertEquals(2, numberOfCarsInDistance);
 		
-		LinkLeaveEvent leaveEvent = new LinkLeaveEvent(100.0, id1, id1, null);
+		LinkLeaveEvent leaveEvent = new LinkLeaveEvent(100.0, Id.create(1, Person.class), Id.create(1, Link.class), null);
 		sensor.handleEvent(leaveEvent);
 		
 		numberOfCarsInDistance = sensor.getNumberOfCarsInDistance(100.0, 100.0);
 		Assert.assertEquals(1, numberOfCarsInDistance);
 		
-		PersonArrivalEvent arrivalEvent = new PersonArrivalEvent(101.0, id2, id1, "car");
+		PersonArrivalEvent arrivalEvent = new PersonArrivalEvent(101.0, Id.create(2, Person.class), Id.create(1, Link.class), "car");
 		sensor.handleEvent(arrivalEvent);
 
 		numberOfCarsInDistance = sensor.getNumberOfCarsInDistance(100.0, 101.0);
 		Assert.assertEquals(0, numberOfCarsInDistance);
 		
-		Wait2LinkEvent wait2LinkEvent = new Wait2LinkEvent(120.0, id2, id1, null);
+		Wait2LinkEvent wait2LinkEvent = new Wait2LinkEvent(120.0, Id.create(2, Person.class), Id.create(1, Link.class), null);
 		sensor.handleEvent(wait2LinkEvent);
 
 		numberOfCarsInDistance = sensor.getNumberOfCarsInDistance(100.0, 120.0);
 		Assert.assertEquals(1, numberOfCarsInDistance);
 
-		leaveEvent = new LinkLeaveEvent(120.0, id2, id1, null);
+		leaveEvent = new LinkLeaveEvent(120.0, Id.create(2, Person.class), Id.create(1, Link.class), null);
 		sensor.handleEvent(leaveEvent);
 		
 		numberOfCarsInDistance = sensor.getNumberOfCarsInDistance(100.0, 120.0);

@@ -54,6 +54,7 @@ import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsDataFactory;
 import org.matsim.signalsystems.model.DefaultPlanbasedSignalSystemController;
 import org.matsim.signalsystems.model.Signal;
 import org.matsim.signalsystems.model.SignalGroup;
+import org.matsim.signalsystems.model.SignalPlan;
 import org.matsim.signalsystems.model.SignalSystem;
 
 
@@ -160,26 +161,26 @@ public class CreateTrafficSignalScenarioWithLanes {
 	
 	private void createSystem5Control(Scenario scenario, SignalControlData control) {
 		// signal system 5 control
-		SignalSystemControllerData controller = control.getFactory().createSignalSystemControllerData(Id.create("5", SignalSystemControllerData.class));
+		SignalSystemControllerData controller = control.getFactory().createSignalSystemControllerData(Id.create("5", SignalSystem.class));
 		control.addSignalSystemControllerData(controller);
 		controller.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
-		SignalPlanData plan = control.getFactory().createSignalPlanData(Id.create("1", SignalPlanData.class));
+		SignalPlanData plan = control.getFactory().createSignalPlanData(Id.create("1", SignalPlan.class));
 		controller.addSignalPlanData(plan);
 		plan.setCycleTime(this.cycle);
 		plan.setOffset(0);
-		SignalGroupSettingsData settings1 = control.getFactory().createSignalGroupSettingsData(Id.create("1", SignalGroupSettingsData.class));
+		SignalGroupSettingsData settings1 = control.getFactory().createSignalGroupSettingsData(Id.create("1", SignalGroup.class));
 		plan.addSignalGroupSettings(settings1);
 		settings1.setOnset(this.onset2);
 		settings1.setDropping(this.dropping2);
-		SignalGroupSettingsData settings2 = control.getFactory().createSignalGroupSettingsData(Id.create("2", SignalGroupSettingsData.class));
+		SignalGroupSettingsData settings2 = control.getFactory().createSignalGroupSettingsData(Id.create("2", SignalGroup.class));
 		plan.addSignalGroupSettings(settings2);
 		settings2.setOnset(this.onset2);
 		settings2.setDropping(this.dropping2);
-		SignalGroupSettingsData settings3 = control.getFactory().createSignalGroupSettingsData(Id.create("3", SignalGroupSettingsData.class));
+		SignalGroupSettingsData settings3 = control.getFactory().createSignalGroupSettingsData(Id.create("3", SignalGroup.class));
 		plan.addSignalGroupSettings(settings3);
 		settings3.setOnset(this.onset1);
 		settings3.setDropping(this.dropping1);
-		SignalGroupSettingsData settings4 = control.getFactory().createSignalGroupSettingsData(Id.create("4", SignalGroupSettingsData.class));
+		SignalGroupSettingsData settings4 = control.getFactory().createSignalGroupSettingsData(Id.create("4", SignalGroup.class));
 		plan.addSignalGroupSettings(settings4);
 		settings4.setOnset(this.onset1);
 		settings4.setDropping(this.dropping1);
@@ -187,26 +188,26 @@ public class CreateTrafficSignalScenarioWithLanes {
 
 	private void createSystem2Control(Scenario scenario, SignalControlData control) {
 		// signal system 2 control
-		SignalSystemControllerData controller = control.getFactory().createSignalSystemControllerData(Id.create("2", SignalSystemControllerData.class));
+		SignalSystemControllerData controller = control.getFactory().createSignalSystemControllerData(Id.create("2", SignalSystem.class));
 		control.addSignalSystemControllerData(controller);
 		controller.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
-		SignalPlanData plan = control.getFactory().createSignalPlanData(Id.create("1", SignalPlanData.class));
+		SignalPlanData plan = control.getFactory().createSignalPlanData(Id.create("1", SignalPlan.class));
 		controller.addSignalPlanData(plan);
 		plan.setCycleTime(this.cycle);
 		plan.setOffset(0);
-		SignalGroupSettingsData settings1 =  control.getFactory().createSignalGroupSettingsData(Id.create("1", SignalGroupSettingsData.class));
+		SignalGroupSettingsData settings1 =  control.getFactory().createSignalGroupSettingsData(Id.create("1", SignalGroup.class));
 		plan.addSignalGroupSettings(settings1);
 		settings1.setOnset(this.onset1);
 		settings1.setDropping(this.dropping1);
-		SignalGroupSettingsData settings2 = control.getFactory().createSignalGroupSettingsData(Id.create("2", SignalGroupSettingsData.class));
+		SignalGroupSettingsData settings2 = control.getFactory().createSignalGroupSettingsData(Id.create("2", SignalGroup.class));
 		plan.addSignalGroupSettings(settings2);
 		settings2.setOnset(this.onset1);
 		settings2.setDropping(this.dropping1);
-		SignalGroupSettingsData settings3 = control.getFactory().createSignalGroupSettingsData(Id.create("3", SignalGroupSettingsData.class));
+		SignalGroupSettingsData settings3 = control.getFactory().createSignalGroupSettingsData(Id.create("3", SignalGroup.class));
 		plan.addSignalGroupSettings(settings3);
 		settings3.setOnset(this.onset2);
 		settings3.setDropping(this.dropping2);
-		SignalGroupSettingsData settings4 = control.getFactory().createSignalGroupSettingsData(Id.create("4", SignalGroupSettingsData.class));
+		SignalGroupSettingsData settings4 = control.getFactory().createSignalGroupSettingsData(Id.create("4", SignalGroup.class));
 		plan.addSignalGroupSettings(settings4);
 		settings4.setOnset(this.onset2);
 		settings4.setDropping(this.dropping2);

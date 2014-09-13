@@ -25,6 +25,7 @@ import java.util.Random;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
@@ -35,7 +36,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
@@ -143,7 +143,7 @@ public class SimpleCottbusFanCreator implements CottbusFanCreator {
 										new RoutingContextImpl(
 												timeCostCalc,
 												timeCostCalc ) ) );
-		PersonPrepareForSim pp4s = new PersonPrepareForSim(router, (NetworkImpl) sc.getNetwork());
+		PersonPrepareForSim pp4s = new PersonPrepareForSim(router, sc.getNetwork());
 		
 //		Scenario sc2 = ScenarioUtils.createScenario(sc.getConfig());
 		Population fanPop = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
@@ -155,7 +155,7 @@ public class SimpleCottbusFanCreator implements CottbusFanCreator {
 		Coordinate stadiumCoordinate;
 		Coordinate homeCoordinate;
 		for (int i = 0; i < numberOfCbFans; i++){
-			p = pop.getFactory().createPerson(sc.createId(Integer.toString(fanId) + "_" + CottbusFootballStrings.CB2FB ));
+			p = pop.getFactory().createPerson(Id.create(Integer.toString(fanId) + "_" + CottbusFootballStrings.CB2FB, Person.class));
 			pop.addPerson(p);
 			fanPop.addPerson(p);
 			this.fanId++;
@@ -170,7 +170,7 @@ public class SimpleCottbusFanCreator implements CottbusFanCreator {
 //			sc2.getPopulation().addPerson(p);
 		}
 		for (int i = 0; i < numberOfSPNFans; i++){
-			p = pop.getFactory().createPerson(sc.createId(Integer.toString(fanId) + "_" + CottbusFootballStrings.SPN2FB));
+			p = pop.getFactory().createPerson(Id.create(Integer.toString(fanId) + "_" + CottbusFootballStrings.SPN2FB, Person.class));
 			pop.addPerson(p);
 			fanPop.addPerson(p);
 			this.fanId++;

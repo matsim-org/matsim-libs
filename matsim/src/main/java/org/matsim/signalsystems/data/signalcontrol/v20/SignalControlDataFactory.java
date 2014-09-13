@@ -21,6 +21,9 @@ package org.matsim.signalsystems.data.signalcontrol.v20;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimFactory;
+import org.matsim.signalsystems.model.SignalGroup;
+import org.matsim.signalsystems.model.SignalPlan;
+import org.matsim.signalsystems.model.SignalSystem;
 
 
 /**
@@ -29,9 +32,9 @@ import org.matsim.core.api.internal.MatsimFactory;
  */
 public interface SignalControlDataFactory extends MatsimFactory {
 
-	public SignalSystemControllerData createSignalSystemControllerData(Id signalSystemId);
+	public SignalSystemControllerData createSignalSystemControllerData(Id<SignalSystem> signalSystemId);
 	
-	public SignalPlanData createSignalPlanData(Id id);
+	public SignalPlanData createSignalPlanData(Id<SignalPlan> id);
 	
-	public SignalGroupSettingsData createSignalGroupSettingsData(Id signalGroupId);
+	public SignalGroupSettingsData createSignalGroupSettingsData(Id<SignalGroup> signalGroupId);
 }
