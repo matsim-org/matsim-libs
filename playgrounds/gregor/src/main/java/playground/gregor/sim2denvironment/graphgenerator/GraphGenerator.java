@@ -29,6 +29,7 @@ import java.util.Set;
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.IllegalAttributeException;
 import org.geotools.feature.SchemaException;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkFactory;
@@ -182,12 +183,12 @@ public class GraphGenerator {
 			Node fromNode = this.sc.getNetwork().getNodes().get(l.getFromNode().getId());
 			Node toNode = this.sc.getNetwork().getNodes().get(l.getToNode().getId());
 
-			Link ml1 = fac.createLink(this.sc.createId(Integer.toString(linkNums++)), fromNode, toNode);
+			Link ml1 = fac.createLink(Id.create(linkNums++, Link.class), fromNode, toNode);
 			ml1.setFreespeed(1.34);
 			ml1.setLength(l.getLength());
 			this.sc.getNetwork().addLink(ml1);
 
-			Link ml2 = fac.createLink(this.sc.createId(Integer.toString(linkNums++)), toNode, fromNode);
+			Link ml2 = fac.createLink(Id.create(linkNums++, Link.class), toNode, fromNode);
 			ml2.setFreespeed(1.34);
 			ml2.setLength(l.getLength());
 			this.sc.getNetwork().addLink(ml2);

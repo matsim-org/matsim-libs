@@ -297,7 +297,7 @@ public class PhysicalSim2DEnvironment implements MobsimBeforeCleanupListener{
 		Polygon p = geofac.createPolygon(lr, null);
 
 		Id hiResLinkId = hiResLink.getLink().getId();
-		Id boxId = this.sim2dsc.getMATSimScenario().createId(id.toString() + "_link" + hiResLinkId + "_dep_box_");
+		Id<Section> boxId = Id.create(id.toString() + "_link" + hiResLinkId + "_dep_box_", Section.class);
 		int [] openings = {3,1};
 		Id [] neighbors = {id};
 		int level = sec.getLevel();

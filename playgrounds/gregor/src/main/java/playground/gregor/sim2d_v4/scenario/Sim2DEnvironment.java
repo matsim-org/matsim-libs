@@ -49,7 +49,7 @@ public class Sim2DEnvironment implements Identifiable{
 		this.envelope = e;
 	}
 
-	public Section createSection(Id id, Polygon p, int[] openings,
+	public Section createSection(Id<Section> id, Polygon p, int[] openings,
 			Id[] neighbors, int level) {
 		//Hack: having openings in ascending order makes things much easier, so wie do it here [gl Jan' 13]
 		if (openings != null)
@@ -59,21 +59,21 @@ public class Sim2DEnvironment implements Identifiable{
 		return s;
 	}
 
-	private Section createSection(Id id2, Polygon p, int[] openings,
+	private Section createSection(Id<Section> id2, Polygon p, int[] openings,
 			Id[] neighbors, int level, Id[] neighborsIds) {
 		Section s = new Section(id2,p,openings,neighbors,neighborsIds,level);
 
 		return s;
 	}
 
-	public Section createAndAddSection(Id id, Polygon p, int[] openings,
+	public Section createAndAddSection(Id<Section> id, Polygon p, int[] openings,
 			Id[] neighbors, int level) {
 		Section s = createSection(id, p, openings, neighbors, level);
 		this.sections.put(id, s);
 		return s;
 	}
 
-	public Section createAndAddSection(Id id, Polygon p, int[] openings,
+	public Section createAndAddSection(Id<Section> id, Polygon p, int[] openings,
 			Id[] neighbors, int level, Id[] neighborsIds) {
 		Section s = createSection(id, p, openings, neighbors, level, neighborsIds);
 		this.sections.put(id, s);

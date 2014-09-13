@@ -32,9 +32,9 @@ import playground.gregor.sim2d_v4.cgal.LineSegment;
 
 import com.vividsolutions.jts.geom.Polygon;
 
-public class Section implements Identifiable {
+public class Section implements Identifiable<Section> {
 
-	private final Id id;
+	private final Id<Section> id;
 	private final Polygon p;
 	private int[] openingsIDs = null;
 	private Id[] neighborsIDs = null;
@@ -49,11 +49,11 @@ public class Section implements Identifiable {
 	private final Map<Id,LineSegment> openingsMappings = new HashMap<Id,LineSegment>(); 
 	private Id[] openingMATSimIds;
 
-	/*package*/ Section(Id id, Polygon p, int[] openings, Id[] neighbors, int level) {
+	/*package*/ Section(Id<Section> id, Polygon p, int[] openings, Id[] neighbors, int level) {
 		this(id,p,openings,neighbors,null,level);
 	}
 	
-	/*package*/ Section(Id id, Polygon p, int[] openings, Id[] neighbors, Id[] openingsMATSimIds, int level) {
+	/*package*/ Section(Id<Section> id, Polygon p, int[] openings, Id[] neighbors, Id[] openingsMATSimIds, int level) {
 		this.id = id;
 		this.p = p; //maybe we can sparse the polygon here and take the coordinate array of its exterior ring instead [gl Jan' 2013]
 		this.openingsIDs = openings;

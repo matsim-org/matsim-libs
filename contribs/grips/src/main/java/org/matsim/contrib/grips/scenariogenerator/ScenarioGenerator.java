@@ -82,7 +82,7 @@ public class ScenarioGenerator {
 	protected static final boolean DEBUG = false;
 	protected final String configFile;
 	protected String matsimConfigFile;
-	protected Id safeLinkId;
+	protected Id<Link> safeLinkId;
 	protected final EventsManager em;
 	protected Config matsimConfig;
 	protected Scenario matsimScenario;

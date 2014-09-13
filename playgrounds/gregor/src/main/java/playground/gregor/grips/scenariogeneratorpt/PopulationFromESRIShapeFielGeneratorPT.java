@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.grips.scenariogenerator.PopulationFromESRIShapeFileGenerator;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -84,7 +83,7 @@ public class PopulationFromESRIShapeFielGeneratorPT extends
 	}
 
 	private void createCAR(PopulationFactory pb, Population pop, SimpleFeature ft) {
-		Person pers = pb.createPerson(this.scenario.createId(Integer.toString(this.id++)));
+		Person pers = pb.createPerson(Id.create(this.id++, Person.class));
 		pop.addPerson(pers);
 		Plan plan = pb.createPlan();
 		Coord c = getRandomCoordInsideFeature(this.rnd, ft);
@@ -108,8 +107,8 @@ public class PopulationFromESRIShapeFielGeneratorPT extends
 //		Leg leg2 = pb.createLeg("pt");
 //		plan.addLeg(leg2);
 		
-		Link lll = net.getLinks().get(new IdImpl("el1"));
-		Activity act3 = pb.createActivityFromLinkId("post-evac", new IdImpl("el1"));
+		Link lll = net.getLinks().get(Id.create("el1", Link.class));
+		Activity act3 = pb.createActivityFromLinkId("post-evac", lll.getId());
 		((ActivityImpl)act3).setCoord(lll.getCoord());
 		act3.setEndTime(0);
 		plan.addActivity(act3);
@@ -119,7 +118,7 @@ public class PopulationFromESRIShapeFielGeneratorPT extends
 	}
 
 	private void createPT(PopulationFactory pb, Population pop, SimpleFeature ft) {
-		Person pers = pb.createPerson(this.scenario.createId(Integer.toString(this.id++)));
+		Person pers = pb.createPerson(Id.create(Integer.toString(this.id++), Person.class));
 		pop.addPerson(pers);
 		Plan plan = pb.createPlan();
 		Coord c = getRandomCoordInsideFeature(this.rnd, ft);

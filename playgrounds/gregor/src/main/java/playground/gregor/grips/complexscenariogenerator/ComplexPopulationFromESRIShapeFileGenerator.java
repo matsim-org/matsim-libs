@@ -32,6 +32,7 @@ import java.util.Random;
 
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
@@ -127,7 +128,7 @@ public class ComplexPopulationFromESRIShapeFileGenerator {
 		genDepTimeLookup(min, max, mu, sigma);
 		
 		for (; number > 0; number--) {
-			Person pers = pb.createPerson(this.scenario.createId(Integer.toString(this.id++)));
+			Person pers = pb.createPerson(Id.create(this.id++, Person.class));
 			pop.addPerson(pers);
 			Plan plan = pb.createPlan();
 			Coord c = getRandomCoordInsideFeature(this.rnd, e.getValue().o);

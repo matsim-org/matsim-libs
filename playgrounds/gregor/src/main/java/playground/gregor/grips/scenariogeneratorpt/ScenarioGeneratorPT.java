@@ -105,7 +105,7 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 		this.c.global().setCoordinateSystem("EPSG:3395");
 		this.c.controler().setOutputDirectory(getGripsConfig(this.c).getOutputDir()+"/output");
 		this.sc = ScenarioUtils.createScenario(this.c);
-		this.safeLinkId = this.sc.createId("el1");
+		this.safeLinkId = Id.create("el1", Link.class);
 
 		log.info("generating network file");
 		e = new InfoEvent(System.currentTimeMillis(), "generating network file");

@@ -129,21 +129,21 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
 
-		Node n0 = fac.createNode(sc.createId("0"), sc.createCoord(-10, 0));
-		Node n1 = fac.createNode(sc.createId("1"), sc.createCoord(0, 0));
-		Node n2 = fac.createNode(sc.createId("2"), sc.createCoord(10, 0));
-		Node n3 = fac.createNode(sc.createId("3"), sc.createCoord(20, 0));
+		Node n0 = fac.createNode(Id.create("0", Node.class), sc.createCoord(-10, 0));
+		Node n1 = fac.createNode(Id.create("1", Node.class), sc.createCoord(0, 0));
+		Node n2 = fac.createNode(Id.create("2", Node.class), sc.createCoord(10, 0));
+		Node n3 = fac.createNode(Id.create("3", Node.class), sc.createCoord(20, 0));
 		net.addNode(n0);
 		net.addNode(n1);
 		net.addNode(n2);
 		net.addNode(n3);
 
-		Link l0 = fac.createLink(sc.createId("0"), n0, n1);
-		Link l1 = fac.createLink(sc.createId("1"), n1, n0);
-		Link l2 = fac.createLink(sc.createId("2"), n1, n2);
-		Link l3 = fac.createLink(sc.createId("3"), n2, n1);
-		Link l4 = fac.createLink(sc.createId("4"), n2, n3);
-		Link l5 = fac.createLink(sc.createId("5"), n3, n2);
+		Link l0 = fac.createLink(Id.create("0", Link.class), n0, n1);
+		Link l1 = fac.createLink(Id.create("1", Link.class), n1, n0);
+		Link l2 = fac.createLink(Id.create("2", Link.class), n1, n2);
+		Link l3 = fac.createLink(Id.create("3", Link.class), n2, n1);
+		Link l4 = fac.createLink(Id.create("4", Link.class), n2, n3);
+		Link l5 = fac.createLink(Id.create("5", Link.class), n3, n2);
 
 		net.addLink(l0);
 		net.addLink(l1);
@@ -171,7 +171,7 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 
 			CALink caLink = caNet.getCALink(links.get(0).getId());
 			CAAgent[] particles = caLink.getParticles();
-			a0 = new CASimpleDynamicAgent(links, 1, sc.createId("0"), caLink);
+			a0 = new CASimpleDynamicAgent(links, 1, Id.create("0", CAAgent.class), caLink);
 			CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a0);
 			em.processEvent(ee);
 			a0.materialize(0, 1);
@@ -184,7 +184,7 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 
 			CALink caLink = caNet.getCALink(links.get(0).getId());
 			CAAgent[] particles = caLink.getParticles();
-			a1 = new CASimpleDynamicAgent(links, 1, sc.createId("1"), caLink);
+			a1 = new CASimpleDynamicAgent(links, 1, Id.create("1", CAAgent.class), caLink);
 			CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a1);
 			em.processEvent(ee);
 			a1.materialize(1, 1);
@@ -207,21 +207,21 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
 
-		Node n0 = fac.createNode(sc.createId("0"), sc.createCoord(-10, 0));
-		Node n1 = fac.createNode(sc.createId("1"), sc.createCoord(0, 0));
-		Node n2 = fac.createNode(sc.createId("2"), sc.createCoord(10, 0));
-		Node n3 = fac.createNode(sc.createId("3"), sc.createCoord(20, 0));
+		Node n0 = fac.createNode(Id.create("0", Node.class), sc.createCoord(-10, 0));
+		Node n1 = fac.createNode(Id.create("1", Node.class), sc.createCoord(0, 0));
+		Node n2 = fac.createNode(Id.create("2", Node.class), sc.createCoord(10, 0));
+		Node n3 = fac.createNode(Id.create("3", Node.class), sc.createCoord(20, 0));
 		net.addNode(n0);
 		net.addNode(n1);
 		net.addNode(n2);
 		net.addNode(n3);
 
-		Link l0 = fac.createLink(sc.createId("0"), n0, n1);
-		Link l1 = fac.createLink(sc.createId("1"), n1, n0);
-		Link l2 = fac.createLink(sc.createId("2"), n1, n2);
-		Link l3 = fac.createLink(sc.createId("3"), n2, n1);
-		Link l4 = fac.createLink(sc.createId("4"), n2, n3);
-		Link l5 = fac.createLink(sc.createId("5"), n3, n2);
+		Link l0 = fac.createLink(Id.create("0", Link.class), n0, n1);
+		Link l1 = fac.createLink(Id.create("1", Link.class), n1, n0);
+		Link l2 = fac.createLink(Id.create("2", Link.class), n1, n2);
+		Link l3 = fac.createLink(Id.create("3", Link.class), n2, n1);
+		Link l4 = fac.createLink(Id.create("4", Link.class), n2, n3);
+		Link l5 = fac.createLink(Id.create("5", Link.class), n3, n2);
 
 		net.addLink(l0);
 		net.addLink(l1);
@@ -249,7 +249,7 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 
 			CALink caLink = caNet.getCALink(links.get(0).getId());
 			CAAgent[] particles = caLink.getParticles();
-			a0 = new CASimpleDynamicAgent(links, 1, sc.createId("0"), caLink);
+			a0 = new CASimpleDynamicAgent(links, 1, Id.create("0", CAAgent.class), caLink);
 			CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a0);
 			em.processEvent(ee);
 			a0.materialize(particles.length-1, -1);
@@ -264,7 +264,7 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 
 			CALink caLink = caNet.getCALink(links.get(0).getId());
 			CAAgent[] particles = caLink.getParticles();
-			a1 = new CASimpleDynamicAgent(links, 1, sc.createId("1"), caLink);
+			a1 = new CASimpleDynamicAgent(links, 1, Id.create("1", CAAgent.class), caLink);
 			CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a1);
 			em.processEvent(ee);
 			a1.materialize(0, 1);
@@ -302,21 +302,21 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
 
-		Node n0 = fac.createNode(sc.createId("0"), sc.createCoord(-10, 0));
-		Node n1 = fac.createNode(sc.createId("1"), sc.createCoord(0, 0));
-		Node n2 = fac.createNode(sc.createId("2"), sc.createCoord(10, 0));
-		Node n3 = fac.createNode(sc.createId("3"), sc.createCoord(20, 0));
+		Node n0 = fac.createNode(Id.create("0", Node.class), sc.createCoord(-10, 0));
+		Node n1 = fac.createNode(Id.create("1", Node.class), sc.createCoord(0, 0));
+		Node n2 = fac.createNode(Id.create("2", Node.class), sc.createCoord(10, 0));
+		Node n3 = fac.createNode(Id.create("3", Node.class), sc.createCoord(20, 0));
 		net.addNode(n0);
 		net.addNode(n1);
 		net.addNode(n2);
 		net.addNode(n3);
 
-		Link l0 = fac.createLink(sc.createId("0"), n0, n1);
-		Link l1 = fac.createLink(sc.createId("1"), n1, n0);
-		Link l2 = fac.createLink(sc.createId("2"), n1, n2);
-		Link l3 = fac.createLink(sc.createId("3"), n2, n1);
-		Link l4 = fac.createLink(sc.createId("4"), n2, n3);
-		Link l5 = fac.createLink(sc.createId("5"), n3, n2);
+		Link l0 = fac.createLink(Id.create("0", Link.class), n0, n1);
+		Link l1 = fac.createLink(Id.create("1", Link.class), n1, n0);
+		Link l2 = fac.createLink(Id.create("2", Link.class), n1, n2);
+		Link l3 = fac.createLink(Id.create("3", Link.class), n2, n1);
+		Link l4 = fac.createLink(Id.create("4", Link.class), n2, n3);
+		Link l5 = fac.createLink(Id.create("5", Link.class), n3, n2);
 
 		net.addLink(l0);
 		net.addLink(l1);
@@ -344,7 +344,7 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 
 			CALink caLink = caNet.getCALink(links.get(0).getId());
 			CAAgent[] particles = caLink.getParticles();
-			a0 = new CASimpleDynamicAgent(links, 1, sc.createId("0"), caLink);
+			a0 = new CASimpleDynamicAgent(links, 1, Id.create("0", CAAgent.class), caLink);
 			CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a0);
 			em.processEvent(ee);
 			a0.materialize(particles.length-1, -1);
@@ -359,7 +359,7 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 
 			CALink caLink = caNet.getCALink(links.get(0).getId());
 			CAAgent[] particles = caLink.getParticles();
-			a1 = new CASimpleDynamicAgent(links, 1, sc.createId("0"), caLink);
+			a1 = new CASimpleDynamicAgent(links, 1, Id.create("0", CAAgent.class), caLink);
 			CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a1);
 			em.processEvent(ee);
 			a1.materialize(particles.length-2, -1);
@@ -374,7 +374,7 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 
 			CALink caLink = caNet.getCALink(links.get(0).getId());
 			CAAgent[] particles = caLink.getParticles();
-			a2 = new CASimpleDynamicAgent(links, 1, sc.createId("1"), caLink);
+			a2 = new CASimpleDynamicAgent(links, 1, Id.create("1", CAAgent.class), caLink);
 			CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a2);
 			em.processEvent(ee);
 			a2.materialize(0, 1);
@@ -389,7 +389,7 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 
 			CALink caLink = caNet.getCALink(links.get(0).getId());
 			CAAgent[] particles = caLink.getParticles();
-			a3 = new CASimpleDynamicAgent(links, 1, sc.createId("1"), caLink);
+			a3 = new CASimpleDynamicAgent(links, 1, Id.create("1", CAAgent.class), caLink);
 			CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a3);
 			em.processEvent(ee);
 			a3.materialize(1, 1);
@@ -411,21 +411,21 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
 
-		Node n0 = fac.createNode(sc.createId("0"), sc.createCoord(-10, 0));
-		Node n1 = fac.createNode(sc.createId("1"), sc.createCoord(0, 0));
-		Node n2 = fac.createNode(sc.createId("2"), sc.createCoord(10, 0));
-		Node n3 = fac.createNode(sc.createId("3"), sc.createCoord(20, 0));
+		Node n0 = fac.createNode(Id.create("0", Node.class), sc.createCoord(-10, 0));
+		Node n1 = fac.createNode(Id.create("1", Node.class), sc.createCoord(0, 0));
+		Node n2 = fac.createNode(Id.create("2", Node.class), sc.createCoord(10, 0));
+		Node n3 = fac.createNode(Id.create("3", Node.class), sc.createCoord(20, 0));
 		net.addNode(n0);
 		net.addNode(n1);
 		net.addNode(n2);
 		net.addNode(n3);
 
-		Link l0 = fac.createLink(sc.createId("0"), n0, n1);
-		Link l1 = fac.createLink(sc.createId("1"), n1, n0);
-		Link l2 = fac.createLink(sc.createId("2"), n1, n2);
-		Link l3 = fac.createLink(sc.createId("3"), n2, n1);
-		Link l4 = fac.createLink(sc.createId("4"), n2, n3);
-		Link l5 = fac.createLink(sc.createId("5"), n3, n2);
+		Link l0 = fac.createLink(Id.create("0", Link.class), n0, n1);
+		Link l1 = fac.createLink(Id.create("1", Link.class), n1, n0);
+		Link l2 = fac.createLink(Id.create("2", Link.class), n1, n2);
+		Link l3 = fac.createLink(Id.create("3", Link.class), n2, n1);
+		Link l4 = fac.createLink(Id.create("4", Link.class), n2, n3);
+		Link l5 = fac.createLink(Id.create("5", Link.class), n3, n2);
 
 		net.addLink(l0);
 		net.addLink(l1);
@@ -453,7 +453,7 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 
 			CALink caLink = caNet.getCALink(links.get(0).getId());
 			CAAgent[] particles = caLink.getParticles();
-			a0 = new CASimpleDynamicAgent(links, 1, sc.createId("0"), caLink);
+			a0 = new CASimpleDynamicAgent(links, 1, Id.create("0", CAAgent.class), caLink);
 			CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a0);
 			em.processEvent(ee);
 			a0.materialize(particles.length-1, -1);
@@ -468,7 +468,7 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 
 			CALink caLink = caNet.getCALink(links.get(0).getId());
 			CAAgent[] particles = caLink.getParticles();
-			a1 = new CASimpleDynamicAgent(links, 1, sc.createId("0"), caLink);
+			a1 = new CASimpleDynamicAgent(links, 1, Id.create("0", CAAgent.class), caLink);
 			CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a1);
 			em.processEvent(ee);
 			a1.materialize(particles.length-2, -1);
@@ -483,7 +483,7 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 
 			CALink caLink = caNet.getCALink(links.get(0).getId());
 			CAAgent[] particles = caLink.getParticles();
-			a2 = new CASimpleDynamicAgent(links, 1, sc.createId("1"), caLink);
+			a2 = new CASimpleDynamicAgent(links, 1, Id.create("1", CAAgent.class), caLink);
 			CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a2);
 			em.processEvent(ee);
 			a2.materialize(0, 1);
@@ -498,7 +498,7 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 
 			CALink caLink = caNet.getCALink(links.get(0).getId());
 			CAAgent[] particles = caLink.getParticles();
-			a3 = new CASimpleDynamicAgent(links, 1, sc.createId("1"), caLink);
+			a3 = new CASimpleDynamicAgent(links, 1, Id.create("1", CAAgent.class), caLink);
 			CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a3);
 			em.processEvent(ee);
 			a3.materialize(1, 1);
@@ -520,21 +520,21 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
 
-		Node n0 = fac.createNode(sc.createId("0"), sc.createCoord(-10, 0));
-		Node n1 = fac.createNode(sc.createId("1"), sc.createCoord(0, 0));
-		Node n2 = fac.createNode(sc.createId("2"), sc.createCoord(10, 0));
-		Node n3 = fac.createNode(sc.createId("3"), sc.createCoord(20, 0));
+		Node n0 = fac.createNode(Id.create("0", Node.class), sc.createCoord(-10, 0));
+		Node n1 = fac.createNode(Id.create("1", Node.class), sc.createCoord(0, 0));
+		Node n2 = fac.createNode(Id.create("2", Node.class), sc.createCoord(10, 0));
+		Node n3 = fac.createNode(Id.create("3", Node.class), sc.createCoord(20, 0));
 		net.addNode(n0);
 		net.addNode(n1);
 		net.addNode(n2);
 		net.addNode(n3);
 
-		Link l0 = fac.createLink(sc.createId("0"), n0, n1);
-		Link l1 = fac.createLink(sc.createId("1"), n1, n0);
-		Link l2 = fac.createLink(sc.createId("2"), n1, n2);
-		Link l3 = fac.createLink(sc.createId("3"), n2, n1);
-		Link l4 = fac.createLink(sc.createId("4"), n2, n3);
-		Link l5 = fac.createLink(sc.createId("5"), n3, n2);
+		Link l0 = fac.createLink(Id.create("0", Link.class), n0, n1);
+		Link l1 = fac.createLink(Id.create("1", Link.class), n1, n0);
+		Link l2 = fac.createLink(Id.create("2", Link.class), n1, n2);
+		Link l3 = fac.createLink(Id.create("3", Link.class), n2, n1);
+		Link l4 = fac.createLink(Id.create("4", Link.class), n2, n3);
+		Link l5 = fac.createLink(Id.create("5", Link.class), n3, n2);
 
 		net.addLink(l0);
 		net.addLink(l1);
@@ -562,7 +562,7 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 
 			CALink caLink = caNet.getCALink(links.get(0).getId());
 			CAAgent[] particles = caLink.getParticles();
-			a0 = new CASimpleDynamicAgent(links, 1, sc.createId("0"), caLink);
+			a0 = new CASimpleDynamicAgent(links, 1, Id.create("0", CAAgent.class), caLink);
 			CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a0);
 			em.processEvent(ee);
 			a0.materialize(particles.length-1, -1);
@@ -577,7 +577,7 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 
 			CALink caLink = caNet.getCALink(links.get(0).getId());
 			CAAgent[] particles = caLink.getParticles();
-			a1 = new CASimpleDynamicAgent(links, 1, sc.createId("1"), caLink);
+			a1 = new CASimpleDynamicAgent(links, 1, Id.create("1", CAAgent.class), caLink);
 			CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a1);
 			em.processEvent(ee);
 			a1.materialize(0, 1);
@@ -599,21 +599,21 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
 
-		Node n0 = fac.createNode(sc.createId("0"), sc.createCoord(-10, 0));
-		Node n1 = fac.createNode(sc.createId("1"), sc.createCoord(0, 0));
-		Node n2 = fac.createNode(sc.createId("2"), sc.createCoord(10, 0));
-		Node n3 = fac.createNode(sc.createId("3"), sc.createCoord(20, 0));
+		Node n0 = fac.createNode(Id.create("0", Node.class), sc.createCoord(-10, 0));
+		Node n1 = fac.createNode(Id.create("1", Node.class), sc.createCoord(0, 0));
+		Node n2 = fac.createNode(Id.create("2", Node.class), sc.createCoord(10, 0));
+		Node n3 = fac.createNode(Id.create("3", Node.class), sc.createCoord(20, 0));
 		net.addNode(n0);
 		net.addNode(n1);
 		net.addNode(n2);
 		net.addNode(n3);
 
-		Link l0 = fac.createLink(sc.createId("0"), n0, n1);
-		Link l1 = fac.createLink(sc.createId("1"), n1, n0);
-		Link l2 = fac.createLink(sc.createId("2"), n1, n2);
-		Link l3 = fac.createLink(sc.createId("3"), n2, n1);
-		Link l4 = fac.createLink(sc.createId("4"), n2, n3);
-		Link l5 = fac.createLink(sc.createId("5"), n3, n2);
+		Link l0 = fac.createLink(Id.create("0", Link.class), n0, n1);
+		Link l1 = fac.createLink(Id.create("1", Link.class), n1, n0);
+		Link l2 = fac.createLink(Id.create("2", Link.class), n1, n2);
+		Link l3 = fac.createLink(Id.create("3", Link.class), n2, n1);
+		Link l4 = fac.createLink(Id.create("4", Link.class), n2, n3);
+		Link l5 = fac.createLink(Id.create("5", Link.class), n3, n2);
 
 		net.addLink(l0);
 		net.addLink(l1);
@@ -639,7 +639,7 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 
 		CALink caLink = caNet.getCALink(links.get(0).getId());
 		CAAgent[] particles = caLink.getParticles();
-		CAAgent a = new CASimpleDynamicAgent(links, 1, sc.createId("0"), caLink);
+		CAAgent a = new CASimpleDynamicAgent(links, 1, Id.create("0", CAAgent.class), caLink);
 		CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a);
 		em.processEvent(ee);
 		a.materialize(particles.length-1, -1);
@@ -658,21 +658,21 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
 
-		Node n0 = fac.createNode(sc.createId("0"), sc.createCoord(-10, 0));
-		Node n1 = fac.createNode(sc.createId("1"), sc.createCoord(0, 0));
-		Node n2 = fac.createNode(sc.createId("2"), sc.createCoord(10, 0));
-		Node n3 = fac.createNode(sc.createId("3"), sc.createCoord(20, 0));
+		Node n0 = fac.createNode(Id.create("0", Node.class), sc.createCoord(-10, 0));
+		Node n1 = fac.createNode(Id.create("1", Node.class), sc.createCoord(0, 0));
+		Node n2 = fac.createNode(Id.create("2", Node.class), sc.createCoord(10, 0));
+		Node n3 = fac.createNode(Id.create("3", Node.class), sc.createCoord(20, 0));
 		net.addNode(n0);
 		net.addNode(n1);
 		net.addNode(n2);
 		net.addNode(n3);
 
-		Link l0 = fac.createLink(sc.createId("0"), n0, n1);
-		Link l1 = fac.createLink(sc.createId("1"), n1, n0);
-		Link l2 = fac.createLink(sc.createId("2"), n1, n2);
-		Link l3 = fac.createLink(sc.createId("3"), n2, n1);
-		Link l4 = fac.createLink(sc.createId("4"), n2, n3);
-		Link l5 = fac.createLink(sc.createId("5"), n3, n2);
+		Link l0 = fac.createLink(Id.create("0", Link.class), n0, n1);
+		Link l1 = fac.createLink(Id.create("1", Link.class), n1, n0);
+		Link l2 = fac.createLink(Id.create("2", Link.class), n1, n2);
+		Link l3 = fac.createLink(Id.create("3", Link.class), n2, n1);
+		Link l4 = fac.createLink(Id.create("4", Link.class), n2, n3);
+		Link l5 = fac.createLink(Id.create("5", Link.class), n3, n2);
 
 		net.addLink(l0);
 		net.addLink(l1);
@@ -698,7 +698,7 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 
 		CALink caLink = caNet.getCALink(links.get(0).getId());
 		CAAgent[] particles = caLink.getParticles();
-		CAAgent a = new CASimpleDynamicAgent(links, 1, sc.createId("0"), caLink);
+		CAAgent a = new CASimpleDynamicAgent(links, 1, Id.create("0", CAAgent.class), caLink);
 		CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a);
 		em.processEvent(ee);
 		a.materialize(0, 1);
@@ -719,21 +719,21 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 	//		Network net = sc.getNetwork();
 	//		NetworkFactory fac = net.getFactory();
 	//		
-	//		Node n0 = fac.createNode(sc.createId("0"), sc.createCoord(-10, 0));
-	//		Node n1 = fac.createNode(sc.createId("1"), sc.createCoord(0, 0));
-	//		Node n2 = fac.createNode(sc.createId("2"), sc.createCoord(10, 0));
-	//		Node n3 = fac.createNode(sc.createId("3"), sc.createCoord(20, 0));
+	//		Node n0 = fac.createNode(Id.create("0"), sc.createCoord(-10, 0));
+	//		Node n1 = fac.createNode(Id.create("1"), sc.createCoord(0, 0));
+	//		Node n2 = fac.createNode(Id.create("2"), sc.createCoord(10, 0));
+	//		Node n3 = fac.createNode(Id.create("3"), sc.createCoord(20, 0));
 	//		net.addNode(n0);
 	//		net.addNode(n1);
 	//		net.addNode(n2);
 	//		net.addNode(n3);
 	//		
-	//		Link l0 = fac.createLink(sc.createId("0"), n0, n1);
-	//		Link l1 = fac.createLink(sc.createId("1"), n1, n0);
-	//		Link l2 = fac.createLink(sc.createId("2"), n1, n2);
-	//		Link l3 = fac.createLink(sc.createId("3"), n2, n1);
-	//		Link l4 = fac.createLink(sc.createId("4"), n2, n3);
-	//		Link l5 = fac.createLink(sc.createId("5"), n3, n2);
+	//		Link l0 = fac.createLink(Id.create("0"), n0, n1);
+	//		Link l1 = fac.createLink(Id.create("1"), n1, n0);
+	//		Link l2 = fac.createLink(Id.create("2"), n1, n2);
+	//		Link l3 = fac.createLink(Id.create("3"), n2, n1);
+	//		Link l4 = fac.createLink(Id.create("4"), n2, n3);
+	//		Link l5 = fac.createLink(Id.create("5"), n3, n2);
 	//
 	//		net.addLink(l0);
 	//		net.addLink(l1);
@@ -757,7 +757,7 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 	//		
 	//		CALink caLink = caNet.getCALink(links.get(0).getId());
 	//		CAAgent[] particles = caLink.getParticles();
-	//		CAAgent a = new CASimpleDynamicAgent(links, 1, sc.createId("0"), caLink);
+	//		CAAgent a = new CASimpleDynamicAgent(links, 1, Id.create("0"), caLink);
 	//		CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a);
 	//		em.processEvent(ee);
 	//		a.materialize(0, 1);
