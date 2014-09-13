@@ -118,7 +118,7 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 		this.allMeetingsPointsSelected = allMeetingsPointsSelected;
 		
 		this.random = new Random();
-		this.exitLinkId = this.scenario.createId(AddExitLinksToNetwork.exitLink);
+		this.exitLinkId = Id.create(AddExitLinksToNetwork.exitLink, Link.class);
 		this.householdsToCheck = new ArrayList<Id>();
 		
 		if (SelectHouseholdMeetingPoint.writeRoutesToFiles) {
