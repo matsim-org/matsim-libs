@@ -14,7 +14,6 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 //import org.jfree.chart.axis.AxisLocation;
 import org.jfree.chart.plot.CategoryPlot;
@@ -26,6 +25,9 @@ import org.jfree.data.DefaultKeyedValues;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.general.DatasetUtilities;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.cadyts.general.CadytsCostOffsetsXMLFileIO;
+import org.matsim.contrib.cadyts.pt.TransitStopFacilityLookUp;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -34,10 +36,6 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.mmoyo.utils.DataLoader;
-
-import org.matsim.contrib.cadyts.general.CadytsCostOffsetsXMLFileIO;
-import org.matsim.contrib.cadyts.pt.TransitStopFacilityLookUp;
-
 import cadyts.utilities.misc.DynamicData;
 
 /**Produces offset bar plots */
@@ -70,7 +68,7 @@ public class LinkCostOffsetbars {
 				double linkOffsetValue = stopOffsets.getBinValue(stop.getStopFacility(), i);
 
 				if (weighted){
-					Volume vol = counts.getCount(stop.getStopFacility().getId()).getVolume(i+1);
+					Volume vol = counts.getCount(Id.create(stop.getStopFacility().getId(), Link.class)).getVolume(i+1);
 					double y = vol!=null? vol.getValue() : 0 ;
 					/*first version*/ linkOffsetValue = linkOffsetValue / Math.max(y, Math.pow(minStddev,2));
 					//second version linkOffsetValue = linkOffsetValue / Math.pow(Math.max(y, minStddev),2);

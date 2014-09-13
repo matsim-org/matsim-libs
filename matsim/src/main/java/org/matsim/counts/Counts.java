@@ -77,7 +77,7 @@ public class Counts {
 		return this.counts;
 	}
 
-	public final Count getCount(final Id locId) {
+	public final Count getCount(final Id<Link> locId) {
 		return this.counts.get(locId);
 	}
 

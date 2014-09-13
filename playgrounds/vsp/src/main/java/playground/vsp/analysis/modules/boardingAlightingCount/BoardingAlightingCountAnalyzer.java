@@ -32,6 +32,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.Count;
@@ -217,7 +218,7 @@ public class BoardingAlightingCountAnalyzer extends AbstractAnalyisModule{
 					w.write(f.getCoord().getY() + ";");
 					//boarding-value
 					for(Counts counts: this.handler.getClassification2Counts().values()){
-						Count count = counts.getCount(f.getId());
+						Count count = counts.getCount(Id.create(f.getId(), Link.class));
 						if(count == null){
 							w.write(0. + ";");
 						}else{
