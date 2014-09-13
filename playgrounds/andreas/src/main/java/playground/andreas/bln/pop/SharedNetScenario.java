@@ -1,7 +1,6 @@
 package playground.andreas.bln.pop;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
@@ -46,11 +45,6 @@ public class SharedNetScenario implements Scenario {
 	@Override
 	public Coord createCoord(double x, double y) {
 		return this.scenario.createCoord(x, y);
-	}
-
-	@Override
-	public Id createId(String string) {
-		return this.scenario.createId(string);
 	}
 
 	@Override

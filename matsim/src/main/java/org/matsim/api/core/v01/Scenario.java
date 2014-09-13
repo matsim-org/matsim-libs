@@ -41,12 +41,6 @@ import org.matsim.vehicles.Vehicles;
  */
 public interface Scenario {
 
-	/**
-	 * @deprecated use {@link Id#create(String, Class)} instead
-	 */
-	@Deprecated
-	public Id createId(final String id);
-	
 	public Network getNetwork();
 
 	public Population getPopulation();

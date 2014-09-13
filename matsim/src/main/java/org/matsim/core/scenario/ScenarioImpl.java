@@ -19,14 +19,15 @@
  * *********************************************************************** */
 package org.matsim.core.scenario;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -38,10 +39,6 @@ import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -62,8 +59,6 @@ public class ScenarioImpl implements Scenario {
 	private Network network;
 	private Population population;
 	private ActivityFacilities facilities;
-
-	private final ConcurrentHashMap<String, Id> idMap = new ConcurrentHashMap<String, Id>();
 
 	//non-mandatory attributes
 	private TransitSchedule transitSchedule = null;
@@ -161,16 +156,6 @@ public class ScenarioImpl implements Scenario {
 	@Override
 	public Coord createCoord(final double d, final double e) {
 		return new CoordImpl( d, e ) ;
-	}
-
-	@Override
-	public Id createId(final String string) {
-		Id id = this.idMap.get(string);
-		if (id == null) {
-			id = new IdImpl(string);
-			this.idMap.put(string, id);
-		}
-		return id;
 	}
 
 	@Override

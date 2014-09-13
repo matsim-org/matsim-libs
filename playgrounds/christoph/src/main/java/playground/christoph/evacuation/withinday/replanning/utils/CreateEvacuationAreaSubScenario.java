@@ -247,11 +247,6 @@ public class CreateEvacuationAreaSubScenario {
 		}
 		
 		@Override
-		public Id createId(String id) {
-			return this.scenario.createId(id);
-		}
-
-		@Override
 		public Network getNetwork() {
 			return this.network;
 		}

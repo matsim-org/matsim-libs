@@ -351,11 +351,6 @@ public class CreateSelectedPlansTables {
 		}
 
 		@Override
-		public Id createId(String string) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
 		public Config getConfig() {
 			return this.scenario.getConfig();
 		}
