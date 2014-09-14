@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.network.Link;
  */
 public class LaneData20Impl implements LaneData20 {
 
-	private Id id;
+	private Id<Lane> id;
 	/**
 	 * the default according to the xml schema, never change the value if schema is not changed
 	 */
@@ -40,22 +40,17 @@ public class LaneData20Impl implements LaneData20 {
 	 */
 	private double startsAtMeterFromLinkEnd = 45.0;
 	private List<Id<Link>> toLinkIds;
-  private List<Id> toLaneIds;
+  private List<Id<Lane>> toLaneIds;
   private int alignment = 0;
 	/**
 	 * the default according to the xml schema, never change the value if schema is not changed
 	 */
 	private double capacity = 3600.0;
-	/**
-	 * @param id
-	 */
-	public LaneData20Impl(Id id) {
+
+	public LaneData20Impl(Id<Lane> id) {
 		this.id = id;
 	}
 
-	/**
-	 * @param number
-	 */
 	@Override
 	public void setNumberOfRepresentedLanes(double number) {
 		this.numberOfRepresentedLanes = number;
@@ -67,7 +62,7 @@ public class LaneData20Impl implements LaneData20 {
 	}
 
 	@Override
-	public Id getId() {
+	public Id<Lane> getId() {
 		return id;
 	}
 
@@ -97,15 +92,15 @@ public class LaneData20Impl implements LaneData20 {
 	}
 	
 	@Override
-	public void addToLaneId(Id id) {
+	public void addToLaneId(Id<Lane> id) {
 		if (this.toLaneIds == null) {
-			this.toLaneIds = new ArrayList<Id>();
+			this.toLaneIds = new ArrayList<>();
 		}
 		this.toLaneIds.add(id);
 	}
 	
 	@Override
-	public List<Id> getToLaneIds() {
+	public List<Id<Lane>> getToLaneIds() {
 		return this.toLaneIds;
 	}
 	

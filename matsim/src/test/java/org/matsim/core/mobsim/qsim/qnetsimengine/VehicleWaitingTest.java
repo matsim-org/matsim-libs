@@ -19,6 +19,12 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
@@ -30,9 +36,12 @@ import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -43,8 +52,6 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
-
-import java.util.*;
 
 /**
  * Tests the behavior of the qsim with agents waiting for vehicles.
@@ -91,17 +98,17 @@ public class VehicleWaitingTest {
 		
 		final NetworkFactory netFact = sc.getNetwork().getFactory();
 
-		final Node node1 = netFact.createNode( new IdImpl( 1 ) , new CoordImpl( 0 , 0 ) );
-		final Node node2 = netFact.createNode( new IdImpl( 2 ) , new CoordImpl( 0 , 1000 ) );
-		final Node node3 = netFact.createNode( new IdImpl( 3 ) , new CoordImpl( 1000 , 1000 ) );
+		final Node node1 = netFact.createNode( Id.create( 1, Node.class ) , new CoordImpl( 0 , 0 ) );
+		final Node node2 = netFact.createNode( Id.create( 2, Node.class ) , new CoordImpl( 0 , 1000 ) );
+		final Node node3 = netFact.createNode( Id.create( 3, Node.class ) , new CoordImpl( 1000 , 1000 ) );
 		
 		sc.getNetwork().addNode( node1 );
 		sc.getNetwork().addNode( node2 );
 		sc.getNetwork().addNode( node3 );
 
-		final Link link1 = netFact.createLink( new IdImpl( 1 ) , node1 , node2 );
-		final Link link2 = netFact.createLink( new IdImpl( 2 ) , node2 , node3 );
-		final Link link3 = netFact.createLink( new IdImpl( 3 ) , node3 , node1 );
+		final Link link1 = netFact.createLink( Id.create( 1, Link.class ) , node1 , node2 );
+		final Link link2 = netFact.createLink( Id.create( 2, Link.class ) , node2 , node3 );
+		final Link link3 = netFact.createLink( Id.create( 3, Link.class ) , node3 , node1 );
 
 		sc.getNetwork().addLink( link1 );
 		sc.getNetwork().addLink( link2 );
@@ -110,11 +117,11 @@ public class VehicleWaitingTest {
 		final PopulationFactory popFact = sc.getPopulation().getFactory();
 
 		final List<Id> personIds = new ArrayList<Id>();
-		final Id personId1 = new IdImpl( "A" );
+		final Id personId1 = Id.create( "A", Person.class );
 		personIds.add( personId1 );
-		personIds.add( new IdImpl( "B" ) );
-		personIds.add( new IdImpl( "C" ) );
-		personIds.add( new IdImpl( "D" ) );
+		personIds.add( Id.create( "B", Person.class ) );
+		personIds.add( Id.create( "C", Person.class ) );
+		personIds.add( Id.create( "D", Person.class ) );
 
 		for ( Id id : personIds ) {
 			final Person person = popFact.createPerson( id );

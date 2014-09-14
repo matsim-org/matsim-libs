@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
@@ -182,7 +181,7 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 			// check if "Wenden"
 			if(getTransitLine() == null){
 				this.internalInterface.getMobsim().getEventsManager().processEvent(new TransitDriverStartsEvent(now, this.dummyPerson.getId(),
-						this.vehicle.getId(), new IdImpl("Wenden"), new IdImpl("Wenden"), new IdImpl("Wenden")));
+						this.vehicle.getId(), Id.create("Wenden", TransitLine.class), Id.create("Wenden", TransitRoute.class), Id.create("Wenden", Departure.class)));
 			} else {
 				this.internalInterface.getMobsim().getEventsManager().processEvent(new TransitDriverStartsEvent(now, this.dummyPerson.getId(),
 						this.vehicle.getId(), getTransitLine().getId(), getTransitRoute().getId(), getDeparture().getId()));

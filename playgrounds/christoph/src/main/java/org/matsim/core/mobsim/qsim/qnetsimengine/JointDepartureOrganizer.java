@@ -28,8 +28,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.vehicles.Vehicle;
 
 public class JointDepartureOrganizer {
 
@@ -82,22 +83,22 @@ public class JointDepartureOrganizer {
 		return this.scheduledDepartures.remove(jointDeparture.getId()) != null;
 	}
 	
-	public JointDeparture createJointDeparture(Id id, Id linkId, Id vehicleId, Id driverId, 
+	public JointDeparture createJointDeparture(Id<JointDeparture> id, Id<Link> linkId, Id<Vehicle> vehicleId, Id driverId, 
 			Set<Id> passengerIds) {		
 		JointDeparture jointDeparture = new JointDeparture(id, linkId, vehicleId, driverId, passengerIds);
 		
 		return jointDeparture;
 	}
 	
-	public JointDeparture createJointDeparture(Id linkId, Id vehicleId, Id driverId, 
+	public JointDeparture createJointDeparture(Id<Link> linkId, Id<Vehicle> vehicleId, Id driverId, 
 			Set<Id> passengerIds) {		
 		JointDeparture jointDeparture = new JointDeparture(getNextId(), linkId, vehicleId, driverId, passengerIds);
 		
 		return jointDeparture;
 	}
 	
-	public Id getNextId() {
-		return new IdImpl("id" + jointDepartureCounter.getAndIncrement());
+	public Id<JointDeparture> getNextId() {
+		return Id.create("id" + jointDepartureCounter.getAndIncrement(), JointDeparture.class);
 	}
 	
 	public void assignAgentToJointDeparture(Id agentId, Leg leg, JointDeparture jointDeparture) {

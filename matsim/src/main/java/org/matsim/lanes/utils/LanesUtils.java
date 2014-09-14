@@ -31,6 +31,7 @@ import org.matsim.lanes.ModelLane;
 import org.matsim.lanes.data.v11.LaneData11;
 import org.matsim.lanes.data.v11.LaneDefinitionsFactory11;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneData20;
 import org.matsim.lanes.data.v20.LaneData20MeterFromLinkEndComparator;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
@@ -87,11 +88,11 @@ public final class LanesUtils {
 			queueLanes.add(lastQLane);
 
 			//if existing create the subsequent lanes
-			List<Id> toLaneIds = lastQLane.getLaneData().getToLaneIds();
+			List<Id<Lane>> toLaneIds = lastQLane.getLaneData().getToLaneIds();
 			double nextMetersFromLinkEnd = 0.0;
 			double laneLength = 0.0;
 			if (toLaneIds != null 	&& (!toLaneIds.isEmpty())) {
-				for (Id toLaneId : toLaneIds){
+				for (Id<Lane> toLaneId : toLaneIds){
 					LaneData20 currentLane = lanesToLinkAssignment.getLanes().get(toLaneId);
 					nextMetersFromLinkEnd = currentLane.getStartsAtMeterFromLinkEnd();
 					ModelLane currentQLane = new ModelLane(currentLane);

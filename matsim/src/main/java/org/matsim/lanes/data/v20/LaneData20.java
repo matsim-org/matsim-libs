@@ -38,7 +38,7 @@ import org.matsim.api.core.v01.network.Link;
  */
 public interface LaneData20 {
 
-	public Id getId();
+	public Id<Lane> getId();
 
 	public double getNumberOfRepresentedLanes();
 
@@ -54,7 +54,7 @@ public interface LaneData20 {
 	
 	public void addToLinkId(Id<Link> id);
 	
-	public void addToLaneId(Id id);
+	public void addToLaneId(Id<Lane> id);
 	/**
 	 * 
 	 * @return List may be null if nothing is set
@@ -64,7 +64,7 @@ public interface LaneData20 {
 	 * 
 	 * @return List may be null if nothing is set
 	 */
-	public List<Id> getToLaneIds();
+	public List<Id<Lane>> getToLaneIds();
 
 	public void setAlignment(int alignment);
 

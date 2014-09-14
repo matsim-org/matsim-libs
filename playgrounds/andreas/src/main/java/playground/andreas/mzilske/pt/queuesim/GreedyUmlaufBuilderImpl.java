@@ -55,6 +55,7 @@ public class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 			return lastArrivalTime;
 		}
 		
+		@Override
 		public String toString() {
 			return stopFacilityId + " at " + lastArrivalTime + "(" + getLineId() + ")";
 		}
@@ -64,6 +65,7 @@ public class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 
 	private static final Comparator<UmlaufStueck> departureTimeComparator = new Comparator<UmlaufStueck>() {
 
+		@Override
 		public int compare(UmlaufStueck o1, UmlaufStueck o2) {
 			return Double.compare(o1.getDeparture().getDepartureTime(), o2.getDeparture().getDepartureTime());
 		}
@@ -72,6 +74,7 @@ public class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 
 	private static final Comparator<UmlaufKey> umlaufKeyComparator = new Comparator<UmlaufKey>() {
 
+		@Override
 		public int compare(UmlaufKey o1, UmlaufKey o2) {
 			int c = o1.getStopFacility().compareTo(o2.getStopFacility());
 			if (c != 0) {
@@ -108,6 +111,7 @@ public class GreedyUmlaufBuilderImpl implements UmlaufBuilder {
 		return true;
 	}
 	
+	@Override
 	public Collection<Umlauf> build() {
 		if (!canBuild()) {
 			throw new IllegalArgumentException();

@@ -22,7 +22,9 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimNetworkObject;
 import org.matsim.vis.snapshotwriters.VisNetwork;
 
@@ -44,11 +46,11 @@ public interface NetsimNetwork extends VisNetwork, MatsimNetworkObject {
 	/**
 	 * Convenience method for getLinks().get( id ).  May be renamed
 	 */
-	public NetsimLink getNetsimLink(final Id id) ;
+	public NetsimLink getNetsimLink(final Id<Link> id) ;
 
 	/**
 	 * Convenience method for getNodes().get( id ).  May be renamed
 	 */
-	public NetsimNode getNetsimNode(final Id id) ;
+	public NetsimNode getNetsimNode(final Id<Node> id) ;
 
 }

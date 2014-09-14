@@ -1,6 +1,9 @@
 package org.matsim.core.mobsim.qsim;
 
-import org.matsim.core.basic.v01.IdImpl;
+import java.util.ArrayList;
+import java.util.Collection;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.UmlaufBuilder;
 import org.matsim.pt.UmlaufImpl;
@@ -8,9 +11,6 @@ import org.matsim.pt.UmlaufStueck;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
-
-import java.util.ArrayList;
-import java.util.Collection;
 
 public class SingletonUmlaufBuilderImpl implements UmlaufBuilder {
 	
@@ -23,6 +23,7 @@ public class SingletonUmlaufBuilderImpl implements UmlaufBuilder {
 	/* (non-Javadoc)
 	 * @see playground.mzilske.pt.queuesim.UmlaufBuilder#build()
 	 */
+	@Override
 	public ArrayList<Umlauf> build() {
 		int id = 0;
 		ArrayList<Umlauf> umlaeufe = new ArrayList<Umlauf>();
@@ -30,7 +31,7 @@ public class SingletonUmlaufBuilderImpl implements UmlaufBuilder {
 			for (TransitRoute route : line.getRoutes().values()) {
 				for (Departure departure : route.getDepartures().values()) {
 					UmlaufStueck umlaufStueck = new UmlaufStueck(line, route, departure);
-					Umlauf umlauf = new UmlaufImpl(new IdImpl(id++));
+					Umlauf umlauf = new UmlaufImpl(Id.create(id++, Umlauf.class));
 					umlauf.getUmlaufStuecke().add(umlaufStueck);
 					umlaeufe.add(umlauf);
 				}

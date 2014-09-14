@@ -23,15 +23,16 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
+import org.matsim.vehicles.Vehicle;
 
 
-public interface Umlauf extends Identifiable {
+public interface Umlauf extends Identifiable<Umlauf> {
 
 	List<UmlaufStueckI> getUmlaufStuecke();
 
-	public Id getVehicleId();
+	public Id<Vehicle> getVehicleId();
 
-	public void setVehicleId(Id vehicleId);
+	public void setVehicleId(Id<Vehicle> vehicleId);
 	/**
 	 * @deprecated as a Umlauf can contain UmlaufStueckI from several Lines. Use getId() instead. dg, nov 2012
 	 */

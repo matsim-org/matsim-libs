@@ -20,6 +20,7 @@
 package org.matsim.lanes.data.v20;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.internal.MatsimFactory;
 
 
@@ -34,11 +35,11 @@ public interface LaneDefinitionsFactory20 extends MatsimFactory {
 	 * @param linkIdReference id of the links the lanes of the created object belong to
 	 * @return An empty instance of LanesToLinkAssignment for the Link with the Id given as parameter
 	 */
-	public LanesToLinkAssignment20 createLanesToLinkAssignment(Id linkIdReference);
+	public LanesToLinkAssignment20 createLanesToLinkAssignment(Id<Link> linkIdReference);
 	/**
 	 * Creates an instance of BasicLane with the id given as parameter.
 	 * @param laneId
 	 * @return
 	 */
-	public LaneData20 createLane(Id laneId);
+	public LaneData20 createLane(Id<Lane> laneId);
 }

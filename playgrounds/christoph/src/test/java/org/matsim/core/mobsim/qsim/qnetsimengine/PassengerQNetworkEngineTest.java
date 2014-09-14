@@ -44,7 +44,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -65,6 +64,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 
 /**
@@ -85,16 +85,16 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		eventsManager.addHandler(new EventsPrinter());
 		
 		makeNetwork(scenario.getNetwork());
-		Person driver = makeNonStopDriver(new IdImpl("p1"), new IdImpl("v1"), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		Person driver = makeNonStopDriver(Id.create("p1", Person.class), Id.create("v1", Vehicle.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
 
 		Tuple<QSim, JointDepartureOrganizer> tuple = makeQSim(scenario, eventsManager); 
 		QSim qSim = tuple.getFirst();
 		JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
 		
-		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(new IdImpl("v1"), VehicleUtils.getDefaultVehicleType()), new IdImpl("0to1"));
+		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
 		Set<Id> passengerIds = new LinkedHashSet<Id>();
-		JointDeparture jointDeparture = jointDepartureOrganizer.createJointDeparture(new IdImpl("jd1"), new IdImpl("1to2"), new IdImpl("v1"), new IdImpl("p1"), passengerIds);
+		JointDeparture jointDeparture = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driver, 1, jointDeparture, jointDepartureOrganizer);
 		
 		boolean caughtException = false;
@@ -117,26 +117,26 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		eventsManager.addHandler(new EventsPrinter());
 		
 		makeNetwork(scenario.getNetwork());
-		Person driver = makeNonStopDriver(new IdImpl("p1"), new IdImpl("v1"), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
-		Person passenger1 = makeNonStopPassenger(new IdImpl("p2"), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
-		Person passenger2 = makeNonStopPassenger(new IdImpl("p3"), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
-		Person passenger3 = makeNonStopPassenger(new IdImpl("p4"), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
-		Person passenger4 = makeNonStopPassenger(new IdImpl("p5"), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
-		Person passenger5 = makeNonStopPassenger(new IdImpl("p6"), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		Person driver = makeNonStopDriver(Id.create("p1", Person.class), Id.create("v1", Vehicle.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		Person passenger1 = makeNonStopPassenger(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		Person passenger2 = makeNonStopPassenger(Id.create("p3", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		Person passenger3 = makeNonStopPassenger(Id.create("p4", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		Person passenger4 = makeNonStopPassenger(Id.create("p5", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		Person passenger5 = makeNonStopPassenger(Id.create("p6", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
 		
 		Tuple<QSim, JointDepartureOrganizer> tuple = makeQSim(scenario, eventsManager); 
 		QSim qSim = tuple.getFirst();
 		JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
 		
-		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(new IdImpl("v1"), VehicleUtils.getDefaultVehicleType()), new IdImpl("0to1"));
+		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
 		Set<Id> passengerIds = new LinkedHashSet<Id>();
-		passengerIds.add(new IdImpl("p2"));
-		passengerIds.add(new IdImpl("p3"));
-		passengerIds.add(new IdImpl("p4"));
-		passengerIds.add(new IdImpl("p5"));
-		passengerIds.add(new IdImpl("p6"));
-		JointDeparture jointDeparture = jointDepartureOrganizer.createJointDeparture(new IdImpl("jd1"), new IdImpl("0to1"), new IdImpl("v1"), new IdImpl("p1"), passengerIds);
+		passengerIds.add(Id.create("p2", Person.class));
+		passengerIds.add(Id.create("p3", Person.class));
+		passengerIds.add(Id.create("p4", Person.class));
+		passengerIds.add(Id.create("p5", Person.class));
+		passengerIds.add(Id.create("p6", Person.class));
+		JointDeparture jointDeparture = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driver, 1, jointDeparture, jointDepartureOrganizer);
 		assignJointDeparture(passenger1, 1, jointDeparture, jointDepartureOrganizer);
 		assignJointDeparture(passenger2, 1, jointDeparture, jointDepartureOrganizer);
@@ -167,16 +167,16 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		eventsManager.addHandler(eventsCounter);
 		
 		makeNetwork(scenario.getNetwork());
-		Person driver = makeNonStopDriver(new IdImpl("p1"), new IdImpl("v1"), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		Person driver = makeNonStopDriver(Id.create("p1", Person.class), Id.create("v1", Vehicle.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
 		
 		Tuple<QSim, JointDepartureOrganizer> tuple = makeQSim(scenario, eventsManager); 
 		QSim qSim = tuple.getFirst();
 		JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
 		
-		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(new IdImpl("v1"), VehicleUtils.getDefaultVehicleType()), new IdImpl("0to1"));
+		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
 		Set<Id> passengerIds = new LinkedHashSet<Id>();
-		JointDeparture jointDeparture = jointDepartureOrganizer.createJointDeparture(new IdImpl("jd1"), new IdImpl("0to1"), new IdImpl("v1"), new IdImpl("p1"), passengerIds);
+		JointDeparture jointDeparture = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driver, 1, jointDeparture, jointDepartureOrganizer);
 		
 		qSim.run();
@@ -184,7 +184,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		// check agents final destinations
 		for (MobsimAgent mobsimAgent : qSim.getAgents()) {
 			if (mobsimAgent.getId().toString().equals("p1")) {
-				assertEquals(new IdImpl("2to3"), mobsimAgent.getCurrentLinkId());
+				assertEquals(Id.create("2to3", Link.class), mobsimAgent.getCurrentLinkId());
 			}
 		}
 		
@@ -193,7 +193,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		assertEquals(1, eventsCounter.getLeaveCount());
 		
 		// check whether all scheduled joint departures have been processed
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p1")));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p1", Person.class)));
 	}
 	
 	/*
@@ -210,18 +210,18 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		eventsManager.addHandler(eventsCounter);
 		
 		makeNetwork(scenario.getNetwork());
-		Person driver = makeNonStopDriver(new IdImpl("p1"), new IdImpl("v1"), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
-		Person passenger = makeNonStopPassenger(new IdImpl("p2"), scenario.getPopulation(), scenario.getNetwork(), 3660.0);
+		Person driver = makeNonStopDriver(Id.create("p1", Person.class), Id.create("v1", Vehicle.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		Person passenger = makeNonStopPassenger(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3660.0);
 		
 		Tuple<QSim, JointDepartureOrganizer> tuple = makeQSim(scenario, eventsManager); 
 		QSim qSim = tuple.getFirst();
 		JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
 		
-		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(new IdImpl("v1"), VehicleUtils.getDefaultVehicleType()), new IdImpl("0to1"));
+		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
 		Set<Id> passengerIds = new LinkedHashSet<Id>();
-		passengerIds.add(new IdImpl("p2"));
-		JointDeparture jointDeparture = jointDepartureOrganizer.createJointDeparture(new IdImpl("jd1"), new IdImpl("0to1"), new IdImpl("v1"), new IdImpl("p1"), passengerIds);
+		passengerIds.add(Id.create("p2", Person.class));
+		JointDeparture jointDeparture = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driver, 1, jointDeparture, jointDepartureOrganizer);
 		assignJointDeparture(passenger, 1, jointDeparture, jointDepartureOrganizer);
 		
@@ -230,9 +230,9 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		// check agents final destinations
 		for (MobsimAgent mobsimAgent : qSim.getAgents()) {
 			if (mobsimAgent.getId().toString().equals("p1")) {
-				assertEquals(new IdImpl("2to3"), mobsimAgent.getCurrentLinkId());
+				assertEquals(Id.create("2to3", Link.class), mobsimAgent.getCurrentLinkId());
 			} else if (mobsimAgent.getId().toString().equals("p2")) {
-				assertEquals(new IdImpl("2to3"), mobsimAgent.getCurrentLinkId());
+				assertEquals(Id.create("2to3", Link.class), mobsimAgent.getCurrentLinkId());
 			}
 		}
 		
@@ -241,8 +241,8 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		assertEquals(2, eventsCounter.getLeaveCount());
 		
 		// check whether all scheduled joint departures have been processed
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p1")));
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p2")));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p1", Person.class)));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p2", Person.class)));
 	}
 	
 	/*
@@ -259,18 +259,18 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		eventsManager.addHandler(eventsCounter);
 		
 		makeNetwork(scenario.getNetwork());
-		Person driver = makeNonStopDriver(new IdImpl("p1"), new IdImpl("v1"), scenario.getPopulation(), scenario.getNetwork(), 3660.0);
-		Person passenger = makeNonStopPassenger(new IdImpl("p2"), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		Person driver = makeNonStopDriver(Id.create("p1", Person.class), Id.create("v1", Vehicle.class), scenario.getPopulation(), scenario.getNetwork(), 3660.0);
+		Person passenger = makeNonStopPassenger(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
 		
 		Tuple<QSim, JointDepartureOrganizer> tuple = makeQSim(scenario, eventsManager); 
 		QSim qSim = tuple.getFirst();
 		JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
 		
-		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(new IdImpl("v1"), VehicleUtils.getDefaultVehicleType()), new IdImpl("0to1"));
+		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
 		Set<Id> passengerIds = new LinkedHashSet<Id>();
-		passengerIds.add(new IdImpl("p2"));
-		JointDeparture jointDeparture = jointDepartureOrganizer.createJointDeparture(new IdImpl("jd1"), new IdImpl("0to1"), new IdImpl("v1"), new IdImpl("p1"), passengerIds);
+		passengerIds.add(Id.create("p2", Person.class));
+		JointDeparture jointDeparture = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driver, 1, jointDeparture, jointDepartureOrganizer);
 		assignJointDeparture(passenger, 1, jointDeparture, jointDepartureOrganizer);
 		
@@ -279,9 +279,9 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		// check agents final destinations
 		for (MobsimAgent mobsimAgent : qSim.getAgents()) {
 			if (mobsimAgent.getId().toString().equals("p1")) {
-				assertEquals(new IdImpl("2to3"), mobsimAgent.getCurrentLinkId());
+				assertEquals(Id.create("2to3", Link.class), mobsimAgent.getCurrentLinkId());
 			} else if (mobsimAgent.getId().toString().equals("p2")) {
-				assertEquals(new IdImpl("2to3"), mobsimAgent.getCurrentLinkId());
+				assertEquals(Id.create("2to3", Link.class), mobsimAgent.getCurrentLinkId());
 			}
 		}
 		
@@ -290,8 +290,8 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		assertEquals(2, eventsCounter.getLeaveCount());
 		
 		// check whether all scheduled joint departures have been processed
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p1")));
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p2")));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p1", Person.class)));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p2", Person.class)));
 	}
 	
 	/*
@@ -310,19 +310,19 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		eventsManager.addHandler(eventsCounter);
 		
 		makeNetwork(scenario.getNetwork());
-		Person driver = makeDropOffPickupDriver(new IdImpl("p1"), scenario.getPopulation(), scenario.getNetwork(), 3600.0, 3650.0);
-		Person passenger = makeDriverThenPassenger(new IdImpl("p2"), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		Person driver = makeDropOffPickupDriver(Id.create("p1", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0, 3650.0);
+		Person passenger = makeDriverThenPassenger(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
 		
 		Tuple<QSim, JointDepartureOrganizer> tuple = makeQSim(scenario, eventsManager); 
 		QSim qSim = tuple.getFirst();
 		JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
 		
-		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(new IdImpl("v0"), VehicleUtils.getDefaultVehicleType()), new IdImpl("0to1"));
-		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(new IdImpl("v1"), VehicleUtils.getDefaultVehicleType()), new IdImpl("0to1"));
+		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v0", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
+		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
 		Set<Id> passengerIds = new LinkedHashSet<Id>();
-		passengerIds.add(new IdImpl("p2"));
-		JointDeparture jointDeparture = jointDepartureOrganizer.createJointDeparture(new IdImpl("jd1"), new IdImpl("1to2"), new IdImpl("v1"), new IdImpl("p1"), passengerIds);
+		passengerIds.add(Id.create("p2", Person.class));
+		JointDeparture jointDeparture = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driver, 3, jointDeparture, jointDepartureOrganizer);
 		assignJointDeparture(passenger, 3, jointDeparture, jointDepartureOrganizer);
 		
@@ -331,9 +331,9 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		// check agents final destinations
 		for (MobsimAgent mobsimAgent : qSim.getAgents()) {
 			if (mobsimAgent.getId().toString().equals("p1")) {
-				assertEquals(new IdImpl("2to3"), mobsimAgent.getCurrentLinkId());
+				assertEquals(Id.create("2to3", Link.class), mobsimAgent.getCurrentLinkId());
 			} else if (mobsimAgent.getId().toString().equals("p2")) {
-				assertEquals(new IdImpl("2to3"), mobsimAgent.getCurrentLinkId());
+				assertEquals(Id.create("2to3", Link.class), mobsimAgent.getCurrentLinkId());
 			}
 		}
 		
@@ -342,8 +342,8 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		assertEquals(4, eventsCounter.getLeaveCount());
 		
 		// check whether all scheduled joint departures have been processed
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p1")));
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p2")));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p1", Person.class)));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p2", Person.class)));
 	}
 	
 	/*
@@ -360,22 +360,22 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		eventsManager.addHandler(eventsCounter);
 		
 		makeNetwork(scenario.getNetwork());
-		Person driver = makeDropOffPickupDriver(new IdImpl("p1"), scenario.getPopulation(), scenario.getNetwork(), 3600.0, 3650.0);
-		Person passenger = makePickUpPassenger(new IdImpl("p2"), scenario.getPopulation(), scenario.getNetwork(), 3700.0);
+		Person driver = makeDropOffPickupDriver(Id.create("p1", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0, 3650.0);
+		Person passenger = makePickUpPassenger(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3700.0);
 		
 		Tuple<QSim, JointDepartureOrganizer> tuple = makeQSim(scenario, eventsManager); 
 		QSim qSim = tuple.getFirst();
 		JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
 		
-		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(new IdImpl("v1"), VehicleUtils.getDefaultVehicleType()), new IdImpl("0to1"));
+		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
 		Set<Id> passengerIds = new LinkedHashSet<Id>();
-		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(new IdImpl("jd1"), new IdImpl("0to1"), new IdImpl("v1"), new IdImpl("p1"), passengerIds);
+		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driver, 1, jointDeparture1, jointDepartureOrganizer);
 		
 		passengerIds = new LinkedHashSet<Id>();
-		passengerIds.add(new IdImpl("p2"));
-		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(new IdImpl("jd2"), new IdImpl("1to2"), new IdImpl("v1"), new IdImpl("p1"), passengerIds);
+		passengerIds.add(Id.create("p2", Person.class));
+		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driver, 3, jointDeparture2, jointDepartureOrganizer);
 		assignJointDeparture(passenger, 1, jointDeparture2, jointDepartureOrganizer);
 		
@@ -384,9 +384,9 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		// check agents final destinations
 		for (MobsimAgent mobsimAgent : qSim.getAgents()) {
 			if (mobsimAgent.getId().toString().equals("p1")) {
-				assertEquals(new IdImpl("2to3"), mobsimAgent.getCurrentLinkId());
+				assertEquals(Id.create("2to3", Link.class), mobsimAgent.getCurrentLinkId());
 			} else if (mobsimAgent.getId().toString().equals("p2")) {
-				assertEquals(new IdImpl("2to3"), mobsimAgent.getCurrentLinkId());
+				assertEquals(Id.create("2to3", Link.class), mobsimAgent.getCurrentLinkId());
 			}
 		}
 		
@@ -395,8 +395,8 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		assertEquals(3, eventsCounter.getLeaveCount());
 		
 		// check whether all scheduled joint departures have been processed
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p1")));
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p2")));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p1", Person.class)));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p2", Person.class)));
 	}
 
 	/*
@@ -413,22 +413,22 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		eventsManager.addHandler(eventsCounter);
 		
 		makeNetwork(scenario.getNetwork());
-		Person driver = makeDropOffPickupDriver(new IdImpl("p1"), scenario.getPopulation(), scenario.getNetwork(), 3600.0, 3700.0);
-		Person passenger = makePickUpPassenger(new IdImpl("p2"), scenario.getPopulation(), scenario.getNetwork(), 3650.0);
+		Person driver = makeDropOffPickupDriver(Id.create("p1", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0, 3700.0);
+		Person passenger = makePickUpPassenger(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3650.0);
 		
 		Tuple<QSim, JointDepartureOrganizer> tuple = makeQSim(scenario, eventsManager); 
 		QSim qSim = tuple.getFirst();
 		JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
 		
-		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(new IdImpl("v1"), VehicleUtils.getDefaultVehicleType()), new IdImpl("0to1"));
+		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
 		Set<Id> passengerIds = new LinkedHashSet<Id>();
-		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(new IdImpl("jd1"), new IdImpl("0to1"), new IdImpl("v1"), new IdImpl("p1"), passengerIds);
+		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driver, 1, jointDeparture1, jointDepartureOrganizer);
 		
 		passengerIds = new LinkedHashSet<Id>();
-		passengerIds.add(new IdImpl("p2"));
-		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(new IdImpl("jd2"), new IdImpl("1to2"), new IdImpl("v1"), new IdImpl("p1"), passengerIds);
+		passengerIds.add(Id.create("p2", Person.class));
+		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driver, 3, jointDeparture2, jointDepartureOrganizer);
 		assignJointDeparture(passenger, 1, jointDeparture2, jointDepartureOrganizer);
 		
@@ -437,9 +437,9 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		// check agents final destinations
 		for (MobsimAgent mobsimAgent : qSim.getAgents()) {
 			if (mobsimAgent.getId().toString().equals("p1")) {
-				assertEquals(new IdImpl("2to3"), mobsimAgent.getCurrentLinkId());
+				assertEquals(Id.create("2to3", Link.class), mobsimAgent.getCurrentLinkId());
 			} else if (mobsimAgent.getId().toString().equals("p2")) {
-				assertEquals(new IdImpl("2to3"), mobsimAgent.getCurrentLinkId());
+				assertEquals(Id.create("2to3", Link.class), mobsimAgent.getCurrentLinkId());
 			}
 		}
 		
@@ -448,8 +448,8 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		assertEquals(3, eventsCounter.getLeaveCount());
 		
 		// check whether all scheduled joint departures have been processed
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p1")));
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p2")));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p1", Person.class)));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p2", Person.class)));
 	}
 	
 	/*
@@ -466,26 +466,26 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		eventsManager.addHandler(eventsCounter);
 		
 		makeNetwork(scenario.getNetwork());
-		Person driver = makeDropOffPickupDriver(new IdImpl("p1"), scenario.getPopulation(), scenario.getNetwork(), 3600.0, 3650.0);
-		Person passenger1 = makeNonStopPassenger(new IdImpl("p2"), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
-		Person passenger2 = makePickUpPassenger(new IdImpl("p3"), scenario.getPopulation(), scenario.getNetwork(), 3700.0);
+		Person driver = makeDropOffPickupDriver(Id.create("p1", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0, 3650.0);
+		Person passenger1 = makeNonStopPassenger(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		Person passenger2 = makePickUpPassenger(Id.create("p3", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3700.0);
 		
 		Tuple<QSim, JointDepartureOrganizer> tuple = makeQSim(scenario, eventsManager); 
 		QSim qSim = tuple.getFirst();
 		JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
 		
-		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(new IdImpl("v1"), VehicleUtils.getDefaultVehicleType()), new IdImpl("0to1"));
+		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
 		Set<Id> passengerIds = new LinkedHashSet<Id>();
-		passengerIds.add(new IdImpl("p2"));
-		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(new IdImpl("jd1"), new IdImpl("0to1"), new IdImpl("v1"), new IdImpl("p1"), passengerIds);
+		passengerIds.add(Id.create("p2", Person.class));
+		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driver, 1, jointDeparture1, jointDepartureOrganizer);
 		assignJointDeparture(passenger1, 1, jointDeparture1, jointDepartureOrganizer);
 		
 		passengerIds = new LinkedHashSet<Id>();
-		passengerIds.add(new IdImpl("p2"));
-		passengerIds.add(new IdImpl("p3"));
-		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(new IdImpl("jd2"), new IdImpl("1to2"), new IdImpl("v1"), new IdImpl("p1"), passengerIds);
+		passengerIds.add(Id.create("p2", Person.class));
+		passengerIds.add(Id.create("p3", Person.class));
+		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driver, 3, jointDeparture2, jointDepartureOrganizer);
 		assignJointDeparture(passenger2, 1, jointDeparture2, jointDepartureOrganizer);
 		
@@ -494,11 +494,11 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		// check agents final destinations
 		for (MobsimAgent mobsimAgent : qSim.getAgents()) {
 			if (mobsimAgent.getId().toString().equals("p1")) {
-				assertEquals(new IdImpl("2to3"), mobsimAgent.getCurrentLinkId());
+				assertEquals(Id.create("2to3", Link.class), mobsimAgent.getCurrentLinkId());
 			} else if (mobsimAgent.getId().toString().equals("p2")) {
-				assertEquals(new IdImpl("2to3"), mobsimAgent.getCurrentLinkId());
+				assertEquals(Id.create("2to3", Link.class), mobsimAgent.getCurrentLinkId());
 			} else if (mobsimAgent.getId().toString().equals("p3")) {
-				assertEquals(new IdImpl("2to3"), mobsimAgent.getCurrentLinkId());
+				assertEquals(Id.create("2to3", Link.class), mobsimAgent.getCurrentLinkId());
 			}
 		}
 		
@@ -507,9 +507,9 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		assertEquals(4, eventsCounter.getLeaveCount());
 		
 		// check whether all scheduled joint departures have been processed
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p1")));
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p2")));
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p3")));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p1", Person.class)));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p2", Person.class)));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p3", Person.class)));
 	}
 	
 	/*
@@ -526,23 +526,23 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		eventsManager.addHandler(eventsCounter);
 		
 		makeNetwork(scenario.getNetwork());
-		Person driver = makePickupDropOffDriver(new IdImpl("p1"), scenario.getPopulation(), scenario.getNetwork(), 3600.0, 3650.0);
-		Person passenger = makePickUpDropOffPassenger(new IdImpl("p2"), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		Person driver = makePickupDropOffDriver(Id.create("p1", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0, 3650.0);
+		Person passenger = makePickUpDropOffPassenger(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
 		
 		Tuple<QSim, JointDepartureOrganizer> tuple = makeQSim(scenario, eventsManager); 
 		QSim qSim = tuple.getFirst();
 		JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
 		
-		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(new IdImpl("v1"), VehicleUtils.getDefaultVehicleType()), new IdImpl("0to1"));
+		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
 		Set<Id> passengerIds = new LinkedHashSet<Id>();
-		passengerIds.add(new IdImpl("p2"));
-		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(new IdImpl("jd1"), new IdImpl("1to2"), new IdImpl("v1"), new IdImpl("p1"), passengerIds);
+		passengerIds.add(Id.create("p2", Person.class));
+		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driver, 3, jointDeparture1, jointDepartureOrganizer);
 		assignJointDeparture(passenger, 1, jointDeparture1, jointDepartureOrganizer);
 		
 		passengerIds = new LinkedHashSet<Id>();
-		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(new IdImpl("jd2"), new IdImpl("1to2"), new IdImpl("v1"), new IdImpl("p1"), passengerIds);
+		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driver, 5, jointDeparture2, jointDepartureOrganizer);
 		
 		qSim.run();
@@ -550,9 +550,9 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		// check agents final destinations
 		for (MobsimAgent mobsimAgent : qSim.getAgents()) {
 			if (mobsimAgent.getId().toString().equals("p1")) {
-				assertEquals(new IdImpl("2to3"), mobsimAgent.getCurrentLinkId());
+				assertEquals(Id.create("2to3", Link.class), mobsimAgent.getCurrentLinkId());
 			} else if (mobsimAgent.getId().toString().equals("p2")) {
-				assertEquals(new IdImpl("2to3"), mobsimAgent.getCurrentLinkId());
+				assertEquals(Id.create("2to3", Link.class), mobsimAgent.getCurrentLinkId());
 			}
 		}
 		
@@ -566,8 +566,8 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		assertEquals(3, eventsCounter.getLeaveCount());
 		
 		// check whether all scheduled joint departures have been processed
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p1")));
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p2")));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p1", Person.class)));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p2", Person.class)));
 	}
 	
 	/*
@@ -584,23 +584,23 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		eventsManager.addHandler(eventsCounter);
 		
 		makeNetwork(scenario.getNetwork());
-		Person driver = makePickupDropOffDriver(new IdImpl("p1"), scenario.getPopulation(), scenario.getNetwork(), 3600.0, 3650.0);
-		Person passenger = makePickUpDropOffPassenger(new IdImpl("p2"), scenario.getPopulation(), scenario.getNetwork(), 3700.0);
+		Person driver = makePickupDropOffDriver(Id.create("p1", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0, 3650.0);
+		Person passenger = makePickUpDropOffPassenger(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3700.0);
 		
 		Tuple<QSim, JointDepartureOrganizer> tuple = makeQSim(scenario, eventsManager); 
 		QSim qSim = tuple.getFirst();
 		JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
 		
-		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(new IdImpl("v1"), VehicleUtils.getDefaultVehicleType()), new IdImpl("0to1"));
+		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
 		Set<Id> passengerIds = new LinkedHashSet<Id>();
-		passengerIds.add(new IdImpl("p2"));
-		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(new IdImpl("jd1"), new IdImpl("1to2"), new IdImpl("v1"), new IdImpl("p1"), passengerIds);
+		passengerIds.add(Id.create("p2", Person.class));
+		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driver, 3, jointDeparture1, jointDepartureOrganizer);
 		assignJointDeparture(passenger, 1, jointDeparture1, jointDepartureOrganizer);
 		
 		passengerIds = new LinkedHashSet<Id>();
-		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(new IdImpl("jd2"), new IdImpl("1to2"), new IdImpl("v1"), new IdImpl("p1"), passengerIds);
+		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driver, 5, jointDeparture2, jointDepartureOrganizer);
 		
 		qSim.run();
@@ -608,9 +608,9 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		// check agents final destinations
 		for (MobsimAgent mobsimAgent : qSim.getAgents()) {
 			if (mobsimAgent.getId().toString().equals("p1")) {
-				assertEquals(new IdImpl("2to3"), mobsimAgent.getCurrentLinkId());
+				assertEquals(Id.create("2to3", Link.class), mobsimAgent.getCurrentLinkId());
 			} else if (mobsimAgent.getId().toString().equals("p2")) {
-				assertEquals(new IdImpl("2to3"), mobsimAgent.getCurrentLinkId());
+				assertEquals(Id.create("2to3", Link.class), mobsimAgent.getCurrentLinkId());
 			}
 		}
 		
@@ -624,8 +624,8 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		assertEquals(3, eventsCounter.getLeaveCount());
 		
 		// check whether all scheduled joint departures have been processed
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p1")));
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p2")));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p1", Person.class)));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p2", Person.class)));
 	}
 	
 	/*
@@ -641,23 +641,23 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		eventsManager.addHandler(eventsCounter);
 		
 		makeNetwork(scenario.getNetwork());
-		Person driver = makeDropOffPickupDriver(new IdImpl("p1"), scenario.getPopulation(), scenario.getNetwork(), 3600.0, 3650.0);
-		Person passenger = makeDropOffPassenger(new IdImpl("p2"), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		Person driver = makeDropOffPickupDriver(Id.create("p1", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0, 3650.0);
+		Person passenger = makeDropOffPassenger(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
 		
 		Tuple<QSim, JointDepartureOrganizer> tuple = makeQSim(scenario, eventsManager); 
 		QSim qSim = tuple.getFirst();
 		JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
 		
-		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(new IdImpl("v1"), VehicleUtils.getDefaultVehicleType()), new IdImpl("0to1"));
+		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
 		Set<Id> passengerIds = new LinkedHashSet<Id>();
-		passengerIds.add(new IdImpl("p2"));
-		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(new IdImpl("jd1"), new IdImpl("0to1"), new IdImpl("v1"), new IdImpl("p1"), passengerIds);
+		passengerIds.add(Id.create("p2", Person.class));
+		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driver, 1, jointDeparture1, jointDepartureOrganizer);
 		assignJointDeparture(passenger, 1, jointDeparture1, jointDepartureOrganizer);
 		
 		passengerIds = new LinkedHashSet<Id>();
-		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(new IdImpl("jd2"), new IdImpl("1to2"), new IdImpl("v1"), new IdImpl("p1"), passengerIds);
+		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driver, 3, jointDeparture2, jointDepartureOrganizer);
 		
 		qSim.run();
@@ -665,9 +665,9 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		// check agents final destinations
 		for (MobsimAgent mobsimAgent : qSim.getAgents()) {
 			if (mobsimAgent.getId().toString().equals("p1")) {
-				assertEquals(new IdImpl("2to3"), mobsimAgent.getCurrentLinkId());
+				assertEquals(Id.create("2to3", Link.class), mobsimAgent.getCurrentLinkId());
 			} else if (mobsimAgent.getId().toString().equals("p2")) {
-				assertEquals(new IdImpl("1to2"), mobsimAgent.getCurrentLinkId());
+				assertEquals(Id.create("1to2", Link.class), mobsimAgent.getCurrentLinkId());
 			}
 		}
 		
@@ -676,8 +676,8 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		assertEquals(3, eventsCounter.getLeaveCount());
 		
 		// check whether all scheduled joint departures have been processed
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p1")));
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p2")));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p1", Person.class)));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p2", Person.class)));
 	}
 	
 	/*
@@ -695,33 +695,33 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		eventsManager.addHandler(eventsCounter);
 		
 		makeNetwork(scenario.getNetwork());
-		Person driver = makeDropOffPickupDriver(new IdImpl("p1"), scenario.getPopulation(), scenario.getNetwork(), 3600.0, 3700.0);
-		Person passenger1 = makeNonStopPassenger(new IdImpl("p2"), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
-		Person passenger2 = makeNonStopPassenger(new IdImpl("p3"), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
-		Person passenger3 = makeDropOffPassenger(new IdImpl("p4"), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
-		Person passenger4 = makePickUpPassenger(new IdImpl("p5"), scenario.getPopulation(), scenario.getNetwork(), 3780.0);
+		Person driver = makeDropOffPickupDriver(Id.create("p1", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0, 3700.0);
+		Person passenger1 = makeNonStopPassenger(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		Person passenger2 = makeNonStopPassenger(Id.create("p3", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		Person passenger3 = makeDropOffPassenger(Id.create("p4", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		Person passenger4 = makePickUpPassenger(Id.create("p5", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3780.0);
 		
 		Tuple<QSim, JointDepartureOrganizer> tuple = makeQSim(scenario, eventsManager); 
 		QSim qSim = tuple.getFirst();
 		JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
 		
-		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(new IdImpl("v1"), VehicleUtils.getDefaultVehicleType()), new IdImpl("0to1"));
+		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 		
 		Set<Id> passengerIds = new LinkedHashSet<Id>();
-		passengerIds.add(new IdImpl("p2"));
-		passengerIds.add(new IdImpl("p3"));
-		passengerIds.add(new IdImpl("p4"));
-		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(new IdImpl("jd1"), new IdImpl("0to1"), new IdImpl("v1"), new IdImpl("p1"), passengerIds);
+		passengerIds.add(Id.create("p2", Person.class));
+		passengerIds.add(Id.create("p3", Person.class));
+		passengerIds.add(Id.create("p4", Person.class));
+		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driver, 1, jointDeparture1, jointDepartureOrganizer);
 		assignJointDeparture(passenger1, 1, jointDeparture1, jointDepartureOrganizer);
 		assignJointDeparture(passenger2, 1, jointDeparture1, jointDepartureOrganizer);
 		assignJointDeparture(passenger3, 1, jointDeparture1, jointDepartureOrganizer);
 		
 		passengerIds = new LinkedHashSet<Id>();
-		passengerIds.add(new IdImpl("p2"));
-		passengerIds.add(new IdImpl("p3"));
-		passengerIds.add(new IdImpl("p5"));
-		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(new IdImpl("jd2"), new IdImpl("1to2"), new IdImpl("v1"), new IdImpl("p1"), passengerIds);
+		passengerIds.add(Id.create("p2", Person.class));
+		passengerIds.add(Id.create("p3", Person.class));
+		passengerIds.add(Id.create("p5", Person.class));
+		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driver, 3, jointDeparture2, jointDepartureOrganizer);
 		assignJointDeparture(passenger4, 1, jointDeparture2, jointDepartureOrganizer);
 		
@@ -730,15 +730,15 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		// check agents final destinations
 		for (MobsimAgent mobsimAgent : qSim.getAgents()) {
 			if (mobsimAgent.getId().toString().equals("p1")) {
-				assertEquals(new IdImpl("2to3"), mobsimAgent.getCurrentLinkId());
+				assertEquals(Id.create("2to3", Link.class), mobsimAgent.getCurrentLinkId());
 			} else if (mobsimAgent.getId().toString().equals("p2")) {
-				assertEquals(new IdImpl("2to3"), mobsimAgent.getCurrentLinkId());
+				assertEquals(Id.create("2to3", Link.class), mobsimAgent.getCurrentLinkId());
 			} else if (mobsimAgent.getId().toString().equals("p3")) {
-				assertEquals(new IdImpl("2to3"), mobsimAgent.getCurrentLinkId());
+				assertEquals(Id.create("2to3", Link.class), mobsimAgent.getCurrentLinkId());
 			} else if (mobsimAgent.getId().toString().equals("p4")) {
-				assertEquals(new IdImpl("1to2"), mobsimAgent.getCurrentLinkId());
+				assertEquals(Id.create("1to2", Link.class), mobsimAgent.getCurrentLinkId());
 			} else if (mobsimAgent.getId().toString().equals("p5")) {
-				assertEquals(new IdImpl("2to3"), mobsimAgent.getCurrentLinkId());
+				assertEquals(Id.create("2to3", Link.class), mobsimAgent.getCurrentLinkId());
 			}
 		}
 		
@@ -747,11 +747,11 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		assertEquals(6, eventsCounter.getLeaveCount());
 
 		// check whether all scheduled joint departures have been processed
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p1")));
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p2")));
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p3")));
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p4")));
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p5")));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p1", Person.class)));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p2", Person.class)));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p3", Person.class)));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p4", Person.class)));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p5", Person.class)));
 	}
 	
 	/*
@@ -768,21 +768,21 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		eventsManager.addHandler(eventsCounter);
 		
 		makeNetwork(scenario.getNetwork());
-		Person driverA = makeDriverA(new IdImpl("p1"), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
-		Person driverB = makeDriverB(new IdImpl("p2"), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		Person driverA = makeDriverA(Id.create("p1", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		Person driverB = makeDriverB(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
 		
 		Tuple<QSim, JointDepartureOrganizer> tuple = makeQSim(scenario, eventsManager); 
 		QSim qSim = tuple.getFirst();
 		JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
 		
-		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(new IdImpl("v1"), VehicleUtils.getDefaultVehicleType()), new IdImpl("0to1"));
+		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
 		Set<Id> passengerIds = new LinkedHashSet<Id>();
-		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(new IdImpl("jd1"), new IdImpl("0to1"), new IdImpl("v1"), new IdImpl("p1"), passengerIds);
+		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driverA, 1, jointDeparture1, jointDepartureOrganizer);
 		
 		passengerIds = new LinkedHashSet<Id>();
-		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(new IdImpl("jd2"), new IdImpl("1to2"), new IdImpl("v1"), new IdImpl("p2"), passengerIds);
+		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p2", Person.class), passengerIds);
 		assignJointDeparture(driverB, 1, jointDeparture2, jointDepartureOrganizer);
 		
 		qSim.run();
@@ -790,9 +790,9 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		// check agents final destinations
 		for (MobsimAgent mobsimAgent : qSim.getAgents()) {
 			if (mobsimAgent.getId().toString().equals("p1")) {
-				assertEquals(new IdImpl("1to2"), mobsimAgent.getCurrentLinkId());
+				assertEquals(Id.create("1to2", Link.class), mobsimAgent.getCurrentLinkId());
 			} else if (mobsimAgent.getId().toString().equals("p2")) {
-				assertEquals(new IdImpl("2to3"), mobsimAgent.getCurrentLinkId());
+				assertEquals(Id.create("2to3", Link.class), mobsimAgent.getCurrentLinkId());
 			}
 		}
 		
@@ -801,8 +801,8 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		assertEquals(2, eventsCounter.getLeaveCount());
 		
 		// check whether all scheduled joint departures have been processed
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p1")));
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p2")));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p1", Person.class)));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p2", Person.class)));
 	}
 	
 	/*
@@ -821,23 +821,23 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		eventsManager.addHandler(eventsCounter);
 		
 		makeNetwork(scenario.getNetwork());
-		Person driverA = makeDriverA(new IdImpl("p1"), scenario.getPopulation(), scenario.getNetwork(), 3650.0);
-		Person driverB = makeDriverB(new IdImpl("p2"), scenario.getPopulation(), scenario.getNetwork(), 3650.0);
-		Person passenger = makePickUpPassenger(new IdImpl("p3"), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		Person driverA = makeDriverA(Id.create("p1", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3650.0);
+		Person driverB = makeDriverB(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3650.0);
+		Person passenger = makePickUpPassenger(Id.create("p3", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
 		
 		Tuple<QSim, JointDepartureOrganizer> tuple = makeQSim(scenario, eventsManager); 
 		QSim qSim = tuple.getFirst();
 		JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
 		
-		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(new IdImpl("v1"), VehicleUtils.getDefaultVehicleType()), new IdImpl("0to1"));
+		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
 		Set<Id> passengerIds = new LinkedHashSet<Id>();
-		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(new IdImpl("jd1"), new IdImpl("0to1"), new IdImpl("v1"), new IdImpl("p1"), passengerIds);
+		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driverA, 1, jointDeparture1, jointDepartureOrganizer);
 		
 		passengerIds = new LinkedHashSet<Id>();
-		passengerIds.add(new IdImpl("p3"));
-		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(new IdImpl("jd2"), new IdImpl("1to2"), new IdImpl("v1"), new IdImpl("p2"), passengerIds);
+		passengerIds.add(Id.create("p3", Person.class));
+		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p2", Person.class), passengerIds);
 		assignJointDeparture(driverB, 1, jointDeparture2, jointDepartureOrganizer);
 		assignJointDeparture(passenger, 1, jointDeparture2, jointDepartureOrganizer);
 		
@@ -846,11 +846,11 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		// check agents final destinations
 		for (MobsimAgent mobsimAgent : qSim.getAgents()) {
 			if (mobsimAgent.getId().toString().equals("p1")) {
-				assertEquals(new IdImpl("1to2"), mobsimAgent.getCurrentLinkId());
+				assertEquals(Id.create("1to2", Link.class), mobsimAgent.getCurrentLinkId());
 			} else if (mobsimAgent.getId().toString().equals("p2")) {
-				assertEquals(new IdImpl("2to3"), mobsimAgent.getCurrentLinkId());
+				assertEquals(Id.create("2to3", Link.class), mobsimAgent.getCurrentLinkId());
 			} else if (mobsimAgent.getId().toString().equals("p3")) {
-				assertEquals(new IdImpl("2to3"), mobsimAgent.getCurrentLinkId());
+				assertEquals(Id.create("2to3", Link.class), mobsimAgent.getCurrentLinkId());
 			}
 		}
 		
@@ -859,9 +859,9 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		assertEquals(3, eventsCounter.getLeaveCount());
 		
 		// check whether all scheduled joint departures have been processed
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p1")));
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p2")));
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p3")));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p1", Person.class)));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p2", Person.class)));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p3", Person.class)));
 	}
 
 	/*
@@ -880,23 +880,23 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		eventsManager.addHandler(eventsCounter);
 		
 		makeNetwork(scenario.getNetwork());
-		Person driverA = makeDriverA(new IdImpl("p1"), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
-		Person driverB = makeDriverB(new IdImpl("p2"), scenario.getPopulation(), scenario.getNetwork(), 3700.0);
-		Person passenger = makePickUpPassenger(new IdImpl("p3"), scenario.getPopulation(), scenario.getNetwork(), 3650.0);
+		Person driverA = makeDriverA(Id.create("p1", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		Person driverB = makeDriverB(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3700.0);
+		Person passenger = makePickUpPassenger(Id.create("p3", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3650.0);
 		
 		Tuple<QSim, JointDepartureOrganizer> tuple = makeQSim(scenario, eventsManager); 
 		QSim qSim = tuple.getFirst();
 		JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
 		
-		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(new IdImpl("v1"), VehicleUtils.getDefaultVehicleType()), new IdImpl("0to1"));
+		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
 		Set<Id> passengerIds = new LinkedHashSet<Id>();
-		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(new IdImpl("jd1"), new IdImpl("0to1"), new IdImpl("v1"), new IdImpl("p1"), passengerIds);
+		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driverA, 1, jointDeparture1, jointDepartureOrganizer);
 		
 		passengerIds = new LinkedHashSet<Id>();
-		passengerIds.add(new IdImpl("p3"));
-		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(new IdImpl("jd2"), new IdImpl("1to2"), new IdImpl("v1"), new IdImpl("p2"), passengerIds);
+		passengerIds.add(Id.create("p3", Person.class));
+		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p2", Person.class), passengerIds);
 		assignJointDeparture(driverB, 1, jointDeparture2, jointDepartureOrganizer);
 		assignJointDeparture(passenger, 1, jointDeparture2, jointDepartureOrganizer);
 		
@@ -905,11 +905,11 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		// check agents final destinations
 		for (MobsimAgent mobsimAgent : qSim.getAgents()) {
 			if (mobsimAgent.getId().toString().equals("p1")) {
-				assertEquals(new IdImpl("1to2"), mobsimAgent.getCurrentLinkId());
+				assertEquals(Id.create("1to2", Link.class), mobsimAgent.getCurrentLinkId());
 			} else if (mobsimAgent.getId().toString().equals("p2")) {
-				assertEquals(new IdImpl("2to3"), mobsimAgent.getCurrentLinkId());
+				assertEquals(Id.create("2to3", Link.class), mobsimAgent.getCurrentLinkId());
 			} else if (mobsimAgent.getId().toString().equals("p3")) {
-				assertEquals(new IdImpl("2to3"), mobsimAgent.getCurrentLinkId());
+				assertEquals(Id.create("2to3", Link.class), mobsimAgent.getCurrentLinkId());
 			}
 		}
 		
@@ -918,9 +918,9 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		assertEquals(3, eventsCounter.getLeaveCount());
 		
 		// check whether all scheduled joint departures have been processed
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p1")));
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p2")));
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p3")));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p1", Person.class)));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p2", Person.class)));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p3", Person.class)));
 	}
 	
 	/*
@@ -939,23 +939,23 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		eventsManager.addHandler(eventsCounter);
 		
 		makeNetwork(scenario.getNetwork());
-		Person driverA = makeDriverA(new IdImpl("p1"), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
-		Person driverB = makeDriverB(new IdImpl("p2"), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
-		Person passenger = makePickUpPassenger(new IdImpl("p3"), scenario.getPopulation(), scenario.getNetwork(), 3650.0);
+		Person driverA = makeDriverA(Id.create("p1", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		Person driverB = makeDriverB(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		Person passenger = makePickUpPassenger(Id.create("p3", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3650.0);
 		
 		Tuple<QSim, JointDepartureOrganizer> tuple = makeQSim(scenario, eventsManager); 
 		QSim qSim = tuple.getFirst();
 		JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
 		
-		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(new IdImpl("v1"), VehicleUtils.getDefaultVehicleType()), new IdImpl("0to1"));
+		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
 		Set<Id> passengerIds = new LinkedHashSet<Id>();
-		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(new IdImpl("jd1"), new IdImpl("0to1"), new IdImpl("v1"), new IdImpl("p1"), passengerIds);
+		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driverA, 1, jointDeparture1, jointDepartureOrganizer);
 		
 		passengerIds = new LinkedHashSet<Id>();
-		passengerIds.add(new IdImpl("p3"));
-		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(new IdImpl("jd2"), new IdImpl("1to2"), new IdImpl("v1"), new IdImpl("p2"), passengerIds);
+		passengerIds.add(Id.create("p3", Person.class));
+		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p2", Person.class), passengerIds);
 		assignJointDeparture(driverB, 1, jointDeparture2, jointDepartureOrganizer);
 		assignJointDeparture(passenger, 1, jointDeparture2, jointDepartureOrganizer);
 		
@@ -964,11 +964,11 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		// check agents final destinations
 		for (MobsimAgent mobsimAgent : qSim.getAgents()) {
 			if (mobsimAgent.getId().toString().equals("p1")) {
-				assertEquals(new IdImpl("1to2"), mobsimAgent.getCurrentLinkId());
+				assertEquals(Id.create("1to2", Link.class), mobsimAgent.getCurrentLinkId());
 			} else if (mobsimAgent.getId().toString().equals("p2")) {
-				assertEquals(new IdImpl("2to3"), mobsimAgent.getCurrentLinkId());
+				assertEquals(Id.create("2to3", Link.class), mobsimAgent.getCurrentLinkId());
 			} else if (mobsimAgent.getId().toString().equals("p3")) {
-				assertEquals(new IdImpl("2to3"), mobsimAgent.getCurrentLinkId());
+				assertEquals(Id.create("2to3", Link.class), mobsimAgent.getCurrentLinkId());
 			}
 		}
 		
@@ -977,9 +977,9 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		assertEquals(3, eventsCounter.getLeaveCount());
 		
 		// check whether all scheduled joint departures have been processed
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p1")));
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p2")));
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p3")));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p1", Person.class)));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p2", Person.class)));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p3", Person.class)));
 	}
 	
 	/*
@@ -995,21 +995,21 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		eventsManager.addHandler(eventsCounter);
 		
 		makeNetwork(scenario.getNetwork());
-		makeNonStopDriver(new IdImpl("p1"), new IdImpl("v1"), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
-		makeNonStopPassenger(new IdImpl("p2"), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		makeNonStopDriver(Id.create("p1", Person.class), Id.create("v1", Vehicle.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		makeNonStopPassenger(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
 		
 		Tuple<QSim, JointDepartureOrganizer> tuple = makeQSim(scenario, eventsManager); 
 		QSim qSim = tuple.getFirst();
 		JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
 		
-		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(new IdImpl("v1"), VehicleUtils.getDefaultVehicleType()), new IdImpl("0to1"));
+		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
 		qSim.run();
 		
 		// check agents final destinations
 		for (MobsimAgent mobsimAgent : qSim.getAgents()) {
 			if (mobsimAgent.getId().toString().equals("p1")) {
-				assertEquals(new IdImpl("2to3"), mobsimAgent.getCurrentLinkId());
+				assertEquals(Id.create("2to3", Link.class), mobsimAgent.getCurrentLinkId());
 			}
 		}
 		
@@ -1019,8 +1019,8 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		assertEquals(1, eventsCounter.getLeaveCount());
 		
 		// check whether all scheduled joint departures have been processed
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p1")));
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p2")));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p1", Person.class)));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p2", Person.class)));
 	}
 	
 	/*
@@ -1036,18 +1036,18 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		eventsManager.addHandler(eventsCounter);
 		
 		makeNetwork(scenario.getNetwork());
-		Person driverA = makeNonStopDriver(new IdImpl("p1"), new IdImpl("v1"), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
-		Person driverB = makeNonStopDriver(new IdImpl("p2"), new IdImpl("v2"), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		Person driverA = makeNonStopDriver(Id.create("p1", Person.class), Id.create("v1", Vehicle.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		Person driverB = makeNonStopDriver(Id.create("p2", Person.class), Id.create("v2", Vehicle.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
 		
 		Tuple<QSim, JointDepartureOrganizer> tuple = makeQSim(scenario, eventsManager); 
 		QSim qSim = tuple.getFirst();
 		JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
 		
-		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(new IdImpl("v1"), VehicleUtils.getDefaultVehicleType()), new IdImpl("0to1"));
-		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(new IdImpl("v2"), VehicleUtils.getDefaultVehicleType()), new IdImpl("0to1"));
+		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
+		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v2", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
 		Set<Id> passengerIds = new LinkedHashSet<Id>();
-		JointDeparture jointDeparture = jointDepartureOrganizer.createJointDeparture(new IdImpl("jd1"), new IdImpl("0to1"), new IdImpl("v1"), new IdImpl("p1"), passengerIds);
+		JointDeparture jointDeparture = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driverA, 1, jointDeparture, jointDepartureOrganizer);
 		
 		qSim.run();
@@ -1055,9 +1055,9 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		// check agents final destinations
 		for (MobsimAgent mobsimAgent : qSim.getAgents()) {
 			if (mobsimAgent.getId().toString().equals("p1")) {
-				assertEquals(new IdImpl("2to3"), mobsimAgent.getCurrentLinkId());
+				assertEquals(Id.create("2to3", Link.class), mobsimAgent.getCurrentLinkId());
 			} else if (mobsimAgent.getId().toString().equals("p2")) {
-				assertEquals(new IdImpl("2to3"), mobsimAgent.getCurrentLinkId());
+				assertEquals(Id.create("2to3", Link.class), mobsimAgent.getCurrentLinkId());
 			}
 
 		}
@@ -1067,8 +1067,8 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		assertEquals(2, eventsCounter.getLeaveCount());
 		
 		// check whether all scheduled joint departures have been processed
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p1")));
-		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, new IdImpl("p2")));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p1", Person.class)));
+		assertEquals(false, peekJointDeparture(jointDepartureOrganizer, Id.create("p2", Person.class)));
 	}
 
 	/**
@@ -1117,21 +1117,21 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 	}
 	
 	private static void makeNetwork(Network network) {
-		Node node0 = network.getFactory().createNode(new IdImpl("node0"), new CoordImpl(0.0, 0.0));
+		Node node0 = network.getFactory().createNode(Id.create("node0", Node.class), new CoordImpl(0.0, 0.0));
 		network.addNode(node0);
-		Node node1 = network.getFactory().createNode(new IdImpl("node1"), new CoordImpl(100.0,0.0));
+		Node node1 = network.getFactory().createNode(Id.create("node1", Node.class), new CoordImpl(100.0,0.0));
 		network.addNode(node1);
-		Node node2 = network.getFactory().createNode(new IdImpl("node2"), new CoordImpl(200.0,0.0));
+		Node node2 = network.getFactory().createNode(Id.create("node2", Node.class), new CoordImpl(200.0,0.0));
 		network.addNode(node2);
-		Node node3 = network.getFactory().createNode(new IdImpl("node3"), new CoordImpl(300.0,0.0));
+		Node node3 = network.getFactory().createNode(Id.create("node3", Node.class), new CoordImpl(300.0,0.0));
 		network.addNode(node3);
 		
-		makeLink(network, new IdImpl("0to1"), node0, node1);
-		makeLink(network, new IdImpl("1to2"), node1, node2);
-		makeLink(network, new IdImpl("2to3"), node2, node3);
+		makeLink(network, Id.create("0to1", Link.class), node0, node1);
+		makeLink(network, Id.create("1to2", Link.class), node1, node2);
+		makeLink(network, Id.create("2to3", Link.class), node2, node3);
 	}
 	
-	private static void makeLink(Network network, Id id, Node from, Node to) {
+	private static void makeLink(Network network, Id<Link> id, Node from, Node to) {
 		Link link = network.getFactory().createLink(id, from, to);
 		link.setFreespeed(100);
 		link.setNumberOfLanes(1);
@@ -1140,23 +1140,23 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		network.addLink(link);
 	}
 
-	private static Person makeNonStopDriver(Id id, Id vehicleId, Population population, Network network, double activityEndTime) {
+	private static Person makeNonStopDriver(Id id, Id<Vehicle> vehicleId, Population population, Network network, double activityEndTime) {
 		Person person = population.getFactory().createPerson(id);
 		
 		Plan plan = population.getFactory().createPlan();
-		Activity a1 = population.getFactory().createActivityFromLinkId("a1", new IdImpl("0to1"));
+		Activity a1 = population.getFactory().createActivityFromLinkId("a1", Id.create("0to1", Link.class));
 		a1.setEndTime(activityEndTime);
 		plan.addActivity(a1);
 		Leg l1 = population.getFactory().createLeg(PassengerDepartureHandler.driverMode);
 		List<Id<Link>> route1 = new ArrayList<Id<Link>>();
-		route1.add(new IdImpl("0to1"));
-		route1.add(new IdImpl("1to2"));
-		route1.add(new IdImpl("2to3"));
+		route1.add(Id.create("0to1", Link.class));
+		route1.add(Id.create("1to2", Link.class));
+		route1.add(Id.create("2to3", Link.class));
 		NetworkRoute r1 = RouteUtils.createNetworkRoute(route1, network);
 		r1.setVehicleId(vehicleId);
 		l1.setRoute(r1);
 		plan.addLeg(l1);		
-		Activity a2 = population.getFactory().createActivityFromLinkId("a2", new IdImpl("2to3"));
+		Activity a2 = population.getFactory().createActivityFromLinkId("a2", Id.create("2to3", Link.class));
 		plan.addActivity(a2);
 		person.addPlan(plan);
 		population.addPerson(person);
@@ -1168,18 +1168,18 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		Person person = population.getFactory().createPerson(id);
 		
 		Plan plan = population.getFactory().createPlan();
-		Activity a1 = population.getFactory().createActivityFromLinkId("a1", new IdImpl("0to1"));
+		Activity a1 = population.getFactory().createActivityFromLinkId("a1", Id.create("0to1", Link.class));
 		a1.setEndTime(activityEndTime);
 		plan.addActivity(a1);
 		Leg l1 = population.getFactory().createLeg(PassengerDepartureHandler.driverMode);
 		List<Id<Link>> route1 = new ArrayList<Id<Link>>();
-		route1.add(new IdImpl("0to1"));
-		route1.add(new IdImpl("1to2"));
+		route1.add(Id.create("0to1", Link.class));
+		route1.add(Id.create("1to2", Link.class));
 		NetworkRoute r1 = RouteUtils.createNetworkRoute(route1, network);
-		r1.setVehicleId(new IdImpl("v1"));
+		r1.setVehicleId(Id.create("v1", Vehicle.class));
 		l1.setRoute(r1);
 		plan.addLeg(l1);		
-		Activity a2 = population.getFactory().createActivityFromLinkId("a2", new IdImpl("1to2"));
+		Activity a2 = population.getFactory().createActivityFromLinkId("a2", Id.create("1to2", Link.class));
 		plan.addActivity(a2);
 		person.addPlan(plan);
 		population.addPerson(person);
@@ -1191,18 +1191,18 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		Person person = population.getFactory().createPerson(id);
 		
 		Plan plan = population.getFactory().createPlan();
-		Activity a1 = population.getFactory().createActivityFromLinkId("a1", new IdImpl("1to2"));
+		Activity a1 = population.getFactory().createActivityFromLinkId("a1", Id.create("1to2", Link.class));
 		a1.setEndTime(activityEndTime);
 		plan.addActivity(a1);
 		Leg l1 = population.getFactory().createLeg(PassengerDepartureHandler.driverMode);
 		List<Id<Link>> route1 = new ArrayList<Id<Link>>();
-		route1.add(new IdImpl("1to2"));
-		route1.add(new IdImpl("2to3"));
+		route1.add(Id.create("1to2", Link.class));
+		route1.add(Id.create("2to3", Link.class));
 		NetworkRoute r1 = RouteUtils.createNetworkRoute(route1, network);
-		r1.setVehicleId(new IdImpl("v1"));
+		r1.setVehicleId(Id.create("v1", Vehicle.class));
 		l1.setRoute(r1);
 		plan.addLeg(l1);		
-		Activity a2 = population.getFactory().createActivityFromLinkId("a2", new IdImpl("2to3"));
+		Activity a2 = population.getFactory().createActivityFromLinkId("a2", Id.create("2to3", Link.class));
 		plan.addActivity(a2);
 		person.addPlan(plan);
 		population.addPerson(person);
@@ -1214,29 +1214,29 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		Person person = population.getFactory().createPerson(id);
 		
 		Plan plan = population.getFactory().createPlan();
-		Activity a1 = population.getFactory().createActivityFromLinkId("a1", new IdImpl("0to1"));
+		Activity a1 = population.getFactory().createActivityFromLinkId("a1", Id.create("0to1", Link.class));
 		a1.setEndTime(activityEndTime);
 		plan.addActivity(a1);
 		Leg l1 = population.getFactory().createLeg(PassengerDepartureHandler.driverMode);
 		List<Id<Link>> route1 = new ArrayList<Id<Link>>();
-		route1.add(new IdImpl("0to1"));
-		route1.add(new IdImpl("1to2"));
+		route1.add(Id.create("0to1", Link.class));
+		route1.add(Id.create("1to2", Link.class));
 		NetworkRoute r1 = RouteUtils.createNetworkRoute(route1, network);
-		r1.setVehicleId(new IdImpl("v0"));
+		r1.setVehicleId(Id.create("v0", Vehicle.class));
 		l1.setRoute(r1);
 		plan.addLeg(l1);		
-		Activity a2 = population.getFactory().createActivityFromLinkId("a2", new IdImpl("1to2"));
+		Activity a2 = population.getFactory().createActivityFromLinkId("a2", Id.create("1to2", Link.class));
 		a2.setEndTime(activityEndTime);
 		plan.addActivity(a2);
 		Leg l2 = population.getFactory().createLeg(PassengerDepartureHandler.passengerMode);
 		List<Id<Link>> route = new ArrayList<Id<Link>>();
-		route.add(new IdImpl("1to2"));
-		route.add(new IdImpl("2to3"));
+		route.add(Id.create("1to2", Link.class));
+		route.add(Id.create("2to3", Link.class));
 		NetworkRoute r2 = RouteUtils.createNetworkRoute(route, network);
-		r2.setVehicleId(new IdImpl("v1"));
+		r2.setVehicleId(Id.create("v1", Vehicle.class));
 		l2.setRoute(r2);
 		plan.addLeg(l2);
-		Activity a3 = population.getFactory().createActivityFromLinkId("a3", new IdImpl("2to3"));
+		Activity a3 = population.getFactory().createActivityFromLinkId("a3", Id.create("2to3", Link.class));
 		plan.addActivity(a3);
 		person.addPlan(plan);
 		population.addPerson(person);
@@ -1248,29 +1248,29 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		Person person = population.getFactory().createPerson(id);
 		
 		Plan plan = population.getFactory().createPlan();
-		Activity a1 = population.getFactory().createActivityFromLinkId("a1", new IdImpl("0to1"));
+		Activity a1 = population.getFactory().createActivityFromLinkId("a1", Id.create("0to1", Link.class));
 		a1.setEndTime(activityEndTime);
 		plan.addActivity(a1);
 		Leg l1 = population.getFactory().createLeg(PassengerDepartureHandler.driverMode);
 		List<Id<Link>> route1 = new ArrayList<Id<Link>>();
-		route1.add(new IdImpl("0to1"));
-		route1.add(new IdImpl("1to2"));
+		route1.add(Id.create("0to1", Link.class));
+		route1.add(Id.create("1to2", Link.class));
 		NetworkRoute r1 = RouteUtils.createNetworkRoute(route1, network);
-		r1.setVehicleId(new IdImpl("v1"));
+		r1.setVehicleId(Id.create("v1", Vehicle.class));
 		l1.setRoute(r1);
 		plan.addLeg(l1);		
-		Activity a2 = population.getFactory().createActivityFromLinkId("pickup/dropoff", new IdImpl("1to2"));
+		Activity a2 = population.getFactory().createActivityFromLinkId("pickup/dropoff", Id.create("1to2", Link.class));
 		a2.setEndTime(stopEndTime);
 		plan.addActivity(a2);
 		Leg l2 = population.getFactory().createLeg(PassengerDepartureHandler.driverMode);
 		List<Id<Link>> route2 = new ArrayList<Id<Link>>();
-		route2.add(new IdImpl("1to2"));
-		route2.add(new IdImpl("2to3"));
+		route2.add(Id.create("1to2", Link.class));
+		route2.add(Id.create("2to3", Link.class));
 		NetworkRoute r2 = RouteUtils.createNetworkRoute(route2, network);
-		r2.setVehicleId(new IdImpl("v1"));
+		r2.setVehicleId(Id.create("v1", Vehicle.class));
 		l2.setRoute(r2);
 		plan.addLeg(l2);
-		Activity a3 = population.getFactory().createActivityFromLinkId("a3", new IdImpl("2to3"));
+		Activity a3 = population.getFactory().createActivityFromLinkId("a3", Id.create("2to3", Link.class));
 		plan.addActivity(a3);
 		person.addPlan(plan);
 		population.addPerson(person);
@@ -1282,39 +1282,39 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		Person person = population.getFactory().createPerson(id);
 		
 		Plan plan = population.getFactory().createPlan();
-		Activity a1 = population.getFactory().createActivityFromLinkId("a1", new IdImpl("0to1"));
+		Activity a1 = population.getFactory().createActivityFromLinkId("a1", Id.create("0to1", Link.class));
 		a1.setEndTime(activityEndTime);
 		plan.addActivity(a1);
 		Leg l1 = population.getFactory().createLeg(PassengerDepartureHandler.driverMode);
 		List<Id<Link>> route1 = new ArrayList<Id<Link>>();
-		route1.add(new IdImpl("0to1"));
-		route1.add(new IdImpl("1to2"));
+		route1.add(Id.create("0to1", Link.class));
+		route1.add(Id.create("1to2", Link.class));
 		NetworkRoute r1 = RouteUtils.createNetworkRoute(route1, network);
-		r1.setVehicleId(new IdImpl("v1"));
+		r1.setVehicleId(Id.create("v1", Vehicle.class));
 		l1.setRoute(r1);
 		plan.addLeg(l1);		
-		Activity a2 = population.getFactory().createActivityFromLinkId("pickup/dropoff", new IdImpl("1to2"));
+		Activity a2 = population.getFactory().createActivityFromLinkId("pickup/dropoff", Id.create("1to2", Link.class));
 		a2.setEndTime(stopEndTime);
 		plan.addActivity(a2);
 		Leg l2 = population.getFactory().createLeg(PassengerDepartureHandler.driverMode);
 		List<Id<Link>> route2 = new ArrayList<Id<Link>>();
-		route2.add(new IdImpl("1to2"));
+		route2.add(Id.create("1to2", Link.class));
 		NetworkRoute r2 = RouteUtils.createNetworkRoute(route2, network);
-		r2.setVehicleId(new IdImpl("v1"));
+		r2.setVehicleId(Id.create("v1", Vehicle.class));
 		l2.setRoute(r2);
 		plan.addLeg(l2);
-		Activity a3 = population.getFactory().createActivityFromLinkId("pickup/dropoff", new IdImpl("1to2"));
+		Activity a3 = population.getFactory().createActivityFromLinkId("pickup/dropoff", Id.create("1to2", Link.class));
 		a3.setEndTime(stopEndTime + 1.0);
 		plan.addActivity(a3);		
 		Leg l3 = population.getFactory().createLeg(PassengerDepartureHandler.driverMode);
 		List<Id<Link>> route3 = new ArrayList<Id<Link>>();
-		route3.add(new IdImpl("1to2"));
-		route3.add(new IdImpl("2to3"));
+		route3.add(Id.create("1to2", Link.class));
+		route3.add(Id.create("2to3", Link.class));
 		NetworkRoute r3 = RouteUtils.createNetworkRoute(route3, network);
-		r3.setVehicleId(new IdImpl("v1"));
+		r3.setVehicleId(Id.create("v1", Vehicle.class));
 		l3.setRoute(r3);
 		plan.addLeg(l3);
-		Activity a4 = population.getFactory().createActivityFromLinkId("a4", new IdImpl("2to3"));
+		Activity a4 = population.getFactory().createActivityFromLinkId("a4", Id.create("2to3", Link.class));
 		plan.addActivity(a4);
 		person.addPlan(plan);
 		population.addPerson(person);
@@ -1326,19 +1326,19 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		Person person = population.getFactory().createPerson(id);
 		
 		Plan plan = population.getFactory().createPlan();
-		Activity a1 = population.getFactory().createActivityFromLinkId("a1", new IdImpl("0to1"));
+		Activity a1 = population.getFactory().createActivityFromLinkId("a1", Id.create("0to1", Link.class));
 		a1.setEndTime(activityEndTime);
 		plan.addActivity(a1);
 		Leg l = population.getFactory().createLeg(PassengerDepartureHandler.passengerMode);
 		List<Id<Link>> route = new ArrayList<Id<Link>>();
-		route.add(new IdImpl("0to1"));
-		route.add(new IdImpl("1to2"));
-		route.add(new IdImpl("2to3"));
+		route.add(Id.create("0to1", Link.class));
+		route.add(Id.create("1to2", Link.class));
+		route.add(Id.create("2to3", Link.class));
 		NetworkRoute r = RouteUtils.createNetworkRoute(route, network);
-		r.setVehicleId(new IdImpl("v1"));
+		r.setVehicleId(Id.create("v1", Vehicle.class));
 		l.setRoute(r);
 		plan.addLeg(l);
-		Activity a2 = population.getFactory().createActivityFromLinkId("a2", new IdImpl("2to3"));
+		Activity a2 = population.getFactory().createActivityFromLinkId("a2", Id.create("2to3", Link.class));
 		plan.addActivity(a2);
 		person.addPlan(plan);
 		population.addPerson(person);
@@ -1350,18 +1350,18 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		Person person = population.getFactory().createPerson(id);
 		
 		Plan plan = population.getFactory().createPlan();
-		Activity a1 = population.getFactory().createActivityFromLinkId("a1", new IdImpl("0to1"));
+		Activity a1 = population.getFactory().createActivityFromLinkId("a1", Id.create("0to1", Link.class));
 		a1.setEndTime(departureTime);
 		plan.addActivity(a1);
 		Leg l = population.getFactory().createLeg(PassengerDepartureHandler.passengerMode);
 		List<Id<Link>> route = new ArrayList<Id<Link>>();
-		route.add(new IdImpl("0to1"));
-		route.add(new IdImpl("1to2"));
+		route.add(Id.create("0to1", Link.class));
+		route.add(Id.create("1to2", Link.class));
 		NetworkRoute r = RouteUtils.createNetworkRoute(route, network);
-		r.setVehicleId(new IdImpl("v1"));
+		r.setVehicleId(Id.create("v1", Vehicle.class));
 		l.setRoute(r);
 		plan.addLeg(l);
-		Activity a2 = population.getFactory().createActivityFromLinkId("a2", new IdImpl("1to2"));
+		Activity a2 = population.getFactory().createActivityFromLinkId("a2", Id.create("1to2", Link.class));
 		plan.addActivity(a2);
 		person.addPlan(plan);
 		population.addPerson(person);
@@ -1373,28 +1373,28 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		Person person = population.getFactory().createPerson(id);
 		
 		Plan plan = population.getFactory().createPlan();
-		Activity a1 = population.getFactory().createActivityFromLinkId("a1", new IdImpl("1to2"));
+		Activity a1 = population.getFactory().createActivityFromLinkId("a1", Id.create("1to2", Link.class));
 		a1.setEndTime(activityEndTime);
 		plan.addActivity(a1);
 		Leg l = population.getFactory().createLeg(PassengerDepartureHandler.passengerMode);
 		List<Id<Link>> route = new ArrayList<Id<Link>>();
-		route.add(new IdImpl("1to2"));
+		route.add(Id.create("1to2", Link.class));
 		NetworkRoute r = RouteUtils.createNetworkRoute(route, network);
-		r.setVehicleId(new IdImpl("v1"));
+		r.setVehicleId(Id.create("v1", Vehicle.class));
 		l.setRoute(r);
 		plan.addLeg(l);
-		Activity a2 = population.getFactory().createActivityFromLinkId("a2", new IdImpl("1to2"));
+		Activity a2 = population.getFactory().createActivityFromLinkId("a2", Id.create("1to2", Link.class));
 		a2.setEndTime(activityEndTime + 600.0);
 		plan.addActivity(a2);
 		Leg l2 = population.getFactory().createLeg(TransportMode.walk);
 		List<Id<Link>> route2 = new ArrayList<Id<Link>>();
-		route2.add(new IdImpl("1to2"));
-		route2.add(new IdImpl("2to3"));
+		route2.add(Id.create("1to2", Link.class));
+		route2.add(Id.create("2to3", Link.class));
 		NetworkRoute r2 = RouteUtils.createNetworkRoute(route2, network);
-		r2.setVehicleId(new IdImpl("v1"));
+		r2.setVehicleId(Id.create("v1", Vehicle.class));
 		l2.setRoute(r2);
 		plan.addLeg(l2);
-		Activity a3 = population.getFactory().createActivityFromLinkId("a3", new IdImpl("2to3"));
+		Activity a3 = population.getFactory().createActivityFromLinkId("a3", Id.create("2to3", Link.class));
 		plan.addActivity(a3);
 		person.addPlan(plan);
 		population.addPerson(person);
@@ -1406,18 +1406,18 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		Person person = population.getFactory().createPerson(id);
 		
 		Plan plan = population.getFactory().createPlan();
-		Activity a1 = population.getFactory().createActivityFromLinkId("a1", new IdImpl("1to2"));
+		Activity a1 = population.getFactory().createActivityFromLinkId("a1", Id.create("1to2", Link.class));
 		a1.setEndTime(activityEndTime);
 		plan.addActivity(a1);
 		Leg l = population.getFactory().createLeg(PassengerDepartureHandler.passengerMode);
 		List<Id<Link>> route = new ArrayList<Id<Link>>();
-		route.add(new IdImpl("1to2"));
-		route.add(new IdImpl("2to3"));
+		route.add(Id.create("1to2", Link.class));
+		route.add(Id.create("2to3", Link.class));
 		NetworkRoute r = RouteUtils.createNetworkRoute(route, network);
-		r.setVehicleId(new IdImpl("v1"));
+		r.setVehicleId(Id.create("v1", Vehicle.class));
 		l.setRoute(r);
 		plan.addLeg(l);
-		Activity a2 = population.getFactory().createActivityFromLinkId("a2", new IdImpl("2to3"));
+		Activity a2 = population.getFactory().createActivityFromLinkId("a2", Id.create("2to3", Link.class));
 		plan.addActivity(a2);
 		person.addPlan(plan);
 		population.addPerson(person);

@@ -5,15 +5,16 @@ import java.util.Collection;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.vehicles.Vehicle;
 
 public class UmlaufImpl implements Umlauf {
 	
-	private Id id;
-	private Id vehicleId;
+	private Id<Umlauf> id;
+	private Id<Vehicle> vehicleId;
 	
 	private ArrayList<UmlaufStueckI> umlaufStuecke = new ArrayList<UmlaufStueckI>();
 
-	public UmlaufImpl(Id id) {
+	public UmlaufImpl(Id<Umlauf> id) {
 		super();
 		this.id = id;
 	}
@@ -24,12 +25,12 @@ public class UmlaufImpl implements Umlauf {
 	}
 
 	@Override
-	public Id getId() {
+	public Id<Umlauf> getId() {
 		return this.id;
 	}
 	
 	@Override
-	public void setVehicleId(final Id vehicleId) {
+	public void setVehicleId(final Id<Vehicle> vehicleId) {
 		this.vehicleId = vehicleId;
 		for (UmlaufStueckI umlaufStueck : umlaufStuecke) {
 			if (umlaufStueck.isFahrt()) {
@@ -39,7 +40,7 @@ public class UmlaufImpl implements Umlauf {
 	}
 
 	@Override
-	public Id getVehicleId() {
+	public Id<Vehicle> getVehicleId() {
 		return this.vehicleId;
 	}
 

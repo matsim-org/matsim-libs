@@ -23,17 +23,18 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 
 /**
  * @author dgrether
  */
 public class LanesToLinkAssignment20Impl implements LanesToLinkAssignment20 {
 
-	private final Id linkId;
+	private final Id<Link> linkId;
 
-	private final SortedMap<Id, LaneData20> lanes = new TreeMap<Id, LaneData20>();
+	private final SortedMap<Id<Lane>, LaneData20> lanes = new TreeMap<>();
 
-	public LanesToLinkAssignment20Impl(Id linkId) {
+	public LanesToLinkAssignment20Impl(Id<Link> linkId) {
 		this.linkId = linkId;
 	}
 
@@ -43,12 +44,12 @@ public class LanesToLinkAssignment20Impl implements LanesToLinkAssignment20 {
 	}
 
 	@Override
-	public Id getLinkId() {
+	public Id<Link> getLinkId() {
 		return linkId;
 	}
 
 	@Override
-	public SortedMap<Id, LaneData20> getLanes() {
+	public SortedMap<Id<Lane>, LaneData20> getLanes() {
 		return this.lanes;
 	}
 

@@ -23,6 +23,8 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.vehicles.Vehicle;
 
 /*
  * Nothing like departure time is needed since this is defined
@@ -30,15 +32,15 @@ import org.matsim.api.core.v01.Id;
  */
 public class JointDeparture {
 	
-	private final Id id;
-	private final Id linkId;
-	private final Id vehicleId;
+	private final Id<JointDeparture> id;
+	private final Id<Link> linkId;
+	private final Id<Vehicle> vehicleId;
 	private final Id driverId;
 	private final Set<Id> passengerIds;
 	
 	private boolean departed = false;
 	
-	/*package*/ JointDeparture(Id id, Id linkId, Id vehicleId, Id driverId, Set<Id> passengerIds) {
+	/*package*/ JointDeparture(Id<JointDeparture> id, Id<Link> linkId, Id<Vehicle> vehicleId, Id driverId, Set<Id> passengerIds) {
 		this.id = id;
 		this.linkId = linkId;
 		this.vehicleId = vehicleId;
@@ -59,15 +61,15 @@ public class JointDeparture {
 		return this.departed;
 	}
 	
-	public Id getId() {
+	public Id<JointDeparture> getId() {
 		return this.id;
 	}
 	
-	public Id getLinkId() {
+	public Id<Link> getLinkId() {
 		return this.linkId;
 	}
 
-	public Id getVehicleId() {
+	public Id<Vehicle> getVehicleId() {
 		return this.vehicleId;
 	}
 	

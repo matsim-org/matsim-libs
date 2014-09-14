@@ -19,6 +19,9 @@
 
 package org.matsim.core.mobsim.qsim;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -26,16 +29,14 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.testcases.MatsimTestUtils;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author dgrether
@@ -44,7 +45,7 @@ public class TravelTimeTest {
 
   @Test
 	public void testEquilOneAgent() {
-		Map<Id, Map<Id, Double>> agentTravelTimes = new HashMap<Id, Map<Id, Double>>();
+		Map<Id<Person>, Map<Id<Link>, Double>> agentTravelTimes = new HashMap<>();
 		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed("test/scenarios/equil/config.xml");
 		ScenarioImpl data = (ScenarioImpl) sl.getScenario();
 		Config conf = data.getConfig();
@@ -59,19 +60,19 @@ public class TravelTimeTest {
 
 		new QSimFactory().createMobsim(data, events).run();
 
-		Map<Id, Double> travelTimes = agentTravelTimes.get(new IdImpl("1"));
-		Assert.assertEquals(360.0, travelTimes.get(new IdImpl(6)).intValue(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(180.0, travelTimes.get(new IdImpl(15)).intValue(), MatsimTestUtils.EPSILON);
+		Map<Id<Link>, Double> travelTimes = agentTravelTimes.get(Id.create("1", Person.class));
+		Assert.assertEquals(360.0, travelTimes.get(Id.create(6, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(180.0, travelTimes.get(Id.create(15, Link.class)).intValue(), MatsimTestUtils.EPSILON);
 		// this one is NOT a travel time (it includes two activities and a zero-length trip)
-		Assert.assertEquals(13561.0, travelTimes.get(new IdImpl(20)).intValue(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(360.0, travelTimes.get(new IdImpl(21)).intValue(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1260.0, travelTimes.get(new IdImpl(22)).intValue(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(360.0, travelTimes.get(new IdImpl(23)).intValue(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(13561.0, travelTimes.get(Id.create(20, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(360.0, travelTimes.get(Id.create(21, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(1260.0, travelTimes.get(Id.create(22, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(360.0, travelTimes.get(Id.create(23, Link.class)).intValue(), MatsimTestUtils.EPSILON);
 	}
 
   @Test
 	public void testEquilTwoAgents() {
-		Map<Id, Map<Id, Double>> agentTravelTimes = new HashMap<Id, Map<Id, Double>>();
+		Map<Id<Person>, Map<Id<Link>, Double>> agentTravelTimes = new HashMap<>();
 		ScenarioLoaderImpl sl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed("test/scenarios/equil/config.xml");
 		ScenarioImpl data = (ScenarioImpl) sl.getScenario();
 		Config conf = data.getConfig();
@@ -86,40 +87,40 @@ public class TravelTimeTest {
 
 		new QSimFactory().createMobsim(data, events).run();
 
-		Map<Id, Double> travelTimes = agentTravelTimes.get(new IdImpl("1"));
-		Assert.assertEquals(360.0, travelTimes.get(new IdImpl(6)).intValue(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(180.0, travelTimes.get(new IdImpl(15)).intValue(), MatsimTestUtils.EPSILON);
+		Map<Id<Link>, Double> travelTimes = agentTravelTimes.get(Id.create("1", Person.class));
+		Assert.assertEquals(360.0, travelTimes.get(Id.create(6, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(180.0, travelTimes.get(Id.create(15, Link.class)).intValue(), MatsimTestUtils.EPSILON);
 		// this one is NOT a travel time (it includes two activities and a zero-length trip)
-		Assert.assertEquals(13561.0, travelTimes.get(new IdImpl(20)).intValue(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(360.0, travelTimes.get(new IdImpl(21)).intValue(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1260.0, travelTimes.get(new IdImpl(22)).intValue(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(360.0, travelTimes.get(new IdImpl(23)).intValue(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(13561.0, travelTimes.get(Id.create(20, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(360.0, travelTimes.get(Id.create(21, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(1260.0, travelTimes.get(Id.create(22, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(360.0, travelTimes.get(Id.create(23, Link.class)).intValue(), MatsimTestUtils.EPSILON);
 
 
-		travelTimes = agentTravelTimes.get(new IdImpl("2"));
-		Assert.assertEquals(360.0, travelTimes.get(new IdImpl(5)).intValue(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(180.0, travelTimes.get(new IdImpl(14)).intValue(), MatsimTestUtils.EPSILON);
+		travelTimes = agentTravelTimes.get(Id.create("2", Person.class));
+		Assert.assertEquals(360.0, travelTimes.get(Id.create(5, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(180.0, travelTimes.get(Id.create(14, Link.class)).intValue(), MatsimTestUtils.EPSILON);
 		// this one is NOT a travel time (it includes two activities and a zero-length trip)
-		Assert.assertEquals(13561.0, travelTimes.get(new IdImpl(20)).intValue(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(360.0, travelTimes.get(new IdImpl(21)).intValue(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(1260.0, travelTimes.get(new IdImpl(22)).intValue(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(360.0, travelTimes.get(new IdImpl(23)).intValue(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(13561.0, travelTimes.get(Id.create(20, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(360.0, travelTimes.get(Id.create(21, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(1260.0, travelTimes.get(Id.create(22, Link.class)).intValue(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(360.0, travelTimes.get(Id.create(23, Link.class)).intValue(), MatsimTestUtils.EPSILON);
 	}
 
 
 	private static class EventTestHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
 
-		private final Map<Id, Map<Id, Double>> agentTravelTimes;
+		private final Map<Id<Person>, Map<Id<Link>, Double>> agentTravelTimes;
 
-		public EventTestHandler(Map<Id, Map<Id, Double>> agentTravelTimes) {
+		public EventTestHandler(Map<Id<Person>, Map<Id<Link>, Double>> agentTravelTimes) {
 			this.agentTravelTimes = agentTravelTimes;
 		}
 
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
-			Map<Id, Double> travelTimes = this.agentTravelTimes.get(event.getPersonId());
+			Map<Id<Link>, Double> travelTimes = this.agentTravelTimes.get(event.getPersonId());
 			if (travelTimes == null) {
-				travelTimes = new HashMap<Id, Double>();
+				travelTimes = new HashMap<>();
 				this.agentTravelTimes.put(event.getPersonId(), travelTimes);
 			}
 			travelTimes.put(event.getLinkId(), Double.valueOf(event.getTime()));
@@ -127,7 +128,7 @@ public class TravelTimeTest {
 
 		@Override
 		public void handleEvent(LinkLeaveEvent event) {
-			Map<Id, Double> travelTimes = this.agentTravelTimes.get(event.getPersonId());
+			Map<Id<Link>, Double> travelTimes = this.agentTravelTimes.get(event.getPersonId());
 			if (travelTimes != null) {
 				Double d = travelTimes.get(event.getLinkId());
 				if (d != null) {

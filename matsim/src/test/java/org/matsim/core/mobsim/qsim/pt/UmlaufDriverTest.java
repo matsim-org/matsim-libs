@@ -20,6 +20,10 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -29,7 +33,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -46,13 +49,19 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.fakes.FakeAgent;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
-import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.vehicles.*;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleCapacity;
+import org.matsim.vehicles.VehicleCapacityImpl;
+import org.matsim.vehicles.VehicleImpl;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleTypeImpl;
 
 
 /**
@@ -70,27 +79,27 @@ public class UmlaufDriverTest extends MatsimTestCase {
 
 	public void testInitializationNetworkRoute() {
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
-		TransitLine tLine = builder.createTransitLine(new IdImpl("L"));
+		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
 		ArrayList<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 
 		NetworkImpl network = NetworkImpl.createNetwork();
-		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(   0, 0));
-		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(1000, 0));
-		Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(2000, 0));
-		Node node4 = network.createAndAddNode(new IdImpl("4"), new CoordImpl(3000, 0));
-		Node node5 = network.createAndAddNode(new IdImpl("5"), new CoordImpl(4000, 0));
-		Node node6 = network.createAndAddNode(new IdImpl("6"), new CoordImpl(5000, 0));
-		Link link1 = network.createAndAddLink(new IdImpl("1"), node1, node2, 1000.0, 10.0, 3600.0, 1);
-		Link link2 = network.createAndAddLink(new IdImpl("2"), node2, node3, 1000.0, 10.0, 3600.0, 1);
-		Link link3 = network.createAndAddLink(new IdImpl("3"), node3, node4, 1000.0, 10.0, 3600.0, 1);
-		Link link4 = network.createAndAddLink(new IdImpl("4"), node4, node5, 1000.0, 10.0, 3600.0, 1);
-		Link link5 = network.createAndAddLink(new IdImpl("5"), node5, node6, 1000.0, 10.0, 3600.0, 1);
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(   0, 0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(1000, 0));
+		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new CoordImpl(2000, 0));
+		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new CoordImpl(3000, 0));
+		Node node5 = network.createAndAddNode(Id.create("5", Node.class), new CoordImpl(4000, 0));
+		Node node6 = network.createAndAddNode(Id.create("6", Node.class), new CoordImpl(5000, 0));
+		Link link1 = network.createAndAddLink(Id.create("1", Link.class), node1, node2, 1000.0, 10.0, 3600.0, 1);
+		Link link2 = network.createAndAddLink(Id.create("2", Link.class), node2, node3, 1000.0, 10.0, 3600.0, 1);
+		Link link3 = network.createAndAddLink(Id.create("3", Link.class), node3, node4, 1000.0, 10.0, 3600.0, 1);
+		Link link4 = network.createAndAddLink(Id.create("4", Link.class), node4, node5, 1000.0, 10.0, 3600.0, 1);
+		Link link5 = network.createAndAddLink(Id.create("5", Link.class), node5, node6, 1000.0, 10.0, 3600.0, 1);
 
 		Collections.addAll(linkIds, link2.getId(), link3.getId(), link4.getId());
 		NetworkRoute route = new LinkNetworkRouteImpl(link1.getId(), link5.getId());
 		route.setLinkIds(link1.getId(), linkIds, link5.getId());
-		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, Collections.<TransitRouteStop>emptyList(), "bus");
-		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
+		TransitRoute tRoute = builder.createTransitRoute(Id.create("L", TransitRoute.class), route, Collections.<TransitRouteStop>emptyList(), "bus");
+		Departure dep = builder.createDeparture(Id.create("L1.1", Departure.class), 9876.0);
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		QSim tqsim = (QSim) new QSimFactory().createMobsim(scenario, EventsUtils.createEventsManager());
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim);
@@ -100,11 +109,11 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		tLine.addRoute(tRoute);
 		Umlauf umlauf = buildUmlauf(tLine);
 		AbstractTransitDriverAgent driver = new TransitDriverAgentImpl(umlauf, TransportMode.walk, null, trEngine.getInternalInterface());
-		VehicleType vehType = new VehicleTypeImpl(new IdImpl("busType"));
+		VehicleType vehType = new VehicleTypeImpl(Id.create("busType", VehicleType.class));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(5));
 		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
+		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
 		driver.setVehicle(queueVehicle);
 		driver.endActivityAndComputeNextState(0);
@@ -120,7 +129,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		assertEquals(link5.getId(), driver.getDestinationLinkId());
 
 		assertEquals(link2.getId(), driver.chooseNextLinkId());
-		Id nextLinkId = driver.chooseNextLinkId() ;
+		Id<Link> nextLinkId = driver.chooseNextLinkId() ;
 		driver.notifyMoveOverNode(nextLinkId);
 
 		assertEquals(link3.getId(), driver.chooseNextLinkId());
@@ -144,11 +153,11 @@ public class UmlaufDriverTest extends MatsimTestCase {
 
 	public void testInitializationDeparture() {
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
-		TransitLine tLine = builder.createTransitLine(new IdImpl("L"));
+		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
 		NetworkRoute route = new LinkNetworkRouteImpl(null, null);
-		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, Collections.<TransitRouteStop>emptyList(), "bus");
+		TransitRoute tRoute = builder.createTransitRoute(Id.create("L", TransitRoute.class), route, Collections.<TransitRouteStop>emptyList(), "bus");
 		double depTime = 9876.5;
-		Departure dep = builder.createDeparture(new IdImpl("L1.1"), depTime);
+		Departure dep = builder.createDeparture(Id.create("L1.1", Departure.class), depTime);
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
 		Umlauf umlauf = buildUmlauf(tLine);
@@ -159,21 +168,21 @@ public class UmlaufDriverTest extends MatsimTestCase {
 	public void testInitializationStops() {
 		EventsManager events = EventsUtils.createEventsManager();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
-		TransitLine tLine = builder.createTransitLine(new IdImpl("L"));
+		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
 		NetworkRoute route = new LinkNetworkRouteImpl(null, null);
 
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl("1"), new CoordImpl(500, 0), false);
-		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl("2"), new CoordImpl(1500, 0), false);
-		TransitStopFacility stop3 = builder.createTransitStopFacility(new IdImpl("3"), new CoordImpl(2500, 0), false);
-		TransitStopFacility stop4 = builder.createTransitStopFacility(new IdImpl("4"), new CoordImpl(3500, 0), false);
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new CoordImpl(500, 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new CoordImpl(1500, 0), false);
+		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new CoordImpl(2500, 0), false);
+		TransitStopFacility stop4 = builder.createTransitStopFacility(Id.create("4", TransitStopFacility.class), new CoordImpl(3500, 0), false);
 		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
 		stops.add(builder.createTransitRouteStop(stop2, 150, 160));
 		stops.add(builder.createTransitRouteStop(stop3, 250, 260));
 		stops.add(builder.createTransitRouteStop(stop4, 350, 360));
 
-		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, stops, "bus");
-		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
+		TransitRoute tRoute = builder.createTransitRoute(Id.create("L", TransitRoute.class), route, stops, "bus");
+		Departure dep = builder.createDeparture(Id.create("L1.1", Departure.class), 9876.0);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		QSim tqsim = (QSim) new QSimFactory().createMobsim(scenario, events);
@@ -184,11 +193,11 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		Umlauf umlauf = buildUmlauf(tLine);
 		AbstractTransitDriverAgent driver = new TransitDriverAgentImpl(umlauf, TransportMode.car, tracker, trEngine.getInternalInterface());
 
-		VehicleType vehType = new VehicleTypeImpl(new IdImpl("busType"));
+		VehicleType vehType = new VehicleTypeImpl(Id.create("busType", VehicleType.class));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(5));
 		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
+		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
 		TransitQVehicle queueVehicle = new TransitQVehicle(vehicle);
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
@@ -207,28 +216,28 @@ public class UmlaufDriverTest extends MatsimTestCase {
 	public void testHandleStop_EnterPassengers() {
 		EventsManager events = EventsUtils.createEventsManager();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
-		TransitLine tLine = builder.createTransitLine(new IdImpl("L"));
+		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
 
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl("1"), new CoordImpl(500, 0), false);
-		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl("2"), new CoordImpl(1500, 0), false);
-		TransitStopFacility stop3 = builder.createTransitStopFacility(new IdImpl("3"), new CoordImpl(1500, 0), false);
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new CoordImpl(500, 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new CoordImpl(1500, 0), false);
+		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new CoordImpl(1500, 0), false);
 		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
 		stops.add(builder.createTransitRouteStop(stop2, 150, 160));
 		stops.add(builder.createTransitRouteStop(stop3, 250, 260));
 		NetworkRoute route = new LinkNetworkRouteImpl(null, null);
-		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, stops, "bus");
-		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
+		TransitRoute tRoute = builder.createTransitRoute(Id.create("L", TransitRoute.class), route, stops, "bus");
+		Departure dep = builder.createDeparture(Id.create("L1.1", Departure.class), 9876.0);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		QSim tqsim = (QSim) new QSimFactory().createMobsim(sc, events);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 		tqsim.addMobsimEngine(trEngine);
-		VehicleType vehType = new VehicleTypeImpl(new IdImpl("busType"));
+		VehicleType vehType = new VehicleTypeImpl(Id.create("busType", VehicleType.class));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(4));
 		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
+		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
 
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
@@ -280,18 +289,18 @@ public class UmlaufDriverTest extends MatsimTestCase {
 	public void testHandleStop_ExitPassengers() {
 		EventsManager events = EventsUtils.createEventsManager();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
-		TransitLine tLine = builder.createTransitLine(new IdImpl("L"));
+		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
 
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl("1"), new CoordImpl(500, 0), false);
-		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl("2"), new CoordImpl(1500, 0), false);
-		stop1.setLinkId(new IdImpl("dummy"));
-		stop2.setLinkId(new IdImpl("dummy"));
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new CoordImpl(500, 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new CoordImpl(1500, 0), false);
+		stop1.setLinkId(Id.create("dummy", Link.class));
+		stop2.setLinkId(Id.create("dummy", Link.class));
 		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
 		stops.add(builder.createTransitRouteStop(stop2, 150, 160));
 		NetworkRoute route = new LinkNetworkRouteImpl(null, null);
-		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, stops, "bus");
-		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
+		TransitRoute tRoute = builder.createTransitRoute(Id.create("L", TransitRoute.class), route, stops, "bus");
+		Departure dep = builder.createDeparture(Id.create("L1.1", Departure.class), 9876.0);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		QSim tqsim = (QSim) new QSimFactory().createMobsim(sc, events);
@@ -299,11 +308,11 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		tqsim.addMobsimEngine(trEngine) ;
 
 
-		VehicleType vehType = new VehicleTypeImpl(new IdImpl("busType"));
+		VehicleType vehType = new VehicleTypeImpl(Id.create("busType", VehicleType.class));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(5));
 		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
+		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
 
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
@@ -344,27 +353,27 @@ public class UmlaufDriverTest extends MatsimTestCase {
 	public void testReturnSensiblePlanElements() {
 		EventsManager events = EventsUtils.createEventsManager();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
-		TransitLine tLine = builder.createTransitLine(new IdImpl("L"));
+		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
 
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl("1"), new CoordImpl(500, 0), false);
-		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl("1"), new CoordImpl(1000, 0), false);
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new CoordImpl(500, 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new CoordImpl(1000, 0), false);
 		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
 		stops.add(builder.createTransitRouteStop(stop2, 100, 110));
 		NetworkRoute route = new LinkNetworkRouteImpl(null, null);
-		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, stops, "bus");
-		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
+		TransitRoute tRoute = builder.createTransitRoute(Id.create("L", TransitRoute.class), route, stops, "bus");
+		Departure dep = builder.createDeparture(Id.create("L1.1", Departure.class), 9876.0);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		QSim tqsim = (QSim) new QSimFactory().createMobsim(sc, events);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 		tqsim.addMobsimEngine(trEngine) ;
 
-		VehicleType vehType = new VehicleTypeImpl(new IdImpl("busType"));
+		VehicleType vehType = new VehicleTypeImpl(Id.create("busType", VehicleType.class));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(5));
 		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
+		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
 
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
@@ -384,27 +393,27 @@ public class UmlaufDriverTest extends MatsimTestCase {
 	public void testHandleStop_CorrectIdentification() {
 		EventsManager events = EventsUtils.createEventsManager();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
-		TransitLine tLine = builder.createTransitLine(new IdImpl("L"));
+		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
 
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl("1"), new CoordImpl(500, 0), false);
-		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl("1"), new CoordImpl(1000, 0), false);
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new CoordImpl(500, 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new CoordImpl(1000, 0), false);
 		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
 		stops.add(builder.createTransitRouteStop(stop2, 100, 110));
 		NetworkRoute route = new LinkNetworkRouteImpl(null, null);
-		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, stops, "bus");
-		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
+		TransitRoute tRoute = builder.createTransitRoute(Id.create("L", TransitRoute.class), route, stops, "bus");
+		Departure dep = builder.createDeparture(Id.create("L1.1", Departure.class), 9876.0);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		QSim tqsim = (QSim) new QSimFactory().createMobsim(sc, events);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim);
 		tqsim.addMobsimEngine(trEngine);
 		
-		VehicleType vehType = new VehicleTypeImpl(new IdImpl("busType"));
+		VehicleType vehType = new VehicleTypeImpl(Id.create("busType", VehicleType.class));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(5));
 		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
+		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
 
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
@@ -423,12 +432,12 @@ public class UmlaufDriverTest extends MatsimTestCase {
 	public void testHandleStop_AwaitDepartureTime() {
 		EventsManager events = EventsUtils.createEventsManager();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
-		TransitLine tLine = builder.createTransitLine(new IdImpl("L"));
+		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
 
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl("1"), new CoordImpl(500, 0), false);
-		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl("2"), new CoordImpl(500, 0), false);
-		TransitStopFacility stop3 = builder.createTransitStopFacility(new IdImpl("3"), new CoordImpl(500, 0), false);
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new CoordImpl(500, 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new CoordImpl(500, 0), false);
+		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new CoordImpl(500, 0), false);
 		double departureOffset1 = 60;
 		double departureOffset2 = 160;
 		double departureOffset3 = Time.UNDEFINED_TIME;
@@ -442,20 +451,20 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		routeStop3.setAwaitDepartureTime(true);
 		stops.add(routeStop3);
 		NetworkRoute route = new LinkNetworkRouteImpl(null, null);
-		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, stops, "bus");
+		TransitRoute tRoute = builder.createTransitRoute(Id.create("L", TransitRoute.class), route, stops, "bus");
 		double departureTime = 9876.0;
-		Departure dep = builder.createDeparture(new IdImpl("L1.1"), departureTime);
+		Departure dep = builder.createDeparture(Id.create("L1.1", Departure.class), departureTime);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		QSim tqsim = (QSim) new QSimFactory().createMobsim(sc, events);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 		tqsim.addMobsimEngine(trEngine);
 		
-		VehicleType vehType = new VehicleTypeImpl(new IdImpl("busType"));
+		VehicleType vehType = new VehicleTypeImpl(Id.create("busType", VehicleType.class));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(5));
 		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
+		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
 
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
@@ -480,32 +489,32 @@ public class UmlaufDriverTest extends MatsimTestCase {
 	public void testExceptionWhenNotEmptyAfterLastStop() {
 		EventsManager events = EventsUtils.createEventsManager();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
-		TransitLine tLine = builder.createTransitLine(new IdImpl("L"));
+		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
 
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl("1"), new CoordImpl(500, 0), false);
-		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl("2"), new CoordImpl(1500, 0), false);
-		TransitStopFacility stop3 = builder.createTransitStopFacility(new IdImpl("3"), new CoordImpl(2500, 0), false);
-		stop1.setLinkId(new IdImpl("dummy"));
-		stop2.setLinkId(new IdImpl("dummy"));
-		stop3.setLinkId(new IdImpl("dummy"));
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new CoordImpl(500, 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new CoordImpl(1500, 0), false);
+		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new CoordImpl(2500, 0), false);
+		stop1.setLinkId(Id.create("dummy", Link.class));
+		stop2.setLinkId(Id.create("dummy", Link.class));
+		stop3.setLinkId(Id.create("dummy", Link.class));
 		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
 		stops.add(builder.createTransitRouteStop(stop2, 150, 160));
 		stops.add(builder.createTransitRouteStop(stop3, 250, 260));
 		NetworkRoute route = new LinkNetworkRouteImpl(null, null);
-		TransitRoute tRoute = builder.createTransitRoute(new IdImpl("L1"), route, stops, "bus");
-		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
+		TransitRoute tRoute = builder.createTransitRoute(Id.create("L", TransitRoute.class), route, stops, "bus");
+		Departure dep = builder.createDeparture(Id.create("L1.1", Departure.class), 9876.0);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		QSim tqsim = (QSim) new QSimFactory().createMobsim(sc, events);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 		tqsim.addMobsimEngine(trEngine);
 		
-		VehicleType vehType = new VehicleTypeImpl(new IdImpl("busType"));
+		VehicleType vehType = new VehicleTypeImpl(Id.create("busType", VehicleType.class));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(5));
 		vehType.setCapacity(capacity);
-		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
+		Vehicle vehicle = new VehicleImpl(Id.create(1976, Vehicle.class), vehType);
 
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
@@ -562,12 +571,12 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		}
 
 		@Override
-		public Id getDesiredAccessStopId() {
+		public Id<TransitStopFacility> getDesiredAccessStopId() {
 			return null;
 		}
 
 		@Override
-		public Id getDesiredDestinationStopId() {
+		public Id<TransitStopFacility> getDesiredDestinationStopId() {
 			return null;
 		}
 		
@@ -581,17 +590,17 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		}
 
 		@Override
-		public Id getPlannedVehicleId() {
+		public Id<Vehicle> getPlannedVehicleId() {
 			return null;
 		}
 
 		@Override
-		public Id getCurrentLinkId() {
+		public Id<Link> getCurrentLinkId() {
 			return null;
 		}
 
 		@Override
-		public Id getDestinationLinkId() {
+		public Id<Link> getDestinationLinkId() {
 			return null;
 		}
 	}
