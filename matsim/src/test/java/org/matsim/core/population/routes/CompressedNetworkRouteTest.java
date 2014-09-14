@@ -33,8 +33,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.SubsequentLinksAnalyzer;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -44,7 +44,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 
 	@Override
-	public NetworkRoute getNetworkRouteInstance(final Id fromLinkId, final Id toLinkId, final NetworkImpl network) {
+	public NetworkRoute getNetworkRouteInstance(final Id<Link> fromLinkId, final Id<Link> toLinkId, final NetworkImpl network) {
 		SubsequentLinksAnalyzer subsequent = new SubsequentLinksAnalyzer(network);
 		return new CompressedNetworkRouteImpl(fromLinkId, toLinkId, network, subsequent.getSubsequentLinks());
 	}
@@ -58,12 +58,12 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 	@Test
 	public void testGetLinks_setLinks() {
 		NetworkImpl network = createTestNetwork();
-		Link link1 = network.getLinks().get(new IdImpl("1"));
-		Link link22 = network.getLinks().get(new IdImpl("22"));
-		Link link12 = network.getLinks().get(new IdImpl("12"));
-		Link link13 = network.getLinks().get(new IdImpl("13"));
-		Link linkM24 = network.getLinks().get(new IdImpl("-24"));
-		Link link4 = network.getLinks().get(new IdImpl("4"));
+		Link link1 = network.getLinks().get(Id.create("1", Link.class));
+		Link link22 = network.getLinks().get(Id.create("22", Link.class));
+		Link link12 = network.getLinks().get(Id.create("12", Link.class));
+		Link link13 = network.getLinks().get(Id.create("13", Link.class));
+		Link linkM24 = network.getLinks().get(Id.create("-24", Link.class));
+		Link link4 = network.getLinks().get(Id.create("4", Link.class));
 
 		List<Id<Link>> linkIds = new ArrayList<Id<Link>>(5);
 		Collections.addAll(linkIds, link22.getId(), link12.getId(), link13.getId(), linkM24.getId());
@@ -80,11 +80,11 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 	@Test
 	public void testGetLinks_onlySubsequentLinks() {
 		NetworkImpl network = createTestNetwork();
-		Link link0 = network.getLinks().get(new IdImpl("0"));
-		Link link1 = network.getLinks().get(new IdImpl("1"));
-		Link link2 = network.getLinks().get(new IdImpl("2"));
-		Link link3 = network.getLinks().get(new IdImpl("3"));
-		Link link4 = network.getLinks().get(new IdImpl("4"));
+		Link link0 = network.getLinks().get(Id.create("0", Link.class));
+		Link link1 = network.getLinks().get(Id.create("1", Link.class));
+		Link link2 = network.getLinks().get(Id.create("2", Link.class));
+		Link link3 = network.getLinks().get(Id.create("3", Link.class));
+		Link link4 = network.getLinks().get(Id.create("4", Link.class));
 
 		List<Id<Link>> linkIds = new ArrayList<Id<Link>>(4);
 		Collections.addAll(linkIds, link1.getId(), link2.getId(), link3.getId());
@@ -112,11 +112,11 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 	@Test
 	public void testGetLinkIds_incompleteInitialization() {
 		NetworkImpl network = createTestNetwork();
-		Link link0 = network.getLinks().get(new IdImpl("0"));
-		Link link1 = network.getLinks().get(new IdImpl("1"));
-		Link link2 = network.getLinks().get(new IdImpl("2"));
-		Link link3 = network.getLinks().get(new IdImpl("3"));
-		Link link4 = network.getLinks().get(new IdImpl("4"));
+		Link link0 = network.getLinks().get(Id.create("0", Link.class));
+		Link link1 = network.getLinks().get(Id.create("1", Link.class));
+		Link link2 = network.getLinks().get(Id.create("2", Link.class));
+		Link link3 = network.getLinks().get(Id.create("3", Link.class));
+		Link link4 = network.getLinks().get(Id.create("4", Link.class));
 
 		Map<Id<Link>, Id<Link>> subsequentLinks = new TreeMap<Id<Link>, Id<Link>>();
 		subsequentLinks.put(link0.getId(), link1.getId());
@@ -133,22 +133,15 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 
 	@Test
 	public void testClone() {
-		Id id1 = new IdImpl(1);
-		Id id2 = new IdImpl(2);
-		Id id3 = new IdImpl(3);
-		Id id4 = new IdImpl(4);
-		Id id5 = new IdImpl(5);
-		Id id6 = new IdImpl(6);
-
-		Network network = NetworkImpl.createNetwork();
+		Network network = NetworkUtils.createNetwork();
 		NetworkFactory builder = network.getFactory();
 
-		Node node1 = builder.createNode(id1, new CoordImpl(0, 1000));
-		Node node2 = builder.createNode(id2, new CoordImpl(0, 2000));
-		Node node3 = builder.createNode(id3, new CoordImpl(0, 3000));
-		Node node4 = builder.createNode(id4, new CoordImpl(0, 4000));
-		Node node5 = builder.createNode(id5, new CoordImpl(0, 5000));
-		Node node6 = builder.createNode(id6, new CoordImpl(0, 6000));
+		Node node1 = builder.createNode(Id.create(1, Node.class), new CoordImpl(0, 1000));
+		Node node2 = builder.createNode(Id.create(2, Node.class), new CoordImpl(0, 2000));
+		Node node3 = builder.createNode(Id.create(3, Node.class), new CoordImpl(0, 3000));
+		Node node4 = builder.createNode(Id.create(4, Node.class), new CoordImpl(0, 4000));
+		Node node5 = builder.createNode(Id.create(5, Node.class), new CoordImpl(0, 5000));
+		Node node6 = builder.createNode(Id.create(6, Node.class), new CoordImpl(0, 6000));
 
 		network.addNode(node1);
 		network.addNode(node2);
@@ -157,11 +150,11 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 		network.addNode(node5);
 		network.addNode(node6);
 
-		Link startLink = builder.createLink(id1, node1, node2);
-		Link link3 = builder.createLink(id3, node2, node3);
-		Link link4 = builder.createLink(id4, node3, node4);
-		Link link5 = builder.createLink(id5, node4, node5);
-		Link endLink = builder.createLink(id2, node5, node6);
+		Link startLink = builder.createLink(Id.create(1, Link.class), node1, node2);
+		Link link3 = builder.createLink(Id.create(3, Link.class), node2, node3);
+		Link link4 = builder.createLink(Id.create(4, Link.class), node3, node4);
+		Link link5 = builder.createLink(Id.create(5, Link.class), node4, node5);
+		Link endLink = builder.createLink(Id.create(2, Link.class), node5, node6);
 
 		network.addLink(startLink);
 		network.addLink(link3);

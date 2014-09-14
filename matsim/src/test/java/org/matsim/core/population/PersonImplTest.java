@@ -21,10 +21,10 @@
 package org.matsim.core.population;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.RandomUnscoredPlanSelector;
@@ -46,7 +46,7 @@ public class PersonImplTest extends MatsimTestCase {
 		PersonImpl person = null;
 		PlanImpl[] plans = new PlanImpl[10];
 		// create a person with 4 unscored plans
-		person = new PersonImpl(new IdImpl(1));
+		person = new PersonImpl(Id.create(1, Person.class));
 		plans[0] = person.createAndAddPlan(false);
 		plans[1] = person.createAndAddPlan(false);
 		plans[1].setScore(0.0);
@@ -89,7 +89,7 @@ public class PersonImplTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testRemoveUnselectedPlans() {
-		PersonImpl person = new PersonImpl(new IdImpl(1));
+		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
 		person.createAndAddPlan(false);
 		person.createAndAddPlan(false);
 		PlanImpl selPlan = person.createAndAddPlan(true);
@@ -104,7 +104,7 @@ public class PersonImplTest extends MatsimTestCase {
 	}
 
 	public void testRemovePlan() {
-		PersonImpl person = new PersonImpl(new IdImpl(5));
+		PersonImpl person = new PersonImpl(Id.create(5, Person.class));
 		PlanImpl p1 = person.createAndAddPlan(false);
 		PlanImpl p2 = person.createAndAddPlan(true);
 		PlanImpl p3 = person.createAndAddPlan(false);
@@ -129,7 +129,7 @@ public class PersonImplTest extends MatsimTestCase {
 	}
 
 	public void testSetSelectedPlan() {
-		PersonImpl person = new PersonImpl(new IdImpl(11));
+		PersonImpl person = new PersonImpl(Id.create(11, Person.class));
 		PlanImpl p1 = person.createAndAddPlan(false);
 		assertEquals(p1, person.getSelectedPlan());
 		PlanImpl p2 = person.createAndAddPlan(false);
@@ -151,7 +151,7 @@ public class PersonImplTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testGetBestPlan() {
-		PersonImpl person = new PersonImpl(new IdImpl(1));
+		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
 		Plan p1 = new PlanImpl();
 		p1.setScore(90.0);
 		Plan p2 = new PlanImpl();
@@ -166,7 +166,7 @@ public class PersonImplTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testGetBestPlan_multipleBest() {
-		PersonImpl person = new PersonImpl(new IdImpl(1));
+		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
 		Plan p1 = new PlanImpl();
 		p1.setScore(11.0);
 		Plan p2 = new PlanImpl();
@@ -184,7 +184,7 @@ public class PersonImplTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testGetBestPlan_oneWithoutScore() {
-		PersonImpl person = new PersonImpl(new IdImpl(1));
+		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
 		Plan p1 = new PlanImpl();
 		Plan p2 = new PlanImpl();
 		p2.setScore(80.0);
@@ -198,7 +198,7 @@ public class PersonImplTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testGetBestPlan_allWithoutScore() {
-		PersonImpl person = new PersonImpl(new IdImpl(1));
+		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
 		Plan p1 = new PlanImpl();
 		Plan p2 = new PlanImpl();
 		person.addPlan(p1);

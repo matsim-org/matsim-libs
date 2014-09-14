@@ -38,7 +38,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
@@ -237,7 +236,7 @@ public class PopulationReaderMatsimV4Test {
 		"</plans>";
 		reader.parse(new ByteArrayInputStream(str.getBytes()));
 
-		Plan plan = population.getPersons().get(new IdImpl(1)).getSelectedPlan();
+		Plan plan = population.getPersons().get(Id.create(1, Person.class)).getSelectedPlan();
 		Assert.assertEquals(5, plan.getPlanElements().size());
 		Assert.assertTrue(plan.getPlanElements().get(0) instanceof Activity);
 		Assert.assertTrue(plan.getPlanElements().get(1) instanceof Leg);
@@ -266,7 +265,7 @@ public class PopulationReaderMatsimV4Test {
 		"</plans>";
 		reader.parse(new ByteArrayInputStream(str.getBytes()));
 
-		Plan plan = population.getPersons().get(new IdImpl(1)).getSelectedPlan();
+		Plan plan = population.getPersons().get(Id.create(1, Person.class)).getSelectedPlan();
 		Assert.assertEquals(4, plan.getPlanElements().size());
 		Assert.assertTrue(plan.getPlanElements().get(0) instanceof Activity);
 		Assert.assertTrue(plan.getPlanElements().get(1) instanceof Leg);
