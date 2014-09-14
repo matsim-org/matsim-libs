@@ -23,11 +23,12 @@ package org.matsim.core.network;
 import java.util.Set;
 import java.util.Stack;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -100,8 +101,8 @@ public class NetworkReaderMatsimV1Test extends MatsimTestCase {
 	private Link prepareTestAllowedModes(final String modes) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
-		network.addNode(network.getFactory().createNode(new IdImpl("1"), new CoordImpl(0, 0)));
-		network.addNode(network.getFactory().createNode(new IdImpl("2"), new CoordImpl(1000, 0)));
+		network.addNode(network.getFactory().createNode(Id.create("1", Node.class), new CoordImpl(0, 0)));
+		network.addNode(network.getFactory().createNode(Id.create("2", Node.class), new CoordImpl(1000, 0)));
 
 		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(scenario);
 		Stack<String> context = new Stack<String>();
@@ -120,7 +121,7 @@ public class NetworkReaderMatsimV1Test extends MatsimTestCase {
 
 		// start test
 		assertEquals("expected one link.", 1, network.getLinks().size());
-		Link link = network.getLinks().get(new IdImpl("1"));
+		Link link = network.getLinks().get(Id.create("1", Link.class));
 		assertNotNull("expected link with id=1.", link);
 
 		return link;

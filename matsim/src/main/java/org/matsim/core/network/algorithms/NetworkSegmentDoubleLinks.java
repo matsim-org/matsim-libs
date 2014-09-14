@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
-import org.matsim.core.basic.v01.IdImpl;
 
 /**
  * This algorithm handles double links (two links with same from and to node) by splitting
@@ -64,7 +63,7 @@ public class NetworkSegmentDoubleLinks implements NetworkRunnable {
 		Queue<Node> nodes = new LinkedList<Node>(network.getNodes().values());
 		while (nodes.peek() != null) {
 			Node n = nodes.poll();
-			HashMap<Id, List<Link>> toNodesMap = new HashMap<Id, List<Link>>();
+			HashMap<Id<Node>, List<Link>> toNodesMap = new HashMap<>();
 			for (Link l : n.getOutLinks().values()) {
 				List<Link> links = toNodesMap.get(l.getToNode().getId());
 				if (links != null) {
@@ -88,7 +87,7 @@ public class NetworkSegmentDoubleLinks implements NetworkRunnable {
 		log.info("done.");
 	}
 
-	private void handleDblLinks(HashMap<Id, List<Link>> toNodesMap) {
+	private void handleDblLinks(HashMap<Id<Node>, List<Link>> toNodesMap) {
 		for (List<Link> vec : toNodesMap.values()) {
 			switch (vec.size()) {
 				case 1:
@@ -137,20 +136,20 @@ public class NetworkSegmentDoubleLinks implements NetworkRunnable {
 		this.network.addLink(tmpLink);
 	}
 
-	private Id getNewLinkId() {
+	private Id<Link> getNewLinkId() {
 		Random r = new Random();
-		Id id = new IdImpl(r.nextInt(Integer.MAX_VALUE));
+		Id<Link> id = Id.create(r.nextInt(Integer.MAX_VALUE), Link.class);
 		while (this.network.getLinks().get(id) != null) {
-			id = new IdImpl(r.nextInt(Integer.MAX_VALUE));
+			id = Id.create(r.nextInt(Integer.MAX_VALUE), Link.class);
 		}
 		return id;
 	}
 
-	private Id getNewNodeId() {
+	private Id<Node> getNewNodeId() {
 		Random r = new Random();
-		Id id = new IdImpl(r.nextInt(Integer.MAX_VALUE));
+		Id<Node> id = Id.create(r.nextInt(Integer.MAX_VALUE), Node.class);
 		while (this.network.getNodes().get(id) != null) {
-			id = new IdImpl(r.nextInt(Integer.MAX_VALUE));
+			id = Id.create(r.nextInt(Integer.MAX_VALUE), Node.class);
 		}
 		return id;
 	}

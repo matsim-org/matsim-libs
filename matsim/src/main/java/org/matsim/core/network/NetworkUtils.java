@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 
 /**
  * Contains several helper methods for working with {@link Network networks}.
@@ -108,7 +107,7 @@ public class NetworkUtils {
 		final List<Node> nodesList = new ArrayList<Node>(parts.length);
 
 		for (String id : parts) {
-			Node node = network.getNodes().get(new IdImpl(id));
+			Node node = network.getNodes().get(Id.create(id, Node.class));
 			if (node == null) {
 				throw new IllegalArgumentException("no node with id " + id);
 			}
@@ -150,7 +149,7 @@ public class NetworkUtils {
 		final List<Link> linksList = new ArrayList<Link>(parts.length);
 
 		for (String id : parts) {
-			Link link = network.getLinks().get(new IdImpl(id));
+			Link link = network.getLinks().get(Id.create(id, Link.class));
 			if (link == null) {
 				throw new IllegalArgumentException("no link with id " + id);
 			}
@@ -184,7 +183,7 @@ public class NetworkUtils {
 
 	public static List<Link> getLinks(final Network network, final List<Id<Link>> linkIds) {
 		List<Link> links = new ArrayList<Link>();
-		for (Id linkId : linkIds) {
+		for (Id<Link> linkId : linkIds) {
 			Link link = network.getLinks().get(linkId);
 			if (link == null) {
 				throw new IllegalArgumentException("no link with id " + linkId);
@@ -219,8 +218,8 @@ public class NetworkUtils {
 		}
 	}
 
-	public static Map<Id, Link> getIncidentLinks(final Node n) {
-		Map<Id, Link> links = new TreeMap<Id, Link>(n.getInLinks());
+	public static Map<Id<Link>, Link> getIncidentLinks(final Node n) {
+		Map<Id<Link>, Link> links = new TreeMap<>(n.getInLinks());
 		links.putAll(n.getOutLinks());
 		return links;
 	}

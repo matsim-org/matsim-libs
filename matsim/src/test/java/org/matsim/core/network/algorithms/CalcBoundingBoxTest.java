@@ -22,11 +22,12 @@ package org.matsim.core.network.algorithms;
 import junit.framework.Assert;
 
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
@@ -36,14 +37,14 @@ public class CalcBoundingBoxTest {
 
 	@Test
 	public void testRun() {
-		Network net = NetworkImpl.createNetwork();
+		Network net = NetworkUtils.createNetwork();
 		NetworkFactory nf = net.getFactory();
 
-		Node n0 = nf.createNode(new IdImpl(0), new CoordImpl(100, 500));
-		Node n1 = nf.createNode(new IdImpl(1), new CoordImpl(300, 400));
-		Node n2 = nf.createNode(new IdImpl(2), new CoordImpl(200, 700));
-		Node n3 = nf.createNode(new IdImpl(3), new CoordImpl(600, 200));
-		Node n4 = nf.createNode(new IdImpl(4), new CoordImpl(400, 300));
+		Node n0 = nf.createNode(Id.create(0, Node.class), new CoordImpl(100, 500));
+		Node n1 = nf.createNode(Id.create(1, Node.class), new CoordImpl(300, 400));
+		Node n2 = nf.createNode(Id.create(2, Node.class), new CoordImpl(200, 700));
+		Node n3 = nf.createNode(Id.create(3, Node.class), new CoordImpl(600, 200));
+		Node n4 = nf.createNode(Id.create(4, Node.class), new CoordImpl(400, 300));
 
 		net.addNode(n0);
 		net.addNode(n1);
@@ -51,16 +52,16 @@ public class CalcBoundingBoxTest {
 		net.addNode(n3);
 		net.addNode(n4);
 
-		net.addLink(nf.createLink(new IdImpl(0), n0, n1));
-		net.addLink(nf.createLink(new IdImpl(1), n0, n2));
-		net.addLink(nf.createLink(new IdImpl(2), n1, n0));
-		net.addLink(nf.createLink(new IdImpl(3), n1, n3));
-		net.addLink(nf.createLink(new IdImpl(4), n2, n1));
-		net.addLink(nf.createLink(new IdImpl(5), n2, n3));
-		net.addLink(nf.createLink(new IdImpl(6), n3, n2));
-		net.addLink(nf.createLink(new IdImpl(7), n3, n4));
-		net.addLink(nf.createLink(new IdImpl(8), n4, n0));
-		net.addLink(nf.createLink(new IdImpl(9), n4, n2));
+		net.addLink(nf.createLink(Id.create(0, Link.class), n0, n1));
+		net.addLink(nf.createLink(Id.create(1, Link.class), n0, n2));
+		net.addLink(nf.createLink(Id.create(2, Link.class), n1, n0));
+		net.addLink(nf.createLink(Id.create(3, Link.class), n1, n3));
+		net.addLink(nf.createLink(Id.create(4, Link.class), n2, n1));
+		net.addLink(nf.createLink(Id.create(5, Link.class), n2, n3));
+		net.addLink(nf.createLink(Id.create(6, Link.class), n3, n2));
+		net.addLink(nf.createLink(Id.create(7, Link.class), n3, n4));
+		net.addLink(nf.createLink(Id.create(8, Link.class), n4, n0));
+		net.addLink(nf.createLink(Id.create(9, Link.class), n4, n2));
 
 		CalcBoundingBox bbox = new CalcBoundingBox();
 		bbox.run(net);
@@ -72,14 +73,14 @@ public class CalcBoundingBoxTest {
 
 	@Test
 	public void testRun_allNegative() {
-		Network net = NetworkImpl.createNetwork();
+		Network net = NetworkUtils.createNetwork();
 		NetworkFactory nf = net.getFactory();
 
-		Node n0 = nf.createNode(new IdImpl(0), new CoordImpl(-100, -500));
-		Node n1 = nf.createNode(new IdImpl(1), new CoordImpl(-300, -400));
-		Node n2 = nf.createNode(new IdImpl(2), new CoordImpl(-200, -700));
-		Node n3 = nf.createNode(new IdImpl(3), new CoordImpl(-600, -200));
-		Node n4 = nf.createNode(new IdImpl(4), new CoordImpl(-400, -300));
+		Node n0 = nf.createNode(Id.create(0, Node.class), new CoordImpl(-100, -500));
+		Node n1 = nf.createNode(Id.create(1, Node.class), new CoordImpl(-300, -400));
+		Node n2 = nf.createNode(Id.create(2, Node.class), new CoordImpl(-200, -700));
+		Node n3 = nf.createNode(Id.create(3, Node.class), new CoordImpl(-600, -200));
+		Node n4 = nf.createNode(Id.create(4, Node.class), new CoordImpl(-400, -300));
 
 		net.addNode(n0);
 		net.addNode(n1);
@@ -87,16 +88,16 @@ public class CalcBoundingBoxTest {
 		net.addNode(n3);
 		net.addNode(n4);
 
-		net.addLink(nf.createLink(new IdImpl(0), n0, n1));
-		net.addLink(nf.createLink(new IdImpl(1), n0, n2));
-		net.addLink(nf.createLink(new IdImpl(2), n1, n0));
-		net.addLink(nf.createLink(new IdImpl(3), n1, n3));
-		net.addLink(nf.createLink(new IdImpl(4), n2, n1));
-		net.addLink(nf.createLink(new IdImpl(5), n2, n3));
-		net.addLink(nf.createLink(new IdImpl(6), n3, n2));
-		net.addLink(nf.createLink(new IdImpl(7), n3, n4));
-		net.addLink(nf.createLink(new IdImpl(8), n4, n0));
-		net.addLink(nf.createLink(new IdImpl(9), n4, n2));
+		net.addLink(nf.createLink(Id.create(0, Link.class), n0, n1));
+		net.addLink(nf.createLink(Id.create(1, Link.class), n0, n2));
+		net.addLink(nf.createLink(Id.create(2, Link.class), n1, n0));
+		net.addLink(nf.createLink(Id.create(3, Link.class), n1, n3));
+		net.addLink(nf.createLink(Id.create(4, Link.class), n2, n1));
+		net.addLink(nf.createLink(Id.create(5, Link.class), n2, n3));
+		net.addLink(nf.createLink(Id.create(6, Link.class), n3, n2));
+		net.addLink(nf.createLink(Id.create(7, Link.class), n3, n4));
+		net.addLink(nf.createLink(Id.create(8, Link.class), n4, n0));
+		net.addLink(nf.createLink(Id.create(9, Link.class), n4, n2));
 
 		CalcBoundingBox bbox = new CalcBoundingBox();
 		bbox.run(net);

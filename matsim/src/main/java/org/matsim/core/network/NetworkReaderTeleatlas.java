@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimSomeReader;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
@@ -245,7 +244,7 @@ public class NetworkReaderTeleatlas implements MatsimSomeReader {
 				throw new IllegalArgumentException("In " + jcShpFileName + ": There is at least one feature that does not have an ID set.");
 			}
 			String type = feattyp + "-" + jncttyp;
-			Node n = network.getFactory().createNode(new IdImpl(id.toString()), c);
+			Node n = network.getFactory().createNode(Id.create(id.toString(), Node.class), c);
 			((NodeImpl) n).setType(type);
 			network.addNode(n);
 		}
@@ -360,8 +359,8 @@ public class NetworkReaderTeleatlas implements MatsimSomeReader {
 			if ((ferryType < 0) || (ferryType > 2)) {
 				throw new IllegalArgumentException(LINK_ID_NAME + "=" + id + ": " + LINK_FERRYTYP_NAME + "=" + ferryType + " not allowed.");
 			}
-			Id fromJunctionId = new IdImpl(f.getAttribute(LINK_FJNCTID_NAME).toString());
-			Id toJunctionId = new IdImpl(f.getAttribute(LINK_TJNCTID_NAME).toString());
+			Id<Node> fromJunctionId = Id.create(f.getAttribute(LINK_FJNCTID_NAME).toString(), Node.class);
+			Id<Node> toJunctionId = Id.create(f.getAttribute(LINK_TJNCTID_NAME).toString(), Node.class);
 			double length = Double.parseDouble(f.getAttribute(LINK_LENGTH_NAME).toString());
 			int linksType = Integer.parseInt(f.getAttribute(LINK_FRCTYP_NAME).toString());
 			if ((linksType < -1) || (linksType > 8)) {
@@ -425,14 +424,14 @@ public class NetworkReaderTeleatlas implements MatsimSomeReader {
 				ignoreCnt++;
 			} else {
 				if (oneway.equals(" ") || oneway.equals("N")) {
-					Link l = network.getFactory().createLink(new IdImpl(id.toString() + "FT"), fNode, tNode);
+					Link l = network.getFactory().createLink(Id.create(id.toString() + "FT", Link.class), fNode, tNode);
 					l.setLength(length);
 					l.setFreespeed(speed / 3.6);
 					l.setCapacity(cap);
 					l.setNumberOfLanes(lanes);
 					((LinkImpl) l).setOrigId(id.toString());
 					((LinkImpl) l).setType(linksType + "-" + featTyp + "-" + ferryType);
-					l = network.getFactory().createLink(new IdImpl(id.toString() + "TF"), tNode, fNode);
+					l = network.getFactory().createLink(Id.create(id.toString() + "TF", Link.class), tNode, fNode);
 					l.setLength(length);
 					l.setFreespeed(speed / 3.6);
 					l.setCapacity(cap);
@@ -440,7 +439,7 @@ public class NetworkReaderTeleatlas implements MatsimSomeReader {
 					((LinkImpl) l).setOrigId(id.toString());
 					((LinkImpl) l).setType(linksType + "-" + featTyp + "-" + ferryType);
 				} else if (oneway.equals("FT")) {
-					Link l = network.getFactory().createLink(new IdImpl(id.toString() + oneway), fNode, tNode);
+					Link l = network.getFactory().createLink(Id.create(id.toString() + oneway, Link.class), fNode, tNode);
 					l.setLength(length);
 					l.setFreespeed(speed / 3.6);
 					l.setCapacity(cap);
@@ -448,7 +447,7 @@ public class NetworkReaderTeleatlas implements MatsimSomeReader {
 					((LinkImpl) l).setOrigId(id.toString());
 					((LinkImpl) l).setType(linksType + "-" + featTyp + "-" + ferryType);
 				} else if (oneway.equals("TF")) {
-					Link l = network.getFactory().createLink(new IdImpl(id.toString() + oneway), tNode, fNode);
+					Link l = network.getFactory().createLink(Id.create(id.toString() + oneway, Link.class), tNode, fNode);
 					l.setLength(length);
 					l.setFreespeed(speed / 3.6);
 					l.setCapacity(cap);

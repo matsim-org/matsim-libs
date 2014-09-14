@@ -20,9 +20,9 @@
 
 package org.matsim.core.network;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -41,12 +41,12 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 		NetworkFactoryImpl nf = new NetworkFactoryImpl(network);
 		nf.setLinkFactory(new TimeVariantLinkFactory());
 		network.setFactory(nf);
-		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(0, 1000));
-		Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(1000, 2000));
-		Node node4 = network.createAndAddNode(new IdImpl("4"), new CoordImpl(2000, 2000));
-		final Link link1 = network.createAndAddLink(new IdImpl("1"), node1, node2, 1000, 1.667, 3600, 1);
-		final Link link3 = network.createAndAddLink(new IdImpl("3"), node3, node4, 1000, 1.667, 3600, 1);
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(0, 0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(0, 1000));
+		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new CoordImpl(1000, 2000));
+		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new CoordImpl(2000, 2000));
+		final Link link1 = network.createAndAddLink(Id.create("1", Link.class), node1, node2, 1000, 1.667, 3600, 1);
+		final Link link3 = network.createAndAddLink(Id.create("3", Link.class), node3, node4, 1000, 1.667, 3600, 1);
 
 		final double [] queryDates = {org.matsim.core.utils.misc.Time.UNDEFINED_TIME, 0., 1., 2., 3., 4.};
 
@@ -79,9 +79,9 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 		nf.setLinkFactory(new TimeVariantLinkFactory());
 		network.setFactory(nf);
 
-		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100, 0));
-		TimeVariantLinkImpl link = (TimeVariantLinkImpl)network.createAndAddLink(new IdImpl("1"), node1, node2, 100, 10, 3600, 1);
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(0, 0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(100, 0));
+		TimeVariantLinkImpl link = (TimeVariantLinkImpl)network.createAndAddLink(Id.create("1", Link.class), node1, node2, 100, 10, 3600, 1);
 
 		// test base values
 		assertEquals(10.0, link.getFreespeed(Time.UNDEFINED_TIME), EPSILON);
@@ -120,9 +120,9 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 		nf.setLinkFactory(new TimeVariantLinkFactory());
 		network.setFactory(nf);
 
-		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100, 0));
-		TimeVariantLinkImpl link = (TimeVariantLinkImpl)network.createAndAddLink(new IdImpl("1"), node1, node2, 100, 10, 3600, 1);
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(0, 0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(100, 0));
+		TimeVariantLinkImpl link = (TimeVariantLinkImpl)network.createAndAddLink(Id.create("1", Link.class), node1, node2, 100, 10, 3600, 1);
 
 		// test base values
 		assertEquals(10.0, link.getFreespeed(Time.UNDEFINED_TIME), EPSILON);
@@ -161,9 +161,9 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 		nf.setLinkFactory(new TimeVariantLinkFactory());
 		network.setFactory(nf);
 
-		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100, 0));
-		TimeVariantLinkImpl link = (TimeVariantLinkImpl)network.createAndAddLink(new IdImpl("1"), node1, node2, 100, 10, 3600, 1);
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(0, 0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(100, 0));
+		TimeVariantLinkImpl link = (TimeVariantLinkImpl)network.createAndAddLink(Id.create("1", Link.class), node1, node2, 100, 10, 3600, 1);
 
 		// test base values
 		assertEquals(10.0, link.getFreespeed(Time.UNDEFINED_TIME), EPSILON);
@@ -257,9 +257,9 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 		network.setFactory(nf);
 		network.setCapacityPeriod(3600.0);
 
-		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100, 0));
-		TimeVariantLinkImpl link = (TimeVariantLinkImpl)network.createAndAddLink(new IdImpl("1"), node1, node2, 100, 10, 3600, 1);
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(0, 0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(100, 0));
+		TimeVariantLinkImpl link = (TimeVariantLinkImpl)network.createAndAddLink(Id.create("1", Link.class), node1, node2, 100, 10, 3600, 1);
 
 		// test base values
 		assertEquals(3600.0, link.getCapacity(org.matsim.core.utils.misc.Time.UNDEFINED_TIME), EPSILON);
@@ -292,9 +292,9 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
 		network.setFactory(nf);
 		network.setCapacityPeriod(3600.0);
 
-		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100, 0));
-		TimeVariantLinkImpl link = (TimeVariantLinkImpl)network.createAndAddLink(new IdImpl("1"), node1, node2, 100, 10, 3600, 1);
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(0, 0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(100, 0));
+		TimeVariantLinkImpl link = (TimeVariantLinkImpl)network.createAndAddLink(Id.create("1", Link.class), node1, node2, 100, 10, 3600, 1);
 
 		// test base values
 		assertEquals(1.0, link.getNumberOfLanes(org.matsim.core.utils.misc.Time.UNDEFINED_TIME), EPSILON);

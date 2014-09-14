@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkReaderTeleatlas;
 import org.matsim.core.network.NodeImpl;
@@ -193,18 +192,20 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 		// create mp data structure
 		// TreeMap<mpId,TreeMap<mpSeqNr,linkId>>
 		log.info("  parsing meneuver paths dbf file...");
-		TreeMap<Id,TreeMap<Integer,Id>> mSequences = new TreeMap<Id, TreeMap<Integer,Id>>();
+		TreeMap<String, TreeMap<Integer,Id<Link>>> mSequences = new TreeMap<>();
 		while (r.hasNext()) {
 			Object[] entries = r.readEntry();
-			Id mpId = new IdImpl(entries[mpIdNameIndex].toString());
+			String mpId = entries[mpIdNameIndex].toString();
 			int mpSeqNr = Integer.parseInt(entries[mpSeqNrNameIndex].toString());
-			Id linkId = new IdImpl(entries[mpTrpelIDNameIndex].toString());
-			TreeMap<Integer,Id> mSequence = mSequences.get(mpId);
-			if (mSequence == null) { mSequence = new TreeMap<Integer,Id>(); }
+			Id<Link> linkId = Id.create(entries[mpTrpelIDNameIndex].toString(), Link.class);
+			TreeMap<Integer,Id<Link>> mSequence = mSequences.get(mpId);
+			if (mSequence == null) {
+				mSequence = new TreeMap<>();
+				mSequences.put(mpId, mSequence);
+			}
 			if (mSequence.put(mpSeqNr,linkId) != null) {
 				throw new IllegalArgumentException(MP_ID_NAME+"="+mpId+": "+MP_SEQNR_NAME+" "+mpSeqNr+" already exists.");
 			}
-			mSequences.put(mpId,mSequence);
 		}
 		log.info("    "+mSequences.size()+" maneuvers sequences stored.");
 		log.info("  done.");
@@ -214,7 +215,7 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 		// store the maneuver list of the nodes
 		// TreeMap<NodeId,ArrayList<Tuple<MnId,MnFeatType>>>
 		log.info("  parsing meneuver shape file...");
-		TreeMap<Id,ArrayList<Tuple<Id,Integer>>> maneuvers = new TreeMap<Id,ArrayList<Tuple<Id,Integer>>>();
+		TreeMap<Id<Node>, ArrayList<Tuple<String, Integer>>> maneuvers = new TreeMap<>();
 		SimpleFeatureSource fs = ShapeFileReader.readDataFile(this.mnShpFileName);
 		SimpleFeatureIterator fIt = fs.getFeatures().features();
 		while (fIt.hasNext()) {
@@ -222,12 +223,14 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 			int featType = Integer.parseInt(f.getAttribute(MN_FEATTYP_NAME).toString());
 			if ((featType == 2103) || (featType == 2102) || (featType == 2101)) {
 				// keep 'Prohibited Maneuver' (2103), 'Restricted Maneuver' (2102) and 'Calculated/Derived Prohibited Maneuver' (2101)
-				Id nodeId = new IdImpl(f.getAttribute(MN_JNCTID_NAME).toString());
-				ArrayList<Tuple<Id,Integer>> ms = maneuvers.get(nodeId);
-				if (ms == null) { ms = new ArrayList<Tuple<Id,Integer>>(); }
-				Tuple<Id,Integer> m = new Tuple<Id,Integer>(new IdImpl(f.getAttribute(MN_ID_NAME).toString()),featType);
+				Id<Node> nodeId = Id.create(f.getAttribute(MN_JNCTID_NAME).toString(), Node.class);
+				ArrayList<Tuple<String, Integer>> ms = maneuvers.get(nodeId);
+				if (ms == null) {
+					ms = new ArrayList<>();
+				}
+				Tuple<String, Integer> m = new Tuple<>(f.getAttribute(MN_ID_NAME).toString(), featType);
 				ms.add(m);
-				maneuvers.put(nodeId,ms);
+				maneuvers.put(nodeId, ms);
 			}
 			else if ((featType == 9401) || (featType == 2104)) {
 				//ignore 'Bifurcation' (9401) and 'Priority Maneuver' (2104)
@@ -249,46 +252,56 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 		int maneuverAssignedCnt = 0;
 		int virtualNodesCnt = 0;
 		int virtualLinksCnt = 0;
-		for (Map.Entry<Id, ArrayList<Tuple<Id, Integer>>> entry : maneuvers.entrySet()) {
-			Id nodeId = entry.getKey();
-			if (network.getNodes().get(nodeId) == null) { log.trace("  nodeid="+nodeId+": maneuvers exist for that node but node is missing. Ignoring and proceeding anyway..."); nodesIgnoredCnt++; }
-			else {
+		for (Map.Entry<Id<Node>, ArrayList<Tuple<String, Integer>>> entry : maneuvers.entrySet()) {
+			Id<Node> nodeId = entry.getKey();
+			if (network.getNodes().get(nodeId) == null) { 
+				log.trace("  nodeid="+nodeId+": maneuvers exist for that node but node is missing. Ignoring and proceeding anyway..."); 
+				nodesIgnoredCnt++;
+			} else {
 				// node found
 				Node n = network.getNodes().get(nodeId);
 				// init maneuver matrix
 				// TreeMap<fromLinkId,TreeMap<toLinkId,turnAllowed>>
-				TreeMap<Id,TreeMap<Id,Boolean>> mmatrix = new TreeMap<Id, TreeMap<Id,Boolean>>();
+				TreeMap<Id<Link>, TreeMap<Id<Link>, Boolean>> mmatrix = new TreeMap<>();
 				// assign maneuvers for given node to the matrix
-				ArrayList<Tuple<Id,Integer>> ms = entry.getValue();
-				for (Tuple<Id,Integer> m : ms) {
+				ArrayList<Tuple<String, Integer>> ms = entry.getValue();
+				for (Tuple<String, Integer> m : ms) {
 					// get maneuver path sequence for given maneuver
-					TreeMap<Integer,Id> mSequence = mSequences.get(m.getFirst());
+					TreeMap<Integer,Id<Link>> mSequence = mSequences.get(m.getFirst());
 					if (mSequence == null) { throw new Exception("nodeid="+nodeId+"; mnId="+m.getFirst()+": no maneuver sequence given."); }
 					if (mSequence.size() < 2) { throw new Exception("nodeid="+nodeId+"; mnId="+m.getFirst()+": mSequenceSize="+mSequence.size()+" not alowed!"); }
 					// get the first element of the sequence, defining the start link for the maneuver
-					Id firstLinkid = mSequence.values().iterator().next();
+					Id<Link> firstLinkid = mSequence.values().iterator().next();
 					// go through each other element (target link of the maneuver) of the sequence by sequence number
-					for (Id otherLinkId : mSequence.values()) {
+					for (Id<Link> otherLinkId : mSequence.values()) {
 						// get the start link and the target link of the maneuver
-						Link inLink = n.getInLinks().get(new IdImpl(firstLinkid+"FT"));
-						if (inLink == null) { inLink = n.getInLinks().get(new IdImpl(firstLinkid+"TF")); }
-						Link outLink = n.getOutLinks().get(new IdImpl(otherLinkId+"FT"));
-						if (outLink == null) { outLink = n.getOutLinks().get(new IdImpl(otherLinkId+"TF")); }
+						Link inLink = n.getInLinks().get(Id.create(firstLinkid+"FT", Link.class));
+						if (inLink == null) {
+							inLink = n.getInLinks().get(Id.create(firstLinkid+"TF", Link.class));
+						}
+						Link outLink = n.getOutLinks().get(Id.create(otherLinkId+"FT", Link.class));
+						if (outLink == null) { 
+							outLink = n.getOutLinks().get(Id.create(otherLinkId+"TF", Link.class));
+						}
 						if ((inLink != null) && (outLink != null)) {
 							// start and target link found and they are incident to the given node
 							if (m.getSecond() == 2102) {
 								// restricted maneuver: given start and target link path is allowed to drive
 								// store it to the matrix
-								TreeMap<Id,Boolean> outLinkMap = mmatrix.get(inLink.getId());
-								if (outLinkMap == null) { outLinkMap = new TreeMap<Id,Boolean>(); }
+								TreeMap<Id<Link>, Boolean> outLinkMap = mmatrix.get(inLink.getId());
+								if (outLinkMap == null) {
+									outLinkMap = new TreeMap<>();
+								}
 								outLinkMap.put(outLink.getId(), Boolean.TRUE);
 								mmatrix.put(inLink.getId(),outLinkMap);
 							}
 							else {
 								// prohibited maneuver: given start and target link path is not allowed to drive
 								// store it to the matrix
-								TreeMap<Id,Boolean> outLinkMap = mmatrix.get(inLink.getId());
-								if (outLinkMap == null) { outLinkMap = new TreeMap<Id,Boolean>(); }
+								TreeMap<Id<Link>,Boolean> outLinkMap = mmatrix.get(inLink.getId());
+								if (outLinkMap == null) {
+									outLinkMap = new TreeMap<>();
+								}
 								outLinkMap.put(outLink.getId(), Boolean.FALSE);
 								mmatrix.put(inLink.getId(),outLinkMap);
 							}
@@ -298,31 +311,33 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 					}
 				}
 				// complete the matrix
-				for (TreeMap<Id, Boolean> fromLinkEntry : mmatrix.values()) {
+				for (TreeMap<Id<Link>, Boolean> fromLinkEntry : mmatrix.values()) {
 					// detect inlinks with restricted maneuvers
 					boolean hasRestrictedManeuver = false;
 					for (Boolean b : fromLinkEntry.values()) {
 						if (b.booleanValue()) { hasRestrictedManeuver = true; }
 					}
 					// add missing toLink maneuvers
-					for (Id toLinkId : n.getOutLinks().keySet()) {
+					for (Id<Link> toLinkId : n.getOutLinks().keySet()) {
 						if (!fromLinkEntry.containsKey(toLinkId)) {
 							fromLinkEntry.put(toLinkId, Boolean.valueOf(!hasRestrictedManeuver));
 						}
 					}
 				}
 				// add allowed maneuvers for fromLinks which were not assigned yet.
-				for (Id fromLinkId : n.getInLinks().keySet()) {
+				for (Id<Link> fromLinkId : n.getInLinks().keySet()) {
 					if (!mmatrix.containsKey(fromLinkId)) {
-						mmatrix.put(fromLinkId,new TreeMap<Id, Boolean>());
-						for (Id toLinkId : n.getOutLinks().keySet()) { mmatrix.get(fromLinkId).put(toLinkId, Boolean.TRUE); }
+						mmatrix.put(fromLinkId, new TreeMap<Id<Link>, Boolean>());
+						for (Id<Link> toLinkId : n.getOutLinks().keySet()) {
+							mmatrix.get(fromLinkId).put(toLinkId, Boolean.TRUE);
+						}
 					}
 				}
 				// remove all U-turns from the matrix
 				if (this.removeUTurns) {
-					for (Id fromLinkId : n.getInLinks().keySet()) {
+					for (Id<Link> fromLinkId : n.getInLinks().keySet()) {
 						String str1 = fromLinkId.toString().substring(0,fromLinkId.toString().length()-2);
-						for (Id toLinkId : n.getOutLinks().keySet()) {
+						for (Id<Link> toLinkId : n.getOutLinks().keySet()) {
 							String str2 = toLinkId.toString().substring(0,toLinkId.toString().length()-2);
 							if (str1.equals(str2)) {
 								mmatrix.get(fromLinkId).put(toLinkId, Boolean.FALSE);
@@ -332,9 +347,9 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 				}
 				// create arraylist with turn tuples
 				ArrayList<TurnInfo> turns = new ArrayList<TurnInfo>();
-				for (Map.Entry<Id, TreeMap<Id, Boolean>> fromLinkEntry : mmatrix.entrySet()) {
-					Id fromLinkId = fromLinkEntry.getKey();
-					for (Map.Entry<Id, Boolean> toLinkEntry : fromLinkEntry.getValue().entrySet()) {
+				for (Map.Entry<Id<Link>, TreeMap<Id<Link>, Boolean>> fromLinkEntry : mmatrix.entrySet()) {
+					Id<Link> fromLinkId = fromLinkEntry.getKey();
+					for (Map.Entry<Id<Link>, Boolean> toLinkEntry : fromLinkEntry.getValue().entrySet()) {
 						if (toLinkEntry.getValue().booleanValue()) {
 							turns.add(new TurnInfo(fromLinkId, toLinkEntry.getKey()));
 						}

@@ -29,9 +29,9 @@ import java.util.List;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -174,7 +174,7 @@ public class NetworkChangeEventsParser extends MatsimXmlParser {
 		} else if(name.equalsIgnoreCase(LINK_TAG) && currentEvent != null) {
 			String value = atts.getValue(REF_ID_TAG);
 			if(value != null) {
-				Link link = network.getLinks().get(new IdImpl(value));
+				Link link = network.getLinks().get(Id.create(value, Link.class));
 				if(link != null)
 					currentEvent.addLink(link);
 				else

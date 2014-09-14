@@ -22,8 +22,9 @@ package org.matsim.core.network.algorithms;
 
 import junit.framework.TestCase;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -39,16 +40,16 @@ public class NetworkCleanerTest extends TestCase {
 	public void testSink() {
 		// create a simple network
 		NetworkImpl network = NetworkImpl.createNetwork();
-		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(  0,   0));
-		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100,   0));
-		Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(100, 100));
-		Node node4 = network.createAndAddNode(new IdImpl("4"), new CoordImpl(  0, 100));
-		Node node5 = network.createAndAddNode(new IdImpl("5"), new CoordImpl(200, 200));
-		network.createAndAddLink(new IdImpl("1"), node1, node2, 100, 100, 100, 1);
-		network.createAndAddLink(new IdImpl("2"), node2, node3, 100, 100, 100, 1);
-		network.createAndAddLink(new IdImpl("3"), node3, node4, 100, 100, 100, 1);
-		network.createAndAddLink(new IdImpl("4"), node4, node1, 100, 100, 100, 1);
-		network.createAndAddLink(new IdImpl("5"), node3, node5, 100, 100, 100, 1);
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(  0,   0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(100,   0));
+		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new CoordImpl(100, 100));
+		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new CoordImpl(  0, 100));
+		Node node5 = network.createAndAddNode(Id.create("5", Node.class), new CoordImpl(200, 200));
+		network.createAndAddLink(Id.create("1", Link.class), node1, node2, 100, 100, 100, 1);
+		network.createAndAddLink(Id.create("2", Link.class), node2, node3, 100, 100, 100, 1);
+		network.createAndAddLink(Id.create("3", Link.class), node3, node4, 100, 100, 100, 1);
+		network.createAndAddLink(Id.create("4", Link.class), node4, node1, 100, 100, 100, 1);
+		network.createAndAddLink(Id.create("5", Link.class), node3, node5, 100, 100, 100, 1);
 		// link 5 is a sink / dead end!
 
 		assertEquals("# nodes", 5, network.getNodes().size());
@@ -64,17 +65,17 @@ public class NetworkCleanerTest extends TestCase {
 	public void testDoubleSink() {
 		// create a simple network
 		NetworkImpl network = NetworkImpl.createNetwork();
-		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(  0,   0));
-		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100,   0));
-		Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(100, 100));
-		Node node4 = network.createAndAddNode(new IdImpl("4"), new CoordImpl(  0, 100));
-		Node node5 = network.createAndAddNode(new IdImpl("5"), new CoordImpl(200, 200));
-		network.createAndAddLink(new IdImpl("1"), node1, node2, 100, 100, 100, 1);
-		network.createAndAddLink(new IdImpl("2"), node2, node3, 100, 100, 100, 1);
-		network.createAndAddLink(new IdImpl("3"), node3, node4, 100, 100, 100, 1);
-		network.createAndAddLink(new IdImpl("4"), node4, node1, 100, 100, 100, 1);
-		network.createAndAddLink(new IdImpl("5"), node3, node5, 100, 100, 100, 1);
-		network.createAndAddLink(new IdImpl("6"), node2, node5, 100, 100, 100, 1);
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(  0,   0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(100,   0));
+		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new CoordImpl(100, 100));
+		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new CoordImpl(  0, 100));
+		Node node5 = network.createAndAddNode(Id.create("5", Node.class), new CoordImpl(200, 200));
+		network.createAndAddLink(Id.create("1", Link.class), node1, node2, 100, 100, 100, 1);
+		network.createAndAddLink(Id.create("2", Link.class), node2, node3, 100, 100, 100, 1);
+		network.createAndAddLink(Id.create("3", Link.class), node3, node4, 100, 100, 100, 1);
+		network.createAndAddLink(Id.create("4", Link.class), node4, node1, 100, 100, 100, 1);
+		network.createAndAddLink(Id.create("5", Link.class), node3, node5, 100, 100, 100, 1);
+		network.createAndAddLink(Id.create("6", Link.class), node2, node5, 100, 100, 100, 1);
 		// link 5 is a sink / dead end!
 
 		assertEquals("# nodes", 5, network.getNodes().size());
@@ -90,16 +91,16 @@ public class NetworkCleanerTest extends TestCase {
 	public void testSource() {
 		// create a simple network
 		NetworkImpl network = NetworkImpl.createNetwork();
-		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(  0,   0));
-		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100,   0));
-		Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(100, 100));
-		Node node4 = network.createAndAddNode(new IdImpl("4"), new CoordImpl(  0, 100));
-		Node node5 = network.createAndAddNode(new IdImpl("5"), new CoordImpl(200, 200));
-		network.createAndAddLink(new IdImpl("1"), node1, node2, 100, 100, 100, 1);
-		network.createAndAddLink(new IdImpl("2"), node2, node3, 100, 100, 100, 1);
-		network.createAndAddLink(new IdImpl("3"), node3, node4, 100, 100, 100, 1);
-		network.createAndAddLink(new IdImpl("4"), node4, node1, 100, 100, 100, 1);
-		network.createAndAddLink(new IdImpl("5"), node5, node3, 100, 100, 100, 1);
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(  0,   0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(100,   0));
+		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new CoordImpl(100, 100));
+		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new CoordImpl(  0, 100));
+		Node node5 = network.createAndAddNode(Id.create("5", Node.class), new CoordImpl(200, 200));
+		network.createAndAddLink(Id.create("1", Link.class), node1, node2, 100, 100, 100, 1);
+		network.createAndAddLink(Id.create("2", Link.class), node2, node3, 100, 100, 100, 1);
+		network.createAndAddLink(Id.create("3", Link.class), node3, node4, 100, 100, 100, 1);
+		network.createAndAddLink(Id.create("4", Link.class), node4, node1, 100, 100, 100, 1);
+		network.createAndAddLink(Id.create("5", Link.class), node5, node3, 100, 100, 100, 1);
 		// link 5 is a source / dead end!
 
 		assertEquals("# nodes", 5, network.getNodes().size());
@@ -115,17 +116,17 @@ public class NetworkCleanerTest extends TestCase {
 	public void testDoubleSource() {
 		// create a simple network
 		NetworkImpl network = NetworkImpl.createNetwork();
-		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(  0,   0));
-		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100,   0));
-		Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(100, 100));
-		Node node4 = network.createAndAddNode(new IdImpl("4"), new CoordImpl(  0, 100));
-		Node node5 = network.createAndAddNode(new IdImpl("5"), new CoordImpl(200, 200));
-		network.createAndAddLink(new IdImpl("1"), node1, node2, 100, 100, 100, 1);
-		network.createAndAddLink(new IdImpl("2"), node2, node3, 100, 100, 100, 1);
-		network.createAndAddLink(new IdImpl("3"), node3, node4, 100, 100, 100, 1);
-		network.createAndAddLink(new IdImpl("4"), node4, node1, 100, 100, 100, 1);
-		network.createAndAddLink(new IdImpl("5"), node5, node3, 100, 100, 100, 1);
-		network.createAndAddLink(new IdImpl("6"), node5, node4, 100, 100, 100, 1);
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(  0,   0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(100,   0));
+		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new CoordImpl(100, 100));
+		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new CoordImpl(  0, 100));
+		Node node5 = network.createAndAddNode(Id.create("5", Node.class), new CoordImpl(200, 200));
+		network.createAndAddLink(Id.create("1", Link.class), node1, node2, 100, 100, 100, 1);
+		network.createAndAddLink(Id.create("2", Link.class), node2, node3, 100, 100, 100, 1);
+		network.createAndAddLink(Id.create("3", Link.class), node3, node4, 100, 100, 100, 1);
+		network.createAndAddLink(Id.create("4", Link.class), node4, node1, 100, 100, 100, 1);
+		network.createAndAddLink(Id.create("5", Link.class), node5, node3, 100, 100, 100, 1);
+		network.createAndAddLink(Id.create("6", Link.class), node5, node4, 100, 100, 100, 1);
 		// link 5 is a source / dead end!
 
 		assertEquals("# nodes", 5, network.getNodes().size());

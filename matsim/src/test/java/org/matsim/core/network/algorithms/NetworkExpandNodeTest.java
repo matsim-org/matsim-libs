@@ -280,7 +280,7 @@ public class NetworkExpandNodeTest {
 		turns.add(new TurnInfo(Id.create("5", Link.class), Id.create("2", Link.class), walkOnly));
 		turns.add(new TurnInfo(Id.create("5", Link.class), Id.create("4", Link.class), carOnly));
 		
-		exp.expandNode(Id.create("3", Link.class), turns);
+		exp.expandNode(Id.create("3", Node.class), turns);
 		Network n = f.scenario.getNetwork();
 		Assert.assertEquals(12, n.getLinks().size());
 		Assert.assertEquals(10, n.getNodes().size());

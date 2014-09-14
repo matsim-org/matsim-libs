@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -174,7 +173,7 @@ public class NetworkExpandNode {
 	 * @return The {@link Tuple} of {@link List lists} containing the newly created
 	 * {@link Node nodes} and {@link Link links}.
 	 */
-	public final Tuple<List<Node>,List<Link>> expandNode(final Id nodeId, final List<TurnInfo> turns) {
+	public final Tuple<List<Node>,List<Link>> expandNode(final Id<Node> nodeId, final List<TurnInfo> turns) {
 		double e = this.offset;
 		Node node = network.getNodes().get(nodeId);
 		if (node == null) {
@@ -185,14 +184,14 @@ public class NetworkExpandNode {
 		}
 		
 		for (int i=0; i<turns.size(); i++) {
-			Id first = turns.get(i).getFromLinkId();
+			Id<Link> first = turns.get(i).getFromLinkId();
 			if (first == null) {
 				throw new IllegalArgumentException("given list contains 'null' values.");
 			}
 			if (!node.getInLinks().containsKey(first)) {
 				throw new IllegalArgumentException("nodeid="+nodeId+", linkid="+first+": link not an inlink of given node.");
 			}
-			Id second = turns.get(i).getToLinkId();
+			Id<Link> second = turns.get(i).getToLinkId();
 			if (second == null) {
 				throw new IllegalArgumentException("given list contains 'null' values.");
 			}
@@ -202,8 +201,8 @@ public class NetworkExpandNode {
 		}
 
 		// remove the node
-		Map<Id,Link> inlinks = new TreeMap<Id, Link>(node.getInLinks());
-		Map<Id,Link> outlinks = new TreeMap<Id, Link>(node.getOutLinks());
+		Map<Id<Link>,Link> inlinks = new TreeMap<>(node.getInLinks());
+		Map<Id<Link>,Link> outlinks = new TreeMap<>(node.getOutLinks());
 		if (network.removeNode(node.getId()) == null) { throw new RuntimeException("nodeid="+nodeId+": Failed to remove node from the network."); }
 
 		ArrayList<Node> newNodes = new ArrayList<Node>(inlinks.size()+outlinks.size());
@@ -225,7 +224,7 @@ public class NetworkExpandNode {
 			double x = c.getX() + d * dx - e * dy;
 			double y = c.getY() + d * dy + e * dx;
 			
-			Node n = network.getFactory().createNode(new IdImpl(node.getId()+"-"+nodeIdCnt),new CoordImpl(x,y));
+			Node n = network.getFactory().createNode(Id.create(node.getId()+"-"+nodeIdCnt, Node.class), new CoordImpl(x,y));
 			network.addNode(n);
 			newNodes.add(n);
 			nodeIdCnt++;
@@ -254,7 +253,7 @@ public class NetworkExpandNode {
 			double dy = cp.getY() / lcp;
 			double x = c.getX() + d * dx + e * dy;
 			double y = c.getY() + d * dy - e * dx;
-			Node n = network.getFactory().createNode(new IdImpl(node.getId()+"-"+nodeIdCnt),new CoordImpl(x,y));
+			Node n = network.getFactory().createNode(Id.create(node.getId()+"-"+nodeIdCnt, Node.class), new CoordImpl(x,y));
 			network.addNode(n);
 			newNodes.add(n);
 			nodeIdCnt++;
@@ -276,7 +275,7 @@ public class NetworkExpandNode {
 			TurnInfo turn = turns.get(i);
 			Link fromLink = network.getLinks().get(turn.getFromLinkId());
 			Link toLink = network.getLinks().get(turn.getToLinkId());
-			Link l = network.getFactory().createLink(new IdImpl(fromLink.getId()+"-"+i), fromLink.getToNode(), toLink.getFromNode());
+			Link l = network.getFactory().createLink(Id.create(fromLink.getId()+"-"+i, Link.class), fromLink.getToNode(), toLink.getFromNode());
 			double dist = CoordUtils.calcDistance(toLink.getFromNode().getCoord(), fromLink.getToNode().getCoord());
 			if (dist < 0.1 * this.expRadius) {
 				// mostly the case when nodes are on top of each other
@@ -317,14 +316,14 @@ public class NetworkExpandNode {
 	 * @param ignoreUTurns set this to <code>true</code> if u-turns are excluded from the check
 	 * @return <code>true</code> if the list of explicit turns given results in the same turning options available as when the node is not expanded, <code>false</code> otherwise. 
 	 */
-	public boolean turnsAreSameAsSingleNode(final Id nodeId, final List<TurnInfo> turns, final boolean ignoreUTurns) {
+	public boolean turnsAreSameAsSingleNode(final Id<Node> nodeId, final List<TurnInfo> turns, final boolean ignoreUTurns) {
 		Node node = this.network.getNodes().get(nodeId);
 
 		// first create list of all possible turning options
-		Map<Id, Map<Id, Set<String>>> allTurns = new HashMap<Id, Map<Id, Set<String>>>();
+		Map<Id<Link>, Map<Id<Link>, Set<String>>> allTurns = new HashMap<>();
 		
 		for (Link inLink : node.getInLinks().values()) {
-			Map<Id, Set<String>> t2 = new HashMap<Id, Set<String>>();
+			Map<Id<Link>, Set<String>> t2 = new HashMap<>();
 			for (Link outLink : node.getOutLinks().values()) {
 				if (inLink.getFromNode() != outLink.getToNode() || !ignoreUTurns) {
 					HashSet<String> modes = new HashSet<String>();
@@ -340,9 +339,9 @@ public class NetworkExpandNode {
 		 * if there remain some options in the "all possibles", we know that the given turns
 		 * act indeed as restrictions. */
 		for (TurnInfo ti : turns) {
-			Id from = ti.fromLinkId;
-			Id to = ti.toLinkId;
-			Map<Id, Set<String>> t2 = allTurns.get(from);
+			Id<Link> from = ti.fromLinkId;
+			Id<Link> to = ti.toLinkId;
+			Map<Id<Link>, Set<String>> t2 = allTurns.get(from);
 			if (t2 != null) {
 				Set<String> modes = t2.get(to);
 				if (modes != null) {
@@ -358,7 +357,7 @@ public class NetworkExpandNode {
 		}
 		
 		// now do the check
-		for (Map<Id, Set<String>> m : allTurns.values()) {
+		for (Map<Id<Link>, Set<String>> m : allTurns.values()) {
 			for (Set<String> modes : m.values()) {
 				if (modes.size() > 0) {
 					return false;
@@ -371,27 +370,27 @@ public class NetworkExpandNode {
 	
 	public static class TurnInfo {
 		
-		private final Id fromLinkId;
-		private final Id toLinkId;
+		private final Id<Link> fromLinkId;
+		private final Id<Link> toLinkId;
 		private final Set<String> modes;
 		
-		public TurnInfo(final Id fromLinkId, final Id toLinkId) {
+		public TurnInfo(final Id<Link> fromLinkId, final Id<Link> toLinkId) {
 			this.fromLinkId = fromLinkId;
 			this.toLinkId = toLinkId;
 			this.modes = null;
 		}
 		
-		public TurnInfo(final Id fromLinkId, final Id toLinkId, final Set<String> modes) {
+		public TurnInfo(final Id<Link> fromLinkId, final Id<Link> toLinkId, final Set<String> modes) {
 			this.fromLinkId = fromLinkId;
 			this.toLinkId = toLinkId;
 			this.modes = modes;
 		}
 		
-		public Id getFromLinkId() {
+		public Id<Link> getFromLinkId() {
 			return this.fromLinkId;
 		}
 		
-		public Id getToLinkId() {
+		public Id<Link> getToLinkId() {
 			return this.toLinkId;
 		}
 		

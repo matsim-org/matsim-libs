@@ -24,10 +24,10 @@ import java.io.FileInputStream;
 
 import org.apache.log4j.Logger;
 import org.geotools.data.shapefile.dbf.DbaseFileReader;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.internal.NetworkRunnable;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkReaderTeleatlas;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -156,8 +156,8 @@ public class NetworkTeleatlasAddSpeedRestrictions implements NetworkRunnable {
 				String id = entries[srIdNameIndex].toString();
 				if (valdir == 1) {
 					// Valid in Both Directions
-					Link ftLink = network.getLinks().get(new IdImpl(id+"FT"));
-					Link tfLink = network.getLinks().get(new IdImpl(id+"TF"));
+					Link ftLink = network.getLinks().get(Id.create(id+"FT", Link.class));
+					Link tfLink = network.getLinks().get(Id.create(id+"TF", Link.class));
 					if ((ftLink == null) || (tfLink == null)) { log.trace("  linkid="+id+", valdir="+valdir+": at least one link not found. Ignoring and proceeding anyway..."); srIgnoreCnt++; }
 					else {
 						double speed = Double.parseDouble(entries[srSpeedNameIndex].toString())/3.6;
@@ -168,7 +168,7 @@ public class NetworkTeleatlasAddSpeedRestrictions implements NetworkRunnable {
 				}
 				else if (valdir == 2) {
 					// Valid Only in Positive Direction
-					Link ftLink = network.getLinks().get(new IdImpl(id+"FT"));
+					Link ftLink = network.getLinks().get(Id.create(id+"FT", Link.class));
 					if (ftLink == null) { log.trace("  linkid="+id+", valdir="+valdir+": link not found. Ignoring and proceeding anyway..."); srIgnoreCnt++; }
 					else {
 						double speed = Double.parseDouble(entries[srSpeedNameIndex].toString())/3.6;
@@ -178,7 +178,7 @@ public class NetworkTeleatlasAddSpeedRestrictions implements NetworkRunnable {
 				}
 				else if (valdir == 3) {
 					// Valid Only in Negative Direction
-					Link tfLink = network.getLinks().get(new IdImpl(id+"TF"));
+					Link tfLink = network.getLinks().get(Id.create(id+"TF", Link.class));
 					if (tfLink == null) { log.trace("  linkid="+id+", valdir="+valdir+": link not found. Ignoring and proceeding anyway..."); srIgnoreCnt++; }
 					else {
 						double speed = Double.parseDouble(entries[srSpeedNameIndex].toString())/3.6;

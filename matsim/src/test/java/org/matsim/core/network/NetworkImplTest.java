@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.network.AbstractNetworkTest;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
@@ -53,13 +52,11 @@ public class NetworkImplTest extends AbstractNetworkTest {
 		Assert.assertEquals(3.75, net.getEffectiveLaneWidth(), 0.0);
 		Assert.assertEquals(3600.0, net.getCapacityPeriod(), 0.0);
 
-		Id id1 = new IdImpl(1);
-		Id id2 = new IdImpl(2);
-		NodeImpl node1 = new NodeImpl(id1, new CoordImpl(0, 0));
-		NodeImpl node2 = new NodeImpl(id2, new CoordImpl(1000, 0));
+		NodeImpl node1 = new NodeImpl(Id.create(1, Node.class), new CoordImpl(0, 0));
+		NodeImpl node2 = new NodeImpl(Id.create(2, Node.class), new CoordImpl(1000, 0));
 		net.addNode(node1);
 		net.addNode(node2);
-		Link link = net.getFactory().createLink(id1, node1, node2);
+		Link link = net.getFactory().createLink(Id.create(1, Link.class), node1, node2);
 		Assert.assertEquals(1, link.getAllowedModes().size());
 		Assert.assertEquals("car", link.getAllowedModes().iterator().next());
 	}
@@ -72,22 +69,18 @@ public class NetworkImplTest extends AbstractNetworkTest {
 	@Test
 	public void testAddLink_existingId() {
 		NetworkImpl network = new NetworkImpl();
-		Id id1 = new IdImpl(1);
-		Id id2 = new IdImpl(2);
-		Id id3 = new IdImpl(3);
-		Id id4 = new IdImpl(4);
-		NodeImpl node1 = new NodeImpl(id1, new CoordImpl(0, 0));
-		NodeImpl node2 = new NodeImpl(id2, new CoordImpl(1000, 0));
-		NodeImpl node3 = new NodeImpl(id3, new CoordImpl(2000, 500));
-		NodeImpl node4 = new NodeImpl(id4, new CoordImpl(2000, -500));
+		NodeImpl node1 = new NodeImpl(Id.create(1, Node.class), new CoordImpl(0, 0));
+		NodeImpl node2 = new NodeImpl(Id.create(2, Node.class), new CoordImpl(1000, 0));
+		NodeImpl node3 = new NodeImpl(Id.create(3, Node.class), new CoordImpl(2000, 500));
+		NodeImpl node4 = new NodeImpl(Id.create(4, Node.class), new CoordImpl(2000, -500));
 		network.addNode(node1);
 		network.addNode(node2);
 		network.addNode(node3);
 		network.addNode(node4);
 
-		LinkImpl link1 = new LinkImpl(id1, node1, node2, network, 1000, 100.0, 2000.0, 1.0);
-		LinkImpl link1b = new LinkImpl(id1, node2, node3, network, 1000, 100.0, 2000.0, 1.0);
-		LinkImpl link2 = new LinkImpl(id2, node2, node4, network, 1000, 100.0, 2000.0, 1.0);
+		LinkImpl link1 = new LinkImpl(Id.create(1, Link.class), node1, node2, network, 1000, 100.0, 2000.0, 1.0);
+		LinkImpl link1b = new LinkImpl(Id.create(1, Link.class), node2, node3, network, 1000, 100.0, 2000.0, 1.0);
+		LinkImpl link2 = new LinkImpl(Id.create(2, Link.class), node2, node4, network, 1000, 100.0, 2000.0, 1.0);
 		network.addLink(link1);
 		Assert.assertEquals(1, network.getLinks().size());
 		try {
@@ -112,11 +105,11 @@ public class NetworkImplTest extends AbstractNetworkTest {
 	@Test
 	public void testAddLink_noNodes(){
 		Network n = NetworkUtils.createNetwork();
-		Node a = n.getFactory().createNode(new IdImpl("a"), new CoordImpl(0.0, 0.0));
-		Node b = n.getFactory().createNode(new IdImpl("b"), new CoordImpl(1000.0, 0.0));
-		Node c = n.getFactory().createNode(new IdImpl("c"), new CoordImpl(0.0, 1000.0));
+		Node a = n.getFactory().createNode(Id.create("a", Node.class), new CoordImpl(0.0, 0.0));
+		Node b = n.getFactory().createNode(Id.create("b", Node.class), new CoordImpl(1000.0, 0.0));
+		Node c = n.getFactory().createNode(Id.create("c", Node.class), new CoordImpl(0.0, 1000.0));
 		
-		Link ab = n.getFactory().createLink(new IdImpl("ab"), a, b);
+		Link ab = n.getFactory().createLink(Id.create("ab", Link.class), a, b);
 		try{
 			n.addLink(ab);
 			Assert.fail("Should have thrown exception as fromNode was not in network.");
@@ -140,7 +133,7 @@ public class NetworkImplTest extends AbstractNetworkTest {
 			Assert.fail("Should not have thrown exception as both nodes are in network.");
 		}
 		
-		Link ac = n.getFactory().createLink(new IdImpl("ac"), a, c);
+		Link ac = n.getFactory().createLink(Id.create("ac", Link.class), a, c);
 		try{
 			n.addLink(ac);
 			Assert.fail("Should have thrown exception as toNode was not in network.");
@@ -161,13 +154,10 @@ public class NetworkImplTest extends AbstractNetworkTest {
 	@Test
 	public void testAddNode_existingId() {
 		NetworkImpl network = new NetworkImpl();
-		Id id1 = new IdImpl(1);
-		Id id2 = new IdImpl(2);
-		Id id3 = new IdImpl(3);
-		NodeImpl node1 = new NodeImpl(id1, new CoordImpl(0, 0));
-		NodeImpl node2 = new NodeImpl(id2, new CoordImpl(1000, 0));
-		NodeImpl node3 = new NodeImpl(id3, new CoordImpl(2000, 500));
-		NodeImpl node1b = new NodeImpl(id1, new CoordImpl(2000, 0));
+		NodeImpl node1 = new NodeImpl(Id.create(1, Node.class), new CoordImpl(0, 0));
+		NodeImpl node2 = new NodeImpl(Id.create(2, Node.class), new CoordImpl(1000, 0));
+		NodeImpl node3 = new NodeImpl(Id.create(3, Node.class), new CoordImpl(2000, 500));
+		NodeImpl node1b = new NodeImpl(Id.create(1, Node.class), new CoordImpl(2000, 0));
 		network.addNode(node1);
 		network.addNode(node2);
 		Assert.assertEquals(2, network.getNodes().size());
