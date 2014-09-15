@@ -15,7 +15,7 @@ public class BikeWalkTravelTimes {
 		// TODO Auto-generated method stub
 		
 		final BufferedReader readLink = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/coord_new.txt");
-		final BufferedWriter outLink = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/travelTimesWalkBike_new.txt");
+		final BufferedWriter outLink = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/travelTimesWalkBik_new.txt");
 
 		//final BufferedReader readLink = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/coordinates.txt");
 		String s = readLink.readLine();
