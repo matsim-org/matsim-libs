@@ -20,104 +20,35 @@
 package playground.julia.newSpatialAveraging;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.emissions.events.EmissionEventsReader;
-import org.matsim.contrib.emissions.types.ColdPollutant;
 import org.matsim.contrib.emissions.types.WarmPollutant;
-import org.matsim.contrib.emissions.utils.EmissionUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.geotools.MGC;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkColdEventHandler;
-import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkWarmEventHandler;
 import playground.julia.newSpatialAveraging.SpatialAveragingWriter;
 
 
 /**
- * @author benjamin
+ * @author benjamin, julia
  *
  */
 public class SpatialAveragingDemandEmissions {
 	private static final Logger logger = Logger.getLogger(SpatialAveragingDemandEmissions.class);
 
-	final double scalingFactor = 100.; //100
-	private final static String runNumber1 = "baseCase";
-	private final static String runDirectory1 = "../../runs-svn/detEval/exposureInternalization/internalize1pct/output/output_baseCase_ctd/";
-	private final static String runNumber2 = "zone30";
-	private final static String runDirectory2 = "../../runs-svn/detEval/exposureInternalization/internalize1pct/output/output_policyCase_zone30/";
-//	private final static String runNumber2 = "pricing";
-//	private final static String runDirectory2 = "../../runs-svn/detEval/exposureInternalization/internalize1pct/output/output_policyCase_pricing/";
-//	private final static String runNumber2 = "exposurePricing";
-//	private final static String runDirectory2 = "../../runs-svn/detEval/exposureInternalization/internalize1pct/output/output_policyCase_exposurePricing/";
-	private final String netFile1 = runDirectory1 + "output_network.xml.gz";
-	private final String munichShapeFile = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
-
-	private static String configFile1 = runDirectory1 + "output_config.xml";
-	private final static Integer lastIteration1 = getLastIteration(configFile1);
-	private static String configFile2 = runDirectory1 + "output_config.xml";
-	private final static Integer lastIteration2 = getLastIteration(configFile2);
-	private final String emissionFile1 = runDirectory1 + "ITERS/it." + lastIteration1 + "/" + lastIteration1 + ".emission.events.xml.gz";
-//	private final String emissionFile1 = "./input/1500.emission.events.xml";
-	private final String emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration2 + "/" + lastIteration2 + ".emission.events.xml.gz";
+	private String baseCase = "exposureInternalization"; // exposureInternalization, latsis, 981
+	private String compareCase = "zone30"; // zone30, pricing, exposurePricing, 983
 	
-
-//	final double scalingFactor = 100.;
-//	private final static String runNumber1 = "baseCase";
-//	private final static String runDirectory1 = "../../runs-svn/detEval/latsis/output/output_baseCase_ctd_newCode/";
-////	private final static String runNumber2 = "zone30";
-////	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_zone30/";
-//	private final static String runNumber2 = "pricing";
-//	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_pricing_newCode/";
-//	private final String netFile1 = runDirectory1 + "output_network.xml.gz";
-//	private final String munichShapeFile = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
-//
-//	private static String configFile1 = runDirectory1 + "output_config.xml.gz";
-//	private final static Integer lastIteration1 = getLastIteration(configFile1);
-//	private static String configFile2 = runDirectory1 + "output_config.xml.gz";
-//	private final static Integer lastIteration2 = getLastIteration(configFile2);
-//	private final String emissionFile1 = runDirectory1 + "ITERS/it." + lastIteration1 + "/" + lastIteration1 + ".emission.events.xml.gz";
-//	private final String emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration2 + "/" + lastIteration2 + ".emission.events.xml.gz";
-	
-	
-//	final double scalingFactor = 10.;
-//	private final static String runNumber1 = "981";
-//	private final static String runNumber2 = "983";
-//	private final static String runDirectory1 = "../../runs-svn/run" + runNumber1 + "/";
-//	private final static String runDirectory2 = "../../runs-svn/run" + runNumber2 + "/";
-//	private final String netFile1 = runDirectory1 + runNumber1 + ".output_network.xml.gz";
-//	private final String munichShapeFile = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
-//
-//	private static String configFile1 = runDirectory1 + runNumber1 + ".output_config.xml.gz";
-//	private final static Integer lastIteration1 = getLastIteration(configFile1);
-//	private static String configFile2 = runDirectory1 + runNumber1 + ".output_config.xml.gz";
-//	private final static Integer lastIteration2 = getLastIteration(configFile2);
-//	private final String emissionFile1 = runDirectory1 + "ITERS/it." + lastIteration1 + "/" + runNumber1 + "." + lastIteration1 + ".emission.events.xml.gz";
-//	private final String emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration2 + "/" + runNumber2 + "." + lastIteration2 + ".emission.events.xml.gz";
-
-	final CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:20004");
-	final double xMin = 4452550.25;
-	final double xMax = 4479483.33;
-	final double yMin = 5324955.00;
-	final double yMax = 5345696.81;
-	final int noOfXbins = 160; //160
-	final int noOfYbins = 120; //120
+	final int noOfXbins = 160;
+	final int noOfYbins = 120; 
 	
 	final int noOfTimeBins = 1;
 	
@@ -129,19 +60,15 @@ public class SpatialAveragingDemandEmissions {
 	private boolean writeRoutput = true;
 	private boolean writeGisOutput = false;
 	
-	SpatialAveragingWriter saWriter;
-	double simulationEndTime;
-	Network network;
-	
-	EmissionUtils emissionUtils = new EmissionUtils();
-
-	String outPathStub;
-
+	private SpatialAveragingWriter saWriter;
+	private double simulationEndTime;
+	private Network network;
+	private String outPathStub;
 	private EmissionsPerLinkAndTimeIntervalEventHandler emissionHandler;
-
 	private LinkWeightUtil linkWeightUtil;
-
 	private SpatialGrid[] timeInterval2GridBaseCase;
+
+	private SpatialAveragingInputData inputData;
 	
 	/*
 	 * process first emission file: calculate weighted emissions per cell
@@ -156,43 +83,43 @@ public class SpatialAveragingDemandEmissions {
 	
 	private void run() throws IOException{
 		
+		inputData = new SpatialAveragingInputData(baseCase, compareCase);
+		
 		if(useLineMethod){
 			linkWeightUtil = new LinkLineWeightUtil(smoothingRadius_m);
 		}else{
-			linkWeightUtil = new SimpleLinkWeightUtil(xMin, xMax, yMin, yMax, noOfXbins, noOfYbins, smoothingRadius_m, munichShapeFile, targetCRS);
+			linkWeightUtil = new SimpleLinkWeightUtil(inputData, noOfXbins, noOfYbins, smoothingRadius_m);
 		}
-		this.saWriter = new SpatialAveragingWriter(xMin, xMax, yMin, yMax, noOfXbins, noOfYbins, smoothingRadius_m, munichShapeFile, targetCRS);
+		this.saWriter = new SpatialAveragingWriter(inputData, noOfXbins, noOfYbins, smoothingRadius_m);
 		
-		this.simulationEndTime = getEndTime(configFile1);
-		this.network = loadScenario(netFile1).getNetwork();		
+		this.simulationEndTime = inputData.getEndTime();
+		this.network = loadNetwork(inputData.getNetworkFile());		
 		
 		runBaseCase();
+		
 		if(compareToBaseCase){
-			runCompareCase(emissionFile2);
+			runCompareCase(inputData.getEmissionFileForCompareCase());
 		}
 	}
 	
 	private void runBaseCase() throws IOException{
 
-		outPathStub = runDirectory1 + "analysis/spatialAveraging/" + runNumber1 + "." + lastIteration1;
-
-		EventsManager eventsManager = EventsUtils.createEventsManager();
-		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);
-		this.emissionHandler = new EmissionsPerLinkAndTimeIntervalEventHandler(this.simulationEndTime, noOfTimeBins, pollutant2analyze);
-		eventsManager.addHandler(emissionHandler);
-		emissionReader.parse(emissionFile1);
+		outPathStub = inputData.getAnalysisOutPathForBaseCase();
+		
+		parseEmissionFile(inputData.getEmissionFileForBaseCase());
 		
 		Map <Integer, Map<Id, Double>>timeInterval2Link2Pollutant = emissionHandler.getTimeIntervals2EmissionsPerLink();
+		
 		timeInterval2GridBaseCase= new SpatialGrid[noOfTimeBins];
 		
 		for(int timeInterval:timeInterval2Link2Pollutant.keySet()){
-			SpatialGrid sGrid = new SpatialGrid(noOfXbins, noOfYbins, this.xMin, this.xMax, this.yMin, this.yMax);
+			SpatialGrid sGrid = new SpatialGrid(inputData, noOfXbins, noOfYbins);
 			
 			for(Id linkId: timeInterval2Link2Pollutant.get(timeInterval).keySet()){
 				sGrid.addLinkValue(network.getLinks().get(linkId), timeInterval2Link2Pollutant.get(timeInterval).get(linkId), linkWeightUtil);
 			}
 			sGrid.multiplyAllCells(linkWeightUtil.getNormalizationFactor());
-			// store results for comparision
+			// store base case results for comparison
 			timeInterval2GridBaseCase[timeInterval] = sGrid;
 			Double endOfTimeInterval = (timeInterval+1)/noOfTimeBins*simulationEndTime;
 			// print tables
@@ -202,26 +129,21 @@ public class SpatialAveragingDemandEmissions {
 	
 	private void runCompareCase(String emissionFile) throws IOException{
 	
-		outPathStub = runDirectory1 + "analysis/spatialAveraging/" + runNumber2 + "." + lastIteration2 + "-" + runNumber1 + "." + lastIteration1 + ".absoluteDelta";
-
-		EventsManager eventsManager = EventsUtils.createEventsManager();
-		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);
-		this.emissionHandler = new EmissionsPerLinkAndTimeIntervalEventHandler(this.simulationEndTime, noOfTimeBins, pollutant2analyze);
-		eventsManager.addHandler(emissionHandler);
-		emissionReader.parse(emissionFile2);
+		outPathStub = inputData.getAnalysisOutPathForCompareCase();
+		
+		parseEmissionFile(inputData.getEmissionFileForCompareCase());
 		
 		Map <Integer, Map<Id, Double>>timeInterval2Link2Pollutant = emissionHandler.getTimeIntervals2EmissionsPerLink();
-		//SpatialGrid[] timeInterval2GridCompareCase = new SpatialGrid[noOfTimeBins];
 		
 		for(int timeInterval:timeInterval2Link2Pollutant.keySet()){
-			SpatialGrid sGrid = new SpatialGrid(noOfXbins, noOfYbins, this.xMin, this.xMax, this.yMin, this.yMax);
+			SpatialGrid sGrid = new SpatialGrid(inputData, noOfXbins, noOfYbins);
 			
 			for(Id linkId: timeInterval2Link2Pollutant.get(timeInterval).keySet()){
 				sGrid.addLinkValue(network.getLinks().get(linkId), timeInterval2Link2Pollutant.get(timeInterval).get(linkId), linkWeightUtil);
 			}
 			sGrid.multiplyAllCells(linkWeightUtil.getNormalizationFactor());
 			// calc differences
-			SpatialGrid differencesGrid = new SpatialGrid(noOfXbins, noOfYbins, this.xMin, this.xMax, this.yMin, this.yMax);
+			SpatialGrid differencesGrid = new SpatialGrid(inputData, noOfXbins, noOfYbins);
 			differencesGrid = sGrid.getDifferences(timeInterval2GridBaseCase[timeInterval]);
 			Double endOfTimeInterval = (timeInterval+1)/noOfTimeBins*simulationEndTime;
 			// print tables
@@ -229,10 +151,19 @@ public class SpatialAveragingDemandEmissions {
 		}			
 	}
 
+	private void parseEmissionFile(String emissionFile) {
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);
+		this.emissionHandler = new EmissionsPerLinkAndTimeIntervalEventHandler(this.simulationEndTime, noOfTimeBins, pollutant2analyze);
+		eventsManager.addHandler(emissionHandler);
+		emissionReader.parse(emissionFile);
+	}
+
 	private void writeOutput(SpatialGrid sGrid, Double endOfTimeInterval)
 			throws IOException {
 		if(writeRoutput){
-			logger.info("start writing r output to " + outPathStub);
+			logger.info("Starting to write R output.");
+			System.out.println("..........sgid" + sGrid.getAverageValuesOfGrid().length);
 			this.saWriter.writeRoutput(sGrid.getAverageValuesOfGrid(), outPathStub + ".Routput." + pollutant2analyze.toString() + ".g." + endOfTimeInterval + ".txt");
 			this.saWriter.writeRoutput(sGrid.getWeightsOfGrid(), outPathStub + ".Routput.Demand.vkm." + endOfTimeInterval + ".txt");
 			this.saWriter.writeRoutput(sGrid.getAverageValuesOfGrid(), outPathStub+ ".Routput." + pollutant2analyze + ".gPerVkm." + endOfTimeInterval + ".txt");
@@ -242,32 +173,14 @@ public class SpatialAveragingDemandEmissions {
 			this.saWriter.writeGISoutput(sGrid.getWeightsOfGrid(), outPathStub + ".GISoutput.Demand.vkm.movie.shp", endOfTimeInterval);
 			this.saWriter.writeGISoutput(sGrid.getAverageValuesOfGrid(), outPathStub +  ".GISoutput." + pollutant2analyze.toString() + ".gPerVkm.movie.shp",endOfTimeInterval);
 			}
-		logger.info("Done writing output.");
+		logger.info("Done writing R output to " + outPathStub);
 	}
 	
-	private Scenario loadScenario(String netFile) {
+	private Network loadNetwork(String netFile) {
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(netFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		return scenario;
-	}
-
-	private Double getEndTime(String configfile) {
-		Config config = ConfigUtils.createConfig();
-		MatsimConfigReader configReader = new MatsimConfigReader(config);
-		configReader.readFile(configfile);
-		Double endTime = config.qsim().getEndTime();
-		logger.info("Simulation end time is: " + endTime / 3600 + " hours.");
-		logger.info("Aggregating emissions for " + (int) (endTime / 3600 / noOfTimeBins) + " hour time bins.");
-		return endTime;
-	}
-
-	private static Integer getLastIteration(String configFile) {
-		Config config = ConfigUtils.createConfig();
-		MatsimConfigReader configReader = new MatsimConfigReader(config);
-		configReader.readFile(configFile);
-		Integer lastIteration = config.controler().getLastIteration();
-		return lastIteration;
+		return scenario.getNetwork();
 	}
 
 	public static void main(String[] args) throws IOException{

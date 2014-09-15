@@ -53,6 +53,10 @@ public class SpatialGrid {
 		}
 	}
 	
+	public SpatialGrid(SpatialAveragingInputData inputData, int noOfXbins,int noOfYbins) {
+		this(noOfXbins, noOfYbins, inputData.getMinX(), inputData.getMaxX(), inputData.getMinY(), inputData.getMaxY());
+	}
+
 	public void addLinkValue(Link link, Double value, LinkWeightUtil linkWeightUtil){
 		for(int i=0; i<numberOfCellsX; i++){
 			for(int j=0; j<numberOfCellsY; j++){

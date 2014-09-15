@@ -62,6 +62,15 @@ public class SimpleLinkWeightUtil implements LinkWeightUtil {
 	}
 	
 
+	public SimpleLinkWeightUtil(SpatialAveragingInputData inputData, int noOfXbins2, int noOfYbins2, double smoothingRadius_m) {
+		this(inputData.getMinX(), inputData.getMaxX(), 
+								inputData.getMinY(), inputData.getMaxY(), 
+								noOfXbins2, noOfYbins2, 
+								smoothingRadius_m, 
+								inputData.getMunichShapeFile(), inputData.getTargetCRS());
+	}
+
+
 	@Override
 	public Double getWeightFromLink(Link link, Coord cellCentroid) {
 		double linkcenterx = 0.5 * link.getFromNode().getCoord().getX() + 0.5 * link.getToNode().getCoord().getX();

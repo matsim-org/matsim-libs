@@ -24,7 +24,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -39,7 +38,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
-//import com.vividsolutions.jts.util.Assert;
 
 public class SpatialAveragingWriter {
 
@@ -66,6 +64,14 @@ public class SpatialAveragingWriter {
 		this.targetCRS = targetCRS;
 	}
 	
+	public SpatialAveragingWriter(SpatialAveragingInputData inputData, int noOfXbins, int noOfYbins, double smoothingRadius_m) {
+		this(	inputData.getMinX(), inputData.getMaxX(), 
+									inputData.getMinY(), inputData.getMaxY(), 
+									noOfXbins, noOfYbins, 
+									smoothingRadius_m, 
+									inputData.getMunichShapeFile(), inputData.getTargetCRS());
+	}
+
 	public void writeRoutput(Double[][] doubles, String outputPathForR) {
 		try {
 			BufferedWriter buffW = new BufferedWriter(new FileWriter(outputPathForR));
