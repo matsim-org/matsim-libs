@@ -33,9 +33,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.Facility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
@@ -84,15 +84,15 @@ public class TripRouterFactoryImplTest {
 		Scenario scenario = ScenarioUtils.createScenario( config );
 		Network net = scenario.getNetwork();
 
-		Node n1 = net.getFactory().createNode( new IdImpl( 1 ) , new CoordImpl( 0 , 0 ) );
-		Node n2 = net.getFactory().createNode( new IdImpl( 2 ) , new CoordImpl( 0 , 0 ) );
-		Node n3 = net.getFactory().createNode( new IdImpl( 3 ) , new CoordImpl( 0 , 0 ) );
-		Node n4 = net.getFactory().createNode( new IdImpl( 4 ) , new CoordImpl( 0 , 0 ) );
+		Node n1 = net.getFactory().createNode( Id.create( 1, Node.class ) , new CoordImpl( 0 , 0 ) );
+		Node n2 = net.getFactory().createNode( Id.create( 2, Node.class ) , new CoordImpl( 0 , 0 ) );
+		Node n3 = net.getFactory().createNode( Id.create( 3, Node.class ) , new CoordImpl( 0 , 0 ) );
+		Node n4 = net.getFactory().createNode( Id.create( 4, Node.class ) , new CoordImpl( 0 , 0 ) );
 
-		Link l1 = net.getFactory().createLink( new IdImpl( "l1" ) , n1 , n2 );
-		Link l2c = net.getFactory().createLink( new IdImpl( "l2c" ) , n2 , n3 );
-		Link l2pt = net.getFactory().createLink( new IdImpl( "l2pt" ) , n2 , n3 );
-		Link l3 = net.getFactory().createLink( new IdImpl( "l3" ) , n3 , n4 );
+		Link l1 = net.getFactory().createLink( Id.create( "l1", Link.class ) , n1 , n2 );
+		Link l2c = net.getFactory().createLink( Id.create( "l2c", Link.class ) , n2 , n3 );
+		Link l2pt = net.getFactory().createLink( Id.create( "l2pt", Link.class ) , n2 , n3 );
+		Link l3 = net.getFactory().createLink( Id.create( "l3", Link.class ) , n3 , n4 );
 
 		l2c.setAllowedModes( Collections.singleton( TransportMode.car ) );
 		l2c.setLength( 1000 );
@@ -131,7 +131,7 @@ public class TripRouterFactoryImplTest {
 				new LinkFacility( l1 ),
 				new LinkFacility( l3 ),
 				0,
-				new PersonImpl( new IdImpl( "toto" ) ));
+				new PersonImpl( Id.create( "toto", Person.class ) ));
 
 		Leg l = (Leg) trip.get( 0 );
 
@@ -158,15 +158,15 @@ public class TripRouterFactoryImplTest {
 		Scenario scenario = ScenarioUtils.createScenario( config );
 		Network net = scenario.getNetwork();
 
-		Node n1 = net.getFactory().createNode( new IdImpl( 1 ) , new CoordImpl( 0 , 0 ) );
-		Node n2 = net.getFactory().createNode( new IdImpl( 2 ) , new CoordImpl( 0 , 0 ) );
-		Node n3 = net.getFactory().createNode( new IdImpl( 3 ) , new CoordImpl( 0 , 0 ) );
-		Node n4 = net.getFactory().createNode( new IdImpl( 4 ) , new CoordImpl( 0 , 0 ) );
+		Node n1 = net.getFactory().createNode( Id.create( 1, Node.class) , new CoordImpl( 0 , 0 ) );
+		Node n2 = net.getFactory().createNode( Id.create( 2, Node.class) , new CoordImpl( 0 , 0 ) );
+		Node n3 = net.getFactory().createNode( Id.create( 3, Node.class) , new CoordImpl( 0 , 0 ) );
+		Node n4 = net.getFactory().createNode( Id.create( 4, Node.class) , new CoordImpl( 0 , 0 ) );
 
-		Link l1 = net.getFactory().createLink( new IdImpl( "l1" ) , n1 , n2 );
-		Link l2long = net.getFactory().createLink( new IdImpl( "l2long" ) , n2 , n3 );
-		Link l2short = net.getFactory().createLink( new IdImpl( "l2short" ) , n2 , n3 );
-		Link l3 = net.getFactory().createLink( new IdImpl( "l3" ) , n3 , n4 );
+		Link l1 = net.getFactory().createLink( Id.create( "l1", Link.class ) , n1 , n2 );
+		Link l2long = net.getFactory().createLink( Id.create( "l2long", Link.class ) , n2 , n3 );
+		Link l2short = net.getFactory().createLink( Id.create( "l2short", Link.class ) , n2 , n3 );
+		Link l3 = net.getFactory().createLink( Id.create( "l3", Link.class ) , n3 , n4 );
 
 		l2long.setLength( 1000 );
 		l2short.setLength( 10 );
@@ -203,7 +203,7 @@ public class TripRouterFactoryImplTest {
 				new LinkFacility( l1 ),
 				new LinkFacility( l3 ),
 				0,
-				new PersonImpl( new IdImpl( "toto" ) ));
+				new PersonImpl( Id.create( "toto", Person.class ) ));
 
 		Leg l = (Leg) trip.get( 0 );
 

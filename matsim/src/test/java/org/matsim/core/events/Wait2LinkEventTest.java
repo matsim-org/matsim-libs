@@ -20,9 +20,12 @@
 
 package org.matsim.core.events;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author mrieser
@@ -30,7 +33,7 @@ import org.matsim.testcases.MatsimTestCase;
 public class Wait2LinkEventTest extends MatsimTestCase {
 
 	public void testWriteReadXml() {
-		final Wait2LinkEvent event1 = new Wait2LinkEvent(8463.7301, new IdImpl("483"), new IdImpl("783"), new IdImpl("veh7"));
+		final Wait2LinkEvent event1 = new Wait2LinkEvent(8463.7301, Id.create("483", Person.class), Id.create("783", Link.class), Id.create("veh7", Vehicle.class));
 		final Wait2LinkEvent event2 = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", event1);
 		assertEquals(event1.getTime(), event2.getTime(), EPSILON);
 		assertEquals(event1.getPersonId().toString(), event2.getPersonId().toString());

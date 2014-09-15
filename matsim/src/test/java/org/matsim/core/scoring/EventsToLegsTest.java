@@ -27,10 +27,11 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -45,9 +46,9 @@ public class EventsToLegsTest {
 		EventsToLegs eventsToLegs = new EventsToLegs(scenario);
 		RememberingLegHandler lh = new RememberingLegHandler();
 		eventsToLegs.setLegHandler(lh);
-		eventsToLegs.handleEvent(new PersonDepartureEvent(10.0, new IdImpl("1"), new IdImpl("l1"), "walk"));
-		eventsToLegs.handleEvent(new TeleportationArrivalEvent(30.0, new IdImpl("1"), 50.0));
-		eventsToLegs.handleEvent(new PersonArrivalEvent(30.0, new IdImpl("1"), new IdImpl("l2"), "walk"));
+		eventsToLegs.handleEvent(new PersonDepartureEvent(10.0, Id.create("1", Person.class), Id.create("l1", Link.class), "walk"));
+		eventsToLegs.handleEvent(new TeleportationArrivalEvent(30.0, Id.create("1", Person.class), 50.0));
+		eventsToLegs.handleEvent(new PersonArrivalEvent(30.0, Id.create("1", Person.class), Id.create("l2", Link.class), "walk"));
 		Assert.assertNotNull(lh.handledLeg);
 		Assert.assertEquals(10.0, lh.handledLeg.getDepartureTime(), 1e-9);
 		Assert.assertEquals(20.0, lh.handledLeg.getTravelTime(), 1e-9);
@@ -60,13 +61,13 @@ public class EventsToLegsTest {
 		EventsToLegs eventsToLegs = new EventsToLegs(scenario);
 		RememberingLegHandler lh = new RememberingLegHandler();
 		eventsToLegs.setLegHandler(lh);
-		IdImpl agentId = new IdImpl("1");
-		eventsToLegs.handleEvent(new PersonDepartureEvent(10.0, agentId, new IdImpl("l1"), "car"));
-		eventsToLegs.handleEvent(new LinkLeaveEvent(10.0, agentId, new IdImpl("l1"), null));
-		eventsToLegs.handleEvent(new LinkEnterEvent(11.0, agentId, new IdImpl("l2"), null));
-		eventsToLegs.handleEvent(new LinkLeaveEvent(15.0, agentId, new IdImpl("l2"), null));
-		eventsToLegs.handleEvent(new LinkEnterEvent(16.0, agentId, new IdImpl("l3"), null));
-		eventsToLegs.handleEvent(new PersonArrivalEvent(30.0, agentId, new IdImpl("l3"), "car"));
+		Id<Person> agentId = Id.create("1", Person.class);
+		eventsToLegs.handleEvent(new PersonDepartureEvent(10.0, agentId, Id.create("l1", Link.class), "car"));
+		eventsToLegs.handleEvent(new LinkLeaveEvent(10.0, agentId, Id.create("l1", Link.class), null));
+		eventsToLegs.handleEvent(new LinkEnterEvent(11.0, agentId, Id.create("l2", Link.class), null));
+		eventsToLegs.handleEvent(new LinkLeaveEvent(15.0, agentId, Id.create("l2", Link.class), null));
+		eventsToLegs.handleEvent(new LinkEnterEvent(16.0, agentId, Id.create("l3", Link.class), null));
+		eventsToLegs.handleEvent(new PersonArrivalEvent(30.0, agentId, Id.create("l3", Link.class), "car"));
 		Assert.assertNotNull(lh.handledLeg);
 		Assert.assertEquals(10.0,lh.handledLeg.getDepartureTime(), 1e-9);
 		Assert.assertEquals(20.0,lh.handledLeg.getTravelTime(), 1e-9);
@@ -83,16 +84,16 @@ public class EventsToLegsTest {
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		
 		// add nodes
-		Node node1 = network.createAndAddNode(new IdImpl("n1"), scenario.createCoord(0, 0));
-		Node node2 = network.createAndAddNode(new IdImpl("n2"), scenario.createCoord(50, 100));
-		Node node3 = network.createAndAddNode(new IdImpl("n3"), scenario.createCoord(50, 0));
-		Node node4 = network.createAndAddNode(new IdImpl("n4"), scenario.createCoord(100, 0));
+		Node node1 = network.createAndAddNode(Id.create("n1", Node.class), scenario.createCoord(0, 0));
+		Node node2 = network.createAndAddNode(Id.create("n2", Node.class), scenario.createCoord(50, 100));
+		Node node3 = network.createAndAddNode(Id.create("n3", Node.class), scenario.createCoord(50, 0));
+		Node node4 = network.createAndAddNode(Id.create("n4", Node.class), scenario.createCoord(100, 0));
 
 		// add links
-		network.createAndAddLink(new IdImpl("l1"), node1, node2, 500.0, 10.0, 3600.0, 1);
-		network.createAndAddLink(new IdImpl("l2"), node2, node3, 500.0, 10.0, 3600.0, 1);
-		network.createAndAddLink(new IdImpl("l3"), node3, node4, 50.0, 0.1, 3600.0, 1);
-		network.createAndAddLink(new IdImpl("l4"), node4, node1, 50.0, 0.1, 3600.0, 1);
+		network.createAndAddLink(Id.create("l1", Link.class), node1, node2, 500.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(Id.create("l2", Link.class), node2, node3, 500.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(Id.create("l3", Link.class), node3, node4, 50.0, 0.1, 3600.0, 1);
+		network.createAndAddLink(Id.create("l4", Link.class), node4, node1, 50.0, 0.1, 3600.0, 1);
 		
 		return scenario;
 	}
@@ -102,7 +103,7 @@ public class EventsToLegsTest {
 		/*package*/ Leg handledLeg = null;
 		
 		@Override
-		public void handleLeg(Id agentId, Leg leg) {
+		public void handleLeg(Id<Person> agentId, Leg leg) {
 			this.handledLeg = leg;
 		}
 	}

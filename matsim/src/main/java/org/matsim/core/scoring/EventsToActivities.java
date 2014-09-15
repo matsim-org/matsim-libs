@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.ActivityImpl;
 
 /**
@@ -47,10 +48,10 @@ import org.matsim.core.population.ActivityImpl;
 public class EventsToActivities implements ActivityStartEventHandler, ActivityEndEventHandler {
 	
 	public interface ActivityHandler {
-	    void handleActivity(Id agentId, Activity activity);
+	    void handleActivity(Id<Person> agentId, Activity activity);
 	}
 
-    private Map<Id, ActivityImpl> activities = new HashMap<Id, ActivityImpl>();
+    private Map<Id<Person>, ActivityImpl> activities = new HashMap<Id<Person>, ActivityImpl>();
     private ActivityHandler activityHandler = null;
 
     @Override
@@ -84,7 +85,7 @@ public class EventsToActivities implements ActivityStartEventHandler, ActivityEn
     }
 
     public void finish() {
-        for (Map.Entry<Id, ActivityImpl> entry : activities.entrySet()) {
+        for (Map.Entry<Id<Person>, ActivityImpl> entry : activities.entrySet()) {
             activityHandler.handleActivity(entry.getKey(), entry.getValue());
         }
     }

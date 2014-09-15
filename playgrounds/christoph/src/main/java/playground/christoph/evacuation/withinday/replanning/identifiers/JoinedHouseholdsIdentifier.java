@@ -155,7 +155,7 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier {
 		
 		for (Id<Person> driverId : driverIds) {
 			Id<Vehicle> vehicleId = assignment.getDriverVehicleMap().get(driverId);
-			Set<Id> passengerIds = new LinkedHashSet<Id>();
+			Set<Id<Person>> passengerIds = new LinkedHashSet<>();
 			for (Entry<Id, Id> entry : assignment.getPassengerVehicleMap().entrySet()) {
 				if (entry.getValue().equals(vehicleId)) {
 					passengerIds.add(entry.getKey());

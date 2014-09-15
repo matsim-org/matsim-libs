@@ -293,13 +293,13 @@ public class RideToRidePassengerAgentIdentifier extends InitialIdentifier {
 						Id vehicleId = ((NetworkRoute) context.carLeg.getRoute()).getVehicleId();
 						if (vehicleId == null) vehicleId = driverId;
 						Id linkId = context.pickupLink.getId();
-						Set<Id> passengerIds = new LinkedHashSet<Id>();
+						Set<Id<Person>> passengerIds = new LinkedHashSet<>();
 						passengerIds.add(agent.getId());
 						context.pickupDeparture = this.jointDepartureOrganizer.createJointDeparture(new IdImpl("jd" + jdCounter++), linkId, vehicleId, driverId, passengerIds);
 						
 						// schedule joint departure for drop off
 						linkId = context.dropOffLink.getId();
-						passengerIds = new LinkedHashSet<Id>();
+						passengerIds = new LinkedHashSet<>();
 						
 						foundMatch = true;
 					}

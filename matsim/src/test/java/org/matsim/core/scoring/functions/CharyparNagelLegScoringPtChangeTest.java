@@ -23,6 +23,7 @@ import java.util.Random;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.Event;
@@ -30,11 +31,13 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.events.EventsUtils;
@@ -42,6 +45,7 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author thibautd
@@ -68,23 +72,23 @@ public class CharyparNagelLegScoringPtChangeTest {
 
 		// "simulate"
 		final EventsManager events = EventsUtils.createEventsManager();
-		final Event endFirstAct =  new ActivityEndEvent(leg.getDepartureTime(), new IdImpl( 1 ), new IdImpl( 1 ), new IdImpl( 1 ), "start");
+		final Event endFirstAct =  new ActivityEndEvent(leg.getDepartureTime(), Id.create( 1, Person.class ), Id.create( 1, Link.class ), Id.create( 1, ActivityFacility.class ), "start");
 		scoring1.handleEvent( endFirstAct );
 		scoring2.handleEvent( endFirstAct );
 
-		final Event departure = new PersonDepartureEvent(leg.getDepartureTime(), new IdImpl( 1 ), new IdImpl( 1 ), leg.getMode());
+		final Event departure = new PersonDepartureEvent(leg.getDepartureTime(), Id.create( 1, Person.class ), Id.create( 1, Link.class ), leg.getMode());
 		scoring1.handleEvent( departure );
 		scoring2.handleEvent( departure );
 
-		final Event enterVehicle = new PersonEntersVehicleEvent(leg.getDepartureTime() + 100, new IdImpl( 1 ), new IdImpl( 1 ));
+		final Event enterVehicle = new PersonEntersVehicleEvent(leg.getDepartureTime() + 100, Id.create( 1, Person.class ), Id.create( 1, Vehicle.class ));
 		scoring1.handleEvent( enterVehicle );
 		scoring2.handleEvent( enterVehicle );
 
-		final Event leaveVehicle = new PersonLeavesVehicleEvent(leg.getDepartureTime() + leg.getTravelTime(), new IdImpl( 1 ), new IdImpl( 1 ));
+		final Event leaveVehicle = new PersonLeavesVehicleEvent(leg.getDepartureTime() + leg.getTravelTime(), Id.create( 1, Person.class ), Id.create( 1, Vehicle.class ));
 		scoring1.handleEvent( leaveVehicle );
 		scoring2.handleEvent( leaveVehicle );
 
-		final Event arrival = new PersonArrivalEvent(leg.getDepartureTime() + leg.getTravelTime(), new IdImpl( 1 ), new IdImpl( 1 ), leg.getMode());
+		final Event arrival = new PersonArrivalEvent(leg.getDepartureTime() + leg.getTravelTime(), Id.create( 1, Person.class ), Id.create( 1, Link.class ), leg.getMode());
 		scoring1.handleEvent( arrival );
 		scoring2.handleEvent( arrival );
 
@@ -124,11 +128,11 @@ public class CharyparNagelLegScoringPtChangeTest {
 	private static Network createNetwork() {
 		final Network network = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getNetwork();
 
-		final Node node1 = network.getFactory().createNode( new IdImpl( 1 ) , new CoordImpl( 0 , 0 ) );
+		final Node node1 = network.getFactory().createNode( Id.create( 1, Node.class ) , new CoordImpl( 0 , 0 ) );
 		network.addNode( node1 );
-		final Node node2 = network.getFactory().createNode( new IdImpl( 2 ) , new CoordImpl( 1 , 1 ) );
+		final Node node2 = network.getFactory().createNode( Id.create( 2, Node.class ) , new CoordImpl( 1 , 1 ) );
 		network.addNode( node2 );
-		network.addLink( network.getFactory().createLink( new IdImpl( 1 ) , node1 , node2 ) );
+		network.addLink( network.getFactory().createLink( Id.create( 1, Link.class ) , node1 , node2 ) );
 
 		return network;
 	}

@@ -21,9 +21,11 @@
 package org.matsim.core.scoring.functions;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -49,7 +51,7 @@ public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 		this.facilities = new ActivityFacilitiesImpl();
 
 		Coord defaultCoord = new CoordImpl(0.0, 0.0);
-		ActivityFacilityImpl testFacility = ((ActivityFacilitiesImpl) facilities).createAndAddFacility(new IdImpl(0), defaultCoord);
+		ActivityFacilityImpl testFacility = ((ActivityFacilitiesImpl) facilities).createAndAddFacility(Id.create(0, ActivityFacility.class), defaultCoord);
 
 		ActivityOptionImpl ao = testFacility.createActivityOption("shop");
 		ao.addOpeningTime(new OpeningTimeImpl(6.0 * 3600, 11.0 * 3600));
@@ -57,7 +59,7 @@ public class CharyparNagelOpenTimesScoringFunctionTest extends MatsimTestCase {
 
 		// here, we don't test the scoring function itself, but just the method to retrieve opening times
 		// we don't really need persons and plans, they're just used to initialize the ScoringFunction object
-		this.person = new PersonImpl(new IdImpl(1));
+		this.person = new PersonImpl(Id.create(1, Person.class));
 		this.plan = new PlanImpl();
 		this.person.addPlan(this.plan);
 

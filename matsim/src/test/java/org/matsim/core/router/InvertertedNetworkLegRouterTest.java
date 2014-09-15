@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.network.NetworkWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -70,10 +69,10 @@ public class InvertertedNetworkLegRouterTest {
 		TravelDisutilityFactory tc = new TravelTimeAndDistanceBasedTravelDisutilityFactory();
 		LeastCostPathCalculatorFactory lcpFactory = new DijkstraFactory();
 
-		Person person = new PersonImpl(new IdImpl(1));
+		Person person = new PersonImpl(Id.create(1, Person.class));
 		Leg leg = new LegImpl(TransportMode.car);
-		Activity fromAct = new ActivityImpl("h", new IdImpl("12"));
-		Activity toAct = new ActivityImpl("h", new IdImpl("78"));
+		Activity fromAct = new ActivityImpl("h", Id.create("12", Link.class));
+		Activity toAct = new ActivityImpl("h", Id.create("78", Link.class));
 
 		InvertedNetworkLegRouter router = new InvertedNetworkLegRouter(f.s, lcpFactory, 
 				tc, tt);
@@ -83,24 +82,24 @@ public class InvertertedNetworkLegRouterTest {
 		router.routeLeg(person, leg, fromAct, toAct, 0.0);
 		NetworkRoute route = (NetworkRoute) leg.getRoute();
 		Assert.assertNotNull(route);
-		Assert.assertEquals(new IdImpl("12"), route.getStartLinkId());
-		Assert.assertEquals(new IdImpl("78"), route.getEndLinkId());
+		Assert.assertEquals(Id.create("12", Link.class), route.getStartLinkId());
+		Assert.assertEquals(Id.create("78", Link.class), route.getEndLinkId());
 		Assert.assertEquals(3, route.getLinkIds().size());
-		Assert.assertEquals(new  IdImpl("23"), route.getLinkIds().get(0));
-		Assert.assertEquals(new  IdImpl("34"), route.getLinkIds().get(1));
-		Assert.assertEquals(new  IdImpl("47"), route.getLinkIds().get(2));
+		Assert.assertEquals(Id.create("23", Link.class), route.getLinkIds().get(0));
+		Assert.assertEquals(Id.create("34", Link.class), route.getLinkIds().get(1));
+		Assert.assertEquals(Id.create("47", Link.class), route.getLinkIds().get(2));
 		
 		//test 2
 		tt.setTurningMoveCosts(100.0, 0.0, 50.0);
 		router.routeLeg(person, leg, fromAct, toAct, 0.0);
 		route = (NetworkRoute) leg.getRoute();
 		Assert.assertNotNull(route);
-		Assert.assertEquals(new IdImpl("12"), route.getStartLinkId());
-		Assert.assertEquals(new IdImpl("78"), route.getEndLinkId());
+		Assert.assertEquals(Id.create("12", Link.class), route.getStartLinkId());
+		Assert.assertEquals(Id.create("78", Link.class), route.getEndLinkId());
 		Assert.assertEquals(3, route.getLinkIds().size());
-		Assert.assertEquals(new  IdImpl("23"), route.getLinkIds().get(0));
-		Assert.assertEquals(new  IdImpl("35"), route.getLinkIds().get(1));
-		Assert.assertEquals(new  IdImpl("57"), route.getLinkIds().get(2));
+		Assert.assertEquals(Id.create("23", Link.class), route.getLinkIds().get(0));
+		Assert.assertEquals(Id.create("35", Link.class), route.getLinkIds().get(1));
+		Assert.assertEquals(Id.create("57", Link.class), route.getLinkIds().get(2));
 		
 		//test 3
 		tt.setTurningMoveCosts(50.0, 100.0, 0.0);
@@ -108,12 +107,12 @@ public class InvertertedNetworkLegRouterTest {
 		router.routeLeg(person, leg, fromAct, toAct, 0.0);
 		route = (NetworkRoute) leg.getRoute();
 		Assert.assertNotNull(route);
-		Assert.assertEquals(new IdImpl("12"), route.getStartLinkId());
-		Assert.assertEquals(new IdImpl("78"), route.getEndLinkId());
+		Assert.assertEquals(Id.create("12", Link.class), route.getStartLinkId());
+		Assert.assertEquals(Id.create("78", Link.class), route.getEndLinkId());
 		Assert.assertEquals(3, route.getLinkIds().size());
-		Assert.assertEquals(new  IdImpl("23"), route.getLinkIds().get(0));
-		Assert.assertEquals(new  IdImpl("36"), route.getLinkIds().get(1));
-		Assert.assertEquals(new  IdImpl("67"), route.getLinkIds().get(2));
+		Assert.assertEquals(Id.create("23", Link.class), route.getLinkIds().get(0));
+		Assert.assertEquals(Id.create("36", Link.class), route.getLinkIds().get(1));
+		Assert.assertEquals(Id.create("67", Link.class), route.getLinkIds().get(2));
 
 
 		
@@ -134,13 +133,13 @@ public class InvertertedNetworkLegRouterTest {
 		@Override
 		public double getLinkToLinkTravelTime(Link fromLink, Link toLink, double time) {
 			double tt = fromLink.getLength() / fromLink.getFreespeed(time);
-			if (new IdImpl("34").equals(toLink.getId())){
+			if (Id.create("34", Link.class).equals(toLink.getId())){
 				tt = tt + this.turningMoveCosts34;
 			}
-			else if (new IdImpl("35").equals(toLink.getId())){
+			else if (Id.create("35", Link.class).equals(toLink.getId())){
 				tt = tt + this.turningMoveCosts35;
 			}
-			else if (new IdImpl("36").equals(toLink.getId())){
+			else if (Id.create("36", Link.class).equals(toLink.getId())){
 				tt = tt + this.turningMoveCosts36;
 			}
 			return tt;

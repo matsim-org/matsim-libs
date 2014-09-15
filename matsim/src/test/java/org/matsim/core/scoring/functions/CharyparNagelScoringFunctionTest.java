@@ -43,7 +43,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -85,7 +84,7 @@ public class CharyparNagelScoringFunctionTest {
 
 	private double calcScore(final Fixture f) {
 		CharyparNagelScoringFunctionFactory charyparNagelScoringFunctionFactory = new CharyparNagelScoringFunctionFactory(f.config.planCalcScore(), f.scenario.getNetwork());
-		ScoringFunction testee = charyparNagelScoringFunctionFactory.createNewScoringFunction(new PersonImpl(new IdImpl("1")));
+		ScoringFunction testee = charyparNagelScoringFunctionFactory.createNewScoringFunction(new PersonImpl(Id.create("1", Person.class)));
 		for (PlanElement planElement : f.plan.getPlanElements()) {
 			if (planElement instanceof Activity) {
 				testee.handleActivity((Activity) planElement);
@@ -569,7 +568,7 @@ public class CharyparNagelScoringFunctionTest {
 		Fixture f = new Fixture();
 
 		// score the same plan twice
-		PersonImpl person1 = new PersonImpl(new IdImpl(1));
+		PersonImpl person1 = new PersonImpl(Id.create(1, Person.class));
 		PlanImpl plan1 = person1.createAndAddPlan(true);
 		Activity act1a = plan1.createAndAddActivity("home", (Id)null);//, 0, 7.0*3600, 7*3600, false);
 		act1a.setEndTime(f.secondLegStartTime);
@@ -679,28 +678,28 @@ public class CharyparNagelScoringFunctionTest {
 
 			this.scenario = ScenarioUtils.createScenario(config);
 			this.network = (NetworkImpl) this.scenario.getNetwork();
-			Node node1 = this.network.createAndAddNode(new IdImpl("1"), new CoordImpl(    0.0, 0.0));
-			Node node2 = this.network.createAndAddNode(new IdImpl("2"), new CoordImpl(  500.0, 0.0));
-			Node node3 = this.network.createAndAddNode(new IdImpl("3"), new CoordImpl( 5500.0, 0.0));
-			Node node4 = this.network.createAndAddNode(new IdImpl("4"), new CoordImpl( 6000.0, 0.0));
-			Node node5 = this.network.createAndAddNode(new IdImpl("5"), new CoordImpl(11000.0, 0.0));
-			Node node6 = this.network.createAndAddNode(new IdImpl("6"), new CoordImpl(11500.0, 0.0));
-			Node node7 = this.network.createAndAddNode(new IdImpl("7"), new CoordImpl(16500.0, 0.0));
-			Node node8 = this.network.createAndAddNode(new IdImpl("8"), new CoordImpl(17000.0, 0.0));
-			Node node9 = this.network.createAndAddNode(new IdImpl("9"), new CoordImpl(22000.0, 0.0));
-			Node node10 = this.network.createAndAddNode(new IdImpl("10"), new CoordImpl(22500.0, 0.0));
+			Node node1 = this.network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(    0.0, 0.0));
+			Node node2 = this.network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(  500.0, 0.0));
+			Node node3 = this.network.createAndAddNode(Id.create("3", Node.class), new CoordImpl( 5500.0, 0.0));
+			Node node4 = this.network.createAndAddNode(Id.create("4", Node.class), new CoordImpl( 6000.0, 0.0));
+			Node node5 = this.network.createAndAddNode(Id.create("5", Node.class), new CoordImpl(11000.0, 0.0));
+			Node node6 = this.network.createAndAddNode(Id.create("6", Node.class), new CoordImpl(11500.0, 0.0));
+			Node node7 = this.network.createAndAddNode(Id.create("7", Node.class), new CoordImpl(16500.0, 0.0));
+			Node node8 = this.network.createAndAddNode(Id.create("8", Node.class), new CoordImpl(17000.0, 0.0));
+			Node node9 = this.network.createAndAddNode(Id.create("9", Node.class), new CoordImpl(22000.0, 0.0));
+			Node node10 = this.network.createAndAddNode(Id.create("10", Node.class), new CoordImpl(22500.0, 0.0));
 
-			Link link1 = this.network.createAndAddLink(new IdImpl("1"), node1, node2, 500, 25, 3600, 1);
-			Link link2 = this.network.createAndAddLink(new IdImpl("2"), node2, node3, 25000, 50, 3600, 1);
-			Link link3 = this.network.createAndAddLink(new IdImpl("3"), node3, node4, 500, 25, 3600, 1);
-			this.network.createAndAddLink(new IdImpl("4"), node4, node5, 5000, 50, 3600, 1);
-			Link link5 = this.network.createAndAddLink(new IdImpl("5"), node5, node6, 500, 25, 3600, 1);
-			this.network.createAndAddLink(new IdImpl("6"), node6, node7, 5000, 50, 3600, 1);
-			Link link7 = this.network.createAndAddLink(new IdImpl("7"), node7, node8, 500, 25, 3600, 1);
-			this.network.createAndAddLink(new IdImpl("8"), node8, node9, 5000, 50, 3600, 1);
-			Link link9 = this.network.createAndAddLink(new IdImpl("9"), node9, node10, 500, 25, 3600, 1);
+			Link link1 = this.network.createAndAddLink(Id.create("1", Link.class), node1, node2, 500, 25, 3600, 1);
+			Link link2 = this.network.createAndAddLink(Id.create("2", Link.class), node2, node3, 25000, 50, 3600, 1);
+			Link link3 = this.network.createAndAddLink(Id.create("3", Link.class), node3, node4, 500, 25, 3600, 1);
+			this.network.createAndAddLink(Id.create("4", Link.class), node4, node5, 5000, 50, 3600, 1);
+			Link link5 = this.network.createAndAddLink(Id.create("5", Link.class), node5, node6, 500, 25, 3600, 1);
+			this.network.createAndAddLink(Id.create("6", Link.class), node6, node7, 5000, 50, 3600, 1);
+			Link link7 = this.network.createAndAddLink(Id.create("7", Link.class), node7, node8, 500, 25, 3600, 1);
+			this.network.createAndAddLink(Id.create("8", Link.class), node8, node9, 5000, 50, 3600, 1);
+			Link link9 = this.network.createAndAddLink(Id.create("9", Link.class), node9, node10, 500, 25, 3600, 1);
 
-			this.person = new PersonImpl(new IdImpl("1"));
+			this.person = new PersonImpl(Id.create("1", Person.class));
 			this.plan = this.person.createAndAddPlan(true);
 
 			ActivityImpl firstActivity = this.plan.createAndAddActivity("h", link1.getId());

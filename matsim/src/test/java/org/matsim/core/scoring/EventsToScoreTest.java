@@ -20,6 +20,7 @@
 
 package org.matsim.core.scoring;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.population.Activity;
@@ -27,7 +28,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -49,7 +49,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 	public void testAddMoney() {
         ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
         Population population = scenario.getPopulation();
-		PersonImpl person = new PersonImpl(new IdImpl(1));
+		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
 		population.addPerson(person);
 		MockScoringFunctionFactory sfFactory = new MockScoringFunctionFactory();
 		EventsToScore e2s = new EventsToScore(scenario, sfFactory, 1.0);
@@ -76,7 +76,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
         Population population = scenario.getPopulation();
-		PersonImpl person = new PersonImpl(new IdImpl(1));
+		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
 		population.addPerson(person);
 		PlanImpl plan = new PlanImpl() ;
 		person.addPlan(plan);
@@ -159,6 +159,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 			// empty public constructor for private inner class
 		}
 
+		@Override
 		public ScoringFunction createNewScoringFunction(final Person person) {
 			this.counter++;
 			return this.sf;
@@ -182,22 +183,27 @@ public class EventsToScoreTest extends MatsimTestCase {
 			// empty public constructor for private inner class
 		}
 
+		@Override
 		public void addMoney(final double amount) {
 			this.cntMoney++;
 		}
 
+		@Override
 		public void agentStuck(final double time) {
 			this.cntStuck++;
 		}
 
+		@Override
 		public void endLeg(final double time) {
 			this.cntEndLeg++;
 		}
 
+		@Override
 		public void finish() {
 			this.cntFinish++;
 		}
 
+		@Override
 		public double getScore() {
 			this.cntGetScore++;
 			return 0;
@@ -207,10 +213,12 @@ public class EventsToScoreTest extends MatsimTestCase {
 			this.cntReset++;
 		}
 
+		@Override
 		public void startActivity(final double time, final Activity act) {
 			this.cntStartAct++;
 		}
 
+		@Override
 		public void startLeg(final double time, final Leg leg) {
 			this.cntStartLeg++;
 		}

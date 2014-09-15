@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Module;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.misc.Time;
@@ -65,7 +65,7 @@ public class CadytsConfigGroup extends Module {
 	private int endTime = (int)Time.MIDNIGHT-1;
 	private int timeBinSize = 3600 ;
 
-	private final Set<Id> calibratedItems = new HashSet<Id>();
+	private final Set<Id> calibratedItems = new HashSet<>();
 
 	public CadytsConfigGroup() {
 		super(GROUP_NAME);
@@ -96,7 +96,7 @@ public class CadytsConfigGroup extends Module {
 		} else if (CALIBRATED_LINKS.equals(paramName) || CALIBRATED_LINES.equals(paramName) || CALIBRATED_ITEMS.equals(paramName) ) {
 			this.calibratedItems.clear();
 			for (String linkId : CollectionUtils.stringToArray(value)) {
-				this.calibratedItems.add(new IdImpl(linkId));
+				this.calibratedItems.add(Id.create(linkId, Link.class));
 			}
 		} else {
 			throw new IllegalArgumentException("Parameter '" + paramName + "' is not supported by config group '" + GROUP_NAME + "'.");
@@ -133,7 +133,7 @@ public class CadytsConfigGroup extends Module {
 		params.put(WRITE_ANALYSIS_FILE, Boolean.toString(isWriteAnalysisFile()));
 		params.put(START_TIME, Integer.toString(getStartTime()));
 		params.put(END_TIME, Integer.toString(getEndTime()));
-		params.put(CALIBRATED_ITEMS, CollectionUtils.idSetToString(this.calibratedItems));
+		params.put(CALIBRATED_ITEMS, CollectionUtils.idSetToString((Set) this.calibratedItems));
 		params.put(TIME_BIN_SIZE, Integer.toString(getTimeBinSize())) ;
 
 		return params;
@@ -215,7 +215,7 @@ public class CadytsConfigGroup extends Module {
 		return Collections.unmodifiableSet(this.calibratedItems);
 	}
 
-	public final void setCalibratedItems(final Set<Id> links) {
+	public final void setCalibratedItems(final Set<Id<Link>> links) {
 		this.calibratedItems.clear();
 		this.calibratedItems.addAll(links);
 	}

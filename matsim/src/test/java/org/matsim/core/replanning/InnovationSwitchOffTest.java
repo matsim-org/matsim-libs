@@ -27,9 +27,9 @@ import junit.framework.Assert;
 import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -67,25 +67,25 @@ public class InnovationSwitchOffTest {
 		config.plans().setInputFile("test/scenarios/equil/plans2.xml") ;
 
 		{
-			StrategySettings settings = new StrategySettings(new IdImpl(1)) ;
+			StrategySettings settings = new StrategySettings(Id.create(1, StrategySettings.class)) ;
 			settings.setModuleName( Selector.BestScore.toString() ) ;
 			settings.setProbability(0.5) ;
 			config.strategy().addStrategySettings(settings) ;
 		}
 		{
-			StrategySettings settings = new StrategySettings(new IdImpl(2)) ;
+			StrategySettings settings = new StrategySettings(Id.create(2, StrategySettings.class)) ;
 			settings.setModuleName( Selector.ChangeExpBeta.toString() ) ;
 			settings.setProbability(0.5) ;
 			config.strategy().addStrategySettings(settings) ;
 		}
 		{
-			StrategySettings settings = new StrategySettings(new IdImpl(3)) ;
+			StrategySettings settings = new StrategySettings(Id.create(3, StrategySettings.class)) ;
 			settings.setModuleName( Names.TimeAllocationMutator.toString() ) ;
 			settings.setProbability(0.1) ;
 			config.strategy().addStrategySettings(settings) ;
 		}
 		{
-			StrategySettings settings = new StrategySettings(new IdImpl(4)) ;
+			StrategySettings settings = new StrategySettings(Id.create(4, StrategySettings.class)) ;
 			settings.setModuleName( Names.ReRoute.toString() ) ;
 			settings.setProbability(0.1) ;
 			settings.setDisableAfter(11) ;

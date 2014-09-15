@@ -29,6 +29,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
 import org.matsim.lanes.utils.LanesTurnInfoBuilder;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
@@ -49,8 +50,8 @@ public class SignalsTurnInfoBuilder {
 	private static int warnCount = 0;
 
 	
-	public Map<Id, List<TurnInfo>> createSignalsTurnInfos(SignalSystemsData ssd) {
-		Map<Id, List<TurnInfo>> inLinkIdTurnInfoMap = new HashMap<Id, List<TurnInfo>>();
+	public Map<Id<Link>, List<TurnInfo>> createSignalsTurnInfos(SignalSystemsData ssd) {
+		Map<Id<Link>, List<TurnInfo>> inLinkIdTurnInfoMap = new HashMap<Id<Link>, List<TurnInfo>>();
 		for (SignalSystemData signalSystem : ssd.getSignalSystemData().values()){
 			for (SignalData signal : signalSystem.getSignalData().values()){
 				if (signal.getTurningMoveRestrictions() != null && ! signal.getTurningMoveRestrictions().isEmpty()){
@@ -61,7 +62,7 @@ public class SignalsTurnInfoBuilder {
 					inLinkIdTurnInfoMap.put(signal.getLinkId(), new ArrayList<TurnInfo>());
 					Set<String> modeCar = new HashSet<String>();
 					modeCar.add(TransportMode.car);
-					for (Id toLinkId : signal.getTurningMoveRestrictions()){
+					for (Id<Link> toLinkId : signal.getTurningMoveRestrictions()){
 						TurnInfo ti = new TurnInfo(signal.getLinkId(), toLinkId, modeCar);
 						inLinkIdTurnInfoMap.get(signal.getLinkId()).add(ti);
 					}

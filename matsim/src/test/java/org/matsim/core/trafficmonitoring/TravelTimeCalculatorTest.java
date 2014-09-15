@@ -45,7 +45,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
@@ -59,6 +58,10 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.Vehicle;
@@ -333,22 +336,22 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		config.setTraveltimeBinSize(900);
 		TravelTimeCalculator ttc = new TravelTimeCalculator(network, config);
 
-		Node n1 = network.getFactory().createNode(new IdImpl(1), new CoordImpl(0, 0));
-		Node n2 = network.getFactory().createNode(new IdImpl(2), new CoordImpl(1000, 0));
+		Node n1 = network.getFactory().createNode(Id.create(1, Node.class), new CoordImpl(0, 0));
+		Node n2 = network.getFactory().createNode(Id.create(2, Node.class), new CoordImpl(1000, 0));
 		network.addNode(n1);
 		network.addNode(n2);
-		Link link1 = network.getFactory().createLink(new IdImpl(1), n1, n2);
+		Link link1 = network.getFactory().createLink(Id.create(1, Link.class), n1, n2);
 		network.addLink(link1);
 
-		Id agId1 = new IdImpl(1510);
-		Id agId2 = new IdImpl("pt2011");
-		Id vehId = new IdImpl(1980);
+		Id<Person> agId1 = Id.create(1510, Person.class);
+		Id<Person> agId2 = Id.create("pt2011", Person.class);
+		Id<Vehicle> vehId = Id.create(1980, Vehicle.class);
 
 		ttc.handleEvent(new LinkEnterEvent(100, agId1, link1.getId(), null));
-		ttc.handleEvent(new TransitDriverStartsEvent(140, agId2, vehId, new IdImpl("line1"), new IdImpl("route1"), new IdImpl("dep1")));
+		ttc.handleEvent(new TransitDriverStartsEvent(140, agId2, vehId, Id.create("line1", TransitLine.class), Id.create("route1", TransitRoute.class), Id.create("dep1", Departure.class)));
 		ttc.handleEvent(new LinkEnterEvent(150, agId2, link1.getId(), null));
 		ttc.handleEvent(new LinkLeaveEvent(200, agId1, link1.getId(), null));
-		ttc.handleEvent(new VehicleArrivesAtFacilityEvent(240, vehId, new IdImpl("stop"), 0));
+		ttc.handleEvent(new VehicleArrivesAtFacilityEvent(240, vehId, Id.create("stop", TransitStopFacility.class), 0));
 		ttc.handleEvent(new LinkLeaveEvent(350, agId2, link1.getId(), null));
 
 		Assert.assertEquals("The time of transit vehicles at stop should not be counted", 100.0, ttc.getLinkTravelTimes().getLinkTravelTime(link1, 200, null, null), 1e-8);
@@ -363,19 +366,19 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		config.setTraveltimeBinSize(900);
 		TravelTimeCalculator ttc = new TravelTimeCalculator(network, config);
 
-		Node n1 = network.getFactory().createNode(new IdImpl(1), new CoordImpl(0, 0));
-		Node n2 = network.getFactory().createNode(new IdImpl(2), new CoordImpl(1000, 0));
+		Node n1 = network.getFactory().createNode(Id.create(1, Node.class), new CoordImpl(0, 0));
+		Node n2 = network.getFactory().createNode(Id.create(2, Node.class), new CoordImpl(1000, 0));
 		network.addNode(n1);
 		network.addNode(n2);
-		Link link1 = network.getFactory().createLink(new IdImpl(1), n1, n2);
+		Link link1 = network.getFactory().createLink(Id.create(1, Link.class), n1, n2);
 		network.addLink(link1);
 
-		Id agId1 = new IdImpl(1510);
-		Id agId2 = new IdImpl("pt2011");
-		Id vehId = new IdImpl(1980);
+		Id<Person> agId1 = Id.create(1510, Person.class);
+		Id<Person> agId2 = Id.create("pt2011", Person.class);
+		Id<Vehicle> vehId = Id.create(1980, Vehicle.class);
 
 		ttc.handleEvent(new LinkEnterEvent(100, agId1, link1.getId(), null));
-		ttc.handleEvent(new TransitDriverStartsEvent(140, agId2, vehId, new IdImpl("line1"), new IdImpl("route1"), new IdImpl("dep1")));
+		ttc.handleEvent(new TransitDriverStartsEvent(140, agId2, vehId, Id.create("line1", TransitLine.class), Id.create("route1", TransitRoute.class), Id.create("dep1", Departure.class)));
 		ttc.handleEvent(new LinkEnterEvent(150, agId2, link1.getId(), null));
 		ttc.handleEvent(new LinkLeaveEvent(200, agId1, link1.getId(), null));
 		ttc.handleEvent(new LinkLeaveEvent(300, agId2, link1.getId(), null));
@@ -397,14 +400,14 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		config.setFilterModes(true);
 		TravelTimeCalculator ttc = new TravelTimeCalculator(network, config);
 
-		Node n1 = network.getFactory().createNode(new IdImpl(1), new CoordImpl(0, 0));
-		Node n2 = network.getFactory().createNode(new IdImpl(2), new CoordImpl(1000, 0));
+		Node n1 = network.getFactory().createNode(Id.create(1, Node.class), new CoordImpl(0, 0));
+		Node n2 = network.getFactory().createNode(Id.create(2, Node.class), new CoordImpl(1000, 0));
 		network.addNode(n1);
 		network.addNode(n2);
-		Link link1 = network.getFactory().createLink(new IdImpl(1), n1, n2);
+		Link link1 = network.getFactory().createLink(Id.create(1, Link.class), n1, n2);
 		network.addLink(link1);
 
-		Id agId1 = new IdImpl(1510);
+		Id<Person> agId1 = Id.create(1510, Person.class);
 		
 		ttc.handleEvent(new PersonDepartureEvent(100, agId1, link1.getId(), TransportMode.car));
 		ttc.handleEvent(new LinkEnterEvent(100, agId1, link1.getId(), null));
@@ -426,15 +429,15 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		config.setFilterModes(true);
 		TravelTimeCalculator ttc = new TravelTimeCalculator(network, config);
 
-		Node n1 = network.getFactory().createNode(new IdImpl(1), new CoordImpl(0, 0));
-		Node n2 = network.getFactory().createNode(new IdImpl(2), new CoordImpl(1000, 0));
+		Node n1 = network.getFactory().createNode(Id.create(1, Node.class), new CoordImpl(0, 0));
+		Node n2 = network.getFactory().createNode(Id.create(2, Node.class), new CoordImpl(1000, 0));
 		network.addNode(n1);
 		network.addNode(n2);
-		Link link1 = network.getFactory().createLink(new IdImpl(1), n1, n2);
+		Link link1 = network.getFactory().createLink(Id.create(1, Link.class), n1, n2);
 		network.addLink(link1);
 
-		Id agId1 = new IdImpl(1510);
-		Id agId2 = new IdImpl(1511);
+		Id<Person> agId1 = Id.create(1510, Person.class);
+		Id<Person> agId2 = Id.create(1511, Person.class);
 		
 		ttc.handleEvent(new PersonDepartureEvent(100, agId1, link1.getId(), TransportMode.car));
 		ttc.handleEvent(new LinkEnterEvent(100, agId1, link1.getId(), null));
@@ -459,15 +462,15 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		config.setFilterModes(false);
 		TravelTimeCalculator ttc = new TravelTimeCalculator(network, config);
 
-		Node n1 = network.getFactory().createNode(new IdImpl(1), new CoordImpl(0, 0));
-		Node n2 = network.getFactory().createNode(new IdImpl(2), new CoordImpl(1000, 0));
+		Node n1 = network.getFactory().createNode(Id.create(1, Node.class), new CoordImpl(0, 0));
+		Node n2 = network.getFactory().createNode(Id.create(2, Node.class), new CoordImpl(1000, 0));
 		network.addNode(n1);
 		network.addNode(n2);
-		Link link1 = network.getFactory().createLink(new IdImpl(1), n1, n2);
+		Link link1 = network.getFactory().createLink(Id.create(1, Link.class), n1, n2);
 		network.addLink(link1);
 
-		Id agId1 = new IdImpl(1510);
-		Id agId2 = new IdImpl(1511);
+		Id<Person> agId1 = Id.create(1510, Person.class);
+		Id<Person> agId2 = Id.create(1511, Person.class);
 		
 		ttc.handleEvent(new PersonDepartureEvent(100, agId1, link1.getId(), TransportMode.car));
 		ttc.handleEvent(new LinkEnterEvent(100, agId1, link1.getId(), null));
@@ -491,15 +494,15 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		config.setFilterModes(true);
 		TravelTimeCalculator ttc = new TravelTimeCalculator(network, config);
 
-		Node n1 = network.getFactory().createNode(new IdImpl(1), new CoordImpl(0, 0));
-		Node n2 = network.getFactory().createNode(new IdImpl(2), new CoordImpl(1000, 0));
+		Node n1 = network.getFactory().createNode(Id.create(1, Node.class), new CoordImpl(0, 0));
+		Node n2 = network.getFactory().createNode(Id.create(2, Node.class), new CoordImpl(1000, 0));
 		network.addNode(n1);
 		network.addNode(n2);
-		Link link1 = network.getFactory().createLink(new IdImpl(1), n1, n2);
+		Link link1 = network.getFactory().createLink(Id.create(1, Link.class), n1, n2);
 		network.addLink(link1);
 
-		Id agId1 = new IdImpl(1510);
-		Id agId2 = new IdImpl(1511);
+		Id<Person> agId1 = Id.create(1510, Person.class);
+		Id<Person> agId2 = Id.create(1511, Person.class);
 		
 		ttc.handleEvent(new PersonDepartureEvent(100, agId1, link1.getId(), TransportMode.car));
 		ttc.handleEvent(new LinkEnterEvent(100, agId1, link1.getId(), null));
@@ -521,11 +524,11 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 		Network network = scenario.getNetwork();
 		((NetworkImpl) network).setCapacityPeriod(3600.0);
-		Node node1 = network.getFactory().createNode(new IdImpl(1), new CoordImpl(0, 0));
-		Node node2 = network.getFactory().createNode(new IdImpl(2), new CoordImpl(1000, 0));
+		Node node1 = network.getFactory().createNode(Id.create(1, Node.class), new CoordImpl(0, 0));
+		Node node2 = network.getFactory().createNode(Id.create(2, Node.class), new CoordImpl(1000, 0));
 		network.addNode(node1);
 		network.addNode(node2);
-		Link link1 = network.getFactory().createLink(new IdImpl(1), node1, node2);
+		Link link1 = network.getFactory().createLink(Id.create(1, Link.class), node1, node2);
 		link1.setCapacity(6.0);
 		link1.setFreespeed(5.56);
 		link1.setLength(1000.0);
@@ -535,9 +538,9 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		int timeBinSize = 5*60;
 		TravelTimeCalculator ttcalc = new TravelTimeCalculator(network, timeBinSize, 12*3600, scenario.getConfig().travelTimeCalculator());
 
-		PersonImpl person1 = new PersonImpl(new IdImpl(1));
-		PersonImpl person2 = new PersonImpl(new IdImpl(2));
-		PersonImpl person3 = new PersonImpl(new IdImpl(3));
+		PersonImpl person1 = new PersonImpl(Id.create(1, Person.class));
+		PersonImpl person2 = new PersonImpl(Id.create(2, Person.class));
+		PersonImpl person3 = new PersonImpl(Id.create(3, Person.class));
 
 		// generate some events that suggest a really long travel time
 		double linkEnterTime1 = 7.0 * 3600;

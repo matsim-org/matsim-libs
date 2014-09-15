@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
 import org.matsim.lanes.data.v20.LaneData20;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
@@ -40,9 +41,9 @@ import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
  */
 public class LanesTurnInfoBuilder {
 
-	public Map<Id, List<TurnInfo>> createTurnInfos(LaneDefinitions20 laneDefs) {
-		Map<Id, List<TurnInfo>> inLinkIdTurnInfoMap = new HashMap<Id, List<TurnInfo>>();
-		Set<Id> toLinkIds = new HashSet<Id>();
+	public Map<Id<Link>, List<TurnInfo>> createTurnInfos(LaneDefinitions20 laneDefs) {
+		Map<Id<Link>, List<TurnInfo>> inLinkIdTurnInfoMap = new HashMap<>();
+		Set<Id<Link>> toLinkIds = new HashSet<>();
 		for (LanesToLinkAssignment20 l2l : laneDefs.getLanesToLinkAssignments().values()) {
 			toLinkIds.clear();
 			for (LaneData20 lane : l2l.getLanes().values()) {
@@ -54,7 +55,7 @@ public class LanesTurnInfoBuilder {
 			}
 			if (!toLinkIds.isEmpty()) {
 				List<TurnInfo> turnInfoList = new ArrayList<TurnInfo>();
-				for (Id toLinkId : toLinkIds) {
+				for (Id<Link> toLinkId : toLinkIds) {
 					turnInfoList.add(new TurnInfo(l2l.getLinkId(), toLinkId));
 				}
 				inLinkIdTurnInfoMap.put(l2l.getLinkId(), turnInfoList);

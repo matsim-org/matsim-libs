@@ -19,30 +19,35 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.*;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.router.TripStructureUtils.Trip;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.router.TripStructureUtils.Trip;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
  * @author thibautd
  */
 public class TripStructureUtilsTest {
 	private static final PopulationFactory populationFactory =
-            (PopulationFactoryImpl) ScenarioUtils.createScenario(
-                    ConfigUtils.createConfig()).getPopulation().getFactory();
+            ScenarioUtils.createScenario(
+	        ConfigUtils.createConfig()).getPopulation().getFactory();
     private static final String dummyType = "dummy";
 	private static final StageActivityTypes stageActivities =
 		new StageActivityTypesImpl( dummyType );
@@ -78,7 +83,7 @@ public class TripStructureUtilsTest {
 	public void createSimpleFixture() {
 		final Plan plan = populationFactory.createPlan();
 
-		final Id linkId = new IdImpl( 1 );
+		final Id<Link> linkId = Id.create( 1, Link.class );
 		int nActs = 0;
 		int nTrips = 0;
 		int nLegs = 0;
@@ -142,7 +147,7 @@ public class TripStructureUtilsTest {
 	public void createFixtureWithComplexTrips() {
 		final Plan plan = populationFactory.createPlan();
 
-		final Id linkId = new IdImpl( 1 );
+		final Id<Link> linkId = Id.create( 1, Link.class );
 		int nActs = 0;
 		int nTrips = 0;
 		int nLegs = 0;
@@ -237,7 +242,7 @@ public class TripStructureUtilsTest {
 	public void createFixtureWithSuccessiveActivities() {
 		final Plan plan = populationFactory.createPlan();
 
-		final Id linkId = new IdImpl( 1 );
+		final Id<Link> linkId = Id.create( 1, Link.class );
 		int nActs = 0;
 		int nTrips = 0;
 		int nLegs = 0;

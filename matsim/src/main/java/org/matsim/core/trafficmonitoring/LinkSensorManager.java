@@ -26,6 +26,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.network.Link;
 
 
 /**
@@ -43,13 +44,13 @@ public class LinkSensorManager implements LinkLeaveEventHandler {
 	 * maps the ids of the links to integers, which represent the amount of traffic on
 	 * the link
 	 */
-	private final Map<Id, Integer> linkCountMap = new HashMap<Id, Integer>();
+	private final Map<Id<Link>, Integer> linkCountMap = new HashMap<>();
 
 	/**
 	 * Adds a traffic sensor to the link with the given id.
 	 * @param id
 	 */
-	public void addLinkSensor(final Id id) {
+	public void addLinkSensor(final Id<Link> id) {
 		this.linkCountMap.put(id, ZERO);
 	}
 	/**
@@ -60,7 +61,7 @@ public class LinkSensorManager implements LinkLeaveEventHandler {
 	 * @param id
 	 * @return the  number of cars for link id since the last time the link traffic was queried by this method
 	 */
-	public int getLinkTraffic(final Id id) {
+	public int getLinkTraffic(final Id<Link> id) {
 		if (this.linkCountMap.containsKey(id)) {
 			int i = this.linkCountMap.get(id).intValue();
 			this.linkCountMap.put(id, ZERO);
@@ -78,7 +79,6 @@ public class LinkSensorManager implements LinkLeaveEventHandler {
 			i++;
 			this.linkCountMap.put(event.getLinkId(), Integer.valueOf(i));
 		}
-
 	}
 	/**
 	 * Resets traffic count data for all links to zero
@@ -86,8 +86,7 @@ public class LinkSensorManager implements LinkLeaveEventHandler {
 	 */
 	@Override
 	public void reset(final int iteration) {
-
-		for (Id id : this.linkCountMap.keySet()) {
+		for (Id<Link> id : this.linkCountMap.keySet()) {
 			this.linkCountMap.put(id, ZERO);
 		}
 	}

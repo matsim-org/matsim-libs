@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -40,12 +39,11 @@ import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
  */
 public class NetworkTurnInfoBuilder {
 
-	private static final Logger log = Logger.getLogger(NetworkTurnInfoBuilder.class);
 	/**
 	 * Creates a List of TurnInfo objects for every existing link of the network. If the links have mode attributes set,
 	 * those are considered in TurnInfo creation.
 	 */
-	public void createAndAddTurnInfo(String mode, Map<Id, List<TurnInfo>> inLinkTurnInfoMap, Network network) {
+	public void createAndAddTurnInfo(String mode, Map<Id<Link>, List<TurnInfo>> inLinkTurnInfoMap, Network network) {
 		TurnInfo turnInfo = null;
 		Set<String> modes = null;
 		List<TurnInfo> turnInfosForInLink = null;
@@ -81,14 +79,14 @@ public class NetworkTurnInfoBuilder {
 	 * or mode is not contained in the restriction, the corresponding TurnInfo or mode is removed or modified in the first
 	 * map.
 	 */
-	public void mergeTurnInfoMaps(Map<Id, List<TurnInfo>> allowedInLinkTurnInfoMap,
-			Map<Id, List<TurnInfo>> restrictingTurnInfoMap) {
-		for (Map.Entry<Id, List<TurnInfo>> e : allowedInLinkTurnInfoMap.entrySet()) {
+	public void mergeTurnInfoMaps(Map<Id<Link>, List<TurnInfo>> allowedInLinkTurnInfoMap,
+			Map<Id<Link>, List<TurnInfo>> restrictingTurnInfoMap) {
+		for (Map.Entry<Id<Link>, List<TurnInfo>> e : allowedInLinkTurnInfoMap.entrySet()) {
 			if (!restrictingTurnInfoMap.containsKey(e.getKey())) {
 				continue; // there is no restriction for the inLink
 			}
 			else { // there are restrictions for the inLink
-				Id inLinkId = e.getKey();
+				Id<Link> inLinkId = e.getKey();
 				List<TurnInfo> allowedTurnInfos = new ArrayList<TurnInfo>(e.getValue());
 				List<TurnInfo> restrictingTurnInfos = restrictingTurnInfoMap.get(inLinkId);
 				for (TurnInfo allowedForOutlink : allowedTurnInfos) {
@@ -117,7 +115,7 @@ public class NetworkTurnInfoBuilder {
 	/**
 	 * Linear search for the TurnInfo describing the turn to the outLinkId
 	 */
-	public TurnInfo getTurnInfoForOutlinkId(List<TurnInfo> turnInfoList, Id outLinkId) {
+	public TurnInfo getTurnInfoForOutlinkId(List<TurnInfo> turnInfoList, Id<Link> outLinkId) {
 		for (TurnInfo ti : turnInfoList) {
 			if (ti.getToLinkId().equals(outLinkId)) {
 				return ti;

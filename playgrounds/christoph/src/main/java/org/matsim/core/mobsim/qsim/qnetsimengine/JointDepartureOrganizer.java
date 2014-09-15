@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.vehicles.Vehicle;
 
 public class JointDepartureOrganizer {
@@ -84,14 +85,14 @@ public class JointDepartureOrganizer {
 	}
 	
 	public JointDeparture createJointDeparture(Id<JointDeparture> id, Id<Link> linkId, Id<Vehicle> vehicleId, Id driverId, 
-			Set<Id> passengerIds) {		
+			Set<Id<Person>> passengerIds) {		
 		JointDeparture jointDeparture = new JointDeparture(id, linkId, vehicleId, driverId, passengerIds);
 		
 		return jointDeparture;
 	}
 	
 	public JointDeparture createJointDeparture(Id<Link> linkId, Id<Vehicle> vehicleId, Id driverId, 
-			Set<Id> passengerIds) {		
+			Set<Id<Person>> passengerIds) {		
 		JointDeparture jointDeparture = new JointDeparture(getNextId(), linkId, vehicleId, driverId, passengerIds);
 		
 		return jointDeparture;

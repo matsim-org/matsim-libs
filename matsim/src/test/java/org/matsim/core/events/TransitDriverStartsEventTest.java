@@ -22,9 +22,14 @@ package org.matsim.core.events;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author mrieser
@@ -35,7 +40,12 @@ public class TransitDriverStartsEventTest {
 
 	@Test
 	public void testWriteReadXml() {
-		final TransitDriverStartsEvent event1 = new TransitDriverStartsEvent(36095.2, new IdImpl("ptDrvr-1"), new IdImpl("vehicle-bus5"), new IdImpl("line L-1"), new IdImpl("route-R1"), new IdImpl("departure-D-1"));
+		final TransitDriverStartsEvent event1 = new TransitDriverStartsEvent(36095.2, 
+				Id.create("ptDrvr-1", Person.class), 
+				Id.create("vehicle-bus5", Vehicle.class), 
+				Id.create("line L-1", TransitLine.class), 
+				Id.create("route-R1", TransitRoute.class), 
+				Id.create("departure-D-1", Departure.class));
 		final TransitDriverStartsEvent event2 = XmlEventsTester.testWriteReadXml(this.utils.getOutputDirectory() + "events.xml", event1);
 		Assert.assertEquals(event1.getTime(), event2.getTime(), 1.0e-9);
 		Assert.assertEquals(event1.getDriverId(), event2.getDriverId());

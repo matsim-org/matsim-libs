@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -161,7 +160,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		assertNotNull(selector.selectPlan(person));
 
 		// test with only one plan, but with NEGATIVE_INFINITY...
-		person = new PersonImpl(new IdImpl(1));
+		person = new PersonImpl(Id.create(1, Person.class));
 		p1 = new org.matsim.core.population.PlanImpl(person);
 		a = new org.matsim.core.population.ActivityImpl("h", l6.getId());
 		b = new org.matsim.core.population.ActivityImpl("w", l7.getId());
@@ -335,19 +334,19 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		//             (5)
 
 		NetworkImpl network = NetworkImpl.createNetwork();
-		Node n1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0,10));
-		Node n2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(3,2));
-		Node n3 = network.createAndAddNode(new IdImpl(3), new CoordImpl(0,0));
-		Node n4 = network.createAndAddNode(new IdImpl(4), new CoordImpl(4,1));
-		Node n5 = network.createAndAddNode(new IdImpl(5), new CoordImpl(0,-1));
-		Node n6 = network.createAndAddNode(new IdImpl(6), new CoordImpl(0,11));
-		network.createAndAddLink(new IdImpl(1), n1, n3, 10, 1, 10, 1);
-		network.createAndAddLink(new IdImpl(2), n1, n2, 8, 1, 10, 1);
-		network.createAndAddLink(new IdImpl(3), n2, n3, 2, 1, 10, 1);
-		network.createAndAddLink(new IdImpl(4), n2, n4, 1, 1, 10, 1);
-		network.createAndAddLink(new IdImpl(5), n4, n3, 1, 1, 10, 1);
-		network.createAndAddLink(new IdImpl(6), n6, n1, 1, 1, 10, 1);
-		network.createAndAddLink(new IdImpl(7), n3, n5, 1, 1, 10, 1);
+		Node n1 = network.createAndAddNode(Id.create(1, Node.class), new CoordImpl(0,10));
+		Node n2 = network.createAndAddNode(Id.create(2, Node.class), new CoordImpl(3,2));
+		Node n3 = network.createAndAddNode(Id.create(3, Node.class), new CoordImpl(0,0));
+		Node n4 = network.createAndAddNode(Id.create(4, Node.class), new CoordImpl(4,1));
+		Node n5 = network.createAndAddNode(Id.create(5, Node.class), new CoordImpl(0,-1));
+		Node n6 = network.createAndAddNode(Id.create(6, Node.class), new CoordImpl(0,11));
+		network.createAndAddLink(Id.create(1, Link.class), n1, n3, 10, 1, 10, 1);
+		network.createAndAddLink(Id.create(2, Link.class), n1, n2, 8, 1, 10, 1);
+		network.createAndAddLink(Id.create(3, Link.class), n2, n3, 2, 1, 10, 1);
+		network.createAndAddLink(Id.create(4, Link.class), n2, n4, 1, 1, 10, 1);
+		network.createAndAddLink(Id.create(5, Link.class), n4, n3, 1, 1, 10, 1);
+		network.createAndAddLink(Id.create(6, Link.class), n6, n1, 1, 1, 10, 1);
+		network.createAndAddLink(Id.create(7, Link.class), n3, n5, 1, 1, 10, 1);
 
 		return network;
 	}

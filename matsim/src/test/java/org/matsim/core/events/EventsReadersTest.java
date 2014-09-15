@@ -24,6 +24,7 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -40,8 +41,8 @@ import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.xml.sax.SAXException;
 
@@ -54,18 +55,21 @@ public class EventsReadersTest extends MatsimTestCase {
 
 		public int eventCounter = 0;
 
+		@Override
 		public void reset(final int iteration) {
 			this.eventCounter = 0;
 		}
 
+		@Override
 		public void handleEvent(final ActivityEndEvent event) {
 			this.eventCounter++;
 			assertEquals("expected activity-End-Event to be event #1", 1, this.eventCounter);
 			assertEquals(21610.0, event.getTime(), 0.0);
 			assertEquals("1", event.getPersonId().toString());
-			assertEquals(new IdImpl("2"), event.getLinkId());
+			assertEquals(Id.create("2", Link.class), event.getLinkId());
 		}
 
+		@Override
 		public void handleEvent(final PersonDepartureEvent event) {
 			this.eventCounter++;
 			assertEquals("expected agentDeparture-Event to be event #2", 2, this.eventCounter);
@@ -74,6 +78,7 @@ public class EventsReadersTest extends MatsimTestCase {
 			assertEquals("3", event.getLinkId().toString());
 		}
 
+		@Override
 		public void handleEvent(final Wait2LinkEvent event) {
 			this.eventCounter++;
 			assertEquals("expected wait2link-Event to be event #3", 3, this.eventCounter);
@@ -82,6 +87,7 @@ public class EventsReadersTest extends MatsimTestCase {
 			assertEquals("4", event.getLinkId().toString());
 		}
 
+		@Override
 		public void handleEvent(final LinkLeaveEvent event) {
 			this.eventCounter++;
 			assertEquals("expected linkleave-Event to be event #4", 4, this.eventCounter);
@@ -90,6 +96,7 @@ public class EventsReadersTest extends MatsimTestCase {
 			assertEquals("5", event.getLinkId().toString());
 		}
 
+		@Override
 		public void handleEvent(final LinkEnterEvent event) {
 			this.eventCounter++;
 			assertEquals("expected linkleave-Event to be event #5", 5, this.eventCounter);
@@ -98,6 +105,7 @@ public class EventsReadersTest extends MatsimTestCase {
 			assertEquals("6", event.getLinkId().toString());
 		}
 
+		@Override
 		public void handleEvent(final PersonArrivalEvent event) {
 			this.eventCounter++;
 			assertEquals("expected agentArrival-Event to be event #6", 6, this.eventCounter);
@@ -106,14 +114,16 @@ public class EventsReadersTest extends MatsimTestCase {
 			assertEquals("7", event.getLinkId().toString());
 		}
 
+		@Override
 		public void handleEvent(final ActivityStartEvent event) {
 			this.eventCounter++;
 			assertEquals("expected activityStart-Event to be event #7", 7, this.eventCounter);
 			assertEquals(21670.0, event.getTime(), 0.0);
 			assertEquals("7", event.getPersonId().toString());
-			assertEquals(new IdImpl("8"), event.getLinkId());
+			assertEquals(Id.create("8", Link.class), event.getLinkId());
 		}
 
+		@Override
 		public void handleEvent(final PersonStuckEvent event) {
 			this.eventCounter++;
 			assertEquals("expected agentStuck-Event to be event #8", 8, this.eventCounter);

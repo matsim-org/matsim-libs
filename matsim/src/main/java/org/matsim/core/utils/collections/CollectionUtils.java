@@ -31,10 +31,10 @@ import org.matsim.core.utils.misc.StringUtils;
  */
 public abstract class CollectionUtils {
 
-	public static final String idSetToString(final Set<Id> values) {
+	public static final <T> String idSetToString(final Set<Id<T>> values) {
 		boolean isFirst = true;
 		StringBuilder str = new StringBuilder();
-		for (Id id : values) {
+		for (Id<?> id : values) {
 			if (!isFirst) {
 				str.append(',');
 			}

@@ -28,6 +28,7 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
@@ -75,6 +76,7 @@ public class AgentsToDropOffIdentifier extends DuringLegIdentifier {
 		this.jointDepartures = new ConcurrentHashMap<Id, JointDeparture>();
 	}
 
+	@Override
 	public Set<MobsimAgent> getAgentsToReplan(double time) {
 		
 		// Get all agents that have just entered a new link.
@@ -122,7 +124,7 @@ public class AgentsToDropOffIdentifier extends DuringLegIdentifier {
 			 */
 //			Id linkId = driver.getCurrentLinkId();
 //			Id driverId = driver.getId();
-			Set<Id> remainingPassengers = new LinkedHashSet<Id>();
+			Set<Id<Person>> remainingPassengers = new LinkedHashSet<>();
 			for (PassengerAgent passenger : vehicle.getPassengers()) {
 				Id passengerId = passenger.getId();
 				if (!agentsLeaveVehicle.contains(passengerId)) remainingPassengers.add(passengerId);

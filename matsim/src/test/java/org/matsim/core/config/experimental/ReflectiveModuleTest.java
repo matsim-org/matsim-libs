@@ -23,7 +23,8 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -43,7 +44,7 @@ public class ReflectiveModuleTest {
 	public void testDumpAndRead() {
 		final MyModule dumpedModule = new MyModule();
 		dumpedModule.setDoubleField( 1000 );
-		dumpedModule.setIdField( new IdImpl( 123 ) );
+		dumpedModule.setIdField( Id.create( 123, Link.class ) );
 		dumpedModule.setCoordField( new CoordImpl( 265 , 463 ) );
 		dumpedModule.setTestEnumField( MyEnum.VALUE2 );
 

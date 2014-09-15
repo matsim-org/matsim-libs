@@ -20,12 +20,14 @@
 package org.matsim.core.events.parallelEventsHandler;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.SimStepParallelEventsManagerImpl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -62,7 +64,7 @@ public class SimStepParallelEventsTest extends MatsimTestCase {
 		events.addHandler(handler);
 		events.removeHandler(handler);
 
-		LinkLeaveEvent linkLeaveEvent = new LinkLeaveEvent(0, new IdImpl(""), new IdImpl(""), null);
+		LinkLeaveEvent linkLeaveEvent = new LinkLeaveEvent(0, Id.create("", Person.class), Id.create("", Link.class), null);
 
 		for (int i = 0; i < 100; i++) {
 			events.processEvent(linkLeaveEvent);
@@ -83,7 +85,7 @@ public class SimStepParallelEventsTest extends MatsimTestCase {
 			events.addHandler(handlers[i]);
 		}
 
-		LinkLeaveEvent linkLeaveEvent = new LinkLeaveEvent(0, new IdImpl(""), new IdImpl(""), null);
+		LinkLeaveEvent linkLeaveEvent = new LinkLeaveEvent(0, Id.create("", Person.class), Id.create("", Link.class), null);
 
 		for (int j = 0; j < numberOfIterations; j++) {
 
@@ -115,13 +117,13 @@ public class SimStepParallelEventsTest extends MatsimTestCase {
 		 */
 		events.initProcessing();
 		
-		linkLeaveEvent = new LinkLeaveEvent(1.0, new IdImpl(""), new IdImpl(""), null);
+		linkLeaveEvent = new LinkLeaveEvent(1.0, Id.create("", Person.class), Id.create("", Link.class), null);
 		events.processEvent(linkLeaveEvent);
-		linkLeaveEvent = new LinkLeaveEvent(1.0, new IdImpl(""), new IdImpl(""), null);
+		linkLeaveEvent = new LinkLeaveEvent(1.0, Id.create("", Person.class), Id.create("", Link.class), null);
 		events.processEvent(linkLeaveEvent);
 		events.afterSimStep(1.0);
 		
-		linkLeaveEvent = new LinkLeaveEvent(2.0, new IdImpl(""), new IdImpl(""), null);
+		linkLeaveEvent = new LinkLeaveEvent(2.0, Id.create("", Person.class), Id.create("", Link.class), null);
 		events.processEvent(linkLeaveEvent);
 		events.afterSimStep(2.0);
 		
@@ -133,15 +135,15 @@ public class SimStepParallelEventsTest extends MatsimTestCase {
 		try {
 			events.initProcessing();
 			
-			linkLeaveEvent = new LinkLeaveEvent(1.0, new IdImpl(""), new IdImpl(""), null);
+			linkLeaveEvent = new LinkLeaveEvent(1.0, Id.create("", Person.class), Id.create("", Link.class), null);
 			events.processEvent(linkLeaveEvent);
 			events.afterSimStep(1.0);
 			
-			linkLeaveEvent = new LinkLeaveEvent(2.0, new IdImpl(""), new IdImpl(""), null);
+			linkLeaveEvent = new LinkLeaveEvent(2.0, Id.create("", Person.class), Id.create("", Link.class), null);
 			events.processEvent(linkLeaveEvent);
 			events.afterSimStep(2.0);
 			
-			linkLeaveEvent = new LinkLeaveEvent(1.0, new IdImpl(""), new IdImpl(""), null);
+			linkLeaveEvent = new LinkLeaveEvent(1.0, Id.create("", Person.class), Id.create("", Link.class), null);
 			events.processEvent(linkLeaveEvent);
 			
 			events.finishProcessing();
@@ -179,7 +181,7 @@ public class SimStepParallelEventsTest extends MatsimTestCase {
 			for (int time = 0; time < 5; time++) {
 				// process event
 				LinkLeaveEvent linkLeaveEvent = new LinkLeaveEvent(time, 
-						new IdImpl(""), new IdImpl(""), null);
+						Id.create("", Person.class), Id.create("", Link.class), null);
 				events.processEvent(linkLeaveEvent);
 				
 				// step ahead in time
@@ -211,7 +213,7 @@ public class SimStepParallelEventsTest extends MatsimTestCase {
 		for (int time = 0; time < 5; time++) {
 			// process event
 			LinkLeaveEvent linkLeaveEvent = new LinkLeaveEvent(time, 
-					new IdImpl(""), new IdImpl(""), null);
+					Id.create("", Person.class), Id.create("", Link.class), null);
 			events.processEvent(linkLeaveEvent);
 			
 			// step ahead in time
@@ -291,7 +293,7 @@ public class SimStepParallelEventsTest extends MatsimTestCase {
 		events.addHandler(handler1);
 		events.addHandler(handler2);
 
-		LinkLeaveEvent linkLeaveEvent = new LinkLeaveEvent(0, new IdImpl(""), new IdImpl(""), null);
+		LinkLeaveEvent linkLeaveEvent = new LinkLeaveEvent(0, Id.create("", Person.class), Id.create("", Link.class), null);
 		try {
 			for (int i = 0; i < 10; i++) {
 				events.processEvent(linkLeaveEvent);

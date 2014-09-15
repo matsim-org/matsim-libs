@@ -30,12 +30,12 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
@@ -61,7 +61,7 @@ public class StrategyManagerTest {
 		
 		Population population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 		for (int i = 0; i < 1000; i++) {
-			PersonImpl p = new PersonImpl(new IdImpl(i));
+			PersonImpl p = new PersonImpl(Id.create(i, Person.class));
 			population.addPerson(p);
 		}
 
@@ -143,7 +143,7 @@ public class StrategyManagerTest {
 		
 		Population population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 		for (int i = 0; i < 100; i++) {
-			PersonImpl p = new PersonImpl(new IdImpl(i));
+			PersonImpl p = new PersonImpl(Id.create(i, Person.class));
 			population.addPerson(p);
 		}
 
@@ -203,7 +203,7 @@ public class StrategyManagerTest {
 		PersonImpl person = null;
 		PlanImpl[] plans = new PlanImpl[10];
 		// create a person with 4 unscored plans
-		person = new PersonImpl(new IdImpl(1));
+		person = new PersonImpl(Id.create(1, Person.class));
 		plans[0] = person.createAndAddPlan(false);
 		plans[1] = person.createAndAddPlan(false);
 		plans[1].setScore(Double.valueOf(0.0));
@@ -253,7 +253,7 @@ public class StrategyManagerTest {
 		manager.addStrategyForDefaultSubpopulation(new PlanStrategyImpl(new RandomPlanSelector()), 1.0);
 
 		// init Population
-		PersonImpl p = new PersonImpl(new IdImpl(1));
+		PersonImpl p = new PersonImpl(Id.create(1, Person.class));
 		PlanImpl[] plans = new PlanImpl[7];
 		for (int i = 0; i < plans.length; i++) {
 			plans[i] = p.createAndAddPlan(false);

@@ -27,12 +27,12 @@ import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -59,35 +59,35 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).parse("test/scenarios/equil/network.xml");
-		Node node12 = network.getNodes().get(new IdImpl("12"));
-		Node node15 = network.getNodes().get(new IdImpl("15"));
+		Node node12 = network.getNodes().get(Id.create("12", Node.class));
+		Node node15 = network.getNodes().get(Id.create("15", Node.class));
 
 		LeastCostPathCalculator routerAlgo = getLeastCostPathCalculator(network);
 		Path path = routerAlgo.calcLeastCostPath(node12, node15, 8.0*3600, null, null);
 
 		assertEquals("number of nodes wrong.", 4, path.nodes.size());
 		assertEquals("number of links wrong.", 3, path.links.size());
-		assertEquals(network.getNodes().get(new IdImpl("12")), path.nodes.get(0));
-		assertEquals(network.getNodes().get(new IdImpl("13")), path.nodes.get(1));
-		assertEquals(network.getNodes().get(new IdImpl("14")), path.nodes.get(2));
-		assertEquals(network.getNodes().get(new IdImpl("15")), path.nodes.get(3));
-		assertEquals(network.getLinks().get(new IdImpl("20")), path.links.get(0));
-		assertEquals(network.getLinks().get(new IdImpl("21")), path.links.get(1));
-		assertEquals(network.getLinks().get(new IdImpl("22")), path.links.get(2));
+		assertEquals(network.getNodes().get(Id.create("12", Node.class)), path.nodes.get(0));
+		assertEquals(network.getNodes().get(Id.create("13", Node.class)), path.nodes.get(1));
+		assertEquals(network.getNodes().get(Id.create("14", Node.class)), path.nodes.get(2));
+		assertEquals(network.getNodes().get(Id.create("15", Node.class)), path.nodes.get(3));
+		assertEquals(network.getLinks().get(Id.create("20", Link.class)), path.links.get(0));
+		assertEquals(network.getLinks().get(Id.create("21", Link.class)), path.links.get(1));
+		assertEquals(network.getLinks().get(Id.create("22", Link.class)), path.links.get(2));
 	}
 
 	public void testCalcLeastCostPath_SameFromTo() throws SAXException, ParserConfigurationException, IOException {
 		Scenario scenario = ScenarioUtils.createScenario(loadConfig(null));
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).parse("test/scenarios/equil/network.xml");
-		Node node12 = network.getNodes().get(new IdImpl("12"));
+		Node node12 = network.getNodes().get(Id.create("12", Node.class));
 
 		LeastCostPathCalculator routerAlgo = getLeastCostPathCalculator(network);
 		Path path = routerAlgo.calcLeastCostPath(node12, node12, 8.0*3600, null, null);
 
 		assertEquals("number of nodes wrong.", 1, path.nodes.size());
 		assertEquals("number of links wrong.", 0, path.links.size());
-		assertEquals(network.getNodes().get(new IdImpl("12")), path.nodes.get(0));
+		assertEquals(network.getNodes().get(Id.create("12", Node.class)), path.nodes.get(0));
 	}
 
 	/**
@@ -319,26 +319,26 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 
 		public MultiModeFixture() {
 			this.network.setCapacityPeriod(3600.0);
-			this.nodes[0] = network.createAndAddNode(new IdImpl(0), new CoordImpl(0, 0));
-			this.nodes[1] = network.createAndAddNode(new IdImpl(1), new CoordImpl(1000, 0));
-			this.nodes[2] = network.createAndAddNode(new IdImpl(2), new CoordImpl(2000, 0));
-			this.nodes[3] = network.createAndAddNode(new IdImpl(3), new CoordImpl(3000, 0));
-			this.nodes[4] = network.createAndAddNode(new IdImpl(4), new CoordImpl(0, 1000));
-			this.nodes[5] = network.createAndAddNode(new IdImpl(5), new CoordImpl(1000, 1000));
-			this.nodes[6] = network.createAndAddNode(new IdImpl(6), new CoordImpl(2000, 1000));
-			this.nodes[7] = network.createAndAddNode(new IdImpl(7), new CoordImpl(3000, 1000));
-			this.links[0] = network.createAndAddLink(new IdImpl(0), this.nodes[0], this.nodes[1], 1000.0, 100.0, 3600.0, 1.0);
-			this.links[1] = network.createAndAddLink(new IdImpl(1), this.nodes[1], this.nodes[2], 1000.0, 100.0, 3600.0, 1.0);
-			this.links[2] = network.createAndAddLink(new IdImpl(2), this.nodes[2], this.nodes[3], 1000.0, 100.0, 3600.0, 1.0);
-			this.links[3] = network.createAndAddLink(new IdImpl(3), this.nodes[0], this.nodes[4], 1000.0, 100.0, 3600.0, 1.0);
-			this.links[4] = network.createAndAddLink(new IdImpl(4), this.nodes[0], this.nodes[5], 1000.0, 100.0, 3600.0, 1.0);
-			this.links[5] = network.createAndAddLink(new IdImpl(5), this.nodes[5], this.nodes[1], 1000.0, 100.0, 3600.0, 1.0);
-			this.links[6] = network.createAndAddLink(new IdImpl(6), this.nodes[5], this.nodes[2], 1000.0, 100.0, 3600.0, 1.0);
-			this.links[7] = network.createAndAddLink(new IdImpl(7), this.nodes[2], this.nodes[6], 1000.0, 100.0, 3600.0, 1.0);
-			this.links[8] = network.createAndAddLink(new IdImpl(8), this.nodes[2], this.nodes[7], 1000.0, 100.0, 3600.0, 1.0);
-			this.links[9] = network.createAndAddLink(new IdImpl(9), this.nodes[4], this.nodes[5], 1000.0, 100.0, 3600.0, 1.0);
-			this.links[10] = network.createAndAddLink(new IdImpl(10), this.nodes[5], this.nodes[6], 1000.0, 100.0, 3600.0, 1.0);
-			this.links[11] = network.createAndAddLink(new IdImpl(11), this.nodes[6], this.nodes[7], 1000.0, 100.0, 3600.0, 1.0);
+			this.nodes[0] = network.createAndAddNode(Id.create(0, Node.class), new CoordImpl(0, 0));
+			this.nodes[1] = network.createAndAddNode(Id.create(1, Node.class), new CoordImpl(1000, 0));
+			this.nodes[2] = network.createAndAddNode(Id.create(2, Node.class), new CoordImpl(2000, 0));
+			this.nodes[3] = network.createAndAddNode(Id.create(3, Node.class), new CoordImpl(3000, 0));
+			this.nodes[4] = network.createAndAddNode(Id.create(4, Node.class), new CoordImpl(0, 1000));
+			this.nodes[5] = network.createAndAddNode(Id.create(5, Node.class), new CoordImpl(1000, 1000));
+			this.nodes[6] = network.createAndAddNode(Id.create(6, Node.class), new CoordImpl(2000, 1000));
+			this.nodes[7] = network.createAndAddNode(Id.create(7, Node.class), new CoordImpl(3000, 1000));
+			this.links[0] = network.createAndAddLink(Id.create(0, Link.class), this.nodes[0], this.nodes[1], 1000.0, 100.0, 3600.0, 1.0);
+			this.links[1] = network.createAndAddLink(Id.create(1, Link.class), this.nodes[1], this.nodes[2], 1000.0, 100.0, 3600.0, 1.0);
+			this.links[2] = network.createAndAddLink(Id.create(2, Link.class), this.nodes[2], this.nodes[3], 1000.0, 100.0, 3600.0, 1.0);
+			this.links[3] = network.createAndAddLink(Id.create(3, Link.class), this.nodes[0], this.nodes[4], 1000.0, 100.0, 3600.0, 1.0);
+			this.links[4] = network.createAndAddLink(Id.create(4, Link.class), this.nodes[0], this.nodes[5], 1000.0, 100.0, 3600.0, 1.0);
+			this.links[5] = network.createAndAddLink(Id.create(5, Link.class), this.nodes[5], this.nodes[1], 1000.0, 100.0, 3600.0, 1.0);
+			this.links[6] = network.createAndAddLink(Id.create(6, Link.class), this.nodes[5], this.nodes[2], 1000.0, 100.0, 3600.0, 1.0);
+			this.links[7] = network.createAndAddLink(Id.create(7, Link.class), this.nodes[2], this.nodes[6], 1000.0, 100.0, 3600.0, 1.0);
+			this.links[8] = network.createAndAddLink(Id.create(8, Link.class), this.nodes[2], this.nodes[7], 1000.0, 100.0, 3600.0, 1.0);
+			this.links[9] = network.createAndAddLink(Id.create(9, Link.class), this.nodes[4], this.nodes[5], 1000.0, 100.0, 3600.0, 1.0);
+			this.links[10] = network.createAndAddLink(Id.create(10, Link.class), this.nodes[5], this.nodes[6], 1000.0, 100.0, 3600.0, 1.0);
+			this.links[11] = network.createAndAddLink(Id.create(11, Link.class), this.nodes[6], this.nodes[7], 1000.0, 100.0, 3600.0, 1.0);
 			Set<String> carOnly = new HashSet<String>();
 			carOnly.add(TransportMode.car);
 			Set<String> busOnly = new HashSet<String>();

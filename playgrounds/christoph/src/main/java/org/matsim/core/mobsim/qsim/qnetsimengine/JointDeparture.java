@@ -24,6 +24,7 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.vehicles.Vehicle;
 
 /*
@@ -36,11 +37,11 @@ public class JointDeparture {
 	private final Id<Link> linkId;
 	private final Id<Vehicle> vehicleId;
 	private final Id driverId;
-	private final Set<Id> passengerIds;
+	private final Set<Id<Person>> passengerIds;
 	
 	private boolean departed = false;
 	
-	/*package*/ JointDeparture(Id<JointDeparture> id, Id<Link> linkId, Id<Vehicle> vehicleId, Id driverId, Set<Id> passengerIds) {
+	/*package*/ JointDeparture(Id<JointDeparture> id, Id<Link> linkId, Id<Vehicle> vehicleId, Id driverId, Set<Id<Person>> passengerIds) {
 		this.id = id;
 		this.linkId = linkId;
 		this.vehicleId = vehicleId;
@@ -77,7 +78,7 @@ public class JointDeparture {
 		return this.driverId;
 	}
 	
-	public Set<Id> getPassengerIds() {
+	public Set<Id<Person>> getPassengerIds() {
 		return this.passengerIds;
 	}
 	

@@ -19,13 +19,12 @@
 
 package org.matsim.core.config;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-import org.matsim.core.utils.io.UncheckedIOException;
-
 import java.io.File;
 import java.util.Iterator;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.utils.io.UncheckedIOException;
 
 /**
  * @author mrieser
@@ -118,13 +117,13 @@ public abstract class ConfigUtils {
 		return absolutePath;
 	}
 
-	public static Id createAvailableStrategyId(Config config) {
+	public static Id<StrategySettings> createAvailableStrategyId(Config config) {
 		long maxStrategyId = 0;
 		Iterator<StrategySettings> iterator = config.strategy().getStrategySettings().iterator();
 		while(iterator.hasNext()){
 			maxStrategyId = Math.max(maxStrategyId, Long.parseLong(iterator.next().getId().toString()));
 		}
-		return new IdImpl(maxStrategyId + 1 );
+		return Id.create(maxStrategyId + 1, StrategySettings.class);
 	}
 
 	/**

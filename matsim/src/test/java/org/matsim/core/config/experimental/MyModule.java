@@ -21,8 +21,6 @@ package org.matsim.core.config.experimental;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.experimental.ReflectiveModule;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 
@@ -71,11 +69,11 @@ public class MyModule extends ReflectiveModule {
 	 * toString: just annotate getter
 	 */
 	@StringGetter( "idField" )
-	public Id getIdField() {
+	public <T> Id<T> getIdField() {
 		return this.idField;
 	}
 
-	public void setIdField(Id idField) {
+	public <T> void setIdField(Id<T> idField) {
 		this.idField = idField;
 	}
 
@@ -86,8 +84,8 @@ public class MyModule extends ReflectiveModule {
 	 * interface: the user just sees the "typed" setter.
 	 */
 	@StringSetter( "idField" )
-	private void setIdField(String s) {
-		this.idField = new IdImpl( s );
+	private <T> void setIdField(String s, Class<T> type) {
+		this.idField = Id.create( s, type );
 	}
 
 	// /////////////////////////////////////////////////////////////////////

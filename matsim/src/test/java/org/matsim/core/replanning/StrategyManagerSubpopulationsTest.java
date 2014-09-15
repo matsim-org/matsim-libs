@@ -24,11 +24,11 @@ import java.util.Random;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -48,7 +48,7 @@ public class StrategyManagerSubpopulationsTest {
 		final Population population = ScenarioUtils.createScenario(
 				ConfigUtils.createConfig()).getPopulation();
 		for (int i = 0; i < 1000; i++) {
-			PersonImpl p = new PersonImpl(new IdImpl(i));
+			PersonImpl p = new PersonImpl(Id.create(i, Person.class));
 			population.addPerson(p);
 			final int group = r.nextInt(3);
 			switch (group) {

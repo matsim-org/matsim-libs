@@ -21,11 +21,12 @@ package org.matsim.core.router;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.PersonImpl;
@@ -51,7 +52,10 @@ public class PersonalizableDisutilityIntegrationTest {
 		Fixture f = new Fixture();
 		
 		Dijkstra router = new Dijkstra(f.network, f.costFunction, new FreeSpeedTravelTime());
-		router.calcLeastCostPath(f.network.getNodes().get(new IdImpl("2")), f.network.getNodes().get(new IdImpl("1")), 07*3600, f.person, f.vehicle);
+		router.calcLeastCostPath(
+				f.network.getNodes().get(Id.create("2", Node.class)), 
+				f.network.getNodes().get(Id.create("1", Node.class)),
+				07*3600, f.person, f.vehicle);
 		// hopefully there was no Exception until here...
 		
 		Assert.assertEquals(22, f.costFunction.cnt); // make sure the costFunction was actually used
@@ -63,7 +67,10 @@ public class PersonalizableDisutilityIntegrationTest {
 		
 		LeastCostPathCalculatorFactory routerFactory = new FastDijkstraFactory();
 		LeastCostPathCalculator router = routerFactory.createPathCalculator(f.network, f.costFunction, new FreeSpeedTravelTime());
-		router.calcLeastCostPath(f.network.getNodes().get(new IdImpl("2")), f.network.getNodes().get(new IdImpl("1")), 07*3600, f.person, f.vehicle);
+		router.calcLeastCostPath(
+				f.network.getNodes().get(Id.create("2", Node.class)), 
+				f.network.getNodes().get(Id.create("1", Node.class)), 
+				07*3600, f.person, f.vehicle);
 		// hopefully there was no Exception until here...
 		
 		Assert.assertEquals(22, f.costFunction.cnt); // make sure the costFunction was actually used
@@ -75,7 +82,10 @@ public class PersonalizableDisutilityIntegrationTest {
 		PreProcessEuclidean preprocess = new PreProcessEuclidean(f.costFunction);
 		preprocess.run(f.network);
 		AStarEuclidean router = new AStarEuclidean(f.network, preprocess, new FreeSpeedTravelTime());
-		router.calcLeastCostPath(f.network.getNodes().get(new IdImpl("2")), f.network.getNodes().get(new IdImpl("1")), 07*3600, f.person, f.vehicle);
+		router.calcLeastCostPath(
+				f.network.getNodes().get(Id.create("2", Node.class)), 
+				f.network.getNodes().get(Id.create("1", Node.class)), 
+				07*3600, f.person, f.vehicle);
 		// hopefully there was no Exception until here...
 		
 		Assert.assertEquals(22, f.costFunction.cnt); // make sure the costFunction was actually used
@@ -87,7 +97,10 @@ public class PersonalizableDisutilityIntegrationTest {
 		PreProcessEuclidean preprocess = new PreProcessEuclidean(f.costFunction);
 		preprocess.run(f.network);
 		AStarEuclidean router = new AStarEuclidean(f.network, preprocess, new FreeSpeedTravelTime());
-		router.calcLeastCostPath(f.network.getNodes().get(new IdImpl("2")), f.network.getNodes().get(new IdImpl("1")), 07*3600, f.person, f.vehicle);
+		router.calcLeastCostPath(
+				f.network.getNodes().get(Id.create("2", Node.class)), 
+				f.network.getNodes().get(Id.create("1", Node.class)), 
+				07*3600, f.person, f.vehicle);
 		// hopefully there was no Exception until here...
 		
 		Assert.assertEquals(22, f.costFunction.cnt); // make sure the costFunction was actually used
@@ -98,7 +111,10 @@ public class PersonalizableDisutilityIntegrationTest {
 		Fixture f = new Fixture();
 		LeastCostPathCalculatorFactory routerFactory = new FastAStarEuclideanFactory(f.network, f.costFunction);
 		LeastCostPathCalculator router = routerFactory.createPathCalculator(f.network, f.costFunction, new FreeSpeedTravelTime());
-		router.calcLeastCostPath(f.network.getNodes().get(new IdImpl("2")), f.network.getNodes().get(new IdImpl("1")), 07*3600, f.person, f.vehicle);
+		router.calcLeastCostPath(
+				f.network.getNodes().get(Id.create("2", Node.class)), 
+				f.network.getNodes().get(Id.create("1", Node.class)), 
+				07*3600, f.person, f.vehicle);
 		// hopefully there was no Exception until here...
 		
 		Assert.assertEquals(22, f.costFunction.cnt); // make sure the costFunction was actually used
@@ -109,7 +125,10 @@ public class PersonalizableDisutilityIntegrationTest {
 		Fixture f = new Fixture();
 		LeastCostPathCalculatorFactory routerFactory = new FastAStarLandmarksFactory(f.network, f.costFunction);
 		LeastCostPathCalculator router = routerFactory.createPathCalculator(f.network, f.costFunction, new FreeSpeedTravelTime());
-		router.calcLeastCostPath(f.network.getNodes().get(new IdImpl("2")), f.network.getNodes().get(new IdImpl("1")), 07*3600, f.person, f.vehicle);
+		router.calcLeastCostPath(
+				f.network.getNodes().get(Id.create("2", Node.class)), 
+				f.network.getNodes().get(Id.create("1", Node.class)), 
+				07*3600, f.person, f.vehicle);
 		// hopefully there was no Exception until here...
 		
 		Assert.assertEquals(22, f.costFunction.cnt); // make sure the costFunction was actually used
@@ -126,7 +145,7 @@ public class PersonalizableDisutilityIntegrationTest {
 			this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			new MatsimNetworkReader(this.scenario).readFile("test/scenarios/equil/network.xml");
 			
-			this.person = new PersonImpl(new IdImpl(1));
+			this.person = new PersonImpl(Id.create(1, Person.class));
 			
 			this.vehicle = new VehicleImpl(null, null);
 			

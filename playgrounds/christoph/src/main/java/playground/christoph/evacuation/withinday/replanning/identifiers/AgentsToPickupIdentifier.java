@@ -260,7 +260,7 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier {
 					plannedDeparture.driverId = driverId;
 					plannedDeparture.linkId = linkId;
 					plannedDeparture.vehicleId = vehicle.getId();
-					plannedDeparture.passengerIds = new LinkedHashSet<Id>();
+					plannedDeparture.passengerIds = new LinkedHashSet<>();
 					
 					/*
 					 * Check which existing passengers will stay in the vehicle
@@ -341,7 +341,7 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier {
 		Id driverId;
 		Id linkId;
 		Id vehicleId;
-		Set<Id> passengerIds;
+		Set<Id<Person>> passengerIds;
 	}
 
 }

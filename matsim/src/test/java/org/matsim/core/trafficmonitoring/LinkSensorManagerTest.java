@@ -20,7 +20,8 @@
 
 package org.matsim.core.trafficmonitoring;
 
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -59,16 +60,18 @@ public class LinkSensorManagerTest extends MatsimTestCase implements IterationSt
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.addControlerListener(this);
 		this.manager = new LinkSensorManager();
-		this.manager.addLinkSensor(new IdImpl("1"));
+		this.manager.addLinkSensor(Id.create("1", Link.class));
 		controler.run();
 	}
 
+	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		if (event.getIteration() > 0)  {
-			assertEquals(100, this.manager.getLinkTraffic(new IdImpl("1")));
+			assertEquals(100, this.manager.getLinkTraffic(Id.create("1", Link.class)));
 		}
 	}
 
+	@Override
 	public void notifyIterationStarts(final IterationStartsEvent event) {
 		if (event.getIteration() == 1) {
 			event.getControler().getEvents().addHandler(this.manager);

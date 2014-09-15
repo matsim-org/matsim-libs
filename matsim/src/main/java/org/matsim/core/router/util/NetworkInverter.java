@@ -10,7 +10,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
@@ -33,9 +32,9 @@ public class NetworkInverter {
 
 	private NetworkImpl invertedNetwork = null;
 
-	private Map<Id, List<TurnInfo>>  inLinkTurnInfoMap = null;
+	private Map<Id<Link>, List<TurnInfo>>  inLinkTurnInfoMap = null;
 
-	public NetworkInverter(Network originalNet, Map<Id, List<TurnInfo>>  inLinkTurnInfoMap) {
+	public NetworkInverter(Network originalNet, Map<Id<Link>, List<TurnInfo>>  inLinkTurnInfoMap) {
 		this.originalNetwork = originalNet;
 		this.inLinkTurnInfoMap = inLinkTurnInfoMap;
 	}
@@ -79,7 +78,7 @@ public class NetworkInverter {
 	}
 
 	private int createInvertedLink(Link inLink, Link outLink, int numberOfLinksGenerated, Set<String> modes){
-		Link link = this.invertedNetwork.createAndAddLink(new IdImpl(numberOfLinksGenerated + 1), // start counting link ids with 1 instead of 0
+		Link link = this.invertedNetwork.createAndAddLink(Id.create(numberOfLinksGenerated + 1, Link.class), // start counting link ids with 1 instead of 0
 				this.invertedNetwork.getNodes().get(inLink.getId()), this.invertedNetwork.getNodes().get(outLink.getId()),
 				outLink.getLength(),
 				outLink.getFreespeed(),

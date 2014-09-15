@@ -25,10 +25,10 @@ import junit.framework.Assert;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -244,9 +244,9 @@ public class OsmNetworkReaderTest {
 		 * - links 5 & 6: for way 3, in both directions
 		 */
 		
-		Link link1 = net.getLinks().get(new IdImpl("1"));
-		Link link3 = net.getLinks().get(new IdImpl("3"));
-		Link link5 = net.getLinks().get(new IdImpl("5"));
+		Link link1 = net.getLinks().get(Id.create("1", Link.class));
+		Link link3 = net.getLinks().get(Id.create("3", Link.class));
+		Link link5 = net.getLinks().get(Id.create("5", Link.class));
 		Assert.assertNotNull("Could not find converted link 1.", link1);
 		Assert.assertNotNull("Could not find converted link 3", link3);
 		Assert.assertNotNull("Could not find converted link 5", link5);
@@ -300,10 +300,10 @@ public class OsmNetworkReaderTest {
 		 * - links 3 & 4: for way 2, in both directions
 		 */
 		
-		Link link1 = net.getLinks().get(new IdImpl("1"));
-		Link link3 = net.getLinks().get(new IdImpl("3"));
+		Link link1 = net.getLinks().get(Id.create("1", Link.class));
+		Link link3 = net.getLinks().get(Id.create("3", Link.class));
 		Assert.assertNotNull("Could not find converted link 1.", link1);
 		Assert.assertNotNull("Could not find converted link 3", link3);
-		Assert.assertNull(net.getLinks().get(new IdImpl("5")));
+		Assert.assertNull(net.getLinks().get(Id.create("5", Link.class)));
 	}
 }

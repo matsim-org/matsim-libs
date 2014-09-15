@@ -25,9 +25,10 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.api.experimental.facilities.Facility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -44,25 +45,25 @@ public class TestActivityWrapperFacility {
 		Activity act = new ActivityImpl(
 				"type",
 				new CoordImpl( 1 , 2 ),
-				new IdImpl( "bouh" ));
+				Id.create( "bouh", Link.class ));
 		activities.add( act );
 
 		act = new ActivityImpl(
 				"another_type",
 				new CoordImpl( 5 , 2 ),
-				new IdImpl( "an_id" ));
+				Id.create( "an_id", Link.class ));
 		activities.add( act );
 
 		act = new ActivityImpl(
 				"h2g2",
 				new CoordImpl( 42 , 42 ),
-				new IdImpl( "42" ));
+				Id.create( "42", Link.class ));
 		activities.add( act );
 
 		act = new ActivityImpl(
 				"nothing",
 				new CoordImpl( 0 , 0 ),
-				new IdImpl( "0" ));
+				Id.create( "0", Link.class ));
 		activities.add( act );
 
 	}

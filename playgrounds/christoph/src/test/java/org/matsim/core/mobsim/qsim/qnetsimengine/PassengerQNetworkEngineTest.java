@@ -93,7 +93,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
-		Set<Id> passengerIds = new LinkedHashSet<Id>();
+		Set<Id<Person>> passengerIds = new LinkedHashSet<>();
 		JointDeparture jointDeparture = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driver, 1, jointDeparture, jointDepartureOrganizer);
 		
@@ -130,7 +130,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
-		Set<Id> passengerIds = new LinkedHashSet<Id>();
+		Set<Id<Person>> passengerIds = new LinkedHashSet<>();
 		passengerIds.add(Id.create("p2", Person.class));
 		passengerIds.add(Id.create("p3", Person.class));
 		passengerIds.add(Id.create("p4", Person.class));
@@ -175,7 +175,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
-		Set<Id> passengerIds = new LinkedHashSet<Id>();
+		Set<Id<Person>> passengerIds = new LinkedHashSet<>();
 		JointDeparture jointDeparture = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driver, 1, jointDeparture, jointDepartureOrganizer);
 		
@@ -219,7 +219,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
-		Set<Id> passengerIds = new LinkedHashSet<Id>();
+		Set<Id<Person>> passengerIds = new LinkedHashSet<>();
 		passengerIds.add(Id.create("p2", Person.class));
 		JointDeparture jointDeparture = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driver, 1, jointDeparture, jointDepartureOrganizer);
@@ -268,7 +268,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
-		Set<Id> passengerIds = new LinkedHashSet<Id>();
+		Set<Id<Person>> passengerIds = new LinkedHashSet<>();
 		passengerIds.add(Id.create("p2", Person.class));
 		JointDeparture jointDeparture = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driver, 1, jointDeparture, jointDepartureOrganizer);
@@ -320,7 +320,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v0", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
-		Set<Id> passengerIds = new LinkedHashSet<Id>();
+		Set<Id<Person>> passengerIds = new LinkedHashSet<>();
 		passengerIds.add(Id.create("p2", Person.class));
 		JointDeparture jointDeparture = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driver, 3, jointDeparture, jointDepartureOrganizer);
@@ -369,11 +369,11 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
-		Set<Id> passengerIds = new LinkedHashSet<Id>();
+		Set<Id<Person>> passengerIds = new LinkedHashSet<>();
 		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driver, 1, jointDeparture1, jointDepartureOrganizer);
 		
-		passengerIds = new LinkedHashSet<Id>();
+		passengerIds = new LinkedHashSet<>();
 		passengerIds.add(Id.create("p2", Person.class));
 		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driver, 3, jointDeparture2, jointDepartureOrganizer);
@@ -422,11 +422,11 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
-		Set<Id> passengerIds = new LinkedHashSet<Id>();
+		Set<Id<Person>> passengerIds = new LinkedHashSet<>();
 		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driver, 1, jointDeparture1, jointDepartureOrganizer);
 		
-		passengerIds = new LinkedHashSet<Id>();
+		passengerIds = new LinkedHashSet<>();
 		passengerIds.add(Id.create("p2", Person.class));
 		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driver, 3, jointDeparture2, jointDepartureOrganizer);
@@ -476,13 +476,13 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
-		Set<Id> passengerIds = new LinkedHashSet<Id>();
+		Set<Id<Person>> passengerIds = new LinkedHashSet<>();
 		passengerIds.add(Id.create("p2", Person.class));
 		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driver, 1, jointDeparture1, jointDepartureOrganizer);
 		assignJointDeparture(passenger1, 1, jointDeparture1, jointDepartureOrganizer);
 		
-		passengerIds = new LinkedHashSet<Id>();
+		passengerIds = new LinkedHashSet<>();
 		passengerIds.add(Id.create("p2", Person.class));
 		passengerIds.add(Id.create("p3", Person.class));
 		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
@@ -535,13 +535,13 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
-		Set<Id> passengerIds = new LinkedHashSet<Id>();
+		Set<Id<Person>> passengerIds = new LinkedHashSet<>();
 		passengerIds.add(Id.create("p2", Person.class));
 		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driver, 3, jointDeparture1, jointDepartureOrganizer);
 		assignJointDeparture(passenger, 1, jointDeparture1, jointDepartureOrganizer);
 		
-		passengerIds = new LinkedHashSet<Id>();
+		passengerIds = new LinkedHashSet<>();
 		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driver, 5, jointDeparture2, jointDepartureOrganizer);
 		
@@ -593,13 +593,13 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
-		Set<Id> passengerIds = new LinkedHashSet<Id>();
+		Set<Id<Person>> passengerIds = new LinkedHashSet<>();
 		passengerIds.add(Id.create("p2", Person.class));
 		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driver, 3, jointDeparture1, jointDepartureOrganizer);
 		assignJointDeparture(passenger, 1, jointDeparture1, jointDepartureOrganizer);
 		
-		passengerIds = new LinkedHashSet<Id>();
+		passengerIds = new LinkedHashSet<>();
 		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driver, 5, jointDeparture2, jointDepartureOrganizer);
 		
@@ -650,13 +650,13 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
-		Set<Id> passengerIds = new LinkedHashSet<Id>();
+		Set<Id<Person>> passengerIds = new LinkedHashSet<>();
 		passengerIds.add(Id.create("p2", Person.class));
 		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driver, 1, jointDeparture1, jointDepartureOrganizer);
 		assignJointDeparture(passenger, 1, jointDeparture1, jointDepartureOrganizer);
 		
-		passengerIds = new LinkedHashSet<Id>();
+		passengerIds = new LinkedHashSet<>();
 		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driver, 3, jointDeparture2, jointDepartureOrganizer);
 		
@@ -707,7 +707,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 		
-		Set<Id> passengerIds = new LinkedHashSet<Id>();
+		Set<Id<Person>> passengerIds = new LinkedHashSet<>();
 		passengerIds.add(Id.create("p2", Person.class));
 		passengerIds.add(Id.create("p3", Person.class));
 		passengerIds.add(Id.create("p4", Person.class));
@@ -717,7 +717,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		assignJointDeparture(passenger2, 1, jointDeparture1, jointDepartureOrganizer);
 		assignJointDeparture(passenger3, 1, jointDeparture1, jointDepartureOrganizer);
 		
-		passengerIds = new LinkedHashSet<Id>();
+		passengerIds = new LinkedHashSet<>();
 		passengerIds.add(Id.create("p2", Person.class));
 		passengerIds.add(Id.create("p3", Person.class));
 		passengerIds.add(Id.create("p5", Person.class));
@@ -777,11 +777,11 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
-		Set<Id> passengerIds = new LinkedHashSet<Id>();
+		Set<Id<Person>> passengerIds = new LinkedHashSet<>();
 		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driverA, 1, jointDeparture1, jointDepartureOrganizer);
 		
-		passengerIds = new LinkedHashSet<Id>();
+		passengerIds = new LinkedHashSet<>();
 		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p2", Person.class), passengerIds);
 		assignJointDeparture(driverB, 1, jointDeparture2, jointDepartureOrganizer);
 		
@@ -831,11 +831,11 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
-		Set<Id> passengerIds = new LinkedHashSet<Id>();
+		Set<Id<Person>> passengerIds = new LinkedHashSet<>();
 		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driverA, 1, jointDeparture1, jointDepartureOrganizer);
 		
-		passengerIds = new LinkedHashSet<Id>();
+		passengerIds = new LinkedHashSet<>();
 		passengerIds.add(Id.create("p3", Person.class));
 		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p2", Person.class), passengerIds);
 		assignJointDeparture(driverB, 1, jointDeparture2, jointDepartureOrganizer);
@@ -890,11 +890,11 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
-		Set<Id> passengerIds = new LinkedHashSet<Id>();
+		Set<Id<Person>> passengerIds = new LinkedHashSet<>();
 		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driverA, 1, jointDeparture1, jointDepartureOrganizer);
 		
-		passengerIds = new LinkedHashSet<Id>();
+		passengerIds = new LinkedHashSet<>();
 		passengerIds.add(Id.create("p3", Person.class));
 		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p2", Person.class), passengerIds);
 		assignJointDeparture(driverB, 1, jointDeparture2, jointDepartureOrganizer);
@@ -949,11 +949,11 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
-		Set<Id> passengerIds = new LinkedHashSet<Id>();
+		Set<Id<Person>> passengerIds = new LinkedHashSet<>();
 		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driverA, 1, jointDeparture1, jointDepartureOrganizer);
 		
-		passengerIds = new LinkedHashSet<Id>();
+		passengerIds = new LinkedHashSet<>();
 		passengerIds.add(Id.create("p3", Person.class));
 		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p2", Person.class), passengerIds);
 		assignJointDeparture(driverB, 1, jointDeparture2, jointDepartureOrganizer);
@@ -1046,7 +1046,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v2", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
-		Set<Id> passengerIds = new LinkedHashSet<Id>();
+		Set<Id<Person>> passengerIds = new LinkedHashSet<>();
 		JointDeparture jointDeparture = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
 		assignJointDeparture(driverA, 1, jointDeparture, jointDepartureOrganizer);
 		

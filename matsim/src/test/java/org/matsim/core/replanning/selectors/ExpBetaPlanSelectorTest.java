@@ -21,9 +21,9 @@
 package org.matsim.core.replanning.selectors;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -60,7 +60,7 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 	 */
 	public void testExpBeta2() {
 		this.config.planCalcScore().setBrainExpBeta(2.0);
-		PersonImpl person = new PersonImpl(new IdImpl(1));
+		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
 		// weight = Math.exp(this.beta * (plan.getScore() - maxScore));
 		PlanImpl plan1 = person.createAndAddPlan(false); // weight: 0.0003.35462627902512
 		plan1.setScore(96.0);
@@ -112,7 +112,7 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 	 */
 	public void testExpBeta1() {
 		this.config.planCalcScore().setBrainExpBeta(1.0);
-		PersonImpl person = new PersonImpl(new IdImpl(1));
+		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
 		// weight = Math.exp(this.beta * (plan.getScore() - maxScore));
 		// weight: 0.018315638888734186
 		PlanImpl plan1 = person.createAndAddPlan(false); 
@@ -174,7 +174,7 @@ public class ExpBetaPlanSelectorTest extends AbstractPlanSelectorTest {
 		final double EPSILON_R = 1e-7;
 		
 		this.config.planCalcScore().setBrainExpBeta(2.0);
-		PersonImpl person = new PersonImpl(new IdImpl(1));
+		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
 		PlanImpl plan1 = person.createAndAddPlan(false); 
 		plan1.setScore(180.0);
 		PlanImpl plan2 = person.createAndAddPlan(false); 

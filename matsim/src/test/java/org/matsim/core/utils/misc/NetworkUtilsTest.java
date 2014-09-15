@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
@@ -77,11 +76,11 @@ public class NetworkUtilsTest {
 		NetworkImpl network = getTestNetwork();
 		List<Node> nodes = NetworkUtils.getNodes(network, " 1\t\t2 \n4\t \t5      3 ");
 		assertEquals(5, nodes.size());
-		assertEquals(network.getNodes().get(new IdImpl(1)), nodes.get(0));
-		assertEquals(network.getNodes().get(new IdImpl(2)), nodes.get(1));
-		assertEquals(network.getNodes().get(new IdImpl(4)), nodes.get(2));
-		assertEquals(network.getNodes().get(new IdImpl(5)), nodes.get(3));
-		assertEquals(network.getNodes().get(new IdImpl(3)), nodes.get(4));
+		assertEquals(network.getNodes().get(Id.create(1, Node.class)), nodes.get(0));
+		assertEquals(network.getNodes().get(Id.create(2, Node.class)), nodes.get(1));
+		assertEquals(network.getNodes().get(Id.create(4, Node.class)), nodes.get(2));
+		assertEquals(network.getNodes().get(Id.create(5, Node.class)), nodes.get(3));
+		assertEquals(network.getNodes().get(Id.create(3, Node.class)), nodes.get(4));
 	}
 
 	@Test
@@ -120,10 +119,10 @@ public class NetworkUtilsTest {
 		NetworkImpl network = getTestNetwork();
 		List<Link> links = NetworkUtils.getLinks(network, " 1\t\t2 \n4\t \t      3 ");
 		assertEquals(4, links.size());
-		assertEquals(network.getLinks().get(new IdImpl(1)), links.get(0));
-		assertEquals(network.getLinks().get(new IdImpl(2)), links.get(1));
-		assertEquals(network.getLinks().get(new IdImpl(4)), links.get(2));
-		assertEquals(network.getLinks().get(new IdImpl(3)), links.get(3));
+		assertEquals(network.getLinks().get(Id.create(1, Link.class)), links.get(0));
+		assertEquals(network.getLinks().get(Id.create(2, Link.class)), links.get(1));
+		assertEquals(network.getLinks().get(Id.create(4, Link.class)), links.get(2));
+		assertEquals(network.getLinks().get(Id.create(3, Link.class)), links.get(3));
 	}
 
 	@Test
@@ -169,7 +168,7 @@ public class NetworkUtilsTest {
 	@Test
 	public void testGetBoundingBox() {
 		Collection<Node> nodes = new ArrayList<Node>();
-		Id id = new IdImpl("dummy");
+		Id<Node> id = Id.create("dummy", Node.class);
 		nodes.add(new PseudoNode(id, new CoordImpl(100, 100)));
 		nodes.add(new PseudoNode(id, new CoordImpl(200, 105)));
 		nodes.add(new PseudoNode(id, new CoordImpl(120, 250)));
@@ -185,7 +184,7 @@ public class NetworkUtilsTest {
 	@Test
 	public void testGetBoundingBox_negativeNodesOnly() {
 		Collection<Node> nodes = new ArrayList<Node>();
-		Id id = new IdImpl("dummy");
+		Id<Node> id = Id.create("dummy", Node.class);
 		nodes.add(new PseudoNode(id, new CoordImpl(-100, -100)));
 		nodes.add(new PseudoNode(id, new CoordImpl(-200, -105)));
 		nodes.add(new PseudoNode(id, new CoordImpl(-120, -250)));
@@ -269,11 +268,11 @@ public class NetworkUtilsTest {
 	@Test
 	public void testGetConnectingLink() {
 		Network net = getTestNetwork();
-		Node node1 = net.getNodes().get(new IdImpl(1));
-		Node node2 = net.getNodes().get(new IdImpl(2));
-		Node node3 = net.getNodes().get(new IdImpl(3));
-		Link link1 = net.getLinks().get(new IdImpl(1));
-		Link link2 = net.getLinks().get(new IdImpl(2));
+		Node node1 = net.getNodes().get(Id.create(1, Node.class));
+		Node node2 = net.getNodes().get(Id.create(2, Node.class));
+		Node node3 = net.getNodes().get(Id.create(3, Node.class));
+		Link link1 = net.getLinks().get(Id.create(1, Link.class));
+		Link link2 = net.getLinks().get(Id.create(2, Link.class));
 		
 		Assert.assertEquals(link1, NetworkUtils.getConnectingLink(node1, node2));
 		Assert.assertEquals(link2, NetworkUtils.getConnectingLink(node2, node3));
@@ -285,7 +284,7 @@ public class NetworkUtilsTest {
 	private static class PseudoLink extends FakeLink {
 		private final double nOfLanes;
 		public PseudoLink(final double nOfLanes) {
-			super(new IdImpl(1));
+			super(Id.create(1, Link.class));
 			this.nOfLanes = nOfLanes;
 		}
 
@@ -297,7 +296,7 @@ public class NetworkUtilsTest {
 
 	private static class PseudoNode extends FakeNode {
 		private final Coord coord;
-		public PseudoNode(final Id id, final Coord coord) {
+		public PseudoNode(final Id<Node> id, final Coord coord) {
 			super(id);
 			this.coord = coord;
 		}
@@ -313,10 +312,10 @@ public class NetworkUtilsTest {
 		NetworkImpl network = NetworkImpl.createNetwork();
 		Node[] nodes = new Node[numOfLinks+1];
 		for (int i = 0; i <= numOfLinks; i++) {
-			nodes[i] = network.createAndAddNode(new IdImpl(i), new CoordImpl(1000 * i, 0));
+			nodes[i] = network.createAndAddNode(Id.create(i, Node.class), new CoordImpl(1000 * i, 0));
 		}
 		for (int i = 0; i < numOfLinks; i++) {
-			network.createAndAddLink(new IdImpl(i), nodes[i], nodes[i+1], 1000.0, 10.0, 3600.0, 1);
+			network.createAndAddLink(Id.create(i, Link.class), nodes[i], nodes[i+1], 1000.0, 10.0, 3600.0, 1);
 		}
 		return network;
 	}
@@ -328,10 +327,10 @@ public class NetworkUtilsTest {
 
 		public MultimodalFixture() {
 			for (int i = 0; i < this.nodes.length; i++) {
-				this.nodes[i] = this.network.createAndAddNode(new IdImpl(i), new CoordImpl(1000 * i, 0));
+				this.nodes[i] = this.network.createAndAddNode(Id.create(i, Node.class), new CoordImpl(1000 * i, 0));
 			}
 			for (int i = 0; i < this.links.length; i++) {
-				this.links[i] = this.network.createAndAddLink(new IdImpl(i), this.nodes[i], this.nodes[i+1], 1000.0, 10.0, 3600.0, 1);
+				this.links[i] = this.network.createAndAddLink(Id.create(i, Link.class), this.nodes[i], this.nodes[i+1], 1000.0, 10.0, 3600.0, 1);
 			}
 		}
 	}

@@ -83,7 +83,7 @@ public class InvertedNetworkLegRouter implements LegRouter {
 				.getModeRouteFactory();
 		this.network = sc.getNetwork();
 
-		Map<Id, List<TurnInfo>> allowedInLinkTurnInfoMap = this.createAllowedTurnInfos(sc);
+		Map<Id<Link>, List<TurnInfo>> allowedInLinkTurnInfoMap = this.createAllowedTurnInfos(sc);
 		
 		NetworkInverter networkInverter = new NetworkInverter(network, allowedInLinkTurnInfoMap);
 		this.invertedNetwork = networkInverter.getInvertedNetwork();
@@ -96,21 +96,20 @@ public class InvertedNetworkLegRouter implements LegRouter {
 				this.invertedNetwork, travelCost, travelTimesProxy);
 	}
 	
-	private Map<Id, List<TurnInfo>> createAllowedTurnInfos(Scenario sc){
-		Map<Id, List<TurnInfo>> allowedInLinkTurnInfoMap = new HashMap<Id, List<TurnInfo>>();
+	private Map<Id<Link>, List<TurnInfo>> createAllowedTurnInfos(Scenario sc){
+		Map<Id<Link>, List<TurnInfo>> allowedInLinkTurnInfoMap = new HashMap<>();
 
 		NetworkTurnInfoBuilder netTurnInfoBuilder = new NetworkTurnInfoBuilder();
 		netTurnInfoBuilder.createAndAddTurnInfo(TransportMode.car, allowedInLinkTurnInfoMap, this.network);
 
 		if (sc.getConfig().scenario().isUseLanes()) {
 			LaneDefinitions20 ld = (LaneDefinitions20) sc.getScenarioElement(LaneDefinitions20.ELEMENT_NAME);
-			Map<Id, List<TurnInfo>> lanesTurnInfoMap = new LanesTurnInfoBuilder().createTurnInfos(ld);
+			Map<Id<Link>, List<TurnInfo>> lanesTurnInfoMap = new LanesTurnInfoBuilder().createTurnInfos(ld);
 			netTurnInfoBuilder.mergeTurnInfoMaps(allowedInLinkTurnInfoMap, lanesTurnInfoMap);
 		}
 		if (sc.getConfig().scenario().isUseSignalSystems()) {
 			SignalSystemsData ssd = ((SignalsData) sc.getScenarioElement(SignalsData.ELEMENT_NAME)).getSignalSystemsData();
-			Map<Id, List<TurnInfo>> signalsTurnInfoMap = new SignalsTurnInfoBuilder()
-					.createSignalsTurnInfos(ssd);
+			Map<Id<Link>, List<TurnInfo>> signalsTurnInfoMap = new SignalsTurnInfoBuilder().createSignalsTurnInfos(ssd);
 			netTurnInfoBuilder.mergeTurnInfoMaps(allowedInLinkTurnInfoMap, signalsTurnInfoMap);
 		}
 		return allowedInLinkTurnInfoMap;
@@ -121,8 +120,8 @@ public class InvertedNetworkLegRouter implements LegRouter {
 			double departureTime) {
 		double travelTime = 0.0;
 		NetworkRoute route = null;
-		Id fromLinkId = fromAct.getLinkId();
-		Id toLinkId = toAct.getLinkId();
+		Id<Link> fromLinkId = fromAct.getLinkId();
+		Id<Link> toLinkId = toAct.getLinkId();
 		if (fromLinkId == null)
 			throw new RuntimeException("fromLink Id missing in Activity.");
 		if (toLinkId == null)
@@ -151,7 +150,7 @@ public class InvertedNetworkLegRouter implements LegRouter {
 		return travelTime;
 	}
 
-	private NetworkRoute invertPath2NetworkRoute(Path path, Id fromLinkId, Id toLinkId) {
+	private NetworkRoute invertPath2NetworkRoute(Path path, Id<Link> fromLinkId, Id<Link> toLinkId) {
 		NetworkRoute route = (NetworkRoute) this.routeFactory.createRoute(TransportMode.car,
 				fromLinkId, toLinkId);
 		List<Node> nodes = path.nodes;

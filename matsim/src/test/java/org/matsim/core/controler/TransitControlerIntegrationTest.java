@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -139,7 +138,7 @@ public class TransitControlerIntegrationTest extends MatsimTestCase {
 		params.setTypicalDuration(8.0*3600);
 		config.planCalcScore().addActivityParams(params);
 
-		StrategySettings tam = new StrategySettings(new IdImpl(1));
+		StrategySettings tam = new StrategySettings(Id.create(1, StrategySettings.class));
 		tam.setModuleName("TimeAllocationMutator");
 		tam.setProbability(1.0);
 		config.strategy().addStrategySettings(tam);

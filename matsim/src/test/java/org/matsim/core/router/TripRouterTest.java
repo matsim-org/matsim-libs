@@ -27,10 +27,10 @@ import java.util.List;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
@@ -55,7 +55,7 @@ public class TripRouterTest {
 
 		List<PlanElement> trip = new ArrayList<PlanElement>();
 		trip.add( new LegImpl( "2" ) );
-		trip.add( new ActivityImpl( "3" , new IdImpl( "coucou" ) ) );
+		trip.add( new ActivityImpl( "3" , Id.create( "coucou", Link.class ) ) );
 		trip.add( new LegImpl( "4" ) );
 
 		TripRouter.insertTrip( plan , o , trip , d );
@@ -86,22 +86,22 @@ public class TripRouterTest {
 	@Test
 	public void testTripInsertionIfActivitiesImplementEquals() {
 		PlanImpl plan = new PlanImpl();
-		plan.addActivity( new EqualsActivity( "-4" , new IdImpl( 1 ) ) );
+		plan.addActivity( new EqualsActivity( "-4" , Id.create( 1, Link.class ) ) );
 		plan.createAndAddLeg( "-3" );
-		plan.addActivity( new EqualsActivity( "-2" , new IdImpl( 1 ) ) );
+		plan.addActivity( new EqualsActivity( "-2" , Id.create( 1, Link.class ) ) );
 		plan.createAndAddLeg( "-1" );
-		Activity o = new EqualsActivity( "1" , new IdImpl( 1 ) );
+		Activity o = new EqualsActivity( "1" , Id.create( 1, Link.class ) );
 		plan.addActivity( o );
-		Activity d = new EqualsActivity( "5" , new IdImpl( 1 ) );
+		Activity d = new EqualsActivity( "5" , Id.create( 1, Link.class ) );
 		plan.addActivity( d );
 		plan.createAndAddLeg( "6" );
-		plan.addActivity( new EqualsActivity( "7" , new IdImpl( 1 ) ) );
+		plan.addActivity( new EqualsActivity( "7" , Id.create( 1, Link.class ) ) );
 		plan.createAndAddLeg( "8" );
-		plan.addActivity( new EqualsActivity( "9" , new IdImpl( 1 ) ) );
+		plan.addActivity( new EqualsActivity( "9" , Id.create( 1, Link.class ) ) );
 
 		List<PlanElement> trip = new ArrayList<PlanElement>();
 		trip.add( new LegImpl( "2" ) );
-		trip.add( new ActivityImpl( "3" , new IdImpl( "coucou" ) ) );
+		trip.add( new ActivityImpl( "3" , Id.create( "coucou", Link.class ) ) );
 		trip.add( new LegImpl( "4" ) );
 
 		TripRouter.insertTrip( plan , o , trip , d );
@@ -152,7 +152,7 @@ public class TripRouterTest {
 		
 		List<PlanElement> trip = new ArrayList<PlanElement>();
 		trip.add( new LegImpl( "2" ) );
-		trip.add( new ActivityImpl( "3" , new IdImpl( "coucou" ) ) );
+		trip.add( new ActivityImpl( "3" , Id.create( "coucou", Link.class ) ) );
 		trip.add( new LegImpl( "4" ) );
 
 		assertEquals(

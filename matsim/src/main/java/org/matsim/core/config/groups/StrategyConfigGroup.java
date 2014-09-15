@@ -25,10 +25,8 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimParameters;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.experimental.ReflectiveModule;
-import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.gbl.MatsimRandom;
 
 /**
@@ -52,7 +50,7 @@ public class StrategyConfigGroup extends Module {
 
 	public static class StrategySettings extends ReflectiveModule implements MatsimParameters {
 		public static final String SET_NAME = "strategysettings";
-		private Id id;
+		private Id<StrategySettings> id;
 		private double probability = -1.0;
 		private String moduleName = null;
 		private int disableAfter = -1;
@@ -60,10 +58,10 @@ public class StrategyConfigGroup extends Module {
 		private String subpopulation = null;
 
 		public StrategySettings() {
-			this( new IdImpl( MatsimRandom.getRandom().nextLong() ) );
+			this( Id.create( MatsimRandom.getRandom().nextLong(), StrategySettings.class) );
 		}
 
-		public StrategySettings(final Id id) {
+		public StrategySettings(final Id<StrategySettings> id) {
 			super( SET_NAME );
 			this.id = id;
 		}
@@ -139,7 +137,7 @@ public class StrategyConfigGroup extends Module {
 			return this.exePath;
 		}
 
-		public Id getId() {
+		public Id<StrategySettings> getId() {
 			return this.id;
 		}
 
@@ -176,23 +174,23 @@ public class StrategyConfigGroup extends Module {
 	public void addParam(final String key, final String value) {
 		// adding underscore parameters is still supported for backward compatibility.
 		if (key != null && key.startsWith(MODULE)) {
-			StrategySettings settings = getStrategySettings(new IdImpl(key.substring(MODULE.length())), true);
+			StrategySettings settings = getStrategySettings(Id.create(key.substring(MODULE.length()), StrategySettings.class), true);
 			settings.setModuleName(value);
 		}
 		else if (key != null && key.startsWith(MODULE_PROBABILITY)) {
-			StrategySettings settings = getStrategySettings(new IdImpl(key.substring(MODULE_PROBABILITY.length())), true);
+			StrategySettings settings = getStrategySettings(Id.create(key.substring(MODULE_PROBABILITY.length()), StrategySettings.class), true);
 			settings.setProbability(Double.parseDouble(value));
 		}
 		else if (key != null && key.startsWith(MODULE_DISABLE_AFTER_ITERATION)) {
-			StrategySettings settings = getStrategySettings(new IdImpl(key.substring(MODULE_DISABLE_AFTER_ITERATION.length())), true);
+			StrategySettings settings = getStrategySettings(Id.create(key.substring(MODULE_DISABLE_AFTER_ITERATION.length()), StrategySettings.class), true);
 			settings.setDisableAfter(Integer.parseInt(value));
 		}
 		else if (key != null && key.startsWith(MODULE_EXE_PATH)) {
-			StrategySettings settings = getStrategySettings(new IdImpl(key.substring(MODULE_EXE_PATH.length())), true);
+			StrategySettings settings = getStrategySettings(Id.create(key.substring(MODULE_EXE_PATH.length()), StrategySettings.class), true);
 			settings.setExePath(value);
 		}
 		else if (key != null && key.startsWith(MODULE_SUBPOPULATION)) {
-			StrategySettings settings = getStrategySettings(new IdImpl(key.substring(MODULE_SUBPOPULATION.length())), true);
+			StrategySettings settings = getStrategySettings(Id.create(key.substring(MODULE_SUBPOPULATION.length()), StrategySettings.class), true);
 			settings.setSubpopulation(value);
 		}
 		else {
@@ -200,7 +198,7 @@ public class StrategyConfigGroup extends Module {
 		}
 	}
 
-	private StrategySettings getStrategySettings(final Id index, final boolean createIfMissing) {
+	private StrategySettings getStrategySettings(final Id<StrategySettings> index, final boolean createIfMissing) {
 		StrategySettings settings = null;
 
 		// should be in a map, but it is difficult to keep consistency with the
