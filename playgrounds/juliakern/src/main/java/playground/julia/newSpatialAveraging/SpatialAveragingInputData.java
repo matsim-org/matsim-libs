@@ -42,9 +42,9 @@ public class SpatialAveragingInputData {
 	
 	private String runNumber1, runNumber2;
 	private String runDirectory1, runDirectory2;
-	private String configFile1, configFile2;
+	private String configFile1;
 	private String emissionFile1, emissionFile2;
-	private Integer lastIteration1, lastIteration2;
+	private Integer lastIteration1;
 
 	
 	public SpatialAveragingInputData(String baseCase, String compareCase) {
@@ -59,7 +59,7 @@ public class SpatialAveragingInputData {
 			runNumber1 = "baseCase";
 			runDirectory1 = "../../runs-svn/detEval/exposureInternalization/internalize1pct/output/output_baseCase_ctd/";
 			netFile = runDirectory1 + "output_network.xml.gz";
-			configFile1 = runDirectory1 + "output_config.xml";
+			configFile1 = runDirectory1 + "output_config.xml.gz";
 			lastIteration1 = getLastIteration(configFile1);
 			emissionFile1 = runDirectory1 + "ITERS/it." + lastIteration1 + "/" + lastIteration1 + ".emission.events.xml.gz";
 		}
@@ -97,9 +97,7 @@ public class SpatialAveragingInputData {
 				runNumber2 = "exposurePricing";
 				runDirectory2 = "../../runs-svn/detEval/exposureInternalization/internalize1pct/output/output_policyCase_exposurePricing/";
 			}
-			configFile2 = runDirectory1 + "output_config.xml";
-			lastIteration2 = getLastIteration(configFile2);
-			emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration2 + "/" + lastIteration2 + ".emission.events.xml.gz";
+			emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration1 + "/" + lastIteration1 + ".emission.events.xml.gz";
 		}
 		
 		if(baseCase.equals("latsis")){
@@ -111,18 +109,14 @@ public class SpatialAveragingInputData {
 				runNumber2 = "pricing";
 				runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_pricing_newCode/";
 			}
-			configFile2 = runDirectory1 + "output_config.xml.gz";
-			lastIteration2 = getLastIteration(configFile2);
-			emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration2 + "/" + lastIteration2 + ".emission.events.xml.gz";
+			emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration1 + "/" + lastIteration1 + ".emission.events.xml.gz";
 		}
 		
 		if(baseCase.equals("981")){
 			if(compareCase.equals("983")){
 				runNumber2 = "983";
 				runDirectory2 = "../../runs-svn/run" + runNumber2 + "/";
-				configFile2 = runDirectory1 + runNumber1 + ".output_config.xml.gz";
-				lastIteration2 = getLastIteration(configFile2);
-				emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration2 + "/" + runNumber2 + "." + lastIteration2 + ".emission.events.xml.gz";
+				emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration1 + "/" + runNumber2 + "." + lastIteration1 + ".emission.events.xml.gz";
 			}
 		}
 	}
@@ -161,7 +155,7 @@ public class SpatialAveragingInputData {
 	
 
 	public String getAnalysisOutPathForCompareCase() {
-		return (runDirectory1 + "analysis/spatialAveraging/" + runNumber2 + "." + lastIteration2 + "-" + runNumber1 + "." + lastIteration1 + ".absoluteDelta");
+		return (runDirectory1 + "analysis/spatialAveraging/" + runNumber2 + "." + lastIteration1 + "-" + runNumber1 + "." + lastIteration1 + ".absoluteDelta");
 	}
 
 	public String getEmissionFileForCompareCase() {
