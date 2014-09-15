@@ -163,7 +163,6 @@ public class SpatialAveragingDemandEmissions {
 			throws IOException {
 		if(writeRoutput){
 			logger.info("Starting to write R output.");
-			System.out.println("..........sgid" + sGrid.getAverageValuesOfGrid().length);
 			this.saWriter.writeRoutput(sGrid.getAverageValuesOfGrid(), outPathStub + ".Routput." + pollutant2analyze.toString() + ".g." + endOfTimeInterval + ".txt");
 			this.saWriter.writeRoutput(sGrid.getWeightsOfGrid(), outPathStub + ".Routput.Demand.vkm." + endOfTimeInterval + ".txt");
 			this.saWriter.writeRoutput(sGrid.getAverageValuesOfGrid(), outPathStub+ ".Routput." + pollutant2analyze + ".gPerVkm." + endOfTimeInterval + ".txt");
