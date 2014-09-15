@@ -21,9 +21,10 @@
 package org.matsim.population;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
@@ -46,7 +47,7 @@ public class DesiresTest extends MatsimTestCase {
 		log.info("  creating single person with desires... ");
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population pop = scenario.getPopulation();
-		PersonImpl p = new PersonImpl(new IdImpl(0));
+		PersonImpl p = new PersonImpl(Id.create(0, Person.class));
 		pop.addPerson(p);
 		Desires d = p.createDesires("created by 'DesiresTest.testReadWriteDesires'");
 		if (!d.putActivityDuration("home","16:00:00")) throw new RuntimeException("'home' actDur not added to the desires.");

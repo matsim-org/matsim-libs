@@ -23,8 +23,9 @@ import java.util.Random;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -40,7 +41,7 @@ public class TripPlanMutateTimeAllocationTest {
 	@Test
 	public void testRun() {
 		// setup population with one person
-		PersonImpl person = new PersonImpl(new IdImpl(1));
+		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
 		PlanImpl plan = person.createAndAddPlan(true);
 		ActivityImpl act = plan.createAndAddActivity("home", new CoordImpl(0, 0));
 		act.setEndTime(8.0 * 3600);

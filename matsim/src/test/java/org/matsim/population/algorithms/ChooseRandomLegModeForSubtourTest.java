@@ -36,6 +36,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -43,7 +44,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
@@ -168,10 +168,10 @@ public class ChooseRandomLegModeForSubtourTest {
 		
 		ChooseRandomLegModeForSubtour testee = new ChooseRandomLegModeForSubtour( EmptyStageActivityTypes.INSTANCE , new MainModeIdentifierImpl() ,new AllowTheseModesForEveryone(modes), modes, CHAIN_BASED_MODES, new Random(15102011));
 		testee.setAnchorSubtoursAtFacilitiesInsteadOfLinks( false );
-		Person person = new PersonImpl(new IdImpl("1000"));
+		Person person = new PersonImpl(Id.create("1000", Person.class));
 		Plan plan = new PlanImpl();
 		person.addPlan(plan);
-		Id linkId = new IdImpl(1);
+		Id<Link> linkId = Id.create(1, Link.class);
 		Activity home1 = new ActivityImpl("home", linkId);
 		Leg leg = new LegImpl("car");
 		Activity home2 = new ActivityImpl("home", linkId);
@@ -254,7 +254,7 @@ public class ChooseRandomLegModeForSubtourTest {
 		String[] modes = new String[] {expectedMode, originalMode};
 		ChooseRandomLegModeForSubtour testee = new ChooseRandomLegModeForSubtour( EmptyStageActivityTypes.INSTANCE , new MainModeIdentifierImpl() ,new AllowTheseModesForEveryone(modes), modes, CHAIN_BASED_MODES, MatsimRandom.getRandom());
 		testee.setAnchorSubtoursAtFacilitiesInsteadOfLinks(false);
-		PersonImpl person = new PersonImpl(new IdImpl("1000"));
+		PersonImpl person = new PersonImpl(Id.create("1000", Person.class));
 		for (String activityChainString : activityChainStrings) {
 			PlanImpl plan = createPlan(network, activityChainString, originalMode);
 			PlanImpl originalPlan = new PlanImpl(person);
@@ -271,7 +271,7 @@ public class ChooseRandomLegModeForSubtourTest {
 		String[] modes = new String[] {expectedMode, originalMode};
 		ChooseRandomLegModeForSubtour testee = new ChooseRandomLegModeForSubtour( EmptyStageActivityTypes.INSTANCE , new MainModeIdentifierImpl() ,new AllowTheseModesForEveryone(modes), modes, CHAIN_BASED_MODES, MatsimRandom.getRandom());
 		testee.setAnchorSubtoursAtFacilitiesInsteadOfLinks(true);
-		PersonImpl person = new PersonImpl(new IdImpl("1000"));
+		PersonImpl person = new PersonImpl(Id.create("1000", Person.class));
 		for (String activityChainString : activityChainStrings) {
 			PlanImpl plan = createPlan(facilities, activityChainString, originalMode);
 			PlanImpl originalPlan = new PlanImpl(person);
@@ -287,7 +287,7 @@ public class ChooseRandomLegModeForSubtourTest {
 		String[] modes = new String[] {TransportMode.car, TransportMode.pt};
 		ChooseRandomLegModeForSubtour testee = new ChooseRandomLegModeForSubtour( EmptyStageActivityTypes.INSTANCE , new MainModeIdentifierImpl() ,new AllowTheseModesForEveryone(modes), modes, CHAIN_BASED_MODES, MatsimRandom.getRandom());
 		testee.setAnchorSubtoursAtFacilitiesInsteadOfLinks(false);
-		PersonImpl person = new PersonImpl(new IdImpl("1000"));
+		PersonImpl person = new PersonImpl(Id.create("1000", Person.class));
 		for (String activityChainString : activityChainStrings) {
 			PlanImpl plan = createPlan(network, activityChainString, originalMode);
 			PlanImpl originalPlan = new PlanImpl(person);
@@ -303,7 +303,7 @@ public class ChooseRandomLegModeForSubtourTest {
 		String[] modes = new String[] {TransportMode.car, TransportMode.pt};
 		ChooseRandomLegModeForSubtour testee = new ChooseRandomLegModeForSubtour( EmptyStageActivityTypes.INSTANCE , new MainModeIdentifierImpl() ,new AllowTheseModesForEveryone(modes), modes, CHAIN_BASED_MODES, MatsimRandom.getRandom());
 		testee.setAnchorSubtoursAtFacilitiesInsteadOfLinks(true);
-		PersonImpl person = new PersonImpl(new IdImpl("1000"));
+		PersonImpl person = new PersonImpl(Id.create("1000", Person.class));
 		for (String activityChainString : activityChainStrings) {
 			PlanImpl plan = createPlan(facilities, activityChainString, originalMode);
 			PlanImpl originalPlan = new PlanImpl(person);
@@ -320,7 +320,7 @@ public class ChooseRandomLegModeForSubtourTest {
 		String[] modes = new String[] {expectedMode, originalMode};
 		ChooseRandomLegModeForSubtour testee = new ChooseRandomLegModeForSubtour( EmptyStageActivityTypes.INSTANCE , new MainModeIdentifierImpl() ,new AllowTheseModesForEveryone(modes), modes, CHAIN_BASED_MODES, MatsimRandom.getRandom());
 		testee.setAnchorSubtoursAtFacilitiesInsteadOfLinks(true);
-		PersonImpl person = new PersonImpl(new IdImpl("1000"));
+		PersonImpl person = new PersonImpl(Id.create("1000", Person.class));
 		for (String activityChainString : activityChainStrings) {
 			PlanImpl plan = createPlan(facilities, activityChainString, originalMode);
 			PlanImpl originalPlan = new PlanImpl(person);
@@ -337,7 +337,7 @@ public class ChooseRandomLegModeForSubtourTest {
 		String[] modes = new String[] {expectedMode, originalMode};
 		ChooseRandomLegModeForSubtour testee = new ChooseRandomLegModeForSubtour( EmptyStageActivityTypes.INSTANCE , new MainModeIdentifierImpl() ,new AllowTheseModesForEveryone(modes), modes, CHAIN_BASED_MODES, MatsimRandom.getRandom());
 		testee.setAnchorSubtoursAtFacilitiesInsteadOfLinks(false);
-		PersonImpl person = new PersonImpl(new IdImpl("1000"));
+		PersonImpl person = new PersonImpl(Id.create("1000", Person.class));
 		for (String activityChainString : activityChainStrings) {
 			PlanImpl plan = createPlan(network, activityChainString, originalMode);
 			PlanImpl originalPlan = new PlanImpl(person);
@@ -480,13 +480,13 @@ public class ChooseRandomLegModeForSubtourTest {
 	}
 
 	private static PlanImpl createPlan(ActivityFacilities facilities, String facString, String mode) {
-		PersonImpl person = new PersonImpl(new IdImpl("1000"));
+		PersonImpl person = new PersonImpl(Id.create("1000", Person.class));
 		PlanImpl plan = TestsUtil.createPlanFromFacilities((ActivityFacilitiesImpl) facilities, person, mode, facString);
 		return plan;
 	}
 
 	private static PlanImpl createPlan(NetworkImpl network, String facString, String mode) {
-		PersonImpl person = new PersonImpl(new IdImpl("1000"));
+		PersonImpl person = new PersonImpl(Id.create("1000", Person.class));
 		PlanImpl plan = TestsUtil.createPlanFromLinks(network, person, mode, facString);
 		return plan;
 	}

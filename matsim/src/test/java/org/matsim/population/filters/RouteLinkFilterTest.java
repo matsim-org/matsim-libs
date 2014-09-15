@@ -20,13 +20,14 @@
 
 package org.matsim.population.filters;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
@@ -49,7 +50,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		TestAlgorithm tester = new TestAlgorithm();
 
 		RouteLinkFilter linkFilter = new RouteLinkFilter(tester);
-		linkFilter.addLink(new IdImpl(15));
+		linkFilter.addLink(Id.create(15, Link.class));
 
 		SelectedPlanFilter selectedPlanFilter = new SelectedPlanFilter(linkFilter);
 		selectedPlanFilter.run(population);
@@ -62,8 +63,8 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile("test/scenarios/equil/network.xml");
 
-		Link link1 = network.getLinks().get(new IdImpl(1));
-		Link link20 = network.getLinks().get(new IdImpl(20));
+		Link link1 = network.getLinks().get(Id.create(1, Link.class));
+		Link link20 = network.getLinks().get(Id.create(20, Link.class));
 
 		Population population = scenario.getPopulation();
 
@@ -72,7 +73,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		LegImpl leg;
 		NetworkRoute route;
 
-		person = new PersonImpl(new IdImpl("1"));
+		person = new PersonImpl(Id.create("1", Person.class));
 		plan = person.createAndAddPlan(true);
 		ActivityImpl a = plan.createAndAddActivity("h", link1.getId());
 		a.setEndTime(7.0 * 3600);
@@ -83,7 +84,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		plan.createAndAddActivity("w", link20.getId());
 		population.addPerson(person);
 
-		person = new PersonImpl(new IdImpl("2"));
+		person = new PersonImpl(Id.create("2", Person.class));
 		plan = person.createAndAddPlan(true);
 		ActivityImpl a2 = plan.createAndAddActivity("h", link1.getId());
 		a2.setEndTime(7.0 * 3600 + 5.0 * 60);
@@ -94,7 +95,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		plan.createAndAddActivity("w", link20.getId());
 		population.addPerson(person);
 
-		person = new PersonImpl(new IdImpl("3"));
+		person = new PersonImpl(Id.create("3", Person.class));
 		plan = person.createAndAddPlan(true);
 		ActivityImpl a3 = plan.createAndAddActivity("h", link1.getId());
 		a3.setEndTime(7.0 * 3600 + 10.0 * 60);

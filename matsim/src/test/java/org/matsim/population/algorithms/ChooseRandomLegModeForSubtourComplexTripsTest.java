@@ -19,15 +19,20 @@
  * *********************************************************************** */
 package org.matsim.population.algorithms;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Random;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
@@ -36,8 +41,6 @@ import org.matsim.core.router.TripStructureUtils.Subtour;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
-
-import java.util.*;
 
 /**
  * Tests specific to the "complex trip" handling (tests in ChooseRandomLegModeForSubtourTest
@@ -68,9 +71,9 @@ public class ChooseRandomLegModeForSubtourComplexTripsTest {
 			public Plan createNewPlanInstance() {
 				final PopulationFactory fact = createPopulationFactory();
 
-				final Id id1 = new IdImpl( 1 );
-				final Id id2 = new IdImpl( 2 );
-				final Id id3 = new IdImpl( 3 );
+				final Id<Link> id1 = Id.create( 1, Link.class );
+				final Id<Link> id2 = Id.create( 2, Link.class );
+				final Id<Link> id3 = Id.create( 3, Link.class );
 
 				final Plan plan = fact.createPlan();
 				
@@ -111,9 +114,9 @@ public class ChooseRandomLegModeForSubtourComplexTripsTest {
 			public Plan createNewPlanInstance() {
 				final PopulationFactory fact = createPopulationFactory();
 
-				final Id id1 = new IdImpl( 1 );
-				final Id id2 = new IdImpl( 2 );
-				final Id id3 = new IdImpl( 3 );
+				final Id<Link> id1 = Id.create( 1, Link.class );
+				final Id<Link> id2 = Id.create( 2, Link.class );
+				final Id<Link> id3 = Id.create( 3, Link.class );
 
 				final Plan plan = fact.createPlan();
 				
@@ -156,10 +159,10 @@ public class ChooseRandomLegModeForSubtourComplexTripsTest {
 			public Plan createNewPlanInstance() {
 				final PopulationFactory fact = createPopulationFactory();
 
-				final Id id1 = new IdImpl( 1 );
-				final Id id2 = new IdImpl( 2 );
-				final Id id3 = new IdImpl( 3 );
-				final Id id4 = new IdImpl( 4 );
+				final Id<Link> id1 = Id.create( 1, Link.class );
+				final Id<Link> id2 = Id.create( 2, Link.class );
+				final Id<Link> id3 = Id.create( 3, Link.class );
+				final Id<Link> id4 = Id.create( 4, Link.class );
 
 				final Plan plan = fact.createPlan();
 				
@@ -252,10 +255,10 @@ public class ChooseRandomLegModeForSubtourComplexTripsTest {
 			public Plan createNewPlanInstance() {
 				final PopulationFactory fact = createPopulationFactory();
 
-				final Id id1 = new IdImpl( 1 );
-				final Id id2 = new IdImpl( 2 );
-				final Id id3 = new IdImpl( 3 );
-				final Id id4 = new IdImpl( 4 );
+				final Id<Link> id1 = Id.create( 1, Link.class );
+				final Id<Link> id2 = Id.create( 2, Link.class );
+				final Id<Link> id3 = Id.create( 3, Link.class );
+				final Id<Link> id4 = Id.create( 4, Link.class );
 
 				final Plan plan = fact.createPlan();
 				
@@ -327,10 +330,10 @@ public class ChooseRandomLegModeForSubtourComplexTripsTest {
 			public Plan createNewPlanInstance() {
 				final PopulationFactory fact = createPopulationFactory();
 
-				final Id id1 = new IdImpl( 1 );
-				final Id id2 = new IdImpl( 2 );
-				final Id id3 = new IdImpl( 3 );
-				final Id id4 = new IdImpl( 4 );
+				final Id<Link> id1 = Id.create( 1, Link.class );
+				final Id<Link> id2 = Id.create( 2, Link.class );
+				final Id<Link> id3 = Id.create( 3, Link.class );
+				final Id<Link> id4 = Id.create( 4, Link.class );
 
 				final Plan plan = fact.createPlan();
 				
@@ -438,7 +441,7 @@ public class ChooseRandomLegModeForSubtourComplexTripsTest {
 	}
 
 	private static PopulationFactory createPopulationFactory() {
-        return (PopulationFactoryImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation().getFactory();
+        return ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation().getFactory();
     }
 	// /////////////////////////////////////////////////////////////////////////
 	// tests

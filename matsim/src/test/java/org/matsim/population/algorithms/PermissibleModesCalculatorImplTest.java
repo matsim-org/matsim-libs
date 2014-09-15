@@ -30,9 +30,10 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
@@ -64,7 +65,7 @@ public class PermissibleModesCalculatorImplTest {
 	@Before
 	public void fixtureWithNothing() {
 		String name = "no information";
-		PersonImpl person = new PersonImpl( new IdImpl( name ) );
+		PersonImpl person = new PersonImpl( Id.create( name, Person.class ) );
 		Plan plan = new PlanImpl( person );
 		fixtures.add( new Fixture( name , plan , true ) );
 	}
@@ -72,7 +73,7 @@ public class PermissibleModesCalculatorImplTest {
 	@Before
 	public void fixtureWithNoLicense() {
 		String name = "no License";
-		PersonImpl person = new PersonImpl( new IdImpl( name ) );
+		PersonImpl person = new PersonImpl( Id.create( name, Person.class ) );
 		Plan plan = new PlanImpl( person );
 		person.setLicence( "no" );
 		fixtures.add( new Fixture( name , plan , false ) );
@@ -81,7 +82,7 @@ public class PermissibleModesCalculatorImplTest {
 	@Before
 	public void fixtureWithNoCar() {
 		String name = "no car" ;
-		PersonImpl person = new PersonImpl( new IdImpl( name ) );
+		PersonImpl person = new PersonImpl( Id.create( name, Person.class ) );
 		Plan plan = new PlanImpl( person );
 		person.setCarAvail( "never" );
 		fixtures.add( new Fixture( name , plan , false ) );
@@ -90,7 +91,7 @@ public class PermissibleModesCalculatorImplTest {
 	@Before
 	public void fixtureWithCarSometimes() {
 		String name = "car sometimes";
-		PersonImpl person = new PersonImpl( new IdImpl( name ) );
+		PersonImpl person = new PersonImpl( Id.create( name, Person.class ) );
 		Plan plan = new PlanImpl( person );
 		person.setCarAvail( "sometimes" );
 		fixtures.add( new Fixture( name , plan , true ) );

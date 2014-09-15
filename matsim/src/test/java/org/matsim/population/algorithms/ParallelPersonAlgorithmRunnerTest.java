@@ -28,7 +28,6 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -69,7 +68,7 @@ public class ParallelPersonAlgorithmRunnerTest {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population population = scenario.getPopulation();
 		for (int i = 0; i < 100; i++) {
-			PersonImpl person = new PersonImpl(new IdImpl(i));
+			PersonImpl person = new PersonImpl(Id.create(i, Person.class));
 			population.addPerson(person);
 		}
 		final PersonAlgorithmTester tester = new PersonAlgorithmTester();
@@ -94,7 +93,7 @@ public class ParallelPersonAlgorithmRunnerTest {
 			ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			Population population = scenario.getPopulation();
 			for (int i = 0; i < 10; i++) {
-				PersonImpl person = new PersonImpl(new IdImpl(i));
+				PersonImpl person = new PersonImpl(Id.create(i, Person.class));
 				population.addPerson(person);
 			}
 			ParallelPersonAlgorithmRunner.run(population, 2, new AbstractPersonAlgorithm() {
