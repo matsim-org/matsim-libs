@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Queue;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
@@ -18,7 +16,6 @@ import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
@@ -40,7 +37,6 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
-import org.matsim.vehicles.VehiclesImplTest;
 
 public class EventsToTransitSchedule implements TransitDriverStartsEventHandler, VehicleDepartsAtFacilityEventHandler {
 
@@ -100,7 +96,7 @@ public class EventsToTransitSchedule implements TransitDriverStartsEventHandler,
 				TransitRoute existingRoute = existingSchedule.getTransitLines().get(startStop.getSecond().getFirst()).getRoutes().get(startStop.getSecond().getSecond());
 				time-=existingRoute.getStop(existingSchedule.getFacilities().get(event.getFacilityId())).getDepartureOffset();
 			}
-			Departure departure = factory.createDeparture(new IdImpl(startStop.getFirst().toString()+","+time), time);
+			Departure departure = factory.createDeparture(Id.create(startStop.getFirst().toString()+","+time,Departure.class), time);
 			departure.setVehicleId(event.getVehicleId());
 			newVehicles.add(event.getVehicleId());
 			route.addDeparture(departure);
