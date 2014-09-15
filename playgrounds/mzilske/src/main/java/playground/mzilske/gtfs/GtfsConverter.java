@@ -1,17 +1,5 @@
 package playground.mzilske.gtfs;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -28,15 +16,13 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
+
+import java.io.File;
+import java.util.*;
 
 
 public class GtfsConverter {
@@ -194,7 +180,6 @@ public class GtfsConverter {
 			this.convertFrequencies(frequenciesSource, tripToRoute, usedTripIds);
 		}
 
-		this.createTransitVehicleTypes();
 		this.createTransitVehicles();
 
 		if(usedTripIds.isEmpty()){
@@ -728,117 +713,47 @@ public class GtfsConverter {
 		for(String s: vehicleIdsAndTypes.keySet()){
 			// TYPE
 			VehicleType vt;
-			switch(vehicleIdsAndTypes.get(s)) {
-			// These are route types as specified by gtfs
-			case 0: vt = scenario.getVehicles().getVehicleTypes().get(new IdImpl("type-tram")); break;
-			case 1: vt = scenario.getVehicles().getVehicleTypes().get(new IdImpl("type-subway")); break;
-			case 2: vt = scenario.getVehicles().getVehicleTypes().get(new IdImpl("type-rail")); break;
-			case 3: vt = scenario.getVehicles().getVehicleTypes().get(new IdImpl("type-bus")); break;
-			case 4: vt = scenario.getVehicles().getVehicleTypes().get(new IdImpl("type-ferry")); break;
-			case 5: vt = scenario.getVehicles().getVehicleTypes().get(new IdImpl("type-cablecar")); break;
-			case 6: vt = scenario.getVehicles().getVehicleTypes().get(new IdImpl("type-gondola")); break;
-			case 7: vt = scenario.getVehicles().getVehicleTypes().get(new IdImpl("type-funicular")); break;
-			default: vt = scenario.getVehicles().getVehicleTypes().get(new IdImpl("type-unidentified"));
-			}
+            int gtfsVehicleType = vehicleIdsAndTypes.get(s);
+            vt = getVehicleType(gtfsVehicleType);
 
-			// Vehicle
+            // Vehicle
 			Vehicle v = scenario.getVehicles().getFactory().createVehicle(new IdImpl(s), vt);
 			scenario.getVehicles().addVehicle(v);
 		}
 	}
 
-	private void createTransitVehicleTypes() {
-		{
-			VehicleCapacity vc = scenario.getVehicles().getFactory().createVehicleCapacity();
-			vc.setSeats(50);
-			vc.setStandingRoom(50);
-			VehicleType vt = scenario.getVehicles().getFactory().createVehicleType(new IdImpl("type-tram"));
-			vt.setCapacity(vc);
-			vt.setLength(5);
+    private VehicleType getVehicleType(int gtfsVehicleType) {
+        VehicleType vt;
+        switch(gtfsVehicleType) {
+        // These are route types as specified by gtfs
+        case 0: vt = vehicleType(Id.create("type-tram", VehicleType.class)); break;
+        case 1: vt = vehicleType(Id.create("type-subway", VehicleType.class)); break;
+        case 2: vt = vehicleType(Id.create("type-rail", VehicleType.class)); break;
+        case 3: vt = vehicleType(Id.create("type-bus", VehicleType.class)); break;
+        case 4: vt = vehicleType(Id.create("type-ferry", VehicleType.class)); break;
+        case 5: vt = vehicleType(Id.create("type-cablecar", VehicleType.class)); break;
+        case 6: vt = vehicleType(Id.create("type-gondola", VehicleType.class)); break;
+        case 7: vt = vehicleType(Id.create("type-funicular", VehicleType.class)); break;
+        default: vt = vehicleType(Id.create("type-unidentified", VehicleType.class));
+        }
+        return vt;
+    }
 
-			scenario.getVehicles().addVehicleType(vt);
-		}
-		{
-			VehicleCapacity vc = scenario.getVehicles().getFactory().createVehicleCapacity();
-			vc.setSeats(50);
-			vc.setStandingRoom(50);
-			VehicleType vt = scenario.getVehicles().getFactory().createVehicleType(new IdImpl("type-subway"));
-			vt.setCapacity(vc);
-			vt.setLength(5);
+    private VehicleType vehicleType(Id<VehicleType> type) {
+        VehicleType vt = scenario.getVehicles().getVehicleTypes().get(type);
+        if (vt == null) {
+            VehicleCapacity vc = scenario.getVehicles().getFactory().createVehicleCapacity();
+            vc.setSeats(50);
+            vc.setStandingRoom(50);
+            vt = scenario.getVehicles().getFactory().createVehicleType(type);
+            vt.setCapacity(vc);
+            vt.setLength(5);
+            scenario.getVehicles().addVehicleType(vt);
+        }
+        return vt;
+    }
 
-			scenario.getVehicles().addVehicleType(vt);
-		}
-		{
-			VehicleCapacity vc = scenario.getVehicles().getFactory().createVehicleCapacity();
-			vc.setSeats(50);
-			vc.setStandingRoom(50);
-			VehicleType vt = scenario.getVehicles().getFactory().createVehicleType(new IdImpl("type-rail"));
-			vt.setCapacity(vc);
-			vt.setLength(5);
-		}
-		{
-			VehicleCapacity vc = scenario.getVehicles().getFactory().createVehicleCapacity();
-			vc.setSeats(50);
-			vc.setStandingRoom(50);
-			VehicleType vt = scenario.getVehicles().getFactory().createVehicleType(new IdImpl("type-bus"));
-			vt.setCapacity(vc);
-			vt.setLength(5);
-
-			scenario.getVehicles().addVehicleType(vt);
-		}
-		{
-			VehicleCapacity vc = scenario.getVehicles().getFactory().createVehicleCapacity();
-			vc.setSeats(50);
-			vc.setStandingRoom(50);
-			VehicleType vt = scenario.getVehicles().getFactory().createVehicleType(new IdImpl("type-ferry"));
-			vt.setCapacity(vc);
-			vt.setLength(5);
-
-			scenario.getVehicles().addVehicleType(vt);
-		}
-		{
-			VehicleCapacity vc = scenario.getVehicles().getFactory().createVehicleCapacity();
-			vc.setSeats(50);
-			vc.setStandingRoom(50);
-			VehicleType vt = scenario.getVehicles().getFactory().createVehicleType(new IdImpl("type-cablecar"));
-			vt.setCapacity(vc);
-			vt.setLength(5);
-
-			scenario.getVehicles().addVehicleType(vt);
-		}
-		{
-			VehicleCapacity vc = scenario.getVehicles().getFactory().createVehicleCapacity();
-			vc.setSeats(50);
-			vc.setStandingRoom(50);
-			VehicleType vt = scenario.getVehicles().getFactory().createVehicleType(new IdImpl("type-gondola"));
-			vt.setCapacity(vc);
-			vt.setLength(5);
-
-			scenario.getVehicles().addVehicleType(vt);
-		}
-		{
-			VehicleCapacity vc = scenario.getVehicles().getFactory().createVehicleCapacity();
-			vc.setSeats(50);
-			vc.setStandingRoom(50);
-			VehicleType vt = scenario.getVehicles().getFactory().createVehicleType(new IdImpl("type-funicular"));
-			vt.setCapacity(vc);
-			vt.setLength(5);
-
-			scenario.getVehicles().addVehicleType(vt);
-		}
-		{
-			VehicleCapacity vc = scenario.getVehicles().getFactory().createVehicleCapacity();
-			vc.setSeats(50);
-			vc.setStandingRoom(50);
-			VehicleType vt = scenario.getVehicles().getFactory().createVehicleType(new IdImpl("type-unidentified"));
-			vt.setCapacity(vc);
-			vt.setLength(5);
-
-			scenario.getVehicles().addVehicleType(vt);
-		}
-	}
-
-	private int getWeekday(long date) {
+    private int getWeekday(long date) {
 		int year = (int)(date/10000);
 		int month = (int)((date - year*10000)/100);
 		int day = (int)((date-month*100-year*10000));

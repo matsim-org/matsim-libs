@@ -27,7 +27,7 @@ class SteppableScheduler extends Scheduler implements Steppable {
         }
         while (!queue.isEmpty()) {
             Message m = queue.getNextMessage();
-            if (m != null && m.getMessageArrivalTime() == time) {
+            if (m != null && m.getMessageArrivalTime() <= time) {
                 m.processEvent();
                 m.handleMessage();
             } else {

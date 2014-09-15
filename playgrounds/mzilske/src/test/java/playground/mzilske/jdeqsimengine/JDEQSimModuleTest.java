@@ -18,6 +18,7 @@ public class JDEQSimModuleTest extends MatsimTestCase {
     public void testRunsAtAll() {
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         EventsManager eventsManager = EventsUtils.createEventsManager(scenario.getConfig());
+        eventsManager.initProcessing();
         QSim qsim = new QSim(scenario, eventsManager);
         JDEQSimModule.configure(qsim);
         qsim.run();
@@ -26,6 +27,7 @@ public class JDEQSimModuleTest extends MatsimTestCase {
     public void testRunsEquil() {
         Scenario scenario = ScenarioUtils.loadScenario(loadConfig("examples/equil/config.xml"));
         EventsManager eventsManager = EventsUtils.createEventsManager(scenario.getConfig());
+        eventsManager.initProcessing();
         QSim qsim = new QSim(scenario, eventsManager);
         JDEQSimModule.configure(qsim);
         PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), new DefaultAgentFactory(qsim), qsim);

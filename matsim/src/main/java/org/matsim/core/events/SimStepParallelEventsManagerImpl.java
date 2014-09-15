@@ -51,8 +51,7 @@ public class SimStepParallelEventsManagerImpl implements EventsManager {
 	private final int numOfThreads;
 	private CyclicBarrier simStepEndBarrier;
 	private CyclicBarrier iterationEndBarrier;
-	private CyclicBarrier waitForEmptyQueuesBarrier;
-	private ProcessEventsRunnable[] runnables;
+    private ProcessEventsRunnable[] runnables;
 	private EventsManagerImpl[] eventsManagers;
 	private EventsManagerImpl delegate;
 	private ProcessedEventsChecker processedEventsChecker;
@@ -62,9 +61,8 @@ public class SimStepParallelEventsManagerImpl implements EventsManager {
 	
 	private AtomicLong counter;
 	private AtomicBoolean hadException;
-	private ExceptionHandler uncaughtExceptionHandler;
-	
-	public SimStepParallelEventsManagerImpl() {
+
+    public SimStepParallelEventsManagerImpl() {
 		this(1);
 	}
 	
@@ -120,10 +118,10 @@ public class SimStepParallelEventsManagerImpl implements EventsManager {
 		delegate.initProcessing();
 		for (EventsManager eventsManager : this.eventsManagers) eventsManager.initProcessing();
 
-		Queue<Event>[] eventsQueuesArray = new Queue[this.numOfThreads];	
+		Queue<Event>[] eventsQueuesArray = new Queue[this.numOfThreads];
 		List<Queue<Event>> eventsQueues = new ArrayList<Queue<Event>>();
 		for (int i = 0; i < numOfThreads; i++) {
-			Queue<Event> eventsQueue = new LinkedBlockingQueue<Event>();
+			Queue<Event> eventsQueue = new LinkedBlockingQueue<>();
 			eventsQueues.add(eventsQueue);
 			eventsQueuesArray[i] = eventsQueue;
 		}
@@ -142,20 +140,20 @@ public class SimStepParallelEventsManagerImpl implements EventsManager {
 		/*
 		 *  Create a Barrier that the threads use to synchronize.
 		 */
-		waitForEmptyQueuesBarrier = new CyclicBarrier(this.numOfThreads, processedEventsChecker);
+        CyclicBarrier waitForEmptyQueuesBarrier = new CyclicBarrier(this.numOfThreads, processedEventsChecker);
 		
 		hadException = new AtomicBoolean(false);
-		uncaughtExceptionHandler = new ExceptionHandler(hadException, waitForEmptyQueuesBarrier, 
-				simStepEndBarrier, iterationEndBarrier);
+        ExceptionHandler uncaughtExceptionHandler = new ExceptionHandler(hadException, waitForEmptyQueuesBarrier,
+                simStepEndBarrier, iterationEndBarrier);
 		
 		runnables = new ProcessEventsRunnable[numOfThreads];
 		for (int i = 0; i < numOfThreads; i++) {
 			ProcessEventsRunnable processEventsRunnable = new ProcessEventsRunnable(eventsManagers[i], processedEventsChecker,
-					waitForEmptyQueuesBarrier, simStepEndBarrier, iterationEndBarrier, eventsQueues.get(i), eventsQueues.get(i + 1));
+                    waitForEmptyQueuesBarrier, simStepEndBarrier, iterationEndBarrier, eventsQueues.get(i), eventsQueues.get(i + 1));
 			runnables[i] = processEventsRunnable;
 			Thread thread = new Thread(processEventsRunnable);
 			thread.setDaemon(true);
-			thread.setUncaughtExceptionHandler(this.uncaughtExceptionHandler);
+			thread.setUncaughtExceptionHandler(uncaughtExceptionHandler);
 			thread.setName(ProcessEventsRunnable.class.toString() + i);
 			thread.start();
 		}		
@@ -186,12 +184,10 @@ public class SimStepParallelEventsManagerImpl implements EventsManager {
 			try {
 				this.processEvent(new LastEventOfIteration(Double.POSITIVE_INFINITY));
 				iterationEndBarrier.await();
-			} catch (InterruptedException e) {
-				this.hadException.set(true);
-			} catch (BrokenBarrierException e) {
+			} catch (InterruptedException | BrokenBarrierException e) {
 				this.hadException.set(true);
 			}
-		}
+        }
 		
 		delegate.finishProcessing();
 		for (EventsManager eventsManager : this.eventsManagers) eventsManager.finishProcessing();
@@ -223,12 +219,10 @@ public class SimStepParallelEventsManagerImpl implements EventsManager {
 			this.processedEventsChecker.setTime(time);
 			this.processEvent(new LastEventOfSimStep(time));
 			simStepEndBarrier.await();
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
-		} catch (BrokenBarrierException e) {
+		} catch (InterruptedException | BrokenBarrierException e) {
 			throw new RuntimeException(e);
 		}
-	}
+    }
 	
 	private static class ProcessEventsRunnable implements Runnable {
 		
@@ -325,12 +319,10 @@ public class SimStepParallelEventsManagerImpl implements EventsManager {
 					eventsManager.processEvent(event);
 				}
 				iterationEndBarrier.await();
-			} catch (InterruptedException e) {
-				throw new RuntimeException(e);
-			} catch (BrokenBarrierException e) {
+			} catch (InterruptedException | BrokenBarrierException e) {
 				throw new RuntimeException(e);
 			}
-			Gbl.printCurrentThreadCpuTime();
+            Gbl.printCurrentThreadCpuTime();
 		}
 
 		public void processEvent(Event event) {

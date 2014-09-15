@@ -16,26 +16,22 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.Vehicles;
-
 import playground.mzilske.gtfs.GtfsConverter;
 
 public class GtfsTests extends MatsimTestCase {
 	
 	
 	public void testGtfsStandardConversion(){
-
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()); 
+        Config config = ConfigUtils.createConfig();
+        config.scenario().setUseVehicles(true);
+        config.scenario().setUseTransit(true);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		GtfsConverter gtfs = new GtfsConverter(getPackageInputDirectory(), scenario, new IdentityTransformation());
 		// The WE-Trip is added on July 11th 2011, so calendar.txt and calendar_dates.txt can be checked
 		gtfs.setDate(20110711);
 		gtfs.convert();
 		
 		// The Conversion is done, now read the checked scenario
-		// Config checkedConfig = ConfigUtils.loadConfig(this.getPackageInputDirectory()+ "/checked/config.xml");
-		// ScenarioImpl checkedScenario = (ScenarioImpl)(ScenarioUtils.createScenario(checkedConfig));
-		Config config = ConfigUtils.createConfig();
-		config.scenario().setUseVehicles(true);
-		config.scenario().setUseTransit(true);
 		ScenarioImpl checkedScenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
 		new MatsimNetworkReader(checkedScenario).readFile(this.getPackageInputDirectory()+ "/checked/network.xml");
 		new VehicleReaderV1(checkedScenario.getVehicles()).readFile(this.getPackageInputDirectory()+ "/checked/transitVehicles.xml");
@@ -45,8 +41,10 @@ public class GtfsTests extends MatsimTestCase {
 	}
 	
 	public void testGtfsShapedConversion(){
-
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()); 
+        Config config = ConfigUtils.createConfig();
+        config.scenario().setUseVehicles(true);
+        config.scenario().setUseTransit(true);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		GtfsConverter gtfs = new GtfsConverter(getPackageInputDirectory(), scenario, new IdentityTransformation());
 		// The WE-Trip is added on July 11th 2011, so calendar.txt and calendar_dates.txt can be checked
 		gtfs.setDate(20110711);
@@ -54,9 +52,6 @@ public class GtfsTests extends MatsimTestCase {
 		gtfs.convert();
 		
 		// The Conversion is done, now read the checked scenario
-		Config config = ConfigUtils.createConfig();
-		config.scenario().setUseVehicles(true);
-		config.scenario().setUseTransit(true);
 		ScenarioImpl checkedScenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
 		new MatsimNetworkReader(checkedScenario).readFile(this.getPackageInputDirectory()+ "/checked/network_shaped.xml");
 		new VehicleReaderV1(checkedScenario.getVehicles()).readFile(this.getPackageInputDirectory()+ "/checked/transitVehicles.xml");
