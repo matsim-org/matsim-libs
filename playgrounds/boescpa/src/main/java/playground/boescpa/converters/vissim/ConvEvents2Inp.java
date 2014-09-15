@@ -117,7 +117,10 @@ public class ConvEvents2Inp extends ConvEvents {
 					// FRACTION of route:
 					if (fracPattern.matcher(line).matches()) {
 						double demand = demandPerVissimTrip.get(new IdImpl(currentRoutingDecision + "-" + currentRoute));
-						String fraction = String.valueOf(demand/totalPerRoutingDecision);
+						String fraction = "0.0";
+						if (totalPerRoutingDecision > 0) {
+							fraction = String.valueOf(demand/totalPerRoutingDecision);
+						}
 						if (fraction.length() < 5) {
 							fraction = fraction + "00000000";
 						}
