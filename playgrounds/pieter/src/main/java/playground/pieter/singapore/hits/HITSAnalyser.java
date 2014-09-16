@@ -838,10 +838,10 @@ public class HITSAnalyser {
 																	: "mrt_lrt"),
 															transitLink.getFromNode().getCoord().getX(),
 															transitLink.getFromNode().getCoord().getY(),
-															transitLink.toNode
+															transitLink.getToNode()
 																	.getCoord()
 																	.getX(),
-															transitLink.toNode
+															transitLink.getToNode()
 																	.getCoord()
 																	.getY(),
 															transitLink
@@ -856,7 +856,7 @@ public class HITSAnalyser {
 															linkStartTime+linkTime);
 											linkStartTime += linkTime;
 											transitInVehTimeFromRouter += linkTime;
-										} else if (transitLink.toNode.route == null) {
+										} else if (transitLink.getToNode().route == null) {
 											// transfer link
 											double linkLength = transitLink
 													.getLength();
@@ -886,16 +886,16 @@ public class HITSAnalyser {
 															stage_id,
 															substage_id,
 															"transferWalk",
-															transitLink.fromNode
+															transitLink.getFromNode()
 																	.getCoord()
 																	.getX(),
-															transitLink.fromNode
+															transitLink.getFromNode()
 																	.getCoord()
 																	.getY(),
-															transitLink.toNode
+															transitLink.getToNode()
 																	.getCoord()
 																	.getX(),
-															transitLink.toNode
+															transitLink.getToNode()
 																	.getCoord()
 																	.getY(),
 															"",
@@ -908,7 +908,7 @@ public class HITSAnalyser {
 											linkStartTime += linkTime;
 											walkTimeTransferFromRouter += linkTime;
 
-										} else if (transitLink.fromNode.route == null) {
+										} else if (transitLink.getFromNode().route == null) {
 											// wait link
 											substage_id++;
 											double linkTime = transitTravelFunction
@@ -929,16 +929,16 @@ public class HITSAnalyser {
 															stage_id,
 															substage_id,
 															"wait",
-															transitLink.fromNode
+															transitLink.getFromNode()
 																	.getCoord()
 																	.getX(),
-															transitLink.fromNode
+															transitLink.getFromNode()
 																	.getCoord()
 																	.getY(),
-															transitLink.toNode
+															transitLink.getToNode()
 																	.getCoord()
 																	.getX(),
-															transitLink.toNode
+															transitLink.getToNode()
 																	.getCoord()
 																	.getY(),
 															"",

@@ -751,7 +751,7 @@ public class HITSAnalyserPostgresqlSummary {
 									null);
 							trip.incrementTime(linkTime);
 							linkStartTime += linkTime;
-						} else if (transitLink.toNode.route == null) {
+						} else if (transitLink.getToNode().route == null) {
 							// transfer link
 							double linkLength = transitLink.getLength();
 							double linkTime = transitTravelFunction.getLinkTravelTime(transitLink, linkStartTime, null,
@@ -782,7 +782,7 @@ public class HITSAnalyserPostgresqlSummary {
 							linkStartTime += linkTime;
 							walk.setEndTime(linkStartTime);
 
-						} else if (transitLink.fromNode.route == null) {
+						} else if (transitLink.getFromNode().route == null) {
 							// wait link
 							substage_id++;
 							double linkTime = transitTravelFunction.getLinkTravelTime(transitLink, linkStartTime, null,
@@ -1078,7 +1078,7 @@ public class HITSAnalyserPostgresqlSummary {
 										null, null);
 								trip.incrementTime(linkTime);
 								linkStartTime += linkTime;
-							} else if (transitLink.toNode.route == null) {
+							} else if (transitLink.getToNode().route == null) {
 								// transfer link
 								double linkLength = transitLink.getLength();
 								double linkTime = transitTravelFunction.getLinkTravelTime(transitLink, linkStartTime,
@@ -1109,7 +1109,7 @@ public class HITSAnalyserPostgresqlSummary {
 								linkStartTime += linkTime;
 								walk.setEndTime(linkStartTime);
 
-							} else if (transitLink.fromNode.route == null) {
+							} else if (transitLink.getFromNode().route == null) {
 								// wait link
 								substage_id++;
 								double linkTime = transitTravelFunction.getLinkTravelTime(transitLink, linkStartTime,
