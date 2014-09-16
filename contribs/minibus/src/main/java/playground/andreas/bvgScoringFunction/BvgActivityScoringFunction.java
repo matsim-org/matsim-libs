@@ -6,7 +6,7 @@ import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.pt.PtConstants;
 
-public class BvgActivityScoringFunction extends CharyparNagelActivityScoring {
+class BvgActivityScoringFunction extends CharyparNagelActivityScoring {
 
 	private CharyparNagelScoringParameters params;
 

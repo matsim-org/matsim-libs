@@ -40,7 +40,7 @@ import org.matsim.pt.PtConstants;
  * @author aneumann roughly based on {@link CharyparNagelLegScoring}
  *
  */
-public class BvgLegScoringFunction implements LegScoring, BasicScoring {
+class BvgLegScoringFunction implements LegScoring, BasicScoring {
 
 	private final static Logger log = Logger.getLogger(BvgLegScoringFunction.class);
 

@@ -18,7 +18,7 @@ import org.matsim.core.utils.misc.Time;
  * @author aneumann
  *
  */
-public class LogReader implements TabularFileHandler {
+public final class LogReader implements TabularFileHandler {
 	
 	private static final Logger log = Logger.getLogger(LogReader.class);
 

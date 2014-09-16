@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
  * @author aneumann
  *
  */
-public class Log2Gexf {
+public final class Log2Gexf {
 
 	private static final Logger log = Logger.getLogger(Log2Gexf.class);
 	

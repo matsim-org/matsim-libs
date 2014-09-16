@@ -19,30 +19,28 @@
 
 package playground.andreas.P2.integration;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
-import org.matsim.pt.PtConstants;
 import org.matsim.testcases.MatsimTestUtils;
+
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.hook.PHook;
 import playground.andreas.bvgScoringFunction.BvgScoringFunctionConfigGroup;
 import playground.andreas.bvgScoringFunction.BvgScoringFunctionFactory;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 
 
 /**

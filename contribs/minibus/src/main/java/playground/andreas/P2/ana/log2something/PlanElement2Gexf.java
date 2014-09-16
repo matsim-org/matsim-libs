@@ -60,7 +60,7 @@ import playground.andreas.P2.genericUtils.gexf.viz.PositionContent;
  * @author aneumann
  *
  */
-public class PlanElement2Gexf extends MatsimJaxbXmlWriter{
+public final class PlanElement2Gexf extends MatsimJaxbXmlWriter{
 	
 	private static final Logger log = Logger.getLogger(PlanElement2Gexf.class);
 	

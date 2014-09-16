@@ -16,7 +16,7 @@ import org.matsim.core.utils.misc.Time;
  * @author aneumann
  *
  */
-public class Log2Tex {
+public final class Log2Tex {
 	
 	private static final Logger log = Logger.getLogger(Log2Tex.class);
 

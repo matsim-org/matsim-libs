@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
  * @author aneumann
  *
  */
-public class LogElement {
+public final class LogElement {
 	
 	private static final Logger log = Logger.getLogger(LogElement.class);
 

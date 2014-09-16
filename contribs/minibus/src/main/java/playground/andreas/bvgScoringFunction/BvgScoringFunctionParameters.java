@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
  * @author aneumann
  *
  */
-public class BvgScoringFunctionParameters {
+final class BvgScoringFunctionParameters {
 	
 	private static final Logger log = Logger.getLogger(BvgScoringFunctionParameters.class);
 	

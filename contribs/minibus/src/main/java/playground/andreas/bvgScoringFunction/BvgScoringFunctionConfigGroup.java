@@ -32,7 +32,7 @@ import org.matsim.core.config.Module;
  * @author aneumann
  *
  */
-public class BvgScoringFunctionConfigGroup extends Module {
+public final class BvgScoringFunctionConfigGroup extends Module {
 	
 	private static final Logger log = Logger.getLogger(BvgScoringFunctionConfigGroup.class);
 	

@@ -37,7 +37,7 @@ import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
  * @author aneumann
  *
  */
-public class BvgScoringFunctionFactory implements ScoringFunctionFactory {
+public final class BvgScoringFunctionFactory implements ScoringFunctionFactory {
 
 	private static final Logger log = Logger.getLogger(BvgScoringFunctionFactory.class);
 

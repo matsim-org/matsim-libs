@@ -33,7 +33,7 @@ import playground.andreas.P2.replanning.modules.SidewaysRouteExtension;
 import playground.andreas.P2.replanning.modules.WeightedEndTimeExtension;
 import playground.andreas.P2.replanning.modules.WeightedStartTimeExtension;
 
-public class PlanElement {
+public final class PlanElement {
 
 	private static final Logger log = Logger.getLogger(PlanElement.class);
 	
