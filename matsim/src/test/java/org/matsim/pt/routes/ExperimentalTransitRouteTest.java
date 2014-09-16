@@ -24,8 +24,8 @@ import java.util.Collections;
 
 import junit.framework.TestCase;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
@@ -40,8 +40,8 @@ import org.matsim.testcases.fakes.FakeLink;
 public class ExperimentalTransitRouteTest extends TestCase {
 
 	public void testInitializationLinks() {
-		Link link1 = new FakeLink(new IdImpl(1));
-		Link link2 = new FakeLink(new IdImpl(2));
+		Link link1 = new FakeLink(Id.create(1, TransitStopFacility.class));
+		Link link2 = new FakeLink(Id.create(2, TransitStopFacility.class));
 		ExperimentalTransitRoute route = new ExperimentalTransitRoute(link1.getId(), link2.getId());
 		assertEquals(link1.getId(), route.getStartLinkId());
 		assertEquals(link2.getId(), route.getEndLinkId());
@@ -52,14 +52,14 @@ public class ExperimentalTransitRouteTest extends TestCase {
 
 	public void testInitializationStops() {
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
-		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl(1), new CoordImpl(5, 11), false);
-		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl(2), new CoordImpl(18, 7), false);
-		Link link1 = new FakeLink(new IdImpl(3));
-		Link link2 = new FakeLink(new IdImpl(4));
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create(1, TransitStopFacility.class), new CoordImpl(5, 11), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create(2, TransitStopFacility.class), new CoordImpl(18, 7), false);
+		Link link1 = new FakeLink(Id.create(3, Link.class));
+		Link link2 = new FakeLink(Id.create(4, Link.class));
 		stop1.setLinkId(link1.getId());
 		stop2.setLinkId(link2.getId());
-		TransitLine line = builder.createTransitLine(new IdImpl(5));
-		TransitRoute tRoute = builder.createTransitRoute(new IdImpl(6), null, Collections.<TransitRouteStop>emptyList(), "bus");
+		TransitLine line = builder.createTransitLine(Id.create(5, TransitLine.class));
+		TransitRoute tRoute = builder.createTransitRoute(Id.create(6, TransitRoute.class), null, Collections.<TransitRouteStop>emptyList(), "bus");
 		ExperimentalTransitRoute route = new ExperimentalTransitRoute(stop1, line, tRoute, stop2);
 		assertEquals(stop1.getId(), route.getAccessStopId());
 		assertEquals(line.getId(), route.getLineId());
@@ -70,10 +70,10 @@ public class ExperimentalTransitRouteTest extends TestCase {
 	}
 
 	public void testLinks() {
-		Link link1 = new FakeLink(new IdImpl(1));
-		Link link2 = new FakeLink(new IdImpl(2));
-		Link link3 = new FakeLink(new IdImpl(3));
-		Link link4 = new FakeLink(new IdImpl(4));
+		Link link1 = new FakeLink(Id.create(1, Link.class));
+		Link link2 = new FakeLink(Id.create(2, Link.class));
+		Link link3 = new FakeLink(Id.create(3, Link.class));
+		Link link4 = new FakeLink(Id.create(4, Link.class));
 		ExperimentalTransitRoute route = new ExperimentalTransitRoute(link1.getId(), link2.getId());
 		assertEquals(link1.getId(), route.getStartLinkId());
 		assertEquals(link2.getId(), route.getEndLinkId());

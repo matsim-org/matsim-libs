@@ -21,9 +21,9 @@
 package org.matsim.pt.transitSchedule;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author mrieser
@@ -39,12 +39,12 @@ public class DepartureTest extends MatsimTestCase {
 	 * @param time
 	 * @return a new instance of a Departure with the given attributes
 	 */
-	protected Departure createDeparture(final Id id, final double time) {
+	protected Departure createDeparture(final Id<Departure> id, final double time) {
 		return new DepartureImpl(id, time);
 	}
 
 	public void testInitialization() {
-		Id id = new IdImpl(1591);
+		Id<Departure> id = Id.create(1591, Departure.class);
 		double time = 11.0 * 3600;
 		Departure dep = createDeparture(id, time);
 		assertEquals(id, dep.getId());
@@ -52,9 +52,9 @@ public class DepartureTest extends MatsimTestCase {
 	}
 
 	public void testVehicleId() {
-		Departure dep = createDeparture(new IdImpl(6791), 7.0*3600);
+		Departure dep = createDeparture(Id.create(6791, Departure.class), 7.0*3600);
 		assertNull(dep.getVehicleId());
-		Id vehId = new IdImpl(2491);
+		Id<Vehicle> vehId = Id.create(2491, Vehicle.class);
 		dep.setVehicleId(vehId);
 		assertEquals(vehId, dep.getVehicleId());
 	}

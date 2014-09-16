@@ -20,7 +20,7 @@
 
 package org.matsim.pt.utils;
 
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -50,7 +50,7 @@ public class CreateVehiclesForSchedule {
 
 	public void run() {
 		VehiclesFactory vb = this.vehicles.getFactory();
-		VehicleType vehicleType = vb.createVehicleType(new IdImpl("defaultTransitVehicleType"));
+		VehicleType vehicleType = vb.createVehicleType(Id.create("defaultTransitVehicleType", VehicleType.class));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(101));
 		capacity.setStandingRoom(Integer.valueOf(0));
@@ -61,7 +61,7 @@ public class CreateVehiclesForSchedule {
 		for (TransitLine line : this.schedule.getTransitLines().values()) {
 			for (TransitRoute route : line.getRoutes().values()) {
 				for (Departure departure : route.getDepartures().values()) {
-					Vehicle veh = vb.createVehicle(new IdImpl("tr_" + Long.toString(vehId++)), vehicleType);
+					Vehicle veh = vb.createVehicle(Id.create("tr_" + Long.toString(vehId++), Vehicle.class), vehicleType);
 					this.vehicles.addVehicle(veh);
 					departure.setVehicleId(veh.getId());
 				}

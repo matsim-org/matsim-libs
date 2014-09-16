@@ -35,10 +35,13 @@ import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author yChen
@@ -52,15 +55,15 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler, Perso
 	private final int timeBinSize, maxSlotIndex;
 	private final double maxTime;
 	/** Map< stopFacilityId,value[]> */
-	private Map<Id, int[]> boards, alights, occupancies;
+	private Map<Id<TransitStopFacility>, int[]> boards, alights, occupancies;
 
 	/** Map< vehId,stopFacilityId> */
-	private final Map<Id, Id> vehStops = new HashMap<Id, Id>();
+	private final Map<Id<Vehicle>, Id<TransitStopFacility>> vehStops = new HashMap<>();
 	/** Map<vehId,passengersNo. in Veh> */
-	private final Map<Id, Integer> vehPassengers = new HashMap<Id, Integer>();
+	private final Map<Id<Vehicle>, Integer> vehPassengers = new HashMap<>();
 	private StringBuffer occupancyRecord = new StringBuffer("time\tvehId\tStopId\tno.ofPassengersInVeh\n");
-	private final Set<Id> transitDrivers = new HashSet<Id>();
-	private final Set<Id> transitVehicles = new HashSet<Id>();
+	private final Set<Id<Person>> transitDrivers = new HashSet<>();
+	private final Set<Id<Vehicle>> transitVehicles = new HashSet<>();
 
 	public OccupancyAnalyzer(final int timeBinSize, final double maxTime) {
 		log.setLevel( Level.INFO ) ;
@@ -68,20 +71,20 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler, Perso
 		this.timeBinSize = timeBinSize;
 		this.maxTime = maxTime;
 		this.maxSlotIndex = ((int) this.maxTime) / this.timeBinSize + 1;
-		this.boards = new HashMap<Id, int[]>();
-		this.alights = new HashMap<Id, int[]>();
-		this.occupancies = new HashMap<Id, int[]>();
+		this.boards = new HashMap<>();
+		this.alights = new HashMap<>();
+		this.occupancies = new HashMap<>();
 	}
 
-	public void setBoards(Map<Id, int[]> boards) {
+	public void setBoards(Map<Id<TransitStopFacility>, int[]> boards) {
 		this.boards = boards;
 	}
 
-	public void setAlights(Map<Id, int[]> alights) {
+	public void setAlights(Map<Id<TransitStopFacility>, int[]> alights) {
 		this.alights = alights;
 	}
 
-	public void setOccupancies(Map<Id, int[]> occupancies) {
+	public void setOccupancies(Map<Id<TransitStopFacility>, int[]> occupancies) {
 		this.occupancies = occupancies;
 	}
 
@@ -116,7 +119,8 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler, Perso
 			return; // ignore transit drivers or persons entering non-transit vehicles
 		}
 		
-		Id vehId = event.getVehicleId(), stopId = this.vehStops.get(vehId);
+		Id<Vehicle> vehId = event.getVehicleId();
+		Id<TransitStopFacility> stopId = this.vehStops.get(vehId);
 		double time = event.getTime();
 		// --------------------------getOns---------------------------
 		int[] getOn = this.boards.get(stopId);
@@ -137,8 +141,8 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler, Perso
 			return; // ignore transit drivers or persons entering non-transit vehicles
 		}
 		
-		Id vehId = event.getVehicleId();
-		Id stopId = this.vehStops.get(vehId);
+		Id<Vehicle> vehId = event.getVehicleId();
+		Id<TransitStopFacility> stopId = this.vehStops.get(vehId);
 		double time = event.getTime();
 		// --------------------------getDowns---------------------------
 		int[] getDown = this.alights.get(stopId);
@@ -164,14 +168,14 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler, Perso
 
 	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-		Id stopId = event.getFacilityId();
+		Id<TransitStopFacility> stopId = event.getFacilityId();
 		this.vehStops.put(event.getVehicleId(), stopId);
 	}
 
 	@Override
 	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
-		Id stopId = event.getFacilityId();
-		Id vehId = event.getVehicleId();
+		Id<TransitStopFacility> stopId = event.getFacilityId();
+		Id<Vehicle> vehId = event.getVehicleId();
 		this.vehStops.remove(vehId);
 		// -----------------------occupancy--------------------------------
 		int[] occupancyAtStop = this.occupancies.get(stopId);
@@ -204,7 +208,7 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler, Perso
 	 *         <code>stopId</code> per time bin, starting with time bin 0 from 0
 	 *         seconds to (timeBinSize-1)seconds.
 	 */
-	public int[] getBoardVolumesForStop(final Id stopId) {
+	public int[] getBoardVolumesForStop(final Id<TransitStopFacility> stopId) {
 		int[] values = this.boards.get(stopId);
 		if (values == null) {
 			return new int[this.maxSlotIndex + 1];
@@ -218,7 +222,7 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler, Perso
 	 *         {@code stopId} per time bin, starting with time bin 0 from 0
 	 *         seconds to (timeBinSize-1)seconds.
 	 */
-	public int[] getAlightVolumesForStop(final Id stopId) {
+	public int[] getAlightVolumesForStop(final Id<TransitStopFacility> stopId) {
 		int[] values = this.alights.get(stopId);
 		if (values == null) {
 			return new int[this.maxSlotIndex + 1];
@@ -232,7 +236,7 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler, Perso
 	 *         transfer at the stop {@code stopId} per time bin, starting with
 	 *         time bin 0 from 0 seconds to (timeBinSize-1)seconds.
 	 */
-	public int[] getOccupancyVolumesForStop(final Id stopId) {
+	public int[] getOccupancyVolumesForStop(final Id<TransitStopFacility> stopId) {
 		int[] values = this.occupancies.get(stopId);
 		if (values == null) {
 			return new int[this.maxSlotIndex + 1];
@@ -244,7 +248,7 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler, Perso
 	 * @return Set of {@code Id}s containing all stop ids, where the agents
 	 *         boarded, for which counting-values are available.
 	 */
-	public Set<Id> getBoardStopIds() {
+	public Set<Id<TransitStopFacility>> getBoardStopIds() {
 		return this.boards.keySet();
 	}
 
@@ -252,11 +256,11 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler, Perso
 	 * @return Set of {@code Id}s containing all stop ids, where the agents
 	 *         alit, for which counting-values are available.
 	 */
-	public Set<Id> getAlightStopIds() {
+	public Set<Id<TransitStopFacility>> getAlightStopIds() {
 		return this.alights.keySet();
 	}
 
-	public Set<Id> getOccupancyStopIds() {
+	public Set<Id<TransitStopFacility>> getOccupancyStopIds() {
 		return this.occupancies.keySet();
 	}
 
@@ -264,8 +268,8 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler, Perso
 	 * @return Set of {@code Id}s containing all stop ids, where the agents alit
 	 *         or/and boarded, for which counting-values are available.
 	 */
-	public Set<Id> getAllStopIds() {
-		Set<Id> allStopIds = new TreeSet<Id>();
+	public Set<Id<TransitStopFacility>> getAllStopIds() {
+		Set<Id<TransitStopFacility>> allStopIds = new TreeSet<>();
 		allStopIds.addAll(getBoardStopIds());
 		allStopIds.addAll(getAlightStopIds());
 		allStopIds.addAll(getOccupancyStopIds());
@@ -287,7 +291,7 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler, Perso
 		}
 		writer.writeln();
 		// write content
-		for (Id stopId : getAllStopIds()) {
+		for (Id<TransitStopFacility> stopId : getAllStopIds()) {
 			writer.write(stopId + "\t");
 
 			int[] board = this.boards.get(stopId);

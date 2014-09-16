@@ -23,7 +23,6 @@ package org.matsim.pt.transitSchedule;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestCase;
@@ -43,12 +42,12 @@ public class TransitStopFacilityTest extends MatsimTestCase {
 	 * @param coord
 	 * @return a new instance of a TransitStopFacility with the given attributes
 	 */
-	protected TransitStopFacility createTransitStopFacility(final Id id, final Coord coord, final boolean isBlockingLane) {
+	protected TransitStopFacility createTransitStopFacility(final Id<TransitStopFacility> id, final Coord coord, final boolean isBlockingLane) {
 		return new TransitStopFacilityImpl(id, coord, isBlockingLane);
 	}
 
 	public void testInitialization() {
-		Id id = new IdImpl(2491);
+		Id<TransitStopFacility> id = Id.create(2491, TransitStopFacility.class);
 		Coord coord = new CoordImpl(30, 5);
 		TransitStopFacility stop = createTransitStopFacility(id, coord, false);
 		assertEquals(id.toString(), stop.getId().toString());
@@ -58,7 +57,7 @@ public class TransitStopFacilityTest extends MatsimTestCase {
 	}
 
 	public void testBlockingStop() {
-		Id id = new IdImpl(2491);
+		Id<TransitStopFacility> id = Id.create(2491, TransitStopFacility.class);
 		Coord coord = new CoordImpl(30, 5);
 		TransitStopFacility stop = createTransitStopFacility(id, coord, false);
 		assertFalse(stop.getIsBlockingLane());
@@ -67,11 +66,11 @@ public class TransitStopFacilityTest extends MatsimTestCase {
 	}
 
 	public void testLink() {
-		Id id = new IdImpl(2491);
+		Id<TransitStopFacility> id = Id.create(2491, TransitStopFacility.class);
 		Coord coord = new CoordImpl(30, 5);
 		TransitStopFacility stop = createTransitStopFacility(id, coord, false);
 		assertNull(stop.getLinkId());
-		Link link = new FakeLink(new IdImpl(99), null, null);
+		Link link = new FakeLink(Id.create(99, Link.class), null, null);
 		stop.setLinkId(link.getId());
 		assertEquals(link.getId(), stop.getLinkId());
 		stop.setLinkId(null);
@@ -79,7 +78,7 @@ public class TransitStopFacilityTest extends MatsimTestCase {
 	}
 
 	public void testName() {
-		Id id = new IdImpl(9791);
+		Id<TransitStopFacility> id = Id.create(9791, TransitStopFacility.class);
 		Coord coord = new CoordImpl(10, 5);
 		TransitStopFacility stop = createTransitStopFacility(id, coord, false);
 		assertNull(stop.getName());

@@ -24,9 +24,10 @@ import java.util.List;
 import java.util.Vector;
 
 import org.junit.Rule;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -84,7 +85,7 @@ public abstract class PtCountsFixture {
 	public List<CountSimComparison> ceateCountSimCompList() {
 		List<CountSimComparison> csc_l = new Vector<CountSimComparison>(24);
 		for (int i = 0; i < 24; i++) {
-			csc_l.add(new CountSimComparisonImpl(new IdImpl(100), i + 1, 1.0,1.0));
+			csc_l.add(new CountSimComparisonImpl(Id.create(100, Link.class), i + 1, 1.0,1.0));
 		}
 		return csc_l;
 	}

@@ -28,11 +28,11 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.router.util.RoutingNetworkLink;
 import org.matsim.core.router.util.TravelTime;
@@ -41,6 +41,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
 import org.matsim.pt.router.util.FastTransitDijkstraFactory;
+import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -148,10 +149,12 @@ public class FastTransitRouterCustomDataTest {
 			return val;
 		}
 		
+		@Override
 		public double getTravelDisutility(Person person, Coord coord, Coord toCoord) {
 			return routerDisutility.getTravelDisutility(person, coord, toCoord);
 		}
 
+		@Override
 		public double getTravelTime(Person person, Coord coord, Coord toCoord) {
 			return routerDisutility.getTravelTime(person, coord, toCoord);
 		}
@@ -191,11 +194,11 @@ public class FastTransitRouterCustomDataTest {
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		TransitScheduleFactory f = schedule.getFactory();
 		
-		TransitStopFacility f1 = f.createTransitStopFacility(new IdImpl("1"), new CoordImpl(0, 0), false);
-		TransitStopFacility f2 = f.createTransitStopFacility(new IdImpl("2"), new CoordImpl(500, 500), false);
-		TransitStopFacility f3 = f.createTransitStopFacility(new IdImpl("3"), new CoordImpl(1000, 0), false);
-		TransitStopFacility f4 = f.createTransitStopFacility(new IdImpl("4"), new CoordImpl(1500, 500), false);
-		TransitStopFacility f5 = f.createTransitStopFacility(new IdImpl("5"), new CoordImpl(2000, 0), false);
+		TransitStopFacility f1 = f.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new CoordImpl(0, 0), false);
+		TransitStopFacility f2 = f.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new CoordImpl(500, 500), false);
+		TransitStopFacility f3 = f.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new CoordImpl(1000, 0), false);
+		TransitStopFacility f4 = f.createTransitStopFacility(Id.create("4", TransitStopFacility.class), new CoordImpl(1500, 500), false);
+		TransitStopFacility f5 = f.createTransitStopFacility(Id.create("5", TransitStopFacility.class), new CoordImpl(2000, 0), false);
 		
 		schedule.addStopFacility(f1);
 		schedule.addStopFacility(f2);
@@ -203,26 +206,26 @@ public class FastTransitRouterCustomDataTest {
 		schedule.addStopFacility(f4);
 		schedule.addStopFacility(f5);
 		
-		TransitLine line1 = f.createTransitLine(new IdImpl("1"));
+		TransitLine line1 = f.createTransitLine(Id.create("1", TransitLine.class));
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 		stops.add(f.createTransitRouteStop(f1, Time.UNDEFINED_TIME, 0.0));
 		stops.add(f.createTransitRouteStop(f2, Time.UNDEFINED_TIME, 300.0));
 		stops.add(f.createTransitRouteStop(f3, Time.UNDEFINED_TIME, 600.0));
 		stops.add(f.createTransitRouteStop(f4, Time.UNDEFINED_TIME, 900.0));
 		stops.add(f.createTransitRouteStop(f5, 1200.0, Time.UNDEFINED_TIME));
-		TransitRoute route1 = f.createTransitRoute(new IdImpl("1"), null, stops, "pt");
+		TransitRoute route1 = f.createTransitRoute(Id.create("1", TransitRoute.class), null, stops, "pt");
 		line1.addRoute(route1);
 		schedule.addTransitLine(line1);
-		route1.addDeparture(f.createDeparture(new IdImpl("1"), 6.0*3600));
+		route1.addDeparture(f.createDeparture(Id.create("1", Departure.class), 6.0*3600));
 		
-		TransitLine line2 = f.createTransitLine(new IdImpl("2"));
+		TransitLine line2 = f.createTransitLine(Id.create("2", TransitLine.class));
 		List<TransitRouteStop> stops2 = new ArrayList<TransitRouteStop>();
 		stops2.add(f.createTransitRouteStop(f1, Time.UNDEFINED_TIME, 0.0));
 		stops2.add(f.createTransitRouteStop(f3, Time.UNDEFINED_TIME, 750.0));
 		stops2.add(f.createTransitRouteStop(f5, 1100.0, Time.UNDEFINED_TIME));
-		TransitRoute route2 = f.createTransitRoute(new IdImpl("2"), null, stops2, "pt");
+		TransitRoute route2 = f.createTransitRoute(Id.create("2", TransitRoute.class), null, stops2, "pt");
 		line2.addRoute(route2);
 		schedule.addTransitLine(line2);
-		route2.addDeparture(f.createDeparture(new IdImpl("2"), 6.0*3600 - 60));
+		route2.addDeparture(f.createDeparture(Id.create("2", Departure.class), 6.0*3600 - 60));
 	}
 }

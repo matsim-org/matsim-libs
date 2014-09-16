@@ -26,7 +26,7 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
@@ -51,7 +51,7 @@ public class FakeAgent implements MobsimDriverAgent, PTPassengerAgent {
 
 	private final TransitStopFacility exitStop;
 	private final Leg dummyLeg;
-	private final PersonImpl dummyPerson = new PersonImpl(new IdImpl(1));
+	private final PersonImpl dummyPerson = new PersonImpl(Id.create(1, Person.class));
 	// as long as all instance variables are final, the "resetCaches" method can remain empty.  kai, oct'10
 
 	/**

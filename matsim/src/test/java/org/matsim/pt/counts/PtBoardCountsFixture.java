@@ -24,8 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 public class PtBoardCountsFixture extends PtCountsFixture {
 
@@ -35,15 +35,15 @@ public class PtBoardCountsFixture extends PtCountsFixture {
 
 	@Override
 	public CountsComparisonAlgorithm getCCA() {
-		Map<Id, int[]> boards = new HashMap<Id, int[]>();
+		Map<Id<TransitStopFacility>, int[]> boards = new HashMap<>();
 		int[] boardArray = new int[24];
 		boardArray[8] = 65;
-		boards.put(new IdImpl("stop1"), boardArray);
+		boards.put(Id.create("stop1", TransitStopFacility.class), boardArray);
 		this.oa.setBoards(boards);
 		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(new CountsComparisonAlgorithm.VolumesForId() {
 			
 			@Override
-			public double[] getVolumesForStop(Id locationId) {
+			public double[] getVolumesForStop(Id<TransitStopFacility> locationId) {
 				return copyFromIntArray(oa.getBoardVolumesForStop(locationId));
 			}
 			

@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -44,6 +43,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.xml.sax.SAXException;
 
@@ -116,32 +116,32 @@ public class OccupancyAnalyzerTest {
 		QSim sim = (QSim) new QSimFactory().createMobsim(f.scenario, eventsManager);
 		sim.run();
 
-		Set<Id> enterStops = oa.getBoardStopIds();
+		Set<Id<TransitStopFacility>> enterStops = oa.getBoardStopIds();
 		Assert.assertEquals(1, enterStops.size());
-		Assert.assertTrue(enterStops.contains(new IdImpl(2)));
+		Assert.assertTrue(enterStops.contains(Id.create(2, TransitStopFacility.class)));
 
-		Set<Id> exitStops = oa.getAlightStopIds();
+		Set<Id<TransitStopFacility>> exitStops = oa.getAlightStopIds();
 		Assert.assertEquals(1, exitStops.size());
-		Assert.assertTrue(exitStops.contains(new IdImpl(4)));
+		Assert.assertTrue(exitStops.contains(Id.create(4, TransitStopFacility.class)));
 		
-		int[] occupancy = oa.getOccupancyVolumesForStop(new IdImpl(1));
+		int[] occupancy = oa.getOccupancyVolumesForStop(Id.create(1, TransitStopFacility.class));
 		Assert.assertEquals(0, occupancy[6]);
-		occupancy = oa.getOccupancyVolumesForStop(new IdImpl(2));
+		occupancy = oa.getOccupancyVolumesForStop(Id.create(2, TransitStopFacility.class));
 		Assert.assertEquals(1, occupancy[6]);
-		occupancy = oa.getOccupancyVolumesForStop(new IdImpl(3));
+		occupancy = oa.getOccupancyVolumesForStop(Id.create(3, TransitStopFacility.class));
 		Assert.assertEquals(1, occupancy[6]);
-		occupancy = oa.getOccupancyVolumesForStop(new IdImpl(4));
+		occupancy = oa.getOccupancyVolumesForStop(Id.create(4, TransitStopFacility.class));
 		Assert.assertEquals(0, occupancy[6]);
 		
-		Assert.assertEquals(0, oa.getBoardVolumesForStop(new IdImpl(1))[6]);
-		Assert.assertEquals(1, oa.getBoardVolumesForStop(new IdImpl(2))[6]);
-		Assert.assertEquals(0, oa.getBoardVolumesForStop(new IdImpl(3))[6]);
-		Assert.assertEquals(0, oa.getBoardVolumesForStop(new IdImpl(4))[6]);
+		Assert.assertEquals(0, oa.getBoardVolumesForStop(Id.create(1, TransitStopFacility.class))[6]);
+		Assert.assertEquals(1, oa.getBoardVolumesForStop(Id.create(2, TransitStopFacility.class))[6]);
+		Assert.assertEquals(0, oa.getBoardVolumesForStop(Id.create(3, TransitStopFacility.class))[6]);
+		Assert.assertEquals(0, oa.getBoardVolumesForStop(Id.create(4, TransitStopFacility.class))[6]);
 
-		Assert.assertEquals(0, oa.getAlightVolumesForStop(new IdImpl(1))[6]);
-		Assert.assertEquals(0, oa.getAlightVolumesForStop(new IdImpl(2))[6]);
-		Assert.assertEquals(0, oa.getAlightVolumesForStop(new IdImpl(3))[6]);
-		Assert.assertEquals(1, oa.getAlightVolumesForStop(new IdImpl(4))[6]);
+		Assert.assertEquals(0, oa.getAlightVolumesForStop(Id.create(1, TransitStopFacility.class))[6]);
+		Assert.assertEquals(0, oa.getAlightVolumesForStop(Id.create(2, TransitStopFacility.class))[6]);
+		Assert.assertEquals(0, oa.getAlightVolumesForStop(Id.create(3, TransitStopFacility.class))[6]);
+		Assert.assertEquals(1, oa.getAlightVolumesForStop(Id.create(4, TransitStopFacility.class))[6]);
 	}
 	
 	private static class Fixture {

@@ -20,7 +20,7 @@
 
 package org.matsim.pt.transitSchedule;
 
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -36,7 +36,7 @@ public class TransitRouteStopTest extends MatsimTestCase {
 	}
 
 	public void testInitialization() {
-		TransitStopFacility stopFacility = new TransitStopFacilityImpl(new IdImpl(1), new CoordImpl(2, 3), false);
+		TransitStopFacility stopFacility = new TransitStopFacilityImpl(Id.create(1, TransitStopFacility.class), new CoordImpl(2, 3), false);
 		double arrivalDelay = 4;
 		double departureDelay = 5;
 		TransitRouteStop routeStop = createTransitRouteStop(stopFacility, arrivalDelay, departureDelay);
@@ -46,8 +46,8 @@ public class TransitRouteStopTest extends MatsimTestCase {
 	}
 
 	public void testStopFacility() {
-		TransitStopFacility stopFacility1 = new TransitStopFacilityImpl(new IdImpl(1), new CoordImpl(2, 3), false);
-		TransitStopFacility stopFacility2 = new TransitStopFacilityImpl(new IdImpl(2), new CoordImpl(3, 4), false);
+		TransitStopFacility stopFacility1 = new TransitStopFacilityImpl(Id.create(1, TransitStopFacility.class), new CoordImpl(2, 3), false);
+		TransitStopFacility stopFacility2 = new TransitStopFacilityImpl(Id.create(2, TransitStopFacility.class), new CoordImpl(3, 4), false);
 		double arrivalDelay = 4;
 		double departureDelay = 5;
 		TransitRouteStop routeStop = createTransitRouteStop(stopFacility1, arrivalDelay, departureDelay);
@@ -57,7 +57,7 @@ public class TransitRouteStopTest extends MatsimTestCase {
 	}
 
 	public void testAwaitDepartureTime() {
-		TransitStopFacility stopFacility = new TransitStopFacilityImpl(new IdImpl(1), new CoordImpl(2, 3), false);
+		TransitStopFacility stopFacility = new TransitStopFacilityImpl(Id.create(1, TransitStopFacility.class), new CoordImpl(2, 3), false);
 		double arrivalDelay = 4;
 		double departureDelay = 5;
 		TransitRouteStop routeStop = createTransitRouteStop(stopFacility, arrivalDelay, departureDelay);
@@ -69,8 +69,8 @@ public class TransitRouteStopTest extends MatsimTestCase {
 	}
 	
 	public void testEquals() {
-		TransitStopFacility stopFacility1 = new TransitStopFacilityImpl(new IdImpl(1), new CoordImpl(2, 3), false);
-		TransitStopFacility stopFacility2 = new TransitStopFacilityImpl(new IdImpl(2), new CoordImpl(3, 4), false);
+		TransitStopFacility stopFacility1 = new TransitStopFacilityImpl(Id.create(1, TransitStopFacility.class), new CoordImpl(2, 3), false);
+		TransitStopFacility stopFacility2 = new TransitStopFacilityImpl(Id.create(2, TransitStopFacility.class), new CoordImpl(3, 4), false);
 		TransitRouteStop stop1 = createTransitRouteStop(stopFacility1, 10, 50);
 		TransitRouteStop stop2 = createTransitRouteStop(stopFacility1, 10, 50);
 		TransitRouteStop stop3 = createTransitRouteStop(stopFacility2, 10, 50);

@@ -21,6 +21,7 @@
 package org.matsim.counts;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 
 /**
  * Implementation of the CountSimComparison Interface.
@@ -39,7 +40,7 @@ public class CountSimComparisonImpl implements CountSimComparison {
 	/**
 	 * the Id of the link
 	 */
-	private final Id id;
+	private final Id<Link> id;
 
 	/**
 	 * @param id
@@ -47,7 +48,7 @@ public class CountSimComparisonImpl implements CountSimComparison {
 	 * @param countValue2
 	 * @param simValue
 	 */
-	public CountSimComparisonImpl(final Id id, final int hour, final double countValue2, final double simValue) {
+	public CountSimComparisonImpl(final Id<Link> id, final int hour, final double countValue2, final double simValue) {
 		this.id = id;
 		this.hour = hour;
 		this.countValue = countValue2;
@@ -91,7 +92,7 @@ public class CountSimComparisonImpl implements CountSimComparison {
 	 * @see org.matsim.counts.CountSimComparison#getId()
 	 */
 	@Override
-	public Id getId() {
+	public Id<Link> getId() {
 		return this.id;
 	}
 

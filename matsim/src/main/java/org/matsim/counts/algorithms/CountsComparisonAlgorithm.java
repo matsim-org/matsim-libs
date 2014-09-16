@@ -37,6 +37,7 @@ import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.CountSimComparisonImpl;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * This algorithm can be used to obtain a List of CountSimComparison objects from the
@@ -48,7 +49,7 @@ import org.matsim.counts.Volume;
 public class CountsComparisonAlgorithm {
 
 	public static interface VolumesForId {
-		double[] getVolumesForStop(Id locationId);
+		double[] getVolumesForStop(Id<TransitStopFacility> locationId);
 	}
 	
 	public static interface DistanceFilter {

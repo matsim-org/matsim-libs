@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -108,14 +107,14 @@ public class CreatePseudoNetwork {
 
 		Node fromNode = this.nodes.get(fromFacility);
 		if (fromNode == null) {
-			fromNode = this.network.getFactory().createNode(new IdImpl(this.prefix + toFacility.getId()), fromFacility.getCoord());
+			fromNode = this.network.getFactory().createNode(Id.create(this.prefix + toFacility.getId(), Node.class), fromFacility.getCoord());
 			this.network.addNode(fromNode);
 			this.nodes.put(toFacility, fromNode);
 		}
 
 		Node toNode = this.nodes.get(toFacility);
 		if (toNode == null) {
-			toNode = this.network.getFactory().createNode(new IdImpl(this.prefix + toFacility.getId()), toFacility.getCoord());
+			toNode = this.network.getFactory().createNode(Id.create(this.prefix + toFacility.getId(), Node.class), toFacility.getCoord());
 			this.network.addNode(toNode);
 			this.nodes.put(toFacility, toNode);
 		}
@@ -134,7 +133,7 @@ public class CreatePseudoNetwork {
 					copies = new ArrayList<TransitStopFacility>();
 					this.facilityCopies.put(toFacility, copies);
 				}
-				IdImpl newId = new IdImpl(toFacility.getId().toString() + "." + Integer.toString(copies.size() + 1));
+				Id<TransitStopFacility> newId = Id.create(toFacility.getId().toString() + "." + Integer.toString(copies.size() + 1), TransitStopFacility.class);
 				TransitStopFacility newFacility = this.schedule.getFactory().createTransitStopFacility(newId, toFacility.getCoord(), toFacility.getIsBlockingLane());
 				newFacility.setStopPostAreaId(toFacility.getId());
 				newFacility.setLinkId(link.getId());
@@ -154,7 +153,7 @@ public class CreatePseudoNetwork {
 	private Link createAndAddLink(Node fromNode, Node toNode,
 			Tuple<Node, Node> connection) {
 		Link link;
-		link = this.network.getFactory().createLink(new IdImpl(this.prefix + this.linkIdCounter++), fromNode, toNode);
+		link = this.network.getFactory().createLink(Id.create(this.prefix + this.linkIdCounter++, Link.class), fromNode, toNode);
 		if (fromNode == toNode) {
 			link.setLength(50);
 		} else {

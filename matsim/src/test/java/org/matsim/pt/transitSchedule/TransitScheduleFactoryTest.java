@@ -28,7 +28,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -60,7 +60,7 @@ public class TransitScheduleFactoryTest {
 	@Test
 	public void testCreateTransitLine() {
 		TransitScheduleFactory builder = createTransitScheduleBuilder();
-		Id id = new IdImpl(1);
+		Id<TransitLine> id = Id.create(1, TransitLine.class);
 		TransitLine line = builder.createTransitLine(id);
 		Assert.assertEquals(id, line.getId());
 	}
@@ -68,8 +68,8 @@ public class TransitScheduleFactoryTest {
 	@Test
 	public void testCreateTransitRoute() {
 		TransitScheduleFactory builder = createTransitScheduleBuilder();
-		Id id = new IdImpl(2);
-		NetworkRoute route = new LinkNetworkRouteImpl(new IdImpl(3), new IdImpl(4));
+		Id<TransitRoute> id = Id.create(2, TransitRoute.class);
+		NetworkRoute route = new LinkNetworkRouteImpl(Id.create(3, Link.class), Id.create(4, Link.class));
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 		TransitRouteStop stop1 = new TransitRouteStopImpl(null, 50, 60);
 		stops.add(stop1);
@@ -85,7 +85,7 @@ public class TransitScheduleFactoryTest {
 	@Test
 	public void testCreateTransitRouteStop() {
 		TransitScheduleFactory builder = createTransitScheduleBuilder();
-		TransitStopFacility stopFacility = new TransitStopFacilityImpl(new IdImpl(5), new CoordImpl(6, 6), false);
+		TransitStopFacility stopFacility = new TransitStopFacilityImpl(Id.create(5, TransitStopFacility.class), new CoordImpl(6, 6), false);
 		double arrivalOffset = 23;
 		double departureOffset = 42;
 		TransitRouteStop stop = builder.createTransitRouteStop(stopFacility, 23, 42);
@@ -97,9 +97,9 @@ public class TransitScheduleFactoryTest {
 	@Test
 	public void testCreateTransitStopFacility() {
 		TransitScheduleFactory builder = createTransitScheduleBuilder();
-		Id id1 = new IdImpl(6);
+		Id<TransitStopFacility> id1 = Id.create(6, TransitStopFacility.class);
 		Coord coord1 = new CoordImpl(511, 1980);
-		Id id2 = new IdImpl(7);
+		Id<TransitStopFacility> id2 = Id.create(7, TransitStopFacility.class);
 		Coord coord2 = new CoordImpl(105, 1979);
 		TransitStopFacility stopFacility1 = builder.createTransitStopFacility(id1, coord1, false);
 		Assert.assertEquals(id1, stopFacility1.getId());
@@ -116,7 +116,7 @@ public class TransitScheduleFactoryTest {
 	@Test
 	public void testCreateDeparture() {
 		TransitScheduleFactory builder = createTransitScheduleBuilder();
-		Id id = new IdImpl(8);
+		Id<Departure> id = Id.create(8, Departure.class);
 		double time = 9.0*3600;
 		Departure dep = builder.createDeparture(id, time);
 		Assert.assertEquals(id, dep.getId());

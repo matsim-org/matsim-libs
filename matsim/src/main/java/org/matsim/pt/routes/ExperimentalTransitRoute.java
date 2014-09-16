@@ -21,7 +21,7 @@
 package org.matsim.pt.routes;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -33,13 +33,13 @@ public class ExperimentalTransitRoute extends GenericRouteImpl {
 	private final static String SEPARATOR = "===";
 	private final static String IDENTIFIER_1 = "PT1" + SEPARATOR;
 
-	private Id accessStopId = null;
-	private Id egressStopId = null;
-	private Id lineId = null;
-	private Id routeId = null;
+	private Id<TransitStopFacility> accessStopId = null;
+	private Id<TransitStopFacility> egressStopId = null;
+	private Id<TransitLine> lineId = null;
+	private Id<TransitRoute> routeId = null;
 	private String description = null;
 
-	/*package*/ ExperimentalTransitRoute(final Id startLinkId, final Id endLinkId) {
+	/*package*/ ExperimentalTransitRoute(final Id<Link> startLinkId, final Id<Link> endLinkId) {
 		super(startLinkId, endLinkId);
 	}
 
@@ -56,31 +56,31 @@ public class ExperimentalTransitRoute extends GenericRouteImpl {
 		return (ExperimentalTransitRoute) super.clone();
 	}
 
-	public Id getAccessStopId() {
+	public Id<TransitStopFacility> getAccessStopId() {
 		return this.accessStopId;
 	}
 
-	public Id getEgressStopId() {
+	public Id<TransitStopFacility> getEgressStopId() {
 		return this.egressStopId;
 	}
 
-	public Id getLineId() {
+	public Id<TransitLine> getLineId() {
 		return this.lineId;
 	}
 
-	public Id getRouteId() {
+	public Id<TransitRoute> getRouteId() {
 		return this.routeId;
 	}
 
 	@Override
-	public void setRouteDescription(final Id startLinkId, final String routeDescription, final Id endLinkId) {
+	public void setRouteDescription(final Id<Link> startLinkId, final String routeDescription, final Id<Link> endLinkId) {
 		super.setRouteDescription(startLinkId, routeDescription, endLinkId);
 		if (routeDescription.startsWith(IDENTIFIER_1)) {
 			String[] parts = routeDescription.split(SEPARATOR, 6);//StringUtils.explode(routeDescription, '\t', 6);
-			this.accessStopId = new IdImpl(parts[1]);
-			this.lineId = new IdImpl(parts[2]);
-			this.routeId = new IdImpl(parts[3]);
-			this.egressStopId = new IdImpl(parts[4]);
+			this.accessStopId = Id.create(parts[1], TransitStopFacility.class);
+			this.lineId = Id.create(parts[2], TransitLine.class);
+			this.routeId = Id.create(parts[3], TransitRoute.class);
+			this.egressStopId = Id.create(parts[4], TransitStopFacility.class);
 			if (parts.length > 5) {
 				this.description = parts[5];
 			} else {

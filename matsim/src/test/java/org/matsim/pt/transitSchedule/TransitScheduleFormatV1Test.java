@@ -29,7 +29,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -43,6 +42,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.vehicles.Vehicle;
 import org.xml.sax.SAXException;
 
 
@@ -59,23 +59,23 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 	public void testWriteRead() throws IOException, SAXException, ParserConfigurationException {
 		// prepare required data
 		NetworkImpl network = NetworkImpl.createNetwork();
-		Node n1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
-		Node n2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(0, 0));
-		Node n3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(0, 0));
-		Node n4 = network.createAndAddNode(new IdImpl("4"), new CoordImpl(0, 0));
-		Node n5 = network.createAndAddNode(new IdImpl("5"), new CoordImpl(0, 0));
-		Link l1 = network.createAndAddLink(new IdImpl("1"), n1, n2, 1000, 10, 3600, 1.0);
-		Link l2 = network.createAndAddLink(new IdImpl("2"), n2, n3, 1000, 10, 3600, 1.0);
-		Link l3 = network.createAndAddLink(new IdImpl("3"), n3, n4, 1000, 10, 3600, 1.0);
-		Link l4 = network.createAndAddLink(new IdImpl("4"), n4, n5, 1000, 10, 3600, 1.0);
+		Node n1 = network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(0, 0));
+		Node n2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(0, 0));
+		Node n3 = network.createAndAddNode(Id.create("3", Node.class), new CoordImpl(0, 0));
+		Node n4 = network.createAndAddNode(Id.create("4", Node.class), new CoordImpl(0, 0));
+		Node n5 = network.createAndAddNode(Id.create("5", Node.class), new CoordImpl(0, 0));
+		Link l1 = network.createAndAddLink(Id.create("1", Link.class), n1, n2, 1000, 10, 3600, 1.0);
+		Link l2 = network.createAndAddLink(Id.create("2", Link.class), n2, n3, 1000, 10, 3600, 1.0);
+		Link l3 = network.createAndAddLink(Id.create("3", Link.class), n3, n4, 1000, 10, 3600, 1.0);
+		Link l4 = network.createAndAddLink(Id.create("4", Link.class), n4, n5, 1000, 10, 3600, 1.0);
 
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule1 = builder.createTransitSchedule();
 
-		TransitStopFacility stop1 = builder.createTransitStopFacility(new IdImpl("stop1"), new CoordImpl(0, 0), false);
-		TransitStopFacility stop2 = builder.createTransitStopFacility(new IdImpl("stop2"), new CoordImpl(1000, 0), true);
-		TransitStopFacility stop3 = builder.createTransitStopFacility(new IdImpl("stop3"), new CoordImpl(1000, 1000), true);
-		TransitStopFacility stop4 = builder.createTransitStopFacility(new IdImpl("stop4"), new CoordImpl(0, 1000), false);
+		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("stop1", TransitStopFacility.class), new CoordImpl(0, 0), false);
+		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("stop2", TransitStopFacility.class), new CoordImpl(1000, 0), true);
+		TransitStopFacility stop3 = builder.createTransitStopFacility(Id.create("stop3", TransitStopFacility.class), new CoordImpl(1000, 1000), true);
+		TransitStopFacility stop4 = builder.createTransitStopFacility(Id.create("stop4", TransitStopFacility.class), new CoordImpl(0, 1000), false);
 		stop2.setName("S + U Nirgendwo");
 		stop4.setName("Irgendwo");
 		schedule1.addStopFacility(stop1);
@@ -92,18 +92,18 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 		stops.add(routeStop3);
 		stops.add(builder.createTransitRouteStop(stop4, 400, Time.UNDEFINED_TIME));
 
-		TransitRoute route1 = builder.createTransitRoute(new IdImpl(1), null, stops, "bus");
+		TransitRoute route1 = builder.createTransitRoute(Id.create(1, TransitRoute.class), null, stops, "bus");
 		route1.setDescription("Just a comment.");
 
-		route1.addDeparture(builder.createDeparture(new IdImpl("2"), 7.0*3600));
-		Departure dep = builder.createDeparture(new IdImpl("4"), 7.0*3600 + 300);
-		dep.setVehicleId(new IdImpl("86"));
+		route1.addDeparture(builder.createDeparture(Id.create("2", Departure.class), 7.0*3600));
+		Departure dep = builder.createDeparture(Id.create("4", Departure.class), 7.0*3600 + 300);
+		dep.setVehicleId(Id.create("86", Vehicle.class));
 		route1.addDeparture(dep);
-		dep = builder.createDeparture(new IdImpl("7"), 7.0*3600 + 600);
-		dep.setVehicleId(new IdImpl("19"));
+		dep = builder.createDeparture(Id.create("7", Departure.class), 7.0*3600 + 600);
+		dep.setVehicleId(Id.create("19", Vehicle.class));
 		route1.addDeparture(dep);
 
-		TransitLine line1 = builder.createTransitLine(new IdImpl("8"));
+		TransitLine line1 = builder.createTransitLine(Id.create("8", TransitLine.class));
 		line1.addRoute(route1);
 
 		schedule1.addTransitLine(line1);
@@ -124,7 +124,7 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 		links.add(l2.getId());
 		links.add(l3.getId());
 		route.setLinkIds(l1.getId(), links, l4.getId());
-		TransitRoute route2 = builder.createTransitRoute(new IdImpl(2), route, stops, "bus");
+		TransitRoute route2 = builder.createTransitRoute(Id.create(2, TransitRoute.class), route, stops, "bus");
 		line1.addRoute(route2);
 		stop1.setLinkId(l1.getId());
 

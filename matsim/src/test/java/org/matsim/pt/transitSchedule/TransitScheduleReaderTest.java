@@ -28,8 +28,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -66,12 +66,12 @@ public class TransitScheduleReaderTest extends MatsimTestCase {
 		new TransitScheduleReaderV1(schedule, network).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 
 		assertEquals("wrong number of transit lines.", 1, schedule.getTransitLines().size());
-		assertEquals("wrong line id.", new IdImpl("T1"), schedule.getTransitLines().keySet().iterator().next());
+		assertEquals("wrong line id.", Id.create("T1", TransitLine.class), schedule.getTransitLines().keySet().iterator().next());
 
-		TransitLine lineT1 = schedule.getTransitLines().get(new IdImpl("T1"));
+		TransitLine lineT1 = schedule.getTransitLines().get(Id.create("T1", TransitLine.class));
 		assertNotNull("could not find line with id T1.", lineT1);
 
-		TransitRoute route1 = lineT1.getRoutes().get(new IdImpl("1"));
+		TransitRoute route1 = lineT1.getRoutes().get(Id.create("1", TransitRoute.class));
 		assertNotNull("could not find route 1 in line T1.", route1);
 
 		Map<Id<Departure>, Departure> departures = route1.getDepartures();
@@ -84,8 +84,8 @@ public class TransitScheduleReaderTest extends MatsimTestCase {
 
 		NetworkRoute route = route1.getRoute();
 		assertNotNull("could not get route.", route);
-		assertEquals("wrong start link.", network.getLinks().get(new IdImpl("1")).getId(), route.getStartLinkId());
-		assertEquals("wrong end link.", network.getLinks().get(new IdImpl("8")).getId(), route.getEndLinkId());
+		assertEquals("wrong start link.", network.getLinks().get(Id.create("1", Link.class)).getId(), route.getStartLinkId());
+		assertEquals("wrong end link.", network.getLinks().get(Id.create("8", Link.class)).getId(), route.getEndLinkId());
 		assertEquals("wrong number of links in route.", 4, route.getLinkIds().size());
 	}
 

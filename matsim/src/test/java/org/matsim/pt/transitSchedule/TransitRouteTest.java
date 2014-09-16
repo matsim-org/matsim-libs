@@ -26,7 +26,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -60,9 +59,9 @@ public class TransitRouteTest extends MatsimTestCase {
 	}
 
 	public void testInitialization() {
-		Id id = new IdImpl(9791);
-		Link fromLink = new FakeLink(new IdImpl(10), null, null);
-		Link toLink = new FakeLink(new IdImpl(5), null, null);
+		Id<TransitRoute> id = Id.create(9791, TransitRoute.class);
+		Link fromLink = new FakeLink(Id.create(10, Link.class), null, null);
+		Link toLink = new FakeLink(Id.create(5, Link.class), null, null);
 		NetworkRoute route = new LinkNetworkRouteImpl(fromLink.getId(), toLink.getId());
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 		TransitRouteStop stop = new TransitRouteStopImpl(null, 50, 60);
@@ -98,9 +97,9 @@ public class TransitRouteTest extends MatsimTestCase {
 
 	public void testAddDepartures() {
 		Fixture f = new Fixture();
-		Departure dep1 = new DepartureImpl(new IdImpl(1), 7.0*3600);
-		Departure dep2 = new DepartureImpl(new IdImpl(2), 8.0*3600);
-		Departure dep3 = new DepartureImpl(new IdImpl(3), 9.0*3600);
+		Departure dep1 = new DepartureImpl(Id.create(1, Departure.class), 7.0*3600);
+		Departure dep2 = new DepartureImpl(Id.create(2, Departure.class), 8.0*3600);
+		Departure dep3 = new DepartureImpl(Id.create(3, Departure.class), 9.0*3600);
 		assertEquals(0, f.tRoute.getDepartures().size());
 		f.tRoute.addDeparture(dep1);
 		assertEquals(1, f.tRoute.getDepartures().size());
@@ -117,8 +116,8 @@ public class TransitRouteTest extends MatsimTestCase {
 
 	public void testAddDeparturesException() {
 		Fixture f = new Fixture();
-		Departure dep1a = new DepartureImpl(new IdImpl(1), 7.0*3600);
-		Departure dep1b = new DepartureImpl(new IdImpl(1), 7.0*3600);
+		Departure dep1a = new DepartureImpl(Id.create(1, Departure.class), 7.0*3600);
+		Departure dep1b = new DepartureImpl(Id.create(1, Departure.class), 7.0*3600);
 		assertEquals(0, f.tRoute.getDepartures().size());
 		f.tRoute.addDeparture(dep1a);
 		assertEquals(1, f.tRoute.getDepartures().size());
@@ -133,8 +132,8 @@ public class TransitRouteTest extends MatsimTestCase {
 
 	public void testRemoveDepartures() {
 		Fixture f = new Fixture();
-		Departure dep1 = new DepartureImpl(new IdImpl(1), 7.0*3600);
-		Departure dep2 = new DepartureImpl(new IdImpl(2), 8.0*3600);
+		Departure dep1 = new DepartureImpl(Id.create(1, Departure.class), 7.0*3600);
+		Departure dep2 = new DepartureImpl(Id.create(2, Departure.class), 8.0*3600);
 
 		f.tRoute.addDeparture(dep1);
 		f.tRoute.addDeparture(dep2);
@@ -159,7 +158,7 @@ public class TransitRouteTest extends MatsimTestCase {
 
 	public void testGetDeparturesImmutable() {
 		Fixture f = new Fixture();
-		Departure dep1 = new DepartureImpl(new IdImpl(1), 7.0*3600);
+		Departure dep1 = new DepartureImpl(Id.create(1, Departure.class), 7.0*3600);
 		assertEquals(0, f.tRoute.getDepartures().size());
 		try {
 			f.tRoute.getDepartures().put(dep1.getId(), dep1);
@@ -172,9 +171,9 @@ public class TransitRouteTest extends MatsimTestCase {
 
 	public void testRoute() {
 		Fixture f = new Fixture();
-		Link link1 = new FakeLink(new IdImpl(1), null, null);
-		Link link2 = new FakeLink(new IdImpl(2), null, null);
-		Link link3 = new FakeLink(new IdImpl(3), null, null);
+		Link link1 = new FakeLink(Id.create(1, Link.class), null, null);
+		Link link2 = new FakeLink(Id.create(2, Link.class), null, null);
+		Link link3 = new FakeLink(Id.create(3, Link.class), null, null);
 		NetworkRoute route1 = new LinkNetworkRouteImpl(link1.getId(), link2.getId());
 		NetworkRoute route2 = new LinkNetworkRouteImpl(link1.getId(), link3.getId());
 
@@ -185,15 +184,15 @@ public class TransitRouteTest extends MatsimTestCase {
 	}
 
 	public void testStops() {
-		Id id = new IdImpl(9791);
-		Link fromLink = new FakeLink(new IdImpl(10), null, null);
-		Link toLink = new FakeLink(new IdImpl(5), null, null);
+		Id<TransitRoute> id = Id.create(9791, TransitRoute.class);
+		Link fromLink = new FakeLink(Id.create(10, Link.class), null, null);
+		Link toLink = new FakeLink(Id.create(5, Link.class), null, null);
 		NetworkRoute route = new LinkNetworkRouteImpl(fromLink.getId(), toLink.getId());
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-		TransitStopFacility stopFacility1 = new TransitStopFacilityImpl(new IdImpl(1), new CoordImpl(0, 0), false);
-		TransitStopFacility stopFacility2 = new TransitStopFacilityImpl(new IdImpl(2), new CoordImpl(0, 0), false);
-		TransitStopFacility stopFacility3 = new TransitStopFacilityImpl(new IdImpl(3), new CoordImpl(0, 0), false);
-		TransitStopFacility stopFacility4 = new TransitStopFacilityImpl(new IdImpl(4), new CoordImpl(0, 0), false);
+		TransitStopFacility stopFacility1 = new TransitStopFacilityImpl(Id.create(1, TransitStopFacility.class), new CoordImpl(0, 0), false);
+		TransitStopFacility stopFacility2 = new TransitStopFacilityImpl(Id.create(2, TransitStopFacility.class), new CoordImpl(0, 0), false);
+		TransitStopFacility stopFacility3 = new TransitStopFacilityImpl(Id.create(3, TransitStopFacility.class), new CoordImpl(0, 0), false);
+		TransitStopFacility stopFacility4 = new TransitStopFacilityImpl(Id.create(4, TransitStopFacility.class), new CoordImpl(0, 0), false);
 		TransitRouteStop stop1 = new TransitRouteStopImpl(stopFacility1, 50, 60);
 		TransitRouteStop stop2 = new TransitRouteStopImpl(stopFacility2, 150, 260);
 		TransitRouteStop stop3 = new TransitRouteStopImpl(stopFacility3, 250, 260);
@@ -239,9 +238,9 @@ public class TransitRouteTest extends MatsimTestCase {
 		public final List<TransitRouteStop> stops;
 
 		protected Fixture() {
-			Id id = new IdImpl(9791);
-			Link fromLink = new FakeLink(new IdImpl(10), null, null);
-			Link toLink = new FakeLink(new IdImpl(5), null, null);
+			Id<TransitRoute> id = Id.create(9791, TransitRoute.class);
+			Link fromLink = new FakeLink(Id.create(10, Link.class), null, null);
+			Link toLink = new FakeLink(Id.create(5, Link.class), null, null);
 			NetworkRoute route = new LinkNetworkRouteImpl(fromLink.getId(), toLink.getId());
 			this.stops = new ArrayList<TransitRouteStop>();
 			TransitRouteStop stop = new TransitRouteStopImpl(null, 50, 60);

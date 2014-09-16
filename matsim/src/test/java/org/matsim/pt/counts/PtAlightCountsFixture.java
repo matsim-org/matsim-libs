@@ -24,8 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 public class PtAlightCountsFixture extends PtCountsFixture {
 
@@ -35,21 +35,21 @@ public class PtAlightCountsFixture extends PtCountsFixture {
 
 	@Override
 	public CountsComparisonAlgorithm getCCA() {
-		Map<Id, int[]> alights = new HashMap<Id, int[]>();
+		Map<Id<TransitStopFacility>, int[]> alights = new HashMap<>();
 
 		int[] alightArrayStop3 = new int[24];
 		alightArrayStop3[8] = 50;
-		alights.put(new IdImpl("stop3"), alightArrayStop3);
+		alights.put(Id.create("stop3", TransitStopFacility.class), alightArrayStop3);
 
 		int[] alightArrayStop4 = new int[24];
 		alightArrayStop4[8] = 15;
-		alights.put(new IdImpl("stop4"), alightArrayStop4);
+		alights.put(Id.create("stop4", TransitStopFacility.class), alightArrayStop4);
 
 		this.oa.setAlights(alights);
 		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(new CountsComparisonAlgorithm.VolumesForId() {
 			
 			@Override
-			public double[] getVolumesForStop(Id locationId) {
+			public double[] getVolumesForStop(Id<TransitStopFacility> locationId) {
 				return copyFromIntArray(oa.getAlightVolumesForStop(locationId));
 			}
 			
