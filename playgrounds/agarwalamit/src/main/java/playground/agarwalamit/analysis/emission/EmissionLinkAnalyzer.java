@@ -63,7 +63,7 @@ public class EmissionLinkAnalyzer extends AbstractAnalyisModule {
 		this.simulationEndTime = simulationEndTime;
 	}
 
-	public void init(ScenarioImpl scenario) {
+	public void init() {
 		this.logger.info("Aggregating emissions for each "+this.simulationEndTime/this.noOfTimeBins+" sec time bin.");
 		this.emissionUtils = new EmissionUtils();
 		this.warmHandler = new EmissionsPerLinkWarmEventHandler(this.simulationEndTime, this.noOfTimeBins);

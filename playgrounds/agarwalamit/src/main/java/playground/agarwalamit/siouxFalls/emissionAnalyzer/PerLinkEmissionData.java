@@ -71,7 +71,7 @@ public class PerLinkEmissionData {
 		int noOfTimeBin =1;
 		double simulationEndTime = LoadMyScenarios.getSimulationEndTime(this.configFile);
 		EmissionLinkAnalyzer linkAnalyzer = new EmissionLinkAnalyzer(simulationEndTime, this.emissionEventFile,noOfTimeBin);
-		linkAnalyzer.init(null);
+		linkAnalyzer.init();
 		linkAnalyzer.preProcessData();
 		linkAnalyzer.postProcessData();
 
