@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.patnaIndia.mixedTraffic.qStartPosition;
+package playground.agarwalamit.mixedTraffic.plots;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

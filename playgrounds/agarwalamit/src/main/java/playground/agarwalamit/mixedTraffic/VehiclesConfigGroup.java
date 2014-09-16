@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.patnaIndia.mixedTraffic;
+package playground.agarwalamit.mixedTraffic;
 
 import java.util.Arrays;
 import java.util.Collection;
