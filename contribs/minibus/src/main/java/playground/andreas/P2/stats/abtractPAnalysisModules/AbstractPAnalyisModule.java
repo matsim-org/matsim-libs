@@ -38,7 +38,7 @@ import org.matsim.vehicles.Vehicles;
  * @author aneumann
  *
  */
-public abstract class AbstractPAnalyisModule implements TransitDriverStartsEventHandler{
+abstract class AbstractPAnalyisModule implements PAnalysisModule{
 	
 	private final String name;
 	protected LinkedList<String> ptModes = null;
@@ -55,18 +55,12 @@ public abstract class AbstractPAnalyisModule implements TransitDriverStartsEvent
 		this.ptDriverIds = new TreeSet<>();
 	}
 	
-	/**
-	 * 
-	 * @return The name of that module
-	 */
+	@Override
 	public String getName() {
 		return this.name;
 	}
 	
-	/**
-	 * 
-	 * @param lineIds2ptModeMap Is called at the beginning of each iteration. Contains one public transport mode for each line in the schedule. 
-	 */
+	@Override
 	public void setLineId2ptModeMap(HashMap<Id<TransitLine>, String> lineIds2ptModeMap) {
 		this.lineIds2ptModeMap = lineIds2ptModeMap;
 		
@@ -83,10 +77,7 @@ public abstract class AbstractPAnalyisModule implements TransitDriverStartsEvent
 		}
 	}
 	
-	/**
-	 * 
-	 * @return The header of the information collected by the module. The header must not change from one iteration to the next one.
-	 */
+	@Override
 	public String getHeader() {
 		StringBuffer strB = new StringBuffer();
 		for (String ptMode : this.ptModes) {
@@ -95,17 +86,10 @@ public abstract class AbstractPAnalyisModule implements TransitDriverStartsEvent
 		return strB.toString();
 	}
 	
-	/**
-	 * 
-	 * @return The results collected by the module. Must be in the same order as the header.
-	 */
+	@Override
 	public abstract String getResult();
 	
-	/**
-	 * This is called before a new iteration starts. Update everything needed.
-	 * 
-	 * @param vehicles The vehicles used in the current iteration.
-	 */
+	@Override
 	public void updateVehicles(Vehicles vehicles) {
 				
 	}

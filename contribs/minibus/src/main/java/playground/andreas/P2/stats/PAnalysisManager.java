@@ -42,7 +42,6 @@ import org.matsim.vehicles.Vehicles;
 
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PConstants;
-import playground.andreas.P2.stats.abtractPAnalysisModules.AbstractPAnalyisModule;
 import playground.andreas.P2.stats.abtractPAnalysisModules.AverageInVehicleTripTravelTimeSecondsPerMode;
 import playground.andreas.P2.stats.abtractPAnalysisModules.AverageLoadPerDeparturePerMode;
 import playground.andreas.P2.stats.abtractPAnalysisModules.AverageLoadPerDistancePerMode;
@@ -58,6 +57,7 @@ import playground.andreas.P2.stats.abtractPAnalysisModules.CountTripsPerMode;
 import playground.andreas.P2.stats.abtractPAnalysisModules.CountTripsPerPtModeCombination;
 import playground.andreas.P2.stats.abtractPAnalysisModules.CountVehPerMode;
 import playground.andreas.P2.stats.abtractPAnalysisModules.CountVehicleMeterPerMode;
+import playground.andreas.P2.stats.abtractPAnalysisModules.PAnalysisModule;
 import playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter.BVGLines2PtModes;
 import playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter.PtMode2LineSetter;
 
@@ -71,7 +71,7 @@ public final class PAnalysisManager implements StartupListener, IterationStartsL
 	private final static Logger log = Logger.getLogger(PAnalysisManager.class);
 	
 	private final String pIdentifier;
-	private List<AbstractPAnalyisModule> pAnalyzesList = new LinkedList<AbstractPAnalyisModule>();
+	private List<PAnalysisModule> pAnalyzesList = new LinkedList<PAnalysisModule>();
 	private HashMap<String, BufferedWriter> pAnalyis2Writer = new HashMap<String, BufferedWriter>();
 	private boolean firstIteration = true;
 	private PtMode2LineSetter lineSetter;
@@ -109,7 +109,7 @@ public final class PAnalysisManager implements StartupListener, IterationStartsL
 		this.pAnalyzesList.add(new AverageLoadPerDistancePerMode(countPassengerMeterPerMode, countCapacityMeterPerMode));
 		
 		// register all analyzes
-		for (AbstractPAnalyisModule ana : this.pAnalyzesList) {
+		for (PAnalysisModule ana : this.pAnalyzesList) {
 			event.getControler().getEvents().addHandler(ana);
 		}
 	}
@@ -129,7 +129,7 @@ public final class PAnalysisManager implements StartupListener, IterationStartsL
 			new File(outFilename).mkdir();
 			
 			// create one output stream for each analysis
-			for (AbstractPAnalyisModule ana : this.pAnalyzesList) {
+			for (PAnalysisModule ana : this.pAnalyzesList) {
 				try {
 					String moduleOutFilename = outFilename + ana.getName() + ".txt";
 					BufferedWriter writer = IOUtils.getBufferedWriter(moduleOutFilename);
@@ -145,7 +145,7 @@ public final class PAnalysisManager implements StartupListener, IterationStartsL
 		}
 		
 		// write results to corresponding files
-		for (AbstractPAnalyisModule ana : this.pAnalyzesList) {
+		for (PAnalysisModule ana : this.pAnalyzesList) {
 			BufferedWriter writer = this.pAnalyis2Writer.get(ana.getName());
 			try {
 				writer.write(event.getIteration() + ana.getResult());
@@ -162,13 +162,13 @@ public final class PAnalysisManager implements StartupListener, IterationStartsL
 		this.lineSetter.setPtModesForEachLine(transitSchedule, this.pIdentifier);
 		HashMap<Id<TransitLine>, String> lineIds2ptModeMap = this.lineSetter.getLineId2ptModeMap();
 		
-		for (AbstractPAnalyisModule ana : this.pAnalyzesList) {
+		for (PAnalysisModule ana : this.pAnalyzesList) {
 			ana.setLineId2ptModeMap(lineIds2ptModeMap);
 		}
 	}
 
 	private void updateVehicleTypes(Vehicles vehicles) {
-		for (AbstractPAnalyisModule ana : this.pAnalyzesList) {
+		for (PAnalysisModule ana : this.pAnalyzesList) {
 			ana.updateVehicles(vehicles);
 		}		
 	}
