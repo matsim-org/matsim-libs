@@ -6,7 +6,7 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 
-public class AggregationObject {
+public final class AggregationObject {
 	
 	private List<Id> objectIdList = null; // either job or person id
 	private Id zoneID;

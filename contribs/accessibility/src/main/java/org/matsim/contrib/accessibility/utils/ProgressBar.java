@@ -6,7 +6,7 @@ package org.matsim.contrib.accessibility.utils;
  *
  */
 
-public class ProgressBar {
+public final class ProgressBar {
 	
 	private long percent = 0;
 	private long stepsDone = 0;

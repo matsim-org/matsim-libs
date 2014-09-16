@@ -35,7 +35,7 @@ import org.apache.log4j.Logger;
  * @author thomas
  *
  */
-public class TempDirectoryUtil {
+public final class TempDirectoryUtil {
 	
 	// logger
 	private static final Logger log = Logger.getLogger(TempDirectoryUtil.class);

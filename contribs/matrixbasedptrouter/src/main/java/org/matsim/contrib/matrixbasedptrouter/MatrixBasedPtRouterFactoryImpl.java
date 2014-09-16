@@ -34,7 +34,7 @@ import org.matsim.core.router.TripRouterFactory;
  * @author thomas
  *
  */
-public class MatrixBasedPtRouterFactoryImpl implements TripRouterFactory {
+public final class MatrixBasedPtRouterFactoryImpl implements TripRouterFactory {
 
 	private static final Logger log = Logger.getLogger(MatrixBasedPtRouterFactoryImpl.class);
 

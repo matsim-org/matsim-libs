@@ -20,7 +20,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 
-public class GridUtils {
+public final class GridUtils {
 	
 	// logger
 	private static final Logger log = Logger.getLogger(GridUtils.class);

@@ -6,13 +6,12 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.accessibility.AccessibilityControlerListenerImpl.Modes4Accessibility;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.io.IOUtils;
 
 // urbansim accessibility writer; better do not touch except when working on matsim-urbansim integration. kai, feb'14
 // yy move to matsim4urbansim
-class UrbansimCellBasedAccessibilityCSVWriterV2 {
+final class UrbansimCellBasedAccessibilityCSVWriterV2 {
 	private static final Logger log = Logger.getLogger(UrbansimCellBasedAccessibilityCSVWriterV2.class);
 
 	private static final String FILE_NAME= "accessibility_indicators.csv";

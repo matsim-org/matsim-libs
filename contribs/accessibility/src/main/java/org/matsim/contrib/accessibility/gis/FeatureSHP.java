@@ -36,7 +36,7 @@ import org.opengis.feature.simple.SimpleFeature;
  * @author illenberger
  * 
  */
-public class FeatureSHP {
+public final class FeatureSHP {
 
 	/**
 	 * Calls {@link FeatureSHP#readFeatures(String, String)} with <tt>null</tt>

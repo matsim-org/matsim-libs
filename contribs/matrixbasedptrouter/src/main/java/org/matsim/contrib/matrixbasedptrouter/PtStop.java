@@ -3,7 +3,7 @@ package org.matsim.contrib.matrixbasedptrouter;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 
-class PtStop {
+final class PtStop {
 	
 	private final Id id;
 	private final Coord coord;

@@ -127,7 +127,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author thomas
  * 
  */
-public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityControlerListenerImpl 
+public final class GridBasedAccessibilityControlerListenerV3 extends AccessibilityControlerListenerImpl 
 implements ShutdownListener, StartupListener { 
 	private static final Logger log = Logger.getLogger(GridBasedAccessibilityControlerListenerV3.class);
 	
@@ -357,7 +357,7 @@ implements ShutdownListener, StartupListener {
 
 				// output for R:
 				GridUtils.writeSpatialGridTable( spatialGrid, matsimOutputDirectory
-						+ "/" + mode.toString() + ACCESSIBILITY_CELLSIZE + spatialGrid.getResolution() + ".txt");
+						+ "/" + mode.toString() + Labels.ACCESSIBILITY_CELLSIZE + spatialGrid.getResolution() + ".txt");
 
 			}
 		}

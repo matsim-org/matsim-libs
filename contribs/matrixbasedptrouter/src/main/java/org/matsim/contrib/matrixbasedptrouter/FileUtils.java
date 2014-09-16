@@ -15,7 +15,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.matrices.Matrix;
 
-class FileUtils {
+final class FileUtils {
 
 	private static final Logger log = Logger.getLogger(FileUtils.class);
 

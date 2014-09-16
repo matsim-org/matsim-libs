@@ -56,7 +56,7 @@ import org.matsim.utils.LeastCostPathTree;
  * @author thomas
  *
  */
-public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityControlerListenerImpl implements ShutdownListener{
+public final class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityControlerListenerImpl implements ShutdownListener{
 	
 	private static final Logger log = Logger.getLogger(ZoneBasedAccessibilityControlerListenerV3.class);
 	private UrbanSimZoneCSVWriterV2 urbanSimZoneCSVWriterV2;

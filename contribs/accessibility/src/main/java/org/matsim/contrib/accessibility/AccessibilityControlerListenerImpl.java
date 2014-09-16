@@ -6,8 +6,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import junit.framework.Assert;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -30,7 +28,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -69,18 +66,9 @@ import org.matsim.utils.LeastCostPathTree;
  * @author thomas, knagel
  *
  */
-public abstract class AccessibilityControlerListenerImpl {
+abstract class AccessibilityControlerListenerImpl {
 
 	private static final Logger log = Logger.getLogger(AccessibilityControlerListenerImpl.class);
-
-	public static enum Modes4Accessibility { freeSpeed, car, bike, walk, pt } ;
-
-	public static final String ACCESSIBILITY_CELLSIZE = "Accessibility_cellsize_" ;
-	public static final String FREESPEED_FILENAME= "freeSpeed" + ACCESSIBILITY_CELLSIZE ;
-	public static final String CAR_FILENAME 		= "car" + ACCESSIBILITY_CELLSIZE ;
-	public static final String BIKE_FILENAME 	= "bike" + ACCESSIBILITY_CELLSIZE ;
-	public static final String WALK_FILENAME 	= "walk" + ACCESSIBILITY_CELLSIZE ;
-	public static final String PT_FILENAME 		= "pt" + ACCESSIBILITY_CELLSIZE ;
 
 	int ZONE_BASED 	= 0;
 	int PARCEL_BASED = 1;

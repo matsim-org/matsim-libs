@@ -3,7 +3,7 @@ package org.matsim.contrib.matrixbasedptrouter.utils;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class HeaderParser {
+public final class HeaderParser {
 	
 	/**
 	 * This is used to parse a header line from a tab-delimited urbansim header and generate a Map that allows to look up column

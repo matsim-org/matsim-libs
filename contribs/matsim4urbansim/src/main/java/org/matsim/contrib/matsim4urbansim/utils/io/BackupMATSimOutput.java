@@ -4,7 +4,7 @@ import java.io.File;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
-import org.matsim.contrib.accessibility.AccessibilityControlerListenerImpl;
+import org.matsim.contrib.accessibility.Labels;
 import org.matsim.contrib.accessibility.UrbanSimZoneCSVWriterV2;
 import org.matsim.contrib.matsim4urbansim.config.ConfigurationUtils;
 import org.matsim.contrib.matsim4urbansim.config.M4UConfigUtils;
@@ -93,19 +93,19 @@ public class BackupMATSimOutput {
 				FileCopy.fileCopy(new File(uspModule.getMATSim4OpusTemp() + Zone2ZoneImpedancesControlerListener.FILE_NAME), new File(savePath + Zone2ZoneImpedancesControlerListener.FILE_NAME) );
 			
 			// backup plotting files free speed
-			String fileName = AccessibilityControlerListenerImpl.FREESPEED_FILENAME + (double)acm.getCellSizeCellBasedAccessibility() + InternalConstants.FILE_TYPE_TXT;
+			String fileName = Labels.FREESPEED_FILENAME + (double)acm.getCellSizeCellBasedAccessibility() + InternalConstants.FILE_TYPE_TXT;
 			if( new File(uspModule.getMATSim4OpusTemp()  + fileName).exists() )
 				FileCopy.fileCopy(new File(uspModule.getMATSim4OpusTemp()  + fileName), new File(savePath + fileName) );
 			// backup plotting files for car
-			fileName = AccessibilityControlerListenerImpl.CAR_FILENAME + (double)acm.getCellSizeCellBasedAccessibility() + InternalConstants.FILE_TYPE_TXT;
+			fileName = Labels.CAR_FILENAME + (double)acm.getCellSizeCellBasedAccessibility() + InternalConstants.FILE_TYPE_TXT;
 			if( new File(uspModule.getMATSim4OpusTemp()  + fileName).exists() )
 				FileCopy.fileCopy(new File(uspModule.getMATSim4OpusTemp()  + fileName), new File(savePath + fileName) );
 			// backup plotting files for bike
-			fileName = AccessibilityControlerListenerImpl.BIKE_FILENAME + (double)acm.getCellSizeCellBasedAccessibility() + InternalConstants.FILE_TYPE_TXT;
+			fileName = Labels.BIKE_FILENAME + (double)acm.getCellSizeCellBasedAccessibility() + InternalConstants.FILE_TYPE_TXT;
 			if( new File(uspModule.getMATSim4OpusTemp()  + fileName).exists() )
 				FileCopy.fileCopy(new File(uspModule.getMATSim4OpusTemp()  + fileName), new File(savePath + fileName) );
 			// backup plotting files for walk
-			fileName = AccessibilityControlerListenerImpl.WALK_FILENAME + (double)acm.getCellSizeCellBasedAccessibility() + InternalConstants.FILE_TYPE_TXT;
+			fileName = Labels.WALK_FILENAME + (double)acm.getCellSizeCellBasedAccessibility() + InternalConstants.FILE_TYPE_TXT;
 			if( new File(uspModule.getMATSim4OpusTemp()  + fileName).exists() )
 				FileCopy.fileCopy(new File(uspModule.getMATSim4OpusTemp()  + fileName), new File(savePath + fileName) );
 		} catch (Exception e) {

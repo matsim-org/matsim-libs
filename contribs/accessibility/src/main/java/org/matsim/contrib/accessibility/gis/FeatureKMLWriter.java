@@ -51,7 +51,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author illenberger
  * 
  */
-public class FeatureKMLWriter {
+public final class FeatureKMLWriter {
 
 	private Colorizable colorizable = new DefaultColorizer();
 

@@ -49,7 +49,7 @@ import org.matsim.matrices.Matrix;
  * @author thomas
  *
  */
-public class PtMatrix {
+public final class PtMatrix {
 
 	private static final Logger log = Logger.getLogger(PtMatrix.class);
 

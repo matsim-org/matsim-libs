@@ -26,7 +26,7 @@ package org.matsim.contrib.accessibility.utils;
  * @author thomas
  *
  */
-public class Distances{
+public final class Distances{
 	
 	/** This stores either the (i) orthogonal distance between 
 	 *  a measure point and the nearest link or (ii) the euclidian 

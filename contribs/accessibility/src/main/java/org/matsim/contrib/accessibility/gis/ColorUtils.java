@@ -31,7 +31,7 @@ import java.awt.Color;
  * @author illenberger
  * 
  */
-public class ColorUtils {
+public final class ColorUtils {
 
 	/**
 	 * Returns a color from the spectrum green-yellow-red-pink-blue with

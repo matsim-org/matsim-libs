@@ -39,7 +39,7 @@ import com.vividsolutions.jts.index.quadtree.Quadtree;
  * @author illenberger
  *
  */
-public class ZoneLayer<T> {
+public final class ZoneLayer<T> {
 
 	private final SpatialIndex quadtree;
 	

@@ -43,7 +43,7 @@ import org.matsim.core.utils.io.IOUtils;
  * @author thomas
  * @author tthunig
  */
-public class CreateTestNetwork {
+public final class CreateTestNetwork {
 
 	/**
 	 * This method creates a test network. It is used for example in PtMatrixTest.java to test the pt simulation in MATSim.

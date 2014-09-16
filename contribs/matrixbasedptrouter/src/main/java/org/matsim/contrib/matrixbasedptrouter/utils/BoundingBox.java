@@ -3,7 +3,7 @@ package org.matsim.contrib.matrixbasedptrouter.utils;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkUtils;
 
-public class BoundingBox {
+public final class BoundingBox {
 	
 	private double boundingBox [] = null;
 	

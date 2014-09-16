@@ -10,7 +10,8 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-public class NetworkUtil {
+public final class NetworkUtil {
+	private NetworkUtil(){} // do not instantiate
 
 	private static final Logger log = Logger.getLogger(NetworkUtil.class);
 	

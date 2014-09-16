@@ -22,7 +22,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
  *
  */
 
-public class CreateTestPopulation {
+public final class CreateTestPopulation {
 	
 	
 	/**

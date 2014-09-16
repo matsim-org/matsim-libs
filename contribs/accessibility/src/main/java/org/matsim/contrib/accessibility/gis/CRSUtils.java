@@ -44,7 +44,7 @@ import com.vividsolutions.jts.geom.Point;
  * @author illenberger
  * 
  */
-public class CRSUtils {
+public final class CRSUtils {
 
 	private static Logger logger = Logger.getLogger(CRSUtils.class);
 

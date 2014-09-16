@@ -33,7 +33,7 @@ import java.awt.Color;
  * @author illenberger
  * @author thomas
  */
-public class MyColorizer implements Colorizable{
+public final class MyColorizer implements Colorizable{
 	
 	private final TObjectDoubleHashMap values;
 	

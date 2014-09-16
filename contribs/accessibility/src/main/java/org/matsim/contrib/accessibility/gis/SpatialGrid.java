@@ -44,7 +44,7 @@ import com.vividsolutions.jts.geom.Point;
  * @author thomas
  * @author tthunig
  */
-public class SpatialGrid{
+public final class SpatialGrid{
 	
 	private double[][] matrix;
 	

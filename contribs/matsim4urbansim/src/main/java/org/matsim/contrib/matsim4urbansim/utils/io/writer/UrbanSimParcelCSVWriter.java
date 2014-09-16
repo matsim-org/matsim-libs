@@ -29,7 +29,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.accessibility.AccessibilityControlerListenerImpl.Modes4Accessibility;
+import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.matsim4urbansim.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.core.config.Config;

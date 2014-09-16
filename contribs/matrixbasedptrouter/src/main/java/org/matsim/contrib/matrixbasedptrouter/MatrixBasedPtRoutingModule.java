@@ -47,7 +47,7 @@ import org.matsim.core.router.StageActivityTypes;
  * @author thomas
  *
  */
-public class MatrixBasedPtRoutingModule implements RoutingModule {
+public final class MatrixBasedPtRoutingModule implements RoutingModule {
 	
 	// 1) read a file with every transit stop
 	// 2) read a file with travel times and general costs from every stop to every other stop ("matrix")

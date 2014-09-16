@@ -29,7 +29,7 @@ import java.io.IOException;
  * @author illenberger
  * @author thomas
  */
-public class SpatialGridTableWriter {
+public final class SpatialGridTableWriter {
 	
 	public static final String separator = "\t";
 

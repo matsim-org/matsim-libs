@@ -28,7 +28,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author illenberger
  * 
  */
-public class Zone<T> {
+public final class Zone<T> {
 
 	private final Geometry geometry;
 	

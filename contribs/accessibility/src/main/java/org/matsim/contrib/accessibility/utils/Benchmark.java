@@ -33,7 +33,7 @@ import org.apache.log4j.Logger;
  * @author thomas
  *
  */
-public class Benchmark {
+public final class Benchmark {
 	
 	// logger
 	private static final Logger log = Logger.getLogger(Benchmark.class);

@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.accessibility.AccessibilityControlerListenerImpl.Modes4Accessibility;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -18,7 +17,7 @@ import org.matsim.core.utils.io.IOUtils;
  * @author thomas
  *
  */
-public class UrbanSimZoneCSVWriterV2 {
+public final class UrbanSimZoneCSVWriterV2 {
 	
 	private static final Logger log 	= Logger.getLogger(UrbanSimZoneCSVWriterV2.class);
 	private BufferedWriter zoneWriter = null;

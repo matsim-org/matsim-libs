@@ -31,7 +31,7 @@ import org.matsim.core.config.experimental.ReflectiveModule;
  * @author nagel
  *
  */
-public class MatrixBasedPtRouterConfigGroup extends ReflectiveModule {
+public final class MatrixBasedPtRouterConfigGroup extends ReflectiveModule {
 	static final Logger log = Logger.getLogger(MatrixBasedPtRouterConfigGroup.class) ;
 
 	public static final String GROUP_NAME="matrixBasedPtRouter" ;

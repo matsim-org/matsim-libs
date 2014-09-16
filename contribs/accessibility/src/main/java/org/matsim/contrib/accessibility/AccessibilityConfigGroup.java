@@ -25,7 +25,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.experimental.ReflectiveModule;
 
-public class AccessibilityConfigGroup extends ReflectiveModule{
+public final class AccessibilityConfigGroup extends ReflectiveModule{
 	// yyyy todo: change in similar way as with other modes ("_mode") 
 	
 	private static final String USING_CUSTOM_BOUNDING_BOX = "usingCustomBoundingBox";
