@@ -27,11 +27,8 @@ import java.util.Iterator;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.misc.CRCChecksum;
-import org.matsim.roadpricing.RoadPricingReaderXMLv1;
-import org.matsim.roadpricing.RoadPricingSchemeImpl;
-import org.matsim.roadpricing.RoadPricingWriterXMLv1;
 import org.matsim.testcases.MatsimTestCase;
 import org.xml.sax.SAXException;
 
@@ -53,9 +50,9 @@ public class RoadPricingIOTest extends MatsimTestCase {
 		final String tmpFile1 = getOutputDirectory() + "roadpricing1.xml";
 		final String tmpFile2 = getOutputDirectory() + "roadpricing2.xml";
 
-		final Id id1 = new IdImpl(1);
-		final Id id2 = new IdImpl(2);
-		final Id id3 = new IdImpl(3);
+		final Id<Link> id1 = Id.create(1, Link.class);
+		final Id<Link> id2 = Id.create(2, Link.class);
+		final Id<Link> id3 = Id.create(3, Link.class);
 
 		// first, read the scheme from file
 		RoadPricingSchemeImpl scheme1 = new RoadPricingSchemeImpl();

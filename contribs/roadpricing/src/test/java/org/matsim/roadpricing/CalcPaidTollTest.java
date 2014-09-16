@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -56,11 +55,11 @@ public class CalcPaidTollTest extends MatsimTestCase {
 		Config config = loadConfig(this.getClassInputDirectory() + "config.xml");
 		final String tollFile = this.getClassInputDirectory() + "/roadpricing1.xml";
 
-		Id id1 = new IdImpl("1");
-		Id id2 = new IdImpl("2");
-		Id id3 = new IdImpl("3");
-		Id id4 = new IdImpl("4");
-		Id id5 = new IdImpl("5");
+		Id<Person> id1 = Id.create("1", Person.class);
+		Id<Person> id2 = Id.create("2", Person.class);
+		Id<Person> id3 = Id.create("3", Person.class);
+		Id<Person> id4 = Id.create("4", Person.class);
+		Id<Person> id5 = Id.create("5", Person.class);
 
 		Map<Id<Person>, ? extends Person> referencePopulation = Fixture.createReferencePopulation1(config.planCalcScore()).getPersons();
 		Map<Id<Person>, ? extends Person> population = runTollSimulation(tollFile, "distance", config.planCalcScore()).getPersons();
@@ -91,14 +90,14 @@ public class CalcPaidTollTest extends MatsimTestCase {
 		Config config = loadConfig(this.getClassInputDirectory() + "config.xml");
 		final String tollFile = this.getClassInputDirectory() + "/roadpricing2.xml";
 
-		Id id1 = new IdImpl("1");
-		Id id2 = new IdImpl("2");
-		Id id3 = new IdImpl("3");
-		Id id4 = new IdImpl("4");
-		Id id5 = new IdImpl("5");
-		Id id7 = new IdImpl("7");
-		Id id8 = new IdImpl("8");
-		Id id10 = new IdImpl("10");
+		Id<Person> id1 = Id.create("1", Person.class);
+		Id<Person> id2 = Id.create("2", Person.class);
+		Id<Person> id3 = Id.create("3", Person.class);
+		Id<Person> id4 = Id.create("4", Person.class);
+		Id<Person> id5 = Id.create("5", Person.class);
+		Id<Person> id7 = Id.create("7", Person.class);
+		Id<Person> id8 = Id.create("8", Person.class);
+		Id<Person> id10 = Id.create("10", Person.class);
 
 		Map<Id<Person>, ? extends Person> referencePopulation = Fixture.createReferencePopulation1(config.planCalcScore()).getPersons();
 		Map<Id<Person>, ? extends Person> population = runTollSimulation(tollFile, "area", config.planCalcScore()).getPersons();
@@ -141,13 +140,13 @@ public class CalcPaidTollTest extends MatsimTestCase {
 		Config config = loadConfig(this.getClassInputDirectory() + "config.xml");
 		final String tollFile = this.getClassInputDirectory() + "/roadpricing3.xml";
 
-		Id id1 = new IdImpl("1");
-		Id id2 = new IdImpl("2");
-		Id id3 = new IdImpl("3");
-		Id id4 = new IdImpl("4");
-		Id id5 = new IdImpl("5");
-		Id id7 = new IdImpl("7");
-		Id id8 = new IdImpl("8");
+		Id<Person> id1 = Id.create("1", Person.class);
+		Id<Person> id2 = Id.create("2", Person.class);
+		Id<Person> id3 = Id.create("3", Person.class);
+		Id<Person> id4 = Id.create("4", Person.class);
+		Id<Person> id5 = Id.create("5", Person.class);
+		Id<Person> id7 = Id.create("7", Person.class);
+		Id<Person> id8 = Id.create("8", Person.class);
 
 		Map<Id<Person>, ? extends Person> referencePopulation = Fixture.createReferencePopulation1(config.planCalcScore()).getPersons();
 		Map<Id<Person>, ? extends Person> population = runTollSimulation(tollFile, "cordon", config.planCalcScore()).getPersons();

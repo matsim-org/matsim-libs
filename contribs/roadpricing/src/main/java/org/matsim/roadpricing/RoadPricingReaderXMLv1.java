@@ -23,7 +23,7 @@ package org.matsim.roadpricing;
 import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Time;
 import org.xml.sax.Attributes;
@@ -64,7 +64,7 @@ public class RoadPricingReaderXMLv1 extends MatsimXmlParser  {
 			this.scheme.setName(atts.getValue(ATTR_NAME));
 			this.scheme.setType(atts.getValue(ATTR_TYPE));
 		} else if (TAG_LINK.equals(name)) {
-			this.currentLinkId = new IdImpl(atts.getValue(ATTR_ID));
+			this.currentLinkId = Id.create(atts.getValue(ATTR_ID), Link.class);
 		} else {
 			final String endTimeString = atts.getValue(ATTR_END_TIME);
 			double endTime = Time.parseTime(endTimeString);
