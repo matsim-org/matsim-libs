@@ -20,18 +20,19 @@
 
 package org.matsim.counts;
 
+import java.util.List;
+import java.util.Vector;
+
 import org.matsim.analysis.CalcLinkStats;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
-
-import java.util.List;
-import java.util.Vector;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 public class CountsFixture {
 
@@ -61,8 +62,8 @@ public class CountsFixture {
 		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(new CountsComparisonAlgorithm.VolumesForId() {
 		
 			@Override
-			public double[] getVolumesForStop(Id locationId) {
-				return linkStats.getAvgLinkVolumes(locationId);
+			public double[] getVolumesForStop(Id<TransitStopFacility> locationId) {
+				return linkStats.getAvgLinkVolumes(Id.create(locationId, Link.class));
 			}
 		
 		}, this.counts, this.network,
@@ -74,7 +75,7 @@ public class CountsFixture {
 	public List<CountSimComparison> ceateCountSimCompList() {
 		List<CountSimComparison> csc_l = new Vector<CountSimComparison>(24);
 		for (int i=0; i<24; i++) {
-			csc_l.add(new CountSimComparisonImpl(new IdImpl(100), i+1, 1.0, 1.0));
+			csc_l.add(new CountSimComparisonImpl(Id.create(100, Link.class), i+1, 1.0, 1.0));
 		}
 		return csc_l;
 	}

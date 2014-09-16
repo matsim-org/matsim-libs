@@ -23,7 +23,8 @@ package org.matsim.counts;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
@@ -72,7 +73,7 @@ public class CountsReaderMatsimV1 extends MatsimXmlParser {
 
 	private void startCount(final Attributes meta) {
 		String locId = meta.getValue("loc_id");
-		this.currcount = this.counts.createAndAddCount(new IdImpl(locId), meta.getValue("cs_id"));
+		this.currcount = this.counts.createAndAddCount(Id.create(locId, Link.class), meta.getValue("cs_id"));
 		if (this.currcount == null) {
 			log.warn("There is already a counts object for location " + locId +
 					". The counts for loc_id=" + locId + ", cs_id=" + meta.getValue("cs_id") + " will be ignored.");

@@ -31,8 +31,9 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CountsConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -393,9 +394,9 @@ public class CountControlerListenerTest {
 		
 		@Override
 		public void run() {
-			Id linkId = new IdImpl("100");
+			Id<Link> linkId = Id.create("100", Link.class);
 			for (int i = 0; i < this.nOfEvents; i++) {
-				this.eventsManager.processEvent(new LinkLeaveEvent(60.0, new IdImpl(i), linkId, null));
+				this.eventsManager.processEvent(new LinkLeaveEvent(60.0, Id.create(i, Person.class), linkId, null));
 			}
 		}
 	}
@@ -416,14 +417,14 @@ public class CountControlerListenerTest {
 		
 		@Override
 		public void run() {
-			Id linkId = new IdImpl("100");
+			Id<Link> linkId = Id.create("100", Link.class);
 			for (int i = 0; i < 100; i++) {
-				Id agentId = new IdImpl(i);
+				Id<Person> agentId = Id.create(i, Person.class);
 				this.eventsManager.processEvent(new PersonDepartureEvent(60.0, agentId, linkId, TransportMode.car));
 				this.eventsManager.processEvent(new LinkLeaveEvent(60.0, agentId, linkId, null));
 			}
 			for (int i = 100; i < 150; i++) {
-				Id agentId = new IdImpl(i);
+				Id<Person> agentId = Id.create(i, Person.class);
 				this.eventsManager.processEvent(new PersonDepartureEvent(60.0, agentId, linkId, TransportMode.walk));
 				this.eventsManager.processEvent(new LinkLeaveEvent(60.0, agentId, linkId, null));
 			}
