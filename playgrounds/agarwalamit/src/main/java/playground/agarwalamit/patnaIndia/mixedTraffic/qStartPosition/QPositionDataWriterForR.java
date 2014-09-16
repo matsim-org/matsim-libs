@@ -33,6 +33,9 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.agarwalamit.analysis.LoadMyScenarios;
+import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
+
 /**
  * @author amit
  */
@@ -42,10 +45,10 @@ public class QPositionDataWriterForR {
 //		private static String outputDir = "../../patnaIndiaSim/outputTestCase/3modesNoPassing/";//"./outputTest/";//
 //		private static String eventFile = outputDir+"ITERS/data_Patna_3modes_withoutPassing_alternativeSpeed_events.xml";//outputDir+"/ITERS/it.10/10.events.xml.gz";//
 //		private static String networkFile="../../patnaIndiaSim/input/dreieck_network.xml";
-	private static String configFile ="../../patnaIndiaSim/outputSS/2modesNoStuck/config.xml";
-	private static String outputDir ="../../patnaIndiaSim/outputSS/2modesNoStuck/";
+//	private static String configFile ="../../patnaIndiaSim/outputSS/2modesNoStuck/config.xml";
+	private static String outputDir ="./outputSeepage/";//"../../patnaIndiaSim/outputSS/2modesNoStuck/";
 	private static String eventFile = outputDir+"/events.xml";
-	private static String networkFile="../../patnaIndiaSim/outputSS/2modesNoStuck/dreieck_network.xml";
+	private static String networkFile=outputDir+"/network.xml";//"../../patnaIndiaSim/outputSS/2modesNoStuck/dreieck_network.xml";
 	
 //		private static String configFile ="./output/config.xml";
 //		private static String outputDir = "./output/";
@@ -58,12 +61,10 @@ public class QPositionDataWriterForR {
 	private final static Logger logger = Logger.getLogger(QPositionDataWriterForR.class);
 
 	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig(configFile);
-		config.network().setInputFile(networkFile);
-		scenario  = ScenarioUtils.loadScenario(config);
+		scenario  = LoadMyScenarios.loadScenarioFromNetwork(networkFile);
 
 		calculationHandler = new QueuePositionCalculationHandler(scenario);
-		EventsManager eventsManager = EventsUtils.createEventsManager(scenario.getConfig());
+		EventsManager eventsManager = EventsUtils.createEventsManager();
 		eventsManager.addHandler(calculationHandler);
 
 		MatsimEventsReader eventsReader = new MatsimEventsReader(eventsManager);
@@ -93,7 +94,7 @@ public class QPositionDataWriterForR {
 				String travelMode = qParts[5];
 				String linkLeaveTime = qParts[6];
 
-				vehicleSpeed=getVehicleSpeed(travelMode);
+				vehicleSpeed=MixedTrafficVehiclesUtils.getSpeed(travelMode);
 
 				double initialPos = Double.valueOf(linkId)*Double.valueOf(linkLength);
 				double qStartTime =Double.valueOf(queuingTime);
@@ -129,18 +130,6 @@ public class QPositionDataWriterForR {
 		} catch (IOException e) {
 			throw new RuntimeException("Data is not written in file. Reason : "+e);
 		}
-	}
-
-	private static double getVehicleSpeed(String travelMode){
-		double vehicleSpeed =0;
-		if(travelMode.equals("cars") || travelMode.equals("fast")) { //fast
-			vehicleSpeed= 16.67;
-		} else if(travelMode.equals("motorbikes") || travelMode.equals("med")) {
-			vehicleSpeed = 16.67;
-		} else if(travelMode.equals("bicycles") || travelMode.equals("truck") ){
-			vehicleSpeed= 4.17;
-		}
-		return vehicleSpeed;
 	}
 
 	private static void writeLinkEnterLeaveTimeForR(){

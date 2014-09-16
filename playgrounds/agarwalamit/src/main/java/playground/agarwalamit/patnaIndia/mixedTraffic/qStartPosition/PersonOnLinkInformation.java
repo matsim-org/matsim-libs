@@ -20,6 +20,8 @@ package playground.agarwalamit.patnaIndia.mixedTraffic.qStartPosition;
 
 import org.matsim.api.core.v01.network.Link;
 
+import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
+
 
 /**
  * @author amit
@@ -32,7 +34,6 @@ public class PersonOnLinkInformation {
 	private String legMode;
 	private Link link;
 	private boolean addVehicleInQ;
-	private final String travelModes [] = new String [] {"cars","motorbikes","bicycles"}; //{"fast","med","truck"};
 	private double availableLinkSpace ;
 	private double queuingTime;
 
@@ -43,7 +44,7 @@ public class PersonOnLinkInformation {
 
 	private void setFreeSpeedLinkTravelTime() {
 		//		double tt = getLinkLength() / Math.min(link.getFreespeed(), getVehicleSpeed(this.legMode));
-		double tt = this.availableLinkSpace / Math.min(this.link.getFreespeed(), getVehicleSpeed(this.legMode));
+		double tt = this.availableLinkSpace / Math.min(this.link.getFreespeed(), MixedTrafficVehiclesUtils.getSpeed(this.legMode));
 		this.freeSpeedLinkTravelTime = tt;
 	}
 
@@ -80,18 +81,6 @@ public class PersonOnLinkInformation {
 		//		return 666/9;
 	}
 
-	private double getVehicleSpeed(String travelMode) {
-		double vehicleSpeed =0;
-		if(travelMode.equals(this.travelModes[0])||travelMode.equals("fast")) {
-			vehicleSpeed= 16.67;
-		} else if(travelMode.equals(this.travelModes[1])||travelMode.equals("med")) {
-			vehicleSpeed = 16.67;
-		} else if(travelMode.equals(this.travelModes[2])||travelMode.equals("truck")){
-			vehicleSpeed= 4.167;
-		}
-		return vehicleSpeed;
-	}
-
 	public void checkIfVehicleWillGoInQ(double currentTimeStep){
 		double travelTimeSincePersonHasEntered = currentTimeStep - getLinkEnterTime();
 		if(currentTimeStep!=getLinkLeaveTime()){
@@ -112,6 +101,6 @@ public class PersonOnLinkInformation {
 	}
 	public void setQueuingTime(double availableSpaceSoFar){
 		// to set actual queuing time (45.56) not like earlier (45.0).
-		this.queuingTime = this.linkEnterTime + availableSpaceSoFar / Math.min(this.link.getFreespeed(), getVehicleSpeed(this.legMode));
+		this.queuingTime = this.linkEnterTime + availableSpaceSoFar / Math.min(this.link.getFreespeed(), MixedTrafficVehiclesUtils.getSpeed(this.legMode));
 	}
 }

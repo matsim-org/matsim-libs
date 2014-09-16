@@ -38,6 +38,8 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 
+import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
+
 /**
  * @author amit
  */
@@ -142,8 +144,8 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 				this.personIdLinkIdLinkEnterTimeLinkLeaveTimeQueuePositionData.add(qDataToWriteInList);
 
 				this.linkId2PersonId2VehicleInQueue.get(linkId).remove(personId);
-				double availableSpaceSoFar=Double.valueOf(this.linkId2LinkAvailableSpace.get(linkId));
-				double newAvailableSpace = availableSpaceSoFar+getCellSize(personOnLinkInfo.getLegMode());
+				double availableSpaceSoFar = Double.valueOf(this.linkId2LinkAvailableSpace.get(linkId));
+				double newAvailableSpace = availableSpaceSoFar+MixedTrafficVehiclesUtils.getCellSize(personOnLinkInfo.getLegMode());
 				this.linkId2LinkAvailableSpace.put(linkId, Double.valueOf(newAvailableSpace));
 			}
 			this.linkId2PersonId2LinkInfo.get(linkId).remove(personId);
@@ -187,7 +189,7 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 							double availableSpaceSoFar=Double.valueOf(this.linkId2LinkAvailableSpace.get(linkId));
 							personOnLinkInfo.setQueuingTime(availableSpaceSoFar);
 //							personOnLinkInfo.setQueuingTime(time-1);
-							double newAvailableSpace = availableSpaceSoFar-getCellSize(personOnLinkInfo.getLegMode());
+							double newAvailableSpace = availableSpaceSoFar-MixedTrafficVehiclesUtils.getCellSize(personOnLinkInfo.getLegMode());
 							this.linkId2LinkAvailableSpace.put(linkId, Double.valueOf(newAvailableSpace));
 						}
 					} 
@@ -197,15 +199,15 @@ public class QueuePositionCalculationHandler implements LinkLeaveEventHandler, L
 		this.lastEventTimeStep=currentTimeStep;
 	}
 
-	private double getCellSize(String travelMode){
-		double effCellSize =7.5;
-		if(travelMode.equals("cars") || travelMode.equals("fast")) {
-			effCellSize= 7.5;
-		} else if(travelMode.equals("motorbikes") || travelMode.equals("med")) {
-			effCellSize = 7.5/4;
-		} else if(travelMode.equals("bicycles") || travelMode.equals("truck") ){
-			effCellSize= 7.5/4;
-		}
-		return effCellSize;
-	}
+//	private double getCellSize(String travelMode){
+//		double effCellSize =7.5;
+//		if(travelMode.equals("cars") || travelMode.equals("fast")) {
+//			effCellSize= 7.5;
+//		} else if(travelMode.equals("motorbikes") || travelMode.equals("med")) {
+//			effCellSize = 7.5/4;
+//		} else if(travelMode.equals("bicycles") || travelMode.equals("truck") ){
+//			effCellSize= 7.5/4;
+//		}
+//		return effCellSize;
+//	}
 }

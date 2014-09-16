@@ -20,9 +20,9 @@ package playground.agarwalamit.patnaIndia.mixedTraffic.qStartPosition;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -32,6 +32,8 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 
+import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
+
 /**
  * @author amit
  * Density vs number of bicycles overtaken by cars on link id"1" in test network.
@@ -39,7 +41,6 @@ import org.matsim.api.core.v01.population.Person;
 public class DensityVsPassingDistributionHandler implements PersonDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler {
 
 	private Map<Id<Person>, String> personId2LegMode;
-	private final Map<String, Double> legMode2PCU;
 	private Map<Double, Double> density2TotalOvertakenBicycles;
 	private Map<Double, Double> density2AverageOvertakenBicycles;
 	private double localDensity = 0.;
@@ -51,22 +52,13 @@ public class DensityVsPassingDistributionHandler implements PersonDepartureEvent
 		this.density2TotalOvertakenBicycles = new HashMap<Double, Double>();
 		this.density2AverageOvertakenBicycles=new HashMap<Double, Double>();
 		this.personId2LinkEnterTime = new HashMap<Id<Person>, Double>();
-		this.legMode2PCU = new HashMap<String, Double>();
 		this.linkId = linkId;
-
-		this.legMode2PCU.put("cars", Double.valueOf(1));
-		this.legMode2PCU.put("motorbikes", Double.valueOf(0.25));
-		this.legMode2PCU.put("bicycles", Double.valueOf(0.25));
-		this.legMode2PCU.put("fast", Double.valueOf(1));
-		this.legMode2PCU.put("med", Double.valueOf(0.25));
-		this.legMode2PCU.put("truck", Double.valueOf(0.25));
 
 	}
 
 	@Override
 	public void reset(int iteration) {
 		this.personId2LegMode.clear();
-		this.legMode2PCU.clear();
 		this.density2TotalOvertakenBicycles.clear();
 		this.density2AverageOvertakenBicycles.clear();
 		this.personId2LinkEnterTime.clear();
@@ -76,12 +68,11 @@ public class DensityVsPassingDistributionHandler implements PersonDepartureEvent
 	public void handleEvent(LinkLeaveEvent event) {
 		Id<Person> personId = event.getPersonId();
 		if(event.getLinkId().equals(this.linkId)){
-
-			this.localDensity -=this.legMode2PCU.get(this.personId2LegMode.get(personId));
-			if(!this.personId2LegMode.get(personId).equals("bicycles")){
+			double nowPCU = MixedTrafficVehiclesUtils.getPCU(this.personId2LegMode.get(personId));
+			this.localDensity -= nowPCU;
+			if(this.personId2LegMode.get(personId).equals(TransportMode.car)){ // when a car leaves; check if it have overtaken anything ?
 				updateDensity2OvertakenBicycleCount(this.localDensity,event);
 			}
-
 			this.personId2LinkEnterTime.remove(personId);
 		}
 	}
@@ -93,7 +84,7 @@ public class DensityVsPassingDistributionHandler implements PersonDepartureEvent
 		if(event.getLinkId().equals(this.linkId)){
 			this.personId2LinkEnterTime.put(personId, event.getTime());
 			String legMode = this.personId2LegMode.get(personId);
-			this.localDensity +=this.legMode2PCU.get(legMode);
+			this.localDensity +=MixedTrafficVehiclesUtils.getPCU(legMode);
 		}
 	}
 
@@ -111,19 +102,22 @@ public class DensityVsPassingDistributionHandler implements PersonDepartureEvent
 
 	private double getNumberOfBicycleOvertaken(LinkLeaveEvent event) {
 		double overtakenBicycles =0;
-
+		// Simply, link leave event of car is passed one at a time and thus for e.g. for car link leave event
+		//enter time of car is more than bike enter time and leave time of bike is not reached yet
+		// if end time of bike will reach, it won't be in linkEnterList 
 		for(Id<Person> personId:this.personId2LinkEnterTime.keySet()){
-			if(this.personId2LinkEnterTime.get(event.getPersonId())>this.personId2LinkEnterTime.get(personId)){
+			if(this.personId2LinkEnterTime.get(event.getPersonId()) > this.personId2LinkEnterTime.get(personId)){
 				overtakenBicycles++;
 			}
 		}
 		return overtakenBicycles;
 	}
 
+
 	public Map<Double, Double> getDensity2TotalOvertakenBicycleCount(){
 		return this.density2TotalOvertakenBicycles;
 	}
-
+	
 	public Map<Double, Double> getDensity2AverageOvertakenBicycleCount(){
 		return this.density2AverageOvertakenBicycles;
 	}
