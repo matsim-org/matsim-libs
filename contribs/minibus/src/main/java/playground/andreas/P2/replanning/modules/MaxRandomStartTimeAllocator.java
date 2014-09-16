@@ -25,8 +25,8 @@ import org.apache.log4j.Logger;
 import org.matsim.core.gbl.MatsimRandom;
 
 import playground.andreas.P2.operator.Operator;
-import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.AbstractPStrategyModule;
+import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.TimeProvider;
 
 /**
@@ -36,7 +36,7 @@ import playground.andreas.P2.replanning.TimeProvider;
  * @author aneumann
  *
  */
-public class MaxRandomStartTimeAllocator extends AbstractPStrategyModule {
+public final class MaxRandomStartTimeAllocator extends AbstractPStrategyModule {
 	
 	private final static Logger log = Logger.getLogger(MaxRandomStartTimeAllocator.class);
 	public static final String STRATEGY_NAME = "MaxRandomStartTimeAllocator";

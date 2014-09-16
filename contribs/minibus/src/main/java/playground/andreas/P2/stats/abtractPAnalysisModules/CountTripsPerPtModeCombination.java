@@ -40,7 +40,7 @@ import org.matsim.vehicles.Vehicle;
  * @author aneumann
  *
  */
-public class CountTripsPerPtModeCombination extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, ActivityStartEventHandler{
+public final class CountTripsPerPtModeCombination extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, ActivityStartEventHandler{
 	
 	private final static Logger log = Logger.getLogger(CountTripsPerPtModeCombination.class);
 	

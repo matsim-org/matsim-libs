@@ -43,7 +43,7 @@ import org.matsim.vehicles.Vehicle;
  * @author aneumann
  *
  */
-public class OperatorCostCollectorHandler implements TransitDriverStartsEventHandler, LinkEnterEventHandler, PersonLeavesVehicleEventHandler, AfterMobsimListener {
+public final class OperatorCostCollectorHandler implements TransitDriverStartsEventHandler, LinkEnterEventHandler, PersonLeavesVehicleEventHandler, AfterMobsimListener {
 	
 	private final static Logger log = Logger.getLogger(OperatorCostCollectorHandler.class);
 	

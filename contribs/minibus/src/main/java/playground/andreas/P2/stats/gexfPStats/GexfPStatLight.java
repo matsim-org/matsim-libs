@@ -70,7 +70,7 @@ import playground.andreas.P2.helper.PConfigGroup;
  * @author aneumann
  *
  */
-public class GexfPStatLight extends MatsimJaxbXmlWriter implements StartupListener, IterationEndsListener, ShutdownListener{
+public final class GexfPStatLight extends MatsimJaxbXmlWriter implements StartupListener, IterationEndsListener, ShutdownListener{
 	
 	private static final Logger log = Logger.getLogger(GexfPStatLight.class);
 	

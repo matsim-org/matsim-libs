@@ -41,7 +41,7 @@ import playground.andreas.P2.helper.PConfigGroup;
  * @author aneumann
  *
  */
-public class PVehiclesFactory {
+class PVehiclesFactory {
 	private final static Logger log = Logger.getLogger(PVehiclesFactory.class);
 	
 	private PConfigGroup pConfig;

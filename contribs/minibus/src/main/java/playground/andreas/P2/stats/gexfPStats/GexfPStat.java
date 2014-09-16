@@ -74,7 +74,7 @@ import playground.andreas.P2.operator.Operator;
  * @author aneumann
  *
  */
-public class GexfPStat extends MatsimJaxbXmlWriter implements StartupListener, IterationEndsListener, ShutdownListener{
+public final class GexfPStat extends MatsimJaxbXmlWriter implements StartupListener, IterationEndsListener, ShutdownListener{
 	
 	private static final Logger log = Logger.getLogger(GexfPStat.class);
 	

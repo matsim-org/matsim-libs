@@ -54,7 +54,7 @@ import com.vividsolutions.jts.operation.buffer.BufferParameters;
  * @author aneumann
  *
  */
-public class SidewaysRouteExtension extends AbstractPStrategyModule {
+public final class SidewaysRouteExtension extends AbstractPStrategyModule {
 	
 	private final static Logger log = Logger.getLogger(SidewaysRouteExtension.class);
 	public static final String STRATEGY_NAME = "SidewaysRouteExtension";

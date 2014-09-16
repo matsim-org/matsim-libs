@@ -36,7 +36,7 @@ import org.matsim.vehicles.Vehicle;
  * @author aneumann
  *
  */
-public class CountDeparturesPerMode extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler, VehicleDepartsAtFacilityEventHandler{
+public final class CountDeparturesPerMode extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler, VehicleDepartsAtFacilityEventHandler{
 	
 	private final static Logger log = Logger.getLogger(CountDeparturesPerMode.class);
 	

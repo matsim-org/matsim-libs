@@ -25,7 +25,7 @@ package playground.andreas.P2.scoring.fare;
  * @author aneumann
  *
  */
-public class TicketMachine {
+public final class TicketMachine {
 	
 	private double earningsPerBoardingPassenger;
 	private double earningsPerMeterAndPassenger;

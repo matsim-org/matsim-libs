@@ -36,7 +36,7 @@ import org.matsim.vehicles.Vehicle;
  * @author aneumann
  *
  */
-public class StageContainer {
+public final class StageContainer {
 	
 	private PersonEntersVehicleEvent personEnterVehE;
 	private TransitDriverStartsEvent transitDriverStartsE;

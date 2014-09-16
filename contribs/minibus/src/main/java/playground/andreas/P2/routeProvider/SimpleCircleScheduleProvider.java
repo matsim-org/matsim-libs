@@ -57,7 +57,7 @@ import playground.andreas.P2.replanning.PPlan;
  * @author aneumann
  *
  */
-public class SimpleCircleScheduleProvider implements PRouteProvider {
+public final class SimpleCircleScheduleProvider implements PRouteProvider {
 	
 	private final static Logger log = Logger.getLogger(SimpleCircleScheduleProvider.class);
 	public final static String NAME = "SimpleCircleScheduleProvider";

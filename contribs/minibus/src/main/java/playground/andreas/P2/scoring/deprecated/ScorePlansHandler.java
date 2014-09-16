@@ -44,7 +44,7 @@ import playground.andreas.P2.helper.PConfigGroup;
  *
  */
 @Deprecated
-public class ScorePlansHandler implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, LinkEnterEventHandler{
+public final class ScorePlansHandler implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, LinkEnterEventHandler{
 	
 	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(ScorePlansHandler.class);

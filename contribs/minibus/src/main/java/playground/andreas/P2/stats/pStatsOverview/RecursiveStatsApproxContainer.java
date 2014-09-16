@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
  * @author aneumann
  *
  */
-public class RecursiveStatsApproxContainer {
+public final class RecursiveStatsApproxContainer {
 	
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(RecursiveStatsApproxContainer.class);

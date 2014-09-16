@@ -35,7 +35,7 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
  * @author aneumann
  *
  */
-public class PReRoute implements PlanStrategy {
+public final class PReRoute implements PlanStrategy {
 	PlanStrategyImpl strategy = null ;
 
 	public PReRoute(Scenario scenario) {

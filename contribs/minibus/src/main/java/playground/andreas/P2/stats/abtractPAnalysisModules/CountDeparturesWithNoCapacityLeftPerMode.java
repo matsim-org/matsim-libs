@@ -41,7 +41,7 @@ import org.matsim.vehicles.Vehicles;
  * @author aneumann
  *
  */
-public class CountDeparturesWithNoCapacityLeftPerMode extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, VehicleDepartsAtFacilityEventHandler{
+public final class CountDeparturesWithNoCapacityLeftPerMode extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, VehicleDepartsAtFacilityEventHandler{
 	
 	private final static Logger log = Logger.getLogger(CountDeparturesWithNoCapacityLeftPerMode.class);
 	

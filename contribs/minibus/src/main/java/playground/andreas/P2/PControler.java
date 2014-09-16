@@ -34,7 +34,7 @@ import playground.andreas.P2.hook.PHook;
  * 
  * @author aneumann
  */
-public class PControler{
+public final class PControler{
 
 	private final static Logger log = Logger.getLogger(PControler.class);
 

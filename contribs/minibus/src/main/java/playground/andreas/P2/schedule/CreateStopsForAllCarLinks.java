@@ -41,7 +41,7 @@ import playground.andreas.P2.helper.PConfigGroup;
  * @author aneumann
  *
  */
-public class CreateStopsForAllCarLinks {
+public final class CreateStopsForAllCarLinks {
 	
 	private final static Logger log = Logger.getLogger(CreateStopsForAllCarLinks.class);
 	

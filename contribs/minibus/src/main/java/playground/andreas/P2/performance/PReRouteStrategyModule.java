@@ -30,7 +30,7 @@ import org.matsim.core.replanning.ReplanningContext;
  * @author aneumann
  *
  */
-public class PReRouteStrategyModule implements PlanStrategyModule{
+public final class PReRouteStrategyModule implements PlanStrategyModule{
 	
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(PReRouteStrategyModule.class);

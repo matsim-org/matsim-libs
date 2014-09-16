@@ -34,7 +34,7 @@ import org.matsim.pt.router.TransitActsRemover;
  *
  * @author aneumann
  */
-public class PersonReRouteStuck extends AbstractPersonReRouteStuck {
+class PersonReRouteStuck extends AbstractPersonReRouteStuck {
 
 
 	private static final Logger log = Logger.getLogger(PersonReRouteStuck.class);

@@ -34,7 +34,7 @@ import org.matsim.pt.router.TransitRouterFactory;
  * @author aneumann, droeder
  *
  */
-public class PTripRouterFactoryFactory {
+class PTripRouterFactoryFactory {
 
 	private final static Logger log = Logger.getLogger(PTripRouterFactoryFactory.class);
 

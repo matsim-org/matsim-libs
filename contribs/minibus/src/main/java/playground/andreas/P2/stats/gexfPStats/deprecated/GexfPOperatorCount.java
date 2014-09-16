@@ -75,7 +75,7 @@ import playground.andreas.P2.stats.gexfPStats.CountPPaxHandler;
  *
  */
 @Deprecated
-public class GexfPOperatorCount extends MatsimJaxbXmlWriter implements StartupListener, IterationEndsListener, ShutdownListener{
+public final class GexfPOperatorCount extends MatsimJaxbXmlWriter implements StartupListener, IterationEndsListener, ShutdownListener{
 	
 	private static final Logger log = Logger.getLogger(GexfPOperatorCount.class);
 	

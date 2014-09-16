@@ -32,7 +32,14 @@ import playground.andreas.bvgScoringFunction.BvgScoringFunctionFactory;
 
 
 /**
- * Entry point, registers all necessary hooks
+ * Entry point, registers all necessary hooks.  This version uses {@link playground.andreas.bvgScoringFunction} instead of the 
+ * standard MATSim scoring function.  This means "scoring for passengers", not "scoring of the operator".
+ * <p/>
+ * Comments:<ul>
+ * <li> I am not sure why there needs to be a separate scoring function; in principle, the standard MATSim scoring function should have
+ * the same functionality.  If not, then it should be added there.  kai, sep'14
+ * <li> In consequence, this version here should not be used by outside people.  kai, sep'14
+ * </ul>
  * 
  * @author aneumann
  */

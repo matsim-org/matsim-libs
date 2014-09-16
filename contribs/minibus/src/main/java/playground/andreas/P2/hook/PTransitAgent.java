@@ -47,7 +47,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  * 
  * @author aneumann
  */
-public class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPassengerAgent {
+class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPassengerAgent {
 
 	private final static Logger log = Logger.getLogger(PTransitAgent.class);
 	

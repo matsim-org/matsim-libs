@@ -56,7 +56,7 @@ import playground.andreas.P2.helper.PConfigGroup;
  * @author aneumann
  *
  */
-public class ActivityLocationsParatransitUser implements IterationEndsListener {
+public final class ActivityLocationsParatransitUser implements IterationEndsListener {
 	private final static Logger log = Logger.getLogger(ActivityLocationsParatransitUser.class);
 	private final String outNameIdentifier = "actsFromParatransitUsers.txt";
 	

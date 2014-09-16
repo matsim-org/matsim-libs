@@ -67,7 +67,7 @@ import playground.andreas.P2.helper.PConfigGroup;
  * @author aneumann
  *
  */
-public class SimpleGexfPStat extends MatsimJaxbXmlWriter implements IterationEndsListener{
+public final class SimpleGexfPStat extends MatsimJaxbXmlWriter implements IterationEndsListener{
 	
 	private static final Logger log = Logger.getLogger(SimpleGexfPStat.class);
 	

@@ -49,7 +49,7 @@ import org.matsim.vehicles.Vehicle;
  * @author aneumann
  *
  */
-public class StageContainerCreator implements TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, LinkEnterEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, AfterMobsimListener{
+public final class StageContainerCreator implements TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, LinkEnterEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, AfterMobsimListener{
 	
 	private final static Logger log = Logger.getLogger(StageContainerCreator.class);
 	

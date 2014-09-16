@@ -59,7 +59,7 @@ import playground.andreas.P2.routeProvider.RandomStopProvider;
  * @author aneumann
  *
  */
-public class SimpleBackAndForthScheduleProvider implements PRouteProvider{
+public final class SimpleBackAndForthScheduleProvider implements PRouteProvider{
 	
 	private final static Logger log = Logger.getLogger(SimpleBackAndForthScheduleProvider.class);
 	public final static String NAME = "SimpleBackAndForthScheduleProvider";

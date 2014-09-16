@@ -41,7 +41,7 @@ import playground.andreas.P2.operator.Operator;
  * @author aneumann
  *
  */
-public class CountPOperatorHandler implements LinkEnterEventHandler, TransitDriverStartsEventHandler{
+public final class CountPOperatorHandler implements LinkEnterEventHandler, TransitDriverStartsEventHandler{
 	
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(CountPOperatorHandler.class);

@@ -36,7 +36,7 @@ import playground.andreas.P2.replanning.TimeProvider;
  * @author aneumann
  *
  */
-public class WeightedStartTimeExtension extends AbstractPStrategyModule {
+public final class WeightedStartTimeExtension extends AbstractPStrategyModule {
 	
 	private final static Logger log = Logger.getLogger(WeightedStartTimeExtension.class);
 	public static final String STRATEGY_NAME = "WeightedStartTimeExtension";

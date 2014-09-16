@@ -41,7 +41,7 @@ import playground.andreas.P2.stats.pStatsOverview.PStatsOverview;
  * @author aneumann
  *
  */
-public class StatsManager implements StartupListener{
+public final class StatsManager implements StartupListener{
 	
 	public StatsManager(Controler controler, PConfigGroup pConfig, PBox pBox, PtMode2LineSetter lineSetter){
 		// register all modules

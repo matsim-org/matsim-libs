@@ -67,7 +67,7 @@ import playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter.PtMode2Lin
  * @author aneumann
  *
  */
-public class PAnalysisManager implements StartupListener, IterationStartsListener, IterationEndsListener{
+public final class PAnalysisManager implements StartupListener, IterationStartsListener, IterationEndsListener{
 	private final static Logger log = Logger.getLogger(PAnalysisManager.class);
 	
 	private final String pIdentifier;

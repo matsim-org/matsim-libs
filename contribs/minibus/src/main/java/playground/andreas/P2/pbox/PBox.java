@@ -57,7 +57,7 @@ import java.util.TreeMap;
  * @author aneumann
  *
  */
-public class PBox implements StartupListener, IterationStartsListener, ScoringListener{
+public final class PBox implements StartupListener, IterationStartsListener, ScoringListener{
 	
 	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(PBox.class);

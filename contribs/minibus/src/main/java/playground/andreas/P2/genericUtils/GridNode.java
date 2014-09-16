@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.Coord;
  * @author aneumann
  *
  */
-public class GridNode {
+public final class GridNode {
 	
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(GridNode.class);

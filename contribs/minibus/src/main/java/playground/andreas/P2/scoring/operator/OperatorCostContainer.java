@@ -36,7 +36,7 @@ import org.matsim.vehicles.Vehicle;
  * @author aneumann
  *
  */
-public class OperatorCostContainer {
+public final class OperatorCostContainer {
 	
 	private final double costPerVehicleAndDay;
 	private final double expensesPerMeter;

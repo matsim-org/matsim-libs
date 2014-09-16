@@ -47,7 +47,7 @@ import playground.andreas.P2.helper.PConfigGroup;
  * @author aneumann
  *
  */
-public class PQSimFactory implements MobsimFactory {
+class PQSimFactory implements MobsimFactory {
 
     private final static Logger log = Logger.getLogger(PQSimFactory.class);
 

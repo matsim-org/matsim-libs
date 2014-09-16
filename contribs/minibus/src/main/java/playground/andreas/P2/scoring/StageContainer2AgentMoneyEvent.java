@@ -42,7 +42,7 @@ import playground.andreas.P2.scoring.fare.TicketMachine;
  * @author aneumann
  *
  */
-public class StageContainer2AgentMoneyEvent implements StageContainerHandler, AfterMobsimListener{
+public final class StageContainer2AgentMoneyEvent implements StageContainerHandler, AfterMobsimListener{
 
 	private EventsManager eventsManager;
 	private double mobsimShutdownTime;

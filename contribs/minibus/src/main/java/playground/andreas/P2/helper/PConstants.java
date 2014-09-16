@@ -22,7 +22,7 @@ package playground.andreas.P2.helper;
 /**
  * @author aneumann
  */
-public class PConstants {
+public final class PConstants {
 
 	public static final String statsOutputFolder = "/pStats/";
 	

@@ -31,7 +31,7 @@ import org.matsim.vehicles.Vehicle;
  *
  */
 @Deprecated
-public class ScoreContainer {
+public final class ScoreContainer {
 	
 	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(ScoreContainer.class);

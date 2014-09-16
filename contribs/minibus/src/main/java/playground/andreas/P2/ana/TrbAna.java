@@ -67,7 +67,7 @@ import playground.andreas.P2.helper.PConfigGroup;
  * @author aneumann
  *
  */
-public class TrbAna implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, LinkEnterEventHandler, VehicleArrivesAtFacilityEventHandler{
+public final class TrbAna implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, LinkEnterEventHandler, VehicleArrivesAtFacilityEventHandler{
 
 	private static final Logger log = Logger.getLogger(TrbAna.class);
 	

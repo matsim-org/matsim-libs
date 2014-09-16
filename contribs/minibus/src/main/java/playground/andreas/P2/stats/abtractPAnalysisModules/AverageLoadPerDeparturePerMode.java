@@ -44,7 +44,7 @@ import playground.andreas.P2.genericUtils.RecursiveStatsContainer;
  * @author aneumann
  *
  */
-public class AverageLoadPerDeparturePerMode extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, VehicleDepartsAtFacilityEventHandler{
+public final class AverageLoadPerDeparturePerMode extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, VehicleDepartsAtFacilityEventHandler{
 	
 	private final static Logger log = Logger.getLogger(AverageLoadPerDeparturePerMode.class);
 	

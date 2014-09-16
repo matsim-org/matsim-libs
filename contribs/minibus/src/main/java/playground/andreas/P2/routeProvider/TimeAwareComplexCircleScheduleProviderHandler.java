@@ -34,7 +34,7 @@ import org.matsim.vehicles.Vehicle;
 /**
  * @author aneumann
  */
-public class TimeAwareComplexCircleScheduleProviderHandler implements TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler{
+public final class TimeAwareComplexCircleScheduleProviderHandler implements TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler{
 
 	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(TimeAwareComplexCircleScheduleProviderHandler.class);

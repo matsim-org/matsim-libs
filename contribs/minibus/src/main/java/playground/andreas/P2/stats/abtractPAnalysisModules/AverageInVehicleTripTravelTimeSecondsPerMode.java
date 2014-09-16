@@ -39,7 +39,7 @@ import org.matsim.vehicles.Vehicle;
  * @author aneumann
  *
  */
-public class AverageInVehicleTripTravelTimeSecondsPerMode extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
+public final class AverageInVehicleTripTravelTimeSecondsPerMode extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
 	
 	private final static Logger log = Logger.getLogger(AverageInVehicleTripTravelTimeSecondsPerMode.class);
 	

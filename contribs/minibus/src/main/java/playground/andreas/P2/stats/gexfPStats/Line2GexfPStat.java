@@ -41,7 +41,7 @@ import playground.andreas.P2.helper.PConstants;
  * @author aneumann
  *
  */
-public class Line2GexfPStat implements StartupListener, IterationEndsListener, ShutdownListener{
+public final class Line2GexfPStat implements StartupListener, IterationEndsListener, ShutdownListener{
 	
 	private static final Logger log = Logger.getLogger(Line2GexfPStat.class);
 

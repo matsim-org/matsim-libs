@@ -35,7 +35,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  * @author aneumann
  *
  */
-public class BVGLines2PtModes implements PtMode2LineSetter{
+public final class BVGLines2PtModes implements PtMode2LineSetter{
 	
 	private final static Logger log = Logger.getLogger(BVGLines2PtModes.class);
 	private HashMap<Id<TransitLine>, String> lineId2ptMode;

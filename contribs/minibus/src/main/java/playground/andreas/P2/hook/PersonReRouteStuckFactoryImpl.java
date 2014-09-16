@@ -29,7 +29,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * @author droeder
  *
  */
-public class PersonReRouteStuckFactoryImpl implements PersonReRouteStuckFactory {
+class PersonReRouteStuckFactoryImpl implements PersonReRouteStuckFactory {
 
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(PersonReRouteStuckFactoryImpl.class);

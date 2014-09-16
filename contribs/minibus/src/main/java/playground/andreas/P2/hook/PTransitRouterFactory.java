@@ -38,7 +38,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  * @author aneumann
  *
  */
-public class PTransitRouterFactory implements TransitRouterFactory{
+class PTransitRouterFactory implements TransitRouterFactory{
 	
 	private final static Logger log = Logger.getLogger(PTransitRouterFactory.class);
 	private TransitRouterConfig transitRouterConfig;

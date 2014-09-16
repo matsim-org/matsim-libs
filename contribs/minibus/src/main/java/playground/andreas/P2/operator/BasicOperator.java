@@ -34,7 +34,7 @@ import playground.andreas.P2.replanning.PStrategyManager;
  * @author aneumann
  *
  */
-public class BasicOperator extends AbstractOperator{
+public final class BasicOperator extends AbstractOperator{
 	
 	public static final String OPERATOR_NAME = "BasicOperator"; 
 

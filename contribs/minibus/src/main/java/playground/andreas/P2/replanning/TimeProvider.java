@@ -40,7 +40,7 @@ import playground.andreas.P2.helper.PConstants;
  * @author aneumann
  *
  */
-public class TimeProvider implements ActivityStartEventHandler, ActivityEndEventHandler{
+public final class TimeProvider implements ActivityStartEventHandler, ActivityEndEventHandler{
 	
 	private final static Logger log = Logger.getLogger(TimeProvider.class);
 	private final double maxTime = 30.0 * 3600.0;

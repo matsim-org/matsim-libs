@@ -39,7 +39,7 @@ import org.matsim.vehicles.Vehicle;
  * @author aneumann
  *
  */
-public class AverageWaitingTimeSecondsPerMode extends AbstractPAnalyisModule implements PersonDepartureEventHandler, TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler{
+public final class AverageWaitingTimeSecondsPerMode extends AbstractPAnalyisModule implements PersonDepartureEventHandler, TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler{
 	
 	private final static Logger log = Logger.getLogger(AverageWaitingTimeSecondsPerMode.class);
 	

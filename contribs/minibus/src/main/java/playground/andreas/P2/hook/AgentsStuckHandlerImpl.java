@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
  *
  * @author aneumann
  */
-public class AgentsStuckHandlerImpl implements PersonStuckEventHandler{
+class AgentsStuckHandlerImpl implements PersonStuckEventHandler{
 
 	private static final Logger log = Logger.getLogger(AgentsStuckHandlerImpl.class);
 

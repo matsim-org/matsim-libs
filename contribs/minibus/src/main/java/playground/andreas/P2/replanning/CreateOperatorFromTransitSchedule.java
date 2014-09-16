@@ -52,7 +52,7 @@ import playground.andreas.P2.routeProvider.PRouteProvider;
  * @author aneumann
  *
  */
-public class CreateOperatorFromTransitSchedule implements PStrategy{
+public final class CreateOperatorFromTransitSchedule implements PStrategy{
 	
 	private final static Logger log = Logger.getLogger(CreateOperatorFromTransitSchedule.class);
 	public static final String STRATEGY_NAME = "CreateOperatorFromSchedule";

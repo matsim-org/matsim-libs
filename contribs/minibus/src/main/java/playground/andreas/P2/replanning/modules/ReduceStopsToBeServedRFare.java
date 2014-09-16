@@ -47,7 +47,7 @@ import playground.andreas.P2.scoring.fare.TicketMachine;
  * @author aneumann
  *
  */
-public class ReduceStopsToBeServedRFare extends AbstractPStrategyModule implements StageContainerHandler{
+public final class ReduceStopsToBeServedRFare extends AbstractPStrategyModule implements StageContainerHandler{
 	
 	private final static Logger log = Logger.getLogger(ReduceStopsToBeServedRFare.class);
 	

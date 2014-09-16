@@ -47,7 +47,7 @@ import playground.andreas.P2.helper.PConstants;
  * @author aneumann
  *
  */
-public class RandomStopProvider {
+public final class RandomStopProvider {
 	
 	private final static Logger log = Logger.getLogger(RandomStopProvider.class);
 	

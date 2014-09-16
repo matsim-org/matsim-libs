@@ -39,7 +39,7 @@ import playground.andreas.P2.routeProvider.PRouteProviderFactory;
  * @author aneumann
  *
  */
-public class OperatorInitializer {
+public final class OperatorInitializer {
 	
 	private final static Logger log = Logger.getLogger(OperatorInitializer.class);
 	private PConfigGroup pConfig;

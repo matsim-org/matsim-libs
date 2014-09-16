@@ -1,5 +1,7 @@
 /**
- * Look into {@link playground.andreas.P2.PControler} and {@link playground.andreas.P2.PControlerBVG} .
+ * Look into:<ul>
+ * <li> {@link playground.andreas.P2.PControler} 
+ * </ul>
  *
  * @author aneumann
  */

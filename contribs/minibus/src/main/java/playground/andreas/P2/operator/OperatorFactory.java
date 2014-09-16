@@ -30,7 +30,7 @@ import playground.andreas.P2.pbox.PFranchise;
  * @author aneumann
  *
  */
-public class OperatorFactory {
+public final class OperatorFactory {
 	
 	private final static Logger log = Logger.getLogger(OperatorFactory.class);
 	

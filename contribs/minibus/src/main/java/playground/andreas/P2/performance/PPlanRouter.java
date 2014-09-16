@@ -47,7 +47,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  *
  * @author aneumann, thibautd
  */
-public class PPlanRouter implements PlanAlgorithm, PersonAlgorithm {
+public final class PPlanRouter implements PlanAlgorithm, PersonAlgorithm {
 	private final TripRouter routingHandler;
 	private final ActivityFacilities facilities;
 

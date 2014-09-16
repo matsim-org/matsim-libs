@@ -33,7 +33,8 @@ import playground.andreas.P2.routeProvider.deprecated.SimpleBackAndForthSchedule
  * @author aneumann
  *
  */
-public class PRouteProviderFactory {
+public final class PRouteProviderFactory {
+	private PRouteProviderFactory(){} // should not be instantiated
 
 	private final static Logger log = Logger.getLogger(PRouteProviderFactory.class);
 

@@ -22,6 +22,7 @@ package playground.andreas.P2.replanning.modules;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
+
 import playground.andreas.P2.operator.Operator;
 import playground.andreas.P2.replanning.AbstractPStrategyModule;
 import playground.andreas.P2.replanning.PPlan;
@@ -35,7 +36,7 @@ import playground.andreas.P2.replanning.TimeProvider;
  * @author aneumann
  *
  */
-public class WeightedEndTimeExtension extends AbstractPStrategyModule {
+public final class WeightedEndTimeExtension extends AbstractPStrategyModule {
 	
 	private final static Logger log = Logger.getLogger(WeightedEndTimeExtension.class);	
 	public static final String STRATEGY_NAME = "WeightedEndTimeExtension";

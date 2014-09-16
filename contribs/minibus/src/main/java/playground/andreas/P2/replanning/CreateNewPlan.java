@@ -34,7 +34,7 @@ import playground.andreas.P2.operator.Operator;
  * @author aneumann
  *
  */
-public class CreateNewPlan extends AbstractPStrategyModule {
+public final class CreateNewPlan extends AbstractPStrategyModule {
 	
 	private final static Logger log = Logger.getLogger(CreateNewPlan.class);
 	public static final String STRATEGY_NAME = "CreateNewPlan";

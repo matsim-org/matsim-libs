@@ -37,7 +37,7 @@ import playground.andreas.P2.replanning.PPlan;
  * @author aneumann
  *
  */
-public class PFranchise {
+public final class PFranchise {
 
 	private final static Logger log = Logger.getLogger(PFranchise.class);
 	

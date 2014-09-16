@@ -38,7 +38,7 @@ import org.matsim.pt.router.TransitActsRemover;
  * @author droeder
  *
  */
-public abstract class AbstractPersonReRouteStuck extends AbstractPersonAlgorithm  {
+abstract class AbstractPersonReRouteStuck extends AbstractPersonAlgorithm  {
 	
 	protected final PlanAlgorithm router;
 	protected final Network  network;

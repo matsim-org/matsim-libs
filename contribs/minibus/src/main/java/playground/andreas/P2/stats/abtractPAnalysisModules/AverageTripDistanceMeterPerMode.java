@@ -42,7 +42,7 @@ import org.matsim.vehicles.Vehicle;
  * @author aneumann
  *
  */
-public class AverageTripDistanceMeterPerMode extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, LinkEnterEventHandler{
+public final class AverageTripDistanceMeterPerMode extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, LinkEnterEventHandler{
 	
 	private final static Logger log = Logger.getLogger(AverageTripDistanceMeterPerMode.class);
 	

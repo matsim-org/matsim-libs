@@ -38,7 +38,7 @@ import org.matsim.vehicles.Vehicles;
  * @author aneumann
  *
  */
-public class CountCapacityMeterPerMode extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler, LinkEnterEventHandler{
+public final class CountCapacityMeterPerMode extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler, LinkEnterEventHandler{
 	
 	private final static Logger log = Logger.getLogger(CountCapacityMeterPerMode.class);
 	

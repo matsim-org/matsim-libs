@@ -41,7 +41,7 @@ import org.matsim.vehicles.Vehicle;
  * @author aneumann
  *
  */
-public class AverageNumberOfStopsPerMode extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, VehicleArrivesAtFacilityEventHandler{
+public final class AverageNumberOfStopsPerMode extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, VehicleArrivesAtFacilityEventHandler{
 	
 	private final static Logger log = Logger.getLogger(AverageNumberOfStopsPerMode.class);
 	

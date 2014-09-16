@@ -54,7 +54,7 @@ import com.vividsolutions.jts.operation.buffer.BufferParameters;
  * @author aneumann
  *
  */
-public class EndRouteExtension extends AbstractPStrategyModule {
+public final class EndRouteExtension extends AbstractPStrategyModule {
 	
 	private final static Logger log = Logger.getLogger(EndRouteExtension.class);
 	public static final String STRATEGY_NAME = "EndRouteExtension";

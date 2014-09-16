@@ -39,7 +39,7 @@ import playground.andreas.P2.routeProvider.PRouteProvider;
  * @author aneumann
  *
  */
-public class MultiPlanOperator extends AbstractOperator{
+public final class MultiPlanOperator extends AbstractOperator{
 	
 	public static final String OPERATOR_NAME = "MultiPlanOperator";
 	

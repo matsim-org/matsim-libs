@@ -44,7 +44,7 @@ import playground.andreas.P2.scoring.fare.TicketMachine;
  * @author aneumann
  *
  */
-public class PStrategyManager {
+public final class PStrategyManager {
 	
 	private final static Logger log = Logger.getLogger(PStrategyManager.class);
 	

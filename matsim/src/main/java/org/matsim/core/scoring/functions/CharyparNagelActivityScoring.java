@@ -272,7 +272,7 @@ public class CharyparNagelActivityScoring implements ActivityScoring, org.matsim
 		return openInterval;
 	}
 
-	private void handleOvernightActivity(Activity lastActivity) {
+	private final void handleOvernightActivity(Activity lastActivity) {
 		assert firstActivity != null;
 		assert lastActivity != null;
 
@@ -315,7 +315,7 @@ public class CharyparNagelActivityScoring implements ActivityScoring, org.matsim
 		}
 	}
 
-	private void handleMorningActivity() {
+	private final void handleMorningActivity() {
 		assert firstActivity != null;
 		// score first activity
 		this.score += calcActScore(0.0, this.firstActivityEndTime, firstActivity);

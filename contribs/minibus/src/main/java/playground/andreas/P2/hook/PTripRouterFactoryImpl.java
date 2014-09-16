@@ -61,7 +61,7 @@ import org.matsim.pt.router.TransitRouterFactory;
  * config file.
  * @author aneumann, thibautd
  */
-public class PTripRouterFactoryImpl implements TripRouterFactory {
+class PTripRouterFactoryImpl implements TripRouterFactory {
 	private static final Logger log =
 		Logger.getLogger(PTripRouterFactoryImpl.class);
 

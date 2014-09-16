@@ -51,7 +51,7 @@ import org.matsim.core.events.EventsUtils;
  * @author aneumann
  *
  */
-public class IatbrAna implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, LinkEnterEventHandler{
+public final class IatbrAna implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, LinkEnterEventHandler{
 
 	private static final Logger log = Logger.getLogger(IatbrAna.class);
 	

@@ -38,7 +38,7 @@ import org.matsim.vehicles.Vehicle;
  * @author aneumann
  *
  */
-public class PPlan implements Comparable<PPlan>{
+public final class PPlan implements Comparable<PPlan>{
 
 	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(PPlan.class);

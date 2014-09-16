@@ -59,7 +59,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * @author aneumann, droeder
  *
  */
-public class CreatePStops{
+public final class CreatePStops{
 	
 	private final static Logger log = Logger.getLogger(CreatePStops.class);
 	

@@ -54,7 +54,7 @@ import java.util.Set;
  * 
  * @author aneumann
  */
-public class PHook implements IterationStartsListener, StartupListener, ScoringListener{
+public final class PHook implements IterationStartsListener, StartupListener, ScoringListener{
 	
 	private final static Logger log = Logger.getLogger(PHook.class);
 

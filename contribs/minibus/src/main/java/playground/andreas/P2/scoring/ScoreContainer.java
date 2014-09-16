@@ -33,7 +33,7 @@ import playground.andreas.P2.scoring.operator.OperatorCostContainer;
  * @author aneumann
  *
  */
-public class ScoreContainer {
+public final class ScoreContainer {
 	
 	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(ScoreContainer.class);

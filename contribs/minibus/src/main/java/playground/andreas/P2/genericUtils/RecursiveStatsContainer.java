@@ -25,7 +25,7 @@ package playground.andreas.P2.genericUtils;
  * @author aneumann
  *
  */
-public class RecursiveStatsContainer {
+public final class RecursiveStatsContainer {
 
 	private double numberOfEntries = Double.NaN;
 	private double arithmeticMean;

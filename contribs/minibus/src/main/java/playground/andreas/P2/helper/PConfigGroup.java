@@ -42,7 +42,7 @@ import playground.andreas.P2.operator.BasicOperator;
  * @author aneumann
  *
  */
-public class PConfigGroup extends Module{
+public final class PConfigGroup extends Module{
 	
 	/**
 	 * TODO [AN] This one has to be checked

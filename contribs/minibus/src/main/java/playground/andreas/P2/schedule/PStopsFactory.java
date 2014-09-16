@@ -30,7 +30,7 @@ import playground.andreas.P2.helper.PConfigGroup;
  * @author aneumann
  *
  */
-public class PStopsFactory {
+public final class PStopsFactory {
 
 	public static TransitSchedule createPStops(Network network, PConfigGroup pConfig, TransitSchedule transitSchedule){
 		// return CreateStopsForAllCarLinks.createStopsForAllCarLinks(network, pConfig, transitSchedule);

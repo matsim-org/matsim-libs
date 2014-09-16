@@ -37,7 +37,7 @@ import playground.andreas.P2.scoring.operator.OperatorCostContainerHandler;
  * @author aneumann
  *
  */
-public class ScorePlansHandler implements StageContainerHandler, OperatorCostContainerHandler{
+public final class ScorePlansHandler implements StageContainerHandler, OperatorCostContainerHandler{
 	
 	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(ScorePlansHandler.class);

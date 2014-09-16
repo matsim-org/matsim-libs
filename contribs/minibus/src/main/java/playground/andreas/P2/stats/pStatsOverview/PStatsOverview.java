@@ -56,7 +56,7 @@ import playground.andreas.P2.replanning.PPlan;
  *
  * @author aneumann based on {@link org.matsim.analysis.ScoreStatsControlerListener} by mrieser
  */
-public class PStatsOverview implements StartupListener, IterationEndsListener, ShutdownListener {
+public final class PStatsOverview implements StartupListener, IterationEndsListener, ShutdownListener {
 
 	private final static Logger log = Logger.getLogger(PStatsOverview.class);
 	

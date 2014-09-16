@@ -60,7 +60,7 @@ import playground.andreas.P2.replanning.PPlan;
  *
  * @author aneumann
  */
-public class POperatorLogger implements StartupListener, IterationEndsListener, ShutdownListener {
+public final class POperatorLogger implements StartupListener, IterationEndsListener, ShutdownListener {
 
 	private final static Logger log = Logger.getLogger(POperatorLogger.class);
 	
