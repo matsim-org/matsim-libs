@@ -22,10 +22,10 @@ public class KNGautengController {
 				, GAUTENG_PATH + "network/gauteng_20131210_coarseNationalNetwork_clean.xml.gz" // net 
 //				, "/Users/nagel/gauteng-kairuns/much_simplified_network.xml.gz"
 
-//				, GAUTENG_PATH + "toll/gauteng_toll_weekday_Existing_20131211.xml" // toll
-				, GAUTENG_PATH + "toll/gauteng_toll_weekday_Combined_20131211.xml" // toll
+				, GAUTENG_PATH + "toll/gauteng_toll_weekday_Existing_20131211.xml" // toll
+//				, GAUTENG_PATH + "toll/gauteng_toll_weekday_Combined_20131211.xml" // toll
 
-				, "20" // base VoT
+				, "110" // base VoT
 				, "3" // VoT multiplier
 				, "6" // number of threads
 				, User.kai.toString()
