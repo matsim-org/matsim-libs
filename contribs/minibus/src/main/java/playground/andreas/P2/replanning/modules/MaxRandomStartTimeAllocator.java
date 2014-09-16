@@ -25,7 +25,6 @@ import org.apache.log4j.Logger;
 import org.matsim.core.gbl.MatsimRandom;
 
 import playground.andreas.P2.operator.Operator;
-import playground.andreas.P2.replanning.AbstractPStrategyModule;
 import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.TimeProvider;
 

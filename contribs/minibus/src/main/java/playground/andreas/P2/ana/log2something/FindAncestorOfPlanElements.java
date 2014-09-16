@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import playground.andreas.P2.replanning.CreateNewPlan;
+import playground.andreas.P2.replanning.modules.CreateNewPlan;
 
 public class FindAncestorOfPlanElements {
 	private static final Logger log = Logger.getLogger(FindAncestorOfPlanElements.class);

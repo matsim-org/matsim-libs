@@ -17,18 +17,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.replanning;
+package playground.andreas.P2.replanning.modules;
 
 import java.util.ArrayList;
+
+import playground.andreas.P2.replanning.PStrategy;
 
 /**
  * Provide a common constructor
  * 
  * @author aneumann
  */
-public abstract class AbstractPStrategyModule implements PStrategy{
+ abstract class AbstractPStrategyModule implements PStrategy{
 	
-	public AbstractPStrategyModule(ArrayList<String> parameter){
+	 AbstractPStrategyModule(ArrayList<String> parameter){
 
 	}
 

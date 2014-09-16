@@ -40,14 +40,14 @@ import org.matsim.pt.router.TransitActsRemover;
  */
 abstract class AbstractPersonReRouteStuck extends AbstractPersonAlgorithm  {
 	
-	protected final PlanAlgorithm router;
-	protected final Network  network;
+	final PlanAlgorithm router;
+	final Network  network;
 
 	private static final Logger log = Logger.getLogger(PersonReRouteStuck.class);
 	
-	protected Set<Id> agentsStuck;
+	Set<Id> agentsStuck;
 
-	public AbstractPersonReRouteStuck(final PlanAlgorithm router, final ScenarioImpl scenario, Set<Id> agentsStuck) {
+	AbstractPersonReRouteStuck(final PlanAlgorithm router, final ScenarioImpl scenario, Set<Id> agentsStuck) {
 		super();
 		this.router = router;
 		this.network = scenario.getNetwork();

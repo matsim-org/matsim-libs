@@ -43,7 +43,7 @@ import playground.andreas.bvgScoringFunction.BvgScoringFunctionFactory;
  * 
  * @author aneumann
  */
-public class PControlerBVG{
+public final class PControlerBVG{
 
 	private final static Logger log = Logger.getLogger(PControlerBVG.class);
 

@@ -31,6 +31,8 @@ import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.operator.Operator;
 import playground.andreas.P2.operator.OperatorFactory;
 import playground.andreas.P2.pbox.PFranchise;
+import playground.andreas.P2.replanning.modules.CreateNew24hPlan;
+import playground.andreas.P2.replanning.modules.CreateNewPlan;
 import playground.andreas.P2.routeProvider.PRouteProvider;
 import playground.andreas.P2.routeProvider.PRouteProviderFactory;
 

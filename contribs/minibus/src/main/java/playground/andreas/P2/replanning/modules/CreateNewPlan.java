@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.replanning;
+package playground.andreas.P2.replanning.modules;
 
 import java.util.ArrayList;
 
@@ -26,6 +26,8 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.andreas.P2.operator.Operator;
+import playground.andreas.P2.replanning.PPlan;
+import playground.andreas.P2.replanning.TimeProvider;
 
 /**
  * 
