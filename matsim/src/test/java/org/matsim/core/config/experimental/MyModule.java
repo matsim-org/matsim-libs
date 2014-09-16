@@ -85,7 +85,7 @@ public class MyModule extends ReflectiveModule {
 	 * interface: the user just sees the "typed" setter.
 	 */
 	@StringSetter( "idField" )
-	private <T> void setIdField(String s) {
+	private void setIdField(String s) {
 		this.idField = Id.create( s, Link.class );
 	}
 
