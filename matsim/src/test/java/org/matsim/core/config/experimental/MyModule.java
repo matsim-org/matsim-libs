@@ -21,6 +21,7 @@ package org.matsim.core.config.experimental;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 
@@ -36,7 +37,7 @@ public class MyModule extends ReflectiveModule {
 
 	// Object fields:
 	// Id: string representation is toString
-	private Id idField = null;
+	private Id<Link> idField = null;
 	// Coord: some conversion needed
 	private Coord coordField = null;
 	// enum: handled especially
@@ -69,11 +70,11 @@ public class MyModule extends ReflectiveModule {
 	 * toString: just annotate getter
 	 */
 	@StringGetter( "idField" )
-	public <T> Id<T> getIdField() {
+	public Id<Link> getIdField() {
 		return this.idField;
 	}
 
-	public <T> void setIdField(Id<T> idField) {
+	public void setIdField(Id<Link> idField) {
 		this.idField = idField;
 	}
 
@@ -84,8 +85,8 @@ public class MyModule extends ReflectiveModule {
 	 * interface: the user just sees the "typed" setter.
 	 */
 	@StringSetter( "idField" )
-	private <T> void setIdField(String s, Class<T> type) {
-		this.idField = Id.create( s, type );
+	private <T> void setIdField(String s) {
+		this.idField = Id.create( s, Link.class );
 	}
 
 	// /////////////////////////////////////////////////////////////////////
