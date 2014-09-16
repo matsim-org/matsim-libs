@@ -11,7 +11,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 
-import playground.agarwalamit.patnaIndia.mixedTraffic.VehiclesConfigGroup;
+import playground.agarwalamit.mixedTraffic.VehiclesConfigGroup;
 
 public class WriteConfig {
 	/**
