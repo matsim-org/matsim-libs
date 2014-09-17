@@ -20,11 +20,15 @@
 package org.matsim.signalsystems;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupData;
 import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsDataFactory;
+import org.matsim.signalsystems.model.Signal;
+import org.matsim.signalsystems.model.SignalGroup;
 
 
 /**
@@ -47,7 +51,7 @@ public class SignalUtils {
 	 */
 	public static void createAndAddSignalGroups4Signals(SignalGroupsData groups, SignalSystemData system) {
 		for (SignalData signal : system.getSignalData().values()){
-			SignalGroupData group4signal = groups.getFactory().createSignalGroupData(system.getId(), signal.getId());
+			SignalGroupData group4signal = groups.getFactory().createSignalGroupData(system.getId(), Id.create(signal.getId(), SignalGroup.class));
 			group4signal.addSignalId(signal.getId());
 			groups.addSignalGroupData(group4signal);
 		}
@@ -58,12 +62,12 @@ public class SignalUtils {
 	 * with the given Ids. The signal is added to the SignalSystemData. 
 	 */
 	public static void createAndAddSignal(SignalSystemData sys, SignalSystemsDataFactory factory, 
-			Id signalId, Id linkId, Id... laneIds){
+			Id<Signal> signalId, Id<Link> linkId, Id<Lane>... laneIds){
 		SignalData signal = factory.createSignalData(signalId);
 		sys.addSignalData(signal);
 		signal.setLinkId(linkId);
 		if (laneIds != null){
-			for (Id laneId : laneIds){
+			for (Id<Lane> laneId : laneIds){
 				signal.addLaneId(laneId);
 			}
 		}

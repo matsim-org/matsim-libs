@@ -31,6 +31,6 @@ public interface SignalGroupStateChangeRequest extends Comparable<SignalGroupSta
 
 	public double getTimeOfDay();
 	
-	public Id getSignalGroupId();
+	public Id<SignalGroup> getSignalGroupId();
 	
 }

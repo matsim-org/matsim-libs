@@ -31,6 +31,7 @@ import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalSystemControllerData;
 import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupData;
 import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsData;
+import org.matsim.signalsystems.model.SignalGroup;
 
 import playground.dgrether.designdrafts.consistency.ConsistencyChecker;
 
@@ -65,7 +66,7 @@ public class SignalControlDataConsistencyChecker implements ConsistencyChecker {
 		SignalControlData control = this.signalsData.getSignalControlData();
 		
 		for (SignalSystemControllerData  controller : control.getSignalSystemControllerDataBySystemId().values()) {
-			Map<Id, SignalGroupData> signalGroups = siganlGroupsData.getSignalGroupDataBySystemId(controller.getSignalSystemId());
+			Map<Id<SignalGroup>, SignalGroupData> signalGroups = siganlGroupsData.getSignalGroupDataBySystemId(controller.getSignalSystemId());
 			if (null == signalGroups) {
 				log.error("Error: No SignalGroups for SignalSystemController:");
 				log.error("\t\tSignalGroups have no entry for SignalSystem Id: " + controller.getSignalSystemId() + " specified in " + 

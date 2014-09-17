@@ -29,6 +29,8 @@ import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupData;
 import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
+import org.matsim.signalsystems.model.Signal;
+import org.matsim.signalsystems.model.SignalGroup;
 
 import playground.dgrether.designdrafts.consistency.ConsistencyChecker;
 
@@ -62,9 +64,9 @@ public class SignalGroupsDataConsistencyChecker implements ConsistencyChecker {
 	private void checkGroupToSignalsMatching() {
 		SignalGroupsData groups = this.signalsData.getSignalGroupsData();
 		SignalSystemsData signals = this.signalsData.getSignalSystemsData();
-		for (Map<Id, SignalGroupData> groupByIdMap : groups.getSignalGroupDataBySignalSystemId().values()) {
+		for (Map<Id<SignalGroup>, SignalGroupData> groupByIdMap : groups.getSignalGroupDataBySignalSystemId().values()) {
 			for (SignalGroupData group : groupByIdMap.values()) {
-				for (Id signalId : group.getSignalIds()) {
+				for (Id<Signal> signalId : group.getSignalIds()) {
 					SignalSystemData signalSystem = signals.getSignalSystemData().get(group.getSignalSystemId());
 					if (signalSystem == null) {
 						log.error("Error: No SignalSystem for SignalGroup." );

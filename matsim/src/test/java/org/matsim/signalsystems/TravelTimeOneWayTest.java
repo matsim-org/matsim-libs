@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.core.events.EventsUtils;
@@ -44,6 +43,9 @@ import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalSystemControllerData;
 import org.matsim.signalsystems.mobsim.QSimSignalEngine;
 import org.matsim.signalsystems.mobsim.SignalEngine;
+import org.matsim.signalsystems.model.Signal;
+import org.matsim.signalsystems.model.SignalGroup;
+import org.matsim.signalsystems.model.SignalSystem;
 import org.matsim.signalsystems.model.SignalSystemsManager;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -109,18 +111,15 @@ public class TravelTimeOneWayTest {
 //		events.addHandler(new LogOutputEventHandler());
 		int circulationTime = 60;
 
-		Id id2 = new IdImpl(2);
-		Id id100 = new IdImpl(100);
-
 		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		
 		for (int dropping = 10; dropping <= circulationTime; dropping++) {
 			eventHandler.reset(1);
 
-			SignalSystemControllerData controllerData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(id2);
-			SignalPlanData signalPlan = controllerData.getSignalPlanData().get(id2);
+			SignalSystemControllerData controllerData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(Id.create(2, SignalSystem.class));
+			SignalPlanData signalPlan = controllerData.getSignalPlanData().get(Id.create(2, Signal.class));
 			signalPlan.setCycleTime(circulationTime);
-			signalPlan.getSignalGroupSettingsDataByGroupId().get(id100).setDropping(dropping);
+			signalPlan.getSignalGroupSettingsDataByGroupId().get(Id.create(100, SignalGroup.class)).setDropping(dropping);
 			signalPlan.setStartTime(0.0);
 			signalPlan.setEndTime(0.0);
 
@@ -218,6 +217,7 @@ public class TravelTimeOneWayTest {
 
 		public MeasurementPoint beginningOfLink2 = null;
 
+		@Override
 		public void handleEvent(LinkEnterEvent event) {
 			// log.info("link enter event id :" + event.linkId);
 			if (event.getLinkId().toString().equalsIgnoreCase("2")) {
@@ -243,6 +243,7 @@ public class TravelTimeOneWayTest {
 			}
 		}
 
+		@Override
 		public void reset(int iteration) {
 			this.beginningOfLink2 = null;
 		}

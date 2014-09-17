@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
+import org.matsim.signalsystems.model.SignalSystem;
 
 
 /**
@@ -36,7 +37,7 @@ public interface SignalSystemsData extends MatsimToplevelContainer {
 	
 	public void setFactory(SignalSystemsDataFactory  factory);
 	
-	public Map<Id, SignalSystemData> getSignalSystemData();
+	public Map<Id<SignalSystem>, SignalSystemData> getSignalSystemData();
 
 	public void addSignalSystemData(SignalSystemData signalSystemData);
 

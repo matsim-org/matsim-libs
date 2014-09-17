@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.lanes.ModelLane;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 import org.matsim.lanes.utils.LanesUtils;
@@ -41,6 +42,8 @@ import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
+import org.matsim.signalsystems.model.Signal;
+import org.matsim.signalsystems.model.SignalGroup;
 import org.matsim.signalsystems.vis.VisSignal;
 import org.matsim.signalsystems.vis.VisSignalGroup;
 import org.matsim.signalsystems.vis.VisSignalSystem;
@@ -74,11 +77,11 @@ public class VisScenarioBuilder {
 			visSignalSystem.setVisCoordinate(new Point2D.Float((float)visCoord.getX(), (float)visCoord.getY()));
 			visScenario.getVisSignalSystemsByIdMap().put(systemIdS, visSignalSystem);
 			
-			Map<Id, SignalGroupData> groups = signals.getSignalGroupsData().getSignalGroupDataBySystemId(ssd.getId());
+			Map<Id<SignalGroup>, SignalGroupData> groups = signals.getSignalGroupsData().getSignalGroupDataBySystemId(ssd.getId());
 			for (SignalGroupData group : groups.values()){
 				VisSignalGroup visGroup = new VisSignalGroup(systemIdS, group.getId().toString());
 				visSignalSystem.addOTFSignalGroup(visGroup);
-				for (Id signalId : group.getSignalIds()){
+				for (Id<Signal> signalId : group.getSignalIds()){
 					VisSignal visSignal = new VisSignal(systemIdS, signalId.toString());
 					visGroup.addSignal(visSignal);
 					SignalData signal = signals.getSignalSystemsData().getSignalSystemData().get(ssd.getId()).getSignalData().get(signalId);
@@ -87,14 +90,14 @@ public class VisScenarioBuilder {
 						visLink.addSignal(visSignal);
 					}
 					else {
-						for (Id laneId : signal.getLaneIds()){
+						for (Id<Lane> laneId : signal.getLaneIds()){
 							VisLane visLane = visLink.getLaneData().get(laneId.toString());
 							visLane.addSignal(visSignal);
 						}
 					}
 					
 					if (! (signal.getTurningMoveRestrictions() == null || signal.getTurningMoveRestrictions().isEmpty())){
-						for (Id outLinkId : signal.getTurningMoveRestrictions()){
+						for (Id<Link> outLinkId : signal.getTurningMoveRestrictions()){
 							VisLinkWLanes vl = visScenario.getLanesLinkData().get(outLinkId.toString());
 							visSignal.addTurningMoveRestriction(vl);
 						}

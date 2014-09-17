@@ -48,6 +48,7 @@ import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
+import org.matsim.signalsystems.model.SignalSystem;
 import org.matsim.vis.vecmathutils.VectorUtils;
 
 import playground.dgrether.koehlerstrehlersignal.data.DgCrossing;
@@ -588,7 +589,7 @@ public class M2KS2010NetworkConverter {
 	}
 	
 	private Set<Id<Link>> getSignalizedLinkIds(SignalSystemsData signals){
-		Map<Id, Set<Id<Link>>> signalizedLinksPerSystem = DgSignalsUtils.calculateSignalizedLinksPerSystem(signals);
+		Map<Id<SignalSystem>, Set<Id<Link>>> signalizedLinksPerSystem = DgSignalsUtils.calculateSignalizedLinksPerSystem(signals);
 		Set<Id<Link>> signalizedLinks = new HashSet<>();
 		for (Set<Id<Link>> signalizedLinksOfSystem : signalizedLinksPerSystem.values()){
 			signalizedLinks.addAll(signalizedLinksOfSystem);

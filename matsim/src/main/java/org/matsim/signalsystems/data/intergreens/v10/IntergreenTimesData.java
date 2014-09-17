@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
+import org.matsim.signalsystems.model.SignalSystem;
 
 
 
@@ -34,8 +35,9 @@ public interface IntergreenTimesData extends MatsimToplevelContainer  {
 	
 	public IntergreensForSignalSystemData addIntergreensForSignalSystem(IntergreensForSignalSystemData intergreens);
 	
-	public Map<Id, IntergreensForSignalSystemData> getIntergreensForSignalSystemDataMap();
+	public Map<Id<SignalSystem>, IntergreensForSignalSystemData> getIntergreensForSignalSystemDataMap();
 	
+	@Override
 	public IntergreenTimesDataFactory getFactory() ;
 	
 	public void setFactory(IntergreenTimesDataFactory factory);

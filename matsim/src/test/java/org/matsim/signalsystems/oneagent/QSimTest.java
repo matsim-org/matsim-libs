@@ -97,12 +97,12 @@ public class QSimTest implements
 		Scenario scenario = fixture.createAndLoadTestScenario(false);
 		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 	
-		SignalSystemControllerData controllerData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(Fixture.id2);
-		SignalPlanData planData = controllerData.getSignalPlanData().get(Fixture.id2);
+		SignalSystemControllerData controllerData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(Fixture.signalSystemId2);
+		SignalPlanData planData = controllerData.getSignalPlanData().get(Fixture.signalPlanId2);
 		planData.setStartTime(0.0);
 		planData.setEndTime(0.0);
 		planData.setCycleTime(5 * 3600);
-		SignalGroupSettingsData groupData = planData.getSignalGroupSettingsDataByGroupId().get(Fixture.id100);
+		SignalGroupSettingsData groupData = planData.getSignalGroupSettingsDataByGroupId().get(Fixture.signalGroupId100);
 		groupData.setDropping(0);
 		groupData.setOnset(100);
 		
@@ -132,12 +132,12 @@ public class QSimTest implements
 		Scenario scenario = fixture.createAndLoadTestScenario(true);
 		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		
-		SignalSystemControllerData controllerData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(Fixture.id2);
-		SignalPlanData planData = controllerData.getSignalPlanData().get(Fixture.id2);
+		SignalSystemControllerData controllerData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(Fixture.signalSystemId2);
+		SignalPlanData planData = controllerData.getSignalPlanData().get(Fixture.signalPlanId2);
 		planData.setStartTime(0.0);
 		planData.setEndTime(0.0);
 		planData.setCycleTime(60);
-		SignalGroupSettingsData groupData = planData.getSignalGroupSettingsDataByGroupId().get(Fixture.id100);
+		SignalGroupSettingsData groupData = planData.getSignalGroupSettingsDataByGroupId().get(Fixture.signalGroupId100);
 		groupData.setDropping(0);
 		groupData.setOnset(30);
 		
@@ -164,10 +164,10 @@ public class QSimTest implements
 	@Override
 	public void handleEvent(LinkEnterEvent e) {
 		log.info("Link id: " + e.getLinkId().toString() + " enter time: " + e.getTime());
-		if (e.getLinkId().equals(Fixture.id1)){
+		if (e.getLinkId().equals(Fixture.linkId1)){
 			Assert.assertEquals(1.0, e.getTime(), MatsimTestUtils.EPSILON);
 		}
-		else if (e.getLinkId().equals(Fixture.id2)){
+		else if (e.getLinkId().equals(Fixture.linkId2)){
 			Assert.assertEquals(this.link2EnterTime, e.getTime(), MatsimTestUtils.EPSILON);
 		}
 	}

@@ -38,6 +38,7 @@ import org.matsim.jaxb.intergreenTimes10.XMLEndingSignalGroupType;
 import org.matsim.jaxb.intergreenTimes10.XMLEndingSignalGroupType.XMLBeginningSignalGroup;
 import org.matsim.jaxb.intergreenTimes10.XMLIntergreenTimes;
 import org.matsim.jaxb.intergreenTimes10.XMLIntergreenTimes.XMLSignalSystem;
+import org.matsim.signalsystems.model.SignalGroup;
 
 
 /**
@@ -63,7 +64,7 @@ public class IntergreenTimesWriter10 extends MatsimJaxbXmlWriter {
 				XMLSignalSystem xmlss = fac.createXMLIntergreenTimesXMLSignalSystem();
 				xmlss.setRefId(intergreens.getSignalSystemId().toString());
 				xmlContainer.getSignalSystem().add(xmlss);
-				for (Tuple<Id, Id> endingBeginningSgIds : intergreens.getEndingBeginningSignalGroupKeys()){
+				for (Tuple<Id<SignalGroup>, Id<SignalGroup>> endingBeginningSgIds : intergreens.getEndingBeginningSignalGroupKeys()){
 					XMLEndingSignalGroupType xmlEnding = this.getXmlEnding(xmlss.getEndingSignalGroup(), endingBeginningSgIds.getFirst());
 					if (xmlEnding == null){
 						xmlEnding = fac.createXMLEndingSignalGroupType();
@@ -79,7 +80,7 @@ public class IntergreenTimesWriter10 extends MatsimJaxbXmlWriter {
 			return xmlContainer;
 		}
 
-		private XMLEndingSignalGroupType getXmlEnding(List<XMLEndingSignalGroupType> endings, Id endingId){
+		private XMLEndingSignalGroupType getXmlEnding(List<XMLEndingSignalGroupType> endings, Id<SignalGroup> endingId){
 			for (XMLEndingSignalGroupType xmlending : endings){
 				if (xmlending.getRefId().compareTo(endingId.toString()) == 0){
 					return xmlending;

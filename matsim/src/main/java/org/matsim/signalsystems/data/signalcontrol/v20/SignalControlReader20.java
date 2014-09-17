@@ -29,7 +29,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -39,6 +39,9 @@ import org.matsim.jaxb.signalcontrol20.XMLSignalPlanType;
 import org.matsim.jaxb.signalcontrol20.XMLSignalSystemControllerType;
 import org.matsim.jaxb.signalcontrol20.XMLSignalSystemType;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
+import org.matsim.signalsystems.model.SignalGroup;
+import org.matsim.signalsystems.model.SignalPlan;
+import org.matsim.signalsystems.model.SignalSystem;
 import org.xml.sax.SAXException;
 
 
@@ -105,12 +108,12 @@ public class SignalControlReader20 extends MatsimJaxbXmlParser {
 
 		XMLSignalControl xmlSignalControl = this.readSignalControl20File(filename);
 		for (XMLSignalSystemType xmlSystem : xmlSignalControl.getSignalSystem()){
-			SignalSystemControllerData controllerData = factory.createSignalSystemControllerData(new IdImpl(xmlSystem.getRefId()));
+			SignalSystemControllerData controllerData = factory.createSignalSystemControllerData(Id.create(xmlSystem.getRefId(), SignalSystem.class));
 			this.signalControlData.addSignalSystemControllerData(controllerData);
 			XMLSignalSystemControllerType xmlController = xmlSystem.getSignalSystemController();
 			controllerData.setControllerIdentifier(xmlController.getControllerIdentifier());
 			for (XMLSignalPlanType xmlPlan : xmlController.getSignalPlan()){
-				SignalPlanData plan = factory.createSignalPlanData(new IdImpl(xmlPlan.getId()));
+				SignalPlanData plan = factory.createSignalPlanData(Id.create(xmlPlan.getId(), SignalPlan.class));
 				controllerData.addSignalPlanData(plan);
 				if (xmlPlan.getCycleTime() != null){
 					plan.setCycleTime(xmlPlan.getCycleTime().getSec());
@@ -125,7 +128,7 @@ public class SignalControlReader20 extends MatsimJaxbXmlParser {
 					plan.setEndTime(this.getSeconds(xmlPlan.getStop().getDaytime()));
 				}
 				for (XMLSignalGroupSettingsType xmlSettings: xmlPlan.getSignalGroupSettings()){
-					SignalGroupSettingsData settings = factory.createSignalGroupSettingsData(new IdImpl(xmlSettings.getRefId()));
+					SignalGroupSettingsData settings = factory.createSignalGroupSettingsData(Id.create(xmlSettings.getRefId(), SignalGroup.class));
 					plan.addSignalGroupSettings(settings);
 					settings.setDropping(xmlSettings.getDropping().getSec());
 					settings.setOnset(xmlSettings.getOnset().getSec());

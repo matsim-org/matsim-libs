@@ -27,6 +27,8 @@ import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.signalsystems.model.SignalGroup;
+import org.matsim.signalsystems.model.SignalSystem;
 
 
 /**
@@ -35,27 +37,28 @@ import org.matsim.core.utils.collections.Tuple;
  */
 public class IntergreensForSignalSystemDataImpl implements IntergreensForSignalSystemData {
 
-	private Id signalSystemId;
-	private Map<Id, Map<Id, Integer>> endingGroupToBeginningGroupTimeMap = new HashMap<Id, Map<Id, Integer>>();
-	private Map<Id, Map<Id, Integer>> beginningGroupToEndingGroupTimeMap = new HashMap<Id, Map<Id, Integer>>();
+	private Id<SignalSystem> signalSystemId;
+	private Map<Id<SignalGroup>, Map<Id<SignalGroup>, Integer>> endingGroupToBeginningGroupTimeMap = new HashMap<>();
+	private Map<Id<SignalGroup>, Map<Id<SignalGroup>, Integer>> beginningGroupToEndingGroupTimeMap = new HashMap<>();
 	
-	public IntergreensForSignalSystemDataImpl(Id signalSystemId) {
+	public IntergreensForSignalSystemDataImpl(Id<SignalSystem> signalSystemId) {
 		this.signalSystemId = signalSystemId;
 	}
 
-	public List<Tuple<Id, Id>> getEndingBeginningSignalGroupKeys(){
-		List<Tuple<Id, Id>> list = new ArrayList<Tuple<Id, Id>>();
-		for (Entry<Id, Map<Id, Integer>> e : this.endingGroupToBeginningGroupTimeMap.entrySet()){
-			for (Id beginningId : e.getValue().keySet()){
-				list.add( new Tuple<Id, Id>(e.getKey(), beginningId));
+	@Override
+	public List<Tuple<Id<SignalGroup>, Id<SignalGroup>>> getEndingBeginningSignalGroupKeys(){
+		List<Tuple<Id<SignalGroup>, Id<SignalGroup>>> list = new ArrayList<>();
+		for (Entry<Id<SignalGroup>, Map<Id<SignalGroup>, Integer>> e : this.endingGroupToBeginningGroupTimeMap.entrySet()){
+			for (Id<SignalGroup> beginningId : e.getValue().keySet()){
+				list.add(new Tuple<>(e.getKey(), beginningId));
 			}
 		}
 		return list;
 	}
 	
 	@Override
-	public Integer getIntergreenTime(Id endingSignalGroupId, Id beginningSignalGroupId) {
-		Map<Id, Integer> beginningSgMap = this.endingGroupToBeginningGroupTimeMap.get(endingSignalGroupId);
+	public Integer getIntergreenTime(Id<SignalGroup> endingSignalGroupId, Id<SignalGroup> beginningSignalGroupId) {
+		Map<Id<SignalGroup>, Integer> beginningSgMap = this.endingGroupToBeginningGroupTimeMap.get(endingSignalGroupId);
 		if (beginningSgMap != null){
 			return beginningSgMap.get(beginningSignalGroupId);
 		}
@@ -63,31 +66,31 @@ public class IntergreensForSignalSystemDataImpl implements IntergreensForSignalS
 	}
 
 	@Override
-	public void setIntergreenTime(Integer timeSeconds, Id endingSignalGroupId,
-			Id beginningSignalGroupId) {
-		Map<Id, Integer> endingSgMap = this.endingGroupToBeginningGroupTimeMap.get(endingSignalGroupId);
+	public void setIntergreenTime(Integer timeSeconds, Id<SignalGroup> endingSignalGroupId,
+			Id<SignalGroup> beginningSignalGroupId) {
+		Map<Id<SignalGroup>, Integer> endingSgMap = this.endingGroupToBeginningGroupTimeMap.get(endingSignalGroupId);
 		if (endingSgMap == null){
-			endingSgMap = new HashMap<Id, Integer>();
+			endingSgMap = new HashMap<>();
 			this.endingGroupToBeginningGroupTimeMap.put(endingSignalGroupId, endingSgMap);
 		}
 		endingSgMap.put(beginningSignalGroupId, timeSeconds);
 		
-		Map<Id, Integer> beginningSgMap = this.beginningGroupToEndingGroupTimeMap.get(beginningSignalGroupId);
+		Map<Id<SignalGroup>, Integer> beginningSgMap = this.beginningGroupToEndingGroupTimeMap.get(beginningSignalGroupId);
 		if (beginningSgMap == null){
-			beginningSgMap = new HashMap<Id, Integer>();
+			beginningSgMap = new HashMap<>();
 			this.beginningGroupToEndingGroupTimeMap.put(endingSignalGroupId, beginningSgMap);
 		}
 		beginningSgMap.put(beginningSignalGroupId, timeSeconds);
 	}
 
 	@Override
-	public Id getSignalSystemId() {
+	public Id<SignalSystem> getSignalSystemId() {
 		return this.signalSystemId;
 	}
 
 
 	@Override
-	public Map<Id, Integer> getEndSignalGroupTimesForBeginningGroup(Id id) {
+	public Map<Id<SignalGroup>, Integer> getEndSignalGroupTimesForBeginningGroup(Id<SignalGroup> id) {
 		return this.beginningGroupToEndingGroupTimeMap.get(id);
 	}
 

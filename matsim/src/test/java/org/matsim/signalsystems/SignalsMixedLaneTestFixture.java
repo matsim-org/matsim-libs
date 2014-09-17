@@ -20,8 +20,10 @@
 package org.matsim.signalsystems;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.lanes.MixedLaneTestFixture;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
@@ -37,7 +39,7 @@ import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsDataImpl;
 public class SignalsMixedLaneTestFixture {
 
 	public final ScenarioImpl sc;
-	public final Id id1, id2, id3;
+	public final Id<Link> id1, id2, id3;
 	private MixedLaneTestFixture delegate;
 
 	public SignalsMixedLaneTestFixture(){
@@ -56,11 +58,11 @@ public class SignalsMixedLaneTestFixture {
 		signals.addSignalSystemData(system);
 		SignalData signal = signalsFactory.createSignalData(delegate.id2);
 		system.addSignalData(signal);
-		signal.addLaneId(delegate.id1);
+		signal.addLaneId(Id.create(1, Lane.class));
 		signal.addTurningMoveRestriction(delegate.id2);
 		signal = signalsFactory.createSignalData(delegate.id3);
 		system.addSignalData(signal);
-		signal.addLaneId(delegate.id1);
+		signal.addLaneId(Id.create(1, Lane.class));
 		signal.addTurningMoveRestriction(delegate.id3);
 		
 		//TODO continue here

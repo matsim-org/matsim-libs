@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.filter.NetworkFilterManager;
 import org.matsim.core.network.filter.NetworkLinkFilter;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
+import org.matsim.signalsystems.model.SignalSystem;
 
 import playground.dgrether.signalsystems.utils.DgSignalsUtils;
 
@@ -41,7 +42,7 @@ public class DgSignalizedLinksNetwork {
 
 	
 	public Network createSmallNetwork(Network net, SignalSystemsData data) {
-		Map<Id, Set<Id<Link>>> signalsToLinks = DgSignalsUtils.calculateSignalizedLinksPerSystem(data);
+		Map<Id<SignalSystem>, Set<Id<Link>>> signalsToLinks = DgSignalsUtils.calculateSignalizedLinksPerSystem(data);
 		final Set<Id<Link>> signalizedLinks = new HashSet<>();
 		for (Set<Id<Link>> linkSet : signalsToLinks.values()){
 			signalizedLinks.addAll(linkSet);

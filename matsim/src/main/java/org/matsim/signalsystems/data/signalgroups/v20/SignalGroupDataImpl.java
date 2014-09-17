@@ -23,38 +23,41 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.signalsystems.model.Signal;
+import org.matsim.signalsystems.model.SignalGroup;
+import org.matsim.signalsystems.model.SignalSystem;
 /**
  * @author jbischoff
  * @author dgrether
  */
 public class SignalGroupDataImpl implements SignalGroupData {
 
-	Set<Id> signalIds = new HashSet<Id>();
-	Id signalGroupId;
-	Id signalSystemId;
+	Set<Id<Signal>> signalIds = new HashSet<>();
+	Id<SignalGroup> signalGroupId;
+	Id<SignalSystem> signalSystemId;
 
-	SignalGroupDataImpl(Id signalSystemId, Id signalGroupId) {
+	SignalGroupDataImpl(Id<SignalSystem> signalSystemId, Id<SignalGroup> signalGroupId) {
 		this.signalSystemId = signalSystemId;
 		this.signalGroupId = signalGroupId;
 	}
 
 	@Override
-	public void addSignalId(Id signalId) {
+	public void addSignalId(Id<Signal> signalId) {
 		signalIds.add(signalId);
 	}
 
 	@Override
-	public Id getId() {
+	public Id<SignalGroup> getId() {
 		return this.signalGroupId;
 	}
 
 	@Override
-	public Set<Id> getSignalIds() {
+	public Set<Id<Signal>> getSignalIds() {
 		return this.signalIds;
 	}
 
 	@Override
-	public Id getSignalSystemId() {
+	public Id<SignalSystem> getSignalSystemId() {
 		return this.signalSystemId;
 	}
 }

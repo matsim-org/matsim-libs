@@ -23,6 +23,8 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
+import org.matsim.signalsystems.model.Signal;
+import org.matsim.signalsystems.model.SignalSystem;
 
 
 
@@ -30,9 +32,9 @@ import org.matsim.api.core.v01.Identifiable;
  * @author dgrether
  *
  */
-public interface SignalSystemData extends Identifiable {
+public interface SignalSystemData extends Identifiable<SignalSystem> {
 
-	public Map<Id, SignalData> getSignalData();
+	public Map<Id<Signal>, SignalData> getSignalData();
 
 	public void addSignalData(SignalData signalData);
 	

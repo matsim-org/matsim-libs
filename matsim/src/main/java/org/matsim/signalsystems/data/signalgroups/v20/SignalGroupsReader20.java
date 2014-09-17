@@ -28,7 +28,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -37,6 +37,9 @@ import org.matsim.jaxb.signalgroups20.XMLSignalGroupType;
 import org.matsim.jaxb.signalgroups20.XMLSignalGroups;
 import org.matsim.jaxb.signalgroups20.XMLSignalSystemSignalGroupType;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
+import org.matsim.signalsystems.model.Signal;
+import org.matsim.signalsystems.model.SignalGroup;
+import org.matsim.signalsystems.model.SignalSystem;
 import org.xml.sax.SAXException;
 
 /**
@@ -96,10 +99,10 @@ public class SignalGroupsReader20 extends MatsimJaxbXmlParser {
 		for (XMLSignalSystemSignalGroupType xsssgt : xmlsgdefs.getSignalSystem()) {
 			// SigSys
 			for (XMLSignalGroupType xsgt : xsssgt.getSignalGroup()) {
-				SignalGroupData sgd = factory.createSignalGroupData(new IdImpl(xsssgt.getRefId()), new IdImpl(xsgt.getId()));
+				SignalGroupData sgd = factory.createSignalGroupData(Id.create(xsssgt.getRefId(), SignalSystem.class), Id.create(xsgt.getId(), SignalGroup.class));
 
 				for (XMLIdRefType id : xsgt.getSignal()) {
-					sgd.addSignalId(new IdImpl(id.getRefId()));
+					sgd.addSignalId(Id.create(id.getRefId(), Signal.class));
 				}
 				signalGroupsData.addSignalGroupData(sgd);
 			}

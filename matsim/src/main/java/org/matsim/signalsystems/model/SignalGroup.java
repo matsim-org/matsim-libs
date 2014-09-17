@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.Id;
  */
 public interface SignalGroup {
 
-	public Id getId();
+	public Id<SignalGroup> getId();
 
 	public void setState(SignalGroupState state);
 
@@ -38,6 +38,6 @@ public interface SignalGroup {
 
 	public void addSignal(Signal signal);
 	
-	public Map<Id, Signal> getSignals();
+	public Map<Id<Signal>, Signal> getSignals();
 
 }

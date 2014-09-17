@@ -33,6 +33,7 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.signalsystems.data.SignalsData;
+import org.matsim.signalsystems.model.SignalSystem;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -54,12 +55,12 @@ public class DgCottbusSignals2PointLayerShape {
 
 	public static void main(String[] args) throws Exception {
 		ScenarioImpl sc = CottbusUtils.loadCottbusScenrio(true);
-		Map<Id, Set<Id<Node>>> systemId2NodeIdsMap = DgSignalsUtils.calculateSignalizedNodesPerSystem(((SignalsData) sc.getScenarioElement(SignalsData.ELEMENT_NAME)).getSignalSystemsData(), sc.getNetwork());
+		Map<Id<SignalSystem>, Set<Id<Node>>> systemId2NodeIdsMap = DgSignalsUtils.calculateSignalizedNodesPerSystem(((SignalsData) sc.getScenarioElement(SignalsData.ELEMENT_NAME)).getSignalSystemsData(), sc.getNetwork());
 		String srsId = TransformationFactory.WGS84_UTM33N;
 		CoordinateReferenceSystem networkSrs = MGC.getCRS(srsId);
 		SimpleFeatureBuilder builder = createMultiPointSignalSystemFeatureBuilder(networkSrs);
 		List<SimpleFeature> multiPointFeatures = new ArrayList<SimpleFeature>();
-		for (Id systemId : systemId2NodeIdsMap.keySet()){
+		for (Id<SignalSystem> systemId : systemId2NodeIdsMap.keySet()){
 			Set<Id<Node>> nodeIds = systemId2NodeIdsMap.get(systemId);
 			Coordinate[] nodeCoords = new Coordinate[nodeIds.size()];
 			int i = 0;

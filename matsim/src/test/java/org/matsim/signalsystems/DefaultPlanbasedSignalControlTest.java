@@ -23,15 +23,16 @@ import junit.framework.Assert;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.SignalGroupStateChangedEvent;
 import org.matsim.core.api.experimental.events.handler.SignalGroupStateChangedEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.signalsystems.model.SignalGroup;
 import org.matsim.signalsystems.model.SignalGroupState;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -95,50 +96,50 @@ public class DefaultPlanbasedSignalControlTest {
 		@Override
 		public void handleEvent(SignalGroupStateChangedEvent e) {
 			if (e.getTime() == 0.0){
-				if (e.getSignalGroupId().equals(new IdImpl("4"))){
+				if (e.getSignalGroupId().equals(Id.create("4", SignalGroup.class))){
 					Assert.assertEquals(SignalGroupState.GREEN, e.getNewState());
 				}
-				else if (e.getSignalGroupId().equals(new IdImpl("5"))){
+				else if (e.getSignalGroupId().equals(Id.create("5", SignalGroup.class))){
 					Assert.assertEquals(SignalGroupState.RED, e.getNewState());
 				}
 			}
 			else if (e.getTime() == 45.0){
-				if (e.getSignalGroupId().equals(new IdImpl("4"))){
+				if (e.getSignalGroupId().equals(Id.create("4", SignalGroup.class))){
 					Assert.assertEquals(SignalGroupState.RED, e.getNewState());
 				}
-				else if (e.getSignalGroupId().equals(new IdImpl("5"))){
+				else if (e.getSignalGroupId().equals(Id.create("5", SignalGroup.class))){
 					Assert.assertEquals(SignalGroupState.GREEN, e.getNewState());
 				}
 			}
 			else if (e.getTime() == 90.0){
-				if (e.getSignalGroupId().equals(new IdImpl("4"))){
+				if (e.getSignalGroupId().equals(Id.create("4", SignalGroup.class))){
 					Assert.assertEquals(SignalGroupState.GREEN, e.getNewState());
 				}
-				else if (e.getSignalGroupId().equals(new IdImpl("5"))){
+				else if (e.getSignalGroupId().equals(Id.create("5", SignalGroup.class))){
 					Assert.assertEquals(SignalGroupState.RED, e.getNewState());
 				}
 			}
 			else if (e.getTime() == 135.0){
-				if (e.getSignalGroupId().equals(new IdImpl("4"))){
+				if (e.getSignalGroupId().equals(Id.create("4", SignalGroup.class))){
 					Assert.assertEquals(SignalGroupState.RED, e.getNewState());
 				}
-				else if (e.getSignalGroupId().equals(new IdImpl("5"))){
+				else if (e.getSignalGroupId().equals(Id.create("5", SignalGroup.class))){
 					Assert.assertEquals(SignalGroupState.GREEN, e.getNewState());
 				}
 			}
 			else if (e.getTime() == 165.0){
-				if (e.getSignalGroupId().equals(new IdImpl("4"))){
+				if (e.getSignalGroupId().equals(Id.create("4", SignalGroup.class))){
 					Assert.assertEquals(SignalGroupState.GREEN, e.getNewState());
 				}
-				else if (e.getSignalGroupId().equals(new IdImpl("5"))){
+				else if (e.getSignalGroupId().equals(Id.create("5", SignalGroup.class))){
 					Assert.assertEquals(SignalGroupState.RED, e.getNewState());
 				}
 			}
 			else if (e.getTime() == 195.0){
-				if (e.getSignalGroupId().equals(new IdImpl("4"))){
+				if (e.getSignalGroupId().equals(Id.create("4", SignalGroup.class))){
 					Assert.assertEquals(SignalGroupState.RED, e.getNewState());
 				}
-				else if (e.getSignalGroupId().equals(new IdImpl("5"))){
+				else if (e.getSignalGroupId().equals(Id.create("5", SignalGroup.class))){
 					Assert.assertEquals(SignalGroupState.GREEN, e.getNewState());
 				}
 			}
@@ -149,26 +150,26 @@ public class DefaultPlanbasedSignalControlTest {
 					Assert.assertEquals(SignalGroupState.OFF, e.getNewState());
 			}
 			else if (e.getTime() == 240.0){
-				if (e.getSignalGroupId().equals(new IdImpl("4"))){
+				if (e.getSignalGroupId().equals(Id.create("4", SignalGroup.class))){
 					Assert.assertEquals(SignalGroupState.GREEN, e.getNewState());
 				}
-				else if (e.getSignalGroupId().equals(new IdImpl("5"))){
+				else if (e.getSignalGroupId().equals(Id.create("5", SignalGroup.class))){
 					Assert.assertEquals(SignalGroupState.RED, e.getNewState());
 				}
 			}
 			else if (e.getTime() == 255.0){
-				if (e.getSignalGroupId().equals(new IdImpl("4"))){
+				if (e.getSignalGroupId().equals(Id.create("4", SignalGroup.class))){
 					Assert.assertEquals(SignalGroupState.RED, e.getNewState());
 				}
-				else if (e.getSignalGroupId().equals(new IdImpl("5"))){
+				else if (e.getSignalGroupId().equals(Id.create("5", SignalGroup.class))){
 					Assert.assertEquals(SignalGroupState.GREEN, e.getNewState());
 				}
 			}
 			else if (e.getTime() == 300.0){
-				if (e.getSignalGroupId().equals(new IdImpl("4"))){
+				if (e.getSignalGroupId().equals(Id.create("4", SignalGroup.class))){
 					Assert.assertEquals(SignalGroupState.GREEN, e.getNewState());
 				}
-				else if (e.getSignalGroupId().equals(new IdImpl("5"))){
+				else if (e.getSignalGroupId().equals(Id.create("5", SignalGroup.class))){
 					Assert.assertEquals(SignalGroupState.RED, e.getNewState());
 				}
 			}

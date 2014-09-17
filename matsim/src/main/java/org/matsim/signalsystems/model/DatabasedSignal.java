@@ -24,8 +24,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
 import org.matsim.signalsystems.mobsim.SignalizeableItem;
 
@@ -36,8 +37,6 @@ import org.matsim.signalsystems.mobsim.SignalizeableItem;
  */
 public class DatabasedSignal implements Signal {
 
-	private static final Logger log = Logger.getLogger(DatabasedSignal.class);
-
 	private List<SignalizeableItem> signalizedItems = new ArrayList<SignalizeableItem>();
 
 	private SignalData data;
@@ -47,7 +46,7 @@ public class DatabasedSignal implements Signal {
 	}
 
 	@Override
-	public Id getLinkId() {
+	public Id<Link> getLinkId() {
 		return this.data.getLinkId();
 	}
 
@@ -60,7 +59,7 @@ public class DatabasedSignal implements Signal {
 		}
 		else {
 			for (SignalizeableItem item : this.signalizedItems){
-				for (Id toLinkId : this.data.getTurningMoveRestrictions()){
+				for (Id<Link> toLinkId : this.data.getTurningMoveRestrictions()) {
 					item.setSignalStateForTurningMove(state, toLinkId);
 				}
 			}
@@ -74,12 +73,12 @@ public class DatabasedSignal implements Signal {
 	}
 
 	@Override
-	public Set<Id> getLaneIds() {
+	public Set<Id<Lane>> getLaneIds() {
 		return this.data.getLaneIds();
 	}
 
 	@Override
-	public Id getId() {
+	public Id<Signal> getId() {
 		return this.data.getId();
 	}
 

@@ -21,6 +21,8 @@ package org.matsim.signalsystems.data.signalcontrol.v20;
 import java.util.SortedMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.signalsystems.model.SignalGroup;
+import org.matsim.signalsystems.model.SignalPlan;
 /**
  * 
  * @author dgrether
@@ -28,12 +30,12 @@ import org.matsim.api.core.v01.Id;
  */
 public interface SignalPlanData {
 
-	public Id getId();
+	public Id<SignalPlan> getId();
 
 	public void addSignalGroupSettings(
 			SignalGroupSettingsData signalGroupSettings);
 
-	public SortedMap<Id, SignalGroupSettingsData> getSignalGroupSettingsDataByGroupId();
+	public SortedMap<Id<SignalGroup>, SignalGroupSettingsData> getSignalGroupSettingsDataByGroupId();
 
 	/**
 	 * @return null if not set

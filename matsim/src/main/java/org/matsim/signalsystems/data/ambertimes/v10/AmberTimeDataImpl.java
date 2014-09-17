@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.signalsystems.model.Signal;
+import org.matsim.signalsystems.model.SignalSystem;
 
 /**
  * @author jbischoff
@@ -33,18 +35,18 @@ public class AmberTimeDataImpl implements AmberTimeData {
 
 	private Integer defaultRedAmberTime;
 	private Integer defaultAmberTime;
-	private Map<Id, Integer> signalAmberMap;
-	private Map<Id, Integer> signalRedAmberMap;
-	private Id signalSystemId;
+	private Map<Id<Signal>, Integer> signalAmberMap;
+	private Map<Id<Signal>, Integer> signalRedAmberMap;
+	private Id<SignalSystem> signalSystemId;
 
-	AmberTimeDataImpl(Id signalSystemId) {
+	AmberTimeDataImpl(Id<SignalSystem> signalSystemId) {
 		this.signalSystemId = signalSystemId;
-		signalAmberMap = new HashMap<Id, Integer>();
-		signalRedAmberMap = new HashMap<Id, Integer>();
+		signalAmberMap = new HashMap<>();
+		signalRedAmberMap = new HashMap<>();
 	}
 
 	@Override
-	public Integer getAmberOfSignal(Id signalId) {
+	public Integer getAmberOfSignal(Id<Signal> signalId) {
 		if (signalAmberMap.containsKey(signalId)) {
 			return signalAmberMap.get(signalId);
 		}
@@ -64,7 +66,7 @@ public class AmberTimeDataImpl implements AmberTimeData {
 	}
 
 	@Override
-	public Integer getRedAmberOfSignal(Id signalId) {
+	public Integer getRedAmberOfSignal(Id<Signal> signalId) {
 		if (signalRedAmberMap.containsKey(signalId)) {
 			return signalRedAmberMap.get(signalId);
 		}
@@ -74,23 +76,23 @@ public class AmberTimeDataImpl implements AmberTimeData {
 	}
 
 	@Override
-	public Map<Id, Integer> getSignalAmberMap() {
+	public Map<Id<Signal>, Integer> getSignalAmberMap() {
 
 		return signalAmberMap;
 	}
 
 	@Override
-	public Map<Id, Integer> getSignalRedAmberMap() {
+	public Map<Id<Signal>, Integer> getSignalRedAmberMap() {
 		return signalRedAmberMap;
 	}
 
 	@Override
-	public Id getSignalSystemId() {
+	public Id<SignalSystem> getSignalSystemId() {
 		return signalSystemId;
 	}
 
 	@Override
-	public void setAmberTimeOfSignal(Id signalId, Integer seconds) {
+	public void setAmberTimeOfSignal(Id<Signal> signalId, Integer seconds) {
 		signalAmberMap.put(signalId, seconds);
 	}
 
@@ -105,7 +107,7 @@ public class AmberTimeDataImpl implements AmberTimeData {
 	}
 
 	@Override
-	public void setRedAmberTimeOfSignal(Id signalId, Integer seconds) {
+	public void setRedAmberTimeOfSignal(Id<Signal> signalId, Integer seconds) {
 		signalRedAmberMap.put(signalId, seconds);
 	}
 

@@ -25,7 +25,6 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsDataImpl;
@@ -34,14 +33,17 @@ import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsDataFactory;
+import org.matsim.signalsystems.model.Signal;
+import org.matsim.signalsystems.model.SignalGroup;
+import org.matsim.signalsystems.model.SignalSystem;
 
 
 public class SignalUtilsTest {
 
 	@Test
 	public final void testCreateAndAddSignalGroups4Signals() {
-		Id id1 = new IdImpl("1");
-		Id id3 = new IdImpl("3");
+		Id<SignalSystem> id1 = Id.create("1", SignalSystem.class);
+		Id<Signal> id3 = Id.create("3", Signal.class);
 		SignalsData signals = new SignalsDataImpl(ConfigUtils.createConfig().signalSystems());
 		SignalSystemsDataFactory fac = signals.getSignalSystemsData().getFactory();
 		SignalSystemData system = fac.createSignalSystemData(id1);
@@ -54,7 +56,7 @@ public class SignalUtilsTest {
 		SignalGroupsData groups = signals.getSignalGroupsData();
 		SignalUtils.createAndAddSignalGroups4Signals(groups, system);
 		
-		Map<Id, SignalGroupData> system1Groups = groups.getSignalGroupDataBySignalSystemId().get(id1);
+		Map<Id<SignalGroup>, SignalGroupData> system1Groups = groups.getSignalGroupDataBySignalSystemId().get(id1);
 		Assert.assertNotNull(system1Groups);
 		Assert.assertEquals(2, system1Groups.size());
 		

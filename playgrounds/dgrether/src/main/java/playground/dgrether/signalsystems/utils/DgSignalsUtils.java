@@ -36,6 +36,9 @@ import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
+import org.matsim.signalsystems.model.Signal;
+import org.matsim.signalsystems.model.SignalGroup;
+import org.matsim.signalsystems.model.SignalSystem;
 
 
 /**
@@ -68,8 +71,8 @@ public class DgSignalsUtils {
 	/**
 	 * @return Map with the signal system Id as key and a List with Node Ids as values
 	 */
-	public static Map<Id, Set<Id<Node>>>calculateSignalizedNodesPerSystem(SignalSystemsData signalSystemsData, Network net){
-		Map<Id, Set<Id<Node>>> signalizedNodesPerSystem = new HashMap<>();
+	public static Map<Id<SignalSystem>, Set<Id<Node>>>calculateSignalizedNodesPerSystem(SignalSystemsData signalSystemsData, Network net){
+		Map<Id<SignalSystem>, Set<Id<Node>>> signalizedNodesPerSystem = new HashMap<>();
 		Set<Id<Node>> nodes;
 		Link link;
 		Node node;
@@ -128,7 +131,7 @@ public class DgSignalsUtils {
 	 * @return null if the signal is not attached to a group
 	 */
 	public static SignalGroupData getSignalGroup4SignalId(Id signalSystemId, Id signalId, SignalGroupsData signalGroups){
-		Map<Id, SignalGroupData> signalGroups4System = signalGroups.getSignalGroupDataBySystemId(signalSystemId);
+		Map<Id<SignalGroup>, SignalGroupData> signalGroups4System = signalGroups.getSignalGroupDataBySystemId(signalSystemId);
 		for (SignalGroupData group : signalGroups4System.values()){
 			if (group.getSignalIds().contains(signalId)){
 				return group;
@@ -142,7 +145,7 @@ public class DgSignalsUtils {
 		if (!signalSystem.getId().equals(signalGroup.getSignalSystemId())){
 			throw new IllegalArgumentException("System Id: " + signalSystem.getId() + " is not equal to signal group Id: " + signalGroup.getId());
 		}
-		for (Id signalId : signalGroup.getSignalIds()){
+		for (Id<Signal> signalId : signalGroup.getSignalIds()){
 			SignalData signal = signalSystem.getSignalData().get(signalId);
 			signalSet.add(signal);
 		}
@@ -153,8 +156,8 @@ public class DgSignalsUtils {
 	 * @param signalSystemsData 
 	 * @return Map with the signal system Id as key and a List with Node Ids as values
 	 */
-	public static Map<Id, Set<Id<Link>>>calculateSignalizedLinksPerSystem(SignalSystemsData signalSystemsData){
-		Map<Id, Set<Id<Link>>> signalizedLinksPerSystem = new HashMap<>();
+	public static Map<Id<SignalSystem>, Set<Id<Link>>>calculateSignalizedLinksPerSystem(SignalSystemsData signalSystemsData){
+		Map<Id<SignalSystem>, Set<Id<Link>>> signalizedLinksPerSystem = new HashMap<>();
 		Set<Id<Link>> links;
 		for (SignalSystemData ss : signalSystemsData.getSignalSystemData().values()){
 			links = new HashSet<>();

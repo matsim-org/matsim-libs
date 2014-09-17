@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.signalsystems.mobsim.SignalizeableItem;
 
 
@@ -37,13 +39,13 @@ public class SignalImpl implements Signal {
 
 	private List<SignalizeableItem> signalizeableItems = new ArrayList<SignalizeableItem>();
 	
-	private Id linkId;
+	private Id<Link> linkId;
 	
-	private Set<Id> laneIds = null;
+	private Set<Id<Lane>> laneIds = null;
 
-	private Id id;
+	private Id<Signal> id;
 	
-	public SignalImpl(Id id, Id linkId){
+	public SignalImpl(Id<Signal> id, Id<Link> linkId){
 		this.linkId = linkId;
 		this.id = id;
 	}
@@ -54,20 +56,20 @@ public class SignalImpl implements Signal {
 	}
 
 	@Override
-	public Id getId() {
+	public Id<Signal> getId() {
 		return this.id;
 	}
 
 	@Override
-	public Set<Id> getLaneIds() {
+	public Set<Id<Lane>> getLaneIds() {
 		if (this.laneIds  == null) {
-			this.laneIds = new HashSet<Id>();
+			this.laneIds = new HashSet<>();
 		}
 		return this.laneIds;
 	}
 
 	@Override
-	public Id getLinkId() {
+	public Id<Link> getLinkId() {
 		return this.linkId;
 	}
 

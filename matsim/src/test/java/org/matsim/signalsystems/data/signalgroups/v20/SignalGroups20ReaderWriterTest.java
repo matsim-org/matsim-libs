@@ -32,8 +32,10 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
+import org.matsim.signalsystems.model.Signal;
+import org.matsim.signalsystems.model.SignalGroup;
+import org.matsim.signalsystems.model.SignalSystem;
 import org.matsim.testcases.MatsimTestUtils;
 import org.xml.sax.SAXException;
 
@@ -50,13 +52,13 @@ public class SignalGroups20ReaderWriterTest {
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
-	private Id id23 = new IdImpl("23");
-	private Id id1 = new IdImpl("1");
-	private Id id2 = new IdImpl("2");
-	private Id id4 = new IdImpl("4");
-	private Id id5 = new IdImpl("5");
-	private Id id42 = new IdImpl("42");
-	Set<Id> sg;
+	private Id<SignalSystem> id23 = Id.create("23", SignalSystem.class);
+	private Id<Signal> id1 = Id.create("1", Signal.class);
+	private Id<Signal> id2 = Id.create("2", Signal.class);
+	private Id<Signal> id4 = Id.create("4", Signal.class);
+	private Id<Signal> id5 = Id.create("5", Signal.class);
+	private Id<SignalSystem> id42 = Id.create("42", SignalSystem.class);
+	Set<Id<Signal>> sg;
 
 
 
@@ -102,7 +104,7 @@ public class SignalGroups20ReaderWriterTest {
 		Assert.assertNotNull(sgd.getSignalGroupDataBySystemId(id23));
 		
 		//sg23
-		Map<Id,SignalGroupData> ss23 = sgd.getSignalGroupDataBySystemId(id23);
+		Map<Id<SignalGroup>,SignalGroupData> ss23 = sgd.getSignalGroupDataBySystemId(id23);
 		Assert.assertEquals(id23,ss23.get(id1).getSignalSystemId());
 
 		sg =  ss23.get(id1).getSignalIds();
@@ -110,7 +112,7 @@ public class SignalGroups20ReaderWriterTest {
 		
 		//sg42
 		Assert.assertNotNull(sgd.getSignalGroupDataBySystemId(id42));
-		Map<Id,SignalGroupData> ss42 = sgd.getSignalGroupDataBySystemId(id42);
+		Map<Id<SignalGroup>,SignalGroupData> ss42 = sgd.getSignalGroupDataBySystemId(id42);
 		Assert.assertEquals(id42,ss42.get(id1).getSignalSystemId());
 
 		sg =  ss42.get(id1).getSignalIds();

@@ -21,7 +21,6 @@ package org.matsim.signalsystems.oneagent;
 
 import junit.framework.Assert;
 
-import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -50,8 +49,6 @@ import org.matsim.testcases.utils.EventsLogger;
  */
 public class ControlerTest {
 	
-	private static final Logger log = Logger.getLogger(ControlerTest.class);
-	
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 	
@@ -73,6 +70,7 @@ public class ControlerTest {
 		controler.setCreateGraphs(false);
 		controler.addControlerListener(new AfterMobsimListener() {
 
+			@Override
 			public void notifyAfterMobsim(AfterMobsimEvent event) {
 				Scenario scenario = event.getControler().getScenario();
 				int dropping = 0;
@@ -95,6 +93,7 @@ public class ControlerTest {
 		
 		controler.addControlerListener(new IterationStartsListener() {
 			
+			@Override
 			public void notifyIterationStarts(IterationStartsEvent event) {
 				event.getControler().getEvents().addHandler(new EventsLogger());
 
@@ -118,6 +117,7 @@ public class ControlerTest {
 	private static final class TestSignalGroupStateChangedHandler implements
 			SignalGroupStateChangedEventHandler {
 
+		@Override
 		public void reset(int i) {}
 
 		@Override
@@ -134,9 +134,11 @@ public class ControlerTest {
 
 	private static final class TestLink2EnterEventHandler implements LinkEnterEventHandler {
 		double link2EnterTime = 0;
+		@Override
 		public void reset(int i) {}
+		@Override
 		public void handleEvent(LinkEnterEvent e){
-			if (e.getLinkId().equals(Fixture.id2)) {
+			if (e.getLinkId().equals(Fixture.linkId2)) {
 				Assert.assertEquals(link2EnterTime,  e.getTime(), MatsimTestUtils.EPSILON);
 			}
 		}

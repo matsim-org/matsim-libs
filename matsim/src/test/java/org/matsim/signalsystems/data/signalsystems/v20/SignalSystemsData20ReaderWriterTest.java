@@ -30,8 +30,11 @@ import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
+import org.matsim.signalsystems.model.Signal;
+import org.matsim.signalsystems.model.SignalSystem;
 import org.matsim.testcases.MatsimTestUtils;
 import org.xml.sax.SAXException;
 
@@ -49,13 +52,20 @@ public class SignalSystemsData20ReaderWriterTest {
   
   @Rule  public MatsimTestUtils testUtils = new MatsimTestUtils();
   
-  private Id id1 = new IdImpl("1");
+  private Id<SignalSystem> systemId1 = Id.create("1", SignalSystem.class);
+  private Id<Signal> signalId1 = Id.create("1", Signal.class);
+  private Id<Lane> laneId1 = Id.create("1", Lane.class);
+  private Id<Link> linkId1 = Id.create("1", Link.class);
   
-  private Id id2 = new IdImpl("2");
+  private Id<SignalSystem> systemId2 = Id.create("2", SignalSystem.class);
+  private Id<Signal> signalId2 = Id.create("2", Signal.class);
+  private Id<Link> linkId2 = Id.create("2", Link.class);
+  private Id<Lane> laneId2 = Id.create("2", Lane.class);
   
-  private Id id3 = new IdImpl("3");
+  private Id<Signal> signalId3 = Id.create("3", Signal.class);
+  private Id<Link> linkId3 = Id.create("3", Link.class);
   
-  private Id id4 = new IdImpl("4");
+  private Id<Link> linkId4 = Id.create("4", Link.class);
   
   @Test
   public void testParser() throws IOException, JAXBException, SAXException, ParserConfigurationException {
@@ -89,49 +99,49 @@ public class SignalSystemsData20ReaderWriterTest {
 
   private void checkContent(SignalSystemsData ss) {
   	//system id 1
-  	SignalSystemData ssdata = ss.getSignalSystemData().get(id1);
+  	SignalSystemData ssdata = ss.getSignalSystemData().get(systemId1);
   	Assert.assertNotNull(ssdata);
   	Assert.assertEquals(2, ssdata.getSignalData().size());
   	
-  	SignalData signaldata = ssdata.getSignalData().get(id1);
+  	SignalData signaldata = ssdata.getSignalData().get(signalId1);
   	Assert.assertNotNull(signaldata);
-  	Assert.assertEquals(id1, signaldata.getId());
-  	Assert.assertEquals(id1, signaldata.getLinkId());
+  	Assert.assertEquals(signalId1, signaldata.getId());
+  	Assert.assertEquals(linkId1, signaldata.getLinkId());
   	Assert.assertNull(signaldata.getLaneIds());
   	Assert.assertNull(signaldata.getTurningMoveRestrictions());
   	
-  	signaldata = ssdata.getSignalData().get(id2);
+  	signaldata = ssdata.getSignalData().get(signalId2);
   	Assert.assertNotNull(signaldata);
-  	Assert.assertEquals(id2, signaldata.getId());
-  	Assert.assertEquals(id2, signaldata.getLinkId());
+  	Assert.assertEquals(signalId2, signaldata.getId());
+  	Assert.assertEquals(linkId2, signaldata.getLinkId());
   	Assert.assertNotNull(signaldata.getTurningMoveRestrictions());
   	Assert.assertEquals(1, signaldata.getTurningMoveRestrictions().size());
-  	Assert.assertEquals(id3, signaldata.getTurningMoveRestrictions().iterator().next());
+  	Assert.assertEquals(linkId3, signaldata.getTurningMoveRestrictions().iterator().next());
   	Assert.assertNull(signaldata.getLaneIds());
   	
   	//system id 2 
-  	ssdata = ss.getSignalSystemData().get(id2);
+  	ssdata = ss.getSignalSystemData().get(systemId2);
   	Assert.assertNotNull(ssdata);
 
-  	signaldata = ssdata.getSignalData().get(id1);
+  	signaldata = ssdata.getSignalData().get(signalId1);
   	Assert.assertNotNull(signaldata);
-  	Assert.assertEquals(id1, signaldata.getId());
-  	Assert.assertEquals(id3, signaldata.getLinkId());
+  	Assert.assertEquals(signalId1, signaldata.getId());
+  	Assert.assertEquals(signalId3, signaldata.getLinkId());
   	Assert.assertNotNull(signaldata.getLaneIds());
-  	Assert.assertEquals(id1, signaldata.getLaneIds().iterator().next());
+  	Assert.assertEquals(laneId1, signaldata.getLaneIds().iterator().next());
   	Assert.assertNull(signaldata.getTurningMoveRestrictions());
 
-  	signaldata = ssdata.getSignalData().get(id2);
+  	signaldata = ssdata.getSignalData().get(signalId2);
   	Assert.assertNotNull(signaldata);
-  	Assert.assertEquals(id2, signaldata.getId());
-  	Assert.assertEquals(id4, signaldata.getLinkId());
+  	Assert.assertEquals(signalId2, signaldata.getId());
+  	Assert.assertEquals(linkId4, signaldata.getLinkId());
   	Assert.assertNotNull(signaldata.getLaneIds());
   	Assert.assertEquals(2, signaldata.getLaneIds().size());
-  	Assert.assertTrue(signaldata.getLaneIds().contains(id1));
-  	Assert.assertTrue(signaldata.getLaneIds().contains(id2));
+  	Assert.assertTrue(signaldata.getLaneIds().contains(laneId1));
+  	Assert.assertTrue(signaldata.getLaneIds().contains(laneId2));
   	Assert.assertNotNull(signaldata.getTurningMoveRestrictions());
   	Assert.assertEquals(1, signaldata.getTurningMoveRestrictions().size());
-  	Assert.assertTrue(signaldata.getTurningMoveRestrictions().contains(id3));
+  	Assert.assertTrue(signaldata.getTurningMoveRestrictions().contains(linkId3));
   	
   }
 

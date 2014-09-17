@@ -36,6 +36,7 @@ import org.matsim.lanes.data.v11.LaneDefinitions11;
 import org.matsim.lanes.data.v11.LaneDefinitions11Impl;
 import org.matsim.lanes.data.v11.LaneDefinitionsFactory11;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.utils.LanesUtils;
 import org.matsim.signalsystems.SignalUtils;
@@ -86,17 +87,17 @@ public class CreateTrafficSignalScenarioWithLanes {
 		systems.addSignalSystemData(sys);
 		SignalSystemsDataFactory factory = systems.getFactory();
 		SignalUtils.createAndAddSignal(sys, factory, Id.create("1", Signal.class), 
-				Id.create("12", Link.class), Id.create("1", Object.class));
+				Id.create("12", Link.class), Id.create("1", Lane.class));
 
 		SignalUtils.createAndAddSignal(sys, factory, Id.create("2", Signal.class), 
-				Id.create("12", Link.class), Id.create("2", Object.class));
+				Id.create("12", Link.class), Id.create("2", Lane.class));
 
 		//create the groups TODO reconsider if this would be better done by utils
-		SignalGroupData group4signal = groups.getFactory().createSignalGroupData(sys.getId(), Id.create("1", SignalGroupData.class));
+		SignalGroupData group4signal = groups.getFactory().createSignalGroupData(sys.getId(), Id.create("1", SignalGroup.class));
 		groups.addSignalGroupData(group4signal);
 		group4signal.addSignalId(Id.create("1", Signal.class));
 		
-		group4signal = groups.getFactory().createSignalGroupData(sys.getId(), Id.create("2", SignalGroupData.class));
+		group4signal = groups.getFactory().createSignalGroupData(sys.getId(), Id.create("2", SignalGroup.class));
 		groups.addSignalGroupData(group4signal);
 		group4signal.addSignalId(Id.create("2", Signal.class));
 
@@ -123,17 +124,17 @@ public class CreateTrafficSignalScenarioWithLanes {
 		SignalSystemsDataFactory factory = systems.getFactory();
 		
 		SignalUtils.createAndAddSignal(sys, factory, Id.create("1", Signal.class), 
-				Id.create("65", Link.class), Id.create("1", Object.class));
+				Id.create("65", Link.class), Id.create("1", Lane.class));
 
 		SignalUtils.createAndAddSignal(sys, factory, Id.create("2", Signal.class), 
-				Id.create("65", Link.class), Id.create("2", Object.class));
+				Id.create("65", Link.class), Id.create("2", Lane.class));
 
 		//create the groups
-		SignalGroupData group4signal = groups.getFactory().createSignalGroupData(sys.getId(), Id.create("1", SignalGroupData.class));
+		SignalGroupData group4signal = groups.getFactory().createSignalGroupData(sys.getId(), Id.create("1", SignalGroup.class));
 		groups.addSignalGroupData(group4signal);
 		group4signal.addSignalId(Id.create("1", Signal.class));
 		
-		group4signal = groups.getFactory().createSignalGroupData(sys.getId(), Id.create("2", SignalGroupData.class));
+		group4signal = groups.getFactory().createSignalGroupData(sys.getId(), Id.create("2", SignalGroup.class));
 		groups.addSignalGroupData(group4signal);
 		group4signal.addSignalId(Id.create("2", Signal.class));
 		//signals 3 and 4

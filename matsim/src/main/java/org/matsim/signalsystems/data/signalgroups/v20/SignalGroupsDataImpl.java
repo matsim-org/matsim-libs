@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.signalsystems.model.SignalGroup;
+import org.matsim.signalsystems.model.SignalSystem;
 
 
 /**
@@ -31,7 +33,7 @@ import org.matsim.api.core.v01.Id;
  */
 public class SignalGroupsDataImpl implements SignalGroupsData {
 
-	private Map<Id, Map<Id, SignalGroupData>> signalGroupsDataBySystemId = new HashMap<Id, Map<Id, SignalGroupData>>();
+	private Map<Id<SignalSystem>, Map<Id<SignalGroup>, SignalGroupData>> signalGroupsDataBySystemId = new HashMap<>();
 	
 	private SignalGroupsDataFactory factory;
 	
@@ -41,17 +43,17 @@ public class SignalGroupsDataImpl implements SignalGroupsData {
 	
 	@Override
 	public void addSignalGroupData(SignalGroupData signalGroupData) {
-		Id signalSystemId = signalGroupData.getSignalSystemId();
-		Map<Id, SignalGroupData> map = this.signalGroupsDataBySystemId.get(signalSystemId);
+		Id<SignalSystem> signalSystemId = signalGroupData.getSignalSystemId();
+		Map<Id<SignalGroup>, SignalGroupData> map = this.signalGroupsDataBySystemId.get(signalSystemId);
 		if (map == null){
-			map = new HashMap<Id, SignalGroupData>();
+			map = new HashMap<>();
 			this.signalGroupsDataBySystemId.put(signalSystemId, map);
 		}
 		map.put(signalGroupData.getId(), signalGroupData);
 	}
 
 	@Override
-	public Map<Id, SignalGroupData> getSignalGroupDataBySystemId(Id signalSystemId) {
+	public Map<Id<SignalGroup>, SignalGroupData> getSignalGroupDataBySystemId(Id<SignalSystem> signalSystemId) {
 		return this.signalGroupsDataBySystemId.get(signalSystemId);
 	}
 
@@ -61,7 +63,7 @@ public class SignalGroupsDataImpl implements SignalGroupsData {
 	}
 
 	@Override
-	public Map<Id, Map<Id, SignalGroupData>> getSignalGroupDataBySignalSystemId() {
+	public Map<Id<SignalSystem>, Map<Id<SignalGroup>, SignalGroupData>> getSignalGroupDataBySignalSystemId() {
 		return signalGroupsDataBySystemId;
 	}
 

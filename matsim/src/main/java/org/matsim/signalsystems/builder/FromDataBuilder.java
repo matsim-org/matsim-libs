@@ -85,10 +85,10 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 
 	public void createAndAddSignalGroupsFromData(SignalSystem system){
 		//process information of  SignalGroupsData object and create the signal groups
-		Map<Id, SignalGroupData> signalGroupDataMap = this.signalsData.getSignalGroupsData().getSignalGroupDataBySystemId(system.getId());
+		Map<Id<SignalGroup>, SignalGroupData> signalGroupDataMap = this.signalsData.getSignalGroupsData().getSignalGroupDataBySystemId(system.getId());
 		for (SignalGroupData signalGroupData : signalGroupDataMap.values()){
 			SignalGroup group = new SignalGroupImpl(signalGroupData.getId());
-			for (Id signalId : signalGroupData.getSignalIds()){
+			for (Id<Signal> signalId : signalGroupData.getSignalIds()){
 				Signal signal = system.getSignals().get(signalId);
 				group.addSignal(signal);
 			}

@@ -31,16 +31,16 @@ import org.matsim.api.core.v01.Id;
  */
 public class SignalGroupImpl implements SignalGroup {
 	
-	private Id id;
-	private Map<Id, Signal> signals = new HashMap<Id, Signal>();
+	private Id<SignalGroup> id;
+	private Map<Id<Signal>, Signal> signals = new HashMap<>();
 	private SignalGroupState state;
 
-	public SignalGroupImpl(Id id) {
+	public SignalGroupImpl(Id<SignalGroup> id) {
 		this.id = id;
 	}
 	
 	@Override
-	public Id getId(){
+	public Id<SignalGroup> getId(){
 		return this.id;
 	}
 
@@ -63,7 +63,7 @@ public class SignalGroupImpl implements SignalGroup {
 	}
 
 	@Override
-	public Map<Id, Signal> getSignals() {
+	public Map<Id<Signal>, Signal> getSignals() {
 		return this.signals;
 	}
 

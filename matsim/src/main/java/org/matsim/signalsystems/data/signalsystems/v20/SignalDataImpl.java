@@ -24,6 +24,7 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.signalsystems.model.Signal;
 
 
@@ -37,7 +38,7 @@ public class SignalDataImpl implements SignalData {
 	
 	private Id<Link> linkId;
 	
-	private Set<Id> laneIds = null;
+	private Set<Id<Lane>> laneIds = null;
 	
 	private Set<Id<Link>> turningMoveRestrictions = null;
 
@@ -46,9 +47,9 @@ public class SignalDataImpl implements SignalData {
 	}
 
 	@Override
-	public void addLaneId(Id laneId) {
+	public void addLaneId(Id<Lane> laneId) {
 		if (this.laneIds == null){
-			this.laneIds = new HashSet<Id>();
+			this.laneIds = new HashSet<>();
 		}
 		this.laneIds.add(laneId);
 	}
@@ -62,12 +63,12 @@ public class SignalDataImpl implements SignalData {
 	}
 
 	@Override
-	public Set<Id> getLaneIds() {
+	public Set<Id<Lane>> getLaneIds() {
 		return this.laneIds;
 	}
 
 	@Override
-	public Id getLinkId() {
+	public Id<Link> getLinkId() {
 		return this.linkId;
 	}
 

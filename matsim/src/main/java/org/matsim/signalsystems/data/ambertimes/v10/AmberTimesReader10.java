@@ -29,13 +29,14 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.jaxb.amberTimes10.XMLAmberTimes;
 import org.matsim.jaxb.amberTimes10.XMLAmberTimes.XMLSignalSystem;
 import org.matsim.jaxb.amberTimes10.XMLAmberTimes.XMLSignalSystem.XMLSignal;
+import org.matsim.signalsystems.model.Signal;
+import org.matsim.signalsystems.model.SignalSystem;
 import org.xml.sax.SAXException;
 
 /**
@@ -109,7 +110,7 @@ public class AmberTimesReader10 extends MatsimJaxbXmlParser {
 		}
 
 		for (XMLSignalSystem xmlss : xmlatdefs.getSignalSystem()) {
-			Id ssid = new IdImpl(xmlss.getRefId());
+			Id<SignalSystem> ssid = Id.create(xmlss.getRefId(), SignalSystem.class);
 			AmberTimeData atdata = new AmberTimeDataImpl(ssid);
 
 			// Signalsystem Defaults
@@ -124,7 +125,7 @@ public class AmberTimesReader10 extends MatsimJaxbXmlParser {
 
 			for (XMLSignal xmls : xmlss.getSignal()) {
 
-				Id sid = new IdImpl(xmls.getRefId());
+				Id<Signal> sid = Id.create(xmls.getRefId(), Signal.class);
 				atdata.setAmberTimeOfSignal(sid, xmls.getAmber().getSeconds().intValue());
 				atdata.setRedAmberTimeOfSignal(sid, xmls.getRedAmber().getSeconds().intValue());
 

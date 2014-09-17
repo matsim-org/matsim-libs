@@ -24,6 +24,7 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.signalsystems.model.Signal;
 
 
@@ -48,9 +49,9 @@ public interface SignalData extends Identifiable<Signal> {
 	 * @return A Set of Lane Ids, if the signal is placed on cerain lanes. Maybe null or empty if the signal is
 	 * on the link.
 	 */
-	public Set<Id> getLaneIds();
+	public Set<Id<Lane>> getLaneIds();
 	
-	public void addLaneId(Id laneId);
+	public void addLaneId(Id<Lane> laneId);
 	/**
 	 * @return Returns a Set of link Ids to that driving is allowed when the signal 
 	 * is activated. May return null if no turning  move restrictions are set.

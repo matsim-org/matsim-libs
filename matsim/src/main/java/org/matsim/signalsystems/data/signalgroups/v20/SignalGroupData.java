@@ -23,22 +23,25 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
+import org.matsim.signalsystems.model.Signal;
+import org.matsim.signalsystems.model.SignalGroup;
+import org.matsim.signalsystems.model.SignalSystem;
 
 
 /**
  * @author dgrether
  *
  */
-public interface SignalGroupData extends Identifiable{
+public interface SignalGroupData extends Identifiable<SignalGroup> {
 	
-	public Id getSignalSystemId();
+	public Id<SignalSystem> getSignalSystemId();
 	
 	@Override
-	public Id getId();
+	public Id<SignalGroup> getId();
 	
-	public void addSignalId(Id signalId);
+	public void addSignalId(Id<Signal> signalId);
 	
-	public Set<Id> getSignalIds();
+	public Set<Id<Signal>> getSignalIds();
 
 
 }

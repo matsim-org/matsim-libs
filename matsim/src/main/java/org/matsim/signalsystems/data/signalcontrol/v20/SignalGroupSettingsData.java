@@ -20,6 +20,7 @@
 package org.matsim.signalsystems.data.signalcontrol.v20;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.signalsystems.model.SignalGroup;
 
 
 /**
@@ -28,7 +29,7 @@ import org.matsim.api.core.v01.Id;
  */
 public interface SignalGroupSettingsData {
 
-	public Id getSignalGroupId();
+	public Id<SignalGroup> getSignalGroupId();
 	
 	public int getOnset();
 

@@ -23,6 +23,8 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
+import org.matsim.signalsystems.model.SignalGroup;
+import org.matsim.signalsystems.model.SignalSystem;
 
 
 /**
@@ -36,10 +38,10 @@ public interface SignalGroupsData extends MatsimToplevelContainer {
 	
 	public void setFactory(SignalGroupsDataFactory factory);
 	
-	public Map<Id, SignalGroupData> getSignalGroupDataBySystemId(Id signalSystemId);
+	public Map<Id<SignalGroup>, SignalGroupData> getSignalGroupDataBySystemId(Id<SignalSystem> signalSystemId);
 	
 	public void addSignalGroupData(SignalGroupData signalGroupData);
 	
-	public Map<Id,Map<Id,SignalGroupData>> getSignalGroupDataBySignalSystemId();
+	public Map<Id<SignalSystem>,Map<Id<SignalGroup>,SignalGroupData>> getSignalGroupDataBySignalSystemId();
 	
 }

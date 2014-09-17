@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.signalsystems.model.SignalSystem;
 
 
 /**
@@ -33,7 +34,7 @@ public class IntergreenTimesDataImpl implements IntergreenTimesData {
 
 	private IntergreenTimesDataFactory factory = new IntergreenTimesDataFactoryImpl();
 
-	private Map<Id, IntergreensForSignalSystemData> intergreensForSystemByIdMap = new HashMap<Id, IntergreensForSignalSystemData>();
+	private Map<Id<SignalSystem>, IntergreensForSignalSystemData> intergreensForSystemByIdMap = new HashMap<>();
 	
 	@Override
 	public IntergreensForSignalSystemData addIntergreensForSignalSystem(
@@ -42,7 +43,7 @@ public class IntergreenTimesDataImpl implements IntergreenTimesData {
 	}
 
 	@Override
-	public Map<Id, IntergreensForSignalSystemData> getIntergreensForSignalSystemDataMap() {
+	public Map<Id<SignalSystem>, IntergreensForSignalSystemData> getIntergreensForSignalSystemDataMap() {
 		return this.intergreensForSystemByIdMap;
 	}
 

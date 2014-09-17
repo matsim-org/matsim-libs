@@ -23,7 +23,7 @@ import java.lang.reflect.Method;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -31,8 +31,9 @@ import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.run.LaneDefinitonsV11ToV20Converter;
-import org.matsim.signalsystems.data.SignalsData;
-import org.matsim.signalsystems.data.SignalsScenarioLoader;
+import org.matsim.signalsystems.model.SignalGroup;
+import org.matsim.signalsystems.model.SignalPlan;
+import org.matsim.signalsystems.model.SignalSystem;
 import org.matsim.testcases.MatsimTestUtils;
 
 
@@ -42,9 +43,11 @@ import org.matsim.testcases.MatsimTestUtils;
  */
 public class Fixture {
 
-	static final Id id1 = new IdImpl(1);
-	static final Id id2 = new IdImpl(2);
-	static final Id id100 = new IdImpl(100);
+	static final Id<Link> linkId1 = Id.create(1, Link.class);
+	static final Id<Link> linkId2 = Id.create(2, Link.class);
+	static final Id<SignalPlan> signalPlanId2 = Id.create(2, SignalPlan.class);
+	static final Id<SignalSystem> signalSystemId2 = Id.create(2, SignalSystem.class);
+	static final Id<SignalGroup> signalGroupId100 = Id.create(100, SignalGroup.class);
 
 	public Scenario createAndLoadTestScenario(Boolean useIntergreens){
 		MatsimTestUtils testUtils = new MatsimTestUtils();
@@ -63,7 +66,7 @@ public class Fixture {
 		params.setTypicalDuration(24.0 * 3600.0);
 		conf.planCalcScore().addActivityParams(params);
 
-		StrategySettings settings = new StrategySettings(new IdImpl("1"));
+		StrategySettings settings = new StrategySettings(Id.create("1", StrategySettings.class));
 		settings.setModuleName("ChangeExpBeta");
 		settings.setProbability(1.0);
 		conf.strategy().addStrategySettings(settings);

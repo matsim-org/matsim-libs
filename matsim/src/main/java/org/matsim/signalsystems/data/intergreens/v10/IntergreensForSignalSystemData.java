@@ -24,6 +24,8 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.signalsystems.model.SignalGroup;
+import org.matsim.signalsystems.model.SignalSystem;
 
 
 /**
@@ -32,14 +34,14 @@ import org.matsim.core.utils.collections.Tuple;
  */
 public interface IntergreensForSignalSystemData {
 
-	public Id getSignalSystemId();
+	public Id<SignalSystem> getSignalSystemId();
 	
-	public Integer getIntergreenTime(Id endingSignalGroupId, Id beginningSignalGroupId);
+	public Integer getIntergreenTime(Id<SignalGroup> endingSignalGroupId, Id<SignalGroup> beginningSignalGroupId);
 
-	public void setIntergreenTime(Integer timeSeconds, Id endingSignalGroupId, Id beginningSignalGroupId);
+	public void setIntergreenTime(Integer timeSeconds, Id<SignalGroup> endingSignalGroupId, Id<SignalGroup> beginningSignalGroupId);
 
-	public List<Tuple<Id, Id>> getEndingBeginningSignalGroupKeys();
+	public List<Tuple<Id<SignalGroup>, Id<SignalGroup>>> getEndingBeginningSignalGroupKeys();
 
-	public Map<Id, Integer> getEndSignalGroupTimesForBeginningGroup(Id id);
+	public Map<Id<SignalGroup>, Integer> getEndSignalGroupTimesForBeginningGroup(Id<SignalGroup> id);
 	
 }

@@ -48,6 +48,7 @@ import org.matsim.lanes.data.v11.LaneDefinitions11Impl;
 import org.matsim.lanes.data.v11.LaneDefinitionsFactory11;
 import org.matsim.lanes.data.v11.LaneDefinitionsWriter11;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsDataImpl;
@@ -287,49 +288,49 @@ public class PoznanNetwork
 
         SignalData signal = sf.createSignalData(Id.create("s12_10_1", Signal.class));
         signal.setLinkId(Id.create("12_10", Link.class));
-        signal.addLaneId(Id.create("12_10_1", Object.class));
+        signal.addLaneId(Id.create("12_10_1", Lane.class));
         sys10.addSignalData(signal);
 
         signal = sf.createSignalData(Id.create("s12_10_2", Signal.class));
         signal.setLinkId(Id.create("12_10", Link.class));
-        signal.addLaneId(Id.create("12_10_2", Object.class));
-        signal.addLaneId(Id.create("12_10_3", Object.class));
+        signal.addLaneId(Id.create("12_10_2", Lane.class));
+        signal.addLaneId(Id.create("12_10_3", Lane.class));
         sys10.addSignalData(signal);
 
         signal = sf.createSignalData(Id.create("s12_10_3", Signal.class));
         signal.setLinkId(Id.create("12_10", Link.class));
-        signal.addLaneId(Id.create("12_10_3", Object.class));
+        signal.addLaneId(Id.create("12_10_3", Lane.class));
         signal.addTurningMoveRestriction(Id.create("10_11", Link.class));
         sys10.addSignalData(signal);
 
         signal = sf.createSignalData(Id.create("s11_10_1", Signal.class));
         signal.setLinkId(Id.create("11_10", Link.class));
-        signal.addLaneId(Id.create("11_10_1", Object.class));
+        signal.addLaneId(Id.create("11_10_1", Lane.class));
         sys10.addSignalData(signal);
 
         signal = sf.createSignalData(Id.create("s11_10_2", Signal.class));
         signal.setLinkId(Id.create("11_10", Link.class));
-        signal.addLaneId(Id.create("11_10_2", Object.class));
+        signal.addLaneId(Id.create("11_10_2", Lane.class));
         sys10.addSignalData(signal);
 
         signal = sf.createSignalData(Id.create("s11_10_3", Signal.class));
         signal.setLinkId(Id.create("11_10", Link.class));
-        signal.addLaneId(Id.create("11_10_3", Object.class));
+        signal.addLaneId(Id.create("11_10_3", Lane.class));
         sys10.addSignalData(signal);
 
         signal = sf.createSignalData(Id.create("s30_10_1", Signal.class));
         signal.setLinkId(Id.create("30_10", Link.class));
-        signal.addLaneId(Id.create("30_10_1", Object.class));
+        signal.addLaneId(Id.create("30_10_1", Lane.class));
         sys10.addSignalData(signal);
 
         signal = sf.createSignalData(Id.create("s30_10_2", Signal.class));
         signal.setLinkId(Id.create("30_10", Link.class));
-        signal.addLaneId(Id.create("30_10_2", Object.class));
+        signal.addLaneId(Id.create("30_10_2", Lane.class));
         sys10.addSignalData(signal);
 
         signal = sf.createSignalData(Id.create("s30_10_3", Signal.class));
         signal.setLinkId(Id.create("30_10", Link.class));
-        signal.addLaneId(Id.create("30_10_3", Object.class));
+        signal.addLaneId(Id.create("30_10_3", Lane.class));
         sys10.addSignalData(signal);
 
 //        signal = sf.createSignalData(Id.create("s30_10_1"));
@@ -349,17 +350,17 @@ public class PoznanNetwork
 
         signal = sf.createSignalData(Id.create("s13_10_1", Signal.class));
         signal.setLinkId(Id.create("13_10", Link.class));
-        signal.addLaneId(Id.create("13_10_1", Object.class));
+        signal.addLaneId(Id.create("13_10_1", Lane.class));
         sys10.addSignalData(signal);
 
         signal = sf.createSignalData(Id.create("s13_10_2", Signal.class));
         signal.setLinkId(Id.create("13_10", Link.class));
-        signal.addLaneId(Id.create("13_10_2", Object.class));
+        signal.addLaneId(Id.create("13_10_2", Lane.class));
         sys10.addSignalData(signal);
 
         signal = sf.createSignalData(Id.create("s13_10_3", Signal.class));
         signal.setLinkId(Id.create("13_10", Link.class));
-        signal.addLaneId(Id.create("13_10_3", Object.class));
+        signal.addLaneId(Id.create("13_10_3", Lane.class));
         sys10.addSignalData(signal);
 
         // create SignalGroups

@@ -29,13 +29,14 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.jaxb.intergreenTimes10.XMLEndingSignalGroupType;
 import org.matsim.jaxb.intergreenTimes10.XMLIntergreenTimes;
 import org.matsim.jaxb.intergreenTimes10.XMLIntergreenTimes.XMLSignalSystem;
+import org.matsim.signalsystems.model.SignalGroup;
+import org.matsim.signalsystems.model.SignalSystem;
 import org.xml.sax.SAXException;
 
 /**
@@ -75,13 +76,13 @@ public class IntergreenTimesReader10 extends MatsimJaxbXmlParser {
 			xmlIntergreenTimes = (XMLIntergreenTimes) u.unmarshal(stream);
 			IntergreenTimesDataFactory factory = this.intergreensData.getFactory();
 			for (XMLSignalSystem xmlSignalSystem : xmlIntergreenTimes.getSignalSystem()){
-				Id signalSystemId = new IdImpl(xmlSignalSystem.getRefId());
+				Id<SignalSystem> signalSystemId = Id.create(xmlSignalSystem.getRefId(), SignalSystem.class);
 				IntergreensForSignalSystemData intergreens = factory.createIntergreensForSignalSystem(signalSystemId);
 				this.intergreensData.addIntergreensForSignalSystem(intergreens);
 				for (XMLEndingSignalGroupType xmlEndingSg : xmlSignalSystem.getEndingSignalGroup()){
 					for (XMLEndingSignalGroupType.XMLBeginningSignalGroup xmlBeginningSg : xmlEndingSg.getBeginningSignalGroup()) {
-						Id endingId = new IdImpl(xmlEndingSg.getRefId());
-						Id beginningId = new IdImpl(xmlBeginningSg.getRefId());
+						Id<SignalGroup> endingId = Id.create(xmlEndingSg.getRefId(), SignalGroup.class);
+						Id<SignalGroup> beginningId = Id.create(xmlBeginningSg.getRefId(), SignalGroup.class);
 						intergreens.setIntergreenTime(xmlBeginningSg.getTimeSeconds().intValue(), endingId, beginningId);
 					}
 				}

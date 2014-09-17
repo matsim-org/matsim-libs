@@ -30,7 +30,8 @@ import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.signalsystems.model.Signal;
+import org.matsim.signalsystems.model.SignalSystem;
 import org.matsim.testcases.MatsimTestUtils;
 import org.xml.sax.SAXException;
 
@@ -47,8 +48,6 @@ public class AmberTimesData10ReaderWriterTest {
 
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
-
-	private Id id1 = new IdImpl("1");
 
 	@Test
 	public void testParser() throws IOException, JAXBException, SAXException,
@@ -89,16 +88,16 @@ public class AmberTimesData10ReaderWriterTest {
 		Assert.assertEquals(1, ats.getDefaultRedAmber().intValue());
 		Assert.assertEquals(4, ats.getDefaultAmber().intValue());
 		// system id1 defaults
-		AmberTimeData atdata = ats.getAmberTimeDataBySystemId().get(id1);
+		AmberTimeData atdata = ats.getAmberTimeDataBySystemId().get(Id.create(1, SignalSystem.class));
 		Assert.assertNotNull(atdata);
 		Assert.assertEquals(1, atdata.getDefaultRedAmber().intValue());
 		Assert.assertEquals(4, atdata.getDefaultAmber().intValue());
 		// Signal 1 defaults
-		Assert.assertNotNull(atdata.getAmberOfSignal(id1));
+		Assert.assertNotNull(atdata.getAmberOfSignal(Id.create(1, Signal.class)));
 		Assert.assertNotNull(atdata.getSignalAmberMap());
 		Assert.assertNotNull(atdata.getSignalRedAmberMap());
-		Assert.assertEquals(4, atdata.getAmberOfSignal(id1).intValue());
-		Assert.assertEquals(2, atdata.getRedAmberOfSignal(id1).intValue());
+		Assert.assertEquals(4, atdata.getAmberOfSignal(Id.create(1, Signal.class)).intValue());
+		Assert.assertEquals(2, atdata.getRedAmberOfSignal(Id.create(1, Signal.class)).intValue());
 
 	}
 

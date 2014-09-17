@@ -23,35 +23,37 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.signalsystems.model.Signal;
+import org.matsim.signalsystems.model.SignalSystem;
 
 /**
  * @author dgrether
  */
 public class SignalSystemDataImpl implements SignalSystemData {
 
-	private Id id;
+	private Id<SignalSystem> id;
 	
-	private Map<Id, SignalData> signalDataMap = null;
+	private Map<Id<Signal>, SignalData> signalDataMap = null;
 
-	SignalSystemDataImpl(Id id) {
+	SignalSystemDataImpl(Id<SignalSystem> id) {
 		this.id = id;
 	}
 
 	@Override
 	public void addSignalData(SignalData signalData) {
 		if (this.signalDataMap == null) {
-			this.signalDataMap = new HashMap<Id, SignalData>();
+			this.signalDataMap = new HashMap<>();
 		}
 		this.signalDataMap.put(signalData.getId(), signalData);
 	}
 
 	@Override
-	public Map<Id, SignalData> getSignalData() {
+	public Map<Id<Signal>, SignalData> getSignalData() {
 		return this.signalDataMap;
 	}
 
 	@Override
-	public Id getId() {
+	public Id<SignalSystem> getId() {
 		return this.id;
 	}
 

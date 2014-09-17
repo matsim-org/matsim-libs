@@ -29,7 +29,8 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.signalsystems.model.SignalGroup;
+import org.matsim.signalsystems.model.SignalSystem;
 import org.matsim.testcases.MatsimTestUtils;
 import org.xml.sax.SAXException;
 
@@ -46,13 +47,12 @@ public class IntergreenTimesData10ReaderWriterTest {
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 
-	private Id id1 = new IdImpl("1");
-	private Id id2 = new IdImpl("2");
-	private Id id3 = new IdImpl("3");
-	private Id id4 = new IdImpl("4");
-	private Id id23 = new IdImpl("23");
-	private Id id42 = new IdImpl("42");
-	
+	private Id<SignalGroup> groupId1 = Id.create("1", SignalGroup.class);
+	private Id<SignalGroup> groupId2 = Id.create("2", SignalGroup.class);
+	private Id<SignalGroup> groupId3 = Id.create("3", SignalGroup.class);
+	private Id<SignalGroup> groupId4 = Id.create("4", SignalGroup.class);
+	private Id<SignalSystem> systemId23 = Id.create("23", SignalSystem.class);
+	private Id<SignalSystem> systemId42 = Id.create("42", SignalSystem.class);
 
 	@Test
 	public void testParser() throws IOException, JAXBException, SAXException,
@@ -90,19 +90,19 @@ public class IntergreenTimesData10ReaderWriterTest {
 		Assert.assertNotNull(itd);
 		Assert.assertNotNull(itd.getIntergreensForSignalSystemDataMap());
 		Assert.assertEquals(2, itd.getIntergreensForSignalSystemDataMap().size());
-		IntergreensForSignalSystemData ig23 = itd.getIntergreensForSignalSystemDataMap().get(id23);
+		IntergreensForSignalSystemData ig23 = itd.getIntergreensForSignalSystemDataMap().get(systemId23);
 		Assert.assertNotNull(ig23);
-		Assert.assertEquals(Integer.valueOf(5), ig23.getIntergreenTime(id1, id2));
-		Assert.assertEquals(Integer.valueOf(3), ig23.getIntergreenTime(id1, id3));
-		Assert.assertEquals(Integer.valueOf(3), ig23.getIntergreenTime(id1, id4));
-		Assert.assertNull(ig23.getIntergreenTime(id2, id3));
+		Assert.assertEquals(Integer.valueOf(5), ig23.getIntergreenTime(groupId1, groupId2));
+		Assert.assertEquals(Integer.valueOf(3), ig23.getIntergreenTime(groupId1, groupId3));
+		Assert.assertEquals(Integer.valueOf(3), ig23.getIntergreenTime(groupId1, groupId4));
+		Assert.assertNull(ig23.getIntergreenTime(groupId2, groupId3));
 		
-		IntergreensForSignalSystemData ig42 = itd.getIntergreensForSignalSystemDataMap().get(id42);
+		IntergreensForSignalSystemData ig42 = itd.getIntergreensForSignalSystemDataMap().get(systemId42);
 		Assert.assertNotNull(ig42);
-		Assert.assertEquals(Integer.valueOf(5), ig42.getIntergreenTime(id1, id2));
-		Assert.assertEquals(Integer.valueOf(3), ig42.getIntergreenTime(id2, id1));
-		Assert.assertNull(ig42.getIntergreenTime(id1, id3));
-		Assert.assertNull(ig42.getIntergreenTime(id1, id1));
+		Assert.assertEquals(Integer.valueOf(5), ig42.getIntergreenTime(groupId1, groupId2));
+		Assert.assertEquals(Integer.valueOf(3), ig42.getIntergreenTime(groupId2, groupId1));
+		Assert.assertNull(ig42.getIntergreenTime(groupId1, groupId3));
+		Assert.assertNull(ig42.getIntergreenTime(groupId1, groupId1));
 	}
 
 }

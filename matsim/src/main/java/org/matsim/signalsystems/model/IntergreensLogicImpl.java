@@ -41,7 +41,7 @@ private static final Logger log = Logger.getLogger(IntergreensLogicImpl.class);
 
 	private final IntergreenTimesData intergreensData;
 	private final SignalSystemsConfigGroup signalsConfig;
-	private final Map<Id, Map<Id, Double>> signalSystemIdSignalGroupMap = new HashMap<Id, Map<Id, Double>>();
+	private final Map<Id<SignalSystem>, Map<Id<SignalGroup>, Double>> signalSystemIdSignalGroupMap = new HashMap<>();
 
 	public IntergreensLogicImpl(IntergreenTimesData intergreenTimesData, SignalSystemsConfigGroup signalSystemsConfigGroup) {
 		this.intergreensData = intergreenTimesData;
@@ -72,9 +72,9 @@ private static final Logger log = Logger.getLogger(IntergreensLogicImpl.class);
 	}
 
 	private void handleRedOrSimilarStateChange(SignalGroupStateChangedEvent event){
-		Map<Id, Double> signalGroupOffTimeMap = this.signalSystemIdSignalGroupMap .get(event.getSignalSystemId());
+		Map<Id<SignalGroup>, Double> signalGroupOffTimeMap = this.signalSystemIdSignalGroupMap.get(event.getSignalSystemId());
 		if (signalGroupOffTimeMap == null){
-			this.signalSystemIdSignalGroupMap.put(event.getSignalSystemId(), new HashMap<Id, Double>());
+			this.signalSystemIdSignalGroupMap.put(event.getSignalSystemId(), new HashMap<Id<SignalGroup>, Double>());
 		}
 		this.signalSystemIdSignalGroupMap.get(event.getSignalSystemId()).put(event.getSignalGroupId(), event.getTime());
 	}
@@ -82,11 +82,11 @@ private static final Logger log = Logger.getLogger(IntergreensLogicImpl.class);
 	private void checkAndHandleGreenAllowed(SignalGroupStateChangedEvent event) {
 			IntergreensForSignalSystemData greensData4System = this.intergreensData.getIntergreensForSignalSystemDataMap().get(event.getSignalSystemId());
 			if (greensData4System != null){
-				Map<Id, Integer> endGroupTimes4BeginningGroup = greensData4System.getEndSignalGroupTimesForBeginningGroup((event.getSignalGroupId()));
+				Map<Id<SignalGroup>, Integer> endGroupTimes4BeginningGroup = greensData4System.getEndSignalGroupTimesForBeginningGroup((event.getSignalGroupId()));
 				if (endGroupTimes4BeginningGroup != null){
-						for (Entry<Id, Integer> intergreens4BeginningGroup : endGroupTimes4BeginningGroup.entrySet()){
+						for (Entry<Id<SignalGroup>, Integer> intergreens4BeginningGroup : endGroupTimes4BeginningGroup.entrySet()){
 							int time = (int) event.getTime();
-							Map<Id, Double> droppingTimes4System =  this.signalSystemIdSignalGroupMap.get(event.getSignalSystemId());
+							Map<Id<SignalGroup>, Double> droppingTimes4System =  this.signalSystemIdSignalGroupMap.get(event.getSignalSystemId());
 							if (droppingTimes4System != null){
 								Double lastDropTime =  droppingTimes4System.get(intergreens4BeginningGroup.getKey());
 								if (lastDropTime != null){

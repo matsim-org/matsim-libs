@@ -39,6 +39,9 @@ import org.matsim.jaxb.signalgroups20.XMLSignalGroupType;
 import org.matsim.jaxb.signalgroups20.XMLSignalGroups;
 import org.matsim.jaxb.signalgroups20.XMLSignalSystemSignalGroupType;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
+import org.matsim.signalsystems.model.Signal;
+import org.matsim.signalsystems.model.SignalGroup;
+import org.matsim.signalsystems.model.SignalSystem;
 
 /**
  * @author dgrether
@@ -86,16 +89,16 @@ public class SignalGroupsWriter20 extends MatsimJaxbXmlWriter {
 		ObjectFactory fac = new ObjectFactory();
 		XMLSignalGroups xmlContainer = fac.createXMLSignalGroups();
 
-		for (Entry<Id, Map<Id, SignalGroupData>> ssid : this.signalGroupsData
+		for (Entry<Id<SignalSystem>, Map<Id<SignalGroup>, SignalGroupData>> ssid : this.signalGroupsData
 				.getSignalGroupDataBySignalSystemId().entrySet()) {
 			// signal System
 			XMLSignalSystemSignalGroupType xsssgt = fac.createXMLSignalSystemSignalGroupType();
 			xsssgt.setRefId(ssid.getKey().toString());
 
-			for (Entry<Id, SignalGroupData> signal : ssid.getValue().entrySet()) {
+			for (Entry<Id<SignalGroup>, SignalGroupData> signal : ssid.getValue().entrySet()) {
 				XMLSignalGroupType xsgt = fac.createXMLSignalGroupType();
 				xsgt.setId(signal.getValue().getId().toString());
-				for (Id ids : signal.getValue().getSignalIds()) {
+				for (Id<Signal> ids : signal.getValue().getSignalIds()) {
 					XMLIdRefType xmlid = fac.createXMLIdRefType();
 					xmlid.setRefId(ids.toString());
 					xsgt.getSignal().add(xmlid);

@@ -23,6 +23,8 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.signalsystems.model.SignalGroup;
+import org.matsim.signalsystems.model.SignalPlan;
 
 
 /**
@@ -31,21 +33,21 @@ import org.matsim.api.core.v01.Id;
  */
 public class SignalPlanDataImpl implements SignalPlanData {
 
-	private Id id;
+	private Id<SignalPlan> id;
 	private Integer cycletime;
 	private Double endtime;
 	private Integer offset;
-	private SortedMap<Id, SignalGroupSettingsData> signalGroupSettingsBySignalGroupId;
+	private SortedMap<Id<SignalGroup>, SignalGroupSettingsData> signalGroupSettingsBySignalGroupId;
 	private Double starttime;
 
-	public SignalPlanDataImpl(Id id) {
+	public SignalPlanDataImpl(Id<SignalPlan> id) {
 		this.id = id;
 	}
 
 	@Override
 	public void addSignalGroupSettings(SignalGroupSettingsData signalGroupSettings) {
 		if (this.signalGroupSettingsBySignalGroupId == null) {
-			this.signalGroupSettingsBySignalGroupId = new TreeMap<Id, SignalGroupSettingsData>();
+			this.signalGroupSettingsBySignalGroupId = new TreeMap<>();
 		}
 		this.signalGroupSettingsBySignalGroupId.put(signalGroupSettings.getSignalGroupId(), signalGroupSettings);
 	}
@@ -61,7 +63,7 @@ public class SignalPlanDataImpl implements SignalPlanData {
 	}
 
 	@Override
-	public Id getId() {
+	public Id<SignalPlan> getId() {
 		return this.id;
 	}
 
@@ -71,7 +73,7 @@ public class SignalPlanDataImpl implements SignalPlanData {
 	}
 
 	@Override
-	public SortedMap<Id, SignalGroupSettingsData> getSignalGroupSettingsDataByGroupId() {
+	public SortedMap<Id<SignalGroup>, SignalGroupSettingsData> getSignalGroupSettingsDataByGroupId() {
 		return this.signalGroupSettingsBySignalGroupId;
 	}
 

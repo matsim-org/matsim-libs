@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.Identifiable;
  * @author dgrether
  *
  */
-public interface SignalSystem extends Identifiable {
+public interface SignalSystem extends Identifiable<SignalSystem> {
 
 	public SignalSystemsManager getSignalSystemsManager();
 	
@@ -42,15 +42,15 @@ public interface SignalSystem extends Identifiable {
 
 	public void addSignal(Signal signal);
 	
-	public Map<Id, Signal> getSignals();
+	public Map<Id<Signal>, Signal> getSignals();
 
 	public void addSignalGroup(SignalGroup group);
 	
-	public Map<Id, SignalGroup> getSignalGroups();
+	public Map<Id<SignalGroup>, SignalGroup> getSignalGroups();
 
-	public void scheduleDropping(double timeSeconds, Id signalGroupId);
+	public void scheduleDropping(double timeSeconds, Id<SignalGroup> signalGroupId);
 
-	public void scheduleOnset(double timeSeconds, Id signalGroupId);
+	public void scheduleOnset(double timeSeconds, Id<SignalGroup> signalGroupId);
 
 	public SignalController getSignalController();
 

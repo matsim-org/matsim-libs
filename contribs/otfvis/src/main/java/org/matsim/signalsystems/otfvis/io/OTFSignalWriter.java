@@ -24,16 +24,21 @@ import java.nio.ByteBuffer;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.SignalGroupStateChangedEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.utils.misc.ByteBufferUtils;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.otfvis.io.OTFLaneWriter;
 import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupData;
 import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
+import org.matsim.signalsystems.model.Signal;
+import org.matsim.signalsystems.model.SignalGroup;
 import org.matsim.signalsystems.model.SignalGroupState;
+import org.matsim.signalsystems.model.SignalSystem;
 import org.matsim.vis.snapshotwriters.VisNetwork;
 
 /**
@@ -60,14 +65,14 @@ public class OTFSignalWriter extends OTFLaneWriter {
 	
 	private void writeSignalSystems(ByteBuffer out){
 		out.putInt(this.signalGroups.getSignalGroupDataBySignalSystemId().size());
-		for (Id systemId : this.signalGroups.getSignalGroupDataBySignalSystemId().keySet()){
+		for (Id<SignalSystem> systemId : this.signalGroups.getSignalGroupDataBySignalSystemId().keySet()){
 			ByteBufferUtils.putString(out, systemId.toString());
-			Map<Id, SignalGroupData> groups = this.signalGroups.getSignalGroupDataBySystemId(systemId);
+			Map<Id<SignalGroup>, SignalGroupData> groups = this.signalGroups.getSignalGroupDataBySystemId(systemId);
 			out.putInt(groups.size());
 			for (SignalGroupData group : groups.values()){
 				ByteBufferUtils.putString(out, group.getId().toString());
 				out.putInt(group.getSignalIds().size());
-				for (Id signalId : group.getSignalIds()){
+				for (Id<Signal> signalId : group.getSignalIds()){
 					ByteBufferUtils.putString(out, signalId.toString());
 					SignalData signal = signalSystems.getSignalSystemData().get(systemId).getSignalData().get(signalId);
 					ByteBufferUtils.putString(out, signal.getLinkId().toString());
@@ -76,7 +81,7 @@ public class OTFSignalWriter extends OTFLaneWriter {
 					}
 					else {
 						out.putInt(signal.getLaneIds().size());
-						for (Id laneId : signal.getLaneIds()){
+						for (Id<Lane> laneId : signal.getLaneIds()){
 							ByteBufferUtils.putString(out, laneId.toString());
 						}
 					}
@@ -86,7 +91,7 @@ public class OTFSignalWriter extends OTFLaneWriter {
 					}
 					else {
 						out.putInt(signal.getTurningMoveRestrictions().size());
-						for (Id outLinkId : signal.getTurningMoveRestrictions()){
+						for (Id<Link> outLinkId : signal.getTurningMoveRestrictions()){
 							ByteBufferUtils.putString(out, outLinkId.toString());
 						}
 					}

@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.SignalGroupStateChangedEvent;
 
@@ -36,22 +35,20 @@ import org.matsim.core.api.experimental.events.SignalGroupStateChangedEvent;
  */
 public class SignalSystemImpl implements SignalSystem {
 
-	private static final Logger log = Logger.getLogger(SignalSystemImpl.class);
-
 	/*package*/ static final int SWITCH_OFF_SEQUENCE_LENGTH = 5;
 	
 	private SignalController controller;
-	private Map<Id, SignalGroup> signalGroups = new HashMap<Id, SignalGroup>();
+	private Map<Id<SignalGroup>, SignalGroup> signalGroups = new HashMap<>();
 	private SignalSystemsManager manager;
 	
 	private Set<SignalGroupStateChangeRequest> requests = new HashSet<SignalGroupStateChangeRequest>();
 	
 	private PriorityQueue<SignalGroupStateChangeRequest> sortedRequests = new PriorityQueue<SignalGroupStateChangeRequest>();
-	private Id id;
-	private Map<Id, Signal> signals = new HashMap<Id, Signal>();
+	private Id<SignalSystem> id;
+	private Map<Id<Signal>, Signal> signals = new HashMap<>();
 	
 	
-	public SignalSystemImpl(Id id) {
+	public SignalSystemImpl(Id<SignalSystem> id) {
 		this.id = id;
 	}
 
@@ -71,14 +68,14 @@ public class SignalSystemImpl implements SignalSystem {
 	}
 	
 	@Override
-	public void scheduleDropping(double timeSeconds, Id signalGroupId){
+	public void scheduleDropping(double timeSeconds, Id<SignalGroup> signalGroupId) {
 //		log.debug("dropping  at time " + timeSeconds + " of  group " + signalGroupId);
 		Set<SignalGroupStateChangeRequest> rqs = this.manager.getAmberLogic().processDropping(timeSeconds, this.getId(), signalGroupId);
 		requests.addAll(rqs);
 	}
 	
 	@Override
-	public void scheduleOnset(double timeSeconds, Id signalGroupId){
+	public void scheduleOnset(double timeSeconds, Id<SignalGroup> signalGroupId) {
 //		log.debug("onset at time " + timeSeconds + " of  group " + signalGroupId);
 		Set<SignalGroupStateChangeRequest> rqs = this.manager.getAmberLogic().processOnsets(timeSeconds, this.getId(), signalGroupId);
 		requests.addAll(rqs);
@@ -119,7 +116,7 @@ public class SignalSystemImpl implements SignalSystem {
 
 	
 	@Override
-	public Id getId() {
+	public Id<SignalSystem> getId() {
 		return this.id;
 	}
 
@@ -129,7 +126,7 @@ public class SignalSystemImpl implements SignalSystem {
 	}
 
 	@Override
-	public Map<Id, Signal> getSignals() {
+	public Map<Id<Signal>, Signal> getSignals() {
 		return this.signals;
 	}
 
@@ -139,7 +136,7 @@ public class SignalSystemImpl implements SignalSystem {
 	}
 	
 	@Override
-	public Map<Id, SignalGroup> getSignalGroups(){
+	public Map<Id<SignalGroup>, SignalGroup> getSignalGroups(){
 		return this.signalGroups;
 	}
 

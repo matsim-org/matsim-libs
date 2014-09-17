@@ -42,6 +42,7 @@ import org.matsim.jaxb.amberTimes10.XMLAmberTimesType.XMLAmber;
 import org.matsim.jaxb.amberTimes10.XMLAmberTimesType.XMLRedAmber;
 import org.matsim.jaxb.amberTimes10.XMLGlobalDefaultsType;
 import org.matsim.jaxb.amberTimes10.XMLGlobalDefaultsType.XMLAmberTimeGreen;
+import org.matsim.signalsystems.model.Signal;
 
 
 /**
@@ -102,7 +103,7 @@ public class AmberTimesWriter10 extends MatsimJaxbXmlWriter {
 				}
 				xmlss.setSystemDefaults(ssd);
 				
-				for (Map.Entry<Id,Integer> amt : atdata.getSignalAmberMap().entrySet()){
+				for (Map.Entry<Id<Signal> ,Integer> amt : atdata.getSignalAmberMap().entrySet()){
 					XMLAmber lca = fac.createXMLAmberTimesTypeXMLAmber();
 					XMLRedAmber lcra = fac.createXMLAmberTimesTypeXMLRedAmber();
 					XMLSignal xmls = fac.createXMLAmberTimesXMLSignalSystemXMLSignal();

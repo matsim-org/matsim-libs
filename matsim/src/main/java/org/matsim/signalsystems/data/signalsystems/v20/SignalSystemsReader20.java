@@ -28,7 +28,8 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -38,7 +39,10 @@ import org.matsim.jaxb.signalsystems20.XMLSignalSystems;
 import org.matsim.jaxb.signalsystems20.XMLSignalType;
 import org.matsim.jaxb.signalsystems20.XMLSignalType.XMLLane;
 import org.matsim.jaxb.signalsystems20.XMLSignalType.XMLTurningMoveRestrictions;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
+import org.matsim.signalsystems.model.Signal;
+import org.matsim.signalsystems.model.SignalSystem;
 import org.xml.sax.SAXException;
 
 
@@ -97,21 +101,21 @@ public class SignalSystemsReader20 extends MatsimJaxbXmlParser {
 		//convert from Jaxb types to MATSim-API conform types
 		SignalSystemsDataFactory builder = this.signalSystemsData.getFactory();
 		for (XMLSignalSystemType xmlss : xmlssdefs.getSignalSystem()){
-			SignalSystemData ssdata = builder.createSignalSystemData(new IdImpl(xmlss.getId()));
+			SignalSystemData ssdata = builder.createSignalSystemData(Id.create(xmlss.getId(), SignalSystem.class));
 			this.signalSystemsData.addSignalSystemData(ssdata);
 			for (XMLSignalType xmlsignal : xmlss.getSignals().getSignal()){
-				SignalData signal = builder.createSignalData(new IdImpl(xmlsignal.getId()));
-				signal.setLinkId(new IdImpl(xmlsignal.getLinkIdRef()));
+				SignalData signal = builder.createSignalData(Id.create(xmlsignal.getId(), Signal.class));
+				signal.setLinkId(Id.create(xmlsignal.getLinkIdRef(), Link.class));
 				ssdata.addSignalData(signal);
 				if (xmlsignal.getLane() != null){
 					for (XMLLane xmllane : xmlsignal.getLane()){
-						signal.addLaneId(new IdImpl(xmllane.getRefId()));
+						signal.addLaneId(Id.create(xmllane.getRefId(), Lane.class));
 					}
 				}
 				if (xmlsignal.getTurningMoveRestrictions() != null){
 					XMLTurningMoveRestrictions tmr = xmlsignal.getTurningMoveRestrictions();
 					for (XMLIdRefType xmlid : tmr.getToLink()){
-						signal.addTurningMoveRestriction(new IdImpl(xmlid.getRefId()));
+						signal.addTurningMoveRestriction(Id.create(xmlid.getRefId(), Link.class));
 					}
 				}
 			}

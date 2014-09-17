@@ -44,8 +44,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.LaneDefinitionsV11ToV20Conversion;
 import org.matsim.lanes.data.v11.LaneData11;
 import org.matsim.lanes.data.v11.LaneDefinitions11;
-import org.matsim.lanes.data.v11.LaneDefinitionsFactory11;
 import org.matsim.lanes.data.v11.LaneDefinitions11Impl;
+import org.matsim.lanes.data.v11.LaneDefinitionsFactory11;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.run.LaneDefinitonsV11ToV20Converter;
@@ -57,6 +57,7 @@ import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsDataFactory;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsDataImpl;
+import org.matsim.signalsystems.model.SignalGroup;
 import org.matsim.testcases.MatsimTestUtils;
 import org.xml.sax.SAXException;
 
@@ -89,7 +90,7 @@ public class DgCalculateSignalGroupsTest {
 		SignalGroupsData signalGroups = calcSignalGroups.calculateSignalGroupsData();
 
 		Assert.assertNotNull(signalGroups);
-		Map<Id, SignalGroupData> groups4signal = signalGroups.getSignalGroupDataBySystemId(this.getId(1));
+		Map<Id<SignalGroup>, SignalGroupData> groups4signal = signalGroups.getSignalGroupDataBySystemId(this.getId(1));
 		Assert.assertNotNull(groups4signal);
 		Assert.assertEquals(2, groups4signal.size());
 		for (SignalGroupData group : groups4signal.values()){
@@ -123,7 +124,7 @@ public class DgCalculateSignalGroupsTest {
 		SignalGroupsData signalGroups = calcSignalGroups.calculateSignalGroupsData();
 
 		Assert.assertNotNull(signalGroups);
-		Map<Id, SignalGroupData> groups4signal = signalGroups.getSignalGroupDataBySystemId(this.getId(1));
+		Map<Id<SignalGroup>, SignalGroupData> groups4signal = signalGroups.getSignalGroupDataBySystemId(this.getId(1));
 		Assert.assertNotNull(groups4signal);
 		Assert.assertEquals(3, groups4signal.size());
 		for (SignalGroupData group : groups4signal.values()){
@@ -180,7 +181,7 @@ public class DgCalculateSignalGroupsTest {
 		SignalGroupsData signalGroups = calcSignalGroups.calculateSignalGroupsData();
 
 		Assert.assertNotNull(signalGroups);
-		Map<Id, SignalGroupData> groups4signal = signalGroups.getSignalGroupDataBySystemId(this.getId(1));
+		Map<Id<SignalGroup>, SignalGroupData> groups4signal = signalGroups.getSignalGroupDataBySystemId(this.getId(1));
 		Assert.assertNotNull(groups4signal);
 		boolean foundSignal2 = false;
 		for (SignalGroupData group : groups4signal.values()){
@@ -249,7 +250,7 @@ public class DgCalculateSignalGroupsTest {
 		SignalGroupsData signalGroups = calcSignalGroups.calculateSignalGroupsData();
 		//test them
 		Assert.assertNotNull(signalGroups);
-		Map<Id, SignalGroupData> groups4signal = signalGroups.getSignalGroupDataBySystemId(this.getId(1));
+		Map<Id<SignalGroup>, SignalGroupData> groups4signal = signalGroups.getSignalGroupDataBySystemId(this.getId(1));
 		Assert.assertNotNull(groups4signal);
 		for (SignalGroupData group : groups4signal.values()){
 			Assert.assertNotNull(group.getSignalIds());

@@ -36,6 +36,7 @@ import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsScenarioWriter;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
+import org.matsim.signalsystems.model.SignalSystem;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.dgrether.lanes.LanesConsistencyChecker;
@@ -164,7 +165,7 @@ public class NetLanesSignalsShrinker {
 	
 
 	private Set<Id<Node>> getSignalizedNodeIds(SignalSystemsData signals, Network network){
-		Map<Id, Set<Id<Node>>> signalizedNodesPerSystem = DgSignalsUtils.calculateSignalizedNodesPerSystem(signals, network);
+		Map<Id<SignalSystem>, Set<Id<Node>>> signalizedNodesPerSystem = DgSignalsUtils.calculateSignalizedNodesPerSystem(signals, network);
 		Set<Id<Node>> signalizedNodes = new HashSet<>();
 		for (Set<Id<Node>> signalizedNodesOfSystem : signalizedNodesPerSystem.values()){
 			signalizedNodes.addAll(signalizedNodesOfSystem);

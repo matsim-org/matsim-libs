@@ -23,6 +23,8 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.signalsystems.mobsim.SignalizeableItem;
 
 
@@ -32,11 +34,11 @@ import org.matsim.signalsystems.mobsim.SignalizeableItem;
  */
 public interface Signal {
 
-	public Id getId();
+	public Id<Signal> getId();
 	
-	public Id getLinkId();
+	public Id<Link> getLinkId();
 	
-	public Set<Id> getLaneIds();
+	public Set<Id<Lane>> getLaneIds();
 
 	public void addSignalizeableItem(SignalizeableItem signalizedItem);
 
