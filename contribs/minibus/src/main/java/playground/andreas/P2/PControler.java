@@ -55,8 +55,8 @@ public final class PControler{
 		controler.setOverwriteFiles(true);
 		controler.setCreateGraphs(false);
 		
-		PHook pHook = new PHook(controler);
-		controler.addControlerListener(pHook);		
+		PHook.Builder builder = new PHook.Builder(controler) ;
+		controler.addControlerListener(builder.build());		
 
 		controler.run();
 	}		

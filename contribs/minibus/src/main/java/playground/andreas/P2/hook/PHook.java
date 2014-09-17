@@ -67,12 +67,38 @@ public final class PHook implements IterationStartsListener, StartupListener, Sc
 	private StatsManager statsManager;
 
 	private PersonReRouteStuckFactory stuckFactory;
-
-    public PHook(Controler controler) {
-		this(controler, null, null, null, null);
-	}
 	
-	public PHook(Controler controler, PtMode2LineSetter lineSetter, PTransitRouterFactory pTransitRouterFactory, PersonReRouteStuckFactory stuckFactory, Class<? extends TripRouterFactory> tripRouterFactory){
+	public static class Builder {
+		private PtMode2LineSetter lineSetter = null ;
+		private PTransitRouterFactory pTransitRouterFactory = null ;
+		private PersonReRouteStuckFactory stuckFactory = null ;
+		private Class<? extends TripRouterFactory> tripRouterFactory = null ; 
+		private final Controler controler ;
+		public Builder( Controler controler ) {
+			this.controler = controler ;
+		}
+		public void setLineSetter(PtMode2LineSetter lineSetter) {
+			this.lineSetter = lineSetter;
+		}
+		public void setPTransitRouterFactory(PTransitRouterFactory pTransitRouterFactory) {
+			this.pTransitRouterFactory = pTransitRouterFactory;
+		}
+		public void setStuckFactory(PersonReRouteStuckFactory stuckFactory) {
+			this.stuckFactory = stuckFactory;
+		}
+		public void setTripRouterFactory(Class<? extends TripRouterFactory> tripRouterFactory) {
+			this.tripRouterFactory = tripRouterFactory;
+		}
+		public PHook build() {
+			return new PHook( controler, lineSetter, pTransitRouterFactory, stuckFactory, tripRouterFactory ) ;
+		}
+	}
+
+    /**
+     * Deliberately private.  Please use the builder
+     */
+	private PHook(Controler controler, PtMode2LineSetter lineSetter, PTransitRouterFactory pTransitRouterFactory, 
+			PersonReRouteStuckFactory stuckFactory, Class<? extends TripRouterFactory> tripRouterFactory){
 		PConfigGroup pConfig = (PConfigGroup) controler.getConfig().getModule(PConfigGroup.GROUP_NAME);
 		this.pBox = new PBox(pConfig);
 		this.pTransitRouterFactory = pTransitRouterFactory;

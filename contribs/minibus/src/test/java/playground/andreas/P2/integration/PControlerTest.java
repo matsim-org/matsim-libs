@@ -76,8 +76,10 @@ public class PControlerTest implements TabularFileHandler{
 		controler.setCreateGraphs(false);
 		
 		// manipulate config
-		PHook pHook = new PHook(controler);
-		controler.addControlerListener(pHook);		
+		PHook.Builder builder = new PHook.Builder(controler) ;
+		controler.addControlerListener(builder.build());		
+		//		controler.setScoringFunctionFactory(new BvgScoringFunctionFactory(controler.getConfig().planCalcScore(), new BvgScoringFunctionConfigGroup(controler.getConfig()), controler.getNetwork()));
+		// looks like the above was removed in head but I had a merge conflict.  kai, sep'14
 
 		controler.run();
 		
