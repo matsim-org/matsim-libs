@@ -89,24 +89,24 @@ public class DreieckNmodes {
 	private static final Logger log = Logger.getLogger(DreieckNmodes.class);
 	
 	//CONFIGURATION: static variables used for aggregating configuration options
-	public final static int subdivisionFactor=3;//all sides of the triangle will be divided into subdivisionFactor links
-	public final static double length = 444.44;//in m, length of one the triangle sides.
+	public final static int subdivisionFactor = 1;//all sides of the triangle will be divided into subdivisionFactor links
+	public final static double length = 1000.;//in m, length of one the triangle sides.
 	public final static int NETWORK_CAPACITY = 2700;//in PCU/h
 	public final static double END_TIME = 14*3600;
 	public final static boolean PASSING_ALLOWED = true;
-	private final static String OUTPUT_DIR = "pathto\\data.txt";
-	private final static String OUTPUT_EVENTS = "pathto\\events.xml";
+	private final static String OUTPUT_DIR = "./output/data_carTruck_withHoles.txt";
+	private final static String OUTPUT_EVENTS = "./output/events_carTruck_withHoles.xml";
 	
 	private final static double FREESPEED = 60.;						//in km/h, maximum authorized velocity on the track
 	public final static int NUMBER_OF_MEMORIZED_FLOWS = 10;
-	public final static int NUMBER_OF_MODES = 3/*4*/;
-	public final static String[] NAMES= {"bicycles","motorbikes","cars"/*, "trucks"*/};	//identification of the different modes
-	public final static Double[] Probabilities = {0.15, 0.25, 0.6/*, 0.25*/}; //modal split
-	public final static Double[] Pcus = {0.25, 0.25, 1./*, 3.*/}; 			//PCUs of the different possible modes
-	public final static Double[] Speeds = {4.17, 16.67, 16.67/*, 10.*/};		//maximum velocities of the vehicle types, in m/s
-	private final static Integer[] MaxAgentDistribution = {800,800,200/*,50*/};
-	private final static Integer[] Steps = {40,40,5/*,10*/};
-	private final static Integer[] startingPoint = {0,0,0};
+	public final static int NUMBER_OF_MODES = 2;
+	public final static String[] NAMES= {"car", "trucks"};	//identification of the different modes
+	public final static Double[] Probabilities = {0.5, 0.5}; //modal split
+	public final static Double[] Pcus = {1., 3.}; 			//PCUs of the different possible modes
+	public final static Double[] Speeds = {16.67, 8.33};		//maximum velocities of the vehicle types, in m/s
+	private final static Integer[] MaxAgentDistribution = {450, 150};
+	private final static Integer[] Steps = {10, 5};
+	private final static Integer[] startingPoint = {0, 0};
 
 	private static class MyRoundAndRoundAgent implements MobsimDriverAgent{
 		
@@ -263,6 +263,7 @@ public class DreieckNmodes {
 		config.qsim().setMainModes(Arrays.asList(NAMES));
 		config.qsim().setStuckTime(100*3600.);//allows to overcome maximal density regime
 		config.qsim().setEndTime(14*3600);//allows to set agents to abort after getting the wanted data.
+		config.qsim().setTrafficDynamics("withHoles");
 		//todo: is for actual network configurations correct, needs dependency on bigger network length 
 		config.vspExperimental().addParam("vspDefaultsCheckingLevel", VspExperimentalConfigGroup.ABORT) ;
 		// this may lead to abort during execution.  In such cases, please fix the configuration.  if necessary, talk
@@ -293,8 +294,8 @@ public class DreieckNmodes {
 		dreieck.openFile(OUTPUT_DIR);
 		
 		
-		//dreieck.parametricRunAccordingToGivenModalSplit();
-		dreieck.parametricRunAccordingToDistribution(Arrays.asList(MaxAgentDistribution), Arrays.asList(Steps));
+		dreieck.parametricRunAccordingToGivenModalSplit();
+		//dreieck.parametricRunAccordingToDistribution(Arrays.asList(MaxAgentDistribution), Arrays.asList(Steps));
 		//dreieck.singleRun(Arrays.asList(TEST_DISTRIBUTION));
 		
 		
@@ -320,6 +321,7 @@ public class DreieckNmodes {
 		//NB: Might be therefore useful to implement a more "permissive" programming.
 		
 		//Creating minimal configuration respecting modal split and integer agent numbers
+		/* METHOD 1: mathematical
 		List<Double> pcus = Arrays.asList(DreieckNmodes.Pcus);
 		List<Integer> minSteps = new ArrayList<Integer>();
 		for (double prob : Arrays.asList(DreieckNmodes.Probabilities)){
@@ -339,9 +341,15 @@ public class DreieckNmodes {
 		int pgcd = pgcd(minSteps);
 		for (int i=0; i<DreieckNmodes.NUMBER_OF_MODES; i++){
 			minSteps.set(i, minSteps.get(i)/pgcd);
-		}
+		}*/
+		//METHOD 2: setting it directly
+		List<Integer> minSteps = new ArrayList<Integer>();
+		minSteps.add(new Integer(3));
+		minSteps.add(new Integer(1));
 		
 		//Deducing all possible points to run by multiplying smallest configuration until reaching max storage capacity
+		//METHOD 1: mathematical
+		/*
 		int iterationStep = 0;
 		int maxPCUcount = (int) (0.150 * DreieckNmodes.length * 3) ;
 		double pcuPerAgent = 0.;
@@ -360,6 +368,19 @@ public class DreieckNmodes {
 			pointsToRun.add(pointToRun);//Could run directly here, not done for better code overview
 		}
 		System.out.println(pointsToRun);
+		*/
+		//METHOD 2: setting it directly
+		List<List<Integer>> pointsToRun = new ArrayList<List<Integer>>();
+		int numberOfPoints = 75;
+		for (int m=0; m<numberOfPoints; m++){
+			List<Integer> pointToRun = new ArrayList<Integer>();
+			for (int i=0; i<DreieckNmodes.NUMBER_OF_MODES; i++){
+				pointToRun.add(minSteps.get(i)*m);
+			}
+			System.out.println(pointToRun);
+			pointsToRun.add(pointToRun);//Could run directly here, not done for better code overview
+		}
+		
 		//Effective iteration over all points 
 		for ( int i=0; i<pointsToRun.size(); i++){
 			List<Integer> pointToRun = pointsToRun.get(i);
@@ -376,7 +397,7 @@ public class DreieckNmodes {
 		//	numberOfPoints *=  ( (maxValues.get(i).intValue() / steps.get(i).intValue()) + 1);
 		//	startingPoint[i] = new Integer(0);
 		//}
-		numberOfPoints = 13920;
+		numberOfPoints = 226;
 		//Actually going through the n-dimensional grid
 		BinaryAdditionModule iterationModule = new BinaryAdditionModule(maxValues, steps, startingPoint);
 		List<List<Integer>> pointsToRun = new ArrayList<List<Integer>>();
