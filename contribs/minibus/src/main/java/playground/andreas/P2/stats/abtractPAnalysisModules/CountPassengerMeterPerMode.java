@@ -41,7 +41,7 @@ import java.util.HashMap;
  * @author aneumann
  *
  */
-public final class CountPassengerMeterPerMode extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, LinkEnterEventHandler{
+final class CountPassengerMeterPerMode extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, LinkEnterEventHandler{
 	
 	private final static Logger log = Logger.getLogger(CountPassengerMeterPerMode.class);
 	

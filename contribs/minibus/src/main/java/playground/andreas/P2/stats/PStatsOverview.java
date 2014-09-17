@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.stats.pStatsOverview;
+package playground.andreas.P2.stats;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
@@ -32,8 +32,8 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import playground.andreas.P2.PConfigGroup;
 import playground.andreas.P2.PConstants.OperatorState;
-import playground.andreas.P2.hook.PBox;
 import playground.andreas.P2.operator.Operator;
+import playground.andreas.P2.operator.Operators;
 import playground.andreas.P2.operator.PPlan;
 
 import java.io.BufferedWriter;
@@ -55,7 +55,7 @@ import java.util.List;
  *
  * @author aneumann based on {@link org.matsim.analysis.ScoreStatsControlerListener} by mrieser
  */
-public final class PStatsOverview implements StartupListener, IterationEndsListener, ShutdownListener {
+final class PStatsOverview implements StartupListener, IterationEndsListener, ShutdownListener {
 
 	private final static Logger log = Logger.getLogger(PStatsOverview.class);
 	
@@ -94,13 +94,13 @@ public final class PStatsOverview implements StartupListener, IterationEndsListe
 
 	private double[][] history = null;
 	private int minIteration = 0;
-	private final PBox pBox;
+	private final Operators pBox;
 	private final PConfigGroup pConfig;
 
 	private RecursiveStatsContainer statsContainer;
 	private RecursiveStatsApproxContainer statsApproxContainer;
 
-	public PStatsOverview(PBox pBox, PConfigGroup pConfig) throws UncheckedIOException {
+	public PStatsOverview(Operators pBox, PConfigGroup pConfig) throws UncheckedIOException {
 		this.pBox = pBox;
 		this.pConfig = pConfig;
 	}

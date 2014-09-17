@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
  * @author aneumann
  *
  */
-public final class AverageLoadPerDistancePerMode extends AbstractPAnalyisModule {
+final class AverageLoadPerDistancePerMode extends AbstractPAnalyisModule {
 	
 	private final static Logger log = Logger.getLogger(AverageLoadPerDistancePerMode.class);
 	

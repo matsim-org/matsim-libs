@@ -25,7 +25,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
-import playground.andreas.P2.hook.PHook;
+import playground.andreas.P2.hook.PModule;
 
 
 /**
@@ -53,8 +53,8 @@ public final class PMain {
 		Controler controler = new Controler(scenario);
 		controler.setCreateGraphs(false);
 		
-		PHook.Builder builder = new PHook.Builder(controler) ;
-		controler.addControlerListener(builder.build());		
+		PModule builder = new PModule() ;
+		builder.configureControler(controler);
 
 		controler.run();
 	}		

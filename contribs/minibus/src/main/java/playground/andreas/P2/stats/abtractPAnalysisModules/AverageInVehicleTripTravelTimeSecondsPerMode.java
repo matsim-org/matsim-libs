@@ -39,7 +39,7 @@ import java.util.HashMap;
  * @author aneumann
  *
  */
-public final class AverageInVehicleTripTravelTimeSecondsPerMode extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
+final class AverageInVehicleTripTravelTimeSecondsPerMode extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
 	
 	private final static Logger log = Logger.getLogger(AverageInVehicleTripTravelTimeSecondsPerMode.class);
 	

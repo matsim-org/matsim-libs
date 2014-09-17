@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.stats.gexfPStats;
+package playground.andreas.P2.stats;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -40,7 +40,7 @@ import java.util.TreeSet;
  * @author aneumann
  *
  */
-public final class Line2GexfPStat implements StartupListener, IterationEndsListener, ShutdownListener{
+final class Line2GexfPStat implements StartupListener, IterationEndsListener, ShutdownListener{
 	
 	private static final Logger log = Logger.getLogger(Line2GexfPStat.class);
 

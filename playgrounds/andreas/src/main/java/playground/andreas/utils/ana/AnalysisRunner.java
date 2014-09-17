@@ -19,17 +19,7 @@
 
 package playground.andreas.utils.ana;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-
+import com.vividsolutions.jts.geom.Geometry;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -50,8 +40,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.opengis.feature.simple.SimpleFeature;
-
-import playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter.BVGLines2PtModes;
+import playground.andreas.P2.stats.abtractPAnalysisModules.BVGLines2PtModes;
 import playground.andreas.dh.TransitScheduleSimplifier;
 import playground.vsp.analysis.VspAnalyzer;
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
@@ -69,7 +58,9 @@ import playground.vsp.analysis.modules.stuckAgents.GetStuckEventsAndPlans;
 import playground.vsp.analysis.modules.transitSchedule2Shp.TransitSchedule2Shp;
 import playground.vsp.analysis.modules.transitVehicleVolume.TransitVehicleVolumeAnalyzer;
 
-import com.vividsolutions.jts.geom.Geometry;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.*;
 
 public class AnalysisRunner {
 
@@ -209,9 +200,7 @@ class MyPtCount extends AbstractAnalyisModule{
 	private ArrayList<Id<Link>> links;
 	private Network network;
 	/**
-	 * @param zones 
-	 * @param network 
-	 * @param name
+	 * @param network
 	 */
 	public MyPtCount(Network network) {
 		super(MyPtCount.class.getSimpleName());

@@ -19,15 +19,15 @@
 
 package playground.andreas.P2.stats.abtractPAnalysisModules;
 
-import java.util.HashMap;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.HashMap;
+import java.util.Set;
+import java.util.TreeSet;
 
 
 /**
@@ -36,7 +36,7 @@ import org.matsim.vehicles.Vehicle;
  * @author aneumann
  *
  */
-public final class CountVehPerMode extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler{
+final class CountVehPerMode extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler{
 	
 	private final static Logger log = Logger.getLogger(CountVehPerMode.class);
 	

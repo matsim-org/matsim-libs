@@ -33,10 +33,7 @@ import playground.andreas.P2.PConfigGroup;
 import playground.andreas.P2.PConstants.OperatorState;
 import playground.andreas.P2.fare.StageContainerCreator;
 import playground.andreas.P2.fare.TicketMachine;
-import playground.andreas.P2.operator.Operator;
-import playground.andreas.P2.operator.OperatorInitializer;
-import playground.andreas.P2.operator.PFranchise;
-import playground.andreas.P2.operator.TimeProvider;
+import playground.andreas.P2.operator.*;
 import playground.andreas.P2.replanning.PStrategyManager;
 import playground.andreas.P2.schedule.PStopsFactory;
 import playground.andreas.P2.scoring.OperatorCostCollectorHandler;
@@ -54,7 +51,7 @@ import java.util.TreeMap;
  * @author aneumann
  *
  */
-public final class PBox {
+final class PBox implements Operators {
 	
 	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(PBox.class);
@@ -75,7 +72,7 @@ public final class PBox {
 
 	private final TicketMachine ticketMachine;
 
-    public PBox(PConfigGroup pConfig) {
+    PBox(PConfigGroup pConfig) {
 		this.pConfig = pConfig;
 		this.ticketMachine = new TicketMachine(this.pConfig.getEarningsPerBoardingPassenger(), this.pConfig.getEarningsPerKilometerAndPassenger() / 1000.0);
 		this.scorePlansHandler = new ScorePlansHandler(this.ticketMachine);
@@ -84,7 +81,7 @@ public final class PBox {
 		this.franchise = new PFranchise(this.pConfig.getUseFranchise(), pConfig.getGridSize());
 	}
 
-	public void notifyStartup(StartupEvent event) {
+	void notifyStartup(StartupEvent event) {
 		// This is the first iteration
 
         TimeProvider timeProvider = new TimeProvider(this.pConfig, event.getControler().getControlerIO().getOutputPath());
@@ -136,7 +133,7 @@ public final class PBox {
 		this.franchise.reset(this.cooperatives);
 	}
 
-	public void notifyIterationStarts(IterationStartsEvent event) {
+	void notifyIterationStarts(IterationStartsEvent event) {
 
         this.strategyManager.updateStrategies(event.getIteration());
 
@@ -161,7 +158,7 @@ public final class PBox {
         this.franchise.reset(this.cooperatives);
     }
 
-	public void notifyScoring(ScoringEvent event) {
+	void notifyScoring(ScoringEvent event) {
 		TreeMap<Id<Vehicle>, ScoreContainer> driverId2ScoreMap = this.scorePlansHandler.getDriverId2ScoreMap();
 		for (Operator cooperative : this.cooperatives) {
 			cooperative.score(driverId2ScoreMap);

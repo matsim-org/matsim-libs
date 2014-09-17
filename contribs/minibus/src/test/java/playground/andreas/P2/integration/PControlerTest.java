@@ -32,7 +32,7 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.testcases.MatsimTestUtils;
 import playground.andreas.P2.PConfigGroup;
-import playground.andreas.P2.hook.PHook;
+import playground.andreas.P2.hook.PModule;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -76,8 +76,8 @@ public class PControlerTest implements TabularFileHandler{
 		controler.setCreateGraphs(false);
 		
 		// manipulate config
-		PHook.Builder builder = new PHook.Builder(controler) ;
-		controler.addControlerListener(builder.build());		
+		PModule builder = new PModule() ;
+		builder.configureControler(controler);
 		//		controler.setScoringFunctionFactory(new BvgScoringFunctionFactory(controler.getConfig().planCalcScore(), new BvgScoringFunctionConfigGroup(controler.getConfig()), controler.getNetwork()));
 		// looks like the above was removed in head but I had a merge conflict.  kai, sep'14
 

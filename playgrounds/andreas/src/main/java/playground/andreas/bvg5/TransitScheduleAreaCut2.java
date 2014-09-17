@@ -18,14 +18,7 @@
  * *********************************************************************** */
 package playground.andreas.bvg5;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.Set;
-
+import com.vividsolutions.jts.geom.Geometry;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -40,30 +33,17 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
-import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleReaderV1;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleWriterV1;
-import org.matsim.vehicles.Vehicles;
+import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.vehicles.*;
 import org.opengis.feature.simple.SimpleFeature;
-
-import playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter.BVGLines2PtModes;
-import playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter.PtMode2LineSetter;
+import playground.andreas.P2.stats.abtractPAnalysisModules.BVGLines2PtModes;
+import playground.andreas.P2.stats.abtractPAnalysisModules.PtMode2LineSetter;
 import playground.andreas.utils.pt.transitSchedule2shape.DaShapeWriter;
 import playground.andreas.utils.pt.transitSchedule2shape.TransitSchedule2Shape;
 import playground.vsp.analysis.VspAnalyzer;
 import playground.vsp.analysis.modules.transitSchedule2Shp.TransitSchedule2Shp;
 
-import com.vividsolutions.jts.geom.Geometry;
+import java.util.*;
 
 /**
  * @author droeder
@@ -86,7 +66,7 @@ public class TransitScheduleAreaCut2 {
 	/**
 	 * 
 	 * @param transitSchedule, the transitschedule to cut
-	 * @param areashape, shapefile that contains the area 2 cut
+	 * @param areaShape, shapefile that contains the area 2 cut
 	 * @param ptMode2LineSetter, only lines will be cutted that are set here and those mode is set in modes2cut 
 	 * @param modes2Cut,
 	 * @param vehicles, the old vehicles

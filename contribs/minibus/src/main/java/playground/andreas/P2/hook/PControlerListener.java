@@ -30,7 +30,6 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
@@ -43,8 +42,6 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 import playground.andreas.P2.PConfigGroup;
-import playground.andreas.P2.stats.StatsManager;
-import playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter.PtMode2LineSetter;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -54,9 +51,9 @@ import java.util.Set;
  * 
  * @author aneumann
  */
-public final class PHook implements IterationStartsListener, StartupListener, ScoringListener {
+final class PControlerListener implements IterationStartsListener, StartupListener, ScoringListener {
 	
-	private final static Logger log = Logger.getLogger(PHook.class);
+	private final static Logger log = Logger.getLogger(PControlerListener.class);
 
 	private final PTransitRouterFactory pTransitRouterFactory;
 	private final PVehiclesFactory pVehiclesFactory;
@@ -66,62 +63,13 @@ public final class PHook implements IterationStartsListener, StartupListener, Sc
 
     private final PersonReRouteStuckFactory stuckFactory;
 
-    public static class Builder {
-        private PtMode2LineSetter lineSetter = null ;
-        private PTransitRouterFactory pTransitRouterFactory = null ;
-        private PersonReRouteStuckFactory stuckFactory = null ;
-        private Class<? extends TripRouterFactory> tripRouterFactory = null ;
-        private final Controler controler ;
-        public Builder( Controler controler ) {
-            this.controler = controler ;
-        }
-        public void setLineSetter(PtMode2LineSetter lineSetter) {
-            this.lineSetter = lineSetter;
-        }
-        public void setPTransitRouterFactory(PTransitRouterFactory pTransitRouterFactory) {
-            this.pTransitRouterFactory = pTransitRouterFactory;
-        }
-        public void setStuckFactory(PersonReRouteStuckFactory stuckFactory) {
-            this.stuckFactory = stuckFactory;
-        }
-        public void setTripRouterFactory(Class<? extends TripRouterFactory> tripRouterFactory) {
-            this.tripRouterFactory = tripRouterFactory;
-        }
-        public PHook build() {
-            return new PHook( controler, lineSetter, pTransitRouterFactory, stuckFactory, tripRouterFactory ) ;
-        }
-    }
-	
-	private PHook(Controler controler, PtMode2LineSetter lineSetter, PTransitRouterFactory pTransitRouterFactory, PersonReRouteStuckFactory stuckFactory, Class<? extends TripRouterFactory> tripRouterFactory){
-		PConfigGroup pConfig = ConfigUtils.addOrGetModule(controler.getConfig(), PConfigGroup.GROUP_NAME, PConfigGroup.class);
-
-        this.pBox = new PBox(pConfig);
-
-        if (pTransitRouterFactory != null) {
-            this.pTransitRouterFactory = pTransitRouterFactory;
-        } else {
-            this.pTransitRouterFactory = new PTransitRouterFactory(pConfig.getPtEnabler());
-        }
-        controler.setTripRouterFactory(PTripRouterFactoryFactory.getTripRouterFactoryInstance(controler, tripRouterFactory, this.pTransitRouterFactory));
-
-        controler.setMobsimFactory(new PQSimFactory());
-
+    PControlerListener(Controler controler, PBox pBox, PTransitRouterFactory pTransitRouterFactory, PersonReRouteStuckFactory stuckFactory, AgentsStuckHandlerImpl agentsStuckHandler){
+        PConfigGroup pConfig = ConfigUtils.addOrGetModule(controler.getConfig(), PConfigGroup.GROUP_NAME, PConfigGroup.class);
+        this.pTransitRouterFactory = pTransitRouterFactory;
 		this.pVehiclesFactory = new PVehiclesFactory(pConfig);
-
-		if (pConfig.getReRouteAgentsStuck()) {
-			this.agentsStuckHandler = new AgentsStuckHandlerImpl();
-			if(stuckFactory != null) {
-                this.stuckFactory = stuckFactory;
-			} else {
-                this.stuckFactory = new PersonReRouteStuckFactoryImpl();
-			}
-		} else {
-            this.stuckFactory = null;
-            this.agentsStuckHandler = null;
-        }
-
-        StatsManager statsManager = new StatsManager(controler, pConfig, this.pBox, lineSetter);
-        controler.addControlerListener(statsManager);
+        this.agentsStuckHandler = agentsStuckHandler;
+        this.stuckFactory = stuckFactory;
+		this.pBox = pBox;
 	}
 	
 	@Override

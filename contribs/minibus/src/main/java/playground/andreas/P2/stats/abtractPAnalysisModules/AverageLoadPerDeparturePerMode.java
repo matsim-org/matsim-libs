@@ -43,7 +43,7 @@ import java.util.HashMap;
  * @author aneumann
  *
  */
-public final class AverageLoadPerDeparturePerMode extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, VehicleDepartsAtFacilityEventHandler{
+final class AverageLoadPerDeparturePerMode extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, VehicleDepartsAtFacilityEventHandler{
 	
 	private final static Logger log = Logger.getLogger(AverageLoadPerDeparturePerMode.class);
 	

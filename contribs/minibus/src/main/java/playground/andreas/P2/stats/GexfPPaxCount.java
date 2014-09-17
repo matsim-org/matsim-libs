@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.stats.gexfPStats.deprecated;
+package playground.andreas.P2.stats;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -35,7 +35,6 @@ import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
 import playground.andreas.P2.PConfigGroup;
 import playground.andreas.P2.genericUtils.gexf.*;
 import playground.andreas.P2.genericUtils.gexf.viz.PositionContent;
-import playground.andreas.P2.stats.gexfPStats.CountPPaxHandler;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;

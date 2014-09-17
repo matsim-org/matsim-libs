@@ -35,8 +35,8 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import playground.andreas.P2.PConfigGroup;
-import playground.andreas.P2.hook.PBox;
 import playground.andreas.P2.operator.Operator;
+import playground.andreas.P2.operator.Operators;
 import playground.andreas.P2.operator.PPlan;
 
 import java.io.BufferedWriter;
@@ -65,10 +65,10 @@ final class POperatorLogger implements StartupListener, IterationEndsListener, S
 	
 	private BufferedWriter pOperatorLoggerWriter;
 
-	private final PBox pBox;
+	private final Operators pBox;
 	private final PConfigGroup pConfig;
 
-	public POperatorLogger(PBox pBox, PConfigGroup pConfig) throws UncheckedIOException {
+	public POperatorLogger(Operators pBox, PConfigGroup pConfig) throws UncheckedIOException {
 		this.pBox = pBox;
 		this.pConfig = pConfig;
 	}

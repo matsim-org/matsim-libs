@@ -1,13 +1,13 @@
 package playground.andreas.P2.stats.abtractPAnalysisModules;
 
-import java.util.HashMap;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.vehicles.Vehicles;
 
-public interface PAnalysisModule extends TransitDriverStartsEventHandler {
+import java.util.HashMap;
+
+interface PAnalysisModule extends TransitDriverStartsEventHandler {
 
 	/**
 	 * 

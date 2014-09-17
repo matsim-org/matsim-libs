@@ -17,13 +17,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter;
-
-import java.util.HashMap;
+package playground.andreas.P2.stats.abtractPAnalysisModules;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+
+import java.util.HashMap;
 
 /**
  * Some common methods for setting public transit modes for each public transit line.

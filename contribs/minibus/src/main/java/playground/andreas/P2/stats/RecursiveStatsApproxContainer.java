@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.stats.pStatsOverview;
+package playground.andreas.P2.stats;
 
 import org.apache.log4j.Logger;
 
@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
  * @author aneumann
  *
  */
-public final class RecursiveStatsApproxContainer {
+final class RecursiveStatsApproxContainer {
 	
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(RecursiveStatsApproxContainer.class);

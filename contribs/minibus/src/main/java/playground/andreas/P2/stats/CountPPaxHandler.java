@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.stats.gexfPStats;
+package playground.andreas.P2.stats;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -40,7 +40,7 @@ import java.util.TreeSet;
  * @author aneumann
  *
  */
-public final class CountPPaxHandler implements LinkEnterEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
+final class CountPPaxHandler implements LinkEnterEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
 	
 	private static final Logger log = Logger.getLogger(CountPPaxHandler.class);
 	

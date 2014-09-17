@@ -38,7 +38,7 @@ import java.util.HashMap;
  * @author aneumann
  *
  */
-public final class CountCapacityMeterPerMode extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler, LinkEnterEventHandler{
+final class CountCapacityMeterPerMode extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler, LinkEnterEventHandler{
 	
 	private final static Logger log = Logger.getLogger(CountCapacityMeterPerMode.class);
 	

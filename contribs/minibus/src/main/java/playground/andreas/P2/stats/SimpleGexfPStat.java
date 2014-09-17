@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.stats.gexfPStats.deprecated;
+package playground.andreas.P2.stats;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -25,19 +25,12 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.events.ShutdownEvent;
-import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
 import playground.andreas.P2.PConfigGroup;
 import playground.andreas.P2.genericUtils.gexf.*;
 import playground.andreas.P2.genericUtils.gexf.viz.PositionContent;
-import playground.andreas.P2.operator.Operator;
-import playground.andreas.P2.stats.gexfPStats.CountPOperatorHandler;
-import playground.andreas.P2.stats.gexfPStats.CountPPaxHandler;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -47,40 +40,47 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.Set;
 
 /**
- * Uses a {@link CountPPaxHandler} to count passengers per paratransit vehicle and link and writes them to a gexf network as dynamic link attributes.
+ * Uses a {@link CountPPaxHandler} to count passengers per paratransit vehicle and link, {@link CountPOperatorHandler} to count operators and their ids and writes them to a gexf network as dynamic link attributes.
+ * In addition, writes one column per link and operator with its number of passengers served.
  * 
  * @author aneumann
  *
  */
-@Deprecated
-final class GexfPOperatorCount extends MatsimJaxbXmlWriter implements StartupListener, IterationEndsListener, ShutdownListener{
+final class SimpleGexfPStat extends MatsimJaxbXmlWriter implements IterationEndsListener{
 	
-	private static final Logger log = Logger.getLogger(GexfPOperatorCount.class);
+	private static final Logger log = Logger.getLogger(SimpleGexfPStat.class);
 	
 	private final static String XSD_PATH = "http://www.gexf.net/1.2draft/gexf.xsd";
-	private final static String FILENAME = "pOperatorCount.gexf.gz";
+	
+	private final static String FILENAME = "pStat.gexf.gz";
 
 	private ObjectFactory gexfFactory;
 	private XMLGexfContent gexfContainer;
 
-	private CountPOperatorHandler eventsHandler;
-	private final String pIdentifier;
+	private CountPPaxHandler globalPaxHandler;
+    private CountPVehHandler vehHandler;
 	private final int getWriteGexfStatsInterval;
 
 	private HashMap<Id<Link>, XMLEdgeContent> edgeMap;
-	private HashMap<Id<Link> ,XMLAttvaluesContent> attValueContentMap;
+	private HashMap<Id<Link>, XMLAttvaluesContent> linkAttributeValueContentMap;
 
-	private HashMap<Id<Link>, Set<Id<Operator>>> linkId2OperatorIdsFromLastIteration;
+	private HashMap<Id<Link>, Integer> linkId2TotalCountsFromLastIteration;
+	private HashMap<Id<Link>, Integer> linkId2VehCountsFromLastIteration;
 
-	private GexfPOperatorCount(PConfigGroup pConfig){
+	private final String lineId;
+	private final String outputFilename;
+
+
+
+	public SimpleGexfPStat(PConfigGroup pConfig, String lineId, String outputDir){
 		this.getWriteGexfStatsInterval = pConfig.getGexfInterval();
-		this.pIdentifier = pConfig.getPIdentifier();
+		this.lineId = lineId;
+		this.outputFilename = outputDir + lineId + "_" + SimpleGexfPStat.FILENAME;
 		
 		if (this.getWriteGexfStatsInterval > 0) {
-			log.info("enabled");
+			log.info("enabled log for line" + lineId);
 
 			this.gexfFactory = new ObjectFactory();
 			this.gexfContainer = this.gexfFactory.createXMLGexfContent();
@@ -92,101 +92,115 @@ final class GexfPOperatorCount extends MatsimJaxbXmlWriter implements StartupLis
 			graph.setTimeformat(XMLTimeformatType.DOUBLE);
 			this.gexfContainer.setGraph(graph);
 			
-			XMLAttributesContent attsContent = new XMLAttributesContent();
-			attsContent.setClazz(XMLClassType.EDGE);
-			attsContent.setMode(XMLModeType.DYNAMIC);
+			XMLAttributesContent edgeAttributeContentsContainer = new XMLAttributesContent();
+			edgeAttributeContentsContainer.setClazz(XMLClassType.EDGE);
+			edgeAttributeContentsContainer.setMode(XMLModeType.DYNAMIC);
 			
-			XMLAttributeContent attContent = new XMLAttributeContent();
-			attContent.setId("weight");
-			attContent.setTitle("Number of operators per iteration");
-			attContent.setType(XMLAttrtypeType.FLOAT);
+			XMLAttributeContent attributeContent = new XMLAttributeContent();
+			attributeContent.setId("weight");
+			attributeContent.setTitle("Number of paratransit passengers per iteration");
+			attributeContent.setType(XMLAttrtypeType.FLOAT);
+			edgeAttributeContentsContainer.getAttribute().add(attributeContent);		
 			
-			attsContent.getAttribute().add(attContent);		
-			this.gexfContainer.getGraph().getAttributesOrNodesOrEdges().add(attsContent);
+			attributeContent = new XMLAttributeContent();
+			attributeContent.setId("nOperators");
+			attributeContent.setTitle("Number of operators per iteration");
+			attributeContent.setType(XMLAttrtypeType.FLOAT);
+			edgeAttributeContentsContainer.getAttribute().add(attributeContent);		
 			
-			attContent = new XMLAttributeContent();
-			attContent.setId("operatorIds");
-			attContent.setTitle("Ids of the operators iteration");
-			attContent.setType(XMLAttrtypeType.STRING);
+			attributeContent = new XMLAttributeContent();
+			attributeContent.setId("operatorIds");
+			attributeContent.setTitle("Ids of the operators iteration");
+			attributeContent.setType(XMLAttrtypeType.STRING);
+			edgeAttributeContentsContainer.getAttribute().add(attributeContent);
 			
-			attsContent.getAttribute().add(attContent);		
-			this.gexfContainer.getGraph().getAttributesOrNodesOrEdges().add(attsContent);
+			attributeContent = new XMLAttributeContent();
+			attributeContent.setId("nVeh");
+			attributeContent.setTitle("Number of paratransit vehicles per iteration");
+			attributeContent.setType(XMLAttrtypeType.FLOAT);
+			edgeAttributeContentsContainer.getAttribute().add(attributeContent);
+			
+			this.gexfContainer.getGraph().getAttributesOrNodesOrEdges().add(edgeAttributeContentsContainer);
 		}
 	}
 
-	@Override
-	public void notifyStartup(StartupEvent event) {
-		if (this.getWriteGexfStatsInterval > 0) {
-			this.addNetworkAsLayer(event.getControler().getNetwork(), 0);
-			this.createAttValues();
-			this.eventsHandler = new CountPOperatorHandler(this.pIdentifier);
-			event.getControler().getEvents().addHandler(this.eventsHandler);
-			this.linkId2OperatorIdsFromLastIteration = new HashMap<>();
-		}
+	public void notifyStartup(Network network, CountPPaxHandler globalPaxHandler, CountPOperatorHandler operatorHandler, CountPVehHandler vehHandler) {
+		this.globalPaxHandler = globalPaxHandler;
+        CountPOperatorHandler operatorHandler1 = operatorHandler;
+		this.vehHandler = vehHandler;
+
+		this.addNetworkAsLayer(network, 0);
+		this.createAttValues();
+		this.linkId2TotalCountsFromLastIteration = new HashMap<>();			
+		this.linkId2VehCountsFromLastIteration = new HashMap<>();
 	}
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		if (this.getWriteGexfStatsInterval > 0) {
-			this.addValuesToGexf(event.getIteration(), this.eventsHandler);
+			this.addValuesToGexf(event.getIteration(), this.globalPaxHandler);
 			if ((event.getIteration() % this.getWriteGexfStatsInterval == 0) ) {
-				this.write(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), GexfPOperatorCount.FILENAME));
+				this.write(this.outputFilename);
 			}			
 		}		
 	}
 
-	@Override
-	public void notifyShutdown(ShutdownEvent event) {
-		if (this.getWriteGexfStatsInterval > 0) {
-			this.write(event.getControler().getControlerIO().getOutputFilename(GexfPOperatorCount.FILENAME));
-		}		
+	public void notifyShutdown(int iteration) {
+		this.addValuesToGexf(iteration, this.globalPaxHandler);
+		this.write(this.outputFilename);
 	}
 
 	private void createAttValues() {
-		this.attValueContentMap = new HashMap<>();
+		this.linkAttributeValueContentMap = new HashMap<>();
 		
 		for (Entry<Id<Link>, XMLEdgeContent> entry : this.edgeMap.entrySet()) {
 			XMLAttvaluesContent attValueContent = new XMLAttvaluesContent();
 			entry.getValue().getAttvaluesOrSpellsOrColor().add(attValueContent);
-			this.attValueContentMap.put(entry.getKey(), attValueContent);
+			this.linkAttributeValueContentMap.put(entry.getKey(), attValueContent);
 		}		
 	}
 
-	private void addValuesToGexf(int iteration, CountPOperatorHandler handler) {
-		for (Entry<Id<Link>, XMLAttvaluesContent> entry : this.attValueContentMap.entrySet()) {
+	private void addValuesToGexf(int iteration, CountPPaxHandler paxHandler) {
+		for (Entry<Id<Link>, XMLAttvaluesContent> linkEntry : this.linkAttributeValueContentMap.entrySet()) {
 			
-			Set<Id<Operator>> operatorsForLink = handler.getOperatorIdsForLinkId(entry.getKey());
+			int countForLink = paxHandler.getPaxCountForLinkId(linkEntry.getKey(), this.lineId);
 			
-			// Test, if something changed
-			if (this.linkId2OperatorIdsFromLastIteration.get(entry.getKey()) != null){
+			if (this.linkId2TotalCountsFromLastIteration.get(linkEntry.getKey()) != null){
 				// There is already an entry
-				if (this.linkId2OperatorIdsFromLastIteration.get(entry.getKey()).equals(operatorsForLink)) {
+				if (this.linkId2TotalCountsFromLastIteration.get(linkEntry.getKey()) == countForLink) {
 					// same as last iteration - ignore
 					continue;
 				}
 			}
 			
-			// completely new or not the same
-			XMLAttvalue operatorIdValue = new XMLAttvalue();
-			XMLAttvalue operatorCountValue = new XMLAttvalue();
+			XMLAttvalue attValue = new XMLAttvalue();
+			attValue.setFor("weight");
+			attValue.setValue(Integer.toString(countForLink));
+			attValue.setStart(Double.toString(iteration));
+
+			linkEntry.getValue().getAttvalue().add(attValue);
+			this.linkId2TotalCountsFromLastIteration.put(linkEntry.getKey(), countForLink);
+		}
 			
-			operatorIdValue.setFor("coopIds");
-			operatorCountValue.setFor("weight");
+		for (Entry<Id<Link>, XMLAttvaluesContent> linkEntry : this.linkAttributeValueContentMap.entrySet()) {
 			
-			if (operatorsForLink == null) {
-				operatorIdValue.setValue("");
-				operatorCountValue.setValue("0");
-			} else {
-				operatorIdValue.setValue(operatorsForLink.toString());
-				operatorCountValue.setValue(Integer.toString(operatorsForLink.size()));
+			int countForLink = vehHandler.getVehCountForLinkId(linkEntry.getKey(), this.lineId);
+			
+			if (this.linkId2VehCountsFromLastIteration.get(linkEntry.getKey()) != null){
+				// There is already an entry
+				if (this.linkId2VehCountsFromLastIteration.get(linkEntry.getKey()) == countForLink) {
+					// same as last iteration - ignore
+					continue;
+				}
 			}
 			
-			operatorIdValue.setStart(Double.toString(iteration));
-			operatorCountValue.setStart(Double.toString(iteration));			
+			XMLAttvalue attValue = new XMLAttvalue();
+			attValue.setFor("nVeh");
+			attValue.setValue(Integer.toString(countForLink));
+			attValue.setStart(Double.toString(iteration));
 
-			entry.getValue().getAttvalue().add(operatorIdValue);
-			entry.getValue().getAttvalue().add(operatorCountValue);
-			this.linkId2OperatorIdsFromLastIteration.put(entry.getKey(), operatorsForLink);
+			linkEntry.getValue().getAttvalue().add(attValue);
+			this.linkId2VehCountsFromLastIteration.put(linkEntry.getKey(), countForLink);
 		}
 	}
 
@@ -195,11 +209,11 @@ final class GexfPOperatorCount extends MatsimJaxbXmlWriter implements StartupLis
 		try {
 			jc = JAXBContext.newInstance(playground.andreas.P2.genericUtils.gexf.ObjectFactory.class);
 			Marshaller m = jc.createMarshaller();
-			super.setMarshallerProperties(GexfPOperatorCount.XSD_PATH, m);
+			super.setMarshallerProperties(SimpleGexfPStat.XSD_PATH, m);
 			BufferedWriter bufout = IOUtils.getBufferedWriter(filename);
 			m.marshal(this.gexfContainer, bufout);
 			bufout.close();
-			log.info("Output written to " + filename);
+//			log.info("Output written to " + filename);
 		} catch (JAXBException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -255,5 +269,4 @@ final class GexfPOperatorCount extends MatsimJaxbXmlWriter implements StartupLis
 			}
 		}		
 	}
-
 }

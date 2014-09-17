@@ -40,7 +40,7 @@ import java.util.HashMap;
  * @author aneumann
  *
  */
-public final class CountTripsPerPtModeCombination extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, ActivityStartEventHandler{
+final class CountTripsPerPtModeCombination extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, ActivityStartEventHandler{
 	
 	private final static Logger log = Logger.getLogger(CountTripsPerPtModeCombination.class);
 	

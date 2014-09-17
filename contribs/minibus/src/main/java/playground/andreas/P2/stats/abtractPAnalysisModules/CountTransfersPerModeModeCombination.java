@@ -41,7 +41,7 @@ import java.util.LinkedList;
  * @author aneumann
  *
  */
-public final class CountTransfersPerModeModeCombination extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, ActivityStartEventHandler{
+final class CountTransfersPerModeModeCombination extends AbstractPAnalyisModule implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, ActivityStartEventHandler{
 	
 	private final static Logger log = Logger.getLogger(CountTransfersPerModeModeCombination.class);
 	

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter;
+package playground.andreas.P2.stats.abtractPAnalysisModules;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;

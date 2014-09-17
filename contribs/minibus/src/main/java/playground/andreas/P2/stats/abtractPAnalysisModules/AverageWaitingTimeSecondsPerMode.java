@@ -39,7 +39,7 @@ import java.util.HashMap;
  * @author aneumann
  *
  */
-public final class AverageWaitingTimeSecondsPerMode extends AbstractPAnalyisModule implements PersonDepartureEventHandler, TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler{
+final class AverageWaitingTimeSecondsPerMode extends AbstractPAnalyisModule implements PersonDepartureEventHandler, TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler{
 	
 	private final static Logger log = Logger.getLogger(AverageWaitingTimeSecondsPerMode.class);
 	

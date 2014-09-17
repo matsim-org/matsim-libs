@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.andreas.P2.stats;
+package playground.andreas.P2.stats.abtractPAnalysisModules;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -33,9 +33,6 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicles;
 import playground.andreas.P2.PConfigGroup;
 import playground.andreas.P2.PConstants;
-import playground.andreas.P2.stats.abtractPAnalysisModules.*;
-import playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter.BVGLines2PtModes;
-import playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter.PtMode2LineSetter;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -50,7 +47,7 @@ import java.util.List;
  * @author aneumann
  *
  */
-final class PAnalysisManager implements StartupListener, IterationStartsListener, IterationEndsListener{
+public final class PAnalysisManager implements StartupListener, IterationStartsListener, IterationEndsListener{
 	private final static Logger log = Logger.getLogger(PAnalysisManager.class);
 	
 	private final String pIdentifier;
