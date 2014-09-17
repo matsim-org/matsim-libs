@@ -297,7 +297,9 @@ public class CharyparNagelActivityScoring implements ActivityScoring, org.matsim
 		} else {
 			if (this.params.scoreActs) {
 				if (firstLastActWarning <= 10) {
-					log.warn("The first and the last activity do not have the same type. The correctness of the scoring function can thus not be guaranteed.");
+					log.warn("The first and the last activity do not have the same type. "
+							+ "Will score the first activity from midnight to its end, and the last activity from its start "
+							+ "to midnight.  Because of the nonlinear function, this is not the same as scoring from start to end.");
 					log.warn("first activity: " + firstActivity ) ;
 					log.warn("last activity: " + lastActivity ) ;
 					log.warn("This may also happen when plans are not completed when the simulation ends.") ;
