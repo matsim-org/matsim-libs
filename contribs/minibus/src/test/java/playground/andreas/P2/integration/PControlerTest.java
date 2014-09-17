@@ -19,11 +19,6 @@
 
 package playground.andreas.P2.integration;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,11 +31,13 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.testcases.MatsimTestUtils;
-
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.hook.PHook;
-import playground.andreas.bvgScoringFunction.BvgScoringFunctionConfigGroup;
-import playground.andreas.bvgScoringFunction.BvgScoringFunctionFactory;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 
 /**
@@ -81,7 +78,6 @@ public class PControlerTest implements TabularFileHandler{
 		// manipulate config
 		PHook pHook = new PHook(controler);
 		controler.addControlerListener(pHook);		
-		controler.setScoringFunctionFactory(new BvgScoringFunctionFactory(controler.getConfig().planCalcScore(), new BvgScoringFunctionConfigGroup(controler.getConfig()), controler.getNetwork()));
 
 		controler.run();
 		
