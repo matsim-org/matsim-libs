@@ -19,8 +19,6 @@
 
 package playground.andreas.P2.hook;
 
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -28,6 +26,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.router.TransitActsRemover;
+
+import java.util.Set;
 
 /**
  * ReRoutes every person from a given set of person ids
@@ -39,7 +39,7 @@ final class PersonReRouteStuck extends AbstractPersonReRouteStuck {
 
 	private static final Logger log = Logger.getLogger(PersonReRouteStuck.class);
 	
-	private TransitActsRemover transitActsRemover;
+	private final TransitActsRemover transitActsRemover;
 
 	public PersonReRouteStuck(final PlanAlgorithm router, final ScenarioImpl scenario, Set<Id> agentsStuck) {
 		super(router, scenario, agentsStuck);

@@ -19,8 +19,6 @@
 
 package playground.andreas.P2.stats.abtractPAnalysisModules;
 
-import java.util.HashMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -33,6 +31,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.HashMap;
 
 
 /**
@@ -68,13 +68,13 @@ public final class AverageNumberOfStopsPerMode extends AbstractPAnalyisModule im
 	public void reset(int iteration) {
 		super.reset(iteration);
 		this.vehId2ptModeMap = new HashMap<>();
-		this.ptMode2NumberOfStopsTravelledMap = new HashMap<String, Integer>();
-		this.ptMode2TripCountMap = new HashMap<String, Integer>();
+		this.ptMode2NumberOfStopsTravelledMap = new HashMap<>();
+		this.ptMode2TripCountMap = new HashMap<>();
 		this.vehId2AgentId2StopCountMap = new HashMap<>();
 		// avoid null-pointer in getResult() /dr
 		for (String ptMode : this.ptModes) {
-			this.ptMode2NumberOfStopsTravelledMap.put(ptMode, new Integer(0));
-			this.ptMode2TripCountMap.put(ptMode, new Integer(0));
+			this.ptMode2NumberOfStopsTravelledMap.put(ptMode, 0);
+			this.ptMode2TripCountMap.put(ptMode, 0);
 		}
 	}
 
@@ -96,7 +96,7 @@ public final class AverageNumberOfStopsPerMode extends AbstractPAnalyisModule im
 		}
 		
 		if(!super.ptDriverIds.contains(event.getPersonId())){
-			this.vehId2AgentId2StopCountMap.get(event.getVehicleId()).put(event.getPersonId(), new Integer(0));
+			this.vehId2AgentId2StopCountMap.get(event.getVehicleId()).put(event.getPersonId(), 0);
 		}
 	}
 	
@@ -109,22 +109,22 @@ public final class AverageNumberOfStopsPerMode extends AbstractPAnalyisModule im
 			}
 			
 			if (ptMode2NumberOfStopsTravelledMap.get(ptMode) == null) {
-				ptMode2NumberOfStopsTravelledMap.put(ptMode, new Integer(0));
+				ptMode2NumberOfStopsTravelledMap.put(ptMode, 0);
 			}
 			if (ptMode2TripCountMap.get(ptMode) == null) {
-				ptMode2TripCountMap.put(ptMode, new Integer(0));
+				ptMode2TripCountMap.put(ptMode, 0);
 			}
 			
-			this.ptMode2NumberOfStopsTravelledMap.put(ptMode, new Integer(this.ptMode2NumberOfStopsTravelledMap.get(ptMode) + this.vehId2AgentId2StopCountMap.get(event.getVehicleId()).get(event.getPersonId()).intValue()));
-			this.ptMode2TripCountMap.put(ptMode, new Integer(this.ptMode2TripCountMap.get(ptMode) + 1));
+			this.ptMode2NumberOfStopsTravelledMap.put(ptMode, this.ptMode2NumberOfStopsTravelledMap.get(ptMode) + this.vehId2AgentId2StopCountMap.get(event.getVehicleId()).get(event.getPersonId()));
+			this.ptMode2TripCountMap.put(ptMode, this.ptMode2TripCountMap.get(ptMode) + 1);
 		}
 	}
 
 	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
 		for (Id<Person> agentId : this.vehId2AgentId2StopCountMap.get(event.getVehicleId()).keySet()) {
-			int oldValue = this.vehId2AgentId2StopCountMap.get(event.getVehicleId()).get(agentId).intValue();
-			this.vehId2AgentId2StopCountMap.get(event.getVehicleId()).put(agentId, new Integer(oldValue + 1));
+			int oldValue = this.vehId2AgentId2StopCountMap.get(event.getVehicleId()).get(agentId);
+			this.vehId2AgentId2StopCountMap.get(event.getVehicleId()).put(agentId, oldValue + 1);
 		}
 	}
 

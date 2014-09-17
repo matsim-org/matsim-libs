@@ -19,18 +19,15 @@
 
 package playground.andreas.P2.operator;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.MatsimRandom;
-
-import playground.andreas.P2.helper.PConfigGroup;
-import playground.andreas.P2.pbox.PFranchise;
-import playground.andreas.P2.replanning.PPlan;
+import playground.andreas.P2.PConfigGroup;
 import playground.andreas.P2.replanning.PStrategy;
 import playground.andreas.P2.replanning.PStrategyManager;
 import playground.andreas.P2.routeProvider.PRouteProvider;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * This cooperative has multiple plans. Each is weighted by the number of vehicles associated with.
@@ -43,11 +40,11 @@ public final class MultiPlanOperator extends AbstractOperator{
 	
 	public static final String OPERATOR_NAME = "MultiPlanOperator";
 	
-	private List<PPlan> plans;
+	private final List<PPlan> plans;
 
 	public MultiPlanOperator(Id id, PConfigGroup pConfig, PFranchise franchise){
 		super(id, pConfig, franchise);
-		this.plans = new LinkedList<PPlan>();
+		this.plans = new LinkedList<>();
 	}
 	
 	public boolean init(PRouteProvider pRouteProvider, PStrategy initialStrategy, int iteration, double initialBudget) {
@@ -69,7 +66,7 @@ public final class MultiPlanOperator extends AbstractOperator{
 		if (this.bestPlan == null) {
 			
 			// will not return the best plan, but one random plan selected from all plans with at least two vehicles
-			List<PPlan> plansWithAtLeastTwoVehicles = new LinkedList<PPlan>();
+			List<PPlan> plansWithAtLeastTwoVehicles = new LinkedList<>();
 			int numberOfVehicles = 0;
 			for (PPlan pPlan : this.plans) {
 				if (pPlan.getNVehicles() > 1) {
@@ -100,7 +97,7 @@ public final class MultiPlanOperator extends AbstractOperator{
 			int numberOfVehiclesToSell = -1 * Math.min(-1, (int) Math.floor(this.budget / this.costPerVehicleSell));
 			
 			while (numberOfVehiclesToSell > 0) {
-				this.findWorstPlanAndRemoveOneVehicle(this.plans);
+				this.findWorstPlanAndRemoveOneVehicle();
 				this.budget += this.costPerVehicleSell;
 				numberOfVehiclesToSell--;
 			}
@@ -117,7 +114,7 @@ public final class MultiPlanOperator extends AbstractOperator{
 		// distribute them among the plans
 		while (numberOfNewVehicles > 0) {
 			// add one vehicle to best plan
-			this.findBestPlanAndAddOneVehicle(this.plans);
+			this.findBestPlanAndAddOneVehicle();
 			numberOfNewVehicles--;
 		}
 
@@ -156,8 +153,8 @@ public final class MultiPlanOperator extends AbstractOperator{
 		
 		// Fourth, move one vehicle from the worst negative plan to the best plan, if possible
 		if (this.plans.size() > 1) {
-			if (this.findWorstNegativePlanAndRemoveOneVehicle(this.plans)) {
-				this.findBestPlanAndAddOneVehicle(this.plans);
+			if (this.findWorstNegativePlanAndRemoveOneVehicle()) {
+				this.findBestPlanAndAddOneVehicle();
 			}
 		}
 		
@@ -187,7 +184,7 @@ public final class MultiPlanOperator extends AbstractOperator{
 //		}
 		
 		// remove all plans with no vehicles
-		List<PPlan> plansToKeep = new LinkedList<PPlan>();
+		List<PPlan> plansToKeep = new LinkedList<>();
 		for (PPlan plan : this.plans) {
 			if (plan.getNVehicles() > 0) {
 				plansToKeep.add(plan);
@@ -209,10 +206,9 @@ public final class MultiPlanOperator extends AbstractOperator{
 	/**
 	 * Find worst negative plan (worst score per vehicle). Removes one vehicle. Removes the whole plan, if no vehicle is left.
 	 * 
-	 * @param plans
 	 * @return true if one vehicle was removed
 	 */
-	private boolean findWorstNegativePlanAndRemoveOneVehicle(List<PPlan> plans){
+	private boolean findWorstNegativePlanAndRemoveOneVehicle(){
 		PPlan worstPlan = null;
 		for (PPlan plan : this.plans) {
 			if (plan.getScorePerVehicle() < 0.0) {
@@ -242,10 +238,9 @@ public final class MultiPlanOperator extends AbstractOperator{
 	/**
 	 * Find plan with the worst score per vehicle. Removes one vehicle. Removes the whole plan, if no vehicle is left.
 	 * 
-	 * @param plans
 	 * @return
 	 */
-	private void findWorstPlanAndRemoveOneVehicle(List<PPlan> plans){
+	private void findWorstPlanAndRemoveOneVehicle(){
 		PPlan worstPlan = null;
 		for (PPlan plan : this.plans) {
 			if (worstPlan == null) {
@@ -268,10 +263,9 @@ public final class MultiPlanOperator extends AbstractOperator{
 	/**
 	 * Find plan with the best score per vehicle. Add one vehicle.
 	 * 
-	 * @param plans
 	 * @return
 	 */
-	private void findBestPlanAndAddOneVehicle(List<PPlan> plans){
+	private void findBestPlanAndAddOneVehicle(){
 		PPlan bestPlan = null;
 		for (PPlan plan : this.plans) {
 			if (bestPlan == null) {

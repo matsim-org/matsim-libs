@@ -19,10 +19,6 @@
 
 package playground.andreas.P2.stats.pStatsOverview;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -34,12 +30,15 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
-
-import playground.andreas.P2.helper.PConfigGroup;
-import playground.andreas.P2.helper.PConstants.OperatorState;
+import playground.andreas.P2.PConfigGroup;
+import playground.andreas.P2.PConstants.OperatorState;
+import playground.andreas.P2.hook.PBox;
 import playground.andreas.P2.operator.Operator;
-import playground.andreas.P2.pbox.PBox;
-import playground.andreas.P2.replanning.PPlan;
+import playground.andreas.P2.operator.PPlan;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * Calculates at the end of each iteration the following statistics:
@@ -95,8 +94,8 @@ public final class PStatsOverview implements StartupListener, IterationEndsListe
 
 	private double[][] history = null;
 	private int minIteration = 0;
-	private PBox pBox;
-	private PConfigGroup pConfig;
+	private final PBox pBox;
+	private final PConfigGroup pConfig;
 
 	private RecursiveStatsContainer statsContainer;
 	private RecursiveStatsApproxContainer statsApproxContainer;

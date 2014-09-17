@@ -19,15 +19,6 @@
 
 package playground.andreas.P2.ana;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -40,6 +31,15 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.TreeSet;
+
 /**
  * Collect some data for iatbr paper. Currently:
  * <li> Number of trips served by train
@@ -51,7 +51,7 @@ import org.matsim.core.events.EventsUtils;
  * @author aneumann
  *
  */
-public final class IatbrAna implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, LinkEnterEventHandler{
+final class IatbrAna implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, LinkEnterEventHandler{
 
 	private static final Logger log = Logger.getLogger(IatbrAna.class);
 	
@@ -60,22 +60,22 @@ public final class IatbrAna implements PersonEntersVehicleEventHandler, PersonLe
 	
 	private int numberOfTripsServedByTrain = 0;
 	private int numberOfTripsServedByMinibus = 0;
-	private Set<Id> minibusesWithAtLeastOneTrip = new TreeSet<Id>();
+	private Set<Id> minibusesWithAtLeastOneTrip = new TreeSet<>();
 	private double kmTravelledByMinibuses = 0.0;
 	private double passengerKmMinibus = 0.0;
 	private int numberOfPassengersUsingTrainAndMinibus;
 
-	private HashMap<Id, Integer> vehId2NumberOfPassengers = new HashMap<Id, Integer>();
-	private HashMap<Id, String> agentId2ModeAlreadyUsed = new HashMap<Id, String>();
+	private HashMap<Id, Integer> vehId2NumberOfPassengers = new HashMap<>();
+	private HashMap<Id, String> agentId2ModeAlreadyUsed = new HashMap<>();
 	
-	public IatbrAna(String pIdentifier, String trainIdentifier){
+	private IatbrAna(String pIdentifier, String trainIdentifier){
 		this.pIdentifier = pIdentifier;
 		this.trainIdentifier = trainIdentifier;
 	}
 	
 	public static void main(String[] args) {
 		
-		ArrayList<String> scenarioIds = new ArrayList<String>();
+		ArrayList<String> scenarioIds = new ArrayList<>();
 		scenarioIds.add("1min");
 		scenarioIds.add("25min");
 		scenarioIds.add("5min");
@@ -121,12 +121,12 @@ public final class IatbrAna implements PersonEntersVehicleEventHandler, PersonLe
 	public void reset(int iteration) {
 		this.numberOfTripsServedByTrain = 0;
 		this.numberOfTripsServedByMinibus = 0;
-		this.minibusesWithAtLeastOneTrip = new TreeSet<Id>();
+		this.minibusesWithAtLeastOneTrip = new TreeSet<>();
 		this.kmTravelledByMinibuses = 0.0;
 		this.passengerKmMinibus = 0.0;
-		this.vehId2NumberOfPassengers = new HashMap<Id, Integer>();
+		this.vehId2NumberOfPassengers = new HashMap<>();
 		this.numberOfPassengersUsingTrainAndMinibus = 0;
-		this.agentId2ModeAlreadyUsed = new HashMap<Id, String>();
+		this.agentId2ModeAlreadyUsed = new HashMap<>();
 	}
 
 	@Override
@@ -150,14 +150,14 @@ public final class IatbrAna implements PersonEntersVehicleEventHandler, PersonLe
 		
 		if(event.getVehicleId().toString().contains(this.pIdentifier)){
 			if (this.vehId2NumberOfPassengers.get(event.getVehicleId()) == null) {
-				this.vehId2NumberOfPassengers.put(event.getVehicleId(), new Integer(0));
+				this.vehId2NumberOfPassengers.put(event.getVehicleId(), 0);
 			}
 			
 			if(!event.getPersonId().toString().contains(this.pIdentifier)){
 				this.minibusesWithAtLeastOneTrip.add(event.getVehicleId());
 				this.numberOfTripsServedByMinibus++;
 
-				this.vehId2NumberOfPassengers.put(event.getVehicleId(), new Integer(this.vehId2NumberOfPassengers.get(event.getVehicleId()).intValue() + 1));
+				this.vehId2NumberOfPassengers.put(event.getVehicleId(), this.vehId2NumberOfPassengers.get(event.getVehicleId()) + 1);
 				
 				if (!this.agentId2ModeAlreadyUsed.containsKey(event.getPersonId())) {
 					this.agentId2ModeAlreadyUsed.put(event.getPersonId(), this.pIdentifier);
@@ -176,7 +176,7 @@ public final class IatbrAna implements PersonEntersVehicleEventHandler, PersonLe
 	public void handleEvent(PersonLeavesVehicleEvent event) {
 		if(event.getVehicleId().toString().contains(this.pIdentifier)){
 			if(!event.getPersonId().toString().contains(this.pIdentifier)){
-				this.vehId2NumberOfPassengers.put(event.getVehicleId(), new Integer(this.vehId2NumberOfPassengers.get(event.getVehicleId()).intValue() - 1));
+				this.vehId2NumberOfPassengers.put(event.getVehicleId(), this.vehId2NumberOfPassengers.get(event.getVehicleId()) - 1);
 			}
 		}
 	}
@@ -192,7 +192,7 @@ public final class IatbrAna implements PersonEntersVehicleEventHandler, PersonLe
 				linkLength = 1.2;
 			}
 			this.kmTravelledByMinibuses += linkLength;
-			this.passengerKmMinibus += this.vehId2NumberOfPassengers.get(event.getVehicleId()).intValue() * linkLength;
+			this.passengerKmMinibus += this.vehId2NumberOfPassengers.get(event.getVehicleId()) * linkLength;
 		}		
 	}
 	

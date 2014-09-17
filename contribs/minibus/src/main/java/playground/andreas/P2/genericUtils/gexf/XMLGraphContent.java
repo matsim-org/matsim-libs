@@ -8,14 +8,9 @@
 
 package playground.andreas.P2.genericUtils.gexf;
 
+import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
-import javax.xml.bind.annotation.XmlType;
 
 
 /**
@@ -60,23 +55,23 @@ public class XMLGraphContent {
         @XmlElement(name = "nodes", type = XMLNodesContent.class),
         @XmlElement(name = "edges", type = XMLEdgesContent.class)
     })
-    protected List<Object> attributesOrNodesOrEdges;
+    private List<Object> attributesOrNodesOrEdges;
     @XmlAttribute
-    protected XMLTimeformatType timeformat;
+    private XMLTimeformatType timeformat;
     @XmlAttribute
-    protected String start;
+    private String start;
     @XmlAttribute
-    protected String startopen;
+    private String startopen;
     @XmlAttribute
-    protected String end;
+    private String end;
     @XmlAttribute
-    protected String endopen;
+    private String endopen;
     @XmlAttribute
-    protected XMLDefaultedgetypeType defaultedgetype;
+    private XMLDefaultedgetypeType defaultedgetype;
     @XmlAttribute
-    protected XMLIdtypeType idtype;
+    private XMLIdtypeType idtype;
     @XmlAttribute
-    protected XMLModeType mode;
+    private XMLModeType mode;
 
     /**
      * Gets the value of the attributesOrNodesOrEdges property.
@@ -104,7 +99,7 @@ public class XMLGraphContent {
      */
     public List<Object> getAttributesOrNodesOrEdges() {
         if (attributesOrNodesOrEdges == null) {
-            attributesOrNodesOrEdges = new ArrayList<Object>();
+            attributesOrNodesOrEdges = new ArrayList<>();
         }
         return this.attributesOrNodesOrEdges;
     }

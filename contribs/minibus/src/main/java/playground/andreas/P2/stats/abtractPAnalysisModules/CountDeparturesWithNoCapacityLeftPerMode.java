@@ -19,8 +19,6 @@
 
 package playground.andreas.P2.stats.abtractPAnalysisModules;
 
-import java.util.HashMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -33,6 +31,8 @@ import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
+
+import java.util.HashMap;
 
 
 /**
@@ -49,7 +49,7 @@ public final class CountDeparturesWithNoCapacityLeftPerMode extends AbstractPAna
 	
 	private HashMap<Id<Vehicle>, String> vehId2ptModeMap;
 	private HashMap<Id<Vehicle>, Integer> vehId2PaxMap = new HashMap<>();
-	private HashMap<String, Integer> ptMode2nOfDepartures = new HashMap<String, Integer>();
+	private HashMap<String, Integer> ptMode2nOfDepartures = new HashMap<>();
 
 	
 	public CountDeparturesWithNoCapacityLeftPerMode(){
@@ -61,7 +61,7 @@ public final class CountDeparturesWithNoCapacityLeftPerMode extends AbstractPAna
 	public String getResult() {
 		StringBuffer strB = new StringBuffer();
 		for (String ptMode : this.ptModes) {
-			strB.append(", " + (this.ptMode2nOfDepartures.get(ptMode).intValue()));
+			strB.append(", " + (this.ptMode2nOfDepartures.get(ptMode)));
 		}
 		return strB.toString();
 	}
@@ -85,7 +85,7 @@ public final class CountDeparturesWithNoCapacityLeftPerMode extends AbstractPAna
 		super.reset(iteration);
 		this.vehId2ptModeMap = new HashMap<>();
 		this.vehId2PaxMap = new HashMap<>();
-		this.ptMode2nOfDepartures = new HashMap<String, Integer>();
+		this.ptMode2nOfDepartures = new HashMap<>();
 	}
 
 	@Override
@@ -99,7 +99,7 @@ public final class CountDeparturesWithNoCapacityLeftPerMode extends AbstractPAna
 		this.vehId2ptModeMap.put(event.getVehicleId(), ptMode);
 		
 		if (this.vehId2PaxMap.get(event.getVehicleId()) != null) {
-			if (this.vehId2PaxMap.get(event.getVehicleId()).intValue() != 0) {
+			if (this.vehId2PaxMap.get(event.getVehicleId()) != 0) {
 				log.warn(event.getVehicleId() + " has still " + this.vehId2PaxMap.get(event.getVehicleId()) + " passengers onboard. Should be zero by now.");
 			}
 		}
@@ -109,17 +109,17 @@ public final class CountDeparturesWithNoCapacityLeftPerMode extends AbstractPAna
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		if(!super.ptDriverIds.contains(event.getPersonId())){
 			if (this.vehId2PaxMap.get(event.getVehicleId()) == null) {
-				this.vehId2PaxMap.put(event.getVehicleId(), new Integer(0));
+				this.vehId2PaxMap.put(event.getVehicleId(), 0);
 			}
 			
-			this.vehId2PaxMap.put(event.getVehicleId(), new Integer(this.vehId2PaxMap.get(event.getVehicleId()) + 1));
+			this.vehId2PaxMap.put(event.getVehicleId(), this.vehId2PaxMap.get(event.getVehicleId()) + 1);
 		}
 	}
 	
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
 		if(!super.ptDriverIds.contains(event.getPersonId())){
-			this.vehId2PaxMap.put(event.getVehicleId(), new Integer(this.vehId2PaxMap.get(event.getVehicleId()) - 1));
+			this.vehId2PaxMap.put(event.getVehicleId(), this.vehId2PaxMap.get(event.getVehicleId()) - 1);
 		}
 	}
 
@@ -130,7 +130,7 @@ public final class CountDeparturesWithNoCapacityLeftPerMode extends AbstractPAna
 			ptMode = "nonPtMode";
 		}
 		if (this.ptMode2nOfDepartures.get(ptMode) == null) {
-			this.ptMode2nOfDepartures.put(ptMode, new Integer(0));
+			this.ptMode2nOfDepartures.put(ptMode, 0);
 		}
 		
 		int currentLoad = 0;
@@ -141,8 +141,8 @@ public final class CountDeparturesWithNoCapacityLeftPerMode extends AbstractPAna
 		
 		if (currentLoad == capacity) {
 			// no capacity left
-			int oldValue = this.ptMode2nOfDepartures.get(ptMode).intValue();
-			this.ptMode2nOfDepartures.put(ptMode, new Integer(oldValue + 1));
+			int oldValue = this.ptMode2nOfDepartures.get(ptMode);
+			this.ptMode2nOfDepartures.put(ptMode, oldValue + 1);
 		}
 	}
 }

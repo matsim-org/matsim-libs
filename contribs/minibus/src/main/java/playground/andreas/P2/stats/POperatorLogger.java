@@ -19,11 +19,6 @@
 
 package playground.andreas.P2.stats;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -39,11 +34,15 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
-import playground.andreas.P2.helper.PConfigGroup;
+import playground.andreas.P2.PConfigGroup;
+import playground.andreas.P2.hook.PBox;
 import playground.andreas.P2.operator.Operator;
-import playground.andreas.P2.pbox.PBox;
-import playground.andreas.P2.replanning.PPlan;
+import playground.andreas.P2.operator.PPlan;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Calculates at the end of each iteration the following statistics for each operator:
@@ -60,14 +59,14 @@ import playground.andreas.P2.replanning.PPlan;
  *
  * @author aneumann
  */
-public final class POperatorLogger implements StartupListener, IterationEndsListener, ShutdownListener {
+final class POperatorLogger implements StartupListener, IterationEndsListener, ShutdownListener {
 
 	private final static Logger log = Logger.getLogger(POperatorLogger.class);
 	
 	private BufferedWriter pOperatorLoggerWriter;
 
-	private PBox pBox;
-	private PConfigGroup pConfig;
+	private final PBox pBox;
+	private final PConfigGroup pConfig;
 
 	public POperatorLogger(PBox pBox, PConfigGroup pConfig) throws UncheckedIOException {
 		this.pBox = pBox;
@@ -143,7 +142,7 @@ public final class POperatorLogger implements StartupListener, IterationEndsList
 				
 				try {
 					this.pOperatorLoggerWriter.write(event.getIteration() + "\t" + cooperative.getId() + "\t" + cooperative.getOperatorState() + "\t" + "===" + "\t" 
-							+ "TOTAL" + "\t" + (int) cooperative.getNumberOfVehiclesOwned() + "\t" + (int) coopPax + "\t" + coopScore + "\t" + cooperative.getBudget() + "\t" 
+							+ "TOTAL" + "\t" + cooperative.getNumberOfVehiclesOwned() + "\t" + (int) coopPax + "\t" + coopScore + "\t" + cooperative.getBudget() + "\t"
 							+ "===" + "\t" + "===" + "\t" + "===" + "\t" + "===" + "\n");
 				} catch (IOException e) {
 					// TODO Auto-generated catch block

@@ -8,12 +8,9 @@
 
 package playground.andreas.P2.genericUtils.gexf.viz;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
 import playground.andreas.P2.genericUtils.gexf.XMLSpellsContent;
+
+import javax.xml.bind.annotation.*;
 
 
 /**
@@ -47,20 +44,20 @@ import playground.andreas.P2.genericUtils.gexf.XMLSpellsContent;
 })
 public class NodeShapeContent {
 
-    protected XMLSpellsContent spells;
+    private XMLSpellsContent spells;
     @XmlAttribute(required = true)
-    protected NodeShapeType value;
+    private NodeShapeType value;
     @XmlAttribute
     @XmlSchemaType(name = "anyURI")
-    protected String uri;
+    private String uri;
     @XmlAttribute
-    protected String start;
+    private String start;
     @XmlAttribute
-    protected String startopen;
+    private String startopen;
     @XmlAttribute
-    protected String end;
+    private String end;
     @XmlAttribute
-    protected String endopen;
+    private String endopen;
 
     /**
      * Gets the value of the spells property.

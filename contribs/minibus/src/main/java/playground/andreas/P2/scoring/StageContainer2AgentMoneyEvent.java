@@ -19,11 +19,6 @@
 
 package playground.andreas.P2.scoring;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map.Entry;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.population.Person;
@@ -31,10 +26,14 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
+import playground.andreas.P2.fare.StageContainer;
+import playground.andreas.P2.fare.StageContainerHandler;
+import playground.andreas.P2.fare.TicketMachine;
 
-import playground.andreas.P2.scoring.fare.StageContainer;
-import playground.andreas.P2.scoring.fare.StageContainerHandler;
-import playground.andreas.P2.scoring.fare.TicketMachine;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map.Entry;
 
 /**
  * Collects {@link StageContainer} and creates {@link PersonMoneyEvent}.
@@ -44,8 +43,8 @@ import playground.andreas.P2.scoring.fare.TicketMachine;
  */
 public final class StageContainer2AgentMoneyEvent implements StageContainerHandler, AfterMobsimListener{
 
-	private EventsManager eventsManager;
-	private double mobsimShutdownTime;
+	private final EventsManager eventsManager;
+	private final double mobsimShutdownTime;
 	private HashMap<Id<Person>, List<StageContainer>> agentId2stageContainerListMap = new HashMap<>();
 	private final TicketMachine ticketMachine;
 
@@ -78,7 +77,7 @@ public final class StageContainer2AgentMoneyEvent implements StageContainerHandl
 	}
 
 	@Override
-	public void reset(int iteration) {
+	public void reset() {
 		this.agentId2stageContainerListMap = new HashMap<>();
 	}
 }

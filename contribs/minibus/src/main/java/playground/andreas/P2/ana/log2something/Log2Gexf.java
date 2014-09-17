@@ -19,9 +19,9 @@
 
 package playground.andreas.P2.ana.log2something;
 
-import java.util.ArrayList;
-
 import org.apache.log4j.Logger;
+
+import java.util.ArrayList;
 
 /**
  * 
@@ -30,11 +30,11 @@ import org.apache.log4j.Logger;
  * @author aneumann
  *
  */
-public final class Log2Gexf {
+final class Log2Gexf {
 
 	private static final Logger log = Logger.getLogger(Log2Gexf.class);
 	
-	public static void convertLog2Gexf(String inputFile, String outputFile) {
+	private static void convertLog2Gexf(String inputFile, String outputFile) {
 		ArrayList<LogElement> logElements = LogReader.readFile(inputFile);
 		ArrayList<PlanElement> planElements = LogElement2PlanElement.logElement2PlanElement(logElements);
 		planElements = FindAncestorOfPlanElements.findAncestorOfPlanElements(planElements);

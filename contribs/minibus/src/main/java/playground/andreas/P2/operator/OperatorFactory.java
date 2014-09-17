@@ -21,16 +21,14 @@ package playground.andreas.P2.operator;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-
-import playground.andreas.P2.helper.PConfigGroup;
-import playground.andreas.P2.pbox.PFranchise;
+import playground.andreas.P2.PConfigGroup;
 
 /**
  * 
  * @author aneumann
  *
  */
-public final class OperatorFactory {
+final class OperatorFactory {
 	
 	private final static Logger log = Logger.getLogger(OperatorFactory.class);
 	

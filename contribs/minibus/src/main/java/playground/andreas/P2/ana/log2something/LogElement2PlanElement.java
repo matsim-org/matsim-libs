@@ -19,12 +19,12 @@
 
 package playground.andreas.P2.ana.log2something;
 
+import org.apache.log4j.Logger;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.apache.log4j.Logger;
 
 /**
  * Aggregate atomic data of {@linkplain LogElement} into time series data of {@link PlanElement}.
@@ -32,7 +32,7 @@ import org.apache.log4j.Logger;
  * @author aneumann
  *
  */
-public final class LogElement2PlanElement {
+final class LogElement2PlanElement {
 	
 	private static final Logger log = Logger.getLogger(LogElement2PlanElement.class);
 	
@@ -43,17 +43,17 @@ public final class LogElement2PlanElement {
 	 * @return
 	 */
 	public static ArrayList<PlanElement> logElement2PlanElement(ArrayList<LogElement> logElements){
-		ArrayList<PlanElement> planElements = new ArrayList<PlanElement>();
+		ArrayList<PlanElement> planElements = new ArrayList<>();
 		
 		int currentIteration = 0;
-		HashMap<String, PlanElement> plansActiveLastIteration = new HashMap<String, PlanElement>();
-		HashMap<String, PlanElement> plansActiveCurrentIteration = new HashMap<String, PlanElement>();
+		HashMap<String, PlanElement> plansActiveLastIteration = new HashMap<>();
+		HashMap<String, PlanElement> plansActiveCurrentIteration = new HashMap<>();
 		
 		for (LogElement logElement : logElements) {
 			if (logElement.getIteration() != currentIteration) {
 				log.info("Terminating iteration " + currentIteration);
 				
-				List<String> plansToTerminate = new LinkedList<String>();
+				List<String> plansToTerminate = new LinkedList<>();
 				for (String planIdFromLastIteration : plansActiveLastIteration.keySet()) {
 					if (!plansActiveCurrentIteration.keySet().contains(planIdFromLastIteration)) {
 						plansToTerminate.add(planIdFromLastIteration);
@@ -65,7 +65,7 @@ public final class LogElement2PlanElement {
 				}
 				
 				plansActiveLastIteration = plansActiveCurrentIteration;
-				plansActiveCurrentIteration = new HashMap<String, PlanElement>();
+				plansActiveCurrentIteration = new HashMap<>();
 				
 				currentIteration = logElement.getIteration();
 				log.info("Starting with iteration " + currentIteration);

@@ -19,15 +19,14 @@
 
 package playground.andreas.P2.routeProvider;
 
-import java.util.Collection;
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
 import playground.andreas.P2.operator.Operator;
-import playground.andreas.P2.replanning.PPlan;
+import playground.andreas.P2.operator.PPlan;
+
+import java.util.Collection;
+import java.util.List;
 
 public interface PRouteProvider {
 	

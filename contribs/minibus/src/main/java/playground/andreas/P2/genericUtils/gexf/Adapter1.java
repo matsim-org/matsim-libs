@@ -10,7 +10,7 @@ package playground.andreas.P2.genericUtils.gexf;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-public class Adapter1
+class Adapter1
     extends XmlAdapter<String, Integer>
 {
 

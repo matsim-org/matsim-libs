@@ -19,14 +19,8 @@
  * *********************************************************************** */
 package playground.andreas.P2.performance;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.population.ActivityImpl;
@@ -38,6 +32,8 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import java.util.List;
+
 /**
  * {@link PlanAlgorithm} responsible for routing all trips of a plan.
  * Activity times are not updated, even if the previous trip arrival time
@@ -47,7 +43,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  *
  * @author aneumann, thibautd
  */
-public final class PPlanRouter implements PlanAlgorithm, PersonAlgorithm {
+final class PPlanRouter implements PlanAlgorithm, PersonAlgorithm {
 	private final TripRouter routingHandler;
 	private final ActivityFacilities facilities;
 
@@ -92,7 +88,7 @@ public final class PPlanRouter implements PlanAlgorithm, PersonAlgorithm {
 			
 			
 			/** That's the only check that got added.... **/
-			if (routingHandler.getMainModeIdentifier().identifyMainMode(trip.getTripElements()) == TransportMode.pt) {
+			if (routingHandler.getMainModeIdentifier().identifyMainMode(trip.getTripElements()).equals(TransportMode.pt)) {
 				final List<? extends PlanElement> newTrip =
 						routingHandler.calcRoute(
 								routingHandler.getMainModeIdentifier().identifyMainMode( trip.getTripElements() ),

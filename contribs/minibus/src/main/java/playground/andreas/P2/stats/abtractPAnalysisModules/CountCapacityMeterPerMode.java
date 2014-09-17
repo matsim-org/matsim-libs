@@ -19,8 +19,6 @@
 
 package playground.andreas.P2.stats.abtractPAnalysisModules;
 
-import java.util.HashMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -30,6 +28,8 @@ import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
+
+import java.util.HashMap;
 
 
 /**
@@ -42,7 +42,7 @@ public final class CountCapacityMeterPerMode extends AbstractPAnalyisModule impl
 	
 	private final static Logger log = Logger.getLogger(CountCapacityMeterPerMode.class);
 	
-	private Network network;
+	private final Network network;
 	private HashMap<Id<Vehicle>, Double> vehId2VehicleCapacity = new HashMap<>();
 	
 	private HashMap<Id<Vehicle>, String> vehId2ptModeMap;
@@ -71,11 +71,10 @@ public final class CountCapacityMeterPerMode extends AbstractPAnalyisModule impl
 			Integer seats = veh.getType().getCapacity().getSeats();
 			Integer standing = veh.getType().getCapacity().getStandingRoom();
 			// setting these values is not mandatory. Thus, they maybe null \\DR, aug'13
-			this.vehId2VehicleCapacity.put(veh.getId(), 
-					new Double(
-							((seats == null) ? 0 : seats) + 
-							((standing == null) ? 0 : standing)
-							- 1.0));
+			this.vehId2VehicleCapacity.put(veh.getId(),
+                    ((seats == null) ? 0 : seats) +
+                            ((standing == null) ? 0 : standing)
+                            - 1.0);
 		}
 	}
 	
@@ -83,7 +82,7 @@ public final class CountCapacityMeterPerMode extends AbstractPAnalyisModule impl
 	public void reset(int iteration) {
 		super.reset(iteration);
 		this.vehId2ptModeMap = new HashMap<>();
-		this.ptMode2CountMap = new HashMap<String, Double>();
+		this.ptMode2CountMap = new HashMap<>();
 	}
 
 	@Override
@@ -104,12 +103,12 @@ public final class CountCapacityMeterPerMode extends AbstractPAnalyisModule impl
 			ptMode = "nonPtMode";
 		}
 		if (ptMode2CountMap.get(ptMode) == null) {
-			ptMode2CountMap.put(ptMode, new Double(0.0));
+			ptMode2CountMap.put(ptMode, 0.0);
 		}
 		
 		double capacity;
 		if(super.ptDriverIds.contains(event.getPersonId())){
-			capacity = this.vehId2VehicleCapacity.get(event.getVehicleId()).doubleValue();
+			capacity = this.vehId2VehicleCapacity.get(event.getVehicleId());
 		}else{
 			// it's a car, which will not appear in the vehicles-list, called in updateVehicles \dr
 			// TODO [AN] nonPtMode is not fully implemented - check that again
@@ -117,7 +116,7 @@ public final class CountCapacityMeterPerMode extends AbstractPAnalyisModule impl
 		}
 		double capacityMeterForThatLink = capacity * this.network.getLinks().get(event.getLinkId()).getLength();
 
-		ptMode2CountMap.put(ptMode, new Double(ptMode2CountMap.get(ptMode) + capacityMeterForThatLink));
+		ptMode2CountMap.put(ptMode, ptMode2CountMap.get(ptMode) + capacityMeterForThatLink);
 	}
 	
 	public HashMap<String, Double> getResults(){

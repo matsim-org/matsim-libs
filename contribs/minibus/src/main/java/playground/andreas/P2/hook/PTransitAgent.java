@@ -19,9 +19,6 @@
 
 package playground.andreas.P2.hook;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
@@ -34,11 +31,10 @@ import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
+
+import java.util.LinkedList;
+import java.util.List;
 
 
 /**
@@ -50,21 +46,16 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPassengerAgent {
 
 	private final static Logger log = Logger.getLogger(PTransitAgent.class);
-	
-	private boolean boardAllLines;
-	private TransitSchedule transitSchedule;
 
+    private final TransitSchedule transitSchedule;
 
-	public static PTransitAgent createTransitAgent(Person p, Netsim simulation, boolean boardAllLines) {
-		PTransitAgent agent = new PTransitAgent(p, simulation, boardAllLines);
-		return agent;
+	public static PTransitAgent createTransitAgent(Person p, Netsim simulation) {
+        return new PTransitAgent(p, simulation);
 	}
 
-
-	private PTransitAgent(final Person p, final Netsim simulation, boolean boardAllLines) {
+	private PTransitAgent(final Person p, final Netsim simulation) {
 		super(PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), simulation);
-		this.boardAllLines = boardAllLines;
-		this.transitSchedule = simulation.getScenario().getTransitSchedule();
+        this.transitSchedule = simulation.getScenario().getTransitSchedule();
 	}
 
 	@Override
@@ -79,7 +70,7 @@ class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPasseng
 		
 		if(containsId(stopsToCome, route.getEgressStopId())){
 			if (route.getRouteId().toString().equalsIgnoreCase(transitRoute.getId().toString())) {
-				LinkedList<TransitRouteStop> tempStopsToCome = new LinkedList<TransitRouteStop>(stopsToCome);
+				LinkedList<TransitRouteStop> tempStopsToCome = new LinkedList<>(stopsToCome);
 				tempStopsToCome.removeLast();
 				boolean egressStopFound = false;
 				for (TransitRouteStop stop : tempStopsToCome) {
@@ -127,16 +118,6 @@ class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPasseng
 		}
 
 		return false;
-		
-//		if (this.boardAllLines) {
-//			return containsId(stopsToCome, route.getEgressStopId());
-//		} else {
-//			if (line.getId().equals(route.getLineId())) {
-//				return containsId(stopsToCome, route.getEgressStopId());
-//			} else {
-//				return false;
-//			}
-//		}
 	}
 
 	private double getArrivalOffsetFromRoute(TransitRoute transitRoute, Id egressStopId) {
@@ -195,8 +176,7 @@ class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPasseng
 			return null;
 		} else {
 			ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
-			Id accessStopId = route.getAccessStopId();
-			return accessStopId;
+            return route.getAccessStopId();
 		}
 	}
 	

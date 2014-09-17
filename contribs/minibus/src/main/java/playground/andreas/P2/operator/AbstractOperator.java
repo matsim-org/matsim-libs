@@ -19,24 +19,21 @@
 
 package playground.andreas.P2.operator;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.vehicles.Vehicle;
-
-import playground.andreas.P2.helper.PConfigGroup;
-import playground.andreas.P2.helper.PConstants.OperatorState;
-import playground.andreas.P2.pbox.PFranchise;
-import playground.andreas.P2.replanning.PPlan;
+import playground.andreas.P2.PConfigGroup;
+import playground.andreas.P2.PConstants.OperatorState;
 import playground.andreas.P2.replanning.PStrategy;
 import playground.andreas.P2.replanning.PStrategyManager;
 import playground.andreas.P2.routeProvider.PRouteProvider;
 import playground.andreas.P2.scoring.ScoreContainer;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.TreeMap;
 
 /**
  * Common implementation for all cooperatives, except for replanning
@@ -46,35 +43,35 @@ import playground.andreas.P2.scoring.ScoreContainer;
  */
 abstract class AbstractOperator implements Operator{
 	
-	protected final static Logger log = Logger.getLogger(AbstractOperator.class);
+	final static Logger log = Logger.getLogger(AbstractOperator.class);
 	
-	protected final Id<Operator> id;
+	final Id<Operator> id;
 	
 	private int numberOfPlansTried;
 	
-	private PFranchise franchise;
+	private final PFranchise franchise;
 	private final double costPerVehicleBuy;
-	protected final double costPerVehicleSell;
+	final double costPerVehicleSell;
 	private final double costPerVehicleAndDay;
 	private final double minOperationTime;
 	
-	protected OperatorState operatorState;
+	OperatorState operatorState;
 
-	protected PPlan bestPlan;
-	protected PPlan testPlan;
+	PPlan bestPlan;
+	PPlan testPlan;
 
-	protected TransitLine currentTransitLine;
+	private TransitLine currentTransitLine;
 	private int numberOfIterationsForProspecting;
 	
-	protected double budget;
-	protected double score;
-	protected double scoreLastIteration;
-	protected int numberOfVehiclesInReserve;
+	double budget;
+	double score;
+	double scoreLastIteration;
+	int numberOfVehiclesInReserve;
 	
-	protected PRouteProvider routeProvider;
-	protected int currentIteration;
+	PRouteProvider routeProvider;
+	int currentIteration;
 
-	public AbstractOperator(Id<Operator> id, PConfigGroup pConfig, PFranchise franchise){
+	AbstractOperator(Id<Operator> id, PConfigGroup pConfig, PFranchise franchise){
 		this.id = id;
 		this.numberOfIterationsForProspecting = pConfig.getNumberOfIterationsForProspecting();
 		this.costPerVehicleBuy = pConfig.getPricePerVehicleBought();
@@ -183,7 +180,7 @@ abstract class AbstractOperator implements Operator{
 	}
 
 	public List<PPlan> getAllPlans(){
-		List<PPlan> plans = new LinkedList<PPlan>();
+		List<PPlan> plans = new LinkedList<>();
 		if(this.bestPlan != null){
 			plans.add(this.bestPlan);
 		}
@@ -214,7 +211,7 @@ abstract class AbstractOperator implements Operator{
 		return this.routeProvider;
 	}
 
-	public double getCostPerVehicleBuy() {
+	double getCostPerVehicleBuy() {
 		return costPerVehicleBuy;
 	}
 
@@ -231,7 +228,7 @@ abstract class AbstractOperator implements Operator{
 		this.budget = budget;
 	}
 	
-	protected void updateCurrentTransitLine(){
+	void updateCurrentTransitLine(){
 		this.currentTransitLine = this.routeProvider.createEmptyLineFromOperator(id);
 		for (PPlan plan : this.getAllPlans()) {
 			for (TransitRoute route : plan.getLine().getRoutes().values()) {

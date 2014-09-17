@@ -22,10 +22,8 @@ package playground.andreas.P2.scoring;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.vehicles.Vehicle;
-
-import playground.andreas.P2.scoring.fare.StageContainer;
-import playground.andreas.P2.scoring.fare.TicketMachine;
-import playground.andreas.P2.scoring.operator.OperatorCostContainer;
+import playground.andreas.P2.fare.StageContainer;
+import playground.andreas.P2.fare.TicketMachine;
 
 /**
  * Simple container class collecting all incomes and expenses for one single vehicle.

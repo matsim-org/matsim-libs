@@ -19,19 +19,16 @@
 
 package playground.andreas.P2.operator;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.MatsimRandom;
-
-import playground.andreas.P2.helper.PConfigGroup;
-import playground.andreas.P2.pbox.PFranchise;
-import playground.andreas.P2.replanning.PPlan;
+import playground.andreas.P2.PConfigGroup;
 import playground.andreas.P2.replanning.PStrategy;
 import playground.andreas.P2.replanning.PStrategyManager;
 import playground.andreas.P2.routeProvider.PRouteProvider;
+
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * This cooperative has multiple plans. Each is weighted by the number of vehicles associated with.
@@ -46,14 +43,12 @@ import playground.andreas.P2.routeProvider.PRouteProvider;
 public final class CarefulMultiPlanOperator extends AbstractOperator{
 	
 	public static final String OPERATOR_NAME = "CarefulMultiPlanOperator";
-	
-	private final int tryouts = 10;
-	
-	private List<PPlan> plans;
+
+    private List<PPlan> plans;
 
 	public CarefulMultiPlanOperator(Id<Operator> id, PConfigGroup pConfig, PFranchise franchise){
 		super(id, pConfig, franchise);
-		this.plans = new LinkedList<PPlan>();
+		this.plans = new LinkedList<>();
 	}
 	
 	public boolean init(PRouteProvider pRouteProvider, PStrategy initialStrategy, int iteration, double initialBudget) {
@@ -97,7 +92,7 @@ public final class CarefulMultiPlanOperator extends AbstractOperator{
 		return this.bestPlan;
 	}
 
-	public void replan(PStrategyManager pStrategyManager, int iteration) {	
+	public void replan(PStrategyManager pStrategyManager, int iteration) {
 		this.currentIteration = iteration;
 		
 		// First remove vehicles from all plans scored negative and add them to the reserve
@@ -116,7 +111,7 @@ public final class CarefulMultiPlanOperator extends AbstractOperator{
 			}
 			
 			while (numberOfVehiclesToSell > 0) {
-				this.findWorstPlanAndRemoveOneVehicle(this.plans);
+				this.findWorstPlanAndRemoveOneVehicle();
 				this.budget += this.costPerVehicleSell;
 				numberOfVehiclesToSell--;
 			}
@@ -134,8 +129,9 @@ public final class CarefulMultiPlanOperator extends AbstractOperator{
 			maxVehiclesToDistribute += plan.getNVehicles();
 		}
 		maxVehiclesToDistribute = Math.max(1, maxVehiclesToDistribute / 2);
-		
-		int remainingNumberOfTryouts = this.tryouts;
+
+        int tryouts = 10;
+        int remainingNumberOfTryouts = tryouts;
 		
 		while (this.numberOfVehiclesInReserve > 0 && maxVehiclesToDistribute > 0 && remainingNumberOfTryouts > 0) {
 			
@@ -176,7 +172,7 @@ public final class CarefulMultiPlanOperator extends AbstractOperator{
 	}
 
 	private void addVehiclesToPlansWithAPositiveScore() {
-		List<PPlan> plansWithAPositiveScore = new LinkedList<PPlan>();
+		List<PPlan> plansWithAPositiveScore = new LinkedList<>();
 		for (PPlan plan : this.plans) {
 			if (plan.getScore() > 0) {
 				// positive
@@ -197,7 +193,7 @@ public final class CarefulMultiPlanOperator extends AbstractOperator{
 
 	private void removeAllPlansWithZeroVehicles() {
 		// remove all plans with no vehicles
-		List<PPlan> plansToKeep = new LinkedList<PPlan>();
+		List<PPlan> plansToKeep = new LinkedList<>();
 		for (PPlan plan : this.plans) {
 			if (plan.getNVehicles() > 0) {
 				plansToKeep.add(plan);
@@ -258,10 +254,9 @@ public final class CarefulMultiPlanOperator extends AbstractOperator{
 	/**
 	 * Find plan with the worst score per vehicle. Removes one vehicle. Removes the whole plan, if no vehicle is left.
 	 * 
-	 * @param plans
 	 * @return
 	 */
-	private void findWorstPlanAndRemoveOneVehicle(List<PPlan> plans){
+	private void findWorstPlanAndRemoveOneVehicle(){
 		PPlan worstPlan = null;
 		for (PPlan plan : this.plans) {
 			if (plan.getNVehicles() > 0) {

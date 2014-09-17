@@ -19,14 +19,6 @@
 
 package playground.andreas.P2.routeProvider;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -38,16 +30,12 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
-
 import playground.andreas.P2.operator.Operator;
-import playground.andreas.P2.replanning.PPlan;
+import playground.andreas.P2.operator.PPlan;
+
+import java.util.*;
 
 
 /**
@@ -56,21 +44,21 @@ import playground.andreas.P2.replanning.PPlan;
  * @author aneumann
  *
  */
-public final class ComplexCircleScheduleProvider implements PRouteProvider {
+final class ComplexCircleScheduleProvider implements PRouteProvider {
 	
 	private final static Logger log = Logger.getLogger(ComplexCircleScheduleProvider.class);
 	public final static String NAME = "ComplexCircleScheduleProvider";
 	
-	private Network net;
-	private LeastCostPathCalculator routingAlgo;
-	private TransitSchedule scheduleWithStopsOnly;
-	private RandomStopProvider randomStopProvider;
-	private LinkedHashMap<Id<Link>, TransitStopFacility> linkId2StopFacilityMap;
-	private double vehicleMaximumVelocity;
-	private double planningSpeedFactor;
-	private String transportMode;
+	private final Network net;
+	private final LeastCostPathCalculator routingAlgo;
+	private final TransitSchedule scheduleWithStopsOnly;
+	private final RandomStopProvider randomStopProvider;
+	private final LinkedHashMap<Id<Link>, TransitStopFacility> linkId2StopFacilityMap;
+	private final double vehicleMaximumVelocity;
+	private final double planningSpeedFactor;
+	private final String transportMode;
 	
-	public ComplexCircleScheduleProvider(TransitSchedule scheduleWithStopsOnly, Network network, RandomStopProvider randomStopProvider, int iteration, double vehicleMaximumVelocity, double planningSpeedFactor, final String transportMode) {
+	public ComplexCircleScheduleProvider(TransitSchedule scheduleWithStopsOnly, Network network, RandomStopProvider randomStopProvider, double vehicleMaximumVelocity, double planningSpeedFactor, final String transportMode) {
 		this.net = network;
 		this.scheduleWithStopsOnly = scheduleWithStopsOnly;
 		FreespeedTravelTimeAndDisutility tC = new FreespeedTravelTimeAndDisutility(-6.0, 0.0, 0.0);
@@ -108,7 +96,7 @@ public final class ComplexCircleScheduleProvider implements PRouteProvider {
 		// initialize
 		TransitLine line = this.scheduleWithStopsOnly.getFactory().createTransitLine(lineId);			
 		routeId = Id.create(lineId + "-" + routeId, TransitRoute.class);
-		TransitRoute transitRoute = createRoute(routeId, stopsToBeServed, startTime);
+		TransitRoute transitRoute = createRoute(routeId, stopsToBeServed);
 		
 		// register route
 		line.addRoute(transitRoute);
@@ -130,9 +118,9 @@ public final class ComplexCircleScheduleProvider implements PRouteProvider {
 		return line;
 	}
 
-	private TransitRoute createRoute(Id<TransitRoute> routeID, ArrayList<TransitStopFacility> stopsToBeServed, double startTime){
+	private TransitRoute createRoute(Id<TransitRoute> routeID, ArrayList<TransitStopFacility> stopsToBeServed){
 		
-		ArrayList<TransitStopFacility> tempStopsToBeServed = new ArrayList<TransitStopFacility>();
+		ArrayList<TransitStopFacility> tempStopsToBeServed = new ArrayList<>();
 		for (TransitStopFacility transitStopFacility : stopsToBeServed) {
 			tempStopsToBeServed.add(transitStopFacility);
 		}
@@ -142,7 +130,7 @@ public final class ComplexCircleScheduleProvider implements PRouteProvider {
 		Id<Link> startLinkId = null;
 		Id<Link> lastLinkId = null;
 		
-		List<Link> links = new LinkedList<Link>();				
+		List<Link> links = new LinkedList<>();
 		
 		// for each stop
 		for (TransitStopFacility stop : tempStopsToBeServed) {
@@ -167,7 +155,7 @@ public final class ComplexCircleScheduleProvider implements PRouteProvider {
 		route.setLinkIds(startLinkId, NetworkUtils.getLinkIds(links), lastLinkId);
 
 		// get stops at Route
-		List<TransitRouteStop> stops = new LinkedList<TransitRouteStop>();
+		List<TransitRouteStop> stops = new LinkedList<>();
 		double runningTime = 0.0;
 		
 		// first stop

@@ -19,20 +19,8 @@
 
 package playground.andreas.P2.stats;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -44,9 +32,16 @@ import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
-
+import playground.andreas.P2.PConfigGroup;
 import playground.andreas.P2.genericUtils.GridNode;
-import playground.andreas.P2.helper.PConfigGroup;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Accumulates the number of activities right before and after a paratransit trip. Ignores pt interactions.
@@ -56,22 +51,21 @@ import playground.andreas.P2.helper.PConfigGroup;
  * @author aneumann
  *
  */
-public final class ActivityLocationsParatransitUser implements IterationEndsListener {
+final class ActivityLocationsParatransitUser implements IterationEndsListener {
 	private final static Logger log = Logger.getLogger(ActivityLocationsParatransitUser.class);
-	private final String outNameIdentifier = "actsFromParatransitUsers.txt";
-	
-	private final String pIdentifier;
+
+    private final String pIdentifier;
 	private final double gridSize;
 	private boolean firstIteration = true;
 	
-	private Set<String> actTypes = new TreeSet<String>();
-	private HashMap<String, GridNode> gridNodeId2GridNode = new HashMap<String, GridNode>();
+	private Set<String> actTypes = new TreeSet<>();
+	private HashMap<String, GridNode> gridNodeId2GridNode = new HashMap<>();
 
 	public ActivityLocationsParatransitUser(PConfigGroup pConfig) {
 		this(pConfig.getPIdentifier(), pConfig.getGridSize());
 	}
 	
-	public ActivityLocationsParatransitUser(String pIdentifier, double gridSize) {
+	private ActivityLocationsParatransitUser(String pIdentifier, double gridSize) {
 		log.info("enabled");
 		this.pIdentifier = pIdentifier;
 		this.gridSize = gridSize;
@@ -81,21 +75,22 @@ public final class ActivityLocationsParatransitUser implements IterationEndsList
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		
 		parsePopulation(event.getControler().getPopulation());
-		
-		if (this.firstIteration) {
+
+        String outNameIdentifier = "actsFromParatransitUsers.txt";
+        if (this.firstIteration) {
 			// write it to main output
-			writeResults(event.getControler().getControlerIO().getOutputFilename("0." + this.outNameIdentifier));
+			writeResults(event.getControler().getControlerIO().getOutputFilename("0." + outNameIdentifier));
 			this.firstIteration = false;
 		} else {
 			// write it somewhere
-			writeResults(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), this.outNameIdentifier));
+			writeResults(event.getControler().getControlerIO().getIterationFilename(event.getIteration(), outNameIdentifier));
 		}
 	}
 
 	private void parsePopulation(Population population) {
 
-		this.gridNodeId2GridNode = new HashMap<String, GridNode>();
-		this.actTypes = new TreeSet<String>();
+		this.gridNodeId2GridNode = new HashMap<>();
+		this.actTypes = new TreeSet<>();
 		
 		for (Person person : population.getPersons().values()) {
 			Activity lastAct = null;

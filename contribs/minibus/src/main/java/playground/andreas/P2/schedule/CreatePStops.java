@@ -19,17 +19,7 @@
 
 package playground.andreas.P2.schedule;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
+import com.vividsolutions.jts.geom.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -43,15 +33,12 @@ import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.opengis.feature.simple.SimpleFeature;
+import playground.andreas.P2.PConfigGroup;
 
-import playground.andreas.P2.helper.PConfigGroup;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * Create one TransitStopFacility for each car mode link of the network
@@ -69,9 +56,9 @@ public final class CreatePStops{
 
 	private Geometry include;
 	private Geometry exclude;
-	private GeometryFactory factory;
+	private final GeometryFactory factory;
 
-	private LinkedHashMap<Id<Link>, TransitStopFacility> linkId2StopFacilityMap;
+	private final LinkedHashMap<Id<Link>, TransitStopFacility> linkId2StopFacilityMap;
 
 	private List<Integer> topoTypesForStops = null;
 
@@ -102,7 +89,7 @@ public final class CreatePStops{
 	 * @param pConfigGroup
 	 * @param realTransitSchedule
 	 */
-	public CreatePStops(Network net, PConfigGroup pConfigGroup, TransitSchedule realTransitSchedule) {
+    private CreatePStops(Network net, PConfigGroup pConfigGroup, TransitSchedule realTransitSchedule) {
 		this.net = net;
 		this.pConfigGroup = pConfigGroup;
 		this.factory = new GeometryFactory();
@@ -179,7 +166,7 @@ public final class CreatePStops{
 	 */
 	private void createServiceAreaTxt(String serviceAreaFile) {
 		
-		List<String> lines = new ArrayList<String>(); 
+		List<String> lines = new ArrayList<>();
 		String line;
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader(serviceAreaFile);
@@ -193,8 +180,6 @@ public final class CreatePStops{
 				}
 			}while(!(line == null));
 			reader.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -223,8 +208,8 @@ public final class CreatePStops{
 	 */
 	private void createServiceAreaShp(String serviceAreaFile) {
 		Collection<SimpleFeature> features = new ShapeFileReader().readFileAndInitialize(serviceAreaFile);
-		Collection<Geometry> include = new ArrayList<Geometry>();
-		Collection<Geometry> exclude = new ArrayList<Geometry>();
+		Collection<Geometry> include = new ArrayList<>();
+		Collection<Geometry> exclude = new ArrayList<>();
 		
 		for(SimpleFeature f: features){
 			boolean incl = true;

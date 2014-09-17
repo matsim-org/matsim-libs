@@ -19,14 +19,6 @@
 
 package playground.andreas.P2.routeProvider;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map.Entry;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -36,10 +28,17 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
+import playground.andreas.P2.PConfigGroup;
+import playground.andreas.P2.PConstants;
 import playground.andreas.P2.genericUtils.GridNode;
-import playground.andreas.P2.helper.PConfigGroup;
-import playground.andreas.P2.helper.PConstants;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map.Entry;
 
 /**
  * Provides random draws of transit stops facilities. The draw is weighted by the number of activities within the stops proximity.
@@ -47,7 +46,7 @@ import playground.andreas.P2.helper.PConstants;
  * @author aneumann
  *
  */
-public final class RandomStopProvider {
+final class RandomStopProvider {
 	
 	private final static Logger log = Logger.getLogger(RandomStopProvider.class);
 	
@@ -56,8 +55,8 @@ public final class RandomStopProvider {
 	private double totalWeight = 0.0;
 	private int lastIteration;
 
-	private Population population;
-	private TransitSchedule pStopsOnly;
+	private final Population population;
+	private final TransitSchedule pStopsOnly;
 
 	private String outputDir;
 
@@ -72,12 +71,12 @@ public final class RandomStopProvider {
 	}
 	
 	private void updateWeights(){
-		this.stops2Weight = new LinkedHashMap<TransitStopFacility, Double>();
+		this.stops2Weight = new LinkedHashMap<>();
 		this.totalWeight = 0.0;
 		double numberOfActsInPlans = 0;
 		
 		// count acts for all grid nodes
-		LinkedHashMap<String, Integer> gridNodeId2ActsCountMap = new LinkedHashMap<String, Integer>();
+		LinkedHashMap<String, Integer> gridNodeId2ActsCountMap = new LinkedHashMap<>();
 		for (Person person : this.population.getPersons().values()) {
 			for (PlanElement pE : person.getSelectedPlan().getPlanElements()) {
 				if (pE instanceof Activity) {
@@ -85,15 +84,15 @@ public final class RandomStopProvider {
 					numberOfActsInPlans++;
 					String gridNodeId = GridNode.getGridNodeIdForCoord(act.getCoord(), this.gridSize);
 					if (gridNodeId2ActsCountMap.get(gridNodeId) == null) {
-						gridNodeId2ActsCountMap.put(gridNodeId, new Integer(0));
+						gridNodeId2ActsCountMap.put(gridNodeId, 0);
 					}
-					gridNodeId2ActsCountMap.put(gridNodeId, new Integer(gridNodeId2ActsCountMap.get(gridNodeId) + 1));
+					gridNodeId2ActsCountMap.put(gridNodeId, gridNodeId2ActsCountMap.get(gridNodeId) + 1);
 				}
 			}
 		}
 		
 		// sort facilities for all grid nodes
-		LinkedHashMap<String, List<TransitStopFacility>> gridNodeId2StopsMap = new LinkedHashMap<String, List<TransitStopFacility>>();
+		LinkedHashMap<String, List<TransitStopFacility>> gridNodeId2StopsMap = new LinkedHashMap<>();
 		for (TransitStopFacility stop : this.pStopsOnly.getFacilities().values()) {
 			String gridNodeId = GridNode.getGridNodeIdForCoord(stop.getCoord(), this.gridSize);
 			if (gridNodeId2StopsMap.get(gridNodeId) == null) {
@@ -117,7 +116,7 @@ public final class RandomStopProvider {
 			// divide count by the number of associated stops, thus neglecting a higher probability for stops located in a dense network area
 			actsCountForThisGridNodeId = actsCountForThisGridNodeId / stopsEntry.getValue().size();
 			for (TransitStopFacility stop : stopsEntry.getValue()) {
-				this.stops2Weight.put(stop, new Double(actsCountForThisGridNodeId));
+				this.stops2Weight.put(stop, actsCountForThisGridNodeId);
 				this.totalWeight += actsCountForThisGridNodeId;
 			}
 		}
@@ -152,7 +151,7 @@ public final class RandomStopProvider {
 		double rnd = MatsimRandom.getRandom().nextDouble() * this.totalWeight;
 		double accumulatedWeight = 0.0;
 		for (Entry<TransitStopFacility, Double> stop2WeightEntry : this.stops2Weight.entrySet()) {
-			accumulatedWeight += stop2WeightEntry.getValue().doubleValue();
+			accumulatedWeight += stop2WeightEntry.getValue();
 			if (accumulatedWeight >= rnd) {
 				return stop2WeightEntry.getKey();
 			}

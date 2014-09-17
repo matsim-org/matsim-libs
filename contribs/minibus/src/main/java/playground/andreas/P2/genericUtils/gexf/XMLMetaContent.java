@@ -8,17 +8,11 @@
 
 package playground.andreas.P2.genericUtils.gexf;
 
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.annotation.*;
+import javax.xml.datatype.XMLGregorianCalendar;
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElementRef;
-import javax.xml.bind.annotation.XmlElementRefs;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.datatype.XMLGregorianCalendar;
 
 
 /**
@@ -54,10 +48,10 @@ public class XMLMetaContent {
         @XmlElementRef(name = "description", namespace = "http://www.gexf.net/1.2draft", type = JAXBElement.class),
         @XmlElementRef(name = "creator", namespace = "http://www.gexf.net/1.2draft", type = JAXBElement.class)
     })
-    protected List<JAXBElement<String>> creatorOrKeywordsOrDescription;
+    private List<JAXBElement<String>> creatorOrKeywordsOrDescription;
     @XmlAttribute
     @XmlSchemaType(name = "date")
-    protected XMLGregorianCalendar lastmodifieddate;
+    private XMLGregorianCalendar lastmodifieddate;
 
     /**
      * Gets the value of the creatorOrKeywordsOrDescription property.
@@ -85,7 +79,7 @@ public class XMLMetaContent {
      */
     public List<JAXBElement<String>> getCreatorOrKeywordsOrDescription() {
         if (creatorOrKeywordsOrDescription == null) {
-            creatorOrKeywordsOrDescription = new ArrayList<JAXBElement<String>>();
+            creatorOrKeywordsOrDescription = new ArrayList<>();
         }
         return this.creatorOrKeywordsOrDescription;
     }

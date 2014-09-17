@@ -19,17 +19,14 @@
 
 package playground.andreas.P2.scoring;
 
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.vehicles.Vehicle;
+import playground.andreas.P2.fare.StageContainer;
+import playground.andreas.P2.fare.StageContainerHandler;
+import playground.andreas.P2.fare.TicketMachine;
 
-import playground.andreas.P2.scoring.fare.StageContainer;
-import playground.andreas.P2.scoring.fare.StageContainerHandler;
-import playground.andreas.P2.scoring.fare.TicketMachine;
-import playground.andreas.P2.scoring.operator.OperatorCostContainer;
-import playground.andreas.P2.scoring.operator.OperatorCostContainerHandler;
+import java.util.TreeMap;
 
 /**
  * Scores paratransit vehicles
@@ -43,7 +40,7 @@ public final class ScorePlansHandler implements StageContainerHandler, OperatorC
 	private final static Logger log = Logger.getLogger(ScorePlansHandler.class);
 	
 	private final TicketMachine ticketMachine;
-	TreeMap<Id<Vehicle>, ScoreContainer> vehicleId2ScoreMap = new TreeMap<>();
+	private TreeMap<Id<Vehicle>, ScoreContainer> vehicleId2ScoreMap = new TreeMap<>();
 
 	public ScorePlansHandler(TicketMachine ticketMachine){
 		this.ticketMachine = ticketMachine;
@@ -62,7 +59,7 @@ public final class ScorePlansHandler implements StageContainerHandler, OperatorC
 		this.vehicleId2ScoreMap.get(fareContainer.getVehicleId()).handleStageContainer(fareContainer);
 	}
 
-	@Override
+    @Override
 	public void handleOperatorCostContainer(OperatorCostContainer operatorCostContainer) {
 		if (this.vehicleId2ScoreMap.get(operatorCostContainer.getVehicleId()) == null) {
 			this.vehicleId2ScoreMap.put(operatorCostContainer.getVehicleId(), new ScoreContainer(operatorCostContainer.getVehicleId(), this.ticketMachine));
@@ -72,7 +69,7 @@ public final class ScorePlansHandler implements StageContainerHandler, OperatorC
 	}
 
 	@Override
-	public void reset(int iteration) {
+	public void reset() {
 		this.vehicleId2ScoreMap = new TreeMap<>();
 	}
 }

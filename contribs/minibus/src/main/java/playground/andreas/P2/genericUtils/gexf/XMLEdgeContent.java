@@ -8,20 +8,15 @@
 
 package playground.andreas.P2.genericUtils.gexf;
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import playground.andreas.P2.genericUtils.gexf.viz.ColorContent;
 import playground.andreas.P2.genericUtils.gexf.viz.EdgeShapeContent;
 import playground.andreas.P2.genericUtils.gexf.viz.ThicknessContent;
+
+import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -72,29 +67,29 @@ public class XMLEdgeContent {
         @XmlElement(name = "spells", type = XMLSpellsContent.class),
         @XmlElement(name = "thickness", type = ThicknessContent.class)
     })
-    protected List<Object> attvaluesOrSpellsOrColor;
+    private List<Object> attvaluesOrSpellsOrColor;
     @XmlAttribute
-    protected String start;
+    private String start;
     @XmlAttribute
-    protected String startopen;
+    private String startopen;
     @XmlAttribute
-    protected String end;
+    private String end;
     @XmlAttribute
-    protected String endopen;
+    private String endopen;
     @XmlAttribute(required = true)
-    protected String id;
+    private String id;
     @XmlAttribute
-    protected XMLEdgetypeType type;
+    private XMLEdgetypeType type;
     @XmlAttribute
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlSchemaType(name = "token")
-    protected String label;
+    private String label;
     @XmlAttribute(required = true)
-    protected String source;
+    private String source;
     @XmlAttribute(required = true)
-    protected String target;
+    private String target;
     @XmlAttribute
-    protected Float weight;
+    private Float weight;
 
     /**
      * Gets the value of the attvaluesOrSpellsOrColor property.
@@ -124,7 +119,7 @@ public class XMLEdgeContent {
      */
     public List<Object> getAttvaluesOrSpellsOrColor() {
         if (attvaluesOrSpellsOrColor == null) {
-            attvaluesOrSpellsOrColor = new ArrayList<Object>();
+            attvaluesOrSpellsOrColor = new ArrayList<>();
         }
         return this.attvaluesOrSpellsOrColor;
     }

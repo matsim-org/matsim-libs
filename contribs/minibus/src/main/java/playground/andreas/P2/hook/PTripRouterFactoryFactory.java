@@ -19,14 +19,14 @@
 
 package playground.andreas.P2.hook;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryInternal;
 import org.matsim.pt.router.TransitRouterFactory;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Decide which {@link TripRouterFactoryInternal} to use.
@@ -68,17 +68,11 @@ class PTripRouterFactoryFactory {
 					}
 				}
 				log.info("Loaded TripRouterFactory " + tripRouterFactory.getSimpleName() + "...");
-			} catch (InstantiationException e) {
-				throw new RuntimeException(e);
-			} catch (IllegalAccessException e) {
-				throw new RuntimeException(e);
-			} catch (NoSuchMethodException e) {
-				throw new RuntimeException(e);
-			} catch (InvocationTargetException e) {
+			} catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
 				throw new RuntimeException(e);
 			}
 
-			return factory;
+            return factory;
 		}
 	}
 

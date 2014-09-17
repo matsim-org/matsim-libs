@@ -21,6 +21,7 @@ package playground.andreas.P2.hook;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ScoringEvent;
@@ -41,8 +42,7 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
-import playground.andreas.P2.helper.PConfigGroup;
-import playground.andreas.P2.pbox.PBox;
+import playground.andreas.P2.PConfigGroup;
 import playground.andreas.P2.stats.StatsManager;
 import playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter.PtMode2LineSetter;
 
@@ -54,78 +54,78 @@ import java.util.Set;
  * 
  * @author aneumann
  */
-public final class PHook implements IterationStartsListener, StartupListener, ScoringListener{
+public final class PHook implements IterationStartsListener, StartupListener, ScoringListener {
 	
 	private final static Logger log = Logger.getLogger(PHook.class);
 
-	private PTransitRouterFactory pTransitRouterFactory = null;
-	private PVehiclesFactory pVehiclesFactory = null;
+	private final PTransitRouterFactory pTransitRouterFactory;
+	private final PVehiclesFactory pVehiclesFactory;
 	
-	private AgentsStuckHandlerImpl agentsStuckHandler;
-	private PBox pBox;
+	private final AgentsStuckHandlerImpl agentsStuckHandler;
+	private final PBox pBox;
 
-	private StatsManager statsManager;
+    private final PersonReRouteStuckFactory stuckFactory;
 
-	private PersonReRouteStuckFactory stuckFactory;
+    public static class Builder {
+        private PtMode2LineSetter lineSetter = null ;
+        private PTransitRouterFactory pTransitRouterFactory = null ;
+        private PersonReRouteStuckFactory stuckFactory = null ;
+        private Class<? extends TripRouterFactory> tripRouterFactory = null ;
+        private final Controler controler ;
+        public Builder( Controler controler ) {
+            this.controler = controler ;
+        }
+        public void setLineSetter(PtMode2LineSetter lineSetter) {
+            this.lineSetter = lineSetter;
+        }
+        public void setPTransitRouterFactory(PTransitRouterFactory pTransitRouterFactory) {
+            this.pTransitRouterFactory = pTransitRouterFactory;
+        }
+        public void setStuckFactory(PersonReRouteStuckFactory stuckFactory) {
+            this.stuckFactory = stuckFactory;
+        }
+        public void setTripRouterFactory(Class<? extends TripRouterFactory> tripRouterFactory) {
+            this.tripRouterFactory = tripRouterFactory;
+        }
+        public PHook build() {
+            return new PHook( controler, lineSetter, pTransitRouterFactory, stuckFactory, tripRouterFactory ) ;
+        }
+    }
 	
-	public static class Builder {
-		private PtMode2LineSetter lineSetter = null ;
-		private PTransitRouterFactory pTransitRouterFactory = null ;
-		private PersonReRouteStuckFactory stuckFactory = null ;
-		private Class<? extends TripRouterFactory> tripRouterFactory = null ; 
-		private final Controler controler ;
-		public Builder( Controler controler ) {
-			this.controler = controler ;
-		}
-		public void setLineSetter(PtMode2LineSetter lineSetter) {
-			this.lineSetter = lineSetter;
-		}
-		public void setPTransitRouterFactory(PTransitRouterFactory pTransitRouterFactory) {
-			this.pTransitRouterFactory = pTransitRouterFactory;
-		}
-		public void setStuckFactory(PersonReRouteStuckFactory stuckFactory) {
-			this.stuckFactory = stuckFactory;
-		}
-		public void setTripRouterFactory(Class<? extends TripRouterFactory> tripRouterFactory) {
-			this.tripRouterFactory = tripRouterFactory;
-		}
-		public PHook build() {
-			return new PHook( controler, lineSetter, pTransitRouterFactory, stuckFactory, tripRouterFactory ) ;
-		}
-	}
+	private PHook(Controler controler, PtMode2LineSetter lineSetter, PTransitRouterFactory pTransitRouterFactory, PersonReRouteStuckFactory stuckFactory, Class<? extends TripRouterFactory> tripRouterFactory){
+		PConfigGroup pConfig = ConfigUtils.addOrGetModule(controler.getConfig(), PConfigGroup.GROUP_NAME, PConfigGroup.class);
 
-    /**
-     * Deliberately private.  Please use the builder
-     */
-	private PHook(Controler controler, PtMode2LineSetter lineSetter, PTransitRouterFactory pTransitRouterFactory, 
-			PersonReRouteStuckFactory stuckFactory, Class<? extends TripRouterFactory> tripRouterFactory){
-		PConfigGroup pConfig = (PConfigGroup) controler.getConfig().getModule(PConfigGroup.GROUP_NAME);
-		this.pBox = new PBox(pConfig);
-		this.pTransitRouterFactory = pTransitRouterFactory;
-		if (this.pTransitRouterFactory == null) {
-			this.pTransitRouterFactory = new PTransitRouterFactory(pConfig.getPtEnabler());
-		}
-		// When setting a TransitRouterFactory and also a TripRouterFactory in the controler a RuntimeException is thrown.
-//		controler.setTransitRouterFactory(this.pTransitRouterFactory);
-		controler.setMobsimFactory(new PQSimFactory());
+        this.pBox = new PBox(pConfig);
+
+        if (pTransitRouterFactory != null) {
+            this.pTransitRouterFactory = pTransitRouterFactory;
+        } else {
+            this.pTransitRouterFactory = new PTransitRouterFactory(pConfig.getPtEnabler());
+        }
+        controler.setTripRouterFactory(PTripRouterFactoryFactory.getTripRouterFactoryInstance(controler, tripRouterFactory, this.pTransitRouterFactory));
+
+        controler.setMobsimFactory(new PQSimFactory());
+
 		this.pVehiclesFactory = new PVehiclesFactory(pConfig);
 
-		if(pConfig.getReRouteAgentsStuck()){
+		if (pConfig.getReRouteAgentsStuck()) {
 			this.agentsStuckHandler = new AgentsStuckHandlerImpl();
-			if(stuckFactory == null){
-				this.stuckFactory = new PersonReRouteStuckFactoryImpl();
-			}else{
-				this.stuckFactory = stuckFactory;
+			if(stuckFactory != null) {
+                this.stuckFactory = stuckFactory;
+			} else {
+                this.stuckFactory = new PersonReRouteStuckFactoryImpl();
 			}
-		}
-		
-		controler.setTripRouterFactory(PTripRouterFactoryFactory.getTripRouterFactoryInstance(controler, tripRouterFactory, this.pTransitRouterFactory));
-		this.statsManager = new StatsManager(controler, pConfig, this.pBox, lineSetter); 
+		} else {
+            this.stuckFactory = null;
+            this.agentsStuckHandler = null;
+        }
+
+        StatsManager statsManager = new StatsManager(controler, pConfig, this.pBox, lineSetter);
+        controler.addControlerListener(statsManager);
 	}
 	
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		this.statsManager.notifyStartup(event);
 		this.pBox.notifyStartup(event);
         addPTransitScheduleToOriginalOne(event.getControler().getScenario().getTransitSchedule(), this.pBox.getpTransitSchedule());
 		addPVehiclesToOriginalOnes(event.getControler().getScenario().getVehicles(), this.pVehiclesFactory.createVehicles(this.pBox.getpTransitSchedule()));
@@ -169,11 +169,11 @@ public final class PHook implements IterationStartsListener, StartupListener, Sc
 
     @Override
 	public void notifyScoring(ScoringEvent event) {
-		this.pBox.notifyScoring(event);	
+		this.pBox.notifyScoring(event);
 	}
 
-    private Set<Id<TransitStopFacility>> currentPFacilityIDs = new HashSet<>();
-    private Set<Id<TransitLine>> currentPTransitLineIDs = new HashSet<>();
+    private final Set<Id<TransitStopFacility>> currentPFacilityIDs = new HashSet<>();
+    private final Set<Id<TransitLine>> currentPTransitLineIDs = new HashSet<>();
 
 	private void addPTransitScheduleToOriginalOne(TransitSchedule baseSchedule, TransitSchedule pSchedule) {
 		if(pSchedule == null){
@@ -205,8 +205,8 @@ public final class PHook implements IterationStartsListener, StartupListener, Sc
         currentPFacilityIDs.clear();
     }
 
-    private Set<Id<VehicleType>> currentPVehicleTypeIDs = new HashSet<>();
-    private Set<Id<Vehicle>> currentPVehicleIDs = new HashSet<>();
+    private final Set<Id<VehicleType>> currentPVehicleTypeIDs = new HashSet<>();
+    private final Set<Id<Vehicle>> currentPVehicleIDs = new HashSet<>();
 
 	private void addPVehiclesToOriginalOnes(Vehicles baseVehicles, Vehicles pVehicles){
 		for (VehicleType t : pVehicles.getVehicleTypes().values()) {

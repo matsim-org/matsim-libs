@@ -19,19 +19,6 @@
 
 package playground.andreas.P2.stats.gexfPStats;
 
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -45,27 +32,21 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
-
-import playground.andreas.P2.genericUtils.gexf.ObjectFactory;
-import playground.andreas.P2.genericUtils.gexf.XMLAttributeContent;
-import playground.andreas.P2.genericUtils.gexf.XMLAttributesContent;
-import playground.andreas.P2.genericUtils.gexf.XMLAttrtypeType;
-import playground.andreas.P2.genericUtils.gexf.XMLAttvalue;
-import playground.andreas.P2.genericUtils.gexf.XMLAttvaluesContent;
-import playground.andreas.P2.genericUtils.gexf.XMLClassType;
-import playground.andreas.P2.genericUtils.gexf.XMLDefaultedgetypeType;
-import playground.andreas.P2.genericUtils.gexf.XMLEdgeContent;
-import playground.andreas.P2.genericUtils.gexf.XMLEdgesContent;
-import playground.andreas.P2.genericUtils.gexf.XMLGexfContent;
-import playground.andreas.P2.genericUtils.gexf.XMLGraphContent;
-import playground.andreas.P2.genericUtils.gexf.XMLIdtypeType;
-import playground.andreas.P2.genericUtils.gexf.XMLModeType;
-import playground.andreas.P2.genericUtils.gexf.XMLNodeContent;
-import playground.andreas.P2.genericUtils.gexf.XMLNodesContent;
-import playground.andreas.P2.genericUtils.gexf.XMLTimeformatType;
+import playground.andreas.P2.PConfigGroup;
+import playground.andreas.P2.genericUtils.gexf.*;
 import playground.andreas.P2.genericUtils.gexf.viz.PositionContent;
-import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.operator.Operator;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Uses a {@link CountPPaxHandler} to count passengers per paratransit vehicle and link, {@link CountPOperatorHandler} to count cooperatives and their ids and writes them to a gexf network as dynamic link attributes.
@@ -87,9 +68,9 @@ public final class GexfPStat extends MatsimJaxbXmlWriter implements StartupListe
 	private CountPPaxHandler globalPaxHandler;
 	private CountPOperatorHandler operatorHandler;
 	private CountPVehHandler vehHandler;
-	private String pIdentifier;
-	private int getWriteGexfStatsInterval;
-	private boolean writeOperatorInDetail;
+	private final String pIdentifier;
+	private final int getWriteGexfStatsInterval;
+	private final boolean writeOperatorInDetail;
 
 	private HashMap<Id<Link>, XMLEdgeContent> edgeMap;
 	private HashMap<Id<Link>, XMLAttvaluesContent> linkAttributeValueContentMap;
@@ -108,7 +89,7 @@ public final class GexfPStat extends MatsimJaxbXmlWriter implements StartupListe
 		this.getWriteGexfStatsInterval = pConfig.getGexfInterval();
 		this.writeOperatorInDetail = writeOperatorInDetail;
 		this.pIdentifier = pConfig.getPIdentifier();
-		this.lastLineIds = new TreeSet<String>();
+		this.lastLineIds = new TreeSet<>();
 		
 		if (this.getWriteGexfStatsInterval > 0) {
 			log.info("enabled");
@@ -216,7 +197,7 @@ public final class GexfPStat extends MatsimJaxbXmlWriter implements StartupListe
 			
 			if (this.linkId2TotalCountsFromLastIteration.get(linkEntry.getKey()) != null){
 				// There is already an entry
-				if (this.linkId2TotalCountsFromLastIteration.get(linkEntry.getKey()).intValue() == countForLink) {
+				if (this.linkId2TotalCountsFromLastIteration.get(linkEntry.getKey()) == countForLink) {
 					// same as last iteration - ignore
 					continue;
 				}
@@ -280,7 +261,7 @@ public final class GexfPStat extends MatsimJaxbXmlWriter implements StartupListe
 			
 			if (this.linkId2VehCountsFromLastIteration.get(linkEntry.getKey()) != null){
 				// There is already an entry
-				if (this.linkId2VehCountsFromLastIteration.get(linkEntry.getKey()).intValue() == countForLink) {
+				if (this.linkId2VehCountsFromLastIteration.get(linkEntry.getKey()) == countForLink) {
 					// same as last iteration - ignore
 					continue;
 				}
@@ -307,7 +288,7 @@ public final class GexfPStat extends MatsimJaxbXmlWriter implements StartupListe
 						if (this.linkId2LineId2CountsFromLastIteration.get(linkEntry.getKey()) != null){
 							if (this.linkId2LineId2CountsFromLastIteration.get(linkEntry.getKey()).get(lineId) != null){
 								// There is already an entry
-								if (this.linkId2LineId2CountsFromLastIteration.get(linkEntry.getKey()).get(lineId).intValue() == 0) {
+								if (this.linkId2LineId2CountsFromLastIteration.get(linkEntry.getKey()).get(lineId) == 0) {
 									// was already zero - ignore
 									continue;
 								}
@@ -344,7 +325,7 @@ public final class GexfPStat extends MatsimJaxbXmlWriter implements StartupListe
 					if (this.linkId2LineId2CountsFromLastIteration.get(linkEntry.getKey()) != null){
 						if (this.linkId2LineId2CountsFromLastIteration.get(linkEntry.getKey()).get(lineId) != null){
 							// There is already an entry
-							if (this.linkId2LineId2CountsFromLastIteration.get(linkEntry.getKey()).get(lineId).intValue() == countForLinkAndLineId) {
+							if (this.linkId2LineId2CountsFromLastIteration.get(linkEntry.getKey()).get(lineId) == countForLinkAndLineId) {
 								// same as last iteration - ignore
 								continue;
 							}
@@ -379,8 +360,6 @@ public final class GexfPStat extends MatsimJaxbXmlWriter implements StartupListe
 			bufout.close();
 //			log.info("Output written to " + filename);
 		} catch (JAXBException e) {
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();

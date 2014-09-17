@@ -24,9 +24,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-
-import playground.andreas.P2.helper.PConfigGroup;
-import playground.andreas.P2.routeProvider.deprecated.SimpleBackAndForthScheduleProvider;
+import playground.andreas.P2.PConfigGroup;
 
 /**
  * 
@@ -43,13 +41,13 @@ public final class PRouteProviderFactory {
 		RandomStopProvider randomStopProvider = new RandomStopProvider(pConfig, population, pStopsOnly, outputDir);
 
 		if(pConfig.getRouteProvider().equalsIgnoreCase(SimpleBackAndForthScheduleProvider.NAME)){
-			return new SimpleBackAndForthScheduleProvider(pConfig.getPIdentifier(), pStopsOnly, network, randomStopProvider, 0, pConfig.getVehicleMaximumVelocity(), pConfig.getMode());
+			return new SimpleBackAndForthScheduleProvider(pConfig.getPIdentifier(), pStopsOnly, network, randomStopProvider, pConfig.getVehicleMaximumVelocity(), pConfig.getMode());
 		} else if(pConfig.getRouteProvider().equalsIgnoreCase(SimpleCircleScheduleProvider.NAME)){
-			return new SimpleCircleScheduleProvider(pConfig.getPIdentifier(), pStopsOnly, network, randomStopProvider, 0, pConfig.getVehicleMaximumVelocity(), pConfig.getMode());
+			return new SimpleCircleScheduleProvider(pConfig.getPIdentifier(), pStopsOnly, network, randomStopProvider, pConfig.getVehicleMaximumVelocity(), pConfig.getMode());
 		} else if(pConfig.getRouteProvider().equalsIgnoreCase(ComplexCircleScheduleProvider.NAME)){
-			return new ComplexCircleScheduleProvider(pStopsOnly, network, randomStopProvider, 0, pConfig.getVehicleMaximumVelocity(), pConfig.getPlanningSpeedFactor(), pConfig.getMode());
+			return new ComplexCircleScheduleProvider(pStopsOnly, network, randomStopProvider, pConfig.getVehicleMaximumVelocity(), pConfig.getPlanningSpeedFactor(), pConfig.getMode());
 		} else if(pConfig.getRouteProvider().equalsIgnoreCase(TimeAwareComplexCircleScheduleProvider.NAME)){
-			return new TimeAwareComplexCircleScheduleProvider(pStopsOnly, network, randomStopProvider, 0, pConfig.getVehicleMaximumVelocity(), pConfig.getPlanningSpeedFactor(), pConfig.getPIdentifier(), eventsManager, pConfig.getMode());
+			return new TimeAwareComplexCircleScheduleProvider(pStopsOnly, network, randomStopProvider, pConfig.getVehicleMaximumVelocity(), pConfig.getPlanningSpeedFactor(), pConfig.getPIdentifier(), eventsManager, pConfig.getMode());
 		} else {
 			log.error("There is no route provider specified. " + pConfig.getRouteProvider() + " unknown");
 			return null;

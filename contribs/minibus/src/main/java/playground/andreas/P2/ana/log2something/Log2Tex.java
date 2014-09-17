@@ -1,14 +1,14 @@
 package playground.andreas.P2.ana.log2something;
 
+import org.apache.log4j.Logger;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Time;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Locale;
-
-import org.apache.log4j.Logger;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.Time;
 
 /**
  * Reads a pLogger file and writes it to tex.
@@ -16,7 +16,7 @@ import org.matsim.core.utils.misc.Time;
  * @author aneumann
  *
  */
-public final class Log2Tex {
+final class Log2Tex {
 	
 	private static final Logger log = Logger.getLogger(Log2Tex.class);
 

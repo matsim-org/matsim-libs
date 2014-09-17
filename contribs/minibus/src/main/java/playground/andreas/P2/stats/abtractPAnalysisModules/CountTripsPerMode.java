@@ -19,8 +19,6 @@
 
 package playground.andreas.P2.stats.abtractPAnalysisModules;
 
-import java.util.HashMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -28,6 +26,8 @@ import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.HashMap;
 
 
 /**
@@ -61,7 +61,7 @@ public final class CountTripsPerMode extends AbstractPAnalyisModule implements T
 	public void reset(int iteration) {
 		super.reset(iteration);
 		this.vehId2ptModeMap = new HashMap<>();
-		this.ptMode2CountMap = new HashMap<String, Integer>();
+		this.ptMode2CountMap = new HashMap<>();
 	}
 
 	@Override
@@ -72,10 +72,10 @@ public final class CountTripsPerMode extends AbstractPAnalyisModule implements T
 				ptMode = "nonPtMode";
 			}
 			if (ptMode2CountMap.get(ptMode) == null) {
-				ptMode2CountMap.put(ptMode, new Integer(0));
+				ptMode2CountMap.put(ptMode, 0);
 			}
 
-			ptMode2CountMap.put(ptMode, new Integer(ptMode2CountMap.get(ptMode) + 1));
+			ptMode2CountMap.put(ptMode, ptMode2CountMap.get(ptMode) + 1);
 		}
 	}
 

@@ -18,7 +18,7 @@
             <manifest>
               <addClasspath>true</addClasspath>
               <classpathPrefix>libs/</classpathPrefix>
-              <mainClass>playground.andreas.P2.PControler</mainClass>
+              <mainClass>playground.andreas.P2.PMain</mainClass>
             </manifest>
           </archive>
         </configuration>

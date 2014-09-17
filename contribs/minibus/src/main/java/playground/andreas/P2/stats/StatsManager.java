@@ -19,20 +19,19 @@
 
 package playground.andreas.P2.stats;
 
-import java.io.File;
-
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-
-import playground.andreas.P2.helper.PConfigGroup;
-import playground.andreas.P2.helper.PConstants;
-import playground.andreas.P2.pbox.PBox;
+import playground.andreas.P2.PConfigGroup;
+import playground.andreas.P2.PConstants;
+import playground.andreas.P2.hook.PBox;
 import playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter.PtMode2LineSetter;
 import playground.andreas.P2.stats.gexfPStats.GexfPStat;
 import playground.andreas.P2.stats.gexfPStats.GexfPStatLight;
 import playground.andreas.P2.stats.gexfPStats.Line2GexfPStat;
 import playground.andreas.P2.stats.pStatsOverview.PStatsOverview;
+
+import java.io.File;
 
 /**
  * 
@@ -41,19 +40,15 @@ import playground.andreas.P2.stats.pStatsOverview.PStatsOverview;
  * @author aneumann
  *
  */
-public final class StatsManager implements StartupListener{
+public final class StatsManager implements StartupListener {
 	
-	public StatsManager(Controler controler, PConfigGroup pConfig, PBox pBox, PtMode2LineSetter lineSetter){
-		// register all modules
+	public StatsManager(Controler controler, PConfigGroup pConfig, PBox pBox, PtMode2LineSetter lineSetter) {
 		controler.addControlerListener(new PStatsOverview(pBox, pConfig));
 		controler.addControlerListener(new POperatorLogger(pBox, pConfig));
 		controler.addControlerListener(new GexfPStat(pConfig, false));
-//		controler.addControlerListener(new GexfPStat(pConfig, true));
 		controler.addControlerListener(new GexfPStatLight(pConfig));
 		controler.addControlerListener(new Line2GexfPStat(pConfig));
-		
 		controler.addControlerListener(new PAnalysisManager(pConfig, lineSetter));
-		
 		controler.addControlerListener(new ActivityLocationsParatransitUser(pConfig));
 	}
 
@@ -62,4 +57,5 @@ public final class StatsManager implements StartupListener{
 		String outFilename = event.getControler().getControlerIO().getOutputPath() + PConstants.statsOutputFolder;
 		new File(outFilename).mkdir();
 	}
+
 }

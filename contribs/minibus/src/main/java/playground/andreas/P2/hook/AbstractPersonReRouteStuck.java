@@ -18,9 +18,6 @@
  * *********************************************************************** */
 package playground.andreas.P2.hook;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -31,7 +28,9 @@ import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.pt.router.TransitActsRemover;
+
+import java.util.HashSet;
+import java.util.Set;
 
 
 /**
@@ -41,22 +40,21 @@ import org.matsim.pt.router.TransitActsRemover;
 abstract class AbstractPersonReRouteStuck extends AbstractPersonAlgorithm  {
 	
 	final PlanAlgorithm router;
-	final Network  network;
 
-	private static final Logger log = Logger.getLogger(PersonReRouteStuck.class);
+    private static final Logger log = Logger.getLogger(PersonReRouteStuck.class);
 	
-	Set<Id> agentsStuck;
+	final Set<Id> agentsStuck;
 
 	AbstractPersonReRouteStuck(final PlanAlgorithm router, final ScenarioImpl scenario, Set<Id> agentsStuck) {
 		super();
 		this.router = router;
-		this.network = scenario.getNetwork();
-		Network net = this.network;
+        Network network = scenario.getNetwork();
+		Network net = network;
 		if (NetworkUtils.isMultimodal(network)) {
 			log.info("Network seems to be multimodal. XY2Links will only use car links.");
 			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
 			net = NetworkImpl.createNetwork();
-			HashSet<String> modes = new HashSet<String>();
+			HashSet<String> modes = new HashSet<>();
 			modes.add(TransportMode.car);
 			filter.filter(net, modes);
 		}

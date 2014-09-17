@@ -19,14 +19,6 @@
 
 package playground.andreas.P2.ana;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -49,8 +41,15 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import playground.andreas.P2.PConfigGroup;
 
-import playground.andreas.P2.helper.PConfigGroup;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Collect some data for iatbr paper. Currently:
@@ -67,7 +66,7 @@ import playground.andreas.P2.helper.PConfigGroup;
  * @author aneumann
  *
  */
-public final class TrbAna implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, LinkEnterEventHandler, VehicleArrivesAtFacilityEventHandler{
+final class TrbAna implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, LinkEnterEventHandler, VehicleArrivesAtFacilityEventHandler{
 
 	private static final Logger log = Logger.getLogger(TrbAna.class);
 	
@@ -82,14 +81,14 @@ public final class TrbAna implements PersonEntersVehicleEventHandler, PersonLeav
 	private final double maxY;
 	
 	private int numberOfTripsServedByPt = 0;
-	private Set<Id> minibusesWithAtLeastOneTrip = new TreeSet<Id>();
+	private Set<Id> minibusesWithAtLeastOneTrip = new TreeSet<>();
 	private double kmTravelledByMinibuses = 0.0;
 	private double passengerKmMinibus = 0.0;
 	private int numberOfPassengersUsingPtAndMinibus;
 
-	private HashMap<Id, Integer> vehId2NumberOfPassengers = new HashMap<Id, Integer>();
-	private HashMap<Id, String> agentId2ModeAlreadyUsed = new HashMap<Id, String>();
-	private HashMap<Id, Id> vehId2StopIdMap = new HashMap<Id, Id>();
+	private HashMap<Id, Integer> vehId2NumberOfPassengers = new HashMap<>();
+	private HashMap<Id, String> agentId2ModeAlreadyUsed = new HashMap<>();
+	private HashMap<Id, Id> vehId2StopIdMap = new HashMap<>();
 
 	private int boardingInServiceAreaPt = 0;
 	private int alightingInServiceAreaPt = 0;
@@ -98,7 +97,7 @@ public final class TrbAna implements PersonEntersVehicleEventHandler, PersonLeav
 
 
 	
-	public TrbAna(String pIdentifier, String ptIdentifier, Network network, TransitSchedule transitSchedule, Config config){
+	private TrbAna(String pIdentifier, String ptIdentifier, Network network, TransitSchedule transitSchedule, Config config){
 		this.pIdentifier = pIdentifier;
 		this.ptIdentifier = ptIdentifier;
 		this.network = network;
@@ -162,13 +161,13 @@ public final class TrbAna implements PersonEntersVehicleEventHandler, PersonLeav
 	@Override
 	public void reset(int iteration) {
 		this.numberOfTripsServedByPt = 0;
-		this.minibusesWithAtLeastOneTrip = new TreeSet<Id>();
+		this.minibusesWithAtLeastOneTrip = new TreeSet<>();
 		this.kmTravelledByMinibuses = 0.0;
 		this.passengerKmMinibus = 0.0;
-		this.vehId2NumberOfPassengers = new HashMap<Id, Integer>();
+		this.vehId2NumberOfPassengers = new HashMap<>();
 		this.numberOfPassengersUsingPtAndMinibus = 0;
-		this.agentId2ModeAlreadyUsed = new HashMap<Id, String>();
-		this.vehId2StopIdMap = new HashMap<Id, Id>();
+		this.agentId2ModeAlreadyUsed = new HashMap<>();
+		this.vehId2StopIdMap = new HashMap<>();
 		
 		this.boardingInServiceAreaPt = 0;
 		this.alightingInServiceAreaPt = 0;
@@ -201,13 +200,13 @@ public final class TrbAna implements PersonEntersVehicleEventHandler, PersonLeav
 		
 		if(event.getVehicleId().toString().contains(this.pIdentifier)){
 			if (this.vehId2NumberOfPassengers.get(event.getVehicleId()) == null) {
-				this.vehId2NumberOfPassengers.put(event.getVehicleId(), new Integer(0));
+				this.vehId2NumberOfPassengers.put(event.getVehicleId(), 0);
 			}
 			
 			if(!event.getPersonId().toString().contains(this.pIdentifier)){
 				this.minibusesWithAtLeastOneTrip.add(event.getVehicleId());
 
-				this.vehId2NumberOfPassengers.put(event.getVehicleId(), new Integer(this.vehId2NumberOfPassengers.get(event.getVehicleId()).intValue() + 1));
+				this.vehId2NumberOfPassengers.put(event.getVehicleId(), this.vehId2NumberOfPassengers.get(event.getVehicleId()) + 1);
 				
 				if (!this.agentId2ModeAlreadyUsed.containsKey(event.getPersonId())) {
 					this.agentId2ModeAlreadyUsed.put(event.getPersonId(), this.pIdentifier);
@@ -230,7 +229,7 @@ public final class TrbAna implements PersonEntersVehicleEventHandler, PersonLeav
 	public void handleEvent(PersonLeavesVehicleEvent event) {
 		if(event.getVehicleId().toString().contains(this.pIdentifier)){
 			if(!event.getPersonId().toString().contains(this.pIdentifier)){
-				this.vehId2NumberOfPassengers.put(event.getVehicleId(), new Integer(this.vehId2NumberOfPassengers.get(event.getVehicleId()).intValue() - 1));
+				this.vehId2NumberOfPassengers.put(event.getVehicleId(), this.vehId2NumberOfPassengers.get(event.getVehicleId()) - 1);
 				if (stopIdInServiceArea(this.vehId2StopIdMap.get(event.getVehicleId()))) {
 					this.alightingInServiceAreaP++;
 				}
@@ -276,7 +275,7 @@ public final class TrbAna implements PersonEntersVehicleEventHandler, PersonLeav
 		if(event.getVehicleId().toString().contains(this.pIdentifier)){
 			double linkLength = this.network.getLinks().get(event.getLinkId()).getLength();
 			this.kmTravelledByMinibuses += linkLength;
-			this.passengerKmMinibus += this.vehId2NumberOfPassengers.get(event.getVehicleId()).intValue() * linkLength;
+			this.passengerKmMinibus += this.vehId2NumberOfPassengers.get(event.getVehicleId()) * linkLength;
 		}		
 	}
 

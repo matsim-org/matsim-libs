@@ -8,11 +8,12 @@
 
 package playground.andreas.P2.genericUtils.gexf.viz;
 
+import playground.andreas.P2.genericUtils.gexf.XMLSpellsContent;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
-import playground.andreas.P2.genericUtils.gexf.XMLSpellsContent;
 
 
 /**
@@ -47,21 +48,21 @@ import playground.andreas.P2.genericUtils.gexf.XMLSpellsContent;
 })
 public class PositionContent {
 
-    protected XMLSpellsContent spells;
+    private XMLSpellsContent spells;
     @XmlAttribute(required = true)
-    protected float x;
+    private float x;
     @XmlAttribute(required = true)
-    protected float y;
+    private float y;
     @XmlAttribute(required = true)
-    protected float z;
+    private float z;
     @XmlAttribute
-    protected String start;
+    private String start;
     @XmlAttribute
-    protected String startopen;
+    private String startopen;
     @XmlAttribute
-    protected String end;
+    private String end;
     @XmlAttribute
-    protected String endopen;
+    private String endopen;
 
     /**
      * Gets the value of the spells property.

@@ -21,8 +21,7 @@ package playground.andreas.P2.schedule;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-
-import playground.andreas.P2.helper.PConfigGroup;
+import playground.andreas.P2.PConfigGroup;
 
 /**
  * Creates the transit stops valid for paratransit. Currently, only a replacement for a configurable version.

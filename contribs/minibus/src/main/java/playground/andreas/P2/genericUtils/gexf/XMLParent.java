@@ -8,11 +8,7 @@
 
 package playground.andreas.P2.genericUtils.gexf;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 
 
 /**
@@ -38,7 +34,7 @@ import javax.xml.bind.annotation.XmlType;
 public class XMLParent {
 
     @XmlAttribute(name = "for", required = true)
-    protected String _for;
+    private String _for;
 
     /**
      * Gets the value of the for property.

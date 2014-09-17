@@ -19,8 +19,6 @@
 
 package playground.andreas.P2.stats.abtractPAnalysisModules;
 
-import java.util.HashMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -29,6 +27,8 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.HashMap;
 
 
 /**
@@ -41,7 +41,7 @@ public final class CountVehicleMeterPerMode extends AbstractPAnalyisModule imple
 	
 	private final static Logger log = Logger.getLogger(CountVehicleMeterPerMode.class);
 	
-	private Network network;
+	private final Network network;
 	private HashMap<Id<Vehicle>, String> vehId2ptModeMap;
 	private HashMap<String, Double> ptMode2CountMap;
 	
@@ -64,7 +64,7 @@ public final class CountVehicleMeterPerMode extends AbstractPAnalyisModule imple
 	public void reset(int iteration) {
 		super.reset(iteration);
 		this.vehId2ptModeMap = new HashMap<>();
-		this.ptMode2CountMap = new HashMap<String, Double>();
+		this.ptMode2CountMap = new HashMap<>();
 	}
 
 	@Override
@@ -85,9 +85,9 @@ public final class CountVehicleMeterPerMode extends AbstractPAnalyisModule imple
 			ptMode = "nonPtMode";
 		}
 		if (ptMode2CountMap.get(ptMode) == null) {
-			ptMode2CountMap.put(ptMode, new Double(0.0));
+			ptMode2CountMap.put(ptMode, 0.0);
 		}
 
-		ptMode2CountMap.put(ptMode, new Double(ptMode2CountMap.get(ptMode) + this.network.getLinks().get(event.getLinkId()).getLength()));
+		ptMode2CountMap.put(ptMode, ptMode2CountMap.get(ptMode) + this.network.getLinks().get(event.getLinkId()).getLength());
 	}
 }

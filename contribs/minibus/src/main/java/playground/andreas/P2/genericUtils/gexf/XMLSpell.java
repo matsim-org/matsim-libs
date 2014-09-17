@@ -8,11 +8,7 @@
 
 package playground.andreas.P2.genericUtils.gexf;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 
 
 /**
@@ -38,13 +34,13 @@ import javax.xml.bind.annotation.XmlType;
 public class XMLSpell {
 
     @XmlAttribute
-    protected String start;
+    private String start;
     @XmlAttribute
-    protected String startopen;
+    private String startopen;
     @XmlAttribute
-    protected String end;
+    private String end;
     @XmlAttribute
-    protected String endopen;
+    private String endopen;
 
     /**
      * Gets the value of the start property.

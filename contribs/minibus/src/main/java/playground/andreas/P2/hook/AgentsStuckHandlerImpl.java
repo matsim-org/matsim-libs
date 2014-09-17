@@ -19,13 +19,13 @@
 
 package playground.andreas.P2.hook;
 
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Collects all {@link PersonStuckEvent} and returns a set of the ids of the agents
@@ -39,13 +39,13 @@ class AgentsStuckHandlerImpl implements PersonStuckEventHandler{
 	private Set<Id> agentsStuck;
 
 	public AgentsStuckHandlerImpl() {
-		this.agentsStuck = new TreeSet<Id>();
+		this.agentsStuck = new TreeSet<>();
 		log.info("initialized");
 	}
 
 	@Override
 	public void reset(int iteration) {
-		this.agentsStuck = new TreeSet<Id>();		
+		this.agentsStuck = new TreeSet<>();
 	}
 
 	@Override

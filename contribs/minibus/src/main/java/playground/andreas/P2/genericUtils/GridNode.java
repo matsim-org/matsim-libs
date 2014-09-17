@@ -19,11 +19,11 @@
 
 package playground.andreas.P2.genericUtils;
 
-import java.util.HashMap;
-import java.util.Map.Entry;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+
+import java.util.HashMap;
+import java.util.Map.Entry;
 
 /**
  * Stores Type-Count pairs clustered to one node. Optional: shifts the node's centroid to the average of all given data points.
@@ -35,13 +35,13 @@ public final class GridNode {
 	
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(GridNode.class);
-	private String id;
+	private final String id;
 	private boolean isShifting = true;
 	private double xMean;
 	private double yMean;
 	private double nEntries = 0;
 	
-	private HashMap<String, Integer> type2countMap = new HashMap<String, Integer>();
+	private final HashMap<String, Integer> type2countMap = new HashMap<>();
 
 	/**
 	 * Creates a unique id from two different slot numbers
@@ -50,7 +50,7 @@ public final class GridNode {
 	 * @param y - number of ySlot
 	 * @return Unique combination of x and y
 	 */
-	public static String createGridNodeId(int x, int y){
+	private static String createGridNodeId(int x, int y){
 		return (x + "_" + y);
 	}
 
@@ -61,7 +61,7 @@ public final class GridNode {
 	 * @param gridSize - distance between two slots
 	 * @return the slot number corresponding to the given coordinate
 	 */
-	public static int getSlotForCoord(double coord, double gridSize){
+	private static int getSlotForCoord(double coord, double gridSize){
 		return (int) (coord / gridSize);
 	}
 
@@ -94,7 +94,7 @@ public final class GridNode {
 	 * @param id
 	 * @param coord
 	 */
-	public GridNode(String id, Coord coord){
+    private GridNode(String id, Coord coord){
 		this(id);
 		this.isShifting = false;
 		this.xMean = coord.getX();
@@ -116,10 +116,10 @@ public final class GridNode {
 		
 		// register actType
 		if (this.type2countMap.get(type) == null) {
-			this.type2countMap.put(type, new Integer(0));
+			this.type2countMap.put(type, 0);
 		}
 		
-		this.type2countMap.put(type, new Integer(this.type2countMap.get(type) + 1));
+		this.type2countMap.put(type, this.type2countMap.get(type) + 1);
 	}
 
 	public String getId() {

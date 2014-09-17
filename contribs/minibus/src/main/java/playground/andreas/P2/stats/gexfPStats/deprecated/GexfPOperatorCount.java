@@ -19,18 +19,6 @@
 
 package playground.andreas.P2.stats.gexfPStats.deprecated;
 
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Set;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -44,29 +32,22 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
-
-import playground.andreas.P2.genericUtils.gexf.ObjectFactory;
-import playground.andreas.P2.genericUtils.gexf.XMLAttributeContent;
-import playground.andreas.P2.genericUtils.gexf.XMLAttributesContent;
-import playground.andreas.P2.genericUtils.gexf.XMLAttrtypeType;
-import playground.andreas.P2.genericUtils.gexf.XMLAttvalue;
-import playground.andreas.P2.genericUtils.gexf.XMLAttvaluesContent;
-import playground.andreas.P2.genericUtils.gexf.XMLClassType;
-import playground.andreas.P2.genericUtils.gexf.XMLDefaultedgetypeType;
-import playground.andreas.P2.genericUtils.gexf.XMLEdgeContent;
-import playground.andreas.P2.genericUtils.gexf.XMLEdgesContent;
-import playground.andreas.P2.genericUtils.gexf.XMLGexfContent;
-import playground.andreas.P2.genericUtils.gexf.XMLGraphContent;
-import playground.andreas.P2.genericUtils.gexf.XMLIdtypeType;
-import playground.andreas.P2.genericUtils.gexf.XMLModeType;
-import playground.andreas.P2.genericUtils.gexf.XMLNodeContent;
-import playground.andreas.P2.genericUtils.gexf.XMLNodesContent;
-import playground.andreas.P2.genericUtils.gexf.XMLTimeformatType;
+import playground.andreas.P2.PConfigGroup;
+import playground.andreas.P2.genericUtils.gexf.*;
 import playground.andreas.P2.genericUtils.gexf.viz.PositionContent;
-import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.operator.Operator;
 import playground.andreas.P2.stats.gexfPStats.CountPOperatorHandler;
 import playground.andreas.P2.stats.gexfPStats.CountPPaxHandler;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * Uses a {@link CountPPaxHandler} to count passengers per paratransit vehicle and link and writes them to a gexf network as dynamic link attributes.
@@ -75,7 +56,7 @@ import playground.andreas.P2.stats.gexfPStats.CountPPaxHandler;
  *
  */
 @Deprecated
-public final class GexfPOperatorCount extends MatsimJaxbXmlWriter implements StartupListener, IterationEndsListener, ShutdownListener{
+final class GexfPOperatorCount extends MatsimJaxbXmlWriter implements StartupListener, IterationEndsListener, ShutdownListener{
 	
 	private static final Logger log = Logger.getLogger(GexfPOperatorCount.class);
 	
@@ -86,15 +67,15 @@ public final class GexfPOperatorCount extends MatsimJaxbXmlWriter implements Sta
 	private XMLGexfContent gexfContainer;
 
 	private CountPOperatorHandler eventsHandler;
-	private String pIdentifier;
-	private int getWriteGexfStatsInterval;
+	private final String pIdentifier;
+	private final int getWriteGexfStatsInterval;
 
 	private HashMap<Id<Link>, XMLEdgeContent> edgeMap;
 	private HashMap<Id<Link> ,XMLAttvaluesContent> attValueContentMap;
 
 	private HashMap<Id<Link>, Set<Id<Operator>>> linkId2OperatorIdsFromLastIteration;
 
-	public GexfPOperatorCount(PConfigGroup pConfig){
+	private GexfPOperatorCount(PConfigGroup pConfig){
 		this.getWriteGexfStatsInterval = pConfig.getGexfInterval();
 		this.pIdentifier = pConfig.getPIdentifier();
 		
@@ -220,8 +201,6 @@ public final class GexfPOperatorCount extends MatsimJaxbXmlWriter implements Sta
 			bufout.close();
 			log.info("Output written to " + filename);
 		} catch (JAXBException e) {
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();

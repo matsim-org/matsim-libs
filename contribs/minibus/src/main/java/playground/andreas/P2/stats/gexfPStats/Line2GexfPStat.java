@@ -19,11 +19,6 @@
 
 package playground.andreas.P2.stats.gexfPStats;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -31,9 +26,13 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
+import playground.andreas.P2.PConfigGroup;
+import playground.andreas.P2.PConstants;
 
-import playground.andreas.P2.helper.PConfigGroup;
-import playground.andreas.P2.helper.PConstants;
+import java.io.File;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * GexfPStat stats for all lines. Each line is written separately to file
@@ -45,21 +44,19 @@ public final class Line2GexfPStat implements StartupListener, IterationEndsListe
 	
 	private static final Logger log = Logger.getLogger(Line2GexfPStat.class);
 
-	private String gexfOutputDir;
-	
-	private CountPPaxHandler globalPaxHandler;
+    private CountPPaxHandler globalPaxHandler;
 	private CountPOperatorHandler operatorHandler;
 	private CountPVehHandler vehHandler;
 	
-	private PConfigGroup pConfig;
-	private HashMap<String, SimpleGexfPStat> lineId2GexfPStat;
+	private final PConfigGroup pConfig;
+	private final HashMap<String, SimpleGexfPStat> lineId2GexfPStat;
 	private Set<String> lastLineIds;
 
 	public Line2GexfPStat(PConfigGroup pConfig){
 		this.pConfig = pConfig;
-		this.lineId2GexfPStat = new HashMap<String, SimpleGexfPStat>();
+		this.lineId2GexfPStat = new HashMap<>();
 		
-		this.lastLineIds = new TreeSet<String>();
+		this.lastLineIds = new TreeSet<>();
 		
 		if (this.pConfig.getGexfInterval() > 0) {
 			log.info("enabled");
@@ -83,9 +80,9 @@ public final class Line2GexfPStat implements StartupListener, IterationEndsListe
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		if (this.pConfig.getGexfInterval() > 0) {
-			this.gexfOutputDir = event.getControler().getControlerIO().getOutputPath() + PConstants.statsOutputFolder + Line2GexfPStat.class.getSimpleName() + "/";
+            String gexfOutputDir = event.getControler().getControlerIO().getOutputPath() + PConstants.statsOutputFolder + Line2GexfPStat.class.getSimpleName() + "/";
 			try {
-				new File(this.gexfOutputDir).mkdir();
+				new File(gexfOutputDir).mkdir();
 			} catch (Exception e) {
 				// TODO: handle exception
 			}
@@ -95,7 +92,7 @@ public final class Line2GexfPStat implements StartupListener, IterationEndsListe
 			for (String lineId : currentLineIds) {
 				if (this.lineId2GexfPStat.get(lineId) == null) {
 					// new line - create new gexf
-					SimpleGexfPStat gexf = new SimpleGexfPStat(this.pConfig, lineId, this.gexfOutputDir);
+					SimpleGexfPStat gexf = new SimpleGexfPStat(this.pConfig, lineId, gexfOutputDir);
 					gexf.notifyStartup(event.getControler().getNetwork(), this.globalPaxHandler, this.operatorHandler, this.vehHandler);
 					this.lineId2GexfPStat.put(lineId, gexf);
 				}

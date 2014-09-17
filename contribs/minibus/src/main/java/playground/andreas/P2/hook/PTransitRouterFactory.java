@@ -19,19 +19,13 @@
 
 package playground.andreas.P2.hook;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
-import org.matsim.pt.router.PreparedTransitSchedule;
-import org.matsim.pt.router.TransitRouter;
-import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterFactory;
-import org.matsim.pt.router.TransitRouterImpl;
-import org.matsim.pt.router.TransitRouterNetwork;
-import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
+import org.matsim.pt.router.*;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * 
@@ -42,7 +36,7 @@ class PTransitRouterFactory implements TransitRouterFactory{
 	
 	private final static Logger log = Logger.getLogger(PTransitRouterFactory.class);
 	private TransitRouterConfig transitRouterConfig;
-	private String ptEnabler;
+	private final String ptEnabler;
 	private boolean needToUpdateRouter = true;
 	private TransitRouterNetwork routerNetwork = null;
 	private TransitRouterFactory routerFactory = null;
@@ -86,22 +80,10 @@ class PTransitRouterFactory implements TransitRouterFactory{
 		try {
 			Class<?> cls = Class.forName("com.senozon.matsim.pt.speedyrouter.SpeedyTransitRouterFactory");
 			Constructor<?> ct = cls.getConstructor(new Class[] {TransitSchedule.class, TransitRouterConfig.class, String.class});
-			return (TransitRouterFactory) ct.newInstance(new Object[] {this.schedule, this.transitRouterConfig, this.ptEnabler});
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (SecurityException e) {
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
+			return (TransitRouterFactory) ct.newInstance(this.schedule, this.transitRouterConfig, this.ptEnabler);
+		} catch (ClassNotFoundException | SecurityException | NoSuchMethodException | IllegalArgumentException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
 			e.printStackTrace();
 		}
-		return null;
+        return null;
 	}
 }

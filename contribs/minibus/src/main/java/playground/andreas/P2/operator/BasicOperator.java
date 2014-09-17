@@ -20,11 +20,8 @@
 package playground.andreas.P2.operator;
 
 import org.matsim.api.core.v01.Id;
-
-import playground.andreas.P2.helper.PConfigGroup;
-import playground.andreas.P2.helper.PConstants.OperatorState;
-import playground.andreas.P2.pbox.PFranchise;
-import playground.andreas.P2.replanning.PPlan;
+import playground.andreas.P2.PConfigGroup;
+import playground.andreas.P2.PConstants.OperatorState;
 import playground.andreas.P2.replanning.PStrategy;
 import playground.andreas.P2.replanning.PStrategyManager;
 
@@ -42,7 +39,7 @@ public final class BasicOperator extends AbstractOperator{
 		super(id, pConfig, franchise);
 	}
 
-	public void replan(PStrategyManager pStrategyManager, int iteration) {	
+	public void replan(PStrategyManager pStrategyManager, int iteration) {
 		this.currentIteration = iteration;
 		
 		if(this.testPlan != null){

@@ -19,8 +19,6 @@
 
 package playground.andreas.P2.stats.abtractPAnalysisModules;
 
-import java.util.HashMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
@@ -28,6 +26,8 @@ import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.HashMap;
 
 
 /**
@@ -41,7 +41,7 @@ public final class CountDeparturesPerMode extends AbstractPAnalyisModule impleme
 	private final static Logger log = Logger.getLogger(CountDeparturesPerMode.class);
 	
 	private HashMap<Id<Vehicle>, String> vehId2ptModeMap;
-	private HashMap<String, Integer> ptMode2nOfDepartures = new HashMap<String, Integer>();
+	private HashMap<String, Integer> ptMode2nOfDepartures = new HashMap<>();
 	
 	public CountDeparturesPerMode(){
 		super(CountDeparturesPerMode.class.getSimpleName());
@@ -52,7 +52,7 @@ public final class CountDeparturesPerMode extends AbstractPAnalyisModule impleme
 	public String getResult() {
 		StringBuffer strB = new StringBuffer();
 		for (String ptMode : this.ptModes) {
-			strB.append(", " + (this.ptMode2nOfDepartures.get(ptMode).intValue()));
+			strB.append(", " + (this.ptMode2nOfDepartures.get(ptMode)));
 		}
 		return strB.toString();
 	}
@@ -61,7 +61,7 @@ public final class CountDeparturesPerMode extends AbstractPAnalyisModule impleme
 	public void reset(int iteration) {
 		super.reset(iteration);
 		this.vehId2ptModeMap = new HashMap<>();
-		this.ptMode2nOfDepartures = new HashMap<String, Integer>();
+		this.ptMode2nOfDepartures = new HashMap<>();
 	}
 
 	@Override
@@ -82,10 +82,10 @@ public final class CountDeparturesPerMode extends AbstractPAnalyisModule impleme
 			ptMode = "nonPtMode";
 		}
 		if (this.ptMode2nOfDepartures.get(ptMode) == null) {
-			this.ptMode2nOfDepartures.put(ptMode, new Integer(0));
+			this.ptMode2nOfDepartures.put(ptMode, 0);
 		}
 		
-		int oldValue = this.ptMode2nOfDepartures.get(ptMode).intValue();
-		this.ptMode2nOfDepartures.put(ptMode, new Integer(oldValue + 1));
+		int oldValue = this.ptMode2nOfDepartures.get(ptMode);
+		this.ptMode2nOfDepartures.put(ptMode, oldValue + 1);
 	}
 }

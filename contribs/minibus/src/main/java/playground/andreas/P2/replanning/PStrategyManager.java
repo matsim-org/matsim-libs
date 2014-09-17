@@ -19,24 +19,15 @@
 
 package playground.andreas.P2.replanning;
 
-import java.util.ArrayList;
-
 import org.apache.log4j.Logger;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.MatsimRandom;
+import playground.andreas.P2.PConfigGroup;
+import playground.andreas.P2.PConfigGroup.PStrategySettings;
+import playground.andreas.P2.fare.StageContainerCreator;
+import playground.andreas.P2.fare.TicketMachine;
+import playground.andreas.P2.operator.TimeProvider;
 
-import playground.andreas.P2.helper.PConfigGroup;
-import playground.andreas.P2.helper.PConfigGroup.PStrategySettings;
-import playground.andreas.P2.replanning.modules.EndRouteExtension;
-import playground.andreas.P2.replanning.modules.MaxRandomEndTimeAllocator;
-import playground.andreas.P2.replanning.modules.MaxRandomStartTimeAllocator;
-import playground.andreas.P2.replanning.modules.ReduceStopsToBeServedRFare;
-import playground.andreas.P2.replanning.modules.ReduceTimeServedRFare;
-import playground.andreas.P2.replanning.modules.SidewaysRouteExtension;
-import playground.andreas.P2.replanning.modules.WeightedEndTimeExtension;
-import playground.andreas.P2.replanning.modules.WeightedStartTimeExtension;
-import playground.andreas.P2.scoring.fare.StageContainerCreator;
-import playground.andreas.P2.scoring.fare.TicketMachine;
+import java.util.ArrayList;
 
 /**
  * Loads strategies from config and chooses strategies according to their weights.
@@ -48,12 +39,12 @@ public final class PStrategyManager {
 	
 	private final static Logger log = Logger.getLogger(PStrategyManager.class);
 	
-	private final ArrayList<PStrategy> strategies = new ArrayList<PStrategy>();
-	private final ArrayList<Double> weights = new ArrayList<Double>();
-	private final ArrayList<Integer> disableInIteration = new ArrayList<Integer>();
+	private final ArrayList<PStrategy> strategies = new ArrayList<>();
+	private final ArrayList<Double> weights = new ArrayList<>();
+	private final ArrayList<Integer> disableInIteration = new ArrayList<>();
 	private double totalWeights = 0.0;
 
-	public void init(PConfigGroup pConfig, EventsManager eventsManager, StageContainerCreator stageContainerCreator, TicketMachine ticketMachine, TimeProvider timeProvider) {
+	public void init(PConfigGroup pConfig, StageContainerCreator stageContainerCreator, TicketMachine ticketMachine, TimeProvider timeProvider) {
 		for (PStrategySettings settings : pConfig.getStrategySettings()) {
 			String classname = settings.getModuleName();
 			double rate = settings.getProbability();
@@ -61,14 +52,14 @@ public final class PStrategyManager {
 				log.info("The following strategy has a weight set to zero. Will drop it. " + classname);
 				continue;
 			}
-			PStrategy strategy = loadStrategy(classname, settings, eventsManager, stageContainerCreator, ticketMachine, timeProvider);
+			PStrategy strategy = loadStrategy(classname, settings, stageContainerCreator, ticketMachine, timeProvider);
 			this.addStrategy(strategy, rate, settings.getDisableInIteration());
 		}
 		
 		log.info("enabled with " + this.strategies.size()  + " strategies");
 	}
 
-	private PStrategy loadStrategy(final String name, final PStrategySettings settings, EventsManager eventsManager, StageContainerCreator stageContainerCreator, TicketMachine ticketMachine, TimeProvider timeProvider) {
+	private PStrategy loadStrategy(final String name, final PStrategySettings settings, StageContainerCreator stageContainerCreator, TicketMachine ticketMachine, TimeProvider timeProvider) {
 		PStrategy strategy = null;
 		
 		if (name.equals(MaxRandomStartTimeAllocator.STRATEGY_NAME)) {
@@ -108,8 +99,8 @@ public final class PStrategyManager {
 
 	private void addStrategy(final PStrategy strategy, final double weight, int disableInIteration) {
 		this.strategies.add(strategy);
-		this.weights.add(Double.valueOf(weight));
-		this.disableInIteration.add(Integer.valueOf(disableInIteration));
+		this.weights.add(weight);
+		this.disableInIteration.add(disableInIteration);
 		this.totalWeights += weight;
 	}
 
@@ -122,7 +113,7 @@ public final class PStrategyManager {
 		for (int i = 0; i < this.disableInIteration.size(); i++) {
 			if (this.disableInIteration.get(i) == iteration) {
 				double weight = this.weights.get(i);
-				this.weights.set(i, new Double(0.0));
+				this.weights.set(i, 0.0);
 				this.strategies.set(i, null);
 				this.totalWeights -= weight;
 			}
@@ -139,7 +130,7 @@ public final class PStrategyManager {
 
 		double sum = 0.0;
 		for (int i = 0, max = this.weights.size(); i < max; i++) {
-			sum += this.weights.get(i).doubleValue();
+			sum += this.weights.get(i);
 			if (rnd <= sum) {
 				return this.strategies.get(i);
 			}

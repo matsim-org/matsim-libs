@@ -19,10 +19,6 @@
 
 package playground.andreas.P2.schedule;
 
-import java.util.LinkedHashMap;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -32,8 +28,11 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import playground.andreas.P2.PConfigGroup;
 
-import playground.andreas.P2.helper.PConfigGroup;
+import java.util.LinkedHashMap;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Create one TransitStopFacility for each car mode link of the network
@@ -49,7 +48,7 @@ public final class CreateStopsForAllCarLinks {
 	private final PConfigGroup pConfigGroup;
 	private TransitSchedule transitSchedule;
 
-	private LinkedHashMap<Id<Link>, TransitStopFacility> linkId2StopFacilityMap;
+	private final LinkedHashMap<Id<Link>, TransitStopFacility> linkId2StopFacilityMap;
 	
 	public static TransitSchedule createStopsForAllCarLinks(Network network, PConfigGroup pConfigGroup){
 		return createStopsForAllCarLinks(network, pConfigGroup, null);
@@ -61,7 +60,7 @@ public final class CreateStopsForAllCarLinks {
 		return cS.getTransitSchedule();
 	}
 
-	public CreateStopsForAllCarLinks(Network net, PConfigGroup pConfigGroup, TransitSchedule realTransitSchedule) {
+	private CreateStopsForAllCarLinks(Network net, PConfigGroup pConfigGroup, TransitSchedule realTransitSchedule) {
 		this.net = net;
 		this.pConfigGroup = pConfigGroup;
 		

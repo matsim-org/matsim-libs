@@ -19,8 +19,6 @@
 
 package playground.andreas.P2.replanning;
 
-import java.io.File;
-
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -28,9 +26,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestUtils;
+import playground.andreas.P2.PConfigGroup;
+import playground.andreas.P2.PConstants;
+import playground.andreas.P2.operator.TimeProvider;
 
-import playground.andreas.P2.helper.PConfigGroup;
-import playground.andreas.P2.helper.PConstants;
+import java.io.File;
 
 
 public class TimeProviderTest {

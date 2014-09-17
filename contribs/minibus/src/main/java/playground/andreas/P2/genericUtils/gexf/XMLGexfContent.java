@@ -8,12 +8,7 @@
 
 package playground.andreas.P2.genericUtils.gexf;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 
 
 /**
@@ -54,13 +49,13 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "gexf")
 public class XMLGexfContent {
 
-    protected XMLMetaContent meta;
+    private XMLMetaContent meta;
     @XmlElement(required = true)
-    protected XMLGraphContent graph;
+    private XMLGraphContent graph;
     @XmlAttribute(required = true)
-    protected String version;
+    private String version;
     @XmlAttribute
-    protected String variant;
+    private String variant;
 
     /**
      * Gets the value of the meta property.

@@ -58,7 +58,7 @@ public interface VehicleType {
 	 */
 	public VehicleCapacity getCapacity();
 	
-	public Id getId();
+	public Id<VehicleType> getId();
 	
 	/**
 	 * Comments:<ul>

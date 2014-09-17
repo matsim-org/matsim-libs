@@ -8,12 +8,12 @@
 
 package playground.andreas.P2.genericUtils.gexf;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -47,19 +47,19 @@ import javax.xml.bind.annotation.XmlType;
 })
 public class XMLAttributesContent {
 
-    protected List<XMLAttributeContent> attribute;
+    private List<XMLAttributeContent> attribute;
     @XmlAttribute(name = "class", required = true)
-    protected XMLClassType clazz;
+    private XMLClassType clazz;
     @XmlAttribute
-    protected XMLModeType mode;
+    private XMLModeType mode;
     @XmlAttribute
-    protected String start;
+    private String start;
     @XmlAttribute
-    protected String startopen;
+    private String startopen;
     @XmlAttribute
-    protected String end;
+    private String end;
     @XmlAttribute
-    protected String endopen;
+    private String endopen;
 
     /**
      * Gets the value of the attribute property.
@@ -85,7 +85,7 @@ public class XMLAttributesContent {
      */
     public List<XMLAttributeContent> getAttribute() {
         if (attribute == null) {
-            attribute = new ArrayList<XMLAttributeContent>();
+            attribute = new ArrayList<>();
         }
         return this.attribute;
     }

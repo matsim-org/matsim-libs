@@ -63,10 +63,10 @@ public final class RecursiveStatsContainer {
 			this.arithmeticMeanRoutes = 0;
 			this.tempVarRoutes = 0;
 			this.arithmeticMeanPax = 0;
-			this.tempVarPax = 0;;
-			this.arithmeticMeanVeh = 0;
-			this.tempVarVeh = 0;;
-		}
+			this.tempVarPax = 0;
+            this.arithmeticMeanVeh = 0;
+			this.tempVarVeh = 0;
+        }
 
 		// calculate the exact mean and variance
 

@@ -19,8 +19,6 @@
 
 package playground.andreas.P2.stats.abtractPAnalysisModules;
 
-import java.util.HashMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -32,6 +30,8 @@ import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.pt.PtConstants;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.HashMap;
 
 
 /**
@@ -72,7 +72,7 @@ public final class CountTripsPerPtModeCombination extends AbstractPAnalyisModule
 	public void reset(int iteration) {
 		super.reset(iteration);
 		this.vehId2ptModeMap = new HashMap<>();
-		this.ptModeCombination2TripCountMap = new HashMap<String, Integer>();
+		this.ptModeCombination2TripCountMap = new HashMap<>();
 		this.agentId2TripCombination = new HashMap<>();
 	}
 
@@ -113,9 +113,9 @@ public final class CountTripsPerPtModeCombination extends AbstractPAnalyisModule
 				String tripCombination = this.agentId2TripCombination.get(event.getPersonId());
 				if (tripCombination != null) {
 					if (this.ptModeCombination2TripCountMap.get(tripCombination) == null) {
-						this.ptModeCombination2TripCountMap.put(tripCombination, new Integer(0));
+						this.ptModeCombination2TripCountMap.put(tripCombination, 0);
 					}
-					this.ptModeCombination2TripCountMap.put(tripCombination, new Integer(this.ptModeCombination2TripCountMap.get(tripCombination) + 1));
+					this.ptModeCombination2TripCountMap.put(tripCombination, this.ptModeCombination2TripCountMap.get(tripCombination) + 1);
 				} 
 				// reset the last used pt mode
 				this.agentId2TripCombination.remove(event.getPersonId());

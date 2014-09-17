@@ -19,17 +19,15 @@
  * *********************************************************************** */
 package playground.andreas.P2.genericUtils.gexf;
 
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import org.apache.log4j.Logger;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-
-import org.apache.log4j.Logger;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
+import java.io.BufferedWriter;
+import java.io.IOException;
 
 
 
@@ -37,15 +35,15 @@ import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
  * @author dgrether
  *
  */
-public class GexfWriter extends MatsimJaxbXmlWriter {
+class GexfWriter extends MatsimJaxbXmlWriter {
 
 	private static final Logger log = Logger.getLogger(GexfWriter.class);
 	
 	private final static String xsdPath = "http://www.gexf.net/1.2draft/gexf.xsd";
 
-	private XMLGexfContent gexfContent;
+	private final XMLGexfContent gexfContent;
 
-	public GexfWriter(XMLGexfContent gexf){
+	private GexfWriter(XMLGexfContent gexf){
 		this.gexfContent = gexf;
 	}
 	
@@ -62,8 +60,6 @@ public class GexfWriter extends MatsimJaxbXmlWriter {
 			bufout.close();
 			log.info(filename + " written successfully.");
 		} catch (JAXBException e) {
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();

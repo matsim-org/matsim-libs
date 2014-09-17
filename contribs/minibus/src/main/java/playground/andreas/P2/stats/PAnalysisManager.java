@@ -19,13 +19,6 @@
 
 package playground.andreas.P2.stats;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -34,32 +27,22 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicles;
-
-import playground.andreas.P2.helper.PConfigGroup;
-import playground.andreas.P2.helper.PConstants;
-import playground.andreas.P2.stats.abtractPAnalysisModules.AverageInVehicleTripTravelTimeSecondsPerMode;
-import playground.andreas.P2.stats.abtractPAnalysisModules.AverageLoadPerDeparturePerMode;
-import playground.andreas.P2.stats.abtractPAnalysisModules.AverageLoadPerDistancePerMode;
-import playground.andreas.P2.stats.abtractPAnalysisModules.AverageNumberOfStopsPerMode;
-import playground.andreas.P2.stats.abtractPAnalysisModules.AverageTripDistanceMeterPerMode;
-import playground.andreas.P2.stats.abtractPAnalysisModules.AverageWaitingTimeSecondsPerMode;
-import playground.andreas.P2.stats.abtractPAnalysisModules.CountCapacityMeterPerMode;
-import playground.andreas.P2.stats.abtractPAnalysisModules.CountDeparturesPerMode;
-import playground.andreas.P2.stats.abtractPAnalysisModules.CountDeparturesWithNoCapacityLeftPerMode;
-import playground.andreas.P2.stats.abtractPAnalysisModules.CountPassengerMeterPerMode;
-import playground.andreas.P2.stats.abtractPAnalysisModules.CountTransfersPerModeModeCombination;
-import playground.andreas.P2.stats.abtractPAnalysisModules.CountTripsPerMode;
-import playground.andreas.P2.stats.abtractPAnalysisModules.CountTripsPerPtModeCombination;
-import playground.andreas.P2.stats.abtractPAnalysisModules.CountVehPerMode;
-import playground.andreas.P2.stats.abtractPAnalysisModules.CountVehicleMeterPerMode;
-import playground.andreas.P2.stats.abtractPAnalysisModules.PAnalysisModule;
+import playground.andreas.P2.PConfigGroup;
+import playground.andreas.P2.PConstants;
+import playground.andreas.P2.stats.abtractPAnalysisModules.*;
 import playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter.BVGLines2PtModes;
 import playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter.PtMode2LineSetter;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Plugs in all analysis.
@@ -67,14 +50,14 @@ import playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter.PtMode2Lin
  * @author aneumann
  *
  */
-public final class PAnalysisManager implements StartupListener, IterationStartsListener, IterationEndsListener{
+final class PAnalysisManager implements StartupListener, IterationStartsListener, IterationEndsListener{
 	private final static Logger log = Logger.getLogger(PAnalysisManager.class);
 	
 	private final String pIdentifier;
-	private List<PAnalysisModule> pAnalyzesList = new LinkedList<PAnalysisModule>();
-	private HashMap<String, BufferedWriter> pAnalyis2Writer = new HashMap<String, BufferedWriter>();
+	private final List<PAnalysisModule> pAnalyzesList = new LinkedList<>();
+	private final HashMap<String, BufferedWriter> pAnalyis2Writer = new HashMap<>();
 	private boolean firstIteration = true;
-	private PtMode2LineSetter lineSetter;
+	private final PtMode2LineSetter lineSetter;
 
 	public PAnalysisManager(PConfigGroup pConfig, PtMode2LineSetter lineSetter){
 		log.info("enabled");
@@ -118,7 +101,7 @@ public final class PAnalysisManager implements StartupListener, IterationStartsL
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		// update pt mode for each line in schedule
 		updateLineId2ptModeMap(event.getControler().getScenario().getTransitSchedule());
-		updateVehicleTypes(((ScenarioImpl) event.getControler().getScenario()).getVehicles());
+		updateVehicleTypes(event.getControler().getScenario().getVehicles());
 	}
 
 	@Override

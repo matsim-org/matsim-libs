@@ -19,8 +19,6 @@
 
 package playground.andreas.P2.stats.abtractPAnalysisModules;
 
-import java.util.HashMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -35,6 +33,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.vehicles.Vehicle;
 
+import java.util.HashMap;
+
 
 /**
  * Calculates the average trip distance per ptModes specified. A trip starts by entering a vehicle and end by leaving one.
@@ -46,7 +46,7 @@ public final class AverageTripDistanceMeterPerMode extends AbstractPAnalyisModul
 	
 	private final static Logger log = Logger.getLogger(AverageTripDistanceMeterPerMode.class);
 	
-	private Network network;
+	private final Network network;
 	private HashMap<Id<Vehicle>, String> vehId2ptModeMap;
 	private HashMap<String, Double> ptMode2MeterTravelledMap;
 	private HashMap<String, Integer> ptMode2TripCountMap;
@@ -72,13 +72,13 @@ public final class AverageTripDistanceMeterPerMode extends AbstractPAnalyisModul
 	public void reset(int iteration) {
 		super.reset(iteration);
 		this.vehId2ptModeMap = new HashMap<>();
-		this.ptMode2MeterTravelledMap = new HashMap<String, Double>();
-		this.ptMode2TripCountMap = new HashMap<String, Integer>();
+		this.ptMode2MeterTravelledMap = new HashMap<>();
+		this.ptMode2TripCountMap = new HashMap<>();
 		this.vehId2AgentId2DistanceTravelledInMeterMap = new HashMap<>();
 		// avoid null-pointer in getResult() /dr
 		for (String ptMode : this.ptModes) {
-			this.ptMode2MeterTravelledMap.put(ptMode, new Double(0.));
-			this.ptMode2TripCountMap.put(ptMode, new Integer(0));
+			this.ptMode2MeterTravelledMap.put(ptMode, 0.);
+			this.ptMode2TripCountMap.put(ptMode, 0);
 		}
 	}
 
@@ -100,7 +100,7 @@ public final class AverageTripDistanceMeterPerMode extends AbstractPAnalyisModul
 		}
 		
 		if(!super.ptDriverIds.contains(event.getPersonId())){
-			this.vehId2AgentId2DistanceTravelledInMeterMap.get(event.getVehicleId()).put(event.getPersonId(), new Double(0.0));
+			this.vehId2AgentId2DistanceTravelledInMeterMap.get(event.getVehicleId()).put(event.getPersonId(), 0.0);
 		}
 	}
 	
@@ -113,14 +113,14 @@ public final class AverageTripDistanceMeterPerMode extends AbstractPAnalyisModul
 				ptMode = "nonPtMode";
 			}
 			if (ptMode2MeterTravelledMap.get(ptMode) == null) {
-				ptMode2MeterTravelledMap.put(ptMode, new Double(0.0));
+				ptMode2MeterTravelledMap.put(ptMode, 0.0);
 			}
 			if (ptMode2TripCountMap.get(ptMode) == null) {
-				ptMode2TripCountMap.put(ptMode, new Integer(0));
+				ptMode2TripCountMap.put(ptMode, 0);
 			}
 			
-			this.ptMode2MeterTravelledMap.put(ptMode, new Double(this.ptMode2MeterTravelledMap.get(ptMode) + this.vehId2AgentId2DistanceTravelledInMeterMap.get(event.getVehicleId()).get(event.getPersonId()).doubleValue()));
-			this.ptMode2TripCountMap.put(ptMode, new Integer(this.ptMode2TripCountMap.get(ptMode) + 1));
+			this.ptMode2MeterTravelledMap.put(ptMode, this.ptMode2MeterTravelledMap.get(ptMode) + this.vehId2AgentId2DistanceTravelledInMeterMap.get(event.getVehicleId()).get(event.getPersonId()));
+			this.ptMode2TripCountMap.put(ptMode, this.ptMode2TripCountMap.get(ptMode) + 1);
 		}
 	}
 
@@ -129,8 +129,8 @@ public final class AverageTripDistanceMeterPerMode extends AbstractPAnalyisModul
 		double newValue = this.network.getLinks().get(event.getLinkId()).getLength();
 		
 		for (Id<Person> agentId : this.vehId2AgentId2DistanceTravelledInMeterMap.get(event.getVehicleId()).keySet()) {
-			double oldValue = this.vehId2AgentId2DistanceTravelledInMeterMap.get(event.getVehicleId()).get(agentId).doubleValue();
-			this.vehId2AgentId2DistanceTravelledInMeterMap.get(event.getVehicleId()).put(agentId, new Double(oldValue + newValue));
+			double oldValue = this.vehId2AgentId2DistanceTravelledInMeterMap.get(event.getVehicleId()).get(agentId);
+			this.vehId2AgentId2DistanceTravelledInMeterMap.get(event.getVehicleId()).put(agentId, oldValue + newValue);
 		}
 	}
 

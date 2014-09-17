@@ -8,14 +8,15 @@
 
 package playground.andreas.P2.genericUtils.gexf;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.XmlElementDecl;
-import javax.xml.bind.annotation.XmlRegistry;
-import javax.xml.namespace.QName;
 import playground.andreas.P2.genericUtils.gexf.viz.ColorContent;
 import playground.andreas.P2.genericUtils.gexf.viz.PositionContent;
 import playground.andreas.P2.genericUtils.gexf.viz.SizeContent;
 import playground.andreas.P2.genericUtils.gexf.viz.ThicknessContent;
+
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.annotation.XmlElementDecl;
+import javax.xml.bind.annotation.XmlRegistry;
+import javax.xml.namespace.QName;
 
 
 /**
@@ -190,7 +191,7 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "http://www.gexf.net/1.2draft", name = "parents")
     public JAXBElement<XMLParentsContent> createParents(XMLParentsContent value) {
-        return new JAXBElement<XMLParentsContent>(_Parents_QNAME, XMLParentsContent.class, null, value);
+        return new JAXBElement<>(_Parents_QNAME, XMLParentsContent.class, null, value);
     }
 
     /**
@@ -199,7 +200,7 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "http://www.gexf.net/1.2draft", name = "edge")
     public JAXBElement<XMLEdgeContent> createEdge(XMLEdgeContent value) {
-        return new JAXBElement<XMLEdgeContent>(_Edge_QNAME, XMLEdgeContent.class, null, value);
+        return new JAXBElement<>(_Edge_QNAME, XMLEdgeContent.class, null, value);
     }
 
     /**
@@ -208,7 +209,7 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "http://www.gexf.net/1.2draft", name = "keywords")
     public JAXBElement<String> createKeywords(String value) {
-        return new JAXBElement<String>(_Keywords_QNAME, String.class, null, value);
+        return new JAXBElement<>(_Keywords_QNAME, String.class, null, value);
     }
 
     /**
@@ -217,7 +218,7 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "http://www.gexf.net/1.2draft", name = "gexf")
     public JAXBElement<XMLGexfContent> createGexf(XMLGexfContent value) {
-        return new JAXBElement<XMLGexfContent>(_Gexf_QNAME, XMLGexfContent.class, null, value);
+        return new JAXBElement<>(_Gexf_QNAME, XMLGexfContent.class, null, value);
     }
 
     /**
@@ -226,7 +227,7 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "http://www.gexf.net/1.2draft", name = "position")
     public JAXBElement<PositionContent> createPosition(PositionContent value) {
-        return new JAXBElement<PositionContent>(_Position_QNAME, PositionContent.class, null, value);
+        return new JAXBElement<>(_Position_QNAME, PositionContent.class, null, value);
     }
 
     /**
@@ -235,7 +236,7 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "http://www.gexf.net/1.2draft", name = "spells")
     public JAXBElement<XMLSpellsContent> createSpells(XMLSpellsContent value) {
-        return new JAXBElement<XMLSpellsContent>(_Spells_QNAME, XMLSpellsContent.class, null, value);
+        return new JAXBElement<>(_Spells_QNAME, XMLSpellsContent.class, null, value);
     }
 
     /**
@@ -244,7 +245,7 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "http://www.gexf.net/1.2draft", name = "attribute")
     public JAXBElement<XMLAttributeContent> createAttribute(XMLAttributeContent value) {
-        return new JAXBElement<XMLAttributeContent>(_Attribute_QNAME, XMLAttributeContent.class, null, value);
+        return new JAXBElement<>(_Attribute_QNAME, XMLAttributeContent.class, null, value);
     }
 
     /**
@@ -253,7 +254,7 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "http://www.gexf.net/1.2draft", name = "meta")
     public JAXBElement<XMLMetaContent> createMeta(XMLMetaContent value) {
-        return new JAXBElement<XMLMetaContent>(_Meta_QNAME, XMLMetaContent.class, null, value);
+        return new JAXBElement<>(_Meta_QNAME, XMLMetaContent.class, null, value);
     }
 
     /**
@@ -262,7 +263,7 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "http://www.gexf.net/1.2draft", name = "creator")
     public JAXBElement<String> createCreator(String value) {
-        return new JAXBElement<String>(_Creator_QNAME, String.class, null, value);
+        return new JAXBElement<>(_Creator_QNAME, String.class, null, value);
     }
 
     /**
@@ -271,7 +272,7 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "http://www.gexf.net/1.2draft", name = "size")
     public JAXBElement<SizeContent> createSize(SizeContent value) {
-        return new JAXBElement<SizeContent>(_Size_QNAME, SizeContent.class, null, value);
+        return new JAXBElement<>(_Size_QNAME, SizeContent.class, null, value);
     }
 
     /**
@@ -280,7 +281,7 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "http://www.gexf.net/1.2draft", name = "node")
     public JAXBElement<XMLNodeContent> createNode(XMLNodeContent value) {
-        return new JAXBElement<XMLNodeContent>(_Node_QNAME, XMLNodeContent.class, null, value);
+        return new JAXBElement<>(_Node_QNAME, XMLNodeContent.class, null, value);
     }
 
     /**
@@ -289,7 +290,7 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "http://www.gexf.net/1.2draft", name = "graph")
     public JAXBElement<XMLGraphContent> createGraph(XMLGraphContent value) {
-        return new JAXBElement<XMLGraphContent>(_Graph_QNAME, XMLGraphContent.class, null, value);
+        return new JAXBElement<>(_Graph_QNAME, XMLGraphContent.class, null, value);
     }
 
     /**
@@ -298,7 +299,7 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "http://www.gexf.net/1.2draft", name = "default")
     public JAXBElement<String> createDefault(String value) {
-        return new JAXBElement<String>(_Default_QNAME, String.class, null, value);
+        return new JAXBElement<>(_Default_QNAME, String.class, null, value);
     }
 
     /**
@@ -307,7 +308,7 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "http://www.gexf.net/1.2draft", name = "attvalues")
     public JAXBElement<XMLAttvaluesContent> createAttvalues(XMLAttvaluesContent value) {
-        return new JAXBElement<XMLAttvaluesContent>(_Attvalues_QNAME, XMLAttvaluesContent.class, null, value);
+        return new JAXBElement<>(_Attvalues_QNAME, XMLAttvaluesContent.class, null, value);
     }
 
     /**
@@ -316,7 +317,7 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "http://www.gexf.net/1.2draft", name = "nodes")
     public JAXBElement<XMLNodesContent> createNodes(XMLNodesContent value) {
-        return new JAXBElement<XMLNodesContent>(_Nodes_QNAME, XMLNodesContent.class, null, value);
+        return new JAXBElement<>(_Nodes_QNAME, XMLNodesContent.class, null, value);
     }
 
     /**
@@ -325,7 +326,7 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "http://www.gexf.net/1.2draft", name = "description")
     public JAXBElement<String> createDescription(String value) {
-        return new JAXBElement<String>(_Description_QNAME, String.class, null, value);
+        return new JAXBElement<>(_Description_QNAME, String.class, null, value);
     }
 
     /**
@@ -334,7 +335,7 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "http://www.gexf.net/1.2draft", name = "edges")
     public JAXBElement<XMLEdgesContent> createEdges(XMLEdgesContent value) {
-        return new JAXBElement<XMLEdgesContent>(_Edges_QNAME, XMLEdgesContent.class, null, value);
+        return new JAXBElement<>(_Edges_QNAME, XMLEdgesContent.class, null, value);
     }
 
     /**
@@ -343,7 +344,7 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "http://www.gexf.net/1.2draft", name = "color")
     public JAXBElement<ColorContent> createColor(ColorContent value) {
-        return new JAXBElement<ColorContent>(_Color_QNAME, ColorContent.class, null, value);
+        return new JAXBElement<>(_Color_QNAME, ColorContent.class, null, value);
     }
 
     /**
@@ -352,7 +353,7 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "http://www.gexf.net/1.2draft", name = "attributes")
     public JAXBElement<XMLAttributesContent> createAttributes(XMLAttributesContent value) {
-        return new JAXBElement<XMLAttributesContent>(_Attributes_QNAME, XMLAttributesContent.class, null, value);
+        return new JAXBElement<>(_Attributes_QNAME, XMLAttributesContent.class, null, value);
     }
 
     /**
@@ -361,7 +362,7 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "http://www.gexf.net/1.2draft", name = "thickness")
     public JAXBElement<ThicknessContent> createThickness(ThicknessContent value) {
-        return new JAXBElement<ThicknessContent>(_Thickness_QNAME, ThicknessContent.class, null, value);
+        return new JAXBElement<>(_Thickness_QNAME, ThicknessContent.class, null, value);
     }
 
     /**
@@ -370,7 +371,7 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "http://www.gexf.net/1.2draft", name = "options")
     public JAXBElement<String> createOptions(String value) {
-        return new JAXBElement<String>(_Options_QNAME, String.class, null, value);
+        return new JAXBElement<>(_Options_QNAME, String.class, null, value);
     }
 
 }

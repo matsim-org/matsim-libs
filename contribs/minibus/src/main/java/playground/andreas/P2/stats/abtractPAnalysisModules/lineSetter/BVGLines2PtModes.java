@@ -19,14 +19,14 @@
 
 package playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter;
 
-import java.awt.Color;
-import java.util.HashMap;
-import java.util.Map.Entry;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+
+import java.awt.*;
+import java.util.HashMap;
+import java.util.Map.Entry;
 
 
 /**
@@ -105,13 +105,13 @@ public final class BVGLines2PtModes implements PtMode2LineSetter{
 	@Override
 	public String toString() {
 		
-		HashMap<String, Integer> ptMode2CountMap = new HashMap<String, Integer>();
+		HashMap<String, Integer> ptMode2CountMap = new HashMap<>();
 		
 		for (String ptMode : this.lineId2ptMode.values()) {
 			if (ptMode2CountMap.get(ptMode) == null) {
-				ptMode2CountMap.put(ptMode, new Integer(0));
+				ptMode2CountMap.put(ptMode, 0);
 			}
-			ptMode2CountMap.put(ptMode, new Integer(ptMode2CountMap.get(ptMode) + 1));
+			ptMode2CountMap.put(ptMode, ptMode2CountMap.get(ptMode) + 1);
 		}
 		
 		StringBuffer strB = new StringBuffer();

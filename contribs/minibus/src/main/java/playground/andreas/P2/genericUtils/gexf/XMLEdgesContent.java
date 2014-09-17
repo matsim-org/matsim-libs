@@ -8,14 +8,10 @@
 
 package playground.andreas.P2.genericUtils.gexf;
 
+import javax.xml.bind.annotation.*;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
 
 
 /**
@@ -44,10 +40,10 @@ import javax.xml.bind.annotation.XmlType;
 })
 public class XMLEdgesContent {
 
-    protected List<XMLEdgeContent> edge;
+    private List<XMLEdgeContent> edge;
     @XmlAttribute
     @XmlSchemaType(name = "nonNegativeInteger")
-    protected BigInteger count;
+    private BigInteger count;
 
     /**
      * Gets the value of the edge property.
@@ -73,7 +69,7 @@ public class XMLEdgesContent {
      */
     public List<XMLEdgeContent> getEdge() {
         if (edge == null) {
-            edge = new ArrayList<XMLEdgeContent>();
+            edge = new ArrayList<>();
         }
         return this.edge;
     }

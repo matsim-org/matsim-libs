@@ -19,9 +19,6 @@
 
 package playground.andreas.P2.stats.abtractPAnalysisModules;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -33,6 +30,9 @@ import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.pt.PtConstants;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.HashMap;
+import java.util.LinkedList;
 
 
 /**
@@ -61,7 +61,7 @@ public final class CountTransfersPerModeModeCombination extends AbstractPAnalyis
 		
 		if (this.ptModeCombinations == null) {
 			// calculate all pt mode combinations
-			this.ptModeCombinations = new LinkedList<String>();
+			this.ptModeCombinations = new LinkedList<>();
 			for (String ptModeFrom : this.ptModes) {
 				for (String ptModeTo : this.ptModes) {
 					this.ptModeCombinations.add(ptModeFrom + "-" + ptModeTo);
@@ -93,7 +93,7 @@ public final class CountTransfersPerModeModeCombination extends AbstractPAnalyis
 	public void reset(int iteration) {
 		super.reset(iteration);
 		this.vehId2ptModeMap = new HashMap<>();
-		this.ptModeCombination2TripCountMap = new HashMap<String, Integer>();
+		this.ptModeCombination2TripCountMap = new HashMap<>();
 		this.agentId2LastPtModeUsed = new HashMap<>();
 	}
 
@@ -116,16 +116,16 @@ public final class CountTransfersPerModeModeCombination extends AbstractPAnalyis
 				ptMode = "nonPtMode";
 			}
 			if (ptModeCombination2TripCountMap.get(ptMode) == null) {
-				ptModeCombination2TripCountMap.put(ptMode, new Integer(0));
+				ptModeCombination2TripCountMap.put(ptMode, 0);
 			}
 			
 			if (this.agentId2LastPtModeUsed.get(event.getPersonId()) != null) {
 				// it's a transfer
 				String tripCombination = this.agentId2LastPtModeUsed.get(event.getPersonId()) + "-" + ptMode;
 				if (this.ptModeCombination2TripCountMap.get(tripCombination) == null) {
-					this.ptModeCombination2TripCountMap.put(tripCombination, new Integer(0));
+					this.ptModeCombination2TripCountMap.put(tripCombination, 0);
 				}
-				this.ptModeCombination2TripCountMap.put(tripCombination, new Integer(this.ptModeCombination2TripCountMap.get(tripCombination) + 1));
+				this.ptModeCombination2TripCountMap.put(tripCombination, this.ptModeCombination2TripCountMap.get(tripCombination) + 1);
 			}
 			this.agentId2LastPtModeUsed.put(event.getPersonId(), ptMode);
 		}

@@ -19,17 +19,16 @@
 
 package playground.andreas.P2.stats.abtractPAnalysisModules;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.vehicles.Vehicles;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Set;
 import java.util.TreeSet;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
-import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.vehicles.Vehicles;
 
 /**
  * 
@@ -41,16 +40,15 @@ import org.matsim.vehicles.Vehicles;
 abstract class AbstractPAnalyisModule implements PAnalysisModule{
 	
 	private final String name;
-	protected LinkedList<String> ptModes = null;
-	protected HashMap<Id<TransitLine>, String> lineIds2ptModeMap;
-	protected Set<Id<Person>> ptDriverIds;
+	LinkedList<String> ptModes = null;
+	HashMap<Id<TransitLine>, String> lineIds2ptModeMap;
+	Set<Id<Person>> ptDriverIds;
 	
 	/**
 	 * 
 	 * @param name The name of the module.
-	 * @param ptDriverPrefix The prefix identifying a driver of driving a public transit vehicles.
 	 */
-	public AbstractPAnalyisModule(String name){
+    AbstractPAnalyisModule(String name){
 		this.name = name;
 		this.ptDriverIds = new TreeSet<>();
 	}
@@ -65,11 +63,11 @@ abstract class AbstractPAnalyisModule implements PAnalysisModule{
 		this.lineIds2ptModeMap = lineIds2ptModeMap;
 		
 		if (this.ptModes == null) {
-			Set<String> ptModesSet = new TreeSet<String>();
+			Set<String> ptModesSet = new TreeSet<>();
 			for (String ptMode : this.lineIds2ptModeMap.values()) {
 				ptModesSet.add(ptMode);
 			}
-			this.ptModes = new LinkedList<String>();
+			this.ptModes = new LinkedList<>();
 			
 			for (String ptMode : ptModesSet) {
 				this.ptModes.add(ptMode);

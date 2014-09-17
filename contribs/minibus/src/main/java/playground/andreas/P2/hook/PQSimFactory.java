@@ -39,8 +39,6 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 
-import playground.andreas.P2.helper.PConfigGroup;
-
 /**
  * The MobsimFactory is only necessary so that I can add the {@link PTransitAgent}.
  *
@@ -69,20 +67,19 @@ class PQSimFactory implements MobsimFactory {
         } else {
             netsimEngFactory = new DefaultQNetsimEngineFactory();
         }
-		QSim qSim1 = new QSim(sc, eventsManager);
+		QSim qSim = new QSim(sc, eventsManager);
 		ActivityEngine activityEngine = new ActivityEngine();
-		qSim1.addMobsimEngine(activityEngine);
-		qSim1.addActivityHandler(activityEngine);
-		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim1);
-		qSim1.addMobsimEngine(netsimEngine);
-		qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
+		qSim.addMobsimEngine(activityEngine);
+		qSim.addActivityHandler(activityEngine);
+		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim);
+		qSim.addMobsimEngine(netsimEngine);
+		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
 		TeleportationEngine teleportationEngine = new TeleportationEngine();
-		qSim1.addMobsimEngine(teleportationEngine);
-        QSim qSim = qSim1;
+		qSim.addMobsimEngine(teleportationEngine);
         AgentFactory agentFactory;
         
         if (sc.getConfig().scenario().isUseTransit()) {
-            agentFactory = new PTransitAgentFactory(qSim, ((PConfigGroup) sc.getConfig().getModule(PConfigGroup.GROUP_NAME)).getPassengersBoardEveryLine());
+            agentFactory = new PTransitAgentFactory(qSim);
             TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
             transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
             qSim.addDepartureHandler(transitEngine);

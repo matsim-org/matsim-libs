@@ -20,6 +20,7 @@
 package playground.andreas.P2.replanning;
 
 import playground.andreas.P2.operator.Operator;
+import playground.andreas.P2.operator.PPlan;
 
 public interface PStrategy {
 
@@ -29,9 +30,9 @@ public interface PStrategy {
 	 * @return the plan found or null if there is no better plan 
 	 */
 	public PPlan run(Operator operator);
-	
+
 	/**
-	 * 
+	 *
 	 * @return The name of the strategy
 	 */
 	public String getStrategyName();

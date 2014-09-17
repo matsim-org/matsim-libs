@@ -19,19 +19,11 @@
 
 package playground.andreas.P2.ana.log2something;
 
-import java.util.ArrayList;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.collections.Tuple;
+import playground.andreas.P2.replanning.*;
 
-import playground.andreas.P2.replanning.modules.EndRouteExtension;
-import playground.andreas.P2.replanning.modules.MaxRandomEndTimeAllocator;
-import playground.andreas.P2.replanning.modules.MaxRandomStartTimeAllocator;
-import playground.andreas.P2.replanning.modules.ReduceStopsToBeServedRFare;
-import playground.andreas.P2.replanning.modules.ReduceTimeServedRFare;
-import playground.andreas.P2.replanning.modules.SidewaysRouteExtension;
-import playground.andreas.P2.replanning.modules.WeightedEndTimeExtension;
-import playground.andreas.P2.replanning.modules.WeightedStartTimeExtension;
+import java.util.ArrayList;
 
 public final class PlanElement {
 
@@ -58,23 +50,23 @@ public final class PlanElement {
 		this.iterationFounded = logElement.getIteration();
 		this.coopId = logElement.getCoopId();
 		
-		this.status = new ArrayList<Tuple<Integer, String>>();
-		this.status.add(new Tuple<Integer, String>(new Integer(this.iterationFounded), logElement.getStatus()));
+		this.status = new ArrayList<>();
+		this.status.add(new Tuple<>(this.iterationFounded, logElement.getStatus()));
 		
 		this.planId = logElement.getPlanId();
 		this.creatorId = logElement.getCreatorId();
 		
-		this.nVeh = new ArrayList<Tuple<Integer, Integer>>();
-		this.nVeh.add(new Tuple<Integer, Integer>(new Integer(this.iterationFounded), new Integer(logElement.getnVeh())));
+		this.nVeh = new ArrayList<>();
+		this.nVeh.add(new Tuple<>(this.iterationFounded, logElement.getnVeh()));
 		
-		this.nPax = new ArrayList<Tuple<Integer, Integer>>();
-		this.nPax.add(new Tuple<Integer, Integer>(new Integer(this.iterationFounded), new Integer(logElement.getnPax())));
+		this.nPax = new ArrayList<>();
+		this.nPax.add(new Tuple<>(this.iterationFounded, logElement.getnPax()));
 		
-		this.score = new ArrayList<Tuple<Integer, Double>>();
-		this.score.add(new Tuple<Integer, Double>(new Integer(this.iterationFounded), new Double(logElement.getScore())));
+		this.score = new ArrayList<>();
+		this.score.add(new Tuple<>(this.iterationFounded, logElement.getScore()));
 		
-		this.budget = new ArrayList<Tuple<Integer, Double>>();
-		this.budget.add(new Tuple<Integer, Double>(new Integer(this.iterationFounded), new Double(logElement.getBudget())));
+		this.budget = new ArrayList<>();
+		this.budget.add(new Tuple<>(this.iterationFounded, logElement.getBudget()));
 		
 		this.startTime = logElement.getStartTime();
 		this.endTime = logElement.getEndTime();
@@ -142,11 +134,11 @@ public final class PlanElement {
 	}
 
 	public void update(LogElement logElement) {
-		this.status.add(new Tuple<Integer, String>(new Integer(logElement.getIteration()), logElement.getStatus()));
-		this.nVeh.add(new Tuple<Integer, Integer>(new Integer(logElement.getIteration()), new Integer(logElement.getnVeh())));
-		this.nPax.add(new Tuple<Integer, Integer>(new Integer(logElement.getIteration()), new Integer(logElement.getnPax())));
-		this.score.add(new Tuple<Integer, Double>(new Integer(logElement.getIteration()), new Double(logElement.getScore())));
-		this.budget.add(new Tuple<Integer, Double>(new Integer(logElement.getIteration()), new Double(logElement.getBudget())));
+		this.status.add(new Tuple<>(logElement.getIteration(), logElement.getStatus()));
+		this.nVeh.add(new Tuple<>(logElement.getIteration(), logElement.getnVeh()));
+		this.nPax.add(new Tuple<>(logElement.getIteration(), logElement.getnPax()));
+		this.score.add(new Tuple<>(logElement.getIteration(), logElement.getScore()));
+		this.budget.add(new Tuple<>(logElement.getIteration(), logElement.getBudget()));
 	}
 
 	public boolean canBeChild(PlanElement planElement) {

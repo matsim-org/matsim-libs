@@ -18,18 +18,18 @@
  * *********************************************************************** */
 package playground.andreas.P2.hook;
 
-import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
+
+import java.util.Set;
 
 
 /**
  * @author droeder
  *
  */
-public interface PersonReRouteStuckFactory {
+interface PersonReRouteStuckFactory {
 	
 
 	/**

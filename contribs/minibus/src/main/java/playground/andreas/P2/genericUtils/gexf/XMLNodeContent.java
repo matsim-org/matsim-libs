@@ -8,21 +8,16 @@
 
 package playground.andreas.P2.genericUtils.gexf;
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import playground.andreas.P2.genericUtils.gexf.viz.ColorContent;
 import playground.andreas.P2.genericUtils.gexf.viz.NodeShapeContent;
 import playground.andreas.P2.genericUtils.gexf.viz.PositionContent;
 import playground.andreas.P2.genericUtils.gexf.viz.SizeContent;
+
+import javax.xml.bind.annotation.*;
+import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -80,23 +75,23 @@ public class XMLNodeContent {
         @XmlElement(name = "nodes", type = XMLNodesContent.class),
         @XmlElement(name = "spells", type = XMLSpellsContent.class)
     })
-    protected List<Object> attvaluesOrSpellsOrNodes;
+    private List<Object> attvaluesOrSpellsOrNodes;
     @XmlAttribute
-    protected String start;
+    private String start;
     @XmlAttribute
-    protected String startopen;
+    private String startopen;
     @XmlAttribute
-    protected String end;
+    private String end;
     @XmlAttribute
-    protected String endopen;
+    private String endopen;
     @XmlAttribute
-    protected String pid;
+    private String pid;
     @XmlAttribute(required = true)
-    protected String id;
+    private String id;
     @XmlAttribute
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlSchemaType(name = "token")
-    protected String label;
+    private String label;
 
     /**
      * Gets the value of the attvaluesOrSpellsOrNodes property.
@@ -130,7 +125,7 @@ public class XMLNodeContent {
      */
     public List<Object> getAttvaluesOrSpellsOrNodes() {
         if (attvaluesOrSpellsOrNodes == null) {
-            attvaluesOrSpellsOrNodes = new ArrayList<Object>();
+            attvaluesOrSpellsOrNodes = new ArrayList<>();
         }
         return this.attvaluesOrSpellsOrNodes;
     }

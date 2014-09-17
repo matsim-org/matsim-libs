@@ -31,16 +31,14 @@ import org.matsim.core.mobsim.qsim.pt.MobsimDriverPassengerAgent;
 class PTransitAgentFactory implements AgentFactory {
 
 	private final Netsim simulation;
-	private boolean boardAllLines;
 
-	public PTransitAgentFactory(final Netsim simulation, boolean boardAllLines) {
+    public PTransitAgentFactory(final Netsim simulation) {
 		this.simulation = simulation;
-		this.boardAllLines = boardAllLines;
-	}
+    }
 
 	@Override
 	public MobsimDriverPassengerAgent createMobsimAgentFromPerson(final Person p) {
-		MobsimDriverPassengerAgent agent = PTransitAgent.createTransitAgent(p, this.simulation, this.boardAllLines);
+		MobsimDriverPassengerAgent agent = PTransitAgent.createTransitAgent(p, this.simulation);
 		return agent;
 	}
 

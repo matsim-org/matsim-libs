@@ -8,11 +8,12 @@
 
 package playground.andreas.P2.genericUtils.gexf.viz;
 
+import playground.andreas.P2.genericUtils.gexf.XMLSpellsContent;
+
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.bind.annotation.XmlRegistry;
 import javax.xml.namespace.QName;
-import playground.andreas.P2.genericUtils.gexf.XMLSpellsContent;
 
 
 /**
@@ -95,7 +96,7 @@ public class ObjectFactory {
      */
     @XmlElementDecl(namespace = "http://www.gexf.net/1.2draft/viz", name = "spells")
     public JAXBElement<XMLSpellsContent> createSpells(XMLSpellsContent value) {
-        return new JAXBElement<XMLSpellsContent>(_Spells_QNAME, XMLSpellsContent.class, null, value);
+        return new JAXBElement<>(_Spells_QNAME, XMLSpellsContent.class, null, value);
     }
 
 }

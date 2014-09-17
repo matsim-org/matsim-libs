@@ -19,8 +19,6 @@
 
 package playground.andreas.P2.stats.abtractPAnalysisModules;
 
-import java.util.HashMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -33,8 +31,9 @@ import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
-
 import playground.andreas.P2.genericUtils.RecursiveStatsContainer;
+
+import java.util.HashMap;
 
 
 
@@ -52,7 +51,7 @@ public final class AverageLoadPerDeparturePerMode extends AbstractPAnalyisModule
 	
 	private HashMap<Id<Vehicle>, String> vehId2ptModeMap;
 	private HashMap<Id<Vehicle>, Integer> vehId2PaxMap = new HashMap<>();
-	private HashMap<String, RecursiveStatsContainer> ptMode2Stats = new HashMap<String, RecursiveStatsContainer>();
+	private HashMap<String, RecursiveStatsContainer> ptMode2Stats = new HashMap<>();
 
 	
 	public AverageLoadPerDeparturePerMode(){
@@ -76,11 +75,10 @@ public final class AverageLoadPerDeparturePerMode extends AbstractPAnalyisModule
 			Integer seats = veh.getType().getCapacity().getSeats();
 			Integer standing = veh.getType().getCapacity().getStandingRoom();
 			// setting these values is not mandatory. Thus, they maybe null \\DR, aug'13
-			this.vehId2VehicleCapacity.put(veh.getId(), 
-					new Double(
-							((seats == null) ? 0 : seats) + 
-							((standing == null) ? 0 : standing)
-							- 1.0));
+			this.vehId2VehicleCapacity.put(veh.getId(),
+                    ((seats == null) ? 0 : seats) +
+                            ((standing == null) ? 0 : standing)
+                            - 1.0);
 		}
 	}
 	
@@ -89,7 +87,7 @@ public final class AverageLoadPerDeparturePerMode extends AbstractPAnalyisModule
 		super.reset(iteration);
 		this.vehId2ptModeMap = new HashMap<>();
 		this.vehId2PaxMap = new HashMap<>();
-		this.ptMode2Stats = new HashMap<String, RecursiveStatsContainer>();
+		this.ptMode2Stats = new HashMap<>();
 	}
 
 	@Override
@@ -103,7 +101,7 @@ public final class AverageLoadPerDeparturePerMode extends AbstractPAnalyisModule
 		this.vehId2ptModeMap.put(event.getVehicleId(), ptMode);
 		
 		if (this.vehId2PaxMap.get(event.getVehicleId()) != null) {
-			if (this.vehId2PaxMap.get(event.getVehicleId()).intValue() != 0) {
+			if (this.vehId2PaxMap.get(event.getVehicleId()) != 0) {
 				log.warn(event.getVehicleId() + " has still " + this.vehId2PaxMap.get(event.getVehicleId()) + " passengers onboard. Should be zero by now.");
 			}
 		}
@@ -113,17 +111,17 @@ public final class AverageLoadPerDeparturePerMode extends AbstractPAnalyisModule
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		if(!super.ptDriverIds.contains(event.getPersonId())){
 			if (this.vehId2PaxMap.get(event.getVehicleId()) == null) {
-				this.vehId2PaxMap.put(event.getVehicleId(), new Integer(0));
+				this.vehId2PaxMap.put(event.getVehicleId(), 0);
 			}
 			
-			this.vehId2PaxMap.put(event.getVehicleId(), new Integer(this.vehId2PaxMap.get(event.getVehicleId()) + 1));
+			this.vehId2PaxMap.put(event.getVehicleId(), this.vehId2PaxMap.get(event.getVehicleId()) + 1);
 		}
 	}
 	
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
 		if(!super.ptDriverIds.contains(event.getPersonId())){
-			this.vehId2PaxMap.put(event.getVehicleId(), new Integer(this.vehId2PaxMap.get(event.getVehicleId()) - 1));
+			this.vehId2PaxMap.put(event.getVehicleId(), this.vehId2PaxMap.get(event.getVehicleId()) - 1);
 		}
 	}
 
@@ -141,7 +139,7 @@ public final class AverageLoadPerDeparturePerMode extends AbstractPAnalyisModule
 		if (this.vehId2PaxMap.get(event.getVehicleId()) != null) {
 			currentLoad = this.vehId2PaxMap.get(event.getVehicleId()).doubleValue();
 		}
-		double capacity = this.vehId2VehicleCapacity.get(event.getVehicleId()).doubleValue();
+		double capacity = this.vehId2VehicleCapacity.get(event.getVehicleId());
 		this.ptMode2Stats.get(ptMode).handleNewEntry(currentLoad / capacity);
 	}
 }

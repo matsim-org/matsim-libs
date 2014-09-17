@@ -19,17 +19,6 @@
 
 package playground.andreas.P2.stats.gexfPStats;
 
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map.Entry;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -39,26 +28,18 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
-
-import playground.andreas.P2.genericUtils.gexf.ObjectFactory;
-import playground.andreas.P2.genericUtils.gexf.XMLAttributeContent;
-import playground.andreas.P2.genericUtils.gexf.XMLAttributesContent;
-import playground.andreas.P2.genericUtils.gexf.XMLAttrtypeType;
-import playground.andreas.P2.genericUtils.gexf.XMLAttvalue;
-import playground.andreas.P2.genericUtils.gexf.XMLAttvaluesContent;
-import playground.andreas.P2.genericUtils.gexf.XMLClassType;
-import playground.andreas.P2.genericUtils.gexf.XMLDefaultedgetypeType;
-import playground.andreas.P2.genericUtils.gexf.XMLEdgeContent;
-import playground.andreas.P2.genericUtils.gexf.XMLEdgesContent;
-import playground.andreas.P2.genericUtils.gexf.XMLGexfContent;
-import playground.andreas.P2.genericUtils.gexf.XMLGraphContent;
-import playground.andreas.P2.genericUtils.gexf.XMLIdtypeType;
-import playground.andreas.P2.genericUtils.gexf.XMLModeType;
-import playground.andreas.P2.genericUtils.gexf.XMLNodeContent;
-import playground.andreas.P2.genericUtils.gexf.XMLNodesContent;
-import playground.andreas.P2.genericUtils.gexf.XMLTimeformatType;
+import playground.andreas.P2.PConfigGroup;
+import playground.andreas.P2.genericUtils.gexf.*;
 import playground.andreas.P2.genericUtils.gexf.viz.PositionContent;
-import playground.andreas.P2.helper.PConfigGroup;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map.Entry;
 
 /**
  * Uses a {@link CountPPaxHandler} to count passengers per paratransit vehicle and link, {@link CountPOperatorHandler} to count operators and their ids and writes them to a gexf network as dynamic link attributes.
@@ -67,7 +48,7 @@ import playground.andreas.P2.helper.PConfigGroup;
  * @author aneumann
  *
  */
-public final class SimpleGexfPStat extends MatsimJaxbXmlWriter implements IterationEndsListener{
+final class SimpleGexfPStat extends MatsimJaxbXmlWriter implements IterationEndsListener{
 	
 	private static final Logger log = Logger.getLogger(SimpleGexfPStat.class);
 	
@@ -79,10 +60,8 @@ public final class SimpleGexfPStat extends MatsimJaxbXmlWriter implements Iterat
 	private XMLGexfContent gexfContainer;
 
 	private CountPPaxHandler globalPaxHandler;
-	// TODO [AN] The operatorHandler is never used?
-	private CountPOperatorHandler operatorHandler;
-	private CountPVehHandler vehHandler;
-	private int getWriteGexfStatsInterval;
+    private CountPVehHandler vehHandler;
+	private final int getWriteGexfStatsInterval;
 
 	private HashMap<Id<Link>, XMLEdgeContent> edgeMap;
 	private HashMap<Id<Link>, XMLAttvaluesContent> linkAttributeValueContentMap;
@@ -90,8 +69,8 @@ public final class SimpleGexfPStat extends MatsimJaxbXmlWriter implements Iterat
 	private HashMap<Id<Link>, Integer> linkId2TotalCountsFromLastIteration;
 	private HashMap<Id<Link>, Integer> linkId2VehCountsFromLastIteration;
 
-	private String lineId;
-	private String outputFilename;
+	private final String lineId;
+	private final String outputFilename;
 
 
 
@@ -147,7 +126,7 @@ public final class SimpleGexfPStat extends MatsimJaxbXmlWriter implements Iterat
 
 	public void notifyStartup(Network network, CountPPaxHandler globalPaxHandler, CountPOperatorHandler operatorHandler, CountPVehHandler vehHandler) {
 		this.globalPaxHandler = globalPaxHandler;
-		this.operatorHandler = operatorHandler;
+        CountPOperatorHandler operatorHandler1 = operatorHandler;
 		this.vehHandler = vehHandler;
 
 		this.addNetworkAsLayer(network, 0);
@@ -159,7 +138,7 @@ public final class SimpleGexfPStat extends MatsimJaxbXmlWriter implements Iterat
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		if (this.getWriteGexfStatsInterval > 0) {
-			this.addValuesToGexf(event.getIteration(), this.globalPaxHandler, this.operatorHandler);
+			this.addValuesToGexf(event.getIteration(), this.globalPaxHandler);
 			if ((event.getIteration() % this.getWriteGexfStatsInterval == 0) ) {
 				this.write(this.outputFilename);
 			}			
@@ -167,7 +146,7 @@ public final class SimpleGexfPStat extends MatsimJaxbXmlWriter implements Iterat
 	}
 
 	public void notifyShutdown(int iteration) {
-		this.addValuesToGexf(iteration, this.globalPaxHandler, this.operatorHandler);
+		this.addValuesToGexf(iteration, this.globalPaxHandler);
 		this.write(this.outputFilename);
 	}
 
@@ -181,14 +160,14 @@ public final class SimpleGexfPStat extends MatsimJaxbXmlWriter implements Iterat
 		}		
 	}
 
-	private void addValuesToGexf(int iteration, CountPPaxHandler paxHandler, CountPOperatorHandler operatorHandler) {
+	private void addValuesToGexf(int iteration, CountPPaxHandler paxHandler) {
 		for (Entry<Id<Link>, XMLAttvaluesContent> linkEntry : this.linkAttributeValueContentMap.entrySet()) {
 			
 			int countForLink = paxHandler.getPaxCountForLinkId(linkEntry.getKey(), this.lineId);
 			
 			if (this.linkId2TotalCountsFromLastIteration.get(linkEntry.getKey()) != null){
 				// There is already an entry
-				if (this.linkId2TotalCountsFromLastIteration.get(linkEntry.getKey()).intValue() == countForLink) {
+				if (this.linkId2TotalCountsFromLastIteration.get(linkEntry.getKey()) == countForLink) {
 					// same as last iteration - ignore
 					continue;
 				}
@@ -209,7 +188,7 @@ public final class SimpleGexfPStat extends MatsimJaxbXmlWriter implements Iterat
 			
 			if (this.linkId2VehCountsFromLastIteration.get(linkEntry.getKey()) != null){
 				// There is already an entry
-				if (this.linkId2VehCountsFromLastIteration.get(linkEntry.getKey()).intValue() == countForLink) {
+				if (this.linkId2VehCountsFromLastIteration.get(linkEntry.getKey()) == countForLink) {
 					// same as last iteration - ignore
 					continue;
 				}
@@ -236,8 +215,6 @@ public final class SimpleGexfPStat extends MatsimJaxbXmlWriter implements Iterat
 			bufout.close();
 //			log.info("Output written to " + filename);
 		} catch (JAXBException e) {
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();

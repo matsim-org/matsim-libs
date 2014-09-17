@@ -19,9 +19,6 @@
 
 package playground.andreas.P2.routeProvider;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
@@ -31,15 +28,18 @@ import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityE
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.vehicles.Vehicle;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+
 /**
  * @author aneumann
  */
-public final class TimeAwareComplexCircleScheduleProviderHandler implements TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler{
+final class TimeAwareComplexCircleScheduleProviderHandler implements TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler{
 
 	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(TimeAwareComplexCircleScheduleProviderHandler.class);
 	
-	private String pIdentifier;
+	private final String pIdentifier;
 	private LinkedHashMap<Id<Vehicle>, TransitDriverStartsEvent> vehId2StartsEvent = new LinkedHashMap<>();
 	private LinkedHashMap<Id<Vehicle>, ArrayList<Double>> vehId2Offset = new LinkedHashMap<>();
 	private LinkedHashMap<Id<TransitRoute>, ArrayList<TinyStatsContainer>> routeId2StatsContrainerMap = new LinkedHashMap<>();
@@ -62,7 +62,7 @@ public final class TimeAwareComplexCircleScheduleProviderHandler implements Tran
 			if (this.vehId2Offset.get(event.getVehicleId()) == null) {
 				this.vehId2Offset.put(event.getVehicleId(), new ArrayList<Double>());				
 			}
-			this.vehId2Offset.get(event.getVehicleId()).add(new Double(event.getTime()));
+			this.vehId2Offset.get(event.getVehicleId()).add(event.getTime());
 		}
 		
 	}
@@ -87,7 +87,7 @@ public final class TimeAwareComplexCircleScheduleProviderHandler implements Tran
 		
 		if (this.routeId2StatsContrainerMap.get(event.getTransitRouteId()) == null) {
 			// first entry - create new one
-			ArrayList<TinyStatsContainer> statsList = new ArrayList<TinyStatsContainer>();
+			ArrayList<TinyStatsContainer> statsList = new ArrayList<>();
 			for (Double offset : offsetList) {
 				TinyStatsContainer statsContainer = new TinyStatsContainer();
 				statsContainer.handleEntry(offset - event.getTime());

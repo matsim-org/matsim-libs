@@ -25,15 +25,8 @@ import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleCapacity;
-import org.matsim.vehicles.VehicleCapacityImpl;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
-import org.matsim.vehicles.Vehicles;
-import org.matsim.vehicles.VehiclesFactory;
-
-import playground.andreas.P2.helper.PConfigGroup;
+import org.matsim.vehicles.*;
+import playground.andreas.P2.PConfigGroup;
 
 /**
  * Generates vehicles for a whole transit schedule
@@ -44,7 +37,7 @@ import playground.andreas.P2.helper.PConfigGroup;
 class PVehiclesFactory {
 	private final static Logger log = Logger.getLogger(PVehiclesFactory.class);
 	
-	private PConfigGroup pConfig;
+	private final PConfigGroup pConfig;
 
 	public PVehiclesFactory(PConfigGroup pConfig) {
 		this.pConfig = pConfig;
@@ -60,8 +53,8 @@ class PVehiclesFactory {
 		VehiclesFactory vehFactory = vehicles.getFactory();
 		VehicleType vehType = vehFactory.createVehicleType(new IdImpl(this.pConfig.getPIdentifier()));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
-		capacity.setSeats(Integer.valueOf(this.pConfig.getPaxPerVehicle() + 1)); // july 2011 the driver takes one seat
-		capacity.setStandingRoom(Integer.valueOf(0));
+		capacity.setSeats(this.pConfig.getPaxPerVehicle() + 1); // july 2011 the driver takes one seat
+		capacity.setStandingRoom(0);
 		vehType.setCapacity(capacity);
 		vehType.setPcuEquivalents(this.pConfig.getPassengerCarEquivalents());
 		vehType.setMaximumVelocity(this.pConfig.getVehicleMaximumVelocity());

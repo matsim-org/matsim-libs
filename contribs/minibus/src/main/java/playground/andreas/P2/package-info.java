@@ -1,6 +1,6 @@
 /**
  * Look into:<ul>
- * <li> {@link playground.andreas.P2.PControler} 
+ * <li> {@link playground.andreas.P2.PMain}
  * </ul>
  *
  * @author aneumann

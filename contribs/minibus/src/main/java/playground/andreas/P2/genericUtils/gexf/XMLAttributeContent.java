@@ -8,15 +8,10 @@
 
 package playground.andreas.P2.genericUtils.gexf;
 
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElementRef;
-import javax.xml.bind.annotation.XmlElementRefs;
-import javax.xml.bind.annotation.XmlType;
 
 
 /**
@@ -52,13 +47,13 @@ public class XMLAttributeContent {
         @XmlElementRef(name = "default", namespace = "http://www.gexf.net/1.2draft", type = JAXBElement.class),
         @XmlElementRef(name = "options", namespace = "http://www.gexf.net/1.2draft", type = JAXBElement.class)
     })
-    protected List<JAXBElement<String>> defaultOrOptions;
+    private List<JAXBElement<String>> defaultOrOptions;
     @XmlAttribute(required = true)
-    protected String id;
+    private String id;
     @XmlAttribute(required = true)
-    protected String title;
+    private String title;
     @XmlAttribute(required = true)
-    protected XMLAttrtypeType type;
+    private XMLAttrtypeType type;
 
     /**
      * Gets the value of the defaultOrOptions property.
@@ -85,7 +80,7 @@ public class XMLAttributeContent {
      */
     public List<JAXBElement<String>> getDefaultOrOptions() {
         if (defaultOrOptions == null) {
-            defaultOrOptions = new ArrayList<JAXBElement<String>>();
+            defaultOrOptions = new ArrayList<>();
         }
         return this.defaultOrOptions;
     }

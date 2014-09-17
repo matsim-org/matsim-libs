@@ -19,13 +19,6 @@
 
 package playground.andreas.P2.routeProvider;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -39,16 +32,12 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
-
 import playground.andreas.P2.operator.Operator;
-import playground.andreas.P2.replanning.PPlan;
+import playground.andreas.P2.operator.PPlan;
+
+import java.util.*;
 
 
 /**
@@ -57,20 +46,20 @@ import playground.andreas.P2.replanning.PPlan;
  * @author aneumann
  *
  */
-public final class SimpleCircleScheduleProvider implements PRouteProvider {
+final class SimpleCircleScheduleProvider implements PRouteProvider {
 	
 	private final static Logger log = Logger.getLogger(SimpleCircleScheduleProvider.class);
 	public final static String NAME = "SimpleCircleScheduleProvider";
 	
-	private String pIdentifier;
-	private Network net;
-	private TransitSchedule scheduleWithStopsOnly;
-	private RandomStopProvider randomStopProvider;
-	private String transportMode;
-	private LeastCostPathCalculator routingAlgo;
-	private double vehicleMaximumVelocity;
+	private final String pIdentifier;
+	private final Network net;
+	private final TransitSchedule scheduleWithStopsOnly;
+	private final RandomStopProvider randomStopProvider;
+	private final String transportMode;
+	private final LeastCostPathCalculator routingAlgo;
+	private final double vehicleMaximumVelocity;
 	
-	public SimpleCircleScheduleProvider(String pIdentifier, TransitSchedule scheduleWithStopsOnly, Network network, RandomStopProvider randomStopProvider, int iteration, double vehicleMaximumVelocity, final String transportMode) {
+	public SimpleCircleScheduleProvider(String pIdentifier, TransitSchedule scheduleWithStopsOnly, Network network, RandomStopProvider randomStopProvider, double vehicleMaximumVelocity, final String transportMode) {
 		this.pIdentifier = pIdentifier;
 		this.net = network;
 		this.scheduleWithStopsOnly = scheduleWithStopsOnly;
@@ -139,7 +128,7 @@ public final class SimpleCircleScheduleProvider implements PRouteProvider {
 		Path forth = this.routingAlgo.calcLeastCostPath(startNode, intermediateEndNode, startTime, null, null);
 		Path back = this.routingAlgo.calcLeastCostPath(intermediateStartNode, endNode, startTime + forth.travelTime, null, null);
 		
-		List<Link> completeLinkList = new LinkedList<Link>();
+		List<Link> completeLinkList = new LinkedList<>();
 		completeLinkList.addAll(forth.links);
 		completeLinkList.add(this.net.getLinks().get(endStop.getLinkId()));
 		completeLinkList.addAll(back.links);
@@ -148,7 +137,7 @@ public final class SimpleCircleScheduleProvider implements PRouteProvider {
 		route.setLinkIds(startStop.getLinkId(), NetworkUtils.getLinkIds(completeLinkList), startStop.getLinkId());		
 		
 		// get stops at Route
-		List<TransitRouteStop> stops = new LinkedList<TransitRouteStop>();
+		List<TransitRouteStop> stops = new LinkedList<>();
 		
 		double runningTime = 0.0;
 		

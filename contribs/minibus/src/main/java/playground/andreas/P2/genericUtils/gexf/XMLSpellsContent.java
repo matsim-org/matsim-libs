@@ -8,12 +8,12 @@
 
 package playground.andreas.P2.genericUtils.gexf;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -42,7 +42,7 @@ import javax.xml.bind.annotation.XmlType;
 public class XMLSpellsContent {
 
     @XmlElement(required = true)
-    protected List<XMLSpell> spell;
+    private List<XMLSpell> spell;
 
     /**
      * Gets the value of the spell property.
@@ -68,7 +68,7 @@ public class XMLSpellsContent {
      */
     public List<XMLSpell> getSpell() {
         if (spell == null) {
-            spell = new ArrayList<XMLSpell>();
+            spell = new ArrayList<>();
         }
         return this.spell;
     }

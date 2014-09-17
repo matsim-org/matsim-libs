@@ -19,10 +19,6 @@
 
 package playground.andreas.P2.stats.gexfPStats;
 
-import java.util.HashMap;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -32,8 +28,11 @@ import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.vehicles.Vehicle;
-
 import playground.andreas.P2.operator.Operator;
+
+import java.util.HashMap;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Counts the number of operators per link
@@ -46,7 +45,7 @@ public final class CountPOperatorHandler implements LinkEnterEventHandler, Trans
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(CountPOperatorHandler.class);
 	
-	private String pIdentifier;
+	private final String pIdentifier;
 	private HashMap<Id<Link>, Set<Id<Operator>>> linkId2OperatorIdsSetMap;
 	private HashMap<Id<Vehicle>, Id<TransitLine>> vehId2lineIdMap;
 
@@ -59,7 +58,7 @@ public final class CountPOperatorHandler implements LinkEnterEventHandler, Trans
 	public Set<Id<Operator>> getOperatorIdsForLinkId(Id<Link> linkId) {
 		Set<Id<Operator>> operatorIds = this.linkId2OperatorIdsSetMap.get(linkId);
 		if(operatorIds == null){
-			return new TreeSet<Id<Operator>>();
+			return new TreeSet<>();
 		} else {
 			return operatorIds;
 		}

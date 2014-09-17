@@ -19,40 +19,21 @@
 
 package playground.andreas.P2.ana.log2something;
 
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
 import org.matsim.core.utils.misc.Time;
-
-import playground.andreas.P2.genericUtils.gexf.ObjectFactory;
-import playground.andreas.P2.genericUtils.gexf.XMLAttributeContent;
-import playground.andreas.P2.genericUtils.gexf.XMLAttributesContent;
-import playground.andreas.P2.genericUtils.gexf.XMLAttrtypeType;
-import playground.andreas.P2.genericUtils.gexf.XMLAttvalue;
-import playground.andreas.P2.genericUtils.gexf.XMLAttvaluesContent;
-import playground.andreas.P2.genericUtils.gexf.XMLClassType;
-import playground.andreas.P2.genericUtils.gexf.XMLDefaultedgetypeType;
-import playground.andreas.P2.genericUtils.gexf.XMLEdgeContent;
-import playground.andreas.P2.genericUtils.gexf.XMLEdgesContent;
-import playground.andreas.P2.genericUtils.gexf.XMLGexfContent;
-import playground.andreas.P2.genericUtils.gexf.XMLGraphContent;
-import playground.andreas.P2.genericUtils.gexf.XMLIdtypeType;
-import playground.andreas.P2.genericUtils.gexf.XMLModeType;
-import playground.andreas.P2.genericUtils.gexf.XMLNodeContent;
-import playground.andreas.P2.genericUtils.gexf.XMLNodesContent;
-import playground.andreas.P2.genericUtils.gexf.XMLTimeformatType;
+import playground.andreas.P2.genericUtils.gexf.*;
 import playground.andreas.P2.genericUtils.gexf.viz.PositionContent;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Transforms {@link PlanElement} into a Gexf file.
@@ -60,14 +41,14 @@ import playground.andreas.P2.genericUtils.gexf.viz.PositionContent;
  * @author aneumann
  *
  */
-public final class PlanElement2Gexf extends MatsimJaxbXmlWriter{
+final class PlanElement2Gexf extends MatsimJaxbXmlWriter{
 	
 	private static final Logger log = Logger.getLogger(PlanElement2Gexf.class);
 	
 	private final static String XSD_PATH = "http://www.gexf.net/1.2draft/gexf.xsd";
 
-	private ObjectFactory gexfFactory;
-	private XMLGexfContent gexfContainer;
+	private final ObjectFactory gexfFactory;
+	private final XMLGexfContent gexfContainer;
 
 	public static void planElement2Gexf(ArrayList<PlanElement> planElements, String outputFile){
 		PlanElement2Gexf planElement2Gexf = new PlanElement2Gexf();
@@ -76,7 +57,7 @@ public final class PlanElement2Gexf extends MatsimJaxbXmlWriter{
 		
 	}
 	
-	public PlanElement2Gexf(){
+	private PlanElement2Gexf(){
 		log.info("enabled");
 		
 		this.gexfFactory = new ObjectFactory();
@@ -186,8 +167,6 @@ public final class PlanElement2Gexf extends MatsimJaxbXmlWriter{
 //			log.info("Output written to " + filename);
 		} catch (JAXBException e) {
 			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}		
@@ -282,25 +261,25 @@ public final class PlanElement2Gexf extends MatsimJaxbXmlWriter{
 			
 			int lastNVeh = Integer.MAX_VALUE;
 			for (Tuple<Integer, Integer> nVeh : node.getnVeh()) {
-				if (lastNVeh != nVeh.getSecond().intValue()) {
+				if (lastNVeh != nVeh.getSecond()) {
 					attValue = new XMLAttvalue();
 					attValue.setFor("nVeh");
 					attValue.setValue(Integer.toString(nVeh.getSecond()));
 					attValue.setStart(Double.toString(nVeh.getFirst()));
 					attValueContent.getAttvalue().add(attValue);
-					lastNVeh = nVeh.getSecond().intValue();
+					lastNVeh = nVeh.getSecond();
 				}
 			}
 			
 			int lastNPax = Integer.MAX_VALUE;
 			for (Tuple<Integer, Integer> nPax : node.getnPax()) {
-				if (lastNPax != nPax.getSecond().intValue()) {
+				if (lastNPax != nPax.getSecond()) {
 					attValue = new XMLAttvalue();
 					attValue.setFor("nPax");
 					attValue.setValue(Integer.toString(nPax.getSecond()));
 					attValue.setStart(Double.toString(nPax.getFirst()));
 					attValueContent.getAttvalue().add(attValue);
-					lastNPax = nPax.getSecond().intValue();
+					lastNPax = nPax.getSecond();
 				}
 			}
 			

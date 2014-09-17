@@ -31,7 +31,7 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.testcases.MatsimTestUtils;
-import playground.andreas.P2.helper.PConfigGroup;
+import playground.andreas.P2.PConfigGroup;
 import playground.andreas.P2.hook.PHook;
 
 import java.io.File;
@@ -49,7 +49,7 @@ public class PControlerTest implements TabularFileHandler{
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	
-	private ArrayList<String[]> pStatsResults = new ArrayList<String[]>();
+	private final ArrayList<String[]> pStatsResults = new ArrayList<>();
 
 
 	@Test
@@ -84,7 +84,7 @@ public class PControlerTest implements TabularFileHandler{
 		controler.run();
 		
 		// Check standard output files	
-		List<String> filesToCheckFor = new LinkedList<String>();
+		List<String> filesToCheckFor = new LinkedList<>();
 		filesToCheckFor.add(outputPath + scenarioName + ".0.actsFromParatransitUsers.txt");
 		filesToCheckFor.add(outputPath + scenarioName + ".pOperatorLogger.txt");
 		filesToCheckFor.add(outputPath + scenarioName + ".pStats.txt");

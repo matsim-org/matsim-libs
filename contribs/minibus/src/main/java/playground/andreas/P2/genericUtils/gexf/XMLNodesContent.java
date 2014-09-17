@@ -8,14 +8,10 @@
 
 package playground.andreas.P2.genericUtils.gexf;
 
+import javax.xml.bind.annotation.*;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
 
 
 /**
@@ -44,10 +40,10 @@ import javax.xml.bind.annotation.XmlType;
 })
 public class XMLNodesContent {
 
-    protected List<XMLNodeContent> node;
+    private List<XMLNodeContent> node;
     @XmlAttribute
     @XmlSchemaType(name = "nonNegativeInteger")
-    protected BigInteger count;
+    private BigInteger count;
 
     /**
      * Gets the value of the node property.
@@ -73,7 +69,7 @@ public class XMLNodesContent {
      */
     public List<XMLNodeContent> getNode() {
         if (node == null) {
-            node = new ArrayList<XMLNodeContent>();
+            node = new ArrayList<>();
         }
         return this.node;
     }

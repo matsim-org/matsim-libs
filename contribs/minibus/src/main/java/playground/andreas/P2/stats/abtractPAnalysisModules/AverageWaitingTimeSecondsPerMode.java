@@ -19,8 +19,6 @@
 
 package playground.andreas.P2.stats.abtractPAnalysisModules;
 
-import java.util.HashMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -31,6 +29,8 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.HashMap;
 
 
 /**
@@ -66,13 +66,13 @@ public final class AverageWaitingTimeSecondsPerMode extends AbstractPAnalyisModu
 	public void reset(int iteration) {
 		super.reset(iteration);
 		this.vehId2ptModeMap = new HashMap<>();
-		this.ptMode2SecondsTravelledMap = new HashMap<String, Double>();
-		this.ptMode2TripCountMap = new HashMap<String, Integer>();
+		this.ptMode2SecondsTravelledMap = new HashMap<>();
+		this.ptMode2TripCountMap = new HashMap<>();
 		this.agentId2AgentDepartureEventTime = new HashMap<>();
 		// avoid null-pointer in getResult() /dr
 		for (String ptMode : this.ptModes) {
-			this.ptMode2SecondsTravelledMap.put(ptMode, new Double(0.));
-			this.ptMode2TripCountMap.put(ptMode, new Integer(0));
+			this.ptMode2SecondsTravelledMap.put(ptMode, 0.);
+			this.ptMode2TripCountMap.put(ptMode, 0);
 		}
 	}
 
@@ -105,14 +105,14 @@ public final class AverageWaitingTimeSecondsPerMode extends AbstractPAnalyisModu
 			}
 			
 			if (ptMode2SecondsTravelledMap.get(ptMode) == null) {
-				ptMode2SecondsTravelledMap.put(ptMode, new Double(0.0));
+				ptMode2SecondsTravelledMap.put(ptMode, 0.0);
 			}
 			if (ptMode2TripCountMap.get(ptMode) == null) {
-				ptMode2TripCountMap.put(ptMode, new Integer(0));
+				ptMode2TripCountMap.put(ptMode, 0);
 			}
 			
-			this.ptMode2SecondsTravelledMap.put(ptMode, new Double(this.ptMode2SecondsTravelledMap.get(ptMode) + (event.getTime() - this.agentId2AgentDepartureEventTime.get(event.getPersonId()).doubleValue())));
-			this.ptMode2TripCountMap.put(ptMode, new Integer(this.ptMode2TripCountMap.get(ptMode) + 1));
+			this.ptMode2SecondsTravelledMap.put(ptMode, this.ptMode2SecondsTravelledMap.get(ptMode) + (event.getTime() - this.agentId2AgentDepartureEventTime.get(event.getPersonId())));
+			this.ptMode2TripCountMap.put(ptMode, this.ptMode2TripCountMap.get(ptMode) + 1);
 		}
 	}
 }

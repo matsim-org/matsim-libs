@@ -19,29 +19,28 @@
 
 package playground.andreas.P2.ana.log2something;
 
+import org.apache.log4j.Logger;
+import playground.andreas.P2.replanning.CreateNewPlan;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-
-import playground.andreas.P2.replanning.modules.CreateNewPlan;
-
-public final class FindAncestorOfPlanElements {
+final class FindAncestorOfPlanElements {
 	private static final Logger log = Logger.getLogger(FindAncestorOfPlanElements.class);
 	
 	
 	public static ArrayList<PlanElement> findAncestorOfPlanElements(ArrayList<PlanElement> planElements){
 		
 		int currentIteration = 0;
-		LinkedList<PlanElement> candidates = new LinkedList<PlanElement>();
+		LinkedList<PlanElement> candidates = new LinkedList<>();
 		
 		for (PlanElement planElement : planElements) {
 			if (currentIteration != planElement.getIterationFounded()) {
 				// new generation - remove ceased plans from the candidates
 				log.info("Terminating iteration " + currentIteration);
 				
-				List<PlanElement> candidatesToBeRemoved = new LinkedList<PlanElement>();
+				List<PlanElement> candidatesToBeRemoved = new LinkedList<>();
 				for (PlanElement candidate : candidates) {
 					if (candidate.getIterationCeased() == currentIteration) {
 						candidatesToBeRemoved.add(candidate);

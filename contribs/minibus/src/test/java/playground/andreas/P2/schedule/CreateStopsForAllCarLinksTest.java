@@ -31,9 +31,8 @@ import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
-
-import playground.andreas.P2.PScenarioHelper;
-import playground.andreas.P2.helper.PConfigGroup;
+import playground.andreas.P2.PConfigGroup;
+import playground.andreas.P2.routeProvider.PScenarioHelper;
 
 
 public class CreateStopsForAllCarLinksTest {

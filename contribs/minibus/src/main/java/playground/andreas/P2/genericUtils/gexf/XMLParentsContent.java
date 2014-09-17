@@ -8,11 +8,11 @@
 
 package playground.andreas.P2.genericUtils.gexf;
 
-import java.util.ArrayList;
-import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlType;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -40,7 +40,7 @@ import javax.xml.bind.annotation.XmlType;
 })
 public class XMLParentsContent {
 
-    protected List<XMLParent> parent;
+    private List<XMLParent> parent;
 
     /**
      * Gets the value of the parent property.
@@ -66,7 +66,7 @@ public class XMLParentsContent {
      */
     public List<XMLParent> getParent() {
         if (parent == null) {
-            parent = new ArrayList<XMLParent>();
+            parent = new ArrayList<>();
         }
         return this.parent;
     }

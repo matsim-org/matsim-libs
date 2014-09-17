@@ -1,16 +1,16 @@
 package playground.andreas.P2.ana.log2something;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.core.utils.misc.Time;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Reads a pLogger file omitting the header and all totals.
@@ -22,9 +22,9 @@ public final class LogReader implements TabularFileHandler {
 	
 	private static final Logger log = Logger.getLogger(LogReader.class);
 
-	private TabularFileParserConfig tabFileParserConfig;
-	private ArrayList<LogElement> processedLines = new ArrayList<LogElement>();
-	private LogElementSinkImpl sink = new LogElementSinkImpl();
+	private final TabularFileParserConfig tabFileParserConfig;
+	private final ArrayList<LogElement> processedLines = new ArrayList<>();
+	private final LogElementSinkImpl sink = new LogElementSinkImpl();
 	private int linesRejected = 0;
 
 	static interface LogElementSink {
@@ -38,7 +38,7 @@ public final class LogReader implements TabularFileHandler {
 		}
 	}
 
-	public LogReader(String filename) {
+	private LogReader(String filename) {
 		tabFileParserConfig = new TabularFileParserConfig();
 		tabFileParserConfig.setFileName(filename);
 		tabFileParserConfig.setDelimiterTags(new String[] {"\t"}); // \t
@@ -54,7 +54,7 @@ public final class LogReader implements TabularFileHandler {
 		return reader.processedLines;		
 	}	
 
-	public void parse() {
+	private void parse() {
         new TabularFileParser().parse(tabFileParserConfig, this);
     }
 	
