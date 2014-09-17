@@ -20,12 +20,13 @@
 
 package org.matsim.integration.replanning;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
@@ -59,7 +60,7 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 		// setup config
 		final Config config = loadConfig(null);
 		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
-		final StrategySettings strategySettings = new StrategySettings(new IdImpl("1"));
+		final StrategySettings strategySettings = new StrategySettings(Id.create("1", StrategySettings.class));
 		strategySettings.setModuleName("ChangeLegMode");
 		strategySettings.setProbability(1.0);
 		config.strategy().addStrategySettings(strategySettings);
@@ -67,13 +68,13 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 
 		// setup network
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
-		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(1000, 0));
-		Link link = network.createAndAddLink(new IdImpl(1), node1, node2, 1000, 10, 3600, 1);
+		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new CoordImpl(0, 0));
+		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new CoordImpl(1000, 0));
+		Link link = network.createAndAddLink(Id.create(1, Link.class), node1, node2, 1000, 10, 3600, 1);
 
 		// setup population with one person
 		Population population = scenario.getPopulation();
-		PersonImpl person = new PersonImpl(new IdImpl(1));
+		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
 		population.addPerson(person);
 		PlanImpl plan = person.createAndAddPlan(true);
 		ActivityImpl act = plan.createAndAddActivity("home", new CoordImpl(0, 0));

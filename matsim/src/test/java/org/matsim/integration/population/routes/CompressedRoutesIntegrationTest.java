@@ -21,9 +21,10 @@ package org.matsim.integration.population.routes;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -44,7 +45,7 @@ public class CompressedRoutesIntegrationTest {
 		new MatsimNetworkReader(s).readFile("test/scenarios/equil/network.xml");
 		new ParallelPopulationReaderMatsimV4(s).readFile("test/scenarios/equil/plans1.xml");
 		Assert.assertEquals(1, s.getPopulation().getPersons().size());
-		Leg firstPersonsLeg = (Leg) s.getPopulation().getPersons().get(new IdImpl("1")).getSelectedPlan().getPlanElements().get(1);
+		Leg firstPersonsLeg = (Leg) s.getPopulation().getPersons().get(Id.create("1", Person.class)).getSelectedPlan().getPlanElements().get(1);
 		Assert.assertTrue(firstPersonsLeg.getRoute() instanceof CompressedNetworkRouteImpl);
 	}
 	

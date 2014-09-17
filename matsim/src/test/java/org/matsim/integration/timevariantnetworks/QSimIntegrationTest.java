@@ -38,7 +38,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.Mobsim;
@@ -76,9 +75,9 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
 		NetworkImpl network = createNetwork(scenario);
-		Link link1 = network.getLinks().get(new IdImpl("1"));
-		Link link2 = network.getLinks().get(new IdImpl("2"));
-		Link link3 = network.getLinks().get(new IdImpl("3"));
+		Link link1 = network.getLinks().get(Id.create("1", Link.class));
+		Link link2 = network.getLinks().get(Id.create("2", Link.class));
+		Link link3 = network.getLinks().get(Id.create("3", Link.class));
 
 		// add a freespeed change to 20 at 8am.
 		NetworkChangeEvent change = network.getFactory().createNetworkChangeEvent(8*3600.0);

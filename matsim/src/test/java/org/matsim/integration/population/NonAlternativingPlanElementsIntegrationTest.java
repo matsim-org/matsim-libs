@@ -19,13 +19,20 @@
 
 package org.matsim.integration.population;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.*;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -37,12 +44,15 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.testcases.MatsimTestUtils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Tests that a simple simulation can be run with plans where
@@ -65,7 +75,7 @@ public class NonAlternativingPlanElementsIntegrationTest {
 		new MatsimNetworkReader(scenario).readFile("test/scenarios/equil/network.xml");
 		
 		Plan plan = createPlanWithConsecutiveActivitiesForEquilNet(scenario);
-		Person person = scenario.getPopulation().getFactory().createPerson(new IdImpl(1));
+		Person person = scenario.getPopulation().getFactory().createPerson(Id.create(1, Person.class));
 		person.addPlan(plan);
 		scenario.getPopulation().addPerson(person);
 		
@@ -88,7 +98,7 @@ public class NonAlternativingPlanElementsIntegrationTest {
 		new MatsimNetworkReader(scenario).readFile("test/scenarios/equil/network.xml");
 		
 		Plan plan = createPlanWithConsecutiveLegsForEquilNet(scenario);
-		Person person = scenario.getPopulation().getFactory().createPerson(new IdImpl(1));
+		Person person = scenario.getPopulation().getFactory().createPerson(Id.create(1, Person.class));
 		person.addPlan(plan);
 		scenario.getPopulation().addPerson(person);
 		
@@ -114,7 +124,7 @@ public class NonAlternativingPlanElementsIntegrationTest {
 		addSimpleTransitServices(scenario);
 		
 		Plan plan = createPlanWithConsecutiveActivitiesForEquilNet(scenario);
-		Person person = scenario.getPopulation().getFactory().createPerson(new IdImpl(1));
+		Person person = scenario.getPopulation().getFactory().createPerson(Id.create(1, Person.class));
 		person.addPlan(plan);
 		scenario.getPopulation().addPerson(person);
 		
@@ -140,7 +150,7 @@ public class NonAlternativingPlanElementsIntegrationTest {
 		addSimpleTransitServices(scenario);
 		
 		Plan plan = createPlanWithConsecutiveLegsForEquilNet(scenario);
-		Person person = scenario.getPopulation().getFactory().createPerson(new IdImpl(1));
+		Person person = scenario.getPopulation().getFactory().createPerson(Id.create(1, Person.class));
 		person.addPlan(plan);
 		scenario.getPopulation().addPerson(person);
 		
@@ -158,27 +168,27 @@ public class NonAlternativingPlanElementsIntegrationTest {
 		
 		Plan plan = pf.createPlan();
 		
-		Activity home1 = pf.createActivityFromLinkId("h", new IdImpl(1));
+		Activity home1 = pf.createActivityFromLinkId("h", Id.create(1, Link.class));
 		((ActivityImpl) home1).setCoord(new CoordImpl(-17000, 500));
 		home1.setEndTime(7.0 * 3600);
 
 		Leg leg1 = pf.createLeg("transit_walk");
-		leg1.setRoute(new GenericRouteImpl(new IdImpl(1), new IdImpl(14)));
+		leg1.setRoute(new GenericRouteImpl(Id.create(1, Link.class), Id.create(14, Link.class)));
 
 		Leg leg2 = pf.createLeg("pt");
-		leg2.setRoute(new LinkNetworkRouteImpl(new IdImpl(14), new Id[] {new IdImpl(20)}, new IdImpl(21)));
+		leg2.setRoute(new LinkNetworkRouteImpl(Id.create(14, Link.class), new Id[] {Id.create(20, Link.class)}, Id.create(21, Link.class)));
 
 		Leg leg3 = pf.createLeg("transit_walk");
-		leg3.setRoute(new LinkNetworkRouteImpl(new IdImpl(14), new Id[0], new IdImpl(14)));
+		leg3.setRoute(new LinkNetworkRouteImpl(Id.create(14, Link.class), new Id[0], Id.create(14, Link.class)));
 
-		Activity work = pf.createActivityFromLinkId("w", new IdImpl(21));
+		Activity work = pf.createActivityFromLinkId("w", Id.create(21, Link.class));
 		work.setEndTime(17.0 * 3600);
 		((ActivityImpl) work).setCoord(new CoordImpl(5000, -8000));
 
 		Leg leg4 = pf.createLeg("car");
-		leg4.setRoute(new LinkNetworkRouteImpl(new IdImpl(21), new Id[] {new IdImpl(22), new IdImpl(23)}, new IdImpl(1)));
+		leg4.setRoute(new LinkNetworkRouteImpl(Id.create(21, Link.class), new Id[] {Id.create(22, Link.class), Id.create(23, Link.class)}, Id.create(1, Link.class)));
 
-		Activity home2 = pf.createActivityFromLinkId("h", new IdImpl(1));
+		Activity home2 = pf.createActivityFromLinkId("h", Id.create(1, Link.class));
 		((ActivityImpl) home2).setCoord(new CoordImpl(-17000, 500));
 		
 		plan.addActivity(home1);
@@ -197,33 +207,33 @@ public class NonAlternativingPlanElementsIntegrationTest {
 		
 		Plan plan = pf.createPlan();
 		
-		Activity home1 = pf.createActivityFromLinkId("h", new IdImpl(1));
+		Activity home1 = pf.createActivityFromLinkId("h", Id.create(1, Link.class));
 		((ActivityImpl) home1).setCoord(new CoordImpl(-17000, 500));
 		home1.setEndTime(7.0 * 3600);
 
 		Leg leg1 = pf.createLeg("walk");
-		leg1.setRoute(new GenericRouteImpl(new IdImpl(1), new IdImpl(21)));
+		leg1.setRoute(new GenericRouteImpl(Id.create(1, Link.class), Id.create(21, Link.class)));
 
-		Activity work = pf.createActivityFromLinkId("w", new IdImpl(21));
+		Activity work = pf.createActivityFromLinkId("w", Id.create(21, Link.class));
 		work.setEndTime(17.0 * 3600);
 		((ActivityImpl) work).setCoord(new CoordImpl(5000, -8000));
 
-		Activity shop = pf.createActivityFromLinkId("h", new IdImpl(21));
+		Activity shop = pf.createActivityFromLinkId("h", Id.create(21, Link.class));
 		shop.setEndTime(17.5 * 3600);
 		((ActivityImpl) shop).setCoord(new CoordImpl(5000, -8000));
 
 		Leg leg2 = pf.createLeg("car");
-		leg2.setRoute(new LinkNetworkRouteImpl(new IdImpl(21), new Id[] {new IdImpl(22), new IdImpl(23)}, new IdImpl(1)));
+		leg2.setRoute(new LinkNetworkRouteImpl(Id.create(21, Link.class), new Id[] {Id.create(22, Link.class), Id.create(23, Link.class)}, Id.create(1, Link.class)));
 
-		Activity home2 = pf.createActivityFromLinkId("h", new IdImpl(1));
+		Activity home2 = pf.createActivityFromLinkId("h", Id.create(1, Link.class));
 		((ActivityImpl) home2).setCoord(new CoordImpl(-17000, 500));
 		home2.setEndTime(21 * 3600);
 
-		Activity home3 = pf.createActivityFromLinkId("h", new IdImpl(1));
+		Activity home3 = pf.createActivityFromLinkId("h", Id.create(1, Link.class));
 		((ActivityImpl) home2).setCoord(new CoordImpl(-17000, 500));
 		home2.setEndTime(22 * 3600);
 
-		Activity home4 = pf.createActivityFromLinkId("h", new IdImpl(1));
+		Activity home4 = pf.createActivityFromLinkId("h", Id.create(1, Link.class));
 		((ActivityImpl) home2).setCoord(new CoordImpl(-17000, 500));
 		
 		plan.addActivity(home1);
@@ -244,24 +254,24 @@ public class NonAlternativingPlanElementsIntegrationTest {
 		
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		TransitScheduleFactory f = schedule.getFactory();
-		TransitStopFacility stopFacility1 = f.createTransitStopFacility(new IdImpl(1), new CoordImpl(-6000, 1500), false);
-		stopFacility1.setLinkId(new IdImpl(14));
-		TransitStopFacility stopFacility2 = f.createTransitStopFacility(new IdImpl(2), new CoordImpl(5000, -4000), false);
-		stopFacility2.setLinkId(new IdImpl(21));
+		TransitStopFacility stopFacility1 = f.createTransitStopFacility(Id.create(1, TransitStopFacility.class), new CoordImpl(-6000, 1500), false);
+		stopFacility1.setLinkId(Id.create(14, Link.class));
+		TransitStopFacility stopFacility2 = f.createTransitStopFacility(Id.create(2, TransitStopFacility.class), new CoordImpl(5000, -4000), false);
+		stopFacility2.setLinkId(Id.create(21, Link.class));
 		schedule.addStopFacility(stopFacility1);
 		schedule.addStopFacility(stopFacility2);
 		
-		TransitLine line1 = f.createTransitLine(new IdImpl(1));
-		NetworkRoute netRoute = new LinkNetworkRouteImpl(new IdImpl("14"), new Id[] { new IdImpl("20") }, new IdImpl("21"));
+		TransitLine line1 = f.createTransitLine(Id.create(1, TransitLine.class));
+		NetworkRoute netRoute = new LinkNetworkRouteImpl(Id.create("14", Link.class), new Id[] { Id.create("20", Link.class) }, Id.create("21", Link.class));
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 		stops.add(f.createTransitRouteStop(stopFacility1, Time.UNDEFINED_TIME, 0));
 		stops.add(f.createTransitRouteStop(stopFacility2, 180, Time.UNDEFINED_TIME));
-		TransitRoute route1 = f.createTransitRoute(new IdImpl(1), netRoute, stops, "bus");
+		TransitRoute route1 = f.createTransitRoute(Id.create(1, TransitRoute.class), netRoute, stops, "bus");
 		line1.addRoute(route1);
 		schedule.addTransitLine(line1);
 		
 		for (int i = 0; i < 20; i++) {
-			route1.addDeparture(f.createDeparture(new IdImpl(i), 6.0 * 3600 + i * 600));
+			route1.addDeparture(f.createDeparture(Id.create(i, Departure.class), 6.0 * 3600 + i * 600));
 		}
 		
 		new CreateVehiclesForSchedule(schedule, ((ScenarioImpl) scenario).getVehicles()).run();

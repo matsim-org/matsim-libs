@@ -24,11 +24,16 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author mrieser
@@ -38,8 +43,8 @@ public class TransitDriverStartsEventHandlerIntegrationTest {
 	@Test
 	public void testProcessEventIntegration() {
 		EventsManager em = EventsUtils.createEventsManager();
-		TransitDriverStartsEvent e1 = new TransitDriverStartsEvent(12345, new IdImpl("driver"),
-				new IdImpl("veh"), new IdImpl("line"), new IdImpl("route"), new IdImpl("dep"));
+		TransitDriverStartsEvent e1 = new TransitDriverStartsEvent(12345, Id.create("driver", Person.class),
+				Id.create("veh", Vehicle.class), Id.create("line", TransitLine.class), Id.create("route", TransitRoute.class), Id.create("dep", Departure.class));
 		TransitDriverStartsTestEventHandler eh = new TransitDriverStartsTestEventHandler();
 		em.addHandler(eh);
 

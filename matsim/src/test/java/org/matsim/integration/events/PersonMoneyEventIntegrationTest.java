@@ -23,9 +23,10 @@ package org.matsim.integration.events;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterTXT;
@@ -40,8 +41,8 @@ import org.matsim.testcases.utils.EventsCollector;
 public class PersonMoneyEventIntegrationTest extends MatsimTestCase {
 
 	public void testWriteReadTxt() {
-		final PersonMoneyEvent event1 = new PersonMoneyEvent(7.0*3600, new IdImpl(1), 2.34);
-		final PersonMoneyEvent event2 = new PersonMoneyEvent(8.5*3600, new IdImpl(2), -3.45);
+		final PersonMoneyEvent event1 = new PersonMoneyEvent(7.0*3600, Id.create(1, Person.class), 2.34);
+		final PersonMoneyEvent event2 = new PersonMoneyEvent(8.5*3600, Id.create(2, Person.class), -3.45);
 
 		// write some events to file
 
@@ -82,8 +83,8 @@ public class PersonMoneyEventIntegrationTest extends MatsimTestCase {
 	}
 
 	public void testWriteReadXxml() {
-		final PersonMoneyEvent event1 = new PersonMoneyEvent(7.0*3600, new IdImpl(1), 2.34);
-		final PersonMoneyEvent event2 = new PersonMoneyEvent(8.5*3600, new IdImpl(2), -3.45);
+		final PersonMoneyEvent event1 = new PersonMoneyEvent(7.0*3600, Id.create(1, Person.class), 2.34);
+		final PersonMoneyEvent event2 = new PersonMoneyEvent(8.5*3600, Id.create(2, Person.class), -3.45);
 
 		// write some events to file
 

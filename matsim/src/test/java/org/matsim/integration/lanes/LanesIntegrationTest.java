@@ -27,7 +27,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -114,20 +114,20 @@ public class LanesIntegrationTest {
 		public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 			Assert.assertTrue(e.getQueueSimulation() instanceof QSim);
 			QSim qsim = (QSim) e.getQueueSimulation();
-			NetsimLink link = qsim.getNetsimNetwork().getNetsimLink(new IdImpl("23"));
+			NetsimLink link = qsim.getNetsimNetwork().getNetsimLink(Id.create("23", Link.class));
 			Assert.assertTrue(link instanceof QLinkLanesImpl);
 			QLinkLanesImpl link23 = (QLinkLanesImpl) link;
 			Assert.assertNotNull(link23.getQueueLanes());
 //			for (QLane lane : link23.getQueueLanes()){
 //				Assert.assertNotNull(lane);
 //				log.error("lane " + lane.getId() + " flow " + lane.getSimulatedFlowCapacity());
-//				if (new IdImpl("1").equals(lane.getId())){
+//				if (Id.create("1").equals(lane.getId())){
 //					log.error("lane 1 " + lane.getSimulatedFlowCapacity());
 //				}
-//				else if (new IdImpl("2").equals(lane.getId())){
+//				else if (Id.create("2").equals(lane.getId())){
 //					log.error("lane 2  " + lane.getSimulatedFlowCapacity());
 //				}
-//				else if (new IdImpl("3").equals(lane.getId())){
+//				else if (Id.create("3").equals(lane.getId())){
 //					log.error("lane 3 " + lane.getSimulatedFlowCapacity());
 //				}
 //			}
@@ -142,9 +142,9 @@ public class LanesIntegrationTest {
 		private int count34 = 0;
 		private int count35 = 0;
 		private int count36 = 0;
-		private Id id34 = new IdImpl("34");
-		private Id id35 = new IdImpl("35");
-		private Id id36 = new IdImpl("36");
+		private Id<Link> id34 = Id.create("34", Link.class);
+		private Id<Link> id35 = Id.create("35", Link.class);
+		private Id<Link> id36 = Id.create("36", Link.class);
 		
 		@Override
 		public void handleEvent(LinkEnterEvent e) {

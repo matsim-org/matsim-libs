@@ -20,9 +20,9 @@
 
 package org.matsim.integration.timevariantnetworks;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
@@ -55,13 +55,13 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
 		network.setCapacityPeriod(3600.0);
 
 		// the netework has 4 nodes and 3 links, each link by default 100 long and freespeed = 10 --> freespeed travel time = 10.0
-		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100, 0));
-		Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(200, 0));
-		Node node4 = network.createAndAddNode(new IdImpl("4"), new CoordImpl(300, 0));
-		Link link1 = network.createAndAddLink(new IdImpl("1"), node1, node2, 100, 10, 3600, 1);
-		TimeVariantLinkImpl link2 = (TimeVariantLinkImpl)network.createAndAddLink(new IdImpl("2"), node2, node3, 100, 10, 3600, 1);
-		network.createAndAddLink(new IdImpl("3"), node3, node4, 100, 10, 3600, 1);
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(0, 0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(100, 0));
+		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new CoordImpl(200, 0));
+		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new CoordImpl(300, 0));
+		Link link1 = network.createAndAddLink(Id.create("1", Link.class), node1, node2, 100, 10, 3600, 1);
+		TimeVariantLinkImpl link2 = (TimeVariantLinkImpl)network.createAndAddLink(Id.create("2", Link.class), node2, node3, 100, 10, 3600, 1);
+		network.createAndAddLink(Id.create("3", Link.class), node3, node4, 100, 10, 3600, 1);
 
 		// add a freespeed change to 20 at 8am.
 		NetworkChangeEvent change = nf.createNetworkChangeEvent(8*3600.0);
@@ -90,13 +90,13 @@ public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
 		network.setCapacityPeriod(3600.0);
 
 		// the netework has 4 nodes and 3 links, each link by default 100 long and freespeed = 10 --> freespeed travel time = 10.0
-		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(100, 0));
-		Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(200, 0));
-		Node node4 = network.createAndAddNode(new IdImpl("4"), new CoordImpl(300, 0));
-		Link link1 = network.createAndAddLink(new IdImpl("1"), node1, node2, 100, 10, 3600, 1);
-		TimeVariantLinkImpl link2 = (TimeVariantLinkImpl)network.createAndAddLink(new IdImpl("2"), node2, node3, 100, 10, 3600, 1);
-		network.createAndAddLink(new IdImpl("3"), node3, node4, 100, 10, 3600, 1);
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(0, 0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(100, 0));
+		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new CoordImpl(200, 0));
+		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new CoordImpl(300, 0));
+		Link link1 = network.createAndAddLink(Id.create("1", Link.class), node1, node2, 100, 10, 3600, 1);
+		TimeVariantLinkImpl link2 = (TimeVariantLinkImpl)network.createAndAddLink(Id.create("2", Link.class), node2, node3, 100, 10, 3600, 1);
+		network.createAndAddLink(Id.create("3", Link.class), node3, node4, 100, 10, 3600, 1);
 
 		// add a freespeed change to 20 at 8am.
 		NetworkChangeEvent change = nf.createNetworkChangeEvent(8*3600.0);
