@@ -23,13 +23,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.lanes.data.v20.Lane;
 
 /**
  * @author dgrether
  */
 public class LaneData11Impl implements LaneData11 {
 
-	private Id id;
+	private Id<Lane> id;
 	/**
 	 * the default according to the xml schema, never change the value if schema is not changed
 	 */
@@ -39,9 +41,9 @@ public class LaneData11Impl implements LaneData11 {
 	 */
 	private double startsAtMeterFromLinkEnd = 45.0;
 	
-	private List<Id> toLinkIds = null;
+	private List<Id<Link>> toLinkIds = null;
 
-	public LaneData11Impl(Id id) {
+	public LaneData11Impl(Id<Lane> id) {
 		this.id = id;
 	}
 
@@ -56,7 +58,7 @@ public class LaneData11Impl implements LaneData11 {
 	}
 
 	@Override
-	public Id getId() {
+	public Id<Lane> getId() {
 		return id;
 	}
 
@@ -73,15 +75,15 @@ public class LaneData11Impl implements LaneData11 {
 	}
 
 	@Override
-	public void addToLinkId(Id id) {
+	public void addToLinkId(Id<Link> id) {
 		if (this.toLinkIds == null) {
-			this.toLinkIds = new ArrayList<Id>();
+			this.toLinkIds = new ArrayList<>();
 		}
 		this.toLinkIds.add(id);
 	}
 	
 	@Override
-	public List<Id> getToLinkIds() {
+	public List<Id<Link>> getToLinkIds() {
 		return this.toLinkIds;
 	}
 }

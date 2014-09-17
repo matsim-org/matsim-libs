@@ -22,6 +22,8 @@ package org.matsim.lanes.data.v11;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.lanes.data.v20.Lane;
 
 
 /**
@@ -41,7 +43,7 @@ import org.matsim.api.core.v01.Id;
  */
 public interface LaneData11 {
 
-	public Id getId();
+	public Id<Lane> getId();
 
 	public void setNumberOfRepresentedLanes(double number);
 
@@ -51,9 +53,9 @@ public interface LaneData11 {
 
 	public double getStartsAtMeterFromLinkEnd();
 
-	public void addToLinkId(Id id);
+	public void addToLinkId(Id<Link> id);
 
-	public List<Id> getToLinkIds();
+	public List<Id<Link>> getToLinkIds();
 
 	
 }

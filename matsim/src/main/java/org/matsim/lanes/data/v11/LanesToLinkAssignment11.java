@@ -23,6 +23,8 @@ package org.matsim.lanes.data.v11;
 import java.util.SortedMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.lanes.data.v20.Lane;
 /**
  *
  * @author dgrether
@@ -30,10 +32,10 @@ import org.matsim.api.core.v01.Id;
  */
 public interface LanesToLinkAssignment11 {
 
-	public SortedMap<Id, LaneData11> getLanes();
+	public SortedMap<Id<Lane>, LaneData11> getLanes();
 
 	public void addLane(LaneData11 lane);
 
-	public Id getLinkId();
+	public Id<Link> getLinkId();
 
 }

@@ -29,10 +29,10 @@ import java.util.SortedMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.lanes.data.v11.LaneData11;
 import org.matsim.lanes.data.v11.LaneDefinitions11;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneData20;
 import org.matsim.lanes.data.v20.LaneData20MeterFromLinkEndComparator;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
@@ -86,7 +86,7 @@ public class LaneDefinitionsV11ToV20Conversion {
 				//copy values
 				lanev20.setNumberOfRepresentedLanes(lanev11.getNumberOfRepresentedLanes());
 				lanev20.setStartsAtMeterFromLinkEnd(lanev11.getStartsAtMeterFromLinkEnd());
-				for (Id toLinkId : lanev11.getToLinkIds()){
+				for (Id<Link> toLinkId : lanev11.getToLinkIds()){
 					lanev20.addToLinkId(toLinkId);
 				}
 				capacityCalculator.calculateAndSetCapacity(lanev20, true, link, network);
@@ -98,7 +98,7 @@ public class LaneDefinitionsV11ToV20Conversion {
 			LaneData20 longestLane = sortedLanes.get(sortedLanes.size()-1);
 //			double originalLaneLength = link.getLength() - longestLane.getStartsAtMeterFromLinkEnd();
 			String originalLaneIdString = link.getId().toString() + ".ol";
-			LaneData20 originalLane = lanedefs20fac.createLane(new IdImpl(originalLaneIdString));
+			LaneData20 originalLane = lanedefs20fac.createLane(Id.create(originalLaneIdString, Lane.class));
 			originalLane.setNumberOfRepresentedLanes(link.getNumberOfLanes());
 			originalLane.setStartsAtMeterFromLinkEnd(link.getLength());
 			originalLane.addToLaneId(longestLane.getId());
@@ -109,13 +109,13 @@ public class LaneDefinitionsV11ToV20Conversion {
 			LaneData20 lastLane = originalLane;
 			LaneData20 secondLongestLane;
 			LaneData20 intermediateLane;
-			Id intermediateLaneId;
+			Id<Lane> intermediateLaneId;
 			int intermediateLanesCounter = 1;
 			for (int i = sortedLanes.size() - 2; i >= 0; i--){ //sortedLanes.size() and sortedLanes.size()-1 are already used, so start at -2
 				secondLongestLane = sortedLanes.get(i);
 				if (longestLane.getStartsAtMeterFromLinkEnd() > secondLongestLane.getStartsAtMeterFromLinkEnd()){
 					//create intermediate lane
-					intermediateLaneId = new IdImpl(intermediateLanesCounter + ".cl");
+					intermediateLaneId = Id.create(intermediateLanesCounter + ".cl", Lane.class);
 					intermediateLanesCounter++;
 					intermediateLane = lanedefs20fac.createLane(intermediateLaneId);
 					//intermdiateLane needs values as startsAt and represented number of lanes

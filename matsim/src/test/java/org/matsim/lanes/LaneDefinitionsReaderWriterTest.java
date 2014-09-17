@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -35,6 +35,7 @@ import org.matsim.lanes.data.v11.LaneData11;
 import org.matsim.lanes.data.v11.LaneDefinitions11;
 import org.matsim.lanes.data.v11.LaneDefinitions11Impl;
 import org.matsim.lanes.data.v11.LaneDefinitionsReader11;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneData20;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
@@ -53,15 +54,16 @@ public class LaneDefinitionsReaderWriterTest extends MatsimTestCase {
 
 	private static final String TESTXMLV20 = "testLaneDefinitions_v2.0.xml";
 
-	private Id id1 = new IdImpl("1");
+	private Id<Lane> laneId1 = Id.create("1", Lane.class);
+	private Id<Link> linkId1 = Id.create("1", Link.class);
 
-	private Id id3 = new IdImpl("3");
+	private Id<Lane> laneId3 = Id.create("3", Lane.class);
 
-	private Id id5 = new IdImpl("5");
+	private Id<Lane> laneId5 = Id.create("5", Lane.class);
 
-	private Id id23 = new IdImpl("23");
+	private Id<Link> linkId23 = Id.create("23", Link.class);
 
-	private Id id42 = new IdImpl("42");
+	private Id<Link> linkId42 = Id.create("42", Link.class);
 
 	private static final class Fixture{
 		ScenarioImpl scenario;
@@ -140,29 +142,29 @@ public class LaneDefinitionsReaderWriterTest extends MatsimTestCase {
 		assignments.addAll(lanedefs.getLanesToLinkAssignments().values());
 		l2la = assignments.get(0);
 		assertNotNull(l2la);
-		assertEquals(id23, l2la.getLinkId());
+		assertEquals(linkId23, l2la.getLinkId());
 		List<LaneData20> lanes = new ArrayList<LaneData20>();
 		lanes.addAll(l2la.getLanes().values());
 		LaneData20 lane = lanes.get(0);
-		assertEquals(id3, lane.getId());
-		assertEquals(id1, lane.getToLinkIds().get(0));
+		assertEquals(laneId3, lane.getId());
+		assertEquals(linkId1, lane.getToLinkIds().get(0));
 		assertEquals(45.0, lane.getStartsAtMeterFromLinkEnd(), EPSILON);
 		assertEquals(1.0, lane.getNumberOfRepresentedLanes());
 		assertEquals(0.725, lane.getCapacityVehiclesPerHour(), EPSILON);
 		lane = lanes.get(1);
-		assertEquals(id5, lane.getId());
+		assertEquals(laneId5, lane.getId());
 		assertEquals(60.0, lane.getStartsAtMeterFromLinkEnd(), EPSILON);
 		assertEquals(2.5, lane.getNumberOfRepresentedLanes());
 		assertEquals(2, lane.getCapacityVehiclesPerHour(), EPSILON);
 		//check a lanes2linkassignment using default values
 		l2la = assignments.get(1);
 		assertNotNull(l2la);
-		assertEquals(id42, l2la.getLinkId());
+		assertEquals(linkId42, l2la.getLinkId());
 		lanes.clear();
 		lanes.addAll(l2la.getLanes().values());
 		lane = lanes.get(0);
-		assertEquals(id1, lane.getId());
-		assertEquals(id1, lane.getToLinkIds().get(0));
+		assertEquals(laneId1, lane.getId());
+		assertEquals(linkId1, lane.getToLinkIds().get(0));
 		assertEquals(45.0, lane.getStartsAtMeterFromLinkEnd(), EPSILON);
 		assertEquals(1900.0, lane.getCapacityVehiclesPerHour(), EPSILON);
 		assertEquals(1.0, lane.getNumberOfRepresentedLanes());
@@ -175,27 +177,27 @@ public class LaneDefinitionsReaderWriterTest extends MatsimTestCase {
 		assignments.addAll(lanedefs.getLanesToLinkAssignments().values());
 		l2la = assignments.get(0);
 		assertNotNull(l2la);
-		assertEquals(id23, l2la.getLinkId());
+		assertEquals(linkId23, l2la.getLinkId());
 		List<LaneData11> lanes = new ArrayList<LaneData11>();
 		lanes.addAll(l2la.getLanes().values());
 		LaneData11 lane = lanes.get(0);
-		assertEquals(id3, lane.getId());
-		assertEquals(id1, lane.getToLinkIds().get(0));
+		assertEquals(laneId3, lane.getId());
+		assertEquals(linkId1, lane.getToLinkIds().get(0));
 		assertEquals(45.0, lane.getStartsAtMeterFromLinkEnd(), EPSILON);
 		assertEquals(1.0, lane.getNumberOfRepresentedLanes());
 		lane = lanes.get(1);
-		assertEquals(id5, lane.getId());
+		assertEquals(laneId5, lane.getId());
 		assertEquals(60.0, lane.getStartsAtMeterFromLinkEnd(), EPSILON);
 		assertEquals(2.5, lane.getNumberOfRepresentedLanes());
 		//check a lanes2linkassignment using default values
 		l2la = assignments.get(1);
 		assertNotNull(l2la);
-		assertEquals(id42, l2la.getLinkId());
+		assertEquals(linkId42, l2la.getLinkId());
 		lanes.clear();
 		lanes.addAll(l2la.getLanes().values());
 		lane = lanes.get(0);
-		assertEquals(id1, lane.getId());
-		assertEquals(id1, lane.getToLinkIds().get(0));
+		assertEquals(laneId1, lane.getId());
+		assertEquals(linkId1, lane.getToLinkIds().get(0));
 		assertEquals(45.0, lane.getStartsAtMeterFromLinkEnd(), EPSILON);
 		assertEquals(1.0, lane.getNumberOfRepresentedLanes());
 	}

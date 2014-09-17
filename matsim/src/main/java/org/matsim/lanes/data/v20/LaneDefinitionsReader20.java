@@ -28,8 +28,9 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.internal.MatsimSomeReader;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
 import org.matsim.jaxb.lanedefinitions20.ObjectFactory;
@@ -97,19 +98,19 @@ public class LaneDefinitionsReader20 extends MatsimJaxbXmlParser implements Mats
 			LaneData20 lane = null;
 			for (XMLLanesToLinkAssignmentType lldef : xmlLaneDefinitions
 					.getLanesToLinkAssignment()) {
-				l2lAssignment = builder.createLanesToLinkAssignment(new IdImpl(lldef
-						.getLinkIdRef()));
+				l2lAssignment = builder.createLanesToLinkAssignment(Id.create(lldef
+						.getLinkIdRef(), Link.class));
 				for (XMLLaneType laneType : lldef.getLane()) {
-					lane = builder.createLane(new IdImpl(laneType.getId()));
+					lane = builder.createLane(Id.create(laneType.getId(), Lane.class));
 					
 					if (!laneType.getLeadsTo().getToLane().isEmpty()) {
 						for (XMLIdRefType toLaneId : laneType.getLeadsTo().getToLane()){
-							lane.addToLaneId(new IdImpl(toLaneId.getRefId()));
+							lane.addToLaneId(Id.create(toLaneId.getRefId(), Lane.class));
 						}
 					}
 					else if (!laneType.getLeadsTo().getToLink().isEmpty()){
 						for (XMLIdRefType toLinkId : laneType.getLeadsTo().getToLink()){
-							lane.addToLinkId(new IdImpl(toLinkId.getRefId()));
+							lane.addToLinkId(Id.create(toLinkId.getRefId(), Link.class));
 						}
 					}
 					
