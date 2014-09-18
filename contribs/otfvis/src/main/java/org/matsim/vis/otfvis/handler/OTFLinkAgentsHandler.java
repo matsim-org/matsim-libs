@@ -26,7 +26,8 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.ByteBufferUtils;
@@ -147,7 +148,7 @@ public class OTFLinkAgentsHandler extends OTFDataReader {
 		float colorValue = in.getFloat();
 		int state = in.getInt();
 
-		AgentSnapshotInfo agInfo = snapshotFactory.createAgentSnapshotInfo(new IdImpl(id), x, y, 0., 0.);
+		AgentSnapshotInfo agInfo = snapshotFactory.createAgentSnapshotInfo(Id.create(id, Person.class), x, y, 0., 0.);
 		agInfo.setColorValueBetweenZeroAndOne(colorValue);
 		agInfo.setUserDefined(userdefined);
 		agInfo.setAgentState(AgentState.values()[state]);

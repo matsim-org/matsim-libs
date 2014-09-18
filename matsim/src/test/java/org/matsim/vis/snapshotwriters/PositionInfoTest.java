@@ -20,9 +20,10 @@
 
 package org.matsim.vis.snapshotwriters;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
@@ -40,13 +41,13 @@ public class PositionInfoTest extends MatsimTestCase {
 	public void testDistanceOnLink_shortLink() {
 
 		NetworkImpl network = NetworkImpl.createNetwork();
-		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(1000, 1000));
-		Link link1 = network.createAndAddLink(new IdImpl("1"), node1, node2, 1000, 10, 9999, 1);
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(0, 0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(1000, 1000));
+		Link link1 = network.createAndAddLink(Id.create("1", Link.class), node1, node2, 1000, 10, 9999, 1);
 
 		// place the vehicle at one quarter of the link
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
-		AgentSnapshotInfo posInfo = new AgentSnapshotInfoFactory(linkWidthCalculator).createAgentSnapshotInfo(new IdImpl(1), link1, 250, 0);
+		AgentSnapshotInfo posInfo = new AgentSnapshotInfoFactory(linkWidthCalculator).createAgentSnapshotInfo(Id.create(1, Person.class), link1, 250, 0);
 		assertEquals(260.60660171779824, posInfo.getEasting(), epsilon);
 		assertEquals(239.3933982822018, posInfo.getNorthing(), epsilon);
 		// These numbers became a little weird when I moved vehicles away from the center of a link. Kai, Dec/08
@@ -63,13 +64,13 @@ public class PositionInfoTest extends MatsimTestCase {
 	public void testDistanceOnLink_longLink() {
 
 		NetworkImpl network = NetworkImpl.createNetwork();
-		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(1000, 1000));
-		Link link1 = network.createAndAddLink(new IdImpl("1"), node1, node2, 2000, 10, 9999, 1);
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(0, 0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(1000, 1000));
+		Link link1 = network.createAndAddLink(Id.create("1", Link.class), node1, node2, 2000, 10, 9999, 1);
 
 		// place the vehicle at one quarter of the link
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
-		AgentSnapshotInfo posInfo = new AgentSnapshotInfoFactory(linkWidthCalculator).createAgentSnapshotInfo(new IdImpl(1), link1, 500, 0);
+		AgentSnapshotInfo posInfo = new AgentSnapshotInfoFactory(linkWidthCalculator).createAgentSnapshotInfo(Id.create(1, Person.class), link1, 500, 0);
 		assertEquals(260.60660171779824, posInfo.getEasting(), epsilon);
 		assertEquals(239.3933982822018, posInfo.getNorthing(), epsilon);
 		// These numbers became a little weird when I moved vehicles away from the center of a link. Kai, Dec/08

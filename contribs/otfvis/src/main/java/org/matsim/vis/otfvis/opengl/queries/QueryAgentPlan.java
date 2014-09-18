@@ -46,9 +46,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -85,7 +85,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 
 	private static final Logger log = Logger.getLogger(QueryAgentPlan.class);
 
-	private Id agentId;
+	private Id<Person> agentId;
 
 	private transient Result result;
 
@@ -165,7 +165,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 
 	@Override
 	public void setId(String id) {
-		this.agentId = new IdImpl(id);
+		this.agentId = Id.create(id, Person.class);
 	}
 
 	@Override
@@ -186,7 +186,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 		private ByteBuffer cols;
 
 
-		private void buildRoute(Plan plan, Id agentId, Network net, Level level) {
+		private void buildRoute(Plan plan, Id<Person> agentId, Network net, Level level) {
 			Color carColor = Color.ORANGE;
 			Color actColor = Color.BLUE;
 			Color ptColor = Color.YELLOW;
@@ -208,7 +208,7 @@ public class QueryAgentPlan extends AbstractQuery implements OTFQueryOptions, It
 						Link startLink = net.getLinks().get(((NetworkRoute) leg.getRoute()).getStartLinkId());
 						Coord from = startLink.getToNode().getCoord();
 						addCoord(from, carColor);
-						for (Id linkId : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
+						for (Id<Link> linkId : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
 							Link driven = net.getLinks().get(linkId);
 							Node node = driven.getToNode();
 							Coord coord = node.getCoord();

@@ -52,13 +52,13 @@ public class QueryLinkById extends AbstractQuery implements OTFQuery {
 
 	private static final Logger log = Logger.getLogger(QueryLinkById.class);
 	
-	private List<Id> linkIds;
+	private List<Id<Link>> linkIds;
 
 	private transient Result result;
 
 	@Override
 	public void setId(String id) {
-		this.linkIds = QueryUtils.parseIds(id);
+		this.linkIds = QueryUtils.parseIds(id, Link.class);
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public class QueryLinkById extends AbstractQuery implements OTFQuery {
 
 		//get the links from the network
 		List<Link> links = new ArrayList<Link>();
-		for (Id linkid : this.linkIds){
+		for (Id<Link> linkid : this.linkIds){
 			Link link = net.getLinks().get(linkid);
 			if (link != null){
 				links.add(link);

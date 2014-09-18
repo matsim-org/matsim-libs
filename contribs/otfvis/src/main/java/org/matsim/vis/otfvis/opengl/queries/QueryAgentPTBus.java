@@ -33,9 +33,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.SimulationViewForQueries;
@@ -140,7 +140,7 @@ public class QueryAgentPTBus extends AbstractQuery {
 	}
 
 	private float[] buildRoute(Plan plan) {
-		List<Id> drivenLinks = new LinkedList<Id> ();
+		List<Id<Link>> drivenLinks = new LinkedList<Id<Link>> ();
 
 		List<PlanElement> actslegs = plan.getPlanElements();
 		for (PlanElement pe : actslegs) {
@@ -152,7 +152,7 @@ public class QueryAgentPTBus extends AbstractQuery {
 				// handle leg
 				Leg leg = (Leg) pe;
 				//if (!leg.getMode().equals("car")) continue;
-				for (Id linkId : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
+				for (Id<Link> linkId : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
 					drivenLinks.add(linkId);
 				}
 			}
@@ -163,7 +163,7 @@ public class QueryAgentPTBus extends AbstractQuery {
 		// convert this to drawable info
 		float[] vertex = new float[drivenLinks.size()*2];
 		int pos = 0;
-		for(Id linkId : drivenLinks) {
+		for(Id<Link> linkId : drivenLinks) {
 			Link link = this.net.getLinks().get(linkId);
 			Node node = link.getFromNode();
 			vertex[pos++] = (float)node.getCoord().getX();
@@ -177,11 +177,11 @@ public class QueryAgentPTBus extends AbstractQuery {
 		this.net = simulationView.getNetwork();
 		this.result = new Result(this.allIds);
 		String prefix = agentId + "-";
-		for(Id planId : simulationView.getPlans().keySet()) {
+		for(Id<Person> planId : simulationView.getPlans().keySet()) {
 			if(planId.toString().startsWith(prefix, 0)) allIds.add(planId.toString());
 		}
 		if (allIds.size()==0) return;
-		Plan plan = simulationView.getPlans().get(new IdImpl(allIds.get(0)));
+		Plan plan = simulationView.getPlans().get(Id.create(allIds.get(0), Person.class));
 		this.result.vertex = buildRoute(plan);
 	}
 

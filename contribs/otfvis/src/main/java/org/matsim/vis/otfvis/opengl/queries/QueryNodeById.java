@@ -47,13 +47,13 @@ public class QueryNodeById extends AbstractQuery implements OTFQuery {
 
 	private static final Logger log = Logger.getLogger(QueryNodeById.class);
 	
-	private List<Id> nodeIds;
+	private List<Id<Node>> nodeIds;
 
 	private transient Result result;
 
 	@Override
 	public void setId(String id) {
-		this.nodeIds = QueryUtils.parseIds(id);
+		this.nodeIds = QueryUtils.parseIds(id, Node.class);
 	}
 
 	@Override
@@ -68,7 +68,7 @@ public class QueryNodeById extends AbstractQuery implements OTFQuery {
 
 		//get the nodes from the network
 		List<Node> nodes = new ArrayList<Node>();
-		for (Id id : this.nodeIds){
+		for (Id<Node> id : this.nodeIds){
 			Node node = net.getNodes().get(id);
 			if (node != null){
 				nodes.add(node);

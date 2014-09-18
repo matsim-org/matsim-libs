@@ -23,6 +23,7 @@ package org.matsim.vis.snapshotwriters;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
@@ -48,7 +49,7 @@ public class AgentSnapshotInfoFactory {
 	// creators based on x/y
 
 	@SuppressWarnings("static-method")
-	public AgentSnapshotInfo createAgentSnapshotInfo(Id agentId, double easting, double northing, double elevation, double azimuth) {
+	public AgentSnapshotInfo createAgentSnapshotInfo(Id<Person> agentId, double easting, double northing, double elevation, double azimuth) {
 		PositionInfo info = new PositionInfo() ;
 		info.setId( agentId ) ;
 		info.setEasting( easting ) ;
@@ -72,7 +73,7 @@ public class AgentSnapshotInfoFactory {
 	 * @param lane
 	 * @return
 	 */
-	public AgentSnapshotInfo createAgentSnapshotInfo(Id agentId, Link link, double distanceOnLink, int lane) {
+	public AgentSnapshotInfo createAgentSnapshotInfo(Id<Person> agentId, Link link, double distanceOnLink, int lane) {
 		PositionInfo info = new PositionInfo() ;
 		info.setId(agentId) ;
 		double euklidean;
@@ -91,7 +92,7 @@ public class AgentSnapshotInfoFactory {
 	 *  creator based on Coord
 	 * @param curveLength lengths are usually different (usually longer) than the euclidean distances between the startCoord and endCoord
 	 */
-	public AgentSnapshotInfo createAgentSnapshotInfo(Id agentId, Coord startCoord, Coord endCoord, double distanceOnLink, 
+	public AgentSnapshotInfo createAgentSnapshotInfo(Id<Person> agentId, Coord startCoord, Coord endCoord, double distanceOnLink, 
 			Integer lane, double curveLength, double euclideanLength) {
 		PositionInfo info = new PositionInfo() ;
 		info.setId(agentId) ;

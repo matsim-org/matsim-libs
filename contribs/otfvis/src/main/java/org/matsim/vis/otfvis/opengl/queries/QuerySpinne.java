@@ -44,10 +44,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.QuadTree;
@@ -204,8 +204,8 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 		}
 	}
 
-	protected Id queryLinkId;
-	private transient Map<Id, Integer> drivenLinks = null;
+	protected Id<Link> queryLinkId;
+	private transient Map<Id<Link>, Integer> drivenLinks = null;
 	private SimulationViewForQueries simulationView;
 
 	private static boolean tripOnly = false;
@@ -239,7 +239,7 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 		return com;
 	}
 
-	private void addLink(Id linkId) {
+	private void addLink(Id<Link> linkId) {
 		Integer count = this.drivenLinks.get(linkId);
 		if (count == null) this.drivenLinks.put(linkId, 1);
 		else  this.drivenLinks.put(linkId, count + 1);
@@ -258,7 +258,7 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 		return actPersons;
 	}
 
-	private List<Plan> getPersons(Map<Id, Plan> plans) {
+	private List<Plan> getPersons(Map<Id<Person>, Plan> plans) {
 		List<Plan> actPersons = new ArrayList<Plan>();
 		for (Plan plan : plans.values()) {
 			List<PlanElement> actslegs = plan.getPlanElements();
@@ -266,7 +266,7 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 				if (pe instanceof Activity) {
 					// handle act
 					Activity act = (Activity) pe;
-					Id id2 = act.getLinkId();
+					Id<Link> id2 = act.getLinkId();
 					if(id2.equals(this.queryLinkId)) {
 						actPersons.add(plan);
 						break;
@@ -276,7 +276,7 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 					Leg leg = (Leg) pe;
 					// just look at car routes right now
 					if(!leg.getMode().equals(TransportMode.car)) continue;
-					for (Id id2 : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
+					for (Id<Link> id2 : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
 						if(id2.equals(this.queryLinkId) ) {
 							actPersons.add(plan);
 							break;
@@ -296,15 +296,15 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 					Leg leg = (Leg) pe ;
 					Route route = leg.getRoute();
 					if ( route instanceof NetworkRoute ) { // added in jun09, see below in "collectLinks". kai, jun09
-						List<Id> linkIds = new ArrayList<Id>();
-						for (Id linkId : ((NetworkRoute) route).getLinkIds() ) {
+						List<Id<Link>> linkIds = new ArrayList<>();
+						for (Id<Link> linkId : ((NetworkRoute) route).getLinkIds() ) {
 							linkIds.add(linkId);
 							if(linkId.equals(this.queryLinkId) ) {
 								// only if this specific route includes link, add the route
 								addthis = true;
 							}
 						}
-						if(addthis) for (Id linkId : linkIds) addLink(linkId);
+						if(addthis) for (Id<Link> linkId : linkIds) addLink(linkId);
 						addthis = false;
 					}
 				}
@@ -323,7 +323,7 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 					Route route = leg.getRoute() ;
 					if (route instanceof NetworkRoute) {
 						NetworkRoute nr = (NetworkRoute) route ;
-						for (Id linkId : nr.getLinkIds()) {
+						for (Id<Link> linkId : nr.getLinkIds()) {
 							addLink(linkId);
 						}
 					}
@@ -337,7 +337,7 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 		this.simulationView = simulationView;
 		this.result = new Result();
 		result.linkIdString = this.queryLinkId.toString();
-		this.drivenLinks = new HashMap<Id, Integer>();
+		this.drivenLinks = new HashMap<Id<Link>, Integer>();
 
 		List<Plan> actPersons = nowOnly ? getPersonsNOW() : getPersons(simulationView.getPlans());
 
@@ -350,7 +350,7 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 		result.vertex = new float[this.drivenLinks.size()*4];
 		result.count = new int[this.drivenLinks.size()];
 		int pos = 0;
-		for(Id linkId : this.drivenLinks.keySet()) {
+		for(Id<Link> linkId : this.drivenLinks.keySet()) {
 			Link link = simulationView.getNetwork().getLinks().get(linkId);
 			result.count[pos/4] = this.drivenLinks.get(linkId);
 			Node node = link.getFromNode();
@@ -371,7 +371,7 @@ public class QuerySpinne extends AbstractQuery implements OTFQueryOptions, ItemL
 
 	@Override
 	public void setId(String id) {
-		this.queryLinkId = new IdImpl(id);
+		this.queryLinkId = Id.create(id, Link.class);
 	}
 
 	@Override

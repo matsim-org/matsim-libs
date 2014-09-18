@@ -76,8 +76,8 @@ public class OnTheFlyServer implements OTFLiveServer {
 	private final class CurrentTimeStepView implements SimulationViewForQueries {
 
 		@Override
-		public Map<Id, Plan> getPlans() {
-			Map<Id, Plan> plans = new HashMap<Id, Plan>();
+		public Map<Id<Person>, Plan> getPlans() {
+			Map<Id<Person>, Plan> plans = new HashMap<>();
 			if (visMobsim != null ) {
 				Collection<MobsimAgent> agents = visMobsim.getAgents();
 				for (MobsimAgent agent : agents) {
@@ -106,12 +106,12 @@ public class OnTheFlyServer implements OTFLiveServer {
 		}
 
 		@Override
-		public void addTrackedAgent(Id agentId) {
+		public void addTrackedAgent(Id<Person> agentId) {
 
 		}
 
 		@Override
-		public void removeTrackedAgent(Id agentId) {
+		public void removeTrackedAgent(Id<Person> agentId) {
 
 		}
 
@@ -188,7 +188,7 @@ public class OnTheFlyServer implements OTFLiveServer {
 
 	private Scenario scenario;
 
-	private Map<Id, Plan> plans = new HashMap<Id, Plan>();
+	private Map<Id<Person>, Plan> plans = new HashMap<Id<Person>, Plan>();
 
 	OnTheFlyServer(Scenario scenario, EventsManager events) {
 		this.scenario = scenario;
@@ -473,7 +473,7 @@ public class OnTheFlyServer implements OTFLiveServer {
 		};
 	}
 
-	public void addAdditionalPlans(Map<Id, Plan> additionalPlans) {
+	public void addAdditionalPlans(Map<Id<Person>, Plan> additionalPlans) {
 		this.plans.putAll(additionalPlans);
 	}
 

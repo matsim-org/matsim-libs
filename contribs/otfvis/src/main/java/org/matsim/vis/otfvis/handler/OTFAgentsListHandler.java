@@ -26,7 +26,8 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.vis.otfvis.caching.SceneGraph;
@@ -91,7 +92,7 @@ public class OTFAgentsListHandler extends OTFDataReader {
 		int int1 = in.getInt() ;
 		int int2 = in.getInt() ;
 		float float1 = in.getFloat() ;
-		AgentSnapshotInfo agInfo = snapshotFactory.createAgentSnapshotInfo(new IdImpl(id), x, y, 0., 0.) ;
+		AgentSnapshotInfo agInfo = snapshotFactory.createAgentSnapshotInfo(Id.create(id, Person.class), x, y, 0., 0.) ;
 		agInfo.setAgentState( al[int1] ) ;
 		agInfo.setUserDefined( int2 ) ;
 		agInfo.setColorValueBetweenZeroAndOne(float1);

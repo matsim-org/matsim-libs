@@ -24,7 +24,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 
 
 /**
@@ -38,19 +37,16 @@ public class QueryUtils {
 	/**
 	 * Method that can be used to parse multiple matsim.org Ids from the query input text field.
 	 */
-	static List<Id> parseIds(String idString){
+	static <T> List<Id<T>> parseIds(String idString, Class<T> type){
 		log.info("Query got Id String: " + idString);
-		List<Id> ids = new ArrayList<Id>();
+		List<Id<T>> ids = new ArrayList<>();
 		if (idString.contains(",")){
 			for (String i : idString.split(",")) {
-				ids.add(new IdImpl(i.trim()));
+				ids.add(Id.create(i.trim(), type));
 			}
 		}
 		else {
-			ids.add(new IdImpl(idString.trim()));
-		}
-		for (Id id : ids){
-			log.info("  parsed id: " + id);
+			ids.add(Id.create(idString.trim(), type));
 		}
 		return ids;
 	}
