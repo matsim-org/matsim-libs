@@ -21,7 +21,6 @@
 package org.matsim.households;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 public class HouseholdImplTest extends MatsimTestCase {
@@ -31,8 +30,8 @@ public class HouseholdImplTest extends MatsimTestCase {
 	 */
 	public void testAddHousehold_DuplicateId(){
 		HouseholdsImpl hhs = new HouseholdsImpl();
-		Household hh1 = new HouseholdImpl(new IdImpl("1"));
-		Household hh2 = new HouseholdImpl(new IdImpl("1"));
+		Household hh1 = new HouseholdImpl(Id.create("1", Household.class));
+		Household hh2 = new HouseholdImpl(Id.create("1", Household.class));
 		
 		assertEquals("Shouldn't have a household.", 0, hhs.getHouseholds().size());
 		hhs.addHousehold(hh1);
@@ -51,8 +50,8 @@ public class HouseholdImplTest extends MatsimTestCase {
 	 */
 	public void testAddHousehold_NoStreaming(){
 		HouseholdsImpl hhs = new HouseholdsImpl();
-		Household hh1 = new HouseholdImpl(new IdImpl("1"));
-		Household hh2 = new HouseholdImpl(new IdImpl("2"));
+		Household hh1 = new HouseholdImpl(Id.create("1", Household.class));
+		Household hh2 = new HouseholdImpl(Id.create("2", Household.class));
 		
 		hhs.addHousehold(hh1);
 		assertEquals("Should have the first household added.", 1, hhs.getHouseholds().size());

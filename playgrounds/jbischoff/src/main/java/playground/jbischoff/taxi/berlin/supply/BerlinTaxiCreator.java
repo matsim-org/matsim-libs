@@ -54,16 +54,16 @@ public class BerlinTaxiCreator
             "EPSG:25833", TransformationFactory.DHDN_GK4);
 
     private final Scenario scenario;
-    private final Map<Id, Zone> zones;
+    private final Map<Id<Zone>, Zone> zones;
     private final NetworkImpl network;
-    private final WeightedRandomSelection<Id> lorSelection;
+    private final WeightedRandomSelection<Id<Zone>> lorSelection;
     private final double evShare;
 
     private int currentVehicleId = 0;
 
 
-    public BerlinTaxiCreator(Scenario scenario, Map<Id, Zone> zones,
-            WeightedRandomSelection<Id> lorSelection, double evShare)
+    public BerlinTaxiCreator(Scenario scenario, Map<Id<Zone>, Zone> zones,
+            WeightedRandomSelection<Id<Zone>> lorSelection, double evShare)
     {
         this.scenario = scenario;
         this.zones = zones;
@@ -77,7 +77,7 @@ public class BerlinTaxiCreator
     @Override
     public Vehicle createVehicle(double t0, double t1)
     {
-        Id lorId = lorSelection.select();
+        Id<Zone> lorId = lorSelection.select();
         String vehIdString = "t_" + lorId + "_" + (t0 / 3600) + "_" + currentVehicleId;
         if (RND.nextDouble() < evShare) {
             vehIdString = "e" + vehIdString;

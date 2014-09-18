@@ -19,20 +19,23 @@
 
 package playground.michalm.zone.poznan;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
-import com.vividsolutions.jts.geom.MultiPolygon;
+import playground.michalm.zone.Zone;
+import playground.michalm.zone.Zones;
 
-import playground.michalm.zone.*;
+import com.vividsolutions.jts.geom.MultiPolygon;
 
 
 public class PoznanZones
 {
-    public static Map<Id, Zone> readVisumZones(Scenario scenario)
+    public static Map<Id<Zone>, Zone> readVisumZones(Scenario scenario)
     {
         String zonesXmlFile = "d:/eTaxi/Poznan_MATSim/zones.xml";
         String zonesShpFile = "d:/eTaxi/Poznan_MATSim/GIS/zones.shp";
@@ -40,7 +43,7 @@ public class PoznanZones
     }
 
 
-    public static Map<Id, Zone> readTaxiZones(Scenario scenario)
+    public static Map<Id<Zone>, Zone> readTaxiZones(Scenario scenario)
     {
         String zonesXmlFile = "d:/PP-rad/taxi/poznan-supply/dane/rejony/taxi_zones.xml";
         String zonesShpFile = "d:/PP-rad/taxi/poznan-supply/dane/rejony/taxi_zones.shp";

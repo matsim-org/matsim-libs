@@ -22,31 +22,27 @@ package playground.jbischoff.taxi.berlin.data;
 import java.io.IOException;
 import java.io.Writer;
 import java.text.DecimalFormat;
-import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.util.DistanceUtils;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.io.IOUtils;
 
-import com.vividsolutions.jts.geom.Point;
-
 import playground.michalm.zone.Zone;
 import playground.michalm.zone.Zones;
+
+import com.vividsolutions.jts.geom.Point;
 
 public class BeelineDistanceExractor
 {
 
-    TreeMap<Id,Zone> zones;
+    TreeMap<Id<Zone>, Zone> zones;
     Scenario scenario;
     /**
      * @param args
@@ -54,7 +50,7 @@ public class BeelineDistanceExractor
     public BeelineDistanceExractor()
     {
         scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        this.zones = new TreeMap<Id, Zone>();
+        this.zones = new TreeMap<>();
         this.zones.putAll(Zones.readZones(scenario, "C:/local_jb/data/shp_merged/zones.xml",
                 "C:/local_jb/data/shp_merged/zones.shp"));                 
         
@@ -78,15 +74,15 @@ public class BeelineDistanceExractor
 
         try {
             writer.append("Zone");
-            for (Id zoneID : this.zones.keySet()){
+            for (Id<Zone> zoneID : this.zones.keySet()){
                 writer.append("\t"+zoneID.toString());
             }
             writer.append("\n");
             
-            for (Id zoneID : this.zones.keySet()){
+            for (Id<Zone> zoneID : this.zones.keySet()){
              
                 writer.append(zoneID.toString());
-                for (Id secondZoneId : this.zones.keySet()){
+                for (Id<Zone> secondZoneId : this.zones.keySet()){
                     double dist = calcDistance(zoneID, secondZoneId);
                     
                     writer.append("\t"+f.format(dist));
@@ -104,7 +100,7 @@ public class BeelineDistanceExractor
 
 
 
-    public double calcDistance(Id zoneID, Id secondZoneId)
+    public double calcDistance(Id<Zone> zoneID, Id<Zone> secondZoneId)
     {
         Point p = this.zones.get(zoneID).getMultiPolygon().getCentroid();
         Coord z1 = new CoordImpl(p.getX(),p.getY());
@@ -114,7 +110,7 @@ public class BeelineDistanceExractor
         return dist;
     }
     
-    public Coord getZoneCentroid(Id zoneID){
+    public Coord getZoneCentroid(Id<Zone> zoneID){
         return MGC.point2Coord(this.zones.get(zoneID).getMultiPolygon().getCentroid());
     }
 

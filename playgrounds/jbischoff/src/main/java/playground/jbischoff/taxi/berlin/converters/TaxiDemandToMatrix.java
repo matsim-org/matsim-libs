@@ -4,8 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
@@ -114,11 +112,9 @@ class TaxiDemandParser
         if (to.equals("null"))
             return;
 
-        Id fromLor = new IdImpl(from);
-        Id toLor = new IdImpl(to);
         double demand = Double.parseDouble(row[2]);
-        System.out.println(fromLor);
-        this.matrix.createEntry(fromLor, toLor, demand);
+        System.out.println(from);
+        this.matrix.createEntry(from, to, demand);
 
     }
 }

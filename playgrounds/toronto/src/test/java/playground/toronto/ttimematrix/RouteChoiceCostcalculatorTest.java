@@ -94,10 +94,10 @@ public class RouteChoiceCostcalculatorTest {
 		System.out.println(costType);
 		System.out.println("Travel Times:" + tt + ", Travel Costs: " + tc);
 		
-		Map<Id, NodeData> tree = st.getTree();
+		Map<Id<Node>, NodeData> tree = st.getTree();
 		
 		// print route choice
-		Id tmpNode = destination.getId();
+		Id<Node> tmpNode = destination.getId();
 		System.out.println("Choosen route :");
 		while(true){
 			System.out.println("Node " + tmpNode);

@@ -338,7 +338,7 @@ public class MyVisumNetworkReader {
 		String line = reader.readLine();
 		while (line != null && line.length() > 0) {
 			final String[] parts = StringUtils.explode(line, ';');
-			MyVisumNetwork.TransitLineRoute lr1 = new MyVisumNetwork.TransitLineRoute(new IdImpl(parts[idxName]), new IdImpl(parts[idxLineName]),new IdImpl(parts[idxDCode]));
+			MyVisumNetwork.TransitLineRoute lr1 = new MyVisumNetwork.TransitLineRoute(new IdImpl(parts[idxName]), new IdImpl(parts[idxLineName]),parts[idxDCode]);
 			if (idxTakt != -1) {
 				lr1.takt = parts[idxTakt];
 			}
@@ -402,7 +402,7 @@ public class MyVisumNetworkReader {
 			final String[] parts = StringUtils.explode(line, ';');
 
 			MyVisumNetwork.TimeProfile tp1 = new MyVisumNetwork.TimeProfile(new IdImpl(parts[idxLineName]),
-					new IdImpl(parts[idxLineRouteName]), new IdImpl(parts[idxIndex]), new IdImpl(parts[idxDCode]),
+					new IdImpl(parts[idxLineRouteName]), new IdImpl(parts[idxIndex]), parts[idxDCode],
 					parts[idxVehCombNo]);
 			this.network.addTimeProfile(tp1);
 			// proceed to next line
@@ -444,7 +444,7 @@ public class MyVisumNetworkReader {
 		while (line != null && line.length() > 0) {
 			final String[] parts = StringUtils.explode(line, ';');
 
-			MyVisumNetwork.Departure d = new MyVisumNetwork.Departure(parts[idxLineName],parts[idxLineRouteName],parts[idxNo],parts[idxTRI],parts[idxDep],new IdImpl(parts[idxDCode]));
+			MyVisumNetwork.Departure d = new MyVisumNetwork.Departure(parts[idxLineName],parts[idxLineRouteName],parts[idxNo],parts[idxTRI],parts[idxDep],parts[idxDCode]);
 			this.network.addDeparture(d);
 			// proceed to next line
 			line = reader.readLine();

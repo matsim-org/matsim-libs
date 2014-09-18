@@ -19,6 +19,10 @@
 
 package playground.qiuhan.sa;
 
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -37,10 +41,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.matrices.Matrix;
 import org.matsim.visum.VisumMatrixReader;
-
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Q. SUN

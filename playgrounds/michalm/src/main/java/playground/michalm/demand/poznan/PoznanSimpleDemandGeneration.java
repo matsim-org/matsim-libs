@@ -19,13 +19,16 @@
 
 package playground.michalm.demand.poznan;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 
 import javax.naming.ConfigurationException;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -36,7 +39,8 @@ import pl.poznan.put.util.array2d.Array2DReader;
 import pl.poznan.put.util.random.RandomUtils;
 import playground.michalm.demand.ODDemandGenerator;
 import playground.michalm.util.matrices.MatrixUtils;
-import playground.michalm.zone.*;
+import playground.michalm.zone.Zone;
+import playground.michalm.zone.Zones;
 
 
 public class PoznanSimpleDemandGeneration
@@ -65,7 +69,7 @@ public class PoznanSimpleDemandGeneration
 
         Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
         new MatsimNetworkReader(scenario).readFile(networkFile);
-        Map<Id, Zone> zones = Zones.readZones(scenario, zonesXmlFile, zonesShpFile);
+        Map<Id<Zone>, Zone> zones = Zones.readZones(scenario, zonesXmlFile, zonesShpFile);
 
         ODDemandGenerator dg = new ODDemandGenerator(scenario, zones, true);
 

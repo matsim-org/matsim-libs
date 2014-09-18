@@ -116,7 +116,7 @@ public class KtiPtRoute extends GenericRouteImpl {
 
 	protected double calcInVehicleTime() {
 
-		Entry matrixEntry = this.plansCalcRouteKtiInfo.getPtTravelTimes().getEntry(this.fromMunicipality.getId(), this.toMunicipality.getId());
+		Entry matrixEntry = this.plansCalcRouteKtiInfo.getPtTravelTimes().getEntry(this.fromMunicipality.getId().toString(), this.toMunicipality.getId().toString());
 		if (matrixEntry == null) {
 			throw new RuntimeException("No entry found for " + this.fromMunicipality.getId() + " --> " + this.toMunicipality.getId());
 		}

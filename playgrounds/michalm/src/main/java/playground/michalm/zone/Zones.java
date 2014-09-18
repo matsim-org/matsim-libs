@@ -39,12 +39,12 @@ import com.vividsolutions.jts.geom.util.PolygonExtracter;
 
 public class Zones
 {
-    public static Map<Id, Zone> readZones(Scenario scenario, String zonesXmlFile,
+    public static Map<Id<Zone>, Zone> readZones(Scenario scenario, String zonesXmlFile,
             String zonesShpFile)
     {
         ZoneXmlReader xmlReader = new ZoneXmlReader(scenario);
         xmlReader.parse(zonesXmlFile);
-        Map<Id, Zone> zones = xmlReader.getZones();
+        Map<Id<Zone>, Zone> zones = xmlReader.getZones();
 
         ZoneShpReader shpReader = new ZoneShpReader(scenario, zones);
         shpReader.readZones(zonesShpFile);

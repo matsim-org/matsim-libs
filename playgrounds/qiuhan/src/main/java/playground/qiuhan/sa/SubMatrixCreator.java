@@ -26,7 +26,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
@@ -65,11 +64,11 @@ public class SubMatrixCreator {
 	private void modifyMatrices() {
 		// compare m and rounded
 		Random r = MatsimRandom.getRandom();
-		for (Id from : this.m.getFromLocations().keySet()) {
+		for (String from : this.m.getFromLocations().keySet()) {
 			DailyTrafficLoadCurve d = this
 					.getSuitableDailyTrafficLoadCurve(from.toString());
 			for (Entry entry : this.m.getFromLocEntries(from)) {
-				Id to = entry.getToLocation();
+				String to = entry.getToLocation();
 				int origVal = (int) this.m.getEntry(from, to).getValue();
 				int roundedVal = (int) this.rounded.getEntry(from, to)
 						.getValue();
@@ -147,9 +146,9 @@ public class SubMatrixCreator {
 	public Matrix createMatrix(String time) {
 		Matrix matrix = new Matrix(time, "from " + (Integer.parseInt(time) - 1)
 				+ " to " + time);
-		for (Id from : this.m.getFromLocations().keySet()) {
+		for (String from : this.m.getFromLocations().keySet()) {
 			for (Entry entry : this.m.getFromLocEntries(from)) {
-				Id to = entry.getToLocation();
+				String to = entry.getToLocation();
 				int value = (int) (entry.getValue()
 						* getShare(from.toString(), time) / 100d + 0.5);
 				matrix.createEntry(from/* O */, to/* D */, value);

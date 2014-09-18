@@ -19,23 +19,34 @@
 
 package playground.jbischoff.taxi.berlin.supply;
 
-import java.text.*;
-import java.util.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.data.file.VehicleWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.io.tabularFileParser.*;
-import org.matsim.matrices.*;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
+import org.matsim.matrices.Entry;
+import org.matsim.matrices.Matrix;
 
 import pl.poznan.put.util.random.WeightedRandomSelection;
 import playground.michalm.supply.VehicleGenerator;
 import playground.michalm.util.matrices.MatrixUtils;
-import playground.michalm.zone.*;
+import playground.michalm.zone.Zone;
+import playground.michalm.zone.Zones;
 
 
 public class BerlinTaxiVehicleCreatorV3
@@ -45,10 +56,10 @@ public class BerlinTaxiVehicleCreatorV3
 
     private Map<Date, Integer> taxisOverTime = new TreeMap<Date,Integer>();
     private double[] taxisOverTimeHourlyAverage;//24h from startDate, e.g. from 4am to 3am
-    private WeightedRandomSelection<Id> wrs;
+    private WeightedRandomSelection<Id<Zone>> wrs;
 
     private Scenario scenario;
-    private Map<Id, Zone> zones;
+    private Map<Id<Zone>, Zone> zones;
     private List<Vehicle> vehicles;
 
     double evShare;
@@ -141,11 +152,11 @@ public class BerlinTaxiVehicleCreatorV3
 
     private void prepareMatrices(String statusMatrixFile)
     {
-        wrs = new WeightedRandomSelection<Id>();
+        wrs = new WeightedRandomSelection<Id<Zone>>();
         Matrix avestatus = MatrixUtils.readMatrices(statusMatrixFile).getMatrix("avg");
 
-        for (Map.Entry<Id, ArrayList<Entry>> fromLOR : avestatus.getFromLocations().entrySet()) {
-            wrs.add(fromLOR.getKey(), MatrixUtils.calculateTotalValue(fromLOR.getValue()));
+        for (Map.Entry<String, ArrayList<Entry>> fromLOR : avestatus.getFromLocations().entrySet()) {
+            wrs.add(Id.create(fromLOR.getKey(), Zone.class), MatrixUtils.calculateTotalValue(fromLOR.getValue()));
         }
     }
 

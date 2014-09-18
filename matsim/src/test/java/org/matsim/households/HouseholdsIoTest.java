@@ -27,9 +27,10 @@ import java.util.Collections;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.households.Income.IncomePeriod;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author dgrether
@@ -39,13 +40,13 @@ public class HouseholdsIoTest extends MatsimTestCase {
 	private static final String TESTHOUSEHOLDSINPUT  = "testHouseholds.xml";
 	private static final String TESTXMLOUTPUT  = "testHouseholdsOut.xml";
 
-  private final Id id23 = new IdImpl("23");
-  private final Id id24 = new IdImpl("24");
-  private final Id id25 = new IdImpl("25");
-  private final Id id42 = new IdImpl("42");
-  private final Id id43 = new IdImpl("43");
-  private final Id id44 = new IdImpl("44");
-  private final Id id45 = new IdImpl("45");
+  private final Id<Household> id23 = Id.create("23", Household.class);
+  private final Id<Household> id24 = Id.create("24", Household.class);
+  private final Id<Household> id25 = Id.create("25", Household.class);
+  private final Id<Household> id42 = Id.create("42", Household.class);
+  private final Id<Household> id43 = Id.create("43", Household.class);
+  private final Id<Household> id44 = Id.create("44", Household.class);
+  private final Id<Household> id45 = Id.create("45", Household.class);
 
 	public void testBasicReaderWriter() throws FileNotFoundException, IOException {
 		Households households = new HouseholdsImpl();
@@ -73,7 +74,7 @@ public class HouseholdsIoTest extends MatsimTestCase {
 		assertNotNull(hh);
 		assertEquals(id23, hh.getId());
 		assertEquals(3, hh.getMemberIds().size());
-		List<Id> hhmemberIds = new ArrayList<Id>();
+		List<Id<Person>> hhmemberIds = new ArrayList<Id<Person>>();
 		hhmemberIds.addAll(hh.getMemberIds());
 		Collections.sort(hhmemberIds);
 		assertEquals(id23, hhmemberIds.get(0));
@@ -81,7 +82,7 @@ public class HouseholdsIoTest extends MatsimTestCase {
 		assertEquals(id43, hhmemberIds.get(2));
 
 		assertNotNull(hh.getVehicleIds());
-		List<Id> vehIds = new ArrayList<Id>();
+		List<Id<Vehicle>> vehIds = new ArrayList<>();
 		vehIds.addAll(hh.getVehicleIds());
 		Collections.sort(vehIds);
 		assertEquals(2, vehIds.size());

@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -68,7 +67,7 @@ public class InitRoutesTest extends MatsimTestCase {
 
 		// create one person with missing link in act
 		Population population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
-		PersonImpl person = new PersonImpl(new IdImpl("1"));
+		PersonImpl person = new PersonImpl(Id.create("1", Person.class));
 		population.addPerson(person);
 		PlanImpl plan = person.createAndAddPlan(true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", Id.create("1", Link.class));
@@ -95,7 +94,7 @@ public class InitRoutesTest extends MatsimTestCase {
 		Population population2 = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).parse(PLANS_FILE_TESTOUTPUT);
 		assertEquals("wrong number of persons.", 1, population2.getPersons().size());
-		Person person2 = population2.getPersons().get(new IdImpl("1"));
+		Person person2 = population2.getPersons().get(Id.create("1", Person.class));
 		assertNotNull("person 1 missing", person2);
 		assertEquals("wrong number of plans in person 1", 1, person2.getPlans().size());
 		Plan plan2 = person2.getPlans().get(0);

@@ -35,7 +35,7 @@ public class ZoneXmlReader
     private final static String ZONE = "zone";
 
     private final Scenario scenario;
-    private final Map<Id, Zone> zones = new LinkedHashMap<Id, Zone>();
+    private final Map<Id<Zone>, Zone> zones = new LinkedHashMap<Id<Zone>, Zone>();
 
 
     public ZoneXmlReader(Scenario scenario)
@@ -44,7 +44,7 @@ public class ZoneXmlReader
     }
 
 
-    public Map<Id, Zone> getZones()
+    public Map<Id<Zone>, Zone> getZones()
     {
         return zones;
     }

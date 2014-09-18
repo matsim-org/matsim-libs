@@ -7,8 +7,8 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.matrixbasedptrouter.utils.HeaderParser;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
+import org.matsim.contrib.matrixbasedptrouter.utils.HeaderParser;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -149,7 +149,7 @@ final class FileUtils {
 							ptStopHashMap.containsKey(destinationPtStopID)){
 
 						// add to od matrix
-						odMatrix.createEntry(originPtStopID, destinationPtStopID, value);
+						odMatrix.createEntry(originPtStopID.toString(), destinationPtStopID.toString(), value);
 					}
 					else{
 						// Print the warn count after reading is finished. We want to know exactly how many stops are missing. Daniel, may '13

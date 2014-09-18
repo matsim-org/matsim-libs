@@ -28,14 +28,11 @@ import java.util.Date;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrices;
 import org.matsim.matrices.Matrix;
 
-import playground.michalm.util.matrices.MatricesTxtWriter;
 import playground.michalm.util.matrices.MatrixUtils;
 
 public class ZoneExtractor
@@ -44,8 +41,8 @@ public class ZoneExtractor
     Matrices matrices = MatrixUtils.readMatrices("C:/local_jb/data/taxi_berlin/2013/OD/demandMatrices.xml");
     Matrices outmat = new Matrices();
     private final static SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
-    private final static Id TXLLOR =  new IdImpl("12214125");
-    private final static Id SXFLOR = new IdImpl("12061433");
+    private final static String TXLLOR =  "12214125";
+    private final static String SXFLOR = "12061433";
     /**
      * @param input matrix file
      * exports values from or to one zone at different times
@@ -78,24 +75,24 @@ public class ZoneExtractor
             Matrix currentMatrix = matrices.getMatrix(sdf.format(currentHour));
             try {
             for (Entry e : currentMatrix.getFromLocEntries(TXLLOR)){
-                fromTXL.createEntry(e.getToLocation(), new IdImpl(sdf.format(currentHour)), e.getValue());
+                fromTXL.createEntry(e.getToLocation(), sdf.format(currentHour), e.getValue());
             }
             } catch (NullPointerException e) {}
             try {
             for (Entry e : currentMatrix.getToLocEntries(TXLLOR)){
-                toTXL.createEntry(e.getFromLocation(), new IdImpl(sdf.format(currentHour)), e.getValue());
+                toTXL.createEntry(e.getFromLocation(), sdf.format(currentHour), e.getValue());
             }
             } catch (NullPointerException e) {}
             try {
             
             for (Entry e : currentMatrix.getFromLocEntries(SXFLOR)){
-                fromSXF.createEntry(e.getToLocation(), new IdImpl(sdf.format(currentHour)), e.getValue());
+                fromSXF.createEntry(e.getToLocation(), sdf.format(currentHour), e.getValue());
             }
             } catch (NullPointerException e) {}
             try {
         
             for (Entry e : currentMatrix.getToLocEntries(SXFLOR)){
-                toSXF.createEntry(e.getFromLocation(), new IdImpl(sdf.format(currentHour)), e.getValue());
+                toSXF.createEntry(e.getFromLocation(), sdf.format(currentHour), e.getValue());
             } 
             } catch (NullPointerException e) {}
             
@@ -119,15 +116,15 @@ public class ZoneExtractor
         Writer writer = IOUtils.getBufferedWriter(fileName);
         try {
             writer.append("loc");
-            for (Id time : matrix.getToLocations().keySet()){
+            for (String time : matrix.getToLocations().keySet()){
                 writer.append("\t"+time.toString());
             }
             writer.append("\n");
         
-        for (Id locId : matrix.getFromLocations().keySet()){
-            Map<Id,Double> currentLoc= new TreeMap<Id,Double>();
+        for (String locId : matrix.getFromLocations().keySet()){
+            Map<String,Double> currentLoc= new TreeMap<String,Double>();
             
-            for (Id time : matrix.getToLocations().keySet()){
+            for (String time : matrix.getToLocations().keySet()){
                 double value = 0;
                 Entry e = matrix.getEntry(locId, time);
                 if (e != null) value = e.getValue();

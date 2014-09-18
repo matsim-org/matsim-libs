@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
@@ -93,7 +92,7 @@ public class CalcMacroZoneTravelTimes implements PersonDepartureEventHandler,
 				writer.newLine();
 				for(ArrayList<Entry> ee:  e.getValue().getFromLocations().values()){
 					for(Entry eee: ee){
-						writer.write(eee.getFromLocation().toString() + ";" + eee.getToLocation() + ";");
+						writer.write(eee.getFromLocation() + ";" + eee.getToLocation() + ";");
 						writer.write(eee.getValue() + ";");
 						writer.write(this.mode2zoneTrips.get(e.getKey()).getEntry(eee.getFromLocation(), eee.getToLocation()).getValue() + ";");
 						writer.write(eee.getValue()/this.mode2zoneTrips.get(e.getKey()).getEntry(eee.getFromLocation(), eee.getToLocation()).getValue() + ";");
@@ -165,10 +164,10 @@ public class CalcMacroZoneTravelTimes implements PersonDepartureEventHandler,
 			init(trip);
 			this.mode2zoneTrips.put(ls.getMode(), trip);
 		}
-		Id from, to;
+		String from, to;
 		// get the macrozone-ids... maybe doublecheck here, if the id exists...
-		from = this.micro2MacroZone.get(ls.getFromFac());
-		to = this.micro2MacroZone.get(ls.getToFac());
+		from = this.micro2MacroZone.get(ls.getFromFac()).toString();
+		to = this.micro2MacroZone.get(ls.getToFac()).toString();
 		// update the trip-matrix-value
 		Entry ee = trip.getEntry(from, to);
 		if(ee == null) ee = trip.setEntry(from, to, 0);
@@ -186,7 +185,7 @@ public class CalcMacroZoneTravelTimes implements PersonDepartureEventHandler,
 	private void init(Matrix matrix) {
 		for(int i = 1; i < 8; i++){
 			for(int j = 1; j < 8; j++){
-				matrix.createEntry(new IdImpl(i), new IdImpl(j), 0.);
+				matrix.createEntry(Integer.toString(i), Integer.toString(j), 0.);
 			}
 		}
 	}

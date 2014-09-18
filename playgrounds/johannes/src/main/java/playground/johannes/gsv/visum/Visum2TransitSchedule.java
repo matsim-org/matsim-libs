@@ -28,7 +28,6 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.misc.Time;
@@ -86,7 +85,7 @@ public class Visum2TransitSchedule {
 		// 1st step: convert vehicle types
 		VehiclesFactory vb = this.vehicles.getFactory();
 		for (VehicleCombination vehComb : this.visum.vehicleCombinations.values()) {
-			VehicleType type = vb.createVehicleType(new IdImpl(vehComb.id));
+			VehicleType type = vb.createVehicleType(Id.create(vehComb.id, VehicleType.class));
 			type.setDescription(vehComb.name);
 			VehicleCapacity capacity = vb.createVehicleCapacity();
 			VehicleUnit vu = this.visum.vehicleUnits.get(vehComb.vehUnitId);
@@ -96,8 +95,8 @@ public class Visum2TransitSchedule {
 			this.vehicles.addVehicleType(type);
 		}
 		// insert a dummy vehicle type if no type is specified
-		Id dummyVehId = new IdImpl(0);
-		VehicleType type = vb.createVehicleType(dummyVehId);
+		Id<Vehicle> dummyVehId = Id.create(0, Vehicle.class);
+		VehicleType type = vb.createVehicleType(Id.create(dummyVehId, VehicleType.class));
 		type.setDescription("unknown");
 		VehicleCapacity capacity = vb.createVehicleCapacity();
 		//VehicleUnit vu = this.visum.vehicleUnits.get(vehComb.vehUnitId);
@@ -107,13 +106,13 @@ public class Visum2TransitSchedule {
 		this.vehicles.addVehicleType(type);
 
 		// 2nd step: convert stop points
-		final Map<Id, TransitStopFacility> stopFacilities = new TreeMap<Id, TransitStopFacility>();
+		final Map<Id<TransitStopFacility>, TransitStopFacility> stopFacilities = new TreeMap<>();
 
 		for (VisumNetwork.StopPoint stopPoint : this.visum.stopPoints.values()){
 			Coord coord = this.coordinateTransformation.transform(this.visum.stops.get(this.visum.stopAreas.get(stopPoint.stopAreaId).StopId).coord);
-			TransitStopFacility stop = builder.createTransitStopFacility(stopPoint.id, coord, false);
+			TransitStopFacility stop = builder.createTransitStopFacility(Id.create(stopPoint.id, TransitStopFacility.class), coord, false);
 			stop.setName(stopPoint.name);
-			stopFacilities.put(stopPoint.id, stop);
+			stopFacilities.put(Id.create(stopPoint.id, TransitStopFacility.class), stop);
 			this.schedule.addStopFacility(stop);
 		}
 
@@ -124,7 +123,7 @@ public class Visum2TransitSchedule {
 			if(i % 10 == 0) {
 				log.info(String.format("Converting %s of %s lines...", i, this.visum.lines.size()));
 			}
-			TransitLine tLine = builder.createTransitLine(line.id);
+			TransitLine tLine = builder.createTransitLine(Id.create(line.id, TransitLine.class));
 			attrs.setTransportSystem(tLine.getId().toString(), transportSystems.get(line.tCode));
 
 			for (VisumNetwork.TimeProfile timeProfile : this.visum.timeProfiles.values()){
@@ -135,15 +134,15 @@ public class Visum2TransitSchedule {
 //				VehicleType defaultVehType = null;
 				VehicleType defaultVehType = this.vehicles.getVehicleTypes().get(dummyVehId);
 				if (defaultVehCombination != null) {
-					defaultVehType = this.vehicles.getVehicleTypes().get(new IdImpl(defaultVehCombination.id));
+					defaultVehType = this.vehicles.getVehicleTypes().get(Id.create(defaultVehCombination.id, VehicleType.class));
 				}
 				// convert line routes
 				if (timeProfile.lineName.equals(line.id)) {
 					List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 					//  convert route profile
 					for (VisumNetwork.TimeProfileItem tpi : this.visum.timeProfileItems.values()){
-						if (tpi.lineName.equals(line.id.toString()) && tpi.lineRouteName.equals(timeProfile.lineRouteName.toString()) && tpi.timeProfileName.equals(timeProfile.index.toString()) && tpi.DCode.equals(timeProfile.DCode.toString())){
-							TransitRouteStop s = builder.createTransitRouteStop(stopFacilities.get(this.visum.lineRouteItems.get(line.id.toString() +"/"+ timeProfile.lineRouteName.toString()+"/"+ tpi.lRIIndex.toString()+"/"+tpi.DCode).stopPointNo),Time.parseTime(tpi.arr),Time.parseTime(tpi.dep));
+						if (tpi.lineName.equals(line.id.toString()) && tpi.lineRouteName.equals(timeProfile.lineRouteName.toString()) && tpi.timeProfileName.equals(timeProfile.index.toString()) && tpi.dirCode.equals(timeProfile.dirCode)){
+							TransitRouteStop s = builder.createTransitRouteStop(stopFacilities.get(this.visum.lineRouteItems.get(line.id.toString() +"/"+ timeProfile.lineRouteName.toString()+"/"+ tpi.lRIIndex.toString()+"/"+tpi.dirCode).stopPointNo),Time.parseTime(tpi.arr),Time.parseTime(tpi.dep));
 							stops.add(s);
 						}
 					}
@@ -151,14 +150,14 @@ public class Visum2TransitSchedule {
 					if (mode == null) {
 						log.error("Could not find TransportMode for " + line.tCode + ", more info: " + line.id);
 					}
-					TransitRoute tRoute = builder.createTransitRoute(new IdImpl(timeProfile.lineName.toString()+"."+timeProfile.lineRouteName.toString()+"."+ timeProfile.index.toString()+"."+timeProfile.DCode.toString()),null,stops,mode);
+					TransitRoute tRoute = builder.createTransitRoute(Id.create(timeProfile.lineName.toString()+"."+timeProfile.lineRouteName.toString()+"."+ timeProfile.index.toString()+"."+timeProfile.dirCode, TransitRoute.class),null,stops,mode);
 					//  convert departures
 					for (VisumNetwork.Departure d : this.visum.departures.values()){
-						if (d.lineName.equals(line.id.toString()) && d.lineRouteName.equals(timeProfile.lineRouteName.toString()) && d.TRI.equals(timeProfile.index.toString()) && d.DCode.equals(timeProfile.DCode)) {
-							Departure departure = builder.createDeparture(new IdImpl(d.index), Time.parseTime(d.dep));
+						if (d.lineName.equals(line.id.toString()) && d.lineRouteName.equals(timeProfile.lineRouteName.toString()) && d.TRI.equals(timeProfile.index.toString()) && d.dirCode.equals(timeProfile.dirCode)) {
+							Departure departure = builder.createDeparture(Id.create(d.index, Departure.class), Time.parseTime(d.dep));
 							VehicleType vehType = defaultVehType;
 							if (d.vehCombinationNo != null) {
-								vehType = this.vehicles.getVehicleTypes().get(new IdImpl(d.vehCombinationNo));
+								vehType = this.vehicles.getVehicleTypes().get(Id.create(d.vehCombinationNo, VehicleType.class));
 								if (vehType == null) {
 									vehType = defaultVehType;
 								}
@@ -166,7 +165,7 @@ public class Visum2TransitSchedule {
 							if (vehType == null) {
 								log.error("Could not find any vehicle combination for deparutre " + d.index + " used in line " + line.id.toString() + ".");
 							} else {
-								Vehicle veh = vb.createVehicle(new IdImpl("tr_" + vehId++), vehType);
+								Vehicle veh = vb.createVehicle(Id.create("tr_" + vehId++, Vehicle.class), vehType);
 								this.vehicles.addVehicle( veh);
 								departure.setVehicleId(veh.getId());
 								tRoute.addDeparture(departure);

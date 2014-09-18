@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.utils.LeastCostPathTree.NodeData;
 
 
@@ -43,7 +44,7 @@ public class PathTreeBasedTravelTimeCalculator
             return 0;
         }
 
-        Map<Id, NodeData> tree = leastCostPathTrees.getTree(fromLink);
+        Map<Id<Node>, NodeData> tree = leastCostPathTrees.getTree(fromLink);
         NodeData nodeData = tree.get(toLink.getFromNode().getId());
         
         double tt = 1;//getting over the first node

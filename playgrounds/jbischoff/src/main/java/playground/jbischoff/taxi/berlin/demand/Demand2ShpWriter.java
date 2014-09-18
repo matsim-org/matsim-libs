@@ -21,13 +21,10 @@ package playground.jbischoff.taxi.berlin.demand;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
@@ -45,12 +42,13 @@ import org.matsim.matrices.Matrices;
 import org.matsim.matrices.Matrix;
 import org.opengis.feature.simple.SimpleFeature;
 
+import playground.jbischoff.taxi.berlin.data.BeelineDistanceExractor;
+import playground.michalm.util.matrices.MatrixUtils;
+import playground.michalm.zone.Zone;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
-
-import playground.jbischoff.taxi.berlin.data.BeelineDistanceExractor;
-import playground.michalm.util.matrices.MatrixUtils;
 
 
 public class Demand2ShpWriter
@@ -100,8 +98,8 @@ public class Demand2ShpWriter
             for (Entry e : l) {
 
                 LineString ls = this.geofac.createLineString(new Coordinate[] {
-                        MGC.coord2Coordinate(bde.getZoneCentroid(e.getFromLocation())),
-                        MGC.coord2Coordinate(bde.getZoneCentroid(e.getToLocation())) });
+                        MGC.coord2Coordinate(bde.getZoneCentroid(Id.create(e.getFromLocation(), Zone.class))),
+                        MGC.coord2Coordinate(bde.getZoneCentroid(Id.create(e.getToLocation(), Zone.class))) });
                 Object[] attribs = new Object[5];
                 attribs[0] = ls;
                 attribs[1] = e.getFromLocation().toString();

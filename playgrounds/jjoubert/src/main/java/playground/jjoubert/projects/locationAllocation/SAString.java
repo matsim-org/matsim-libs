@@ -40,8 +40,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -58,12 +56,12 @@ public class SAString {
 	private static int OBJECTIVE_FUNCTION_STRATEGY;
 	final private Random random;
 	private Matrix distanceMatrix;
-	private List<Id> sites;
-	private List<Id> demandPoints;
-	private List<Id> fixedSites;
+	private List<String> sites;
+	private List<String> demandPoints;
+	private List<String> fixedSites;
 	private int numberOfThreads;
 
-	private Map<Id, Double> demandPointWeights;
+	private Map<String, Double> demandPointWeights;
 
 	/**
 	 * @param args
@@ -147,9 +145,9 @@ public class SAString {
 	public SAString(int numberOfThreads, long seed, boolean useDemandPoints) {
 		this.distanceMatrix = new Matrix("Distance",
 				"Distance matrix from demand point to site.");
-		this.sites = new ArrayList<Id>();
-		this.demandPoints = new ArrayList<Id>();
-		this.fixedSites = new ArrayList<Id>();
+		this.sites = new ArrayList<>();
+		this.demandPoints = new ArrayList<>();
+		this.fixedSites = new ArrayList<>();
 		
 		this.random = new Random(seed);
 		this.numberOfThreads = numberOfThreads;
@@ -176,8 +174,8 @@ public class SAString {
 	private void readDistanceMatrix(String filename) {
 		LOG.info("Reading distance matrix from " + filename);
 
-		Map<Id, Integer> siteMap;
-		Map<Integer, Id> siteIndexMap;
+		Map<String, Integer> siteMap;
+		Map<Integer, String> siteIndexMap;
 
 		BufferedReader br = IOUtils.getBufferedReader(filename);
 		try {
@@ -192,11 +190,11 @@ public class SAString {
 			
 			int numberOfSites = sa.length - 1;
 
-			siteMap = new HashMap<Id, Integer>(numberOfSites);
-			siteIndexMap = new HashMap<Integer, Id>();
+			siteMap = new HashMap<>(numberOfSites);
+			siteIndexMap = new HashMap<>();
 
 			for (int i = 1; i < sa.length; i++) {
-				Id siteId = new IdImpl(sa[i]);
+				String siteId = sa[i];
 				this.sites.add(siteId);
 				siteMap.put(siteId, new Integer(i));
 				siteIndexMap.put(new Integer(i), siteId);
@@ -211,7 +209,7 @@ public class SAString {
 					LOG.error("Wrong line length read!!");
 				}
 				/* Add the demand point to the list demand of points. */
-				Id demandPointId = new IdImpl(sa[0]);
+				String demandPointId = sa[0];
 				//FIXME Remove once sorted out.
 				this.demandPoints.add(demandPointId);
 
@@ -246,8 +244,7 @@ public class SAString {
 	
 	private void readDemandWeights(String filename) {
 		/* Only read a filename if it exists, and is not null. */
-		this.demandPointWeights = new HashMap<Id, Double>(
-				this.demandPoints.size());
+		this.demandPointWeights = new HashMap<>(this.demandPoints.size());
 		if (filename != null) {
 			File f = new File(filename);
 			if (f.exists() && f.isFile() && f.canRead()) {
@@ -256,7 +253,7 @@ public class SAString {
 					String line = null;
 					while ((line = br.readLine()) != null) {
 						String[] sa = line.split(",");
-						Id id = new IdImpl(sa[0]);
+						String id = sa[0];
 						if (!this.demandPoints.contains(id)) {
 							LOG.warn("Demand point "
 									+ sa[0]
@@ -286,7 +283,7 @@ public class SAString {
 		 * Check for each demand point that there is a weight, or add a zero
 		 * weight if it is not included.
 		 */
-		for (Id demandPointId : this.demandPoints) {
+		for (String demandPointId : this.demandPoints) {
 			if (!this.demandPointWeights.containsKey(demandPointId)) {
 				this.demandPointWeights.put(demandPointId, 1.0);
 			}
@@ -310,7 +307,7 @@ public class SAString {
 				try {
 					String line = null;
 					while ((line = br.readLine()) != null) {
-						Id id = new IdImpl(line);
+						String id = line;
 						if (!this.sites.contains(id)) {
 							LOG.warn("Site "
 									+ line
@@ -503,20 +500,20 @@ public class SAString {
 	public Solution getNearestNeighbour(Solution current, double temperature){
 		Solution newCurrent = null;
 		
-		Map<Tuple<Id, Id>, Double> map = new HashMap<Tuple<Id, Id>, Double>();
+		Map<Tuple<String, String>, Double> map = new HashMap<Tuple<String, String>, Double>();
 		
 		/*TODO Fix to increasing again. */
 		ValueComparatorDecreasing vc = new ValueComparatorDecreasing(map);
-		Map<Tuple<Id, Id>, Double> sortedMap = new TreeMap<Tuple<Id, Id>, Double>(vc); 
+		Map<Tuple<String, String>, Double> sortedMap = new TreeMap<Tuple<String, String>, Double>(vc); 
 		
 		/* Pick a random current site. */
-		Id selectedSite = current.getRepresentation().get(getRandomPermutation(current.getRepresentation().size())[0]);
+		String selectedSite = current.getRepresentation().get(getRandomPermutation(current.getRepresentation().size())[0]);
 		
 		/* Find it's closest neighbour. */
-		for(Id nextSite : this.sites){
+		for(String nextSite : this.sites){
 			if(!selectedSite.toString().equalsIgnoreCase(nextSite.toString())){
 				/* Consider this possible move. */
-				map.put(new Tuple<Id, Id>(selectedSite, nextSite), this.distanceMatrix.getEntry(selectedSite, nextSite).getValue());
+				map.put(new Tuple<String, String>(selectedSite, nextSite), this.distanceMatrix.getEntry(selectedSite, nextSite).getValue());
 			}
 		}
 		
@@ -524,8 +521,8 @@ public class SAString {
 		
 		/* Get the first (best) accepted move */
 		boolean found = false;
-		for(java.util.Map.Entry<Tuple<Id, Id>, Double> entry : sortedMap.entrySet()){
-			Tuple<Id, Id> thisMove = entry.getKey();
+		for(java.util.Map.Entry<Tuple<String, String>, Double> entry : sortedMap.entrySet()){
+			Tuple<String, String> thisMove = entry.getKey();
 			double thisSaving = entry.getValue();
 			while(!found){
 				if(thisSaving < 0){
@@ -568,16 +565,16 @@ public class SAString {
 		 * TODO - Consider the implication on diversification when using 
 		 * different fraction values. 
 		 *--------------------------------------------------------------------*/
-		Map<Tuple<Id, Id>, Double> map = new HashMap<Tuple<Id, Id>, Double>(); 
+		Map<Tuple<String, String>, Double> map = new HashMap<Tuple<String, String>, Double>(); 
 		
 		/* Select, randomly, the sites to consider for a move. */
-		int numberOfSitesToConsiderForNeighborhood = Math.max(1, (int) Math.floor(FRACTION_OF_SOLUTIONS_CHECKED*((double)current.getRepresentation().size())) );
-		List<Id> sitesToConsiderForMoves = new ArrayList<Id>(numberOfSitesToConsiderForNeighborhood);
+		int numberOfSitesToConsiderForNeighborhood = Math.max(1, (int) Math.floor(FRACTION_OF_SOLUTIONS_CHECKED*(current.getRepresentation().size())) );
+		List<String> sitesToConsiderForMoves = new ArrayList<String>(numberOfSitesToConsiderForNeighborhood);
 
-		List<Id> currentRepresentation = current.getRepresentation();
+		List<String> currentRepresentation = current.getRepresentation();
 		int[] randomPermutation = getRandomPermutation(currentRepresentation.size());
 		while(sitesToConsiderForMoves.size() < numberOfSitesToConsiderForNeighborhood){
-			Id siteId = currentRepresentation.get( randomPermutation[sitesToConsiderForMoves.size()] );
+			String siteId = currentRepresentation.get( randomPermutation[sitesToConsiderForMoves.size()] );
 
 			/* Only add the site if it is NOT a fixed site. */
 			if(!this.fixedSites.contains(siteId)){
@@ -586,14 +583,14 @@ public class SAString {
 		}
 
 		/* Consider the various moves. */
-		for(Id selectedSite : sitesToConsiderForMoves){
+		for(String selectedSite : sitesToConsiderForMoves){
 			
 			switch (NEIGHBOURHOOD_STRATEGY) {
 			case 1:
 				/* TODO Consider the twenty sites that are farthest away from the
 				 * sites in the current solution. */
-				List<Id> farthestSites = new ArrayList<Id>(20);
-				for(Id site : this.sites){
+				List<String> farthestSites = new ArrayList<>(20);
+				for(String site : this.sites){
 					if(!current.representation.contains(site)){
 						/* The site is not in the current solution. But to check 
 						 * how far it is from the OTHER SITES, we need to read 
@@ -604,7 +601,7 @@ public class SAString {
 				
 			case 2:
 				/* Consider all possible moves for this site, but again ignore fixed sites. */
-				for(Id nextSite : this.sites){
+				for(String nextSite : this.sites){
 					if(!selectedSite.toString().equalsIgnoreCase(nextSite.toString()) && 	/* Don't replace a site with itself. */ 
 							!this.fixedSites.contains(nextSite) && 							/* Don't replace a fixed site. */ 
 							!currentRepresentation.contains(nextSite)){						/* Don't replace with a site that is already in the current solution. */
@@ -618,13 +615,13 @@ public class SAString {
 							 * negative. */
 							possibleMove.makeMove(selectedSite, nextSite);
 							double actualDifference = possibleMove.objective - current.objective;						
-							map.put(new Tuple<Id, Id>(selectedSite, nextSite), actualDifference );
+							map.put(new Tuple<String, String>(selectedSite, nextSite), actualDifference );
 							break;
 							
 						case 2:
 							/* Estimate the objective function difference. */
 							double estimatedDifference = possibleMove.evaluateObjectiveFunctionDifference(selectedSite);
-							map.put(new Tuple<Id, Id>(selectedSite, nextSite), estimatedDifference );
+							map.put(new Tuple<String, String>(selectedSite, nextSite), estimatedDifference );
 							
 						default:
 							throw new IllegalArgumentException("Cannot interpret " + OBJECTIVE_FUNCTION_STRATEGY + " as a valid objective function strategy.");
@@ -640,17 +637,17 @@ public class SAString {
 
 		/* Rank the neighbourhood moves from best to worst. */
 		ValueComparatorIncreasing vc = new ValueComparatorIncreasing(map);
-		Map<Tuple<Id, Id>, Double> sortedMap = new TreeMap<Tuple<Id, Id>, Double>(vc); 
+		Map<Tuple<String, String>, Double> sortedMap = new TreeMap<Tuple<String, String>, Double>(vc); 
 		sortedMap.putAll(map);
 		
 		/* Get the first (best) accepted move */
 		boolean found = false;
-		Iterator<java.util.Map.Entry<Tuple<Id, Id>, Double>> iterator = sortedMap.entrySet().iterator();
+		Iterator<java.util.Map.Entry<Tuple<String, String>, Double>> iterator = sortedMap.entrySet().iterator();
 		
 		while(!found && iterator.hasNext()){
-			java.util.Map.Entry<Tuple<Id, Id>, Double> entry = iterator.next();
+			java.util.Map.Entry<Tuple<String, String>, Double> entry = iterator.next();
 			
-			Tuple<Id, Id> thisMove = entry.getKey();
+			Tuple<String, String> thisMove = entry.getKey();
 			double thisSaving = entry.getValue();
 			
 			/* Consider what is considered an "acceptable" move, based on the
@@ -714,14 +711,14 @@ public class SAString {
 		}
 		
 		/* Start by populating the fixed sites. */
-		List<Id> chosenSites = new ArrayList<Id>(numberOfSites);
+		List<String> chosenSites = new ArrayList<>(numberOfSites);
 		chosenSites.addAll(fixedSites);
 		
 		/* Then add randomly sampled sites until the required number is reached. */
 		int[] randomPerm = getRandomPermutation(this.sites.size());
 		int nextInt = 0;
 		while(chosenSites.size() < numberOfSites){
-			Id nextId = this.sites.get(randomPerm[nextInt]);
+			String nextId = this.sites.get(randomPerm[nextInt]);
 			
 			/* Ensure that there are no duplicate sites. */
 			if(!chosenSites.contains(nextId)){
@@ -736,7 +733,7 @@ public class SAString {
 	private Solution generateGreedyInitialSolution(int numberOfSites){
 		LOG.info("Generating a greedy initial solution");
 		Counter counter = new Counter("  sites # ");
-		List<Id> initial = new ArrayList<Id>(numberOfSites);
+		List<String> initial = new ArrayList<>(numberOfSites);
 		
 		/* Randomly pick the seed. */
 		int[] permutation = getRandomPermutation(this.sites.size());
@@ -747,10 +744,10 @@ public class SAString {
 
 		do {
 			double best = Double.NEGATIVE_INFINITY;
-			Id bestId =  null;
-			List<Id> evaluateList = new ArrayList<Id>( initial.size()+1 );
+			String bestId =  null;
+			List<String> evaluateList = new ArrayList<>( initial.size()+1 );
 			evaluateList.addAll(initial);
-			for(Id siteId : this.sites){
+			for(String siteId : this.sites){
 				if(!initial.contains(siteId)){
 					evaluateList.add(siteId);
 					
@@ -775,11 +772,11 @@ public class SAString {
 	}
 	
 	
-	private double evaluatePartialSolution(List<Id> sites){
+	private double evaluatePartialSolution(List<String> sites){
 		double sum = 0.0;
-		for(Id demandPoint : this.demandPoints){
+		for(String demandPoint : this.demandPoints){
 			double closestDistance = Double.POSITIVE_INFINITY;
-			for(Id siteId : sites){
+			for(String siteId : sites){
 				double thisDistance = this.distanceMatrix.getEntry(demandPoint, siteId).getValue();
 				if(thisDistance < closestDistance){
 					closestDistance = thisDistance;
@@ -793,13 +790,13 @@ public class SAString {
 	
 	private Solution generateDemandDrivenInitialSolution(int numberOfSites){
 		LOG.info("Generating demand-driven initial solution.");
-		List<Id> initial = new ArrayList<Id>(numberOfSites);
+		List<String> initial = new ArrayList<String>(numberOfSites);
 		
 		int[] randomDemandSites = getRandomPermutation(this.demandPoints.size());
 		
 		int demandIndex = 0;
 		do {
-			Id demandId = this.demandPoints.get( randomDemandSites[demandIndex] );
+			String demandId = this.demandPoints.get( randomDemandSites[demandIndex] );
 			
 			List<Entry> thisDemandPointSites =  distanceMatrix.getFromLocEntries(demandId);
 			Comparator<Entry> entryComparator = new Comparator<Entry>() {
@@ -809,7 +806,7 @@ public class SAString {
 				}
 			};
 			Collections.sort(thisDemandPointSites, entryComparator);
-			Id closestSite = thisDemandPointSites.get(0).getToLocation();
+			String closestSite = thisDemandPointSites.get(0).getToLocation();
 
 			if(initial.contains(closestSite)){
 				demandIndex++;
@@ -825,32 +822,32 @@ public class SAString {
 	
 		
 	private class Solution {
-		public List<Id> representation;
-		public Map<Id, Id> allocation;
+		public List<String> representation;
+		public Map<String, String> allocation;
 		public double objective;
 
-		public Solution(List<Id> representation) {
+		public Solution(List<String> representation) {
 			this(representation, 0.0);
 			this.objective = calculateObjective();
 		}
 		
-		public Solution(List<Id> representation, double objective){
+		public Solution(List<String> representation, double objective){
 			this.representation = representation;
 			this.objective = objective;
 		}
 		
 		public double calculateObjective() {
-			this.allocation = new HashMap<Id, Id>(this.representation.size());
+			this.allocation = new HashMap<String, String>(this.representation.size());
 			double obj = 0.0;
 		
 			/* Set up multi-threaded objective function evaluator. */
 			ExecutorService threadExecutor = Executors.newFixedThreadPool(numberOfThreads);
-			List<Future<Tuple<Tuple<Id,Id>, Double>>> listOfJobs = new ArrayList<Future<Tuple<Tuple<Id,Id>, Double>>>();
+			List<Future<Tuple<Tuple<String, String>, Double>>> listOfJobs = new ArrayList<Future<Tuple<Tuple<String, String>, Double>>>();
 			
 			/* Assign to each demand point its closest site. */
-			for(Id demandPointId : demandPoints){
-				Callable<Tuple<Tuple<Id,Id>, Double>> job = new EvaluateClosestSiteCallable(demandPointId, this.representation);
-				Future<Tuple<Tuple<Id,Id>, Double>> result = threadExecutor.submit(job);
+			for(String demandPointId : demandPoints){
+				Callable<Tuple<Tuple<String, String>, Double>> job = new EvaluateClosestSiteCallable(demandPointId, this.representation);
+				Future<Tuple<Tuple<String, String>, Double>> result = threadExecutor.submit(job);
 				listOfJobs.add(result);
 			}
 			
@@ -860,7 +857,7 @@ public class SAString {
 			
 			/* Consolidate the output. */
 			try {
-				for(Future<Tuple<Tuple<Id,Id>, Double>> job : listOfJobs){
+				for(Future<Tuple<Tuple<String, String>, Double>> job : listOfJobs){
 					this.allocation.put(job.get().getFirst().getFirst(), job.get().getFirst().getSecond());
 					obj += job.get().getSecond().doubleValue();
 				}
@@ -880,30 +877,30 @@ public class SAString {
 		 */
 		public Solution copy(){
 			/* Copy the representation. */
-			List<Id> newRepresentation = new ArrayList<Id>(this.representation.size());
-			for(Id id : this.representation){
-				newRepresentation.add(new IdImpl(id.toString()));
+			List<String> newRepresentation = new ArrayList<String>(this.representation.size());
+			for(String id : this.representation){
+				newRepresentation.add(id);
 			}
 			
 			/* Copy the objective. */
 			Solution ss = new Solution(newRepresentation, this.getObjective());
 		
 			/* Copy the allocation. */
-			Map<Id, Id> newAllocation = new HashMap<Id, Id>();
-			for(Id id : this.allocation.keySet()){
-				newAllocation.put(new IdImpl(id.toString()), new IdImpl(this.allocation.get(id).toString()));
+			Map<String, String> newAllocation = new HashMap<String, String>();
+			for(String id : this.allocation.keySet()){
+				newAllocation.put(id, this.allocation.get(id));
 			}
 			ss.allocation = newAllocation;
 			
 			return ss;
 		}
 
-		public double evaluateObjectiveFunctionDifference(Id oldId){
+		public double evaluateObjectiveFunctionDifference(String oldId){
 			double difference = 0.0;
 		
 			/* Check each demand point's allocated site. */
-			for(Id id : this.allocation.keySet()){
-				Id thisAllocationId = this.allocation.get(id);
+			for (String id : this.allocation.keySet()){
+				String thisAllocationId = this.allocation.get(id);
 				
 				/* Check if the current allocation is affected by the move. */
 				if(thisAllocationId.toString().equalsIgnoreCase(oldId.toString())){
@@ -912,7 +909,7 @@ public class SAString {
 					
 					/* Now get the affected site's new closest distance, BUT don't
 					 * consider the site will be removed. */
-					Id newAllocationId = null;					
+					String newAllocationId = null;					
 					List<Entry> thisDemandPointSites =  distanceMatrix.getFromLocEntries(id);
 					Comparator<Entry> entryComparator = new Comparator<Entry>() {
 						@Override
@@ -924,7 +921,7 @@ public class SAString {
 					boolean foundClosest = false;
 					Iterator<Entry> siteIterator = thisDemandPointSites.iterator();
 					while(!foundClosest && siteIterator.hasNext()){
-						Id thisSite = siteIterator.next().getToLocation();
+						String thisSite = siteIterator.next().getToLocation();
 						if(this.representation.contains(thisSite) && !thisSite.toString().equalsIgnoreCase(oldId.toString()) ){
 							foundClosest = true;
 							newAllocationId = thisSite;
@@ -942,11 +939,11 @@ public class SAString {
 			return this.objective;
 		}
 
-		public List<Id> getRepresentation() {
+		public List<String> getRepresentation() {
 			return this.representation;
 		}
 		
-		public void makeMove(Id oldId, Id newId){
+		public void makeMove(String oldId, String newId){
 			/* Remove the old site, and add the new. */
 			this.representation.remove(oldId);
 			this.representation.add(newId);
@@ -957,6 +954,7 @@ public class SAString {
 		}
 		
 		
+		@Override
 		public String toString(){
 			String string = "";
 			/* Add all but the last element. */
@@ -971,15 +969,15 @@ public class SAString {
 	}
 	
 	
-	class ValueComparatorIncreasing implements Comparator<Tuple<Id, Id>>{
-		Map<Tuple<Id, Id>, Double> map;
+	class ValueComparatorIncreasing implements Comparator<Tuple<String, String>>{
+		Map<Tuple<String, String>, Double> map;
 		
-		public ValueComparatorIncreasing(Map<Tuple<Id, Id>, Double> map) {
+		public ValueComparatorIncreasing(Map<Tuple<String, String>, Double> map) {
 			this.map = map;
 		}
 
 		@Override
-		public int compare(Tuple<Id, Id> arg0, Tuple<Id, Id> arg1) {
+		public int compare(Tuple<String, String> arg0, Tuple<String, String> arg1) {
 			if(map.get(arg0) <= map.get(arg1)){
 				return -1;
 			} else{
@@ -988,15 +986,15 @@ public class SAString {
 		}
 	}
 
-	class ValueComparatorDecreasing implements Comparator<Tuple<Id, Id>>{
-		Map<Tuple<Id, Id>, Double> map;
+	class ValueComparatorDecreasing implements Comparator<Tuple<String, String>>{
+		Map<Tuple<String, String>, Double> map;
 		
-		public ValueComparatorDecreasing(Map<Tuple<Id, Id>, Double> map) {
+		public ValueComparatorDecreasing(Map<Tuple<String, String>, Double> map) {
 			this.map = map;
 		}
 		
 		@Override
-		public int compare(Tuple<Id, Id> arg0, Tuple<Id, Id> arg1) {
+		public int compare(Tuple<String, String> arg0, Tuple<String, String> arg1) {
 			if(map.get(arg0) >= map.get(arg1)){
 				return -1;
 			} else{
@@ -1006,26 +1004,26 @@ public class SAString {
 	}
 	
 	
-	class EvaluateClosestSiteCallable implements Callable<Tuple<Tuple<Id,Id>, Double>> {
-		private Id id;
-		private List<Id> currentSites;
+	class EvaluateClosestSiteCallable implements Callable<Tuple<Tuple<String,String>, Double>> {
+		private String id;
+		private List<String> currentSites;
 		
-		public EvaluateClosestSiteCallable(Id id, List<Id> currentSites) {
+		public EvaluateClosestSiteCallable(String id, List<String> currentSites) {
 			this.id = id;
 			this.currentSites = currentSites;
 		}
 
 		@Override
-		public Tuple<Tuple<Id,Id>, Double> call() throws Exception {
-			Id closest = getClosestSite();
+		public Tuple<Tuple<String, String>, Double> call() throws Exception {
+			String closest = getClosestSite();
 			
-			Tuple<Id, Id> idPair = new Tuple<Id, Id>(this.id, closest);
+			Tuple<String, String> idPair = new Tuple<String, String>(this.id, closest);
 			Double distance = distanceMatrix.getEntry(id, closest).getValue();
-			return new Tuple<Tuple<Id,Id>, Double>(idPair, distance);
+			return new Tuple<Tuple<String, String>, Double>(idPair, distance);
 		}
 		
-		public Id getClosestSite(){
-			Id closest = null;
+		public String getClosestSite(){
+			String closest = null;
 			List<Entry> thisDemandPointSites =  distanceMatrix.getFromLocEntries(id);
 			Comparator<Entry> entryComparator = new Comparator<Entry>() {
 				@Override
@@ -1037,7 +1035,7 @@ public class SAString {
 			boolean foundClosest = false;
 			Iterator<Entry> siteIterator = thisDemandPointSites.iterator();
 			while(!foundClosest && siteIterator.hasNext()){
-				Id thisSite = siteIterator.next().getToLocation();
+				String thisSite = siteIterator.next().getToLocation();
 				if(currentSites.contains(thisSite)){
 					foundClosest = true;
 					closest = thisSite;

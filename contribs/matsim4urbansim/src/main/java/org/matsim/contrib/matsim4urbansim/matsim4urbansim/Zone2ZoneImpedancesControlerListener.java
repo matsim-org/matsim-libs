@@ -45,7 +45,6 @@ import org.matsim.contrib.matsim4urbansim.utils.helperobjects.Benchmark;
 import org.matsim.contrib.matsim4urbansim.utils.helperobjects.ZoneObject;
 import org.matsim.contrib.matsim4urbansim.utils.io.misc.ProgressBar;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
@@ -240,7 +239,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 
 					// query trips in OD Matrix
 					double trips = 0.0;
-					Entry e = originDestinationMatrix.getEntry( originZoneID, destinationZoneID );
+					Entry e = originDestinationMatrix.getEntry( originZoneID.toString(), destinationZoneID.toString() );
 					if(e != null) // trips are scaled to 100%
 						trips = e.getValue() * inverseOfSamplingRate;
 					
@@ -355,13 +354,13 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 					if (isFirstPlanActivity)
 						isFirstPlanActivity = false; 
 					else if (enterTripInODMatrix){
-						matrixEntry = originDestinationMatrix.getEntry(new IdImpl(lastZoneId), new IdImpl(zone_ID));
+						matrixEntry = originDestinationMatrix.getEntry(lastZoneId, zone_ID);
 						if(matrixEntry != null){
 							double trips = matrixEntry.getValue() + 1.;
-							originDestinationMatrix.setEntry(new IdImpl(lastZoneId), new IdImpl(zone_ID), trips);
+							originDestinationMatrix.setEntry(lastZoneId, zone_ID, trips);
 						}
 						else	
-							originDestinationMatrix.createEntry(new IdImpl(lastZoneId), new IdImpl(zone_ID), 1.);
+							originDestinationMatrix.createEntry(lastZoneId, zone_ID, 1.);
 							// see PtPlanToPlanStepBasedOnEvents.addPersonToVehicleContainer (or zone coordinate addition)
 					}
 					lastZoneId = zone_ID; // stores the first activity (e. g. "home")

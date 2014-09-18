@@ -20,12 +20,16 @@
 
 package org.matsim.utils;
 
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.PriorityQueue;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.PersonImpl;
@@ -38,11 +42,6 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
-
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.PriorityQueue;
 
 /**
  * Calculates a least-cost-path tree using Dijkstra's algorithm  for calculating a shortest-path
@@ -62,10 +61,10 @@ public class LeastCostPathTree {
 	
 	private final TravelTime ttFunction;
 	private final TravelDisutility tcFunction;
-	private HashMap<Id, NodeData> nodeData = null;
+	private HashMap<Id<Node>, NodeData> nodeData = null;
 	
-	private final Vehicle VEHICLE = VehicleUtils.getFactory().createVehicle(new IdImpl("theVehicle"), VehicleUtils.getDefaultVehicleType());
-	private final Person PERSON = new PersonImpl(new IdImpl("thePerson"));
+	private final Vehicle VEHICLE = VehicleUtils.getFactory().createVehicle(Id.create("theVehicle", Vehicle.class), VehicleUtils.getDefaultVehicleType());
+	private final Person PERSON = new PersonImpl(Id.create("thePerson", Person.class));
 
 	// ////////////////////////////////////////////////////////////////////
 	// constructors
@@ -80,7 +79,7 @@ public class LeastCostPathTree {
 		this.origin1 = origin;
 		this.dTime = time;
 		
-		this.nodeData = new HashMap<Id, NodeData>((int) (network.getNodes().size() * 1.1), 0.95f);
+		this.nodeData = new HashMap<Id<Node>, NodeData>((int) (network.getNodes().size() * 1.1), 0.95f);
 		NodeData d = new NodeData();
 		d.time = time;
 		d.cost = 0;
@@ -100,11 +99,11 @@ public class LeastCostPathTree {
 	// ////////////////////////////////////////////////////////////////////
 
 	public static class NodeData {
-		private Id prevId = null;
+		private Id<Node> prevId = null;
 		private double cost = Double.MAX_VALUE;
 		private double time = 0;
 
-        /*package*/ void visit(final Id comingFromNodeId, final double cost, final double time) {
+        /*package*/ void visit(final Id<Node> comingFromNodeId, final double cost, final double time) {
 			this.prevId = comingFromNodeId;
 			this.cost = cost;
 			this.time = time;
@@ -118,15 +117,15 @@ public class LeastCostPathTree {
 			return this.time;
 		}
 
-		public Id getPrevNodeId() {
+		public Id<Node> getPrevNodeId() {
 			return this.prevId;
 		}
 	}
 
 	/*package*/ static class ComparatorCost implements Comparator<Node> {
-		protected Map<Id, ? extends NodeData> nodeData;
+		protected Map<Id<Node>, ? extends NodeData> nodeData;
 
-		ComparatorCost(final Map<Id, ? extends NodeData> nodeData) {
+		ComparatorCost(final Map<Id<Node>, ? extends NodeData> nodeData) {
 			this.nodeData = nodeData;
 		}
 
@@ -150,7 +149,7 @@ public class LeastCostPathTree {
 	// get methods
 	// ////////////////////////////////////////////////////////////////////
 
-	public final Map<Id, NodeData> getTree() {
+	public final Map<Id<Node>, NodeData> getTree() {
 		return this.nodeData;
 	}
 
@@ -209,11 +208,11 @@ public class LeastCostPathTree {
 		TravelTimeCalculator ttc = new TravelTimeCalculator(network, 60, 30 * 3600, scenario.getConfig().travelTimeCalculator());
 		LeastCostPathTree st = new LeastCostPathTree(ttc.getLinkTravelTimes(), new TravelTimeAndDistanceBasedTravelDisutility(ttc.getLinkTravelTimes(), scenario.getConfig()
 				.planCalcScore()));
-		Node origin = network.getNodes().get(new IdImpl(1));
+		Node origin = network.getNodes().get(Id.create(1, Node.class));
 		st.calculate(network, origin, 8*3600);
-		Map<Id, NodeData> tree = st.getTree();
-		for (Map.Entry<Id, NodeData> e : tree.entrySet()) {
-			Id id = e.getKey();
+		Map<Id<Node>, NodeData> tree = st.getTree();
+		for (Map.Entry<Id<Node>, NodeData> e : tree.entrySet()) {
+			Id<Node> id = e.getKey();
 			NodeData d = e.getValue();
 			if (d.getPrevNodeId() != null) {
 				System.out.println(id + "\t" + d.getTime() + "\t" + d.getCost() + "\t" + d.getPrevNodeId());

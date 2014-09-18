@@ -19,14 +19,18 @@
 
 package playground.michalm.taxi.optimizer.mip;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.*;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
-import org.matsim.core.router.util.*;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-import org.matsim.utils.*;
+import org.matsim.utils.LeastCostPathTree;
 import org.matsim.utils.LeastCostPathTree.NodeData;
 
 
@@ -34,7 +38,7 @@ public class LeastCostPathTreeStorage
 {
     private final Network network;
     private final LeastCostPathTree leastCostPathTree;
-    private final Map<Id, Map<Id, NodeData>> treesByRootNodeId;
+    private final Map<Id<Node>, Map<Id<Node>, NodeData>> treesByRootNodeId;
 
 
     public LeastCostPathTreeStorage(Network network)
@@ -45,19 +49,19 @@ public class LeastCostPathTreeStorage
         TravelDisutility travelDisutility = new TimeAsTravelDisutility(travelTime);
         leastCostPathTree = new LeastCostPathTree(travelTime, travelDisutility);
 
-        treesByRootNodeId = new HashMap<Id, Map<Id, NodeData>>();
+        treesByRootNodeId = new HashMap<>();
     }
 
 
-    public Map<Id, NodeData> getTree(Link fromLink)
+    public Map<Id<Node>, NodeData> getTree(Link fromLink)
     {
         return getTree(fromLink.getToNode());
     }
 
 
-    public Map<Id, NodeData> getTree(Node rootNode)
+    public Map<Id<Node>, NodeData> getTree(Node rootNode)
     {
-        Map<Id, NodeData> tree = treesByRootNodeId.get(rootNode.getId());
+        Map<Id<Node>, NodeData> tree = treesByRootNodeId.get(rootNode.getId());
 
         if (tree != null) {
             return tree;

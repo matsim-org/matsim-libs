@@ -5,8 +5,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -74,7 +74,7 @@ public class Visum2TransitSchedule {
 	private long convertLines() {
 		nextVehicleId = 0;
 		for (VisumNetwork.TransitLine line : this.visum.lines.values()){
-			TransitLine tLine = builder.createTransitLine(line.id);
+			TransitLine tLine = builder.createTransitLine(Id.create(line.id, TransitLine.class));
 			for (VisumNetwork.TimeProfile timeProfile : this.visum.timeProfiles.values()) {
 				if (timeProfile.lineName.equals(line.id)) {
 					TransitRoute tRoute = convertRouteProfile(line, timeProfile);
@@ -149,8 +149,8 @@ public class Visum2TransitSchedule {
 			VisumNetwork.TimeProfile timeProfile) {
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 		for (VisumNetwork.TimeProfileItem tpi : this.visum.timeProfileItems.values()){
-			if (tpi.lineName.equals(line.id.toString()) && tpi.lineRouteName.equals(timeProfile.lineRouteName.toString()) && tpi.timeProfileName.equals(timeProfile.index.toString()) && tpi.DCode.equals(timeProfile.DCode.toString())){
-				String lineRouteItemKey = line.id.toString() +"/"+ timeProfile.lineRouteName.toString()+"/"+ tpi.lRIIndex.toString()+"/"+tpi.DCode;
+			if (tpi.lineName.equals(line.id.toString()) && tpi.lineRouteName.equals(timeProfile.lineRouteName.toString()) && tpi.timeProfileName.equals(timeProfile.index.toString()) && tpi.dirCode.equals(timeProfile.dirCode.toString())){
+				String lineRouteItemKey = line.id.toString() +"/"+ timeProfile.lineRouteName.toString()+"/"+ tpi.lRIIndex.toString()+"/"+tpi.dirCode;
 				LineRouteItem lineRouteItem = this.visum.lineRouteItems.get(lineRouteItemKey);
 				Id stopFacilityId = lineRouteItem.stopPointNo;
 				if (stopFacilityId != null) {
@@ -168,9 +168,9 @@ public class Visum2TransitSchedule {
 		if (mode == null) {
 			log.error("Could not find TransportMode for " + line.tCode + ", more info: " + line.id);
 		}
-		TransitRouteImpl tRoute = (TransitRouteImpl) builder.createTransitRoute(new IdImpl(timeProfile.lineName.toString()+"."+timeProfile.lineRouteName.toString()+"."+ timeProfile.index.toString()+"."+timeProfile.DCode.toString()),null,stops,mode);
+		TransitRouteImpl tRoute = (TransitRouteImpl) builder.createTransitRoute(new IdImpl(timeProfile.lineName.toString()+"."+timeProfile.lineRouteName.toString()+"."+ timeProfile.index.toString()+"."+timeProfile.dirCode.toString()),null,stops,mode);
 		tRoute.setLineRouteName(timeProfile.lineRouteName.toString());
-		tRoute.setDirection(timeProfile.DCode.toString());
+		tRoute.setDirection(timeProfile.dirCode.toString());
 		return tRoute;
 	}
 
@@ -180,7 +180,7 @@ public class Visum2TransitSchedule {
 
 		for (VisumNetwork.StopPoint stopPoint : this.visum.stopPoints.values()){
 			Coord coord = this.coordinateTransformation.transform(this.visum.stops.get(this.visum.stopAreas.get(stopPoint.stopAreaId).StopId).coord);
-			TransitStopFacility stop = builder.createTransitStopFacility(stopPoint.id, coord, false);
+			TransitStopFacility stop = builder.createTransitStopFacility(Id.create(stopPoint.id, TransitStopFacility.class), coord, false);
 			stopFacilities.put(stopPoint.id, stop);
 			this.schedule.addStopFacility(stop);
 		}
@@ -190,7 +190,7 @@ public class Visum2TransitSchedule {
 	private void convertVehicleTypes() {
 		VehiclesFactory vb = this.vehicles.getFactory();
 		for (VehicleCombination vehComb : this.visum.vehicleCombinations.values()) {
-			VehicleType type = vb.createVehicleType(new IdImpl(vehComb.id));
+			VehicleType type = vb.createVehicleType(Id.create(vehComb.id, VehicleType.class));
 			type.setDescription(vehComb.name);
 			VehicleCapacity capacity = vb.createVehicleCapacity();
 			VehicleUnit vu = this.visum.vehicleUnits.get(vehComb.vehUnitId);

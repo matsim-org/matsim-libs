@@ -163,7 +163,7 @@ public class PoznanLanduseDemandGeneration
 
 
     private Scenario scenario;
-    private Map<Id, Zone> zones;
+    private Map<Id<Zone>, Zone> zones;
     private Map<Id, ZoneLanduseValidation> zoneLanduseValidation;
     private EnumMap<ActivityPair, Double> prtCoeffs;
 

@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -67,8 +66,8 @@ public class WorldConnectLocations {
 				String[] entries = currLine.split("\t", -1);
 				// fid  lid
 				// 0    1
-				Id fid = new IdImpl(entries[0].trim());
-				Id lid = new IdImpl(entries[1].trim());
+				Id<ActivityFacility> fid = Id.create(entries[0].trim(), ActivityFacility.class);
+				Id<Link> lid = Id.create(entries[1].trim(), Link.class);
 				ActivityFacility f = facilities.getFacilities().get(fid);
 				Link l = network.getLinks().get(lid);
 				if ((f != null) && (l != null)) {

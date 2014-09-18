@@ -31,8 +31,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.io.IOUtils;
@@ -94,13 +92,13 @@ public class createDemandFromSaturnMatrix {
 			populationFraction = Double.parseDouble(args[5]);
 		}
 		
-		List<Id> list = new ArrayList<Id>();
+		List<String> list = new ArrayList<>();
 		try {
 			BufferedReader br = IOUtils.getBufferedReader(externalZonesFilename);
 			try{
 				String line = null;
 				while((line = br.readLine()) != null){
-					list.add(new IdImpl(line));
+					list.add(line);
 				}
 			} finally{
 				br.close();
@@ -119,7 +117,7 @@ public class createDemandFromSaturnMatrix {
 		NetworkReaderMatsimV1 nr = new NetworkReaderMatsimV1(sc);
 		nr.parse(networkFilename);
 		
-		XY2Links xy = new XY2Links((NetworkImpl) sc.getNetwork());
+		XY2Links xy = new XY2Links(sc.getNetwork());
 		xy.run(sc.getPopulation());
 		
 		PopulationWriter pw = new PopulationWriter(sc.getPopulation(), sc.getNetwork());

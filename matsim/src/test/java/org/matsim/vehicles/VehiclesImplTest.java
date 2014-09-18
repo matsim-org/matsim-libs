@@ -21,7 +21,7 @@ package org.matsim.vehicles;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
 
 /**
  *
@@ -34,8 +34,8 @@ public class VehiclesImplTest {
 	public void testAddVehicle() {
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 
-		VehicleType testType = vehicles.getFactory().createVehicleType(new IdImpl("test"));
-		Vehicle v1 = vehicles.getFactory().createVehicle(new IdImpl("v1"), testType);
+		VehicleType testType = vehicles.getFactory().createVehicleType(Id.create("test", VehicleType.class));
+		Vehicle v1 = vehicles.getFactory().createVehicle(Id.create("v1", Vehicle.class), testType);
 
 		/* Must add vehicle type before adding vehicle. */
 		try{
@@ -48,7 +48,7 @@ public class VehiclesImplTest {
 		vehicles.addVehicleType(testType);
 		vehicles.addVehicle(v1);
 
-		Vehicle v2 = vehicles.getFactory().createVehicle(new IdImpl("v1"), testType);
+		Vehicle v2 = vehicles.getFactory().createVehicle(Id.create("v1", Vehicle.class), testType);
 		try{
 			vehicles.addVehicle(v2);
 			Assert.fail("Cannot add another vehicle with the same Id.");
@@ -62,13 +62,13 @@ public class VehiclesImplTest {
 	public void testGetVehicles(){
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 
-		VehicleType testType = vehicles.getFactory().createVehicleType(new IdImpl("test"));
+		VehicleType testType = vehicles.getFactory().createVehicleType(Id.create("test", VehicleType.class));
 		vehicles.addVehicleType(testType);
-		Vehicle v1 = vehicles.getFactory().createVehicle(new IdImpl("v1"), testType);
+		Vehicle v1 = vehicles.getFactory().createVehicle(Id.create("v1", Vehicle.class), testType);
 
 		/* Should get an unmodifiable Map of the Vehicles container. */
 		try{
-			vehicles.getVehicles().put(new IdImpl("v1"), v1 );
+			vehicles.getVehicles().put(Id.create("v1", Vehicle.class), v1 );
 			vehicles.getVehicles();
 			Assert.fail("Should not be able to add to an unmodiafiable Map");
 		} catch (UnsupportedOperationException e){
@@ -81,10 +81,10 @@ public class VehiclesImplTest {
 	public void testGetVehicleTypes(){
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 
-		VehicleType t1 = vehicles.getFactory().createVehicleType(new IdImpl("type1"));
+		VehicleType t1 = vehicles.getFactory().createVehicleType(Id.create("type1", VehicleType.class));
 		/* Should get an unmodifiable Map of the Vehicles container. */
 		try{
-			vehicles.getVehicleTypes().put(new IdImpl("type1"), t1 );
+			vehicles.getVehicleTypes().put(Id.create("type1", VehicleType.class), t1 );
 			Assert.fail("Should not be able to add to an unmodiafiable Map");
 		} catch (UnsupportedOperationException e){
 			/* Pass. */
@@ -95,8 +95,8 @@ public class VehiclesImplTest {
 	public void testAddVehicleType(){
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 
-		VehicleType t1 = vehicles.getFactory().createVehicleType(new IdImpl("type1"));
-		VehicleType t2 = vehicles.getFactory().createVehicleType(new IdImpl("type1"));
+		VehicleType t1 = vehicles.getFactory().createVehicleType(Id.create("type1", VehicleType.class));
+		VehicleType t2 = vehicles.getFactory().createVehicleType(Id.create("type1", VehicleType.class));
 
 		vehicles.addVehicleType(t1);
 		try{
@@ -110,24 +110,24 @@ public class VehiclesImplTest {
 	@Test
 	public void testRemoveVehicle() {
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
-		VehicleType t1 = vehicles.getFactory().createVehicleType(new IdImpl("type1"));
+		VehicleType t1 = vehicles.getFactory().createVehicleType(Id.create("type1", VehicleType.class));
 		vehicles.addVehicleType(t1);
 
-		Vehicle v1 = vehicles.getFactory().createVehicle(new IdImpl("v1"), t1);
+		Vehicle v1 = vehicles.getFactory().createVehicle(Id.create("v1", Vehicle.class), t1);
 
 		Assert.assertEquals(0, vehicles.getVehicles().size());
 		vehicles.addVehicle(v1);
 		Assert.assertEquals(1, vehicles.getVehicles().size());
-		vehicles.removeVehicle(new IdImpl("v1"));
+		vehicles.removeVehicle(Id.create("v1", Vehicle.class));
 		Assert.assertEquals(0, vehicles.getVehicles().size());
 	}
 
 	@Test
 	public void testRemoveVehicleType() {
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
-		VehicleType t1 = vehicles.getFactory().createVehicleType(new IdImpl("type1"));
+		VehicleType t1 = vehicles.getFactory().createVehicleType(Id.create("type1", VehicleType.class));
 		vehicles.addVehicleType(t1);
-		Vehicle v1 = vehicles.getFactory().createVehicle(new IdImpl("v1"), t1);
+		Vehicle v1 = vehicles.getFactory().createVehicle(Id.create("v1", Vehicle.class), t1);
 		vehicles.addVehicle(v1);
 
 		try {
@@ -141,7 +141,7 @@ public class VehiclesImplTest {
 		vehicles.removeVehicleType(t1.getId());
 
 		// also test for non-existant vehicle types
-		vehicles.removeVehicleType(new IdImpl("type2"));
+		vehicles.removeVehicleType(Id.create("type2", VehicleType.class));
 	}
 
 }

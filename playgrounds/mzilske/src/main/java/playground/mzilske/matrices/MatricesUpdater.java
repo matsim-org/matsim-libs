@@ -22,6 +22,12 @@
 
 package playground.mzilske.matrices;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.inject.Inject;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -35,11 +41,6 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.matrices.Entry;
-
-import javax.inject.Inject;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 class MatricesUpdater implements StartupListener, BeforeMobsimListener, AfterMobsimListener {
 
@@ -87,7 +88,7 @@ class MatricesUpdater implements StartupListener, BeforeMobsimListener, AfterMob
             for (TimedMatrix matrix : timedMatrices.getMatrices()) {
                 if (departure.getTime() >= matrix.getStartTime() &&
                         departure.getTime() < matrix.getEndTime()) {
-                    Entry entry = matrix.getMatrix().getEntry(departure.getLinkId(), arrival.getLinkId());
+                    Entry entry = matrix.getMatrix().getEntry(departure.getLinkId().toString(), arrival.getLinkId().toString());
                     if (entry != null) {
                         entry.setValue(entry.getValue() + 1.0);
                     }

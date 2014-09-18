@@ -20,8 +20,8 @@
 
 package org.matsim.facilities.algorithms;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
@@ -31,8 +31,8 @@ public class AbstractFacilityAlgorithmTest extends MatsimTestCase {
 	public void testRunAlgorithms() {
 		final ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
 		// create 2 facilities
-		facilities.createAndAddFacility(new IdImpl(1), new CoordImpl(1.0, 1.0));
-		facilities.createAndAddFacility(new IdImpl(2), new CoordImpl(2.0, 2.0));
+		facilities.createAndAddFacility(Id.create(1, ActivityFacility.class), new CoordImpl(1.0, 1.0));
+		facilities.createAndAddFacility(Id.create(2, ActivityFacility.class), new CoordImpl(2.0, 2.0));
 		// create an algo and let it run over the facilities
 		MockAlgo1 algo1 = new MockAlgo1();
 		algo1.run(facilities);
@@ -42,6 +42,7 @@ public class AbstractFacilityAlgorithmTest extends MatsimTestCase {
 	/*package*/ static class MockAlgo1 extends AbstractFacilityAlgorithm {
 		private int counter = 0;
 
+		@Override
 		public void run(final ActivityFacility facility) {
 			this.counter++;
 		}

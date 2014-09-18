@@ -1,12 +1,13 @@
 package playground.ciarif.flexibletransports.router;
 
+import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.matrices.Entry;
+
 import playground.meisterk.kti.router.SwissHaltestelle;
-import org.matsim.api.core.v01.BasicLocation;
 
 public class FtPtRoute extends GenericRouteImpl
 {
@@ -48,7 +49,8 @@ public class FtPtRoute extends GenericRouteImpl
     this.inVehicleTime = Double.valueOf(calcInVehicleTime());
   }
 
-  public String getRouteDescription()
+  @Override
+	public String getRouteDescription()
   {
     if (this.fromStop == null) {
       return super.getRouteDescription();
@@ -64,7 +66,8 @@ public class FtPtRoute extends GenericRouteImpl
     return routeDescription;
   }
 
-  public void setRouteDescription(Id startLinkId, String routeDescription, Id endLinkId)
+  @Override
+	public void setRouteDescription(Id startLinkId, String routeDescription, Id endLinkId)
   {
     super.setRouteDescription(startLinkId, routeDescription, endLinkId);
   }
@@ -76,7 +79,7 @@ public class FtPtRoute extends GenericRouteImpl
 
   protected double calcInVehicleTime()
   {
-    Entry matrixEntry = this.plansCalcRouteFtInfo.getPtTravelTimes().getEntry(this.fromMunicipality.getId(), this.toMunicipality.getId());
+    Entry matrixEntry = this.plansCalcRouteFtInfo.getPtTravelTimes().getEntry(this.fromMunicipality.getId().toString(), this.toMunicipality.getId().toString());
     if (matrixEntry == null) {
       throw new RuntimeException("No entry found for " + this.fromMunicipality.getId() + " --> " + this.toMunicipality.getId());
     }

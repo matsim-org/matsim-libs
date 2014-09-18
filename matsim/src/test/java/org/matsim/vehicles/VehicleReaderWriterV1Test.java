@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.vehicles.VehicleType.DoorOperationMode;
 
@@ -36,9 +35,9 @@ public class VehicleReaderWriterV1Test extends MatsimTestCase {
 
   private static final String TESTXML  = "testVehicles.xml";
 
-  private final Id id23 = new IdImpl("23");
-  private final Id id42 = new IdImpl("42");
-  private final Id id42_23 = new IdImpl(" 42  23"); //indeed this should be double blank in the middle but due to collapse this is only one blank
+  private final Id<Vehicle> id23 = Id.create("23", Vehicle.class);
+  private final Id<Vehicle> id42 = Id.create("42", Vehicle.class);
+  private final Id<Vehicle> id42_23 = Id.create(" 42  23", Vehicle.class); //indeed this should be double blank in the middle but due to collapse this is only one blank
   
 	public void testBasicParser() {
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
@@ -75,7 +74,7 @@ public class VehicleReaderWriterV1Test extends MatsimTestCase {
 			
 		assertNotNull(vehicleTypes);
 		assertEquals(2, vehicleTypes.size());
-		VehicleType vehType = vehicleTypes.get(new IdImpl("normal&Car"));
+		VehicleType vehType = vehicleTypes.get(Id.create("normal&Car", VehicleType.class));
 		assertNotNull(vehType);
 		assertEquals(9.5, vehType.getLength(), EPSILON);
 		assertEquals(3.0, vehType.getWidth(), EPSILON);
@@ -93,7 +92,7 @@ public class VehicleReaderWriterV1Test extends MatsimTestCase {
 		assertEquals(DoorOperationMode.parallel, vehType.getDoorOperationMode());
 		assertEquals(2.0, vehType.getPcuEquivalents());
 		
-		vehType = vehicleTypes.get(new IdImpl("defaultValue>Car"));
+		vehType = vehicleTypes.get(Id.create("defaultValue>Car", VehicleType.class));
 		assertNotNull(vehType);
 		assertEquals(7.5, vehType.getLength(), EPSILON);
 		assertEquals(1.0, vehType.getWidth(), EPSILON);
@@ -107,11 +106,11 @@ public class VehicleReaderWriterV1Test extends MatsimTestCase {
 	
 		assertNotNull(vehicles.get(id23));
 		assertEquals(id23, vehicles.get(id23).getId());
-		assertEquals(new IdImpl("normal&Car"), vehicles.get(id23).getType().getId());
+		assertEquals(Id.create("normal&Car", VehicleType.class), vehicles.get(id23).getType().getId());
 
 		assertNotNull(vehicles.get(id42));
 		assertEquals(id42, vehicles.get(id42).getId());
-		assertEquals(new IdImpl("defaultValue>Car"), vehicles.get(id42).getType().getId());
+		assertEquals(Id.create("defaultValue>Car", VehicleType.class), vehicles.get(id42).getType().getId());
 	
 		assertNotNull(vehicles.get(id42_23));
 		assertEquals(id42_23, vehicles.get(id42_23).getId());

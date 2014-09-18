@@ -19,24 +19,31 @@
 
 package playground.michalm.demand.mielec;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 
 import javax.naming.ConfigurationException;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.matrices.Matrix;
 import org.xml.sax.SAXException;
 
-import pl.poznan.put.util.array2d.*;
-import playground.michalm.demand.*;
+import pl.poznan.put.util.array2d.Array2DReader;
+import pl.poznan.put.util.array2d.Array2DUtils;
+import playground.michalm.demand.ActivityCreator;
+import playground.michalm.demand.DefaultActivityCreator;
+import playground.michalm.demand.ODDemandGenerator;
 import playground.michalm.demand.taxi.PersonCreatorWithRandomTaxiMode;
 import playground.michalm.util.matrices.MatrixUtils;
-import playground.michalm.zone.*;
+import playground.michalm.zone.Zone;
+import playground.michalm.zone.Zones;
 
 
 public class MielecSimpleDemandGeneration
@@ -63,7 +70,7 @@ public class MielecSimpleDemandGeneration
 
         Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
         new MatsimNetworkReader(scenario).readFile(networkFile);
-        Map<Id, Zone> zones = Zones.readZones(scenario, zonesXmlFile, zonesShpFile);
+        Map<Id<Zone>, Zone> zones = Zones.readZones(scenario, zonesXmlFile, zonesShpFile);
 
         ActivityCreator ac = new DefaultActivityCreator(scenario);
         PersonCreatorWithRandomTaxiMode pc = new PersonCreatorWithRandomTaxiMode(scenario,

@@ -33,10 +33,10 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 public class ZoneShpReader
 {
     private final Scenario scenario;
-    private final Map<Id, Zone> zones;
+    private final Map<Id<Zone>, Zone> zones;
 
 
-    public ZoneShpReader(Scenario scenario, Map<Id, Zone> zones)
+    public ZoneShpReader(Scenario scenario, Map<Id<Zone>, Zone> zones)
     {
         this.scenario = scenario;
         this.zones = zones;

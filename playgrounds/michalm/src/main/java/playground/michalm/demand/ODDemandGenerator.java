@@ -21,12 +21,21 @@ package playground.michalm.demand;
 
 import java.util.Map;
 
-import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.matrices.*;
+import org.matsim.matrices.Entry;
+import org.matsim.matrices.Matrix;
 
-import pl.poznan.put.util.random.*;
+import pl.poznan.put.util.random.RandomUtils;
+import pl.poznan.put.util.random.UniformRandom;
 import playground.michalm.util.matrices.MatrixUtils;
 import playground.michalm.zone.Zone;
 
@@ -38,19 +47,19 @@ public class ODDemandGenerator
     private final Scenario scenario;
     private final ActivityCreator activityCreator;
     private final PersonCreator personCreator;
-    private final Map<Id, Zone> zones;
+    private final Map<Id<Zone>, Zone> zones;
     private final boolean addEmptyRoute;
     private final PopulationFactory pf;
 
 
-    public ODDemandGenerator(Scenario scenario, Map<Id, Zone> zones, boolean addEmptyRoute)
+    public ODDemandGenerator(Scenario scenario, Map<Id<Zone>, Zone> zones, boolean addEmptyRoute)
     {
         this(scenario, zones, addEmptyRoute, new DefaultActivityCreator(scenario),
                 new DefaultPersonCreator(scenario));
     }
 
 
-    public ODDemandGenerator(Scenario scenario, Map<Id, Zone> zones, boolean addEmptyRoute,
+    public ODDemandGenerator(Scenario scenario, Map<Id<Zone>, Zone> zones, boolean addEmptyRoute,
             ActivityCreator activityCreator, PersonCreator personCreator)
     {
         this.scenario = scenario;

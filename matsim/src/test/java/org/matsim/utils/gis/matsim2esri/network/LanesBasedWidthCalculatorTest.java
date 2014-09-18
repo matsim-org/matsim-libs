@@ -21,11 +21,12 @@ package org.matsim.utils.gis.matsim2esri.network;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
@@ -35,12 +36,12 @@ public class LanesBasedWidthCalculatorTest {
 
 	@Test
 	public void testGetWidth_laneWidthNaN() {
-		Network net = NetworkImpl.createNetwork();
-		Node n1 = net.getFactory().createNode(new IdImpl("1"), new CoordImpl(0, 0));
-		Node n2 = net.getFactory().createNode(new IdImpl("2"), new CoordImpl(1000, 0));
+		Network net = NetworkUtils.createNetwork();
+		Node n1 = net.getFactory().createNode(Id.create("1", Node.class), new CoordImpl(0, 0));
+		Node n2 = net.getFactory().createNode(Id.create("2", Node.class), new CoordImpl(1000, 0));
 		net.addNode(n1);
 		net.addNode(n2);
-		Link l1 = net.getFactory().createLink(new IdImpl("1"), n1.getId(), n2.getId());
+		Link l1 = net.getFactory().createLink(Id.create("1", Link.class), n1, n2);
 		l1.setNumberOfLanes(2.0);
 
 

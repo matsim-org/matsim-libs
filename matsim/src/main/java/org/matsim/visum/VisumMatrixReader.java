@@ -24,8 +24,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.matrices.Matrix;
 
@@ -118,7 +116,7 @@ public class VisumMatrixReader {
 					" in line " + this.lineCounter + ".");
 				}
 				for (int i = 0; i < this.nofZones; i++) {
-					this.matrix.setEntry(new IdImpl(this.zoneNames[this.zoneCounter]), new IdImpl(this.zoneNames[i]), Double.parseDouble(data[i]));
+					this.matrix.setEntry(this.zoneNames[this.zoneCounter], this.zoneNames[i], Double.parseDouble(data[i]));
 				}
 				this.zoneCounter++;
 				if (this.zoneCounter == this.nofZones) {
@@ -192,8 +190,8 @@ public class VisumMatrixReader {
 					);
 				}
 
-				Id from = new IdImpl(data[0]);
-				Id to = new IdImpl(data[1]);
+				String from = data[0];
+				String to = data[1];
 
 				/*
 				 * There is no intrazonal traffic in VISUM.

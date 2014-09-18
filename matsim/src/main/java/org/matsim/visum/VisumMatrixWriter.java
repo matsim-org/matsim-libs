@@ -27,7 +27,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 
@@ -42,12 +41,12 @@ public class VisumMatrixWriter {
 	/*package*/ final static Logger log = Logger.getLogger(VisumMatrixWriter.class);
 
 	Matrix matrix;
-	Set<Id> ids;
+	Set<String> ids;
 
 	public VisumMatrixWriter(final Matrix matrix) {
 		super();
 		this.matrix = matrix;
-		this.ids = new TreeSet<Id>();
+		this.ids = new TreeSet<>();
 		this.ids.addAll(matrix.getFromLocations().keySet());
 		this.ids.addAll(matrix.getToLocations().keySet());
 	}
@@ -61,7 +60,7 @@ public class VisumMatrixWriter {
 	 * contain values, but should still be written out in the matrix containing
 	 * only zeros.
 	 */
-	public void setIds(final Set<Id> ids) {
+	public void setIds(final Set<String> ids) {
 		this.ids = ids;
 	}
 
@@ -78,7 +77,7 @@ public class VisumMatrixWriter {
 
 			out.write("*\tBezirksNummern\n");
 			int cnt = 0;
-			for (Id value : this.ids) {
+			for (String value : this.ids) {
 				cnt++;
 				if (cnt > 1) {
 					out.write("\t");
@@ -87,10 +86,10 @@ public class VisumMatrixWriter {
 			}
 			out.write("\n");
 
-			for (Id from : this.ids) {
+			for (String from : this.ids) {
 				out.write("*\t" + from.toString() + "\n");
 				cnt = 0;
-				for (Id to : this.ids) {
+				for (String to : this.ids) {
 					cnt++;
 					Entry e = this.matrix.getEntry(from, to);
 					if (cnt > 1) {

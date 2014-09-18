@@ -27,6 +27,8 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 
 /**
  * @author mrieser
@@ -34,11 +36,11 @@ import org.matsim.api.core.v01.Id;
  */
 public class VisumNetwork {
 
-	public final Map<Id, EdgeType> edgeTypes = new HashMap<Id, EdgeType>();
-	public final Map<Id, Stop> stops = new TreeMap<Id, Stop>();
-	public final Map<Id, StopArea> stopAreas = new TreeMap<Id, StopArea>();
+	public final Map<Id<EdgeType>, EdgeType> edgeTypes = new HashMap<>();
+	public final Map<Id<Stop>, Stop> stops = new TreeMap<>();
+	public final Map<Id<StopArea>, StopArea> stopAreas = new TreeMap<>();
 	public final Map<String, StopPoint> stopPoints = new TreeMap<String, StopPoint>();
-	public final Map<Id, TransitLine> lines = new TreeMap<Id, TransitLine>();
+	public final Map<Id<TransitLine>, TransitLine> lines = new TreeMap<Id<TransitLine>, TransitLine>();
 	public final Map<String, TransitLineRoute> lineRoutes = new TreeMap<String, TransitLineRoute>();
 	public final Map<String, LineRouteItem> lineRouteItems = new TreeMap<String, LineRouteItem>();
 	public final Map<String, TimeProfile> timeProfiles = new TreeMap<String, TimeProfile>();
@@ -98,11 +100,11 @@ public class VisumNetwork {
 
 	}
 	public void addLineRoute(final TransitLineRoute lr1) {
-		TransitLineRoute oldlr = this.lineRoutes.put(lr1.lineName.toString()+"/"+lr1.id.toString()+"/"+lr1.DCode.toString(), lr1);
+		TransitLineRoute oldlr = this.lineRoutes.put(lr1.lineName.toString()+"/"+lr1.id.toString()+"/"+lr1.DCode, lr1);
 		if (oldlr != null) {
 			// there was already a line route with the same id
 			// re-do the insertion
-			this.lineRoutes.put(oldlr.lineName.toString()+"/"+oldlr.id.toString()+"/"+oldlr.DCode.toString(), oldlr);
+			this.lineRoutes.put(oldlr.lineName.toString()+"/"+oldlr.id.toString()+"/"+oldlr.DCode, oldlr);
 			throw new IllegalArgumentException("There is already a line route with the same id.");
 		}
 
@@ -118,21 +120,21 @@ public class VisumNetwork {
 
 	}
 	public void addTimeProfile(final TimeProfile tp1) {
-		TimeProfile oldtp = this.timeProfiles.put(tp1.lineName.toString()+"/"+tp1.lineRouteName.toString() +"/"+tp1.DCode.toString()+"/"+ tp1.index.toString(), tp1);
+		TimeProfile oldtp = this.timeProfiles.put(tp1.lineName.toString()+"/"+tp1.lineRouteName.toString() +"/"+tp1.dirCode+"/"+ tp1.index.toString(), tp1);
 		if (oldtp != null) {
 			// there was already a stop with the same id
 			// re-do the insertion
-			this.timeProfiles.put(oldtp.lineName.toString()+"/"+oldtp.lineRouteName.toString() +"/"+oldtp.DCode.toString()+"/"+ oldtp.index.toString(), oldtp);
+			this.timeProfiles.put(oldtp.lineName.toString()+"/"+oldtp.lineRouteName.toString() +"/"+oldtp.dirCode+"/"+ oldtp.index.toString(), oldtp);
 			throw new IllegalArgumentException("There is already a time profile with the same id."+oldtp.lineRouteName.toString() +"/"+ oldtp.index.toString());
 		}
 
 	}
 	public void addTimeProfileItem(final TimeProfileItem tpi1) {
-		TimeProfileItem oldtpi = this.timeProfileItems.put(tpi1.lineName+"/"+tpi1.lineRouteName+"/"+tpi1.timeProfileName+"/"+tpi1.DCode+"/"+tpi1.index, tpi1);
+		TimeProfileItem oldtpi = this.timeProfileItems.put(tpi1.lineName+"/"+tpi1.lineRouteName+"/"+tpi1.timeProfileName+"/"+tpi1.dirCode+"/"+tpi1.index, tpi1);
 		if (oldtpi != null) {
 			// there was already ane entry with the same id
 			// re-do the insertion
-			this.timeProfileItems.put(oldtpi.lineName+"/"+oldtpi.lineRouteName+"/"+oldtpi.timeProfileName+"/"+oldtpi.DCode+"/"+oldtpi.index, oldtpi);
+			this.timeProfileItems.put(oldtpi.lineName+"/"+oldtpi.lineRouteName+"/"+oldtpi.timeProfileName+"/"+oldtpi.dirCode+"/"+oldtpi.index, oldtpi);
 			throw new IllegalArgumentException("There is already a time profile item with the same id.");
 		}
 
@@ -169,12 +171,12 @@ public class VisumNetwork {
 	}
 
 	public static class EdgeType {
-		public final Id id;
+		public final Id<EdgeType> id;
 		public final String kapIV;
 		public final String v0IV;
 		public final String noOfLanes;
 
-		public EdgeType(Id id, String kapIV, String v0IV, String noOfLanes) {
+		public EdgeType(Id<EdgeType> id, String kapIV, String v0IV, String noOfLanes) {
 			super();
 			this.id = id;
 			this.kapIV = kapIV;
@@ -185,33 +187,33 @@ public class VisumNetwork {
 	}
 
 	public static class Stop {
-		public final Id id;
+		public final Id<Stop> id;
 		public final String name;
 		public final Coord coord;
 
-		public Stop(final Id id, final String name, final Coord coord) {
+		public Stop(final Id<Stop> id, final String name, final Coord coord) {
 			this.id = id;
 			this.name = name;
 			this.coord = coord;
 		}
 	}
 	public static class StopArea {
-		public final Id id;
-		public final Id StopId;
+		public final Id<StopArea> id;
+		public final Id<Stop> StopId;
 
-		public StopArea(final Id id, final Id StopId) {
+		public StopArea(final Id<StopArea> id, final Id<Stop> stopId) {
 			this.id = id;
-			this.StopId = StopId;
+			this.StopId = stopId;
 		}
 	}
 	public static class StopPoint {
-		public final Id id;
-		public final Id stopAreaId;
+		public final Id<StopPoint> id;
+		public final Id<StopArea> stopAreaId;
 		public final String name;
-		public final Id refLinkNo;
-		public final Id nodeId;
+		public final Id<Link> refLinkNo;
+		public final Id<Node> nodeId;
 
-		public StopPoint(final Id id, final Id stopAreaId, final String name, final Id refLinkNo, final Id nodeId) {
+		public StopPoint(final Id<StopPoint> id, final Id<StopArea> stopAreaId, final String name, final Id<Link> refLinkNo, final Id<Node> nodeId) {
 			this.id = id;
 			this.stopAreaId = stopAreaId;
 			this.name = name;
@@ -221,12 +223,12 @@ public class VisumNetwork {
 	}
 	public static class TransitLineRoute {
 
-		public final Id id;
-		public final Id lineName;
-		public final Id DCode;
+		public final Id<TransitLineRoute> id;
+		public final Id<TransitLine> lineName;
+		public final String DCode;
 		public String takt;
 
-		public TransitLineRoute(final Id id,final Id lineName,final Id DCode) {
+		public TransitLineRoute(final Id<TransitLineRoute> id,final Id<TransitLine> lineName,final String DCode) {
 			this.id = id;
 			this.lineName = lineName;
 			this.DCode = DCode;
@@ -235,11 +237,11 @@ public class VisumNetwork {
 
 	public static class TransitLine {
 
-		public final Id id;
+		public final Id<TransitLine> id;
 		public final String tCode;
 		public final String vehCombNo;
 
-		public TransitLine(final Id id, final String tCode,final String vehCombNo) {
+		public TransitLine(final Id<TransitLine> id, final String tCode,final String vehCombNo) {
 			this.id = id;
 			this.tCode = tCode;
 			this.vehCombNo = vehCombNo;
@@ -251,10 +253,10 @@ public class VisumNetwork {
 		public final String lineRouteName;
 		public final String index;
 		public final String DCode;
-		public final Id nodeId;
-		public final Id stopPointNo;
+		public final Id<Node> nodeId;
+		public final Id<StopPoint> stopPointNo;
 
-		public LineRouteItem(final String lineName, final String lineRouteName, final String index,final String DCode, final Id nodeId, final Id stopPointNo) {
+		public LineRouteItem(final String lineName, final String lineRouteName, final String index,final String DCode, final Id<Node> nodeId, final Id<StopPoint> stopPointNo) {
 			this.lineName = lineName;
 			this.lineRouteName = lineRouteName;
 			this.index = index;
@@ -265,17 +267,17 @@ public class VisumNetwork {
 	}
 
 	public static class TimeProfile {
-		public final Id lineName;
-		public final Id lineRouteName;
-		public final Id index;
-		public final Id DCode;
+		public final Id<TransitLine> lineName;
+		public final Id<TransitLineRoute> lineRouteName;
+		public final Id<TimeProfile> index;
+		public final String dirCode;
 		public final String vehCombNr;
 
-		public TimeProfile(final Id lineName, final Id lineRouteName, final Id index,final Id DCode, final String vehCombNr) {
+		public TimeProfile(final Id<TransitLine> lineName, final Id<TransitLineRoute> lineRouteName, final Id<TimeProfile> index,final String dirCode, final String vehCombNr) {
 			this.lineName = lineName;
 			this.lineRouteName = lineRouteName;
 			this.index = index;
-			this.DCode = DCode;
+			this.dirCode = dirCode;
 			this.vehCombNr = vehCombNr;
 		}
 	}
@@ -287,14 +289,14 @@ public class VisumNetwork {
 		public final String index;
 		public final String arr;
 		public final String dep;
-		public final Id lRIIndex;
-		public final String DCode;
+		public final Id<TimeProfileItem> lRIIndex;
+		public final String dirCode;
 
-		public TimeProfileItem(final String lineName, final String lineRouteName,  final String timeProfileName,final String DCode,final String index, final String arr, final String dep, final Id lRIIndex) {
+		public TimeProfileItem(final String lineName, final String lineRouteName,  final String timeProfileName,final String DCode,final String index, final String arr, final String dep, final Id<TimeProfileItem> lRIIndex) {
 			this.lineName = lineName;
 			this.lineRouteName = lineRouteName;
 			this.timeProfileName = timeProfileName;
-			this.DCode = DCode;
+			this.dirCode = DCode;
 			this.index = index;
 			this.arr = arr;
 			this.dep = dep;
@@ -308,16 +310,16 @@ public class VisumNetwork {
 		public final String index;
 		public final String TRI;
 		public final String dep;
-		public final Id DCode;
+		public final String dirCode;
 		public String vehCombinationNo = null;
 
-		public Departure(final String lineName, final String lineRouteName, final String index, final String TRI, final String dep,final Id DCode) {
+		public Departure(final String lineName, final String lineRouteName, final String index, final String TRI, final String dep, final String dirCode) {
 			this.lineName = lineName;
 			this.lineRouteName = lineRouteName;
 			this.index = index;
 			this.TRI = TRI;
 			this.dep = dep;
-			this.DCode=DCode;
+			this.dirCode = dirCode;
 		}
 	}
 

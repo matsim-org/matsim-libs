@@ -1,12 +1,15 @@
 package playground.jbischoff.taxi.berlin.converters;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.utils.io.tabularFileParser.*;
-import org.matsim.matrices.*;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
+import org.matsim.matrices.Matrices;
+import org.matsim.matrices.MatricesWriter;
+import org.matsim.matrices.Matrix;
 
 
 public class TaxiStatusToMatrix
@@ -92,10 +95,10 @@ public class TaxiStatusToMatrix
         @Override
         public void startRow(String[] row)
         {
-            Id lor = new IdImpl(row[0]);
+            String lor = row[0];
 
             for (int i = 1; i < row.length; i += 2) {
-                Id statusId = new IdImpl(row[i]);
+                String statusId = row[i];
                 double vehicles = Double.parseDouble(row[i + 1]);
                 this.matrix.createEntry(lor, statusId, vehicles);
             }

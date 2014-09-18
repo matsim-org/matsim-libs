@@ -22,7 +22,6 @@ package org.matsim.matrices;
 
 import java.util.Stack;
 
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -77,7 +76,7 @@ public class MatricesReaderMatsimV1<T> extends MatsimXmlParser {
 	}
 
 	private void startEntry(final Attributes  atts) {
-		this.currMatrix.createEntry(new IdImpl(atts.getValue("from_id")), new IdImpl(atts.getValue("to_id")), Double.parseDouble(atts.getValue("value")));
+		this.currMatrix.createEntry(atts.getValue("from_id"), atts.getValue("to_id"), Double.parseDouble(atts.getValue("value")));
 	}
 
 }

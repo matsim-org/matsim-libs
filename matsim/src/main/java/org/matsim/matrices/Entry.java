@@ -20,23 +20,21 @@
 
 package org.matsim.matrices;
 
-import org.matsim.api.core.v01.Id;
-
 public class Entry {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private final Id f_loc;
-	private final Id t_loc;
+	private final String f_loc;
+	private final String t_loc;
 	private double value;
 
 	//////////////////////////////////////////////////////////////////////
 	// Constructors
 	//////////////////////////////////////////////////////////////////////
 
-	protected Entry(final Id f_loc, final Id t_loc, final double value) {
+	protected Entry(final String f_loc, final String t_loc, final double value) {
 		if ((f_loc == null)||(t_loc == null)) {
 			throw new RuntimeException("[f_loc="+f_loc+",t_loc="+t_loc+", 'null' is not allowed!]");
 		}
@@ -60,11 +58,11 @@ public class Entry {
 	// get methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final Id getFromLocation() {
+	public final String getFromLocation() {
 		return this.f_loc;
 	}
 
-	public final Id getToLocation() {
+	public final String getToLocation() {
 		return this.t_loc;
 	}
 

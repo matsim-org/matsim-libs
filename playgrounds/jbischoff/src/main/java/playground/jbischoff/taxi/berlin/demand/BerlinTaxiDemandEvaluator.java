@@ -8,7 +8,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -23,6 +22,7 @@ import org.matsim.matrices.Matrix;
 
 import playground.jbischoff.taxi.berlin.data.BeelineDistanceExractor;
 import playground.michalm.util.matrices.MatrixUtils;
+import playground.michalm.zone.Zone;
 
 
 public class BerlinTaxiDemandEvaluator
@@ -138,7 +138,7 @@ public class BerlinTaxiDemandEvaluator
             for (ArrayList<Entry> l :currentMatrix.getFromLocations().values()){
                 for (Entry e: l){
                     currentDemand += e.getValue();
-                    currentPkm += bde.calcDistance(e.getFromLocation(), e.getToLocation()) * e.getValue();
+                    currentPkm += bde.calcDistance(Id.create(e.getFromLocation(), Zone.class), Id.create(e.getToLocation(), Zone.class)) * e.getValue();
                 }
             }
             this.hourlyFromDemand.put(currentHr, currentDemand);
@@ -150,7 +150,7 @@ public class BerlinTaxiDemandEvaluator
         
     }
     
-    private void read(String filename, Date start, Date end, Id fromZone, Id toZone)
+    private void read(String filename, Date start, Date end, Id<Zone> fromZone, Id<Zone> toZone)
     {
         Map<Date,Integer> amount = new TreeMap<Date, Integer>();
         Matrices matrices = MatrixUtils.readMatrices(filename);
@@ -159,7 +159,7 @@ public class BerlinTaxiDemandEvaluator
             Matrix currentMatrix = matrices.getMatrix(filenameformat.format(currentHr));
             double value = 0.;
             try{
-            value = currentMatrix.getEntry(fromZone, toZone).getValue();
+            value = currentMatrix.getEntry(fromZone.toString(), toZone.toString()).getValue();
             }
             catch (NullPointerException e) {
                 
@@ -228,10 +228,10 @@ public class BerlinTaxiDemandEvaluator
             double fromValue=0.;
             double toValue=0.;
             try{
-            for(Entry e: currentMatrix.getFromLocEntries(zone)){
+            for(Entry e: currentMatrix.getFromLocEntries(zone.toString())){
                 fromValue+=e.getValue();
             }
-            for(Entry e: currentMatrix.getToLocEntries(zone)){
+            for(Entry e: currentMatrix.getToLocEntries(zone.toString())){
                 toValue+=e.getValue();
             }
             }

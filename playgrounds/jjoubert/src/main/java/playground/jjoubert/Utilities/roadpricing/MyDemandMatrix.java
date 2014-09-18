@@ -39,9 +39,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
@@ -50,11 +48,11 @@ import org.matsim.matrices.Matrix;
 
 public class MyDemandMatrix {
 	private Logger log = Logger.getLogger(MyDemandMatrix.class);
-	private Map<Id, Coord> locationCoordinates;
+	private Map<String, Coord> locationCoordinates;
 	private Matrix demandMatrix;
 
 	public MyDemandMatrix() {
-		locationCoordinates = new TreeMap<Id, Coord>();
+		locationCoordinates = new TreeMap<>();
 	}
 	
 	/**
@@ -74,7 +72,7 @@ public class MyDemandMatrix {
 	 */
 	public void parseMatrix(String filename, String matrixName, String matrixDesc) {
 		log.info("Reading matrix from " + filename);
-		List<Id> locations = new ArrayList<Id>(); 
+		List<String> locations = new ArrayList<>(); 
 		Matrix matrix = new Matrix(matrixName, matrixDesc);
 		try {
 			BufferedReader br = IOUtils.getBufferedReader(filename);
@@ -82,7 +80,7 @@ public class MyDemandMatrix {
 				String line = null;
 				while((line = br.readLine()) != null){
 					String [] sa = line.split(",");
-					locations.add(new IdImpl(sa[0]));
+					locations.add(sa[0]);
 				}
 				log.info("   ...matrix seem to have " + locations.size() + " locations.");
 			} finally{
@@ -102,12 +100,12 @@ public class MyDemandMatrix {
 					if(sa.length-1 != locations.size()){
 						log.warn("Locations: " + locations.size() + "; Row length: " + sa.length);
 					}
-					Id fromId = new IdImpl(sa[0]);
+					String fromId = sa[0];
 					if(!locationCoordinates.containsKey(fromId)){
 						log.warn("Location " + fromId + " not found in list of locations. May not be fatal.");
 					}
 					for(int i = 1; i < sa.length; i++){
-						Id toId = locations.get(i-1);
+						String toId = locations.get(i-1);
 						if(!locationCoordinates.containsKey(fromId)){
 							log.warn("Location " + toId + " not found in list of locations. May not be fatal.");
 						}
@@ -153,8 +151,8 @@ public class MyDemandMatrix {
 				if(entries.length != 3){
 					log.error("The line `" + ls + "' has more than three entries!");
 				}
-				Id fromId = new IdImpl(entries[0]);
-				Id toId = new IdImpl(entries[1]);
+				String fromId = entries[0];
+				String toId = entries[1];
 				Double trips = Double.parseDouble(entries[2]);
 				matrix.createEntry(fromId, toId, trips);				
 			}
@@ -181,7 +179,7 @@ public class MyDemandMatrix {
 				while((line = br.readLine()) != null){
 					String[] sa = line.split(",");
 					if(sa.length == 3){
-						locationCoordinates.put(new IdImpl(sa[idField]), new CoordImpl(sa[longField], sa[latField]));						
+						locationCoordinates.put(sa[idField], new CoordImpl(sa[longField], sa[latField]));						
 					}
 				}
 			} finally{
@@ -197,7 +195,7 @@ public class MyDemandMatrix {
 	
 
 
-	public Map<Id, Coord> getLocationCoordinates() {
+	public Map<String, Coord> getLocationCoordinates() {
 		return locationCoordinates;
 	}
 
@@ -213,20 +211,20 @@ public class MyDemandMatrix {
 	 * @param fraction
 	 * @return
 	 */
-	public Scenario generateDemand(List<Id> list, Random r, double fraction, String mode) {
+	public Scenario generateDemand(List<String> list, Random r, double fraction, String mode) {
 		if(locationCoordinates.size() == 0){
 			throw new RuntimeException("Cannot create plans if no locations coordinates exist.");
 		}
 		if(demandMatrix == null){
 			throw new RuntimeException("Cannot create plans... demand matrix is null.");
 		}
-		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population pop = sc.getPopulation();
 		PopulationFactory pf = pop.getFactory();
 		
 		// Determine the total number of agents to create entering FROM each external zone.
-		Map<Id, Double> rowSum = new TreeMap<Id, Double>();
-		for(Id fromId : demandMatrix.getFromLocations().keySet()){
+		Map<String, Double> rowSum = new TreeMap<>();
+		for(String fromId : demandMatrix.getFromLocations().keySet()){
 			if(list.contains(fromId)){
 				double sum = 0.0;
 				for(Entry e : demandMatrix.getFromLocEntries(fromId)){
@@ -238,8 +236,8 @@ public class MyDemandMatrix {
 		}
 		
 		// Determine the total number of agents to create leaving TO each external zone.
-		Map<Id, Double> columnSum = new TreeMap<Id, Double>();
-		for(Id toId : demandMatrix.getToLocations().keySet()){
+		Map<String, Double> columnSum = new TreeMap<>();
+		for(String toId : demandMatrix.getToLocations().keySet()){
 			if(list.contains(toId)){
 				double sum = 0.0;
 				for(Entry e : demandMatrix.getToLocEntries(toId)){
@@ -252,16 +250,16 @@ public class MyDemandMatrix {
 
 		// Create agents
 		long newId = 0;
-		for(Id id : list){
+		for(String id : list){
 			/*
 			 * First the agents leaving FROM each zone, i.e. row sums.
 			 */
-			Map<Id,Double> rowProb = new TreeMap<Id, Double>();
+			Map<String, Double> rowProb = new TreeMap<>();
 			// Create probabilities of selection.
-			List<Id> idList = new ArrayList<Id>();
+			List<String> idList = new ArrayList<String>();
 			List<Double> probList = new ArrayList<Double>();
 	
-			for(Id toId : demandMatrix.getToLocations().keySet()){
+			for(String toId : demandMatrix.getToLocations().keySet()){
 				Double prob = new Double(0.0); 
 				if(rowSum.get(id) > 0){
 					prob = demandMatrix.getEntry(id, toId).getValue() / rowSum.get(id);
@@ -269,7 +267,7 @@ public class MyDemandMatrix {
 				rowProb.put(toId, prob);
 			}
 			double cumSum = 0.0;
-			for(Id toId : rowProb.keySet()){
+			for(String toId : rowProb.keySet()){
 				idList.add(toId);
 				probList.add(cumSum += rowProb.get(toId));
 			}
@@ -307,7 +305,7 @@ public class MyDemandMatrix {
 							index++;
 						}
 					}
-					Id theDestination = null;
+					String theDestination = null;
 					if(index < probList.size()){
 						theDestination = idList.get(index);		
 					} else{
@@ -333,7 +331,7 @@ public class MyDemandMatrix {
 					home2.setStartTime(64800);
 					plan.addActivity(home2);
 					
-					Person p = pf.createPerson(new IdImpl(newId++));
+					Person p = pf.createPerson(Id.create(newId++, Person.class));
 					p.addPlan(plan);
 					pop.addPerson(p);				
 				}
@@ -342,12 +340,12 @@ public class MyDemandMatrix {
 			/*
 			 * Second the agents arriving TO each zone, i.e. column sums.
 			 */
-			Map<Id,Double> columnProb = new TreeMap<Id, Double>();
+			Map<String,Double> columnProb = new TreeMap<>();
 			// Create probabilities of selection.
-			idList = new ArrayList<Id>();
+			idList = new ArrayList<>();
 			probList = new ArrayList<Double>();
 			
-			for(Id fromId : demandMatrix.getFromLocations().keySet()){
+			for(String fromId : demandMatrix.getFromLocations().keySet()){
 				Double prob = new Double(0.0);
 				if(columnSum.get(id) > 0){
 					prob = new Double(demandMatrix.getEntry(fromId, id).getValue() / columnSum.get(id));
@@ -356,7 +354,7 @@ public class MyDemandMatrix {
 			}
 			
 			cumSum = 0.0;
-			for(Id fromId : columnProb.keySet()){
+			for(String fromId : columnProb.keySet()){
 				idList.add(fromId);
 				probList.add(cumSum += columnProb.get(fromId));
 			}
@@ -395,7 +393,7 @@ public class MyDemandMatrix {
 						}
 					}
 					
-					Id theOrigin = null;
+					String theOrigin = null;
 					if(index < probList.size()){
 						theOrigin = idList.get(index);		
 					} else{
@@ -421,7 +419,7 @@ public class MyDemandMatrix {
 					home2.setStartTime(64800);
 					plan.addActivity(home2);
 					
-					Person p = pf.createPerson(new IdImpl(newId++));
+					Person p = pf.createPerson(Id.create(newId++, Person.class));
 					p.addPlan(plan);
 					pop.addPerson(p);				
 				}

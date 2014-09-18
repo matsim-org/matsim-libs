@@ -118,12 +118,12 @@ public class MatrixToPersons {
 	}
 
 	public Map<Id, Person> createPersons() {
-		for (Id fromZoneId : m.getFromLocations().keySet()) {
+		for (String fromZoneId : m.getFromLocations().keySet()) {
 			if (zoneIdCoords == null)/* zoneIdFeatures!=0 */{
 				SimpleFeature fromZoneFeature = zoneIdFeatures.get(fromZoneId.toString());
 
 				for (Entry entry : m.getFromLocEntries(fromZoneId)) {
-					Id toZoneId = entry.getToLocation();
+					String toZoneId = entry.getToLocation();
 					SimpleFeature toZoneFeature = zoneIdFeatures.get(toZoneId.toString());
 					int numberPersons = (int) entry.getValue();
 					for (int i = 0; i < numberPersons; i++) {
@@ -140,7 +140,7 @@ public class MatrixToPersons {
 				Coord fromZone = zoneIdCoords.get(fromZoneId.toString());
 
 				for (Entry entry : m.getFromLocEntries(fromZoneId)) {
-					Id toZoneId = entry.getToLocation();
+					String toZoneId = entry.getToLocation();
 					Coord toZone = zoneIdCoords.get(toZoneId.toString());
 
 					int numberPersons = (int) entry.getValue();

@@ -21,10 +21,16 @@ package playground.michalm.util.matrices;
 
 import java.util.Map;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.matrices.*;
+import org.matsim.matrices.Entry;
+import org.matsim.matrices.Matrices;
+import org.matsim.matrices.Matrix;
+import org.matsim.matrices.MatsimMatricesReader;
+
+import playground.michalm.zone.Zone;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
@@ -41,19 +47,19 @@ public class MatrixUtils
     }
     
     
-    public static Matrix createDenseMatrix(String id, Iterable<Id> ids, double[][] values)
+    public static Matrix createDenseMatrix(String id, Iterable<Id<Zone>> ids, double[][] values)
     {
         return createMatrix(id, ids, values, true);
     }
 
 
-    public static Matrix createSparseMatrix(String id, Iterable<Id> ids, double[][] values)
+    public static Matrix createSparseMatrix(String id, Iterable<Id<Zone>> ids, double[][] values)
     {
         return createMatrix(id, ids, values, false);
     }
 
 
-    public static Matrix createMatrix(String id, Iterable<Id> ids, double[][] values,
+    public static Matrix createMatrix(String id, Iterable<Id<Zone>> ids, double[][] values,
             boolean denseMatrix)
     {
         Matrix matrix = new Matrix(id, null);
@@ -62,7 +68,7 @@ public class MatrixUtils
         for (int i = 0; i < idArray.length; i++) {
             for (int j = 0; j < idArray.length; j++) {
                 if (denseMatrix || values[i][j] != 0) {
-                    matrix.createEntry(idArray[i], idArray[j], values[i][j]);
+                    matrix.createEntry(idArray[i].toString(), idArray[j].toString(), values[i][j]);
                 }
             }
         }
@@ -83,7 +89,7 @@ public class MatrixUtils
     }
 
 
-    public static void setOrIncrementValue(Matrix matrix, Id fromId, Id toId, double value)
+    public static void setOrIncrementValue(Matrix matrix, String fromId, String toId, double value)
     {
         Entry entry = matrix.getEntry(fromId, toId);
 

@@ -118,9 +118,9 @@ public final class PtMatrix {
 					double travelTime = distance / plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.pt);
 
 					// create entry - travel times in seconds
-					originDestinationTravelTimeMatrix.createEntry(originStop.getId(), destinationStop.getId(), travelTime);			
+					originDestinationTravelTimeMatrix.createEntry(originStop.getId().toString(), destinationStop.getId().toString(), travelTime);			
 					// create entry - travel distances in meter
-					originDestinationTravelDistanceMatrix.createEntry(originStop.getId(), destinationStop.getId(), distance);	
+					originDestinationTravelDistanceMatrix.createEntry(originStop.getId().toString(), destinationStop.getId().toString(), distance);	
 				}
 			}
 			log.info("Done creating OD matrices with pt stop to pt stop travel times and distances.");
@@ -197,7 +197,7 @@ public final class PtMatrix {
 		PtStop fromPtStop = this.ptStops.get(fromFacilityCoord.getX(), fromFacilityCoord.getY());
 		PtStop toPtStop   = this.ptStops.get(toFacilityCoord.getX(), toFacilityCoord.getY());
 
-		Entry entry = originDestinationTravelTimeMatrix.getEntry(fromPtStop.getId(), toPtStop.getId());
+		Entry entry = originDestinationTravelTimeMatrix.getEntry(fromPtStop.getId().toString(), toPtStop.getId().toString());
 		double ptTravelTime = Double.MAX_VALUE;
 		if(entry != null)
 			ptTravelTime = entry.getValue();
@@ -259,7 +259,7 @@ public final class PtMatrix {
 		PtStop fromPtStop = this.ptStops.get(fromCoord.getX(), fromCoord.getY());
 		PtStop toPtStop   = this.ptStops.get(toCoord.getX(), toCoord.getY());
 
-		Entry entry = originDestinationTravelDistanceMatrix.getEntry(fromPtStop.getId(), toPtStop.getId());
+		Entry entry = originDestinationTravelDistanceMatrix.getEntry(fromPtStop.getId().toString(), toPtStop.getId().toString());
 		double ptTravelDistance = Double.MAX_VALUE;
 		if(entry != null)
 			ptTravelDistance = entry.getValue();

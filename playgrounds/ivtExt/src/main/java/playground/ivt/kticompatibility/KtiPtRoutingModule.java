@@ -25,6 +25,7 @@ import java.util.List;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -32,7 +33,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkImpl;
@@ -49,7 +49,6 @@ import org.matsim.pt.PtConstants;
 
 import playground.balmermi.world.Layer;
 import playground.balmermi.world.World;
-
 import playground.meisterk.kti.config.KtiConfigGroup;
 import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
 import playground.meisterk.kti.router.SwissHaltestelle;
@@ -120,8 +119,8 @@ public class KtiPtRoutingModule implements RoutingModule {
 
 		final Entry ptTravelTimeEntry =
 			info.ptTravelTimes.getEntry(
-					fromMunicipality.getId(),
-					toMunicipality.getId() );
+					fromMunicipality.getId().toString(),
+					toMunicipality.getId().toString() );
 
 		final Leg ptLeg = new LegImpl( TransportMode.pt );
 		final Route ptRoute = new GenericRouteImpl( linkStartPt.getId() , linkEndPt.getId() );

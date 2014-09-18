@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 
 public class Matrix {
 
@@ -36,10 +35,8 @@ public class Matrix {
 	private String desc = null;
 
 	// double data structure. for fast access via from_location or via to_location
-	// TreeMap<Integer f_loc_id,ArrayList<Entry entry>>
-	private final TreeMap<Id,ArrayList<Entry>> fromLocs = new TreeMap<Id,ArrayList<Entry>>();
-	// TreeMap<Integer t_loc_id,ArrayList<Entry entry>>
-	private final TreeMap<Id,ArrayList<Entry>> toLocs = new TreeMap<Id,ArrayList<Entry>>();
+	private final TreeMap<String,ArrayList<Entry>> fromLocs = new TreeMap<>();
+	private final TreeMap<String,ArrayList<Entry>> toLocs = new TreeMap<>();
 
 	private static final Logger log = Logger.getLogger(Matrix.class);
 
@@ -62,21 +59,21 @@ public class Matrix {
 	// create methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final Entry createEntry(final Id fromLocId, final Id toLocId, final double value) {
+	public final Entry createEntry(final String fromLocId, final String toLocId, final double value) {
 
 		// create an entry
 		Entry e = new Entry(fromLocId, toLocId, value);
 
 		// add it to the from location data structure
 		if (!this.fromLocs.containsKey(fromLocId)) {
-			this.fromLocs.put(fromLocId,new ArrayList<Entry>());
+			this.fromLocs.put(fromLocId, new ArrayList<Entry>());
 		}
 		ArrayList<Entry> fe = this.fromLocs.get(fromLocId);
 		fe.add(e);
 
 		// add it to the to location data structure
 		if (!this.toLocs.containsKey(toLocId)) {
-			this.toLocs.put(toLocId,new ArrayList<Entry>());
+			this.toLocs.put(toLocId, new ArrayList<Entry>());
 		}
 		ArrayList<Entry> te = this.toLocs.get(toLocId);
 		te.add(e);
@@ -96,7 +93,7 @@ public class Matrix {
 	// set/add methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final Entry setEntry(final Id fromLocId, final Id toLocId, final double value) {
+	public final Entry setEntry(final String fromLocId, final String toLocId, final double value) {
 		Entry e = getEntry(fromLocId, toLocId);
 		if (e == null) {
 			return createEntry(fromLocId, toLocId, value);
@@ -113,7 +110,7 @@ public class Matrix {
 	// remove methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final void removeEntry(final Id from_loc, final Id to_loc) {
+	public final void removeEntry(final String from_loc, final String to_loc) {
 		Entry entry = getEntry(from_loc, to_loc);
 		ArrayList<Entry> from_loc_entries = this.fromLocs.get(from_loc);
 		ArrayList<Entry> to_loc_entries = this.toLocs.get(to_loc);
@@ -156,23 +153,23 @@ public class Matrix {
 		return this.desc;
 	}
 
-	public final TreeMap<Id, ArrayList<Entry>> getFromLocations() {
+	public final TreeMap<String, ArrayList<Entry>> getFromLocations() {
 		return this.fromLocs;
 	}
 
-	public final TreeMap<Id, ArrayList<Entry>> getToLocations() {
+	public final TreeMap<String, ArrayList<Entry>> getToLocations() {
 		return this.toLocs;
 	}
 
-	public final ArrayList<Entry> getFromLocEntries(final Id fromLocationId) {
+	public final ArrayList<Entry> getFromLocEntries(final String fromLocationId) {
 		return this.fromLocs.get(fromLocationId);
 	}
 
-	public final ArrayList<Entry> getToLocEntries(final Id toLocationId) {
+	public final ArrayList<Entry> getToLocEntries(final String toLocationId) {
 		return this.toLocs.get(toLocationId);
 	}
 
-	public final Entry getEntry(final Id from, final Id to) {
+	public final Entry getEntry(final String from, final String to) {
 		ArrayList<Entry> fe = this.fromLocs.get(from);
 		if (fe == null) return null;
 		for (int i=0; i<fe.size(); i++) {

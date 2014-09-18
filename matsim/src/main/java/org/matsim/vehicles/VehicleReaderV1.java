@@ -23,7 +23,6 @@ import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.vehicles.EngineInformation.FuelType;
@@ -116,7 +115,7 @@ public class VehicleReaderV1 extends MatsimXmlParser {
 	@Override
 	public void startTag(final String name, final Attributes atts, final Stack<String> context) {
 		if (VehicleSchemaV1Names.VEHICLETYPE.equalsIgnoreCase(name)) {
-			this.currentVehType = this.builder.createVehicleType(new IdImpl(atts.getValue(VehicleSchemaV1Names.ID)));
+			this.currentVehType = this.builder.createVehicleType(Id.create(atts.getValue(VehicleSchemaV1Names.ID), VehicleType.class));
 		}
 		else if (VehicleSchemaV1Names.LENGTH.equalsIgnoreCase(name)){
 			this.currentVehType.setLength(Double.parseDouble(atts.getValue(VehicleSchemaV1Names.METER)));
@@ -150,13 +149,13 @@ public class VehicleReaderV1 extends MatsimXmlParser {
 			this.currentGasConsumption = Double.parseDouble(atts.getValue(VehicleSchemaV1Names.LITERPERMETER));
 		}
 		else if (VehicleSchemaV1Names.VEHICLE.equalsIgnoreCase(name)){
-			Id typeId = new IdImpl(atts.getValue(VehicleSchemaV1Names.TYPE));
+			Id<VehicleType> typeId = Id.create(atts.getValue(VehicleSchemaV1Names.TYPE), VehicleType.class);
 			VehicleType type = this.vehicles.getVehicleTypes().get(typeId);
 			if (type == null) {
 				log.error("VehicleType " + typeId + " does not exist.");
 			}
 			String idString = atts.getValue(VehicleSchemaV1Names.ID);
-			Id id = new IdImpl(idString);
+			Id<Vehicle> id = Id.create(idString, Vehicle.class);
 			Vehicle v = this.builder.createVehicle(id, type);
 			this.vehicles.addVehicle(v);
 		}

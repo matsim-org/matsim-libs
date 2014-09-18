@@ -20,7 +20,8 @@
 
 package org.matsim.vehicles;
 
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
+
 
 /**
  * @author nagel
@@ -28,7 +29,7 @@ import org.matsim.core.basic.v01.IdImpl;
  */
 public class VehicleUtils {
 
-	private static final VehicleType DEFAULT_VEHICLE_TYPE = VehicleUtils.getFactory().createVehicleType(new IdImpl("defaultVehicleType"));
+	private static final VehicleType DEFAULT_VEHICLE_TYPE = VehicleUtils.getFactory().createVehicleType(Id.create("defaultVehicleType", VehicleType.class));
 
 	public static VehiclesFactory getFactory() {
 		return new VehiclesFactoryImpl();

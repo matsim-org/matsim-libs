@@ -21,15 +21,20 @@ package playground.jbischoff.taxi.berlin.demand;
 
 import java.util.Map;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.*;
-import org.matsim.matrices.*;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.matrices.Matrices;
+import org.matsim.matrices.Matrix;
+import org.matsim.matrices.MatsimMatricesReader;
 
-import playground.michalm.demand.*;
-import playground.michalm.zone.*;
+import playground.michalm.demand.DefaultPersonCreator;
+import playground.michalm.demand.ODDemandGenerator;
+import playground.michalm.zone.Zone;
+import playground.michalm.zone.Zones;
 
 
 public class TaxiDemandGenerator
@@ -41,7 +46,7 @@ public class TaxiDemandGenerator
     private static final String ODMATRIX = DATADIR+"taxi_berlin/2013/OD/demandMatrices.xml";
     private static final String PLANSFILE = DATADIR+"scenarios/2014_05_basic_scenario_v3/plans4to3.xml";
     private ODDemandGenerator odd;
-    private Map<Id, Zone> zones;
+    private Map<Id<Zone>, Zone> zones;
     private Scenario scenario;
     private Matrices matrices;
 
