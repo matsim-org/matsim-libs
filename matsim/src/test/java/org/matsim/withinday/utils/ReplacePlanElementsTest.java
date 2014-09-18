@@ -20,11 +20,12 @@
 
 package org.matsim.withinday.utils;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -86,7 +87,7 @@ public class ReplacePlanElementsTest extends MatsimTestCase {
 	 * @author cdobler
 	 */
 	private Plan createSamplePlan() {
-		PlanImpl plan = new PlanImpl(new PersonImpl(new IdImpl(1)));
+		PlanImpl plan = new PlanImpl(new PersonImpl(Id.create(1, Person.class)));
 		
 		plan.createAndAddActivity("h", new CoordImpl(0, 0));
 		plan.createAndAddLeg(TransportMode.car);

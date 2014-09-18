@@ -32,7 +32,7 @@ import org.matsim.withinday.replanning.replanners.tools.ReplanningIdGenerator;
 public abstract class WithinDayReplannerFactory<T extends Identifier> {
 
 	private final WithinDayEngine withinDayEngine;
-	private Id id;
+	private Id<WithinDayReplannerFactory> id;
 	private Set<T> identifiers = new HashSet<T>();
 	
 	public WithinDayReplannerFactory(WithinDayEngine withinDayEngine) {
@@ -46,7 +46,7 @@ public abstract class WithinDayReplannerFactory<T extends Identifier> {
 		return this.withinDayEngine;
 	}
 	
-	public final Id getId() {
+	public final Id<WithinDayReplannerFactory> getId() {
 		return this.id;
 	}
 	

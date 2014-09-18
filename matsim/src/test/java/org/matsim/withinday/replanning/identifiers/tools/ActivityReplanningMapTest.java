@@ -20,9 +20,12 @@
 
 package org.matsim.withinday.replanning.identifiers.tools;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -43,9 +46,6 @@ import org.matsim.withinday.events.ReplanningEvent;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.mobsim.WithinDayQSimFactory;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 public class ActivityReplanningMapTest extends MatsimTestCase {
 
@@ -150,7 +150,7 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
 
 		private final ActivityReplanningMap arp;
 		private final WithinDayEngine withinDayEngine;
-		private final Map<Id, MobsimAgent> agents;
+		private final Map<Id<Person>, MobsimAgent> agents;
 		private static final int t1 = 5*3600 + 58*60 + 30;
 		private static final int t2 = 5*3600 + 59*60;
 		private static final int t3 = 5*3600 + 59*60 + 30;
@@ -161,7 +161,7 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
 		public MobsimListenerForTests(final ActivityReplanningMap arp, WithinDayEngine withinDayEngine) {
 			this.arp = arp;
 			this.withinDayEngine = withinDayEngine;
-			this.agents = new LinkedHashMap<Id, MobsimAgent>();
+			this.agents = new LinkedHashMap<Id<Person>, MobsimAgent>();
 		}
 
 		@Override
@@ -195,7 +195,7 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
 				assertEquals(97, this.arp.getActivityEndingAgents(e.getSimulationTime()).size());	// 97 agents end an activity
 								
 				// now reschedule the activity end time of an agent
-				MobsimAgent agent = this.agents.get(new IdImpl("40"));
+				MobsimAgent agent = this.agents.get(Id.create("40", Person.class));
                 Activity currentActivity = (Activity) WithinDayAgentUtils.getCurrentPlanElement(agent);
 				currentActivity.setEndTime(e.getSimulationTime() + 60);
 				WithinDayAgentUtils.resetCaches(agent);

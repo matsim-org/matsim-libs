@@ -21,14 +21,14 @@
 package org.matsim.withinday.replanning.replanners.tools;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplannerFactory;
 
 public class ReplanningIdGenerator {
 	
 	private static int idCount = 0;
 	
-	public synchronized static Id getNextId() {
-		Id id = new IdImpl(idCount);
+	public synchronized static Id<WithinDayReplannerFactory> getNextId() {
+		Id<WithinDayReplannerFactory> id = Id.create(idCount, WithinDayReplannerFactory.class);
 		idCount++;
 		
 		return id;
