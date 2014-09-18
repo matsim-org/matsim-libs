@@ -22,6 +22,7 @@ package org.matsim.core.mobsim.framework;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.vehicles.Vehicle;
 
 public interface VehicleUsingAgent extends MobsimAgentMarkerInterface {
 
@@ -39,5 +40,5 @@ public interface VehicleUsingAgent extends MobsimAgentMarkerInterface {
 	 */
 	public MobsimVehicle getVehicle();
 	
-	public Id getPlannedVehicleId();
+	public Id<Vehicle> getPlannedVehicleId();
 }

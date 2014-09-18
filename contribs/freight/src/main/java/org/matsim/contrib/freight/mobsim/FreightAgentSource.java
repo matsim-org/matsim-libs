@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -68,11 +69,11 @@ class FreightAgentSource implements AgentSource {
 			MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(vRoute.getPlan().getPerson());
 			Vehicle vehicle = null;
 			if(vRoute.getVehicle() == null){
-				vehicle = VehicleUtils.getFactory().createVehicle(agent.getId(), VehicleUtils.getDefaultVehicleType());
+				vehicle = VehicleUtils.getFactory().createVehicle(Id.create(agent.getId(), Vehicle.class), VehicleUtils.getDefaultVehicleType());
 				log.warn("vehicle for agent "+vRoute.getPlan().getPerson().getId() + " is missing. set default vehicle where maxVelocity is solely defined by link.speed.");
 			}
 			else if(vRoute.getVehicle().getType() == null){
-				vehicle = VehicleUtils.getFactory().createVehicle(agent.getId(), VehicleUtils.getDefaultVehicleType());
+				vehicle = VehicleUtils.getFactory().createVehicle(Id.create(agent.getId(), Vehicle.class), VehicleUtils.getDefaultVehicleType());
 				log.warn("vehicleType for agent "+vRoute.getPlan().getPerson().getId() + " is missing. set default vehicleType where maxVelocity is solely defined by link.speed.");
 			}
 			else vehicle = vRoute.getVehicle();

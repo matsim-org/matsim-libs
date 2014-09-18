@@ -72,7 +72,7 @@ public class Main {
 						qsim.insertAgentIntoMobsim(ag) ;
 						
 						// insert vehicle:
-						final Vehicle vehicle = VehicleUtils.getFactory().createVehicle(ag.getId(), VehicleUtils.getDefaultVehicleType() );
+						final Vehicle vehicle = VehicleUtils.getFactory().createVehicle(Id.create(ag.getId(), Vehicle.class), VehicleUtils.getDefaultVehicleType() );
 						Id linkId4VehicleInsertion = null ;
 						qsim.createAndParkVehicleOnLink(vehicle, linkId4VehicleInsertion);
 					}

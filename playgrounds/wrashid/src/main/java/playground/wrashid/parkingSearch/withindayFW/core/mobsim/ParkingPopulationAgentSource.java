@@ -36,6 +36,7 @@ import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 
 import playground.wrashid.parkingSearch.withindayFW.core.InsertParkingActivities;
@@ -139,7 +140,7 @@ public class ParkingPopulationAgentSource implements AgentSource {
 			
 			synchronized(qsim){
 			qsim.createAndParkVehicleOnLink(
-					VehicleUtils.getFactory().createVehicle(agent.getId(), VehicleUtils.getDefaultVehicleType()),
+					VehicleUtils.getFactory().createVehicle(Id.create(agent.getId(), Vehicle.class), VehicleUtils.getDefaultVehicleType()),
 					getParkingLinkId(plan));
 			}
 		
@@ -149,7 +150,7 @@ public class ParkingPopulationAgentSource implements AgentSource {
 	private void reserveInitialParking(Person p) {
 
 		HashMap<Id, ActivityFacility> initialParkingFacilityOfAgent = parkingInfrastructure.getInitialParkingFacilityOfAgent();
-		Id personId = p.getId();
+		Id<Person> personId = p.getId();
 		initInitialParkingFacilityIfRequired(p, initialParkingFacilityOfAgent, personId);
 
 		parkingInfrastructure.parkVehicle(initialParkingFacilityOfAgent.get(personId).getId());
@@ -157,7 +158,7 @@ public class ParkingPopulationAgentSource implements AgentSource {
 	}
 
 	private void initInitialParkingFacilityIfRequired(Person p, HashMap<Id, ActivityFacility> initialParkingFacilityOfAgent,
-			Id personId) {
+			Id<Person> personId) {
 		if (initialParkingFacilityOfAgent.get(personId) == null) {
 
 			Activity firstActivity = (Activity) p.getSelectedPlan().getPlanElements().get(0);

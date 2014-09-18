@@ -22,6 +22,8 @@ package org.matsim.core.mobsim.framework;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 
 /**Minimal interface for an agent that can do activities and legs.  For the legs, there is the minimal information to
  * perform teleportation, but nothing else.
@@ -34,7 +36,7 @@ import org.matsim.api.core.v01.Identifiable;
  * @author nagel
  *
  */
-public interface MobsimAgent extends NetworkAgent, Identifiable {
+public interface MobsimAgent extends NetworkAgent, Identifiable<Person> {
 
 	public enum State {
 		ACTIVITY, LEG, ABORT
@@ -111,6 +113,6 @@ public interface MobsimAgent extends NetworkAgent, Identifiable {
 	* taxicabs.  kai, nov'10
 	* </ul>
 	*/
-	public void notifyArrivalOnLinkByNonNetworkMode(final Id linkId);
+	public void notifyArrivalOnLinkByNonNetworkMode(final Id<Link> linkId);
 
 }

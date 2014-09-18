@@ -22,18 +22,20 @@ package org.matsim.core.mobsim.framework;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * 
  * @author nagel
  *
  */
-public interface DriverAgent extends Identifiable, NetworkAgent, VehicleUsingAgent {
+public interface DriverAgent extends Identifiable<Person>, NetworkAgent, VehicleUsingAgent {
 
 	/**
 	 * @return The next link the vehicle will drive on, or null if an error has happened.
 	 */
-	public Id chooseNextLinkId();
+	public Id<Link> chooseNextLinkId();
 
 	/**
 	 * notifies the agent that it was moved over the node.  
@@ -44,6 +46,6 @@ public interface DriverAgent extends Identifiable, NetworkAgent, VehicleUsingAge
 	 * need this method. kai, nov'11
 	 * </ul>
 	 */
-	public void notifyMoveOverNode(Id newLinkId);
+	public void notifyMoveOverNode(Id<Link> newLinkId);
 	
 }
