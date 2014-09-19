@@ -22,6 +22,7 @@ package org.matsim.contrib.locationchoice.bestresponse.preprocess;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -31,7 +32,6 @@ import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestRespo
 import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DestinationScoring;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -71,7 +71,7 @@ public class ComputeMaxDCScorePlanAlgo implements PlanAlgorithm {
 						int facilityIndex = f.getArrayIndex();
 						if (!this.sampler.sample(facilityIndex, personIndex)) continue;
 						
-						ActivityImpl act = new ActivityImpl(type, new IdImpl(1));
+						ActivityImpl act = new ActivityImpl(type, Id.create(1, Link.class));
 						act.setFacilityId(f.getId());
 						
 						double epsilonScaleFactor = 1.0; // no scaling back needed here anymore

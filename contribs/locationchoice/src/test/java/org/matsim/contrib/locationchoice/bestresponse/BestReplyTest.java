@@ -1,8 +1,10 @@
 package org.matsim.contrib.locationchoice.bestresponse;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.DCControler;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
@@ -22,8 +24,8 @@ public class BestReplyTest extends MatsimTestCase {
 	public void testSampler() {
 		DestinationSampler sampler = new DestinationSampler(
 				context.getPersonsKValuesArray(), context.getFacilitiesKValuesArray(), scenario.getConfig().locationchoice());
-		assertTrue(sampler.sample(context.getFacilityIndex(new IdImpl(1)), context.getPersonIndex(new IdImpl(1))));
-		assertTrue(!sampler.sample(context.getFacilityIndex(new IdImpl(1)), context.getPersonIndex(new IdImpl(2))));
+		assertTrue(sampler.sample(context.getFacilityIndex(Id.create(1, ActivityFacility.class)), context.getPersonIndex(Id.create(1, Person.class))));
+		assertTrue(!sampler.sample(context.getFacilityIndex(Id.create(1, ActivityFacility.class)), context.getPersonIndex(Id.create(2, Person.class))));
 	}
 	
 	public void init() {

@@ -21,8 +21,9 @@ package org.matsim.contrib.locationchoice;
 
 import java.util.Random;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.random.RandomLocationMutator;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -43,6 +44,6 @@ public class RandomLocationMutatorTest  extends MatsimTestCase {
 	 */
 	public void testHandlePlan() {
 		RandomLocationMutator randomlocationmutator = this.initialize();
-		randomlocationmutator.run(scenario.getPopulation().getPersons().get(new IdImpl("1")).getSelectedPlan());
+		randomlocationmutator.run(scenario.getPopulation().getPersons().get(Id.create("1", Person.class)).getSelectedPlan());
 	}
 }

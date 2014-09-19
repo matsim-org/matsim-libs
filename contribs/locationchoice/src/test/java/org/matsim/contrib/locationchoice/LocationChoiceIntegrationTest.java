@@ -23,6 +23,7 @@ package org.matsim.contrib.locationchoice;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -40,7 +41,6 @@ import org.matsim.contrib.locationchoice.bestresponse.scoring.DCScoringFunctionF
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.LocationChoiceConfigGroup.Algotype;
@@ -91,8 +91,8 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		final double speed = 10. ;
 		createExampleNetwork(scenario, scale, speed);
 
-		Link ll1 = scenario.getNetwork().getLinks().get(new IdImpl(1)) ;
-		ActivityFacility ff1 = scenario.getActivityFacilities().getFacilities().get(new IdImpl(1)) ;
+		Link ll1 = scenario.getNetwork().getLinks().get(Id.create(1, Link.class)) ;
+		ActivityFacility ff1 = scenario.getActivityFacilities().getFacilities().get(Id.create(1, ActivityFacility.class));
 		Person person = localCreatePopWOnePerson(scenario, ll1, ff1, 8.*60*60+5*60);
 
 		// joint context (based on scenario):
@@ -147,8 +147,8 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		ActivityImpl newWork = (ActivityImpl) newPlan.getPlanElements().get(2);
 		System.err.println( " newWork: " + newWork ) ;
 		System.err.println( " facilityId: " + newWork.getFacilityId() ) ;
-		assertTrue( !newWork.getFacilityId().equals(new IdImpl(1) ) ) ; // should be different from facility number 1 !!
-		assertEquals( new IdImpl(63), newWork.getFacilityId() ); // as I have changed the scoring (act is included) I also changed the test here: 27->92
+		assertTrue( !newWork.getFacilityId().equals(Id.create(1, ActivityFacility.class) ) ) ; // should be different from facility number 1 !!
+		assertEquals( Id.create(63, ActivityFacility.class), newWork.getFacilityId() ); // as I have changed the scoring (act is included) I also changed the test here: 27->92
 	}
 
 	public void testLocationChoiceFeb2013NegativeScores() {
@@ -166,8 +166,8 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 
 		createExampleNetwork(scenario, scale, speed);
 
-		Link ll1 = scenario.getNetwork().getLinks().get(new IdImpl(1)) ;
-		ActivityFacility ff1 = scenario.getActivityFacilities().getFacilities().get(new IdImpl(1)) ;
+		Link ll1 = scenario.getNetwork().getLinks().get(Id.create(1, Link.class)) ;
+		ActivityFacility ff1 = scenario.getActivityFacilities().getFacilities().get(Id.create(1, ActivityFacility.class)) ;
 		Person person = localCreatePopWOnePerson(scenario, ll1, ff1, 8.*60*60+5*60);
 
 		final DestinationChoiceBestResponseContext lcContext = new DestinationChoiceBestResponseContext(scenario) ;
@@ -211,23 +211,23 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		ActivityImpl newWork = (ActivityImpl) newPlan.getPlanElements().get(2);
 		System.err.println( " newWork: " + newWork ) ;
 		System.err.println( " facilityId: " + newWork.getFacilityId() ) ;
-		//		assertTrue( !newWork.getFacilityId().equals(new IdImpl(1) ) ) ; // should be different from facility number 1 !!
-		//		assertEquals( new IdImpl(55), newWork.getFacilityId() );
+		//		assertTrue( !newWork.getFacilityId().equals(Id.create(1) ) ) ; // should be different from facility number 1 !!
+		//		assertEquals( Id.create(55), newWork.getFacilityId() );
 		System.err.println("shouldn't this change anyways??") ;
 	}
 
 	private void createExampleNetwork(final ScenarioImpl scenario, final double scale, final double speed) {
 		Network network = scenario.getNetwork() ;
 
-		Node node0 = network.getFactory().createNode(new IdImpl(0), new CoordImpl(-scale,0) ) ;
+		Node node0 = network.getFactory().createNode(Id.create(0, Node.class), new CoordImpl(-scale,0) ) ;
 		network.addNode(node0) ;
 
-		Node node1 = network.getFactory().createNode(new IdImpl(1), new CoordImpl(10,0) ) ;
+		Node node1 = network.getFactory().createNode(Id.create(1, Node.class), new CoordImpl(10,0) ) ;
 		network.addNode(node1) ;
 
-		Link link1 = network.getFactory().createLink(new IdImpl(1), node0, node1 );
+		Link link1 = network.getFactory().createLink(Id.create(1, Link.class), node0, node1 );
 		network.addLink(link1) ;
-		Link link1b = network.getFactory().createLink(new IdImpl("1b"), node1, node0 ) ;
+		Link link1b = network.getFactory().createLink(Id.create("1b", Link.class), node1, node0 ) ;
 		network.addLink(link1b) ;
 
 		final int nNodes = 100 ;
@@ -236,32 +236,32 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 			double tmp = Math.PI*(ii-1)/nNodes ;
 			Coord coord = new CoordImpl( scale*Math.sin(tmp),scale*Math.cos(tmp) ) ;
 
-			Node node = network.getFactory().createNode(new IdImpl(ii), coord ) ;
+			Node node = network.getFactory().createNode(Id.create(ii, Node.class), coord ) ;
 			network.addNode(node) ;
 
 			double rnd = random.nextDouble() ;
 			{
-				Link link = network.getFactory().createLink(new IdImpl(ii), node1, node) ;
+				Link link = network.getFactory().createLink(Id.create(ii, Link.class), node1, node) ;
 				link.setLength(rnd*scale) ;
 				link.setFreespeed(speed) ;
 				link.setCapacity(1.) ;
 				network.addLink(link) ;
 			}
 			{
-				Link link = network.getFactory().createLink(new IdImpl(ii+"b"), node, node1) ;
+				Link link = network.getFactory().createLink(Id.create(ii+"b", Link.class), node, node1) ;
 				link.setLength(rnd*scale) ;
 				link.setFreespeed(speed) ;
 				link.setCapacity(1.) ;
 				network.addLink(link) ;
 			}
 
-			ActivityFacility facility = scenario.getActivityFacilities().getFactory().createActivityFacility(new IdImpl(ii), coord);
+			ActivityFacility facility = scenario.getActivityFacilities().getFactory().createActivityFacility(Id.create(ii, ActivityFacility.class), coord);
 			scenario.getActivityFacilities().addActivityFacility(facility);
 			facility.addActivityOption(new ActivityOptionImpl("work"));
 		}
 
 		// create one additional facility for the initial activity:
-		ActivityFacility facility1 = scenario.getActivityFacilities().getFactory().createActivityFacility(new IdImpl(1), new CoordImpl(scale,0) );
+		ActivityFacility facility1 = scenario.getActivityFacilities().getFactory().createActivityFacility(Id.create(1, ActivityFacility.class), new CoordImpl(scale,0) );
 		scenario.getActivityFacilities().addActivityFacility(facility1);
 		facility1.addActivityOption(new ActivityOptionImpl("work"));
 		// (as soon as you set a scoring function that looks if activity types match opportunities at facilities, you can only use
@@ -274,14 +274,14 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 
 		// setup network
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
-		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(1000, 0));
-		Link link = network.createAndAddLink(new IdImpl(1), node1, node2, 1000, 10, 3600, 1);
-		ActivityFacilityImpl facility1 = ((ActivityFacilitiesImpl) scenario.getActivityFacilities()).createAndAddFacility(new IdImpl(1), new CoordImpl(0, 500));
+		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new CoordImpl(0, 0));
+		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new CoordImpl(1000, 0));
+		Link link = network.createAndAddLink(Id.create(1, Link.class), node1, node2, 1000, 10, 3600, 1);
+		ActivityFacilityImpl facility1 = ((ActivityFacilitiesImpl) scenario.getActivityFacilities()).createAndAddFacility(Id.create(1, ActivityFacility.class), new CoordImpl(0, 500));
 		facility1.addActivityOption(new ActivityOptionImpl("initial-work"));
-		ActivityFacilityImpl facility2 = ((ActivityFacilitiesImpl) scenario.getActivityFacilities()).createAndAddFacility(new IdImpl(2), new CoordImpl(0, 400));
+		ActivityFacilityImpl facility2 = ((ActivityFacilitiesImpl) scenario.getActivityFacilities()).createAndAddFacility(Id.create(2, ActivityFacility.class), new CoordImpl(0, 400));
 		facility2.addActivityOption(new ActivityOptionImpl("work"));
-		ActivityFacilityImpl facility3 = ((ActivityFacilitiesImpl) scenario.getActivityFacilities()).createAndAddFacility(new IdImpl(3), new CoordImpl(0, 300));
+		ActivityFacilityImpl facility3 = ((ActivityFacilitiesImpl) scenario.getActivityFacilities()).createAndAddFacility(Id.create(3, ActivityFacility.class), new CoordImpl(0, 300));
 		facility3.addActivityOption(new ActivityOptionImpl("work"));
 
 		Person person = localCreatePopWOnePerson(scenario, link, facility1, 17.*60.*60.);
@@ -310,7 +310,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		assertEquals("number of plans in person.", 2, person.getPlans().size());
 		Plan newPlan = person.getSelectedPlan();
 		ActivityImpl newWork = (ActivityImpl) newPlan.getPlanElements().get(2);
-		assertTrue(newWork.getFacilityId().equals(new IdImpl(2)) || newWork.getFacilityId().equals(new IdImpl(3)));
+		assertTrue(newWork.getFacilityId().equals(Id.create(2, ActivityFacility.class)) || newWork.getFacilityId().equals(Id.create(3, ActivityFacility.class)));
 	}
 
 	/**
@@ -321,7 +321,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 
 		Population population = scenario.getPopulation();
 
-		Person person = population.getFactory().createPerson(new IdImpl(1));
+		Person person = population.getFactory().createPerson(Id.create(1, Person.class));
 		population.addPerson(person);
 
 		PlanImpl plan = (PlanImpl) population.getFactory().createPlan() ;
@@ -371,7 +371,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		work.setTypicalDuration(12*60*60);
 		config.planCalcScore().addActivityParams(work);
 
-		final StrategySettings strategySettings = new StrategySettings(new IdImpl("1"));
+		final StrategySettings strategySettings = new StrategySettings(Id.create("1", StrategySettings.class));
 		strategySettings.setModuleName("MyLocationChoice");
 		strategySettings.setProbability(1.0);
 		config.strategy().addStrategySettings(strategySettings);

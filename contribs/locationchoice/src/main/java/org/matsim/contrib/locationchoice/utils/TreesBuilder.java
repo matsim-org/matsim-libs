@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
@@ -77,11 +76,11 @@ public class TreesBuilder {
 	}
 
 	public void createTrees(ActivityFacilities facilities) {
-		TreeMap<String, TreeMap<Id, ActivityFacility>> treesForTypes = this.createTreesForTypes(facilities);
+		TreeMap<String, TreeMap<Id<ActivityFacility>, ActivityFacility>> treesForTypes = this.createTreesForTypes(facilities);
 		this.createQuadTreesAndArrays(treesForTypes);
 	}
 
-	private TreeMap<String, TreeMap<Id, ActivityFacility>> createTreesForTypes(ActivityFacilities facilities) {
+	private TreeMap<String, TreeMap<Id<ActivityFacility>, ActivityFacility>> createTreesForTypes(ActivityFacilities facilities) {
 
 		boolean regionalScenario = false;
 		double radius = 0.0;
@@ -90,7 +89,7 @@ public class TreesBuilder {
 		if (!config.getCenterNode().equals("null") &&
 				!config.getRadius().equals("null")) {
 			regionalScenario = true;
-			centerNode = this.network.getNodes().get(new IdImpl(config.getCenterNode()));
+			centerNode = this.network.getNodes().get(Id.create(config.getCenterNode(), Node.class));
 			radius = Double.parseDouble(config.getRadius());
 			log.info("Building trees regional scenario");
 		}
@@ -98,7 +97,7 @@ public class TreesBuilder {
 			log.info("Building trees complete scenario");
 		}
 
-		TreeMap<String, TreeMap<Id, ActivityFacility>> trees = new TreeMap<String, TreeMap<Id, ActivityFacility>>();
+		TreeMap<String, TreeMap<Id<ActivityFacility>, ActivityFacility>> trees = new TreeMap<>();
 		// get all types of activities
 		for (ActivityFacility f : facilities.getFacilities().values()) {
 			Map<String, ? extends ActivityOption> facilityActOpts = f.getActivityOptions();
@@ -117,7 +116,7 @@ public class TreesBuilder {
 				// otherwise we add all types given by flexibleTypes
 				if (this.flexibleTypes.size() == 0 ||  this.flexibleTypes.contains(this.converter.convertType(actOpt.getType()))) {
 					if (!trees.containsKey(this.converter.convertType(actOpt.getType()))) {
-						trees.put(this.converter.convertType(actOpt.getType()), new TreeMap<Id, ActivityFacility>());
+						trees.put(this.converter.convertType(actOpt.getType()), new TreeMap<Id<ActivityFacility>, ActivityFacility>());
 					}
 					trees.get(this.converter.convertType(actOpt.getType())).put(f.getId(), f);
 				}
@@ -126,23 +125,23 @@ public class TreesBuilder {
 		return trees;
 	}
 
-	private void createQuadTreesAndArrays(TreeMap<String, TreeMap<Id, ActivityFacility>> trees) {
-		Iterator<TreeMap<Id, ActivityFacility>> tree_it = trees.values().iterator();
+	private void createQuadTreesAndArrays(TreeMap<String, TreeMap<Id<ActivityFacility>, ActivityFacility>> trees) {
+		Iterator<TreeMap<Id<ActivityFacility>, ActivityFacility>> tree_it = trees.values().iterator();
 		Iterator<String> type_it = trees.keySet().iterator();
 
 		while (tree_it.hasNext()) {
-			TreeMap<Id, ActivityFacility> tree_of_type = tree_it.next();
+			TreeMap<Id<ActivityFacility>, ActivityFacility> tree_of_type = tree_it.next();
 			String type = type_it.next();
 
 			// do not construct tree for home and tta act
 			if (type.startsWith("h") || type.startsWith("tta")) continue;
 
-			this.quadTreesOfType.put(this.converter.convertType(type), this.builFacQuadTree(this.converter.convertType(type), tree_of_type));
+			this.quadTreesOfType.put(this.converter.convertType(type), this.buildFacQuadTree(this.converter.convertType(type), tree_of_type));
 			this.facilitiesOfType.put(this.converter.convertType(type), tree_of_type.values().toArray(new ActivityFacilityImpl[tree_of_type.size()]));
 		}
 	}
 
-	private QuadTreeRing<ActivityFacility> builFacQuadTree(String type, TreeMap<Id,ActivityFacility> facilities_of_type) {
+	private QuadTreeRing<ActivityFacility> buildFacQuadTree(String type, TreeMap<Id<ActivityFacility>,ActivityFacility> facilities_of_type) {
 		Gbl.startMeasurement();
 		log.info(" building " + type + " facility quad tree");
 		double minx = Double.POSITIVE_INFINITY;
