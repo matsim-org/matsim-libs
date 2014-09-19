@@ -19,21 +19,16 @@
 
 package org.matsim.contrib.emissions.example;
 
-import java.util.HashSet;
-import java.util.Set;
-
+import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 
@@ -93,7 +88,7 @@ public class CreateEmissionConfig {
 
 		// strategy
 			StrategyConfigGroup scg = controler.getConfig().strategy();
-			StrategySettings strategySettings = new StrategySettings(new IdImpl("1"));
+			StrategySettings strategySettings = new StrategySettings(Id.create("1", StrategySettings.class));
 			strategySettings.setModuleName("ChangeExpBeta");
 			strategySettings.setProbability(1.0);
 			scg.addStrategySettings(strategySettings);

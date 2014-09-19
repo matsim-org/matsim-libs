@@ -35,6 +35,7 @@ import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.events.EmissionEventsReader;
 import org.matsim.contrib.emissions.types.ColdPollutant;
 import org.matsim.contrib.emissions.types.WarmPollutant;
@@ -65,9 +66,9 @@ public class EmissionsAnalyzer extends AbstractAnalyisModule{
 	private EmissionUtils emissionUtils;
 	private EmissionsPerPersonWarmEventHandler warmHandler;
 	private EmissionsPerPersonColdEventHandler coldHandler;
-	private Map<Id, Map<WarmPollutant, Double>> person2warmEmissions;
-	private Map<Id, Map<ColdPollutant, Double>> person2coldEmissions;
-	private Map<Id, SortedMap<String, Double>> person2totalEmissions;
+	private Map<Id<Person>, Map<WarmPollutant, Double>> person2warmEmissions;
+	private Map<Id<Person>, Map<ColdPollutant, Double>> person2coldEmissions;
+	private Map<Id<Person>, SortedMap<String, Double>> person2totalEmissions;
 	private SortedMap<String, Double> totalEmissions;
 	
 	public EmissionsAnalyzer(String emissionsEventsFile) {
@@ -140,15 +141,15 @@ public class EmissionsAnalyzer extends AbstractAnalyisModule{
 		return totalEmissions;
 	}
 
-	public Map<Id, Map<WarmPollutant, Double>> getPerson2warmEmissions() {
+	public Map<Id<Person>, Map<WarmPollutant, Double>> getPerson2warmEmissions() {
 		return person2warmEmissions;
 	}
 
-	public Map<Id, Map<ColdPollutant, Double>> getPerson2coldEmissions() {
+	public Map<Id<Person>, Map<ColdPollutant, Double>> getPerson2coldEmissions() {
 		return person2coldEmissions;
 	}
 
-	public Map<Id, SortedMap<String, Double>> getPerson2totalEmissions() {
+	public Map<Id<Person>, SortedMap<String, Double>> getPerson2totalEmissions() {
 		return person2totalEmissions;
 	}
 	

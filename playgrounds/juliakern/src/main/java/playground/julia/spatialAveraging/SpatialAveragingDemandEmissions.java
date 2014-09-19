@@ -143,9 +143,9 @@ public class SpatialAveragingDemandEmissions {
 	Map<Double, double[][]> time2NormalizedWeightedDemandBaseCase = new HashMap<Double, double[][]>();
 	Map<Double, double[][]> time2SpecificEmissionsBaseCase = new HashMap<Double, double[][]>();
 
-	Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFiltered;
-	Map<Double, Map<Id, Double>> time2CountsPerLink;
-	Map<Double, Map<Id, Double>> time2CountsPerLinkFilledAndFiltered;
+	Map<Double, Map<Id<Link>, Map<String, Double>>> time2EmissionsTotalFilledAndFiltered;
+	Map<Double, Map<Id<Link>, Double>> time2CountsPerLink;
+	Map<Double, Map<Id<Link>, Double>> time2CountsPerLinkFilledAndFiltered;
 
 	private Map<Double, double[][]> time2NormalizedWeightedDemand;
 	private Map<Double, double[][]> time2NormalizedWeightedEmissions;
@@ -183,9 +183,9 @@ public class SpatialAveragingDemandEmissions {
 		 * 2. parse emission file and store overall emission amounts by time bins 
 		 */
 		
-		Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFilteredBaseCase = new HashMap<Double, Map<Id,Map<String,Double>>>(); 
-		Map<Double, Map<Id, Double>> time2CountsPerLinkBaseCase = new HashMap<Double, Map<Id,Double>>();
-		Map<Double, Map<Id, Double>> time2CountsPerLinkFilledAndFilteredBaseCase = new HashMap<Double, Map<Id,Double>>();
+		Map<Double, Map<Id<Link>, Map<String, Double>>> time2EmissionsTotalFilledAndFilteredBaseCase = new HashMap<>(); 
+		Map<Double, Map<Id<Link>, Double>> time2CountsPerLinkBaseCase = new HashMap<>();
+		Map<Double, Map<Id<Link>, Double>> time2CountsPerLinkFilledAndFilteredBaseCase = new HashMap<>();
 		
 		parseAndProcessEmissions(emissionFile1);
 		time2EmissionsTotalFilledAndFilteredBaseCase = this.time2EmissionsTotalFilledAndFiltered;
@@ -214,9 +214,9 @@ public class SpatialAveragingDemandEmissions {
 		 * 1. parse emission file and store overall emission amounts by time bins 
 		 */
 		
-		Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFilteredCompareCase = new HashMap<Double, Map<Id,Map<String,Double>>>(); 
-		Map<Double, Map<Id, Double>> time2CountsPerLinkCompareCase = new HashMap<Double, Map<Id,Double>>();
-		Map<Double, Map<Id, Double>> time2CountsPerLinkFilledAndFilteredCompareCase = new HashMap<Double, Map<Id,Double>>();
+		Map<Double, Map<Id<Link>, Map<String, Double>>> time2EmissionsTotalFilledAndFilteredCompareCase = new HashMap<>(); 
+		Map<Double, Map<Id<Link>, Double>> time2CountsPerLinkCompareCase = new HashMap<>();
+		Map<Double, Map<Id<Link>, Double>> time2CountsPerLinkFilledAndFilteredCompareCase = new HashMap<>();
 		
 		//parseAndProcessEmissions(emissionFile, time2EmissionsTotalFilledAndFilteredCompareCase, time2CountsPerLinkCompareCase, time2CountsPerLinkFilledAndFilteredCompareCase);
 		parseAndProcessEmissions(emissionFile);
@@ -270,8 +270,8 @@ public class SpatialAveragingDemandEmissions {
 //		this.coldHandler.reset(0);
 	}
 	
-	private void calculateWeightedEmissionsAndDemands(Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFiltered1, 
-			Map<Double, Map<Id, Double>> time2CountsPerLinkFilledAndFiltered1) {
+	private void calculateWeightedEmissionsAndDemands(Map<Double, Map<Id<Link>, Map<String, Double>>> time2EmissionsTotalFilledAndFiltered1, 
+			Map<Double, Map<Id<Link>, Double>> time2CountsPerLinkFilledAndFiltered1) {
 		
 		this.time2NormalizedWeightedEmissions = fillAndNormalizeWeightedEmissionValues(time2EmissionsTotalFilledAndFiltered1);
 		this.time2NormalizedWeightedDemand = fillAndNormalizeWeightedDemandValues(time2CountsPerLinkFilledAndFiltered1);
@@ -297,14 +297,14 @@ public class SpatialAveragingDemandEmissions {
 	}
 	
 	private Map<Double, double[][]> fillAndNormalizeWeightedDemandValues(
-			Map<Double, Map<Id, Double>> time2CountsPerLinkFilledAndFiltered1) {
+			Map<Double, Map<Id<Link>, Double>> time2CountsPerLinkFilledAndFiltered1) {
 		Map<Double, double[][]> time2WeightedDemand1 = fillWeightedDemandValues(time2CountsPerLinkFilledAndFiltered1);
 		Map<Double, double[][]> time2NormalizedWeightedDemand1 = normalizeAllArrays(time2WeightedDemand1);
 		return time2NormalizedWeightedDemand1;
 	}
 
 	private Map<Double, double[][]> fillAndNormalizeWeightedEmissionValues(
-			Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFiltered1) {
+			Map<Double, Map<Id<Link>, Map<String, Double>>> time2EmissionsTotalFilledAndFiltered1) {
 		
 		Map<Double, double[][]> time2WeightedEmissions1 = fillWeightedEmissionValues(time2EmissionsTotalFilledAndFiltered1);
 		Map<Double, double[][]> time2NormalizedWeightedEmissions1 = normalizeAllArrays(time2WeightedEmissions1);
@@ -334,13 +334,13 @@ public class SpatialAveragingDemandEmissions {
 		
 	}
 
-	private Map<Double, double[][]> fillWeightedEmissionValues(Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFiltered){
+	private Map<Double, double[][]> fillWeightedEmissionValues(Map<Double, Map<Id<Link>, Map<String, Double>>> time2EmissionsTotalFilledAndFiltered){
 		Map<Double, double[][]> time2weightedEmissions = new HashMap<Double, double[][]>();
 		
 		for(Double endOfTimeInterval : time2EmissionsTotalFilledAndFiltered.keySet()){
 			double[][]weightedEmissions = new double[noOfXbins][noOfYbins];
 			
-			for(Id linkId : time2EmissionsTotalFilledAndFiltered.get(endOfTimeInterval).keySet()){
+			for(Id<Link> linkId : time2EmissionsTotalFilledAndFiltered.get(endOfTimeInterval).keySet()){
 				Coord linkCoord = this.network.getLinks().get(linkId).getCoord();
 				double xLink = linkCoord.getX();
 				double yLink = linkCoord.getY();
@@ -380,13 +380,13 @@ public class SpatialAveragingDemandEmissions {
 		return time2weightedEmissions;
 	}
 	
-	private Map<Double, double[][]> fillWeightedDemandValues(Map<Double, Map<Id, Double>> time2CountsPerLinkFilledAndFiltered) {
+	private Map<Double, double[][]> fillWeightedDemandValues(Map<Double, Map<Id<Link>, Double>> time2CountsPerLinkFilledAndFiltered) {
 		Map<Double, double[][]> time2weightedDemand = new HashMap<Double, double[][]>();
 		
 		for(Double endOfTimeInterval : time2CountsPerLinkFilledAndFiltered.keySet()){
 			double[][]weightedDemand = new double[noOfXbins][noOfYbins];
 			
-			for(Id linkId : time2CountsPerLinkFilledAndFiltered.get(endOfTimeInterval).keySet()){
+			for(Id<Link> linkId : time2CountsPerLinkFilledAndFiltered.get(endOfTimeInterval).keySet()){
 				Coord linkCoord = this.network.getLinks().get(linkId).getCoord();
 				double xLink = linkCoord.getX();
 				double yLink = linkCoord.getY();
@@ -461,17 +461,17 @@ public class SpatialAveragingDemandEmissions {
 		return time2NormalizedArray;
 	}
 
-	private Map<Double, Map<Id, Double>> setNonCalculatedCountsAndFilter(Map<Double, Map<Id, Double>> time2CountsPerLink) {
-		Map<Double, Map<Id, Double>> time2CountsTotalFiltered = new HashMap<Double, Map<Id,Double>>();
+	private Map<Double, Map<Id<Link>, Double>> setNonCalculatedCountsAndFilter(Map<Double, Map<Id<Link>, Double>> time2CountsPerLink) {
+		Map<Double, Map<Id<Link>, Double>> time2CountsTotalFiltered = new HashMap<>();
 	
 		for(Double endOfTimeInterval : time2CountsPerLink.keySet()){
-			Map<Id, Double> linkId2Count = time2CountsPerLink.get(endOfTimeInterval);
-			Map<Id, Double> linkId2CountFiltered = new HashMap<Id, Double>();
+			Map<Id<Link>, Double> linkId2Count = time2CountsPerLink.get(endOfTimeInterval);
+			Map<Id<Link>, Double> linkId2CountFiltered = new HashMap<>();
 		
 			for(Link link : network.getLinks().values()){
 				Coord linkCoord = link.getCoord();
 				if(this.sau.isInResearchArea(linkCoord)){
-					Id linkId = link.getId();
+					Id<Link> linkId = link.getId();
 	
 					if(linkId2Count.get(linkId) == null){
 						linkId2CountFiltered.put(linkId, 0.);
@@ -485,27 +485,27 @@ public class SpatialAveragingDemandEmissions {
 		return time2CountsTotalFiltered;
 	}
 
-	private Map<Double, Map<Id, SortedMap<String, Double>>> setNonCalculatedEmissions(Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotal) {
-		Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotalFilled = new HashMap<Double, Map<Id, SortedMap<String, Double>>>();
+	private Map<Double, Map<Id<Link>, SortedMap<String, Double>>> setNonCalculatedEmissions(Map<Double, Map<Id<Link>, SortedMap<String, Double>>> time2EmissionsTotal) {
+		Map<Double, Map<Id<Link>, SortedMap<String, Double>>> time2EmissionsTotalFilled = new HashMap<Double, Map<Id<Link>, SortedMap<String, Double>>>();
 		
 		for(double endOfTimeInterval : time2EmissionsTotal.keySet()){
-			Map<Id, SortedMap<String, Double>> emissionsTotalFilled = this.emissionUtils.setNonCalculatedEmissionsForNetwork(this.network, time2EmissionsTotal.get(endOfTimeInterval));
+			Map<Id<Link>, SortedMap<String, Double>> emissionsTotalFilled = this.emissionUtils.setNonCalculatedEmissionsForNetwork(this.network, time2EmissionsTotal.get(endOfTimeInterval));
 			time2EmissionsTotalFilled.put(endOfTimeInterval, emissionsTotalFilled);
 		}
 		return time2EmissionsTotalFilled;
 	}
 
-	private Map<Double, Map<Id, Map<String, Double>>> filterEmissionLinks(Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotal) {
-		Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFiltered = new HashMap<Double, Map<Id, Map<String, Double>>>();
+	private Map<Double, Map<Id<Link>, Map<String, Double>>> filterEmissionLinks(Map<Double, Map<Id<Link>, SortedMap<String, Double>>> time2EmissionsTotal) {
+		Map<Double, Map<Id<Link>, Map<String, Double>>> time2EmissionsTotalFiltered = new HashMap<>();
 		
 		for(Double endOfTimeInterval : time2EmissionsTotal.keySet()){
-			Map<Id, SortedMap<String, Double>> emissionsTotal = time2EmissionsTotal.get(endOfTimeInterval);
-			Map<Id, Map<String, Double>> emissionsTotalFiltered = new HashMap<Id, Map<String, Double>>();
+			Map<Id<Link>, SortedMap<String, Double>> emissionsTotal = time2EmissionsTotal.get(endOfTimeInterval);
+			Map<Id<Link>, Map<String, Double>> emissionsTotalFiltered = new HashMap<>();
 
 			for(Link link : network.getLinks().values()){
 				Coord linkCoord = link.getCoord();
 				if(this.sau.isInResearchArea(linkCoord)){
-					Id linkId = link.getId();
+					Id<Link> linkId = link.getId();
 					emissionsTotalFiltered.put(linkId, emissionsTotal.get(linkId));
 				}
 			}
@@ -514,23 +514,23 @@ public class SpatialAveragingDemandEmissions {
 		return time2EmissionsTotalFiltered;
 	}
 
-	private Map<Double, Map<Id, SortedMap<String, Double>>> sumUpEmissionsPerTimeInterval(
-			Map<Double, Map<Id, Map<WarmPollutant, Double>>> time2warmEmissionsTotal,
-			Map<Double, Map<Id, Map<ColdPollutant, Double>>> time2coldEmissionsTotal) {
+	private Map<Double, Map<Id<Link>, SortedMap<String, Double>>> sumUpEmissionsPerTimeInterval(
+			Map<Double, Map<Id<Link>, Map<WarmPollutant, Double>>> time2warmEmissionsTotal,
+			Map<Double, Map<Id<Link>, Map<ColdPollutant, Double>>> time2coldEmissionsTotal) {
 	
-		Map<Double, Map<Id, SortedMap<String, Double>>> time2totalEmissions = new HashMap<Double, Map<Id, SortedMap<String, Double>>>();
+		Map<Double, Map<Id<Link>, SortedMap<String, Double>>> time2totalEmissions = new HashMap<>();
 	
 		for(double endOfTimeInterval: time2warmEmissionsTotal.keySet()){
-			Map<Id, Map<WarmPollutant, Double>> warmEmissions = time2warmEmissionsTotal.get(endOfTimeInterval);
+			Map<Id<Link>, Map<WarmPollutant, Double>> warmEmissions = time2warmEmissionsTotal.get(endOfTimeInterval);
 			
-			Map<Id, SortedMap<String, Double>> totalEmissions = new HashMap<Id, SortedMap<String, Double>>();
+			Map<Id<Link>, SortedMap<String, Double>> totalEmissions = new HashMap<>();
 			if(time2coldEmissionsTotal.get(endOfTimeInterval) == null){
-				for(Id id : warmEmissions.keySet()){
+				for(Id<Link> id : warmEmissions.keySet()){
 					SortedMap<String, Double> warmEmissionsOfLink = this.emissionUtils.convertWarmPollutantMap2String(warmEmissions.get(id));
 					totalEmissions.put(id, warmEmissionsOfLink);
 				}
 			} else {
-				Map<Id, Map<ColdPollutant, Double>> coldEmissions = time2coldEmissionsTotal.get(endOfTimeInterval);
+				Map<Id<Link>, Map<ColdPollutant, Double>> coldEmissions = time2coldEmissionsTotal.get(endOfTimeInterval);
 				totalEmissions = this.emissionUtils.sumUpEmissionsPerId(warmEmissions, coldEmissions);
 			}
 			time2totalEmissions.put(endOfTimeInterval, totalEmissions);
@@ -538,7 +538,7 @@ public class SpatialAveragingDemandEmissions {
 		return time2totalEmissions;
 	}
 
-	private Map<Double, Map<Id, Map<String, Double>>> processEmissions(String emissionFile) {
+	private Map<Double, Map<Id<Link>, Map<String, Double>>> processEmissions(String emissionFile) {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);
 		this.warmHandler = new EmissionsPerLinkWarmEventHandler(this.simulationEndTime, noOfTimeBins);
@@ -547,14 +547,14 @@ public class SpatialAveragingDemandEmissions {
 		eventsManager.addHandler(this.coldHandler);
 		emissionReader.parse(emissionFile);
 		
-		Map<Double, Map<Id, Map<WarmPollutant, Double>>> time2WarmEmissionsTotal1 = this.warmHandler.getWarmEmissionsPerLinkAndTimeInterval();
+		Map<Double, Map<Id<Link>, Map<WarmPollutant, Double>>> time2WarmEmissionsTotal1 = this.warmHandler.getWarmEmissionsPerLinkAndTimeInterval();
 		System.out.println("number of links with warm emissions");
 		for(Double et: time2WarmEmissionsTotal1.keySet()){
 			System.out.println(time2WarmEmissionsTotal1.get(et).size());
 		}
-		Map<Double, Map<Id, Map<ColdPollutant, Double>>> time2ColdEmissionsTotal1 = this.coldHandler.getColdEmissionsPerLinkAndTimeInterval();
-		Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotal1 = sumUpEmissionsPerTimeInterval(time2WarmEmissionsTotal1, time2ColdEmissionsTotal1);
-		Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotalFilled1 = setNonCalculatedEmissions(time2EmissionsTotal1);
+		Map<Double, Map<Id<Link>, Map<ColdPollutant, Double>>> time2ColdEmissionsTotal1 = this.coldHandler.getColdEmissionsPerLinkAndTimeInterval();
+		Map<Double, Map<Id<Link>, SortedMap<String, Double>>> time2EmissionsTotal1 = sumUpEmissionsPerTimeInterval(time2WarmEmissionsTotal1, time2ColdEmissionsTotal1);
+		Map<Double, Map<Id<Link>, SortedMap<String, Double>>> time2EmissionsTotalFilled1 = setNonCalculatedEmissions(time2EmissionsTotal1);
 		
 		return filterEmissionLinks(time2EmissionsTotalFilled1);
 	}

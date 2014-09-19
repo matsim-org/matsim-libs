@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.events.ColdEmissionEvent;
 import org.matsim.contrib.emissions.events.ColdEmissionEventHandler;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
@@ -48,8 +49,8 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 	Double simulationStartTime;
 	Double timeBinSize;
 	Map<Double, ArrayList<EmPerCell>> emissionPerCell;
-	Map<Id,Integer> link2xbins; 
-	Map<Id,Integer> link2ybins;
+	Map<Id<Link>,Integer> link2xbins; 
+	Map<Id<Link>,Integer> link2ybins;
 	
 	private final static Double dist0factor = 0.216;
 	private final static Double dist1factor = 0.132;
@@ -68,7 +69,7 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 	private final double EURO_PER_GRAMM_CO2 = 70. / (1000. * 1000.);
 	
 	
-	public GeneratedEmissionsHandler(Double simulationStartTime, Double timeBinSize, Map<Id, Integer>link2xbins, Map<Id, Integer>link2ybins){
+	public GeneratedEmissionsHandler(Double simulationStartTime, Double timeBinSize, Map<Id<Link>, Integer> link2xbins, Map<Id<Link>, Integer> link2ybins){
 		this.simulationStartTime = simulationStartTime;
 		this.timeBinSize= timeBinSize;
 		this.link2xbins = link2xbins;

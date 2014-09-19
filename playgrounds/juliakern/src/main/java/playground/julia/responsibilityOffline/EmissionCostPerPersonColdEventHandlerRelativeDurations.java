@@ -23,11 +23,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.events.ColdEmissionEvent;
 import org.matsim.contrib.emissions.events.ColdEmissionEventHandler;
 import org.matsim.contrib.emissions.types.ColdPollutant;
+import org.matsim.vehicles.Vehicle;
 
 
 /**
@@ -35,13 +36,12 @@ import org.matsim.contrib.emissions.types.ColdPollutant;
  *
  */
 public class EmissionCostPerPersonColdEventHandlerRelativeDurations implements ColdEmissionEventHandler {
-	private static final Logger logger = Logger.getLogger(EmissionCostPerPersonColdEventHandlerRelativeDurations.class);
 
-	Map<Id, Map<ColdPollutant, Double>> coldEmissionCostTotal = new HashMap<Id, Map<ColdPollutant, Double>>();
+	Map<Id<Vehicle>, Map<ColdPollutant, Double>> coldEmissionCostTotal = new HashMap<>();
 
-	private Map<Id, Integer> links2xbins;
+	private Map<Id<Link>, Integer> links2xbins;
 
-	private Map<Id, Integer> links2ybins;
+	private Map<Id<Link>, Integer> links2ybins;
 
 	private double timeBinSize = 60*60.;
 
@@ -53,14 +53,15 @@ public class EmissionCostPerPersonColdEventHandlerRelativeDurations implements C
 	private HashMap<Double, Double[][]> relativeDurationFactor;
 
 	public EmissionCostPerPersonColdEventHandlerRelativeDurations(
-			HashMap<Double, Double[][]> relativeDurationFactor, Map<Id, Integer> links2xbins, Map<Id, Integer> links2ybins) {
+			HashMap<Double, Double[][]> relativeDurationFactor, Map<Id<Link>, Integer> links2xbins, Map<Id<Link>, Integer> links2ybins) {
 		this.relativeDurationFactor = relativeDurationFactor;
 		this.links2xbins = links2xbins;
 		this.links2ybins = links2ybins;
 	}
 
+	@Override
 	public void handleEvent(ColdEmissionEvent event) {
-		Id vehicleId = event.getVehicleId();
+		Id<Vehicle> vehicleId = event.getVehicleId();
 		Map<ColdPollutant, Double> coldEmissionsOfEvent = event.getColdEmissions();
 
 		if(coldEmissionCostTotal.get(vehicleId) != null){
@@ -72,7 +73,7 @@ public class EmissionCostPerPersonColdEventHandlerRelativeDurations implements C
 				Double eventCosts = 0.0;
 				
 					Double timeBin = Math.ceil(event.getTime()/timeBinSize)*timeBinSize;
-					Id linkId = event.getLinkId();
+					Id<Link> linkId = event.getLinkId();
 					try {
 						int xCell = links2xbins.get(linkId);
 						int yCell = links2ybins.get(linkId);
@@ -104,7 +105,7 @@ public class EmissionCostPerPersonColdEventHandlerRelativeDurations implements C
 				Double eventCosts = 0.0;
 				
 					Double timeBin = Math.ceil(event.getTime()/timeBinSize)*timeBinSize;
-					Id linkId = event.getLinkId();
+					Id<Link> linkId = event.getLinkId();
 					try {
 						int xCell = links2xbins.get(linkId);
 						int yCell = links2ybins.get(linkId);
@@ -122,7 +123,7 @@ public class EmissionCostPerPersonColdEventHandlerRelativeDurations implements C
 		}
 	}
 
-	public Map<Id, Map<ColdPollutant, Double>> getColdEmissionCostsPerPerson() {
+	public Map<Id<Vehicle>, Map<ColdPollutant, Double>> getColdEmissionCostsPerPerson() {
 		return coldEmissionCostTotal;
 	}
 
@@ -135,6 +136,7 @@ public class EmissionCostPerPersonColdEventHandlerRelativeDurations implements C
 		}
 	}
 	
+	@Override
 	public void reset(int iteration) {
 		coldEmissionCostTotal.clear();
 	}

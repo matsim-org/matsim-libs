@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.network.Link;
 
 import playground.julia.distribution.EmActivity;
 
@@ -55,7 +56,7 @@ public class IntervalHandler implements ActivityStartEventHandler, ActivityEndEv
 		person2asevent.put(personId, events);
 	}
 
-	public void addActivitiesToTimetables(Map<Id,Integer> link2xbins, Map<Id,Integer> link2ybins, Double simulationEndTime) {
+	public void addActivitiesToTimetables(Map<Id<Link>,Integer> link2xbins, Map<Id<Link>,Integer> link2ybins, Double simulationEndTime) {
 		this.activities = new ArrayList<EmActivity>();
 		// combine act start events with act leave events to em activities
 		// without emission values - store person id, time and x,y-cell

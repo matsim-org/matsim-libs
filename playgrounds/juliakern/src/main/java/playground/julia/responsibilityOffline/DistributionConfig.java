@@ -249,18 +249,18 @@ public class DistributionConfig implements DistributionConfiguration {
 
 
 	@Override
-	public Map<Id, Integer> getLink2xBin() {
-		Map<Id, Integer> link2xbin = new HashMap<Id, Integer>();
-		for(Id linkId: this.getLinks().keySet()){
+	public Map<Id<Link>, Integer> getLink2xBin() {
+		Map<Id<Link>, Integer> link2xbin = new HashMap<>();
+		for(Id<Link> linkId: this.getLinks().keySet()){
 			link2xbin.put(linkId, mapXCoordToBin(this.getLinks().get(linkId).getCoord().getX()));
 		}
 		return link2xbin;
 	}
 
 	@Override
-	public Map<Id, Integer> getLink2yBin() {
-		Map<Id, Integer> link2ybin = new HashMap<Id, Integer>();
-		for(Id linkId: this.getLinks().keySet()){
+	public Map<Id<Link>, Integer> getLink2yBin() {
+		Map<Id<Link>, Integer> link2ybin = new HashMap<>();
+		for(Id<Link> linkId: this.getLinks().keySet()){
 			link2ybin.put(linkId, mapYCoordToBin(this.getLinks().get(linkId).getCoord().getY()));
 		}
 		return link2ybin;

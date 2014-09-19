@@ -10,34 +10,36 @@ import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 
 public class IntervalHandler implements ActivityStartEventHandler, ActivityEndEventHandler{
 
 	HashMap<Double, Double[][]> duration = new HashMap<Double, Double[][]>();
-	Map<Id,Integer> link2xbins;
-	Map<Id,Integer> link2ybins;
+	Map<Id<Link>,Integer> link2xbins;
+	Map<Id<Link>,Integer> link2ybins;
 	private Double timeBinSize;
 	private Double simulationEndTime;
 	private int noOfxCells;
 	private int noOfyCells;
-	private Set<Id> recognisedPersons;
+	private Set<Id<Person>> recognisedPersons;
 
 	
 	public IntervalHandler(Double timeBinSize, Double simulationEndTime, int noOfxCells, int noOfyCells, 
-			Map<Id,Integer> link2xbins, Map<Id,Integer> link2ybins){
+			Map<Id<Link>,Integer> link2xbins, Map<Id<Link>,Integer> link2ybins){
 		this.timeBinSize=timeBinSize;
 		this.simulationEndTime = simulationEndTime;
 		this.noOfxCells = noOfxCells;
 		this.noOfyCells = noOfyCells;
 		this.link2xbins = link2xbins;
 		this.link2ybins = link2ybins;
-		recognisedPersons = new HashSet<Id>();
+		recognisedPersons = new HashSet<Id<Person>>();
 		this.reset(0);
 	}
 	
 	@Override
 	public void reset(int iteration) {
-		recognisedPersons = new HashSet<Id>();
+		recognisedPersons = new HashSet<Id<Person>>();
 		for(int i=0; i<simulationEndTime/timeBinSize+1; i++){
 			duration.put(i*timeBinSize, new Double[noOfxCells][noOfyCells]);
 			for(int j=0; j< noOfxCells; j++){
@@ -52,7 +54,7 @@ public class IntervalHandler implements ActivityStartEventHandler, ActivityEndEv
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
 			
-		Id linkId = event.getLinkId();
+		Id<Link> linkId = event.getLinkId();
 		if(link2xbins.get(linkId)!=null && link2ybins.get(linkId)!=null){
 		int xCell = link2xbins.get(linkId); 
 		int	yCell = link2ybins.get(linkId);
@@ -98,7 +100,7 @@ public class IntervalHandler implements ActivityStartEventHandler, ActivityEndEv
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
 		
-		Id linkId = event.getLinkId();
+		Id<Link> linkId = event.getLinkId();
 		
 		if(link2xbins.get(linkId)!=null && link2ybins.get(linkId)!=null){
 		if(!recognisedPersons.contains(event.getPersonId()))recognisedPersons.add(event.getPersonId());

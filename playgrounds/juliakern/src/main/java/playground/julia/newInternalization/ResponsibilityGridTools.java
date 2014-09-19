@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 
 import playground.julia.distribution.Cell;
 
@@ -20,17 +21,17 @@ public class ResponsibilityGridTools {
 	int noOfTimeBins;
 	Map<Double, Map<Id, Double>> timebin2link2factor;
  
-	private Map<Id, Integer> links2xCells;
-	private Map<Id, Integer> links2yCells;
+	private Map<Id<Link>, Integer> links2xCells;
+	private Map<Id<Link>, Integer> links2yCells;
 	private int noOfXCells;
 	private int noOfYCells;
 	
 	public ResponsibilityGridTools(Double timeBinSize, int noOfTimeBins,
-			Map<Id, Integer> links2xCells, Map<Id, Integer> links2yCells, int noOfXCells, int noOfYCells) {
+			Map<Id<Link>, Integer> links2xCells, Map<Id<Link>, Integer> links2yCells, int noOfXCells, int noOfYCells) {
 		this.init(timeBinSize, noOfTimeBins, links2xCells, links2yCells, noOfXCells, noOfYCells);		
 	}
 	
-	public Double getFactorForLink(Id linkId, double time) {
+	public Double getFactorForLink(Id<Link> linkId, double time) {
 		Double currentTimeBin = getTimeBin(time);
 		
 		if(timebin2link2factor!=null){
@@ -127,7 +128,7 @@ public class ResponsibilityGridTools {
 
 
 	public void init(Double timeBinSize, int noOfTimeBins,
-			Map<Id, Integer> links2xCells, Map<Id, Integer> links2yCells, int noOfXCells, int noOfYCells) {
+			Map<Id<Link>, Integer> links2xCells, Map<Id<Link>, Integer> links2yCells, int noOfXCells, int noOfYCells) {
 		this.timeBinSize = timeBinSize;
 		this.noOfTimeBins = noOfTimeBins;
 		this.timebin2link2factor = new HashMap<Double, Map<Id,Double>>();

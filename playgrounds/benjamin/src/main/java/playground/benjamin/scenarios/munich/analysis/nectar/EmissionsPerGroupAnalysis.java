@@ -24,6 +24,7 @@ import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroupUtils;
@@ -49,7 +50,7 @@ public class EmissionsPerGroupAnalysis {
 		ema.postProcessData();
 		
 		UserGroupUtils ugu = new UserGroupUtils();
-		Map<Id, SortedMap<String, Double>> person2totalEmissions = ema.getPerson2totalEmissions();
+		Map<Id<Person>, SortedMap<String, Double>> person2totalEmissions = ema.getPerson2totalEmissions();
 		SortedMap<UserGroup, SortedMap<String, Double>> group2FinalTotalEmissions = ugu.getEmissionsPerGroup(person2totalEmissions);
 
 		for(UserGroup userGroup : group2FinalTotalEmissions.keySet()){

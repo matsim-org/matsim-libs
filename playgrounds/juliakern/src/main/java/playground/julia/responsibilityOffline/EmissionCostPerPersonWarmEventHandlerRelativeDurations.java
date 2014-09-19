@@ -23,11 +23,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
 import org.matsim.contrib.emissions.types.WarmPollutant;
+import org.matsim.vehicles.Vehicle;
 
 
 /**
@@ -35,9 +36,8 @@ import org.matsim.contrib.emissions.types.WarmPollutant;
  *
  */
 public class EmissionCostPerPersonWarmEventHandlerRelativeDurations implements WarmEmissionEventHandler {
-	private static final Logger logger = Logger.getLogger(EmissionCostPerPersonWarmEventHandlerRelativeDurations.class);
 
-	Map<Id, Map<WarmPollutant, Double>> warmEmissionCostTotal = new HashMap<Id, Map<WarmPollutant, Double>>();
+	Map<Id<Vehicle>, Map<WarmPollutant, Double>> warmEmissionCostTotal = new HashMap<>();
 
 	private HashMap<Double, Double[][]> relativeDurationFactor;
 
@@ -49,20 +49,21 @@ public class EmissionCostPerPersonWarmEventHandlerRelativeDurations implements W
 	private final double EURO_PER_GRAMM_PM2_5_EXHAUST = 384500. / (1000. * 1000.);
 	private final double EURO_PER_GRAMM_CO2 = 70. / (1000. * 1000.);
 
-	private Map<Id, Integer> links2xbins;
+	private Map<Id<Link>, Integer> links2xbins;
 
-	private Map<Id, Integer> links2ybins;
+	private Map<Id<Link>, Integer> links2ybins;
 
 	private boolean considerCO2 =true;
 
-	public EmissionCostPerPersonWarmEventHandlerRelativeDurations(HashMap<Double, Double[][]> relativeDurationFactor, Map<Id, Integer> links2xbins, Map<Id, Integer> links2ybins) {
+	public EmissionCostPerPersonWarmEventHandlerRelativeDurations(HashMap<Double, Double[][]> relativeDurationFactor, Map<Id<Link>, Integer> links2xbins, Map<Id<Link>, Integer> links2ybins) {
 		this.relativeDurationFactor = relativeDurationFactor;
 		this.links2xbins=links2xbins;
 		this.links2ybins=links2ybins;
 	}
 
+	@Override
 	public void handleEvent(WarmEmissionEvent event) {
-		Id vehicleId = event.getVehicleId();
+		Id<Vehicle> vehicleId = event.getVehicleId();
 		Map<WarmPollutant, Double> warmEmissionsOfEvent = event.getWarmEmissions();
 
 		if(warmEmissionCostTotal.get(vehicleId) != null){
@@ -74,7 +75,7 @@ public class EmissionCostPerPersonWarmEventHandlerRelativeDurations implements W
 				Double eventCosts = 0.0;
 				
 					Double timeBin = Math.ceil(event.getTime()/timeBinSize)*timeBinSize;
-					Id linkId = event.getLinkId();
+					Id<Link> linkId = event.getLinkId();
 					try {
 						int xCell = links2xbins.get(linkId);
 						int yCell = links2ybins.get(linkId);
@@ -106,7 +107,7 @@ public class EmissionCostPerPersonWarmEventHandlerRelativeDurations implements W
 				Double eventCosts = 0.0;
 				
 					Double timeBin = Math.ceil(event.getTime()/timeBinSize)*timeBinSize;
-					Id linkId = event.getLinkId();
+					Id<Link> linkId = event.getLinkId();
 					try {
 						int xCell = links2xbins.get(linkId);
 						int yCell = links2ybins.get(linkId);
@@ -139,10 +140,11 @@ public class EmissionCostPerPersonWarmEventHandlerRelativeDurations implements W
 		}
 	}
 
-	public Map<Id, Map<WarmPollutant, Double>> getWarmEmissionCostsPerPerson() {
+	public Map<Id<Vehicle>, Map<WarmPollutant, Double>> getWarmEmissionCostsPerPerson() {
 		return warmEmissionCostTotal;
 	}
 
+	@Override
 	public void reset(int iteration) {
 		warmEmissionCostTotal.clear();
 	}

@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.events.ColdEmissionEvent;
 import org.matsim.contrib.emissions.events.ColdEmissionEventHandler;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
@@ -49,8 +51,8 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 	Double timeBinSize;
 	Map<Double, ArrayList<EmPerCell>> emissionPerCell;
 	Map<Double, ArrayList<EmPerLink>> emissionPerLink;
-	Map<Id,Integer> link2xbins; 
-	Map<Id,Integer> link2ybins;
+	Map<Id<Link>,Integer> link2xbins; 
+	Map<Id<Link>,Integer> link2ybins;
 	WarmPollutant warmPollutant2analyze;
 	ColdPollutant coldPollutant2analyze;
 	
@@ -59,7 +61,7 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 	private final static Double dist2factor = 0.029;
 	private final static Double dist3factor = 0.002;	
 	
-	public GeneratedEmissionsHandler(Double simulationStartTime, Double timeBinSize, Map<Id, Integer>link2xbins, Map<Id, Integer>link2ybins,
+	public GeneratedEmissionsHandler(Double simulationStartTime, Double timeBinSize, Map<Id<Link>, Integer>link2xbins, Map<Id<Link>, Integer>link2ybins,
 			WarmPollutant warmPollutant2analyze, ColdPollutant coldPollutant2analyze){
 		this.simulationStartTime = simulationStartTime;
 		this.timeBinSize= timeBinSize;
@@ -78,14 +80,14 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 	@Override
 	public void handleEvent(ColdEmissionEvent event) {
 		//event information
-		Id linkId = event.getLinkId();
+		Id<Link> linkId = event.getLinkId();
 		Integer xBin = link2xbins.get(linkId);
 		Integer yBin = link2ybins.get(linkId);
 		Double eventStartTime = event.getTime();
 		
 		if (xBin != null && yBin != null) {
 			// TODO person id statt vehicleid??? woher?
-			Id personId = event.getVehicleId();
+			Id<Person> personId = Id.create(event.getVehicleId(), Person.class);
 			Double value = event.getColdEmissions().get(coldPollutant2analyze);
 
 			// distribute onto cells

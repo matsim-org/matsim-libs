@@ -43,16 +43,16 @@ public class GridTools {
 	}
 
 	// TODO maybe store x and y values only if in area of interest now x might be null but y not
-	public Map<Id, Integer> mapLinks2Xcells(Integer noOfXCells) {
-		Map<Id, Integer> link2xbin = new HashMap<Id, Integer>();
+	public Map<Id<Link>, Integer> mapLinks2Xcells(Integer noOfXCells) {
+		Map<Id<Link>, Integer> link2xbin = new HashMap<>();
 		for(Id<Link> linkId: this.links.keySet()){
 			link2xbin.put(linkId, mapXCoordToBin(this.links.get(linkId).getCoord().getX(), noOfXCells));
 		}
 		return link2xbin;
 	}
 
-	public Map<Id, Integer> mapLinks2Ycells(Integer noOfYCells) {
-		Map<Id, Integer> link2ybin = new HashMap<Id, Integer>();
+	public Map<Id<Link>, Integer> mapLinks2Ycells(Integer noOfYCells) {
+		Map<Id<Link>, Integer> link2ybin = new HashMap<Id<Link>, Integer>();
 		for(Id<Link> linkId: this.links.keySet()){
 			link2ybin.put(linkId, mapYCoordToBin(this.links.get(linkId).getCoord().getY(), noOfYCells));
 		}

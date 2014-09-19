@@ -59,7 +59,7 @@ public class DemandFromEmissionEvents {
 
 		this.simulationEndTime = LoadMyScenarios.getSimulationEndTime(this.configFile);
 
-		Map<Double, Map<Id, Double>> demandBAU = filterLinks(processEmissionsAndReturnDemand(runNumber[0])); 
+		Map<Double, Map<Id<Link>, Double>> demandBAU = filterLinks(processEmissionsAndReturnDemand(runNumber[0])); 
 		//		Map<Double, Map<Id, Double>> demandPolicy = filterLinks(processEmissionsAndReturnDemand(runNumber[1]));
 
 		writeAbsoluteDemand(this.runDir+this.runNumber[0]+"/analysis/emissionVsCongestion/hourlyNetworkDemand.txt", demandBAU);
@@ -70,7 +70,7 @@ public class DemandFromEmissionEvents {
 		this.logger.info("Writing file(s) is finished.");
 	}
 
-	private void writeAbsoluteDemand(String outputFolder,Map<Double, Map<Id, Double>> linkCountMap ){
+	private void writeAbsoluteDemand(String outputFolder,Map<Double, Map<Id<Link>, Double>> linkCountMap ){
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder);
 		try {
 			writer.write("time \t linkCounts  \n");
@@ -78,7 +78,7 @@ public class DemandFromEmissionEvents {
 			for(double time :linkCountMap.keySet()){
 				double hrDemand =0;
 				writer.write(time+"\t");
-				for(Id id:linkCountMap.get(time).keySet()){
+				for(Id<Link> id:linkCountMap.get(time).keySet()){
 					hrDemand += linkCountMap.get(time).get(id);
 				}
 				writer.write(hrDemand+"\n");
@@ -89,7 +89,7 @@ public class DemandFromEmissionEvents {
 		}
 	}
 
-	private void writeChangeInDemand(String outputFolder,Map<Double, Map<Id, Double>> linkCountMapBAU, Map<Double, Map<Id, Double>> linkCountMapPolicy ){
+	private void writeChangeInDemand(String outputFolder,Map<Double, Map<Id<Link>, Double>> linkCountMapBAU, Map<Double, Map<Id<Link>, Double>> linkCountMapPolicy ){
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder);
 		try {
 			writer.write("time \t %ChangeInlinkCounts  \n");
@@ -98,7 +98,7 @@ public class DemandFromEmissionEvents {
 				double hrDemandBAU =0;
 				double hrDemandPolicy=0;
 				writer.write(time+"\t");
-				for(Id id:linkCountMapBAU.get(time).keySet()){
+				for(Id<Link> id:linkCountMapBAU.get(time).keySet()){
 					hrDemandBAU += linkCountMapBAU.get(time).get(id);
 					double tempPolicyDemand =0;
 					if(linkCountMapPolicy.get(time).get(id)!=null){
@@ -115,15 +115,15 @@ public class DemandFromEmissionEvents {
 		}
 	}
 
-	private Map<Double, Map<Id,  Double>> filterLinks (Map<Double, Map<Id, Double>> time2LinksData) {
-		Map<Double, Map<Id, Double>> time2LinksDataFiltered = new HashMap<Double, Map<Id, Double>>();
+	private Map<Double, Map<Id<Link>,  Double>> filterLinks (Map<Double, Map<Id<Link>, Double>> time2LinksData) {
+		Map<Double, Map<Id<Link>, Double>> time2LinksDataFiltered = new HashMap<Double, Map<Id<Link>, Double>>();
 
 		for(Double endOfTimeInterval : time2LinksData.keySet()){
-			Map<Id,  Double> linksData = time2LinksData.get(endOfTimeInterval);
-			Map<Id, Double> linksDataFiltered = new HashMap<Id,  Double>();
+			Map<Id<Link>,  Double> linksData = time2LinksData.get(endOfTimeInterval);
+			Map<Id<Link>, Double> linksDataFiltered = new HashMap<Id<Link>, Double>();
 
 			for(Link link : this.network.getLinks().values()){
-				Id linkId = link.getId();
+				Id<Link> linkId = link.getId();
 
 				if(linksData.get(linkId) == null){
 					linksDataFiltered.put(linkId, 0.);
@@ -135,7 +135,7 @@ public class DemandFromEmissionEvents {
 		}
 		return time2LinksDataFiltered;
 	}
-	private Map<Double, Map<Id, Double>> processEmissionsAndReturnDemand(String runNumber){
+	private Map<Double, Map<Id<Link>, Double>> processEmissionsAndReturnDemand(String runNumber){
 		String emissionFileBAU = this.runDir+runNumber+"/ITERS/it.1500/1500.emission.events.xml.gz";
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();

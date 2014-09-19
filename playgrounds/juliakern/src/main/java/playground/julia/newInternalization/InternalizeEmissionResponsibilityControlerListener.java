@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
@@ -71,8 +72,8 @@ public class InternalizeEmissionResponsibilityControlerListener implements Start
 	
 	private int noOfTimeBins; // = 30;
 	
-	private Map<Id, Integer> links2xCells;
-	private Map<Id, Integer> links2yCells;
+	private Map<Id<Link>, Integer> links2xCells;
+	private Map<Id<Link>, Integer> links2yCells;
 	
 	private IntervalHandler intervalHandler;
 
@@ -81,7 +82,7 @@ public class InternalizeEmissionResponsibilityControlerListener implements Start
 	
 
 
-	public InternalizeEmissionResponsibilityControlerListener(EmissionModule emissionModule, EmissionResponsibilityCostModule emissionCostModule, ResponsibilityGridTools rgt, Map<Id, Integer> links2xCells, Map<Id, Integer> links2yCells) {
+	public InternalizeEmissionResponsibilityControlerListener(EmissionModule emissionModule, EmissionResponsibilityCostModule emissionCostModule, ResponsibilityGridTools rgt, Map<Id<Link>, Integer> links2xCells, Map<Id<Link>, Integer> links2yCells) {
 		this.noOfTimeBins = rgt.getNoOfTimeBins();
 		this.timeBinSize = rgt.getTimeBinSize();
 		this.noOfXCells = rgt.getNoOfXCells();

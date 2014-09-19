@@ -27,7 +27,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -38,6 +40,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.vehicles.Vehicle;
 
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroupUtils;
@@ -47,7 +50,6 @@ import playground.benjamin.scenarios.munich.analysis.kuhmo.TravelTimePerModeEven
 import playground.benjamin.scenarios.zurich.analysis.MoneyEventHandler;
 import playground.julia.distribution.GridTools;
 import playground.julia.newInternalization.IntervalHandler;
-
 import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
 
 /**
@@ -248,7 +250,7 @@ public class MultiAnalyzer {
 		ema.preProcessData();
 		ema.postProcessData();
 		
-		Map<Id, SortedMap<String, Double>> person2totalEmissions = ema.getPerson2totalEmissions();
+		Map<Id<Person>, SortedMap<String, Double>> person2totalEmissions = ema.getPerson2totalEmissions();
 		SortedMap<UserGroup, SortedMap<String, Double>> group2totalEmissions = userGroupUtils.getEmissionsPerGroup(person2totalEmissions);
 
 		writer.setRunName(runName);
@@ -269,8 +271,8 @@ public class MultiAnalyzer {
 		
 		// map links to cells
 		GridTools gt = new GridTools(network.getLinks(), xMin, xMax, yMin, yMax);
-		Map<Id, Integer> link2xbins = gt.mapLinks2Xcells(noOfXbins);
-		Map<Id, Integer> link2ybins = gt.mapLinks2Ycells(noOfYbins);
+		Map<Id<Link>, Integer> link2xbins = gt.mapLinks2Xcells(noOfXbins);
+		Map<Id<Link>, Integer> link2ybins = gt.mapLinks2Ycells(noOfYbins);
 		
 		// calc durations
 		IntervalHandler intervalHandler = new IntervalHandler(timeBinSize, simulationEndTime, noOfXbins, noOfYbins, link2xbins, link2ybins); 
@@ -287,7 +289,7 @@ public class MultiAnalyzer {
 		ema.preProcessData();
 		ema.postProcessData();
 		
-		Map<Id, SortedMap<String, Double>> person2totalEmissionCosts = ema.getPerson2totalEmissionCosts();
+		Map<Id<Vehicle>, SortedMap<String, Double>> person2totalEmissionCosts = ema.getPerson2totalEmissionCosts();
 		SortedMap<UserGroup, SortedMap<String, Double>> group2totalEmissionCosts = userGroupUtils.getEmissionsPerGroup(person2totalEmissionCosts);
 
 		writer.setRunName(runName);

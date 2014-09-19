@@ -89,11 +89,11 @@ public class TestEmissionPricing {
 
 	private static Double yMax = 12500.;
 
-	private static Map<Id, Integer> links2xCells;
+	private static Map<Id<Link>, Integer> links2xCells;
 
 	private static Integer noOfXCells = 32;
 
-	private static Map<Id, Integer> links2yCells;
+	private static Map<Id<Link>, Integer> links2yCells;
 
 	private static Integer noOfYCells = 20;
 

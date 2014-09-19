@@ -26,6 +26,7 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.events.ColdEmissionEvent;
 import org.matsim.contrib.emissions.events.ColdEmissionEventImpl;
 import org.matsim.contrib.emissions.types.ColdPollutant;
@@ -90,7 +91,7 @@ public class TestColdEmissionHandler {
 				ColdEmissionEvent event5 = new ColdEmissionEventImpl(time2, link1, vehicle1, coldEm5);
 				handler.handleEvent(event5);
 				
-		Map<Id, Map<ColdPollutant, Double>> cepp = handler.getColdEmissionsPerPerson(); 
+		Map<Id<Person>, Map<ColdPollutant, Double>> cepp = handler.getColdEmissionsPerPerson(); 
 		Double actualCO1 =0.0, actualNOX1 =0.0, actualPM1=0.0, actualCO2=.0, actualNOX2=.0, actualPM2 =0.0;
 		
 		if(cepp.get(new IdImpl("v1")).containsKey(ColdPollutant.CO))actualCO1 = cepp.get(new IdImpl("v1")).get(ColdPollutant.CO);  

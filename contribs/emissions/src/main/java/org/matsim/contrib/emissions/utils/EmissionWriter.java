@@ -49,7 +49,7 @@ public class EmissionWriter {
 	
 	public void writeHomeLocation2TotalEmissions(
 			Population population,
-			Map<Id, SortedMap<String, Double>> totalEmissions,
+			Map<Id<Person>, SortedMap<String, Double>> totalEmissions,
 			String outFile) {
 		try{
 			FileWriter fstream = new FileWriter(outFile);			
@@ -61,7 +61,7 @@ public class EmissionWriter {
 			out.append("\n");
 
 			for(Person person: population.getPersons().values()){
-				Id personId = person.getId();
+				Id<Person> personId = person.getId();
 				Plan plan = person.getSelectedPlan();
 				Activity homeAct = (Activity) plan.getPlanElements().get(0);
 				Coord homeCoord = homeAct.getCoord();
@@ -89,7 +89,7 @@ public class EmissionWriter {
 	}
 
 	void writeLinkLocation2Emissions(
-			Map<Id, Map<String, Double>> emissions,
+			Map<Id<Link>, Map<String, Double>> emissions,
 			Network network,
 			String outFile){
 		try{
@@ -101,7 +101,7 @@ public class EmissionWriter {
 			}
 			out.append("\n");
 
-			for(Id linkId : emissions.keySet()){
+			for(Id<Link> linkId : emissions.keySet()){
 				Link link = network.getLinks().get(linkId);
 				Coord linkCoord = link.getCoord();
 				Double xLink = linkCoord.getX();

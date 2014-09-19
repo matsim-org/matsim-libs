@@ -74,8 +74,8 @@ public class EmissionsAndCongestionsPerTimeBin {
 
 		this.emissionUtils = new EmissionUtils();
 
-		SortedMap<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotal = eLinkAnalyzer.getLink2TotalEmissions();
-		SortedMap<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotalFilled = setNonCalculatedEmissions(time2EmissionsTotal);
+		SortedMap<Double, Map<Id<Link>, SortedMap<String, Double>>> time2EmissionsTotal = eLinkAnalyzer.getLink2TotalEmissions();
+		SortedMap<Double, Map<Id<Link>, SortedMap<String, Double>>> time2EmissionsTotalFilled = setNonCalculatedEmissions(time2EmissionsTotal);
 
 		CongestionLinkAnalyzer cLinkAnalyzer = new CongestionLinkAnalyzer(this.simulationEndTime, eventsFile, noOfTimeBins);
 		cLinkAnalyzer.init(this.scenario);
@@ -155,8 +155,8 @@ public class EmissionsAndCongestionsPerTimeBin {
 		this.logger.info("Finished Writing files.");
 	}
 
-	private SortedMap<Double, Map<Id, SortedMap<String, Double>>> setNonCalculatedEmissions(Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotal) {
-		SortedMap<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotalFilled = new TreeMap<Double, Map<Id, SortedMap<String, Double>>>();
+	private SortedMap<Double, Map<Id<Link>, SortedMap<String, Double>>> setNonCalculatedEmissions(Map<Double, Map<Id<Link>, SortedMap<String, Double>>> time2EmissionsTotal) {
+		SortedMap<Double, Map<Id<Link>, SortedMap<String, Double>>> time2EmissionsTotalFilled = new TreeMap<>();
 
 		double timeBinSize = this.simulationEndTime/this.noOfTimeBins;
 
@@ -171,10 +171,10 @@ public class EmissionsAndCongestionsPerTimeBin {
 
 		for(double endOfTimeInterval : this.allTimeBins){
 			if(!time2EmissionsTotal.containsKey(endOfTimeInterval)){
-				time2EmissionsTotal.put(endOfTimeInterval, new HashMap<Id, SortedMap<String, Double>>());
+				time2EmissionsTotal.put(endOfTimeInterval, new HashMap<Id<Link>, SortedMap<String, Double>>());
 			}
 
-			Map<Id, SortedMap<String, Double>> emissionsTotalFilled = this.emissionUtils.setNonCalculatedEmissionsForNetwork(this.network, time2EmissionsTotal.get(endOfTimeInterval));
+			Map<Id<Link>, SortedMap<String, Double>> emissionsTotalFilled = this.emissionUtils.setNonCalculatedEmissionsForNetwork(this.network, time2EmissionsTotal.get(endOfTimeInterval));
 			time2EmissionsTotalFilled.put(endOfTimeInterval, emissionsTotalFilled);
 		}
 		return time2EmissionsTotalFilled;

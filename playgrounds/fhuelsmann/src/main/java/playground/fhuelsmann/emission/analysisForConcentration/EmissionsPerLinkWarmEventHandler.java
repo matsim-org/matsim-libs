@@ -25,10 +25,12 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.contrib.emissions.utils.EmissionUtils;
+import org.matsim.vehicles.Vehicle;
 
 
 /**
@@ -38,10 +40,10 @@ import org.matsim.contrib.emissions.utils.EmissionUtils;
 public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandler{
 	private static final Logger logger = Logger.getLogger(EmissionsPerLinkWarmEventHandler.class);
 
-	Map<Double, Map<Id, Map<WarmPollutant, Double>>> time2warmEmissionsTotal = new HashMap<Double, Map<Id, Map<WarmPollutant, Double>>>();
-	Map<Double, Map<Id, Map<WarmPollutant, Double>>> time2warmHdvEmissionsTotal = new HashMap<Double, Map<Id, Map<WarmPollutant, Double>>>();
-	Map<Double, Map<Id, Double>> time2linkIdLeaveCount = new HashMap<Double, Map<Id,Double>>();
-	Map<Double, Map<Id, Double>> time2linkIdLeaveHdvCount = new HashMap<Double, Map<Id,Double>>();
+	Map<Double, Map<Id<Link>, Map<WarmPollutant, Double>>> time2warmEmissionsTotal = new HashMap<>();
+	Map<Double, Map<Id<Link>, Map<WarmPollutant, Double>>> time2warmHdvEmissionsTotal = new HashMap<>();
+	Map<Double, Map<Id<Link>, Double>> time2linkIdLeaveCount = new HashMap<>();
+	Map<Double, Map<Id<Link>, Double>> time2linkIdLeaveHdvCount = new HashMap<>();
 	
 	final int noOfTimeBins;
 	final double timeBinSize;
@@ -68,8 +70,8 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 	@Override
 	public void handleEvent(WarmEmissionEvent event) {
 		Double time = event.getTime();
-		Id linkId = event.getLinkId();
-		Id vehicleId = event.getVehicleId();
+		Id<Link> linkId = event.getLinkId();
+		Id<Vehicle> vehicleId = event.getVehicleId();
 
 		Map<WarmPollutant, Double> warmEmissionsOfEvent = event.getWarmEmissions();
 		double endOfTimeInterval = 0.0;
@@ -77,8 +79,8 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 		for(int i = 0; i < this.noOfTimeBins; i++){
 			if(time > i * this.timeBinSize && time <= (i + 1) * this.timeBinSize){
 				endOfTimeInterval = (i + 1) * this.timeBinSize;
-				Map<Id, Map<WarmPollutant, Double>> warmEmissionsTotal = new HashMap<Id, Map<WarmPollutant, Double>>();;
-				Map<Id, Double> countTotal = new HashMap<Id, Double>();
+				Map<Id<Link>, Map<WarmPollutant, Double>> warmEmissionsTotal = new HashMap<>();
+				Map<Id<Link>, Double> countTotal = new HashMap<>();
 				
 				if(this.time2warmEmissionsTotal.get(endOfTimeInterval) != null){
 					warmEmissionsTotal = this.time2warmEmissionsTotal.get(endOfTimeInterval);
@@ -115,8 +117,8 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 			for(int i = 0; i < this.noOfTimeBins; i++){
 				if(time > i * this.timeBinSize && time <= (i + 1) * this.timeBinSize){
 					endOfTimeInterval = (i + 1) * this.timeBinSize;
-					Map<Id, Map<WarmPollutant, Double>> warmEmissionsTotal = new HashMap<Id, Map<WarmPollutant, Double>>();;
-					Map<Id, Double> countTotal = new HashMap<Id, Double>();
+					Map<Id<Link>, Map<WarmPollutant, Double>> warmEmissionsTotal = new HashMap<>();
+					Map<Id<Link>, Double> countTotal = new HashMap<>();
 					
 					if(this.time2warmHdvEmissionsTotal.get(endOfTimeInterval) != null){
 						warmEmissionsTotal = this.time2warmHdvEmissionsTotal.get(endOfTimeInterval);
@@ -153,15 +155,15 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 		}
 	}
 
-	public Map<Double, Map<Id, Double>> getTime2linkIdLeaveCount() {
+	public Map<Double, Map<Id<Link>, Double>> getTime2linkIdLeaveCount() {
 		return this.time2linkIdLeaveCount;
 	}
 	
-	public Map<Double, Map<Id, Double>> getTime2linkIdLeaveHDVCount() {
+	public Map<Double, Map<Id<Link>, Double>> getTime2linkIdLeaveHDVCount() {
 		return this.time2linkIdLeaveHdvCount;
 	}
 
-	public Map<Double, Map<Id, Map<WarmPollutant, Double>>> getWarmEmissionsPerLinkAndTimeInterval() {
+	public Map<Double, Map<Id<Link>, Map<WarmPollutant, Double>>> getWarmEmissionsPerLinkAndTimeInterval() {
 		return time2warmEmissionsTotal;
 	}
 }

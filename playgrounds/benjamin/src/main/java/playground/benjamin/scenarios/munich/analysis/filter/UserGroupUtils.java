@@ -27,6 +27,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 
@@ -46,12 +47,12 @@ public class UserGroupUtils {
 		this.personFilter = new PersonFilter();
 	}
 	
-	public SortedMap<UserGroup, SortedMap<String, Double>> getEmissionsPerGroup(Map<Id, SortedMap<String, Double>> person2TotalEmissions) {
+	public <T> SortedMap<UserGroup, SortedMap<String, Double>> getEmissionsPerGroup(Map<Id<T>, SortedMap<String, Double>> person2TotalEmissions) {
 		SortedMap<UserGroup, SortedMap<String, Double>> userGroup2Emissions = new TreeMap<UserGroup, SortedMap<String, Double>>();
 		
 		for(UserGroup userGroup : UserGroup.values()){
 			SortedMap<String, Double> totalEmissions = new TreeMap<String,Double>();
-			for(Id personId : person2TotalEmissions.keySet()){
+			for(Id<T> personId : person2TotalEmissions.keySet()){
 				SortedMap<String, Double> individualEmissions = person2TotalEmissions.get(personId);
 				if(personFilter.isPersonIdFromUserGroup(personId, userGroup)){
 					double sumOfPollutant;
@@ -76,7 +77,7 @@ public class UserGroupUtils {
 		for(UserGroup userGroup : UserGroup.values()){
 			double groupSize = 0.0;
 			
-			for(Id personId : pop.getPersons().keySet()){
+			for(Id<Person> personId : pop.getPersons().keySet()){
 				if(personFilter.isPersonIdFromUserGroup(personId, userGroup)){
 					groupSize++;
 				}

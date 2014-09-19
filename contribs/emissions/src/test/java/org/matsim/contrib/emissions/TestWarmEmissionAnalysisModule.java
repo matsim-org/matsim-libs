@@ -24,10 +24,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import junit.framework.Assert;
-import org.junit.Test;
 
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.emissions.WarmEmissionAnalysisModule;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.WarmEmissionAnalysisModule.WarmEmissionAnalysisModuleParameter;
 import org.matsim.contrib.emissions.types.HbefaTrafficSituation;
 import org.matsim.contrib.emissions.types.HbefaVehicleAttributes;
@@ -36,8 +37,8 @@ import org.matsim.contrib.emissions.types.HbefaWarmEmissionFactor;
 import org.matsim.contrib.emissions.types.HbefaWarmEmissionFactorKey;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.Vehicle;
 
 
 /**
@@ -175,8 +176,8 @@ public class TestWarmEmissionAnalysisModule {
 		setUp();
 		
 		// case 1 - data in both tables -> use detailed
-		Id personId = new IdImpl("person 1");
-		Id vehicleId = new IdImpl("veh 1");		
+		Id<Person> personId = Id.create("person 1", Person.class);
+		Id<Vehicle> vehicleId = Id.create("veh 1", Vehicle.class);		
 		Double linkLength = 200.; 
 		String vehicleInformation = passengercar+ ";"+petrolTechnology+";"+petrolSizeClass+";"+petrolConcept;
 		
@@ -195,8 +196,8 @@ public class TestWarmEmissionAnalysisModule {
 		setUp();
 		
 		// case 2 - free flow entry in both tables, stop go entry in average table -> use average
-		Id pcPersonId = new IdImpl("person 2"); 
-		Id pcVehicleId = new IdImpl("veh 2");
+		Id<Person> pcPersonId = Id.create("person 2", Person.class);
+		Id<Vehicle> pcVehicleId = Id.create("veh 2", Vehicle.class);
 		Double pclinkLength= 100.;
 		String pcVehicleInformation = passengercar + ";"+ pcTechnology + ";"+pcSizeClass+";"+pcConcept;
 		
@@ -222,8 +223,8 @@ public class TestWarmEmissionAnalysisModule {
 		setUp();
 
 		// case 3 - stop go entry in both tables, free flow entry in average table -> use average
-		Id dieselPersonId = new IdImpl("person 3");
-		Id dieselVehicleId = new IdImpl("veh 3");
+		Id<Person> dieselPersonId = Id.create("person 3", Person.class);
+		Id<Vehicle> dieselVehicleId = Id.create("veh 3", Vehicle.class);
 		Double dieselLinkLength= 20.;
 		String dieselVehicleInformation = passengercar +";"+ dieselTechnology+ ";"+ dieselSizeClass+";"+dieselConcept;
 		
@@ -251,8 +252,8 @@ public class TestWarmEmissionAnalysisModule {
 		setUp();
 
 		// case 4 - data in average table
-		Id lpgPersonId = new IdImpl("person4");
-		Id lpgVehicleId = new IdImpl("veh 4");
+		Id<Person> lpgPersonId = Id.create("person4", Person.class);
+		Id<Vehicle> lpgVehicleId = Id.create("veh 4", Vehicle.class);
 		Double lpgLinkLength = 700.;
 		String lpgVehicleInformation = passengercar + ";"+ lpgTechnology+";"+lpgSizeClass+";"+lpgConcept;		
 		
@@ -280,8 +281,8 @@ public class TestWarmEmissionAnalysisModule {
 		
 		// case 6 - data in detailed table, stop go speed zero
 		// use free flow factor to calculate emissions
-		Id zeroPersonId = new IdImpl("person zero");
-		Id zeroLinkId = new IdImpl("link zero");
+		Id<Person> zeroPersonId = Id.create("person zero", Person.class);
+		Id<Link> zeroLinkId = Id.create("link zero", Link.class);
 		Double zeroLinklength = 3000.;
 		String zeroVehicleInformation = passengercar + ";"+ zeroTechnology + ";" + zeroSizeClass + ";" + zeroConcept;
 		
@@ -300,7 +301,7 @@ public class TestWarmEmissionAnalysisModule {
 		//-- set up tables, event handler, parameters, module
 		setUp();
 		
-		Id sgffPersonId = new IdImpl("person sg equals ff");
+		Id<Person> sgffPersonId = Id.create("person sg equals ff", Person.class);
 		Double sgffLinklength = 4000.;
 		String sgffVehicleInformaition = passengercar + ";" + sgffTechnology + ";"+ sgffSizeClass + ";"+sgffConcept;
 		
@@ -328,8 +329,8 @@ public class TestWarmEmissionAnalysisModule {
 		setUp();
 		
 		// case 5 - no entry in any table - must be different to other test case's strings	
-		Id noePersonId = new IdImpl("person 5");
-		Id noeVehicleId = new IdImpl("veh 5");
+		Id<Person> noePersonId = Id.create("person 5", Person.class);
+		Id<Vehicle> noeVehicleId = Id.create("veh 5", Vehicle.class);
 		String noeVehicleInformation = passengercar + ";"+ noeTechnology + ";" + noeSizeClass + ";" + noeConcept;
 		
 		excep= false;
@@ -349,8 +350,8 @@ public class TestWarmEmissionAnalysisModule {
 		setUp();
 		
 		// no vehicle information given
-		Id noePersonId = new IdImpl("person 6");
-		Id noeVehicleId = new IdImpl("veh 6");
+		Id<Person> noePersonId = Id.create("person 6", Person.class);
+		Id<Vehicle> noeVehicleId = Id.create("veh 6", Vehicle.class);
 		String noeVehicleInformation = "";
 		
 		excep= false;
@@ -370,8 +371,8 @@ public class TestWarmEmissionAnalysisModule {
 		setUp();
 		
 		// empty vehicle information 
-		Id noePersonId = new IdImpl("person 7");
-		Id noeVehicleId = new IdImpl("veh 7");
+		Id<Person> noePersonId = Id.create("person 7", Person.class);
+		Id<Vehicle> noeVehicleId = Id.create("veh 7", Vehicle.class);
 		String noeVehicleInformation = ";;;";
 		
 		excep= false;
@@ -390,8 +391,8 @@ public class TestWarmEmissionAnalysisModule {
 		//-- set up tables, event handler, parameters, module
 		setUp();
 		//  vehicle information string is 'null'
-		Id noePersonId = new IdImpl("person 8");
-		Id noeVehicleId = new IdImpl("veh 8");
+		Id<Person> noePersonId = Id.create("person 8", Person.class);
+		Id<Vehicle> noeVehicleId = Id.create("veh 8", Vehicle.class);
 		String noeVehicleInformation = null;
 		
 		excep= false;
@@ -415,7 +416,7 @@ public class TestWarmEmissionAnalysisModule {
 		 * using the same case as above - case 1 and check the counters for all possible combinations of avg, stop go and free flow speed 
 		 */
 		 
-		Id personId = new IdImpl("person 1");
+		Id<Person> personId = Id.create("person 1", Person.class);
 		Integer roadType = 0;
 		Double linkLength = 2*1000.; //in meter
 		String vehicleInformation = passengercar+ ";"+petrolTechnology+";"+petrolSizeClass+";"+petrolConcept;
@@ -493,7 +494,7 @@ public class TestWarmEmissionAnalysisModule {
 		weam.reset();
 		
 		// ff und sg not part of the detailed table -> use average table
-		Id personId = new IdImpl("person4");
+		Id<Person> personId = Id.create("person4", Person.class);
 		Double lpgLinkLength = 2000.*1000;
 		String lpgVehicleInformation = passengercar + ";"+ lpgTechnology+";"+lpgSizeClass+";"+lpgConcept;
 		
@@ -528,7 +529,7 @@ public class TestWarmEmissionAnalysisModule {
 		weam.reset();
 		
 		// case 2 - free flow entry in both tables, stop go entry in average table -> use average
-		Id pcPersonId = new IdImpl("person 2"); 
+		Id<Person> pcPersonId = Id.create("person 2", Person.class); 
 		Double pclinkLength= 20.*1000;
 		String pcVehicleInformation = passengercar + ";"+ pcTechnology + ";"+pcSizeClass+";"+pcConcept;
 		
@@ -562,7 +563,7 @@ public class TestWarmEmissionAnalysisModule {
 	weam.reset();
 			
 	// case 3 - stop go entry in both tables, free flow entry in average table -> use average
-	Id dieselPersonId = new IdImpl("person 3");
+	Id<Person> dieselPersonId = Id.create("person 3", Person.class);
 	Double dieselLinkLength= 200.*1000;
 	String dieselVehicleInformation = passengercar +";"+ dieselTechnology+ ";"+ dieselSizeClass+";"+dieselConcept;
 	
@@ -596,7 +597,7 @@ public class TestWarmEmissionAnalysisModule {
 		
 		// case 1 - data in both tables -> use detailed
 		// free flow velocity inconsistent -> different value in table
-		Id inconffPersonId = new IdImpl("person 7");
+		Id<Person> inconffPersonId = Id.create("person 7", Person.class);
 		Double inconff = 30. * 1000;
 		Double inconffavgSpeed = petrolSpeedFf*2.2;
 		String inconffVehicleInformation = passengercar + ";"+petrolTechnology+";"+petrolSizeClass+";"+petrolConcept;
@@ -627,7 +628,7 @@ public class TestWarmEmissionAnalysisModule {
 		weam.reset();
 	
 		// case 10 - data in detailed table, stop go speed > free flow speed
-		Id tablePersonId = new IdImpl("person 8");
+		Id<Person> tablePersonId = Id.create("person 8", Person.class);
 		Double tableLinkLength= 30.*1000;
 		String tableVehicleInformation = passengercar + ";" + tableTechnology +";" + tableSizeClass+";"+tableConcept;
 		 
@@ -664,7 +665,7 @@ public class TestWarmEmissionAnalysisModule {
 		// test summing up of counters
 		
 		// case 1 - data in both tables -> use detailed
-		Id personId = new IdImpl("person 1");
+		Id<Person> personId = Id.create("person 1", Person.class);
 		Integer roadType = 0;
 		Double linkLength = 2*1000.; //in meter
 		String vehicleInformation = passengercar+ ";"+petrolTechnology+";"+petrolSizeClass+";"+petrolConcept;
@@ -718,8 +719,8 @@ public class TestWarmEmissionAnalysisModule {
 		// ---- end of setup
 		
 		// case 3 - stop go entry in both tables, free flow entry in average table -> use average
-		Id idForAvgTable = new IdImpl("link id avg");
-		Id personIdForAvgTable = new IdImpl("person avg");
+		Id<Link> idForAvgTable = Id.create("link id avg", Link.class);
+		Id<Person> personIdForAvgTable = Id.create("person avg", Person.class);
 		String dieselVehicleInformation = passengercar +";"+ dieselTechnology+ ";"+ dieselSizeClass+";"+dieselConcept;
 		
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(personIdForAvgTable, roadType, dieselFreeVelocity/3.6, 1000., 1000./dieselFreeVelocity*3.6, dieselVehicleInformation);

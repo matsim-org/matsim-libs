@@ -78,13 +78,13 @@ public class PerLinkEmissionData {
 		this.emissionUtils = new EmissionUtils();
 		EmissionUtilsExtended emissionUtilsExtended = new EmissionUtilsExtended();
 
-		Map<Double, Map<Id, Map<WarmPollutant, Double>>> time2warmEmissionsTotal = linkAnalyzer.getLink2WarmEmissions();
-		Map<Double, Map<Id, Map<ColdPollutant, Double>>> time2coldEmissionsTotal = linkAnalyzer.getLink2ColdEmissions();
-		Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotal = linkAnalyzer.getLink2TotalEmissions();
-		Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotalFilled = setNonCalculatedEmissions(time2EmissionsTotal);
+		Map<Double, Map<Id<Link>, Map<WarmPollutant, Double>>> time2warmEmissionsTotal = linkAnalyzer.getLink2WarmEmissions();
+		Map<Double, Map<Id<Link>, Map<ColdPollutant, Double>>> time2coldEmissionsTotal = linkAnalyzer.getLink2ColdEmissions();
+		Map<Double, Map<Id<Link>, SortedMap<String, Double>>> time2EmissionsTotal = linkAnalyzer.getLink2TotalEmissions();
+		Map<Double, Map<Id<Link>, SortedMap<String, Double>>> time2EmissionsTotalFilled = setNonCalculatedEmissions(time2EmissionsTotal);
 
-		Map<Double, Map<Id, SortedMap<String, Double>>> time2WarmEmissionsTotalFilled = emissionUtilsExtended.convertPerLinkWarmEmissions2String(network, time2warmEmissionsTotal);
-		Map<Double, Map<Id, SortedMap<String, Double>>> time2ColdEmissionsTotalFilled = emissionUtilsExtended.convertPerLinkColdEmissions2String(network, time2coldEmissionsTotal);
+		Map<Double, Map<Id<Link>, SortedMap<String, Double>>> time2WarmEmissionsTotalFilled = emissionUtilsExtended.convertPerLinkWarmEmissions2String(network, time2warmEmissionsTotal);
+		Map<Double, Map<Id<Link>, SortedMap<String, Double>>> time2ColdEmissionsTotalFilled = emissionUtilsExtended.convertPerLinkColdEmissions2String(network, time2coldEmissionsTotal);
 
 		writer1.write("time"+"\t"+"linkId"+"\t"+"CO"+"\t"+"CO2_Total"+"\t"+"FC"+"\t"+"HC"+"\t"+"NMHC"+"\t"+"NO2"+"\t"+"NOX"+"\t"+"PM"+"\t"+"SO2"+"\n");
 		writer2.write("time"+"\t"+"linkId"+"\t"+"CO"+"\t"+"CO2_Total"+"\t"+"FC"+"\t"+"HC"+"\t"+"NMHC"+"\t"+"NO2"+"\t"+"NOX"+"\t"+"PM"+"\t"+"SO2"+"\n");
@@ -119,17 +119,18 @@ public class PerLinkEmissionData {
 		this.logger.info("Finished Writing files.");
 	}
 
-	private Map<Double, Map<Id, SortedMap<String, Double>>> setNonCalculatedEmissions(Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotal) {
-		Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotalFilled = new HashMap<Double, Map<Id, SortedMap<String, Double>>>();
+	private Map<Double, Map<Id<Link>, SortedMap<String, Double>>> setNonCalculatedEmissions(Map<Double, Map<Id<Link>, SortedMap<String, Double>>> time2EmissionsTotal) {
+		Map<Double, Map<Id<Link>, SortedMap<String, Double>>> time2EmissionsTotalFilled = new HashMap<>();
 
 		for(double endOfTimeInterval : time2EmissionsTotal.keySet()){
-			Map<Id, SortedMap<String, Double>> emissionsTotalFilled = emissionUtils.setNonCalculatedEmissionsForNetwork(network, time2EmissionsTotal.get(endOfTimeInterval));
+			Map<Id<Link>, SortedMap<String, Double>> emissionsTotalFilled = emissionUtils.setNonCalculatedEmissionsForNetwork(network, time2EmissionsTotal.get(endOfTimeInterval));
 			time2EmissionsTotalFilled.put(endOfTimeInterval, emissionsTotalFilled);
 		}
 		return time2EmissionsTotalFilled;
 	}
+	
 	public void writeLinkLocation2Emissions(
-			Map<Id, SortedMap<String, Double>> map,
+			Map<Id<Link>, SortedMap<String, Double>> map,
 			Network network,
 			String outFile){
 		try{
@@ -141,7 +142,7 @@ public class PerLinkEmissionData {
 			}
 			out.append("\n");
 
-			for(Id linkId : map.keySet()){
+			for(Id<Link> linkId : map.keySet()){
 				Link link = network.getLinks().get(linkId);
 				Coord linkCoord = link.getCoord();
 				Double xLink = linkCoord.getX();

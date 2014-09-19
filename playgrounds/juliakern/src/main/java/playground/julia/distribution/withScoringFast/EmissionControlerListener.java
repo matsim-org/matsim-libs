@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.emissions.*;
+import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.events.EmissionEventsReader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
@@ -39,7 +39,6 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
 
@@ -48,7 +47,6 @@ import playground.julia.distribution.EmPerCell;
 import playground.julia.distribution.GridTools;
 import playground.julia.newInternalization.IntervalHandler;
 import playground.julia.responsibilityOffline.EmCarTrip;
-import playground.julia.spatialAveraging.SimpleWarmEmissionEventHandler;
 
 /**
  * @author benjamin
@@ -76,8 +74,8 @@ public class EmissionControlerListener implements StartupListener, IterationStar
 
 	Double timeBinSize;
 	Integer noOfTimeBins =30;
-	Map<Id, Integer> links2xcells;
-	Map<Id, Integer> links2ycells;
+	Map<Id<Link>, Integer> links2xcells;
+	Map<Id<Link>, Integer> links2ycells;
 
 	private int maximalDistance =3;
 

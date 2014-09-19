@@ -28,6 +28,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.contrib.emissions.utils.EmissionUtils;
@@ -69,7 +70,7 @@ public class EmissionsPerPersonPerUserGroup {
 	private SortedMap<UserGroup, SortedMap<String, Double>> userGroupToEmissions = new TreeMap<UserGroup, SortedMap<String,Double>>();
 	private SortedMap<UserGroup, Population> userGrpToPopulation = new TreeMap<UserGroup, Population>();
 	private Scenario scenario;
-	private Map<Id, SortedMap<String, Double>> emissionsPerPerson = new HashMap<Id, SortedMap<String,Double>>();
+	private Map<Id<Person>, SortedMap<String, Double>> emissionsPerPerson = new HashMap<>();
 	
 	public static void main(String[] args) {
 		EmissionsPerPersonPerUserGroup eppa = new EmissionsPerPersonPerUserGroup();
@@ -84,7 +85,7 @@ public class EmissionsPerPersonPerUserGroup {
 		ema.postProcessData();
 
 		EmissionUtils emu = new EmissionUtils();
-		Map<Id, SortedMap<String, Double>> totalEmissions = ema.getPerson2totalEmissions();
+		Map<Id<Person>, SortedMap<String, Double>> totalEmissions = ema.getPerson2totalEmissions();
 		emissionsPerPerson = emu.setNonCalculatedEmissionsForPopulation(scenario.getPopulation(), totalEmissions);
 
 		getPopulationPerUserGroup();
@@ -142,8 +143,8 @@ public class EmissionsPerPersonPerUserGroup {
 	}
 
 	private void getTotalEmissionsPerUserGroup(
-			Map<Id, SortedMap<String, Double>> emissionsPerPerson) {
-		for(Id personId: scenario.getPopulation().getPersons().keySet()){
+			Map<Id<Person>, SortedMap<String, Double>> emissionsPerPerson) {
+		for(Id<Person> personId: scenario.getPopulation().getPersons().keySet()){
 			UserGroup ug = getUserGroupFromPersonId(personId);
 			SortedMap<String, Double> emissionsNewValue = new TreeMap<String, Double>();
 			for(String str: emissionsPerPerson.get(personId).keySet()){
@@ -163,7 +164,7 @@ public class EmissionsPerPersonPerUserGroup {
 		return this.userGrpToPopulation;
 	}
 
-	private UserGroup getUserGroupFromPersonId(Id personId){
+	private UserGroup getUserGroupFromPersonId(Id<Person> personId){
 		UserGroup usrgrp = null;
 		for(UserGroup ug:this.userGrpToPopulation.keySet()){
 			if(this.userGrpToPopulation.get(ug).getPersons().get(personId)!=null) {

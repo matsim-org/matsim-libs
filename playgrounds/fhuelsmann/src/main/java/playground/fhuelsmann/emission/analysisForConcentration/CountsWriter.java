@@ -17,8 +17,8 @@ public class CountsWriter {
 	
 	private static final Logger logger = Logger.getLogger(CountsWriter.class);
 
-	public void writeHour2Link2Counts(
-			Map<Double, Map<Id, Double[]>>time2CountsTotalFiltered,
+	public <T> void writeHour2Link2Counts(
+			Map<Double, Map<Id<T>, Double[]>>time2CountsTotalFiltered,
 			Network network,
 			String outFile){
 		try{
@@ -27,8 +27,8 @@ public class CountsWriter {
 			out.append("endOfTimeInterval\t linkId\t freeSpeed\t allVehicles\t hdv\t length\t");
 			out.append("\n");
 			for (Double endOfTimeInterval : time2CountsTotalFiltered.keySet()){
-				Map<Id, Double[]> time2value = time2CountsTotalFiltered.get(endOfTimeInterval);
-				for(Id linkId : time2value.keySet()){
+				Map<Id<T>, Double[]> time2value = time2CountsTotalFiltered.get(endOfTimeInterval);
+				for(Id<T> linkId : time2value.keySet()){
 				out.append(endOfTimeInterval/3600 +"\t"+ linkId +"\t");
 
 				Double [] link2value = time2value.get(linkId);

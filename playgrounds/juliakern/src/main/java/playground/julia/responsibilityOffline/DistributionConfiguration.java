@@ -63,8 +63,8 @@ public interface DistributionConfiguration {
 
 	public abstract Double getTimeBinSize();
 
-	public abstract Map<Id, Integer> getLink2yBin();
+	public abstract Map<Id<Link>, Integer> getLink2yBin();
 
-	public abstract Map<Id, Integer> getLink2xBin();
+	public abstract Map<Id<Link>, Integer> getLink2xBin();
 
 }

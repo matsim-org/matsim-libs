@@ -25,12 +25,13 @@ import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.types.ColdPollutant;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -78,8 +79,8 @@ public class EmissionEventsReader extends MatsimXmlParser{
 		String eventType = attributes.getValue("type");
 
 		Double time = 0.0;
-		Id linkId = null;
-		Id vehicleId = null;
+		Id<Link> linkId = null;
+		Id<Vehicle> vehicleId = null;
 		Map<WarmPollutant, Double> warmEmissions = new HashMap<WarmPollutant, Double>();
 		Map<ColdPollutant, Double> coldEmissions = new HashMap<ColdPollutant, Double>();
 
@@ -92,10 +93,10 @@ public class EmissionEventsReader extends MatsimXmlParser{
 					eventType = attributes.getValue(i);
 				}
 				else if(attributes.getQName(i).equals(WarmEmissionEventImpl.ATTRIBUTE_LINK_ID)){
-					linkId = new IdImpl((attributes.getValue(i)));
+					linkId = Id.create((attributes.getValue(i)), Link.class);
 				}
 				else if(attributes.getQName(i).equals(WarmEmissionEventImpl.ATTRIBUTE_VEHICLE_ID)){
-					vehicleId = new IdImpl((attributes.getValue(i)));
+					vehicleId = Id.create((attributes.getValue(i)), Vehicle.class);
 				}
 				else {
 					WarmPollutant pollutant = WarmPollutant.valueOf(attributes.getQName(i));
@@ -119,10 +120,10 @@ public class EmissionEventsReader extends MatsimXmlParser{
 					eventType = attributes.getValue(i);
 				}
 				else if(attributes.getQName(i).equals(ColdEmissionEventImpl.ATTRIBUTE_LINK_ID)){
-					linkId = new IdImpl((attributes.getValue(i)));
+					linkId = Id.create((attributes.getValue(i)), Link.class);
 				}
 				else if(attributes.getQName(i).equals(ColdEmissionEventImpl.ATTRIBUTE_VEHICLE_ID)){
-					vehicleId = new IdImpl((attributes.getValue(i)));
+					vehicleId = Id.create((attributes.getValue(i)), Vehicle.class);
 				}
 				else {
 					ColdPollutant pollutant = ColdPollutant.valueOf(attributes.getQName(i));

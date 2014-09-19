@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.events.EmissionEventsReader;
 import org.matsim.contrib.emissions.types.ColdPollutant;
 import org.matsim.contrib.emissions.types.WarmPollutant;
@@ -46,8 +47,8 @@ import playground.julia.distribution.withScoring.IntervalHandler;
 public class SpatialAveragingDistribution {
 	private static final Logger logger = Logger.getLogger(SpatialAveragingDistribution.class);
 
-	Map<Id, Integer> link2xbin;
-	Map<Id, Integer> link2ybin;
+	Map<Id<Link>, Integer> link2xbin;
+	Map<Id<Link>, Integer> link2ybin;
 	
 	Map<Double, ArrayList<EmPerCell>> emissionPerBin ;
 	Map<Double, ArrayList<EmPerLink>> emissionPerLink;

@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.types.ColdPollutant;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 
@@ -56,7 +57,7 @@ public class EmissionResponsibilityCostModule {
 	private ResponsibilityGridTools responsibilityGridTools;
 
 	
-	public EmissionResponsibilityCostModule(double emissionCostFactor, boolean considerCO2Costs, ResponsibilityGridTools rgt, Map<Id, Integer> links2xCells, Map<Id, Integer> links2yCells) {
+	public EmissionResponsibilityCostModule(double emissionCostFactor, boolean considerCO2Costs, ResponsibilityGridTools rgt, Map<Id<Link>, Integer> links2xCells, Map<Id<Link>, Integer> links2yCells) {
 		this.emissionCostFactor = emissionCostFactor;
 		logger.info("Emission costs from Maibach et al. (2008) are multiplied by a factor of " + this.emissionCostFactor);
 		
@@ -73,7 +74,7 @@ public class EmissionResponsibilityCostModule {
 		
 	}
 	
-	public EmissionResponsibilityCostModule(double emissionCostFactor, ResponsibilityGridTools rgt, Map<Id, Integer> links2xCells, Map<Id, Integer> links2yCells) {
+	public EmissionResponsibilityCostModule(double emissionCostFactor, ResponsibilityGridTools rgt, Map<Id<Link>, Integer> links2xCells, Map<Id<Link>, Integer> links2yCells) {
 		this.emissionCostFactor = emissionCostFactor;
 		logger.info("Emission costs from Maibach et al. (2008) are multiplied by a factor of " + this.emissionCostFactor);
 		logger.info("CO2 emission costs will NOT be calculated... ");

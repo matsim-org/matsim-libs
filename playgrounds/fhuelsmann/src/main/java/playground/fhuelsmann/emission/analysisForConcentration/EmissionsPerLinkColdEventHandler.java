@@ -25,6 +25,7 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.events.ColdEmissionEvent;
 import org.matsim.contrib.emissions.events.ColdEmissionEventHandler;
 import org.matsim.contrib.emissions.types.ColdPollutant;
@@ -38,7 +39,7 @@ import org.matsim.contrib.emissions.utils.EmissionUtils;
 public class EmissionsPerLinkColdEventHandler implements ColdEmissionEventHandler{
 	private static final Logger logger = Logger.getLogger(EmissionsPerLinkColdEventHandler.class);
 
-	Map<Double, Map<Id, Map<ColdPollutant, Double>>> time2coldEmissionsTotal = new HashMap<Double, Map<Id, Map<ColdPollutant, Double>>>();
+	Map<Double, Map<Id<Link>, Map<ColdPollutant, Double>>> time2coldEmissionsTotal = new HashMap<>();
 
 	final int noOfTimeBins;
 	final double timeBinSize;
@@ -59,14 +60,14 @@ public class EmissionsPerLinkColdEventHandler implements ColdEmissionEventHandle
 	@Override
 	public void handleEvent(ColdEmissionEvent event) {
 		Double time = event.getTime();
-		Id linkId = event.getLinkId();
+		Id<Link> linkId = event.getLinkId();
 		Map<ColdPollutant, Double> coldEmissionsOfEvent = event.getColdEmissions();
 		double endOfTimeInterval = 0.0;
 
 		for(int i = 0; i < this.noOfTimeBins; i++){
 			if(time > i * this.timeBinSize && time <= (i + 1) * this.timeBinSize){
 				endOfTimeInterval = (i + 1) * this.timeBinSize;
-				Map<Id, Map<ColdPollutant, Double>> coldEmissionsTotal = new HashMap<Id, Map<ColdPollutant, Double>>();
+				Map<Id<Link>, Map<ColdPollutant, Double>> coldEmissionsTotal = new HashMap<>();
 
 				if(this.time2coldEmissionsTotal.get(endOfTimeInterval) != null){
 					coldEmissionsTotal = this.time2coldEmissionsTotal.get(endOfTimeInterval);
@@ -93,7 +94,7 @@ public class EmissionsPerLinkColdEventHandler implements ColdEmissionEventHandle
 		}
 	}
 
-	public Map<Double, Map<Id, Map<ColdPollutant, Double>>> getColdEmissionsPerLinkAndTimeInterval() {
+	public Map<Double, Map<Id<Link>, Map<ColdPollutant, Double>>> getColdEmissionsPerLinkAndTimeInterval() {
 		return time2coldEmissionsTotal;
 	}
 

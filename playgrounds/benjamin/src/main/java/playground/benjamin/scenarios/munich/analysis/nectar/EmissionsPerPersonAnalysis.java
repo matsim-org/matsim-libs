@@ -24,6 +24,7 @@ import java.util.SortedMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.utils.EmissionUtils;
 import org.matsim.contrib.emissions.utils.EmissionWriter;
 import org.matsim.core.config.Config;
@@ -67,8 +68,8 @@ public class EmissionsPerPersonAnalysis {
 		ema.postProcessData();
 		
 		EmissionUtils emu = new EmissionUtils();
-		Map<Id, SortedMap<String, Double>> totalEmissions = ema.getPerson2totalEmissions();
-		Map<Id, SortedMap<String, Double>> filledTotalEmissions = emu.setNonCalculatedEmissionsForPopulation(scenario.getPopulation(), totalEmissions);
+		Map<Id<Person>, SortedMap<String, Double>> totalEmissions = ema.getPerson2totalEmissions();
+		Map<Id<Person>, SortedMap<String, Double>> filledTotalEmissions = emu.setNonCalculatedEmissionsForPopulation(scenario.getPopulation(), totalEmissions);
 
 		EmissionWriter emissionWriter = new EmissionWriter();
 		//		emissionWriter.writeHomeLocation2TotalEmissions(

@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -208,7 +209,7 @@ public class MultiAnalyzer {
 		ema.preProcessData();
 		ema.postProcessData();
 		
-		Map<Id, SortedMap<String, Double>> person2totalEmissions = ema.getPerson2totalEmissions();
+		Map<Id<Person>, SortedMap<String, Double>> person2totalEmissions = ema.getPerson2totalEmissions();
 		SortedMap<UserGroup, SortedMap<String, Double>> group2totalEmissions = userGroupUtils.getEmissionsPerGroup(person2totalEmissions);
 
 		writer.setRunName(runName);

@@ -25,7 +25,8 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.emissions.*;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -39,7 +40,6 @@ import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.algorithms.EventWriterXML;
-
 
 import playground.julia.distribution.GridTools;
 import playground.julia.distribution.ResponsibilityEvent;
@@ -79,8 +79,8 @@ ShutdownListener, ScoringListener, AfterMobsimListener{
 
 	Double timeBinSize;
 	Integer noOfTimeBins =1;
-	Map<Id, Integer> links2xcells;
-	Map<Id, Integer> links2ycells;
+	Map<Id<Link>, Integer> links2xcells;
+	Map<Id<Link>, Integer> links2ycells;
 
 	public EmissionControlerListener(Controler controler) {
 		this.controler = controler;

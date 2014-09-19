@@ -22,7 +22,9 @@ package org.matsim.contrib.emissions.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.types.WarmPollutant;
+import org.matsim.vehicles.Vehicle;
 
 
 /**
@@ -37,9 +39,9 @@ public interface WarmEmissionEvent {
 	public final static String ATTRIBUTE_LINK_ID = "linkId";
 	public final static String ATTRIBUTE_VEHICLE_ID = "vehicleId";
 	
-	public Id getLinkId();
+	public Id<Link> getLinkId();
 	
-	public Id getVehicleId();
+	public Id<Vehicle> getVehicleId();
 
 	public Map<WarmPollutant, Double> getWarmEmissions();
 	

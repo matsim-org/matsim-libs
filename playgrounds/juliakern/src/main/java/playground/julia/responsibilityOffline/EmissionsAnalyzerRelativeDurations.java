@@ -36,6 +36,7 @@ import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.events.EmissionEventsReader;
 import org.matsim.contrib.emissions.types.ColdPollutant;
 import org.matsim.contrib.emissions.types.WarmPollutant;
@@ -44,6 +45,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.vehicles.Vehicle;
 
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
 
@@ -66,18 +68,18 @@ public class EmissionsAnalyzerRelativeDurations extends AbstractAnalyisModule{
 	private EmissionUtils emissionUtils;
 	private EmissionCostPerPersonWarmEventHandlerRelativeDurations warmHandler;
 	private EmissionCostPerPersonColdEventHandlerRelativeDurations coldHandler;
-	private Map<Id, Map<WarmPollutant, Double>> person2warmEmissions;
-	private Map<Id, Map<ColdPollutant, Double>> person2coldEmissions;
-	private Map<Id, SortedMap<String, Double>> person2totalEmissions;
+	private Map<Id<Vehicle>, Map<WarmPollutant, Double>> person2warmEmissions;
+	private Map<Id<Vehicle>, Map<ColdPollutant, Double>> person2coldEmissions;
+	private Map<Id<Vehicle>, SortedMap<String, Double>> person2totalEmissions;
 	private SortedMap<String, Double> totalEmissions;
 	private HashMap<Double, Double[][]> durations;
 	private int noOfXCells = 160;
 	private int noOfYCells = 120;
 	private HashMap<Double, Double[][]> relativeDurationFactor;
-	private Map<Id, Integer> links2xbins;
-	private Map<Id, Integer> links2ybins;
+	private Map<Id<Link>, Integer> links2xbins;
+	private Map<Id<Link>, Integer> links2ybins;
 	
-	public EmissionsAnalyzerRelativeDurations(String emissionsEventsFile, HashMap<Double, Double[][]> durations, Map<Id, Integer> link2xbins, Map<Id, Integer> link2ybins) {
+	public EmissionsAnalyzerRelativeDurations(String emissionsEventsFile, HashMap<Double, Double[][]> durations, Map<Id<Link>, Integer> link2xbins, Map<Id<Link>, Integer> link2ybins) {
 		super(EmissionsAnalyzerRelativeDurations.class.getSimpleName());
 		this.durations = durations;
 		this.emissionEventsFile = emissionsEventsFile;
@@ -163,15 +165,15 @@ public class EmissionsAnalyzerRelativeDurations extends AbstractAnalyisModule{
 		return totalEmissions;
 	}
 
-	public Map<Id, Map<WarmPollutant, Double>> getPerson2warmEmissionCosts() {
+	public Map<Id<Vehicle>, Map<WarmPollutant, Double>> getPerson2warmEmissionCosts() {
 		return person2warmEmissions;
 	}
 
-	public Map<Id, Map<ColdPollutant, Double>> getPerson2coldEmissionCosts() {
+	public Map<Id<Vehicle>, Map<ColdPollutant, Double>> getPerson2coldEmissionCosts() {
 		return person2coldEmissions;
 	}
 
-	public Map<Id, SortedMap<String, Double>> getPerson2totalEmissionCosts() {
+	public Map<Id<Vehicle>, SortedMap<String, Double>> getPerson2totalEmissionCosts() {
 		return person2totalEmissions;
 	}
 	

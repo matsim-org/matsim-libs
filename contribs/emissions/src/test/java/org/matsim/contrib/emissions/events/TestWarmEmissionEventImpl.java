@@ -34,18 +34,16 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.emissions.events.ColdEmissionEventImpl;
-import org.matsim.contrib.emissions.events.WarmEmissionEventImpl;
-import org.matsim.contrib.emissions.types.ColdPollutant;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.types.WarmPollutant;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.Vehicle;
 
 
 public class TestWarmEmissionEventImpl {
 	
-	Id vehicleId =new IdImpl("veh 1");
-	Id linkId = new IdImpl("link 1");
+	Id<Vehicle> vehicleId = Id.create("veh 1", Vehicle.class);
+	Id<Link> linkId = Id.create("link 1", Link.class);
 	Double co = 20., c2 = 8., fc = 30., hc=4., nm=5., n2=6., nx=7., pm=8., so=1.6;
 	
 	@Test

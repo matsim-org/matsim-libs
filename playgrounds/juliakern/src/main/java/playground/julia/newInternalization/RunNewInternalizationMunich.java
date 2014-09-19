@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -44,8 +45,8 @@ public class RunNewInternalizationMunich {
 	static String emissionEfficiencyFactor;
 	static String considerCO2Costs;
 	private static ResponsibilityGridTools rgt;
-	private static Map<Id, Integer> links2xCells;
-	private static Map<Id, Integer> links2yCells;
+	private static Map<Id<Link>, Integer> links2xCells;
+	private static Map<Id<Link>, Integer> links2yCells;
 	
 	private static Integer noOfXCells = 160;
 	private static Integer noOfYCells = 120;

@@ -26,6 +26,7 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.events.WarmEmissionEventImpl;
 import org.matsim.contrib.emissions.types.WarmPollutant;
@@ -88,7 +89,7 @@ public class TestWarmEmissionHandler {
 				WarmEmissionEvent event5 = new WarmEmissionEventImpl(55., link1, vehicle1, warmEm5);
 				handler.handleEvent(event5);
 				
-		Map<Id, Map<WarmPollutant, Double>> wepp = handler.getWarmEmissionsPerPerson();
+		Map<Id<Person>, Map<WarmPollutant, Double>> wepp = handler.getWarmEmissionsPerPerson();
 		//CO vehicle 1
 		if(wepp.get(new IdImpl("v1")).containsKey(WarmPollutant.CO)){
 			Double actualCO1 = wepp.get(new IdImpl("v1")).get(WarmPollutant.CO);

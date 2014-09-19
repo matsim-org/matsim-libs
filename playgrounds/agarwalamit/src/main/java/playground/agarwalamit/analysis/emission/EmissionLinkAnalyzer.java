@@ -27,6 +27,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.events.EmissionEventsReader;
 import org.matsim.contrib.emissions.types.ColdPollutant;
 import org.matsim.contrib.emissions.types.WarmPollutant;
@@ -34,7 +35,6 @@ import org.matsim.contrib.emissions.utils.EmissionUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkColdEventHandler;
 import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkWarmEventHandler;
@@ -50,9 +50,9 @@ public class EmissionLinkAnalyzer extends AbstractAnalyisModule {
 	private EmissionUtils emissionUtils;
 	private EmissionsPerLinkWarmEventHandler warmHandler;
 	private EmissionsPerLinkColdEventHandler coldHandler;
-	private Map<Double, Map<Id, Map<WarmPollutant, Double>>> link2WarmEmissions;
-	private Map<Double, Map<Id, Map<ColdPollutant, Double>>> link2ColdEmissions;
-	private SortedMap<Double, Map<Id, SortedMap<String, Double>>> link2TotalEmissions;
+	private Map<Double, Map<Id<Link>, Map<WarmPollutant, Double>>> link2WarmEmissions;
+	private Map<Double, Map<Id<Link>, Map<ColdPollutant, Double>>> link2ColdEmissions;
+	private SortedMap<Double, Map<Id<Link>, SortedMap<String, Double>>> link2TotalEmissions;
 	private final int noOfTimeBins;
 	private double simulationEndTime;
 
@@ -99,23 +99,23 @@ public class EmissionLinkAnalyzer extends AbstractAnalyisModule {
 
 	}
 
-	private SortedMap<Double, Map<Id, SortedMap<String, Double>>> sumUpEmissionsPerTimeInterval(
-			Map<Double, Map<Id, Map<WarmPollutant, Double>>> time2warmEmissionsTotal,
-			Map<Double, Map<Id, Map<ColdPollutant, Double>>> time2coldEmissionsTotal) {
+	private SortedMap<Double, Map<Id<Link>, SortedMap<String, Double>>> sumUpEmissionsPerTimeInterval(
+			Map<Double, Map<Id<Link>, Map<WarmPollutant, Double>>> time2warmEmissionsTotal,
+			Map<Double, Map<Id<Link>, Map<ColdPollutant, Double>>> time2coldEmissionsTotal) {
 
-		SortedMap<Double, Map<Id, SortedMap<String, Double>>> time2totalEmissions = new TreeMap<Double, Map<Id, SortedMap<String, Double>>>();
+		SortedMap<Double, Map<Id<Link>, SortedMap<String, Double>>> time2totalEmissions = new TreeMap<>();
 
 		for(double endOfTimeInterval: time2warmEmissionsTotal.keySet()){
-			Map<Id, Map<WarmPollutant, Double>> warmEmissions = time2warmEmissionsTotal.get(endOfTimeInterval);
+			Map<Id<Link>, Map<WarmPollutant, Double>> warmEmissions = time2warmEmissionsTotal.get(endOfTimeInterval);
 
-			Map<Id, SortedMap<String, Double>> totalEmissions = new HashMap<Id, SortedMap<String, Double>>();
+			Map<Id<Link>, SortedMap<String, Double>> totalEmissions = new HashMap<>();
 			if(time2coldEmissionsTotal.get(endOfTimeInterval) == null){
-				for(Id id : warmEmissions.keySet()){
+				for(Id<Link> id : warmEmissions.keySet()){
 					SortedMap<String, Double> warmEmissionsOfLink = this.emissionUtils.convertWarmPollutantMap2String(warmEmissions.get(id));
 					totalEmissions.put(id, warmEmissionsOfLink);
 				}
 			} else {
-				Map<Id, Map<ColdPollutant, Double>> coldEmissions = time2coldEmissionsTotal.get(endOfTimeInterval);
+				Map<Id<Link>, Map<ColdPollutant, Double>> coldEmissions = time2coldEmissionsTotal.get(endOfTimeInterval);
 				totalEmissions = this.emissionUtils.sumUpEmissionsPerId(warmEmissions, coldEmissions);
 			}
 			time2totalEmissions.put(endOfTimeInterval, totalEmissions);
@@ -123,15 +123,15 @@ public class EmissionLinkAnalyzer extends AbstractAnalyisModule {
 		return time2totalEmissions;
 	}
 
-	public SortedMap<Double, Map<Id, SortedMap<String, Double>>> getLink2TotalEmissions() {
+	public SortedMap<Double, Map<Id<Link>, SortedMap<String, Double>>> getLink2TotalEmissions() {
 		return this.link2TotalEmissions;
 	}
 
-	public Map<Double, Map<Id, Map<WarmPollutant, Double>>> getLink2WarmEmissions() {
+	public Map<Double, Map<Id<Link>, Map<WarmPollutant, Double>>> getLink2WarmEmissions() {
 		return link2WarmEmissions;
 	}
 
-	public Map<Double, Map<Id, Map<ColdPollutant, Double>>> getLink2ColdEmissions() {
+	public Map<Double, Map<Id<Link>, Map<ColdPollutant, Double>>> getLink2ColdEmissions() {
 		return link2ColdEmissions;
 	}
 }
