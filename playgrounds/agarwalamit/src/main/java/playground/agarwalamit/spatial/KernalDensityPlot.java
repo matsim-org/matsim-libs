@@ -89,7 +89,7 @@ public class KernalDensityPlot extends AbstractAnalysis {
 	private final GeometryFactory gf = new GeometryFactory();
 	private GeneralGrid grid;
 	private KernelDensityEstimator kde;
-	private Map<Double,Map<Id,SortedMap<String,Double>>> linkEmissions;
+	private Map<Double,Map<Id<Link>,SortedMap<String,Double>>> linkEmissions;
 
 	public static void main(String[] args) {
 		KernalDensityPlot munichEmissionPlot = new KernalDensityPlot();
