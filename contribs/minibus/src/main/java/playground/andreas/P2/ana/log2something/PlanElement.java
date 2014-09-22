@@ -21,12 +21,14 @@ package playground.andreas.P2.ana.log2something;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.collections.Tuple;
+
 import playground.andreas.P2.replanning.*;
 
 import java.util.ArrayList;
 
 public final class PlanElement {
 
+	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(PlanElement.class);
 	
 	private final int iterationFounded;

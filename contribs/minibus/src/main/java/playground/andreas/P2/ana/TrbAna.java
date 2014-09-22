@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
@@ -41,6 +42,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
+
 import playground.andreas.P2.PConfigGroup;
 
 import java.io.BufferedWriter;
@@ -68,6 +71,7 @@ import java.util.TreeSet;
  */
 final class TrbAna implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, LinkEnterEventHandler, VehicleArrivesAtFacilityEventHandler{
 
+	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(TrbAna.class);
 	
 	private final String pIdentifier;
@@ -81,14 +85,14 @@ final class TrbAna implements PersonEntersVehicleEventHandler, PersonLeavesVehic
 	private final double maxY;
 	
 	private int numberOfTripsServedByPt = 0;
-	private Set<Id> minibusesWithAtLeastOneTrip = new TreeSet<>();
+	private Set<Id<Vehicle>> minibusesWithAtLeastOneTrip = new TreeSet<>();
 	private double kmTravelledByMinibuses = 0.0;
 	private double passengerKmMinibus = 0.0;
 	private int numberOfPassengersUsingPtAndMinibus;
 
-	private HashMap<Id, Integer> vehId2NumberOfPassengers = new HashMap<>();
-	private HashMap<Id, String> agentId2ModeAlreadyUsed = new HashMap<>();
-	private HashMap<Id, Id> vehId2StopIdMap = new HashMap<>();
+	private HashMap<Id<Vehicle>, Integer> vehId2NumberOfPassengers = new HashMap<>();
+	private HashMap<Id<Person>, String> agentId2ModeAlreadyUsed = new HashMap<>();
+	private HashMap<Id<Vehicle>, Id<TransitStopFacility>> vehId2StopIdMap = new HashMap<>();
 
 	private int boardingInServiceAreaPt = 0;
 	private int alightingInServiceAreaPt = 0;
@@ -247,7 +251,7 @@ final class TrbAna implements PersonEntersVehicleEventHandler, PersonLeavesVehic
 	}
 
 
-	private boolean stopIdInServiceArea(Id stopId) {
+	private boolean stopIdInServiceArea(Id<TransitStopFacility> stopId) {
 
 		TransitStopFacility stop = this.transitSchedule.getFacilities().get(stopId);
 		

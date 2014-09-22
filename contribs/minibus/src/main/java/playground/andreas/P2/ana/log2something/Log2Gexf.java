@@ -32,6 +32,7 @@ import java.util.ArrayList;
  */
 final class Log2Gexf {
 
+	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(Log2Gexf.class);
 	
 	private static void convertLog2Gexf(String inputFile, String outputFile) {

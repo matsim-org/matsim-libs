@@ -27,8 +27,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 final class FindAncestorOfPlanElements {
-	private static final Logger log = Logger.getLogger(FindAncestorOfPlanElements.class);
 	
+	private static final Logger log = Logger.getLogger(FindAncestorOfPlanElements.class);
 	
 	public static ArrayList<PlanElement> findAncestorOfPlanElements(ArrayList<PlanElement> planElements){
 		
@@ -71,13 +71,8 @@ final class FindAncestorOfPlanElements {
 				}
 			}
 
-			
 			candidates.add(planElement);
 		}
-		
-		
-		
-		
 		
 		return planElements;
 	}

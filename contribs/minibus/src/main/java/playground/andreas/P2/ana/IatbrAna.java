@@ -27,9 +27,11 @@ import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.vehicles.Vehicle;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -53,6 +55,7 @@ import java.util.TreeSet;
  */
 final class IatbrAna implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, LinkEnterEventHandler{
 
+	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(IatbrAna.class);
 	
 	private final String pIdentifier;
@@ -60,13 +63,13 @@ final class IatbrAna implements PersonEntersVehicleEventHandler, PersonLeavesVeh
 	
 	private int numberOfTripsServedByTrain = 0;
 	private int numberOfTripsServedByMinibus = 0;
-	private Set<Id> minibusesWithAtLeastOneTrip = new TreeSet<>();
+	private Set<Id<Vehicle>> minibusesWithAtLeastOneTrip = new TreeSet<>();
 	private double kmTravelledByMinibuses = 0.0;
 	private double passengerKmMinibus = 0.0;
 	private int numberOfPassengersUsingTrainAndMinibus;
 
-	private HashMap<Id, Integer> vehId2NumberOfPassengers = new HashMap<>();
-	private HashMap<Id, String> agentId2ModeAlreadyUsed = new HashMap<>();
+	private HashMap<Id<Vehicle>, Integer> vehId2NumberOfPassengers = new HashMap<>();
+	private HashMap<Id<Person>, String> agentId2ModeAlreadyUsed = new HashMap<>();
 	
 	private IatbrAna(String pIdentifier, String trainIdentifier){
 		this.pIdentifier = pIdentifier;

@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
  */
 final class LogElement {
 	
+	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(LogElement.class);
 
 	private int iteration;
