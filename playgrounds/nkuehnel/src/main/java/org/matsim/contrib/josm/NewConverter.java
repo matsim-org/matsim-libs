@@ -105,10 +105,6 @@ class NewConverter {
 				convertTransitRouteMatsim(relation, scenario, way2Links, relation2Route);
 			}
 
-			TransitScheduleWriter writer = new TransitScheduleWriter(
-					scenario.getTransitSchedule());
-			writer.writeFile("C:/Users/Nico/Desktop/miau.xml");
-
 		}
 		log.info("=== End of Conversion. #Links: "
 				+ scenario.getNetwork().getLinks().size() + " | #Nodes: "
