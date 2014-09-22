@@ -81,7 +81,7 @@ final class POperatorLogger implements StartupListener, IterationEndsListener, S
 			log.info("enabled");
 			this.pOperatorLoggerWriter = IOUtils.getBufferedWriter(controler.getControlerIO().getOutputFilename("pOperatorLogger.txt"));
 			try {
-				this.pOperatorLoggerWriter.write("iter\tcoop\tstatus\tplan\tcreator\tveh\tpax\tscore\tbudget\tstart\tend\tstopsToBeServed\tlinks\t\n");
+				this.pOperatorLoggerWriter.write("iter\toperator\tstatus\tplan\tcreator\tveh\tpax\tscore\tbudget\tstart\tend\tstopsToBeServed\tlinks\t\n");
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
@@ -94,22 +94,22 @@ final class POperatorLogger implements StartupListener, IterationEndsListener, S
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		if(this.pConfig.getLogOperators()){
 			
-			// get cooperatives
-			for (Operator cooperative : this.pBox.getOperators()) {
+			// get operators
+			for (Operator operator : this.pBox.getOperators()) {
 				// get all plans
-				List<PPlan> plans = cooperative.getAllPlans();
+				List<PPlan> plans = operator.getAllPlans();
 				
-				double coopPax = 0.0;
-				double coopScore = 0.0;
+				double operatorPax = 0.0;
+				double operatorScore = 0.0;
 				
 				for (PPlan plan : plans) {
 					double planPax = plan.getTripsServed();
-					coopPax += planPax;
+					operatorPax += planPax;
 					
 					double planVeh = plan.getNVehicles();
 					
 					double planScore = plan.getScore();
-					coopScore += planScore;
+					operatorScore += planScore;
 					
 					String startTime = Time.writeTime(plan.getStartTime());
 					String endTime = Time.writeTime(plan.getEndTime());
@@ -131,8 +131,8 @@ final class POperatorLogger implements StartupListener, IterationEndsListener, S
 					}
 					
 					try {
-						this.pOperatorLoggerWriter.write(event.getIteration() + "\t" + cooperative.getId() + "\t" + cooperative.getOperatorState() + "\t" + plan.getId() + "\t" 
-								+ plan.getCreator() + "\t" + (int) planVeh + "\t" + (int) planPax + "\t" + planScore + "\t" + cooperative.getBudget() + "\t" 
+						this.pOperatorLoggerWriter.write(event.getIteration() + "\t" + operator.getId() + "\t" + operator.getOperatorState() + "\t" + plan.getId() + "\t" 
+								+ plan.getCreator() + "\t" + (int) planVeh + "\t" + (int) planPax + "\t" + planScore + "\t" + operator.getBudget() + "\t" 
 								+ startTime + "\t" + endTime + "\t" + stopsServed + "\t" + linksServed + "\n");
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
@@ -141,8 +141,8 @@ final class POperatorLogger implements StartupListener, IterationEndsListener, S
 				}
 				
 				try {
-					this.pOperatorLoggerWriter.write(event.getIteration() + "\t" + cooperative.getId() + "\t" + cooperative.getOperatorState() + "\t" + "===" + "\t" 
-							+ "TOTAL" + "\t" + cooperative.getNumberOfVehiclesOwned() + "\t" + (int) coopPax + "\t" + coopScore + "\t" + cooperative.getBudget() + "\t"
+					this.pOperatorLoggerWriter.write(event.getIteration() + "\t" + operator.getId() + "\t" + operator.getOperatorState() + "\t" + "===" + "\t" 
+							+ "TOTAL" + "\t" + operator.getNumberOfVehiclesOwned() + "\t" + (int) operatorPax + "\t" + operatorScore + "\t" + operator.getBudget() + "\t"
 							+ "===" + "\t" + "===" + "\t" + "===" + "\t" + "===" + "\n");
 				} catch (IOException e) {
 					// TODO Auto-generated catch block

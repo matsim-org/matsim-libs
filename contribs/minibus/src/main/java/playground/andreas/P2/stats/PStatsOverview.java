@@ -169,7 +169,7 @@ final class PStatsOverview implements StartupListener, IterationEndsListener, Sh
 				budget += operator.getBudget();
 				score += operatorScore;				
 				
-				// statistics for each coop in business
+				// statistics for each operator in business
 				if(operator.getOperatorState().equals(OperatorState.INBUSINESS)){
 					operatorsPos++;
 					routesPos += operatorRoutes;
@@ -242,7 +242,7 @@ final class PStatsOverview implements StartupListener, IterationEndsListener, Sh
 						XYLineChart scores = new XYLineChart("Paratransit Statistics", "iteration", "score/budget");
 						XYLineChart passengers = new XYLineChart("Paratransit Statistics", "iteration", "pax");
 						XYLineChart shares = new XYLineChart("Paratransit Statistics", "iteration", "shares of operators in business");
-						XYLineChart relaxCoop = new XYLineChart("Paratransit Statistics", "iteration", "average and deviation of operators");
+						XYLineChart relaxOperator = new XYLineChart("Paratransit Statistics", "iteration", "average and deviation of operators");
 						XYLineChart relaxRoutes = new XYLineChart("Paratransit Statistics", "iteration", "average and deviation of routes");
 						XYLineChart relaxPax = new XYLineChart("Paratransit Statistics", "iteration", "average and deviation of passengers");
 						XYLineChart relaxVeh = new XYLineChart("Paratransit Statistics", "iteration", "average and deviation of vehicles");
@@ -290,11 +290,11 @@ final class PStatsOverview implements StartupListener, IterationEndsListener, Sh
 						shares.addSeries("share pos veh", iterations, values);
 
 						System.arraycopy(this.history[INDEX_MEANPOSOPERATORS], 0, values, 0, index + 1);
-						relaxCoop.addSeries("average number of pos operators", iterations, values);
+						relaxOperator.addSeries("average number of pos operators", iterations, values);
 						System.arraycopy(this.history[INDEX_SIGMAUPPERPOSOPERATORS], 0, values, 0, index + 1);
-						relaxCoop.addSeries("average number of pos operators + 1 sigma", iterations, values);
+						relaxOperator.addSeries("average number of pos operators + 1 sigma", iterations, values);
 						System.arraycopy(this.history[INDEX_SIGMALOWERPOSOPERATORS], 0, values, 0, index + 1);
-						relaxCoop.addSeries("average number of pos operators - 1 sigma", iterations, values);
+						relaxOperator.addSeries("average number of pos operators - 1 sigma", iterations, values);
 						
 						System.arraycopy(this.history[INDEX_MEANPOSROUTES], 0, values, 0, index + 1);
 						relaxRoutes.addSeries("average number of pos routes", iterations, values);
@@ -321,7 +321,7 @@ final class PStatsOverview implements StartupListener, IterationEndsListener, Sh
 						scores.addMatsimLogo();
 						passengers.addMatsimLogo();
 						shares.addMatsimLogo();
-						relaxCoop.addMatsimLogo();
+						relaxOperator.addMatsimLogo();
 						relaxRoutes.addMatsimLogo();
 						relaxPax.addMatsimLogo();
 						relaxVeh.addMatsimLogo();
@@ -330,7 +330,7 @@ final class PStatsOverview implements StartupListener, IterationEndsListener, Sh
 						scores.saveAsPng(event.getControler().getControlerIO().getOutputFilename("pStats_score.png"), 800, 600);
 						passengers.saveAsPng(event.getControler().getControlerIO().getOutputFilename("pStats_pax.png"), 800, 600);
 						shares.saveAsPng(event.getControler().getControlerIO().getOutputFilename("pStats_shares.png"), 800, 600);
-						relaxCoop.saveAsPng(event.getControler().getControlerIO().getOutputFilename("pStats_relaxOperators.png"), 800, 600);
+						relaxOperator.saveAsPng(event.getControler().getControlerIO().getOutputFilename("pStats_relaxOperators.png"), 800, 600);
 						relaxRoutes.saveAsPng(event.getControler().getControlerIO().getOutputFilename("pStats_relaxRoutes.png"), 800, 600);
 						relaxPax.saveAsPng(event.getControler().getControlerIO().getOutputFilename("pStats_relaxPax.png"), 800, 600);
 						relaxVeh.saveAsPng(event.getControler().getControlerIO().getOutputFilename("pStats_relaxVeh.png"), 800, 600);

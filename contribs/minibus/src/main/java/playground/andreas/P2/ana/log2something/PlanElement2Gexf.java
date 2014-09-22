@@ -82,7 +82,7 @@ final class PlanElement2Gexf extends MatsimJaxbXmlWriter{
 		
 		attributeContent = new XMLAttributeContent();
 		attributeContent.setId("planId");
-		attributeContent.setTitle("Unique Identifier based on coop and plan id");
+		attributeContent.setTitle("Unique Identifier based on operator and plan id");
 		attributeContent.setType(XMLAttrtypeType.STRING);
 		nodeAttributeContentsContainer.getAttribute().add(attributeContent);
 		
@@ -187,7 +187,7 @@ final class PlanElement2Gexf extends MatsimJaxbXmlWriter{
 			playground.andreas.P2.genericUtils.gexf.viz.ObjectFactory vizFac = new playground.andreas.P2.genericUtils.gexf.viz.ObjectFactory();
 			PositionContent pos = vizFac.createPositionContent();
 			pos.setX((float) node.getIterationFounded());
-			pos.setY((float) Integer.parseInt(node.getCoopId().split("_")[1]));
+			pos.setY((float) Integer.parseInt(node.getOperatorId().split("_")[1]));
 			pos.setZ((float) Integer.parseInt(node.getPlanId().split("_")[1]));
 
 			n.getAttvaluesOrSpellsOrNodes().add(pos);

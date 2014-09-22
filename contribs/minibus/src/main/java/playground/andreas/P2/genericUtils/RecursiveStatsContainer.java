@@ -33,8 +33,8 @@ public final class RecursiveStatsContainer {
 
 	public void handleNewEntry(double entry){
 		// new entries n + 1
-		double meanCoops_n_1;
-		double tempVarCoops_n_1;
+		double meanOperators_n_1;
+		double tempVarOperators_n_1;
 
 		if(Double.isNaN(this.numberOfEntries)){
 			// initialize
@@ -46,19 +46,19 @@ public final class RecursiveStatsContainer {
 		// calculate the exact mean and variance
 
 		// calculate new mean
-		meanCoops_n_1 =  (this.numberOfEntries * this.arithmeticMean + entry) / (this.numberOfEntries + 1);
+		meanOperators_n_1 =  (this.numberOfEntries * this.arithmeticMean + entry) / (this.numberOfEntries + 1);
 
 		if (this.numberOfEntries == 0) {
-			tempVarCoops_n_1 = 0;
+			tempVarOperators_n_1 = 0;
 		} else {
-			tempVarCoops_n_1 = this.tempVar + (this.numberOfEntries + 1) / (this.numberOfEntries) * (meanCoops_n_1 - entry) * (meanCoops_n_1 - entry);
+			tempVarOperators_n_1 = this.tempVar + (this.numberOfEntries + 1) / (this.numberOfEntries) * (meanOperators_n_1 - entry) * (meanOperators_n_1 - entry);
 		}
 
 		this.numberOfEntries++;
 
 		// store em away
-		this.arithmeticMean = meanCoops_n_1;
-		this.tempVar = tempVarCoops_n_1;
+		this.arithmeticMean = meanOperators_n_1;
+		this.tempVar = tempVarOperators_n_1;
 	}
 
 	public double getStdDev() {

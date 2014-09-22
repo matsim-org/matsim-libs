@@ -82,7 +82,7 @@ public final class LogReader implements TabularFileHandler {
 					LogElement logElement = new LogElement();
 					
 					logElement.setIteration(Integer.parseInt(row[0]));
-					logElement.setCoopId(row[1]);
+					logElement.setOperatorId(row[1]);
 					logElement.setStatus(row[2]);
 					logElement.setPlanId(row[3]);
 					logElement.setCreatorId(row[4]);

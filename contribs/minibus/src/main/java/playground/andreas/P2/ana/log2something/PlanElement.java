@@ -32,7 +32,7 @@ public final class PlanElement {
 	private static final Logger log = Logger.getLogger(PlanElement.class);
 	
 	private final int iterationFounded;
-	private final String coopId;
+	private final String operatorId;
 	private final ArrayList<Tuple<Integer, String>> status;
 	private final String planId;
 	private final String creatorId;
@@ -50,7 +50,7 @@ public final class PlanElement {
 	
 	public PlanElement(LogElement logElement) {
 		this.iterationFounded = logElement.getIteration();
-		this.coopId = logElement.getCoopId();
+		this.operatorId = logElement.getOperatorId();
 		
 		this.status = new ArrayList<>();
 		this.status.add(new Tuple<>(this.iterationFounded, logElement.getStatus()));
@@ -76,15 +76,15 @@ public final class PlanElement {
 	}
 	
 	public String getUniquePlanIdentifier() {
-		return this.coopId + "_" + this.planId;
+		return this.operatorId + "_" + this.planId;
 	}
 	
 	public int getIterationFounded() {
 		return iterationFounded;
 	}
 
-	public String getCoopId() {
-		return coopId;
+	public String getOperatorId() {
+		return operatorId;
 	}
 
 	public ArrayList<Tuple<Integer, String>> getStatus() {
@@ -144,7 +144,7 @@ public final class PlanElement {
 	}
 
 	public boolean canBeChild(PlanElement planElement) {
-		if (!this.getCoopId().equalsIgnoreCase(planElement.getCoopId())) {
+		if (!this.getOperatorId().equalsIgnoreCase(planElement.getOperatorId())) {
 			// wrong family
 			return false;
 		}

@@ -49,8 +49,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- * Uses a {@link CountPPaxHandler} to count passengers per paratransit vehicle and link, {@link CountPOperatorHandler} to count cooperatives and their ids and writes them to a gexf network as dynamic link attributes.
- * In addition, writes one column per link and cooperative with its number of passengers served.
+ * Uses a {@link CountPPaxHandler} to count passengers per paratransit vehicle and link, {@link CountPOperatorHandler} to count operators and their ids and writes them to a gexf network as dynamic link attributes.
+ * In addition, writes one column per link and operator with its number of passengers served.
  * 
  * @author aneumann
  *
@@ -229,8 +229,8 @@ final class GexfPStat extends MatsimJaxbXmlWriter implements StartupListener, It
 			XMLAttvalue operatorIdValue = new XMLAttvalue();
 			XMLAttvalue operatorCountValue = new XMLAttvalue();
 			
-			operatorIdValue.setFor("coopIds");
-			operatorCountValue.setFor("nCoops");
+			operatorIdValue.setFor("operatorIds");
+			operatorCountValue.setFor("nOperators");
 			
 			if (operatorsForLink == null) {
 				operatorIdValue.setValue("");
@@ -243,7 +243,7 @@ final class GexfPStat extends MatsimJaxbXmlWriter implements StartupListener, It
 					strB.append(id.toString());strB.append(",");
 				}
 				operatorIdValue.setValue(strB.toString());
-//				coopIdValue.setValue(coopsForLink.toString());
+//				operatorIdValue.setValue(operatorsForLink.toString());
 				operatorCountValue.setValue(Integer.toString(operatorsForLink.size()));
 			}
 			
@@ -279,7 +279,7 @@ final class GexfPStat extends MatsimJaxbXmlWriter implements StartupListener, It
 		
 		if (writeOperatorInDetail) {
 			Set<String> currentLineIds = this.globalPaxHandler.getLineIds();
-			// finish all cooperatives who do not exist anymore
+			// finish all operators who do not exist anymore
 			for (String lineId : this.lastLineIds) {
 				if (!currentLineIds.contains(lineId)) {
 					// does not exist anymore - terminate
@@ -304,10 +304,10 @@ final class GexfPStat extends MatsimJaxbXmlWriter implements StartupListener, It
 				}
 			}
 
-			// add new attribute for all new cooperatives
+			// add new attribute for all new operators
 			for (String lineId : currentLineIds) {
 				if (!this.lastLineIds.contains(lineId)) {
-					// new cooperative - create new attribute
+					// new operator - create new attribute
 					XMLAttributeContent attributeContent = new XMLAttributeContent();
 					attributeContent.setId(lineId);
 					attributeContent.setTitle(lineId);

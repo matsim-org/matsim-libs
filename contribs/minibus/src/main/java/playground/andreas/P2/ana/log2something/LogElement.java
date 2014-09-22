@@ -33,7 +33,7 @@ final class LogElement {
 	private static final Logger log = Logger.getLogger(LogElement.class);
 
 	private int iteration;
-	private String coopId;
+	private String operatorId;
 	private String status;
 	private String planId;
 	private String creatorId;
@@ -46,7 +46,7 @@ final class LogElement {
 	private String[] stopsToBeServed;
 	
 	public String getUniquePlanIdentifier() {
-		return this.coopId + "_" + this.planId;
+		return this.operatorId + "_" + this.planId;
 	}
 	
 	public int getIteration() {
@@ -55,11 +55,11 @@ final class LogElement {
 	public void setIteration(int iteration) {
 		this.iteration = iteration;
 	}
-	public String getCoopId() {
-		return coopId;
+	public String getOperatorId() {
+		return operatorId;
 	}
-	public void setCoopId(String coopId) {
-		this.coopId = coopId;
+	public void setOperatorId(String operatorId) {
+		this.operatorId = operatorId;
 	}
 	public String getStatus() {
 		return status;

@@ -168,7 +168,7 @@ final class GexfPOperatorCount extends MatsimJaxbXmlWriter implements StartupLis
 			XMLAttvalue operatorIdValue = new XMLAttvalue();
 			XMLAttvalue operatorCountValue = new XMLAttvalue();
 			
-			operatorIdValue.setFor("coopIds");
+			operatorIdValue.setFor("operatorIds");
 			operatorCountValue.setFor("weight");
 			
 			if (operatorsForLink == null) {

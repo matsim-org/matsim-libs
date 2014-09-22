@@ -356,7 +356,7 @@ public final class PConfigGroup extends Module{
 		map.put(PLANNING_SPEED_FACTOR, "Freespeed of link will be modified by factor. Resulting link travel time is written to transit schedule. Default is 1.0 aka freespeed of the link.");
 		map.put(GRID_SIZE, "The grid size (length and height) for aggregating stuff in various modules (RandomStopProvider, ActivityLocationsParatransitUser, PFranchise). Default of Double.maxvalue effectively aggregates all data points into one gridPoint");
 		map.put(TIMESLOT_SIZE, "The size of a time slot aggregating stuff in various modules (TimeProvider, CreateNewPlan). Default of Double.maxvalue effectively aggregates all data points into one time slot");
-		map.put(USE_ADAPTIVE_NUMBER_OF_OPERATORS, "Will try to adapt the number of operators to meet the given share of profitable coopertives if set to true");
+		map.put(USE_ADAPTIVE_NUMBER_OF_OPERATORS, "Will try to adapt the number of operators to meet the given share of profitable operators if set to true");
 		map.put(SHARE_OF_OPERATORS_WITH_PROFIT, "Target share of profitable operators - Set " + USE_ADAPTIVE_NUMBER_OF_OPERATORS + "=true to enable this feature");
 		map.put(DISABLE_CREATION_OF_NEW_OPERATORS_IN_ITERATION, "No more new operators will be found beginning with the iteration specified");
 		map.put(REROUTE_AGENTS_STUCK, "All agents stuck will be rerouted at the beginning of an iteration, if set to true.");

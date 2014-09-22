@@ -45,8 +45,8 @@ final class Log2Tex {
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
 
 		int lastIteration = -1;
-		int coopCounterInThatIteration = 1;
-		String lastCoopName = "";
+		int operatorCounterInThatIteration = 1;
+		String lastOperatorName = "";
 		int lastPaxSum = 0;
 
 			try {
@@ -55,8 +55,8 @@ final class Log2Tex {
 
 					if (logElement.getIteration() != lastIteration) {
 						lastIteration = logElement.getIteration();
-						coopCounterInThatIteration = 1;
-						lastCoopName = "";
+						operatorCounterInThatIteration = 1;
+						lastOperatorName = "";
 						lastPaxSum = 0;
 						writer.write("\\addlinespace[1.0em]"); writer.newLine();
 					}
@@ -65,12 +65,12 @@ final class Log2Tex {
 
 					strB.append(" & ");
 
-					String operatorName = logElement.getCoopId().split("_")[1];
-					if (!lastCoopName.equalsIgnoreCase(operatorName)) {
-						strB.append("O" + coopCounterInThatIteration + " -- ");
-						coopCounterInThatIteration++;
+					String operatorName = logElement.getOperatorId().split("_")[1];
+					if (!lastOperatorName.equalsIgnoreCase(operatorName)) {
+						strB.append("O" + operatorCounterInThatIteration + " -- ");
+						operatorCounterInThatIteration++;
 						strB.append(operatorName);
-						lastCoopName = operatorName;
+						lastOperatorName = operatorName;
 					}
 
 					strB.append(" & ");
