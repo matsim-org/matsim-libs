@@ -45,7 +45,6 @@ final class Line2GexfPStat implements StartupListener, IterationEndsListener, Sh
 	private static final Logger log = Logger.getLogger(Line2GexfPStat.class);
 
     private CountPPaxHandler globalPaxHandler;
-	private CountPOperatorHandler operatorHandler;
 	private CountPVehHandler vehHandler;
 	
 	private final PConfigGroup pConfig;
@@ -69,9 +68,6 @@ final class Line2GexfPStat implements StartupListener, IterationEndsListener, Sh
 			this.globalPaxHandler = new CountPPaxHandler(this.pConfig.getPIdentifier());
 			event.getControler().getEvents().addHandler(this.globalPaxHandler);
 
-			this.operatorHandler = new CountPOperatorHandler(this.pConfig.getPIdentifier());
-			event.getControler().getEvents().addHandler(this.operatorHandler);
-			
 			this.vehHandler = new CountPVehHandler(this.pConfig.getPIdentifier());
 			event.getControler().getEvents().addHandler(this.vehHandler);
 		}
@@ -93,7 +89,7 @@ final class Line2GexfPStat implements StartupListener, IterationEndsListener, Sh
 				if (this.lineId2GexfPStat.get(lineId) == null) {
 					// new line - create new gexf
 					SimpleGexfPStat gexf = new SimpleGexfPStat(this.pConfig, lineId, gexfOutputDir);
-					gexf.notifyStartup(event.getControler().getNetwork(), this.globalPaxHandler, this.operatorHandler, this.vehHandler);
+					gexf.notifyStartup(event.getControler().getNetwork(), this.globalPaxHandler, this.vehHandler);
 					this.lineId2GexfPStat.put(lineId, gexf);
 				}
 

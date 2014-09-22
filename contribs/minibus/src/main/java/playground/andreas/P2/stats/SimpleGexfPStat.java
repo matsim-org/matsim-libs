@@ -124,9 +124,8 @@ final class SimpleGexfPStat extends MatsimJaxbXmlWriter implements IterationEnds
 		}
 	}
 
-	public void notifyStartup(Network network, CountPPaxHandler globalPaxHandler, CountPOperatorHandler operatorHandler, CountPVehHandler vehHandler) {
+	public void notifyStartup(Network network, CountPPaxHandler globalPaxHandler, CountPVehHandler vehHandler) {
 		this.globalPaxHandler = globalPaxHandler;
-        CountPOperatorHandler operatorHandler1 = operatorHandler;
 		this.vehHandler = vehHandler;
 
 		this.addNetworkAsLayer(network, 0);
