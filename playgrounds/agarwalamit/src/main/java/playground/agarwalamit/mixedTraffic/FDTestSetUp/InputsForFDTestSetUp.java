@@ -71,7 +71,7 @@ public class InputsForFDTestSetUp {
 	private  final int LINK_CAPACITY = 2700;//in PCU/h
 	private  final double END_TIME = 14*3600;
 	private final  double FREESPEED = 60.;						//in km/h, maximum authorized velocity on the track
-	private final  double STUCK_TIME = 10*3600;
+	private final  double STUCK_TIME = 14*3600;
 	
 	private Scenario scenario;
 	private  Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> vehicle2TravelModesData;
@@ -85,7 +85,6 @@ public class InputsForFDTestSetUp {
 	}
 
 	private void setUpConfig(){
-		GenerateFundametalDiagramData.log.info("======================================");
 		GenerateFundametalDiagramData.log.info("==========Creating config ============");
 		Config config = ConfigUtils.createConfig();
 
@@ -108,7 +107,6 @@ public class InputsForFDTestSetUp {
 	 * Each link is subdivided in number of sub division factor.
 	 */
 	private void createTriangularNetwork(){
-		GenerateFundametalDiagramData.log.info("======================================");
 		GenerateFundametalDiagramData.log.info("==========Creating network=========");
 		Network network = scenario.getNetwork();
 		int capMax = 100*LINK_CAPACITY;
@@ -216,7 +214,6 @@ public class InputsForFDTestSetUp {
 	 * @param gapInSecond
 	 */
 	void createWantedPopulation(List<Integer> agentDistribution, int gapInSecond){
-		GenerateFundametalDiagramData.log.info("======================================");
 		GenerateFundametalDiagramData.log.info("==========Creating population=========");
 		Population population = scenario.getPopulation();
 

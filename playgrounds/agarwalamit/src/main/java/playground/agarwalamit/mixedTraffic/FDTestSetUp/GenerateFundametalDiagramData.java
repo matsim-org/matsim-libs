@@ -65,7 +65,7 @@ public class GenerateFundametalDiagramData {
 	static final Logger log = Logger.getLogger(GenerateFundametalDiagramData.class);
 
 	//CONFIGURATION: static variables used for aggregating configuration options
-	
+
 	public static final boolean PASSING_ALLOWED = true;
 	private static final String OUTPUT_FOLDER = "seepage/carBike/";
 	public static final boolean WITH_HOLES = false;
@@ -79,11 +79,12 @@ public class GenerateFundametalDiagramData {
 	//	private final static Integer[] Steps = {40,40,5/*,10*/};
 	private final static Integer[] STARTING_POINT = {0,0,0};
 	//	private final static Integer [] MIN_STEPS_POINTS = {4,1};
-	
+
+	private final int reduceDataPointsByFactor = 1;
+
 	private int flowUnstableWarnCount [] = new int [TRAVELMODES.length];
 	private int speedUnstableWarnCount [] = new int [TRAVELMODES.length];
-	
-	
+
 	private static InputsForFDTestSetUp inputs;
 	private PrintStream writer;
 	private Scenario scenario;
@@ -97,7 +98,7 @@ public class GenerateFundametalDiagramData {
 
 		if(PASSING_ALLOWED) log.info("=======Passing is allowed.========");
 		if(WITH_HOLES) log.info("======= Using double ended queue.=======");
-		
+
 		inputs = new InputsForFDTestSetUp(RUN_DIR+OUTPUT_FOLDER);
 		inputs.run();
 		scenario = inputs.getScenario();
@@ -110,7 +111,7 @@ public class GenerateFundametalDiagramData {
 		generateFDData.parametricRunAccordingToGivenModalSplit();
 		//		dreieck.parametricRunAccordingToDistribution(Arrays.asList(MaxAgentDistribution), Arrays.asList(Steps));
 		//		dreieck.singleRun(Arrays.asList(TEST_DISTRIBUTION));
-		 generateFDData.closeFile();
+		generateFDData.closeFile();
 	}
 
 	private void parametricRunAccordingToDistribution(List<Integer> maxAgentDistribution, List<Integer> steps){
@@ -157,6 +158,16 @@ public class GenerateFundametalDiagramData {
 			minSteps.set(i, minSteps.get(i)/pgcd);
 		}
 
+		// for a faster simulation or to have less points on FD, minSteps is increased
+		if(reduceDataPointsByFactor!=1) {
+			log.info("===============");
+			log.warn("Data points for FD will be reduced by a factor of "+reduceDataPointsByFactor+". ");
+			log.warn( "Make sure this is what you want because it will be more likely to have less or no points in congested regime.");
+			log.info("===============");
+			for(int index=0;index<minSteps.size();index++){
+				minSteps.set(index, minSteps.get(index)*reduceDataPointsByFactor);
+			}
+		}
 		//set up number of Points to run.
 		double cellSizePerPCU = 7.5;
 		double networkDensity = (InputsForFDTestSetUp.LINK_LENGTH/cellSizePerPCU)*3;
@@ -230,23 +241,28 @@ public class GenerateFundametalDiagramData {
 		Netsim qSim = createModifiedQSim(this.scenario, events);
 
 		qSim.run();
-		
+
 		for(int index=0;index<TRAVELMODES.length;index++){
 			Id<VehicleType> veh = Id.create(TRAVELMODES[index], VehicleType.class);
 			if(!mode2FlowData.get(veh).isFlowStable()) 
 			{
-				flowUnstableWarnCount[index] = flowUnstableWarnCount[index]++;
+				int existingCount = flowUnstableWarnCount[index]; existingCount++;
+				flowUnstableWarnCount[index] = existingCount;
 				log.warn("Flow stability is not reached for travel mode "+veh.toString()
-					+" and simulation end time is reached. This is " + flowUnstableWarnCount[index]+ "th warning.");
+						+" and simulation end time is reached. Output data sheet will have all zeros for such runs."
+						+ "This is " + flowUnstableWarnCount[index]+ "th warning.");
+				//				log.warn("Increasing simulation time could be a possible solution to avoid it.");
 			}
 			if(!mode2FlowData.get(veh).isSpeedStable()) 
 			{
-				speedUnstableWarnCount[index] = speedUnstableWarnCount[index]++;
+				int existingCount = speedUnstableWarnCount[index]; existingCount++;
+				speedUnstableWarnCount[index] = existingCount;
 				log.warn("Speed stability is not reached for travel mode "+veh.toString()
-					+" and simulation end time is reached. This is " + speedUnstableWarnCount[index]+ "th warning.");
+						+" and simulation end time is reached. Output data sheet will have all zeros for such runs."
+						+ "This is " + speedUnstableWarnCount[index]+ "th warning.");
 			}
 		}
-		
+
 		writer.format("%d\t\t",globalFlowDynamicsUpdator.getGlobalData().numberOfAgents);
 		for (int i=0; i < TRAVELMODES.length; i++){
 			writer.format("%d\t", this.mode2FlowData.get(Id.create(TRAVELMODES[i],VehicleType.class)).numberOfAgents);
@@ -443,7 +459,9 @@ public class GenerateFundametalDiagramData {
 
 		@Override
 		public Id<Link> chooseNextLinkId() {
-			if (GenerateFundametalDiagramData.globalFlowDynamicsUpdator.isPermanent()){ goHome = true; }
+			if (GenerateFundametalDiagramData.globalFlowDynamicsUpdator.isPermanent()){ 
+				goHome = true; 
+			}
 
 			Id<Link> lastLinkOnTriangularTrack = Id.createLinkId(3*InputsForFDTestSetUp.SUBDIVISION_FACTOR - 1);
 			Id<Link> lastLinkOfBase = Id.createLinkId(InputsForFDTestSetUp.SUBDIVISION_FACTOR - 1);
