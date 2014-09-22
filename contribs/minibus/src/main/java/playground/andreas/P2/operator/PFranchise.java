@@ -69,28 +69,28 @@ public final class PFranchise {
 	/**
 	 * Reset all route hashes to the routes currently in use
 	 * 
-	 * @param cooperatives
+	 * @param operators
 	 */
-	public void reset(LinkedList<Operator> cooperatives) {
+	public void reset(LinkedList<Operator> operators) {
 		
 		if(this.activated){
 			this.routeHashes = new TreeSet<>();
 
-			for (Operator cooperative : cooperatives) {
-				Set<String> routesHashesOfCooperative = new TreeSet<>();
-				for (PPlan plan : cooperative.getAllPlans()) {
+			for (Operator operator : operators) {
+				Set<String> routesHashesOfOperator = new TreeSet<>();
+				for (PPlan plan : operator.getAllPlans()) {
 					String routeHash = generateRouteHash(plan);				
 					if (this.routeHashes.contains(routeHash)) {
-						if (routesHashesOfCooperative.contains(routeHash)) {
-							// This route is already served by the same cooperative
-							log.warn("Cooperative " + cooperative.getId() + " offers the same plan twice. Plan: " + plan.getId() + " managed to circumvent the franchise system with route " + routeHash);
+						if (routesHashesOfOperator.contains(routeHash)) {
+							// This route is already served by the same operator
+							log.warn("Operator " + operator.getId() + " offers the same plan twice. Plan: " + plan.getId() + " managed to circumvent the franchise system with route " + routeHash);
 						} else {
-							// This route is already served by another cooperative
-							log.warn("Cooperative " + cooperative.getId() + " with plan " + plan.getId() + " managed to circumvent the franchise system with route " + routeHash);
+							// This route is already served by another operator
+							log.warn("Operator " + operator.getId() + " with plan " + plan.getId() + " managed to circumvent the franchise system with route " + routeHash);
 						}
 					}
 					this.routeHashes.add(routeHash);
-					routesHashesOfCooperative.add(routeHash);
+					routesHashesOfOperator.add(routeHash);
 				}
 			}
 		}

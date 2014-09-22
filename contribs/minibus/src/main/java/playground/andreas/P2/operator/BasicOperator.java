@@ -26,7 +26,7 @@ import playground.andreas.P2.replanning.PStrategy;
 import playground.andreas.P2.replanning.PStrategyManager;
 
 /**
- * Manages one paratransit line
+ * Operator that manages one paratransit line
  * 
  * @author aneumann
  *
@@ -35,7 +35,7 @@ public final class BasicOperator extends AbstractOperator{
 	
 	public static final String OPERATOR_NAME = "BasicOperator"; 
 
-	public BasicOperator(Id id, PConfigGroup pConfig, PFranchise franchise){
+	public BasicOperator(Id<Operator> id, PConfigGroup pConfig, PFranchise franchise){
 		super(id, pConfig, franchise);
 	}
 
@@ -46,7 +46,7 @@ public final class BasicOperator extends AbstractOperator{
 			// compare scores
 			if (this.score > this.scoreLastIteration){
 				// testPlan improves the plan, apply its modification to bestPlan, transfer the vehicle from the testPlan to the bestPlan
-				// changed to get a more useful output in the pCoopLogger /dr
+				// changed to get a more useful output in the pOperatorLogger /dr
 				this.testPlan.setNVehicles(this.testPlan.getNVehicles() + this.bestPlan.getNVehicles());
 				this.bestPlan = this.testPlan;
 			}else{

@@ -30,10 +30,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * This cooperative has multiple plans. Each is weighted by the number of vehicles associated with.
+ * This operator has multiple plans. Each is weighted by the number of vehicles associated with.
  * The number of vehicles depends on the score per vehicle and plan. In the end, each plan should have approximately the same score.
  * 
  * @author aneumann
+ * 
+ * @deprecated This one is not very well tested. Use {@link CarefulMultiPlanOperator} instead.
  *
  */
 public final class MultiPlanOperator extends AbstractOperator{
@@ -42,7 +44,7 @@ public final class MultiPlanOperator extends AbstractOperator{
 	
 	private final List<PPlan> plans;
 
-	public MultiPlanOperator(Id id, PConfigGroup pConfig, PFranchise franchise){
+	public MultiPlanOperator(Id<Operator> id, PConfigGroup pConfig, PFranchise franchise){
 		super(id, pConfig, franchise);
 		this.plans = new LinkedList<>();
 	}

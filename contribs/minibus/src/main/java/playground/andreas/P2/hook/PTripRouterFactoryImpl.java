@@ -64,7 +64,7 @@ class PTripRouterFactoryImpl implements TripRouterFactory {
 
 	/**
 	 * Hook provided to change the {@link TripRouter}
-	 * implementation whithout changing the configuration.
+	 * implementation without changing the configuration.
 	 *
 	 * @return a new unconfigured instance
 	 */

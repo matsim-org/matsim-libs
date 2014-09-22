@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.TreeMap;
 
 /**
- * Common implementation for all cooperatives, except for replanning
+ * Common implementation for all operators, except for replanning
  * 
  * @author aneumann
  *

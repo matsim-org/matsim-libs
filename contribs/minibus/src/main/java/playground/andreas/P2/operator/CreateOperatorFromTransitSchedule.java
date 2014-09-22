@@ -36,7 +36,7 @@ import java.util.Map.Entry;
 
 /**
  * 
- * Creates cooperatives from a given transit schedule
+ * Creates operators from a given transit schedule
  * 
  * @author aneumann
  *
