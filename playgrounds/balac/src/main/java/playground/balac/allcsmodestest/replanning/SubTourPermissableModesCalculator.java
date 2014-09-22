@@ -3,17 +3,17 @@ package playground.balac.allcsmodestest.replanning;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.population.algorithms.PermissibleModesCalculator;
 
 public class SubTourPermissableModesCalculator implements PermissibleModesCalculator{
 
-	private Config config = null;
-	public SubTourPermissableModesCalculator(Config config) {
+	private final Scenario scenario;
+	public SubTourPermissableModesCalculator(final Scenario scenario) {
 		// TODO Auto-generated constructor stub
-		this.config = config;
+		this.scenario = scenario;
 	}
 
 	/**
@@ -30,9 +30,9 @@ public class SubTourPermissableModesCalculator implements PermissibleModesCalcul
 		if (p.getLicense().equals( "yes" ) && !p.getCarAvail().equals( "never" )) 
 			modes.add("car");
 		
-		 if (p.getTravelcards() != null && Boolean.parseBoolean(config.getModule("TwoWayCarsharing").getParams().get("useTwoWayCarsharing"))
+		 if (Boolean.parseBoolean(scenario.getConfig().getModule("TwoWayCarsharing").getParams().get("useTwoWayCarsharing"))
 		
-		&& (p.getLicense().equals( "yes"))  && p.getTravelcards().contains("ch-HT-mobility"))
+		&& scenario.getPopulation().getPersonAttributes().getAttribute(p.getId().toString(), "CS_CARD").equals("carsharing_RT"))
 		
 				modes.add("twowaycarsharing");
 		

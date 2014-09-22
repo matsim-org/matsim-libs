@@ -29,7 +29,7 @@ public class bla {
 		networkReader.readFile(args[0]);
 		populationReader.readFile(args[1]);
 		
-final BufferedWriter outLink = IOUtils.getBufferedWriter("P:/_TEMP/sschmutz/routing_matsim/20140428_stage_car/output/details/outputStatistics_ettapen_10.txt");
+final BufferedWriter outLink = IOUtils.getBufferedWriter("P:/_TEMP/sschmutz/routing_matsim/20140506_trip_car/output/outputStatistics_trips_6.txt");
 
 		
 		for(Person per: sc.getPopulation().getPersons().values()) {

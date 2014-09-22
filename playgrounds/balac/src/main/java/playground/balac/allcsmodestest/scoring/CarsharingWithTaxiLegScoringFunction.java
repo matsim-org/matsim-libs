@@ -87,7 +87,7 @@ public class CarsharingWithTaxiLegScoringFunction extends org.matsim.core.scorin
 						}
 						else if (!startBefore && !endBefore) {
 							
-							specialTime = specialEndTime - s.startTime;
+							specialTime += specialEndTime - s.startTime;
 							time += s.endTime - specialEndTime;
 						}
 						else {

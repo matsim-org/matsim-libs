@@ -4,6 +4,7 @@ package playground.balac.allcsmodestest.replanning;
 
 
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.TripRouter;
@@ -27,7 +28,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * 
  * If the plan initially violates this constraint, this module may (!) repair it. 
  * 
- * Added parameters used to evaulate scores of pt and walk legs when changing subtours to PT.
+ * Added parameters used to evaluate scores of pt and walk legs when changing subtours to PT.
  * 
  * @author balac
  * 
@@ -48,8 +49,8 @@ public class SubTourModeChoiceCS extends AbstractMultithreadedModule {
 				config.subtourModeChoice().considerCarAvailability(),
 				new CharyparNagelScoringParameters(config.planCalcScore()),
 				Double.parseDouble(config.getModule("planscalcroute").getParams().get("beelineDistanceFactor")),
-				Double.parseDouble(config.getModule("planscalcroute").getParams().get("teleportedModeSpeed_walk")),
-				Double.parseDouble(config.getModule("planscalcroute").getParams().get("teleportedModeSpeed_pt"))
+				(((PlansCalcRouteConfigGroup)config.getModule("planscalcroute")).getTeleportedModeSpeeds().get("walk")),
+				(((PlansCalcRouteConfigGroup)config.getModule("planscalcroute")).getTeleportedModeSpeeds().get("pt"))
 		);
 	}
 

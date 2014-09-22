@@ -4,10 +4,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
@@ -22,12 +22,14 @@ public class ChooseRandomTripModeWithTaxi implements PlanAlgorithm {
 	//private boolean ignoreCarAvailability = true;
 
 	private final Random rng;
+	private final Scenario scenario;
 	
 	private final StageActivityTypes stageActivityTypes;
-	public ChooseRandomTripModeWithTaxi(final String[] possibleModes, final Random rng, final StageActivityTypes stageActivityTypes) {
+	public ChooseRandomTripModeWithTaxi(final Scenario scenario, final String[] possibleModes, final Random rng, final StageActivityTypes stageActivityTypes) {
 		this.possibleModes = possibleModes.clone();
 		this.rng = rng;
 		this.stageActivityTypes = stageActivityTypes;
+		this.scenario = scenario;
 	}
 	@Override
 	public void run(Plan plan) {
@@ -35,7 +37,6 @@ public class ChooseRandomTripModeWithTaxi implements PlanAlgorithm {
 		List<Trip> t = TripStructureUtils.getTrips(plan, stageActivityTypes);
 		
 		int cnt = t.size();
-		PersonImpl p = (PersonImpl) plan.getPerson();
 		if (cnt == 0) {
 			return;
 		}
@@ -56,9 +57,7 @@ public class ChooseRandomTripModeWithTaxi implements PlanAlgorithm {
 		//carsharing is the new trip
 		int temp = rng.nextInt(6);
 		
-		if (((PersonImpl) plan.getPerson()).hasLicense() && 
-				(((PersonImpl) plan.getPerson()).getTravelcards() != null)  && 
-				((PersonImpl) plan.getPerson()).getTravelcards().contains("ffProgram")) {
+		if (this.scenario.getPopulation().getPersonAttributes().getAttribute(plan.getPerson().getId().toString(), "CS_CARD").equals("freefloating")) {
 		
 			if (possibleModes.length == 3) {			
 				

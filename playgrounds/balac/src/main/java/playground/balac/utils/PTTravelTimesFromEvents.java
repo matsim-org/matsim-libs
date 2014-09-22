@@ -47,8 +47,7 @@ public class PTTravelTimesFromEvents {
 				if (a.get(i).description.equals("pt"))
 					count++;
 			int numberOfTransfers = -1 + count;
-			if (a.get(0).personId.toString().equals("30256"))
-				System.out.println();
+			
 			outLink.write(a.get(0).personId.toString() + " ");
 			outLink.write(Integer.toString(numberOfTransfers) + " ");
 			double firstWaitingTIme = 0.0;

@@ -86,9 +86,9 @@ public class PTTravelTimes {
 		int i = 0;
 		while(s != null) {
 			String[] arr = s.split("\\s");
-			CoordImpl coordStart = new CoordImpl(arr[4], arr[5]);
+			CoordImpl coordStart = new CoordImpl(arr[3], arr[4]);
 			Link lStart = MyLinkUtils.getClosestLink(scenario.getNetwork(), coordStart);
-			CoordImpl coordEnd = new CoordImpl(arr[6], arr[7]);
+			CoordImpl coordEnd = new CoordImpl(arr[5], arr[6]);
 			Link lEnd = MyLinkUtils.getClosestLink(scenario.getNetwork(), coordEnd);
 			
 			PersonImpl person = new PersonImpl(new IdImpl(arr[0]));
@@ -98,7 +98,7 @@ public class PTTravelTimes {
 			act.setCoord(coordStart);
 			//String[] arr2 = arr[6].split(":");
 			//double h = Double.parseDouble(arr2[0]);
-			double m = Double.parseDouble(arr[3]);
+			double m = Double.parseDouble(arr[2]);
 			act.setEndTime(m * 60);
 			plan.addActivity(act);
 			

@@ -15,13 +15,13 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 public class RandomTripToCarsharingWithTaxiStrategy implements PlanStrategy{
 	private final PlanStrategyImpl strategy;
 	
-	public RandomTripToCarsharingWithTaxiStrategy(final Scenario controler) {
+	public RandomTripToCarsharingWithTaxiStrategy(final Scenario scenario) {
 		this.strategy = new PlanStrategyImpl( new RandomPlanSelector<Plan, Person>() );
 		 	
 		//addStrategyModule( new TripsToLegsModule(controler.getConfig() ) );   //lets try without this, not sure if it is needed
-		CarsharingWithTaxiTripModeChoice smc = new CarsharingWithTaxiTripModeChoice(controler.getConfig());
+		CarsharingWithTaxiTripModeChoice smc = new CarsharingWithTaxiTripModeChoice(scenario);
 		addStrategyModule(smc );
-		addStrategyModule( new ReRoute(controler) );
+		addStrategyModule( new ReRoute(scenario) );
 	}
 	public void addStrategyModule(final PlanStrategyModule module) {
 		strategy.addStrategyModule(module);

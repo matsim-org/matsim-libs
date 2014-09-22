@@ -39,16 +39,16 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 public class SubtourModeChoiceStrategy implements PlanStrategy {
 	private final PlanStrategyImpl strategy;
 
-	public SubtourModeChoiceStrategy(final Scenario controler) {
+	public SubtourModeChoiceStrategy(final Scenario scenario) {
 		this.strategy = new PlanStrategyImpl( new RandomPlanSelector<Plan, Person>() );
 
 		//addStrategyModule( new TripsToLegsModule(controler.getConfig() ) );   
-		SubTourModeChoiceCS smc = new SubTourModeChoiceCS(controler.getConfig());
-		SubTourPermissableModesCalculator cpmc = new SubTourPermissableModesCalculator(controler.getConfig());
+		SubTourModeChoiceCS smc = new SubTourModeChoiceCS(scenario.getConfig());
+		SubTourPermissableModesCalculator cpmc = new SubTourPermissableModesCalculator(scenario);
 		smc.setPermissibleModesCalculator(cpmc);
 		
 		addStrategyModule(smc );
-		addStrategyModule( new ReRoute(controler) );
+		addStrategyModule( new ReRoute(scenario) );
 	}
 
 	public void addStrategyModule(final PlanStrategyModule module) {
