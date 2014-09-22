@@ -26,6 +26,6 @@ import java.util.List;
 
 public interface Operators {
 
-    public List<Operator> getCooperatives();
+    public List<Operator> getOperators();
 
 }

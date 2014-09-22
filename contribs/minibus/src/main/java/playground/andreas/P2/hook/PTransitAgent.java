@@ -39,7 +39,7 @@ import java.util.List;
 
 /**
  * 
- * Own implementation of boarding behavior. Note, that this behavior may be (more) inconstistent with the transit router as the default implementation.
+ * Own implementation of boarding behavior. Note, that this behavior may be (more) inconsistent with the transit router as the default implementation.
  * 
  * @author aneumann
  */
@@ -120,7 +120,7 @@ class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPasseng
 		return false;
 	}
 
-	private double getArrivalOffsetFromRoute(TransitRoute transitRoute, Id egressStopId) {
+	private double getArrivalOffsetFromRoute(TransitRoute transitRoute, Id<TransitStopFacility> egressStopId) {
 		for (TransitRouteStop routeStop : transitRoute.getStops()) {
 			if (egressStopId.equals(routeStop.getStopFacility().getId())) {
 				return routeStop.getArrivalOffset();
@@ -132,7 +132,7 @@ class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPasseng
 		return -1.0;
 	}
 	
-	private double getDepartureOffsetFromRoute(TransitRoute transitRoute, Id accessStopId) {
+	private double getDepartureOffsetFromRoute(TransitRoute transitRoute, Id<TransitStopFacility> accessStopId) {
 		for (TransitRouteStop routeStop : transitRoute.getStops()) {
 			if (accessStopId.equals(routeStop.getStopFacility().getId())) {
 				return routeStop.getDepartureOffset();
@@ -150,7 +150,7 @@ class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPasseng
 		return (Leg) currentPlanElement;
 	}
 
-	private boolean containsId(List<TransitRouteStop> stopsToCome, Id egressStopId) {
+	private boolean containsId(List<TransitRouteStop> stopsToCome, Id<TransitStopFacility> egressStopId) {
 		for (TransitRouteStop stop : stopsToCome) {
 			if (egressStopId.equals(stop.getStopFacility().getId())) {
 				return true;
@@ -165,7 +165,7 @@ class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPasseng
 	}
 
 	@Override
-	public Id getDesiredAccessStopId() {
+	public Id<TransitStopFacility> getDesiredAccessStopId() {
 		Leg leg = getCurrentLeg();
 		if (!(leg.getRoute() instanceof ExperimentalTransitRoute)) {
 			log.error("pt-leg has no TransitRoute. Removing agent from simulation. Agent " + getId().toString());
@@ -181,7 +181,7 @@ class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPasseng
 	}
 	
 	@Override
-	public Id getDesiredDestinationStopId() {
+	public Id<TransitStopFacility> getDesiredDestinationStopId() {
 		Leg leg = getCurrentLeg();
 		if (!(leg.getRoute() instanceof ExperimentalTransitRoute)) {
 			log.error("pt-leg has no TransitRoute. Removing agent from simulation. Agent " + getId().toString());

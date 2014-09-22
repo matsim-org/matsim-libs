@@ -19,16 +19,16 @@
 
 package playground.andreas.P2;
 
+import java.util.*;
+import java.util.Map.Entry;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Module;
 import org.matsim.core.utils.misc.StringUtils;
-import playground.andreas.P2.operator.BasicOperator;
 
-import java.util.*;
-import java.util.Map.Entry;
+import playground.andreas.P2.operator.BasicOperator;
 
 /**
  * Config group to configure p
@@ -55,7 +55,7 @@ public final class PConfigGroup extends Module{
 	private static final String MAX_Y = "maxY";
 	private static final String SERVICEAREAFILE = "serviceAreaFile";
 	private static final String OPERATOR_TYPE = "operatorType";
-	private static final String NUMBER_OF_COOPERATIVES = "numberOfCooperatives";
+	private static final String NUMBER_OF_OPERATORS = "numberOfOperators";
 	private static final String PAX_PER_VEHICLE = "paxPerVehicle";
 	private static final String PCE = "passengerCarEquivalents";
 	private static final String VEHICLE_MAXIMUM_VELOCITY = "vehicleMaximumVelocity";
@@ -82,9 +82,9 @@ public final class PConfigGroup extends Module{
 	private static final String PLANNING_SPEED_FACTOR = "planningSpeedFactor";
 	private static final String GRID_SIZE = "gridSize";
 	private static final String TIMESLOT_SIZE = "timeSlotSize";
-	private static final String USE_ADAPTIVE_NUMBER_OF_COOPERATIVES = "useAdaptiveNumberOfCooperatives";
-	private static final String SHARE_OF_COOPERATIVES_WITH_PROFIT = "shareOfCooperativesWithProfit";
-	private static final String DISABLE_CREATION_OF_NEW_COOPERATIVES_IN_ITERATION = "disableCreationOfNewCooperativesInIteration";
+	private static final String USE_ADAPTIVE_NUMBER_OF_OPERATORS = "useAdaptiveNumberOfOperators";
+	private static final String SHARE_OF_OPERATORS_WITH_PROFIT = "shareOfOperatorsWithProfit";
+	private static final String DISABLE_CREATION_OF_NEW_OPERATORS_IN_ITERATION = "disableCreationOfNewOperatorsInIteration";
 	private static final String REROUTE_AGENTS_STUCK = "reRouteAgentsStuck";
 	private static final String PASSENGERS_BOARD_EVERY_LINE = "passengersBoardEveryLine";
 	private static final String TRANSIT_SCHEDULE_TO_START_WITH = "transitScheduleToStartWith";
@@ -105,7 +105,7 @@ public final class PConfigGroup extends Module{
 	private double maxY = Double.MAX_VALUE;
 	private String serviceAreaFile = "";
 	private String operatorType = BasicOperator.OPERATOR_NAME;
-	private int numberOfCooperatives = 1;
+	private int numberOfOperators = 1;
 	private int paxPerVehicle = 10;
 	private double passengerCarEquivalents = 1.0;
 	private double vehicleMaximumVelocity = Double.POSITIVE_INFINITY;
@@ -132,9 +132,9 @@ public final class PConfigGroup extends Module{
 	private double planningSpeedFactor = 1.0;
 	private double gridSize = Double.MAX_VALUE;
 	private double timeSlotSize = Double.MAX_VALUE;
-	private boolean useAdaptiveNumberOfCooperatives = false;
-	private double shareOfCooperativesWithProfit = 0.50;
-	private int disableCreationOfNewCooperativesInIteration = Integer.MAX_VALUE;
+	private boolean useAdaptiveNumberOfOperators = false;
+	private double shareOfOperatorsWithProfit = 0.50;
+	private int disableCreationOfNewOperatorsInIteration = Integer.MAX_VALUE;
 	private boolean reRouteAgentsStuck = false;
 	private boolean passengersBoardEveryLine = false;
 	private String transitScheduleToStartWith = null;
@@ -143,7 +143,7 @@ public final class PConfigGroup extends Module{
 	private String topoTypesForStops = null;
 
 	// Strategies
-	private final LinkedHashMap<Id, PStrategySettings> strategies = new LinkedHashMap<>();
+	private final LinkedHashMap<Id<PStrategySettings>, PStrategySettings> strategies = new LinkedHashMap<>();
 	
 	
 	public PConfigGroup(){
@@ -170,8 +170,8 @@ public final class PConfigGroup extends Module{
 			this.maxY = Double.parseDouble(value);
 		}else if (OPERATOR_TYPE.equals(key)){
 			this.operatorType = value;
-		} else if (NUMBER_OF_COOPERATIVES.equals(key)) {
-			this.numberOfCooperatives = Integer.parseInt(value);
+		} else if (NUMBER_OF_OPERATORS.equals(key)) {
+			this.numberOfOperators = Integer.parseInt(value);
 		} else if (NUMBER_OF_ITERATIONS_FOR_PROSPECTING.equals(key)) {
 			this.numberOfIterationsForProspecting = Integer.parseInt(value);
 		} else if (INITIAL_BUDGET.equals(key)) {
@@ -224,12 +224,12 @@ public final class PConfigGroup extends Module{
 			this.gridSize = Double.parseDouble(value);
 		} else if (TIMESLOT_SIZE.equals(key)){
 			this.timeSlotSize = Double.parseDouble(value);
-		} else if (USE_ADAPTIVE_NUMBER_OF_COOPERATIVES.equals(key)){
-			this.useAdaptiveNumberOfCooperatives = Boolean.parseBoolean(value);
-		} else if (SHARE_OF_COOPERATIVES_WITH_PROFIT.equals(key)){
-			this.shareOfCooperativesWithProfit = Double.parseDouble(value);
-		} else if (DISABLE_CREATION_OF_NEW_COOPERATIVES_IN_ITERATION.equals(key)){
-			this.disableCreationOfNewCooperativesInIteration = Integer.parseInt(value);
+		} else if (USE_ADAPTIVE_NUMBER_OF_OPERATORS.equals(key)){
+			this.useAdaptiveNumberOfOperators = Boolean.parseBoolean(value);
+		} else if (SHARE_OF_OPERATORS_WITH_PROFIT.equals(key)){
+			this.shareOfOperatorsWithProfit = Double.parseDouble(value);
+		} else if (DISABLE_CREATION_OF_NEW_OPERATORS_IN_ITERATION.equals(key)){
+			this.disableCreationOfNewOperatorsInIteration = Integer.parseInt(value);
 		} else if (REROUTE_AGENTS_STUCK.equals(key)){
 			this.reRouteAgentsStuck = Boolean.parseBoolean(value);
 		} else if (PASSENGERS_BOARD_EVERY_LINE.equals(key)){
@@ -243,19 +243,19 @@ public final class PConfigGroup extends Module{
 		} else if(TOPOTYPESFORSTOPS.equals(key)){
 			this.topoTypesForStops = value;
 		}else if (key != null && key.startsWith(PMODULE)) {
-			PStrategySettings settings = getStrategySettings(new IdImpl(key.substring(PMODULE.length())), true);
+			PStrategySettings settings = getStrategySettings(Id.create(key.substring(PMODULE.length()), PStrategySettings.class), true);
 			settings.setModuleName(value);
 		} else if (key != null && key.startsWith(PMODULE_PROBABILITY)) {
-			PStrategySettings settings = getStrategySettings(new IdImpl(key.substring(PMODULE_PROBABILITY.length())), true);
+			PStrategySettings settings = getStrategySettings(Id.create(key.substring(PMODULE_PROBABILITY.length()), PStrategySettings.class), true);
 			settings.setProbability(Double.parseDouble(value));
 		} else if (key != null && key.startsWith(PMODULE_DISABLEINITERATION)) {
-			PStrategySettings settings = getStrategySettings(new IdImpl(key.substring(PMODULE_DISABLEINITERATION.length())), true);
+			PStrategySettings settings = getStrategySettings(Id.create(key.substring(PMODULE_DISABLEINITERATION.length()), PStrategySettings.class), true);
 			settings.setDisableInIteration(Integer.parseInt(value));
 		} else if (key != null && key.startsWith(PMODULE_PARAMETER)) {
-			PStrategySettings settings = getStrategySettings(new IdImpl(key.substring(PMODULE_PARAMETER.length())), true);
+			PStrategySettings settings = getStrategySettings(Id.create(key.substring(PMODULE_PARAMETER.length()), PStrategySettings.class), true);
 			settings.setParameters(value);
 		}else{
-			log.warn("unknown parameter: " + key + "...");
+			log.error("unknown parameter: " + key + "...");
 		}
 	}
 	
@@ -272,7 +272,7 @@ public final class PConfigGroup extends Module{
 		map.put(MAX_Y, Double.toString(this.maxY));
 		map.put(SERVICEAREAFILE, this.serviceAreaFile);
 		map.put(OPERATOR_TYPE, this.operatorType);
-		map.put(NUMBER_OF_COOPERATIVES, Integer.toString(this.numberOfCooperatives));
+		map.put(NUMBER_OF_OPERATORS, Integer.toString(this.numberOfOperators));
 		map.put(NUMBER_OF_ITERATIONS_FOR_PROSPECTING, Integer.toString(this.numberOfIterationsForProspecting));
 		map.put(INITIAL_BUDGET, Double.toString(this.initialBudget));
 		map.put(PAX_PER_VEHICLE, Integer.toString(this.paxPerVehicle));
@@ -299,16 +299,16 @@ public final class PConfigGroup extends Module{
 		map.put(PLANNING_SPEED_FACTOR, Double.toString(this.planningSpeedFactor));
 		map.put(GRID_SIZE, Double.toString(this.gridSize));
 		map.put(TIMESLOT_SIZE, Double.toString(this.timeSlotSize));
-		map.put(USE_ADAPTIVE_NUMBER_OF_COOPERATIVES, Boolean.toString(this.useAdaptiveNumberOfCooperatives));
-		map.put(SHARE_OF_COOPERATIVES_WITH_PROFIT, Double.toString(this.shareOfCooperativesWithProfit));
-		map.put(DISABLE_CREATION_OF_NEW_COOPERATIVES_IN_ITERATION, Integer.toString(this.disableCreationOfNewCooperativesInIteration));
+		map.put(USE_ADAPTIVE_NUMBER_OF_OPERATORS, Boolean.toString(this.useAdaptiveNumberOfOperators));
+		map.put(SHARE_OF_OPERATORS_WITH_PROFIT, Double.toString(this.shareOfOperatorsWithProfit));
+		map.put(DISABLE_CREATION_OF_NEW_OPERATORS_IN_ITERATION, Integer.toString(this.disableCreationOfNewOperatorsInIteration));
 		map.put(REROUTE_AGENTS_STUCK, Boolean.toString(this.reRouteAgentsStuck));
 		map.put(PASSENGERS_BOARD_EVERY_LINE, Boolean.toString(this.passengersBoardEveryLine));
 		map.put(TRANSIT_SCHEDULE_TO_START_WITH, this.transitScheduleToStartWith);
 		map.put(OPERATIONMODE, this.operationMode);
 		map.put(TOPOTYPESFORSTOPS, this.topoTypesForStops);
 		
-		for (Entry<Id, PStrategySettings>  entry : this.strategies.entrySet()) {
+		for (Entry<Id<PStrategySettings>, PStrategySettings> entry : this.strategies.entrySet()) {
 			map.put(PMODULE + entry.getKey().toString(), entry.getValue().getModuleName());
 			map.put(PMODULE_PROBABILITY + entry.getKey().toString(), Double.toString(entry.getValue().getProbability()));
 			map.put(PMODULE_DISABLEINITERATION + entry.getKey().toString(), Integer.toString(entry.getValue().getDisableInIteration()));
@@ -328,10 +328,10 @@ public final class PConfigGroup extends Module{
 		map.put(MAX_X, "max x coordinate for service area");
 		map.put(MAX_Y, "max y coordinate for service area");
 		map.put(SERVICEAREAFILE, "a shapefile containing a shape of the service-area or a textfile containing a sequence of x/y values, describing a line string");
-		map.put(OPERATOR_TYPE, "Type of cooperative to be used");
-		map.put(NUMBER_OF_COOPERATIVES, "number of cooperatives operating");
-		map.put(NUMBER_OF_ITERATIONS_FOR_PROSPECTING, "number of iterations an cooperative will survive with a negative scoring");
-		map.put(INITIAL_BUDGET, "The budget a new cooperative is initialized with");
+		map.put(OPERATOR_TYPE, "Type of operator to be used");
+		map.put(NUMBER_OF_OPERATORS, "number of operators operating");
+		map.put(NUMBER_OF_ITERATIONS_FOR_PROSPECTING, "number of iterations an operator will survive with a negative scoring");
+		map.put(INITIAL_BUDGET, "The budget a new operator is initialized with");
 		map.put(PAX_PER_VEHICLE, "number of passengers per vehicle");
 		map.put(PCE, "Passenger car equilvalents of one paratransit vehicle");
 		map.put(VEHICLE_MAXIMUM_VELOCITY, "Maximum velocity of minibuses. Default is Double.POSITIVE_INFINITY.");
@@ -345,7 +345,7 @@ public final class PConfigGroup extends Module{
 		map.put(PRICE_PER_VEHICLE_BOUGHT, "price of one vehicle bought");
 		map.put(PRICE_PER_VEHICLE_SOLD, "price of one vehicle sold");
 		map.put(START_WITH_24_HOURS, "Initial plan will start operating 0-24 hours");
-		map.put(MIN_OPERATION_TIME, "min time of operation of each cooperative in seconds");
+		map.put(MIN_OPERATION_TIME, "min time of operation of each operator in seconds");
 		map.put(MIN_INITIAL_STOP_DISTANCE, "min distance the two initial stops of a new operator's first route should be apart. Default is 1.0. Set to 0.0 to allow for the same stop being picked as start and end stop.");
 		map.put(USEFRANCHISE, "Will use a franchise system if set to true");
 		map.put(WRITESTATS_INTERVAL, "number of iterations statistics will be plotted. Set to zero to turn this feature off. Set to infinity to turn off the plots, but write the statistics file anyway");
@@ -356,16 +356,16 @@ public final class PConfigGroup extends Module{
 		map.put(PLANNING_SPEED_FACTOR, "Freespeed of link will be modified by factor. Resulting link travel time is written to transit schedule. Default is 1.0 aka freespeed of the link.");
 		map.put(GRID_SIZE, "The grid size (length and height) for aggregating stuff in various modules (RandomStopProvider, ActivityLocationsParatransitUser, PFranchise). Default of Double.maxvalue effectively aggregates all data points into one gridPoint");
 		map.put(TIMESLOT_SIZE, "The size of a time slot aggregating stuff in various modules (TimeProvider, CreateNewPlan). Default of Double.maxvalue effectively aggregates all data points into one time slot");
-		map.put(USE_ADAPTIVE_NUMBER_OF_COOPERATIVES, "Will try to adapt the number of cooperatives to meet the given share of profitable coopertives if set to true");
-		map.put(SHARE_OF_COOPERATIVES_WITH_PROFIT, "Target share of profitable cooperatives - Set " + USE_ADAPTIVE_NUMBER_OF_COOPERATIVES + "=true to enable this feature");
-		map.put(DISABLE_CREATION_OF_NEW_COOPERATIVES_IN_ITERATION, "No more new cooperatives will be found beginning with the iteration specified");
+		map.put(USE_ADAPTIVE_NUMBER_OF_OPERATORS, "Will try to adapt the number of operators to meet the given share of profitable coopertives if set to true");
+		map.put(SHARE_OF_OPERATORS_WITH_PROFIT, "Target share of profitable operators - Set " + USE_ADAPTIVE_NUMBER_OF_OPERATORS + "=true to enable this feature");
+		map.put(DISABLE_CREATION_OF_NEW_OPERATORS_IN_ITERATION, "No more new operators will be found beginning with the iteration specified");
 		map.put(REROUTE_AGENTS_STUCK, "All agents stuck will be rerouted at the beginning of an iteration, if set to true.");
 		map.put(PASSENGERS_BOARD_EVERY_LINE, "Agents will board every vehicles serving the destination (stop), if set to true. Set to false, to force agents to take only vehicles of the line planned. Default is false.");
-		map.put(TRANSIT_SCHEDULE_TO_START_WITH, "Will initialize one cooperative for each transit line with the given time of operation and number of vehicles");
+		map.put(TRANSIT_SCHEDULE_TO_START_WITH, "Will initialize one operator for each transit line with the given time of operation and number of vehicles");
 		map.put(OPERATIONMODE, "the mode of transport in which the paratransit operates");
 		map.put(TOPOTYPESFORSTOPS, "comma separated integer-values, as used in NetworkCalcTopoTypes");
 		
-		for (Entry<Id, PStrategySettings>  entry : this.strategies.entrySet()) {
+		for (Entry<Id<PStrategySettings>, PStrategySettings>  entry : this.strategies.entrySet()) {
 			map.put(PMODULE + entry.getKey().toString(), "name of strategy");
 			map.put(PMODULE_PROBABILITY + entry.getKey().toString(), "probability that a strategy is applied to a given a plan. despite its name, this really is a ``weight''");
 			map.put(PMODULE_DISABLEINITERATION + entry.getKey().toString(), "removes the strategy from the choice set at the beginning of the given iteration");
@@ -403,8 +403,8 @@ public final class PConfigGroup extends Module{
 		return this.operatorType;
 	}
 	
-	public int getNumberOfCooperatives() {
-		return this.numberOfCooperatives;
+	public int getNumberOfOperators() {
+		return this.numberOfOperators;
 	}
 	
 	public int getNumberOfIterationsForProspecting() {
@@ -511,16 +511,16 @@ public final class PConfigGroup extends Module{
 		return this.timeSlotSize;
 	}
 	
-	public boolean getUseAdaptiveNumberOfCooperatives() {
-		return this.useAdaptiveNumberOfCooperatives;
+	public boolean getUseAdaptiveNumberOfOperators() {
+		return this.useAdaptiveNumberOfOperators;
 	}
 
-	public double getShareOfCooperativesWithProfit() {
-		return this.shareOfCooperativesWithProfit;
+	public double getShareOfOperatorsWithProfit() {
+		return this.shareOfOperatorsWithProfit;
 	}
 	
-	public int getDisableCreationOfNewCooperativesInIteration() {
-		return this.disableCreationOfNewCooperativesInIteration;
+	public int getDisableCreationOfNewOperatorsInIteration() {
+		return this.disableCreationOfNewOperatorsInIteration;
 	}
 	
 	public boolean getReRouteAgentsStuck() {
@@ -558,23 +558,23 @@ public final class PConfigGroup extends Module{
 		return this.strategies.values();
 	}
 	
-	private PStrategySettings getStrategySettings(final Id index, final boolean createIfMissing) {
-		PStrategySettings settings = this.strategies.get(index);
+	private PStrategySettings getStrategySettings(final Id<PStrategySettings> strategyId, final boolean createIfMissing) {
+		PStrategySettings settings = this.strategies.get(strategyId);
 		if (settings == null && createIfMissing) {
-			settings = new PStrategySettings(index);
-			this.strategies.put(index, settings);
+			settings = new PStrategySettings(strategyId);
+			this.strategies.put(strategyId, settings);
 		}
 		return settings;
 	}
 	
 	public static class PStrategySettings{
-		private Id id;
+		private Id<PStrategySettings> id;
 		private double probability = -1.0;
 		private int disableInIteration = -1;
 		private String moduleName = null;
 		private String[] parameters = null;
 
-		public PStrategySettings(final Id id) {
+		public PStrategySettings(final Id<PStrategySettings> id) {
 			this.id = id;
 		}
 
@@ -602,11 +602,11 @@ public final class PConfigGroup extends Module{
 			return this.moduleName;
 		}		
 
-		public Id getId() {
+		public Id<PStrategySettings> getId() {
 			return this.id;
 		}
 
-		public void setId(final Id id) {
+		public void setId(final Id<PStrategySettings> id) {
 			this.id = id;
 		}
 		

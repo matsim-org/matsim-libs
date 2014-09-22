@@ -95,7 +95,7 @@ final class POperatorLogger implements StartupListener, IterationEndsListener, S
 		if(this.pConfig.getLogOperators()){
 			
 			// get cooperatives
-			for (Operator cooperative : this.pBox.getCooperatives()) {
+			for (Operator cooperative : this.pBox.getOperators()) {
 				// get all plans
 				List<PPlan> plans = cooperative.getAllPlans();
 				

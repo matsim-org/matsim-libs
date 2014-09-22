@@ -41,7 +41,7 @@ final class PersonReRouteStuck extends AbstractPersonReRouteStuck {
 	
 	private final TransitActsRemover transitActsRemover;
 
-	public PersonReRouteStuck(final PlanAlgorithm router, final ScenarioImpl scenario, Set<Id> agentsStuck) {
+	public PersonReRouteStuck(final PlanAlgorithm router, final ScenarioImpl scenario, Set<Id<Person>> agentsStuck) {
 		super(router, scenario, agentsStuck);
 		this.transitActsRemover = new TransitActsRemover(); 
 	}

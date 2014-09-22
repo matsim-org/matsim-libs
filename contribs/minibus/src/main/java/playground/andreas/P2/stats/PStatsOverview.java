@@ -147,7 +147,7 @@ final class PStatsOverview implements StartupListener, IterationEndsListener, Sh
 			double score = 0.0;
 			double scorePos = 0.0;
 
-			for (Operator operator : this.pBox.getCooperatives()) {
+			for (Operator operator : this.pBox.getOperators()) {
 				List<PPlan> plans = operator.getAllPlans();
 				
 				double operatorRoutes = 0.0;

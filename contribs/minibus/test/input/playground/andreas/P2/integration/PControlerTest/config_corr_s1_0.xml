@@ -14,7 +14,7 @@
 	<module name="p" >
 		<param name="pIdentifier" value="para_" />
 		<param name="operatorType" value="CarefulMultiPlanOperator" />
-		<param name="numberOfCooperatives" value="1" />
+		<param name="numberOfOperators" value="1" />
 		<param name="numberOfIterationsForProspecting" value="10" />
 		<param name="initialBudget" value="201.0" />
 		<param name="paxPerVehicle" value="10" />
@@ -48,9 +48,9 @@
 		<param name="planningSpeedFactor" value="1.0" />
 		<param name="gridSize" value="500.0" />
 		<param name="timeSlotSize" value="900.0" />
-		<param name="useAdaptiveNumberOfCooperatives" value="true" />
-		<param name="shareOfCooperativesWithProfit" value="0.90" />
-		<param name="disableCreationOfNewCooperativesInIteration" value="900" />
+		<param name="useAdaptiveNumberOfOperators" value="true" />
+		<param name="shareOfOperatorsWithProfit" value="0.90" />
+		<param name="disableCreationOfNewOperatorsInIteration" value="900" />
 		<param name="reRouteAgentsStuck" value="false" />
 		<param name="passengersBoardEveryLine" value="false" /> <!-- This is not used anymore -->
 		<!--<param name="transitScheduleToStartWith" value="&INPUTBASE;/transitSchedule_onlyTxlBusLines.xml.gz" />-->

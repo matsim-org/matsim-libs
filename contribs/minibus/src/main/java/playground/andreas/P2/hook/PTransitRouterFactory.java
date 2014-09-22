@@ -69,8 +69,9 @@ class PTransitRouterFactory implements TransitRouterFactory{
 		
 		if (this.routerFactory == null) {
 			// no speedy router available - return old one
-			TransitRouterNetworkTravelTimeAndDisutility ttCalculator = new TransitRouterNetworkTravelTimeAndDisutility(this.transitRouterConfig);
-			return new TransitRouterImpl(this.transitRouterConfig, new PreparedTransitSchedule(schedule), routerNetwork, ttCalculator, ttCalculator);
+			PreparedTransitSchedule preparedTransitSchedule = new PreparedTransitSchedule(schedule);
+			TransitRouterNetworkTravelTimeAndDisutility ttCalculator = new TransitRouterNetworkTravelTimeAndDisutility(this.transitRouterConfig, preparedTransitSchedule);
+			return new TransitRouterImpl(this.transitRouterConfig, preparedTransitSchedule, routerNetwork, ttCalculator, ttCalculator);
 		} else {
 			return this.routerFactory.createTransitRouter();
 		}

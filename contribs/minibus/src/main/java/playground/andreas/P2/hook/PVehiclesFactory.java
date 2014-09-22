@@ -20,12 +20,13 @@
 package playground.andreas.P2.hook;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.*;
+
 import playground.andreas.P2.PConfigGroup;
 
 /**
@@ -35,6 +36,8 @@ import playground.andreas.P2.PConfigGroup;
  *
  */
 class PVehiclesFactory {
+	
+	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(PVehiclesFactory.class);
 	
 	private final PConfigGroup pConfig;
@@ -51,7 +54,7 @@ class PVehiclesFactory {
 	public Vehicles createVehicles(TransitSchedule pTransitSchedule){		
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();		
 		VehiclesFactory vehFactory = vehicles.getFactory();
-		VehicleType vehType = vehFactory.createVehicleType(new IdImpl(this.pConfig.getPIdentifier()));
+		VehicleType vehType = vehFactory.createVehicleType(Id.create(this.pConfig.getPIdentifier(), VehicleType.class));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(this.pConfig.getPaxPerVehicle() + 1); // july 2011 the driver takes one seat
 		capacity.setStandingRoom(0);

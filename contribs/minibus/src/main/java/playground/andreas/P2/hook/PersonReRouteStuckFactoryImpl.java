@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -39,7 +40,7 @@ class PersonReRouteStuckFactoryImpl implements PersonReRouteStuckFactory {
 	}
 
 	@Override
-	public AbstractPersonReRouteStuck getReRouteStuck(final PlanAlgorithm router, final ScenarioImpl scenario, Set<Id> agentsStuck) {
+	public AbstractPersonReRouteStuck getReRouteStuck(final PlanAlgorithm router, final ScenarioImpl scenario, Set<Id<Person>> agentsStuck) {
 		return new PersonReRouteStuck(router, scenario, agentsStuck);
 	}
 }

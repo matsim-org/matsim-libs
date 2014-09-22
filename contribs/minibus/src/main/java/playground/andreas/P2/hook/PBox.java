@@ -56,7 +56,7 @@ final class PBox implements Operators {
 	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(PBox.class);
 	
-	private LinkedList<Operator> cooperatives;
+	private LinkedList<Operator> operators;
 	
 	private final PConfigGroup pConfig;
 	private final PFranchise franchise;
@@ -109,40 +109,40 @@ final class PBox implements Operators {
 		// init possible paratransit stops
 		this.pStopsOnly = PStopsFactory.createPStops(event.getControler().getNetwork(), this.pConfig, event.getControler().getScenario().getTransitSchedule());
 		
-		this.cooperatives = new LinkedList<>();
+		this.operators = new LinkedList<>();
 		this.operatorInitializer = new OperatorInitializer(this.pConfig, this.franchise, this.pStopsOnly, event.getControler(), timeProvider);
 		
-		// init additional cooperatives from a given transit schedule file
-		LinkedList<Operator> coopsFromSchedule = this.operatorInitializer.createOperatorsFromSchedule(event.getControler().getScenario().getTransitSchedule());
-		this.cooperatives.addAll(coopsFromSchedule);
+		// init additional operators from a given transit schedule file
+		LinkedList<Operator> operatorsFromSchedule = this.operatorInitializer.createOperatorsFromSchedule(event.getControler().getScenario().getTransitSchedule());
+		this.operators.addAll(operatorsFromSchedule);
 		
-		// init initial set of cooperatives - reduced by the number of preset coops
-		LinkedList<Operator> initialCoops = this.operatorInitializer.createAdditionalOperators(this.strategyManager, event.getControler().getConfig().controler().getFirstIteration(), (this.pConfig.getNumberOfCooperatives() - coopsFromSchedule.size()));
-		this.cooperatives.addAll(initialCoops);
+		// init initial set of operators - reduced by the number of preset operators
+		LinkedList<Operator> initialOperators = this.operatorInitializer.createAdditionalOperators(this.strategyManager, event.getControler().getConfig().controler().getFirstIteration(), (this.pConfig.getNumberOfOperators() - operatorsFromSchedule.size()));
+		this.operators.addAll(initialOperators);
 		
-		// collect the transit schedules from all cooperatives
+		// collect the transit schedules from all operators
 		this.pTransitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
 		for (TransitStopFacility stop : this.pStopsOnly.getFacilities().values()) {
 			this.pTransitSchedule.addStopFacility(stop);
 		}
-		for (Operator cooperative : this.cooperatives) {
-			this.pTransitSchedule.addTransitLine(cooperative.getCurrentTransitLine());
+		for (Operator operator : this.operators) {
+			this.pTransitSchedule.addTransitLine(operator.getCurrentTransitLine());
 		}
 		
 		// Reset the franchise system - TODO necessary?
-		this.franchise.reset(this.cooperatives);
+		this.franchise.reset(this.operators);
 	}
 
 	void notifyIterationStarts(IterationStartsEvent event) {
 
         this.strategyManager.updateStrategies(event.getIteration());
 
-        // Adapt number of cooperatives
-        this.handleBankruptCopperatives(event.getIteration());
+        // Adapt number of operators
+        this.handleBankruptOperators(event.getIteration());
 
-        // Replan all cooperatives
-        for (Operator cooperative : this.cooperatives) {
-            cooperative.replan(this.strategyManager, event.getIteration());
+        // Replan all operators
+        for (Operator operator : this.operators) {
+            operator.replan(this.strategyManager, event.getIteration());
         }
 
         // Collect current lines offered
@@ -150,18 +150,18 @@ final class PBox implements Operators {
         for (TransitStopFacility stop : this.pStopsOnly.getFacilities().values()) {
             this.pTransitSchedule.addStopFacility(stop);
         }
-        for (Operator cooperative : this.cooperatives) {
-            this.pTransitSchedule.addTransitLine(cooperative.getCurrentTransitLine());
+        for (Operator operator : this.operators) {
+            this.pTransitSchedule.addTransitLine(operator.getCurrentTransitLine());
         }
 
         // Reset the franchise system
-        this.franchise.reset(this.cooperatives);
+        this.franchise.reset(this.operators);
     }
 
 	void notifyScoring(ScoringEvent event) {
 		TreeMap<Id<Vehicle>, ScoreContainer> driverId2ScoreMap = this.scorePlansHandler.getDriverId2ScoreMap();
-		for (Operator cooperative : this.cooperatives) {
-			cooperative.score(driverId2ScoreMap);
+		for (Operator operator : this.operators) {
+			operator.score(driverId2ScoreMap);
 		}
 		
 		this.pTransitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
@@ -169,70 +169,61 @@ final class PBox implements Operators {
 			this.pTransitSchedule.addStopFacility(stop);
 		}
 		
-		for (Operator cooperative : this.cooperatives) {
-			this.pTransitSchedule.addTransitLine(cooperative.getCurrentTransitLine());
+		for (Operator operator : this.operators) {
+			this.pTransitSchedule.addTransitLine(operator.getCurrentTransitLine());
 		}
 		
 		writeScheduleToFile(this.pTransitSchedule, event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "transitScheduleScored.xml.gz"));		
 	}
 
-	private void handleBankruptCopperatives(int iteration) {
+	private void handleBankruptOperators(int iteration) {
 		
-		LinkedList<Operator> cooperativesToKeep = new LinkedList<>();
-		int coopsProspecting = 0;
-		int coopsInBusiness = 0;
-		int coopsBankrupt = 0;
+		LinkedList<Operator> operatorsToKeep = new LinkedList<>();
+		int operatorsProspecting = 0;
+		int operatorsInBusiness = 0;
+		int operatorsBankrupt = 0;
 		
-		// Get cooperatives with positive budget
-		for (Operator cooperative : this.cooperatives) {
-			if(cooperative.getOperatorState().equals(OperatorState.PROSPECTING)){
-				cooperativesToKeep.add(cooperative);
-				coopsProspecting++;
+		// Get operators with positive budget
+		for (Operator operator : this.operators) {
+			if(operator.getOperatorState().equals(OperatorState.PROSPECTING)){
+				operatorsToKeep.add(operator);
+				operatorsProspecting++;
 			}
 			
-			if(cooperative.getOperatorState().equals(OperatorState.INBUSINESS)){
-				cooperativesToKeep.add(cooperative);
-				coopsInBusiness++;
+			if(operator.getOperatorState().equals(OperatorState.INBUSINESS)){
+				operatorsToKeep.add(operator);
+				operatorsInBusiness++;
 			}
 			
-			if(cooperative.getOperatorState().equals(OperatorState.BANKRUPT)){
-				coopsBankrupt++;
+			if(operator.getOperatorState().equals(OperatorState.BANKRUPT)){
+				operatorsBankrupt++;
 			}
 		}
 		
-		// get the number of new coops
-		int numberOfNewCoopertives = coopsBankrupt;
+		// get the number of new operators
+		int numberOfNewOperators = operatorsBankrupt;
 		
-		if(this.pConfig.getUseAdaptiveNumberOfCooperatives()){
-			// adapt the number of cooperatives
-//			if((double) nonBankruptCooperatives.size() / (double) this.cooperatives.size() < this.pConfig.getShareOfCooperativesWithProfit()){
-//				// too few with profit, decrease number of new cooperatives by one
-//				numberOfNewCoopertives--;
-//			} else {
-//				// too many with profit, there should be some market niche left, increase number of new cooperatives by one
-//				numberOfNewCoopertives++;
-//			}
-			
-			// calculate the exact number necessary
-			numberOfNewCoopertives = (int) (coopsInBusiness * (1.0/this.pConfig.getShareOfCooperativesWithProfit() - 1.0) + 0.0000000000001) - coopsProspecting;
+		if(this.pConfig.getUseAdaptiveNumberOfOperators()){
+			// adapt the number of operators by calculating the exact number necessary
+			numberOfNewOperators = (int) (operatorsInBusiness * (1.0/this.pConfig.getShareOfOperatorsWithProfit() - 1.0) + 0.0000000000001) - operatorsProspecting;
 		}
 		
 		// delete bankrupt ones
-		this.cooperatives = cooperativesToKeep;
+		this.operators = operatorsToKeep;
 		
-		if (this.pConfig.getDisableCreationOfNewCooperativesInIteration() > iteration) {
+		if (this.pConfig.getDisableCreationOfNewOperatorsInIteration() > iteration) {
 			// recreate all other
-			LinkedList<Operator> newCoops1 = this.operatorInitializer.createAdditionalOperators(this.strategyManager, iteration, numberOfNewCoopertives);
-			this.cooperatives.addAll(newCoops1);
+			LinkedList<Operator> newOperators1 = this.operatorInitializer.createAdditionalOperators(this.strategyManager, iteration, numberOfNewOperators);
+			this.operators.addAll(newOperators1);
 			
-			// too few cooperatives in play, increase to the minimum specified in the config
-			LinkedList<Operator> newCoops2 = this.operatorInitializer.createAdditionalOperators(this.strategyManager, iteration, (this.pConfig.getNumberOfCooperatives() - this.cooperatives.size()));
-			this.cooperatives.addAll(newCoops2);
+			// too few operators in play, increase to the minimum specified in the config
+			LinkedList<Operator> newOperators2 = this.operatorInitializer.createAdditionalOperators(this.strategyManager, iteration, (this.pConfig.getNumberOfOperators() - this.operators.size()));
+			this.operators.addAll(newOperators2);
 			
-			// all coops are in business, increase by one to ensure minimal mutation
-			if (this.cooperatives.size() == coopsInBusiness) {
-				LinkedList<Operator> newCoops3 = this.operatorInitializer.createAdditionalOperators(this.strategyManager, iteration, 1);
-				this.cooperatives.addAll(newCoops3);
+			// all operators are in business, increase by one to ensure minimal mutation
+			if (this.operators.size() == operatorsInBusiness) {
+				LinkedList<Operator> newOperators3 = this.operatorInitializer.createAdditionalOperators(this.strategyManager, iteration, 1);
+				this.operators.addAll(newOperators3);
 			}
 		}
 	}
@@ -241,8 +232,8 @@ final class PBox implements Operators {
 		return this.pTransitSchedule;
 	}
 
-	public List<Operator> getCooperatives() {
-		return cooperatives;
+	public List<Operator> getOperators() {
+		return operators;
 	}
 
 	private void writeScheduleToFile(TransitSchedule schedule, String iterationFilename) {

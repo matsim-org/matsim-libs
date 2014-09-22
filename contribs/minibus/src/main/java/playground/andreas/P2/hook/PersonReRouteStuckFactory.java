@@ -19,6 +19,7 @@
 package playground.andreas.P2.hook;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -38,7 +39,7 @@ interface PersonReRouteStuckFactory {
 	 * @param agentsStuck
 	 * @return
 	 */
-	public AbstractPersonReRouteStuck getReRouteStuck(PlanAlgorithm router, ScenarioImpl scenario, Set<Id> agentsStuck) ;
+	public AbstractPersonReRouteStuck getReRouteStuck(PlanAlgorithm router, ScenarioImpl scenario, Set<Id<Person>> agentsStuck) ;
 
 }
 
