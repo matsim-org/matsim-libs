@@ -81,7 +81,7 @@ final class POperatorLogger implements StartupListener, IterationEndsListener, S
 			log.info("enabled");
 			this.pOperatorLoggerWriter = IOUtils.getBufferedWriter(controler.getControlerIO().getOutputFilename("pOperatorLogger.txt"));
 			try {
-				this.pOperatorLoggerWriter.write("iter\toperator\tstatus\tplan\tcreator\tveh\tpax\tscore\tbudget\tstart\tend\tstopsToBeServed\tlinks\t\n");
+				this.pOperatorLoggerWriter.write("iter\toperator\tstatus\tplan\tcreator\tparent\tveh\tpax\tscore\tbudget\tstart\tend\tstopsToBeServed\tlinks\t\n");
 			} catch (IOException e) {
 				throw new UncheckedIOException(e);
 			}
@@ -132,7 +132,7 @@ final class POperatorLogger implements StartupListener, IterationEndsListener, S
 					
 					try {
 						this.pOperatorLoggerWriter.write(event.getIteration() + "\t" + operator.getId() + "\t" + operator.getOperatorState() + "\t" + plan.getId() + "\t" 
-								+ plan.getCreator() + "\t" + (int) planVeh + "\t" + (int) planPax + "\t" + planScore + "\t" + operator.getBudget() + "\t" 
+								+ plan.getCreator() + "\t" + plan.getParentId() + "\t" + (int) planVeh + "\t" + (int) planPax + "\t" + planScore + "\t" + operator.getBudget() + "\t" 
 								+ startTime + "\t" + endTime + "\t" + stopsServed + "\t" + linksServed + "\n");
 					} catch (IOException e) {
 						// TODO Auto-generated catch block

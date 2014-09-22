@@ -27,7 +27,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.Vehicle;
+
 import playground.andreas.P2.PConfigGroup;
+import playground.andreas.P2.PConstants;
 import playground.andreas.P2.replanning.PStrategy;
 import playground.andreas.P2.routeProvider.PRouteProvider;
 
@@ -162,7 +164,7 @@ public final class CreateOperatorFromTransitSchedule implements PStrategy {
 			}
 		}
 		
-		PPlan plan = new PPlan(id, this.getStrategyName());
+		PPlan plan = new PPlan(id, this.getStrategyName(), PConstants.founderPlanId);
 		plan.setStopsToBeServed(stopsToBeServed);
 		plan.setStartTime(startTime);
 		plan.setEndTime(endTime);

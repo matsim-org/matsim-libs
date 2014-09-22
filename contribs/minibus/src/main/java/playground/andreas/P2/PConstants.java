@@ -19,12 +19,18 @@
 
 package playground.andreas.P2;
 
+import org.matsim.api.core.v01.Id;
+
+import playground.andreas.P2.operator.PPlan;
+
 /**
  * @author aneumann
  */
 public final class PConstants {
 
 	public static final String statsOutputFolder = "/pStats/";
+	
+	public static final Id<PPlan> founderPlanId = Id.create("founder", PPlan.class);
 	
 	public enum OperatorState {
 	    PROSPECTING, INBUSINESS, BANKRUPT

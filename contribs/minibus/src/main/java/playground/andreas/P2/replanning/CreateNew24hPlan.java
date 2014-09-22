@@ -21,6 +21,8 @@ package playground.andreas.P2.replanning;
 
 import org.apache.log4j.Logger;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+
+import playground.andreas.P2.PConstants;
 import playground.andreas.P2.operator.Operator;
 import playground.andreas.P2.operator.PPlan;
 
@@ -63,7 +65,7 @@ public final class CreateNew24hPlan extends AbstractPStrategyModule {
 			stopsToBeServed.add(stop1);
 			stopsToBeServed.add(stop2);
 			
-			newPlan = new PPlan(operator.getNewPlanId(), this.getStrategyName());
+			newPlan = new PPlan(operator.getNewPlanId(), this.getStrategyName(), PConstants.founderPlanId);
 			newPlan.setStopsToBeServed(stopsToBeServed);
 			newPlan.setStartTime(startTime);
 			newPlan.setEndTime(endTime);

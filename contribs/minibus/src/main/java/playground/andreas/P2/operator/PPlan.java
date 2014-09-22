@@ -45,6 +45,7 @@ public final class PPlan implements Comparable<PPlan>{
 	
 	private final Id<PPlan> planId;
 	private final String creator;
+	private Id<PPlan> parentId;
 
 	private TransitLine line;
 	private double score = Double.NaN;
@@ -57,10 +58,12 @@ public final class PPlan implements Comparable<PPlan>{
 	private ArrayList<TransitStopFacility> stopsToBeServed;
 
 	private Set<Id<Vehicle>> vehicleIds;
+
 	
-	public PPlan(Id<PPlan> planId, String creator) {
+	public PPlan(Id<PPlan> planId, String creator, Id<PPlan> parentId) {
 		this.planId = planId;
 		this.creator = creator;
+		this.parentId = parentId;
 	}
 	
 	@Override
@@ -100,6 +103,10 @@ public final class PPlan implements Comparable<PPlan>{
 	
 	public String getCreator() {
 		return this.creator;
+	}
+	
+	public Id<PPlan> getParentId() {
+		return this.parentId;
 	}
 
 	public TransitLine getLine(){

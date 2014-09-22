@@ -89,7 +89,7 @@ public final class SidewaysRouteExtension extends AbstractPStrategyModule {
 		ArrayList<TransitStopFacility> newStopsToBeServed = this.addStopToExistingStops(baseStop, remoteStop, currentStopsToBeServed, newStop);
 		
 		// create new plan
-		PPlan newPlan = new PPlan(operator.getNewPlanId(), this.getStrategyName());
+		PPlan newPlan = new PPlan(operator.getNewPlanId(), this.getStrategyName(), oldPlan.getParentId());
 		newPlan.setNVehicles(1);
 		newPlan.setStartTime(oldPlan.getStartTime());
 		newPlan.setEndTime(oldPlan.getEndTime());

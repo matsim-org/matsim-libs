@@ -28,7 +28,9 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.testcases.MatsimTestUtils;
+
 import playground.andreas.P2.PConfigGroup;
+import playground.andreas.P2.PConstants;
 import playground.andreas.P2.operator.PPlan;
 import playground.andreas.P2.schedule.CreateStopsForAllCarLinks;
 
@@ -52,7 +54,7 @@ public class SimpleCircleScheduleProviderTest {
 		Id lineId = new IdImpl("line1");
 		Id routeId = new IdImpl("route1");
 		
-		PPlan plan = new PPlan(routeId, "noCreator");
+		PPlan plan = new PPlan(routeId, "noCreator", PConstants.founderPlanId);
 		plan.setStartTime(7.0 * 3600.0);
 		plan.setEndTime(9.0 * 3600.0);
 		plan.setNVehicles(2);

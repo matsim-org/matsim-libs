@@ -32,7 +32,9 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.*;
+
 import playground.andreas.P2.PConfigGroup;
+import playground.andreas.P2.PConstants;
 import playground.andreas.P2.operator.*;
 import playground.andreas.P2.replanning.CreateNewPlan;
 import playground.andreas.P2.replanning.PStrategy;
@@ -395,7 +397,7 @@ class Route2111to2333 implements PStrategy{
 	public PPlan run(Operator cooperative) {
 		Id routeId = new IdImpl(cooperative.getCurrentIteration());
 		
-		PPlan newPlan = new PPlan(routeId, this.getStrategyName());
+		PPlan newPlan = new PPlan(routeId, this.getStrategyName(), PConstants.founderPlanId);
 		newPlan.setNVehicles(1);
 		newPlan.setStartTime(8.0 * 3600.0);
 		newPlan.setEndTime(16.0 * 3600.0);
@@ -432,7 +434,7 @@ class Route2333to2111 implements PStrategy{
 	public PPlan run(Operator cooperative) {
 		Id routeId = new IdImpl(cooperative.getCurrentIteration());
 		
-		PPlan newPlan = new PPlan(routeId, this.getStrategyName());
+		PPlan newPlan = new PPlan(routeId, this.getStrategyName(), PConstants.founderPlanId);
 		newPlan.setNVehicles(1);
 		newPlan.setStartTime(8.0 * 3600.0);
 		newPlan.setEndTime(16.0 * 3600.0);
@@ -468,7 +470,7 @@ class Route2414to3444 implements PStrategy{
 	@Override
 	public PPlan run(Operator cooperative) {
 		Id routeId = new IdImpl(cooperative.getCurrentIteration());
-		PPlan newPlan = new PPlan(routeId, this.getStrategyName());
+		PPlan newPlan = new PPlan(routeId, this.getStrategyName(), PConstants.founderPlanId);
 		newPlan.setNVehicles(1);
 		newPlan.setStartTime(8.0 * 3600.0);
 		newPlan.setEndTime(16.0 * 3600.0);
@@ -505,7 +507,7 @@ class Route2111to1314to4443 implements PStrategy{
 	@Override
 	public PPlan run(Operator cooperative) {
 		Id routeId = new IdImpl(cooperative.getCurrentIteration());
-		PPlan newPlan = new PPlan(routeId, this.getStrategyName());
+		PPlan newPlan = new PPlan(routeId, this.getStrategyName(), PConstants.founderPlanId);
 		newPlan.setNVehicles(1);
 		newPlan.setStartTime(8.0 * 3600.0);
 		newPlan.setEndTime(16.0 * 3600.0);
