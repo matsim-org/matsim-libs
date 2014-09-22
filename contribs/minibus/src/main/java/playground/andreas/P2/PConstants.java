@@ -30,7 +30,7 @@ public final class PConstants {
 
 	public static final String statsOutputFolder = "/pStats/";
 	
-	public static final Id<PPlan> founderPlanId = Id.create("founder", PPlan.class);
+	public static final Id<PPlan> founderPlanId = Id.create("none", PPlan.class);
 	
 	public enum OperatorState {
 	    PROSPECTING, INBUSINESS, BANKRUPT

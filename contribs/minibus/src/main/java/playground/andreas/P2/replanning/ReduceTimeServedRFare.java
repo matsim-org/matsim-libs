@@ -93,7 +93,7 @@ public final class ReduceTimeServedRFare extends AbstractPStrategyModule impleme
 		}
 		
 		// profitable route, change startTime
-		PPlan newPlan = new PPlan(operator.getNewPlanId(), this.getStrategyName(), operator.getBestPlan().getParentId());
+		PPlan newPlan = new PPlan(operator.getNewPlanId(), this.getStrategyName(), operator.getBestPlan().getId());
 		newPlan.setNVehicles(1);
 		newPlan.setStopsToBeServed(operator.getBestPlan().getStopsToBeServed());
 		

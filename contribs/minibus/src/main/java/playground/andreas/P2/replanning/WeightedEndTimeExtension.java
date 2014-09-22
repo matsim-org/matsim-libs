@@ -55,7 +55,7 @@ public final class WeightedEndTimeExtension extends AbstractPStrategyModule {
 	@Override
 	public PPlan run(Operator operator) {
 		// change endTime
-		PPlan newPlan = new PPlan(operator.getNewPlanId(), this.getStrategyName(), operator.getBestPlan().getParentId());
+		PPlan newPlan = new PPlan(operator.getNewPlanId(), this.getStrategyName(), operator.getBestPlan().getId());
 		newPlan.setNVehicles(1);
 		newPlan.setStopsToBeServed(operator.getBestPlan().getStopsToBeServed());
 		newPlan.setStartTime(operator.getBestPlan().getStartTime());
