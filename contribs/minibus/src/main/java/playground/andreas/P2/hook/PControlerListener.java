@@ -120,8 +120,8 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 		this.pBox.notifyScoring(event);
 	}
 
-    private final Set<Id<TransitStopFacility>> currentPFacilityIDs = new HashSet<>();
-    private final Set<Id<TransitLine>> currentPTransitLineIDs = new HashSet<>();
+    private final Set<Id<TransitStopFacility>> currentExclusivePFacilityIDs = new HashSet<>();
+    private final Set<Id<TransitLine>> currentExclusivePTransitLineIDs = new HashSet<>();
 
 	private void addPTransitScheduleToOriginalOne(TransitSchedule baseSchedule, TransitSchedule pSchedule) {
 		if(pSchedule == null){
@@ -131,55 +131,55 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 		for (TransitStopFacility pStop : pSchedule.getFacilities().values()) {
             if (!baseSchedule.getFacilities().containsKey(pStop.getId())) {
                 baseSchedule.addStopFacility(pStop);
-                currentPFacilityIDs.add(pStop.getId());
+                currentExclusivePFacilityIDs.add(pStop.getId());
             }
 		}
 		for (TransitLine pLine : pSchedule.getTransitLines().values()) {
             if (!baseSchedule.getTransitLines().containsKey(pLine.getId())) {
                 baseSchedule.addTransitLine(pLine);
-                currentPTransitLineIDs.add(pLine.getId());
+                currentExclusivePTransitLineIDs.add(pLine.getId());
             }
 		}
 	}
 
     private void removePreviousPTransitScheduleFromOriginalOne(TransitSchedule transitSchedule) {
-        for (Id<TransitLine> transitLineId : currentPTransitLineIDs) {
+        for (Id<TransitLine> transitLineId : currentExclusivePTransitLineIDs) {
             transitSchedule.removeTransitLine(transitSchedule.getTransitLines().get(transitLineId));
         }
-        currentPTransitLineIDs.clear();
-        for (Id<TransitStopFacility> facilityId : currentPFacilityIDs) {
+        currentExclusivePTransitLineIDs.clear();
+        for (Id<TransitStopFacility> facilityId : currentExclusivePFacilityIDs) {
             transitSchedule.removeStopFacility(transitSchedule.getFacilities().get(facilityId));
         }
-        currentPFacilityIDs.clear();
+        currentExclusivePFacilityIDs.clear();
     }
 
-    private final Set<Id<VehicleType>> currentPVehicleTypeIDs = new HashSet<>();
-    private final Set<Id<Vehicle>> currentPVehicleIDs = new HashSet<>();
+    private final Set<Id<VehicleType>> currentExclusivePVehicleTypeIDs = new HashSet<>();
+    private final Set<Id<Vehicle>> currentExclusivePVehicleIDs = new HashSet<>();
 
 	private void addPVehiclesToOriginalOnes(Vehicles baseVehicles, Vehicles pVehicles){
 		for (VehicleType t : pVehicles.getVehicleTypes().values()) {
             if (!baseVehicles.getVehicleTypes().containsKey(t.getId())) {
                 baseVehicles.addVehicleType(t);
-                currentPVehicleTypeIDs.add(t.getId());
+                currentExclusivePVehicleTypeIDs.add(t.getId());
             }
 		}
 		for (Vehicle v : pVehicles.getVehicles().values()) {
             if (!baseVehicles.getVehicles().containsKey(v.getId())) {
                 baseVehicles.addVehicle(v);
-                currentPVehicleIDs.add(v.getId());
+                currentExclusivePVehicleIDs.add(v.getId());
             }
 		}
 	}
 
     private void removePreviousPVehiclesFromScenario(Vehicles vehicles) {
-        for (Id<Vehicle> vehicleId : currentPVehicleIDs) {
+        for (Id<Vehicle> vehicleId : currentExclusivePVehicleIDs) {
             vehicles.removeVehicle(vehicleId);
         }
-        currentPVehicleIDs.clear();
-        for (Id<VehicleType> vehicleTypeId : currentPVehicleTypeIDs) {
+        currentExclusivePVehicleIDs.clear();
+        for (Id<VehicleType> vehicleTypeId : currentExclusivePVehicleTypeIDs) {
             vehicles.removeVehicleType(vehicleTypeId);
         }
-        currentPVehicleTypeIDs.clear();
+        currentExclusivePVehicleTypeIDs.clear();
     }
 	
 	private void dumpTransitScheduleAndVehicles(Controler controler, int iteration){
