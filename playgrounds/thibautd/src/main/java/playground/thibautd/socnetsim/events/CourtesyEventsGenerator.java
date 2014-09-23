@@ -61,7 +61,7 @@ public class CourtesyEventsGenerator implements ActivityStartEventHandler, Activ
 	@Override
 	public void handleEvent(final ActivityStartEvent event) {
 		handleEvent(
-				CourtesyEvent.Message.HELLO,
+				CourtesyEvent.Type.HELLO,
 				event.getPersonId(),
 				event.getFacilityId(),
 				event.getTime() );
@@ -70,14 +70,14 @@ public class CourtesyEventsGenerator implements ActivityStartEventHandler, Activ
 	@Override
 	public void handleEvent(final ActivityEndEvent event) {
 		handleEvent(
-				CourtesyEvent.Message.GOODBYE,
+				CourtesyEvent.Type.GOODBYE,
 				event.getPersonId(),
 				event.getFacilityId(),
 				event.getTime() );
 	}
 
 	private void handleEvent(
-			final CourtesyEvent.Message type,
+			final CourtesyEvent.Type type,
 			final Id<Person> ego,
 			final Id<ActivityFacility> facility,
 			final double time) {
