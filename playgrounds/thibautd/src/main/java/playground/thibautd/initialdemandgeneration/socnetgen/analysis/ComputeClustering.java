@@ -19,10 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.socnetgen.analysis;
 
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -38,7 +35,7 @@ public class ComputeClustering {
 	private static final Logger log =
 		Logger.getLogger(ComputeClustering.class);
 
-	public static void main(final String[] args) throws IOException {
+	public static void main(final String[] args) {
 		final String socialNetworkFile = args[ 0 ];
 
 		final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );

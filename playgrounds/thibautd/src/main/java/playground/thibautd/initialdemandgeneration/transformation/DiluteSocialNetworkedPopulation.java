@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.initialdemandgeneration.transformation;
 
-import java.io.IOException;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.PopulationWriter;
@@ -50,7 +48,7 @@ public class DiluteSocialNetworkedPopulation {
 		area_all_alters;
 	}
 
-	private static void main(final ArgParser.Args args) throws IOException {
+	private static void main(final ArgParser.Args args) {
 
 		final Coord center =
 			new CoordImpl(
@@ -113,7 +111,7 @@ public class DiluteSocialNetworkedPopulation {
 		}
 	}
 
-	public static void main(final String[] args) throws IOException {
+	public static void main(final String[] args) {
 		final ArgParser parser = new ArgParser();
 		
 		parser.setDefaultValue( "--xcenter" , "683518.0" );
