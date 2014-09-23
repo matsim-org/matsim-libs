@@ -28,7 +28,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PatternLayout;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -80,7 +82,7 @@ public class GenerateFundametalDiagramData {
 	private final static Integer[] STARTING_POINT = {0,0,0};
 	//	private final static Integer [] MIN_STEPS_POINTS = {4,1};
 
-	private final int reduceDataPointsByFactor = 1;
+	private final int reduceDataPointsByFactor = 100;
 
 	private int flowUnstableWarnCount [] = new int [TRAVELMODES.length];
 	private int speedUnstableWarnCount [] = new int [TRAVELMODES.length];
@@ -92,6 +94,8 @@ public class GenerateFundametalDiagramData {
 	private Map<Id<VehicleType>, TravelModesFlowDynamicsUpdator> mode2FlowData;
 
 	public GenerateFundametalDiagramData(){
+		createLogFile();
+	
 		if (TRAVELMODES.length != MODAL_SPLIT.length){
 			throw new RuntimeException("Modal split for each travel mode is necessray parameter, it is not defined correctly. Check your static variable!!! \n Aborting ...");
 		}
@@ -104,7 +108,7 @@ public class GenerateFundametalDiagramData {
 		scenario = inputs.getScenario();
 		mode2FlowData = inputs.getTravelMode2FlowDynamicsData();
 	}
-
+	
 	public static void main(String[] args) {
 		GenerateFundametalDiagramData generateFDData = new GenerateFundametalDiagramData();
 		generateFDData.openFileAndWriteHeader(OUTPUT_FILE);
@@ -387,6 +391,20 @@ public class GenerateFundametalDiagramData {
 		}
 		return gcd;
 	}
+	
+	private void createLogFile(){
+		PatternLayout layout = new PatternLayout();
+		 String conversionPattern = " %d %4p %c{1} %L %m%n";
+		 layout.setConversionPattern(conversionPattern);
+		FileAppender appender;
+		try {
+			appender = new FileAppender(layout, RUN_DIR+OUTPUT_FOLDER+"/logfile.log",false);
+		} catch (IOException e1) {
+			throw new RuntimeException("File not found.");
+		}
+		log.addAppender(appender);
+	}
+	
 	private static class MyRoundAndRoundAgent implements MobsimDriverAgent{
 
 		private MyPersonDriverAgentImpl delegate;
