@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.scoring;
+package playground.thibautd.socnetsim.scoring;
 
 import java.util.ArrayList;
 import java.util.Collection;

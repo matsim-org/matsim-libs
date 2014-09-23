@@ -35,7 +35,6 @@ import playground.ivt.matsim2030.generation.ScenarioMergingConfigGroup;
 import playground.ivt.matsim2030.scoring.MATSim2010ScoringFunctionFactory;
 import playground.thibautd.initialdemandgeneration.transformation.SocialNetworkedPopulationDilutionUtils;
 import playground.thibautd.initialdemandgeneration.transformation.SocialNetworkedPopulationDilutionUtils.DilutionType;
-import playground.thibautd.scoring.KtiScoringFunctionFactoryWithJointModes;
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.SocialNetworkConfigGroup;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
@@ -46,6 +45,7 @@ import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.population.SocialNetworkReader;
 import playground.thibautd.socnetsim.population.SocialNetworkWriter;
 import playground.thibautd.socnetsim.replanning.grouping.DynamicGroupIdentifier;
+import playground.thibautd.socnetsim.scoring.KtiScoringFunctionFactoryWithJointModes;
 import playground.thibautd.socnetsim.utils.JointScenarioUtils;
 
 /**

@@ -59,7 +59,6 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import playground.thibautd.pseudoqsim.DeactivableTravelTimeProvider;
 import playground.thibautd.pseudoqsim.DeactivableTravelTimeProvider.PSimIterationsCriterion;
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
-import playground.thibautd.scoring.CharyparNagelWithJointModesScoringFunctionFactory;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.qsim.JointQSimFactory;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
@@ -72,6 +71,7 @@ import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.router.JointTripRouterFactory;
+import playground.thibautd.socnetsim.scoring.CharyparNagelWithJointModesScoringFunctionFactory;
 import playground.thibautd.socnetsim.scoring.UniformlyInternalizingPlansScoring;
 import playground.thibautd.socnetsim.utils.ImportedJointRoutesChecker;
 

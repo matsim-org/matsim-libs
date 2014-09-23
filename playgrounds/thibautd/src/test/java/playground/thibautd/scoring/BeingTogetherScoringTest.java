@@ -39,8 +39,9 @@ import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
-import playground.thibautd.scoring.BeingTogetherScoring.AcceptAllFilter;
-import playground.thibautd.scoring.BeingTogetherScoring.RejectAllFilter;
+import playground.thibautd.socnetsim.scoring.BeingTogetherScoring;
+import playground.thibautd.socnetsim.scoring.BeingTogetherScoring.AcceptAllFilter;
+import playground.thibautd.socnetsim.scoring.BeingTogetherScoring.RejectAllFilter;
 
 /**
  * @author thibautd
