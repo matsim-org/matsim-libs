@@ -8,9 +8,8 @@
   <groupId>org.matsim.contrib</groupId>
   <artifactId>emissions</artifactId>
   <name>emissions</name>
-</project>
-
-  <build>
+  
+    <build>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -27,3 +26,5 @@
       </plugin>
     </plugins>
   </build>
+  
+</project>
