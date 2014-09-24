@@ -20,16 +20,12 @@
 package playground.johannes.gsv.synPop.sim2;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.ActivityOption;
 
 import playground.johannes.gsv.misc.QuadTree;
 import playground.johannes.gsv.synPop.CommonKeys;
@@ -55,7 +51,7 @@ private final String blacklist;
 	
 	private final ActivityFacilities facilities;
 	
-	private final Map<String, QuadTree<ActivityFacility>> quadTrees;
+//	private final Map<String, QuadTree<ActivityFacility>> quadTrees;
 	
 	private final double mutationRange = 2000;
 	
@@ -69,30 +65,30 @@ private final String blacklist;
 		this.facilities = facilities;
 		this.rndFacilities = RandomFacilities.getInstance(facilities, random);
 		
-		double minx = Double.MAX_VALUE;
-		double miny = Double.MAX_VALUE;
-		double maxx = 0;
-		double maxy = 0;
-		for(ActivityFacility facility : facilities.getFacilities().values()) {
-			Coord coord = facility.getCoord();
-			minx = Math.min(minx, coord.getX());
-			miny = Math.min(miny, coord.getY());
-			maxx = Math.max(maxx, coord.getX());
-			maxy = Math.max(maxy, coord.getY());
-		}
-		
-		quadTrees = new HashMap<String, QuadTree<ActivityFacility>>();
-		for(ActivityFacility facility : facilities.getFacilities().values()) {
-			for(ActivityOption option : facility.getActivityOptions().values()) {
-				QuadTree<ActivityFacility> quadTree = quadTrees.get(option.getType());
-				if(quadTree == null) {
-					quadTree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
-					quadTrees.put(option.getType(), quadTree);
-				}
-				Coord coord = facility.getCoord();
-				quadTree.put(coord.getX(), coord.getY(), facility);
-			}
-		}
+//		double minx = Double.MAX_VALUE;
+//		double miny = Double.MAX_VALUE;
+//		double maxx = 0;
+//		double maxy = 0;
+//		for(ActivityFacility facility : facilities.getFacilities().values()) {
+//			Coord coord = facility.getCoord();
+//			minx = Math.min(minx, coord.getX());
+//			miny = Math.min(miny, coord.getY());
+//			maxx = Math.max(maxx, coord.getX());
+//			maxy = Math.max(maxy, coord.getY());
+//		}
+//		
+//		quadTrees = new HashMap<String, QuadTree<ActivityFacility>>();
+//		for(ActivityFacility facility : facilities.getFacilities().values()) {
+//			for(ActivityOption option : facility.getActivityOptions().values()) {
+//				QuadTree<ActivityFacility> quadTree = quadTrees.get(option.getType());
+//				if(quadTree == null) {
+//					quadTree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
+//					quadTrees.put(option.getType(), quadTree);
+//				}
+//				Coord coord = facility.getCoord();
+//				quadTree.put(coord.getX(), coord.getY(), facility);
+//			}
+//		}
 	}
 	
 	@Override
@@ -148,7 +144,8 @@ private final String blacklist;
 					String value = leg.getAttribute(MIDKeys.LEG_DISTANCE);
 					if(value != null) {
 						double dist = Double.parseDouble(value);
-						QuadTree<ActivityFacility> quadTree = quadTrees.get(act.getAttribute(CommonKeys.ACTIVITY_TYPE));
+//						QuadTree<ActivityFacility> quadTree = quadTrees.get(act.getAttribute(CommonKeys.ACTIVITY_TYPE));
+						QuadTree<ActivityFacility> quadTree = rndFacilities.getQuadTree(act.getAttribute(CommonKeys.ACTIVITY_TYPE));
 						List<ActivityFacility> list = new ArrayList<ActivityFacility>(quadTree.get(prevFac.getCoord().getX(), prevFac.getCoord().getY(), dist - mutationRange, dist + mutationRange));
 						
 						facility = list.get(random.nextInt(list.size()));

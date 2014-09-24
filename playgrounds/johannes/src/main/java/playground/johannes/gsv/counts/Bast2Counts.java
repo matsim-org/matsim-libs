@@ -42,7 +42,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
@@ -56,7 +55,6 @@ import playground.johannes.sna.gis.CRSUtils;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.index.quadtree.Quadtree;
 
 /**
  * @author johannes
@@ -73,9 +71,9 @@ public class Bast2Counts {
 	 * @throws FactoryException 
 	 */
 	public static void main(String[] args) throws IOException, ParseException, FactoryException {
-		String bastFile = "/home/johannes/gsv/counts/bast-geolocated2.csv";
-		String netFile = "/home/johannes/gsv/osm/germany-network-cat5.simplified3.xml";
-		String countsFile = "/home/johannes/gsv/counts/bast-counts.xml";
+		String bastFile = args[0];//"/home/johannes/gsv/counts/counts-modena.geo.txt";
+		String netFile = args[1];//"/home/johannes/gsv/osm/network/germany-network-cat5.xml";
+		String countsFile = args[2];//"/home/johannes/gsv/counts/counts.2009.osm.xml";
 		
 		logger.info("Loading bast counts...");
 		BufferedReader reader = new BufferedReader(new FileReader(bastFile));
@@ -87,15 +85,19 @@ public class Bast2Counts {
 			colIdices.put(header[i], i);
 		}
 		
-		NumberFormat format = NumberFormat.getInstance(Locale.GERMAN);
+		NumberFormat format = NumberFormat.getInstance(Locale.US);
 		
 		List<CountsData> counts = new ArrayList<CountsData>();
 		
-		int xIdx = colIdices.get("GeoX");
-		int yIdx = colIdices.get("GeoY");
-		int valDirect1Idx = colIdices.get("DTV_Kfz_Mo-So_Ri1");
-		int valDirect2Idx = colIdices.get("DTV_Kfz_Mo-So_Ri2");
-		int nameIdx = colIdices.get("DZ_Name");
+//		int xIdx = colIdices.get("GEOX");
+//		int yIdx = colIdices.get("GEOY");
+		int xIdx = colIdices.get("XKOORD");
+		int yIdx = colIdices.get("YKOORD");
+		int valDirect1Idx = colIdices.get("DTV_KFZ_MO-SO_RI1");
+		int valDirect2Idx = colIdices.get("DTV_KFZ_MO-SO_RI2");
+		int valDirect1SVIdx = colIdices.get("DTV_SV_MO-SO_RI1");
+		int valDirect2SVIdx = colIdices.get("DTV_SV_MO-SO_RI2");
+		int nameIdx = colIdices.get("NAME");
 		
 		int xDirect1 = colIdices.get("Fernziel_Ri1_long");
 		int yDirect1 = colIdices.get("Fernziel_Ri1_lat");
@@ -108,9 +110,14 @@ public class Bast2Counts {
 			CountsData data = new CountsData();
 			
 
-			data.yCoord  = format.parse(tokens[xIdx]).doubleValue();
-			data.xCoord = format.parse(tokens[yIdx]).doubleValue();
+//			data.yCoord  = format.parse(tokens[xIdx]).doubleValue();
+//			data.xCoord = format.parse(tokens[yIdx]).doubleValue();
+			data.xCoord  = format.parse(tokens[xIdx]).doubleValue();
+			data.yCoord = format.parse(tokens[yIdx]).doubleValue();
 			data.name = tokens[nameIdx];
+//			if(data.name.contains("Neufahrn")) {
+//				System.err.println();
+//			}
 			data.name = data.name.replace("<", "-");
 			data.name = data.name.replace(">", "-");
 			
@@ -128,8 +135,12 @@ public class Bast2Counts {
 			
 			
 			try {
-				data.valDirect1 = format.parse(tokens[valDirect1Idx]).doubleValue();
-				data.valDirect2 = format.parse(tokens[valDirect2Idx]).doubleValue();
+				double kfz1 = format.parse(tokens[valDirect1Idx]).doubleValue();
+				double sv1 = format.parse(tokens[valDirect1SVIdx]).doubleValue();
+				double kfz2 = format.parse(tokens[valDirect2Idx]).doubleValue();
+				double sv2 = format.parse(tokens[valDirect2SVIdx]).doubleValue();
+				data.valDirect1 = kfz1 - sv1;
+				data.valDirect2 = kfz2 - sv2;
 				counts.add(data);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -151,7 +162,7 @@ public class Bast2Counts {
 		MathTransform transform = CRS.findMathTransform(CRSUtils.getCRS(4326), CRSUtils.getCRS(31467));
 		
 		Counts theCounts = new Counts();
-		theCounts.setYear(2012);
+		theCounts.setYear(2009);
 		theCounts.setName("BaSt Zählstellen");
 		
 		int noreturn = 0;
@@ -169,18 +180,25 @@ public class Bast2Counts {
 			
 			double returnVal;
 			if(dist1 < dist2) {
+				logger.info(String.format("Adding count %s to link %s with direction 1.", data.name, link1.getId().toString()));
 				createCount(theCounts, link1, countPos, data.name, data.valDirect1);
 				returnVal = data.valDirect2;
 			} else {
+				logger.info(String.format("Adding count %s to link %s with direction 2.", data.name, link1.getId().toString()));
 				createCount(theCounts, link1, countPos, data.name, data.valDirect2);
 				returnVal = data.valDirect1;
 			}
 			
 			Link link2 = NetworkUtils.getConnectingLink(link1.getToNode(), link1.getFromNode());
+			
 			if(link2 == null) {
 				link2 = getReturnLink(link1, network);
 			}
 			if(link2 != null) {
+//				if(link1.getId().toString().equals("new223251")) {
+//					System.err.println();
+//				}
+				logger.info(String.format("Link %s has return link %s.", link1.getId().toString(), link2.getId().toString()));
 				createCount(theCounts, link2, countPos, data.name, returnVal);
 			} else {
 				noreturn++;

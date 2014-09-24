@@ -55,4 +55,13 @@ public class BlockingSamplerListener implements SamplerListener {
 			}
 		}
 	}
+
+	/* (non-Javadoc)
+	 * @see playground.johannes.gsv.synPop.sim2.SamplerListener#afterModify(playground.johannes.gsv.synPop.ProxyPerson)
+	 */
+	@Override
+	public void afterModify(ProxyPerson person) {
+		// TODO Auto-generated method stub
+		
+	}
 }

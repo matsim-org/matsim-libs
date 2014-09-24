@@ -22,6 +22,7 @@ package playground.johannes.gsv.synPop.invermo;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,16 +34,16 @@ import playground.johannes.gsv.synPop.FixActivityTimesTask;
 import playground.johannes.gsv.synPop.InsertActivitiesTask;
 import playground.johannes.gsv.synPop.ProxyObject;
 import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.gsv.synPop.ProxyPersonTaskComposite;
 import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.ProxyPlanTaskComposite;
-import playground.johannes.gsv.synPop.RoundTripTask;
 import playground.johannes.gsv.synPop.SetActivityTimeTask;
-import playground.johannes.gsv.synPop.SetActivityTypeTask;
-import playground.johannes.gsv.synPop.SetFirstActivityTypeTask;
 import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.gsv.synPop.mid.PersonAttributeHandler;
+import playground.johannes.gsv.synPop.mid.PersonCloner;
 import playground.johannes.gsv.synPop.mid.RowHandler;
 import playground.johannes.gsv.synPop.mid.run.ProxyTaskRunner;
+import playground.johannes.socialnetworks.utils.XORShiftRandom;
 
 /**
  * @author johannes
@@ -63,7 +64,7 @@ public class TXTReader {
 //	private List<AttributeHandler<ProxyPlan>> planAttHandlers = new ArrayList<AttributeHandler<ProxyPlan>>();
 	private LegHandlerAdaptor legAdaptor = new LegHandlerAdaptor();
 
-	public Collection<ProxyPerson> read(String householdFile, String personFile, String journeyFile) throws IOException {
+	public Collection<ProxyPerson> read(String rootDir) throws IOException {
 		households = new LinkedHashMap<String, ProxyObject>(5000);
 		persons = new LinkedHashMap<String, ProxyPerson>(65000);
 		/*
@@ -71,12 +72,21 @@ public class TXTReader {
 		 */
 		RowHandler hHandler = new HouseholdRowHandler();
 		hHandler.setColumnOffset(0);
-		hHandler.read(householdFile);
+		hHandler.read(rootDir + "hhw1.txt");
+		hHandler.read(rootDir + "hhw2.txt");
+		hHandler.read(rootDir + "hhw3.txt");
+		hHandler.read(rootDir + "hh4.txt");
+		hHandler.read(rootDir + "mobgewichtw1.txt");
+		hHandler.read(rootDir + "mobgewichtw2.txt");
+		hHandler.read(rootDir + "mobgewichtw3.txt");
 		
 		RowHandler pHandler = new PersonRowHandler();
 //		pHandler.setSeparator(",");
 		pHandler.setColumnOffset(0);
-		pHandler.read(personFile);
+		pHandler.read(rootDir + "pw1.txt");
+		pHandler.read(rootDir + "pw2.txt");
+		pHandler.read(rootDir + "pw3.txt");
+		pHandler.read(rootDir + "p4.txt");
 //		/*
 //		 * add an empty plan to each person
 //		 */
@@ -91,9 +101,12 @@ public class TXTReader {
 		RowHandler jHandler = new JourneyRowHandler();
 //		jHandler.setSeparator(",");
 		jHandler.setColumnOffset(0);
-		jHandler.read(journeyFile);
+		jHandler.read(rootDir + "rw1.txt");
+		jHandler.read(rootDir + "rw2.txt");
+//		jHandler.read(rootDir + "rw3.txt");
+//		jHandler.read(rootDir + "r4.txt");
 		
-		return persons.values();
+		return new HashSet<ProxyPerson>(persons.values());
 	}
 	
 	private String personIdBuilder(Map<String, String> attributes) {
@@ -109,9 +122,12 @@ public class TXTReader {
 
 		@Override
 		protected void handleRow(Map<String, String> attributes) {
-			ProxyObject household = new ProxyObject();
 			String id = attributes.get(ColumnKeys.HOUSEHOLD_ID);
-			households.put(id, household);
+			ProxyObject household = households.get(id);
+			if(household == null) {
+				household = new ProxyObject();
+				households.put(id, household);
+			}
 			
 			for(AttributeHandler<ProxyObject> handler : householdAttHandlers) {
 				handler.handleAttribute(household, attributes);
@@ -124,7 +140,20 @@ public class TXTReader {
 		
 		@Override
 		protected void handleRow(Map<String, String> attributes) {
-			ProxyPerson person = new ProxyPerson(personIdBuilder(attributes));
+			String id = personIdBuilder(attributes);
+			ProxyPerson person = persons.get(id);
+			if(person == null) {
+				if(attributes.get(ColumnKeys.PERSON_ID).equals("1")) { 
+					person = new ProxyPerson(id);
+					persons.put(person.getId(), person);
+				}
+			}
+			
+			if(person == null)
+				return;
+//			ProxyPerson person = new ProxyPerson(id);
+//			persons.put(person.getId(), person);
+			
 			ProxyObject household = households.get(attributes.get(ColumnKeys.HOUSEHOLD_ID));
 			if(household == null) {
 				logger.warn(String.format("Household %s not found.", attributes.get(ColumnKeys.HOUSEHOLD_ID)));
@@ -138,7 +167,7 @@ public class TXTReader {
 				handler.handle(person, attributes);
 			}
 		
-			persons.put(person.getId(), person);
+			
 		}
 	}
 	
@@ -152,10 +181,23 @@ public class TXTReader {
 			if (person == null) {
 				logger.warn(String.format("Person %s not found.", id));
 			} else {
-				ProxyPlan plan = new ProxyPlan();
-				legAdaptor.handleAttribute(plan, attributes);
+				String planId = attributes.get("Reisenr");
+				ProxyPlan thePlan = null;
+//				for(ProxyPlan plan : person.getPlans()) {
+//					if(plan.getAttribute("id").equals(planId)) {
+//						thePlan = plan;
+//						break;
+//					}
+//				}
+				if(thePlan == null) {
+					thePlan = new ProxyPlan();
+					thePlan.setAttribute("id", planId);
+					person.addPlan(thePlan);
+				}
+				
+				legAdaptor.handleAttribute(thePlan, attributes);
 
-				person.addPlan(plan);
+				
 			}
 			
 		}
@@ -166,21 +208,74 @@ public class TXTReader {
 		TXTReader reader = new TXTReader();
 //		reader.planAttHandlers.add(new LegHandlerAdaptor());
 		reader.householdAttHandlers.add(new HouseholdLocationHandler());
+		reader.householdAttHandlers.add(new HouseholdWeigthHandler());
+		reader.personAttHandlers.add(new WorkLocationHandler());
 		reader.legAdaptor.addHandler(new LegStartLocHandler());
-		Collection persons = reader.read("/home/johannes/gsv/invermo/txt/hhw1.csv", "/home/johannes/gsv/invermo/txt/pw1.csv", "/home/johannes/gsv/invermo/txt/rw1.csv");
+		reader.legAdaptor.addHandler(new LegDestinationLocHandler());
+		reader.legAdaptor.addHandler(new LegEndTimeHandler());
+		reader.legAdaptor.addHandler(new LegStartTimeHandler());
+		reader.legAdaptor.addHandler(new LegModeHandler());
+		reader.legAdaptor.addHandler(new LegPurposeHandler());
+		Collection<ProxyPerson> persons = reader.read("/home/johannes/gsv/invermo/txt-utf8/");
+		
+		logger.info(String.format("Parsed %s persons.", persons.size()));
 		
 		ProxyPlanTaskComposite composite = new ProxyPlanTaskComposite();
 		composite.addComponent(new InsertActivitiesTask());
+		composite.addComponent(new ValidateDatesTask());
+		composite.addComponent(new ComposeTimeTask());
+		composite.addComponent(new SetActivityLocations());
+		composite.addComponent(new CleanLegLocations());
+		composite.addComponent(new SetActivityTypes());
+		composite.addComponent(new CleanLegPurposes());
+		
 //		composite.addComponent(new SetActivityTypeTask());
 //		composite.addComponent(new SetFirstActivityTypeTask());
 //		composite.addComponent(new RoundTripTask());
-//		composite.addComponent(new SetActivityTimeTask());
-//		composite.addComponent(new FixActivityTimesTask());
+		
 		
 		logger.info("Applying person tasks...");
 		ProxyTaskRunner.run(composite, persons);
+		
+		ProxyPersonTaskComposite personTasks = new ProxyPersonTaskComposite();
+		
+		GeocodeLocationsTask geoTask = new GeocodeLocationsTask("localhost", 3128);
+		geoTask.setCacheFile("/home/johannes/gsv/invermo/txt-utf8/geocache.txt");
+		
+		Plans2PersonsTask plans2Persons = new Plans2PersonsTask();
+		
+		
+		personTasks.addComponent(new SplitPlanTask());
+		personTasks.addComponent(new InsertHomePlanTask());
+		personTasks.addComponent(new ReplaceLocationAliasTask());
+		personTasks.addComponent(geoTask);
+//		personTasks.addComponent(plans2Persons);
+		
+		
+		ProxyTaskRunner.run(personTasks, persons);
+		
+		geoTask.writeCache();
+		
+		ProxyTaskRunner.run(plans2Persons, persons);
+		for(ProxyPerson person : plans2Persons.getNewPersons()) {
+			persons.add(person);
+		}
+		
+		
+		composite = new ProxyPlanTaskComposite();
+		composite.addComponent(new Date2TimeTask());
+		composite.addComponent(new SetActivityTimeTask());
+		composite.addComponent(new FixActivityTimesTask());
+		
+		ProxyTaskRunner.run(composite, persons);
+		
+		ProxyTaskRunner.run(new CopyDate2PersonTask(), persons);
+		
 		logger.info("Done.");
 		XMLWriter writer = new XMLWriter();
 		writer.write("/home/johannes/gsv/invermo/pop.xml", persons);
+		
+		persons = PersonCloner.weightedClones(persons, 100000, new XORShiftRandom());
+		writer.write("/home/johannes/gsv/invermo/pop.100K.xml", persons);
 	}
 }

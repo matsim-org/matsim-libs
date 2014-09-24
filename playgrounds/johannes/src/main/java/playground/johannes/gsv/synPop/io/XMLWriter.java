@@ -72,7 +72,7 @@ public class XMLWriter extends MatsimXmlWriter {
 	}
 
 	private void writePlan(ProxyPlan plan) {
-		writeStartTag(Constants.PLAN_TAG, null);
+		writeStartTag(Constants.PLAN_TAG, getAttributes(plan.getAttributes()));
 		for (int i = 0; i < plan.getActivities().size(); i++) {
 			if (i > 0)
 				writeLeg(plan.getLegs().get(i - 1));

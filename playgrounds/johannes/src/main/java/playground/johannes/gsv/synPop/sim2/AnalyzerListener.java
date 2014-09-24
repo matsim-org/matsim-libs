@@ -30,6 +30,7 @@ import playground.johannes.coopsim.analysis.TrajectoryAnalyzer;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
 import playground.johannes.coopsim.pysical.Trajectory;
 import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.gsv.synPop.analysis.ActivityDistanceTask;
 import playground.johannes.gsv.synPop.analysis.TrajectoryProxyBuilder;
 
 /**
@@ -48,6 +49,7 @@ public class AnalyzerListener implements SamplerListener {
 		this.rootDir = rootDir;
 		task = new TrajectoryAnalyzerTaskComposite();
 		task.addTask(new FacilityOccupancyTask(facilities));
+//		task.addTask(new ActivityDistanceTask(facilities));
 	
 	}
 	
@@ -64,6 +66,15 @@ public class AnalyzerListener implements SamplerListener {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see playground.johannes.gsv.synPop.sim2.SamplerListener#afterModify(playground.johannes.gsv.synPop.ProxyPerson)
+	 */
+	@Override
+	public void afterModify(ProxyPerson person) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

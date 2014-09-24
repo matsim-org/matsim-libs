@@ -51,10 +51,16 @@ public class PersonCloner {
 		 */
 		TObjectDoubleHashMap<ProxyPerson> weights = new TObjectDoubleHashMap<ProxyPerson>(persons.size());
 		double maxW = 0;
+//		double minW = Double.MAX_VALUE;
 		for(ProxyPerson person : persons) {
-			double w = Double.parseDouble(person.getAttribute(CommonKeys.PERSON_WEIGHT));
+			String wStr = person.getAttribute(CommonKeys.PERSON_WEIGHT);
+			double w = 0;
+			if(wStr != null) {
+				w = Double.parseDouble(wStr);
+			}
 			weights.put(person, w);
 			maxW = Math.max(w, maxW);
+//			minW = Math.min(w, minW);
 		}
 		/*
 		 * adjust weight so that max weight equals probability 1

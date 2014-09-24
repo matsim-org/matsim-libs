@@ -19,7 +19,10 @@
  * *********************************************************************** */
 package playground.johannes.gsv.sim;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,6 +32,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -48,39 +52,43 @@ import playground.johannes.socialnetworks.utils.CollectionUtils;
 
 /**
  * @author illenberger
- *
+ * 
  */
 public class ParallelPseudoSim {
 
+	private final static Logger logger = Logger.getLogger(ParallelPseudoSim.class);
+
 	private final static double MIN_ACT_DURATION = 1.0;
 
-	private final static double MIN_LEG_DURATION = 0.0;
+	private final static double MIN_LEG_DURATION = 1.0;
 
 	private SimThread[] threads;
-	
+
 	private Future<?>[] futures;
-	
+
 	private final ExecutorService executor;
-	
+
 	private final Map<String, LegSimEngine> legSimEngines;
-	
+
 	private final LegSimEngine defaultLegSimEngine;
-	
+
 	public ParallelPseudoSim(int numThreads) {
-		
+
 		executor = Executors.newFixedThreadPool(numThreads);
-		
+
 		threads = new SimThread[numThreads];
-		for(int i = 0; i < numThreads; i++)
+		for (int i = 0; i < numThreads; i++)
 			threads[i] = new SimThread();
-		
+
 		futures = new Future[numThreads];
-		
+
 		legSimEngines = new HashMap<String, LegSimEngine>();
 		defaultLegSimEngine = new DefaultLegSimEngine();
 	}
-		
+
 	public void run(Collection<Plan> plans, Network network, TravelTime linkTravelTimes, EventsManager eventManager) {
+		logger.debug("Preparing simulation threads...");
+
 		legSimEngines.put(TransportMode.car, new CarLegSimEngine(network, linkTravelTimes));
 		/*
 		 * split collection in approx even segments
@@ -90,14 +98,15 @@ public class ParallelPseudoSim {
 		/*
 		 * submit tasks
 		 */
-		for(int i = 0; i < segments.length; i++) {
+		for (int i = 0; i < segments.length; i++) {
 			threads[i].init(segments[i], network, linkTravelTimes, eventManager);
 			futures[i] = executor.submit(threads[i]);
 		}
 		/*
 		 * wait for threads
 		 */
-		for(int i = 0; i < segments.length; i++) {
+		logger.debug("Runngin simulation threads...");
+		for (int i = 0; i < segments.length; i++) {
 			try {
 				futures[i].get();
 			} catch (InterruptedException e) {
@@ -106,52 +115,77 @@ public class ParallelPseudoSim {
 				e.printStackTrace();
 			}
 		}
-		
+
+		logger.debug("Collecting and sorting events...");
+		List<Event> eventList = new ArrayList<>();
+		for (int i = 0; i < segments.length; i++) {
+			eventList.addAll(threads[i].getEventList());
+		}
+
+		Collections.sort(eventList, new Comparator<Event>() {
+			@Override
+			public int compare(Event o1, Event o2) {
+				return Double.compare(o1.getTime(), o2.getTime());
+			}
+		});
+
+		logger.debug("Processing events...");
+		for (Event event : eventList) {
+			eventManager.processEvent(event);
+		}
+
 		executor.shutdown();
 	}
-	
+
 	public class SimThread implements Runnable {
-		
+
 		private Collection<Plan> plans;
-		
-		private EventsManager eventManager;
-		
+
+		// private EventsManager eventManager;
+
 		private LinkedList<Event> eventList;
-	
+
 		public void init(Collection<Plan> plans, Network network, TravelTime linkTravelTimes, EventsManager eventManager) {
 			this.plans = plans;
-			this.eventManager = eventManager;
+			// this.eventManager = eventManager;
+		}
+
+		public List<Event> getEventList() {
+			return eventList;
 		}
 
 		@Override
 		public void run() {
 			eventList = new LinkedList<Event>();
 			for (Plan plan : plans) {
+				if (plan.getPerson().getId().toString().equals("211121.1clone678889")) {
+					System.err.println();
+				}
 				List<PlanElement> elements = plan.getPlanElements();
 
 				double prevEndTime = 0;
 				for (int idx = 0; idx < elements.size(); idx += 2) {
 					Activity act = (Activity) elements.get(idx);
 					/*
-					 * Make sure that the activity does not end before the previous
-					 * activity.
+					 * Make sure that the activity does not end before the
+					 * previous activity.
 					 */
 					double actEndTime = Math.max(prevEndTime + MIN_ACT_DURATION, act.getEndTime());
 
 					if (idx > 0) {
 						/*
-						 * If this is not the first activity, then there must exist
-						 * a leg before.
+						 * If this is not the first activity, then there must
+						 * exist a leg before.
 						 */
 						Leg leg = (Leg) elements.get(idx - 1);
 						double travelTime = Double.NaN;
-						
+
 						LegSimEngine engine = legSimEngines.get(leg.getMode());
-						if(engine == null) {
+						if (engine == null) {
 							engine = defaultLegSimEngine;
 						}
-						
-						travelTime = engine.simulate(plan.getPerson(), leg, actEndTime, eventList);
+
+						travelTime = engine.simulate(plan.getPerson(), leg, prevEndTime, eventList);
 						travelTime = Math.max(MIN_LEG_DURATION, travelTime);
 						double arrivalTime = travelTime + prevEndTime;
 						/*
@@ -161,20 +195,20 @@ public class ParallelPseudoSim {
 							throw new RuntimeException("I think this is discuraged.");
 						}
 						/*
-						 * Make sure that the activity does not end before the agent
-						 * arrives.
+						 * Make sure that the activity does not end before the
+						 * agent arrives.
 						 */
 						actEndTime = Math.max(arrivalTime + MIN_ACT_DURATION, actEndTime);
 						/*
 						 * Send arrival and activity start events.
 						 */
-						PersonArrivalEvent arrivalEvent = new PersonArrivalEvent(arrivalTime, plan.getPerson().getId(),
-								act.getLinkId(), leg.getMode());
-//						eventManager.processEvent(arrivalEvent);
+						PersonArrivalEvent arrivalEvent = new PersonArrivalEvent(arrivalTime, plan.getPerson().getId(), act.getLinkId(),
+								leg.getMode());
+						// eventManager.processEvent(arrivalEvent);
 						eventList.add(arrivalEvent);
-						ActivityStartEvent startEvent = new ActivityStartEvent(arrivalTime, plan.getPerson().getId(),
-								act.getLinkId(), act.getFacilityId(), act.getType());
-//						eventManager.processEvent(startEvent);
+						ActivityStartEvent startEvent = new ActivityStartEvent(arrivalTime, plan.getPerson().getId(), act.getLinkId(),
+								act.getFacilityId(), act.getType());
+						// eventManager.processEvent(startEvent);
 						eventList.add(startEvent);
 					}
 
@@ -183,24 +217,31 @@ public class ParallelPseudoSim {
 						 * This is not the last activity, send activity end and
 						 * departure events.
 						 */
-						ActivityEndEvent endEvent = new ActivityEndEvent(actEndTime, plan.getPerson().getId(),
-								act.getLinkId(), act.getFacilityId(), act.getType());
-//						eventManager.processEvent(endEvent);
+						ActivityEndEvent endEvent = new ActivityEndEvent(actEndTime, plan.getPerson().getId(), act.getLinkId(), act.getFacilityId(),
+								act.getType());
+						// eventManager.processEvent(endEvent);
 						eventList.add(endEvent);
 						Leg leg = (Leg) elements.get(idx + 1);
-						PersonDepartureEvent departureEvent = new PersonDepartureEvent(actEndTime, plan.getPerson()
-								.getId(), act.getLinkId(), leg.getMode());
-//						eventManager.processEvent(deparutreEvent);
+						PersonDepartureEvent departureEvent = new PersonDepartureEvent(actEndTime, plan.getPerson().getId(), act.getLinkId(),
+								leg.getMode());
+						// eventManager.processEvent(deparutreEvent);
 						eventList.add(departureEvent);
 					}
 
 					prevEndTime = actEndTime;
 				}
 			}
-			
-			for(Event event : eventList) {
-				eventManager.processEvent(event);
-			}
+
+			Collections.sort(eventList, new Comparator<Event>() {
+
+				@Override
+				public int compare(Event o1, Event o2) {
+					return Double.compare(o1.getTime(), o2.getTime());
+				}
+			});
+			// for(Event event : eventList) {
+			// eventManager.processEvent(event);
+			// }
 		}
 	}
 
@@ -209,13 +250,13 @@ public class ParallelPseudoSim {
 		super.finalize();
 		executor.shutdown();
 	}
-	
+
 	private static class DefaultLegSimEngine implements LegSimEngine {
 
 		@Override
 		public double simulate(Person person, Leg leg, double departureTime, LinkedList<Event> eventList) {
-			return leg.getRoute().getTravelTime(); //TODO replace
+			return leg.getRoute().getTravelTime(); // TODO replace
 		}
-		
+
 	}
 }

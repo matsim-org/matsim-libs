@@ -29,20 +29,49 @@ public class LegStartLocHandler implements LegAttributeHandler {
 
 	@Override
 	public void handle(ProxyObject leg, int idx, String key, String value) {
-		if(key.contains("e1start1")) {
+		if(key.contains(ColumnKeys.START1_TRIP1)) {
 			if(value.equalsIgnoreCase("1")) {
-				leg.setAttribute("startLoc", "home");
+				leg.setAttribute(InvermoKeys.START_LOCATION, "home");
 			} else if(value.equalsIgnoreCase("2")) {
-				leg.setAttribute("startLoc", "work");
+				leg.setAttribute(InvermoKeys.START_LOCATION, "work");
 			}
-		} else if(key.contains("e1start2")) {
-			leg.setAttribute("e1start2", value);
-		} else if(key.contains("e2start1")) {
+		} else if(key.contains(ColumnKeys.START2_TRIP1)) {
 			if(value.equalsIgnoreCase("1")) {
-				leg.setAttribute("startLoc", "prev");
-			} else if(value.equalsIgnoreCase("2")) {
-//				String loc = 
+				leg.setAttribute(InvermoKeys.START_LOCATION, "secondHome");
+			} else if(key.equalsIgnoreCase("2")) {
+				leg.setAttribute(InvermoKeys.START_LOCATION, "friends");
+			} else if(key.equalsIgnoreCase("3")) {
+				leg.setAttribute(InvermoKeys.START_LOCATION, "buisiness");
 			}
+			
+		} else if(key.contains(ColumnKeys.START1_TRIP2) || key.contains(ColumnKeys.START1_TRIP3)) {
+			if(value.equalsIgnoreCase("1")) {
+				leg.setAttribute(InvermoKeys.START_LOCATION, "prev");
+			} else if(value.equalsIgnoreCase("2")) {
+				leg.setAttribute(InvermoKeys.START_LOCATION, "sameTown");
+			}
+		} else if(key.contains(ColumnKeys.START2_TRIP2) || key.contains(ColumnKeys.START2_TRIP3)) {
+			leg.setAttribute(InvermoKeys.START_LOCATION, value);
+		} else if(key.contains(ColumnKeys.START1_TRIP4)) {
+			if(value.equals("1")) {
+				leg.setAttribute(InvermoKeys.START_LOCATION, "prev");
+			} else if(value.equals("2")) {
+				leg.setAttribute(InvermoKeys.START_LOCATION, "other");
+			}
+		} else if(key.contains("e4start1a")) {
+			if(value.equals("1")) {
+				leg.setAttribute(InvermoKeys.START_LOCATION, "germany");
+			} else if(value.equals("2")) {
+				leg.setAttribute(InvermoKeys.START_LOCATION, "foreign");
+			}
+		} else if(key.contains("e4startd1") || key.contains("e4startd2") || key.contains("e4startd3") || key.contains("e4startd4")) {
+			String desc = leg.getAttribute(InvermoKeys.START_LOCATION);
+			if(desc == null) {
+				desc = value;
+			} else {
+				desc = desc + ", " + value;
+			}
+			leg.setAttribute(InvermoKeys.START_LOCATION, desc);
 		}
 	}
 

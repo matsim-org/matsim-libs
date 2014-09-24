@@ -101,7 +101,7 @@ public class SetActivityLocations {
 		ActivityLocationMutatorFactory factory = new ActivityLocationMutatorFactory(facilities, "home", random);
 		
 		HamiltonianComposite h = new HamiltonianComposite();
-		h.addComponent(new ActivityLocationHamiltonian(facilities), 0.01);
+		h.addComponent(new ActivityLocationHamiltonian(facilities), 100);
 //		h.addComponent(new HFacilityCapacity(null, facilities), 0.00001);
 		
 		Sampler sampler = new Sampler(persons, h, factory, random);
@@ -113,10 +113,10 @@ public class SetActivityLocations {
 		listeners.addComponent(new BlockingSamplerListener(popWriter, dumpInterval));
 		
 		for(Hamiltonian hamil : h.getComponents()) {
-			listeners.addComponent(new HamiltonianLogger(hamil, logInterval, outputDir + "/" + hamil.getClass().getSimpleName() + ".txt"));
+			listeners.addComponent(new HamiltonianLogger(hamil, logInterval, outputDir));
 		}
 		listeners.addComponent(new SamplerLogger());
-		listeners.addComponent(new BlockingSamplerListener(new AnalyzerListener(facilities, outputDir), logInterval));
+//		listeners.addComponent(new BlockingSamplerListener(new AnalyzerListener(facilities, outputDir), logInterval));
 		sampler.setSamplerListener(listeners);
 		/*
 		 * initialize persons

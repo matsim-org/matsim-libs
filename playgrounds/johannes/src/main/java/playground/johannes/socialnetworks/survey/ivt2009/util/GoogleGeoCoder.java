@@ -19,7 +19,13 @@
  * *********************************************************************** */
 package playground.johannes.socialnetworks.survey.ivt2009.util;
 
-import java.util.LinkedHashMap;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.httpclient.HttpClient;
@@ -40,74 +46,130 @@ import com.google.code.geocoder.model.LatLng;
  * 
  */
 public class GoogleGeoCoder {
-	
+
 	private static final Logger logger = Logger.getLogger(GoogleGeoCoder.class);
-	
+
+	private static final String cacheFile = System.getProperty("user.home") + "/.geocoder.cache";
+
 	private final Geocoder geocoder;
-	
+
 	private final long sleepInterval;
-	
-	private HashMapCash cache = new HashMapCash();
+
+	private Map<String, LatLng> cache;
+
+	private boolean overQueryLimit = false;
+
+	private BufferedWriter writer;
 
 	public GoogleGeoCoder() {
 		this(null, 0, 0);
 	}
-	
+
 	public GoogleGeoCoder(String proxy, int port, long sleep) {
 		HttpClient httpClient = new HttpClient(new MultiThreadedHttpConnectionManager());
-		if(proxy != null) {
+		if (proxy != null) {
 			httpClient.getHostConfiguration().setProxy(proxy, port);
 		}
 		geocoder = new AdvancedGeoCoder(httpClient);
-		
+
 		this.sleepInterval = sleep;
+
+		cache = new HashMap<String, LatLng>();
+		readCache();
 	}
 
 	public LatLng requestCoordinate(String query) {
+		if (overQueryLimit)
+			return null;
+
+		if (query.trim().isEmpty())
+			return null;
+
 		Level level = Logger.getRootLogger().getLevel();
 		Logger.getRootLogger().setLevel(Level.INFO);
-		
-		GeocodeResponse response = cache.get(query);
-		if (response == null) {
+
+		LatLng coord = null;
+
+		if (!cache.containsKey(query)) {
 			try {
 				Thread.sleep(sleepInterval);
 				GeocoderRequest geocoderRequest = new GeocoderRequestBuilder().setAddress(query).setLanguage("de").getGeocoderRequest();
-				response = geocoder.geocode(geocoderRequest);
-				if(response.getStatus() == GeocoderStatus.OK) {
-					cache.put(query, response);
-				} else if(response.getStatus() == GeocoderStatus.ZERO_RESULTS){
+				GeocodeResponse response = geocoder.geocode(geocoderRequest);
+				if (response.getStatus() == GeocoderStatus.OK) {
+					coord = response.getResults().get(0).getGeometry().getLocation();
+					addToCache(query, coord);
+				} else if (response.getStatus() == GeocoderStatus.ZERO_RESULTS) {
 					logger.warn(String.format("No results for query \"%s\" found.", query));
+					addToCache(query, null);
+				} else if (response.getStatus() == GeocoderStatus.OVER_QUERY_LIMIT) {
+					logger.warn("Query limit exceeded.");
+					overQueryLimit = true;
 				} else {
 					logger.warn(String.format("Request failed with error \"%s\".", response.getStatus().name()));
 				}
-				
+
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+		} else {
+			coord = cache.get(query);
 		}
-		
+
 		Logger.getRootLogger().setLevel(level);
-		
-		if(response != null) {
-			if(!response.getResults().isEmpty()) {
-				LatLng c = response.getResults().get(0).getGeometry().getLocation();
-				return c;//new CoordImpl(c.getLng().doubleValue(), c.getLat().doubleValue());
-			} else { // should not happen
-				logger.warn(String.format("No results for query \"%s\" found.", query));
-			}
-		}
-		
-		return null;
+
+		return coord;
 	}
 
-	private static class HashMapCash extends LinkedHashMap<String, GeocodeResponse> {
+	private void readCache() {
+		try {
+			File file = new File(cacheFile);
+			if (file.exists()) {
+				BufferedReader reader = new BufferedReader(new FileReader(file));
+				String line = null;
+				while ((line = reader.readLine()) != null) {
+					String tokens[] = line.split("\t", -1);
 
-		private static final long serialVersionUID = 1L;
+					String query = tokens[0];
+					String coordStr = tokens[1];
 
-		private static final int MAX_ENTRIES = 100;
+					LatLng latlng = null;
+					if (!coordStr.isEmpty()) {
+						String coords[] = coordStr.split(",");
+						latlng = new LatLng(coords[1], coords[0]);
+					}
+					cache.put(query, latlng);
+				}
 
-		protected boolean removeEldestEntry(Map.Entry<String, GeocodeResponse> eldest) {
-			return size() > MAX_ENTRIES;
+				reader.close();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void addToCache(String query, LatLng coord) {
+		cache.put(query, coord);
+
+		try {
+			if (writer == null) {
+				File file = new File(cacheFile);
+				if (file.exists()) {
+					writer = new BufferedWriter(new FileWriter(cacheFile, true));
+				} else {
+					writer = new BufferedWriter(new FileWriter(cacheFile));
+				}
+			}
+			writer.write(query);
+			writer.write("\t");
+			if (coord != null) {
+				writer.write(String.valueOf(coord.getLng()));
+				writer.write(",");
+				writer.write(String.valueOf(coord.getLat()));
+			}
+			writer.newLine();
+			writer.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 }

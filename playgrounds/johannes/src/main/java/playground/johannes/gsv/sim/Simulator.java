@@ -70,10 +70,12 @@ import playground.johannes.coopsim.analysis.LegLoadTask;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzer;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTask;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
+import playground.johannes.coopsim.analysis.TripCountTask;
 import playground.johannes.coopsim.analysis.TripDistanceTask;
 import playground.johannes.coopsim.analysis.TripDurationTask;
 import playground.johannes.coopsim.analysis.TripPurposeShareTask;
 import playground.johannes.coopsim.pysical.TrajectoryEventsBuilder;
+import playground.johannes.gsv.analysis.CountsCompareAnalyzer;
 import playground.johannes.gsv.analysis.PkmTask;
 import playground.johannes.gsv.analysis.ScoreTask;
 import playground.johannes.gsv.analysis.SpeedFactorTask;
@@ -147,15 +149,15 @@ public class Simulator {
 			 * setup scoring and cadyts integration
 			 */
 			boolean disableCadyts = Boolean.parseBoolean(config.getModule("gsv").getValue("disableCadyts"));
-			if(!disableCadyts) {
-			CadytsContext context = new CadytsContext(controler.getScenario().getConfig());
-			controler.setScoringFunctionFactory(new ScoringFactory(context, controler.getConfig(), controler.getNetwork()));
-			
-			controler.addControlerListener(context);
-			Logger.getRootLogger().setLevel(org.apache.log4j.Level.FATAL);
-			context.notifyStartup(event);
-			Logger.getRootLogger().setLevel(org.apache.log4j.Level.DEBUG);
-			controler.addControlerListener(new CadytsRegistration(context));
+			if (!disableCadyts) {
+				CadytsContext context = new CadytsContext(controler.getScenario().getConfig());
+				controler.setScoringFunctionFactory(new ScoringFactory(context, controler.getConfig(), controler.getNetwork()));
+
+				controler.addControlerListener(context);
+				Logger.getRootLogger().setLevel(org.apache.log4j.Level.FATAL);
+				context.notifyStartup(event);
+				Logger.getRootLogger().setLevel(org.apache.log4j.Level.DEBUG);
+				controler.addControlerListener(new CadytsRegistration(context));
 			}
 			/*
 			 * setup analysis modules
@@ -164,8 +166,11 @@ public class Simulator {
 			controler.getEvents().addHandler(calculator);
 			String countsFile = config.findParam("gsv", "countsfile");
 			double factor = Double.parseDouble(config.findParam("counts", "countsScaleFactor"));
+			
 			DTVAnalyzer dtv = new DTVAnalyzer(controler.getNetwork(), controler, controler.getEvents(), countsFile, calculator, factor);
 			controler.addControlerListener(dtv);
+			
+			controler.addControlerListener(new CountsCompareAnalyzer(calculator, countsFile, factor));
 			
 			TrajectoryAnalyzerTaskComposite task = new TrajectoryAnalyzerTaskComposite();
 			task.addTask(new TripDistanceTask(controler.getFacilities()));
@@ -181,6 +186,7 @@ public class Simulator {
 			task.addTask(new TripDurationTask());
 			task.addTask(new TripPurposeShareTask());
 //			task.addTask(new LegFrequencyTask());
+			task.addTask(new TripCountTask());
 			
 			AnalyzerListiner listener = new AnalyzerListiner();
 			listener.task = task;
@@ -262,6 +268,8 @@ public class Simulator {
 		public void notifyIterationEnds(IterationEndsEvent event) {
 			try {
 				TrajectoryAnalyzer.analyze(builder.trajectories(), task, controler.getControlerIO().getIterationPath(event.getIteration()));
+				
+				
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

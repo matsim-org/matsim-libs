@@ -19,6 +19,8 @@
 
 package playground.johannes.gsv.synPop.sim2;
 
+import gnu.trove.TDoubleDoubleHashMap;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -30,6 +32,9 @@ import org.apache.log4j.Logger;
 
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.sim2.SamplerListener;
+import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
+import playground.johannes.sna.math.Histogram;
+import playground.johannes.sna.util.TXTWriter;
 
 /**
  * @author johannes
@@ -49,17 +54,20 @@ public class HamiltonianLogger implements SamplerListener {
 	
 	private static final String TAB = "\t";
 	
+	private final String outdir;
+	
 	public HamiltonianLogger(Hamiltonian h, int logInterval) {
 		this(h, logInterval, null);
 	}
 	
-	public HamiltonianLogger(Hamiltonian h, int logInterval, String file) {
+	public HamiltonianLogger(Hamiltonian h, int logInterval, String outdir) {
 		this.h = h;
 		this.logInterval = logInterval;
+		this.outdir = outdir;
 		
-		if(file != null) {
+		if(outdir != null) {
 			try {
-				writer = new BufferedWriter(new FileWriter(file));
+				writer = new BufferedWriter(new FileWriter(outdir + "/" + h.getClass().getSimpleName() +".txt"));
 				writer.write("iter\ttotal\tavr\tmed\tmin\tmax");
 				writer.newLine();
 			} catch (IOException e) {
@@ -82,7 +90,7 @@ public class HamiltonianLogger implements SamplerListener {
 			DescriptiveStatistics stats = new DescriptiveStatistics(values);
 			double sum = stats.getSum();
 			double avr = stats.getMean();
-			double med = stats.getPercentile(50);
+//			double med = stats.getPercentile(50);
 			double max = stats.getMax();
 			double min = stats.getMin();
 			
@@ -91,7 +99,7 @@ public class HamiltonianLogger implements SamplerListener {
 			builder.append(h.getClass().getSimpleName());
 			builder.append(String.format(Locale.US, ": Sum = %.4f, ", sum));
 			builder.append(String.format(Locale.US, ": Avr = %.4f, ", avr));
-			builder.append(String.format(Locale.US, ": Med = %.4f, ", med));
+//			builder.append(String.format(Locale.US, ": Med = %.4f, ", med));
 			builder.append(String.format(Locale.US, ": Max = %.4f, ", max));
 			builder.append(String.format(Locale.US, ": Min = %.4f", min));
 			
@@ -105,8 +113,8 @@ public class HamiltonianLogger implements SamplerListener {
 					writer.write(TAB);
 					writer.write(String.valueOf(avr));
 					writer.write(TAB);
-					writer.write(String.valueOf(med));
-					writer.write(TAB);
+//					writer.write(String.valueOf(med));
+//					writer.write(TAB);
 					writer.write(String.valueOf(min));
 					writer.write(TAB);
 					writer.write(String.valueOf(max));
@@ -116,8 +124,25 @@ public class HamiltonianLogger implements SamplerListener {
 					e.printStackTrace();
 				}
 			}
+			
+			TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, FixedSampleSizeDiscretizer.create(stats.getValues(), 1, 100), true);
+			String file = String.format("%s/%s.%s.txt", outdir, h.getClass().getSimpleName(), iter);
+			try {
+				TXTWriter.writeMap(hist, "value", "frequency", file);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 
+	}
+
+	/* (non-Javadoc)
+	 * @see playground.johannes.gsv.synPop.sim2.SamplerListener#afterModify(playground.johannes.gsv.synPop.ProxyPerson)
+	 */
+	@Override
+	public void afterModify(ProxyPerson person) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

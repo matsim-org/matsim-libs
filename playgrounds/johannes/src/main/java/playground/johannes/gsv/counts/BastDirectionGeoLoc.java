@@ -35,27 +35,28 @@ import com.google.code.geocoder.model.LatLng;
 
 /**
  * @author johannes
- *
+ * 
  */
 public class BastDirectionGeoLoc {
 
 	private static final Logger logger = Logger.getLogger(BastDirectionGeoLoc.class);
-	
+
 	private static GoogleGeoCoder googleLookup;
+
 	/**
 	 * @param args
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
 		googleLookup = new GoogleGeoCoder("localhost", 3128, 100);
-		
-		String bastFile = "/home/johannes/gsv/counts/bast-geolocated.csv";
-		String outFile = "/home/johannes/gsv/counts/bast-geolocated2.csv";
-		
+
+		String bastFile = "/home/johannes/gsv/counts/counts-modena.txt";
+		String outFile = "/home/johannes/gsv/counts/counts-modena.geo.txt";
+
 		logger.info("Loading bast counts...");
 		BufferedReader reader = new BufferedReader(new FileReader(bastFile));
 		BufferedWriter writer = new BufferedWriter(new FileWriter(outFile));
-		
+
 		String line = reader.readLine();
 		writer.write(line);
 		writer.write("\tFernziel_Ri1_long");
@@ -63,63 +64,75 @@ public class BastDirectionGeoLoc {
 		writer.write("\tFernziel_Ri2_long");
 		writer.write("\tFernziel_Ri2_lat");
 		writer.newLine();
-		
+
 		String[] header = line.split("\t");
 		Map<String, Integer> colIdices = new HashMap<String, Integer>();
-		for(int i = 0; i < header.length; i++) {
+		for (int i = 0; i < header.length; i++) {
 			colIdices.put(header[i], i);
 		}
-		
-//		NumberFormat format = NumberFormat.getInstance(Locale.GERMAN);
-		
-		int dest1Idx = colIdices.get("Fernziel_Ri1");
-		int dest2Idx = colIdices.get("Fernziel_Ri2");
-		
+
+		// NumberFormat format = NumberFormat.getInstance(Locale.GERMAN);
+
+		// int dest1Idx = colIdices.get("Fernziel_Ri1");
+		// int dest2Idx = colIdices.get("Fernziel_Ri2");
+		int dest1Idx = colIdices.get("FERNZIEL_RI1");
+		int dest2Idx = colIdices.get("FERNZIEL_RI2");
+
+		int dest1LocalIdx = colIdices.get("NAHZIEL_RI1");
+		int dest2LocalIdx = colIdices.get("NAHZIEL_RI2");
+
 		int cnt = 0;
-		while((line = reader.readLine()) != null) {
+		while ((line = reader.readLine()) != null) {
 			String tokens[] = line.split("\t");
-			
-			double[] coord1 = coordinates(tokens[dest1Idx]);
-			double[] coord2 = coordinates(tokens[dest2Idx]);
-			
-			writer.write(line);
-			writer.write("\t");
-			if (coord1 != null) {
-				writer.write(String.valueOf(coord1[0]));
+
+			if (tokens.length > dest2Idx) {
+				double[] coord1 = coordinates(tokens[dest1Idx]);
+				if(coord1 == null && tokens.length > dest1LocalIdx) {
+					coord1 = coordinates(tokens[dest1LocalIdx]);
+				}
+				double[] coord2 = coordinates(tokens[dest2Idx]);
+				if(coord2 == null && tokens.length > dest2LocalIdx) {
+					coord2 = coordinates(tokens[dest2LocalIdx]);
+				}
+				
+				writer.write(line);
+				writer.write("\t");
+				if (coord1 != null) {
+					writer.write(String.valueOf(coord1[0]));
+				}
+				writer.write("\t");
+				if (coord1 != null) {
+					writer.write(String.valueOf(coord1[1]));
+				}
+
+				writer.write("\t");
+				if (coord2 != null) {
+					writer.write(String.valueOf(coord2[0]));
+				}
+				writer.write("\t");
+				if (coord2 != null) {
+					writer.write(String.valueOf(coord2[1]));
+				}
+				writer.newLine();
+				writer.flush();
 			}
-			writer.write("\t");
-			if (coord1 != null) {
-				writer.write(String.valueOf(coord1[1]));
-			}
-			
-			writer.write("\t");
-			if (coord2 != null) {
-				writer.write(String.valueOf(coord2[0]));
-			}
-			writer.write("\t");
-			if (coord2 != null) {
-				writer.write(String.valueOf(coord2[1]));
-			}
-			writer.newLine();
-			writer.flush();
-			
 			cnt++;
-			if(cnt % 20 == 0) {
+			if (cnt % 20 == 0) {
 				logger.info(String.format("Parsed %s lines...", cnt));
 			}
 		}
 
 		reader.close();
 		writer.close();
-		
+
 		logger.info("Done.");
 	}
-	
+
 	private static double[] coordinates(String destination) {
 		LatLng coord = googleLookup.requestCoordinate(destination);
-		
-		if(coord != null) {
-			return new double[]{coord.getLng().doubleValue(), coord.getLat().doubleValue()};
+
+		if (coord != null) {
+			return new double[] { coord.getLng().doubleValue(), coord.getLat().doubleValue() };
 		} else {
 			return null;
 		}

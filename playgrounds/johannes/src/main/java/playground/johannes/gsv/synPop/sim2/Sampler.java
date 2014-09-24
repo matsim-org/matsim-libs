@@ -127,6 +127,7 @@ public class Sampler {
 //			double H_before = hamiltonian.evaluate(person);
 			boolean accepted = false;
 			if (mutator.modify(person)) {
+				listener.afterModify(person);
 				/*
 				 * evaluate
 				 */
@@ -155,6 +156,15 @@ public class Sampler {
 		@Override
 		public void afterStep(Collection<ProxyPerson> population, ProxyPerson person, boolean accepted) {
 			// does nothing
+		}
+
+		/* (non-Javadoc)
+		 * @see playground.johannes.gsv.synPop.sim2.SamplerListener#afterModify(playground.johannes.gsv.synPop.ProxyPerson)
+		 */
+		@Override
+		public void afterModify(ProxyPerson person) {
+			// TODO Auto-generated method stub
+			
 		}
 		
 	}

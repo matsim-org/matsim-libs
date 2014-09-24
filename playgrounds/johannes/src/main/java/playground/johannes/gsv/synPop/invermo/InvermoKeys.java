@@ -29,5 +29,21 @@ public class InvermoKeys {
 	
 	public static final String STATION_DIST = "stationDist";
 	
-	public static final String HOME_LOCATION = "homeLocation";
+	public static final String HOME_LOCATION = "homeLoc";
+	
+	public static final String HOME_COORD = "homeCoord";
+	
+	public static final String START_LOCATION = "startLoc";
+	
+	public static final String DESTINATION_LOCATION = "destLoc";
+	
+	public static final String WEIGHT = "weight";
+	
+	public static final String PREV = "prev";
+	
+	public static final String HOME = "home";
+	
+	public static final String WORK = "work";
+	
+	public static final String LOCATION = "location";
 }

@@ -51,6 +51,14 @@ public class ProxyObject {
 		return attributes.put(key, value);
 	}
 	
+	public String removeAttribute(String key) {
+		if(attributes != null) {
+			return attributes.remove(key);
+		} else {
+			return null;
+		}
+	}
+	
 	public ProxyObject clone() {
 		ProxyObject clone = new ProxyObject();
 		

@@ -26,11 +26,11 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -52,7 +52,7 @@ public class NetworkSimplifier {
 	private boolean mergeLinkStats = false;
 	private Set<Integer> nodeTopoToMerge = new TreeSet<Integer>();
 
-	public void run(final Network network) {
+	public void run(final Network network, boolean overwriteIds) {
 
 		if(this.nodeTopoToMerge.size() == 0){
 			throw new RuntimeException("No types of node specified. Please use setNodesToMerge to specify which nodes should be merged");
@@ -65,6 +65,20 @@ public class NetworkSimplifier {
 
 		NetworkCalcTopoType nodeTopo = new NetworkCalcTopoType();
 		nodeTopo.run(network);
+
+		long maxId = 0;
+
+		for (Link link : network.getLinks().values()) {
+			if (overwriteIds) {
+				((LinkImpl) link).setOrigId(link.getId().toString());
+			}
+			try {
+				long id = Long.parseLong(link.getId().toString());
+				maxId = Math.max(maxId, id);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
 
 		for (Node node : network.getNodes().values()) {
 
@@ -86,11 +100,8 @@ public class NetworkSimplifier {
 								if(this.mergeLinkStats){
 
 									// Try to merge both links by guessing the resulting links attributes
-									Link link = network.getFactory().createLink(
-											new IdImpl(inLink.getId() + "-" + outLink.getId()),
-											inLink.getFromNode().getId(),
-											outLink.getToNode().getId());
-
+									Id<Link> id = Id.create(++maxId, Link.class);
+									Link link = network.getFactory().createLink(id, inLink.getFromNode(), outLink.getToNode());
 									// length can be summed up
 									link.setLength(inLink.getLength() + outLink.getLength());
 
@@ -113,13 +124,17 @@ public class NetworkSimplifier {
 									network.addLink(link);
 									network.removeLink(inLink.getId());
 									(network).removeLink(outLink.getId());
+									
+									((LinkImpl)link).setOrigId(String.format("%s,%s", inLink.getOrigId(), outLink.getOrigId()));
 
 								} else {
 
 									// Only merge links with same attributes
 									if(bothLinksHaveSameLinkStats(inLink, outLink)){
+										Id<Link> id = Id.create(++maxId, Link.class);
+										
 										LinkImpl newLink = ((NetworkImpl) network).createAndAddLink(
-												new IdImpl(inLink.getId() + "-" + outLink.getId()),
+												id,
 												inLink.getFromNode(),
 												outLink.getToNode(),
 												inLink.getLength() + outLink.getLength(),
@@ -128,11 +143,12 @@ public class NetworkSimplifier {
 												inLink.getNumberOfLanes(),
 												inLink.getOrigId() + "-" + outLink.getOrigId(),
 												null);
-
 										newLink.setAllowedModes(inLink.getAllowedModes());
 
 										network.removeLink(inLink.getId());
 										network.removeLink(outLink.getId());
+										
+										((LinkImpl)newLink).setOrigId(String.format("%s,%s", inLink.getOrigId(), outLink.getOrigId()));
 									}
 
 								}
@@ -209,14 +225,15 @@ public class NetworkSimplifier {
 
 		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario).readFile("/home/johannes/gsv/osm/germany-network-cat5.simplified2.xml");
+		new MatsimNetworkReader(scenario).readFile(args[0]);
 
 		NetworkSimplifier nsimply = new NetworkSimplifier();
 		nsimply.setNodesToMerge(nodeTypesToMerge);
 		nsimply.setMergeLinkStats(true);
-		nsimply.run(network);
+		Boolean overwriteIds = Boolean.parseBoolean(args[2]);
+		nsimply.run(network, overwriteIds);
 
-		new NetworkWriter(network).write("/home/johannes/gsv/osm/germany-network-cat5.simplified3.xml");
+		new NetworkWriter(network).write(args[1]);
 
 	}
 }

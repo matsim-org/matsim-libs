@@ -58,7 +58,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.gsv.gis.LinkSHPWriter;
 import playground.johannes.sna.gis.CRSUtils;
-import playground.johannes.socialnetworks.graph.spatial.io.NumericAttributeColorizer;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -121,7 +120,7 @@ public class DTVAnalyzer implements IterationEndsListener, IterationStartsListen
 				writer.write(String.valueOf(simVol));
 				writer.newLine();
 				
-				countsMap.put(count, simVol/obsVol);
+				countsMap.put(count, simVol);
 			}
 
 			writer.close();
@@ -130,6 +129,8 @@ public class DTVAnalyzer implements IterationEndsListener, IterationStartsListen
 			
 			LinkSHPWriter shpWriter = new LinkSHPWriter();
 			shpWriter.write(event.getControler().getNetwork().getLinks().values(), simCounts, outdir + "/linkflow.shp", factor);
+			
+			simCounts.writeValues(outdir + "/linkoccup.txt");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -143,8 +144,9 @@ public class DTVAnalyzer implements IterationEndsListener, IterationStartsListen
 		typeBuilder.setCRS(crs);
 		typeBuilder.setName("count station");
 		typeBuilder.add("the_geom", Point.class);
+		typeBuilder.add("sim", Double.class);
+		typeBuilder.add("obs", Double.class);
 		typeBuilder.add("relerror", Double.class);
-		typeBuilder.add("color", String.class);
 		
 		SimpleFeatureType featureType = typeBuilder.buildFeatureType();
         
@@ -152,16 +154,19 @@ public class DTVAnalyzer implements IterationEndsListener, IterationStartsListen
         SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(featureType);
 
 //        GeometryFactory factory = JTSFactoryFinder.getGeometryFactory(null);
-        NumericAttributeColorizer colorizer = new NumericAttributeColorizer(counts);
+//        NumericAttributeColorizer colorizer = new NumericAttributeColorizer(counts);
         TObjectDoubleIterator<Count> it = counts.iterator();
         for(int i = 0; i < counts.size(); i++) {
         	it.advance();
-        	Point p = MatsimCoordUtils.coordToPoint(it.key().getCoord());
+        	Count count = it.key();
+        	Point p = MatsimCoordUtils.coordToPoint(count.getCoord());
         	featureBuilder.add(p);
-        	featureBuilder.add(it.value());
-        	String rgb = Integer.toHexString(colorizer.getColor(it.key()).getRGB());
-        	rgb = rgb.substring(2, rgb.length());
-        	featureBuilder.add("#"+rgb);
+        	
+        	double sim = it.value();
+        	double obs = count.getVolume(1).getValue();
+        	featureBuilder.add(sim);
+        	featureBuilder.add(obs);
+        	featureBuilder.add((obs-sim)/obs);
         	SimpleFeature feature = featureBuilder.buildFeature(null);
         	collection.add(feature);
         }

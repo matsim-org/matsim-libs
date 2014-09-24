@@ -39,10 +39,10 @@ public class HouseholdLocationHandler implements AttributeHandler<ProxyObject> {
 			town = "";
 		
 		String zip = attributes.get(ColumnKeys.HOME_ZIPCODE);
-		if(!ColumnKeys.validate(zip))
-			zip = "";
-		
-		household.setAttribute(InvermoKeys.HOME_LOCATION, String.format("%s %s", zip, town));
+		if(ColumnKeys.validate(zip)) {
+			int code = Integer.parseInt(zip);
+			household.setAttribute(InvermoKeys.HOME_LOCATION, String.format("%05d %s", code, town));
+		}
 		
 	}
 

@@ -42,10 +42,8 @@ public class LegHandlerAdaptor implements AttributeHandler<ProxyPlan> {
 	@Override
 	public void handleAttribute(ProxyPlan plan, Map<String, String> attributes) {
 		for (Entry<String, String> entry : attributes.entrySet()) {
-			if (!entry.getValue().equalsIgnoreCase("nan")) {
+			if (ColumnKeys.validate(entry.getValue())) {
 				String key = entry.getKey();
-				int dotIdx = key.indexOf(".");
-				key = key.substring(dotIdx + 1);
 				if (key.startsWith("e")) {
 					int idx = Character.getNumericValue(key.charAt(1));
 					idx = idx - 1;

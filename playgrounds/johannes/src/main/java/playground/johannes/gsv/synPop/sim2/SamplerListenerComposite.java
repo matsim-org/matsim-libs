@@ -38,4 +38,12 @@ public class SamplerListenerComposite extends Composite<SamplerListener> impleme
 
 	}
 
+	@Override
+	public void afterModify(ProxyPerson person) {
+		for(SamplerListener listener : components) {
+			listener.afterModify(person);
+		}
+		
+	}
+
 }

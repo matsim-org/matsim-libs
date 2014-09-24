@@ -57,7 +57,8 @@ public class PersonFilter {
 		XMLParser parser = new XMLParser();
 		parser.setValidating(false);
 		
-		parser.parse("/home/johannes/gsv/mid2008/pop/pop.200K.xml");
+//		parser.parse("/home/johannes/gsv/mid2008/pop/pop.200K.xml");
+		parser.parse("/home/johannes/gsv/invermo/pop.100K.xml");
 		logger.info(String.format("Loaded %s persons.", parser.getPersons().size()));
 
 		logger.info("Converting ride legs to car legs.");
@@ -81,7 +82,8 @@ public class PersonFilter {
 		
 		logger.info("Writing population...");
 		XMLWriter writer = new XMLWriter();
-		writer.write("/home/johannes/gsv/mid2008/pop/pop.car.wkday.200K.xml", subset);
+//		writer.write("/home/johannes/gsv/mid2008/pop/pop.car.wkday.200K.xml", subset);
+		writer.write("/home/johannes/gsv/invermo/pop.car.wkday.100K.xml", subset);
 		logger.info("Done.");
 	}
 }

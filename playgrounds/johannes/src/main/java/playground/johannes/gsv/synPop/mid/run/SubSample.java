@@ -43,18 +43,18 @@ public class SubSample {
 		XMLParser parser = new XMLParser();
 		parser.setValidating(false);
 		
-		parser.parse("/home/johannes/gsv/synpop/data/3800000000.pop.xml.gz");
+		parser.parse("/home/johannes/gsv/synpop/output/38.pop.xml");
 		logger.info(String.format("Loaded %s persons.", parser.getPersons().size()));
 		
 		ProxyPersonTaskComposite tasks = new ProxyPersonTaskComposite();
-		tasks.addComponent(new DeleteRandom(0.9));
+		tasks.addComponent(new DeleteRandom(0.5));
 		
 		Collection<ProxyPerson> subset = ProxyTaskRunner.runAndDelete(tasks, parser.getPersons());
 		logger.info(String.format("New population: %s persons.", subset.size()));
 		
 		logger.info("Writing population...");
 		XMLWriter writer = new XMLWriter();
-		writer.write("/home/johannes/gsv/synpop/data/100K.pop.xml.gz", subset);
+		writer.write("/home/johannes/gsv/synpop/output/38.pop.50.xml", subset);
 		logger.info("Done.");
 		
 	}

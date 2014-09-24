@@ -39,7 +39,23 @@ public class ColumnKeys {
 	
 	public static final String NA = "nan";
 	
+	public static final String START1_TRIP1 = "e1start1";
+	
+	public static final String START2_TRIP1 = "e1start2";
+	
+	public static final String START1_TRIP2 = "e2start1";
+	
+	public static final String START2_TRIP2 = "e2start2";
+	
+	public static final String START1_TRIP3 = "e3start1";
+	
+	public static final String START2_TRIP3 = "e3start2";
+	
+	public static final String START1_TRIP4 = "e4start1";
+	
+	public static final String MOB_WEIGTH = "gewmobil";
+	
 	public static boolean validate(String value) {
-		return (value != null && !value.equalsIgnoreCase(NA));
+		return (value != null && !value.equalsIgnoreCase(NA) && !value.isEmpty());
 	}
 }

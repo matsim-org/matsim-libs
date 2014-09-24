@@ -40,12 +40,13 @@ public class SamplerLogger implements SamplerListener {
 	
 	private Timer timer;
 	
-	private Task task = new Task();
+	private Task task;
 	
 	@Override
 	public void afterStep(Collection<ProxyPerson> population, ProxyPerson person, boolean accpeted) {
 		if(timer == null) {
 			timer = new Timer();
+			task = new Task();
 			timer.schedule(task, 2000, 2000);
 		}
 		
@@ -75,6 +76,24 @@ public class SamplerLogger implements SamplerListener {
 			if(accepted)
 				accepts++;
 		}
+
+		/* (non-Javadoc)
+		 * @see playground.johannes.gsv.synPop.sim2.SamplerListener#afterModify(playground.johannes.gsv.synPop.ProxyPerson)
+		 */
+		@Override
+		public void afterModify(ProxyPerson person) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+	}
+
+	/* (non-Javadoc)
+	 * @see playground.johannes.gsv.synPop.sim2.SamplerListener#afterModify(playground.johannes.gsv.synPop.ProxyPerson)
+	 */
+	@Override
+	public void afterModify(ProxyPerson person) {
+		// TODO Auto-generated method stub
 		
 	}
 

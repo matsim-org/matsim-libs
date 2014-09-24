@@ -21,6 +21,7 @@ package playground.johannes.gsv.synPop.gis;
 
 import gnu.trove.TDoubleArrayList;
 import gnu.trove.TDoubleDoubleHashMap;
+import gnu.trove.TIntArrayList;
 import gnu.trove.TObjectIntHashMap;
 
 import java.io.BufferedReader;
@@ -75,10 +76,11 @@ public class KreisOsmCompare {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		FacilitiesReaderMatsimV1 facReader = new FacilitiesReaderMatsimV1(scenario);
-		facReader.readFile("/home/johannes/gsv/osm/facilities.leisure.xml");
+		facReader.readFile("/home/johannes/gsv/osm/facilities/facilities.shop.xml");
 		ActivityFacilities facilities = scenario.getActivityFacilities();
 		
-		TObjectIntHashMap<String> attractivness = readEmployees("/home/johannes/gsv/osm/kreisCompare/StrukturAttraktivitaet.csv");
+		String[] types = new String[]{"E"};
+		TObjectIntHashMap<String> attractivness = readEmployees("/home/johannes/gsv/osm/kreisCompare/StrukturAttraktivitaet.csv", types);
 
 		countFacilities(zoneLayer, facilities);
 		
@@ -104,9 +106,9 @@ public class KreisOsmCompare {
 		System.err.println(String.format("%s zones not found.", zoneNotFound));
 		
 		TDoubleDoubleHashMap stats = Correlations.mean(values1.toNativeArray(), values2.toNativeArray());
-//		TXTWriter.writeMap(stats, "employees", "facilities", "/home/johannes/gsv/osm/kreisCompare/shop-compare.txt");
-		BufferedWriter writer = new BufferedWriter(new FileWriter("/home/johannes/gsv/osm/kreisCompare/leisure-compare.txt"));
-		writer.write("employees\tfacilities");
+		TXTWriter.writeMap(stats, "attractivity", "facilities", "/home/johannes/gsv/osm/kreisCompare/shop.mean.txt");
+		BufferedWriter writer = new BufferedWriter(new FileWriter("/home/johannes/gsv/osm/kreisCompare/shop.txt"));
+		writer.write("attractivity\tfacilities");
 		writer.newLine();
 		for(int i = 0; i < values1.size(); i++) {
 			writer.write(String.valueOf(values1.get(i)));
@@ -143,17 +145,30 @@ public class KreisOsmCompare {
 		return CRSUtils.transformPoint(MatsimCoordUtils.coordToPoint(coord), transform);
 	}
 	
-	private static TObjectIntHashMap<String> readEmployees(String filename) throws IOException {
+	private static TObjectIntHashMap<String> readEmployees(String filename, String[] types) throws IOException {
 		BufferedReader reader = new BufferedReader(new FileReader(filename));
 		String line = reader.readLine();
+
+		TIntArrayList indices = new TIntArrayList();
+		String tokens[] = line.split("\t", -1);
+		for (int i = 0; i < tokens.length; i++) {
+			for (String type : types) {
+				if (tokens[i].startsWith(type)) {
+					indices.add(i);
+				}
+			}
+		}
 		
 		TObjectIntHashMap<String> map = new TObjectIntHashMap<String>();
 		
 		while((line = reader.readLine()) != null) {
-			String tokens[] = line.split("\t", -1);
+			tokens = line.split("\t", -1);
 			
 			String id = tokens[0];
-			int count = Integer.parseInt(tokens[7]);
+			int count = 0;//Integer.parseInt(tokens[idx]);
+			for(int i = 0; i < indices.size(); i++) {
+				count += Integer.parseInt(tokens[indices.get(i)]);
+			}
 			
 			map.put(id, count);
 		}

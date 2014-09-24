@@ -19,6 +19,7 @@
 
 package playground.johannes.gsv.synPop.sim2;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
@@ -112,8 +113,9 @@ public class ActivityLocationHamiltonian implements Hamiltonian {
 				ProxyObject next = person.getPlan().getActivities().get(i);
 				
 				double dist = distance(prev, next);
+				targetDistance = Math.max(targetDistance, 100);
 				dist = dist * detourFactor;
-				double delta = Math.abs(dist - targetDistance);
+				double delta = Math.abs(dist - targetDistance)/targetDistance;
 				totaldelta += delta;
 			}
 		}
@@ -125,11 +127,14 @@ public class ActivityLocationHamiltonian implements Hamiltonian {
 		ActivityFacility orgFac = getFacility(origin);
 		ActivityFacility destFac = getFacility(destination);
 
-		Point p1 = MatsimCoordUtils.coordToPoint(orgFac.getCoord());
-		Point p2 = MatsimCoordUtils.coordToPoint(destFac.getCoord());
+//		Point p1 = MatsimCoordUtils.coordToPoint(orgFac.getCoord());
+//		Point p2 = MatsimCoordUtils.coordToPoint(destFac.getCoord());
+//
+//		double d = calculator.distance(p1, p2);
 
-		double d = calculator.distance(p1, p2);
-
+		Coord c1 = orgFac.getCoord();
+		Coord c2 = destFac.getCoord();
+		double d = Math.sqrt(c1.getX() * c2.getX() + c1.getY() * c2.getY()); 
 		return d;
 	}
 

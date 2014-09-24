@@ -29,6 +29,8 @@ import playground.johannes.gsv.synPop.ProxyPerson;
  */
 public interface SamplerListener {
 
+	public void afterModify(ProxyPerson person);
+	
 	public void afterStep(Collection<ProxyPerson> population, ProxyPerson person, boolean accpeted);
 	
 }
