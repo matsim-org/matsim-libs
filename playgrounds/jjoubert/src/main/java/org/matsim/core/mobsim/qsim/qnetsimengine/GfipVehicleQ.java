@@ -17,10 +17,58 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * Testing a new priority queue using actual Gauteng Freeway Improvement 
- * Project (GFIP) gantry data.
- * 
- * @author jwjoubert
- */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
+
+import java.util.AbstractQueue;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.PriorityQueue;
+import java.util.Queue;
+
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.VehicleQ;
+
+public class GfipVehicleQ extends AbstractQueue<QVehicle> implements VehicleQ<QVehicle> {
+
+	public GfipVehicleQ() {} /* Just to find calls. */
+	private final Queue<QVehicle> delegate = new PriorityQueue<QVehicle>(11, new Comparator<QVehicle>() {
+
+		@Override
+		public int compare(QVehicle arg0, QVehicle arg1) {
+			// TODO Auto-generated method stub
+			return 0;
+		}
+	});
+	
+	@Override
+	public boolean offer(QVehicle arg0) {
+		return delegate.offer(arg0);
+	}
+
+	@Override
+	public QVehicle peek() {
+		return delegate.peek();
+	}
+
+	@Override
+	public QVehicle poll() {
+		return delegate.poll();
+	}
+
+	@Override
+	public Iterator<QVehicle> iterator() {
+		return delegate.iterator();
+	}
+
+	@Override
+	public int size() {
+		return delegate.size();
+	}
+
+	@Override
+	public void addFirst(QVehicle vehicle) {
+		vehicle.setEarliestLinkExitTime(Double.NEGATIVE_INFINITY);
+		this.add(vehicle);
+	}
+
+}
