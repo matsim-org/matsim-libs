@@ -25,7 +25,7 @@ public class TaxiDemandToMatrix
 
     public static void main(String[] args)
     {
-        TaxiDemandToMatrix m = new TaxiDemandToMatrix("C:\\local_jb\\data\\OD\\OD_2013\\");
+        TaxiDemandToMatrix m = new TaxiDemandToMatrix("C:\\local_jb\\data\\taxi_berlin\\2014\\OD\\");
         m.read();
         m.write();
     }

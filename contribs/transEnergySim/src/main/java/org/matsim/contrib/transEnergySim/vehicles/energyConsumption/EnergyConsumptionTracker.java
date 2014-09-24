@@ -66,16 +66,16 @@ public class EnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeav
 
 	private EnergyConsumptionOutputLog log;
 
-	HashMap<Id, Vehicle> vehicles;
+	HashMap<Id<Vehicle>, Vehicle> vehicles;
 
-	DoubleValueHashMap<Id> linkEnterTime;
-	HashMap<Id, Id> previousLinkEntered;
+	DoubleValueHashMap<Id<Vehicle>> linkEnterTime;
+//	HashMap<Id, Id> previousLinkEntered;
 
 	private final Network network;
 
 	private boolean loggingEnabled;
 
-	public EnergyConsumptionTracker(HashMap<Id, Vehicle> vehicles, Network network) {
+	public EnergyConsumptionTracker(HashMap<Id<Vehicle>, Vehicle> vehicles, Network network) {
 		this.vehicles = vehicles;
 		this.network = network;
 		enableLogging();
@@ -84,8 +84,8 @@ public class EnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeav
 
 	@Override
 	public void reset(int iteration) {
-		linkEnterTime = new DoubleValueHashMap<Id>();
-		previousLinkEntered = new HashMap<Id, Id>();
+		linkEnterTime = new DoubleValueHashMap<Id<Vehicle>>();
+//		previousLinkEntered = new HashMap<Id, Id>();
 		setLog(new EnergyConsumptionOutputLog());
 
 		for (Vehicle vehicle : vehicles.values()) {
@@ -96,16 +96,16 @@ public class EnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeav
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
 		if (event.getLegMode().equals(TransportMode.car)) {
-			handleEnergyConsumption(event.getPersonId(), event.getLinkId(), event.getTime());
+			handleEnergyConsumption(Id.create(event.getPersonId(), Vehicle.class), event.getLinkId(), event.getTime());
 		}
 	}
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
 		if (event.getLegMode().equals(TransportMode.car)) {
-			Id personId = event.getPersonId();
-			
-			linkEnterTime.put(personId, event.getTime());
+			Id<Vehicle> vehicleId = Id.create(event.getPersonId(), Vehicle.class);
+			linkEnterTime.put(vehicleId, event.getTime());
+			//assumption  - Vehicle and Person Ids are the same
 			
 		
 			}
@@ -113,11 +113,11 @@ public class EnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeav
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		handleEnergyConsumption(event.getPersonId(), event.getLinkId(), event.getTime());
+		handleEnergyConsumption(Id.create(event.getPersonId(), Vehicle.class), event.getLinkId(), event.getTime());
 	}
 
-	private void handleEnergyConsumption(Id personId, Id linkId, double linkLeaveTime) {
-		double linkEnterTime = this.linkEnterTime.get(personId);
+	private void handleEnergyConsumption(Id<Vehicle> vehicleId, Id<Link> linkId, double linkLeaveTime) {
+		double linkEnterTime = this.linkEnterTime.get(vehicleId);
 		double timeSpendOnLink = GeneralLib.getIntervalDuration(linkEnterTime, linkLeaveTime);
 
 		Link link = network.getLinks().get(linkId);
@@ -127,9 +127,9 @@ public class EnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeav
 			return;
 		}
 
-		if (vehicles.containsKey(personId)){
+		if (vehicles.containsKey(vehicleId)){
 			
-		Vehicle vehicle = vehicles.get(personId);
+		Vehicle vehicle = vehicles.get(vehicleId);
 		
 		double energyConsumptionInJoule=0;
 		if (averageSpeedDrivenInMetersPerSecond<=link.getFreespeed()){
@@ -153,7 +153,7 @@ public class EnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeav
 //			Id ll = new IdImpl(Math.round(link.getLength()));
 //			 getLog().add(new EnergyConsumptionLogRow(personId, ll, energyConsumptionInJoule));
 
-			getLog().add(new EnergyConsumptionLogRow(personId, linkId, energyConsumptionInJoule));
+			getLog().add(new EnergyConsumptionLogRow(vehicleId, linkId, energyConsumptionInJoule));
 		}
 		}
 	}
@@ -164,8 +164,8 @@ public class EnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeav
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		Id personId = event.getPersonId();
-		linkEnterTime.put(personId, event.getTime());
+		Id<Vehicle> vehicleId = Id.create(event.getPersonId(), Vehicle.class);
+		linkEnterTime.put(vehicleId, event.getTime());
 	}
 
 	public EnergyConsumptionOutputLog getLog() {

@@ -57,81 +57,79 @@ import org.matsim.core.controler.listener.StartupListener;
 public class InductiveStreetCharger implements PersonDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler,
 		PersonArrivalEventHandler, StartupListener {
 
-	private DoubleValueHashMap<Id> chargableStreets;
+	private DoubleValueHashMap<Id<Link>> chargableStreets;
 	private ChargingOutputLog log;
 
-	private HashMap<Id, Vehicle> vehicles;
+	private HashMap<Id<Vehicle>, Vehicle> vehicles;
 
-	DoubleValueHashMap<Id> linkEnterTime;
+	DoubleValueHashMap<Id<Vehicle>> linkEnterTime;
 	HashMap<Id, Id> previousLinkEntered;
 
-	private final Network network;
 	private Double samePowerAtAllLinks;
 	private boolean loggingEnabled;
 
-	public InductiveStreetCharger(HashMap<Id, Vehicle> vehicles, Network network, AddHandlerAtStartupControler controller) {
+	public InductiveStreetCharger(HashMap<Id<Vehicle>, Vehicle> vehicles, Network network, AddHandlerAtStartupControler controller) {
 		this.setVehicles(vehicles);
-		this.network = network;
 		controller.addControlerListener(this);
 		enableLogging();
 	}
 
-	private void setVehicles(HashMap<Id, Vehicle> vehicles) {
+	private void setVehicles(HashMap<Id<Vehicle>, Vehicle> vehicles) {
 		this.vehicles = vehicles;
 	}
 
 	@Override
 	public void reset(int iteration) {
-		linkEnterTime = new DoubleValueHashMap<Id>();
+		linkEnterTime = new DoubleValueHashMap<Id<Vehicle>>();
 		previousLinkEntered = new HashMap<Id, Id>();
 		setLog(new InductiveChargingAtRoadOutputLog());
 	}
 
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
-		if (ignoreAgent(event.getPersonId(), event.getLinkId())) {
+	       Id<Vehicle> vehicleId = Id.create(event.getPersonId(),Vehicle.class);
+
+		if (ignoreAgent(vehicleId, event.getLinkId())) {
 			return;
 		}
 
-		handleCharging(event.getPersonId(), event.getLinkId(), event.getTime());
+		handleCharging(vehicleId, event.getLinkId(), event.getTime());
 	}
 
-	private boolean ignoreAgent(Id agentId, Id linkId) {
+	private boolean ignoreAgent(Id<Vehicle> vehicleId, Id<Link> linkId) {
 		return (samePowerAtAllLinks == null && !getChargableStreets().containsKey(linkId))
-				&& !(getVehicles().get(agentId) instanceof AbstractVehicleWithBattery);
+				&& !(getVehicles().get(vehicleId) instanceof AbstractVehicleWithBattery);
 	}
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		if (ignoreAgent(event.getPersonId(), event.getLinkId())) {
+		if (ignoreAgent(Id.create(event.getPersonId(),Vehicle.class), event.getLinkId())) {
 			return;
 		}
 
 		if (event.getLegMode().equals(TransportMode.car)) {
-			Id personId = event.getPersonId();
-			linkEnterTime.put(personId, event.getTime());
+			Id<Vehicle> vehicleId = Id.create(event.getPersonId(),Vehicle.class);
+			linkEnterTime.put(vehicleId, event.getTime());
 		}
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if (ignoreAgent(event.getPersonId(), event.getLinkId())) {
+	    Id<Vehicle> vehicleId = Id.create(event.getPersonId(),Vehicle.class);
+		if (ignoreAgent(vehicleId, event.getLinkId())) {
 			return;
 		}
 
-		handleCharging(event.getPersonId(), event.getLinkId(), event.getTime());
+		handleCharging(vehicleId, event.getLinkId(), event.getTime());
 	}
 
-	private void handleCharging(Id personId, Id linkId, double linkLeaveTime) {
-		if (!(getVehicles().get(personId) instanceof InductivlyChargable)) {
+	private void handleCharging(Id<Vehicle> vehicleId, Id<Link> linkId, double linkLeaveTime) {
+		if (!(getVehicles().get(vehicleId) instanceof InductivlyChargable)) {
 			return;
 		}
 
-		double linkEnterTime = this.linkEnterTime.get(personId);
+		double linkEnterTime = this.linkEnterTime.get(vehicleId);
 		double timeSpendOnLink = GeneralLib.getIntervalDuration(linkEnterTime, linkLeaveTime);
-
-		Link link = network.getLinks().get(linkId);
-		double averageSpeedDrivenInMetersPerSecond = link.getLength() / timeSpendOnLink;
 
 		if (shouldLinkBeIgnored(linkEnterTime, linkLeaveTime)) {
 			return;
@@ -146,7 +144,7 @@ public class InductiveStreetCharger implements PersonDepartureEventHandler, Link
 
 		double chargableEnergyInJoules = availablePowerInWatt * timeSpendOnLink;
 
-		AbstractVehicleWithBattery vehicleWithBattery = (AbstractVehicleWithBattery) getVehicles().get(personId);
+		AbstractVehicleWithBattery vehicleWithBattery = (AbstractVehicleWithBattery) getVehicles().get(vehicleId);
 		double energyToChargeInJoules = 0;
 		if (vehicleWithBattery.getRequiredEnergyInJoules() <= chargableEnergyInJoules) {
 			energyToChargeInJoules = vehicleWithBattery.getRequiredEnergyInJoules();
@@ -158,7 +156,7 @@ public class InductiveStreetCharger implements PersonDepartureEventHandler, Link
 			vehicleWithBattery.chargeBattery(energyToChargeInJoules);
 
 			if (loggingEnabled) {
-				ChargingLogRowLinkLevel chargingLogRow = new ChargingLogRowLinkLevel(personId, linkId, linkEnterTime, energyToChargeInJoules
+				ChargingLogRowLinkLevel chargingLogRow = new ChargingLogRowLinkLevel(vehicleId, linkId, linkEnterTime, energyToChargeInJoules
 						/ availablePowerInWatt, energyToChargeInJoules);
 				getLog().add(chargingLogRow);
 			}
@@ -172,12 +170,11 @@ public class InductiveStreetCharger implements PersonDepartureEventHandler, Link
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (ignoreAgent(event.getPersonId(), event.getLinkId())) {
+		if (ignoreAgent(Id.create(event.getPersonId(), Vehicle.class), event.getLinkId())) {
 			return;
 		}
 
-		Id personId = event.getPersonId();
-		linkEnterTime.put(personId, event.getTime());
+		linkEnterTime.put(Id.create(event.getPersonId(), Vehicle.class), event.getTime());
 	}
 
 	public ChargingOutputLog getLog() {
@@ -188,15 +185,15 @@ public class InductiveStreetCharger implements PersonDepartureEventHandler, Link
 		this.log = log;
 	}
 
-	public HashMap<Id, Vehicle> getVehicles() {
+	public HashMap<Id<Vehicle>, Vehicle> getVehicles() {
 		return vehicles;
 	}
 
-	public DoubleValueHashMap<Id> getChargableStreets() {
+	public DoubleValueHashMap<Id<Link>> getChargableStreets() {
 		return chargableStreets;
 	}
 
-	public void setChargableStreets(DoubleValueHashMap<Id> chargableStreets) {
+	public void setChargableStreets(DoubleValueHashMap<Id<Link>> chargableStreets) {
 		this.chargableStreets = chargableStreets;
 	}
 

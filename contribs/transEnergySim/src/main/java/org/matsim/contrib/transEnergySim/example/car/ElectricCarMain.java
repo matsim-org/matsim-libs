@@ -50,7 +50,7 @@ public class ElectricCarMain {
 	private Scenario sc;
 	
 	private static final Logger log = Logger.getLogger(ElectricCarMain.class);
-	private static final String CONFIG = "path to your config here";
+	private static final String CONFIG = "C:/local_jb/workspace/contrib/transEnergySim/test/input/org/matsim/contrib/transEnergySim/controllers/TestInductiveChargingController/config.xml";
 	private static final String ESTATS =  "output/estats.txt"; //fairly simple statistics about energy consumption on each link
 	private DisChargingControler c;
 	
@@ -79,9 +79,9 @@ public class ElectricCarMain {
 		int batteryCapacityInJoules = 25*1000*3600;
 		EnergyConsumptionModel faria = new EnergyConsumptionModelRicardoFaria2012();
 		this.sc = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
-		HashMap<Id,Vehicle> vehicles = new HashMap<Id, Vehicle>();
+		HashMap<Id<Vehicle>,Vehicle> vehicles = new HashMap<Id<Vehicle>, Vehicle>();
 		for (Person p : this.sc.getPopulation().getPersons().values()){
-			vehicles.put(p.getId(), new BatteryElectricVehicleImpl(faria, batteryCapacityInJoules));
+			vehicles.put(Id.create(p.getId(), Vehicle.class), new BatteryElectricVehicleImpl(faria, batteryCapacityInJoules));
 			//gives every person of the population an electric car
 		}
 		

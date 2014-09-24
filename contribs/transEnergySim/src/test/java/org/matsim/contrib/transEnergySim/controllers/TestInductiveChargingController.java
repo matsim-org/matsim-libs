@@ -51,10 +51,11 @@ public class TestInductiveChargingController extends MatsimTestCase {
 		Config config= loadConfig(getClassInputDirectory()+"config.xml");
 		
 		EnergyConsumptionModel ecm=new EnergyConsumptionModelGalus();
-		HashMap<Id, Vehicle> vehicles=new HashMap<Id, Vehicle>();
+		HashMap<Id<Vehicle>, Vehicle> vehicles=new HashMap<>();
 		int batteryCapacityInJoules = 10*1000*3600;
-		IdImpl agentId = new IdImpl("1");
-		vehicles.put(agentId, new InductivelyChargableBatteryElectricVehicle(ecm,batteryCapacityInJoules));
+		
+		Id<Vehicle> vehicleId = Id.create("1", Vehicle.class);
+		vehicles.put(vehicleId, new InductivelyChargableBatteryElectricVehicle(ecm,batteryCapacityInJoules));
 		
 		InductiveChargingController controller = new InductiveChargingController(config,vehicles);
 
@@ -85,7 +86,7 @@ public class TestInductiveChargingController extends MatsimTestCase {
 		assertEquals(28903897, chargingUponArrival.getLog().get(0).getEnergyChargedInJoule(),1.0);
 		assertEquals(4129, chargingUponArrival.getLog().get(1).getChargingDuration(),1.0);
 		
-		isBatteryFullyChargedAtEndOfSimulation(vehicles, batteryCapacityInJoules, agentId);
+		isBatteryFullyChargedAtEndOfSimulation(vehicles, batteryCapacityInJoules, vehicleId);
 		
 		ChargingLogRowFacilityLevel chargingLogRow = (ChargingLogRowFacilityLevel) chargingUponArrival.getLog().get(0);
 		chargingLogRow.getFacilityId().equals("2");
@@ -95,7 +96,7 @@ public class TestInductiveChargingController extends MatsimTestCase {
 	}
 	
 
-	private void isBatteryFullyChargedAtEndOfSimulation(HashMap<Id, Vehicle> vehicles, int batteryCapacityInJoules, IdImpl agentId) {
+	private void isBatteryFullyChargedAtEndOfSimulation(HashMap<Id<Vehicle>, Vehicle> vehicles, int batteryCapacityInJoules, Id<Vehicle> agentId) {
 		assertEquals(batteryCapacityInJoules, ((AbstractVehicleWithBattery) vehicles.get(agentId)).getSocInJoules(),1.0);
 	}
 }

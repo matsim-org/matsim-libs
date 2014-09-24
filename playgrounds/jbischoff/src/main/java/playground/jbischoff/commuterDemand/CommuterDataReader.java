@@ -104,6 +104,7 @@ public void readFile(String filename){
 			    	log.error("Found possible dataless line , if not check: "+line);
 			    	continue;
 			    }
+			   
 	         
 			  
 		
@@ -111,11 +112,11 @@ public void readFile(String filename){
 		
 		
 	
+		br.close();
 	} catch (Exception e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
-	
 	
 	log.info("read "+this.CommuterRelations.size()+" commuter relations");	
 	}

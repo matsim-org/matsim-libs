@@ -53,19 +53,19 @@ public class InductiveChargingController extends AddHandlerAtStartupControler {
 	private InductiveStreetCharger inductiveCharger;
 	private ChargingUponArrival chargingUponArrival;
 	private EnergyConsumptionTracker energyConsumptionTracker;
-	private HashMap<Id, Vehicle> vehicles;
+	private HashMap<Id<Vehicle>, Vehicle> vehicles;
 
-	public InductiveChargingController(String[] args, HashMap<Id, Vehicle> vehicles) {
+	public InductiveChargingController(String[] args, HashMap<Id<Vehicle>, Vehicle> vehicles) {
 		super(args);
 		init(vehicles);
 	}
 
-	public InductiveChargingController(Config config, HashMap<Id, Vehicle> vehicles) {
+	public InductiveChargingController(Config config, HashMap<Id<Vehicle>, Vehicle> vehicles) {
 		super(config);
 		init(vehicles);
 	}
 
-	private void init(HashMap<Id, Vehicle> vehicles) {
+	private void init(HashMap<Id<Vehicle>, Vehicle> vehicles) {
 		this.vehicles = vehicles;
 
 		EventHandlerGroup handlerGroup = new EventHandlerGroup();

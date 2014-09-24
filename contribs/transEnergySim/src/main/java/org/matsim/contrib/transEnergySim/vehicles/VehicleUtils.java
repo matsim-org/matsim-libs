@@ -37,32 +37,32 @@ public class VehicleUtils {
 	 * @param vehicles
 	 */
 	public static void printToConsoleVehiclesWhichRanOutOfBattery(
-			HashMap<Id, Vehicle> vehicles) {
+			HashMap<Id<Vehicle>, Vehicle> vehicles) {
 		System.out.println("agentId");
 
-		for (Id personId : vehicles.keySet()) {
-			Vehicle vehicle = vehicles.get(personId);
+		for (Id<Vehicle> vehicleId : vehicles.keySet()) {
+			Vehicle vehicle = vehicles.get(vehicleId);
 
 			if (vehicle instanceof BatteryElectricVehicle) {
 				BatteryElectricVehicle bev = (BatteryElectricVehicle) vehicle;
 
 				if (bev.didVehicleRunOutOfBattery()) {
-					System.out.println(personId);
+					System.out.println(vehicleId);
 				}
 			}
 		}
 	}
 
-	public static void writeToFile(HashMap<Id, Vehicle> vehicles,
+	public static void writeToFile(HashMap<Id<Vehicle>, Vehicle> vehicles,
 			String outputFile) {
 		ArrayList<String> list = new ArrayList<String>();
 		list.add("agentId");
-		for (Id personId : vehicles.keySet()) {
-			Vehicle vehicle = vehicles.get(personId);
+		for (Id<Vehicle> vehicleId : vehicles.keySet()) {
+			Vehicle vehicle = vehicles.get(vehicleId);
 			if (vehicle instanceof BatteryElectricVehicle) {
 				BatteryElectricVehicle bev = (BatteryElectricVehicle) vehicle;
 				if (bev.didVehicleRunOutOfBattery()) {
-					list.add(personId.toString());
+					list.add(vehicleId.toString());
 				}
 			}
 		}

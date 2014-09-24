@@ -31,25 +31,25 @@ import org.matsim.core.config.Config;
 public class DisChargingControler extends AddHandlerAtStartupControler {
 
 	
-	private HashMap<Id, Vehicle> vehicles;
+	private HashMap<Id<Vehicle>, Vehicle> vehicles;
 	private EnergyConsumptionTracker energyConsumptionTracker;
 
 
 	
-	public DisChargingControler(Config config,  HashMap<Id, Vehicle> vehicles) {
+	public DisChargingControler(Config config,  HashMap<Id<Vehicle>, Vehicle> vehicles) {
 		super(config);
 		init(vehicles);
 		
 	}
 
-	public DisChargingControler(String[] args,  HashMap<Id, Vehicle> vehicles) {
+	public DisChargingControler(String[] args,  HashMap<Id<Vehicle>, Vehicle> vehicles) {
 		super(args);
 		init(vehicles);
 	}
 	
 		
 
-	private void init(HashMap<Id, Vehicle> vehicles2) {
+	private void init(HashMap<Id<Vehicle>, Vehicle> vehicles2) {
 		this.vehicles = vehicles2;
 		EventHandlerGroup handlerGroup = new EventHandlerGroup();
 		setEnergyConsumptionTracker(new EnergyConsumptionTracker(vehicles, network));

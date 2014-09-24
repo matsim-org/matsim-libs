@@ -60,7 +60,7 @@ public class ElectricBerlinMain {
 	private static final String CONFIG = DIR + "scenario/config_congested_scenario2.xml";
 	private static final String ADDPLANS = DIR + "scenario/input/testPlans.xml";
 	private static final String ESTATS = DIR + "scenario/output/estats.txt";
-	private Map<Id,String> eagentsWithBehaviour;
+	private Map<Id<Person>,String> eagentsWithBehaviour;
 	private DisChargingControler c;
 	private List<Person> emobagents;
 	
@@ -69,7 +69,7 @@ public class ElectricBerlinMain {
 	public void updatePersons(String configFile, String identifier, String additionalPlansFile){
 		Scenario s = ScenarioUtils.createScenario(ConfigUtils.loadConfig(configFile));
 		this.emobagents = new ArrayList<Person>();
-		this.eagentsWithBehaviour = new HashMap<Id,String>();
+		this.eagentsWithBehaviour = new HashMap<Id<Person>,String>();
 		PopulationFactory f = s.getPopulation().getFactory();
 		new MatsimNetworkReader(s).readFile(s.getConfig().getParam(NetworkConfigGroup.GROUP_NAME, "inputNetworkFile"));
 		new MatsimPopulationReader(s).readFile(additionalPlansFile);
@@ -151,25 +151,25 @@ public class ElectricBerlinMain {
 		EnergyConsumptionModel bmed = new EnergyConsumptionModelBerlinMedium();
 		EnergyConsumptionModel bhigh = new EnergyConsumptionModelBerlinHigh();
 		
-		HashMap<Id, Vehicle> vehicles=new HashMap<Id, Vehicle>();
+		HashMap<Id<Vehicle>, Vehicle> vehicles=new HashMap<Id<Vehicle>, Vehicle>();
 		
 		
-		for (Entry<Id,String> e : this.eagentsWithBehaviour.entrySet()){
+		for (Entry<Id<Person>,String> e : this.eagentsWithBehaviour.entrySet()){
 			if (e.getValue().equals("LOW")){
 				
-				vehicles.put(e.getKey(), new BatteryElectricVehicleImpl(blow,batteryCapacityInJoules));
+				vehicles.put(Id.create(e.getKey(), Vehicle.class), new BatteryElectricVehicleImpl(blow,batteryCapacityInJoules));
 			} else if (e.getValue().equals("MEDIUM")){
-				vehicles.put(e.getKey(), new BatteryElectricVehicleImpl(bmed,batteryCapacityInJoules));
+				vehicles.put(Id.create(e.getKey(), Vehicle.class), new BatteryElectricVehicleImpl(bmed,batteryCapacityInJoules));
 
 			}
 			  else if (e.getValue().equals("HIGH")){
-				vehicles.put(e.getKey(), new BatteryElectricVehicleImpl(bhigh,batteryCapacityInJoules));
+				vehicles.put(Id.create(e.getKey(), Vehicle.class), new BatteryElectricVehicleImpl(bhigh,batteryCapacityInJoules));
 
 			}
 			  else {
 				  	
 				  	log.info("No valid driving behaviour data for agent: "+e.getKey()+"Assuming Medium");
-					vehicles.put(e.getKey(), new BatteryElectricVehicleImpl(bmed,batteryCapacityInJoules));
+					vehicles.put(Id.create(e.getKey(), Vehicle.class), new BatteryElectricVehicleImpl(bmed,batteryCapacityInJoules));
 					
 			  }
 		}

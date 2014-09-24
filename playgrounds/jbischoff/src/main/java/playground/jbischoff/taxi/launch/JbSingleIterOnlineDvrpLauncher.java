@@ -117,7 +117,7 @@ import playground.michalm.util.RunningVehicleRegister;
     	   dirName = "C:\\local_jb\\data\\scenarios\\2014_05_basic_scenario_v3\\";
 
 //           plansFileName = dirName + "1.0plans4to3.xml";
-           plansFileName = dirName + "oldplans4to3.xml";
+           plansFileName = dirName + "plans4to3.xml";
 //           plansFileName = dirName + "1.5plans4to3.xml.gz";
 //    	   	plansFileName = dirName + "1.5plans4to3.xml.gz";
 

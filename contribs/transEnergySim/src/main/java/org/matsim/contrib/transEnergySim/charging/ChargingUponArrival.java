@@ -89,15 +89,15 @@ public class ChargingUponArrival implements ActivityStartEventHandler, PersonArr
 
 	private DoubleValueHashMap<String> chargablePowerAtActivityTypes;
 
-	HashMap<Id, Vehicle> vehicles;
+	HashMap<Id<Vehicle>, Vehicle> vehicles;
 
-	DoubleValueHashMap<Id> firstDepartureTimeOfDay;
-	DoubleValueHashMap<Id> previousCarArrivalTime;
+	DoubleValueHashMap<Id<Vehicle>> firstDepartureTimeOfDay;
+	DoubleValueHashMap<Id<Vehicle>> previousCarArrivalTime;
 
-	HashMap<Id, String> firstActivityTypeAfterCarArrival;
-	HashMap<Id, Id> firstFacilityIdAfterCarArrival;
+	HashMap<Id<Vehicle>, String> firstActivityTypeAfterCarArrival;
+	HashMap<Id<Vehicle>, Id> firstFacilityIdAfterCarArrival;
 
-	HashMap<Id, Id> previousCarArrivalLinkId;
+	HashMap<Id<Vehicle>, Id> previousCarArrivalLinkId;
 
 	private PowerAvalabilityParameters powerAvalabilityParameters;
 
@@ -105,7 +105,7 @@ public class ChargingUponArrival implements ActivityStartEventHandler, PersonArr
 
 	private AddHandlerAtStartupControler controller;
 
-	public ChargingUponArrival(HashMap<Id, Vehicle> vehicles, AddHandlerAtStartupControler controller) {
+	public ChargingUponArrival(HashMap<Id<Vehicle>, Vehicle> vehicles, AddHandlerAtStartupControler controller) {
 		this.vehicles = vehicles;
 		this.controller = controller;
 		this.setDefaultValues(chargablePowerAtActivityTypes);
@@ -116,17 +116,17 @@ public class ChargingUponArrival implements ActivityStartEventHandler, PersonArr
 
 	@Override
 	public void reset(int iteration) {
-		firstDepartureTimeOfDay = new DoubleValueHashMap<Id>();
-		previousCarArrivalTime = new DoubleValueHashMap<Id>();
-		firstActivityTypeAfterCarArrival = new HashMap<Id, String>();
-		firstFacilityIdAfterCarArrival = new HashMap<Id, Id>();
+		firstDepartureTimeOfDay = new DoubleValueHashMap<Id<Vehicle>>();
+		previousCarArrivalTime = new DoubleValueHashMap<Id<Vehicle>>();
+		firstActivityTypeAfterCarArrival = new HashMap<Id<Vehicle>, String>();
+		firstFacilityIdAfterCarArrival = new HashMap<Id<Vehicle>, Id>();
 		setLog(new StationaryChargingOutputLog());
-		previousCarArrivalLinkId = new HashMap<Id, Id>();
+		previousCarArrivalLinkId = new HashMap<Id<Vehicle>, Id>();
 	}
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		if (!isVehicleWithBattery(event.getPersonId())) {
+		if (!isVehicleWithBattery(Id.create(event.getPersonId(), Vehicle.class))) {
 			return;
 		}
 
@@ -188,13 +188,13 @@ public class ChargingUponArrival implements ActivityStartEventHandler, PersonArr
 
 	}
 
-	private boolean isFirstCarDepartureOfDay(Id personId) {
-		return !firstDepartureTimeOfDay.containsKey(personId);
+	private boolean isFirstCarDepartureOfDay(Id<Vehicle> vehicleId) {
+		return !firstDepartureTimeOfDay.containsKey(vehicleId);
 	}
 
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
-		if (!isVehicleWithBattery(event.getPersonId())) {
+		if (!isVehicleWithBattery(Id.create(event.getPersonId(), Vehicle.class))) {
 			return;
 		}
 
@@ -205,16 +205,16 @@ public class ChargingUponArrival implements ActivityStartEventHandler, PersonArr
 		}
 	}
 
-	private boolean isVehicleWithBattery(Id personId) {
-		return vehicles.get(personId) instanceof AbstractVehicleWithBattery;
+	private boolean isVehicleWithBattery(Id<Vehicle> vehicleId) {
+		return vehicles.get(vehicleId) instanceof AbstractVehicleWithBattery;
 	}
 
 	private void updatePreviousCarArrivalLinkId(PersonArrivalEvent event) {
-		previousCarArrivalLinkId.put(event.getPersonId(), event.getLinkId());
+		previousCarArrivalLinkId.put(Id.create(event.getPersonId(),Vehicle.class), event.getLinkId());
 	}
 
 	private void updateCarArrivalTime(PersonArrivalEvent event) {
-		previousCarArrivalTime.put(event.getPersonId(), event.getTime());
+		previousCarArrivalTime.put(Id.create(event.getPersonId(),Vehicle.class), event.getTime());
 	}
 
 	private void initFirstActivityAfterCarArrival(PersonArrivalEvent event) {
@@ -228,26 +228,26 @@ public class ChargingUponArrival implements ActivityStartEventHandler, PersonArr
 	}
 
 	private void updateFirstActivityTypeAfterCarArrival(ActivityStartEvent event) {
-		if (!isVehicleWithBattery(event.getPersonId())) {
+		if (!isVehicleWithBattery(Id.create(event.getPersonId(), Vehicle.class))){
 			return;
 		}
 
-		Id personId = event.getPersonId();
-		if (!firstActivityTypeAfterCarArrival.containsKey(personId)) {
-			firstActivityTypeAfterCarArrival.put(personId, event.getActType());
+		Id<Vehicle> vehicleId = Id.create(event.getPersonId(), Vehicle.class);
+		if (!firstActivityTypeAfterCarArrival.containsKey(vehicleId)) {
+			firstActivityTypeAfterCarArrival.put(vehicleId, event.getActType());
 		}
 
-		if (!firstFacilityIdAfterCarArrival.containsKey(personId)) {
-			firstFacilityIdAfterCarArrival.put(event.getPersonId(), event.getFacilityId());
+		if (!firstFacilityIdAfterCarArrival.containsKey(vehicleId)) {
+			firstFacilityIdAfterCarArrival.put(Id.create(event.getPersonId(),Vehicle.class), event.getFacilityId());
 		}
 	}
 
 	public void handleLastParkingOfDay() {
-		for (Id personId : vehicles.keySet()) {
-			double carArrivalTime = previousCarArrivalTime.get(personId);
-			double carDepartureTime = firstDepartureTimeOfDay.get(personId);
+		for (Id<Vehicle> vehicleId : vehicles.keySet()) {
+			double carArrivalTime = previousCarArrivalTime.get(vehicleId);
+			double carDepartureTime = firstDepartureTimeOfDay.get(vehicleId);
 
-			chargeVehicle(personId, carArrivalTime, carDepartureTime);
+			chargeVehicle(vehicleId, carArrivalTime, carDepartureTime);
 		}
 	}
 

@@ -22,18 +22,16 @@ package playground.jbischoff.BAsignals;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.XY2Links;
 import org.matsim.signalsystems.builder.FromDataBuilder;
 import org.matsim.signalsystems.data.SignalsData;
@@ -57,12 +55,11 @@ public class CottbusLiveVis {
 
 	
 	private void runCottbus() {
-		ScenarioLoaderImpl loader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(config);
-		loader.loadScenario();
-		Scenario scenario = loader.getScenario();
 		
-		((PopulationImpl)scenario.getPopulation()).addAlgorithm(new XY2Links(scenario.getNetwork()));
-		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory();
+		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(config));
+		
+		((PopulationImpl)scenario.getPopulation()).addAlgorithm(new XY2Links(scenario));
+//		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory();
 		final FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(scenario.getConfig().planCalcScore());
 		((PopulationImpl)scenario.getPopulation()).addAlgorithm(
 				new PlanRouter(
@@ -74,7 +71,7 @@ public class CottbusLiveVis {
 		((PopulationImpl)scenario.getPopulation()).runAlgorithms();
 		
 		EventsManager events = EventsUtils.createEventsManager();
-		OutputDirectoryHierarchy controlerIO = new OutputDirectoryHierarchy(scenario.getConfig().controler().getOutputDirectory(), false);
+//		OutputDirectoryHierarchy controlerIO = new OutputDirectoryHierarchy(scenario.getConfig().controler().getOutputDirectory(), false);
 		QSim qSim = (QSim) new QSimFactory().createMobsim(scenario, events);
 		if (scenario.getConfig().scenario().isUseSignalSystems()){
 			AdaptiveControllHead adaptiveControllHead = new AdaptiveControllHead();

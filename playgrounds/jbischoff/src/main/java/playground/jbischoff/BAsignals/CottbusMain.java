@@ -19,10 +19,6 @@
  * *********************************************************************** */
 package playground.jbischoff.BAsignals;
 
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.Map.Entry;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 
@@ -51,7 +47,6 @@ public class CottbusMain {
 		controler.getConfig().controler().setOutputDirectory("/Users/JB/Desktop/BA-Arbeit/sim/scen/1211/output-slv_ot100ii/");
 		JBSignalControllerListenerFactory fact = new JBSignalControllerListenerFactory();
 		controler.setSignalsControllerListenerFactory(fact);
-		controler.setOverwriteFiles(true);
 		controler.run();
 	}
 	
@@ -67,7 +62,6 @@ public class CottbusMain {
 			controler.getConfig().plans().setInputFile("/Users/JB/Desktop/BA-Arbeit/sim/scen/1211/planswithfb/output_plans_"+scale+".xml.gz");
 			JBSignalControllerListenerFactory fact = new JBSignalControllerListenerFactory();
 			controler.setSignalsControllerListenerFactory(fact);
-			controler.setOverwriteFiles(true);
 			controler.run();
 			
 			controler = new Controler(configslv);
@@ -75,7 +69,6 @@ public class CottbusMain {
 			controler.getConfig().plans().setInputFile("/Users/JB/Desktop/BA-Arbeit/sim/scen/1211/planswithfb/output_plans_"+scale+".xml.gz");
 			fact = new JBSignalControllerListenerFactory();
 			controler.setSignalsControllerListenerFactory(fact);
-			controler.setOverwriteFiles(true);
 			controler.run();
 			
 			

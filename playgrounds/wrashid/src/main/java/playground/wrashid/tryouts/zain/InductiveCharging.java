@@ -4,6 +4,7 @@ package playground.wrashid.tryouts.zain;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.transEnergySim.charging.ChargingUponArrival;
 import org.matsim.contrib.transEnergySim.chargingInfrastructure.road.InductiveStreetCharger;
@@ -30,7 +31,7 @@ public class InductiveCharging {
 	
 		EnergyConsumptionModel ecm=new EnergyConsumptionModelGalus();
 		
-		HashMap<Id, Vehicle> vehicles=new HashMap<Id, Vehicle>();
+		HashMap<Id<Vehicle>, Vehicle> vehicles=new HashMap<Id<Vehicle>, Vehicle>();
 		
 		
 		
@@ -52,11 +53,11 @@ public class InductiveCharging {
 		InductiveStreetCharger inductiveCharger = controller.getInductiveCharger();
 		ChargingUponArrival chargingUponArrival= controller.getChargingUponArrival();
 		
-		DoubleValueHashMap<Id> chargableStreets=new DoubleValueHashMap<Id>();
-		chargableStreets.put(new IdImpl("2223"), 3500.0);
-		chargableStreets.put(new IdImpl("2322"), 3500.0);
-		chargableStreets.put(new IdImpl("1213"), 3500.0);
-		chargableStreets.put(new IdImpl("1312"), 3500.0);
+		DoubleValueHashMap<Id<Link>> chargableStreets=new DoubleValueHashMap<Id<Link>>();
+		chargableStreets.put(Id.createLinkId("2223"), 3500.0);
+		chargableStreets.put(Id.createLinkId("2322"), 3500.0);
+		chargableStreets.put(Id.createLinkId("1213"), 3500.0);
+		chargableStreets.put(Id.createLinkId("1312"), 3500.0);
 		
 		inductiveCharger.setChargableStreets(chargableStreets);
 		//inductiveCharger.setSamePowerAtAllStreets(3000);

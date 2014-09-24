@@ -76,14 +76,14 @@ public class ElectroCabLaunchUtils
         travelDistanceEvaluator = new TravelDistanceTimeEvaluator(scenario.getNetwork());
         ecabhandler = new ElectricTaxiChargingHandler(events);
         rankhandler = new TaxiRankHandler();
-        HashMap<Id, org.matsim.contrib.transEnergySim.vehicles.api.Vehicle> bevs = new HashMap<Id, org.matsim.contrib.transEnergySim.vehicles.api.Vehicle>();
+        HashMap<Id<org.matsim.contrib.transEnergySim.vehicles.api.Vehicle>, org.matsim.contrib.transEnergySim.vehicles.api.Vehicle> bevs = new HashMap<Id<org.matsim.contrib.transEnergySim.vehicles.api.Vehicle>, org.matsim.contrib.transEnergySim.vehicles.api.Vehicle>();
         for (Vehicle v : context.getVrpData().getVehicles()) {
             Id aid = v.getId();
             rankhandler.addVehicle(v);
             if (aid.toString().startsWith("et")) {
                 BatteryElectricVehicleImpl bev = new BatteryElectricVehicleImpl(ecm,
                         20 * 1000 * 3600);
-                bevs.put(v.getId(), bev);
+                bevs.put(Id.create(v.getId(), org.matsim.contrib.transEnergySim.vehicles.api.Vehicle.class), bev);
                 ecabhandler.addVehicle(new ElectricTaxi(bev, v));
             }
 
