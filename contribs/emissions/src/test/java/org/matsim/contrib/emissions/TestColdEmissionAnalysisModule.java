@@ -61,10 +61,9 @@ public class TestColdEmissionAnalysisModule {
 	private final String passengercar= "PASSENGER_CAR";
     private final Double startTime = 0.0;
     private final Double parkingDuration =1.;
-    private final Double accDistance = 1.;
 	// same values as int for table
     private final int tableParkingDuration= (int) Math.round(parkingDuration);
-    private final int tableAccDistance = (int) Math.round(accDistance);
+    private final int tableAccDistance = 1;
 	private final int numberOfColdEmissions = ColdPollutant.values().length;
 	
 	// strings for test cases
@@ -137,7 +136,7 @@ public class TestColdEmissionAnalysisModule {
 			Id<Link> linkId = Id.create("linkId"+testCases.indexOf(tc), Link.class);
 			Id<Person> personId = Id.create("personId"+testCases.indexOf(tc), Person.class);
 			String vehicleInfo = tc.get(0) +";"+ tc.get(1) +";"+ tc.get(2) +";"+ tc.get(3);
-			ceam.calculateColdEmissionsAndThrowEvent(linkId, personId, startTime, parkingDuration, accDistance, vehicleInfo);
+			ceam.calculateColdEmissionsAndThrowEvent(linkId, personId, startTime, parkingDuration, tableAccDistance, vehicleInfo);
 			String message = "The expected emissions for " + tc.toString() + " are " + 
 						numberOfColdEmissions*(Double)tc.get(4) + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
 			Assert.assertEquals(message, numberOfColdEmissions*(Double)tc.get(4), HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON);
@@ -173,7 +172,7 @@ public class TestColdEmissionAnalysisModule {
 			try{
 				Id<Link> linkId = Id.create("linkId"+testCasesExceptions.indexOf(vehinfo), Link.class);
 				Id<Person> personId = Id.create("personId"+testCasesExceptions.indexOf(vehinfo), Person.class);
-				ceam.calculateColdEmissionsAndThrowEvent(linkId, personId, startTime, parkingDuration, accDistance, vehinfo);
+				ceam.calculateColdEmissionsAndThrowEvent(linkId, personId, startTime, parkingDuration, tableAccDistance, vehinfo);
 			}catch(Exception e){
 				excep=true;
 			}
@@ -196,7 +195,7 @@ public class TestColdEmissionAnalysisModule {
 		Id<Person> personId7 = Id.create("person 11", Person.class);
 		
 		HandlerToTestEmissionAnalysisModules.reset();
-		ceam.calculateColdEmissionsAndThrowEvent(linkId11, personId7, startTime, parkingDuration, accDistance, vehInfo11);
+		ceam.calculateColdEmissionsAndThrowEvent(linkId11, personId7, startTime, parkingDuration, tableAccDistance, vehInfo11);
 		String message = "The expected emissions for an event with vehicle information string '" + vehInfo11+ "' are " + 
 				numberOfColdEmissions*averageAverageFactor + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
 		Assert.assertEquals(message, numberOfColdEmissions*averageAverageFactor, HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON);
@@ -220,7 +219,7 @@ public class TestColdEmissionAnalysisModule {
 		Id<Link> idForAvgTable = Id.create("link id avg", Link.class);
 		Id<Person> personIdForAvgTable = Id.create("person avg", Person.class);
         String vehicleInfoForAvgCase = "PASSENGER_CAR;PC petrol;petrol;none";
-        ceam.calculateColdEmissionsAndThrowEvent(idForAvgTable, personIdForAvgTable, startTime, parkingDuration, accDistance, vehicleInfoForAvgCase);
+        ceam.calculateColdEmissionsAndThrowEvent(idForAvgTable, personIdForAvgTable, startTime, parkingDuration, tableAccDistance, vehicleInfoForAvgCase);
 		String message = "The expected rescaled emissions for this event are (calculated emissions * rescalefactor) = " 
 				+ (numberOfColdEmissions*petrolFactor) + " * " + rescaleFactor + " = " +
 				(numberOfColdEmissions*petrolFactor* rescaleFactor) + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
