@@ -35,15 +35,19 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.vehicles.Vehicle;
 
 
 /**
+ * Counts number of vehicles, number of passengers, and capacity of transit vehicles per mode and link. In addition provides Paxkm and capacitykm per mode and link.
+ * 
  * @authors aneumann, fuerbas, droeder
  *
  */
@@ -55,9 +59,9 @@ public class TravelStatsHandler implements LinkEnterEventHandler, TransitDriverS
 	private final ScenarioImpl scenario;
 	private final Double interval;
 	
-	private final Map<Id, String> transitVehicleId2transportMode;
-	private final Set<Id> transitVehicleDrivers;
-	private final Map<Id, Integer> transitVehicle2CurrentPaxCountMap;
+	private final Map<Id<Vehicle>, String> transitVehicleId2transportModeMap;
+	private final Set<Id<Person>> transitVehicleDriverIds;
+	private final Map<Id<Vehicle>, Integer> transitVehicleId2CurrentPaxCountMap;
 	
 	private final HashMap<String, Counts> mode2CountsVehicles;
 	private final HashMap<String, Counts> mode2CountsCapacity;
@@ -71,15 +75,15 @@ public class TravelStatsHandler implements LinkEnterEventHandler, TransitDriverS
 		this.scenario = (ScenarioImpl) scenario;
 		this.interval = interval;
 
-		this.transitVehicleId2transportMode = new HashMap<Id, String>();
-		this.transitVehicleDrivers = new TreeSet<Id>();
-		this.transitVehicle2CurrentPaxCountMap = new HashMap<Id, Integer>();
+		this.transitVehicleId2transportModeMap = new HashMap<>();
+		this.transitVehicleDriverIds = new TreeSet<>();
+		this.transitVehicleId2CurrentPaxCountMap = new HashMap<>();
 		
-		this.mode2CountsVehicles = new HashMap<String, Counts>();
-		this.mode2CountsCapacity = new HashMap<String, Counts>();
-		this.mode2CountsCapacity_m = new HashMap<String, Counts>();
-		this.mode2CountsPax = new HashMap<String, Counts>();
-		this.mode2CountsPax_m = new HashMap<String, Counts>();
+		this.mode2CountsVehicles = new HashMap<>();
+		this.mode2CountsCapacity = new HashMap<>();
+		this.mode2CountsCapacity_m = new HashMap<>();
+		this.mode2CountsPax = new HashMap<>();
+		this.mode2CountsPax_m = new HashMap<>();
 	}
 	
 	@Override
@@ -89,22 +93,27 @@ public class TravelStatsHandler implements LinkEnterEventHandler, TransitDriverS
 
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
-		this.transitVehicleDrivers.add(event.getDriverId());
-		this.transitVehicle2CurrentPaxCountMap.put(event.getVehicleId(), new Integer(0));
+		this.transitVehicleDriverIds.add(event.getDriverId());
+		this.transitVehicleId2CurrentPaxCountMap.put(event.getVehicleId(), new Integer(0));
 		
-		if(!this.scenario.getTransitSchedule().getTransitLines().containsKey(event.getTransitLineId())) return;
+		if(!this.scenario.getTransitSchedule().getTransitLines().containsKey(event.getTransitLineId())) {
+			log.debug("The transit line " + event.getTransitLineId() + " does not exist in the transit schedule of the provided scenario.");
+			return;
+		}
 		
 		TransitLine line = this.scenario.getTransitSchedule().getTransitLines().get(event.getTransitLineId());
-		if(line == null )log.debug(event.getTransitLineId());
+		if(line == null ){
+			log.debug(event.getTransitLineId());
+		}
 		
 		TransitRoute route = line.getRoutes().get(event.getTransitRouteId());
 		if(route == null) {
-			log.debug("route " + event.getTransitRouteId() + " is null on TransitLine " + event.getTransitLineId()); 
+			log.debug("The route " + event.getTransitRouteId() + " does not exist for transit line " + event.getTransitLineId()); 
 			return;
 		}
 		
 		String mode = route.getTransportMode();
-		this.transitVehicleId2transportMode.put(event.getVehicleId(), mode);
+		this.transitVehicleId2transportModeMap.put(event.getVehicleId(), mode);
 		
 		if(!this.mode2CountsVehicles.containsKey(mode)){
 			this.mode2CountsVehicles.put(mode, new Counts());
@@ -125,10 +134,10 @@ public class TravelStatsHandler implements LinkEnterEventHandler, TransitDriverS
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		//handle only pt-Vehicles!
-		if(this.transitVehicle2CurrentPaxCountMap.containsKey(event.getVehicleId())){
+		// handle only pt-Vehicles!
+		if(this.transitVehicleId2CurrentPaxCountMap.containsKey(event.getVehicleId())){
 			
-			String mode = this.transitVehicleId2transportMode.get(event.getVehicleId());
+			String mode = this.transitVehicleId2transportModeMap.get(event.getVehicleId());
 			
 			//create the counts if none exist
 			Count countVehicles = this.mode2CountsVehicles.get(mode).createAndAddCount(event.getLinkId(), event.getLinkId().toString());
@@ -144,7 +153,7 @@ public class TravelStatsHandler implements LinkEnterEventHandler, TransitDriverS
 				countCapacity_m = this.mode2CountsCapacity_m.get(mode).getCount(event.getLinkId());
 				countPax = this.mode2CountsPax.get(mode).getCount(event.getLinkId());
 				countPax_m = this.mode2CountsPax_m.get(mode).getCount(event.getLinkId());
-			}else{
+			} else {
 				//we always want to start with hour zero
 				countVehicles.createVolume(0, 0.);
 				countCapacity.createVolume(0, 0.);
@@ -155,13 +164,13 @@ public class TravelStatsHandler implements LinkEnterEventHandler, TransitDriverS
 
 			this.increaseCount(countVehicles, event.getTime(), 1);
 			
-			double vehCapacity = getCapacityForVehicle(event.getVehicleId()) - 1; // As of Apr 2013, the dirver take one seat
+			double vehCapacity = getCapacityForVehicle(event.getVehicleId());
 			this.increaseCount(countCapacity, event.getTime(), vehCapacity);
 			
 			double vehCapacity_m = vehCapacity * this.scenario.getNetwork().getLinks().get(event.getLinkId()).getLength();
 			this.increaseCount(countCapacity_m, event.getTime(), vehCapacity_m);
 			
-			double pax = this.transitVehicle2CurrentPaxCountMap.get(event.getVehicleId());
+			double pax = this.transitVehicleId2CurrentPaxCountMap.get(event.getVehicleId());
 			this.increaseCount(countPax, event.getTime(), pax);
 			
 			double pax_m = pax * this.scenario.getNetwork().getLinks().get(event.getLinkId()).getLength();
@@ -172,21 +181,21 @@ public class TravelStatsHandler implements LinkEnterEventHandler, TransitDriverS
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		// add a passenger to the vehicle counts data, but ignore every non pt-vehicle and every driver
-		if(this.transitVehicle2CurrentPaxCountMap.keySet().contains(event.getVehicleId())){
-			if(!this.transitVehicleDrivers.contains(event.getPersonId())){
+		if(this.transitVehicleId2CurrentPaxCountMap.keySet().contains(event.getVehicleId())){
+			if(!this.transitVehicleDriverIds.contains(event.getPersonId())){
 				// transit vehicle, but not the driver - increase by one
-				this.transitVehicle2CurrentPaxCountMap.put(event.getVehicleId(), this.transitVehicle2CurrentPaxCountMap.get(event.getVehicleId()) + 1);
+				this.transitVehicleId2CurrentPaxCountMap.put(event.getVehicleId(), this.transitVehicleId2CurrentPaxCountMap.get(event.getVehicleId()) + 1);
 			}
 		}	
 	}
 
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
-		// substract a passenger to the vehicle counts data, but ignore every non pt-vehicle and every driver
-		if(this.transitVehicle2CurrentPaxCountMap.keySet().contains(event.getVehicleId())){
-			if(!this.transitVehicleDrivers.contains(event.getPersonId())){
+		// subtract a passenger to the vehicle counts data, but ignore every non pt-vehicle and every driver
+		if(this.transitVehicleId2CurrentPaxCountMap.keySet().contains(event.getVehicleId())){
+			if(!this.transitVehicleDriverIds.contains(event.getPersonId())){
 				// transit vehicle, but not the driver - decrease by one
-				this.transitVehicle2CurrentPaxCountMap.put(event.getVehicleId(), this.transitVehicle2CurrentPaxCountMap.get(event.getVehicleId()) - 1);
+				this.transitVehicleId2CurrentPaxCountMap.put(event.getVehicleId(), this.transitVehicleId2CurrentPaxCountMap.get(event.getVehicleId()) - 1);
 			}
 		}	
 	}
@@ -205,33 +214,33 @@ public class TravelStatsHandler implements LinkEnterEventHandler, TransitDriverS
 		v.setValue(v.getValue() + amount);
 	}
 	
-	private double getCapacityForVehicle(Id vehicleId) {
+	private double getCapacityForVehicle(Id<Vehicle> vehicleId) {
 		int vehSeats = this.scenario.getVehicles().getVehicles().get(vehicleId).getType().getCapacity().getSeats();
 		int vehStand = this.scenario.getVehicles().getVehicles().get(vehicleId).getType().getCapacity().getStandingRoom();
 		return vehSeats + vehStand;
 	}
 
-	public int getMaxTimeSlice() {
+	protected int getMaxTimeSlice() {
 		return this.maxSlice;
 	}
 	
-	public HashMap<String, Counts> getMode2CountsVolume() {
+	protected HashMap<String, Counts> getMode2CountsVehicles() {
 		return this.mode2CountsVehicles;
 	}
 
-	public HashMap<String, Counts> getMode2CountsCapacity() {
+	protected HashMap<String, Counts> getMode2CountsCapacity() {
 		return this.mode2CountsCapacity;
 	}
 
-	public HashMap<String, Counts> getMode2CountsCapacity_m() {
+	protected HashMap<String, Counts> getMode2CountsCapacity_m() {
 		return this.mode2CountsCapacity_m;
 	}
 
-	public HashMap<String, Counts> getMode2CountsPax() {
+	protected HashMap<String, Counts> getMode2CountsPax() {
 		return this.mode2CountsPax;
 	}
 
-	public HashMap<String, Counts> getMode2CountsPax_m() {
+	protected HashMap<String, Counts> getMode2CountsPax_m() {
 		return this.mode2CountsPax_m;
 	}
 }

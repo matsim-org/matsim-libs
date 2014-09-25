@@ -40,12 +40,24 @@ import org.matsim.counts.Volume;
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
 
 /**
+ * Writes counts data for pax, paxMeter, transit vehicle capacity, capacityMeter, and number of transit vehicles each per link and mode.
+ * Note: In order to have statistics for different transit modes, e.g. subway and bus, you have to set different modes in the transit schedule before running this analysis.
+ * Implement your own {@linkplain PtMode2LineSetter} for this.
+ * 
  * @author aneumann, sfuerbas
  */
 public class TravelStatsAnalyzer extends AbstractAnalyisModule {
 
+	public final static String CAPACITY = "capacity";
+	public final static String CAPACITY_METER = "capacityMeter";
+	public final static String PAX = "pax";
+	public final static String PAX_METER = "paxMeter";
+	public final static String VEHICLE = "vehicle";
+	public final static String OCCUPANCY = "occupancy";
+	
 	private final static Logger log = Logger.getLogger(TravelStatsAnalyzer.class);
 	private final String separator = "\t";
+	private final String header = "# Link Id" + separator + "x1" + separator + "y1" + separator + "x2" + separator + "y2" + separator + "total";
 	private Scenario scenario;
 	private TravelStatsHandler handler;
 	
@@ -64,12 +76,12 @@ public class TravelStatsAnalyzer extends AbstractAnalyisModule {
 
 	@Override
 	public void preProcessData() {
-		// nothing to pre-processed
+		// nothing to pre-process
 	}
 
 	@Override
 	public void postProcessData() {
-		// nothing to post-processed
+		// nothing to post-process
 	}
 
 	@Override
@@ -79,36 +91,43 @@ public class TravelStatsAnalyzer extends AbstractAnalyisModule {
 		String countsName;
 		
 		mode2countsMap = this.handler.getMode2CountsCapacity();
-		countsName = "capacity";
+		countsName = TravelStatsAnalyzer.CAPACITY;
 		writeCounts(outputFolder, mode2countsMap, countsName);
 		
 		mode2countsMap = this.handler.getMode2CountsCapacity_m();
-		countsName = "capacityMeter";
+		countsName = TravelStatsAnalyzer.CAPACITY_METER;
 		writeCounts(outputFolder, mode2countsMap, countsName);
 		
 		mode2countsMap = this.handler.getMode2CountsPax();
-		countsName = "pax";
+		countsName = TravelStatsAnalyzer.PAX;
 		writeCounts(outputFolder, mode2countsMap, countsName);
 		
 		mode2countsMap = this.handler.getMode2CountsPax_m();
-		countsName = "paxMeter";
+		countsName = TravelStatsAnalyzer.PAX_METER;
 		writeCounts(outputFolder, mode2countsMap, countsName);
 		
-		mode2countsMap = this.handler.getMode2CountsVolume();
-		countsName = "vehicle";
+		mode2countsMap = this.handler.getMode2CountsVehicles();
+		countsName = TravelStatsAnalyzer.VEHICLE;
 		writeCounts(outputFolder, mode2countsMap, countsName);
 		
 		this.writeOccupancy(outputFolder, this.handler.getMode2CountsPax(), this.handler.getMode2CountsCapacity());
 	}
 
+	/**
+	 * Write the counts data to file
+	 * 
+	 * @param outputFolder
+	 * @param mode2countsMap
+	 * @param countsName
+	 */
 	private void writeCounts(String outputFolder, HashMap<String, Counts> mode2countsMap, String countsName) {
 		for (Entry<String, Counts> mode2Counts : mode2countsMap.entrySet()) {
 			
-			String fileName = outputFolder + mode2Counts.getKey() + "_" + countsName + ".txt";
+			String fileName = outputFolder + this.createFilename(mode2Counts.getKey(), countsName);
 
 			try {
 				BufferedWriter bw = new BufferedWriter(new FileWriter(new File(fileName)));
-				bw.write("# Link Id" + separator + "x1" + separator + "y1" + separator + "x2" + separator + "y2" + separator + "total");
+				bw.write(this.header);
 				for (int i = 0; i < 25; i++) {
 					bw.write(separator + i);
 				}
@@ -150,7 +169,9 @@ public class TravelStatsAnalyzer extends AbstractAnalyisModule {
 	}
 	
 	/**
-	 * This is kind of an awkward implementation duplicating all that code
+	 * This is kind of an awkward implementation duplicating all that code.
+	 * 
+	 * Calculates the occupancy for the given pax and capacity counts.
 	 * 
 	 * @param outputFolder
 	 * @param paxCounts
@@ -159,11 +180,11 @@ public class TravelStatsAnalyzer extends AbstractAnalyisModule {
 	private void writeOccupancy(String outputFolder, HashMap<String, Counts> paxCounts, HashMap<String, Counts> capCounts) {
 		for (Entry<String, Counts> mode2CapCounts : capCounts.entrySet()) {
 			
-			String fileName = outputFolder + mode2CapCounts.getKey() + "_occupancy.txt";
+			String fileName = outputFolder + this.createFilename(mode2CapCounts.getKey(), TravelStatsAnalyzer.OCCUPANCY);
 
 			try {
 				BufferedWriter bw = new BufferedWriter(new FileWriter(new File(fileName)));
-				bw.write("# Link Id" + separator + "x1" + separator + "y1" + separator + "x2" + separator + "y2" + separator + "total");
+				bw.write(this.header);
 				for (int i = 0; i < 25; i++) {
 					bw.write(separator + i);
 				}
@@ -222,5 +243,9 @@ public class TravelStatsAnalyzer extends AbstractAnalyisModule {
 				e.printStackTrace();
 			}		
 		}
+	}
+	
+	private String createFilename(String mode, String identifier){
+		return mode + "_" + identifier + ".txt";
 	}
 }
