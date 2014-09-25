@@ -20,33 +20,33 @@
 
 package org.matsim.contrib.multimodal.router.util;
 
+import org.matsim.api.core.v01.TransportMode;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.matsim.api.core.v01.TransportMode;
-
-public class ModeRestrictions {
+class ModeRestrictions {
 
 	/*
 	 * Define restrictions for the supported modes.
 	 */
 	public Map<String, Set<String>> initModeRestrictions() {
 		
-		Map<String, Set<String>> modeRestrictions = new HashMap<String, Set<String>>();
+		Map<String, Set<String>> modeRestrictions = new HashMap<>();
 		
 		/*
 		 * Car
 		 */	
-		Set<String> carModeRestrictions = new HashSet<String>();
+		Set<String> carModeRestrictions = new HashSet<>();
 		carModeRestrictions.add(TransportMode.car);
 		modeRestrictions.put(TransportMode.car, carModeRestrictions);
 		
 		/*
 		 * Walk
 		 */	
-		Set<String> walkModeRestrictions = new HashSet<String>();
+		Set<String> walkModeRestrictions = new HashSet<>();
 		walkModeRestrictions.add(TransportMode.bike);
 		walkModeRestrictions.add(TransportMode.walk);
 		modeRestrictions.put(TransportMode.walk, walkModeRestrictions);
@@ -56,7 +56,7 @@ public class ModeRestrictions {
 		 * Besides bike mode we also allow walk mode - but then the
 		 * agent only travels with walk speed (handled in MultiModalTravelTimeCost).
 		 */
-		Set<String> bikeModeRestrictions = new HashSet<String>();
+		Set<String> bikeModeRestrictions = new HashSet<>();
 		bikeModeRestrictions.add(TransportMode.walk);
 		bikeModeRestrictions.add(TransportMode.bike);
 		modeRestrictions.put(TransportMode.bike, bikeModeRestrictions);
@@ -70,7 +70,7 @@ public class ModeRestrictions {
 		 * are only use e.g. to walk from the origin to the bus station or from the
 		 * bus station to the destination.
 		 */
-		Set<String> ptModeRestrictions = new HashSet<String>();
+		Set<String> ptModeRestrictions = new HashSet<>();
 		ptModeRestrictions.add(TransportMode.pt);
 		ptModeRestrictions.add(TransportMode.car);
 		ptModeRestrictions.add(TransportMode.bike);
@@ -83,7 +83,7 @@ public class ModeRestrictions {
 		 * Additionally we also allow ride trips to use walk and / or bike only links.
 		 * For those links walk travel times are used.
 		 */
-		Set<String> rideModeRestrictions = new HashSet<String>();
+		Set<String> rideModeRestrictions = new HashSet<>();
 		rideModeRestrictions.add(TransportMode.car);
 		rideModeRestrictions.add(TransportMode.bike);
 		rideModeRestrictions.add(TransportMode.walk);

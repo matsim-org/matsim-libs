@@ -20,9 +20,6 @@
 
 package org.matsim.contrib.multimodal.router.util;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -31,11 +28,14 @@ import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class LinkSlopesReader {
 
-	protected static final Logger log = Logger.getLogger(LinkSlopesReader.class);
+	private static final Logger log = Logger.getLogger(LinkSlopesReader.class);
 	
-	public static final String ATTRIBUTE_NAME = "slope";
+	private static final String ATTRIBUTE_NAME = "slope";
 	
 	/**
 	 * If height information for a network is available, the links' slopes

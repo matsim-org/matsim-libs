@@ -23,7 +23,7 @@ package org.matsim.contrib.multimodal.router.util;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.TravelTimeFactory;
 
-public class PersonalizedTravelTimeFactory implements TravelTimeFactory {
+class PersonalizedTravelTimeFactory implements TravelTimeFactory {
 
 	@Override
 	public TravelTime createTravelTime() {

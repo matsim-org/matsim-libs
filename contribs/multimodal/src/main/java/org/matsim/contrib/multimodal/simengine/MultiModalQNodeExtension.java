@@ -20,16 +20,16 @@
 
 package org.matsim.contrib.multimodal.simengine;
 
-import java.util.Collection;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
-public class MultiModalQNodeExtension {
+import java.util.Collection;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+class MultiModalQNodeExtension {
 	
 	private static final Logger log = Logger.getLogger(MultiModalQNodeExtension.class);
 	
@@ -39,7 +39,7 @@ public class MultiModalQNodeExtension {
 	/*
 	 * Is set to "true" if the MultiModalNodeExtension has active inLinks.
 	 */
-	protected AtomicBoolean isActive = new AtomicBoolean(false);
+    private final AtomicBoolean isActive = new AtomicBoolean(false);
 	
 	/*package*/ MultiModalQNodeExtension(MultiModalSimEngine simEngine, int numInLinks) {	
 		this.simEngine = simEngine;
@@ -122,7 +122,7 @@ public class MultiModalQNodeExtension {
 	   * @return <code>true</code> if the agent was successfully moved over the node, <code>false</code>
 	   * otherwise (e.g. in case where the next link is jammed - not yet implemented)
 	   */
-	protected boolean moveAgentOverNode(final MobsimAgent mobsimAgent, final double now) {
+      boolean moveAgentOverNode(final MobsimAgent mobsimAgent, final double now) {
 		
 		Id currentLinkId = mobsimAgent.getCurrentLinkId();
 		Id nextLinkId = ((MobsimDriverAgent) mobsimAgent).chooseNextLinkId();

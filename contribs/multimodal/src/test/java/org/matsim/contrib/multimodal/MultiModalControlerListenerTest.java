@@ -20,9 +20,6 @@
 
 package org.matsim.contrib.multimodal;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -39,11 +36,7 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.tools.PrepareMultiModalScenario;
 import org.matsim.core.config.Config;
@@ -56,6 +49,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MultiModalControlerListenerTest {
 
@@ -74,7 +70,7 @@ public class MultiModalControlerListenerTest {
 		runSimpleScenario(4);
 	}
 	
-	public void runSimpleScenario(int numberOfThreads) {
+	void runSimpleScenario(int numberOfThreads) {
 		
 		Config config = ConfigUtils.createConfig();
 		
@@ -188,7 +184,7 @@ public class MultiModalControlerListenerTest {
 		runBerlinScenario(4);
 	}
 	
-	public void runBerlinScenario(int numberOfThreads) {
+	void runBerlinScenario(int numberOfThreads) {
 		
 		String inputDir = this.utils.getClassInputDirectory();
 
@@ -303,8 +299,8 @@ public class MultiModalControlerListenerTest {
 		private final Network network;
 		private final Map<Id<Person>, String> modes = new HashMap<>();
 		private final Map<Id<Person>, Double> departures = new HashMap<>();
-		final Map<String, Integer> leftCountPerMode = new HashMap<String, Integer>();
-		final Map<String, Double> travelTimesPerMode = new HashMap<String, Double>();
+		final Map<String, Integer> leftCountPerMode = new HashMap<>();
+		final Map<String, Double> travelTimesPerMode = new HashMap<>();
 		
 		public LinkModeChecker(Network network) {
 			this.network = network;

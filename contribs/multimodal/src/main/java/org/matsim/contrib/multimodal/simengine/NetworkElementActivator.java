@@ -20,7 +20,7 @@
 
 package org.matsim.contrib.multimodal.simengine;
 
-public interface NetworkElementActivator {
+interface NetworkElementActivator {
 
 	/*package*/ void activateLink(MultiModalQLinkExtension link);
 

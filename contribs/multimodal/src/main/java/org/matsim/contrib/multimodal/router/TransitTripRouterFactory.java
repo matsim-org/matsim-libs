@@ -20,27 +20,21 @@
 
 package org.matsim.contrib.multimodal.router;
 
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.LegRouterWrapper;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.TransitRouterWrapper;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.*;
 import org.matsim.core.router.old.LegRouter;
 import org.matsim.core.router.old.TeleportationLegRouter;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.pt.router.TransitRouterFactory;
+
+import java.util.Set;
 
 /**
  * @author cdobler
@@ -67,8 +61,7 @@ public class TransitTripRouterFactory implements TripRouterFactory {
 		
 		if (this.scenario.getConfig().scenario().isUseTransit()) {
 
-			Network network = this.scenario.getNetwork();
-			PopulationFactory populationFactory = this.scenario.getPopulation().getFactory();
+            PopulationFactory populationFactory = this.scenario.getPopulation().getFactory();
 			ModeRouteFactory modeRouteFactory = ((PopulationFactoryImpl) populationFactory).getModeRouteFactory();
 			PlansCalcRouteConfigGroup routeConfigGroup = scenario.getConfig().plansCalcRoute();
 			RoutingModule transitWalkRoutingModule;

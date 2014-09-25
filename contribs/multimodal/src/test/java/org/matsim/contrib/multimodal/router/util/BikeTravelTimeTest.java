@@ -20,9 +20,6 @@
 
 package org.matsim.contrib.multimodal.router.util;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -37,6 +34,9 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class BikeTravelTimeTest extends MatsimTestCase {
 
@@ -197,7 +197,7 @@ public class BikeTravelTimeTest extends MatsimTestCase {
 		
 		double h1 = 0.0;
 		double h2 = 0.0;
-		Map<Id<Link>, Double> linkSlopes = new HashMap<Id<Link>, Double>();
+		Map<Id<Link>, Double> linkSlopes = new HashMap<>();
 		double slope = 100 * (h2 - h1) / link.getLength();
 		linkSlopes.put(link.getId(), slope);
 

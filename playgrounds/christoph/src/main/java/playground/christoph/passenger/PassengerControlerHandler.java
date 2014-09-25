@@ -20,15 +20,10 @@
 
 package playground.christoph.passenger;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.multimodal.MultiModalControlerListener;
-import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
-import org.matsim.contrib.multimodal.simengine.MultiModalDepartureHandler;
-import org.matsim.contrib.multimodal.simengine.MultiModalSimEngine;
-import org.matsim.contrib.multimodal.simengine.MultiModalSimEngineFactory;
+import org.matsim.contrib.multimodal.simengine.MultiModalQSimModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -49,6 +44,8 @@ import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.withinday.controller.WithinDayControlerListener;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifier;
+
+import java.util.Map;
 
 public class PassengerControlerHandler implements StartupListener {
 
@@ -128,11 +125,9 @@ public class PassengerControlerHandler implements StartupListener {
 			qSim.addMobsimEngine(netsimEngine);
 			qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
 			qSim.addDepartureHandler(netsimEngine.getVehicularDepartureHandler());
-			
-			MultiModalSimEngine multiModalEngine = new MultiModalSimEngineFactory().createMultiModalSimEngine(qSim, this.multiModalTravelTimes);
-			qSim.addMobsimEngine(multiModalEngine);
-			MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) sc.getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
-			qSim.addDepartureHandler(new MultiModalDepartureHandler(multiModalEngine, multiModalConfigGroup));
+
+
+            new MultiModalQSimModule(sc.getConfig(), this.multiModalTravelTimes).configure(qSim);
 			
 			TeleportationEngine teleportationEngine = new TeleportationEngine();
 			qSim.addMobsimEngine(teleportationEngine);

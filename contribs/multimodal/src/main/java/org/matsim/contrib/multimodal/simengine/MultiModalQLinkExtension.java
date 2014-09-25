@@ -20,14 +20,6 @@
 
 package org.matsim.contrib.multimodal.simengine;
 
-import java.io.Serializable;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
@@ -40,7 +32,11 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 
-public class MultiModalQLinkExtension {
+import java.io.Serializable;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+class MultiModalQLinkExtension {
 
 	private final Link link;
 	private final MultiModalQNodeExtension toNode;
@@ -49,11 +45,11 @@ public class MultiModalQLinkExtension {
 	/*
 	 * Is set to "true" if the MultiModalQLinkExtension has active Agents.
 	 */
-	protected AtomicBoolean isActive = new AtomicBoolean(false);
+    private final AtomicBoolean isActive = new AtomicBoolean(false);
 
-	private final Queue<Tuple<Double, MobsimAgent>> agents = new PriorityQueue<Tuple<Double, MobsimAgent>>(30, new TravelTimeComparator());
-	private final Queue<MobsimAgent> waitingAfterActivityAgents = new LinkedList<MobsimAgent>();
-	private final Queue<MobsimAgent> waitingToLeaveAgents = new LinkedList<MobsimAgent>();
+	private final Queue<Tuple<Double, MobsimAgent>> agents = new PriorityQueue<>(30, new TravelTimeComparator());
+	private final Queue<MobsimAgent> waitingAfterActivityAgents = new LinkedList<>();
+	private final Queue<MobsimAgent> waitingToLeaveAgents = new LinkedList<>();
 
 	/*package*/ MultiModalQLinkExtension(Link link, MultiModalSimEngine simEngine, MultiModalQNodeExtension multiModalQNodeExtension) {
 		this.link = link;
@@ -73,13 +69,7 @@ public class MultiModalQLinkExtension {
 		return this.link;
 	}
 
-	/**
-	 * Adds a mobsimAgent to the link (i.e. the "queue"), called by
-	 * {@link MultiModalQNode#moveAgentOverNode(MobsimAgent, double)}.
-	 *
-	 * @param personAgent
-	 *          the personAgent
-	 */
+
 	public void addAgentFromIntersection(MobsimAgent mobsimAgent, double now) {
 		this.activateLink();
 
@@ -100,7 +90,7 @@ public class MultiModalQLinkExtension {
 
 		departureTime = Math.round(departureTime);
 
-		agents.add(new Tuple<Double, MobsimAgent>(departureTime, mobsimAgent));
+		agents.add(new Tuple<>(departureTime, mobsimAgent));
 	}
 
 	public void addDepartingAgent(MobsimAgent mobsimAgent, double now) {
@@ -111,7 +101,7 @@ public class MultiModalQLinkExtension {
 				new Wait2LinkEvent(now, mobsimAgent.getId(), link.getId(), null));
 	}
 
-	protected boolean moveLink(double now) {
+	boolean moveLink(double now) {
 		
 		boolean keepLinkActive = moveAgents(now);
 		this.isActive.set(keepLinkActive);
@@ -139,7 +129,7 @@ public class MultiModalQLinkExtension {
 	 * Returns true, if the Link has to be still active.
 	 */
 	private boolean moveAgents(double now) {
-		Tuple<Double, MobsimAgent> tuple = null;
+		Tuple<Double, MobsimAgent> tuple;
 
 		while ((tuple = agents.peek()) != null) {
 			/*

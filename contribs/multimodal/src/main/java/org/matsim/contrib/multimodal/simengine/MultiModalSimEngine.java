@@ -20,17 +20,6 @@
 
 package org.matsim.contrib.multimodal.simengine;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -45,22 +34,24 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.misc.Time;
 
-public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivator {
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
-	private static Logger log = Logger.getLogger(MultiModalSimEngine.class);
+class MultiModalSimEngine implements MobsimEngine, NetworkElementActivator {
+
+	private static final Logger log = Logger.getLogger(MultiModalSimEngine.class);
 
 	private double infoTime = 0;
 
 	private static final int INFO_PERIOD = 3600;
-	
-	/*package*/ Mobsim qSim;
-	/*package*/ EventsManager eventsManager;
-	/*package*/ Map<String, TravelTime> multiModalTravelTimes;
-	/*package*/ Collection<MultiModalQLinkExtension> activeLinks;
-	/*package*/ Collection<MultiModalQNodeExtension> activeNodes;
 
-	private Map<Id, MultiModalQNodeExtension> nodes = new HashMap<Id, MultiModalQNodeExtension>();
-	private Map<Id, MultiModalQLinkExtension> links = new HashMap<Id, MultiModalQLinkExtension>();
+	/*package*/ Map<String, TravelTime> multiModalTravelTimes;
+	/*package*/ private final Collection<MultiModalQLinkExtension> activeLinks;
+	/*package*/ private final Collection<MultiModalQNodeExtension> activeNodes;
+
+	private final Map<Id, MultiModalQNodeExtension> nodes = new HashMap<>();
+	private final Map<Id, MultiModalQLinkExtension> links = new HashMap<>();
 	
 	/*package*/ InternalInterface internalInterface = null;
 
@@ -69,9 +60,7 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 		this.internalInterface = internalInterface;
 	}
 
-	/*package*/ MultiModalSimEngine(Mobsim qSim, Map<String, TravelTime> multiModalTravelTimes) {
-		this.qSim = qSim;
-		this.eventsManager = qSim.getEventsManager();
+	/*package*/ MultiModalSimEngine(Map<String, TravelTime> multiModalTravelTimes) {
 
 		/*
 		 * This is the collection of active nodes. This needs to be thread-safe since in the
@@ -79,7 +68,7 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 		 * (Each thread has its own queue. However, it is not guaranteed that all incoming
 		 * links of a node are handled by the same thread). 
 		 */
-		activeNodes = new ConcurrentLinkedQueue<MultiModalQNodeExtension>();
+		activeNodes = new ConcurrentLinkedQueue<>();
 
 		/*
 		 * Here, in theory, no thread-safe data structure is needed since links can only
@@ -88,17 +77,17 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 		 * However, since this assignment might be changed, we still use a thread-safe data 
 		 * structure.
 		 */
-		activeLinks = new ConcurrentLinkedQueue<MultiModalQLinkExtension>();
+		activeLinks = new ConcurrentLinkedQueue<>();
 		
 		this.multiModalTravelTimes = multiModalTravelTimes;
 	}
 
 	/*package*/ Mobsim getMobsim() {
-		return qSim;
+		return this.internalInterface.getMobsim();
 	}
 
 	/*package*/ EventsManager getEventsManager() {
-		return this.eventsManager;
+        return this.internalInterface.getMobsim().getEventsManager();
 	}
 	
 	@Override
@@ -110,15 +99,15 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 			log.info("\t" + entry.getKey() + "\t" + entry.getValue().getClass().toString());
 		}
 		
-		Scenario scenario = this.qSim.getScenario();
+		Scenario scenario = this.internalInterface.getMobsim().getScenario();
 		MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) scenario.getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
 		Set<String> simulatedModes = CollectionUtils.stringToSet(multiModalConfigGroup.getSimulatedModes());
 		
 		/*
 		 * Identify links and nodes that allow one of the simulated modes.
 		 */
-		Set<Link> simulatedLinks = new LinkedHashSet<Link>();
-		Set<Node> simulatedNodes = new LinkedHashSet<Node>();
+		Set<Link> simulatedLinks = new LinkedHashSet<>();
+		Set<Node> simulatedNodes = new LinkedHashSet<>();
 		for (Link link : scenario.getNetwork().getLinks().values()) {
 			// node mode restrictions -> use link
 			if (link.getAllowedModes() == null) {
@@ -154,7 +143,7 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 		
 		for (Node node : simulatedNodes) {
 			MultiModalQNodeExtension extension = this.getMultiModalQNodeExtension(node.getId());
-			List<MultiModalQLinkExtension> inLinks = new ArrayList<MultiModalQLinkExtension>();
+			List<MultiModalQLinkExtension> inLinks = new ArrayList<>();
 			for (Link inLink : node.getInLinks().values()) {
 				if (simulatedLinks.contains(inLink)) inLinks.add(this.getMultiModalQLinkExtension(inLink.getId()));
 			}

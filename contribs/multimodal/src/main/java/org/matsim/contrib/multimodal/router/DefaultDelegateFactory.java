@@ -20,11 +20,6 @@
 
 package org.matsim.contrib.multimodal.router;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -35,11 +30,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.LegRouterWrapper;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.old.LegRouter;
 import org.matsim.core.router.old.NetworkLegRouter;
@@ -49,6 +40,11 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Due to several reasons, the DefaultTripRouterFactoryImpl should not be used
@@ -84,7 +80,7 @@ public class DefaultDelegateFactory implements TripRouterFactory {
 	private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
     private final Scenario scenario;
     
-    private final Map<String, Network> multimodalSubNetworks = new HashMap<String, Network>();
+    private final Map<String, Network> multimodalSubNetworks = new HashMap<>();
 	
     public DefaultDelegateFactory(Scenario scenario, LeastCostPathCalculatorFactory leastCostPathCalculatorFactory) {
     	this.scenario = scenario;
@@ -116,7 +112,7 @@ public class DefaultDelegateFactory implements TripRouterFactory {
 			Network subNetwork = multimodalSubNetworks.get(mode);
 			if (subNetwork == null) {
 				subNetwork = NetworkImpl.createNetwork();
-				Set<String> restrictions = new HashSet<String>();
+				Set<String> restrictions = new HashSet<>();
 				restrictions.add(mode);
 				TransportModeNetworkFilter networkFilter = new TransportModeNetworkFilter(network);
 				networkFilter.filter(subNetwork, restrictions);
@@ -166,7 +162,7 @@ public class DefaultDelegateFactory implements TripRouterFactory {
 			Network subNetwork = multimodalSubNetworks.get(mode);
 			if (subNetwork == null) {
 				subNetwork = NetworkImpl.createNetwork();
-				Set<String> restrictions = new HashSet<String>();
+				Set<String> restrictions = new HashSet<>();
 				restrictions.add(mode);
 				TransportModeNetworkFilter networkFilter = new TransportModeNetworkFilter(network);
 				networkFilter.filter(subNetwork, restrictions);

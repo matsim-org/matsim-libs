@@ -20,11 +20,6 @@
 
 package org.matsim.contrib.multimodal.router;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -34,12 +29,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.DefaultTripRouterFactoryImpl;
-import org.matsim.core.router.LegRouterWrapper;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.old.LegRouter;
 import org.matsim.core.router.old.NetworkLegRouter;
@@ -48,6 +38,11 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author cdobler
@@ -62,7 +57,7 @@ public class MultimodalTripRouterFactory implements TripRouterFactory {
 	private final TripRouterFactory delegateFactory;
 	private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 	
-	private final Map<String, Network> multimodalSubNetworks = new HashMap<String, Network>();
+	private final Map<String, Network> multimodalSubNetworks = new HashMap<>();
 	
 	@Deprecated
 	public MultimodalTripRouterFactory(Scenario scenario, Map<String, TravelTime> multimodalTravelTimes,
@@ -111,7 +106,7 @@ public class MultimodalTripRouterFactory implements TripRouterFactory {
 			Network subNetwork = multimodalSubNetworks.get(mode);
 			if (subNetwork == null) {
 				subNetwork = NetworkImpl.createNetwork();
-				Set<String> restrictions = new HashSet<String>();
+				Set<String> restrictions = new HashSet<>();
 				restrictions.add(mode);
 				TransportModeNetworkFilter networkFilter = new TransportModeNetworkFilter(network);
 				networkFilter.filter(subNetwork, restrictions);

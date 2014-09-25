@@ -20,17 +20,15 @@
 
 package org.matsim.contrib.multimodal.simengine;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.router.util.TravelTime;
+
 import java.util.Map;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.qsim.interfaces.Mobsim;
-import org.matsim.core.router.util.TravelTime;
-
-public class MultiModalSimEngineRunner extends MultiModalSimEngine implements Runnable {
+class MultiModalSimEngineRunner extends MultiModalSimEngine implements Runnable {
 
 	private double time = 0.0;
 	private volatile boolean simulationRunning = true;
@@ -40,19 +38,15 @@ public class MultiModalSimEngineRunner extends MultiModalSimEngine implements Ru
 	private final CyclicBarrier endBarrier;
 	private final MultiModalSimEngine multiModalSimEngine;
 	
-	/*package*/ MultiModalSimEngineRunner(CyclicBarrier startBarrier, CyclicBarrier separationBarrier, 
-			CyclicBarrier endBarrier, Mobsim sim, Map<String, TravelTime> multiModalTravelTime, 
-			MultiModalSimEngine multiModalSimEngine) {
-		super(sim, multiModalTravelTime);
+	/*package*/ MultiModalSimEngineRunner(CyclicBarrier startBarrier, CyclicBarrier separationBarrier,
+                                          CyclicBarrier endBarrier, Map<String, TravelTime> multiModalTravelTime,
+                                          MultiModalSimEngine multiModalSimEngine) {
+		super(multiModalTravelTime);
 		this.startBarrier = startBarrier;
 		this.separationBarrier = separationBarrier;
 		this.endBarrier = endBarrier;
 		this.multiModalTravelTimes = multiModalTravelTime;
 		this.multiModalSimEngine = multiModalSimEngine;
-	}
-
-	/*package*/ void setEventsManager(EventsManager eventsManager) {
-		this.eventsManager = eventsManager;
 	}
 	
 	/*
@@ -119,12 +113,10 @@ public class MultiModalSimEngineRunner extends MultiModalSimEngine implements Ru
 				 * the main Thread can go on.
 				 */
 				endBarrier.await();
-			} catch (InterruptedException e) {
+			} catch (InterruptedException | BrokenBarrierException e) {
 				throw new RuntimeException(e);
-			} catch (BrokenBarrierException e) {
-            	throw new RuntimeException(e);
-            }
-		}
+			}
+        }
 	}
 	
 	/*

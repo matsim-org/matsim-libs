@@ -20,19 +20,16 @@
 
 package org.matsim.contrib.multimodal;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
-import org.matsim.contrib.multimodal.simengine.MultiModalDepartureHandler;
-import org.matsim.contrib.multimodal.simengine.MultiModalSimEngine;
-import org.matsim.contrib.multimodal.simengine.MultiModalSimEngineFactory;
+import org.matsim.contrib.multimodal.simengine.MultiModalQSimModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.router.util.TravelTime;
+
+import java.util.Map;
 
 public class MultimodalQSimFactory implements MobsimFactory {
 
@@ -51,12 +48,9 @@ public class MultimodalQSimFactory implements MobsimFactory {
 	
 	@Override
 	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-		QSim qSim = (QSim) this.delegateFactory.createMobsim(sc, eventsManager);			
-		MultiModalSimEngine multiModalEngine = new MultiModalSimEngineFactory().createMultiModalSimEngine(qSim, this.multiModalTravelTimes);
-		qSim.addMobsimEngine(multiModalEngine);
-        MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) sc.getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
-        qSim.addDepartureHandler(new MultiModalDepartureHandler(multiModalEngine, multiModalConfigGroup));
-		return qSim;
+		QSim qSim = (QSim) this.delegateFactory.createMobsim(sc, eventsManager);
+        new MultiModalQSimModule(sc.getConfig(), this.multiModalTravelTimes).configure(qSim);
+        return qSim;
 	}
 
 }

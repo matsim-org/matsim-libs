@@ -20,10 +20,6 @@
 
 package org.matsim.contrib.multimodal;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -33,6 +29,7 @@ import org.matsim.contrib.multimodal.router.MultimodalTripRouterFactory;
 import org.matsim.contrib.multimodal.router.TransitTripRouterFactory;
 import org.matsim.contrib.multimodal.router.util.LinkSlopesReader;
 import org.matsim.contrib.multimodal.router.util.MultiModalTravelTimeFactory;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -48,13 +45,17 @@ import org.matsim.core.router.util.TravelTimeFactory;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.pt.router.TransitRouterFactory;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 public class MultiModalControlerListener implements StartupListener {
 
 	private final static Logger log = Logger.getLogger(MultiModalControlerListener.class);
 	
 	private boolean locked = false;
 	
-	private final Map<String, TravelTimeFactory> additionalTravelTimeFactories = new LinkedHashMap<String, TravelTimeFactory>();
+	private final Map<String, TravelTimeFactory> additionalTravelTimeFactories = new LinkedHashMap<>();
 	private Map<String, TravelTime> multiModalTravelTimes;
 	
 	@Override
@@ -69,7 +70,7 @@ public class MultiModalControlerListener implements StartupListener {
 			controler.getConfig().travelTimeCalculator().setFilterModes(true);
 		}
 		
-		MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) controler.getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
+		MultiModalConfigGroup multiModalConfigGroup = ConfigUtils.addOrGetModule(controler.getConfig(), MultiModalConfigGroup.GROUP_NAME, MultiModalConfigGroup.class);
 		
 		Map<Id<Link>, Double> linkSlopes = new LinkSlopesReader().getLinkSlopes(multiModalConfigGroup, controler.getNetwork());
 		MultiModalTravelTimeFactory multiModalTravelTimeFactory = new MultiModalTravelTimeFactory(controler.getConfig(), linkSlopes, 

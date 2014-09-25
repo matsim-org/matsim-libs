@@ -20,9 +20,6 @@
 
 package org.matsim.contrib.multimodal.pt;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -49,6 +46,9 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MultiModalPTCombinationTest {
 
@@ -133,8 +133,8 @@ public class MultiModalPTCombinationTest {
 		private final Network network;
 		private final Map<Id<Person>, String> modes = new HashMap<>();
 		private final Map<Id<Person>, Double> departures = new HashMap<>();
-		final Map<String, Integer> leftCountPerMode = new HashMap<String, Integer>();
-		final Map<String, Double> travelTimesPerMode = new HashMap<String, Double>();
+		final Map<String, Integer> leftCountPerMode = new HashMap<>();
+		final Map<String, Double> travelTimesPerMode = new HashMap<>();
 		
 		public LinkModeChecker(Network network) {
 			this.network = network;

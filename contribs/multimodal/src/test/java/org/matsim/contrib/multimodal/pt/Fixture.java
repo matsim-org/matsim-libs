@@ -20,10 +20,6 @@
 
 package org.matsim.contrib.multimodal.pt;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -44,18 +40,12 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleCapacity;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.Vehicles;
-import org.matsim.vehicles.VehiclesFactory;
+import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.vehicles.*;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Network:
@@ -83,11 +73,11 @@ import org.matsim.vehicles.VehiclesFactory;
 /*package*/ class Fixture {
 
 	/*package*/ final ScenarioImpl scenario;
-	/*package*/ final Config config;
-	/*package*/ final Network network;
-	/*package*/ final TransitScheduleFactory builder;
-	/*package*/ final TransitSchedule schedule;
-	/*package*/ TransitLine blueLine = null;
+	/*package*/ private final Config config;
+	/*package*/ private final Network network;
+	/*package*/ private final TransitScheduleFactory builder;
+	/*package*/ private final TransitSchedule schedule;
+	/*package*/ private TransitLine blueLine = null;
 	private final Node[] nodes = new Node[5];
 	private final Link[] links = new Link[4];
 	private final TransitStopFacility[] stopFacilities = new TransitStopFacility[3];
@@ -104,7 +94,7 @@ import org.matsim.vehicles.VehiclesFactory;
 		this.builder = this.schedule.getFactory();
 	}
 
-	protected void init() {
+	void init() {
 		buildNetwork();
 		buildStops();
 		buildVehicles();
@@ -112,7 +102,7 @@ import org.matsim.vehicles.VehiclesFactory;
 		buildPopulation();
 	}
 	
-	protected void buildNetwork() {
+	void buildNetwork() {
 		this.nodes[0] = this.network.getFactory().createNode(Id.create("0", Node.class),  this.scenario.createCoord(    0, 5000));
 		this.nodes[1] = this.network.getFactory().createNode(Id.create("1", Node.class),  this.scenario.createCoord( 4000, 5000));
 		this.nodes[2] = this.network.getFactory().createNode(Id.create("2", Node.class),  this.scenario.createCoord( 8000, 5000));
@@ -140,7 +130,7 @@ import org.matsim.vehicles.VehiclesFactory;
 		}
 	}
 
-	protected void buildStops() {
+	void buildStops() {
 		this.stopFacilities[0] = this.builder.createTransitStopFacility(Id.create( "0", TransitStopFacility.class), this.scenario.createCoord( 4000,  5002), true);
 		this.stopFacilities[1] = this.builder.createTransitStopFacility(Id.create( "1", TransitStopFacility.class), this.scenario.createCoord( 8000,  4998), true);
 		this.stopFacilities[2] = this.builder.createTransitStopFacility(Id.create( "2", TransitStopFacility.class), this.scenario.createCoord(12000,  5002), true);
@@ -156,13 +146,13 @@ import org.matsim.vehicles.VehiclesFactory;
 		}
 	}
 
-	protected void buildVehicles() {
+	void buildVehicles() {
 		Vehicles vehicles = scenario.getVehicles();
         VehiclesFactory vb = vehicles.getFactory();
         VehicleType vehicleType = vb.createVehicleType(Id.create("transitVehicleType", VehicleType.class));
         VehicleCapacity capacity = vb.createVehicleCapacity();
-        capacity.setSeats(Integer.valueOf(101));
-        capacity.setStandingRoom(Integer.valueOf(0));
+        capacity.setSeats(101);
+        capacity.setStandingRoom(0);
         vehicleType.setCapacity(capacity);
         vehicles.addVehicleType(vehicleType);
         vehicles.addVehicle( vb.createVehicle(Id.create("veh1", Vehicle.class), vehicleType));
@@ -173,15 +163,15 @@ import org.matsim.vehicles.VehiclesFactory;
         vehicles.addVehicle( vb.createVehicle(Id.create("veh6", Vehicle.class), vehicleType));
 	}
 	
-	protected void buildBlueLine() {
+	void buildBlueLine() {
 		this.blueLine = this.builder.createTransitLine(Id.create("blue", TransitLine.class));
 		this.schedule.addTransitLine(this.blueLine);
 		{ // route from left to right
 			NetworkRoute netRoute = new LinkNetworkRouteImpl(this.links[0].getId(), this.links[2].getId());
-			List<Id<Link>> routeLinks = new ArrayList<Id<Link>>();
+			List<Id<Link>> routeLinks = new ArrayList<>();
 			Collections.addAll(routeLinks, this.links[1].getId());
 			netRoute.setLinkIds(this.links[0].getId(), routeLinks, this.links[2].getId());
-			List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
+			List<TransitRouteStop> stops = new ArrayList<>();
 			TransitRouteStop stop;
 			stop = this.builder.createTransitRouteStop(this.stopFacilities[0], Time.UNDEFINED_TIME, 0.0);
 			stop.setAwaitDepartureTime(true);
@@ -217,7 +207,7 @@ import org.matsim.vehicles.VehiclesFactory;
 		}
 	}
 	
-	protected void buildPopulation() {
+	void buildPopulation() {
 		persons[0] = createPerson(scenario, "0", "pt");
 		scenario.getPopulation().addPerson(persons[0]);
 	}

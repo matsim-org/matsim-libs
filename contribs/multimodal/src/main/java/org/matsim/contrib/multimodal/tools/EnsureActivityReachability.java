@@ -20,29 +20,24 @@
 
 package org.matsim.contrib.multimodal.tools;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /*
  * Agents try to reach an Activity on a Link which does not support
@@ -54,16 +49,16 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * If an Activity Location is changed, the Routes of its to and from Legs
  * are set to null.
  */
-public class EnsureActivityReachability extends AbstractPersonAlgorithm implements PlanAlgorithm {
+class EnsureActivityReachability extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 	private static final Logger log = Logger.getLogger(EnsureActivityReachability.class);
 	
 	private final String allModes = "allModes";
 	
-	private Scenario scenario;
-	private MultiModalConfigGroup multiModalConfigGroup;
+	private final Scenario scenario;
+	private final MultiModalConfigGroup multiModalConfigGroup;
 	
-	private Counter relocateCounter = new Counter("Number of relocated activities: ");
+	private final Counter relocateCounter = new Counter("Number of relocated activities: ");
 	
 	private Map<String, QuadTree<Facility>> facilityQuadTrees;
 	private Map<String, QuadTree<Link>> linkQuadTrees;
@@ -99,7 +94,7 @@ public class EnsureActivityReachability extends AbstractPersonAlgorithm implemen
 			
 			if (planElement instanceof Activity) {
 				boolean relocateActivity = false;
-				Set<String> requiredModes = new HashSet<String>();
+				Set<String> requiredModes = new HashSet<>();
 				
 				Activity activity = (Activity) planElement;
 				
@@ -113,7 +108,7 @@ public class EnsureActivityReachability extends AbstractPersonAlgorithm implemen
 					 *  the Activity. It that is not possible, nothing is done.
 					 */
 					else {
-						Facility facility = ((ScenarioImpl)scenario).getActivityFacilities().getFacilities().get(activity.getFacilityId());
+						Facility facility = scenario.getActivityFacilities().getFacilities().get(activity.getFacilityId());
 						if (facility != null) {
 							if (facility.getLinkId() != null) {
 								((ActivityImpl)activity).setLinkId(facility.getLinkId());
@@ -126,7 +121,7 @@ public class EnsureActivityReachability extends AbstractPersonAlgorithm implemen
 				
 				Link link = scenario.getNetwork().getLinks().get(activity.getLinkId());
 				
-				Set<String> allowedModes = new HashSet<String>(link.getAllowedModes());
+				Set<String> allowedModes = new HashSet<>(link.getAllowedModes());
 				
 				// PT is currently allowed on all kinds of links
 				allowedModes.add(TransportMode.pt);
@@ -177,7 +172,7 @@ public class EnsureActivityReachability extends AbstractPersonAlgorithm implemen
 					 * Facility, if its located at a Link, we move it to another Link. 
 					 */
 					if (activity.getFacilityId() != null) {
-						Facility newFacility = null;
+						Facility newFacility;
 						if (requiredModes.size() > 1) {
 							newFacility = this.facilityQuadTrees.get(this.allModes).get(activity.getCoord().getX(), activity.getCoord().getY());
 						} else {
@@ -196,7 +191,7 @@ public class EnsureActivityReachability extends AbstractPersonAlgorithm implemen
 							log.error("Could not relocate Activity");
 						}				
 					} else if (activity.getLinkId() != null) {
-						Link newLink = null;
+						Link newLink;
 						if (requiredModes.size() > 1) {
 							newLink = this.linkQuadTrees.get(this.allModes).get(activity.getCoord().getX(), activity.getCoord().getY());
 						} else {
@@ -245,7 +240,7 @@ public class EnsureActivityReachability extends AbstractPersonAlgorithm implemen
 		log.info("QuadTrees: xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 		
 		Set<String> modes = CollectionUtils.stringToSet(multiModalConfigGroup.getSimulatedModes());
-		this.linkQuadTrees = new HashMap<String, QuadTree<Link>>();
+		this.linkQuadTrees = new HashMap<>();
 		for (String mode : modes) {
 			this.linkQuadTrees.put(mode, new QuadTree<Link>(minx, miny, maxx, maxy));
 		}
@@ -277,7 +272,7 @@ public class EnsureActivityReachability extends AbstractPersonAlgorithm implemen
 		double maxx = Double.NEGATIVE_INFINITY;
 		double maxy = Double.NEGATIVE_INFINITY;
 		
-		for (Facility facility : ((ScenarioImpl)scenario).getActivityFacilities().getFacilities().values()) {
+		for (Facility facility : scenario.getActivityFacilities().getFacilities().values()) {
 			if (facility.getCoord().getX() < minx) { minx = facility.getCoord().getX(); }
 			if (facility.getCoord().getY() < miny) { miny = facility.getCoord().getY(); }
 			if (facility.getCoord().getX() > maxx) { maxx = facility.getCoord().getX(); }
@@ -292,13 +287,13 @@ public class EnsureActivityReachability extends AbstractPersonAlgorithm implemen
 		log.info("QuadTrees: xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
 		
 		Set<String> modes = CollectionUtils.stringToSet(multiModalConfigGroup.getSimulatedModes());
-		this.facilityQuadTrees = new HashMap<String, QuadTree<Facility>>();
+		this.facilityQuadTrees = new HashMap<>();
 		for (String mode : modes) {
 			this.facilityQuadTrees.put(mode, new QuadTree<Facility>(minx, miny, maxx, maxy));
 		}
 		this.facilityQuadTrees.put(this.allModes, new QuadTree<Facility>(minx, miny, maxx, maxy));
 		
-		for (Facility facility : ((ScenarioImpl)scenario).getActivityFacilities().getFacilities().values()) {
+		for (Facility facility : scenario.getActivityFacilities().getFacilities().values()) {
 			Link link = scenario.getNetwork().getLinks().get(facility.getLinkId());
 			
 			Set<String> allowedModes = link.getAllowedModes();

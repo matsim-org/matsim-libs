@@ -20,10 +20,7 @@
 
 package org.matsim.contrib.multimodal;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.router.DefaultDelegateFactory;
 import org.matsim.contrib.multimodal.router.MultimodalTripRouterFactory;
 import org.matsim.contrib.multimodal.router.util.MultiModalTravelTimeFactory;
@@ -35,6 +32,8 @@ import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import java.util.Map;
 
 /**
  * 

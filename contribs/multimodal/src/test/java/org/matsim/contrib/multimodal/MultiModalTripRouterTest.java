@@ -20,11 +20,6 @@
 
 package org.matsim.contrib.multimodal;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -45,12 +40,7 @@ import org.matsim.contrib.multimodal.router.util.MultiModalTravelTimeFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.RoutingContextImpl;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.FastDijkstraFactory;
@@ -58,6 +48,11 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author cdobler
@@ -158,12 +153,12 @@ public class MultiModalTripRouterTest {
 	}
 	
 	private void checkMode(Scenario scenario, String transportMode, PlanRouter planRouter) {
-		Person person = createPerson(scenario, transportMode);
+		Person person = createPerson(scenario);
 		planRouter.run(person);
-		checkRoute(createSet(new String[]{transportMode}), (Leg) person.getSelectedPlan().getPlanElements().get(1), scenario.getNetwork());
+		checkRoute((Leg) person.getSelectedPlan().getPlanElements().get(1), scenario.getNetwork());
 	}
 	
-	private Person createPerson(Scenario scenario, String transportMode) {
+	private Person createPerson(Scenario scenario) {
 		
 		Person person = scenario.getPopulation().getFactory().createPerson(Id.create("person", Person.class));
 		Plan plan = scenario.getPopulation().getFactory().createPlan();
@@ -182,7 +177,7 @@ public class MultiModalTripRouterTest {
 	}
 	
 	
-	private void checkRoute(Set<String> allowedModes, Leg leg, Network network) {
+	private void checkRoute(Leg leg, Network network) {
 		NetworkRoute route = (NetworkRoute) leg.getRoute();
 		
 		for (Id<Link> id : route.getLinkIds()) {
@@ -306,7 +301,7 @@ public class MultiModalTripRouterTest {
 	}
 	
 	private Set<String> createSet(String[] entries) {
-		Set<String> set = new HashSet<String>();
+		Set<String> set = new HashSet<>();
         Collections.addAll(set, entries);
 		return set;
 	}

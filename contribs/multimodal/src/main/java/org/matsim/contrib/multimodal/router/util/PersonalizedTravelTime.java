@@ -20,14 +20,14 @@
 
 package org.matsim.contrib.multimodal.router.util;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Travel time calculator that uses a personalized speed for each person. 
@@ -37,7 +37,7 @@ public class PersonalizedTravelTime implements TravelTime {
 	private final Map<Id, Double> personSpeeds;
 		
 	public PersonalizedTravelTime() {
-		personSpeeds = new ConcurrentHashMap<Id, Double>();
+		personSpeeds = new ConcurrentHashMap<>();
 	}
 	
 	public void setPersonSpeed(Id personId, double speed) {

@@ -24,7 +24,7 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.TravelTimeFactory;
 
-public class UnknownTravelTimeFactory implements TravelTimeFactory {
+class UnknownTravelTimeFactory implements TravelTimeFactory {
 
 	private final String mode;
 	private final PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;

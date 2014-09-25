@@ -20,9 +20,6 @@
 
 package org.matsim.contrib.multimodal.simengine;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -30,10 +27,13 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.utils.collections.CollectionUtils;
 
-public class MultiModalDepartureHandler implements DepartureHandler {
+import java.util.HashSet;
+import java.util.Set;
 
-	private MultiModalSimEngine simEngine;
-	private Set<String> handledModes = new HashSet<String>();
+class MultiModalDepartureHandler implements DepartureHandler {
+
+	private final MultiModalSimEngine simEngine;
+	private Set<String> handledModes = new HashSet<>();
 	
 	public MultiModalDepartureHandler(MultiModalSimEngine simEngine, MultiModalConfigGroup multiModalConfigGroup) {
 		this.simEngine = simEngine;

@@ -20,9 +20,6 @@
 
 package org.matsim.contrib.multimodal.tools;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -30,6 +27,9 @@ import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.misc.Counter;
+
+import java.util.HashSet;
+import java.util.Set;
 
 /*
  * Simple tool that converts a car only network into a multi modal network.
@@ -41,7 +41,7 @@ public class MultiModalNetworkCreator implements NetworkRunnable {
 
 	private static final Logger log = Logger.getLogger(MultiModalNetworkCreator.class);
 	
-	private MultiModalConfigGroup multiModalConfigGroup;
+	private final MultiModalConfigGroup multiModalConfigGroup;
 	
 	public MultiModalNetworkCreator(MultiModalConfigGroup multiModalConfigGroup) {
 		this.multiModalConfigGroup = multiModalConfigGroup;
@@ -63,7 +63,7 @@ public class MultiModalNetworkCreator implements NetworkRunnable {
 		Counter counter = new Counter("Converted links to multi-modal links: ");
 		for (Link link : network.getLinks().values()) {
 			if (Math.round(link.getFreespeed()) <= cutoffSpeed) {
-				Set<String> allowedModes = new HashSet<String>(link.getAllowedModes());
+				Set<String> allowedModes = new HashSet<>(link.getAllowedModes());
 				allowedModes.addAll(modes);
 				link.setAllowedModes(allowedModes);
 				counter.incCounter();

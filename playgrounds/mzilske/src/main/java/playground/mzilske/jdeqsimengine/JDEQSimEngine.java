@@ -18,9 +18,6 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
 import java.util.HashMap;
 
-/**
- * Created by michaelzilske on 19/03/14.
- */
 class JDEQSimEngine implements MobsimEngine, ActivityHandler {
 
     private final static Logger log = Logger.getLogger(JDEQSimEngine.class);

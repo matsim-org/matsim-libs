@@ -41,16 +41,17 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
+import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
@@ -68,10 +69,7 @@ import playground.mzilske.cdr.CompareMain;
 import playground.mzilske.controller.Controller;
 import playground.mzilske.controller.ControllerModule;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class CadytsRandomTrips {
 
@@ -85,11 +83,11 @@ public class CadytsRandomTrips {
 
     private static Config randomConfig() {
         Config config = ConfigUtils.createConfig();
-        config.qsim().setMainModes(Collections.<String>emptyList());
-        config.controler().setOutputDirectory("wurst");
+        config.controler().setOutputDirectory("wurst-full");
         config.controler().setLastIteration(1000);
         PlanCalcScoreConfigGroup.ActivityParams sightingParam = new PlanCalcScoreConfigGroup.ActivityParams("sighting");
         sightingParam.setTypicalDuration(30.0 * 60);
+        config.controler().setMobsim("qsim");
         config.controler().setWritePlansInterval(10);
         config.counts().setWriteCountsInterval(10);
         config.global().setNumberOfThreads(8);
@@ -108,10 +106,12 @@ public class CadytsRandomTrips {
 
         cadytsConfig.setPreparatoryIterations(1);
 
-        QSimConfigGroup tmp = config.qsim();
-        tmp.setFlowCapFactor(100);
-        tmp.setStorageCapFactor(100);
-        tmp.setRemoveStuckVehicles(false);
+
+        // config.qsim().setMainModes(Collections.<String>emptyList());
+        config.qsim().setMainModes(Arrays.asList("car"));
+        config.qsim().setFlowCapFactor(100);
+        config.qsim().setStorageCapFactor(100);
+        config.qsim().setRemoveStuckVehicles(false);
 
         {
             StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings(new IdImpl(1));
@@ -127,6 +127,10 @@ public class CadytsRandomTrips {
 //            stratSets.setDisableAfter(25);
             config.strategy().addStrategySettings(stratSets);
         }
+
+        MultiModalConfigGroup multiModal = ConfigUtils.addOrGetModule(config, MultiModalConfigGroup.GROUP_NAME, MultiModalConfigGroup.class);
+        multiModal.setSimulatedModes("car");
+
         return config;
 
     }
@@ -181,7 +185,8 @@ public class CadytsRandomTrips {
                 bind(Counts.class).annotatedWith(Names.named("calibrationCounts")).toInstance(someCounts);
                 Multibinder<ControlerListener> controlerListenerBinder = Multibinder.newSetBinder(binder(), ControlerListener.class);
                 controlerListenerBinder.addBinding().to(LegTimesHistogramControlerListener.class);
-
+                MapBinder<String, MobsimFactory> mobsimFactoryMapBinder = MapBinder.newMapBinder(binder(), String.class, MobsimFactory.class);
+                mobsimFactoryMapBinder.addBinding("my-qsim").to(MyQSimFactory.class);
                 MapBinder<String, PlanStrategyFactory> planStrategyFactoryBinder
                         = MapBinder.newMapBinder(binder(), String.class, PlanStrategyFactory.class);
                 planStrategyFactoryBinder.addBinding("NewRandomTrip").toInstance(new PlanStrategyFactory() {

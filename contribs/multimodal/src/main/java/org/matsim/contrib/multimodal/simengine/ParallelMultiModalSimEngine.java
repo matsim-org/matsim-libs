@@ -20,18 +20,17 @@
 
 package org.matsim.contrib.multimodal.simengine;
 
-import java.util.Map;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.router.util.TravelTime;
+
+import java.util.Map;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 
 class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 	
@@ -42,14 +41,10 @@ class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 	private Thread[] threads;
 	private MultiModalSimEngineRunner[] engines;
 	private CyclicBarrier startBarrier;
-	private CyclicBarrier separationBarrier;	// separates moveNodes and moveLinks
-	private CyclicBarrier endBarrier;
+    private CyclicBarrier endBarrier;
 	
-	// use the factory
-	/*package*/ ParallelMultiModalSimEngine(Netsim sim, Map<String, TravelTime> multiModalTravelTimes) {
-		super(sim, multiModalTravelTimes);
-		MultiModalConfigGroup multiModalConfigGroup = 
-				(MultiModalConfigGroup) sim.getScenario().getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
+	ParallelMultiModalSimEngine(Map<String, TravelTime> multiModalTravelTimes, MultiModalConfigGroup multiModalConfigGroup) {
+		super(multiModalTravelTimes);
 		this.numOfThreads = multiModalConfigGroup.getNumberOfThreads();
 	}
 	
@@ -96,13 +91,11 @@ class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 			this.startBarrier.await();
 
 			this.endBarrier.await();
-		} catch (InterruptedException e) {
+		} catch (InterruptedException | BrokenBarrierException e) {
 			throw new RuntimeException(e);
-		} catch (BrokenBarrierException e) {
-	      	throw new RuntimeException(e);
 		}
-		
-		this.printSimLog(time);
+
+        this.printSimLog(time);
 	}
 
 	@Override
@@ -138,13 +131,11 @@ class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 		 */
 		try {
 			this.startBarrier.await();
-		} catch (InterruptedException e) {
-			throw new RuntimeException(e);
-		} catch (BrokenBarrierException e) {
+		} catch (InterruptedException | BrokenBarrierException e) {
 			throw new RuntimeException(e);
 		}
 
-		// wait until each thread is finished
+        // wait until each thread is finished
 		try {
 			for (Thread thread : this.threads) {
 				thread.join();
@@ -190,13 +181,13 @@ class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 		this.engines = new MultiModalSimEngineRunner[numOfThreads];
 
 		this.startBarrier = new CyclicBarrier(numOfThreads + 1);
-		this.separationBarrier = new CyclicBarrier(numOfThreads);
+        CyclicBarrier separationBarrier = new CyclicBarrier(numOfThreads); // separates moveNodes and moveLinks
 		this.endBarrier = new CyclicBarrier(numOfThreads + 1);
 
 		// setup runners
 		for (int i = 0; i < numOfThreads; i++) {
-			MultiModalSimEngineRunner engine = new MultiModalSimEngineRunner(startBarrier, 
-					separationBarrier, endBarrier, this.getMobsim(), multiModalTravelTimes, this);
+			MultiModalSimEngineRunner engine = new MultiModalSimEngineRunner(startBarrier,
+                    separationBarrier, endBarrier, multiModalTravelTimes, this);
 
 			engine.setInternalInterface(this.internalInterface);
 			
@@ -227,7 +218,7 @@ class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 		int links[] = new int[this.engines.length];
 		
 		int roundRobin = 0;
-		Scenario scenario = this.qSim.getScenario();
+		Scenario scenario = this.internalInterface.getMobsim().getScenario();
 		
 		for (Node node : scenario.getNetwork().getNodes().values()) {
 			MultiModalQNodeExtension multiModalQNodeExtension = this.getMultiModalQNodeExtension(node.getId());

@@ -20,8 +20,6 @@
 
 package org.matsim.contrib.multimodal.router.util;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -29,7 +27,9 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.TravelTimeFactory;
 
-public class TransitWalkTravelTimeFactory implements TravelTimeFactory {
+import java.util.Map;
+
+class TransitWalkTravelTimeFactory implements TravelTimeFactory {
 
 	private final PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
 	private final Map<Id<Link>, Double> linkSlopes;	// slope information in %

@@ -20,12 +20,6 @@
 
 package org.matsim.contrib.multimodal.router.util;
 
-import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -35,6 +29,12 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Data to calculate a person's travel time on a link is taken from:
@@ -109,22 +109,22 @@ public class WalkTravelTime implements TravelTime {
 	
 	public WalkTravelTime(PlansCalcRouteConfigGroup plansCalcGroup, Map<Id<Link>, Double> linkSlopes) {
 		this.referenceWalkSpeed = plansCalcGroup.getTeleportedModeSpeeds().get(TransportMode.walk);
-		this.personCache = new ThreadLocal<Person>();
-		this.personFactorCache = new ThreadLocal<Double>();
-		this.personWalkSpeedCache = new ThreadLocal<Double>();
+		this.personCache = new ThreadLocal<>();
+		this.personFactorCache = new ThreadLocal<>();
+		this.personWalkSpeedCache = new ThreadLocal<>();
 		
-		this.personFactors = new ConcurrentHashMap<Id, Double>();
+		this.personFactors = new ConcurrentHashMap<>();
 		this.linkSlopes = linkSlopes;
 	}
 	
 	// when used for transit_walk
 	/*package*/ WalkTravelTime(double referenceWalkSpeed, Map<Id<Link>, Double> linkSlopes) {
 		this.referenceWalkSpeed = referenceWalkSpeed;
-		this.personCache = new ThreadLocal<Person>();
-		this.personFactorCache = new ThreadLocal<Double>();
-		this.personWalkSpeedCache = new ThreadLocal<Double>();
+		this.personCache = new ThreadLocal<>();
+		this.personFactorCache = new ThreadLocal<>();
+		this.personWalkSpeedCache = new ThreadLocal<>();
 		
-		this.personFactors = new ConcurrentHashMap<Id, Double>();
+		this.personFactors = new ConcurrentHashMap<>();
 		this.linkSlopes = linkSlopes;
 	}
 
@@ -144,7 +144,7 @@ public class WalkTravelTime implements TravelTime {
 	}
 
 	/*package*/ double getSlopeFactor(double slope) {
-		double slopeFactor = 1.0;
+		double slopeFactor;
 		
 		if (slope > 80.0) {
 			if (slopeRangeWarnCount.get() < 10) {
@@ -234,7 +234,7 @@ public class WalkTravelTime implements TravelTime {
 			return;
 		}
 		
-		double scatterFactor = 1.0;
+		double scatterFactor;
 		double ageFactor = 1.0;
 		double genderFactor = 1.0;
 

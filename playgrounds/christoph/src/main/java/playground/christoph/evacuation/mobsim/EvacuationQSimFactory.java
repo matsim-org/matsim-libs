@@ -20,14 +20,9 @@
 
 package playground.christoph.evacuation.mobsim;
 
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
-import org.matsim.contrib.multimodal.simengine.MultiModalDepartureHandler;
-import org.matsim.contrib.multimodal.simengine.MultiModalSimEngine;
-import org.matsim.contrib.multimodal.simengine.MultiModalSimEngineFactory;
+import org.matsim.contrib.multimodal.simengine.MultiModalQSimModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -50,8 +45,9 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.withinday.mobsim.WithinDayEngine;
-
 import playground.christoph.evacuation.config.EvacuationConfig;
+
+import java.util.Map;
 
 /**
  * Registering this as an IterationStartsListener is optional. It allows 
@@ -114,11 +110,9 @@ public class EvacuationQSimFactory implements MobsimFactory, IterationStartsList
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
 		qSim.addDepartureHandler(netsimEngine.getVehicularDepartureHandler());
-			
-		MultiModalSimEngine multiModalEngine = new MultiModalSimEngineFactory().createMultiModalSimEngine(qSim, this.multiModalTravelTimes);
-		qSim.addMobsimEngine(multiModalEngine);
-        MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) sc.getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
-        qSim.addDepartureHandler(new MultiModalDepartureHandler(multiModalEngine, multiModalConfigGroup));
+
+
+        new MultiModalQSimModule(sc.getConfig(), this.multiModalTravelTimes).configure(qSim);
 		
 		TeleportationEngine teleportationEngine = new TeleportationEngine();
 		qSim.addMobsimEngine(teleportationEngine);

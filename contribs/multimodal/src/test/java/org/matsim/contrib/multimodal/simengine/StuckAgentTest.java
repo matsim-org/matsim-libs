@@ -20,10 +20,6 @@
 
 package org.matsim.contrib.multimodal.simengine;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -35,11 +31,7 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.multimodal.MultiModalControlerListener;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.config.Config;
@@ -56,6 +48,10 @@ import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.testcases.utils.EventsCollector;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class StuckAgentTest {
 
@@ -130,7 +126,7 @@ public class StuckAgentTest {
 		RouteFactory routeFactory = new LinkNetworkRouteFactory();
 		Route route0 = routeFactory.createRoute(Id.create("l0", Link.class), Id.create("l3", Link.class));	// missing l1 & l2
 		Route route1 = routeFactory.createRoute(Id.create("l0", Link.class), Id.create("l3", Link.class));	// missing l2
-		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
+		List<Id<Link>> linkIds = new ArrayList<>();
 		linkIds.add(Id.create("l0", Link.class));
 		((NetworkRoute) route1).setLinkIds(Id.create("l0", Link.class), linkIds, Id.create("l3", Link.class));
 

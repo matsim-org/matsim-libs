@@ -20,10 +20,10 @@
 
 package org.matsim.contrib.multimodal.config;
 
+import org.matsim.core.config.Module;
+
 import java.util.Map;
 import java.util.TreeMap;
-
-import org.matsim.core.config.Module;
 
 public class MultiModalConfigGroup extends Module {
 
@@ -102,7 +102,7 @@ public class MultiModalConfigGroup extends Module {
 
 	@Override
 	public final TreeMap<String, String> getParams() {
-		TreeMap<String, String> map = new TreeMap<String, String>();
+		TreeMap<String, String> map = new TreeMap<>();
 		map.put(MULTI_MODAL_SIMULATION_ENABLED, getValue(MULTI_MODAL_SIMULATION_ENABLED));
 		map.put(NUMBER_OF_THREADS, getValue(NUMBER_OF_THREADS));
 		map.put(SIMULATED_MODES, getValue(SIMULATED_MODES));
@@ -154,7 +154,7 @@ public class MultiModalConfigGroup extends Module {
 		return this.simulatedModes;
 	}
 
-	public void setSlopeInformationFile(String file) {
+	void setSlopeInformationFile(String file) {
 		this.slopeInformationFile = file;
 	}
 	
@@ -186,7 +186,7 @@ public class MultiModalConfigGroup extends Module {
 		return this.dropNonCarRoutes;
 	}
 	
-	public void setEnsureActivityReachability(final boolean enabled) {
+	void setEnsureActivityReachability(final boolean enabled) {
 		this.ensureActivityReachability = enabled;
 	}
 

@@ -20,12 +20,6 @@
 
 package org.matsim.contrib.multimodal.router.util;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -38,9 +32,15 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.TravelTimeFactory;
 import org.matsim.core.utils.collections.CollectionUtils;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
 public class MultiModalTravelTimeFactory implements MatsimFactory {
 	
-	protected static final Logger log = Logger.getLogger(MultiModalTravelTimeFactory.class);
+	private static final Logger log = Logger.getLogger(MultiModalTravelTimeFactory.class);
 	
 	private final Map<String, TravelTimeFactory> factories;
 	private final Map<String, TravelTimeFactory> additionalFactories;
@@ -56,7 +56,7 @@ public class MultiModalTravelTimeFactory implements MatsimFactory {
 	
 	public MultiModalTravelTimeFactory(Config config, Map<Id<Link>, Double> linkSlopes, Map<String, TravelTimeFactory> additionalFactories) {
 		this.linkSlopes = linkSlopes;
-		this.factories = new LinkedHashMap<String, TravelTimeFactory>();
+		this.factories = new LinkedHashMap<>();
 		this.additionalFactories = additionalFactories;
 		
 		if (this.linkSlopes == null) {
@@ -67,7 +67,7 @@ public class MultiModalTravelTimeFactory implements MatsimFactory {
 	}
 	
 	public Map<String, TravelTime> createTravelTimes() {
-		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();
+		Map<String, TravelTime> travelTimes = new HashMap<>();
 		
 		for (Entry<String, TravelTimeFactory> entry : factories.entrySet()) {
 			travelTimes.put(entry.getKey(), entry.getValue().createTravelTime());

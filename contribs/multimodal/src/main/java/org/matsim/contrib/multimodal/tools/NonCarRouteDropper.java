@@ -20,10 +20,6 @@
 
 package org.matsim.contrib.multimodal.tools;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -34,15 +30,19 @@ import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Drops all non car routes which are specified in the multiModalConfigGroup
  * ("simulatedModes").
  */
-public class NonCarRouteDropper extends AbstractPersonAlgorithm implements PlanAlgorithm {
+class NonCarRouteDropper extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 	private static final Logger log = Logger.getLogger(NonCarRouteDropper.class);
 
-	private Set<String> modesToDrop = new HashSet<String>();
+	private final Set<String> modesToDrop = new HashSet<>();
 
 	public NonCarRouteDropper(MultiModalConfigGroup multiModalConfigGroup) {
 

@@ -20,14 +20,14 @@
 
 package org.matsim.contrib.multimodal.router.util;
 
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.Map;
 
 /**
  * Data to calculate a person's travel time on a link is taken from:
@@ -45,10 +45,10 @@ public class BikeTravelTime extends WalkTravelTime {
 	/*
 	 * Cache variables for each thread accessing the object separately.
 	 */
-	/*package*/ final ThreadLocal<Double> personBikeSpeedCache;
-	/*package*/ final ThreadLocal<Double> maxPersonBikeSpeedCache;
-	/*package*/ final ThreadLocal<Double> personUphillFactorCache;
-	/*package*/ final ThreadLocal<Double> personDownhillFactorCache;
+	/*package*/ private final ThreadLocal<Double> personBikeSpeedCache;
+	/*package*/ private final ThreadLocal<Double> maxPersonBikeSpeedCache;
+	/*package*/ private final ThreadLocal<Double> personUphillFactorCache;
+	/*package*/ private final ThreadLocal<Double> personDownhillFactorCache;
 	
 	/*
 	 * If the set reference speed does not match the default reference speed,
@@ -67,10 +67,10 @@ public class BikeTravelTime extends WalkTravelTime {
 		
 		this.referenceBikeSpeed = plansCalcGroup.getTeleportedModeSpeeds().get(TransportMode.bike);
 		
-		this.personBikeSpeedCache = new ThreadLocal<Double>();
-		this.maxPersonBikeSpeedCache = new ThreadLocal<Double>();
-		this.personUphillFactorCache = new ThreadLocal<Double>();
-		this.personDownhillFactorCache = new ThreadLocal<Double>();
+		this.personBikeSpeedCache = new ThreadLocal<>();
+		this.maxPersonBikeSpeedCache = new ThreadLocal<>();
+		this.personUphillFactorCache = new ThreadLocal<>();
+		this.personDownhillFactorCache = new ThreadLocal<>();
 	}
 	
 	public BikeTravelTime(PlansCalcRouteConfigGroup plansCalcGroup) {
@@ -109,7 +109,7 @@ public class BikeTravelTime extends WalkTravelTime {
 	}
 	
 	@Override
-	protected void setPerson(Person person) {
+    void setPerson(Person person) {
 		/* 
 		 * Only recalculate the person's speed factor if the person has 
 		 * changed. This check has to be performed before super.setPerson(...)

@@ -20,9 +20,6 @@
 
 package org.matsim.contrib.multimodal.router.util;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -36,6 +33,9 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class WalkTravelTimeTest extends MatsimTestCase {
 
@@ -121,8 +121,7 @@ public class WalkTravelTimeTest extends MatsimTestCase {
 		slope = 100 * (h2 - h1) / link.getLength();
 		linkSlopes.put(link.getId(), slope);
 		walkTravelTime = new WalkTravelTime(scenario.getConfig().plansCalcRoute(), linkSlopes);
-		slope2 = walkTravelTime.getSlope(link);
-		slopeFactor = walkTravelTime.getSlopeFactor(slope);
+        slopeFactor = walkTravelTime.getSlopeFactor(slope);
 		calculatedTravelTime = walkTravelTime.getLinkTravelTime(link, 0.0, person, null);
 		speed = defaultWalkSpeed * walkTravelTime.personFactors.get(person.getId()) * slopeFactor;
 		expectedTravelTime = link.getLength() / speed;
