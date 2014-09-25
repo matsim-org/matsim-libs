@@ -19,7 +19,11 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -34,18 +38,7 @@ import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetsimEngineFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.FIFOVehicleQ;
-import org.matsim.core.mobsim.qsim.qnetsimengine.PassingVehicleQ;
-import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetworkFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetwork;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNode;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
-import org.matsim.core.mobsim.qsim.qnetsimengine.VehicleQ;
+import org.matsim.vehicles.VehicleType;
 
 public class GfipQueuePassingQSimFactory implements MobsimFactory{
 	final private Logger log = Logger.getLogger(GfipQueuePassingQSimFactory.class);
@@ -53,6 +46,25 @@ public class GfipQueuePassingQSimFactory implements MobsimFactory{
 	
 	public GfipQueuePassingQSimFactory(QueueType queueType) {
 		this.queueType = queueType;
+		switch (queueType) {
+		case FIFO:
+			log.info("------------------------------------------------------------------");
+			log.info("  Using first-in-first-out (FIFO) queue in mobility simulation."); 
+			log.info("------------------------------------------------------------------");
+			break;
+		case BASIC_PASSING:
+			log.info("------------------------------------------------------------------");
+			log.info("  Using priority queue (allowing passing) in mobility simulation."); 
+			log.info("------------------------------------------------------------------");
+			break;
+		case GFIP_PASSING:
+			log.info("---------------------------------------------------------------------------------------");
+			log.info("  Using link density-based priority queue (allowing passing) in mobility simulation."); 
+			log.info("---------------------------------------------------------------------------------------");
+			break;
+		default:
+			throw new IllegalArgumentException("Do not know what to do with queue type " + queueType.toString());
+		}
 	}
 
 	@Override
@@ -78,7 +90,7 @@ public class GfipQueuePassingQSimFactory implements MobsimFactory{
 		ActivityEngine activityEngine = new ActivityEngine();
 		qsim.addMobsimEngine(activityEngine);
 		qsim.addActivityHandler(activityEngine);
-
+		
 		/* This is the crucial part for changing the queue type. */ 
 		NetsimNetworkFactory<QNode, QLinkImpl> netsimNetworkFactory = new NetsimNetworkFactory<QNode, QLinkImpl>() {
 			@Override
@@ -103,11 +115,13 @@ public class GfipQueuePassingQSimFactory implements MobsimFactory{
 			}
 		};
 		QNetsimEngine netsimEngine = new QNetsimEngine(qsim, netsimNetworkFactory);
-
 		
 		/* Add the custom GFIP link speed calculator, but only when required. */
 		if(queueType == QueueType.GFIP_PASSING){
-			netsimEngine.setLinkSpeedCalculator(new GfipLinkSpeedCalculator());
+			log.info("------------------------------------------------------------------");
+			log.info("  Using custom GFIP-link-density-based link speed calculator. "); 
+			log.info("------------------------------------------------------------------");
+			netsimEngine.setLinkSpeedCalculator(new GfipLinkSpeedCalculator(qsim));
 		}
 		
 		qsim.addMobsimEngine(netsimEngine);
@@ -116,10 +130,19 @@ public class GfipQueuePassingQSimFactory implements MobsimFactory{
 		qsim.addMobsimEngine(teleportationEngine);
 		AgentFactory agentFactory = new DefaultAgentFactory(qsim);
 		
+		/* ..Update the PopulationAgentSource to ensure the correct vehicle is 
+		 * passed to the mobsim, not some default-per-mode vehicle. */		
 		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qsim);
+		Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
+		for(Id<VehicleType> id : sc.getVehicles().getVehicleTypes().keySet()){
+			modeVehicleTypes.put(id.toString(), sc.getVehicles().getVehicleTypes().get(id));
+		}
+		agentSource.setModeVehicleTypes(modeVehicleTypes);
 		qsim.addAgentSource(agentSource);
+
 		return qsim;		
 	}
+	
 	
 	public enum QueueType{
 		FIFO, BASIC_PASSING, GFIP_PASSING;
