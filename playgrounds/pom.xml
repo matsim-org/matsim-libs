@@ -8,6 +8,13 @@
 	<version>0.7.0-SNAPSHOT</version>
 	<name>MATSim-Playgrounds</name>
 
+	<scm>
+		<connection>scm:svn:https://svn.code.sf.net/p/matsim/source/playgrounds/trunk</connection>
+		<developerConnection>scm:svn:https://svn.code.sf.net/p/matsim/source/playgrounds/trunk</developerConnection>
+		<tag>HEAD</tag>
+		<url>https://svn.code.sf.net/p/matsim/source/playgrounds/trunk</url>
+	</scm>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -32,6 +39,25 @@
 					<forkMode>once</forkMode>
 					<argLine>-Xmx400m -Djava.awt.headless=true</argLine>
 					<enableAssertions>false</enableAssertions> <!-- this should be set to true, but we still have some tests that don't work otherwise... -->
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+				<version>1.0</version>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>create</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<doCheck>false</doCheck>
+					<doUpdate>false</doUpdate>
+					<revisionOnScmFailure>unknown</revisionOnScmFailure>
+					<timestampFormat>{0,date,yyyy-MM-dd HH:mm:ss}</timestampFormat>
 				</configuration>
 			</plugin>
 		</plugins>
