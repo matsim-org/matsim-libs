@@ -45,19 +45,16 @@ import java.util.TreeMap;
 /**
  * @author benjamin
  */
-public class ColdEmissionHandler implements LinkLeaveEventHandler,
-        PersonArrivalEventHandler, PersonDepartureEventHandler {
+public class ColdEmissionHandler implements LinkLeaveEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler {
 
     private final Vehicles emissionVehicles;
     private final Network network;
     private final ColdEmissionAnalysisModule coldEmissionAnalysisModule;
 
-    private final Map<Id, Double> stopEngine = new TreeMap<>();
-
-    private final Map<Id, Double> accumulatedDistance = new TreeMap<>();
-    private final Map<Id, Double> parkingDuration = new TreeMap<>();
+    private final Map<Id<Person>, Double> personId2stopEngineTime = new TreeMap<>();
+    private final Map<Id<Person>, Double> personId2accumulatedDistance = new TreeMap<>();
+    private final Map<Id<Person>, Double> personId2parkingDuration = new TreeMap<>();
     private final Map<Id<Person>, Id<Link>> personId2coldEmissionEventLinkId = new TreeMap<>();
-
 
     public ColdEmissionHandler(
             Vehicles emissionVehicles,
@@ -72,9 +69,9 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler,
 
     @Override
     public void reset(int iteration) {
-        stopEngine.clear();
-        accumulatedDistance.clear();
-        parkingDuration.clear();
+        personId2stopEngineTime.clear();
+        personId2accumulatedDistance.clear();
+        personId2parkingDuration.clear();
         personId2coldEmissionEventLinkId.clear();
         coldEmissionAnalysisModule.reset();
     }
@@ -85,10 +82,10 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler,
         Id<Link> linkId = event.getLinkId();
         Link link = this.network.getLinks().get(linkId);
         double linkLength = link.getLength();
-        Double previousDistance = this.accumulatedDistance.get(personId);
+        Double previousDistance = this.personId2accumulatedDistance.get(personId);
         if (previousDistance != null) {
             double distance = previousDistance + linkLength;
-            double parkingDuration = this.parkingDuration.get(personId);
+            double parkingDuration = this.personId2parkingDuration.get(personId);
             Id<Link> coldEmissionEventLinkId = this.personId2coldEmissionEventLinkId.get(personId);
             Id<Vehicle> vehicleId = Id.create(personId, Vehicle.class);
             String vehicleInformation = getVehicleInformation(personId, vehicleId);
@@ -100,9 +97,9 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler,
                         parkingDuration,
                         2,
                         vehicleInformation);
-                this.accumulatedDistance.remove(personId);
+                this.personId2accumulatedDistance.remove(personId);
             } else {
-                this.accumulatedDistance.put(personId, distance);
+                this.personId2accumulatedDistance.put(personId, distance);
             }
         }
     }
@@ -114,22 +111,7 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler,
         }
         Id<Person> personId = event.getPersonId();
         Double stopEngineTime = event.getTime();
-        this.stopEngine.put(personId, stopEngineTime);
-    }
-
-    private String getVehicleInformation(Id<Person> personId, Id<Vehicle> vehicleId) {
-        String vehicleInformation;
-
-        if (!this.emissionVehicles.getVehicles().containsKey(vehicleId)) {
-            throw new RuntimeException("No vehicle defined for person " + personId + ". " +
-                    "Please make sure that requirements for emission vehicles in " +
-                    VspExperimentalConfigGroup.GROUP_NAME + " config group are met. Aborting...");
-        }
-
-        Vehicle vehicle = this.emissionVehicles.getVehicles().get(vehicleId);
-        VehicleType vehicleType = vehicle.getType();
-        vehicleInformation = vehicleType.getId().toString();
-        return vehicleInformation;
+        this.personId2stopEngineTime.put(personId, stopEngineTime);
     }
 
     @Override
@@ -143,15 +125,15 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler,
         this.personId2coldEmissionEventLinkId.put(personId, linkId);
 
         double parkingDuration;
-        if (this.stopEngine.containsKey(personId)) {
-            double stopEngineTime = this.stopEngine.get(personId);
+        if (this.personId2stopEngineTime.containsKey(personId)) {
+            double stopEngineTime = this.personId2stopEngineTime.get(personId);
             parkingDuration = startEngineTime - stopEngineTime;
 
         } else { //parking duration is assumed to be at least 12 hours when parking overnight
             parkingDuration = 43200.0;
         }
-        this.parkingDuration.put(personId, parkingDuration);
-        this.accumulatedDistance.put(personId, 0.0);
+        this.personId2parkingDuration.put(personId, parkingDuration);
+        this.personId2accumulatedDistance.put(personId, 0.0);
         this.coldEmissionAnalysisModule.calculateColdEmissionsAndThrowEvent(
                 linkId,
                 personId,
@@ -161,4 +143,18 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler,
                 getVehicleInformation(personId, Id.create(event.getPersonId(), Vehicle.class)));
     }
 
+	private String getVehicleInformation(Id<Person> personId, Id<Vehicle> vehicleId) {
+	    String vehicleInformation;
+	
+	    if (!this.emissionVehicles.getVehicles().containsKey(vehicleId)) {
+	        throw new RuntimeException("No vehicle defined for person " + personId + ". " +
+	                "Please make sure that requirements for emission vehicles in " +
+	                VspExperimentalConfigGroup.GROUP_NAME + " config group are met. Aborting...");
+	    }
+	
+	    Vehicle vehicle = this.emissionVehicles.getVehicles().get(vehicleId);
+	    VehicleType vehicleType = vehicle.getType();
+	    vehicleInformation = vehicleType.getId().toString();
+	    return vehicleInformation;
+	}
 }

@@ -56,10 +56,10 @@ import java.util.Map;
  * 
  * Remarks:
  * <ul>
- * <li>HBEFA 3.1 does not provide further distance categories for cold start emission factors; <br>
- * <li>HBEFA 3.1 does not provide cold start emission factors for Heavy Goods Vehicles; <br>
- * <li>The major part of cold start emissions is known to be emitted during the first few kilometers;
- * here it is assumed to be emitted on the first link of the leg.
+ * <li>HBEFA 3.1 does not provide further distance categories for cold start emission factors when average amient temperature is assumed <br>
+ * <li>HBEFA 3.1 does not provide cold start emission factors for Heavy Goods Vehicles; thus, HGV are assumed to produce the same cold start emission factors as passenger cars <br>
+ * <li>In the current implementation, vehicles emit one part of their cold start emissions when the engine is started (distance class 0 - 1 km);
+ * after reaching 1 km, the rest of their cold start emissions is emitted (difference between distance class 1 - 2 km and distance class 0 - 1 km)
  * </ul>
  * 
  * 
@@ -126,11 +126,6 @@ public class ColdEmissionAnalysisModule {
 					"Please make sure that requirements for emission vehicles in " + 
 					VspExperimentalConfigGroup.GROUP_NAME + " config group are met. Aborting...");
 		}
-
-        ;
-
-
-
         coldEmissions = getColdPollutantDoubleMap(personId, parkingDuration, vehicleInformationTuple, distance_km);
 
 		// a basic apporach to introduce emission reduced cars:
@@ -159,7 +154,6 @@ public class ColdEmissionAnalysisModule {
 
         if(vehicleInformationTuple.getFirst().equals(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE)){
             key.setHbefaVehicleCategory(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE);
-
             key.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
             if(vehInfoWarnHDVCnt < maxWarnCnt) {
                 vehInfoWarnHDVCnt++;
