@@ -228,7 +228,7 @@ class MultiRateRunResource {
         controler2.run();
     }
 
-    private Counts filterCounts(Counts allCounts) {
+    static Counts filterCounts(Counts allCounts) {
         Counts someCounts = new Counts();
         for (Map.Entry<Id<Link>, Count> entry: allCounts.getCounts().entrySet()) {
             if (Math.random() < 0.05) {

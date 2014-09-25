@@ -19,20 +19,16 @@
  * *********************************************************************** */
 package playground.benjamin.scenarios.munich.analysis.nectar;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import junit.framework.Assert;
-
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
-import org.matsim.contrib.emissions.events.WarmEmissionEventImpl;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
-import playground.benjamin.scenarios.munich.analysis.nectar.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TestEmissionsPerLinkWarmEventHandler {
 
@@ -165,7 +161,7 @@ public class TestEmissionsPerLinkWarmEventHandler {
 		Id linkId2 = new IdImpl("link 2");
 
 		// event 5 has no map of emissions - should be handled like 0.0
-		event5 = new WarmEmissionEventImpl(timeOfEvent5, linkId2, vehicleId, null);
+		event5 = new WarmEmissionEvent(timeOfEvent5, linkId2, vehicleId, null);
 		handler.handleEvent(event5);
 		// check event 5
 		for (WarmPollutant wp: WarmPollutant.values()){
@@ -230,7 +226,7 @@ public class TestEmissionsPerLinkWarmEventHandler {
 		return intervalEnd;
 	}
 
-	private WarmEmissionEventImpl setUpEvent(double timeOfEvent1, Id linkId, Id vehicleId, Map<WarmPollutant, Double> warmEmissions) {
+	private WarmEmissionEvent setUpEvent(double timeOfEvent1, Id linkId, Id vehicleId, Map<WarmPollutant, Double> warmEmissions) {
 		//warmEmissions = new HashMap<WarmPollutant, Double>();
 		warmEmissions.put(WarmPollutant.CO, new Double(coValue));
 		warmEmissions.put(WarmPollutant.CO2_TOTAL, new Double(c2Value));
@@ -242,7 +238,7 @@ public class TestEmissionsPerLinkWarmEventHandler {
 		warmEmissions.put(WarmPollutant.PM, new Double(pmValue));
 		warmEmissions.put(WarmPollutant.SO2, new Double(soValue));
 		
-		return new WarmEmissionEventImpl(timeOfEvent1, linkId, vehicleId, warmEmissions);
+		return new WarmEmissionEvent(timeOfEvent1, linkId, vehicleId, warmEmissions);
 		
 	}
 

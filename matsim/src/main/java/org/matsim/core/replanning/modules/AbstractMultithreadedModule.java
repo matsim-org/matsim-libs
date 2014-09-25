@@ -20,11 +20,6 @@
 
 package org.matsim.core.replanning.modules;
 
-import java.lang.Thread.UncaughtExceptionHandler;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
@@ -32,6 +27,11 @@ import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.population.algorithms.PlanAlgorithm;
+
+import java.lang.Thread.UncaughtExceptionHandler;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * An abstract strategy module for running multiple plan algorithms in parallel.
@@ -166,7 +166,7 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 		this.afterFinishReplanningHook();
 	}
 
-	private final void initThreads() {
+	private void initThreads() {
 		if (this.threads != null) {
 			throw new RuntimeException("threads are already initialized");
 		}
@@ -214,7 +214,7 @@ abstract public class AbstractMultithreadedModule implements PlanStrategyModule 
 	private final static class PlanAlgoThread implements Runnable {
 
 		private final PlanAlgorithm planAlgo;
-		private final List<Plan> plans = new LinkedList<Plan>();
+		private final List<Plan> plans = new LinkedList<>();
 		private final Counter counter;
 
 		public PlanAlgoThread(final PlanAlgorithm algo, final Counter counter) {

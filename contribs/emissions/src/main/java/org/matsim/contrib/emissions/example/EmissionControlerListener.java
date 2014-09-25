@@ -40,11 +40,11 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 public class EmissionControlerListener implements StartupListener, IterationStartsListener, ShutdownListener {
 	private static final Logger logger = Logger.getLogger(EmissionControlerListener.class);
 	
-	Controler controler;
-	String emissionEventOutputFile;
-	Integer lastIteration;
-	EmissionModule emissionModule;
-	EventWriterXML emissionEventWriter;
+	private Controler controler;
+	private String emissionEventOutputFile;
+	private Integer lastIteration;
+	private EmissionModule emissionModule;
+	private EventWriterXML emissionEventWriter;
 
 	public EmissionControlerListener() {
 		

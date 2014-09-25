@@ -19,16 +19,14 @@
 
 package org.matsim.contrib.emissions.utils;
 
-import java.util.Map;
-
 import org.matsim.core.config.experimental.ReflectiveModule;
-import org.matsim.core.config.experimental.ReflectiveModule.StringGetter;
-import org.matsim.core.config.experimental.ReflectiveModule.StringSetter;
+
+import java.util.Map;
 
 public class EmissionsConfigGroup
     extends ReflectiveModule
 {
-    public static final String GROUP_NAME = "emissions";
+    private static final String GROUP_NAME = "emissions";
 
     private static final String EMISSION_ROADTYPE_MAPPING_FILE = "emissionRoadTypeMappingFile";
     private String emissionRoadTypeMappingFile = null;

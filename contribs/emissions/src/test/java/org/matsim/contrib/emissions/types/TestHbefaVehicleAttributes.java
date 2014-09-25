@@ -22,7 +22,6 @@ package org.matsim.contrib.emissions.types;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.matsim.contrib.emissions.types.HbefaVehicleAttributes;
 
 
 /*
@@ -33,9 +32,13 @@ import org.matsim.contrib.emissions.types.HbefaVehicleAttributes;
  */
 
 public class TestHbefaVehicleAttributes {
-	String technology = "technology", sizeClass = "size class", concept = "concept";
-	String message, assertErrorMessage; 
-	HbefaVehicleAttributes normal, differentValues;
+	private final String technology = "technology";
+    private final String sizeClass = "size class";
+    private final String concept = "concept";
+	private String message;
+    private String assertErrorMessage;
+	private HbefaVehicleAttributes normal;
+    private HbefaVehicleAttributes differentValues;
 	
 	@Test
 	public final void testEqualsForCompleteAttributes(){
@@ -184,41 +187,13 @@ public class TestHbefaVehicleAttributes {
 		Assert.assertTrue(message, normal.equals(noSize));
 		
 }
-	
-	@Test
-	public final void testEqualsForIncompleteAttributes_wrongType(){
-		
-		//generate a complete key and set its parameters
-		normal = new HbefaVehicleAttributes();
-		setToNormal(normal);
-		
-		//diffent data types
-		message = "if a HbefaVehicleAttribute is compared to a different object, 'false' shouls be returned";
-		Assert.assertFalse(message, normal.equals(null));
-		Assert.assertFalse(message, normal.equals("a string"));
-		Assert.assertFalse(message, normal.equals(1));
-	}
 
 	private void setToNormal(HbefaVehicleAttributes normal) {
 		normal.setHbefaEmConcept(concept);
 		normal.setHbefaSizeClass(sizeClass);
 		normal.setHbefaTechnology(technology);
 	}
-	
-	public final void testInit(){
-		
-		// missing attributes should be initilized with 'average' by default
-		HbefaVehicleAttributes emptyAttributes = new HbefaVehicleAttributes();
-		HbefaVehicleAttributes average = new  HbefaVehicleAttributes();
-		average.setHbefaEmConcept("average");
-		average.setHbefaSizeClass("average");
-		average.setHbefaTechnology("average");
-		message = "The empty and the average initialization of an HbefaVehicleAttributes should be the same: ";
-		message += emptyAttributes.toString() + " and " + average.toString();
-		Assert.assertTrue(message, emptyAttributes.equals(average));
-		Assert.assertTrue(message, average.equals(emptyAttributes));
-	}
-	
+
 }
 	
 

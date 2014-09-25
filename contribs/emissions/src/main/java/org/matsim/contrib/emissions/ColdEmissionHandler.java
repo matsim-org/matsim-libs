@@ -21,20 +21,18 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions;
 
-import java.util.Map;
-import java.util.TreeMap;
-
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.ColdEmissionAnalysisModule.ColdEmissionAnalysisModuleParameter;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
@@ -43,6 +41,9 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 
 /**
  * @author benjamin
@@ -50,20 +51,19 @@ import org.matsim.vehicles.Vehicles;
  */
 public class ColdEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, 
 PersonArrivalEventHandler, PersonDepartureEventHandler{
-	private static final Logger logger = Logger.getLogger(ColdEmissionHandler.class);
 
-	Vehicles emissionVehicles;
-	Network network;
-	ColdEmissionAnalysisModule coldEmissionAnalysisModule;
+    private final Vehicles emissionVehicles;
+	private final Network network;
+	private final ColdEmissionAnalysisModule coldEmissionAnalysisModule;
 
-	Map<Id, Double> linkenter = new TreeMap<Id, Double>();
-	Map<Id, Double> linkleave = new TreeMap<Id, Double>();
-	Map<Id, Double> startEngine = new TreeMap<Id, Double>();
-	Map<Id, Double> stopEngine = new TreeMap<Id, Double>();
+	private final Map<Id, Double> linkenter = new TreeMap<>();
+	private final Map<Id, Double> linkleave = new TreeMap<>();
+	private final Map<Id, Double> startEngine = new TreeMap<>();
+	private final Map<Id, Double> stopEngine = new TreeMap<>();
 
-	Map<Id, Double> accumulatedDistance = new TreeMap<Id, Double>();
-	Map<Id, Double> parkingDuration = new TreeMap<Id, Double>();
-	Map<Id, Id> personId2coldEmissionEventLinkId = new TreeMap<Id, Id>();
+	private final Map<Id, Double> accumulatedDistance = new TreeMap<>();
+	private final Map<Id, Double> parkingDuration = new TreeMap<>();
+	private final Map<Id<Person>, Id<Link>> personId2coldEmissionEventLinkId = new TreeMap<>();
 
 
 	public ColdEmissionHandler(
@@ -119,13 +119,13 @@ PersonArrivalEventHandler, PersonDepartureEventHandler{
 		if(!event.getLegMode().equals("car")){ // no emissions to calculate...
 			return;
 		}
-		Id personId= event.getPersonId();
+		Id<Person> personId= event.getPersonId();
 		Double stopEngineTime = event.getTime();
 		this.stopEngine.put(personId, stopEngineTime);
 
 		double startEngineTime = this.startEngine.get(personId);
 		double parkingDuration = this.parkingDuration.get(personId);
-		Id coldEmissionEventLinkId = this.personId2coldEmissionEventLinkId.get(personId);
+		Id<Link> coldEmissionEventLinkId = this.personId2coldEmissionEventLinkId.get(personId);
 
 		Double accumulatedDistance;
 		if(this.accumulatedDistance.containsKey(personId)){
@@ -135,8 +135,8 @@ PersonArrivalEventHandler, PersonDepartureEventHandler{
 			this.accumulatedDistance.put(personId, 0.0);
 		}
 
-		Id vehicleId = personId;
-		String vehicleInformation = null;
+		Id<Vehicle> vehicleId = Id.create(personId, Vehicle.class);
+		String vehicleInformation;
 
 		if(!this.emissionVehicles.getVehicles().containsKey(vehicleId)){
 			throw new RuntimeException("No vehicle defined for person " + personId + ". " +
@@ -162,8 +162,8 @@ PersonArrivalEventHandler, PersonDepartureEventHandler{
 		if(!event.getLegMode().equals("car")){ // no engine to start...
 			return;
 		}
-		Id linkId = event.getLinkId();
-		Id personId= event.getPersonId();
+		Id<Link> linkId = event.getLinkId();
+		Id<Person> personId= event.getPersonId();
 		double startEngineTime = event.getTime();
 		this.startEngine.put(personId, startEngineTime);
 		this.personId2coldEmissionEventLinkId.put(personId, linkId);
@@ -178,8 +178,5 @@ PersonArrivalEventHandler, PersonDepartureEventHandler{
 		}
 		this.parkingDuration.put(personId, parkingDuration);
 	}
-	
-	public ColdEmissionAnalysisModule getColdEmissionAnalysisModule(){
-		return coldEmissionAnalysisModule;
-	}
+
 }

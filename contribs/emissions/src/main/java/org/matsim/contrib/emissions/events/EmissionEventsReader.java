@@ -19,10 +19,6 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions.events;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Stack;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -34,6 +30,10 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Stack;
 
 
 /**
@@ -81,10 +81,10 @@ public class EmissionEventsReader extends MatsimXmlParser{
 		Double time = 0.0;
 		Id<Link> linkId = null;
 		Id<Vehicle> vehicleId = null;
-		Map<WarmPollutant, Double> warmEmissions = new HashMap<WarmPollutant, Double>();
-		Map<ColdPollutant, Double> coldEmissions = new HashMap<ColdPollutant, Double>();
+		Map<WarmPollutant, Double> warmEmissions = new HashMap<>();
+		Map<ColdPollutant, Double> coldEmissions = new HashMap<>();
 
-		if(WarmEmissionEventImpl.EVENT_TYPE.equals(eventType)){
+		if(WarmEmissionEvent.EVENT_TYPE.equals(eventType)){
 			for (int i = 0; i < attributes.getLength(); i++){
 				if (attributes.getQName(i).equals("time")){
 					time = Double.parseDouble(attributes.getValue(i));
@@ -92,10 +92,10 @@ public class EmissionEventsReader extends MatsimXmlParser{
 				else if(attributes.getQName(i).equals("type")){
 					eventType = attributes.getValue(i);
 				}
-				else if(attributes.getQName(i).equals(WarmEmissionEventImpl.ATTRIBUTE_LINK_ID)){
+				else if(attributes.getQName(i).equals(WarmEmissionEvent.ATTRIBUTE_LINK_ID)){
 					linkId = Id.create((attributes.getValue(i)), Link.class);
 				}
-				else if(attributes.getQName(i).equals(WarmEmissionEventImpl.ATTRIBUTE_VEHICLE_ID)){
+				else if(attributes.getQName(i).equals(WarmEmissionEvent.ATTRIBUTE_VEHICLE_ID)){
 					vehicleId = Id.create((attributes.getValue(i)), Vehicle.class);
 				}
 				else {
@@ -104,14 +104,14 @@ public class EmissionEventsReader extends MatsimXmlParser{
 					warmEmissions.put(pollutant, value);
 				}
 			}
-			this.eventsManager.processEvent(new WarmEmissionEventImpl(
+			this.eventsManager.processEvent(new WarmEmissionEvent(
 					time,
 					linkId,
 					vehicleId,
 					warmEmissions
 			));
 		}
-		else if (ColdEmissionEventImpl.EVENT_TYPE.equals(eventType)){
+		else if (ColdEmissionEvent.EVENT_TYPE.equals(eventType)){
 			for (int i = 0; i < attributes.getLength(); i++){
 				if (attributes.getQName(i).equals("time")){
 					time = Double.parseDouble(attributes.getValue(i));
@@ -119,10 +119,10 @@ public class EmissionEventsReader extends MatsimXmlParser{
 				else if(attributes.getQName(i).equals("type")){
 					eventType = attributes.getValue(i);
 				}
-				else if(attributes.getQName(i).equals(ColdEmissionEventImpl.ATTRIBUTE_LINK_ID)){
+				else if(attributes.getQName(i).equals(ColdEmissionEvent.ATTRIBUTE_LINK_ID)){
 					linkId = Id.create((attributes.getValue(i)), Link.class);
 				}
-				else if(attributes.getQName(i).equals(ColdEmissionEventImpl.ATTRIBUTE_VEHICLE_ID)){
+				else if(attributes.getQName(i).equals(ColdEmissionEvent.ATTRIBUTE_VEHICLE_ID)){
 					vehicleId = Id.create((attributes.getValue(i)), Vehicle.class);
 				}
 				else {
@@ -131,7 +131,7 @@ public class EmissionEventsReader extends MatsimXmlParser{
 					coldEmissions.put(pollutant, value);
 				}
 			}
-			this.eventsManager.processEvent(new ColdEmissionEventImpl(
+			this.eventsManager.processEvent(new ColdEmissionEvent(
 					time,
 					linkId,
 					vehicleId,

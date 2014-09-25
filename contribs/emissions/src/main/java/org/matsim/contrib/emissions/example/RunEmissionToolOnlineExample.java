@@ -37,11 +37,10 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 
 public class RunEmissionToolOnlineExample {
-	
-	private static String configFile = "./test/input/org/matsim/contrib/emissions/config.xml";
-	
+
+	private static final String configFile = "./test/input/org/matsim/contrib/emissions/config.xml";
+
 	public static void main(String[] args) {
-		
 		Config config ;
 		if ( args.length==0 ) {
 			config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup());
@@ -50,10 +49,8 @@ public class RunEmissionToolOnlineExample {
 		}
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
-		
-	// controler settings	
-		controler.setOverwriteFiles(true);
 		controler.addControlerListener(new EmissionControlerListener());
 		controler.run();
 	}
+
 }

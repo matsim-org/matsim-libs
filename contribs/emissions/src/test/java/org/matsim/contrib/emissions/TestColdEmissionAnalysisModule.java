@@ -20,25 +20,17 @@
 
 package org.matsim.contrib.emissions;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.ColdEmissionAnalysisModule.ColdEmissionAnalysisModuleParameter;
-import org.matsim.contrib.emissions.types.ColdPollutant;
-import org.matsim.contrib.emissions.types.HbefaColdEmissionFactor;
-import org.matsim.contrib.emissions.types.HbefaColdEmissionFactorKey;
-import org.matsim.contrib.emissions.types.HbefaVehicleAttributes;
-import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
+import org.matsim.contrib.emissions.types.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.util.*;
 
 
 /**
@@ -64,34 +56,41 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class TestColdEmissionAnalysisModule {
 
-	Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable;
-	Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable;
-	EventsManager emissionEventManager;
-	ColdEmissionAnalysisModule ceam;
+    private ColdEmissionAnalysisModule ceam;
 	
-	String passengercar= "PASSENGER_CAR", heavygoodsvehicle="HEAVY_GOODS_VEHICLE"; 
-	Double startTime = 0.0, parkingDuration =1., accDistance = 1.;
+	private final String passengercar= "PASSENGER_CAR";
+    private final Double startTime = 0.0;
+    private final Double parkingDuration =1.;
+    private final Double accDistance = 1.;
 	// same values as int for table
-	int tableParkingDuration= (int) Math.round(parkingDuration), tableAccDistance = (int) Math.round(accDistance);
-	int numberOfColdEmissions = ColdPollutant.values().length;
+    private final int tableParkingDuration= (int) Math.round(parkingDuration);
+    private final int tableAccDistance = (int) Math.round(accDistance);
+	private final int numberOfColdEmissions = ColdPollutant.values().length;
 	
 	// strings for test cases
 	// first case: complete data - corresponding entry in average table
-	String pcpetrol ="PC petrol", petrol= "petrol", none="none";
+    private final String pcpetrol ="PC petrol";
+    private final String petrol= "petrol";
+    private final String none="none";
 	// second case: complete data - corresponding entry in detailed table
-	String pcpetrol14 = "PC petrol <1,4L <ECE", petrol4S = "petrol (4S)",leq14l = "<1,4L";
+    private final String pcpetrol14 = "PC petrol <1,4L <ECE";
+    private final String petrol4S = "petrol (4S)";
+    private final String leq14l = "<1,4L";
 	// third case: complete data corresponding entries in average and detailed table - use detailed
-	String pcdiesel = "PC diesel", diesel = "diesel", geq2l = ">=2L";
+    private final String pcdiesel = "PC diesel";
+    private final String diesel = "diesel";
+    private final String geq2l = ">=2L";
 	// fifth case: cold emission factor not set
-	String nullcase = "nullCase", vehicleInfoForNoCase = "PASSENGER_CAR;PC diesel;;>=2L";
-	String vehicleInfoForAvgCase = "PASSENGER_CAR;PC petrol;petrol;none";
-	
-	// emission factors for tables - no dublicates!
-	Double detailedAverageFactor = 100., dieselFactor = 10., heavygoodsFactor= -1.; 
-	Double averageAverageFactor = .1, petrolFactor = .01, averageDieselFactor = .001; 
-	
-	Double rescaleFactor = -.001;
-	boolean excep =false;
+    private final String nullcase = "nullCase";
+
+    // emission factors for tables - no dublicates!
+    private final Double detailedAverageFactor = 100.;
+    private final Double dieselFactor = 10.;
+    private final Double heavygoodsFactor= -1.;
+	private final Double averageAverageFactor = .1;
+    private final Double petrolFactor = .01;
+
+    private boolean excep =false;
 	
 	@Test 
 	public void calculateColdEmissionsAndThrowEventTest_completeData() {
@@ -103,11 +102,11 @@ public class TestColdEmissionAnalysisModule {
 		
 		setUp();
 		
-		List<ArrayList> testCases = new ArrayList<ArrayList>();		
+		List<ArrayList> testCases = new ArrayList<>();
 
-		ArrayList<Object> testCase1= new ArrayList<Object>(), testCase2= new ArrayList<Object>();
-		ArrayList<Object> testCase3= new ArrayList<Object>(), testCase4= new ArrayList<Object>();
-		ArrayList<Object> testCase5= new ArrayList<Object>(), testCase6= new ArrayList<Object>();
+		ArrayList<Object> testCase1= new ArrayList<>(), testCase2= new ArrayList<>();
+		ArrayList<Object> testCase3= new ArrayList<>(), testCase4= new ArrayList<>();
+		ArrayList<Object> testCase5= new ArrayList<>(), testCase6= new ArrayList<>();
 		
 		// first case: complete data
 		// corresponding entry in average table
@@ -127,7 +126,8 @@ public class TestColdEmissionAnalysisModule {
 		Collections.addAll(testCase5, passengercar, pcpetrol, petrol, nullcase, .0);		
 		// sixth case: heavy goods vehicle 
 		// -> throw warning -> use detailed or average table for passenger cars
-		Collections.addAll(testCase6, heavygoodsvehicle, pcpetrol, petrol, none, petrolFactor);
+        String heavygoodsvehicle = "HEAVY_GOODS_VEHICLE";
+        Collections.addAll(testCase6, heavygoodsvehicle, pcpetrol, petrol, none, petrolFactor);
 		
 		testCases.add(testCase1);testCases.add(testCase2);testCases.add(testCase3);
 		testCases.add(testCase4);testCases.add(testCase5);testCases.add(testCase6);
@@ -136,7 +136,7 @@ public class TestColdEmissionAnalysisModule {
 			HandlerToTestEmissionAnalysisModules.reset();
 			Id<Link> linkId = Id.create("linkId"+testCases.indexOf(tc), Link.class);
 			Id<Person> personId = Id.create("personId"+testCases.indexOf(tc), Person.class);
-			String vehicleInfo = (String) tc.get(0)+";"+(String) tc.get(1)+";"+(String) tc.get(2)+";"+(String) tc.get(3);
+			String vehicleInfo = tc.get(0) +";"+ tc.get(1) +";"+ tc.get(2) +";"+ tc.get(3);
 			ceam.calculateColdEmissionsAndThrowEvent(linkId, personId, startTime, parkingDuration, accDistance, vehicleInfo);
 			String message = "The expected emissions for " + tc.toString() + " are " + 
 						numberOfColdEmissions*(Double)tc.get(4) + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
@@ -154,11 +154,12 @@ public class TestColdEmissionAnalysisModule {
 		 */
 		
 		setUp();
-		List<String> testCasesExceptions = new ArrayList<String>();		
+		List<String> testCasesExceptions = new ArrayList<>();
 		excep  = false;
 		
 		// seventh case: no corresponding entry either in the detailed nor the average table
-		testCasesExceptions.add(vehicleInfoForNoCase);
+        String vehicleInfoForNoCase = "PASSENGER_CAR;PC diesel;;>=2L";
+        testCasesExceptions.add(vehicleInfoForNoCase);
 		// eighth case: vehicle category not specified
 		testCasesExceptions.add(";;;");
 		// ninth case: empty string
@@ -206,33 +207,35 @@ public class TestColdEmissionAnalysisModule {
 	public void rescaleColdEmissionsTest() {
 		
 		// can not use the setUp method here because the efficiency factor is not null
-		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable = new HashMap<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor>();
-		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable = new HashMap<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor>();
+		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable = new HashMap<>();
+		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable = new HashMap<>();
 		fillAverageTable(avgHbefaColdTable);
 		fillDetailedTable(detailedHbefaColdTable);
 
 		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
-		ColdEmissionAnalysisModule ceam = new ColdEmissionAnalysisModule(new ColdEmissionAnalysisModuleParameter(avgHbefaColdTable, detailedHbefaColdTable), emissionEventManager, rescaleFactor);
+        Double rescaleFactor = -.001;
+        ColdEmissionAnalysisModule ceam = new ColdEmissionAnalysisModule(new ColdEmissionAnalysisModuleParameter(avgHbefaColdTable, detailedHbefaColdTable), emissionEventManager, rescaleFactor);
 		HandlerToTestEmissionAnalysisModules.reset();
 		
 		Id<Link> idForAvgTable = Id.create("link id avg", Link.class);
 		Id<Person> personIdForAvgTable = Id.create("person avg", Person.class);
-		ceam.calculateColdEmissionsAndThrowEvent(idForAvgTable, personIdForAvgTable, startTime, parkingDuration, accDistance, vehicleInfoForAvgCase);
+        String vehicleInfoForAvgCase = "PASSENGER_CAR;PC petrol;petrol;none";
+        ceam.calculateColdEmissionsAndThrowEvent(idForAvgTable, personIdForAvgTable, startTime, parkingDuration, accDistance, vehicleInfoForAvgCase);
 		String message = "The expected rescaled emissions for this event are (calculated emissions * rescalefactor) = " 
 				+ (numberOfColdEmissions*petrolFactor) + " * " + rescaleFactor + " = " +
-				(numberOfColdEmissions*petrolFactor*rescaleFactor) + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
-		Assert.assertEquals(message, rescaleFactor*numberOfColdEmissions*petrolFactor, HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON);
+				(numberOfColdEmissions*petrolFactor* rescaleFactor) + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
+		Assert.assertEquals(message, rescaleFactor *numberOfColdEmissions*petrolFactor, HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON);
 		
 	}
 	
 	private void setUp() {
-		avgHbefaColdTable = new HashMap<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor>();	
-		detailedHbefaColdTable = new HashMap<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor>();
+        Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable = new HashMap<>();
+        Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable = new HashMap<>();
 		
 		fillAverageTable(avgHbefaColdTable);
 		fillDetailedTable(detailedHbefaColdTable);
 
-		emissionEventManager = new HandlerToTestEmissionAnalysisModules();
+        EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
 		ceam = new ColdEmissionAnalysisModule(new ColdEmissionAnalysisModuleParameter(avgHbefaColdTable, detailedHbefaColdTable), emissionEventManager, null);
 		
 	}
@@ -368,7 +371,8 @@ for (ColdPollutant cp: ColdPollutant.values()) {
 		vehAtt.setHbefaEmConcept(geq2l);
 		
 		avColdFactor = new HbefaColdEmissionFactor();
-		avColdFactor.setColdEmissionFactor(averageDieselFactor); 
+        Double averageDieselFactor = .001;
+        avColdFactor.setColdEmissionFactor(averageDieselFactor);
 		
 		for (ColdPollutant cp: ColdPollutant.values()) {
 			HbefaColdEmissionFactorKey avColdKey = new HbefaColdEmissionFactorKey();

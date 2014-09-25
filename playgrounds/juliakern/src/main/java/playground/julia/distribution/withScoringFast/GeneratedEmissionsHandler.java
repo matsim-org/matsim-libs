@@ -20,10 +20,6 @@
 
 package playground.julia.distribution.withScoringFast;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.events.ColdEmissionEvent;
@@ -32,8 +28,11 @@ import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
 import org.matsim.contrib.emissions.types.ColdPollutant;
 import org.matsim.contrib.emissions.types.WarmPollutant;
-
 import playground.julia.distribution.EmPerCell;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 
@@ -112,7 +111,7 @@ public class GeneratedEmissionsHandler implements WarmEmissionEventHandler, Cold
 	}
 
 	@Override
-	public void handleEvent(WarmEmissionEvent event) {		
+	public void handleEvent(WarmEmissionEvent event) {
 		// event information 
 		Id linkId = event.getLinkId();
 		Integer xBin = link2xbins.get(linkId);

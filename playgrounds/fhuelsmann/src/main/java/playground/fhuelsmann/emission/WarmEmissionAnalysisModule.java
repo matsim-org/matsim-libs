@@ -23,24 +23,19 @@
 
 package playground.fhuelsmann.emission;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.Map.Entry;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.contrib.emissions.events.WarmEmissionEventImpl;
+import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
+import playground.fhuelsmann.emission.objects.*;
 
-import playground.fhuelsmann.emission.objects.HbefaWarmEmissionFactors;
-import playground.fhuelsmann.emission.objects.HbefaWarmEmissionFactorsDetailed;
-import playground.fhuelsmann.emission.objects.HbefaWarmEmissionTableCreator;
-import playground.fhuelsmann.emission.objects.HbefaWarmEmissionTableCreatorDetailed;
-import playground.fhuelsmann.emission.objects.VisumRoadTypes;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
 public class WarmEmissionAnalysisModule{
 	private static final Logger logger = Logger.getLogger(WarmEmissionAnalysisModule.class);
@@ -75,7 +70,7 @@ public class WarmEmissionAnalysisModule{
 			Double enterTime, Double travelTime, String ageFuelCcm) {
 
 		Map<WarmPollutant, Double> warmEmissions = calculateWarmEmissions(personId, roadType, linkLength, travelTime, ageFuelCcm);
-		Event warmEmissionEvent = new WarmEmissionEventImpl(enterTime, linkId, personId, warmEmissions);
+		Event warmEmissionEvent = new WarmEmissionEvent(enterTime, linkId, personId, warmEmissions);
 		this.eventsManager.processEvent(warmEmissionEvent);
 	}
 

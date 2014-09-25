@@ -20,13 +20,6 @@
 
 package org.matsim.contrib.emissions.utils;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -44,6 +37,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
+
+import java.util.*;
 
 
 /*
@@ -63,16 +58,21 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class TestEmissionUtils {
 	
-	String co="CO", c2="CO2_TOTAL", fc = "FC", hc= "HC",
-			nm ="NMHC", n2="NO2", nx="NOX", pm="PM", so="SO2";
-	String message;
-	int numOfPolls;
-	boolean nullpointer;
-	EmissionUtils eu;
+	private final String co="CO";
+    private final String c2="CO2_TOTAL";
+    private final String fc = "FC";
+    private final String hc= "HC";
+    private final String nm ="NMHC";
+    private final String n2="NO2";
+    private final String nx="NOX";
+    private final String pm="PM";
+    private final String so="SO2";
+	private String message;
+    private EmissionUtils eu;
 	
-	Map<Id<Person>, SortedMap<String, Double>> totalEmissions;
-	Config config; 	Scenario sc; Population pop;
-	PopulationFactory populationFactory;
+	private Map<Id<Person>, SortedMap<String, Double>> totalEmissions;
+    private Population pop;
+	private PopulationFactory populationFactory;
 	private SortedSet<String> pollsFromEU;
 	private boolean nullPointerEx;
 	
@@ -103,7 +103,7 @@ public class TestEmissionUtils {
 		// the enums WarmPollutant and ColdPollutant
 		eu = new EmissionUtils();
 		SortedSet<String> pollsFromEU = eu.getListOfPollutants();
-		SortedSet<String> pollsFromEnum = new TreeSet<String>();
+		SortedSet<String> pollsFromEnum = new TreeSet<>();
 		
 		for(WarmPollutant wp: WarmPollutant.values()){
 			pollsFromEnum.add(wp.toString());
@@ -128,8 +128,8 @@ public class TestEmissionUtils {
 		// missing data is not tested here
 		eu = new EmissionUtils();
 		
-		Map<WarmPollutant, Double> warmEmissions = new HashMap<WarmPollutant, Double>();
-		Map<ColdPollutant, Double> coldEmissions = new HashMap<ColdPollutant, Double>();	
+		Map<WarmPollutant, Double> warmEmissions = new HashMap<>();
+		Map<ColdPollutant, Double> coldEmissions = new HashMap<>();
 		
 		//cold pollutants: CO, FC, HC, NMHC, NO2, NOX, PM
 		//warm pollutants: CO, CO2_TOTAL, FC, HC, NMHC, NO2, NOX, PM, SO2
@@ -185,10 +185,10 @@ public class TestEmissionUtils {
 		Map<Id<Person>, Map<ColdPollutant, Double>> coldEmissions = new HashMap<>();
 		
 		//warm list for person1, warm list for person2, cold list for person1, cold list for person2
-		Map<WarmPollutant, Double> mapWarm1 = new HashMap<WarmPollutant, Double>();
-		Map<WarmPollutant, Double> mapWarm2 = new HashMap<WarmPollutant, Double>();
-		Map<ColdPollutant, Double> mapCold1 = new HashMap<ColdPollutant, Double>();
-		Map<ColdPollutant, Double> mapCold2 = new HashMap<ColdPollutant, Double>();
+		Map<WarmPollutant, Double> mapWarm1 = new HashMap<>();
+		Map<WarmPollutant, Double> mapWarm2 = new HashMap<>();
+		Map<ColdPollutant, Double> mapCold1 = new HashMap<>();
+		Map<ColdPollutant, Double> mapCold2 = new HashMap<>();
 		
 		//what about negativ numbers? ok
 		mapWarm1.put(WarmPollutant.CO, .0002);
@@ -319,7 +319,7 @@ public class TestEmissionUtils {
 		//test an empty list as input
 		eu = new EmissionUtils();
 		
-		SortedMap<String, Double> totalEmissions = new TreeMap<String, Double>();
+		SortedMap<String, Double> totalEmissions = new TreeMap<>();
 		Map<Id<Person>, SortedMap<String, Double>> persons2emissions = new HashMap<>();
 		
 		//test empty list as input		
@@ -333,15 +333,15 @@ public class TestEmissionUtils {
 		eu = new EmissionUtils();
 		SortedSet<String> pollsFromEU = eu.getListOfPollutants();
 		
-		SortedMap<String, Double> totalEmissions = new TreeMap<String, Double>();
-		Map<Id<Person>, SortedMap<String, Double>> persons2emissions = new HashMap<Id<Person>, SortedMap<String, Double>>();
+		SortedMap<String, Double> totalEmissions = new TreeMap<>();
+		Map<Id<Person>, SortedMap<String, Double>> persons2emissions = new HashMap<>();
 		
 		//put some content into the list
 		// no incorrect/incomplete input data here
 		// warm and cold emissions are already sumed up -> sumUpEmissionsPerId is tested seperatly
 		
 		//person1
-		SortedMap<String, Double> allEmissionsP1 = new TreeMap<String, Double>();
+		SortedMap<String, Double> allEmissionsP1 = new TreeMap<>();
 		Double p1co = .9, p1c2 = 3.2, p1fc=9.3, p1hc= 1.0, p1nm=-68., p1n2= .87, p1nx= 5., p1pm = 3.22, p1so=79.8;
 		Id<Person> p1Id = Id.create("p1", Person.class);
 		allEmissionsP1.put(co, p1co);
@@ -355,7 +355,7 @@ public class TestEmissionUtils {
 		allEmissionsP1.put(so, p1so);
 		
 		//person2
-		SortedMap<String, Double> allEmissionsp2 = new TreeMap<String, Double>();
+		SortedMap<String, Double> allEmissionsp2 = new TreeMap<>();
 		Double p2co = .65, p2c2= -7., p2fc=-.3149, p2hc=54., p2nm=7.9, p2n2=.34, p2nx=-.8, p2pm=4., p2so=-750.;
 		Id<Person> p2Id = Id.create("p2", Person.class);
 		allEmissionsp2.put(co, p2co);
@@ -369,7 +369,7 @@ public class TestEmissionUtils {
 		allEmissionsp2.put(so, p2so);
 		
 		//person3
-		SortedMap<String, Double> allEmissionsp3 = new TreeMap<String, Double>();
+		SortedMap<String, Double> allEmissionsp3 = new TreeMap<>();
 		Double p3co=-970., p3c2=-.000012, p3fc=57.21, p3hc=80.8, p3nm=9.52, p3n2=.0074, p3nx=42., p3pm=.38, p3so=70.;
 		Id<Person> p3Id = Id.create("p3", Person.class);
 		allEmissionsp3.put(co, p3co);
@@ -427,7 +427,7 @@ public class TestEmissionUtils {
 		//person1
 		Double cov1=.0005, c2v1= .003, fcv1 = .01, hcv1=.2, nmv1=1., n2v1=30., nxv1=200., pmv1 =7000., sov1=70000.;
 		
-		SortedMap<String, Double> p1Emissions = new TreeMap<String, Double>();
+		SortedMap<String, Double> p1Emissions = new TreeMap<>();
 		//complete list of all pollutants - missing data is not tested here
 		p1Emissions.put(co, cov1);
 		p1Emissions.put(c2, c2v1);
@@ -447,7 +447,7 @@ public class TestEmissionUtils {
 		//person2
 		Double cov2=.0007, c2v2= .006, fcv2 = .04, hcv2=.5, nmv2=7., n2v2=60., nxv2=800., pmv2 =1000., sov2=90000.;
 		
-		SortedMap<String, Double> p2Emissions = new TreeMap<String, Double>();
+		SortedMap<String, Double> p2Emissions = new TreeMap<>();
 		//complete list of all pollutants - missing data is not tested here
 		p2Emissions.put(co, cov2);
 		p2Emissions.put(c2, c2v2);
@@ -544,7 +544,7 @@ public class TestEmissionUtils {
 						Assert.assertTrue(finalMap.get(idp3).containsKey(emission));
 					}
 					//nothing else in the list
-					numOfPolls = pollsFromEU.size();
+        int numOfPolls = pollsFromEU.size();
 					message = "the number of pullutants is " + finalMap.get(idp3).keySet().size()+ " but should be" + numOfPolls;
 					Assert.assertEquals(message, numOfPolls, finalMap.get(idp3).keySet().size());
 				
@@ -560,7 +560,7 @@ public class TestEmissionUtils {
 		//person 4 in totalEmissions but not in population
 					Double cov4=.0008, c2v4= .004, fcv4 = .07, hcv4=.9, nmv4=1., n2v4=50., nxv4=700., pmv4 =4000., sov4=30000.;
 					
-					SortedMap<String, Double> p4Emissions = new TreeMap<String, Double>();
+					SortedMap<String, Double> p4Emissions = new TreeMap<>();
 					//complete list of all pollutants - missing data is not tested here
 					p4Emissions.put(co, cov4);
 					p4Emissions.put(c2, c2v4);
@@ -589,8 +589,8 @@ public class TestEmissionUtils {
 		//intern method to set some parameters
 		eu = new EmissionUtils();
 		totalEmissions = new TreeMap<>();
-		config = ConfigUtils.createConfig();
-		sc = ScenarioUtils.createScenario(config);
+        Config config = ConfigUtils.createConfig();
+        Scenario sc = ScenarioUtils.createScenario(config);
 		pop = sc.getPopulation();
 		populationFactory = pop.getFactory();
 		pollsFromEU = eu.getListOfPollutants();
@@ -670,7 +670,7 @@ public class TestEmissionUtils {
 		setUpForNonCaculatedEmissions();
 
 		//person 7 in totalEmissions but not in population		
-		SortedMap<String, Double> p7Emissions = new TreeMap<String, Double>();
+		SortedMap<String, Double> p7Emissions = new TreeMap<>();
 		//complete list of all pollutants - missing data is not tested here
 		p7Emissions.put(co, .0);
 		p7Emissions.put(c2, .0);
@@ -716,14 +716,14 @@ public class TestEmissionUtils {
 		Config config = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(config);
 		Network network = sc.getNetwork();
-		addLinksToNetwork(network, sc);
+		addLinksToNetwork(sc);
 		pollsFromEU = eu.getListOfPollutants();
 		
 		Map<Id<Link>, SortedMap<String, Double>> totalEmissions = new HashMap<>();
 	
 		//complete link - link12
 		Id<Link> link12id = Id.create("link12", Link.class);
-		SortedMap<String, Double> emLink12 = new TreeMap<String, Double>();
+		SortedMap<String, Double> emLink12 = new TreeMap<>();
 		Double c2link12v=.0008, colink12v=.001, fclink12v=.05,
 				hclink12v=.8, nmlink12v=1., n2link12v=50.,
 				nxlink12v=600., pmlink12v=2000., solink12v=60000.;
@@ -734,7 +734,7 @@ public class TestEmissionUtils {
 		
 		//complete link - link13
 		Id<Link> link13id = Id.create("link13", Link.class);
-		SortedMap<String, Double> emLink13 = new TreeMap<String, Double>();
+		SortedMap<String, Double> emLink13 = new TreeMap<>();
 		Double c2link13v=.0003, colink13v=.008, fclink13v=.03,
 				hclink13v=.7, nmlink13v=6., n2link13v=40.,
 				nxlink13v=800., pmlink13v=1000., solink13v=90000.;
@@ -749,14 +749,14 @@ public class TestEmissionUtils {
 		
 		//partial map - link 23
 		Id<Link> link23id = Id.create("link23", Link.class);
-		SortedMap<String, Double> emLink23 = new TreeMap<String, Double>();
+		SortedMap<String, Double> emLink23 = new TreeMap<>();
 		Double nxlink23v=900., pmlink23v=6000., solink23v=20000.;
 		emLink23.put(nx, nxlink23v); emLink23.put(pm, pmlink23v); emLink23.put(so, solink23v);
 		totalEmissions.put(Id.create("link23", Link.class), emLink23 );
 		
 		//empty map - link 24
 		Id<Link> link24id = Id.create("link24", Link.class);
-		SortedMap<String, Double> emLink24 = new TreeMap<String, Double>();
+		SortedMap<String, Double> emLink24 = new TreeMap<>();
 		totalEmissions.put(Id.create("link24", Link.class), emLink24);
 		
 		//not put into totalEmissionsMap - link 34
@@ -829,7 +829,7 @@ public class TestEmissionUtils {
 		
 	}
 	
-	private void addLinksToNetwork(Network nw, Scenario sc) {
+	private void addLinksToNetwork(Scenario sc) {
 		//intern method to set up a network with nodes and links
 		NetworkImpl network = (NetworkImpl) sc.getNetwork();
 		Node node1 = network.createAndAddNode(Id.create("node1", Node.class), sc.createCoord(.0, .0));
@@ -850,7 +850,7 @@ public class TestEmissionUtils {
 		// test convertWarmPollutantMap2String for a complete map of warm emissions
 		eu = new EmissionUtils();
 		
-		Map<WarmPollutant, Double> warmEmissions = new HashMap<WarmPollutant, Double>();	
+		Map<WarmPollutant, Double> warmEmissions = new HashMap<>();
 		//warm pollutants: CO, CO2_TOTAL, FC, HC, NMHC, NO2, NOX, PM, SO2
 		//values for warm polls
 		Double cov=.0005, c2v= .003, fcv = .01, hcv=.2, nmv=1., n2v=30., nxv=200., pmv =7000., sov=70000.;
@@ -888,7 +888,7 @@ public class TestEmissionUtils {
 		// test convertWarmPollutantMap2String for a complete map of warm emissions
 		eu = new EmissionUtils();
 		
-		Map<ColdPollutant, Double> coldEmissions = new HashMap<ColdPollutant, Double>();	
+		Map<ColdPollutant, Double> coldEmissions = new HashMap<>();
 		//values for cold polls
 		Double cov=.0005, fcv = .01, hcv=.2, nmv=1., n2v=30., nxv=200., pmv =7000.;
 		

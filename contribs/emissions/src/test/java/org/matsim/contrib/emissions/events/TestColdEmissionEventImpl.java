@@ -21,9 +21,6 @@
 
 package org.matsim.contrib.emissions.events;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -31,6 +28,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.types.ColdPollutant;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 /*
@@ -41,17 +41,23 @@ import org.matsim.vehicles.Vehicle;
  */
 
 public class TestColdEmissionEventImpl {
-			Double co = 20., fc = 30., hc=4., nm=5., n2=6., nx=7., pm=8.;
-					Id<Vehicle> vehicleId = Id.create("veh 1", Vehicle.class);
-					Id<Link> linkId = Id.create("link 1", Link.class);
+			private final Double co = 20.;
+    private final Double fc = 30.;
+    private final Double hc=4.;
+    private final Double nm=5.;
+    private final Double n2=6.;
+    private final Double nx=7.;
+    private final Double pm=8.;
+					private final Id<Vehicle> vehicleId = Id.create("veh 1", Vehicle.class);
+					private final Id<Link> linkId = Id.create("link 1", Link.class);
 	@Test
 	public final void testGetAttributesForCompleteEmissionMaps(){
 		//test normal functionality
 
 		//create a normal event impl
-		Map<ColdPollutant, Double> coldEmissionsMap = new HashMap<ColdPollutant, Double>();
+		Map<ColdPollutant, Double> coldEmissionsMap = new HashMap<>();
 		setColdEmissions(coldEmissionsMap);
-		ColdEmissionEventImpl ce = new ColdEmissionEventImpl(0.0, linkId, vehicleId, coldEmissionsMap);
+		ColdEmissionEvent ce = new ColdEmissionEvent(0.0, linkId, vehicleId, coldEmissionsMap);
 		
 		Map<String, String> ceg = ce.getAttributes();
 		Assert.assertEquals("the CO value of this cold emission event was "+ Double.parseDouble(ceg.get("CO"))+ "but should have been "+ co, Double.parseDouble(ceg.get("CO")), co, MatsimTestUtils.EPSILON);
@@ -82,11 +88,11 @@ public class TestColdEmissionEventImpl {
 		// - throw NullPointerExceptions if no emission map is assigned 
 		
 		//empty map
-		Map<ColdPollutant, Double> emptyMap = new HashMap<ColdPollutant, Double>();
-		ColdEmissionEventImpl emptyMapEvent = new ColdEmissionEventImpl(22., linkId, vehicleId, emptyMap);
+		Map<ColdPollutant, Double> emptyMap = new HashMap<>();
+		ColdEmissionEvent emptyMapEvent = new ColdEmissionEvent(22., linkId, vehicleId, emptyMap);
 		
 		//values not set
-		Map<ColdPollutant, Double> valuesNotSet = new HashMap<ColdPollutant, Double>();
+		Map<ColdPollutant, Double> valuesNotSet = new HashMap<>();
 		valuesNotSet.put(ColdPollutant.CO, null);
 		valuesNotSet.put(ColdPollutant.FC, null);
 		valuesNotSet.put(ColdPollutant.HC, null);
@@ -94,10 +100,10 @@ public class TestColdEmissionEventImpl {
 		valuesNotSet.put(ColdPollutant.NO2, null);
 		valuesNotSet.put(ColdPollutant.NOX, null);
 		valuesNotSet.put(ColdPollutant.PM, null);
-		ColdEmissionEventImpl valuesNotSetEvent = new ColdEmissionEventImpl(44., linkId, vehicleId, valuesNotSet);
+		ColdEmissionEvent valuesNotSetEvent = new ColdEmissionEvent(44., linkId, vehicleId, valuesNotSet);
 		
 		//no map
-		ColdEmissionEventImpl noMap = new ColdEmissionEventImpl(50., linkId, vehicleId, null);
+		ColdEmissionEvent noMap = new ColdEmissionEvent(50., linkId, vehicleId, null);
 		
 		int numberOfColdPollutants = ColdPollutant.values().length;	
 
@@ -134,9 +140,9 @@ public class TestColdEmissionEventImpl {
 		//the number of attributes returned by getAttributes is related to the number of fields of coldEmissionEvent
 		
 		// create a normal event impl
-		Map<ColdPollutant, Double> coldEmissionsMap = new HashMap<ColdPollutant, Double>();
+		Map<ColdPollutant, Double> coldEmissionsMap = new HashMap<>();
 		setColdEmissions(coldEmissionsMap);
-		ColdEmissionEventImpl ce = new ColdEmissionEventImpl(0.0, linkId, vehicleId, coldEmissionsMap);
+		ColdEmissionEvent ce = new ColdEmissionEvent(0.0, linkId, vehicleId, coldEmissionsMap);
 		Map<String, String> ceg = ce.getAttributes();
 
 		int numberOfColdPollutants = ColdPollutant.values().length;	
@@ -144,7 +150,7 @@ public class TestColdEmissionEventImpl {
 		// event parameters beside emissions: time, type, linkId, vehicleId = 4
 		int numberOfEventAttributes; // = 4; 
 		// linkId, vehicleId, coldEmissions
-		numberOfEventAttributes = ColdEmissionEventImpl.class.getFields().length;
+		numberOfEventAttributes = ColdEmissionEvent.class.getFields().length;
 		//time as double, time as string, type
 
 		// -1 because the event type appears twice - once from the coldEmissionEvent and once from the superclass event

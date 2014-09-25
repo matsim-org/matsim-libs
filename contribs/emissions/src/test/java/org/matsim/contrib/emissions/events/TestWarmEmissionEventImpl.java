@@ -28,9 +28,6 @@ package org.matsim.contrib.emissions.events;
  * 3 test the number of attributes returned
  */
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -39,21 +36,32 @@ import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class TestWarmEmissionEventImpl {
 	
-	Id<Vehicle> vehicleId = Id.create("veh 1", Vehicle.class);
-	Id<Link> linkId = Id.create("link 1", Link.class);
-	Double co = 20., c2 = 8., fc = 30., hc=4., nm=5., n2=6., nx=7., pm=8., so=1.6;
+	private final Id<Vehicle> vehicleId = Id.create("veh 1", Vehicle.class);
+	private final Id<Link> linkId = Id.create("link 1", Link.class);
+	private final Double co = 20.;
+    private final Double c2 = 8.;
+    private final Double fc = 30.;
+    private final Double hc=4.;
+    private final Double nm=5.;
+    private final Double n2=6.;
+    private final Double nx=7.;
+    private final Double pm=8.;
+    private final Double so=1.6;
 	
 	@Test
 	public final void testGetAttributesForCompleteEmissionMaps(){
 		//test normal functionality
 		
 		//create a normal event impl
-		Map<WarmPollutant, Double> warmEmissionsMap = new HashMap<WarmPollutant, Double>();
+		Map<WarmPollutant, Double> warmEmissionsMap = new HashMap<>();
 		setWarmEmissions(warmEmissionsMap);
-		WarmEmissionEventImpl we = new WarmEmissionEventImpl(0.0, linkId, vehicleId, warmEmissionsMap);
+		WarmEmissionEvent we = new WarmEmissionEvent(0.0, linkId, vehicleId, warmEmissionsMap);
 		
 		Map<String, String> weg = we.getAttributes();
 		Assert.assertEquals("the CO value of this warm emission event was "+ Double.parseDouble(weg.get("CO"))+ "but should have been "+ co, Double.parseDouble(weg.get("CO")), co, MatsimTestUtils.EPSILON);
@@ -87,11 +95,11 @@ public class TestWarmEmissionEventImpl {
 			// - throw NullPointerExceptions if no emission map is assigned 
 			
 		//empty map
-		Map<WarmPollutant, Double> emptyMap = new HashMap<WarmPollutant, Double>();
-		WarmEmissionEventImpl emptyMapEvent = new WarmEmissionEventImpl(22., linkId, vehicleId, emptyMap);
+		Map<WarmPollutant, Double> emptyMap = new HashMap<>();
+		WarmEmissionEvent emptyMapEvent = new WarmEmissionEvent(22., linkId, vehicleId, emptyMap);
 		
 		//values not set
-		Map<WarmPollutant, Double> valuesNotSet = new HashMap<WarmPollutant, Double>();
+		Map<WarmPollutant, Double> valuesNotSet = new HashMap<>();
 		valuesNotSet.put(WarmPollutant.CO, null);
 		valuesNotSet.put(WarmPollutant.FC, null);
 		valuesNotSet.put(WarmPollutant.HC, null);
@@ -99,10 +107,10 @@ public class TestWarmEmissionEventImpl {
 		valuesNotSet.put(WarmPollutant.NO2, null);
 		valuesNotSet.put(WarmPollutant.NOX, null);
 		valuesNotSet.put(WarmPollutant.PM, null);
-		WarmEmissionEventImpl valuesNotSetEvent = new WarmEmissionEventImpl(44., linkId, vehicleId, valuesNotSet);
+		WarmEmissionEvent valuesNotSetEvent = new WarmEmissionEvent(44., linkId, vehicleId, valuesNotSet);
 		
 		//no map
-		WarmEmissionEventImpl noMap = new WarmEmissionEventImpl(23, linkId, vehicleId, null);
+		WarmEmissionEvent noMap = new WarmEmissionEvent(23, linkId, vehicleId, null);
 		
 		int numberOfWarmPollutants = WarmPollutant.values().length;	
 
@@ -133,31 +141,5 @@ public class TestWarmEmissionEventImpl {
 		Assert.assertEquals(numberOfWarmPollutants, valuesNotSetNullPointers);
 		Assert.assertEquals(numberOfWarmPollutants, noMapNullPointers);
 		}
-		
-		public final void testgetAttributes_numberOfAttributes(){
-			//the number of attributes returned by getAttributes is related to the number of fields of warmEmissionEvent
-			
-			// create a normal event impl
-			Map<WarmPollutant, Double> warmEmissionsMap = new HashMap<WarmPollutant, Double>();
-			setWarmEmissions(warmEmissionsMap);
-			WarmEmissionEventImpl we = new WarmEmissionEventImpl(0.0, linkId, vehicleId, warmEmissionsMap);
-			Map<String, String> weg = we.getAttributes();
-		
-			int numberOfWarmPollutants = WarmPollutant.values().length;	
-
-		// event parameters beside emissions: time, type, linkId, vehicleId = 4
-		int numberOfEventAttributes; // = 4; 
-		// linkId, vehicleId, coldEmissions
-		numberOfEventAttributes = ColdEmissionEventImpl.class.getFields().length;
-		//time as double, time as string, type
-
-		// -1 because the event type appears twice - once from the coldEmissionEvent and once from the superclass event
-		// the list of pollutants is not a field of coldEmissionEventImpl
-		// getAttributes does return each pollutant separately
-		// -> +1 for each pollutant
-		Assert.assertEquals(numberOfEventAttributes -1 + numberOfWarmPollutants, weg.size());
-
-		
-	}
 
 }

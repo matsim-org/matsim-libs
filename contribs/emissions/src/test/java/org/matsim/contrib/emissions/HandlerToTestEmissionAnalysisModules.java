@@ -29,8 +29,8 @@ import org.matsim.core.events.handler.EventHandler;
  * @author julia
  *
  */
-public class HandlerToTestEmissionAnalysisModules implements EventsManager {
-	static Double sumOverAll=0.0;
+class HandlerToTestEmissionAnalysisModules implements EventsManager {
+	private static Double sumOverAll=0.0;
 
 	@Override
 	public void processEvent(Event event) {	
@@ -41,7 +41,7 @@ public class HandlerToTestEmissionAnalysisModules implements EventsManager {
 				}
 				
 			} catch (NumberFormatException e) {
-				String notANumber = event.getAttributes().get(attribute).toString();
+				String notANumber = event.getAttributes().get(attribute);
 				if(notANumber.equals("coldEmissionEvent")||notANumber.equals("coldEmissionEventLinkId")||notANumber.equals("personId")){
 					//everything ok
 				}else{

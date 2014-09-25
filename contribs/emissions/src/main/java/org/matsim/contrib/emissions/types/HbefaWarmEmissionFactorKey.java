@@ -34,7 +34,7 @@ public class HbefaWarmEmissionFactorKey {
 	public HbefaWarmEmissionFactorKey(){
 	}
 
-	public HbefaVehicleCategory getHbefaVehicleCategory() {
+	HbefaVehicleCategory getHbefaVehicleCategory() {
 		return this.hbefaVehicleCategory;
 	}
 
@@ -42,7 +42,7 @@ public class HbefaWarmEmissionFactorKey {
 		this.hbefaVehicleCategory = hbefaVehicleCategory;
 	}
 
-	public WarmPollutant getHbefaComponent(){
+	WarmPollutant getHbefaComponent(){
 		return this.hbefaComponent;
 	}
 	
@@ -50,7 +50,7 @@ public class HbefaWarmEmissionFactorKey {
 		this.hbefaComponent = warmPollutant;
 	}
 
-	public String getHbefaRoadCategory() {
+	String getHbefaRoadCategory() {
 		return this.hbefaRoadCategory;
 	}
 
@@ -58,7 +58,7 @@ public class HbefaWarmEmissionFactorKey {
 		this.hbefaRoadCategory = hbefaRoadCategory;
 	}
 
-	public HbefaTrafficSituation getHbefaTrafficSituation() {
+	HbefaTrafficSituation getHbefaTrafficSituation() {
 		return this.hbefaTrafficSituation;
 	}
 
@@ -66,7 +66,7 @@ public class HbefaWarmEmissionFactorKey {
 		this.hbefaTrafficSituation = hbefaTrafficSituation;
 	}
 
-	public HbefaVehicleAttributes getHbefaVehicleAttributes(){
+	HbefaVehicleAttributes getHbefaVehicleAttributes(){
 		return this.hbefaVehicleAttributes;
 	}
 	

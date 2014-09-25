@@ -19,20 +19,19 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.WarmEmissionAnalysisModule.WarmEmissionAnalysisModuleParameter;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -44,6 +43,9 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 /**
  * @author benjamin
@@ -52,19 +54,17 @@ import org.matsim.vehicles.Vehicles;
 public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler {
 	private static final Logger logger = Logger.getLogger(WarmEmissionHandler.class);
 
-	Network network;
-	Vehicles emissionVehicles;
-	WarmEmissionAnalysisModule warmEmissionAnalysisModule;
+	private final Network network;
+	private final Vehicles emissionVehicles;
+	private final WarmEmissionAnalysisModule warmEmissionAnalysisModule;
 	
-	int linkLeaveCnt = 0;
-	int linkLeaveFirstActWarnCnt = 0;
-	final int maxLinkLeaveFirstActWarnCnt = 3;
-	int linkLeaveSomeActWarnCnt = 0;
-	final int maxLinkLeaveSomeActWarnCnt =3;
+	private int linkLeaveCnt = 0;
+	private int linkLeaveFirstActWarnCnt = 0;
+    private int linkLeaveSomeActWarnCnt = 0;
 
-	Map<Id, Tuple<Id, Double>> linkenter = new HashMap<Id, Tuple<Id, Double>>();
-	Map<Id, Tuple<Id, Double>> agentarrival = new HashMap<Id, Tuple<Id, Double>>();
-	Map<Id, Tuple<Id, Double>> agentdeparture = new HashMap<Id, Tuple<Id, Double>>();
+    private final Map<Id, Tuple<Id, Double>> linkenter = new HashMap<>();
+	private final Map<Id, Tuple<Id, Double>> agentarrival = new HashMap<>();
+	private final Map<Id, Tuple<Id, Double>> agentdeparture = new HashMap<>();
 
 	public WarmEmissionHandler(
 			Vehicles emissionVehicles,
@@ -116,8 +116,8 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		linkLeaveCnt++;
-		Id personId= event.getPersonId();
-		Id linkId = event.getLinkId();
+		Id<Person> personId= event.getPersonId();
+		Id<Link> linkId = event.getLinkId();
 		Double leaveTime = event.getTime();
 		LinkImpl link = (LinkImpl) this.network.getLinks().get(linkId);
 		Double linkLength = link.getLength();
@@ -134,24 +134,24 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 		}
 
 		if(!this.linkenter.containsKey(personId)){
-			if(linkLeaveFirstActWarnCnt < maxLinkLeaveFirstActWarnCnt){
+            int maxLinkLeaveFirstActWarnCnt = 3;
+            if(linkLeaveFirstActWarnCnt < maxLinkLeaveFirstActWarnCnt){
 				logger.info("Person " + personId + " is ending its first activity of the day and leaving link " + linkId + " without having entered.");
 				logger.info("This is because of the MATSim logic that there is no link enter event for the link of the first activity");
 				logger.info("Thus, no emissions are calculated for this link leave event.");
 				if (linkLeaveFirstActWarnCnt == maxLinkLeaveFirstActWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
 			}
 			linkLeaveFirstActWarnCnt++;
-			return;
-		} else if (!this.linkenter.get(personId).getFirst().equals(linkId)){
-			if(linkLeaveSomeActWarnCnt < maxLinkLeaveSomeActWarnCnt){
+        } else if (!this.linkenter.get(personId).getFirst().equals(linkId)){
+            int maxLinkLeaveSomeActWarnCnt = 3;
+            if(linkLeaveSomeActWarnCnt < maxLinkLeaveSomeActWarnCnt){
 				logger.warn("Person " + personId + " is ending an activity other than the first and leaving link " + linkId + " without having entered.");
 				logger.warn("This indicates that there is some inconsistency in vehicle use; please check your inital plans file for consistency.");
 				logger.warn("Thus, no emissions are calculated neither for this link leave event nor for the last link that was entered.");
 				if (linkLeaveSomeActWarnCnt == maxLinkLeaveSomeActWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
 			}
 			linkLeaveSomeActWarnCnt++;
-			return;
-		} else {
+        } else {
 			double enterTime = this.linkenter.get(personId).getSecond();
 			double travelTime;
 			if(!this.agentarrival.containsKey(personId) || !this.agentdeparture.containsKey(personId)){
@@ -167,7 +167,7 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 				travelTime = leaveTime - enterTime - departureTime + arrivalTime;	
 			}
 
-			Id vehicleId = personId;
+			Id<Vehicle> vehicleId = Id.create(personId, Vehicle.class);
 			String vehicleInformation;
 			if(!this.emissionVehicles.getVehicles().containsKey(vehicleId)){
 				throw new RuntimeException("No vehicle defined for person " + personId + ". " +

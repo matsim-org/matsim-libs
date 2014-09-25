@@ -20,25 +20,19 @@
 
 package org.matsim.contrib.emissions;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import junit.framework.Assert;
-
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.WarmEmissionAnalysisModule.WarmEmissionAnalysisModuleParameter;
-import org.matsim.contrib.emissions.types.HbefaTrafficSituation;
-import org.matsim.contrib.emissions.types.HbefaVehicleAttributes;
-import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
-import org.matsim.contrib.emissions.types.HbefaWarmEmissionFactor;
-import org.matsim.contrib.emissions.types.HbefaWarmEmissionFactorKey;
-import org.matsim.contrib.emissions.types.WarmPollutant;
+import org.matsim.contrib.emissions.types.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -73,84 +67,79 @@ import org.matsim.vehicles.Vehicle;
 
 public class TestWarmEmissionAnalysisModule {
 	
-	int numberOfWarmPollutants= WarmPollutant.values().length;
-	String hbefaRoadCategory = "URB";
-	Double rescaleFactor = -.001;
-	int roadType =0;
-	int leaveTime = 0;
-	boolean excep =false;
-	String passengercar= "PASSENGER_CAR", heavygoodsvehicle="HEAVY_GOODS_VEHICLE"; 
-	
-	Map<Integer, String> roadTypeMapping;
-	Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
-	Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
-	WarmEmissionAnalysisModuleParameter weamp;
-	EventsManager emissionEventManager;
-	WarmEmissionAnalysisModuleParameter warmEmissionParameterObject;
-	WarmEmissionAnalysisModule weam;
-	Map<WarmPollutant, Double> warmEmissions;
+	private final int numberOfWarmPollutants= WarmPollutant.values().length;
+	private final String hbefaRoadCategory = "URB";
+    private final int roadType =0;
+	private final int leaveTime = 0;
+	private boolean excep =false;
+	private final String passengercar= "PASSENGER_CAR";
+
+    private Map<Integer, String> roadTypeMapping;
+	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
+	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
+    private WarmEmissionAnalysisModule weam;
+	private Map<WarmPollutant, Double> warmEmissions;
 	
 	// saturated and heavy not used so far -> not tested
-	HbefaTrafficSituation trafficSituationff = HbefaTrafficSituation.FREEFLOW;
-	HbefaTrafficSituation trafficSituationsg = HbefaTrafficSituation.STOPANDGO;
+    private final HbefaTrafficSituation trafficSituationff = HbefaTrafficSituation.FREEFLOW;
+	private final HbefaTrafficSituation trafficSituationsg = HbefaTrafficSituation.STOPANDGO;
 	
 	// emission factors for tables - no dublicates!
-	Double detailedPetrolFactorFf = .1; 
-	Double detailedPetrolFactorSg = .01; 
-	Double detailedPcFactorSg = .001;
-	Double detailedPcFactorFf = .0001;
-	Double detailedDieselFactorSg= .00001;
-	Double detailedDieselFactorFf = .000001;
-	Double detailedFfOnlyFactorFf = .0000001;
-	Double detailedSgOnlyFactorSg = .00000001;
-	Double detailedTableFactorFf =  .11;
-	Double detailedTableFactorSg =  .011;
-	Double detailedZeroFactorFf  =  .0011;
-	Double detailedZeroFactorSg  =  .00011;
-	Double detailedSgffFactorFf =   .000011;
-	Double detailedSgffFactorSg = 	.0000011;
-	Double avgPcFactorFf = 1.;
-	Double avgPcFactorSg= 10.;
-	Double avgDieselFactorFf = 100.;
-	Double avgDieselFactorSg = 1000.;
-	Double avgLpgFactorFf = 10000.;
-	Double avgLpgFactorSg = 100000.;
-	Double avgPetrolFactorFf = 1000000.;
-	Double avgPetrolFactorSg = 10000000.;
-	
-	// vehicle information for regular test cases  
+    private final Double detailedPetrolFactorFf = .1;
+    private final Double detailedZeroFactorFf  =  .0011;
+    private final Double detailedSgffFactorFf =   .000011;
+	private final Double detailedSgffFactorSg = 	.0000011;
+	private final Double avgPcFactorFf = 1.;
+	private final Double avgPcFactorSg= 10.;
+	private final Double avgDieselFactorFf = 100.;
+	private final Double avgDieselFactorSg = 1000.;
+	private final Double avgLpgFactorFf = 10000.;
+	private final Double avgLpgFactorSg = 100000.;
+
+    // vehicle information for regular test cases
 	// case 1 - data in both tables -> use detailed
-	String 	petrolTechnology = "PC petrol <1,4L", petrolSizeClass ="<ECE petrol (4S)", petrolConcept ="<1,4L";
-	Double petrolSpeedFf = 20., petrolSpeedSg = 10.;
+    private final String 	petrolTechnology = "PC petrol <1,4L";
+    private final String petrolSizeClass ="<ECE petrol (4S)";
+    private final String petrolConcept ="<1,4L";
+	private final Double petrolSpeedFf = 20.;
+    private final Double petrolSpeedSg = 10.;
 	// case 2 - free flow entry in both tables, stop go entry in average table -> use average
-	String 	pcTechnology = "PC petrol <1,4L <ECE", pcSizeClass = "petrol (4S)", pcConcept = "<1,4L";
-	Double pcfreeVelocity = 50., pcsgVelocity= 10.;
+    private final String 	pcTechnology = "PC petrol <1,4L <ECE";
+    private final String pcSizeClass = "petrol (4S)";
+    private final String pcConcept = "<1,4L";
+	private final Double pcfreeVelocity = 50.;
+    private final Double pcsgVelocity= 10.;
 	// case 3 - stop go entry in both tables, free flow entry in average table -> use average
-	String 	dieselTechnology = "PC diesel", dieselSizeClass = "diesel", dieselConcept = ">=2L";
-	Double dieselFreeVelocity = 100., dieselSgVelocity = 30.;
+    private final String 	dieselTechnology = "PC diesel";
+    private final String dieselSizeClass = "diesel";
+    private final String dieselConcept = ">=2L";
+	private final Double dieselFreeVelocity = 100.;
+    private final Double dieselSgVelocity = 30.;
 	// case 4 - data in average table
-	String 	lpgTechnology = "PC LPG Euro-4", lpgSizeClass = "LPG", lpgConcept = "not specified";
-	Double lpgFreeVelocity = 100., lpgSgVelocity = 35.;
-	// case 5 - no entry in any table - must be different to other test case's strings
-	String 	noeTechnology = "technology", noeConcept = "concept", noeSizeClass = "size";
-	Double noeFreeSpeed=100.;
+    private final String 	lpgTechnology = "PC LPG Euro-4";
+    private final String lpgSizeClass = "LPG";
+    private final String lpgConcept = "not specified";
+	private final Double lpgFreeVelocity = 100.;
+    private final Double lpgSgVelocity = 35.;
+    private final Double noeFreeSpeed=100.;
 	// case 6 - data in detailed table, stop go speed zero
-	String zeroTechnology = "zero technology", zeroConcept = "zero concept", zeroSizeClass = "zero size class";
-	Double zeroFreeVelocity = 100., zeroSgVelocity = 0.;
+    private final String zeroTechnology = "zero technology";
+    private final String zeroConcept = "zero concept";
+    private final String zeroSizeClass = "zero size class";
+	private final Double zeroFreeVelocity = 100.;
+    private final Double zeroSgVelocity = 0.;
 	// case 7 - data in detailed table, stop go speed = free flow speed
-	String sgffTechnology = "sg ff technology", sgffConcept = "sg ff concept", sgffSizeClass = "sg ff size class";
-	Double sgffDetailedFfSpeed = 44., sgffDetailedSgSpeed = 44.;
-	// case 8 - sg entry in detailed table, no free flow entry anywhere 
-	String sgOnlyTechnology ="bifuel CNG/petrol", sgOnlySizeClass="not specified", sgOnlyConcept="PC-Alternative Fuel";
-	Double sgOnlysgSpeed = 50.;
-	// case 9 - ff entry in detailed table, no stop go entry anywhere
-	String ffOnlyTechnology="diesel", ffOnlySizeClass=">=2L", ffOnlyConcept="PC-D-Euro-3";
-	Double ffOnlyffSpeed = 120.;
-	// case 10 - data in detailed table, stop go speed > free flow speed
-	String tableTechnology = "petrol (4S)", tableSizeClass= "<1,4L", tableConcept = "PC-P-Euro-0";
-	Double tableffSpeed = 30., tablesgSpeed = 55.;
-	
-	@Test 
+    private final String sgffTechnology = "sg ff technology";
+    private final String sgffConcept = "sg ff concept";
+    private final String sgffSizeClass = "sg ff size class";
+	private final Double sgffDetailedFfSpeed = 44.;
+    // case 10 - data in detailed table, stop go speed > free flow speed
+    private final String tableTechnology = "petrol (4S)";
+    private final String tableSizeClass= "<1,4L";
+    private final String tableConcept = "PC-P-Euro-0";
+	private final Double tableffSpeed = 30.;
+
+    @Test
 	public void testWarmEmissionAnalysisParameter(){
 		setUp();
 		WarmEmissionAnalysisModuleParameter weamp = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, null);
@@ -176,7 +165,7 @@ public class TestWarmEmissionAnalysisModule {
 		setUp();
 		
 		// case 1 - data in both tables -> use detailed
-		Id<Person> personId = Id.create("person 1", Person.class);
+		Id<Link> personId = Id.create("person 1", Link.class);    // !!!
 		Id<Vehicle> vehicleId = Id.create("veh 1", Vehicle.class);		
 		Double linkLength = 200.; 
 		String vehicleInformation = passengercar+ ";"+petrolTechnology+";"+petrolSizeClass+";"+petrolConcept;
@@ -196,7 +185,7 @@ public class TestWarmEmissionAnalysisModule {
 		setUp();
 		
 		// case 2 - free flow entry in both tables, stop go entry in average table -> use average
-		Id<Person> pcPersonId = Id.create("person 2", Person.class);
+		Id<Link> pcPersonId = Id.create("person 2", Link.class);
 		Id<Vehicle> pcVehicleId = Id.create("veh 2", Vehicle.class);
 		Double pclinkLength= 100.;
 		String pcVehicleInformation = passengercar + ";"+ pcTechnology + ";"+pcSizeClass+";"+pcConcept;
@@ -223,7 +212,7 @@ public class TestWarmEmissionAnalysisModule {
 		setUp();
 
 		// case 3 - stop go entry in both tables, free flow entry in average table -> use average
-		Id<Person> dieselPersonId = Id.create("person 3", Person.class);
+		Id<Link> dieselPersonId = Id.create("person 3", Link.class);
 		Id<Vehicle> dieselVehicleId = Id.create("veh 3", Vehicle.class);
 		Double dieselLinkLength= 20.;
 		String dieselVehicleInformation = passengercar +";"+ dieselTechnology+ ";"+ dieselSizeClass+";"+dieselConcept;
@@ -252,7 +241,7 @@ public class TestWarmEmissionAnalysisModule {
 		setUp();
 
 		// case 4 - data in average table
-		Id<Person> lpgPersonId = Id.create("person4", Person.class);
+		Id<Link> lpgPersonId = Id.create("person4", Link.class);
 		Id<Vehicle> lpgVehicleId = Id.create("veh 4", Vehicle.class);
 		Double lpgLinkLength = 700.;
 		String lpgVehicleInformation = passengercar + ";"+ lpgTechnology+";"+lpgSizeClass+";"+lpgConcept;		
@@ -281,7 +270,7 @@ public class TestWarmEmissionAnalysisModule {
 		
 		// case 6 - data in detailed table, stop go speed zero
 		// use free flow factor to calculate emissions
-		Id<Person> zeroPersonId = Id.create("person zero", Person.class);
+		Id<Vehicle> zeroPersonId = Id.create("person zero", Vehicle.class);
 		Id<Link> zeroLinkId = Id.create("link zero", Link.class);
 		Double zeroLinklength = 3000.;
 		String zeroVehicleInformation = passengercar + ";"+ zeroTechnology + ";" + zeroSizeClass + ";" + zeroConcept;
@@ -329,9 +318,12 @@ public class TestWarmEmissionAnalysisModule {
 		setUp();
 		
 		// case 5 - no entry in any table - must be different to other test case's strings	
-		Id<Person> noePersonId = Id.create("person 5", Person.class);
+		Id<Link> noePersonId = Id.create("person 5", Link.class);
 		Id<Vehicle> noeVehicleId = Id.create("veh 5", Vehicle.class);
-		String noeVehicleInformation = passengercar + ";"+ noeTechnology + ";" + noeSizeClass + ";" + noeConcept;
+        String noeSizeClass = "size";
+        String noeConcept = "concept";
+        String noeTechnology = "technology";
+        String noeVehicleInformation = passengercar + ";"+ noeTechnology + ";" + noeSizeClass + ";" + noeConcept;
 		
 		excep= false;
 		try{
@@ -350,7 +342,7 @@ public class TestWarmEmissionAnalysisModule {
 		setUp();
 		
 		// no vehicle information given
-		Id<Person> noePersonId = Id.create("person 6", Person.class);
+		Id<Link> noePersonId = Id.create("person 6", Link.class);
 		Id<Vehicle> noeVehicleId = Id.create("veh 6", Vehicle.class);
 		String noeVehicleInformation = "";
 		
@@ -371,7 +363,7 @@ public class TestWarmEmissionAnalysisModule {
 		setUp();
 		
 		// empty vehicle information 
-		Id<Person> noePersonId = Id.create("person 7", Person.class);
+		Id<Link> noePersonId = Id.create("person 7", Link.class);
 		Id<Vehicle> noeVehicleId = Id.create("veh 7", Vehicle.class);
 		String noeVehicleInformation = ";;;";
 		
@@ -391,7 +383,7 @@ public class TestWarmEmissionAnalysisModule {
 		//-- set up tables, event handler, parameters, module
 		setUp();
 		//  vehicle information string is 'null'
-		Id<Person> noePersonId = Id.create("person 8", Person.class);
+		Id<Link> noePersonId = Id.create("person 8", Link.class);
 		Id<Vehicle> noeVehicleId = Id.create("veh 8", Vehicle.class);
 		String noeVehicleInformation = null;
 		
@@ -701,9 +693,9 @@ public class TestWarmEmissionAnalysisModule {
 		// can not use the setUp method here because the efficiency factor is not null
 		
 		// setup ----
-		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable = new HashMap<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor>();
-		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable = new HashMap<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor>();
-		Map<Integer, String> roadTypeMapping = new HashMap<Integer, String>();
+		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable = new HashMap<>();
+		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable = new HashMap<>();
+		Map<Integer, String> roadTypeMapping = new HashMap<>();
 		fillAverageTable(avgHbefaWarmTable);
 		fillDetailedTable(detailedHbefaWarmTable);
 		fillRoadTypeMapping(roadTypeMapping);
@@ -720,7 +712,7 @@ public class TestWarmEmissionAnalysisModule {
 		
 		// case 3 - stop go entry in both tables, free flow entry in average table -> use average
 		Id<Link> idForAvgTable = Id.create("link id avg", Link.class);
-		Id<Person> personIdForAvgTable = Id.create("person avg", Person.class);
+		Id<Vehicle> personIdForAvgTable = Id.create("person avg", Vehicle.class);
 		String dieselVehicleInformation = passengercar +";"+ dieselTechnology+ ";"+ dieselSizeClass+";"+dieselConcept;
 		
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(personIdForAvgTable, roadType, dieselFreeVelocity/3.6, 1000., 1000./dieselFreeVelocity*3.6, dieselVehicleInformation);
@@ -737,16 +729,16 @@ public class TestWarmEmissionAnalysisModule {
 	}
 	
 	private void setUp() {
-		roadTypeMapping = new HashMap<Integer, String>();
-		avgHbefaWarmTable = new HashMap<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor>();
-		detailedHbefaWarmTable = new HashMap<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor>();
+		roadTypeMapping = new HashMap<>();
+		avgHbefaWarmTable = new HashMap<>();
+		detailedHbefaWarmTable = new HashMap<>();
 		
 		fillRoadTypeMapping(roadTypeMapping);
 		fillAverageTable(avgHbefaWarmTable);
 		fillDetailedTable(detailedHbefaWarmTable);
-		
-		emissionEventManager = new HandlerToTestEmissionAnalysisModules();
-		warmEmissionParameterObject = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, detailedHbefaWarmTable);
+
+        EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
+        WarmEmissionAnalysisModuleParameter warmEmissionParameterObject = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, detailedHbefaWarmTable);
 		weam = new WarmEmissionAnalysisModule(warmEmissionParameterObject, emissionEventManager, null);
 	}
 	
@@ -780,7 +772,8 @@ public class TestWarmEmissionAnalysisModule {
 		vehAtt.setHbefaEmConcept(petrolConcept);
 		
 		detWarmFactor = new HbefaWarmEmissionFactor();
-		detWarmFactor.setWarmEmissionFactor(detailedPetrolFactorSg); 
+        Double detailedPetrolFactorSg = .01;
+        detWarmFactor.setWarmEmissionFactor(detailedPetrolFactorSg);
 		detWarmFactor.setSpeed(petrolSpeedSg);
 
 		for (WarmPollutant wp: WarmPollutant.values()){
@@ -801,7 +794,8 @@ public class TestWarmEmissionAnalysisModule {
 		vehAtt.setHbefaEmConcept(pcConcept);
 		
 		detWarmFactor = new HbefaWarmEmissionFactor();
-		detWarmFactor.setWarmEmissionFactor(detailedPcFactorFf); 
+        Double detailedPcFactorFf = .0001;
+        detWarmFactor.setWarmEmissionFactor(detailedPcFactorFf);
 		detWarmFactor.setSpeed(pcfreeVelocity);
 
 		for (WarmPollutant wp: WarmPollutant.values()){
@@ -822,7 +816,8 @@ public class TestWarmEmissionAnalysisModule {
 		vehAtt.setHbefaEmConcept(dieselConcept);
 		
 		detWarmFactor = new HbefaWarmEmissionFactor();
-		detWarmFactor.setWarmEmissionFactor(detailedDieselFactorSg); 
+        Double detailedDieselFactorSg = .00001;
+        detWarmFactor.setWarmEmissionFactor(detailedDieselFactorSg);
 		detWarmFactor.setSpeed(dieselSgVelocity);
 
 		for (WarmPollutant wp: WarmPollutant.values()){
@@ -838,13 +833,18 @@ public class TestWarmEmissionAnalysisModule {
 		// entry for ffOnlyTestcase
 		
 		vehAtt = new HbefaVehicleAttributes();
-		vehAtt.setHbefaEmConcept(ffOnlyConcept);
-		vehAtt.setHbefaSizeClass(ffOnlySizeClass);
-		vehAtt.setHbefaTechnology(ffOnlyTechnology);
+        String ffOnlyConcept = "PC-D-Euro-3";
+        vehAtt.setHbefaEmConcept(ffOnlyConcept);
+        String ffOnlySizeClass = ">=2L";
+        vehAtt.setHbefaSizeClass(ffOnlySizeClass);
+        String ffOnlyTechnology = "diesel";
+        vehAtt.setHbefaTechnology(ffOnlyTechnology);
 		
 		detWarmFactor = new HbefaWarmEmissionFactor();
-		detWarmFactor.setWarmEmissionFactor(detailedFfOnlyFactorFf);
-		detWarmFactor.setSpeed(ffOnlyffSpeed);
+        Double detailedFfOnlyFactorFf = .0000001;
+        detWarmFactor.setWarmEmissionFactor(detailedFfOnlyFactorFf);
+        Double ffOnlyffSpeed = 120.;
+        detWarmFactor.setSpeed(ffOnlyffSpeed);
 		
 		for (WarmPollutant wp: WarmPollutant.values()){
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
@@ -859,13 +859,18 @@ public class TestWarmEmissionAnalysisModule {
 		// entry for sgOnlyTestcase
 		
 		vehAtt = new HbefaVehicleAttributes();
-		vehAtt.setHbefaEmConcept(sgOnlyConcept);
-		vehAtt.setHbefaSizeClass(sgOnlySizeClass);
-		vehAtt.setHbefaTechnology(sgOnlyTechnology);
+        String sgOnlyConcept = "PC-Alternative Fuel";
+        vehAtt.setHbefaEmConcept(sgOnlyConcept);
+        String sgOnlySizeClass = "not specified";
+        vehAtt.setHbefaSizeClass(sgOnlySizeClass);
+        String sgOnlyTechnology = "bifuel CNG/petrol";
+        vehAtt.setHbefaTechnology(sgOnlyTechnology);
 		
 		detWarmFactor = new HbefaWarmEmissionFactor();
-		detWarmFactor.setWarmEmissionFactor(detailedSgOnlyFactorSg);
-		detWarmFactor.setSpeed(sgOnlysgSpeed);
+        Double detailedSgOnlyFactorSg = .00000001;
+        detWarmFactor.setWarmEmissionFactor(detailedSgOnlyFactorSg);
+        Double sgOnlysgSpeed = 50.;
+        detWarmFactor.setSpeed(sgOnlysgSpeed);
 		
 		for (WarmPollutant wp: WarmPollutant.values()){
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
@@ -885,7 +890,8 @@ public class TestWarmEmissionAnalysisModule {
 		vehAtt.setHbefaTechnology(tableTechnology);
 		
 		detWarmFactor = new HbefaWarmEmissionFactor();
-		detWarmFactor.setWarmEmissionFactor(detailedTableFactorFf);
+        Double detailedTableFactorFf = .11;
+        detWarmFactor.setWarmEmissionFactor(detailedTableFactorFf);
 		detWarmFactor.setSpeed(tableffSpeed);
 		
 		for (WarmPollutant wp: WarmPollutant.values()){
@@ -899,8 +905,10 @@ public class TestWarmEmissionAnalysisModule {
 		}
 		
 		detWarmFactor = new HbefaWarmEmissionFactor();
-		detWarmFactor.setWarmEmissionFactor(detailedTableFactorSg);
-		detWarmFactor.setSpeed(tablesgSpeed);
+        Double detailedTableFactorSg = .011;
+        detWarmFactor.setWarmEmissionFactor(detailedTableFactorSg);
+        Double tablesgSpeed = 55.;
+        detWarmFactor.setSpeed(tablesgSpeed);
 		
 		for (WarmPollutant wp: WarmPollutant.values()){
 			HbefaWarmEmissionFactorKey detWarmKey = new HbefaWarmEmissionFactorKey();	
@@ -933,7 +941,8 @@ public class TestWarmEmissionAnalysisModule {
 		}
 		
 		detWarmFactor = new HbefaWarmEmissionFactor();
-		detWarmFactor.setWarmEmissionFactor(detailedZeroFactorSg);
+        Double detailedZeroFactorSg = .00011;
+        detWarmFactor.setWarmEmissionFactor(detailedZeroFactorSg);
 		detWarmFactor.setSpeed(zeroSgVelocity);
 		
 		for (WarmPollutant wp: WarmPollutant.values()){
@@ -997,7 +1006,8 @@ public class TestWarmEmissionAnalysisModule {
 		vehAtt.setHbefaTechnology(petrolTechnology);
 		
 		HbefaWarmEmissionFactor detWarmFactor = new HbefaWarmEmissionFactor();
-		detWarmFactor.setWarmEmissionFactor(avgPetrolFactorFf);
+        Double avgPetrolFactorFf = 1000000.;
+        detWarmFactor.setWarmEmissionFactor(avgPetrolFactorFf);
 		detWarmFactor.setSpeed(petrolSpeedFf);
 		
 		for (WarmPollutant wp: WarmPollutant.values()){
@@ -1012,7 +1022,8 @@ public class TestWarmEmissionAnalysisModule {
 		
 		// stop and go
 		detWarmFactor = new HbefaWarmEmissionFactor();
-		detWarmFactor.setWarmEmissionFactor(avgPetrolFactorSg);
+        Double avgPetrolFactorSg = 10000000.;
+        detWarmFactor.setWarmEmissionFactor(avgPetrolFactorSg);
 		detWarmFactor.setSpeed(petrolSpeedSg);
 		
 		for (WarmPollutant wp: WarmPollutant.values()){

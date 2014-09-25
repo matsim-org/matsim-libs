@@ -20,20 +20,18 @@
 
 package playgrund.vsp.analysis.modules.emissions;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.events.ColdEmissionEvent;
-import org.matsim.contrib.emissions.events.ColdEmissionEventImpl;
 import org.matsim.contrib.emissions.types.ColdPollutant;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestUtils;
-
 import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsPerPersonColdEventHandler;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * test for playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsPerPersonColdEventHandler
@@ -63,32 +61,32 @@ public class TestColdEmissionHandler {
 			Map<ColdPollutant,Double> coldEm1 = new HashMap<ColdPollutant, Double>();
 			coldEm1.put(ColdPollutant.CO, 7.1);
 			coldEm1.put(ColdPollutant.NOX, 11.9);
-			ColdEmissionEvent event1 = new ColdEmissionEventImpl(time1, link1, vehicle1, coldEm1);
+			ColdEmissionEvent event1 = new ColdEmissionEvent(time1, link1, vehicle1, coldEm1);
 			handler.handleEvent(event1);
 		
 		//second event: create and handle
 				Map<ColdPollutant,Double> coldEm2 = new HashMap<ColdPollutant, Double>();
 				coldEm2.put(ColdPollutant.CO, 23.9);
 				coldEm2.put(ColdPollutant.PM, 18.1);
-				ColdEmissionEvent event2 = new ColdEmissionEventImpl(time1, link1, vehicle2, coldEm2);
+				ColdEmissionEvent event2 = new ColdEmissionEvent(time1, link1, vehicle2, coldEm2);
 				handler.handleEvent(event2);
 				
 		//third event: create and handle
 				Map<ColdPollutant,Double> coldEm3 = new HashMap<ColdPollutant, Double>();
 				coldEm3.put(ColdPollutant.NOX, 12.4);
-				ColdEmissionEvent event3 = new ColdEmissionEventImpl(time2, link2, vehicle1, coldEm3);
+				ColdEmissionEvent event3 = new ColdEmissionEvent(time2, link2, vehicle1, coldEm3);
 				handler.handleEvent(event3);
 						
 		//fourth event: create and handle
 				Map<ColdPollutant,Double> coldEm4 = new HashMap<ColdPollutant, Double>();
-				ColdEmissionEvent event4 = new ColdEmissionEventImpl(time1, link2, vehicle2, coldEm4);
+				ColdEmissionEvent event4 = new ColdEmissionEvent(time1, link2, vehicle2, coldEm4);
 				handler.handleEvent(event4);
 				
 		//fifth event: create and handle
 				Map<ColdPollutant,Double> coldEm5 = new HashMap<ColdPollutant, Double>();
 				coldEm5.put(ColdPollutant.NOX, 19.8);
 				coldEm5.put(ColdPollutant.CO, 10.0);
-				ColdEmissionEvent event5 = new ColdEmissionEventImpl(time2, link1, vehicle1, coldEm5);
+				ColdEmissionEvent event5 = new ColdEmissionEvent(time2, link1, vehicle1, coldEm5);
 				handler.handleEvent(event5);
 				
 		Map<Id<Person>, Map<ColdPollutant, Double>> cepp = handler.getColdEmissionsPerPerson(); 

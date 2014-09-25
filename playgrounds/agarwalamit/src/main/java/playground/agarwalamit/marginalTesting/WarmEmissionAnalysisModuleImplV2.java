@@ -21,23 +21,18 @@
  * *********************************************************************** */
 package playground.agarwalamit.marginalTesting;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.contrib.emissions.events.WarmEmissionEventImpl;
-import org.matsim.contrib.emissions.types.HbefaTrafficSituation;
-import org.matsim.contrib.emissions.types.HbefaVehicleAttributes;
-import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
-import org.matsim.contrib.emissions.types.HbefaWarmEmissionFactor;
-import org.matsim.contrib.emissions.types.HbefaWarmEmissionFactorKey;
-import org.matsim.contrib.emissions.types.WarmPollutant;
+import org.matsim.contrib.emissions.events.WarmEmissionEvent;
+import org.matsim.contrib.emissions.types.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -131,7 +126,7 @@ public class WarmEmissionAnalysisModuleImplV2 {
 	}
 
 	public void throwWarmEmissionEvent(double leaveTime, Id linkId, Id vehicleId, Map<WarmPollutant, Double> warmEmissions){
-		Event warmEmissionEvent = new WarmEmissionEventImpl(leaveTime, linkId, vehicleId, warmEmissions);
+		Event warmEmissionEvent = new WarmEmissionEvent(leaveTime, linkId, vehicleId, warmEmissions);
 		this.eventsManager.processEvent(warmEmissionEvent);
 	}
 

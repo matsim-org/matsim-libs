@@ -22,11 +22,6 @@ package org.matsim.contrib.emissions.types;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.matsim.contrib.emissions.types.HbefaTrafficSituation;
-import org.matsim.contrib.emissions.types.HbefaVehicleAttributes;
-import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
-import org.matsim.contrib.emissions.types.HbefaWarmEmissionFactorKey;
-import org.matsim.contrib.emissions.types.WarmPollutant;
 
 
 
@@ -41,14 +36,15 @@ public class TestHbefaWarmEmissionFactorKey{
  	*  @author julia
  	*/
 	
-	HbefaVehicleAttributes hbefaVehicleAttributes;
-	String hbefaRoadCategory;		
-	HbefaTrafficSituation hbefaTrafficSituation;
-	HbefaVehicleCategory hbefaVehicleCategory;
-	WarmPollutant warmPollutant;
-	String message, message2;
-	HbefaWarmEmissionFactorKey normal;
-	boolean equalErr;
+	private HbefaVehicleAttributes hbefaVehicleAttributes;
+	private String hbefaRoadCategory;
+	private HbefaTrafficSituation hbefaTrafficSituation;
+	private HbefaVehicleCategory hbefaVehicleCategory;
+	private WarmPollutant warmPollutant;
+	private String message;
+    private String message2;
+	private HbefaWarmEmissionFactorKey normal;
+	private boolean equalErr;
 	
 	private void setUp(){
 		equalErr = false;

@@ -23,12 +23,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.NetworkConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.*;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 
@@ -45,24 +41,24 @@ import org.matsim.core.controler.Controler;
  */
 public class CreateEmissionConfig {
 
-		static String inputPath = "./test/input/org/matsim/contrib/emissions/";
-		static String networkFile = inputPath + "sample_network.xml";
-		static String plansFile = inputPath + "sample_population.xml";
+		private static final String inputPath = "./test/input/org/matsim/contrib/emissions/";
+		private static final String networkFile = inputPath + "sample_network.xml";
+		private static final String plansFile = inputPath + "sample_population.xml";
 		
-		static String roadTypeMappingFile = inputPath + "sample_roadTypeMapping.txt";
-		static String emissionVehicleFile = inputPath + "sample_emissionVehicles.xml";
+		private static final String roadTypeMappingFile = inputPath + "sample_roadTypeMapping.txt";
+		private static final String emissionVehicleFile = inputPath + "sample_emissionVehicles.xml";
 		
-		static String averageFleetWarmEmissionFactorsFile = inputPath + "sample_EFA_HOT_vehcat_2005average.txt";
-		static String averageFleetColdEmissionFactorsFile = inputPath + "sample_EFA_ColdStart_vehcat_2005average.txt";
+		private static final String averageFleetWarmEmissionFactorsFile = inputPath + "sample_EFA_HOT_vehcat_2005average.txt";
+		private static final String averageFleetColdEmissionFactorsFile = inputPath + "sample_EFA_ColdStart_vehcat_2005average.txt";
 		
-		static boolean isUsingDetailedEmissionCalculation = true;
-		static String detailedWarmEmissionFactorsFile = inputPath + "sample_EFA_HOT_SubSegm_2005detailed.txt";
-		static String detailedColdEmissionFactorsFile = inputPath + "sample_EFA_ColdStart_SubSegm_2005detailed.txt";
+		private static final boolean isUsingDetailedEmissionCalculation = true;
+		private static final String detailedWarmEmissionFactorsFile = inputPath + "sample_EFA_HOT_SubSegm_2005detailed.txt";
+		private static final String detailedColdEmissionFactorsFile = inputPath + "sample_EFA_ColdStart_SubSegm_2005detailed.txt";
 		
-		static String outputPath = "./test/output/";
-		static String configFilePath = inputPath + "config.xml";
+		private static final String outputPath = "./test/output/";
+		private static final String configFilePath = inputPath + "config.xml";
 		
-		static int numberOfIterations = 6;
+		private static final int numberOfIterations = 6;
 		
 		
 		public static void main(String[] args) {

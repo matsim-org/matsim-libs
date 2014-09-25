@@ -19,26 +19,12 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.emissions.ColdEmissionAnalysisModule.ColdEmissionAnalysisModuleParameter;
 import org.matsim.contrib.emissions.WarmEmissionAnalysisModule.WarmEmissionAnalysisModuleParameter;
-import org.matsim.contrib.emissions.types.ColdPollutant;
-import org.matsim.contrib.emissions.types.HbefaColdEmissionFactor;
-import org.matsim.contrib.emissions.types.HbefaColdEmissionFactorKey;
-import org.matsim.contrib.emissions.types.HbefaTrafficSituation;
-import org.matsim.contrib.emissions.types.HbefaVehicleAttributes;
-import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
-import org.matsim.contrib.emissions.types.HbefaWarmEmissionFactor;
-import org.matsim.contrib.emissions.types.HbefaWarmEmissionFactorKey;
-import org.matsim.contrib.emissions.types.WarmPollutant;
+import org.matsim.contrib.emissions.types.*;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
@@ -48,6 +34,11 @@ import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 
 /**
  * @author benjamin
@@ -56,31 +47,31 @@ import org.matsim.vehicles.Vehicles;
 public class EmissionModule {
 	private static final Logger logger = Logger.getLogger(EmissionModule.class);
 	
-	final Scenario scenario;
-	WarmEmissionHandler warmEmissionHandler;
-	ColdEmissionHandler coldEmissionHandler;
+	private final Scenario scenario;
+	private WarmEmissionHandler warmEmissionHandler;
+	private ColdEmissionHandler coldEmissionHandler;
 	public EventsManager emissionEventsManager;
-	Double emissionEfficiencyFactor;
+	private Double emissionEfficiencyFactor;
 
 	//===
-	static String roadTypeMappingFile;
-	static String emissionVehicleFile;
+	private static String roadTypeMappingFile;
+	private static String emissionVehicleFile;
 	
-	static String averageFleetColdEmissionFactorsFile;
-	static String averageFleetWarmEmissionFactorsFile;
+	private static String averageFleetColdEmissionFactorsFile;
+	private static String averageFleetWarmEmissionFactorsFile;
 
-	static String detailedWarmEmissionFactorsFile;
-	static String detailedColdEmissionFactorsFile;
+	private static String detailedWarmEmissionFactorsFile;
+	private static String detailedColdEmissionFactorsFile;
 	
 	//===
-	Map<Integer, String> roadTypeMapping;
-	Vehicles emissionVehicles;
+    private Map<Integer, String> roadTypeMapping;
+	private Vehicles emissionVehicles;
 	
-	Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
-	Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable;
+	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
+	private Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable;
 
-	Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
-	Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable;
+	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
+	private Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable;
 
 
 	public EmissionModule(Scenario scenario) {
@@ -146,11 +137,11 @@ public class EmissionModule {
 	private Map<Integer, String> createRoadTypeMapping(String filename){
 		logger.info("entering createRoadTypeMapping ...") ;
 		
-		Map<Integer, String> mapping = new HashMap<Integer, String>();
+		Map<Integer, String> mapping = new HashMap<>();
 		try{
 			BufferedReader br = IOUtils.getBufferedReader(filename);
 			String strLine = br.readLine();
-			Map<String, Integer> indexFromKey = createIndexFromKey(strLine, ";");
+			Map<String, Integer> indexFromKey = createIndexFromKey(strLine);
 			
 			while ((strLine = br.readLine()) != null){
 				if ( strLine.contains("\"")) throw new RuntimeException("cannot handle this character in parsing") ;
@@ -161,8 +152,6 @@ public class EmissionModule {
 				
 				mapping.put(visumRtNr, hbefaRtName);
 			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -182,12 +171,12 @@ public class EmissionModule {
 	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> createAvgHbefaWarmTable(String filename){
 		logger.info("entering createAvgHbefaWarmTable ...");
 		
-		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgWarmTable = new HashMap<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor>();
+		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgWarmTable = new HashMap<>();
 		
 		try{
 			BufferedReader br = IOUtils.getBufferedReader(filename);
 			String strLine = br.readLine();
-			Map<String, Integer> indexFromKey = createIndexFromKey(strLine, ";");
+			Map<String, Integer> indexFromKey = createIndexFromKey(strLine);
 			
 			while ((strLine = br.readLine()) != null) {
 				String[] array = strLine.split(";");
@@ -205,8 +194,6 @@ public class EmissionModule {
 				
 				avgWarmTable.put(key, value);
 			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -218,11 +205,11 @@ public class EmissionModule {
 	private Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> createAvgHbefaColdTable(String filename){
 		logger.info("entering createAvgHbefaColdTable ...");
 		
-		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgColdTable = new HashMap<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor>();
+		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgColdTable = new HashMap<>();
 		try{
 			BufferedReader br = IOUtils.getBufferedReader(filename);
 			String strLine = br.readLine();
-			Map<String, Integer> indexFromKey = createIndexFromKey(strLine, ";");
+			Map<String, Integer> indexFromKey = createIndexFromKey(strLine);
 			
 			while ((strLine = br.readLine()) != null)   {
 				String[] array = strLine.split(";");
@@ -239,8 +226,6 @@ public class EmissionModule {
 				
 				avgColdTable.put(key, value);
 			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -251,12 +236,12 @@ public class EmissionModule {
 	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> createDetailedHbefaWarmTable(String filename){
 		logger.info("entering createDetailedHbefaWarmTable ...");
 
-		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> hbefaWarmTableDetailed = new HashMap<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor>() ;
+		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> hbefaWarmTableDetailed = new HashMap<>() ;
 		try{
 			BufferedReader br = IOUtils.getBufferedReader(filename);
 			String strLine = br.readLine();
 
-			Map<String, Integer> indexFromKey = createIndexFromKey(strLine, ";");
+			Map<String, Integer> indexFromKey = createIndexFromKey(strLine);
 
 			while ((strLine = br.readLine()) != null) {
 				String[] array = strLine.split(";");
@@ -278,8 +263,6 @@ public class EmissionModule {
 
 				hbefaWarmTableDetailed.put(key, value);
 			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -290,11 +273,11 @@ public class EmissionModule {
 	private Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> createDetailedHbefaColdTable(String filename) {
 		logger.info("entering createDetailedHbefaColdTable ...");
 		
-		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> hbefaColdTableDetailed = new HashMap<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor>();
+		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> hbefaColdTableDetailed = new HashMap<>();
 		try{
 			BufferedReader br = IOUtils.getBufferedReader(filename);
 			String strLine = br.readLine();
-			Map<String, Integer> indexFromKey = createIndexFromKey(strLine, ";");
+			Map<String, Integer> indexFromKey = createIndexFromKey(strLine);
 			
 			while ((strLine = br.readLine()) != null)   {
 				String[] array = strLine.split(";");
@@ -315,8 +298,6 @@ public class EmissionModule {
 				
 				hbefaColdTableDetailed.put(key, value);
 			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -324,10 +305,10 @@ public class EmissionModule {
 		return hbefaColdTableDetailed;
 	}
 
-	private Map<String, Integer> createIndexFromKey(String strLine, String fieldSeparator) {
-		String[] keys = strLine.split(fieldSeparator) ;
+	private Map<String, Integer> createIndexFromKey(String strLine) {
+		String[] keys = strLine.split(";") ;
 
-		Map<String, Integer> indexFromKey = new HashMap<String, Integer>() ;
+		Map<String, Integer> indexFromKey = new HashMap<>() ;
 		for ( int ii = 0; ii < keys.length; ii++ ) {
 			indexFromKey.put(keys[ii], ii ) ;
 		}
@@ -335,7 +316,7 @@ public class EmissionModule {
 	}
 
 	private Integer mapAmbientCondPattern2Distance(String string) {
-		Integer distance = null;
+		Integer distance;
 		String distanceString = string.split(",")[2];
 		String upperbound = distanceString.split("-")[1];
 		distance = Integer.parseInt(upperbound.split("k")[0]);
@@ -343,7 +324,7 @@ public class EmissionModule {
 	}
 
 	private Integer mapAmbientCondPattern2ParkingTime(String string) {
-		Integer parkingTime = null;
+		Integer parkingTime;
 		String parkingTimeString = string.split(",")[1];
 		if(parkingTimeString.equals(">12h")){
 			parkingTime = 13 ;
@@ -357,8 +338,9 @@ public class EmissionModule {
 	private WarmPollutant mapComponent2WarmPollutant(String string) {
 		WarmPollutant warmPollutant = null;
 		for(WarmPollutant wp : WarmPollutant.values()){
-			if(string.equals(wp.getText())) warmPollutant = wp;
-			else continue;
+			if(string.equals(wp.getText())) {
+                warmPollutant = wp;
+            }
 		}
 		return warmPollutant;
 	}
@@ -366,21 +348,22 @@ public class EmissionModule {
 	private ColdPollutant mapComponent2ColdPollutant(String string) {
 		ColdPollutant coldPollutant = null;
 		for(ColdPollutant cp : ColdPollutant.values()){
-			if(string.equals(cp.getText())) coldPollutant = cp;
-			else continue;
+			if(string.equals(cp.getText())) {
+                coldPollutant = cp;
+            }
 		}
 		return coldPollutant;
 	}
 
 	private String mapString2HbefaRoadCategory(String string) {
-		String hbefaRoadCategory = null;
+		String hbefaRoadCategory;
 		String[] parts = string.split("/");
 		hbefaRoadCategory = parts[0] + "/" + parts[1] + "/" + parts[2];
 		return hbefaRoadCategory;
 	}
 
 	private HbefaVehicleCategory mapString2HbefaVehicleCategory(String string) {
-		HbefaVehicleCategory hbefaVehicleCategory = null;
+		HbefaVehicleCategory hbefaVehicleCategory;
 		if(string.contains("pass. car")) hbefaVehicleCategory = HbefaVehicleCategory.PASSENGER_CAR;
 		else if(string.contains("HGV")) hbefaVehicleCategory = HbefaVehicleCategory.HEAVY_GOODS_VEHICLE;
 		else{
@@ -391,7 +374,7 @@ public class EmissionModule {
 	}
 
 	private HbefaTrafficSituation mapString2HbefaTrafficSituation(String string) {
-		HbefaTrafficSituation hbefaTrafficSituation = null;
+		HbefaTrafficSituation hbefaTrafficSituation;
 		if(string.endsWith("Freeflow")) hbefaTrafficSituation = HbefaTrafficSituation.FREEFLOW;
 		else if(string.endsWith("Heavy")) hbefaTrafficSituation = HbefaTrafficSituation.HEAVY;
 		else if(string.endsWith("Satur.")) hbefaTrafficSituation = HbefaTrafficSituation.SATURATED;
@@ -419,11 +402,7 @@ public class EmissionModule {
 		return emissionVehicles;
 	}
 
-	public Double getEmissionEfficiencyFactor() {
-		return emissionEfficiencyFactor;
-	}
-
-	public void setEmissionEfficiencyFactor(Double emissionEfficiencyFactor) {
+    public void setEmissionEfficiencyFactor(Double emissionEfficiencyFactor) {
 		this.emissionEfficiencyFactor = emissionEfficiencyFactor;
 		logger.info("Emission efficiency for the whole fleet is globally set to " + this.emissionEfficiencyFactor);
 //		logger.warn("Emission efficiency for the whole fleet is globally set to " + this.emissionEfficiencyFactor);

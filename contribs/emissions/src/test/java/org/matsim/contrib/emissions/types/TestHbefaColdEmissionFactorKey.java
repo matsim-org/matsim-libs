@@ -22,10 +22,6 @@ package org.matsim.contrib.emissions.types;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.matsim.contrib.emissions.types.ColdPollutant;
-import org.matsim.contrib.emissions.types.HbefaColdEmissionFactorKey;
-import org.matsim.contrib.emissions.types.HbefaVehicleAttributes;
-import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
 
 
 /*
@@ -38,13 +34,15 @@ import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
 
 public class TestHbefaColdEmissionFactorKey {
 	
-	Integer distance, parkingTime;
-	ColdPollutant coldPollutant;
-	HbefaVehicleAttributes hbefaVehicleAttributes;
-	HbefaVehicleCategory hbefaVehCategory;
-	String message, message2;
-	boolean equalErr;
-	HbefaColdEmissionFactorKey normal;
+	private Integer distance;
+    private Integer parkingTime;
+	private ColdPollutant coldPollutant;
+	private HbefaVehicleAttributes hbefaVehicleAttributes;
+	private HbefaVehicleCategory hbefaVehCategory;
+	private String message;
+    private String message2;
+	private boolean equalErr;
+	private HbefaColdEmissionFactorKey normal;
 	
 	private void setUp(){
 		normal = new HbefaColdEmissionFactorKey();

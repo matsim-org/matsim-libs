@@ -19,20 +19,18 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions.utils;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.util.Map;
-import java.util.SortedMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.util.Map;
+import java.util.SortedMap;
 
 /**
  * @author benjamin
@@ -88,38 +86,4 @@ public class EmissionWriter {
 		}
 	}
 
-	void writeLinkLocation2Emissions(
-			Map<Id<Link>, Map<String, Double>> emissions,
-			Network network,
-			String outFile){
-		try{
-			FileWriter fstream = new FileWriter(outFile);			
-			BufferedWriter out = new BufferedWriter(fstream);
-			out.append("linkId\txLink\tyLink\t");
-			for (String pollutant : emu.getListOfPollutants()){
-				out.append(pollutant + "[g]\t");
-			}
-			out.append("\n");
-
-			for(Id<Link> linkId : emissions.keySet()){
-				Link link = network.getLinks().get(linkId);
-				Coord linkCoord = link.getCoord();
-				Double xLink = linkCoord.getX();
-				Double yLink = linkCoord.getY();
-
-				out.append(linkId + "\t" + xLink + "\t" + yLink + "\t");
-
-				Map<String, Double> emissionType2Value = emissions.get(linkId);
-				for(String pollutant : emu.getListOfPollutants()){
-					out.append(emissionType2Value.get(pollutant) + "\t");
-				}
-				out.append("\n");
-			}
-			//Close the output stream
-			out.close();
-			logger.info("Finished writing output to " + outFile);
-		} catch (Exception e){
-			throw new RuntimeException(e);
-		}
-	}
 }

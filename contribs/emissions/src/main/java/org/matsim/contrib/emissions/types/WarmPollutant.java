@@ -27,7 +27,7 @@ public enum WarmPollutant {
 	
 	CO("CO"), CO2_TOTAL("CO2(total)"), FC("FC"), HC("HC"), NMHC("NMHC"), NOX("NOx"), NO2("NO2"), PM("PM"),	SO2("SO2");
 	
-	private String key;
+	private final String key;
 
 	WarmPollutant(String key) {
 		this.key = key;

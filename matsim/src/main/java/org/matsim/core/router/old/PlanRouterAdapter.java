@@ -19,31 +19,23 @@
  * *********************************************************************** */
 package org.matsim.core.router.old;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.ActivityWrapperFacility;
-import org.matsim.core.router.LegRouterWrapper;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
+
+import java.util.List;
 
 /**
  * Adapts a PlanRouter to the PlansCalcRoute interface.
@@ -56,11 +48,8 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 @Deprecated // use TripRouter instead. kai, dec'13 
 public class PlanRouterAdapter implements PlanAlgorithm, PersonAlgorithm {
 	private final LeastCostPathCalculator routeAlgo;
-	private final LeastCostPathCalculator routeAlgoPtFreeFlow;
-	private final Network network;
-	private final ModeRouteFactory routeFactory;
-	private final PopulationFactory populationFactory;
-	private final PlanRouter planRouter;
+    private final ModeRouteFactory routeFactory;
+    private final PlanRouter planRouter;
 
 	@Deprecated // use TripRouter instead. kai, dec'13 
 	public static double handleLeg(TripRouter tripRouter, final Person person,
@@ -90,23 +79,7 @@ public class PlanRouterAdapter implements PlanAlgorithm, PersonAlgorithm {
 				tripLeg.getTravelTime();
 	}
 
-	@Deprecated // use TripRouter instead. kai, dec'13 
-	public PlanRouterAdapter(
-			final PlanRouter planRouter,
-			final LeastCostPathCalculator routeAlgo,
-			final LeastCostPathCalculator routeAlgoPtFreeFlow,
-			final Network network,
-			final ModeRouteFactory routeFactory,
-			final PopulationFactory populationFactory) {
-		this.routeAlgo = routeAlgo;
-		this.routeAlgoPtFreeFlow = routeAlgoPtFreeFlow;
-		this.network = network;
-		this.routeFactory = routeFactory;
-		this.populationFactory = populationFactory;
-		this.planRouter = planRouter;
-	}
-
-	@Deprecated // use TripRouter instead. kai, dec'13 
+    @Deprecated // use TripRouter instead. kai, dec'13
 	public PlanRouterAdapter(
 			final Controler controler) {
 		this.planRouter = new PlanRouter(
@@ -118,61 +91,21 @@ public class PlanRouterAdapter implements PlanAlgorithm, PersonAlgorithm {
 			controler.getTravelDisutilityFactory().createTravelDisutility(
 					time,
 					controler.getConfig().planCalcScore());
-		FreespeedTravelTimeAndDisutility ptTimeCostCalc =
-			new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
-		
-		LeastCostPathCalculatorFactory factory = controler.getLeastCostPathCalculatorFactory();
-		this.network = controler.getNetwork();
+
+        LeastCostPathCalculatorFactory factory = controler.getLeastCostPathCalculatorFactory();
+        Network network = controler.getNetwork();
 		this.routeAlgo = factory.createPathCalculator(network, disutility, time);
-		this.routeAlgoPtFreeFlow = factory.createPathCalculator(network, ptTimeCostCalc, ptTimeCostCalc);
-		this.populationFactory = controler.getPopulation().getFactory();
-		this.routeFactory = ((PopulationFactoryImpl) populationFactory).getModeRouteFactory();
-	}
-
-	@Deprecated // use TripRouter instead. kai, dec'13 
-	public PlanRouterAdapter(
-			final PlanRouter planRouter,
-			final Network network,
-			final PopulationFactory populationFactory,
-			final TravelTime time,
-			final TravelDisutility disutility,
-			final LeastCostPathCalculatorFactory factory) {
-		this.planRouter = planRouter;
-
-		FreespeedTravelTimeAndDisutility ptTimeCostCalc =
-			new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
-
-		this.network = network;
-		this.routeAlgo = factory.createPathCalculator(network, disutility, time);
-		this.routeAlgoPtFreeFlow = factory.createPathCalculator(network, ptTimeCostCalc, ptTimeCostCalc);
-		this.populationFactory = populationFactory;
+        PopulationFactory populationFactory = controler.getPopulation().getFactory();
 		this.routeFactory = ((PopulationFactoryImpl) populationFactory).getModeRouteFactory();
 	}
 
 
-	@Deprecated // use TripRouter instead. kai, dec'13 
+    @Deprecated // use TripRouter instead. kai, dec'13
 	public final LeastCostPathCalculator getLeastCostPathCalculator(){
 		return this.routeAlgo;
 	}
 
-	@Deprecated // use TripRouter instead. kai, dec'13 
-	public final LeastCostPathCalculator getPtFreeflowLeastCostPathCalculator(){
-		return this.routeAlgoPtFreeFlow;
-	}
-
-	@Deprecated // use TripRouter instead. kai, dec'13 
-	public final void addLegHandler(
-			final String transportMode,
-			final LegRouter legHandler) {
-		planRouter.getTripRouter().setRoutingModule(
-				transportMode,
-				new LegRouterWrapper(
-					transportMode,
-					populationFactory,
-					legHandler));
-	}
-
-	@Override
+    @Override
 	@Deprecated // use TripRouter instead. kai, dec'13 
 	public void run(final Person person) {
 		for (Plan plan : person.getPlans()) {

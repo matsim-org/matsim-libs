@@ -36,7 +36,7 @@ public class HbefaColdEmissionFactorKey {
 	public HbefaColdEmissionFactorKey(){
 	}
 
-	public HbefaVehicleCategory getHbefaVehicleCategory() {
+	HbefaVehicleCategory getHbefaVehicleCategory() {
 		return hbefaVehicleCategory;
 	}
 
@@ -44,7 +44,7 @@ public class HbefaColdEmissionFactorKey {
 		this.hbefaVehicleCategory = hbefaVehicleCategory;
 	}
 
-	public ColdPollutant getHbefaComponent() {
+	ColdPollutant getHbefaComponent() {
 		return hbefaComponent;
 	}
 
@@ -52,7 +52,7 @@ public class HbefaColdEmissionFactorKey {
 		this.hbefaComponent = hbefaComponent;
 	}
 
-	public Integer getHbefaParkingTime() {
+	Integer getHbefaParkingTime() {
 		return hbefaParkingTime;
 	}
 
@@ -60,7 +60,7 @@ public class HbefaColdEmissionFactorKey {
 		this.hbefaParkingTime = hbefaParkingTime;
 	}
 
-	public Integer getHbefaDistance() {
+	Integer getHbefaDistance() {
 		return hbefaDistance;
 	}
 
@@ -68,7 +68,7 @@ public class HbefaColdEmissionFactorKey {
 		this.hbefaDistance = hbefaDistance;
 	}
 		
-	public HbefaVehicleAttributes getHbefaVehicleAttributes() {
+	HbefaVehicleAttributes getHbefaVehicleAttributes() {
 		return hbefaVehicleAttributes;
 	}
 

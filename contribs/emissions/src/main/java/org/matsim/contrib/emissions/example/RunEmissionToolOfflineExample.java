@@ -42,13 +42,13 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class RunEmissionToolOfflineExample {
 	
-	final static String runDirectory = "./test/output/";
-	static String configFile = runDirectory + "output_config.xml.gz";
-	final static Integer lastIteration = getLastIteration(configFile);
+	private final static String runDirectory = "./test/output/";
+	private static final String configFile = runDirectory + "output_config.xml.gz";
+	private final static Integer lastIteration = getLastIteration();
 	
-	static String eventsPath = runDirectory + "ITERS/it." + lastIteration + "/" +  lastIteration;
-	static String eventsFile = eventsPath + ".events.xml.gz";
-	static String emissionEventOutputFile = eventsPath + ".emission.events.offline.xml.gz";
+	private static final String eventsPath = runDirectory + "ITERS/it." + lastIteration + "/" +  lastIteration;
+	private static final String eventsFile = eventsPath + ".events.xml.gz";
+	private static final String emissionEventOutputFile = eventsPath + ".emission.events.offline.xml.gz";
 	
 	// =======================================================================================================		
 	
@@ -76,12 +76,11 @@ public class RunEmissionToolOfflineExample {
 		emissionModule.writeEmissionInformation(emissionEventOutputFile);
 	}
 
-	private static int getLastIteration(String configFile) {
+	private static int getLastIteration() {
 		Config config = new Config();
 		config.addCoreModules();
 		MatsimConfigReader configReader = new MatsimConfigReader(config);
-		configReader.readFile(configFile);
-		Integer lastIteration = config.controler().getLastIteration();
-		return lastIteration;
+		configReader.readFile(RunEmissionToolOfflineExample.configFile);
+        return config.controler().getLastIteration();
 	}
 }

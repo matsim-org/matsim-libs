@@ -21,19 +21,18 @@
  * *********************************************************************** */
 package playground.fhuelsmann.emission;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.contrib.emissions.events.ColdEmissionEventImpl;
+import org.matsim.contrib.emissions.events.ColdEmissionEvent;
 import org.matsim.contrib.emissions.types.ColdPollutant;
 import org.matsim.core.api.experimental.events.EventsManager;
-
 import playground.fhuelsmann.emission.objects.HbefaColdEmissionFactor;
 import playground.fhuelsmann.emission.objects.HbefaColdEmissionTableCreator;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class ColdEmissionAnalysisModule {
 	private static final Logger logger = Logger.getLogger(ColdEmissionAnalysisModule.class);
@@ -76,7 +75,7 @@ public class ColdEmissionAnalysisModule {
 			generatedEmissions = coldEf ;
 			coldEmissions.put(coldPollutant, generatedEmissions);
 		}
-		Event coldEmissionEvent = new ColdEmissionEventImpl(startEngineTime, coldEmissionEventLinkId, personId, coldEmissions);
+		Event coldEmissionEvent = new ColdEmissionEvent(startEngineTime, coldEmissionEventLinkId, personId, coldEmissions);
 		emissionEventsManager.processEvent(coldEmissionEvent);
 	}
 }
