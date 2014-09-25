@@ -21,14 +21,39 @@
  * An example config and the associated files can be found at the test input directory.
  * The example config file allows you to directly run the online example.
  * <p>
- * Please note that the emission values given by the sample files are NOT actual data from HBEFA due to copyright restrictions. A guide on how to export the necessary files from the HBEFA Microsoft Access database will be available soon.
- *  <p>
- * To set up your own simulation cases you will have to specify several input files. See the above classes as examples and the following section for details.
+ * Please note that the emission values given by the sample files are NOT actual data from HBEFA due to copyright restrictions. In the follwing section, there is a guide how to export these files.
+ *
+ * <h2>Export from HBEFA 3.1</h2>
+ * Currently, data from the HBEFA 3.1 Microsoft Access database needs to be exported manually.
+ * We are currently testing code to read the database directly from JAVA via <a href="http://jackcess.sourceforge.net/">Jackcess</a>. However, this is not available yet.
+ * 
+ * Consequently, the following steps within HBEFA 3.1 need still be done manually:
+ * <ul>
+ *  <li> Install and open HBEFA 3.1</li>
+ *  <li> Select your country and language</li>
+ *  <li> Go to "CaseDefinition" > "New"</li>
+ *  <li> Select the desired parameters:</li>
+ *   <ul>
+ *    <li> VEHICLE CATEGORIES: Currently, PC (passenger car) and HGV (heavy goods vehicle) are supported (see {@link org.matsim.contrib.emissions.types.HbefaVehicleCategory HbefaVehicleCategory})</li>
+ *    <li> COMPONENTS: Currently, all pollutants listed under {@link org.matsim.contrib.emissions.types.WarmPollutant WarmPollutant} are supported; please choose accordingly</li>
+ *    <li> YEARS: Choose the year of your scenario (only when exporting the mandatory average emission factors files)</li>
+ *    <li> FLEET COMPOSITION: Choose "EF weighted with fleet composition" for the mandatory average emission factors files, and "EF per subsegment (without weighting)" for the optional detailed emission factors files</li>
+ *    <li> HOT EMISSION FACTORS: Choose "Individual TrafficSituations" > "Construct your own list" > "SelectAll" > "Return"</li>
+ *    <li> COLD START EXCESS EMISSION FACTORS: Tick this option and choose "Construct your own list" > select all "patterns" with average temperature, detailed parking time (0-1h .. >12h), and detailed distance (0-1km and 1-2km) > "Return"</li>
+ *    <li> Leave everything else as default</li>
+ *   </ul> 
+ *  <li> Enter "Name of parameter set" and press "Calculate"</li>
+ *  <li> Save the two generated tables using "Results" > "Export" to the desired location</li>
+ * </ul>
+ * 
+ *  All these emission factor files need to be converted into *.txt or *.csv with ";" as delimiter.
+ *  Their column headers should automatically match the parser definition
+ *  in the respective method of the {@link org.matsim.contrib.emissions.EmissionModule EmissionModule}.
  *
  * <h2>Input files</h2>
  * Required files are:
  * <ul>
- * <li>roadTypeMappingFile: This file needs to map road types in your network to Hbefa 3.1 road types. 
+ * <li>roadTypeMappingFile: This file needs to map road types in your network to HBEFA 3.1 road types. 
  * See the parser {@link org.matsim.contrib.emissions.EmissionModule#createRoadTypeMapping createRoadTypeMapping} 
  * at the {@link org.matsim.contrib.emissions.EmissionModule EmissionModule} 
  * or see {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup EmissionsConfigGroup} for a detailed description.
@@ -41,12 +66,12 @@
  *  <li> OPTIONAL: If detailed emission calculation is switched on, the vehicle type Id should additionally contain
  *  HbefaVehicleAttributes ("Technology;SizeClasse;EmConcept"), corresponding to the strings in detailedWarmEmissionFactorsFile (see below) </li>
  * </ul>
- * <li>averageFleetWarmEmissionFactorsFile: This file can be exported from Hbefa 3.1. 
+ * <li>averageFleetWarmEmissionFactorsFile: This file can be exported from HBEFA 3.1 (see above). 
  * See the parser {@link org.matsim.contrib.emissions.EmissionModule#createAvgHbefaWarmTable createAvgHbefaWarmTable}
  *  at the {@link org.matsim.contrib.emissions.EmissionModule EmissionModule} 
  *  or see the {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup EmissionsConfigGroup} for a detailed description. </li>
  *
- * <li>averageFleetColdEmissionFactorsFile: This file can be exported from Hbefa 3.1.
+ * <li>averageFleetColdEmissionFactorsFile: This file can be exported from HBEFA 3.1 (see above).
  * See the parser {@link org.matsim.contrib.emissions.EmissionModule#createAvgHbefaColdTable createAvgHbefaColdTable}
  * at the {@link org.matsim.contrib.emissions.EmissionModule EmissionModule} 
  * or see the {@link org.matsim.contrib.emissions.utils.EmissionsConfigGroup EmissionsConfigGroup} for a detailed description. </li>
@@ -67,10 +92,6 @@
  * at the {@link org.matsim.contrib.emissions.EmissionModule EmissionModule} for details.
  * </li>
  * </ul>
- * 
- *  All emission factor files represent tables from Hbefa 3.1, which are read columnwise. 
- *  Their column headers need to match the parser definition 
- *  in the respective method of the {@link org.matsim.contrib.emissions.EmissionModule EmissionModule}.
  *
  * <h2>Model description</h2>
  * 
