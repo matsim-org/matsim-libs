@@ -10,7 +10,7 @@
   <artifactId>emissions</artifactId>
   <name>emissions</name>
   
-    <build>
+  <build>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
