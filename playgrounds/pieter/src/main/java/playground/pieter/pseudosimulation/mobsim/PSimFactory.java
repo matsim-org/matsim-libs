@@ -36,8 +36,7 @@ public class PSimFactory implements MobsimFactory {
 		else
 			iteration++;
 		if (waitTime != null) {
-			return new PSim(sc, eventsManager, plans, travelTime, waitTime,
-					stopStopTime);
+			return new PSim(sc, eventsManager, plans, travelTime, waitTime, stopStopTime);
 
 		} else {
 			return new PSim(sc, eventsManager, plans, travelTime);
@@ -52,8 +51,7 @@ public class PSimFactory implements MobsimFactory {
 		this.travelTime = travelTime;
 	}
 
-	public void setTimes(TravelTime travelTime, WaitTime waitTime,
-			StopStopTime stopStopTime) {
+	public void setTimes(TravelTime travelTime, WaitTime waitTime, StopStopTime stopStopTime) {
 		this.travelTime = travelTime;
 		this.waitTime = waitTime;
 		this.stopStopTime = stopStopTime;

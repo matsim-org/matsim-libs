@@ -28,27 +28,24 @@ import playground.pieter.pseudosimulation.mobsim.PSimFactory;
 
 public class SlaveControler implements IterationStartsListener, BeforeMobsimListener {
 	class TimesReceiver implements Runnable {
-		
 
 		@Override
 		public void run() {
-			while(true){
+			while (true) {
 				boolean res = false;
 				try {
 					res = reader.readBoolean();
-				}
-				catch (IOException e) {
+				} catch (IOException e) {
 					System.out.println("Master terminated. Exiting.");
 					System.exit(0);
 				}
 				try {
-					if(res) {
+					if (res) {
 						linkTravelTimes = (SerializableLinkTravelTimes) reader.readObject();
-						sendPlans = true;
-					}
-					else {
+						writer.writeObject(plansCopyForSending);
+					} else {
 						System.out.println("Master terminated. Exiting.");
-						
+
 						System.exit(0);
 					}
 				} catch (ClassNotFoundException | IOException e) {
@@ -56,25 +53,25 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
 				}
 			}
 		}
-		
+
 	}
+
 	Controler matsimControler;
 	private SerializableLinkTravelTimes linkTravelTimes;
 	private ObjectInputStream reader;
 	private ObjectOutputStream writer;
 	private PSimFactory pSimFactory;
-	private boolean sendPlans = false;
+	private Map<String, PlanSerializable> plansCopyForSending;
 
 	public SlaveControler(String[] args) throws NumberFormatException, UnknownHostException, IOException, ClassNotFoundException {
-		matsimControler = new Controler(ScenarioUtils.loadScenario(ConfigUtils
-				.loadConfig(args[0])));
+		matsimControler = new Controler(ScenarioUtils.loadScenario(ConfigUtils.loadConfig(args[0])));
 		matsimControler.setOverwriteFiles(true);
 		matsimControler.addControlerListener(this);
 		Socket socket = new Socket(args[1], Integer.parseInt(args[2]));
 		this.reader = new ObjectInputStream(socket.getInputStream());
 		this.writer = new ObjectOutputStream(socket.getOutputStream());
 		int myNumber = reader.readInt();
-		matsimControler.getConfig().controler().setOutputDirectory(matsimControler.getConfig().controler().getOutputDirectory()+"_"+myNumber);
+		matsimControler.getConfig().controler().setOutputDirectory(matsimControler.getConfig().controler().getOutputDirectory() + "_" + myNumber);
 		removeNonSimulatedAgents((List<String>) reader.readObject());
 		new Thread(new TimesReceiver()).start();
 	}
@@ -82,14 +79,14 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
 	private void removeNonSimulatedAgents(List<String> idStrings) {
 		Set<Id<Person>> noIds = new HashSet<>(matsimControler.getPopulation().getPersons().keySet());
 		Set<String> noIdStrings = new HashSet<>();
-		for(Id<Person> id:noIds)
+		for (Id<Person> id : noIds)
 			noIdStrings.add(id.toString());
 		noIdStrings.removeAll(idStrings);
-		
-		for(String idString:noIdStrings){
+
+		for (String idString : noIdStrings) {
 			matsimControler.getPopulation().getPersons().remove(Id.create(idString, Person.class));
 		}
-		
+
 	}
 
 	public static void main(String[] args) throws NumberFormatException, UnknownHostException, IOException, ClassNotFoundException {
@@ -100,37 +97,31 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
 	private void run() {
 		pSimFactory = new PSimFactory();
 		matsimControler.setMobsimFactory(pSimFactory);
-		Collection<Plan> plans  =new ArrayList<>();
-		for(Person person:matsimControler.getPopulation().getPersons().values())
+		Collection<Plan> plans = new ArrayList<>();
+		for (Person person : matsimControler.getPopulation().getPersons().values())
 			plans.add(person.getSelectedPlan());
-//		pSimFactory.setPlans(plans);
+		// pSimFactory.setPlans(plans);
 		matsimControler.run();
 	}
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		if(event.getIteration()==0 || linkTravelTimes == null)
+		if (event.getIteration() == 0 || linkTravelTimes == null)
 			pSimFactory.setTimes(matsimControler.getLinkTravelTimes());
 		else
 			pSimFactory.setTimes(linkTravelTimes);
-		Collection<Plan> plans  =new ArrayList<>();
-		for(Person person:matsimControler.getPopulation().getPersons().values())
+		Collection<Plan> plans = new ArrayList<>();
+		for (Person person : matsimControler.getPopulation().getPersons().values())
 			plans.add(person.getSelectedPlan());
 		pSimFactory.setPlans(plans);
 	}
 
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-		if(sendPlans) {
-			sendPlans = false;
-			Map<String,PlanSerializable> plans  =new HashMap<>();
-			for(Person person:matsimControler.getPopulation().getPersons().values())
-				plans.put(person.getId().toString(), new PlanSerializable(person.getSelectedPlan()));
-			try {
-				writer.writeObject(plans);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+		Map<String, PlanSerializable> tempPlansCopyForSending = new HashMap<>();
+		for (Person person : matsimControler.getPopulation().getPersons().values())
+			tempPlansCopyForSending.put(person.getId().toString(), new PlanSerializable(person.getSelectedPlan()));
+		plansCopyForSending = tempPlansCopyForSending;
 	}
+
 }
