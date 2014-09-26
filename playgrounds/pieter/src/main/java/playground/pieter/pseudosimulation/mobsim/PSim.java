@@ -100,6 +100,7 @@ public class PSim implements Mobsim {
 
 	public PSim(Scenario sc, EventsManager eventsManager,Collection<Plan> plans,
 			TravelTime carLinkTravelTimes) {
+		Logger.getLogger(getClass()).warn("Constructing PSim");
 		this.scenario = sc;
 		this.eventManager = eventsManager;
 		int numThreads = Integer.parseInt(sc.getConfig().getParam("global",
@@ -163,6 +164,8 @@ public class PSim implements Mobsim {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			} catch (ExecutionException e) {
+				Logger.getLogger(this.getClass()).error("Something went wrong");
+				Logger.getLogger(this.getClass()).error(e.getMessage());
 				e.printStackTrace();
 			}
 		}
@@ -409,6 +412,8 @@ public class PSim implements Mobsim {
 				List<Id<Link>> ids = route.getLinkIds();
 				for (int i = 0; i < ids.size(); i++) {
 					Id link = ids.get(i);
+					if(linkEnterTime>1E16){
+						int mmm=0;}
 					linkEnterTime = linkLeaveTime;
 					linkEnterEvent = new LinkEnterEvent(linkEnterTime, agentId,
 							link, agentId);

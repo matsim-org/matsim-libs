@@ -22,7 +22,7 @@ public class SerializableLinkTravelTimes implements Serializable, TravelTime {
 			int traveltimeBinSize, double endTime,
 			Collection<? extends Link> links) {
 		this.travelTimeBinSize = traveltimeBinSize;
-		endTime = endTime < 0 ? 86400 : endTime;
+		endTime = endTime <= 0 ? 86400 : endTime;
 		times = new double[links.size()][(int) (endTime / traveltimeBinSize)];
 		Iterator<? extends Link> iterator = links.iterator();
 		for (int i = 0; i < times.length; i++) {
@@ -37,7 +37,14 @@ public class SerializableLinkTravelTimes implements Serializable, TravelTime {
 	@Override
 	public double getLinkTravelTime(Link link, double time, Person person,
 			Vehicle vehicle) {
-		return times[indices.get(link.getId().toString())][(int) (time / travelTimeBinSize)];
+		time = time % 86400;
+		try {
+			return times[indices.get(link.getId().toString())][(int) (time / travelTimeBinSize)];
+		} catch (ArrayIndexOutOfBoundsException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return time;
 	}
 
 }

@@ -18,14 +18,17 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.pieter.pseudosimulation.mobsim.PSimFactory;
 
-public class SlaveControler implements IterationStartsListener {
+public class SlaveControler implements IterationStartsListener, BeforeMobsimListener {
 	class TimesReceiver implements Runnable {
+		
 
 		@Override
 		public void run() {
@@ -41,11 +44,7 @@ public class SlaveControler implements IterationStartsListener {
 				try {
 					if(res) {
 						linkTravelTimes = (SerializableLinkTravelTimes) reader.readObject();
-						Map<String,PlanSerializable> plans  =new HashMap<>();
-						for(Person person:matsimControler.getPopulation().getPersons().values())
-							plans.put(person.getId().toString(), new PlanSerializable(person.getSelectedPlan()));
-						writer.writeObject(plans);
-						pSimFactory.setTimes(linkTravelTimes);
+						sendPlans = true;
 					}
 					else {
 						System.out.println("Master terminated. Exiting.");
@@ -64,6 +63,7 @@ public class SlaveControler implements IterationStartsListener {
 	private ObjectInputStream reader;
 	private ObjectOutputStream writer;
 	private PSimFactory pSimFactory;
+	private boolean sendPlans = false;
 
 	public SlaveControler(String[] args) throws NumberFormatException, UnknownHostException, IOException, ClassNotFoundException {
 		matsimControler = new Controler(ScenarioUtils.loadScenario(ConfigUtils
@@ -73,6 +73,8 @@ public class SlaveControler implements IterationStartsListener {
 		Socket socket = new Socket(args[1], Integer.parseInt(args[2]));
 		this.reader = new ObjectInputStream(socket.getInputStream());
 		this.writer = new ObjectOutputStream(socket.getOutputStream());
+		int myNumber = reader.readInt();
+		matsimControler.getConfig().controler().setOutputDirectory(matsimControler.getConfig().controler().getOutputDirectory()+"_"+myNumber);
 		removeNonSimulatedAgents((List<String>) reader.readObject());
 		new Thread(new TimesReceiver()).start();
 	}
@@ -101,17 +103,34 @@ public class SlaveControler implements IterationStartsListener {
 		Collection<Plan> plans  =new ArrayList<>();
 		for(Person person:matsimControler.getPopulation().getPersons().values())
 			plans.add(person.getSelectedPlan());
-		pSimFactory.setPlans(plans);
+//		pSimFactory.setPlans(plans);
 		matsimControler.run();
 	}
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		if(event.getIteration()==0)
+		if(event.getIteration()==0 || linkTravelTimes == null)
 			pSimFactory.setTimes(matsimControler.getLinkTravelTimes());
+		else
+			pSimFactory.setTimes(linkTravelTimes);
 		Collection<Plan> plans  =new ArrayList<>();
 		for(Person person:matsimControler.getPopulation().getPersons().values())
 			plans.add(person.getSelectedPlan());
 		pSimFactory.setPlans(plans);
+	}
+
+	@Override
+	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+		if(sendPlans) {
+			sendPlans = false;
+			Map<String,PlanSerializable> plans  =new HashMap<>();
+			for(Person person:matsimControler.getPopulation().getPersons().values())
+				plans.put(person.getId().toString(), new PlanSerializable(person.getSelectedPlan()));
+			try {
+				writer.writeObject(plans);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 }

@@ -19,23 +19,28 @@ import playground.singapore.transitRouterEventsBased.waitTimes.WaitTime;
 
 /**
  * @author fouriep
- *
+ * 
  */
 public class PSimFactory implements MobsimFactory {
-
 
 	private Collection<Plan> plans;
 	private TravelTime travelTime;
 	private WaitTime waitTime;
 	private StopStopTime stopStopTime;
+	private int iteration = 0;
 
 	@Override
 	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-		if(waitTime != null){
-			return new PSim(sc, eventsManager, plans, travelTime, waitTime, stopStopTime);
-			
-		}else{
-			return new PSim(sc,eventsManager,plans,travelTime);
+		if (iteration > 0)
+			eventsManager.resetHandlers(iteration++);
+		else
+			iteration++;
+		if (waitTime != null) {
+			return new PSim(sc, eventsManager, plans, travelTime, waitTime,
+					stopStopTime);
+
+		} else {
+			return new PSim(sc, eventsManager, plans, travelTime);
 		}
 	}
 
@@ -46,14 +51,12 @@ public class PSimFactory implements MobsimFactory {
 	public void setTimes(TravelTime travelTime) {
 		this.travelTime = travelTime;
 	}
-	
-	public void setTimes(TravelTime travelTime,
-			WaitTime waitTime, StopStopTime stopStopTime){
+
+	public void setTimes(TravelTime travelTime, WaitTime waitTime,
+			StopStopTime stopStopTime) {
 		this.travelTime = travelTime;
 		this.waitTime = waitTime;
 		this.stopStopTime = stopStopTime;
 	}
-	
-
 
 }

@@ -60,10 +60,13 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
 				}
 				numThreads.decrementAndGet();
 			} catch (IOException | ClassNotFoundException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
+				System.exit(0);
 			} catch (Exception e){
 				e.printStackTrace();
+
+				
+				System.exit(0);
 			}
 		}
 
@@ -74,6 +77,10 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
 		public void shutdown() throws IOException {
 			// kills the slave
 			writer.writeBoolean(false);
+		}
+
+		public void sendNumber(int i) throws IOException {
+			writer.writeInt(i);
 		}
 
 	}
@@ -107,6 +114,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
 		for (int i = 0; i < numSlaves; i++) {
 			Socket s = server.accept();
 			slaves[i] = new Slave(s);
+			slaves[i].sendNumber(i);
 			List<String> idStrings = new ArrayList<>();
 			for (Id id : split[i])
 				idStrings.add(id.toString());

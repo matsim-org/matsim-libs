@@ -78,12 +78,17 @@ class PlanSerializable implements Serializable {
 			else if (leg.getRoute() instanceof GenericRoute)
 				route = new GenericRouteSerializable(
 						(GenericRoute) leg.getRoute());
+			else {
+				System.out.println("Some other route jesus %$&^&$%");
+			}
 		}
 
 		public Leg getLeg() {
 			Leg leg = new LegImpl(mode);
 			leg.setDepartureTime(departureTime);
 			leg.setTravelTime(travelTime);
+			if(route == null)
+				System.out.println("jesus c the route is null!!");
 			leg.setRoute(route.getRoute());
 			return leg;
 		}
