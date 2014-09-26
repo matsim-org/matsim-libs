@@ -41,7 +41,8 @@ class MultiModalQLinkExtension {
 	private final Link link;
 	private final MultiModalQNodeExtension toNode;
 	private MultiModalSimEngine simEngine;
-
+	private NetworkElementActivator activator = null;
+	
 	/*
 	 * Is set to "true" if the MultiModalQLinkExtension has active Agents.
 	 */
@@ -57,8 +58,8 @@ class MultiModalQLinkExtension {
 		this.toNode = multiModalQNodeExtension;
 	}
 
-	/*package*/ void setMultiModalSimEngine(MultiModalSimEngine simEngine) {
-		this.simEngine = simEngine;
+	/*package*/ void setNetworkElementActivator(NetworkElementActivator activator) {
+		this.activator = activator;
 	}
 
 	/*package*/ boolean hasWaitingToLeaveAgents() {
@@ -68,7 +69,6 @@ class MultiModalQLinkExtension {
 	/*package*/ Link getLink() {
 		return this.link;
 	}
-
 
 	public void addAgentFromIntersection(MobsimAgent mobsimAgent, double now) {
 		this.activateLink();
@@ -80,7 +80,7 @@ class MultiModalQLinkExtension {
 
 	private void addAgent(MobsimAgent mobsimAgent, double now) {
 
-		Map<String, TravelTime> multiModalTravelTime = simEngine.getMultiModalTravelTimes();
+		Map<String, TravelTime> multiModalTravelTime = this.simEngine.getMultiModalTravelTimes();
 		Person person = null;
 		if (mobsimAgent instanceof HasPerson) {
 			person = ((HasPerson) mobsimAgent).getPerson(); 
@@ -90,7 +90,7 @@ class MultiModalQLinkExtension {
 
 		departureTime = Math.round(departureTime);
 
-		agents.add(new Tuple<>(departureTime, mobsimAgent));
+		this.agents.add(new Tuple<>(departureTime, mobsimAgent));
 	}
 
 	public void addDepartingAgent(MobsimAgent mobsimAgent, double now) {
@@ -121,7 +121,7 @@ class MultiModalQLinkExtension {
 		 * Otherwise, it could be activated multiple times concurrently.
 		 */
 		if (this.isActive.compareAndSet(false, true)) {			
-			simEngine.activateLink(this);
+			this.activator.activateLink(this);
 		}
 	}
 

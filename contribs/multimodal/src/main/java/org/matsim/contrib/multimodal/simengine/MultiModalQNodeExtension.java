@@ -20,25 +20,24 @@
 
 package org.matsim.contrib.multimodal.simengine;
 
+import java.util.Collection;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
-import java.util.Collection;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 class MultiModalQNodeExtension {
 	
 	private static final Logger log = Logger.getLogger(MultiModalQNodeExtension.class);
 	
 	private MultiModalSimEngine simEngine;
+	private NetworkElementActivator activator = null;
 	private final MultiModalQLinkExtension[] inLinksArrayCache;
 	
-	/*
-	 * Is set to "true" if the MultiModalNodeExtension has active inLinks.
-	 */
+	// Is set to "true" if the MultiModalNodeExtension has active inLinks.
     private final AtomicBoolean isActive = new AtomicBoolean(false);
 	
 	/*package*/ MultiModalQNodeExtension(MultiModalSimEngine simEngine, int numInLinks) {	
@@ -55,15 +54,12 @@ class MultiModalQNodeExtension {
 		}
 	}
 	
-	/*package*/ void setMultiModalSimEngine(MultiModalSimEngine simEngine) {
-		this.simEngine = simEngine;
+	/*package*/ void setNetworkElementActivator(NetworkElementActivator activator) {
+		this.activator = activator;
 	}
 	
 	public boolean moveNode(final double now) {
-		/*
-		 *  Check all incoming links for WaitingToLeaveAgents
-		 *  If waiting Agents are found, we activate the Node.
-		 */
+		// Check all incoming links for WaitingToLeaveAgents. If waiting Agents are found, we activate the Node.
 		boolean agentsWaitingAtInLinks = false;
 		for (MultiModalQLinkExtension link : this.inLinksArrayCache) {
 			if(link.hasWaitingToLeaveAgents()) {
@@ -102,7 +98,7 @@ class MultiModalQNodeExtension {
 		 * Otherwise, it could be activated multiple times concurrently.
 		 */
 		if (this.isActive.compareAndSet(false, true)) {
-			simEngine.activateNode(this);
+			this.activator.activateNode(this);
 		}
 	}
 	
@@ -124,8 +120,8 @@ class MultiModalQNodeExtension {
 	   */
       boolean moveAgentOverNode(final MobsimAgent mobsimAgent, final double now) {
 		
-		Id currentLinkId = mobsimAgent.getCurrentLinkId();
-		Id nextLinkId = ((MobsimDriverAgent) mobsimAgent).chooseNextLinkId();
+		Id<Link> currentLinkId = mobsimAgent.getCurrentLinkId();
+		Id<Link> nextLinkId = ((MobsimDriverAgent) mobsimAgent).chooseNextLinkId();
 		
 		Link currentLink = this.simEngine.getMultiModalQLinkExtension(currentLinkId).getLink();
 		
@@ -136,7 +132,7 @@ class MultiModalQNodeExtension {
 			
 			// move Agent over the Node
 			((MobsimDriverAgent)mobsimAgent).notifyMoveOverNode(nextLinkId);
-			simEngine.getMultiModalQLinkExtension(nextLinkId).addAgentFromIntersection(mobsimAgent, now);
+			this.simEngine.getMultiModalQLinkExtension(nextLinkId).addAgentFromIntersection(mobsimAgent, now);
 		}
 		// --> nextLink == null
 		else {

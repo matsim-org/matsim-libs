@@ -20,13 +20,13 @@
 
 package org.matsim.contrib.multimodal.simengine;
 
-interface NetworkElementActivator {
-
-	/*package*/ void activateLink(MultiModalQLinkExtension link);
-
-	/*package*/ int getNumberOfSimulatedLinks();
+public abstract class NetworkElementActivator {
 	
-	/*package*/ void activateNode(MultiModalQNodeExtension node);
+	protected abstract void activateNode(final MultiModalQNodeExtension node);
+	
+	abstract int getNumberOfSimulatedNodes();
+	
+	protected abstract void activateLink(final MultiModalQLinkExtension link);
 
-	/*package*/ int getNumberOfSimulatedNodes();
+	abstract int getNumberOfSimulatedLinks();
 }

@@ -20,6 +20,15 @@
 
 package org.matsim.contrib.multimodal.simengine;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.concurrent.Phaser;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -34,11 +43,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.misc.Time;
 
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
-class MultiModalSimEngine implements MobsimEngine, NetworkElementActivator {
+class MultiModalSimEngine implements MobsimEngine {
 
 	private static final Logger log = Logger.getLogger(MultiModalSimEngine.class);
 
@@ -47,39 +52,28 @@ class MultiModalSimEngine implements MobsimEngine, NetworkElementActivator {
 	private static final int INFO_PERIOD = 3600;
 
 	/*package*/ Map<String, TravelTime> multiModalTravelTimes;
-	/*package*/ private final Collection<MultiModalQLinkExtension> activeLinks;
-	/*package*/ private final Collection<MultiModalQNodeExtension> activeNodes;
 
-	private final Map<Id, MultiModalQNodeExtension> nodes = new HashMap<>();
-	private final Map<Id, MultiModalQLinkExtension> links = new HashMap<>();
+	private final Map<Id<Node>, MultiModalQNodeExtension> nodes = new HashMap<>();
+	private final Map<Id<Link>, MultiModalQLinkExtension> links = new HashMap<>();
 	
 	/*package*/ InternalInterface internalInterface = null;
 
+	private final int numOfThreads;
+	
+	private MultiModalSimEngineRunner[] runners;
+	private Phaser startBarrier;
+    private Phaser endBarrier;
+	    
+    /*package*/ MultiModalSimEngine(Map<String, TravelTime> multiModalTravelTimes, MultiModalConfigGroup multiModalConfigGroup) {		
+    	this.multiModalTravelTimes = multiModalTravelTimes;
+    	this.numOfThreads = multiModalConfigGroup.getNumberOfThreads();
+    	
+    	if (this.numOfThreads > 1) log.info("Using " + multiModalConfigGroup.getNumberOfThreads() + " threads for MultiModalSimEngine.");
+    }
+    
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
 		this.internalInterface = internalInterface;
-	}
-
-	/*package*/ MultiModalSimEngine(Map<String, TravelTime> multiModalTravelTimes) {
-
-		/*
-		 * This is the collection of active nodes. This needs to be thread-safe since in the
-		 * parallel implementation, multiple threads could activate nodes concurrently.
-		 * (Each thread has its own queue. However, it is not guaranteed that all incoming
-		 * links of a node are handled by the same thread). 
-		 */
-		activeNodes = new ConcurrentLinkedQueue<>();
-
-		/*
-		 * Here, in theory, no thread-safe data structure is needed since links can only
-		 * be activated by their from links and all links are handled by the same thread
-		 * as that node is handled (see assignSimEngines() method in ParallelMultiModalSimEngine).
-		 * However, since this assignment might be changed, we still use a thread-safe data 
-		 * structure.
-		 */
-		activeLinks = new ConcurrentLinkedQueue<>();
-		
-		this.multiModalTravelTimes = multiModalTravelTimes;
 	}
 
 	/*package*/ Mobsim getMobsim() {
@@ -136,7 +130,7 @@ class MultiModalSimEngine implements MobsimEngine, NetworkElementActivator {
 		}
 		
 		for (Link link : simulatedLinks) {
-			Id toNodeId = link.getToNode().getId();
+			Id<Node> toNodeId = link.getToNode().getId();
 			MultiModalQLinkExtension extension = new MultiModalQLinkExtension(link, this, getMultiModalQNodeExtension(toNodeId));
 			this.links.put(link.getId(), extension);
 		}
@@ -154,44 +148,33 @@ class MultiModalSimEngine implements MobsimEngine, NetworkElementActivator {
 		 * InfoTime may be < simStartTime, this ensures to print out the info 
 		 * at the very first timestep already
 		 */
-		this.infoTime = Math.floor(internalInterface.getMobsim().getSimTimer().getSimStartTime() / INFO_PERIOD) * INFO_PERIOD; 
+		this.infoTime = Math.floor(internalInterface.getMobsim().getSimTimer().getSimStartTime() / INFO_PERIOD) * INFO_PERIOD;
+		
+		initMultiModalSimEngineRunners();
 	}
 
+	/*
+	 * The threads are waiting at the startBarrier. We trigger them by reaching this barrier. Now the threads will start 
+	 * moving the nodes and links. We wait until all of them reach the endBarrier to move on. We should not have any 
+	 * problems with race conditions since even if the threads would be faster than this thread, means they reach the 
+	 * endBarrier before this Method does, it should work anyway.
+	 */
 	@Override
 	public void doSimStep(double time) {
-		moveNodes(time);
-		moveLinks(time);
-		printSimLog(time);
-	}
-
-	/*package*/ void moveNodes(final double time) {
-
-		Iterator<MultiModalQNodeExtension> simNodes = this.activeNodes.iterator();
-		MultiModalQNodeExtension node;
-		boolean isActive;
-
-		while (simNodes.hasNext()) {
-			node = simNodes.next();
-			isActive = node.moveNode(time);
-			if (!isActive) {
-				simNodes.remove();
-			}
+		// set current Time
+		for (MultiModalSimEngineRunner runner : this.runners) {
+			runner.setTime(time);
 		}
-	}
+		
+		/*
+		 * Triggering the barrier will cause calls to moveLinks and moveNodes
+		 * in the threads.
+		 */
+		this.startBarrier.arriveAndAwaitAdvance();
+		
+		this.endBarrier.arriveAndAwaitAdvance();
 
-	/*package*/ void moveLinks(final double time) {
-
-		Iterator<MultiModalQLinkExtension> simLinks = this.activeLinks.iterator();
-		MultiModalQLinkExtension link;
-		boolean isActive;
-
-		while (simLinks.hasNext()) {
-			link = simLinks.next();
-			isActive = link.moveLink(time);
-			if (!isActive) {
-				simLinks.remove();
-			}
-		}
+        this.printSimLog(time);
 	}
 
 	/*package*/ void printSimLog(double time) {
@@ -206,9 +189,19 @@ class MultiModalSimEngine implements MobsimEngine, NetworkElementActivator {
 
 	@Override
 	public void afterSim() {
-		/* Reset vehicles on ALL links. We cannot iterate only over the active links
-		 * (this.simLinksArray), because there may be links that have vehicles only
-		 * in the buffer (such links are *not* active, as the buffer gets emptied
+		// Calling the afterSim Method of the MultiModalSimEngineRunners will set their simulationRunning flag to false.
+		for (MultiModalSimEngineRunner engine : this.runners) {
+			engine.afterSim();
+		}
+
+		/*
+		 * Triggering the startBarrier of the MultiModalSimEngineRunners. They will check whether the Simulation is 
+		 * still running. It is not, so the Threads will stop running.
+		 */
+		this.startBarrier.arriveAndAwaitAdvance();
+		
+		/* Reset vehicles on ALL links. We cannot iterate only over the active links (this.simLinksArray), because there 
+		 * may be links that have vehicles only in the buffer (such links are *not* active, as the buffer gets emptied
 		 * when handling the nodes.
 		 */
 		for (MultiModalQLinkExtension link : this.links.values()) {
@@ -216,45 +209,98 @@ class MultiModalSimEngine implements MobsimEngine, NetworkElementActivator {
 		}
 	}
 
-	/*
-	 * This is now thread-safe since the MultiModalQLinkExtension uses an
-	 * AtomicBoolean to store its state. Therefore, it cannot be activated
-	 * multiple times.
-	 */
-	@Override
-	public void activateLink(MultiModalQLinkExtension link) {
-		this.activeLinks.add(link);
-	}
-
-	/*
-	 * This is now thread-safe since the MultiModalQNodeExtension uses an
-	 * AtomicBoolean to store its state. Therefore, it cannot be activated
-	 * multiple times.
-	 */
-	@Override
-	public void activateNode(MultiModalQNodeExtension node) {
-		this.activeNodes.add(node);
-	}
-
-	@Override
 	public int getNumberOfSimulatedLinks() {
-		return activeLinks.size();
+		int numLinks = 0;
+		for (MultiModalSimEngineRunner engine : this.runners) {
+			numLinks = numLinks + engine.getNumberOfSimulatedLinks();
+		}
+		return numLinks;
 	}
 
-	@Override
 	public int getNumberOfSimulatedNodes() {
-		return activeNodes.size();
+		int numNodes = 0;
+		for (MultiModalSimEngineRunner engine : this.runners) {
+			numNodes = numNodes + engine.getNumberOfSimulatedNodes();
+		}
+		return numNodes;
 	}
-
+	
 	/*package*/ Map<String, TravelTime> getMultiModalTravelTimes() {
 		return this.multiModalTravelTimes;
 	}
 
-	/*package*/ MultiModalQNodeExtension getMultiModalQNodeExtension(Id nodeId) {
+	/*package*/ MultiModalQNodeExtension getMultiModalQNodeExtension(Id<Node> nodeId) {
 		return this.nodes.get(nodeId);
 	}
 
-	/*package*/ MultiModalQLinkExtension getMultiModalQLinkExtension(Id linkId) {
+	/*package*/ MultiModalQLinkExtension getMultiModalQLinkExtension(Id<Link> linkId) {
 		return this.links.get(linkId);
-	}	
+	}
+	
+	private void initMultiModalSimEngineRunners() {
+
+		this.runners = new MultiModalSimEngineRunner[numOfThreads];
+
+		this.startBarrier = new Phaser(numOfThreads + 1);
+        Phaser separationBarrier = new Phaser(numOfThreads); // separates moveNodes and moveLinks
+		this.endBarrier = new Phaser(numOfThreads + 1);
+
+		// setup runners
+		for (int i = 0; i < numOfThreads; i++) {
+			MultiModalSimEngineRunner engine = new MultiModalSimEngineRunner(this.startBarrier, 
+					separationBarrier, this.endBarrier);
+			
+			Thread thread = new Thread(engine);
+			thread.setName("MultiModalSimEngineRunner_" + i);
+
+			thread.setDaemon(true);	// make the Thread Daemons so they will terminate automatically
+			this.runners[i] = engine;
+
+			thread.start();
+		}
+		
+		// assign the Links and Nodes to the SimEngines
+		assignSimEngines();
+	}
+
+	private void assignSimEngines() {
+
+		// only for statistics
+		int nodes[] = new int[this.runners.length];
+		int links[] = new int[this.runners.length];
+		
+		int roundRobin = 0;
+		Scenario scenario = this.internalInterface.getMobsim().getScenario();
+		
+		for (Node node : scenario.getNetwork().getNodes().values()) {
+			MultiModalQNodeExtension multiModalQNodeExtension = this.getMultiModalQNodeExtension(node.getId());
+			
+			// if the node is simulated by the MultiModalSimulation
+			if (multiModalQNodeExtension != null) {
+				int i = roundRobin % this.numOfThreads;
+				MultiModalSimEngineRunner simEngineRunner = this.runners[i];
+				multiModalQNodeExtension.setNetworkElementActivator(simEngineRunner);
+				nodes[i]++;
+				
+				/*
+				 * Assign each link to its in-node to ensure that they are processed by the same
+				 * thread which should avoid running into some race conditions.
+				 */
+				for (Link link : node.getOutLinks().values()) {
+					MultiModalQLinkExtension multiModalQLinkExtension = this.getMultiModalQLinkExtension(link.getId());
+					if (multiModalQLinkExtension != null) {
+						multiModalQLinkExtension.setNetworkElementActivator(simEngineRunner);
+						links[i]++;
+					}
+				}
+				
+				roundRobin++;
+			}
+		}
+		
+		// print some statistics
+		for (int i = 0; i < this.runners.length; i++) {
+			log.info("Assigned " + nodes[i] + " nodes and " + links[i] + " links to MultiModalSimEngineRunner #" + i);
+		}
+	}
 }
