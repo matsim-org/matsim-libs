@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.sim;
+package playground.johannes.gsv.synPop.data;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,13 +38,16 @@ import playground.johannes.gsv.misc.QuadTree;
  * @author johannes
  * 
  */
-public class RandomFacilities {
+public class FacilityData {
 
-	private static RandomFacilities instance;
+	private static FacilityData instance;
 
-	public static synchronized RandomFacilities getInstance(ActivityFacilities facilities, Random random) {
+	/**
+	 * @deprecated
+	 */
+	public static synchronized FacilityData getInstance(ActivityFacilities facilities, Random random) {
 		if (instance == null)
-			instance = new RandomFacilities(facilities, random);
+			instance = new FacilityData(facilities, random);
 
 		return instance;
 	}
@@ -55,7 +58,7 @@ public class RandomFacilities {
 
 	private final Random random;
 
-	public RandomFacilities(ActivityFacilities facilities, Random random) {
+	public FacilityData(ActivityFacilities facilities, Random random) {
 		System.out.println("Loading random facilities...");
 		this.random = random;
 		facilitiesMap = new HashMap<String, List<ActivityFacility>>();

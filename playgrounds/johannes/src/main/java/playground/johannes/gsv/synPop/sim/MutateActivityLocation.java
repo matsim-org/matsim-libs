@@ -35,6 +35,7 @@ import playground.johannes.gsv.misc.QuadTree;
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyObject;
 import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.gsv.synPop.data.FacilityData;
 import playground.johannes.gsv.synPop.mid.MIDKeys;
 
 /**
@@ -49,7 +50,7 @@ public class MutateActivityLocation implements Mutator, Initializer {
 	
 	private final Random random;
 	
-	private final RandomFacilities rndFacilities;
+	private final FacilityData rndFacilities;
 	
 	private final ActivityFacilities facilities;
 	
@@ -61,7 +62,7 @@ public class MutateActivityLocation implements Mutator, Initializer {
 		this.random = random;
 		this.blacklist = type;
 		this.facilities = facilities;
-		this.rndFacilities = new RandomFacilities(facilities, random);
+		this.rndFacilities = new FacilityData(facilities, random);
 		
 		double minx = Double.MAX_VALUE;
 		double miny = Double.MAX_VALUE;

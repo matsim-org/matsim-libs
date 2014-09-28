@@ -25,7 +25,7 @@ import java.util.Random;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.sim.RandomFacilities;
+import playground.johannes.gsv.synPop.data.FacilityData;
 
 /**
  * @author johannes
@@ -39,7 +39,7 @@ public class MutateHomeLocation implements Mutator {
 	
 	private ActivityFacility old;
 	
-	public MutateHomeLocation(RandomFacilities rfacilities, Random random) {
+	public MutateHomeLocation(FacilityData rfacilities, Random random) {
 		facilities = rfacilities.getFacilities("home");
 		this.random = random;
 	}

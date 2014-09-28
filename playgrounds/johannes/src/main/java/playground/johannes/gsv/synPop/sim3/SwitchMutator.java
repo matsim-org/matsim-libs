@@ -17,45 +17,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.invermo.sim;
+package playground.johannes.gsv.synPop.sim3;
 
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
-
-import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.sim3.Hamiltonian;
-import playground.johannes.sna.gis.Zone;
-import playground.johannes.sna.gis.ZoneLayer;
 
-/**
- * @author johannes
- *
- */
-public class PersonPopulationDenstiy implements Hamiltonian {
+public interface SwitchMutator {
 
-	public static final Object TARGET_DENSITY = new Object();
+	public boolean mutate(ProxyPerson person1, ProxyPerson person2);
 	
-//	public static final Object ZONE_KEY =  new Object();
+	public void revert(ProxyPerson person1, ProxyPerson person2);
 	
-	private final ZoneLayer<Double> zoneLayer;
-	
-	public PersonPopulationDenstiy(ZoneLayer<Double> zoneLayer) {
-		this.zoneLayer = zoneLayer;
-	}
-	
-	@Override
-	public double evaluate(ProxyPerson person) {
-		ActivityFacility home = (ActivityFacility) person.getUserData(SwitchHomeLocations.HOME_FACIL_KEY);
-		Zone<Double> zone = zoneLayer.getZone(MatsimCoordUtils.coordToPoint(home.getCoord()));
-		if(zone == null) {
-			return Double.NEGATIVE_INFINITY;
-		}
-		
-		Double target = (Double) person.getUserData(TARGET_DENSITY);
-		
-		double diff = Math.abs(zone.getAttribute() - target);
-				 
-		return diff;
-	}
-
 }

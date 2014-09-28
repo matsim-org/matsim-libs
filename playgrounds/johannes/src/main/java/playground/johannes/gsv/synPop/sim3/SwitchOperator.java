@@ -17,45 +17,50 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.invermo.sim;
+package playground.johannes.gsv.synPop.sim3;
 
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
-import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.sim3.Hamiltonian;
-import playground.johannes.sna.gis.Zone;
-import playground.johannes.sna.gis.ZoneLayer;
 
-/**
- * @author johannes
- *
- */
-public class PersonPopulationDenstiy implements Hamiltonian {
+public class SwitchOperator implements Mutator {
 
-	public static final Object TARGET_DENSITY = new Object();
+	private final SwitchMutator mutator;
 	
-//	public static final Object ZONE_KEY =  new Object();
+	private final Random random;
 	
-	private final ZoneLayer<Double> zoneLayer;
-	
-	public PersonPopulationDenstiy(ZoneLayer<Double> zoneLayer) {
-		this.zoneLayer = zoneLayer;
+	private final List<ProxyPerson> mutations;
+
+	public SwitchOperator(SwitchMutator mutator, Random random) {
+		this.mutator = mutator;
+		this.random = random;
+		
+		mutations = new ArrayList<>(2);
+		mutations.add(null);
+		mutations.add(null);
 	}
 	
 	@Override
-	public double evaluate(ProxyPerson person) {
-		ActivityFacility home = (ActivityFacility) person.getUserData(SwitchHomeLocations.HOME_FACIL_KEY);
-		Zone<Double> zone = zoneLayer.getZone(MatsimCoordUtils.coordToPoint(home.getCoord()));
-		if(zone == null) {
-			return Double.NEGATIVE_INFINITY;
-		}
+	public List<ProxyPerson> select(List<ProxyPerson> persons) {
+		ProxyPerson person1 = persons.get(random.nextInt(persons.size()));
+		ProxyPerson person2 = persons.get(random.nextInt(persons.size()));
 		
-		Double target = (Double) person.getUserData(TARGET_DENSITY);
+		mutations.set(0, person1);
+		mutations.set(1, person2);
+			
+		return mutations;
 		
-		double diff = Math.abs(zone.getAttribute() - target);
-				 
-		return diff;
+	}
+	
+	public boolean modify(List<ProxyPerson> persons) {
+		return mutator.mutate(persons.get(0), persons.get(1));
+	}
+
+	@Override
+	public void revert(List<ProxyPerson> persons) {
+		mutator.revert(persons.get(0), persons.get(1));
 	}
 
 }

@@ -27,6 +27,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyObject;
 import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.gsv.synPop.data.FacilityData;
 
 /**
  * @author johannes
@@ -36,10 +37,10 @@ public class MutateHomeActLocation implements Mutator, Initializer {
 
 //	public static final String USER_DATA_KEY = "homefacility";
 	
-	private final RandomFacilities facilities;
+	private final FacilityData facilities;
 	
 	public MutateHomeActLocation(ActivityFacilities actFacilities, Random random) {
-		facilities = new RandomFacilities(actFacilities, random);
+		facilities = new FacilityData(actFacilities, random);
 	}
 	
 	/* (non-Javadoc)

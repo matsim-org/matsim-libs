@@ -28,6 +28,7 @@ import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyObject;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.sim.MutateActivityLocation;
+import playground.johannes.gsv.synPop.sim3.Hamiltonian;
 
 /**
  * @author johannes

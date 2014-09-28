@@ -21,7 +21,7 @@ package playground.johannes.gsv.synPop.invermo.sim;
 
 import java.util.Random;
 
-import playground.johannes.gsv.synPop.sim.RandomFacilities;
+import playground.johannes.gsv.synPop.data.FacilityData;
 import playground.johannes.gsv.synPop.sim2.Mutator;
 import playground.johannes.gsv.synPop.sim2.MutatorFactory;
 
@@ -31,11 +31,11 @@ import playground.johannes.gsv.synPop.sim2.MutatorFactory;
  */
 public class StartLocationMutatorFactory implements MutatorFactory {
 
-	private final RandomFacilities facilities;
+	private final FacilityData facilities;
 	
 	private final Random random;
 	
-	public StartLocationMutatorFactory(RandomFacilities facilities, Random random) {
+	public StartLocationMutatorFactory(FacilityData facilities, Random random) {
 		this.facilities = facilities;
 		this.random = random;
 	}

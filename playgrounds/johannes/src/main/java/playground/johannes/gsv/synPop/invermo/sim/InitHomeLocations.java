@@ -33,8 +33,8 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
 import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.gsv.synPop.data.FacilityData;
 import playground.johannes.gsv.synPop.sim.Initializer;
-import playground.johannes.gsv.synPop.sim.RandomFacilities;
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
 import playground.johannes.sna.util.ProgressLogger;
@@ -47,7 +47,7 @@ public class InitHomeLocations implements Initializer {
 
 	private static final Logger logger = Logger.getLogger(InitHomeLocations.class);
 	
-	public InitHomeLocations(Collection<ProxyPerson> persons, ZoneLayer<Double> zoneLayer, RandomFacilities facilities, Random random) {
+	public InitHomeLocations(Collection<ProxyPerson> persons, ZoneLayer<Double> zoneLayer, FacilityData facilities, Random random) {
 		double max = Double.MIN_VALUE;
 		
 		for(Zone<Double> zone : zoneLayer.getZones()) {

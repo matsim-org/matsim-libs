@@ -38,10 +38,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.gsv.synPop.data.FacilityData;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.mid.PersonCloner;
 import playground.johannes.gsv.synPop.sim.Initializer;
-import playground.johannes.gsv.synPop.sim.RandomFacilities;
 import playground.johannes.gsv.synPop.sim2.HamiltonianComposite;
 import playground.johannes.gsv.synPop.sim2.HamiltonianLogger;
 import playground.johannes.gsv.synPop.sim2.PopulationWriter;
@@ -129,7 +129,7 @@ public class SetHomeLocations {
 		
 		logger.info("Setting up sampler...");
 		
-		RandomFacilities rFacilities = RandomFacilities.getInstance(facilities, random);
+		FacilityData rFacilities = FacilityData.getInstance(facilities, random);
 		
 		HamiltonianComposite H = new HamiltonianComposite();
 		PersonPopulationDenstiy persDen = new PersonPopulationDenstiy(popDensity);

@@ -17,45 +17,52 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.invermo.sim;
+package playground.johannes.gsv.synPop.data;
 
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import java.util.HashMap;
+import java.util.Map;
 
-import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.sim3.Hamiltonian;
-import playground.johannes.sna.gis.Zone;
-import playground.johannes.sna.gis.ZoneLayer;
+import org.apache.log4j.Logger;
 
-/**
- * @author johannes
- *
- */
-public class PersonPopulationDenstiy implements Hamiltonian {
+public class DataPool {
 
-	public static final Object TARGET_DENSITY = new Object();
+	private static final Logger logger = Logger.getLogger(DataPool.class);
 	
-//	public static final Object ZONE_KEY =  new Object();
+	private final Map<String, Object> dataObjects;
 	
-	private final ZoneLayer<Double> zoneLayer;
+	private final Map<String, DataLoader> dataLoaders;
 	
-	public PersonPopulationDenstiy(ZoneLayer<Double> zoneLayer) {
-		this.zoneLayer = zoneLayer;
+	public DataPool() {
+		dataObjects = new HashMap<>();
+		dataLoaders = new HashMap<>();
 	}
 	
-	@Override
-	public double evaluate(ProxyPerson person) {
-		ActivityFacility home = (ActivityFacility) person.getUserData(SwitchHomeLocations.HOME_FACIL_KEY);
-		Zone<Double> zone = zoneLayer.getZone(MatsimCoordUtils.coordToPoint(home.getCoord()));
-		if(zone == null) {
-			return Double.NEGATIVE_INFINITY;
+	public void register(DataLoader loader, String key) {
+		if(dataLoaders.containsKey(key)) {
+			logger.warn(String.format("Cannot override the data loader for key \"%s\"", key));
+		} else {
+			dataLoaders.put(key, loader);
+		}
+	}
+	
+	public Object get(String key) {
+		Object data = dataObjects.get(key);
+
+		if(data == null) {
+			loadData(key);
+			data = dataObjects.get(key);
 		}
 		
-		Double target = (Double) person.getUserData(TARGET_DENSITY);
-		
-		double diff = Math.abs(zone.getAttribute() - target);
-				 
-		return diff;
+		return data;
 	}
-
+	
+	private void loadData(String key) {
+		DataLoader loader = dataLoaders.get(key);
+		if(loader == null) {
+			logger.warn(String.format("No data loader for key \"%s\" found. Register the corresponding data loader first.", key));
+		} else {
+			Object data = loader.load();
+			dataObjects.put(key, data);
+		}
+	}
 }

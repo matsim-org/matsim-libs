@@ -27,7 +27,7 @@ import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyObject;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
-import playground.johannes.gsv.synPop.sim.RandomFacilities;
+import playground.johannes.gsv.synPop.data.FacilityData;
 import playground.johannes.gsv.synPop.sim2.Mutator;
 
 /**
@@ -40,7 +40,7 @@ public class MutateStartLocation implements Mutator {
 	
 	public static final Object FACILITY_KEY = new Object();
 	
-	private final RandomFacilities facilities;
+	private final FacilityData facilities;
 	
 	private ProxyObject[] acts;
 	
@@ -48,7 +48,7 @@ public class MutateStartLocation implements Mutator {
 	
 	private int size;
 	
-	public MutateStartLocation(RandomFacilities facilities, Random random) {
+	public MutateStartLocation(FacilityData facilities, Random random) {
 		this.facilities = facilities;
 		
 		acts = new ProxyObject[10];

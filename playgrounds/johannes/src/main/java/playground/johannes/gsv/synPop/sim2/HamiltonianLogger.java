@@ -32,6 +32,7 @@ import org.apache.log4j.Logger;
 
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.sim2.SamplerListener;
+import playground.johannes.gsv.synPop.sim3.Hamiltonian;
 import playground.johannes.sna.math.FixedSampleSizeDiscretizer;
 import playground.johannes.sna.math.Histogram;
 import playground.johannes.sna.util.TXTWriter;

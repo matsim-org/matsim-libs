@@ -32,8 +32,8 @@ import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyObject;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
+import playground.johannes.gsv.synPop.data.FacilityData;
 import playground.johannes.gsv.synPop.sim.Initializer;
-import playground.johannes.gsv.synPop.sim.RandomFacilities;
 import playground.johannes.sna.gis.CRSUtils;
 
 /**
@@ -42,11 +42,11 @@ import playground.johannes.sna.gis.CRSUtils;
  */
 public class InitializeFacilities implements Initializer {
 
-	private final RandomFacilities facilities;
+	private final FacilityData facilities;
 
 	private MathTransform transform;
 
-	public InitializeFacilities(RandomFacilities facilities) {
+	public InitializeFacilities(FacilityData facilities) {
 		this.facilities = facilities;
 		try {
 			transform = CRS.findMathTransform(DefaultGeographicCRS.WGS84, CRSUtils.getCRS(31467));

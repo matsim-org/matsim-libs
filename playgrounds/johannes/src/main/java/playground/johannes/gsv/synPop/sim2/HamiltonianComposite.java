@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.gsv.synPop.sim3.Hamiltonian;
 import playground.johannes.sna.util.Composite;
 
 /**

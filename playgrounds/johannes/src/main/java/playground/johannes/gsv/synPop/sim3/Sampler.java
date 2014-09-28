@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.invermo.sim;
+package playground.johannes.gsv.synPop.sim3;
 
 import java.util.Collection;
 import java.util.List;
@@ -25,7 +25,6 @@ import java.util.Random;
 
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.sim2.SamplerListener;
-import playground.johannes.gsv.synPop.sim3.Hamiltonian;
 import playground.johannes.socialnetworks.utils.CollectionUtils;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 
@@ -117,40 +116,37 @@ public class Sampler {
 			/*
 			 * select person
 			 */
-			int idx1 = random.nextInt(population.size());
-			int idx2 = random.nextInt(population.size());
-			ProxyPerson person1 = population.get(idx1);
-			ProxyPerson person2 = population.get(idx2);
+			List<ProxyPerson> mutations = mutator.select(population);
 			/*
-			 * select mutator
+			 * evaluate
 			 */
-//			Double H_before = (Double) person1.getUserData(H_KEY);
-//			if(H_before == null) {
-				double H_before = hamiltonian.evaluate(person1) + hamiltonian.evaluate(person2);
-//			}
-//			double H_before = hamiltonian.evaluate(person);
+			double H_before = 0;
+			for(int i = 0; i < mutations.size(); i++) {
+				H_before += hamiltonian.evaluate(mutations.get(i));
+			}
+
 			boolean accepted = false;
-			if (mutator.modify(person1, person2)) {
-				listener.afterModify(person1);
+			if (mutator.modify(mutations)) {
+//				listener.afterModify(person1);
 				/*
 				 * evaluate
 				 */
-				double H_after = hamiltonian.evaluate(person1) + hamiltonian.evaluate(person2);
-//				System.out.println(String.valueOf(H_after - H_before));
+				double H_after = 0;
+				for(int i = 0; i < mutations.size(); i++) {
+				 H_after += hamiltonian.evaluate(mutations.get(i));
+				}
+
 				double p = 1 / (1 + Math.exp(H_after - H_before));
 
 				if (p >= random.nextDouble()) {
 					accepted = true;
-//					person1.setUserData(H_KEY, H_after);
 				} else {
-					mutator.revert(person1, person2);
-//					person1.setUserData(H_KEY, H_before);
+					mutator.revert(mutations);
+
 				}
-			} else {
-//				person1.setUserData(H_KEY, H_before);
 			}
 			
-			listener.afterStep(Sampler.this.population, person1, accepted);
+//			listener.afterStep(Sampler.this.population, person1, accepted);
 		}
 
 	}

@@ -17,16 +17,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.sim2;
+package playground.johannes.gsv.synPop.data;
 
-import playground.johannes.gsv.synPop.ProxyPerson;
+public interface DataLoader {
 
-/**
- * @author johannes
- *
- */
-public interface Hamiltonian {
-
-	public double evaluate(ProxyPerson person);
+	public Object load();
 	
 }

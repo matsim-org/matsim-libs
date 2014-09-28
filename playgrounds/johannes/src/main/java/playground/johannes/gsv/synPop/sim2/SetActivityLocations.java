@@ -42,6 +42,7 @@ import playground.johannes.gsv.synPop.mid.MIDKeys;
 import playground.johannes.gsv.synPop.mid.PersonCloner;
 import playground.johannes.gsv.synPop.sim.ActivityLocationInitializer;
 import playground.johannes.gsv.synPop.sim2.HamiltonianLogger;
+import playground.johannes.gsv.synPop.sim3.Hamiltonian;
 import playground.johannes.gsv.synPop.sim.Initializer;
 import playground.johannes.sna.gis.ZoneLayer;
 import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;

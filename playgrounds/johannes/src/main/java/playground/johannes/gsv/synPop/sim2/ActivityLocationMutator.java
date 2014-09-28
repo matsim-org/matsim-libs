@@ -31,9 +31,9 @@ import playground.johannes.gsv.misc.QuadTree;
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyObject;
 import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.gsv.synPop.data.FacilityData;
 import playground.johannes.gsv.synPop.mid.MIDKeys;
 import playground.johannes.gsv.synPop.sim.MutateActivityLocation;
-import playground.johannes.gsv.synPop.sim.RandomFacilities;
 
 /**
  * @author johannes
@@ -47,7 +47,7 @@ private final String blacklist;
 	
 	private final Random random;
 	
-	private final RandomFacilities rndFacilities;
+	private final FacilityData rndFacilities;
 	
 	private final ActivityFacilities facilities;
 	
@@ -63,7 +63,7 @@ private final String blacklist;
 		this.random = random;
 		this.blacklist = type;
 		this.facilities = facilities;
-		this.rndFacilities = RandomFacilities.getInstance(facilities, random);
+		this.rndFacilities = FacilityData.getInstance(facilities, random);
 		
 //		double minx = Double.MAX_VALUE;
 //		double miny = Double.MAX_VALUE;

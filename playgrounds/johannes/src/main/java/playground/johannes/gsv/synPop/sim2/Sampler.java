@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Random;
 
 import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.gsv.synPop.sim3.Hamiltonian;
 import playground.johannes.socialnetworks.utils.CollectionUtils;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 

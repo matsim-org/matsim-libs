@@ -17,45 +17,49 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.invermo.sim;
+package playground.johannes.gsv.synPop.data;
 
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import java.util.Random;
 
-import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.sim3.Hamiltonian;
-import playground.johannes.sna.gis.Zone;
-import playground.johannes.sna.gis.ZoneLayer;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
+import org.matsim.core.scenario.ScenarioUtils;
 
-/**
- * @author johannes
- *
- */
-public class PersonPopulationDenstiy implements Hamiltonian {
+public class FacilityDataLoader implements DataLoader {
 
-	public static final Object TARGET_DENSITY = new Object();
+	private static final Logger logger = Logger.getLogger(FacilityDataLoader.class);
 	
-//	public static final Object ZONE_KEY =  new Object();
+	public static final String KEY = "facilityData";
 	
-	private final ZoneLayer<Double> zoneLayer;
+	private final String file;
 	
-	public PersonPopulationDenstiy(ZoneLayer<Double> zoneLayer) {
-		this.zoneLayer = zoneLayer;
+	private final Random random;
+	
+	public FacilityDataLoader(String file, Random random) {
+		this.file = file;
+		this.random = random;
 	}
 	
 	@Override
-	public double evaluate(ProxyPerson person) {
-		ActivityFacility home = (ActivityFacility) person.getUserData(SwitchHomeLocations.HOME_FACIL_KEY);
-		Zone<Double> zone = zoneLayer.getZone(MatsimCoordUtils.coordToPoint(home.getCoord()));
-		if(zone == null) {
-			return Double.NEGATIVE_INFINITY;
-		}
+	public Object load() {
+		logger.info("Loading facility data...");
+		Level level = Logger.getRootLogger().getLevel();
+		Logger.getRootLogger().setLevel(Level.WARN);
 		
-		Double target = (Double) person.getUserData(TARGET_DENSITY);
+		Config config = ConfigUtils.createConfig();
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		FacilitiesReaderMatsimV1 reader = new FacilitiesReaderMatsimV1(scenario);
+		reader.readFile(file);
 		
-		double diff = Math.abs(zone.getAttribute() - target);
-				 
-		return diff;
+		FacilityData data = new FacilityData(scenario.getActivityFacilities(), random);
+		
+		Logger.getRootLogger().setLevel(level);
+		
+		return data;
 	}
 
 }
