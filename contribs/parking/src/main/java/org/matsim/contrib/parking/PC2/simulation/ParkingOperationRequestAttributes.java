@@ -20,13 +20,14 @@ package org.matsim.contrib.parking.PC2.simulation;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 
 public class ParkingOperationRequestAttributes {
 
 	Coord destCoordinate;
 	double arrivalTime;
 	double parkingDurationInSeconds;
-	Id personId;
+	Id<Person> personId;
 	Id facilityId;
 	String actType;
 	int legIndex;

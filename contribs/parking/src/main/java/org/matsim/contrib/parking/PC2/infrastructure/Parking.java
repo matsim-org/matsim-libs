@@ -20,10 +20,11 @@ package org.matsim.contrib.parking.PC2.infrastructure;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 
 public interface Parking {
 
-	public Id getId();
+	public Id<Parking> getId();
 
 	public int getMaximumParkingCapacity();
 
@@ -33,7 +34,7 @@ public interface Parking {
 
 	public void unparkVehicle();
 	
-	public double getCost(Id agentId, double arrivalTime, double parkingDurationInSecond);
+	public double getCost(Id<Person> agentId, double arrivalTime, double parkingDurationInSecond);
 	
 	public Coord getCoordinate();
 

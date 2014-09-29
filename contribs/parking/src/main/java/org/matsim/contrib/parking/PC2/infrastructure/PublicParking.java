@@ -20,20 +20,20 @@ package org.matsim.contrib.parking.PC2.infrastructure;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.PC2.scoring.ParkingCostModel;
 import org.matsim.contrib.parking.lib.DebugLib;
-import org.matsim.contrib.parking.parkingChoice.infrastructure.cost.CostCalculator;
 
 public class PublicParking implements Parking {
 
-	private Id id = null;
+	private Id<Parking> id = null;
 	private int capacity =0;
 	private int availableParking=0;
 	private Coord coord=null;
 	private ParkingCostModel parkingCostModel=null;
 	private String groupName;
 	
-	public PublicParking(Id id, int capacity, Coord coord, ParkingCostModel parkingCostModel, String groupName){
+	public PublicParking(Id<Parking> id, int capacity, Coord coord, ParkingCostModel parkingCostModel, String groupName){
 		this.id=id;
 		this.capacity=capacity;
 		resetAvailability();
@@ -42,14 +42,17 @@ public class PublicParking implements Parking {
 		this.groupName=groupName;
 	}
 	
-	public Id getId(){
+	@Override
+	public Id<Parking> getId(){
 		return id;
 	}
 	
-	public double getCost(Id personId, double arrivalTime, double parkingDurationInSecond){
+	@Override
+	public double getCost(Id<Person> personId, double arrivalTime, double parkingDurationInSecond){
 		return parkingCostModel.calcParkingCost(arrivalTime, parkingDurationInSecond, personId, id);
 	}
 	
+	@Override
 	public Coord getCoordinate(){
 		return coord;
 	}
@@ -58,14 +61,17 @@ public class PublicParking implements Parking {
 		return availableParking>0;
 	}
 	
+	@Override
 	public int getMaximumParkingCapacity(){
 		return capacity;
 	}
 	
+	@Override
 	public int getAvailableParkingCapacity(){
 		return availableParking;
 	}
 	
+	@Override
 	public void parkVehicle(){
 		if (availableParking>0){
 			availableParking--;
@@ -74,6 +80,7 @@ public class PublicParking implements Parking {
 		}
 	}
 	
+	@Override
 	public void unparkVehicle(){
 		if (availableParking<capacity){
 			availableParking++;

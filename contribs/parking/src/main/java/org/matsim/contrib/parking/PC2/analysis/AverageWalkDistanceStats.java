@@ -19,38 +19,25 @@
 package org.matsim.contrib.parking.PC2.analysis;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
-import org.geotools.math.Statistics;
-import org.jfree.data.statistics.MeanAndStandardDeviation;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
-import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.PC2.infrastructure.Parking;
 import org.matsim.contrib.parking.PC2.simulation.ParkingArrivalEvent;
-import org.matsim.contrib.parking.PC2.simulation.ParkingDepartureEvent;
-import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.lib.obj.list.Lists;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.handler.BasicEventHandler;
-
-import com.sun.xml.bind.v2.runtime.unmarshaller.UnmarshallingContext.State;
 
 public abstract  class AverageWalkDistanceStats implements BasicEventHandler {
 
 	private static final Logger log = Logger.getLogger(AverageWalkDistanceStats.class);
 
-	private HashMap<Id, Parking> parking;
+	private HashMap<Id<Parking>, Parking> parking;
 
 	private HashMap<String, LinkedList<Double>> walkDistances;
 
@@ -59,7 +46,7 @@ public abstract  class AverageWalkDistanceStats implements BasicEventHandler {
 		walkDistances=new HashMap<String, LinkedList<Double>>();
 	}
 
-	public AverageWalkDistanceStats(HashMap<Id, Parking> parking) {
+	public AverageWalkDistanceStats(HashMap<Id<Parking>, Parking> parking) {
 		this.parking = parking;
 	}
 
@@ -67,9 +54,9 @@ public abstract  class AverageWalkDistanceStats implements BasicEventHandler {
 	public void handleEvent(Event event) {
 		if (event.getEventType().equalsIgnoreCase(ParkingArrivalEvent.EVENT_TYPE)
 				) {
-			Id personId=ParkingArrivalEvent.getPersonId(event.getAttributes());
+			Id<Person> personId=ParkingArrivalEvent.getPersonId(event.getAttributes());
 			if (personId != null) {
-				Id parkingId = ParkingArrivalEvent.getParkingId(event.getAttributes());
+				Id<Parking> parkingId = ParkingArrivalEvent.getParkingId(event.getAttributes());
 
 				Coord destCoord = ParkingArrivalEvent.getDestCoord(event.getAttributes());
 				
@@ -95,6 +82,6 @@ public abstract  class AverageWalkDistanceStats implements BasicEventHandler {
 		}
 	}
 
-	public abstract String getGroupName(Id parkingId);
+	public abstract String getGroupName(Id<Parking> parkingId);
 
 }

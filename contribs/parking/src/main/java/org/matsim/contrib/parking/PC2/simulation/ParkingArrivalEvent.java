@@ -23,8 +23,9 @@ import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.parking.PC2.infrastructure.Parking;
 import org.matsim.contrib.parking.lib.DebugLib;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 public class ParkingArrivalEvent extends Event {
@@ -92,21 +93,21 @@ public class ParkingArrivalEvent extends Event {
 		return Double.parseDouble(scoreString);
 	}
 	
-	public static Id getPersonId(Map<String, String> attributes){
+	public static Id<Person> getPersonId(Map<String, String> attributes){
 		String personIdString = attributes.get(ParkingArrivalEvent.ATTRIBUTE_PERSON_ID);
 		if (personIdString==null){
 			return null;
 		} else {
-			return new IdImpl(personIdString);
+			return Id.create(personIdString, Person.class);
 		}
 	}
 	
-	public static Id getParkingId(Map<String, String> attributes){
+	public static Id<Parking> getParkingId(Map<String, String> attributes){
 		String parkingIdString = attributes.get(ParkingArrivalEvent.ATTRIBUTE_PARKING_ID);
 		if (parkingIdString==null){
 			return null;
 		} else {
-			return new IdImpl(parkingIdString);
+			return Id.create(parkingIdString, Parking.class);
 		}
 	}
 

@@ -156,7 +156,7 @@ public class HUPCBasicControllerKTI extends KTIWithinDayControler  {
 
 		for (Parking parking:parkings){
 			
-			ActivityFacility parkingFacility = factory.createActivityFacility(parking.getId(), parking.getCoord());
+			ActivityFacility parkingFacility = factory.createActivityFacility(Id.create(parking.getId(), ActivityFacility.class), parking.getCoord());
 			facilities.addActivityFacility(parkingFacility);
 			Link nearestLink = ((NetworkImpl)this.scenarioData.getNetwork()).getNearestLink(parking.getCoord());
 			

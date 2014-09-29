@@ -1,13 +1,14 @@
 package playground.wrashid.parkingChoice.infrastructure;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
 public class ActInfo {
 
-	Id facilityId;
+	Id<ActivityFacility> facilityId;
 	String actType;
 	
-	public Id getFacilityId() {
+	public Id<ActivityFacility> getFacilityId() {
 		return facilityId;
 	}
 
@@ -15,7 +16,7 @@ public class ActInfo {
 		return actType;
 	}
 
-	public ActInfo(Id facilityId, String actType) {
+	public ActInfo(Id<ActivityFacility> facilityId, String actType) {
 		super();
 		this.facilityId = facilityId;
 		this.actType = actType;

@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.Id;
 
 public interface Parking {
 
-	public Id getId();
+	public Id<Parking> getId();
 
 	public int getMaximumParkingCapacity();
 

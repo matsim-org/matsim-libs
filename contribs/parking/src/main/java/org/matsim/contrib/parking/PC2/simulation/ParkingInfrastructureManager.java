@@ -20,23 +20,23 @@ package org.matsim.contrib.parking.PC2.simulation;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.PriorityQueue;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.PC2.infrastructure.PPRestrictedToFacilities;
+import org.matsim.contrib.parking.PC2.infrastructure.Parking;
 import org.matsim.contrib.parking.PC2.infrastructure.PrivateParking;
 import org.matsim.contrib.parking.PC2.infrastructure.PublicParking;
+import org.matsim.contrib.parking.PC2.scoring.ParkingScoreManager;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
 import org.matsim.contrib.parking.lib.obj.SortableMapObject;
 import org.matsim.contrib.parking.lib.obj.network.EnclosingRectangle;
 import org.matsim.contrib.parking.lib.obj.network.QuadTreeInitializer;
-import org.matsim.contrib.parking.PC2.infrastructure.Parking;
-import org.matsim.contrib.parking.PC2.scoring.ParkingScoreManager;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -46,10 +46,10 @@ public class ParkingInfrastructureManager {
 
 	private ParkingScoreManager parkingScoreManager;
 
-	private HashMap<Id, Parking> allParkings;
+	private HashMap<Id<Parking>, Parking> allParkings;
 
 	// personId, parkingFacilityId
-	private HashMap<Id, Id> parkedVehicles;
+	private HashMap<Id<Person>, Id> parkedVehicles;
 
 	private EventsManager eventsManager;
 
@@ -68,8 +68,8 @@ public class ParkingInfrastructureManager {
 	public ParkingInfrastructureManager(ParkingScoreManager parkingScoreManager, EventsManager eventsManager) {
 		this.parkingScoreManager = parkingScoreManager;
 		this.eventsManager = eventsManager;
-		parkedVehicles = new HashMap<Id, Id>();
-		setAllParkings(new HashMap<Id, Parking>());
+		parkedVehicles = new HashMap<>();
+		setAllParkings(new HashMap<Id<Parking>, Parking>());
 		privateParkingsRestrictedToFacilities = new LinkedListValueHashMap<Id, PPRestrictedToFacilities>();
 	}
 
@@ -367,7 +367,7 @@ public class ParkingInfrastructureManager {
 		parkingScoreManager.addScore(parkingOperationRequestAttributes.personId, score);
 	}
 
-	public synchronized void unParkVehicle(Parking parking, double departureTime, Id personId) {
+	public synchronized void unParkVehicle(Parking parking, double departureTime, Id<Person> personId) {
 		if (parking == null) {
 			DebugLib.emptyFunctionForSettingBreakPoint();
 		}
@@ -402,11 +402,11 @@ public class ParkingInfrastructureManager {
 		this.eventsManager = eventsManager;
 	}
 
-	public HashMap<Id, Parking> getAllParkings() {
+	public HashMap<Id<Parking>, Parking> getAllParkings() {
 		return allParkings;
 	}
 
-	public void setAllParkings(HashMap<Id, Parking> allParkings) {
+	public void setAllParkings(HashMap<Id<Parking>, Parking> allParkings) {
 		this.allParkings = allParkings;
 	}
 

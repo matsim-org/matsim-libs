@@ -38,13 +38,11 @@ import org.jfree.ui.ApplicationFrame;
 import org.jfree.ui.RefineryUtilities;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.contrib.parking.PC2.infrastructure.Parking;
 import org.matsim.contrib.parking.PC2.simulation.ParkingArrivalEvent;
 import org.matsim.contrib.parking.PC2.simulation.ParkingDepartureEvent;
 import org.matsim.contrib.parking.lib.DebugLib;
-import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
-import org.matsim.contrib.parking.lib.obj.TwoKeyHashMapWithDouble;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.handler.BasicEventHandler;
 
 public abstract class ParkingGroupOccupancies implements BasicEventHandler {
@@ -63,7 +61,7 @@ public abstract class ParkingGroupOccupancies implements BasicEventHandler {
 	@Override
 	public void handleEvent(Event event) {
 		if (event.getEventType().equalsIgnoreCase(ParkingArrivalEvent.EVENT_TYPE) || event.getEventType().equalsIgnoreCase(ParkingDepartureEvent.EVENT_TYPE)) {
-			Id parkingId = new IdImpl(event.getAttributes().get(ParkingArrivalEvent.ATTRIBUTE_PARKING_ID));
+			Id<Parking> parkingId = Id.create(event.getAttributes().get(ParkingArrivalEvent.ATTRIBUTE_PARKING_ID), Parking.class);
 			String groupName = getGroupName(parkingId);
 			initializeGroupOccupancyIfNeeded(event, groupName);
 			

@@ -21,18 +21,17 @@ package playground.wrashid.parkingChoice.freeFloatingCarSharing.analysis;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.PC2.analysis.AverageWalkDistanceStats;
 import org.matsim.contrib.parking.PC2.infrastructure.Parking;
 
 public class AverageWalkDistanceStatsZH extends AverageWalkDistanceStats {
 
-	public AverageWalkDistanceStatsZH(HashMap<Id, Parking> parking) {
+	public AverageWalkDistanceStatsZH(HashMap<Id<Parking>, Parking> parking) {
 		super(parking);
 	}
 
 	@Override
-	public String getGroupName(Id parkingId) {
+	public String getGroupName(Id<Parking> parkingId) {
 		return ParkingGroupOccupanciesZH.getGroup(parkingId);
 	}
 	

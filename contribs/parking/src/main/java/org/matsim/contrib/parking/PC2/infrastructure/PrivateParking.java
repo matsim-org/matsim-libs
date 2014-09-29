@@ -18,16 +18,13 @@
  * *********************************************************************** */
 package org.matsim.contrib.parking.PC2.infrastructure;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.parking.lib.DebugLib;
-import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
 public interface PrivateParking extends Parking{
 
-	public boolean isAllowedToUseParking(Id personId, Id actFacilityId, String actType);
+	public boolean isAllowedToUseParking(Id<Person> personId, Id<ActivityFacility> actFacilityId, String actType);
 	
 //	//allow restricting to single person, actType at facility or whole facility.
 //	String restrictionType;

@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.multimodal.router.util.WalkTravelTime;
 import org.matsim.contrib.parking.PC2.infrastructure.PPRestrictedToFacilities;
@@ -36,6 +37,7 @@ import org.matsim.contrib.parking.PC2.scoring.ParkingScoringFunctionFactory;
 import org.matsim.contrib.parking.PC2.scoring.RandomErrorTermManager;
 import org.matsim.contrib.parking.PC2.simulation.ParkingInfrastructureManager;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -72,14 +74,14 @@ public class SetupParkingForZHScenario {
 				groupName="publicPOutsideCity";
 			}
 			if (groupName!=null){
-				PublicParking publicParking=new PublicParking(parking.getId(),parking.getIntCapacity(),parking.getCoord(),pcm,groupName);
+				PublicParking publicParking=new PublicParking(Id.create(parking.getId(), org.matsim.contrib.parking.PC2.infrastructure.Parking.class),parking.getIntCapacity(),parking.getCoord(),pcm,groupName);
 				publicParkings.add(publicParking);
 			} else {
 				PrivateParking pp=(PrivateParking) parking;
-				HashSet<Id> hs=new HashSet<Id>();
+				HashSet<Id<ActivityFacility>> hs=new HashSet<>();
 				hs.add(pp.getActInfo().getFacilityId());
 				groupName="privateParking";
-				PPRestrictedToFacilities PPRestrictedToFacilitiesTmp=new PPRestrictedToFacilities(parking.getId(),parking.getIntCapacity(),parking.getCoord(),pcm,groupName,hs);
+				PPRestrictedToFacilities PPRestrictedToFacilitiesTmp=new PPRestrictedToFacilities(Id.create(parking.getId(), org.matsim.contrib.parking.PC2.infrastructure.Parking.class), parking.getIntCapacity(),parking.getCoord(),pcm,groupName,hs);
 				ppRestrictedToFacilities.add(PPRestrictedToFacilitiesTmp);
 			}
 		}
@@ -142,7 +144,7 @@ public class SetupParkingForZHScenario {
 	public static DoubleValueHashMap<Id> getHouseHoldIncomeCantonZH(Population population) {
 		DoubleValueHashMap<Id> houseHoldIncome=new DoubleValueHashMap<Id>();
 		
-		for (Id personId : population.getPersons().keySet()) {
+		for (Id<Person> personId : population.getPersons().keySet()) {
 			double rand = MatsimRandom.getRandom().nextDouble();
 			if (rand<0.032) {
 				houseHoldIncome.put(personId, 1000+MatsimRandom.getRandom().nextDouble()*1000);
