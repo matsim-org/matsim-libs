@@ -25,6 +25,10 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.pieter.pseudosimulation.mobsim.PSimFactory;
+import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTime;
+import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTimeCalculatorSerializable;
+import playground.singapore.transitRouterEventsBased.waitTimes.WaitTime;
+import playground.singapore.transitRouterEventsBased.waitTimes.WaitTimeCalculatorSerializable;
 
 public class SlaveControler implements IterationStartsListener, BeforeMobsimListener {
 	class TimesReceiver implements Runnable {
@@ -42,6 +46,8 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
 				try {
 					if (res) {
 						linkTravelTimes = (SerializableLinkTravelTimes) reader.readObject();
+						stopStopTimes = (StopStopTime) reader.readObject();
+						waitTimes = (WaitTime) reader.readObject();
 						writer.writeObject(plansCopyForSending);
 					} else {
 						System.out.println("Master terminated. Exiting.");
@@ -58,6 +64,8 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
 
 	Controler matsimControler;
 	private SerializableLinkTravelTimes linkTravelTimes;
+	private WaitTime waitTimes;
+	private StopStopTime stopStopTimes;
 	private ObjectInputStream reader;
 	private ObjectOutputStream writer;
 	private PSimFactory pSimFactory;
@@ -66,12 +74,14 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
 	public SlaveControler(String[] args) throws NumberFormatException, UnknownHostException, IOException, ClassNotFoundException {
 		matsimControler = new Controler(ScenarioUtils.loadScenario(ConfigUtils.loadConfig(args[0])));
 		matsimControler.setOverwriteFiles(true);
+		matsimControler.setCreateGraphs(false);
 		matsimControler.addControlerListener(this);
 		Socket socket = new Socket(args[1], Integer.parseInt(args[2]));
 		this.reader = new ObjectInputStream(socket.getInputStream());
 		this.writer = new ObjectOutputStream(socket.getOutputStream());
 		int myNumber = reader.readInt();
-		matsimControler.getConfig().controler().setOutputDirectory(matsimControler.getConfig().controler().getOutputDirectory() + "_" + myNumber);
+		matsimControler.getConfig().controler()
+				.setOutputDirectory(matsimControler.getConfig().controler().getOutputDirectory() + "_" + myNumber);
 		removeNonSimulatedAgents((List<String>) reader.readObject());
 		new Thread(new TimesReceiver()).start();
 	}
@@ -106,10 +116,26 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		if (event.getIteration() == 0 || linkTravelTimes == null)
-			pSimFactory.setTimes(matsimControler.getLinkTravelTimes());
+		// the time calculators are null until the master sends them, need
+		// something to keep psim occupied until then
+		if (linkTravelTimes == null)
+			pSimFactory.setTravelTime(matsimControler.getLinkTravelTimes());
 		else
-			pSimFactory.setTimes(linkTravelTimes);
+			pSimFactory.setTravelTime(linkTravelTimes);
+		if (matsimControler.getConfig().scenario().isUseTransit()) {
+			if (stopStopTimes == null)
+				pSimFactory.setStopStopTime(new StopStopTimeCalculatorSerializable(matsimControler.getScenario().getTransitSchedule(),
+						matsimControler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (matsimControler.getConfig()
+								.qsim().getEndTime() - matsimControler.getConfig().qsim().getStartTime())).getStopStopTimes());
+			else
+				pSimFactory.setStopStopTime(stopStopTimes);
+			if (waitTimes == null)
+				pSimFactory.setWaitTime(new WaitTimeCalculatorSerializable(matsimControler.getScenario().getTransitSchedule(),
+						matsimControler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (matsimControler.getConfig()
+								.qsim().getEndTime() - matsimControler.getConfig().qsim().getStartTime())).getWaitTimes());
+			else
+				pSimFactory.setWaitTime(waitTimes);
+		}
 		Collection<Plan> plans = new ArrayList<>();
 		for (Person person : matsimControler.getPopulation().getPersons().values())
 			plans.add(person.getSelectedPlan());

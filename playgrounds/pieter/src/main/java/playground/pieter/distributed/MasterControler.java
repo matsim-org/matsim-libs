@@ -28,6 +28,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.pieter.pseudosimulation.util.CollectionUtils;
 import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTimeCalculator;
+import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTimeCalculatorSerializable;
+import playground.singapore.transitRouterEventsBased.waitTimes.WaitTimeCalculatorSerializable;
 import playground.singapore.transitRouterEventsBased.waitTimes.WaitTimeStuckCalculator;
 
 public class MasterControler implements AfterMobsimListener, ShutdownListener {
@@ -47,25 +49,19 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
 			try {
 				writer.writeBoolean(true);
 				writer.writeObject(linkTravelTimes);
-				// writer.writeObject(stopStopTimeCalculator.getStopStopTimes());
-				// writer.writeObject(waitTimeCalculator.getWaitTimes());
-				Map<String, PlanSerializable> serialPlans = (Map<String, PlanSerializable>) reader
-						.readObject();
-				for (Entry<String, PlanSerializable> entry : serialPlans
-						.entrySet()) {
-					plans.put(
-							entry.getKey(),
-							entry.getValue().getPlan(
-									matsimControler.getPopulation()));
+				writer.writeObject(stopStopTimeCalculator.getStopStopTimes());
+				writer.writeObject(waitTimeCalculator.getWaitTimes());
+				Map<String, PlanSerializable> serialPlans = (Map<String, PlanSerializable>) reader.readObject();
+				for (Entry<String, PlanSerializable> entry : serialPlans.entrySet()) {
+					plans.put(entry.getKey(), entry.getValue().getPlan(matsimControler.getPopulation()));
 				}
 				numThreads.decrementAndGet();
 			} catch (IOException | ClassNotFoundException e) {
 				e.printStackTrace();
 				System.exit(0);
-			} catch (Exception e){
+			} catch (Exception e) {
 				e.printStackTrace();
 
-				
 				System.exit(0);
 			}
 		}
@@ -87,8 +83,8 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
 
 	private Controler matsimControler;
 	private Slave[] slaves;
-	private WaitTimeStuckCalculator waitTimeCalculator;
-	private StopStopTimeCalculator stopStopTimeCalculator;
+	private WaitTimeCalculatorSerializable waitTimeCalculator;
+	private StopStopTimeCalculatorSerializable stopStopTimeCalculator;
 	private SerializableLinkTravelTimes linkTravelTimes;
 	private AtomicInteger numThreads;
 	private HashMap<String, Plan> newPlans = new HashMap<>();
@@ -97,16 +93,12 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
 		return matsimControler;
 	}
 
-	public MasterControler(String[] args) throws NumberFormatException,
-			IOException {
-		matsimControler = new Controler(ScenarioUtils.loadScenario(ConfigUtils
-				.loadConfig(args[0])));
+	public MasterControler(String[] args) throws NumberFormatException, IOException {
+		matsimControler = new Controler(ScenarioUtils.loadScenario(ConfigUtils.loadConfig(args[0])));
 		matsimControler.setOverwriteFiles(true);
 		matsimControler.setMobsimFactory(new QSimFactory());
-		int size = matsimControler.getScenario().getPopulation().getPersons()
-				.size();
-		Set<Id<Person>> ids = matsimControler.getScenario().getPopulation()
-				.getPersons().keySet();
+		int size = matsimControler.getScenario().getPopulation().getPersons().size();
+		Set<Id<Person>> ids = matsimControler.getScenario().getPopulation().getPersons().keySet();
 		ServerSocket server = new ServerSocket(Integer.parseInt(args[1]));
 		int numSlaves = Integer.parseInt(args[2]);
 		slaves = new Slave[numSlaves];
@@ -120,49 +112,41 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
 				idStrings.add(id.toString());
 			slaves[i].sendIds(idStrings);
 		}
-		/*
-		 * waitTimeCalculator = new WaitTimeStuckCalculator(
-		 * matsimControler.getPopulation(),
-		 * matsimControler.getScenario().getTransitSchedule(),
-		 * matsimControler.getConfig().travelTimeCalculator()
-		 * .getTraveltimeBinSize(), (int)
-		 * (matsimControler.getConfig().qsim().getEndTime() - matsimControler
-		 * .getConfig().qsim().getStartTime()));
-		 * matsimControler.getEvents().addHandler(waitTimeCalculator);
-		 * stopStopTimeCalculator = new StopStopTimeCalculator(
-		 * matsimControler.getScenario().getTransitSchedule(),
-		 * matsimControler.getConfig().travelTimeCalculator()
-		 * .getTraveltimeBinSize(), (int)
-		 * (matsimControler.getConfig().qsim().getEndTime() - matsimControler
-		 * .getConfig().qsim().getStartTime()));
-		 * matsimControler.getEvents().addHandler(stopStopTimeCalculator);
-		 */
-		matsimControler.addPlanStrategyFactory("ReplacePlanFromSlave",
-				new ReplacePlanFromSlaveFactory(newPlans));
+		if (matsimControler.getConfig().scenario().isUseTransit()) {
+			waitTimeCalculator = new WaitTimeCalculatorSerializable(matsimControler.getScenario().getTransitSchedule(), matsimControler
+					.getConfig().travelTimeCalculator().getTraveltimeBinSize(),
+					(int) (matsimControler.getConfig().qsim().getEndTime() - matsimControler.getConfig().qsim().getStartTime()));
+			matsimControler.getEvents().addHandler(waitTimeCalculator);
+			stopStopTimeCalculator = new StopStopTimeCalculatorSerializable(matsimControler.getScenario().getTransitSchedule(),
+					matsimControler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (matsimControler.getConfig().qsim()
+							.getEndTime() - matsimControler.getConfig().qsim().getStartTime()));
+			matsimControler.getEvents().addHandler(stopStopTimeCalculator);
+		}
+
+		matsimControler.addPlanStrategyFactory("ReplacePlanFromSlave", new ReplacePlanFromSlaveFactory(newPlans));
 		matsimControler.addControlerListener(this);
+
 	}
 
 	public void run() {
 		matsimControler.run();
 	}
 
-	public static void main(String[] args) throws NumberFormatException,
-			IOException {
+	public static void main(String[] args) throws NumberFormatException, IOException {
 		MasterControler master = new MasterControler(args);
 		master.run();
 	}
 
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		linkTravelTimes = new SerializableLinkTravelTimes(event.getControler()
-				.getLinkTravelTimes(), matsimControler.getConfig()
-				.travelTimeCalculator().getTraveltimeBinSize(), matsimControler
-				.getConfig().qsim().getEndTime(), matsimControler.getNetwork()
-				.getLinks().values());
+		linkTravelTimes = new SerializableLinkTravelTimes(event.getControler().getLinkTravelTimes(), matsimControler.getConfig()
+				.travelTimeCalculator().getTraveltimeBinSize(), matsimControler.getConfig().qsim().getEndTime(), matsimControler
+				.getNetwork().getLinks().values());
 		numThreads = new AtomicInteger(slaves.length);
 		for (int i = 0; i < slaves.length; i++)
 			new Thread(slaves[i]).start();
-		while (numThreads.get() > 0);
+		while (numThreads.get() > 0)
+			;
 		mergePlansFromSlaves();
 	}
 

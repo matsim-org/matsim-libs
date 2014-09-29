@@ -27,6 +27,8 @@ public class PSimFactory implements MobsimFactory {
 	private TravelTime travelTime;
 	private WaitTime waitTime;
 	private StopStopTime stopStopTime;
+
+
 	private int iteration = 0;
 
 	@Override
@@ -47,9 +49,17 @@ public class PSimFactory implements MobsimFactory {
 		this.plans = plans;
 	}
 
-	public void setTimes(TravelTime travelTime) {
+	public void setTravelTime(TravelTime travelTime) {
 		this.travelTime = travelTime;
 	}
+	public void setWaitTime(WaitTime waitTime) {
+		this.waitTime = waitTime;
+	}
+	
+	public void setStopStopTime(StopStopTime stopStopTime) {
+		this.stopStopTime = stopStopTime;
+	}
+
 
 	public void setTimes(TravelTime travelTime, WaitTime waitTime, StopStopTime stopStopTime) {
 		this.travelTime = travelTime;
