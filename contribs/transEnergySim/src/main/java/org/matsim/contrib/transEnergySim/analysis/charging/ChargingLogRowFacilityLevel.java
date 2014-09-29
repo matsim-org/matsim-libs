@@ -20,14 +20,13 @@
 package org.matsim.contrib.transEnergySim.analysis.charging;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.network.NetworkImpl;
+import org.matsim.api.core.v01.network.Link;
 
 public class ChargingLogRowFacilityLevel extends ChargingLogRowLinkLevel {
 
 	private Id facilityId;
 	
-	public ChargingLogRowFacilityLevel(Id agentId, Id linkId, Id facilityId, double startChargingTime, double chargingDuration,
+	public ChargingLogRowFacilityLevel(Id agentId, Id<Link> linkId, Id facilityId, double startChargingTime, double chargingDuration,
 			double energyChargedInJoule) {
 		super(agentId, linkId, startChargingTime, chargingDuration, energyChargedInJoule);
 		this.setFacilityId(facilityId);

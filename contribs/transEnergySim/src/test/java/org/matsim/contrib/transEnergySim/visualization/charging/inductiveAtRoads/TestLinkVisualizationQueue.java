@@ -19,19 +19,21 @@
 
 package org.matsim.contrib.transEnergySim.visualization.charging.inductiveAtRoads;
 
+import junit.framework.TestCase;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.transEnergySim.analysis.charging.ChargingLogRowLinkLevel;
 import org.matsim.contrib.transEnergySim.analysis.charging.InductiveChargingAtRoadOutputLog;
-import org.matsim.core.basic.v01.IdImpl;
-
-import junit.framework.TestCase;
+import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 
 public class TestLinkVisualizationQueue extends TestCase {
 
 	public void testBasic() {
 		InductiveChargingAtRoadOutputLog log = new InductiveChargingAtRoadOutputLog();
 
-		IdImpl linkId = new IdImpl("link-1");
-		IdImpl agentId = new IdImpl("agent-1");
+		Id<Link> linkId = Id.create("link-1", Link.class);
+		Id<Vehicle> agentId = Id.create("agent-1", Vehicle.class);
 		log.add(new ChargingLogRowLinkLevel(agentId, linkId, (24 * 3600) - 10, 20, 3600 * 20));
 		log.add(new ChargingLogRowLinkLevel(agentId, linkId, 80, 20, 3600 * 20));
 		log.add(new ChargingLogRowLinkLevel(agentId, linkId, 90, 20, 3600 * 20));
@@ -51,8 +53,8 @@ public class TestLinkVisualizationQueue extends TestCase {
 	public void testNoValueBeginning() {
 		InductiveChargingAtRoadOutputLog log = new InductiveChargingAtRoadOutputLog();
 
-		IdImpl linkId = new IdImpl("link-1");
-		IdImpl agentId = new IdImpl("agent-1");
+		Id<Link> linkId = Id.create("link-1", Link.class);
+		Id<Vehicle> agentId = Id.create("agent-1", Vehicle.class);
 		log.add(new ChargingLogRowLinkLevel(agentId, linkId, 80, 20, 3600 * 20));
 
 		LinkVisualizationQueue linkEventsQueue = log.getLinkEventsQueue();
@@ -63,13 +65,13 @@ public class TestLinkVisualizationQueue extends TestCase {
 	public void testLinkIdDoesNotExist() {
 		InductiveChargingAtRoadOutputLog log = new InductiveChargingAtRoadOutputLog();
 
-		IdImpl linkId = new IdImpl("link-1");
-		IdImpl agentId = new IdImpl("agent-1");
+		Id<Link> linkId = Id.create("link-1", Link.class);
+		Id<Vehicle> agentId = Id.create("agent-1", Vehicle.class);
 		log.add(new ChargingLogRowLinkLevel(agentId, linkId, 80, 20, 3600 * 20));
 
 		LinkVisualizationQueue linkEventsQueue = log.getLinkEventsQueue();
 
-		assertEquals(0.0, linkEventsQueue.getValue(new IdImpl("link-2"), 5));
+		assertEquals(0.0, linkEventsQueue.getValue(Id.create("link-2", Link.class), 5));
 	}
 
 }

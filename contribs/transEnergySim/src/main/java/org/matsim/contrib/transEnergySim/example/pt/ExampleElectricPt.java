@@ -29,10 +29,10 @@ import org.matsim.contrib.transEnergySim.pt.ElectricPtSimModule;
 import org.matsim.contrib.transEnergySim.pt.PtVehicleEnergyControl;
 import org.matsim.contrib.transEnergySim.pt.PtVehicleEnergyState;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.ConstantEnergyConsumptionModel;
-import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumption;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 
 /*
  * This uses the input files from the following tutorial:
@@ -45,17 +45,17 @@ public class ExampleElectricPt {
 	 */
 	public static void main(String[] args) {
 		Controler controler = new Controler(args);
-		HashMap<Id, PtVehicleEnergyState> ptEnergyMangementModels=new HashMap<Id, PtVehicleEnergyState>();
+		HashMap<Id<Vehicle>, PtVehicleEnergyState> ptEnergyMangementModels = new HashMap<>();
 		EnergyConsumptionModel ecm=new ConstantEnergyConsumptionModel(600);
 		double batterySize=24*3600000;
-		ptEnergyMangementModels.put(new IdImpl("tr_1"), new PtVehicleEnergyState(batterySize, ecm, ecm));
-		ptEnergyMangementModels.put(new IdImpl("tr_2"), new PtVehicleEnergyState(batterySize, ecm, ecm));
+		ptEnergyMangementModels.put(Id.create("tr_1", Vehicle.class), new PtVehicleEnergyState(batterySize, ecm, ecm));
+		ptEnergyMangementModels.put(Id.create("tr_2", Vehicle.class), new PtVehicleEnergyState(batterySize, ecm, ecm));
 		
-		DoubleValueHashMap<Id> chargingPowerAtStops=new DoubleValueHashMap<Id>();
-		chargingPowerAtStops.put(new IdImpl("1"), 1.0);
-		chargingPowerAtStops.put(new IdImpl("2a"), 10.0);
-		chargingPowerAtStops.put(new IdImpl("2b"), 5.0);
-		chargingPowerAtStops.put(new IdImpl("3"), 1.0);
+		DoubleValueHashMap<Id<TransitStopFacility>> chargingPowerAtStops=new DoubleValueHashMap<>();
+		chargingPowerAtStops.put(Id.create("1", TransitStopFacility.class), 1.0);
+		chargingPowerAtStops.put(Id.create("2a", TransitStopFacility.class), 10.0);
+		chargingPowerAtStops.put(Id.create("2b", TransitStopFacility.class), 5.0);
+		chargingPowerAtStops.put(Id.create("3", TransitStopFacility.class), 1.0);
 		PtVehicleEnergyControlImpl ptVehicleEnergyControl = new PtVehicleEnergyControlImpl(controler.getNetwork(),chargingPowerAtStops);
 		
 		new ElectricPtSimModule(controler, ptEnergyMangementModels,ptVehicleEnergyControl);
@@ -66,15 +66,15 @@ public class ExampleElectricPt {
 	private static class PtVehicleEnergyControlImpl implements PtVehicleEnergyControl{
 
 		private Network network;
-		private DoubleValueHashMap<Id> chargingPowerAtStops;
+		private DoubleValueHashMap<Id<TransitStopFacility>> chargingPowerAtStops;
 
-		public PtVehicleEnergyControlImpl(Network network, DoubleValueHashMap<Id> chargingPowerAtStops){
+		public PtVehicleEnergyControlImpl(Network network, DoubleValueHashMap<Id<TransitStopFacility>> chargingPowerAtStops){
 			this.network = network;
 			this.chargingPowerAtStops = chargingPowerAtStops;
 		}
 		
 		@Override
-		public void handleLinkTravelled(PtVehicleEnergyState ptVehicleEnergyState, Id linkId, double travelTime) {
+		public void handleLinkTravelled(PtVehicleEnergyState ptVehicleEnergyState, Id<Link> linkId, double travelTime) {
 			DebugLib.emptyFunctionForSettingBreakPoint();
 			Link link = network.getLinks().get(linkId);
 			ptVehicleEnergyState.useBattery(link.getLength(), link.getFreespeed(), link.getLength()/travelTime);
@@ -83,7 +83,7 @@ public class ExampleElectricPt {
 
 		@Override
 		public void handleChargingOpportunityAtStation(PtVehicleEnergyState ptVehicleEnergyState,
-				double durationOfStayAtStationInSeconds, Id stationId) {
+				double durationOfStayAtStationInSeconds, Id<TransitStopFacility> stationId) {
 			DebugLib.emptyFunctionForSettingBreakPoint();
 			if (ptVehicleEnergyState.getSocInJoules()<ptVehicleEnergyState.getUsableBatterySize()){
 				double charge = durationOfStayAtStationInSeconds*chargingPowerAtStops.get(stationId);

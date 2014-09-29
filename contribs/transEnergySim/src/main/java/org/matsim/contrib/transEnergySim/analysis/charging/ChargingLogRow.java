@@ -20,10 +20,12 @@
 package org.matsim.contrib.transEnergySim.analysis.charging;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 
 public abstract class ChargingLogRow {
-	Id agentId;
-	Id linkId;
+	Id<Vehicle> agentId;
+	Id<Link> linkId;
 	double startChargingTime;
 	double chargingDuration;
 	double energyChargedInJoule;
@@ -40,11 +42,11 @@ public abstract class ChargingLogRow {
 		return energyChargedInJoule;
 	}
 	
-	public Id getAgentId() {
+	public Id<Vehicle> getAgentId() {
 		return agentId;
 	}
 
-	public Id getLinkId() {
+	public Id<Link> getLinkId() {
 		return linkId;
 	}
 	

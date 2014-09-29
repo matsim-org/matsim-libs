@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.contrib.parking.lib.EventHandlerAtStartupAdder;
 import org.matsim.contrib.parking.lib.GeneralLib;
@@ -38,23 +37,24 @@ import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 
 public class ElectricPtSimModule implements VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler,
 		LinkEnterEventHandler, LinkLeaveEventHandler, Wait2LinkEventHandler {
 
-	private HashMap<Id, EnergyConsumptionModel> vehicleEnergyConsumption;
-	private DoubleValueHashMap<Id> chargingPowerAtStops;
-	private HashMap<Id, PtVehicleEnergyState> ptEnergyMangementModels;
+	private HashMap<Id<Vehicle>, EnergyConsumptionModel> vehicleEnergyConsumption;
+	private DoubleValueHashMap<Id<TransitStopFacility>> chargingPowerAtStops;
+	private HashMap<Id<Vehicle>, PtVehicleEnergyState> ptEnergyMangementModels;
 	private PtVehicleEnergyControl ptVehicleEnergyControl;
-	private DoubleValueHashMap<Id> stopArrivalTime = new DoubleValueHashMap<Id>();
+	private DoubleValueHashMap<Id<TransitStopFacility>> stopArrivalTime = new DoubleValueHashMap<>();
 	// vehicleId, linkId
 	private TwoKeyHashMapWithDouble<Id, Id> linkEnterTime = new TwoKeyHashMapWithDouble<Id, Id>();
 
-	public ElectricPtSimModule(Controler controler, HashMap<Id, PtVehicleEnergyState> ptEnergyMangementModels,
+	public ElectricPtSimModule(Controler controler, HashMap<Id<Vehicle>, PtVehicleEnergyState> ptEnergyMangementModels,
 			PtVehicleEnergyControl ptVehicleEnergyControl) {
 		this.ptEnergyMangementModels = ptEnergyMangementModels;
-		this.chargingPowerAtStops = chargingPowerAtStops;
+//		this.chargingPowerAtStops = chargingPowerAtStops;
 		this.ptVehicleEnergyControl = ptVehicleEnergyControl;
 		EventHandlerAtStartupAdder eventHandlerAtStartupAdder = new EventHandlerAtStartupAdder();
 		controler.addControlerListener(eventHandlerAtStartupAdder);

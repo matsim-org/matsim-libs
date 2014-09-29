@@ -20,9 +20,10 @@ package org.matsim.contrib.transEnergySim.pt;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 public interface PtVehicleEnergyControl {
-	public void handleLinkTravelled(PtVehicleEnergyState ptVehicleEnergyState, Id linkId, double travelTime);
-	public void handleChargingOpportunityAtStation(PtVehicleEnergyState ptVehicleEnergyState, double durationOfStayAtStationInSeconds, Id stationId);
+	public void handleLinkTravelled(PtVehicleEnergyState ptVehicleEnergyState, Id<Link> linkId, double travelTime);
+	public void handleChargingOpportunityAtStation(PtVehicleEnergyState ptVehicleEnergyState, double durationOfStayAtStationInSeconds, Id<TransitStopFacility> stationId);
 }
 

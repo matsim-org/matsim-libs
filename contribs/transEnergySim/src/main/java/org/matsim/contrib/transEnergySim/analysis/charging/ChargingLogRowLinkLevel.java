@@ -20,10 +20,12 @@
 package org.matsim.contrib.transEnergySim.analysis.charging;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 
 public class ChargingLogRowLinkLevel extends ChargingLogRow {
 
-	public ChargingLogRowLinkLevel(Id agentId, Id linkId, double startChargingTime, double chargingDuration,
+	public ChargingLogRowLinkLevel(Id<Vehicle> agentId, Id<Link> linkId, double startChargingTime, double chargingDuration,
 			double energyChargedInJoule) {
 		super();
 		this.agentId = agentId;
