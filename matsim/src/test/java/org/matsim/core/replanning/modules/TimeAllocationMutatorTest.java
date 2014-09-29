@@ -85,7 +85,7 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(100, 0));
 		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new CoordImpl(200, 0));
 		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new CoordImpl(300, 0));
-		Link link1 = network.createAndAddLink(Id.create("0", Node.class), node1, node2, 100, 5, 100, 1);
+		Link link1 = network.createAndAddLink(Id.create("0", Link.class), node1, node2, 100, 5, 100, 1);
 		network.createAndAddLink(Id.create("1", Link.class), node2, node3, 100, 5, 100, 1);
 		network.createAndAddLink(Id.create("2", Link.class), node3, node4, 100, 5, 100, 1);
 
@@ -164,7 +164,7 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(100, 0));
 		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new CoordImpl(200, 0));
 		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new CoordImpl(300, 0));
-		Link link1 = network.createAndAddLink(Id.create("0", Node.class), node1, node2, 100, 5, 100, 1);
+		Link link1 = network.createAndAddLink(Id.create("0", Link.class), node1, node2, 100, 5, 100, 1);
 		network.createAndAddLink(Id.create("1", Link.class), node2, node3, 100, 5, 100, 1);
 		network.createAndAddLink(Id.create("2", Link.class), node3, node4, 100, 5, 100, 1);
 

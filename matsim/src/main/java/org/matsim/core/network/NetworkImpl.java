@@ -576,18 +576,18 @@ public final class NetworkImpl implements Network {
 		return n;
 	}
 
-	public Node createAndAddNode(final Id id, final Coord coord, final String nodeType) {
+	public Node createAndAddNode(final Id<Node> id, final Coord coord, final String nodeType) {
 		NodeImpl n = (NodeImpl) createAndAddNode(id, coord);
 		n.setType(nodeType);
 		return n;
 	}
 
-	public Link createAndAddLink(final Id id, final Node fromNode,
+	public Link createAndAddLink(final Id<Link> id, final Node fromNode,
 			final Node toNode, final double length, final double freespeed, final double capacity, final double numLanes) {
 				return createAndAddLink(id, fromNode, toNode, length, freespeed, capacity, numLanes, null, null);
 			}
 
-	public LinkImpl createAndAddLink(final Id id, final Node fromNode,
+	public LinkImpl createAndAddLink(final Id<Link> id, final Node fromNode,
 			final Node toNode, final double length, final double freespeed, final double capacity, final double numLanes,
 			final String origId, final String type) {
 

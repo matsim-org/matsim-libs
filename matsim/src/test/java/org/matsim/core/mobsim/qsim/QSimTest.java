@@ -1212,9 +1212,9 @@ public class QSimTest {
 		Node node5 = f.network.createAndAddNode(Id.create("5", Node.class), new CoordImpl(3100, 0));
 		Node node6 = f.network.createAndAddNode(Id.create("6", Node.class), new CoordImpl(3200, 0));
 		Node node7 = f.network.createAndAddNode(Id.create("7", Node.class), new CoordImpl(3300, 0));
-		f.network.createAndAddLink(Id.create("4", Node.class), f.node4, node5, 1000, 10, 6000, 2);
-		Link link5 = f.network.createAndAddLink(Id.create("5", Node.class), node5, node6, 100, 10, 60000, 9);
-		Link link6 = f.network.createAndAddLink(Id.create("6", Node.class), node6, node7, 100, 10, 60000, 9);
+		f.network.createAndAddLink(Id.create("4", Link.class), f.node4, node5, 1000, 10, 6000, 2);
+		Link link5 = f.network.createAndAddLink(Id.create("5", Link.class), node5, node6, 100, 10, 60000, 9);
+		Link link6 = f.network.createAndAddLink(Id.create("6", Link.class), node6, node7, 100, 10, 60000, 9);
 
 		((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).setRouteFactory(TransportMode.car, new LinkNetworkRouteFactory());
 
