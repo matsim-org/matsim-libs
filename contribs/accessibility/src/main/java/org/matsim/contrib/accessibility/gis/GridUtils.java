@@ -6,10 +6,10 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.accessibility.CSVWriter;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.opengis.feature.simple.SimpleFeature;
@@ -92,7 +92,7 @@ public final class GridUtils {
 				
 				if(boundary.contains(centroid)) {
 					Coord center = new CoordImpl(centerX, centerY);
-					measuringPoints.createAndAddFacility(new IdImpl( setPoints ), center);
+					measuringPoints.createAndAddFacility(Id.create( setPoints , ActivityFacility.class), center);
 					setPoints++;
 				}
 				else skippedPoints++;
@@ -138,7 +138,7 @@ public final class GridUtils {
 					centerY <= maxY && centerY >= minY) {
 					
 					Coord center = new CoordImpl(centerX, centerY);
-					measuringPoints.createAndAddFacility(new IdImpl( setPoints ), center);
+					measuringPoints.createAndAddFacility(Id.create( setPoints , ActivityFacility.class), center);
 					setPoints++;
 				}
 				else skippedPoints++;

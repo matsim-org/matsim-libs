@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.matrixbasedptrouter.utils.TempDirectoryUtil;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup;
@@ -60,7 +59,7 @@ public final class LeastCostPathTreeExtended extends LeastCostPathTree{
 	
 	protected static final Logger log = Logger.getLogger(LeastCostPathTreeExtended.class);
 	
-	private Map<Id, NodeDataExtended> nodeDataExt = null;
+	private Map<Id<Node>, NodeDataExtended> nodeDataExt = null;
 	private RoadPricingScheme scheme = null;
 	
 	/**
@@ -80,7 +79,7 @@ public final class LeastCostPathTreeExtended extends LeastCostPathTree{
 	 */
 	public final void calculateExtended(final Network network, final Node origin, final double time) {
 		
-		this.nodeDataExt = new ConcurrentHashMap<Id, NodeDataExtended>((int) (network.getNodes().size() * 1.1), 0.95f);
+		this.nodeDataExt = new ConcurrentHashMap<Id<Node>, NodeDataExtended>((int) (network.getNodes().size() * 1.1), 0.95f);
 		if(this.nodeDataExt.get(origin.getId()) == null){
 			NodeDataExtended nde = new NodeDataExtended();
 			nde.distance = 0.;
@@ -129,7 +128,7 @@ public final class LeastCostPathTreeExtended extends LeastCostPathTree{
 	// get methods
 	// ////////////////////////////////////////////////////////////////////
 	
-	public final Map<Id, NodeDataExtended> getTreeExtended() {
+	public final Map<Id<Node>, NodeDataExtended> getTreeExtended() {
 		return this.nodeDataExt;
 	}
 	
@@ -192,8 +191,8 @@ public final class LeastCostPathTreeExtended extends LeastCostPathTree{
 		
 		// contains all network nodes
 		Map<Id<Node>, Node> networkNodesMap = network.getNodes();
-		Id originNodeID = new IdImpl(1);
-		Id destinationNodeId = new IdImpl(4);
+		Id<Node> originNodeID = Id.create(1, Node.class);
+		Id<Node> destinationNodeId = Id.create(4, Node.class);
 		// run lcpte
 		lcpte.calculateExtended(network, networkNodesMap.get( originNodeID ), 3600.);
 		double time = lcpte.getTree().get( destinationNodeId ).getTime();
@@ -232,16 +231,16 @@ public final class LeastCostPathTreeExtended extends LeastCostPathTree{
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		
 		// add nodes
-		Node node1 = network.createAndAddNode(new IdImpl(1), scenario.createCoord(0, 0));
-		Node node2 = network.createAndAddNode(new IdImpl(2), scenario.createCoord(50, 100));
-		Node node3 = network.createAndAddNode(new IdImpl(3), scenario.createCoord(50, 0));
-		Node node4 = network.createAndAddNode(new IdImpl(4), scenario.createCoord(100, 0));
+		Node node1 = network.createAndAddNode(Id.create(1, Node.class), scenario.createCoord(0, 0));
+		Node node2 = network.createAndAddNode(Id.create(2, Node.class), scenario.createCoord(50, 100));
+		Node node3 = network.createAndAddNode(Id.create(3, Node.class), scenario.createCoord(50, 0));
+		Node node4 = network.createAndAddNode(Id.create(4, Node.class), scenario.createCoord(100, 0));
 
 		// add links
-		network.createAndAddLink(new IdImpl(1), node1, node2, 500.0, 10.0, 3600.0, 1);
-		network.createAndAddLink(new IdImpl(2), node2, node4, 500.0, 10.0, 3600.0, 1);
-		network.createAndAddLink(new IdImpl(3), node1, node3, 50.0, 0.1, 3600.0, 1);
-		network.createAndAddLink(new IdImpl(4), node3, node4, 50.0, 0.1, 3600.0, 1);
+		network.createAndAddLink(Id.create(1, Link.class), node1, node2, 500.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(Id.create(2, Link.class), node2, node4, 500.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(Id.create(3, Link.class), node1, node3, 50.0, 0.1, 3600.0, 1);
+		network.createAndAddLink(Id.create(4, Link.class), node3, node4, 50.0, 0.1, 3600.0, 1);
 		
 		return network;
 	}
