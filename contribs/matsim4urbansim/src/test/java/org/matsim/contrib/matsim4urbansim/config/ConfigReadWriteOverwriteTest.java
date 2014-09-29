@@ -34,13 +34,13 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.utils.TempDirectoryUtil;
 import org.matsim.contrib.matsim4urbansim.utils.CreateTestExternalMATSimConfig;
 import org.matsim.contrib.matsim4urbansim.utils.CreateTestM4UConfig;
 import org.matsim.contrib.matsim4urbansim.utils.io.Paths;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -301,11 +301,11 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 		while(iteratorStrategyCG.hasNext()){
 			StrategySettings strategySettings = iteratorStrategyCG.next();
 
-			if(strategySettings.getId() == new IdImpl(1))
+			if(strategySettings.getId() == Id.create(1, StrategySettings.class))
 				Assert.assertTrue(strategySettings.getProbability() == externalTestConfig.timeAllocationMutatorProbability);
-			else if(strategySettings.getId() == new IdImpl(2))
+			else if(strategySettings.getId() == Id.create(2, StrategySettings.class))
 				Assert.assertTrue(strategySettings.getProbability() == externalTestConfig.changeExpBetaProbability);
-			else if(strategySettings.getId() == new IdImpl(3))
+			else if(strategySettings.getId() == Id.create(3, StrategySettings.class))
 				Assert.assertTrue(strategySettings.getProbability() == externalTestConfig.reRouteDijkstraProbability);
 		}
 
@@ -379,11 +379,11 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 		while(iteratorStrategyCG.hasNext()){
 			StrategySettings strategySettings = iteratorStrategyCG.next();
 
-			if(strategySettings.getId() == new IdImpl(1))
+			if(strategySettings.getId() == Id.create(1, StrategySettings.class))
 				Assert.assertTrue(strategySettings.getProbability() == testConfig.timeAllocationMutatorProbability);
-			else if(strategySettings.getId() == new IdImpl(2))
+			else if(strategySettings.getId() == Id.create(2, StrategySettings.class))
 				Assert.assertTrue(strategySettings.getProbability() == testConfig.changeExpBetaProbability);
-			else if(strategySettings.getId() == new IdImpl(3))
+			else if(strategySettings.getId() == Id.create(3, StrategySettings.class))
 				Assert.assertTrue(strategySettings.getProbability() == testConfig.reRouteDijkstraProbability);
 		}
 

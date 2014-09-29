@@ -6,7 +6,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 
 
 public class ZurichUtilitiesIVTCHOSMNetwork extends ZurichUtilities{
@@ -39,10 +38,10 @@ public class ZurichUtilitiesIVTCHOSMNetwork extends ZurichUtilities{
 
 		linksToRemove = new ArrayList<Id<Link>>();
 		
-		linksToRemove.add(new IdImpl(103727));
-		linksToRemove.add(new IdImpl(103728));
-		linksToRemove.add(new IdImpl(101895));
-		linksToRemove.add(new IdImpl(101896));
+		linksToRemove.add(Id.create(103727, Link.class));
+		linksToRemove.add(Id.create(103728, Link.class));
+		linksToRemove.add(Id.create(101895, Link.class));
+		linksToRemove.add(Id.create(101896, Link.class));
 
 		// remove links from network
 		applyScenario(network);

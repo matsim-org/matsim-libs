@@ -28,10 +28,12 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.contrib.matsim4urbansim.utils.io.HeaderParser;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
@@ -148,7 +150,7 @@ public class CreateJonesCityNetwork {
 
 		String line;
 		// temporary variables, needed to construct nodes
-		IdImpl zoneID;
+		Id<ActivityFacility> zoneID;
 		Coord coord;
 		String[] parts;
 
@@ -157,7 +159,7 @@ public class CreateJonesCityNetwork {
 
 			// get zone ID, UrbanSim sometimes writes IDs as floats!
 			int zoneIdAsInt = Integer.parseInt(parts[indexZoneID]);
-			zoneID = new IdImpl(zoneIdAsInt);
+			zoneID = Id.create(zoneIdAsInt, ActivityFacility.class);
 			// get the coordinates of that parcel
 			// tnicolai remove the 1000.
 			double x = Double.parseDouble( parts[indexXCoodinate] );
@@ -214,8 +216,8 @@ public class CreateJonesCityNetwork {
 			
 			Node neighborNode = network.getNearestNode(neighbor);
 			if(neighborNode != currentNode){
-				network.createAndAddLink(new IdImpl(linkID++), currentNode, neighborNode, length, freeSpeed, capacity, lanes);
-				network.createAndAddLink(new IdImpl(linkID++), neighborNode, currentNode, length, freeSpeed, capacity, lanes);
+				network.createAndAddLink(Id.create(linkID++, Link.class), currentNode, neighborNode, length, freeSpeed, capacity, lanes);
+				network.createAndAddLink(Id.create(linkID++, Link.class), neighborNode, currentNode, length, freeSpeed, capacity, lanes);
 			}
 		}
 		else

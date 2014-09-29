@@ -6,6 +6,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
@@ -17,14 +18,12 @@ import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
 import org.matsim.contrib.accessibility.interfaces.ZoneDataExchangeInterface;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
-import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestNetwork;
 import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestPopulation;
 import org.matsim.contrib.matsim4urbansim.config.M4UConfigurationConverterV4;
 import org.matsim.contrib.matsim4urbansim.utils.CreateTestM4UConfig;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.network.NetworkWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
@@ -108,7 +107,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 
 			//initialize opportunities for accessibility computation
 			ActivityFacilitiesImpl opportunities = new ActivityFacilitiesImpl("opportunities");
-			opportunities.createAndAddFacility(new IdImpl("opp"), new CoordImpl(200, 100));
+			opportunities.createAndAddFacility(Id.create("opp", ActivityFacility.class), new CoordImpl(200, 100));
 
 			//initialize new grid based accessibility controler listener and grids for the modes we want to analyze here
 			GridBasedAccessibilityControlerListenerV3 listener = new GridBasedAccessibilityControlerListenerV3(opportunities, ptMatrix, config, net);
@@ -184,7 +183,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 
 		//initialize opportunities for accessibility computation
 		ActivityFacilitiesImpl opportunities = new ActivityFacilitiesImpl("opportunities");
-		opportunities.createAndAddFacility(new IdImpl("opp"), new CoordImpl(200, 100));
+		opportunities.createAndAddFacility(Id.create("opp", ActivityFacility.class), new CoordImpl(200, 100));
 
 		ActivityFacilitiesImpl measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(minX, minY, maxX, maxY, resolution);
 

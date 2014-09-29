@@ -1,6 +1,3 @@
-/**
- *
- */
 package org.matsim.contrib.matsim4urbansim.utils.io;
 
 import java.io.BufferedReader;
@@ -26,11 +23,9 @@ import org.matsim.contrib.matsim4urbansim.config.M4UConfigUtils;
 import org.matsim.contrib.matsim4urbansim.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.contrib.matsim4urbansim.utils.helperobjects.SpatialReferenceObject;
-import org.matsim.contrib.matsim4urbansim.utils.ids.ZoneId;
 import org.matsim.contrib.matsim4urbansim.utils.io.misc.RandomLocationDistributor;
 import org.matsim.contrib.matsim4urbansim.utils.io.writer.AnalysisPopulationCSVWriter;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -115,7 +110,7 @@ public class ReadFromUrbanSimModel {
 			final int indexZoneID 		= idxFromKey.get( InternalConstants.ZONE_ID );
 
 			// temporary variables, needed to construct parcels and zones
-			ZoneId zone_ID;
+			Id<ActivityFacility> zone_ID;
 			Coord coord;
 			String[] parts;
 
@@ -124,7 +119,7 @@ public class ReadFromUrbanSimModel {
 
 				// get zone ID, UrbanSim sometimes writes IDs as floats!
 				long zoneIdAsLong = (long) Double.parseDouble( parts[ indexZoneID ] );
-				zone_ID = new ZoneId( zoneIdAsLong ) ;
+				zone_ID = Id.create( zoneIdAsLong , ActivityFacility.class) ;
 
 				// get the coordinates of that parcel
 				coord = new CoordImpl( parts[ indexXCoodinate ],parts[ indexYCoodinate ] );
@@ -162,7 +157,7 @@ public class ReadFromUrbanSimModel {
 
 		// temporary data structure in order to get coordinates for zones:
 		// Map<Id,Id> zoneFromParcel = new HashMap<Id,Id>();
-		Map<Id,PseudoZone> pseudoZones = new ConcurrentHashMap<Id,PseudoZone>();
+		Map<Id<ActivityFacility>, PseudoZone> pseudoZones = new ConcurrentHashMap<>();
 
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader( filename );
@@ -178,9 +173,9 @@ public class ReadFromUrbanSimModel {
 			final int indexZoneID 		= idxFromKey.get( InternalConstants.ZONE_ID );
 
 			// temporary variables, needed to construct parcels and zones
-			Id parcel_ID;
+			Id<ActivityFacility> parcel_ID;
 			Coord coord;
-			ZoneId zone_ID;
+			Id<ActivityFacility> zone_ID;
 			PseudoZone pseudoZone;
 			String[] parts;
 
@@ -190,7 +185,7 @@ public class ReadFromUrbanSimModel {
 
 				// urbansim sometimes writes IDs as floats!
 				long parcelIdAsLong = (long) Double.parseDouble( parts[ indexParcelID ] );
-				parcel_ID = new IdImpl( parcelIdAsLong ) ;
+				parcel_ID = Id.create( parcelIdAsLong, ActivityFacility.class ) ;
 
 				// get the coordinates of that parcel
 				coord = new CoordImpl( parts[ indexXCoodinate ],parts[ indexYCoodinate ] );
@@ -201,7 +196,7 @@ public class ReadFromUrbanSimModel {
 				
 				// get zone ID
 				long zoneIdAsLong = (long) Double.parseDouble( parts[ indexZoneID ] );
-				zone_ID = new ZoneId( zoneIdAsLong );
+				zone_ID = Id.create( zoneIdAsLong, ActivityFacility.class );
 
 				// set custom attributes, these are needed to compute zone2zone trips
 				Map<String, Object> customFacilityAttributes = facility.getCustomAttributes();
@@ -245,16 +240,16 @@ public class ReadFromUrbanSimModel {
 	 * @param zones ActivityFacilitiesImpl
 	 * @param pseudoZones Map<Id,PseudoZone>
 	 */
-	void constructZones (final ActivityFacilitiesImpl zones, final Map<Id,PseudoZone> pseudoZones  ) {
+	void constructZones (final ActivityFacilitiesImpl zones, final Map<Id<ActivityFacility>,PseudoZone> pseudoZones  ) {
 
 		log.info( "Starting to construct urbansim zones (for the impedance matrix)" ) ;
 
-		Id zone_ID;
+		Id<ActivityFacility> zone_ID;
 		PseudoZone pz;
 		Coord coord;
 
 		// constructing the zones from the pseudoZones:
-		for ( Entry<Id,PseudoZone> entry : pseudoZones.entrySet() ) {
+		for ( Entry<Id<ActivityFacility>,PseudoZone> entry : pseudoZones.entrySet() ) {
 			zone_ID = entry.getKey();
 			pz = entry.getValue();
 			// compute the average center of a zone
@@ -322,7 +317,7 @@ public class ReadFromUrbanSimModel {
 				String[] parts = line.split( InternalConstants.TAB_SEPERATOR );
 
 				// create new person
-				Id personId = new IdImpl( parts[ indexPersonID ] );
+				Id<Person> personId = Id.create( parts[ indexPersonID ], Person.class );
 
 				if ( !( compensationFlag || MatsimRandom.getRandom().nextDouble() < samplingRate || personExistsInOldPopulation(oldPop, personId)) )
 					continue;
@@ -334,7 +329,7 @@ public class ReadFromUrbanSimModel {
 				PersonImpl newPerson = new PersonImpl( personId ) ;
 
 				// get home location id
-				Id homeZoneId = new IdImpl( parts[ indexZoneID_HOME ] );
+				Id<ActivityFacility> homeZoneId = Id.create( parts[ indexZoneID_HOME ], ActivityFacility.class );
 				ActivityFacility homeLocation = zones.getFacilities().get( homeZoneId ); // the home location is the zone centroid
 				currentZoneLocations.setHomeZoneIDAndZoneCoordinate(homeZoneId, homeLocation);
 				if ( homeLocation==null ){
@@ -358,7 +353,7 @@ public class ReadFromUrbanSimModel {
 					newPerson.setEmployed(Boolean.FALSE);
 				else {
 					newPerson.setEmployed(Boolean.TRUE);
-					Id workZoneId = new IdImpl( parts[ indexZoneID_WORK ] );
+					Id<ActivityFacility> workZoneId = Id.create( parts[ indexZoneID_WORK ], ActivityFacility.class );
 					ActivityFacility jobLocation = zones.getFacilities().get( workZoneId );
 					currentZoneLocations.setWorkZoneIDAndZoneCoordinate(workZoneId, jobLocation);
 					if ( jobLocation == null ) {
@@ -441,7 +436,7 @@ public class ReadFromUrbanSimModel {
 				String[] parts = line.split( InternalConstants.TAB_SEPERATOR );
 
 				// create new person
-				Id personId = new IdImpl( parts[ indexPersonID ] );
+				Id<Person> personId = Id.create( parts[ indexPersonID ], Person.class );
 
 				if ( !( compensationFlag || MatsimRandom.getRandom().nextDouble() < samplingRate || personExistsInOldPopulation(oldPop, personId)) )
 					continue ;
@@ -452,7 +447,7 @@ public class ReadFromUrbanSimModel {
 				PersonImpl newPerson = new PersonImpl( personId ) ;
 
 				// get home location id
-				Id homeParcelId = new IdImpl( parts[ indexParcelID_HOME ] );
+				Id<ActivityFacility> homeParcelId = Id.create( parts[ indexParcelID_HOME ], ActivityFacility.class );
 				ActivityFacility homeLocation = parcels.getFacilities().get( homeParcelId );
 				if ( homeLocation==null ) {
 					log.warn( "homeLocation==null; personId: " + personId + " parcelId: " + homeParcelId + ' ' + this ) ;
@@ -473,7 +468,7 @@ public class ReadFromUrbanSimModel {
 					newPerson.setEmployed(Boolean.FALSE);
 				else {
 					newPerson.setEmployed(Boolean.TRUE);
-					Id workParcelId = new IdImpl( parts[ indexParcelID_WORK ] ) ;
+					Id<ActivityFacility> workParcelId = Id.create( parts[ indexParcelID_WORK ], ActivityFacility.class ) ;
 					ActivityFacility jobLocation = parcels.getFacilities().get( workParcelId ) ;
 					if ( jobLocation == null ) {
 						// show warning message only once
@@ -665,7 +660,7 @@ public class ReadFromUrbanSimModel {
 					break;
 				}
 				else if(this.shapefile != null){ // check home location via shape file
-					Id newHomeZoneID = currentZoneLocations.getHomeZoneID();
+					Id<ActivityFacility> newHomeZoneID = currentZoneLocations.getHomeZoneID();
 					if(!rld.coordinateInZone(newHomeZoneID, oldHomeCoord)){
 						// home location changed
 						newPop.addPerson(newPerson);
@@ -715,7 +710,7 @@ public class ReadFromUrbanSimModel {
 					break;
 				}
 				else if(this.shapefile != null){ // check work location via shape file
-					Id newWorkZoneID = currentZoneLocations.getWorkZoneID();
+					Id<ActivityFacility> newWorkZoneID = currentZoneLocations.getWorkZoneID();
 					if(!rld.coordinateInZone(newWorkZoneID, oldWorkCoord)){
 						// work location changed
 						newPop.addPerson(newPerson);
@@ -771,17 +766,17 @@ public class ReadFromUrbanSimModel {
 			while ( (line=reader.readLine()) != null ) {
 				
 				String[] parts = line.split( InternalConstants.TAB );
-				IdImpl jobId = new IdImpl(parts[indexJobID]);
+				Id<ActivityFacility> jobId = Id.create(parts[indexJobID], ActivityFacility.class);
 				
 				if(isParcel){
 					
-					IdImpl parcelId = new IdImpl(parts[indexParcelID]);
+					Id<ActivityFacility> parcelId = Id.create(parts[indexParcelID], ActivityFacility.class);
 					ActivityFacility parcel = facilityMap.get(parcelId);
 					opportunities.createAndAddFacility(jobId, parcel.getCoord());
 				}
 				else{// zones
 					
-					IdImpl zoneId = new IdImpl(parts[indexZoneID]);
+					Id zoneId = Id.create(parts[indexZoneID], ActivityFacility.class);
 					ActivityFacility zone = facilityMap.get(zoneId);
 					opportunities.createAndAddFacility(jobId, zone.getCoord());
 				}
@@ -808,11 +803,11 @@ public class ReadFromUrbanSimModel {
 //		Coord coord;
 //		if( Integer.parseInt( parts[indexParcelID] ) >= 0 ){
 //			
-//			jobID = new IdImpl( parts[indexJobID] );
+//			jobID = Id.create( parts[indexJobID] );
 //			assert( jobID != null);
-//			parcelID = new IdImpl( parts[indexParcelID] );
+//			parcelID = Id.create( parts[indexParcelID] );
 //			assert( parcelID != null );
-//			zoneID = new IdImpl( parts[indexZoneID] );
+//			zoneID = Id.create( parts[indexZoneID] );
 //			assert( zoneID != null );
 //			coord = facilityMap.get( parcelID ).getCoord();
 //			assert( coord != null );
@@ -842,19 +837,19 @@ public class ReadFromUrbanSimModel {
 //		Coord coord;
 //		if( Integer.parseInt( parts[indexZoneID] ) >= 0 ){
 //		
-//			jobID = new IdImpl( parts[indexJobID] );
+//			jobID = Id.create( parts[indexJobID] );
 //			assert( jobID != null);
-//			zoneID = new IdImpl( parts[indexZoneID] );
+//			zoneID = Id.create( parts[indexZoneID] );
 //			assert( zoneID != null );
 //			coord = facilityMap.get( zoneID ).getCoord();
 //			assert( coord != null );
 //			
 //			if(isBackup){
-//				backupList.add( new SpatialReferenceObject(jobID, new IdImpl(-1), zoneID, coord) );
+//				backupList.add( new SpatialReferenceObject(jobID, Id.create(-1), zoneID, coord) );
 //				cnt.backupJobs++;
 //			}
 //			else
-//				jobSampleList.add( new SpatialReferenceObject(jobID, new IdImpl(-1), zoneID, coord) );
+//				jobSampleList.add( new SpatialReferenceObject(jobID, Id.create(-1), zoneID, coord) );
 //		}
 //		else
 //			cnt.skippedJobs++;	// counting number of skipped jobs ...
@@ -912,7 +907,7 @@ public class ReadFromUrbanSimModel {
 	 * @param personId
 	 * @return true if a person already exists in an old population
 	 */
-	private boolean personExistsInOldPopulation(Population oldPop, Id personId){
+	private boolean personExistsInOldPopulation(Population oldPop, Id<Person> personId){
 
 		if(oldPop == null)
 			return false;
@@ -987,9 +982,9 @@ public class ReadFromUrbanSimModel {
 				// check if home location is available
 				if( Integer.parseInt(parts[ indexParcelID_HOME ]) >=  0){
 					// create new person
-					Id personId = new IdImpl( parts[ indexPersonID ] );
+					Id<Person> personId = Id.create( parts[ indexPersonID ] , Person.class);
 					// get home location id
-					Id homeParcelId = new IdImpl( parts[ indexParcelID_HOME ] );
+					Id<ActivityFacility> homeParcelId = Id.create( parts[ indexParcelID_HOME ] , ActivityFacility.class);
 					ActivityFacility homeLocation = parcels.getFacilities().get( homeParcelId );
 					
 					
@@ -1026,24 +1021,24 @@ public class ReadFromUrbanSimModel {
 	
 	public class ZoneLocations{
 		
-		private Id zoneIdHome = null;
-		private Id zoneIdWork = null;
+		private Id<ActivityFacility> zoneIdHome = null;
+		private Id<ActivityFacility> zoneIdWork = null;
 		private Coord homeCoord = null;
 		private Coord workCoord = null;
 		
-		public void setHomeZoneIDAndZoneCoordinate(Id zoneId, ActivityFacility home){
+		public void setHomeZoneIDAndZoneCoordinate(Id<ActivityFacility> zoneId, ActivityFacility home){
 			this.zoneIdHome = zoneId;
 			this.homeCoord  = home.getCoord();
 		}
-		public void setWorkZoneIDAndZoneCoordinate(Id zoneId, ActivityFacility work){
+		public void setWorkZoneIDAndZoneCoordinate(Id<ActivityFacility> zoneId, ActivityFacility work){
 			this.zoneIdWork = zoneId;
 			this.workCoord  = work.getCoord();
 		}
 		
-		public Id getHomeZoneID(){
+		public Id<ActivityFacility> getHomeZoneID(){
 			return this.zoneIdHome;
 		}
-		public Id getWorkZoneID(){
+		public Id<ActivityFacility> getWorkZoneID(){
 			return this.zoneIdWork;
 		}
 		public Coord getHomeZoneCoord(){
@@ -1079,13 +1074,13 @@ public class ReadFromUrbanSimModel {
 			this.populationMergeTotal = 0;
 		}
 	}
-	
-	private class JobCounter{
-		public long numberOfUrbanSimJobs = 0;
-		public long skippedJobs = 0;
-		public long backupJobs = 0;
-		public long allowedJobs = 0;
-		public long addedJobsFromBackup = 0;
-	}
+//	
+//	private class JobCounter{
+//		public long numberOfUrbanSimJobs = 0;
+//		public long skippedJobs = 0;
+//		public long backupJobs = 0;
+//		public long allowedJobs = 0;
+//		public long addedJobsFromBackup = 0;
+//	}
 	
 }

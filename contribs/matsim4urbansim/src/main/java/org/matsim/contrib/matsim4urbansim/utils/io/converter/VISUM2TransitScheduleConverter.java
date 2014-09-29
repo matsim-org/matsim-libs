@@ -37,7 +37,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.matsim4urbansim.utils.io.HeaderParser;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -51,6 +50,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 
 
 /**
@@ -351,9 +351,9 @@ public class VISUM2TransitScheduleConverter {
 			Coord coord = transitStop.get(transitStopKey);
 //			Link nearestLink = network.getNearestLinkExactly(coord);
 			
-			TransitStopFacility stop = tsfi.createTransitStopFacility(new IdImpl(transitStopKey), coord, false);
+			TransitStopFacility stop = tsfi.createTransitStopFacility(Id.create(transitStopKey, TransitStopFacility.class), coord, false);
 //			((TransitStopFacilityImpl) stop).setLinkId(nearestLink.getId());
-			((TransitStopFacilityImpl) stop).setLinkId(new IdImpl(transitStopKey +""+ transitStopKey));
+			((TransitStopFacilityImpl) stop).setLinkId(Id.create(transitStopKey +""+ transitStopKey, Link.class));
 			transitSchedule.addStopFacility(stop);
 		}
 		log.info("Creating transit stops done.");
@@ -384,7 +384,7 @@ public class VISUM2TransitScheduleConverter {
 				long transitStopB 	= voA2B.getDestinationBezirkNummer();
 				
 				// transit line A -> B & B -> A
-				TransitLine transitLine = tsfi.createTransitLine(new IdImpl(transitLineId));
+				TransitLine transitLine = tsfi.createTransitLine(Id.create(transitLineId, TransitLine.class));
 				
 				if(! voA2B.isHandeled() ){ 				// direction A -> B
 					
@@ -441,8 +441,8 @@ public class VISUM2TransitScheduleConverter {
 			TransitSchedule transitSchedule, String mode, long transitStopOrigin,
 			long transitStopDestination, TransitLine transitLine, double travelTime, long waitTime) {
 		// create transit route stops
-		TransitStopFacility origin 		= transitSchedule.getFacilities().get(new IdImpl(transitStopOrigin));
-		TransitStopFacility destination = transitSchedule.getFacilities().get(new IdImpl(transitStopDestination));
+		TransitStopFacility origin 	    = transitSchedule.getFacilities().get(Id.create(transitStopOrigin, TransitStopFacility.class));
+		TransitStopFacility destination = transitSchedule.getFacilities().get(Id.create(transitStopDestination, TransitStopFacility.class));
 		
 		TransitRouteStop transitRouteStopOrigin 	= tsfi.createTransitRouteStop(origin, 0., 0.);
 		TransitRouteStop transitRouteStopDestination= tsfi.createTransitRouteStop(destination, travelTime, 0.);
@@ -461,18 +461,18 @@ public class VISUM2TransitScheduleConverter {
 //			linkIds.add(l.getId());
 		
 		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
-		linkIds.add(new IdImpl(origin.getId() +""+ destination.getId()));
+		linkIds.add(Id.create(origin.getId() +""+ destination.getId(), Link.class));
 		
 		NetworkRoute route = new LinkNetworkRouteImpl(origin.getLinkId(), destination.getLinkId());
 		route.setLinkIds(origin.getLinkId(), linkIds, destination.getLinkId());
 
-		TransitRoute transitRoute = tsfi.createTransitRoute(new IdImpl(transitStopOrigin+"to"+transitStopDestination), route, stops, mode);
+		TransitRoute transitRoute = tsfi.createTransitRoute(Id.create(transitStopOrigin+"to"+transitStopDestination, TransitRoute.class), route, stops, mode);
 		
 		// set departures
 		int departureId = 1;
 		for(int t = 0; t < secondsOfDay; t += (waitTime*2)){
-			Departure departure = tsfi.createDeparture(new IdImpl(getNumberFormat(departureId)), t);
-			departure.setVehicleId(new IdImpl(departureId));
+			Departure departure = tsfi.createDeparture(Id.create(getNumberFormat(departureId), Departure.class), t);
+			departure.setVehicleId(Id.create(departureId, Vehicle.class));
 			transitRoute.addDeparture(departure);
 			
 			departureId++;

@@ -33,7 +33,7 @@ import org.geotools.data.simple.SimpleFeatureSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.matsim4urbansim.utils.io.Paths;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -57,7 +57,7 @@ public class RandomLocationDistributor {
 	private String shapefile 	= null;
 	private double radius 		= 0.;
 	private boolean isShapefile = false;
-	private Map<Id, SimpleFeature> featureMap = null;
+	private Map<Id<ActivityFacility>, SimpleFeature> featureMap = null;
 	
 	/**
 	 * constructor
@@ -86,16 +86,15 @@ public class RandomLocationDistributor {
 	 * @param shapefile
 	 * @return
 	 */
-	private Map<Id, SimpleFeature> initShapeFeatures(String shapefile) {
+	private Map<Id<ActivityFacility>, SimpleFeature> initShapeFeatures(String shapefile) {
 		try {
 			SimpleFeatureSource fts = ShapeFileReader.readDataFile(shapefile); // reads in shape file
 			SimpleFeatureIterator fIt = fts.getFeatures().features();
-			Map<Id, SimpleFeature> featureMap = new ConcurrentHashMap<Id, SimpleFeature>();
+			Map<Id<ActivityFacility>, SimpleFeature> featureMap = new ConcurrentHashMap<>();
 			
 			while (fIt.hasNext()) {
 				SimpleFeature feature = fIt.next();
-				featureMap.put(new IdImpl(feature.getAttribute(ZONE_ID)
-						.toString()), feature);
+				featureMap.put(Id.create(feature.getAttribute(ZONE_ID).toString(), ActivityFacility.class), feature);
 			}
 			fIt.close();
 			return featureMap;
@@ -108,7 +107,7 @@ public class RandomLocationDistributor {
 		return null;
 	}
 	
-	public Coord getRandomLocation(Id zoneID, Coord coord) {
+	public Coord getRandomLocation(Id<ActivityFacility> zoneID, Coord coord) {
 		if(isShapefile){
 			SimpleFeature feature = this.featureMap.get(zoneID);
 			return getRandomPointInFeature(feature);
@@ -166,7 +165,7 @@ public class RandomLocationDistributor {
 	 * @param coordinate to be tested if it lies within the selected zone
 	 * @return true if coordinate lies within the selected zone
 	 */
-	public boolean coordinateInZone(Id zoneID, Coord coordinate){
+	public boolean coordinateInZone(Id<ActivityFacility> zoneID, Coord coordinate){
 		Point point = MGC.xy2Point(coordinate.getX(), coordinate.getY());
 		return pointInZone(zoneID, point);
 	}
@@ -179,7 +178,7 @@ public class RandomLocationDistributor {
 	 * @param point to be tested if it lies within the selected zone
 	 * @return true if point lies within the selected zone
 	 */
-	public boolean pointInZone(Id zoneID, Point point){
+	public boolean pointInZone(Id<ActivityFacility> zoneID, Point point){
 		SimpleFeature feature = this.featureMap.get(zoneID);
 		boolean withinZoneGeometry = ((Geometry) feature.getDefaultGeometry()).contains(point);
 		return withinZoneGeometry;

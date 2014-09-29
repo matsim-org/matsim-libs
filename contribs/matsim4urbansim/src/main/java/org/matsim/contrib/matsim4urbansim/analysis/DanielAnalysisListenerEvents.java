@@ -31,7 +31,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -48,7 +48,7 @@ import org.matsim.core.utils.io.IOUtils;
 public class DanielAnalysisListenerEvents implements StartupListener, IterationStartsListener, IterationEndsListener {
 	
 	private List<CalcMacroZoneTravelTimes> traveltimes;
-	private Map<Id, Id> micro2MacroZone;
+	private Map<Id<ActivityFacility>, Id<ActivityFacility>> micro2MacroZone;
 	private String micro2macroZonesFile;
 	private ActivityFacilities parcels;
 	private List<Tuple<Integer, Integer>> timeslots;
@@ -93,10 +93,10 @@ public class DanielAnalysisListenerEvents implements StartupListener, IterationS
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		this.micro2MacroZone = new HashMap<Id, Id>();
+		this.micro2MacroZone = new HashMap<>();
 		Set<String[]> zones = readFileContent(micro2macroZonesFile, ",", true);
 		for(String[] s: zones){
-			this.micro2MacroZone.put(new IdImpl(s[0]), new IdImpl(s[2]));
+			this.micro2MacroZone.put(Id.create(s[0], ActivityFacility.class), Id.create(s[2], ActivityFacility.class));
 		}
 	}
 	

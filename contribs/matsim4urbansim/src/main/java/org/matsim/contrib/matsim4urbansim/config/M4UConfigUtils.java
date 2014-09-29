@@ -27,6 +27,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matsim4urbansim.config.modules.M4UControlerConfigModuleV3;
@@ -34,7 +35,6 @@ import org.matsim.contrib.matsim4urbansim.config.modules.UrbanSimParameterConfig
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.Matsim4UrbansimConfigType;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.Matsim4UrbansimType;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.MatsimConfigType;
-import org.matsim.contrib.matsim4urbansim.utils.ids.IdFactory;
 import org.matsim.contrib.matsim4urbansim.utils.io.Paths;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -46,6 +46,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.PlanStrategyRegistrar.Names;
 import org.matsim.core.controler.PlanStrategyRegistrar.Selector;
@@ -356,19 +357,19 @@ public class M4UConfigUtils {
 
 		config.strategy().setMaxAgentPlanMemorySize( 5 );
 
-		StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings(IdFactory.get(1));
+		StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings(Id.create(1, StrategySettings.class));
 		changeExpBeta.setModuleName(Selector.ChangeExpBeta.toString());
 		changeExpBeta.setProbability( 0.8 ) ;
 		config.strategy().addStrategySettings(changeExpBeta);
 
-		StrategyConfigGroup.StrategySettings timeAlocationMutator = new StrategyConfigGroup.StrategySettings(IdFactory.get(2));
+		StrategyConfigGroup.StrategySettings timeAlocationMutator = new StrategyConfigGroup.StrategySettings(Id.create(2, StrategySettings.class));
 		timeAlocationMutator.setModuleName(Names.TimeAllocationMutator.toString()); 
 		timeAlocationMutator.setProbability( 0.1 ); 
 		timeAlocationMutator.setDisableAfter(disableStrategyAfterIteration(config)); // just to be sure
 		config.strategy().addStrategySettings(timeAlocationMutator);
 		config.timeAllocationMutator().setMutationRange(7200.) ;
 
-		StrategyConfigGroup.StrategySettings reroute = new StrategyConfigGroup.StrategySettings(IdFactory.get(3));
+		StrategyConfigGroup.StrategySettings reroute = new StrategyConfigGroup.StrategySettings(Id.create(3, StrategySettings.class));
 		reroute.setModuleName(Names.ReRoute.toString());  
 		reroute.setProbability( 0.1 );
 		reroute.setDisableAfter(disableStrategyAfterIteration(config));

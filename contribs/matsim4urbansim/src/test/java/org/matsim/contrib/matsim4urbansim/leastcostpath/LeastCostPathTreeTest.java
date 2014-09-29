@@ -13,7 +13,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestNetwork;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.costcalculators.TravelDistanceCalculator;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.costcalculators.TravelTimeCostCalculator;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -46,11 +45,11 @@ public class LeastCostPathTreeTest extends MatsimTestCase{
 		assert( this.scenario.getNetwork() != null );
 		
 		// get origin node
-		Node origin = this.scenario.getNetwork().getNodes().get(new IdImpl(1));
+		Node origin = this.scenario.getNetwork().getNodes().get(Id.create(1, Node.class));
 		assert( origin != null );
 		
 		// get destination node
-		Node destination = this.scenario.getNetwork().getNodes().get(new IdImpl(4));
+		Node destination = this.scenario.getNetwork().getNodes().get(Id.create(4, Node.class));
 		assert( destination != null );
 
 		lcptTime.calculate(this.scenario.getNetwork(), origin, departureTime);

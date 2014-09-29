@@ -30,8 +30,10 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestNetwork;
 import org.matsim.contrib.matsim4urbansim.config.M4UConfigUtils;
@@ -42,7 +44,6 @@ import org.matsim.contrib.matsim4urbansim.utils.io.CreateHomeWorkHomePlan;
 import org.matsim.contrib.matsim4urbansim.utils.io.ReadFromUrbanSimModel;
 import org.matsim.contrib.matsim4urbansim.utils.io.ReadFromUrbanSimModel.PopulationCounter;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.population.PersonImpl;
@@ -104,41 +105,41 @@ public class PopulationMergeTest extends MatsimTestCase{
 		
 		// create dummy persons
 		Population oldPop = scenario.getPopulation();
-		ActivityFacility dummyFacility = zones.getFacilities().get( new IdImpl(1) );
+		ActivityFacility dummyFacility = zones.getFacilities().get( Id.create(1, ActivityFacility.class) );
 		Coord dummyCoord = dummyFacility.getCoord();
 		// create persons
 		
-		PersonImpl person1 = new PersonImpl( new IdImpl(1));
+		PersonImpl person1 = new PersonImpl( Id.create(1, Person.class));
 		PlanImpl plan1 = person1.createAndAddPlan(true);
 		CreateHomeWorkHomePlan.makeHomePlan(plan1, dummyCoord, dummyFacility);
 		person1.setEmployed(true);
 		CreateHomeWorkHomePlan.completePlanToHwh(plan1, dummyCoord, dummyFacility);
 		
-		PersonImpl person2 = new PersonImpl( new IdImpl(2));
+		PersonImpl person2 = new PersonImpl( Id.create(2, Person.class));
 		PlanImpl plan2 = person2.createAndAddPlan(true);
 		CreateHomeWorkHomePlan.makeHomePlan(plan2, dummyCoord, dummyFacility);
 		person2.setEmployed(true);
 		CreateHomeWorkHomePlan.completePlanToHwh(plan2, dummyCoord, dummyFacility);
 		
-		PersonImpl person3 = new PersonImpl( new IdImpl(3));
+		PersonImpl person3 = new PersonImpl( Id.create(3, Person.class));
 		PlanImpl plan3 = person3.createAndAddPlan(true);
 		CreateHomeWorkHomePlan.makeHomePlan(plan3, dummyCoord, dummyFacility);
 		person3.setEmployed(true);
 		CreateHomeWorkHomePlan.completePlanToHwh(plan3, dummyCoord, dummyFacility);
 		
-		PersonImpl person4 = new PersonImpl( new IdImpl(4));
+		PersonImpl person4 = new PersonImpl( Id.create(4, Person.class));
 		PlanImpl plan4 = person4.createAndAddPlan(true);
 		CreateHomeWorkHomePlan.makeHomePlan(plan4, dummyCoord, dummyFacility);
 		person4.setEmployed(true);
 		CreateHomeWorkHomePlan.completePlanToHwh(plan4, dummyCoord, dummyFacility);
 		
-		PersonImpl person5 = new PersonImpl( new IdImpl(5));
+		PersonImpl person5 = new PersonImpl( Id.create(5, Person.class));
 		PlanImpl plan5 = person5.createAndAddPlan(true);
 		CreateHomeWorkHomePlan.makeHomePlan(plan5, dummyCoord, dummyFacility);
 		person5.setEmployed(true);
 		CreateHomeWorkHomePlan.completePlanToHwh(plan5, dummyCoord, dummyFacility);
 		
-		PersonImpl person6 = new PersonImpl( new IdImpl(6));
+		PersonImpl person6 = new PersonImpl( Id.create(6, Person.class));
 		PlanImpl plan6 = person6.createAndAddPlan(true);
 		CreateHomeWorkHomePlan.makeHomePlan(plan6, dummyCoord, dummyFacility);
 		person6.setEmployed(false);
@@ -173,8 +174,8 @@ public class PopulationMergeTest extends MatsimTestCase{
 	private ActivityFacilitiesImpl createZones() {
 		// create dummy zone facilities
 		ActivityFacilitiesImpl zones   = new ActivityFacilitiesImpl("urbansim zones");
-		zones.createAndAddFacility(new IdImpl(1), new CoordImpl(0., 0.));
-		zones.createAndAddFacility(new IdImpl(2), new CoordImpl(200., 100.));
+		zones.createAndAddFacility(Id.create(1, ActivityFacility.class), new CoordImpl(0., 0.));
+		zones.createAndAddFacility(Id.create(2, ActivityFacility.class), new CoordImpl(200., 100.));
 		return zones;
 	}
 	
