@@ -9,7 +9,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.contrib.matrixbasedptrouter.utils.HeaderParser;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
@@ -61,7 +60,7 @@ final class FileUtils {
 
 				// create id for pt stop
 				Long id = Long.parseLong( parts[idIDX] );
-				Id stopId = new IdImpl(id);
+				Id<PtStop> stopId = Id.create(id, PtStop.class);
 				// create pt stop coordinate
 				Coord ptStopCoord = new CoordImpl(parts[xCoordIDX], parts[yCoordIDX]);
 
@@ -89,7 +88,7 @@ final class FileUtils {
 		return qTree;
 	}
 
-	static void fillODMatrix(Matrix odMatrix, Map<Id, PtStop> ptStopHashMap,
+	static void fillODMatrix(Matrix odMatrix, Map<Id<PtStop>, PtStop> ptStopHashMap,
 			BufferedReader br, boolean isTravelTimes) {
 
 		long wrnCnt = 0;
@@ -141,8 +140,8 @@ final class FileUtils {
 					}
 
 					// create Id's
-					Id originPtStopID 			= new IdImpl(originPtStopAsLong);
-					Id destinationPtStopID 		= new IdImpl(destinationPtStopAsLong);
+					Id<PtStop> originPtStopID 			= Id.create(originPtStopAsLong, PtStop.class);
+					Id<PtStop> destinationPtStopID 		= Id.create(destinationPtStopAsLong, PtStop.class);
 
 					// check if a pt stop with the given id exists
 					if( ptStopHashMap.containsKey(originPtStopID) && 

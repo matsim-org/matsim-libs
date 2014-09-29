@@ -5,14 +5,14 @@ import org.matsim.api.core.v01.Id;
 
 final class PtStop {
 	
-	private final Id id;
+	private final Id<PtStop> id;
 	private final Coord coord;
 
-	public PtStop(Id id, Coord coord) {
+	public PtStop(Id<PtStop> id, Coord coord) {
 		this.id = id;
 		this.coord = coord;
 	}
-	public Id getId() {
+	public Id<PtStop> getId() {
 		return id;
 	}
 	public Coord getCoord() {

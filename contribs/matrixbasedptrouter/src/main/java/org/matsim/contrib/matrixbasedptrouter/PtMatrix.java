@@ -85,7 +85,7 @@ public final class PtMatrix {
 
 			BufferedReader brTravelTimes = IOUtils.getBufferedReader(ptTravelTimeInputFile);
 			log.info("Creating travel time OD matrix from VISUM pt stop 2 pt stop travel times file: " + ptTravelTimeInputFile);
-			final Map<Id, PtStop> ptStopsMap = PtMatrix.convertQuadTree2HashMap(ptStops);
+			final Map<Id<PtStop>, PtStop> ptStopsMap = PtMatrix.convertQuadTree2HashMap(ptStops);
 			FileUtils.fillODMatrix(originDestinationTravelTimeMatrix, ptStopsMap, brTravelTimes, true);
 			log.info("Done creating travel time OD matrix. " + originDestinationTravelTimeMatrix.toString());
 
@@ -272,10 +272,10 @@ public final class PtMatrix {
 		return ptTravelDistance;
 	}
 
-	private static Map<Id, PtStop> convertQuadTree2HashMap(QuadTree<PtStop> qTree){
+	private static Map<Id<PtStop>, PtStop> convertQuadTree2HashMap(QuadTree<PtStop> qTree){
 
 		Iterator<PtStop> ptStopIterator = qTree.values().iterator();
-		Map<Id, PtStop> ptStopHashMap = new ConcurrentHashMap<Id, PtStop>();
+		Map<Id<PtStop>, PtStop> ptStopHashMap = new ConcurrentHashMap<>();
 
 		while(ptStopIterator.hasNext()){
 			PtStop ptStop = ptStopIterator.next();
