@@ -1,6 +1,8 @@
 package playground.singapore.transitRouterEventsBased.stopStopTimes;
 
-public interface StopStopTimeData {
+import java.io.Serializable;
+
+public interface StopStopTimeData extends Serializable {
 
 	int getNumData(int i);
 	double getStopStopTime(int i);

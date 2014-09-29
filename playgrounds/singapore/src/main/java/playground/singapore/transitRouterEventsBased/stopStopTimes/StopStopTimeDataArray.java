@@ -1,5 +1,7 @@
 package playground.singapore.transitRouterEventsBased.stopStopTimes;
 
+import java.io.Serializable;
+
 public class StopStopTimeDataArray implements StopStopTimeData {
 
 	//Attributes

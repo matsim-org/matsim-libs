@@ -20,6 +20,8 @@
 
 package playground.singapore.transitRouterEventsBased.waitTimes;
 
+import java.io.Serializable;
+
 /**
  * Array implementation of the structure for saving wait times
  * 

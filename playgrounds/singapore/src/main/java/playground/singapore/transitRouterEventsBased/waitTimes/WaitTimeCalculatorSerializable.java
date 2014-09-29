@@ -112,9 +112,9 @@ public class WaitTimeCalculatorSerializable implements PersonDepartureEventHandl
 	}
 	private double getRouteStopWaitTime(Id lineId, Id routeId, Id stopId, double time) {
 		Tuple<String, String> key = new Tuple<String, String>(lineId.toString(), routeId.toString());
-		WaitTimeData waitTimeData = waitTimes.get(key).get(stopId);
+		WaitTimeData waitTimeData = waitTimes.get(key).get(stopId.toString());
 		if(waitTimeData.getNumData((int) (time/timeSlot))==0) {
-			double[] waitTimes = scheduledWaitTimes.get(key).get(stopId);
+			double[] waitTimes = scheduledWaitTimes.get(key).get(stopId.toString());
 			return waitTimes[(int) (time/timeSlot)<waitTimes.length?(int) (time/timeSlot):(waitTimes.length-1)];
 		}
 		else

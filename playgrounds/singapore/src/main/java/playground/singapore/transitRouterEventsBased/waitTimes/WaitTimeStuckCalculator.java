@@ -20,6 +20,7 @@
 
 package playground.singapore.transitRouterEventsBased.waitTimes;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -51,7 +52,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  * @author sergioo
  */
 
-public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, PersonEntersVehicleEventHandler, PersonStuckEventHandler {
+public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, PersonEntersVehicleEventHandler, PersonStuckEventHandler, Serializable {
 	
 	//Constants
 	private final static String SEPARATOR = "===";

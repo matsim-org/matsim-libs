@@ -37,14 +37,14 @@ public class StopStopTimeCalculatorSerializable implements VehicleArrivesAtFacil
 		for(TransitLine line:transitSchedule.getTransitLines().values())
 			for(TransitRoute route:line.getRoutes().values()) {
 				for(int s=0; s<route.getStops().size()-1; s++) {
-					Map<String, StopStopTimeData> map = stopStopTimes.get(route.getStops().get(s).getStopFacility().getId());
+					Map<String, StopStopTimeData> map = stopStopTimes.get(route.getStops().get(s).getStopFacility().getId().toString());
 					if(map==null) {
 						map = new HashMap<String, StopStopTimeData>(2);
 						stopStopTimes.put(route.getStops().get(s).getStopFacility().getId().toString(), map);
 					}
 					map.put(route.getStops().get(s+1).getStopFacility().getId().toString(), new StopStopTimeDataArray((int) (totalTime/timeSlot)+1));
-					Map<String, Double> map2 = scheduledStopStopTimes.get(route.getStops().get(s).getStopFacility().getId());
-					Map<String, Integer> map3 = numObservations.get(route.getStops().get(s).getStopFacility().getId());
+					Map<String, Double> map2 = scheduledStopStopTimes.get(route.getStops().get(s).getStopFacility().getId().toString());
+					Map<String, Integer> map3 = numObservations.get(route.getStops().get(s).getStopFacility().getId().toString());
 					Double stopStopTime;
 					Integer num;
 					if(map2==null) {
@@ -56,8 +56,8 @@ public class StopStopTimeCalculatorSerializable implements VehicleArrivesAtFacil
 						num = 0;
 					}
 					else {
-						stopStopTime = map2.get(route.getStops().get(s+1).getStopFacility().getId());
-						num = map3.get(route.getStops().get(s+1).getStopFacility().getId());
+						stopStopTime = map2.get(route.getStops().get(s+1).getStopFacility().getId().toString());
+						num = map3.get(route.getStops().get(s+1).getStopFacility().getId().toString());
 						if(stopStopTime==null) {
 							stopStopTime = 0.0;
 							num = 0;
@@ -88,14 +88,14 @@ public class StopStopTimeCalculatorSerializable implements VehicleArrivesAtFacil
 		};
 	}
 	private double getStopStopTime(Id stopOId, Id stopDId, double time) {
-		StopStopTimeData stopStopTimeData = stopStopTimes.get(stopOId).get(stopDId);
+		StopStopTimeData stopStopTimeData = stopStopTimes.get(stopOId.toString()).get(stopDId.toString());
 		if(stopStopTimeData.getNumData((int) (time/timeSlot))==0)
-			return scheduledStopStopTimes.get(stopOId).get(stopDId);
+			return scheduledStopStopTimes.get(stopOId.toString()).get(stopDId.toString());
 		else
 			return stopStopTimeData.getStopStopTime((int) (time/timeSlot));
 	}
 	private double getStopStopTimeVariance(Id stopOId, Id stopDId, double time) {
-		StopStopTimeData stopStopTimeData = stopStopTimes.get(stopOId).get(stopDId);
+		StopStopTimeData stopStopTimeData = stopStopTimes.get(stopOId.toString()).get(stopDId.toString());
 		if(stopStopTimeData.getNumData((int) (time/timeSlot))==0)
 			return 0;
 		else

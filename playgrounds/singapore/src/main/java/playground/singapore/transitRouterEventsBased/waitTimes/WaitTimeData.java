@@ -20,13 +20,15 @@
 
 package playground.singapore.transitRouterEventsBased.waitTimes;
 
+import java.io.Serializable;
+
 /**
  * Structure for saving waiting times
  * 
  * @author sergioo
  */
 
-public interface WaitTimeData {
+public interface WaitTimeData extends Serializable {
 
 	//Methods
 	void resetWaitTimes();
