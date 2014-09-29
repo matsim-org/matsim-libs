@@ -103,7 +103,7 @@ public class ScenarioGenerator {
 		
 		Set<Id> linesToSimulatePara = new TreeSet<Id>();
 		// B285
-//		linesToSimulatePara.add(new IdImpl("285-B-285"));
+		linesToSimulatePara.add(new IdImpl("285-B-285"));
 
 		// 100/200
 //		linesToSimulatePara.add(new IdImpl("100-B-100"));
