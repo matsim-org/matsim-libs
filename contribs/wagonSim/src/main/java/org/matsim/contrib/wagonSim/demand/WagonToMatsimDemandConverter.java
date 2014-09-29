@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -56,7 +57,7 @@ public class WagonToMatsimDemandConverter {
 	
 	private final Scenario scenario;
 	private final ObjectAttributes wagonAttributes;
-	private final Map<Id,Id> zoneToNodeMap;
+	private final Map<String, Id<Node>> zoneToNodeMap;
 	private final ObjectAttributes transitVehicleAttributes;
 
 	private static final Logger log = Logger.getLogger(WagonToMatsimDemandConverter.class);
@@ -65,7 +66,7 @@ public class WagonToMatsimDemandConverter {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public WagonToMatsimDemandConverter(Scenario scenario, ObjectAttributes wagonAttributes, ObjectAttributes transitVehicleAttributes, Map<Id,Id> zoneToNodeMap) {
+	public WagonToMatsimDemandConverter(Scenario scenario, ObjectAttributes wagonAttributes, ObjectAttributes transitVehicleAttributes, Map<String, Id<Node>> zoneToNodeMap) {
 		this.scenario = scenario;
 		this.wagonAttributes = wagonAttributes;
 		this.transitVehicleAttributes = transitVehicleAttributes;
@@ -76,12 +77,12 @@ public class WagonToMatsimDemandConverter {
 	// methods
 	//////////////////////////////////////////////////////////////////////
 	
-	private final void printIdSet(Set<Id> ids, String desc) {
+	private final <T> void printIdSet(Set<T> ids, String desc) {
 		System.out.println("--- START printing "+ids.size()+" "+desc+" ids ---");
-		for (Id id : ids) { System.out.println(id.toString()); }
+		for (T id : ids) { System.out.println(id.toString()); }
 		System.out.println("--- END   printing "+ids.size()+" "+desc+" ids ---");
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 	
 	public final void convert(WagonDataContainer dataContainer) {
@@ -105,18 +106,18 @@ public class WagonToMatsimDemandConverter {
 				new TransitRouterConfig(scenario.getConfig())).createTransitRouter();
 
 		
-		Set<Id> fromZonesNotConnected = new HashSet<Id>();
-		Set<Id> toZonesNotConnected = new HashSet<Id>();
-		Set<Id> fromNodesNotInPseudoNetwork = new HashSet<Id>();
-		Set<Id> toNodesNotInPseudoNetwork = new HashSet<Id>();
-		Set<Id> fromNodesInPseudoNetwork = new HashSet<Id>();
-		Set<Id> toNodesInPseudoNetwork = new HashSet<Id>();
-		Set<Id> wagonWithoutRoute = new HashSet<Id>();
+		Set<String> fromZonesNotConnected = new HashSet<>();
+		Set<String> toZonesNotConnected = new HashSet<>();
+		Set<Id<Node>> fromNodesNotInPseudoNetwork = new HashSet<>();
+		Set<Id<Node>> toNodesNotInPseudoNetwork = new HashSet<>();
+		Set<Id<Node>> fromNodesInPseudoNetwork = new HashSet<>();
+		Set<Id<Node>> toNodesInPseudoNetwork = new HashSet<>();
+		Set<Id<Person>> wagonWithoutRoute = new HashSet<>();
 		int nofWagonsMissed = 0;
 		
 		for (Wagon wagon : dataContainer.wagons.values()) {
-			Id fromNodeId = zoneToNodeMap.get(wagon.fromZoneId);
-			Id toNodeId = zoneToNodeMap.get(wagon.toZoneId);
+			Id<Node> fromNodeId = zoneToNodeMap.get(wagon.fromZoneId);
+			Id<Node> toNodeId = zoneToNodeMap.get(wagon.toZoneId);
 
 			if (fromNodeId == null) { fromZonesNotConnected.add(wagon.fromZoneId); nofWagonsMissed++; continue; }
 			if (toNodeId == null) { toZonesNotConnected.add(wagon.toZoneId); nofWagonsMissed++; continue; }
@@ -148,13 +149,13 @@ public class WagonToMatsimDemandConverter {
 		
 		printIdSet(fromZonesNotConnected,"not connected from-zone");
 		printIdSet(toZonesNotConnected,"not connected to-zone");
-		Set<Id> zonesNotConnected = new HashSet<Id>(fromZonesNotConnected); zonesNotConnected.addAll(toZonesNotConnected); printIdSet(zonesNotConnected,"not connected zone");
+		Set<String> zonesNotConnected = new HashSet<>(fromZonesNotConnected); zonesNotConnected.addAll(toZonesNotConnected); printIdSet(zonesNotConnected,"not connected zone");
 		printIdSet(fromNodesNotInPseudoNetwork,"not defined from-node");
 		printIdSet(toNodesNotInPseudoNetwork,"not defined to-node");
-		Set<Id> nodesNotInPseudoNetwork = new HashSet<Id>(fromNodesNotInPseudoNetwork); nodesNotInPseudoNetwork.addAll(toNodesNotInPseudoNetwork); printIdSet(nodesNotInPseudoNetwork,"not defined node");
+		Set<Id<Node>> nodesNotInPseudoNetwork = new HashSet<>(fromNodesNotInPseudoNetwork); nodesNotInPseudoNetwork.addAll(toNodesNotInPseudoNetwork); printIdSet(nodesNotInPseudoNetwork,"not defined node");
 		printIdSet(fromNodesInPseudoNetwork,"demand origin node");
 		printIdSet(toNodesInPseudoNetwork,"demand destination node");
-		Set<Id> nodesInPseudoNetwork = new HashSet<Id>(fromNodesInPseudoNetwork); nodesInPseudoNetwork.addAll(toNodesInPseudoNetwork); printIdSet(nodesInPseudoNetwork,"demand origin or destination node");
+		Set<Id<Node>> nodesInPseudoNetwork = new HashSet<>(fromNodesInPseudoNetwork); nodesInPseudoNetwork.addAll(toNodesInPseudoNetwork); printIdSet(nodesInPseudoNetwork,"demand origin or destination node");
 		printIdSet(wagonWithoutRoute,"no route wagon");
 		
 		log.info("number of wagons in the container: "+dataContainer.wagons.size());

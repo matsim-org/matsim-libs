@@ -8,7 +8,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
@@ -31,9 +31,9 @@ public class NetworkEditsReader {
 			while ((line = reader.readLine()) != null) {
 				String[] parts = line.split("\t");
 				if (parts[0].equals("MERGE_NODE")) {
-					edits.add(new MergeNodes(new IdImpl(parts[1]), new IdImpl(parts[2])));
+					edits.add(new MergeNodes(Id.create(parts[1], Node.class), Id.create(parts[2], Node.class)));
 				} else if (parts[0].equals("NEW_LINK")) {
-					edits.add(new AddLink(new IdImpl(parts[1]), new IdImpl(parts[2]), new IdImpl(parts[3])));
+					edits.add(new AddLink(Id.create(parts[1], Link.class), Id.create(parts[2], Node.class), Id.create(parts[3], Node.class)));
 				} else if (parts[0].equals("REPLACE_LINK")) {
 					List<Id<Link>> ids = new ArrayList<Id<Link>>();
 					for (String part : parts[2].split(",")) {

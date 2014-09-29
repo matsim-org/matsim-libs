@@ -52,6 +52,7 @@ import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * @author droeder
@@ -66,7 +67,7 @@ public final class WagonSimTripRouterFactoryImpl implements TripRouterFactory {
 	private LegRouterWrapper walkRouter;
 	private TransitSchedule transitSchedule;
 	private TransitRouterFactory routerFactory;
-	private Map<Id,Double> minShuntingTimes;
+	private Map<Id<TransitStopFacility>, Double> minShuntingTimes;
 	private Network network;
 
 	public WagonSimTripRouterFactoryImpl(
@@ -75,7 +76,7 @@ public final class WagonSimTripRouterFactoryImpl implements TripRouterFactory {
 //			final TravelTime travelTime,
 //			final LeastCostPathCalculatorFactory leastCostAlgoFactory,
 			final TransitRouterFactory transitRouterFactory,
-			Map<Id,Double> minShuntingTimes) {
+			Map<Id<TransitStopFacility>, Double> minShuntingTimes) {
 //		this.delegate = new TripRouterFactoryImpl(scenario, disutilityFactory, travelTime, leastCostAlgoFactory, transitRouterFactory);
 		this.routerFactory = transitRouterFactory;
 		this.transitSchedule = scenario.getTransitSchedule();
@@ -106,14 +107,14 @@ public final class WagonSimTripRouterFactoryImpl implements TripRouterFactory {
 	private static class WagonSimRouterWrapper implements RoutingModule{
 
 		private TransitRouterWrapper delegate;
-		private Map<Id,Double> minShuntingTimes;
+		private Map<Id<TransitStopFacility>, Double> minShuntingTimes;
 
 		public WagonSimRouterWrapper(
 				final TransitRouter router,
 				final TransitSchedule transitSchedule,
 				final Network network,
 				final RoutingModule walkRouter,
-				Map<Id,Double> minShuntingTimes) {
+				Map<Id<TransitStopFacility>, Double> minShuntingTimes) {
 			this.delegate = new TransitRouterWrapper(router, transitSchedule, network, walkRouter);
 			this.minShuntingTimes = minShuntingTimes;
 		}
@@ -142,7 +143,7 @@ public final class WagonSimTripRouterFactoryImpl implements TripRouterFactory {
 					pe.add(l); // that's a pt leg
 					
 					// get the minimum shunting time of the stop facility
-					Id stopFacId = ((ExperimentalTransitRoute)l.getRoute()).getEgressStopId();
+					Id<TransitStopFacility> stopFacId = ((ExperimentalTransitRoute)l.getRoute()).getEgressStopId();
 					Double minShuntingTime = minShuntingTimes.get(stopFacId);
 					if (minShuntingTime == null) {  throw new RuntimeException("stationId="+stopFacId+" does not have a minimum shunting time defined. Bailing out."); } 
 					

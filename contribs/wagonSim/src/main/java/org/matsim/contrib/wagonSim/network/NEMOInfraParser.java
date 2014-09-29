@@ -30,6 +30,8 @@ import java.util.Set;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.wagonSim.network.NEMOInfraDataContainer.NEMOInfraCountry;
 import org.matsim.contrib.wagonSim.network.NEMOInfraDataContainer.NEMOInfraDirection;
 import org.matsim.contrib.wagonSim.network.NEMOInfraDataContainer.NEMOInfraLink;
@@ -38,7 +40,6 @@ import org.matsim.contrib.wagonSim.network.NEMOInfraDataContainer.NEMOInfraLinkT
 import org.matsim.contrib.wagonSim.network.NEMOInfraDataContainer.NEMOInfraNode;
 import org.matsim.contrib.wagonSim.network.NEMOInfraDataContainer.NEMOInfraNodeCluster;
 import org.matsim.contrib.wagonSim.network.NEMOInfraDataContainer.NEMOInfraTrack;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
@@ -226,15 +227,15 @@ public class NEMOInfraParser extends MatsimXmlParser {
 		NEMOInfraNode node = new NEMOInfraNode(bscode);
 		node.name = name;
 		node.coord = new CoordImpl(xkoord,ykoord);
-		node.countryId = new IdImpl(land);
+		node.countryId = Integer.toString(land);
 		node.isStation = bahnhof;
 		node.isValid = gueltig;
-		node.clusterId = new IdImpl(cluster);
-		
+		node.clusterId = cluster;
+
 		if (dataContainer.nodes.put(node.id,node) != null) {
 			throw new RuntimeException("At Entity '"+KNOTEN+"': A node with id="+bscode+" exists at least twice. Bailing out.");
 		}
-		
+
 		NEMOInfraNodeCluster nodeCluster = dataContainer.nodeClusters.get(node.clusterId);
 		if (nodeCluster == null) { 
 			nodeCluster = new NEMOInfraNodeCluster(cluster);
@@ -242,7 +243,7 @@ public class NEMOInfraParser extends MatsimXmlParser {
 		}
 		nodeCluster.nodeIds.add(node.id);
 	}
-	
+
 	//////////////////////////////////////////////////////////////////////
 
 	private static final String STRECKENKATEGORIE_ID_STRECKENKATEGORIE = "id_Streckenkategorie";
@@ -325,14 +326,14 @@ public class NEMOInfraParser extends MatsimXmlParser {
 		}
 		
 		NEMOInfraLink link = new NEMOInfraLink(id_Kante);
-		link.fromNodeId = new IdImpl(vonKnoten);
-		link.toNodeId = new IdImpl(nachKnoten);
+		link.fromNodeId = Id.create(vonKnoten, Node.class);
+		link.toNodeId = Id.create(nachKnoten, Node.class);
 		if (streckeSIMU == 0) { link.isSimuLink = false; } else { link.isSimuLink = true; }
 		link.length = (double)laenge;
 		link.hasTwoTracks = zweigleisig;
 		link.isGlobal = globalbereich;
-		link.typeId = new IdImpl(streckenkategorie);
-		link.ownerId = new IdImpl(streckenKST);
+		link.typeId = Integer.toString(streckenkategorie);
+		link.ownerId = Integer.toString(streckenKST);
 		link.isClosed = gesperrt;
 		link.isValid = gueltig;
 		link.maxTrainLength = (double)zuglaenge_max;
@@ -375,7 +376,7 @@ public class NEMOInfraParser extends MatsimXmlParser {
 		
 		NEMOInfraDirection direction = new NEMOInfraDirection(kante,gleisnr,richtung);
 		
-		if (dataContainer.directions.put(direction.id,direction) != null) {
+		if (dataContainer.directions.put(direction.id, direction) != null) {
 			throw new RuntimeException("At Entity '"+FAHRTRICHTUNG+"': A traffic direction with linkId-trackNr-direction-triple=("+kante+","+gleisnr+","+richtung+") exists at least twice. Bailing out.");
 		}
 	}

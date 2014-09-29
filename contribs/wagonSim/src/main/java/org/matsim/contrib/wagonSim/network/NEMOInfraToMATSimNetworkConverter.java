@@ -26,7 +26,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
@@ -40,7 +39,6 @@ import org.matsim.contrib.wagonSim.network.NEMOInfraDataContainer.NEMOInfraLinkT
 import org.matsim.contrib.wagonSim.network.NEMOInfraDataContainer.NEMOInfraNode;
 import org.matsim.contrib.wagonSim.network.NEMOInfraDataContainer.NEMOInfraNodeCluster;
 import org.matsim.contrib.wagonSim.network.NEMOInfraDataContainer.NEMOInfraTrack;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 /**
@@ -89,16 +87,16 @@ public class NEMOInfraToMATSimNetworkConverter {
 			Node node = factory.createNode(nemoNode.id,nemoNode.coord);
 			network.addNode(node);
 			
-			nodeAttributes.putAttribute(node.getId().toString(),WagonSimConstants.NODE_STATION,nemoNode.isStation);
-			nodeAttributes.putAttribute(node.getId().toString(),WagonSimConstants.NODE_VALID,nemoNode.isValid);
+			nodeAttributes.putAttribute(node.getId().toString(), WagonSimConstants.NODE_STATION,nemoNode.isStation);
+			nodeAttributes.putAttribute(node.getId().toString(), WagonSimConstants.NODE_VALID,nemoNode.isValid);
 			
 			NEMOInfraCountry country = dataContainer.countries.get(nemoNode.countryId);
-			nodeAttributes.putAttribute(node.getId().toString(),WagonSimConstants.NODE_COUNTRY_ID,country.id.toString());
-			nodeAttributes.putAttribute(node.getId().toString(),WagonSimConstants.NODE_NAME,country.name);
-			nodeAttributes.putAttribute(node.getId().toString(),WagonSimConstants.NODE_HOME_COUNTRY,country.isHomeCountry);
+			nodeAttributes.putAttribute(node.getId().toString(), WagonSimConstants.NODE_COUNTRY_ID, country.id);
+			nodeAttributes.putAttribute(node.getId().toString(), WagonSimConstants.NODE_NAME, country.name);
+			nodeAttributes.putAttribute(node.getId().toString(), WagonSimConstants.NODE_HOME_COUNTRY, country.isHomeCountry);
 			
 			NEMOInfraNodeCluster nodeCluster = dataContainer.nodeClusters.get(nemoNode.clusterId);
-			nodeAttributes.putAttribute(node.getId().toString(),WagonSimConstants.NODE_CLUSTER_ID,nodeCluster.id.toString());
+			nodeAttributes.putAttribute(node.getId().toString(), WagonSimConstants.NODE_CLUSTER_ID, nodeCluster.id.toString());
 		}
 	}
 
@@ -107,8 +105,8 @@ public class NEMOInfraToMATSimNetworkConverter {
 	private final void convertLinks(NEMOInfraDataContainer dataContainer) {
 		NetworkFactory factory = network.getFactory();
 		
-		Set<Id> nemoLinkIdsUsed = new HashSet<Id>();
-		Set<Id> nemoTrackIdsUsed = new HashSet<Id>();
+		Set<Id<Link>> nemoLinkIdsUsed = new HashSet<>();
+		Set<String> nemoTrackIdsUsed = new HashSet<>();
 		
 		for (NEMOInfraDirection nemoDir : dataContainer.directions.values()) {
 			NEMOInfraTrack nemoTrack = dataContainer.tracks.get(nemoDir.trackId);
@@ -131,20 +129,20 @@ public class NEMOInfraToMATSimNetworkConverter {
 			link.setNumberOfLanes(1);
 			link.setCapacity(WagonSimConstants.DEFAULT_CAPACITY);
 			
-			linkAttributes.putAttribute(link.getId().toString(),WagonSimConstants.LINK_SIMULATE,nemoLink.isSimuLink);
-			linkAttributes.putAttribute(link.getId().toString(),WagonSimConstants.LINK_GLOBAL,nemoLink.isGlobal);
-			linkAttributes.putAttribute(link.getId().toString(),WagonSimConstants.LINK_CLOSED,nemoLink.isClosed);
-			linkAttributes.putAttribute(link.getId().toString(),WagonSimConstants.LINK_VALID,nemoLink.isValid);
-			linkAttributes.putAttribute(link.getId().toString(),WagonSimConstants.LINK_MAXTRAINLENGTH,nemoLink.maxTrainLength);
+			linkAttributes.putAttribute(link.getId().toString(), WagonSimConstants.LINK_SIMULATE, nemoLink.isSimuLink);
+			linkAttributes.putAttribute(link.getId().toString(), WagonSimConstants.LINK_GLOBAL, nemoLink.isGlobal);
+			linkAttributes.putAttribute(link.getId().toString(), WagonSimConstants.LINK_CLOSED, nemoLink.isClosed);
+			linkAttributes.putAttribute(link.getId().toString(), WagonSimConstants.LINK_VALID, nemoLink.isValid);
+			linkAttributes.putAttribute(link.getId().toString(), WagonSimConstants.LINK_MAXTRAINLENGTH, nemoLink.maxTrainLength);
 			
 			NEMOInfraLinkType linkType = dataContainer.linkTypes.get(nemoLink.typeId);
-			linkAttributes.putAttribute(link.getId().toString(),WagonSimConstants.LINK_TYPE,linkType.id.toString());
-			linkAttributes.putAttribute(link.getId().toString(),WagonSimConstants.LINK_VFACTOR,linkType.vFactor);
+			linkAttributes.putAttribute(link.getId().toString(), WagonSimConstants.LINK_TYPE, linkType.id);
+			linkAttributes.putAttribute(link.getId().toString(), WagonSimConstants.LINK_VFACTOR, linkType.vFactor);
 			link.setFreespeed(linkType.velocity); // m/s
 
 			NEMOInfraLinkOwner linkOwner = dataContainer.linkOwners.get(nemoLink.ownerId);
-			linkAttributes.putAttribute(link.getId().toString(),WagonSimConstants.LINK_OWNERID,linkOwner.id.toString());
-			linkAttributes.putAttribute(link.getId().toString(),WagonSimConstants.LINK_OWNERNAME,linkOwner.owner);
+			linkAttributes.putAttribute(link.getId().toString(), WagonSimConstants.LINK_OWNERID, linkOwner.id);
+			linkAttributes.putAttribute(link.getId().toString(), WagonSimConstants.LINK_OWNERNAME, linkOwner.owner);
 		}
 		
 		if (nemoTrackIdsUsed.size() != dataContainer.tracks.size()) {
@@ -160,8 +158,8 @@ public class NEMOInfraToMATSimNetworkConverter {
 	public final void makeNetworkBiDirectional() {
 		NetworkFactory factory = network.getFactory();
 
-		Set<Id> linkIds = new HashSet<Id>(network.getLinks().keySet());
-		for (Id linkId : linkIds) {
+		Set<Id<Link>> linkIds = new HashSet<>(network.getLinks().keySet());
+		for (Id<Link> linkId : linkIds) {
 			Link link = network.getLinks().get(linkId);
 			boolean hasOtherDirection = false;
 			for (Link otherLink : link.getToNode().getOutLinks().values()) {
@@ -171,7 +169,7 @@ public class NEMOInfraToMATSimNetworkConverter {
 				}
 			}
 			if (!hasOtherDirection) {
-				Link l = factory.createLink(new IdImpl(link.getId().toString()+"-r"),link.getToNode(),link.getFromNode());
+				Link l = factory.createLink(Id.create(link.getId().toString()+"-r", Link.class), link.getToNode(), link.getFromNode());
 				l.setLength(link.getLength());
 				l.setFreespeed(link.getFreespeed());
 				l.setCapacity(link.getCapacity());

@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.wagonSim.WagonSimConstants;
 
 /**
@@ -41,13 +42,13 @@ public class EventsStuckAgentsCollector implements ActivityEndEventHandler, Acti
 	// variables
 	//////////////////////////////////////////////////////////////////////
 
-	private final Set<Id> stuckAgents;
+	private final Set<Id<Person>> stuckAgents;
 	
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 	
-	public EventsStuckAgentsCollector(Set<Id> stuckAgents) {
+	public EventsStuckAgentsCollector(Set<Id<Person>> stuckAgents) {
 		this.stuckAgents = stuckAgents;
 		if (this.stuckAgents == null) { throw new RuntimeException("stuckAgents Set is null. Bailing out."); }
 	}

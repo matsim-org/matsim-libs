@@ -28,6 +28,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.wagonSim.Utils;
 import org.matsim.contrib.wagonSim.shunting.ShuntingTableToMATSimScheduleEnricher;
 import org.matsim.core.config.Config;
@@ -35,8 +36,10 @@ import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
@@ -77,7 +80,7 @@ public class MATSimScheduleEnricherMain {
 	public final void enrich(String shuntingTableFile, double minDwellTime) throws IOException {
 		ShuntingTableToMATSimScheduleEnricher enricher = new ShuntingTableToMATSimScheduleEnricher(scenario,vehicleAttributes);
 
-		Map<Id,Map<Id,Boolean>> shuntingTable = Utils.parseShuntingTable(shuntingTableFile);
+		Map<Id<TransitLine>, Map<Id<Node>, Boolean>> shuntingTable = Utils.parseShuntingTable(shuntingTableFile);
 		enricher.enrich(shuntingTable,minDwellTime);
 	}
 
@@ -140,7 +143,7 @@ public class MATSimScheduleEnricherMain {
 		MATSimScheduleEnricherMain enricher = new MATSimScheduleEnricherMain(networkFile, transitScheduleFile, transitVehiclesFile, transitVehicleAttributesFile);
 		enricher.enrich(shuntingTableFile, minDwellTime);
 		
-		Map<Id,Double> shuntingTimes = Utils.parseShuntingTimes(shuntingTimesFile);
+		Map<Id<TransitStopFacility>, Double> shuntingTimes = Utils.parseShuntingTimes(shuntingTimesFile);
 		
 		if (!Utils.prepareFolder(outputBase)) {
 			throw new RuntimeException("Could not prepare output folder for one of the three reasons: (i) folder exists and is not empty, (ii) it's a path to an existing file or (iii) the folder could not be created. Bailing out.");

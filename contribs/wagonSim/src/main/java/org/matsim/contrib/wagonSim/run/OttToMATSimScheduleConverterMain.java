@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.wagonSim.Utils;
 import org.matsim.contrib.wagonSim.schedule.OTTDataContainer;
 import org.matsim.contrib.wagonSim.schedule.OTTDataToMATSimScheduleConverter;
@@ -71,11 +72,11 @@ public class OttToMATSimScheduleConverterMain {
 	//////////////////////////////////////////////////////////////////////
 	
 	public final void convertFromFiles(String ottFile, Network infraNetwork, String nodeMapFile, String trainTypesFile, boolean isPerformance) throws IOException {
-		Map<Id,Id> nodeMap = Utils.parseNodeMapFile(nodeMapFile);
+		Map<Id<Node>, Id<Node>> nodeMap = Utils.parseNodeMapFile(nodeMapFile);
 		log.info("node map file contains "+nodeMap.size()+" mappings.");
 		ObjectAttributes trainTypes = Utils.parseTrainTypesFile(trainTypesFile);
 		OTTDataContainer dataContainer = new OTTDataContainer();
-		new OTTScheduleParser(dataContainer).parse(ottFile,nodeMap);
+		new OTTScheduleParser(dataContainer).parse(ottFile, nodeMap);
 		
 		OTTDataToMATSimScheduleConverter converter = new OTTDataToMATSimScheduleConverter(scenario,vehicleAttributes);
 		converter.convert(dataContainer,infraNetwork,trainTypes,isPerformance);

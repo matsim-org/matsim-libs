@@ -40,7 +40,6 @@ import org.matsim.contrib.wagonSim.production.ProductionDataContainer.Production
 import org.matsim.contrib.wagonSim.production.ProductionDataContainer.RbNode;
 import org.matsim.contrib.wagonSim.production.ProductionDataContainer.RcpNode;
 import org.matsim.contrib.wagonSim.production.ProductionDataContainer.SatNode;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -102,7 +101,7 @@ public class ProductionToMATSimNetworkConverter {
 			if (index == -1) { index = pNode.id.toString().indexOf(ProductionParser.SAT_NODE_POSTFIX); }
 			if (index == -1) { throw new RuntimeException("Production node id="+pNode.id+" is neither a RB nor a RCP nor a SAT node. Bailing out."); }
 			nodeId = pNode.id.toString().substring(0,index);
-			Node infraNode = infraNetwork.getNodes().get(new IdImpl(nodeId));
+			Node infraNode = infraNetwork.getNodes().get(Id.create(nodeId, Node.class));
 			if (infraNode == null) { throw new RuntimeException("Production node id="+pNode.id+": A node id="+nodeId+" is not found in the infrastructure network. Bailing out."); }
 			
 			if (pNode instanceof RbNode) {
@@ -170,7 +169,7 @@ public class ProductionToMATSimNetworkConverter {
 			
 			if (pNode.parentNode != null) {
 				Node toNode = network.getNodes().get(pNode.parentNode.id);
-				Link link = factory.createLink(new IdImpl(fromNode.getId().toString()+"-"+toNode.getId().toString()),fromNode,toNode);
+				Link link = factory.createLink(Id.create(fromNode.getId().toString()+"-"+toNode.getId().toString(), Link.class),fromNode,toNode);
 				network.addLink(link);
 				link.setLength(CoordUtils.calcDistance(fromNode.getCoord(),toNode.getCoord()));
 				link.setAllowedModes(defaultModes);
@@ -179,7 +178,7 @@ public class ProductionToMATSimNetworkConverter {
 			}
 			for (ProductionNode sNode : pNode.siblingNodes) {
 				Node toNode = network.getNodes().get(sNode.id);
-				Link link = factory.createLink(new IdImpl(fromNode.getId().toString()+"-"+toNode.getId().toString()),fromNode,toNode);
+				Link link = factory.createLink(Id.create(fromNode.getId().toString()+"-"+toNode.getId().toString(), Link.class),fromNode,toNode);
 				network.addLink(link);
 				link.setLength(CoordUtils.calcDistance(fromNode.getCoord(),toNode.getCoord()));
 				link.setAllowedModes(defaultModes);
@@ -199,9 +198,9 @@ public class ProductionToMATSimNetworkConverter {
 		for (Connection c : dataContainer.connections.values()) {
 			Node fromNode = network.getNodes().get(c.fromNode.id);
 			Node toNode = network.getNodes().get(c.viaNodes.get(0).id);
-			Id linkId = new IdImpl(fromNode.getId().toString()+"-"+toNode.getId().toString());
+			Id<Link> linkId = Id.create(fromNode.getId().toString()+"-"+toNode.getId().toString(), Link.class);
 			if (!network.getLinks().containsKey(linkId)) {
-				Link link = factory.createLink(linkId,fromNode,toNode);
+				Link link = factory.createLink(linkId, fromNode, toNode);
 				network.addLink(link);
 				link.setLength(CoordUtils.calcDistance(fromNode.getCoord(),toNode.getCoord()));
 				link.setAllowedModes(defaultModes);
@@ -211,7 +210,7 @@ public class ProductionToMATSimNetworkConverter {
 			for (int i=0; i<c.viaNodes.size()-1; i++) {
 				fromNode = network.getNodes().get(c.viaNodes.get(i).id);
 				toNode = network.getNodes().get(c.viaNodes.get(i+1).id);
-				linkId = new IdImpl(fromNode.getId().toString()+"-"+toNode.getId().toString());
+				linkId = Id.create(fromNode.getId().toString()+"-"+toNode.getId().toString(), Link.class);
 				if (!network.getLinks().containsKey(linkId)) {
 					Link link = factory.createLink(linkId,fromNode,toNode);
 					network.addLink(link);

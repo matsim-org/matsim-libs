@@ -70,14 +70,14 @@ public class ShuntingTableToMATSimScheduleEnricher {
 	// methods
 	//////////////////////////////////////////////////////////////////////
 	
-	public final void enrich(Map<Id,Map<Id,Boolean>> shuntingTable, double minDwellTime) {
+	public final void enrich(Map<Id<TransitLine>,Map<Id<Node>, Boolean>> shuntingTable, double minDwellTime) {
 		
 		NetworkFactory factory = scenario.getNetwork().getFactory();
 		Set<String> transitModes = Collections.singleton(TransportMode.pt);
 		
 		for (TransitLine transitLine : scenario.getTransitSchedule().getTransitLines().values()) {
 
-			Map<Id,Boolean> shuntingInfoMap = shuntingTable.get(transitLine.getId());
+			Map<Id<Node>, Boolean> shuntingInfoMap = shuntingTable.get(transitLine.getId());
 			List<TransitRoute> newTransitRoutes = new ArrayList<TransitRoute>();
 			
 			for (TransitRoute transitRoute : transitLine.getRoutes().values()) {
@@ -128,7 +128,7 @@ public class ShuntingTableToMATSimScheduleEnricher {
 
 						boolean found = false;
 						for (int j=0; j<routeLinkIds.size(); j++) {
-							Id linkId = routeLinkIds.get(j);
+							Id<Link> linkId = routeLinkIds.get(j);
 							if (linkId.equals(stop.getStopFacility().getLinkId())) {
 								routeLinkIds.add(j+1,dwellLink.getId());
 								found = true;

@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.wagonSim.Utils;
 import org.matsim.contrib.wagonSim.analysis.stuckWagons.EventsStuckAgentsCollector;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -44,7 +45,7 @@ public class WagonSimAnalysisListener implements BeforeMobsimListener, AfterMobs
 	// variables
 	//////////////////////////////////////////////////////////////////////
 
-	private Set<Id> stuckAgents;
+	private Set<Id<Person>> stuckAgents;
 	
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -59,7 +60,7 @@ public class WagonSimAnalysisListener implements BeforeMobsimListener, AfterMobs
 	
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-		stuckAgents = new HashSet<Id>();
+		stuckAgents = new HashSet<>();
 		event.getControler().getEvents().addHandler(new EventsStuckAgentsCollector(stuckAgents));
 	}
 	

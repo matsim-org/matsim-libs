@@ -30,10 +30,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.wagonSim.WagonSimConstants;
 import org.matsim.contrib.wagonSim.demand.WagonDataContainer.Wagon;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
@@ -108,8 +106,8 @@ public class WagonDataParser {
 			if (referenceDate.getDate() != day.getDate()) { continue; }
 			
 			Double weightLoad = Double.parseDouble(row[lookup.get(NETTO_GEW)].trim());
-			Id fromZoneId = new IdImpl(row[lookup.get(VONZELLE)].trim());
-			Id toZoneId = new IdImpl(row[lookup.get(NACHZELLE)].trim());
+			String fromZoneId = row[lookup.get(VONZELLE)].trim();
+			String toZoneId = row[lookup.get(NACHZELLE)].trim();
 			Double length = Double.parseDouble(row[lookup.get(WAGENLAENGE)].trim())/100.0;
 			Double weight = Double.parseDouble(row[lookup.get(TARA_WAGEN)].trim());
 			

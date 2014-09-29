@@ -32,7 +32,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Node;
 
 /**
  * @author balmermi @ Seonzon AG
@@ -44,12 +44,12 @@ public class ProductionDataContainer {
 	// variables
 	//////////////////////////////////////////////////////////////////////
 
-	final Map<Id,ProductionNode> productionNodes = new HashMap<Id,ProductionNode>();
-	final Map<Id,RcpDeliveryType> rcpDeliveryTypes = new HashMap<Id,RcpDeliveryType>();
+	final Map<Id<Node>,ProductionNode> productionNodes = new HashMap<>();
+	final Map<String, RcpDeliveryType> rcpDeliveryTypes = new HashMap<>();
 	
-	final Map<Id,TrainClass> trainClasss = new HashMap<Id,TrainClass>();
+	final Map<Id<TrainClass>,TrainClass> trainClasss = new HashMap<>();
 	
-	final Map<Id,Connection> connections = new HashMap<Id,Connection>();
+	final Map<Id<Connection>,Connection> connections = new HashMap<>();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -63,7 +63,7 @@ public class ProductionDataContainer {
 	//////////////////////////////////////////////////////////////////////
 	
 	public final void printRcpDeliveryTypes() {
-		for (Entry<Id,RcpDeliveryType> e : rcpDeliveryTypes.entrySet()) {
+		for (Entry<String, RcpDeliveryType> e : rcpDeliveryTypes.entrySet()) {
 			System.out.println(e.getKey().toString()+": "+e.getValue().toString());
 		}
 	}
@@ -72,19 +72,19 @@ public class ProductionDataContainer {
 
 	public final void printProductionNodes() {
 		System.out.println("RB Nodes:");
-		for (Entry<Id,ProductionNode> e : productionNodes.entrySet()) {
+		for (Entry<Id<Node>, ProductionNode> e : productionNodes.entrySet()) {
 			if (e.getValue() instanceof RbNode) {
 				System.out.println(e.getKey().toString()+": "+e.getValue().toString());
 			}
 		}
 		System.out.println("RCP Nodes:");
-		for (Entry<Id,ProductionNode> e : productionNodes.entrySet()) {
+		for (Entry<Id<Node>, ProductionNode> e : productionNodes.entrySet()) {
 			if (e.getValue() instanceof RcpNode) {
 				System.out.println(e.getKey().toString()+": "+e.getValue().toString());
 			}
 		}
 		System.out.println("Sat Nodes:");
-		for (Entry<Id,ProductionNode> e : productionNodes.entrySet()) {
+		for (Entry<Id<Node>, ProductionNode> e : productionNodes.entrySet()) {
 			if (e.getValue() instanceof SatNode) {
 				System.out.println(e.getKey().toString()+": "+e.getValue().toString());
 			}
@@ -95,7 +95,7 @@ public class ProductionDataContainer {
 
 	public final void printConnections() {
 		System.out.println("Connections:");
-		for (Entry<Id,Connection> e : connections.entrySet()) {
+		for (Entry<Id<Connection>, Connection> e : connections.entrySet()) {
 			System.out.println(e.getKey().toString()+": "+e.getValue().toString());
 		}
 	}
@@ -115,12 +115,12 @@ public class ProductionDataContainer {
 	//////////////////////////////////////////////////////////////////////
 
 	static abstract class ProductionNode {
-		final Id id;
+		final Id<Node> id;
 		ProductionNode parentNode = null;
 		ProductionNode parentReceptionNode = null;
 		final Set<ProductionNode> siblingNodes = new HashSet<ProductionNode>();
 		
-		ProductionNode(String name) { id = new IdImpl(name); }
+		ProductionNode(String name) { id = Id.create(name, Node.class); }
 		
 		@Override
 		public String toString() {
@@ -184,16 +184,16 @@ public class ProductionDataContainer {
 	//////////////////////////////////////////////////////////////////////
 	
 	static class RcpDeliveryType {
-		final Id id;
+		final String id;
 		final String desc;
 		double [] hourlyDistribution = new double[24];
-		
+
 		public RcpDeliveryType(int id, String desc) {
-			this.id = new IdImpl(id);
+			this.id = Integer.toString(id);
 			this.desc = desc;
 			for (int i=0; i<24; i++) { hourlyDistribution[i] = Double.NaN; }
 		}
-		
+
 		@Override
 		public String toString() {
 			return "id="+id+";desc="+desc+";distr="+Arrays.toString(hourlyDistribution);
@@ -203,28 +203,28 @@ public class ProductionDataContainer {
 	//////////////////////////////////////////////////////////////////////
 	// inner classes: train class (not sure for what to use...)
 	//////////////////////////////////////////////////////////////////////
-	
+
 	static class TrainClass {
-		final Id id;
+		final Id<TrainClass> id;
 		String desc = null;
 		Integer speed = null;
 		Integer weight = null;
 		Integer length = null;
-		
-		public TrainClass(int id) { this.id = new IdImpl(id); }
+
+		public TrainClass(int id) { this.id = Id.create(id, TrainClass.class); }
 	}
 	
 	//////////////////////////////////////////////////////////////////////
 	// inner classes: production connections
 	//////////////////////////////////////////////////////////////////////
-	
+
 	static class Connection {
-		final Id id; 
+		final Id<Connection> id; 
 		final ProductionNode fromNode;
 		final ProductionNode toNode;
 		final List<ProductionNode> viaNodes = new ArrayList<ProductionNode>();
 		
-		Connection(Id id, ProductionNode fromNode, ProductionNode toNode) { this.id = id; this.fromNode = fromNode; this.toNode = toNode; }
+		Connection(Id<Connection> id, ProductionNode fromNode, ProductionNode toNode) { this.id = id; this.fromNode = fromNode; this.toNode = toNode; }
 		
 		@Override
 		public String toString() {
@@ -238,7 +238,7 @@ public class ProductionDataContainer {
 			return str;
 		}
 	}
-	
+
 	
 	//////////////////////////////////////////////////////////////////////
 
@@ -246,6 +246,6 @@ public class ProductionDataContainer {
 		Integer maxTrainGrossWeight = null;
 		Integer maxTrainLength = null;
 		
-		public ConnectionAttributes(Id id, ProductionNode fromNode, ProductionNode toNode) { super(id,fromNode,toNode); }
+		public ConnectionAttributes(Id<Connection> id, ProductionNode fromNode, ProductionNode toNode) { super(id,fromNode,toNode); }
 	}
 }

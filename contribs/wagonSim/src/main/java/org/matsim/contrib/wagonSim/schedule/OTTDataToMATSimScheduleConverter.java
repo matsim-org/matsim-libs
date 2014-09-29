@@ -38,7 +38,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.wagonSim.WagonSimConstants;
 import org.matsim.contrib.wagonSim.schedule.OTTDataContainer.Locomotive;
 import org.matsim.contrib.wagonSim.schedule.OTTDataContainer.StationData;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -83,14 +82,14 @@ public class OTTDataToMATSimScheduleConverter {
 		TransitScheduleFactory factory = scenario.getTransitSchedule().getFactory();
 
 		// get station ids
-		Set<Id> stationIds = new HashSet<Id>();
+		Set<Id<TransitStopFacility>> stationIds = new HashSet<>();
 		for (Locomotive locomotive : dataContainer.locomotives.values()) {
 			for (StationData stationData : locomotive.trips.values()) {
 				stationIds.add(stationData.stationId);
 			}
 		}
 
-		for (Id stationId : stationIds) {
+		for (Id<TransitStopFacility> stationId : stationIds) {
 			Node node = infraNetwork.getNodes().get(stationId);
 			if (node != null) {
 				TransitStopFacility stopFacility = factory.createTransitStopFacility(stationId,node.getCoord(),false);
@@ -132,7 +131,7 @@ public class OTTDataToMATSimScheduleConverter {
 		TransitScheduleFactory scheduleFactory = scenario.getTransitSchedule().getFactory();
 		VehiclesFactory vehiclesFactory = ((ScenarioImpl)scenario).getVehicles().getFactory();
 		
-		VehicleType vehicleType = vehiclesFactory.createVehicleType(new IdImpl(WagonSimConstants.DEFAULT_VEHICLE_TYPE));
+		VehicleType vehicleType = vehiclesFactory.createVehicleType(Id.create(WagonSimConstants.DEFAULT_VEHICLE_TYPE, VehicleType.class));
 		VehicleCapacity vehicleCapacity = vehiclesFactory.createVehicleCapacity();
 		// we do not use this capacity. Therefore it should infinite, otherwise this capacity may exceed
 		// before ``our'' capacities are exceeded // dr, oct'13
@@ -163,7 +162,7 @@ public class OTTDataToMATSimScheduleConverter {
 				if (departure == null) {
 					double lineDepartureOffset = (stationData.departure.getTime()-startDate.getTime())/1000.0;
 					if (!isPerformance) { lineDepartureOffset -= stationData.delayDeparture; }
-					departure = scheduleFactory.createDeparture(locomotive.id,lineDepartureOffset);
+					departure = scheduleFactory.createDeparture(Id.create(locomotive.id, Departure.class), lineDepartureOffset);
 					arrivalDelay = 0.0;
 				}
 				else {
@@ -251,7 +250,7 @@ public class OTTDataToMATSimScheduleConverter {
 	private final void createVehicleLinkSpeedAttributes() {
 		for (TransitLine transitLine : scenario.getTransitSchedule().getTransitLines().values()) {
 			for (TransitRoute transitRoute : transitLine.getRoutes().values()) {
-				Set<Id> vehIds = new HashSet<Id>();
+				Set<Id<Vehicle>> vehIds = new HashSet<>();
 				for (Departure departure : transitRoute.getDepartures().values()) {
 					vehIds.add(departure.getVehicleId());
 				}
@@ -267,7 +266,7 @@ public class OTTDataToMATSimScheduleConverter {
 						System.out.println("line="+transitLine.getId()+";route="+transitRoute.getId()+"stop="+routeStop.getStopFacility().getId()+": lLenth="+link.getLength()+";arr="+arrival+";dep="+departure+"");
 					}
 
-					for (Id vehId : vehIds) {
+					for (Id<Vehicle> vehId : vehIds) {
 						this.vehicleAttributes.putAttribute(vehId.toString(),link.getId().toString(),speed);
 					}
 					

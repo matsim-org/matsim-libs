@@ -32,6 +32,7 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.wagonSim.Utils;
 import org.matsim.contrib.wagonSim.WagonSimConstants;
 import org.matsim.contrib.wagonSim.demand.WagonDataContainer;
@@ -74,16 +75,16 @@ public class WagonToDemandConverterMain {
 	//////////////////////////////////////////////////////////////////////
 	
 	public final void convertFromFiles(String wagonDataFile, String nodeMapFile, String zoneToNodeMapFile, Scenario scenario, ObjectAttributes transitVehicleAttributes) throws IOException {
-		Map<Id,Id> nodeMap = Utils.parseNodeMapFile(nodeMapFile);
+		Map<Id<Node>, Id<Node>> nodeMap = Utils.parseNodeMapFile(nodeMapFile);
 		log.info("node map file contains "+nodeMap.size()+" mappings.");
-		Map<Id,Id> zoneToNodeMap = Utils.parseZoneToNodeMapFile(zoneToNodeMapFile);
+		Map<String, Id<Node>> zoneToNodeMap = Utils.parseZoneToNodeMapFile(zoneToNodeMapFile);
 		log.info("zone to node map file contains "+zoneToNodeMap.size()+" mappings.");
-		
-		Map<Id,Id> remappedZoneToNodeMap = new HashMap<Id,Id>();
-		for (Entry<Id,Id> e : zoneToNodeMap.entrySet()) {
-			Id mappedNodeId = nodeMap.get(e.getValue());
+
+		Map<String, Id<Node>> remappedZoneToNodeMap = new HashMap<>();
+		for (Entry<String, Id<Node>> e : zoneToNodeMap.entrySet()) {
+			Id<Node> mappedNodeId = nodeMap.get(e.getValue());
 			if (mappedNodeId != null) {
-				remappedZoneToNodeMap.put(e.getKey(),mappedNodeId);
+				remappedZoneToNodeMap.put(e.getKey(), mappedNodeId);
 				log.info("remapped zone id="+e.getKey()+" from node id="+e.getValue()+" to node id="+mappedNodeId+".");
 			}
 			else {
@@ -94,7 +95,7 @@ public class WagonToDemandConverterMain {
 		WagonDataContainer dataContainer = new WagonDataContainer();
 		new WagonDataParser(dataContainer,demandDateTime).parse(wagonDataFile);
 		
-		new WagonToMatsimDemandConverter(scenario,wagonAttributes,transitVehicleAttributes,remappedZoneToNodeMap).convert(dataContainer);
+		new WagonToMatsimDemandConverter(scenario, wagonAttributes, transitVehicleAttributes, remappedZoneToNodeMap).convert(dataContainer);
 	}
 	
 	//////////////////////////////////////////////////////////////////////

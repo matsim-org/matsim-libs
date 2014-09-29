@@ -29,7 +29,8 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 
 /**
  * @author balmermi @ Seonzon AG
@@ -41,14 +42,14 @@ public class NEMOInfraDataContainer {
 	// variables
 	//////////////////////////////////////////////////////////////////////
 	
-	final Map<Id,NEMOInfraNodeCluster> nodeClusters = new HashMap<Id,NEMOInfraNodeCluster>();
-	final Map<Id,NEMOInfraNode> nodes = new HashMap<Id,NEMOInfraNode>();
-	final Map<Id,NEMOInfraCountry> countries = new HashMap<Id,NEMOInfraCountry>();
-	final Map<Id,NEMOInfraLinkType> linkTypes = new HashMap<Id,NEMOInfraLinkType>();
-	final Map<Id,NEMOInfraLinkOwner> linkOwners = new HashMap<Id,NEMOInfraLinkOwner>();
-	final Map<Id,NEMOInfraLink> links = new HashMap<Id,NEMOInfraLink>();
-	final Map<Id,NEMOInfraTrack> tracks = new HashMap<Id,NEMOInfraTrack>();
-	final Map<Id,NEMOInfraDirection> directions = new HashMap<Id,NEMOInfraDirection>();
+	final Map<String, NEMOInfraNodeCluster> nodeClusters = new HashMap<>();
+	final Map<Id<Node>, NEMOInfraNode> nodes = new HashMap<>();
+	final Map<String, NEMOInfraCountry> countries = new HashMap<>();
+	final Map<String, NEMOInfraLinkType> linkTypes = new HashMap<>();
+	final Map<String, NEMOInfraLinkOwner> linkOwners = new HashMap<>();
+	final Map<Id<Link>,NEMOInfraLink> links = new HashMap<>();
+	final Map<String, NEMOInfraTrack> tracks = new HashMap<>();
+	final Map<Id<Link>, NEMOInfraDirection> directions = new HashMap<>();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -167,103 +168,103 @@ public class NEMOInfraDataContainer {
 	//////////////////////////////////////////////////////////////////////
 
 	static class NEMOInfraNodeCluster {
-		final Id id;
-		Set<Id> nodeIds = new HashSet<Id>();
+		final String id;
+		Set<Id<Node>> nodeIds = new HashSet<>();
 		
-		NEMOInfraNodeCluster(String cluster) { id = new IdImpl(cluster); }
+		NEMOInfraNodeCluster(String cluster) { id = cluster; }
 	}
 	
 	//////////////////////////////////////////////////////////////////////
 	
 	static class NEMOInfraNode {
-		final Id id;
+		final Id<Node> id;
 		String name = null;
 		Coord coord = null;
-		Id countryId = null;
+		String countryId = null;
 		Boolean isStation = null;
 		Boolean isValid = null;
-		Id clusterId = null;
+		String clusterId = null;
 		
-		NEMOInfraNode(String bscode) { id = new IdImpl(bscode); }
+		NEMOInfraNode(String bscode) { id = Id.create(bscode, Node.class); }
 	}
 
 	//////////////////////////////////////////////////////////////////////
 	
 	static class NEMOInfraCountry {
-		final Id id;
+		final String id;
 		String name = null;
 		Boolean isHomeCountry = null;
 		
-		NEMOInfraCountry(int id_Land) { id = new IdImpl(id_Land);  }
+		NEMOInfraCountry(int id_Land) { id = Integer.toString(id_Land);  }
 	}
 
 	//////////////////////////////////////////////////////////////////////
 	
 	static class NEMOInfraLinkType {
-		final Id id;
+		final String id;
 		Double velocity = null;
 		Double vFactor = null;
 		
-		NEMOInfraLinkType(int id_Streckenkategorie) { id = new IdImpl(id_Streckenkategorie);  }
+		NEMOInfraLinkType(int id_Streckenkategorie) { id = Integer.toString(id_Streckenkategorie);  }
 	}
 
 	//////////////////////////////////////////////////////////////////////
 	
 	static class NEMOInfraLinkOwner {
-		final Id id;
+		final String id;
 		String owner = null;
 		
-		NEMOInfraLinkOwner(int id_StreckenKST) { id = new IdImpl(id_StreckenKST);  }
+		NEMOInfraLinkOwner(int id_StreckenKST) { id = Integer.toString(id_StreckenKST);  }
 	}
 
 	//////////////////////////////////////////////////////////////////////
 
 	static class NEMOInfraLink {
-		final Id id;
-		Id fromNodeId = null;
-		Id toNodeId = null;
+		final Id<Link> id;
+		Id<Node> fromNodeId = null;
+		Id<Node> toNodeId = null;
 		Boolean isSimuLink = null;
 		Double length = null;
 		Boolean hasTwoTracks = null;
 		Boolean isGlobal = null;
-		Id typeId = null;
-		Id ownerId = null;
+		String typeId = null;
+		String ownerId = null;
 		Boolean isClosed = null;
 		Boolean isValid = null;
 		Double maxTrainLength = null;
 		
-		NEMOInfraLink(int id_Kante) { id = new IdImpl(id_Kante);  }
+		NEMOInfraLink(int id_Kante) { id = Id.create(id_Kante, Link.class);  }
 	}
 
 	//////////////////////////////////////////////////////////////////////
 	
 	static class NEMOInfraTrack {
-		final Id id; // format: [linkId]-[trackNr]
-		final Id linkId;
+		final String id; // format: [linkId]-[trackNr]
+		final Id<Link> linkId;
 		final Boolean trackNr;
 		
 		NEMOInfraTrack(int kante, boolean gleisnr) {
-			linkId = new IdImpl(kante);
+			linkId = Id.create(kante, Link.class);
 			trackNr = new Boolean(gleisnr);
-			id = new IdImpl(linkId.toString()+"-"+trackNr.toString());
+			id = linkId.toString()+"-"+trackNr.toString();
 		}
 	}
 
 	//////////////////////////////////////////////////////////////////////
 	
 	static class NEMOInfraDirection {
-		final Id id; // format: [linkId]-[trackNr]-[trafficDirection]
-		final Id trackId; // format: [linkId]-[trackNr]
-		final Id linkId;
+		final Id<Link> id; // format: [linkId]-[trackNr]-[trafficDirection]
+		final String trackId; // format: [linkId]-[trackNr]
+		final Id<Link> linkId;
 		final Boolean trackNr;
 		final Boolean direction;
 		
 		NEMOInfraDirection(int kante, boolean gleisnr, boolean richtung) {
-			linkId = new IdImpl(kante);
+			linkId = Id.create(kante, Link.class);
 			trackNr = new Boolean(gleisnr);
 			direction = new Boolean(richtung);
-			trackId = new IdImpl(linkId.toString()+"-"+trackNr.toString());
-			id = new IdImpl(linkId.toString()+"-"+trackNr.toString()+"-"+direction.toString());
+			trackId = linkId.toString()+"-"+trackNr.toString();
+			id = Id.create(linkId.toString()+"-"+trackNr.toString()+"-"+direction.toString(), Link.class);
 		}
 	}
 }

@@ -1,31 +1,33 @@
 package org.matsim.contrib.wagonSim.schedule.mapping;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 
 /**
  * @author mrieser / senozon
  */
 public class AddLink implements NetworkEdit {
 
-	private final Id linkId;
-	private final Id fromNodeId;
-	private final Id toNodeId;
+	private final Id<Link> linkId;
+	private final Id<Node> fromNodeId;
+	private final Id<Node> toNodeId;
 	
-	public AddLink(final Id linkId, final Id fromNodeId, final Id toNodeId) {
+	public AddLink(final Id<Link> linkId, final Id<Node> fromNodeId, final Id<Node> toNodeId) {
 		this.linkId = linkId;
 		this.fromNodeId = fromNodeId;
 		this.toNodeId = toNodeId;
 	}
 	
-	public Id getLinkId() {
+	public Id<Link> getLinkId() {
 		return linkId;
 	}
 	
-	public Id getFromNodeId() {
+	public Id<Node> getFromNodeId() {
 		return fromNodeId;
 	}
 	
-	public Id getToNodeId() {
+	public Id<Node> getToNodeId() {
 		return toNodeId;
 	}
 

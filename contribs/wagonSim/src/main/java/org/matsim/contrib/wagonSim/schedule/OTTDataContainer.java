@@ -29,7 +29,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 
 /**
@@ -42,7 +42,7 @@ public class OTTDataContainer {
 	// variables
 	//////////////////////////////////////////////////////////////////////
 	
-	final Map<Id,Locomotive> locomotives = new HashMap<Id,Locomotive>();
+	final Map<Id<Locomotive>,Locomotive> locomotives = new HashMap<>();
 	
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -64,11 +64,11 @@ public class OTTDataContainer {
 	//////////////////////////////////////////////////////////////////////
 
 	static class Locomotive {
-		final Id id;
+		final Id<Locomotive> id;
 		final Integer type;
 		SortedMap<Date,StationData> trips = new TreeMap<Date,StationData>();
 		
-		Locomotive(int locNr, int locType) { id = new IdImpl(locNr); type = locType; }
+		Locomotive(int locNr, int locType) { id = Id.create(locNr, Locomotive.class); type = locType; }
 		
 		@Override
 		public final String toString() {
@@ -85,7 +85,7 @@ public class OTTDataContainer {
 		Date departure = null;
 		Double delayArrival = null;
 		Double delayDeparture = null;
-		Id stationId = null;
+		Id<TransitStopFacility> stationId = null;
 		
 		@Override
 		public final String toString() { return arrival.toString()+";"+departure.toString()+";"+delayArrival+";"+delayDeparture+";"+stationId.toString(); }

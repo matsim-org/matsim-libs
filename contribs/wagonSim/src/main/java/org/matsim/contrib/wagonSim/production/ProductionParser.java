@@ -29,6 +29,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.wagonSim.Utils;
 import org.matsim.contrib.wagonSim.production.ProductionDataContainer.Connection;
 import org.matsim.contrib.wagonSim.production.ProductionDataContainer.ProductionNode;
@@ -36,7 +37,6 @@ import org.matsim.contrib.wagonSim.production.ProductionDataContainer.RbNode;
 import org.matsim.contrib.wagonSim.production.ProductionDataContainer.RcpDeliveryType;
 import org.matsim.contrib.wagonSim.production.ProductionDataContainer.RcpNode;
 import org.matsim.contrib.wagonSim.production.ProductionDataContainer.SatNode;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
@@ -95,7 +95,9 @@ public class ProductionParser {
 			int maxWagonShuntings = Integer.parseInt(Utils.removeSurroundingQuotes(row[lookup.get(RB_MAXWAGENUMSTELLUNGEN)].trim()));
 			int shuntingTime = Integer.parseInt(Utils.removeSurroundingQuotes(row[lookup.get(RB_WAGENUMSTELLZEIT)].trim()));
 			
-			if (dataContainer.productionNodes.containsKey(new IdImpl(name))) { throw new RuntimeException("row "+currRow+": Production node '"+name+"' already exists. Bailing out."); }
+			if (dataContainer.productionNodes.containsKey(Id.create(name, Node.class))) {
+				throw new RuntimeException("row "+currRow+": Production node '"+name+"' already exists. Bailing out.");
+			}
 			RbNode rbNode = new RbNode(name);
 			dataContainer.productionNodes.put(rbNode.id,rbNode);
 			rbNode.maxTrainCreation = maxTrainCreation;
@@ -133,7 +135,7 @@ public class ProductionParser {
 			int deliveryTypeId = Integer.parseInt(Utils.removeSurroundingQuotes(row[lookup.get(ID_VERSANDTYP)].trim()));
 			String desc = Utils.removeSurroundingQuotes(row[lookup.get(BEZEICHNUNG)].trim());
 			
-			if (dataContainer.rcpDeliveryTypes.containsKey(new IdImpl(deliveryTypeId))) { throw new RuntimeException("row "+currRow+": delivery type '"+deliveryTypeId+"' already exists. Bailing out."); }
+			if (dataContainer.rcpDeliveryTypes.containsKey(Id.create(deliveryTypeId, String.class))) { throw new RuntimeException("row "+currRow+": delivery type '"+deliveryTypeId+"' already exists. Bailing out."); }
 			RcpDeliveryType rcpDeliveryType = new RcpDeliveryType(deliveryTypeId,desc);
 			dataContainer.rcpDeliveryTypes.put(rcpDeliveryType.id,rcpDeliveryType);
 		}
@@ -156,7 +158,7 @@ public class ProductionParser {
 			currRow++;
 			String [] row = curr_line.split(";");
 
-			Id deliveryTypeId = new IdImpl(Utils.removeSurroundingQuotes(row[lookup.get(VERSANDTYP)].trim()));
+			String deliveryTypeId = Utils.removeSurroundingQuotes(row[lookup.get(VERSANDTYP)].trim());
 			int hour = Integer.parseInt(Utils.removeSurroundingQuotes(row[lookup.get(STUNDE)].trim()));
 			double fraction = Double.parseDouble(Utils.removeSurroundingQuotes(row[lookup.get(ANTEIL)].trim()));
 
@@ -194,12 +196,12 @@ public class ProductionParser {
 
 			String name = Utils.removeSurroundingQuotes(row[lookup.get(RCP_BEDIENKNOTEN)].trim())+RCP_NODE_POSTFIX;
 			
-			Id rbNodeId = new IdImpl(Utils.removeSurroundingQuotes(row[lookup.get(RCP_VERSCHUBKNOTEN)].trim())+RB_NODE_POSTFIX);
+			Id<Node> rbNodeId = Id.create(Utils.removeSurroundingQuotes(row[lookup.get(RCP_VERSCHUBKNOTEN)].trim())+RB_NODE_POSTFIX, Node.class);
 			ProductionNode rbNode = dataContainer.productionNodes.get(rbNodeId);
 			if (rbNode == null) { throw new RuntimeException("row "+currRow+": "+RCP_VERSCHUBKNOTEN+"="+rbNodeId+" does not exist. Bailing out."); }
 			if (!(rbNode instanceof RbNode)) { throw new RuntimeException("row "+currRow+": "+RCP_VERSCHUBKNOTEN+"="+rbNodeId+" is not of type RB. Bailing out."); }
 			
-			Id receptionNodeId = new IdImpl(Utils.removeSurroundingQuotes(row[lookup.get(RCP_VERSCHUBKNOTEN_EMPFANG)].trim())+RB_NODE_POSTFIX);
+			Id<Node> receptionNodeId = Id.create(Utils.removeSurroundingQuotes(row[lookup.get(RCP_VERSCHUBKNOTEN_EMPFANG)].trim())+RB_NODE_POSTFIX, Node.class);
 			ProductionNode receptionNode = dataContainer.productionNodes.get(receptionNodeId);
 			if (receptionNode == null) { throw new RuntimeException("row "+currRow+": "+RCP_VERSCHUBKNOTEN_EMPFANG+"="+receptionNodeId+" does not exist. Bailing out."); }
 			
@@ -207,11 +209,11 @@ public class ProductionParser {
 			boolean isBorder = false;
 			if (border == 1) { isBorder = true; }
 			
-			Id deliveryTypeId = new IdImpl(Utils.removeSurroundingQuotes(row[lookup.get(RCP_VERSANDTYP)].trim()));
+			String deliveryTypeId = Utils.removeSurroundingQuotes(row[lookup.get(RCP_VERSANDTYP)].trim());
 			RcpDeliveryType rcpDeliveryType = dataContainer.rcpDeliveryTypes.get(deliveryTypeId);
 			if (!dataContainer.rcpDeliveryTypes.containsKey(deliveryTypeId)) { throw new RuntimeException("row "+currRow+": delivery type '"+deliveryTypeId+"' does not exist. Bailing out."); }
 			
-			if (dataContainer.productionNodes.containsKey(new IdImpl(name))) { throw new RuntimeException("row "+currRow+": Production node '"+name+"' already exists. Bailing out."); }
+			if (dataContainer.productionNodes.containsKey(Id.create(name, Node.class))) { throw new RuntimeException("row "+currRow+": Production node '"+name+"' already exists. Bailing out."); }
 			RcpNode rcpNode = new RcpNode(name);
 			dataContainer.productionNodes.put(rcpNode.id,rcpNode);
 			rcpNode.parentNode = rbNode;
@@ -249,18 +251,18 @@ public class ProductionParser {
 
 			String name = Utils.removeSurroundingQuotes(row[lookup.get(SAT_ABFERTIGUNGSSTELLE)].trim())+SAT_NODE_POSTFIX;
 			
-			Id rcpNodeId = new IdImpl(Utils.removeSurroundingQuotes(row[lookup.get(SAT_BEDIENKNOTEN)].trim())+RCP_NODE_POSTFIX);
+			Id<Node> rcpNodeId = Id.create(Utils.removeSurroundingQuotes(row[lookup.get(SAT_BEDIENKNOTEN)].trim())+RCP_NODE_POSTFIX, Node.class);
 			ProductionNode rcpNode = dataContainer.productionNodes.get(rcpNodeId);
 			if (rcpNode == null) { throw new RuntimeException("row "+currRow+": "+SAT_BEDIENKNOTEN+"="+rcpNode+" does not exist. Bailing out."); }
 			if (!(rcpNode instanceof RcpNode)) { throw new RuntimeException("row "+currRow+": "+SAT_BEDIENKNOTEN+"="+rcpNode+" is not of type RCP. Bailing out."); }
 			
-			Id receptionNodeId = new IdImpl(Utils.removeSurroundingQuotes(row[lookup.get(SAT_BEDIENKNOTEN_EMPFANG)].trim())+RCP_NODE_POSTFIX);
+			Id<Node> receptionNodeId = Id.create(Utils.removeSurroundingQuotes(row[lookup.get(SAT_BEDIENKNOTEN_EMPFANG)].trim())+RCP_NODE_POSTFIX, Node.class);
 			ProductionNode receptionNode = dataContainer.productionNodes.get(receptionNodeId);
 			if (receptionNode == null) { throw new RuntimeException("row "+currRow+": "+SAT_BEDIENKNOTEN_EMPFANG+"="+receptionNodeId+" does not exist. Bailing out."); }
 			
 			double minService = Double.parseDouble(Utils.removeSurroundingQuotes(row[lookup.get(SAT_MINDESTBEDIENUNG)].trim()));
 			
-			if (dataContainer.productionNodes.containsKey(new IdImpl(name))) { throw new RuntimeException("row "+currRow+": Production node '"+name+"' already exists. Bailing out."); }
+			if (dataContainer.productionNodes.containsKey(Id.create(name, Node.class))) { throw new RuntimeException("row "+currRow+": Production node '"+name+"' already exists. Bailing out."); }
 			SatNode satNode = new SatNode(name);
 			dataContainer.productionNodes.put(satNode.id,satNode);
 			satNode.parentNode = rcpNode;
@@ -300,19 +302,19 @@ public class ProductionParser {
 			int index = Integer.parseInt(Utils.removeSurroundingQuotes(row[lookup.get(ROUTE_ZWISCHENKNOTENNR)].trim()));
 			String via = Utils.removeSurroundingQuotes(row[lookup.get(ROUTE_ZWISCHENKNOTEN)].trim());
 
-			Id fromId = new IdImpl(from+RB_NODE_POSTFIX);
+			Id<Node> fromId = Id.create(from+RB_NODE_POSTFIX, Node.class);
 			ProductionNode fromNode = dataContainer.productionNodes.get(fromId);
 			if (fromNode == null) { throw new RuntimeException("row "+currRow+": from node id="+from+" is not an RB node. Bailing out."); }
 
-			Id toId = new IdImpl(to+RB_NODE_POSTFIX);
+			Id<Node> toId = Id.create(to+RB_NODE_POSTFIX, Node.class);
 			ProductionNode toNode = dataContainer.productionNodes.get(toId);
 			if (toNode == null) { throw new RuntimeException("row "+currRow+": to node id="+to+" is not an RB node. Bailing out."); }
 
-			Id viaId = new IdImpl(via+RB_NODE_POSTFIX);
+			Id<Node> viaId = Id.create(via+RB_NODE_POSTFIX, Node.class);
 			ProductionNode viaNode = dataContainer.productionNodes.get(viaId);
 			if (viaNode == null) { throw new RuntimeException("row "+currRow+": via node id="+via+" is not an RB node. Bailing out."); }
 
-			Id routeId = new IdImpl(fromNode.id.toString()+"---"+toNode.id.toString());
+			Id<Connection> routeId = Id.create(fromNode.id.toString()+"---"+toNode.id.toString(), Connection.class);
 			Connection route = dataContainer.connections.get(routeId);
 			if (route == null) {
 				if (index != 1) { throw new RuntimeException("row "+currRow+": file is not sorted according to the via node index. Bailing out."); }

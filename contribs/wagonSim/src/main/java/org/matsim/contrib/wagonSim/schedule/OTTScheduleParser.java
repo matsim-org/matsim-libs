@@ -30,12 +30,13 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.wagonSim.Utils;
 import org.matsim.contrib.wagonSim.WagonSimConstants;
 import org.matsim.contrib.wagonSim.schedule.OTTDataContainer.Locomotive;
 import org.matsim.contrib.wagonSim.schedule.OTTDataContainer.StationData;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * @author balmermi @ Senozon AG
@@ -72,7 +73,7 @@ public class OTTScheduleParser {
 	// methods
 	//////////////////////////////////////////////////////////////////////
 	
-	public final void parse(String ottFile, Map<Id,Id> nodeMap) throws IOException {
+	public final void parse(String ottFile, Map<Id<Node>, Id<Node>> nodeMap) throws IOException {
 
 		BufferedReader br = IOUtils.getBufferedReader(ottFile);
 		int currRow = 0;
@@ -105,10 +106,10 @@ public class OTTScheduleParser {
 			catch (ParseException e) { throw new RuntimeException("row "+currRow+": Column '"+IST_AB+"' not well fomatted. Bailing out."); }
 			double delayArrival = Double.parseDouble(Utils.removeSurroundingQuotes(row[lookup.get(VERSPAETUNG_AN)].trim()));
 			double delayDeparture = Double.parseDouble(Utils.removeSurroundingQuotes(row[lookup.get(VERSPAETUNG_AB)].trim()));
-			Id station = new IdImpl(Utils.removeSurroundingQuotes(row[lookup.get(BETRIEBSSTELLE)].trim()));
+			Id<TransitStopFacility> station = Id.create(Utils.removeSurroundingQuotes(row[lookup.get(BETRIEBSSTELLE)].trim()), TransitStopFacility.class);
 			int locType = Integer.parseInt(Utils.removeSurroundingQuotes(row[lookup.get(ZUGART)].trim()));
 			
-			Locomotive locomotive = dataContainer.locomotives.get(new IdImpl(locNr.longValue()));
+			Locomotive locomotive = dataContainer.locomotives.get(Id.create(locNr.longValue(), Locomotive.class));
 			if (locomotive == null) { locomotive = new Locomotive(locNr,locType); dataContainer.locomotives.put(locomotive.id,locomotive); prevStationData = null; }
 			if (locomotive.type.intValue() != locType) { throw new RuntimeException("row "+currRow+": alredy given locomotive type="+locomotive.type+" does not fit with locType="+locType+". Bailing out."); }
 
@@ -137,9 +138,9 @@ public class OTTScheduleParser {
 			}
 			
 			// replace station ids according to nodeMap
-			Id mappedStationId = nodeMap.get(station);
+			Id<Node> mappedStationId = nodeMap.get(Id.create(station, Node.class));
 			if (mappedStationId != null) {
-				station = new IdImpl(mappedStationId.toString());
+				station = Id.create(mappedStationId.toString(), TransitStopFacility.class);
 			}
 			
 			// take care that there is no DEFAULTFLAG ANYMORE

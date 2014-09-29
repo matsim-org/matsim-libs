@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 
 /**
  * @author balmermi
@@ -38,7 +37,7 @@ public class WagonDataContainer {
 	// variables
 	//////////////////////////////////////////////////////////////////////
 	
-	final Map<Id,Wagon> wagons = new HashMap<Id,Wagon>();
+	final Map<Id<Wagon>, Wagon> wagons = new HashMap<>();
 	
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -56,14 +55,14 @@ public class WagonDataContainer {
 	//////////////////////////////////////////////////////////////////////
 	
 	static class Wagon {
-		final Id id;
+		final Id<Wagon> id;
 		Double weight = null;
 		Double length = null;
 		Double weightLoad = null;
-		Id fromZoneId = null;
-		Id toZoneId = null;
+		String fromZoneId = null;
+		String toZoneId = null;
 		Double depTime = null;
 		
-		Wagon(String id) { this.id = new IdImpl(id); }
+		Wagon(String id) { this.id = Id.create(id, Wagon.class); }
 	}
 }

@@ -39,6 +39,7 @@ import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
@@ -56,7 +57,7 @@ public class WagonSimController extends Controler {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public WagonSimController(Scenario scenario,ObjectAttributes vehicleLinkSpeedAttributes, Map<Id,Double> minShuntingTimes) {
+	public WagonSimController(Scenario scenario,ObjectAttributes vehicleLinkSpeedAttributes, Map<Id<TransitStopFacility>, Double> minShuntingTimes) {
 		super(scenario);
 		
 		WagonSimVehicleLoadListener listener = new WagonSimVehicleLoadListener(scenario.getPopulation().getPersonAttributes());
@@ -131,7 +132,7 @@ public class WagonSimController extends Controler {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		ObjectAttributes vehicleLinkSpeedAttributes = new ObjectAttributes();
 		new ObjectAttributesXmlReader(vehicleLinkSpeedAttributes).parse(vehicleAttributeFile);
-		Map<Id, Double> minShuntingTimes;
+		Map<Id<TransitStopFacility>, Double> minShuntingTimes;
 		try { minShuntingTimes = Utils.parseShuntingTimes(shuntingTimesFile); }
 		catch (IOException e) { throw new RuntimeException(e); }
 		
