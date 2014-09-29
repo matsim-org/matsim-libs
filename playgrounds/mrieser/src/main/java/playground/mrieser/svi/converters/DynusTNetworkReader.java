@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.network.NetworkWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -63,7 +62,7 @@ public class DynusTNetworkReader {
 			while ((line = reader.readLine()) != null) {
 				String[] parts = line.trim().split("\\s+");
 				if (parts.length == 3) {
-					Node n = nf.createNode(new IdImpl(parts[0]), new CoordImpl(parts[1], parts[2]));
+					Node n = nf.createNode(Id.create(parts[0], Node.class), new CoordImpl(parts[1], parts[2]));
 					this.network.addNode(n);
 				} else {
 					log.warn("Cannot parse line " + line);
@@ -96,9 +95,9 @@ public class DynusTNetworkReader {
 			for (int i = 0; i < nOfLinks; i++) {
 				String line = reader.readLine();
 				String[] parts = line.trim().split("\\s+");
-				Id linkId = new IdImpl(i);
-				Node fromNode = this.network.getNodes().get(new IdImpl(parts[0]));
-				Node toNode = this.network.getNodes().get(new IdImpl(parts[1]));
+				Id<Link> linkId = Id.create(i, Link.class);
+				Node fromNode = this.network.getNodes().get(Id.create(parts[0], Node.class));
+				Node toNode = this.network.getNodes().get(Id.create(parts[1], Node.class));
 				if (fromNode == null || toNode == null) {
 					System.out.println("breakpoint");
 				}

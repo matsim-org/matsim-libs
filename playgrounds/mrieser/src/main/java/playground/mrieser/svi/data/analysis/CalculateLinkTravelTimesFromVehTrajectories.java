@@ -26,9 +26,10 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.vehicles.Vehicle;
 
 import playground.mrieser.svi.data.vehtrajectories.VehicleTrajectory;
 import playground.mrieser.svi.data.vehtrajectories.VehicleTrajectoryHandler;
@@ -57,7 +58,7 @@ public class CalculateLinkTravelTimesFromVehTrajectories implements VehicleTraje
 		
 		Node prevNode = null;
 		for (int i = 0; i < nodes.length; i++) {
-			Node node = this.network.getNodes().get(new IdImpl(nodes[i]));
+			Node node = this.network.getNodes().get(Id.create(nodes[i], Node.class));
 			if (prevNode != null) {
 				Link link = NetworkUtils.getConnectingLink(prevNode, node);
 				if (link == null) {
@@ -65,10 +66,10 @@ public class CalculateLinkTravelTimesFromVehTrajectories implements VehicleTraje
 					break;
 				}
 				double linkTime = times[i];
-				Id id = new IdImpl(trajectory.getVehNr());
-				this.ttcalc.handleEvent(new LinkEnterEvent(time, id, link.getId(), id));
+				Id<Person> id = Id.create(trajectory.getVehNr(), Person.class);
+				this.ttcalc.handleEvent(new LinkEnterEvent(time, id, link.getId(), Id.create(id, Vehicle.class)));
 				time += linkTime;
-				this.ttcalc.handleEvent(new LinkLeaveEvent(time, id, link.getId(), id));
+				this.ttcalc.handleEvent(new LinkLeaveEvent(time, id, link.getId(), Id.create(id, Vehicle.class)));
 			}
 			prevNode = node;
 		}

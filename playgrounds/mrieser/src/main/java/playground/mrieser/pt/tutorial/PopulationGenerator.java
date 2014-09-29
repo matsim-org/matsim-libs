@@ -22,6 +22,7 @@ package playground.mrieser.pt.tutorial;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
@@ -31,12 +32,10 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -51,7 +50,7 @@ public class PopulationGenerator {
 	private static final double loc2Y = 1000;
 
 	private static void makePopulation(final int nOfPersonFromEachHome, final String networkFilename, final String filename) {
-		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population pop = sc.getPopulation();
 		PopulationFactory pf = pop.getFactory();
 
@@ -64,7 +63,7 @@ public class PopulationGenerator {
 			pId++;
 			String mode = (r.nextDouble() < 0.50 ? TransportMode.car : TransportMode.pt);
 
-			Person person = pf.createPerson(new IdImpl(pId));
+			Person person = pf.createPerson(Id.create(pId, Person.class));
 			Plan plan = pf.createPlan();
 			Coord homeCoord = new CoordImpl((int) (baseX - 450 + 900*r.nextDouble()), (int) (baseY - 450 + 900*r.nextDouble()));
 			fillPlan(plan, mode, r, pf, homeCoord);
@@ -78,7 +77,7 @@ public class PopulationGenerator {
 			pId++;
 			String mode = (r.nextDouble() < 0.50 ? TransportMode.car : TransportMode.pt);
 
-			Person person = pf.createPerson(new IdImpl(pId));
+			Person person = pf.createPerson(Id.create(pId, Person.class));
 			Plan plan = pf.createPlan();
 			Coord homeCoord = new CoordImpl((int) (baseX - 450 + 900*r.nextDouble()), (int) (baseY - 450 + 900*r.nextDouble()));
 			fillPlan(plan, mode, r, pf, homeCoord);
@@ -92,7 +91,7 @@ public class PopulationGenerator {
 			pId++;
 			String mode = (r.nextDouble() < 0.50 ? TransportMode.car : TransportMode.pt);
 
-			Person person = pf.createPerson(new IdImpl(pId));
+			Person person = pf.createPerson(Id.create(pId, Person.class));
 			Plan plan = pf.createPlan();
 			Coord homeCoord = new CoordImpl((int) (baseX - 450 + 900.0*r.nextDouble()), (int) (baseY - 450 + 900.0*r.nextDouble()));
 			fillPlan(plan, mode, r, pf, homeCoord);

@@ -25,11 +25,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.mrieser.osm.core.OsmNodeHandler;
@@ -162,7 +162,7 @@ public class Osm2TransitLines {
 		@Override
 		public void handleNode(OsmNode node) {
 			if (this.nodeIds.contains(node.id)) {
-				Node netNode = this.factory.createNode(new IdImpl(node.id), node.coord);
+				Node netNode = this.factory.createNode(Id.create(node.id, Node.class), node.coord);
 				this.network.addNode(netNode);
 			}
 		}
@@ -170,9 +170,9 @@ public class Osm2TransitLines {
 		@Override
 		public void handleWay(OsmWay way) {
 			if (this.wayIds.contains(way.id)) {
-				Node fromNode = this.network.getNodes().get(new IdImpl(way.nodes.get(0)));
-				Node toNode = this.network.getNodes().get(new IdImpl(way.nodes.get(way.nodes.size() - 1)));
-				Link link = this.factory.createLink(new IdImpl(way.id), fromNode, toNode);
+				Node fromNode = this.network.getNodes().get(Id.create(way.nodes.get(0), Node.class));
+				Node toNode = this.network.getNodes().get(Id.create(way.nodes.get(way.nodes.size() - 1), Node.class));
+				Link link = this.factory.createLink(Id.create(way.id, Link.class), fromNode, toNode);
 				this.network.addLink(link);
 			}
 		}

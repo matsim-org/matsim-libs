@@ -24,16 +24,21 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.vehicles.Vehicle;
 
 public class TransitLoadByTimeTest {
 
 	@Test
 	public void testTransitLoad_singleLine() {
-		Id[] id = {new IdImpl(0), new IdImpl(1), new IdImpl(2), new IdImpl(3)};
+		Id<Person>[] id = new Id[4];
+		id[0] = Id.create(0, Person.class);
+		id[1] = Id.create(1, Person.class);
+		id[2] = Id.create(2, Person.class);
+		id[3] = Id.create(3, Person.class);
 
-		Id vehicleIdDep1 = id[0];
-		Id vehicleIdDep2 = id[3];
+		Id<Vehicle> vehicleIdDep1 = Id.create(0, Vehicle.class);
+		Id<Vehicle> vehicleIdDep2 = Id.create(3, Vehicle.class);
 
 		TransitLoadByTime tl = new TransitLoadByTime();
 		tl.handleEvent(new PersonEntersVehicleEvent(7.0*3600-5, id[0], vehicleIdDep1));

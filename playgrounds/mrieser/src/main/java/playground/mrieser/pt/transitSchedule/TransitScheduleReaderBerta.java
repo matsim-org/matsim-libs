@@ -36,7 +36,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -44,6 +43,7 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
+import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -113,7 +113,7 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 	private BFahrt tmpFahrt = null;
 	private BFahrzeitprofil tmpFahrzeitprofil = null;
 	private BFahrzeitprofilpunkt tmpFahrzeitprofilpunkt = null;
-	private final Map<Id, BHaltepunkt> haltepunkte = new HashMap<Id, BHaltepunkt>();
+	private final Map<Id<TransitStopFacility>, BHaltepunkt> haltepunkte = new HashMap<>();
 
 	private int departureCounter = 0;
 
@@ -167,9 +167,9 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 	@Override
 	public void endTag(final String name, final String content, final Stack<String> context) {
 		if (HALTEPUNKTNUMMER.equals(name) && HALTEPUNKT.equals(context.peek())) {
-			this.tmpHaltepunkt.id = new IdImpl(this.tmpLinie.betriebszweignummer + "_" + content);
+			this.tmpHaltepunkt.id = Id.create(this.tmpLinie.betriebszweignummer + "_" + content, TransitStopFacility.class);
 		} else if (HALTEPUNKTNUMMER.equals(name) && ROUTENPUNKT.equals(context.peek())) {
-			this.tmpRoutenpunkt.haltepunkt = this.haltepunkte.get(new IdImpl(this.tmpLinie.betriebszweignummer + "_" + content));
+			this.tmpRoutenpunkt.haltepunkt = this.haltepunkte.get(Id.create(this.tmpLinie.betriebszweignummer + "_" + content, TransitStopFacility.class));
 		} else if (XKOORDINATE.equals(name)) {
 			if (content.length() > 0) {
 				this.tmpHaltepunkt.x = Double.parseDouble(content);
@@ -182,17 +182,17 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 			this.haltepunkte.put(this.tmpHaltepunkt.id, this.tmpHaltepunkt);
 			this.tmpHaltepunkt = null;
 		} else if (ROUTENNUMMER.equals(name)) {
-			this.tmpRoute.id = new IdImpl(content);
+			this.tmpRoute.id = content;
 		} else if (ROUTE.equals(name)) {
 			convertRoute(this.tmpRoute);
 			this.tmpRoute = null;
 		} else if (ROUTENPUNKT.equals(name)) {
-			this.tmpRoute.routenpunkte.put(new IdImpl(this.tmpRoutenpunkt.position), this.tmpRoutenpunkt);
+			this.tmpRoute.routenpunkte.put(Integer.toString(this.tmpRoutenpunkt.position), this.tmpRoutenpunkt);
 			this.tmpRoutenpunkt = null;
 		} else if (POSITION.equals(name) && ROUTENPUNKT.equals(context.peek())) {
 			this.tmpRoutenpunkt.position = Integer.parseInt(content);
 		} else if (POSITION.equals(name) && FAHRZEITPROFILPUNKT.equals(context.peek())) {
-			this.tmpFahrzeitprofilpunkt.routenpunkt = this.tmpRoute.routenpunkte.get(new IdImpl(content));
+			this.tmpFahrzeitprofilpunkt.routenpunkt = this.tmpRoute.routenpunkte.get(content);
 		} else if (FAHRGASTWECHSEL.equals(name)) {
 			this.tmpRoutenpunkt.realStop = !("N".equals(content));
 		} else if (OEFFENTLICHE_LINIENNUMMER.equals(name)) {
@@ -204,7 +204,7 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 		} else if (BETRIEBSZWEIGNUMMER.equals(name)) {
 			this.tmpLinie.betriebszweignummer = content;
 		} else if (LINIE.equals(name)) {
-			this.currentTransitLine = this.builder.createTransitLine(new IdImpl(this.tmpLinie.betriebszweig + " " + this.tmpLinie.id));
+			this.currentTransitLine = this.builder.createTransitLine(Id.create(this.tmpLinie.betriebszweig + " " + this.tmpLinie.id, TransitLine.class));
 		} else if (LINIENFAHRPLAN.equals(name)) {
 			if (this.currentTransitLine.getRoutes().size() > 0) {
 				this.schedule.addTransitLine(this.currentTransitLine);
@@ -218,9 +218,9 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 			this.tmpFahrzeitprofil.profilpunkte.add(this.tmpFahrzeitprofilpunkt);
 			this.tmpFahrzeitprofilpunkt = null;
 		} else if (FAHRZEITPROFILNUMMER.equals(name) && FAHRZEITPROFIL.equals(context.peek())) {
-			this.tmpFahrzeitprofil.id = new IdImpl(content);
+			this.tmpFahrzeitprofil.id = content;
 		} else if (FAHRZEITPROFILNUMMER.equals(name) && FAHRT.equals(context.peek())) {
-			this.tmpFahrt.fahrzeitprofil = this.tmpRoute.fahrzeitprofile.get(new IdImpl(content));
+			this.tmpFahrt.fahrzeitprofil = this.tmpRoute.fahrzeitprofile.get(content);
 		} else if (STRECKENFAHRZEIT.equals(name)) {
 			this.tmpFahrzeitprofilpunkt.fahrzeit = Double.parseDouble(content);
 		} else if (WARTEZEIT.equals(name)) {
@@ -238,7 +238,7 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 	}
 
 	private void convertRoute(final BRoute route) {
-		Map<Id, TransitRoute> transitRoutes = new HashMap<Id, TransitRoute>();
+		Map<Id<TransitRoute>, TransitRoute> transitRoutes = new HashMap<>();
 
 		for (BFahrt fahrt : route.fahrten) {
 			TransitRoute tRoute = transitRoutes.get(getTransitRouteId(route, fahrt.fahrzeitprofil));
@@ -247,7 +247,7 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 				transitRoutes.put(tRoute.getId(), tRoute);
 				this.currentTransitLine.addRoute(tRoute);
 			}
-			tRoute.addDeparture(this.builder.createDeparture(new IdImpl(this.departureCounter++), fahrt.departureTime));
+			tRoute.addDeparture(this.builder.createDeparture(Id.create(this.departureCounter++, Departure.class), fahrt.departureTime));
 		}
 	}
 
@@ -262,14 +262,14 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 			}
 			timeOffset += profilpunkt.wartezeit;
 		}
-		Id routeId = getTransitRouteId(route, fahrzeitprofil);
+		Id<TransitRoute> routeId = getTransitRouteId(route, fahrzeitprofil);
 		TransitRoute transitRoute = this.builder.createTransitRoute(routeId, null, stops, "bus"); // TODO find correct transport mode
 		transitRoute.setDescription("Linie " + this.tmpLinie.publicId);
 		return transitRoute;
 	}
 
-	private Id getTransitRouteId(final BRoute route, final BFahrzeitprofil fahrzeitprofil) {
-		return new IdImpl(route.id.toString() + "-" + fahrzeitprofil.id.toString());
+	private Id<TransitRoute> getTransitRouteId(final BRoute route, final BFahrzeitprofil fahrzeitprofil) {
+		return Id.create(route.id.toString() + "-" + fahrzeitprofil.id.toString(), TransitRoute.class);
 	}
 
 	private TransitStopFacility getStopFacility(final BHaltepunkt hp) {
@@ -290,15 +290,15 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 	}
 
 	protected static class BHaltepunkt {
-		/*package*/ Id id = null;
+		/*package*/ Id<TransitStopFacility> id = null;
 		/*package*/ double x = 0;
 		/*package*/ double y = 0;
 	}
 
 	protected static class BRoute {
-		/*package*/ Id id = null;
-		/*package*/ Map<Id, BRoutenpunkt> routenpunkte = new HashMap<Id, BRoutenpunkt>();
-		/*package*/ Map<Id, BFahrzeitprofil> fahrzeitprofile = new HashMap<Id, BFahrzeitprofil>();
+		/*package*/ String id = null;
+		/*package*/ Map<String, BRoutenpunkt> routenpunkte = new HashMap<>();
+		/*package*/ Map<String, BFahrzeitprofil> fahrzeitprofile = new HashMap<>();
 		/*package*/ List<BFahrt> fahrten = new ArrayList<BFahrt>();
 	}
 
@@ -309,7 +309,7 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 	}
 
 	protected static class BFahrzeitprofil {
-		/*package*/ Id id = null;
+		/*package*/ String id = null;
 		/*package*/ List<BFahrzeitprofilpunkt> profilpunkte = new ArrayList<BFahrzeitprofilpunkt>();
 	}
 
@@ -327,7 +327,6 @@ public class TransitScheduleReaderBerta extends MatsimXmlParser {
 
 
 	public static void main(final String[] args) throws SAXException, ParserConfigurationException, IOException {
-		// TODO [MR] remove after testing
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule = builder.createTransitSchedule();
 		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.DHDN_GK4);

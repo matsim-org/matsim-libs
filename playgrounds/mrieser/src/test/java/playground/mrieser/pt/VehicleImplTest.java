@@ -20,11 +20,12 @@
 
 package playground.mrieser.pt;
 
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.qsim.pt.TransitQVehicle;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.pt.fakes.FakePassengerAgent;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleImpl;
@@ -37,12 +38,12 @@ public class VehicleImplTest extends MatsimTestCase {
 	public void testAddPassenger() {
 		FakePassengerAgent passenger1 = new FakePassengerAgent(null);
 		FakePassengerAgent passenger2 = new FakePassengerAgent(null);
-		VehicleType vehicleType = new VehicleTypeImpl(new IdImpl("testVehType"));
+		VehicleType vehicleType = new VehicleTypeImpl(Id.create("testVehType", VehicleType.class));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(4));
 		capacity.setStandingRoom(Integer.valueOf(0));
 		vehicleType.setCapacity(capacity);
-		TransitVehicle vehicle = new TransitQVehicle(new VehicleImpl(new IdImpl(10), vehicleType));
+		TransitVehicle vehicle = new TransitQVehicle(new VehicleImpl(Id.create(10, Vehicle.class), vehicleType));
 
 		vehicle.addPassenger(passenger1);
 		assertEquals("there should be 1 passenger in vehicle.", 1, vehicle.getPassengers().size());
@@ -59,12 +60,12 @@ public class VehicleImplTest extends MatsimTestCase {
 		FakePassengerAgent passenger2 = new FakePassengerAgent(null);
 		FakePassengerAgent passenger3 = new FakePassengerAgent(null);
 		
-		VehicleType vehicleType = new VehicleTypeImpl(new IdImpl("testVehType"));
+		VehicleType vehicleType = new VehicleTypeImpl(Id.create("testVehType", VehicleType.class));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(4));
 		capacity.setStandingRoom(Integer.valueOf(0));
 		vehicleType.setCapacity(capacity);
-		TransitVehicle vehicle = new TransitQVehicle(new VehicleImpl(new IdImpl(55), vehicleType));
+		TransitVehicle vehicle = new TransitQVehicle(new VehicleImpl(Id.create(55, Vehicle.class), vehicleType));
 
 		vehicle.addPassenger(passenger1);
 		vehicle.addPassenger(passenger2);

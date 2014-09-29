@@ -26,10 +26,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -67,7 +67,7 @@ public class CalculateLinkStatsFromVehTrajectories implements VehicleTrajectoryH
 		
 		Node prevNode = null;
 		for (int i = 0; i < nodes.length; i++) {
-			Node node = this.network.getNodes().get(new IdImpl(nodes[i]));
+			Node node = this.network.getNodes().get(Id.create(nodes[i], Node.class));
 			if (prevNode != null) {
 				Link link = NetworkUtils.getConnectingLink(prevNode, node);
 				if (link == null) {

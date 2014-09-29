@@ -24,26 +24,27 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author mrieser
  */
 public class ActivityToZoneMapping {
 
-	private final Map<Id, String[]> actZonesPerAgent = new LinkedHashMap<Id, String[]>();
+	private final Map<Id<Person>, String[]> actZonesPerAgent = new LinkedHashMap<Id<Person>, String[]>();
 
 	public ActivityToZoneMapping() {
 	}
 
-	public void addAgentActivityZones(final Id agentId, final String[] zones) {
+	public void addAgentActivityZones(final Id<Person> agentId, final String[] zones) {
 		this.actZonesPerAgent.put(agentId, zones.clone());
 	}
 
-	public String[] getAgentActivityZones(final Id agentId) {
+	public String[] getAgentActivityZones(final Id<Person> agentId) {
 		return this.actZonesPerAgent.get(agentId);
 	}
 
-	/*package*/ Set<Id> getAgentIds() {
+	/*package*/ Set<Id<Person>> getAgentIds() {
 		return this.actZonesPerAgent.keySet();
 	}
 }

@@ -27,6 +27,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -36,7 +37,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacilitiesFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -129,7 +129,7 @@ public class FacilitiesFromPopulation {
 	private void handleActivities(final Population population) {
 		int idxCounter = 0;
 		ActivityFacilitiesFactory factory = this.facilities.getFactory();
-		Map<Id, ActivityFacility> facilitiesPerLinkId = new HashMap<Id, ActivityFacility>();
+		Map<Id<Link>, ActivityFacility> facilitiesPerLinkId = new HashMap<>();
 		Map<Coord, ActivityFacility> facilitiesPerCoordinate = new HashMap<Coord, ActivityFacility>();
 		
 		for (Person person : population.getPersons().values()) {
@@ -139,7 +139,7 @@ public class FacilitiesFromPopulation {
 						Activity a = (Activity) pe;
 						
 						Coord c = a.getCoord();
-						Id linkId = a.getLinkId();
+						Id<Link> linkId = a.getLinkId();
 						ActivityFacility facility = null;
 
 						if (linkId == null && this.network != null) {
@@ -149,7 +149,7 @@ public class FacilitiesFromPopulation {
 						if (this.oneFacilityPerLink && linkId != null) {
 							facility = facilitiesPerLinkId.get(linkId);
 							if (facility == null) {
-								facility = factory.createActivityFacility(new IdImpl(this.idPrefix + linkId.toString()), c);
+								facility = factory.createActivityFacility(Id.create(this.idPrefix + linkId.toString(), ActivityFacility.class), c);
 								((ActivityFacilityImpl) facility).setLinkId(linkId);
 								this.facilities.addActivityFacility(facility);
 								facilitiesPerLinkId.put(linkId, facility);
@@ -157,7 +157,7 @@ public class FacilitiesFromPopulation {
 						} else {
 							facility = facilitiesPerCoordinate.get(c);
 							if (facility == null) {
-								facility = factory.createActivityFacility(new IdImpl(this.idPrefix + idxCounter++), c);
+								facility = factory.createActivityFacility(Id.create(this.idPrefix + idxCounter++, ActivityFacility.class), c);
 								if (linkId != null) {
 									((ActivityFacilityImpl) facility).setLinkId(linkId);
 								}

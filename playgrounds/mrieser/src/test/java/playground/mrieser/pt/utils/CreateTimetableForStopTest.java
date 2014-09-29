@@ -28,8 +28,8 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -41,6 +41,7 @@ import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestCase;
 import org.xml.sax.SAXException;
 
@@ -62,11 +63,11 @@ public class CreateTimetableForStopTest {
 		TransitSchedule schedule = builder.createTransitSchedule();
 		new TransitScheduleReaderV1(schedule, network).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 
-		TransitLine line = schedule.getTransitLines().get(new IdImpl("T1"));
+		TransitLine line = schedule.getTransitLines().get(Id.create("T1", TransitLine.class));
 		CreateTimetableForStop timetable = new CreateTimetableForStop(line);
 		assertNotNull("could not get transit line.", line);
 
-		double[] departures = timetable.getDeparturesAtStop(schedule.getFacilities().get(new IdImpl("stop3")));
+		double[] departures = timetable.getDeparturesAtStop(schedule.getFacilities().get(Id.create("stop3", TransitStopFacility.class)));
 
 		for (double d : departures) {
 			System.out.println("Departure at " + Time.writeTime(d));

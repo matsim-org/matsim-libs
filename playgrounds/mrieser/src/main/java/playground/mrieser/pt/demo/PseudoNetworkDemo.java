@@ -20,6 +20,7 @@
 
 package playground.mrieser.pt.demo;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -30,7 +31,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -90,7 +90,7 @@ public class PseudoNetworkDemo {
 		Link link1 = network.getLinks().values().iterator().next();//getLink(scenario.createId("1"));
 
 		Population population = scenario.getPopulation();
-		Person person = population.getFactory().createPerson(new IdImpl(1));
+		Person person = population.getFactory().createPerson(Id.create(1, Person.class));
 		population.addPerson(person);
 		Plan plan = population.getFactory().createPlan();
 		person.addPlan(plan);

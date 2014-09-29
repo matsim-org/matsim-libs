@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -61,7 +60,7 @@ public class PtLinesReader {
 				Node prevNode = null;
 				List<Link> links = new ArrayList<Link>();
 				for (int i = 2; i < parts.length; i++) {
-					Id id = new IdImpl(parts[i]);
+					Id<Node> id = Id.create(parts[i], Node.class);
 					Node node = this.network.getNodes().get(id);
 					if (node == null) {
 						log.error("Could not find node with id " + id.toString() + " in line " + line + "/" + direction);

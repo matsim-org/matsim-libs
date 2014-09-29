@@ -24,7 +24,8 @@ import java.io.IOException;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
@@ -50,7 +51,7 @@ public class ActivityToZoneMappingReader {
 					String id = parts[0];
 					String[] zones = new String[parts.length - 1];
 					System.arraycopy(parts, 1, zones, 0, zones.length);
-					this.mapping.addAgentActivityZones(new IdImpl(id), zones);
+					this.mapping.addAgentActivityZones(Id.create(id, Person.class), zones);
 				}
 			}
 		} catch (IOException e) {

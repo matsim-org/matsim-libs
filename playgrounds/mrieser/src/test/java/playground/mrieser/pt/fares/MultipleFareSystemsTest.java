@@ -23,7 +23,8 @@ package playground.mrieser.pt.fares;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.utils.collections.Tuple;
@@ -34,12 +35,12 @@ public class MultipleFareSystemsTest extends MatsimTestCase {
 
 	public void testGetSingleTripCost() {
 		final ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
-		final ActivityFacilityImpl stop1 = facilities.createAndAddFacility(new IdImpl(1), new CoordImpl(100, 200));
-		final ActivityFacilityImpl stop2 = facilities.createAndAddFacility(new IdImpl(2), new CoordImpl(2100, 200));
-		final ActivityFacilityImpl stop3 = facilities.createAndAddFacility(new IdImpl(3), new CoordImpl(1100, 1200));
-		final ActivityFacilityImpl stop4 = facilities.createAndAddFacility(new IdImpl(4), new CoordImpl(2100, 1200));
-		final ActivityFacilityImpl stop5 = facilities.createAndAddFacility(new IdImpl(5), new CoordImpl(100, 1200));
-		final ActivityFacilityImpl stop6 = facilities.createAndAddFacility(new IdImpl(6), new CoordImpl(2100, 2200));
+		final ActivityFacilityImpl stop1 = facilities.createAndAddFacility(Id.create(1, ActivityFacility.class), new CoordImpl(100, 200));
+		final ActivityFacilityImpl stop2 = facilities.createAndAddFacility(Id.create(2, ActivityFacility.class), new CoordImpl(2100, 200));
+		final ActivityFacilityImpl stop3 = facilities.createAndAddFacility(Id.create(3, ActivityFacility.class), new CoordImpl(1100, 1200));
+		final ActivityFacilityImpl stop4 = facilities.createAndAddFacility(Id.create(4, ActivityFacility.class), new CoordImpl(2100, 1200));
+		final ActivityFacilityImpl stop5 = facilities.createAndAddFacility(Id.create(5, ActivityFacility.class), new CoordImpl(100, 1200));
+		final ActivityFacilityImpl stop6 = facilities.createAndAddFacility(Id.create(6, ActivityFacility.class), new CoordImpl(2100, 2200));
 
 		// first TableLookupFares, connecting Stops 1-3
 		final Map<Tuple<ActivityFacilityImpl, ActivityFacilityImpl>, Double> fares1 = new HashMap<Tuple<ActivityFacilityImpl, ActivityFacilityImpl>, Double>();
