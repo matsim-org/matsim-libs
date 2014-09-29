@@ -1,6 +1,7 @@
 package org.matsim.contrib.freight.carrier;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 
 /**
  * A shipment from one location to another, with certain size and other constraints such as time-windows and service-times.
@@ -32,19 +33,19 @@ public final class CarrierShipment {
 		 * @param size
 		 * @return the builder
 		 */
-		public static Builder newInstance(Id from, Id to, int size){
+		public static Builder newInstance(Id<Link> from, Id<Link> to, int size){
 			return new Builder(from,to,size);
 		}
 		
-		Id from;
-		Id to;
+		Id<Link> from;
+		Id<Link> to;
 		int size;
 		TimeWindow pickTW = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
 		TimeWindow delTW = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
 		double pickServiceTime = 0.0;
 		double delServiceTime = 0.0;
 		
-		public Builder(Id from, Id to, int size) {
+		public Builder(Id<Link> from, Id<Link> to, int size) {
 			super();
 			this.from = from;
 			this.to = to;
@@ -76,9 +77,9 @@ public final class CarrierShipment {
 		}
 	}
 	
-	private final Id from;
+	private final Id<Link> from;
 
-	private final Id to;
+	private final Id<Link> to;
 
 	private final int size;
 
@@ -125,11 +126,11 @@ public final class CarrierShipment {
 		this.deliveryServiceTime = deliveryServiceTime;
 	}
 
-	public Id getFrom() {
+	public Id<Link> getFrom() {
 		return from;
 	}
 
-	public Id getTo() {
+	public Id<Link> getTo() {
 		return to;
 	}
 

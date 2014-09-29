@@ -22,7 +22,7 @@ public interface Carrier extends HasPlansAndId<CarrierPlan, Carrier> {
 	 * @return id
 	 */
 	@Override
-	public abstract Id getId();
+	public abstract Id<Carrier> getId();
 
 	/**
 	 * Gets a collection of carrierPlans.

@@ -2,6 +2,7 @@ package org.matsim.contrib.freight.carrier;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.vehicles.EngineInformation;
+import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
 
 /**
@@ -31,11 +32,11 @@ public class CarrierVehicleType extends ForwardingVehicleType {
 		 * @param typeId
 		 * @return a type builder
 		 */
-		public static Builder newInstance(Id typeId){
+		public static Builder newInstance(Id<VehicleType> typeId){
 			return new Builder(typeId);
 		}
 		
-		private Id typeId;
+		private Id<VehicleType> typeId;
 		private double fix = 0.0;
 		private double perDistanceUnit = 1.0;
 		private double perTimeUnit = 0.0;
@@ -45,7 +46,7 @@ public class CarrierVehicleType extends ForwardingVehicleType {
 		private double maxVeloInMeterPerSeconds = Double.MAX_VALUE;
 		
 		
-		private Builder(Id typeId){
+		private Builder(Id<VehicleType> typeId){
 			this.typeId = typeId;
 		}
 		

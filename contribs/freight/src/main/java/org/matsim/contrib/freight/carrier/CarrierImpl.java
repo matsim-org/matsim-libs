@@ -15,11 +15,11 @@ import org.matsim.api.core.v01.Id;
  */
 public class CarrierImpl implements Carrier {
 
-	public static Carrier newInstance(Id id){
+	public static Carrier newInstance(Id<Carrier> id){
 		return new CarrierImpl(id);
 	}
 	
-	private final Id id;
+	private final Id<Carrier> id;
 
 	private final List<CarrierPlan> plans;
 
@@ -31,7 +31,7 @@ public class CarrierImpl implements Carrier {
 	
 	private CarrierPlan selectedPlan;
 	
-	private CarrierImpl(final Id id) {
+	private CarrierImpl(final Id<Carrier> id) {
 		super();
 		this.carrierCapabilities = CarrierCapabilities.newInstance();
 		this.id = id;
@@ -40,51 +40,26 @@ public class CarrierImpl implements Carrier {
 		plans = new ArrayList<CarrierPlan>();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see playground.mzilske.freight.Carrier#getId()
-	 */
 	@Override
-	public Id getId() {
+	public Id<Carrier> getId() {
 		return id;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see playground.mzilske.freight.Carrier#getDepotLinkId()
-	 */
 //	@Override
 //	public Id getDepotLinkId() {
 //		return depotLinkId;
 //	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see playground.mzilske.freight.Carrier#getPlans()
-	 */
 	@Override
 	public List<CarrierPlan> getPlans() {
 		return plans;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see playground.mzilske.freight.Carrier#getContracts()
-	 */
 	@Override
 	public Collection<CarrierShipment> getShipments() {
 		return shipments;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see playground.mzilske.freight.Carrier#getSelectedPlan()
-	 */
 	@Override
 	public CarrierPlan getSelectedPlan() {
 		return selectedPlan;
@@ -125,6 +100,7 @@ public class CarrierImpl implements Carrier {
 		return carrierCapabilities;
 	}
 
+	@Override
 	public Collection<CarrierService> getServices(){
 		return services;
 	}

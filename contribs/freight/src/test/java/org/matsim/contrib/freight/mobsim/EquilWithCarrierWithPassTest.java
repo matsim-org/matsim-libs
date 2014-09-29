@@ -20,9 +20,9 @@
 
 package org.matsim.contrib.freight.mobsim;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.controler.CarrierControlerListener;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -37,6 +37,7 @@ public class EquilWithCarrierWithPassTest extends MatsimTestCase {
 
 	private String planFile;
 	
+	@Override
 	public void setUp() throws Exception{
 		super.setUp();
 		String NETWORK_FILENAME = getClassInputDirectory() + "network.xml";
@@ -55,10 +56,10 @@ public class EquilWithCarrierWithPassTest extends MatsimTestCase {
 		config.controler().setLastIteration(2);
 		config.network().setInputFile(NETWORK_FILENAME);
 		config.plans().setInputFile(PLANS_FILENAME);
-		StrategySettings bestScore = new StrategySettings(new IdImpl("1"));
+		StrategySettings bestScore = new StrategySettings(Id.create("1", StrategySettings.class));
 		bestScore.setModuleName("BestScore");
 		bestScore.setProbability(1.0);
-		StrategySettings reRoute = new StrategySettings(new IdImpl("2"));
+		StrategySettings reRoute = new StrategySettings(Id.create("2", StrategySettings.class));
 		reRoute.setModuleName("ReRoute");
 		reRoute.setProbability(0.0);
 		reRoute.setDisableAfter(300);
@@ -86,10 +87,10 @@ public class EquilWithCarrierWithPassTest extends MatsimTestCase {
 		controler.setOverwriteFiles(true);
 		controler.run();
 
-		Carrier carrier1 = carrierControler.getCarriers().get(new IdImpl("carrier1"));
+		Carrier carrier1 = carrierControler.getCarriers().get(Id.create("carrier1", Carrier.class));
 		assertEquals(-170000.0,carrier1.getSelectedPlan().getScore());
 
-		Carrier carrier2 = carrierControler.getCarriers().get(new IdImpl("carrier2"));
+		Carrier carrier2 = carrierControler.getCarriers().get(Id.create("carrier2", Carrier.class));
 		assertEquals(-85000.0,carrier2.getSelectedPlan().getScore());
 
 //		}
@@ -106,7 +107,7 @@ public class EquilWithCarrierWithPassTest extends MatsimTestCase {
 //		controler.setOverwriteFiles(true);
 //		controler.run();	
 //
-//		Carrier carrier1 = carrierControler.getCarriers().get(new IdImpl("carrier1"));
+//		Carrier carrier1 = carrierControler.getCarriers().get(Id.create("carrier1"));
 //		assertEquals(-8040.0,carrier1.getSelectedPlan().getScore());
 //
 //		
@@ -124,7 +125,7 @@ public class EquilWithCarrierWithPassTest extends MatsimTestCase {
 //		controler.setOverwriteFiles(true);
 //		controler.run();	
 //
-//		Carrier carrier2 = carrierControler.getCarriers().get(new IdImpl("carrier2"));
+//		Carrier carrier2 = carrierControler.getCarriers().get(Id.create("carrier2"));
 //		assertEquals(-6572.0,carrier2.getSelectedPlan().getScore());
 //
 //
@@ -138,7 +139,7 @@ public class EquilWithCarrierWithPassTest extends MatsimTestCase {
 //		controler.setOverwriteFiles(true);
 //		controler.run();	
 //
-//		Carrier carrier3 = carrierControler.getCarriers().get(new IdImpl("carrier3"));
+//		Carrier carrier3 = carrierControler.getCarriers().get(Id.create("carrier3"));
 //		assertEquals(-7701.0,carrier3.getSelectedPlan().getScore());
 //
 ////		}

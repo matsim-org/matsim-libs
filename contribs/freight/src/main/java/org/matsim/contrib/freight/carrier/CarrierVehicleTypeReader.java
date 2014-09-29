@@ -5,11 +5,11 @@ import java.util.Stack;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.CarrierVehicleType.VehicleCostInformation;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.vehicles.EngineInformation;
 import org.matsim.vehicles.EngineInformation.FuelType;
 import org.matsim.vehicles.EngineInformationImpl;
+import org.matsim.vehicles.VehicleType;
 import org.xml.sax.Attributes;
 
 /**
@@ -24,7 +24,7 @@ public class CarrierVehicleTypeReader extends MatsimXmlParser {
 	
 	private CarrierVehicleTypes carrierVehicleTypes;
 
-	private Id currentTypeId;
+	private Id<VehicleType> currentTypeId;
 
 	private String currentDescription;
 
@@ -67,7 +67,7 @@ public class CarrierVehicleTypeReader extends MatsimXmlParser {
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		if(name.equals("vehicleType")){
-			this.currentTypeId = makeId(atts.getValue("id"));
+			this.currentTypeId = Id.create(atts.getValue("id"), VehicleType.class);
 		}
 		if(name.equals("allowableWeight")){
 			String weight = atts.getValue("weight");
@@ -105,10 +105,6 @@ public class CarrierVehicleTypeReader extends MatsimXmlParser {
 
 	private double parseDouble(String weight) {
 		return Double.parseDouble(weight);
-	}
-
-	private Id makeId(String value) {
-		return new IdImpl(value);
 	}
 
 	@Override

@@ -20,9 +20,9 @@
 
 package org.matsim.contrib.freight.mobsim;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.controler.CarrierControlerListener;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
@@ -82,10 +82,10 @@ public class EquilWithCarrierWithoutPassTest extends MatsimTestCase {
 			controler.setOverwriteFiles(true);
 			controler.run();
 			
-			Carrier carrier1 = carrierControler.getCarriers().get(new IdImpl("carrier1"));
+			Carrier carrier1 = carrierControler.getCarriers().get(Id.create("carrier1", Carrier.class));
 			assertEquals(-170000.0,carrier1.getSelectedPlan().getScore());
 			
-			Carrier carrier2 = carrierControler.getCarriers().get(new IdImpl("carrier2"));
+			Carrier carrier2 = carrierControler.getCarriers().get(Id.create("carrier2", Carrier.class));
 			assertEquals(-85000.0,carrier2.getSelectedPlan().getScore());
 			
 		}
@@ -102,10 +102,10 @@ public class EquilWithCarrierWithoutPassTest extends MatsimTestCase {
 		controler.setOverwriteFiles(true);
 		controler.run();	
 
-		Carrier carrier1 = carrierControler.getCarriers().get(new IdImpl("carrier1"));	
+		Carrier carrier1 = carrierControler.getCarriers().get(Id.create("carrier1", Carrier.class));	
 		assertEquals(-240.0, carrier1.getSelectedPlan().getScore(),2.0);
 
-		Carrier carrier2 = carrierControler.getCarriers().get(new IdImpl("carrier2"));
+		Carrier carrier2 = carrierControler.getCarriers().get(Id.create("carrier2", Carrier.class));
 		assertEquals(0.0,carrier2.getSelectedPlan().getScore());
 
 	}
@@ -117,7 +117,7 @@ public class EquilWithCarrierWithoutPassTest extends MatsimTestCase {
 		controler.setOverwriteFiles(true);
 		controler.run();	
 
-		Carrier carrier1 = carrierControler.getCarriers().get(new IdImpl("carrier1"));	
+		Carrier carrier1 = carrierControler.getCarriers().get(Id.create("carrier1", Carrier.class));	
 		assertEquals(-4871.0, carrier1.getSelectedPlan().getScore(),2.0);
 
 		

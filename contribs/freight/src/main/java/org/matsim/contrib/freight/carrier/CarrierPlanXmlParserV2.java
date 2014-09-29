@@ -12,7 +12,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.Builder;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -20,6 +19,8 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.EngineInformation;
 import org.matsim.vehicles.EngineInformation.FuelType;
 import org.matsim.vehicles.EngineInformationImpl;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
 import org.xml.sax.Attributes;
 
 class CarrierPlanXmlParserV2 extends MatsimXmlParser {
@@ -66,7 +67,7 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 
 	private Tour.Builder currentTourBuilder = null;
 
-	private Id previousActLoc = null;
+	private Id<Link> previousActLoc = null;
 
 	private String previousRouteContent;
 
@@ -93,11 +94,11 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 
 	private org.matsim.contrib.freight.carrier.CarrierVehicleType.Builder vehicleTypeBuilder;
 
-	private Map<Id, CarrierVehicleType> vehicleTypeMap = new HashMap<Id, CarrierVehicleType>();
+	private Map<Id<VehicleType>, CarrierVehicleType> vehicleTypeMap = new HashMap<>();
 
 	private double currentStartTime;
 	
-	private Map<Id,CarrierService> serviceMap;
+	private Map<Id<CarrierService>, CarrierService> serviceMap;
 
 	/**
 	 * Constructs a reader with an empty carriers-container for the carriers to be constructed. 
@@ -109,28 +110,24 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 		this.carriers = carriers;
 	}
 
-	private Id createId(String id) {
-		return new IdImpl(id);
-	}
-
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		if (name.equals(CARRIER)) {
 			String id = atts.getValue(ID);
 			if(id == null) throw new IllegalStateException("carrierId is missing.");
-			currentCarrier = CarrierImpl.newInstance(createId(id));
+			currentCarrier = CarrierImpl.newInstance(Id.create(id, Carrier.class));
 		}
 		//services
 		else if (name.equals("services")) {
-			serviceMap = new HashMap<Id, CarrierService>();
+			serviceMap = new HashMap<>();
 		}
 		else if (name.equals("service")) {
 			String idString = atts.getValue("id");
 			if(idString == null) throw new IllegalStateException("service.id is missing.");
-			Id id = makeId(idString);
+			Id<CarrierService> id = Id.create(idString, CarrierService.class);
 			String toLocation = atts.getValue("to");
 			if(toLocation == null) throw new IllegalStateException("service.to is missing. ");
-			Id to = makeId(toLocation);
+			Id<Link> to = Id.create(toLocation, Link.class);
 			CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(id, to);
 			String capDemandString = atts.getValue("capacityDemand");
 			if(capDemandString != null) serviceBuilder.setCapacityDemand(getInt(capDemandString));
@@ -159,7 +156,7 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 			String sizeString = atts.getValue(SIZE);
 			if(sizeString == null) throw new IllegalStateException("shipment.size is missing.");
 			int size = getInt(sizeString);
-			CarrierShipment.Builder shipmentBuilder = CarrierShipment.Builder.newInstance(createId(from), createId(to), size);
+			CarrierShipment.Builder shipmentBuilder = CarrierShipment.Builder.newInstance(Id.create(from, Link.class), Id.create(to, Link.class), size);
 			
 			String startPickup = atts.getValue("startPickup");
 			String endPickup = atts.getValue("endPickup");
@@ -195,7 +192,7 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 		else if(name.equals("vehicleType")){
 			String typeId = atts.getValue("id");
 			if(typeId == null) throw new IllegalStateException("vehicleTypeId is missing.");
-			this.vehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(makeId(typeId)); 
+			this.vehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(Id.create(typeId, VehicleType.class)); 
 		}
 		else if(name.equals("engineInformation")){
 			String fuelType = atts.getValue("fuelType");
@@ -221,11 +218,11 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 			if(vId == null) throw new IllegalStateException("vehicleId is missing.");
 			String depotLinkId = atts.getValue("depotLinkId");
 			if(depotLinkId == null) throw new IllegalStateException("depotLinkId of vehicle is missing.");
-			CarrierVehicle.Builder vehicleBuilder = CarrierVehicle.Builder.newInstance(makeId(vId), makeId(depotLinkId));
+			CarrierVehicle.Builder vehicleBuilder = CarrierVehicle.Builder.newInstance(Id.create(vId, Vehicle.class), Id.create(depotLinkId, Link.class));
 			String typeId = atts.getValue("typeId");
 			if(typeId == null) throw new IllegalStateException("vehicleTypeId is missing.");
-			CarrierVehicleType vehicleType = vehicleTypeMap.get(makeId(typeId));
-			vehicleBuilder.setTypeId(makeId(typeId));
+			CarrierVehicleType vehicleType = vehicleTypeMap.get(Id.create(typeId, VehicleType.class));
+			vehicleBuilder.setTypeId(Id.create(typeId, VehicleType.class));
 			if(vehicleType != null) vehicleBuilder.setType(vehicleType);
 			String startTime = atts.getValue(VEHICLESTART);
 			if(startTime != null) vehicleBuilder.setEarliestStart(parseTimeToDouble(startTime));
@@ -291,7 +288,7 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 			} else if (type.equals("service")){
 				String id = atts.getValue("serviceId");
 				if(id == null) throw new IllegalStateException("act.serviceId is missing.");
-				CarrierService s = serviceMap.get(makeId(id));
+				CarrierService s = serviceMap.get(Id.create(id, CarrierService.class));
 				if(s == null) throw new IllegalStateException("serviceId is not known.");
 				finishLeg(s.getLocationLinkId());
 				currentTourBuilder.scheduleService(s);
@@ -355,7 +352,7 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 		throw new IllegalStateException("fuelType " + fuelType + " is not supported");
 	}
 
-	private void finishLeg(Id toLocation) {
+	private void finishLeg(Id<Link> toLocation) {
 		LinkNetworkRouteImpl route = null;
 		if (previousRouteContent != null) {
 			List<Id<Link>> linkIds = NetworkUtils.getLinkIds(previousRouteContent);
@@ -379,10 +376,6 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 
 	private int getInt(String value) {
 		return Integer.parseInt(value);
-	}
-
-	private Id makeId(String value) {
-		return new IdImpl(value);
 	}
 
 }

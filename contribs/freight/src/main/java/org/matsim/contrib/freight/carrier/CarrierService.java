@@ -1,25 +1,26 @@
 package org.matsim.contrib.freight.carrier;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 
 
 public class CarrierService  {
 
 	public static class Builder {
 		
-		public static Builder newInstance(Id id, Id locationLinkId){
+		public static Builder newInstance(Id<CarrierService> id, Id<Link> locationLinkId){
 			return new Builder(id,locationLinkId);
 		}
 		
-		private Id id;
-		private Id locationLinkId;
+		private Id<CarrierService> id;
+		private Id<Link> locationLinkId;
 		private String name = "service";
 		
 		private double serviceTime = 0.0;
 		private TimeWindow timeWindow = TimeWindow.newInstance(0.0, Integer.MAX_VALUE);
 		private int capacityDemand = 0;
 		
-		private Builder(Id id, Id locationLinkId) {
+		private Builder(Id<CarrierService> id, Id<Link> locationLinkId) {
 			super();
 			this.id = id;
 			this.locationLinkId = locationLinkId;
@@ -67,9 +68,9 @@ public class CarrierService  {
 	}
 	
 	
-	private final Id id;
+	private final Id<CarrierService> id;
 
-	private final Id locationId;
+	private final Id<Link> locationId;
 	
 	private final String name;
 	
@@ -88,11 +89,11 @@ public class CarrierService  {
 		name = builder.name;
 	}
 
-	public Id getId() {
+	public Id<CarrierService> getId() {
 		return id;
 	}
 
-	public Id getLocationLinkId() {
+	public Id<Link> getLocationLinkId() {
 		return locationId;
 	}
 

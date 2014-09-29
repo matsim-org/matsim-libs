@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.CarrierVehicleType;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -81,12 +80,12 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 	 */
 	static class MatsimVehicleWrapper implements org.matsim.vehicles.Vehicle {
 
-		private Id id;
+		private Id<org.matsim.vehicles.Vehicle> id;
 		
 		private VehicleType type;
 
 		public MatsimVehicleWrapper(jsprit.core.problem.vehicle.Vehicle vehicle) {
-			this.id = makeId(vehicle.getId());
+			this.id = Id.create(vehicle.getId(), org.matsim.vehicles.Vehicle.class);
 			this.type = makeType(vehicle.getType().getTypeId(),vehicle.getType().getMaxVelocity());
 		}
 		
@@ -96,17 +95,13 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		}
 
 		private VehicleType makeType(String typeId, double maxVelocity) {
-			VehicleTypeImpl vehicleTypeImpl = new VehicleTypeImpl(makeId(typeId));
+			VehicleTypeImpl vehicleTypeImpl = new VehicleTypeImpl(Id.create(typeId, org.matsim.vehicles.VehicleType.class));
 			vehicleTypeImpl.setMaximumVelocity(maxVelocity);
 			return vehicleTypeImpl;
 		}
 
-		private Id makeId(String id) {
-			return new IdImpl(id);
-		}
-
 		@Override
-		public Id getId() {
+		public Id<org.matsim.vehicles.Vehicle> getId() {
 			return id;
 		}
 
@@ -301,7 +296,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		@Override
 		public double getLinkTravelDisutility(Link link, double time, Person person, org.matsim.vehicles.Vehicle vehicle) {
 			double costs = baseTransportDisutility.getLinkTravelDisutility(link, time, person, vehicle);
-			Id typeId = vehicle.getType().getId();
+			Id<org.matsim.vehicles.VehicleType> typeId = vehicle.getType().getId();
 			double toll = vehicleTypeDependentPricingCalculator.getTollAmount(typeId, link, time);
 //			System.out.println("huuuuuuuuuuuuuuuuuuuu - paid toll");
 			return costs + toll;
@@ -552,8 +547,8 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		}
 		else{
 			informStartCalc();
-			Id fromLinkId = makeId(fromId);
-			Id toLinkId = makeId(toId);
+			Id<Link> fromLinkId = Id.create(fromId, Link.class);
+			Id<Link> toLinkId = Id.create(toId, Link.class);
 			Link fromLink = network.getLinks().get(fromLinkId);
 			Link toLink = network.getLinks().get(toLinkId);
 			org.matsim.vehicles.Vehicle matsimVehicle = getMatsimVehicle(vehicle);
@@ -597,8 +592,8 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 			return 0.0;
 		}
 		if(vehicle == null) throw new IllegalStateException("cannot calculate transport-costs since vehicle is missing");
-		Id fromLinkId = makeId(fromId);
-		Id toLinkId = makeId(toId);
+		Id<Link> fromLinkId = Id.create(fromId, Link.class);
+		Id<Link> toLinkId = Id.create(toId, Link.class);
 		Link fromLink = network.getLinks().get(fromLinkId);
 		Link toLink = network.getLinks().get(toLinkId);
 		LeastCostPathCalculator router = createLeastCostPathCalculator();
@@ -663,10 +658,6 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		return getTransportTime(fromId, toId, arrivalTime, driver, vehicle);
 	}
 
-	private IdImpl makeId(String id) {
-		return new IdImpl(id);
-	}
-
 	private org.matsim.vehicles.Vehicle getMatsimVehicle(Vehicle vehicle) {
 		String typeId = vehicle.getType().getTypeId();
 		if(matsimVehicles.containsKey(typeId)){
@@ -698,7 +689,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 	}
 	
 	private int getTimeSlice(double time) {
-		int timeSlice = (int) (time/(double)timeSliceWidth);
+		int timeSlice = (int) (time/timeSliceWidth);
 		return timeSlice;
 	}
 

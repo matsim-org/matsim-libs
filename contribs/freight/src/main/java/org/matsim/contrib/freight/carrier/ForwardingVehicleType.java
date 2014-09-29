@@ -51,7 +51,7 @@ public class ForwardingVehicleType implements VehicleType{
 	public VehicleCapacity getCapacity() { return vType.getCapacity(); }
 
 	@Override
-	public Id getId() { return vType.getId(); }
+	public Id<VehicleType> getId() { return vType.getId(); }
 
 	@Override
 	@Deprecated

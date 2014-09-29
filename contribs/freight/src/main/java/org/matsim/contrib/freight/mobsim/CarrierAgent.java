@@ -35,7 +35,6 @@ import org.matsim.contrib.freight.carrier.Tour.Pickup;
 import org.matsim.contrib.freight.carrier.Tour.TourActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.contrib.freight.scoring.FreightActivity;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -73,13 +72,13 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 
 		private List<Id<Link>> currentRoute;
 
-		private final Id driverId;
+		private final Id<Person> driverId;
 
 		private final ScheduledTour scheduledTour;
 
 		private int activityCounter = 1;
 
-		CarrierDriverAgent(Id driverId, ScheduledTour tour) {
+		CarrierDriverAgent(Id<Person> driverId, ScheduledTour tour) {
 			this.driverId = driverId;
 			this.scheduledTour = tour;
 			new HashMap<Integer, CarrierShipment>();
@@ -100,7 +99,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 				currentLeg.setRoute(networkRoute);
 				currentRoute = null;
 			} else {
-				Id startLink;
+				Id<Link> startLink;
 				if(currentRoute.size() != 0){
 					startLink = currentRoute.get(0);
 				}
@@ -190,19 +189,19 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 		}
 	}
 
-	private final Id id;
+	private final Id<Carrier> id;
 
 	private final Carrier carrier;
 
 	private final CarrierAgentTracker tracker;
 
-	private Collection<Id> driverIds = new ArrayList<Id>();
+	private Collection<Id<Person>> driverIds = new ArrayList<>();
 
 	private int nextId = 0;
 
-	private Map<Id, CarrierDriverAgent> carrierDriverAgents = new HashMap<Id, CarrierDriverAgent>();
+	private Map<Id<Person>, CarrierDriverAgent> carrierDriverAgents = new HashMap<>();
 
-	private Map<Id, ScheduledTour> driverTourMap = new HashMap<Id, ScheduledTour>();
+	private Map<Id<Person>, ScheduledTour> driverTourMap = new HashMap<>();
 
 	private final ScoringFunction scoringFunction;
 
@@ -214,7 +213,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 		this.scoringFunction = carrierScoringFunction;
 	}
 
-	public Id getId() {
+	public Id<Carrier> getId() {
 		return id;
 	}
 
@@ -236,7 +235,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 			return routes;
 		}
 		for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
-			Id driverId = createDriverId(scheduledTour.getVehicle());
+			Id<Person> driverId = createDriverId(scheduledTour.getVehicle());
 			CarrierVehicle carrierVehicle = scheduledTour.getVehicle();
 			Person driverPerson = createDriverPerson(driverId);
 			Vehicle vehicle = createVehicle(driverPerson,carrierVehicle);
@@ -288,17 +287,17 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 		nextId = 0;
 	}
 
-	public Collection<Id> getDriverIds() {
+	public Collection<Id<Person>> getDriverIds() {
 		return Collections.unmodifiableCollection(driverIds);
 	}
 
-	private Person createDriverPerson(Id driverId) {
+	private Person createDriverPerson(Id<Person> driverId) {
 		Person person = new PersonImpl(driverId);
 		return person;
 	}
 
-	private Id createDriverId(CarrierVehicle carrierVehicle) {
-		IdImpl id = new IdImpl("freight_" + carrier.getId() + "_veh_" + carrierVehicle.getVehicleId() + "_" + nextId);
+	private Id<Person> createDriverId(CarrierVehicle carrierVehicle) {
+		Id<Person> id = Id.create("freight_" + carrier.getId() + "_veh_" + carrierVehicle.getVehicleId() + "_" + nextId, Person.class);
 		driverIds.add(id);
 		++nextId;
 		return id;
@@ -353,7 +352,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 		getDriver(event.getPersonId()).handleEvent(event);
 	}
 
-	CarrierDriverAgent getDriver(Id driverId){
+	CarrierDriverAgent getDriver(Id<Person> driverId){
 		return carrierDriverAgents.get(driverId);
 	}
 

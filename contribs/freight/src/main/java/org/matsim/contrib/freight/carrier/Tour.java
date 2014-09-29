@@ -275,7 +275,7 @@ public class Tour {
 
 		public abstract String getActivityType();
 
-		public abstract Id getLocation();
+		public abstract Id<Link> getLocation();
 
 		public abstract double getDuration();
 

@@ -10,11 +10,12 @@ import java.util.Stack;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
 import org.xml.sax.Attributes;
 
 /**
@@ -69,7 +70,7 @@ public class CarrierPlanReader extends MatsimXmlParser {
 
 	private Double currentStartTime = null;
 
-	private Id previousActLoc = null;
+	private Id<Link> previousActLoc = null;
 
 	private String previousRouteContent;
 
@@ -116,15 +117,11 @@ public class CarrierPlanReader extends MatsimXmlParser {
 
 	}
 	
-	private Id createId(String id) {
-		return new IdImpl(id);
-	}
-
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		if (name.equals(CARRIER)) {
 			String id = atts.getValue(ID);
-			currentCarrier = CarrierImpl.newInstance(createId(id)); 
+			currentCarrier = CarrierImpl.newInstance(Id.create(id, Carrier.class)); 
 		}
 		if (name.equals(SHIPMENTS)) {
 			currentShipments = new HashMap<String, CarrierShipment>();
@@ -139,7 +136,7 @@ public class CarrierPlanReader extends MatsimXmlParser {
 			String endDelivery = atts.getValue("endDelivery");
 			String pickupServiceTime = atts.getValue("pickupServiceTime");
 			String deliveryServiceTime = atts.getValue("deliveryServiceTime");
-			CarrierShipment.Builder shipmentBuilder = CarrierShipment.Builder.newInstance(createId(from), createId(to), size);
+			CarrierShipment.Builder shipmentBuilder = CarrierShipment.Builder.newInstance(Id.create(from, Link.class), Id.create(to, Link.class), size);
 			if (startPickup == null) {
 				shipmentBuilder.setPickupTimeWindow(TimeWindow.newInstance(0.0, Integer.MAX_VALUE)).setDeliveryTimeWindow(TimeWindow.newInstance(0.0, Integer.MAX_VALUE));
 			} else {
@@ -166,9 +163,9 @@ public class CarrierPlanReader extends MatsimXmlParser {
 				logger.warn("no vehicle type. set type='default' -> defaultVehicleType (see CarrierVehicleTypeImpl)");
 				typeId = "default";
 			}
-			CarrierVehicle.Builder vehicleBuilder = CarrierVehicle.Builder.newInstance(createId(vId), createId(linkId));
-			vehicleBuilder.setTypeId(createId(typeId));
-			vehicleBuilder.setType(CarrierVehicleType.Builder.newInstance(createId(typeId)).build());
+			CarrierVehicle.Builder vehicleBuilder = CarrierVehicle.Builder.newInstance(Id.create(vId, Vehicle.class), Id.create(linkId, Link.class));
+			vehicleBuilder.setTypeId(Id.create(typeId, VehicleType.class));
+			vehicleBuilder.setType(CarrierVehicleType.Builder.newInstance(Id.create(typeId, VehicleType.class)).build());
 			if (startTime != null) vehicleBuilder.setEarliestStart(getDouble(startTime));
 			if (endTime != null) vehicleBuilder.setLatestEnd(getDouble(endTime));
 			CarrierVehicle vehicle = vehicleBuilder.build();
@@ -228,7 +225,7 @@ public class CarrierPlanReader extends MatsimXmlParser {
 		}
 	}
 
-	private void finishLeg(Id toLocation) {
+	private void finishLeg(Id<Link> toLocation) {
 		LinkNetworkRouteImpl route = null;
 		if (previousRouteContent != null) {
 			List<Id<Link>> linkIds = NetworkUtils.getLinkIds(previousRouteContent);

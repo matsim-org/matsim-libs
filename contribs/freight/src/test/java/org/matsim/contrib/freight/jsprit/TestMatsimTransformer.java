@@ -19,6 +19,9 @@ import jsprit.core.problem.vehicle.VehicleType;
 import jsprit.core.problem.vehicle.VehicleTypeImpl;
 
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierImpl;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.CarrierService;
@@ -28,7 +31,6 @@ import org.matsim.contrib.freight.carrier.CarrierVehicleType;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.contrib.freight.carrier.Tour;
-import org.matsim.core.basic.v01.IdImpl;
 
 public class TestMatsimTransformer {
 	
@@ -92,7 +94,7 @@ public class TestMatsimTransformer {
 	
 	@Test
 	public void whenTransforming_matsimService2jspritService_isMadeCorrectly(){
-		CarrierService carrierService = CarrierService.Builder.newInstance(new IdImpl("serviceId"), new IdImpl("locationId"))
+		CarrierService carrierService = CarrierService.Builder.newInstance(Id.create("serviceId", CarrierService.class), Id.create("locationId", Link.class))
 				.setCapacityDemand(50).setServiceDuration(30.0).setServiceStartTimeWindow(TimeWindow.newInstance(10.0, 20.0)).build();
 		Service service = MatsimJspritFactory.createService(carrierService, null);
 		assertNotNull(service);
@@ -199,7 +201,7 @@ public class TestMatsimTransformer {
 		List<ScheduledTour> sTours = new ArrayList<ScheduledTour>();
 		sTours.add(getMatsimTour());
 		sTours.add(getMatsimTour());
-		CarrierPlan plan = new CarrierPlan(CarrierImpl.newInstance(new IdImpl("myCarrier")), sTours);
+		CarrierPlan plan = new CarrierPlan(CarrierImpl.newInstance(Id.create("myCarrier", Carrier.class)), sTours);
 		plan.setScore(-100.0);
 		VehicleRoutingProblemSolution solution = MatsimJspritFactory.createSolution(plan, null);
 		assertNotNull(solution);
@@ -209,8 +211,8 @@ public class TestMatsimTransformer {
 	}
 
 	private ScheduledTour getMatsimServiceTour() {
-		CarrierService s1 = CarrierService.Builder.newInstance(new IdImpl("serviceId"),new IdImpl("to1")).setCapacityDemand(20).build();
-		CarrierService s2 = CarrierService.Builder.newInstance(new IdImpl("serviceId2"),new IdImpl("to2")).setCapacityDemand(10).build();
+		CarrierService s1 = CarrierService.Builder.newInstance(Id.create("serviceId", CarrierService.class),Id.create("to1", Link.class)).setCapacityDemand(20).build();
+		CarrierService s2 = CarrierService.Builder.newInstance(Id.create("serviceId2", CarrierService.class),Id.create("to2", Link.class)).setCapacityDemand(10).build();
 		CarrierVehicle matsimVehicle = getMatsimVehicle(getMatsimVehicleType());
 		double startTime = 15.0;
 		Tour.Builder sTourBuilder = Tour.Builder.newInstance();
@@ -245,17 +247,17 @@ public class TestMatsimTransformer {
 	}
 
 	private CarrierVehicle getMatsimVehicle(CarrierVehicleType matsimType) {
-		return CarrierVehicle.Builder.newInstance(new IdImpl("matsimVehicle"), new IdImpl("loc")).setEarliestStart(10.0).setLatestEnd(20.0).setType(matsimType).build();
+		return CarrierVehicle.Builder.newInstance(Id.create("matsimVehicle", org.matsim.vehicles.Vehicle.class), Id.create("loc", Link.class)).setEarliestStart(10.0).setLatestEnd(20.0).setType(matsimType).build();
 	}
 
 	private CarrierVehicleType getMatsimVehicleType() {
-		CarrierVehicleType matsimType = CarrierVehicleType.Builder.newInstance(new IdImpl("matsimType")).setCapacity(50).setCostPerDistanceUnit(10.0).setCostPerTimeUnit(5.0)
+		CarrierVehicleType matsimType = CarrierVehicleType.Builder.newInstance(Id.create("matsimType", org.matsim.vehicles.VehicleType.class)).setCapacity(50).setCostPerDistanceUnit(10.0).setCostPerTimeUnit(5.0)
 				.setFixCost(100.0).build();
 		return matsimType;
 	}
 
 	private CarrierShipment getMatsimShipment(String from, String to, int size) {
-		return CarrierShipment.Builder.newInstance(new IdImpl(from), new IdImpl(to), size).setDeliveryServiceTime(30.0).
+		return CarrierShipment.Builder.newInstance(Id.create(from, Link.class), Id.create(to, Link.class), size).setDeliveryServiceTime(30.0).
 				setDeliveryTimeWindow(TimeWindow.newInstance(10.0, 20.0)).build();
 	}
 }

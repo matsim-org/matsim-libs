@@ -1,6 +1,6 @@
 package org.matsim.contrib.freight.carrier;
 
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
 import org.matsim.testcases.MatsimTestCase;
 
 public class CarrierVehicleTypeLoaderTest extends MatsimTestCase{
@@ -9,6 +9,7 @@ public class CarrierVehicleTypeLoaderTest extends MatsimTestCase{
 	
 	Carriers carriers;
 	
+	@Override
 	public void setUp() throws Exception{
 		super.setUp();
 		types = new CarrierVehicleTypes();
@@ -32,7 +33,7 @@ public class CarrierVehicleTypeLoaderTest extends MatsimTestCase{
 	}
 
 	private CarrierVehicle getVehicle(String vehicleName) {
-		for(CarrierVehicle v : carriers.getCarriers().get(new IdImpl("testCarrier")).getCarrierCapabilities().getCarrierVehicles()){
+		for(CarrierVehicle v : carriers.getCarriers().get(Id.create("testCarrier", Carrier.class)).getCarrierCapabilities().getCarrierVehicles()){
 			if(v.getVehicleId().toString().equals(vehicleName)){
 				return v;
 			}

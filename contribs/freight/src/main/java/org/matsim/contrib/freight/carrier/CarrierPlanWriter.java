@@ -6,12 +6,14 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import jsprit.core.problem.job.Shipment;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.contrib.freight.carrier.Tour.ShipmentBasedActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
@@ -30,7 +32,7 @@ public class CarrierPlanWriter extends MatsimXmlWriter {
 
 	private int idCounter = 0;
 
-	private Map<CarrierShipment, Id> registeredShipments = new HashMap<CarrierShipment, Id>();
+	private Map<CarrierShipment, Id<Shipment>> registeredShipments = new HashMap<CarrierShipment, Id<Shipment>>();
 
 	/**
 	 * Constructs the writer with the carriers to be written.
@@ -98,7 +100,7 @@ public class CarrierPlanWriter extends MatsimXmlWriter {
 		writer.write("\t\t\t<shipments>\n");
 		for (CarrierShipment s : carrier.getShipments()) {
 			// CarrierShipment s = contract.getShipment();
-			Id shipmentId = createId();
+			Id<Shipment> shipmentId = Id.create(++idCounter, Shipment.class);
 			registeredShipments.put(s, shipmentId);
 			writer.write("\t\t\t\t<shipment ");
 			writer.write("id=\"" + shipmentId + "\" ");
@@ -168,8 +170,7 @@ public class CarrierPlanWriter extends MatsimXmlWriter {
 							writer.write("\n");
 							writer.write("\t\t\t\t\t\t<route>");
 							boolean firstLink = true;
-							for (Id id : ((NetworkRoute) leg.getRoute())
-									.getLinkIds()) {
+							for (Id<Link> id : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
 								if (firstLink) {
 									writer.write(id.toString());
 									firstLink = false;
@@ -206,11 +207,6 @@ public class CarrierPlanWriter extends MatsimXmlWriter {
 	private void endCarrier(BufferedWriter writer) throws IOException {
 		writer.write("\t\t</carrier>\n\n");
 		registeredShipments.clear();
-	}
-
-	private Id createId() {
-		idCounter++;
-		return new IdImpl(idCounter);
 	}
 
 	private void endCarriers(BufferedWriter writer) throws IOException {

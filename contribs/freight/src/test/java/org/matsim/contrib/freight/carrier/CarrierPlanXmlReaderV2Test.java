@@ -8,19 +8,20 @@ import java.util.List;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.vehicles.Vehicle;
 
 public class CarrierPlanXmlReaderV2Test extends MatsimTestCase {
 	
 	Carrier testCarrier;
 	
+	@Override
 	public void setUp() throws Exception{
 		super.setUp();
 		Carriers carriers = new Carriers();
 		String classInputDirectory = getClassInputDirectory();
 		new CarrierPlanXmlReaderV2(carriers).read(classInputDirectory + "carrierPlansEquils.xml");
-		testCarrier = carriers.getCarriers().get(makeId("testCarrier"));
+		testCarrier = carriers.getCarriers().get(Id.create("testCarrier", Carrier.class));
 	}
 	
 	@Test
@@ -45,7 +46,8 @@ public class CarrierPlanXmlReaderV2Test extends MatsimTestCase {
 	public void test_whenReadingCarrier_itReadsVehiclesCorrectly(){
 		Collection<CarrierVehicle> carrierVehicles = testCarrier.getCarrierCapabilities().getCarrierVehicles();
 		assertEquals(3,carrierVehicles.size());
-		assertTrue(exactlyTheseVehiclesAreInVehicleCollection(Arrays.asList(makeId("lightVehicle"),makeId("mediumVehicle"),makeId("heavyVehicle")),carrierVehicles));
+		assertTrue(exactlyTheseVehiclesAreInVehicleCollection(Arrays.asList(Id.create("lightVehicle", Vehicle.class),
+				Id.create("mediumVehicle", Vehicle.class),Id.create("heavyVehicle", Vehicle.class)),carrierVehicles));
 	}
 	
 	@Test
@@ -73,7 +75,7 @@ public class CarrierPlanXmlReaderV2Test extends MatsimTestCase {
 		Carriers carriers = new Carriers();
 		String classInputDirectory = getClassInputDirectory();
 		new CarrierPlanXmlReaderV2(carriers).read(classInputDirectory + "carrierPlansEquilsFiniteFleet.xml");
-		assertEquals(FleetSize.FINITE, carriers.getCarriers().get(makeId("testCarrier")).getCarrierCapabilities().getFleetSize());
+		assertEquals(FleetSize.FINITE, carriers.getCarriers().get(Id.create("testCarrier", Carrier.class)).getCarrierCapabilities().getFleetSize());
 	}
 	
 	@Test
@@ -109,7 +111,7 @@ public class CarrierPlanXmlReaderV2Test extends MatsimTestCase {
 	}
 	
 	
-	private boolean exactlyTheseVehiclesAreInVehicleCollection(List<Id> asList, Collection<CarrierVehicle> carrierVehicles) {
+	private boolean exactlyTheseVehiclesAreInVehicleCollection(List<Id<Vehicle>> asList, Collection<CarrierVehicle> carrierVehicles) {
 		List<CarrierVehicle> vehicles = new ArrayList<CarrierVehicle>(carrierVehicles);
 		for(CarrierVehicle type : carrierVehicles) if(asList.contains(type.getVehicleId())) vehicles.remove(type);
 		return vehicles.isEmpty();
@@ -124,8 +126,4 @@ public class CarrierPlanXmlReaderV2Test extends MatsimTestCase {
 		return null;
 	}
 	
-	private Id makeId(String id) {
-		return new IdImpl(id);
-	}
-
 }

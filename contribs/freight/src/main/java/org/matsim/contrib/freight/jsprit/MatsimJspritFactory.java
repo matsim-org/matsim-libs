@@ -53,7 +53,6 @@ import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
-import org.matsim.core.basic.v01.IdImpl;
 
 
 /**
@@ -66,12 +65,9 @@ public class MatsimJspritFactory {
 
 	private static Logger log = Logger.getLogger(MatsimJspritFactory.class);
 	
-	private static Id makeId(String id) {
-		return new IdImpl(id);
-	}
-	
 	static CarrierShipment createCarrierShipment(Service service, String depotLink){
-		CarrierShipment carrierShipment = CarrierShipment.Builder.newInstance(makeId(depotLink), makeId(service.getLocationId()), service.getSize().get(0)).
+		CarrierShipment carrierShipment = CarrierShipment.Builder.newInstance(Id.create(depotLink, Link.class),
+				Id.create(service.getLocationId(), Link.class), service.getSize().get(0)).
 				setDeliveryServiceTime(service.getServiceDuration()).
 				setDeliveryTimeWindow(TimeWindow.newInstance(service.getTimeWindow().getStart(),service.getTimeWindow().getEnd())).build();
 		return carrierShipment;
@@ -90,7 +86,7 @@ public class MatsimJspritFactory {
 	}
 	
 	static CarrierService createCarrierService(Service service) {
-		CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(makeId(service.getId()), makeId(service.getLocationId()));
+		CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(Id.create(service.getId(), CarrierService.class), Id.create(service.getLocationId(), Link.class));
 		serviceBuilder.setCapacityDemand(service.getSize().get(0));
 		serviceBuilder.setServiceDuration(service.getServiceDuration());
 		serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(service.getTimeWindow().getStart(), service.getTimeWindow().getEnd()));
@@ -133,7 +129,7 @@ public class MatsimJspritFactory {
 	 */
 	static CarrierVehicle createCarrierVehicle(Vehicle vehicle){
 		String vehicleId = vehicle.getId();
-		CarrierVehicle.Builder vehicleBuilder = CarrierVehicle.Builder.newInstance(makeId(vehicleId), makeId(vehicle.getStartLocationId()));
+		CarrierVehicle.Builder vehicleBuilder = CarrierVehicle.Builder.newInstance(Id.create(vehicleId, org.matsim.vehicles.Vehicle.class), Id.create(vehicle.getStartLocationId(), Link.class));
 		CarrierVehicleType carrierVehicleType = createCarrierVehicleType(vehicle.getType());
 		vehicleBuilder.setType(carrierVehicleType);
 		vehicleBuilder.setEarliestStart(vehicle.getEarliestDeparture());
@@ -155,7 +151,7 @@ public class MatsimJspritFactory {
 	 * @return CarrierVehicleType
 	 */
 	static CarrierVehicleType createCarrierVehicleType(VehicleType type){
-		CarrierVehicleType.Builder typeBuilder = CarrierVehicleType.Builder.newInstance(makeId(type.getTypeId()));
+		CarrierVehicleType.Builder typeBuilder = CarrierVehicleType.Builder.newInstance(Id.create(type.getTypeId(), org.matsim.vehicles.VehicleType.class));
 		typeBuilder.setCapacity(type.getCapacityDimensions().get(0));
 		typeBuilder.setCostPerDistanceUnit(type.getVehicleCostParams().perDistanceUnit).setCostPerTimeUnit(type.getVehicleCostParams().perTimeUnit)
 		.setFixCost(type.getVehicleCostParams().fix);
@@ -194,7 +190,7 @@ public class MatsimJspritFactory {
 		double depTime = route.getStart().getEndTime();
  
 		Tour.Builder tourBuilder = Tour.Builder.newInstance();
-		tourBuilder.scheduleStart(makeId(route.getStart().getLocationId()));
+		tourBuilder.scheduleStart(Id.create(route.getStart().getLocationId(), Link.class));
 		for (TourActivity act : tour.getActivities()) {
 			if(act instanceof ServiceActivity || act instanceof PickupService){
 				Service job = (Service) ((JobActivity) act).getJob();				 
@@ -207,14 +203,14 @@ public class MatsimJspritFactory {
 			}
 		}
 		tourBuilder.addLeg(new Leg());
-		tourBuilder.scheduleEnd(makeId(route.getEnd().getLocationId()));
+		tourBuilder.scheduleEnd(Id.create(route.getEnd().getLocationId(), Link.class));
 		org.matsim.contrib.freight.carrier.Tour vehicleTour = tourBuilder.build();
 		ScheduledTour sTour = ScheduledTour.newInstance(vehicleTour, carrierVehicle, depTime);
 		assert route.getDepartureTime() == sTour.getDeparture() : "departureTime of both route and scheduledTour must be equal";
 		return sTour;
 	}
 	
-	private static Coord findCoord(Id linkId, Network network) {
+	private static Coord findCoord(Id<Link> linkId, Network network) {
 		if(network == null) return null;
 		Link l = network.getLinks().get(linkId);
 		if(l == null) throw new IllegalStateException("link to linkId " + linkId + " is missing.");
@@ -400,7 +396,7 @@ public class MatsimJspritFactory {
 	 * @return {@link Carrier}
 	 */
 	public static Carrier createCarrier(String carrierId, VehicleRoutingProblem vrp){
-		Id id = makeId(carrierId);
+		Id<Carrier> id = Id.create(carrierId, Carrier.class);
 		Carrier carrier = CarrierImpl.newInstance(id);
 		CarrierCapabilities.Builder capabilityBuilder = CarrierCapabilities.Builder.newInstance();
 

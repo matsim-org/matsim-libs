@@ -22,7 +22,6 @@ import jsprit.core.problem.vehicle.VehicleType;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 
@@ -61,14 +60,14 @@ public class VehicleTypeDependentRoadPricingCalculator {
 	}
 	
 	
-	private Map<Id, Collection<RoadPricingScheme>> schemes = new HashMap<Id, Collection<RoadPricingScheme>>();
+	private Map<Id<org.matsim.vehicles.VehicleType>, Collection<RoadPricingScheme>> schemes = new HashMap<>();
 
 	private Map<String,TollCalculator> calculators = new HashMap<String, TollCalculator>();
 	
 	/**
 	 * Gets an unmodifiable list of {@link RoadPricingScheme} for a {@link VehicleType} with input-id.
 	 */
-	public Collection<RoadPricingScheme> getPricingSchemes(Id vehicleType){
+	public Collection<RoadPricingScheme> getPricingSchemes(Id<org.matsim.vehicles.VehicleType> vehicleType){
 		Collection<RoadPricingScheme> collection = schemes.get(vehicleType);
 		if(collection == null) return Collections.unmodifiableCollection(Collections.<RoadPricingScheme>emptyList());
 		return Collections.unmodifiableCollection(collection);
@@ -86,7 +85,7 @@ public class VehicleTypeDependentRoadPricingCalculator {
 	 * @param time
 	 * @return
 	 */
-	public double getTollAmount(Id vehicleType, Link link, double time){ 
+	public double getTollAmount(Id<org.matsim.vehicles.VehicleType> vehicleType, Link link, double time){ 
 		Collection<RoadPricingScheme> pricingSchemes = getPricingSchemes(vehicleType);
 		if(pricingSchemes == null) return 0.0; 
 		double toll = 0.0;
@@ -99,7 +98,7 @@ public class VehicleTypeDependentRoadPricingCalculator {
 	
 	
 	public void addPricingScheme(String vehicleTypeId, RoadPricingScheme pricingScheme){
-		Id typeId = new IdImpl(vehicleTypeId);
+		Id<org.matsim.vehicles.VehicleType> typeId = Id.create(vehicleTypeId, org.matsim.vehicles.VehicleType.class);
 		addPricingScheme(typeId, pricingScheme);
 	}
 	
@@ -116,7 +115,7 @@ public class VehicleTypeDependentRoadPricingCalculator {
 	 * @param vehicleTypeId
 	 * @param {@link RoadPricingScheme}
 	 */
-	public void addPricingScheme(Id vehicleTypeId, RoadPricingScheme pricingScheme){
+	public void addPricingScheme(Id<org.matsim.vehicles.VehicleType> vehicleTypeId, RoadPricingScheme pricingScheme){
 		if(!schemes.containsKey(vehicleTypeId)){
 			schemes.put(vehicleTypeId, new ArrayList<RoadPricingScheme>());
 		}
@@ -134,7 +133,7 @@ public class VehicleTypeDependentRoadPricingCalculator {
 	 * 
 	 * @param vehicleTypeId
 	 */
-	public void removePricingSchemes(Id vehicleTypeId){
+	public void removePricingSchemes(Id<org.matsim.vehicles.VehicleType> vehicleTypeId){
 		schemes.remove(vehicleTypeId);
 	}
 
@@ -144,14 +143,14 @@ public class VehicleTypeDependentRoadPricingCalculator {
 	 * @param typeId
 	 * @return true if there is a pricing-scheme, false otherwise
 	 */
-	public boolean containsKey(Id typeId) {
+	public boolean containsKey(Id<org.matsim.vehicles.VehicleType> typeId) {
 		return schemes.containsKey(typeId);
 	}
 	
 	/**
 	 * Gets an unmodifiable map of pricing schemes.
 	 */
-	public Map<Id,Collection<RoadPricingScheme>> getSchemes(){
+	public Map<Id<org.matsim.vehicles.VehicleType>,Collection<RoadPricingScheme>> getSchemes(){
 		return Collections.unmodifiableMap(schemes);
 	}
 }

@@ -10,7 +10,9 @@ import jsprit.core.util.Solutions;
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities;
@@ -25,11 +27,12 @@ import org.matsim.contrib.freight.carrier.CarrierVehicleTypes;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts.Builder;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
 
 
 
@@ -94,13 +97,13 @@ public class TestIntegration {
 	private static Carriers createCarriers(String carrierFilename, CarrierVehicleTypes vehicleTypes) {
 		Carriers carriers = new Carriers() ;
 		{
-			Carrier carrier = CarrierImpl.newInstance( new IdImpl("TestCarrier")); 
+			Carrier carrier = CarrierImpl.newInstance( Id.create("TestCarrier", Carrier.class)); 
 			{
 				org.matsim.contrib.freight.carrier.CarrierCapabilities.Builder capabilityBuilder = CarrierCapabilities.Builder.newInstance();
 				capabilityBuilder.setFleetSize(FleetSize.FINITE);
 				{
-					CarrierVehicle.Builder vehicleBuilder = CarrierVehicle.Builder.newInstance(new IdImpl("TestVehicle1"), new IdImpl("182616-182618"));
-					vehicleBuilder.setTypeId( new IdImpl("15_tonner") ) ;
+					CarrierVehicle.Builder vehicleBuilder = CarrierVehicle.Builder.newInstance(Id.create("TestVehicle1", Vehicle.class), Id.create("182616-182618", Link.class));
+					vehicleBuilder.setTypeId( Id.create("15_tonner", VehicleType.class) ) ;
 
 					vehicleBuilder.setEarliestStart(0.);
 					vehicleBuilder.setLatestEnd( 24.*3600. );
@@ -112,7 +115,7 @@ public class TestIntegration {
 				carrier.setCarrierCapabilities(capabilities);
 			}
 			for ( int ii=1 ; ii<=100 ; ii++ ) {
-				CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(new IdImpl("service" + Integer.toString(ii) ), new IdImpl("146829"));
+				CarrierService.Builder serviceBuilder = CarrierService.Builder.newInstance(Id.create("service" + Integer.toString(ii), CarrierService.class ), Id.create("146829", Link.class));
 				serviceBuilder.setCapacityDemand( 33 );
 				serviceBuilder.setServiceStartTimeWindow(TimeWindow.newInstance(0., 24.*3600.) );
 				serviceBuilder.setServiceDuration( 10.*60. );

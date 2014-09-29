@@ -6,16 +6,18 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import jsprit.core.problem.job.Shipment;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.ShipmentBasedActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.vehicles.VehicleType;
 
 /**
  * A writer that writes carriers and their plans in an xml-file.
@@ -99,7 +101,7 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 		//vehicles
 		writer.write("\t\t\t\t<vehicles>\n");
 		for (CarrierVehicle v : carrier.getCarrierCapabilities().getCarrierVehicles()) {
-			Id vehicleTypeId = v.getVehicleTypeId();
+			Id<VehicleType> vehicleTypeId = v.getVehicleTypeId();
 			if(vehicleTypeId == null) vehicleTypeId = v.getVehicleType().getId();
 			if(vehicleTypeId == null) throw new IllegalStateException("vehicleTypeId is missing.");
 			writer.write("\t\t\t\t\t<vehicle id=\"" + v.getVehicleId()
@@ -118,7 +120,7 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 		writer.write("\t\t\t<shipments>\n");
 		for (CarrierShipment s : carrier.getShipments()) {
 			// CarrierShipment s = contract.getShipment();
-			Id shipmentId = createId();
+			Id<Shipment> shipmentId = Id.create(++idCounter, Shipment.class);
 			registeredShipments.put(s, shipmentId);
 			writer.write("\t\t\t\t<shipment ");
 			writer.write("id=\"" + shipmentId + "\" ");
@@ -249,11 +251,6 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 	private void endCarrier(BufferedWriter writer) throws IOException {
 		writer.write("\t\t</carrier>\n\n");
 		registeredShipments.clear();
-	}
-
-	private Id createId() {
-		idCounter++;
-		return new IdImpl(idCounter);
 	}
 
 	private void endCarriers(BufferedWriter writer) throws IOException {
