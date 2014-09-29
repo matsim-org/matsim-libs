@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Module;
 import org.matsim.core.utils.misc.StringUtils;
+import org.matsim.vehicles.VehicleType.DoorOperationMode;
 
 import playground.andreas.P2.operator.BasicOperator;
 
@@ -61,6 +62,7 @@ public final class PConfigGroup extends Module{
 	private static final String VEHICLE_MAXIMUM_VELOCITY = "vehicleMaximumVelocity";
 	private static final String DELAY_PER_BOARDING_PASSENGER = "delayPerBoardingPassenger";
 	private static final String DELAY_PER_ALIGHTING_PASSENGER = "delayPerAlightingPassenger";
+	private static final String DOOR_OPERATION_MODE = "doorOperationMode";
 	private static final String NUMBER_OF_ITERATIONS_FOR_PROSPECTING = "numberOfIterationsForProspecting";
 	private static final String INITIAL_BUDGET = "initialBudget";
 	private static final String COST_PER_VEHICLE_AND_DAY = "costPerVehicleAndDay";
@@ -111,6 +113,7 @@ public final class PConfigGroup extends Module{
 	private double vehicleMaximumVelocity = Double.POSITIVE_INFINITY;
 	private double delayPerBoardingPassenger = 2.0;
 	private double delayPerAlightingPassenger = 1.0;
+	private DoorOperationMode doorOperationMode = DoorOperationMode.serial;
 	private int numberOfIterationsForProspecting = 0;
 	private double initialBudget = 0.0;
 	private double costPerVehicleAndDay = 0.0;
@@ -186,6 +189,12 @@ public final class PConfigGroup extends Module{
 			this.delayPerBoardingPassenger = Double.parseDouble(value);
 		} else if (DELAY_PER_ALIGHTING_PASSENGER.equals(key)) {
 			this.delayPerAlightingPassenger = Double.parseDouble(value);
+		} else if (DOOR_OPERATION_MODE.equals(key)) { 
+			if (DoorOperationMode.serial.toString().equalsIgnoreCase(value)){
+				this.doorOperationMode = DoorOperationMode.serial;
+			} else if (DoorOperationMode.parallel.toString().equalsIgnoreCase(value)){
+				this.doorOperationMode = DoorOperationMode.parallel;
+			} 
 		} else if (COST_PER_VEHICLE_AND_DAY.equals(key)){
 			this.costPerVehicleAndDay = Double.parseDouble(value);
 		} else if (COST_PER_KILOMETER.equals(key)){
@@ -278,6 +287,7 @@ public final class PConfigGroup extends Module{
 		map.put(PAX_PER_VEHICLE, Integer.toString(this.paxPerVehicle));
 		map.put(DELAY_PER_BOARDING_PASSENGER, Double.toString(this.delayPerBoardingPassenger));
 		map.put(DELAY_PER_ALIGHTING_PASSENGER, Double.toString(this.delayPerAlightingPassenger));
+		map.put(DOOR_OPERATION_MODE, this.doorOperationMode.toString());
 		map.put(PCE, Double.toString(this.passengerCarEquivalents));
 		map.put(VEHICLE_MAXIMUM_VELOCITY, Double.toString(this.vehicleMaximumVelocity));
 		map.put(COST_PER_VEHICLE_AND_DAY, Double.toString(this.costPerVehicleAndDay));
@@ -337,6 +347,7 @@ public final class PConfigGroup extends Module{
 		map.put(VEHICLE_MAXIMUM_VELOCITY, "Maximum velocity of minibuses. Default is Double.POSITIVE_INFINITY.");
 		map.put(DELAY_PER_BOARDING_PASSENGER, "The amount of time a vehicle is delayed by one single boarding passenger in seconds.");
 		map.put(DELAY_PER_ALIGHTING_PASSENGER, "The amount of time a vehicle is delayed by one single alighting passenger in seconds.");
+		map.put(DOOR_OPERATION_MODE, "serial and parallel are permitted. Default is serial.");
 		map.put(COST_PER_VEHICLE_AND_DAY, "cost per vehicle and day - will prevent companies from operating only short periods of a day");
 		map.put(COST_PER_KILOMETER, "cost per vehicle and kilometer travelled");
 		map.put(COST_PER_HOUR, "cost per vehicle and hour in service");
@@ -433,6 +444,10 @@ public final class PConfigGroup extends Module{
 	
 	public double getDelayPerAlightingPassenger() {
 		return this.delayPerAlightingPassenger;
+	}
+	
+	public DoorOperationMode getDoorOperationMode() {
+		return this.doorOperationMode;
 	}
 	
 	public double getCostPerVehicleAndDay() {
