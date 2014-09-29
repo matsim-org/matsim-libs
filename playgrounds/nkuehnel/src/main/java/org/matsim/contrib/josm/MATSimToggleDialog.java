@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -375,7 +374,7 @@ class MATSimToggleDialog extends ToggleDialog implements LayerChangeListener,
 				int row = table.getRowSorter().convertRowIndexToModel(
 						table.getSelectedRow());
 				String tempId = (String) this.getValueAt(row, 1);
-				Link link = network.getLinks().get(new IdImpl(tempId));
+				Link link = network.getLinks().get(Id.create(tempId, Link.class));
 				if (link2Segments.containsKey(link)) {
 					List<WaySegment> segments = link2Segments.get(link);
 					layer.data.setHighlightedWaySegments(segments);
@@ -465,7 +464,7 @@ class MATSimToggleDialog extends ToggleDialog implements LayerChangeListener,
 			notifyDataChanged(currentScenario);
 			osmNetworkListener = new NetworkListener(currentScenario,
 					way2Links, link2Segments, relation2Route);
-			((OsmDataLayer) newLayer).data
+			newLayer.data
 					.addDataSetListener(osmNetworkListener);
 
 		}

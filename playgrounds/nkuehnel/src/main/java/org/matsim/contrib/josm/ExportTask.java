@@ -5,11 +5,11 @@ import java.io.IOException;
 
 import javax.swing.JOptionPane;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
@@ -88,20 +88,18 @@ class ExportTask extends PleaseWaitRunnable {
 				for (Node node : ((MATSimLayer) layer).getMatsimScenario().getNetwork()
 						.getNodes().values()) {
 					Node newNode = network.getFactory().createNode(
-							new IdImpl(((NodeImpl) node).getOrigId()),
+							Id.create(((NodeImpl) node).getOrigId(), Node.class),
 							node.getCoord());
 					network.addNode(newNode);
 				}
 				for (Link link : ((MATSimLayer) layer).getMatsimScenario().getNetwork()
 						.getLinks().values()) {
 					Link newLink = network.getFactory().createLink(
-							new IdImpl(((LinkImpl) link).getOrigId()),
+							Id.create(((LinkImpl) link).getOrigId(), Link.class),
 							network.getNodes().get(
-									new IdImpl(((NodeImpl) link.getFromNode())
-											.getOrigId())),
+									Id.create(((NodeImpl) link.getFromNode()).getOrigId(), Link.class)),
 							network.getNodes().get(
-									new IdImpl(((NodeImpl) link.getToNode())
-											.getOrigId())));
+									Id.create(((NodeImpl) link.getToNode()).getOrigId(), Node.class)));
 					newLink.setFreespeed(link.getFreespeed());
 					newLink.setCapacity(link.getCapacity());
 					newLink.setLength(link.getLength());

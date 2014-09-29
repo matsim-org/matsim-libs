@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.openstreetmap.josm.Main;
@@ -88,7 +88,7 @@ class MATSimTest extends Test {
 		this.linkIds = new HashMap<String, ArrayList<Way>>();
 		if (Main.main.getActiveLayer() instanceof MATSimLayer) {
 			layer = (MATSimLayer) Main.main.getActiveLayer();
-			this.network = ((MATSimLayer) layer).getMatsimScenario().getNetwork();
+			this.network = layer.getMatsimScenario().getNetwork();
 		}
 	}
 
@@ -141,7 +141,7 @@ class MATSimTest extends Test {
 	public void visit(Node n) {
 		if (this.network != null) {
 			org.matsim.api.core.v01.network.Node node = network.getNodes().get(
-					new IdImpl(n.getUniqueId()));
+					Id.create(n.getUniqueId(), Node.class));
 			if (node != null) {
 				String origId = ((NodeImpl) node).getOrigId();
 				if (!nodeIds.containsKey(origId)) {
@@ -230,7 +230,7 @@ class MATSimTest extends Test {
 				} else if (primitive instanceof Node) {
 					org.matsim.api.core.v01.network.Node node = this.network
 							.getNodes()
-							.get(new IdImpl(((Node) primitive).getUniqueId()));
+							.get(Id.create(((Node) primitive).getUniqueId(), org.matsim.api.core.v01.network.Node.class));
 					String origId = ((NodeImpl) node).getOrigId();
 					((NodeImpl) node).setOrigId(origId + "(" + j + ")");
 					j++;

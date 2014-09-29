@@ -7,9 +7,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -98,8 +96,8 @@ class NetworkListener implements DataSetListener, Visitor {
 			log.info("Primitive removed. "+ primitive.getType() + " " + primitive.getUniqueId());
 			if (primitive instanceof org.openstreetmap.josm.data.osm.Node) {
 				String id = String.valueOf(primitive.getUniqueId());
-				if (scenario.getNetwork().getNodes().containsKey(new IdImpl(id))) {
-					Node node = scenario.getNetwork().getNodes().get(new IdImpl(id));
+				if (scenario.getNetwork().getNodes().containsKey(Id.create(id, Node.class))) {
+					Node node = scenario.getNetwork().getNodes().get(Id.create(id, Node.class));
 					log.debug("MATSim Node removed. " + ((NodeImpl) node).getOrigId());
 					scenario.getNetwork().removeNode(node.getId());
 				}
@@ -121,23 +119,23 @@ class NetworkListener implements DataSetListener, Visitor {
 				log.debug("Relation deleted "+ primitive.getUniqueId());
 				if(relation2Route.containsKey(primitive)) {
 					TransitRoute route = relation2Route.get(primitive);
-					for (Id linkId: route.getRoute().getLinkIds()) {
+					for (Id<Link> linkId: route.getRoute().getLinkIds()) {
 						if(!link2Segments.containsKey(scenario.getNetwork().getLinks().get(linkId))) {
 							scenario.getNetwork().removeLink(linkId);
 						}
 					}
 					
-					Id lineId;
+					Id<TransitLine> lineId;
 					if (primitive.hasKey("ref")) {
-						lineId = new IdImpl(primitive.get("ref"));
+						lineId = Id.create(primitive.get("ref"), TransitLine.class);
 					} else if (primitive.hasKey("name")) {
-						lineId = new IdImpl(primitive.get("name"));
+						lineId = Id.create(primitive.get("name"), TransitLine.class);
 					} else {
-						lineId = new IdImpl(primitive.getUniqueId());
+						lineId = Id.create(primitive.getUniqueId(), TransitLine.class);
 					}
 					
 					for (TransitRouteStop stop: route.getStops()) {
-						Id linkId = stop.getStopFacility().getLinkId();
+						Id<Link> linkId = stop.getStopFacility().getLinkId();
 						Link link = scenario.getNetwork().getLinks().get(linkId);
 						if (link2Segments.containsKey(link)) {
 							scenario.getNetwork().removeLink(linkId);
@@ -246,23 +244,23 @@ class NetworkListener implements DataSetListener, Visitor {
 				
 				if(relation2Route.containsKey(relation)) {
 					TransitRoute route = relation2Route.get(relation);
-					for (Id linkId: route.getRoute().getLinkIds()) {
+					for (Id<Link> linkId: route.getRoute().getLinkIds()) {
 						if(!link2Segments.containsKey(scenario.getNetwork().getLinks().get(linkId))) {
 							scenario.getNetwork().removeLink(linkId);
 						}
 					}
 					
-					Id lineId;
+					Id<TransitLine> lineId;
 					if (relation.hasKey("ref")) {
-						lineId = new IdImpl(relation.get("ref"));
+						lineId = Id.create(relation.get("ref"), TransitLine.class);
 					} else if (relation.hasKey("name")) {
-						lineId = new IdImpl(relation.get("name"));
+						lineId = Id.create(relation.get("name"), TransitLine.class);
 					} else {
-						lineId = new IdImpl(relation.getUniqueId());
+						lineId = Id.create(relation.getUniqueId(), TransitLine.class);
 					}
 					
 					for (TransitRouteStop stop: route.getStops()) {
-						Id linkId = stop.getStopFacility().getLinkId();
+						Id<Link> linkId = stop.getStopFacility().getLinkId();
 						Link link = scenario.getNetwork().getLinks().get(linkId);
 						if (!link2Segments.containsKey(link)) {
 							scenario.getNetwork().removeLink(linkId);

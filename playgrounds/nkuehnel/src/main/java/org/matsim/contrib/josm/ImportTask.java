@@ -7,10 +7,10 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
@@ -138,7 +138,7 @@ class ImportTask extends PleaseWaitRunnable {
 			node2OsmNode.put(node, nodeOsm);
 			dataSet.addPrimitive(nodeOsm);
 			Node newNode = scenario.getNetwork().getFactory().createNode(
-					new IdImpl(Long.toString(nodeOsm.getUniqueId())),
+					Id.create(nodeOsm.getUniqueId(), Node.class),
 					node.getCoord());
 			((NodeImpl) newNode).setOrigId(node.getId().toString());
 			scenario.getNetwork().addNode(newNode);
@@ -171,11 +171,11 @@ class ImportTask extends PleaseWaitRunnable {
 
 			dataSet.addPrimitive(way);
 			Link newLink = scenario.getNetwork().getFactory().createLink(
-					new IdImpl(Long.toString(way.getUniqueId())),
+					Id.create(way.getUniqueId(), Link.class),
 					scenario.getNetwork().getNodes().get(
-							new IdImpl(Long.toString(fromNode.getUniqueId()))),
+							Id.create(fromNode.getUniqueId(), Node.class)),
 					scenario.getNetwork().getNodes().get(
-							new IdImpl(Long.toString(toNode.getUniqueId()))));
+							Id.create(toNode.getUniqueId(), Node.class)));
 			newLink.setFreespeed(link.getFreespeed());
 			newLink.setCapacity(link.getCapacity());
 			newLink.setLength(link.getLength());

@@ -17,7 +17,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.josm.OsmConvertDefaults.OsmHighwayDefaults;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -28,7 +27,6 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
-import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.data.osm.Node;
@@ -383,13 +381,13 @@ class NewConverter {
 	}
 
 	private static void checkNode(Network network, Node node) {
-		Id<Node> nodeId = new IdImpl(node.getUniqueId());
+		Id<Node> nodeId = Id.create(node.getUniqueId(), Node.class);
 		if (!node.isIncomplete()) {
 			if (!network.getNodes().containsKey(nodeId)) {
 				double lat = node.getCoor().lat();
 				double lon = node.getCoor().lon();
 				org.matsim.api.core.v01.network.Node nn = network.getFactory()
-						.createNode(new IdImpl(node.getUniqueId()),
+						.createNode(Id.create(node.getUniqueId(), org.matsim.api.core.v01.network.Node.class),
 								new CoordImpl(lon, lat));
 				if (node.hasKey(ImportTask.NODE_TAG_ID)) {
 					((NodeImpl) nn).setOrigId(node.get(ImportTask.NODE_TAG_ID));
@@ -418,7 +416,7 @@ class NewConverter {
 		int i = 0;
 		while (scenario.getTransitSchedule().getFacilities()
 				.containsKey(stopId)) {
-			stopId = new IdImpl("(" + i + ")_" + stopId.toString());
+			stopId = Id.create("(" + i + ")_" + stopId.toString(), TransitStopFacility.class);
 			i++;
 		}
 		double lat = node.getCoor().lat();
@@ -445,8 +443,8 @@ class NewConverter {
 
 			if (member.isNode() && !member.getMember().isIncomplete()) {
 				checkNode(scenario.getNetwork(), member.getNode());
-				Id<TransitStopFacility> stopId = new IdImpl(relation.getUniqueId() + "_"
-						+ member.getUniqueId());
+				Id<TransitStopFacility> stopId = Id.create(relation.getUniqueId() + "_"
+						+ member.getUniqueId(), TransitStopFacility.class);
 				checkStopFacility(scenario, member.getNode(), stops, stopId);
 			}
 		}
@@ -460,11 +458,11 @@ class NewConverter {
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		TransitScheduleFactory builder = schedule.getFactory();
 
-		Id lineId;
+		Id<TransitLine> lineId;
 		if (relation.hasKey("ref")) {
-			lineId = new IdImpl(relation.get("ref"));
+			lineId = Id.create(relation.get("ref"), TransitLine.class);
 		} else {
-			lineId = new IdImpl(relation.getUniqueId());
+			lineId = Id.create(relation.getUniqueId(), TransitLine.class);
 		}
 
 		TransitLine tLine;
@@ -475,10 +473,9 @@ class NewConverter {
 			tLine = scenario.getTransitSchedule().getTransitLines().get(lineId);
 		}
 
-		Id firstLinkId = stops.get(0).getLinkId();
-		Id secondLinkId = stops.get(stops.size() - 1).getLinkId();
-		NetworkRoute networkRoute = new LinkNetworkRouteImpl(firstLinkId,
-				secondLinkId);
+		Id<Link> firstLinkId = stops.get(0).getLinkId();
+		Id<Link> secondLinkId = stops.get(stops.size() - 1).getLinkId();
+		NetworkRoute networkRoute = new LinkNetworkRouteImpl(firstLinkId, secondLinkId);
 
 		networkRoute.setLinkIds(firstLinkId, links, secondLinkId);
 
@@ -488,8 +485,7 @@ class NewConverter {
 		}
 
 		TransitRoute tRoute = builder.createTransitRoute(
-				new IdImpl(relation.getUniqueId()), networkRoute, routeStops,
-				"pt");
+				Id.create(relation.getUniqueId(), TransitRoute.class), networkRoute, routeStops, "pt");
 
 		tLine.addRoute(tRoute);
 
@@ -510,7 +506,7 @@ class NewConverter {
 						links.add(link.getId());
 					}
 					if (member.getWay().hasKey("stopId")) {
-						Id<TransitStopFacility> stopId = (new IdImpl(member.getWay().get("stopId")));
+						Id<TransitStopFacility> stopId = (Id.create(member.getWay().get("stopId"), TransitStopFacility.class));
 						if(scenario.getTransitSchedule().getFacilities().containsKey(stopId)) {
 							for (TransitStopFacility removeStop: stops) {
 								scenario.getTransitSchedule().removeStopFacility(removeStop);
@@ -546,9 +542,9 @@ class NewConverter {
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		TransitScheduleFactory builder = schedule.getFactory();
 
-		Id lineId;
+		Id<TransitLine> lineId;
 		if (relation.hasKey("name")) {
-			lineId = new IdImpl(relation.get("name"));
+			lineId = Id.create(relation.get("name"), TransitLine.class);
 		} else {
 			return;
 		}
@@ -574,10 +570,10 @@ class NewConverter {
 		TransitRoute tRoute;
 		if(relation.hasKey("routeId")) {
 			tRoute = builder.createTransitRoute(
-						new IdImpl(relation.get("routeId")), networkRoute, routeStops,
+						Id.create(relation.get("routeId"), TransitRoute.class), networkRoute, routeStops,
 						"pt");
 		} else {
-			tRoute = builder.createTransitRoute(new IdImpl(relation.getUniqueId()), networkRoute, routeStops, "pt");
+			tRoute = builder.createTransitRoute(Id.create(relation.getUniqueId(), TransitRoute.class), networkRoute, routeStops, "pt");
 		}
 		
 		tLine.addRoute(tRoute);
@@ -656,8 +652,8 @@ class NewConverter {
 		// only create link, if both nodes were found, node could be null, since
 		// nodes outside a layer were dropped
 		List<Link> links = new ArrayList<Link>();
-		Id<Node> fromId = new IdImpl(fromNode.getUniqueId());
-		Id<Node> toId = new IdImpl(toNode.getUniqueId());
+		Id<org.matsim.api.core.v01.network.Node> fromId = Id.create(fromNode.getUniqueId(), org.matsim.api.core.v01.network.Node.class);
+		Id<org.matsim.api.core.v01.network.Node> toId = Id.create(toNode.getUniqueId(), org.matsim.api.core.v01.network.Node.class);
 		if (network.getNodes().get(fromId) != null
 				&& network.getNodes().get(toId) != null) {
 
@@ -679,7 +675,7 @@ class NewConverter {
 			}
 
 			if (!onewayReverse) {
-				Link l = network.getFactory().createLink(new IdImpl(id),
+				Link l = network.getFactory().createLink(Id.create(id, Link.class),
 						network.getNodes().get(fromId),
 						network.getNodes().get(toId));
 				l.setLength(length);
@@ -696,7 +692,7 @@ class NewConverter {
 						+ ((LinkImpl) l).getOrigId() + " created");
 			}
 			if (!oneway) {
-				Link l = network.getFactory().createLink(new IdImpl(id + "_r"),
+				Link l = network.getFactory().createLink(Id.create(id + "_r", Link.class),
 						network.getNodes().get(toId),
 						network.getNodes().get(fromId));
 				l.setLength(length);

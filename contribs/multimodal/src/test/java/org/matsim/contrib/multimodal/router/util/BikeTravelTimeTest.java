@@ -20,6 +20,9 @@
 
 package org.matsim.contrib.multimodal.router.util;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -27,16 +30,12 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class BikeTravelTimeTest extends MatsimTestCase {
 
@@ -179,11 +178,11 @@ public class BikeTravelTimeTest extends MatsimTestCase {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
-		PersonImpl p1 = new PersonImpl(new IdImpl("1"));
+		PersonImpl p1 = new PersonImpl(Id.create("1", Person.class));
 		p1.setAge(90);
 		p1.setSex("f");
 
-		PersonImpl p2 = new PersonImpl(new IdImpl("2"));
+		PersonImpl p2 = new PersonImpl(Id.create("2", Person.class));
 		p2.setAge(20);
 		p2.setSex("m");
 		

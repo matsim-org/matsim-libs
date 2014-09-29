@@ -12,7 +12,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NodeImpl;
@@ -109,7 +108,7 @@ class ConvertTask extends PleaseWaitRunnable {
 		HashMap<Relation, TransitRoute> relation2Route = new HashMap<Relation, TransitRoute>();
 		HashMap<Node, org.openstreetmap.josm.data.osm.Node> node2OsmNode = new HashMap<Node, org.openstreetmap.josm.data.osm.Node>();
 		HashMap<TransitStopFacility, TransitStopFacility> stop2Stop = new HashMap<TransitStopFacility, TransitStopFacility>();
-		HashMap<Id, Way> linkId2Way = new HashMap<Id, Way>();
+		HashMap<Id<Link>, Way> linkId2Way = new HashMap<>();
 
 		this.progressMonitor.setTicks(4);
 		this.progressMonitor.setCustomText("loading nodes..");
@@ -124,7 +123,7 @@ class ConvertTask extends PleaseWaitRunnable {
 			node2OsmNode.put(node, nodeOsm);
 			dataSet.addPrimitive(nodeOsm);
 			Node newNode = network.getFactory().createNode(
-					new IdImpl(Long.toString(nodeOsm.getUniqueId())),
+					Id.create(Long.toString(nodeOsm.getUniqueId()), Node.class),
 					node.getCoord());
 			((NodeImpl) newNode).setOrigId(((NodeImpl) node).getOrigId());
 			network.addNode(newNode);
@@ -157,11 +156,11 @@ class ConvertTask extends PleaseWaitRunnable {
 			dataSet.addPrimitive(way);
 
 			Link newLink = network.getFactory().createLink(
-					new IdImpl(Long.toString(way.getUniqueId())),
+					Id.create(Long.toString(way.getUniqueId()), Link.class),
 					network.getNodes().get(
-							new IdImpl(Long.toString(fromNode.getUniqueId()))),
+							Id.create(Long.toString(fromNode.getUniqueId()), Node.class)),
 					network.getNodes().get(
-							new IdImpl(Long.toString(toNode.getUniqueId()))));
+							Id.create(Long.toString(toNode.getUniqueId()), Node.class)));
 			newLink.setFreespeed(link.getFreespeed());
 			newLink.setCapacity(link.getCapacity());
 			newLink.setLength(link.getLength());
@@ -207,7 +206,7 @@ class ConvertTask extends PleaseWaitRunnable {
 					stopLink2Way.put("stop_id", tRStop.getStopFacility()
 							.getId().toString());
 					List<Link> newStopLinks = way2Links.get(stopLink2Way);
-					Id linkId = newStopLinks.get(newStopLinks.size() - 1)
+					Id<Link> linkId = newStopLinks.get(newStopLinks.size() - 1)
 							.getId();
 					stop.setLinkId(linkId);
 
@@ -219,14 +218,14 @@ class ConvertTask extends PleaseWaitRunnable {
 
 				List<Link> startWay2Links = way2Links.get(linkId2Way.get(route
 						.getRoute().getStartLinkId()));
-				Id firstLinkId = startWay2Links.get(startWay2Links.size() - 1)
+				Id<Link> firstLinkId = startWay2Links.get(startWay2Links.size() - 1)
 						.getId();
 				RelationMember start = new RelationMember("stop_link",
 						linkId2Way.get(route.getRoute().getStartLinkId()));
 				relation.addMember(start);
 
 				List<Id<Link>> links = new ArrayList<Id<Link>>();
-				for (Id linkId : route.getRoute().getLinkIds()) {
+				for (Id<Link> linkId : route.getRoute().getLinkIds()) {
 					RelationMember member = new RelationMember("stop_link",
 							linkId2Way.get(linkId));
 					relation.addMember(member);
@@ -239,7 +238,7 @@ class ConvertTask extends PleaseWaitRunnable {
 				relation.addMember(end);
 				List<Link> endWay2Links = way2Links.get(linkId2Way.get(route
 						.getRoute().getEndLinkId()));
-				Id lastLinkId = endWay2Links.get(endWay2Links.size() - 1)
+				Id<Link> lastLinkId = endWay2Links.get(endWay2Links.size() - 1)
 						.getId();
 
 				NetworkRoute networkRoute = new LinkNetworkRouteImpl(
