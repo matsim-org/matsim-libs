@@ -26,12 +26,17 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.grips.model.Constants.Mode;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.collections.Tuple;
 
-public class EventData {
+/**
+ * @param <C> cluster type
+ */
+public class EventData<C> {
 
 	private String eventName;
 	private double cellSize;
@@ -41,8 +46,8 @@ public class EventData {
 	private QuadTree<Cell> cellTree;
 	private List<Tuple<Double, Integer>> arrivalTimes;
 	private Rect boundingBox;
-	private HashMap<Id, List<Tuple<Id, Double>>> linkLeaveTimes;
-	private HashMap<Id, List<Tuple<Id, Double>>> linkEnterTimes;
+	private HashMap<Id<Link>, List<Tuple<Id<Person>, Double>>> linkLeaveTimes;
+	private HashMap<Id<Link>, List<Tuple<Id<Person>, Double>>> linkEnterTimes;
 	private int maxUtilization;
 	private double maxClearingTime;
 	private double sampleSize;
@@ -51,7 +56,7 @@ public class EventData {
 	private AttributeData<Color> clearingTimeVisData;
 	private AttributeData<Tuple<Float, Color>> linkUtilizationVisData;
 
-	private HashMap<Mode, LinkedList<Tuple<Id, Double>>> clusters;
+	private HashMap<Mode, LinkedList<Tuple<Id<C>, Double>>> clusters;
 
 	public EventData(String eventName, QuadTree<Cell> cellTree, double cellSize, double timeSum, double maxCellTimeSum, int arrivals, List<Tuple<Double, Integer>> arrivalTimes, Rect boundingBox) {
 		this.eventName = eventName;
@@ -132,19 +137,19 @@ public class EventData {
 		this.boundingBox = boundingBox;
 	}
 
-	public void setLinkEnterTimes(HashMap<Id, List<Tuple<Id, Double>>> linkEnterTimes) {
+	public void setLinkEnterTimes(HashMap<Id<Link>, List<Tuple<Id<Person>, Double>>> linkEnterTimes) {
 		this.linkEnterTimes = linkEnterTimes;
 	}
 
-	public void setLinkLeaveTimes(HashMap<Id, List<Tuple<Id, Double>>> linkLeaveTimes) {
+	public void setLinkLeaveTimes(HashMap<Id<Link>, List<Tuple<Id<Person>, Double>>> linkLeaveTimes) {
 		this.linkLeaveTimes = linkLeaveTimes;
 	}
 
-	public HashMap<Id, List<Tuple<Id, Double>>> getLinkEnterTimes() {
+	public HashMap<Id<Link>, List<Tuple<Id<Person>, Double>>> getLinkEnterTimes() {
 		return linkEnterTimes;
 	}
 
-	public HashMap<Id, List<Tuple<Id, Double>>> getLinkLeaveTimes() {
+	public HashMap<Id<Link>, List<Tuple<Id<Person>, Double>>> getLinkLeaveTimes() {
 		return linkLeaveTimes;
 	}
 
@@ -195,22 +200,22 @@ public class EventData {
 		return cells;
 	}
 
-	public void updateClusters(Mode mode, LinkedList<Tuple<Id, Double>> clusters) {
+	public void updateClusters(Mode mode, LinkedList<Tuple<Id<C>, Double>> clusters) {
 		if (this.clusters == null)
-			this.clusters = new HashMap<Mode, LinkedList<Tuple<Id, Double>>>();
+			this.clusters = new HashMap<>();
 
 		this.clusters.put(mode, clusters);
 
 	}
 
-	public LinkedList<Tuple<Id, Double>> getClusters(Mode mode) {
+	public LinkedList<Tuple<Id<C>, Double>> getClusters(Mode mode) {
 		if (this.clusters != null)
 			return this.clusters.get(mode);
 		else
 			return null;
 	}
 
-	public HashMap<Mode, LinkedList<Tuple<Id, Double>>> getClusters() {
+	public HashMap<Mode, LinkedList<Tuple<Id<C>, Double>>> getClusters() {
 		return this.clusters;
 	}
 	

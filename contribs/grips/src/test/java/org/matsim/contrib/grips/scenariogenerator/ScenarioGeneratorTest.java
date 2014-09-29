@@ -28,17 +28,14 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.contrib.grips.analysis.control.EventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.grips.analysis.control.EventReaderThread;
 import org.matsim.contrib.grips.control.Controller;
 import org.matsim.contrib.grips.io.ConfigIO;
 import org.matsim.contrib.grips.model.config.GripsConfigModule;
-import org.matsim.contrib.grips.simulation.SimulationMask;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.Module;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
@@ -50,10 +47,10 @@ public class ScenarioGeneratorTest extends MatsimTestCase {
 	@Test
 	public void testScenarioGenerator() {
 		
-		ArrayList<Id> closedRoadIDs = new ArrayList<Id>();
-		closedRoadIDs.add(new IdImpl(156));
-		closedRoadIDs.add(new IdImpl(316));
-		closedRoadIDs.add(new IdImpl(263));
+		ArrayList<Id<Link>> closedRoadIDs = new ArrayList<>();
+		closedRoadIDs.add(Id.create(156, Link.class));
+		closedRoadIDs.add(Id.create(316, Link.class));
+		closedRoadIDs.add(Id.create(263, Link.class));
 		
 		String inputDir = getInputDirectory();
 		String outputDir = getOutputDirectory();
@@ -118,8 +115,8 @@ public class ScenarioGeneratorTest extends MatsimTestCase {
 		new ConfigWriter(mc).write(matsimConfigFileString);
 		
 		//save road closures
-		HashMap<Id,String> roadClosures = new HashMap<Id,String>();
-		for (Id id : closedRoadIDs)
+		HashMap<Id<Link>, String> roadClosures = new HashMap<Id<Link>, String>();
+		for (Id<Link> id : closedRoadIDs)
 			roadClosures.put(id, "00:00");
 		boolean saved = ConfigIO.saveRoadClosures(controller, roadClosures);
 		assertTrue("could not save road closures",saved);
@@ -143,7 +140,7 @@ public class ScenarioGeneratorTest extends MatsimTestCase {
 		EventsManager e = EventsUtils.createEventsManager();
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(e);
 		Thread readerThread = new Thread(new EventReaderThread(reader, outputDir+"output/ITERS/it.10/10.events.xml.gz"), "readerthread");
-		final ArrayList<Id> usedIDs = new ArrayList<Id>();
+		final ArrayList<Id<Link>> usedIDs = new ArrayList<Id<Link>>();
 		eventHandler = new LinkEnterEventHandler() {
 			@Override
 			public void reset(int iteration) {
@@ -157,7 +154,7 @@ public class ScenarioGeneratorTest extends MatsimTestCase {
 		e.addHandler(eventHandler);
 		readerThread.run();
 		
-		for (Id id : closedRoadIDs)
+		for (Id<Link> id : closedRoadIDs)
 			assertTrue("a closed road is crossed (id: " + id.toString() + ")", !usedIDs.contains(id));
 		
 //		assertEquals("different config-files.", CRCChecksum.getCRCFromFile(inputDir + "/config.xml"), CRCChecksum.getCRCFromFile(outputDir + "/config.xml"));

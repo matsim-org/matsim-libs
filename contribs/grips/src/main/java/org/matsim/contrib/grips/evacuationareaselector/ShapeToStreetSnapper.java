@@ -28,20 +28,20 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.grips.control.helper.Algorithms;
 import org.matsim.contrib.grips.control.helper.shapetostreetsnapper.LinkSorter;
 import org.matsim.contrib.grips.control.helper.shapetostreetsnapper.TravelCost;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -103,7 +103,7 @@ public class ShapeToStreetSnapper {
 			Node n0 = nodes.get(i-1);
 			Node n1 = nodes.get(i);
 			Path path = dijkstra.calcLeastCostPath(n0, n1, 0, null, null);
-			if (path != null && (path.travelCost < TRAVEL_COST_CUTOFF || path.travelCost < DETOUR_COEF * ((CoordImpl)n0.getCoord()).calcDistance(n1.getCoord())) ){
+			if (path != null && (path.travelCost < TRAVEL_COST_CUTOFF || path.travelCost < DETOUR_COEF * CoordUtils.calcDistance(n0.getCoord(), n1.getCoord()))) {
 				finalNodes.addAll(path.nodes.subList(0, path.nodes.size()-1));
 			}else {
 				finalNodes.add(n0);
@@ -113,7 +113,7 @@ public class ShapeToStreetSnapper {
 		Node nn0 = nodes.get(nodes.size()-1);
 		Node nn1 = nodes.get(0);
 		Path path = dijkstra.calcLeastCostPath(nn0, nn1, 0, null, null);
-		if (path.travelCost < TRAVEL_COST_CUTOFF || path.travelCost < DETOUR_COEF * ((CoordImpl)nn0.getCoord()).calcDistance(nn1.getCoord()) ){
+		if (path.travelCost < TRAVEL_COST_CUTOFF || path.travelCost < DETOUR_COEF * CoordUtils.calcDistance(nn0.getCoord(), nn1.getCoord()) ) {
 			finalNodes.addAll(path.nodes.subList(0, path.nodes.size()-1));
 		}
 
@@ -175,7 +175,7 @@ public class ShapeToStreetSnapper {
 				}
 			}
 			if (oneWay) {
-				Link reverse = this.sc.getNetwork().getFactory().createLink(new IdImpl(link.getId().toString()+"reverse"), link.getToNode(), link.getFromNode());
+				Link reverse = this.sc.getNetwork().getFactory().createLink(Id.create(link.getId().toString()+"reverse", Link.class), link.getToNode(), link.getFromNode());
 				reverse.setFreespeed(link.getFreespeed());
 				reverse.setLength(link.getLength());
 				reverse.setNumberOfLanes(link.getNumberOfLanes());

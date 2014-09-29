@@ -72,11 +72,11 @@ public class PTLToolBox extends AbstractToolBox {
 	public static final String RED = "LINK_SELECT_RED";
 	public static final String GREEN = "LINK_SELECT_GREEN";
 
-	private Id currentLinkIdRed = null;
-	private Id currentLinkIdGreen = null;
+	private Id<Link> currentLinkIdRed = null;
+	private Id<Link> currentLinkIdGreen = null;
 	private JPanel busStopConfigPanel;
 	private JButton blockButtonOK;
-	private final Map<Id, BusStop> busStops = new HashMap<Id, BusStop>();
+	private final Map<Id<Link>, BusStop> busStops = new HashMap<>();
 	private JRadioButton redLinkSelct;
 	private JRadioButton greenLinkSelct;
 	private JSpinner numDepSpinner;
@@ -445,8 +445,8 @@ public class PTLToolBox extends AbstractToolBox {
 	@Override
 	public void updateMask() {
 
-		Id linkId1 = this.controller.getTempLinkId(0);
-		Id linkId2 = this.controller.getTempLinkId(1);
+		Id<Link> linkId1 = this.controller.getTempLinkId(0);
+		Id<Link> linkId2 = this.controller.getTempLinkId(1);
 
 		setLink1Id(linkId1);
 		setLink2Id(linkId2);
@@ -499,7 +499,7 @@ public class PTLToolBox extends AbstractToolBox {
 	 * 
 	 * @param id
 	 */
-	public void setLink1Id(Id id) {
+	public void setLink1Id(Id<Link> id) {
 		this.currentLinkIdRed = id;
 		if (id != null) {
 			if (this.busStops.containsKey(id)) {
@@ -539,7 +539,7 @@ public class PTLToolBox extends AbstractToolBox {
 	 * 
 	 * @param id
 	 */
-	public void setLink2Id(Id id) {
+	public void setLink2Id(Id<Link> id) {
 		this.currentLinkIdGreen = id;
 		this.greenLinkSelct.setEnabled(id != null);
 	}

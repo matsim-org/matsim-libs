@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -59,12 +58,12 @@ public class PTLinesGenerator {
 
 	private final Scenario sc;
 	private TransitSchedule schedule = null;
-	private final Map<Id, BusStop> busStops;
+	private final Map<Id<Link>, BusStop> busStops;
 	private final Dijkstra dijkstra;
 	private final TransitScheduleFactoryImpl fac;
 	private Id safeId;
 
-	public PTLinesGenerator(Scenario sc, Map<Id, BusStop> busStops) {
+	public PTLinesGenerator(Scenario sc, Map<Id<Link>, BusStop> busStops) {
 		this.sc = sc;
 		this.busStops = busStops;
 		FreeSpeedTravelTime fs = new FreeSpeedTravelTime();
@@ -105,10 +104,10 @@ public class PTLinesGenerator {
 			return;
 
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-		Id id = stop.id;
+		Id<Link> id = stop.id;
 		Link link = this.sc.getNetwork().getLinks().get(id);
 		Coord c = link.getCoord();
-		TransitStopFacility facility = this.fac.createTransitStopFacility(id, c, false);
+		TransitStopFacility facility = this.fac.createTransitStopFacility(Id.create(id, TransitStopFacility.class), c, false);
 		facility.setLinkId(id);
 		this.schedule.addStopFacility(facility);
 		TransitRouteStop rs = this.fac.createTransitRouteStop(facility, 0, 0);
@@ -146,15 +145,15 @@ public class PTLinesGenerator {
 			linkIds.add(l.getId());
 		}
 
-		TransitLine line = this.fac.createTransitLine(id);
+		TransitLine line = this.fac.createTransitLine(Id.create(id, TransitLine.class));
 		NetworkRoute route = new LinkNetworkRouteImpl(id, safeFacility.getLinkId());
 		route.setLinkIds(id, linkIds, safeFacility.getLinkId());
-		TransitRoute tr = this.fac.createTransitRoute(id, route, stops, "bus");
+		TransitRoute tr = this.fac.createTransitRoute(Id.create(id, TransitRoute.class), route, stops, "bus");
 
 		// Vehicles
 		Vehicles vehicles = ((ScenarioImpl) this.sc).getVehicles();
 		VehiclesFactory vf = vehicles.getFactory();
-		VehicleType vt = vf.createVehicleType(id);
+		VehicleType vt = vf.createVehicleType(Id.create(id, VehicleType.class));
 		VehicleCapacity vc = vf.createVehicleCapacity();
 		vc.setSeats((Integer) stop.capSpinnerValue + 1);
 		vc.setStandingRoom(0);
@@ -167,9 +166,9 @@ public class PTLinesGenerator {
 
 		// departures
 		for (int i = 0; i < (Integer) stop.numDepSpinnerValue; i++) {
-			Vehicle veh = vf.createVehicle(new IdImpl(id.toString() + "_veh_" + i), vt);
+			Vehicle veh = vf.createVehicle(Id.create(id.toString() + "_veh_" + i, Vehicle.class), vt);
 			vehicles.addVehicle( veh);
-			Departure dep = this.fac.createDeparture(new IdImpl(id.toString() + "_dep_" + i), depTime);
+			Departure dep = this.fac.createDeparture(Id.create(id.toString() + "_dep_" + i, Departure.class), depTime);
 			dep.setVehicleId(veh.getId());
 			tr.addDeparture(dep);
 			depTime += 5 * 30;

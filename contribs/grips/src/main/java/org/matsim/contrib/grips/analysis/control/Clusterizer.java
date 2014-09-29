@@ -36,13 +36,13 @@ import org.matsim.core.utils.collections.Tuple;
  */
 public class Clusterizer {
 
-	public LinkedList<Tuple<Id, Double>> getClusters(LinkedList<Tuple<Id, Double>> data, int n) {
-		LinkedList<Tuple<Id, Double>> clusters = new LinkedList<Tuple<Id, Double>>();
+	public <T> LinkedList<Tuple<Id<T>, Double>> getClusters(LinkedList<Tuple<Id<T>, Double>> data, int n) {
+		LinkedList<Tuple<Id<T>, Double>> clusters = new LinkedList<>();
 
-		Collections.sort(data, new Comparator<Tuple<Id, Double>>() {
+		Collections.sort(data, new Comparator<Tuple<Id<T>, Double>>() {
 
 			@Override
-			public int compare(Tuple<Id, Double> o1, Tuple<Id, Double> o2) {
+			public int compare(Tuple<Id<T>, Double> o1, Tuple<Id<T>, Double> o2) {
 				if (o1.getSecond() > o2.getSecond())
 					return 1;
 				else if (o1.getSecond() < o2.getSecond())
@@ -54,7 +54,7 @@ public class Clusterizer {
 		int m = (data.size() / (n-1)) > 0 ? (data.size() / (n-1)) : 1;
 		int i = 0;
 
-		for (Tuple<Id, Double> element : data) {
+		for (Tuple<Id<T>, Double> element : data) {
 			if ((i++ % m == 0) && clusters.size() < n) {
 				clusters.add(element);
 			}

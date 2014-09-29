@@ -30,17 +30,18 @@ import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.grips.analysis.control.vis.ClearingTimeVisualizer;
 import org.matsim.contrib.grips.analysis.control.vis.EvacuationTimeVisualizer;
 import org.matsim.contrib.grips.analysis.control.vis.UtilizationVisualizer;
@@ -67,7 +68,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	private double cellSize;
 	private QuadTree<Cell> cellTree;
 
-	private final Map<Id, Event> events = new HashMap<Id, Event>();
+	private final Map<Id<Person>, Event> events = new HashMap<>();
 	private double timeSum;
 	private double maxCellTimeSum;
 	private int maxUtilization;
@@ -79,8 +80,8 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	private Rect boundingBox;
 	private String eventName;
 
-	private HashMap<Id, List<Tuple<Id, Double>>> linkEnterTimes;
-	private HashMap<Id, List<Tuple<Id, Double>>> linkLeaveTimes;
+	private HashMap<Id<Link>, List<Tuple<Id<Person>, Double>>> linkEnterTimes;
+	private HashMap<Id<Link>, List<Tuple<Id<Person>, Double>>> linkLeaveTimes;
 	private double maxClearingTime;
 
 	private ColorationMode colorationMode = ColorationMode.GREEN_YELLOW_RED;
@@ -128,8 +129,8 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		this.maxUtilization = 0;
 		this.maxClearingTime = Double.NEGATIVE_INFINITY;
 		this.maxCellTimeSum = Double.NEGATIVE_INFINITY;
-		this.linkEnterTimes = new HashMap<Id, List<Tuple<Id, Double>>>();
-		this.linkLeaveTimes = new HashMap<Id, List<Tuple<Id, Double>>>();
+		this.linkEnterTimes = new HashMap<>();
+		this.linkLeaveTimes = new HashMap<>();
 
 		double minX = Double.POSITIVE_INFINITY;
 		double minY = Double.POSITIVE_INFINITY;
@@ -156,7 +157,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		this.cellTree = new QuadTree<Cell>(minX, minY, maxX, maxY);
 
 		if ((useCellCount) && (cellCount>0))
-			cellSize = (maxX-minX)/(double)cellCount;
+			cellSize = (maxX-minX)/cellCount;
 		
 		cellCount = 0;
 		
@@ -265,8 +266,8 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 			return;
 
 		// get link id
-		Id linkId = event.getLinkId();
-		Id personId = event.getPersonId();
+		Id<Link> linkId = event.getLinkId();
+		Id<Person> personId = event.getPersonId();
 
 		// get cell from person id
 		Link link = this.network.getLinks().get(linkId);
@@ -285,12 +286,12 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		maxUtilization = Math.max(maxUtilization, enterCount);
 
 		// update global link enter times
-		List<Tuple<Id, Double>> times;
+		List<Tuple<Id<Person>, Double>> times;
 		if (linkEnterTimes.containsKey(linkId))
 			times = linkEnterTimes.get(linkId);
 		else
-			times = new LinkedList<Tuple<Id, Double>>();
-		times.add(new Tuple<Id, Double>(personId, event.getTime()));
+			times = new LinkedList<Tuple<Id<Person>, Double>>();
+		times.add(new Tuple<Id<Person>, Double>(personId, event.getTime()));
 
 		linkEnterTimes.put(linkId, times);
 
@@ -300,8 +301,8 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	public void handleEvent(LinkLeaveEvent event) {
 
 		// get link id
-		Id linkId = event.getLinkId();
-		Id personId = event.getPersonId();
+		Id<Link> linkId = event.getLinkId();
+		Id<Person> personId = event.getPersonId();
 
 		// get cell from person id
 		Link link = this.network.getLinks().get(linkId);
@@ -316,12 +317,12 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		cell.addLinkLeaveTime(linkId, personId, event.getTime());
 
 		// update global link leave times
-		List<Tuple<Id, Double>> times;
+		List<Tuple<Id<Person>, Double>> times;
 		if (linkLeaveTimes.containsKey(linkId))
 			times = linkLeaveTimes.get(linkId);
 		else
-			times = new LinkedList<Tuple<Id, Double>>();
-		times.add(new Tuple<Id, Double>(personId, event.getTime()));
+			times = new LinkedList<>();
+		times.add(new Tuple<Id<Person>, Double>(personId, event.getTime()));
 
 		linkLeaveTimes.put(linkId, times);
 
@@ -384,7 +385,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 
 			// get all cells that are within the boundary from celltree
 			LinkedList<Cell> cells = new LinkedList<Cell>();
-			List<Tuple<Id, Double>> currentLinkLeaveTimes = linkLeaveTimes.get(link.getId());
+			List<Tuple<Id<Person>, Double>> currentLinkLeaveTimes = linkLeaveTimes.get(link.getId());
 
 			if ((currentLinkLeaveTimes != null) && (currentLinkLeaveTimes.size() > 0)) {
 				// cut 5%

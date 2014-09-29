@@ -23,29 +23,28 @@ package org.matsim.contrib.grips.analysis.data;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 
 public class AttributeData<T> {
 
-	private HashMap<Id, T> attributeData;
+	private HashMap<Id<?>, T> attributeData;
 
 	public AttributeData() {
-		this.attributeData = new HashMap<Id, T>();
+		this.attributeData = new HashMap<>();
 	}
 
-	public HashMap<Id, T> getAttributeData() {
+	public HashMap<Id<?>, T> getAttributeData() {
 		return attributeData;
 	}
 
-	public void setAttributeData(HashMap<Id, T> attributeData) {
+	public void setAttributeData(HashMap<Id<?>, T> attributeData) {
 		this.attributeData = attributeData;
 	}
 
-	public void setAttribute(IdImpl id, T data) {
+	public void setAttribute(Id<?> id, T data) {
 		attributeData.put(id, data);
 	}
 
-	public T getAttribute(IdImpl id) {
+	public <U> T getAttribute(Id<U> id) {
 		return attributeData.get(id);
 	}
 

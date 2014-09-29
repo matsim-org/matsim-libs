@@ -29,6 +29,7 @@ import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.grips.control.Controller;
 import org.matsim.contrib.grips.evacuationptlineseditor.BusStop;
 import org.matsim.contrib.grips.evacuationptlineseditor.PTLinesGenerator;
@@ -56,7 +57,7 @@ import org.matsim.vehicles.VehicleWriterV1;
 public class ConfigIO
 {
 
-	public static synchronized boolean saveRoadClosures(Controller controller, HashMap<Id, String> roadClosures)
+	public static synchronized boolean saveRoadClosures(Controller controller, HashMap<Id<Link>, String> roadClosures)
 	{
 		
 		Scenario scenario = controller.getScenario();
@@ -75,12 +76,12 @@ public class ConfigIO
 			Collection<NetworkChangeEvent> evs = new ArrayList<NetworkChangeEvent>();
 			NetworkChangeEventFactory fac = new NetworkChangeEventFactoryImpl();
 
-			Iterator<Entry<Id,String>> it = roadClosures.entrySet().iterator();
+			Iterator<Entry<Id<Link>, String>> it = roadClosures.entrySet().iterator();
 			while (it.hasNext())
 			{
-				Entry<Id, String> pairs = it.next();
+				Entry<Id<Link>, String> pairs = it.next();
 
-				Id currentId = pairs.getKey();
+				Id<Link> currentId = pairs.getKey();
 				String timeString = pairs.getValue();
 
 				try
@@ -116,7 +117,7 @@ public class ConfigIO
 
 	}
 	
-	public static synchronized boolean savePTLines(Controller controller, Map<Id,BusStop> busStops)
+	public static synchronized boolean savePTLines(Controller controller, Map<Id<Link>, BusStop> busStops)
 	{
 		Config config = controller.getScenario().getConfig();
 		

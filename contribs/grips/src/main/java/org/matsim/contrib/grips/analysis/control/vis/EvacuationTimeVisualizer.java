@@ -55,7 +55,7 @@ public class EvacuationTimeVisualizer {
 	}
 
 	public void processVisualData() {
-		LinkedList<Tuple<Id, Double>> cellIdsAndTimes = new LinkedList<Tuple<Id, Double>>();
+		LinkedList<Tuple<Id<Cell>, Double>> cellIdsAndTimes = new LinkedList<>();
 		LinkedList<Double> cellTimes = new LinkedList<Double>();
 		this.coloration = new AttributeData<Color>();
 
@@ -64,16 +64,16 @@ public class EvacuationTimeVisualizer {
 		for (Cell cell : cells) {
 			if (!cellTimes.contains(cell.getMedianArrivalTime())) {
 				cellTimes.add(cell.getMedianArrivalTime());
-				cellIdsAndTimes.add(new Tuple<Id, Double>(cell.getId(), cell.getMedianArrivalTime()));
+				cellIdsAndTimes.add(new Tuple<Id<Cell>, Double>(cell.getId(), cell.getMedianArrivalTime()));
 			}
 		}
 
 		// calculate data clusters
-		LinkedList<Tuple<Id, Double>> clusters = this.clusterizer.getClusters(cellIdsAndTimes, k);
+		LinkedList<Tuple<Id<Cell>, Double>> clusters = this.clusterizer.getClusters(cellIdsAndTimes, k);
 		this.data.updateClusters(Mode.EVACUATION, clusters);
 
 		LinkedList<Double> clusterValues = new LinkedList<Double>();
-		for (Tuple<Id, Double> cluster : clusters)
+		for (Tuple<Id<Cell>, Double> cluster : clusters)
 			clusterValues.add(cluster.getSecond());
 
 		for (Cell cell : cells) {

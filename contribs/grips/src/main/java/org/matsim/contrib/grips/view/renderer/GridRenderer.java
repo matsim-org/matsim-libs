@@ -38,6 +38,7 @@ import java.util.List;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.grips.analysis.EAToolBox;
 import org.matsim.contrib.grips.analysis.data.AttributeData;
 import org.matsim.contrib.grips.analysis.data.Cell;
@@ -46,7 +47,6 @@ import org.matsim.contrib.grips.control.Controller;
 import org.matsim.contrib.grips.model.Constants.Mode;
 import org.matsim.contrib.grips.model.Constants.Unit;
 import org.matsim.contrib.grips.model.config.ToolConfig;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.collections.Tuple;
@@ -112,15 +112,15 @@ public class GridRenderer extends AbstractRenderLayer {
 		if ((links == null) || (links.size() == 0))
 			return;
 
-		HashMap<Id, List<Tuple<Id, Double>>> linkLeaveTimes = data
+		HashMap<Id<Link>, List<Tuple<Id<Person>, Double>>> linkLeaveTimes = data
 				.getLinkLeaveTimes();
-		HashMap<Id, List<Tuple<Id, Double>>> linkEnterTimes = data
+		HashMap<Id<Link>, List<Tuple<Id<Person>, Double>>> linkEnterTimes = data
 				.getLinkEnterTimes();
 
 		for (Link link : this.links) {
-			List<Tuple<Id, Double>> leaveTimes = linkLeaveTimes.get(link
+			List<Tuple<Id<Person>, Double>> leaveTimes = linkLeaveTimes.get(link
 					.getId());
-			List<Tuple<Id, Double>> enterTimes = linkEnterTimes.get(link
+			List<Tuple<Id<Person>, Double>> enterTimes = linkEnterTimes.get(link
 					.getId());
 
 			if ((enterTimes != null) && (enterTimes.size() > 0)
@@ -144,10 +144,10 @@ public class GridRenderer extends AbstractRenderLayer {
 
 				if (data.getLinkUtilizationVisData() != null) {
 					if (data.getLinkUtilizationVisData().getAttribute(
-							(IdImpl) link.getId()) != null) {
-						Tuple<Float, Color> currentColoration = data
+							link.getId()) != null) {
+						Tuple<Float, Color> currentColoration = (Tuple<Float, Color>) data
 								.getLinkUtilizationVisData().getAttribute(
-										(IdImpl) link.getId());
+										link.getId());
 						strokeWidth = ((currentColoration.getFirst() * 35f) / (float) Math
 								.pow(2, this.controller.getZoom()));
 						linkColor = currentColoration.getSecond();
@@ -238,14 +238,14 @@ public class GridRenderer extends AbstractRenderLayer {
 							.setColor(ToolConfig.COLOR_DISABLED_TRANSPARENT); // default
 
 					if (mode.equals(Mode.EVACUATION)) {
-						visData = (AttributeData<Color>) data
+						visData = data
 								.getEvacuationTimeVisData();
 						if ((cell.getCount() > 0))
 							this.imageContainer.setColor(visData
 									.getAttribute(cell.getId()));
 
 					} else if (mode.equals(Mode.CLEARING)) {
-						visData = (AttributeData<Color>) data
+						visData = data
 								.getClearingTimeVisData();
 						if (cell.getClearingTime() > 0)
 							this.imageContainer.setColor(visData
@@ -362,8 +362,8 @@ public class GridRenderer extends AbstractRenderLayer {
 		int minY = (int) Math.min(fromGridPoint.getY(), toGridPoint.getY());
 		int maxY = (int) Math.max(fromGridPoint.getY(), toGridPoint.getY());
 
-		BufferedImage bImage = gc.createCompatibleImage((int) (maxX - minX),
-				(int) (maxY - minY), Transparency.TRANSLUCENT);
+		BufferedImage bImage = gc.createCompatibleImage(maxX - minX,
+				maxY - minY, Transparency.TRANSLUCENT);
 
 		Graphics IG = bImage.getGraphics();
 		Graphics2D IG2D = (Graphics2D) IG;

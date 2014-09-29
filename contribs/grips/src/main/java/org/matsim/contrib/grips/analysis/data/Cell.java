@@ -26,7 +26,8 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -35,11 +36,11 @@ public class Cell {
 	private int count;
 	private List<Event> data;
 	private List<Double> arrivalTimes;
-	private List<Tuple<Tuple<Id, Id>, Double>> linkLeaveTimes;
-	private List<Tuple<Tuple<Id, Id>, Double>> linkEnterTimes;
+	private List<Tuple<Tuple<Id<Link>, Id<Person>>, Double>> linkLeaveTimes;
+	private List<Tuple<Tuple<Id<Link>, Id<Person>>, Double>> linkEnterTimes;
 	private CoordImpl coord;
 	private double clearingTime;
-	private IdImpl id;
+	private Id<Cell> id;
 
 	private static int currentId = 0;
 
@@ -47,13 +48,13 @@ public class Cell {
 
 	public Cell(List<Event> data) {
 		this.data = data;
-		this.linkLeaveTimes = new ArrayList<Tuple<Tuple<Id, Id>, Double>>();
-		this.linkEnterTimes = new ArrayList<Tuple<Tuple<Id, Id>, Double>>();
+		this.linkLeaveTimes = new ArrayList<>();
+		this.linkEnterTimes = new ArrayList<>();
 		this.arrivalTimes = new ArrayList<Double>();
 		this.clearingTime = 0d;
 
 		currentId++;
-		this.id = new IdImpl(currentId);
+		this.id = Id.create(currentId, Cell.class);
 	}
 
 	public double getTimeSum() {
@@ -92,34 +93,34 @@ public class Cell {
 		return arrivalTimes;
 	}
 
-	public List<Tuple<Tuple<Id, Id>, Double>> getLinkEnterTimes() {
+	public List<Tuple<Tuple<Id<Link>, Id<Person>>, Double>> getLinkEnterTimes() {
 		return linkEnterTimes;
 	}
 
-	public List<Tuple<Tuple<Id, Id>, Double>> getLinkLeaveTimes() {
+	public List<Tuple<Tuple<Id<Link>, Id<Person>>, Double>> getLinkLeaveTimes() {
 		return linkLeaveTimes;
 	}
 
-	public void setLinkEnterTimes(List<Tuple<Tuple<Id, Id>, Double>> linkEnterTimes) {
+	public void setLinkEnterTimes(List<Tuple<Tuple<Id<Link>, Id<Person>>, Double>> linkEnterTimes) {
 		this.linkEnterTimes = linkEnterTimes;
 	}
 
-	public void setLinkLeaveTimes(List<Tuple<Tuple<Id, Id>, Double>> linkLeaveTimes) {
+	public void setLinkLeaveTimes(List<Tuple<Tuple<Id<Link>, Id<Person>>, Double>> linkLeaveTimes) {
 		this.linkLeaveTimes = linkLeaveTimes;
 	}
 
-	public void addLinkEnterTime(Id linkId, Id personId, Double time) {
+	public void addLinkEnterTime(Id<Link> linkId, Id<Person> personId, Double time) {
 		if (this.linkEnterTimes == null)
-			this.linkEnterTimes = new ArrayList<Tuple<Tuple<Id, Id>, Double>>();
+			this.linkEnterTimes = new ArrayList<>();
 
-		this.linkEnterTimes.add(new Tuple<Tuple<Id, Id>, Double>(new Tuple<Id, Id>(linkId, personId), time));
+		this.linkEnterTimes.add(new Tuple<Tuple<Id<Link>, Id<Person>>, Double>(new Tuple<Id<Link>, Id<Person>>(linkId, personId), time));
 	}
 
-	public void addLinkLeaveTime(Id linkId, Id personId, Double time) {
+	public void addLinkLeaveTime(Id<Link> linkId, Id<Person> personId, Double time) {
 		if (this.linkLeaveTimes == null)
-			this.linkLeaveTimes = new ArrayList<Tuple<Tuple<Id, Id>, Double>>();
+			this.linkLeaveTimes = new ArrayList<Tuple<Tuple<Id<Link>, Id<Person>>, Double>>();
 
-		this.linkLeaveTimes.add(new Tuple<Tuple<Id, Id>, Double>(new Tuple<Id, Id>(linkId, personId), time));
+		this.linkLeaveTimes.add(new Tuple<Tuple<Id<Link>, Id<Person>>, Double>(new Tuple<Id<Link>, Id<Person>>(linkId, personId), time));
 	}
 
 	public void setCoord(CoordImpl centroid) {
@@ -139,7 +140,7 @@ public class Cell {
 		return clearingTime;
 	}
 
-	public IdImpl getId() {
+	public Id<Cell> getId() {
 		return this.id;
 	}
 

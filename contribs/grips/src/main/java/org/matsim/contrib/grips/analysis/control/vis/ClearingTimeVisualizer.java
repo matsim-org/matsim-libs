@@ -56,7 +56,7 @@ public class ClearingTimeVisualizer {
 	}
 
 	public void processVisualData() {
-		LinkedList<Tuple<Id, Double>> cellIdsAndTimes = new LinkedList<Tuple<Id, Double>>();
+		LinkedList<Tuple<Id<Cell>, Double>> cellIdsAndTimes = new LinkedList<>();
 		LinkedList<Double> cellTimes = new LinkedList<Double>();
 
 		// create new coloration (id <-> color relation)
@@ -68,7 +68,7 @@ public class ClearingTimeVisualizer {
 			// System.out.println("cellid:" + cell.getId());
 			if (!cellTimes.contains(cell.getClearingTime())) {
 				cellTimes.add(cell.getClearingTime());
-				cellIdsAndTimes.add(new Tuple<Id, Double>(cell.getId(), cell.getClearingTime()));
+				cellIdsAndTimes.add(new Tuple<Id<Cell>, Double>(cell.getId(), cell.getClearingTime()));
 			}
 
 			
@@ -77,7 +77,7 @@ public class ClearingTimeVisualizer {
 	
 		// calculate data clusters
 
-		LinkedList<Tuple<Id, Double>> clusters = this.clusterizer.getClusters(cellIdsAndTimes, k);
+		LinkedList<Tuple<Id<Cell>, Double>> clusters = this.clusterizer.getClusters(cellIdsAndTimes, k);
 		this.data.updateClusters(Mode.CLEARING, clusters);
 
 

@@ -127,8 +127,8 @@ public class Controller {
 	public Point2D c1;
 	public Point p0;
 	public Point p1;
-	public Id linkID1;
-	public Id linkID2;
+	public Id<Link> linkID1;
+	public Id<Link> linkID2;
 	private JPanel mainPanel;
 	private Rectangle mainPanelBounds;
 	private boolean inSelection;
@@ -931,14 +931,14 @@ public class Controller {
 
 	}
 
-	public void setTempLinkId(int n, Id id) {
+	public void setTempLinkId(int n, Id<Link> id) {
 		if (n == 0)
 			this.linkID1 = id;
 		else if (n == 1)
 			this.linkID2 = id;
 	}
 
-	public Id getTempLinkId(int n) {
+	public Id<Link> getTempLinkId(int n) {
 		if (n == 0)
 			return this.linkID1;
 		else

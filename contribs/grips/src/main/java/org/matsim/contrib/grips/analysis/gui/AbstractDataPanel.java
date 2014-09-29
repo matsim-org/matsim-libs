@@ -22,12 +22,13 @@ package org.matsim.contrib.grips.analysis.gui;
 
 import javax.swing.JPanel;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.grips.analysis.data.EventData;
 
 public abstract class AbstractDataPanel extends JPanel implements DataPanelInterface {
 
 	private static final long serialVersionUID = 1L;
-	protected EventData data;
+	protected EventData<Link> data;
 	protected int width;
 	protected int height;
 
@@ -47,11 +48,13 @@ public abstract class AbstractDataPanel extends JPanel implements DataPanelInter
 		drawDataPanel();
 	}
 
+	@Override
 	public void setPanelSize(int width, int height) {
 		this.width = width;
 		this.height = height;
 	}
 
+	@Override
 	public abstract void drawDataPanel();
 
 }

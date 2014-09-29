@@ -21,9 +21,10 @@
 package org.matsim.contrib.grips.evacuationptlineseditor;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 
 public class BusStop {
-	Id id;
+	Id<Link> id;
 	protected String hh = "0";
 	protected String mm = "1";
 	protected Object numDepSpinnerValue = new Integer(1);

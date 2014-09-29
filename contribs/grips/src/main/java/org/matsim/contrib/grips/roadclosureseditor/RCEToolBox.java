@@ -39,7 +39,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
@@ -54,7 +53,6 @@ import org.matsim.contrib.grips.model.AbstractModule;
 import org.matsim.contrib.grips.model.AbstractToolBox;
 import org.matsim.contrib.grips.model.Constants;
 import org.matsim.contrib.grips.model.shape.LineShape;
-import org.matsim.contrib.grips.simulation.SimulationMask;
 
 public class RCEToolBox extends AbstractToolBox {
 
@@ -77,9 +75,9 @@ public class RCEToolBox extends AbstractToolBox {
 	private boolean saveLink2;
 	private boolean blockButtonOkClicked;
 
-	private Id currentLinkId1 = null;
-	private Id currentLinkId2 = null;
-	private HashMap<Id, String> roadClosures;
+	private Id<Link> currentLinkId1 = null;
+	private Id<Link> currentLinkId2 = null;
+	private HashMap<Id<Link>, String> roadClosures;
 
 	public RCEToolBox(AbstractModule module, Controller controller) {
 		super(module, controller);
@@ -112,7 +110,7 @@ public class RCEToolBox extends AbstractToolBox {
 		this.cbLink1 = new JCheckBox("link 1");
 		this.cbLink2 = new JCheckBox("link 2");
 
-		this.roadClosures = new HashMap<Id, String>();
+		this.roadClosures = new HashMap<>();
 
 		this.blockButtonOK.addActionListener(new ActionListener() {
 			@Override

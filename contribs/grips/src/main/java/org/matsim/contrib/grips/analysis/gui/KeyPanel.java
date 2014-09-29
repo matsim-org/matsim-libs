@@ -31,9 +31,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.grips.model.Constants.Mode;
 import org.matsim.contrib.grips.model.Constants.Unit;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.Tuple;
 
 public class KeyPanel extends AbstractDataPanel
@@ -62,7 +62,7 @@ public class KeyPanel extends AbstractDataPanel
 		else
 			this.removeAll();
 
-		LinkedList<Tuple<Id, Double>> clusters = this.data.getClusters(mode);
+		LinkedList<Tuple<Id<Link>, Double>> clusters = this.data.getClusters(mode);
 		int k = clusters.size();
 
 		String[] classVal = new String[k];
@@ -75,19 +75,19 @@ public class KeyPanel extends AbstractDataPanel
 		{
 			if (mode.equals(Mode.EVACUATION))
 			{
-				classColor[i] = this.data.getEvacuationTimeVisData().getAttribute((IdImpl) clusters.get(i).getFirst());
+				classColor[i] = this.data.getEvacuationTimeVisData().getAttribute(clusters.get(i).getFirst());
 				classVal[i] = getReadableTime(clusters.get(i).getSecond(), Unit.TIME);
 				
 			}
 			else if (mode.equals(Mode.CLEARING))
 			{
-				classColor[i] = this.data.getClearingTimeVisData().getAttribute((IdImpl) clusters.get(i).getFirst());
+				classColor[i] = this.data.getClearingTimeVisData().getAttribute(clusters.get(i).getFirst());
 				classVal[i] = getReadableTime(clusters.get(i).getSecond(), Unit.TIME);
 				
 			}
 			else
 			{
-				classColor[i] = this.data.getLinkUtilizationVisData().getAttribute((IdImpl) clusters.get(i).getFirst()).getSecond();
+				classColor[i] = this.data.getLinkUtilizationVisData().getAttribute(clusters.get(i).getFirst()).getSecond();
 				classVal[i] = getReadableTime(clusters.get(i).getSecond()/data.getSampleSize(), Unit.PEOPLE);
 			}
 
