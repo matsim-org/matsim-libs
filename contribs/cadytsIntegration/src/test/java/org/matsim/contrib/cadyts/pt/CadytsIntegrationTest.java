@@ -29,6 +29,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsCostOffsetsXMLFileIO;
@@ -36,7 +37,6 @@ import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.contrib.cadyts.utils.CalibrationStatReader;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.Module;
@@ -79,7 +79,7 @@ public class CadytsIntegrationTest {
 
 		Config config = createTestConfig(inputDir, this.utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
-		StrategySettings stratSets = new StrategySettings(new IdImpl(1));
+		StrategySettings stratSets = new StrategySettings(Id.create(1, StrategySettings.class));
 		stratSets.setModuleName("ccc") ;
 		stratSets.setProbability(1.) ;
 		config.strategy().addStrategySettings(stratSets) ;
@@ -88,7 +88,6 @@ public class CadytsIntegrationTest {
 		final Controler controler = new Controler(scenario);
 		final CadytsPtContext context = new CadytsPtContext( config, controler.getEvents()  ) ;
 		controler.addControlerListener(context) ;
-		controler.setOverwriteFiles(true);
 		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
@@ -127,7 +126,7 @@ public class CadytsIntegrationTest {
 
 		config.planCalcScore().setBrainExpBeta(beta) ;
 
-		StrategySettings stratSets = new StrategySettings(new IdImpl("1")) ;
+		StrategySettings stratSets = new StrategySettings(Id.create("1", StrategySettings.class)) ;
 		//		stratSets.setModuleName("ChangeExpBeta") ;
 		stratSets.setModuleName("ccc") ;
 		stratSets.setProbability(1.0) ;
@@ -138,7 +137,6 @@ public class CadytsIntegrationTest {
 		final Controler controler = new Controler(config);
 		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(true);
-		controler.setOverwriteFiles(true) ;
 
 		final CadytsPtContext cContext = new CadytsPtContext( config, controler.getEvents()  ) ;
 		controler.addControlerListener(cContext) ;
@@ -194,7 +192,7 @@ public class CadytsIntegrationTest {
 		Assert.assertEquals("Occupancy count file is wrong.", controler.getScenario().getConfig().ptCounts().getOccupancyCountsFileName(), inputDir + "counts/counts_occupancy.xml");
 		Counts occupCounts = new Counts();
 		new MatsimCountsReader(occupCounts).readFile(controler.getScenario().getConfig().ptCounts().getOccupancyCountsFileName());
-		Count count =  occupCounts.getCount(new IdImpl("stop1"));
+		Count count =  occupCounts.getCount(Id.create("stop1", Link.class)); // casting id from stop to link, not nice
 		Assert.assertEquals("Occupancy counts description is wrong", occupCounts.getDescription(), "counts values for equil net");
 		Assert.assertEquals("CsId is wrong.", count.getCsId() , "stop1");
 		Assert.assertEquals("Volume of hour 4 is wrong", count.getVolume(7).getValue(), 4.0 , MatsimTestUtils.EPSILON);
@@ -207,25 +205,25 @@ public class CadytsIntegrationTest {
 			double[] simValues;
 			double[] realValues;
 
-			Id stopId1 = new IdImpl("stop1");
+			Id<TransitStopFacility> stopId1 = Id.create("stop1", TransitStopFacility.class);
 			simValues = reader.getSimulatedValues(stopId1);
 			realValues= reader.getRealValues(stopId1);
 			Assert.assertEquals("Volume of hour 6 is wrong", 4.0, simValues[6], MatsimTestUtils.EPSILON);
 			Assert.assertEquals("Volume of hour 6 is wrong", 4.0, realValues[6], MatsimTestUtils.EPSILON);
 
-			Id stopId2 = new IdImpl("stop2");
+			Id<TransitStopFacility> stopId2 = Id.create("stop2", TransitStopFacility.class);
 			simValues = reader.getSimulatedValues(stopId2);
 			realValues= reader.getRealValues(stopId2);
 			Assert.assertEquals("Volume of hour 6 is wrong", 0.0, simValues[6], MatsimTestUtils.EPSILON);
 			Assert.assertEquals("Volume of hour 6 is wrong", 1.0, realValues[6] , MatsimTestUtils.EPSILON);
 
-			Id stopId6 = new IdImpl("stop6");
+			Id<TransitStopFacility> stopId6 = Id.create("stop6", TransitStopFacility.class);
 			simValues = reader.getSimulatedValues(stopId6);
 			realValues= reader.getRealValues(stopId6);
 			Assert.assertEquals("Volume of hour 6 is wrong", 0.0, simValues[6], MatsimTestUtils.EPSILON);
 			Assert.assertEquals("Volume of hour 6 is wrong", 2.0, realValues[6], MatsimTestUtils.EPSILON);
 
-			Id stopId10 = new IdImpl("stop10");
+			Id<TransitStopFacility> stopId10 = Id.create("stop10", TransitStopFacility.class);
 			simValues = reader.getSimulatedValues(stopId10);
 			realValues= reader.getRealValues(stopId10);
 			Assert.assertEquals("Volume of hour 6 is wrong", 4.0, simValues[6], MatsimTestUtils.EPSILON);
@@ -256,7 +254,7 @@ public class CadytsIntegrationTest {
 			String linkOffsetFile = outputDir + "ITERS/it." + lastIteration + "/" + lastIteration + ".linkCostOffsets.xml";
 			//			CadytsPtLinkCostOffsetsXMLFileIO offsetReader = new CadytsPtLinkCostOffsetsXMLFileIO (schedule);
 			CadytsCostOffsetsXMLFileIO<TransitStopFacility> offsetReader 
-			= new CadytsCostOffsetsXMLFileIO<TransitStopFacility> (new TransitStopFacilityLookUp(controler.getScenario()));
+			= new CadytsCostOffsetsXMLFileIO<TransitStopFacility> (new TransitStopFacilityLookUp(controler.getScenario()), TransitStopFacility.class);
 			DynamicData<TransitStopFacility> stopOffsets = offsetReader.read(linkOffsetFile);
 
 			TransitStopFacility stop2 = schedule.getFacilities().get(stopId2);
@@ -292,7 +290,7 @@ public class CadytsIntegrationTest {
 
 		config.planCalcScore().setBrainExpBeta(beta) ;
 
-		StrategySettings stratSets = new StrategySettings(new IdImpl(1));
+		StrategySettings stratSets = new StrategySettings(Id.create(1, StrategySettings.class));
 		stratSets.setModuleName("ccc") ;
 		stratSets.setProbability(1.) ;
 		config.strategy().addStrategySettings(stratSets) ;
@@ -302,7 +300,6 @@ public class CadytsIntegrationTest {
 		final Controler controler = new Controler( scenario );
 		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(true);
-		controler.setOverwriteFiles(true) ;
 
 		final CadytsPtContext context = new CadytsPtContext( config, controler.getEvents()  ) ;
 		controler.addControlerListener(context) ;
@@ -334,7 +331,7 @@ public class CadytsIntegrationTest {
 		Assert.assertEquals("Occupancy count file is wrong.", controler.getScenario().getConfig().ptCounts().getOccupancyCountsFileName(), inputDir + "counts/counts_occupancy.xml");
 		Counts occupCounts = new Counts();
 		new MatsimCountsReader(occupCounts).readFile(controler.getScenario().getConfig().ptCounts().getOccupancyCountsFileName());
-		Count count =  occupCounts.getCount(new IdImpl("stop1"));
+		Count count =  occupCounts.getCount(Id.create("stop1", Link.class)); // casting the id from a stop to a link, not nice..
 		Assert.assertEquals("Occupancy counts description is wrong", occupCounts.getDescription(), "counts values for equil net");
 		Assert.assertEquals("CsId is wrong.", count.getCsId() , "stop1");
 		Assert.assertEquals("Volume of hour 4 is wrong", count.getVolume(7).getValue(), 4.0 , MatsimTestUtils.EPSILON);
@@ -347,25 +344,25 @@ public class CadytsIntegrationTest {
 			double[] simValues;
 			double[] realValues;
 
-			Id stopId1 = new IdImpl("stop1");
+			Id<TransitStopFacility> stopId1 = Id.create("stop1", TransitStopFacility.class);
 			simValues = reader.getSimulatedValues(stopId1);
 			realValues= reader.getRealValues(stopId1);
 			Assert.assertEquals("Volume of hour 6 is wrong", 4.0, simValues[6], MatsimTestUtils.EPSILON);
 			Assert.assertEquals("Volume of hour 6 is wrong", 4.0, realValues[6], MatsimTestUtils.EPSILON);
 
-			Id stopId2 = new IdImpl("stop2");
+			Id<TransitStopFacility> stopId2 = Id.create("stop2", TransitStopFacility.class);
 			simValues = reader.getSimulatedValues(stopId2);
 			realValues= reader.getRealValues(stopId2);
 			Assert.assertEquals("Volume of hour 6 is wrong", 0.0, simValues[6], MatsimTestUtils.EPSILON);
 			Assert.assertEquals("Volume of hour 6 is wrong", 1.0, realValues[6] , MatsimTestUtils.EPSILON);
 
-			Id stopId6 = new IdImpl("stop6");
+			Id<TransitStopFacility> stopId6 = Id.create("stop6", TransitStopFacility.class);
 			simValues = reader.getSimulatedValues(stopId6);
 			realValues= reader.getRealValues(stopId6);
 			Assert.assertEquals("Volume of hour 6 is wrong", 0.0, simValues[6], MatsimTestUtils.EPSILON);
 			Assert.assertEquals("Volume of hour 6 is wrong", 2.0, realValues[6], MatsimTestUtils.EPSILON);
 
-			Id stopId10 = new IdImpl("stop10");
+			Id<TransitStopFacility> stopId10 = Id.create("stop10", TransitStopFacility.class);
 			simValues = reader.getSimulatedValues(stopId10);
 			realValues= reader.getRealValues(stopId10);
 			Assert.assertEquals("Volume of hour 6 is wrong", 4.0, simValues[6], MatsimTestUtils.EPSILON);
@@ -396,7 +393,7 @@ public class CadytsIntegrationTest {
 			String linkOffsetFile = outputDir + "ITERS/it." + lastIteration + "/" + lastIteration + ".linkCostOffsets.xml";
 			//			CadytsPtLinkCostOffsetsXMLFileIO offsetReader = new CadytsPtLinkCostOffsetsXMLFileIO (schedule);
 			CadytsCostOffsetsXMLFileIO<TransitStopFacility> offsetReader 
-			= new CadytsCostOffsetsXMLFileIO<TransitStopFacility> (new TransitStopFacilityLookUp(controler.getScenario()));
+			= new CadytsCostOffsetsXMLFileIO<TransitStopFacility> (new TransitStopFacilityLookUp(controler.getScenario()), TransitStopFacility.class);
 			DynamicData<TransitStopFacility> stopOffsets = offsetReader.read(linkOffsetFile);
 
 			TransitStopFacility stop2 = schedule.getFacilities().get(stopId2);
@@ -440,7 +437,7 @@ public class CadytsIntegrationTest {
 
 		config.ptCounts().setPtCountsInterval(1) ;
 
-		StrategySettings stratSets = new StrategySettings(new IdImpl(1));
+		StrategySettings stratSets = new StrategySettings(Id.create(1, StrategySettings.class));
 		stratSets.setModuleName("ccc") ;
 		stratSets.setProbability(1.) ;
 		config.strategy().addStrategySettings(stratSets) ;
@@ -453,7 +450,7 @@ public class CadytsIntegrationTest {
 		final Controler controler = new Controler(config);
 		final CadytsPtContext context = new CadytsPtContext( config, controler.getEvents()  ) ;
 		controler.addControlerListener(context) ;
-		controler.setOverwriteFiles(true);
+//		controler.setOverwriteFiles(true);
 		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
@@ -485,7 +482,7 @@ public class CadytsIntegrationTest {
 		Assert.assertEquals("Occupancy count file is wrong.", controler.getScenario().getConfig().ptCounts().getOccupancyCountsFileName(), inputDir + "counts/counts_occupancy.xml");
 		Counts occupCounts = new Counts();
 		new MatsimCountsReader(occupCounts).readFile(controler.getScenario().getConfig().ptCounts().getOccupancyCountsFileName());
-		Count count =  occupCounts.getCount(new IdImpl("stop1"));
+		Count count =  occupCounts.getCount(Id.create("stop1", Link.class));
 		Assert.assertEquals("Occupancy counts description is wrong", occupCounts.getDescription(), "counts values for equil net");
 		Assert.assertEquals("CsId is wrong.", count.getCsId() , "stop1");
 
@@ -497,28 +494,28 @@ public class CadytsIntegrationTest {
 		// test resulting simulation volumes
 		String outCounts = outputDir + "ITERS/it." + lastIteration + "/" + lastIteration + ".simCountCompareOccupancy.txt";
 		CountsReader reader = new CountsReader(outCounts);
-		Id stopId1 = new IdImpl("stop1");
+		Id<TransitStopFacility> stopId1 = Id.create("stop1", TransitStopFacility.class);
 		{
 			double[] simValues = reader.getSimulatedValues(stopId1);
 			double[] realValues= reader.getRealValues(stopId1);
 			Assert.assertEquals("Volume of hour 6 (probably: 7) is wrong", 4.0, simValues[6], MatsimTestUtils.EPSILON);
 			Assert.assertEquals("Volume of hour 6 (probably: 7) is wrong", 4.0, realValues[6], MatsimTestUtils.EPSILON);
 		}
-		Id stopId2 = new IdImpl("stop2");
+		Id<TransitStopFacility> stopId2 = Id.create("stop2", TransitStopFacility.class);
 		{
 			double[] simValues = reader.getSimulatedValues(stopId2);
 			double[] realValues= reader.getRealValues(stopId2);
 			Assert.assertEquals("Volume of hour 6 (probably: 7) is wrong", 0.0, simValues[6], MatsimTestUtils.EPSILON);
 			Assert.assertEquals("Volume of hour 6 (probably: 7) is wrong", 1.0, realValues[6] , MatsimTestUtils.EPSILON);
 		}
-		Id stopId6 = new IdImpl("stop6");
+		Id<TransitStopFacility> stopId6 = Id.create("stop6", TransitStopFacility.class);
 		{
 			double[] simValues = reader.getSimulatedValues(stopId6);
 			double[] realValues= reader.getRealValues(stopId6);
 			Assert.assertEquals("Volume of hour 6 (probably: 7) is wrong", 0.0, simValues[6], MatsimTestUtils.EPSILON);
 			Assert.assertEquals("Volume of hour 6 (probably: 7) is wrong", 2.0, realValues[6], MatsimTestUtils.EPSILON);
 		}
-		Id stopId10 = new IdImpl("stop10");
+		Id<TransitStopFacility> stopId10 = Id.create("stop10", TransitStopFacility.class);
 		{
 			double[] simValues = reader.getSimulatedValues(stopId10);
 			double[] realValues= reader.getRealValues(stopId10);
@@ -561,7 +558,7 @@ public class CadytsIntegrationTest {
 		//test link offsets
 		final TransitSchedule schedule = controler.getScenario().getTransitSchedule();
 		CadytsCostOffsetsXMLFileIO<TransitStopFacility> offsetReader = 
-				new CadytsCostOffsetsXMLFileIO<TransitStopFacility> (new TransitStopFacilityLookUp(controler.getScenario()));
+				new CadytsCostOffsetsXMLFileIO<TransitStopFacility> (new TransitStopFacilityLookUp(controler.getScenario()), TransitStopFacility.class);
 		DynamicData<TransitStopFacility> stopOffsets = 
 				offsetReader.read(outputDir + "ITERS/it." + lastIteration + "/" + lastIteration + ".linkCostOffsets.xml");
 

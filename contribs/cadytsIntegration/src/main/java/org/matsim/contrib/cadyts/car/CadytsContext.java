@@ -137,7 +137,7 @@ public class CadytsContext implements CadytsContextI<Link>, StartupListener, Ite
 		String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), LINKOFFSET_FILENAME);
 		try {
 //			new CadytsLinkCostOffsetsXMLFileIO(event.getControler().getScenario().getNetwork())
-			new CadytsCostOffsetsXMLFileIO<Link>(new LinkLookUp(event.getControler().getScenario()))
+			new CadytsCostOffsetsXMLFileIO<Link>(new LinkLookUp(event.getControler().getScenario()), Link.class)
    			   .write(filename, this.calibrator.getLinkCostOffsets());
 		} catch (IOException e) {
 			log.error("Could not write link cost offsets!", e);

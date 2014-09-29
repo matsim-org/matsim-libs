@@ -21,7 +21,12 @@
 package org.matsim.contrib.analysis.kai;
 
 import org.apache.log4j.Logger;
-import org.junit.*;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -30,10 +35,10 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.analysis.kai.KNAnalysisEventsHandler.StatType;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.LegImpl;
@@ -54,8 +59,8 @@ public class KNAnalysisEventsHandlerTest {
 	// yy this test is probably not doing anything with respect to some of the newer statistics, such as money. kai, mar'14 
 
 	public static final String BASE_FILE_NAME = "stats_";
-	public static final Id DEFAULT_PERSON_ID = new IdImpl(123);
-	public static final Id DEFAULT_LINK_ID = new IdImpl(456);
+	public static final Id<Person> DEFAULT_PERSON_ID = Id.create(123, Person.class);
+	public static final Id<Link> DEFAULT_LINK_ID = Id.create(456, Link.class);
 
 	private Scenario scenario = null ;
 	private Population population = null ;
@@ -82,9 +87,9 @@ public class KNAnalysisEventsHandlerTest {
 		plan.setScore(12.);
 
 		this.network = scenario.getNetwork();
-		Node fromNode = this.network.getFactory().createNode(new IdImpl("123456"), new CoordImpl(100.0, 100.0));
+		Node fromNode = this.network.getFactory().createNode(Id.create("123456", Node.class), new CoordImpl(100.0, 100.0));
 		this.network.addNode(fromNode);
-		Node toNode = this.network.getFactory().createNode(new IdImpl("789012"), new CoordImpl(200.0, 200.0));
+		Node toNode = this.network.getFactory().createNode(Id.create("789012", Node.class), new CoordImpl(200.0, 200.0));
 		this.network.addNode(toNode);
 		Link link = this.network.getFactory().createLink(DEFAULT_LINK_ID, fromNode.getId(), toNode.getId());
 		link.setLength(Math.sqrt(20000.0));

@@ -3,10 +3,10 @@ package playground.mmoyo.utils;
 import java.io.File;
 import java.io.IOException;
 
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.contrib.cadyts.general.CadytsCostOffsetsXMLFileIO;
 import org.matsim.contrib.cadyts.pt.TransitStopFacilityLookUp;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import cadyts.utilities.misc.DynamicData;
 
@@ -24,7 +24,7 @@ public class LinkOffsetScaler {
 
 //		CadytsPtLinkCostOffsetsXMLFileIO reader = new CadytsPtLinkCostOffsetsXMLFileIO (schedule);
 		CadytsCostOffsetsXMLFileIO<TransitStopFacility> reader 
-		   = new CadytsCostOffsetsXMLFileIO<TransitStopFacility> (new TransitStopFacilityLookUp(schedule));
+		   = new CadytsCostOffsetsXMLFileIO<TransitStopFacility> (new TransitStopFacilityLookUp(schedule), TransitStopFacility.class);
 
 		DynamicData<TransitStopFacility> stopOffsets = reader.read(linkCostOffsetFilePath);
 
@@ -41,7 +41,7 @@ public class LinkOffsetScaler {
 		try {
 //			CadytsPtLinkCostOffsetsXMLFileIO cadytsPtLinkCostOffsetsXMLFileIO = new CadytsPtLinkCostOffsetsXMLFileIO( schedule );
 			CadytsCostOffsetsXMLFileIO<TransitStopFacility> cadytsPtLinkCostOffsetsXMLFileIO 
-			   = new CadytsCostOffsetsXMLFileIO<TransitStopFacility> (new TransitStopFacilityLookUp(schedule));
+			   = new CadytsCostOffsetsXMLFileIO<TransitStopFacility> (new TransitStopFacilityLookUp(schedule), TransitStopFacility.class);
 
 			cadytsPtLinkCostOffsetsXMLFileIO.write( filename , stopOffsets);
 			cadytsPtLinkCostOffsetsXMLFileIO = null;

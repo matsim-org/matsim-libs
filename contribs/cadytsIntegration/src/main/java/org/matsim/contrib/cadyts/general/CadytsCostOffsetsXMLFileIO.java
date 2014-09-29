@@ -19,29 +19,29 @@
 
 package org.matsim.contrib.cadyts.general;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
-import org.matsim.core.basic.v01.IdImpl;
 
 import cadyts.utilities.misc.DynamicDataXMLFileIO;
-
-
 
 /**
  * Enables cadyts to persist the cost offsets to file.
  */
-public final class CadytsCostOffsetsXMLFileIO<T extends Identifiable> extends DynamicDataXMLFileIO<T> {
+public final class CadytsCostOffsetsXMLFileIO<T extends Identifiable<T>> extends DynamicDataXMLFileIO<T> {
 
 	private static final long serialVersionUID = 1L;
 	private LookUp<T> lookUp;
+	private Class<T> idType;
 
-	public CadytsCostOffsetsXMLFileIO(final LookUp<T> lookUp ) {
+	public CadytsCostOffsetsXMLFileIO(final LookUp<T> lookUp, Class<T> idType) {
 		super();
-		this.lookUp = lookUp ;
+		this.lookUp = lookUp;
+		this.idType = idType;
 	}
 
 	@Override
 	protected T attrValue2key(final String stopId) {
-		return this.lookUp.lookUp(new IdImpl(stopId)) ;
+		return this.lookUp.lookUp(Id.create(stopId, idType));
 	}
 
 	@Override

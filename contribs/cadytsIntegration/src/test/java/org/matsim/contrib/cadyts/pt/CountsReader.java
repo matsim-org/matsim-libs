@@ -22,13 +22,12 @@ package org.matsim.contrib.cadyts.pt;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.misc.StringUtils;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * parses a output text file containing counts comparisons
@@ -45,7 +44,7 @@ final class CountsReader {
 	final String ZERO = "0.0";
 
 	String countsTextFile;
-	Map<Id, Map<String, double[]>> count = new TreeMap<Id, Map<String, double[]>>();
+	Map<Id<TransitStopFacility>, Map<String, double[]>> count = new TreeMap<>();
 
 	CountsReader(final String countsTextFile){
 		this.countsTextFile = countsTextFile;
@@ -60,13 +59,13 @@ final class CountsReader {
 			String row = bufferedReader.readLine(); // TODO : include the first row inside the iteration
 			String[] values = StringUtils.explode(row, '\t');
 
-			Id id = new IdImpl(values[1]);
+			Id<TransitStopFacility> id = Id.create(values[1], TransitStopFacility.class);
 			while (row != null) {
 				row = bufferedReader.readLine();
 				if (row != null && row != "") {
 					values = StringUtils.explode(row, '\t');
 					if (values[0].equals(this.STOP_ID_STRING_0)) {
-						id = new IdImpl(values[1]);
+						id = Id.create(values[1], TransitStopFacility.class);
 					} else if (values[0].equals(this.HEAD_STRING_0)) {
 						// it does nothing, correct this condition
 					} else {
@@ -88,28 +87,28 @@ final class CountsReader {
 	/**
 	 * I am reasonably sure that the first entry (hour 1) is at array-position 0. kai, sep'14
 	 */
-	double[]getSimulatedValues(final Id stopId) {
+	double[]getSimulatedValues(final Id<TransitStopFacility> stopId) {
 		return this.getCountValues(stopId, 0);
 	}
 
 	/**
 	 * I am reasonably sure that the first entry (hour 1) is at array-position 0. kai, sep'14
 	 */
-	double[]getSimulatedScaled(final Id stopId) {
+	double[]getSimulatedScaled(final Id<TransitStopFacility> stopId) {
 		return this.getCountValues(stopId, 1);
 	}
 
 	/**
 	 * I am reasonably sure that the first entry (hour 1) is at array-position 0. kai, sep'14
 	 */
-	double[]getRealValues(final Id stopId) {
+	double[]getRealValues(final Id<TransitStopFacility> stopId) {
 		return this.getCountValues(stopId, 2);
 	}
 
 	/**
 	 * I am reasonably sure that the first entry (hour 1) is at array-position 0. kai, sep'14
 	 */
-	double[]getCountValues(final Id stopId, final int col) {
+	double[]getCountValues(final Id<TransitStopFacility> stopId, final int col) {
 		double[] valueArray = new double[24];
 		for (byte i= 0; i<24 ; i++) {
 			String hour = String.valueOf(i+1);
@@ -125,13 +124,6 @@ final class CountsReader {
 			}
 		}
 		return valueArray;
-	}
-
-	/**
-	 * @return returns a id set of stops listed in the text file
-	 */
-	Set<Id> getStopsIds(){
-		return this.count.keySet();
 	}
 
 }

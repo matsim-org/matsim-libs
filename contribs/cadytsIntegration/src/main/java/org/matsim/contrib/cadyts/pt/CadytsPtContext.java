@@ -147,8 +147,8 @@ CadytsContextI<TransitStopFacility> {
 		int it = event.getIteration();
 
 		// Get all stations of all analyzed lines and invoke the method write to get all information of them
-		Set<Id> stopIds = new HashSet<Id>();
-		for (Id lineId : this.cadytsConfig.getCalibratedItems()) {
+		Set<Id<TransitStopFacility>> stopIds = new HashSet<>();
+		for (Id<TransitLine> lineId : this.cadytsConfig.getCalibratedItems()) {
 			TransitLine line = event.getControler().getScenario().getTransitSchedule().getTransitLines().get(lineId);
 			for (TransitRoute route : line.getRoutes().values()) {
 				for (TransitRouteStop stop : route.getStops()) {
@@ -172,7 +172,7 @@ CadytsContextI<TransitStopFacility> {
 		// write some output
 		String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), LINKOFFSET_FILENAME);
 		try {
-			new CadytsCostOffsetsXMLFileIO<TransitStopFacility>(new TransitStopFacilityLookUp(event.getControler().getScenario()))  
+			new CadytsCostOffsetsXMLFileIO<TransitStopFacility>(new TransitStopFacilityLookUp(event.getControler().getScenario()), TransitStopFacility.class)
 			.write(filename, this.calibrator.getLinkCostOffsets());
 		} catch (IOException e) {
 			log.error("Could not write link cost offsets!", e);

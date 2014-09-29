@@ -177,7 +177,7 @@ public class LinkCostOffsetbars {
 		TransitSchedule schedule = dLoader.readTransitSchedule(transitScheduleFilePath);
 //		CadytsPtLinkCostOffsetsXMLFileIO reader = new CadytsPtLinkCostOffsetsXMLFileIO (schedule);
 		CadytsCostOffsetsXMLFileIO<TransitStopFacility> reader 
-		   = new CadytsCostOffsetsXMLFileIO<TransitStopFacility> (new TransitStopFacilityLookUp(schedule));
+		   = new CadytsCostOffsetsXMLFileIO<TransitStopFacility> (new TransitStopFacilityLookUp(schedule), TransitStopFacility.class);
 
 		
 		cadyts.utilities.misc.DynamicData<TransitStopFacility> stopOffsets = reader.read(linkCostOffsetFilePath);

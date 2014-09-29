@@ -6,9 +6,9 @@ import org.matsim.contrib.cadyts.pt.TransitStopFacilityLookUp;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import cadyts.utilities.misc.DynamicData;
 import playground.mmoyo.analysis.counts.reader.CountsReader;
 import playground.mmoyo.utils.DataLoader;
+import cadyts.utilities.misc.DynamicData;
 
 public class LinkOffsetValidator {
 	final static String SEP = " ";
@@ -28,7 +28,7 @@ public class LinkOffsetValidator {
 
 //		CadytsPtLinkCostOffsetsXMLFileIO reader = new CadytsPtLinkCostOffsetsXMLFileIO (schedule);
 		CadytsCostOffsetsXMLFileIO<TransitStopFacility> reader 
-		   = new CadytsCostOffsetsXMLFileIO<TransitStopFacility> (new TransitStopFacilityLookUp(schedule));
+		   = new CadytsCostOffsetsXMLFileIO<TransitStopFacility> (new TransitStopFacilityLookUp(schedule), TransitStopFacility.class);
 
 		DynamicData<TransitStopFacility> stopOffsets = reader.read(linkCostOffsetFilePath);
 

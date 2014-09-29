@@ -27,7 +27,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.misc.StringUtils;
 
 /**Parses a output text file containing counts comparisons for car
@@ -45,7 +45,7 @@ public class CountsReaderCar {
 	// final String ZERO = "0.0";
 
 	String countsTextFile;
-	Map<Id, Map<String, double[]>> count = new TreeMap<Id, Map<String, double[]>>();
+	Map<Id<Link>, Map<String, double[]>> count = new TreeMap<>();
 
 	public CountsReaderCar(final String countsTextFile){
 		this.countsTextFile = countsTextFile;
@@ -69,7 +69,7 @@ public class CountsReaderCar {
 					String[] values = StringUtils.explode(row, '\t');
 					// if (values[0].equals(this.STOP_ID_STRING_0)) {
 						//id = new IdImpl(values[1]);
-						Id id = new IdImpl(values[0]);
+						Id<Link> id = Id.create(values[0], Link.class);
 					//}
 					// else if (values[0].equals(this.HEAD_STRING_0)) {
 						// it does nothing, correct this condition
@@ -93,7 +93,7 @@ public class CountsReaderCar {
 	}
 
 	// public double[]getSimulatedValues(final Id stopId) {
-	public double[]getSimulatedValues(final Id locId) {
+	public double[]getSimulatedValues(final Id<Link> locId) {
 		// return this.getCountValues(stopId, 0);
 		return this.getCountValues(locId, 0);
 	}
@@ -103,18 +103,18 @@ public class CountsReaderCar {
 //	}
 
 	// public double[]getRealValues(final Id stopId) {
-	public double[]getRealValues(final Id locId) {
+	public double[]getRealValues(final Id<Link> locId) {
 		// return this.getCountValues(stopId, 2);
 		return this.getCountValues(locId, 1);
 	}
 
 	// private double[]getCountValues(final Id stopId, final int col) {
-	private double[]getCountValues(final Id stopId, final int col) {
+	private double[]getCountValues(final Id<Link> linkId, final int col) {
 		double[] valueArray = new double[24];
 		for (byte i= 0; i<24 ; i++) {
 			String hour = String.valueOf(i+1);
-			if (this.count.keySet().contains(stopId)) {
-				double[] value = this.count.get(stopId).get(hour);
+			if (this.count.keySet().contains(linkId)) {
+				double[] value = this.count.get(linkId).get(hour);
 				if (value == null){
 					valueArray[i] = 0.0;
 				} else {
@@ -131,7 +131,7 @@ public class CountsReaderCar {
 	/**
 	 * @return returns a id set of stops listed in the text file
 	 */
-	public Set<Id> getStopsIds(){
+	public Set<Id<Link>> getStopsIds(){
 		return this.count.keySet();
 	}
 

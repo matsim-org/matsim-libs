@@ -46,13 +46,13 @@ import org.matsim.counts.Counts;
 
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
 
-class Item implements Identifiable, Comparable<Item> {
-	private final Id id;
-	Item( Id id ) {
+class Item implements Identifiable<Item>, Comparable<Item> {
+	private final Id<Item> id;
+	Item( Id<Item> id ) {
 		this.id = id ;
 	}
 	@Override
-	public Id getId() {
+	public Id<Item> getId() {
 		return this.id ;
 	}
 	@Override
@@ -154,7 +154,7 @@ class CadytsFreightChainsContext implements CadytsContextI<Item>, BeforeMobsimLi
 		// write some output
 		String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), LINKOFFSET_FILENAME);
 		try {
-			new CadytsCostOffsetsXMLFileIO<Item>( this.lookUp ).write(filename, this.calibrator.getLinkCostOffsets());
+			new CadytsCostOffsetsXMLFileIO<Item>( this.lookUp, Item.class ).write(filename, this.calibrator.getLinkCostOffsets());
 		} catch (IOException e) {
 			log.error("Could not write link cost offsets.  Continuing anyway ...", e);
 		}

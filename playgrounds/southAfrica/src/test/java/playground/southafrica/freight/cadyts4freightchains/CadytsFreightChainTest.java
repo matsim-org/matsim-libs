@@ -185,7 +185,7 @@ public class CadytsFreightChainTest {
 
 		// CadytsPtLinkCostOffsetsXMLFileIO offsetReader = new CadytsPtLinkCostOffsetsXMLFileIO (schedule);
 		//			CadytsLinkCostOffsetsXMLFileIO offsetReader = new CadytsLinkCostOffsetsXMLFileIO(network);
-		CadytsCostOffsetsXMLFileIO<Item> offsetReader = new CadytsCostOffsetsXMLFileIO<Item>( cContext.getLookUp() );
+		CadytsCostOffsetsXMLFileIO<Item> offsetReader = new CadytsCostOffsetsXMLFileIO<Item>( cContext.getLookUp(), Item.class );
 
 		DynamicData<Item> linkOffsets = offsetReader.read(linkOffsetFile);
 
