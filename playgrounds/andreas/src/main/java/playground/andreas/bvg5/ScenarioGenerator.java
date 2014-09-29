@@ -80,7 +80,7 @@ public class ScenarioGenerator {
 
 	public static void main(String[] args) {
 //		String outputdir = "e:/_shared-svn/andreas/paratransit/b285/run/output/";
-		String outputdir = "e:/_shared-svn/andreas/paratransit/txl/run/output_huge/";
+		String outputdir = "e:/_shared-svn/_projects/bvg_6_paratransit_scaling/b285/run/input_10pt/";
 		String targetCoordinateSystem = TransformationFactory.WGS84_UTM33N; // Berlin
 		double distance = 100.0;
 		
@@ -88,16 +88,18 @@ public class ScenarioGenerator {
 		String scheduleFile = "e:/_shared-svn/andreas/paratransit/b285/common_ana/baseSchedule/transitSchedule_basecase.xml.gz";
 		String vehiclesFile = "e:/_shared-svn/andreas/paratransit/b285/run/input/transitVehicles100.final.xml.gz";
 
-//		String popInFile = "d:/Berlin/berlin_bvg3/berlin-bvg09_runs/bvg.run189.10pct/ITERS/it.100/bvg.run189.10pct.100.plans.selected.xml.gz";
-//		String eventsFile = "d:/Berlin/berlin_bvg3/berlin-bvg09_runs/bvg.run189.10pct/ITERS/it.100/bvg.run189.10pct.100.events.xml.gz";
+		String popInFile = "d:/Berlin/berlin_bvg3/berlin-bvg09_runs/bvg.run189.10pct/ITERS/it.100/bvg.run189.10pct.100.plans.selected.xml.gz";
+		String eventsFile = "d:/Berlin/berlin_bvg3/berlin-bvg09_runs/bvg.run189.10pct/ITERS/it.100/bvg.run189.10pct.100.events_enriched.xml.gz";
 		
 //		String popInFile = "d:/Berlin/berlin_bvg3/berlin-bvg09_runs/bvg.run192.100pct/ITERS/it.100/bvg.run192.100pct.100.plans.selected.xml.gz";
-		String popInFile = "d:/Berlin/berlin_bvg3/berlin-bvg09_runs/bvg.run190.25pct/ITERS/it.100/bvg.run190.25pct.100.plans.selected.xml.gz";
 //		String eventsFile = "d:/Berlin/berlin_bvg3/berlin-bvg09_runs/bvg.run192.100pct/ITERS/it.100/bvg.run192.100pct.100.events_enriched.xml.gz";
-		String eventsFile = "d:/Berlin/berlin_bvg3/berlin-bvg09_runs/bvg.run190.25pct/ITERS/it.100/bvg.run190.25pct.100.events_enriched.xml.gz";
-//		String scenarioAreaFilename = "e:/_shared-svn/andreas/paratransit/b285/run/input/scenarioArea.shp";
+		
+//		String popInFile = "d:/Berlin/berlin_bvg3/berlin-bvg09_runs/bvg.run190.25pct/ITERS/it.100/bvg.run190.25pct.100.plans.selected.xml.gz";
+//		String eventsFile = "d:/Berlin/berlin_bvg3/berlin-bvg09_runs/bvg.run190.25pct/ITERS/it.100/bvg.run190.25pct.100.events_enriched.xml.gz";
+		
+		String scenarioAreaFilename = "e:/_shared-svn/andreas/paratransit/b285/run/input/scenarioArea.shp";
 //		String scenarioAreaFilename = "e:/_shared-svn/andreas/paratransit/txl/run/output_medium/scenarioArea.shp";
-		String scenarioAreaFilename = "e:/_shared-svn/andreas/paratransit/txl/run/output_huge/scenarioArea.shp";
+//		String scenarioAreaFilename = "e:/_shared-svn/andreas/paratransit/txl/run/output_huge/scenarioArea.shp";
 		
 		Set<Id> linesToSimulatePara = new TreeSet<Id>();
 		// B285
@@ -108,10 +110,10 @@ public class ScenarioGenerator {
 //		linesToSimulatePara.add(new IdImpl("200-B-200"));
 
 		// TXL
-		linesToSimulatePara.add(new IdImpl("TXL-B-500"));
-		linesToSimulatePara.add(new IdImpl("X9-B-509"));
-		linesToSimulatePara.add(new IdImpl("109-B-109"));
-		linesToSimulatePara.add(new IdImpl("128-B-128"));
+//		linesToSimulatePara.add(new IdImpl("TXL-B-500"));
+//		linesToSimulatePara.add(new IdImpl("X9-B-509"));
+//		linesToSimulatePara.add(new IdImpl("109-B-109"));
+//		linesToSimulatePara.add(new IdImpl("128-B-128"));
 		
 		
 		ScenarioGenerator sG = new ScenarioGenerator(netFile, scheduleFile, vehiclesFile, outputdir);
