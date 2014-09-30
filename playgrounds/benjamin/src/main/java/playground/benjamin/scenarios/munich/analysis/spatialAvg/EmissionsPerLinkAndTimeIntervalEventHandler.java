@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.julia.newSpatialAveraging;
+package playground.benjamin.scenarios.munich.analysis.spatialAvg;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.emissions.events.ColdEmissionEvent;

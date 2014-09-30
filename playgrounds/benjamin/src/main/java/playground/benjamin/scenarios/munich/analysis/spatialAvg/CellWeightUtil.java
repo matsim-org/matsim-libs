@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.julia.newSpatialAveraging;
+package playground.benjamin.scenarios.munich.analysis.spatialAvg;
 
 import java.util.Collection;
 import java.util.HashMap;

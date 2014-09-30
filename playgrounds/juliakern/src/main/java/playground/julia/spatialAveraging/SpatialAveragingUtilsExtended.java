@@ -23,7 +23,7 @@ import org.apache.commons.math.special.Erf;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 
-import playground.benjamin.scenarios.munich.analysis.nectar.SpatialAveragingUtils;
+import playground.benjamin.scenarios.munich.analysis.spatialAvg.old.SpatialAveragingUtils;
 
 /**
  * @author amit

@@ -45,7 +45,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkColdEventHandler;
 import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkWarmEventHandler;
-import playground.julia.newSpatialAveraging.SpatialAveragingWriter;
+import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialAveragingWriter;
 
 
 /**

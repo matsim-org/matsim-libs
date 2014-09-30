@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.julia.newSpatialAveraging;
+package playground.benjamin.scenarios.munich.analysis.spatialAvg;
 
 import java.util.Collection;
 
@@ -28,12 +28,10 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.julia.spatialAveraging.SpatialAveragingUtils;
 
 public class LinkPointWeightUtil implements LinkWeightUtil {
 
-
-	private static final Logger logger = Logger.getLogger(SpatialAveragingUtils.class);
+	private static final Logger logger = Logger.getLogger(LinkPointWeightUtil.class);
 	
 	double xMin;
 	double xMax;

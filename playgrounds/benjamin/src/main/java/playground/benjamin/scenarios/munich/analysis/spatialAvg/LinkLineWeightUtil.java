@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.julia.newSpatialAveraging;
+package playground.benjamin.scenarios.munich.analysis.spatialAvg;
 
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.special.Erf;

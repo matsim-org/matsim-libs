@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.benjamin.scenarios.munich.analysis.nectar;
+package playground.benjamin.scenarios.munich.analysis.spatialAvg.old;
 
 import java.io.IOException;
 import java.util.Map;

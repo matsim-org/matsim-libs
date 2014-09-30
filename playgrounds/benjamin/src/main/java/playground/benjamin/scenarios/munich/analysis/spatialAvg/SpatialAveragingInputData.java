@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.julia.newSpatialAveraging;
+package playground.benjamin.scenarios.munich.analysis.spatialAvg;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;

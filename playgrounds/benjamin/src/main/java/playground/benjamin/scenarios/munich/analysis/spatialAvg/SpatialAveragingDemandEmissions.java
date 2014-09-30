@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.julia.newSpatialAveraging;
+package playground.benjamin.scenarios.munich.analysis.spatialAvg;
 
 import java.io.IOException;
 import java.util.Map;
@@ -34,7 +34,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.julia.newSpatialAveraging.SpatialAveragingWriter;
+import playground.benjamin.scenarios.munich.analysis.spatialAvg.SpatialAveragingWriter;
 
 
 /**
