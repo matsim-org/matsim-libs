@@ -37,9 +37,9 @@ public class UsersOfBothServices {
 		while(s != null) {
 			String[] arr = s.split("\\s");
 			
-			if (bla.contains((arr[0])));
+			if (bla.contains((arr[0])))
 				count++;
-			s = readLink1.readLine();
+			s = readLink2.readLine();
 		
 			
 		}

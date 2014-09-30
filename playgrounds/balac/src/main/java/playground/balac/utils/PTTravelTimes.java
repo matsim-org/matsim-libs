@@ -129,7 +129,7 @@ public class PTTravelTimes {
 	//	}
 		
 		// create pt routes
-		int numThreads = 24;
+		int numThreads = 8;
 		ParallelPersonAlgorithmRunner.run(scenario.getPopulation(), numThreads, new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
 			@Override
 			public AbstractPersonAlgorithm getPersonAlgorithm() {

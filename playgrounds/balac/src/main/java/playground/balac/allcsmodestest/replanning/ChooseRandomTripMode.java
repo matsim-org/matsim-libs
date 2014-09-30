@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.LegImpl;
@@ -22,18 +23,21 @@ public class ChooseRandomTripMode implements PlanAlgorithm {
 	//private boolean ignoreCarAvailability = true;
 
 	private final Random rng;
-	
+	private final Scenario scenario;
+
 	private final StageActivityTypes stageActivityTypes;
-	public ChooseRandomTripMode(final String[] possibleModes, final Random rng, final StageActivityTypes stageActivityTypes) {
+	public ChooseRandomTripMode(final Scenario scenario, final String[] possibleModes, final Random rng, final StageActivityTypes stageActivityTypes) {
 		this.possibleModes = possibleModes.clone();
 		this.rng = rng;
 		this.stageActivityTypes = stageActivityTypes;
+		this.scenario = scenario;
 	}
 	@Override
 	public void run(Plan plan) {
 		
 		List<Trip> t = TripStructureUtils.getTrips(plan, stageActivityTypes);
-		
+		boolean ffcard = false;
+		boolean owcard = false;
 		int cnt = t.size();
 		PersonImpl p = (PersonImpl) plan.getPerson();
 		if (cnt == 0) {
@@ -45,19 +49,23 @@ public class ChooseRandomTripMode implements PlanAlgorithm {
 			if (l.getMode().equals( "car" ) || l.getMode().equals( "bike" ) || l.getMode().equals("twowaycarsharing"))
 				return;
 		
-		if (p.hasLicense() &&  (p.getTravelcards() != null)  && p.getTravelcards().contains("ch-HT-mobility"))
+		if (Boolean.parseBoolean(((String) this.scenario.getPopulation().getPersonAttributes().getAttribute(plan.getPerson().getId().toString(), "FF_CARD"))))
+			ffcard = true;
+		if (Boolean.parseBoolean(((String) this.scenario.getPopulation().getPersonAttributes().getAttribute(plan.getPerson().getId().toString(), "OW_CARD"))))
+			owcard = true;
+		
 			//don't change the trips between the same links
 			if (!t.get(rndIdx).getOriginActivity().getLinkId().toString().equals(t.get(rndIdx).getDestinationActivity().getLinkId().toString()))
-				setRandomTripMode(t.get(rndIdx), plan);
+				setRandomTripMode(t.get(rndIdx), plan, ffcard, owcard);
 			else return;
-		else return;
 	}
 
-	private void setRandomTripMode(final Trip trip, final Plan plan) {		
+	private void setRandomTripMode(final Trip trip, final Plan plan, boolean ffcard, boolean owcard) {		
 		
 		//carsharing is the new trip
 		if (possibleModes.length == 2) {
 		if(rng.nextBoolean()) {
+			if (owcard)
 			TripRouter.insertTrip(
 					plan,
 					trip.getOriginActivity(),
@@ -65,6 +73,7 @@ public class ChooseRandomTripMode implements PlanAlgorithm {
 					trip.getDestinationActivity());
 		}
 		else {
+			if (ffcard)
 			TripRouter.insertTrip(
 					plan,
 					trip.getOriginActivity(),
@@ -73,6 +82,7 @@ public class ChooseRandomTripMode implements PlanAlgorithm {
 		}
 		}
 		else if (possibleModes.length == 1 && possibleModes[0] != null){
+			if ((possibleModes[0].equals("freefloating") && ffcard) || (possibleModes[0].equals("onewaycarsharing") && owcard))
 			TripRouter.insertTrip(
 					plan,
 					trip.getOriginActivity(),

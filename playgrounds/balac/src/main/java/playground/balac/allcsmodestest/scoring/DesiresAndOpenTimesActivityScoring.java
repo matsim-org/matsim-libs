@@ -21,10 +21,12 @@
 package playground.balac.allcsmodestest.scoring;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
@@ -44,13 +46,15 @@ import org.matsim.population.Desires;
 public class DesiresAndOpenTimesActivityScoring extends CharyparNagelOpenTimesActivityScoring {
 
 	private final CharyparNagelScoringParameters params;
+	private final Scenario scenario;
 	private final Desires desires;
 	private final Id personId;
 	
-	public DesiresAndOpenTimesActivityScoring(Plan plan, final CharyparNagelScoringParameters params, final ActivityFacilities facilities) {
-		super(params, facilities);
+	public DesiresAndOpenTimesActivityScoring(Plan plan, final CharyparNagelScoringParameters params, final Scenario scenario) {
+		super(params, ((ScenarioImpl)scenario).getActivityFacilities());
 		this.desires = ((PersonImpl) plan.getPerson()).getDesires();
 		this.params = params;
+		this.scenario = scenario;
 		this.personId = plan.getPerson().getId();
 	}
 
@@ -138,7 +142,10 @@ public class DesiresAndOpenTimesActivityScoring extends CharyparNagelOpenTimesAc
 			// utility of performing an action, duration is >= 1, thus log is no problem
 //			double typicalDuration = actParams.getTypicalDuration();
 			// the next three lines have been added
-			Double typicalDuration = this.desires.getActivityDuration(act.getType());
+			
+			Double typicalDuration = (Double) this.scenario.getPopulation().getPersonAttributes().getAttribute(this.personId.toString(), act.getType());
+			
+			//Double typicalDuration = this.desires.getActivityDuration(act.getType());
 			if (typicalDuration == null) {
 				throw new IllegalArgumentException("acttype \"" + act.getType() + "\" is not known in person's desires " + personId.toString());
 			}				

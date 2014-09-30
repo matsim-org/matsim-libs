@@ -2,6 +2,7 @@ package playground.balac.test;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -31,13 +32,13 @@ public class TestScoringFunctionFactory extends org.matsim.core.scoring.function
 	    this.scenario = sc;
 		
 	}
-	
-	 public ScoringFunction createNewScoringFunction(Plan plan)
+	@Override
+	 public ScoringFunction createNewScoringFunction(Person person)
 	  {
 		  SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 	    
 		  scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(new CharyparNagelScoringParameters(config.planCalcScore()), network));
-	    scoringFunctionAccumulator.addScoringFunction(new DesiresAndOpenTimesActivityScoring(plan, new CharyparNagelScoringParameters(config.planCalcScore()), ((ScenarioImpl) scenario).getActivityFacilities()));
+	    scoringFunctionAccumulator.addScoringFunction(new DesiresAndOpenTimesActivityScoring(person.getSelectedPlan(), new CharyparNagelScoringParameters(config.planCalcScore()), scenario));
 	    //scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(new CharyparNagelScoringParameters(config.planCalcScore())));
 		   
 	    scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(new CharyparNagelScoringParameters(config.planCalcScore())));

@@ -1,10 +1,8 @@
 package playground.balac.allcsmodestest.replanning;
 
-import org.apache.log4j.Logger;
-import org.matsim.core.config.Config;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.replanning.modules.ChangeSingleLegMode;
 import org.matsim.core.router.TripRouter;
 import org.matsim.population.algorithms.PlanAlgorithm;
 /**
@@ -12,28 +10,29 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  */
 public class CarsharingTripModeChoice extends AbstractMultithreadedModule{
 
-	private final static Logger log = Logger.getLogger(ChangeSingleLegMode.class);
-
 	/*package*/ final static String CONFIG_MODULE = "ft";
 	/*package*/ final static String CONFIG_PARAM_MODES = "modes";
 	/*package*/ final static String CONFIG_PARAM_IGNORECARAVAILABILITY = "ignoreCarAvailability";
 
 	private String[] availableModes = null;
 	private boolean ignoreCarAvailability = true;
+	private final Scenario scenario;
 
-	public CarsharingTripModeChoice(final Config config) {
-		super(config.global().getNumberOfThreads());
+	public CarsharingTripModeChoice(final Scenario scenario) {
+		super(scenario.getConfig().global().getNumberOfThreads());
 
 		// try to get the modes from the "changeLegMode" module of the config file
-		String ignorance = config.findParam(CONFIG_MODULE, CONFIG_PARAM_IGNORECARAVAILABILITY);
+
+		this.scenario = scenario;
+		// try to get the modes from the "changeLegMode" module of the config file
 
 		
-		if (Boolean.parseBoolean(config.getModule("OneWayCarsharing").getValue("useOneWayCarsharing") )) {
+		if (Boolean.parseBoolean(this.scenario.getConfig().getModule("OneWayCarsharing").getValue("useOneWayCarsharing") )) {
 			
 			this.availableModes = new String[1];
 			this.availableModes[0] = "onewaycarsharing";
 		}
-		if (Boolean.parseBoolean(config.getModule("FreeFloating").getValue("useFreeFloating") )) {
+		if (Boolean.parseBoolean(this.scenario.getConfig().getModule("FreeFloating").getValue("useFreeFloating") )) {
 			if (this.availableModes == null) {
 				this.availableModes = new String[1];
 				this.availableModes[0] = "freefloating";
@@ -45,28 +44,20 @@ public class CarsharingTripModeChoice extends AbstractMultithreadedModule{
 			}
 		}
 		
-		if (!Boolean.parseBoolean(config.getModule("FreeFloating").getValue("useFreeFloating") ) && !Boolean.parseBoolean(config.getModule("OneWayCarsharing").getValue("useOneWayCarsharing") )) {
+		if (!Boolean.parseBoolean(this.scenario.getConfig().getModule("FreeFloating").getValue("useFreeFloating") ) && !Boolean.parseBoolean(this.scenario.getConfig().getModule("OneWayCarsharing").getValue("useOneWayCarsharing") )) {
 			this.availableModes = new String[1];
 		}
 				
 
-		if (ignorance != null) {
-			this.ignoreCarAvailability = Boolean.parseBoolean(ignorance);
-			log.info("using ignoreCarAvailability from configuration: " + this.ignoreCarAvailability);
-		}
+		
 
 	}
 	
-	public CarsharingTripModeChoice(final int nOfThreads, final String[] modes, final boolean ignoreCarAvailabilty) {
-		super(nOfThreads);
-		this.availableModes = modes.clone();
-		this.ignoreCarAvailability = ignoreCarAvailabilty;
-	}
-
+	
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 		final TripRouter tripRouter = getReplanningContext().getTripRouter();
-		ChooseRandomTripMode algo = new ChooseRandomTripMode(this.availableModes, MatsimRandom.getLocalInstance(), tripRouter.getStageActivityTypes());
+		ChooseRandomTripMode algo = new ChooseRandomTripMode(this.scenario, this.availableModes, MatsimRandom.getLocalInstance(), tripRouter.getStageActivityTypes());
 		algo.setIgnoreCarAvailability(this.ignoreCarAvailability);
 		return algo;
 	}

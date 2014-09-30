@@ -73,7 +73,7 @@ public class CarsUsedLocationsffSHP {
 				s = readLink2.readLine();
 			}
 	        
-	        ShapeFileWriter.writeGeometries(featuresMovedIncrease, "C:/Users/balacm/Desktop/SHP_files/used_ff_interval_peak.shp");
+	        ShapeFileWriter.writeGeometries(featuresMovedIncrease, "C:/Users/balacm/Desktop/SHP_files/used_ff_interval_peak_new.shp");
 	     
 
 	}

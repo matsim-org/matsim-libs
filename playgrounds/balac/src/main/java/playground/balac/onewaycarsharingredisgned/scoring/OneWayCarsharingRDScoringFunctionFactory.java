@@ -32,6 +32,7 @@ public class OneWayCarsharingRDScoringFunctionFactory extends org.matsim.core.sc
 	    this.config = config;
 	  }   
 
+	@Override
 	  public ScoringFunction createNewScoringFunction(Person person) {
 		  
 		  SumScoringFunction scoringFunctionSum = new SumScoringFunction();
@@ -41,7 +42,7 @@ public class OneWayCarsharingRDScoringFunctionFactory extends org.matsim.core.sc
 	      new CharyparNagelScoringParameters(config.planCalcScore()), 
 	      this.config, 
 	      network));
-		  scoringFunctionSum.addScoringFunction(new DesiresAndOpenTimesActivityScoring(person.getSelectedPlan(), new CharyparNagelScoringParameters(config.planCalcScore()), ((ScenarioImpl) scenario).getActivityFacilities()));
+		  scoringFunctionSum.addScoringFunction(new DesiresAndOpenTimesActivityScoring(person.getSelectedPlan(), new CharyparNagelScoringParameters(config.planCalcScore()), scenario));
 		   
 		  scoringFunctionSum.addScoringFunction(new CharyparNagelMoneyScoring(new CharyparNagelScoringParameters(config.planCalcScore())));
 		  scoringFunctionSum.addScoringFunction(new CharyparNagelAgentStuckScoring(new CharyparNagelScoringParameters(config.planCalcScore())));

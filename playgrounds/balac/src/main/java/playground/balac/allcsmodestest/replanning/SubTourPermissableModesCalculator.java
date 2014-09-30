@@ -32,7 +32,7 @@ public class SubTourPermissableModesCalculator implements PermissibleModesCalcul
 		
 		 if (Boolean.parseBoolean(scenario.getConfig().getModule("TwoWayCarsharing").getParams().get("useTwoWayCarsharing"))
 		
-		&& scenario.getPopulation().getPersonAttributes().getAttribute(p.getId().toString(), "CS_CARD").equals("carsharing_RT"))
+		&& Boolean.parseBoolean((String) scenario.getPopulation().getPersonAttributes().getAttribute(p.getId().toString(), "RT_CARD")))
 		
 				modes.add("twowaycarsharing");
 		

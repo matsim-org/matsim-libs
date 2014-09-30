@@ -136,7 +136,9 @@ public class ModeSubstitutionCSAnalysis {
 		int k = 0;
 		for(PlanElement pe1: p.getSelectedPlan().getPlanElements()) {
 			
-			if (pe1  instanceof Activity && !((Activity) pe1).getType().equals("cs_interaction") && !((Activity) pe1).getType().equals("pt interaction")) {
+			if (pe1  instanceof Activity && 
+					!((Activity) pe1).getType().equals("cs_interaction") && 
+					!((Activity) pe1).getType().equals("pt interaction")) {
 				i++;
 				if (i == j) {
 					

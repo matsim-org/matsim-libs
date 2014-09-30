@@ -57,7 +57,7 @@ public class ChooseRandomTripModeWithTaxi implements PlanAlgorithm {
 		//carsharing is the new trip
 		int temp = rng.nextInt(6);
 		
-		if (this.scenario.getPopulation().getPersonAttributes().getAttribute(plan.getPerson().getId().toString(), "CS_CARD").equals("freefloating")) {
+		if (Boolean.parseBoolean(((String) this.scenario.getPopulation().getPersonAttributes().getAttribute(plan.getPerson().getId().toString(), "FF_CARD")))) {
 		
 			if (possibleModes.length == 3) {			
 				

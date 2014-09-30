@@ -19,7 +19,7 @@ public class MunicipalitiesCSUsersCount {
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
 		networkReader.readFile(args[0]);
 		final BufferedReader readLink1 = IOUtils.getBufferedReader(args[1]);
-		final BufferedWriter outLink = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/" + "matrix_normal_price.txt");
+		final BufferedWriter outLink = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/" + "matrix_interval_peak.txt");
 
 		int[][] mat = new int[12][12];
 		
