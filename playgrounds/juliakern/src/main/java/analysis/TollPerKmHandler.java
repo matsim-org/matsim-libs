@@ -41,7 +41,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
-import playground.julia.spatialAveraging.SpatialAveragingUtils;
+import playground.juliakern.spatialAveraging.SpatialAveragingUtils;
 
 public class TollPerKmHandler implements PersonMoneyEventHandler,
 		LinkLeaveEventHandler {
