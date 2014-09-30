@@ -30,7 +30,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.julia.spatialAveraging.SpatialAveragingUtils;
 
-public class SimpleLinkWeightUtil implements LinkWeightUtil {
+public class LinkPointWeightUtil implements LinkWeightUtil {
 
 
 	private static final Logger logger = Logger.getLogger(SpatialAveragingUtils.class);
@@ -47,7 +47,7 @@ public class SimpleLinkWeightUtil implements LinkWeightUtil {
 	Collection<SimpleFeature> featuresInVisBoundary;
 	CoordinateReferenceSystem targetCRS;
 	
-	public SimpleLinkWeightUtil(double xMin, double xMax, double yMin,	double yMax, int noOfXbins, int noOfYbins, double smoothingRadius_m, String visBoundaryShapeFile, CoordinateReferenceSystem targetCRS) {
+	public LinkPointWeightUtil(double xMin, double xMax, double yMin,	double yMax, int noOfXbins, int noOfYbins, double smoothingRadius_m, String visBoundaryShapeFile, CoordinateReferenceSystem targetCRS) {
 		this.xMin = xMin;
 		this.xMax = xMax;
 		this.yMin = yMin;
@@ -62,7 +62,7 @@ public class SimpleLinkWeightUtil implements LinkWeightUtil {
 	}
 	
 
-	public SimpleLinkWeightUtil(SpatialAveragingInputData inputData, int noOfXbins2, int noOfYbins2, double smoothingRadius_m) {
+	public LinkPointWeightUtil(SpatialAveragingInputData inputData, int noOfXbins2, int noOfYbins2, double smoothingRadius_m) {
 		this(inputData.getMinX(), inputData.getMaxX(), 
 								inputData.getMinY(), inputData.getMaxY(), 
 								noOfXbins2, noOfYbins2, 

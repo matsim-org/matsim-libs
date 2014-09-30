@@ -50,7 +50,7 @@ public class SpatialAveragingDemandEmissions {
 	final int noOfXbins = 160;
 	final int noOfYbins = 120; 
 	
-	final int noOfTimeBins = 1;
+	final int noOfTimeBins = 60;
 	
 	final double smoothingRadius_m = 500.;
 	
@@ -88,7 +88,7 @@ public class SpatialAveragingDemandEmissions {
 		if(useLineMethod){
 			linkWeightUtil = new LinkLineWeightUtil(smoothingRadius_m);
 		}else{
-			linkWeightUtil = new SimpleLinkWeightUtil(inputData, noOfXbins, noOfYbins, smoothingRadius_m);
+			linkWeightUtil = new LinkPointWeightUtil(inputData, noOfXbins, noOfYbins, smoothingRadius_m);
 		}
 		this.saWriter = new SpatialAveragingWriter(inputData, noOfXbins, noOfYbins, smoothingRadius_m);
 		
