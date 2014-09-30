@@ -19,11 +19,6 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Queue;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -45,6 +40,11 @@ import org.matsim.signalsystems.mobsim.SignalizeableItem;
 import org.matsim.signalsystems.model.SignalGroupState;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.VisData;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  * Separating out the "lane" functionality from the "link" functionality also for QLinkImpl.  Ultimate goal is to unite this class here
@@ -96,42 +96,42 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 			this.timeStep = now ;
 		}
 	}
-	FlowcapAccumulate flowcap_accumulate = new FlowcapAccumulate() ;
+	private final FlowcapAccumulate flowcap_accumulate = new FlowcapAccumulate() ;
 	// might be changed back to standard double after all of this was figured out. kai, sep'14
 
 	/**
 	 * true, i.e. green, if the link is not signalized
 	 */
-	boolean thisTimeStepGreen = true ;
-	double inverseFlowCapacityPerTimeStep;
-	double flowCapacityPerTimeStepFractionalPart;
+    private boolean thisTimeStepGreen = true ;
+	private double inverseFlowCapacityPerTimeStep;
+	private double flowCapacityPerTimeStepFractionalPart;
 	/**
 	 * The number of vehicles able to leave the buffer in one time step (usually 1s).
 	 */
 	private double flowCapacityPerTimeStep;
-	int bufferStorageCapacity;
-	double usedBufferStorageCapacity = 0.0 ;
-	private Queue<QueueWithBuffer.Hole> holes = new LinkedList<QueueWithBuffer.Hole>();
-	double freespeedTravelTime = Double.NaN;
+	private int bufferStorageCapacity;
+	private double usedBufferStorageCapacity = 0.0 ;
+	private final Queue<QueueWithBuffer.Hole> holes = new LinkedList<>();
+	private double freespeedTravelTime = Double.NaN;
 	/** the last timestep the front-most vehicle in the buffer was moved. Used for detecting dead-locks. */
 	private double bufferLastMovedTime = Time.UNDEFINED_TIME ;
 	/**
 	 * The list of vehicles that have not yet reached the end of the link
 	 * according to the free travel speed of the link
 	 */
-	VehicleQ<QVehicle> vehQueue;
+    private final VehicleQ<QVehicle> vehQueue;
 
-	double storageCapacity;
+	private double storageCapacity;
 	double usedStorageCapacity;
 	/**
 	 * Holds all vehicles that are ready to cross the outgoing intersection
 	 */
-	Queue<QVehicle> buffer = new LinkedList<QVehicle>() ;
+    private final Queue<QVehicle> buffer = new LinkedList<>() ;
 	/**
 	 * null if the link is not signalized
 	 */
 	private DefaultSignalizeableItem qSignalizedItem = null ;
-	final AbstractQLink qLink;
+	private final AbstractQLink qLink;
 	private final QNetwork network ;
 	private final Id id;
 	private static int spaceCapWarningCount = 0;
@@ -148,12 +148,12 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 	// NOTE: we need to have qlink since we need access e.g. for vehicle arrival or for public transit
 	// On the other hand, the qlink properties (e.g. number of lanes) may not be the ones we need here because they
 	// may be divided between parallel lanes.  So we need both.
-	double length = Double.NaN ;
+    private double length = Double.NaN ;
 	private double unscaledFlowCapacity_s = Double.NaN ;
 	private double effectiveNumberOfLanes = Double.NaN ;
 
 	// (still) private:
-	private VisData visData = new VisDataImpl() ;
+	private final VisData visData = new VisDataImpl() ;
 	private final double timeStepSize;
 
 	QueueWithBuffer(AbstractQLink qLinkImpl,  final VehicleQ<QVehicle> vehicleQueue ) {
@@ -425,7 +425,7 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 	}
 
 	@Override
-	public final void recalcTimeVariantAttributes( final double now) {
+    final void recalcTimeVariantAttributes(final double now) {
 		freespeedTravelTime = this.length / qLink.getLink().getFreespeed(now);
 		// as of now, speed is NOT explicity set but pulled from the qlink since we assume that all lanes have the same freespeed as the
 		// qlink
@@ -450,8 +450,8 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 	}
 
 	@Override
-	public final Collection<MobsimVehicle> getAllDrivingVehicles() {
-		Collection<MobsimVehicle> vehicles = new ArrayList<MobsimVehicle>();
+    final Collection<MobsimVehicle> getAllDrivingVehicles() {
+		Collection<MobsimVehicle> vehicles = new ArrayList<>();
 		vehicles.addAll(vehQueue);
 		vehicles.addAll(buffer);
 		return vehicles ;
@@ -501,12 +501,12 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 	}
 
 	@Override
-	public final double getStorageCapacity() {
+    final double getStorageCapacity() {
 		return storageCapacity;
 	}
 
 	@Override
-	public final boolean isNotOfferingVehicle() {
+    final boolean isNotOfferingVehicle() {
 		return buffer.isEmpty();
 	}
 

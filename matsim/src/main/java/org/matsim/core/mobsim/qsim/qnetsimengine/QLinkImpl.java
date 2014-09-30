@@ -72,9 +72,9 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 
 	private final VisData visdata;
 
-	final double length;
+	private final double length;
 
-	public QLaneInternalI road;
+	public final QLaneInternalI road;
 
 	/**
 	 * Initializes a QueueLink with one QueueLane.
@@ -222,7 +222,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 
 	@Override
 	public Collection<MobsimVehicle> getAllNonParkedVehicles(){
-		Collection<MobsimVehicle> vehicles = new ArrayList<MobsimVehicle>();
+		Collection<MobsimVehicle> vehicles = new ArrayList<>();
 		vehicles.addAll(this.transitQLink.getTransitVehicleStopQueue());
 		vehicles.addAll(this.waitingList);
 		vehicles.addAll( road.getAllDrivingVehicles() ) ;

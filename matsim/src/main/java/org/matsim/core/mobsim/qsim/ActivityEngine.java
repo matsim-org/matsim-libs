@@ -19,11 +19,6 @@
 
 package org.matsim.core.mobsim.qsim;
 
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.Queue;
-import java.util.concurrent.PriorityBlockingQueue;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -31,6 +26,11 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.utils.misc.Time;
+
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.Queue;
+import java.util.concurrent.PriorityBlockingQueue;
 
 public class ActivityEngine implements MobsimEngine, ActivityHandler {
 
@@ -48,8 +48,8 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 			this.agent = agent;
 			this.activityEndTime = activityEndTime;
 		}
-		MobsimAgent agent;
-		double activityEndTime;
+		final MobsimAgent agent;
+		final double activityEndTime;
 	}
 
 	private InternalInterface internalInterface;
@@ -58,7 +58,7 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 	 * This list needs to be a "blocking" queue since this is needed for
 	 * thread-safety in the parallel qsim. cdobler, oct'10
 	 */
-	private final Queue<AgentEntry> activityEndsList = new PriorityBlockingQueue<AgentEntry>(500, new Comparator<AgentEntry>() {
+	private final Queue<AgentEntry> activityEndsList = new PriorityBlockingQueue<>(500, new Comparator<AgentEntry>() {
 
 		@Override
 		public int compare(AgentEntry arg0, AgentEntry arg1) {

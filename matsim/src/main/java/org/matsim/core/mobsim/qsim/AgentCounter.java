@@ -36,12 +36,12 @@ class AgentCounter implements AgentCounterI {
     /**
      * Number of agents that have not yet reached their final activity location
      */
-    private AtomicInteger living = new AtomicInteger(0);
+    private final AtomicInteger living = new AtomicInteger(0);
 
     /**
      * Number of agents that got stuck in a traffic jam and were removed from the simulation to solve a possible deadlock
      */
-    private AtomicInteger lost = new AtomicInteger(0);
+    private final AtomicInteger lost = new AtomicInteger(0);
 
     @Override
     public final int getLiving() {return living.get();	}

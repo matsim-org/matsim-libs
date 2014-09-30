@@ -20,8 +20,6 @@
 
 package org.matsim.core.mobsim.qsim.agents;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
@@ -38,6 +36,8 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
+import java.util.List;
+
 /**
  * @author mrieser
  */
@@ -50,7 +50,7 @@ public class TransitAgent extends PersonDriverAgentImpl implements MobsimDriverP
 		return agent;
 	}
 
-	protected TransitAgent(final Person p, final Netsim simulation) {
+	private TransitAgent(final Person p, final Netsim simulation) {
 		super(PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), simulation);
 	}
 
@@ -70,13 +70,13 @@ public class TransitAgent extends PersonDriverAgentImpl implements MobsimDriverP
 		}
 	}
 
-	protected Leg getCurrentLeg() {
+	Leg getCurrentLeg() {
 		PlanElement currentPlanElement = this.getCurrentPlanElement();
 		return (Leg) currentPlanElement;
 	}
 
-	protected boolean containsId(List<TransitRouteStop> stopsToCome,
-			Id egressStopId) {
+	boolean containsId(List<TransitRouteStop> stopsToCome,
+                       Id egressStopId) {
 		for (TransitRouteStop stop : stopsToCome) {
 			if (egressStopId.equals(stop.getStopFacility().getId())) {
 				return true;

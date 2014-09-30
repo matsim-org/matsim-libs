@@ -20,10 +20,6 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -31,6 +27,10 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import org.matsim.vis.snapshotwriters.VisLink;
+
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  *
@@ -57,8 +57,8 @@ public class QNetwork implements NetsimNetwork {
 	QNetwork(final Network network, final NetsimNetworkFactory<QNode, ? extends QLinkInternalI> netsimNetworkFactory ) {
 		this.network = network;
 		this.queueNetworkFactory = netsimNetworkFactory;
-		this.links = new LinkedHashMap<Id, QLinkInternalI>((int)(network.getLinks().size()*1.1), 0.95f);
-		this.nodes = new LinkedHashMap<Id, QNode>((int)(network.getLinks().size()*1.1), 0.95f);
+		this.links = new LinkedHashMap<>((int)(network.getLinks().size()*1.1), 0.95f);
+		this.nodes = new LinkedHashMap<>((int)(network.getLinks().size()*1.1), 0.95f);
 		if (! Double.isNaN(network.getEffectiveLaneWidth())){
 			this.linkWidthCalculator.setLaneWidth(network.getEffectiveLaneWidth());
 		}

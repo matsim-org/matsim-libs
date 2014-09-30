@@ -1,12 +1,5 @@
 package org.matsim.core.mobsim.qsim;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Queue;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
@@ -25,22 +18,24 @@ import org.matsim.vis.snapshotwriters.TeleportationVisData;
 import org.matsim.vis.snapshotwriters.VisData;
 import org.matsim.vis.snapshotwriters.VisMobsim;
 
+import java.util.*;
+
 public class TeleportationEngine implements DepartureHandler, MobsimEngine,
 VisData {
 	/**
 	 * Includes all agents that have transportation modes unknown to the
 	 * QueueSimulation (i.e. != "car") or have two activities on the same link
 	 */
-	private Queue<Tuple<Double, MobsimAgent>> teleportationList = new PriorityQueue<Tuple<Double, MobsimAgent>>(
+	private final Queue<Tuple<Double, MobsimAgent>> teleportationList = new PriorityQueue<>(
 			30, new TeleportationArrivalTimeComparator());
-	private final LinkedHashMap<Id, TeleportationVisData> teleportationData = new LinkedHashMap<Id, TeleportationVisData>();
+	private final LinkedHashMap<Id, TeleportationVisData> teleportationData = new LinkedHashMap<>();
 	private InternalInterface internalInterface;
-	private final Map<Id, MobsimAgent> agents = new HashMap<Id, MobsimAgent>();
+	private final Map<Id, MobsimAgent> agents = new HashMap<>();
 
 	@Override
 	public boolean handleDeparture(double now, MobsimAgent agent, Id linkId) {
 		double arrivalTime = now + agent.getExpectedTravelTime();
-		this.teleportationList.add(new Tuple<Double, MobsimAgent>(arrivalTime,
+		this.teleportationList.add(new Tuple<>(arrivalTime,
 				agent));
 		Id agentId = agent.getId();
 		Link currLink = this.internalInterface.getMobsim().getScenario()
@@ -75,7 +70,7 @@ VisData {
 		double now = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
 		while (teleportationList.peek() != null) {
 			Tuple<Double, MobsimAgent> entry = teleportationList.peek();
-			if (entry.getFirst().doubleValue() <= now) {
+			if (entry.getFirst() <= now) {
 				teleportationList.poll();
 				MobsimAgent personAgent = entry.getSecond();
 				personAgent.notifyArrivalOnLinkByNonNetworkMode(personAgent

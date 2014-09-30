@@ -25,7 +25,7 @@ package org.matsim.core.mobsim.qsim;
 /**
  * @author nagel
  */
-public class QSimUtils {
+class QSimUtils {
 	 // should only contain static methods; should thus not be instantiated
 	private QSimUtils() {}
 

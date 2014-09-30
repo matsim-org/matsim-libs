@@ -64,7 +64,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 
 	}
 
-	private static Logger log = Logger.getLogger(TransitQSimEngine.class);
+	private static final Logger log = Logger.getLogger(TransitQSimEngine.class);
 
 	private final QSim qSim;
 

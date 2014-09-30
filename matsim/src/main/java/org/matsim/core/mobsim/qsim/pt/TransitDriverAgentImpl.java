@@ -19,24 +19,12 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
-import java.util.Iterator;
-import java.util.ListIterator;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.*;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.Umlauf;
@@ -45,6 +33,9 @@ import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 
+import java.util.Iterator;
+import java.util.ListIterator;
+
 /**
  * @author michaz
  */
@@ -52,9 +43,9 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 
 	private static class PlanBuilder {
 
-		PlanImpl plan = new PlanImpl();
+		final PlanImpl plan = new PlanImpl();
 
-		String activityType = PtConstants.TRANSIT_ACTIVITY_TYPE;
+		final String activityType = PtConstants.TRANSIT_ACTIVITY_TYPE;
 
 		public void addTrip(NetworkRoute networkRoute, String transportMode) {
 			Activity lastActivity;
@@ -79,8 +70,8 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 	}
 
 	private final Umlauf umlauf;
-	private Iterator<UmlaufStueckI> iUmlaufStueck;
-	private ListIterator<PlanElement> iPlanElement;
+	private final Iterator<UmlaufStueckI> iUmlaufStueck;
+	private final ListIterator<PlanElement> iPlanElement;
 	private NetworkRoute carRoute;
 	private double departureTime;
 	private PlanElement currentPlanElement;

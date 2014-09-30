@@ -19,18 +19,14 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.PriorityQueue;
-import java.util.Queue;
-
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.qsim.comparators.QVehicleEarliestLinkExitTimeComparator;
+import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.AbstractQLink.HandleTransitStopResult;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+
+import java.io.Serializable;
+import java.util.*;
 
 
 /**
@@ -44,8 +40,8 @@ final class TransitQLink {
 	 * A list containing all transit vehicles that are at a stop but not
 	 * blocking other traffic on the lane.
 	 */
-	private final Queue<QVehicle> transitVehicleStopQueue = new PriorityQueue<QVehicle>(5, VEHICLE_EXIT_COMPARATOR);
-	private QLaneInternalI road;
+	private final Queue<QVehicle> transitVehicleStopQueue = new PriorityQueue<>(5, VEHICLE_EXIT_COMPARATOR);
+	private final QLaneInternalI road;
 
 	private static final Comparator<QVehicle> VEHICLE_EXIT_COMPARATOR = new QVehicleEarliestLinkExitTimeComparator();
 
@@ -97,7 +93,7 @@ final class TransitQLink {
 				break;
 			}
 			if (departingTransitVehicles == null) {
-				departingTransitVehicles = new LinkedList<QVehicle>();
+				departingTransitVehicles = new LinkedList<>();
 			}
 			departingTransitVehicles.add(transitVehicleStopQueue.poll());
 		}
@@ -135,4 +131,29 @@ final class TransitQLink {
 			return HandleTransitStopResult.continue_driving;
 		}
 	}
+
+    /**
+     * @author dstrippgen
+     *
+     * Comparator object, to sort the Vehicle objects in QueueLink.parkingList
+     * according to their departure time
+     */
+    static class QVehicleEarliestLinkExitTimeComparator implements Comparator<QVehicle>,
+            Serializable, MatsimComparator {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public int compare(final QVehicle veh1, final QVehicle veh2) {
+            if (veh1.getEarliestLinkExitTime() > veh2.getEarliestLinkExitTime()) {
+                return 1;
+            }
+            if (veh1.getEarliestLinkExitTime() < veh2.getEarliestLinkExitTime()) {
+                return -1;
+            }
+
+            // Both depart at the same time -> let the one with the larger id be first
+            return veh2.getId().compareTo(veh1.getId());
+        }
+    }
 }

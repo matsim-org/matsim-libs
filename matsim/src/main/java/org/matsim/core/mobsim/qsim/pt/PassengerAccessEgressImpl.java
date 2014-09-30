@@ -19,11 +19,6 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.pt;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
@@ -40,6 +35,11 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 
 /**
  * 
@@ -48,8 +48,8 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  */
 class PassengerAccessEgressImpl implements PassengerAccessEgress {
 
-	private InternalInterface internalInterface;
-	private TransitStopAgentTracker agentTracker;
+	private final InternalInterface internalInterface;
+	private final TransitStopAgentTracker agentTracker;
 	private final boolean isGeneratingDeniedBoardingEvents ;
 	private Set<PTPassengerAgent> agentsDeniedToBoard = null; 
 	
@@ -60,7 +60,7 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 			this.isGeneratingDeniedBoardingEvents = 
 					this.internalInterface.getMobsim().getScenario().getConfig().vspExperimental().isGeneratingBoardingDeniedEvents() ;
 			if (this.isGeneratingDeniedBoardingEvents){
-				this.agentsDeniedToBoard = new HashSet<PTPassengerAgent>();
+				this.agentsDeniedToBoard = new HashSet<>();
 			}
 		} else {
 			this.isGeneratingDeniedBoardingEvents = false ;
@@ -100,7 +100,7 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 	
 	private List<PTPassengerAgent> findPassengersEntering(TransitRoute transitRoute, TransitLine transitLine, TransitVehicle vehicle, 
 			final TransitStopFacility stop, List<TransitRouteStop> stopsToCome, int freeCapacity, double now) {
-		ArrayList<PTPassengerAgent> passengersEntering = new ArrayList<PTPassengerAgent>();
+		ArrayList<PTPassengerAgent> passengersEntering = new ArrayList<>();
 		for (PTPassengerAgent agent : this.agentTracker.getAgentsAtStop(stop.getId())) {
 			if ( !this.isGeneratingDeniedBoardingEvents ) {
 				if (freeCapacity == 0) {
@@ -131,7 +131,7 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 	
 	private ArrayList<PTPassengerAgent> findPassengersLeaving(TransitVehicle vehicle,
 			final TransitStopFacility stop) {
-		ArrayList<PTPassengerAgent> passengersLeaving = new ArrayList<PTPassengerAgent>();
+		ArrayList<PTPassengerAgent> passengersLeaving = new ArrayList<>();
 		for (PassengerAgent passenger : vehicle.getPassengers()) {
 			if (((PTPassengerAgent) passenger).getExitAtStop(stop)) {
 				passengersLeaving.add((PTPassengerAgent) passenger);

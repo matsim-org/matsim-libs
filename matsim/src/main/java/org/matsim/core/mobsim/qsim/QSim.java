@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.gbl.Gbl;
@@ -32,7 +33,6 @@ import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
-import org.matsim.core.mobsim.framework.listeners.MobsimListenerManager;
 import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
@@ -90,7 +90,7 @@ public final class QSim implements VisMobsim, Netsim {
 
 	private QNetsimEngine netEngine;
 
-	private final Collection<MobsimEngine> mobsimEngines = new ArrayList<MobsimEngine>();
+	private final Collection<MobsimEngine> mobsimEngines = new ArrayList<>();
 
 	private final MobsimTimer simTimer;
 
@@ -104,15 +104,15 @@ public final class QSim implements VisMobsim, Netsim {
 	private double stopTime = 100 * 3600;
 	private final MobsimListenerManager listenerManager;
 	private final Scenario scenario;
-	private final List<ActivityHandler> activityHandlers = new ArrayList<ActivityHandler>();
-	private final List<DepartureHandler> departureHandlers = new ArrayList<DepartureHandler>();
+	private final List<ActivityHandler> activityHandlers = new ArrayList<>();
+	private final List<DepartureHandler> departureHandlers = new ArrayList<>();
 	private final AgentCounter agentCounter;
-	private final Collection<MobsimAgent> agents = new LinkedHashSet<MobsimAgent>();
-	private final List<AgentSource> agentSources = new ArrayList<AgentSource>();
+	private final Collection<MobsimAgent> agents = new LinkedHashSet<>();
+	private final List<AgentSource> agentSources = new ArrayList<>();
 	private TransitQSimEngine transitEngine;
 
 
-	/*package (for tests)*/ InternalInterface internalInterface = new InternalInterface() {
+	/*package (for tests)*/ final InternalInterface internalInterface = new InternalInterface() {
 
 		// These methods must be synchronized, because they are called back
 		// from possibly multi-threaded engines, and they access
@@ -186,7 +186,7 @@ public final class QSim implements VisMobsim, Netsim {
 		// (can be located somewhere) before you execute a sim step.
         // Agents can abort in this loop already, so we iterate over
         // a defensive copy of the agent collection.
-		for (MobsimAgent agent : new ArrayList<MobsimAgent>(this.agents)) {
+		for (MobsimAgent agent : new ArrayList<>(this.agents)) {
 			arrangeNextAgentAction(agent);
 		}
 		
@@ -326,12 +326,11 @@ public final class QSim implements VisMobsim, Netsim {
 	 * current activity. The simulation can then put the agent onto its vehicle
 	 * on a link or teleport it to its destination.
 	 *
-	 * @param agent
 	 */
 	private void arrangeAgentDeparture(final MobsimAgent agent) {
 		double now = this.getSimTimer().getTimeOfDay();
 		String mode = agent.getMode();
-		Id linkId = agent.getCurrentLinkId();
+		Id<Link> linkId = agent.getCurrentLinkId();
 		events.processEvent(new PersonDepartureEvent(now, agent.getId(), linkId, mode));
 
 		for (DepartureHandler departureHandler : this.departureHandlers) {
@@ -479,7 +478,6 @@ public final class QSim implements VisMobsim, Netsim {
 	 * Adds the QueueSimulationListener instance given as parameters as listener
 	 * to this QueueSimulation instance.
 	 *
-	 * @param listener
 	 */
 	@Override
 	public void addQueueSimulationListeners(MobsimListener listener) {

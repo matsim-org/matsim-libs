@@ -17,11 +17,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.framework.listeners;
+package org.matsim.core.mobsim.qsim;
 
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 
 /**
  * @author mrieser

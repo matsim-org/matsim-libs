@@ -6,7 +6,7 @@ final class PassingVehicleQ extends AbstractQueue<QVehicle> implements VehicleQ<
 
 	public PassingVehicleQ() {} // to find calls 
 	
-	private final Queue<QVehicle> delegate = new PriorityQueue<QVehicle>(11, new Comparator<QVehicle>() {
+	private final Queue<QVehicle> delegate = new PriorityQueue<>(11, new Comparator<QVehicle>() {
 
 		@Override
 		public int compare(QVehicle arg0, QVehicle arg1) {

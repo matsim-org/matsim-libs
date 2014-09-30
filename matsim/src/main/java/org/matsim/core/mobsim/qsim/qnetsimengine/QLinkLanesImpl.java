@@ -117,7 +117,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	/**
 	 * A List holding all QueueLane instances of the QueueLink
 	 */
-	private LinkedHashMap<Id, QLaneInternalI> laneQueues;
+	private final LinkedHashMap<Id, QLaneInternalI> laneQueues;
 	
 	/**
 	 * If more than one QueueLane exists this list holds all QueueLanes connected to
@@ -127,9 +127,9 @@ public final class QLinkLanesImpl extends AbstractQLink {
 
 	private VisData visdata = null;
 
-	private List<ModelLane> lanes;
+	private final List<ModelLane> lanes;
 	
-	private Map<Id, Map<Id, List<QLaneInternalI>>> nextQueueToLinkCache;
+	private final Map<Id, Map<Id, List<QLaneInternalI>>> nextQueueToLinkCache;
 
 	/**
 	 * Initializes a QueueLink with one QueueLane.
@@ -137,19 +137,19 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	QLinkLanesImpl(final Link link2, QNetwork network, final QNode toNode, List<ModelLane> lanes) {
 		super(link2, network) ;
 		this.toQueueNode = toNode;
-		this.laneQueues = new LinkedHashMap<Id, QLaneInternalI>();
-		this.toNodeLaneQueues = new ArrayList<QLaneInternalI>();
+		this.laneQueues = new LinkedHashMap<>();
+		this.toNodeLaneQueues = new ArrayList<>();
 		this.lanes = lanes;
-		this.nextQueueToLinkCache = new LinkedHashMap<Id, Map<Id, List<QLaneInternalI>>>(); //maps a lane id to a map containing the downstream queues indexed by a downstream link
+		this.nextQueueToLinkCache = new LinkedHashMap<>(); //maps a lane id to a map containing the downstream queues indexed by a downstream link
 		this.initLaneQueues(lanes);
 		this.visdata = this.new VisDataImpl();
 		this.transitQLink = new TransitQLink(this.firstLaneQueue);
 	}
 
 	private void initLaneQueues(List<ModelLane> lanes){
-		Stack<QLaneInternalI> stack = new Stack<QLaneInternalI>();
-		Map<Id, QLaneInternalI> queueByIdMap = new HashMap<Id, QLaneInternalI>();
-		Map<Id, Set<Id>> laneIdToLinksMap = new HashMap<Id, Set<Id>>();
+		Stack<QLaneInternalI> stack = new Stack<>();
+		Map<Id, QLaneInternalI> queueByIdMap = new HashMap<>();
+		Map<Id, Set<Id>> laneIdToLinksMap = new HashMap<>();
 		for (ModelLane lane : lanes) { //lanes is sorted downstream to upstream
 			Id laneId = lane.getLaneData().getId();
 			double noEffectiveLanes = lane.getLaneData().getNumberOfRepresentedLanes();
@@ -159,7 +159,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 			queueByIdMap.put(laneId, queue);
 			firstLaneQueue = queue;
 			stack.push(queue);
-			Set<Id> toLinkIds = new HashSet<Id>();
+			Set<Id> toLinkIds = new HashSet<>();
 			
 			if (lane.getToLanes() == null || lane.getToLanes().isEmpty()){ //lane is at the end of link
 				this.toNodeLaneQueues.add(queue);
@@ -167,7 +167,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 				laneIdToLinksMap.put(laneId, toLinkIds);
 			}
 			else { //lane is within the link and has no connection to a node
-				LinkedHashMap<Id, List<QLaneInternalI>> toLinkIdDownstreamQueues = new LinkedHashMap<Id, List<QLaneInternalI>>();
+				LinkedHashMap<Id, List<QLaneInternalI>> toLinkIdDownstreamQueues = new LinkedHashMap<>();
 				nextQueueToLinkCache.put(((QueueWithBuffer)queue).getId(), toLinkIdDownstreamQueues);
 				for (ModelLane toLane : lane.getToLanes()) {
 					Set<Id> toLinks = laneIdToLinksMap.get(toLane.getLaneData().getId());
@@ -178,7 +178,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 					for (Id toLinkId : toLinks){
 						List<QLaneInternalI> downstreamQueues = toLinkIdDownstreamQueues.get(toLinkId);
 						if (downstreamQueues == null){
-							downstreamQueues = new ArrayList<QLaneInternalI>();
+							downstreamQueues = new ArrayList<>();
 							toLinkIdDownstreamQueues.put(toLinkId, downstreamQueues);
 						}
 						downstreamQueues.add(queueByIdMap.get(toLane.getLaneData().getId()));
@@ -485,7 +485,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 			if (visLink != null){
 				for (QLaneInternalI  ql : QLinkLanesImpl.this.laneQueues.values()){
 					VisLane otfLane = visLink.getLaneData().get(((QueueWithBuffer)ql).getId().toString());
-					((QueueWithBuffer.VisDataImpl) ((QueueWithBuffer)ql).getVisData()).setVisInfo(otfLane.getStartCoord(), otfLane.getEndCoord(), otfLane.getEuklideanDistance());
+					((QueueWithBuffer.VisDataImpl) ql.getVisData()).setVisInfo(otfLane.getStartCoord(), otfLane.getEndCoord(), otfLane.getEuklideanDistance());
 				}
 			}
 			

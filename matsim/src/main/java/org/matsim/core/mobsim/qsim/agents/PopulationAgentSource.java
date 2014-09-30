@@ -19,20 +19,9 @@
 
 package org.matsim.core.mobsim.qsim.agents;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -40,20 +29,22 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
+import java.util.*;
+
 public class PopulationAgentSource implements AgentSource {
 
-	private Population population;
-	private AgentFactory agentFactory;
-	private QSim qsim;
+	private final Population population;
+	private final AgentFactory agentFactory;
+	private final QSim qsim;
 	private Map<String, VehicleType> modeVehicleTypes;
-	private Collection<String> mainModes;
+	private final Collection<String> mainModes;
 	private boolean insertVehicles = true;
 
 	public PopulationAgentSource(Population population, AgentFactory agentFactory, QSim qsim) {
 		this.population = population;
 		this.agentFactory = agentFactory;
 		this.qsim = qsim;  
-		this.modeVehicleTypes = new HashMap<String, VehicleType>();
+		this.modeVehicleTypes = new HashMap<>();
 		this.mainModes = qsim.getScenario().getConfig().qsim().getMainModes();
 		for (String mode : mainModes) {
 			modeVehicleTypes.put(mode, VehicleUtils.getDefaultVehicleType());
@@ -73,9 +64,9 @@ public class PopulationAgentSource implements AgentSource {
 		}
 	}
 
-	public void insertVehicles(Person p) {
+	void insertVehicles(Person p) {
 		Plan plan = p.getSelectedPlan();
-		Set<String> seenModes = new HashSet<String>();
+		Set<String> seenModes = new HashSet<>();
 		for (PlanElement planElement : plan.getPlanElements()) {
 			if (planElement instanceof Leg) {
 				Leg leg = (Leg) planElement;
@@ -94,7 +85,7 @@ public class PopulationAgentSource implements AgentSource {
 	 *	A more careful way to decide where this agent should have its vehicles created
 	 *  than to ask agent.getCurrentLinkId() after creation.
 	 */
-	public static final Id<Link> findVehicleLink(Person p) {
+	private static Id<Link> findVehicleLink(Person p) {
 		// hope it is ok to make this public as long as it is static final. kai, mar'14
 		
 		for (PlanElement planElement : p.getSelectedPlan().getPlanElements()) {

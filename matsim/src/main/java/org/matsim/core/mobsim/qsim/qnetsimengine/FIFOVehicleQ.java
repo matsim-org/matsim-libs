@@ -24,7 +24,7 @@ import java.util.LinkedList;
 
 public final class FIFOVehicleQ extends AbstractQueue<QVehicle> implements VehicleQ<QVehicle>  {
 	
-	LinkedList<QVehicle> vehicleQueue = new LinkedList<QVehicle>();
+	private final LinkedList<QVehicle> vehicleQueue = new LinkedList<>();
 
 	@Override
 	public boolean offer(QVehicle e) {

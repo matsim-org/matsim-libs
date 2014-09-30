@@ -47,34 +47,34 @@ abstract class AbstractQLink extends QLinkInternalI {
 
 	}
 
-	private static Logger log = Logger.getLogger(AbstractQLink.class);
+	private static final Logger log = Logger.getLogger(AbstractQLink.class);
 
 	final Link link;
 
 	final QNetwork network;
 
 	// joint implementation for Customizable
-	private Map<String, Object> customAttributes = new HashMap<String, Object>();
+	private final Map<String, Object> customAttributes = new HashMap<>();
 
-	private final Map<Id, QVehicle> parkedVehicles = new LinkedHashMap<Id, QVehicle>(10);
+	private final Map<Id, QVehicle> parkedVehicles = new LinkedHashMap<>(10);
 
-	private final Map<Id, MobsimAgent> additionalAgentsOnLink = new LinkedHashMap<Id, MobsimAgent>();
+	private final Map<Id, MobsimAgent> additionalAgentsOnLink = new LinkedHashMap<>();
 
-	private final Map<Id, Queue<MobsimDriverAgent>> driversWaitingForCars = new LinkedHashMap<Id, Queue<MobsimDriverAgent>>();
+	private final Map<Id, Queue<MobsimDriverAgent>> driversWaitingForCars = new LinkedHashMap<>();
 
-	private final Map<Id, MobsimDriverAgent> driversWaitingForPassengers = new LinkedHashMap<Id, MobsimDriverAgent>();
+	private final Map<Id, MobsimDriverAgent> driversWaitingForPassengers = new LinkedHashMap<>();
 
 	// vehicleId
-	private final Map<Id, Set<MobsimAgent>> passengersWaitingForCars = new LinkedHashMap<Id, Set<MobsimAgent>>();
+	private final Map<Id, Set<MobsimAgent>> passengersWaitingForCars = new LinkedHashMap<>();
 
 	/**
 	 * All vehicles from parkingList move to the waitingList as soon as their time
 	 * has come. They are then filled into the vehQueue, depending on free space
 	 * in the vehQueue
 	 */
-	/*package*/ final Queue<QVehicle> waitingList = new LinkedList<QVehicle>();
+	/*package*/ final Queue<QVehicle> waitingList = new LinkedList<>();
 
-	NetElementActivator netElementActivator;
+	private NetElementActivator netElementActivator;
 
 	/*package*/ final boolean insertingWaitingVehiclesBeforeDrivingVehicles;
 
@@ -154,7 +154,7 @@ abstract class AbstractQLink extends QLinkInternalI {
 		 * Some agents might be present in multiple lists/maps.
 		 * Ensure that only one stuck event per agent is created.
 		 */
-		Set<Id> stuckAgents = new HashSet<Id>();
+		Set<Id> stuckAgents = new HashSet<>();
 
 		for (QVehicle veh : this.parkedVehicles.values()) {
 			if (veh.getDriver() != null) {
@@ -242,7 +242,7 @@ abstract class AbstractQLink extends QLinkInternalI {
 		Set<MobsimAgent> passengers = this.passengersWaitingForCars.get(vehicleId);
 		if (passengers != null) {
 			// Copy set of passengers since otherwise we would modify it concurrently.
-			List<MobsimAgent> passengersToHandle = new ArrayList<MobsimAgent>(passengers);
+			List<MobsimAgent> passengersToHandle = new ArrayList<>(passengers);
 			for (MobsimAgent passenger : passengersToHandle) {
 				this.unregisterPassengerAgentWaitingForCar(passenger, vehicleId);
 				this.insertPassengerIntoVehicle(passenger, vehicleId, now);
@@ -348,7 +348,7 @@ abstract class AbstractQLink extends QLinkInternalI {
 		Queue<MobsimDriverAgent> queue = driversWaitingForCars.get( vehicleId );
 
 		if ( queue == null ) {
-			queue = new LinkedList<MobsimDriverAgent>();
+			queue = new LinkedList<>();
 			driversWaitingForCars.put( vehicleId , queue );
 		}
 
@@ -369,7 +369,7 @@ abstract class AbstractQLink extends QLinkInternalI {
 	/*package*/ void registerPassengerAgentWaitingForCar(MobsimAgent agent, Id vehicleId) {
 		Set<MobsimAgent> passengers = passengersWaitingForCars.get(vehicleId);
 		if (passengers == null) {
-			passengers = new LinkedHashSet<MobsimAgent>();
+			passengers = new LinkedHashSet<>();
 			passengersWaitingForCars.put(vehicleId, passengers);
 		}
 		passengers.add(agent);

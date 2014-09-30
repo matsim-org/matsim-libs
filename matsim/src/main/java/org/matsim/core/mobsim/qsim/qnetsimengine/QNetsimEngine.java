@@ -20,13 +20,6 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.Phaser;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -41,10 +34,12 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.VehicularDepartureHandler.VehicleBehavior;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
+
+import java.util.*;
+import java.util.concurrent.Phaser;
 
 /**
  * Coordinates the movement of vehicles on the links and the nodes.
@@ -61,7 +56,7 @@ public class QNetsimEngine implements MobsimEngine {
 
 	/*package*/   QNetwork network;
 
-	private final Map<Id, QVehicle> vehicles = new HashMap<Id, QVehicle>();
+	private final Map<Id, QVehicle> vehicles = new HashMap<>();
 
 	private final QSim qsim;
 
@@ -82,7 +77,7 @@ public class QNetsimEngine implements MobsimEngine {
     private Phaser startBarrier;
     private Phaser endBarrier;
     
-    private final Set<QLinkInternalI> linksToActivateInitially = new HashSet<QLinkInternalI>();
+    private final Set<QLinkInternalI> linksToActivateInitially = new HashSet<>();
 
 	/*package*/ InternalInterface internalInterface = null ;
 	@Override

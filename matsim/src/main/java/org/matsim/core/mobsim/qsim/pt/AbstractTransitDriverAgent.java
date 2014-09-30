@@ -19,9 +19,6 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
-import java.util.List;
-import java.util.ListIterator;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
@@ -40,11 +37,10 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
+
+import java.util.List;
+import java.util.ListIterator;
 
 public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, PlanAgent {
 
@@ -57,7 +53,7 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 	private TransitRouteStop currentStop = null;
 	protected TransitRouteStop nextStop;
 	private ListIterator<TransitRouteStop> stopIterator;
-	private InternalInterface internalInterface;
+	private final InternalInterface internalInterface;
 
 	private final PassengerAccessEgressImpl accessEgress;
 
@@ -70,20 +66,20 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 
 	@Override
 	public abstract void endLegAndComputeNextState(final double now);
-	public abstract NetworkRoute getCarRoute();
-	public abstract TransitLine getTransitLine();
+	protected abstract NetworkRoute getCarRoute();
+	protected abstract TransitLine getTransitLine();
 	public abstract TransitRoute getTransitRoute();
-	public abstract Departure getDeparture();
+	protected abstract Departure getDeparture();
 	@Override
 	public abstract double getActivityEndTime();
 
-	public AbstractTransitDriverAgent(InternalInterface internalInterface, TransitStopAgentTracker agentTracker2) {
+	AbstractTransitDriverAgent(InternalInterface internalInterface, TransitStopAgentTracker agentTracker2) {
 		super();
 		this.internalInterface = internalInterface;
 		accessEgress = new PassengerAccessEgressImpl(this.internalInterface, agentTracker2);
 	}
 
-	protected final void init() {
+	final void init() {
 		if (getTransitRoute() != null) {
 			this.stopIterator = getTransitRoute().getStops().listIterator();
 			this.nextStop = (stopIterator.hasNext() ? stopIterator.next() : null);
@@ -93,7 +89,7 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 		this.nextLinkIndex = 0;
 	}
 
-	protected final void setDriver(Person personImpl) {
+	final void setDriver(Person personImpl) {
 		this.dummyPerson = personImpl;
 	}
 
@@ -173,7 +169,7 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 		return stopTime;
 	}
 
-	protected final void sendTransitDriverStartsEvent(final double now) {
+	final void sendTransitDriverStartsEvent(final double now) {
 		// A test initializes this Agent without internalInterface. 
 		// Actually, I am not sure if agents should send Events (or just be reactive, so they can be
 		// tested / exercised as a unit, without a QSim.  michaz
@@ -312,7 +308,7 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 	}
 
 
-	protected final NetworkRouteWrapper getWrappedCarRoute(NetworkRoute carRoute) {
+	final NetworkRouteWrapper getWrappedCarRoute(NetworkRoute carRoute) {
 		return new NetworkRouteWrapper(carRoute);
 	}
 

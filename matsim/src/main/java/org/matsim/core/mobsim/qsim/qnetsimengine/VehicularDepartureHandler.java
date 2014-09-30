@@ -19,14 +19,13 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.Collection;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
-import org.matsim.core.mobsim.qsim.pt.AbstractTransitDriverAgent;
+
+import java.util.Collection;
 
 class VehicularDepartureHandler implements DepartureHandler {
 
@@ -37,15 +36,15 @@ class VehicularDepartureHandler implements DepartureHandler {
 	 */
 	public static enum VehicleBehavior { TELEPORT, WAIT_UNTIL_IT_COMES_ALONG, EXCEPTION }
 
-    private static Logger log = Logger.getLogger(VehicularDepartureHandler.class);
+    private static final Logger log = Logger.getLogger(VehicularDepartureHandler.class);
 
 	private int cntTeleportVehicle = 0;
 
-	private VehicleBehavior vehicleBehavior;
+	private final VehicleBehavior vehicleBehavior;
 
-	private QNetsimEngine qNetsimEngine;
+	private final QNetsimEngine qNetsimEngine;
 
-	private Collection<String> transportModes;
+	private final Collection<String> transportModes;
 
 	VehicularDepartureHandler(QNetsimEngine qNetsimEngine, VehicleBehavior vehicleBehavior) {
 		this.qNetsimEngine = qNetsimEngine;

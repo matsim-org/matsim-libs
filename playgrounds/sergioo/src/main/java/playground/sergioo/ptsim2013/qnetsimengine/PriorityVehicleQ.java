@@ -19,13 +19,12 @@
  * *********************************************************************** */
 package playground.sergioo.ptsim2013.qnetsimengine;
 
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.VehicleQ;
+
 import java.util.AbstractQueue;
 import java.util.Iterator;
 import java.util.PriorityQueue;
-
-import org.matsim.core.mobsim.qsim.comparators.QVehicleEarliestLinkExitTimeComparator;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
-import org.matsim.core.mobsim.qsim.qnetsimengine.VehicleQ;
 
 public class PriorityVehicleQ extends AbstractQueue<QVehicle> implements VehicleQ<QVehicle>  {
 	

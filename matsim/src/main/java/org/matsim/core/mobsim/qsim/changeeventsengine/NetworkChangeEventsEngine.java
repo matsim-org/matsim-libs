@@ -20,15 +20,15 @@
 
 package org.matsim.core.mobsim.qsim.changeeventsengine;
 
-import java.util.Collection;
-import java.util.PriorityQueue;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
+
+import java.util.Collection;
+import java.util.PriorityQueue;
 
 /**
  * @author dgrether
@@ -52,7 +52,7 @@ public class NetworkChangeEventsEngine implements MobsimEngine {
 	public void onPrepareSim() {
 		Collection<NetworkChangeEvent> changeEvents = ((NetworkImpl)this.mobsim.getScenario().getNetwork()).getNetworkChangeEvents();
 		if ((changeEvents != null) && (changeEvents.size() > 0)) {
-			this.networkChangeEventsQueue = new PriorityQueue<NetworkChangeEvent>(changeEvents.size(), new NetworkChangeEvent.StartTimeComparator());
+			this.networkChangeEventsQueue = new PriorityQueue<>(changeEvents.size(), new NetworkChangeEvent.StartTimeComparator());
 			this.networkChangeEventsQueue.addAll(changeEvents);
 		}
 	}

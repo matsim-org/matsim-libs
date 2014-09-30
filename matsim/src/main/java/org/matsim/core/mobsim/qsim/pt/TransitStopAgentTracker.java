@@ -20,15 +20,11 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
+
+import java.util.*;
 
 /**
  * @author mrieser
@@ -36,7 +32,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 public class TransitStopAgentTracker {
 
 	private final EventsManager events;
-	private final Map<Id, List<PTPassengerAgent>> agentsAtStops = new HashMap<Id, List<PTPassengerAgent>>();
+	private final Map<Id, List<PTPassengerAgent>> agentsAtStops = new HashMap<>();
 
 	public TransitStopAgentTracker(final EventsManager events) {
 		this.events = events;
@@ -48,7 +44,7 @@ public class TransitStopAgentTracker {
 		}
 		List<PTPassengerAgent> agents = this.agentsAtStops.get(stopId);
 		if (agents == null) {
-			agents = new LinkedList<PTPassengerAgent>();
+			agents = new LinkedList<>();
 			this.agentsAtStops.put(stopId, agents);
 		}
 		agents.add(agent);

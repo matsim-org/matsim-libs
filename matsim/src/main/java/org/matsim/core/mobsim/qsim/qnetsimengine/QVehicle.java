@@ -20,10 +20,6 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -34,6 +30,10 @@ import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 /**
  * interface to the ``Q'' implementation of the MobsimVehicle.
@@ -56,16 +56,16 @@ public class QVehicle extends QItem implements MobsimVehicle {
 
 	private double earliestLinkExitTime = 0;
 	private DriverAgent driver = null;
-	protected Collection<PassengerAgent> passengers = null;
-	private Id id;
+	private Collection<PassengerAgent> passengers = null;
+	private final Id<Vehicle> id;
 	private Link currentLink = null;
-	private Vehicle vehicle;
+	private final Vehicle vehicle;
 	private final int passengerCapacity;
 
 	public QVehicle(final Vehicle basicVehicle) {
 		this.id = basicVehicle.getId();
 		this.vehicle = basicVehicle;
-		this.passengers = new ArrayList<PassengerAgent>();
+		this.passengers = new ArrayList<>();
 
 		VehicleCapacity capacity = basicVehicle.getType().getCapacity();
 		if (capacity == null) {
@@ -80,8 +80,8 @@ public class QVehicle extends QItem implements MobsimVehicle {
 		} else {
 			// do *not* subtract one for the driver! Most pt vehicles define the capacity without the driver.
 			// for private cars, think about if we should subtract one from the capacity if the driver is set?
-			this.passengerCapacity = capacity.getSeats().intValue() +
-					(capacity.getStandingRoom() == null ? 0 : capacity.getStandingRoom().intValue() );
+			this.passengerCapacity = capacity.getSeats() +
+					(capacity.getStandingRoom() == null ? 0 : capacity.getStandingRoom());
 		}
 	}
 
@@ -163,7 +163,7 @@ public class QVehicle extends QItem implements MobsimVehicle {
 	}
 
 	@Override
-	public Id getId() {
+	public Id<Vehicle> getId() {
 		return this.id;
 	}
 

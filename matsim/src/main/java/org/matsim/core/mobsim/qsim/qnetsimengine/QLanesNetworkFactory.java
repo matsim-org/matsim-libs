@@ -21,8 +21,6 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 
-import java.util.List;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.lanes.ModelLane;
@@ -30,11 +28,13 @@ import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 import org.matsim.lanes.utils.LanesUtils;
 
+import java.util.List;
+
 
 public class QLanesNetworkFactory implements NetsimNetworkFactory<QNode, QLinkInternalI> {
 
-	private NetsimNetworkFactory<QNode, QLinkInternalI> delegate;
-	private LaneDefinitions20 laneDefinitions;
+	private final NetsimNetworkFactory<QNode, QLinkInternalI> delegate;
+	private final LaneDefinitions20 laneDefinitions;
 
 	public QLanesNetworkFactory(NetsimNetworkFactory<QNode, QLinkInternalI> delegate, LaneDefinitions20 laneDefintions){
 		this.delegate = delegate;

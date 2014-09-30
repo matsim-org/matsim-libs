@@ -52,7 +52,7 @@ public class QNode implements NetsimNode {
 	 * activateNode() concurrently.
 	 * cdobler, sep'14
 	 */
-	private AtomicBoolean active = new AtomicBoolean(false);
+	private final AtomicBoolean active = new AtomicBoolean(false);
 
 	private final Node node;
 
@@ -60,9 +60,9 @@ public class QNode implements NetsimNode {
 	private NetElementActivator activator = null;
 
 	// for Customizable
-	private Map<String, Object> customAttributes = new HashMap<String, Object>();
+	private final Map<String, Object> customAttributes = new HashMap<>();
 
-	private QNetwork network;
+	private final QNetwork network;
 
 	private Random random;
 

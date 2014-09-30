@@ -20,18 +20,14 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Queue;
+import org.matsim.core.gbl.Gbl;
+
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Phaser;
 
-import org.matsim.core.gbl.Gbl;
-
 /**
- * These are the "threads" of the {@link ParallelQNetsimEngine}. The "run()" method is implicitly called by starting the thread.  
+ * These are the "threads" of the {@link QNetsimEngine}. The "run()" method is implicitly called by starting the thread.
  * 
  * @author (of this documentation) nagel
  *
@@ -54,7 +50,7 @@ public class QSimEngineRunner extends NetElementActivator implements Runnable {
 	 * possible anymore.
 	 * cdobler, sep'14
 	 */
-	private final Queue<QNode> nodesQueue = new ConcurrentLinkedQueue<QNode>();
+	private final Queue<QNode> nodesQueue = new ConcurrentLinkedQueue<>();
 
 	/*
 	 * Needs not to be thread-safe since links are only activated from nodes which
@@ -63,7 +59,7 @@ public class QSimEngineRunner extends NetElementActivator implements Runnable {
 	 * cdobler, sep'14
 	 */
 //	private final List<QLinkInternalI> linksList = new ArrayList<QLinkInternalI>();
-	private final List<QLinkInternalI> linksList = new LinkedList<QLinkInternalI>();
+	private final List<QLinkInternalI> linksList = new LinkedList<>();
 	
 	/*
 	 * Ensure that nodes and links are only activate during times where we expect it.
