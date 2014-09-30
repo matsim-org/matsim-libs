@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package analysis;
+package playground.juliakern.analysis;
 
 import java.util.Collection;
 import java.util.HashMap;

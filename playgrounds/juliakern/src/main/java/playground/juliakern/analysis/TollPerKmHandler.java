@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package analysis;
+package playground.juliakern.analysis;
 
 import java.util.ArrayList;
 import java.util.Collection;

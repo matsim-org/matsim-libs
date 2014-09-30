@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package math;
+package playground.juliakern.math;
 
 public class CalculationOfDistribution {
 	

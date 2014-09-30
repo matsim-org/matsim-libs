@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * Trb09Analysis
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,38 +17,47 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.juliakern.analysis;
 
-package analysis;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.List;
+import java.util.Collections;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
-import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 
-public class AnalysisWriter {
+/**
+ * @author benjamin
+ *
+ */
+public class TollEventHandler implements PersonMoneyEventHandler{
 
-	public void writeCostPerKmInformation(
-			Map<UserGroup, List<Double>> usergroup2listOfcostPerKm, String outPutDir) {
-		for(UserGroup usergroup: usergroup2listOfcostPerKm.keySet()){
-			// write new file for each user group
-			String filename = outPutDir + "TollPaymentsPerKm_" + usergroup.toString() + ".txt";
-			File file = new File(filename);
-			try {
-				BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-				List<Double> tpklist = usergroup2listOfcostPerKm.get(usergroup);
-				for(int i = 0; i<tpklist.size(); i++){
-					bw.write(tpklist.get(i).toString());
-					bw.newLine();
-				}
-				bw.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+	SortedMap<Id, Double> id2Toll = new TreeMap<Id, Double>();
+	
+	@Override
+	public void handleEvent(PersonMoneyEvent event) {
+		
+		Id id = event.getPersonId();
+		Double tollByEvent = event.getAmount();
+		Double tollSoFar = id2Toll.get(id);
+		
+		if(tollSoFar == null){
+			id2Toll.put(id, tollByEvent);
 		}
+		else{
+			tollSoFar += tollByEvent;
+			id2Toll.put(id, tollSoFar);
+		}	
+	}
+
+	public Map<Id, Double> getPersonId2TollMap() {
+		return Collections.unmodifiableMap(id2Toll);
 	}
 	
+	@Override
+	public void reset(int iteration) {
+		// TODO Auto-generated method stub	
+	}
 }
