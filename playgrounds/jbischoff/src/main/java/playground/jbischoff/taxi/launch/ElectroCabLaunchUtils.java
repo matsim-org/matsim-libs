@@ -31,8 +31,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 
-import playground.jbischoff.energy.charging.Charger;
-import playground.jbischoff.energy.charging.ElectricTaxiChargingHandler;
+import playground.jbischoff.energy.charging.taxi.ElectricTaxiChargingHandler;
+import playground.jbischoff.energy.charging.taxi.TaxiCharger;
 import playground.jbischoff.energy.vehicles.BatteryElectricVehicleImpl;
 import playground.jbischoff.taxi.evaluation.*;
 import playground.jbischoff.taxi.optimizer.rank.NOSRankTaxiOptimizer;
@@ -107,7 +107,7 @@ public class ElectroCabLaunchUtils
 
         for (TaxiRank r : ((TaxiData)context.getVrpData()).getTaxiRanks()) {
             rankhandler.addRank(r);
-            ecabhandler.addCharger(new Charger(1000, 50, r.getLink().getId()));
+            ecabhandler.addCharger(new TaxiCharger(1000, 50, r.getLink().getId()));
         }
 
         events.addHandler(handlerGroup);

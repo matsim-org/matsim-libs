@@ -5,7 +5,7 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.transEnergySim.vehicles.api.BatteryElectricVehicle;
 
 
-public class ElectricTaxi
+public class ElectricTaxi 
 {
 
     /**
@@ -14,7 +14,7 @@ public class ElectricTaxi
      * 
      * @param args
      */
-    private final Id vehicleId;
+    private final Id<ElectricTaxi> vehicleId;
     private final BatteryElectricVehicle bev;
     private final Vehicle veh;
     private final boolean isElectric;
@@ -24,12 +24,12 @@ public class ElectricTaxi
     {
         this.bev = bev;
         this.veh = veh;
-        this.vehicleId = veh.getId();
+        this.vehicleId = Id.create(veh.getId(),ElectricTaxi.class);
         this.isElectric = true;
     }
 
 
-    public Id getVehicleId()
+    public Id<ElectricTaxi> getVehicleId()
     {
         return vehicleId;
     }

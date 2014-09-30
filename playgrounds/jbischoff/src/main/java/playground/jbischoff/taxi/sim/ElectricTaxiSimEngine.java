@@ -22,7 +22,7 @@ package playground.jbischoff.taxi.sim;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
-import playground.jbischoff.energy.charging.ElectricTaxiChargingHandler;
+import playground.jbischoff.energy.charging.taxi.ElectricTaxiChargingHandler;
 import playground.jbischoff.taxi.optimizer.rank.NOSRankTaxiOptimizer;
 
 

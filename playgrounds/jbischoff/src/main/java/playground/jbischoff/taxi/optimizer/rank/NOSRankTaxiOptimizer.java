@@ -35,7 +35,7 @@ import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.contrib.dvrp.schedule.Task.TaskType;
 import org.matsim.contrib.dvrp.util.DistanceUtils;
 
-import playground.jbischoff.energy.charging.ElectricTaxiChargingHandler;
+import playground.jbischoff.energy.charging.taxi.ElectricTaxiChargingHandler;
 import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration.Goal;
 import playground.michalm.taxi.optimizer.fifo.NOSTaxiOptimizer;

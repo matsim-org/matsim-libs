@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,115 +17,20 @@
  *                                                                         *
  * *********************************************************************** */
 
+/**
+ * 
+ */
 package playground.jbischoff.energy.charging;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-
-import org.matsim.api.core.v01.Id;
-
-import playground.jbischoff.taxi.vehicles.ElectricTaxi;
 
 
-public class Charger{
-
-private final Id chargerLinkId;   
-private final int CAPACITY;
-private int powerInKW;
-private List<ElectricTaxi> chargingVehicles;
-private Queue<ElectricTaxi>  waitingVehicles;
-private double maxsoc = 0.8;
-
-
-
-public Charger(int capacity, int powerInkW, Id chargerLinkId)
+/**
+ * @author jbischoff
+ *
+ */
+public interface Charger
 {
-    this.CAPACITY = capacity;
-    this.powerInKW = powerInkW;
-    this.chargerLinkId = chargerLinkId;
-    
-    this.chargingVehicles = new ArrayList<ElectricTaxi>();
-    this.waitingVehicles = new LinkedList<ElectricTaxi>();
-}
-
-public int getPowerInKW()
-{
-    return powerInKW;
-}
-
-public void setPowerInKW(int powerInKW)
-{
-    this.powerInKW = powerInKW;
-}
-
-public int getCurrentOccupation()
-{
-    return chargingVehicles.size();
-}
-
-public Id getChargerLinkId()
-{
-    return chargerLinkId;
-} 
-
-
-public int getCAPACITY()
-{
-    return CAPACITY;
-}
-
-public boolean chargeOrQueueForCharging(ElectricTaxi taxi){
-    if (!taxi.isElectric()) return false;
-    if (this.getCurrentOccupation() < this.CAPACITY) 
-        {
-        this.chargingVehicles.add(taxi);
-//        System.out.println("plugin" + taxi.getVehicleId());
-        return true;
-        }
-    else {
-        this.waitingVehicles.add(taxi);
-//        System.out.println("wait" + taxi.getVehicleId());
-        return false;
-    }
-}
-
-public boolean removeFromCharger(ElectricTaxi taxi){
-    if (this.chargingVehicles.contains(taxi)){
-        this.chargingVehicles.remove(taxi);
-//        System.out.println("unplug" + taxi.getVehicleId());
-        addNextVehicleFromQueueToCharger();
-        return true;
-    }
-    else if (this.waitingVehicles.contains(taxi)){
-        this.waitingVehicles.remove(taxi);
-        return true;
-    }
-    else return false;
-    
-}
-private void addNextVehicleFromQueueToCharger(){
-    ElectricTaxi taxi  = this.waitingVehicles.poll();
-    if (taxi!=null) {
-        this.chargingVehicles.add(taxi);
-//        System.out.println("plugin" + taxi.getVehicleId());
-
-    }
-}
-
-void chargeVehicles(double chargeTime){
-    
-    double chargeInJoule = chargeTime * this.powerInKW*1000;
-    
-    for (ElectricTaxi taxi : this.chargingVehicles){
-        double actualCharge = chargeInJoule;
-        double maximumSOC =  maxsoc * taxi.getBev().getUsableBatteryCapacityInJoules();
-        if ( chargeInJoule+taxi.getBev().getSocInJoules() > maximumSOC ) actualCharge = maximumSOC-taxi.getBev().getSocInJoules();
-        taxi.getBev().chargeBattery(actualCharge);
-        
-    }
-}
-
+    public int getPowerInKW();
+    public int getCapacity();
 
 }

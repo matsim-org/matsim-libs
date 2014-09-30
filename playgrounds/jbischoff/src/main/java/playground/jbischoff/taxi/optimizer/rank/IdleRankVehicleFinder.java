@@ -26,7 +26,7 @@ import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.util.*;
 
-import playground.jbischoff.energy.charging.ElectricTaxiChargingHandler;
+import playground.jbischoff.energy.charging.taxi.ElectricTaxiChargingHandler;
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.query.*;
 import playground.michalm.taxi.scheduler.*;

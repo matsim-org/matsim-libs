@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jbischoff.energy.charging;
+package playground.jbischoff.energy.charging.taxi;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,8 +35,8 @@ import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 
 import playground.jbischoff.energy.log.ChargeLogRow;
 import playground.jbischoff.energy.log.ChargerLog;
@@ -51,9 +51,9 @@ public class ElectricTaxiChargingHandler
 
 {
 
-    private Map<Id, Charger> chargers;
-    private Map<Id, ElectricTaxi> vehicles;
-    private Map<Id, ElectricTaxi> activeVehicles;
+    private Map<Id<TaxiCharger>, TaxiCharger> chargers;
+    private Map<Id<ElectricTaxi>, ElectricTaxi> vehicles;
+    private Map<Id<ElectricTaxi>, ElectricTaxi> activeVehicles;
     private SoCLog soCLog;
     private ChargerLog chargerLog;
     private long underChargeMinutes = 0;
@@ -63,9 +63,9 @@ public class ElectricTaxiChargingHandler
 
     public ElectricTaxiChargingHandler(EventsManager events)
     {
-        this.vehicles = new HashMap<Id, ElectricTaxi>();
-        this.activeVehicles = new HashMap<Id, ElectricTaxi>();
-        this.chargers = new HashMap<Id, Charger>();
+        this.vehicles = new HashMap<>();
+        this.activeVehicles = new HashMap<>();
+        this.chargers = new HashMap<>();
         this.soCLog = new SoCLog();
         this.chargerLog = new ChargerLog();
         this.events = events;
@@ -82,7 +82,7 @@ public class ElectricTaxiChargingHandler
     public void doSimStep(double time)
     {
         if (time % 60 == 0) {
-            for (Charger charger : this.chargers.values()) {
+            for (TaxiCharger charger : this.chargers.values()) {
                 charger.chargeVehicles(60);
 
             }
@@ -97,11 +97,12 @@ public class ElectricTaxiChargingHandler
     @Override
     public void handleEvent(PersonArrivalEvent event)
     {
-        if (!isActiveVehicle(event.getPersonId()))
+        Id<ElectricTaxi> taxiId = Id.create(event.getPersonId(),ElectricTaxi.class);
+        if (!isActiveVehicle(taxiId))
             return;
         if (!isAtCharger(event.getLinkId()))
             return;
-        if (this.getRelativeTaxiSoC(event.getPersonId()) >= 0.8 ) return;
+        if (this.getRelativeTaxiSoC(taxiId) >= 0.8 ) return;
         this.chargers.get(event.getLinkId()).chargeOrQueueForCharging(
                 this.activeVehicles.get(event.getPersonId()));
         this.events.processEvent(new ActivityStartEvent(event.getTime(), event.getPersonId(), event
@@ -113,7 +114,7 @@ public class ElectricTaxiChargingHandler
     @Override
     public void handleEvent(PersonDepartureEvent event)
     {
-        if (!isActiveVehicle(event.getPersonId()))
+        if (!isActiveVehicle(Id.create(event.getPersonId(),ElectricTaxi.class)))
             return;
         if (!isAtCharger(event.getLinkId()))
             return;
@@ -127,11 +128,12 @@ public class ElectricTaxiChargingHandler
 
     @Override
     public void handleEvent(ActivityEndEvent event)
-    {
-        if (!this.vehicles.containsKey(event.getPersonId()))
+    {      
+        Id<ElectricTaxi> taxiid =  Id.create(event.getPersonId(),ElectricTaxi.class);
+        if (!this.vehicles.containsKey(taxiid))
             return;
         if (event.getActType().startsWith("Before schedule:")) {
-            this.activeVehicles.put(event.getPersonId(), this.vehicles.get(event.getPersonId()));
+            this.activeVehicles.put(taxiid, this.vehicles.get(event.getPersonId()));
         }
 
     }
@@ -140,22 +142,24 @@ public class ElectricTaxiChargingHandler
     @Override
     public void handleEvent(ActivityStartEvent event)
     {
-        if (!this.activeVehicles.containsKey(event.getPersonId()))
+        Id<ElectricTaxi> taxiid =  Id.create(event.getPersonId(),ElectricTaxi.class);
+
+        if (!this.activeVehicles.containsKey(taxiid))
             return;
         if (event.getActType().startsWith("After schedule:")){
             if (isAtCharger(event.getLinkId())){
                 this.chargers.get(event.getLinkId()).removeFromCharger(this.activeVehicles.get(event.getPersonId()));
             }
-            this.activeVehicles.remove(event.getPersonId());
+            this.activeVehicles.remove(taxiid);
             }
             
 
     }
 
 
-    public void addCharger(Charger charger)
+    public void addCharger(TaxiCharger charger)
     {
-        this.chargers.put(charger.getChargerLinkId(), charger);
+        this.chargers.put(Id.create(charger.getChargerLinkId(),TaxiCharger.class), charger);
 
     }
 
@@ -166,13 +170,13 @@ public class ElectricTaxiChargingHandler
     }
 
 
-    public boolean isAtCharger(Id linkId)
+    public boolean isAtCharger(Id<Link> linkId)
     {
-        return this.chargers.containsKey(linkId);
+        return this.chargers.containsKey(Id.create(linkId,TaxiCharger.class));
     }
 
 
-    private boolean isActiveVehicle(Id taxiId)
+    private boolean isActiveVehicle(Id<ElectricTaxi> taxiId)
     {
         return this.activeVehicles.containsKey(taxiId);
     }
@@ -193,14 +197,14 @@ public class ElectricTaxiChargingHandler
             currentSoc.add(soc);
         }
         if (currentSoc.size() > 0) {
-            this.soCLog.add(new SocLogRow(new IdImpl("max"), time, Collections.max(currentSoc), 0));
-            this.soCLog.add(new SocLogRow(new IdImpl("min"), time, Collections.min(currentSoc), 0));
+            this.soCLog.add(new SocLogRow(Id.create("max",ElectricTaxi.class), time, Collections.max(currentSoc), 0));
+            this.soCLog.add(new SocLogRow(Id.create("min",ElectricTaxi.class), time, Collections.min(currentSoc), 0));
             double socs = 0;
             for (Double d : currentSoc) {
                 socs += d;
             }
             double average = socs / currentSoc.size();
-            this.soCLog.add(new SocLogRow(new IdImpl("ave"), time, average, 0));
+            this.soCLog.add(new SocLogRow(Id.create("ave",ElectricTaxi.class), time, average, 0));
             Collections.sort(currentSoc);
             int p05 = (int)Math.floor(currentSoc.size() * 0.05);
             double p05v = currentSoc.get(p05);
@@ -212,13 +216,13 @@ public class ElectricTaxiChargingHandler
             }
             worst5pc = worst5pc / p05;
 
-            this.soCLog.add(new SocLogRow(new IdImpl("p05"), time, p05v, 0));
-            this.soCLog.add(new SocLogRow(new IdImpl("w05av"), time, worst5pc, 0));
+            this.soCLog.add(new SocLogRow(Id.create("p05",ElectricTaxi.class), time, p05v, 0));
+            this.soCLog.add(new SocLogRow(Id.create("w05av",ElectricTaxi.class), time, worst5pc, 0));
 
         }
-        for (Charger c : this.chargers.values()) {
+        for (TaxiCharger c : this.chargers.values()) {
             int occ = c.getCurrentOccupation();
-            double rocc = occ / c.getCAPACITY();
+            double rocc = occ / c.getCapacity();
             this.chargerLog.add(new ChargeLogRow(c.getChargerLinkId(), time, occ, rocc));
         }
     }
@@ -231,7 +235,7 @@ public class ElectricTaxiChargingHandler
     }
 
 
-    public Map<Id, ElectricTaxi> getVehicles()
+    public Map<Id<ElectricTaxi>, ElectricTaxi> getVehicles()
     {
         return vehicles;
     }
@@ -241,12 +245,12 @@ public class ElectricTaxiChargingHandler
     {
         return chargerLog;
     }
-    public Map<Id, Charger> getChargers()
+    public Map<Id<TaxiCharger>, TaxiCharger> getChargers()
     {
         return chargers;
     }
     
-    public double getRelativeTaxiSoC(Id vid){
+    public double getRelativeTaxiSoC(Id<ElectricTaxi> vid){
         double rsoc = 1.;
         if (this.vehicles.containsKey(vid)){
             ElectricTaxi taxi = this.vehicles.get(vid);
