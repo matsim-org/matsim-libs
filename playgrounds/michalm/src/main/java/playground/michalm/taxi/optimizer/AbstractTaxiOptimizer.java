@@ -19,15 +19,16 @@
 
 package playground.michalm.taxi.optimizer;
 
-import java.util.Collection;
-
 import org.matsim.contrib.dvrp.data.Request;
-import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.schedule.DriveTask;
+import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
-
 import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.schedule.*;
+import playground.michalm.taxi.schedule.TaxiTask;
 import playground.michalm.taxi.schedule.TaxiTask.TaxiTaskType;
+
+import java.util.Collection;
 
 
 public abstract class AbstractTaxiOptimizer

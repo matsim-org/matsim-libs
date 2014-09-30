@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QueueSimulationBeforeCleanupEvent
+ * QueueSimulationBeforeCleanupEventImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -21,15 +21,20 @@ package org.matsim.core.mobsim.framework.events;
 
 import org.matsim.core.mobsim.framework.Mobsim;
 
-
 /**
- * A simple interface for QueueSimulationEvents that are fired for every time step.
- * 
  * @author mrieser
  */
-public interface MobsimAfterSimStepEvent<T extends Mobsim> 
-	extends MobsimEvent<T>{
+public class MobsimAfterSimStepEvent<T extends Mobsim> extends AbstractMobsimEvent<T> {
 
-	public double getSimulationTime();
+	private final double simTime;
+	
+	public MobsimAfterSimStepEvent(final T queuesim, final double simTime) {
+		super(queuesim);
+		this.simTime = simTime;
+	}
+
+	public double getSimulationTime() {
+		return this.simTime;
+	}
 
 }

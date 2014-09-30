@@ -20,13 +20,13 @@
 
 package org.matsim.core.mobsim.framework.listeners;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * To avoid problems with the order of some SimulationListeners, this

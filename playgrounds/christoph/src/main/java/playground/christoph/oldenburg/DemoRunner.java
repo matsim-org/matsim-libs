@@ -20,8 +20,6 @@
 
 package playground.christoph.oldenburg;
 
-import java.util.Collection;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -64,6 +62,8 @@ import org.matsim.withinday.replanning.replanners.NextLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplannerFactory;
+
+import java.util.Collection;
 
 public class DemoRunner implements MobsimInitializedListener, StartupListener, 
 	MobsimBeforeSimStepListener, IterationEndsListener {
@@ -153,7 +153,7 @@ public class DemoRunner implements MobsimInitializedListener, StartupListener,
 	}
 	
 	@Override
-	public void notifyMobsimInitialized(MobsimInitializedEvent e) {		
+	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		
 		VehiclesFactory vehiclesFactory = VehicleUtils.getFactory();
 		VehicleType vehicleType = VehicleUtils.getDefaultVehicleType();

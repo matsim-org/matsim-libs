@@ -20,12 +20,7 @@
 
 package playground.christoph.evacuation.analysis.postprocessing;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import com.vividsolutions.jts.geom.Geometry;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.Event;
@@ -42,9 +37,7 @@ import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
-import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEventImpl;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
-import org.matsim.core.mobsim.framework.events.MobsimInitializedEventImpl;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
@@ -53,7 +46,6 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
-
 import playground.christoph.evacuation.analysis.AgentsReturnHomeCounter;
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.config.EvacuationConfig;
@@ -67,7 +59,11 @@ import playground.christoph.evacuation.mobsim.decisionmodel.PanicModel;
 import playground.christoph.evacuation.mobsim.decisionmodel.PickupModel;
 import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
 
-import com.vividsolutions.jts.geom.Geometry;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Class to produce AgentsReturnHome data using output data from a previous simulation run.
@@ -191,7 +187,7 @@ public class AgentsReturnHomePostProcessing {
 		eventsManager.addHandler(agentsReturnHomeCounter);
 				
 		// MobsimInitializedListener
-		MobsimInitializedEvent<Mobsim> mobsimInitializedEvent = new MobsimInitializedEventImpl<Mobsim>(null);
+		MobsimInitializedEvent<Mobsim> mobsimInitializedEvent = new MobsimInitializedEvent<Mobsim>(null);
 		for(MobsimListener mobsimListener : mobsimListeners) {
 			if (mobsimListener instanceof MobsimInitializedListener) {
 				((MobsimInitializedListener) mobsimListener).notifyMobsimInitialized(mobsimInitializedEvent);
@@ -226,7 +222,7 @@ public class AgentsReturnHomePostProcessing {
 		public void handleEvent(Event event) {
 			double time = event.getTime();
 			while (time > lastSimStep) {
-				MobsimAfterSimStepEvent<Mobsim> e = new MobsimAfterSimStepEventImpl<Mobsim>(null, lastSimStep);
+				MobsimAfterSimStepEvent<Mobsim> e = new MobsimAfterSimStepEvent<Mobsim>(null, lastSimStep);
 				
 				for(MobsimListener mobsimListener : mobsimListeners) {
 					if (mobsimListener instanceof MobsimAfterSimStepListener) {

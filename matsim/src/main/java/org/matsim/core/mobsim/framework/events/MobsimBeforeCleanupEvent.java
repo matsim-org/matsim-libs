@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QueueSimulationBeforeCleanupEvent
+ * QueueSimulationBeforeCleanupEventImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,14 +23,13 @@ import org.matsim.core.mobsim.framework.Mobsim;
 
 
 /**
- * A simple tagging interface to mark all QueueSimulationEvents that are fired
- * before the QueueSimulation instance starts to shut down.
- * 
  * @author dgrether
- *
  */
-public interface MobsimBeforeCleanupEvent
-<T extends Mobsim> extends MobsimEvent<T>
-{
+public class MobsimBeforeCleanupEvent<T extends Mobsim> extends
+		AbstractMobsimEvent<T> {
+
+	public MobsimBeforeCleanupEvent(T queuesim) {
+		super(queuesim);
+	}
 
 }

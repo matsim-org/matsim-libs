@@ -20,13 +20,7 @@
 
 package playground.christoph.evacuation.controler;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.vividsolutions.jts.geom.Geometry;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.analysis.christoph.TravelTimesWriter;
@@ -46,7 +40,6 @@ import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
 import org.matsim.core.mobsim.qsim.qnetsimengine.MissedJointDepartureWriter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerDepartureHandler;
@@ -70,7 +63,6 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.functions.OnlyTravelTimeDependentScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
-import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.households.Household;
 import org.matsim.pt.router.TransitRouterNetwork;
@@ -87,11 +79,7 @@ import org.matsim.withinday.replanning.identifiers.filter.ActivityStartingFilter
 import org.matsim.withinday.replanning.identifiers.filter.EarliestLinkExitTimeFilterFactory;
 import org.matsim.withinday.replanning.identifiers.filter.ProbabilityFilterFactory;
 import org.matsim.withinday.replanning.identifiers.filter.TransportModeFilterFactory;
-import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilterFactory;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifierFactory;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
+import org.matsim.withinday.replanning.identifiers.interfaces.*;
 import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
@@ -99,19 +87,10 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplannerF
 import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
 import org.matsim.withinday.trafficmonitoring.LinkEnteredProvider;
 import org.opengis.feature.simple.SimpleFeature;
-
-import playground.christoph.evacuation.analysis.AgentsInEvacuationAreaActivityCounter;
-import playground.christoph.evacuation.analysis.AgentsInEvacuationAreaCounter;
-import playground.christoph.evacuation.analysis.AgentsReturnHomeCounter;
-import playground.christoph.evacuation.analysis.CoordAnalyzer;
-import playground.christoph.evacuation.analysis.EvacuationTimePicture;
+import playground.christoph.evacuation.analysis.*;
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.config.EvacuationConfigReader;
-import playground.christoph.evacuation.mobsim.EvacuationQSimFactory;
-import playground.christoph.evacuation.mobsim.HouseholdsTracker;
-import playground.christoph.evacuation.mobsim.InformedHouseholdsTracker;
-import playground.christoph.evacuation.mobsim.LegModeChecker;
-import playground.christoph.evacuation.mobsim.VehiclesTracker;
+import playground.christoph.evacuation.mobsim.*;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataGrabber;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisionmodel.DecisionModelRunner;
@@ -125,27 +104,18 @@ import playground.christoph.evacuation.trafficmonitoring.SwissPTTravelTimeCalcul
 import playground.christoph.evacuation.vehicles.AssignVehiclesToPlans;
 import playground.christoph.evacuation.vehicles.CreateVehiclesForHouseholds;
 import playground.christoph.evacuation.vehicles.HouseholdVehicleAssignmentReader;
-import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToDropOffIdentifier;
-import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToDropOffIdentifierFactory;
-import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToPickupIdentifier;
-import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToPickupIdentifierFactory;
-import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifier;
-import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifierFactory;
+import playground.christoph.evacuation.withinday.replanning.identifiers.*;
 import playground.christoph.evacuation.withinday.replanning.identifiers.filters.AffectedAgentsFilter;
 import playground.christoph.evacuation.withinday.replanning.identifiers.filters.AffectedAgentsFilterFactory;
 import playground.christoph.evacuation.withinday.replanning.identifiers.filters.InformedAgentsFilter;
 import playground.christoph.evacuation.withinday.replanning.identifiers.filters.InformedAgentsFilterFactory;
-import playground.christoph.evacuation.withinday.replanning.replanners.CurrentActivityToMeetingPointReplannerFactory;
-import playground.christoph.evacuation.withinday.replanning.replanners.CurrentLegToMeetingPointReplannerFactory;
-import playground.christoph.evacuation.withinday.replanning.replanners.DropOffAgentReplannerFactory;
-import playground.christoph.evacuation.withinday.replanning.replanners.JoinedHouseholdsReplannerFactory;
-import playground.christoph.evacuation.withinday.replanning.replanners.PickupAgentReplannerFactory;
+import playground.christoph.evacuation.withinday.replanning.replanners.*;
 import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;
 import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
 import playground.christoph.evacuation.withinday.replanning.utils.SelectHouseholdMeetingPoint;
 import playground.meisterk.kti.config.KtiConfigGroup;
 
-import com.vividsolutions.jts.geom.Geometry;
+import java.util.*;
 
 public class EvacuationControler extends WithinDayController implements 
 		MobsimAfterSimStepListener, IterationStartsListener, AfterMobsimListener {
