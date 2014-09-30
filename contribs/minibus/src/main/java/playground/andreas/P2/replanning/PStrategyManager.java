@@ -43,6 +43,7 @@ public final class PStrategyManager {
 	private final ArrayList<Double> weights = new ArrayList<>();
 	private final ArrayList<Integer> disableInIteration = new ArrayList<>();
 	private double totalWeights = 0.0;
+	private boolean allStrategiesAreDisabled = false;
 
 	public void init(PConfigGroup pConfig, StageContainerCreator stageContainerCreator, TicketMachine ticketMachine, TimeProvider timeProvider) {
 		for (PStrategySettings settings : pConfig.getStrategySettings()) {
@@ -123,19 +124,22 @@ public final class PStrategyManager {
 	/**
 	 * Picks randomly one strategy from the set of available strategies. Strategies with a higher weight have a higher probability of being picked.
 	 *  
-	 * @return The strategy picked.
+	 * @return The strategy picked or null if all strategies were disabled.
 	 */
 	public PStrategy chooseStrategy() {
-		double rnd = MatsimRandom.getRandom().nextDouble() * this.totalWeights;
-
-		double sum = 0.0;
-		for (int i = 0, max = this.weights.size(); i < max; i++) {
-			sum += this.weights.get(i);
-			if (rnd <= sum) {
-				return this.strategies.get(i);
+		if (!allStrategiesAreDisabled) {
+			double rnd = MatsimRandom.getRandom().nextDouble() * this.totalWeights;
+			double accumulatedWeight = 0.0;
+			for (int i = 0; i < this.weights.size(); i++) {
+				accumulatedWeight += this.weights.get(i);
+				if (accumulatedWeight >= rnd) {
+					return this.strategies.get(i);
+				}
 			}
+			log.info("Total weight is " + this.totalWeights + ". All strategies seem to be disabled.");
+			log.info("Will start to return null only. This message is given only once.");
+			this.allStrategiesAreDisabled = true;
 		}
-		log.error("This line should not be reachable. Check it.");
 		return null;
 	}
 

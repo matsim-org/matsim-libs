@@ -118,13 +118,17 @@ public final class TimeProvider implements ActivityStartEventHandler, ActivityEn
 		
 		if (totalWeight == 0.0) {
 			log.info("Total weight is zero. Probably first iteration. Will pick time slots randomly.");
-			int numberOfRemainingSlots = numberOfValidSlots;
+			double rnd = MatsimRandom.getRandom().nextDouble() * numberOfValidSlots;
+			double accumulatedWeight = 0.0;
 			for (int i = startSlot; i <= endSlot; i++) {
-				if(MatsimRandom.getRandom().nextDouble() < 1.0 / numberOfRemainingSlots){
+				accumulatedWeight += 1.0;
+				if(accumulatedWeight >= rnd){
 					return i * this.timeSlotSize;
 				}
-				numberOfRemainingSlots--;
 			}
+			// TODO Double-check
+			log.warn("Could not find a random time slot between: " + startSlot + " and " + endSlot);
+			
 		} else {
 			double rnd = MatsimRandom.getRandom().nextDouble() * totalWeight;
 			double accumulatedWeight = 0.0;
@@ -134,6 +138,7 @@ public final class TimeProvider implements ActivityStartEventHandler, ActivityEn
 					return i * this.timeSlotSize;
 				}
 			}
+			// TODO Double-check for null weights 
 		}
 		
 		log.warn("Could not find any time slot. This should not happen. Check time slot size in config. Will return the start slot time");

@@ -263,7 +263,7 @@ public final class PConfigGroup extends Module{
 		} else if (key != null && key.startsWith(PMODULE_PARAMETER)) {
 			PStrategySettings settings = getStrategySettings(Id.create(key.substring(PMODULE_PARAMETER.length()), PStrategySettings.class), true);
 			settings.setParameters(value);
-		}else{
+		} else {
 			log.error("unknown parameter: " + key + "...");
 		}
 	}
@@ -627,27 +627,32 @@ public final class PConfigGroup extends Module{
 		
 		public ArrayList<String> getParametersAsArrayList(){
 			ArrayList<String> list = new ArrayList<>();
-            for (String parameter : this.parameters) {
-                list.add(parameter);
-            }
+			
+			if (this.parameters != null) {
+				for (String parameter : this.parameters) {
+					list.add(parameter);
+				}
+			}
+			
 			return list;
 		}
 		
 		public String getParametersAsString() {
 			StringBuffer strBuffer = new StringBuffer();
 			
-			if (this.parameters.length > 0) {
+			if (this.parameters != null) {
 		        strBuffer.append(this.parameters[0]);
 		        for (int i = 1; i < this.parameters.length; i++) {
 		            strBuffer.append(",");
 		            strBuffer.append(this.parameters[i]);
 		        }
 		    }
+			
 			return strBuffer.toString();
 		}
 
 		public void setParameters(String parameter) {
-			if (parameter != null) {
+			if (!parameter.equalsIgnoreCase("")) {
 				String[] parts = StringUtils.explode(parameter, ',');
 				this.parameters = new String[parts.length];
 				for (int i = 0, n = parts.length; i < n; i++) {

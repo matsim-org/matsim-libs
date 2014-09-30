@@ -97,13 +97,21 @@ public final class CreatePStops{
 		this.linkId2StopFacilityMap = new LinkedHashMap<>();
 		
 		Set<Id<TransitStopFacility>> stopsWithoutLinkIds = new TreeSet<>();
+
+		int warnCounter = 10;
 		
 		if (realTransitSchedule != null) {
 			for (TransitStopFacility stopFacility : realTransitSchedule.getFacilities().values()) {
 				if (stopFacility.getLinkId() != null) {
 					if (this.linkId2StopFacilityMap.get(stopFacility.getLinkId()) != null) {
-						log.error("There is more than one stop registered on link " + stopFacility.getLinkId() + ". "
-								+ this.linkId2StopFacilityMap.get(stopFacility.getLinkId()).getId() + " stays registered as paratransit stop. Will ignore stop " + stopFacility.getId());
+						if (warnCounter > 0) {
+							log.warn("There is more than one stop registered on link " + stopFacility.getLinkId() + ". "
+									+ this.linkId2StopFacilityMap.get(stopFacility.getLinkId()).getId() + " stays registered as paratransit stop. Will ignore stop " + stopFacility.getId());
+							warnCounter--;
+						} if (warnCounter == 0) {
+							log.warn("Future occurences of this logging statement are suppressed.");
+							warnCounter--;
+						}
 					} else {
 						this.linkId2StopFacilityMap.put(stopFacility.getLinkId(), stopFacility);
 					}

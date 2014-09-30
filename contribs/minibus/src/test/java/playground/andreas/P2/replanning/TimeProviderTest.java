@@ -85,18 +85,18 @@ public class TimeProviderTest {
 		double endTime = 19400.0;
 		
 		Assert.assertEquals("Check time", 7200.0, tP.getRandomTimeInInterval(startTime, endTime), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Check time", 16200.0, tP.getRandomTimeInInterval(startTime, endTime), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Check time", 11700.0, tP.getRandomTimeInInterval(startTime, endTime), MatsimTestUtils.EPSILON);
 		
 		Id id = new IdImpl("id");
 		for (int i = 0; i < 100; i++) {
 			tP.handleEvent(new ActivityEndEvent(500.0 * i, id, id, id, "type"));
 		}
 		
-		Assert.assertEquals("Check time", 9900.0, tP.getRandomTimeInInterval(startTime, endTime), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Check time", 18000.0, tP.getRandomTimeInInterval(startTime, endTime), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Check time", 9000.0, tP.getRandomTimeInInterval(startTime, endTime), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Check time", 10800.0, tP.getRandomTimeInInterval(startTime, endTime), MatsimTestUtils.EPSILON);
 
 		tP.reset(1);
-		Assert.assertEquals("Check time", 10800.0, tP.getRandomTimeInInterval(startTime, endTime), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Check time", 18000.0, tP.getRandomTimeInInterval(startTime, endTime), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Check time", 11700.0, tP.getRandomTimeInInterval(startTime, endTime), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Check time", 9900.0, tP.getRandomTimeInInterval(startTime, endTime), MatsimTestUtils.EPSILON);
 	}
 }

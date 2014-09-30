@@ -73,7 +73,7 @@ public class WeightedStartTimeExtensionTest {
 		Assert.assertEquals("Compare start time", 19500.0, coop.getBestPlan().getStartTime(), MatsimTestUtils.EPSILON);
 		Assert.assertNotNull("Test plan should be not null", testPlan);
 		Assert.assertEquals("There should be one vehicle bought", 1.0, testPlan.getNVehicles(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Compare start time", 7200.0, testPlan.getStartTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Compare start time", 9000.0, testPlan.getStartTime(), MatsimTestUtils.EPSILON);
 		
 		// enough vehicles for testing
 		testPlan = strat.run(coop);
@@ -82,7 +82,7 @@ public class WeightedStartTimeExtensionTest {
 		Assert.assertEquals("Compare start time", 19500.0, coop.getBestPlan().getStartTime(), MatsimTestUtils.EPSILON);
 		Assert.assertNotNull("Test plan should be not null", testPlan);
 		Assert.assertEquals("There should be one vehicle bought", 1.0, testPlan.getNVehicles(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Compare start time", 18900.0, testPlan.getStartTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Compare start time", 900.0, testPlan.getStartTime(), MatsimTestUtils.EPSILON);
 		
 		// Now same with acts
 		Id id = new IdImpl("id");
@@ -105,6 +105,6 @@ public class WeightedStartTimeExtensionTest {
 		Assert.assertEquals("Compare start time", 19500.0, coop.getBestPlan().getStartTime(), MatsimTestUtils.EPSILON);
 		Assert.assertNotNull("Test plan should be not null", testPlan);
 		Assert.assertEquals("There should be one vehicle bought", 1.0, testPlan.getNVehicles(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("Compare start time", 18900.0, testPlan.getStartTime(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Compare start time", 8100.0, testPlan.getStartTime(), MatsimTestUtils.EPSILON);
 	}
 }
