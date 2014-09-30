@@ -36,9 +36,7 @@ public class FreeFloatingConfigGroup extends ReflectiveModule {
 	
 	private String distanceFeeFreeFloating = null;
 	
-	private boolean useFeeFreeFloating = false;
-	
-	private String statsFileName = null;
+	private boolean useFeeFreeFloating = false;	
 	
 	private String specialTimeStart = null; //in seconds
 	
@@ -51,16 +49,6 @@ public class FreeFloatingConfigGroup extends ReflectiveModule {
 		super(GROUP_NAME);
 	}
 	
-	@StringGetter( "statsFileName" )
-	public String getStatsFileName() {
-		return this.statsFileName;
-	}
-
-	@StringSetter( "statsFileName" )
-	public void setStatsFileName(final String statsFileName) {
-		this.statsFileName = statsFileName;
-	}
-
 	@StringGetter( "travelingFreeFloating" )
 	public String getUtilityOfTravelling() {
 		return this.travelingFreeFloating;

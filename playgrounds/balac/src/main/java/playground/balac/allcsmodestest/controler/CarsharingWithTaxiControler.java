@@ -65,9 +65,8 @@ public class CarsharingWithTaxiControler extends Controler{
 	    		this.getConfig().getParam("controler", "outputDirectory") + "/distancesFile",
 	    		modes, true, this.getNetwork());
 	    this.addControlerListener(tripsAnalyzer);
-	    this.addControlerListener(new AllCSModesTestListener(this.getConfig().getModule("TwoWayCarsharing").getValue("statsFileName"),
-	    		this.getConfig().getModule("FreeFloating").getValue("statsFileName"),
-	    		this.getConfig().getModule("OneWayCarsharing").getValue("statsFileName"),
+	    
+	    this.addControlerListener(new AllCSModesTestListener(this,
 	    		Integer.parseInt(this.getConfig().getModule("AllCSModes").getValue("statsWriterFrequency"))));
 	  }
 	public static void main(final String[] args) {

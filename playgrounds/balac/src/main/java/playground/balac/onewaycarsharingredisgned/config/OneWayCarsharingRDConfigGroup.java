@@ -22,24 +22,10 @@ public class OneWayCarsharingRDConfigGroup extends ReflectiveModule {
 	
 	private boolean useOneWayCarsharing = false;
 	
-	private String statsFileName = null;
-
-
-	
 	public OneWayCarsharingRDConfigGroup() {
 		super(GROUP_NAME);
 	}
-	
-	@StringGetter( "statsFileName" )
-	public String getStatsFileName() {
-		return this.statsFileName;
-	}
-
-	@StringSetter( "statsFileName" )
-	public void setStatsFileName(final String statsFileName) {
-		this.statsFileName = statsFileName;
-	}
-	
+		
 	@StringGetter( "travelingOneWayCarsharing" )
 	public String getUtilityOfTravelling() {
 		return this.travelingOneWayCarsharing;

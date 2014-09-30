@@ -20,25 +20,12 @@ public class TwoWayCSConfigGroup extends ReflectiveModule {
 	
 	private String distanceFeeTwoWayCarsharing = null;
 	
-	private String statsFileName = null;
-	
 	private boolean useTwoWayCarsharing = false;
 	
 	public TwoWayCSConfigGroup() {
 		super(GROUP_NAME);
 	}
 
-	
-	@StringGetter( "statsFileName" )
-	public String getStatsFileName() {
-		return this.statsFileName;
-	}
-
-	@StringSetter( "statsFileName" )
-	public void setStatsFileName(final String statsFileName) {
-		this.statsFileName = statsFileName;
-	}
-	
 	@StringGetter( "travelingTwoWayCarsharing" )
 	public String getUtilityOfTravelling() {
 		return this.travelingTwoWayCarsharing;
