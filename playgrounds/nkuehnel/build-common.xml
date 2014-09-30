@@ -17,8 +17,8 @@
     <property name="plugin.lib.dir"         value="lib"/>
     <!-- this is the directory where the plugin jar is copied to -->
     <property name="plugin.dist.dir"        value="dist"/>
-    <property name="ant.build.javac.target" value="1.6"/>
-    <property name="ant.build.javac.source" value="1.6"/>
+    <property name="ant.build.javac.target" value="1.7"/>
+    <property name="ant.build.javac.source" value="1.7"/>
     <property name="plugin.jar"             value="${plugin.dist.dir}/${ant.project.name}.jar"/>
 
     <!--
