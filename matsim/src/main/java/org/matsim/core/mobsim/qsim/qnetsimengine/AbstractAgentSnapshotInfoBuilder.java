@@ -27,7 +27,6 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
@@ -40,25 +39,18 @@ import java.util.*;
  * @author knagel
  *
  */
-abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuilder {
+abstract class AbstractAgentSnapshotInfoBuilder {
 
-	private final double storageCapacityFactor;
-
-	private final double cellSize;
-
-	private final AgentSnapshotInfoFactory snapshotInfoFactory;
+    private final AgentSnapshotInfoFactory snapshotInfoFactory;
 	
 	AbstractAgentSnapshotInfoBuilder( Scenario sc, final AgentSnapshotInfoFactory agentSnapshotInfoFactory ){
-		this.storageCapacityFactor = sc.getConfig().qsim().getStorageCapFactor();
-		this.cellSize = ((NetworkImpl) sc.getNetwork()).getEffectiveCellSize() ;
-		this.snapshotInfoFactory = agentSnapshotInfoFactory;
+        this.snapshotInfoFactory = agentSnapshotInfoFactory;
 	}
 	
 	/**
 	 * Put the vehicles from the waiting list in positions. Their actual position doesn't matter, PositionInfo provides a
 	 * constructor for handling this situation.
 	 */
-	@Override
 	public int positionVehiclesFromWaitingList(final Collection<AgentSnapshotInfo> positions,
 			final Link link, int cnt2, final Queue<QVehicle> waitingList) {
 		for (QVehicle veh : waitingList) {
@@ -83,7 +75,6 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 		return cnt2 ;
 	}
 
-	@Override
 	public int positionAgentsInActivities(final Collection<AgentSnapshotInfo> positions, Link link,
 			Collection<MobsimAgent> agentsInActivities,  int cnt2) {
 		for (MobsimAgent pa : agentsInActivities) {
@@ -99,7 +90,6 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 	 * Put the transit vehicles from the transit stop list in positions.
 	 * @param transitVehicleStopQueue 
 	 */
-	@Override
 	public int positionVehiclesFromTransitStop(final Collection<AgentSnapshotInfo> positions, Link link, Queue<QVehicle> transitVehicleStopQueue, int cnt2 ) {
 		if (transitVehicleStopQueue.size() > 0) {
 			for (QVehicle veh : transitVehicleStopQueue) {
@@ -130,8 +120,7 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 		return cnt2 ;
 	}
 
-	@Override
-	public void positionAgentOnLink(final Collection<AgentSnapshotInfo> positions, Coord startCoord, Coord endCoord, 
+	public void positionAgentOnLink(final Collection<AgentSnapshotInfo> positions, Coord startCoord, Coord endCoord,
 			double lengthOfCurve, double euclideanLength, QVehicle veh, 
 			double distanceFromFromNode,	Integer lane, double speedValueBetweenZeroAndOne){
 		MobsimDriverAgent driverAgent = veh.getDriver();
@@ -190,7 +179,6 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 		positions.add(pos);
 	}
 	
-	@Override
 	public double calcSpeedValueBetweenZeroAndOne(QVehicle veh, double inverseSimulatedFlowCapacity, double now, double freespeed){
 		int cmp = (int) (veh.getEarliestLinkExitTime() + inverseSimulatedFlowCapacity + 2.0);
 		// "inverseSimulatedFlowCapacity" is there to keep vehicles green that only wait for capacity (i.e. have no vehicle
@@ -200,7 +188,6 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 		return speed;
 	}
 	
-	@Override
 	public Integer guessLane(QVehicle veh, int numberOfLanes){
 		Integer tmpLane;
 		try {
@@ -255,4 +242,17 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 		return people;
 	}
 
+    public abstract double calculateVehicleSpacing(double linkLength, double numberOfVehiclesOnLink, double overallStorageCapacity);
+
+    /**
+     * @param length
+     * @param spacing
+     * @param lastDistanceFromFromNode
+     * @param now
+     * @param freespeedTraveltime
+     * @param remainingTravelTime
+     * @return
+     */
+    public abstract double calculateDistanceOnVectorFromFromNode2(double length, double spacing, double lastDistanceFromFromNode, double now,
+                                                                  double freespeedTraveltime, double remainingTravelTime);
 }

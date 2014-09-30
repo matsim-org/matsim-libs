@@ -32,7 +32,7 @@ import java.util.concurrent.Phaser;
  * @author (of this documentation) nagel
  *
  */
-public class QSimEngineRunner extends NetElementActivator implements Runnable {
+class QSimEngineRunner extends NetElementActivator implements Runnable {
 
 	private double time = 0.0;
 

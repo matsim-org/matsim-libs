@@ -72,14 +72,10 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 
 	private final VisData visdata;
 
-	private final double length;
-
-	public final QLaneInternalI road;
+    public final QLaneInternalI road;
 
 	/**
 	 * Initializes a QueueLink with one QueueLane.
-	 * @param link2
-	 * @param toNode
 	 */
 	public QLinkImpl(final Link link2, QNetwork network, final QNode toNode) {
 		this(link2, network, toNode, new FIFOVehicleQ());
@@ -91,8 +87,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	 */
 	public QLinkImpl(final Link link2, QNetwork network, final QNode toNode, final VehicleQ<QVehicle> vehicleQueue) {
 		super(link2, network) ;
-		this.length = this.getLink().getLength();
-		this.road = new QueueWithBuffer(this, vehicleQueue);
+        this.road = new QueueWithBuffer(this, vehicleQueue);
 		this.toQueueNode = toNode;
 		this.visdata = this.new VisDataImpl() ; // instantiating this here and not earlier so we can cache some things
 	  super.transitQLink = new TransitQLink(this.road);
@@ -104,8 +99,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	 */
 	public QLinkImpl(final Link link2, QNetwork network, final QNode toNode, final LaneFactory roadFactory) {
 		super(link2, network) ;
-		this.length = this.getLink().getLength();
-		// The next line must must by contract stay within the constructor,
+        // The next line must must by contract stay within the constructor,
 		// so that the caller can use references to the created roads to wire them together,
 		// if it must.
 		this.road = roadFactory.createLane(this); 
