@@ -27,7 +27,7 @@ import org.matsim.core.mobsim.framework.Mobsim;
  */
 public class MobsimBeforeSimStepEvent<T extends Mobsim> extends AbstractMobsimEvent<T> {
 
-	private double time;
+	private final double time;
 
 	public MobsimBeforeSimStepEvent(T queuesim, double time) {
 		super(queuesim);

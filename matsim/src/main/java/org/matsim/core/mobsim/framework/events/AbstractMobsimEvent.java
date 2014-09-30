@@ -27,18 +27,14 @@ import org.matsim.core.mobsim.framework.Mobsim;
  *
  * @author dgrether
  */
-public abstract class AbstractMobsimEvent<T extends Mobsim> implements MobsimEvent<T> {
+abstract class AbstractMobsimEvent<T extends Mobsim> {
 	
-	private T queuesim;
+	private final T queuesim;
 
-	public AbstractMobsimEvent(T queuesim){
+	AbstractMobsimEvent(T queuesim){
 		this.queuesim = queuesim;
 	}
-	
-	/**
-	 * @see org.matsim.core.mobsim.framework.events.MobsimEvent#getQueueSimulation()
-	 */
-	@Override
+
 	public T getQueueSimulation() {
 		return this.queuesim;
 	}
