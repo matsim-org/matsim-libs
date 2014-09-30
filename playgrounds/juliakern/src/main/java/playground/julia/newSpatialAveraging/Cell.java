@@ -60,6 +60,13 @@ public class Cell {
 		this.weight=this.weight*normalizationFactor;
 		this.weightedValue=this.weightedValue*normalizationFactor;
 	}
+	public int getXNumber() {
+		return this.xCell;
+	}
+	
+	public int getYNumber(){
+		return this.yCell;
+	}
 	
 
 }

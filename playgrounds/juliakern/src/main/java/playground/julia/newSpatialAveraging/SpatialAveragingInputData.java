@@ -59,7 +59,7 @@ public class SpatialAveragingInputData {
 			runNumber1 = "baseCase";
 			runDirectory1 = "../../runs-svn/detEval/exposureInternalization/internalize1pct/output/output_baseCase_ctd/";
 			netFile = runDirectory1 + "output_network.xml.gz";
-			configFile1 = runDirectory1 + "output_config.xml.gz";
+			configFile1 = runDirectory1 + "output_config.xml";
 			lastIteration1 = getLastIteration(configFile1);
 			emissionFile1 = runDirectory1 + "ITERS/it." + lastIteration1 + "/" + lastIteration1 + ".emission.events.xml.gz";
 		}

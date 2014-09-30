@@ -33,6 +33,8 @@ public class SpatialGrid {
 	private Double gridMaxY;
 	private int numberOfCellsX;
 	private int numberOfCellsY;
+	private double cellWidth;
+	private double cellHeight;
 	
 	public SpatialGrid(int numberOfCellsX, int numberOfCellsY, Double gridMinX, Double gridMaxX, Double gridMinY, Double gridMaxY){
 		this.gridMinX= gridMinX;
@@ -41,6 +43,8 @@ public class SpatialGrid {
 		this.gridMaxY= gridMaxY;
 		this.numberOfCellsX = numberOfCellsX;
 		this.numberOfCellsY = numberOfCellsY;
+		this.cellWidth = gridMaxX-gridMinX;
+		this.cellHeight = gridMaxY-gridMinY;
 		this.grid = new Cell [numberOfCellsX][numberOfCellsY];
 		// initialize grid with 0.0
 
@@ -118,5 +122,24 @@ public class SpatialGrid {
 			}
 		}
 		return differences;
+	}
+
+	public Cell getCellForCoordinate(Coord coord) {
+		int i = mapXCoordToGrid(coord.getX());
+		int j = mapYCoordToGrid(coord.getY());
+		if(i>=0 && j>=0) return this.grid[i][j];
+		return null;
+	}
+
+	private int mapYCoordToGrid(double y) {
+		int yGrid = (int) Math.floor((y-gridMinY)/cellHeight);
+		if(yGrid>=0 && yGrid<numberOfCellsY) return yGrid;
+		return -1;
+	}
+
+	private int mapXCoordToGrid(double x) {
+		int xGrid = (int) Math.floor((x-gridMinX)/cellWidth);
+		if(xGrid>=0 && xGrid<numberOfCellsX) return xGrid;
+		return -1;
 	}
 }

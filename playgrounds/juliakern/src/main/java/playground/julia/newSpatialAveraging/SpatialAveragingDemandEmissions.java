@@ -45,7 +45,7 @@ public class SpatialAveragingDemandEmissions {
 	private static final Logger logger = Logger.getLogger(SpatialAveragingDemandEmissions.class);
 
 	private String baseCase = "exposureInternalization"; // exposureInternalization, latsis, 981
-	private String compareCase = "zone30"; // zone30, pricing, exposurePricing, 983
+	private String compareCase = "exposurePricing"; // zone30, pricing, exposurePricing, 983
 	
 	final int noOfXbins = 160;
 	final int noOfYbins = 120; 
@@ -56,7 +56,7 @@ public class SpatialAveragingDemandEmissions {
 	
 	final String pollutant2analyze = WarmPollutant.NO2.toString();
 	final boolean compareToBaseCase = true;
-	final boolean useLineMethod = false;
+	final boolean useLineMethod = true;
 	private boolean writeRoutput = true;
 	private boolean writeGisOutput = false;
 	
