@@ -72,7 +72,7 @@ public class QNetsimEngine implements MobsimEngine {
 	private LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator();
 
 
-    private QSimEngineRunner[] engines;
+    private QNetsimEngineRunner[] engines;
 
     private Phaser startBarrier;
     private Phaser endBarrier;
@@ -224,7 +224,7 @@ public class QNetsimEngine implements MobsimEngine {
 		 * Calling the afterSim Method of the QSimEngineThreads
 		 * will set their simulationRunning flag to false.
 		 */
-        for (QSimEngineRunner engine : this.engines) {
+        for (QNetsimEngineRunner engine : this.engines) {
             engine.afterSim();
         }
 
@@ -278,7 +278,7 @@ public class QNetsimEngine implements MobsimEngine {
 
 //        try {
             // set current Time
-            for (QSimEngineRunner engine : this.engines) {
+            for (QNetsimEngineRunner engine : this.engines) {
                 engine.setTime(time);
             }
 
@@ -311,7 +311,7 @@ public class QNetsimEngine implements MobsimEngine {
 
         int numLinks = 0;
 
-        for (QSimEngineRunner engine : this.engines) {
+        for (QNetsimEngineRunner engine : this.engines) {
             numLinks = numLinks + engine.getNumberOfSimulatedLinks();
         }
 
@@ -322,7 +322,7 @@ public class QNetsimEngine implements MobsimEngine {
 
         int numNodes = 0;
 
-        for (QSimEngineRunner engine : this.engines) {
+        for (QNetsimEngineRunner engine : this.engines) {
             numNodes = numNodes + engine.getNumberOfSimulatedNodes();
         }
 
@@ -371,9 +371,9 @@ public class QNetsimEngine implements MobsimEngine {
 	}
 
 	void letVehicleArrive(QVehicle veh) {
-		double now = qsim.getSimTimer().getTimeOfDay();
+		double now = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
 		MobsimDriverAgent driver = veh.getDriver();
-		qsim.getEventsManager().processEvent(new PersonLeavesVehicleEvent(now, driver.getId(), veh.getId()));
+		internalInterface.getMobsim().getEventsManager().processEvent(new PersonLeavesVehicleEvent(now, driver.getId(), veh.getId()));
 		// reset vehicles driver
 		veh.setDriver(null);
 		driver.endLegAndComputeNextState(now);
@@ -390,7 +390,7 @@ public class QNetsimEngine implements MobsimEngine {
 
     private void initQSimEngineThreads() {
 
-        this.engines = new QSimEngineRunner[this.numOfThreads];
+        this.engines = new QNetsimEngineRunner[this.numOfThreads];
 
         this.startBarrier = new Phaser(this.numOfThreads + 1);
         Phaser separationBarrier = new Phaser(this.numOfThreads);
@@ -398,7 +398,7 @@ public class QNetsimEngine implements MobsimEngine {
        
         // setup threads
         for (int i = 0; i < this.numOfThreads; i++) {
-            QSimEngineRunner engine = new QSimEngineRunner(this.startBarrier, separationBarrier, endBarrier);
+            QNetsimEngineRunner engine = new QNetsimEngineRunner(this.startBarrier, separationBarrier, endBarrier);
             Thread thread = new Thread(engine);
             thread.setName("QNetsimEngineRunner_" + i);
             thread.setDaemon(true);	// make the Thread Daemons so they will terminate automatically

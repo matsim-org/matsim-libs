@@ -19,14 +19,10 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.qsim;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
@@ -34,12 +30,14 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
-
 import playground.thibautd.pseudoqsim.ParkedVehicleProvider;
 import playground.thibautd.pseudoqsim.PopulationAgentSourceForTeleportedVehicles;
 import playground.thibautd.pseudoqsim.VehicularTeleportationEngine;
 import playground.thibautd.pseudoqsim.VehicularTeleportationEngine.VehicleBehavior;
 import playground.thibautd.socnetsim.population.JointActingTypes;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author thibautd
@@ -67,9 +65,7 @@ public class JointTeleportationSimFactory implements MobsimFactory {
 		// default initialisation
 		final QSim qSim =
 			new QSim(
-					sc,
-					new SynchronizedEventsManagerImpl(
-						eventsManager ) );
+					sc, eventsManager  );
 		
 		final ParkedVehicleProvider vehicles = new ParkedVehicleProvider();
 		final VehicularTeleportationEngine vehicularEngine =

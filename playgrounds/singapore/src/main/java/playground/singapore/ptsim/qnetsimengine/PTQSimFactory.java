@@ -24,7 +24,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -36,11 +35,7 @@ import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetsimEngineFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
-
 import playground.singapore.ptsim.pt.BoardAlightVehicleTransitStopHandlerFactory;
 import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTime;
 
@@ -73,21 +68,11 @@ public class PTQSimFactory implements MobsimFactory {
 			throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
 		}
 
-		// Get number of parallel Threads
-		int numOfThreads = conf.getNumberOfThreads();
-		QNetsimEngineFactory netsimEngFactory;
-		if (numOfThreads > 1) {
-			eventsManager = new SynchronizedEventsManagerImpl(eventsManager);
-			netsimEngFactory = new ParallelQNetsimEngineFactory();
-			log.info("Using parallel QSim with " + numOfThreads + " threads.");
-		} else {
-			netsimEngFactory = new DefaultQNetsimEngineFactory();
-		}
 		QSim qSim = new QSim(sc, eventsManager);
 		ActivityEngine activityEngine = new ActivityEngine();
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
-		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim);
+        QNetsimEngine netsimEngine = new QNetsimEngine(qSim);
 		if(stopStopTime!=null)
 			netsimEngine.setLinkSpeedCalculator(new PTLinkSpeedCalculator(stopStopTime));
 		else

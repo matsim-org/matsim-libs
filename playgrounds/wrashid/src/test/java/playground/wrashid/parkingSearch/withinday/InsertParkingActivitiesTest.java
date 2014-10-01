@@ -20,9 +20,6 @@
 
 package playground.wrashid.parkingSearch.withinday;
 
-import java.util.HashMap;
-import java.util.HashSet;
-
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.matsim.api.core.v01.Id;
@@ -50,9 +47,7 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
-import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
@@ -66,11 +61,13 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.testcases.MatsimTestCase;
-
 import playground.wrashid.parkingSearch.withindayFW.core.InsertParkingActivities;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
 import playground.wrashid.parkingSearch.withindayFW.core.mobsim.ParkingPopulationAgentSource;
 import playground.wrashid.parkingSearch.withindayFW.impl.ParkingCostCalculatorFW;
+
+import java.util.HashMap;
+import java.util.HashSet;
 
 public class InsertParkingActivitiesTest extends MatsimTestCase {
 
@@ -171,8 +168,7 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		QSim qSim = new QSim(sc, eventsManager);
-		QNetsimEngineFactory netsimEngFactory = new DefaultQNetsimEngineFactory();
-		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim);
+        QNetsimEngine netsimEngine = new QNetsimEngine(qSim);
 		qSim.addMobsimEngine(netsimEngine);
 //        AgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory(qSim);
 		AgentFactory agentFactory = new DefaultAgentFactory(qSim) ;

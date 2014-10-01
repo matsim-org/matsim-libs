@@ -44,7 +44,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * 
  * @author cdobler
  */
-public class SimStepParallelEventsManagerImpl implements EventsManager {
+class SimStepParallelEventsManagerImpl implements EventsManager {
 
 	private final static Logger log = Logger.getLogger(SimStepParallelEventsManagerImpl.class);
 	

@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -158,10 +159,13 @@ public final class QSim implements VisMobsim, Netsim {
 	 * If you wish to use QSim as a product and run a simulation based on a Config file, rather use QSimFactory as your entry point.
 	 *
 	 */
-	public QSim(final Scenario sc, final EventsManager events) {
-		this.scenario = sc;
-		this.events = events;
-		log.info("Using QSim...");
+	public QSim(final Scenario sc, EventsManager events) {
+        this.scenario = sc;
+        if (sc.getConfig().qsim().getNumberOfThreads() > 1) {
+            this.events = EventsUtils.getParallelFeedableInstance(events);
+        } else {
+            this.events = events;
+        }
 		this.listenerManager = new MobsimListenerManager(this);
 		this.agentCounter = new AgentCounter();
 		this.simTimer = new MobsimTimer(sc.getConfig().qsim().getTimeStepSize());

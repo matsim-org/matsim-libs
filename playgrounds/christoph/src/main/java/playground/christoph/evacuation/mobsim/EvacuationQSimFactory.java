@@ -27,8 +27,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.events.SimStepParallelEventsManagerImpl;
-import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimFactory;
@@ -98,14 +96,7 @@ public class EvacuationQSimFactory implements MobsimFactory, IterationStartsList
 		 * as well as its (super)VehicularDepartureHandler to the QSim.
 		 * The later one handles non-joint departures.
 		 */
-		// Get number of parallel Threads
-		int numOfThreads = conf.getNumberOfThreads();
-		if (numOfThreads > 1) {
-			if (!(eventsManager instanceof SimStepParallelEventsManagerImpl)) {
-				eventsManager = new SynchronizedEventsManagerImpl(eventsManager);        		
-			}
-			log.info("Using parallel PassengerQSim with " + numOfThreads + " threads.");
-		}
+
 		PassengerQNetsimEngine netsimEngine = new PassengerQNetsimEngine(qSim, MatsimRandom.getLocalInstance(), jointDepartureOrganizer);
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());

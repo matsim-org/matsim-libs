@@ -24,8 +24,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.events.SimStepParallelEventsManagerImpl;
-import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -38,10 +36,7 @@ import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetsimEngineFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 
 /**
  * Constructs an instance of the modular QSim based on the required features as per the Config file.
@@ -65,33 +60,14 @@ public class QSimFactory implements MobsimFactory {
 			throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
 		}
 
-		if (conf.getNumberOfThreads() > 1) {
-			/*
-			 * The SimStepParallelEventsManagerImpl can handle events from multiple threads.
-			 * The (Parallel)EventsMangerImpl cannot, therefore it has to be wrapped into a
-			 * SynchronizedEventsManagerImpl.
-			 */
-			if (!(eventsManager instanceof SimStepParallelEventsManagerImpl)) {
-				eventsManager = new SynchronizedEventsManagerImpl(eventsManager);				
-			}
-		}
-
 		QSim qSim = new QSim(sc, eventsManager);
 		
 		ActivityEngine activityEngine = new ActivityEngine();
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 
-		QNetsimEngineFactory netsimEngFactory;
-		if (conf.getNumberOfThreads() > 1) {
-			netsimEngFactory = new ParallelQNetsimEngineFactory();
-			log.info("Using parallel QSim with " + conf.getNumberOfThreads() + " threads.");
-		} else {
-			netsimEngFactory = new DefaultQNetsimEngineFactory();
-		}
-		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim);
-		qSim.addMobsimEngine(netsimEngine);
-		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
+
+        QNetsimEngineModule.configure(qSim);
 		
 		TeleportationEngine teleportationEngine = new TeleportationEngine();
 		qSim.addMobsimEngine(teleportationEngine);

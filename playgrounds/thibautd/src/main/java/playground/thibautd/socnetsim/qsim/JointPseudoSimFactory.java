@@ -19,14 +19,10 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.qsim;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
@@ -36,17 +32,17 @@ import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 import org.matsim.core.router.util.TravelTime;
-
 import playground.thibautd.pseudoqsim.NetsimWrappingQVehicleProvider;
 import playground.thibautd.pseudoqsim.PseudoSimConfigGroup;
 import playground.thibautd.pseudoqsim.QVehicleProvider;
 import playground.thibautd.pseudoqsim.pseudoqsimengine.PseudoQsimEngine;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.sharedvehicles.qsim.PopulationAgentSourceWithVehicles;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author thibautd
@@ -82,11 +78,9 @@ public class JointPseudoSimFactory implements MobsimFactory {
 		final QSim qSim =
 			new QSim(
 					sc,
-					new SynchronizedEventsManagerImpl(
-						eventsManager ) );
-		
-		final QNetsimEngineFactory netsimEngFactory = new DefaultQNetsimEngineFactory();
-		final QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine( qSim );
+						eventsManager );
+
+        final QNetsimEngine netsimEngine = new QNetsimEngine(qSim);
 		final QVehicleProvider vehicles = new NetsimWrappingQVehicleProvider( netsimEngine );
 
 		final ActivityEngine activityEngine = new ActivityEngine();

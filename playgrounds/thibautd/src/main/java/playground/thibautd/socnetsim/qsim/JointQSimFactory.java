@@ -19,9 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.qsim;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -35,14 +32,13 @@ import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetsimEngineFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
-
 import playground.thibautd.pseudoqsim.NetsimWrappingQVehicleProvider;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.sharedvehicles.qsim.PopulationAgentSourceWithVehicles;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author thibautd
@@ -74,11 +70,7 @@ public class JointQSimFactory implements MobsimFactory {
 		qSim.addMobsimEngine( activityEngine );
 		qSim.addActivityHandler( activityEngine );
 
-		final QNetsimEngineFactory netsimEngFactory =
-				conf.getNumberOfThreads() > 1 ?
-					new ParallelQNetsimEngineFactory() :
-					new DefaultQNetsimEngineFactory();
-		final QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine( qSim );
+        final QNetsimEngine netsimEngine = new QNetsimEngine(qSim);
 		qSim.addMobsimEngine( netsimEngine );
 		// DO NOT ADD DEPARTURE HANDLER: it is done by the joint departure handler
 

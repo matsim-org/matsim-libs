@@ -20,22 +20,20 @@
 
 package playground.christoph.mobsim.modularqsimfactory;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.events.SimStepParallelEventsManagerImpl;
-import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class ModularQSimFactory implements MobsimFactory {
 	
@@ -74,19 +72,6 @@ public class ModularQSimFactory implements MobsimFactory {
 		QSimConfigGroup conf = sc.getConfig().qsim();
 		if (conf == null) {
 			throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
-		}
-		
-		// Get number of parallel Threads
-		int numOfThreads = conf.getNumberOfThreads();
-		if (numOfThreads > 1) {
-			/*
-			 * The SimStepParallelEventsManagerImpl can handle events from multiple threads.
-			 * The (Parallel)EventsMangerImpl cannot, therefore it has to be wrapped into a
-			 * SynchronizedEventsManagerImpl.
-			 */
-			if (!(eventsManager instanceof SimStepParallelEventsManagerImpl)) {
-				eventsManager = new SynchronizedEventsManagerImpl(eventsManager);				
-			}
 		}
 		
 		QSim qSim = new QSim(sc, eventsManager);

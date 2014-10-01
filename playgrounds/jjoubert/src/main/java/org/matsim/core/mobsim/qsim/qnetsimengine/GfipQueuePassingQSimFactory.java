@@ -19,9 +19,6 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -29,7 +26,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
@@ -39,6 +35,9 @@ import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.vehicles.VehicleType;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class GfipQueuePassingQSimFactory implements MobsimFactory{
 	final private Logger log = Logger.getLogger(GfipQueuePassingQSimFactory.class);
@@ -72,17 +71,6 @@ public class GfipQueuePassingQSimFactory implements MobsimFactory{
 		QSimConfigGroup configGroup = sc.getConfig().qsim();
 		if(configGroup == null){
 			throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
-		}
-		
-		/* Set up parallelisation */
-		int numberOfThreads = configGroup.getNumberOfThreads();
-		QNetsimEngineFactory netsimEngineFactory;
-		if(numberOfThreads > 1){
-			eventsManager = new SynchronizedEventsManagerImpl(eventsManager);
-			netsimEngineFactory = new ParallelQNetsimEngineFactory();
-			log.info("Using parallel QSim with " + numberOfThreads + " threads.");
-		} else{
-			netsimEngineFactory = new DefaultQNetsimEngineFactory();
 		}
 		
 		/* Set up the QSim */

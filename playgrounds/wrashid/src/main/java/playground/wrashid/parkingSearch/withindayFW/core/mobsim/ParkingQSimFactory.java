@@ -24,7 +24,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
@@ -33,12 +32,8 @@ import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetsimEngineFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.withinday.mobsim.WithinDayEngine;
-
 import playground.wrashid.parkingSearch.withindayFW.core.InsertParkingActivities;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
 
@@ -46,7 +41,7 @@ import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
  * This class is basically a copy of QSimFactory but instead of a
  * PopulationAgentSource, a ParkingPopulationAgentSource object is
  * created and added to the QSim.
- * 
+ *
  * Can be removed when a DefaultAgentSource can be set in the QSimFactory.
  *
  * @author cdobler
@@ -58,14 +53,14 @@ public class ParkingQSimFactory implements MobsimFactory {
     private final InsertParkingActivities insertParkingActivities;
     private final ParkingInfrastructure parkingInfrastructure;
     private final WithinDayEngine replanningManager;
-    
+
     public ParkingQSimFactory(InsertParkingActivities insertParkingActivities, ParkingInfrastructure parkingInfrastructure,
     		WithinDayEngine replanningManager) {
     	this.insertParkingActivities = insertParkingActivities;
     	this.parkingInfrastructure = parkingInfrastructure;
     	this.replanningManager = replanningManager;
     }
-    
+
     @Override
     public Netsim createMobsim(Scenario sc, EventsManager eventsManager) {
 
@@ -74,30 +69,19 @@ public class ParkingQSimFactory implements MobsimFactory {
             throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
         }
 
-        // Get number of parallel Threads
-        int numOfThreads = conf.getNumberOfThreads();
-        QNetsimEngineFactory netsimEngFactory;
-        if (numOfThreads > 1) {
-            eventsManager = new SynchronizedEventsManagerImpl(eventsManager);
-            netsimEngFactory = new ParallelQNetsimEngineFactory();
-            log.info("Using parallel QSim with " + numOfThreads + " threads.");
-        } else {
-            netsimEngFactory = new DefaultQNetsimEngineFactory();
-        }
+
 		QSim qSim1 = new QSim(sc, eventsManager);
 		ActivityEngine activityEngine = new ActivityEngine();
 		qSim1.addMobsimEngine(activityEngine);
 		qSim1.addActivityHandler(activityEngine);
-		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim1);
-		qSim1.addMobsimEngine(netsimEngine);
-		qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
+        QNetsimEngineModule.configure(qSim1);
 		TeleportationEngine teleportationEngine = new TeleportationEngine();
 		qSim1.addMobsimEngine(teleportationEngine);
 		qSim1.addMobsimEngine(replanningManager);
         QSim qSim = qSim1;
         AgentFactory agentFactory = new DefaultAgentFactory(qSim);
         AgentSource agentSource = new ParkingPopulationAgentSource(sc.getPopulation(), agentFactory, qSim, 
-        		insertParkingActivities, parkingInfrastructure, numOfThreads);
+        		insertParkingActivities, parkingInfrastructure, conf.getNumberOfThreads());
         qSim.addAgentSource(agentSource);
         return qSim;
 

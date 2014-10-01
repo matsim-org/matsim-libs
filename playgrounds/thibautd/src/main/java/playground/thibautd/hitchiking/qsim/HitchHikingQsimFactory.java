@@ -19,16 +19,11 @@
  * *********************************************************************** */
 package playground.thibautd.hitchiking.qsim;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -40,12 +35,12 @@ import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetsimEngineFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
-
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import playground.thibautd.hitchiking.HitchHikingConstants;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author thibautd
@@ -78,17 +73,6 @@ public class HitchHikingQsimFactory implements MobsimFactory {
 			conf.setMainModes( ms );
 		}
 
-        // Get number of parallel Threads
-        int numOfThreads = conf.getNumberOfThreads();
-        QNetsimEngineFactory netsimEngFactory;
-        if (numOfThreads > 1) {
-            eventsManager = new SynchronizedEventsManagerImpl(eventsManager);
-            netsimEngFactory = new ParallelQNetsimEngineFactory();
-            log.info("Using parallel QSim with " + numOfThreads + " threads.");
-        }
-		else {
-            netsimEngFactory = new DefaultQNetsimEngineFactory();
-        }
 
         //QSim qSim = QSim.createQSimWithDefaultEngines(sc, eventsManager, netsimEngFactory);
 
@@ -97,9 +81,7 @@ public class HitchHikingQsimFactory implements MobsimFactory {
 		ActivityEngine activityEngine = new ActivityEngine();
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
-		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim);
-		qSim.addMobsimEngine(netsimEngine);
-		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
+        QNetsimEngineModule.configure(qSim);
 		TeleportationEngine teleportationEngine = new TeleportationEngine();
 		qSim.addMobsimEngine(teleportationEngine);
 

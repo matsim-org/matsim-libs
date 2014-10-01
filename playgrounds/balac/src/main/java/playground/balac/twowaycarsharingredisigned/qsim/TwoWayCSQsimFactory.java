@@ -1,9 +1,5 @@
 package playground.balac.twowaycarsharingredisigned.qsim;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.ArrayList;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -14,8 +10,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.SimStepParallelEventsManagerImpl;
-import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -28,15 +22,15 @@ import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetsimEngineFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
-
 import playground.balac.twowaycarsharingredisigned.config.TwoWayCSConfigGroup;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.ArrayList;
 
 
 public class TwoWayCSQsimFactory implements MobsimFactory{
@@ -100,31 +94,12 @@ public class TwoWayCSQsimFactory implements MobsimFactory{
 			throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
 		}
 
-		// Get number of parallel Threads
-		int numOfThreads = conf.getNumberOfThreads();
-		QNetsimEngineFactory netsimEngFactory;
-		if (numOfThreads > 1) {
-			/*
-			 * The SimStepParallelEventsManagerImpl can handle events from multiple threads.
-			 * The (Parallel)EventsMangerImpl cannot, therefore it has to be wrapped into a
-			 * SynchronizedEventsManagerImpl.
-			 */
-			if (!(eventsManager instanceof SimStepParallelEventsManagerImpl)) {
-				eventsManager = new SynchronizedEventsManagerImpl(eventsManager);				
-			}
-			netsimEngFactory = new ParallelQNetsimEngineFactory();
-			log.info("Using parallel QSim with " + numOfThreads + " threads.");
-		} else {
-			netsimEngFactory = new DefaultQNetsimEngineFactory();
-		}
 		QSim qSim = new QSim(sc, eventsManager);
 		
 		ActivityEngine activityEngine = new ActivityEngine();
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
-		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim);
-		qSim.addMobsimEngine(netsimEngine);
-		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
+        QNetsimEngineModule.configure(qSim);
 		TeleportationEngine teleportationEngine = new TeleportationEngine();
 		qSim.addMobsimEngine(teleportationEngine);
 

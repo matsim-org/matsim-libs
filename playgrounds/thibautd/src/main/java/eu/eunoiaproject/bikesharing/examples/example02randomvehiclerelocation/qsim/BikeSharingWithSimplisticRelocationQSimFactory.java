@@ -19,6 +19,12 @@
  * *********************************************************************** */
 package eu.eunoiaproject.bikesharing.examples.example02randomvehiclerelocation.qsim;
 
+import eu.eunoiaproject.bikesharing.framework.qsim.BikeSharingEngine;
+import eu.eunoiaproject.bikesharing.framework.qsim.BikeSharingManager;
+import eu.eunoiaproject.bikesharing.framework.qsim.BikeSharingManagerImpl;
+import eu.eunoiaproject.bikesharing.framework.qsim.FacilityStateChangeRepeater;
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingConfigGroup;
+import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -33,16 +39,7 @@ import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetsimEngineFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
-
-import eu.eunoiaproject.bikesharing.framework.qsim.BikeSharingEngine;
-import eu.eunoiaproject.bikesharing.framework.qsim.BikeSharingManagerImpl;
-import eu.eunoiaproject.bikesharing.framework.qsim.BikeSharingManager;
-import eu.eunoiaproject.bikesharing.framework.qsim.FacilityStateChangeRepeater;
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingConfigGroup;
-import eu.eunoiaproject.bikesharing.framework.scenario.BikeSharingFacilities;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 
 /**
  * Builds a QSim with vehicles traveling around randomly to relocate bikes.
@@ -66,13 +63,9 @@ public class BikeSharingWithSimplisticRelocationQSimFactory implements MobsimFac
 			throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
 		}
 
-		final QNetsimEngineFactory netsimEngFactory = new DefaultQNetsimEngineFactory();
-	
-		final QSim qSim = new QSim( sc, eventsManager );
+        final QSim qSim = new QSim( sc, eventsManager );
 
-		final QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim);
-		qSim.addMobsimEngine(netsimEngine);
-		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
+        QNetsimEngineModule.configure(qSim);
 
 		// ---------------------------------------------------------------------
 		// Here is the only modified part.

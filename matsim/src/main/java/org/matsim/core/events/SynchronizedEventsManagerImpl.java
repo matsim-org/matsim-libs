@@ -37,7 +37,7 @@ import org.matsim.core.events.handler.EventHandler;
  * @author dgrether
  *
  */
-public class SynchronizedEventsManagerImpl implements EventsManager {
+class SynchronizedEventsManagerImpl implements EventsManager {
 
 	private final EventsManager delegate;
 

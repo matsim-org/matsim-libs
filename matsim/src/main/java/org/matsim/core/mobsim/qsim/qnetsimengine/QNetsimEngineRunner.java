@@ -32,7 +32,7 @@ import java.util.concurrent.Phaser;
  * @author (of this documentation) nagel
  *
  */
-class QSimEngineRunner extends NetElementActivator implements Runnable {
+class QNetsimEngineRunner extends NetElementActivator implements Runnable {
 
 	private double time = 0.0;
 
@@ -73,7 +73,7 @@ class QSimEngineRunner extends NetElementActivator implements Runnable {
 	private boolean lockNodes = false;
 	private boolean lockLinks = false;
 		
-	/*package*/ QSimEngineRunner(Phaser startBarrier, Phaser separationBarrier, Phaser endBarrier) {
+	/*package*/ QNetsimEngineRunner(Phaser startBarrier, Phaser separationBarrier, Phaser endBarrier) {
 		this.startBarrier = startBarrier;
 		this.separationBarrier = separationBarrier;
 		this.endBarrier = endBarrier;

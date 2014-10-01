@@ -24,7 +24,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
@@ -33,7 +32,6 @@ import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-
 import playground.sergioo.ptsim2013.QSim;
 import playground.sergioo.ptsim2013.agents.PopulationAgentSource;
 import playground.sergioo.ptsim2013.pt.BoardAlightVehicleTransitStopHandlerFactory;
@@ -73,7 +71,6 @@ public class PTQSimFactory implements MobsimFactory {
 		int numOfThreads = conf.getNumberOfThreads();
 		PTQNetsimEngineFactory netsimEngFactory;
 		if (numOfThreads > 1) {
-			eventsManager = new SynchronizedEventsManagerImpl(eventsManager);
 			netsimEngFactory = new PTParallelQNetsimEngineFactory();
 			log.info("Using parallel QSim with " + numOfThreads + " threads.");
 		} else {

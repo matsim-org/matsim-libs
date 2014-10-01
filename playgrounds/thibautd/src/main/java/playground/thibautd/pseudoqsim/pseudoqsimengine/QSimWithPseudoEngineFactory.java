@@ -22,10 +22,11 @@ package playground.thibautd.pseudoqsim.pseudoqsimengine;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
@@ -33,12 +34,8 @@ import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.router.util.TravelTime;
-
 import playground.thibautd.pseudoqsim.NetsimWrappingQVehicleProvider;
 import playground.thibautd.pseudoqsim.PseudoSimConfigGroup;
 
@@ -65,15 +62,13 @@ public class QSimWithPseudoEngineFactory implements MobsimFactory {
 
 		final QSim qSim =
 			new QSim(
-					sc,
-					new SynchronizedEventsManagerImpl(
-						eventsManager) );
+					sc, eventsManager );
 
 		final ActivityEngine activityEngine = new ActivityEngine();
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 
-		final QNetsimEngine netsim = new DefaultQNetsimEngineFactory().createQSimEngine( qSim );
+        final QNetsimEngine netsim = new QNetsimEngine(qSim);
 
 		final PseudoSimConfigGroup pSimConf = (PseudoSimConfigGroup)
 			sc.getConfig().getModule( PseudoSimConfigGroup.GROUP_NAME );

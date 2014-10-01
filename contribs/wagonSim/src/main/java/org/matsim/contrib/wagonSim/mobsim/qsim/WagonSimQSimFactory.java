@@ -27,7 +27,6 @@ import org.matsim.contrib.wagonSim.mobsim.qsim.framework.listeners.WagonSimVehic
 import org.matsim.contrib.wagonSim.mobsim.qsim.pt.WagonSimTransitStopHandlerFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.events.SynchronizedEventsManagerImpl;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
@@ -39,11 +38,8 @@ import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.LinkSpeedCalculator;
-import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
@@ -81,21 +77,11 @@ public class WagonSimQSimFactory implements MobsimFactory {
 			throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
 		}
 
-		// Get number of parallel Threads
-		int numOfThreads = conf.getNumberOfThreads();
-		QNetsimEngineFactory netsimEngFactory;
-		if (numOfThreads > 1) {
-			eventsManager = new SynchronizedEventsManagerImpl(eventsManager);
-			netsimEngFactory = new ParallelQNetsimEngineFactory();
-			log.info("Using parallel QSim with " + numOfThreads + " threads.");
-		} else {
-			netsimEngFactory = new DefaultQNetsimEngineFactory();
-		}
 		QSim qSim = new QSim(sc, eventsManager);
 		ActivityEngine activityEngine = new ActivityEngine();
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
-		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim);
+        QNetsimEngine netsimEngine = new QNetsimEngine(qSim);
 		// add the vehicleLinkSpeedCalculator
 		netsimEngine.setLinkSpeedCalculator(new LocomotiveLinkSpeedCalculator(vehicleLinkSpeedAttributes));
 		qSim.addMobsimEngine(netsimEngine);
