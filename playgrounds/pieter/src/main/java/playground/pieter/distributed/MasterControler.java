@@ -101,20 +101,22 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
 	}
 
 	public MasterControler(String[] args) throws NumberFormatException, IOException {
+		int numSlaves = Integer.parseInt(args[2]);
+		slaves = new Slave[numSlaves];
+		ServerSocket server = new ServerSocket(Integer.parseInt(args[1]));
+		for (int i = 0; i < numSlaves; i++) {
+			Socket s = server.accept();
+			masterLogger.warn("Slave accepted.");
+			slaves[i] = new Slave(s);
+			slaves[i].sendNumber(i);
+		}
+		server.close();
 		matsimControler = new Controler(ScenarioUtils.loadScenario(ConfigUtils.loadConfig(args[0])));
 		matsimControler.setOverwriteFiles(true);
 		matsimControler.setMobsimFactory(new QSimFactory());
-		int size = matsimControler.getScenario().getPopulation().getPersons().size();
 		Set<Id<Person>> ids = matsimControler.getScenario().getPopulation().getPersons().keySet();
-		ServerSocket server = new ServerSocket(Integer.parseInt(args[1]));
-		int numSlaves = Integer.parseInt(args[2]);
-		slaves = new Slave[numSlaves];
 		List<Id<Person>>[] split = CollectionUtils.split(ids, numSlaves);
 		for (int i = 0; i < numSlaves; i++) {
-			Socket s = server.accept();
-			masterLogger.warn("Slave accepted. Preparing ids to send.");
-			slaves[i] = new Slave(s);
-			slaves[i].sendNumber(i);
 			List<String> idStrings = new ArrayList<>();
 			for (Id id : split[i])
 				idStrings.add(id.toString());
@@ -133,7 +135,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
 
 		matsimControler.addPlanStrategyFactory("ReplacePlanFromSlave", new ReplacePlanFromSlaveFactory(newPlans));
 		matsimControler.addControlerListener(this);
-
+		masterLogger.warn("master inited");
 	}
 
 	public void run() {

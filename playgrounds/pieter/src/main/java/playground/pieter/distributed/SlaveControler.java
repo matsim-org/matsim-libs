@@ -40,6 +40,7 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
 			while (true) {
 				boolean res = false;
 				try {
+					timesLogger.warn("trying to read boolean from master");
 					res = reader.readBoolean();
 				} catch (IOException e) {
 					System.out.println("Master terminated. Exiting.");
@@ -59,7 +60,6 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
 						timesLogger.warn("Sending completed.");
 					} else {
 						System.out.println("Master terminated. Exiting.");
-
 						System.exit(0);
 					}
 				} catch (ClassNotFoundException | IOException e) {
@@ -105,7 +105,7 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
 		for (Id<Person> id : noIds)
 			noIdStrings.add(id.toString());
 		noIdStrings.removeAll(idStrings);
-
+		slaveLogger.warn("removing ids");
 		for (String idString : noIdStrings) {
 			matsimControler.getPopulation().getPersons().remove(Id.create(idString, Person.class));
 		}
