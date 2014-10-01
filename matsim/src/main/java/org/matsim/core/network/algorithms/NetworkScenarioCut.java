@@ -20,15 +20,15 @@
 
 package org.matsim.core.network.algorithms;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.utils.geometry.CoordUtils;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class NetworkScenarioCut implements NetworkRunnable {
 
@@ -46,7 +46,7 @@ public class NetworkScenarioCut implements NetworkRunnable {
 
 	private final static Logger log = Logger.getLogger(NetworkScenarioCut.class);
 
-	public NetworkScenarioCut(final Coord min, final Coord max) {
+	private NetworkScenarioCut(final Coord min, final Coord max) {
 		super();
 		
 		this.cutType = CutType.RECTANGLE;
@@ -95,8 +95,8 @@ public class NetworkScenarioCut implements NetworkRunnable {
 		log.info("number of links remaining: "+network.getLinks().size());
 	}
 	
-	private final Set<Node> rectangularCut(Network network) {
-		Set<Node> nodesToRemove = new HashSet<Node>();
+	private Set<Node> rectangularCut(Network network) {
+		Set<Node> nodesToRemove = new HashSet<>();
 		for (Node n : network.getNodes().values()) {
 			Coord coord = n.getCoord();
 			double x = coord.getX();
@@ -108,8 +108,8 @@ public class NetworkScenarioCut implements NetworkRunnable {
 		return nodesToRemove;
 	}
 	
-	private final Set<Node> circularCut(Network network) {
-		Set<Node> nodesToRemove = new HashSet<Node>();
+	private Set<Node> circularCut(Network network) {
+		Set<Node> nodesToRemove = new HashSet<>();
 		for (Node n : network.getNodes().values()) {
 			Coord coord = n.getCoord();
 			double distance = CoordUtils.calcDistance(coord, center);

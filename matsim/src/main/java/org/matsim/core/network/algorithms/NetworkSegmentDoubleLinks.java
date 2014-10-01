@@ -20,19 +20,14 @@
 
 package org.matsim.core.network.algorithms;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-import java.util.Random;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
+
+import java.util.*;
 
 /**
  * This algorithm handles double links (two links with same from and to node) by splitting
@@ -60,7 +55,7 @@ public class NetworkSegmentDoubleLinks implements NetworkRunnable {
 		this.network = network;
 		log.info("    running " + this.getClass().getName() + " algorithm...");
 
-		Queue<Node> nodes = new LinkedList<Node>(network.getNodes().values());
+		Queue<Node> nodes = new LinkedList<>(network.getNodes().values());
 		while (nodes.peek() != null) {
 			Node n = nodes.poll();
 			HashMap<Id<Node>, List<Link>> toNodesMap = new HashMap<>();
@@ -69,7 +64,7 @@ public class NetworkSegmentDoubleLinks implements NetworkRunnable {
 				if (links != null) {
 					links.add(l);
 				} else {
-					links = new ArrayList<Link>();
+					links = new ArrayList<>();
 					links.add(l);
 					toNodesMap.put(l.getToNode().getId(), links);
 				}

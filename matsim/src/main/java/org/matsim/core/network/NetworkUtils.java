@@ -20,20 +20,13 @@
 
 package org.matsim.core.network;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+
+import java.util.*;
 
 /**
  * Contains several helper methods for working with {@link Network networks}.
@@ -47,7 +40,6 @@ public class NetworkUtils {
 	}
 	
 	/**
-	 * @param nodes
 	 * @return The bounding box of all the given nodes as <code>double[] = {minX, minY, maxX, maxY}</code>
 	 */
 	public static double[] getBoundingBox(final Collection<? extends Node> nodes) {
@@ -75,7 +67,6 @@ public class NetworkUtils {
 	}
 
 	/**
-	 * @param network
 	 * @return array containing the nodes, sorted ascending by id.
 	 */
 	public static Node[] getSortedNodes(final Network network) {
@@ -90,21 +81,20 @@ public class NetworkUtils {
 	}
 	
 	/**
-	 * @param network
 	 * @param nodes list of node ids, separated by one or multiple whitespace (space, \t, \n)
 	 * @return list containing the specified nodes.
 	 * @throws IllegalArgumentException if a specified node is not found in the network
 	 */
 	public static List<Node> getNodes(final Network network, final String nodes) {
 		if (nodes == null) {
-			return new ArrayList<Node>(0);
+			return new ArrayList<>(0);
 		}
 		String trimmed = nodes.trim();
 		if (trimmed.length() == 0) {
-			return new ArrayList<Node>(0);
+			return new ArrayList<>(0);
 		}
 		String[] parts = trimmed.split("[ \t\n]+");
-		final List<Node> nodesList = new ArrayList<Node>(parts.length);
+		final List<Node> nodesList = new ArrayList<>(parts.length);
 
 		for (String id : parts) {
 			Node node = network.getNodes().get(Id.create(id, Node.class));
@@ -117,7 +107,6 @@ public class NetworkUtils {
 	}
 
 	/**
-	 * @param network
 	 * @return array containing the links, sorted ascending by id.
 	 */
 	public static Link[] getSortedLinks(final Network network) {
@@ -132,21 +121,20 @@ public class NetworkUtils {
 	}
 	
 	/**
-	 * @param network
 	 * @param links list of link ids, separated by one or multiple whitespace (space, \t, \n)
 	 * @return list containing the specified links.
 	 * @throws IllegalArgumentException if a specified node is not found in the network
 	 */
 	public static List<Link> getLinks(final Network network, final String links) {
 		if (links == null) {
-			return new ArrayList<Link>(0);
+			return new ArrayList<>(0);
 		}
 		String trimmed = links.trim();
 		if (trimmed.length() == 0) {
-			return new ArrayList<Link>(0);
+			return new ArrayList<>(0);
 		}
 		String[] parts = trimmed.split("[ \t\n]+");
-		final List<Link> linksList = new ArrayList<Link>(parts.length);
+		final List<Link> linksList = new ArrayList<>(parts.length);
 
 		for (String id : parts) {
 			Link link = network.getLinks().get(Id.create(id, Link.class));
@@ -161,19 +149,17 @@ public class NetworkUtils {
 	/**
 	 * Splits the given string at whitespace (one or more space, tab, newline) into single pieces, which are interpreted as ids.
 	 *
-	 * @param links
-	 * @return
 	 */
 	public static List<Id<Link>> getLinkIds(final String links) {
 		if (links == null) {
-			return new ArrayList<Id<Link>>(0);
+			return new ArrayList<>(0);
 		}
 		String trimmed = links.trim();
 		if (trimmed.length() == 0) {
-			return new ArrayList<Id<Link>>(0);
+			return new ArrayList<>(0);
 		}
 		String[] parts = trimmed.split("[ \t\n]+");
-		final List<Id<Link>> linkIdsList = new ArrayList<Id<Link>>(parts.length);
+		final List<Id<Link>> linkIdsList = new ArrayList<>(parts.length);
 
 		for (String id : parts) {
 			linkIdsList.add(Id.create(id, Link.class));
@@ -182,7 +168,7 @@ public class NetworkUtils {
 	}
 
 	public static List<Link> getLinks(final Network network, final List<Id<Link>> linkIds) {
-		List<Link> links = new ArrayList<Link>();
+		List<Link> links = new ArrayList<>();
 		for (Id<Link> linkId : linkIds) {
 			Link link = network.getLinks().get(linkId);
 			if (link == null) {
@@ -194,7 +180,7 @@ public class NetworkUtils {
 	}
 
 	public static List<Id<Link>> getLinkIds(final List<Link> links) {
-		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
+		List<Id<Link>> linkIds = new ArrayList<>();
 		if (links != null) {
 			for (Link link : links) {
 				linkIds.add(link.getId());
@@ -262,54 +248,11 @@ public class NetworkUtils {
 		return null;
 	}
 
-	/**
-	 * Returns the orthogonal distance between a point and a network link (a straight line).
-	 * It assumes that a link has unlimited length.
-	 * So it gives just the distance between a point and a line.
-	 * 
-	 * tnicolai feb'13: not used any more for accessibility calculation
-	 * @param pointx
-	 * @param pointy
-	 * @param link
-	 * 
-	 * @return
-	 */
-	public static double getOrthogonalDistance(double pointx, double pointy, Link link){
-		// yyyy I don't think there is a test for this anywhere.  kai, mar'14
-		
-		double ax = link.getFromNode().getCoord().getX();
-		double ay = link.getFromNode().getCoord().getY();
-		double bx = link.getToNode().getCoord().getX();
-		double by = link.getToNode().getCoord().getY();
-	
-		double normalzation = Math.sqrt( Math.pow( bx - ax , 2) + Math.pow( by - ay, 2));
-		double distance = Math.abs( ((pointx - ax) * (by - ay)) - ((pointy -ay) * (bx - ax)) );
-		
-		return distance/normalzation;
-	}
-
-	/**
-	 * Returns the orthogonal distance between a point and a network link (a straight line).
-	 * It assumes that a link has unlimited length.
-	 * So it gives just the distance between a point and a line.
-	 * 
-	 * tnicolai feb'13: not used any more for accessibility calculation
-	 * @param link
-	 * @param coord
-	 * 
-	 * @return
-	 */
-	public static double getOrthogonalDistance(Coord point, Link link){
-		return getOrthogonalDistance(point.getX(), point.getY(), link);
-	}
-
-	/**
+    /**
 	 * This method expects the nearest link to a given measure point. 
 	 * It calculates the euclidian distance for both nodes of the link, 
 	 * "fromNode" and "toNode" and returns the node with shorter distance
-	 * 
-	 * @param coord
-	 * @param link
+	 *
 	 */
 	public static Node getCloserNodeOnLink(Coord coord, Link link) {
 		// yyyy I don't think there is a test for this anywhere.  kai, mar'14
@@ -327,16 +270,9 @@ public class NetworkUtils {
 
 	/**
 		 * returns the euclidean distance between two coordinates
-		 * 
-		 * @param origin
-		 * @param destination
-		 * @return distance
+		 *
 		 */
 		public static double getEuclidianDistance(Coord origin, Coord destination){
-			
-	//		assert(origin != null);
-	//		assert(destination != null);
-			
 			double xDiff = origin.getX() - destination.getX();
 			double yDiff = origin.getY() - destination.getY();
 			double distance = Math.sqrt( (xDiff*xDiff) + (yDiff*yDiff) );
@@ -345,19 +281,13 @@ public class NetworkUtils {
 		}
 
 	/** returns the euclidean distance between two points (x1,y1) and (x2,y2)
-	 * 
-	 * @param x1
-	 * @param y1
-	 * @param x2
-	 * @param y2
-	 * @return Distances
+	 *
 	 */
 	public static double getEuclidianDistance(double x1, double y1, double x2, double y2){
 		
 		double xDiff = x1 - x2;
 		double yDiff = y1 - y2;
 		double distance =  Math.sqrt( (xDiff*xDiff) + (yDiff*yDiff) );
-		
 		return distance ;
 	}
 }

@@ -20,20 +20,21 @@
 
 package org.matsim.core.network;
 
-import java.util.Arrays;
-import java.util.TreeMap;
-
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
+
+import java.util.Arrays;
+import java.util.TreeMap;
 
 /**
  * @author laemmel
  * @author illenberger
  *
  */
-public class TimeVariantLinkImpl extends LinkImpl {
+class TimeVariantLinkImpl extends LinkImpl {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -57,7 +58,7 @@ public class TimeVariantLinkImpl extends LinkImpl {
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 
-	public TimeVariantLinkImpl(final Id id, final Node from, final Node to, final Network network, final double length, final double freespeed, final double capacity, final double lanes) {
+	TimeVariantLinkImpl(final Id<Link> id, final Node from, final Node to, final Network network, final double length, final double freespeed, final double capacity, final double lanes) {
 		super(id, from, to, network, length, freespeed, capacity, lanes);
 	}
 
@@ -68,7 +69,7 @@ public class TimeVariantLinkImpl extends LinkImpl {
 	 */
 	protected synchronized void applyEvent(final NetworkChangeEvent event) {
 		if(this.changeEvents == null)
-			this.changeEvents = new TreeMap<Double,NetworkChangeEvent>();
+			this.changeEvents = new TreeMap<>();
 
 		this.changeEvents.put(event.getStartTime(), event);
 
@@ -94,7 +95,7 @@ public class TimeVariantLinkImpl extends LinkImpl {
 	 * Removes all NetworkChangeEvents so that the link's attributes will be
 	 * reset to their initial values.
 	 */
-	protected synchronized void clearEvents() {
+	synchronized void clearEvents() {
 		if(this.changeEvents != null)
 			this.changeEvents.clear();
 
@@ -307,14 +308,6 @@ public class TimeVariantLinkImpl extends LinkImpl {
 			throw new RuntimeException("Expected number of change events (" + (this.aLanesEvents -1) + ") differs from the number of events found (" + numEvent + ")!");
 		}
 
-	}
-
-	/**
-	 * Getter for the change events tree map
-	 * @return changeEvents
-	 */
-	public TreeMap<Double,NetworkChangeEvent> getChangeEvents() {
-		return this.changeEvents;
 	}
 
 }

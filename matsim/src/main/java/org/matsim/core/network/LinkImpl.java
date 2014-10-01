@@ -20,16 +20,6 @@
 
 package org.matsim.core.network;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -42,6 +32,11 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
 public class LinkImpl implements Link {
 
 	private final static Logger log = Logger.getLogger(LinkImpl.class);
@@ -50,27 +45,27 @@ public class LinkImpl implements Link {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private Id<Link> id;
+	private final Id<Link> id;
 
 	protected Node from = null;
 	protected Node to = null;
 
-	protected double length = Double.NaN;
-	protected double freespeed = Double.NaN;
-	protected double capacity = Double.NaN;
-	protected double nofLanes = Double.NaN;
+	private double length = Double.NaN;
+	double freespeed = Double.NaN;
+	double capacity = Double.NaN;
+	double nofLanes = Double.NaN;
 
 	private Set<String> allowedModes = HashSetCache.get(new HashSet<String>());
 
 	private double flowCapacity;
 
-	protected String type = null;
+	private String type = null;
 
-	protected String origid = null;
+	private String origid = null;
 
-	protected double euklideanDist;
+	private final double euklideanDist;
 
-	private Network network;
+	private final Network network;
 
 	private static int fsWarnCnt = 0 ;
 	private static int cpWarnCnt = 0 ;
@@ -85,7 +80,7 @@ public class LinkImpl implements Link {
 
 	private static final Set<String> DEFAULT_ALLOWED_MODES;
 	static {
-		Set<String> set = new HashSet<String>();
+		Set<String> set = new HashSet<>();
 		set.add(TransportMode.car);
 		DEFAULT_ALLOWED_MODES = HashSetCache.get(set);
 	}
@@ -120,7 +115,7 @@ public class LinkImpl implements Link {
 		this.checkCapacitiySemantics();
 	}
 
-	protected double getCapacityPeriod() {
+	double getCapacityPeriod() {
 		return network.getCapacityPeriod();
 	}
 
@@ -376,7 +371,7 @@ public class LinkImpl implements Link {
 	}
 
 	/*package*/ abstract static class HashSetCache {
-		private final static Map<Integer, List<Set<?>>> cache = new ConcurrentHashMap<Integer, List<Set<?>>>();
+		private final static Map<Integer, List<Set<?>>> cache = new ConcurrentHashMap<>();
 		public static <T> Set<T> get(final Set<T> set) {
 			if (set == null) {
 				return null;
@@ -384,9 +379,9 @@ public class LinkImpl implements Link {
 			int size = set.size();
 			List<Set<?>> list = cache.get(size);
 			if (list == null) {
-				list = new ArrayList<Set<?>>(4);
+				list = new ArrayList<>(4);
 				cache.put(size, list);
-				HashSet<T> set2 = new HashSet<T>(set);
+				HashSet<T> set2 = new HashSet<>(set);
 				Set<T> set3 = Collections.unmodifiableSet(set2);
 				list.add(set3);
 				return set3;
@@ -397,7 +392,7 @@ public class LinkImpl implements Link {
 				}
 			}
 			// not yet in cache
-			HashSet<T> set2 = new HashSet<T>(set);
+			HashSet<T> set2 = new HashSet<>(set);
 			Set<T> set3 = Collections.unmodifiableSet(set2);
 			list.add(set3);
 			return set3;

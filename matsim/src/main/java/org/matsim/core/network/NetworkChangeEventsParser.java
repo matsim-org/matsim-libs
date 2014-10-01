@@ -23,11 +23,6 @@
  */
 package org.matsim.core.network;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -38,6 +33,11 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 import org.xml.sax.Attributes;
+
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
 
 
 /**
@@ -54,35 +54,35 @@ public class NetworkChangeEventsParser extends MatsimXmlParser {
 	
 	private static final Logger log = Logger.getLogger(NetworkChangeEventsParser.class);
 	
-	protected static final String NETWORK_CHANGE_EVENTS_TAG = "networkChangeEvents";
+	static final String NETWORK_CHANGE_EVENTS_TAG = "networkChangeEvents";
 	
-	protected static final String NETWORK_CHANGE_EVENT_TAG = "networkChangeEvent";
+	static final String NETWORK_CHANGE_EVENT_TAG = "networkChangeEvent";
 	
-	protected static final String START_TIME_TAG = "startTime";
+	static final String START_TIME_TAG = "startTime";
 	
-	protected static final String LINK_TAG = "link";
+	static final String LINK_TAG = "link";
 	
-	protected static final String REF_ID_TAG = "refId";
+	static final String REF_ID_TAG = "refId";
 	
-	protected static final String FLOW_CAPACITY_TAG = "flowCapacity";
+	static final String FLOW_CAPACITY_TAG = "flowCapacity";
 	
-	protected static final String FREESPEED_TAG = "freespeed";
+	static final String FREESPEED_TAG = "freespeed";
 	
-	protected static final String LANES_TAG = "lanes";
+	static final String LANES_TAG = "lanes";
 	
-	protected static final String CHANGE_TYPE_TAG = "type";
+	static final String CHANGE_TYPE_TAG = "type";
 	
-	protected static final String VALUE_TAG = "value";
+	static final String VALUE_TAG = "value";
 	
-	protected static final String ABSOLUTE_VALUE = "absolute";
+	static final String ABSOLUTE_VALUE = "absolute";
 	
-	protected static final String FACTOR_VALUE = "scaleFactor";
+	static final String FACTOR_VALUE = "scaleFactor";
 
 	// ========================================================================
 	// private members
 	// ========================================================================
 
-	private Network network;
+	private final Network network;
 	
 	private NetworkChangeEvent currentEvent;
 	
@@ -108,7 +108,7 @@ public class NetworkChangeEventsParser extends MatsimXmlParser {
 	 *            a xml file containing network change events.
 	 */
 	public List<NetworkChangeEvent> parseEvents(String file) {
-		events = new ArrayList<NetworkChangeEvent>();
+		events = new ArrayList<>();
 		super.parse(file);
 		return events;
 	}
@@ -116,13 +116,13 @@ public class NetworkChangeEventsParser extends MatsimXmlParser {
 
 	@Override
 	public void parse(String filename) throws UncheckedIOException {
-		events = new ArrayList<NetworkChangeEvent>();
+		events = new ArrayList<>();
 		super.parse(filename);
 	}
 
 	@Override
 	public void parse(URL url) throws UncheckedIOException {
-		events = new ArrayList<NetworkChangeEvent>();
+		events = new ArrayList<>();
 		super.parse(url);
 	}
 	

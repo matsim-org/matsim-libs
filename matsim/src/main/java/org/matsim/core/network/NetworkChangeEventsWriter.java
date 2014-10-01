@@ -23,9 +23,6 @@
  */
 package org.matsim.core.network;
 
-import java.io.IOException;
-import java.util.Collection;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.internal.MatsimSomeWriter;
@@ -33,6 +30,9 @@ import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
+
+import java.io.IOException;
+import java.util.Collection;
 
 
 /**
@@ -49,28 +49,28 @@ public class NetworkChangeEventsWriter extends MatsimXmlWriter implements Matsim
 	
 	private static final Logger log = Logger.getLogger(NetworkChangeEventsWriter.class);
 	
-	public static final String TAB = "\t";
+	private static final String TAB = "\t";
 	
-	public static final String WHITESPACE = " ";
+	private static final String WHITESPACE = " ";
 	
-	public static final String OPEN_TAG_1 = "<";
+	private static final String OPEN_TAG_1 = "<";
 	
-	public static final String OPEN_TAG_2 = "</";
+	private static final String OPEN_TAG_2 = "</";
 	
-	public static final String CLOSE_TAG_1 = ">";
+	private static final String CLOSE_TAG_1 = ">";
 	
-	public static final String CLOSE_TAG_2 = "/>";
+	private static final String CLOSE_TAG_2 = "/>";
 	
-	public static final String QUOTE = "\"";
+	private static final String QUOTE = "\"";
 	
-	public static final String EQUALS = "=";
+	private static final String EQUALS = "=";
 	
 	// DEFAULT_DTD_LOCATION does not work for _some_ reason...
-	public static final String DTD_LOCATION = "http://www.matsim.org/files/dtd";
+	private static final String DTD_LOCATION = "http://www.matsim.org/files/dtd";
 	
-	public static final String W3_URL = "http://www.w3.org/2001/XMLSchema-instance";
+	private static final String W3_URL = "http://www.w3.org/2001/XMLSchema-instance";
 	
-	public static final String XSD_LOCATION = "http://www.matsim.org/files/dtd/networkChangeEvents.xsd";
+	private static final String XSD_LOCATION = "http://www.matsim.org/files/dtd/networkChangeEvents.xsd";
 
 	public void write(String file, Collection<NetworkChangeEvent> events) {
 		try {

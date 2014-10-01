@@ -20,8 +20,6 @@
 
 package org.matsim.core.network;
 
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.simple.SimpleFeatureSource;
@@ -35,6 +33,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.geometry.BoundingBox;
+
+import java.io.IOException;
 
 /**
  * A reader for TeleAtlas network description files. The reader is based on
@@ -217,10 +217,9 @@ public class NetworkReaderTeleatlas implements MatsimSomeReader {
 	 * <pre>
 	 * <code>{@link NodeImpl#type} = {@link #NODE_FEATTYP_NAME}+"-"+{@link #NODE_JNCTTYP_NAME}</code>
 	 * </pre>
-	 * 
-	 * @throws
+	 *
 	 */
-	private final void readNodesFromJCshp() throws IOException {
+	private void readNodesFromJCshp() throws IOException {
 		int nCnt = network.getNodes().size();
 		SimpleFeatureSource fs = ShapeFileReader.readDataFile(jcShpFileName);
 		SimpleFeatureIterator fIt = fs.getFeatures().features();
@@ -341,7 +340,7 @@ public class NetworkReaderTeleatlas implements MatsimSomeReader {
 	 * 
 	 * @throws IOException
 	 */
-	private final void readLinksFromNWshp() throws IOException {
+	private void readLinksFromNWshp() throws IOException {
 		int lCnt = network.getLinks().size();
 		int ignoreCnt = 0;
 		SimpleFeatureSource fs = ShapeFileReader.readDataFile(this.nwShpFileName);

@@ -20,12 +20,6 @@
 
 package org.matsim.core.network.algorithms;
 
-import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.geotools.data.shapefile.dbf.DbaseFileReader;
 import org.geotools.data.simple.SimpleFeatureIterator;
@@ -43,6 +37,12 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.opengis.feature.simple.SimpleFeature;
+
+import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Adds maneuver restrictions to a MATSim {@link Network network} created
@@ -315,12 +315,12 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 					// detect inlinks with restricted maneuvers
 					boolean hasRestrictedManeuver = false;
 					for (Boolean b : fromLinkEntry.values()) {
-						if (b.booleanValue()) { hasRestrictedManeuver = true; }
+						if (b) { hasRestrictedManeuver = true; }
 					}
 					// add missing toLink maneuvers
 					for (Id<Link> toLinkId : n.getOutLinks().keySet()) {
 						if (!fromLinkEntry.containsKey(toLinkId)) {
-							fromLinkEntry.put(toLinkId, Boolean.valueOf(!hasRestrictedManeuver));
+							fromLinkEntry.put(toLinkId, !hasRestrictedManeuver);
 						}
 					}
 				}
@@ -346,11 +346,11 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 					}
 				}
 				// create arraylist with turn tuples
-				ArrayList<TurnInfo> turns = new ArrayList<TurnInfo>();
+				ArrayList<TurnInfo> turns = new ArrayList<>();
 				for (Map.Entry<Id<Link>, TreeMap<Id<Link>, Boolean>> fromLinkEntry : mmatrix.entrySet()) {
 					Id<Link> fromLinkId = fromLinkEntry.getKey();
 					for (Map.Entry<Id<Link>, Boolean> toLinkEntry : fromLinkEntry.getValue().entrySet()) {
-						if (toLinkEntry.getValue().booleanValue()) {
+						if (toLinkEntry.getValue()) {
 							turns.add(new TurnInfo(fromLinkId, toLinkEntry.getKey()));
 						}
 					}

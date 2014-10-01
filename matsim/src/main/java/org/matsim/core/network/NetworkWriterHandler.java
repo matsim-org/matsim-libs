@@ -20,14 +20,14 @@
 
 package org.matsim.core.network;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 
-public interface NetworkWriterHandler {
+import java.io.BufferedWriter;
+import java.io.IOException;
+
+interface NetworkWriterHandler {
 
 	//////////////////////////////////////////////////////////////////////
 	// <network ... > ... </network>

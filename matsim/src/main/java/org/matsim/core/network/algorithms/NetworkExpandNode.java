@@ -20,14 +20,6 @@
 
 package org.matsim.core.network.algorithms;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -37,6 +29,8 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
+
+import java.util.*;
 
 /**
  * A Procedure to expand a node of the {@link Network network}.
@@ -64,7 +58,7 @@ public class NetworkExpandNode {
 	 * @param expRadius the expansion radius. If zero, all new nodes have the same coordinate
 	 * and the new links with have length equals zero
 	 */
-	public void setExpRadius(final double expRadius) {
+    void setExpRadius(final double expRadius) {
 		if (Double.isNaN(expRadius)) {
 			throw new IllegalArgumentException("expansion radius must not be NaN.");
 		}
@@ -76,7 +70,7 @@ public class NetworkExpandNode {
 	 * @param offset the offset between a link pair with the same incident nodes. If zero, the two new
 	 * nodes created for that link pair will have the same coordinates
 	 */
-	public void setOffset(final double offset) {
+    void setOffset(final double offset) {
 		if (Double.isNaN(offset)) {
 			throw new IllegalArgumentException("expansion offset must not be NaN.");
 		}
@@ -182,31 +176,31 @@ public class NetworkExpandNode {
 		if (turns == null) {
 			throw new IllegalArgumentException("nodeid="+nodeId+": turn list not defined!");
 		}
-		
-		for (int i=0; i<turns.size(); i++) {
-			Id<Link> first = turns.get(i).getFromLinkId();
-			if (first == null) {
-				throw new IllegalArgumentException("given list contains 'null' values.");
-			}
-			if (!node.getInLinks().containsKey(first)) {
-				throw new IllegalArgumentException("nodeid="+nodeId+", linkid="+first+": link not an inlink of given node.");
-			}
-			Id<Link> second = turns.get(i).getToLinkId();
-			if (second == null) {
-				throw new IllegalArgumentException("given list contains 'null' values.");
-			}
-			if (!node.getOutLinks().containsKey(second)) {
-				throw new IllegalArgumentException("nodeid="+nodeId+", linkid="+second+": link not an outlink of given node.");
-			}
-		}
+
+        for (TurnInfo turn1 : turns) {
+            Id<Link> first = turn1.getFromLinkId();
+            if (first == null) {
+                throw new IllegalArgumentException("given list contains 'null' values.");
+            }
+            if (!node.getInLinks().containsKey(first)) {
+                throw new IllegalArgumentException("nodeid=" + nodeId + ", linkid=" + first + ": link not an inlink of given node.");
+            }
+            Id<Link> second = turn1.getToLinkId();
+            if (second == null) {
+                throw new IllegalArgumentException("given list contains 'null' values.");
+            }
+            if (!node.getOutLinks().containsKey(second)) {
+                throw new IllegalArgumentException("nodeid=" + nodeId + ", linkid=" + second + ": link not an outlink of given node.");
+            }
+        }
 
 		// remove the node
 		Map<Id<Link>,Link> inlinks = new TreeMap<>(node.getInLinks());
 		Map<Id<Link>,Link> outlinks = new TreeMap<>(node.getOutLinks());
 		if (network.removeNode(node.getId()) == null) { throw new RuntimeException("nodeid="+nodeId+": Failed to remove node from the network."); }
 
-		ArrayList<Node> newNodes = new ArrayList<Node>(inlinks.size()+outlinks.size());
-		ArrayList<Link> newLinks = new ArrayList<Link>(turns.size());
+		ArrayList<Node> newNodes = new ArrayList<>(inlinks.size()+outlinks.size());
+		ArrayList<Link> newLinks = new ArrayList<>(turns.size());
 		// add new nodes and connect them with the in and out links
 		int nodeIdCnt = 0;
 		double d = this.dist;
@@ -326,7 +320,7 @@ public class NetworkExpandNode {
 			Map<Id<Link>, Set<String>> t2 = new HashMap<>();
 			for (Link outLink : node.getOutLinks().values()) {
 				if (inLink.getFromNode() != outLink.getToNode() || !ignoreUTurns) {
-					HashSet<String> modes = new HashSet<String>();
+					HashSet<String> modes = new HashSet<>();
 					modes.addAll(inLink.getAllowedModes());
 					modes.retainAll(outLink.getAllowedModes()); // modes contains now all useful modes
 					t2.put(outLink.getId(), modes);

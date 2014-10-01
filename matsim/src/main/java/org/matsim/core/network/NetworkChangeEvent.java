@@ -20,15 +20,11 @@
 
 package org.matsim.core.network;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.internal.MatsimComparator;
+
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * A container class for events that represent time-variant changes for link
@@ -45,9 +41,9 @@ public class NetworkChangeEvent {
 
 	public static class ChangeValue {
 
-		private ChangeType type;
+		private final ChangeType type;
 
-		private double value;
+		private final double value;
 
 		public ChangeValue(ChangeType type, double value) {
 			this.type = type;
@@ -67,11 +63,11 @@ public class NetworkChangeEvent {
 	// private members
 	// ========================================================================
 
-	private List<Link> links = new ArrayList<Link>();
+	private final List<Link> links = new ArrayList<>();
 	
-	private List<Link> unmodifiableLinks = Collections.unmodifiableList(links);
+	private final List<Link> unmodifiableLinks = Collections.unmodifiableList(links);
 
-	private double startTime;
+	private final double startTime;
 
 	private ChangeValue flowCapacityChange = null;
 

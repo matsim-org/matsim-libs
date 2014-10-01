@@ -27,7 +27,7 @@ import org.matsim.core.api.internal.NetworkRunnable;
 /**
  * Calculates the number of lanes for each link, based on the capacity.
  */
-public class NetworkCalcLanes implements NetworkRunnable {
+class NetworkCalcLanes implements NetworkRunnable {
 
 	@Override
 	public void run(Network network) {

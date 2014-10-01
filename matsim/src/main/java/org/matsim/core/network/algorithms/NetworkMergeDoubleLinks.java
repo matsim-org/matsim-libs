@@ -20,8 +20,6 @@
 
 package org.matsim.core.network.algorithms;
 
-import java.util.Iterator;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -29,6 +27,8 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
+
+import java.util.Iterator;
 
 public class NetworkMergeDoubleLinks implements NetworkRunnable {
 
@@ -64,7 +64,7 @@ public class NetworkMergeDoubleLinks implements NetworkRunnable {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final void mergeLink2IntoLink1(Link link1, Link link2, Network network) {
+	private void mergeLink2IntoLink1(Link link1, Link link2, Network network) {
 		switch (this.mergetype) {
 			case REMOVE:
 				log.info("        Link id=" + link2.getId() + " removed because of Link id=" + link1.getId());

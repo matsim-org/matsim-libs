@@ -20,10 +20,6 @@
 
 package org.matsim.core.network;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Stack;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -35,6 +31,10 @@ import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.core.utils.misc.Time;
 import org.xml.sax.Attributes;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.Stack;
 
 /**
  * A reader for network-files of MATSim according to <code>network_v1.dtd</code>.
@@ -49,14 +49,12 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 	private final static String LINK = "link";
 
 	private final Network network;
-	private final Scenario scenario;
 
-	private final static Logger log = Logger.getLogger(NetworkReaderMatsimV1.class);
+    private final static Logger log = Logger.getLogger(NetworkReaderMatsimV1.class);
 
 	public NetworkReaderMatsimV1(final Scenario scenario) {
 		super();
-		this.scenario = scenario;
-		this.network = scenario.getNetwork();
+        this.network = scenario.getNetwork();
 	}
 
 	@Override
@@ -159,10 +157,10 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 			if ((strModes.length == 1) && strModes[0].isEmpty()) {
 				l.setAllowedModes(new HashSet<String>());
 			} else {
-				Set<String> modes = new HashSet<String>();
-				for (int i = 0, n = strModes.length; i < n; i++) {
-					modes.add(strModes[i].trim().intern());
-				}
+				Set<String> modes = new HashSet<>();
+                for (String strMode : strModes) {
+                    modes.add(strMode.trim().intern());
+                }
 				l.setAllowedModes(modes);
 			}
 		}

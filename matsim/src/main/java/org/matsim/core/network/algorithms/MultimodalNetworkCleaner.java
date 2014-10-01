@@ -19,21 +19,13 @@
 
 package org.matsim.core.network.algorithms;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+
+import java.util.*;
 
 /**
  * Variant of {@link org.matsim.core.network.algorithms.NetworkCleaner NetworkCleaner} that supports
@@ -51,8 +43,8 @@ public class MultimodalNetworkCleaner {
 
 	private final Network network;
 	
-	private Set<Id> removedLinks = new HashSet<Id>();
-	private Set<Id> modifiedLinks = new HashSet<Id>();
+	private final Set<Id> removedLinks = new HashSet<>();
+	private final Set<Id> modifiedLinks = new HashSet<>();
 
 	public MultimodalNetworkCleaner(final Network network) {
 		this.network = network;
@@ -62,7 +54,7 @@ public class MultimodalNetworkCleaner {
 	 * Removes nodes from the network that have no incoming or outgoing links attached to them.
 	 */
 	public void removeNodesWithoutLinks() {
-		List<Node> toBeRemoved = new ArrayList<Node>();
+		List<Node> toBeRemoved = new ArrayList<>();
 		for (Node node : this.network.getNodes().values()) {
 			if ((node.getInLinks().size() == 0) && (node.getOutLinks().size() == 0)) {
 				toBeRemoved.add(node);
@@ -108,10 +100,10 @@ public class MultimodalNetworkCleaner {
 	 * @param connectivityModes
 	 */
 	public void run(final Set<String> cleaningModes, final Set<String> connectivityModes) {
-		final Set<String> combinedModes = new HashSet<String>(cleaningModes);
+		final Set<String> combinedModes = new HashSet<>(cleaningModes);
 		combinedModes.addAll(connectivityModes);
-		final Map<Id, Link> visitedLinks = new TreeMap<Id, Link>();
-		Map<Id, Link> biggestCluster = new TreeMap<Id, Link>();
+		final Map<Id, Link> visitedLinks = new TreeMap<>();
+		Map<Id, Link> biggestCluster = new TreeMap<>();
 
 		log.info("running " + this.getClass().getName() + " algorithm for modes " + Arrays.toString(cleaningModes.toArray())
 				+ " with connectivity modes " + Arrays.toString(connectivityModes.toArray()) + "...");
@@ -141,10 +133,10 @@ public class MultimodalNetworkCleaner {
 		/* Remove the modes from all links not being part of the cluster. If a link has no allowed mode
 		 * anymore after this, remove the link from the network.
 		 */
-		List<Link> allLinks = new ArrayList<Link>(this.network.getLinks().values());
+		List<Link> allLinks = new ArrayList<>(this.network.getLinks().values());
 		for (Link link : allLinks) {
 			if (!biggestCluster.containsKey(link.getId())) {
-				Set<String> reducedModes = new HashSet<String>(link.getAllowedModes());
+				Set<String> reducedModes = new HashSet<>(link.getAllowedModes());
 				reducedModes.removeAll(cleaningModes);
 				link.setAllowedModes(reducedModes);
 				if (reducedModes.isEmpty()) {
@@ -176,12 +168,12 @@ public class MultimodalNetworkCleaner {
 	 */
 	private Map<Id, Link> findCluster(final Link startLink, final Set<String> modes) {
 
-		final Map<Id, DoubleFlagRole> linkRoles = new HashMap<Id, DoubleFlagRole>(this.network.getLinks().size());
+		final Map<Id, DoubleFlagRole> linkRoles = new HashMap<>(this.network.getLinks().size());
 
-		ArrayList<Node> pendingForward = new ArrayList<Node>();
-		ArrayList<Node> pendingBackward = new ArrayList<Node>();
+		ArrayList<Node> pendingForward = new ArrayList<>();
+		ArrayList<Node> pendingBackward = new ArrayList<>();
 
-		TreeMap<Id, Link> clusterLinks = new TreeMap<Id, Link>();
+		TreeMap<Id, Link> clusterLinks = new TreeMap<>();
 
 		pendingForward.add(startLink.getToNode());
 		pendingBackward.add(startLink.getFromNode());
@@ -268,8 +260,8 @@ public class MultimodalNetworkCleaner {
 	}
 
 	static class DoubleFlagRole {
-		protected boolean forwardFlag = false;
-		protected boolean backwardFlag = false;
+		boolean forwardFlag = false;
+		boolean backwardFlag = false;
 	}
 
 }

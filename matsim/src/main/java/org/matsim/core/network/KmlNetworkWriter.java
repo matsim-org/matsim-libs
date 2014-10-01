@@ -20,15 +20,7 @@
 
 package org.matsim.core.network;
 
-import java.io.IOException;
-
-import net.opengis.kml._2.AbstractFeatureType;
-import net.opengis.kml._2.DocumentType;
-import net.opengis.kml._2.FolderType;
-import net.opengis.kml._2.ObjectFactory;
-import net.opengis.kml._2.PlacemarkType;
-import net.opengis.kml._2.StyleType;
-
+import net.opengis.kml._2.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -40,6 +32,8 @@ import org.matsim.vis.kml.MatsimKmlStyleFactory;
 import org.matsim.vis.kml.NetworkFeatureFactory;
 import org.matsim.vis.kml.NetworkKmlStyleFactory;
 
+import java.io.IOException;
+
 /**
  * @author dgrether
  */
@@ -47,19 +41,15 @@ public class KmlNetworkWriter implements MatsimSomeWriter {
 
 	private static final Logger log = Logger.getLogger(KmlNetworkWriter.class);
 
-	private Network network;
+	private final Network network;
 
 	private NetworkKmlStyleFactory styleFactory;
 
-	private ObjectFactory kmlObjectFactory = new ObjectFactory();
-	
-	private StyleType networkLinkStyle;
+	private final ObjectFactory kmlObjectFactory = new ObjectFactory();
 
-	private NetworkFeatureFactory networkFeatureFactory;
+    private final NetworkFeatureFactory networkFeatureFactory;
 
-	private StyleType networkNodeStyle;
-
-	public KmlNetworkWriter(final Network network, final CoordinateTransformation coordTransform, KMZWriter writer, DocumentType doc) {
+    public KmlNetworkWriter(final Network network, final CoordinateTransformation coordTransform, KMZWriter writer, DocumentType doc) {
 		this.network = network;
 		this.styleFactory = new MatsimKmlStyleFactory(writer, doc);
 		this.networkFeatureFactory = new NetworkFeatureFactory(coordTransform, network);
@@ -74,15 +64,15 @@ public class KmlNetworkWriter implements MatsimSomeWriter {
 		FolderType folder = this.kmlObjectFactory.createFolderType();
 		
 		folder.setName("MATSIM Network");
-		this.networkLinkStyle = this.styleFactory.createDefaultNetworkLinkStyle();
-		this.networkNodeStyle = this.styleFactory.createDefaultNetworkNodeStyle();
+        StyleType networkLinkStyle = this.styleFactory.createDefaultNetworkLinkStyle();
+        StyleType networkNodeStyle = this.styleFactory.createDefaultNetworkNodeStyle();
 		
 		FolderType nodeFolder = kmlObjectFactory.createFolderType();
 		nodeFolder.setName("Nodes");
 //		linkFolder.addStyle(this.networkNodeStyle);
 		for (Node n : this.network.getNodes().values()) {
 			
-			AbstractFeatureType abstractFeature = this.networkFeatureFactory.createNodeFeature(n, this.networkNodeStyle);
+			AbstractFeatureType abstractFeature = this.networkFeatureFactory.createNodeFeature(n, networkNodeStyle);
 			if (abstractFeature.getClass().equals(PlacemarkType.class)) {
 				nodeFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark((PlacemarkType) abstractFeature));
 			} else if (abstractFeature.getClass().equals(FolderType.class)) {
@@ -98,7 +88,7 @@ public class KmlNetworkWriter implements MatsimSomeWriter {
 		linkFolder.setName("Links");
 //		linkFolder.addStyle(this.networkLinkStyle);
 		for (Link l : this.network.getLinks().values()) {
-			AbstractFeatureType abstractFeature = this.networkFeatureFactory.createLinkFeature(l, this.networkLinkStyle);
+			AbstractFeatureType abstractFeature = this.networkFeatureFactory.createLinkFeature(l, networkLinkStyle);
 			if (abstractFeature.getClass().equals(PlacemarkType.class)) {
 				linkFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark((PlacemarkType) abstractFeature));
 			} else if (abstractFeature.getClass().equals(FolderType.class)) {

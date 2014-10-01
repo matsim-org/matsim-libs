@@ -20,14 +20,6 @@
 
 package org.matsim.core.network;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -35,6 +27,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.collections.QuadTree;
+
+import java.util.*;
 
 /**
  * Design thoughts:<ul>
@@ -58,9 +52,9 @@ public final class NetworkImpl implements Network {
 
 	private double capperiod = 3600.0 ;
 
-	private final Map<Id<Node>, Node> nodes = new LinkedHashMap<Id<Node>, Node>();
+	private final Map<Id<Node>, Node> nodes = new LinkedHashMap<>();
 
-	private Map<Id<Link>, Link> links = new LinkedHashMap<Id<Link>, Link>();
+	private final Map<Id<Link>, Link> links = new LinkedHashMap<>();
 
 	private QuadTree<Node> nodeQuadTree = null;
 	
@@ -171,7 +165,7 @@ public final class NetworkImpl implements Network {
 		if (n == null) {
 			return null;
 		}
-		HashSet<Link> links = new HashSet<Link>();
+		HashSet<Link> links = new HashSet<>();
 		links.addAll(n.getInLinks().values());
 		links.addAll(n.getOutLinks().values());
 		for (Link l : links) {
@@ -262,7 +256,7 @@ public final class NetworkImpl implements Network {
 		}
 
 		if (this.networkChangeEvents == null) {
-			this.networkChangeEvents = new ArrayList<NetworkChangeEvent>();
+			this.networkChangeEvents = new ArrayList<>();
 		}
 
 		this.networkChangeEvents.add(event);
@@ -301,7 +295,7 @@ public final class NetworkImpl implements Network {
 	 */
 	public Link getNearestLink(final Coord coord) {
 		Link nearestLink = null;
-		Node nearestNode = null;
+		Node nearestNode;
 		if (this.nodeQuadTree == null) { buildQuadTree(); }
 		nearestNode = this.nodeQuadTree.get(coord.getX(), coord.getY());
 		if ( nearestNode == null ) {
@@ -388,7 +382,7 @@ public final class NetworkImpl implements Network {
 	public Link getNearestRightEntryLink(final Coord coord) {
 		Link nearestRightLink = null;
 		Link nearestOverallLink = null;
-		Node nearestNode = null;
+		Node nearestNode;
 		if (this.nodeQuadTree == null) { buildQuadTree(); }
 		nearestNode = this.nodeQuadTree.get(coord.getX(), coord.getY());
 
@@ -399,7 +393,7 @@ public final class NetworkImpl implements Network {
 		// now find nearest link from the nearest node
 		double shortestRightDistance = Double.MAX_VALUE; // reset the value
 		double shortestOverallDistance = Double.MAX_VALUE; // reset the value
-		List<Link> incidentLinks = new ArrayList<Link>(nearestNode.getInLinks().values());
+		List<Link> incidentLinks = new ArrayList<>(nearestNode.getInLinks().values());
 		incidentLinks.addAll(nearestNode.getOutLinks().values());
 		for (Link link : incidentLinks) {
 			double dist = ((LinkImpl) link).calcDistance(coord);
@@ -519,7 +513,7 @@ public final class NetworkImpl implements Network {
 		maxx += 1.0;
 		maxy += 1.0;
 		log.info("building QuadTree for nodes: xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-		QuadTree<Node> quadTree = new QuadTree<Node>(minx, miny, maxx, maxy);
+		QuadTree<Node> quadTree = new QuadTree<>(minx, miny, maxx, maxy);
 		for (Node n : this.nodes.values()) {
 			quadTree.put(n.getCoord().getX(), n.getCoord().getY(), n);
 		}

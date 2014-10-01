@@ -20,19 +20,14 @@
 
 package org.matsim.core.network.algorithms;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkIdComparator;
+
+import java.util.*;
 
 /**
  * Analyzes the network to find for each link the "logical subsequent link",
@@ -51,7 +46,7 @@ public class SubsequentLinksAnalyzer {
 	private final Network network;
 
 	/** Stores the logical subsequent link (value) for a given link (key). */
-	private final TreeMap<Id<Link>, Id<Link>> subsequentLinks = new TreeMap<Id<Link>, Id<Link>>();
+	private final TreeMap<Id<Link>, Id<Link>> subsequentLinks = new TreeMap<>();
 
 	public SubsequentLinksAnalyzer(final Network network) {
 		this.network = network;
@@ -71,7 +66,7 @@ public class SubsequentLinksAnalyzer {
 	 * ssLinks.
 	 */
 	private void compute() {
-		Map<Link, Double> absDeltaThetas = new TreeMap<Link, Double>(new LinkIdComparator());
+		Map<Link, Double> absDeltaThetas = new TreeMap<>(new LinkIdComparator());
 		for (Link l : this.network.getLinks().values()) {
 			Node from = l.getFromNode();
 			Node to = l.getToNode();
@@ -107,12 +102,12 @@ public class SubsequentLinksAnalyzer {
 	 * @return the link with the smallest theta, if multiple links have the same smallest theta, the one with the biggest capacity is returned.
 	 */
 	private Link computeSubsequentLink(final Map<Link, Double> thetas) {
-		List<Link> minThetaOutLinks = new ArrayList<Link>();
+		List<Link> minThetaOutLinks = new ArrayList<>();
 
 		minThetaOutLinks.clear();
-		double absMin = Collections.min(thetas.values()).doubleValue();
+		double absMin = Collections.min(thetas.values());
 		for (Map.Entry<Link, Double> entry : thetas.entrySet()) {
-			if (absMin == (entry.getValue()).doubleValue()) {
+			if (absMin == entry.getValue()) {
 				minThetaOutLinks.add(entry.getKey());
 			}
 		}

@@ -19,15 +19,15 @@
 
 package org.matsim.core.network.filter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkImpl;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Add several filter instances to this class and create a new
@@ -46,14 +46,14 @@ public class NetworkFilterManager {
 
 	private final Network network;
 
-	private List<NetworkLinkFilter> linkFilters;
+	private final List<NetworkLinkFilter> linkFilters;
 
-	private List<NetworkNodeFilter> nodeFilters;
+	private final List<NetworkNodeFilter> nodeFilters;
 
 	public NetworkFilterManager(final Network net) {
 		this.network = net;
-		this.linkFilters = new ArrayList<NetworkLinkFilter>();
-		this.nodeFilters = new ArrayList<NetworkNodeFilter>();
+		this.linkFilters = new ArrayList<>();
+		this.nodeFilters = new ArrayList<>();
 	}
 
 	public void addLinkFilter(NetworkLinkFilter f) {
@@ -73,8 +73,8 @@ public class NetworkFilterManager {
 	private void addLink(Network net, Link l){
 		Id fromId = l.getFromNode().getId();
 		Id toId = l.getToNode().getId();
-		Node from = null;
-		Node to = null;
+		Node from;
+		Node to;
 		Node nn;
 		//check if from node already exists
 		if (! net.getNodes().containsKey(fromId)) {

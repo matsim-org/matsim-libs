@@ -20,16 +20,16 @@
 
 package org.matsim.core.network.algorithms;
 
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.utils.misc.Counter;
+
+import java.util.HashMap;
+import java.util.IdentityHashMap;
+import java.util.Map;
 
 /** See "http://www.ivt.ethz.ch/vpl/publications/reports/ab283.pdf"
  * for a description of node types. It's the graph matching paper.
@@ -38,17 +38,17 @@ import org.matsim.core.utils.misc.Counter;
  **/
 public class NetworkCalcTopoType implements NetworkRunnable {
 
-	public final static Integer EMPTY        = Integer.valueOf(0);
-	public final static Integer SOURCE       = Integer.valueOf(1);
-	public final static Integer SINK         = Integer.valueOf(2);
-	public final static Integer DEADEND      = Integer.valueOf(3);
-	public final static Integer PASS1WAY     = Integer.valueOf(4);
-	public final static Integer PASS2WAY     = Integer.valueOf(5);
-	public final static Integer START1WAY    = Integer.valueOf(6);
-	public final static Integer END1WAY      = Integer.valueOf(7);
-	public final static Integer INTERSECTION = Integer.valueOf(8);
+	public final static Integer EMPTY        = 0;
+	public final static Integer SOURCE       = 1;
+	public final static Integer SINK         = 2;
+	public final static Integer DEADEND      = 3;
+	public final static Integer PASS1WAY     = 4;
+	public final static Integer PASS2WAY     = 5;
+	public final static Integer START1WAY    = 6;
+	public final static Integer END1WAY      = 7;
+	public final static Integer INTERSECTION = 8;
 
-	private final Map<Node, Integer> topoTypePerNode = new IdentityHashMap<Node, Integer>(100000);
+	private final Map<Node, Integer> topoTypePerNode = new IdentityHashMap<>(100000);
 
 	@Override
 	public void run(final Network network) {
@@ -83,15 +83,15 @@ public class NetworkCalcTopoType implements NetworkRunnable {
 		}
 
 		System.out.println("      #nodes        = " + network.getNodes().size());
-		System.out.println("      #EMTPY        = " + cnt[EMPTY.intValue()]);
-		System.out.println("      #SOURCE       = " + cnt[SOURCE.intValue()]);
-		System.out.println("      #SINK         = " + cnt[SINK.intValue()]);
-		System.out.println("      #DEADEND      = " + cnt[DEADEND.intValue()]);
-		System.out.println("      #PASS1WAY     = " + cnt[PASS1WAY.intValue()]);
-		System.out.println("      #PASS2WAY     = " + cnt[PASS2WAY.intValue()]);
-		System.out.println("      #START1WAY    = " + cnt[START1WAY.intValue()]);
-		System.out.println("      #END1WAY      = " + cnt[END1WAY.intValue()]);
-		System.out.println("      #INTERSECTION = " + cnt[INTERSECTION.intValue()]);
+		System.out.println("      #EMTPY        = " + cnt[EMPTY]);
+		System.out.println("      #SOURCE       = " + cnt[SOURCE]);
+		System.out.println("      #SINK         = " + cnt[SINK]);
+		System.out.println("      #DEADEND      = " + cnt[DEADEND]);
+		System.out.println("      #PASS1WAY     = " + cnt[PASS1WAY]);
+		System.out.println("      #PASS2WAY     = " + cnt[PASS2WAY]);
+		System.out.println("      #START1WAY    = " + cnt[START1WAY]);
+		System.out.println("      #END1WAY      = " + cnt[END1WAY]);
+		System.out.println("      #INTERSECTION = " + cnt[INTERSECTION]);
 
 		System.out.println("    done.");
 	}
@@ -105,11 +105,11 @@ public class NetworkCalcTopoType implements NetworkRunnable {
 		if (i == null) {
 			return Integer.MIN_VALUE;
 		}
-		return i.intValue();
+		return i;
 	}
 
 	private int getNOfIncidentNodes(final Node node) {
-		HashMap<Id, Node> nodes = new HashMap<Id, Node>();
+		HashMap<Id, Node> nodes = new HashMap<>();
 		for (Link link : node.getInLinks().values()) {
 			nodes.put(link.getFromNode().getId(), link.getFromNode());
 		}

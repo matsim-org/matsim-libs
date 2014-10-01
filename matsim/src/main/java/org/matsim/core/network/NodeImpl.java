@@ -20,12 +20,6 @@
 
 package org.matsim.core.network;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -33,6 +27,12 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.IdentifiableArrayMap;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class NodeImpl implements Node {
 
@@ -43,11 +43,11 @@ public class NodeImpl implements Node {
 	private String type = null;
 	private String origid = null;
 
-	protected transient  Map<Id<Link>, Link> inlinks  = new IdentifiableArrayMap<Link, Link>();
-	protected transient  Map<Id<Link>, Link> outlinks = new IdentifiableArrayMap<Link, Link>();
+	private transient  Map<Id<Link>, Link> inlinks  = new IdentifiableArrayMap<>();
+	private transient  Map<Id<Link>, Link> outlinks = new IdentifiableArrayMap<>();
 
-	protected Coord coord;
-	protected final Id<Node> id;
+	private Coord coord;
+	private final Id<Node> id;
 
 	private final static Logger log = Logger.getLogger(NodeImpl.class);
 
@@ -152,13 +152,13 @@ public class NodeImpl implements Node {
 	}
 
 	public final Map<Id<Link>, ? extends Link> getIncidentLinks() {
-		Map<Id<Link>, Link> links = new TreeMap<Id<Link>, Link>(getInLinks());
+		Map<Id<Link>, Link> links = new TreeMap<>(getInLinks());
 		links.putAll(getOutLinks());
 		return links;
 	}
 
 	public final Map<Id<Node>, ? extends Node> getInNodes() {
-		Map<Id<Node>, Node> nodes = new TreeMap<Id<Node>, Node>();
+		Map<Id<Node>, Node> nodes = new TreeMap<>();
 		for (Link link : getInLinks().values()) {
 			Node node = link.getFromNode();
 			nodes.put(node.getId(), node);
@@ -167,7 +167,7 @@ public class NodeImpl implements Node {
 	}
 
 	public final Map<Id<Node>, ? extends Node> getOutNodes() {
-		Map<Id<Node>, Node> nodes = new TreeMap<Id<Node>, Node>();
+		Map<Id<Node>, Node> nodes = new TreeMap<>();
 		for (Link link : getOutLinks().values()) {
 			Node node = link.getToNode();
 			nodes.put(node.getId(), node);
@@ -176,7 +176,7 @@ public class NodeImpl implements Node {
 	}
 
 	public final Map<Id<Node>, ? extends Node> getIncidentNodes() {
-		Map<Id<Node>, Node> nodes = new TreeMap<Id<Node>, Node>(getInNodes());
+		Map<Id<Node>, Node> nodes = new TreeMap<>(getInNodes());
 		nodes.putAll(getOutNodes());
 		return nodes;
 	}
@@ -205,8 +205,8 @@ public class NodeImpl implements Node {
 	private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
 		ois.defaultReadObject();
 
-		inlinks = new LinkedHashMap<Id<Link>, Link>(4, 0.95f);
-		outlinks = new LinkedHashMap<Id<Link>, Link>(4, 0.95f);
+		inlinks = new LinkedHashMap<>(4, 0.95f);
+		outlinks = new LinkedHashMap<>(4, 0.95f);
 
 	}
 

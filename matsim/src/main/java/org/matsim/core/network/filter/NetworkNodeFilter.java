@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.network.Node;
  * 
  * @author dgrether
  */
-public interface NetworkNodeFilter {
+interface NetworkNodeFilter {
 
 	public boolean judgeNode(Node n);
 
