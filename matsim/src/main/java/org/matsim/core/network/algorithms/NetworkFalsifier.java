@@ -35,7 +35,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
  *
  * @author mrieser
  */
-class NetworkFalsifier implements NetworkRunnable {
+public class NetworkFalsifier implements NetworkRunnable {
 
 	private final double distance;
 
