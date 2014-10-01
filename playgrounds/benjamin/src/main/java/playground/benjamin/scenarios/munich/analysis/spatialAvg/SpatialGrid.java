@@ -50,7 +50,7 @@ public class SpatialGrid {
 
 		for(int i=0; i<numberOfCellsX; i++){
 			for(int j=0; j<numberOfCellsY; j++){
-				Coord cellCentroid = new CoordImpl(gridMinX + i*(gridMaxX-gridMinX)/numberOfCellsY,
+				Coord cellCentroid = new CoordImpl(gridMinX + i*(gridMaxX-gridMinX)/numberOfCellsX,
 													gridMinY + j*(gridMaxY-gridMinY)/numberOfCellsY);
 				grid[i][j]= new Cell(i,j,cellCentroid);
 			}

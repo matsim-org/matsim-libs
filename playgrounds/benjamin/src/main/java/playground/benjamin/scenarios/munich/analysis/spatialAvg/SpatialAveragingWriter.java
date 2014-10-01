@@ -48,12 +48,13 @@ public class SpatialAveragingWriter {
 	private Double yMax;
 	private Double xMin;
 	private Double xMax;
+	private boolean useVisBoundary = false;
 	
 	Collection<SimpleFeature> featuresInVisBoundary;
 
 	private static final Logger logger = Logger.getLogger(SpatialAveragingWriter.class);
 	
-	public SpatialAveragingWriter(double xMin, double xMax, double yMin, double yMax, int noOfXbins, int noOfYbins, double smoothingRadius_m, String munichShapeFile, CoordinateReferenceSystem targetCRS){
+	public SpatialAveragingWriter(double xMin, double xMax, double yMin, double yMax, int noOfXbins, int noOfYbins, double smoothingRadius_m, String munichShapeFile, CoordinateReferenceSystem targetCRS, boolean useVisBoundary){
 		this.xMin = xMin;
 		this.xMax = xMax;
 		this.yMin = yMin;
@@ -62,14 +63,15 @@ public class SpatialAveragingWriter {
 		this.noOfYbins = noOfYbins;
 		this.featuresInVisBoundary = ShapeFileReader.getAllFeatures(munichShapeFile);
 		this.targetCRS = targetCRS;
+		this.useVisBoundary=useVisBoundary;
 	}
 	
-	public SpatialAveragingWriter(SpatialAveragingInputData inputData, int noOfXbins, int noOfYbins, double smoothingRadius_m) {
+	public SpatialAveragingWriter(SpatialAveragingInputData inputData, int noOfXbins, int noOfYbins, double smoothingRadius_m, boolean useVisBoundary) {
 		this(	inputData.getMinX(), inputData.getMaxX(), 
 									inputData.getMinY(), inputData.getMaxY(), 
 									noOfXbins, noOfYbins, 
 									smoothingRadius_m, 
-									inputData.getMunichShapeFile(), inputData.getTargetCRS());
+									inputData.getMunichShapeFile(), inputData.getTargetCRS(), useVisBoundary);
 	}
 
 	public void writeRoutput(Double[][] doubles, String outputPathForR) {
@@ -151,6 +153,7 @@ public class SpatialAveragingWriter {
 	}
 	
 	private boolean isInVisBoundary(Coord cellCentroid) {
+		if(useVisBoundary==false)return true;
 		boolean isInMunichShape = false;
 		GeometryFactory factory = new GeometryFactory();
 		Geometry geo = factory.createPoint(new Coordinate(cellCentroid.getX(), cellCentroid.getY()));

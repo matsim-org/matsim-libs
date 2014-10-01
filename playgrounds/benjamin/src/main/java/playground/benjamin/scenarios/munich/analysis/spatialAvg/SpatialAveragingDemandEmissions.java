@@ -50,15 +50,16 @@ public class SpatialAveragingDemandEmissions {
 	final int noOfXbins = 160;
 	final int noOfYbins = 120; 
 	
-	final int noOfTimeBins = 60;
+	final int noOfTimeBins = 1;
 	
 	final double smoothingRadius_m = 500.;
 	
 	final String pollutant2analyze = WarmPollutant.NO2.toString();
 	final boolean compareToBaseCase = true;
-	final boolean useLineMethod = true;
+	final boolean useLineMethod = false;
 	private boolean writeRoutput = true;
 	private boolean writeGisOutput = false;
+	final private boolean useVisBoundary = false;
 	
 	private SpatialAveragingWriter saWriter;
 	private double simulationEndTime;
@@ -90,7 +91,7 @@ public class SpatialAveragingDemandEmissions {
 		}else{
 			linkWeightUtil = new LinkPointWeightUtil(inputData, noOfXbins, noOfYbins, smoothingRadius_m);
 		}
-		this.saWriter = new SpatialAveragingWriter(inputData, noOfXbins, noOfYbins, smoothingRadius_m);
+		this.saWriter = new SpatialAveragingWriter(inputData, noOfXbins, noOfYbins, smoothingRadius_m, useVisBoundary);
 		
 		this.simulationEndTime = inputData.getEndTime();
 		this.network = loadNetwork(inputData.getNetworkFile());		
@@ -100,6 +101,8 @@ public class SpatialAveragingDemandEmissions {
 		if(compareToBaseCase){
 			runCompareCase(inputData.getEmissionFileForCompareCase());
 		}
+		
+		logger.info("Done with spatial averaging.");
 	}
 	
 	private void runBaseCase() throws IOException{
@@ -113,6 +116,7 @@ public class SpatialAveragingDemandEmissions {
 		timeInterval2GridBaseCase= new SpatialGrid[noOfTimeBins];
 		
 		for(int timeInterval:timeInterval2Link2Pollutant.keySet()){
+			logger.info("Calculating grid values for time interval " + (timeInterval+1) + " of " + noOfTimeBins + " time intervals.");
 			SpatialGrid sGrid = new SpatialGrid(inputData, noOfXbins, noOfYbins);
 			
 			for(Id linkId: timeInterval2Link2Pollutant.get(timeInterval).keySet()){
@@ -121,14 +125,17 @@ public class SpatialAveragingDemandEmissions {
 			sGrid.multiplyAllCells(linkWeightUtil.getNormalizationFactor());
 			// store base case results for comparison
 			timeInterval2GridBaseCase[timeInterval] = sGrid;
-			Double endOfTimeInterval = (timeInterval+1)/noOfTimeBins*simulationEndTime;
+			Double endOfTimeInterval = simulationEndTime/noOfTimeBins*(timeInterval+1);
+	
 			// print tables
+			logger.info("Writing output for the current time interval");
 			writeOutput(sGrid, endOfTimeInterval);
 			}
 		}
 	
 	private void runCompareCase(String emissionFile) throws IOException{
 	
+		logger.info("Starting with compare case.");
 		outPathStub = inputData.getAnalysisOutPathForCompareCase();
 		
 		parseEmissionFile(inputData.getEmissionFileForCompareCase());
@@ -136,6 +143,7 @@ public class SpatialAveragingDemandEmissions {
 		Map <Integer, Map<Id, Double>>timeInterval2Link2Pollutant = emissionHandler.getTimeIntervals2EmissionsPerLink();
 		
 		for(int timeInterval:timeInterval2Link2Pollutant.keySet()){
+			logger.info("Calculating differences to base case for time interval " + (timeInterval+1) + " of " + noOfTimeBins + " time intervals.");
 			SpatialGrid sGrid = new SpatialGrid(inputData, noOfXbins, noOfYbins);
 			
 			for(Id linkId: timeInterval2Link2Pollutant.get(timeInterval).keySet()){
@@ -145,8 +153,9 @@ public class SpatialAveragingDemandEmissions {
 			// calc differences
 			SpatialGrid differencesGrid = new SpatialGrid(inputData, noOfXbins, noOfYbins);
 			differencesGrid = sGrid.getDifferences(timeInterval2GridBaseCase[timeInterval]);
-			Double endOfTimeInterval = (timeInterval+1)/noOfTimeBins*simulationEndTime;
+			Double endOfTimeInterval = simulationEndTime/noOfTimeBins*(timeInterval+1);
 			// print tables
+			logger.info("Writing output for the current time interval");
 			writeOutput(differencesGrid, endOfTimeInterval);
 		}			
 	}
