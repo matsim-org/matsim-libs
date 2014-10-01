@@ -26,6 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -36,6 +37,8 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  */
 public class TransitStopAgentTracker {
 
+	private final static Logger log = Logger.getLogger(TransitStopAgentTracker.class);
+	
 	private final EventsManager events;
 	private final Map<Id<TransitStopFacility>, List<PTPassengerAgent>> agentsAtStops = new HashMap<>();
 
@@ -63,7 +66,9 @@ public class TransitStopAgentTracker {
 		}
 		List<PTPassengerAgent> agents = this.agentsAtStops.get(stopId);
 		if (agents != null) {
-			agents.remove(agent);
+			if (!agents.remove(agent)) {
+				log.error("Agent " + agent.getId() + " could not be removed from waiting at stop " + stopId);
+			}
 		}
 	}
 
