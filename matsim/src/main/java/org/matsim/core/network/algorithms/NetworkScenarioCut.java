@@ -20,15 +20,15 @@
 
 package org.matsim.core.network.algorithms;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.utils.geometry.CoordUtils;
-
-import java.util.HashSet;
-import java.util.Set;
 
 public class NetworkScenarioCut implements NetworkRunnable {
 
@@ -46,7 +46,7 @@ public class NetworkScenarioCut implements NetworkRunnable {
 
 	private final static Logger log = Logger.getLogger(NetworkScenarioCut.class);
 
-	private NetworkScenarioCut(final Coord min, final Coord max) {
+	public NetworkScenarioCut(final Coord min, final Coord max) {
 		super();
 		
 		this.cutType = CutType.RECTANGLE;
