@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -32,6 +33,7 @@ import playground.singapore.transitRouterEventsBased.waitTimes.WaitTimeCalculato
 
 public class SlaveControler implements IterationStartsListener, BeforeMobsimListener {
 	class TimesReceiver implements Runnable {
+		Logger timesLogger = Logger.getLogger(this.getClass());
 
 		@Override
 		public void run() {
@@ -45,10 +47,16 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
 				}
 				try {
 					if (res) {
+						timesLogger.warn("Receiving travel times.");
 						linkTravelTimes = (SerializableLinkTravelTimes) reader.readObject();
 						stopStopTimes = (StopStopTime) reader.readObject();
 						waitTimes = (WaitTime) reader.readObject();
+						timesLogger.warn("Checking to see if plans are ready to be sent");
+						while (!readyToSendPlans)
+							;
+						timesLogger.warn("Sending plans...");
 						writer.writeObject(plansCopyForSending);
+						timesLogger.warn("Sending completed.");
 					} else {
 						System.out.println("Master terminated. Exiting.");
 
@@ -63,6 +71,7 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
 	}
 
 	Controler matsimControler;
+	Logger slaveLogger = Logger.getLogger(this.getClass());
 	private SerializableLinkTravelTimes linkTravelTimes;
 	private WaitTime waitTimes;
 	private StopStopTime stopStopTimes;
@@ -70,6 +79,7 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
 	private ObjectOutputStream writer;
 	private PSimFactory pSimFactory;
 	private Map<String, PlanSerializable> plansCopyForSending;
+	private boolean readyToSendPlans = false;
 
 	public SlaveControler(String[] args) throws NumberFormatException, UnknownHostException, IOException, ClassNotFoundException {
 		matsimControler = new Controler(ScenarioUtils.loadScenario(ConfigUtils.loadConfig(args[0])));
@@ -82,7 +92,10 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
 		int myNumber = reader.readInt();
 		matsimControler.getConfig().controler()
 				.setOutputDirectory(matsimControler.getConfig().controler().getOutputDirectory() + "_" + myNumber);
-		removeNonSimulatedAgents((List<String>) reader.readObject());
+		slaveLogger.warn("About to receive agent ids for removal from master");
+		List<String> idStrings = (List<String>) reader.readObject();
+		slaveLogger.warn("RECEIVED agent ids for removal from master. Starting TimesReceiver thread.");
+		removeNonSimulatedAgents(idStrings);
 		new Thread(new TimesReceiver()).start();
 	}
 
@@ -107,10 +120,11 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
 	private void run() {
 		pSimFactory = new PSimFactory();
 		matsimControler.setMobsimFactory(pSimFactory);
-		Collection<Plan> plans = new ArrayList<>();
-		for (Person person : matsimControler.getPopulation().getPersons().values())
-			plans.add(person.getSelectedPlan());
-		// pSimFactory.setPlans(plans);
+		// Collection<Plan> plans = new ArrayList<>();
+		// for (Person person :
+		// matsimControler.getPopulation().getPersons().values())
+		// plans.add(person.getSelectedPlan());
+		// // pSimFactory.setPlans(plans);
 		matsimControler.run();
 	}
 
@@ -144,10 +158,16 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
 
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+		createPlansCopyForMaster();
+	}
+
+	public void createPlansCopyForMaster() {
 		Map<String, PlanSerializable> tempPlansCopyForSending = new HashMap<>();
 		for (Person person : matsimControler.getPopulation().getPersons().values())
 			tempPlansCopyForSending.put(person.getId().toString(), new PlanSerializable(person.getSelectedPlan()));
 		plansCopyForSending = tempPlansCopyForSending;
+		readyToSendPlans = true;
+
 	}
 
 }

@@ -14,6 +14,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -34,6 +35,7 @@ import playground.singapore.transitRouterEventsBased.waitTimes.WaitTimeStuckCalc
 
 public class MasterControler implements AfterMobsimListener, ShutdownListener {
 	private class Slave implements Runnable {
+		Logger slaveLogger = Logger.getLogger(this.getClass());
 		ObjectInputStream reader;
 		ObjectOutputStream writer;
 		Map<String, Plan> plans = new HashMap<>();
@@ -47,11 +49,14 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
 		@Override
 		public void run() {
 			try {
+				slaveLogger.warn("About to send travel times.");
 				writer.writeBoolean(true);
 				writer.writeObject(linkTravelTimes);
 				writer.writeObject(stopStopTimeCalculator.getStopStopTimes());
 				writer.writeObject(waitTimeCalculator.getWaitTimes());
+				slaveLogger.warn("waiting to receive plans");
 				Map<String, PlanSerializable> serialPlans = (Map<String, PlanSerializable>) reader.readObject();
+				slaveLogger.warn("Plans received.");
 				for (Entry<String, PlanSerializable> entry : serialPlans.entrySet()) {
 					plans.put(entry.getKey(), entry.getValue().getPlan(matsimControler.getPopulation()));
 				}
@@ -67,6 +72,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
 		}
 
 		public void sendIds(Collection<String> idStrings) throws IOException {
+			slaveLogger.warn("Sending ids.");
 			writer.writeObject(idStrings);
 		}
 
@@ -88,6 +94,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
 	private SerializableLinkTravelTimes linkTravelTimes;
 	private AtomicInteger numThreads;
 	private HashMap<String, Plan> newPlans = new HashMap<>();
+	Logger masterLogger = Logger.getLogger(this.getClass());
 
 	public Controler getMATSimControler() {
 		return matsimControler;
@@ -105,6 +112,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
 		List<Id<Person>>[] split = CollectionUtils.split(ids, numSlaves);
 		for (int i = 0; i < numSlaves; i++) {
 			Socket s = server.accept();
+			masterLogger.warn("Slave accepted. Preparing ids to send.");
 			slaves[i] = new Slave(s);
 			slaves[i].sendNumber(i);
 			List<String> idStrings = new ArrayList<>();
