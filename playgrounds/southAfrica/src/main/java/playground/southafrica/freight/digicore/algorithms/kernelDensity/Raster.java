@@ -176,6 +176,7 @@ public class Raster{
 	 * <i>java.awt</i> package.
 	 * @return
 	 */
+	@SuppressWarnings("unused")
 	private BufferedImage readTriumphPicture(){
 		File f2 = new File("/Users/johanwjoubert/Documents/Personal/Financing/Triumph/Pictures/S1.jpg");
 		BufferedImage bi = null;

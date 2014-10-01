@@ -27,10 +27,11 @@ import java.util.TimeZone;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacilitiesFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilitiesFactoryImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
@@ -44,6 +45,7 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
+import org.matsim.vehicles.Vehicle;
 
 import playground.southafrica.freight.digicore.algorithms.djcluster.HullConverter;
 import playground.southafrica.freight.digicore.containers.DigicoreActivity;
@@ -77,14 +79,14 @@ public class ClusteredChainGeneratorTest{
 		FacilitiesReaderMatsimV1 fr = new FacilitiesReaderMatsimV1(sc);
 		fr.parse(utils.getClassInputDirectory() + "facilities.xml");
 		ActivityFacilities afs = sc.getActivityFacilities();
-		Assert.assertTrue("Facility 1 not in map.", afs.getFacilities().containsKey(new IdImpl("f1")));
-		Assert.assertTrue("Facility 2 not in map.", afs.getFacilities().containsKey(new IdImpl("f2")));
-		Assert.assertTrue("Facility 3 not in map.", afs.getFacilities().containsKey(new IdImpl("f3")));
+		Assert.assertTrue("Facility 1 not in map.", afs.getFacilities().containsKey(Id.create("f1", Facility.class)));
+		Assert.assertTrue("Facility 2 not in map.", afs.getFacilities().containsKey(Id.create("f2", Facility.class)));
+		Assert.assertTrue("Facility 3 not in map.", afs.getFacilities().containsKey(Id.create("f3", Facility.class)));
 		
 		/* Check facility coordinates. */
-		Assert.assertEquals("Wrong centroid for f1", new CoordImpl(0.5, 5.5), afs.getFacilities().get(new IdImpl("f1")).getCoord());
-		Assert.assertEquals("Wrong centroid for f2", new CoordImpl((3.0 + 4.0 + 5.0)/3.0, (1.0 + 3.0 + 3.0)/3.0), afs.getFacilities().get(new IdImpl("f2")).getCoord());
-		Assert.assertEquals("Wrong centroid for f3", new CoordImpl(5.0, 6.0), afs.getFacilities().get(new IdImpl("f3")).getCoord());
+		Assert.assertEquals("Wrong centroid for f1", new CoordImpl(0.5, 5.5), afs.getFacilities().get(Id.create("f1", Facility.class)).getCoord());
+		Assert.assertEquals("Wrong centroid for f2", new CoordImpl((3.0 + 4.0 + 5.0)/3.0, (1.0 + 3.0 + 3.0)/3.0), afs.getFacilities().get(Id.create("f2", Facility.class)).getCoord());
+		Assert.assertEquals("Wrong centroid for f3", new CoordImpl(5.0, 6.0), afs.getFacilities().get(Id.create("f3", Facility.class)).getCoord());
 		
 		File facilityAttributeFile = new File(utils.getClassInputDirectory() + "facilityAttributes.xml");
 		Assert.assertTrue("Facility attributes file does not exist.", facilityAttributeFile.exists());
@@ -124,9 +126,9 @@ public class ClusteredChainGeneratorTest{
 		}
 		
 		Assert.assertEquals("Wrong number of facilities in QT.", 3, qt.get(3, 3, 10).size());
-		Assert.assertEquals("Wrong facility", new IdImpl("f1"), qt.get(0, 6).getId());
-		Assert.assertEquals("Wrong facility", new IdImpl("f2"), qt.get(6, 0).getId());
-		Assert.assertEquals("Wrong facility", new IdImpl("f3"), qt.get(5, 6).getId());
+		Assert.assertEquals("Wrong facility", Id.create("f1", Facility.class), qt.get(0, 6).getId());
+		Assert.assertEquals("Wrong facility", Id.create("f2", Facility.class), qt.get(6, 0).getId());
+		Assert.assertEquals("Wrong facility", Id.create("f3", Facility.class), qt.get(5, 6).getId());
 	}
 	
 	@Test
@@ -171,11 +173,11 @@ public class ClusteredChainGeneratorTest{
 		dvr.parse(utils.getClassInputDirectory() + "xml2/v1.xml.gz");
 		DigicoreChain chain = dvr.getVehicle().getChains().get(0);
 		Assert.assertNotNull("First activity must have an id.", chain.getAllActivities().get(0).getFacilityId());
-		Assert.assertEquals("First activity has wrong id.", new IdImpl("f1"), chain.getAllActivities().get(0).getFacilityId());
+		Assert.assertEquals("First activity has wrong id.", Id.create("f1", Facility.class), chain.getAllActivities().get(0).getFacilityId());
 		Assert.assertNotNull("Second activity must have an id.", chain.getAllActivities().get(2).getFacilityId());
-		Assert.assertEquals("Second activity has wrong id.", new IdImpl("f2"), chain.getAllActivities().get(2).getFacilityId());
+		Assert.assertEquals("Second activity has wrong id.", Id.create("f2", Facility.class), chain.getAllActivities().get(2).getFacilityId());
 		Assert.assertNotNull("Third activity must have an id.", chain.getAllActivities().get(4).getFacilityId());
-		Assert.assertEquals("Third activity has wrong id.", new IdImpl("f3"), chain.getAllActivities().get(4).getFacilityId());
+		Assert.assertEquals("Third activity has wrong id.", Id.create("f3", Facility.class), chain.getAllActivities().get(4).getFacilityId());
 	}
 	
 	
@@ -226,7 +228,7 @@ public class ClusteredChainGeneratorTest{
 		ca1[3] = new Coordinate(a4.getCoord().getX(), a4.getCoord().getY());
 		ca1[4] = ca1[0];
 		Polygon p1 = gf.createPolygon(ca1);
-		ActivityFacility f1 = ff.createActivityFacility(new IdImpl("f1"), new CoordImpl(p1.getCentroid().getX(), p1.getCentroid().getY()));
+		ActivityFacility f1 = ff.createActivityFacility(Id.create("f1", ActivityFacility.class), new CoordImpl(p1.getCentroid().getX(), p1.getCentroid().getY()));
 		facilities.addActivityFacility(f1);
 		attributes.putAttribute(f1.getId().toString(), "concaveHull", p1);
 		
@@ -236,19 +238,19 @@ public class ClusteredChainGeneratorTest{
 		ca2[2] = new Coordinate(a7.getCoord().getX(), a7.getCoord().getY());
 		ca2[3] = ca2[0];
 		Polygon p2 = gf.createPolygon(ca2);
-		ActivityFacility f2 = ff.createActivityFacility(new IdImpl("f2"), new CoordImpl(p2.getCentroid().getX(), p2.getCentroid().getY()));
+		ActivityFacility f2 = ff.createActivityFacility(Id.create("f2", ActivityFacility.class), new CoordImpl(p2.getCentroid().getX(), p2.getCentroid().getY()));
 		facilities.addActivityFacility(f2);
 		attributes.putAttribute(f2.getId().toString(), "concaveHull", p2);
 		
 		Coordinate[] ca3 = new Coordinate[1];
 		ca3[0] = new Coordinate(a11.getCoord().getX(), a11.getCoord().getY());
 		Point p3 = gf.createPoint(ca3[0]);
-		ActivityFacility f3 = ff.createActivityFacility(new IdImpl("f3"), new CoordImpl(p3.getCentroid().getX(), p3.getCentroid().getY()));
+		ActivityFacility f3 = ff.createActivityFacility(Id.create("f3", ActivityFacility.class), new CoordImpl(p3.getCentroid().getX(), p3.getCentroid().getY()));
 		facilities.addActivityFacility(f3);
 		attributes.putAttribute(f3.getId().toString(), "concaveHull", p3);
 		
 		/* Set up activity chain for the vehicle. */
-		DigicoreVehicle vehicle = new DigicoreVehicle(new IdImpl("v1"));
+		DigicoreVehicle vehicle = new DigicoreVehicle(Id.create("v1", Vehicle.class));
 		DigicoreChain chain = new DigicoreChain();
 		chain.add(a1);
 		chain.add(a9);

@@ -22,20 +22,19 @@ package playground.southafrica.freight.digicore.analysis.activity;
 import java.io.File;
 import java.util.concurrent.Callable;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.vehicles.Vehicle;
 
 import playground.southafrica.freight.digicore.containers.DigicoreActivity;
 import playground.southafrica.freight.digicore.containers.DigicoreChain;
 import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
 import playground.southafrica.freight.digicore.io.DigicoreVehicleReader_v1;
 
-public class ActivityWithFacilityIdCallable implements Callable<Tuple<Id, Double>> {
+public class ActivityWithFacilityIdCallable implements Callable<Tuple<Id<Vehicle>, Double>> {
 	final private File vehicleFile; 
 	final private Counter counter;
-	final private Logger log = Logger.getLogger(ActivityWithFacilityIdCallable.class);
 	
 	public ActivityWithFacilityIdCallable(File vehicleFile, Counter counter) {
 		this.vehicleFile = vehicleFile;
@@ -43,7 +42,7 @@ public class ActivityWithFacilityIdCallable implements Callable<Tuple<Id, Double
 	}
 	
 	@Override
-	public Tuple<Id, Double> call() throws Exception {
+	public Tuple<Id<Vehicle>, Double> call() throws Exception {
 		/* Read the vehicle file. */
 		DigicoreVehicleReader_v1 dvr = new DigicoreVehicleReader_v1();
 		dvr.parse(this.vehicleFile.getAbsolutePath());
@@ -63,7 +62,7 @@ public class ActivityWithFacilityIdCallable implements Callable<Tuple<Id, Double
 		this.counter.incCounter();
 		
 		double percentage = ((double)activitiesWithId) / ((double)activitiesTotal);
-		Tuple<Id, Double> tuple = new Tuple<Id, Double>(vehicle.getId(), percentage);
+		Tuple<Id<Vehicle>, Double> tuple = new Tuple<Id<Vehicle>, Double>(vehicle.getId(), percentage);
 		return tuple;
 	}
 

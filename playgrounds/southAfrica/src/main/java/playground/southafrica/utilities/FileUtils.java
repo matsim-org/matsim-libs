@@ -13,7 +13,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 public class FileUtils {
@@ -126,17 +125,18 @@ public class FileUtils {
 	
 	
 	/**
-	 * Reads a given file and parses a {@link List} of {@link Id}s from the file.
-	 * It is assumed that the file contains <i>NO HEADER</i> row, and each row 
-	 * contains a single Id. No validation is done on the {@link Id}s, <i><b>so
-	 * make sure you read in the file you really want!</b></i>. The file may be
-	 * compressed as the parsing will uncompress on the fly. 
+	 * Reads a given file and parses a {@link List} of (typed) {@link Id}s from 
+	 * the file. It is assumed that the file contains <i>NO HEADER</i> row, and 
+	 * each row contains a single Id. No validation is done on the {@link Id}s, 
+	 * <i><b>so make sure you read in the file you really want!</b></i>. The 
+	 * file may be compressed as the parsing will uncompress on the fly. 
+	 * @param <T>
 	 * @param filename
 	 * @return {@link List}<{@link Id}>.
 	 */
-	public static List<Id> readIds(String filename){
+	public static <T> List<Id<T>> readIds(String filename, Class<T> type){
 		LOG.info("Reading Ids from file " + filename);
-		List<Id> list = new ArrayList<Id>();
+		List<Id<T>> list = new ArrayList<Id<T>>();
 		
 		BufferedReader br = IOUtils.getBufferedReader(filename);
 		try{
@@ -145,7 +145,7 @@ public class FileUtils {
 				if(line.contains(" ")){
 					LOG.error("The id `" + line + "' contains whitespaces and will result in a corrupted Id. Line will be ignored.");
 				} else{
-					list.add(new IdImpl(line));
+					list.add(Id.create(line, type));
 				}
 			}
 		} catch (IOException e) {

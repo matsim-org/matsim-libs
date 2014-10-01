@@ -25,9 +25,11 @@ import java.util.Locale;
 import java.util.Stack;
 import java.util.TimeZone;
 
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
 
 import playground.southafrica.freight.digicore.containers.DigicoreActivity;
@@ -95,7 +97,7 @@ public class DigicoreVehicleReader_v1 extends MatsimXmlParser {
 	
 	
 	private void startVehicle(final Attributes atts){
-		DigicoreVehicle dv = new DigicoreVehicle(new IdImpl(atts.getValue(ATTR_ID)));
+		DigicoreVehicle dv = new DigicoreVehicle(Id.create(atts.getValue(ATTR_ID), Vehicle.class ));
 		String type = atts.getValue(ATTR_TYPE);
 		dv.setType(type);
 		String tz = atts.getValue(ATTR_TIMEZONE);
@@ -124,10 +126,10 @@ public class DigicoreVehicleReader_v1 extends MatsimXmlParser {
 		currentActivity.setEndTime(parseDate(endTime));
 		currentActivity.setType(type);
 		if(facility != null){
-			currentActivity.setFacilityId(new IdImpl(facility));
+			currentActivity.setFacilityId(Id.create(facility, ActivityFacility.class));
 		}
 		if(link != null){
-			currentActivity.setLinkId(new IdImpl(link));
+			currentActivity.setLinkId(Id.createLinkId(link));
 		}		
 	}
 	

@@ -21,23 +21,46 @@
 package playground.southafrica.utilities;
 
 
-import org.matsim.testcases.MatsimTestCase;
+import org.junit.Assert;
+import org.junit.Test;
+import org.matsim.testcases.MatsimTestUtils;
 
 import playground.southafrica.utilities.SouthAfricaInflationCorrector;
 
-public class SouthAfricaInflationCorrectorTest extends MatsimTestCase {
+public class SouthAfricaInflationCorrectorTest {
 
+	@Test
 	public void testConvert() {
-		assertEquals("Wrong conversion", 1.0, SouthAfricaInflationCorrector.convert(1, 1981, 1981));
-		assertEquals("Wrong conversion", 1.0, SouthAfricaInflationCorrector.convert(1, 2000, 2000));
-		assertEquals("Wrong conversion", 1.147, SouthAfricaInflationCorrector.convert(1, 1981, 1982));
-		assertEquals("Wrong conversion", 1.289228, Double.parseDouble(String.format("%.6f", SouthAfricaInflationCorrector.convert(1, 1981, 1983))));
-		assertEquals("Wrong conversion", 0.871840, Double.parseDouble(String.format("%.6f", SouthAfricaInflationCorrector.convert(1, 1982, 1981))));
-		assertEquals("Wrong conversion", 0.775658, Double.parseDouble(String.format("%.6f", SouthAfricaInflationCorrector.convert(1, 1983, 1981))));
+		Assert.assertEquals("Wrong conversion", 
+				1.0, 
+				SouthAfricaInflationCorrector.convert(1, 1981, 1981), 
+				MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong conversion", 
+				1.0, 
+				SouthAfricaInflationCorrector.convert(1, 2000, 2000), 
+				MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong conversion", 
+				1.147, 
+				SouthAfricaInflationCorrector.convert(1, 1981, 1982), 
+				MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong conversion", 
+				1.289228, 
+				Double.parseDouble(String.format("%.6f", SouthAfricaInflationCorrector.convert(1, 1981, 1983))), 
+				MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong conversion", 
+				0.871840, 
+				Double.parseDouble(String.format("%.6f", SouthAfricaInflationCorrector.convert(1, 1982, 1981))), 
+				MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong conversion", 
+				0.775658, 
+				Double.parseDouble(String.format("%.6f", SouthAfricaInflationCorrector.convert(1, 1983, 1981))), 
+				MatsimTestUtils.EPSILON);
 		try{
+			@SuppressWarnings("unused")
 			double d = SouthAfricaInflationCorrector.convert(1, 1970, 1970);
-			fail("Should have caught an IllegalArgumentException.");
+			Assert.fail("Should have caught an IllegalArgumentException.");
 		} catch (IllegalArgumentException  e){
+			/* Correctly caught exception. */
 		}
 	}
 

@@ -25,7 +25,7 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
@@ -69,7 +69,7 @@ public class DigicoreNetworkParser {
 	 * 1,2,3<br>
 	 * 2,1,0
 	 * </code></blockquote>
-	 * @param filename absolute path of the inpu file;
+	 * @param filename absolute path of the input file;
 	 * @throws IOException
 	 */
 	public DigicoreNetwork parseNetwork(String filename) throws IOException{
@@ -97,24 +97,24 @@ public class DigicoreNetworkParser {
 				}
 				String[] sa = line.split(",");
 				if(type.equals("node")){
-					Id id = new IdImpl(sa[0]);
+					Id<ActivityFacility> id = Id.create(sa[0], ActivityFacility.class);
 					if(!dn.containsVertex(id)){
 						dn.addVertex(id);
 						dn.getCoordinates().put(id, new CoordImpl(sa[1], sa[2]));
 					}
 					nodeCounter.incCounter();
 				} else if(type.equals("arc")){
-					Id o = new IdImpl(sa[0]);
-					Id d = new IdImpl(sa[1]);
+					Id<ActivityFacility> o = Id.create(sa[0], ActivityFacility.class);
+					Id<ActivityFacility> d = Id.create(sa[1], ActivityFacility.class);
 					String oType = sa[2];
 					String dType = sa[3];
 					if(!dn.containsVertex(o) || !dn.containsVertex(d)){
 						throw new IOException("Parsing an edge [" + o.toString() + " --> " + d.toString() + "] of which one or both of the vertices do not exist in the network.");
 					}
-					Pair<Id> idPair = new Pair<Id>(o, d);
+					Pair<Id<ActivityFacility>> idPair = new Pair<Id<ActivityFacility>>(o, d);
 					Pair<String> typePair = new Pair<String>(oType, dType);
 					dn.addEdge(idPair, o, d);
-					dn.getWeights().put(new Tuple<Pair<Id>, Pair<String>>(idPair, typePair), Integer.parseInt(sa[4]));
+					dn.getWeights().put(new Tuple<Pair<Id<ActivityFacility>>, Pair<String>>(idPair, typePair), Integer.parseInt(sa[4]));
 					arcCounter.incCounter();
 				} else{
 					log.error("Could not find an entry type.");

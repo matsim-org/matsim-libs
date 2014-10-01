@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.jzy3d.analysis.AbstractAnalysis;
+import org.jzy3d.analysis.AnalysisLauncher;
 import org.jzy3d.chart.factories.AWTChartComponentFactory;
 import org.jzy3d.colors.Color;
 import org.jzy3d.maths.Coord3d;
@@ -78,16 +79,24 @@ public class BuildingTypeParser extends AbstractAnalysis{
 		Header.printHeader(BuildingTypeParser.class.toString(), args);
 		
 		String areaShapefile = args[0];
-		Double gridWidth = Double.parseDouble(args[1]);
-		GridType gridType = GridType.valueOf(args[2]);
+		GridType gridType = GridType.valueOf(args[1]);
+		Double gridWidth = Double.parseDouble(args[2]);
 		String buildingShapefile = args[3];
 		String outputFolder = args[4];
 		
 		BuildingTypeParser btp = new BuildingTypeParser(areaShapefile, gridWidth, gridType);
 		btp.parseGtiBuildingShapefile(buildingShapefile);
-		btp.writeActivityMapToFile(outputFolder + (outputFolder.endsWith("/") ? "" : "/") + btp.grid.getGridType() + "_activityTypes.csv");
+		btp.writeActivityMapToFile(String.format("%s%s%s_activityTypes_%.0f.csv", outputFolder, (outputFolder.endsWith("/") ? "" : "/"), btp.grid.getGridType(), gridWidth));
 		btp.grid.writeGrid(outputFolder, "WGS84_SA_Albers");
 		
+		/* Visualise. */
+		try {
+			AnalysisLauncher.open(btp);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new RuntimeException("Cannot visualise!!");
+		}
+
 		Header.printFooter();
 	}
 	
@@ -111,7 +120,7 @@ public class BuildingTypeParser extends AbstractAnalysis{
 				
 				/* Check if the land-use code has already been featured. */
 				if(!activityMap.containsKey(code)){
-					activityMap.put(code, new KernelDensityEstimator(this.grid, KdeType.TRIWEIGHT, 3.0*this.width));
+					activityMap.put(code, new KernelDensityEstimator(this.grid, KdeType.CELL, this.width));
 				}
 				KernelDensityEstimator kde = activityMap.get(code);
 				kde.processPoint(ps.getFactory().createPoint(new Coordinate(cNew.getX(), cNew.getY())), 1.0);
@@ -127,7 +136,7 @@ public class BuildingTypeParser extends AbstractAnalysis{
 		LOG.info("Writing output to " + filename);
 		BufferedWriter bw = IOUtils.getBufferedWriter(filename);
 		try{
-			bw.write("Type,Subtype,From,To,Count");
+			bw.write("Type,Subtype,X,Y,Count");
 			bw.newLine();
 			
 			for(String activityType : this.activityMap.keySet()){
@@ -136,7 +145,7 @@ public class BuildingTypeParser extends AbstractAnalysis{
 				for(Point cell : kde.getGrid().getGrid().values()){
 					double weight = kde.getWeight(cell);
 					if(weight > 0.0){
-						bw.write(String.format("%s,%s,%s,%s,%.4f\n", mainType, activityType, cell.getX(), cell.getY(), weight));
+						bw.write(String.format("%s,%s,%.4f,%.4f,%.4f\n", mainType, activityType, cell.getX(), cell.getY(), weight));
 					}
 				}
 			}

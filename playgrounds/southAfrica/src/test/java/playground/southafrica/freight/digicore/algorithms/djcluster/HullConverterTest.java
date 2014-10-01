@@ -20,6 +20,8 @@
 package playground.southafrica.freight.digicore.algorithms.djcluster;
 
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.matsim.testcases.MatsimTestCase;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -30,7 +32,7 @@ import com.vividsolutions.jts.geom.Polygon;
 
 import playground.southafrica.freight.digicore.algorithms.djcluster.HullConverter;
 
-public class HullConverterTest extends MatsimTestCase {
+public class HullConverterTest {
 
 	public void testConvert() {
 
@@ -46,12 +48,13 @@ public class HullConverterTest extends MatsimTestCase {
 	 *   (0,0)-------(5,0)
 	 *     1           2
 	 */
+	@Test
 	public void testConvertString(){
 		/* Must pass a Geometry. */
 		Object o = new Integer(0);
 		HullConverter hc = new HullConverter();
 		String s = hc.convertToString(o);
-		assertTrue("Should receive empty string", s.isEmpty());
+		Assert.assertTrue("Should receive empty string", s.isEmpty());
 		
 		/* Check String. */
 		GeometryFactory gf = new GeometryFactory();
@@ -66,7 +69,7 @@ public class HullConverterTest extends MatsimTestCase {
 		Point point = gf.createPoint(ca[0]);
 		s = hc.convertToString(point);
 		String pointString = "(0.0;0.0)";
-		assertTrue("Wrong string for point.", pointString.equalsIgnoreCase(s));
+		Assert.assertTrue("Wrong string for point.", pointString.equalsIgnoreCase(s));
 		
 		/* Line */
 		Coordinate[] ca2 = new Coordinate[2];
@@ -75,13 +78,13 @@ public class HullConverterTest extends MatsimTestCase {
 		LineString line = gf.createLineString(ca2);
 		s = hc.convertToString(line);
 		String lineString = "(0.0;0.0),(5.0;0.0)";
-		assertTrue("Wrong string for line.", lineString.equalsIgnoreCase(s));
+		Assert.assertTrue("Wrong string for line.", lineString.equalsIgnoreCase(s));
 		
 		/* Polygon */
 		Polygon polygon = gf.createPolygon(ca);
 		s = hc.convertToString(polygon);
 		String polygonString = "(0.0;0.0),(5.0;0.0),(5.0;5.0),(0.0;5.0),(0.0;0.0)"; 
-		assertTrue("Wrong string for polygon.", polygonString.equalsIgnoreCase(s));
+		Assert.assertTrue("Wrong string for polygon.", polygonString.equalsIgnoreCase(s));
 	}
 	
 	
@@ -93,6 +96,7 @@ public class HullConverterTest extends MatsimTestCase {
 	 *     |           |
 	 *   (0,0)-------(5,0)
 	 */
+	@Test
 	public void testConstructor(){
 		HullConverter hc = new HullConverter();
 		GeometryFactory gf = new GeometryFactory();
@@ -105,18 +109,18 @@ public class HullConverterTest extends MatsimTestCase {
 		
 		/* Point */
 		Point point = gf.createPoint(ca[0]);
-		assertEquals("Wrong point.", point, hc.convert(hc.convertToString(point)));
+		Assert.assertEquals("Wrong point.", point, hc.convert(hc.convertToString(point)));
 		
 		/* Line */
 		Coordinate[] ca2 = new Coordinate[2];
 		ca2[0] = ca[0];
 		ca2[1] = ca[1];
 		LineString line = gf.createLineString(ca2);
-		assertEquals("Wrong line.", line, hc.convert(hc.convertToString(line)));
+		Assert.assertEquals("Wrong line.", line, hc.convert(hc.convertToString(line)));
 		
 		/* Polygon */
 		Polygon polygon = gf.createPolygon(ca);
-		assertEquals("Wrong polygon.", polygon, hc.convert(hc.convertToString(polygon)));
+		Assert.assertEquals("Wrong polygon.", polygon, hc.convert(hc.convertToString(polygon)));
 	}
 	
 

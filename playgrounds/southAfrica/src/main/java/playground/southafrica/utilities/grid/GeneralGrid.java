@@ -27,13 +27,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.jzy3d.analysis.AbstractAnalysis;
-import org.jzy3d.analysis.AnalysisLauncher;
-import org.jzy3d.chart.factories.AWTChartComponentFactory;
-import org.jzy3d.colors.Color;
-import org.jzy3d.maths.Coord3d;
-import org.jzy3d.plot3d.rendering.canvas.Quality;
-import org.jzy3d.plot3d.rendering.view.modes.ViewPositionMode;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
@@ -156,7 +149,13 @@ public class GeneralGrid{
 
 				Point p = gf.createPoint(new Coordinate(thisX, thisY));
 				Geometry cell = this.getIndividualGeometry(p);
+				
+				/* This is the new implementation. The original implementation
+				 * only checked if the centroid was within the study area. */
 				if(g.intersects(cell)){
+
+				/*FIXME Remove after reproducing maps for Joubert & Meintjes paper. */
+//				if(g.contains(p)){
 					qt.put(thisX, thisY, p);
 					geometryCache.put(p, cell);					
 				}
@@ -208,7 +207,7 @@ public class GeneralGrid{
 	 * 		  on the coordinate points of the centroids.  
 	 */
 	public void writeGrid(String folder, String originalCRS){
-		String filename = folder + (folder.endsWith("/") ? "" : "/") + this.type + ".csv";
+		String filename = String.format("%s%s%s_%.0f.csv", folder, (folder.endsWith("/") ? "" : "/"), this.type, this.width, ".csv");
 		LOG.info("Writing grid to file: " + filename);
 
 		CoordinateTransformation ct = null;
@@ -222,7 +221,7 @@ public class GeneralGrid{
 		int count = 0;
 
 		try{
-			bw.write("From,To,Long,Lat,X,Y,Width");
+			bw.write("Long,Lat,X,Y,Width");
 			bw.newLine();
 			Collection<Point> list = qt.get(qt.getMinEasting(), qt.getMinNorthing(), qt.getMaxEasting(), qt.getMaxNorthing(), new ArrayList<Point>());
 			for(Point p : list){

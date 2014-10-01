@@ -26,74 +26,81 @@ import java.io.IOException;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.matsim.core.basic.v01.IdImpl;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 import playground.southafrica.freight.digicore.algorithms.complexNetwork.DigicoreNetworkWriter;
 import playground.southafrica.freight.digicore.containers.DigicoreActivity;
 import playground.southafrica.freight.digicore.containers.DigicoreNetwork;
 
-public class DigicoreNetworkWriterTest extends MatsimTestCase {
+public class DigicoreNetworkWriterTest {
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+	@Test
 	public void testWriteNetwork() {
 		DigicoreNetwork dn = buildSmallNetwork();
 		DigicoreNetworkWriter dnw = new DigicoreNetworkWriter(dn);
 		
 		/* Check that writing and overwriting of output is correct. */
 		try {
-			dnw.writeNetwork(getOutputDirectory() + "network.txt.gz");
+			dnw.writeNetwork(utils.getOutputDirectory() + "network.txt.gz");
 		} catch (IOException e) {
-			fail("Should be able to write the first file without IOException.");
+			Assert.fail("Should be able to write the first file without IOException.");
 		}
 		try {
-			dnw.writeNetwork(getOutputDirectory() + "network.txt.gz");
-			fail("Should not be able to overwrite the file.");
+			dnw.writeNetwork(utils.getOutputDirectory() + "network.txt.gz");
+			Assert.fail("Should not be able to overwrite the file.");
 		} catch (IOException e) {
 			/* Pass. */
 		}
 		try {
-			dnw.writeNetwork(getOutputDirectory() + "network.txt.gz", false);
-			fail("Should not be able to overwrite the file.");
+			dnw.writeNetwork(utils.getOutputDirectory() + "network.txt.gz", false);
+			Assert.fail("Should not be able to overwrite the file.");
 		} catch (IOException e) {
 			/* Pass. */
 		}
 		try {
-			dnw.writeNetwork(getOutputDirectory() + "network.txt.gz", true);
+			dnw.writeNetwork(utils.getOutputDirectory() + "network.txt.gz", true);
 		} catch (IOException e) {
-			fail("Should overwrite the file without IOException.");
+			Assert.fail("Should overwrite the file without IOException.");
 		}
 		
 		/* Now check the content of the file. */
-		BufferedReader br = IOUtils.getBufferedReader(getOutputDirectory() + "network.txt.gz");
+		BufferedReader br = IOUtils.getBufferedReader(utils.getOutputDirectory() + "network.txt.gz");
 		try {
 			String line = br.readLine();
-			assertTrue("Wrong line.", line.equalsIgnoreCase("NODES"));
+			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("NODES"));
 			line = br.readLine();
-			assertTrue("Wrong line.", line.equalsIgnoreCase("NodeId,Long,Lat"));
+			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("NodeId,Long,Lat"));
 			line = br.readLine();
-			assertTrue("Wrong line.", line.equalsIgnoreCase("3,1.0000,1.0000"));
+			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("3,1.0000,1.0000"));
 			line = br.readLine();
-			assertTrue("Wrong line.", line.equalsIgnoreCase("2,0.0000,1.0000"));
+			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("2,0.0000,1.0000"));
 			line = br.readLine();
-			assertTrue("Wrong line.", line.equalsIgnoreCase("1,0.0000,0.0000"));
+			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("1,0.0000,0.0000"));
 			line = br.readLine();
-			assertTrue("Wrong line.", line.equalsIgnoreCase("4,1.0000,0.0000"));
+			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("4,1.0000,0.0000"));
 			line = br.readLine();
-			assertTrue("Wrong line.", line.equalsIgnoreCase("ARCS"));
+			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("ARCS"));
 			line = br.readLine();
-			assertTrue("Wrong line.", line.equalsIgnoreCase("From_Id,To_Id,From_Type,To_Type,Weight"));
+			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("From_Id,To_Id,From_Type,To_Type,Weight"));
 			line = br.readLine();
-			assertTrue("Wrong line.", line.equalsIgnoreCase("1,2,test,test,1"));
+			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("1,2,test,test,1"));
 			line = br.readLine();
-			assertTrue("Wrong line.", line.equalsIgnoreCase("3,1,test,test,1"));
+			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("3,1,test,test,1"));
 			line = br.readLine();
-			assertTrue("Wrong line.", line.equalsIgnoreCase("1,3,test,test,2"));
+			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("1,3,test,test,2"));
 			line = br.readLine();
-			assertTrue("Wrong line.", line.equalsIgnoreCase("4,1,test,test,3"));
+			Assert.assertTrue("Wrong line.", line.equalsIgnoreCase("4,1,test,test,3"));
 		} catch (IOException e) {
-			fail("Should not fail reading the file.");
+			Assert.fail("Should not fail reading the file.");
 		}
 	}
 
@@ -110,22 +117,25 @@ public class DigicoreNetworkWriterTest extends MatsimTestCase {
 	 *  |/<-------
 	 *  1 <--- w:3 ---- 4
 	 */
+	@Test
+	@Ignore
 	public void testWriteGraphML(){
 		DigicoreNetworkWriter dnw = new DigicoreNetworkWriter(buildSmallNetwork());
-		String fGraphML = getOutputDirectory() + "graphML.graphML";
+		String fGraphML = utils.getOutputDirectory() + "graphML.graphML";
 //		dnw.writeGraphML(fGraphML, "test", "today");
 	}
 	
 	/**
 	 * Just test if no exceptions are thrown when writing to file.
 	 */
+	@Test
 	public void testWriteGraphOrderToFile(){
 		
 		DigicoreNetworkWriter dnw = new DigicoreNetworkWriter(buildSmallNetwork());
 		try {
-			dnw.writeGraphOrderToFile(getOutputDirectory() + "testOrder.csv");
+			dnw.writeGraphOrderToFile(utils.getOutputDirectory() + "testOrder.csv");
 		} catch (IOException e1) {
-			fail("Should not throw an exception.");
+			Assert.fail("Should not throw an exception.");
 		}
 	}
 	
@@ -148,19 +158,19 @@ public class DigicoreNetworkWriterTest extends MatsimTestCase {
 
 		DigicoreActivity da1 = new DigicoreActivity("test", TimeZone.getTimeZone("GMT+2"), new Locale("en"));		
 		da1.setCoord(new CoordImpl(0.0, 0.0));						
-		da1.setFacilityId(new IdImpl(1));	
+		da1.setFacilityId(Id.create(1, ActivityFacility.class));	
 		
 		DigicoreActivity da2 = new DigicoreActivity("test", TimeZone.getTimeZone("GMT+2"), new Locale("en"));
 		da2.setCoord(new CoordImpl(0.0, 1.0));
-		da2.setFacilityId(new IdImpl(2));
+		da2.setFacilityId(Id.create(2, ActivityFacility.class));
 		
 		DigicoreActivity da3 = new DigicoreActivity("test", TimeZone.getTimeZone("GMT+2"), new Locale("en"));
 		da3.setCoord(new CoordImpl(1.0, 1.0));
-		da3.setFacilityId(new IdImpl(3));
+		da3.setFacilityId(Id.create(3, ActivityFacility.class));
 		
 		DigicoreActivity da4 = new DigicoreActivity("test", TimeZone.getTimeZone("GMT+2"), new Locale("en"));
 		da4.setCoord(new CoordImpl(1.0, 0.0));
-		da4.setFacilityId(new IdImpl(4));
+		da4.setFacilityId(Id.create(4, ActivityFacility.class));
 
 		dn.addArc(da1, da2);
 		dn.addArc(da1, da3);

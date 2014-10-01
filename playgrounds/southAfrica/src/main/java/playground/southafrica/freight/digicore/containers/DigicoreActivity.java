@@ -6,7 +6,9 @@ import java.util.TimeZone;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -15,8 +17,8 @@ import com.vividsolutions.jts.geom.Point;
 
 public class DigicoreActivity implements Activity {
 		
-	private Id facilityId;
-	private Id linkId;
+	private Id<ActivityFacility> facilityId;
+	private Id<Link> linkId;
 	private String type;
 	private Coord coord;
 	private GregorianCalendar startTime;
@@ -97,20 +99,20 @@ public class DigicoreActivity implements Activity {
 
 
 	@Override
-	public Id getLinkId() {
+	public Id<Link> getLinkId() {
 		return this.linkId;
 	}
 	
-	public void setLinkId(Id linkId){
+	public void setLinkId(Id<Link> linkId){
 		this.linkId = linkId;
 	}
 
 	@Override
-	public Id getFacilityId() {
+	public Id<ActivityFacility> getFacilityId() {
 		return this.facilityId;
 	}
 	
-	public void setFacilityId(Id facilityId){
+	public void setFacilityId(Id<ActivityFacility> facilityId){
 		this.facilityId = facilityId;
 	}
 

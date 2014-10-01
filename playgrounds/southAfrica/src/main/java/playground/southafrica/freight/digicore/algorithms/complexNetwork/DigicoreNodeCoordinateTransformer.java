@@ -25,17 +25,18 @@ import java.util.Map;
 import org.apache.commons.collections15.Transformer;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
-public class DigicoreNodeCoordinateTransformer implements Transformer<Id, String> {
-	private Map<Id, Coord> map;
+public class DigicoreNodeCoordinateTransformer implements Transformer<Id<ActivityFacility>, String> {
+	private Map<Id<ActivityFacility>, Coord> map;
 	
-	public DigicoreNodeCoordinateTransformer(Map<Id, Coord> coordinateMap) {
+	public DigicoreNodeCoordinateTransformer(Map<Id<ActivityFacility>, Coord> coordinateMap) {
 		this.map = coordinateMap;
 	}
 
 	@Override
-	public String transform(Id id) {
-		return String.format("[%.2f ; %.2f]", map.get(id).getX(), map.get(id).getY());
+	public String transform(Id<ActivityFacility> facilityId) {
+		return String.format("[%.2f ; %.2f]", map.get(facilityId).getX(), map.get(facilityId).getY());
 	}
 
 

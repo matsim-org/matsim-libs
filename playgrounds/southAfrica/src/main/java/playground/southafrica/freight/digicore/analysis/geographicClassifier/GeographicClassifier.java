@@ -18,6 +18,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.vehicles.Vehicle;
 
 import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
 import playground.southafrica.utilities.FileUtils;
@@ -47,7 +48,7 @@ public class GeographicClassifier {
 	private final static Logger LOG = Logger.getLogger(GeographicClassifier.class);
 	private final File folder;
 	private final MultiPolygon area;
-	private Map<String,List<Id>> lists;
+	private Map<String,List<Id<Vehicle>>> lists;
 	
 	/**
 	 * 
@@ -111,10 +112,10 @@ public class GeographicClassifier {
 		this.area = list.get(0);
 		
 		/* Set up the result map. */
-		lists = new HashMap<String, List<Id>>();
-		lists.put("intra", new ArrayList<Id>());
-		lists.put("inter", new ArrayList<Id>());
-		lists.put("extra", new ArrayList<Id>());
+		lists = new HashMap<String, List<Id<Vehicle>>>();
+		lists.put("intra", new ArrayList<Id<Vehicle>>());
+		lists.put("inter", new ArrayList<Id<Vehicle>>());
+		lists.put("extra", new ArrayList<Id<Vehicle>>());
 	}
 	
 		
@@ -148,13 +149,13 @@ public class GeographicClassifier {
 		
 		/* Set up multi-threaded executor. */
 		ExecutorService threadExecutor = Executors.newFixedThreadPool(nThreads);
-		List<Future<Tuple<Id, Integer>>> listOfJobs = new ArrayList<Future<Tuple<Id, Integer>>>();
+		List<Future<Tuple<Id<Vehicle>, Integer>>> listOfJobs = new ArrayList<Future<Tuple<Id<Vehicle>, Integer>>>();
 		Counter counter = new Counter("   vehicles # ");		
 		
 		/* Execute the multi-threaded classification. */
 		for(File file : files){
-			Callable<Tuple<Id, Integer>> job = new GeographicClassifierCallable(file, area, threshold, counter);
-			Future<Tuple<Id, Integer>> result = threadExecutor.submit(job);
+			Callable<Tuple<Id<Vehicle>, Integer>> job = new GeographicClassifierCallable(file, area, threshold, counter);
+			Future<Tuple<Id<Vehicle>, Integer>> result = threadExecutor.submit(job);
 			listOfJobs.add(result);
 		}
 		
@@ -164,9 +165,9 @@ public class GeographicClassifier {
 		counter.printCounter();
 		
 		/* Consolidate the output. */
-		for(Future<Tuple<Id, Integer>> job : listOfJobs){
+		for(Future<Tuple<Id<Vehicle>, Integer>> job : listOfJobs){
 			/* Get the job's result. */
-			Tuple<Id, Integer> tuple = null;
+			Tuple<Id<Vehicle>, Integer> tuple = null;
 			try {
 				tuple = job.get();
 			} catch (InterruptedException e) {
@@ -217,7 +218,7 @@ public class GeographicClassifier {
 			String filename = f.getAbsolutePath() + "/" + s + "_" + descriptor + ".txt";
 			BufferedWriter bw = IOUtils.getBufferedWriter(filename);
 			try{
-				for(Id id : this.lists.get(s)){
+				for(Id<Vehicle> id : this.lists.get(s)){
 					bw.write(id.toString());
 					bw.newLine();
 				}
@@ -237,7 +238,7 @@ public class GeographicClassifier {
 	}
 	
 	
-	public Map<String, List<Id>> getLists(){
+	public Map<String, List<Id<Vehicle>>> getLists(){
 		return this.lists;
 	}
 	

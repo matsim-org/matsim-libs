@@ -30,22 +30,21 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class MyZone extends MultiPolygon implements Identifiable{
-	private GeometryFactory gf;
+public class MyZone extends MultiPolygon implements Identifiable<MyZone>{
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private final Id id;
+	private final Id<MyZone> id;
 
-	public MyZone(Polygon[] polygons, GeometryFactory factory, Id id) {
+	public MyZone(Polygon[] polygons, GeometryFactory factory, Id<MyZone> id) {
 		super(polygons, factory);
 		this.id = id;
 	}
 	
 	@Override
-	public Id getId() {
+	public Id<MyZone> getId() {
 		return this.id;
 	}
 	

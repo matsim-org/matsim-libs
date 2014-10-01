@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DigicoreEdgeWeightTransformer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,     *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,27 +17,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.southafrica.freight.digicore.algorithms.complexNetwork;
-
-import java.util.Map;
-
-import org.apache.commons.collections15.Transformer;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
-
-import edu.uci.ics.jung.graph.util.Pair;
-
-public class DigicoreEdgeWeightTransformer implements Transformer<Pair<Id<ActivityFacility>>, String> {
-	private final Map<Pair<Id<ActivityFacility>>, Integer> map;
-	
-	public DigicoreEdgeWeightTransformer(Map<Pair<Id<ActivityFacility>>, Integer> map) {
-		this.map = map;
-	}
-
-	@Override
-	public String transform(Pair<Id<ActivityFacility>> pair) {
-		return map.get(pair).toString();
-	}
-
-}
-
+/**
+ * Code to do the analysis and visualisation of the kernel density maps for
+ * Nelson Mandela Bay's commercial vehicle activities as needed for the paper
+ * on repeatability and reproducibility of GPS record analysis: Joubert & 
+ * Meintjes. 
+ * 
+ * @author jwjoubert
+ */
+package playground.southafrica.projects.reproducibility;

@@ -20,10 +20,17 @@
 
 package playground.southafrica.freight.digicore.containers;
 
-import org.matsim.testcases.MatsimTestCase;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.testcases.MatsimTestUtils;
 
-public class DigicoreVehicleTest extends MatsimTestCase{
-	
+
+public class DigicoreVehicleTest{
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+
+	@Test
+	@Ignore
 	public void testConstructor(){
 		//TODO Finish
 	}

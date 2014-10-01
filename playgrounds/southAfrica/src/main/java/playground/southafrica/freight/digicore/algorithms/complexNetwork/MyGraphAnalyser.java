@@ -32,7 +32,7 @@ import org.apache.commons.collections15.Transformer;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -97,7 +97,7 @@ public class MyGraphAnalyser {
 		LOG.info("========================   DONE   ==========================");
 	}
 	
-	static class MyTransformer implements Transformer<Pair<Id>, Number>{
+	static class MyTransformer implements Transformer<Pair<Id<ActivityFacility>>, Number>{
 		private final DigicoreNetwork network;
 		
 		public MyTransformer(DigicoreNetwork network) {
@@ -105,7 +105,7 @@ public class MyGraphAnalyser {
 		}
 		
 		@Override
-		public Number transform(Pair<Id> edge) {
+		public Number transform(Pair<Id<ActivityFacility>> edge) {
 			return this.network.getWeights().get(edge);
 		}
 	}
@@ -114,9 +114,9 @@ public class MyGraphAnalyser {
 	private static void calculateBetweennessAndEigenvalueCentrality(String[] args, DigicoreNetwork network){
 		/* Create a map with edge weights. First, consolidate all activity types
 		 * so that only a single edge weight exists. */
-		Map<Pair<Id>,Number> weightMap = new HashMap<Pair<Id>, Number>();
+		Map<Pair<Id<ActivityFacility>>,Number> weightMap = new HashMap<Pair<Id<ActivityFacility>>, Number>();
 		
-		for(Tuple<Pair<Id>, Pair<String> > tuple : network.getWeights().keySet()){
+		for(Tuple<Pair<Id<ActivityFacility>>, Pair<String> > tuple : network.getWeights().keySet()){
 			if(!weightMap.containsKey(tuple.getFirst())){
 				weightMap.put(tuple.getFirst(), network.getWeights().get(tuple));
 			} else{
@@ -126,14 +126,16 @@ public class MyGraphAnalyser {
 		}
 		
 		LOG.info("Evaluating the betweenness centrality...");
-		BetweennessCentrality<Id, Pair<Id>> bc = new BetweennessCentrality<Id, Pair<Id>>(network);
+		BetweennessCentrality<Id<ActivityFacility>, Pair<Id<ActivityFacility>>> bc = 
+				new BetweennessCentrality<Id<ActivityFacility>, Pair<Id<ActivityFacility>>>(network);
 		bc.setEdgeWeights(weightMap);
 		bc.setRemoveRankScoresOnFinalize(false);
 		bc.evaluate();
 		
 		LOG.info("Evaluating the Eigenvector centrality...");
-		EigenvectorCentrality<Id, Pair<Id>> ec = new EigenvectorCentrality<Id, Pair<Id>>(network);
-		Transformer<Pair<Id>, Number> t = new MyTransformer(network);
+		EigenvectorCentrality<Id<ActivityFacility>, Pair<Id<ActivityFacility>>> ec = 
+				new EigenvectorCentrality<Id<ActivityFacility>, Pair<Id<ActivityFacility>>>(network);
+		Transformer<Pair<Id<ActivityFacility>>, Number> t = new MyTransformer(network);
 		ec.setEdgeWeights(t);
 		LOG.info("   tolerance: " + ec.getTolerance());
 		LOG.info("   max iterations: " + ec.getMaxIterations());
@@ -151,7 +153,7 @@ public class MyGraphAnalyser {
 		} catch(IllegalArgumentException e){
 			LOG.error("Cannot complete Eigenvector centrality... adding artificial edges.");
 			DigicoreNetwork network2 = addArtificialEdges(network);
-			ec = new EigenvectorCentrality<Id, Pair<Id>>(network2);
+			ec = new EigenvectorCentrality<Id<ActivityFacility>, Pair<Id<ActivityFacility>>>(network2);
 			ec.setEdgeWeights(t);			
 			ec.setMaxIterations(10000);
 			ec.setTolerance(1e-8 );
@@ -168,7 +170,7 @@ public class MyGraphAnalyser {
 			try {
 				bw.write("NodeId,Long,Lat,BC,EC");
 				bw.newLine();
-				for(Id node : network.getVertices()){
+				for(Id<ActivityFacility> node : network.getVertices()){
 					bw.write(node.toString());
 					bw.write(",");
 					Coord c = network.getCoordinates().get(node);
@@ -191,20 +193,21 @@ public class MyGraphAnalyser {
 	}
 
 	
+	@SuppressWarnings("unchecked")
 	private static DigicoreNetwork addArtificialEdges(DigicoreNetwork network){
 		/* Duplicate the current network. */
 		LOG.info("   Duplicating the network...");
 		int sourceCount = 0;
 		int sinkCount = 0;
 		DigicoreNetwork newNetwork = new DigicoreNetwork();
-		for(Tuple<Pair<Id>, Pair<String> > tuple : network.getWeights().keySet()){
-			Pair<Id> edge = tuple.getFirst();
-			Id first = edge.getFirst();
+		for(Tuple<Pair<Id<ActivityFacility>>, Pair<String> > tuple : network.getWeights().keySet()){
+			Pair<Id<ActivityFacility>> edge = tuple.getFirst();
+			Id<ActivityFacility> first = edge.getFirst();
 			if(!newNetwork.containsVertex(first)){
 				newNetwork.addVertex(first);
 				newNetwork.getCoordinates().put(first, network.getCoordinates().get(first));
 			}
-			Id second = edge.getSecond();
+			Id<ActivityFacility> second = edge.getSecond();
 			if(!newNetwork.containsVertex(second)){
 				newNetwork.addVertex(second);
 				newNetwork.getCoordinates().put(second, network.getCoordinates().get(second));
@@ -215,7 +218,7 @@ public class MyGraphAnalyser {
 		
 		/* Evaluate each node as being either a sink or source. */
 		LOG.info("   Looking for sources and sinks...");
-		for(Id node : network.getVertices()){
+		for(Id<ActivityFacility> node : network.getVertices()){
 			/* Add the node to the network. */
 			boolean isSource = network.getPredecessorCount(node) == 0 ? true : false;
 			boolean isSink = network.getSuccessorCount(node) == 0 ? true : false;
@@ -224,31 +227,32 @@ public class MyGraphAnalyser {
 				LOG.warn("   Node " + node.toString() + " is a source.");
 				sourceCount++;
 				Object o = network.getVertices().toArray()[(int) Math.round(Math.random()*network.getVertexCount())];
-				Id someOrigin = null;
-				if(o instanceof Id){
-					someOrigin = (Id) o;
+				Id<ActivityFacility> someOrigin = null;
+				if(o instanceof Id<?>){
+					Id<?> someId = (Id<?>)o;
+					someOrigin = (Id<ActivityFacility>) someId;
 				} else{
 					throw new RuntimeException("Cannot sample an origin node for source: sampled object is of type " + o.getClass().toString());
 				}
 				/* Add new edge with weight 1. */
-				Pair<Id> newEdge = new Pair<Id>(someOrigin, node);
+				Pair<Id<ActivityFacility>> newEdge = new Pair<Id<ActivityFacility>>(someOrigin, node);
 				newNetwork.addEdge(newEdge, someOrigin, node);
-				newNetwork.getWeights().put(new Tuple<Pair<Id>, Pair<String>>(newEdge, new Pair<String>("dummy","dummy")), 1);
+				newNetwork.getWeights().put(new Tuple<Pair<Id<ActivityFacility>>, Pair<String>>(newEdge, new Pair<String>("dummy","dummy")), 1);
 			}
 			if(isSink){
 				LOG.warn("   Node " + node.toString() + " is a sink.");
 				sinkCount++;
 				Object o = network.getVertices().toArray()[(int) Math.round(Math.random()*network.getVertexCount())];
-				Id someDestination = null;
+				Id<ActivityFacility> someDestination = null;
 				if(o instanceof Id){
-					someDestination = (Id) o;
+					someDestination = (Id<ActivityFacility>) o;
 				} else{
 					throw new RuntimeException("Cannot sample a destination node for sink: sampled object is of type " + o.getClass().toString());
 				}
 				/* Add new edge with weight 1. */
-				Pair<Id> newEdge = new Pair<Id>(node, someDestination);
+				Pair<Id<ActivityFacility>> newEdge = new Pair<Id<ActivityFacility>>(node, someDestination);
 				newNetwork.addEdge(newEdge, node, someDestination);
-				newNetwork.getWeights().put(new Tuple<Pair<Id>, Pair<String>>(newEdge, new Pair<String>("dummy","dummy")), 1);
+				newNetwork.getWeights().put(new Tuple<Pair<Id<ActivityFacility>>, Pair<String>>(newEdge, new Pair<String>("dummy","dummy")), 1);
 			}
 		}
 		LOG.info("   Edges added to eliminate sources: " + sourceCount);
@@ -263,7 +267,7 @@ public class MyGraphAnalyser {
 		try{
 			bw.write("From,To,Weight,ox,oy,dx,dy");
 			bw.newLine();
-			for(Pair<Id> arc : network.getEdges()){
+			for(Pair<Id<ActivityFacility>> arc : network.getEdges()){
 				bw.write(arc.getFirst().toString());
 				bw.write(",");
 				bw.write(arc.getSecond().toString());
@@ -290,21 +294,19 @@ public class MyGraphAnalyser {
 				throw new RuntimeException("Could not close BufferedWriter " + args[2]);
 			}
 		}
-		
-		
 	}
 
 
 	private static void calculateDegreeDistribution(String[] args, DigicoreNetwork network, boolean weighted) {
-		Map<Id, Integer> inDegreeMap = new HashMap<Id, Integer>(network.getVertexCount());
-		Map<Id, Integer> outDegreeMap = new HashMap<Id, Integer>(network.getVertexCount());
-		Map<Id, Integer> degreeMap = new HashMap<Id, Integer>(network.getVertexCount());
+		Map<String, Integer> inDegreeMap = new HashMap<String, Integer>(network.getVertexCount());
+		Map<String, Integer> outDegreeMap = new HashMap<String, Integer>(network.getVertexCount());
+		Map<String, Integer> degreeMap = new HashMap<String, Integer>(network.getVertexCount());
 		
-		for(Id node : network.getVertices()){
+		for(Id<ActivityFacility> node : network.getVertices()){
 			/* First for in-degree. */
 			int inDegree = getInDegree(network, node, weighted);
 			if(inDegree > 0){
-				Id inDegreeId = new IdImpl(inDegree);
+				String inDegreeId = String.valueOf(inDegree);
 				if(!inDegreeMap.containsKey(inDegreeId)){
 					inDegreeMap.put(inDegreeId, 1);
 				} else{
@@ -318,7 +320,7 @@ public class MyGraphAnalyser {
 			/* Next for out-degree. */
 			int outDegree = getOutDegree(network, node, weighted);
 			if(outDegree > 0){
-				Id outDegreeId = new IdImpl(outDegree);
+				String outDegreeId =String.valueOf(outDegree);
 				if(!outDegreeMap.containsKey(outDegreeId)){
 					outDegreeMap.put(outDegreeId, 1);
 				} else{
@@ -332,7 +334,7 @@ public class MyGraphAnalyser {
 			/* Last for total degree. */
 			int degree = inDegree + outDegree;
 			if(degree > 0){
-				Id degreeId = new IdImpl(degree);
+				String degreeId = String.valueOf(degree);
 				if(!degreeMap.containsKey(degreeId)){
 					degreeMap.put(degreeId, 1);
 				} else{
@@ -352,15 +354,15 @@ public class MyGraphAnalyser {
 
 
 	private static void calculateMolloyReedQ(String[] args, DigicoreNetwork network, boolean weighted){
-		Map<Id, Integer> inDegreeMap = new HashMap<Id, Integer>(network.getVertexCount());
-		Map<Id, Integer> outDegreeMap = new HashMap<Id, Integer>(network.getVertexCount());
-		Map<Id, Integer> degreeMap = new HashMap<Id, Integer>(network.getVertexCount());
+		Map<String, Integer> inDegreeMap = new HashMap<String, Integer>(network.getVertexCount());
+		Map<String, Integer> outDegreeMap = new HashMap<String, Integer>(network.getVertexCount());
+		Map<String, Integer> degreeMap = new HashMap<String, Integer>(network.getVertexCount());
 		
-		for(Id node : network.getVertices()){
+		for(Id<ActivityFacility> node : network.getVertices()){
 			/* First for in-degree. */
 			int inDegree = getInDegree(network, node, weighted);
 			if(inDegree > 0){
-				Id inDegreeId = new IdImpl(inDegree);
+				String inDegreeId = String.valueOf(inDegree);
 				if(!inDegreeMap.containsKey(inDegreeId)){
 					inDegreeMap.put(inDegreeId, 1);
 				} else{
@@ -374,7 +376,7 @@ public class MyGraphAnalyser {
 			/* Next for out-degree. */
 			int outDegree = getOutDegree(network, node, weighted);
 			if(outDegree > 0){
-				Id outDegreeId = new IdImpl(outDegree);
+				String outDegreeId = String.valueOf(outDegree);
 				if(!outDegreeMap.containsKey(outDegreeId)){
 					outDegreeMap.put(outDegreeId, 1);
 				} else{
@@ -388,7 +390,7 @@ public class MyGraphAnalyser {
 			/* Last for total degree. */
 			int degree = inDegree + outDegree;
 			if(degree > 0){
-				Id degreeId = new IdImpl(degree);
+				String degreeId = String.valueOf(degree);
 				if(!degreeMap.containsKey(degreeId)){
 					degreeMap.put(degreeId, 1);
 				} else{
@@ -410,7 +412,7 @@ public class MyGraphAnalyser {
 		BufferedWriter bw = IOUtils.getBufferedWriter(args[2]);
 		Counter c = new Counter("   nodes: ");
 		try{
-			for(Id node : network.getVertices()){
+			for(Id<ActivityFacility> node : network.getVertices()){
 				try {
 					bw.write(String.valueOf(getInDegree(network, node, weighted)));
 					bw.newLine();
@@ -430,32 +432,32 @@ public class MyGraphAnalyser {
 	}
 	
 	
-	private static double calculateQ(Map<Id, Integer> map){
+	private static double calculateQ(Map<String, Integer> map){
 		/* Calculate the total number of instances. */
 		int count = 0;
-		for(Id id : map.keySet()){
+		for(String id : map.keySet()){
 			count += map.get(id);
 		}
 		
 		double q = 0;
-		for(Id k : map.keySet()){
+		for(String k : map.keySet()){
 			q += ((double)map.get(k)/count)*Integer.parseInt(k.toString())*(Integer.parseInt(k.toString()) - 2);
 		}
 		return q;
 	}
 	
 	
-	private static void printDegreeDistribution(String filename, Map<Id, Integer> map) {
+	private static void printDegreeDistribution(String filename, Map<String, Integer> map) {
 		/* Add each degree-value to a list for sorting. */
 		List<Integer> c = new ArrayList<Integer>();
-		for(Id id : map.keySet()){
+		for(String id : map.keySet()){
 			c.add(Integer.parseInt(id.toString()));
 		}
 		Collections.sort(c);
 		
 		/* Calculate the total number of instances. */
 		int count = 0;
-		for(Id id : map.keySet()){
+		for(String id : map.keySet()){
 			count += map.get(id);
 		}
 		
@@ -470,10 +472,10 @@ public class MyGraphAnalyser {
 				/* Write the order. */
 				bw.write(String.valueOf(c.get(i)));
 				bw.write(",");
-				int freq = map.get(new IdImpl(c.get(i)));
+				int freq = map.get(String.valueOf(c.get(i)));
 				bw.write(String.valueOf(freq));
 				bw.write(",");
-				double degreeDist = (double)map.get(new IdImpl(c.get(i))) / (double)count;
+				double degreeDist = (double)map.get(String.valueOf(c.get(i))) / (double)count;
 				bw.write(String.valueOf(degreeDist));
 				bw.write(",");
 				sum += degreeDist;
@@ -497,12 +499,12 @@ public class MyGraphAnalyser {
 	}
 	
 	
-	private static int getInDegree(DigicoreNetwork network, Id node, boolean weighted){
+	private static int getInDegree(DigicoreNetwork network, Id<ActivityFacility> node, boolean weighted){
 		if(!weighted){
 			return network.getInEdges(node).size();
 		} else{
 			int inDegree = 0;
-			for(Pair<Id> arc : network.getInEdges(node)){
+			for(Pair<Id<ActivityFacility>> arc : network.getInEdges(node)){
 				inDegree += network.getEdgeWeight(arc.getFirst(), arc.getSecond());
 			}
 			return inDegree;
@@ -510,22 +512,17 @@ public class MyGraphAnalyser {
 	}
 
 	
-	private static int getOutDegree(DigicoreNetwork network, Id node, boolean weighted){
+	private static int getOutDegree(DigicoreNetwork network, Id<ActivityFacility> node, boolean weighted){
 		if(!weighted){
 			return network.getOutEdges(node).size();
 		} else{
 			int outDegree = 0;
-			for(Pair<Id> arc : network.getOutEdges(node)){
+			for(Pair<Id<ActivityFacility>> arc : network.getOutEdges(node)){
 				outDegree += network.getEdgeWeight(arc.getFirst(), arc.getSecond());
 			}
 			return outDegree;
 		}
 	}
 
-	
-	
-	
-
-	
 }
 

@@ -26,8 +26,12 @@ package playground.southafrica.utilities.openstreetmap.shopping;
 
 import java.io.FileNotFoundException;
 
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
@@ -35,53 +39,55 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
-import playground.southafrica.utilities.openstreetmap.shopping.MyShoppingReader;
-
 /**
- * @author johanwjoubert
+ * @author jwjoubert
  *
  */
-public class MyShoppingReaderTest extends MatsimTestCase {
+public class MyShoppingReaderTest {
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	private CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84", "WGS84_SA_Albers");
 
+	@Test
 	public void testConstructor() {
-		String oneMall = getPackageInputDirectory() + "oneMall.osm";
+		String oneMall = utils.getPackageInputDirectory() + "oneMall.osm";
 		MyShoppingReader msr = new MyShoppingReader(oneMall, ct);
-		assertEquals("Wrong number of links.", 231, msr.getQuadTree().size());		
+		Assert.assertEquals("Wrong number of links.", 231, msr.getQuadTree().size());		
 	}
 	
+	@Test
 	public void testParseShopping() {
-		String oneMall = getPackageInputDirectory() + "oneMall.osm";
+		String oneMall = utils.getPackageInputDirectory() + "oneMall.osm";
 		MyShoppingReader msr = new MyShoppingReader(oneMall, ct);
 		
 		try {
 			msr.parseShopping(oneMall);
 		} catch (FileNotFoundException e) {
-			fail("Test file should exist!");
+			Assert.fail("Test file should exist!");
 		}
 		
 		/* Test that the right facility was created. */
-		assertEquals("Wrong number of facilities.", 1, msr.getShops().getFacilities().size());
-		assertNotNull("Could find the right facility Id.", msr.getShops().getFacilities().get(new IdImpl("1713491")));
-		ActivityFacilityImpl afi = (ActivityFacilityImpl) msr.getShops().getFacilities().get(new IdImpl("1713491"));
-		assertEquals("Wrong facility name/description.", "Eco Boulevard", afi.getDesc());
-		assertEquals("Wrong number of activity options.", 4, afi.getActivityOptions().size());
+		Assert.assertEquals("Wrong number of facilities.", 1, msr.getShops().getFacilities().size());
+		Assert.assertNotNull("Could find the right facility Id.", msr.getShops().getFacilities().get(Id.create("1713491", ActivityFacility.class)));
+		ActivityFacilityImpl afi = (ActivityFacilityImpl) msr.getShops().getFacilities().get(Id.create("1713491", ActivityFacility.class));
+		Assert.assertEquals("Wrong facility name/description.", "Eco Boulevard", afi.getDesc());
+		Assert.assertEquals("Wrong number of activity options.", 4, afi.getActivityOptions().size());
 				
 	}
 	
+	@Test
 	public void testWriteReadFacility(){
-		String oneMall = getPackageInputDirectory() + "oneMall.osm";
+		String oneMall = utils.getPackageInputDirectory() + "oneMall.osm";
 		MyShoppingReader msr = new MyShoppingReader(oneMall, ct);
 		
 		/* Parse, and write facilities and its attributes. */
 		try {
 			msr.parseShopping(oneMall);
-			msr.writeFacilities(getOutputDirectory() + "facilities.xml");
-			msr.writeFacilityAttributes(getOutputDirectory() + "facilityAttributes.xml");
+			msr.writeFacilities(utils.getOutputDirectory() + "facilities.xml");
+			msr.writeFacilityAttributes(utils.getOutputDirectory() + "facilityAttributes.xml");
 		} catch (FileNotFoundException e) {
 			/* Already tested. */
 		}
@@ -89,24 +95,21 @@ public class MyShoppingReaderTest extends MatsimTestCase {
 		/* Read facilities and its attributes. */
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		FacilitiesReaderMatsimV1 fr = new FacilitiesReaderMatsimV1(sc);
-		fr.parse(getOutputDirectory() + "facilities.xml");
+		fr.parse(utils.getOutputDirectory() + "facilities.xml");
 		ActivityFacilities afi = sc.getActivityFacilities();
 		
 		ObjectAttributes oa = new ObjectAttributes();
 		ObjectAttributesXmlReader oar = new ObjectAttributesXmlReader(oa);
-		oar.parse(getOutputDirectory() + "facilityAttributes.xml");
+		oar.parse(utils.getOutputDirectory() + "facilityAttributes.xml");
 		
-		assertNotNull("Should find the facility.", afi.getFacilities().get(new IdImpl("1713491")));
-		assertEquals("Wrong number of facilties found.", 1, afi.getFacilities().size());
+		Assert.assertNotNull("Should find the facility.", afi.getFacilities().get(Id.create("1713491", ActivityFacility.class)));
+		Assert.assertEquals("Wrong number of facilties found.", 1, afi.getFacilities().size());
 		
-		ActivityFacilityImpl facility = (ActivityFacilityImpl) afi.getFacilities().get(new IdImpl("1713491"));
-		assertEquals("Wrong facility name.", "Eco Boulevard", facility.getDesc());
-		assertEquals("Wrong number of activity options.", 4, facility.getActivityOptions().size());
-		assertNotNull("Should find lettable area attribute.", oa.getAttribute(facility.getId().toString(), "gla"));
-		assertEquals("Wrong GLA found.", "35000", oa.getAttribute(facility.getId().toString(), "gla"));
-
-
-		
+		ActivityFacilityImpl facility = (ActivityFacilityImpl) afi.getFacilities().get(Id.create("1713491", ActivityFacility.class));
+		Assert.assertEquals("Wrong facility name.", "Eco Boulevard", facility.getDesc());
+		Assert.assertEquals("Wrong number of activity options.", 4, facility.getActivityOptions().size());
+		Assert.assertNotNull("Should find lettable area attribute.", oa.getAttribute(facility.getId().toString(), "gla"));
+		Assert.assertEquals("Wrong GLA found.", "35000", oa.getAttribute(facility.getId().toString(), "gla"));
 	}
 
 }

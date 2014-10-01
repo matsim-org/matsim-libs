@@ -29,8 +29,6 @@ import java.util.List;
 import java.util.Scanner;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 
 /**
  * Class to read vehicle status codes for the <i>Digicore</i> records. 
@@ -38,8 +36,8 @@ import org.matsim.core.basic.v01.IdImpl;
  */
 public class DigicoreStatusReader {
 	private final Logger log = Logger.getLogger(DigicoreStatusReader.class);
-	private List<Id> startSignals;
-	private List<Id> stopSignals;
+	private List<String> startSignals;
+	private List<String> stopSignals;
 	
 	/**
 	 * Instantiates the {@link DigicoreStatusReader}. The user should not get 
@@ -58,8 +56,8 @@ public class DigicoreStatusReader {
 	 * @throws FileNotFoundException
 	 */
 	public DigicoreStatusReader(String filename) throws FileNotFoundException {
-		startSignals = new ArrayList<Id>();
-		stopSignals = new ArrayList<Id>();
+		startSignals = new ArrayList<String>();
+		stopSignals = new ArrayList<String>();
 		this.readSignals(filename);
 	}
 	
@@ -71,7 +69,7 @@ public class DigicoreStatusReader {
 			String[] listStart = input.nextLine().split(",");
 			if(listStart[0].equalsIgnoreCase("start")){
 				for(int i = 1; i < listStart.length; i++){
-					startSignals.add(new IdImpl(listStart[i]));
+					startSignals.add( listStart[i] );
 				}
 				if(startSignals.size()==0){
 					log.warn("No start signals were identified!");
@@ -83,7 +81,7 @@ public class DigicoreStatusReader {
 			String[] listStop = input.nextLine().split(",");
 			if(listStop[0].equalsIgnoreCase("stop")){
 				for(int i = 1; i < listStop.length; i++){
-					stopSignals.add(new IdImpl(listStop[i]));
+					stopSignals.add( listStop[i] );
 				}
 				if(stopSignals.size()==0){
 					log.warn("No stop signals were identified!");
@@ -99,12 +97,12 @@ public class DigicoreStatusReader {
 	}
 
 
-	public List<Id> getStartSignals() {
+	public List<String> getStartSignals() {
 		return startSignals;
 	}
 
 
-	public List<Id> getStopSignals() {
+	public List<String> getStopSignals() {
 		return stopSignals;
 	}
 

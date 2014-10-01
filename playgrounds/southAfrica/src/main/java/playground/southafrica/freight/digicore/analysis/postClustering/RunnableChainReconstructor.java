@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Counter;
@@ -78,7 +79,7 @@ public class RunnableChainReconstructor implements Runnable {
 					boolean found = false;
 					int i = 0;
 					while(!found && i < neighbours.size()){
-						Id thisFacilityId = neighbours.get(i).getId();
+						Id<ActivityFacility> thisFacilityId = neighbours.get(i).getId();
 						Geometry g = null;
 						Object o = this.facilityAttributes.getAttribute(thisFacilityId.toString(), "concaveHull");
 						if(o instanceof Geometry){

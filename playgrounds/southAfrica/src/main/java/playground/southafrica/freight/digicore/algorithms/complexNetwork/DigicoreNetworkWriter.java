@@ -27,14 +27,13 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 
 import playground.southafrica.freight.digicore.containers.DigicoreNetwork;
 import edu.uci.ics.jung.graph.util.Pair;
-import edu.uci.ics.jung.io.graphml.GraphMetadata;
-import edu.uci.ics.jung.io.graphml.GraphMetadata.EdgeDefault;
 
 /**
  * Class to write a {@link DigicoreNetwork} in different formats to file. Current
@@ -101,7 +100,7 @@ public class DigicoreNetworkWriter {
 		bw.newLine();
 		bw.write("NodeId,Long,Lat");
 		bw.newLine();
-		for(Id id : network.getVertices()){
+		for(Id<ActivityFacility> id : network.getVertices()){
 			bw.write(id.toString());
 			bw.write(",");
 			bw.write(String.format("%.4f,%.4f\n", network.getCoordinates().get(id).getX(), network.getCoordinates().get(id).getY()));
@@ -118,7 +117,7 @@ public class DigicoreNetworkWriter {
 		bw.newLine();
 		bw.write("From_Id,To_Id,From_Type,To_Type,Weight");
 		bw.newLine();
-		for(Tuple<Pair<Id>, Pair<String> > tuple : network.getWeights().keySet()){
+		for(Tuple<Pair<Id<ActivityFacility>>, Pair<String> > tuple : network.getWeights().keySet()){
 			bw.write(tuple.getFirst().getFirst().toString());
 			bw.write(",");
 			bw.write(tuple.getFirst().getSecond().toString());
@@ -185,7 +184,7 @@ public class DigicoreNetworkWriter {
 			bw.write("FacilityId,Long,Lat,InOrder,OutOrder,Order");
 			bw.newLine();
 			
-			for(Id id : this.network.getVertices()){
+			for(Id<ActivityFacility> id : this.network.getVertices()){
 				bw.write(id.toString());
 				bw.write(",");
 				Coord c = network.getCoordinates().get(id);
@@ -196,7 +195,7 @@ public class DigicoreNetworkWriter {
 				
 				/* Get the total weighted in-degree. */
 				int in = 0;
-				for(Tuple<Pair<Id>, Pair<String>> tuple : network.getWeights().keySet()){
+				for(Tuple<Pair<Id<ActivityFacility>>, Pair<String>> tuple : network.getWeights().keySet()){
 					if(tuple.getFirst().getSecond() == id){
 						in += network.getWeights().get(tuple);
 					}
@@ -206,7 +205,7 @@ public class DigicoreNetworkWriter {
 				
 				/* Get the total weighted out-degree. */
 				int out = 0;
-				for(Tuple<Pair<Id>, Pair<String>> tuple : network.getWeights().keySet()){
+				for(Tuple<Pair<Id<ActivityFacility>>, Pair<String>> tuple : network.getWeights().keySet()){
 					if(tuple.getFirst().getFirst() == id){
 						out += network.getWeights().get(tuple);
 					}

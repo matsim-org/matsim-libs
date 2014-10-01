@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
@@ -16,15 +15,15 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 
 public class DigicoreVehicle implements Vehicle {
-	private Id id;
-	private VehicleType type = new VehicleTypeImpl(new IdImpl("commercial"));
+	private Id<Vehicle> id;
+	private VehicleType type = new VehicleTypeImpl(Id.create("commercial", VehicleType.class));
 	private List<DigicoreChain> chains = new ArrayList<DigicoreChain>();
 	
-	public DigicoreVehicle(Id id) {
+	public DigicoreVehicle(final Id<Vehicle> id) {
 		this.id = id;
 	}
 
-	public Id getId() {
+	public Id<Vehicle> getId() {
 		return this.id;
 	}
 
@@ -37,7 +36,7 @@ public class DigicoreVehicle implements Vehicle {
 	}
 	
 	public void setType(String type){
-		this.type = new VehicleTypeImpl(new IdImpl(type));
+		this.type = new VehicleTypeImpl(Id.create(type, VehicleType.class));
 	}
 	
 	

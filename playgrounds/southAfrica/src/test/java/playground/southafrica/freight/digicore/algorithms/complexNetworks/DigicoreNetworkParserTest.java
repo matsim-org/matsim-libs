@@ -25,46 +25,50 @@ import java.io.IOException;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 import playground.southafrica.freight.digicore.algorithms.complexNetwork.DigicoreNetworkParser;
 import playground.southafrica.freight.digicore.containers.DigicoreActivity;
 import playground.southafrica.freight.digicore.containers.DigicoreNetwork;
 import edu.uci.ics.jung.graph.util.Pair;
 
-public class DigicoreNetworkParserTest extends MatsimTestCase {
+public class DigicoreNetworkParserTest{
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+	@Test
 	public void testParseNetwork(){
 		DigicoreNetwork dn1 = buildSmallNetwork();
 
 		DigicoreNetworkParser dnp = new DigicoreNetworkParser();
 		DigicoreNetwork dn2 = null;
 		try {
-			dn2 = dnp.parseNetwork(getClassInputDirectory() + "network.txt.gz");
+			dn2 = dnp.parseNetwork(utils.getClassInputDirectory() + "network.txt.gz");
 		} catch (IOException e) {
-			fail("Should not have caught an IOException in reading input file.");
+			Assert.fail("Should not have caught an IOException in reading input file.");
 		}
 		
 		/* Test nodes. */
-		for(Id node : dn1.getVertices()){
-			assertTrue("Couldn't find node " + node.toString() + " in output network.", dn2.containsVertex(node));
+		for(Id<ActivityFacility> node : dn1.getVertices()){
+			Assert.assertTrue("Couldn't find node " + node.toString() + " in output network.", dn2.containsVertex(node));
 		}
-		for(Id node : dn2.getVertices()){
-			assertTrue("Couldn't find node " + node.toString() + " in input network.", dn1.containsVertex(node));
-			assertTrue("Wrong coordinate for node " + node.toString(), dn1.getCoordinates().get(node).equals(dn2.getCoordinates().get(node)));
+		for(Id<ActivityFacility> node : dn2.getVertices()){
+			Assert.assertTrue("Couldn't find node " + node.toString() + " in input network.", dn1.containsVertex(node));
+			Assert.assertTrue("Wrong coordinate for node " + node.toString(), dn1.getCoordinates().get(node).equals(dn2.getCoordinates().get(node)));
 		}
 		
 		/* Test edges. */
-		for(Pair<Id> arc : dn1.getEdges()){
-			assertTrue("Couldn't find arc " + arc.toString() + " in output network.", dn2.containsEdge(arc));
+		for(Pair<Id<ActivityFacility>> arc : dn1.getEdges()){
+			Assert.assertTrue("Couldn't find arc " + arc.toString() + " in output network.", dn2.containsEdge(arc));
 		}
-		for(Pair<Id> arc : dn2.getEdges()){
-			assertTrue("Couldn't find arc " + arc.toString() + " in input network.", dn1.containsEdge(arc));
-			assertEquals("Wrong weight for arc " + arc.toString(), dn1.getMultiplexEdgeWeight(arc.getFirst(), "test", arc.getSecond(), "test"), dn2.getMultiplexEdgeWeight(arc.getFirst(), "test", arc.getSecond(), "test"));
+		for(Pair<Id<ActivityFacility>> arc : dn2.getEdges()){
+			Assert.assertTrue("Couldn't find arc " + arc.toString() + " in input network.", dn1.containsEdge(arc));
+			Assert.assertEquals("Wrong weight for arc " + arc.toString(), dn1.getMultiplexEdgeWeight(arc.getFirst(), "test", arc.getSecond(), "test"), dn2.getMultiplexEdgeWeight(arc.getFirst(), "test", arc.getSecond(), "test"));
 		}		
 	}
 
@@ -85,19 +89,19 @@ public class DigicoreNetworkParserTest extends MatsimTestCase {
 
 		DigicoreActivity da1 = new DigicoreActivity("test", TimeZone.getTimeZone("GMT+2"), new Locale("en"));		
 		da1.setCoord(new CoordImpl(0.0, 0.0));						
-		da1.setFacilityId(new IdImpl(1));	
+		da1.setFacilityId(Id.create(1, ActivityFacility.class));	
 		
 		DigicoreActivity da2 = new DigicoreActivity("test", TimeZone.getTimeZone("GMT+2"), new Locale("en"));
 		da2.setCoord(new CoordImpl(0.0, 1.0));
-		da2.setFacilityId(new IdImpl(2));
+		da2.setFacilityId(Id.create(2, ActivityFacility.class));
 		
 		DigicoreActivity da3 = new DigicoreActivity("test", TimeZone.getTimeZone("GMT+2"), new Locale("en"));
 		da3.setCoord(new CoordImpl(1.0, 1.0));
-		da3.setFacilityId(new IdImpl(3));
+		da3.setFacilityId(Id.create(3, ActivityFacility.class));
 		
 		DigicoreActivity da4 = new DigicoreActivity("test", TimeZone.getTimeZone("GMT+2"), new Locale("en"));
 		da4.setCoord(new CoordImpl(1.0, 0.0));
-		da4.setFacilityId(new IdImpl(4));
+		da4.setFacilityId(Id.create(4, ActivityFacility.class));
 
 		dn.addArc(da1, da2);
 		dn.addArc(da1, da3);

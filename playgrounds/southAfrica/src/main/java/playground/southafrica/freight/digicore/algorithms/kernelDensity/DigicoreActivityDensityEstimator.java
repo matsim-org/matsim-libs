@@ -39,7 +39,6 @@ import org.matsim.core.utils.misc.Counter;
 
 import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
 import playground.southafrica.freight.digicore.io.DigicoreVehicleReader_v1;
-import playground.southafrica.freight.digicore.utils.DigicoreUtils;
 import playground.southafrica.utilities.FileUtils;
 import playground.southafrica.utilities.Header;
 import playground.southafrica.utilities.containers.MyZone;

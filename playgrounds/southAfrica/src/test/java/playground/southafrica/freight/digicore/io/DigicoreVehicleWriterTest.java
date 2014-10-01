@@ -24,26 +24,28 @@ package playground.southafrica.freight.digicore.io;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.matsim.core.basic.v01.IdImpl;
+import org.junit.Rule;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.Vehicle;
 
 import playground.southafrica.freight.digicore.containers.DigicoreActivity;
 import playground.southafrica.freight.digicore.containers.DigicoreChain;
 import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
-import playground.southafrica.freight.digicore.io.DigicoreVehicleWriter;
 
-public class DigicoreVehicleWriterTest extends MatsimTestCase {
-	
+public class DigicoreVehicleWriterTest{
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+
 	public void testWriteVehicle(){
 		DigicoreVehicle v = createVehicle();
 		DigicoreVehicleWriter dvw = new DigicoreVehicleWriter();
-		dvw.write(getOutputDirectory() + "tmp.xml", v);
+		dvw.write(utils.getOutputDirectory() + "tmp.xml", v);
 	}
 
 	
 	private DigicoreVehicle createVehicle(){
-		DigicoreVehicle vehicle = new DigicoreVehicle(new IdImpl("1"));
+		DigicoreVehicle vehicle = new DigicoreVehicle(Id.create("1", Vehicle.class));
 		
 		DigicoreChain dc = new DigicoreChain();
 		

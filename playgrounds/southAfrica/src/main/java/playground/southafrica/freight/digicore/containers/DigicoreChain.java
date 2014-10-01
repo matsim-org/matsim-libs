@@ -6,12 +6,9 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-//import other.gibb.DigicoreChainCleaner2;
-//import digicore.analysis.chainVkm.DigicoreNetworkRouterFactory;
-//import digicore.utilities.DigicoreUtils;
 
 
 public class DigicoreChain extends ArrayList<DigicoreActivity>{
@@ -66,7 +63,7 @@ public class DigicoreChain extends ArrayList<DigicoreActivity>{
 	public Double getDistance(){
 		double distance = 0.0;
 		for(int i = 0; i < this.size()-1; i++){
-			distance += ((CoordImpl) this.get(i).getCoord()).calcDistance(this.get(i+1).getCoord());
+			distance += CoordUtils.calcDistance(this.get(i).getCoord(), this.get(i+1).getCoord());
 		}
 		return distance;
 	}
@@ -174,7 +171,7 @@ public class DigicoreChain extends ArrayList<DigicoreActivity>{
 	 * @return true if at least one of the activities in the chain occurs 
 	 * 		at the given facility, false otherwise.
 	 */
-	public boolean containsFacility(Id id){
+	public boolean containsFacility(Id<ActivityFacility> id){
 		boolean answer = false;
 		int i = 0;
 		while(!answer && i < this.size()){

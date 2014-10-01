@@ -36,8 +36,6 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class GeneralGridTest {
-	private final static double delta = 0.0001;
-	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	
 	@Test
@@ -61,10 +59,10 @@ public class GeneralGridTest {
 		
 		/* Cell at (0,0) */
 		Point p1 = p.getFactory().createPoint(new Coordinate(0.0, 0.0));
-		Assert.assertEquals("Points should be at the same location.", 0.0, p1.distance(qt1.get(0.0, 0.0)), delta);
+		Assert.assertEquals("Points should be at the same location.", 0.0, p1.distance(qt1.get(0.0, 0.0)), MatsimTestUtils.EPSILON);
 		/* Cell at (10,10) */
 		Point p2 = p.getFactory().createPoint(new Coordinate(10.0, 10.0));
-		Assert.assertEquals("Points should be at the same location.", 0.0, p2.distance(qt1.get(10.0, 10.0)), delta);
+		Assert.assertEquals("Points should be at the same location.", 0.0, p2.distance(qt1.get(10.0, 10.0)), MatsimTestUtils.EPSILON);
 	}
 
 	@Test
@@ -78,11 +76,11 @@ public class GeneralGridTest {
 		
 		/* Cell at (0,0) */
 		Point p1 = p.getFactory().createPoint(new Coordinate(0.0, 0.0));
-		Assert.assertEquals("Points should be at the same location.", 0.0, p1.distance(qt1.get(0.0, 0.0)), delta);
+		Assert.assertEquals("Points should be at the same location.", 0.0, p1.distance(qt1.get(0.0, 0.0)), MatsimTestUtils.EPSILON);
 		
 		/* Cell at (10,0) */
 		Point p2 = p.getFactory().createPoint(new Coordinate(7.5, ( Math.sqrt(3.0) / 2 ) * 5.0));
-		Assert.assertEquals("Points should be at the same location.", 0.0, p2.distance(qt1.get(7.5, ( Math.sqrt(3.0) / 2 ) * 5.0)), delta);
+		Assert.assertEquals("Points should be at the same location.", 0.0, p2.distance(qt1.get(7.5, ( Math.sqrt(3.0) / 2 ) * 5.0)), MatsimTestUtils.EPSILON);
 	}
 	
 	@Test

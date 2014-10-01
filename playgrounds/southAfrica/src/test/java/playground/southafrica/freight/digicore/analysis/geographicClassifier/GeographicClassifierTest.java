@@ -9,10 +9,11 @@ import java.util.TimeZone;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.Vehicle;
 
 import playground.southafrica.freight.digicore.containers.DigicoreActivity;
 import playground.southafrica.freight.digicore.containers.DigicoreChain;
@@ -53,9 +54,9 @@ public class GeographicClassifierTest{
 		Assert.assertEquals("There should only be one extra vehicle.", 1, gc.getLists().get("extra").size());
 		
 		/* Check that the right vehicles are in the right lists. */
-		Assert.assertTrue("Wrong intra vehicle.", gc.getLists().get("intra").contains(new IdImpl(1)));
-		Assert.assertTrue("Wrong inter vehicle.", gc.getLists().get("inter").contains(new IdImpl(2)));
-		Assert.assertTrue("Wrong extra vehicle.", gc.getLists().get("extra").contains(new IdImpl(3)));
+		Assert.assertTrue("Wrong intra vehicle.", gc.getLists().get("intra").contains(Id.create("1", DigicoreVehicle.class)));
+		Assert.assertTrue("Wrong inter vehicle.", gc.getLists().get("inter").contains(Id.create("2", DigicoreVehicle.class)));
+		Assert.assertTrue("Wrong extra vehicle.", gc.getLists().get("extra").contains(Id.create("3", DigicoreVehicle.class)));
 	}
 	
 	@Test
@@ -121,7 +122,7 @@ public class GeographicClassifierTest{
 	 * @throws IOException
 	 */
 	public void setUpIntraVehicle(){
-		DigicoreVehicle vehicle = new DigicoreVehicle(new IdImpl(1));
+		DigicoreVehicle vehicle = new DigicoreVehicle(Id.create("1", Vehicle.class));
 		
 		DigicoreChain chain = new DigicoreChain();
 		
@@ -164,7 +165,7 @@ public class GeographicClassifierTest{
 	 * @throws IOException
 	 */
 	public void setUpInterVehicle(){
-		DigicoreVehicle vehicle = new DigicoreVehicle(new IdImpl(2));
+		DigicoreVehicle vehicle = new DigicoreVehicle(Id.create("2", Vehicle.class));
 		
 		DigicoreChain chain = new DigicoreChain();
 		
@@ -202,7 +203,7 @@ public class GeographicClassifierTest{
 	
 	
 	public void setUpExtraVehicle(){
-		DigicoreVehicle vehicle = new DigicoreVehicle(new IdImpl(3));
+		DigicoreVehicle vehicle = new DigicoreVehicle(Id.create("3", Vehicle.class));
 		
 		DigicoreChain chain = new DigicoreChain();
 		

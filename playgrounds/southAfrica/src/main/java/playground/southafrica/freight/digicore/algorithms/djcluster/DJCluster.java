@@ -32,10 +32,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.southafrica.freight.digicore.algorithms.djcluster.containers.ClusterActivity;
@@ -62,7 +59,7 @@ import playground.southafrica.freight.digicore.algorithms.djcluster.containers.D
  */
 public class DJCluster {
 	private List<Coord> inputPoints;
-	private Map<Id, ClusterActivity> lostPoints = new TreeMap<Id, ClusterActivity>();
+	private Map<Id<Coord>, ClusterActivity> lostPoints = new TreeMap<Id<Coord>, ClusterActivity>();
 	private QuadTree<ClusterActivity> quadTree;
 	private List<DigicoreCluster> clusterList;
 	private final static Logger log = Logger.getLogger(DJCluster.class);
@@ -148,7 +145,7 @@ public class DJCluster {
 			for (int i = 0; i < this.inputPoints.size(); i++) {
 				double x = inputPoints.get(i).getX();
 				double y = inputPoints.get(i).getY();
-				ClusterActivity cp = new ClusterActivity(new IdImpl(i), inputPoints.get(i), null);
+				ClusterActivity cp = new ClusterActivity(Id.create(i, Coord.class), inputPoints.get(i), null);
 				quadTree.put(x, y, cp);
 				listOfPoints.add(cp);
 			}
@@ -227,7 +224,7 @@ public class DJCluster {
 						}
 					} else{
 						// Create new DigicoreCluster and add all the points.
-						DigicoreCluster newCluster = new DigicoreCluster(new IdImpl(clusterIndex));
+						DigicoreCluster newCluster = new DigicoreCluster(Id.create(clusterIndex, DigicoreCluster.class));
 						clusterIndex++;
 						
 						for (ClusterActivity cp : uN) {
@@ -266,9 +263,6 @@ public class DJCluster {
 				log.info("New way of unclustered points:");
 				log.info("   Number: " + lostPoints.size());
 			}
-			
-			
-			
 			
 			/* 
 			 * Build the DigicoreCluster list. Once built, I rename the clusterId field so as to
@@ -321,7 +315,7 @@ public class DJCluster {
 			for (DigicoreCluster DigicoreCluster : clusterMap.keySet()) {
 				List<ClusterActivity> listOfClusterPoints = clusterMap.get(DigicoreCluster);
 				if(listOfClusterPoints.size() >= minimumPoints){
-					DigicoreCluster.setClusterId(new IdImpl(clusterNumber));
+					DigicoreCluster.setClusterId(Id.create(clusterNumber++, DigicoreCluster.class));
 					clusterNumber++;
 					DigicoreCluster.setCenterOfGravity();
 					clusterList.add(DigicoreCluster);
@@ -423,7 +417,7 @@ public class DJCluster {
 		this.delimiter = delimiter;
 	}
 	
-	public Map<Id,ClusterActivity> getLostPoints(){
+	public Map<Id<Coord>,ClusterActivity> getLostPoints(){
 		return this.lostPoints;
 	}
 

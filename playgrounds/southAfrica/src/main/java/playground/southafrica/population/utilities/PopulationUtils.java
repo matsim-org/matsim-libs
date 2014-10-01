@@ -264,6 +264,38 @@ public class PopulationUtils {
 		LOG.info("--------------------------------------------");
 	}
 	
+	
+	/**
+	 * Identifies the agent type by the Id-prefix, and reports the number of 
+	 * each type.
+	 * 
+	 * @param population
+	 */
+	public static void printNumberOfAgentTypes(String population){
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MatsimPopulationReader pr = new MatsimPopulationReader(sc);
+		pr.readFile(population);
+		
+		Map<String, Integer> map = new TreeMap<String, Integer>();
+		
+		for(Id<Person> id : sc.getPopulation().getPersons().keySet()){
+			String agentType = id.toString().split("_")[0];
+			if(map.containsKey(agentType)){
+				map.put(agentType, map.get(agentType)+1 );
+			} else{
+				map.put(agentType, 1);
+			}
+		}
+		
+		/* Report the statistics */
+		LOG.info("--------------------------------------------");
+		for(String s : map.keySet()){
+			LOG.info("   " + s + ": " + String.valueOf(map.get(s)));
+		}
+		LOG.info("--------------------------------------------");
+	}
+	
+	
 	/**
 	 * An implementation to quickly use to print statistics.
 	 */
@@ -283,6 +315,9 @@ public class PopulationUtils {
 			break;
 		case 4:
 			printNumberOfEmployedPersons(args[1]);
+			break;
+		case 5:
+			printNumberOfAgentTypes(args[1]);
 			break;
 		default:
 			LOG.warn("Cannot print any statistics for option `" + option + "'");

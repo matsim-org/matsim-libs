@@ -32,14 +32,12 @@ import java.util.TimeZone;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.matsim.vehicles.Vehicle;
 
 import playground.southafrica.freight.digicore.containers.DigicoreActivity;
 import playground.southafrica.freight.digicore.containers.DigicoreChain;
@@ -52,8 +50,8 @@ public class DigicoreChainExtractor implements Runnable {
 	private final File outputFolder;
 	private final double thresholdMinorMajor;
 	private final double thresholdActivityDuration;
-	private final List<Id> ignitionOn;
-	private final List<Id> ignitionOff;
+	private final List<String> ignitionOn;
+	private final List<String> ignitionOff;
 	private CoordinateTransformation ct;
 	private DigicoreVehicle vehicle;
 	
@@ -64,7 +62,7 @@ public class DigicoreChainExtractor implements Runnable {
 	public void run() {
 		/* Identify vehicle Id and create new vehicle. */
 		String name = vehicleFile.getName().substring(0, vehicleFile.getName().indexOf("."));
-		vehicle = new DigicoreVehicle(new IdImpl(name));
+		vehicle = new DigicoreVehicle(Id.create(name, Vehicle.class));
 
 		DigicoreChain chain = new DigicoreChain();
 		DigicoreActivity activity = null;
@@ -77,9 +75,9 @@ public class DigicoreChainExtractor implements Runnable {
 				String line = br.readLine();
 				while((line = br.readLine()) != null){
 					String [] sa = line.split(",");
-					if(this.ignitionOn.contains(new IdImpl(sa[4]))){
+					if(this.ignitionOn.contains( sa[4] )){
 						move = true;
-					} else if(this.ignitionOff.contains(new IdImpl(sa[4]))){
+					} else if(this.ignitionOff.contains( sa[4] )){
 						move = false;
 					} else{
 						log.warn("Could not identify status " + sa[4] + " for vehicle " + name);
@@ -190,7 +188,7 @@ public class DigicoreChainExtractor implements Runnable {
 	 * @param ignitionOff
 	 * @param threadCounter 
 	 */
-	public DigicoreChainExtractor(File file, File outputFolder, double thresholdMinor, double thresholdActivity, List<Id> ignitionOn, List<Id> ignitionOff, CoordinateTransformation ct, Counter threadCounter) {
+	public DigicoreChainExtractor(File file, File outputFolder, double thresholdMinor, double thresholdActivity, List<String> ignitionOn, List<String> ignitionOff, CoordinateTransformation ct, Counter threadCounter) {
 		// TODO Auto-generated constructor stub
 		this.vehicleFile = file;
 		this.outputFolder = outputFolder;

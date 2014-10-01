@@ -23,13 +23,15 @@ package playground.southafrica.freight.digicore.algorithms.djcluster;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.testcases.MatsimTestCase;
 
 import playground.southafrica.freight.digicore.algorithms.djcluster.DJCluster;
 
-public class DJClusterTest extends MatsimTestCase{
+public class DJClusterTest{
+	
 	
 	/**
 	 * Tests if the following cluster pattern is clustered into two clusters:
@@ -43,21 +45,22 @@ public class DJClusterTest extends MatsimTestCase{
 	 * 		|  *		|
 	 * 		|___________|
 	 */		
-	 
+	@Test
 	public void testDJCluster(){
 		List<Coord> al = buildTestArrayList();
 		DJCluster djc = new DJCluster(al, false);
 		djc.clusterInput(2, 3);
 		
-		assertEquals("There should only be two clusters", 2, djc.getClusterList().size());
+		Assert.assertEquals("There should only be two clusters", 2, djc.getClusterList().size());
 		
 		int small = Math.min(djc.getClusterList().get(0).getPoints().size(), djc.getClusterList().get(1).getPoints().size());
 		int large = Math.max(djc.getClusterList().get(0).getPoints().size(), djc.getClusterList().get(1).getPoints().size());
 		
-		assertEquals("The small cluster must have 4 points.", 4, small);
-		assertEquals("The large cluster must have 8 points.", 8, large);
-		
+		Assert.assertEquals("The small cluster must have 4 points.", 4, small);
+		Assert.assertEquals("The large cluster must have 8 points.", 8, large);
 	}
+	
+	
 	private static List<Coord> buildTestArrayList(){
 		// Build the test QuadTree
 		List<Coord> al = new ArrayList<Coord>();

@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DigicoreEdgeWeightTransformer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,     *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,27 +17,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.southafrica.freight.digicore.algorithms.complexNetwork;
+package playground.southafrica.projects.reproducibility;
 
-import java.util.Map;
+public class ExtractNmbmActivityDensities {
 
-import org.apache.commons.collections15.Transformer;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
 
-import edu.uci.ics.jung.graph.util.Pair;
-
-public class DigicoreEdgeWeightTransformer implements Transformer<Pair<Id<ActivityFacility>>, String> {
-	private final Map<Pair<Id<ActivityFacility>>, Integer> map;
-	
-	public DigicoreEdgeWeightTransformer(Map<Pair<Id<ActivityFacility>>, Integer> map) {
-		this.map = map;
-	}
-
-	@Override
-	public String transform(Pair<Id<ActivityFacility>> pair) {
-		return map.get(pair).toString();
 	}
 
 }
-

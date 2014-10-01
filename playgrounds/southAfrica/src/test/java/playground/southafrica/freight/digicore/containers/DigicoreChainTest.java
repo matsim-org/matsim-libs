@@ -25,19 +25,22 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.testcases.MatsimTestCase;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.testcases.MatsimTestUtils;
 
-import playground.southafrica.freight.digicore.containers.DigicoreActivity;
-import playground.southafrica.freight.digicore.containers.DigicoreChain;
+public class DigicoreChainTest{
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-public class DigicoreChainTest extends MatsimTestCase{
-	
 	public void testConstructor(){
 		//TODO Finish
 	}
 	
 	
+	@Test
 	public void testGetChainStartDay(){
 		/* Thursday, 4 October 2012 */
 		GregorianCalendar gc1a = new GregorianCalendar(2012, Calendar.OCTOBER, 4, 0, 0, 0); gc1a.setTimeZone(TimeZone.getTimeZone("GMT+2"));    // 00:00:00
@@ -60,7 +63,7 @@ public class DigicoreChainTest extends MatsimTestCase{
 		da2.setType("major");
 		dc.add(da2);
 		
-		assertEquals("Wrong start day.", Calendar.THURSDAY, dc.getChainStartDay());
+		Assert.assertEquals("Wrong start day.", Calendar.THURSDAY, dc.getChainStartDay());
 	}
 	
 	
@@ -71,16 +74,16 @@ public class DigicoreChainTest extends MatsimTestCase{
 		DigicoreActivity da1 = new DigicoreActivity("test", TimeZone.getTimeZone("GMT+2"), new Locale("en"));
 		DigicoreActivity da2 = new DigicoreActivity("test", TimeZone.getTimeZone("GMT+2"), new Locale("en"));
 		DigicoreActivity da3 = new DigicoreActivity("test", TimeZone.getTimeZone("GMT+2"), new Locale("en"));
-		da2.setFacilityId(new IdImpl("f2"));
-		da3.setFacilityId(new IdImpl("f3"));
+		da2.setFacilityId(Id.create("f2", ActivityFacility.class));
+		da3.setFacilityId(Id.create("f3", ActivityFacility.class));
 		dc.add(da1);
 		dc.add(da2);
 		dc.add(da3);
 		
-		assertFalse("Should not have found facility.", dc.containsFacility(new IdImpl("f1")));
-		assertTrue("Should have found facility.", dc.containsFacility(new IdImpl("f2")));
-		assertTrue("Should have found facility.", dc.containsFacility(new IdImpl("f3")));
-		assertTrue("Should have found NULL facility.", dc.containsFacility(null));
+		Assert.assertFalse("Should not have found facility.", dc.containsFacility(Id.create("f1", ActivityFacility.class)));
+		Assert.assertTrue("Should have found facility.", dc.containsFacility(Id.create("f2", ActivityFacility.class)));
+		Assert.assertTrue("Should have found facility.", dc.containsFacility(Id.create("f3", ActivityFacility.class)));
+		Assert.assertTrue("Should have found NULL facility.", dc.containsFacility(null));
 
 	}
 

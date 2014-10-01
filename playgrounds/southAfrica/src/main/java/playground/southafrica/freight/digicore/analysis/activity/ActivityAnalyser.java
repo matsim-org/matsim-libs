@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.vehicles.Vehicle;
 
 import playground.southafrica.freight.digicore.analysis.postClustering.ClusteredChainGenerator;
 import playground.southafrica.freight.digicore.containers.DigicoreActivity;
@@ -238,13 +239,14 @@ public class ActivityAnalyser {
 	public void runActivitiesWithFacilityIdAnalysis(List<File> vehicles, String output){
 		LOG.info("Performing analysis on the percentage of activities with facility Ids (" + vehicles.size() + " vehicle files)");
 		Counter counter = new Counter("   vehicles completed # ");
-		List<Future<Tuple<Id, Double>>> listOfJobs = new ArrayList<Future<Tuple<Id,Double>>>();
+		List<Future<Tuple<Id<Vehicle>, Double>>> listOfJobs = 
+				new ArrayList<Future<Tuple<Id<Vehicle>,Double>>>();
 		
 		/* Execute the multi-threaded analysis. */
 		ExecutorService threadExecutor = Executors.newFixedThreadPool(numberOfThreads);
 		for(File file : vehicles){
-			Callable<Tuple<Id, Double>> job = new ActivityWithFacilityIdCallable(file, counter);
-			Future<Tuple<Id, Double>> result = threadExecutor.submit(job);
+			Callable<Tuple<Id<Vehicle>, Double>> job = new ActivityWithFacilityIdCallable(file, counter);
+			Future<Tuple<Id<Vehicle>, Double>> result = threadExecutor.submit(job);
 			listOfJobs.add(result);
 		}
 		
@@ -254,9 +256,9 @@ public class ActivityAnalyser {
 		counter.printCounter();
 		
 		/* Consolidate the output */
-		Map<Id, Double> map = new TreeMap<Id, Double>();
-		for(Future<Tuple<Id, Double>> job : listOfJobs){
-			Tuple<Id, Double> tuple = null;
+		Map<Id<Vehicle>, Double> map = new TreeMap<Id<Vehicle>, Double>();
+		for(Future<Tuple<Id<Vehicle>, Double>> job : listOfJobs){
+			Tuple<Id<Vehicle>, Double> tuple = null;
 			try {
 				tuple = job.get();
 			} catch (InterruptedException e) {
@@ -272,7 +274,7 @@ public class ActivityAnalyser {
 		/* Write the output to file. */
 		BufferedWriter bw = IOUtils.getBufferedWriter(output);
 		try{
-			for(Id id : map.keySet()){
+			for(Id<Vehicle> id : map.keySet()){
 				bw.write(String.format("%s,%.4f\n", id.toString(), map.get(id)));
 			}
 		} catch (IOException e) {

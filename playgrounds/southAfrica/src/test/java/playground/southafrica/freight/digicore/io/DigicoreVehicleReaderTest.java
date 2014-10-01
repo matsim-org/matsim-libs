@@ -24,48 +24,56 @@ package playground.southafrica.freight.digicore.io;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.apache.log4j.Logger;
-import org.matsim.core.basic.v01.IdImpl;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.Vehicle;
 
 import playground.southafrica.freight.digicore.containers.DigicoreActivity;
 import playground.southafrica.freight.digicore.containers.DigicoreChain;
 import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
-import playground.southafrica.freight.digicore.io.DigicoreVehicleReader_v1;
-import playground.southafrica.freight.digicore.io.DigicoreVehicleWriter;
 
-public class DigicoreVehicleReaderTest extends MatsimTestCase {
-	private final static Logger LOG = Logger.getLogger(DigicoreVehicleReaderTest.class);
-	
+public class DigicoreVehicleReaderTest {
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+
+	@Test
 	public void testReadVehicle(){
 		DigicoreVehicle v1 = createVehicle();
 		DigicoreVehicleWriter dvw = new DigicoreVehicleWriter();
 		try{
-			dvw.write(getOutputDirectory() + "tmp.xml");
-			fail();
+			dvw.write(utils.getOutputDirectory() + "tmp.xml");
+			Assert.fail();
 		} catch(IllegalArgumentException e){
 			/* Pass. */
 		}
-		dvw.write(getOutputDirectory() + "tmp.xml", v1);
+		dvw.write(utils.getOutputDirectory() + "tmp.xml", v1);
 		
 		DigicoreVehicleReader_v1 dvr = new DigicoreVehicleReader_v1();
-		dvr.parse(getOutputDirectory() + "tmp.xml");
+		dvr.parse(utils.getOutputDirectory() + "tmp.xml");
 		DigicoreVehicle v2 = dvr.getVehicle();
 		
-		assertEquals("Wrong id.", true, v1.getId().toString().equalsIgnoreCase(v2.getId().toString()));
-		assertEquals("Wrong number of chains.", 1, v2.getChains().size());
-		assertEquals("Wrong number of activities in chain.", 3, v2.getChains().get(0).getAllActivities().size());
+		Assert.assertEquals("Wrong id.", true, v1.getId().toString().equalsIgnoreCase(v2.getId().toString()));
+		Assert.assertEquals("Wrong number of chains.", 1, v2.getChains().size());
+		Assert.assertEquals("Wrong number of activities in chain.", 3, v2.getChains().get(0).getAllActivities().size());
 
-		assertTrue("Wrong activity type.", "minor".equalsIgnoreCase(v2.getChains().get(0).getAllActivities().get(1).getType()));
-		assertTrue("Wrong coordinate.", v2.getChains().get(0).getAllActivities().get(1).getCoord().equals(new CoordImpl(5, 5)));
-		assertEquals("Wrong start time.", v1.getChains().get(0).getAllActivities().get(1).getStartTime(), v2.getChains().get(0).getAllActivities().get(1).getStartTime());
-		assertEquals("Wrong end time.", v1.getChains().get(0).getAllActivities().get(1).getEndTime(), v2.getChains().get(0).getAllActivities().get(1).getEndTime());
+		Assert.assertTrue("Wrong activity type.", "minor".equalsIgnoreCase(v2.getChains().get(0).getAllActivities().get(1).getType()));
+		Assert.assertTrue("Wrong coordinate.", v2.getChains().get(0).getAllActivities().get(1).getCoord().equals(new CoordImpl(5, 5)));
+		Assert.assertEquals("Wrong start time.", 
+				v1.getChains().get(0).getAllActivities().get(1).getStartTime(), 
+				v2.getChains().get(0).getAllActivities().get(1).getStartTime(),
+				MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong end time.", 
+				v1.getChains().get(0).getAllActivities().get(1).getEndTime(), 
+				v2.getChains().get(0).getAllActivities().get(1).getEndTime(),
+				MatsimTestUtils.EPSILON);
 	}
 
 	
 	private DigicoreVehicle createVehicle(){
-		DigicoreVehicle vehicle = new DigicoreVehicle(new IdImpl("1"));
+		DigicoreVehicle vehicle = new DigicoreVehicle(Id.create("1", Vehicle.class));
 		
 		DigicoreChain dc = new DigicoreChain();
 		

@@ -201,7 +201,7 @@ public class ClusteredChainGenerator {
 		
 		/* Convert each MATSim facility to a specific DigicoreFacility. */
 		List<DigicoreFacility> facilityList = new ArrayList<DigicoreFacility>();
-		for(Id id : sc.getActivityFacilities().getFacilities().keySet()){
+		for(Id<ActivityFacility> id : sc.getActivityFacilities().getFacilities().keySet()){
 			ActivityFacility af = sc.getActivityFacilities().getFacilities().get(id); 
 			
 			DigicoreFacility df = new DigicoreFacility(id);

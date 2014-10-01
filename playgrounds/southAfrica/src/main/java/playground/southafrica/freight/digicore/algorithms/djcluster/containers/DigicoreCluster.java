@@ -40,15 +40,15 @@ import com.vividsolutions.jts.geom.Point;
  * 
  * @author jwjoubert
  */
-public class DigicoreCluster implements Identifiable{
+public class DigicoreCluster implements Identifiable<DigicoreCluster>{
 	private final Logger log = Logger.getLogger(DigicoreCluster.class);
 	
-	private Id clusterId;
+	private Id<DigicoreCluster> clusterId;
 	private Coord centerOfGravity;
 	private List<ClusterActivity> activities;
 	private Geometry concaveHull;
 			
-	public DigicoreCluster(Id clusterId){
+	public DigicoreCluster(Id<DigicoreCluster> clusterId){
 		this.clusterId = clusterId;
 		this.activities = new ArrayList<ClusterActivity>();
 	}
@@ -90,7 +90,7 @@ public class DigicoreCluster implements Identifiable{
 		return centerOfGravity;
 	}
 
-	public void setClusterId(Id id){
+	public void setClusterId(Id<DigicoreCluster> id){
 		this.clusterId = id;
 	}
 	
@@ -99,7 +99,7 @@ public class DigicoreCluster implements Identifiable{
 	}
 
 	@Override
-	public Id getId() {
+	public Id<DigicoreCluster> getId() {
 		return this.clusterId;
 	}
 	

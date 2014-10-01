@@ -35,7 +35,6 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class KernelDensityEstimatorTest {
 
-	private final static double delta = 0.0001;
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
@@ -57,7 +56,7 @@ public class KernelDensityEstimatorTest {
 			kde = new KernelDensityEstimator(grid, KdeType.CELL, 0.0);
 			Assert.assertEquals("Wrong KdeType.", KdeType.CELL, kde.getKdeType());
 			Assert.assertEquals("Wrong GeneralGrid", grid, kde.getGrid());
-			Assert.assertEquals("Wrong radius.", 0.0, kde.getRadius(), delta);
+			Assert.assertEquals("Wrong radius.", 0.0, kde.getRadius(), MatsimTestUtils.EPSILON);
 		} catch(IllegalArgumentException e){
 			Assert.fail("Should not have caused an exception. KdeType and width combination is correct");
 		}
@@ -75,9 +74,9 @@ public class KernelDensityEstimatorTest {
 
 		Point p1 = p.getFactory().createPoint(new Coordinate(1.0, 1.0));
 		kde.processPoint(p1, 5);
-		Assert.assertEquals("Wrong weight.", 5.0, kde.getWeight(pc), delta);
+		Assert.assertEquals("Wrong weight.", 5.0, kde.getWeight(pc), MatsimTestUtils.EPSILON);
 		kde.processPoint(p1, 5);
-		Assert.assertEquals("Wrong weight.", 10.0, kde.getWeight(pc), delta);
+		Assert.assertEquals("Wrong weight.", 10.0, kde.getWeight(pc), MatsimTestUtils.EPSILON);
 	}
 
 	/**
@@ -99,10 +98,10 @@ public class KernelDensityEstimatorTest {
 		Point pc3 = p.getFactory().createPoint(new Coordinate(10.0, 10.0));
 		Point pc4 = p.getFactory().createPoint(new Coordinate(0.0, 10.0));
 		
-		Assert.assertEquals("Wrong weight for cell (0, 0)", 5.0, kde.getWeight(pc1), delta);
-		Assert.assertEquals("Wrong weight for cell (1, 0)", 5.0, kde.getWeight(pc2), delta);
-		Assert.assertEquals("Wrong weight for cell (1, 1)", 5.0, kde.getWeight(pc3), delta);
-		Assert.assertEquals("Wrong weight for cell (0, 1)", 5.0, kde.getWeight(pc4), delta);
+		Assert.assertEquals("Wrong weight for cell (0, 0)", 5.0, kde.getWeight(pc1), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong weight for cell (1, 0)", 5.0, kde.getWeight(pc2), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong weight for cell (1, 1)", 5.0, kde.getWeight(pc3), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong weight for cell (0, 1)", 5.0, kde.getWeight(pc4), MatsimTestUtils.EPSILON);
 		
 		/* Try another point on the boundary of four cells. */
 		Point target = p.getFactory().createPoint(new Coordinate(15.0, 15.0));
@@ -111,10 +110,10 @@ public class KernelDensityEstimatorTest {
 		Point pc6 = p.getFactory().createPoint(new Coordinate(20.0, 10.0));
 		Point pc7 = p.getFactory().createPoint(new Coordinate(20.0, 20.0));
 		
-		Assert.assertEquals("Wrong weight for cell (1, 1)", 10.0, kde.getWeight(pc3), delta);
-		Assert.assertEquals("Wrong weight for cell (1, 2)", 5.0, kde.getWeight(pc5), delta);
-		Assert.assertEquals("Wrong weight for cell (2, 1)", 5.0, kde.getWeight(pc6), delta);
-		Assert.assertEquals("Wrong weight for cell (2, 2)", 5.0, kde.getWeight(pc7), delta);
+		Assert.assertEquals("Wrong weight for cell (1, 1)", 10.0, kde.getWeight(pc3), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong weight for cell (1, 2)", 5.0, kde.getWeight(pc5), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong weight for cell (2, 1)", 5.0, kde.getWeight(pc6), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong weight for cell (2, 2)", 5.0, kde.getWeight(pc7), MatsimTestUtils.EPSILON);
 	}
 	
 	@Test
@@ -140,12 +139,12 @@ public class KernelDensityEstimatorTest {
 		double w12 = 10.0;
 		double w22 = (20 - Math.sqrt(Math.pow(10.0, 2.0) + Math.pow(10.0, 2.0)));
 		double sum = w11 + w21 + w12 + w22;
-		Assert.assertEquals("Wrong weight for cell (1,  1)", w11 / sum * 20.0, kde.getWeight(pc11), delta);
-		Assert.assertEquals("Wrong weight for cell (2,  1)", w21 / sum * 20.0, kde.getWeight(pc21), delta);
-		Assert.assertEquals("Wrong weight for cell (3,  1)", 0.0, kde.getWeight(pc31), delta);
-		Assert.assertEquals("Wrong weight for cell (1,  2)", w12 / sum * 20.0, kde.getWeight(pc12), delta);
-		Assert.assertEquals("Wrong weight for cell (2,  2)", w22 / sum * 20.0, kde.getWeight(pc22), delta);
-		Assert.assertEquals("Wrong weight for cell (1,  3)", 0.0, kde.getWeight(pc13), delta);
+		Assert.assertEquals("Wrong weight for cell (1,  1)", w11 / sum * 20.0, kde.getWeight(pc11), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong weight for cell (2,  1)", w21 / sum * 20.0, kde.getWeight(pc21), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong weight for cell (3,  1)", 0.0, kde.getWeight(pc31), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong weight for cell (1,  2)", w12 / sum * 20.0, kde.getWeight(pc12), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong weight for cell (2,  2)", w22 / sum * 20.0, kde.getWeight(pc22), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong weight for cell (1,  3)", 0.0, kde.getWeight(pc13), MatsimTestUtils.EPSILON);
 	}
 	
 	@Test
@@ -163,9 +162,9 @@ public class KernelDensityEstimatorTest {
 		Point pc11 = p.getFactory().createPoint(new Coordinate(0.0, 0.0));
 		Point pc21 = p.getFactory().createPoint(new Coordinate(10.0, 0.0));
 		Point pc31 = p.getFactory().createPoint(new Coordinate(20.0, 0.0));
-		Assert.assertEquals("Wrong weight to cell (0, 0)", 5.0, kde1.getWeight(pc11), delta);
-		Assert.assertEquals("Wrong weight to cell (1, 0)", 10.0, kde1.getWeight(pc21), delta);
-		Assert.assertEquals("Wrong weight to cell (2, 0)", 5.0, kde1.getWeight(pc31), delta);
+		Assert.assertEquals("Wrong weight to cell (0, 0)", 5.0, kde1.getWeight(pc11), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong weight to cell (1, 0)", 10.0, kde1.getWeight(pc21), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong weight to cell (2, 0)", 5.0, kde1.getWeight(pc31), MatsimTestUtils.EPSILON);
 		
 		KernelDensityEstimator kde2 = new KernelDensityEstimator(grid, KdeType.CELL, 0.0);
 		Coordinate c2 = new Coordinate(0.0, 5.0);
@@ -176,12 +175,12 @@ public class KernelDensityEstimatorTest {
 		Point pc12 = p.getFactory().createPoint(new Coordinate(0.0, 10.0));
 		Point pc22 = p.getFactory().createPoint(new Coordinate(10.0, 10.0));
 		Point pc32 = p.getFactory().createPoint(new Coordinate(20.0, 10.0));
-		Assert.assertEquals("Wrong weight to cell (0, 0)", 2.5, kde2.getWeight(pc11), delta);
-		Assert.assertEquals("Wrong weight to cell (1, 0)", 5.0, kde2.getWeight(pc21), delta);
-		Assert.assertEquals("Wrong weight to cell (2, 0)", 2.5, kde2.getWeight(pc31), delta);
-		Assert.assertEquals("Wrong weight to cell (0, 1)", 2.5, kde2.getWeight(pc12), delta);
-		Assert.assertEquals("Wrong weight to cell (1, 1)", 5.0, kde2.getWeight(pc22), delta);
-		Assert.assertEquals("Wrong weight to cell (2, 1)", 2.5, kde2.getWeight(pc32), delta);
+		Assert.assertEquals("Wrong weight to cell (0, 0)", 2.5, kde2.getWeight(pc11), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong weight to cell (1, 0)", 5.0, kde2.getWeight(pc21), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong weight to cell (2, 0)", 2.5, kde2.getWeight(pc31), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong weight to cell (0, 1)", 2.5, kde2.getWeight(pc12), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong weight to cell (1, 1)", 5.0, kde2.getWeight(pc22), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong weight to cell (2, 1)", 2.5, kde2.getWeight(pc32), MatsimTestUtils.EPSILON);
 	}
 	
 

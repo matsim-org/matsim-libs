@@ -19,7 +19,10 @@
 
 package playground.southafrica.freight.digicore.algorithms.concaveHull;
 
-import org.matsim.testcases.MatsimTestCase;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.testcases.MatsimTestUtils;
 
 import playground.southafrica.freight.digicore.algorithms.concaveHull.ConcaveHull;
 
@@ -29,17 +32,20 @@ import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class ConcaveHullTest extends MatsimTestCase{
+public class ConcaveHullTest {
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
+
 	
 	/** Test whether duplicate input points are removed. **/
+	@Test
 	public void testConstructor(){
 		GeometryCollection gcIncorrect = setupWithDuplicates();
 		ConcaveHull ch1 = new ConcaveHull(gcIncorrect, 2);
-		assertEquals("Duplicates not removed.", 8, ch1.getInputPoints());
+		Assert.assertEquals("Duplicates not removed.", 8, ch1.getInputPoints());
 		
 		GeometryCollection gcCorrect = setup();
 		ConcaveHull ch2 = new ConcaveHull(gcCorrect, 2);
-		assertEquals("Wrong number of input points.", 8, ch2.getInputPoints());
+		Assert.assertEquals("Wrong number of input points.", 8, ch2.getInputPoints());
 	}
 	
 	
@@ -47,7 +53,7 @@ public class ConcaveHullTest extends MatsimTestCase{
 		GeometryCollection gc = setup();
 		ConcaveHull ch = new ConcaveHull(gc, 1.0);
 		Geometry g = ch.getConcaveHull();
-		assertTrue("Wrong geometry created.", g instanceof Polygon);
+		Assert.assertTrue("Wrong geometry created.", g instanceof Polygon);
 	}
 	
 

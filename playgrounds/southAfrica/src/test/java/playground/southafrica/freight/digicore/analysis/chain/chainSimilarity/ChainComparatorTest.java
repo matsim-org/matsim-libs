@@ -3,64 +3,75 @@ package playground.southafrica.freight.digicore.analysis.chain.chainSimilarity;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.matsim.core.basic.v01.IdImpl;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.Vehicle;
 
 import playground.southafrica.freight.digicore.analysis.chain.chainSimilarity.binary.ChainComparator;
 import playground.southafrica.freight.digicore.containers.DigicoreActivity;
 import playground.southafrica.freight.digicore.containers.DigicoreChain;
 import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
 
-public class ChainComparatorTest extends MatsimTestCase {
+public class ChainComparatorTest {
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+	@Test
 	public void testSetup() {
 		DigicoreVehicle vehicle = setupVehicleWithTwoChains();
 		
-		assertEquals("Wrong number of chains.", 2, vehicle.getChains().size());
+		Assert.assertEquals("Wrong number of chains.", 2, vehicle.getChains().size());
 		
-		assertEquals("Wrong umber of activities in chain 1.", 4, vehicle.getChains().get(0).size());
-		assertTrue("Wrong activity: 'a' should be in there.", vehicle.getChains().get(0).get(0).getType().equalsIgnoreCase("a"));
-		assertTrue("Wrong activity: 'b' should be in there.", vehicle.getChains().get(0).get(1).getType().equalsIgnoreCase("b"));
-		assertTrue("Wrong activity: 'c' should be in there.", vehicle.getChains().get(0).get(2).getType().equalsIgnoreCase("c"));
-		assertTrue("Wrong activity: 'd' should be in there.", vehicle.getChains().get(0).get(3).getType().equalsIgnoreCase("d"));
+		Assert.assertEquals("Wrong umber of activities in chain 1.", 4, vehicle.getChains().get(0).size());
+		Assert.assertTrue("Wrong activity: 'a' should be in there.", vehicle.getChains().get(0).get(0).getType().equalsIgnoreCase("a"));
+		Assert.assertTrue("Wrong activity: 'b' should be in there.", vehicle.getChains().get(0).get(1).getType().equalsIgnoreCase("b"));
+		Assert.assertTrue("Wrong activity: 'c' should be in there.", vehicle.getChains().get(0).get(2).getType().equalsIgnoreCase("c"));
+		Assert.assertTrue("Wrong activity: 'd' should be in there.", vehicle.getChains().get(0).get(3).getType().equalsIgnoreCase("d"));
 		
-		assertEquals("Wrong umber of activities in chain 2.", 4, vehicle.getChains().get(1).size());
-		assertTrue("Wrong activity: 'a' should be in there.", vehicle.getChains().get(1).get(0).getType().equalsIgnoreCase("a"));
-		assertTrue("Wrong activity: 'c' should be in there.", vehicle.getChains().get(1).get(1).getType().equalsIgnoreCase("c"));
-		assertTrue("Wrong activity: 'd' should be in there.", vehicle.getChains().get(1).get(2).getType().equalsIgnoreCase("d"));
-		assertTrue("Wrong activity: 'e' should be in there.", vehicle.getChains().get(1).get(3).getType().equalsIgnoreCase("e"));
+		Assert.assertEquals("Wrong umber of activities in chain 2.", 4, vehicle.getChains().get(1).size());
+		Assert.assertTrue("Wrong activity: 'a' should be in there.", vehicle.getChains().get(1).get(0).getType().equalsIgnoreCase("a"));
+		Assert.assertTrue("Wrong activity: 'c' should be in there.", vehicle.getChains().get(1).get(1).getType().equalsIgnoreCase("c"));
+		Assert.assertTrue("Wrong activity: 'd' should be in there.", vehicle.getChains().get(1).get(2).getType().equalsIgnoreCase("d"));
+		Assert.assertTrue("Wrong activity: 'e' should be in there.", vehicle.getChains().get(1).get(3).getType().equalsIgnoreCase("e"));
 	}
 	
+	@Test
 	public void testConstructor(){
 		DigicoreVehicle vehicle = setupVehicleWithTwoChains();
 		ChainComparator cc = new ChainComparator(vehicle);
 		
-		assertEquals("Wrong number of Ids in list. Should be empty.", 0, cc.getFacilityIds().size());
-		assertNull("Quadtree should still be null.", cc.getQuadTree());
+		Assert.assertEquals("Wrong number of Ids in list. Should be empty.", 0, cc.getFacilityIds().size());
+		Assert.assertNull("Quadtree should still be null.", cc.getQuadTree());
 	}
 	
 	
+	@Test
 	public void testBuildActivityFacilityList(){
 		DigicoreVehicle vehicle = setupVehicleWithTwoChains();
 		ChainComparator cc = new ChainComparator(vehicle);
 		cc.buildActivityFacilityList();
 		
 		/* Check list of facilities. */
-		assertEquals("Wrong number of Ids in list.", 5, cc.getFacilityIds().size());
-		assertTrue("Facility 'f1' not in list", cc.getFacilityIds().contains(new IdImpl("f1")));
-		assertTrue("Facility 'f2' not in list", cc.getFacilityIds().contains(new IdImpl("f2")));
-		assertTrue("Facility 'f3' not in list", cc.getFacilityIds().contains(new IdImpl("f3")));
-		assertTrue("Facility 'a0' not in list", cc.getFacilityIds().contains(new IdImpl("a0")));
-		assertTrue("Facility 'a1' not in list", cc.getFacilityIds().contains(new IdImpl("a1")));
+		Assert.assertEquals("Wrong number of Ids in list.", 5, cc.getFacilityIds().size());
+		Assert.assertTrue("Facility 'f1' not in list", cc.getFacilityIds().contains(Id.create("f1", ActivityFacility.class)));
+		Assert.assertTrue("Facility 'f2' not in list", cc.getFacilityIds().contains(Id.create("f2", ActivityFacility.class)));
+		Assert.assertTrue("Facility 'f3' not in list", cc.getFacilityIds().contains(Id.create("f3", ActivityFacility.class)));
+		Assert.assertTrue("Facility 'a0' not in list", cc.getFacilityIds().contains(Id.create("a0", ActivityFacility.class)));
+		Assert.assertTrue("Facility 'a1' not in list", cc.getFacilityIds().contains(Id.create("a1", ActivityFacility.class)));
 		
 		/* Check QuadTree. */
-		assertEquals("Wrong number of Ids in QuadTree.", 2, cc.getQuadTree().size());
-		assertTrue("Facility 'a0' not in the QuadTree where its supposed to be.", cc.getQuadTree().get(2, 0).equals(new IdImpl("a0")));
-		assertTrue("Facility 'a1' not in the QuadTree where its supposed to be.", cc.getQuadTree().get(8, 0).equals(new IdImpl("a1")));
+		Assert.assertEquals("Wrong number of Ids in QuadTree.", 2, cc.getQuadTree().size());
+		Assert.assertTrue("Facility 'a0' not in the QuadTree where its supposed to be.", cc.getQuadTree().get(2, 0).equals(Id.create("a0", Facility.class)));
+		Assert.assertTrue("Facility 'a1' not in the QuadTree where its supposed to be.", cc.getQuadTree().get(8, 0).equals(Id.create("a1", Facility.class)));
 	}
 
 	
+	@Test
 	public void testGetActivityPosition(){
 		DigicoreVehicle vehicle = setupVehicleWithTwoChains();
 		ChainComparator cc = new ChainComparator(vehicle);
@@ -68,14 +79,24 @@ public class ChainComparatorTest extends MatsimTestCase {
 		
 		DigicoreChain chain = vehicle.getChains().get(0);
 		
-		assertEquals("Wrong position for facility f1", 0, cc.getActivityPosition(chain, new IdImpl("f1")).intValue());
-		assertEquals("Wrong position for facility a0", 1, cc.getActivityPosition(chain, new IdImpl("a0")).intValue());
-		assertEquals("Wrong position for facility f2", 2, cc.getActivityPosition(chain, new IdImpl("f2")).intValue());
-		assertEquals("Wrong position for facility f3", 3, cc.getActivityPosition(chain, new IdImpl("f3")).intValue());
-		assertNull("Wrong position for facility a1", cc.getActivityPosition(chain, new IdImpl("a1")) );
+		Assert.assertEquals("Wrong position for facility f1", 
+				0, 
+				cc.getActivityPosition(chain, Id.create("f1", ActivityFacility.class)).intValue());
+		Assert.assertEquals("Wrong position for facility a0", 
+				1, 
+				cc.getActivityPosition(chain, Id.create("a0", ActivityFacility.class)).intValue());
+		Assert.assertEquals("Wrong position for facility f2", 
+				2, 
+				cc.getActivityPosition(chain, Id.create("f2", ActivityFacility.class)).intValue());
+		Assert.assertEquals("Wrong position for facility f3", 
+				3, 
+				cc.getActivityPosition(chain, Id.create("f3", ActivityFacility.class)).intValue());
+		Assert.assertNull("Wrong position for facility a1", 
+				cc.getActivityPosition(chain, Id.create("a1", ActivityFacility.class)) );
 	}
 
 	
+	@Test
 	public void testCompareChains(){
 		DigicoreVehicle vehicle = setupVehicleWithTwoChains();
 		ChainComparator cc = new ChainComparator(vehicle);
@@ -83,8 +104,8 @@ public class ChainComparatorTest extends MatsimTestCase {
 		
 		DigicoreChain chain1 = vehicle.getChains().get(0);
 		DigicoreChain chain2 = vehicle.getChains().get(1);
-		assertEquals("Wrong comparison value for penalty 10.", 22.0, cc.compareChains(chain1, chain2, 10));
-		assertEquals("Wrong comparison value for penalty 10.", 202.0, cc.compareChains(chain1, chain2, 100));
+		Assert.assertEquals("Wrong comparison value for penalty 10.", 22.0, cc.compareChains(chain1, chain2, 10), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("Wrong comparison value for penalty 10.", 202.0, cc.compareChains(chain1, chain2, 100), MatsimTestUtils.EPSILON);
 	}
 	
 	
@@ -99,20 +120,20 @@ public class ChainComparatorTest extends MatsimTestCase {
 	 *   f1    f2    f3   
 	 */
 	private DigicoreVehicle setupVehicleWithTwoChains(){
-		DigicoreVehicle vehicle = new DigicoreVehicle(new IdImpl("1"));
+		DigicoreVehicle vehicle = new DigicoreVehicle(Id.create("1", Vehicle.class));
 		
 		/* Set up all the activities. */
 		DigicoreActivity a = new DigicoreActivity("a", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH); 
 		a.setCoord(new CoordImpl(0.0, 0.0));
-		a.setFacilityId(new IdImpl("f1"));
+		a.setFacilityId(Id.create("f1", ActivityFacility.class));
 		DigicoreActivity b = new DigicoreActivity("b", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH); 
 		b.setCoord(new CoordImpl(2.0, 0.0));
 		DigicoreActivity c = new DigicoreActivity("c", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH); 
 		c.setCoord(new CoordImpl(4.0, 0.0));
-		c.setFacilityId(new IdImpl("f2"));
+		c.setFacilityId(Id.create("f2", ActivityFacility.class));
 		DigicoreActivity d = new DigicoreActivity("d", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH); 
 		d.setCoord(new CoordImpl(6.0, 0.0));
-		d.setFacilityId(new IdImpl("f3"));
+		d.setFacilityId(Id.create("f3", ActivityFacility.class));
 		DigicoreActivity e = new DigicoreActivity("e", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH); 
 		e.setCoord(new CoordImpl(8.0, 0.0));
 		

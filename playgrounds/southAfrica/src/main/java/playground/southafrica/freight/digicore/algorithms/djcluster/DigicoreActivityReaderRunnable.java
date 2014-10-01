@@ -28,7 +28,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.QuadTree;
@@ -46,11 +45,10 @@ import com.vividsolutions.jts.geom.Point;
 
 public class DigicoreActivityReaderRunnable implements Runnable {
 	
-	private final static Logger log = Logger.getLogger(DigicoreActivityReaderRunnable.class);
 	private int inCount = 0;
 	private int outCount = 0;
 	private GeometryFactory gf = new GeometryFactory();
-	private final Map<Id,List<Coord>> map = new HashMap<Id, List<Coord>>();;
+	private final Map<Id<MyZone>, List<Coord>> map = new HashMap<Id<MyZone>, List<Coord>>();;
 	private final File vehicleFile;
 	private final QuadTree<MyZone> zoneQT;
 	private Counter counter;
@@ -138,7 +136,7 @@ public class DigicoreActivityReaderRunnable implements Runnable {
 	}
 
 
-	public Map<Id, List<Coord>> getMap(){
+	public Map<Id<MyZone>, List<Coord>> getMap(){
 		return this.map;
 	}
 

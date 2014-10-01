@@ -26,13 +26,10 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 
@@ -70,7 +67,7 @@ public class NormalDayChainCounts {
 	}
 	
 	public static void analyseNormalWeekdayVehicleCounts(String output){
-		Map<Id, Integer> map = new TreeMap<Id, Integer>();
+		Map<String, Integer> map = new TreeMap<String, Integer>();
 		Counter counter = new Counter("   vehicles # ");
 		
 		for(File f : vehicleFiles){
@@ -85,7 +82,7 @@ public class NormalDayChainCounts {
 					/* Check that it is a weekday */
 					int dayOfWeek = chain.getFirstMajorActivity().getEndTimeGregorianCalendar().get(Calendar.DAY_OF_WEEK);
 					if(dayOfWeek != Calendar.SATURDAY && dayOfWeek != Calendar.SUNDAY){
-						Id dayId = new IdImpl(dayOfYear);
+						String dayId = String.valueOf(dayOfYear);
 						
 						if(!map.containsKey(dayId)){
 							map.put(dayId, new Integer(1));
@@ -105,7 +102,7 @@ public class NormalDayChainCounts {
 		try{
 			bw.write("day,numberOfChains");
 			bw.newLine();
-			for(Id day : map.keySet()){
+			for(String day : map.keySet()){
 				bw.write(String.format("%s,%d\n", day.toString(), map.get(day)));
 			}
 		} catch (IOException e) {

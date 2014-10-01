@@ -25,27 +25,31 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.testcases.MatsimTestCase;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Polygon;
+import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.Vehicle;
 
 import playground.southafrica.freight.digicore.analysis.chain.chainSimilarity.geometric.GeometricChainSimilarityAnalyser;
 import playground.southafrica.freight.digicore.containers.DigicoreActivity;
 import playground.southafrica.freight.digicore.containers.DigicoreChain;
 import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
 
-public class GeometricChainSimilarityAnalyserTest extends MatsimTestCase {
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Polygon;
+
+public class GeometricChainSimilarityAnalyserTest {
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void testConstructor() {
-
 	}
 	
+	@Test
 	public void testGetBuffer(){
 		DigicoreVehicle vehicle = setupVehicle();
 		
@@ -53,33 +57,34 @@ public class GeometricChainSimilarityAnalyserTest extends MatsimTestCase {
 		DigicoreChain chain = vehicle.getChains().get(0);
 		Polygon p1 = (Polygon) GeometricChainSimilarityAnalyser.getBuffer(chain, 0.5).getEnvelope();
 		List<Coordinate> list = getCoordinateList(p1.getCoordinates());
-		assertTrue("Coordinate (0,0) not in buffer.", list.contains(new Coordinate(0.0, 0.0)));
-		assertTrue("Coordinate (1,0) not in buffer.", list.contains(new Coordinate(1.0, 0.0)));
-		assertTrue("Coordinate (0,3) not in buffer.", list.contains(new Coordinate(0.0, 3.0)));
-		assertTrue("Coordinate (1,3) not in buffer.", list.contains(new Coordinate(1.0, 3.0)));
+		Assert.assertTrue("Coordinate (0,0) not in buffer.", list.contains(new Coordinate(0.0, 0.0)));
+		Assert.assertTrue("Coordinate (1,0) not in buffer.", list.contains(new Coordinate(1.0, 0.0)));
+		Assert.assertTrue("Coordinate (0,3) not in buffer.", list.contains(new Coordinate(0.0, 3.0)));
+		Assert.assertTrue("Coordinate (1,3) not in buffer.", list.contains(new Coordinate(1.0, 3.0)));
 		
 		/* Chain 2. */
 		chain = vehicle.getChains().get(1);
 		Polygon p2 = (Polygon) GeometricChainSimilarityAnalyser.getBuffer(chain, 0.5).getEnvelope();
 		list = getCoordinateList(p2.getCoordinates());
-		assertTrue("Coordinate (0,2) not in buffer.", list.contains(new Coordinate(0.0, 2.0)));
-		assertTrue("Coordinate (3,2) not in buffer.", list.contains(new Coordinate(3.0, 2.0)));
-		assertTrue("Coordinate (0,3) not in buffer.", list.contains(new Coordinate(0.0, 3.0)));
-		assertTrue("Coordinate (3,3) not in buffer.", list.contains(new Coordinate(3.0, 3.0)));
+		Assert.assertTrue("Coordinate (0,2) not in buffer.", list.contains(new Coordinate(0.0, 2.0)));
+		Assert.assertTrue("Coordinate (3,2) not in buffer.", list.contains(new Coordinate(3.0, 2.0)));
+		Assert.assertTrue("Coordinate (0,3) not in buffer.", list.contains(new Coordinate(0.0, 3.0)));
+		Assert.assertTrue("Coordinate (3,3) not in buffer.", list.contains(new Coordinate(3.0, 3.0)));
 	}
 	
 	
+	@Test
 	public void testGetOverlapPercentage(){
 		DigicoreVehicle vehicle = setupVehicle();
 		
 		DigicoreChain chain1 = vehicle.getChains().get(0);
 		DigicoreChain chain2 = vehicle.getChains().get(1);
-		double buffer = 0.5;		
+		double buffer = 0.5;	
 
 		Geometry rectangle1 = GeometricChainSimilarityAnalyser.getBuffer(chain1, buffer).getEnvelope();
 		Geometry rectangle2 = GeometricChainSimilarityAnalyser.getBuffer(chain2, buffer).getEnvelope();
 		double percentage = GeometricChainSimilarityAnalyser.getPercentageOfInterSectionToUnion(rectangle1, rectangle2);
-		assertEquals("Wrong overlap area.", 1.0/5.0, percentage);
+		Assert.assertEquals("Wrong overlap area.", 1.0/5.0, percentage, MatsimTestUtils.EPSILON);
 	}
 	
 	
@@ -107,7 +112,7 @@ public class GeometricChainSimilarityAnalyserTest extends MatsimTestCase {
 	 * @return
 	 */
 	private DigicoreVehicle setupVehicle(){
-		DigicoreVehicle vehicle = new DigicoreVehicle(new IdImpl(1));
+		DigicoreVehicle vehicle = new DigicoreVehicle(Id.create("1", Vehicle.class));
 		
 		/* Set up activities. */
 		DigicoreActivity a1 = new DigicoreActivity("test", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH);

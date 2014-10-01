@@ -24,19 +24,21 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 
+import playground.southafrica.freight.digicore.containers.DigicoreActivity;
+
 
 /**
  * A simple class linking a {@link DigicoreActivity} to a specific cluster.
  * 
  * @author jwjoubert
  */
-public class ClusterActivity implements Identifiable{
-	private Id id;
+public class ClusterActivity implements Identifiable<Coord>{
+	private Id<Coord> activityId;
 	private Coord coord;
 	private DigicoreCluster cluster;
 	
-	public ClusterActivity(Id id, Coord coord, DigicoreCluster cluster){
-		this.id = id;
+	public ClusterActivity(Id<Coord> activityId, Coord coord, DigicoreCluster cluster){
+		this.activityId = activityId;
 		this.coord = coord;
 		this.cluster = cluster;
 	}
@@ -54,8 +56,8 @@ public class ClusterActivity implements Identifiable{
 	}
 
 	@Override
-	public Id getId() {
-		return this.id;
+	public Id<Coord> getId() {
+		return this.activityId;
 	}
 	
 

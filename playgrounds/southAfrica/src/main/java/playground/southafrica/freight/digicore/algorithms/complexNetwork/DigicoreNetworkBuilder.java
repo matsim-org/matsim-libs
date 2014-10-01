@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.misc.Counter;
 
 import playground.southafrica.freight.digicore.algorithms.djcluster.DigicoreClusterRunner;
@@ -75,16 +75,16 @@ public class DigicoreNetworkBuilder {
 
 		/* Checks if a filter facility is provided. Either as a readable file,
 		 * or as sequential Id arguments. */
-		List<Id> filter = null;
+		List<Id<ActivityFacility>> filter = null;
 		if(args.length > 1){
 			File f = new File(args[1]);
 			if(f.exists() && f.canRead() && f.isFile()){
-				filter = FileUtils.readIds(f.getAbsolutePath());
+				filter = FileUtils.readIds(f.getAbsolutePath(), ActivityFacility.class);
 			} else{
-				filter = new ArrayList<Id>();
+				filter = new ArrayList<Id<ActivityFacility>>();
 				int numberOfIdArguments = 0;
 				for(int i = 1; i < args.length; i++){
-					filter.add(new IdImpl(args[i]));
+					filter.add(Id.create(args[i], ActivityFacility.class));
 					numberOfIdArguments++;
 				}
 				LOG.info("Read " + numberOfIdArguments + " Ids from arguments.");
@@ -145,7 +145,7 @@ public class DigicoreNetworkBuilder {
 	}
 
 
-	public void buildNetwork(List<Id> filter, List<File> fileList) {
+	public void buildNetwork(List<Id<ActivityFacility>> filter, List<File> fileList) {
 		LOG.info("Building network... number of vehicle files to process: " + fileList.size());
 		this.buildStartTime = System.currentTimeMillis();
 		
@@ -195,7 +195,7 @@ public class DigicoreNetworkBuilder {
 	 * @return <code>true</code> if the chain contains facilities of interest, 
 	 * 		   <code>false</code> otherwise.
 	 */
-	public boolean checkChain(DigicoreChain chain, List<Id> filter){
+	public boolean checkChain(DigicoreChain chain, List<Id<ActivityFacility>> filter){
 		boolean check = false;
 		if(filter == null){
 			check = true;

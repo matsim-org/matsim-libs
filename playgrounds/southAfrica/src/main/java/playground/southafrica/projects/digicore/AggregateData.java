@@ -21,6 +21,7 @@ package playground.southafrica.projects.digicore;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,6 +36,7 @@ import org.jzy3d.analysis.AbstractAnalysis;
 import org.jzy3d.analysis.AnalysisLauncher;
 import org.jzy3d.chart.factories.AWTChartComponentFactory;
 import org.jzy3d.colors.Color;
+import org.jzy3d.maths.BoundingBox3d;
 import org.jzy3d.maths.Coord3d;
 import org.jzy3d.plot3d.primitives.Point;
 import org.jzy3d.plot3d.primitives.Polygon;
@@ -158,17 +160,34 @@ public class AggregateData extends AbstractAnalysis{
 		
 		/* Populate the Dodecahedra. */
 		LOG.info("Populating the dodecahedra with point observations...");
+		double pointsConsidered = 0.0;
 		br = IOUtils.getBufferedReader(filename);
 		try{
 			String line = null;
 			while( (line = br.readLine()) != null && counter.getCounter() < maxLines){
 				String[] sa = line.split(",");
+				String id = sa[1];
 				double x = Double.parseDouble(sa[5]);
 				double y = Double.parseDouble(sa[6]);
 				double z = Double.parseDouble(sa[7]);
+				double speed = Double.parseDouble(sa[8]);
+				double road = Double.parseDouble(sa[9]);
 				
-				Coord3d c = ot.get(x, y, z);
-				map.put(c, map.get(c)+1);
+				/* Put data conditions here. */
+				if(
+//						id.equalsIgnoreCase("37ff9d8e04c164ee793e172a561c7b1e") &	/* Specific individual, A. */
+//						id.equalsIgnoreCase("9a01080c086096aaaaff7504a01ea9e3") &	/* Specific individual, B. */
+//						id.equalsIgnoreCase("0ae0c60759b410c2c38fa0ba135a8e16") &	/* Specific individual, C. */
+//						road <= 2 & 												/* Road is a highway */
+//						speed <= 60.0 &												/* Low speed */
+//						speed > 60.0 &												/* High speed */
+						true
+						){
+					Coord3d c = ot.get(x, y, z);
+					map.put(c, map.get(c)+1);
+					pointsConsidered++;
+				}
+				
 				counter.incCounter();
 			}
 		} catch (IOException e) {
@@ -207,7 +226,7 @@ public class AggregateData extends AbstractAnalysis{
 			Coord3d c = sortedCoords.get(i);
 			int obs = map.get(c);
 			totalAdded += (double)obs;
-			cumulative = totalAdded / (double)counter.getCounter();
+			cumulative = totalAdded / pointsConsidered;
 			
 			/* Get the rating class for this value. */
 			Integer ratingZone = null;
@@ -220,6 +239,19 @@ public class AggregateData extends AbstractAnalysis{
 				}
 			}
 			mapRating.put(c, ratingZone);
+		}
+		
+		/* Remove zero-count dodecahedra. */
+		List<Coord3d> centroidsToRemove = new ArrayList<Coord3d>();
+		for(Coord3d c : map.keySet()){
+			int count = map.get(c);
+			countMax = Math.max(countMax, (double)count);
+			if(count == 0){
+				centroidsToRemove.add(c);
+			}
+		}
+		for(Coord3d c : centroidsToRemove){
+			map.remove(c);
 		}
 		
 		/* Write values out to file, for visualisation in R. */
@@ -244,19 +276,6 @@ public class AggregateData extends AbstractAnalysis{
 				e.printStackTrace();
 				throw new RuntimeException("Cannot close " + rFile);
 			}
-		}
-		
-		/* Remove zero-count dodecahedra. */
-		List<Coord3d> centroidsToRemove = new ArrayList<Coord3d>();
-		for(Coord3d c : map.keySet()){
-			int count = map.get(c);
-			countMax = Math.max(countMax, (double)count);
-			if(count == 0){
-				centroidsToRemove.add(c);
-			}
-		}
-		for(Coord3d c : centroidsToRemove){
-			map.remove(c);
 		}
 		
 		LOG.info("A total of " + map.size() + " dodecahedra contains points (max value: " + countMax + ")");
@@ -286,12 +305,13 @@ public class AggregateData extends AbstractAnalysis{
 		}
 		Scatter scatter = new Scatter(coords, colors, 6f);
 		chart = AWTChartComponentFactory.chart(Quality.Advanced, "awt");
+		chart.getView().updateBounds();
 		chart.getScene().add(scatter);
 	}
 	
 	private void printPolyhedra(){
 		/* Set up the chart. */
-		chart = AWTChartComponentFactory.chart(Quality.Advanced, "awt");
+		chart = AWTChartComponentFactory.chart(Quality.Nicest, "awt");
 		Light light = chart.addLight(new Coord3d(-1000f, -300f, 12000f));
 		light.setRepresentationRadius(100);
 		light.setEnabled(true);
@@ -299,13 +319,14 @@ public class AggregateData extends AbstractAnalysis{
 
 		chart.addKeyController();
 		Coord3d oldViewPoint = chart.getCanvas().getView().getViewPoint();
-		Coord3d newViewPoint = new Coord3d(oldViewPoint.x, oldViewPoint.y/3, 100);
+		Coord3d newViewPoint = new Coord3d(oldViewPoint.x, oldViewPoint.y/3, 500);
 
 		chart.getView().setSquared(false);
 		chart.getView().setSquared(true);
 		chart.getView().setMaximized(true);
 		chart.getView().setViewPoint(newViewPoint, true);
 		chart.getView().setViewPositionMode(ViewPositionMode.FREE);
+		chart.getView().setBoundManual(new BoundingBox3d(-800f, 800f, -800f, 800f, 600f, 1500f));
 		chart.getView().updateBounds();
 		
 		for(Coord3d c : map.keySet()){
@@ -342,22 +363,27 @@ public class AggregateData extends AbstractAnalysis{
 				LOG.error("Something wrong!!");
 			}
 			
-			/* Create faces. */
-			FCCPolyhedron poly = new FCCPolyhedron(c.x, c.y, c.z, scale);
-			for(NDPolygon face : poly.getFcPolyhedron()){
-				Quad q = new Quad();
-				for(GridPoint point : face.getPolyFace()){
-					q.add(new Point(new Coord3d(point.getX(), point.getY(), point.getZ())));
-				}
-				body.add((org.jzy3d.plot3d.primitives.Polygon)q);
-			}
 			
-			Shape shape = new Shape(body);
-			shape.setFaceDisplayed(true);
-			shape.setColor(fillColor);
-			shape.setFaceDisplayed(true);
-			shape.setWireframeColor(darkerGray);
-			chart.getScene().add(shape);
+			/* Limit faces to certain colours. */
+			if(zone < 4){
+				/* Create faces. */
+				FCCPolyhedron poly = new FCCPolyhedron(c.x, c.y, c.z, scale);
+				for(NDPolygon face : poly.getFcPolyhedron()){
+					Quad q = new Quad();
+					for(GridPoint point : face.getPolyFace()){
+						q.add(new Point(new Coord3d(point.getX(), point.getY(), point.getZ())));
+					}
+					body.add((org.jzy3d.plot3d.primitives.Polygon)q);
+				}
+				
+				Shape shape = new Shape(body);
+				shape.setFaceDisplayed(true);
+				shape.setColor(fillColor);
+				shape.setFaceDisplayed(true);
+				shape.setWireframeColor(darkerGray);
+				chart.getScene().add(shape);
+			}
+
 			chart.getView().shoot();
 		}
 	}
@@ -373,13 +399,14 @@ public class AggregateData extends AbstractAnalysis{
 		
 		chart.addKeyController();
 		Coord3d oldViewPoint = chart.getCanvas().getView().getViewPoint();
-//		Coord3d newViewPoint = new Coord3d(oldViewPoint.x, oldViewPoint.y/3, 100);
-		Coord3d newViewPoint = new Coord3d(3*Math.PI/2, Math.PI/2, 5000);
+		Coord3d newViewPoint = new Coord3d(2*Math.PI/2, Math.PI/2, 2000);
 		
 		chart.getView().setSquared(false);
+		chart.getView().setSquared(true);
 		chart.getView().setMaximized(true);
 		chart.getView().setViewPoint(newViewPoint, true);
 		chart.getView().setViewPositionMode(ViewPositionMode.FREE);
+		chart.getView().setBoundManual(new BoundingBox3d(-600f, 600f, -700f, 700f, 600f, 1500f));
 		chart.getView().updateBounds();
 		
 		for(Coord3d c : map.keySet()){
@@ -411,7 +438,7 @@ public class AggregateData extends AbstractAnalysis{
 			
 			/* Create slice face. */
 //			for(double depth = 800; depth <= 1200; depth+=10){
-			{double depth = 1003.0;
+			{double depth = 1009.0;
 				FCCPlanePolygon fccPoly = new FCCPlanePolygon(c.x, c.y, c.z, 3, depth, scale);
 				Polygon poly = new Polygon();
 				

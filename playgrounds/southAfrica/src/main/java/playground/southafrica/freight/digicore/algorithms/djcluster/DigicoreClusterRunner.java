@@ -36,9 +36,10 @@ import java.util.concurrent.Future;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.facilities.FacilitiesUtils;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.io.IOUtils;
@@ -68,8 +69,8 @@ public class DigicoreClusterRunner {
 	private final static int BLOCK_SIZE = 100; 
 	
 	private final int numberOfThreads;
-	private Map<Id, List<Coord>> zoneMap = null;
-	private ActivityFacilitiesImpl facilities;
+	private Map<Id<MyZone>, List<Coord>> zoneMap = null;
+	private ActivityFacilities facilities;
 	private ObjectAttributes facilityAttributes;
 
 	/** 
@@ -142,7 +143,7 @@ public class DigicoreClusterRunner {
 				folder.mkdirs();
 				
 				/* Cluster. */
-				dcr.facilities = new ActivityFacilitiesImpl(String.format("Digicore clustered facilities: %.0f (radius); %d (pmin)",thisRadius, thisPmin));
+				dcr.facilities = FacilitiesUtils.createActivityFacilities(String.format("Digicore clustered facilities: %.0f (radius); %d (pmin)",thisRadius, thisPmin));
 				dcr.facilityAttributes = new ObjectAttributes();
 				try{
 					dcr.clusterPointLists(thisRadius, thisPmin, facilityPointFolder);
@@ -194,7 +195,7 @@ public class DigicoreClusterRunner {
 		try{
 			bw.write("Id,Long,Lat,Count");
 			bw.newLine();
-			for(Id id : this.facilities.getFacilities().keySet()){
+			for(Id<ActivityFacility> id : this.facilities.getFacilities().keySet()){
 				ActivityFacility af = this.facilities.getFacilities().get(id);
 				bw.write(id.toString());
 				bw.write(",");
@@ -243,7 +244,7 @@ public class DigicoreClusterRunner {
 		
 		Counter counter = new Counter("   Zones completed: ");
 		/* Submit the clustering jobs to the different threads. */
-		for(Id id : zoneMap.keySet()){			
+		for(Id<MyZone> id : zoneMap.keySet()){			
 			Callable<List<DigicoreCluster>> job = new DigicoreClusterCallable(zoneMap.get(id), radius, minimumPoints, counter);
 			Future<List<DigicoreCluster>> submit = threadExecutor.submit(job);
 			listOfJobs.add(submit);
@@ -259,7 +260,7 @@ public class DigicoreClusterRunner {
 			try {
 				List<DigicoreCluster> list = future.get();
 				for(DigicoreCluster dc : list){
-					Id facilityId = new IdImpl(i++);
+					Id<ActivityFacility> facilityId = Id.create(i++, ActivityFacility.class);
 
 					/* Construct the concave hull for the clustered points. */
 					List<ClusterActivity> dcPoints = dc.getPoints();
@@ -282,7 +283,8 @@ public class DigicoreClusterRunner {
 							dc.setConcaveHull(hull);
 							dc.setCenterOfGravity();
 							
-							facilities.createAndAddFacility(facilityId, dc.getCenterOfGravity());
+							ActivityFacility af = facilities.getFactory().createActivityFacility(facilityId, dc.getCenterOfGravity());
+							facilities.addActivityFacility(af);
 							facilityAttributes.putAttribute(facilityId.toString(), "DigicoreActivityCount", String.valueOf(dc.getPoints().size()));
 							facilityAttributes.putAttribute(facilityId.toString(), "concaveHull", hull);
 						} else{
@@ -329,7 +331,7 @@ public class DigicoreClusterRunner {
 			}				
 		}
 		
-		facilities.printFacilitiesCount();
+		((ActivityFacilitiesImpl)facilities).printFacilitiesCount();
 		
 		/*TODO Can remove after debugging. Report the number of
 		 * facilities that were ignored because of empty geometries. */
@@ -386,11 +388,11 @@ public class DigicoreClusterRunner {
 
 		/* Set up the output infrastructure:
 		 * Create a new map with an empty list for each zone. These will be passed to threads later. */
-		zoneMap = new HashMap<Id, List<Coord>>();
+		zoneMap = new HashMap<Id<MyZone>, List<Coord>>();
 		for(MyZone mz : zoneList){
 			zoneMap.put(mz.getId(), new ArrayList<Coord>());
 		}
-		Map<Id, List<Coord>> theMap = null;
+		Map<Id<MyZone>, List<Coord>> theMap = null;
 		
 		while(vehicleCounter < vehicleList.size()){
 			int blockCounter = 0;
@@ -416,7 +418,7 @@ public class DigicoreClusterRunner {
 			/* Add all the coordinates from each vehicle to the main map. */
 			for(DigicoreActivityReaderRunnable rdar : threadList){
 				theMap = rdar.getMap();
-				for(Id id : theMap.keySet()){
+				for(Id<MyZone> id : theMap.keySet()){
 					zoneMap.get(id).addAll(theMap.get(id));
 				}
 				inActivities += rdar.getInCount();
@@ -435,7 +437,7 @@ public class DigicoreClusterRunner {
 
 	public DigicoreClusterRunner(int numberOfThreads) {
 		this.numberOfThreads = numberOfThreads;
-		facilities = new ActivityFacilitiesImpl("Digicore facilities");
+		facilities = FacilitiesUtils.createActivityFacilities("Digicore facilities");
 		facilityAttributes = new ObjectAttributes();
 	}
 	

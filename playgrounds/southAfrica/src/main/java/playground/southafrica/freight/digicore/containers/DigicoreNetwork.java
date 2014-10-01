@@ -29,6 +29,7 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.Tuple;
 
@@ -42,20 +43,23 @@ import edu.uci.ics.jung.graph.util.Pair;
  * 
  * @author jwjoubert
  */
-public class DigicoreNetwork extends DirectedSparseGraph<Id, Pair<Id>>{
+public class DigicoreNetwork extends DirectedSparseGraph<Id<ActivityFacility>, Pair<Id<ActivityFacility>>>{
 	private final Logger LOG = Logger.getLogger(DigicoreNetwork.class);
 	
 	private List<String> activityTypes;
 	
-	private Map< Tuple<Pair<Id>, Pair<String>>, Integer> weights 
-		= new HashMap<Tuple<Pair<Id>,Pair<String>>, Integer>();
+	private Map< Tuple<Pair<Id<ActivityFacility>>, Pair<String>>, Integer> weights 
+		= new HashMap<Tuple<Pair<Id<ActivityFacility>>,Pair<String>>, Integer>();
 	
 	/* Different weight maps. */
-	private Map<Tuple<Id, String>, Map<Id, Integer>> nodeWeightMap = new HashMap<Tuple<Id,String>, Map<Id,Integer>>();
-	private Map<String, Map<Id, Integer>> originWeightMaps = new HashMap<String, Map<Id,Integer>>();
-	private Map<String, Map<Id, Integer>> destinationWeightMaps = new HashMap<String, Map<Id,Integer>>();
+	private Map<Tuple<Id<ActivityFacility>, String>, Map<Id<ActivityFacility>, Integer>> nodeWeightMap = 
+			new HashMap<Tuple<Id<ActivityFacility>,String>, Map<Id<ActivityFacility>,Integer>>();
+	private Map<String, Map<Id<ActivityFacility>, Integer>> originWeightMaps = 
+			new HashMap<String, Map<Id<ActivityFacility>,Integer>>();
+	private Map<String, Map<Id<ActivityFacility>, Integer>> destinationWeightMaps = 
+			new HashMap<String, Map<Id<ActivityFacility>,Integer>>();
 	
-	private Map<Id,Coord> coord = new HashMap<Id, Coord>();
+	private Map<Id<ActivityFacility>,Coord> coord = new HashMap<Id<ActivityFacility>, Coord>();
 	public int nodeCounter = 0;
 
 	/**
@@ -82,7 +86,7 @@ public class DigicoreNetwork extends DirectedSparseGraph<Id, Pair<Id>>{
 			throw new RuntimeException("Either the origin or destination facility Id, or both, are NULL.");
 		}
 		Pair<String> typePair = new Pair<String>(origin.getType(), destination.getType());
-		Pair<Id> idPair = new Pair<Id>(origin.getFacilityId(), destination.getFacilityId());
+		Pair<Id<ActivityFacility>> idPair = new Pair<Id<ActivityFacility>>(origin.getFacilityId(), destination.getFacilityId());
 		
 		/* Check if both origin and destination vertices exist, add if not. */
 		if(!this.containsVertex(origin.getFacilityId())){
@@ -105,7 +109,7 @@ public class DigicoreNetwork extends DirectedSparseGraph<Id, Pair<Id>>{
 		/* Add the edge with weight 1 if it does not exist yet, otherwise 
 		 * increment weight. These are the general network weights, and
 		 * does not take activity pairs into account. */
-		Tuple<Pair<Id>, Pair<String>> tuple = new Tuple<Pair<Id>, Pair<String>>( idPair, typePair );
+		Tuple<Pair<Id<ActivityFacility>>, Pair<String>> tuple = new Tuple<Pair<Id<ActivityFacility>>, Pair<String>>( idPair, typePair );
 		if(!this.containsEdge(idPair)){
 			this.addEdge(idPair, origin.getFacilityId(), destination.getFacilityId(), EdgeType.DIRECTED);
 			weights.put(tuple, 1);
@@ -119,7 +123,7 @@ public class DigicoreNetwork extends DirectedSparseGraph<Id, Pair<Id>>{
 	}
 
 	
-	public Map<Id, Coord> getCoordinates(){
+	public Map<Id<ActivityFacility>, Coord> getCoordinates(){
 		return this.coord;
 	}
 	
@@ -154,15 +158,15 @@ public class DigicoreNetwork extends DirectedSparseGraph<Id, Pair<Id>>{
 	}
 		
 
-	public Map<Tuple<Pair<Id>, Pair<String>>, Integer> getWeights(){
+	public Map<Tuple<Pair<Id<ActivityFacility>>, Pair<String>>, Integer> getWeights(){
 		return this.weights;
 	}
 	
 	
-	public int getMultiplexEdgeWeight(Id oId, String oType, Id dId, String dType){
-		Pair<Id> idPair = new Pair<Id>(oId, dId);
+	public int getMultiplexEdgeWeight(Id<ActivityFacility> oId, String oType, Id<ActivityFacility> dId, String dType){
+		Pair<Id<ActivityFacility>> idPair = new Pair<Id<ActivityFacility>>(oId, dId);
 		Pair<String> typePair = new Pair<String>(oType, dType);
-		Tuple<Pair<Id>, Pair<String>> tuple = new Tuple<Pair<Id>, Pair<String>>(idPair, typePair);
+		Tuple<Pair<Id<ActivityFacility>>, Pair<String>> tuple = new Tuple<Pair<Id<ActivityFacility>>, Pair<String>>(idPair, typePair);
 		
 		if(this.weights.containsKey(tuple)){
 			return this.weights.get(tuple);
@@ -181,7 +185,7 @@ public class DigicoreNetwork extends DirectedSparseGraph<Id, Pair<Id>>{
 	 * @param destination
 	 * @return the weight of the directed edge, or 0 if the edge is not in the graph.
 	 */
-	public int getEdgeWeight(Id oId, Id dId){
+	public int getEdgeWeight(Id<ActivityFacility> oId, Id<ActivityFacility> dId){
 		int totalWeight = 0;
 		for(int i = 0; i < this.activityTypes.size(); i++){
 			for(int j = 0; j < this.activityTypes.size(); j++){
@@ -215,7 +219,7 @@ public class DigicoreNetwork extends DirectedSparseGraph<Id, Pair<Id>>{
 	 * @param activityType
 	 * @return
 	 */
-	public Id sampleBiasedOriginNode(String activityType){
+	public Id<ActivityFacility> sampleBiasedOriginNode(String activityType){
 		return this.sampleBiasedOriginNode(activityType, MatsimRandom.getRandom());
 	}
 	
@@ -226,14 +230,14 @@ public class DigicoreNetwork extends DirectedSparseGraph<Id, Pair<Id>>{
 	 * @param random
 	 * @return
 	 */
-	public Id sampleBiasedOriginNode(String activityType, Random random) {
-		Map<Id, Integer> weightMap;
+	public Id<ActivityFacility> sampleBiasedOriginNode(String activityType, Random random) {
+		Map<Id<ActivityFacility>, Integer> weightMap;
 		if(originWeightMaps.get(activityType) == null){
-			weightMap = new HashMap<Id, Integer>();
+			weightMap = new HashMap<Id<ActivityFacility>, Integer>();
 			
-			for(Tuple<Pair<Id>, Pair<String>> tuple : this.weights.keySet()){
+			for(Tuple<Pair<Id<ActivityFacility>>, Pair<String>> tuple : this.weights.keySet()){
 				if(tuple.getSecond().getFirst().equalsIgnoreCase(activityType)){
-					Id major = tuple.getFirst().getFirst();
+					Id<ActivityFacility> major = tuple.getFirst().getFirst();
 					if(!weightMap.containsKey(major)){
 						weightMap.put(major, this.weights.get(tuple));					
 					} else{
@@ -246,7 +250,7 @@ public class DigicoreNetwork extends DirectedSparseGraph<Id, Pair<Id>>{
 			weightMap = originWeightMaps.get(activityType);
 		}
 		
-		WeightedChoice<Id> vertexWeights = new WeightedChoice<Id>(weightMap, random);
+		WeightedChoice<Id<ActivityFacility>> vertexWeights = new WeightedChoice<Id<ActivityFacility>>(weightMap, random);
 		return vertexWeights.nextItem();
 	}
 
@@ -260,7 +264,7 @@ public class DigicoreNetwork extends DirectedSparseGraph<Id, Pair<Id>>{
 	 * @param destinationType
 	 * @return
 	 */
-	public Id sampleBiasedDestinationNode(Id origin, String destinationType) {
+	public Id<ActivityFacility> sampleBiasedDestinationNode(Id<ActivityFacility> origin, String destinationType) {
 		return this.sampleBiasedDestinationNode(origin, destinationType, MatsimRandom.getRandom());
 	}	
 	
@@ -273,17 +277,17 @@ public class DigicoreNetwork extends DirectedSparseGraph<Id, Pair<Id>>{
 	 * @param random
 	 * @return
 	 */
-	public Id sampleBiasedDestinationNode(Id origin, String destinationType, Random random) {
-		Tuple<Id, String> weightMapTuple = new Tuple<Id, String>(origin, destinationType);
-		Map<Id, Integer> weightMap;
+	public Id<ActivityFacility> sampleBiasedDestinationNode(Id<ActivityFacility> origin, String destinationType, Random random) {
+		Tuple<Id<ActivityFacility>, String> weightMapTuple = new Tuple<Id<ActivityFacility>, String>(origin, destinationType);
+		Map<Id<ActivityFacility>, Integer> weightMap;
 		if(!nodeWeightMap.containsKey(weightMapTuple)){
 			/* Build a weight map for the origin node, given the specific destination type. */
-			weightMap = new HashMap<Id, Integer>();
+			weightMap = new HashMap<Id<ActivityFacility>, Integer>();
 			
-			for(Tuple<Pair<Id>, Pair<String>> tuple : this.weights.keySet()){
+			for(Tuple<Pair<Id<ActivityFacility>>, Pair<String>> tuple : this.weights.keySet()){
 				if(tuple.getFirst().getFirst() == origin &&
 						tuple.getSecond().getSecond().equalsIgnoreCase(destinationType)){
-					Id destinationId = tuple.getFirst().getSecond();
+					Id<ActivityFacility> destinationId = tuple.getFirst().getSecond();
 					weightMap.put(destinationId, weights.get(tuple));
 				}
 			}		
@@ -295,9 +299,9 @@ public class DigicoreNetwork extends DirectedSparseGraph<Id, Pair<Id>>{
 		if(weightMap.size() == 0){
 			if(!destinationWeightMaps.containsKey(destinationType)){
 				/* Build a destination weight map for the activity type. */
-				for(Tuple<Pair<Id>, Pair<String>> tuple : this.weights.keySet()){
+				for(Tuple<Pair<Id<ActivityFacility>>, Pair<String>> tuple : this.weights.keySet()){
 					if(tuple.getSecond().getSecond().equalsIgnoreCase(destinationType)){
-						Id node = tuple.getFirst().getSecond();
+						Id<ActivityFacility> node = tuple.getFirst().getSecond();
 						if(!weightMap.containsKey(node)){
 							weightMap.put(node, this.weights.get(tuple));					
 						} else{
@@ -310,7 +314,7 @@ public class DigicoreNetwork extends DirectedSparseGraph<Id, Pair<Id>>{
 				weightMap = destinationWeightMaps.get(destinationType);
 			}
 		}
-		WeightedChoice<Id> vertexWeights = new WeightedChoice<Id>(weightMap, random);
+		WeightedChoice<Id<ActivityFacility>> vertexWeights = new WeightedChoice<Id<ActivityFacility>>(weightMap, random);
 		return vertexWeights.nextItem();			
 	}
 	
