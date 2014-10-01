@@ -234,7 +234,7 @@ public abstract class MarginalCongestionHandler implements
 //					log.warn("The causing agent and the affected agent are the same (" + id.toString() + "). This situation is NOT considered as an external effect; NO marginal congestion event is thrown.");
 				} else {
 					// using the time when the causing agent entered the link
-					MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(linkInfo.getPersonId2linkEnterTime().get(id), "flowStorageCapacity", id, event.getVehicleId(), linkInfo.getMarginalDelayPerLeavingVehicle_sec(), event.getLinkId());
+					MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowStorageCapacity", id, event.getVehicleId(), linkInfo.getMarginalDelayPerLeavingVehicle_sec(), event.getLinkId(), linkInfo.getPersonId2linkEnterTime().get(id));
 					this.events.processEvent(congestionEvent);
 					this.totalInternalizedDelay = this.totalInternalizedDelay + linkInfo.getMarginalDelayPerLeavingVehicle_sec();
 				}
@@ -247,7 +247,7 @@ public abstract class MarginalCongestionHandler implements
 //						log.warn("The causing agent and the affected agent are the same (" + id.toString() + "). This situation is NOT considered as an external effect; NO marginal congestion event is thrown.");
 					} else {
 						// using the time when the causing agent entered the link
-						MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(linkInfo.getPersonId2linkEnterTime().get(id), "flowStorageCapacity", id, event.getVehicleId(), delayToPayFor, event.getLinkId());
+						MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowStorageCapacity", id, event.getVehicleId(), delayToPayFor, event.getLinkId(), linkInfo.getPersonId2linkEnterTime().get(id));
 						this.events.processEvent(congestionEvent);	
 						this.totalInternalizedDelay = this.totalInternalizedDelay + delayToPayFor;
 					}

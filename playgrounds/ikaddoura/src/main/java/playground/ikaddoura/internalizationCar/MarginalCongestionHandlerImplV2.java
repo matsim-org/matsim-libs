@@ -94,14 +94,14 @@ public class MarginalCongestionHandlerImplV2 extends MarginalCongestionHandler {
 			
 		} else {
 			// using the time when the causing agent entered the link
-			double time = 0.;
+			double emergenceTime = 0.;
 			if (linkInfo.getPersonId2linkEnterTime().get(causingAgent) == null) {
-				time = event.getTime();
+				emergenceTime = event.getTime();
 			} else {
-				time = linkInfo.getPersonId2linkEnterTime().get(causingAgent);
+				emergenceTime = linkInfo.getPersonId2linkEnterTime().get(causingAgent);
 			}
 			
-			MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(time, "storageCapacity", causingAgent, event.getVehicleId(), remainingDelay, event.getLinkId());
+			MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "storageCapacity", causingAgent, event.getVehicleId(), remainingDelay, event.getLinkId(), emergenceTime);
 			this.events.processEvent(congestionEvent);
 			this.totalInternalizedDelay += remainingDelay;
 		}

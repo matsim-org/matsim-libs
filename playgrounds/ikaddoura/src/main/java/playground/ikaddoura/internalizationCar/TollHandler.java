@@ -280,7 +280,7 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkEnterEve
 				for (double time = 0; time < (30 * 3600);) {
 					time = time + this.timeBinSize;
 					
-					if (event.getTime() < time && event.getTime() >= (time - this.timeBinSize)) {
+					if (event.getEmergenceTime() < time && event.getEmergenceTime() >= (time - this.timeBinSize)) {
 						// congestion event in time bin
 						// update toll sum of this link and time bin
 						
@@ -305,7 +305,7 @@ public class TollHandler implements MarginalCongestionEventHandler, LinkEnterEve
 				for (double time = 0; time < (30 * 3600);) {
 					time = time + this.timeBinSize;
 
-					if (event.getTime() < time && event.getTime() >= (time - this.timeBinSize)) {
+					if (event.getEmergenceTime() < time && event.getEmergenceTime() >= (time - this.timeBinSize)) {
 						// congestion event in time bin
 						double amount = event.getDelay() / 3600.0 * this.vtts_car;
 						timeBin2tollSum.put(time, amount);

@@ -80,9 +80,9 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 	private List<Id> ptDrivers = new ArrayList<Id>();
 	private Scenario scenario;
 	
-	private double distance = 500.;
-	private double maxDistance = 40 * distance;
-	private double timeBinSize = 900.0;
+	private double distance = 500.; // TODO: set dynamically!
+	private double maxDistance = 40 * distance; // TODO: set dynamically!
+	private double timeBinSize = 900.0; // TODO: set dynamically!
 	
 	public ExtCostEventHandler(Scenario scenario, boolean useMoneyEvents) {
 		this.scenario = scenario;
@@ -114,13 +114,13 @@ public class ExtCostEventHandler implements PersonMoneyEventHandler, TransitDriv
 			
 			// trip-based analysis
 			double amount = event.getDelay() / 3600 * this.vtts_car;
-			double eventTime = event.getTime();
+			double emergenceTime = event.getEmergenceTime();
 			int tripNumber = 0;
 			double maxDepTime = 0.;
 			Map<Integer,Double> tripNumber2departureTime = personId2tripNumber2departureTime.get(event.getCausingAgentId());
 			
 			for(int tripNr : tripNumber2departureTime.keySet()) {
-				if(eventTime >= tripNumber2departureTime.get(tripNr)) {
+				if(emergenceTime >= tripNumber2departureTime.get(tripNr)) {
 					if (tripNumber2departureTime.get(tripNr) >= maxDepTime) {
 						tripNumber = tripNr;
 					}

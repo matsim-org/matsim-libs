@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 
 /**
- * Event to indicate that an agent entering or leaving a link is delaying other agents on that link later on.
+ * Event to indicate that an agent entering or leaving a link is delaying other agents on that link.
  * 
  * @author ikaddoura
  */
@@ -40,20 +40,27 @@ public final class MarginalCongestionEvent extends Event {
 	public static final String ATTRIBUTE_AFFECTED_AGENT = "affectedAgent";
 	public static final String ATTRIBUTE_DELAY = "delay";
 	public static final String ATTRIBUTE_LINK = "link";
+	public static final String ATTRIBUTE_EMERGENCETIME = "emergenceTime"; // i.e. the time when the causing agent enters the link
 	
 	private final Id causingAgentId;
 	private final Id affectedAgentId;
 	private final double delay;
 	private final Id linkId;
 	private final String capacityConstraint;
+	private final double emergenceTime;
 
-	public MarginalCongestionEvent(double time, String capacityConstraint, Id causingAgentId, Id affectedAgentId, double externalDelay, Id linkId) {
+	public MarginalCongestionEvent(double time, String capacityConstraint, Id causingAgentId, Id affectedAgentId, double externalDelay, Id linkId, double emergenceTime) {
 		super(time);
 		this.capacityConstraint = capacityConstraint;
 		this.causingAgentId = causingAgentId;
 		this.affectedAgentId = affectedAgentId;
 		this.delay = externalDelay;
 		this.linkId = linkId;
+		this.emergenceTime = emergenceTime;
+	}
+	
+	public double getEmergenceTime(){
+		return emergenceTime;
 	}
 	
 	public double getDelay() {
@@ -71,6 +78,10 @@ public final class MarginalCongestionEvent extends Event {
 	public Id getLinkId() {
 		return linkId;
 	}
+	
+	public String getCapacityConstraint() {
+		return capacityConstraint;
+	}
 
 	@Override
 	public String getEventType() {
@@ -85,11 +96,8 @@ public final class MarginalCongestionEvent extends Event {
 		attrs.put(ATTRIBUTE_AFFECTED_AGENT, this.affectedAgentId.toString());
 		attrs.put(ATTRIBUTE_DELAY, Double.toString(this.delay));
 		attrs.put(ATTRIBUTE_LINK, this.linkId.toString());
+		attrs.put(ATTRIBUTE_EMERGENCETIME, Double.toString(this.emergenceTime));
 		return attrs;
-	}
-
-	public String getCapacityConstraint() {
-		return capacityConstraint;
 	}
 
 }
