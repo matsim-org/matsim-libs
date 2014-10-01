@@ -56,7 +56,11 @@ import org.matsim.lanes.data.v20.LaneDefinitions20;
 public class MixedLaneTestFixture {
 
 	public final ScenarioImpl sc;
-	public final Id<Link> id0, id1, id2, id3, id4;
+	public final Id<Link> id0;
+	public final Id<Link> id1;
+	public final Id<Link> id2;
+	public final Id<Link> id3;
+	public final Id<Link> id4;
 	public final Id<Object> link1FirstLaneId;
 	
 	public MixedLaneTestFixture(){
@@ -162,7 +166,7 @@ public class MixedLaneTestFixture {
 		Population pop = sc.getPopulation();
 		PopulationFactory pb = pop.getFactory();
 		//first person
-		Person p = pb.createPerson(id1);
+		Person p = pb.createPerson(Id.create(1, Person.class));
 		Plan plan = pb.createPlan();
 		Activity act = pb.createActivityFromLinkId("h", id0);
 		act.setEndTime(3600.0);
@@ -178,7 +182,7 @@ public class MixedLaneTestFixture {
 		p.addPlan(plan);
 		pop.addPerson(p);
 		//second person
-		p = pb.createPerson(id2);
+		p = pb.createPerson(Id.create(2, Person.class));
 		plan = pb.createPlan();
 		act = pb.createActivityFromLinkId("h", id0);
 		act.setEndTime(3600.0);
@@ -199,7 +203,7 @@ public class MixedLaneTestFixture {
 		Population pop = sc.getPopulation();
 		PopulationFactory pb = pop.getFactory();
 		//first person
-		Person p = pb.createPerson(id1);
+		Person p = pb.createPerson(Id.create(1, Person.class));
 		Plan plan = pb.createPlan();
 		Activity act = pb.createActivityFromLinkId("h", id1);
 		act.setEndTime(3600.0);

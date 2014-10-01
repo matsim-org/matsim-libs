@@ -124,7 +124,7 @@ public class CountsComparisonAlgorithm {
 			if (!distanceFilter.isInRange(count)) {
 				continue;
 			}
-			double[] volumes = this.volumesPerLinkPerHour.getVolumesForStop(count.getLocId());
+			double[] volumes = this.volumesPerLinkPerHour.getVolumesForStop(Id.create(count.getLocId(), TransitStopFacility.class));
 			if (volumes == null || volumes.length == 0) {
 				log.warn("No volumes for count location: " + count.getLocId().toString());
 				continue;

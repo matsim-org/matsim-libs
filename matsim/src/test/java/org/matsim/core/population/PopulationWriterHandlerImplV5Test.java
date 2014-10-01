@@ -137,7 +137,7 @@ public class PopulationWriterHandlerImplV5Test {
 		route.setDistance(dist); 
 		leg.setRoute(route);
 		plan.addLeg(leg);
-		plan.addActivity(pb.createActivityFromLinkId("h", Id.create("2", Person.class)));
+		plan.addActivity(pb.createActivityFromLinkId("h", Id.create("2", Link.class)));
 		person.addPlan(plan);
 		pop.addPerson(person);
 

@@ -142,11 +142,11 @@ public class RunDemo {
 		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
 		
 		for (int i = 0; i < populationSize; i++) {
-			Id fromLinkId = Id.create("l0", Link.class);
-			Id endLinkId;
+			Id<Link> fromLinkId = Id.create("l0", Link.class);
+			Id<Link> endLinkId;
 			if (MatsimRandom.getRandom().nextBoolean()) endLinkId = Id.create("l4", Link.class);
 			else endLinkId = Id.create("l5", Link.class);
-			Person p0 = populationFactory.createPerson(Id.create("p" + i, Link.class));
+			Person p0 = populationFactory.createPerson(Id.create("p" + i, Person.class));
 			Plan plan = populationFactory.createPlan();
 			Activity from = populationFactory.createActivityFromLinkId("home", fromLinkId);
 			from.setStartTime(0.0);

@@ -128,7 +128,7 @@ public class WagonToMatsimDemandConverter {
 			fromNodesInPseudoNetwork.add(fromNodeId);
 			toNodesInPseudoNetwork.add(toNodeId);
 			
-			Person person = factory.createPerson(wagon.id);
+			Person person = factory.createPerson(Id.create(wagon.id, Person.class));
 			Plan plan = factory.createPlan();
 			person.addPlan(plan);
 			Activity origin = factory.createActivityFromCoord(WagonSimConstants.ORIGIN,scenario.getNetwork().getNodes().get(fromNodeId).getCoord());

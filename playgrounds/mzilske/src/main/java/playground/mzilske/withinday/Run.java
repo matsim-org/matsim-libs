@@ -1,5 +1,7 @@
 package playground.mzilske.withinday;
 
+import java.util.Arrays;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -22,10 +24,9 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+
 import playground.mzilske.city2000w.GridCreator;
 import playground.mzilske.logevents.LogOutputEventHandler;
-
-import java.util.Arrays;
 
 public class Run {
 	
@@ -77,7 +78,7 @@ public class Run {
 		GridCreator gridCreator = new GridCreator(scenario);
 		gridCreator.createGrid(8);
 		
-		Person person = scenario.getPopulation().getFactory().createPerson(Id.create("1", Link.class));
+		Person person = scenario.getPopulation().getFactory().createPerson(Id.create("1", Person.class));
 		Plan plan = scenario.getPopulation().getFactory().createPlan();
 		
 		Activity activity1 = scenario.getPopulation().getFactory().createActivityFromLinkId("wurst", Id.create("i(1,1)", Link.class));

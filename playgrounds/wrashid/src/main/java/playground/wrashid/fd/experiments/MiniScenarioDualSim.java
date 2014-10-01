@@ -98,7 +98,7 @@ public class MiniScenarioDualSim {
 		int p = 0;
 		for (int hour = 0; hour < 24; hour++) {
 			for (int pNum = 0; pNum < initialAgents+agentIncrementPerHour*hour; pNum++) {
-				Person person = factory.createPerson(Id.create(String.valueOf(p++), Link.class));
+				Person person = factory.createPerson(Id.create(String.valueOf(p++), Person.class));
 				Plan plan = factory.createPlan();
 				Activity from = factory.createActivityFromLinkId("home", Id.create("l3", Link.class));
 				from.setEndTime(Math.round(3600*(hour + random.nextDouble())));

@@ -21,6 +21,7 @@ package org.matsim.api.core.v01.population;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.internal.MatsimFactory;
 
 /**
@@ -28,7 +29,7 @@ import org.matsim.core.api.internal.MatsimFactory;
  */
 public interface PopulationFactory extends MatsimFactory {
 
-	Person createPerson(Id id);
+	Person createPerson(Id<Person> id);
 
 	Plan createPlan();
 
@@ -48,7 +49,7 @@ public interface PopulationFactory extends MatsimFactory {
 	 * @param actType - the type of the activity, which needs to correspond to some string in the config file
 	 * @return the activity
 	 */
-	Activity createActivityFromLinkId(String actType, Id linkId);
+	Activity createActivityFromLinkId(String actType, Id<Link> linkId);
 
 	Leg createLeg(String legMode);
 

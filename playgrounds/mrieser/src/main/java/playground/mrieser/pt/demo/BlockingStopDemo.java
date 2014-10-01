@@ -234,7 +234,7 @@ public class BlockingStopDemo {
 			act1.setEndTime(startTime + i*60);
 			LegImpl leg = (LegImpl) pb.createLeg(TransportMode.pt);
 			leg.setRoute(new ExperimentalTransitRoute(schedule.getFacilities().get(Id.create(nOfStops+i-1, TransitStopFacility.class)), tLine2, tRoute2, schedule.getFacilities().get(Id.create(2*nOfStops-1, TransitStopFacility.class))));
-			ActivityImpl act2 = (ActivityImpl) pb.createActivityFromLinkId("work", Id.create(2*nOfLinks-1, TransitStopFacility.class));
+			ActivityImpl act2 = (ActivityImpl) pb.createActivityFromLinkId("work", Id.create(2*nOfLinks-1, Link.class));
 
 			population.addPerson(person);
 			person.addPlan(plan);

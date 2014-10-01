@@ -208,7 +208,7 @@ public class RunInternalizationTest {
 
 	private void createActiveAgents() {
 		PopulationFactory pFactory = scenario.getPopulation().getFactory();
-		Person person = pFactory.createPerson(Id.create("worker", Link.class));
+		Person person = pFactory.createPerson(Id.create("worker", Person.class));
 		Plan plan = pFactory.createPlan();
 		
 		Activity home = pFactory.createActivityFromLinkId("home", Id.create("1", Link.class));
