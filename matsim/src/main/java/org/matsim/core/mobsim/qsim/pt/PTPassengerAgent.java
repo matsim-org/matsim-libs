@@ -63,9 +63,9 @@ public interface PTPassengerAgent extends PassengerAgent {
 	 * 
 	 * @return The transit stop id.
 	 */
-	public Id getDesiredAccessStopId();
+	public Id<TransitStopFacility> getDesiredAccessStopId();
 	
-	public Id getDesiredDestinationStopId();
+	public Id<TransitStopFacility> getDesiredDestinationStopId();
 
 	/**
 	 * @return a statistical weight, how many "real" agents this agent represents, e.g. "5.0" if you simulate a 20%-sample.

@@ -20,11 +20,16 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-
-import java.util.*;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * @author mrieser
@@ -32,13 +37,13 @@ import java.util.*;
 public class TransitStopAgentTracker {
 
 	private final EventsManager events;
-	private final Map<Id, List<PTPassengerAgent>> agentsAtStops = new HashMap<>();
+	private final Map<Id<TransitStopFacility>, List<PTPassengerAgent>> agentsAtStops = new HashMap<>();
 
 	public TransitStopAgentTracker(final EventsManager events) {
 		this.events = events;
 	}
 	
-	public void addAgentToStop(final double now, final PTPassengerAgent agent, final Id stopId) {
+	public void addAgentToStop(final double now, final PTPassengerAgent agent, final Id<TransitStopFacility> stopId) {
 		if (stopId == null) {
 			throw new NullPointerException("stop must not be null.");
 		}
@@ -48,11 +53,11 @@ public class TransitStopAgentTracker {
 			this.agentsAtStops.put(stopId, agents);
 		}
 		agents.add(agent);
-		Id destinationStopId = agent.getDesiredDestinationStopId();
+		Id<TransitStopFacility> destinationStopId = agent.getDesiredDestinationStopId();
 		events.processEvent(new AgentWaitingForPtEvent(now, agent.getId(), stopId, destinationStopId));
 	}
 
-	public void removeAgentFromStop(final PTPassengerAgent agent, final Id stopId) {
+	public void removeAgentFromStop(final PTPassengerAgent agent, final Id<TransitStopFacility> stopId) {
 		if (stopId == null) {
 			throw new NullPointerException("stopId must not be null.");
 		}
@@ -62,7 +67,7 @@ public class TransitStopAgentTracker {
 		}
 	}
 
-	public List<PTPassengerAgent> getAgentsAtStop(final Id stopId) {
+	public List<PTPassengerAgent> getAgentsAtStop(final Id<TransitStopFacility> stopId) {
 		List<PTPassengerAgent> agents = this.agentsAtStops.get(stopId);
 		if (agents == null) {
 			return Collections.emptyList();
@@ -70,7 +75,7 @@ public class TransitStopAgentTracker {
 		return Collections.unmodifiableList(agents);
 	}
 
-	public Map<Id, List<PTPassengerAgent>> getAgentsAtStop() {
+	public Map<Id<TransitStopFacility>, List<PTPassengerAgent>> getAgentsAtStop() {
 		return this.agentsAtStops;
 	}
 }

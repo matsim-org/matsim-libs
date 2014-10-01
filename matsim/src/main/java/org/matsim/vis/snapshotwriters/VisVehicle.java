@@ -11,7 +11,7 @@ import org.matsim.vehicles.Vehicle;
  * @author nagel
  *
  */
-public interface VisVehicle extends Identifiable {
+public interface VisVehicle extends Identifiable<Vehicle> {
 	
 	/**
 	 * @return the <code>Vehicle</code> that this simulation vehicle represents
