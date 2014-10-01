@@ -70,7 +70,7 @@ import playground.ikaddoura.internalizationCar.MarginalCongestionEvent;
  * 2) Persons leaving that link is identified and these are charged until delay =0; if there is no leaving agents (=spill back delays), spill back causing link and person are stored
  * 3) Subsequently spill back delays are processed by identifying person in front of queue and charging entering agents and leaving agents alternatively untill delay=0;
  * 
- * @author amit
+ * @author amit based on ikaddoura
  *
  */
 
@@ -374,10 +374,11 @@ PersonStuckEventHandler
 				//				throw new RuntimeException("The causing agent and the affected agent are the same (" + personToBeCharged.toString() + "). This situation is NOT considered as an external effect; NO marginal congestion event is thrown.");
 			} else {
 				// using the time when the causing agent entered the link
+				// right now, you are using the time when the affected agent leaves the link... ik
 				this.totalInternalizedDelay = this.totalInternalizedDelay + marginalDelaysPerLeavingVehicle;
 				//				emissionCorrespondingToDelays = getDelaysEquivalentEmissions(marginalDelaysPerLeavingVehicle/delayToPayFor, emissionsToPayFor);
 				//				warmEmissionAnalysisModule.throwWarmEmissionEvent(event.getTime(), event.getLinkId(), personToBeCharged, emissionCorrespondingToDelays);
-				MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowStorageCapacity", personToBeCharged, event.getVehicleId(), marginalDelaysPerLeavingVehicle, event.getLinkId());
+				MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowStorageCapacity", personToBeCharged, event.getVehicleId(), marginalDelaysPerLeavingVehicle, event.getLinkId(), event.getTime());
 				this.events.processEvent(congestionEvent);	
 			}
 			delayToPayFor = delayToPayFor - marginalDelaysPerLeavingVehicle;
@@ -389,9 +390,10 @@ PersonStuckEventHandler
 				//				throw new RuntimeException("The causing agent and the affected agent are the same (" + personToBeCharged.toString() + "). This situation is NOT considered as an external effect; NO marginal congestion event is thrown.");
 			} else {
 				// using the time when the causing agent entered the link
+				// right now, you are using the time when the affected agent leaves the link... ik
 				this.totalInternalizedDelay = this.totalInternalizedDelay + delayToPayFor;
 				//				warmEmissionAnalysisModule.throwWarmEmissionEvent(event.getTime(), event.getLinkId(), personToBeCharged, emissionsToPayFor);
-				MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowStorageCapacity", personToBeCharged, event.getVehicleId(), delayToPayFor, event.getLinkId());
+				MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowStorageCapacity", personToBeCharged, event.getVehicleId(), delayToPayFor, event.getLinkId(), event.getTime());
 				this.events.processEvent(congestionEvent);	
 			}
 			delayToPayFor = 0.;
