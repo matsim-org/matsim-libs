@@ -104,29 +104,34 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 	private List<PTPassengerAgent> findPassengersEntering(TransitRoute transitRoute, TransitLine transitLine, TransitVehicle vehicle, 
 			final TransitStopFacility stop, List<TransitRouteStop> stopsToCome, int freeCapacity, double now) {
 		ArrayList<PTPassengerAgent> passengersEntering = new ArrayList<>();
-		for (PTPassengerAgent agent : this.agentTracker.getAgentsAtStop(stop.getId())) {
-			if ( !this.isGeneratingDeniedBoardingEvents ) {
-				if (freeCapacity == 0) {
-					break;
-				}
-			}
-			if (agent.getEnterTransitRoute(transitLine, transitRoute, stopsToCome, vehicle)) {
-				if ( !this.isGeneratingDeniedBoardingEvents ) {
-					// this tries to leave the pre-existing code intact; thus the replication of code below
-					passengersEntering.add(agent);
-					freeCapacity--;
-				} 
-				else {
-					if ( freeCapacity >= 1 ) {
+		
+		if (this.isGeneratingDeniedBoardingEvents) {
+			
+			for (PTPassengerAgent agent : this.agentTracker.getAgentsAtStop(stop.getId())) {
+				if (agent.getEnterTransitRoute(transitLine, transitRoute, stopsToCome, vehicle)) {
+					if (freeCapacity >= 1) {
 						passengersEntering.add(agent);
 						freeCapacity--;
-					} 
-					else {
+					} else {
 						this.agentsDeniedToBoard.add(agent);
 					}
 				}
 			}
+
+		} else {
+		
+			for (PTPassengerAgent agent : this.agentTracker.getAgentsAtStop(stop.getId())) {
+				if (freeCapacity == 0) {
+					break;
+				}
+				if (agent.getEnterTransitRoute(transitLine, transitRoute, stopsToCome, vehicle)) {
+					passengersEntering.add(agent);
+					freeCapacity--;
+				}
+			}
+		
 		}
+		
 		return passengersEntering;
 	}
 	
