@@ -20,16 +20,16 @@
 
 package org.matsim.core.network.algorithms;
 
+import java.util.HashMap;
+import java.util.IdentityHashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
 import org.matsim.core.utils.misc.Counter;
-
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.Map;
 
 /** See "http://www.ivt.ethz.ch/vpl/publications/reports/ab283.pdf"
  * for a description of node types. It's the graph matching paper.
@@ -109,7 +109,7 @@ public class NetworkCalcTopoType implements NetworkRunnable {
 	}
 
 	private int getNOfIncidentNodes(final Node node) {
-		HashMap<Id, Node> nodes = new HashMap<>();
+		HashMap<Id<Node>, Node> nodes = new HashMap<>();
 		for (Link link : node.getInLinks().values()) {
 			nodes.put(link.getFromNode().getId(), link.getFromNode());
 		}

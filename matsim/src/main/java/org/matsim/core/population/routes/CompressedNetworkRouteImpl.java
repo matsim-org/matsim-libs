@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Implementation of {@link NetworkRoute} that tries to minimize the amount of
@@ -60,7 +61,7 @@ public class CompressedNetworkRouteImpl extends AbstractRoute implements Network
 	private int uncompressedLength = -1;
 	private int modCount = 0;
 	private int routeModCountState = 0;
-	private Id vehicleId = null;
+	private Id<Vehicle> vehicleId = null;
 	private final Network network;
 
 	public CompressedNetworkRouteImpl(final Id<Link> startLinkId, final Id<Link> endLinkId, Network network, final Map<Id<Link>, Id<Link>> subsequentLinks) {
@@ -210,12 +211,12 @@ public class CompressedNetworkRouteImpl extends AbstractRoute implements Network
 	}
 
 	@Override
-	public Id getVehicleId() {
+	public Id<Vehicle> getVehicleId() {
 		return this.vehicleId;
 	}
 
 	@Override
-	public void setVehicleId(final Id vehicleId) {
+	public void setVehicleId(final Id<Vehicle> vehicleId) {
 		this.vehicleId = vehicleId;
 	}
 

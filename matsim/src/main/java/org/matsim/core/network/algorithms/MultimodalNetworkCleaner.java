@@ -19,13 +19,21 @@
 
 package org.matsim.core.network.algorithms;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-
-import java.util.*;
 
 /**
  * Variant of {@link org.matsim.core.network.algorithms.NetworkCleaner NetworkCleaner} that supports
@@ -43,8 +51,8 @@ public class MultimodalNetworkCleaner {
 
 	private final Network network;
 	
-	private final Set<Id> removedLinks = new HashSet<>();
-	private final Set<Id> modifiedLinks = new HashSet<>();
+	private final Set<Id<Link>> removedLinks = new HashSet<>();
+	private final Set<Id<Link>> modifiedLinks = new HashSet<>();
 
 	public MultimodalNetworkCleaner(final Network network) {
 		this.network = network;
@@ -102,8 +110,8 @@ public class MultimodalNetworkCleaner {
 	public void run(final Set<String> cleaningModes, final Set<String> connectivityModes) {
 		final Set<String> combinedModes = new HashSet<>(cleaningModes);
 		combinedModes.addAll(connectivityModes);
-		final Map<Id, Link> visitedLinks = new TreeMap<>();
-		Map<Id, Link> biggestCluster = new TreeMap<>();
+		final Map<Id<Link>, Link> visitedLinks = new TreeMap<>();
+		Map<Id<Link>, Link> biggestCluster = new TreeMap<>();
 
 		log.info("running " + this.getClass().getName() + " algorithm for modes " + Arrays.toString(cleaningModes.toArray())
 				+ " with connectivity modes " + Arrays.toString(connectivityModes.toArray()) + "...");
@@ -116,7 +124,7 @@ public class MultimodalNetworkCleaner {
 		while (iter.hasNext() && stillSearching) {
 			Link startLink = iter.next();
 			if ((!visitedLinks.containsKey(startLink.getId())) && (intersectingSets(combinedModes, startLink.getAllowedModes()))) {
-				Map<Id, Link> cluster = this.findCluster(startLink, combinedModes);
+				Map<Id<Link>, Link> cluster = this.findCluster(startLink, combinedModes);
 				visitedLinks.putAll(cluster);
 				if (cluster.size() > biggestCluster.size()) {
 					biggestCluster = cluster;
@@ -166,14 +174,14 @@ public class MultimodalNetworkCleaner {
 	 * @param modes the set of modes that are allowed to
 	 * @return cluster of links <pre>startLink</pre> is part of
 	 */
-	private Map<Id, Link> findCluster(final Link startLink, final Set<String> modes) {
+	private Map<Id<Link>, Link> findCluster(final Link startLink, final Set<String> modes) {
 
-		final Map<Id, DoubleFlagRole> linkRoles = new HashMap<>(this.network.getLinks().size());
+		final Map<Id<Link>, DoubleFlagRole> linkRoles = new HashMap<>(this.network.getLinks().size());
 
 		ArrayList<Node> pendingForward = new ArrayList<>();
 		ArrayList<Node> pendingBackward = new ArrayList<>();
 
-		TreeMap<Id, Link> clusterLinks = new TreeMap<>();
+		TreeMap<Id<Link>, Link> clusterLinks = new TreeMap<>();
 
 		pendingForward.add(startLink.getToNode());
 		pendingBackward.add(startLink.getFromNode());
@@ -218,14 +226,14 @@ public class MultimodalNetworkCleaner {
 	/**
 	 * @return the removedLinks
 	 */
-	public final Set<Id> getRemovedLinkIds() {
+	public final Set<Id<Link>> getRemovedLinkIds() {
 		return removedLinks;
 	}
 
 	/**
 	 * @return the modifiedLinks
 	 */
-	public final Set<Id> getModifiedLinkIds() {
+	public final Set<Id<Link>> getModifiedLinkIds() {
 		return modifiedLinks;
 	}
 
@@ -250,7 +258,7 @@ public class MultimodalNetworkCleaner {
 		return false;
 	}
 
-	private static DoubleFlagRole getDoubleFlag(final Link l, final Map<Id, DoubleFlagRole> linkRoles) {
+	private static DoubleFlagRole getDoubleFlag(final Link l, final Map<Id<Link>, DoubleFlagRole> linkRoles) {
 		DoubleFlagRole r = linkRoles.get(l.getId());
 		if (null == r) {
 			r = new DoubleFlagRole();

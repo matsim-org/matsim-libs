@@ -37,7 +37,6 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.population.Desires;
 
 public class PopulationWriterHandlerImplV4 extends AbstractPopulationWriterHandler {
 

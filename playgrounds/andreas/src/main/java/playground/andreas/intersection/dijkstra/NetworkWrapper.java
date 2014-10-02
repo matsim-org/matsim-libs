@@ -20,10 +20,10 @@
 package playground.andreas.intersection.dijkstra;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 
@@ -48,15 +48,15 @@ public class NetworkWrapper {
 		int numberOfLinksGenerated = 0;
 
 		for (Link link : networkLayer.getLinks().values()) {
-			wrappedNetwork.createAndAddNode(link.getId(), link.getToNode().getCoord());
+			wrappedNetwork.createAndAddNode(Id.create(link.getId(), Node.class), link.getToNode().getCoord());
 			numberOfNodesGenerated++;
 		}
 
 		for (Node node : networkLayer.getNodes().values()) {
 			for (Link inLink : node.getInLinks().values()) {
 				for (Link outLink : node.getOutLinks().values()) {
-					Link link = wrappedNetwork.createAndAddLink(new IdImpl(numberOfLinksGenerated),
-							wrappedNetwork.getNodes().get(inLink.getId()), wrappedNetwork.getNodes().get(new IdImpl(outLink.getId().toString())),
+					Link link = wrappedNetwork.createAndAddLink(Id.create(numberOfLinksGenerated, Link.class),
+							wrappedNetwork.getNodes().get(inLink.getId()), wrappedNetwork.getNodes().get(Id.create(outLink.getId().toString(), Node.class)),
 							outLink.getLength(),
 							outLink.getFreespeed(),
 							outLink.getCapacity(),

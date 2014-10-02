@@ -168,7 +168,7 @@ public class CreateJonesCityNetwork {
 			coord = new CoordImpl(x, y);
 
 			// create a new node
-			NodeImpl node = (NodeImpl)network.createAndAddNode(zoneID, coord);
+			NodeImpl node = (NodeImpl)network.createAndAddNode(Id.create(zoneID, Node.class), coord);
 			node.setOrigId(zoneID.toString());
 			node.setType("unknownType");		
 		}

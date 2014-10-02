@@ -20,6 +20,16 @@
 
 package org.matsim.core.network;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -31,11 +41,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
-
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class LinkImpl implements Link {
 
@@ -371,29 +376,29 @@ public class LinkImpl implements Link {
 	}
 
 	/*package*/ abstract static class HashSetCache {
-		private final static Map<Integer, List<Set<?>>> cache = new ConcurrentHashMap<>();
-		public static <T> Set<T> get(final Set<T> set) {
+		private final static Map<Integer, List<Set<String>>> cache = new ConcurrentHashMap<>();
+		public static Set<String> get(final Set<String> set) {
 			if (set == null) {
 				return null;
 			}
 			int size = set.size();
-			List<Set<?>> list = cache.get(size);
+			List<Set<String>> list = cache.get(size);
 			if (list == null) {
 				list = new ArrayList<>(4);
 				cache.put(size, list);
-				HashSet<T> set2 = new HashSet<>(set);
-				Set<T> set3 = Collections.unmodifiableSet(set2);
+				HashSet<String> set2 = new HashSet<>(set);
+				Set<String> set3 = Collections.unmodifiableSet(set2);
 				list.add(set3);
 				return set3;
 			}
-			for (Set<?> s : list) {
+			for (Set<String> s : list) {
 				if (s.equals(set)) {
-					return (Set<T>) s;
+					return s;
 				}
 			}
 			// not yet in cache
-			HashSet<T> set2 = new HashSet<>(set);
-			Set<T> set3 = Collections.unmodifiableSet(set2);
+			HashSet<String> set2 = new HashSet<>(set);
+			Set<String> set3 = Collections.unmodifiableSet(set2);
 			list.add(set3);
 			return set3;
 		}

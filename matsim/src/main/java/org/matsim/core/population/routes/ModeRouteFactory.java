@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Route;
 
 /**
@@ -47,7 +48,7 @@ public class ModeRouteFactory {
 	 *
 	 * @see #setRouteFactory(String, RouteFactory)
 	 */
-	public Route createRoute(final String transportMode, final Id startLinkId, final Id endLinkId) {
+	public Route createRoute(final String transportMode, final Id<Link> startLinkId, final Id<Link> endLinkId) {
 		RouteFactory factory = this.routeFactories.get(transportMode);
 		if (factory == null) {
 			factory = this.defaultFactory;

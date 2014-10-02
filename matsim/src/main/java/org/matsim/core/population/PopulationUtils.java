@@ -34,6 +34,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -42,6 +43,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.population.routes.CompressedNetworkRouteFactory;
@@ -212,12 +214,12 @@ public final class PopulationUtils {
 		}
 
 		@Override
-		public Id getLinkId() {
+		public Id<Link> getLinkId() {
 			return this.delegate.getLinkId() ;
 		}
 
 		@Override
-		public Id getFacilityId() {
+		public Id<ActivityFacility> getFacilityId() {
 			return this.delegate.getFacilityId() ;
 		}
 	}
@@ -307,8 +309,8 @@ public final class PopulationUtils {
 	/**
 	 * @return sorted map containing containing the persons as values and their ids as keys.
 	 */
-	public static SortedMap<Id, Person> getSortedPersons(final Population population) {
-		return new TreeMap<Id, Person>(population.getPersons());
+	public static SortedMap<Id<Person>, Person> getSortedPersons(final Population population) {
+		return new TreeMap<Id<Person>, Person>(population.getPersons());
 	}
 	
 	/**

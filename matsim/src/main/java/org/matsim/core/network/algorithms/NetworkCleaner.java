@@ -20,14 +20,19 @@
 
 package org.matsim.core.network.algorithms;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
-
-import java.util.*;
 
 /**
  * Ensures that each link in the network can be reached by any other link.
@@ -52,14 +57,14 @@ public class NetworkCleaner implements NetworkRunnable {
 	 * @param network the network the startNode is part of
 	 * @return cluster of nodes of which <code>startNode</code> is part of
 	 */
-	private Map<Id, Node> findCluster(final Node startNode, final Network network) {
+	private Map<Id<Node>, Node> findCluster(final Node startNode, final Network network) {
 
 		final Map<Node, DoubleFlagRole> nodeRoles = new HashMap<>(network.getNodes().size());
 
 		ArrayList<Node> pendingForward = new ArrayList<>();
 		ArrayList<Node> pendingBackward = new ArrayList<>();
 
-		TreeMap<Id, Node> clusterNodes = new TreeMap<>();
+		TreeMap<Id<Node>, Node> clusterNodes = new TreeMap<>();
 		clusterNodes.put(startNode.getId(), startNode);
 		DoubleFlagRole r = getDoubleFlag(startNode, nodeRoles);
 		r.forwardFlag = true;
@@ -106,9 +111,9 @@ public class NetworkCleaner implements NetworkRunnable {
 	/**
 	 * Searches the biggest cluster in the given Network. The Network is not modified.
 	 */
-	public Map<Id, Node> searchBiggestCluster(Network network) {
-		final Map<Id, Node> visitedNodes = new TreeMap<>();
-		Map<Id, Node> biggestCluster = new TreeMap<>();
+	public Map<Id<Node>, Node> searchBiggestCluster(Network network) {
+		final Map<Id<Node>, Node> visitedNodes = new TreeMap<>();
+		Map<Id<Node>, Node> biggestCluster = new TreeMap<>();
 
 		log.info("running " + this.getClass().getName() + " algorithm...");
 
@@ -120,7 +125,7 @@ public class NetworkCleaner implements NetworkRunnable {
 		while (iter.hasNext() && stillSearching) {
 			Node startNode = iter.next();
 			if (!visitedNodes.containsKey(startNode.getId())) {
-				Map<Id, Node> cluster = this.findCluster(startNode, network);
+				Map<Id<Node>, Node> cluster = this.findCluster(startNode, network);
 				visitedNodes.putAll(cluster);
 				if (cluster.size() > biggestCluster.size()) {
 					biggestCluster = cluster;
@@ -140,7 +145,7 @@ public class NetworkCleaner implements NetworkRunnable {
 	 * Reducing the network so it only contains nodes included in the biggest Cluster.
 	 * Loop over all nodes and check if they are in the cluster, if not, remove them from the network
 	 */
-	public void reduceToBiggestCluster(Network network, Map<Id, Node> biggestCluster) {
+	public void reduceToBiggestCluster(Network network, Map<Id<Node>, Node> biggestCluster) {
 		List<Node> allNodes2 = new ArrayList<>(network.getNodes().values());
 		for (Node node : allNodes2) {
 			if (!biggestCluster.containsKey(node.getId())) {
@@ -154,7 +159,7 @@ public class NetworkCleaner implements NetworkRunnable {
 	
 	@Override
 	public void run(final Network network) {
-		Map<Id, Node> biggestCluster = this.searchBiggestCluster(network);
+		Map<Id<Node>, Node> biggestCluster = this.searchBiggestCluster(network);
 		this.reduceToBiggestCluster(network, biggestCluster);
 	}
 

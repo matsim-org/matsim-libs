@@ -21,7 +21,13 @@ package org.matsim.core.population;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.RouteFactory;
 
@@ -37,7 +43,7 @@ public class PopulationFactoryImpl implements PopulationFactory {
     }
 
     @Override
-	public Person createPerson(final Id id) {
+	public Person createPerson(final Id<Person> id) {
         return new PersonImpl(id);
 	}
 
@@ -52,7 +58,7 @@ public class PopulationFactoryImpl implements PopulationFactory {
 	}
 
 	@Override
-	public Activity createActivityFromLinkId(final String actType, final Id linkId) {
+	public Activity createActivityFromLinkId(final String actType, final Id<Link> linkId) {
         return new ActivityImpl(actType, linkId);
 	}
 
@@ -69,7 +75,7 @@ public class PopulationFactoryImpl implements PopulationFactory {
 	 *
 	 * @see #setRouteFactory(String, RouteFactory)
 	 */
-	public Route createRoute(final String transportMode, final Id startLinkId, final Id endLinkId) {
+	public Route createRoute(final String transportMode, final Id<Link> startLinkId, final Id<Link> endLinkId) {
 		return this.routeFactory.createRoute(transportMode, startLinkId, endLinkId);
 	}
 

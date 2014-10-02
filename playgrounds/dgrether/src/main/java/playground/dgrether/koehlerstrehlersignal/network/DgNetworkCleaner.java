@@ -39,9 +39,9 @@ public class DgNetworkCleaner  {
 
 	private static final Logger log = Logger.getLogger(DgNetworkCleaner.class);
 
-	private Map<Id, Node> findBackwardCluster(final Node startNode, final Network network) {
+	private Map<Id<Node>, Node> findBackwardCluster(final Node startNode, final Network network) {
 		List<Node> pendingBackward = new LinkedList<Node>();
-		TreeMap<Id, Node> clusterNodes = new TreeMap<Id, Node>();
+		TreeMap<Id<Node>, Node> clusterNodes = new TreeMap<>();
 		clusterNodes.put(startNode.getId(), startNode);
 		pendingBackward.add(startNode);
 		Set<Node> visitedNodes = new HashSet<Node>();
@@ -64,10 +64,10 @@ public class DgNetworkCleaner  {
 	}
 	
 	
-	private Map<Id, Node> findForwardCluster(final Node startNode, final Network network) {
+	private Map<Id<Node>, Node> findForwardCluster(final Node startNode, final Network network) {
 		List<Node> pendingForward = new LinkedList<Node>();
 		Set<Node> visitedNodes = new HashSet<Node>();
-		Map<Id, Node> clusterNodes = new HashMap<Id, Node>();
+		Map<Id<Node>, Node> clusterNodes = new HashMap<Id<Node>, Node>();
 		clusterNodes.put(startNode.getId(), startNode);
 
 		pendingForward.add(startNode);
@@ -91,16 +91,16 @@ public class DgNetworkCleaner  {
 	
 	public void cleanNetwork(final Network network) {
 		NetworkCleaner netCleaner = new NetworkCleaner();
-		Map<Id, Node> biggestCluster = netCleaner.searchBiggestCluster(network);
-		Map<Id, Node> visitedForward = new HashMap<Id, Node>();
-		Map<Id, Node> visitedBackward = new HashMap<Id, Node>();
+		Map<Id<Node>, Node> biggestCluster = netCleaner.searchBiggestCluster(network);
+		Map<Id<Node>, Node> visitedForward = new HashMap<>();
+		Map<Id<Node>, Node> visitedBackward = new HashMap<>();
 		
 		log.info("searching forward...");
 		for (Node node : network.getNodes().values()){
 			if (biggestCluster.containsKey(node.getId()) ||  visitedForward.containsKey(node.getId())) {
 				continue;
 			}
-			Map<Id, Node> forwardCluster = this.findForwardCluster(node, network);
+			Map<Id<Node>, Node> forwardCluster = this.findForwardCluster(node, network);
 
 			if (this.containCommonNode(forwardCluster, biggestCluster)) {
 				biggestCluster.putAll(forwardCluster);
@@ -113,7 +113,7 @@ public class DgNetworkCleaner  {
 			if (biggestCluster.containsKey(node.getId()) ||  visitedBackward.containsKey(node.getId())) {
 				continue;
 			}
-			Map<Id, Node> backwardCluster = this.findBackwardCluster(node, network);
+			Map<Id<Node>, Node> backwardCluster = this.findBackwardCluster(node, network);
 			if (this.containCommonNode(backwardCluster, biggestCluster)){
 				biggestCluster.putAll(backwardCluster);
 				visitedBackward.putAll(backwardCluster);
@@ -123,8 +123,8 @@ public class DgNetworkCleaner  {
 		netCleaner.reduceToBiggestCluster(network, biggestCluster);
 	}
 	
-	private boolean containCommonNode(Map<Id, Node> cluster1, Map<Id, Node> cluster2) {
-		for (Id id1 : cluster1.keySet()) {
+	private boolean containCommonNode(Map<Id<Node>, Node> cluster1, Map<Id<Node>, Node> cluster2) {
+		for (Id<Node> id1 : cluster1.keySet()) {
 			if (cluster2.containsKey(id1)) {
 				return true;
 			}

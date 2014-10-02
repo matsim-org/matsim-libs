@@ -62,7 +62,6 @@ import org.xml.sax.Attributes;
 
 	private final Population plans;
 	private final Network network;
-	private final Scenario scenario;
 
 	private PersonImpl currperson = null;
 
@@ -78,7 +77,6 @@ import org.xml.sax.Attributes;
 	public PopulationReaderMatsimV1(final Scenario scenario) {
 		this.plans = scenario.getPopulation();
 		this.network = scenario.getNetwork();
-		this.scenario = scenario;
 	}
 
 	@Override

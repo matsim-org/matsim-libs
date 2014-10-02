@@ -122,78 +122,78 @@ public class NetworkTeleatlasAddSpeedRestrictions implements NetworkRunnable {
 
 	private void run2(final Network network) throws Exception {
 		log.info("running " + this.getClass().getName() + " module...");
-		FileInputStream fis = new FileInputStream(this.srDbfFileName);
-		DbaseFileReader r = new DbaseFileReader(fis.getChannel(), true, IOUtils.CHARSET_WINDOWS_ISO88591);
-		// getting header indices
-		int srIdNameIndex = -1;
-		int srSpeedNameIndex = -1;
-		int srValDirNameIndex = -1;
-		int srVerifiedNameIndex = -1;
-		for (int i=0; i<r.getHeader().getNumFields(); i++) {
-			if (r.getHeader().getFieldName(i).equals(SR_ID_NAME)) { srIdNameIndex = i; }
-			if (r.getHeader().getFieldName(i).equals(SR_SPEED_NAME)) { srSpeedNameIndex = i; }
-			if (r.getHeader().getFieldName(i).equals(SR_VALDIR_NAME)) { srValDirNameIndex = i; }
-			if (r.getHeader().getFieldName(i).equals(SR_VERIFIED_NAME)) { srVerifiedNameIndex = i; }
-		}
-		if (srIdNameIndex < 0) { throw new NoSuchFieldException("Field name '"+SR_ID_NAME+"' not found."); }
-		if (srSpeedNameIndex < 0) { throw new NoSuchFieldException("Field name '"+SR_SPEED_NAME+"' not found."); }
-		if (srValDirNameIndex < 0) { throw new NoSuchFieldException("Field name '"+SR_VALDIR_NAME+"' not found."); }
-		if (srVerifiedNameIndex < 0) { throw new NoSuchFieldException("Field name '"+SR_VERIFIED_NAME+"' not found."); }
-		log.trace("  FieldName-->Index:");
-		log.trace("    "+SR_ID_NAME+"-->"+srIdNameIndex);
-		log.trace("    "+SR_SPEED_NAME+"-->"+srSpeedNameIndex);
-		log.trace("    "+SR_VALDIR_NAME+"-->"+srValDirNameIndex);
-		log.trace("    "+SR_VERIFIED_NAME+"-->"+srVerifiedNameIndex);
-
-		int srCnt = 0;
-		int srIgnoreCnt = 0;
-		while (r.hasNext()) {
-			Object[] entries = r.readEntry();
-			int verified = Integer.parseInt(entries[srVerifiedNameIndex].toString());
-			// assign only verfied speed restricitons
-			if (verified == 1) {
-				int valdir = Integer.parseInt(entries[srValDirNameIndex].toString());
-				String id = entries[srIdNameIndex].toString();
-				if (valdir == 1) {
-					// Valid in Both Directions
-					Link ftLink = network.getLinks().get(Id.create(id+"FT", Link.class));
-					Link tfLink = network.getLinks().get(Id.create(id+"TF", Link.class));
-					if ((ftLink == null) || (tfLink == null)) { log.trace("  linkid="+id+", valdir="+valdir+": at least one link not found. Ignoring and proceeding anyway..."); srIgnoreCnt++; }
-					else {
-						double speed = Double.parseDouble(entries[srSpeedNameIndex].toString())/3.6;
-						// assigning speed restriction only if given freespeed is higher
-						if (speed < ftLink.getFreespeed()) { ftLink.setFreespeed(speed); srCnt++; } else { srIgnoreCnt++; }
-						if (speed < tfLink.getFreespeed()) { tfLink.setFreespeed(speed); srCnt++; } else { srIgnoreCnt++; }
-					}
-				}
-				else if (valdir == 2) {
-					// Valid Only in Positive Direction
-					Link ftLink = network.getLinks().get(Id.create(id+"FT", Link.class));
-					if (ftLink == null) { log.trace("  linkid="+id+", valdir="+valdir+": link not found. Ignoring and proceeding anyway..."); srIgnoreCnt++; }
-					else {
-						double speed = Double.parseDouble(entries[srSpeedNameIndex].toString())/3.6;
-						// assigning speed restriction only if given freespeed is higher
-						if (speed < ftLink.getFreespeed()) { ftLink.setFreespeed(speed); srCnt++; } else { srIgnoreCnt++; }
-					}
-				}
-				else if (valdir == 3) {
-					// Valid Only in Negative Direction
-					Link tfLink = network.getLinks().get(Id.create(id+"TF", Link.class));
-					if (tfLink == null) { log.trace("  linkid="+id+", valdir="+valdir+": link not found. Ignoring and proceeding anyway..."); srIgnoreCnt++; }
-					else {
-						double speed = Double.parseDouble(entries[srSpeedNameIndex].toString())/3.6;
-						// assigning speed restriction only if given freespeed is higher
-						if (speed < tfLink.getFreespeed()) { tfLink.setFreespeed(speed); srCnt++; } else { srIgnoreCnt++; }
-					}
-				}
-				else { throw new IllegalArgumentException("linkid="+id+": valdir="+valdir+" not known."); }
+		try (FileInputStream fis = new FileInputStream(this.srDbfFileName)) {
+			DbaseFileReader r = new DbaseFileReader(fis.getChannel(), true, IOUtils.CHARSET_WINDOWS_ISO88591);
+			// getting header indices
+			int srIdNameIndex = -1;
+			int srSpeedNameIndex = -1;
+			int srValDirNameIndex = -1;
+			int srVerifiedNameIndex = -1;
+			for (int i=0; i<r.getHeader().getNumFields(); i++) {
+				if (r.getHeader().getFieldName(i).equals(SR_ID_NAME)) { srIdNameIndex = i; }
+				if (r.getHeader().getFieldName(i).equals(SR_SPEED_NAME)) { srSpeedNameIndex = i; }
+				if (r.getHeader().getFieldName(i).equals(SR_VALDIR_NAME)) { srValDirNameIndex = i; }
+				if (r.getHeader().getFieldName(i).equals(SR_VERIFIED_NAME)) { srVerifiedNameIndex = i; }
 			}
+			if (srIdNameIndex < 0) { throw new NoSuchFieldException("Field name '"+SR_ID_NAME+"' not found."); }
+			if (srSpeedNameIndex < 0) { throw new NoSuchFieldException("Field name '"+SR_SPEED_NAME+"' not found."); }
+			if (srValDirNameIndex < 0) { throw new NoSuchFieldException("Field name '"+SR_VALDIR_NAME+"' not found."); }
+			if (srVerifiedNameIndex < 0) { throw new NoSuchFieldException("Field name '"+SR_VERIFIED_NAME+"' not found."); }
+			log.trace("  FieldName-->Index:");
+			log.trace("    "+SR_ID_NAME+"-->"+srIdNameIndex);
+			log.trace("    "+SR_SPEED_NAME+"-->"+srSpeedNameIndex);
+			log.trace("    "+SR_VALDIR_NAME+"-->"+srValDirNameIndex);
+			log.trace("    "+SR_VERIFIED_NAME+"-->"+srVerifiedNameIndex);
+	
+			int srCnt = 0;
+			int srIgnoreCnt = 0;
+			while (r.hasNext()) {
+				Object[] entries = r.readEntry();
+				int verified = Integer.parseInt(entries[srVerifiedNameIndex].toString());
+				// assign only verfied speed restricitons
+				if (verified == 1) {
+					int valdir = Integer.parseInt(entries[srValDirNameIndex].toString());
+					String id = entries[srIdNameIndex].toString();
+					if (valdir == 1) {
+						// Valid in Both Directions
+						Link ftLink = network.getLinks().get(Id.create(id+"FT", Link.class));
+						Link tfLink = network.getLinks().get(Id.create(id+"TF", Link.class));
+						if ((ftLink == null) || (tfLink == null)) { log.trace("  linkid="+id+", valdir="+valdir+": at least one link not found. Ignoring and proceeding anyway..."); srIgnoreCnt++; }
+						else {
+							double speed = Double.parseDouble(entries[srSpeedNameIndex].toString())/3.6;
+							// assigning speed restriction only if given freespeed is higher
+							if (speed < ftLink.getFreespeed()) { ftLink.setFreespeed(speed); srCnt++; } else { srIgnoreCnt++; }
+							if (speed < tfLink.getFreespeed()) { tfLink.setFreespeed(speed); srCnt++; } else { srIgnoreCnt++; }
+						}
+					}
+					else if (valdir == 2) {
+						// Valid Only in Positive Direction
+						Link ftLink = network.getLinks().get(Id.create(id+"FT", Link.class));
+						if (ftLink == null) { log.trace("  linkid="+id+", valdir="+valdir+": link not found. Ignoring and proceeding anyway..."); srIgnoreCnt++; }
+						else {
+							double speed = Double.parseDouble(entries[srSpeedNameIndex].toString())/3.6;
+							// assigning speed restriction only if given freespeed is higher
+							if (speed < ftLink.getFreespeed()) { ftLink.setFreespeed(speed); srCnt++; } else { srIgnoreCnt++; }
+						}
+					}
+					else if (valdir == 3) {
+						// Valid Only in Negative Direction
+						Link tfLink = network.getLinks().get(Id.create(id+"TF", Link.class));
+						if (tfLink == null) { log.trace("  linkid="+id+", valdir="+valdir+": link not found. Ignoring and proceeding anyway..."); srIgnoreCnt++; }
+						else {
+							double speed = Double.parseDouble(entries[srSpeedNameIndex].toString())/3.6;
+							// assigning speed restriction only if given freespeed is higher
+							if (speed < tfLink.getFreespeed()) { tfLink.setFreespeed(speed); srCnt++; } else { srIgnoreCnt++; }
+						}
+					}
+					else { throw new IllegalArgumentException("linkid="+id+": valdir="+valdir+" not known."); }
+				}
+			}
+			log.info("  "+srCnt+" links with restricted speed assigned.");
+			log.info("  "+srIgnoreCnt+" speed restrictions ignored (while verified = 1).");
+			log.info("done.");
+			r.close();
 		}
-		log.info("  "+srCnt+" links with restricted speed assigned.");
-		log.info("  "+srIgnoreCnt+" speed restrictions ignored (while verified = 1).");
-		log.info("done.");
-		r.close();
-		fis.close();
 	}
 
 	//////////////////////////////////////////////////////////////////////

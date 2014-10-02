@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -36,7 +37,7 @@ public class NetworkInverter {
 		int numberOfLinksGenerated = 0;
 
 		for (Link link : this.originalNetwork.getLinks().values()) {
-			this.invertedNetwork.createAndAddNode(link.getId(), link.getCoord());
+			this.invertedNetwork.createAndAddNode(Id.create(link.getId(), Node.class), link.getCoord());
 			numberOfNodesGenerated++;
 		}
 

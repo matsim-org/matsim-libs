@@ -20,6 +20,12 @@
 
 package org.matsim.core.population;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -28,8 +34,6 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.population.Desires;
 import org.matsim.utils.customize.Customizable;
 import org.matsim.utils.customize.CustomizableImpl;
-
-import java.util.*;
 /**
  * Default implementation of {@link Person} interface.
  */
@@ -116,7 +120,7 @@ public class PersonImpl implements Person {
 	}
 
     // Not on interface. Only to be used for demand generation.
-	public void setId(final Id id) {
+	public void setId(final Id<Person> id) {
 		this.id = id;
 	}
 

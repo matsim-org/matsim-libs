@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Implementation of {@link NetworkRoute} which internally stores the route as a series of {@link Link}s.
@@ -37,7 +38,7 @@ public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRoute,
 	private ArrayList<Id<Link>> route = new ArrayList<Id<Link>>();
 	private List<Id<Link>> safeRoute = Collections.unmodifiableList(this.route);
 	private double travelCost = Double.NaN;
-	private Id vehicleId = null;
+	private Id<Vehicle> vehicleId = null;
 
 	public LinkNetworkRouteImpl(final Id<Link> startLinkId, final Id<Link> endLinkId) {
 		super(startLinkId, endLinkId);
@@ -146,12 +147,12 @@ public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRoute,
 	}
 
 	@Override
-	public Id getVehicleId() {
+	public Id<Vehicle> getVehicleId() {
 		return this.vehicleId;
 	}
 
 	@Override
-	public void setVehicleId(final Id vehicleId) {
+	public void setVehicleId(final Id<Vehicle> vehicleId) {
 		this.vehicleId = vehicleId;
 	}
 

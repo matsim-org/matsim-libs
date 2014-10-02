@@ -30,6 +30,7 @@ import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * Provides helper methods to work with routes.
@@ -50,7 +51,7 @@ public class RouteUtils {
 		List<Node> nodes = new ArrayList<Node>(linkIds.size() + 1);
 		if ((linkIds.size() > 0)) {
 			nodes.add(network.getLinks().get(linkIds.get(0)).getFromNode());
-			for (Id linkId : linkIds) {
+			for (Id<Link> linkId : linkIds) {
 				Link link = network.getLinks().get(linkId);
 				nodes.add(link.getToNode());
 			}
@@ -76,10 +77,10 @@ public class RouteUtils {
 		return links;
 	}
 
-	public static List<Link> getLinksFromNodeIds(final Network network, final List<Id> nodeIds) {
+	public static List<Link> getLinksFromNodeIds(final Network network, final List<Id<Node>> nodeIds) {
 		ArrayList<Link> links = new ArrayList<Link>(nodeIds.size());
 		Node prevNode = null;
-		for (Id nodeId : nodeIds) {
+		for (Id<Node> nodeId : nodeIds) {
 			Node node = network.getNodes().get(nodeId);
 			if (prevNode != null) {
 				Link foundLink = findLink(prevNode, node);
@@ -103,14 +104,14 @@ public class RouteUtils {
 	}
 
 	public static NetworkRoute getSubRoute(final NetworkRoute route, final Node fromNode, final Node toNode, final Network network) {
-		Id fromLinkId = null;
-		Id toLinkId = null;
+		Id<Link> fromLinkId = null;
+		Id<Link> toLinkId = null;
 
-		List<Id> linkIds = new ArrayList<Id>(route.getLinkIds().size() + 2);
+		List<Id<Link>> linkIds = new ArrayList<>(route.getLinkIds().size() + 2);
 		linkIds.add(route.getStartLinkId());
 		linkIds.addAll(route.getLinkIds());
 		linkIds.add(route.getEndLinkId());
-		for (Id linkId : linkIds) {
+		for (Id<Link> linkId : linkIds) {
 			Link link = network.getLinks().get(linkId);
 			if (link.getToNode() == fromNode) {
 				fromLinkId = link.getId();
@@ -142,7 +143,7 @@ public class RouteUtils {
 		 * the above comment was written.  kai, nov'13
 		 */
 		double dist = 0;
-		for (Id linkId : route.getLinkIds()) {
+		for (Id<Link> linkId : route.getLinkIds()) {
 			dist += network.getLinks().get(linkId).getLength();
 		}
 		return dist;
@@ -150,9 +151,9 @@ public class RouteUtils {
 	
 
 	public static NetworkRoute createNetworkRoute(List<Id<Link>> routeLinkIds, final Network network) {
-		Id startLinkId = routeLinkIds.get(0);
+		Id<Link> startLinkId = routeLinkIds.get(0);
 		List<Id<Link>> linksBetween = (routeLinkIds.size() > 2) ? routeLinkIds.subList(1, routeLinkIds.size() - 1) : new ArrayList<Id<Link>>(0);
-		Id endLinkId = routeLinkIds.get(routeLinkIds.size() - 1);
+		Id<Link> endLinkId = routeLinkIds.get(routeLinkIds.size() - 1);
 		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(startLinkId, endLinkId);
 		route.setLinkIds(startLinkId, linksBetween, endLinkId);
 		return route;
@@ -160,16 +161,16 @@ public class RouteUtils {
 
 	public static double calcDistance(ExperimentalTransitRoute route, TransitSchedule ts, Network network) {
 		
-		Id lineId = route.getLineId();
-		Id routeId = route.getRouteId();
-		Id enterStopId = route.getAccessStopId();
-		Id exitStopId = route.getEgressStopId();
+		Id<TransitLine> lineId = route.getLineId();
+		Id<TransitRoute> routeId = route.getRouteId();
+		Id<TransitStopFacility> enterStopId = route.getAccessStopId();
+		Id<TransitStopFacility> exitStopId = route.getEgressStopId();
 	
 		TransitLine line = ts.getTransitLines().get(lineId);
 		TransitRoute tr = line.getRoutes().get(routeId);
 	
-		Id enterLinkId = ts.getFacilities().get(enterStopId).getLinkId();
-		Id exitLinkId = ts.getFacilities().get(exitStopId).getLinkId();
+		Id<Link> enterLinkId = ts.getFacilities().get(enterStopId).getLinkId();
+		Id<Link> exitLinkId = ts.getFacilities().get(exitStopId).getLinkId();
 	
 		NetworkRoute nr = tr.getRoute();
 		double dist = 0;
@@ -177,7 +178,7 @@ public class RouteUtils {
 		if (enterLinkId.equals(nr.getStartLinkId())) {
 			count = true;
 		}
-		for (Id linkId : nr.getLinkIds()) {
+		for (Id<Link> linkId : nr.getLinkIds()) {
 			if (count) {
 				Link l = network.getLinks().get(linkId);
 				dist += l.getLength();
@@ -208,7 +209,7 @@ public class RouteUtils {
 	public static double calculateCoverage(NetworkRoute route1, NetworkRoute route2, Network network ) {
 		double routeLength = 0. ;
 		double coveredLength = 0. ;
-		for ( Id id : route1.getLinkIds() ) {
+		for ( Id<Link> id : route1.getLinkIds() ) {
 			routeLength += network.getLinks().get( id ).getLength() ;
 			if ( route2.getLinkIds().contains(id) ) {
 				coveredLength += network.getLinks().get( id ).getLength() ;

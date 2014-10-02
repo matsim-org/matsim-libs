@@ -21,12 +21,13 @@
 package org.matsim.core.population.routes;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Route;
 
 public class GenericRouteFactory implements RouteFactory {
 
 	@Override
-	public Route createRoute(final Id startLinkId, final Id endLinkId) {
+	public Route createRoute(final Id<Link> startLinkId, final Id<Link> endLinkId) {
 		return new GenericRouteImpl(startLinkId, endLinkId);
 	}
 

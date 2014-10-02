@@ -20,17 +20,22 @@
 
 package org.matsim.core.population;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.*;
-import org.matsim.core.utils.misc.Time;
-import org.matsim.utils.customize.Customizable;
-import org.matsim.utils.customize.CustomizableImpl;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.utils.misc.Time;
+import org.matsim.utils.customize.Customizable;
+import org.matsim.utils.customize.CustomizableImpl;
 
 public class PlanImpl implements Plan {
 
@@ -84,7 +89,7 @@ public class PlanImpl implements Plan {
 
 
 	@Deprecated // use scenario.getPopulation().getFactory().createActivity(...) instead, and add it yourself
-	public final ActivityImpl createAndAddActivity(final String type, final Id linkId) {
+	public final ActivityImpl createAndAddActivity(final String type, final Id<Link> linkId) {
 		ActivityImpl a = new ActivityImpl(type, linkId);
 		getPlanElements().add(a);
 		return a;

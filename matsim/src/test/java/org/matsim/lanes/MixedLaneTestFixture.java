@@ -106,19 +106,19 @@ public class MixedLaneTestFixture {
 		// create network
 		Node node = null;
 		Coord coord = sc.createCoord(0.0, 0.0);
-		node = nb.createNode(id0, coord);
+		node = nb.createNode(Id.create(id0, Node.class), coord);
 		n.addNode(node);
 		coord = sc.createCoord(100.0, 0.0);
-		node = nb.createNode(id1, coord);
+		node = nb.createNode(Id.create(id1, Node.class), coord);
 		n.addNode(node);
 		coord = sc.createCoord(200.0, 0.0);
-		node = nb.createNode(id2, coord);
+		node = nb.createNode(Id.create(id2, Node.class), coord);
 		n.addNode(node);
 		coord = sc.createCoord(200.0, 100.0);
-		node = nb.createNode(id3, coord);
+		node = nb.createNode(Id.create(id3, Node.class), coord);
 		n.addNode(node);
 		coord = sc.createCoord(200.0, -100.0);
-		node = nb.createNode(id4, coord);
+		node = nb.createNode(Id.create(id4, Node.class), coord);
 		n.addNode(node);
 
 		Link link0 = nb.createLink(id0, n.getNodes().get(id0) , n.getNodes().get(id1));

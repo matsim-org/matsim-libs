@@ -23,16 +23,16 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.tools.MultiModalNetworkCreator;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
 
@@ -64,7 +64,7 @@ public class GenerateMultimodalNetworkFromSpeeds {
 				sc.getNetwork(),
 				nvModes );
 
-		final Set<Id> biggestCluster = new NetworkCleaner().searchBiggestCluster( subnet ).keySet();
+		final Set<Id<Node>> biggestCluster = new NetworkCleaner().searchBiggestCluster( subnet ).keySet();
 		for ( Node n : sc.getNetwork().getNodes().values() ) {
 			if ( !biggestCluster.remove( n.getId() ) ) {
 				for ( Link l : n.getInLinks().values() ) removeModes( l , nvModes );

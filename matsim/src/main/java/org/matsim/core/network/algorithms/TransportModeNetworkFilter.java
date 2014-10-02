@@ -19,14 +19,14 @@
 
 package org.matsim.core.network.algorithms;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * This class extracts a subnetwork from a given network containing only
@@ -61,8 +61,8 @@ public final class TransportModeNetworkFilter {
 			Set<String> intersection = new HashSet<>(extractModes);
 			intersection.retainAll(link.getAllowedModes());
 			if (intersection.size() > 0) {
-				Id fromId = link.getFromNode().getId();
-				Id toId = link.getToNode().getId();
+				Id<Node> fromId = link.getFromNode().getId();
+				Id<Node> toId = link.getToNode().getId();
 				Node fromNode2 = subNetwork.getNodes().get(fromId);
 				Node toNode2 = subNetwork.getNodes().get(toId);
 				if (fromNode2 == null) {

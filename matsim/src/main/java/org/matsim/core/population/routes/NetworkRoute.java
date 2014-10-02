@@ -25,6 +25,7 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.vehicles.Vehicle;
 
 
 /**
@@ -72,12 +73,12 @@ public interface NetworkRoute extends Route {
 	 *
 	 * @param vehicleId
 	 */
-	public abstract void setVehicleId(final Id vehicleId);
+	public abstract void setVehicleId(final Id<Vehicle> vehicleId);
 
 	/**
 	 * @return the id of the vehicle that should be used to drive along this route.
 	 */
-	public abstract Id getVehicleId();
+	public abstract Id<Vehicle> getVehicleId();
 	// Does it really make sense to couple the vehicle to the route?  I would have coupled it to the leg.  kai, aug'10
 	// Well, I guess now it belongs to the route. :-)  kai, aug'10
 

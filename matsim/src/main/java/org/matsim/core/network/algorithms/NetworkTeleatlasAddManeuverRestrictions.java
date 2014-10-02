@@ -20,6 +20,12 @@
 
 package org.matsim.core.network.algorithms;
 
+import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.geotools.data.shapefile.dbf.DbaseFileReader;
 import org.geotools.data.simple.SimpleFeatureIterator;
@@ -37,12 +43,6 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.opengis.feature.simple.SimpleFeature;
-
-import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Adds maneuver restrictions to a MATSim {@link Network network} created
@@ -170,47 +170,50 @@ public class NetworkTeleatlasAddManeuverRestrictions implements NetworkRunnable 
 	private void run2(final Network network) throws Exception {
 		log.info("running " + this.getClass().getName() + " module...");
 		NetworkExpandNode neModule = new NetworkExpandNode(network, expansionRadius, this.linkSeparation);
-		FileInputStream fis = new FileInputStream(this.mpDbfFileName);
-		DbaseFileReader r = new DbaseFileReader(fis.getChannel(), true, IOUtils.CHARSET_WINDOWS_ISO88591);
-		// get header indices
-		int mpIdNameIndex = -1;
-		int mpSeqNrNameIndex = -1;
-		int mpTrpelIDNameIndex = -1;
-		for (int i=0; i<r.getHeader().getNumFields(); i++) {
-			if (r.getHeader().getFieldName(i).equals(MP_ID_NAME)) { mpIdNameIndex = i; }
-			if (r.getHeader().getFieldName(i).equals(MP_SEQNR_NAME)) { mpSeqNrNameIndex = i; }
-			if (r.getHeader().getFieldName(i).equals(MP_TRPELID_NAME)) { mpTrpelIDNameIndex = i; }
-		}
-		if (mpIdNameIndex < 0) { throw new NoSuchFieldException("Field name '"+MP_ID_NAME+"' not found."); }
-		if (mpSeqNrNameIndex < 0) { throw new NoSuchFieldException("Field name '"+MP_SEQNR_NAME+"' not found."); }
-		if (mpTrpelIDNameIndex < 0) { throw new NoSuchFieldException("Field name '"+MP_TRPELID_NAME+"' not found."); }
-		log.trace("  FieldName-->Index:");
-		log.trace("    "+MP_ID_NAME+"-->"+mpIdNameIndex);
-		log.trace("    "+MP_SEQNR_NAME+"-->"+mpSeqNrNameIndex);
-		log.trace("    "+MP_TRPELID_NAME+"-->"+mpTrpelIDNameIndex);
 
-		// create mp data structure
-		// TreeMap<mpId,TreeMap<mpSeqNr,linkId>>
-		log.info("  parsing meneuver paths dbf file...");
 		TreeMap<String, TreeMap<Integer,Id<Link>>> mSequences = new TreeMap<>();
-		while (r.hasNext()) {
-			Object[] entries = r.readEntry();
-			String mpId = entries[mpIdNameIndex].toString();
-			int mpSeqNr = Integer.parseInt(entries[mpSeqNrNameIndex].toString());
-			Id<Link> linkId = Id.create(entries[mpTrpelIDNameIndex].toString(), Link.class);
-			TreeMap<Integer,Id<Link>> mSequence = mSequences.get(mpId);
-			if (mSequence == null) {
-				mSequence = new TreeMap<>();
-				mSequences.put(mpId, mSequence);
+		
+		try (FileInputStream fis = new FileInputStream(this.mpDbfFileName)) {
+			DbaseFileReader r = new DbaseFileReader(fis.getChannel(), true, IOUtils.CHARSET_WINDOWS_ISO88591);
+			// get header indices
+			int mpIdNameIndex = -1;
+			int mpSeqNrNameIndex = -1;
+			int mpTrpelIDNameIndex = -1;
+			for (int i=0; i<r.getHeader().getNumFields(); i++) {
+				if (r.getHeader().getFieldName(i).equals(MP_ID_NAME)) { mpIdNameIndex = i; }
+				if (r.getHeader().getFieldName(i).equals(MP_SEQNR_NAME)) { mpSeqNrNameIndex = i; }
+				if (r.getHeader().getFieldName(i).equals(MP_TRPELID_NAME)) { mpTrpelIDNameIndex = i; }
 			}
-			if (mSequence.put(mpSeqNr,linkId) != null) {
-				throw new IllegalArgumentException(MP_ID_NAME+"="+mpId+": "+MP_SEQNR_NAME+" "+mpSeqNr+" already exists.");
+			if (mpIdNameIndex < 0) { throw new NoSuchFieldException("Field name '"+MP_ID_NAME+"' not found."); }
+			if (mpSeqNrNameIndex < 0) { throw new NoSuchFieldException("Field name '"+MP_SEQNR_NAME+"' not found."); }
+			if (mpTrpelIDNameIndex < 0) { throw new NoSuchFieldException("Field name '"+MP_TRPELID_NAME+"' not found."); }
+			log.trace("  FieldName-->Index:");
+			log.trace("    "+MP_ID_NAME+"-->"+mpIdNameIndex);
+			log.trace("    "+MP_SEQNR_NAME+"-->"+mpSeqNrNameIndex);
+			log.trace("    "+MP_TRPELID_NAME+"-->"+mpTrpelIDNameIndex);
+	
+			// create mp data structure
+			// TreeMap<mpId,TreeMap<mpSeqNr,linkId>>
+			log.info("  parsing meneuver paths dbf file...");
+			while (r.hasNext()) {
+				Object[] entries = r.readEntry();
+				String mpId = entries[mpIdNameIndex].toString();
+				int mpSeqNr = Integer.parseInt(entries[mpSeqNrNameIndex].toString());
+				Id<Link> linkId = Id.create(entries[mpTrpelIDNameIndex].toString(), Link.class);
+				TreeMap<Integer,Id<Link>> mSequence = mSequences.get(mpId);
+				if (mSequence == null) {
+					mSequence = new TreeMap<>();
+					mSequences.put(mpId, mSequence);
+				}
+				if (mSequence.put(mpSeqNr,linkId) != null) {
+					fis.close();
+					throw new IllegalArgumentException(MP_ID_NAME+"="+mpId+": "+MP_SEQNR_NAME+" "+mpSeqNr+" already exists.");
+				}
 			}
+			log.info("    "+mSequences.size()+" maneuvers sequences stored.");
+			log.info("  done.");
+			r.close();
 		}
-		log.info("    "+mSequences.size()+" maneuvers sequences stored.");
-		log.info("  done.");
-		r.close();
-		fis.close();
 
 		// store the maneuver list of the nodes
 		// TreeMap<NodeId,ArrayList<Tuple<MnId,MnFeatType>>>

@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.network.Node;
 public class LinkFactoryImpl implements LinkFactory {
 
 	@Override
-	public Link createLink(Id id, Node from, Node to, Network network, double length, double freespeed,
+	public Link createLink(Id<Link> id, Node from, Node to, Network network, double length, double freespeed,
 			double capacity, double nOfLanes) {
 		return new LinkImpl(id, from, to, network, length, freespeed, capacity, nOfLanes);
 	}
