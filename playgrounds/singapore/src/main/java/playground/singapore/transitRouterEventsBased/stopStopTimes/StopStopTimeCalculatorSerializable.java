@@ -1,5 +1,6 @@
 package playground.singapore.transitRouterEventsBased.stopStopTimes;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -18,7 +19,7 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
-public class StopStopTimeCalculatorSerializable implements VehicleArrivesAtFacilityEventHandler, PersonLeavesVehicleEventHandler {
+public class StopStopTimeCalculatorSerializable implements VehicleArrivesAtFacilityEventHandler, PersonLeavesVehicleEventHandler, Serializable {
 	
 	private final Map<String, Map<String, StopStopTimeData>> stopStopTimes = new HashMap<String, Map<String, StopStopTimeData>>(5000);
 	private final Map<String, Map<String, Double>> scheduledStopStopTimes = new HashMap<String, Map<String, Double>>(5000);
