@@ -17,39 +17,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.invermo.sim;
+package playground.johannes.gsv.synPop.data;
 
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import java.util.Map;
 
-import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.sna.gis.ZoneLayer;
 
 /**
  * @author johannes
  *
  */
-public class SwitchHomeLocations implements Mutator {
+public class LandUseData {
 
-	public static final Object HOME_FACIL_KEY = new Object();
+	public static final String POPULATION_KEY = "population";
 	
-	@Override
-	public boolean modify(ProxyPerson person1, ProxyPerson person2) {
-		return doSwitch(person1, person2);
+	public ZoneLayer<Map<String, Object>> getZoneLayer() {
+		return null;
 	}
-
-	@Override
-	public void revert(ProxyPerson person1, ProxyPerson person2) {
-		doSwitch(person1, person2);
-
-	}
-	
-	private boolean doSwitch(ProxyPerson person1, ProxyPerson person2) {
-		ActivityFacility home1 = (ActivityFacility) person1.getUserData(HOME_FACIL_KEY);
-		ActivityFacility home2 = (ActivityFacility) person2.getUserData(HOME_FACIL_KEY);
-		
-		person1.setUserData(HOME_FACIL_KEY, home2);
-		person2.setUserData(HOME_FACIL_KEY, home1);
-		
-		return true;
-	}
-
 }

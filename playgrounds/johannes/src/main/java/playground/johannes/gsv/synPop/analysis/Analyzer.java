@@ -21,14 +21,8 @@ package playground.johannes.gsv.synPop.analysis;
 
 import java.io.IOException;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
-import org.matsim.core.scenario.ScenarioUtils;
-
 import playground.johannes.gsv.synPop.io.XMLParser;
+import playground.johannes.gsv.synPop.mid.analysis.SeasonsTask;
 
 /**
  * @author johannes
@@ -41,10 +35,10 @@ public class Analyzer {
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		String output = args[2];
-//		String output = "/home/johannes/gsv/synpop/output/";
-		String personFile = args[0];
-//		String personFile = "/home/johannes/gsv/synpop/output/30000000.pop.xml.gz";
+//		String output = args[2];
+		String output = "/home/johannes/gsv/mid2008/analysis/car.wkday.wo3k.200K/";
+//		String personFile = args[0];
+		String personFile = "/home/johannes/gsv/mid2008/pop/pop.car.wkday.wo3k.200K.xml";
 		
 		XMLParser parser = new XMLParser();
 		parser.setValidating(false);
@@ -58,19 +52,20 @@ public class Analyzer {
 //			geometries.add((Geometry) feature.getDefaultGeometry());
 //		}
 //		
-		Config config = ConfigUtils.createConfig();
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		FacilitiesReaderMatsimV1 facReader = new FacilitiesReaderMatsimV1(scenario);
-		facReader.readFile(args[1]);
-		ActivityFacilities facilities = scenario.getActivityFacilities();
+//		Config config = ConfigUtils.createConfig();
+//		Scenario scenario = ScenarioUtils.createScenario(config);
+//		FacilitiesReaderMatsimV1 facReader = new FacilitiesReaderMatsimV1(scenario);
+//		facReader.readFile(args[1]);
+//		ActivityFacilities facilities = scenario.getActivityFacilities();
 	
 	
 		AnalyzerTaskComposite task = new AnalyzerTaskComposite();
-//		task.addTask(new ActivityChainTask());
-//		task.addTask(new LegTargetDistanceTask("car"));
-		task.addTask(new ActivityDistanceTask(facilities));
-//		task.addTask(new SpeedFactorAnalyzer());
-//		task.addTask(new SeasonsTask());
+		task.addTask(new ActivityChainTask());
+		task.addTask(new LegTargetDistanceTask("car"));
+//		task.addTask(new ActivityDistanceTask(facilities));
+		task.addTask(new SpeedFactorAnalyzer());
+		task.addTask(new SeasonsTask());
+		task.addTask(new PkmTask());
 //		task.addTask(new PopulationDensityTask(geometries, facilities, output));
 		
 		task.setOutputDirectory(output);

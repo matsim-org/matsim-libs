@@ -38,7 +38,13 @@ import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.NetworkReaderMatsimV1;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -86,7 +92,7 @@ public class LinkSHPWriter {
         	featureBuilder.add(lineString);
         	double cap = link.getCapacity() * 24;
         	featureBuilder.add(cap);
-        	double occup = calculator.getOccupancy(link.getId()) * factor;
+        	double occup = 0;//calculator.getOccupancy(link.getId()) * factor;
         	featureBuilder.add(occup);
         	featureBuilder.add(occup/cap);
         	featureBuilder.add(link.getFreespeed());
@@ -125,5 +131,19 @@ public class LinkSHPWriter {
 		} finally {
 			transaction.close();
 		}
+	}
+	
+	public static void main(String[] args) throws IOException {
+		Config config = ConfigUtils.createConfig();
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		
+		NetworkReaderMatsimV1 reader = new NetworkReaderMatsimV1(scenario);
+		reader.parse("/home/johannes/gsv/osm/network/germany-20140909.5.xml");
+		
+		Network network = scenario.getNetwork();
+		LinkOccupancyCalculator calc = new LinkOccupancyCalculator(null);
+//		calc.reset(0);
+		
+		new LinkSHPWriter().write(network.getLinks().values(), calc, "/home/johannes/gsv/osm/network/germany-20140909.5.shp", 1);
 	}
 }

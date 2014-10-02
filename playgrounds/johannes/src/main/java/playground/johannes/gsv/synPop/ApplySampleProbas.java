@@ -17,50 +17,33 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.invermo.sim;
+package playground.johannes.gsv.synPop;
 
 import java.util.Collection;
-
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
-
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
-import playground.johannes.gsv.synPop.sim2.SamplerListener;
-import playground.johannes.gsv.synPop.sim3.SwitchHomeLocation;
 
 /**
  * @author johannes
  *
  */
-public class CopyHomeLocations implements SamplerListener {
+public class ApplySampleProbas implements ProxyPersonsTask {
 
-	private final long interval;
+	private final int N;
 	
-	private long iter;
-	
-	public CopyHomeLocations(long interval) {
-		this.interval = interval;
+	public ApplySampleProbas(int N) {
+		this.N = N;
 	}
 	
 	@Override
-	public void afterModify(ProxyPerson person) {
-	}
-
-	@Override
-	public void afterStep(Collection<ProxyPerson> population, ProxyPerson person, boolean accpeted) {
-		iter++;
-		if(iter % interval == 0) {
-			for(ProxyPerson thePerson : population) {
-				ActivityFacility home = (ActivityFacility) thePerson.getUserData(SwitchHomeLocation.USER_FACILITY_KEY);
-				ProxyPlan plan = thePerson.getPlans().get(0);
-				for(ProxyObject act : plan.getActivities()) {
-					if(act.getAttribute(CommonKeys.ACTIVITY_TYPE).equalsIgnoreCase("home")) {
-						act.setAttribute(CommonKeys.ACTIVITY_FACILITY, home.getId().toString());
-					}
-				}
-			}
+	public void apply(Collection<ProxyPerson> persons) {
+		double p = 1/(double)N;
+		double wsum = 0;
+		for(ProxyPerson person : persons) {
+			wsum += Double.parseDouble(person.getAttribute(CommonKeys.PERSON_WEIGHT));
+		}
+		
+		for(ProxyPerson person : persons) {
+			double w = Double.parseDouble(person.getAttribute(CommonKeys.PERSON_WEIGHT));
+			person.setAttribute(CommonKeys.PERSON_WEIGHT, String.valueOf(p * w * persons.size()/wsum));
 		}
 
 	}

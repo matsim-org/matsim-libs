@@ -22,11 +22,13 @@ package playground.johannes.socialnetworks.gis.io;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.geotools.data.DefaultTransaction;
 import org.geotools.data.Transaction;
@@ -214,56 +216,64 @@ public class ZoneLayerSHP {
 		}
 	}
 	
-//	public static void writeWithAttributes(ZoneLayer<Map<String, Object>> layer, String filename) throws IOException {
-//		CoordinateReferenceSystem crs = layer.getCRS();
-//		SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
-//		typeBuilder.setCRS(crs);
-//		typeBuilder.setName("zone");
-//		typeBuilder.add("the_geom", MultiPolygon.class);
-//		typeBuilder.add("value", Double.class);
-//		SimpleFeatureType featureType = typeBuilder.buildFeatureType();
-//        
-//		SimpleFeatureCollection collection = FeatureCollections.newCollection();
-//        SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(featureType);
-//
-//        for(Zone<T> zone : layer.getZones()) {
-//        	featureBuilder.add(zone.getGeometry());
-//        	featureBuilder.add(zone.getAttribute());
-//        	SimpleFeature feature = featureBuilder.buildFeature(null);
-//        	collection.add(feature);
-//        }
-//
-//        File newFile = new File(filename);
-//
-//        ShapefileDataStoreFactory dataStoreFactory = new ShapefileDataStoreFactory();
-//
-//        Map<String, Serializable> params = new HashMap<String, Serializable>();
-//        params.put("url", newFile.toURI().toURL());
-//        params.put("create spatial index", Boolean.TRUE);
-//
-//        ShapefileDataStore newDataStore = (ShapefileDataStore) dataStoreFactory.createNewDataStore(params);
-//        newDataStore.createSchema(featureType);
-//
-////        newDataStore.forceSchemaCRS(layer.getCRS());
-//		
-//        Transaction transaction = new DefaultTransaction("create");
-//
-//		String typeName = newDataStore.getTypeNames()[0];
-//		SimpleFeatureSource featureSource = newDataStore.getFeatureSource(typeName);
-//
-//		SimpleFeatureStore featureStore = (SimpleFeatureStore) featureSource;
-//
-//		featureStore.setTransaction(transaction);
-//		try {
-//			featureStore.addFeatures(collection);
-//			transaction.commit();
-//
-//		} catch (Exception problem) {
-//			problem.printStackTrace();
-//			transaction.rollback();
-//
-//		} finally {
-//			transaction.close();
-//		}
-//	}
+	public static void writeWithAttributes(ZoneLayer<Map<String, Object>> layer, String filename) throws IOException {
+		CoordinateReferenceSystem crs = layer.getCRS();
+		SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
+		typeBuilder.setCRS(crs);
+		typeBuilder.setName("zone");
+		typeBuilder.add("the_geom", MultiPolygon.class);
+		
+		Zone<Map<String, Object>> azone = layer.getZones().iterator().next();
+		List<String> keys = new ArrayList<>(azone.getAttribute().keySet());
+		for(String key : keys) {
+			typeBuilder.add(key, azone.getAttribute().get(key).getClass());
+		}
+		
+		SimpleFeatureType featureType = typeBuilder.buildFeatureType();
+        
+		SimpleFeatureCollection collection = FeatureCollections.newCollection();
+        SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(featureType);
+
+        for(Zone<Map<String, Object>> zone : layer.getZones()) {
+        	featureBuilder.add(zone.getGeometry());
+        	for(String key : keys) {
+        		featureBuilder.add(zone.getAttribute().get(key));
+        	}
+        	SimpleFeature feature = featureBuilder.buildFeature(null);
+        	collection.add(feature);
+        }
+
+        File newFile = new File(filename);
+
+        ShapefileDataStoreFactory dataStoreFactory = new ShapefileDataStoreFactory();
+
+        Map<String, Serializable> params = new HashMap<String, Serializable>();
+        params.put("url", newFile.toURI().toURL());
+        params.put("create spatial index", Boolean.TRUE);
+
+        ShapefileDataStore newDataStore = (ShapefileDataStore) dataStoreFactory.createNewDataStore(params);
+        newDataStore.createSchema(featureType);
+
+//        newDataStore.forceSchemaCRS(layer.getCRS());
+		
+        Transaction transaction = new DefaultTransaction("create");
+
+		String typeName = newDataStore.getTypeNames()[0];
+		SimpleFeatureSource featureSource = newDataStore.getFeatureSource(typeName);
+
+		SimpleFeatureStore featureStore = (SimpleFeatureStore) featureSource;
+
+		featureStore.setTransaction(transaction);
+		try {
+			featureStore.addFeatures(collection);
+			transaction.commit();
+
+		} catch (Exception problem) {
+			problem.printStackTrace();
+			transaction.rollback();
+
+		} finally {
+			transaction.close();
+		}
+	}
 }

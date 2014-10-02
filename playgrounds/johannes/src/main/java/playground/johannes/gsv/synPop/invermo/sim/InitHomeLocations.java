@@ -35,6 +35,7 @@ import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.data.FacilityData;
 import playground.johannes.gsv.synPop.sim.Initializer;
+import playground.johannes.gsv.synPop.sim3.SwitchHomeLocation;
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
 import playground.johannes.sna.util.ProgressLogger;
@@ -96,7 +97,7 @@ public class InitHomeLocations implements Initializer {
 				List<ActivityFacility> list = facilMap.get(zone);
 				ActivityFacility facil = list.get(random.nextInt(list.size()));
 				
-				person.setUserData(SwitchHomeLocations.HOME_FACIL_KEY, facil);
+				person.setUserData(SwitchHomeLocation.USER_FACILITY_KEY, facil);
 				ProgressLogger.step();
 			}
 		}

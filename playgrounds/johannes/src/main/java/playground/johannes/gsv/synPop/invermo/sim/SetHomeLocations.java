@@ -132,11 +132,11 @@ public class SetHomeLocations {
 		FacilityData rFacilities = FacilityData.getInstance(facilities, random);
 		
 		HamiltonianComposite H = new HamiltonianComposite();
-		PersonPopulationDenstiy persDen = new PersonPopulationDenstiy(popDensity);
+		PersonPopulationDenstiy persDen = null;//new PersonPopulationDenstiy(popDensity);
 		H.addComponent(persDen, 10000);
 		
-		PopulationDensity popDen = new PopulationDensity(persons, popZone, persons.size(), random); 
-		H.addComponent(popDen, 1000);
+//		PopulationDensity popDen = new PopulationDensity(persons, popZone, persons.size(), random); 
+//		H.addComponent(popDen, 1000);
 		
 //		HFacilityCapacity cap = new HFacilityCapacity("home", facilities);
 //		H.addComponent(cap, 0.0001);
@@ -160,7 +160,7 @@ public class SetHomeLocations {
 		 */
 		int logInterval = (int) Double.parseDouble(config.getParam(MODULE_NAME, "logInterval"));
 //		lComposite.addComponent(popDen);
-		lComposite.addComponent(new HamiltonianLogger(popDen, logInterval, outputDir));
+//		lComposite.addComponent(new HamiltonianLogger(popDen, logInterval, outputDir));
 		lComposite.addComponent(new HamiltonianLogger(persDen, logInterval, outputDir));
 //		lComposite.addComponent(new HamiltonianLogger(cap, logInterval, outputDir + "/capacity.log"));
 		lComposite.addComponent(new SamplerLogger());
@@ -174,7 +174,7 @@ public class SetHomeLocations {
 		initializers.add(new SetMissingActTypes());
 		initializers.add(new InitializeFacilities(rFacilities));
 //		initializers.add(new InitializeStartLocation());
-		initializers.add(new InitializeTargetDensity(popDensity));
+//		initializers.add(new InitializeTargetDensity(popDensity));
 //		initializers.add(new InitHomeLocations(persons, popZone, rFacilities, random));
 		
 		
@@ -186,14 +186,14 @@ public class SetHomeLocations {
 		
 		new InitHomeLocations(persons, popZone, rFacilities, random);
 		
-		popDen.initializeZones();
-		popDen.writeZoneData(outputDir + "zones-start.shp");
+//		popDen.initializeZones();
+//		popDen.writeZoneData(outputDir + "zones-start.shp");
 		logger.info("Running sampler...");
 		long iters = (long) Double.parseDouble(config.getParam(MODULE_NAME, "iterations"));
 		int numThreads = Integer.parseInt(config.findParam(MODULE_NAME, "numThreads"));
 		sampler.run(iters, numThreads);
 		logger.info("Done.");
-		popDen.writeZoneData(outputDir + "zones-end.shp");
+//		popDen.writeZoneData(outputDir + "zones-end.shp");
 	}
 	
 	

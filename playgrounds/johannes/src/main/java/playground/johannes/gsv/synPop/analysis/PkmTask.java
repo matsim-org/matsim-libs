@@ -17,52 +17,46 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.invermo.sim;
+package playground.johannes.gsv.synPop.analysis;
 
 import java.util.Collection;
+import java.util.Map;
 
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyObject;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
-import playground.johannes.gsv.synPop.sim2.SamplerListener;
-import playground.johannes.gsv.synPop.sim3.SwitchHomeLocation;
 
 /**
  * @author johannes
  *
  */
-public class CopyHomeLocations implements SamplerListener {
+public class PkmTask extends AnalyzerTask {
 
-	private final long interval;
-	
-	private long iter;
-	
-	public CopyHomeLocations(long interval) {
-		this.interval = interval;
-	}
-	
+	/* (non-Javadoc)
+	 * @see playground.johannes.gsv.synPop.analysis.AnalyzerTask#analyze(java.util.Collection, java.util.Map)
+	 */
 	@Override
-	public void afterModify(ProxyPerson person) {
-	}
-
-	@Override
-	public void afterStep(Collection<ProxyPerson> population, ProxyPerson person, boolean accpeted) {
-		iter++;
-		if(iter % interval == 0) {
-			for(ProxyPerson thePerson : population) {
-				ActivityFacility home = (ActivityFacility) thePerson.getUserData(SwitchHomeLocation.USER_FACILITY_KEY);
-				ProxyPlan plan = thePerson.getPlans().get(0);
-				for(ProxyObject act : plan.getActivities()) {
-					if(act.getAttribute(CommonKeys.ACTIVITY_TYPE).equalsIgnoreCase("home")) {
-						act.setAttribute(CommonKeys.ACTIVITY_FACILITY, home.getId().toString());
+	public void analyze(Collection<ProxyPerson> persons, Map<String, DescriptiveStatistics> results) {
+		DescriptiveStatistics stats = new DescriptiveStatistics();
+		
+		double pkm = 0;
+		for(ProxyPerson person : persons) {
+			for(ProxyPlan plan :person.getPlans()) {
+				for(ProxyObject leg : plan.getLegs()) {
+					String value = leg.getAttribute(CommonKeys.LEG_DISTANCE);
+					if(value != null) {
+						pkm += Double.parseDouble(value);
 					}
 				}
 			}
 		}
-
+		
+		stats.addValue(pkm);
+		
+		results.put("pkm", stats);
 	}
 
 }

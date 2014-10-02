@@ -17,17 +17,40 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.invermo.sim;
+package playground.johannes.gsv.synPop.invermo;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.apache.log4j.Logger;
+
+import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.gsv.synPop.ProxyPersonsTask;
 
 /**
  * @author johannes
  *
  */
-public class SwitchHomeLocFactory implements MutatorFactory {
+public class DeleteNoWeight implements ProxyPersonsTask {
 
+	private static final Logger logger = Logger.getLogger(DeleteNoWeight.class);
+	
 	@Override
-	public Mutator newInstance() {
-		return new SwitchHomeLocations();
+	public void apply(Collection<ProxyPerson> persons) {
+		Set<ProxyPerson> remove = new HashSet<>();
+		for(ProxyPerson person : persons) {
+			if(!person.getAttributes().containsKey(CommonKeys.PERSON_WEIGHT)) {
+				remove.add(person);
+			}
+		}
+		
+		for(ProxyPerson person : remove) {
+			persons.remove(person);
+		}
+
+		logger.warn(String.format("Removed %s out of %s persons because of missing weight attribute.", remove.size(), remove.size() + persons.size()));
 	}
 
 }

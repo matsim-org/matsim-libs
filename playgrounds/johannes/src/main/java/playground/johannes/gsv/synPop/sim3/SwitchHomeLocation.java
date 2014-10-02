@@ -17,51 +17,37 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.invermo.sim;
+package playground.johannes.gsv.synPop.sim3;
 
-import java.util.Map;
-
-import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
-import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPersonTask;
-import playground.johannes.gsv.synPop.data.DataPool;
-import playground.johannes.gsv.synPop.data.LandUseData;
-import playground.johannes.gsv.synPop.data.LandUseDataLoader;
-import playground.johannes.gsv.synPop.sim3.SwitchHomeLocation;
-import playground.johannes.sna.gis.Zone;
-import playground.johannes.sna.gis.ZoneLayer;
 
 /**
  * @author johannes
  *
  */
-public class InitializeTargetDensity implements ProxyPersonTask {
+public class SwitchHomeLocation implements SwitchMutator {
 
-	private static final Logger logger = Logger.getLogger(InitializeTargetDensity.class);
-	
-	private final LandUseData landUseData;
-	
-	public InitializeTargetDensity(DataPool dataPool) {
-		this.landUseData = (LandUseData) dataPool.get(LandUseDataLoader.KEY);
-	}
+	public static final Object USER_FACILITY_KEY = new Object();
 	
 	@Override
-	public void apply(ProxyPerson person) {
-		ActivityFacility home = (ActivityFacility) person.getUserData(SwitchHomeLocation.USER_FACILITY_KEY);
-		ZoneLayer<Map<String, Object>> zoneLayer = landUseData.getZoneLayer();
-		Zone<Map<String, Object>> zone = zoneLayer.getZone(MatsimCoordUtils.coordToPoint(home.getCoord()));
-		if(zone == null) {
-			zone = zoneLayer.getZones().iterator().next();
-			logger.warn("Zone not found. Drawing random zone.");
-		}
+	public boolean mutate(ProxyPerson person1, ProxyPerson person2) {
+		switchFacilities(person1, person2);
+		return true;
+	}
+
+	@Override
+	public void revert(ProxyPerson person1, ProxyPerson person2) {
+		switchFacilities(person1, person2);
+	}
 	
-		Double inhabs = (Double)zone.getAttribute().get(LandUseData.POPULATION_KEY);
-		double area = zone.getGeometry().getArea();
+	private void switchFacilities(ProxyPerson person1, ProxyPerson person2) {
+		ActivityFacility f1 = (ActivityFacility) person1.getUserData(USER_FACILITY_KEY);
+		ActivityFacility f2 = (ActivityFacility) person2.getUserData(USER_FACILITY_KEY);
 		
-		person.setUserData(PersonPopulationDenstiy.TARGET_DENSITY, inhabs/area);
+		person1.setUserData(USER_FACILITY_KEY, f2);
+		person2.setUserData(USER_FACILITY_KEY, f1);
 	}
 
 }

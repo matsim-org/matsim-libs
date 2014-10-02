@@ -19,11 +19,18 @@
 
 package playground.johannes.gsv.synPop.invermo.sim;
 
+import java.util.IdentityHashMap;
+import java.util.Map;
+
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
 import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.gsv.synPop.data.DataPool;
+import playground.johannes.gsv.synPop.data.LandUseData;
+import playground.johannes.gsv.synPop.data.LandUseDataLoader;
 import playground.johannes.gsv.synPop.sim3.Hamiltonian;
+import playground.johannes.gsv.synPop.sim3.SwitchHomeLocation;
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
 
@@ -35,27 +42,44 @@ public class PersonPopulationDenstiy implements Hamiltonian {
 
 	public static final Object TARGET_DENSITY = new Object();
 	
-//	public static final Object ZONE_KEY =  new Object();
+	private final LandUseData landUseData;
 	
-	private final ZoneLayer<Double> zoneLayer;
+	private final Map<ActivityFacility, Double> densities;
 	
-	public PersonPopulationDenstiy(ZoneLayer<Double> zoneLayer) {
-		this.zoneLayer = zoneLayer;
+	public PersonPopulationDenstiy(DataPool dataPool) {
+		landUseData = (LandUseData) dataPool.get(LandUseDataLoader.KEY);
+		densities = new IdentityHashMap<>();
 	}
 	
 	@Override
 	public double evaluate(ProxyPerson person) {
-		ActivityFacility home = (ActivityFacility) person.getUserData(SwitchHomeLocations.HOME_FACIL_KEY);
-		Zone<Double> zone = zoneLayer.getZone(MatsimCoordUtils.coordToPoint(home.getCoord()));
-		if(zone == null) {
+		ActivityFacility home = (ActivityFacility) person.getUserData(SwitchHomeLocation.USER_FACILITY_KEY);
+		Double density = densities.get(home);
+		if(density == null) {
+			attachDensity(home);
+		}
+		
+		if(Double.isNaN(density)) {
 			return Double.NEGATIVE_INFINITY;
 		}
 		
 		Double target = (Double) person.getUserData(TARGET_DENSITY);
 		
-		double diff = Math.abs(zone.getAttribute() - target);
-				 
-		return diff;
+		return Math.abs(density - target)/density;
+	}
+	
+	private void attachDensity(ActivityFacility home) {
+		ZoneLayer<Map<String, Object>> zoneLayer = landUseData.getZoneLayer();
+		Zone<Map<String, Object>> zone = zoneLayer.getZone(MatsimCoordUtils.coordToPoint(home.getCoord()));
+		
+		if(zone == null) {
+			densities.put(home, Double.NaN);
+		} else {
+			Double inhabs = (Double)zone.getAttribute().get(LandUseData.POPULATION_KEY);
+			double area = zone.getGeometry().getArea();
+			
+			densities.put(home, inhabs/area);
+		}
 	}
 
 }

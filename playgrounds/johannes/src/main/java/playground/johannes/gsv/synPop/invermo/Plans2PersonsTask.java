@@ -23,49 +23,74 @@ import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPersonTask;
 import playground.johannes.gsv.synPop.ProxyPlan;
 
 /**
  * @author johannes
- *
+ * 
  */
 public class Plans2PersonsTask implements ProxyPersonTask {
 
 	private Set<ProxyPerson> newPersons;
-	
+
 	public Plans2PersonsTask() {
 		newPersons = new HashSet<ProxyPerson>();
 	}
-	
+
 	public Set<ProxyPerson> getNewPersons() {
 		return newPersons;
 	}
-	
+
 	@Override
 	public void apply(ProxyPerson person) {
-		if(person.getPlans().size() > 1) {
-			for(int i = 1; i < person.getPlans().size(); i++) {
-				ProxyPerson newPerson = new ProxyPerson(String.format("%s.%s", person.getId(), i));
-				for(Entry<String, String> entry : person.getAttributes().entrySet()) {
+		int counter = 0;
+		if (person.getPlans().size() > 1) {
+			for (int i = 1; i < person.getPlans().size(); i++) {
+				ProxyPerson newPerson = new ProxyPerson(String.format("%s.%s", person.getId(), counter++));
+				for (Entry<String, String> entry : person.getAttributes().entrySet()) {
 					newPerson.setAttribute(entry.getKey(), entry.getValue());
 				}
-				
+
 				newPerson.addPlan(person.getPlans().get(i));
-				
+
+				double w = Double.parseDouble(newPerson.getAttribute(CommonKeys.PERSON_WEIGHT));
+				w = w * 1 / 365.0;
+				newPerson.setAttribute(CommonKeys.PERSON_WEIGHT, String.valueOf(w));
+
 				newPersons.add(newPerson);
 			}
-			
+
 			ProxyPlan plan = person.getPlans().get(0);
 			person.getPlans().clear();
 			person.addPlan(plan);
 		}
-
+		/*
+		 * adjust the weight of the original person
+		 */
+		if (counter > 0) {
+			double w = Double.parseDouble(person.getAttribute(CommonKeys.PERSON_WEIGHT));
+			w = w * 1 / 365.0;
+			person.setAttribute(CommonKeys.PERSON_WEIGHT, String.valueOf(w));
+			/*
+			 * add one person with an empty plan
+			 */
+			ProxyPerson newPerson = new ProxyPerson(String.format("%s.%s", person.getId(), counter++));
+			for (Entry<String, String> entry : person.getAttributes().entrySet()) {
+				newPerson.setAttribute(entry.getKey(), entry.getValue());
+			}
+			newPerson.addPlan(new ProxyPlan());
+			
+			w = Double.parseDouble(newPerson.getAttribute(CommonKeys.PERSON_WEIGHT));
+			w = w * (365 - counter)/365.0;
+			newPerson.setAttribute(CommonKeys.PERSON_WEIGHT, String.valueOf(w));
+			
+			newPersons.add(newPerson);
+		}
 		
-//		for(int i = 1; i < person.getPlans().size(); i++) {
-//			person.getPlans().remove(1);
-//		}
+
 	}
 
 }

@@ -40,7 +40,7 @@ public class MutateHomeLocFactory implements MutatorFactory {
 	
 	@Override
 	public Mutator newInstance() {
-		return new MutateHomeLocation(facilities, random);
+		return null;// new MutateHomeLocation(facilities, random);
 	}
 
 }

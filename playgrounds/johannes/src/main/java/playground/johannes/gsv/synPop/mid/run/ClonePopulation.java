@@ -24,6 +24,8 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
+import playground.johannes.gsv.synPop.ApplySampleProbas;
+import playground.johannes.gsv.synPop.DeleteNoLegs;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;
@@ -51,11 +53,16 @@ public class ClonePopulation {
 		
 		logger.info("Cloning persons...");
 		Random random = new XORShiftRandom();
-		persons = PersonCloner.weightedClones(persons, 200000, random);
+		persons = PersonCloner.weightedClones(persons, 2000000, random);
+		new ApplySampleProbas(82000000).apply(persons);
 		logger.info(String.format("Generated %s persons.", persons.size()));
 
+		logger.info("Deleting persons with no legs..." );
+		persons = ProxyTaskRunner.runAndDelete(new DeleteNoLegs(), persons);
+		logger.info("Population size = " + persons.size());
+		
 		XMLWriter writer = new XMLWriter();
-		writer.write("/home/johannes/gsv/mid2008/pop/pop.200K.xml", persons);
+		writer.write("/home/johannes/gsv/mid2008/pop/pop.mob.xml", persons);
 	}
 
 }

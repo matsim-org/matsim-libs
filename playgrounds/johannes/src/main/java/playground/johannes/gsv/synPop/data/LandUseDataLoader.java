@@ -17,52 +17,22 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.invermo.sim;
-
-import java.util.Collection;
-
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
-
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
-import playground.johannes.gsv.synPop.sim2.SamplerListener;
-import playground.johannes.gsv.synPop.sim3.SwitchHomeLocation;
+package playground.johannes.gsv.synPop.data;
 
 /**
  * @author johannes
  *
  */
-public class CopyHomeLocations implements SamplerListener {
+public class LandUseDataLoader implements DataLoader {
 
-	private final long interval;
-	
-	private long iter;
-	
-	public CopyHomeLocations(long interval) {
-		this.interval = interval;
-	}
-	
+	public static final String KEY = "landuse";
+	/* (non-Javadoc)
+	 * @see playground.johannes.gsv.synPop.data.DataLoader#load()
+	 */
 	@Override
-	public void afterModify(ProxyPerson person) {
-	}
-
-	@Override
-	public void afterStep(Collection<ProxyPerson> population, ProxyPerson person, boolean accpeted) {
-		iter++;
-		if(iter % interval == 0) {
-			for(ProxyPerson thePerson : population) {
-				ActivityFacility home = (ActivityFacility) thePerson.getUserData(SwitchHomeLocation.USER_FACILITY_KEY);
-				ProxyPlan plan = thePerson.getPlans().get(0);
-				for(ProxyObject act : plan.getActivities()) {
-					if(act.getAttribute(CommonKeys.ACTIVITY_TYPE).equalsIgnoreCase("home")) {
-						act.setAttribute(CommonKeys.ACTIVITY_FACILITY, home.getId().toString());
-					}
-				}
-			}
-		}
-
+	public Object load() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

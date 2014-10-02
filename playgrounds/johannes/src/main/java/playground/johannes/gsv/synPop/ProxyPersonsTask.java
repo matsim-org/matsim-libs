@@ -17,45 +17,16 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.invermo.sim;
+package playground.johannes.gsv.synPop;
 
-import java.util.List;
-import java.util.Random;
-
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
-
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.data.FacilityData;
+import java.util.Collection;
 
 /**
  * @author johannes
  *
  */
-public class MutateHomeLocation implements Mutator {
+public interface ProxyPersonsTask {
 
-	private List<ActivityFacility> facilities;
+	public void apply(Collection<ProxyPerson> persons);
 	
-	private final Random random;
-	
-	private ActivityFacility old;
-	
-	public MutateHomeLocation(FacilityData rfacilities, Random random) {
-		facilities = rfacilities.getFacilities("home");
-		this.random = random;
-	}
-	
-	@Override
-	public boolean modify(ProxyPerson person1, ProxyPerson person2) {
-		old = (ActivityFacility) person1.getUserData(SwitchHomeLocations.HOME_FACIL_KEY);
-		ActivityFacility newFac = facilities.get(random.nextInt(facilities.size()));
-		person1.setUserData(SwitchHomeLocations.HOME_FACIL_KEY, newFac);
-		return true;
-	}
-
-	@Override
-	public void revert(ProxyPerson person1, ProxyPerson person2) {
-		person1.setUserData(SwitchHomeLocations.HOME_FACIL_KEY, old);
-		old = null;
-	}
-
 }

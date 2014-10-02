@@ -34,6 +34,7 @@ import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.data.FacilityData;
 import playground.johannes.gsv.synPop.sim.Initializer;
+import playground.johannes.gsv.synPop.sim3.SwitchHomeLocation;
 import playground.johannes.sna.gis.CRSUtils;
 
 /**
@@ -87,7 +88,7 @@ public class InitializeFacilities implements Initializer {
 		} else {
 			fac = facilities.randomFacility("home");
 		}
-		person.setUserData(SwitchHomeLocations.HOME_FACIL_KEY, fac);
+		person.setUserData(SwitchHomeLocation.USER_FACILITY_KEY, fac);
 
 	}
 

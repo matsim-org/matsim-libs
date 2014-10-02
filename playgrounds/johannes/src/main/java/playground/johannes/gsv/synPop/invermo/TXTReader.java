@@ -30,6 +30,9 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 
+import playground.johannes.gsv.synPop.ApplySampleProbas;
+import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.gsv.synPop.DeleteNoLegs;
 import playground.johannes.gsv.synPop.FixActivityTimesTask;
 import playground.johannes.gsv.synPop.InsertActivitiesTask;
 import playground.johannes.gsv.synPop.ProxyObject;
@@ -261,6 +264,14 @@ public class TXTReader {
 			persons.add(person);
 		}
 		
+		new DeleteNoWeight().apply(persons);
+//		new ApplySampleProbas(82000000).apply(persons);
+//		
+//		double wsum = 0;
+//		for(ProxyPerson person : persons) {
+//			wsum += Double.parseDouble(person.getAttribute(CommonKeys.PERSON_WEIGHT));
+//		}
+//		logger.info(String.format("Sum of weigths = %s.", wsum));
 		
 		composite = new ProxyPlanTaskComposite();
 		composite.addComponent(new Date2TimeTask());
@@ -275,7 +286,14 @@ public class TXTReader {
 		XMLWriter writer = new XMLWriter();
 		writer.write("/home/johannes/gsv/invermo/pop.xml", persons);
 		
-		persons = PersonCloner.weightedClones(persons, 100000, new XORShiftRandom());
-		writer.write("/home/johannes/gsv/invermo/pop.100K.xml", persons);
+		logger.info("Cloning persons...");
+		persons = PersonCloner.weightedClones(persons, 3000000, new XORShiftRandom());
+		new ApplySampleProbas(82000000).apply(persons);
+		
+		logger.info("Deleting person with no legs...");
+		persons = ProxyTaskRunner.runAndDelete(new DeleteNoLegs(), persons);
+		logger.info("Population size = " + persons.size());
+		
+		writer.write("/home/johannes/gsv/invermo/pop.mob.xml", persons);
 	}
 }

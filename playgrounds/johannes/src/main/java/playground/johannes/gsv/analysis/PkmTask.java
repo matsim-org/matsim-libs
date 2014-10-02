@@ -3,12 +3,10 @@ package playground.johannes.gsv.analysis;
 import gnu.trove.TObjectDoubleHashMap;
 import gnu.trove.TObjectDoubleIterator;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 
 import playground.johannes.coopsim.analysis.LegModeCondition;
