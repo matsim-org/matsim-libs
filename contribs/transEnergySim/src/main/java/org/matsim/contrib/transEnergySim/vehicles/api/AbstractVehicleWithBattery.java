@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.transEnergySim.vehicles.api;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.MathLib;
@@ -45,7 +46,9 @@ public abstract class AbstractVehicleWithBattery extends AbstractVehicle {
 	protected double socInJoules;
 
 	protected EnergyConsumptionModel electricDriveEnergyConsumptionModel;
-
+    protected Id<Vehicle> vehicleId;
+	
+	
 	public double getRequiredEnergyInJoules() {
 		double requiredEnergyInJoules = getUsableBatteryCapacityInJoules() - socInJoules;
 
@@ -92,5 +95,11 @@ public abstract class AbstractVehicleWithBattery extends AbstractVehicle {
 	public void ignoreOverCharging(boolean ignoreOverCharging) {
 		this.ignoreOverCharging=ignoreOverCharging;
 	}
+	   @Override
+	    public Id<Vehicle> getId()
+	    {
+	        return this.vehicleId;
+	    }
+
 
 }

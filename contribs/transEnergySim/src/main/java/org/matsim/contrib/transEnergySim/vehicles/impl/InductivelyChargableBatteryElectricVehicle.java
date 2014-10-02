@@ -19,8 +19,10 @@
 
 package org.matsim.contrib.transEnergySim.vehicles.impl;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.transEnergySim.vehicles.api.BatteryElectricVehicle;
 import org.matsim.contrib.transEnergySim.vehicles.api.InductivlyChargable;
+import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
 
 /**
@@ -36,5 +38,6 @@ public class InductivelyChargableBatteryElectricVehicle extends BatteryElectricV
 		this.socInJoules=batteryCapacityInJoules;
 	}
 
+ 
 	 
 }

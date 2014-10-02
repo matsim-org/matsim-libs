@@ -116,7 +116,7 @@ private void addNextVehicleFromQueueToCharger(){
     }
 }
 
-void chargeVehicles(double chargeTime){
+public void chargeVehicles(double chargeTime){
     
     double chargeInJoule = chargeTime * this.powerInKW*1000;
     
@@ -127,6 +127,18 @@ void chargeVehicles(double chargeTime){
         taxi.getBev().chargeBattery(actualCharge);
         
     }
+}
+
+@Override
+public Id<Charger> getId()
+{
+    return (Id.create(this.chargerLinkId,Charger.class));
+}
+
+@Override
+public Id<Link> getLinkId()
+{
+    return this.chargerLinkId;
 }
 
 

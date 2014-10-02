@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
+import org.matsim.contrib.transEnergySim.vehicles.impl.BatteryElectricVehicleImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -43,7 +44,6 @@ import playground.jbischoff.energy.consumption.EnergyConsumptionModelBerlinHigh;
 import playground.jbischoff.energy.consumption.EnergyConsumptionModelBerlinLow;
 import playground.jbischoff.energy.consumption.EnergyConsumptionModelBerlinMedium;
 import playground.jbischoff.energy.controlers.DisChargingControler;
-import playground.jbischoff.energy.vehicles.BatteryElectricVehicleImpl;
 
 
 
@@ -155,21 +155,22 @@ public class ElectricBerlinMain {
 		
 		
 		for (Entry<Id<Person>,String> e : this.eagentsWithBehaviour.entrySet()){
+		    Id<Vehicle> vid = Id.create(e.getKey(), Vehicle.class);
 			if (e.getValue().equals("LOW")){
 				
-				vehicles.put(Id.create(e.getKey(), Vehicle.class), new BatteryElectricVehicleImpl(blow,batteryCapacityInJoules));
+				vehicles.put(vid, new BatteryElectricVehicleImpl(blow,batteryCapacityInJoules,vid));
 			} else if (e.getValue().equals("MEDIUM")){
-				vehicles.put(Id.create(e.getKey(), Vehicle.class), new BatteryElectricVehicleImpl(bmed,batteryCapacityInJoules));
+				vehicles.put(vid, new BatteryElectricVehicleImpl(bmed,batteryCapacityInJoules,vid));
 
 			}
 			  else if (e.getValue().equals("HIGH")){
-				vehicles.put(Id.create(e.getKey(), Vehicle.class), new BatteryElectricVehicleImpl(bhigh,batteryCapacityInJoules));
+				vehicles.put(vid, new BatteryElectricVehicleImpl(bhigh,batteryCapacityInJoules,vid));
 
 			}
 			  else {
 				  	
 				  	log.info("No valid driving behaviour data for agent: "+e.getKey()+"Assuming Medium");
-					vehicles.put(Id.create(e.getKey(), Vehicle.class), new BatteryElectricVehicleImpl(bmed,batteryCapacityInJoules));
+					vehicles.put(vid, new BatteryElectricVehicleImpl(bmed,batteryCapacityInJoules,vid));
 					
 			  }
 		}

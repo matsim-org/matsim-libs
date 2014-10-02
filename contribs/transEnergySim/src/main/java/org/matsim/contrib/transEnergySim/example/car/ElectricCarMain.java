@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.ricardoFaria2012.EnergyConsumptionModelRicardoFaria2012;
+import org.matsim.contrib.transEnergySim.vehicles.impl.BatteryElectricVehicleImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -81,7 +82,8 @@ public class ElectricCarMain {
 		this.sc = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
 		HashMap<Id<Vehicle>,Vehicle> vehicles = new HashMap<Id<Vehicle>, Vehicle>();
 		for (Person p : this.sc.getPopulation().getPersons().values()){
-			vehicles.put(Id.create(p.getId(), Vehicle.class), new BatteryElectricVehicleImpl(faria, batteryCapacityInJoules));
+		    Id<Vehicle> vid = Id.create(p.getId(), Vehicle.class);
+			vehicles.put(vid, new BatteryElectricVehicleImpl(faria, batteryCapacityInJoules, vid));
 			//gives every person of the population an electric car
 		}
 		

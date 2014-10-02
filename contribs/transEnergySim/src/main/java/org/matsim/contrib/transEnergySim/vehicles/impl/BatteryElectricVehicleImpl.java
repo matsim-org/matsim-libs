@@ -17,9 +17,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.transEnergySim.example.car;
+package org.matsim.contrib.transEnergySim.vehicles.impl;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.transEnergySim.vehicles.api.BatteryElectricVehicle;
+import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
 
 public class BatteryElectricVehicleImpl extends BatteryElectricVehicle {
@@ -32,10 +34,11 @@ public class BatteryElectricVehicleImpl extends BatteryElectricVehicle {
 	 * 
 	 * 
 	 */
-	public BatteryElectricVehicleImpl(EnergyConsumptionModel ecm, double usableBatteryCapacityInJoules) {
+	public BatteryElectricVehicleImpl(EnergyConsumptionModel ecm, double usableBatteryCapacityInJoules, Id<Vehicle> vehicleId) {
 		this.electricDriveEnergyConsumptionModel=ecm;
 		this.usableBatteryCapacityInJoules=usableBatteryCapacityInJoules;
 		this.socInJoules=usableBatteryCapacityInJoules;
+		this.vehicleId = vehicleId;
 	
 	}
 

@@ -22,15 +22,21 @@
  */
 package playground.jbischoff.energy.charging;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
+import org.matsim.api.core.v01.network.Link;
+
 
 
 /**
  * @author jbischoff
  *
  */
-public interface Charger
+public interface Charger extends Identifiable<Charger>
 {
     public int getPowerInKW();
     public int getCapacity();
-
+    public Id<Link> getLinkId();
+    
+    void chargeVehicles(double chargeTime);
 }

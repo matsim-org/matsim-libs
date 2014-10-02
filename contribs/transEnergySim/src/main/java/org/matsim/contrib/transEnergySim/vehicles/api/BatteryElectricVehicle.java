@@ -40,7 +40,6 @@ public abstract class BatteryElectricVehicle extends AbstractVehicleWithBattery 
 	 * 
 	 */
 	private boolean didRunOutOfBattery = false;
-
 	public boolean didVehicleRunOutOfBattery() {
 		return didRunOutOfBattery;
 	}
@@ -63,6 +62,7 @@ public abstract class BatteryElectricVehicle extends AbstractVehicleWithBattery 
 		useBattery(energyConsumptionForLinkInJoule);
 		return energyConsumptionForLinkInJoule;
 	}
+	
 
 	@Override
 	public void reset() {

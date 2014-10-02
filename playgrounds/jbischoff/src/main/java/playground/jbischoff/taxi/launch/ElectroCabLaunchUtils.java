@@ -25,15 +25,16 @@ import org.matsim.api.core.v01.*;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.transEnergySim.controllers.EventHandlerGroup;
+import org.matsim.contrib.transEnergySim.vehicles.api.BatteryElectricVehicle;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.*;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.ricardoFaria2012.EnergyConsumptionModelRicardoFaria2012;
+import org.matsim.contrib.transEnergySim.vehicles.impl.BatteryElectricVehicleImpl;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 
 import playground.jbischoff.energy.charging.taxi.ElectricTaxiChargingHandler;
 import playground.jbischoff.energy.charging.taxi.TaxiCharger;
-import playground.jbischoff.energy.vehicles.BatteryElectricVehicleImpl;
 import playground.jbischoff.taxi.evaluation.*;
 import playground.jbischoff.taxi.optimizer.rank.NOSRankTaxiOptimizer;
 import playground.jbischoff.taxi.optimizer.rank.TaxiRankHandler;
@@ -81,9 +82,9 @@ public class ElectroCabLaunchUtils
             Id aid = v.getId();
             rankhandler.addVehicle(v);
             if (aid.toString().startsWith("et")) {
-                BatteryElectricVehicleImpl bev = new BatteryElectricVehicleImpl(ecm,
-                        20 * 1000 * 3600);
-                bevs.put(Id.create(v.getId(), org.matsim.contrib.transEnergySim.vehicles.api.Vehicle.class), bev);
+                BatteryElectricVehicle bev = new BatteryElectricVehicleImpl(ecm,
+                        20 * 1000 * 3600,Id.create(aid,org.matsim.contrib.transEnergySim.vehicles.api.Vehicle.class));
+                bevs.put(bev.getId(), bev);
                 ecabhandler.addVehicle(new ElectricTaxi(bev, v));
             }
 

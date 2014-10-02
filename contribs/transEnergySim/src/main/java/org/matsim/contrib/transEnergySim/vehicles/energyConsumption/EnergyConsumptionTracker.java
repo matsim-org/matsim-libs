@@ -97,6 +97,7 @@ public class EnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeav
 	public void handleEvent(PersonArrivalEvent event) {
 		if (event.getLegMode().equals(TransportMode.car)) {
 			handleEnergyConsumption(Id.create(event.getPersonId(), Vehicle.class), event.getLinkId(), event.getTime());
+			    
 		}
 	}
 
