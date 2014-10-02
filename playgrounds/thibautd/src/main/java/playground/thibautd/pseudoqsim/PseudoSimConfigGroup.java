@@ -27,8 +27,8 @@ import org.matsim.core.config.experimental.ReflectiveModule;
 public class PseudoSimConfigGroup extends ReflectiveModule {
 	public static final String GROUP_NAME = "pseudoSim";
 
-	public static enum PSimType { none , detailled , teleported; }
-	private PSimType psimType = PSimType.none;
+	public static enum PSimType { detailled , teleported; }
+	private PSimType psimType = PSimType.teleported;
 	private int nPSimIters = 5;
 	private int period = 3;
 	private int nThreads = 1;

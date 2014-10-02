@@ -544,12 +544,9 @@ public class RunUtils {
 		final PseudoSimConfigGroup pSimConf = (PseudoSimConfigGroup)
 					config.getModule( PseudoSimConfigGroup.GROUP_NAME );
 
-		switch ( pSimConf.getPsimType() ) {
-		case none:
-			return initializeNonPSimController( controllerRegistry );
-		default:
-			return initializePSimController( controllerRegistry );
-		}
+		return pSimConf.getNPSimIters() <= 0 ?
+			initializeNonPSimController( controllerRegistry ) :
+			initializePSimController( controllerRegistry );
 	}
 
 	public static ImmutableJointController initializePSimController(

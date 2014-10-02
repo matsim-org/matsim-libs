@@ -24,7 +24,6 @@ import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
 
 import playground.thibautd.pseudoqsim.PseudoSimConfigGroup;
-import playground.thibautd.pseudoqsim.PseudoSimConfigGroup.PSimType;
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 
@@ -59,7 +58,6 @@ public class InnovationSwitchingGroupReplanningListenner implements ReplanningLi
 					GroupReplanningConfigGroup.GROUP_NAME );
 
 		if ( event.getIteration() < repl.getDisableInnovationAfterIter() &&
-				!config.getPsimType().equals( PSimType.none ) &&
 				config.isPSimIter( event.getIteration() ) ) {
 			log.info( "performing INNOVATION ONLY iteration (for feeding PSim)" );
 			innovativeStrategyManager.run(

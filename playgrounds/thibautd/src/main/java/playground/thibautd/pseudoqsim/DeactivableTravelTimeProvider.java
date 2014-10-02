@@ -39,8 +39,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
-import playground.thibautd.pseudoqsim.PseudoSimConfigGroup.PSimType;
-
 /**
  * Necessary for "teleporting" QSim: otherwise, the TravelTimeCalculator
  * listen to no traffic, and assumes freeflow for the next re-routing and
@@ -148,8 +146,7 @@ public class DeactivableTravelTimeProvider implements LinkEnterEventHandler, Lin
 
 		@Override
 		public boolean isListenning(int iteration) {
-			return config.getPsimType().equals( PSimType.none ) ||
-				!config.isPSimIter( iteration );
+			return !config.isPSimIter( iteration );
 		}
 
 		@Override

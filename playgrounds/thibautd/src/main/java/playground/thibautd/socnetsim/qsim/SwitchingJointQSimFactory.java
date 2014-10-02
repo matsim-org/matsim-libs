@@ -29,7 +29,6 @@ import org.matsim.core.mobsim.framework.MobsimFactory;
 
 import playground.thibautd.pseudoqsim.DeactivableTravelTimeProvider;
 import playground.thibautd.pseudoqsim.PseudoSimConfigGroup;
-import playground.thibautd.pseudoqsim.PseudoSimConfigGroup.PSimType;
 import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
 
 /**
@@ -61,7 +60,6 @@ public class SwitchingJointQSimFactory implements MobsimFactory, IterationStarts
 		if ( iteration == Integer.MIN_VALUE ) throw new IllegalStateException( "undefined iteration" );
 
 		if ( iteration < repl.getDisableInnovationAfterIter() &&
-				!config.getPsimType().equals( PSimType.none ) &&
 				config.isPSimIter( iteration ) ) {
 			switch ( config.getPsimType() ) {
 			case detailled:
@@ -70,7 +68,6 @@ public class SwitchingJointQSimFactory implements MobsimFactory, IterationStarts
 			case teleported:
 				log.info( "Using teleported pseudo simulation for iteration "+iteration );
 				return new JointTeleportationSimFactory().createMobsim( sc , eventsManager );
-			case none:
 			default:
 				throw new RuntimeException( config.getPsimType().toString() );
 			}
