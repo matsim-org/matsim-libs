@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.thibautd.hitchiking.qsim;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -27,7 +26,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
@@ -47,9 +45,7 @@ import java.util.List;
  */
 public class HitchHikingQsimFactory implements MobsimFactory {
 
-    private final static Logger log = Logger.getLogger(QSimFactory.class);
-
-	private final Controler controler;
+    private final Controler controler;
 
 	public HitchHikingQsimFactory(final Controler controler) {
 		this.controler = controler;
