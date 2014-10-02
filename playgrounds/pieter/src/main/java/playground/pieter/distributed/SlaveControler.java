@@ -24,8 +24,10 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
 
 import playground.pieter.pseudosimulation.mobsim.PSimFactory;
+import playground.singapore.transitRouterEventsBased.TransitRouterWSImplFactory;
 import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTime;
 import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTimeCalculatorSerializable;
 import playground.singapore.transitRouterEventsBased.waitTimes.WaitTime;
@@ -97,6 +99,11 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
 		slaveLogger.warn("RECEIVED agent ids for removal from master. Starting TimesReceiver thread.");
 		removeNonSimulatedAgents(idStrings);
 		new Thread(new TimesReceiver()).start();
+		if(args.length==3){
+			slaveLogger.warn("Singapore scenario: Doing events-based transit routing.");
+			matsimControler.setTransitRouterFactory(new TransitRouterWSImplFactory(matsimControler.getScenario(), waitTimes, stopStopTimes));
+			matsimControler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(matsimControler.getScenario().getConfig().planCalcScore(), matsimControler.getScenario()));
+		}
 	}
 
 	private void removeNonSimulatedAgents(List<String> idStrings) {

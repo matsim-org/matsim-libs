@@ -26,8 +26,10 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
 
 import playground.pieter.pseudosimulation.util.CollectionUtils;
+import playground.singapore.transitRouterEventsBased.TransitRouterWSImplFactory;
 import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTimeCalculator;
 import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTimeCalculatorSerializable;
 import playground.singapore.transitRouterEventsBased.waitTimes.WaitTimeCalculatorSerializable;
@@ -135,6 +137,11 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
 
 		matsimControler.addPlanStrategyFactory("ReplacePlanFromSlave", new ReplacePlanFromSlaveFactory(newPlans));
 		matsimControler.addControlerListener(this);
+		if(args.length==4){
+			masterLogger.warn("Singapore scenario: Doing events-based transit routing.");
+			matsimControler.setTransitRouterFactory(new TransitRouterWSImplFactory(matsimControler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
+			matsimControler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(matsimControler.getScenario().getConfig().planCalcScore(), matsimControler.getScenario()));
+		}
 		masterLogger.warn("master inited");
 	}
 
