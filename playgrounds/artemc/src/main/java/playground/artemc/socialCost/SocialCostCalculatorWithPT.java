@@ -223,7 +223,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler {
 		linkTrip.enterTime = event.getTime();
 
 		activeTrips.put(event.getPersonId(), linkTrip);
-		
+
 		if(vehicleObserver.getVehicleOccupancy().containsKey(event.getVehicleId())){
 			if(!linkPassengers.containsKey(event.getLinkId()))
 				linkPassengers.put(event.getLinkId(), new int[numSlots]);
@@ -271,7 +271,6 @@ LinkEnterEventHandler, LinkLeaveEventHandler {
 		 */
 		String transportMode = event.getLegMode();
 		if (!transportModes.contains(transportMode)) return;
-		if(event.getPersonId().toString().startsWith("pt")) return;
 
 		LinkTrip linkTrip = new LinkTrip();
 		linkTrip.person_id = event.getPersonId();
@@ -369,7 +368,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler {
 
 		double socialCosts = 0.0;
 		double socialCostsPT = 0.0;
-		
+
 		int enterIndex = getTimeSlotIndex(enterTime);
 
 		// if it is the last time slot
@@ -386,7 +385,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler {
 
 			socialCosts = fraction * socialCostsMap.get(link_id).socialCosts[enterIndex]
 					+ (1 - fraction) * socialCostsMap.get(link_id).socialCosts[enterIndex + 1];
-			
+
 			socialCostsPT = fraction * socialCostsMap.get(link_id).socialCostsPT[enterIndex]
 					+ (1 - fraction) * socialCostsMap.get(link_id).socialCostsPT[enterIndex + 1];
 
@@ -398,7 +397,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler {
 		socialCosts = socialCosts + socialCostsPT;
 		return socialCosts;
 	}
-	
+
 	private double calcSocCostsFromPT(Id link_id, double enterTime) {
 
 		double socialCostsPT = 0.0;
@@ -414,12 +413,14 @@ LinkEnterEventHandler, LinkLeaveEventHandler {
 			 * linkTrip.enterTime == endEnterSlot -> fraction = 0.0
 			 */
 			double fraction = 1 - ((enterTime - beginEnterSlot) / travelTimeBinSize);
-			
+
 			socialCostsPT = fraction * socialCostsMap.get(link_id).socialCostsPT[enterIndex]
 					+ (1 - fraction) * socialCostsMap.get(link_id).socialCostsPT[enterIndex + 1];
 
 		}
 		socialCostsPT = (opportunityCostOfPTTravel * socialCostsPT / 3600) / marginalUtilityOfMoney;	
+
+
 
 		return socialCostsPT;
 	}
@@ -457,10 +458,10 @@ LinkEnterEventHandler, LinkLeaveEventHandler {
 				if (socialCosts > 0.0) cost = cost + socialCosts;
 				distance = legTrip.distance + network.getLinks().get(linkTrip.link_id).getLength();
 			}
-	
+
 			legTrip.distance = distance;
 			legTrip.cost = cost;
-			
+
 			tripStats.addValue(cost);
 
 			/*
@@ -561,7 +562,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler {
 		fileName = event.getControler().getControlerIO().getOutputFilename("normalizedSocialCosts");
 		writer.writeGraphic(fileName + ".png", "social costs (per leg, normalized)", meanData, medianData, quantil25Data, quantil75Data);
 		writer.writeTable(fileName + ".txt", meanData, medianData, quantil25Data, quantil75Data);
-		
+
 		//Write link toll statistics
 		String filenameLinkStats = this.controler.getControlerIO().getIterationFilename(event.getIteration(), "linkTollStats.txt");
 		String[] linkTableColumns = new String[this.numSlots+1];
@@ -582,12 +583,12 @@ LinkEnterEventHandler, LinkLeaveEventHandler {
 				}
 				linkTable.addData(linkTollData);
 			}
-			
+
 			linkTable.finish();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}	
-		
+
 		//Write trip statistics
 		String tripTableColumns[] = {"tripID","startTime","duration","distance","tollFromPT","tollTotal"};
 		HashMap<Id,Integer> personTrips = new HashMap<Id,Integer>();		
@@ -601,34 +602,37 @@ LinkEnterEventHandler, LinkLeaveEventHandler {
 			String[] dataLine = new String[6];
 			for (LegTrip legTrip : performedLegs) {
 
-				if(personTrips.containsKey(legTrip.person_id)){
-					personTrips.put(legTrip.person_id, personTrips.get(legTrip.person_id)+1);
-				}
-				else{
-					personTrips.put(legTrip.person_id, 1);
-				}
-				
-				costPT = 0.0;
-				for (LinkTrip linkTrip : legTrip.linkTrips) {
-					double scPT = calcSocCostsFromPT(linkTrip.link_id, linkTrip.enterTime);
-					if(scPT<0) scPT=0.0;
-					costPT = costPT + scPT;
-				}
-				tripDuration = legTrip.arrivalTime - legTrip.departureTime;
+				if(!legTrip.person_id.toString().startsWith("pt")){
 
-				dataLine[0] = legTrip.person_id.toString()+"_"+personTrips.get(legTrip.person_id);
-				dataLine[1] = String.valueOf(legTrip.departureTime);
-				dataLine[2] = String.valueOf(tripDuration);
-				dataLine[3] = String.valueOf(legTrip.distance);
-				dataLine[4] = String.valueOf(costPT);
-				dataLine[5] = String.valueOf(legTrip.cost);
-				tripTable.addData(dataLine);
+					if(personTrips.containsKey(legTrip.person_id)){
+						personTrips.put(legTrip.person_id, personTrips.get(legTrip.person_id)+1);
+					}
+					else{
+						personTrips.put(legTrip.person_id, 1);
+					}
+
+					costPT = 0.0;
+					for (LinkTrip linkTrip : legTrip.linkTrips) {
+						double scPT = calcSocCostsFromPT(linkTrip.link_id, linkTrip.enterTime);
+						if(scPT<0.0) scPT=0.0;
+						costPT = costPT + scPT;
+					}
+					tripDuration = legTrip.arrivalTime - legTrip.departureTime;
+
+					dataLine[0] = legTrip.person_id.toString()+"_"+personTrips.get(legTrip.person_id);
+					dataLine[1] = String.valueOf(legTrip.departureTime);
+					dataLine[2] = String.valueOf(tripDuration);
+					dataLine[3] = String.valueOf(legTrip.distance);
+					dataLine[4] = String.valueOf(costPT);
+					dataLine[5] = String.valueOf(legTrip.cost);
+					tripTable.addData(dataLine);
+				}
 			}
 			tripTable.finish();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}	
-		
+
 	}
 
 	private void updateSocCosts(int iteration) {
@@ -650,12 +654,12 @@ LinkEnterEventHandler, LinkLeaveEventHandler {
 				}else{
 					if(linkPassengers.containsKey(data.link.getId())){
 
-//											log.info("TimeSlot: "+k
-//													+" LinkPassengersSize: "+linkPassengers.size()
-//													+" LinkId: "+data.link.getId()
-//													+" LinkCapacity: "+data.link.getCapacity()
-//													+" LinkTimeSlots: "+linkPassengers.get(data.link.getId()).length
-//													+" LinkPassengers: "+(double)linkPassengers.get(data.link.getId())[k]);
+						//											log.info("TimeSlot: "+k
+						//													+" LinkPassengersSize: "+linkPassengers.size()
+						//													+" LinkId: "+data.link.getId()
+						//													+" LinkCapacity: "+data.link.getCapacity()
+						//													+" LinkTimeSlots: "+linkPassengers.get(data.link.getId()).length
+						//													+" LinkPassengers: "+(double)linkPassengers.get(data.link.getId())[k]);
 
 						socialCostPT = socialCostPT + ( 3600.0 / (double)data.link.getCapacity())*(double)linkPassengers.get(data.link.getId())[k];
 					}
@@ -669,10 +673,10 @@ LinkEnterEventHandler, LinkLeaveEventHandler {
 
 				if (socialCost < 0.0) socialCost = 0.0;
 				if (socialCostPT < 0.0) socialCostPT = 0.0;
-				
-//				if(socialCost!=0.0 && socialCostPT!=0.0){
-//					log.info(k+","+data.link.getId().toString()+"   SocialCost: "+socialCost+"SocialCost PT: "+socialCostPT);
-//				}
+
+				//				if(socialCost!=0.0 && socialCostPT!=0.0){
+				//					log.info(k+","+data.link.getId().toString()+"   SocialCost: "+socialCost+"SocialCost PT: "+socialCostPT);
+				//				}
 
 				// If it is the first iteration, there is no old value, therefore use this iterations value. 
 				double oldValue;
@@ -682,11 +686,10 @@ LinkEnterEventHandler, LinkLeaveEventHandler {
 				double blendedNewValue = blendFactor * socialCost;
 
 				data.socialCosts[k] = blendedOldValue + blendedNewValue;
-				
-				
+
+
 				//Social cost for PT passenger delay
-				if (socialCostPT < 0.0) socialCostPT = 0.0;
-	
+
 				// If it is the first iteration, there is no old value, therefore use this iterations value. 
 				double oldValuePT;
 				if (iteration == 0) oldValuePT = socialCostPT;
@@ -696,12 +699,12 @@ LinkEnterEventHandler, LinkLeaveEventHandler {
 				double blendedNewValuePT = blendFactor * socialCostPT;
 
 				data.socialCostsPT[k] = blendedOldValuePT + blendedNewValuePT;
-		
+
 			}
-			
+
 			//	SavitzkyGolayFilter sgf = new SavitzkyGolayFilter(5,data.socialCosts, true);
 			//	data.socialCosts = sgf.appllyFilter();
-			
+
 			//SavitzkyGolayFilter sgf2 = new SavitzkyGolayFilter(5,data.socialCostsPT, true);
 			//data.socialCostsPT = sgf2.appllyFilter();
 		}
