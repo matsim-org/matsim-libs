@@ -72,7 +72,7 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
 
 	}
 
-	CopiedControler matsimControler;
+	Controler matsimControler;
 	Logger slaveLogger = Logger.getLogger(this.getClass());
 	private SerializableLinkTravelTimes linkTravelTimes;
 	private WaitTime waitTimes;
@@ -84,7 +84,7 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
 	private boolean readyToSendPlans = false;
 
 	public SlaveControler(String[] args) throws  UnknownHostException, IOException, ClassNotFoundException {
-		matsimControler = new CopiedControler(ScenarioUtils.loadScenario(ConfigUtils.loadConfig(args[0])));
+		matsimControler = new Controler(ScenarioUtils.loadScenario(ConfigUtils.loadConfig(args[0])));
 		matsimControler.setOverwriteFiles(true);
 		matsimControler.setCreateGraphs(false);
 		matsimControler.addControlerListener(this);
