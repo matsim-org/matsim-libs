@@ -72,7 +72,7 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
 
 	}
 
-	Controler matsimControler;
+	CopiedControler matsimControler;
 	Logger slaveLogger = Logger.getLogger(this.getClass());
 	private SerializableLinkTravelTimes linkTravelTimes;
 	private WaitTime waitTimes;
@@ -83,8 +83,8 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
 	private Map<String, PlanSerializable> plansCopyForSending;
 	private boolean readyToSendPlans = false;
 
-	public SlaveControler(String[] args) throws NumberFormatException, UnknownHostException, IOException, ClassNotFoundException {
-		matsimControler = new Controler(ScenarioUtils.loadScenario(ConfigUtils.loadConfig(args[0])));
+	public SlaveControler(String[] args) throws  UnknownHostException, IOException, ClassNotFoundException {
+		matsimControler = new CopiedControler(ScenarioUtils.loadScenario(ConfigUtils.loadConfig(args[0])));
 		matsimControler.setOverwriteFiles(true);
 		matsimControler.setCreateGraphs(false);
 		matsimControler.addControlerListener(this);
@@ -99,7 +99,7 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
 		slaveLogger.warn("RECEIVED agent ids for removal from master. Starting TimesReceiver thread.");
 		removeNonSimulatedAgents(idStrings);
 		new Thread(new TimesReceiver()).start();
-		if(args.length==3){
+		if(args[3].equals("sing")){
 			slaveLogger.warn("Singapore scenario: Doing events-based transit routing.");
 			matsimControler.setTransitRouterFactory(new TransitRouterWSImplFactory(matsimControler.getScenario(), waitTimes, stopStopTimes));
 			matsimControler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(matsimControler.getScenario().getConfig().planCalcScore(), matsimControler.getScenario()));
@@ -119,7 +119,7 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
 
 	}
 
-	public static void main(String[] args) throws NumberFormatException, UnknownHostException, IOException, ClassNotFoundException {
+	public static void main(String[] args) throws  UnknownHostException, IOException, ClassNotFoundException {
 		SlaveControler slave = new SlaveControler(args);
 		slave.run();
 	}

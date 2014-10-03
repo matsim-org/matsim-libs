@@ -66,10 +66,6 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
 			} catch (IOException | ClassNotFoundException e) {
 				e.printStackTrace();
 				System.exit(0);
-			} catch (Exception e) {
-				e.printStackTrace();
-
-				System.exit(0);
 			}
 		}
 
@@ -137,7 +133,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
 
 		matsimControler.addPlanStrategyFactory("ReplacePlanFromSlave", new ReplacePlanFromSlaveFactory(newPlans));
 		matsimControler.addControlerListener(this);
-		if(args.length==4){
+        if(args[4].equals("sing")){
 			masterLogger.warn("Singapore scenario: Doing events-based transit routing.");
 			matsimControler.setTransitRouterFactory(new TransitRouterWSImplFactory(matsimControler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
 			matsimControler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(matsimControler.getScenario().getConfig().planCalcScore(), matsimControler.getScenario()));
@@ -160,8 +156,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
 				.travelTimeCalculator().getTraveltimeBinSize(), matsimControler.getConfig().qsim().getEndTime(), matsimControler
 				.getNetwork().getLinks().values());
 		numThreads = new AtomicInteger(slaves.length);
-		for (int i = 0; i < slaves.length; i++)
-			new Thread(slaves[i]).start();
+        for (Slave slave : slaves) new Thread(slave).start();
 		while (numThreads.get() > 0)
 			;
 		mergePlansFromSlaves();
