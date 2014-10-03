@@ -27,27 +27,26 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalty;
+import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionAccumulator;
-import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.ivt.kticompatibility.KtiActivityScoring;
@@ -174,6 +173,12 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 		final PlanCalcScoreConfigGroup dummyGroup = new PlanCalcScoreConfigGroup();
 		for ( Map.Entry<String, String> e : config.getParams().entrySet() ) {
 			dummyGroup.addParam( e.getKey() , e.getValue() );
+		}
+
+		for ( Collection<? extends Module> sets : config.getParameterSets().values() ) {
+			for ( Module set : sets ) {
+				dummyGroup.addParameterSet( set );
+			}
 		}
 
 		final Set<String> handledTypes = new HashSet<String>();
