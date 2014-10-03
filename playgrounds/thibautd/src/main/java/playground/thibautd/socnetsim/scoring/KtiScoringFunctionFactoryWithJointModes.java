@@ -161,6 +161,16 @@ public class KtiScoringFunctionFactoryWithJointModes implements ScoringFunctionF
 							scenario ) ) );
 		}
 
+		final GroupSizePreferencesConfigGroup groupSizeGroup = (GroupSizePreferencesConfigGroup)
+			scenario.getConfig().getModule( GroupSizePreferencesConfigGroup.GROUP_NAME );
+
+		scoringFunctionAccumulator.addScoringFunction(
+				new GroupCompositionPenalizer(
+					groupSizeGroup.getActivityType(),
+					new GroupCompositionPenalizer.MinGroupSizeLinearUtilityOfTime(
+						groupSizeGroup.getPersonPreference( person ),
+						groupSizeGroup.getUtilityOfMissingContact_util_s() ) ) );
+
 		return scoringFunctionAccumulator;
 	}
 

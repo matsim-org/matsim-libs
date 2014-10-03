@@ -96,6 +96,7 @@ import playground.thibautd.socnetsim.replanning.selectors.AnnealingCoalitionExpB
 import playground.thibautd.socnetsim.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.router.JointPlanRouterFactory;
 import playground.thibautd.socnetsim.scoring.FireMoneyEventsForUtilityOfBeingTogether;
+import playground.thibautd.socnetsim.scoring.GroupSizePreferencesConfigGroup;
 import playground.thibautd.socnetsim.scoring.KtiScoringFunctionFactoryWithJointModes;
 import playground.thibautd.socnetsim.scoring.UniformlyInternalizingPlansScoring;
 import playground.thibautd.socnetsim.scoring.BeingTogetherScoring.LinearOverlapScorer;
@@ -690,6 +691,7 @@ public class RunUtils {
 	public static void addConfigGroups(final Config config) {
 		config.addModule( new ScoringFunctionConfigGroup() );
 		config.addModule( new KtiInputFilesConfigGroup() );
+		config.addModule( new GroupSizePreferencesConfigGroup() );
 	}
 
 	public static Scenario createScenario(final String configFile) {
