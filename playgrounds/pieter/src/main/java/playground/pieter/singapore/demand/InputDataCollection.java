@@ -15,6 +15,7 @@ import java.util.TreeMap;
 
 import javax.management.timer.Timer;
 
+
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -316,7 +317,7 @@ public class InputDataCollection implements Serializable {
 				ArrayList ids = subDGPActivityMapping.get(subdgp).get(acttype).getFirst();
 				ArrayList caps = subDGPActivityMapping.get(subdgp).get(acttype).getSecond();
 				String[] idsA = (String[]) ids.toArray(new String[ids.size()]);
-				double[] capsA = ArrayUtils.toPrimitive((Double[])caps.toArray(new Double[caps.size()]));
+				double[] capsA = ArrayUtils.toPrimitive((Double[]) caps.toArray(new Double[caps.size()]));
 				subDGPActivityLocationSamplers.get(subdgp).put(acttype, new LocationSampler(acttype, idsA, capsA));
 			}
 		}

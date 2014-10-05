@@ -57,7 +57,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
         CommandLine commandLine = parser.parse(options, args);
         int numSlaves = 0;
         if (commandLine.hasOption("c"))
-            numSlaves = Integer.parseInt(args[2]);
+            numSlaves = Integer.parseInt(commandLine.getOptionValue("n"));
         else {
             System.err.println("Unspecified number of slaves");
             System.out.println(options.toString());
