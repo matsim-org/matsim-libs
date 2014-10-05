@@ -53,7 +53,7 @@ public class JbSignalController implements SignalController {
 	private Map<Id, Integer> adaptiveOnsets;
 	private Map<Id, Integer> adaptiveDroppings;
 	private AdaptiveControllHead adaptiveControllHead;
-	private Map<Double, List<Id>> gapsAtSecond;
+	private Map<Double, List<Id<SignalGroup>>> gapsAtSecond;
 	private int availableStretchTime;
 	private Map<Id, Integer> maxDrop;
 	private Map<Id, Integer> minDrop;
@@ -67,7 +67,7 @@ public class JbSignalController implements SignalController {
 		this.minDrop = new HashMap<Id, Integer>();
 		this.minOn = new HashMap<Id, Integer>();
 		this.adaptiveControllHead = ach;
-		this.gapsAtSecond = new HashMap<Double, List<Id>>();
+		this.gapsAtSecond = new HashMap<Double, List<Id<SignalGroup>>>();
 
 	}
 
@@ -242,31 +242,31 @@ public class JbSignalController implements SignalController {
 	private void updateNonAdaptiveStates(double timeSeconds) {
 		log.info("Updating na ss "+this.system.getId());
 
-		List<Id> droppingGroupIds = this.activePlan.getDroppings(timeSeconds);
+		List<Id<SignalGroup>> droppingGroupIds = this.activePlan.getDroppings(timeSeconds);
 		if (droppingGroupIds != null) {
-			for (Id id : droppingGroupIds) {
+			for (Id<SignalGroup> id : droppingGroupIds) {
 				this.system.scheduleDropping(timeSeconds, id);
 			}
 		}
 
-		List<Id> onsetGroupIds = this.activePlan.getOnsets(timeSeconds);
+		List<Id<SignalGroup>> onsetGroupIds = this.activePlan.getOnsets(timeSeconds);
 		if (onsetGroupIds != null) {
-			for (Id id : onsetGroupIds) {
+			for (Id<SignalGroup> id : onsetGroupIds) {
 				this.system.scheduleOnset(timeSeconds, id);
 			}
 		}
 	}
 
-	public void addGapAtSecond(double second, Id sgId) {
+	public void addGapAtSecond(double second, Id<SignalGroup> sgId) {
 		if (!this.gapsAtSecond.containsKey(second)) {
-			this.gapsAtSecond.put(second, new LinkedList<Id>());
+			this.gapsAtSecond.put(second, new LinkedList<Id<SignalGroup>>());
 		}
 		this.gapsAtSecond.get(second).add(sgId);
 	}
 
-	public List<Id> getGapListatSecond(double second) {
+	public List<Id<SignalGroup>> getGapListatSecond(double second) {
 		if (!this.gapsAtSecond.containsKey(second)) {
-			this.gapsAtSecond.put(second, new LinkedList<Id>());
+			this.gapsAtSecond.put(second, new LinkedList<Id<SignalGroup>>());
 		}
 		return this.gapsAtSecond.get(second);
 

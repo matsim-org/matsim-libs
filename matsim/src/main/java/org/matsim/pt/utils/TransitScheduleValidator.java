@@ -76,7 +76,7 @@ public abstract class TransitScheduleValidator {
 					result.addError("Transit line " + line.getId() + ", route " + route.getId() + " has no network route.");
 				} else {
 					Link prevLink = network.getLinks().get(netRoute.getStartLinkId());
-					for (Id linkId : netRoute.getLinkIds()) {
+					for (Id<Link> linkId : netRoute.getLinkIds()) {
 						Link link = network.getLinks().get(linkId);
 						if (link == null) {
 							result.addError("Transit line " + line.getId() + ", route " + route.getId() +
@@ -113,15 +113,15 @@ public abstract class TransitScheduleValidator {
 				if (netRoute == null) {
 					result.addError("Transit line " + line.getId() + ", route " + route.getId() + " has no network route.");
 				} else {
-					List<Id> linkIds = new ArrayList<Id>();
+					List<Id<Link>> linkIds = new ArrayList<>();
 					linkIds.add(netRoute.getStartLinkId());
 					linkIds.addAll(netRoute.getLinkIds());
 					linkIds.add(netRoute.getEndLinkId());
-					Iterator<Id> linkIdIterator = linkIds.iterator();
-					Id nextLinkId = linkIdIterator.next();
+					Iterator<Id<Link>> linkIdIterator = linkIds.iterator();
+					Id<Link> nextLinkId = linkIdIterator.next();
 					boolean error = false;
 					for (TransitRouteStop stop : route.getStops()) {
-						Id linkRefId = stop.getStopFacility().getLinkId();
+						Id<Link> linkRefId = stop.getStopFacility().getLinkId();
 
 						while (!linkRefId.equals(nextLinkId)) {
 							if (linkIdIterator.hasNext()) {
@@ -148,7 +148,7 @@ public abstract class TransitScheduleValidator {
 		for (TransitLine line : schedule.getTransitLines().values()) {
 			for (TransitRoute route : line.getRoutes().values()) {
 				for (TransitRouteStop stop : route.getStops()) {
-					Id linkId = stop.getStopFacility().getLinkId();
+					Id<Link> linkId = stop.getStopFacility().getLinkId();
 					if (linkId == null) {
 						result.addError("Transit Stop Facility " + stop.getStopFacility().getId() + " has no linkId, but is used by transit line " + line.getId() + ", route " + route.getId());
 					}

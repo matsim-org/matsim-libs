@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Vector;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.algorithms.graphs.CountsGraph;
 import org.matsim.counts.algorithms.graphs.CountsGraphsCreator;
@@ -55,7 +56,7 @@ public class PtCountsLoadCurveGraphCreator extends CountsGraphsCreator {
 				lcg.add2LoadCurveDataSets(cc_last);
 			}
 			CountSimComparison cc= l_it.next();
-			Id stopId = cc.getId();
+			Id<Link> stopId = cc.getId();
 			while (cc.getId().equals(stopId)) {
 				if (l_it.hasNext()) {
 					lcg.add2LoadCurveDataSets(cc);

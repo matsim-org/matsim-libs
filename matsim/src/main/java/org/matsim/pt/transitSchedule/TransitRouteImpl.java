@@ -58,7 +58,7 @@ public class TransitRouteImpl implements TransitRoute {
 	}
 
 	@Override
-	public Id getId() {
+	public Id<TransitRoute> getId() {
 		return this.routeId;
 	}
 
@@ -90,7 +90,7 @@ public class TransitRouteImpl implements TransitRoute {
 
 	@Override
 	public void addDeparture(final Departure departure) {
-		final Id id = departure.getId();
+		final Id<Departure> id = departure.getId();
 		if (this.departures.containsKey(id)) {
 			throw new IllegalArgumentException("There is already a departure with id " + id.toString() + " in transit route " + this.routeId);
 		}

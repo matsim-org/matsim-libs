@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.signalsystems.model.SignalSystem;
 
 
 /**
@@ -32,7 +33,7 @@ import org.matsim.api.core.v01.Id;
 public class SignalControlDataImpl implements SignalControlData {
 
 	private SignalControlDataFactory factory = new SignalControlDataFactoryImpl();
-	private Map<Id, SignalSystemControllerData> signalControllerDataBySystemId = new HashMap<Id, SignalSystemControllerData>();
+	private Map<Id<SignalSystem>, SignalSystemControllerData> signalControllerDataBySystemId = new HashMap<>();
 
 	@Override
 	public void addSignalSystemControllerData(SignalSystemControllerData controllerData) {
@@ -45,7 +46,7 @@ public class SignalControlDataImpl implements SignalControlData {
 	}
 
 	@Override
-	public Map<Id, SignalSystemControllerData> getSignalSystemControllerDataBySystemId() {
+	public Map<Id<SignalSystem>, SignalSystemControllerData> getSignalSystemControllerDataBySystemId() {
 		return this.signalControllerDataBySystemId;
 	}
 

@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
+import org.matsim.signalsystems.model.SignalSystem;
 
 
 /**
@@ -40,7 +41,7 @@ public interface AmberTimesData extends MatsimToplevelContainer {
 	
 	public Integer getDefaultAmber();
 	
-	public Map<Id, AmberTimeData> getAmberTimeDataBySystemId();
+	public Map<Id<SignalSystem>, AmberTimeData> getAmberTimeDataBySystemId();
 	
 	public void addAmberTimeData(AmberTimeData amberTimeData);
 	

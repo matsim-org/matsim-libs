@@ -75,7 +75,7 @@ public class LinkReplanningMap implements PersonStuckEventHandler, ActivityStart
 		EXACT, RESTRICTED, UNRESTRICTED
 	}
 
-	private final Set<Id> legJustStartedAgents;
+	private final Set<Id<Person>> legJustStartedAgents;
 	private double currentTime = 0.0;
 	
 	public LinkReplanningMap(EarliestLinkExitTimeProvider earliestLinkExitTimeProvider) {
@@ -83,7 +83,7 @@ public class LinkReplanningMap implements PersonStuckEventHandler, ActivityStart
 		log.info("Note that the LinkReplanningMap has to be registered as an EventHandler and a SimulationListener!");
 		this. earliestLinkExitTimeProvider = earliestLinkExitTimeProvider;
 		
-		this.legJustStartedAgents = new HashSet<Id>();
+		this.legJustStartedAgents = new HashSet<Id<Person>>();
 	}
 
 	@Override
@@ -139,7 +139,7 @@ public class LinkReplanningMap implements PersonStuckEventHandler, ActivityStart
 	 * @param time
 	 * @return a list of agents who might need an unrestricted replanning and use the given transport mode
 	 */
-	public Set<Id> getUnrestrictedReplanningAgents(final double time) {
+	public Set<Id<Person>> getUnrestrictedReplanningAgents(final double time) {
 		return this.filterAgents(time, TimeFilterMode.UNRESTRICTED);
 	}
 	
@@ -147,13 +147,13 @@ public class LinkReplanningMap implements PersonStuckEventHandler, ActivityStart
 	 * @param time
 	 * @return a list of agents who might need a restricted replanning and use the given transport mode
 	 */
-	public Set<Id> getRestrictedReplanningAgents(final double time) {
+	public Set<Id<Person>> getRestrictedReplanningAgents(final double time) {
 		return this.filterAgents(time, TimeFilterMode.RESTRICTED);
 	}
 	
-	private Set<Id> filterAgents(final double time, final TimeFilterMode timeMode) {
+	private Set<Id<Person>> filterAgents(final double time, final TimeFilterMode timeMode) {
 		
-		Set<Id> set = new HashSet<Id>();
+		Set<Id<Person>> set = new HashSet<>();
 		
 		Set<Entry<Double, Set<Id<Person>>>> entries = this.earliestLinkExitTimeProvider.getEarliestLinkExitTimesPerTimeStep().entrySet();
 		
@@ -188,7 +188,7 @@ public class LinkReplanningMap implements PersonStuckEventHandler, ActivityStart
 	 * @return A list of all agents that have just started a leg. Note that
 	 * they cannot end their leg on their current link!
 	 */
-	public Set<Id> getLegStartedAgents() {
+	public Set<Id<Person>> getLegStartedAgents() {
 		return Collections.unmodifiableSet(this.legJustStartedAgents);
 	}
 }

@@ -54,7 +54,7 @@ public class WorldConnectLocations {
 		this.config = config;
 	}
 
-	private final void connectByFile(final ActivityFacilities facilities, final Network network, final String file, final Set<Id> remainingFacilities) {
+	private final void connectByFile(final ActivityFacilities facilities, final Network network, final String file, final Set<Id<ActivityFacility>> remainingFacilities) {
 		log.info("    connecting facilities with links via "+CONFIG_F2L_INPUTF2LFile+"="+file);
 		BufferedReader br = null;
 		try {
@@ -121,7 +121,7 @@ public class WorldConnectLocations {
 	public final void connectFacilitiesWithLinks(final ActivityFacilities facilities, final NetworkImpl network) {
 		log.info("  connecting facilities with links...");
 
-		Set<Id> remainingFacilities = new HashSet<Id>(facilities.getFacilities().keySet());
+		Set<Id<ActivityFacility>> remainingFacilities = new HashSet<>(facilities.getFacilities().keySet());
 		if (this.config != null) {
 			String inputF2LFile = this.config.findParam(CONFIG_F2L,CONFIG_F2L_INPUTF2LFile);
 			if (inputF2LFile != null) {
@@ -130,7 +130,7 @@ public class WorldConnectLocations {
 		}
 
 		log.info("    connecting remaining facilities with links ("+remainingFacilities.size()+" remaining)...");
-		for (Id fid : remainingFacilities) {
+		for (Id<ActivityFacility> fid : remainingFacilities) {
 			ActivityFacility f = facilities.getFacilities().get(fid);
 			Link l = network.getNearestRightEntryLink(f.getCoord());
 			l = network.getLinks().get(l.getId());

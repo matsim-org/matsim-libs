@@ -49,10 +49,10 @@ public final class LanesUtils {
 	 * lanes and the given Ids of the downstream links the lane leads to. The Lane is added to the LanesToLinkAssignment
 	 * given as parameter.
 	 */
-	public static void createAndAddLane(LanesToLinkAssignment11 l2l, LaneDefinitionsFactory11 factory, Id laneId, 
-			double length, 	double noLanes, Id... toLinkIds) {
+	public static void createAndAddLane(LanesToLinkAssignment11 l2l, LaneDefinitionsFactory11 factory, Id<Lane> laneId, 
+			double length, 	double noLanes, Id<Link>... toLinkIds) {
 		LaneData11 lane = factory.createLane(laneId);
-		for (Id toLinkId : toLinkIds) {
+		for (Id<Link> toLinkId : toLinkIds) {
 			lane.addToLinkId(toLinkId);
 		}
 		lane.setStartsAtMeterFromLinkEnd(length);
@@ -114,13 +114,13 @@ public final class LanesUtils {
 		while (! laneStack.isEmpty()){
 			ModelLane qLane = laneStack.pop();
 			if (qLane.getToLanes() == null || (qLane.getToLanes().isEmpty())) {
-				for (Id toLinkId : qLane.getLaneData().getToLinkIds()){
+				for (Id<Link> toLinkId : qLane.getLaneData().getToLinkIds()){
 					qLane.addDestinationLink(toLinkId);
 				}
 			}
 			else {
 				for (ModelLane subsequentLane : qLane.getToLanes()){
-					for (Id toLinkId : subsequentLane.getDestinationLinkIds()){
+					for (Id<Link> toLinkId : subsequentLane.getDestinationLinkIds()){
 						qLane.addDestinationLink(toLinkId);
 					}
 				}

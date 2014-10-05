@@ -73,7 +73,7 @@ public class PlansPrepare {
 	}
 
 	public void createDilutedPlans(final CoordImpl center, final double radius, final String fromFile, final String toFile) {
-		final Map<Id, Link> areaOfInterest = new HashMap<Id, Link>();
+		final Map<Id<Link>, Link> areaOfInterest = new HashMap<>();
 
 		Network network = this.scenario.getNetwork();
 

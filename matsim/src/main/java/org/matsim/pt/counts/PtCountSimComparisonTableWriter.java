@@ -5,6 +5,7 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.counts.CountSimComparison;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 public class PtCountSimComparisonTableWriter implements MatsimWriter {
 
@@ -19,10 +20,10 @@ public class PtCountSimComparisonTableWriter implements MatsimWriter {
 		SimpleWriter simpleWriter = null;
 		try {
 			simpleWriter = new SimpleWriter(filename);
-			Id lastStopId = null;
+			Id<TransitStopFacility> lastStopId = null;
 			// Sorted by stopId
 			for (CountSimComparison count : countSimCompList) {
-				Id stopId = count.getId();
+				Id<TransitStopFacility> stopId = Id.create(count.getId(), TransitStopFacility.class);
 				if (!stopId.equals(lastStopId)) {
 					simpleWriter.write("StopId :\t");
 					simpleWriter.write(stopId.toString());

@@ -43,8 +43,10 @@ import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.signalsystems.model.DefaultPlanbasedSignalSystemController;
+import org.matsim.signalsystems.model.Signal;
 import org.matsim.signalsystems.model.SignalGroup;
 import org.matsim.signalsystems.model.SignalPlan;
+import org.matsim.signalsystems.model.SignalSystem;
 
 
 /**
@@ -68,46 +70,46 @@ public class CreateSimpleTrafficSignalScenario {
 		SignalGroupsData groups = signalsData.getSignalGroupsData();
 		
 		//signal system 3
-		SignalSystemData sys = systems.getFactory().createSignalSystemData(Id.create("3", SignalSystemData.class));
+		SignalSystemData sys = systems.getFactory().createSignalSystemData(Id.create("3", SignalSystem.class));
 		systems.addSignalSystemData(sys);
-		SignalData signal = systems.getFactory().createSignalData(Id.create("1", SignalData.class));
+		SignalData signal = systems.getFactory().createSignalData(Id.create("1", Signal.class));
 		sys.addSignalData(signal);
 		signal.setLinkId(Id.create("23", Link.class));
-		signal = systems.getFactory().createSignalData(Id.create("2", SignalData.class));
+		signal = systems.getFactory().createSignalData(Id.create("2", Signal.class));
 		sys.addSignalData(signal);
 		signal.setLinkId(Id.create("43", Link.class));
 		SignalUtils.createAndAddSignalGroups4Signals(groups, sys);
 		
 		
 		//signal system 4
-		sys = systems.getFactory().createSignalSystemData(Id.create("4", SignalSystemData.class));
+		sys = systems.getFactory().createSignalSystemData(Id.create("4", SignalSystem.class));
 		systems.addSignalSystemData(sys);
-		signal = systems.getFactory().createSignalData(Id.create("1", SignalData.class));
+		signal = systems.getFactory().createSignalData(Id.create("1", Signal.class));
 		sys.addSignalData(signal);
 		signal.setLinkId(Id.create("34", Link.class));
-		signal = systems.getFactory().createSignalData(Id.create("2", SignalData.class));
+		signal = systems.getFactory().createSignalData(Id.create("2", Signal.class));
 		sys.addSignalData(signal);
 		signal.setLinkId(Id.create("54", Link.class));
 		SignalUtils.createAndAddSignalGroups4Signals(groups, sys);
 
 		//signal system 7
-		sys = systems.getFactory().createSignalSystemData(Id.create("7", SignalSystemData.class));
+		sys = systems.getFactory().createSignalSystemData(Id.create("7", SignalSystem.class));
 		systems.addSignalSystemData(sys);
-		signal = systems.getFactory().createSignalData(Id.create("1", SignalData.class));
+		signal = systems.getFactory().createSignalData(Id.create("1", Signal.class));
 		sys.addSignalData(signal);
 		signal.setLinkId(Id.create("27", Link.class));
-		signal = systems.getFactory().createSignalData(Id.create("2", SignalData.class));
+		signal = systems.getFactory().createSignalData(Id.create("2", Signal.class));
 		sys.addSignalData(signal);
 		signal.setLinkId(Id.create("87", Link.class));
 		SignalUtils.createAndAddSignalGroups4Signals(groups, sys);
 		
 		//signal system 8
-		sys = systems.getFactory().createSignalSystemData(Id.create("8", SignalSystemData.class));
+		sys = systems.getFactory().createSignalSystemData(Id.create("8", SignalSystem.class));
 		systems.addSignalSystemData(sys);
-		signal = systems.getFactory().createSignalData(Id.create("1", SignalData.class));
+		signal = systems.getFactory().createSignalData(Id.create("1", Signal.class));
 		sys.addSignalData(signal);
 		signal.setLinkId(Id.create("78", Link.class));
-		signal = systems.getFactory().createSignalData(Id.create("2", SignalData.class));
+		signal = systems.getFactory().createSignalData(Id.create("2", Signal.class));
 		sys.addSignalData(signal);
 		signal.setLinkId(Id.create("58", Link.class));
 		SignalUtils.createAndAddSignalGroups4Signals(groups, sys);
@@ -118,10 +120,10 @@ public class CreateSimpleTrafficSignalScenario {
 		SignalControlData control = sd.getSignalControlData();
 		
 		//signal system 3, 4 control
-		List<Id<SignalSystemControllerData>> ids = new LinkedList<Id<SignalSystemControllerData>>();
-		ids.add(Id.create("3", SignalSystemControllerData.class));
-		ids.add(Id.create("4", SignalSystemControllerData.class));
-		for (Id id : ids){
+		List<Id<SignalSystem>> ids = new LinkedList<Id<SignalSystem>>();
+		ids.add(Id.create("3", SignalSystem.class));
+		ids.add(Id.create("4", SignalSystem.class));
+		for (Id<SignalSystem> id : ids){
 			SignalSystemControllerData controller = control.getFactory().createSignalSystemControllerData(id);
 			control.addSignalSystemControllerData(controller);
 			controller.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
@@ -140,9 +142,9 @@ public class CreateSimpleTrafficSignalScenario {
 		}
 		// signal system 7, 8 control
 		ids.clear();
-		ids.add(Id.create("7", SignalSystemControllerData.class));
-		ids.add(Id.create("8", SignalSystemControllerData.class));
-		for (Id id : ids){
+		ids.add(Id.create("7", SignalSystem.class));
+		ids.add(Id.create("8", SignalSystem.class));
+		for (Id<SignalSystem> id : ids) {
 			SignalSystemControllerData controller = control.getFactory().createSignalSystemControllerData(id);
 			control.addSignalSystemControllerData(controller);
 			controller.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);

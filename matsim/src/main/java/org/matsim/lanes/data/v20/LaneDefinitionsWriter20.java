@@ -30,6 +30,7 @@ import javax.xml.crypto.MarshalException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.internal.MatsimSomeWriter;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
@@ -113,14 +114,14 @@ public class LaneDefinitionsWriter20 extends MatsimJaxbXmlWriter implements Mats
 				}
 				
 				if (bl.getToLinkIds() != null){
-					for (Id id : bl.getToLinkIds()) {
+					for (Id<Link> id : bl.getToLinkIds()) {
 						XMLIdRefType xmlToLink = fac.createXMLIdRefType();
 						xmlToLink.setRefId(id.toString());
 						xmllane.getLeadsTo().getToLink().add(xmlToLink);
 					}
 				}
 				else if (bl.getToLaneIds() != null){
-					for (Id id : bl.getToLaneIds()) {
+					for (Id<Lane> id : bl.getToLaneIds()) {
 						XMLIdRefType xmlToLink = fac.createXMLIdRefType();
 						xmlToLink.setRefId(id.toString());
 						xmllane.getLeadsTo().getToLane().add(xmlToLink);

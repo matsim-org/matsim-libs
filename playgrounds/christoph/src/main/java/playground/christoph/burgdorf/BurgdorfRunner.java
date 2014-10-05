@@ -160,7 +160,7 @@ public class BurgdorfRunner implements StartupListener {
 		Set<String> duringLegRerouteTransportModes = new HashSet<String>();
 		duringLegRerouteTransportModes.add(TransportMode.car);
 
-		Set<Id> visitorAgents = new HashSet<>();
+		Set<Id<Person>> visitorAgents = new HashSet<>();
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			if (person.getId().toString().toLowerCase().contains("visitor")) visitorAgents.add(person.getId());
 		}

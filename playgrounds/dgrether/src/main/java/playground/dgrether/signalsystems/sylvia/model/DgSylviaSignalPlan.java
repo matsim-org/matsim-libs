@@ -25,6 +25,7 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
 import org.matsim.signalsystems.model.DatabasedSignalPlan;
+import org.matsim.signalsystems.model.SignalGroup;
 import org.matsim.signalsystems.model.SignalPlan;
 
 
@@ -44,30 +45,37 @@ public class DgSylviaSignalPlan implements SignalPlan {
 		this.delegate = delegate;
 	}
 	
-	public List<Id> getDroppings(double timeSeconds) {
+	@Override
+	public List<Id<SignalGroup>> getDroppings(double timeSeconds) {
 		return delegate.getDroppings(timeSeconds);
 	}
 
-	public List<Id> getOnsets(double timeSeconds) {
+	@Override
+	public List<Id<SignalGroup>> getOnsets(double timeSeconds) {
 		return delegate.getOnsets(timeSeconds);
 	}
 
+	@Override
 	public Double getEndTime() {
 		return delegate.getEndTime();
 	}
 
+	@Override
 	public Double getStartTime() {
 		return delegate.getStartTime();
 	}
 
-	public Id getId() {
+	@Override
+	public Id<SignalPlan> getId() {
 		return delegate.getId();
 	}
 
+	@Override
 	public Integer getOffset() {
 		return delegate.getOffset();
 	}
 
+	@Override
 	public Integer getCycleTime() {
 		return delegate.getCycleTime();
 	}

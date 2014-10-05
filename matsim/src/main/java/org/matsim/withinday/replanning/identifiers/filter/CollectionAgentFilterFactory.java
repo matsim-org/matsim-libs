@@ -23,13 +23,14 @@ package org.matsim.withinday.replanning.identifiers.filter;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilterFactory;
 
 public class CollectionAgentFilterFactory implements AgentFilterFactory {
 
-	private final Set<Id> includedAgents;
+	private final Set<Id<Person>> includedAgents;
 
-	public CollectionAgentFilterFactory(Set<Id> includedAgents) {
+	public CollectionAgentFilterFactory(Set<Id<Person>> includedAgents) {
 		this.includedAgents = includedAgents;
 	}
 	

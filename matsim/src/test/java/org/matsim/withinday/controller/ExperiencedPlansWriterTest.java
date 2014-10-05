@@ -64,7 +64,6 @@ import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.identifiers.ActivityEndIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilter;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilterFactory;
-import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
@@ -214,7 +213,7 @@ private static final Logger log = Logger.getLogger(ExperiencedPlansWriterTest.cl
 	 */
 	private static class Replanner extends WithinDayDuringActivityReplanner {
 
-		public Replanner(Id<WithinDayReplanner<DuringActivityIdentifier>> id, Scenario scenario, InternalInterface internalInterface) {
+		public Replanner(Id<WithinDayReplanner> id, Scenario scenario, InternalInterface internalInterface) {
 			super(id, scenario, internalInterface);
 		}
 		
@@ -251,7 +250,7 @@ private static final Logger log = Logger.getLogger(ExperiencedPlansWriterTest.cl
 
 		@Override
 		public WithinDayDuringActivityReplanner createReplanner() {
-			Id<WithinDayReplanner<DuringActivityIdentifier>> id = (Id) Id.create(super.getId(), WithinDayReplanner.class);
+			Id<WithinDayReplanner> id = super.getId();
 			WithinDayDuringActivityReplanner replanner = new Replanner(id, scenario, 
 					this.getWithinDayEngine().getInternalInterface());
 			return replanner;

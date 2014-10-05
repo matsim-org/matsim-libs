@@ -45,9 +45,9 @@ import playground.sergioo.singapore2012.transitRouterVariable.stopStopTimes.Stop
 
 public class QNetwork implements NetsimNetwork {
 
-	private final Map<Id, PTQLink> links;
+	private final Map<Id<Link>, PTQLink> links;
 
-	private final Map<Id, QNode> nodes;
+	private final Map<Id<Node>, QNode> nodes;
 
 	private final Network network;
 
@@ -62,8 +62,8 @@ public class QNetwork implements NetsimNetwork {
 	QNetwork(final Network network, final NetsimNetworkFactory<QNode, ? extends PTQLink> netsimNetworkFactory) {
 		this.network = network;
 		this.queueNetworkFactory = netsimNetworkFactory;
-		this.links = new LinkedHashMap<Id, PTQLink>((int)(network.getLinks().size()*1.1), 0.95f);
-		this.nodes = new LinkedHashMap<Id, QNode>((int)(network.getLinks().size()*1.1), 0.95f);
+		this.links = new LinkedHashMap<>((int)(network.getLinks().size()*1.1), 0.95f);
+		this.nodes = new LinkedHashMap<>((int)(network.getLinks().size()*1.1), 0.95f);
 		if (! Double.isNaN(network.getEffectiveLaneWidth())){
 			this.linkWidthCalculator.setLaneWidth(network.getEffectiveLaneWidth());
 		}
@@ -101,27 +101,27 @@ public class QNetwork implements NetsimNetwork {
 	}
 
 	@Override
-	public Map<Id, PTQLink> getNetsimLinks() {
+	public Map<Id<Link>, PTQLink> getNetsimLinks() {
 		return Collections.unmodifiableMap(this.links);
 	}
 
 	@Override
-	public Map<Id, ? extends VisLink> getVisLinks() {
+	public Map<Id<Link>, ? extends VisLink> getVisLinks() {
 		return Collections.unmodifiableMap(this.links);
 	}
 
 	@Override
-	public Map<Id, QNode> getNetsimNodes() {
+	public Map<Id<Node>, QNode> getNetsimNodes() {
 		return Collections.unmodifiableMap(this.nodes);
 	}
 
 	@Override
-	public PTQLink getNetsimLink(final Id id) {
+	public PTQLink getNetsimLink(final Id<Link> id) {
 		return this.links.get(id);
 	}
 
 	@Override
-	public NetsimNode getNetsimNode(final Id id) {
+	public NetsimNode getNetsimNode(final Id<Node> id) {
 		return this.nodes.get(id);
 	}
 

@@ -24,6 +24,7 @@ package tutorial.unsupported.readingNonstdRoutesIntoScenario;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -48,7 +49,7 @@ public class Main {
 		ModeRouteFactory modeRouteFactory = ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory();
 		modeRouteFactory.setRouteFactory( "mySpecialMode" , new RouteFactory(){
 			@Override
-			public Route createRoute(Id startLinkId, Id endLinkId) {
+			public Route createRoute(Id<Link> startLinkId, Id<Link> endLinkId) {
 				// TODO Auto-generated method stub
 				return null;
 			}} );

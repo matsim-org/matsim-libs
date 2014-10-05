@@ -27,6 +27,7 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 
 /*
  * The InitialReplanner can be used when the Simulations is initialized but
@@ -37,7 +38,7 @@ public class InitialReplanner extends WithinDayInitialReplanner {
 
 	private final PlanRouter planRouter;
 	
-	/*package*/ InitialReplanner(Id id, Scenario scenario, InternalInterface internalInterface, PlanRouter planRouter) {
+	/*package*/ InitialReplanner(Id<WithinDayReplanner> id, Scenario scenario, InternalInterface internalInterface, PlanRouter planRouter) {
 		super(id, scenario, internalInterface);
 		this.planRouter = planRouter;
 	}

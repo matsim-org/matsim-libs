@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
@@ -55,8 +56,8 @@ public class EditRoutes {
 		Link fromLink = network.getLinks().get(fromLinkId);
 		Link toLink = network.getLinks().get(toLinkId);
 		
-		Facility fromFacility = new LinkWrapperFacility(fromLink);
-		Facility toFacility = new LinkWrapperFacility(toLink);
+		Facility<ActivityFacility> fromFacility = new LinkWrapperFacility(fromLink);
+		Facility<ActivityFacility> toFacility = new LinkWrapperFacility(toLink);
 		
 		List<? extends PlanElement> planElements = tripRouter.calcRoute(leg.getMode(), fromFacility, toFacility, leg.getDepartureTime(), person);
 		
@@ -88,8 +89,8 @@ public class EditRoutes {
 		Link fromLink = network.getLinks().get(route.getStartLinkId());
 		Link toLink = network.getLinks().get(route.getEndLinkId());
 		
-		Facility fromFacility = new LinkWrapperFacility(fromLink);
-		Facility toFacility = new LinkWrapperFacility(toLink);
+		Facility<ActivityFacility> fromFacility = new LinkWrapperFacility(fromLink);
+		Facility<ActivityFacility> toFacility = new LinkWrapperFacility(toLink);
 		
 		List<? extends PlanElement> planElements = tripRouter.calcRoute(leg.getMode(), fromFacility, toFacility, leg.getDepartureTime(), person);
 		
@@ -125,8 +126,8 @@ public class EditRoutes {
 		Link fromLink = network.getLinks().get(fromActivity.getLinkId());
 		Link toLink = network.getLinks().get(toActivity.getLinkId());
 		
-		Facility fromFacility = new LinkWrapperFacility(fromLink);
-		Facility toFacility = new LinkWrapperFacility(toLink);
+		Facility<ActivityFacility> fromFacility = new LinkWrapperFacility(fromLink);
+		Facility<ActivityFacility> toFacility = new LinkWrapperFacility(toLink);
 				
 		final List<? extends PlanElement> newTrip =
 				tripRouter.calcRoute(mainMode, fromFacility, toFacility, departureTime, person);
@@ -141,7 +142,7 @@ public class EditRoutes {
 	 * 
 	 * @return true when replacing the route worked, false when something went wrong
 	 */
-	public static boolean relocateCurrentLegRoute(Leg leg, Person person, int currentLinkIndex, Id toLinkId, double time, Network network, TripRouter tripRouter) {
+	public static boolean relocateCurrentLegRoute(Leg leg, Person person, int currentLinkIndex, Id<Link> toLinkId, double time, Network network, TripRouter tripRouter) {
 		
 		Route route = leg.getRoute();
 
@@ -155,13 +156,13 @@ public class EditRoutes {
 		 *  Create a List that contains all links of a route, including the Start- and EndLinks.
 		 */
 		List<Id<Link>> allLinkIds = getRouteLinkIds(oldRoute);
-		Id currentLinkId = allLinkIds.get(currentLinkIndex);
+		Id<Link> currentLinkId = allLinkIds.get(currentLinkIndex);
 
 		Link fromLink = network.getLinks().get(currentLinkId);
 		Link toLink = network.getLinks().get(toLinkId);
 		
-		Facility fromFacility = new LinkWrapperFacility(fromLink);
-		Facility toFacility = new LinkWrapperFacility(toLink);
+		Facility<ActivityFacility> fromFacility = new LinkWrapperFacility(fromLink);
+		Facility<ActivityFacility> toFacility = new LinkWrapperFacility(toLink);
 		
 		List<? extends PlanElement> planElements = tripRouter.calcRoute(leg.getMode(), fromFacility, toFacility, time, person);
 		
@@ -278,7 +279,7 @@ public class EditRoutes {
 	/*
 	 * Wraps a Link into a Facility.
 	 */
-	private static class LinkWrapperFacility implements Facility {
+	private static class LinkWrapperFacility implements Facility<ActivityFacility> {
 		
 		private final Link wrapped;
 
@@ -292,7 +293,7 @@ public class EditRoutes {
 		}
 
 		@Override
-		public Id getId() {
+		public Id<ActivityFacility> getId() {
 			throw new UnsupportedOperationException();
 		}
 
@@ -302,7 +303,7 @@ public class EditRoutes {
 		}
 
 		@Override
-		public Id getLinkId() {
+		public Id<Link> getLinkId() {
 			return wrapped.getId();
 		}
 

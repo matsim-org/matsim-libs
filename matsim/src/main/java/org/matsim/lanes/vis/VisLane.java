@@ -28,6 +28,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -50,7 +51,7 @@ public class VisLane implements Serializable {
 	private Point2D.Double startPoint = null;
 	private Point2D.Double endPoint = null;
 	private Map<String, VisSignal> signals = null;
-	private List<Id> toLinkIds;
+	private List<Id<Link>> toLinkIds;
 	private transient List<VisLinkWLanes> toLinksData = null;
 	private double euklideanDistance;
 	private CoordImpl startCoord;
@@ -184,13 +185,13 @@ public class VisLane implements Serializable {
 		return toLinksData;
 	}
 	
-	public void addToLinkId(Id toLinkId){
+	public void addToLinkId(Id<Link> toLinkId){
 		if (this.toLinkIds == null)
-			this.toLinkIds = new ArrayList<Id>();
+			this.toLinkIds = new ArrayList<>();
 		this.toLinkIds.add(toLinkId);
 	}
 
-	public List<Id> getToLinkIds() {
+	public List<Id<Link>> getToLinkIds() {
 		return toLinkIds ;
 	}
 	

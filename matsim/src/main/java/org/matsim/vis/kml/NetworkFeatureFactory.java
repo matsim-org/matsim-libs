@@ -136,7 +136,7 @@ public class NetworkFeatureFactory implements MatsimFactory {
 		FolderType folder = this.kmlObjectFactory.createFolderType();
 		folder.setName(leg.getMode() + "_" + Time.writeTime(leg.getDepartureTime()));
 
-		for (Id linkId : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
+		for (Id<Link> linkId : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
 			Link l = this.network.getLinks().get(linkId);
 
 			AbstractFeatureType abstractFeature = this.createLinkFeature(l, style);

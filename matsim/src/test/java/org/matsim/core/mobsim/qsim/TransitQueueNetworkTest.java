@@ -20,12 +20,24 @@
 
 package org.matsim.core.mobsim.qsim;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 import junit.framework.TestCase;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
@@ -34,22 +46,36 @@ import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.pt.*;
-import org.matsim.core.mobsim.qsim.qnetsimengine.*;
+import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
+import org.matsim.core.mobsim.qsim.pt.SimpleTransitStopHandler;
+import org.matsim.core.mobsim.qsim.pt.TransitDriverAgentImpl;
+import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
+import org.matsim.core.mobsim.qsim.pt.TransitQVehicle;
+import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
+import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.fakes.FakeAgent;
-import org.matsim.pt.transitSchedule.api.*;
-import org.matsim.vehicles.*;
-
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleCapacity;
+import org.matsim.vehicles.VehicleCapacityImpl;
+import org.matsim.vehicles.VehicleImpl;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleTypeImpl;
 
 
 public class TransitQueueNetworkTest extends TestCase {
@@ -1055,7 +1081,7 @@ public class TransitQueueNetworkTest extends TestCase {
             qsim.getSimTimer().setTime(100);
 
             // setup: vehicles
-            VehicleType vehicleType = new VehicleTypeImpl(Id.create("testVehicleType", Vehicle.class));
+            VehicleType vehicleType = new VehicleTypeImpl(Id.create("testVehicleType", VehicleType.class));
             VehicleCapacity capacity = new VehicleCapacityImpl();
             capacity.setSeats(Integer.valueOf(101));
             capacity.setStandingRoom(Integer.valueOf(0));

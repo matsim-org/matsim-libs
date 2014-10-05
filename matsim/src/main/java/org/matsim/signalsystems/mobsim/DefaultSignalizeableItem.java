@@ -34,7 +34,7 @@ import org.matsim.signalsystems.model.SignalGroupState;
  */
 public final class DefaultSignalizeableItem implements SignalizeableItem {
 
-	private Map<Id, SignalGroupState> toLinkIdSignalStates = null;
+	private Map<Id<Link>, SignalGroupState> toLinkIdSignalStates = null;
 	private SignalGroupState allToLinksState = SignalGroupState.GREEN;
 	private boolean linkGreen = true;
 	private Set<Id<Link>> outLinks;
@@ -51,14 +51,14 @@ public final class DefaultSignalizeableItem implements SignalizeableItem {
 
 	private void initToLinkIdSignalStates(){
 		this.allToLinksState = null;
-		this.toLinkIdSignalStates = new HashMap<Id, SignalGroupState>();
-		for (Id outLinkId : this.outLinks){
+		this.toLinkIdSignalStates = new HashMap<>();
+		for (Id<Link> outLinkId : this.outLinks){
 			this.toLinkIdSignalStates.put(outLinkId, SignalGroupState.GREEN);
 		}
 	}
 	
 	@Override
-	public void setSignalStateForTurningMove(SignalGroupState state, Id toLinkId) {
+	public void setSignalStateForTurningMove(SignalGroupState state, Id<Link> toLinkId) {
 		if (this.toLinkIdSignalStates == null){
 			this.initToLinkIdSignalStates();
 		}
@@ -85,7 +85,7 @@ public final class DefaultSignalizeableItem implements SignalizeableItem {
 		return linkGreen;
 	}
 	
-	public boolean isLinkGreenForToLink(Id toLinkId){
+	public boolean isLinkGreenForToLink(Id<Link> toLinkId){
 		if (this.allToLinksState != null) {
 			return this.checkGreen(this.allToLinksState);
 		}

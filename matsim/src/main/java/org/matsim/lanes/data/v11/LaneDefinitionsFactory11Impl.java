@@ -20,6 +20,8 @@
 package org.matsim.lanes.data.v11;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.lanes.data.v20.Lane;
 
 
 /**
@@ -29,12 +31,12 @@ import org.matsim.api.core.v01.Id;
 public class LaneDefinitionsFactory11Impl implements LaneDefinitionsFactory11 {
 
 	@Override
-	public LanesToLinkAssignment11 createLanesToLinkAssignment(Id linkId) {
+	public LanesToLinkAssignment11 createLanesToLinkAssignment(Id<Link> linkId) {
 		return new LanesToLinkAssignment11Impl(linkId);
 	}
 
 	@Override
-	public LaneData11 createLane(Id laneId) {
+	public LaneData11 createLane(Id<Lane> laneId) {
 		return new LaneData11Impl(laneId);
 	}
 

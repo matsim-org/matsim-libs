@@ -33,6 +33,7 @@ import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.signalsystems.model.DefaultPlanbasedSignalSystemController;
+import org.matsim.signalsystems.model.Signal;
 import org.matsim.signalsystems.model.SignalGroup;
 import org.matsim.signalsystems.model.SignalPlan;
 import org.matsim.signalsystems.model.SignalSystem;
@@ -210,16 +211,16 @@ public class SingleCrossingScenario {
 		SignalSystemsData systems = signals.getSignalSystemsData();
 		SignalSystemData system = systems.getFactory().createSignalSystemData(systemId);
 		systems.addSignalSystemData(system);
-		SignalData signal = systems.getFactory().createSignalData(sE);
+		SignalData signal = systems.getFactory().createSignalData(Id.create(sE, Signal.class));
 		signal.setLinkId(linkE3CId);
 		system.addSignalData(signal);
-		signal = systems.getFactory().createSignalData(sW);
+		signal = systems.getFactory().createSignalData(Id.create(sW, Signal.class));
 		signal.setLinkId(linkW3CId);
 		system.addSignalData(signal);
-		signal = systems.getFactory().createSignalData(sN);
+		signal = systems.getFactory().createSignalData(Id.create(sN, Signal.class));
 		signal.setLinkId(linkN3CId);
 		system.addSignalData(signal);
-		signal = systems.getFactory().createSignalData(sS);
+		signal = systems.getFactory().createSignalData(Id.create(sS, Signal.class));
 		signal.setLinkId(linkS3CId);
 		system.addSignalData(signal);
 		

@@ -23,6 +23,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 
 
 /**
@@ -30,12 +31,12 @@ import org.matsim.api.core.v01.Id;
  */
 public class LaneDefinitions20Impl implements LaneDefinitions20 {
 
-	private SortedMap<Id, LanesToLinkAssignment20> lanesToLinkAssignments =  new TreeMap<Id, LanesToLinkAssignment20>();
+	private SortedMap<Id<Link>, LanesToLinkAssignment20> lanesToLinkAssignments =  new TreeMap<>();
 
 	private LaneDefinitionsFactory20 builder = new LaneDefinitionsFactory20Impl();
 
 	@Override
-	public SortedMap<Id, LanesToLinkAssignment20> getLanesToLinkAssignments() {
+	public SortedMap<Id<Link>, LanesToLinkAssignment20> getLanesToLinkAssignments() {
 		return this.lanesToLinkAssignments;
 	}
 

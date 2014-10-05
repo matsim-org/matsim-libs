@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -34,6 +35,7 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Provides Mobsim related data such as the Agents or QVehicles.
@@ -43,7 +45,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
 public class MobsimDataProvider implements MobsimInitializedListener {
 
 	private final Map<Id<Person>, MobsimAgent> agents = new HashMap<>(); 
-	private final Map<Id, MobsimVehicle> vehicles = new HashMap<Id, MobsimVehicle>();
+	private final Map<Id<Vehicle>, MobsimVehicle> vehicles = new HashMap<Id<Vehicle>, MobsimVehicle>();
 
 	private NetsimNetwork netsimNetwork;
 	
@@ -76,19 +78,19 @@ public class MobsimDataProvider implements MobsimInitializedListener {
 		return this.agents.get(agentId);
 	}
 	
-	public Map<Id, MobsimVehicle> getVehicles() {
+	public Map<Id<Vehicle>, MobsimVehicle> getVehicles() {
 		return this.vehicles;
 	}
 	
-	public MobsimVehicle getVehicle(Id vehicleId) {
+	public MobsimVehicle getVehicle(Id<Vehicle> vehicleId) {
 		return this.vehicles.get(vehicleId);
 	}
 	
-	public Collection<MobsimVehicle> getEnrouteVehiclesOnLink(Id linkId) {
+	public Collection<MobsimVehicle> getEnrouteVehiclesOnLink(Id<Link> linkId) {
 		return this.netsimNetwork.getNetsimLink(linkId).getAllNonParkedVehicles();
 	}
 	
-	public MobsimVehicle getDriversVehicle(Id driverId) {
+	public MobsimVehicle getDriversVehicle(Id<Person> driverId) {
 		MobsimAgent mobsimAgent = this.agents.get(driverId);
 		if (mobsimAgent == null) return null;
 		
@@ -96,7 +98,7 @@ public class MobsimDataProvider implements MobsimInitializedListener {
 		return driver.getVehicle();
 	}
 	
-	public MobsimAgent getVehiclesDriver(Id vehicleId) {
+	public MobsimAgent getVehiclesDriver(Id<Vehicle> vehicleId) {
 		MobsimVehicle mobsimVehicle = this.vehicles.get(vehicleId);
 		if (mobsimVehicle == null) return null;
 		else return mobsimVehicle.getDriver();

@@ -1,5 +1,8 @@
 package tutorial.programming.example16customscoring;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.Event;
@@ -7,6 +10,7 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -17,25 +21,27 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.functions.*;
+import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
+import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
+import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
+import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.utils.objectattributes.ObjectAttributes;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.matsim.vehicles.Vehicle;
 
 public class Main {
 
 	static class RainOnPersonEvent extends Event implements HasPersonId {
 
-		private Id personId;
+		private Id<Person> personId;
 
-		public RainOnPersonEvent(double time, Id personId) {
+		public RainOnPersonEvent(double time, Id<Person> personId) {
 			super(time);
 			this.personId = personId;
 		}
 
 		@Override
-		public Id getPersonId() {
+		public Id<Person> getPersonId() {
 			return personId;
 		}
 
@@ -144,7 +150,7 @@ public class Main {
 		
 		private EventsManager eventsManager;
 		
-		private Map<Id, Id> vehicle2driver = new HashMap<Id, Id>();
+		private Map<Id<Vehicle>, Id<Person>> vehicle2driver = new HashMap<>();
 		 
 		public RainEngine(EventsManager eventsManager) {
 			this.eventsManager = eventsManager;
@@ -166,7 +172,7 @@ public class Main {
 		}
 
 		// It starts raining on link 1 at 7:30.
-		private boolean rainingAt(double time, Id linkId) {
+		private boolean rainingAt(double time, Id<Link> linkId) {
 			if (time > (7.5 * 60.0 * 60.0) && linkId.toString().equals("1")) {
 				return true;
 			} else {

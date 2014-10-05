@@ -40,6 +40,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Calculates the number of passenger that are in a transit vehicle when
@@ -49,10 +50,10 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  */
 public class TransitLoad implements TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 
-	private final Map<Id, LineData> lineData = new HashMap<Id, LineData>();
+	private final Map<Id<TransitLine>, LineData> lineData = new HashMap<>();
 
-	private final Map<Id, Id> vehicleFacilityMap = new HashMap<Id, Id>();
-	private final Map<Id, VehicleData> vehicleData = new HashMap<Id, VehicleData>();
+	private final Map<Id<Vehicle>, Id<TransitStopFacility>> vehicleFacilityMap = new HashMap<>();
+	private final Map<Id<Vehicle>, VehicleData> vehicleData = new HashMap<>();
 
 	public TransitLoad() {
 	}
@@ -97,7 +98,7 @@ public class TransitLoad implements TransitDriverStartsEventHandler, VehicleArri
 
 	@Override
 	public void handleEvent(final VehicleDepartsAtFacilityEvent event) {
-		Id stopId = this.vehicleFacilityMap.remove(event.getVehicleId());
+		Id<TransitStopFacility> stopId = this.vehicleFacilityMap.remove(event.getVehicleId());
 		VehicleData vData = this.vehicleData.get(event.getVehicleId());
 		if (vData != null) {
 			StopInformation si = getStopInformation(vData.lineId, vData.routeId, stopId, vData.departureId, true);
@@ -131,7 +132,7 @@ public class TransitLoad implements TransitDriverStartsEventHandler, VehicleArri
 		}
 	}
 
-	private StopInformation getStopInformation(final Id lineId, final Id routeId, final Id stopFacilityId, final Id departureId, final boolean createIfMissing) {
+	private StopInformation getStopInformation(final Id<TransitLine> lineId, final Id<TransitRoute> routeId, final Id<TransitStopFacility> stopFacilityId, final Id<Departure> departureId, final boolean createIfMissing) {
 		LineData ld = this.lineData.get(lineId);
 		if (ld == null) {
 			if (createIfMissing) {
@@ -175,12 +176,12 @@ public class TransitLoad implements TransitDriverStartsEventHandler, VehicleArri
 	}
 
 	private static class VehicleData {
-		public final Id vehicleId;
-		public final Id lineId;
-		public final Id routeId;
-		public final Id departureId;
+		public final Id<Vehicle> vehicleId;
+		public final Id<TransitLine> lineId;
+		public final Id<TransitRoute> routeId;
+		public final Id<Departure> departureId;
 
-		public VehicleData(final Id vehicleId, final Id lineId, final Id routeId, final Id departureId) {
+		public VehicleData(final Id<Vehicle> vehicleId, final Id<TransitLine> lineId, final Id<TransitRoute> routeId, final Id<Departure> departureId) {
 			this.vehicleId = vehicleId;
 			this.lineId = lineId;
 			this.routeId = routeId;
@@ -189,15 +190,15 @@ public class TransitLoad implements TransitDriverStartsEventHandler, VehicleArri
 	}
 
 	/*package*/ static class LineData {
-		public final Map<Id, RouteData> routeData = new HashMap<Id, RouteData>();
+		public final Map<Id<TransitRoute>, RouteData> routeData = new HashMap<>();
 	}
 
 	/*package*/ static class RouteData {
-		public final Map<Id, StopData> stopData = new HashMap<Id, StopData>(); // use stopFacilityId as key
+		public final Map<Id<TransitStopFacility>, StopData> stopData = new HashMap<Id<TransitStopFacility>, StopData>(); // use stopFacilityId as key
 	}
 
 	/*package*/ static class StopData {
-		public final Map<Id, StopInformation> departureData = new HashMap<Id, StopInformation>(); // use departure id as key
+		public final Map<Id<Departure>, StopInformation> departureData = new HashMap<>(); // use departure id as key
 	}
 
 	public static class StopInformation {

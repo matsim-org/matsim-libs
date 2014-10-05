@@ -30,8 +30,8 @@ import org.matsim.api.core.v01.Id;
  */
 public interface AmberLogic {
 
-	public Set<SignalGroupStateChangeRequest> processDropping(double timeSec, Id systemId, Id signalGroupId);
+	public Set<SignalGroupStateChangeRequest> processDropping(double timeSec, Id<SignalSystem> systemId, Id<SignalGroup> signalGroupId);
 
-	public Set<SignalGroupStateChangeRequest> processOnsets(double timeSeconds, Id systemId, Id signalGroup);
+	public Set<SignalGroupStateChangeRequest> processOnsets(double timeSeconds, Id<SignalSystem> systemId, Id<SignalGroup> signalGroup);
 
 }

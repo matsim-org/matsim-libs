@@ -61,7 +61,7 @@ public class TransitLineImpl implements TransitLine {
 
 	@Override
 	public void addRoute(final TransitRoute transitRoute) {
-		final Id id = transitRoute.getId();
+		final Id<TransitRoute> id = transitRoute.getId();
 		if (this.transitRoutes.containsKey(id)) {
 			throw new IllegalArgumentException("There is already a transit route with id " + id.toString() + " with line " + this.lineId);
 		}

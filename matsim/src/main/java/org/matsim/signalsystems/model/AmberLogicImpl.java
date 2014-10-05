@@ -40,14 +40,14 @@ public class AmberLogicImpl implements AmberLogic {
 	}
 
 	@Override
-	public Set<SignalGroupStateChangeRequest> processDropping(double timeSec, Id systemId,
-			Id signalGroupId) {
+	public Set<SignalGroupStateChangeRequest> processDropping(double timeSec, Id<SignalSystem> systemId,
+			Id<SignalGroup> signalGroupId) {
 		Set<SignalGroupStateChangeRequest> ret = new HashSet<SignalGroupStateChangeRequest>();
 		AmberTimeData systemData = this.data.getAmberTimeDataBySystemId().get(systemId);
 		Integer amber = null;
 		//first check the values for the specific system
 		if (systemData != null){
-			amber = systemData.getAmberOfSignal(signalGroupId);
+			amber = systemData.getAmberOfSignal(Id.create(signalGroupId, Signal.class));
 		}
 		//if nothing is found use the defaults if set
 		if (amber == null && this.data.getDefaultAmber() != null){
@@ -72,14 +72,14 @@ public class AmberLogicImpl implements AmberLogic {
 	}
 
 	@Override
-	public Set<SignalGroupStateChangeRequest> processOnsets(double timeSec, Id systemId,
-			Id signalGroupId) {
+	public Set<SignalGroupStateChangeRequest> processOnsets(double timeSec, Id<SignalSystem> systemId,
+			Id<SignalGroup> signalGroupId) {
 		Set<SignalGroupStateChangeRequest> ret = new HashSet<SignalGroupStateChangeRequest>();
 		AmberTimeData systemData = this.data.getAmberTimeDataBySystemId().get(systemId);
 		Integer redAmber = null;
 		//first check the values for the specific system
 		if (systemData != null){
-			redAmber = systemData.getRedAmberOfSignal(signalGroupId);
+			redAmber = systemData.getRedAmberOfSignal(Id.create(signalGroupId, Signal.class));
 		} 
 		//if nothing is found use the defaults if set
 		if (redAmber == null && this.data.getDefaultRedAmber() != null){

@@ -31,6 +31,8 @@ import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 
@@ -47,10 +49,10 @@ import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 public class LinkEnteredProvider implements LinkEnterEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler,
 		MobsimAfterSimStepListener {
 
-	private Map<Id, Id> linkEnteredAgents = new ConcurrentHashMap<Id, Id>();	// <agentId, linkId>
-	private Map<Id, Id> lastTimeStepLinkEnteredAgents = new ConcurrentHashMap<Id, Id>();	// <agentId, linkId>
+	private Map<Id<Person>, Id<Link>> linkEnteredAgents = new ConcurrentHashMap<>();	// <agentId, linkId>
+	private Map<Id<Person>, Id<Link>> lastTimeStepLinkEnteredAgents = new ConcurrentHashMap<>();	// <agentId, linkId>
 	
-	public Map<Id, Id> getLinkEnteredAgentsInLastTimeStep() {
+	public Map<Id<Person>, Id<Link>> getLinkEnteredAgentsInLastTimeStep() {
 		return Collections.unmodifiableMap(this.lastTimeStepLinkEnteredAgents);
 	}
 	
@@ -82,7 +84,7 @@ public class LinkEnteredProvider implements LinkEnterEventHandler, PersonArrival
 	@Override
 	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
 		this.lastTimeStepLinkEnteredAgents = linkEnteredAgents;
-		this.linkEnteredAgents = new ConcurrentHashMap<Id, Id>();
+		this.linkEnteredAgents = new ConcurrentHashMap<>();
 	}
 
 }

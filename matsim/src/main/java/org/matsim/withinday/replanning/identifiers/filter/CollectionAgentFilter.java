@@ -31,10 +31,10 @@ import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilter;
 
 public class CollectionAgentFilter implements AgentFilter {
 
-	private final Set<Id> includedAgents;
+	private final Set<Id<Person>> includedAgents;
 	
 	// use the factory
-	/*package*/ CollectionAgentFilter(Set<Id> includedAgents) {
+	/*package*/ CollectionAgentFilter(Set<Id<Person>> includedAgents) {
 		this.includedAgents = includedAgents;
 	}
 	
@@ -54,7 +54,7 @@ public class CollectionAgentFilter implements AgentFilter {
 		else return true;
 	}
 	
-	public Collection<Id> getIncludedAgents() {
+	public Collection<Id<Person>> getIncludedAgents() {
 		return Collections.unmodifiableSet(this.includedAgents);
 	}
 }

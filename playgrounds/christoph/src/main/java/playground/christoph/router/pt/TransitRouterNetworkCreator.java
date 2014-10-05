@@ -303,12 +303,12 @@ public class TransitRouterNetworkCreator {
 		}
 
 		@Override
-		public Id getStopPostAreaId() {
+		public String getStopPostAreaId() {
 			return null;
 		}
 
 		@Override
-		public void setStopPostAreaId(Id stopPostAreaId) {
+		public void setStopPostAreaId(String stopPostAreaId) {
 		}
 	}
 	

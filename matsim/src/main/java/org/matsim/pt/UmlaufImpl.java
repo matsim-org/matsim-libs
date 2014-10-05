@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.vehicles.Vehicle;
 
 public class UmlaufImpl implements Umlauf {
@@ -45,12 +46,12 @@ public class UmlaufImpl implements Umlauf {
 	}
 
 	@Override
-	public Id getLineId() {
+	public Id<TransitLine> getLineId() {
 		return getLineId(getUmlaufStuecke());
 	}
 
-	private Id getLineId(Collection<UmlaufStueckI> umlaufInConstruction) {
-		Id lineId = null;
+	private Id<TransitLine> getLineId(Collection<UmlaufStueckI> umlaufInConstruction) {
+		Id<TransitLine> lineId = null;
 		for (UmlaufStueckI umlaufStueck : umlaufInConstruction) {
 			if (umlaufStueck.isFahrt()) {
 				if (lineId == null) {

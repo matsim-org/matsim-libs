@@ -31,7 +31,9 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * Counts the number of vehicles leaving a link, aggregated into time bins of a specified size.
@@ -44,12 +46,12 @@ public class VolumesAnalyzer implements LinkLeaveEventHandler, PersonDepartureEv
 	private final int timeBinSize;
 	private final int maxTime;
 	private final int maxSlotIndex;
-	private final Map<Id, int[]> links;
+	private final Map<Id<Link>, int[]> links;
 	
 	// for multi-modal support
 	private final boolean observeModes;
-	private final Map<Id, String> enRouteModes;
-	private final Map<Id, Map<String, int[]>> linksPerMode;
+	private final Map<Id<Person>, String> enRouteModes;
+	private final Map<Id<Link>, Map<String, int[]>> linksPerMode;
 
 	public VolumesAnalyzer(final int timeBinSize, final int maxTime, final Network network) {
 		this(timeBinSize, maxTime, network, true);
@@ -59,12 +61,12 @@ public class VolumesAnalyzer implements LinkLeaveEventHandler, PersonDepartureEv
 		this.timeBinSize = timeBinSize;
 		this.maxTime = maxTime;
 		this.maxSlotIndex = (this.maxTime/this.timeBinSize) + 1;
-		this.links = new HashMap<Id, int[]>((int) (network.getLinks().size() * 1.1), 0.95f);
+		this.links = new HashMap<Id<Link>, int[]>((int) (network.getLinks().size() * 1.1), 0.95f);
 		
 		this.observeModes = observeModes;
 		if (this.observeModes) {
-			this.enRouteModes = new HashMap<Id, String>();
-			this.linksPerMode = new HashMap<Id, Map<String, int[]>>((int) (network.getLinks().size() * 1.1), 0.95f);
+			this.enRouteModes = new HashMap<>();
+			this.linksPerMode = new HashMap<Id<Link>, Map<String, int[]>>((int) (network.getLinks().size() * 1.1), 0.95f);
 		} else {
 			this.enRouteModes = null;
 			this.linksPerMode = null;
@@ -116,7 +118,7 @@ public class VolumesAnalyzer implements LinkLeaveEventHandler, PersonDepartureEv
 	 * @return Array containing the number of vehicles leaving the link <code>linkId</code> per time bin,
 	 * 		starting with time bin 0 from 0 seconds to (timeBinSize-1)seconds.
 	 */
-	public int[] getVolumesForLink(final Id linkId) {
+	public int[] getVolumesForLink(final Id<Link> linkId) {
 		return this.links.get(linkId);
 	}
 	
@@ -126,7 +128,7 @@ public class VolumesAnalyzer implements LinkLeaveEventHandler, PersonDepartureEv
 	 * @return Array containing the number of vehicles using the specified mode leaving the link 
 	 *  	<code>linkId</code> per time bin, starting with time bin 0 from 0 seconds to (timeBinSize-1)seconds.
 	 */
-	public int[] getVolumesForLink(final Id linkId, String mode) {
+	public int[] getVolumesForLink(final Id<Link> linkId, String mode) {
 		if (observeModes) {
 			Map<String, int[]> modeVolumes = this.linksPerMode.get(linkId);
 			if (modeVolumes != null) return modeVolumes.get(mode);
@@ -154,7 +156,7 @@ public class VolumesAnalyzer implements LinkLeaveEventHandler, PersonDepartureEv
 	 * getTimeSlotIndex = (int)time / this.timeBinSize => jumps at 3600.0!
 	 * Thus, starting time = (hour = 0) * 3600.0
 	 */
-	public double[] getVolumesPerHourForLink(final Id linkId) {
+	public double[] getVolumesPerHourForLink(final Id<Link> linkId) {
 		if (3600.0 % this.timeBinSize != 0) log.error("Volumes per hour and per link probably not correct!");
 		
 		double [] volumes = new double[24];
@@ -176,7 +178,7 @@ public class VolumesAnalyzer implements LinkLeaveEventHandler, PersonDepartureEv
 		return volumes;
 	}
 
-	public double[] getVolumesPerHourForLink(final Id linkId, String mode) {
+	public double[] getVolumesPerHourForLink(final Id<Link> linkId, String mode) {
 		if (observeModes) {
 			if (3600.0 % this.timeBinSize != 0) log.error("Volumes per hour and per link probably not correct!");
 			
@@ -217,7 +219,7 @@ public class VolumesAnalyzer implements LinkLeaveEventHandler, PersonDepartureEv
 	/**
 	 * @return Set of Strings containing all link ids for which counting-values are available.
 	 */
-	public Set<Id> getLinkIds() {
+	public Set<Id<Link>> getLinkIds() {
 		return this.links.keySet();
 	}
 

@@ -53,7 +53,7 @@ public class TransitScheduleImpl implements TransitSchedule {
 
 	@Override
 	public void addTransitLine(final TransitLine line) {
-		final Id id = line.getId();
+		final Id<TransitLine> id = line.getId();
 		if (this.transitLines.containsKey(id)) {
 			throw new IllegalArgumentException("There is already a transit line with id " + id.toString());
 		}
@@ -75,7 +75,7 @@ public class TransitScheduleImpl implements TransitSchedule {
 	
 	@Override
 	public void addStopFacility(final TransitStopFacility stop) {
-		final Id id = stop.getId();
+		final Id<TransitStopFacility> id = stop.getId();
 		if (this.stopFacilities.containsKey(id)) {
 			throw new IllegalArgumentException("There is already a stop facility with id " + id.toString());
 		}

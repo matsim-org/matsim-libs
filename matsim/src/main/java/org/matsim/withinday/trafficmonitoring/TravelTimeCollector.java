@@ -20,11 +20,31 @@
 
 package org.matsim.withinday.trafficmonitoring;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CyclicBarrier;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.*;
-import org.matsim.api.core.v01.events.handler.*;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -46,11 +66,6 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
-import java.util.*;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CyclicBarrier;
-
 /**
  * Collects link travel times over a given time span (storedTravelTimesBinSize)
  * and calculates an average travel time over this time span.
@@ -71,8 +86,8 @@ public class TravelTimeCollector implements TravelTime,
 	private Network network;
 
 	// Trips with no Activity on the current Link
-	private Map<Id, TripBin> regularActiveTrips; // PersonId
-	private Map<Id, TravelTimeInfo> travelTimeInfos; // LinkId
+	private Map<Id<Person>, TripBin> regularActiveTrips; // PersonId
+	private Map<Id<Link>, TravelTimeInfo> travelTimeInfos; // LinkId
 	
 	private TravelTimeInfoProvider travelTimeInfoProvider;
 
@@ -91,7 +106,7 @@ public class TravelTimeCollector implements TravelTime,
 	private final int infoTimeStep = 3600;
 	private int nextInfoTime = 0;
 	
-	private Set<Id> agentsToFilter;
+	private Set<Id<Person>> agentsToFilter;
 	private final Set<String> analyzedModes;
 	private final boolean filterModes;
 	
@@ -122,10 +137,10 @@ public class TravelTimeCollector implements TravelTime,
 	}
 
 	private void init() {
-		this.regularActiveTrips = new HashMap<Id, TripBin>();
-		this.travelTimeInfos = new ConcurrentHashMap<Id, TravelTimeInfo>();
+		this.regularActiveTrips = new HashMap<>();
+		this.travelTimeInfos = new ConcurrentHashMap<>();
 		this.changedLinks = new HashMap<Double, Collection<Link>>();
-		this.agentsToFilter = new HashSet<Id>();
+		this.agentsToFilter = new HashSet<>();
 				
 		for (Link link : this.network.getLinks().values()) {
 			TravelTimeInfo travelTimeInfo = new TravelTimeInfo();
@@ -188,7 +203,7 @@ public class TravelTimeCollector implements TravelTime,
 		 */
 		if (filterModes && agentsToFilter.contains(event.getPersonId())) return;
 		
-		Id personId = event.getPersonId();
+		Id<Person> personId = event.getPersonId();
 		double time = event.getTime();
 
 		TripBin tripBin = new TripBin();
@@ -199,8 +214,8 @@ public class TravelTimeCollector implements TravelTime,
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		Id linkId = event.getLinkId();
-		Id personId = event.getPersonId();
+		Id<Link> linkId = event.getLinkId();
+		Id<Person> personId = event.getPersonId();
 		double time = event.getTime();
 
 		TripBin tripBin = this.regularActiveTrips.remove(personId);
@@ -235,7 +250,7 @@ public class TravelTimeCollector implements TravelTime,
 	 */
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
-		Id personId = event.getPersonId();
+		Id<Person> personId = event.getPersonId();
 
 		this.regularActiveTrips.remove(personId);
 		

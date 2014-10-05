@@ -20,6 +20,7 @@
 package org.matsim.signalsystems.data.ambertimes.v10;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.signalsystems.model.SignalSystem;
 
 
 /**
@@ -29,7 +30,7 @@ import org.matsim.api.core.v01.Id;
 public class AmberTimesDataFactoryImpl implements AmberTimesDataFactory {
 
 	@Override
-	public AmberTimeData createAmberTimeData(Id signalSystemId) {
+	public AmberTimeData createAmberTimeData(Id<SignalSystem> signalSystemId) {
 		return new AmberTimeDataImpl(signalSystemId);
 	}
 

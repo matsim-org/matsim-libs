@@ -20,6 +20,7 @@
 package org.matsim.lanes.data.v20;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 
 
 /**
@@ -32,14 +33,14 @@ public class LaneDefinitionsFactory20Impl implements LaneDefinitionsFactory20 {
 	 * @see org.matsim.lanes.data.v20.LaneDefinitionsFactory20#createLanesToLinkAssignment(org.matsim.api.core.v01.Id)
 	 */
 	@Override
-	public LanesToLinkAssignment20 createLanesToLinkAssignment(Id linkIdReference) {
+	public LanesToLinkAssignment20 createLanesToLinkAssignment(Id<Link> linkIdReference) {
 		return new LanesToLinkAssignment20Impl(linkIdReference);
 	}
 	/**
 	 * @see org.matsim.lanes.data.v20.LaneDefinitionsFactory20#createLane(org.matsim.api.core.v01.Id)
 	 */
 	@Override
-	public LaneData20 createLane(Id id) {
+	public LaneData20 createLane(Id<Lane> id) {
 		return new LaneData20Impl(id);
 	}
 }

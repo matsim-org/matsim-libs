@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
+import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.vehicles.Vehicle;
 
 
@@ -37,6 +38,6 @@ public interface Umlauf extends Identifiable<Umlauf> {
 	 * @deprecated as a Umlauf can contain UmlaufStueckI from several Lines. Use getId() instead. dg, nov 2012
 	 */
 	@Deprecated
-	Id getLineId();
+	Id<TransitLine> getLineId();
 
 }

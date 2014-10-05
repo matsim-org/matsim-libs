@@ -1,5 +1,7 @@
 package playground.mzilske.jdeqsimengine;
 
+import java.util.HashMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -15,8 +17,6 @@ import org.matsim.core.mobsim.jdeqsim.util.Timer;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-
-import java.util.HashMap;
 
 class JDEQSimEngine implements MobsimEngine, ActivityHandler {
 
@@ -41,7 +41,7 @@ class JDEQSimEngine implements MobsimEngine, ActivityHandler {
         t = new Timer();
         t.startTimer();
 
-        SimulationParameters.setAllRoads(new HashMap<Id, Road>());
+        SimulationParameters.setAllRoads(new HashMap<Id<Link>, Road>());
 
         // initialize network
         Road road;

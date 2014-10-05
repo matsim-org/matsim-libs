@@ -29,6 +29,7 @@ import javax.xml.bind.Marshaller;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.internal.MatsimSomeWriter;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
@@ -100,7 +101,7 @@ public class LaneDefinitionsWriter11 extends MatsimJaxbXmlWriter implements Mats
 				XMLLaneType xmllane = fac.createXMLLaneType();
 				xmllane.setId(bl.getId().toString());
 
-				for (Id id : bl.getToLinkIds()) {
+				for (Id<Link> id : bl.getToLinkIds()) {
 					XMLIdRefType xmlToLink = fac.createXMLIdRefType();
 					xmlToLink.setRefId(id.toString());
 					xmllane.getToLink().add(xmlToLink);

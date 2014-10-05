@@ -94,7 +94,7 @@ public class DilutedZurichFilter {
 		log.info("  calculate area of interest... ");
 		double radius = 30000.0;
 		final CoordImpl center = new CoordImpl(683518.0,246836.0);
-		final Map<Id, Link> areaOfInterest = new HashMap<Id, Link>();
+		final Map<Id<Link>, Link> areaOfInterest = new HashMap<>();
 		log.info("    => area of interest (aoi): center=" + center + "; radius=" + radius);
 
 		log.info("    extracting links of the aoi... " + (new Date()));

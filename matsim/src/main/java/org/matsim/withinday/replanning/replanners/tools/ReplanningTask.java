@@ -22,13 +22,14 @@ package org.matsim.withinday.replanning.replanners.tools;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 
 public class ReplanningTask {
 
 	protected MobsimAgent agentToReplan;
-	protected Id withinDayReplannerId;
+	protected Id<WithinDayReplanner> withinDayReplannerId;
 	
-	public ReplanningTask(MobsimAgent agentToReplan, Id withinDayReplannerId) {
+	public ReplanningTask(MobsimAgent agentToReplan, Id<WithinDayReplanner> withinDayReplannerId) {
 		this.agentToReplan = agentToReplan;
 		this.withinDayReplannerId = withinDayReplannerId;
 	}
@@ -37,7 +38,7 @@ public class ReplanningTask {
 		return this.agentToReplan;
 	}
 	
-	public Id getWithinDayReplannerId() {
+	public Id<WithinDayReplanner> getWithinDayReplannerId() {
 		return this.withinDayReplannerId;
 	}
 }

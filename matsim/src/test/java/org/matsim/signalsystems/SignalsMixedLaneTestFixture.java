@@ -30,6 +30,8 @@ import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsDataFactory;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsDataImpl;
+import org.matsim.signalsystems.model.Signal;
+import org.matsim.signalsystems.model.SignalSystem;
 
 
 /**
@@ -54,13 +56,13 @@ public class SignalsMixedLaneTestFixture {
 		SignalSystemsData signals = new SignalSystemsDataImpl();
 		this.sc.addScenarioElement( SignalsData.ELEMENT_NAME , signals);
 		SignalSystemsDataFactory signalsFactory = signals.getFactory();
-		SignalSystemData system = signalsFactory.createSignalSystemData(delegate.id1);
+		SignalSystemData system = signalsFactory.createSignalSystemData(Id.create(delegate.id1, SignalSystem.class));
 		signals.addSignalSystemData(system);
-		SignalData signal = signalsFactory.createSignalData(delegate.id2);
+		SignalData signal = signalsFactory.createSignalData(Id.create(delegate.id2, Signal.class));
 		system.addSignalData(signal);
 		signal.addLaneId(Id.create(1, Lane.class));
 		signal.addTurningMoveRestriction(delegate.id2);
-		signal = signalsFactory.createSignalData(delegate.id3);
+		signal = signalsFactory.createSignalData(Id.create(delegate.id3, Signal.class));
 		system.addSignalData(signal);
 		signal.addLaneId(Id.create(1, Lane.class));
 		signal.addTurningMoveRestriction(delegate.id3);

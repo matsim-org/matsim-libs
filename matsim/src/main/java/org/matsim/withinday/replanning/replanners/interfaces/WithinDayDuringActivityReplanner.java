@@ -30,7 +30,7 @@ import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIden
  */
 public abstract class WithinDayDuringActivityReplanner extends WithinDayReplanner<DuringActivityIdentifier> {
 
-	public WithinDayDuringActivityReplanner(Id id, Scenario scenario, InternalInterface internalInterface) {
+	public WithinDayDuringActivityReplanner(Id<WithinDayReplanner> id, Scenario scenario, InternalInterface internalInterface) {
 		super(id, scenario, internalInterface);
 	}
 	

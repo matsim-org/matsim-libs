@@ -21,6 +21,7 @@
 package org.matsim.pt.routes;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.routes.RouteFactory;
 
@@ -28,7 +29,7 @@ import org.matsim.core.population.routes.RouteFactory;
 public class ExperimentalTransitRouteFactory implements RouteFactory {
 
 	@Override
-	public Route createRoute(final Id startLinkId, final Id endLinkId) {
+	public Route createRoute(final Id<Link> startLinkId, final Id<Link> endLinkId) {
 		return new ExperimentalTransitRoute(startLinkId, endLinkId);
 	}
 

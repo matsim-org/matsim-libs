@@ -21,6 +21,8 @@
 package org.matsim.vis.snapshotwriters;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * A helper class to store information about agents (id, position, speed), mainly used to create
@@ -33,23 +35,23 @@ import org.matsim.api.core.v01.Id;
  */
 public class PositionInfo implements AgentSnapshotInfo {
 
-	private Id agentId = null;
+	private Id<Person> agentId = null;
 	private double easting = Double.NaN;
 	private double northing = Double.NaN;
 	private double azimuth = Double.NaN;
 	private double colorValue = 0;
 	private AgentState agentState = null;
-	private Id linkId = null;
+	private Id<Link> linkId = null;
 	private int type = 0;
 	private int user = 0;
 
 	/* package-private */ PositionInfo() { }
 
 	@Override
-	public final Id getId() {
+	public final Id<Person> getId() {
 		return this.agentId;
 	}
-	public final void setId( Id tmp ) {
+	public final void setId( Id<Person> tmp ) {
 		this.agentId = tmp ;
 	}
 
@@ -95,10 +97,10 @@ public class PositionInfo implements AgentSnapshotInfo {
 		this.agentState = state ;
 	}
 
-	public final Id getLinkId() {
+	public final Id<Link> getLinkId() {
 		return this.linkId;
 	}
-	public final void setLinkId( Id tmp ) {
+	public final void setLinkId( Id<Link> tmp ) {
 		this.linkId = tmp ;
 	}
 

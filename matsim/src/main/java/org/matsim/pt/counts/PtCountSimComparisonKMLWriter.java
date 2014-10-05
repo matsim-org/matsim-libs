@@ -45,6 +45,7 @@ import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.MatsimResource;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.IOUtils;
@@ -428,7 +429,7 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 	private void writeStopData(
 			final List<CountSimComparison> countSimComparisonList,
 			final FolderType folder, PtCountsType type) {
-		Id stopid;
+		Id<Link> stopid;
 		PlacemarkType placemark;
 		double relativeError;
 		Coord coord;

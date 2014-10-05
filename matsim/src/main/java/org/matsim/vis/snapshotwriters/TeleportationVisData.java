@@ -22,6 +22,7 @@ package org.matsim.vis.snapshotwriters;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  *
@@ -36,7 +37,7 @@ public class TeleportationVisData implements AgentSnapshotInfo {
 	private double currentX;
 	private double currentY;
 	private final double starttime;
-	private final Id agentId;
+	private final Id<Person> agentId;
 	private int userDefined;
 	private int type;
 	private double colorval;
@@ -48,7 +49,7 @@ public class TeleportationVisData implements AgentSnapshotInfo {
 	private final double travelTime;
 	private final static int offset = 100;
 
-	public TeleportationVisData(double now, Id personId, Coord fromCoord, Coord toCoord, double travelTime ) {
+	public TeleportationVisData(double now, Id<Person> personId, Coord fromCoord, Coord toCoord, double travelTime ) {
 		this.starttime = now;
 		this.travelTime = travelTime ;
 		this.agentId = personId;
@@ -77,7 +78,7 @@ public class TeleportationVisData implements AgentSnapshotInfo {
 	}
 
 	@Override
-	public Id getId(){
+	public Id<Person> getId(){
 		return this.agentId;
 	}
 

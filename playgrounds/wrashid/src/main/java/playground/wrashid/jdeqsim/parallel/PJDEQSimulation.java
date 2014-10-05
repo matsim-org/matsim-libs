@@ -94,7 +94,7 @@ public class PJDEQSimulation extends JDEQSimulation {
 
 		PScheduler scheduler = new PScheduler(queue);
 		scheduler.getQueue().idOfMainThread = Thread.currentThread().getId();
-		SimulationParameters.setAllRoads(new HashMap<Id, Road>());
+		SimulationParameters.setAllRoads(new HashMap<Id<Link>, Road>());
 
 		// find out networkXMedian
 		int numberOfLinks = 0;

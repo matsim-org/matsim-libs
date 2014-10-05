@@ -46,7 +46,7 @@ public class DefaultSignalModelFactory implements SignalModelFactory {
 	}
 
 	@Override
-	public SignalSystem createSignalSystem(Id id) {
+	public SignalSystem createSignalSystem(Id<SignalSystem> id) {
 		return new SignalSystemImpl(id);
 	}
 

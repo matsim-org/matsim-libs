@@ -42,7 +42,7 @@ public interface SignalSystemsManager {
 	
 	public void addSignalSystem(SignalSystem system);
 
-	public Map<Id, SignalSystem> getSignalSystems();
+	public Map<Id<SignalSystem>, SignalSystem> getSignalSystems();
 	
 	public void resetModel(Integer iterationNumber);
 	

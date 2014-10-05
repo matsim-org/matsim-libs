@@ -28,21 +28,21 @@ import org.matsim.withinday.trafficmonitoring.TravelTimeCollector.TravelTimeInfo
 
 public class MapBasedTravelTimeInfoProvider implements TravelTimeInfoProvider {
 
-	private final Map<Id, TravelTimeInfo> linkData;
+	private final Map<Id<Link>, TravelTimeInfo> linkData;
 	
-	public MapBasedTravelTimeInfoProvider(Map<Id, TravelTimeInfo> linkData) {
+	public MapBasedTravelTimeInfoProvider(Map<Id<Link>, TravelTimeInfo> linkData) {
 		this.linkData = linkData;
 	}
 	
 	@Override 
-	public TravelTimeInfo getTravelTimeData(final Id linkId) {
+	public TravelTimeInfo getTravelTimeData(final Id<Link> linkId) {
 		TravelTimeInfo data = this.linkData.get(linkId);
 		return data;
 	}
 		
 	@Override
 	public TravelTimeInfo getTravelTimeData(Link link) {
-		Id linkId = link.getId();
+		Id<Link> linkId = link.getId();
 		return this.getTravelTimeData(linkId);
 	}
 	

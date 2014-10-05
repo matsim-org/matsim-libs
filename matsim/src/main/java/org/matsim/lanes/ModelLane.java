@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.lanes.data.v20.LaneData20;
 
 
@@ -40,7 +41,7 @@ public final class ModelLane {
 	private final LaneData20 laneData;
 	private double length;
 	private double endsAtMetersFromLinkEnd;
-	private final List<Id> destinationLinkIds = new ArrayList<Id>();
+	private final List<Id<Link>> destinationLinkIds = new ArrayList<>();
 	private final List<ModelLane> toLanes = new ArrayList<ModelLane>();
 
 	public ModelLane(LaneData20 data) {
@@ -76,11 +77,11 @@ public final class ModelLane {
 		this.endsAtMetersFromLinkEnd = endsAtMetersFromLinkEnd;
 	}
 
-	public void addDestinationLink(Id toLinkId) {
+	public void addDestinationLink(Id<Link> toLinkId) {
 		this.destinationLinkIds.add(toLinkId);
 	}
 
-	public List<Id> getDestinationLinkIds() {
+	public List<Id<Link>> getDestinationLinkIds() {
 		return this.destinationLinkIds;
 	}
 

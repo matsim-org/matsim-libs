@@ -37,13 +37,13 @@ class VehiclesFactoryImpl implements VehiclesFactory {
 	}
 
 	@Override
-	public Vehicle createVehicle(Id id, VehicleType type) {
+	public Vehicle createVehicle(Id<Vehicle> id, VehicleType type) {
 		Vehicle veh = new VehicleImpl(id, type);
 		return veh;
 	}
 	
 	@Override
-	public VehicleType createVehicleType(Id typeId) {
+	public VehicleType createVehicleType(Id<VehicleType> typeId) {
 			VehicleType veh = new VehicleTypeImpl(typeId);
 			return veh;
 	}

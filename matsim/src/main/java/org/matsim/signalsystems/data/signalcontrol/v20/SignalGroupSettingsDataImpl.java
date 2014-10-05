@@ -20,6 +20,7 @@
 package org.matsim.signalsystems.data.signalcontrol.v20;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.signalsystems.model.SignalGroup;
 
 
 /**
@@ -30,9 +31,9 @@ public class SignalGroupSettingsDataImpl implements SignalGroupSettingsData {
 
 	private int dropping;
 	private int onset;
-	private Id signalGroupId;
+	private Id<SignalGroup> signalGroupId;
 
-	public SignalGroupSettingsDataImpl(Id signalGroupId){
+	public SignalGroupSettingsDataImpl(Id<SignalGroup> signalGroupId){
 		this.signalGroupId = signalGroupId;
 	}
 	
@@ -47,7 +48,7 @@ public class SignalGroupSettingsDataImpl implements SignalGroupSettingsData {
 	}
 
 	@Override
-	public Id getSignalGroupId() {
+	public Id<SignalGroup> getSignalGroupId() {
 		return this.signalGroupId;
 	}
 

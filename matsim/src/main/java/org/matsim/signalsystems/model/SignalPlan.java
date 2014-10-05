@@ -30,15 +30,15 @@ import org.matsim.api.core.v01.Id;
  */
 public interface SignalPlan {
 
-	public List<Id> getDroppings(double timeSeconds);
+	public List<Id<SignalGroup>> getDroppings(double timeSeconds);
 
-	public List<Id> getOnsets(double timeSeconds);
+	public List<Id<SignalGroup>> getOnsets(double timeSeconds);
 
 	public Double getEndTime();
 	
 	public Double getStartTime();
 
-	public Id getId();
+	public Id<SignalPlan> getId();
 	
 	public Integer getOffset();
 	

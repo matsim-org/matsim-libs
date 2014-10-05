@@ -226,7 +226,7 @@ public class Matsim2030Utils {
 			final Scenario scenario,
 			final Coord center,
 			final double radius) {
-		final Map<Id, Link> areaOfInterest = new HashMap<Id, Link>();
+		final Map<Id<Link>, Link> areaOfInterest = new HashMap<>();
 
 		for (Link link : scenario.getNetwork().getLinks().values()) {
 			final Node from = link.getFromNode();

@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.lanes.ModelLane;
@@ -110,7 +111,7 @@ public class VisLaneModelBuilder {
 		for (VisLinkWLanes otfLink : otfNetwork.values()){
 			if (otfLink.getLaneData() == null || otfLink.getLaneData().isEmpty()){
 				if (otfLink.getToLinkIds() != null){
-					for (Id toLinkId : otfLink.getToLinkIds()){
+					for (Id<Link> toLinkId : otfLink.getToLinkIds()){
 						VisLinkWLanes toLink = otfNetwork.get(toLinkId.toString());
 						otfLink.addToLink(toLink);
 					}
@@ -119,7 +120,7 @@ public class VisLaneModelBuilder {
 			else {
 				for (VisLane otfLane : otfLink.getLaneData().values()){
 					if (otfLane.getToLinkIds() != null) {
-						for (Id toLinkId : otfLane.getToLinkIds()){
+						for (Id<Link> toLinkId : otfLane.getToLinkIds()){
 							VisLinkWLanes toLink = otfNetwork.get(toLinkId.toString());
 							otfLane.addToLink(toLink);
 						}
@@ -183,7 +184,7 @@ public class VisLaneModelBuilder {
 			for (ModelLane lane : lanes){
 				VisLane otfLane = lanesLinkData.getLaneData().get(lane.getLaneData().getId().toString());
 				if (lane.getToLanes() == null ||  lane.getToLanes().isEmpty()){
-					for (Id id : lane.getLaneData().getToLinkIds()){
+					for (Id<Link> id : lane.getLaneData().getToLinkIds()){
 						otfLane.addToLinkId(id);
 					}
 				}
@@ -196,7 +197,7 @@ public class VisLaneModelBuilder {
 			}
 		}
 		else {
-			for (Id id : link.getLink().getToNode().getOutLinks().keySet()){
+			for (Id<Link> id : link.getLink().getToNode().getOutLinks().keySet()){
 				lanesLinkData.addToLinkId(id);
 			}
 		}

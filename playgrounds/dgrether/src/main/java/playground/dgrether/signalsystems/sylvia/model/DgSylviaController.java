@@ -34,6 +34,7 @@ import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.model.DatabasedSignalPlan;
 import org.matsim.signalsystems.model.SignalController;
+import org.matsim.signalsystems.model.SignalGroup;
 import org.matsim.signalsystems.model.SignalPlan;
 
 import playground.dgrether.signalsystems.DgSensorManager;
@@ -136,16 +137,16 @@ public class DgSylviaController extends DgAbstractSignalController implements Si
 				}
 			}
 			//else no extension...
-			List<Id> droppings = this.activeSylviaPlan.getDroppings(this.secondInSylviaCycle);
+			List<Id<SignalGroup>> droppings = this.activeSylviaPlan.getDroppings(this.secondInSylviaCycle);
 			if (droppings != null){
-				for (Id groupId : droppings){
+				for (Id<SignalGroup> groupId : droppings){
 					this.system.scheduleDropping(timeSeconds, groupId);
 					this.greenGroupId2OnsetMap.remove(groupId);
 				}
 			}
-			List<Id> onsets = this.activeSylviaPlan.getOnsets(this.secondInSylviaCycle);
+			List<Id<SignalGroup>> onsets = this.activeSylviaPlan.getOnsets(this.secondInSylviaCycle);
 			if (onsets != null){
-				for (Id groupId : onsets){
+				for (Id<SignalGroup> groupId : onsets){
 					this.system.scheduleOnset(timeSeconds, groupId);
 					this.greenGroupId2OnsetMap.put(groupId, timeSeconds);
 				}

@@ -39,9 +39,9 @@ public class DatabasedSignalPlan implements SignalPlan {
 	private SignalPlanData data;
 	private int cylce;
 	
-	private Map<Integer, List<Id>> secondInPlanOnsetsMap = new HashMap<Integer, List<Id>>();
+	private Map<Integer, List<Id<SignalGroup>>> secondInPlanOnsetsMap = new HashMap<>();
 
-	private Map<Integer, List<Id>> secondInPlanDroppingsMap = new HashMap<Integer, List<Id>>();
+	private Map<Integer, List<Id<SignalGroup>>> secondInPlanDroppingsMap = new HashMap<>();
 	
 	public DatabasedSignalPlan(SignalPlanData planData) {
 		this.data = planData;
@@ -69,18 +69,18 @@ public class DatabasedSignalPlan implements SignalPlan {
 				int onset = sgdata.getOnset();
 				onset = (onset + offset) % this.cylce;
 				//onsets
-				List<Id> onsetsSgIds = this.secondInPlanOnsetsMap.get(onset);
+				List<Id<SignalGroup>> onsetsSgIds = this.secondInPlanOnsetsMap.get(onset);
 				if (onsetsSgIds == null){
-					onsetsSgIds = new ArrayList<Id>();
+					onsetsSgIds = new ArrayList<>();
 					this.secondInPlanOnsetsMap.put(onset, onsetsSgIds);
 				}
 				onsetsSgIds.add(sgdata.getSignalGroupId());
 				//dropping
 				int dropping = sgdata.getDropping();
 				dropping = (dropping + offset) % this.cylce;
-				List<Id> droppingSgIds = this.secondInPlanDroppingsMap.get(dropping);
+				List<Id<SignalGroup>> droppingSgIds = this.secondInPlanDroppingsMap.get(dropping);
 				if (droppingSgIds == null){
-					droppingSgIds = new ArrayList<Id>();
+					droppingSgIds = new ArrayList<>();
 					this.secondInPlanDroppingsMap.put(dropping, droppingSgIds);
 				}
 				droppingSgIds.add(sgdata.getSignalGroupId());
@@ -90,13 +90,13 @@ public class DatabasedSignalPlan implements SignalPlan {
 	
 
 	@Override
-	public List<Id> getDroppings(double timeSeconds) {
+	public List<Id<SignalGroup>> getDroppings(double timeSeconds) {
 		Integer currentSecondInPlan = ((int) (timeSeconds % this.cylce));
 		return this.secondInPlanDroppingsMap.get(currentSecondInPlan);
 	}
 
 	@Override
-	public List<Id> getOnsets(double timeSeconds) {
+	public List<Id<SignalGroup>> getOnsets(double timeSeconds) {
 		Integer currentSecondInPlan = ((int) (timeSeconds  % this.cylce));
 		return this.secondInPlanOnsetsMap.get(currentSecondInPlan);
 	}
@@ -113,7 +113,7 @@ public class DatabasedSignalPlan implements SignalPlan {
 	}
 
 	@Override
-	public Id getId() {
+	public Id<SignalPlan> getId() {
 		return this.data.getId();
 	}
 

@@ -27,8 +27,8 @@ import java.util.Set;
 
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.groups.CountsConfigGroup;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -55,7 +55,7 @@ public class CountControlerListener implements StartupListener, IterationEndsLis
 	public static final String OPERATION_COMPARECOUNTS = "compare with counts";
 	
 	private final CountsConfigGroup config;
-	private final Map<Id, double[]> linkStats = new HashMap<Id, double[]>();
+	private final Map<Id<Link>, double[]> linkStats = new HashMap<>();
 	private final Set<String> analyzedModes;
 	private int iterationsUsed = 0;
 
@@ -73,7 +73,7 @@ public class CountControlerListener implements StartupListener, IterationEndsLis
             counts_parser.readFile(this.config.getCountsFileName());
             controlerStartupEvent.getControler().getScenario().addScenarioElement(Counts.ELEMENT_NAME, counts);
         }
-		for (Id linkId : counts.getCounts().keySet()) {
+		for (Id<Link> linkId : counts.getCounts().keySet()) {
 			this.linkStats.put(linkId, new double[24]);
 		}
 	}
@@ -90,11 +90,11 @@ public class CountControlerListener implements StartupListener, IterationEndsLis
 
 		if (createCountsInIteration(event.getIteration())) {
 			event.getControler().stopwatch.beginOperation(OPERATION_COMPARECOUNTS);
-			Map<Id, double[]> averages;
+			Map<Id<Link>, double[]> averages;
 			if (this.iterationsUsed > 1) {
-				averages = new HashMap<Id, double[]>();
-				for (Map.Entry<Id, double[]> e : this.linkStats.entrySet()) {
-					Id linkId = e.getKey();
+				averages = new HashMap<Id<Link>, double[]>();
+				for (Map.Entry<Id<Link>, double[]> e : this.linkStats.entrySet()) {
+					Id<Link> linkId = e.getKey();
 					double[] totalVolumesPerHour = e.getValue();
 					double[] averageVolumesPerHour = new double[totalVolumesPerHour.length];
 					for (int i = 0; i < totalVolumesPerHour.length; i++) {
@@ -159,8 +159,8 @@ public class CountControlerListener implements StartupListener, IterationEndsLis
 
 	private void addVolumes(final VolumesAnalyzer volumes) {
 		this.iterationsUsed++;
-		for (Map.Entry<Id, double[]> e : this.linkStats.entrySet()) {
-			Id linkId = e.getKey();
+		for (Map.Entry<Id<Link>, double[]> e : this.linkStats.entrySet()) {
+			Id<Link> linkId = e.getKey();
 			double[] volumesPerHour = e.getValue(); 
 			double[] newVolume = getVolumesPerHourForLink(volumes, linkId); 
 			for (int i = 0; i < 24; i++) {
@@ -169,7 +169,7 @@ public class CountControlerListener implements StartupListener, IterationEndsLis
 		}
 	}
 	
-	private double[] getVolumesPerHourForLink(final VolumesAnalyzer volumes, final Id linkId) {
+	private double[] getVolumesPerHourForLink(final VolumesAnalyzer volumes, final Id<Link> linkId) {
 		if (this.config.isFilterModes()) {
 			double[] newVolume = new double[24];
 			for (String mode : this.analyzedModes) {

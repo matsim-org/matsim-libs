@@ -12,13 +12,14 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.vehicles.Vehicle;
 
 public class MySimulationObserver implements BasicEventHandler {
 
 	// Actually, no need to be concurrent here.
 	// Event handlers are always considered to be "one event at a time" actors.
 	// If you ever get Events concurrently, something is wrong.
-	private Map<Id, Double> enterEvents = new ConcurrentHashMap<Id,Double>() ;
+	private Map<Id<Vehicle>, Double> enterEvents = new ConcurrentHashMap<>() ;
 
 	private List<Double> sum = new ArrayList<Double>() ;
 	private List<Double> cnt = new ArrayList<Double>() ;

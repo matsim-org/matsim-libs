@@ -36,7 +36,7 @@ import org.matsim.withinday.utils.EditRoutes;
  */
 public abstract class WithinDayReplanner<T extends Identifier> {
 	
-	protected final Id<WithinDayReplanner<T>> id;
+	protected final Id<WithinDayReplanner> id;
 	protected final Scenario scenario;
 	protected final InternalInterface internalInterface;
 	protected final EditRoutes editRoutes;
@@ -44,7 +44,7 @@ public abstract class WithinDayReplanner<T extends Identifier> {
 
 	protected double time = Time.UNDEFINED_TIME;
 
-	public WithinDayReplanner(Id<WithinDayReplanner<T>> id, Scenario scenario, InternalInterface internalInterface) {
+	public WithinDayReplanner(Id<WithinDayReplanner> id, Scenario scenario, InternalInterface internalInterface) {
 		this.id = id;
 		this.scenario = scenario;
 		this.internalInterface = internalInterface;
@@ -54,7 +54,7 @@ public abstract class WithinDayReplanner<T extends Identifier> {
 	
 	public abstract boolean doReplanning(MobsimAgent withinDayAgent);
 	
-	public final Id<WithinDayReplanner<T>> getId() {
+	public final Id<WithinDayReplanner> getId() {
 		return this.id;
 	}
 	

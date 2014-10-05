@@ -21,6 +21,7 @@ package org.matsim.signalsystems.data.intergreens.v10;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimFactory;
+import org.matsim.signalsystems.model.SignalSystem;
 
 
 /**
@@ -29,6 +30,6 @@ import org.matsim.core.api.internal.MatsimFactory;
  */
 public interface IntergreenTimesDataFactory extends MatsimFactory {
 
-	public IntergreensForSignalSystemData createIntergreensForSignalSystem(Id signalSystemId);
+	public IntergreensForSignalSystemData createIntergreensForSignalSystem(Id<SignalSystem> signalSystemId);
 	
 }

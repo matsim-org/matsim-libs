@@ -457,13 +457,13 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 		}
 
 		@Override
-		public Id getStopPostAreaId() {
+		public String getStopPostAreaId() {
 			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
-		public void setStopPostAreaId(Id stopPostAreaId) {
+		public void setStopPostAreaId(String stopPostAreaId) {
 			// TODO Auto-generated method stub
 			
 		}

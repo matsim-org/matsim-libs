@@ -25,13 +25,13 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.facilities.Facility;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -54,10 +54,10 @@ public class SimulateTeleportation {
 		final Controler controler = new Controler( scenario );
 
 		// create the teleportation station on a central link
-		final Facility teleport =
+		final ActivityFacility teleport =
 			createFacility(
-					new IdImpl( "teleport" ),
-					controler.getScenario().getNetwork().getLinks().get( new IdImpl( "2333" ) ));
+					Id.create( "teleport" , ActivityFacility.class),
+					controler.getScenario().getNetwork().getLinks().get( Id.create( "2333", Link.class ) ));
 
 		// now, plug our stuff in
 		controler.setTripRouterFactory(
@@ -77,18 +77,19 @@ public class SimulateTeleportation {
 		config.planCalcScore().addActivityParams( scoreTelepInteract );
 	}
 
-	private static Facility createFacility(
-			final Id id,
+	private static ActivityFacility createFacility(
+			final Id<ActivityFacility> id,
 			final Link link) {
 		if ( link == null ) throw new IllegalArgumentException( "link == "+link );
-		return new Facility() {
+		
+		return new ActivityFacility() {
 			@Override
 			public Coord getCoord() {
 				return link.getFromNode().getCoord();
 			}
 
 			@Override
-			public Id getId() {
+			public Id<ActivityFacility> getId() {
 				return id;
 			}
 
@@ -98,8 +99,18 @@ public class SimulateTeleportation {
 			}
 
 			@Override
-			public Id getLinkId() {
+			public Id<Link> getLinkId() {
 				return link.getId();
+			}
+			
+			@Override
+			public void addActivityOption(ActivityOption option) {
+				throw new UnsupportedOperationException();
+			}
+			
+			@Override
+			public Map<String, ActivityOption> getActivityOptions() {
+				throw new UnsupportedOperationException();
 			}
 		};
 	}

@@ -24,8 +24,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -100,20 +100,20 @@ class MyAgent implements MobsimDriverAgent {
 	private MobsimVehicle vehicle;
 	private Scenario sc;
 	private EventsManager ev;
-	private Id currentLinkId;
-	private Id myId;
+	private Id<Link> currentLinkId;
+	private Id<Person> myId;
 	private State state = State.ACTIVITY;
 	private Netsim netsim;
-	private Id destinationLinkId = new IdImpl("dummy");
-	private Id plannedVehicleId ;
+	private Id<Link> destinationLinkId = Id.create("dummy", Link.class);
+	private Id<Vehicle> plannedVehicleId ;
 
 	private double activityEndTime = 1. ;
 	
-	MyAgent( Scenario sc, EventsManager ev, Netsim netsim, Id startLinkId, MobsimVehicle veh ) {
+	MyAgent( Scenario sc, EventsManager ev, Netsim netsim, Id<Link> startLinkId, MobsimVehicle veh ) {
 		log.info( "calling MyAgent" ) ;
 		this.sc = sc ;
 		this.ev = ev ;
-		this.myId = new IdImpl("testveh") ;
+		this.myId = Id.create("testveh", Person.class) ;
 		this.netsim = netsim ;
 		this.currentLinkId = startLinkId ;
 		this.plannedVehicleId = veh.getId() ;
@@ -161,40 +161,40 @@ class MyAgent implements MobsimDriverAgent {
 	}
 
 	@Override
-	public void notifyArrivalOnLinkByNonNetworkMode(Id linkId) {
+	public void notifyArrivalOnLinkByNonNetworkMode(Id<Link> linkId) {
 		this.currentLinkId = linkId ;
 	}
 
 	@Override
-	public Id getCurrentLinkId() {
+	public Id<Link> getCurrentLinkId() {
 		return this.currentLinkId ;
 	}
 
 	@Override
-	public Id getDestinationLinkId() {
+	public Id<Link> getDestinationLinkId() {
 		return this.destinationLinkId ;
 	}
 
 	@Override
-	public Id getId() {
+	public Id<Person> getId() {
 		return this.myId ;
 	}
 
 	@Override
-	public Id chooseNextLinkId() {
+	public Id<Link> chooseNextLinkId() {
 		Link currentLink = sc.getNetwork().getLinks().get(this.currentLinkId) ;
 		Object[] outLinks = currentLink.getToNode().getOutLinks().keySet().toArray() ;
 		int idx = MatsimRandom.getRandom().nextInt(outLinks.length) ;
 		if ( this.netsim.getSimTimer().getTimeOfDay() < 24.*3600 ) {
-			return (Id) outLinks[idx] ;
+			return (Id<Link>) outLinks[idx] ;
 		} else {
-			this.destinationLinkId  = (Id) outLinks[idx] ;
+			this.destinationLinkId  = (Id<Link>) outLinks[idx] ;
 			return null ;
 		}
 	}
 
 	@Override
-	public Id getPlannedVehicleId() {
+	public Id<Vehicle> getPlannedVehicleId() {
 		return this.plannedVehicleId ;
 	}
 
@@ -204,7 +204,7 @@ class MyAgent implements MobsimDriverAgent {
 	}
 
 	@Override
-	public void notifyMoveOverNode(Id newLinkId) {
+	public void notifyMoveOverNode(Id<Link> newLinkId) {
 		this.currentLinkId = newLinkId ;
 	}
 

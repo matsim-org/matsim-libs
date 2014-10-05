@@ -21,6 +21,7 @@ package org.matsim.signalsystems.data.ambertimes.v10;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimFactory;
+import org.matsim.signalsystems.model.SignalSystem;
 
 
 /**
@@ -29,6 +30,6 @@ import org.matsim.core.api.internal.MatsimFactory;
  */
 public interface AmberTimesDataFactory extends MatsimFactory {
 
-	public AmberTimeData createAmberTimeData(Id signalSystemId);
+	public AmberTimeData createAmberTimeData(Id<SignalSystem> signalSystemId);
 	
 }

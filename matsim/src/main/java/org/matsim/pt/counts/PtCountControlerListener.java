@@ -20,6 +20,11 @@
 
 package org.matsim.pt.counts;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -40,11 +45,7 @@ import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 public class PtCountControlerListener implements StartupListener, IterationEndsListener,
 BeforeMobsimListener, AfterMobsimListener  {
@@ -126,21 +127,21 @@ BeforeMobsimListener, AfterMobsimListener  {
 			cca.put( CountType.Boarding, new CountsComparisonAlgorithm(new CountsComparisonAlgorithm.VolumesForId() {
 
 				@Override
-				public double[] getVolumesForStop(Id locationId) {
+				public double[] getVolumesForStop(Id<TransitStopFacility> locationId) {
 					return copyFromIntArray(occupancyAnalyzer.getBoardVolumesForStop(locationId));
 				}
 			}, this.boardCounts, network, countsScaleFactor)) ;
 			cca.put( CountType.Alighting, new CountsComparisonAlgorithm(new CountsComparisonAlgorithm.VolumesForId() {
 
 				@Override
-				public double[] getVolumesForStop(Id locationId) {
+				public double[] getVolumesForStop(Id<TransitStopFacility> locationId) {
 					return copyFromIntArray(occupancyAnalyzer.getAlightVolumesForStop(locationId));
 				}
 			}, this.alightCounts, network, countsScaleFactor) ) ;
 			cca.put( CountType.Occupancy, new CountsComparisonAlgorithm(new CountsComparisonAlgorithm.VolumesForId() {
 
 				@Override
-				public double[] getVolumesForStop(Id locationId) {
+				public double[] getVolumesForStop(Id<TransitStopFacility> locationId) {
 					return copyFromIntArray(occupancyAnalyzer.getOccupancyVolumesForStop(locationId));
 				}
 			}, this.occupancyCounts, network, countsScaleFactor) ) ;

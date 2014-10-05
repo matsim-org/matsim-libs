@@ -20,6 +20,7 @@
 package org.matsim.vis.snapshotwriters;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 
 public interface AgentSnapshotInfo {
 
@@ -28,7 +29,7 @@ public interface AgentSnapshotInfo {
 	public enum AgentState { PERSON_AT_ACTIVITY, PERSON_DRIVING_CAR, PERSON_OTHER_MODE, TRANSIT_DRIVER }
 	// !!! WARNING: See comment above this enum.
 
-	Id getId() ;
+	Id<Person> getId() ;
 
 	double getEasting();
 

@@ -455,7 +455,7 @@ public class PoznanNetwork
     private static void createAndAddLanes(LanesToLinkAssignment11 l2l, int id, double length,
             double noLanes, Link... toLinks)
     {
-    	LaneData11 lane = laneFactory.createLane(Id.create(l2l.getLinkId() + "_" + id, Object.class));
+    	LaneData11 lane = laneFactory.createLane(Id.create(l2l.getLinkId() + "_" + id, Lane.class));
 
         for (Link toLink : toLinks) {
             lane.addToLinkId(toLink.getId());

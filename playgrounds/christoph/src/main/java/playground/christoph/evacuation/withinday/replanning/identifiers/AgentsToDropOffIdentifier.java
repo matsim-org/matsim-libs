@@ -28,6 +28,7 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -89,10 +90,10 @@ public class AgentsToDropOffIdentifier extends DuringLegIdentifier {
 		
 		Set<Id> agentsLeaveVehicle = new TreeSet<Id>();
 //		for (Entry<Id, Id> entry : linkEnteredAgents.entrySet()) {
-		for (Entry<Id, Id> entry : this.linkEnteredProvider.getLinkEnteredAgentsInLastTimeStep().entrySet()) {
+		for (Entry<Id<Person>, Id<Link>> entry : this.linkEnteredProvider.getLinkEnteredAgentsInLastTimeStep().entrySet()) {
 						
-			Id driverId = entry.getKey();
-			Id linkId = entry.getValue();
+			Id<Person> driverId = entry.getKey();
+			Id<Link> linkId = entry.getValue();
 			
 			// if the filters do not include the agent skip it
 			if (!this.applyFilters(driverId, time)) continue;
@@ -117,7 +118,7 @@ public class AgentsToDropOffIdentifier extends DuringLegIdentifier {
 			
 			// add driver and remaining agents to replanning set
 			agentsToDropOff.add(driver);
-			for (Id agentId : agentsLeaveVehicle) agentsToDropOff.add(this.mobsimDataProvider.getAgent(agentId));
+			for (Id<Person> agentId : agentsLeaveVehicle) agentsToDropOff.add(this.mobsimDataProvider.getAgent(agentId));
 			
 			/*
 			 * Create a JointDeparture where the passenger(s) is(are) dropped off.
@@ -126,7 +127,7 @@ public class AgentsToDropOffIdentifier extends DuringLegIdentifier {
 //			Id driverId = driver.getId();
 			Set<Id<Person>> remainingPassengers = new LinkedHashSet<>();
 			for (PassengerAgent passenger : vehicle.getPassengers()) {
-				Id passengerId = passenger.getId();
+				Id<Person> passengerId = passenger.getId();
 				if (!agentsLeaveVehicle.contains(passengerId)) remainingPassengers.add(passengerId);
 			}
 			JointDeparture jointDeparture = this.jointDepartureOrganizer.createJointDeparture(linkId, vehicle.getId(), driverId, remainingPassengers);

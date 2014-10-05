@@ -30,6 +30,7 @@ import java.util.Random;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
@@ -116,7 +117,7 @@ public class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 			return;
 		}
 
-		final Id homeLocation = anchorAtFacilities ?
+		final Id<? extends BasicLocation> homeLocation = anchorAtFacilities ?
 			((Activity) plan.getPlanElements().get(0)).getFacilityId() :
 			((Activity) plan.getPlanElements().get(0)).getLinkId();
 		Collection<String> permissibleModesForThisPlan = permissibleModesCalculator.getPermissibleModes(plan);
@@ -138,7 +139,7 @@ public class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 	}
 
 	private List<Candidate> determineChoiceSet(
-			final Id homeLocation,
+			final Id<? extends BasicLocation> homeLocation,
 			final List<Trip> trips,
 			final Collection<Subtour> subtours,
 			final Collection<String> permissibleModesForThisPerson) {
@@ -153,7 +154,7 @@ public class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 			}
 
 			final Set<String> usableChainBasedModes = new HashSet<String>();
-			final Id subtourStartLocation = anchorAtFacilities ?
+			final Id<? extends BasicLocation> subtourStartLocation = anchorAtFacilities ?
 				subtour.getTrips().get( 0 ).getOriginActivity().getFacilityId() :
 				subtour.getTrips().get( 0 ).getOriginActivity().getLinkId();
 			
@@ -163,7 +164,7 @@ public class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 					chainBasedModes;
 
 			for (String mode : testingModes) {
-				Id vehicleLocation = homeLocation;
+				Id<? extends BasicLocation> vehicleLocation = homeLocation;
 				Activity lastDestination =
 					findLastDestinationOfMode(
 						trips.subList(
@@ -240,7 +241,7 @@ public class ChooseRandomLegModeForSubtour implements PlanAlgorithm {
 		return atSameLocation(firstOrigin, lastDestination);
 	}
 
-	private Id getLocationId(Activity activity) {
+	private Id<? extends BasicLocation> getLocationId(Activity activity) {
 		return anchorAtFacilities ?
 			activity.getFacilityId() :
 			activity.getLinkId();

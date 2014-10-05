@@ -46,6 +46,7 @@ import org.matsim.lanes.data.v11.LaneDefinitions11;
 import org.matsim.lanes.data.v11.LaneDefinitions11Impl;
 import org.matsim.lanes.data.v11.LaneDefinitionsFactory11;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 
 
@@ -148,7 +149,7 @@ public class MixedLaneTestFixture {
 		//create lanes
 		LaneDefinitions11 lanes = new LaneDefinitions11Impl();
 		LaneDefinitionsFactory11 lb = lanes.getFactory();
-		LaneData11 lane = lb.createLane(id1);
+		LaneData11 lane = lb.createLane(Id.create(id1, Lane.class));
 		lane.setNumberOfRepresentedLanes(2.0);
 		lane.setStartsAtMeterFromLinkEnd(50.0);
 		lane.addToLinkId(id2);

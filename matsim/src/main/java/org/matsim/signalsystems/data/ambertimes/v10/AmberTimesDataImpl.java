@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.signalsystems.model.SignalSystem;
 
 /**
  * @author jbischoff
@@ -29,7 +30,7 @@ import org.matsim.api.core.v01.Id;
  */
 public class AmberTimesDataImpl implements AmberTimesData {
 
-	private Map<Id, AmberTimeData> amberTimeData = new HashMap<Id, AmberTimeData>();
+	private Map<Id<SignalSystem>, AmberTimeData> amberTimeData = new HashMap<>();
 	private Double defaultAmberTimeGreen;
 	private Integer globalDefaultAmberTime;
 	private Integer globalDefaultRedAmberTime;
@@ -43,7 +44,7 @@ public class AmberTimesDataImpl implements AmberTimesData {
 	}
 
 	@Override
-	public Map<Id, AmberTimeData> getAmberTimeDataBySystemId() {
+	public Map<Id<SignalSystem>, AmberTimeData> getAmberTimeDataBySystemId() {
 		return amberTimeData;
 	}
 

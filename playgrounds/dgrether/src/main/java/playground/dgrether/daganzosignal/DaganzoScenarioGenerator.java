@@ -54,6 +54,7 @@ import org.matsim.lanes.data.v11.LaneDefinitions11;
 import org.matsim.lanes.data.v11.LaneDefinitions11Impl;
 import org.matsim.lanes.data.v11.LaneDefinitionsFactory11;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 
@@ -441,7 +442,7 @@ public class DaganzoScenarioGenerator {
 		LaneDefinitionsFactory11 factory = lanes.getFactory();
 		//lanes for link 4
 		LanesToLinkAssignment11 lanesForLink4 = factory.createLanesToLinkAssignment(Id.create(4, Link.class));
-		LaneData11 link4lane1 = factory.createLane(Id.create(1, Object.class));
+		LaneData11 link4lane1 = factory.createLane(Id.create(1, Lane.class));
 		link4lane1.addToLinkId(Id.create(6, Link.class));
 		link4lane1.setNumberOfRepresentedLanes(numberOfLanes);
 		link4lane1.setStartsAtMeterFromLinkEnd(100.0);
@@ -449,7 +450,7 @@ public class DaganzoScenarioGenerator {
 		lanes.addLanesToLinkAssignment(lanesForLink4);
 		//lanes for link 5
 		LanesToLinkAssignment11 lanesForLink5 = factory.createLanesToLinkAssignment(Id.create(5, Link.class));
-		LaneData11 link5lane1 = factory.createLane(Id.create(1, Object.class));
+		LaneData11 link5lane1 = factory.createLane(Id.create(1, Lane.class));
 		link5lane1.setNumberOfRepresentedLanes(numberOfLanes);
 		link5lane1.addToLinkId(Id.create(6, Link.class));
 		link5lane1.setStartsAtMeterFromLinkEnd(7.5);

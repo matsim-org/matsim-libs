@@ -83,7 +83,7 @@ public class CreateTrafficSignalScenarioWithLanes {
 	
 	private void createGroupsAndSystem2(Scenario scenario, SignalSystemsData systems, SignalGroupsData groups){
 		//signal system 2
-		SignalSystemData sys = systems.getFactory().createSignalSystemData(Id.create("2", SignalSystemData.class));
+		SignalSystemData sys = systems.getFactory().createSignalSystemData(Id.create("2", SignalSystem.class));
 		systems.addSignalSystemData(sys);
 		SignalSystemsDataFactory factory = systems.getFactory();
 		SignalUtils.createAndAddSignal(sys, factory, Id.create("1", Signal.class), 
@@ -101,14 +101,14 @@ public class CreateTrafficSignalScenarioWithLanes {
 		groups.addSignalGroupData(group4signal);
 		group4signal.addSignalId(Id.create("2", Signal.class));
 
-		SignalData signal = systems.getFactory().createSignalData(Id.create("3", SignalData.class));
+		SignalData signal = systems.getFactory().createSignalData(Id.create("3", Signal.class));
 		sys.addSignalData(signal);
 		signal.setLinkId(Id.create("32", Link.class));
 		group4signal = groups.getFactory().createSignalGroupData(Id.create("2", SignalSystem.class), Id.create("3", SignalGroup.class));
 		groups.addSignalGroupData(group4signal);
 //		SignalGroupData group4signal  = groups.getSignalGroupDataBySignalSystemId().get(sys.getId()).get(Id.create("1"));
 		group4signal.addSignalId(Id.create("3", Signal.class));
-		signal = systems.getFactory().createSignalData(Id.create("4", SignalData.class));
+		signal = systems.getFactory().createSignalData(Id.create("4", Signal.class));
 		sys.addSignalData(signal);
 		signal.setLinkId(Id.create("72", Link.class));
 		group4signal = groups.getFactory().createSignalGroupData(Id.create("2", SignalSystem.class), Id.create("4", SignalGroup.class));
@@ -119,7 +119,7 @@ public class CreateTrafficSignalScenarioWithLanes {
 	
 	private void createGroupsAndSystem5(Scenario scenario, SignalSystemsData systems, SignalGroupsData groups){
 		//signal system 5
-		SignalSystemData sys = systems.getFactory().createSignalSystemData(Id.create("5", SignalSystemData.class));
+		SignalSystemData sys = systems.getFactory().createSignalSystemData(Id.create("5", SignalSystem.class));
 		systems.addSignalSystemData(sys);
 		SignalSystemsDataFactory factory = systems.getFactory();
 		
@@ -138,7 +138,7 @@ public class CreateTrafficSignalScenarioWithLanes {
 		groups.addSignalGroupData(group4signal);
 		group4signal.addSignalId(Id.create("2", Signal.class));
 		//signals 3 and 4
-		SignalData signal = systems.getFactory().createSignalData(Id.create("3", SignalData.class));
+		SignalData signal = systems.getFactory().createSignalData(Id.create("3", Signal.class));
 		sys.addSignalData(signal);
 		signal.setLinkId(Id.create("45", Link.class));
 		//creates a separate group for signal 3 
@@ -147,7 +147,7 @@ public class CreateTrafficSignalScenarioWithLanes {
 		//eventually better: add them to existing group
 //		SignalGroupData group4signal = groups.getSignalGroupDataBySignalSystemId().get(sys.getId()).get(Id.create("1"));
 		group4signal.addSignalId(Id.create("3", Signal.class));
-		signal = systems.getFactory().createSignalData(Id.create("4", SignalData.class));
+		signal = systems.getFactory().createSignalData(Id.create("4", Signal.class));
 		sys.addSignalData(signal);
 		signal.setLinkId(Id.create("85", Link.class));
 		//creates a separate group for signal 4
@@ -219,22 +219,22 @@ public class CreateTrafficSignalScenarioWithLanes {
 		LaneDefinitions11 lanes = new LaneDefinitions11Impl();
 		LaneDefinitionsFactory11 factory = lanes.getFactory();
 		//lanes for link 12
-		LanesToLinkAssignment11 lanesForLink12 = factory.createLanesToLinkAssignment(Id.create("12", Object.class));
+		LanesToLinkAssignment11 lanesForLink12 = factory.createLanesToLinkAssignment(Id.create("12", Link.class));
 		lanes.addLanesToLinkAssignment(lanesForLink12);
-		LanesUtils.createAndAddLane(lanesForLink12, factory, Id.create("1", Object.class), 
+		LanesUtils.createAndAddLane(lanesForLink12, factory, Id.create("1", Lane.class), 
 				laneLenght, 1, Id.create("23", Link.class));
 
-		LanesUtils.createAndAddLane(lanesForLink12, factory, Id.create("2", Object.class), 
+		LanesUtils.createAndAddLane(lanesForLink12, factory, Id.create("2", Lane.class), 
 				laneLenght, 1, Id.create("27", Link.class));
 
 		//lanes for link 65
-		LanesToLinkAssignment11 lanesForLink65 = factory.createLanesToLinkAssignment(Id.create("65", Object.class));
+		LanesToLinkAssignment11 lanesForLink65 = factory.createLanesToLinkAssignment(Id.create("65", Link.class));
 		lanes.addLanesToLinkAssignment(lanesForLink65);
 
-		LanesUtils.createAndAddLane(lanesForLink65, factory, Id.create("1", Object.class), 
+		LanesUtils.createAndAddLane(lanesForLink65, factory, Id.create("1", Lane.class), 
 				laneLenght, 1, Id.create("54", Link.class));
 
-		LanesUtils.createAndAddLane(lanesForLink65, factory, Id.create("2", Object.class), 
+		LanesUtils.createAndAddLane(lanesForLink65, factory, Id.create("2", Lane.class), 
 				laneLenght, 1, Id.create("58", Link.class));
 		
 		//convert to 2.0 format and return

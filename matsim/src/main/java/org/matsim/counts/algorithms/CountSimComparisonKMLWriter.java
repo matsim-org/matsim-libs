@@ -374,7 +374,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 * @param folder The folder to which to add the data in the kml-file.
 	 */
 	private void writeLinkData(final List<CountSimComparison> countSimComparisonList, final FolderType folder) {
-		Id linkid;
+		Id<Link> linkid;
 		Link link;
 		PlacemarkType placemark;
 		double relativeError;

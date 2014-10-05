@@ -85,18 +85,18 @@ public class CountsComparisonAlgorithm {
 		this.volumesPerLinkPerHour = new VolumesForId() {
 
 			@Override
-			public double[] getVolumesForStop(Id locationId) {
-				return volumes.getVolumesPerHourForLink(locationId);
+			public double[] getVolumesForStop(Id<TransitStopFacility> locationId) {
+				return volumes.getVolumesPerHourForLink(Id.create(locationId, Link.class));
 			}
 
 		};
 	}
 
-	public CountsComparisonAlgorithm(final Map<Id, double[]> volumesPerLinkPerHour, final Counts counts, final Network network, final double countsScaleFactor) {
+	public CountsComparisonAlgorithm(final Map<Id<Link>, double[]> volumesPerLinkPerHour, final Counts counts, final Network network, final double countsScaleFactor) {
 		this.volumesPerLinkPerHour = new VolumesForId() {
 
 			@Override
-			public double[] getVolumesForStop(Id locationId) {
+			public double[] getVolumesForStop(Id<TransitStopFacility> locationId) {
 				return volumesPerLinkPerHour.get(locationId);
 			}
 

@@ -30,6 +30,7 @@ import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 import org.matsim.withinday.utils.EditRoutes;
 
 /**
@@ -43,7 +44,7 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 
 	private final TripRouter tripRouter;
 	
-	/*package*/ NextLegReplanner(Id id, Scenario scenario, InternalInterface internalInterface, TripRouter tripRouter) {
+	/*package*/ NextLegReplanner(Id<WithinDayReplanner> id, Scenario scenario, InternalInterface internalInterface, TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
 		this.tripRouter = tripRouter;
 	}

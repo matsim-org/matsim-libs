@@ -20,6 +20,7 @@
 package org.matsim.signalsystems.data.intergreens.v10;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.signalsystems.model.SignalSystem;
 
 
 /**
@@ -29,7 +30,7 @@ import org.matsim.api.core.v01.Id;
 public class IntergreenTimesDataFactoryImpl implements IntergreenTimesDataFactory {
 
 	@Override
-	public IntergreensForSignalSystemData createIntergreensForSignalSystem(Id signalSystemId) {
+	public IntergreensForSignalSystemData createIntergreensForSignalSystem(Id<SignalSystem> signalSystemId) {
 		return new IntergreensForSignalSystemDataImpl(signalSystemId);
 	}
 

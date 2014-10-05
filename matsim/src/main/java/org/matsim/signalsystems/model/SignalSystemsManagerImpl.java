@@ -32,7 +32,7 @@ import org.matsim.signalsystems.data.SignalsData;
  */
 public class SignalSystemsManagerImpl implements SignalSystemsManager {
 
-	private SortedMap<Id, SignalSystem> signalSystems = new TreeMap<Id, SignalSystem>();
+	private SortedMap<Id<SignalSystem>, SignalSystem> signalSystems = new TreeMap<>();
 	
 	private AmberLogic amberLogic = new EmptyAmberLogicImpl();
 
@@ -91,7 +91,7 @@ public class SignalSystemsManagerImpl implements SignalSystemsManager {
 	}
 
 	@Override
-	public Map<Id, SignalSystem> getSignalSystems() {
+	public Map<Id<SignalSystem>, SignalSystem> getSignalSystems() {
 		return this.signalSystems;
 	}
 	

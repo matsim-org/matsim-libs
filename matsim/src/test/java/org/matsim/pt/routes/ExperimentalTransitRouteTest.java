@@ -40,8 +40,8 @@ import org.matsim.testcases.fakes.FakeLink;
 public class ExperimentalTransitRouteTest extends TestCase {
 
 	public void testInitializationLinks() {
-		Link link1 = new FakeLink(Id.create(1, TransitStopFacility.class));
-		Link link2 = new FakeLink(Id.create(2, TransitStopFacility.class));
+		Link link1 = new FakeLink(Id.create(1, Link.class));
+		Link link2 = new FakeLink(Id.create(2, Link.class));
 		ExperimentalTransitRoute route = new ExperimentalTransitRoute(link1.getId(), link2.getId());
 		assertEquals(link1.getId(), route.getStartLinkId());
 		assertEquals(link2.getId(), route.getEndLinkId());

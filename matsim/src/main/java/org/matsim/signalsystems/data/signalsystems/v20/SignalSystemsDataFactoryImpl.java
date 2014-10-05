@@ -20,6 +20,8 @@
 package org.matsim.signalsystems.data.signalsystems.v20;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.signalsystems.model.Signal;
+import org.matsim.signalsystems.model.SignalSystem;
 
 
 /**
@@ -29,12 +31,12 @@ import org.matsim.api.core.v01.Id;
 public class SignalSystemsDataFactoryImpl implements SignalSystemsDataFactory {
 
 	@Override
-	public SignalData createSignalData(Id id) {
+	public SignalData createSignalData(Id<Signal> id) {
 		return new SignalDataImpl(id);
 	}
 
 	@Override
-	public SignalSystemData createSignalSystemData(Id id) {
+	public SignalSystemData createSignalSystemData(Id<SignalSystem> id) {
 		return new SignalSystemDataImpl(id);
 	}
 

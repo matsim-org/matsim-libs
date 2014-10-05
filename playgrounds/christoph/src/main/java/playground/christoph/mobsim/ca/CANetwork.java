@@ -38,8 +38,8 @@ public class CANetwork implements NetsimNetwork {
 
 	private final Network network;
 	private final CANetworkFactory networkFactory; 
-	private final Map<Id, CANode> nodes;
-	private final Map<Id, CALink> links;
+	private final Map<Id<Node>, CANode> nodes;
+	private final Map<Id<Link>, CALink> links;
 	
 	private CA ca;
 	
@@ -47,8 +47,8 @@ public class CANetwork implements NetsimNetwork {
 		this.network = network;
 		this.networkFactory = networkFactory;
 		
-		this.nodes = new HashMap<Id, CANode>();
-		this.links = new HashMap<Id, CALink>();
+		this.nodes = new HashMap<>();
+		this.links = new HashMap<>();
 	}
 	
 	public void initialize(CA ca) {
@@ -65,7 +65,7 @@ public class CANetwork implements NetsimNetwork {
 	}
 	
 	@Override
-	public Map<Id, ? extends VisLink> getVisLinks() {
+	public Map<Id<Link>, ? extends VisLink> getVisLinks() {
 		return null;
 	}
 
@@ -80,24 +80,24 @@ public class CANetwork implements NetsimNetwork {
 	}
 
 	@Override
-	public Map<Id, ? extends NetsimLink> getNetsimLinks() {
+	public Map<Id<Link>, ? extends NetsimLink> getNetsimLinks() {
 		return this.links;
 	}
 
 	@Override
-	public Map<Id, ? extends NetsimNode> getNetsimNodes() {
+	public Map<Id<Node>, ? extends NetsimNode> getNetsimNodes() {
 		return this.nodes;
 	}
 
 	// getLinkById(id)
 	@Override
-	public NetsimLink getNetsimLink(Id id) {
+	public NetsimLink getNetsimLink(Id<Link> id) {
 		return this.links.get(id);
 	}
 
 	// getNodeById(id)
 	@Override
-	public NetsimNode getNetsimNode(Id id) {
+	public NetsimNode getNetsimNode(Id<Node> id) {
 		return this.nodes.get(id);
 	}
 	

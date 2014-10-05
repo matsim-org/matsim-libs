@@ -29,11 +29,11 @@ public class SignalGroupStateChangeRequestImpl implements SignalGroupStateChange
 	
 	private SignalGroupState newState;
 	private double timeSec;
-	private Id signalGroupId;
+	private Id<SignalGroup> signalGroupId;
 	
 	private String hashCode = null;
 	
-	public SignalGroupStateChangeRequestImpl(Id groupId, SignalGroupState newState, double timeSeconds){
+	public SignalGroupStateChangeRequestImpl(Id<SignalGroup> groupId, SignalGroupState newState, double timeSeconds){
 		this.signalGroupId = groupId;
 		this.newState = newState;
 		this.timeSec = timeSeconds;
@@ -50,7 +50,7 @@ public class SignalGroupStateChangeRequestImpl implements SignalGroupStateChange
 	}
 
 	@Override
-	public Id getSignalGroupId() {
+	public Id<SignalGroup> getSignalGroupId() {
 		return signalGroupId;
 	}
 

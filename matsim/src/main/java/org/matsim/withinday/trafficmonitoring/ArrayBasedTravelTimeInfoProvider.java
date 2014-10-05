@@ -33,7 +33,7 @@ public class ArrayBasedTravelTimeInfoProvider implements TravelTimeInfoProvider 
 	private final TravelTimeInfo[] arrayLinkData;
 	private final TravelTimeInfoProvider delegate;
 	
-	public ArrayBasedTravelTimeInfoProvider(Map<Id, TravelTimeInfo> linkData, Network network) {
+	public ArrayBasedTravelTimeInfoProvider(Map<Id<Link>, TravelTimeInfo> linkData, Network network) {
 		this.delegate = new MapBasedTravelTimeInfoProvider(linkData);
 		this.arrayLinkData = new TravelTimeInfo[linkData.size()];
 	}
@@ -43,7 +43,7 @@ public class ArrayBasedTravelTimeInfoProvider implements TravelTimeInfoProvider 
 	 * There, only link ids are available. We cannot optimize this. 
 	 */
 	@Override
-	public TravelTimeInfo getTravelTimeData(final Id linkId) {
+	public TravelTimeInfo getTravelTimeData(final Id<Link> linkId) {
 		return this.delegate.getTravelTimeData(linkId);
 	}
 	

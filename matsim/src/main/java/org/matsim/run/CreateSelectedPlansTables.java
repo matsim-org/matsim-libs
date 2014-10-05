@@ -178,7 +178,7 @@ public class CreateSelectedPlansTables {
 			out.write(header);
 			out.write('\n');
 
-			for (final Id person_id : this.plans0.getPersons().keySet()) {
+			for (final Id<Person> person_id : this.plans0.getPersons().keySet()) {
 
 				// method person.toString() not appropriate
 				out.write(person_id.toString()+"\t");

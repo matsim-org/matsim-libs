@@ -29,6 +29,7 @@ import javax.xml.bind.Marshaller;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
 import org.matsim.jaxb.signalsystems20.ObjectFactory;
@@ -37,6 +38,7 @@ import org.matsim.jaxb.signalsystems20.XMLSignalSystemType;
 import org.matsim.jaxb.signalsystems20.XMLSignalSystems;
 import org.matsim.jaxb.signalsystems20.XMLSignalType;
 import org.matsim.jaxb.signalsystems20.XMLSignalType.XMLLane;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
 
 
@@ -73,7 +75,7 @@ public class SignalSystemsWriter20 extends MatsimJaxbXmlWriter {
 					xmlssd.setId(sd.getId().toString());
 					xmlssd.setLinkIdRef(sd.getLinkId().toString());
 					if (sd.getLaneIds() != null){
-						for (Id id : sd.getLaneIds()){
+						for (Id<Lane> id : sd.getLaneIds()){
 							XMLLane xmllane = fac.createXMLSignalTypeXMLLane();
 							xmlssd.getLane().add(xmllane);
 							xmllane.setRefId(id.toString());
@@ -81,7 +83,7 @@ public class SignalSystemsWriter20 extends MatsimJaxbXmlWriter {
 					}
 					if (sd.getTurningMoveRestrictions() != null){
 						xmlssd.setTurningMoveRestrictions(fac.createXMLSignalTypeXMLTurningMoveRestrictions());
-						for (Id id : sd.getTurningMoveRestrictions()){
+						for (Id<Link> id : sd.getTurningMoveRestrictions()){
 							XMLIdRefType xmlid = fac.createXMLIdRefType();
 							xmlssd.getTurningMoveRestrictions().getToLink().add(xmlid);
 							xmlid.setRefId(id.toString());

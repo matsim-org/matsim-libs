@@ -30,6 +30,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
@@ -47,7 +48,7 @@ public class SelectHandledAgentsByProbability implements MobsimInitializedListen
 
 	private static final Logger log = Logger.getLogger(SelectHandledAgentsByProbability.class);
 	
-	protected Collection<Id> withinDayAgents;
+	protected Collection<Id<Person>> withinDayAgents;
 
 	protected List<Tuple<Identifier, Double>> identifierProbabilities;	// <Identifier, probability for handling an agent>
 
@@ -69,12 +70,12 @@ public class SelectHandledAgentsByProbability implements MobsimInitializedListen
 
 		Random random = MatsimRandom.getLocalInstance();
 		double probability;
-		Set<Id> agentsToHandle;
+		Set<Id<Person>> agentsToHandle;
 
 		for (Tuple<Identifier, Double> tuple : identifierProbabilities) {
-			agentsToHandle = new LinkedHashSet<Id>();
+			agentsToHandle = new LinkedHashSet<Id<Person>>();
 
-			for (Id agentId : this.withinDayAgents) {
+			for (Id<Person> agentId : this.withinDayAgents) {
 				probability = random.nextDouble();
 				if (probability <= tuple.getSecond()) {
 					agentsToHandle.add(agentId);
@@ -97,7 +98,7 @@ public class SelectHandledAgentsByProbability implements MobsimInitializedListen
 	}
 
 	private void collectAgents(QSim sim) {
-		this.withinDayAgents = new ArrayList<Id>();
+		this.withinDayAgents = new ArrayList<>();
 
 		for (MobsimAgent mobsimAgent : sim.getAgents()) {
 			Logger.getLogger(this.getClass()).fatal("WithinDayAgent is no longer") ;

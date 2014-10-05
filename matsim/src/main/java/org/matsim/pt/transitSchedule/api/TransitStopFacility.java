@@ -49,8 +49,8 @@ public interface TransitStopFacility extends Facility<TransitStopFacility> {
 	 */
 	public String getName();
 
-	public Id getStopPostAreaId();
+	public String getStopPostAreaId();
 
-	public void setStopPostAreaId(Id stopPostAreaId);
+	public void setStopPostAreaId(String stopPostAreaId);
 
 }

@@ -26,7 +26,7 @@ import org.matsim.withinday.trafficmonitoring.TravelTimeCollector.TravelTimeInfo
 
 public interface TravelTimeInfoProvider {
 	
-	/*package*/ TravelTimeInfo getTravelTimeData(final Id linkId);
+	/*package*/ TravelTimeInfo getTravelTimeData(final Id<Link> linkId);
 	
 	/*package*/ TravelTimeInfo getTravelTimeData(final Link link);
 }

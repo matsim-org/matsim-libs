@@ -28,6 +28,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkLanesImpl;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.signalsystems.model.Signal;
 import org.matsim.signalsystems.model.SignalSystem;
 import org.matsim.signalsystems.model.SignalSystemsManager;
@@ -72,7 +73,7 @@ public class QSimSignalEngine implements SignalEngine {
 				else {
 					QLinkLanesImpl l = (QLinkLanesImpl) link;
 //					log.debug("  signal is on lanes: ");
-					for (Id laneId : signal.getLaneIds()){
+					for (Id<Lane> laneId : signal.getLaneIds()){
 //						log.debug("    lane id: " + laneId);
 						SignalizeableItem lane = getQLane(laneId, l);
 						lane.setSignalized(true);
@@ -84,7 +85,7 @@ public class QSimSignalEngine implements SignalEngine {
 		}
 	}
 
-	private SignalizeableItem getQLane(Id laneId, QLinkLanesImpl link){
+	private SignalizeableItem getQLane(Id<Lane> laneId, QLinkLanesImpl link){
 		if (link.getQueueLanes().containsKey(laneId)){
 			return (SignalizeableItem) link.getQueueLanes().get(laneId);
 		}

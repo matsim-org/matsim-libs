@@ -19,6 +19,13 @@
 
 package org.matsim.pt;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -28,8 +35,6 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
-
-import java.util.*;
 
 public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 	private static final Logger log = Logger.getLogger(ReconstructingUmlaufBuilder.class);
@@ -45,10 +50,10 @@ public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 
 	private Collection<TransitLine> transitLines;
 	private Vehicles vehicles;
-	private Map<Id,Umlauf> umlaeufe = null;
+	private Map<Id<Umlauf>,Umlauf> umlaeufe = null;
 	private ArrayList<UmlaufStueck> umlaufStuecke;
 	private UmlaufInterpolator umlaufInterpolator;
-	private Map<Id, Id> umlaufIdsByVehicleId;
+	private Map<Id<Vehicle>, Id<Umlauf>> umlaufIdsByVehicleId;
 
 	public ReconstructingUmlaufBuilder(Network network, Collection<TransitLine> transitLines,
 			Vehicles basicVehicles, PlanCalcScoreConfigGroup config) {
@@ -70,7 +75,7 @@ public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 	private void createUmlaeufe(){
 		int cnt = 0;
 		for (UmlaufStueck umlaufStueck : umlaufStuecke) {
-			Id umlaufId = this.getUmlaufIdForVehicleId(umlaufStueck.getDeparture().getVehicleId());
+			Id<Umlauf> umlaufId = this.getUmlaufIdForVehicleId(umlaufStueck.getDeparture().getVehicleId());
 			if (umlaufId == null) {
 				throw new RuntimeException("UmlaufId could not be found. veh=" + umlaufStueck.getDeparture().getVehicleId());
 			}
@@ -84,11 +89,11 @@ public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 		}
 	}
 	
-	private Id getUmlaufIdForVehicleId(Id vehId){
+	private Id<Umlauf> getUmlaufIdForVehicleId(Id<Vehicle> vehId){
 		return this.umlaufIdsByVehicleId.get(vehId);
 	}
 	
-	private Id createUmlaufIdFromVehicle(Vehicle vehicle){
+	private Id<Umlauf> createUmlaufIdFromVehicle(Vehicle vehicle){
 		Id<Umlauf> id = Id.create(vehicle.getId().toString() + "_" + vehicle.getType().getId().toString(), Umlauf.class);
 		this.umlaufIdsByVehicleId.put(vehicle.getId(), id);
 		return id;

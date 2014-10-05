@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.withinday.replanning.identifiers.interfaces.Identifier;
 import org.matsim.withinday.replanning.parallel.ParallelReplanner;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplannerFactory;
 import org.matsim.withinday.replanning.replanners.tools.ReplanningTask;
 
@@ -36,7 +37,7 @@ public abstract class WithinDayReplanningModule<T extends WithinDayReplannerFact
 	public void doReplanning(double time) {
 		for (T factory : this.parallelReplanner.getWithinDayReplannerFactories()) {
 			Set<? extends Identifier> identifiers = factory.getIdentifers(); 
-			Id id = factory.getId();
+			Id<WithinDayReplanner> id = factory.getId();
 			
 			for (Identifier identifier : identifiers) {
 				for (MobsimAgent withinDayAgent : identifier.getAgentsToReplan(time)) {					

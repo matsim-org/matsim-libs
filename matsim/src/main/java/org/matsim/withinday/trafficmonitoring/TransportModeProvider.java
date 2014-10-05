@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * Returns an agent's current transport mode or null if the agent is performing an activity. 
@@ -38,9 +39,9 @@ import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
  */
 public class TransportModeProvider implements PersonArrivalEventHandler, PersonDepartureEventHandler, PersonStuckEventHandler {
 
-	private final Map<Id, String> transportModes = new ConcurrentHashMap<Id, String>();
+	private final Map<Id<Person>, String> transportModes = new ConcurrentHashMap<Id<Person>, String>();
 	
-	public String getTransportMode(Id agentId) {
+	public String getTransportMode(Id<Person> agentId) {
 		return this.transportModes.get(agentId);
 	}
 	

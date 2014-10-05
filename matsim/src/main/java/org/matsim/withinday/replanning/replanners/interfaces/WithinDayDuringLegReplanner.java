@@ -30,7 +30,7 @@ import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifie
  */
 public abstract class WithinDayDuringLegReplanner extends WithinDayReplanner<DuringLegIdentifier> {
 
-	public WithinDayDuringLegReplanner(Id id, Scenario scenario, InternalInterface internalInterface) {
+	public WithinDayDuringLegReplanner(Id<WithinDayReplanner> id, Scenario scenario, InternalInterface internalInterface) {
 		super(id, scenario, internalInterface);
 	}
 	

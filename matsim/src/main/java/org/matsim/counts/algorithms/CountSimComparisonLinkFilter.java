@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Vector;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.counts.CountSimComparison;
 
 /**
@@ -38,7 +39,7 @@ import org.matsim.counts.CountSimComparison;
  */
 public class CountSimComparisonLinkFilter {
 
-	private Hashtable<Id, List<CountSimComparison>> countSimComparisonLinkMap;
+	private Hashtable<Id<Link>, List<CountSimComparison>> countSimComparisonLinkMap;
 	
 	/**
 	 * The list containing the comparisons
@@ -53,14 +54,14 @@ public class CountSimComparisonLinkFilter {
 	 */
 	public CountSimComparisonLinkFilter(final List<CountSimComparison> countSimComparisons) {
 		this.countSimComparisons = countSimComparisons;
-		this.countSimComparisonLinkMap=new Hashtable<Id, List<CountSimComparison>>();
+		this.countSimComparisonLinkMap=new Hashtable<>();
 		
 		if (this.countSimComparisons.size() < 1) {
 			return;
 		}
 
 		List<CountSimComparison> countSimComparisonsPerLink=new Vector<CountSimComparison>();
-		Id prevId=this.countSimComparisons.get(0).getId();
+		Id<Link> prevId=this.countSimComparisons.get(0).getId();
 		
 		Iterator<CountSimComparison> csc_it = this.countSimComparisons.iterator();		
 		while (csc_it.hasNext()) {
@@ -85,7 +86,7 @@ public class CountSimComparisonLinkFilter {
 	 * @param linkfilter
 	 * @return All counts if the parameter is null, else a subset of all counts for the given link
 	 */
-	public List<CountSimComparison> getCountsForLink(final Id linkfilter) {
+	public List<CountSimComparison> getCountsForLink(final Id<Link> linkfilter) {
 		// only need to do this once
 		if (linkfilter == null) {
 			return this.countSimComparisons;
@@ -93,7 +94,7 @@ public class CountSimComparisonLinkFilter {
 		return this.countSimComparisonLinkMap.get(linkfilter);
 	}
 	
-	public double getAggregatedCountValue(final Id linkfilter) {
+	public double getAggregatedCountValue(final Id<Link> linkfilter) {
 		Iterator<CountSimComparison> csc_it = this.countSimComparisonLinkMap.get(linkfilter).iterator();		
 		double countValue=0.0;
 		while (csc_it.hasNext()) {
@@ -103,7 +104,7 @@ public class CountSimComparisonLinkFilter {
 		return countValue;
 	}
 	
-	public double getAggregatedSimValue(final Id linkfilter) {
+	public double getAggregatedSimValue(final Id<Link> linkfilter) {
 		Iterator<CountSimComparison> csc_it = this.countSimComparisonLinkMap.get(linkfilter).iterator();		
 		double simValue=0.0;
 		while (csc_it.hasNext()) {
@@ -114,9 +115,9 @@ public class CountSimComparisonLinkFilter {
 	}
 	
 	// sorting ok for IdIs ?
-	public Vector<Id> getLinkIds() {
-		Vector<Id> linkIds = new Vector<Id>(countSimComparisonLinkMap.keySet());
+	public Vector<Id<Link>> getLinkIds() {
+		Vector<Id<Link>> linkIds = new Vector<Id<Link>>(countSimComparisonLinkMap.keySet());
 	    Collections.sort(linkIds);    
-	    return linkIds;		
+	    return linkIds;
 	}
 }

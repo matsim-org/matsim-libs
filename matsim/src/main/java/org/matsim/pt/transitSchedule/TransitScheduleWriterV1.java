@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.internal.MatsimSomeWriter;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.Tuple;
@@ -155,7 +156,7 @@ public class TransitScheduleWriterV1 extends MatsimXmlWriter implements MatsimSo
 			attributes.add(this.createTuple(Constants.REF_ID, route.getStartLinkId().toString()));
 			this.writeStartTag(Constants.LINK, attributes, true);
 
-			for (Id linkId : route.getLinkIds()) {
+			for (Id<Link> linkId : route.getLinkIds()) {
 				attributes.clear();
 				attributes.add(this.createTuple(Constants.REF_ID, linkId.toString()));
 				this.writeStartTag(Constants.LINK, attributes, true);

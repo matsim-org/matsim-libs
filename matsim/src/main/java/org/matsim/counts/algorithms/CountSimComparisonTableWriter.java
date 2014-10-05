@@ -31,6 +31,7 @@ import java.util.Locale;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.counts.CountSimComparison;
 
 /**
@@ -146,11 +147,11 @@ public class CountSimComparisonTableWriter extends CountSimComparisonWriter {
 			out.write("Link Id\tMATSIM volumes\tCount volumes");
 			out.write(NEWLINE);
 
-			Iterator<Id> id_it = new CountSimComparisonLinkFilter(
+			Iterator<Id<Link>> id_it = new CountSimComparisonLinkFilter(
 					this.countComparisonFilter.getCountsForHour(null)).getLinkIds().iterator();
 
 			while (id_it.hasNext()) {
-				Id id= id_it.next();
+				Id<Link> id= id_it.next();
 				out.write(id.toString());
 				out.write(SEPARATOR);
 				out.write(this.numberFormat.format(linkFilter.getAggregatedSimValue(id)));

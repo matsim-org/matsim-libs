@@ -38,8 +38,8 @@ public class EmptyAmberLogicImpl implements AmberLogic {
 	}
 
 	@Override
-	public Set<SignalGroupStateChangeRequest> processDropping(double timeSec, Id systemId,
-			Id signalGroupId) {
+	public Set<SignalGroupStateChangeRequest> processDropping(double timeSec, Id<SignalSystem> systemId,
+			Id<SignalGroup> signalGroupId) {
 		Set<SignalGroupStateChangeRequest> ret = new HashSet<SignalGroupStateChangeRequest>();
 		SignalGroupStateChangeRequest redRequest = new SignalGroupStateChangeRequestImpl(signalGroupId, SignalGroupState.RED, 
 				timeSec);
@@ -48,8 +48,8 @@ public class EmptyAmberLogicImpl implements AmberLogic {
 	}
 
 	@Override
-	public Set<SignalGroupStateChangeRequest> processOnsets(double timeSeconds, Id systemId,
-			Id signalGroupId) {
+	public Set<SignalGroupStateChangeRequest> processOnsets(double timeSeconds, Id<SignalSystem> systemId,
+			Id<SignalGroup> signalGroupId) {
 		Set<SignalGroupStateChangeRequest> ret = new HashSet<SignalGroupStateChangeRequest>();
 		SignalGroupStateChangeRequest redRequest = new SignalGroupStateChangeRequestImpl(signalGroupId, SignalGroupState.GREEN, 
 				timeSeconds);

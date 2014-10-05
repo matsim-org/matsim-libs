@@ -70,7 +70,7 @@ public class ActivityReplanningMap implements PersonStuckEventHandler,
 	 * However, this will result in few unnecessary lookups for agents who end their
 	 * activity in the same time step as they start it. 
 	 */
-	private final Map<Id, MobsimAgent> startingAgents;	// PersonId
+	private final Map<Id<Person>, MobsimAgent> startingAgents;	// PersonId
 
 	/*
 	 * Contains activity end times of agents that are currently performing an activity.
@@ -84,7 +84,7 @@ public class ActivityReplanningMap implements PersonStuckEventHandler,
 	 * Contains a map for each time bin (a bin equals a time step in the mobility simulation).
 	 * The set contains all agents ending their activity in that time bin.
 	 */
-	private final Map<Integer, Map<Id, MobsimAgent>> activityPerformingAgents;
+	private final Map<Integer, Map<Id<Person>, MobsimAgent>> activityPerformingAgents;
 	
 	// package protected to be accessible for test case
 	/*package*/ double simStartTime = Time.UNDEFINED_TIME;
@@ -98,7 +98,7 @@ public class ActivityReplanningMap implements PersonStuckEventHandler,
 		this.startingAgents = new HashMap<>();
 		this.activityEndTimes = new HashMap<>();
 		
-		this.activityPerformingAgents = new ConcurrentHashMap<Integer, Map<Id, MobsimAgent>>();
+		this.activityPerformingAgents = new ConcurrentHashMap<Integer, Map<Id<Person>, MobsimAgent>>();
 	}
 
 	/*
@@ -123,7 +123,7 @@ public class ActivityReplanningMap implements PersonStuckEventHandler,
 			this.activityEndTimes.put(mobsimAgent.getId(), activityEndTime);
 			
 			int bin = this.getTimeBin(activityEndTime);
-			Map<Id, MobsimAgent> map = getMapForTimeBin(bin);
+			Map<Id<Person>, MobsimAgent> map = getMapForTimeBin(bin);
 			map.put(mobsimAgent.getId(), mobsimAgent);
 		}
 		
@@ -150,7 +150,7 @@ public class ActivityReplanningMap implements PersonStuckEventHandler,
 			if (departureTime >= now) {
 				this.activityEndTimes.put(mobsimAgent.getId(), departureTime);
 				int bin = this.getTimeBin(mobsimAgent.getActivityEndTime());
-				Map<Id, MobsimAgent> map = getMapForTimeBin(bin);
+				Map<Id<Person>, MobsimAgent> map = getMapForTimeBin(bin);
 				map.put(mobsimAgent.getId(), mobsimAgent);
 			} else {
 				log.warn("Departure time is in the past - ignoring activity!");
@@ -192,10 +192,10 @@ public class ActivityReplanningMap implements PersonStuckEventHandler,
 		return bin;
 	}
 	
-	private Map<Id, MobsimAgent> getMapForTimeBin(int bin) {
-		Map<Id, MobsimAgent> map = this.activityPerformingAgents.get(bin);
+	private Map<Id<Person>, MobsimAgent> getMapForTimeBin(int bin) {
+		Map<Id<Person>, MobsimAgent> map = this.activityPerformingAgents.get(bin);
 		if (map == null) {
-			map = new HashMap<Id, MobsimAgent>();
+			map = new HashMap<>();
 			this.activityPerformingAgents.put(bin, map);
 		}
 		return map;
@@ -207,7 +207,7 @@ public class ActivityReplanningMap implements PersonStuckEventHandler,
 	 */
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
-		Id agentId = event.getPersonId();
+		Id<Person> agentId = event.getPersonId();
 		this.startingAgents.put(agentId, this.mobsimDataProvider.getAgent(agentId));
 	}
 
@@ -217,12 +217,12 @@ public class ActivityReplanningMap implements PersonStuckEventHandler,
 	 */
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		Id agentId = event.getPersonId();
+		Id<Person> agentId = event.getPersonId();
 		this.startingAgents.remove(agentId);
 		
 		Double activityEndTime = this.activityEndTimes.remove(agentId);
 		if (activityEndTime != null) {
-			Map<Id, MobsimAgent> map;
+			Map<Id<Person>, MobsimAgent> map;
 			// remove
 			map = this.getMapForTimeBin(this.getTimeBin(activityEndTime));
 			map.remove(agentId);
@@ -251,7 +251,7 @@ public class ActivityReplanningMap implements PersonStuckEventHandler,
 				this.activityEndTimes.put(agent.getId(), agent.getActivityEndTime());
 				
 				// Update the activity performing agents map. To do so, remove old entry and add new one.
-				Map<Id, MobsimAgent> map;				
+				Map<Id<Person>, MobsimAgent> map;				
 				// remove
 				map = this.getMapForTimeBin(this.getTimeBin(activityEndTime));
 				map.remove(agent.getId());

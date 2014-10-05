@@ -35,7 +35,7 @@ public interface SignalModelFactory {
 	
 	public SignalSystemsManager createSignalSystemsManager();
 	
-	public SignalSystem createSignalSystem(Id id);
+	public SignalSystem createSignalSystem(Id<SignalSystem> id);
 	
 	public SignalController createSignalSystemController(String controllerIdentifier);
 

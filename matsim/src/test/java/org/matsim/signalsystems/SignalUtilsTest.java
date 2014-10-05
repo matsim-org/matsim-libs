@@ -47,7 +47,7 @@ public class SignalUtilsTest {
 		SignalsData signals = new SignalsDataImpl(ConfigUtils.createConfig().signalSystems());
 		SignalSystemsDataFactory fac = signals.getSignalSystemsData().getFactory();
 		SignalSystemData system = fac.createSignalSystemData(id1);
-		SignalData signal = fac.createSignalData(id1);
+		SignalData signal = fac.createSignalData(Id.create(id1, Signal.class));
 		system.addSignalData(signal);
 		signal = fac.createSignalData(id3);
 		system.addSignalData(signal);

@@ -275,9 +275,9 @@ public class InvertedNetworkRoutingTest {
 			this.scenario.addScenarioElement(SignalsData.ELEMENT_NAME, signalsData);
 			SignalSystemsData ssd = signalsData.getSignalSystemsData();
 			SignalSystemsDataFactory f = ssd.getFactory();
-			SignalSystemData system = f.createSignalSystemData(Id.create(2, SignalSystemData.class));
+			SignalSystemData system = f.createSignalSystemData(Id.create(2, SignalSystem.class));
 			ssd.addSignalSystemData(system);
-			SignalData signal = f.createSignalData(Id.create(1, SignalData.class));
+			SignalData signal = f.createSignalData(Id.create(1, Signal.class));
 			signal.setLinkId(Id.create(12, Link.class));
 			signal.addTurningMoveRestriction(Id.create(25, Link.class));
 			system.addSignalData(signal);

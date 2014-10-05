@@ -22,6 +22,7 @@ package org.matsim.lanes.data.v11;
 import java.util.SortedMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
 
 /**
@@ -35,7 +36,7 @@ public interface LaneDefinitions11 extends MatsimToplevelContainer {
 	 *
 	 * @return Map with Link Ids as keys and assignments as values
 	 */
-	public SortedMap<Id, LanesToLinkAssignment11> getLanesToLinkAssignments();
+	public SortedMap<Id<Link>, LanesToLinkAssignment11> getLanesToLinkAssignments();
 
 	/**
 	 * Adds a LanesToLinkAssignment to the container.

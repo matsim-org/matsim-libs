@@ -20,6 +20,13 @@
 
 package playground.christoph.households;
 
+import java.io.IOException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -40,9 +47,6 @@ import org.matsim.population.filters.PersonIntersectAreaFilter;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
-
-import java.io.IOException;
-import java.util.*;
 
 /**
  * Creates diluted cut scenario that where only households are removed if no 
@@ -77,7 +81,7 @@ public class CreateDilutedHouseholdCut {
 
 		log.info("  calculate area of interest... ");
 		final CoordImpl center = new CoordImpl(xCoord, yCoord);
-		final Map<Id, Link> areaOfInterest = new HashMap<Id, Link>();
+		final Map<Id<Link>, Link> areaOfInterest = new HashMap<>();
 		log.info("    => area of interest (aoi): center=" + center + "; radius=" + radius);
 
 		log.info("    extracting links of the aoi... " + (new Date()));

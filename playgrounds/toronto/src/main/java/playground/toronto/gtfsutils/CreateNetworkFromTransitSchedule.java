@@ -187,7 +187,7 @@ public class CreateNetworkFromTransitSchedule {
 				}
 				IdImpl newId = new IdImpl(toFacility.getId().toString() + "." + Integer.toString(copies.size() + 1));
 				TransitStopFacility newFacility = this.schedule.getFactory().createTransitStopFacility(newId, toFacility.getCoord(), toFacility.getIsBlockingLane());
-				newFacility.setStopPostAreaId(toFacility.getId());
+				newFacility.setStopPostAreaId(toFacility.getId().toString());
 				newFacility.setLinkId(link.getId());
 				newFacility.setName(toFacility.getName());
 				copies.add(newFacility);

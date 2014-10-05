@@ -59,7 +59,7 @@ public abstract class ReplanningRunnable implements Runnable {
 	 *  Threads. Each agents has references to the original Replanners,
 	 *  so we have to identify the corresponding clone! 
 	 */
-	protected Map<Id, WithinDayReplanner<? extends Identifier>> withinDayReplanners = new HashMap<Id, WithinDayReplanner<? extends Identifier>>();
+	protected Map<Id<WithinDayReplanner>, WithinDayReplanner<? extends Identifier>> withinDayReplanners = new HashMap<>();
 	
 	/*
 	 * Use one List of ReplanningTasks per WithinDayReplanner. By doing so
@@ -68,7 +68,7 @@ public abstract class ReplanningRunnable implements Runnable {
 	 * different Replanners on different Threads could try to replan the
 	 * same Agent.
 	 */
-	protected Map<Id, Queue<ReplanningTask>> replanningTasks = new TreeMap<Id, Queue<ReplanningTask>>();
+	protected Map<Id<WithinDayReplanner>, Queue<ReplanningTask>> replanningTasks = new TreeMap<>();
 	protected WithinDayReplanner<Identifier> withinDayReplanner;
 	protected EventsManager eventsManager;
 	
@@ -110,7 +110,7 @@ public abstract class ReplanningRunnable implements Runnable {
 		this.replanningTasks.put(withinDayReplanner.getId(), queue);
 	}
 	
-	public final void removeWithinDayReplanner(Id replannerId) {
+	public final void removeWithinDayReplanner(Id<WithinDayReplanner> replannerId) {
 		this.withinDayReplanners.remove(replannerId);
 		this.replanningTasks.remove(replannerId);
 	}
@@ -136,9 +136,9 @@ public abstract class ReplanningRunnable implements Runnable {
 	 */
 	private final void doReplanning() throws InterruptedException, BrokenBarrierException {
 
-		for (Entry<Id, Queue<ReplanningTask>> entry : this.replanningTasks.entrySet()) {
+		for (Entry<Id<WithinDayReplanner>, Queue<ReplanningTask>> entry : this.replanningTasks.entrySet()) {
 			
-			Id withinDayReplannerId = entry.getKey();
+			Id<WithinDayReplanner> withinDayReplannerId = entry.getKey();
 			Queue<ReplanningTask> queue = entry.getValue();
 			
 			WithinDayReplanner<? extends Identifier> withinDayReplanner = this.withinDayReplanners.get(withinDayReplannerId);

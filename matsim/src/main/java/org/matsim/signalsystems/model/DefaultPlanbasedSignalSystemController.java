@@ -43,7 +43,7 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 	
 	public static final String IDENTIFIER = "DefaultPlanbasedSignalSystemController";
 	private Queue<SignalPlan> planQueue = null;
-	private Map<Id, SignalPlan> plans = null;
+	private Map<Id<SignalPlan>, SignalPlan> plans = null;
 	private SignalSystem signalSystem = null;
 	private SignalPlan activePlan = null;
 	private double nextActivePlanCheckTime;
@@ -57,25 +57,25 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 		}
 		if (this.activePlan != null){
 //		log.error("update state of system: " + this.signalSystem.getId());
-			List<Id> droppingGroupIds = this.activePlan.getDroppings(timeSeconds);
+			List<Id<SignalGroup>> droppingGroupIds = this.activePlan.getDroppings(timeSeconds);
 			this.processDroppingGroupIds(timeSeconds, droppingGroupIds);
 			
-			List<Id> onsetGroupIds = this.activePlan.getOnsets(timeSeconds);
+			List<Id<SignalGroup>> onsetGroupIds = this.activePlan.getOnsets(timeSeconds);
 			this.processOnsetGroupIds(timeSeconds, onsetGroupIds);
 		}
 	}
 	
-	private void processOnsetGroupIds(double timeSeconds, List<Id> onsetGroupIds) {
+	private void processOnsetGroupIds(double timeSeconds, List<Id<SignalGroup>> onsetGroupIds) {
 		if (onsetGroupIds != null){
-			for (Id id : onsetGroupIds){
+			for (Id<SignalGroup> id : onsetGroupIds){
 				this.signalSystem.scheduleOnset(timeSeconds, id);
 			}
 		}		
 	}
 
-	private void processDroppingGroupIds(double timeSeconds, List<Id> droppingGroupIds){
+	private void processDroppingGroupIds(double timeSeconds, List<Id<SignalGroup>> droppingGroupIds){
 		if (droppingGroupIds != null){
-			for (Id id : droppingGroupIds){
+			for (Id<SignalGroup> id : droppingGroupIds){
 				this.signalSystem.scheduleDropping(timeSeconds, id);
 			}
 		}
@@ -143,7 +143,7 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 	public void addPlan(SignalPlan plan) {
 //		log.error("addPlan to system : " + this.signalSystem.getId());
 		if (this.plans == null){
-			this.plans = new HashMap<Id, SignalPlan>();
+			this.plans = new HashMap<>();
 			this.activePlan = plan;
 		}
 		this.plans.put(plan.getId(), plan);
@@ -161,6 +161,8 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 
 	
 	private static class SignalPlanStartTimeComparator implements Comparator<SignalPlan>, Serializable {
+
+		private static final long serialVersionUID = 1L;
 
 		@Override
 		public int compare(SignalPlan p1, SignalPlan p2) {
