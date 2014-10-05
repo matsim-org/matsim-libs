@@ -27,18 +27,18 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.meisterk.org.matsim.enterprisecensus.EnterpriseCensus;
-import playground.meisterk.org.matsim.enterprisecensus.EnterpriseCensusParser;
 import playground.meisterk.org.matsim.enterprisecensus.EnterpriseCensus.ProductionSector;
+import playground.meisterk.org.matsim.enterprisecensus.EnterpriseCensusParser;
 import playground.meisterk.org.matsim.run.facilities.FacilitiesProductionKTI;
 import playground.meisterk.org.matsim.run.facilities.FacilitiesProductionKTI.KTIYear;
 
@@ -212,13 +212,13 @@ public class FacilitiesAllActivitiesFTE {
 					tempFacilityId = tempFacilities_it.next();
 					attributeId = this.getAttributeIdFromTemporaryFacilityID(tempFacilityId);
 					f = facilities.createAndAddFacility(
-							new IdImpl(this.getNumberFromTemporaryFacilityID(tempFacilityId)),
+							Id.create(this.getNumberFromTemporaryFacilityID(tempFacilityId), ActivityFacility.class),
 							new CoordImpl(X, Y));
 
 					if (ktiYear.equals(KTIYear.KTI_YEAR_2007)) {
 						// create the work activity and its capacity according to all the computation done before
 						a = f.createActivityOption("work");
-						a.setCapacity((double) tempFacilities.get(tempFacilityId));
+						a.setCapacity(tempFacilities.get(tempFacilityId));
 
 						// create the other activities
 						if (this.facilityActivities.containsKey(attributeId)) {
@@ -247,7 +247,7 @@ public class FacilitiesAllActivitiesFTE {
 						} else if(sector.equals(ProductionSector.SECTOR3)) {
 							a = f.createActivityOption(FacilitiesProductionKTI.WORK_SECTOR3);
 						}
-						a.setCapacity((double) tempFacilities.get(tempFacilityId));
+						a.setCapacity(tempFacilities.get(tempFacilityId));
 
 						// add more activities as planned for KTI Year 2008
 						if (this.facilityActivities.containsKey(activityId)) {
@@ -257,7 +257,7 @@ public class FacilitiesAllActivitiesFTE {
 							// so capacity depends on the number of people working somewhere
 							// this is especially opposed to using sales area as trip attraction/trip production parameter
 							// as used in established transport models
-							a.setCapacity((double) (tempFacilities.get(tempFacilityId) * (10 + random.nextInt(10))));
+							a.setCapacity(tempFacilities.get(tempFacilityId) * (10 + random.nextInt(10)));
 						}
 					}
 

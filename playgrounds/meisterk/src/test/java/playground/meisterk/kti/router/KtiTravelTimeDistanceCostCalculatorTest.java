@@ -23,9 +23,10 @@ package playground.meisterk.kti.router;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkImpl;
@@ -40,8 +41,8 @@ import playground.meisterk.kti.config.KtiConfigGroup;
 
 public class KtiTravelTimeDistanceCostCalculatorTest extends MatsimTestCase {
 
-	private static final Id TEST_LINK_ID = new IdImpl(1);
-	private static final Id DUMMY_PERSON_ID = new IdImpl(1000);
+	private static final Id<Link> TEST_LINK_ID = Id.create(1, Link.class);
+	private static final Id<Person> DUMMY_PERSON_ID = Id.create(1000, Person.class);
 
 	private NetworkImpl network = null;
 	private KtiTravelTimeDistanceCostCalculator testee = null;
@@ -51,8 +52,8 @@ public class KtiTravelTimeDistanceCostCalculatorTest extends MatsimTestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		this.network = NetworkImpl.createNetwork();
-		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(1000.0, 1000.0));
-		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(2000.0, 1000.0));
+		Node node1 = network.createAndAddNode(Id.create(1, Node.class), new CoordImpl(1000.0, 1000.0));
+		Node node2 = network.createAndAddNode(Id.create(2, Node.class), new CoordImpl(2000.0, 1000.0));
 		network.createAndAddLink(TEST_LINK_ID, node1, node2, 1000.0, 50.0/3.6, 2000.0, 1);
 
 		Config config = new Config();

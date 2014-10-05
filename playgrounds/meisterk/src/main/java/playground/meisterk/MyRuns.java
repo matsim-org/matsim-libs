@@ -27,8 +27,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -37,7 +39,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
@@ -50,7 +51,6 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -153,11 +153,11 @@ public class MyRuns {
 
 		NodeImpl node = null;
 
-		node = new NodeImpl(new IdImpl(1));
+		node = new NodeImpl(Id.create(1, Node.class));
 		node.setCoord(new CoordImpl(-824635.0, -799519.0));
 		network.addNode(node);
 
-		node = new NodeImpl(new IdImpl(2));
+		node = new NodeImpl(Id.create(2, Node.class));
 		node.setCoord(new CoordImpl(2732681.5, 2625289.25));
 		network.addNode(node);
 
@@ -242,7 +242,7 @@ public class MyRuns {
 //				for (String timingModule : VARY_TIME_MODULE) {
 //					Controler testee = new PhDControler(args);
 //
-//					StrategySettings timingStrategy = new StrategySettings(new IdImpl(3));
+//					StrategySettings timingStrategy = new StrategySettings(Id.create(3));
 //					timingStrategy.setModuleName(timingModule);
 //					timingStrategy.setProbability(0.1);
 //					testee.getConfig().strategy().addStrategySettings(timingStrategy);

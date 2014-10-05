@@ -23,11 +23,12 @@ package playground.meisterk.kti.router;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.matrices.Entry;
+
+import playground.balmermi.world.Zone;
 
 public class KtiPtRoute extends GenericRouteImpl {
 
@@ -96,11 +97,11 @@ public class KtiPtRoute extends GenericRouteImpl {
 		super.setRouteDescription(startLinkId, routeDescription, endLinkId);
 		if (routeDescription.startsWith(IDENTIFIER)) {
 			String[] routeDescriptionArray = StringUtils.explode(routeDescription, SEPARATOR);
-			this.fromStop = plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(new IdImpl(routeDescriptionArray[1]));
-			this.fromMunicipality = plansCalcRouteKtiInfo.getLocalWorld().getLayer("municipality").getLocation(new IdImpl(routeDescriptionArray[2]));
+			this.fromStop = plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(routeDescriptionArray[1]);
+			this.fromMunicipality = plansCalcRouteKtiInfo.getLocalWorld().getLayer("municipality").getLocation(Id.create(routeDescriptionArray[2], Zone.class));
 			this.inVehicleTime = Double.parseDouble(routeDescriptionArray[3]);
-			this.toMunicipality = plansCalcRouteKtiInfo.getLocalWorld().getLayer("municipality").getLocation(new IdImpl(routeDescriptionArray[4]));
-			this.toStop = plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(new IdImpl(routeDescriptionArray[5]));
+			this.toMunicipality = plansCalcRouteKtiInfo.getLocalWorld().getLayer("municipality").getLocation(Id.create(routeDescriptionArray[4], Zone.class));
+			this.toStop = plansCalcRouteKtiInfo.getHaltestellen().getHaltestelle(routeDescriptionArray[5]);
 		} else {
 			this.fromStop = null;
 			this.fromMunicipality = null;

@@ -33,13 +33,13 @@ import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcAverageTripLength;
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -128,13 +128,13 @@ public class CompareScenarios {
 	private final TreeMap<Integer, String> analysisNames = new TreeMap<Integer, String>();
 
 	// analysisRegions
-	private final HashSet<Id> weststrasseLinkIds = new HashSet<Id>();
+	private final HashSet<Id<Link>> weststrasseLinkIds = new HashSet<>();
 
 	private final TreeMap<String, String> plansInputFilenames = new TreeMap<String, String>();
 	private final TreeMap<String, String> eventsInputFilenames = new TreeMap<String, String>();
 	private final TreeMap<String, String> networkInputFilenames = new TreeMap<String, String>();
 	private final TreeMap<String, String> linkSetFilenames = new TreeMap<String, String>();
-	private final TreeMap<String, HashSet<Id>> linkSets = new TreeMap<String, HashSet<Id>>();
+	private final TreeMap<String, HashSet<Id<Link>>> linkSets = new TreeMap<>();
 	private final TreeMap<String, String> linkSetNames = new TreeMap<String, String>();
 
 	private String scenarioComparisonFilename = null;
@@ -257,7 +257,7 @@ public class CompareScenarios {
 		List<String> lines = new ArrayList<String>();
 
 		File linkSetFile = null;
-		HashSet<Id> linkSet = null;
+		HashSet<Id<Link>> linkSet = null;
 
 		for (String scenarioName : this.scenarioNames) {
 
@@ -267,10 +267,10 @@ public class CompareScenarios {
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
-			linkSet = new HashSet<Id>();
+			linkSet = new HashSet<Id<Link>>();
 			for (String line : lines) {
 				try {
-					linkSet.add(new IdImpl(Integer.parseInt(line, 10)));
+					linkSet.add(Id.create(Integer.parseInt(line, 10), Link.class));
 				} catch (NumberFormatException e) {
 					log.info("Reading in " + line + " link set...");
 					this.linkSetNames.put(scenarioName, line);
@@ -289,7 +289,7 @@ public class CompareScenarios {
 //		linkSet = new HashSet<Id>();
 		for (String line : lines) {
 			try {
-				this.weststrasseLinkIds.add(new IdImpl(Integer.parseInt(line)));
+				this.weststrasseLinkIds.add(Id.create(Integer.parseInt(line), Link.class));
 			} catch (NumberFormatException e) {
 				log.info("Reading in " + line + " link set...");
 			}

@@ -31,10 +31,13 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.BasicLocation;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -507,7 +510,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 	}
 
 	private PlanImpl generateTestPlan(String facString, NetworkImpl network) {
-		PersonImpl person = new PersonImpl(new IdImpl("1000"));
+		PersonImpl person = new PersonImpl(Id.create("1000", Person.class));
 		PlanomatConfigGroup.TripStructureAnalysisLayerOption tripStructureAnalysisLayer = this.planomatConfigGroup.getTripStructureAnalysisLayer();
 		BasicLocation location = null;
 		ActivityImpl act = null;
@@ -516,7 +519,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 
 		String[] locationIdSequence = facString.split(" ");
 		for (int aa=0; aa < locationIdSequence.length; aa++) {
-			location = network.getLinks().get(new IdImpl(locationIdSequence[aa]));
+			location = network.getLinks().get(Id.create(locationIdSequence[aa], Link.class));
 			if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(tripStructureAnalysisLayer)) {
 				act = plan.createAndAddActivity("actAtFacility" + locationIdSequence[aa]);
 				act.setFacilityId(location.getId());
@@ -532,7 +535,7 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 	}
 
 	private PlanImpl generateTestPlan(String facString, ActivityFacilitiesImpl facilities) {
-		PersonImpl person = new PersonImpl(new IdImpl("1000"));
+		PersonImpl person = new PersonImpl(Id.create("1000", Person.class));
 		PlanomatConfigGroup.TripStructureAnalysisLayerOption tripStructureAnalysisLayer = this.planomatConfigGroup.getTripStructureAnalysisLayer();
 		BasicLocation location = null;
 		ActivityImpl act = null;
@@ -541,12 +544,12 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 		
 		String[] locationIdSequence = facString.split(" ");
 		for (int aa=0; aa < locationIdSequence.length; aa++) {
-			location = facilities.getFacilities().get(new IdImpl(locationIdSequence[aa]));
+			location = facilities.getFacilities().get(Id.create(locationIdSequence[aa], ActivityFacility.class));
 			if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.facility.equals(tripStructureAnalysisLayer)) {
 				act = plan.createAndAddActivity("actAtFacility" + locationIdSequence[aa]);
 				act.setFacilityId(location.getId());
 			} else if (PlanomatConfigGroup.TripStructureAnalysisLayerOption.link.equals(tripStructureAnalysisLayer)) {
-				act = plan.createAndAddActivity("actOnLink" + locationIdSequence[aa], location.getId());
+				act = plan.createAndAddActivity("actOnLink" + locationIdSequence[aa], Id.create(location.getId(), Link.class));
 			}
 			act.setEndTime(10*3600);
 			if (aa != (locationIdSequence.length - 1)) {

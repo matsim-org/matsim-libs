@@ -23,11 +23,12 @@ package playground.meisterk.org.matsim.population.algorithms;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -56,13 +57,13 @@ public class PopulationLegDistanceDistributionTest extends MatsimTestCase {
 	public void testGenerationDistribution() {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl testNetwork = (NetworkImpl) scenario.getNetwork();
-		Node node1 = testNetwork.createAndAddNode(new IdImpl("1"), new CoordImpl(0.0, 0.0));
-		Node node2 = testNetwork.createAndAddNode(new IdImpl("2"), new CoordImpl(500.0, 500.0));
-		Node node3 = testNetwork.createAndAddNode(new IdImpl("3"), new CoordImpl(1000.0, 1000.0));
-		Link startLink = testNetwork.createAndAddLink(new IdImpl("101"), node1, node2, 500.0, 27.7778, 2000.0, 1.0);
-		Link endLink = testNetwork.createAndAddLink(new IdImpl("102"), node2, node3, 1000.0, 27.7778, 2000.0, 1.0);
+		Node node1 = testNetwork.createAndAddNode(Id.create("1", Node.class), new CoordImpl(0.0, 0.0));
+		Node node2 = testNetwork.createAndAddNode(Id.create("2", Node.class), new CoordImpl(500.0, 500.0));
+		Node node3 = testNetwork.createAndAddNode(Id.create("3", Node.class), new CoordImpl(1000.0, 1000.0));
+		Link startLink = testNetwork.createAndAddLink(Id.create("101", Link.class), node1, node2, 500.0, 27.7778, 2000.0, 1.0);
+		Link endLink = testNetwork.createAndAddLink(Id.create("102", Link.class), node2, node3, 1000.0, 27.7778, 2000.0, 1.0);
 
-		PersonImpl testPerson = new PersonImpl(new IdImpl("1000"));
+		PersonImpl testPerson = new PersonImpl(Id.create("1000", Person.class));
 		PlanImpl testPlan = testPerson.createAndAddPlan(true);
 
 		ActivityImpl act = testPlan.createAndAddActivity("startActivity", startLink.getId());

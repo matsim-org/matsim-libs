@@ -28,7 +28,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.AbstractNetworkRouteTest;
@@ -59,8 +58,8 @@ public class KtiNodeNetworkRouteImplTest extends AbstractNetworkRouteTest {
 		expectedDistances.put(PlanomatConfigGroup.SimLegInterpretation.CetinCompatible, 6000.0);
 
 		NetworkImpl network = createTestNetwork();
-		Link link1 = network.getLinks().get(new IdImpl("1"));
-		Link link4 = network.getLinks().get(new IdImpl("4"));
+		Link link1 = network.getLinks().get(Id.create("1", Link.class));
+		Link link4 = network.getLinks().get(Id.create("4", Link.class));
 		link4.setLength(2000.0);
 
 		for (PlanomatConfigGroup.SimLegInterpretation simLegInterpretation : expectedDistances.keySet()) {
@@ -98,7 +97,7 @@ public class KtiNodeNetworkRouteImplTest extends AbstractNetworkRouteTest {
 	}
 
 	@Override
-	protected NetworkRoute getNetworkRouteInstance(Id fromLinkId, Id toLinkId,
+	protected NetworkRoute getNetworkRouteInstance(Id<Link> fromLinkId, Id<Link> toLinkId,
 			NetworkImpl network) {
 		return new KtiLinkNetworkRouteImpl(fromLinkId, toLinkId, network, this.config.getSimLegInterpretation());
 

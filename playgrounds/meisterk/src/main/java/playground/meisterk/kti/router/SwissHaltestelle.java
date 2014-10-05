@@ -21,20 +21,19 @@
 package playground.meisterk.kti.router;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 
 public class SwissHaltestelle {
 
-	private final Id id;
+	private final String id;
 	private final Coord coord;
 
-	/*package*/ SwissHaltestelle(Id id, Coord coord) {
+	/*package*/ SwissHaltestelle(String id, Coord coord) {
 		super();
 		this.id = id;
 		this.coord = coord;
 	}
 
-	public Id getId() {
+	public String getId() {
 		return id;
 	}
 

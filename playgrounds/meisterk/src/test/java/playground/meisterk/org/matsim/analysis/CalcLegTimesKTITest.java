@@ -29,9 +29,9 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkImpl;
@@ -72,9 +72,9 @@ public class CalcLegTimesKTITest extends MatsimTestCase {
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population pop = scenario.getPopulation();
-		PersonImpl testPerson = new PersonImpl(new IdImpl("1"));
+		PersonImpl testPerson = new PersonImpl(Id.create("1", Person.class));
 		pop.addPerson(testPerson);
-		Id personId = testPerson.getId();
+		Id<Person> personId = testPerson.getId();
 
 		PrintStream out = null;
 		try {
@@ -89,11 +89,11 @@ public class CalcLegTimesKTITest extends MatsimTestCase {
 		events.addHandler(testee);
 
 		NetworkImpl testNetwork = (NetworkImpl) scenario.getNetwork();
-		Node node1 = testNetwork.createAndAddNode(new IdImpl("1"), new CoordImpl(0.0, 0.0));
-		Node node2 = testNetwork.createAndAddNode(new IdImpl("2"), new CoordImpl(100.0, 100.0));
-		Link link = testNetwork.createAndAddLink(new IdImpl("200"), node1, node2, 0, 0, 0, 0);
+		Node node1 = testNetwork.createAndAddNode(Id.create("1", Node.class), new CoordImpl(0.0, 0.0));
+		Node node2 = testNetwork.createAndAddNode(Id.create("2", Node.class), new CoordImpl(100.0, 100.0));
+		Link link = testNetwork.createAndAddLink(Id.create("200", Link.class), node1, node2, 0, 0, 0, 0);
 		LegImpl leg = new LegImpl(TransportMode.car);
-		Id linkId = link.getId();
+		Id<Link> linkId = link.getId();
 
 		events.processEvent(new PersonDepartureEvent(Time.parseTime("06:00:00"), personId, linkId, leg.getMode()));
 		events.processEvent(new PersonArrivalEvent(Time.parseTime("06:30:00"), personId, linkId, leg.getMode()));

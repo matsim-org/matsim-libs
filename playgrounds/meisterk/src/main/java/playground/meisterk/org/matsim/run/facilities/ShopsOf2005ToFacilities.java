@@ -57,9 +57,9 @@ import net.opengis.kml._2.TimeSpanType;
 
 import org.apache.commons.io.FileUtils;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -703,7 +703,7 @@ public class ShopsOf2005ToFacilities {
 						System.out.println("There it is: " + name);
 						System.out.flush();
 					}
-					/*ActivityFacility newFacility =*/ facilities.createAndAddFacility(new IdImpl(name), ch1903Coordinates);
+					/*ActivityFacility newFacility =*/ facilities.createAndAddFacility(Id.create(name, ActivityFacility.class), ch1903Coordinates);
 				}
 			}
 
@@ -772,7 +772,7 @@ public class ShopsOf2005ToFacilities {
 
 			facilityId = shopId.getShopId();
 			//System.out.println(facilityId);
-			ActivityFacilityImpl theCurrentPickpay = (ActivityFacilityImpl) facilities.getFacilities().get(new IdImpl(facilityId));
+			ActivityFacilityImpl theCurrentPickpay = (ActivityFacilityImpl) facilities.getFacilities().get(Id.create(facilityId, ActivityFacility.class));
 			if (theCurrentPickpay != null) {
 
 				// yeah, we can use the open times
@@ -879,7 +879,7 @@ public class ShopsOf2005ToFacilities {
 			System.out.println(facilityId);
 			System.out.flush();
 
-			ActivityFacility theCurrentMigrosZH = facilities.getFacilities().get(new IdImpl(facilityId));
+			ActivityFacility theCurrentMigrosZH = facilities.getFacilities().get(Id.create(facilityId, ActivityFacility.class));
 			if (theCurrentMigrosZH != null) {
 				ActivityOptionImpl shopping = ((ActivityFacilityImpl) theCurrentMigrosZH).createActivityOption(ACTIVITY_TYPE_SHOP);
 				String openTimeString = tokens[6];
@@ -1052,7 +1052,7 @@ public class ShopsOf2005ToFacilities {
 			addressLinePointer++;
 
 			//System.out.println(facilityId);
-			ActivityFacilityImpl theCurrentMigrosOstschweiz = (ActivityFacilityImpl) facilities.getFacilities().get(new IdImpl(facilityId));
+			ActivityFacilityImpl theCurrentMigrosOstschweiz = (ActivityFacilityImpl) facilities.getFacilities().get(Id.create(facilityId, ActivityFacility.class));
 			if (theCurrentMigrosOstschweiz != null) {
 
 				ActivityOptionImpl shopping = theCurrentMigrosOstschweiz.createActivityOption(ACTIVITY_TYPE_SHOP);
@@ -1146,7 +1146,7 @@ public class ShopsOf2005ToFacilities {
 			shopId = new ShopId(COOP, tokens[7], tokens[8], COOP_ZH, tokens[43], tokens[44], tokens[42]);
 			String facilityId = shopId.getShopId();
 			System.out.println(facilityId);
-			ActivityFacility theCurrentCoopZH = facilities.getFacilities().get(new IdImpl(facilityId));
+			ActivityFacility theCurrentCoopZH = facilities.getFacilities().get(Id.create(facilityId, ActivityFacility.class));
 			if (theCurrentCoopZH != null) {
 
 				ActivityOptionImpl shopping = ((ActivityFacilityImpl) theCurrentCoopZH).createActivityOption(ACTIVITY_TYPE_SHOP);
@@ -1228,7 +1228,7 @@ public class ShopsOf2005ToFacilities {
 
 			String facilityId = shopId.getShopId();
 			System.out.println(facilityId);
-			ActivityFacilityImpl theCurrentCoopTG = (ActivityFacilityImpl) facilities.getFacilities().get(new IdImpl(facilityId));
+			ActivityFacilityImpl theCurrentCoopTG = (ActivityFacilityImpl) facilities.getFacilities().get(Id.create(facilityId, ActivityFacility.class));
 			if (theCurrentCoopTG != null) {
 				ActivityOptionImpl shopping = theCurrentCoopTG.createActivityOption(ACTIVITY_TYPE_SHOP);
 
@@ -1388,7 +1388,7 @@ public class ShopsOf2005ToFacilities {
 				System.out.println(saturdayToken);
 				System.out.println();
 
-				ActivityFacility theCurrentDenner = facilities.getFacilities().get(new IdImpl(shopId.getShopId()));
+				ActivityFacility theCurrentDenner = facilities.getFacilities().get(Id.create(shopId.getShopId(), ActivityFacility.class));
 				if (theCurrentDenner != null) {
 					ActivityOptionImpl shopping = ((ActivityFacilityImpl) theCurrentDenner).createActivityOption(ACTIVITY_TYPE_SHOP);
 					for (String openTimeString : new String[]{weekDayToken, saturdayToken}) {

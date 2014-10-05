@@ -22,7 +22,8 @@ package playground.meisterk.org.matsim.run.westumfahrung;
 
 import java.util.TreeMap;
 
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -37,7 +38,7 @@ public class PersonIdFilterTest extends MatsimTestCase {
 		// create fixture: 4 persons with special ids
 		TreeMap<String, PersonImpl> persons = new TreeMap<String, PersonImpl>();
 		for (String personId : new String[]{"1", "2102002002", "30", "3030"}) {
-			persons.put(personId, new PersonImpl(new IdImpl(personId)));
+			persons.put(personId, new PersonImpl(Id.create(personId, Person.class)));
 		}
 
 		PersonIdFilter tenDigitIdFilter = new PersonIdFilter("[0-9]{10}", null);

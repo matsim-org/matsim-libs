@@ -29,9 +29,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.algorithms.CalcBoundingBox;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -40,7 +38,7 @@ import org.matsim.core.utils.misc.StringUtils;
 
 public class SwissHaltestellen {
 
-	private final Map<Id, SwissHaltestelle> haltestellenMap;
+	private final Map<String, SwissHaltestelle> haltestellenMap;
 	private final QuadTree<SwissHaltestelle> haltestellen;
 
 	private static final Logger log = Logger.getLogger(SwissHaltestellen.class);
@@ -49,7 +47,7 @@ public class SwissHaltestellen {
 		CalcBoundingBox bbox = new CalcBoundingBox();
 		bbox.run(network);
 		this.haltestellen = new QuadTree<SwissHaltestelle>(bbox.getMinX(), bbox.getMinY(), bbox.getMaxX(), bbox.getMaxY());
-		this.haltestellenMap = new HashMap<Id, SwissHaltestelle>();
+		this.haltestellenMap = new HashMap<>();
 	}
 
 	public void readFile(final String filename) throws FileNotFoundException, IOException {
@@ -59,7 +57,7 @@ public class SwissHaltestellen {
 			String[] parts = StringUtils.explode(line, '\t');
 			if (parts.length == 7) {
 				CoordImpl coord = new CoordImpl(Double.parseDouble(parts[2]), Double.parseDouble(parts[3]));
-				SwissHaltestelle swissStop = new SwissHaltestelle(new IdImpl(parts[0]), coord);
+				SwissHaltestelle swissStop = new SwissHaltestelle(parts[0], coord);
 				this.haltestellen.put(coord.getX(), coord.getY(), swissStop);
 				this.haltestellenMap.put(swissStop.getId(), swissStop);
 			} else {
@@ -79,14 +77,14 @@ public class SwissHaltestellen {
 	 * @param id
 	 * @return
 	 */
-	public SwissHaltestelle getHaltestelle(Id id) {
+	public SwissHaltestelle getHaltestelle(String id) {
 		return this.haltestellenMap.get(id);
 	}
 
 	/** 
 	 * cdobler, may'12
 	 */
-	public Map<Id, SwissHaltestelle> getHaltestellenMap() {
+	public Map<String, SwissHaltestelle> getHaltestellenMap() {
 		return Collections.unmodifiableMap(this.haltestellenMap);
 	}
 	
@@ -94,7 +92,7 @@ public class SwissHaltestellen {
 	 * Added this method to be able to add stops not only during initialization.
 	 * cdobler, may'12
 	 */
-	public void addHaltestelle(Id id, double x, double y) {
+	public void addHaltestelle(String id, double x, double y) {
 		CoordImpl coord = new CoordImpl(x, y);
 		SwissHaltestelle swissStop = new SwissHaltestelle(id, coord);
 		this.haltestellen.put(coord.getX(), coord.getY(), swissStop);

@@ -23,13 +23,13 @@ package playground.meisterk.org.matsim.facilities.algorithms;
 import java.util.Iterator;
 import java.util.TreeMap;
 
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.OpeningTimeImpl;
-import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.meisterk.org.matsim.enterprisecensus.EnterpriseCensus;
@@ -80,7 +80,7 @@ public class FacilitiesWork9To18 {
 			Y = Integer.toString((int) this.myCensus.getHectareAggregationInformation(reli, "Y"));
 
 			for (int i=0; i<B01S2; i++) {
-				f = facilities.createAndAddFacility(new IdImpl(facilityCnt++), new CoordImpl(X, Y));
+				f = facilities.createAndAddFacility(Id.create(facilityCnt++, ActivityFacility.class), new CoordImpl(X, Y));
 				a = f.createActivityOption("work");
 
 				// equally distribute jobs among facilities
@@ -88,13 +88,13 @@ public class FacilitiesWork9To18 {
 				// in the data, the number of fulltime job equivalents is >0, but the rounding might be ==0
 				// but there has to be at least one job
 				jobsPerFacility = Math.max(B01EQTS2 / B01S2, 1);
-				a.setCapacity((double) jobsPerFacility);
+				a.setCapacity(jobsPerFacility);
 
-				a.addOpeningTime(new OpeningTimeImpl(DayType.wk, 9*3600, 18*3600));
+				a.addOpeningTime(new OpeningTimeImpl(9*3600, 18*3600));
 			}
 
 			for (int i=0; i<B01S3; i++) {
-				f = facilities.createAndAddFacility(new IdImpl(facilityCnt++), new CoordImpl(X, Y));
+				f = facilities.createAndAddFacility(Id.create(facilityCnt++, ActivityFacility.class), new CoordImpl(X, Y));
 				a = f.createActivityOption("work");
 
 				// equally distribute jobs among facilities
@@ -102,9 +102,9 @@ public class FacilitiesWork9To18 {
 				// in the data, the number of fulltime job equivalents is >0, but the rounding might be ==0
 				// but there has to be at least one job
 				jobsPerFacility = Math.max(B01EQTS3 / B01S3, 1);
-				a.setCapacity((double) jobsPerFacility);
+				a.setCapacity(jobsPerFacility);
 
-				a.addOpeningTime(new OpeningTimeImpl(DayType.wk, 9*3600, 18*3600));
+				a.addOpeningTime(new OpeningTimeImpl(9*3600, 18*3600));
 			}
 
 			hectareCnt++;
