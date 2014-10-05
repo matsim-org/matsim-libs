@@ -21,35 +21,30 @@ package playground.johannes.gsv.synPop.invermo.sim;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
-import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.data.FacilityData;
+import playground.johannes.gsv.synPop.data.DataPool;
+import playground.johannes.gsv.synPop.data.FacilityDataLoader;
+import playground.johannes.gsv.synPop.data.LandUseDataLoader;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.mid.PersonCloner;
+import playground.johannes.gsv.synPop.mid.run.ProxyTaskRunner;
 import playground.johannes.gsv.synPop.sim.Initializer;
 import playground.johannes.gsv.synPop.sim2.HamiltonianComposite;
 import playground.johannes.gsv.synPop.sim2.HamiltonianLogger;
 import playground.johannes.gsv.synPop.sim2.PopulationWriter;
 import playground.johannes.gsv.synPop.sim2.SamplerListenerComposite;
 import playground.johannes.gsv.synPop.sim2.SamplerLogger;
-import playground.johannes.sna.gis.Zone;
-import playground.johannes.sna.gis.ZoneLayer;
-import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
+import playground.johannes.gsv.synPop.sim3.InitHomeLocations;
+import playground.johannes.gsv.synPop.sim3.Sampler;
+import playground.johannes.gsv.synPop.sim3.SwitchHomeLocationFactory;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 
 /**
@@ -83,53 +78,25 @@ public class SetHomeLocations {
 		persons = PersonCloner.weightedClones(persons, Integer.parseInt(config.getParam(MODULE_NAME, "targetSize")), random);
 		logger.info(String.format("Generated %s persons.", persons.size()));
 		
-		logger.info("Loading GIS data...");
-	
-//		ZoneLayer<Double> municipalities = ZoneLayerSHP.read(config.findParam(MODULE_NAME, "popGemd"), "EWZ");
-		ZoneLayer<Double> popZone = ZoneLayerSHP.read(config.findParam(MODULE_NAME, "popNuts3"), "value");
-		ZoneLayer<Double> popDensity = ZoneLayerSHP.read(config.findParam(MODULE_NAME, "popNuts3"), "value");
-		
-		for(Zone<Double> zone : popDensity.getZones()) {
-			double inhabs = zone.getAttribute();
-			double a = zone.getGeometry().getArea();
-			zone.setAttribute(inhabs/a);
-		}
-		
-		double sum = 0;
-		for(Zone<Double> zone : popZone.getZones()) {
-			sum += zone.getAttribute();
-		}
-		for(Zone<Double> zone : popZone.getZones()) {
-			zone.setAttribute(zone.getAttribute()/sum);
-		}
-		
-//		ZoneLayer<Map<String, Object>> nuts1 = ZoneLayerSHP.read(config.findParam(MODULE_NAME, "nuts1"));
-		/*
-		 * load facilities
-		 */
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		FacilitiesReaderMatsimV1 facReader = new FacilitiesReaderMatsimV1(scenario);
-		facReader.readFile(config.getParam(MODULE_NAME, "facilities"));
-		ActivityFacilities facilities = scenario.getActivityFacilities();
-		
-		Set<ActivityFacility> remove = new HashSet<>();
-		for(ActivityFacility facility : facilities.getFacilities().values()) {
-			Coord coord = facility.getCoord();
-			Zone<?> zone = popDensity.getZone(MatsimCoordUtils.coordToPoint(coord));
-			if(zone == null) {
-				remove.add(facility);
-			}
-		}
-		logger.warn(String.format("Removing %s of %s facilities because the can not be assigned to a zone.", remove.size(), facilities.getFacilities().size()));
-		for(ActivityFacility facility : remove) {
-			facilities.getFacilities().remove(facility.getId());
-		}
-		
+		logger.info("Loading data...");
+		DataPool dataPool = new DataPool();
+		dataPool.register(new FacilityDataLoader(config.getParam(MODULE_NAME, "facilities"), random), FacilityDataLoader.KEY);
+		dataPool.register(new LandUseDataLoader(config.getParam(MODULE_NAME, ""), ""), LandUseDataLoader.KEY);
 		logger.info("Done.");
 		
 		logger.info("Setting up sampler...");
-		
-		FacilityData rFacilities = FacilityData.getInstance(facilities, random);
+		/*
+		 * Assign facilities to the geocoded home locations.
+		 */
+		ProxyTaskRunner.run(new AssignHomeFacilities(dataPool), persons);
+		/*
+		 * Calculate the target population density.
+		 */
+		ProxyTaskRunner.run(new InitializeTargetDensity(dataPool), persons);
+		/*
+		 * Distribute population according to zone values.
+		 */
+		new InitHomeLocations(dataPool, random).apply(persons);
 		
 		HamiltonianComposite H = new HamiltonianComposite();
 		PersonPopulationDenstiy persDen = null;//new PersonPopulationDenstiy(popDensity);
@@ -143,7 +110,7 @@ public class SetHomeLocations {
 		
 //		MutatorFactory factory = new StartLocationMutatorFactory(rFacilities, random);
 //		MutatorFactory factory = new SwitchHomeLocFactory();
-		MutatorFactory factory = new MutateHomeLocFactory(rFacilities, random);
+		SwitchHomeLocationFactory factory = new SwitchHomeLocationFactory(random);
 		Sampler sampler = new Sampler(persons, H, factory, random);
 		
 		SamplerListenerComposite lComposite = new SamplerListenerComposite();
@@ -172,7 +139,7 @@ public class SetHomeLocations {
 		logger.info("Initializing persons...");
 		List<Initializer> initializers = new ArrayList<Initializer>();
 		initializers.add(new SetMissingActTypes());
-		initializers.add(new InitializeFacilities(rFacilities));
+		
 //		initializers.add(new InitializeStartLocation());
 //		initializers.add(new InitializeTargetDensity(popDensity));
 //		initializers.add(new InitHomeLocations(persons, popZone, rFacilities, random));
@@ -184,7 +151,7 @@ public class SetHomeLocations {
 			}
 		}
 		
-		new InitHomeLocations(persons, popZone, rFacilities, random);
+		
 		
 //		popDen.initializeZones();
 //		popDen.writeZoneData(outputDir + "zones-start.shp");

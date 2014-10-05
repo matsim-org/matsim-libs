@@ -31,7 +31,13 @@ public class LandUseData {
 
 	public static final String POPULATION_KEY = "population";
 	
+	private ZoneLayer<Map<String, Object>> zoneLayer;
+	
+	public LandUseData(ZoneLayer<Map<String, Object>> zoneLayer) {
+		this.zoneLayer = zoneLayer;
+	}
+	
 	public ZoneLayer<Map<String, Object>> getZoneLayer() {
-		return null;
+		return zoneLayer;
 	}
 }

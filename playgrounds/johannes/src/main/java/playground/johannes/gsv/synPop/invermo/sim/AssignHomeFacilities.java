@@ -28,12 +28,12 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
+import playground.johannes.gsv.synPop.ProxyPersonTask;
+import playground.johannes.gsv.synPop.data.DataPool;
 import playground.johannes.gsv.synPop.data.FacilityData;
-import playground.johannes.gsv.synPop.sim.Initializer;
+import playground.johannes.gsv.synPop.data.FacilityDataLoader;
 import playground.johannes.gsv.synPop.sim3.SwitchHomeLocation;
 import playground.johannes.sna.gis.CRSUtils;
 
@@ -41,55 +41,20 @@ import playground.johannes.sna.gis.CRSUtils;
  * @author johannes
  * 
  */
-public class InitializeFacilities implements Initializer {
+public class AssignHomeFacilities implements ProxyPersonTask {
 
 	private final FacilityData facilities;
 
 	private MathTransform transform;
 
-	public InitializeFacilities(FacilityData facilities) {
-		this.facilities = facilities;
+	public AssignHomeFacilities(DataPool dataPool) {
+		facilities = (FacilityData) dataPool.get(FacilityDataLoader.KEY);
+		
 		try {
 			transform = CRS.findMathTransform(DefaultGeographicCRS.WGS84, CRSUtils.getCRS(31467));
 		} catch (FactoryException e) {
 			e.printStackTrace();
 		}
-	}
-
-	@Override
-	public void init(ProxyPerson person) {
-		ProxyPlan plan = person.getPlans().get(0);
-
-		for (ProxyObject act : plan.getActivities()) {
-			String str = act.getAttribute("coord");
-			ActivityFacility fac = null;
-			String type = act.getAttribute(CommonKeys.ACTIVITY_TYPE);
-			if(type == null) {
-				type = "misc";
-			}
-			
-			if (str == null) {
-				fac = facilities.randomFacility(type);
-			} else {
-				Coord coord = string2Coord(str);
-				fac = facilities.getClosest(coord, type);
-				
-			}
-			act.setAttribute(CommonKeys.ACTIVITY_FACILITY, fac.getId().toString());
-//			act.setUserData(MutateStartLocation.FACILITY_KEY, fac);
-		}
-		
-		String str = person.getAttribute("homeCoord");
-		ActivityFacility fac;
-		if(str != null) {
-			Coord coord = string2Coord(str);
-			fac = facilities.getClosest(coord, "home");
-			
-		} else {
-			fac = facilities.randomFacility("home");
-		}
-		person.setUserData(SwitchHomeLocation.USER_FACILITY_KEY, fac);
-
 	}
 
 	private Coord string2Coord(String str) {
@@ -105,5 +70,19 @@ public class InitializeFacilities implements Initializer {
 		}
 
 		return new CoordImpl(points[0], points[1]);
+	}
+
+	@Override
+	public void apply(ProxyPerson person) {
+		String str = person.getAttribute("homeCoord");
+		ActivityFacility fac;
+		if(str != null) {
+			Coord coord = string2Coord(str);
+			fac = facilities.getClosest(coord, ActivityType.HOME);
+			
+		} else {
+			fac = facilities.randomFacility(ActivityType.HOME);
+		}
+		person.setUserData(SwitchHomeLocation.USER_FACILITY_KEY, fac);
 	}
 }

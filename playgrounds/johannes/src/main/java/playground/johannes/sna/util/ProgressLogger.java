@@ -60,6 +60,8 @@ public class ProgressLogger {
 	}
 	
 	public static void termiante() {
-		System.out.println(NumberFormat.getPercentInstance().format(counter/(double)maxVal));
+		if(counter != maxVal) {
+			System.out.println(NumberFormat.getPercentInstance().format(counter/(double)maxVal));
+		}
 	}
 }

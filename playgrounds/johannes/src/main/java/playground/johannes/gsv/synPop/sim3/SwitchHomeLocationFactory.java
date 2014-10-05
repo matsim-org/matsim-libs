@@ -17,48 +17,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.data;
+package playground.johannes.gsv.synPop.sim3;
 
-import java.io.IOException;
-import java.util.Map;
+import java.util.Random;
 
-import playground.johannes.sna.gis.Zone;
-import playground.johannes.sna.gis.ZoneLayer;
-import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
+public class SwitchHomeLocationFactory implements MutatorFactory {
 
-/**
- * @author johannes
- *
- */
-public class LandUseDataLoader implements DataLoader {
-
-	public static final String KEY = "landuse";
+	private final Random random;
 	
-	private final String file;
-	
-	private final String populationKey;
-	
-	public LandUseDataLoader(String file, String populationKey) {
-		this.file = file;
-		this.populationKey = populationKey;
+	public SwitchHomeLocationFactory(Random random) {
+		this.random = random;
 	}
 	
 	@Override
-	public Object load() {
-		try {
-			ZoneLayer<Map<String, Object>> zoneLayer = ZoneLayerSHP.read(file);
-			
-			for(Zone<Map<String, Object>> zone : zoneLayer.getZones()) {
-				zone.getAttribute().put(LandUseData.POPULATION_KEY, zone.getAttribute().get(populationKey));
-			}
-			
-			LandUseData data = new LandUseData(zoneLayer);
-			
-			return data;
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		}
+	public Mutator newInstance() {
+		return new SwitchOperator(new SwitchHomeLocation(), random);
 	}
 
 }
