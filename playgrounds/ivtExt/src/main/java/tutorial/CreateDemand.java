@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -141,13 +140,13 @@ public class CreateDemand {
 			int index_mode = 7;
 			int index_activityType = 8;			
 			
-			Id previousPerson = null;
+			Id<Person> previousPerson = null;
 			boolean worker = false;
 			
 			while ((line = bufferedReader.readLine()) != null) {
 				String parts[] = line.split("\t");
 
-				Id personId = new IdImpl(parts[index_personId]);
+				Id<Person> personId = Id.create(parts[index_personId], Person.class);
 				Person person = population.getPersons().get(personId);
 				
 				Plan plan = person.getSelectedPlan();

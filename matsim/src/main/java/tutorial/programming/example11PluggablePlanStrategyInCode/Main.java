@@ -19,7 +19,7 @@
 
 package tutorial.programming.example11PluggablePlanStrategyInCode;
 
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -37,7 +37,7 @@ class Main {
 		}
 		
 		int lastStrategyIdx = config.strategy().getStrategySettings().size() ;
-		StrategySettings stratSets = new StrategySettings(new IdImpl(lastStrategyIdx+1));
+		StrategySettings stratSets = new StrategySettings(Id.create(lastStrategyIdx+1, StrategySettings.class));
 		stratSets.setModuleName("doSomethingSpecial");
 		stratSets.setProbability(0.1);
 		config.strategy().addStrategySettings(stratSets);

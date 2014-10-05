@@ -1,8 +1,9 @@
 package tutorial.programming.example06EventsHandling;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.charts.XYLineChart;
 /**
  * This EventHandler implementation counts the 
@@ -36,7 +37,7 @@ public class MyEventHandler3 implements LinkEnterEventHandler {
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (event.getLinkId().equals(new IdImpl("6"))) {
+		if (event.getLinkId().equals(Id.create("6", Link.class))) {
 			this.volumeLink6[getSlot(event.getTime())]++;
 		}	
 	}

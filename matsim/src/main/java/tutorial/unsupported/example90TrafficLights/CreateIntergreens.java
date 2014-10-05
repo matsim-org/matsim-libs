@@ -20,7 +20,7 @@
 package tutorial.unsupported.example90TrafficLights;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.signalsystems.data.SignalsData;
@@ -29,6 +29,8 @@ import org.matsim.signalsystems.data.intergreens.v10.IntergreenTimesData;
 import org.matsim.signalsystems.data.intergreens.v10.IntergreenTimesDataFactory;
 import org.matsim.signalsystems.data.intergreens.v10.IntergreenTimesWriter10;
 import org.matsim.signalsystems.data.intergreens.v10.IntergreensForSignalSystemData;
+import org.matsim.signalsystems.model.SignalGroup;
+import org.matsim.signalsystems.model.SignalSystem;
 
 
 /**
@@ -44,15 +46,15 @@ public class CreateIntergreens {
 		IntergreenTimesData ig = sd.getIntergreenTimesData();
 		IntergreenTimesDataFactory igdf = ig.getFactory();
 		// Create a data object for signal system with id 3
-		IntergreensForSignalSystemData ig3 = igdf.createIntergreensForSignalSystem(new IdImpl("3"));
+		IntergreensForSignalSystemData ig3 = igdf.createIntergreensForSignalSystem(Id.create("3", SignalSystem.class));
 		// Request at least 10 seconds red between the end of green of signal group 1 
 		// and the beginning of green of signal group 2 (signal system 3)
-		ig3.setIntergreenTime(10, new IdImpl("1"), new IdImpl("2"));
+		ig3.setIntergreenTime(10, Id.create("1", SignalGroup.class), Id.create("2", SignalGroup.class));
 		// add the data object to the container
 		ig.addIntergreensForSignalSystem(ig3);
 		// same as above for signal system 4...
-		IntergreensForSignalSystemData ig4 = igdf.createIntergreensForSignalSystem(new IdImpl("4"));
-		ig4.setIntergreenTime(10, new IdImpl("1"), new IdImpl("2"));
+		IntergreensForSignalSystemData ig4 = igdf.createIntergreensForSignalSystem(Id.create("4", SignalSystem.class));
+		ig4.setIntergreenTime(10, Id.create("1", SignalGroup.class), Id.create("2", SignalGroup.class));
 		ig.addIntergreensForSignalSystem(ig4);
 	}
 	
