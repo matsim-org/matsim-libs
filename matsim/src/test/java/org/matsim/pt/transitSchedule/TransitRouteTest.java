@@ -54,7 +54,7 @@ public class TransitRouteTest extends MatsimTestCase {
 	 * @param mode
 	 * @return a new instance of a TransitRoute with the given attributes
 	 */
-	protected static TransitRoute createTransitRoute(final Id id, final NetworkRoute route, final List<TransitRouteStop> stops, final String mode) {
+	protected static TransitRoute createTransitRoute(final Id<TransitRoute> id, final NetworkRoute route, final List<TransitRouteStop> stops, final String mode) {
 		return new TransitRouteImpl(id, route, stops, mode);
 	}
 

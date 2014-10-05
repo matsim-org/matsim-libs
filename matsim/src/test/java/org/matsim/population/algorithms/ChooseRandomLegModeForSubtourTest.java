@@ -358,15 +358,15 @@ public class ChooseRandomLegModeForSubtourTest {
 			testee.run(plan);
 			Iterator<PlanElement> peIterator = plan.getPlanElements().iterator();
 			Activity firstActivity = (Activity) peIterator.next();
-			Id firstLocation = firstActivity.getLinkId();
-			Id carLocation = firstLocation;
-			Id currentLocation = firstLocation;
+			Id<Link> firstLocation = firstActivity.getLinkId();
+			Id<Link> carLocation = firstLocation;
+			Id<Link> currentLocation = firstLocation;
 			int legCount = 0;
 			while (peIterator.hasNext()) {
 				legCount++;
 				Leg nextLeg = (Leg) peIterator.next();
 				Activity nextActivity = (Activity) peIterator.next();
-				Id nextLocation = nextActivity.getLinkId();
+				Id<Link> nextLocation = nextActivity.getLinkId();
 				if (nextLeg.getMode().equals(TransportMode.car)) {
 					assertEquals(
 							"wrong car location at leg "+legCount+" in "+plan.getPlanElements(),
@@ -393,15 +393,15 @@ public class ChooseRandomLegModeForSubtourTest {
 			testee.run(plan);
 			Iterator<PlanElement> peIterator = plan.getPlanElements().iterator();
 			Activity firstActivity = (Activity) peIterator.next();
-			Id firstLocation = firstActivity.getLinkId();
-			Id carLocation = firstLocation;
-			Id currentLocation = firstLocation;
+			Id<Link> firstLocation = firstActivity.getLinkId();
+			Id<Link> carLocation = firstLocation;
+			Id<Link> currentLocation = firstLocation;
 			int legCount = 0;
 			while (peIterator.hasNext()) {
 				legCount++;
 				Leg nextLeg = (Leg) peIterator.next();
 				Activity nextActivity = (Activity) peIterator.next();
-				Id nextLocation = nextActivity.getLinkId();
+				Id<Link> nextLocation = nextActivity.getLinkId();
 				if (nextLeg.getMode().equals(TransportMode.car)) {
 					assertEquals(
 							"wrong car location at leg "+legCount+" in "+plan.getPlanElements(),

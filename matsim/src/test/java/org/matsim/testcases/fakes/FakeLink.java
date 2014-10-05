@@ -41,7 +41,7 @@ import org.matsim.core.utils.misc.Time;
  */
 public class FakeLink implements Link {
 
-	private final Id id;
+	private final Id<Link> id;
 	private final Node fromNode;
 	private final Node toNode;
 
@@ -52,11 +52,11 @@ public class FakeLink implements Link {
 	 *
 	 * @param id
 	 */
-	public FakeLink(final Id id) {
+	public FakeLink(final Id<Link> id) {
 		this(id, null, null);
 	}
 
-	public FakeLink(final Id id, final Node fromNode, final Node toNode) {
+	public FakeLink(final Id<Link> id, final Node fromNode, final Node toNode) {
 		this.id = id;
 		this.fromNode = fromNode;
 		this.toNode = toNode;
@@ -148,7 +148,7 @@ public class FakeLink implements Link {
 	}
 
 	@Override
-	public Id getId() {
+	public Id<Link> getId() {
 		return this.id;
 	}
 

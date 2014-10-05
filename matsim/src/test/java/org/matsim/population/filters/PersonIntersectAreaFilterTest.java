@@ -82,7 +82,7 @@ public class PersonIntersectAreaFilterTest extends MatsimTestCase {
 		route.setLinkIds(link0.getId(), NetworkUtils.getLinkIds("1 2"), link5.getId());
 
 		// prepare area of interest
-		HashMap<Id, Link> aoi = new HashMap<Id, Link>();
+		HashMap<Id<Link>, Link> aoi = new HashMap<>();
 
 		// prepare filter
 		PersonIntersectAreaFilter filter = null;

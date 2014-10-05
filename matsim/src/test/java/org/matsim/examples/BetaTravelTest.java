@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
@@ -502,8 +503,8 @@ public class BetaTravelTest extends MatsimTestCase {
 	 */
 	private static class BottleneckTravelTimeAnalyzer implements PersonDepartureEventHandler, PersonArrivalEventHandler {
 
-		private final HashMap<Id, Double> agentDepTimes = new HashMap<Id, Double>(); // <AgentId, Time>
-		private final HashSet<Id> agentSeen = new HashSet<Id>();
+		private final HashMap<Id<Person>, Double> agentDepTimes = new HashMap<>(); // <AgentId, Time>
+		private final HashSet<Id<Person>> agentSeen = new HashSet<>();
 		private int agentCounter = 0;
 		private final double[] depTimes;
 		private final double[] arrTimes;

@@ -51,12 +51,12 @@ import org.matsim.population.algorithms.PersonAlgorithm;
  */
 public class PersonIntersectAreaFilter extends AbstractPersonFilter {
 
-	private final Map<Id, Link> areaOfInterest;
+	private final Map<Id<Link>, Link> areaOfInterest;
 	private Coord aoiCenter = null;
 	private double aoiRadius = 0.0;
 	private final Network network;
 
-	public PersonIntersectAreaFilter(final PersonAlgorithm nextAlgorithm, final Map<Id, Link> areaOfInterest, final Network network) {
+	public PersonIntersectAreaFilter(final PersonAlgorithm nextAlgorithm, final Map<Id<Link>, Link> areaOfInterest, final Network network) {
 		this.nextAlgorithm = nextAlgorithm;
 		this.areaOfInterest = areaOfInterest;
 		this.network = network;
@@ -96,13 +96,13 @@ public class PersonIntersectAreaFilter extends AbstractPersonFilter {
 						}
 					}
 					else {
-						for (Id link : linkIds) {
+						for (Id<Link> link : linkIds) {
 							if (this.areaOfInterest.containsKey(link)) {
 								return true;
 							}
 						}
 						// test departure link
-						Id linkId = ((Activity) plan.getPlanElements().get(i-1)).getLinkId();
+						Id<Link> linkId = ((Activity) plan.getPlanElements().get(i-1)).getLinkId();
 						if ((linkId != null) && (this.areaOfInterest.containsKey(linkId))) {
 							return true;
 						}

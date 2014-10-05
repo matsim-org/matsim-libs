@@ -23,6 +23,8 @@ package org.matsim.pt.fakes;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
@@ -30,6 +32,7 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 
 
 /**
@@ -50,7 +53,7 @@ public class FakePassengerAgent implements PTPassengerAgent {
 	}
 
 	@Override
-	public Id getId() {
+	public Id<Person> getId() {
 		return null;
 	}
 
@@ -71,12 +74,12 @@ public class FakePassengerAgent implements PTPassengerAgent {
 	}
 
 	@Override
-	public Id getDesiredAccessStopId() {
+	public Id<TransitStopFacility> getDesiredAccessStopId() {
 		return null;
 	}
 	
 	@Override
-	public Id getDesiredDestinationStopId() {
+	public Id<TransitStopFacility> getDesiredDestinationStopId() {
 		return null;
 	}
 
@@ -90,17 +93,17 @@ public class FakePassengerAgent implements PTPassengerAgent {
 	}
 
 	@Override
-	public Id getPlannedVehicleId() {
+	public Id<Vehicle> getPlannedVehicleId() {
 		return null;
 	}
 
 	@Override
-	public Id getCurrentLinkId() {
+	public Id<Link> getCurrentLinkId() {
 		return null;
 	}
 
 	@Override
-	public Id getDestinationLinkId() {
+	public Id<Link> getDestinationLinkId() {
 		return null;
 	}
 

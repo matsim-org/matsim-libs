@@ -44,7 +44,7 @@ public class TransitLineTest extends MatsimTestCase {
 	 * @param id
 	 * @return a new instance of a TransitLine with the given Id set
 	 */
-	protected TransitLine createTransitLine(final Id id) {
+	protected TransitLine createTransitLine(final Id<TransitLine> id) {
 		return new TransitLineImpl(id);
 	}
 

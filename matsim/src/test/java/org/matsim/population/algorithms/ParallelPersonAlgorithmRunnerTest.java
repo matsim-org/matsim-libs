@@ -133,7 +133,7 @@ public class ParallelPersonAlgorithmRunnerTest {
 	 * @author mrieser
 	 */
 	private static class PersonAlgorithmTester extends AbstractPersonAlgorithm {
-		protected final ArrayList<Id> personIds = new ArrayList<Id>(100);
+		protected final ArrayList<Id<Person>> personIds = new ArrayList<>(100);
 
 		public PersonAlgorithmTester() {
 			// make constructor public
