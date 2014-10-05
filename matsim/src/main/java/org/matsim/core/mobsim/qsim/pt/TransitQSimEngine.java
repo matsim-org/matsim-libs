@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -152,15 +153,15 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 		veh.setStopHandler(this.stopHandlerFactory.createTransitStopHandler(veh.getVehicle()));
 		driver.setVehicle(veh);
 		Leg firstLeg = (Leg) driver.getNextPlanElement();
-		Id startLinkId = firstLeg.getRoute().getStartLinkId();
+		Id<Link> startLinkId = firstLeg.getRoute().getStartLinkId();
 		this.qSim.addParkedVehicle(veh, startLinkId);
 		this.qSim.insertAgentIntoMobsim(driver);
 		return driver;
 	}
 
-	private void handleAgentPTDeparture(final MobsimAgent planAgent, Id linkId) {
+	private void handleAgentPTDeparture(final MobsimAgent planAgent, Id<Link> linkId) {
 		// this puts the agent into the transit stop.
-		Id accessStopId = ((PTPassengerAgent) planAgent).getDesiredAccessStopId();
+		Id<TransitStopFacility> accessStopId = ((PTPassengerAgent) planAgent).getDesiredAccessStopId();
 		if (accessStopId == null) {
 			// looks like this agent has a bad transit route, likely no
 			// route could be calculated for it
@@ -181,7 +182,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 
 
 	@Override
-	public boolean handleDeparture(double now, MobsimAgent agent, Id linkId) {
+	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
 		if (agent.getMode().equals(TransportMode.pt)) {
 			handleAgentPTDeparture(agent, linkId);
 			return true ;

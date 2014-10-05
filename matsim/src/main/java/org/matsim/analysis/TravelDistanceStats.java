@@ -33,6 +33,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
@@ -106,7 +107,7 @@ public class TravelDistanceStats {
 		}
 	}
 
-	public void addIteration(int iteration, Map<Id, Plan> map) {
+	public void addIteration(int iteration, Map<Id<Person>, Plan> map) {
 
 		int numOfThreads = this.config.global().getNumberOfThreads();
 		if (numOfThreads < 1) numOfThreads = 1;

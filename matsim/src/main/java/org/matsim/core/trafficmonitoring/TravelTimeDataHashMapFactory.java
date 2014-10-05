@@ -21,6 +21,7 @@
 package org.matsim.core.trafficmonitoring;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 
 public class TravelTimeDataHashMapFactory implements TravelTimeDataFactory {
@@ -32,7 +33,7 @@ public class TravelTimeDataHashMapFactory implements TravelTimeDataFactory {
 	}
 	
 	@Override
-	public TravelTimeData createTravelTimeData(Id linkId) {
+	public TravelTimeData createTravelTimeData(Id<Link> linkId) {
 		return new TravelTimeDataHashMap(this.network.getLinks().get(linkId));
 	}
 

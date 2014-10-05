@@ -142,7 +142,7 @@ public class JDEQSimulation implements Mobsim {
 		t.startTimer();
 
 		Scheduler scheduler = new Scheduler(new MessageQueue());
-		SimulationParameters.setAllRoads(new HashMap<Id, Road>());
+		SimulationParameters.setAllRoads(new HashMap<Id<Link>, Road>());
 
 		// initialize network
 		Road road = null;

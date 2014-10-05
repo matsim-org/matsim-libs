@@ -1,10 +1,18 @@
 package org.matsim.core.mobsim.qsim;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -18,8 +26,6 @@ import org.matsim.vis.snapshotwriters.TeleportationVisData;
 import org.matsim.vis.snapshotwriters.VisData;
 import org.matsim.vis.snapshotwriters.VisMobsim;
 
-import java.util.*;
-
 public class TeleportationEngine implements DepartureHandler, MobsimEngine,
 VisData {
 	/**
@@ -28,16 +34,16 @@ VisData {
 	 */
 	private final Queue<Tuple<Double, MobsimAgent>> teleportationList = new PriorityQueue<>(
 			30, new TeleportationArrivalTimeComparator());
-	private final LinkedHashMap<Id, TeleportationVisData> teleportationData = new LinkedHashMap<>();
+	private final LinkedHashMap<Id<Person>, TeleportationVisData> teleportationData = new LinkedHashMap<>();
 	private InternalInterface internalInterface;
-	private final Map<Id, MobsimAgent> agents = new HashMap<>();
+	private final Map<Id<Person>, MobsimAgent> agents = new HashMap<>();
 
 	@Override
-	public boolean handleDeparture(double now, MobsimAgent agent, Id linkId) {
+	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
 		double arrivalTime = now + agent.getExpectedTravelTime();
 		this.teleportationList.add(new Tuple<>(arrivalTime,
 				agent));
-		Id agentId = agent.getId();
+		Id<Person> agentId = agent.getId();
 		Link currLink = this.internalInterface.getMobsim().getScenario()
 				.getNetwork().getLinks().get(linkId);
 		Link destLink = this.internalInterface.getMobsim().getScenario()

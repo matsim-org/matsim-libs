@@ -20,12 +20,20 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Phaser;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -37,9 +45,7 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.VehicularDepartureHandler.VehicleBehavior;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
-
-import java.util.*;
-import java.util.concurrent.Phaser;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Coordinates the movement of vehicles on the links and the nodes.
@@ -56,7 +62,7 @@ public class QNetsimEngine implements MobsimEngine {
 
 	/*package*/   QNetwork network;
 
-	private final Map<Id, QVehicle> vehicles = new HashMap<>();
+	private final Map<Id<Vehicle>, QVehicle> vehicles = new HashMap<>();
 
 	private final QSim qsim;
 
@@ -180,7 +186,7 @@ public class QNetsimEngine implements MobsimEngine {
         this.numOfThreads = this.getMobsim().getScenario().getConfig().qsim().getNumberOfThreads();
 	}
 
-	public void addParkedVehicle(MobsimVehicle veh, Id startLinkId) {
+	public void addParkedVehicle(MobsimVehicle veh, Id<Link> startLinkId) {
 		vehicles.put(veh.getId(), (QVehicle) veh);
 		QLinkInternalI qlink = network.getNetsimLinks().get(startLinkId);
 		if ( qlink==null ) {
@@ -353,19 +359,19 @@ public class QNetsimEngine implements MobsimEngine {
 		return dpHandler;
 	}
 
-	public final Map<Id, QVehicle> getVehicles() {
+	public final Map<Id<Vehicle>, QVehicle> getVehicles() {
 		return Collections.unmodifiableMap(this.vehicles);
 	}
 
 	public final void registerAdditionalAgentOnLink(final MobsimAgent planAgent) {
-		Id linkId = planAgent.getCurrentLinkId(); 
+		Id<Link> linkId = planAgent.getCurrentLinkId(); 
 		if (linkId != null) { // may be bushwacking
 			QLinkInternalI qLink = network.getNetsimLink(linkId);
 			qLink.registerAdditionalAgentOnLink(planAgent);
 		}
 	}
 
-	public MobsimAgent unregisterAdditionalAgentOnLink(Id agentId, Id linkId) {
+	public MobsimAgent unregisterAdditionalAgentOnLink(Id<Person> agentId, Id<Link> linkId) {
 		QLinkInternalI qLink = network.getNetsimLink(linkId);
 		return qLink.unregisterAdditionalAgentOnLink(agentId);
 	}

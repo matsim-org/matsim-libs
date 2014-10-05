@@ -41,6 +41,7 @@ import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.MobsimConfigGroupI;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
@@ -57,9 +58,9 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 	private final Network network;
 	private int lastSnapshotIndex = -1;
 	private final double snapshotPeriod;
-	private final HashMap<Id, EventLink> eventLinks;
+	private final HashMap<Id<Link>, EventLink> eventLinks;
 	private final ArrayList<EventLink> linkList;
-	private final HashMap<Id, EventAgent> eventAgents;
+	private final HashMap<Id<Person>, EventAgent> eventAgents;
 	private final List<SnapshotWriter> snapshotWriters = new ArrayList<SnapshotWriter>();
 	private final double capCorrectionFactor;
 	private final double storageCapFactor;
@@ -71,9 +72,9 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 	public SnapshotGenerator(final Network network, final double snapshotPeriod, final MobsimConfigGroupI config) {
 		this.network = network;
 		int initialCapacity = (int)(network.getLinks().size()*1.1);
-		this.eventLinks = new HashMap<Id, EventLink>(initialCapacity, 0.95f);
+		this.eventLinks = new HashMap<>(initialCapacity, 0.95f);
 		this.linkList = new ArrayList<EventLink>(initialCapacity);
-		this.eventAgents = new HashMap<Id, EventAgent>(1000, 0.95f);
+		this.eventAgents = new HashMap<>(1000, 0.95f);
 		this.snapshotPeriod = snapshotPeriod;
 		this.capCorrectionFactor = config.getFlowCapFactor() / network.getCapacityPeriod();
 		this.storageCapFactor = config.getStorageCapFactor();
@@ -149,7 +150,7 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 		this.lastSnapshotIndex = -1;
 	}
 
-	private EventAgent getEventAgent(final Id id, double time) {
+	private EventAgent getEventAgent(final Id<Person> id, double time) {
 		EventAgent agent = this.eventAgents.get(id);
 		if (agent == null) {
 			agent = new EventAgent(id, time);
@@ -472,13 +473,13 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 	}
 
 	private static class EventAgent implements Comparable<EventAgent> {
-		protected final Id id;
+		protected final Id<Person> id;
 		protected final int intId;
 		protected double time;
 		protected EventLink currentLink = null;
 		protected double speed = 0.0;
 		protected int lane = 1;
-		protected EventAgent(final Id id, final double time) {
+		protected EventAgent(final Id<Person> id, final double time) {
 			this.id = id;
 			this.time = time;
 			this.intId = id.hashCode();

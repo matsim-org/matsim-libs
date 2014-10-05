@@ -19,12 +19,25 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
+import java.util.Iterator;
+import java.util.ListIterator;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.population.*;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.Umlauf;
@@ -32,9 +45,7 @@ import org.matsim.pt.UmlaufStueckI;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
-
-import java.util.Iterator;
-import java.util.ListIterator;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author michaz
@@ -179,7 +190,7 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 	}
 	
 	@Override
-	public Id getPlannedVehicleId() {
+	public Id<Vehicle> getPlannedVehicleId() {
 		Route route = ((Leg)this.currentPlanElement).getRoute() ;
 		return ((NetworkRoute)route).getVehicleId() ; 
 	}
@@ -206,7 +217,7 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 	}
 
 	@Override
-	public Id getDestinationLinkId() {
+	public Id<Link> getDestinationLinkId() {
 		return getCurrentLeg().getRoute().getEndLinkId();
 	}
 

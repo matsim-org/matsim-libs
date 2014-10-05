@@ -44,7 +44,7 @@ public class ArrayBasedDataContainerProvider implements DataContainerProvider {
 	private final DataContainer[] arrayLinkData;
 	private final DataContainerProvider delegate;
 	
-	public ArrayBasedDataContainerProvider(Map<Id, DataContainer> linkData, TravelTimeDataFactory ttDataFactory,
+	public ArrayBasedDataContainerProvider(Map<Id<Link>, DataContainer> linkData, TravelTimeDataFactory ttDataFactory,
 			Network network) {
 		this.arrayLinkData = new DataContainer[network.getLinks().size()];
 		this.delegate = new MapBasedDataContainerProvider(linkData, ttDataFactory);
@@ -55,7 +55,7 @@ public class ArrayBasedDataContainerProvider implements DataContainerProvider {
 	 * There, only link ids are available. We cannot optimize this. 
 	 */
 	@Override
-	public DataContainer getTravelTimeData(final Id linkId, final boolean createIfMissing) {
+	public DataContainer getTravelTimeData(final Id<Link> linkId, final boolean createIfMissing) {
 		return this.delegate.getTravelTimeData(linkId, createIfMissing);
 	}
 	

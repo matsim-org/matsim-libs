@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.BoardingDeniedEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -125,7 +126,7 @@ public class TransitDriverTest {
 
 		assertEquals(link5.getId(), driver.getDestinationLinkId());
 		assertEquals(link2.getId(), driver.chooseNextLinkId());
-		Id nextLinkId = driver.chooseNextLinkId() ;
+		Id<Link> nextLinkId = driver.chooseNextLinkId() ;
 		driver.notifyMoveOverNode(nextLinkId);
 
 		assertEquals(link3.getId(), driver.chooseNextLinkId());
@@ -564,7 +565,7 @@ public class TransitDriverTest {
 		
 		driver.handleTransitStop(stop1, 60);
 		assertEquals(Id.create("2", Link.class), driver.chooseNextLinkId());
-		driver.notifyMoveOverNode(Id.create("2", Node.class));
+		driver.notifyMoveOverNode(Id.create("2", Link.class));
 		driver.handleTransitStop(stop2, 120);
 		try {
 			assertNull(driver.chooseNextLinkId());
@@ -591,7 +592,7 @@ public class TransitDriverTest {
 		}
 
 		@Override
-		public Id getId() {
+		public Id<Person> getId() {
 			return null;
 		}
 
@@ -601,12 +602,12 @@ public class TransitDriverTest {
 		}
 
 		@Override
-		public Id getDesiredAccessStopId() {
+		public Id<TransitStopFacility> getDesiredAccessStopId() {
 			return null;
 		}
 		
 		@Override
-		public Id getDesiredDestinationStopId() {
+		public Id<TransitStopFacility> getDesiredDestinationStopId() {
 			return null;
 		}
 		
@@ -620,17 +621,17 @@ public class TransitDriverTest {
 		}
 
 		@Override
-		public Id getPlannedVehicleId() {
+		public Id<Vehicle> getPlannedVehicleId() {
 			return null;
 		}
 
 		@Override
-		public Id getCurrentLinkId() {
+		public Id<Link> getCurrentLinkId() {
 			return null;
 		}
 
 		@Override
-		public Id getDestinationLinkId() {
+		public Id<Link> getDestinationLinkId() {
 			return null;
 		}
 	}

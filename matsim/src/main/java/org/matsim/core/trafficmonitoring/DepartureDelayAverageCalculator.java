@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 
 /**
@@ -40,7 +41,7 @@ public class DepartureDelayAverageCalculator implements PersonDepartureEventHand
 	private Network network;
 	private int timeBinSize;
 	private HashMap<DepartureEvent, Double> departureEventsTimes = new HashMap<DepartureEvent, Double>();
-	private final HashMap<Id, DepartureDelayData> linkData;
+	private final HashMap<Id<Link>, DepartureDelayData> linkData;
 	
 	private static final Logger log = Logger.getLogger(DepartureDelayAverageCalculator.class);
 
@@ -52,7 +53,7 @@ public class DepartureDelayAverageCalculator implements PersonDepartureEventHand
 		super();
 		this.network = network;
 		this.timeBinSize = timeBinSize;
-		this.linkData = new HashMap<Id, DepartureDelayData>(this.network.getLinks().size());
+		this.linkData = new HashMap<>(this.network.getLinks().size());
 		this.resetDepartureDelays();
 	}
 
@@ -63,7 +64,7 @@ public class DepartureDelayAverageCalculator implements PersonDepartureEventHand
 	 * @param departureTime
 	 * @return departure delay estimation
 	 */
-	public double getLinkDepartureDelay(Id linkId, double departureTime) {
+	public double getLinkDepartureDelay(Id<Link> linkId, double departureTime) {
 		DepartureDelayData ddd = this.getDepartureDelayRole(linkId);
 		if (ddd == null) {
 			return 0.0;
@@ -126,7 +127,7 @@ public class DepartureDelayAverageCalculator implements PersonDepartureEventHand
 
 	}
 
-	private DepartureDelayData getDepartureDelayRole(Id linkId) {
+	private DepartureDelayData getDepartureDelayRole(Id<Link> linkId) {
 		return this.linkData.get(linkId);
 	}
 
@@ -145,7 +146,7 @@ public class DepartureDelayAverageCalculator implements PersonDepartureEventHand
 			if (departureDelay < 0) {
 				throw new RuntimeException("departureDelay cannot be < 0.");
 			}
-			Id linkId = event.getLinkId();
+			Id<Link> linkId = event.getLinkId();
 			DepartureDelayData ddd = this.getDepartureDelayRole(linkId);
 			if (ddd == null) {
 				ddd = new DepartureDelayData();

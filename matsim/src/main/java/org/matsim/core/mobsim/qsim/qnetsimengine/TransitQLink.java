@@ -19,14 +19,20 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.io.Serializable;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.PriorityQueue;
+import java.util.Queue;
+
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.AbstractQLink.HandleTransitStopResult;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
-import java.io.Serializable;
-import java.util.*;
 
 
 /**
@@ -54,7 +60,7 @@ final class TransitQLink {
 		return this.transitVehicleStopQueue;
 	}
 	
-	final boolean addTransitToStopQueue(final double now, final QVehicle veh, final Id linkId) {
+	final boolean addTransitToStopQueue(final double now, final QVehicle veh, final Id<Link> linkId) {
 		if (veh.getDriver() instanceof TransitDriverAgent) {
 			TransitDriverAgent driver = (TransitDriverAgent) veh.getDriver();
 			while (true) {
@@ -107,7 +113,7 @@ final class TransitQLink {
 	}
 	
 	protected HandleTransitStopResult handleTransitStop(final double now, final QVehicle veh, 
-			final TransitDriverAgent transitDriver, Id linkId) {
+			final TransitDriverAgent transitDriver, Id<Link> linkId) {
 		TransitStopFacility stop = transitDriver.getNextTransitStop();
 		if ((stop != null) && (stop.getLinkId().equals(linkId))) {
 			double delay = transitDriver.handleTransitStop(stop, now);

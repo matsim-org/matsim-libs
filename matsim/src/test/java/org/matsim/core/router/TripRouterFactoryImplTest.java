@@ -234,7 +234,7 @@ public class TripRouterFactoryImplTest {
 		}
 
 		@Override
-		public Id getId() {
+		public Id<Link> getId() {
 			return l.getId();
 		}
 
@@ -244,7 +244,7 @@ public class TripRouterFactoryImplTest {
 		}
 
 		@Override
-		public Id getLinkId() {
+		public Id<Link> getLinkId() {
 			return l.getId();
 		}
 	}

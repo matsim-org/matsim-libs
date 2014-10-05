@@ -72,7 +72,7 @@ public class PreProcessDijkstra {
 		for (Node node : network.getNodes().values()) {
 			deadEndData = getNodeData(node);
 
-			Map<Id, Node> incidentNodes = getIncidentNodes(node);
+			Map<Id<Node>, Node> incidentNodes = getIncidentNodes(node);
 			if (incidentNodes.size() == 1) {
 				ArrayList<Node> deadEndNodes = new ArrayList<Node>();
 
@@ -120,8 +120,8 @@ public class PreProcessDijkstra {
 				+ (System.currentTimeMillis() - now) + " ms");
 	}
 
-	private static Map<Id, Node> getIncidentNodes(Node node) {
-		Map<Id, Node> nodes = new TreeMap<Id, Node>();
+	private static Map<Id<Node>, Node> getIncidentNodes(Node node) {
+		Map<Id<Node>, Node> nodes = new TreeMap<>();
 		for (Link link : node.getInLinks().values()) {
 			nodes.put(link.getFromNode().getId(), link.getFromNode());
 		}

@@ -115,7 +115,7 @@ public class PlansScoring implements ScoringListener, IterationStartsListener, I
 	 * Let's try and get rid of it. michaz '2012
 	 */
 	@Deprecated
-	public ScoringFunction getScoringFunctionForAgent(Id agentId) {
+	public ScoringFunction getScoringFunctionForAgent(Id<Person> agentId) {
 		return this.eventsToScore.getScoringFunctionForAgent(agentId);
 	}
 

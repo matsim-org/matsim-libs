@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.jdeqsim.EventLog;
 import org.matsim.core.mobsim.jdeqsim.SimulationParameters;
 import org.matsim.core.utils.io.IOUtils;
@@ -115,7 +116,8 @@ public class CppEventFileParser {
 	 * @param personId TODO
 	 * @deprecated Use {@link #equals(Event,EventLog)} instead
 	 */
-	public static boolean equals(final Event personEvent, Id personId, final EventLog deqSimEvent) {
+	@Deprecated
+	public static boolean equals(final Event personEvent, Id<Person> personId, final EventLog deqSimEvent) {
 		return equals(personEvent, deqSimEvent);
 	}
 

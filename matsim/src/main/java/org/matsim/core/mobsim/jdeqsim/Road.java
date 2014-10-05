@@ -315,7 +315,7 @@ public class Road extends SimUnit {
 		assert (this.interestedInEnteringRoad.size()==this.deadlockPreventionMessages.size());
 	}
 
-	public static Road getRoad(Id linkId) {
+	public static Road getRoad(Id<Link> linkId) {
 		return SimulationParameters.getAllRoads().get(linkId);
 	}
 

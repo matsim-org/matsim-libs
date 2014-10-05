@@ -20,24 +20,34 @@
 
 package org.matsim.core.mobsim.qsim.agents;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.*;
+import org.matsim.core.mobsim.framework.HasPerson;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
-
-import java.util.List;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author dgrether, nagel
@@ -56,7 +66,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 
 	private MobsimVehicle vehicle;
 
-	private Id cachedNextLinkId = null;
+	private Id<Link> cachedNextLinkId = null;
 
 	// This agent never seriously calls the simulation back! (That's good.)
 	// It is only held to get to the EventManager and to the Scenario, and, 
@@ -65,7 +75,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 
 	private double activityEndTime = Time.UNDEFINED_TIME;
 
-	private Id currentLinkId = null;
+	private Id<Link> currentLinkId = null;
 
 	int currentPlanElementIndex = 0;
 
@@ -139,12 +149,12 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 	// -----------------------------------------------------------------------------------------------------------------------------
 
 	@Override
-	public final void notifyArrivalOnLinkByNonNetworkMode(final Id linkId) {
+	public final void notifyArrivalOnLinkByNonNetworkMode(final Id<Link> linkId) {
 		this.currentLinkId = linkId;
 	}
 
 	@Override
-	public final void notifyMoveOverNode(Id newLinkId) {
+	public final void notifyMoveOverNode(Id<Link> newLinkId) {
 		if (expectedLinkWarnCount < 10 && !newLinkId.equals(this.cachedNextLinkId)) {
 			log.warn("Agent did not end up on expected link. Ok for within-day replanning agent, otherwise not.  Continuing " +
 					"anyway ... This warning is suppressed after the first 10 warnings.") ;
@@ -161,7 +171,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 	 * @return The next link the vehicle will drive on, or null if an error has happened.
 	 */
 	@Override
-	public Id chooseNextLinkId() {
+	public Id<Link> chooseNextLinkId() {
 
 		// Please, let's try, amidst all checking and caching, to have this method return the same thing
 		// if it is called several times in a row. Otherwise, you get Heisenbugs.
@@ -207,7 +217,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 		}
 
 
-		Id nextLinkId = this.cachedRouteLinkIds.get(this.currentLinkIdIndex);
+		Id<Link> nextLinkId = this.cachedRouteLinkIds.get(this.currentLinkIdIndex);
 		Link currentLink = this.simulation.getScenario().getNetwork().getLinks().get(this.currentLinkId);
 		Link nextLink = this.simulation.getScenario().getNetwork().getLinks().get(nextLinkId);
 		if (currentLink.getToNode().equals(nextLink.getFromNode())) {
@@ -411,7 +421,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 	}
 
 	@Override
-	public final Id getCurrentLinkId() {
+	public final Id<Link> getCurrentLinkId() {
 		// note: the method is really only defined for DriverAgent!  kai, oct'10
 		return this.currentLinkId;
 	}
@@ -441,18 +451,18 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 	}
 
 	@Override
-	public final Id getPlannedVehicleId() {
+	public final Id<Vehicle> getPlannedVehicleId() {
 		PlanElement currentPlanElement = this.getCurrentPlanElement();
 		NetworkRoute route = (NetworkRoute) ((Leg) currentPlanElement).getRoute(); // if casts fail: illegal state.
 		if (route.getVehicleId() != null) {
 			return route.getVehicleId();
 		} else {
-			return this.getId(); // we still assume the vehicleId is the agentId if no vehicleId is given.
+			return Id.create(this.getId(), Vehicle.class); // we still assume the vehicleId is the agentId if no vehicleId is given.
 		}
 	}
 
 	@Override
-	public final Id getDestinationLinkId() {
+	public final Id<Link> getDestinationLinkId() {
 		return this.cachedDestinationLinkId;
 	}
 
@@ -462,7 +472,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 	}
 
 	@Override
-	public final Id getId() {
+	public final Id<Person> getId() {
 		return this.person.getId();
 	}
 

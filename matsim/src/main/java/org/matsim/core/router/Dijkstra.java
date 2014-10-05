@@ -99,7 +99,7 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 	 */
 	final TravelTime timeFunction;
 
-	final HashMap<Id, DijkstraNodeData> nodeData;
+	final HashMap<Id<Node>, DijkstraNodeData> nodeData;
 
 	/**
 	 * Provides an unique id (loop number) for each routing request, so we don't
@@ -167,7 +167,7 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 		this.timeFunction = timeFunction;
 		this.preProcessData = preProcessData;
 
-		this.nodeData = new HashMap<Id, DijkstraNodeData>((int)(network.getNodes().size() * 1.1), 0.95f);
+		this.nodeData = new HashMap<>((int)(network.getNodes().size() * 1.1), 0.95f);
 
 		if (preProcessData != null) {
 			if (!preProcessData.containsData()) {

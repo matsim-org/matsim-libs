@@ -407,7 +407,7 @@ public class NetworkExpandNodeTest {
 		turns.add(new TurnInfo(Id.create("5", Link.class), Id.create("2", Link.class), walkOnly));
 		turns.add(new TurnInfo(Id.create("5", Link.class), Id.create("4", Link.class), carOnly));
 
-		Id nodeId = Id.create("3", Link.class);
+		Id<Node> nodeId = Id.create("3", Node.class);
 		Assert.assertFalse(exp.turnsAreSameAsSingleNode(nodeId, turns, false));
 
 		turns.clear();
@@ -446,7 +446,7 @@ public class NetworkExpandNodeTest {
 		turns.add(new TurnInfo(Id.create("5", Link.class), Id.create("2", Link.class), walkOnly));
 		turns.add(new TurnInfo(Id.create("5", Link.class), Id.create("4", Link.class), carOnly));
 		
-		Id nodeId = Id.create("3", Link.class);
+		Id<Node> nodeId = Id.create("3", Node.class);
 		Assert.assertFalse(exp.turnsAreSameAsSingleNode(nodeId, turns, true));
 		
 		turns.clear();

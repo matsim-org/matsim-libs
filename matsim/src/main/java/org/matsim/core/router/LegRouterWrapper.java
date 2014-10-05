@@ -24,11 +24,13 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.router.old.LegRouter;
 
@@ -147,12 +149,12 @@ public class LegRouterWrapper implements RoutingModule {
 		}
 
 		@Override
-		public Id getLinkId() {
+		public Id<Link> getLinkId() {
 			return wrapped.getLinkId();
 		}
 
 		@Override
-		public Id getFacilityId() {
+		public Id<ActivityFacility> getFacilityId() {
 			throw new UnsupportedOperationException( "only facility fields access are supported" );
 		}
 

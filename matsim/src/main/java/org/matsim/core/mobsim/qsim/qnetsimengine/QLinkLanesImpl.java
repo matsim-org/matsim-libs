@@ -20,6 +20,16 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -32,14 +42,14 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.ModelLane;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.vis.VisLane;
 import org.matsim.lanes.vis.VisLaneModelBuilder;
 import org.matsim.lanes.vis.VisLinkWLanes;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import org.matsim.vis.snapshotwriters.VisData;
-
-import java.util.*;
 
 /**
  * Please read the docu of QBufferItem, QLane, QLinkInternalI (arguably to be renamed
@@ -117,7 +127,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	/**
 	 * A List holding all QueueLane instances of the QueueLink
 	 */
-	private final LinkedHashMap<Id, QLaneInternalI> laneQueues;
+	private final LinkedHashMap<Id<Lane>, QLaneInternalI> laneQueues;
 	
 	/**
 	 * If more than one QueueLane exists this list holds all QueueLanes connected to
@@ -129,7 +139,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 
 	private final List<ModelLane> lanes;
 	
-	private final Map<Id, Map<Id, List<QLaneInternalI>>> nextQueueToLinkCache;
+	private final Map<Id<Lane>, Map<Id<Link>, List<QLaneInternalI>>> nextQueueToLinkCache;
 
 	/**
 	 * Initializes a QueueLink with one QueueLane.
@@ -148,10 +158,10 @@ public final class QLinkLanesImpl extends AbstractQLink {
 
 	private void initLaneQueues(List<ModelLane> lanes){
 		Stack<QLaneInternalI> stack = new Stack<>();
-		Map<Id, QLaneInternalI> queueByIdMap = new HashMap<>();
-		Map<Id, Set<Id>> laneIdToLinksMap = new HashMap<>();
+		Map<Id<Lane>, QLaneInternalI> queueByIdMap = new HashMap<>();
+		Map<Id<Lane>, Set<Id<Link>>> laneIdToLinksMap = new HashMap<>();
 		for (ModelLane lane : lanes) { //lanes is sorted downstream to upstream
-			Id laneId = lane.getLaneData().getId();
+			Id<Lane> laneId = lane.getLaneData().getId();
 			double noEffectiveLanes = lane.getLaneData().getNumberOfRepresentedLanes();
 			QLaneInternalI queue = new QueueWithBuffer(this, new FIFOVehicleQ(), laneId, 
 					lane.getLength(), noEffectiveLanes, (lane.getLaneData().getCapacityVehiclesPerHour()/3600.0));
@@ -159,7 +169,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 			queueByIdMap.put(laneId, queue);
 			firstLaneQueue = queue;
 			stack.push(queue);
-			Set<Id> toLinkIds = new HashSet<>();
+			Set<Id<Link>> toLinkIds = new HashSet<>();
 			
 			if (lane.getToLanes() == null || lane.getToLanes().isEmpty()){ //lane is at the end of link
 				this.toNodeLaneQueues.add(queue);
@@ -167,15 +177,15 @@ public final class QLinkLanesImpl extends AbstractQLink {
 				laneIdToLinksMap.put(laneId, toLinkIds);
 			}
 			else { //lane is within the link and has no connection to a node
-				LinkedHashMap<Id, List<QLaneInternalI>> toLinkIdDownstreamQueues = new LinkedHashMap<>();
-				nextQueueToLinkCache.put(((QueueWithBuffer)queue).getId(), toLinkIdDownstreamQueues);
+				LinkedHashMap<Id<Link>, List<QLaneInternalI>> toLinkIdDownstreamQueues = new LinkedHashMap<>();
+				nextQueueToLinkCache.put(Id.create(((QueueWithBuffer)queue).getId(), Lane.class), toLinkIdDownstreamQueues);
 				for (ModelLane toLane : lane.getToLanes()) {
-					Set<Id> toLinks = laneIdToLinksMap.get(toLane.getLaneData().getId());
+					Set<Id<Link>> toLinks = laneIdToLinksMap.get(toLane.getLaneData().getId());
 					if (! laneIdToLinksMap.containsKey(laneId)){
-						laneIdToLinksMap.put(laneId, new HashSet<Id>());
+						laneIdToLinksMap.put(laneId, new HashSet<Id<Link>>());
 					}
 					laneIdToLinksMap.get(laneId).addAll(toLinks);
-					for (Id toLinkId : toLinks){
+					for (Id<Link> toLinkId : toLinks){
 						List<QLaneInternalI> downstreamQueues = toLinkIdDownstreamQueues.get(toLinkId);
 						if (downstreamQueues == null){
 							downstreamQueues = new ArrayList<>();
@@ -267,7 +277,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		QVehicle veh;
 		while (! queue.isNotOfferingVehicle()) {
 			veh = queue.getFirstVehicle();
-			Id toLinkId = veh.getDriver().chooseNextLinkId();
+			Id<Link> toLinkId = veh.getDriver().chooseNextLinkId();
 			QLaneInternalI nextQueue = this.chooseNextLane(queue, toLinkId);
 			if (nextQueue != null) {
 				if (nextQueue.isAcceptingFromUpstream()) {
@@ -300,7 +310,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	}
 
 	
-	private QLaneInternalI chooseNextLane(QLaneInternalI queue, Id toLinkId){
+	private QLaneInternalI chooseNextLane(QLaneInternalI queue, Id<Link> toLinkId){
 		List<QLaneInternalI> toQueues = this.nextQueueToLinkCache.get(((QueueWithBuffer)queue).getId()).get(toLinkId);
 		QLaneInternalI retLane = toQueues.get(0);
 		if (toQueues.size() == 1){
@@ -380,7 +390,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	}
 
 	@Override
-	QVehicle getVehicle(Id vehicleId) {
+	QVehicle getVehicle(Id<Vehicle> vehicleId) {
 		QVehicle ret = super.getVehicle(vehicleId);
 		if (ret != null) {
 			return ret;
@@ -444,7 +454,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	/**
 	 * @return the QLanes of this QueueLink
 	 */
-	public LinkedHashMap<Id, QLaneInternalI> getQueueLanes(){
+	public LinkedHashMap<Id<Lane>, QLaneInternalI> getQueueLanes(){
 		return this.laneQueues;
 	}
 
@@ -527,7 +537,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 
 
 	@Override
-	boolean hasGreenForToLink(Id toLinkId) {
+	boolean hasGreenForToLink(Id<Link> toLinkId) {
 		throw new UnsupportedOperationException("Method should not be called on this instance");
 	}
 

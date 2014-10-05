@@ -127,7 +127,7 @@ public class CharyparNagelScoringFunctionTest {
 		if (leg.getRoute() instanceof NetworkRoute) {
 			NetworkRoute networkRoute = (NetworkRoute) leg.getRoute();
 			eventsToScore.handleEvent(new LinkLeaveEvent(leg.getDepartureTime(), f.person.getId(), leg.getRoute().getStartLinkId(), networkRoute.getVehicleId()));
-			for (Id linkId : networkRoute.getLinkIds()) {
+			for (Id<Link> linkId : networkRoute.getLinkIds()) {
 				eventsToScore.handleEvent(new LinkEnterEvent(leg.getDepartureTime(), f.person.getId(), linkId, networkRoute.getVehicleId()));
 				eventsToScore.handleEvent(new LinkLeaveEvent(leg.getDepartureTime(), f.person.getId(), linkId, networkRoute.getVehicleId()));
 			}
@@ -570,7 +570,7 @@ public class CharyparNagelScoringFunctionTest {
 		// score the same plan twice
 		PersonImpl person1 = new PersonImpl(Id.create(1, Person.class));
 		PlanImpl plan1 = person1.createAndAddPlan(true);
-		Activity act1a = plan1.createAndAddActivity("home", (Id)null);//, 0, 7.0*3600, 7*3600, false);
+		Activity act1a = plan1.createAndAddActivity("home", (Id<Link>)null);//, 0, 7.0*3600, 7*3600, false);
 		act1a.setEndTime(f.secondLegStartTime);
 		Leg leg1 = plan1.createAndAddLeg(TransportMode.car);//, 7*3600, 100, 7*3600+100);
 		leg1.setDepartureTime(f.secondLegStartTime);
@@ -578,7 +578,7 @@ public class CharyparNagelScoringFunctionTest {
 		Route route2 = new GenericRouteImpl(null, null);
 		leg1.setRoute(route2);
 		route2.setDistance(20000.0);
-		Activity act1b = plan1.createAndAddActivity("work", (Id)null);//, 7.0*3600+100, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, false);
+		Activity act1b = plan1.createAndAddActivity("work", (Id<Link>)null);//, 7.0*3600+100, Time.UNDEFINED_TIME, Time.UNDEFINED_TIME, false);
 		act1b.setStartTime(f.secondLegStartTime + f.secondLegTravelTime);
 		ScoringFunction sf1 = getScoringFunctionInstance(f, person1);
 		sf1.handleActivity(act1a);

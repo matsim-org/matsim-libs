@@ -27,9 +27,12 @@ public interface RoutingNetworkLink extends Link {
 
 	public Link getLink();
 	
-	public Id getId();
+	@Override
+	public Id<Link> getId();
 	
+	@Override
 	public RoutingNetworkNode getFromNode();
 	
+	@Override
 	public RoutingNetworkNode getToNode();
 }

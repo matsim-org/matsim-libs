@@ -162,7 +162,7 @@ public class TripRouterTest {
 	}
 
 	private static class EqualsActivity extends ActivityImpl {
-		public EqualsActivity(final String type, final Id link) {
+		public EqualsActivity(final String type, final Id<Link> link) {
 			super( type , link );
 		}
 

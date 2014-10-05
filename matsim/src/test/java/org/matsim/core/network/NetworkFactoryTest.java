@@ -22,6 +22,7 @@ package org.matsim.core.network;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -69,7 +70,7 @@ public class NetworkFactoryTest extends MatsimTestCase {
 	}
 
 	/*package*/ static class CarRouteMock extends AbstractRoute implements Cloneable {
-		CarRouteMock(final Id startLinkId, final Id endLinkId) {
+		CarRouteMock(final Id<Link> startLinkId, final Id<Link> endLinkId) {
 			super(startLinkId, endLinkId);
 		}
 		@Override
@@ -79,7 +80,7 @@ public class NetworkFactoryTest extends MatsimTestCase {
 	}
 
 	/*package*/ static class PtRouteMock extends AbstractRoute implements Cloneable {
-		PtRouteMock(final Id startLinkId, final Id endLinkId) {
+		PtRouteMock(final Id<Link> startLinkId, final Id<Link> endLinkId) {
 			super(startLinkId, endLinkId);
 		}
 		@Override
@@ -90,7 +91,7 @@ public class NetworkFactoryTest extends MatsimTestCase {
 
 	/*package*/ static class CarRouteMockFactory implements RouteFactory {
 		@Override
-		public Route createRoute(final Id startLinkId, final Id endLinkId) {
+		public Route createRoute(final Id<Link> startLinkId, final Id<Link> endLinkId) {
 			return new CarRouteMock(startLinkId, endLinkId);
 		}
 
@@ -98,7 +99,7 @@ public class NetworkFactoryTest extends MatsimTestCase {
 
 	/*package*/ static class PtRouteMockFactory implements RouteFactory {
 		@Override
-		public Route createRoute(final Id startLinkId, final Id endLinkId) {
+		public Route createRoute(final Id<Link> startLinkId, final Id<Link> endLinkId) {
 			return new PtRouteMock(startLinkId, endLinkId);
 		}
 

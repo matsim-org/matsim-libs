@@ -200,12 +200,12 @@ public class TripStructureUtils {
 			final boolean useFacilitiesInsteadOfLinks) {
 		final List<Subtour> subtours = new ArrayList<Subtour>();
 
-		Id destinationId = null;
-		final List<Id> originIds = new ArrayList<Id>();
+		Id<?> destinationId = null;
+		final List<Id<?>> originIds = new ArrayList<Id<?>>();
 		final List<Trip> trips = getTrips( planElements , stageActivityTypes );
 		final List<Trip> nonAllocatedTrips = new ArrayList<Trip>( trips );
 		for (Trip trip : trips) {
-			final Id originId = useFacilitiesInsteadOfLinks ?
+			final Id<?> originId = useFacilitiesInsteadOfLinks ?
 				trip.getOriginActivity().getFacilityId() :
 				trip.getOriginActivity().getLinkId();
 

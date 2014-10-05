@@ -20,6 +20,7 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.VisData;
 
 /**
@@ -50,13 +51,13 @@ abstract class QLaneInternalI extends QInternalI {
 
 	abstract void recalcTimeVariantAttributes(final double now);
 
-	abstract QVehicle getVehicle( final Id vehicleId);
+	abstract QVehicle getVehicle( final Id<Vehicle> vehicleId);
 
 //	Collection<MobsimVehicle> getAllVehicles();
 
 //	QVehicle popFirstVehicle();
 
-//	boolean hasGreenForToLink( final Id toLinkId);
+//	boolean hasGreenForToLink( final Id<Link> toLinkId);
 
 	abstract double getStorageCapacity();
 

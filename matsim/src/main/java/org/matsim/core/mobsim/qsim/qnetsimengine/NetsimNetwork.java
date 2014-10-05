@@ -38,10 +38,10 @@ public interface NetsimNetwork extends VisNetwork, MatsimNetworkObject {
 	@Override
 	Network getNetwork();
 
-	Map<Id, ? extends NetsimLink> getNetsimLinks();
+	Map<Id<Link>, ? extends NetsimLink> getNetsimLinks();
 	// yyyy this should arguable be getQLinks() or getMobsimLinks().  Esthetically less pleasing, but imho easier to use.  kai, may'10
 
-	Map<Id, ? extends NetsimNode> getNetsimNodes() ;
+	Map<Id<Node>, ? extends NetsimNode> getNetsimNodes() ;
 
 	/**
 	 * Convenience method for getLinks().get( id ).  May be renamed

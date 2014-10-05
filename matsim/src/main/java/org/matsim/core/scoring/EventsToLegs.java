@@ -52,6 +52,9 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 
 
 
@@ -72,10 +75,10 @@ public final class EventsToLegs implements PersonDepartureEventHandler, PersonAr
 	
 	private class PendingTransitTravel {
 
-		final Id vehicleId;
-		final Id accessStop;
+		final Id<Vehicle> vehicleId;
+		final Id<TransitStopFacility> accessStop;
 
-		public PendingTransitTravel(Id vehicleId, Id accessStop) {
+		public PendingTransitTravel(Id<Vehicle> vehicleId, Id<TransitStopFacility> accessStop) {
 			this.vehicleId = vehicleId;
 			this.accessStop = accessStop;
 		}
@@ -84,12 +87,12 @@ public final class EventsToLegs implements PersonDepartureEventHandler, PersonAr
 
 	private class LineAndRoute {
 
-		final Id transitLineId;
-		final Id transitRouteId;
-        final Id<Person> driverId;
-        Id lastFacilityId;
+		final Id<TransitLine> transitLineId;
+		final Id<TransitRoute> transitRouteId;
+		final Id<Person> driverId;
+		Id<TransitStopFacility> lastFacilityId;
 
-		LineAndRoute(Id transitLineId, Id transitRouteId, Id<Person> driverId) {
+		LineAndRoute(Id<TransitLine> transitLineId, Id<TransitRoute> transitRouteId, Id<Person> driverId) {
 			this.transitLineId = transitLineId;
 			this.transitRouteId = transitRouteId;
             this.driverId = driverId;
@@ -101,13 +104,13 @@ public final class EventsToLegs implements PersonDepartureEventHandler, PersonAr
 	    void handleLeg(Id<Person> agentId, Leg leg);
 	}
 	
-    private Scenario scenario;
-	private Map<Id, LegImpl> legs = new HashMap<>();
-    private Map<Id, List<Id<Link>>> routes = new HashMap<>();
-    private Map<Id, TeleportationArrivalEvent> routelessTravels = new HashMap<>();
-    private Map<Id, PendingTransitTravel> transitTravels = new HashMap<>();
-    private Map<Id, LineAndRoute> transitVehicle2currentRoute = new HashMap<>();
-    private LegHandler legHandler;
+	private Scenario scenario;
+	private Map<Id<Person>, LegImpl> legs = new HashMap<>();
+	private Map<Id<Person>, List<Id<Link>>> routes = new HashMap<>();
+	private Map<Id<Person>, TeleportationArrivalEvent> routelessTravels = new HashMap<>();
+	private Map<Id<Person>, PendingTransitTravel> transitTravels = new HashMap<>();
+	private Map<Id<Vehicle>, LineAndRoute> transitVehicle2currentRoute = new HashMap<>();
+	private LegHandler legHandler;
 	public EventsToLegs(Scenario scenario) {
 		this.scenario = scenario;
 	}

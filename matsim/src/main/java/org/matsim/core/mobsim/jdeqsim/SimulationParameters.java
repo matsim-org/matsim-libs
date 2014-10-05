@@ -22,6 +22,7 @@ package org.matsim.core.mobsim.jdeqsim;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 
 /**
@@ -68,7 +69,7 @@ public class SimulationParameters {
 	 * this must be initialized before starting the simulation! mapping:
 	 * key=linkId used to find a road corresponding to a link
 	 */
-	private static HashMap<Id, Road> allRoads = null;
+	private static HashMap<Id<Link>, Road> allRoads = null;
 
 	public static void reset(){
 		simulationEndTime = Double.MAX_VALUE;
@@ -164,11 +165,11 @@ public class SimulationParameters {
 		SimulationParameters.processEventThread = processEventThread;
 	}
 
-	public static HashMap<Id, Road> getAllRoads() {
+	public static HashMap<Id<Link>, Road> getAllRoads() {
 		return allRoads;
 	}
 
-	public static void setAllRoads(HashMap<Id, Road> allRoads) {
+	public static void setAllRoads(HashMap<Id<Link>, Road> allRoads) {
 		SimulationParameters.allRoads = allRoads;
 	}
 

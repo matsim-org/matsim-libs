@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -52,6 +51,7 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Tests the behavior of the qsim with agents waiting for vehicles.
@@ -63,8 +63,6 @@ import org.matsim.core.utils.geometry.CoordImpl;
  * @author thibautd
  */
 public class VehicleWaitingTest {
-	private static final Logger log =
-		Logger.getLogger(VehicleWaitingTest.class);
 
 	@Test
 	public void testVehicleWaitingOneLapDoesntFailNoDummies() {
@@ -116,14 +114,14 @@ public class VehicleWaitingTest {
 
 		final PopulationFactory popFact = sc.getPopulation().getFactory();
 
-		final List<Id> personIds = new ArrayList<Id>();
-		final Id personId1 = Id.create( "A", Person.class );
+		final List<Id<Person>> personIds = new ArrayList<>();
+		final Id<Person> personId1 = Id.create( "A", Person.class );
 		personIds.add( personId1 );
 		personIds.add( Id.create( "B", Person.class ) );
 		personIds.add( Id.create( "C", Person.class ) );
 		personIds.add( Id.create( "D", Person.class ) );
 
-		for ( Id id : personIds ) {
+		for ( Id<Person> id : personIds ) {
 			final Person person = popFact.createPerson( id );
 			final Plan plan = popFact.createPlan();
 			plan.setPerson( person );
@@ -140,7 +138,7 @@ public class VehicleWaitingTest {
 							link1.getId(),
 							Collections.singletonList( link2.getId() ),
 							link3.getId());
-				route.setVehicleId( personId1 ); // QSim creates a vehicle per person, with the ids of the persons
+				route.setVehicleId( Id.create(personId1, Vehicle.class) ); // QSim creates a vehicle per person, with the ids of the persons
 				leg.setRoute( route );
 				plan.addLeg( leg );
 
@@ -157,7 +155,7 @@ public class VehicleWaitingTest {
 							Collections.<Id<Link>>emptyList(),
 							link1.getId());
 
-				secondRoute.setVehicleId( personId1 ); // QSim creates a vehicle per person, with the ids of the persons
+				secondRoute.setVehicleId( Id.create(personId1, Vehicle.class) ); // QSim creates a vehicle per person, with the ids of the persons
 				secondLeg.setRoute( secondRoute );
 				plan.addLeg( secondLeg );
 
@@ -169,7 +167,7 @@ public class VehicleWaitingTest {
 			}
 		}
 
-		final Map<Id, Integer> arrivalCounts = new HashMap<Id, Integer>();
+		final Map<Id<Person>, Integer> arrivalCounts = new HashMap<>();
 		final EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler( new PersonArrivalEventHandler() {
 			@Override
@@ -195,7 +193,7 @@ public class VehicleWaitingTest {
 //			Assert.fail( "got an exception in the mobsim with arrivals "+arrivalCounts+"! "+e.getMessage() );
 //		}
 
-		for ( Id id : personIds ) {
+		for ( Id<Person> id : personIds ) {
 			Assert.assertNotNull(
 					"no arrivals for person "+id,
 					arrivalCounts.get( id ) );

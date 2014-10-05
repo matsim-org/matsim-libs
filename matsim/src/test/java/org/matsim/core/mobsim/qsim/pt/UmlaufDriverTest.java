@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -561,7 +562,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		}
 
 		@Override
-		public Id getId() {
+		public Id<Person> getId() {
 			return null;
 		}
 

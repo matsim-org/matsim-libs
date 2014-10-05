@@ -20,12 +20,20 @@
 
 package org.matsim.core.mobsim.qsim;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.LinkedHashSet;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
@@ -34,7 +42,12 @@ import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
-import org.matsim.core.mobsim.qsim.interfaces.*;
+import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounterI;
+import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
@@ -46,8 +59,6 @@ import org.matsim.vis.snapshotwriters.VisData;
 import org.matsim.vis.snapshotwriters.VisMobsim;
 import org.matsim.vis.snapshotwriters.VisNetwork;
 import org.matsim.withinday.mobsim.WithinDayEngine;
-
-import java.util.*;
 
 /**
  * This has developed over the last couple of months/years towards an increasingly pluggable module.  The current (dec'2011)
@@ -137,7 +148,7 @@ public final class QSim implements VisMobsim, Netsim {
 		}
 
 		@Override
-		public synchronized MobsimAgent unregisterAdditionalAgentOnLink(Id agentId, Id linkId) {
+		public synchronized MobsimAgent unregisterAdditionalAgentOnLink(Id<Person> agentId, Id<Link> linkId) {
             if (QSim.this.netEngine != null) {
                 return QSim.this.netEngine.unregisterAdditionalAgentOnLink(agentId, linkId);
             }
@@ -241,14 +252,14 @@ public final class QSim implements VisMobsim, Netsim {
 		}
 	}
 
-	public void createAndParkVehicleOnLink(Vehicle vehicle, Id linkId) {
+	public void createAndParkVehicleOnLink(Vehicle vehicle, Id<Link> linkId) {
 		QVehicle veh = new QVehicle(vehicle);
         if (netEngine != null) {
             netEngine.addParkedVehicle(veh, linkId);
         }
 	}
 
-	public void addParkedVehicle(MobsimVehicle veh, Id startLinkId) {
+	public void addParkedVehicle(MobsimVehicle veh, Id<Link> startLinkId) {
 		if (netEngine != null) {
             netEngine.addParkedVehicle(veh, startLinkId);
         }

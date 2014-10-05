@@ -23,6 +23,9 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.lanes.data.v20.Lane;
 
 
 /**
@@ -40,7 +43,7 @@ public class LaneLeaveEvent extends Event {
 	
 	public static final String EVENT_TYPE = "left lane";
 	
-	public LaneLeaveEvent(double time, Id agentId, Id linkId, Id laneId) {
+	public LaneLeaveEvent(double time, Id<Person> agentId, Id<Link> linkId, Id<Lane> laneId) {
 		super(time);
 		this.laneId = laneId;
 		this.personId = agentId;
@@ -55,7 +58,7 @@ public class LaneLeaveEvent extends Event {
 	public static final String ATTRIBUTE_LANE = "lane";
 	public static final String ATTRIBUTE_LINK = "link";
 
-	private final Id linkId;
+	private final Id<Link> linkId;
 
 	@Override
 	public Map<String, String> getAttributes() {
@@ -66,23 +69,23 @@ public class LaneLeaveEvent extends Event {
 		return attr;
 	}
 
-	public Id getLinkId() {
+	public Id<Link> getLinkId() {
 		return this.linkId;
 	}
 
 	public static final String ATTRIBUTE_PERSON = "person";
 
-	private final Id personId;
+	private final Id<Person> personId;
 
 
-	public Id getPersonId() {
+	public Id<Person> getPersonId() {
 		return this.personId;
 	}
 	
 	
-	private final Id laneId;
+	private final Id<Lane> laneId;
 
-	public Id getLaneId() {
+	public Id<Lane> getLaneId() {
 		return this.laneId;
 	}
 

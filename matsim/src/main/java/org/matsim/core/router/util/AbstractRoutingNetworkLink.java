@@ -45,7 +45,7 @@ public abstract class AbstractRoutingNetworkLink implements RoutingNetworkLink {
 	}
 	
 	@Override
-	public Id getId() {
+	public Id<Link> getId() {
 		return link.getId();
 	}
 

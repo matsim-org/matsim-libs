@@ -20,21 +20,30 @@
 
 package org.matsim.core.scoring;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scoring.EventsToActivities.ActivityHandler;
 import org.matsim.core.scoring.EventsToLegs.LegHandler;
 import org.matsim.core.utils.io.IOUtils;
-
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * 
@@ -50,10 +59,10 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 	
 	private ScoringFunctionFactory scoringFunctionFactory = null;
 
-	private final TreeMap<Id,  ScoringFunction> agentScorers = new TreeMap<Id,ScoringFunction>();
+	private final TreeMap<Id<Person>, ScoringFunction> agentScorers = new TreeMap<>();
 
-	private final Map<Id,  Plan> agentRecords = new TreeMap<Id,Plan>();
-	private final Map<Id,List<Double>> partialScores = new TreeMap<Id,List<Double>>() ;
+	private final Map<Id<Person>, Plan> agentRecords = new TreeMap<>();
+	private final Map<Id<Person>, List<Double>> partialScores = new TreeMap<>() ;
 
 	private Scenario scenario;
 
@@ -78,16 +87,16 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 	 *            The id of the agent the scoring function is requested for.
 	 * @return The scoring function for the specified agent.
 	 */
-	public ScoringFunction getScoringFunctionForAgent(final Id agentId) {
+	public ScoringFunction getScoringFunctionForAgent(final Id<Person> agentId) {
 		return this.agentScorers.get(agentId);
 	}
 
-	public Map<Id, Plan> getAgentRecords() {
+	public Map<Id<Person>, Plan> getAgentRecords() {
 		return agentRecords;
 	}
 
 	@Override
-	public void handleActivity(Id agentId, Activity activity) {
+	public void handleActivity(Id<Person> agentId, Activity activity) {
 		ScoringFunction scoringFunctionForAgent = this.getScoringFunctionForAgent(agentId);
 		if (scoringFunctionForAgent != null) {
 			scoringFunctionForAgent.handleActivity(activity);
@@ -98,7 +107,7 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 	}
 
 	@Override
-	public void handleLeg(Id agentId, Leg leg) {
+	public void handleLeg(Id<Person> agentId, Leg leg) {
 		ScoringFunction scoringFunctionForAgent = this.getScoringFunctionForAgent(agentId);
 		if (scoringFunctionForAgent != null) {
 			scoringFunctionForAgent.handleLeg(leg);
@@ -112,14 +121,14 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 		for (ScoringFunction sf : agentScorers.values()) {
 			sf.finish();
 		}
-		for ( Entry<Id, List<Double>> entry : this.partialScores.entrySet() ) {
+		for ( Entry<Id<Person>, List<Double>> entry : this.partialScores.entrySet() ) {
 			entry.getValue().add(this.getScoringFunctionForAgent(entry.getKey()).getScore());
 		}
 	}
 
 	public void writeExperiencedPlans(String iterationFilename) {
 		Population population = PopulationUtils.createPopulation(scenario.getConfig());
-		for (Entry<Id, Plan> entry : agentRecords.entrySet()) {
+		for (Entry<Id<Person>, Plan> entry : agentRecords.entrySet()) {
 			PersonImpl person = new PersonImpl(entry.getKey());
 			Plan plan = entry.getValue();
 			plan.setScore(getScoringFunctionForAgent(person.getId()).getScore());
@@ -133,7 +142,7 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 
 		BufferedWriter out = IOUtils.getBufferedWriter(iterationFilename + "_scores.xml.gz");
 		try {
-			for (Entry<Id,List<Double>> entry : partialScores.entrySet()) {
+			for (Entry<Id<Person>,List<Double>> entry : partialScores.entrySet()) {
 				out.write( entry.getKey().toString());
 				for (Double score : entry.getValue()) {
 					out.write('\t'+ score.toString());

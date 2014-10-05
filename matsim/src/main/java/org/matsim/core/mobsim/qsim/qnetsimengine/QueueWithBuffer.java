@@ -19,7 +19,11 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import org.apache.log4j.Logger;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Queue;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -35,16 +39,13 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.signalsystems.mobsim.DefaultSignalizeableItem;
 import org.matsim.signalsystems.mobsim.SignalizeableItem;
 import org.matsim.signalsystems.model.SignalGroupState;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.VisData;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.Queue;
 
 /**
  * Separating out the "lane" functionality from the "link" functionality also for QLinkImpl.  Ultimate goal is to unite this class here
@@ -62,8 +63,6 @@ import java.util.Queue;
  * @author nagel
  */
 final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem {
-	@SuppressWarnings("unused")
-	private static Logger log = Logger.getLogger(QueueWithBuffer.class) ;
 
 	/**
 	 * The remaining integer part of the flow capacity available in one time step to move vehicles into the
@@ -133,7 +132,7 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 	private DefaultSignalizeableItem qSignalizedItem = null ;
 	private final AbstractQLink qLink;
 	private final QNetwork network ;
-	private final Id id;
+	private final Id<Lane> id;
 	private static int spaceCapWarningCount = 0;
 	static boolean HOLES = false ; // can be set from elsewhere in package, but not from outside.  kai, nov'10
 	static boolean VIS_HOLES = false ;
@@ -157,15 +156,15 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 	private final double timeStepSize;
 
 	QueueWithBuffer(AbstractQLink qLinkImpl,  final VehicleQ<QVehicle> vehicleQueue ) {
-		this(qLinkImpl, vehicleQueue,  qLinkImpl.getLink().getId() ) ;
+		this(qLinkImpl, vehicleQueue,  Id.create(qLinkImpl.getLink().getId(), Lane.class) ) ;
 	}
 
-	QueueWithBuffer(AbstractQLink qLinkImpl,  final VehicleQ<QVehicle> vehicleQueue, Id id ) {
+	QueueWithBuffer(AbstractQLink qLinkImpl,  final VehicleQ<QVehicle> vehicleQueue, Id<Lane> id ) {
 		this(qLinkImpl, vehicleQueue, id, qLinkImpl.getLink().getLength(), qLinkImpl.getLink().getNumberOfLanes(),
 				((LinkImpl)qLinkImpl.getLink()).getFlowCapacity());
 	}
 
-	QueueWithBuffer(AbstractQLink qLinkImpl,  final VehicleQ<QVehicle> vehicleQueue, Id id, 
+	QueueWithBuffer(AbstractQLink qLinkImpl,  final VehicleQ<QVehicle> vehicleQueue, Id<Lane> id, 
 			double length, double effectiveNumberOfLanes, double flowCapacity_s) {
 		this.id = id ;
 		this.qLink = qLinkImpl;
@@ -437,7 +436,7 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 	}
 
 	@Override
-	public final QVehicle getVehicle(final Id vehicleId) {
+	public final QVehicle getVehicle(final Id<Vehicle> vehicleId) {
 		for (QVehicle veh : this.vehQueue) {
 			if (veh.getId().equals(vehicleId))
 				return veh;
@@ -481,7 +480,7 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 	}
 
 	@Override
-	public final void setSignalStateForTurningMove( final SignalGroupState state, final Id toLinkId) {
+	public final void setSignalStateForTurningMove( final SignalGroupState state, final Id<Link> toLinkId) {
 		if (!qLink.getToNode().getNode().getOutLinks().containsKey(toLinkId)){
 			throw new IllegalArgumentException("ToLink " + toLinkId + " is not reachable from QLink Id " +  this.id );
 		}
@@ -493,7 +492,7 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 	}
 
 	@Override
-	public final boolean hasGreenForToLink(final Id toLinkId) {
+	public final boolean hasGreenForToLink(final Id<Link> toLinkId) {
 		if (qSignalizedItem != null){
 			return qSignalizedItem.isLinkGreenForToLink(toLinkId);
 		}
@@ -610,7 +609,7 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 		this.recalcTimeVariantAttributes(now);
 	}
 
-	Id getId() {
+	Id<Lane> getId() {
 		// need this so we can generate lane events although we do not need them here. kai, sep'13
 		// yyyy would probably be better to have this as a final variable set during construction. kai, sep'13
 		return this.id;

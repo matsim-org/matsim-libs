@@ -78,17 +78,17 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 
 	private static final Logger log = Logger.getLogger(TravelTimeCalculator.class);
 
-	private Map<Id, DataContainer> linkData;
+	private Map<Id<Link>, DataContainer> linkData;
 
-	private Map<Tuple<Id, Id>, DataContainer> linkToLinkData;
+	private Map<Tuple<Id<Link>, Id<Link>>, DataContainer> linkToLinkData;
 
 	private final DataContainerProvider dataContainerProvider;
 	
-	private final Map<Id, LinkEnterEvent> linkEnterEvents;
+	private final Map<Id<Person>, LinkEnterEvent> linkEnterEvents;
 
-	private final Map<Id, Id> transitVehicleDriverMapping;
+	private final Map<Id<Vehicle>, Id<Person>> transitVehicleDriverMapping;
 
-	private final Set<Id> agentsToFilter;
+	private final Set<Id<Person>> agentsToFilter;
 	private final Set<String> analyzedModes;
 
 	private final boolean filterAnalyzedModes;
@@ -113,7 +113,7 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 		this.calculateLinkToLinkTravelTimes = ttconfigGroup.isCalculateLinkToLinkTravelTimes();
 		this.filterAnalyzedModes = ttconfigGroup.isFilterModes();
 		if (this.calculateLinkTravelTimes){
-			this.linkData = new ConcurrentHashMap<Id, DataContainer>((int) (network.getLinks().size() * 1.4));
+			this.linkData = new ConcurrentHashMap<>((int) (network.getLinks().size() * 1.4));
 
 			/*
 			 * So far, link data objects were stored in a HashMap. This lookup strategy is used
@@ -130,11 +130,11 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 		} else this.dataContainerProvider = null;
 		if (this.calculateLinkToLinkTravelTimes){
 			// assume that every link has 2 outgoing links as default
-			this.linkToLinkData = new ConcurrentHashMap<Tuple<Id, Id>, DataContainer>((int) (network.getLinks().size() * 1.4 * 2));
+			this.linkToLinkData = new ConcurrentHashMap<>((int) (network.getLinks().size() * 1.4 * 2));
 		}
-		this.linkEnterEvents = new ConcurrentHashMap<Id, LinkEnterEvent>();
-		this.transitVehicleDriverMapping = new ConcurrentHashMap<Id, Id>();
-		this.agentsToFilter = new HashSet<Id>();
+		this.linkEnterEvents = new ConcurrentHashMap<>();
+		this.transitVehicleDriverMapping = new ConcurrentHashMap<>();
+		this.agentsToFilter = new HashSet<>();
 		this.analyzedModes = CollectionUtils.stringToSet(ttconfigGroup.getAnalyzedModes());
 	
 		this.reset(0);
@@ -148,7 +148,7 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 
 		LinkEnterEvent oldEvent = this.linkEnterEvents.remove(e.getPersonId());
 		if ((oldEvent != null) && this.calculateLinkToLinkTravelTimes) {
-			Tuple<Id, Id> fromToLink = new Tuple<Id, Id>(oldEvent.getLinkId(), e.getLinkId());
+			Tuple<Id<Link>, Id<Link>> fromToLink = new Tuple<>(oldEvent.getLinkId(), e.getLinkId());
 			DataContainer data = getLinkToLinkTravelTimeData(fromToLink, true);
 			this.aggregator.addTravelTime(data.ttData, oldEvent.getTime(), e.getTime());
 			data.needsConsolidation = true;
@@ -194,7 +194,7 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 		/* remove EnterEvents from list when a bus stops on a link.
 		 * otherwise, the stop time would counted as travel time, when the
 		 * bus departs again and leaves the link! */
-		Id personId = transitVehicleDriverMapping.get(event.getVehicleId());
+		Id<Person> personId = transitVehicleDriverMapping.get(event.getVehicleId());
 		if (personId != null) this.linkEnterEvents.remove(personId);
 	}
 
@@ -223,7 +223,7 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 		if (filterAnalyzedModes) this.agentsToFilter.remove(event.getPersonId());
 	}
 
-	private DataContainer getLinkToLinkTravelTimeData(Tuple<Id, Id> fromLinkToLink, final boolean createIfMissing) {
+	private DataContainer getLinkToLinkTravelTimeData(Tuple<Id<Link>, Id<Link>> fromLinkToLink, final boolean createIfMissing) {
 		DataContainer data = this.linkToLinkData.get(fromLinkToLink);
 		if ((null == data) && createIfMissing) {
 			data = new DataContainer(this.ttDataFactory.createTravelTimeData(fromLinkToLink.getFirst()));
@@ -237,12 +237,12 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 	 * @deprecated Use getLinkTravelTimes()
 	 * 
 	 */
-	public double getLinkTravelTime(final Id linkId, final double time) {
+	public double getLinkTravelTime(final Id<Link> linkId, final double time) {
 		return doGetLinkTravelTime(linkId, time);
 	}
 
 	@Deprecated
-	private double doGetLinkTravelTime(final Id linkId, final double time) {
+	private double doGetLinkTravelTime(final Id<Link> linkId, final double time) {
 		if (this.calculateLinkTravelTimes) {
 			DataContainer data = this.dataContainerProvider.getTravelTimeData(linkId, true);
 			if (data.needsConsolidation) {
@@ -271,16 +271,16 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 	 * 
 	 * @deprecated Use getLinkToLinkTravelTimes()
 	 */
-	public double getLinkToLinkTravelTime(final Id fromLinkId, final Id toLinkId, double time) {
+	public double getLinkToLinkTravelTime(final Id<Link> fromLinkId, final Id<Link> toLinkId, double time) {
 		return doGetLinkToLinkTravelTime(fromLinkId, toLinkId, time);
 	}
 
-	private double doGetLinkToLinkTravelTime(final Id fromLinkId, final Id toLinkId, double time) {
+	private double doGetLinkToLinkTravelTime(final Id<Link> fromLinkId, final Id<Link> toLinkId, double time) {
 		if (!this.calculateLinkToLinkTravelTimes) {
 			throw new IllegalStateException("No link to link travel time is available " +
 					"if calculation is switched off by config option!");      
 		}
-		DataContainer data = this.getLinkToLinkTravelTimeData(new Tuple<Id, Id>(fromLinkId, toLinkId), true);
+		DataContainer data = this.getLinkToLinkTravelTimeData(new Tuple<Id<Link>, Id<Link>>(fromLinkId, toLinkId), true);
 		if (data.needsConsolidation) {
 			consolidateData(data);
 		}

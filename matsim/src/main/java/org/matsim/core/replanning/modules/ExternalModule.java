@@ -20,6 +20,9 @@
 
 package org.matsim.core.replanning.modules;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -39,9 +42,6 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ExeRunner;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Basic wrapper for any call to external "plans-to-plans" modules. As basic handling of
@@ -83,7 +83,7 @@ public class ExternalModule implements PlanStrategyModule {
 	
 	private Population exportPopulation;
 	
-	private Map<Id, Plan> plansToMutate = new HashMap<Id, Plan>();
+	private Map<Id<Person>, Plan> plansToMutate = new HashMap<>();
 
 	public ExternalModule(final String exePath, final String moduleId, final OutputDirectoryHierarchy controler, final Scenario scenario) {
         this.modulePrefix = moduleId + "_";

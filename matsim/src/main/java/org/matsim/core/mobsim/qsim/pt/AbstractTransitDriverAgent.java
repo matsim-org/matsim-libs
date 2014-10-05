@@ -19,6 +19,9 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
+import java.util.List;
+import java.util.ListIterator;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
@@ -37,10 +40,12 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.transitSchedule.api.*;
-
-import java.util.List;
-import java.util.ListIterator;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 
 public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, PlanAgent {
 
@@ -133,7 +138,7 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 	}
 
 	@Override
-	public final void notifyMoveOverNode(Id nextLinkId) {
+	public final void notifyMoveOverNode(Id<Link> nextLinkId) {
 		this.nextLinkIndex++;
 	}
 
@@ -186,7 +191,7 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 	}
 
 	@Override
-	public void notifyArrivalOnLinkByNonNetworkMode(final Id linkId) {
+	public void notifyArrivalOnLinkByNonNetworkMode(final Id<Link> linkId) {
 	}
 
 	final Netsim getSimulation(){
@@ -313,7 +318,7 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 	}
 
 	@Override
-	public Id getId() {
+	public Id<Person> getId() {
 		return this.dummyPerson.getId() ;
 	}
 
@@ -355,7 +360,7 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 		}
 
 		@Override
-		public Id getVehicleId() {
+		public Id<Vehicle> getVehicleId() {
 			return AbstractTransitDriverAgent.this.vehicle.getVehicle().getId();
 		}
 
@@ -370,17 +375,17 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 		}
 
 		@Override
-		public void setVehicleId(final Id vehicleId) {
+		public void setVehicleId(final Id<Vehicle> vehicleId) {
 			throw new UnsupportedOperationException("read only route.");
 		}
 
 		@Override
-		public void setEndLinkId(final Id  linkId) {
+		public void setEndLinkId(final Id<Link>  linkId) {
 			throw new UnsupportedOperationException("read only route.");
 		}
 
 		@Override
-		public void setStartLinkId(final Id linkId) {
+		public void setStartLinkId(final Id<Link> linkId) {
 			throw new UnsupportedOperationException("read only route.");
 		}
 
@@ -391,12 +396,12 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 		}
 
 		@Override
-		public Id getEndLinkId() {
+		public Id<Link> getEndLinkId() {
 			return this.delegate.getEndLinkId();
 		}
 
 		@Override
-		public Id getStartLinkId() {
+		public Id<Link> getStartLinkId() {
 			return this.delegate.getStartLinkId();
 		}
 

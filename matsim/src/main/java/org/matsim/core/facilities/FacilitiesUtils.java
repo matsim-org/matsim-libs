@@ -48,8 +48,8 @@ public class FacilitiesUtils {
 	 * @param network
 	 * @return sorted map containing containing the facilities as values and their ids as keys.
 	 */
-	public static SortedMap<Id, ActivityFacility> getSortedFacilities(final ActivityFacilities facilities) {
-		return new TreeMap<Id, ActivityFacility>(facilities.getFacilities());
+	public static SortedMap<Id<ActivityFacility>, ActivityFacility> getSortedFacilities(final ActivityFacilities facilities) {
+		return new TreeMap<>(facilities.getFacilities());
 	}
 
 }

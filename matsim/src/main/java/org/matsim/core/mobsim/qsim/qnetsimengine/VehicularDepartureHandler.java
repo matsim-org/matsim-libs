@@ -19,13 +19,15 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.Collection;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
-
-import java.util.Collection;
+import org.matsim.vehicles.Vehicle;
 
 class VehicularDepartureHandler implements DepartureHandler {
 
@@ -53,7 +55,7 @@ class VehicularDepartureHandler implements DepartureHandler {
 	}
 
 	@Override
-	public boolean handleDeparture(double now, MobsimAgent agent, Id linkId) {
+	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
 		if (this.transportModes.contains(agent.getMode())) {
 			if ( agent instanceof MobsimDriverAgent ) {
 				handleCarDeparture(now, (MobsimDriverAgent)agent, linkId);
@@ -65,13 +67,13 @@ class VehicularDepartureHandler implements DepartureHandler {
 		return false;
 	}
 
-	private void handleCarDeparture(double now, MobsimDriverAgent agent, Id linkId) {
+	private void handleCarDeparture(double now, MobsimDriverAgent agent, Id<Link> linkId) {
 		// The situation where a leg starts and ends at the same link used to be
 		// handled specially, for all agents except AbstractTransitDriverAgents.
 		// This however caused some problems in some cases, as apparently for taxicabs.
 		// Thus, such trips are now simulated normally.
 		// See MATSIM-233 for details. td apr'14
-		Id vehicleId = agent.getPlannedVehicleId() ;
+		Id<Vehicle> vehicleId = agent.getPlannedVehicleId() ;
 		QLinkInternalI qlink = (QLinkInternalI) qNetsimEngine.getNetsimNetwork().getNetsimLink(linkId);
 		QVehicle vehicle = qlink.removeParkedVehicle(vehicleId);
 		if (vehicle == null) {
@@ -114,7 +116,7 @@ class VehicularDepartureHandler implements DepartureHandler {
 	 * <li> yyyyyy Note that the "linkId" parameter is not used for any physical action!!
 	 * </ul> 
 	 */
-	private void teleportVehicleTo(QVehicle vehicle, Id linkId) {
+	private void teleportVehicleTo(QVehicle vehicle, Id<Link> linkId) {
 		if (vehicle.getCurrentLink() != null) {
 			if (cntTeleportVehicle < 9) {
 				cntTeleportVehicle++;

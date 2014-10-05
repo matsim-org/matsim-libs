@@ -20,6 +20,9 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -33,12 +36,10 @@ import org.matsim.lanes.vis.VisLaneModelBuilder;
 import org.matsim.lanes.vis.VisLinkWLanes;
 import org.matsim.signalsystems.mobsim.SignalizeableItem;
 import org.matsim.signalsystems.model.SignalGroupState;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import org.matsim.vis.snapshotwriters.VisData;
-
-import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * Please read the docu of QBufferItem, QLane, QLinkInternalI (arguably to be renamed
@@ -202,7 +203,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	}
 
 	@Override
-	QVehicle getVehicle(Id vehicleId) {
+	QVehicle getVehicle(Id<Vehicle> vehicleId) {
 		QVehicle ret = super.getVehicle(vehicleId);
 		if (ret != null) {
 			return ret;
@@ -283,7 +284,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	}
 
 	@Override
-	public boolean hasGreenForToLink(Id toLinkId){
+	public boolean hasGreenForToLink(Id<Link> toLinkId){
 		return road.hasGreenForToLink(toLinkId);
 	}
 
@@ -293,7 +294,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	}
 
 	@Override
-	public void setSignalStateForTurningMove(SignalGroupState state, Id toLinkId) {
+	public void setSignalStateForTurningMove(SignalGroupState state, Id<Link> toLinkId) {
 		((SignalizeableItem) road).setSignalStateForTurningMove(state, toLinkId);
 	}
 

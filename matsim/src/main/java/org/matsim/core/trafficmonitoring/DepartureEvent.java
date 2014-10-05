@@ -21,12 +21,13 @@
 package org.matsim.core.trafficmonitoring;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 
 /*package*/ class DepartureEvent {
 
-	private final Id agentId;
+	private final Id<Person> agentId;
 
-	protected DepartureEvent(final Id agentId) {
+	protected DepartureEvent(final Id<Person> agentId) {
 		this.agentId = agentId;
 	}
 

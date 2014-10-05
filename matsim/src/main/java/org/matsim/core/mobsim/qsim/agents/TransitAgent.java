@@ -20,6 +20,8 @@
 
 package org.matsim.core.mobsim.qsim.agents;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
@@ -35,8 +37,6 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
-import java.util.List;
 
 /**
  * @author mrieser
@@ -76,7 +76,7 @@ public class TransitAgent extends PersonDriverAgentImpl implements MobsimDriverP
 	}
 
 	boolean containsId(List<TransitRouteStop> stopsToCome,
-                       Id egressStopId) {
+                       Id<TransitStopFacility> egressStopId) {
 		for (TransitRouteStop stop : stopsToCome) {
 			if (egressStopId.equals(stop.getStopFacility().getId())) {
 				return true;
@@ -91,7 +91,7 @@ public class TransitAgent extends PersonDriverAgentImpl implements MobsimDriverP
 	}
 
 	@Override
-	public Id getDesiredAccessStopId() {
+	public Id<TransitStopFacility> getDesiredAccessStopId() {
 		Leg leg = getCurrentLeg();
 		if (!(leg.getRoute() instanceof ExperimentalTransitRoute)) {
 			log.error("pt-leg has no TransitRoute. Removing agent from simulation. Agent " + getId().toString());
@@ -102,13 +102,13 @@ public class TransitAgent extends PersonDriverAgentImpl implements MobsimDriverP
 			return null;
 		} else {
 			ExperimentalTransitRoute route = (ExperimentalTransitRoute) leg.getRoute();
-			Id accessStopId = route.getAccessStopId();
+			Id<TransitStopFacility> accessStopId = route.getAccessStopId();
 			return accessStopId;
 		}
 	}
 
 	@Override
-	public Id getDesiredDestinationStopId() {
+	public Id<TransitStopFacility> getDesiredDestinationStopId() {
 		ExperimentalTransitRoute route = (ExperimentalTransitRoute) getCurrentLeg().getRoute();
 		return route.getEgressStopId();
 	}

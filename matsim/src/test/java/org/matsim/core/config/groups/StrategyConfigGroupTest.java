@@ -222,7 +222,7 @@ public class StrategyConfigGroupTest {
 		}
 
 		for ( StrategySettings settings : initialGroup.getStrategySettings() ) {
-			final Id id = settings.getId();
+			final Id<StrategySettings> id = settings.getId();
 			module.addParam( "Module_"+id , settings.getModuleName() );
 			module.addParam( "ModuleProbability_"+id , ""+settings.getProbability() );
 			module.addParam( "ModuleDisableAfterIteration_"+id , ""+settings.getDisableAfter() );

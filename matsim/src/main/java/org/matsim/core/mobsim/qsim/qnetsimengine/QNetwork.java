@@ -20,6 +20,10 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -27,10 +31,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import org.matsim.vis.snapshotwriters.VisLink;
-
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  *
@@ -41,9 +41,9 @@ import java.util.Map;
 
 public class QNetwork implements NetsimNetwork {
 
-	private final Map<Id, QLinkInternalI> links;
+	private final Map<Id<Link>, QLinkInternalI> links;
 
-	private final Map<Id, QNode> nodes;
+	private final Map<Id<Node>, QNode> nodes;
 
 	private final Network network;
 
@@ -89,27 +89,27 @@ public class QNetwork implements NetsimNetwork {
 	}
 
 	@Override
-	public Map<Id, QLinkInternalI> getNetsimLinks() {
+	public Map<Id<Link>, QLinkInternalI> getNetsimLinks() {
 		return Collections.unmodifiableMap(this.links);
 	}
 
 	@Override
-	public Map<Id, ? extends VisLink> getVisLinks() {
+	public Map<Id<Link>, ? extends VisLink> getVisLinks() {
 		return Collections.unmodifiableMap(this.links);
 	}
 
 	@Override
-	public Map<Id, QNode> getNetsimNodes() {
+	public Map<Id<Node>, QNode> getNetsimNodes() {
 		return Collections.unmodifiableMap(this.nodes);
 	}
 
 	@Override
-	public QLinkInternalI getNetsimLink(final Id id) {
+	public QLinkInternalI getNetsimLink(final Id<Link> id) {
 		return this.links.get(id);
 	}
 
 	@Override
-	public NetsimNode getNetsimNode(final Id id) {
+	public NetsimNode getNetsimNode(final Id<Node> id) {
 		return this.nodes.get(id);
 	}
 

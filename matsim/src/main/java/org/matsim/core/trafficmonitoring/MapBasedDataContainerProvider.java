@@ -28,16 +28,16 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator.DataContainer;
 
 public class MapBasedDataContainerProvider implements DataContainerProvider {
 
-	private final Map<Id, DataContainer> linkData;
+	private final Map<Id<Link>, DataContainer> linkData;
 	private final TravelTimeDataFactory ttDataFactory;
 	
-	public MapBasedDataContainerProvider(Map<Id, DataContainer> linkData, TravelTimeDataFactory ttDataFactory) {
+	public MapBasedDataContainerProvider(Map<Id<Link>, DataContainer> linkData, TravelTimeDataFactory ttDataFactory) {
 		this.linkData = linkData;
 		this.ttDataFactory = ttDataFactory;
 	}
 	
 	@Override 
-	public DataContainer getTravelTimeData(final Id linkId, final boolean createIfMissing) {
+	public DataContainer getTravelTimeData(final Id<Link> linkId, final boolean createIfMissing) {
 		DataContainer data = this.linkData.get(linkId);
 		if ((null == data) && createIfMissing) {
 			data = new DataContainer(this.ttDataFactory.createTravelTimeData(linkId));

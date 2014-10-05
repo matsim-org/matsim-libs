@@ -67,7 +67,7 @@ public final class PathSizeLogitSelector extends AbstractPlanSelector {
 
 		double maxScore = Double.NEGATIVE_INFINITY;
 
-		HashMap<Id, ArrayList<Double>> linksInTime = new HashMap<Id, ArrayList<Double>>();
+		HashMap<Id<Link>, ArrayList<Double>> linksInTime = new HashMap<>();
 		// (a data structure that memorizes possible leg start times for link utilization (??))
 		
 		HashMap<Integer,Double> planLength = new HashMap<Integer, Double>();
@@ -97,7 +97,7 @@ public final class PathSizeLogitSelector extends AbstractPlanSelector {
 					pathSize += RouteUtils.calcDistance(r, network);
 					// (i.e. pathSize will be the sum over all routes of the plan)
 					
-					for (Id linkId : r.getLinkIds()){
+					for (Id<Link> linkId : r.getLinkIds()){
 						ArrayList<Double> lit = linksInTime.get(linkId);
 						if (lit == null){
 							lit = new ArrayList<Double>();
@@ -118,7 +118,7 @@ public final class PathSizeLogitSelector extends AbstractPlanSelector {
 					Leg leg = (Leg) pe;
 					double currentTime = leg.getDepartureTime();
 					NetworkRoute route = (NetworkRoute) leg.getRoute();
-					for (Id linkId : route.getLinkIds()){
+					for (Id<Link> linkId : route.getLinkIds()){
 						double denominator = 0;
 						for (double dbl : linksInTime.get(linkId)){
 							//TODO this is just for testing (those legs where the departure time differs more then 3600 seconds will not compared to each other) - need a

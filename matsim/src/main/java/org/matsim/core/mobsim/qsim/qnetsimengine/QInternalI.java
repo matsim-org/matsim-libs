@@ -22,6 +22,7 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 
 
@@ -50,7 +51,7 @@ abstract class QInternalI {
 
 	abstract double getLastMovementTimeOfFirstVehicle();
 
-	abstract boolean hasGreenForToLink(final Id toLinkId);
+	abstract boolean hasGreenForToLink(final Id<Link> toLinkId);
 	
 	abstract boolean isAcceptingFromUpstream();
 	

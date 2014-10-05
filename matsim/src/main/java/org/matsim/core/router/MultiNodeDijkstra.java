@@ -102,7 +102,8 @@ public class MultiNodeDijkstra extends Dijkstra {
 	 * 
 	 * cdobler, jun'14
 	 */
-	/*package*/ void checkNodeBelongToNetwork(Node node) {
+	/*package*/ @Override
+	void checkNodeBelongToNetwork(Node node) {
 		if (node instanceof ImaginaryNode) {
 			ImaginaryNode imaginaryNode = (ImaginaryNode) node;
 			for (InitialNode initialNode : imaginaryNode.initialNodes) super.checkNodeBelongToNetwork(initialNode.node);
@@ -115,7 +116,7 @@ public class MultiNodeDijkstra extends Dijkstra {
 		// If it is an imaginary node...
 		if (toNode instanceof ImaginaryNode) {
 			
-			Map<Id, InitialNode> endNodes = new HashMap<Id, InitialNode>();
+			Map<Id<Node>, InitialNode> endNodes = new HashMap<>();
 			
 			Collection<InitialNode> initialNodes = ((ImaginaryNode) toNode).initialNodes;
 			for (InitialNode initialNode : initialNodes) endNodes.put(initialNode.node.getId(), initialNode);

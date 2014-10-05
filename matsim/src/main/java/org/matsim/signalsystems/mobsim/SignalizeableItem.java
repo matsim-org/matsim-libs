@@ -20,6 +20,7 @@
 package org.matsim.signalsystems.mobsim;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.signalsystems.model.SignalGroupState;
 
 
@@ -38,6 +39,6 @@ public interface SignalizeableItem {
 	
 	public void setSignalStateAllTurningMoves( final SignalGroupState state);
 	
-	public void setSignalStateForTurningMove( final SignalGroupState state, final Id toLinkId);
+	public void setSignalStateForTurningMove( final SignalGroupState state, final Id<Link> toLinkId);
 
 }

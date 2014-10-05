@@ -23,11 +23,12 @@
 package org.matsim.core.api.internal;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author nagel
  *
  */
 public interface HasPersonId {
-	Id getPersonId() ;
+	Id<Person> getPersonId() ;
 }

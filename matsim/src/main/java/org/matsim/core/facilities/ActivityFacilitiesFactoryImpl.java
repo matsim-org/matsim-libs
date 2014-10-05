@@ -32,7 +32,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 public class ActivityFacilitiesFactoryImpl implements ActivityFacilitiesFactory {
 
 	@Override
-	public ActivityFacility createActivityFacility(Id id, Coord coord) {
+	public ActivityFacility createActivityFacility(Id<ActivityFacility> id, Coord coord) {
 		return new ActivityFacilityImpl(id,coord);
 	}
 

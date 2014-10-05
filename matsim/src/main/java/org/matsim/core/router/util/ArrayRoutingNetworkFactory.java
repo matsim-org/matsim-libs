@@ -51,7 +51,7 @@ public class ArrayRoutingNetworkFactory extends AbstractRoutingNetworkFactory {
 			RoutingNetworkNode routingNode = createRoutingNetworkNode(node, node.getOutLinks().size());
 			routingNetwork.addNode(routingNode);
 		}
-		Map<Id, RoutingNetworkLink> routingLinks = new HashMap<Id, RoutingNetworkLink>();
+		Map<Id<Link>, RoutingNetworkLink> routingLinks = new HashMap<Id<Link>, RoutingNetworkLink>();
 		for (Link link : network.getLinks().values()) {
 			RoutingNetworkNode fromNode = routingNetwork.getNodes().get(link.getFromNode().getId());
 			RoutingNetworkNode toNode = routingNetwork.getNodes().get(link.getToNode().getId());

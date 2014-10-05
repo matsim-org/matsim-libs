@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -39,13 +40,13 @@ import org.matsim.testcases.MatsimTestCase;
 
 public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 
-	protected Map<Id, List<Event>> eventsByPerson = null;
+	protected Map<Id<Person>, List<Event>> eventsByPerson = null;
 	public LinkedList<Event> allEvents = null;
 
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
-		this.eventsByPerson = new HashMap<Id, List<Event>>();
+		this.eventsByPerson = new HashMap<Id<Person>, List<Event>>();
 		this.allEvents = new LinkedList<Event>();
 	}
 
@@ -91,7 +92,7 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 	 * Checks the type of the event and the linkId.
 	 */
 	protected void checkEventsCorrespondToPlans(final Population population) {
-		for (Entry<Id, List<Event>> entry : eventsByPerson.entrySet()) {
+		for (Entry<Id<Person>, List<Event>> entry : eventsByPerson.entrySet()) {
 			List<Event> list = entry.getValue();
 			Person p = population.getPersons().get(entry.getKey());
 			// printEvents(list.get(0).agentId);
@@ -158,7 +159,7 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 							index++;
 						}
 
-						for (Id linkId : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
+						for (Id<Link> linkId : ((NetworkRoute) leg.getRoute()).getLinkIds()) {
 							// enter link and leave each link on route
 							assertTrue(list.get(index) instanceof LinkEnterEvent);
 							assertTrue(linkId.equals(	((LinkEnterEvent) list.get(index)).getLinkId()) );
@@ -217,6 +218,7 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 
 	private class PersonEventCollector implements ActivityStartEventHandler, ActivityEndEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler, Wait2LinkEventHandler {
 
+		@Override
 		public void reset(int iteration) {
 		}
 

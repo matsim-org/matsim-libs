@@ -364,7 +364,7 @@ public class LinkStatsControlerListenerTest {
 		}
 		@Override
 		public void run() {
-			Id linkId = Id.create("100", Link.class);
+			Id<Link> linkId = Id.create("100", Link.class);
 			for (int i = 0; i < this.nOfEvents; i++) {
 				this.eventsManager.processEvent(new LinkLeaveEvent(60.0, Id.create(i, Person.class), linkId, null));
 			}

@@ -23,7 +23,9 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.facilities.Facility;
 
 /**
@@ -45,7 +47,7 @@ public class ActivityWrapperFacility implements Facility {
 	}
 
 	@Override
-	public Id getId() {
+	public Id<ActivityFacility> getId() {
 		return this.wrapped.getFacilityId();
 	}
 
@@ -55,7 +57,7 @@ public class ActivityWrapperFacility implements Facility {
 	}
 
 	@Override
-	public Id getLinkId() {
+	public Id<Link> getLinkId() {
 		return this.wrapped.getLinkId();
 	}
 

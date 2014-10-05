@@ -83,7 +83,7 @@ public class AStarEuclidean extends Dijkstra {
 	protected final double overdoFactor;
 
 	private double minTravelCostPerLength;
-	/*package*/ final HashMap<Id, AStarNodeData> nodeData;
+	/*package*/ final HashMap<Id<Node>, AStarNodeData> nodeData;
 
 	/**
 	 * Default constructor; sets the overdo factor to 1.
@@ -130,7 +130,7 @@ public class AStarEuclidean extends Dijkstra {
 
 		setMinTravelCostPerLength(preProcessData.getMinTravelCostPerLength());
 
-		this.nodeData = new HashMap<Id, AStarNodeData>((int)(network.getNodes().size() * 1.1), 0.95f);
+		this.nodeData = new HashMap<>((int)(network.getNodes().size() * 1.1), 0.95f);
 		this.overdoFactor = overdoFactor;
 	}
 

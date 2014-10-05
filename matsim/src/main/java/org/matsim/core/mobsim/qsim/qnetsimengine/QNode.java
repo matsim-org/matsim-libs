@@ -20,6 +20,14 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -29,10 +37,6 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
-
-import java.io.Serializable;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Represents a node in the QSimulation.
@@ -207,7 +211,7 @@ public class QNode implements NetsimNode {
 			for (QLaneInternalI lane : ((QLinkLanesImpl)link).getToNodeQueueLanes()) {
 					while (! lane.isNotOfferingVehicle()) {
 						QVehicle veh = lane.getFirstVehicle();
-						Id nextLink = veh.getDriver().chooseNextLinkId();
+						Id<Link> nextLink = veh.getDriver().chooseNextLinkId();
 						if (! (lane.hasGreenForToLink(nextLink) && moveVehicleOverNode(veh, lane, now))) {
 							break;
 						}
@@ -225,7 +229,7 @@ public class QNode implements NetsimNode {
 	}
 
 
-	private void checkNextLinkSemantics(Link currentLink, Id nextLinkId, QLinkInternalI nextQLink, QVehicle veh){
+	private void checkNextLinkSemantics(Link currentLink, Id<Link> nextLinkId, QLinkInternalI nextQLink, QVehicle veh){
 		if (nextQLink == null){
 			throw new IllegalStateException("The link id " + nextLinkId + " is not available in the simulation network, but vehicle " + veh.getId() + " plans to travel on that link from link " + veh.getCurrentLink().getId());
 		}
@@ -247,7 +251,7 @@ public class QNode implements NetsimNode {
 	 * otherwise (e.g. in case where the next link is jammed)
 	 */
 	private boolean moveVehicleOverNode(final QVehicle veh, final QInternalI fromLaneBuffer, final double now) {
-		Id nextLinkId = veh.getDriver().chooseNextLinkId();
+		Id<Link> nextLinkId = veh.getDriver().chooseNextLinkId();
 		Link currentLink = veh.getCurrentLink();
 
 		if ((! fromLaneBuffer.hasGreenForToLink(nextLinkId))) {

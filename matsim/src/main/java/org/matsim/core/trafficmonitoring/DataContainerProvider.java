@@ -29,7 +29,7 @@ public interface DataContainerProvider {
 	/*
 	 * This method is called from the EventHandler part of the TravelTimeCalculator. 
 	 */
-	/*package*/ DataContainer getTravelTimeData(final Id linkId, final boolean createIfMissing);
+	/*package*/ DataContainer getTravelTimeData(final Id<Link> linkId, final boolean createIfMissing);
 	
 	/*
 	 * This method is called from the TravelTime part of the TravelTimeCalculator.

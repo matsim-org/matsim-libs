@@ -29,6 +29,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.signalsystems.vis.VisSignal;
@@ -52,7 +53,7 @@ public class VisLinkWLanes implements Serializable{
 	private Point2D.Double linkStartCenterPoint = null;
 	private Point2D.Double linkEndCenterPoint = null;
 	private Map<String, VisSignal> signals = null;
-	private ArrayList<Id> toLinkIds;
+	private ArrayList<Id<Link>> toLinkIds;
 	private transient List<VisLinkWLanes> toLinks = null;
 	private CoordImpl startCoord;
 	private CoordImpl endCoord;
@@ -189,13 +190,13 @@ public class VisLinkWLanes implements Serializable{
 		return this.toLinks ;
 	}
 	
-	public void addToLinkId(Id toLinkId){
+	public void addToLinkId(Id<Link> toLinkId){
 		if (this.toLinkIds == null)
-			this.toLinkIds = new ArrayList<Id>();
+			this.toLinkIds = new ArrayList<>();
 		this.toLinkIds.add(toLinkId);
 	}
 
-	public List<Id> getToLinkIds() {
+	public List<Id<Link>> getToLinkIds() {
 		return toLinkIds ;
 	}
 

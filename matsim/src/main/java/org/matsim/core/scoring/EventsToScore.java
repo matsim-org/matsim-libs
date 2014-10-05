@@ -20,18 +20,28 @@
 
 package org.matsim.core.scoring;
 
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.events.handler.BasicEventHandler;
-
-import java.util.Map;
 
 /**
  * Calculates the score of the selected plans of a given scenario
@@ -237,7 +247,7 @@ public class EventsToScore implements BasicEventHandler {
 	 *            The id of the agent the score is requested for.
 	 * @return The score of the specified agent.
 	 */
-	public Double getAgentScore(final Id agentId) {
+	public Double getAgentScore(final Id<Person> agentId) {
 		if (!finished) {
 			throw new IllegalStateException("Must call finish first.");
 		}
@@ -257,11 +267,11 @@ public class EventsToScore implements BasicEventHandler {
 		// ("reset" is called just before the mobsim starts, so it probably has the correct iteration number for our purposes) 
 	}
 
-	public ScoringFunction getScoringFunctionForAgent(Id agentId) {
+	public ScoringFunction getScoringFunctionForAgent(Id<Person> agentId) {
 		return scoringFunctionsForPopulation.getScoringFunctionForAgent(agentId);
 	}
 
-	public Map<Id, Plan> getAgentRecords() {
+	public Map<Id<Person>, Plan> getAgentRecords() {
 		return scoringFunctionsForPopulation.getAgentRecords();
 	}
 

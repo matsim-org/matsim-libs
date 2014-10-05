@@ -19,19 +19,32 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-
-import java.util.*;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * QLinkInternalI is the interface; this here is an abstract class that contains implementation
@@ -56,16 +69,16 @@ abstract class AbstractQLink extends QLinkInternalI {
 	// joint implementation for Customizable
 	private final Map<String, Object> customAttributes = new HashMap<>();
 
-	private final Map<Id, QVehicle> parkedVehicles = new LinkedHashMap<>(10);
+	private final Map<Id<Vehicle>, QVehicle> parkedVehicles = new LinkedHashMap<>(10);
 
-	private final Map<Id, MobsimAgent> additionalAgentsOnLink = new LinkedHashMap<>();
+	private final Map<Id<Person>, MobsimAgent> additionalAgentsOnLink = new LinkedHashMap<>();
 
-	private final Map<Id, Queue<MobsimDriverAgent>> driversWaitingForCars = new LinkedHashMap<>();
+	private final Map<Id<Vehicle>, Queue<MobsimDriverAgent>> driversWaitingForCars = new LinkedHashMap<>();
 
-	private final Map<Id, MobsimDriverAgent> driversWaitingForPassengers = new LinkedHashMap<>();
+	private final Map<Id<Person>, MobsimDriverAgent> driversWaitingForPassengers = new LinkedHashMap<>();
 
 	// vehicleId
-	private final Map<Id, Set<MobsimAgent>> passengersWaitingForCars = new LinkedHashMap<>();
+	private final Map<Id<Vehicle>, Set<MobsimAgent>> passengersWaitingForCars = new LinkedHashMap<>();
 
 	/**
 	 * All vehicles from parkingList move to the waitingList as soon as their time
@@ -113,12 +126,12 @@ abstract class AbstractQLink extends QLinkInternalI {
 	}
 
 	@Override
-	/*package*/ final QVehicle removeParkedVehicle(Id vehicleId) {
+	/*package*/ final QVehicle removeParkedVehicle(Id<Vehicle> vehicleId) {
 		return this.parkedVehicles.remove(vehicleId);
 	}
 
 	@Override
-	/*package*/ QVehicle getParkedVehicle(Id vehicleId) {
+	/*package*/ QVehicle getParkedVehicle(Id<Vehicle> vehicleId) {
 		return this.parkedVehicles.get(vehicleId);
 	}
 
@@ -135,7 +148,7 @@ abstract class AbstractQLink extends QLinkInternalI {
 	}
 
 	@Override
-	/*package*/ MobsimAgent unregisterAdditionalAgentOnLink(Id mobsimAgentId) {
+	/*package*/ MobsimAgent unregisterAdditionalAgentOnLink(Id<Person> mobsimAgentId) {
 		return this.additionalAgentsOnLink.remove(mobsimAgentId);
 	}
 
@@ -154,7 +167,7 @@ abstract class AbstractQLink extends QLinkInternalI {
 		 * Some agents might be present in multiple lists/maps.
 		 * Ensure that only one stuck event per agent is created.
 		 */
-		Set<Id> stuckAgents = new HashSet<>();
+		Set<Id<Person>> stuckAgents = new HashSet<>();
 
 		for (QVehicle veh : this.parkedVehicles.values()) {
 			if (veh.getDriver() != null) {
@@ -238,7 +251,7 @@ abstract class AbstractQLink extends QLinkInternalI {
 		/*
 		 * Insert waiting passengers into vehicle.
 		 */
-		Id vehicleId = veh.getId();
+		Id<Vehicle> vehicleId = veh.getId();
 		Set<MobsimAgent> passengers = this.passengersWaitingForCars.get(vehicleId);
 		if (passengers != null) {
 			// Copy set of passengers since otherwise we would modify it concurrently.
@@ -295,7 +308,7 @@ abstract class AbstractQLink extends QLinkInternalI {
 	 * the waiting list and return false.
 	 */
 	@Override
-	final boolean insertPassengerIntoVehicle(MobsimAgent passenger, Id vehicleId, double now) {
+	final boolean insertPassengerIntoVehicle(MobsimAgent passenger, Id<Vehicle> vehicleId, double now) {
 		QVehicle vehicle = this.getParkedVehicle(vehicleId);
 
 		// if the vehicle is not parked at the link, mark the agent as passenger waiting for vehicle
@@ -321,7 +334,7 @@ abstract class AbstractQLink extends QLinkInternalI {
 	}
 
 	@Override
-	/*package*/ QVehicle getVehicle(Id vehicleId) {
+	/*package*/ QVehicle getVehicle(Id<Vehicle> vehicleId) {
 		QVehicle ret = this.parkedVehicles.get(vehicleId);
 		return ret;
 	}
@@ -344,7 +357,7 @@ abstract class AbstractQLink extends QLinkInternalI {
 
 	@Override
 	/*package*/ void registerDriverAgentWaitingForCar(final MobsimDriverAgent agent) {
-		final Id vehicleId = agent.getPlannedVehicleId() ;
+		final Id<Vehicle> vehicleId = agent.getPlannedVehicleId() ;
 		Queue<MobsimDriverAgent> queue = driversWaitingForCars.get( vehicleId );
 
 		if ( queue == null ) {
@@ -361,12 +374,12 @@ abstract class AbstractQLink extends QLinkInternalI {
 	}
 
 	@Override
-	/*package*/ MobsimAgent unregisterDriverAgentWaitingForPassengers(Id agentId) {
+	/*package*/ MobsimAgent unregisterDriverAgentWaitingForPassengers(Id<Person> agentId) {
 		return driversWaitingForPassengers.remove(agentId);
 	}
 
 	@Override
-	/*package*/ void registerPassengerAgentWaitingForCar(MobsimAgent agent, Id vehicleId) {
+	/*package*/ void registerPassengerAgentWaitingForCar(MobsimAgent agent, Id<Vehicle> vehicleId) {
 		Set<MobsimAgent> passengers = passengersWaitingForCars.get(vehicleId);
 		if (passengers == null) {
 			passengers = new LinkedHashSet<>();
@@ -376,14 +389,14 @@ abstract class AbstractQLink extends QLinkInternalI {
 	}
 
 	@Override
-	/*package*/ MobsimAgent unregisterPassengerAgentWaitingForCar(MobsimAgent agent, Id vehicleId) {
+	/*package*/ MobsimAgent unregisterPassengerAgentWaitingForCar(MobsimAgent agent, Id<Vehicle> vehicleId) {
 		Set<MobsimAgent> passengers = passengersWaitingForCars.get(vehicleId);
 		if (passengers != null && passengers.remove(agent)) return agent;
 		else return null;
 	}
 
 	@Override
-	/*package*/ Set<MobsimAgent> getAgentsWaitingForCar(Id vehicleId) {
+	/*package*/ Set<MobsimAgent> getAgentsWaitingForCar(Id<Vehicle> vehicleId) {
 		Set<MobsimAgent> set = passengersWaitingForCars.get(vehicleId);
 		if (set != null) return Collections.unmodifiableSet(set);
 		else return null;
