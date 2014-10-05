@@ -29,8 +29,6 @@ import java.util.Random;
 
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
 
 import playground.balmermi.world.Layer;
 import playground.balmermi.world.Zone;
@@ -42,7 +40,7 @@ public class Municipalities {
 	//////////////////////////////////////////////////////////////////////
 
 	public static final String MUNICIPALITY = "municipality";
-	private final HashMap<Id,Municipality> municipalities = new HashMap<Id,Municipality>();
+	private final HashMap<Id<Municipality>, Municipality> municipalities = new HashMap<Id<Municipality>, Municipality>();
 	private final String inputfile;
 
 	private Random random = new Random(123);
@@ -62,14 +60,14 @@ public class Municipalities {
 	//////////////////////////////////////////////////////////////////////
 
 	public final Municipality getMunicipality(int m_id) {
-		return this.getMunicipality(new IdImpl(m_id));
+		return this.getMunicipality(Id.create(m_id, Municipality.class));
 	}
 
-	public final Municipality getMunicipality(Id m_id) {
+	public final Municipality getMunicipality(Id<Municipality> m_id) {
 		return this.municipalities.get(m_id);
 	}
 
-	public final HashMap<Id,Municipality> getMunicipalities() {
+	public final HashMap<Id<Municipality>, Municipality> getMunicipalities() {
 		return this.municipalities;
 	}
 
@@ -92,7 +90,7 @@ public class Municipalities {
 				// 0        1       2       3           4           5           6       7
 
 				int m_id = Integer.parseInt(entries[2].trim());
-				BasicLocation l = municipalityLayer.getLocation(new IdImpl(m_id));
+				BasicLocation l = municipalityLayer.getLocation(Id.create(m_id, Zone.class));
 				if (l == null) {
 					System.out.println("    Municipality id=" + m_id + " ignored. (Does not exist in the world layer.)");
 				} else {

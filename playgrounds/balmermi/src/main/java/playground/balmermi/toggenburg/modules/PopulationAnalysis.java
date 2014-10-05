@@ -6,12 +6,12 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -38,7 +38,7 @@ public class PopulationAnalysis {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final void populationStats(final Population population, final Set<IdImpl> toggenLinks) {
+	private final void populationStats(final Population population, final Set<Id<Link>> toggenLinks) {
 		// Geschlechter Verteilung (Anzahl), Altersverteilung, Fahrausweis, Autoverfuegbarkeit, Berufstaetig, OeV Abo Verfuegbarkeit
 		// index  : 0..99  100    101  102  103          104           105          106       107       108    109     110     111
 		// meaning: 0..99  >=100  m    f    licenseTrue  licenseFalse  availAlways  availSom  availNev  eTrue  eFalse  ptTrue  ptFalse
@@ -139,7 +139,7 @@ public class PopulationAnalysis {
 	// run methods
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(final Population population, final Set<IdImpl> toggenLinks) {
+	public void run(final Population population, final Set<Id<Link>> toggenLinks) {
 		log.info("running " + this.getClass().getName() + " module...");
 		this.populationStats(population,toggenLinks);
 		this.tripStats(population);

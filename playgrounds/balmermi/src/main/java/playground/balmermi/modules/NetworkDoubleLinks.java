@@ -26,8 +26,8 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
@@ -59,10 +59,10 @@ public class NetworkDoubleLinks {
 		Node fn = l.getFromNode();
 		Node tn = l.getToNode();
 		Coord nc = new CoordImpl(0.5*(fn.getCoord().getX()+tn.getCoord().getX()),0.5*(fn.getCoord().getY()+tn.getCoord().getY()));
-		Node n = network.createAndAddNode(new IdImpl(l.getId()+this.suffix),nc,((NodeImpl) fn).getType());
+		Node n = network.createAndAddNode(Id.create(l.getId()+this.suffix, Node.class),nc,((NodeImpl) fn).getType());
 		network.removeLink(l.getId());
 		LinkImpl l1new = network.createAndAddLink(l.getId(),l.getFromNode(),n,0.5*l.getLength(),l.getFreespeed(),l.getCapacity(),l.getNumberOfLanes(),l.getOrigId(),l.getType());
-		LinkImpl l2new = network.createAndAddLink(new IdImpl(l.getId()+this.suffix),n,l.getToNode(),0.5*l.getLength(),l.getFreespeed(),l.getCapacity(),l.getNumberOfLanes(),l.getOrigId(),l.getType());
+		LinkImpl l2new = network.createAndAddLink(Id.create(l.getId()+this.suffix, Link.class),n,l.getToNode(),0.5*l.getLength(),l.getFreespeed(),l.getCapacity(),l.getNumberOfLanes(),l.getOrigId(),l.getType());
 		log.info("    lid="+l.getId()+" split into lids="+l1new.getId()+","+l2new.getId()+" with additional nid="+n.getId());
 	}
 

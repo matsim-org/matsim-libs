@@ -32,12 +32,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.gbl.Gbl;
 
 import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000.data.Municipality;
+import playground.balmermi.world.Zone;
 
 public class Households {
 
@@ -47,7 +47,7 @@ public class Households {
 
 	private final static Logger log = Logger.getLogger(Households.class);
 
-	private final HashMap<Id,Household> households = new HashMap<Id, Household>();
+	private final HashMap<Id<Household>,Household> households = new HashMap<>();
 	private final Municipalities municipalities;
 
 	//////////////////////////////////////////////////////////////////////
@@ -67,11 +67,11 @@ public class Households {
 	// get methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final Household getHousehold(final Id id) {
+	public final Household getHousehold(final Id<Household> id) {
 		return this.households.get(id);
 	}
 
-	public final HashMap<Id,Household> getHouseholds() {
+	public final HashMap<Id<Household>, Household> getHouseholds() {
 		return this.households;
 	}
 
@@ -105,10 +105,10 @@ public class Households {
 				// 1404079  3103  914921  2111   2111   5742752;5757646;  5742752;5757646;
 				// 0        1     2       3      4      5                 6
 
-				Id hhid = new IdImpl(entries[0]);
-				Id zid = new IdImpl(entries[1]);
+				Id<Household> hhid = Id.create(entries[0], Household.class);
+				Id<Zone> zid = Id.create(entries[1], Zone.class);
 				int mid = Integer.parseInt(zid.toString());
-				Id fid = new IdImpl(entries[2]);
+				Id<ActivityFacility> fid = Id.create(entries[2], ActivityFacility.class);
 				int hhtpw = Integer.parseInt(entries[3]);
 				int hhtpz = Integer.parseInt(entries[4]);
 
@@ -124,7 +124,7 @@ public class Households {
 				String p_z_list = entries[6];
 				entries = p_w_list.split(";",-1);
 				for (int i=0; i<entries.length-1; i++) {
-					Id pid = new IdImpl(entries[i]);
+					Id<Person> pid = Id.create(entries[i], Person.class);
 					Person p = plans.getPersons().get(pid);
 					if (p == null) { throw new RuntimeException("that should not happen!"); }
 					if (hh.getPersonsW().put(p.getId(),p) !=  null) { throw new RuntimeException("that should not happen!"); }
@@ -134,7 +134,7 @@ public class Households {
 				}
 				entries = p_z_list.split(";",-1);
 				for (int i=0; i<entries.length-1; i++) {
-					Id pid = new IdImpl(entries[i]);
+					Id<Person> pid = Id.create(entries[i], Person.class);
 					Person p = plans.getPersons().get(pid);
 					if (p == null) { throw new RuntimeException("that should not happen!"); }
 					if (hh.getPersonsZ().put(p.getId(),p) != null) { throw new RuntimeException("that should not happen!"); }
@@ -146,6 +146,7 @@ public class Households {
 				if (line_cnt % 100000 == 0) { log.info("      Line " + line_cnt); }
 				line_cnt++;
 			}
+			br.close();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
@@ -174,8 +175,8 @@ public class Households {
 				          hh.getFacility().getId()+"\t"+
 				          hh.getHHTPW()+"\t"+
 				          hh.getHHTPZ()+"\t");
-				for (Id id : hh.getPersonsW().keySet()) { out.write(id+";"); } out.write("\t");
-				for (Id id : hh.getPersonsZ().keySet()) { out.write(id+";"); } out.write("\n");
+				for (Id<Person> id : hh.getPersonsW().keySet()) { out.write(id+";"); } out.write("\t");
+				for (Id<Person> id : hh.getPersonsZ().keySet()) { out.write(id+";"); } out.write("\n");
 			}
 			out.close();
 			fw.close();

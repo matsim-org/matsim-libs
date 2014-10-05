@@ -24,11 +24,10 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 
 public class World {
 
-	private final Map<Id, Layer> layers = new TreeMap<Id, Layer>();
+	private final Map<Id<Layer>, Layer> layers = new TreeMap<>();
 
 	@Deprecated
 	public final Layer createLayer(final Id<Layer> type) {
@@ -39,19 +38,19 @@ public class World {
 	}
 
 	@Deprecated
-	private final ZoneLayer createZoneLayer(final Id type) {
+	private final ZoneLayer createZoneLayer(final Id<Layer> type) {
 		ZoneLayer l = new ZoneLayer();
 		this.layers.put(type,l);
 		return l;
 	}
 
-	public final Layer getLayer(final Id layer_type) {
+	public final Layer getLayer(final Id<Layer> layer_type) {
 		return this.layers.get(layer_type);
 	}
 
 	@Deprecated
 	public final Layer getLayer(final String layer_type) {
-		return this.layers.get(new IdImpl(layer_type));
+		return this.layers.get(Id.create(layer_type, Layer.class));
 	}
 
 	@Override

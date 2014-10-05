@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -72,7 +71,7 @@ public class TeleatlasIvtcheuMerger {
 				String[] entries = curr_line.split("\t", -1);
 				// ivtchLID
 				// 0
-				Id lid = new IdImpl(entries[0].trim());
+				Id<Link> lid = Id.create(entries[0].trim(), Link.class);
 				Link l = networkIvtcheu.getLinks().get(lid);
 				if (l == null) { throw new RuntimeException(lineCnt+": link with id="+lid+" not found."); }
 				if (networkIvtcheu.removeLink(l.getId()) != null) { throw new RuntimeException(lineCnt+": could not remove link with id="+lid+"."); }
@@ -96,7 +95,7 @@ public class TeleatlasIvtcheuMerger {
 		log.info("  init number of links (networkIvtcheu): "+networkIvtcheu.getLinks().size());
 		log.info("  init number of nodes (networkIvtcheu): "+networkIvtcheu.getNodes().size());
 		int lineCnt = 0;
-		Map<Id,Id> nodeMapping = new TreeMap<Id, Id>();
+		Map<Id<Node>, Id<Node>> nodeMapping = new TreeMap<>();
 		try {
 			FileReader fr = new FileReader(i2tmappingfile);
 			BufferedReader br = new BufferedReader(fr);
@@ -106,8 +105,8 @@ public class TeleatlasIvtcheuMerger {
 				String[] entries = curr_line.split("\t", -1);
 				// ivtchNID  teleatlasNID
 				// 0         1
-				Id iNid = new IdImpl(entries[0].trim());
-				Id tNid = new IdImpl(entries[1].trim());
+				Id<Node> iNid = Id.create(entries[0].trim(), Node.class);
+				Id<Node> tNid = Id.create(entries[1].trim(), Node.class);
 				if (nodeMapping.put(iNid,tNid) != null) { throw new RuntimeException(lineCnt+": ivtch node id="+iNid+" already exists."); }
 				lineCnt++;
 			}
@@ -127,8 +126,8 @@ public class TeleatlasIvtcheuMerger {
 		if (nodeMapCnt != nodeMapping.size()) { throw new RuntimeException("Something is wrong!"); }
 
 		for (Link l : networkIvtcheu.getLinks().values()) {
-			Id fromNodeId = l.getFromNode().getId();
-			Id toNodeId = l.getToNode().getId();
+			Id<Node> fromNodeId = l.getFromNode().getId();
+			Id<Node> toNodeId = l.getToNode().getId();
 			if (nodeMapping.keySet().contains(fromNodeId) && nodeMapping.keySet().contains(toNodeId)) {
 				fromNodeId = nodeMapping.get(fromNodeId);
 				toNodeId = nodeMapping.get(toNodeId);

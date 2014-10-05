@@ -25,10 +25,9 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
 
 import playground.balmermi.census2000v2.data.CAtts;
 
@@ -74,8 +73,8 @@ public class PopulationAddCustomAttributes {
 				Integer aperw = Integer.valueOf(entries[CAtts.I_APERW]);
 				Integer wkata = Integer.valueOf(entries[CAtts.I_WKATA]);
 
-				Person p = pop.getPersons().get(new IdImpl(entries[CAtts.I_PERSON_ID]));
-				if (p == null) { p = pop.getPersons().get(new IdImpl(entries[CAtts.I_PARTNR])); }
+				Person p = pop.getPersons().get(Id.create(entries[CAtts.I_PERSON_ID], Person.class));
+				if (p == null) { p = pop.getPersons().get(Id.create(entries[CAtts.I_PARTNR], Person.class)); }
 				if (p != null) {
 					p.getCustomAttributes().put(CAtts.P_HMAT,nat);
 					p.getCustomAttributes().put(CAtts.P_APERZ,aperz);

@@ -23,6 +23,7 @@ package playground.balmermi.census2000v2.old;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 
 
 public class Humans {
@@ -31,7 +32,7 @@ public class Humans {
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private final HashMap<Id,Human> humans = new HashMap<Id,Human>();
+	private final HashMap<Id<Person>,Human> humans = new HashMap<>();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -49,11 +50,11 @@ public class Humans {
 	// get methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final Human getHuman(final Id id) {
+	public final Human getHuman(final Id<Person> id) {
 		return this.humans.get(id);
 	}
 	
-	public final HashMap<Id,Human> getHumans() {
+	public final HashMap<Id<Person>,Human> getHumans() {
 		return this.humans;
 	}
 

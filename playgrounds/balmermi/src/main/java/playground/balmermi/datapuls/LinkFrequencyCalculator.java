@@ -17,7 +17,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsUtils;
@@ -34,9 +33,10 @@ public class LinkFrequencyCalculator {
 		String currLine = null;
 		Set<Id<Link>> linkIds = new HashSet<Id<Link>>();
 		while ((currLine = br.readLine()) != null) {
-			Id id = new IdImpl(currLine.trim());
+			Id<Link> id = Id.create(currLine.trim(), Link.class);
 			linkIds.add(id);
 		}
+		br.close();
 		return linkIds;
 	}
 
@@ -72,8 +72,8 @@ public class LinkFrequencyCalculator {
 		eManager.addHandler(fa);
 		EventsReaderTXTv1 reader = new EventsReaderTXTv1(eManager);
 		
-		Map<Id,List<Integer>> freqs = new TreeMap<Id, List<Integer>>();
-		for (Id lid : linkIds) { freqs.put(lid,new ArrayList<Integer>()); }
+		Map<Id<Link>, List<Integer>> freqs = new TreeMap<>();
+		for (Id<Link> lid : linkIds) { freqs.put(lid,new ArrayList<Integer>()); }
 
 		Map<Integer,File> eventFiles = new TreeMap<Integer, File>();
 		for (File eventfile : inDir.listFiles()) {
@@ -92,7 +92,7 @@ public class LinkFrequencyCalculator {
 			File eventfile = eventFiles.get(it);
 			System.out.println("processing "+eventfile+"...");
 			reader.readFile(eventfile.toString());
-			for (Id lid : fa.getFrequencies().keySet()) {
+			for (Id<Link> lid : fa.getFrequencies().keySet()) {
 				freqs.get(lid).add(fa.getFrequencies().get(lid).size());
 			}
 			fa.resetLog();
@@ -105,7 +105,7 @@ public class LinkFrequencyCalculator {
 		out.write("linkId");
 		for (int i=0; i<freqs.values().iterator().next().size(); i++) { out.write("\tstep"+i); }
 		out.write("\n");
-		for (Id lid : freqs.keySet()) {
+		for (Id<Link> lid : freqs.keySet()) {
 			out.write(lid.toString());
 			for (Integer i : freqs.get(lid)) { out.write("\t"+i); }
 			out.write("\n");

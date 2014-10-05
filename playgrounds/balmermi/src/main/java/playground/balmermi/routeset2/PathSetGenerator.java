@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NodeImpl;
@@ -58,7 +57,7 @@ public class PathSetGenerator {
 	private final double avLinkDensityPerNodeNetwork;
 	private final double avLinkDensityPerNonePassNodeNetwork;
 
-	private final Map<Id,StreetSegment> l2sMapping = new HashMap<Id,StreetSegment>();
+	private final Map<Id<Link>,StreetSegment> l2sMapping = new HashMap<>();
 	private final double avIncidentNodeDensityPerNodeNetwork;
 	private final double avIncidentNodeDensityPerNonePassNodeNetwork;
 
@@ -107,14 +106,14 @@ public class PathSetGenerator {
 		this.avIncidentNodeDensityPerNodeNetwork = nodeDensity;
 
 		// calc street segment node density
-		Set<Id> nodeIds = new HashSet<Id>(this.network.getNodes().size());
+		Set<Id<Node>> nodeIds = new HashSet<>(this.network.getNodes().size());
 		for (StreetSegment s : l2sMapping.values()) {
 			nodeIds.add(s.getFromNode().getId());
 			nodeIds.add(s.getToNode().getId());
 		}
 		linkDensity = 0.0;
 		nodeDensity = 0.0;
-		for (Id nid : nodeIds) {
+		for (Id<Node> nid : nodeIds) {
 			linkDensity += ((NodeImpl) this.network.getNodes().get(nid)).getIncidentLinks().size();
 			nodeDensity += ((NodeImpl) this.network.getNodes().get(nid)).getIncidentNodes().size();
 		}
@@ -182,7 +181,7 @@ public class PathSetGenerator {
 	}
 
 	public final void printL2SMapping() {
-		for (Id id : l2sMapping.keySet()) {
+		for (Id<Link> id : l2sMapping.keySet()) {
 			System.out.println(id.toString()+"\t"+l2sMapping.get(id).getId());
 		}
 	}
@@ -210,7 +209,7 @@ public class PathSetGenerator {
 			// create the street segment for the whole "one- or twoway path" (if not already exists)
 			StreetSegment s = l2sMapping.get(currLink.getId());
 			if (s == null) {
-				s = new StreetSegment(new IdImpl("s"+currLink.getId()),currLink.getFromNode(),currLink.getToNode(),network,1,1,1,1);
+				s = new StreetSegment(Id.create("s"+currLink.getId(), Link.class),currLink.getFromNode(),currLink.getToNode(),network,1,1,1,1);
 				s.links.add(currLink);
 				l2sMapping.put(currLink.getId(),s);
 				NodeImpl toNode = (NodeImpl) currLink.getToNode();

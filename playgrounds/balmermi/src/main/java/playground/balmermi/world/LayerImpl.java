@@ -25,7 +25,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -39,14 +38,14 @@ import org.matsim.core.utils.geometry.CoordUtils;
  */
 public class LayerImpl implements Layer {
 
-	final TreeMap<Id, BasicLocation> locations = new TreeMap<Id,BasicLocation>();
+	final TreeMap<Id<Zone>, Zone> locations = new TreeMap<Id<Zone>, Zone>();
 
 	//////////////////////////////////////////////////////////////////////
 	// get methods
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public final BasicLocation getLocation(final Id location_id) {
+	public final Zone getLocation(final Id<Zone> location_id) {
 		return this.locations.get(location_id);
 	}
 
@@ -60,7 +59,7 @@ public class LayerImpl implements Layer {
 	 * the same minimal distance, all of them are returned.
 	 */
 	@Override
-	public final ArrayList<BasicLocation> getNearestLocations(final Coord coord) {
+	public final ArrayList<Zone> getNearestLocations(final Coord coord) {
 		return getNearestLocations(coord, null);
 	}
 
@@ -77,12 +76,12 @@ public class LayerImpl implements Layer {
 	 *
 	 */
 	@Override
-	public final ArrayList<BasicLocation> getNearestLocations(final Coord coord, final BasicLocation excludeLocation) {
-		ArrayList<BasicLocation> locs = new ArrayList<BasicLocation>();
+	public final ArrayList<Zone> getNearestLocations(final Coord coord, final Zone excludeLocation) {
+		ArrayList<Zone> locs = new ArrayList<>();
 		double shortestDistance = Double.MAX_VALUE;
-		Iterator<BasicLocation> loc_it = this.locations.values().iterator();
+		Iterator<Zone> loc_it = this.locations.values().iterator();
 		while (loc_it.hasNext()) {
-			BasicLocation loc = loc_it.next();
+			Zone loc = loc_it.next();
 			if (loc != excludeLocation) {
 				double distance = CoordUtils.calcDistance(loc.getCoord(), coord);
 				if (distance == shortestDistance) { locs.add(loc); }
@@ -93,7 +92,7 @@ public class LayerImpl implements Layer {
 	}
 
 	@Override
-	public final Map<Id, BasicLocation> getLocations() {
+	public final Map<Id<Zone>, Zone> getLocations() {
 		return this.locations;
 	}
 

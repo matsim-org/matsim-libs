@@ -53,12 +53,17 @@ public class Zone extends AbstractLocation {
 	//////////////////////////////////////////////////////////////////////
 
 	@Deprecated // use of current matsim zone object is discouraged
-	public Zone(final Id id, final Coord center, final Coord min, final Coord max) {
+	public Zone(final Id<Zone> id, final Coord center, final Coord min, final Coord max) {
 		super(id,center);
 		this.setMin(min);
 		this.setMax(max);
 	}
 
+	@Override
+	public Id<Zone> getId() {
+		return this.id;
+	}
+	
 	//////////////////////////////////////////////////////////////////////
 	// calc methods
 	//////////////////////////////////////////////////////////////////////

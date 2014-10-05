@@ -39,11 +39,11 @@ public class Household {
 
 	private final static Logger log = Logger.getLogger(Household.class);
 
-	private final Id id;
+	private final Id<Household> id;
 	private final Municipality municipality;
 	private final ActivityFacilityImpl facility;
-	private final Map<Id,Person> persons_w = new HashMap<Id,Person>();
-	private final Map<Id,Person> persons_z = new HashMap<Id,Person>();
+	private final Map<Id<Person>,Person> persons_w = new HashMap<Id<Person>,Person>();
+	private final Map<Id<Person>,Person> persons_z = new HashMap<Id<Person>,Person>();
 	private int hhtpz = Integer.MIN_VALUE;
 	private int hhtpw = Integer.MIN_VALUE;
 	
@@ -51,7 +51,7 @@ public class Household {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public Household(final Id id, final Municipality municipality, final ActivityFacilityImpl facility) {
+	public Household(final Id<Household> id, final Municipality municipality, final ActivityFacilityImpl facility) {
 		this.id = id;
 		this.municipality = municipality;
 		this.facility = facility;
@@ -81,11 +81,11 @@ public class Household {
 	// remove methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final Person removePersonW(Id pid) {
+	public final Person removePersonW(Id<Person> pid) {
 		return this.persons_w.remove(pid);
 	}
 	
-	public final Person removePersonZ(Id pid) {
+	public final Person removePersonZ(Id<Person> pid) {
 		return this.persons_z.remove(pid);
 	}
 	
@@ -93,7 +93,7 @@ public class Household {
 	// get methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final Id getId() {
+	public final Id<Household> getId() {
 		return this.id;
 	}
 	
@@ -105,34 +105,34 @@ public class Household {
 		return this.facility;
 	}
 	
-	public final Map<Id,Person> getPersonsW() {
+	public final Map<Id<Person>,Person> getPersonsW() {
 		return this.persons_w;
 	}
 	
-	public final Map<Id,Person> getPersonsZ() {
+	public final Map<Id<Person>,Person> getPersonsZ() {
 		return this.persons_z;
 	}
 	
-	public final Map<Id,Person> getPersons() {
-		Map<Id,Person> map = new HashMap<Id, Person>(this.persons_w);
+	public final Map<Id<Person>,Person> getPersons() {
+		Map<Id<Person>,Person> map = new HashMap<>(this.persons_w);
 		map.putAll(this.persons_z);
 		return map;
 	}
 	
-	public final Map<Id,Person> getKidsW() {
-		Map<Id,Person> map = new HashMap<Id, Person>();
+	public final Map<Id<Person>,Person> getKidsW() {
+		Map<Id<Person>,Person> map = new HashMap<>();
 		for (Person p : this.persons_w.values()) { if (((PersonImpl) p).getAge() < 15) { map.put(p.getId(),p); } }
 		return map;
 	}
 	
-	public final Map<Id,Person> getKidsZ() {
-		Map<Id,Person> map = new HashMap<Id, Person>();
+	public final Map<Id<Person>,Person> getKidsZ() {
+		Map<Id<Person>,Person> map = new HashMap<Id<Person>, Person>();
 		for (Person p : this.persons_z.values()) { if (((PersonImpl) p).getAge() < 15) { map.put(p.getId(),p); } }
 		return map;
 	}
 
-	public final Map<Id,Person> getKids() {
-		Map<Id,Person> map = new HashMap<Id, Person>(this.getKidsW());
+	public final Map<Id<Person>,Person> getKids() {
+		Map<Id<Person>,Person> map = new HashMap<Id<Person>, Person>(this.getKidsW());
 		map.putAll(this.getKidsZ());
 		return map;
 	}

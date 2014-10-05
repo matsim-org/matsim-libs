@@ -27,10 +27,9 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.gbl.Gbl;
 
 import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000.data.Municipality;
@@ -38,6 +37,7 @@ import playground.balmermi.census2000v2.data.CAtts;
 import playground.balmermi.census2000v2.data.Household;
 import playground.balmermi.census2000v2.data.Households;
 import playground.balmermi.world.Layer;
+import playground.balmermi.world.Zone;
 
 public class HouseholdsCreateFromCensus2000 {
 
@@ -98,12 +98,12 @@ public class HouseholdsCreateFromCensus2000 {
 				// 1       2              3
 
 				// check for existing zone
-				Id zone_id = new IdImpl(entries[CAtts.I_ZGDE]);
+				Id<Zone> zone_id = Id.create(entries[CAtts.I_ZGDE], Zone.class);
 				BasicLocation zone = municipalityLayer.getLocation(zone_id);
 				if (zone == null) { throw new RuntimeException("Line "+line_cnt+": Zone id="+zone_id+" does not exist!"); }
 
 				// check for existing facility
-				Id f_id = new IdImpl(entries[CAtts.I_GEBAEUDE_ID]);
+				Id<ActivityFacility> f_id = Id.create(entries[CAtts.I_GEBAEUDE_ID], ActivityFacility.class);
 				ActivityFacilityImpl f = (ActivityFacilityImpl) this.facilities.getFacilities().get(f_id);
 				if (f == null) { throw new RuntimeException("Line "+line_cnt+": Facility id="+f_id+" does not exist!"); }
 				if (f.getActivityOptions().get(CAtts.ACT_HOME) == null) { throw new RuntimeException("Line "+line_cnt+": Facility id="+f_id+" exists but does not have 'home' activity type assigned!"); }
@@ -113,7 +113,7 @@ public class HouseholdsCreateFromCensus2000 {
 				if (muni == null) { throw new RuntimeException("Line "+line_cnt+": Municipality id="+zone_id+" does not exist!"); }
 
 				// household creation
-				Id hh_id = new IdImpl(entries[CAtts.I_HHNR]);
+				Id<Household> hh_id = Id.create(entries[CAtts.I_HHNR], Household.class);
 				Household hh = households.getHousehold(hh_id);
 				if (hh == null) {
 					// create new household

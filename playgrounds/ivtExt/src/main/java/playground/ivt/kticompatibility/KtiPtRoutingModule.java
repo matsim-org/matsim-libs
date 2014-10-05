@@ -22,7 +22,6 @@ package playground.ivt.kticompatibility;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -49,6 +48,7 @@ import org.matsim.pt.PtConstants;
 
 import playground.balmermi.world.Layer;
 import playground.balmermi.world.World;
+import playground.balmermi.world.Zone;
 import playground.meisterk.kti.config.KtiConfigGroup;
 import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
 import playground.meisterk.kti.router.SwissHaltestelle;
@@ -112,10 +112,10 @@ public class KtiPtRoutingModule implements RoutingModule {
 		// pt
 		// ---------------------------------------------------------------------
 		final Layer municipalities = info.world.getLayer("municipality");
-		final List<BasicLocation> froms = municipalities.getNearestLocations( stop1.getCoord() );
-		final List<BasicLocation> tos = municipalities.getNearestLocations( stop2.getCoord() );
-		final BasicLocation fromMunicipality = froms.get(0);
-		final BasicLocation toMunicipality = tos.get(0);
+		final List<Zone> froms = municipalities.getNearestLocations( stop1.getCoord() );
+		final List<Zone> tos = municipalities.getNearestLocations( stop2.getCoord() );
+		final Zone fromMunicipality = froms.get(0);
+		final Zone toMunicipality = tos.get(0);
 
 		final Entry ptTravelTimeEntry =
 			info.ptTravelTimes.getEntry(

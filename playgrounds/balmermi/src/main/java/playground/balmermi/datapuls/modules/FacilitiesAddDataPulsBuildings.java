@@ -27,7 +27,7 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
@@ -76,7 +76,7 @@ public class FacilitiesAddDataPulsBuildings {
 				Coord coord = new CoordImpl(entries[entries.length-6].trim(),entries[entries.length-5].trim());
 				double cap = Double.parseDouble(entries[entries.length-1].trim());
 				if (cap < 1.0) { cap = 1.0; }
-				Id id = new IdImpl(entries[0].trim());
+				Id<ActivityFacility> id = Id.create(entries[0].trim(), ActivityFacility.class);
 
 				// datapuls 2008
 				// BFS_GDE_NR  KANTON  RT_KOORD  HOCH_KOORD  ANZPRS  ANZHH  ANZKND  ANZAUSL  ANTAUSL  KKKL  KKKT  HHKLS1  HHKLS2  HHKLS3  HHKLS4  ALTKLS1  ALTKLS2  ALTKLS3  ALTKLS4  ALTKLS5  ALTER  ANTERWPRS  ANTERWLOS  GTYP  DKBAUPER  MPPBAUPER  RPBAUPER1  RPBAUPER2  RPBAUPER3  RPBAUPER4  RPBAUPER5  RPBAUPER6  RPBAUPER7  RPBAUPER8  MPPRENPER  RPRENPER0  RPRENPER5  RPRENPER6  RPRENPER7  LINKID
@@ -96,6 +96,7 @@ public class FacilitiesAddDataPulsBuildings {
 				if (line_cnt % 100000 == 0) { log.info("    line " + line_cnt); }
 				line_cnt++;
 			}
+			br.close();
 		} catch (IOException e) {
 			throw new RuntimeException(e.getMessage());
 		}

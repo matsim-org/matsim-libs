@@ -26,8 +26,7 @@ import java.io.IOException;
 import java.util.HashSet;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.api.core.v01.population.Person;
 
 import playground.balmermi.census2000v2.data.Household;
 import playground.balmermi.census2000v2.data.Households;
@@ -141,7 +140,7 @@ public class HumansCreateFromCensus2000 {
 			int line_cnt = 0;
 			
 			// keep track of the pids which need to be found twice
-			HashSet<Id> pids = new HashSet<Id>();
+			HashSet<Id<Person>> pids = new HashSet<>();
 
 			// Skip header
 			String curr_line = br.readLine(); line_cnt++;
@@ -152,11 +151,11 @@ public class HumansCreateFromCensus2000 {
 				//1       2              3       5            10      11      12
 				
 				// check for existing household
-				Id hhnr = new IdImpl(entries[3]);
+				Id<Household> hhnr = Id.create(entries[3], Household.class);
 				Household hh = households.getHousehold(hhnr);
 				if (hh == null) { throw new RuntimeException("Line "+line_cnt+": Household id="+hhnr+" does not exist!"); }
 
-				Id pid = new IdImpl(entries[5]);
+				Id<Person> pid = Id.create(entries[5], Person.class);
 				int wkat = Integer.parseInt(entries[10]);
 				int gem2 = Integer.parseInt(entries[11]);
 				int partnr = Integer.parseInt(entries[12]);
@@ -196,7 +195,7 @@ public class HumansCreateFromCensus2000 {
 					humans.addHuman(h);
 				}
 				else if ((wkat == 3) && ((1 <= gem2)&&(gem2 <= 7011)) && ((1 <= partnr)&&(partnr <= 999999999))) {
-					Human h = humans.getHuman(new IdImpl(partnr));
+					Human h = humans.getHuman(Id.create(partnr, Person.class));
 					if (h == null) {
 						if (!pids.add(pid)) { throw new RuntimeException(e_head+"partner human not found, but pid found in the set!"); }
 						h = new Human(pid);
@@ -205,13 +204,13 @@ public class HumansCreateFromCensus2000 {
 						humans.addHuman(h);
 					}
 					else {
-						if (!pids.remove(new IdImpl(partnr))) { throw new RuntimeException(e_head+"partner human found, but not found in the set!"); }
+						if (!pids.remove(Id.create(partnr, Person.class))) { throw new RuntimeException(e_head+"partner human found, but not found in the set!"); }
 						if (!((h.getHouseholdW() == null) && (h.getHouseholdZ() != null))) { throw new RuntimeException(e_head+"something is wrong!"); }
 						h.setHouseholdW(hh);
 					}
 				}
 				else if ((wkat == 4) && ((1 <= gem2)&&(gem2 <= 7011)) && ((1 <= partnr)&&(partnr <= 999999999))) {
-					Human h = humans.getHuman(new IdImpl(partnr));
+					Human h = humans.getHuman(Id.create(partnr, Person.class));
 					if (h == null) {
 						if (!pids.add(pid)) { throw new RuntimeException(e_head+"partner human not found, but pid found in the set!"); }
 						h = new Human(pid);
@@ -220,7 +219,7 @@ public class HumansCreateFromCensus2000 {
 						humans.addHuman(h);
 					}
 					else {
-						if (!pids.remove(new IdImpl(partnr))) { throw new RuntimeException(e_head+"partner human found, but not found in the set!"); }
+						if (!pids.remove(Id.create(partnr, Person.class))) { throw new RuntimeException(e_head+"partner human found, but not found in the set!"); }
 						if (!((h.getHouseholdW() != null) && (h.getHouseholdZ() == null))) { throw new RuntimeException(e_head+"something is wrong!"); }
 						h.setHouseholdZ(hh);
 					}

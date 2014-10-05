@@ -22,15 +22,14 @@ package playground.balmermi.world;
 import java.util.ArrayList;
 import java.util.Map;
 
-import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 
 public interface Layer {
 
-	public abstract BasicLocation getLocation(final Id location_id);
+	public abstract Zone getLocation(final Id<Zone> location_id);
 
-	public abstract Map<Id, BasicLocation> getLocations();
+	public abstract Map<Id<Zone>, Zone> getLocations();
 
 	/**
 	 * Note: this is method is, I think, <em> not </em> quad-tree based, and therefore is rather slow in
@@ -41,7 +40,7 @@ public interface Layer {
 	 * @return the Location with the smallest distance to the given coordinate. If multiple locations have
 	 * the same minimal distance, all of them are returned.
 	 */
-	public ArrayList<BasicLocation> getNearestLocations(final Coord coord);
+	public ArrayList<Zone> getNearestLocations(final Coord coord);
 
 	/**
 	 * Note: this is method is, I think, <em> not </em> quad-tree based, and therefore is rather slow in
@@ -55,6 +54,6 @@ public interface Layer {
 	 * the same minimal distance, all of them are returned.
 	 *
 	 */
-	public ArrayList<BasicLocation> getNearestLocations(final Coord coord, final BasicLocation excludeLocation);
+	public ArrayList<Zone> getNearestLocations(final Coord coord, final Zone excludeLocation);
 
 }

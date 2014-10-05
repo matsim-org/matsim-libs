@@ -21,24 +21,25 @@
 package playground.balmermi.census2000v2.old;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 
 import playground.balmermi.census2000v2.data.Household;
 
 public class Human {
 
-	private class WHousehold {
-		private final Household hh = null;
-	}
-	
-	private class ZHousehold {
-		private final Household hh = null;
-	}
+//	private class WHousehold {
+//		private final Household hh = null;
+//	}
+//	
+//	private class ZHousehold {
+//		private final Household hh = null;
+//	}
 	
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	private final Id id;
+	private final Id<Person> id;
 	private Household hh_z = null;
 	private Household hh_w = null;
 	
@@ -50,7 +51,7 @@ public class Human {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public Human(final Id id) {
+	public Human(final Id<Person> id) {
 		this.id = id;
 	}
 	
@@ -58,7 +59,7 @@ public class Human {
 	// get methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final Id getId() {
+	public final Id<Person> getId() {
 		return this.id;
 	}
 	

@@ -32,7 +32,7 @@ public class StreetSegment extends LinkImpl {
 	
 	public final Set<Link> links = new HashSet<Link>();
 
-	public StreetSegment(Id id, Node from, Node to, Network network, double length, double freespeed, double capacity, double lanes) {
+	public StreetSegment(Id<Link> id, Node from, Node to, Network network, double length, double freespeed, double capacity, double lanes) {
 		super(id, from, to, network, length, freespeed, capacity, lanes);
 	}
 }

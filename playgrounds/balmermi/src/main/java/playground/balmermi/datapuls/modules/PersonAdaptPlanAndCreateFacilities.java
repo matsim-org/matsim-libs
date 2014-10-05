@@ -22,17 +22,17 @@ package playground.balmermi.datapuls.modules;
 
 import java.util.Random;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
@@ -72,7 +72,7 @@ public class PersonAdaptPlanAndCreateFacilities extends AbstractPersonAlgorithm 
 
 	@Override
 	public void run(final Person person) {
-		OpeningTime ot = new OpeningTimeImpl(DayType.wkday,0,24*3600);
+		OpeningTime ot = new OpeningTimeImpl(0,24*3600);
 		if (person.getPlans().size() != 1) { throw new RuntimeException("Each person must have one plan."); }
 		Plan plan = person.getPlans().get(0);
 		Desires desires = ((PersonImpl) person).createDesires("");
@@ -125,7 +125,7 @@ public class PersonAdaptPlanAndCreateFacilities extends AbstractPersonAlgorithm 
 					CoordImpl c = new CoordImpl(x,y);
 					ActivityFacilityImpl af = facs.get(x,y);
 					if (af == null) {
-						af = ((ActivityFacilitiesImpl) activityFacilities).createAndAddFacility(new IdImpl(id),c);
+						af = ((ActivityFacilitiesImpl) activityFacilities).createAndAddFacility(Id.create(id, ActivityFacility.class),c);
 						id++;
 						ActivityOptionImpl ao = af.createActivityOption(a.getType());
 						ao.setCapacity(1.0);
@@ -141,7 +141,7 @@ public class PersonAdaptPlanAndCreateFacilities extends AbstractPersonAlgorithm 
 						}
 					}
 					else {
-						af = ((ActivityFacilitiesImpl) activityFacilities).createAndAddFacility(new IdImpl(id),c);
+						af = ((ActivityFacilitiesImpl) activityFacilities).createAndAddFacility(Id.create(id, ActivityFacility.class),c);
 						id++;
 						ActivityOptionImpl ao = af.createActivityOption(a.getType());
 						ao.setCapacity(1.0);

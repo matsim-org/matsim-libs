@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -54,8 +53,8 @@ public class GeneratePathSets {
 	// methods
 	//////////////////////////////////////////////////////////////////////
 
-	private static final Map<Id,Tuple<Node,Node>> parseODs(String inputFileName, Network network) throws IOException {
-		Map<Id,Tuple<Node,Node>> ods = new TreeMap<Id,Tuple<Node,Node>>();
+	private static final Map<String,Tuple<Node,Node>> parseODs(String inputFileName, Network network) throws IOException {
+		Map<String,Tuple<Node,Node>> ods = new TreeMap<>();
 		int lineCnt = 0;
 		FileReader fr = new FileReader(inputFileName);
 		BufferedReader in = new BufferedReader(fr);
@@ -66,9 +65,9 @@ public class GeneratePathSets {
 			String[] entries = currLine.split("\t", -1);
 			// IDSEGMENT  StartNode  EndNode
 			// 0          1          2
-			Id id = new IdImpl(entries[0].trim());
-			Node origin = network.getNodes().get(new IdImpl(entries[1].trim()));
-			Node destination = network.getNodes().get(new IdImpl(entries[2].trim()));
+			String id = entries[0].trim();
+			Node origin = network.getNodes().get(Id.create(entries[1].trim(), Node.class));
+			Node destination = network.getNodes().get(Id.create(entries[2].trim(), Node.class));
 			if ((origin == null) || (destination == null)) { throw new RuntimeException("line "+lineCnt+": O and/or D not found in the network"); }
 			ods.put(id,new Tuple<Node,Node>(origin,destination));
 			// progress report
@@ -82,15 +81,15 @@ public class GeneratePathSets {
 		return ods;
 	}
 
-	private static final void writePathSets(String outputFileName, Map<Id,Tuple<Node,Node>> ods, PathSetGenerator gen) throws IOException {
+	private static final void writePathSets(String outputFileName, Map<String,Tuple<Node,Node>> ods, PathSetGenerator gen) throws IOException {
 		FileWriter fw = new FileWriter(outputFileName);
 		BufferedWriter out = new BufferedWriter(fw);
 		out.write("# Routesets\n");
 		out.write("# SEG_ID\tFROM_NODE\tTO_NODE\tROUTE(linklist)...\t-1\tLEASTCOSTROUTE(0,1)\t-1\n");
 		out.flush();
 
-		for (Map.Entry<Id, Tuple<Node,Node>> entry : ods.entrySet()) {
-			Id id = entry.getKey();
+		for (Map.Entry<String, Tuple<Node,Node>> entry : ods.entrySet()) {
+			String id = entry.getKey();
 			Tuple<Node,Node> od = entry.getValue();
 			// generate paths
 
@@ -168,7 +167,7 @@ public class GeneratePathSets {
 		gen.setTimeout(timeout);
 //		gen.printL2SMapping();
 
-		Map<Id,Tuple<Node,Node>> ods = GeneratePathSets.parseODs(inputODFile,network);
+		Map<String,Tuple<Node,Node>> ods = GeneratePathSets.parseODs(inputODFile,network);
 
 		Gbl.printMemoryUsage();
 

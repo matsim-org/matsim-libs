@@ -29,14 +29,14 @@ import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.balmermi.census2000v2.data.CAtts;
 import playground.balmermi.world.Layer;
+import playground.balmermi.world.Zone;
 
 public class FacilitiesCreateBuildingsFromCensus2000 {
 
@@ -103,12 +103,12 @@ public class FacilitiesCreateBuildingsFromCensus2000 {
 				// 1     2                 170   171
 
 				// check for existing municipality
-				Id zone_id = new IdImpl(entries[CAtts.I_ZGDE]);
+				Id<Zone> zone_id = Id.create(entries[CAtts.I_ZGDE], Zone.class);
 				BasicLocation zone = this.municipalities.getLocation(zone_id);
 				if (zone == null) { throw new RuntimeException("Line "+line_cnt+": Zone id="+zone_id+" does not exist!"); }
 
 				// check for facility id
-				Id f_id = new IdImpl(entries[CAtts.I_GEBAEUDE_ID]);
+				Id<ActivityFacility> f_id = Id.create(entries[CAtts.I_GEBAEUDE_ID], ActivityFacility.class);
 				if (Integer.parseInt(f_id.toString()) >= min_id_given) { throw new RuntimeException("Line "+line_cnt+": f_id="+f_id+" must be less then min_id="+min_id_given+"!"); }
 
 				// home facility creation

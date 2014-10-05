@@ -33,8 +33,6 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
 
 public class NetworkAnalyseRouteSet {
@@ -56,11 +54,11 @@ public class NetworkAnalyseRouteSet {
 	private static final int NATBEL = 7;
 	private static final int DTVKAT = 8;
 
-	private final TreeMap<Id,Double> node_heights = new TreeMap<Id, Double>();
+	private final TreeMap<Id<Node>,Double> node_heights = new TreeMap<>();
 	// Link atts: Laenge  VWeg  VWegEm  ParkW  Ampel  Bruecke  Tunnel  NatBel  DTVKat
 	// idx:       0       1     2       3      4      5        6       7       8
-	private final TreeMap<Id,double[]> link_atts = new TreeMap<Id, double[]>();
-	private final TreeMap<Id,ArrayList<Node>> routes = new TreeMap<Id, ArrayList<Node>>();
+	private final TreeMap<Id<Link>,double[]> link_atts = new TreeMap<>();
+	private final TreeMap<String, ArrayList<Node>> routes = new TreeMap<>();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -86,7 +84,7 @@ public class NetworkAnalyseRouteSet {
 				// example: 10001    404.60
 				// index:   0        1
 
-				Id nodeid = new IdImpl(entries[0].trim());
+				Id<Node> nodeid = Id.create(entries[0].trim(), Node.class);
 				if (!network.getNodes().containsKey(nodeid)) { throw new RuntimeException("Node id=" + nodeid + " does not exist in the network!"); }
 				Double height = new Double(entries[1].trim());
 				if (this.node_heights.put(nodeid,height) != null) { throw new RuntimeException("Node id=" + nodeid + " already has a height assigned!"); }
@@ -114,7 +112,7 @@ public class NetworkAnalyseRouteSet {
 				// example: 1    10001     10002   11.71   1     1       0      0      0        0       0       5
 				// index:   0    1         2       3       4     5       6      7      8        9       10      11
 
-				Id linkid = new IdImpl(entries[0].trim());
+				Id<Link> linkid = Id.create(entries[0].trim(), Link.class);
 				if (!network.getLinks().containsKey(linkid)) { throw new RuntimeException("Link id=" + linkid + " does not exist in the network!"); }
 				this.link_atts.put(linkid,new double[9]);
 				double[] atts = this.link_atts.get(linkid);
@@ -147,22 +145,22 @@ public class NetworkAnalyseRouteSet {
 				// index:   0       1          2        3     4  ...
 
 				ArrayList<Node> node_routes = new ArrayList<Node>();
-				Node node = network.getNodes().get(new IdImpl(entries[1].trim()));
+				Node node = network.getNodes().get(Id.create(entries[1].trim(), Node.class));
 				if (node == null) { throw new RuntimeException("Node id=" + entries[1].trim() + " does not exist!"); }
 				node_routes.add(node);
 
 				int idx = 3;
 				while (!entries[idx].trim().equals("-1")) {
-					node = network.getLinks().get(new IdImpl(entries[idx].trim())).getToNode();
+					node = network.getLinks().get(Id.create(entries[idx].trim(), Link.class)).getToNode();
 					node_routes.add(node);
 					idx++;
 				}
-				Node last = network.getNodes().get(new IdImpl(entries[2].trim()));
+				Node last = network.getNodes().get(Id.create(entries[2].trim(), Node.class));
 				if (last == null) { throw new RuntimeException("Node id=" + entries[1].trim() + " does not exist!"); }
 				if (!last.getId().equals(node_routes.get(node_routes.size()-1).getId())) {
 					throw new RuntimeException("Last node does not fit!");
 				}
-				Id routeid = new IdImpl(entries[0].trim());
+				String routeid = entries[0].trim();
 				if (this.routes.put(routeid,node_routes) != null) { throw new RuntimeException("Route id=" + routeid + " already exists!"); }
 			}
 			buffered_reader.close();
@@ -173,7 +171,7 @@ public class NetworkAnalyseRouteSet {
 		System.out.println("      => # routes: " + this.routes.size());
 	}
 
-	private final void analysis(Id routeid, ArrayList<Node> route) {
+	private final void analysis(String routeid, ArrayList<Node> route) {
 		double length = 0.0;
 		double rise_av = 0.0;
 		double rise_min = 0.0;
@@ -479,7 +477,7 @@ public class NetworkAnalyseRouteSet {
 		System.out.print("tunnel_av\t");
 		System.out.print("tunnel_linkcnt\t");
 		System.out.print("tlights_linkcnt\n");
-		for (Id routeid : this.routes.keySet()) {
+		for (String routeid : this.routes.keySet()) {
 			this.analysis(routeid,this.routes.get(routeid));
 		}
 		System.out.println("      done.");

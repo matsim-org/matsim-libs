@@ -20,8 +20,8 @@
 
 package playground.balmermi.census2000;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
@@ -53,6 +53,7 @@ import playground.balmermi.census2000.modules.PersonSetSecLoc;
 import playground.balmermi.census2000.modules.PersonSummary;
 import playground.balmermi.census2000.modules.PersonZoneSummary;
 import playground.balmermi.census2000.modules.PersonsSummaryTable;
+import playground.balmermi.world.Layer;
 import playground.balmermi.world.World;
 import playground.balmermi.world.ZoneLayer;
 
@@ -86,7 +87,7 @@ public class InitDemandCreation {
 
 		System.out.println("  parsing additional municipality information... ");
 		Municipalities municipalities = new Municipalities("input/gg25_2001_infos.txt");
-		municipalities.parse(world.getLayer(new IdImpl("municipality")));
+		municipalities.parse(world.getLayer(Id.create("municipality", Layer.class)));
 		System.out.println("  done.");
 
 		System.out.println("  parsing household information... ");
@@ -122,7 +123,7 @@ public class InitDemandCreation {
 		plans.addAlgorithm(new PersonLicenseModel(persons));
 		plans.addAlgorithm(new PersonDistributeActChains(actchains));
 		plans.addAlgorithm(new PersonSetHomeLoc(facilities, persons));
-		plans.addAlgorithm(new PersonSetPrimLoc(facilities, matrices, persons, (ZoneLayer)world.getLayer(new IdImpl("municipality"))));
+		plans.addAlgorithm(new PersonSetPrimLoc(facilities, matrices, persons, (ZoneLayer)world.getLayer(Id.create("municipality", Layer.class))));
 		plans.addAlgorithm(new PersonSetSecLoc(facilities, persons));
 		plans.addAlgorithm(new PersonMobilityToolModel(persons));
 		plans.addAlgorithm(new PersonModeChoiceModel(persons));
@@ -135,7 +136,7 @@ public class InitDemandCreation {
 		plans.addAlgorithm(pcst);
 		PersonMunicipalitySummaryTable pmst = new PersonMunicipalitySummaryTable("output/output_municipalities.txt",persons);
 		plans.addAlgorithm(pmst);
-		PersonZoneSummary pzs = new PersonZoneSummary((ZoneLayer)world.getLayer(new IdImpl("municipality")),persons,"output/output_zones.txt");
+		PersonZoneSummary pzs = new PersonZoneSummary((ZoneLayer)world.getLayer(Id.create("municipality", Layer.class)),persons,"output/output_zones.txt");
 		plans.addAlgorithm(pzs);
 		//////////////////////////////////////////////////////////////////////
 		PersonRoundTimes prt = new PersonRoundTimes(); // must be last one!!!

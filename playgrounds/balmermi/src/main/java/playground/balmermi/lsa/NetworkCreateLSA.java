@@ -32,8 +32,6 @@ import java.util.Iterator;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.Time;
 
@@ -46,8 +44,8 @@ public class NetworkCreateLSA {
 	private final String inputfolder = "../../input/";
 	private final String outputfolder = "../../output/";
 	private final NetworkImpl network;
-	private final HashMap<Integer,Intersection> intersections = new HashMap<Integer, Intersection>();
-	private final HashMap<Id,HashSet<LSA>> lsalinklist = new HashMap<Id, HashSet<LSA>>();
+	private final HashMap<Integer,Intersection> intersections = new HashMap<>();
+	private final HashMap<Id<Link>,HashSet<LSA>> lsalinklist = new HashMap<>();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -239,7 +237,7 @@ public class NetworkCreateLSA {
 		if ((net_idx < 2) || (5 < net_idx)) { throw new RuntimeException("Index must be in range [2,5]"); }
 		int map_cnt = 0;
 		int ignored = 0;
-		Id ignore_flag = new IdImpl("-");
+		Id<Link> ignore_flag = Id.create("-", Link.class);
 		try {
 			FileReader file_reader = new FileReader(inputfile);
 			BufferedReader buffered_reader = new BufferedReader(file_reader);
@@ -254,7 +252,7 @@ public class NetworkCreateLSA {
 
 				Integer knotennr  = new Integer(entries[0].trim());
 				Integer lnr = new Integer(entries[1].trim());
-				Id linkid = new IdImpl(entries[net_idx].trim());
+				Id<Link> linkid = Id.create(entries[net_idx].trim(), Link.class);
 				if (!linkid.equals(ignore_flag)) {
 					if (!this.intersections.containsKey(knotennr)) { throw new RuntimeException("Intersection id = " + knotennr + " does not exist!"); }
 					Intersection intersec = this.intersections.get(knotennr);
@@ -348,30 +346,30 @@ public class NetworkCreateLSA {
 	public final void writeData(String outfile) {
 		// HARDCODED: links with LSA's which should be ignored
 		// for the ivtch network
-		ArrayList<Id> links_to_ignore = new ArrayList<Id>();
-		links_to_ignore.add(new IdImpl(106026));
-		links_to_ignore.add(new IdImpl(106305));
-		links_to_ignore.add(new IdImpl(106307));
-		links_to_ignore.add(new IdImpl(106308));
-		links_to_ignore.add(new IdImpl(106309));
-		links_to_ignore.add(new IdImpl(106310));
-		links_to_ignore.add(new IdImpl(106312));
-		links_to_ignore.add(new IdImpl(106315));
-		links_to_ignore.add(new IdImpl(106317));
-		links_to_ignore.add(new IdImpl(106318));
-		links_to_ignore.add(new IdImpl(106319));
-		links_to_ignore.add(new IdImpl(106320));
-		links_to_ignore.add(new IdImpl(106322));
-		links_to_ignore.add(new IdImpl(108042));
+		ArrayList<Id<Link>> links_to_ignore = new ArrayList<Id<Link>>();
+		links_to_ignore.add(Id.create(106026, Link.class));
+		links_to_ignore.add(Id.create(106305, Link.class));
+		links_to_ignore.add(Id.create(106307, Link.class));
+		links_to_ignore.add(Id.create(106308, Link.class));
+		links_to_ignore.add(Id.create(106309, Link.class));
+		links_to_ignore.add(Id.create(106310, Link.class));
+		links_to_ignore.add(Id.create(106312, Link.class));
+		links_to_ignore.add(Id.create(106315, Link.class));
+		links_to_ignore.add(Id.create(106317, Link.class));
+		links_to_ignore.add(Id.create(106318, Link.class));
+		links_to_ignore.add(Id.create(106319, Link.class));
+		links_to_ignore.add(Id.create(106320, Link.class));
+		links_to_ignore.add(Id.create(106322, Link.class));
+		links_to_ignore.add(Id.create(108042, Link.class));
 
 		try {
 			FileWriter fw = new FileWriter(outfile);
 			BufferedWriter out = new BufferedWriter(fw);
 			out.write("<greentimefractions desc=\"based on LSA data from City of Zurich\">\n");
 			out.flush();
-			Iterator<Id> id_it = this.lsalinklist.keySet().iterator();
+			Iterator<Id<Link>> id_it = this.lsalinklist.keySet().iterator();
 			while (id_it.hasNext()) {
-				Id id = id_it.next();
+				Id<Link> id = id_it.next();
 				Link link = this.network.getLinks().get(id);
 				HashSet<LSA> lsas = this.lsalinklist.get(id);
 				if (links_to_ignore.contains(id)){

@@ -27,9 +27,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 import playground.balmermi.toggenburg.modules.PopulationAnalysis;
@@ -48,8 +48,8 @@ public class Analysis {
 	// parse File
 	//////////////////////////////////////////////////////////////////////
 
-	private static final Set<IdImpl> setLinkSet(String infile) {
-		Set<IdImpl> linkSet = new HashSet<IdImpl>();
+	private static final Set<Id<Link>> setLinkSet(String infile) {
+		Set<Id<Link>> linkSet = new HashSet<Id<Link>>();
 		try {
 			FileReader fr = new FileReader(infile);
 			BufferedReader br = new BufferedReader(fr);
@@ -60,9 +60,10 @@ public class Analysis {
 				String[] entries = curr_line.split("\t", -1);
 				// LinkId
 				// 0
-				IdImpl linkId = new IdImpl(entries[0]);
+				Id<Link> linkId = Id.create(entries[0], Link.class);
 				linkSet.add(linkId);
 			}
+			br.close();
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

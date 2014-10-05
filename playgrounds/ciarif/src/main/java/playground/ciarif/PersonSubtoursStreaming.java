@@ -22,6 +22,7 @@ package playground.ciarif;
 
 import java.io.IOException;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -36,6 +37,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.balmermi.census2000.data.Households;
 import playground.balmermi.census2000.data.Municipalities;
 import playground.balmermi.census2000.data.Persons;
+import playground.balmermi.world.Layer;
 import playground.balmermi.world.MatsimWorldReader;
 import playground.balmermi.world.World;
 import playground.ciarif.models.subtours.PersonInitDemandSummaryTable;
@@ -58,7 +60,7 @@ public class PersonSubtoursStreaming {
 
 		System.out.println("  parsing additional municipality information... ");
 		Municipalities municipalities = new Municipalities("input/ gg25_2001_infos.txt");
-		municipalities.parse(world.getLayer(new IdImpl("municipality")));
+		municipalities.parse(world.getLayer(Id.create("municipality", Layer.class)));
 		System.out.println("  done.");
 
 		System.out.println("  parsing household information... ");

@@ -24,8 +24,9 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
@@ -64,7 +65,7 @@ public class NetworkParseETNet {
 				String[] entries = curr_line.split("\t", -1);
 				// ID  X  Y
 				// 0   1  2
-				network.createAndAddNode(new IdImpl(entries[0]), new CoordImpl(entries[1],entries[2]));
+				network.createAndAddNode(Id.create(entries[0], Node.class), new CoordImpl(entries[1],entries[2]));
 			}
 			buffered_reader.close();
 			file_reader.close();
@@ -89,7 +90,7 @@ public class NetworkParseETNet {
 					double freespeed = Double.parseDouble(entries[5])/3.6;
 					double capacity = Double.parseDouble(entries[6]);
 					double nofLanes = Double.parseDouble(entries[7]);
-					network.createAndAddLink(new IdImpl(entries[1]), network.getNodes().get(new IdImpl(entries[2])), network.getNodes().get(new IdImpl(entries[3])),
+					network.createAndAddLink(Id.create(entries[1], Link.class), network.getNodes().get(Id.create(entries[2], Node.class)), network.getNodes().get(Id.create(entries[3], Node.class)),
 					                   length, freespeed, capacity, nofLanes, entries[8], entries[9]);
 				}
 			}
