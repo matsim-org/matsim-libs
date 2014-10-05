@@ -2,7 +2,7 @@ package playground.florian;
 
 import java.util.TreeSet;
 
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -55,8 +55,8 @@ class TransitScenarioManipulator {
 		TreeSet<String> vt = new TreeSet<String>();
 		for(String type: vehicleTypes){
 			vt.add(type);
-			if(sc.getVehicles().getVehicleTypes().containsKey(new IdImpl(type))){
-				VehicleType vehTyp = sc.getVehicles().getVehicleTypes().get(new IdImpl(type));
+			if(sc.getVehicles().getVehicleTypes().containsKey(Id.create(type, Vehicle.class))){
+				VehicleType vehTyp = sc.getVehicles().getVehicleTypes().get(Id.create(type, VehicleType.class));
 				result.getVehicles().addVehicleType( vehTyp);
 			}else{
 				System.out.println(type + " doesn't exist as a vehicletype");

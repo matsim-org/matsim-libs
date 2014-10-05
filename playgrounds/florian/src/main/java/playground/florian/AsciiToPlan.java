@@ -11,9 +11,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.PersonImpl;
@@ -24,6 +24,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 
+@SuppressWarnings("deprecation")
 public class AsciiToPlan {
 
 	/**
@@ -77,7 +78,7 @@ public class AsciiToPlan {
 		do{
 			int j=0;
 			zaehler++;
-			Id id =new IdImpl(zaehler);
+			Id<Person> id =Id.create(zaehler, Person.class);
 			PersonImpl person = (PersonImpl) pb.createPerson(id);
 			PlanImpl plan = (PlanImpl) pb.createPlan();
 			person.addPlan(plan);

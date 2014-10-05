@@ -21,7 +21,7 @@ package playground.fhuelsmann.airpollution.testroad;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
@@ -42,8 +42,8 @@ public class RunTestRoad {
 //	static Id enterLinkId = new IdImpl("52804333-52804338-53271504-52804341-53271503");
 //	static Id leaveLinkId = new IdImpl("52804333-52804338-53271504-52804341-53271503");
 //nord_fuzzify
-		static Id enterLinkId = new IdImpl("592627223-52804320");
-	static Id leaveLinkId = new IdImpl("592627223-52804320");
+		static Id<Link> enterLinkId = Id.create("592627223-52804320", Link.class);
+	static Id<Link> leaveLinkId = Id.create("592627223-52804320", Link.class);
 //	static Id enterLinkId = new IdImpl("52804339-52804334");
 //	static Id leaveLinkId = new IdImpl("52804339-52804334");
 

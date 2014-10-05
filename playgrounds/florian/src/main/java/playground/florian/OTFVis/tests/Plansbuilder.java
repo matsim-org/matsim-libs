@@ -21,11 +21,12 @@ package playground.florian.OTFVis.tests;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.PersonImpl;
@@ -53,15 +54,15 @@ public class Plansbuilder {
 
 		// Gestalte kontinuierlichen Verkehr
 		for(int i=0;i<(KONT_PLAENE+1);i++){
-			Id id =new IdImpl(i);
+			Id<Person> id =Id.create(i, Person.class);
 			PersonImpl person = (PersonImpl) pb.createPerson(id);
 			PlanImpl plan = (PlanImpl) pb.createPlan();
 			person.addPlan(plan);
 
 			// Activity 1
-//			Id linkId = new IdImpl((i % 4)+1);
-//			Id linkId = new IdImpl((int)((Math.random()*15)+1));
-			Id linkId = new IdImpl(6);
+//			Id linkId = Id.create((i % 4)+1);
+//			Id linkId = Id.create((int)((Math.random()*15)+1));
+			Id<Link> linkId = Id.create(6, Link.class);
 			Activity act = plan.createAndAddActivity("h", linkId);
 			act.setEndTime(i*((6*60*60)/KONT_PLAENE));
 			plan.addLeg(pb.createLeg(TransportMode.car));
@@ -69,10 +70,10 @@ public class Plansbuilder {
 			// Activity 2
 			int j = (i % 4) + 3;
 			if (j>4){j=j-4;}
-//			Id linkId2 = new IdImpl(j);
-			Id linkId2;
+//			Id linkId2 = Id.create(j);
+			Id<Link> linkId2;
 			do{
-				linkId2 = new IdImpl((int)((Math.random()*15)+1));
+				linkId2 = Id.create((int)((Math.random()*15)+1), Link.class);
 			}while((linkId2.equals(linkId)));
 			Activity act2 = plan.createAndAddActivity("w", linkId2);
 			act2.setStartTime(i*((6*60*60)/KONT_PLAENE));
@@ -88,14 +89,14 @@ public class Plansbuilder {
 
 		//	Gestalte RushHourVerkehr
 		for(int i=0; i<(RUSH_PLAENE + 1);i++){
-			Id id =new IdImpl(i+KONT_PLAENE+1);
+			Id<Person> id =Id.create(i+KONT_PLAENE+1, Person.class);
 			PersonImpl person = (PersonImpl) pb.createPerson(id);
 			PlanImpl plan = (PlanImpl) pb.createPlan();
 			person.addPlan(plan);
 
 			// Start Activity
-			Id linkId = new IdImpl(15);
-			Id linkId2 = new IdImpl(6);
+			Id<Link> linkId = Id.create(15, Link.class);
+			Id<Link> linkId2 = Id.create(6, Link.class);
 
 			Activity act = plan.createAndAddActivity("h", linkId);
 			act.setEndTime(0);
