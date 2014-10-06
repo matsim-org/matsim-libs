@@ -159,7 +159,7 @@ public class QLinkLanesTest extends MatsimTestCase {
 		//900 m link, 2 lanes = 240 storage + 105 m lane, 1 lane = 14 storage
 		assertEquals(254.0, ql.getSpaceCap());
 		//check original lane
-		QLaneInternalI qlane = ql.getOriginalLane();
+		QLaneI qlane = ql.getOriginalLane();
 		assertNotNull(qlane);
 //		assertTrue(qlane.isFirstLaneOnLink());
 		assertEquals(0.5, qlane.getSimulatedFlowCapacity());
@@ -192,7 +192,7 @@ public class QLinkLanesTest extends MatsimTestCase {
 		//900 m link, 2 lanes = 240 storage + 105 m lane, 2 lanes = 28 storage
 		assertEquals(268.0, ql.getSpaceCap());
 		//check original lane
-		QLaneInternalI qlane = ql.getOriginalLane();
+		QLaneI qlane = ql.getOriginalLane();
 		assertNotNull(qlane);
 //		assertTrue(qlane.isFirstLaneOnLink());
 		assertEquals(0.5, qlane.getSimulatedFlowCapacity());
@@ -226,7 +226,7 @@ public class QLinkLanesTest extends MatsimTestCase {
 		assertEquals(296.0, ql.getSpaceCap());
 		double totalStorageCapacity = 0.0;
 		//check original lane
-		QLaneInternalI qlane = ql.getOriginalLane();
+		QLaneI qlane = ql.getOriginalLane();
 		assertNotNull(qlane);
 //		assertTrue(qlane.isFirstLaneOnLink());
 		assertEquals(0.5, qlane.getSimulatedFlowCapacity());
@@ -236,7 +236,7 @@ public class QLinkLanesTest extends MatsimTestCase {
 		assertNotNull(ql.getToNodeQueueLanes());
 		assertEquals(3, ql.getToNodeQueueLanes().size());
 		double totalFlowCapacity = 0.0;
-		for (QLaneInternalI qll : ql.getToNodeQueueLanes()) {
+		for (QLaneI qll : ql.getToNodeQueueLanes()) {
 			if (((QueueWithBuffer)qll).getId().equals(Id.create(2, Lane.class))) {
 				assertEquals(0.5, qll.getSimulatedFlowCapacity());
 				assertEquals(28.0, qll.getStorageCapacity());

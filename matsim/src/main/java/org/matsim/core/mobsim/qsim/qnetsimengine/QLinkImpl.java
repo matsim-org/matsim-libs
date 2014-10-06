@@ -58,7 +58,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		 * it will call back this factory within the constructor (!) to obtain a road and pass
 		 * itself to the creation method.
 		 */
-		public QLaneInternalI createLane(QLinkImpl qLinkImpl);
+		public QLaneI createLane(QLinkImpl qLinkImpl);
 
 	}
 
@@ -73,7 +73,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 
 	private final VisData visdata;
 
-    public final QLaneInternalI road;
+	public final QLaneI road;
 
 	/**
 	 * Initializes a QueueLink with one QueueLane.
@@ -88,7 +88,11 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	 */
 	public QLinkImpl(final Link link2, QNetwork network, final QNode toNode, final VehicleQ<QVehicle> vehicleQueue) {
 		super(link2, network) ;
-        this.road = new QueueWithBuffer(this, vehicleQueue);
+		//--
+		QueueWithBuffer.Builder builder = new QueueWithBuffer.Builder(this) ;
+		builder.setVehicleQueue(vehicleQueue);
+		this.road = builder.build() ;
+		//--
 		this.toQueueNode = toNode;
 		this.visdata = this.new VisDataImpl() ; // instantiating this here and not earlier so we can cache some things
 	  super.transitQLink = new TransitQLink(this.road);

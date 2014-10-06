@@ -31,7 +31,7 @@ import org.matsim.vis.snapshotwriters.VisData;
  * @author nagel
  *
  */
-abstract class QLaneInternalI extends QInternalI {
+abstract class QLaneI extends QInternalI {
 	
 //	boolean doSimStep( final double now ) ;
 	

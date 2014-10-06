@@ -62,7 +62,7 @@ import org.matsim.vis.snapshotwriters.VisData;
  *
  * @author nagel
  */
-final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem {
+final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 
 	/**
 	 * The remaining integer part of the flow capacity available in one time step to move vehicles into the
@@ -131,6 +131,7 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 	 */
 	private DefaultSignalizeableItem qSignalizedItem = null ;
 	private final AbstractQLink qLink;
+	private final Link link ; // I want to know where we really need the qLink.  kai, sep'14
 	private final QNetwork network ;
 	private final Id<Lane> id;
 	private static int spaceCapWarningCount = 0;
@@ -154,20 +155,77 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 	// (still) private:
 	private final VisData visData = new VisDataImpl() ;
 	private final double timeStepSize;
-
-	QueueWithBuffer(AbstractQLink qLinkImpl,  final VehicleQ<QVehicle> vehicleQueue ) {
-		this(qLinkImpl, vehicleQueue,  Id.create(qLinkImpl.getLink().getId(), Lane.class) ) ;
+	
+	static class Builder {
+		private VehicleQ<QVehicle> vehicleQueue = null ;
+		private Id<Lane> id = null ;
+		private Double length = null ;
+		private Double effectiveNumberOfLanes = null ;
+		private Double flowCapacity_s = null ;
+		private AbstractQLink qLink;
+		/**
+		 * @param qLink -- The embedding qLink is needed, for example to park vehicles or to activate toNodes.
+		 */
+		Builder( AbstractQLink qLink ) {
+			this.qLink = qLink ;
+		}
+		QueueWithBuffer build() {
+			if ( vehicleQueue == null ) {
+				vehicleQueue = new FIFOVehicleQ() ;
+			}
+			if ( id==null ) {
+				id = Id.create( qLink.getLink().getId() , Lane.class ) ;
+			}
+			if ( length==null ) {
+				length = qLink.getLink().getLength() ;
+			}
+			if ( effectiveNumberOfLanes==null ) {
+				effectiveNumberOfLanes = qLink.getLink().getNumberOfLanes() ;
+			}
+			if ( flowCapacity_s==null ) {
+				flowCapacity_s = qLink.getLink().getCapacity() ;
+			}
+			return new QueueWithBuffer( qLink, vehicleQueue, id, length, effectiveNumberOfLanes, flowCapacity_s ) ;
+		}
+		/**
+		 * @param vehicleQueue -- may be set away from its default.
+		 */
+		void setVehicleQueue(VehicleQ<QVehicle> vehicleQueue) {
+			this.vehicleQueue = vehicleQueue;
+		}
+		/**
+		 * @param id -- may be different from the QLink's ID (e.g. for lanes)
+		 */
+		void setId(Id<Lane> id) {
+			this.id = id;
+		}
+		/**
+		 * @param length -- may be different from the QLink's lane (e.g. for lanes)
+		 */
+		void setLength(Double length) {
+			this.length = length;
+		}
+		/**
+		 * @param effectiveNumberOfLanes -- may be different from the QLink's lane (e.g. for lanes)
+		 */
+		void setEffectiveNumberOfLanes(Double effectiveNumberOfLanes) {
+			this.effectiveNumberOfLanes = effectiveNumberOfLanes;
+		}
+		/**
+		 * @param flowCapacity_s -- may be different from the QLink's lane (e.g. for lanes)
+		 * 
+		 * Probably not useful since not a constant inside QLane!
+		 */
+		void setFlowCapacity_s(Double flowCapacity_s) {
+			this.flowCapacity_s = flowCapacity_s;
+		}
 	}
 
-	QueueWithBuffer(AbstractQLink qLinkImpl,  final VehicleQ<QVehicle> vehicleQueue, Id<Lane> id ) {
-		this(qLinkImpl, vehicleQueue, id, qLinkImpl.getLink().getLength(), qLinkImpl.getLink().getNumberOfLanes(),
-				((LinkImpl)qLinkImpl.getLink()).getFlowCapacity());
-	}
-
-	QueueWithBuffer(AbstractQLink qLinkImpl,  final VehicleQ<QVehicle> vehicleQueue, Id<Lane> id, 
+	private QueueWithBuffer(AbstractQLink qLinkImpl,  final VehicleQ<QVehicle> vehicleQueue, Id<Lane> id, 
 			double length, double effectiveNumberOfLanes, double flowCapacity_s) {
 		this.id = id ;
 		this.qLink = qLinkImpl;
+		this.link = qLinkImpl.link ;
 		this.network = qLinkImpl.network ;
 		this.vehQueue = vehicleQueue ;
 
@@ -187,7 +245,9 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 
 		if ( this.network.simEngine.getMobsim().getSimTimer().getSimTimestepSize()<1.) {
 			throw new RuntimeException("yyyy This will produce weird results because in at least one place "
-					+ "(addFromUpstream(...)) everything is pulled to integer values.  Aborting ...") ;
+					+ "(addFromUpstream(...)) everything is pulled to integer values.  Aborting ... "
+					+ "(This statement may no longer be correct; I think that the incriminating code was modified.  So please test and remove"
+					+ " the warning if it works. kai, sep'14") ;
 		}
 	}
 
@@ -218,7 +278,7 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 			// use the lastMovedTime that was (somehow) computed for that vehicle.)
 		}
 		qLink.getToNode().activateNode();
-		// yy for an "upstream" QLane, this is too early.  Yet I think I founds this
+		// yy for an "upstream" QLane, this activates the toNode too early.  Yet I think I founds this
 		// also in the original QLane code.  kai, sep'13
 	}
 
@@ -239,7 +299,7 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 	public final void updateRemainingFlowCapacity() {
 		remainingflowCap = flowCapacityPerTimeStep;
 		if (thisTimeStepGreen && flowcap_accumulate.getValue() < 1.0 && isNotOfferingVehicle() ) {
-			final double now = this.qLink.network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
+			final double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
 			flowcap_accumulate.addValue( flowCapacityPerTimeStepFractionalPart, now);
 		}
 	}
@@ -425,9 +485,9 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 
 	@Override
     final void recalcTimeVariantAttributes(final double now) {
-		freespeedTravelTime = this.length / qLink.getLink().getFreespeed(now);
-		// as of now, speed is NOT explicity set but pulled from the qlink since we assume that all lanes have the same freespeed as the
-		// qlink
+		freespeedTravelTime = this.length / link.getFreespeed(now);
+		// as of now, speed is NOT explicity set but pulled from the link since we assume that all lanes have the same freespeed as the
+		// link
 		if (Double.isNaN(freespeedTravelTime)) {
 			throw new IllegalStateException("Double.NaN is not a valid freespeed travel time for a link. Please check the attributes length and freespeed!");
 		}
@@ -459,20 +519,20 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 	@Override
 	public final QVehicle popFirstVehicle() {
 		QVehicle veh = removeFirstVehicle();
-		double now = qLink.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
+		double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 		if (this.generatingEvents) {
-			this.qLink.network.simEngine.getMobsim().getEventsManager().processEvent(new LaneLeaveEvent(
-					now, veh.getDriver().getId(), this.qLink.getLink().getId(), this.getId()
+			this.network.simEngine.getMobsim().getEventsManager().processEvent(new LaneLeaveEvent(
+					now, veh.getDriver().getId(), this.link.getId(), this.getId()
 					));
 		}
-		qLink.network.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEvent(
-				now, veh.getDriver().getId(), this.qLink.getLink().getId(), veh.getId()
+		network.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEvent(
+				now, veh.getDriver().getId(), this.link.getId(), veh.getId()
 				));
 		return veh;
 	}
 
 	final QVehicle removeFirstVehicle(){
-		double now = qLink.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
+		double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 		QVehicle veh = buffer.poll();
 		usedBufferStorageCapacity = usedBufferStorageCapacity - veh.getSizeInEquivalents();
 		bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
@@ -481,7 +541,7 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 
 	@Override
 	public final void setSignalStateForTurningMove( final SignalGroupState state, final Id<Link> toLinkId) {
-		if (!qLink.getToNode().getNode().getOutLinks().containsKey(toLinkId)){
+		if (!link.getToNode().getOutLinks().containsKey(toLinkId)){
 			throw new IllegalArgumentException("ToLink " + toLinkId + " is not reachable from QLink Id " +  this.id );
 		}
 		qSignalizedItem.setSignalStateForTurningMove(state, toLinkId);
@@ -511,21 +571,21 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 
 	@Override
 	public final void clearVehicles() {
-		double now = qLink.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
+		double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 
 		for (QVehicle veh : vehQueue) {
-			qLink.network.simEngine.getMobsim().getEventsManager().processEvent(
+			network.simEngine.getMobsim().getEventsManager().processEvent(
 					new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
-			qLink.network.simEngine.getMobsim().getAgentCounter().incLost();
-			qLink.network.simEngine.getMobsim().getAgentCounter().decLiving();
+			network.simEngine.getMobsim().getAgentCounter().incLost();
+			network.simEngine.getMobsim().getAgentCounter().decLiving();
 		}
 		vehQueue.clear();
 
 		for (QVehicle veh : buffer) {
-			qLink.network.simEngine.getMobsim().getEventsManager().processEvent(
+			network.simEngine.getMobsim().getEventsManager().processEvent(
 					new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
-			qLink.network.simEngine.getMobsim().getAgentCounter().incLost();
-			qLink.network.simEngine.getMobsim().getAgentCounter().decLiving();
+			network.simEngine.getMobsim().getAgentCounter().incLost();
+			network.simEngine.getMobsim().getAgentCounter().decLiving();
 		}
 		buffer.clear();
 		usedBufferStorageCapacity = 0;
@@ -544,7 +604,7 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 		double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 
 		// compute and set earliest link exit time:
-		double linkTravelTime = this.length / this.network.simEngine.getLinkSpeedCalculator().getMaximumVelocity(veh, this.qLink.link, now);
+		double linkTravelTime = this.length / this.network.simEngine.getLinkSpeedCalculator().getMaximumVelocity(veh, link, now);
 		double earliestExitTime = now + linkTravelTime ;
 
 		earliestExitTime = timeStepSize * Math.floor(earliestExitTime/timeStepSize );
@@ -560,7 +620,7 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 		// Also, it could happen that vehicles with an earlier link exit time could be 
 		// inserted and thus end up after vehicles with a later link exit time.  theresa & kai, jun'14
 
-		veh.setCurrentLink(qLink.getLink());
+		veh.setCurrentLink(link);
 		vehQueue.add(veh);
 		if ( QueueWithBuffer.HOLES ) {
 			holes.poll();
@@ -592,7 +652,7 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 
 	@Override
 	public final void setSignalized( final boolean isSignalized) {
-		qSignalizedItem  = new DefaultSignalizeableItem(qLink.getLink().getToNode().getOutLinks().keySet());
+		qSignalizedItem  = new DefaultSignalizeableItem(link.getToNode().getOutLinks().keySet());
 	}
 
 	@Override
@@ -611,7 +671,6 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 
 	Id<Lane> getId() {
 		// need this so we can generate lane events although we do not need them here. kai, sep'13
-		// yyyy would probably be better to have this as a final variable set during construction. kai, sep'13
 		return this.id;
 	}
 
@@ -639,7 +698,6 @@ final class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem 
 			AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = network.simEngine.getAgentSnapshotInfoBuilder();
 
 			double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
-			Link link = qLink.getLink();
 
 			// vehicles:
 			if ( !buffer.isEmpty() || !vehQueue.isEmpty() ) {

@@ -48,7 +48,7 @@ import org.matsim.vis.snapshotwriters.VisData;
  * 
  * @author nagel
  */
-class AssignmentEmulatingQLane extends QLaneInternalI {
+class AssignmentEmulatingQLane extends QLaneI {
 	private static Logger log = Logger.getLogger(AssignmentEmulatingQLane.class ) ;
 
 	double freespeedTravelTime = Double.NaN;

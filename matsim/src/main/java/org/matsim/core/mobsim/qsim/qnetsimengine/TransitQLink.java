@@ -47,12 +47,12 @@ final class TransitQLink {
 	 * blocking other traffic on the lane.
 	 */
 	private final Queue<QVehicle> transitVehicleStopQueue = new PriorityQueue<>(5, VEHICLE_EXIT_COMPARATOR);
-	private final QLaneInternalI road;
+	private final QLaneI road;
 
 	private static final Comparator<QVehicle> VEHICLE_EXIT_COMPARATOR = new QVehicleEarliestLinkExitTimeComparator();
 
 
-	TransitQLink(QLaneInternalI road){
+	TransitQLink(QLaneI road){
 		this.road = road;
 	}
 	

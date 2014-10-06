@@ -16,9 +16,10 @@ public final class JJExperimentalQSimNetworkFactory implements NetsimNetworkFact
 	public QLinkInternalI createNetsimLink(Link link, QNetwork network, QNode queueNode) {
 		LaneFactory laneFactory = new LaneFactory() {
 			@Override
-			public QLaneInternalI createLane(QLinkImpl qLinkImpl) {
-				VehicleQ<QVehicle> vehicleQueue = new JJExperimentalVehicleQ() ; 
-				return new QueueWithBuffer(qLinkImpl, vehicleQueue, Id.create(qLinkImpl.getLink().getId(), Lane.class) ) ;
+			public QLaneI createLane(QLinkImpl qLinkImpl) {
+				QueueWithBuffer.Builder builder = new QueueWithBuffer.Builder( qLinkImpl ) ;
+				builder.setVehicleQueue(new JJExperimentalVehicleQ());
+				return builder.build() ;
 			}
 		} ;
 		return new QLinkImpl(link, network, queueNode, laneFactory) ;
