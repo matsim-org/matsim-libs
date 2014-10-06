@@ -64,11 +64,7 @@ public final class PopulationAgentSource implements AgentSource {
 		}
 	}
 
-<<<<<<< HEAD
-	void insertVehicles(Person p) {
-=======
 	private void insertVehicles(Person p) {
->>>>>>> some formatting; one final
 		Plan plan = p.getSelectedPlan();
 		Set<String> seenModes = new HashSet<>();
 		for (PlanElement planElement : plan.getPlanElements()) {
