@@ -172,7 +172,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 			builder.setId(laneId);
 			builder.setLength(lane.getLength()); 
 			builder.setEffectiveNumberOfLanes( noEffectiveLanes );
-			builder.setFlowCapacity_s( lane.getLaneData().getCapacityVehiclesPerHour() );
+			builder.setFlowCapacity_s( lane.getLaneData().getCapacityVehiclesPerHour()/3600. );
 			QLaneI queue = builder.build() ;
 			// --
 			((QueueWithBuffer)queue).generatingEvents = true;
