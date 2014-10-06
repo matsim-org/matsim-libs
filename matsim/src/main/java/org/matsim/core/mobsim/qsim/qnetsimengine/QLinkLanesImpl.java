@@ -140,7 +140,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 
 	private final List<ModelLane> lanes;
 	
-	private final Map<Id, Map<Id, List<QLaneI>>> nextQueueToLinkCache;
+	private final Map<Id<Lane>, Map<Id<Link>, List<QLaneI>>> nextQueueToLinkCache;
 
 	/**
 	 * Initializes a QueueLink with one QueueLane.
@@ -187,7 +187,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 				laneIdToLinksMap.put(laneId, toLinkIds);
 			}
 			else { //lane is within the link and has no connection to a node
-				Map<Id, List<QLaneI>> toLinkIdDownstreamQueues = new LinkedHashMap<>();
+				Map<Id<Link>, List<QLaneI>> toLinkIdDownstreamQueues = new LinkedHashMap<>();
 				nextQueueToLinkCache.put(Id.create(((QueueWithBuffer)queue).getId(), Lane.class), toLinkIdDownstreamQueues);
 				for (ModelLane toLane : lane.getToLanes()) {
 					Set<Id<Link>> toLinks = laneIdToLinksMap.get(toLane.getLaneData().getId());
