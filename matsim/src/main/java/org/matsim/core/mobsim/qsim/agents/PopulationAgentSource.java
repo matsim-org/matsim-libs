@@ -31,7 +31,7 @@ import org.matsim.vehicles.VehicleUtils;
 
 import java.util.*;
 
-public class PopulationAgentSource implements AgentSource {
+public final class PopulationAgentSource implements AgentSource {
 
 	private final Population population;
 	private final AgentFactory agentFactory;
@@ -64,7 +64,11 @@ public class PopulationAgentSource implements AgentSource {
 		}
 	}
 
+<<<<<<< HEAD
 	void insertVehicles(Person p) {
+=======
+	private void insertVehicles(Person p) {
+>>>>>>> some formatting; one final
 		Plan plan = p.getSelectedPlan();
 		Set<String> seenModes = new HashSet<>();
 		for (PlanElement planElement : plan.getPlanElements()) {
@@ -73,7 +77,9 @@ public class PopulationAgentSource implements AgentSource {
 				if (this.mainModes.contains(leg.getMode())) { // only simulated modes get vehicles
 					if (!seenModes.contains(leg.getMode())) { // create one vehicle per simulated mode, put it on the home location
 						Id<Link> vehicleLink = findVehicleLink(p);
-						qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create(p.getId(), Vehicle.class), modeVehicleTypes.get(leg.getMode())), vehicleLink);
+						qsim.createAndParkVehicleOnLink(
+								VehicleUtils.getFactory().createVehicle(Id.create(p.getId(), Vehicle.class), modeVehicleTypes.get(leg.getMode())), 
+								vehicleLink);
 						seenModes.add(leg.getMode());
 					}
 				}
