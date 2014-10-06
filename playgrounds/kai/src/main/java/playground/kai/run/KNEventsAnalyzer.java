@@ -47,7 +47,7 @@ public class KNEventsAnalyzer {
 		formatter.close();
 		
 		if ( args.length < 3 ) {
-			System.out.println("Usage: cmd eventsFile popFile netFile [popAttrFile] [tollFile]. Aborting ..." ) ;
+			System.out.println("Usage: cmd eventsFile popFile netFile [popAttrFile] [tollFile] [futureTollFile]. Aborting ..." ) ;
 			System.exit(-1);
 		}
 		
@@ -63,6 +63,11 @@ public class KNEventsAnalyzer {
 		String tollFilename = null ;
 		if ( args.length >= 4 && args[4]!=null ) {
 			tollFilename = args[4] ;
+		}
+		
+		String otherLinksFilename = null ;
+		if ( args.length >= 5 && args[5]!=null ) {
+			otherLinksFilename = args[5] ;
 		}
 		
 		// ===
@@ -89,8 +94,11 @@ public class KNEventsAnalyzer {
 		
 		EventsManager events = new EventsManagerImpl() ;
 		
-		final KNAnalysisEventsHandler calcLegTimes = new KNAnalysisEventsHandler(scenario);
-		events.addHandler(calcLegTimes);
+		final KNAnalysisEventsHandler.Builder builder = new KNAnalysisEventsHandler.Builder(scenario) ;
+		builder.setOtherTollLinkFile( otherLinksFilename );
+		final KNAnalysisEventsHandler calcLegTimes = builder.build();
+		
+		events.addHandler( calcLegTimes );
 		
 		new MatsimEventsReader(events).readFile(eventsFilename) ;
 		

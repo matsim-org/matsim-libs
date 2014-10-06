@@ -164,6 +164,12 @@ public class KNPopCompare {
 						popTypes.add( subpopName + "_nonPayer") ;
 					}
 					
+					Double certainLinksCnt = (Double) pop1.getPersonAttributes().getAttribute( person1.getId().toString(), 
+							KNAnalysisEventsHandler.CERTAIN_LINKS_CNT ) ;
+					if ( certainLinksCnt != null && payments2==0. ) {
+						popTypes.add( subpopName + "_avoid" ) ;
+					}
+					
 					addItemToStatsContainer( StatType.payments1, popTypes, payments1 );
 					addItemToStatsContainer( StatType.payments2, popTypes, payments2 );
 					addItemToStatsContainer( StatType.paymentsDiff, popTypes, deltaPayments );

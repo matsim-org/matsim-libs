@@ -39,6 +39,7 @@ import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
+import org.matsim.vehicles.Vehicle;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -59,6 +60,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 
 	public static final String PAYMENTS = "payments";
 	public static final String TRAV_TIME = "travTime" ;
+	public static final String CERTAIN_LINKS_CNT = "cntOnCertainLinks" ;
 	public static final String SUBPOPULATION = "subpopulation" ; // subpopulationAttributeName
 
 	private Scenario scenario = null ;
@@ -84,10 +86,40 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 
 	private  Set<Id<Link>> tolledLinkIds = new HashSet<Id<Link>>() ;
 	// (initializing with empty set, meaning output will say no vehicles at gantries).
+	
+	private Set<Id<Link>> otherTolledLinkIds = new HashSet<Id<Link>>() ;
 
 	// general trip counter.  Would, in theory, not necessary to do this per StatType, but I find it too brittle 
 	// to avoid under- or over-counting with respect to loops.
 	//	private final Map<StatType,Integer> legCount = new TreeMap<StatType,Integer>() ;
+	
+	public static class Builder {
+		private final Scenario scenario ;
+		private String otherTollLinkFile = null ;
+		public void setOtherTollLinkFile(String otherTollLinkFile) {
+			this.otherTollLinkFile = otherTollLinkFile;
+		}
+		public Builder( final Scenario sc ) {
+			scenario = sc ;
+		}
+		public KNAnalysisEventsHandler build() {
+			return new KNAnalysisEventsHandler( scenario, otherTollLinkFile ) ;
+		}
+	}
+	
+	private KNAnalysisEventsHandler( final Scenario scenario, final String otherTollLinkFile ) {
+		this( scenario ) ;
+		if ( otherTollLinkFile != null && !otherTollLinkFile.equals("") ) {
+			RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
+			RoadPricingReaderXMLv1 rpReader = new RoadPricingReaderXMLv1(scheme);
+			try {
+				rpReader.parse( otherTollLinkFile  );
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+			this.otherTolledLinkIds = scheme.getTolledLinkIds() ;
+		}
+	}
 
 	public KNAnalysisEventsHandler(final Scenario scenario) {
 		this.scenario = scenario ;
@@ -187,7 +219,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 			controlStatisticsSum += travTime ;
 			controlStatisticsCnt ++ ;
 
-			add(person,travTime, TRAV_TIME) ;
+			add(person.getId(),travTime, TRAV_TIME) ;
 
 			int legNr = this.agentLegs.get(event.getPersonId());
 			Plan plan = person.getSelectedPlan();
@@ -317,6 +349,9 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 		for ( Person person : this.scenario.getPopulation().getPersons().values() ) {
 			ObjectAttributes attribs = this.scenario.getPopulation().getPersonAttributes() ;
 			attribs.putAttribute( person.getId().toString(), TRAV_TIME, 0. ) ;
+			if ( attribs.getAttribute( person.getId().toString(), CERTAIN_LINKS_CNT ) != null ) {
+				attribs.putAttribute( person.getId().toString(), CERTAIN_LINKS_CNT, 0. ) ;
+			}
 			if ( attribs.getAttribute( person.getId().toString(), PAYMENTS) != null ) {
 				attribs.putAttribute( person.getId().toString(), PAYMENTS, 0. ) ;
 			}
@@ -343,17 +378,17 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 		// are added up in the legType category.  kai, feb'14)
 
 
-		add(person, item, PAYMENTS);
+		add(person.getId(), item, PAYMENTS);
 	}
 
-	private void add(Person person, double val, final String attributeName) {
+	private void add(Id<Person> id, double val, final String attributeName) {
 		final ObjectAttributes pAttribs = this.scenario.getPopulation().getPersonAttributes();
-		Double oldVal = (Double) pAttribs.getAttribute( person.getId().toString(), attributeName) ;
+		Double oldVal = (Double) pAttribs.getAttribute( id.toString(), attributeName) ;
 		double newVal = val ;
 		if ( oldVal!=null ) {
 			newVal += oldVal ;
 		}
-		pAttribs.putAttribute( person.getId().toString(), attributeName, newVal ) ; 
+		pAttribs.putAttribute( id.toString(), attributeName, newVal ) ; 
 	}
 
 	public void writeStats(final String filenameTmp) {
@@ -449,9 +484,9 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 
 		{
 			BufferedWriter writer = IOUtils.getBufferedWriter("gantries.txt") ;
-			for (  Entry<Id, Double> entry : this.vehicleGantryCounts.entrySet() ) {
+			for (  Entry<Id<Vehicle>, Double> entry : this.vehicleGantryCounts.entrySet() ) {
 				try {
-					writer.write( entry.getKey() + "\t" + entry.getValue() + "\t 1 \n") ; // the "1" makes automatic processing a bit easier. kai, mar'14
+					writer.write( entry.getKey() + "\t" + entry.getValue() + "\t 1 ") ; // the "1" makes automatic processing a bit easier. kai, mar'14
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -531,7 +566,7 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 
 	private Map<Id,Double> vehicleEnterTimes = new HashMap<Id,Double>() ;
 
-	private Map<Id,Double> vehicleGantryCounts = new HashMap<Id,Double>() ;
+	private Map<Id<Vehicle>,Double> vehicleGantryCounts = new HashMap<Id<Vehicle>,Double>() ;
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
@@ -545,6 +580,11 @@ PersonLeavesVehicleEventHandler, PersonEntersVehicleEventHandler {
 				this.vehicleGantryCounts.put( event.getVehicleId(), 1. + gantryCountSoFar ) ;
 			}
 		}
+		
+		if ( this.otherTolledLinkIds.contains( event.getLinkId() ) ) {
+			add( event.getPersonId(), 1., CERTAIN_LINKS_CNT );
+		}
+		
 	}
 
 	private Map<Id,Double> linkTtimesSums = new HashMap<Id,Double>() ;
