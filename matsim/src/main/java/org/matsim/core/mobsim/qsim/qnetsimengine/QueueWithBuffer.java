@@ -183,7 +183,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 				effectiveNumberOfLanes = qLink.getLink().getNumberOfLanes() ;
 			}
 			if ( flowCapacity_s==null ) {
-				flowCapacity_s = qLink.getLink().getCapacity() ;
+				flowCapacity_s = ((LinkImpl)qLink.getLink()).getFlowCapacity() ;
 			}
 			return new QueueWithBuffer( qLink, vehicleQueue, id, length, effectiveNumberOfLanes, flowCapacity_s ) ;
 		}
