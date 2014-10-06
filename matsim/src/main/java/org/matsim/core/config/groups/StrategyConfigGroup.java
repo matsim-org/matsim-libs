@@ -47,6 +47,8 @@ public class StrategyConfigGroup extends Module {
 	private static final String MODULE_SUBPOPULATION = "ModuleSubpopulation_";
 
 	private final ReflectiveDelegate delegate = new ReflectiveDelegate();
+	// yy could you please describe why this indirect design was done?  Was ist just because it made refactoring easier, or does it provide
+	// an advantage or is even necessary?  Thanks ...  kai, oct'14
 
 	public static class StrategySettings extends ReflectiveModule implements MatsimParameters {
 		public static final String SET_NAME = "strategysettings";

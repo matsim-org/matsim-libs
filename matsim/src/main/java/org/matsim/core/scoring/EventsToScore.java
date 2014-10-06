@@ -21,6 +21,7 @@
 package org.matsim.core.scoring;
 
 import java.util.Map;
+import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -41,6 +42,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.internal.HasPersonId;
+import org.matsim.core.config.Config;
 import org.matsim.core.events.handler.BasicEventHandler;
 
 /**
@@ -92,7 +94,28 @@ public class EventsToScore implements BasicEventHandler {
 		this.learningRate = learningRate;
 		initHandlers(scoringFunctionFactory);
 		
-		this.scoreMSAstartsAtIteration = this.scenario.getConfig().vspExperimental().getScoreMSAStartsAtIteration() ;
+		Config config = this.scenario.getConfig() ;
+		
+		// yy the following is also in the consistency check.  Leaving it also here for the time being since it is difficult to make sense out of the settings
+		// if they are inconsistent.  In the longer run, the deprecated things should just go.  kai, oct'14
+		Integer tmp2 = config.vspExperimental().getScoreMSAStartsAtIteration() ;
+
+		Integer tmp = null ;
+		if ( config.vspExperimental().getFractionOfIterationsToStartScoreMSA()!=null ) {
+			tmp = (int) ((config.controler().getLastIteration() - config.controler().getFirstIteration()) 
+				* config.vspExperimental().getFractionOfIterationsToStartScoreMSA() + config.controler().getFirstIteration());
+		}
+		
+		if ( tmp!=null && tmp2!=null && tmp!=tmp2 ) {
+			throw new RuntimeException( "inconsistent" ) ;
+		}
+		
+		if ( tmp!=null ) {
+			this.scoreMSAstartsAtIteration = tmp ;
+		} else if ( tmp2!=null ) {
+			this.scoreMSAstartsAtIteration = tmp2 ;
+		}
+		
 	}
 
 	private void initHandlers(final ScoringFunctionFactory factory) {
@@ -164,6 +187,7 @@ public class EventsToScore implements BasicEventHandler {
 		finished = true;
 	}
 	
+	private Map<Plan,Integer> msaContributions = new HashMap<Plan,Integer>() ;
 	private void assignNewScores() {
 		log.info("it: " + this.iteration + " msaStart: " + this.scoreMSAstartsAtIteration );
 
@@ -188,11 +212,19 @@ public class EventsToScore implements BasicEventHandler {
 						log.warn("score is NaN; plan:" + plan.toString() );
 					}
 				} else {
-					double alpha = 1./(this.iteration - this.scoreMSAstartsAtIteration + 1) ;
-					alpha *= scenario.getConfig().strategy().getMaxAgentPlanMemorySize() ; //(**)
-					if ( alpha>1 ) {
-						alpha = 1. ;
+//					double alpha = 1./(this.iteration - this.scoreMSAstartsAtIteration + 1) ;
+//					alpha *= scenario.getConfig().strategy().getMaxAgentPlanMemorySize() ; //(**)
+//					if ( alpha>1 ) {
+//						alpha = 1. ;
+//					}
+
+					Integer msaContribs = this.msaContributions.get(plan) ;
+					if ( msaContribs==null ) {
+						msaContribs = 0 ;
 					}
+					this.msaContributions.put(plan,msaContribs+1) ;
+					double alpha = 1./(msaContribs+1) ;
+
 					final double newScore = alpha * score + (1.-alpha) * oldScore;
 					if ( log.isTraceEnabled() ) {
 						log.trace( " alpha: " + alpha + " oldScore: " + oldScore + " simScore: " + score + " newScore: " + newScore );
@@ -265,6 +297,8 @@ public class EventsToScore implements BasicEventHandler {
 		finished = false;
 		this.iteration = iteration ;
 		// ("reset" is called just before the mobsim starts, so it probably has the correct iteration number for our purposes) 
+		
+//		this.msaContributions.clear() ;
 	}
 
 	public ScoringFunction getScoringFunctionForAgent(Id<Person> agentId) {
