@@ -374,11 +374,10 @@ PersonStuckEventHandler
 				//				throw new RuntimeException("The causing agent and the affected agent are the same (" + personToBeCharged.toString() + "). This situation is NOT considered as an external effect; NO marginal congestion event is thrown.");
 			} else {
 				// using the time when the causing agent entered the link
-				// right now, you are using the time when the affected agent leaves the link... ik
 				this.totalInternalizedDelay = this.totalInternalizedDelay + marginalDelaysPerLeavingVehicle;
 				//				emissionCorrespondingToDelays = getDelaysEquivalentEmissions(marginalDelaysPerLeavingVehicle/delayToPayFor, emissionsToPayFor);
 				//				warmEmissionAnalysisModule.throwWarmEmissionEvent(event.getTime(), event.getLinkId(), personToBeCharged, emissionCorrespondingToDelays);
-				MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowStorageCapacity", personToBeCharged, event.getVehicleId(), marginalDelaysPerLeavingVehicle, event.getLinkId(), event.getTime());
+				MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowStorageCapacity", personToBeCharged, event.getVehicleId(), marginalDelaysPerLeavingVehicle, event.getLinkId(),this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2linkEnterTime().get(personToBeCharged) );
 				this.events.processEvent(congestionEvent);	
 			}
 			delayToPayFor = delayToPayFor - marginalDelaysPerLeavingVehicle;
@@ -390,10 +389,9 @@ PersonStuckEventHandler
 				//				throw new RuntimeException("The causing agent and the affected agent are the same (" + personToBeCharged.toString() + "). This situation is NOT considered as an external effect; NO marginal congestion event is thrown.");
 			} else {
 				// using the time when the causing agent entered the link
-				// right now, you are using the time when the affected agent leaves the link... ik
 				this.totalInternalizedDelay = this.totalInternalizedDelay + delayToPayFor;
 				//				warmEmissionAnalysisModule.throwWarmEmissionEvent(event.getTime(), event.getLinkId(), personToBeCharged, emissionsToPayFor);
-				MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowStorageCapacity", personToBeCharged, event.getVehicleId(), delayToPayFor, event.getLinkId(), event.getTime());
+				MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowStorageCapacity", personToBeCharged, event.getVehicleId(), delayToPayFor, event.getLinkId(), this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2linkEnterTime().get(personToBeCharged) );
 				this.events.processEvent(congestionEvent);	
 			}
 			delayToPayFor = 0.;
