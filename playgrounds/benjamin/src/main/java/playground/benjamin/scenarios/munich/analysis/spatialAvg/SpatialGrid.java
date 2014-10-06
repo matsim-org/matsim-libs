@@ -33,6 +33,8 @@ public class SpatialGrid {
 	private Double gridMaxY;
 	private int numberOfCellsX;
 	private int numberOfCellsY;
+	private double gridWidth;
+	private double gridHeight;
 	private double cellWidth;
 	private double cellHeight;
 	
@@ -43,15 +45,17 @@ public class SpatialGrid {
 		this.gridMaxY= gridMaxY;
 		this.numberOfCellsX = numberOfCellsX;
 		this.numberOfCellsY = numberOfCellsY;
-		this.cellWidth = gridMaxX-gridMinX;
-		this.cellHeight = gridMaxY-gridMinY;
+		this.gridWidth = gridMaxX-gridMinX;
+		this.cellWidth = gridWidth/numberOfCellsX;
+		this.gridHeight = gridMaxY-gridMinY;
+		this.cellHeight = gridHeight/numberOfCellsY;
 		this.grid = new Cell [numberOfCellsX][numberOfCellsY];
 		// initialize grid with 0.0
 
 		for(int i=0; i<numberOfCellsX; i++){
 			for(int j=0; j<numberOfCellsY; j++){
-				Coord cellCentroid = new CoordImpl(gridMinX + i*(gridMaxX-gridMinX)/numberOfCellsX,
-													gridMinY + j*(gridMaxY-gridMinY)/numberOfCellsY);
+				Coord cellCentroid = new CoordImpl(gridMinX + (i+0.5)*cellWidth,
+													gridMinY + (j+0.5)*cellHeight);
 				grid[i][j]= new Cell(i,j,cellCentroid);
 			}
 		}
@@ -61,14 +65,15 @@ public class SpatialGrid {
 		this(noOfXbins, noOfYbins, inputData.getMinX(), inputData.getMaxX(), inputData.getMinY(), inputData.getMaxY());
 	}
 
-	public void addLinkValue(Link link, Double value, LinkWeightUtil linkWeightUtil){
+	public void addLinkValue(Link link, EmissionsAndVehicleKm emissionsAndVehicleKm, LinkWeightUtil linkWeightUtil){
 		for(int i=0; i<numberOfCellsX; i++){
 			for(int j=0; j<numberOfCellsY; j++){
 				Cell currentCell = grid[i][j];
 				Double weight = linkWeightUtil.getWeightFromLink(link, currentCell.getCentroid());
-				Double weightedValue = value * weight;
-				currentCell.addWeightedValue(weightedValue);
-				currentCell.addWeight(weight*link.getLength()/1000.);
+				Double weightedEmissionValue = emissionsAndVehicleKm.getEmissionValue() * weight;
+				Double weightedVehicleKm = emissionsAndVehicleKm.getLinkLenghtKm() * weight;
+				currentCell.addWeightedValue(weightedEmissionValue);
+				currentCell.addWeight(weightedVehicleKm);
 			}
 		}
 	}
@@ -132,13 +137,13 @@ public class SpatialGrid {
 	}
 
 	private int mapYCoordToGrid(double y) {
-		int yGrid = (int) Math.floor((y-gridMinY)/cellHeight);
+		int yGrid = (int) Math.floor((y-gridMinY)/gridHeight);
 		if(yGrid>=0 && yGrid<numberOfCellsY) return yGrid;
 		return -1;
 	}
 
 	private int mapXCoordToGrid(double x) {
-		int xGrid = (int) Math.floor((x-gridMinX)/cellWidth);
+		int xGrid = (int) Math.floor((x-gridMinX)/gridWidth);
 		if(xGrid>=0 && xGrid<numberOfCellsX) return xGrid;
 		return -1;
 	}

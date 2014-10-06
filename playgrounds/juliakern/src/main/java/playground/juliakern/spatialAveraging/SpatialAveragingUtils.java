@@ -68,8 +68,8 @@ public class SpatialAveragingUtils {
 		return Math.exp((-distanceSquared) / (smoothinRadiusSquared_m));
 	}
 	
-	public double[][] normalizeArray(double[][] array) {
-		double [][] normalizedArray = new double[noOfXbins][noOfYbins];
+	public Double[][] normalizeArray(Double[][] array) {
+		Double [][] normalizedArray = new Double[noOfXbins][noOfYbins];
 		for(int xIndex = 0; xIndex<noOfXbins; xIndex++){
 			for(int yIndex = 0; yIndex<noOfYbins; yIndex++){
 				normalizedArray[xIndex][yIndex] = array[xIndex][yIndex] / this.area_in_smoothing_circle_sqkm;

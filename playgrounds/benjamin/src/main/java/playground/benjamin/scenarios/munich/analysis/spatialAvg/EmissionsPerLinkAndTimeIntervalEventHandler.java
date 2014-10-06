@@ -20,6 +20,7 @@
 package playground.benjamin.scenarios.munich.analysis.spatialAvg;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.events.ColdEmissionEvent;
 import org.matsim.contrib.emissions.events.ColdEmissionEventHandler;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
@@ -33,22 +34,24 @@ import java.util.Map;
 public class EmissionsPerLinkAndTimeIntervalEventHandler implements ColdEmissionEventHandler, WarmEmissionEventHandler{
 
 	
-	private Map<Integer, Map<Id, Double>> intervals2links2emissions;
+	private Map<Integer, Map<Id, EmissionsAndVehicleKm>> intervals2links2emissions;
 	private WarmPollutant warmPollutant;
 	private ColdPollutant coldPollutant;
 	private int noOfTimeBins;
 	private double simulationEndTime;
+	private Map<Id<Link>, ? extends Link> links;
 
 	public EmissionsPerLinkAndTimeIntervalEventHandler(
-			double simulationEndTime, int noOfTimeBins, String pollutant2analyze) {
+			Map<Id<Link>, ? extends Link> links, double simulationEndTime, int noOfTimeBins, String pollutant2analyze) {
 		
+		this.links = links;
 		warmPollutant = WarmPollutant.valueOf(pollutant2analyze);
 		coldPollutant = ColdPollutant.valueOf(pollutant2analyze);
 		this.noOfTimeBins=noOfTimeBins;
 		this.simulationEndTime = simulationEndTime;
-		intervals2links2emissions = new HashMap<Integer, Map<Id,Double>>();
+		intervals2links2emissions = new HashMap<Integer, Map<Id,EmissionsAndVehicleKm>>();
 		for(int i=0;i<noOfTimeBins;i++){
-			intervals2links2emissions.put(i, new HashMap<Id, Double>());
+			intervals2links2emissions.put(i, new HashMap<Id, EmissionsAndVehicleKm>());
 		}
 	}
 
@@ -62,12 +65,18 @@ public class EmissionsPerLinkAndTimeIntervalEventHandler implements ColdEmission
 	public void handleEvent(WarmEmissionEvent event) {
 		Id linkId = event.getLinkId();
 		Double emissionValue = event.getWarmEmissions().get(warmPollutant);
+		Double linkLenghtKm = links.get(linkId).getLength()/1000.;
 		int timeInterval = (int) Math.floor(event.getTime()/simulationEndTime*noOfTimeBins);
-		Map<Id, Double> currentInterval = intervals2links2emissions.get(timeInterval);
+		Map<Id, EmissionsAndVehicleKm> currentInterval = intervals2links2emissions.get(timeInterval);
 		if(!currentInterval.containsKey(linkId)){
-			currentInterval.put(linkId, emissionValue);
+			currentInterval.put(linkId, new EmissionsAndVehicleKm(emissionValue, linkLenghtKm));
 		}else{
-			currentInterval.put(linkId, emissionValue+currentInterval.get(linkId));
+			EmissionsAndVehicleKm eavk = currentInterval.get(linkId);
+//			System.out.println("em value " + emissionValue + " old value " + eavk.emissionValue);
+			eavk.add(emissionValue, linkLenghtKm);
+//			System.out.println("new value " + eavk.emissionValue);
+			currentInterval.put(linkId, eavk);
+			
 		}
 	}
 
@@ -75,17 +84,21 @@ public class EmissionsPerLinkAndTimeIntervalEventHandler implements ColdEmission
 	public void handleEvent(ColdEmissionEvent event) {
 		Id linkId = event.getLinkId();
 		Double emissionValue = event.getColdEmissions().get(coldPollutant);
+//		Double linkLenghtKm = links.get(linkId).getLength()/1000.;
 		int timeInterval = (int) Math.floor(event.getTime()/simulationEndTime*noOfTimeBins);
-		Map<Id, Double> currentInterval = intervals2links2emissions.get(timeInterval);
+		Map<Id, EmissionsAndVehicleKm> currentInterval = intervals2links2emissions.get(timeInterval);
 		if(!currentInterval.containsKey(linkId)){
-			currentInterval.put(linkId, emissionValue);
+			//TODO check with Benjamin
+			currentInterval.put(linkId, new EmissionsAndVehicleKm(emissionValue, 0.0));
 		}else{
-			currentInterval.put(linkId, emissionValue+currentInterval.get(linkId));
+			EmissionsAndVehicleKm eavk = currentInterval.get(linkId);
+			eavk.add(emissionValue, 0.0);
+			currentInterval.put(linkId, eavk);
 		}
 		
 	}
 
-	public Map<Integer, Map<Id, Double>> getTimeIntervals2EmissionsPerLink() {
+	public Map<Integer, Map<Id, EmissionsAndVehicleKm>> getTimeIntervals2EmissionsPerLink() {
 		return this.intervals2links2emissions;
 	}
 

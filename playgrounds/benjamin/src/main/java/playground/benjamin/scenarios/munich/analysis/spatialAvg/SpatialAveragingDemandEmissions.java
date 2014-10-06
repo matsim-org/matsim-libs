@@ -56,7 +56,7 @@ public class SpatialAveragingDemandEmissions {
 	
 	final String pollutant2analyze = WarmPollutant.NO2.toString();
 	final boolean compareToBaseCase = true;
-	final boolean useLineMethod = false;
+	final boolean useLineMethod = true;
 	private boolean writeRoutput = true;
 	private boolean writeGisOutput = false;
 	final private boolean useVisBoundary = false;
@@ -94,6 +94,7 @@ public class SpatialAveragingDemandEmissions {
 		this.saWriter = new SpatialAveragingWriter(inputData, noOfXbins, noOfYbins, smoothingRadius_m, useVisBoundary);
 		
 		this.simulationEndTime = inputData.getEndTime();
+		
 		this.network = loadNetwork(inputData.getNetworkFile());		
 		
 		runBaseCase();
@@ -111,7 +112,7 @@ public class SpatialAveragingDemandEmissions {
 		
 		parseEmissionFile(inputData.getEmissionFileForBaseCase());
 		
-		Map <Integer, Map<Id, Double>>timeInterval2Link2Pollutant = emissionHandler.getTimeIntervals2EmissionsPerLink();
+		Map <Integer, Map<Id, EmissionsAndVehicleKm>>timeInterval2Link2Pollutant = emissionHandler.getTimeIntervals2EmissionsPerLink();
 		
 		timeInterval2GridBaseCase= new SpatialGrid[noOfTimeBins];
 		
@@ -122,7 +123,9 @@ public class SpatialAveragingDemandEmissions {
 			for(Id linkId: timeInterval2Link2Pollutant.get(timeInterval).keySet()){
 				sGrid.addLinkValue(network.getLinks().get(linkId), timeInterval2Link2Pollutant.get(timeInterval).get(linkId), linkWeightUtil);
 			}
-			sGrid.multiplyAllCells(linkWeightUtil.getNormalizationFactor());
+			Double factor = linkWeightUtil.getNormalizationFactor()*inputData.scalingFactor;
+			
+			sGrid.multiplyAllCells(factor);
 			// store base case results for comparison
 			timeInterval2GridBaseCase[timeInterval] = sGrid;
 			Double endOfTimeInterval = simulationEndTime/noOfTimeBins*(timeInterval+1);
@@ -140,7 +143,7 @@ public class SpatialAveragingDemandEmissions {
 		
 		parseEmissionFile(inputData.getEmissionFileForCompareCase());
 		
-		Map <Integer, Map<Id, Double>>timeInterval2Link2Pollutant = emissionHandler.getTimeIntervals2EmissionsPerLink();
+		Map <Integer, Map<Id, EmissionsAndVehicleKm>>timeInterval2Link2Pollutant = emissionHandler.getTimeIntervals2EmissionsPerLink();
 		
 		for(int timeInterval:timeInterval2Link2Pollutant.keySet()){
 			logger.info("Calculating differences to base case for time interval " + (timeInterval+1) + " of " + noOfTimeBins + " time intervals.");
@@ -149,7 +152,7 @@ public class SpatialAveragingDemandEmissions {
 			for(Id linkId: timeInterval2Link2Pollutant.get(timeInterval).keySet()){
 				sGrid.addLinkValue(network.getLinks().get(linkId), timeInterval2Link2Pollutant.get(timeInterval).get(linkId), linkWeightUtil);
 			}
-			sGrid.multiplyAllCells(linkWeightUtil.getNormalizationFactor());
+			sGrid.multiplyAllCells(linkWeightUtil.getNormalizationFactor()*inputData.scalingFactor);
 			// calc differences
 			SpatialGrid differencesGrid = new SpatialGrid(inputData, noOfXbins, noOfYbins);
 			differencesGrid = sGrid.getDifferences(timeInterval2GridBaseCase[timeInterval]);
@@ -163,7 +166,7 @@ public class SpatialAveragingDemandEmissions {
 	private void parseEmissionFile(String emissionFile) {
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EmissionEventsReader emissionReader = new EmissionEventsReader(eventsManager);
-		this.emissionHandler = new EmissionsPerLinkAndTimeIntervalEventHandler(this.simulationEndTime, noOfTimeBins, pollutant2analyze);
+		this.emissionHandler = new EmissionsPerLinkAndTimeIntervalEventHandler(network.getLinks(), this.simulationEndTime, noOfTimeBins, pollutant2analyze);
 		eventsManager.addHandler(emissionHandler);
 		emissionReader.parse(emissionFile);
 	}

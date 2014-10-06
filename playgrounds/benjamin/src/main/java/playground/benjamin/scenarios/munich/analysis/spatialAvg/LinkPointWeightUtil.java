@@ -71,8 +71,10 @@ public class LinkPointWeightUtil implements LinkWeightUtil {
 
 	@Override
 	public Double getWeightFromLink(Link link, Coord cellCentroid) {
-		double linkcenterx = 0.5 * link.getFromNode().getCoord().getX() + 0.5 * link.getToNode().getCoord().getX();
-		double linkcentery = 0.5 * link.getFromNode().getCoord().getY() + 0.5 * link.getToNode().getCoord().getY();
+//		double linkcenterx = 0.5 * link.getFromNode().getCoord().getX() + 0.5 * link.getToNode().getCoord().getX();
+//		double linkcentery = 0.5 * link.getFromNode().getCoord().getY() + 0.5 * link.getToNode().getCoord().getY();
+		double linkcenterx = link.getCoord().getX();
+		double linkcentery = link.getCoord().getY();
 		double cellCentroidX = cellCentroid.getX();
 		double cellCentroidY = cellCentroid.getY();
 		return calculateWeightOfPointForCell(linkcenterx, linkcentery, cellCentroidX, cellCentroidY);
@@ -86,6 +88,7 @@ public class LinkPointWeightUtil implements LinkWeightUtil {
 	private double calculateWeightOfPointForCell(double x1, double y1, double x2, double y2) {
 		double distanceSquared = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
 //		System.out.println("distance squared" + distanceSquared);
+//		if(distanceSquared < 125000.)System.out.println("small distance");
 		return Math.exp((-distanceSquared) / (smoothinRadiusSquared_m));
 	}
 
