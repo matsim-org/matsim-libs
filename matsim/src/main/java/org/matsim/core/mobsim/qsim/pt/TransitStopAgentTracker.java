@@ -21,10 +21,10 @@
 package org.matsim.core.mobsim.qsim.pt;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -40,7 +40,7 @@ public class TransitStopAgentTracker {
 	private final static Logger log = Logger.getLogger(TransitStopAgentTracker.class);
 	
 	private final EventsManager events;
-	private final Map<Id<TransitStopFacility>, List<PTPassengerAgent>> agentsAtStops = new HashMap<>();
+	private final Map<Id<TransitStopFacility>, List<PTPassengerAgent>> agentsAtStops = new ConcurrentHashMap<>();
 
 	public TransitStopAgentTracker(final EventsManager events) {
 		this.events = events;
@@ -52,7 +52,7 @@ public class TransitStopAgentTracker {
 		}
 		List<PTPassengerAgent> agents = this.agentsAtStops.get(stopId);
 		if (agents == null) {
-			agents = new LinkedList<>();
+			agents = new CopyOnWriteArrayList<>();// TODO check again. this might turn out to be slow, but we likely need something thread safe here. marcel/oct2014 
 			this.agentsAtStops.put(stopId, agents);
 		}
 		agents.add(agent);
