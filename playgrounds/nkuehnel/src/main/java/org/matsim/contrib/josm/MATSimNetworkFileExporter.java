@@ -111,6 +111,7 @@ final class MATSimNetworkFileExporter extends FileExporter {
 		}
 
 		if (okToExport) {
+			file.mkdirs();
 			ExportTask task = new ExportTask(file);
 			Main.worker.execute(task);
 		}

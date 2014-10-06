@@ -188,9 +188,6 @@ class NetworkListener implements DataSetListener, Visitor {
 				primitive.visitReferrers(this);
 			}
 		}
-		for(TransitStopFacility stop: scenario.getTransitSchedule().getFacilities().values()) {
-			System.out.println(stop.getName());
-		}
 	}
 
 	@Override
@@ -234,6 +231,7 @@ class NetworkListener implements DataSetListener, Visitor {
 			MATSimPlugin.toggleDialog.notifyDataChanged(scenario);
 		}
 		log.info("Number of links: " + scenario.getNetwork().getLinks().size());
+		
 	}
 
 	@Override

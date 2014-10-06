@@ -39,6 +39,7 @@ import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.actions.AutoScaleAction;
 import org.openstreetmap.josm.actions.ExtensionFileFilter;
@@ -69,9 +70,11 @@ import org.xml.sax.SAXException;
 @SuppressWarnings("serial")
 class MATSimToggleDialog extends ToggleDialog implements LayerChangeListener,
 		PreferenceChangedListener {
-	private JTable table;
+	private JTable table_links;
+	private JTable table_pt;
 	private OsmDataLayer layer;
-	private MATSimTableModel tableModel;
+	private MATSimTableModel_links tableModel_links;
+	private MATSimTableModel_pt tableModel_pt;
 	private JButton networkAttributes = new JButton(new ImageProvider(
 			"dialogs", "edit").setWidth(16).get());
 	private JButton manualConvert = new JButton(new ImageProvider("restart")
@@ -90,16 +93,22 @@ class MATSimToggleDialog extends ToggleDialog implements LayerChangeListener,
 
 		exporterCopy.addAll(ExtensionFileFilter.exporters);
 
-		table = new JTable();
-		table.setDefaultRenderer(Object.class, new MATSimTableRenderer());
-		table.setAutoCreateRowSorter(true);
-		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		table_links = new JTable();
+		table_links.setDefaultRenderer(Object.class, new MATSimTableRenderer());
+		table_links.setAutoCreateRowSorter(true);
+		table_links.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-		JScrollPane tableContainer = new JScrollPane(table);
-		
+		table_pt = new JTable();
+		table_pt.setDefaultRenderer(Object.class, new MATSimTableRenderer());
+		table_pt.setAutoCreateRowSorter(true);
+		table_pt.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+		JScrollPane tableContainer_links = new JScrollPane(table_links);
+		JScrollPane tableContainer_pt = new JScrollPane(table_pt);
+
 		JTabbedPane tabPane = new JTabbedPane();
-		tabPane.addTab("Private Transport", tableContainer);
-		tabPane.addTab("Public Transport", new JPanel());
+		tabPane.addTab("Links", tableContainer_links);
+		tabPane.addTab("Routes", tableContainer_pt);
 		createLayout(tabPane, false, null);
 
 		networkAttributes.setToolTipText(tr("edit network attributes"));
@@ -145,9 +154,12 @@ class MATSimToggleDialog extends ToggleDialog implements LayerChangeListener,
 							(OsmDataLayer) tmpLayer);
 					task.run();
 
-					tableModel = new MATSimTableModel(currentScenario
-							.getNetwork());
-					table.setModel(tableModel);
+					tableModel_links = new MATSimTableModel_links(
+							currentScenario.getNetwork());
+					table_links.setModel(tableModel_links);
+					tableModel_pt = new MATSimTableModel_pt(
+							currentScenario.getTransitSchedule());
+					table_pt.setModel(tableModel_pt);
 					notifyDataChanged(currentScenario);
 					networkAttributes.setEnabled(true);
 					layer = (OsmDataLayer) tmpLayer;
@@ -161,23 +173,28 @@ class MATSimToggleDialog extends ToggleDialog implements LayerChangeListener,
 	public void notifyDataChanged(Scenario scenario) {
 		setTitle(tr(
 				"Links: {0} / Nodes: {1} / Stops: {2} / Lines: {3} / Routes: {4}",
-				scenario.getNetwork().getLinks().size(), scenario.getNetwork().getNodes().size(),
-				scenario.getTransitSchedule().getFacilities().size(),
-				scenario.getTransitSchedule().getTransitLines().size(), relation2Route.size()
-				));
-		tableModel.networkChanged();
+				scenario.getNetwork().getLinks().size(), scenario.getNetwork()
+						.getNodes().size(), scenario.getTransitSchedule()
+						.getFacilities().size(), scenario.getTransitSchedule()
+						.getTransitLines().size(), relation2Route.size()));
+		tableModel_links.networkChanged();
+		tableModel_pt.scheduleChanged();
 	}
 
 	@Override
 	public void activeLayerChange(Layer oldLayer, Layer newLayer) {
-		DataSet.removeSelectionListener(tableModel);
+		DataSet.removeSelectionListener(tableModel_links);
+		DataSet.removeSelectionListener(tableModel_pt);
 		if (osmNetworkListener != null && oldLayer != null
 				&& oldLayer instanceof OsmDataLayer) {
 			((OsmDataLayer) oldLayer).data.clearSelection();
 			((OsmDataLayer) oldLayer).data
 					.removeDataSetListener(osmNetworkListener);
 		}
-		table.getSelectionModel().removeListSelectionListener(tableModel);
+		table_links.getSelectionModel().removeListSelectionListener(
+				tableModel_links);
+		table_links.getSelectionModel().removeListSelectionListener(
+				tableModel_pt);
 		if (newLayer instanceof OsmDataLayer) {
 			if (newLayer instanceof MATSimLayer) {
 				currentScenario = ((MATSimLayer) newLayer).getMatsimScenario();
@@ -209,21 +226,27 @@ class MATSimToggleDialog extends ToggleDialog implements LayerChangeListener,
 				}
 			}
 			if (currentScenario != null) {
-				tableModel = new MATSimTableModel(currentScenario.getNetwork());
-				table.setModel(tableModel);
+				tableModel_links = new MATSimTableModel_links(
+						currentScenario.getNetwork());
+				table_links.setModel(tableModel_links);
+				tableModel_pt = new MATSimTableModel_pt(
+						currentScenario.getTransitSchedule());
+				table_pt.setModel(tableModel_pt);
 				notifyDataChanged(currentScenario);
 				this.networkAttributes.setEnabled(true);
 				this.layer = (OsmDataLayer) newLayer;
 				checkInternalIdColumn();
 			} else {
-				table.setModel(new DefaultTableModel());
+				table_links.setModel(new DefaultTableModel());
+				table_pt.setModel(new DefaultTableModel());
 				setTitle(tr("Links/Nodes"));
 				networkAttributes.setEnabled(false);
 				this.layer = null;
 			}
 
 		} else {
-			table.setModel(new DefaultTableModel());
+			table_links.setModel(new DefaultTableModel());
+			table_pt.setModel(new DefaultTableModel());
 			setTitle(tr("Links/Nodes"));
 			networkAttributes.setEnabled(false);
 			way2Links = null;
@@ -242,13 +265,13 @@ class MATSimToggleDialog extends ToggleDialog implements LayerChangeListener,
 
 	private void checkInternalIdColumn() {
 		if (!Main.pref.getBoolean("matsim_showInternalIds", false)) {
-			table.getColumn("internal-id").setMinWidth(0);
-			table.getColumn("internal-id").setMaxWidth(0);
+			table_links.getColumn("internal-id").setMinWidth(0);
+			table_links.getColumn("internal-id").setMaxWidth(0);
 		} else {
-			table.getColumn("internal-id").setMaxWidth(
-					table.getColumn("id").getMaxWidth());
-			table.getColumn("internal-id").setWidth(
-					table.getColumn("id").getWidth());
+			table_links.getColumn("internal-id").setMaxWidth(
+					table_links.getColumn("id").getMaxWidth());
+			table_links.getColumn("internal-id").setWidth(
+					table_links.getColumn("id").getWidth());
 		}
 	}
 
@@ -265,7 +288,7 @@ class MATSimToggleDialog extends ToggleDialog implements LayerChangeListener,
 		}
 	}
 
-	private class MATSimTableModel extends AbstractTableModel implements
+	private class MATSimTableModel_links extends AbstractTableModel implements
 			SelectionChangedListener, ListSelectionListener {
 
 		private String[] columnNames = { "id", "internal-id", "length",
@@ -275,11 +298,11 @@ class MATSimToggleDialog extends ToggleDialog implements LayerChangeListener,
 
 		private Map<Integer, Id> links;
 
-		MATSimTableModel(Network network) {
+		MATSimTableModel_links(Network network) {
 			this.network = network;
 			this.links = new HashMap<Integer, Id>();
 			DataSet.addSelectionListener(this);
-			table.getSelectionModel().addListSelectionListener(this);
+			table_links.getSelectionModel().addListSelectionListener(this);
 		}
 
 		@Override
@@ -371,8 +394,8 @@ class MATSimToggleDialog extends ToggleDialog implements LayerChangeListener,
 		public void valueChanged(ListSelectionEvent e) {
 			if (!layer.data.selectionEmpty() && !e.getValueIsAdjusting()
 					&& !((ListSelectionModel) e.getSource()).isSelectionEmpty()) {
-				int row = table.getRowSorter().convertRowIndexToModel(
-						table.getSelectedRow());
+				int row = table_links.getRowSorter().convertRowIndexToModel(
+						table_links.getSelectedRow());
 				String tempId = (String) this.getValueAt(row, 1);
 				Link link = network.getLinks().get(Id.create(tempId, Link.class));
 				if (link2Segments.containsKey(link)) {
@@ -386,6 +409,99 @@ class MATSimToggleDialog extends ToggleDialog implements LayerChangeListener,
 					}
 				}
 			}
+		}
+	}
+
+	private class MATSimTableModel_pt extends AbstractTableModel implements
+			SelectionChangedListener, ListSelectionListener {
+
+		private String[] columnNames = { "route id",
+				"mode", "#stops", "#links"};
+
+		private TransitSchedule transit_schedule;
+
+		private Map<Integer, TransitRoute> routes;
+
+		MATSimTableModel_pt(TransitSchedule transit_schedule) {
+			this.transit_schedule = transit_schedule;
+			this.routes = new HashMap<Integer, TransitRoute>();
+			DataSet.addSelectionListener(this);
+			table_pt.getSelectionModel().addListSelectionListener(this);
+		}
+
+		@Override
+		public Class<?> getColumnClass(int columnIndex) {
+			if (columnIndex == 0) {
+				return String.class;
+			} else if (columnIndex == 1) {
+				return String.class;
+			} else if (columnIndex == 2) {
+				return Integer.class;
+			} else if (columnIndex == 3) {
+				return Integer.class;
+			} 
+			throw new RuntimeException();
+		}
+
+		@Override
+		public String getColumnName(int column) {
+			return columnNames[column];
+		}
+
+		public void scheduleChanged() {
+			if (layer != null) {
+				if (!layer.data.selectionEmpty()) {
+					selectionChanged(layer.data.getSelected());
+				}
+			}
+			fireTableDataChanged();
+		}
+
+		@Override
+		public int getColumnCount() {
+			return columnNames.length;
+		}
+
+		@Override
+		public int getRowCount() {
+			return routes.size();
+		}
+
+		@Override
+		public Object getValueAt(int rowIndex, int columnIndex) {
+			TransitRoute route = routes.get(rowIndex);
+			if (columnIndex == 0) {
+				return route.getId();
+			} else if (columnIndex == 1) {
+				return route.getTransportMode();
+			} else if (columnIndex == 2) {
+				return route.getStops().size();
+			} else if (columnIndex == 3) {
+				return route.getRoute().getLinkIds().size()+2;
+			}
+			throw new RuntimeException();
+		}
+
+		@Override
+		public void selectionChanged(
+				Collection<? extends OsmPrimitive> newSelection) {
+			layer.data.clearHighlightedWaySegments();
+			this.routes = new HashMap<Integer, TransitRoute>();
+			int i = 0;
+			for (OsmPrimitive primitive : newSelection) {
+				for(OsmPrimitive primitive_2 : primitive.getReferrers()) {
+					if(relation2Route.containsKey(primitive_2)) {
+						routes.put(i, relation2Route.get(primitive_2));
+						i++;
+					}
+				}
+			}
+			fireTableDataChanged();
+		}
+
+		@Override
+		public void valueChanged(ListSelectionEvent e) {
+			
 		}
 	}
 

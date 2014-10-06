@@ -29,6 +29,9 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.openstreetmap.josm.Main;
+import org.openstreetmap.josm.data.coor.LatLon;
+import org.openstreetmap.josm.data.osm.MultipolygonBuilder;
+import org.openstreetmap.josm.data.osm.MultipolygonBuilder.JoinedPolygon;
 import org.openstreetmap.josm.data.osm.Node;
 import org.openstreetmap.josm.data.osm.OsmPrimitive;
 import org.openstreetmap.josm.data.osm.OsmPrimitiveType;
@@ -38,6 +41,7 @@ import org.openstreetmap.josm.data.osm.Way;
 import org.openstreetmap.josm.data.osm.WaySegment;
 import org.openstreetmap.josm.gui.dialogs.relation.sort.RelationSorter;
 import org.openstreetmap.josm.gui.layer.OsmDataLayer;
+import org.openstreetmap.josm.tools.Geometry;
 
 class NewConverter {
 	private final static Logger log = Logger.getLogger(NewConverter.class);
@@ -63,11 +67,20 @@ class NewConverter {
 		log.info("=== Starting conversion of Osm data ===");
 		log.setLevel(Level.WARN);
 
+//		List<JoinedPolygon> polygons = new ArrayList<JoinedPolygon>();
+//		for (Way way : layer.data.getWays()) {
+//			if (way.isClosed() && way.hasTag("matsim:convert_Area", "active")) {
+//				polygons.add(new MultipolygonBuilder.JoinedPolygon(way));
+//			}
+//		}
+		
+		
 		if (!layer.data.getWays().isEmpty()) {
 			for (Way way : layer.data.getWays()) {
-				if (!way.isDeleted()) {
-					convertWay(way, scenario.getNetwork(), way2Links,
-							link2Segments);
+				if (!way.isDeleted() /*&& isInArea(polygons, way)*/) {
+						convertWay(way, scenario.getNetwork(), way2Links,
+								link2Segments);
+				
 				}
 			}
 
@@ -109,6 +122,18 @@ class NewConverter {
 				+ scenario.getNetwork().getNodes().size() + " ===");
 	}
 
+//	private static boolean isInArea(List<JoinedPolygon> polygons, Way way) {
+//		
+//		for (JoinedPolygon polygon: polygons) {
+//			for (Node node: way.getNodes()) {
+//				if ((Geometry.nodeInsidePolygon(node, polygon.getNodes()))) {
+//					return true;
+//				}
+//			}
+//		}
+//		return false;
+//	}
+
 	public static void convertWay(Way way, Network network,
 			Map<Way, List<Link>> way2Links,
 			Map<Link, List<WaySegment>> link2Segments) {
@@ -123,6 +148,9 @@ class NewConverter {
 				StringBuilder nodeOrderLog = new StringBuilder();
 				for (int l = 0; l < way.getNodesCount(); l++) {
 					Node current = way.getNode(l);
+					if(current.getDataSet()==null) {
+						continue;
+					}
 					if (l == 0 || l == way.getNodesCount() - 1 || keepPaths) {
 						nodeOrder.add(current);
 						log.debug("--- Way " + way.getUniqueId()
@@ -185,6 +213,9 @@ class NewConverter {
 					OsmHighwayDefaults defaults = highwayDefaults.get(highway);
 					if (defaults != null) {
 
+						if (defaults.hierarchy>Main.pref.getInteger("matsim_filter_hierarchy", 6)) {
+							return;
+						}
 						nofLanes = defaults.lanes;
 						double laneCapacity = defaults.laneCapacity;
 						freespeed = defaults.freespeed;
@@ -375,6 +406,7 @@ class NewConverter {
 		log.debug("### Finished Way " + way.getUniqueId() + ". " + links.size()
 				+ " links resulted. ###");
 		if (way == null || links.isEmpty() || links == null) {
+			return;
 		} else {
 			way2Links.put(way, links);
 		}
@@ -499,9 +531,20 @@ class NewConverter {
 		List<Id<Link>> links = new ArrayList<Id<Link>>();
 		List<TransitStopFacility> stops = new ArrayList<TransitStopFacility>();
 		
+		
+		Way previous=null;
 		for (RelationMember member : relation.getMembers()) {
 			if (member.isWay() && !member.getMember().isIncomplete()) {
-				if(way2Links.containsKey(member.getWay())) {
+				if(way2Links.containsKey(member.getWay()) && !member.getWay().hasKey(TAG_HIGHWAY)) {
+					if (previous!=null) {
+						if(!previous.lastNode().equals(member.getWay().firstNode())) {
+							for (TransitStopFacility removeStop: stops) {
+								scenario.getTransitSchedule().removeStopFacility(removeStop);
+							}
+							return;
+						}
+					}
+					previous = member.getWay();
 					for (Link link: way2Links.get(member.getWay())) {
 						links.add(link.getId());
 					}
@@ -533,7 +576,7 @@ class NewConverter {
 				}
 			}
 		}
-		if (links.size()<3) {
+		if (links.size()<2) {
 			return;
 		}
 		Id<Link> firstLinkId = links.remove(0);

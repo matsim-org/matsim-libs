@@ -18,6 +18,8 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.gui.PleaseWaitRunnable;
 import org.openstreetmap.josm.gui.layer.Layer;
@@ -34,18 +36,21 @@ import org.xml.sax.SAXException;
 
 class ExportTask extends PleaseWaitRunnable {
 
-	private File file;
-	
-/**
- * Creates a new Export task with the given export <code>file</code> location
- * @param file The file to be exported to
- */
+	private File networkFile;
+	private File scheduleFile;
+
+	/**
+	 * Creates a new Export task with the given export <code>file</code>
+	 * location
+	 * 
+	 * @param file
+	 *            The file to be exported to
+	 */
 	public ExportTask(File file) {
 		super("MATSim Export");
-		this.file = file;
-		if (!this.file.getAbsolutePath().endsWith(".xml")) {
-			this.file = new File(this.file.getAbsolutePath() + ".xml");
-		}
+		this.networkFile = new File(file.getAbsolutePath() + "/network.xml");
+		this.scheduleFile = new File(file.getAbsolutePath()
+				+ "/transit_schedule.xml");
 	}
 
 	/**
@@ -61,7 +66,7 @@ class ExportTask extends PleaseWaitRunnable {
 	@Override
 	protected void finish() {
 		JOptionPane.showMessageDialog(Main.parent,
-				"Export finished. File written to: " + file.getPath());
+				"Export finished. File written to: " + networkFile.getPath());
 	}
 
 	/**
@@ -77,23 +82,26 @@ class ExportTask extends PleaseWaitRunnable {
 		Config config = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(config);
 		Network network = sc.getNetwork();
+		TransitSchedule schedule = null;
 
 		Layer layer = Main.main.getActiveLayer();
 
 		if (layer instanceof OsmDataLayer) {
 			if (layer instanceof MATSimLayer) {
+				schedule = ((MATSimLayer) layer).getMatsimScenario()
+						.getTransitSchedule();
 				this.progressMonitor.setTicks(1);
 				this.progressMonitor.setCustomText("rearranging data..");
 
-				for (Node node : ((MATSimLayer) layer).getMatsimScenario().getNetwork()
-						.getNodes().values()) {
+				for (Node node : ((MATSimLayer) layer).getMatsimScenario()
+						.getNetwork().getNodes().values()) {
 					Node newNode = network.getFactory().createNode(
 							Id.create(((NodeImpl) node).getOrigId(), Node.class),
 							node.getCoord());
 					network.addNode(newNode);
 				}
-				for (Link link : ((MATSimLayer) layer).getMatsimScenario().getNetwork()
-						.getLinks().values()) {
+				for (Link link : ((MATSimLayer) layer).getMatsimScenario()
+						.getNetwork().getLinks().values()) {
 					Link newLink = network.getFactory().createLink(
 							Id.create(((LinkImpl) link).getOrigId(), Link.class),
 							network.getNodes().get(
@@ -115,8 +123,12 @@ class ExportTask extends PleaseWaitRunnable {
 				new NetworkCleaner().run(network);
 			}
 			this.progressMonitor.setTicks(3);
-			this.progressMonitor.setCustomText("writing out xml file..");
-			new NetworkWriter(network).write(file.getAbsolutePath());
+			this.progressMonitor.setCustomText("writing out xml file(s)..");
+			new NetworkWriter(network).write(networkFile.getAbsolutePath());
+			if (schedule != null) {
+				new TransitScheduleWriter(schedule).writeFile(scheduleFile
+						.getAbsolutePath());
+			}
 		}
 	}
 }
