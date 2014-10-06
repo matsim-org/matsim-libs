@@ -19,6 +19,7 @@
 package playground.agarwalamit.siouxFalls;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,8 +46,8 @@ import playground.agarwalamit.analysis.emission.EmissionLinkAnalyzer;
 public class EmissionsAndCongestionsPerTimeBin {
 
 	private final Logger logger = Logger.getLogger(EmissionsAndCongestionsPerTimeBin.class);
-	private final String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMCOff/";
-	private final String runCase = "run208";
+	private final String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/";
+	private final String runCase = "eci";
 	private final String networkFile =outputDir+runCase+"/output_network.xml.gz";
 	private final String configFile = outputDir+runCase+"/output_config.xml";
 	private EmissionUtils emissionUtils;
@@ -84,6 +85,7 @@ public class EmissionsAndCongestionsPerTimeBin {
 		cLinkAnalyzer.checkTotalDelayUsingAlternativeMethod();
 
 		Map<Double, Map<Id, Double>> time2linkIdDelays = cLinkAnalyzer.getCongestionPerLinkTimeInterval();
+		new File(outputDir+runCase+"/analysis/emissionVsCongestion/").mkdirs();
 		BufferedWriter writer1 = IOUtils.getBufferedWriter(outputDir+runCase+"/analysis/emissionVsCongestion/"+runCase+".hourlyDelaysAndEmissionsPerLink.txt");
 
 

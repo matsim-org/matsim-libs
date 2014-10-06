@@ -19,12 +19,11 @@
  * *********************************************************************** */
 package playground.agarwalamit.analysis.legModeHandler;
 
-import java.io.BufferedWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
@@ -33,250 +32,157 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.pt.PtConstants;
-
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
+import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
+import org.matsim.core.api.experimental.events.handler.TeleportationArrivalEventHandler;
 
 /**
- * Provides leg mode distance distribution, distances are calculated from routes of selected plans 
- * unlike playground.vsp.analysis.modules.legModeDistanceDistribution where beeline distance is calculated
- *
- * Also returns mode2PersonId2RouteDistances.
  * @author amit
  */
-public class LegModeRouteDistanceDistributionHandler extends AbstractAnalyisModule{
+public class LegModeRouteDistanceDistributionHandler implements PersonDepartureEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler, TeleportationArrivalEventHandler {
 	private final Logger log = Logger.getLogger(LegModeRouteDistanceDistributionHandler.class);
 
+	private Network network;
 	private Scenario scenario;
-	private final List<Integer> distanceClasses;
-	private final SortedSet<String> usedModes;
+	private SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2distances;
+	private SortedMap<String, Map<Id<Person>, Double>> mode2PersonId2OneTripdist;
+	private SortedMap<String, Map<Id<Person>, Double>> mode2PersonId2TeleportDist;
+	private List<String> mainModes = new ArrayList<String>();
+	private Map<Id<Person>, String> personId2LegModes;
+	private double maxDist = Double.NEGATIVE_INFINITY;
 
-	private SortedMap<String, SortedMap<Integer, Integer>> mode2DistanceClass2LegCount ;
-	private SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2dist;
-
-	public LegModeRouteDistanceDistributionHandler(){
-		super(LegModeRouteDistanceDistributionHandler.class.getSimpleName());
-		this.log.info("enabled");
-
-		this.distanceClasses = new ArrayList<Integer>();
-		this.usedModes = new TreeSet<String>();
-		this.mode2PersonId2dist = new TreeMap<String, Map<Id<Person>,List<Double>>>();
-		this.mode2DistanceClass2LegCount = new TreeMap<String, SortedMap<Integer,Integer>>();
+	public LegModeRouteDistanceDistributionHandler(Scenario scenario){
+		this.log.info("Route distance will be calculated based on events.");
+		this.log.warn("During distance calculation, link from which person is departed or arrived will not be considered.");
+		this.scenario = scenario;
+		this.mainModes.addAll(this.scenario.getConfig().qsim().getMainModes());
+		this.network = scenario.getNetwork();
+		this.mode2PersonId2distances = new TreeMap<>();
+		this.mode2PersonId2OneTripdist = new TreeMap<>();
+		this.mode2PersonId2TeleportDist = new TreeMap<>();
+		this.personId2LegModes = new HashMap<>();
 	}
 
-	public void init(Scenario sc){
-		this.scenario = sc;
-		initializeDistanceClasses(this.scenario.getPopulation());
-		initializeUsedModes(this.scenario.getPopulation());
+	@Override
+	public void reset(int iteration) {
 
-		for(String mode:this.usedModes){
-			this.mode2PersonId2dist.put(mode, new HashMap<Id<Person>, List<Double>>());
-			SortedMap<Integer, Integer> distClass2Legs = new TreeMap<Integer, Integer>();
-			for(int i: this.distanceClasses){
-				distClass2Legs.put(i, 0);
+	}
+
+	@Override
+	public void handleEvent(LinkLeaveEvent event) {
+		Id<Person> personId = event.getPersonId();
+		Id<Link> linkId = event.getLinkId();
+		// if a person is in more than two groups, then which one is correct mode ?
+		String mode = this.personId2LegModes.get(personId);
+		Map<Id<Person>, Double> person2Dist = mode2PersonId2OneTripdist.get(mode);
+		double distSoFar = person2Dist.get(personId);
+		double distNew = distSoFar+ network.getLinks().get(linkId).getLength();
+		person2Dist.put(personId, distNew);
+	}
+
+	@Override
+	public void handleEvent(PersonDepartureEvent event) {
+		String tavelMode = event.getLegMode();
+		Id<Person> personId = event.getPersonId();
+		this.personId2LegModes.put(personId, tavelMode);
+
+		if(mainModes.contains(tavelMode)){
+			//initialize one trip distance map
+			if(mode2PersonId2OneTripdist.containsKey(tavelMode)){
+				Map<Id<Person>, Double> personId2Dist = mode2PersonId2OneTripdist.get(tavelMode);
+				if(!personId2Dist.containsKey(personId)){
+					personId2Dist.put(personId, 0.0);
+				} else {
+					log.warn("Person is departing again.");
+				}
+			} else {
+				Map<Id<Person>, Double> personId2Dist = new TreeMap<>();
+				personId2Dist.put(personId, 0.0);
+				mode2PersonId2OneTripdist.put(tavelMode, personId2Dist);
 			}
-			this.mode2DistanceClass2LegCount.put(mode, distClass2Legs);
+		} else {
+			//initialize teleporation dist map
+			if(mode2PersonId2TeleportDist.containsKey(tavelMode)){
+				Map<Id<Person>, Double> personId2Dist = mode2PersonId2TeleportDist.get(tavelMode);
+				if(!personId2Dist.containsKey(personId)){
+					personId2Dist.put(personId, 0.0);
+				} else {
+					log.warn("Person is departing again.");
+				}
+			} else {
+				Map<Id<Person>, Double> personId2Dist = new TreeMap<>();
+				personId2Dist.put(personId, 0.0);
+				mode2PersonId2TeleportDist.put(tavelMode, personId2Dist);
+			}
+		}
+		//initialize distances map
+		if(mode2PersonId2distances.containsKey(tavelMode)){
+			Map<Id<Person>, List<Double>> personId2Dists = mode2PersonId2distances.get(tavelMode);
+			if(!personId2Dists.containsKey(personId)){
+				personId2Dists.put(personId, new ArrayList<Double>());
+			}
+		} else {
+			Map<Id<Person>, List<Double>> personId2Dists = new TreeMap<>();
+			personId2Dists.put(personId, new ArrayList<Double>());
+			mode2PersonId2distances.put(tavelMode, personId2Dists);
 		}
 	}
 
 	@Override
-	public List<EventHandler> getEventHandler() {
-		return new LinkedList<EventHandler>();
+	public void handleEvent(PersonArrivalEvent event) {
+		String travelMode = event.getLegMode();
+		Id<Person> personId = event.getPersonId();
+		if(!travelMode.equals(this.personId2LegModes.get(personId))) throw new RuntimeException("Person is leaving and arriving with different travel modes. Can not happen.");
+		
+		Map<Id<Person>, List<Double>> personId2Dists = mode2PersonId2distances.get(travelMode);
+		if(mainModes.contains(travelMode)){
+			if(personId2Dists.containsKey(personId) ){
+				List<Double> dists = personId2Dists.get(personId); // it might happen, person is departing and arriving on same link.
+				double tripDist = mode2PersonId2OneTripdist.get(travelMode).get(personId);
+				if(maxDist<tripDist) maxDist = tripDist;
+				dists.add(tripDist);
+				personId2Dists.put(personId, dists);
+				mode2PersonId2OneTripdist.get(travelMode).remove(personId);
+			} else throw new RuntimeException("Person is not registered in the map and still arriving. This can not happen.");
+		} else {
+			List<Double> dists = personId2Dists.get(personId);
+			double tripDist = mode2PersonId2TeleportDist.get(travelMode).get(personId);
+			if(maxDist<tripDist) maxDist = tripDist;
+			dists.add(tripDist);
+			personId2Dists.put(personId, dists);
+			mode2PersonId2TeleportDist.get(travelMode).remove(personId);
+		}
+	}
+
+	public SortedMap<String,Map<Id<Person>,List<Double>>> getMode2PersonId2TravelDistances (){
+		return this.mode2PersonId2distances;
+	}
+	
+	public SortedSet<String> getUsedModes (){
+		SortedSet<String> modes = new TreeSet<String>();
+		modes.addAll(mode2PersonId2distances.keySet());
+		return modes;
+	}
+	
+	public double getLongestDistance(){
+		return maxDist;
 	}
 
 	@Override
-	public void preProcessData() {
-
-		this.log.info("Checking if the plans file that will be analyzed is based on a run with simulated public transport.");
-		this.log.info("Transit activities and belonging transit walk legs will be removed from the plan.");
-
-		for (Person person : this.scenario.getPopulation().getPersons().values()){
-			for (Plan plan : person.getPlans()){
-				List<PlanElement> planElements = plan.getPlanElements();
-				for (int i = 0, n = planElements.size(); i < n; i++) {
-					PlanElement pe = planElements.get(i);
-					if (pe instanceof Activity) {
-						Activity act = (Activity) pe;
-						if (PtConstants.TRANSIT_ACTIVITY_TYPE.equals(act.getType())) {
-							PlanElement previousPe = planElements.get(i-1);
-							if (previousPe instanceof Leg) {
-								Leg previousLeg = (Leg) previousPe;
-								previousLeg.setMode(TransportMode.pt);
-								previousLeg.setRoute(null);
-							} else {
-								throw new RuntimeException("A transit activity should follow a leg! Aborting...");
-							}
-							((PlanImpl) plan).removeActivity(i); // also removes the following leg
-							n -= 2;
-							i--;
-						}
-					}
-				}
-			}
-		}
-	}
-
-	@Override
-	public void postProcessData() {
-		calculateMode2DistanceClass2LegCount();
-		calculateMode2PersonId2Distances();
-	}
-
-	@Override
-	public void writeResults(String outputFolder) {
-
-		String outFile = outputFolder + "legModeRouteDistanceDistribution.txt";
-		try{
-			BufferedWriter writer1 = IOUtils.getBufferedWriter(outFile);
-			writer1.write("#");
-			for(String mode : this.usedModes){
-				writer1.write("\t" + mode);
-			}
-			writer1.write("\t" + "sum");
-			writer1.write("\n");
-			for(int i = 0; i < this.distanceClasses.size() - 1 ; i++){
-				writer1.write(this.distanceClasses.get(i+1) + "\t");
-				Integer totalLegsInDistanceClass = 0;
-				for(String mode : this.usedModes){
-					Integer modeLegs = null;
-					modeLegs = this.mode2DistanceClass2LegCount.get(mode).get(this.distanceClasses.get(i + 1));
-					totalLegsInDistanceClass = totalLegsInDistanceClass + modeLegs;
-					writer1.write(modeLegs.toString() + "\t");
-				}
-				writer1.write(totalLegsInDistanceClass.toString());
-				writer1.write("\n");
-			}
-			writer1.close();
-			this.log.info("Finished writing output to " + outFile);
-		}catch (Exception e){
-			this.log.error("Data is not written. Reason " + e.getMessage());
-		}
-	}
-
-	private void calculateMode2DistanceClass2LegCount() {
-		Population pop = this.scenario.getPopulation();
-		for(Person person : pop.getPersons().values()){
-			PlanImpl plan = (PlanImpl) person.getSelectedPlan();
-			List<PlanElement> planElements = plan.getPlanElements();
-			for(PlanElement pe : planElements){
-				if(pe instanceof Leg){
-					Leg leg = (Leg)pe;
-					Route route = ((Route)((Leg)pe).getRoute());
-					double distance = route.getDistance();
-					for(int i=0;i<this.distanceClasses.size()-1;i++){
-						if(distance > this.distanceClasses.get(i) && distance <= this.distanceClasses.get(i + 1)){
-							SortedMap<Integer, Integer> distanceClass2NoOfLegs = this.mode2DistanceClass2LegCount.get(leg.getMode());	
-							int oldLeg = distanceClass2NoOfLegs.get(this.distanceClasses.get(i+1));
-							int newLeg = oldLeg+1;
-							distanceClass2NoOfLegs.put(this.distanceClasses.get(i+1), newLeg);
-						} 
-					}
-				}
-			}
-		}
-	}
-
-	private void calculateMode2PersonId2Distances() {
-		Population pop = this.scenario.getPopulation();
-		for(Person person : pop.getPersons().values()){
-			PlanImpl plan = (PlanImpl) person.getSelectedPlan();
-			List<PlanElement> planElements = plan.getPlanElements();
-			for(PlanElement pe : planElements){
-				if(pe instanceof Leg){
-					Leg leg = (Leg)pe;
-					Route route = ((Route)((Leg)pe).getRoute());
-					double distance = route.getDistance();
-					Map<Id<Person>, List<Double>> personId2dist = this.mode2PersonId2dist.get(leg.getMode());
-					if(personId2dist.containsKey(person.getId())){
-						List<Double> dists = personId2dist.get(person.getId());
-						dists.add(distance);
-						personId2dist.put(person.getId(), dists);
-					} else {
-						List<Double> dists = new ArrayList<Double>();
-						dists.add(distance);
-						personId2dist.put(person.getId(), dists);
-					}
-				}
-			}
-		}
-	}
-
-	private double getLongestDistance(Population pop){
-		double longestDistance = 0.0;
-		for(Person person : pop.getPersons().values()){
-			PlanImpl plan = (PlanImpl) person.getSelectedPlan();
-			List<PlanElement> planElements = plan.getPlanElements();
-			for(PlanElement pe : planElements){
-				if(pe instanceof Leg ){
-					Route route = ((Route)((Leg)pe).getRoute());
-					double distance = route.getDistance();
-					if(distance > longestDistance){
-						longestDistance = distance;
-					}
-				}
-			}
-		}
-		this.log.info("The longest distance is found to be: " + longestDistance);
-		return longestDistance;
-	}
-
-	private void initializeDistanceClasses(Population pop) {
-		double longestDistance = getLongestDistance(pop);
-		int endOfDistanceClass = 0;
-		int classCounter = 0;
-		this.distanceClasses.add(endOfDistanceClass);
-
-		while(endOfDistanceClass <= longestDistance){
-			endOfDistanceClass = 100 * (int) Math.pow(2, classCounter);
-			classCounter++;
-			this.distanceClasses.add(endOfDistanceClass);
-		}
-		this.log.info("The following distance classes were defined: " + this.distanceClasses);
-	}
-
-	private void initializeUsedModes(Population pop) {
-		for(Person person : pop.getPersons().values()){
-			for(PlanElement pe : person.getSelectedPlan().getPlanElements()){
-				if(pe instanceof Leg){
-					Leg leg = (Leg) pe;
-					this.usedModes.add(leg.getMode());
-				}
-			}
-		}
-		this.log.info("The following transport modes are considered: " + this.usedModes);
-	}
-
-	public SortedMap<String, SortedMap<Integer, Integer>> getMode2DistanceClass2LegCount() {
-		return this.mode2DistanceClass2LegCount;
-	}
-
-	public SortedMap<String, Map<Id<Person>, List<Double>>> getMode2PersonId2RouteDistances(){
-		return this.mode2PersonId2dist;
-	}
-	public SortedMap<String, Map<Id<Person>, Double>> getMode2PersonId2TotalRouteDistance(){
-		SortedMap<String, Map<Id<Person>, Double>> mode2PersonId2TotalRouteDist = new TreeMap<String, Map<Id<Person>,Double>>();
-		for(String str:this.mode2PersonId2dist.keySet()){
-			Map<Id<Person>, Double> personIdeRouteDist = new HashMap<Id<Person>, Double>();
-			for(Id<Person> id:this.mode2PersonId2dist.get(str).keySet()){
-				double sum=0;
-				for(double d:this.mode2PersonId2dist.get(str).get(id)){
-					sum +=d;
-				}
-				personIdeRouteDist.put(id, sum);
-			}
-			mode2PersonId2TotalRouteDist.put(str, personIdeRouteDist);
-		}
-		return mode2PersonId2TotalRouteDist;
+	public void handleEvent(TeleportationArrivalEvent event) {
+		Id<Person> personId = event.getPersonId();
+		String mode = this.personId2LegModes.get(personId);
+		// if a person is in more than two groups, then which one is correct mode ?
+		Map<Id<Person>, Double> person2Dist = mode2PersonId2TeleportDist.get(mode);
+		double teleportDist = event.getDistance();
+		person2Dist.put(personId, teleportDist);
 	}
 }

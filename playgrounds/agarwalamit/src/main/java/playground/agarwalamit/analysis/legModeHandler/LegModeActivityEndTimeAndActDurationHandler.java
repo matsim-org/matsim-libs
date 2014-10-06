@@ -59,7 +59,7 @@ ActivityEndEventHandler, ActivityStartEventHandler, PersonStuckEventHandler {
 	private double simEndTime;
 
 	public LegModeActivityEndTimeAndActDurationHandler(Scenario scenario) {
-		this.logger.warn("This will work fine if all trips of a person are made by same travel mode.");
+		this.logger.warn("This will work fine if all trips of a person are made by same travel mode. Because, travel mode is linked with departure events not with activity end or start events.");
 		this.sc = scenario;
 		this.simEndTime = sc.getConfig().qsim().getEndTime();
 		this.mode2PersonId2ActEndTimes = new TreeMap<String, Map<Id<Person>,List<Double>>>();
@@ -116,6 +116,18 @@ ActivityEndEventHandler, ActivityStartEventHandler, PersonStuckEventHandler {
 			if(this.warnCount==this.maxStuckAndAbortWarnCount) this.logger.warn(Gbl.FUTURE_SUPPRESSED);
 		}
 	}
+	
+	public SortedMap<String, Map<Id<Person>, List<Double>>> getLegMode2PesonId2ActEndTimes (){
+		this.mode2PersonId2ActEndTimes= sortingPersonWRTMode(this.personId2ActEndTimes);
+		return this.mode2PersonId2ActEndTimes;
+	}
+
+	public SortedMap<String, Map<Id<Person>, List<Double>>> getLegMode2PesonId2ActDurations (){
+		Map<Id<Person>, SortedMap<String,Double>> personId2ActDurations = calculatePersonId2Durations();
+		this.mode2PersonId2ActDurations = sortingPersonWRTMode(personId2ActDurations);
+		return this.mode2PersonId2ActDurations;
+	}
+	
 	private SortedMap<String, Map<Id<Person>, List<Double>>> sortingPersonWRTMode(Map<Id<Person>, SortedMap<String,Double>> pId2Times){
 		SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2Times = new TreeMap<String, Map<Id<Person>,List<Double>>>();
 
@@ -130,17 +142,6 @@ ActivityEndEventHandler, ActivityStartEventHandler, PersonStuckEventHandler {
 			localPersonId2ActTimes.put(id, new ArrayList<Double>(pId2Times.get(id).values()));
 		}
 		return mode2PersonId2Times;
-	}
-
-	public SortedMap<String, Map<Id<Person>, List<Double>>> getLegMode2PesonId2ActEndTimes (){
-		this.mode2PersonId2ActEndTimes= sortingPersonWRTMode(this.personId2ActEndTimes);
-		return this.mode2PersonId2ActEndTimes;
-	}
-
-	public SortedMap<String, Map<Id<Person>, List<Double>>> getLegMode2PesonId2ActDurations (){
-		Map<Id<Person>, SortedMap<String,Double>> personId2ActDurations = calculatePersonId2Durations();
-		this.mode2PersonId2ActDurations = sortingPersonWRTMode(personId2ActDurations);
-		return this.mode2PersonId2ActDurations;
 	}
 
 	private void checkForActivityDuration(SortedMap<String,Double> actDurations){

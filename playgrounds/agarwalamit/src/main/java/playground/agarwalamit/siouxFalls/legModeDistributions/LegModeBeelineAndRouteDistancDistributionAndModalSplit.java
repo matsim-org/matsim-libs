@@ -18,10 +18,12 @@
  * *********************************************************************** */
 package playground.agarwalamit.siouxFalls.legModeDistributions;
 
+import java.io.File;
+
 import org.matsim.api.core.v01.Scenario;
 
 import playground.agarwalamit.analysis.LoadMyScenarios;
-import playground.agarwalamit.analysis.legModeHandler.LegModeRouteDistanceDistributionHandler;
+import playground.agarwalamit.analysis.legModeHandler.LegModeRouteDistanceDistributionAnalyzer;
 import playground.vsp.analysis.modules.legModeDistanceDistribution.LegModeDistanceDistribution;
 
 /**
@@ -29,9 +31,9 @@ import playground.vsp.analysis.modules.legModeDistanceDistribution.LegModeDistan
  */
 public class LegModeBeelineAndRouteDistancDistributionAndModalSplit {
 
-	private final static String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMCOff/";//outputModalSplitSetUp
+	private final static String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/";//outputModalSplitSetUp
 //	private final static String run = "/run201/";
-	private final static String [] runs = {"run33","run205","run206","run207","run208"};
+	private final static String [] runs = {"baseCase","baseCaseCtd","ei","ci","eci"};
 	//	private  String initialPlanFile = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/input/SiouxFalls_population_probably_v3.xml";
 	//	private  String initialPlanFile = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMCOff/run33/output_plans.xml.gz";
 //	private static String finalPlanFileLocation = runDir+run+"/ITERS/";
@@ -49,13 +51,15 @@ public class LegModeBeelineAndRouteDistancDistributionAndModalSplit {
 			String configFile = runDir+str+"/output_config.xml";
 			int lastIteration = LoadMyScenarios.getLastIteration(configFile);
 			String finalPlanFile = runDir+str+"/ITERS/it."+lastIteration+"/"+lastIteration+".plans.xml.gz";
-			ms.runRoutesDistance(str, finalPlanFile);
+			String networkFile = runDir+str+"/output_network.xml.gz";
+			String eventsFile = runDir+str+"/ITERS/it."+lastIteration+"/"+lastIteration+".events.xml.gz";
+			ms.runRoutesDistance(str, networkFile, eventsFile);
 //			ms.runBeelineDistance(str, finalPlanFile);
 		}
 	}
 	
 	/**
-	 * It will write legModeShare and beeline distance distribution	
+	 * It will write legModeShare and beeline distance distribution	from plans
 	 */
 	private void runBeelineDistance(String runNr,String finalPlanFile){
 		Scenario sc = LoadMyScenarios.loadScenarioFromPlans(finalPlanFile);
@@ -66,14 +70,15 @@ public class LegModeBeelineAndRouteDistancDistributionAndModalSplit {
 		lmdd.writeResults(runDir+runNr+"/analysis/legModeDistributions/"+runNr+".");
 	}
 	/**
-	 * It will route distance distribution	
+	 * It will write route distance distribution from events	
 	 */
-	private void runRoutesDistance(String runNr,String finalPlanFile){
-		Scenario sc = LoadMyScenarios.loadScenarioFromPlans(finalPlanFile);
-		LegModeRouteDistanceDistributionHandler	lmdfed = new LegModeRouteDistanceDistributionHandler();
-		lmdfed.init(sc);
+	private void runRoutesDistance(String runNr,String networkFile, String eventsFile){
+		Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(networkFile);
+		LegModeRouteDistanceDistributionAnalyzer	lmdfed = new LegModeRouteDistanceDistributionAnalyzer();
+		lmdfed.init(sc,eventsFile);
 		lmdfed.preProcessData();
 		lmdfed.postProcessData();
-		lmdfed.writeResults(runDir+"/analysis500Its/legModeDistributions/"+runNr+".");
+		new File(runDir+"/analysis/legModeDistributions/").mkdirs();
+		lmdfed.writeResults(runDir+"/analysis/legModeDistributions/"+runNr+".");
 	}
 }

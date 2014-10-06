@@ -29,6 +29,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.LoadMyScenarios;
@@ -43,20 +46,22 @@ public class RouteDistancePerUserGroup {
 
 	public RouteDistancePerUserGroup() {
 		super();
-		this.sc = LoadMyScenarios.loadScenarioFromPlansAndNetwork(this.populationFile, this.networkFile);
+		this.sc = LoadMyScenarios.loadScenarioFromNetworkPlansAndConfig(plansFile, networkFile, configFile);
 		this.usrGrpExtended = new UserGroupUtilsExtended();
 	}
 
 	private Logger logger = Logger.getLogger(RouteDistancePerUserGroup.class);
-	private  String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/eci/";/*"./output/run2/";*/
-	private  String populationFile =outputDir+ "/output_plans.xml.gz";//"/network.xml";
+	private  String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/ci/";/*"./output/run2/";*/
 	private  String networkFile =outputDir+ "/output_network.xml.gz";//"/network.xml";
+	private  String plansFile =outputDir+ "/output_plans.xml.gz";//"/network.xml";
+	private String configFile = outputDir+"/output_config.xml";
+	private int lastIteration = LoadMyScenarios.getLastIteration(configFile);
+	private String eventsFile = outputDir+"/ITERS/it."+lastIteration+"/"+lastIteration+".events.xml.gz";
 	private Scenario sc;
 	private UserGroupUtilsExtended usrGrpExtended;
 	private SortedMap<UserGroup, SortedMap<String, Double>> usrGrp2Mode2MeanDistance = new TreeMap<UserGroup, SortedMap<String,Double>>();
 	private SortedMap<UserGroup, SortedMap<String, Double>> usrGrp2Mode2MedianDistance = new TreeMap<UserGroup, SortedMap<String,Double>>();
 	private SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2RouteDist;
-	private SortedMap<String, Map<Id<Person>, Double>> mode2PersonId2TotalRouteDist;
 
 	public static void main(String[] args) {
 		RouteDistancePerUserGroup routeDistUG = new RouteDistancePerUserGroup();
@@ -64,13 +69,14 @@ public class RouteDistancePerUserGroup {
 	}
 
 	private void run(){
-		LegModeRouteDistanceDistributionHandler	lmdfed = new LegModeRouteDistanceDistributionHandler();
-		lmdfed.init(this.sc);
-		lmdfed.preProcessData();
-		lmdfed.postProcessData();
-		lmdfed.writeResults(this.outputDir+"/analysis/");
-		this.mode2PersonId2RouteDist = lmdfed.getMode2PersonId2RouteDistances();
-		this.mode2PersonId2TotalRouteDist = lmdfed.getMode2PersonId2TotalRouteDistance();
+		LegModeRouteDistanceDistributionHandler	lmdfed = new LegModeRouteDistanceDistributionHandler(sc);
+		
+		EventsManager manager = EventsUtils.createEventsManager();
+		MatsimEventsReader reader = new MatsimEventsReader(manager);
+		manager.addHandler(lmdfed);
+		reader.readFile(eventsFile);
+		
+		this.mode2PersonId2RouteDist = lmdfed.getMode2PersonId2TravelDistances();
 		getUserGroupDistanceMeanAndMeadian();
 		writeResults(this.outputDir+"/analysis/");
 	}
@@ -97,8 +103,6 @@ public class RouteDistancePerUserGroup {
 			Population pop = pf.getPopulation(sc.getPopulation(), ug);
 			this.usrGrp2Mode2MeanDistance.put(ug, this.usrGrpExtended.calculateTravelMode2MeanFromLists(mode2PersonId2RouteDist, pop));
 			this.usrGrp2Mode2MedianDistance.put(ug, this.usrGrpExtended.calculateTravelMode2MedianFromLists(mode2PersonId2RouteDist, pop));
-//			usrGrp2Mode2MeanDistance.put(ug, this.usrGrpExtended.calculateTravelMode2Mean(mode2PersonId2TotalRouteDist, pop));
-//			usrGrp2Mode2MedianDistance.put(ug, this.usrGrpExtended.calculateTravelMode2Median(mode2PersonId2TotalRouteDist, pop));
 		}
 	}
 }
