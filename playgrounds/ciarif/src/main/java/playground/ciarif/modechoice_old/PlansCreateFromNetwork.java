@@ -20,9 +20,9 @@
 
 package playground.ciarif.modechoice_old;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.algorithms.NetworkSummary;
 import org.matsim.core.population.PersonImpl;
@@ -110,7 +110,7 @@ public class PlansCreateFromNetwork {
 					else if (rd2 < 0.4) { car_avail = "always"; }
 				}
 			}
-			PersonImpl p = new PersonImpl(new IdImpl(i));
+			PersonImpl p = new PersonImpl(Id.create(i, Person.class));
 			p.setSex(sex);
 			p.setAge(age);
 			p.setLicence(license);

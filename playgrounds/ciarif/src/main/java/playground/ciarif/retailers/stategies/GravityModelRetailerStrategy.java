@@ -7,10 +7,11 @@ import java.util.TreeMap;
 import org.apache.commons.math.stat.regression.OLSMultipleLinearRegression;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
@@ -36,11 +37,11 @@ public class GravityModelRetailerStrategy extends RetailerStrategyImpl
   public static final String SIMPLIFY_MODEL = "isSimplifiedGravityModel";
   public static final String POPULATION = "PopulationSize";
   public static final String NAME = "gravityModelRetailerStrategy";
-  private Map<Id, ActivityFacilityImpl> shops;
+  private Map<Id<ActivityFacility>, ActivityFacility> shops;
   private RetailZones retailZones;
   private ArrayList<Consumer> consumers;
   private Map<Id, Integer> shops_keys;
-  private Map<Id, ActivityFacilityImpl> movedFacilities = new TreeMap<Id, ActivityFacilityImpl>();
+  private Map<Id<ActivityFacility>, ActivityFacility> movedFacilities = new TreeMap<Id<ActivityFacility>, ActivityFacility>();
 
   public GravityModelRetailerStrategy(Controler controler) {
     super(controler);
@@ -48,7 +49,7 @@ public class GravityModelRetailerStrategy extends RetailerStrategyImpl
   }
 
   @Override
-	public Map<Id, ActivityFacilityImpl> moveFacilities(Map<Id, ActivityFacilityImpl> retailerFacilities, TreeMap<Id, LinkRetailersImpl> freeLinks)
+	public Map<Id<ActivityFacility>, ActivityFacility> moveFacilities(Map<Id<ActivityFacility>, ActivityFacility> retailerFacilities, Map<Id<Link>, LinkRetailersImpl> freeLinks)
   {
     this.retailerFacilities = retailerFacilities;
     log.info("Controler" + this.controler);
@@ -80,9 +81,9 @@ public class GravityModelRetailerStrategy extends RetailerStrategyImpl
     gm.setInitialSolution(first.size());
     ArrayList<Integer> solution = rrGA.runGA(gm);
     int count = 0;
-    for (ActivityFacilityImpl af : this.retailerFacilities.values()) {
+    for (ActivityFacility af : this.retailerFacilities.values()) {
       if (first.get(solution.get(count)) != af.getLinkId().toString()) {
-        Utils.moveFacility(af, this.controler.getNetwork().getLinks().get(new IdImpl(first.get(solution.get(count)))));
+        Utils.moveFacility((ActivityFacilityImpl) af, this.controler.getNetwork().getLinks().get(Id.create(first.get(solution.get(count)), Link.class)));
         log.info("The facility " + af.getId() + " has been moved");
         this.movedFacilities.put(af.getId(), af);
         log.info("Link Id after = " + af.getLinkId());
@@ -106,7 +107,7 @@ public class GravityModelRetailerStrategy extends RetailerStrategyImpl
     log.info("This scenario has " + this.retailZones.getRetailZones().size() + " zones");
     int cases = 0;
     for (Consumer c : this.consumers) {
-      int consumer_index = Integer.parseInt(c.getId().toString());
+      int consumer_index = Integer.parseInt(c.getId());
       int zone_index = Integer.parseInt(c.getRzId().toString());
       ActivityFacilityImpl af = (ActivityFacilityImpl)c.getShoppingFacility();
       double prob = prob_zone_shop.get(zone_index, (this.shops_keys.get(af.getId())).intValue());
@@ -120,8 +121,8 @@ public class GravityModelRetailerStrategy extends RetailerStrategyImpl
       double sumDim = 0.0D;
       double dist2 = 0.0D;
       double dim = 0.0D;
-      for (ActivityFacilityImpl aaff : this.shops.values()) {
-        dist2 = aaff.calcDistance(((PlanImpl)c.getPerson().getSelectedPlan()).getFirstActivity().getCoord());
+      for (ActivityFacility aaff : this.shops.values()) {
+        dist2 = ((ActivityFacilityImpl) aaff).calcDistance(((PlanImpl)c.getPerson().getSelectedPlan()).getFirstActivity().getCoord());
         sumDist += dist2;
         dim = ((ActivityOptionImpl)aaff.getActivityOptions().get("shopgrocery")).getCapacity();
         sumDim += dim;
@@ -149,7 +150,7 @@ public class GravityModelRetailerStrategy extends RetailerStrategyImpl
     int consumer_count = 0;
     int j = 0;
     log.info("This scenario has " + this.shops.size() + " shops");
-    for (ActivityFacilityImpl f : this.shops.values()) {
+    for (ActivityFacility f : this.shops.values()) {
       this.shops_keys.put(f.getId(), Integer.valueOf(j));
       for (RetailZone rz : this.retailZones.getRetailZones().values())
       {
@@ -188,7 +189,7 @@ public class GravityModelRetailerStrategy extends RetailerStrategyImpl
     return prob_i_j;
   }
 
-  public Map<Id, ActivityFacilityImpl> getMovedFacilities() {
+  public Map<Id<ActivityFacility>, ActivityFacility> getMovedFacilities() {
     log.info("moved Facilities are: " + this.movedFacilities);
     return this.movedFacilities;
   }

@@ -6,7 +6,6 @@ package playground.ciarif.retailers.stategies;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -16,7 +15,6 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.LinkImpl;
 
 import playground.ciarif.retailers.data.LinkRetailersImpl;
 import playground.ciarif.retailers.utils.Utils;
@@ -116,19 +114,11 @@ public class MaxLinkRetailerStrategy implements RetailerStrategy {
 		return null;
 	}
 
-
-	public Map<Id, ActivityFacility> moveFacilities(
-			Map<Id, ActivityFacility> facilities,
-			Map<Id, LinkRetailersImpl> links) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
+	
 	@Override
-	public Map<Id, ActivityFacilityImpl> moveFacilities(
-			Map<Id, ActivityFacilityImpl> paramMap,
-			TreeMap<Id, LinkRetailersImpl> paramTreeMap) {
+	public Map<Id<ActivityFacility>, ActivityFacility> moveFacilities(
+			Map<Id<ActivityFacility>, ActivityFacility> paramMap,
+			Map<Id<Link>, LinkRetailersImpl> paramTreeMap) {
 		// TODO Auto-generated method stub
 		return null;
 	}

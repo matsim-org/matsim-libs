@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -39,7 +40,7 @@ public class ReRoutePersons {
 
 
 	public void run (
-			Map<Id,ActivityFacilityImpl> movedFacilities,
+			Map<Id<ActivityFacility>,ActivityFacility> movedFacilities,
 			Network network,
 			Map<Id, PersonImpl> persons,
 			PersonAlgorithm pcrl,

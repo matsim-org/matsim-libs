@@ -25,7 +25,8 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 
@@ -42,9 +43,9 @@ public class MinTravelingCostsRetailerStrategy extends RetailerStrategyImpl
   public static final String NAME = "minTravelingCostsRetailerStrategy";
   public static final String GENERATIONS = "numberOfGenerations";
   public static final String POPULATION = "PopulationSize";
-  private Map<Id, ActivityFacilityImpl> shops;
-  private Map<Id, ActivityFacilityImpl> retailerFacilities;
-  private Map<Id, ActivityFacilityImpl> movedFacilities = new TreeMap();
+  private Map<Id<ActivityFacility>, ActivityFacility> shops;
+  private Map<Id<ActivityFacility>, ActivityFacility> retailerFacilities;
+  private Map<Id<ActivityFacility>, ActivityFacility> movedFacilities = new TreeMap();
 
   public MinTravelingCostsRetailerStrategy(Controler controler)
   {
@@ -52,7 +53,7 @@ public class MinTravelingCostsRetailerStrategy extends RetailerStrategyImpl
   }
 
   @Override
-	public Map<Id, ActivityFacilityImpl> moveFacilities(Map<Id, ActivityFacilityImpl> retailerFacilities, TreeMap<Id, LinkRetailersImpl> freeLinks)
+	public Map<Id<ActivityFacility>, ActivityFacility> moveFacilities(Map<Id<ActivityFacility>, ActivityFacility> retailerFacilities, Map<Id<Link>, LinkRetailersImpl> freeLinks)
   {
     this.retailerFacilities = retailerFacilities;
     MinTravelCostsModel mam = new MinTravelCostsModel(this.controler, retailerFacilities);
@@ -67,10 +68,10 @@ public class MinTravelingCostsRetailerStrategy extends RetailerStrategyImpl
     RunRetailerGA rrGA = new RunRetailerGA(populationSize, numberGenerations);
     ArrayList<Integer> solution = rrGA.runGA(mam);
     int count = 0;
-    for (ActivityFacilityImpl af : this.retailerFacilities.values()) {
+    for (ActivityFacility af : this.retailerFacilities.values()) {
       log.info("The facility on the link = " + af.getLinkId() + " will be checked");
       if (first.get(solution.get(count)) != af.getLinkId().toString()) {
-        Utils.moveFacility(af, this.controler.getNetwork().getLinks().get(new IdImpl((String)first.get(solution.get(count)))));
+        Utils.moveFacility((ActivityFacilityImpl) af, this.controler.getNetwork().getLinks().get(Id.create((String)first.get(solution.get(count)), Link.class)));
         log.info("The facility " + af.getId() + " has been moved");
         this.movedFacilities.put(af.getId(), af);
         log.info("Link Id after = " + af.getLinkId());

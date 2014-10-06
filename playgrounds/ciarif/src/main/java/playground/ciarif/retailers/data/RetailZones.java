@@ -2,16 +2,16 @@ package playground.ciarif.retailers.data;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordImpl;
+
 import playground.ciarif.retailers.stategies.MaxLinkRetailerStrategy;
 
 public class RetailZones
 {
   private static final Logger log = Logger.getLogger(MaxLinkRetailerStrategy.class);
-  private final Map<Id, RetailZone> retailZones = new LinkedHashMap();
+  private final Map<Id<RetailZone>, RetailZone> retailZones = new LinkedHashMap<>();
 
   public final boolean addRetailZone(RetailZone retailZone) {
     if (retailZone == null) return false;
@@ -22,7 +22,7 @@ public class RetailZones
     return true;
   }
 
-  public Map<Id, RetailZone> getRetailZones() {
+  public Map<Id<RetailZone>, RetailZone> getRetailZones() {
     return this.retailZones;
   }
 }

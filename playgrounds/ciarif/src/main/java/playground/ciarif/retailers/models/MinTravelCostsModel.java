@@ -13,10 +13,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.LegImpl;
@@ -43,7 +41,7 @@ public class MinTravelCostsModel extends RetailerModelImpl
 
   private TreeMap<Id, LinkRetailersImpl> availableLinks = new TreeMap<Id, LinkRetailersImpl>();
 
-  public MinTravelCostsModel(Controler controler, Map<Id, ActivityFacilityImpl> retailerFacilities)
+  public MinTravelCostsModel(Controler controler, Map<Id<ActivityFacility>, ActivityFacility> retailerFacilities)
   {
     this.controler = controler;
     this.retailerFacilities = retailerFacilities;
@@ -64,8 +62,8 @@ public class MinTravelCostsModel extends RetailerModelImpl
     log.info("Initial solution = " + getInitialSolution());
     findScenarioShops(this.controlerFacilities.getFacilities().values());
     Gbl.printMemoryUsage();
-    for (PersonImpl pi : this.persons.values()) {
-      PersonRetailersImpl pr = new PersonRetailersImpl(pi);
+    for (Person pi : this.persons.values()) {
+      PersonRetailersImpl pr = new PersonRetailersImpl((PersonImpl) pi);
       this.retailersPersons.put(pr.getId(), pr);
     }
     Utils.setPersonPrimaryActivityQuadTree(Utils.createPersonPrimaryActivityQuadTree(this.controler));
@@ -76,7 +74,7 @@ public class MinTravelCostsModel extends RetailerModelImpl
     for (Integer i = Integer.valueOf(0); i.intValue() < first.size(); i = Integer.valueOf(i.intValue() + 1)) {
       String linkId = this.first.get(i);
       double scoreSum = 0.0D;
-      LinkRetailersImpl link = new LinkRetailersImpl(this.controler.getNetwork().getLinks().get(new IdImpl(linkId)), this.controler.getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
+      LinkRetailersImpl link = new LinkRetailersImpl(this.controler.getNetwork().getLinks().get(Id.create(linkId, Link.class)), this.controler.getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
       Collection<PersonPrimaryActivity> primaryActivities = Utils.getPersonPrimaryActivityQuadTree().get(link.getCoord().getX(), link.getCoord().getY(), 3000.0D);
       
       
@@ -167,13 +165,13 @@ public class MinTravelCostsModel extends RetailerModelImpl
     Double Fitness = Double.valueOf(0.0D);
     for (int s = 0; s < this.retailerFacilities.size(); ++s) {
       String linkId = this.first.get(solution.get(s));
-      Fitness = Double.valueOf(Fitness.doubleValue() + this.availableLinks.get(new IdImpl(linkId)).getPotentialCustomers());
+      Fitness = Double.valueOf(Fitness.doubleValue() + this.availableLinks.get(Id.create(linkId, Link.class)).getPotentialCustomers());
     }
 
     return Fitness.doubleValue();
   }
 
-  public Map<Id, ActivityFacilityImpl> getScenarioShops() {
+  public Map<Id<ActivityFacility>, ActivityFacility> getScenarioShops() {
     return this.shops;
   }
 }

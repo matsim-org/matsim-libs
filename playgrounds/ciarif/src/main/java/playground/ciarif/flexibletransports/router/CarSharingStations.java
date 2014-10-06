@@ -6,15 +6,12 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.algorithms.CalcBoundingBox;
 import org.matsim.core.utils.collections.QuadTree;
@@ -52,7 +49,7 @@ public class CarSharingStations implements FacilitiesPortfolio
         CoordImpl coord = new CoordImpl(Double.parseDouble(parts[2]), Double.parseDouble(parts[3]));
         int cars = Integer.parseInt(parts[4]);
         LinkImpl stationLink = MyLinkUtils.getClosestLink(this.network, coord);
-        CarSharingStation csStation = new CarSharingStation(new IdImpl(parts[0]), coord, stationLink, cars);
+        CarSharingStation csStation = new CarSharingStation(Id.create(parts[0], CarSharingStation.class), coord, stationLink, cars);
         this.stations.put(coord.getX(), coord.getY(), csStation);
         log.info("The station " + csStation.getId() + " has been added");
       } else {
@@ -63,7 +60,7 @@ public class CarSharingStations implements FacilitiesPortfolio
 
   public CarSharingStation getClosestLocation(Coord coord)
   {
-    return ((CarSharingStation)this.stations.get(coord.getX(), coord.getY()));
+    return (this.stations.get(coord.getX(), coord.getY()));
   }
   
   public Vector<CarSharingStation> getClosestStations (Coord coord, int number, double distance) {

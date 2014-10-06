@@ -1,7 +1,7 @@
 package playground.ciarif.retailers.data;
 
 import java.util.ArrayList;
-import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
@@ -11,8 +11,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 
 public class RetailZone
 {
-  private static final Logger log = Logger.getLogger(RetailZone.class);
-  private Id id;
+  private Id<RetailZone> id;
   private QuadTree<Person> personsQuadTree;
   private QuadTree<ActivityFacility> shopsQuadTree;
   private ArrayList<Person> persons = new ArrayList<Person>();
@@ -20,7 +19,7 @@ public class RetailZone
   private CoordImpl minCoord;
   private CoordImpl maxCoord;
 
-  public RetailZone(Id id, Double minx, Double miny, Double maxx, Double maxy)
+  public RetailZone(Id<RetailZone> id, Double minx, Double miny, Double maxx, Double maxy)
   {
     this.id = id;
     this.personsQuadTree = new QuadTree<Person>(minx.doubleValue(), miny.doubleValue(), maxx.doubleValue(), maxy.doubleValue());
@@ -29,9 +28,8 @@ public class RetailZone
     this.maxCoord = new CoordImpl(maxx.toString(), maxy.toString());
   }
 
-  public Id getId() {
-    Id id = this.id;
-    return id;
+  public Id<RetailZone> getId() {
+    return this.id;
   }
 
   public void addPersonToQuadTree(Coord coord, Person person) {

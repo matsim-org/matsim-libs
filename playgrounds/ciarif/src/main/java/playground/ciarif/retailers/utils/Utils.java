@@ -21,12 +21,12 @@ package playground.ciarif.retailers.utils;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -192,7 +192,7 @@ public abstract class Utils
         {
           if (pe instanceof Activity) {
             Coord c;
-            IdImpl activityLink;
+            Id<Link> activityLink;
             int ppaId;
             PersonPrimaryActivity ppa;
             Activity act = (Activity)pe;
@@ -200,7 +200,7 @@ public abstract class Utils
             if (act.getType().equals("home")) {
               if (!(hasHome)) {
                 c = ((ActivityFacility)controler.getFacilities().getFacilities().get(act.getFacilityId())).getCoord();
-                activityLink = (IdImpl)(((NetworkImpl) controler.getNetwork()).getNearestLink(act.getCoord())).getId();
+                activityLink = (((NetworkImpl) controler.getNetwork()).getNearestLink(act.getCoord())).getId();
                 //activityLink = (IdImpl)((ActivityFacility)controler.getFacilities().getFacilities().get(act.getFacilityId())).getLinkId();
                 ppaId = Integer.parseInt(p.getId().toString()) * 10 + primaryActivityCount;
                 ppa = new PersonPrimaryActivity(act.getType(), ppaId, p.getId(), activityLink);
@@ -213,7 +213,7 @@ public abstract class Utils
             else if (act.getType().equals("work")) {
               if (!(hasWork)) {
                 c = ((ActivityFacility)controler.getFacilities().getFacilities().get(act.getFacilityId())).getCoord();
-                activityLink = (IdImpl)((ActivityFacility)controler.getFacilities().getFacilities().get(act.getFacilityId())).getLinkId();
+                activityLink = ((ActivityFacility)controler.getFacilities().getFacilities().get(act.getFacilityId())).getLinkId();
                 ppaId = Integer.parseInt(p.getId().toString()) * 10 + primaryActivityCount;
                 ppa = new PersonPrimaryActivity(act.getType(), ppaId, p.getId(), activityLink);
                 personPrimaryActivityQuadTree.put(c.getX(), c.getY(), ppa);
@@ -225,7 +225,7 @@ public abstract class Utils
               if ((!(act.getType().equals("education"))) ||
                 (hasEducation)) continue;
               c = ((ActivityFacility)controler.getFacilities().getFacilities().get(act.getFacilityId())).getCoord();
-              activityLink = (IdImpl)((ActivityFacility)controler.getFacilities().getFacilities().get(act.getFacilityId())).getLinkId();
+              activityLink = ((ActivityFacility)controler.getFacilities().getFacilities().get(act.getFacilityId())).getLinkId();
               log.info("Act Link " + activityLink);
               ppaId = Integer.parseInt(p.getId().toString()) * 10 + primaryActivityCount;
               ppa = new PersonPrimaryActivity(act.getType(), ppaId, p.getId(), activityLink);

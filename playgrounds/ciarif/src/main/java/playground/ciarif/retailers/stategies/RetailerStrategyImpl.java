@@ -1,14 +1,13 @@
 package playground.ciarif.retailers.stategies;
 
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 
 import playground.ciarif.retailers.data.LinkRetailersImpl;
@@ -17,7 +16,7 @@ public class RetailerStrategyImpl
   implements RetailerStrategy
 {
 	  private static final Logger log = Logger.getLogger(GravityModelRetailerStrategy.class);
-	  protected Map<Id, ActivityFacilityImpl> retailerFacilities;
+	  protected Map<Id<ActivityFacility>, ActivityFacility> retailerFacilities;
 	  protected Controler controler;
 	
 	  public RetailerStrategyImpl(Controler controler)
@@ -27,7 +26,7 @@ public class RetailerStrategyImpl
 	  }
 	
 	  @Override
-		public Map<Id, ActivityFacilityImpl> moveFacilities(Map<Id, ActivityFacilityImpl> facilities, TreeMap<Id, LinkRetailersImpl> links)
+		public Map<Id<ActivityFacility>, ActivityFacility> moveFacilities(Map<Id<ActivityFacility>, ActivityFacility> facilities, Map<Id<Link>, LinkRetailersImpl> links)
 	  {
 	    return null;
 	  }
@@ -35,7 +34,7 @@ public class RetailerStrategyImpl
 	  protected TreeMap<Integer, String> createInitialLocationsForGA(TreeMap<Id, LinkRetailersImpl> availableLinks) {
 	    TreeMap<Integer, String> locations = new TreeMap<Integer, String>();
 	    int intCount = 0;
-	    for (ActivityFacilityImpl af : this.retailerFacilities.values())
+	    for (ActivityFacility af : this.retailerFacilities.values())
 	    {
 	      locations.put(Integer.valueOf(intCount), ((NetworkImpl) this.controler.getNetwork()).getNearestLink(af.getCoord()).getId().toString());
 	      ++intCount;
@@ -56,12 +55,12 @@ public class RetailerStrategyImpl
 	    return locations;
 	  }
 	
-	  protected TreeMap<Id, LinkRetailersImpl> mergeLinks(TreeMap<Id, LinkRetailersImpl> freeLinks, Map<Id, ActivityFacilityImpl> retailerFacilities)
+	  protected TreeMap<Id, LinkRetailersImpl> mergeLinks(Map<Id<Link>, LinkRetailersImpl> freeLinks, Map<Id<ActivityFacility>, ActivityFacility> retailerFacilities)
 	  {
 	    this.retailerFacilities = retailerFacilities;
 	    TreeMap<Id,LinkRetailersImpl> availableLinks = new TreeMap<Id,LinkRetailersImpl>();
-	    for (ActivityFacilityImpl af : this.retailerFacilities.values()) {
-	    	Id id = af.getLinkId();
+	    for (ActivityFacility af : this.retailerFacilities.values()) {
+	    	Id<Link> id = af.getLinkId();
 	    	LinkRetailersImpl link = new LinkRetailersImpl(this.controler.getNetwork().getLinks().get(id), this.controler.getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
 	    	availableLinks.put(id, link);
 	    }

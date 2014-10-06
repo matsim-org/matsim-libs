@@ -3,11 +3,11 @@ package playground.ciarif.carpooling;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 
 public class WorkTrip {
-	private Id tripId;
-	private Id personId;
+	private String tripId;
+	private Id<Person> personId;
 	private Coord homeCoord;
 	private Coord workCoord;
 	private double departureTime;
@@ -15,9 +15,9 @@ public class WorkTrip {
 	private double travelDistance;
 	private boolean homeWork;
 
-	public WorkTrip (Integer tripNumber, Id personId, Coord homeCoord, Coord workCoord, Leg homeWorkLeg, boolean homework){
+	public WorkTrip (Integer tripNumber, Id<Person> personId, Coord homeCoord, Coord workCoord, Leg homeWorkLeg, boolean homework){
 
-		this.tripId = new IdImpl(tripNumber.toString());
+		this.tripId = tripNumber.toString();
 		this.personId = personId;
 		this.homeCoord = homeCoord;
 		this.workCoord = workCoord;
@@ -27,7 +27,7 @@ public class WorkTrip {
 		this.homeWork = homework;
 	}
 
-	public Id getPersonId() {
+	public Id<Person> getPersonId() {
 		return this.personId;
 	}
 
@@ -48,7 +48,7 @@ public class WorkTrip {
 	public double getTravelDistance() {
 		return this.travelDistance;
 	}
-	public Id getTripId() {
+	public String getTripId() {
 		return this.tripId;
 	}
 

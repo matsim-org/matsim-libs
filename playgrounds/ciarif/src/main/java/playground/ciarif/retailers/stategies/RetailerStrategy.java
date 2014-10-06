@@ -1,13 +1,14 @@
 package playground.ciarif.retailers.stategies;
 
 import java.util.Map;
-import java.util.TreeMap;
+
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
+
 import playground.ciarif.retailers.data.LinkRetailersImpl;
-import playground.ciarif.stategies.LocationStrategy;
 
 public abstract interface RetailerStrategy
 {
-  public abstract Map<Id, ActivityFacilityImpl> moveFacilities(Map<Id, ActivityFacilityImpl> paramMap, TreeMap<Id, LinkRetailersImpl> paramTreeMap);
+  public abstract Map<Id<ActivityFacility>, ActivityFacility> moveFacilities(Map<Id<ActivityFacility>, ActivityFacility> facilities, Map<Id<Link>, LinkRetailersImpl> link);
 }

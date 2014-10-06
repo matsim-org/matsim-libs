@@ -24,6 +24,8 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -35,7 +37,7 @@ public class RandomRetailerStrategy extends RetailerStrategyImpl
 {
 	private final static Logger log = Logger.getLogger(RandomRetailerStrategy.class);
 
-	private TreeMap<Id, ActivityFacilityImpl> movedFacilities = new TreeMap<Id, ActivityFacilityImpl>();
+	private TreeMap<Id<ActivityFacility>, ActivityFacility> movedFacilities = new TreeMap<>();
 
 	public RandomRetailerStrategy(Controler controler) {
 		super(controler);
@@ -43,17 +45,17 @@ public class RandomRetailerStrategy extends RetailerStrategyImpl
 
 
 	@Override
-	public Map<Id, ActivityFacilityImpl> moveFacilities(Map<Id, ActivityFacilityImpl> facilities, TreeMap<Id, LinkRetailersImpl> freeLinks)
+	public Map<Id<ActivityFacility>, ActivityFacility> moveFacilities(Map<Id<ActivityFacility>, ActivityFacility> facilities, Map<Id<Link>, LinkRetailersImpl> freeLinks)
 	{
 		log.info("available Links are= " + freeLinks);
 		log.info("The facilities are= " + facilities);
 		this.retailerFacilities=facilities;
-		for (ActivityFacilityImpl f : this.retailerFacilities.values())
+		for (ActivityFacility f : this.retailerFacilities.values())
 		{
 			int rd = MatsimRandom.getRandom().nextInt(freeLinks.size());
 			LinkRetailersImpl newLink =(LinkRetailersImpl) freeLinks.values().toArray()[rd];
 			LinkRetailersImpl oldLink = new LinkRetailersImpl(this.controler.getNetwork().getLinks().get(f.getLinkId()), controler.getNetwork(), 0.0, 0.0);
-			Utils.moveFacility(f,newLink);
+			Utils.moveFacility((ActivityFacilityImpl) f,newLink);
 			freeLinks.put(oldLink.getId(),oldLink );
 			this.movedFacilities.put(f.getId(),f);
 		}

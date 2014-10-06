@@ -23,7 +23,6 @@ package playground.ciarif;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
@@ -95,7 +94,7 @@ public class PersonSubtoursStreaming {
 //		persons.persons.put(person.p_id,person);
 
 		System.out.println("  adding mode choice module...");
-		PersonModeChoiceModel pmcm= new PersonModeChoiceModel(persons, municipalities, world.getLayer(new IdImpl(Municipalities.MUNICIPALITY)));
+		PersonModeChoiceModel pmcm= new PersonModeChoiceModel(persons, municipalities, world.getLayer(Id.create(Municipalities.MUNICIPALITY, Layer.class)));
 		plans.addAlgorithm(pmcm);
 		System.out.println("  done.");
 

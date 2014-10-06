@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
 public class CountFacilityCustomers {
 
@@ -37,7 +37,7 @@ public class CountFacilityCustomers {
 		this.persons=persons;
 	}
 
-	public int countCustomers(ActivityFacilityImpl facility) {
+	public int countCustomers(ActivityFacility facility) {
 		int customersCount = 0;
 		 for (Person p: persons.values()) {
 			Plan plan = p.getSelectedPlan();

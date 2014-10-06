@@ -11,10 +11,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -32,9 +29,9 @@ public class LinksRetailerReader
   public static final String CONFIG_GROUP = "Retailers";
   private String linkIdFile;
   private Controler controler;
-  protected TreeMap<Id, LinkRetailersImpl> allLinks = new TreeMap<Id, LinkRetailersImpl>();
-  protected TreeMap<Id, LinkRetailersImpl> freeLinks = new TreeMap<Id, LinkRetailersImpl>();
-  private TreeMap<Id, LinkRetailersImpl> currentLinks = new TreeMap<Id, LinkRetailersImpl>();
+  protected TreeMap<Id<Link>, LinkRetailersImpl> allLinks = new TreeMap<>();
+  protected TreeMap<Id<Link>, LinkRetailersImpl> freeLinks = new TreeMap<>();
+  private TreeMap<Id<Link>, LinkRetailersImpl> currentLinks = new TreeMap<>();
   private Retailers retailers;
   private double minRatio;
   private double ratioSum = 0.0D;
@@ -65,14 +62,14 @@ public class LinksRetailerReader
   public void updateFreeLinks()
   {
     LinkRetailersImpl link;
-    TreeMap<Id,LinkRetailersImpl> links = new TreeMap<Id,LinkRetailersImpl>();
-    TreeMap<Id,LinkRetailersImpl> linksToRemove = new TreeMap<Id,LinkRetailersImpl>();
+    TreeMap<Id<Link>,LinkRetailersImpl> links = new TreeMap<>();
+    TreeMap<Id<Link>,LinkRetailersImpl> linksToRemove = new TreeMap<>();
     detectRetailersActualLinks();
 
-    for (Iterator<LinkRetailersImpl> localIterator1 = this.allLinks.values().iterator(); localIterator1.hasNext(); ) { link = (LinkRetailersImpl)localIterator1.next();
+    for (Iterator<LinkRetailersImpl> localIterator1 = this.allLinks.values().iterator(); localIterator1.hasNext(); ) { link = localIterator1.next();
       links.put(link.getId(), link);
     }
-    for (Iterator<LinkRetailersImpl> localIterator1 = this.currentLinks.values().iterator(); localIterator1.hasNext(); ) { link = (LinkRetailersImpl)localIterator1.next();
+    for (Iterator<LinkRetailersImpl> localIterator1 = this.currentLinks.values().iterator(); localIterator1.hasNext(); ) { link = localIterator1.next();
       Id id = link.getId();
       for (LinkRetailersImpl link2 : links.values()) {
         Id id2 = link2.getId();
@@ -99,8 +96,8 @@ public class LinksRetailerReader
       while ((curr_line = br.readLine()) != null) {
         String[] entries = curr_line.split("\t", -1);
 
-        Id lId = new IdImpl(entries[0]);
-        LinkRetailersImpl l = new LinkRetailersImpl((Link)this.controler.getNetwork().getLinks().get(lId), (NetworkImpl)this.controler.getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
+        Id<Link> lId = Id.create(entries[0], Link.class);
+        LinkRetailersImpl l = new LinkRetailersImpl(this.controler.getNetwork().getLinks().get(lId), this.controler.getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
         l.setMaxFacOnLink(Integer.parseInt(entries[1]));
 //        if (l.getUpMapping().size() > Integer.parseInt(entries[1]))
 //        {
@@ -113,6 +110,7 @@ public class LinksRetailerReader
         this.freeLinks.put(l.getId(), l);
         this.allLinks.put(l.getId(), l);
       }
+      br.close();
     }
     catch (IOException e) {
       throw new RuntimeException(e);
@@ -120,11 +118,11 @@ public class LinksRetailerReader
   }
 
   private void detectRetailersActualLinks() {
-	    TreeMap<Id, LinkRetailersImpl> links = new TreeMap<Id, LinkRetailersImpl>();
+	    TreeMap<Id<Link>, LinkRetailersImpl> links = new TreeMap<>();
 	    for (Retailer r : this.retailers.getRetailers().values()) {
 	      for (ActivityFacility af : r.getFacilities().values()) {
-	    	Link fLink =  (Link)this.controler.getNetwork().getLinks().get(af.getLinkId()); 
-	        LinkRetailersImpl link = new LinkRetailersImpl(fLink, (NetworkImpl)this.controler.getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
+	    	Link fLink =  this.controler.getNetwork().getLinks().get(af.getLinkId()); 
+	        LinkRetailersImpl link = new LinkRetailersImpl(fLink, this.controler.getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
 	        links.put(link.getId(), link);
 	        log.info("The facility " + af.getId() + " is currently on the link: " + link.getId());
 	      }
@@ -148,7 +146,7 @@ public class LinksRetailerReader
         for (ActivityFacility facility : facilities)
         {
           if (facility.getActivityOptions().get("shopgrocery") != null) {
-            double shopCapacity = ((ActivityOption)facility.getActivityOptions().get("shopgrocery")).getCapacity();
+            double shopCapacity = facility.getActivityOptions().get("shopgrocery").getCapacity();
             globalCapacity += shopCapacity;
           }
         }
@@ -207,7 +205,7 @@ public class LinksRetailerReader
         int numberShops = 0;
         for (ActivityFacility facility : facilities) {
           if (facility.getActivityOptions().get("shopgrocery") != null) {
-            double shopCapacity = ((ActivityOption)facility.getActivityOptions().get("shopgrocery")).getCapacity();
+            double shopCapacity = facility.getActivityOptions().get("shopgrocery").getCapacity();
             globalCapacity += shopCapacity;
             numberShops = numberShops+1;
           }
@@ -250,7 +248,7 @@ public class LinksRetailerReader
     }
   }
 
-  public TreeMap<Id, LinkRetailersImpl> getFreeLinks()
+  public TreeMap<Id<Link>, LinkRetailersImpl> getFreeLinks()
   {
     return this.freeLinks;
   }
