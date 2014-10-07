@@ -21,11 +21,15 @@ package playground.michalm.taxi.data;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.data.RequestImpl;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
-import playground.michalm.taxi.schedule.*;
+import playground.michalm.taxi.schedule.TaxiDropoffDriveTask;
+import playground.michalm.taxi.schedule.TaxiDropoffStayTask;
+import playground.michalm.taxi.schedule.TaxiPickupDriveTask;
+import playground.michalm.taxi.schedule.TaxiPickupStayTask;
 
 
 public class TaxiRequest
@@ -61,7 +65,7 @@ public class TaxiRequest
     private TaxiDropoffStayTask dropoffStayTask;
 
 
-    public TaxiRequest(Id id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
+    public TaxiRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
             double t0, double submissionTime)
     {
         super(id, 1, t0, t0, submissionTime);

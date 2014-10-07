@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.Id;
 public class RequestImpl
     implements Request
 {
-    private final Id id;
+    private final Id<Request> id;
     private final double quantity;
     private final double t0;// earliest start time
     private final double t1;// latest start time
@@ -37,7 +37,7 @@ public class RequestImpl
     private boolean rejected = false;
 
 
-    public RequestImpl(Id id, double quantity, double t0, double t1, double submissionTime)
+    public RequestImpl(Id<Request> id, double quantity, double t0, double t1, double submissionTime)
     {
         this.id = id;
         this.quantity = quantity;
@@ -48,7 +48,7 @@ public class RequestImpl
 
 
     @Override
-    public Id getId()
+    public Id<Request> getId()
     {
         return id;
     }

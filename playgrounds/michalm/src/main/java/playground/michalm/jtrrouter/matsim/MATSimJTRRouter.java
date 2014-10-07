@@ -37,7 +37,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -81,13 +80,13 @@ public class MATSimJTRRouter
         Node next;
 
         if (inLink != -1) {
-            Link link = idToLinkMap.get(new IdImpl(inLink));
+            Link link = idToLinkMap.get(Id.create(inLink, Link.class));
 
             node = link.getFromNode();
             next = link.getToNode();
         }
         else {
-            Link link = idToLinkMap.get(new IdImpl(outLink));
+            Link link = idToLinkMap.get(Id.create(outLink, Link.class));
 
             node = link.getToNode();
             next = link.getFromNode();

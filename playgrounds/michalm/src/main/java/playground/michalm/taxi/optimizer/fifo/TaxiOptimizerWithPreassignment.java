@@ -28,11 +28,10 @@ import java.util.Map;
 import java.util.Scanner;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
+import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.router.VrpPathCalculator;
-import org.matsim.core.basic.v01.IdImpl;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
@@ -55,7 +54,7 @@ public class TaxiOptimizerWithPreassignment
             VrpPathCalculator calculator, double pickupDuration, double dropoffDuration,
             String reqIdToVehIdFile, String workingDir)
     {
-        final Map<Id, Vehicle> reqIdToVehMap = readReqIdToVehMap(context, reqIdToVehIdFile);
+        final Map<Id<Request>, Vehicle> reqIdToVehMap = readReqIdToVehMap(context, reqIdToVehIdFile);
 
         TaxiSchedulerParams params = new TaxiSchedulerParams(true, pickupDuration, dropoffDuration);
         TaxiScheduler scheduler = new TaxiScheduler(context, calculator, params);
@@ -70,7 +69,7 @@ public class TaxiOptimizerWithPreassignment
 
 
     private static VehicleRequestPathFinder createVrpFinder(VrpPathCalculator calculator,
-            TaxiScheduler scheduler, final Map<Id, Vehicle> reqIdToVehMap)
+            TaxiScheduler scheduler, final Map<Id<Request>, Vehicle> reqIdToVehMap)
     {
         return new VehicleRequestPathFinder(calculator, scheduler) {
             @Override
@@ -84,7 +83,7 @@ public class TaxiOptimizerWithPreassignment
     }
 
 
-    private static Map<Id, Vehicle> readReqIdToVehMap(MatsimVrpContext context,
+    private static Map<Id<Request>, Vehicle> readReqIdToVehMap(MatsimVrpContext context,
             String reqIdToVehIdFile)
     {
         Scanner scanner = null;
@@ -97,11 +96,10 @@ public class TaxiOptimizerWithPreassignment
         }
 
         List<Vehicle> vehicles = context.getVrpData().getVehicles();
-        Scenario scenario = context.getScenario();
-        Map<Id, Vehicle> reqIdToVehMap = new HashMap<Id, Vehicle>();
+        Map<Id<Request>, Vehicle> reqIdToVehMap = new HashMap<Id<Request>, Vehicle>();
 
         while (scanner.hasNext()) {
-            Id reqId = new IdImpl(scanner.next());
+            Id<Request> reqId = Id.create(scanner.next(), Request.class);
             Vehicle veh = vehicles.get(scanner.nextInt());
             reqIdToVehMap.put(reqId, veh);
         }

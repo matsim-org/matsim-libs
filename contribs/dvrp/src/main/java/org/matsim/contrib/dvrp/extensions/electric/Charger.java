@@ -19,13 +19,14 @@
 
 package org.matsim.contrib.dvrp.extensions.electric;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.BasicLocation;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 
 
 public interface Charger
-    extends BasicLocation, Identifiable
+    extends BasicLocation<Charger>, Identifiable<Charger>
 {
     Link getLink();
 

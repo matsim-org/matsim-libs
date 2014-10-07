@@ -19,21 +19,22 @@
 
 package org.matsim.contrib.dvrp.extensions.electric;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
 
 public class ChargerImpl
     implements Charger
 {
-    private final Id id;
+    private final Id<Charger> id;
     private final double powerInWatts;
     private final Link link;
 
     private final ChargingSchedule<? extends ChargeTask> schedule;
 
 
-    public ChargerImpl(Id id, double powerInWatts, Link link)
+    public ChargerImpl(Id<Charger> id, double powerInWatts, Link link)
     {
         this.id = id;
         this.powerInWatts = powerInWatts;
@@ -44,7 +45,7 @@ public class ChargerImpl
 
 
     @Override
-    public Id getId()
+    public Id<Charger> getId()
     {
         return id;
     }
