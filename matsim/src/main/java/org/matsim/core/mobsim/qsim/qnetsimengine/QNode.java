@@ -20,14 +20,6 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -37,6 +29,10 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
+
+import java.io.Serializable;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Represents a node in the QSimulation.
@@ -175,31 +171,28 @@ public class QNode implements NetsimNode {
 			return false; // Nothing to do
 		}
 
-		int auxCounter = 0;
 		// randomize based on capacity
-		while (auxCounter < inLinksCounter) {
+        for (int auxCounter = 0; auxCounter < inLinksCounter; auxCounter++) {
 			double rndNum = random.nextDouble() * inLinksCapSum;
 			double selCap = 0.0;
 			for (int i = 0; i < inLinksCounter; i++) {
 				QLinkInternalI link = this.tempLinks[i];
-				if (link == null)
-					continue;
-				selCap += link.getLink().getCapacity(now);
-				if (selCap >= rndNum) {
-					auxCounter++;
-					inLinksCapSum -= link.getLink().getCapacity(now);
-					this.tempLinks[i] = null;
-					//move the link
-					this.clearLinkBuffer(link, now);
-					break;
-				}
+				if (link != null) {
+                    selCap += link.getLink().getCapacity(now);
+                    if (selCap >= rndNum) {
+                        inLinksCapSum -= link.getLink().getCapacity(now);
+                        this.tempLinks[i] = null;
+                        this.moveLink(link, now);
+                        break;
+                    }
+                }
 			}
 		}
 		
 		return true;
 	}
 
-	private void clearLinkBuffer(final QLinkInternalI link, final double now){
+	private void moveLink(final QLinkInternalI link, final double now){
 		if ( link instanceof QLinkLanesImpl ) {
 			// This cannot be moved to QLinkLanesImpl since we want to be able to serve other lanes if one lane is blocked.
 			// kai, feb'12
