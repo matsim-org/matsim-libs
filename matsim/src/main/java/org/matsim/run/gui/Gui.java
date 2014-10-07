@@ -35,6 +35,7 @@ public class Gui extends JFrame {
 	private JTextField txtJvmversion;
 	private JTextField txtJvmlocation;
 	private JTextField txtOutput;
+	private JLabel lblWorkDirectory;
 	
 	private JButton btnStartMatsim;
 	private JProgressBar progressBar;
@@ -54,6 +55,8 @@ public class Gui extends JFrame {
 		
 		btnStartMatsim = new JButton("Start MATSim");
 		btnStartMatsim.setEnabled(false);
+		
+		this.lblWorkDirectory = new JLabel("Filepaths must either be absolute or relative to the location of the config file.");
 		
 		JButton btnChoose = new JButton("Choose");
 		btnChoose.addActionListener(new ActionListener() {
@@ -192,6 +195,7 @@ public class Gui extends JFrame {
 					.addContainerGap()
 					.addGroup(groupLayout.createParallelGroup(Alignment.TRAILING)
 						.addComponent(scrollPane, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 697, Short.MAX_VALUE)
+						.addComponent(lblWorkDirectory, Alignment.LEADING)
 						.addComponent(lblJavaLocation, Alignment.LEADING)
 						.addComponent(lblConfigurationFile, Alignment.LEADING)
 						.addComponent(lblOutputDirectory, Alignment.LEADING)
@@ -244,6 +248,8 @@ public class Gui extends JFrame {
 						.addComponent(txtConfigfilename, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 						.addComponent(btnChoose))
 					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(lblWorkDirectory)
+					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblOutputDirectory)
 						.addComponent(txtOutput, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
@@ -275,10 +281,18 @@ public class Gui extends JFrame {
 			@Override
 			public void run() {
 				String classpath = System.getProperty("java.class.path");
+				String[] cpParts = classpath.split(File.pathSeparator);
+				StringBuilder absoluteClasspath = new StringBuilder();
+				for (String cpPart : cpParts) {
+					if (absoluteClasspath.length() > 0) {
+						absoluteClasspath.append(File.pathSeparatorChar);
+					}
+					absoluteClasspath.append(new File(cpPart).getAbsolutePath());
+				}
 				String[] cmdArgs = new String[] {
 						txtJvmlocation.getText(),
 						"-cp",
-						classpath,
+						absoluteClasspath.toString(),
 						"-Xmx" + txtRam.getText() + "m",
 						"org.matsim.run.Controler",
 						txtConfigfilename.getText()
