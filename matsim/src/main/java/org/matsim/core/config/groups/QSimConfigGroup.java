@@ -342,6 +342,9 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 
 
 	public void setNumberOfThreads(final int numberOfThreads) {
+		if ( numberOfThreads < 1 ) {
+			throw new IllegalArgumentException( "Number of threads must be strictly positive, got "+numberOfThreads );
+		}
 		this.numberOfThreads = numberOfThreads;
 	}
 
