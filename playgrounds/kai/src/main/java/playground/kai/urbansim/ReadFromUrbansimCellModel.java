@@ -28,9 +28,9 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -38,10 +38,9 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.kai.urbansim.ids.HHId;
-import playground.kai.urbansim.ids.JobIdFactory;
-import playground.kai.urbansim.ids.LocationId;
-import playground.kai.urbansim.ids.LocationIdFactory;
+import playground.kai.urbansim.ids.HH;
+import playground.kai.urbansim.ids.Job;
+import playground.kai.urbansim.ids.Location;
 
 /**
  * This is meant to read urbansim input from the cell model.  Since in those models the persons don't know where they work,
@@ -80,7 +79,7 @@ public class ReadFromUrbansimCellModel implements ReadFromUrbansim {
 				String[] parts = line.split("[\t]+");
 
 				int idx_id = idxFromKey.get("grid_id:i4") ;
-				Id id = new IdImpl( parts[idx_id] ) ;
+				Id<ActivityFacility> id = Id.create( parts[idx_id] , ActivityFacility.class) ;
 
 				int idx_x = idxFromKey.get("relative_x:i4") ;
 				int idx_y = idxFromKey.get("relative_y:i4") ;
@@ -103,8 +102,8 @@ public class ReadFromUrbansimCellModel implements ReadFromUrbansim {
 	public void readPersons( Population population, ActivityFacilitiesImpl facilities, double fraction) {
 		log.fatal("does not work; see javadoc of class.  Aborting ..." + this) ;
 		System.exit(-1) ;
-		Map<Id,Id> gridcellFromJob = new HashMap<Id,Id>() ;
-		Utils.readKV( gridcellFromJob, "job_id:i4", new JobIdFactory(), "grid_id:i4", new LocationIdFactory(),
+		Map<Id<Job>,Id<Location>> gridcellFromJob = new HashMap<>() ;
+		Utils.readKV( gridcellFromJob, "job_id:i4", Job.class, "grid_id:i4", Location.class,
 				"../opus/opus_matsim/tmp/jobs.tab" ) ;
 		readPersonsFromHouseholds( population, facilities, fraction ) ;
 		PseudoGravityModel gravMod = new PseudoGravityModel( population, facilities, gridcellFromJob ) ;
@@ -137,11 +136,11 @@ public class ReadFromUrbansimCellModel implements ReadFromUrbansim {
 				int nWorkers = Integer.parseInt( parts[idx] ) ;
 
 				idx = idxFromKey.get("household_id:i4") ;
-				HHId hhId = new HHId( parts[idx] ) ;
+				Id<HH> hhId = Id.create( parts[idx], HH.class ) ;
 
 				idx = idxFromKey.get("grid_id:i4") ;
-				LocationId homeGridId = new LocationId( parts[idx] ) ;
-				ActivityFacility homeLocation = facilities.getFacilities().get( homeGridId ) ;
+				Id<Location> homeGridId = Id.create( parts[idx], Location.class ) ;
+				ActivityFacility homeLocation = facilities.getFacilities().get( Id.create(homeGridId, ActivityFacility.class) ) ;
 				if ( homeLocation==null ) {
 					log.warn("no home location; hhId: " + hhId.toString() ) ;
 					line = reader.readLine(); // next line
@@ -151,7 +150,7 @@ public class ReadFromUrbansimCellModel implements ReadFromUrbansim {
 
 				// generate persons only after it's clear that they have a home location:
 				for ( int ii=0 ; ii<nPersons ; ii++ ) {
-					Id personId = new IdImpl( personCnt ) ;
+					Id<Person> personId = Id.create( personCnt, Person.class ) ;
 					PersonImpl person = new PersonImpl( personId ) ;
 					personCnt++ ;
 					if ( personCnt > 10 ) {

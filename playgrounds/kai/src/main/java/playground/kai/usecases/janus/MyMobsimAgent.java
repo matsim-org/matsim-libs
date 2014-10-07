@@ -23,20 +23,20 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.janusproject.kernel.agent.Agent;
 import org.janusproject.kernel.agent.Kernels;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.vehicles.Vehicle;
 
 class MyMobsimAgent implements MobsimDriverAgent {
 	
-	Id currentLinkId ;
+	Id<Link> currentLinkId ;
 	private MobsimVehicle vehicle;
 	private final Network network;
 	private final JanusAgent janusAgent;
@@ -51,18 +51,18 @@ class MyMobsimAgent implements MobsimDriverAgent {
 	}
 	
 	@Override
-	public Id getCurrentLinkId() {
+	public Id<Link> getCurrentLinkId() {
 		return currentLinkId ;
 	}
 
 	@Override
-	public Id getDestinationLinkId() {
+	public Id<Link> getDestinationLinkId() {
 		return null ; // agent does not know where it is heading
 	}
 
 	@Override
-	public Id getId() {
-		return new IdImpl("janusAgent") ;
+	public Id<Person> getId() {
+		return Id.create("janusAgent", Person.class) ;
 	}
 
 	@Override
@@ -108,7 +108,7 @@ class MyMobsimAgent implements MobsimDriverAgent {
 	}
 
 	@Override
-	public void notifyArrivalOnLinkByNonNetworkMode(Id linkId) {
+	public void notifyArrivalOnLinkByNonNetworkMode(Id<Link> linkId) {
 		this.currentLinkId = linkId ;
 	}
 
@@ -123,12 +123,12 @@ class MyMobsimAgent implements MobsimDriverAgent {
 	}
 
 	@Override
-	public Id getPlannedVehicleId() {
-		return new IdImpl("janusVehicle") ;
+	public Id<Vehicle> getPlannedVehicleId() {
+		return Id.create("janusVehicle", Vehicle.class) ;
 	}
 
 	@Override
-	public Id chooseNextLinkId() {
+	public Id<Link> chooseNextLinkId() {
 		// select a random outgoing link as an example.  Would need to be replaced by BDI input.
 		Node node = network.getLinks().get( currentLinkId ).getToNode() ;
 		List<Link> outgoingLinks = new ArrayList<Link>(node.getOutLinks().values() );
@@ -137,7 +137,7 @@ class MyMobsimAgent implements MobsimDriverAgent {
 	}
 
 	@Override
-	public void notifyMoveOverNode(Id newLinkId) {
+	public void notifyMoveOverNode(Id<Link> newLinkId) {
 		this.currentLinkId = newLinkId ;
 		Logger.getLogger(this.getClass()).warn(" just moved over node; currentLinkId: " + this.currentLinkId ) ;
 	}

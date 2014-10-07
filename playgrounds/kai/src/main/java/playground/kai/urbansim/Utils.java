@@ -22,8 +22,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.kai.urbansim.ids.IdFactory;
-
 /**
  * Various standalone utilities that don't need to be inside a specific package
  *
@@ -43,7 +41,7 @@ public class Utils {
 	 * @param valueIdFactory
 	 * @param filename
 	 */
-	public static void readKV( Map<Id,Id> yFromX, String key, IdFactory keyIdFactory, String value, IdFactory valueIdFactory, String filename ) {
+	public static <K, V> void readKV( Map<Id<K>,Id<V>> yFromX, String key, Class<K> keyType, String value, Class<V> valueType, String filename ) {
 		try {
 			log.info( "Starting to read some key-value pairs from " + filename ) ;
 
@@ -57,10 +55,10 @@ public class Utils {
 				String[] parts = line.split("[\t\n]+");
 
 				int idx = idxFromKey.get(value) ;
-				Id valueId = valueIdFactory.createId( parts[idx] ) ;
+				Id<V> valueId = Id.create( parts[idx], valueType ) ;
 
 				idx = idxFromKey.get(key) ;
-				Id keyId = keyIdFactory.createId( parts[idx] ) ;
+				Id<K> keyId = Id.create( parts[idx], keyType ) ;
 
 				yFromX.put(keyId, valueId) ;
 

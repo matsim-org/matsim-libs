@@ -4,11 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -109,22 +109,22 @@ class KNPatnaControler {
 	        PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
 	        Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
 
-	        VehicleType car = VehicleUtils.getFactory().createVehicleType(new IdImpl("car"));
+	        VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car", VehicleType.class));
 	        car.setMaximumVelocity(60.0/3.6);
 	        car.setPcuEquivalents(1.0);
 	        modeVehicleTypes.put("car", car);
 	        
-	        VehicleType bike = VehicleUtils.getFactory().createVehicleType(new IdImpl("bike"));
+	        VehicleType bike = VehicleUtils.getFactory().createVehicleType(Id.create("bike", VehicleType.class));
 	        bike.setMaximumVelocity(60.0/3.6);
 	        bike.setPcuEquivalents(0.25);
 	        modeVehicleTypes.put("bike", bike);
 	        
-	        VehicleType bicycles = VehicleUtils.getFactory().createVehicleType(new IdImpl("bicycle"));
+	        VehicleType bicycles = VehicleUtils.getFactory().createVehicleType(Id.create("bicycle", VehicleType.class));
 	        bicycles.setMaximumVelocity(15.0/3.6);
 	        bicycles.setPcuEquivalents(0.05);
 	        modeVehicleTypes.put("bicycle", bicycles);
 
-	        VehicleType walks = VehicleUtils.getFactory().createVehicleType(new IdImpl("walk"));
+	        VehicleType walks = VehicleUtils.getFactory().createVehicleType(Id.create("walk", VehicleType.class));
 	        walks.setMaximumVelocity(1.5);
 	        walks.setPcuEquivalents(0.10);  			// assumed pcu for walks is 0.1
 	        modeVehicleTypes.put("walk", walks);

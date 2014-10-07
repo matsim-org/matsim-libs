@@ -37,7 +37,8 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-import playground.kai.urbansim.ids.LocationId;
+import playground.kai.urbansim.ids.Job;
+import playground.kai.urbansim.ids.Location;
 
 /**
  * This is meant to generate hwh trips if only home locations and work locations are given, but not their relation (2nd step of
@@ -65,7 +66,7 @@ public class PseudoGravityModel {
 
 	private Population population ;
 	private ActivityFacilitiesImpl facilities ;
-	private Map<Id,Id> locationFromJob ;
+	private Map<Id<Job>,Id<Location>> locationFromJob ;
 
 	private Coord minCoord = new CoordImpl( Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY ) ;
 	private Coord maxCoord = new CoordImpl( Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY ) ;
@@ -108,7 +109,7 @@ public class PseudoGravityModel {
 	}
 
 	// TODO: there should actually a ctor that constructs this w/o coords (i.e. computes them internally)
-	public PseudoGravityModel ( Population population, ActivityFacilitiesImpl facilities, Map<Id,Id> locationFromJob ) {
+	public PseudoGravityModel ( Population population, ActivityFacilitiesImpl facilities, Map<Id<Job>,Id<Location>> locationFromJob ) {
 		this.population = population ;
 		this.facilities = facilities ;
 		this.locationFromJob = locationFromJob ;
@@ -125,9 +126,9 @@ public class PseudoGravityModel {
 			checkMax( homeCoord ) ;
 		}
 		// same for jobs except it's a bit more indirect:
-		for ( Iterator<Id> it = locationFromJob.values().iterator(); it.hasNext(); ) {
-			LocationId gridId = (LocationId) it.next();
-			Coord jobCoord = facilities.getFacilities().get( gridId ).getCoord() ;
+		for ( Iterator<Id<Location>> it = locationFromJob.values().iterator(); it.hasNext(); ) {
+			Id<Location> gridId = it.next();
+			Coord jobCoord = facilities.getFacilities().get( Id.create(gridId, ActivityFacility.class) ).getCoord() ;
 			checkMax(jobCoord) ;
 		}
 
@@ -140,9 +141,9 @@ public class PseudoGravityModel {
 		}
 
 		// for every job, add it to the pseudoCell
-		for ( Iterator<Id> it = locationFromJob.values().iterator(); it.hasNext(); ) {
-			LocationId parcelId = (LocationId) it.next();
-			ActivityFacility parcel = facilities.getFacilities().get( parcelId ) ;
+		for ( Iterator<Id<Location>> it = locationFromJob.values().iterator(); it.hasNext(); ) {
+			Id<Location> parcelId = it.next();
+			ActivityFacility parcel = facilities.getFacilities().get( Id.create(parcelId, ActivityFacility.class) ) ;
 			Coord cc = parcel.getCoord() ;
 			int bin = binFromXY( cc.getX() , cc.getY() ) ;
 			PseudoCell pc = pseudoCells.get(bin) ;

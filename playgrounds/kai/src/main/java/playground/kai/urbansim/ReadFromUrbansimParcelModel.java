@@ -21,7 +21,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -35,7 +34,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.kai.urbansim.ids.ZoneId;
+import playground.kai.urbansim.ids.Zone;
 
 /**
  * @author nagel
@@ -58,7 +57,7 @@ public class ReadFromUrbansimParcelModel {
 		log.info( "Starting to read urbansim parcels from " + filename ) ;
 
 		// temporary data structure in order to get coordinates for zones:
-		Map<Id,Id> zoneFromParcel = new HashMap<Id,Id>() ;
+		Map<Id<ActivityFacility>,Id<Zone>> zoneFromParcel = new HashMap<>() ;
 
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader( filename ) ;
@@ -71,7 +70,7 @@ public class ReadFromUrbansimParcelModel {
 
 				// Urbansim sometimes writes IDs as floats!
 				long parcelIdAsLong = (long) Double.parseDouble( parts[idxFromKey.get("parcel_id")] ) ;
-				Id parcelId = new IdImpl( parcelIdAsLong ) ;
+				Id<ActivityFacility> parcelId = Id.create( parcelIdAsLong, ActivityFacility.class ) ;
 
 				Coord coord = new CoordImpl( parts[idxFromKey.get("x_coord_sp")],parts[idxFromKey.get("y_coord_sp")] ) ;
 
@@ -80,7 +79,7 @@ public class ReadFromUrbansimParcelModel {
 
 				// Can't add info (in this case zone ID) to facilities, so put into separate data structure:
 				long zoneIdAsLong = (long) Double.parseDouble( parts[idxFromKey.get("zone_id")] ) ;
-				ZoneId zoneId = new ZoneId( zoneIdAsLong ) ;
+				Id<Zone> zoneId = Id.create( zoneIdAsLong , Zone.class) ;
 				zoneFromParcel.put( parcelId, zoneId ) ;
 			}
 		} catch (FileNotFoundException e) {
@@ -102,13 +101,13 @@ public class ReadFromUrbansimParcelModel {
 		long cnt = 0 ;
 	}
 
-	public void constructZones ( final ActivityFacilitiesImpl parcels, final ActivityFacilitiesImpl zones, final Map<Id,Id> zoneFromParcel ) {
+	public void constructZones ( final ActivityFacilitiesImpl parcels, final ActivityFacilitiesImpl zones, final Map<Id<ActivityFacility>,Id<Zone>> zoneFromParcel ) {
 
 		// summing the coordinates of all participating parcels into the zones
-		Map<Id,PseudoZone> pseudoZones = new HashMap<Id,PseudoZone>() ;
-		for ( Entry<Id,Id> entry : zoneFromParcel.entrySet() ) {
-			Id       parcelId =            entry.getKey();
-			ZoneId   zoneId   = (ZoneId)   entry.getValue() ;
+		Map<Id<Zone>,PseudoZone> pseudoZones = new HashMap<>() ;
+		for ( Entry<Id<ActivityFacility>,Id<Zone>> entry : zoneFromParcel.entrySet() ) {
+			Id<ActivityFacility>       parcelId =            entry.getKey();
+			Id<Zone>   zoneId   =            entry.getValue() ;
 
 			ActivityFacility parcel = parcels.getFacilities().get(parcelId) ;
 			assert( parcel!= null ) ;
@@ -125,11 +124,11 @@ public class ReadFromUrbansimParcelModel {
 		}
 
 		// constructing the zones from the pseudozones:
-		for ( Entry<Id,PseudoZone> entry : pseudoZones.entrySet() ) {
-			Id zoneId = entry.getKey();
+		for ( Entry<Id<Zone>,PseudoZone> entry : pseudoZones.entrySet() ) {
+			Id<Zone> zoneId = entry.getKey();
 			PseudoZone pz = entry.getValue() ;
 			Coord coord = new CoordImpl( pz.sumx/pz.cnt , pz.sumy/pz.cnt ) ;
-			zones.createAndAddFacility(zoneId, coord) ;
+			zones.createAndAddFacility(Id.create(zoneId, ActivityFacility.class), coord) ;
 		}
 
 	}
@@ -159,7 +158,7 @@ public class ReadFromUrbansimParcelModel {
 				NUrbansimPersons++ ;
 				String[] parts = line.split("[\t\n]+");
 
-				Id personId = new IdImpl( parts[idxFromKey.get("person_id")] ) ;
+				Id<Person> personId = Id.create( parts[idxFromKey.get("person_id")], Person.class ) ;
 				PersonImpl newPerson = new PersonImpl( personId ) ;
 
 				if ( !( flag || MatsimRandom.getRandom().nextDouble() < samplingRate || (oldPop.getPersons().get( personId))!=null ) ) {
@@ -167,7 +166,7 @@ public class ReadFromUrbansimParcelModel {
 				}
 				flag = false ;
 
-				Id homeParcelId = new IdImpl( parts[idxFromKey.get("parcel_id_home")] ) ;
+				Id<ActivityFacility> homeParcelId = Id.create( parts[idxFromKey.get("parcel_id_home")], ActivityFacility.class ) ;
 				ActivityFacility homeLocation = facilities.getFacilities().get( homeParcelId ) ;
 				if ( homeLocation==null ) {
 					log.warn( "homeLocation==null; personId: " + personId + " parcelId: " + homeParcelId + ' ' + this ) ;
@@ -187,7 +186,7 @@ public class ReadFromUrbansimParcelModel {
 					newPerson.setEmployed(Boolean.FALSE);
 				} else {
 					newPerson.setEmployed(Boolean.TRUE);
-					Id workParcelId = new IdImpl( parts[idx] ) ;
+					Id<ActivityFacility> workParcelId = Id.create( parts[idx], ActivityFacility.class ) ;
 					ActivityFacility jobLocation = facilities.getFacilities().get( workParcelId ) ;
 					if ( jobLocation == null ) {
 						if ( jobLocationIdNullCnt < 1 ) {

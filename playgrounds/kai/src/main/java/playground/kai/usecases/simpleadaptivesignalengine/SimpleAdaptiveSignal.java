@@ -20,12 +20,20 @@
 
 package playground.kai.usecases.simpleadaptivesignalengine;
 
+import java.io.IOException;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
@@ -33,13 +41,6 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.signalsystems.mobsim.SignalizeableItem;
 import org.matsim.signalsystems.model.SignalGroupState;
-
-import java.io.IOException;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
 
 /**
  * @author nagel
@@ -70,8 +71,8 @@ class SimpleAdaptiveSignal implements MobsimBeforeSimStepListener, LinkEnterEven
 		Netsim mobsim = (Netsim) e.getQueueSimulation() ;
 		double now = mobsim.getSimTimer().getTimeOfDay() ;
 
-		SignalizeableItem link4 = (SignalizeableItem) mobsim.getNetsimNetwork().getNetsimLink(new IdImpl("4")) ;
-		SignalizeableItem link5 = (SignalizeableItem) mobsim.getNetsimNetwork().getNetsimLink(new IdImpl("5")) ;
+		SignalizeableItem link4 = (SignalizeableItem) mobsim.getNetsimNetwork().getNetsimLink(Id.create("4", Link.class)) ;
+		SignalizeableItem link5 = (SignalizeableItem) mobsim.getNetsimNetwork().getNetsimLink(Id.create("5", Link.class)) ;
 		final Double dpTime = this.vehicleExitTimesOnLink5.peek();
 		if ( dpTime !=null && dpTime < now && (long)now%4 < 4  ) {
 			link4.setSignalStateAllTurningMoves(SignalGroupState.RED) ;
@@ -90,19 +91,19 @@ class SimpleAdaptiveSignal implements MobsimBeforeSimStepListener, LinkEnterEven
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if ( event.getLinkId().equals(new IdImpl("5")) ) {
+		if ( event.getLinkId().equals(Id.create("5", Link.class)) ) {
 			this.vehicleExitTimesOnLink5.add( event.getTime() + 100. ) ;
 			// yy replace "100" by freeSpeedTravelTime
 			// jedes Fahrzeug, welches die Kante betritt, erhöht den Zähler um 1:
 			cnt5++ ;
 		} 
-		if ( event.getLinkId().equals(new IdImpl("4")) ) {
+		if ( event.getLinkId().equals(Id.create("4", Link.class)) ) {
 			cnt4++ ;
 		}
 	}
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if ( event.getLinkId().equals(new IdImpl("5")) ) {
+		if ( event.getLinkId().equals(Id.create("5", Link.class)) ) {
 			// jedes Fahrzeug, welches die Kante verlässg, erniedrigt den Zähler um 1:
 			this.vehicleExitTimesOnLink5.remove() ;
 		}
