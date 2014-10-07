@@ -7,7 +7,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -180,10 +179,10 @@ public class ExpTransRouteUtils {
 			
 		ScenarioImpl scenario = new DataLoader ().loadScenario(configFile);
 		TransitSchedule trSchedule = scenario.getTransitSchedule();
-		TransitLine line = trSchedule.getTransitLines().get(new IdImpl(strTrLine));
-		TransitRoute route = line.getRoutes().get(new IdImpl(strTrRoute));
-		TransitStopFacility accessFacility = trSchedule.getFacilities().get(new IdImpl(strAccessFacility));
-		TransitStopFacility egressFacility = trSchedule.getFacilities().get(new IdImpl(strEgressFacility));
+		TransitLine line = trSchedule.getTransitLines().get(Id.create(strTrLine, TransitLine.class));
+		TransitRoute route = line.getRoutes().get(Id.create(strTrRoute, TransitRoute.class));
+		TransitStopFacility accessFacility = trSchedule.getFacilities().get(Id.create(strAccessFacility, TransitStopFacility.class));
+		TransitStopFacility egressFacility = trSchedule.getFacilities().get(Id.create(strEgressFacility, TransitStopFacility.class));
 		ExperimentalTransitRoute expTrRoute = new ExperimentalTransitRoute(accessFacility, line, route, egressFacility);
 		
 		ExpTransRouteUtils ptRouteUtill = new ExpTransRouteUtils(scenario.getNetwork(), trSchedule, expTrRoute);

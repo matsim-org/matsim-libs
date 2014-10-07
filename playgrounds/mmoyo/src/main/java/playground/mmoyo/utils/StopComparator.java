@@ -1,13 +1,10 @@
 package playground.mmoyo.utils;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
-import playground.mmoyo.utils.DataLoader;
 
 /**
  * Compare counts transit stop coordinates versus schedule stops coordinates 
@@ -28,7 +25,7 @@ public class StopComparator {
 	final String noStop = "stop from counts is not in transit schedule: ";
 	private void run(){
 		for(Count count : counts.getCounts().values()){
-			Id pseudoStopId = new IdImpl(count.getLocId().toString() + pref);
+			Id<TransitStopFacility> pseudoStopId = Id.create(count.getLocId().toString() + pref, TransitStopFacility.class);
 			TransitStopFacility stop = schedule.getFacilities().get(pseudoStopId);
 			
 			if(stop !=null){

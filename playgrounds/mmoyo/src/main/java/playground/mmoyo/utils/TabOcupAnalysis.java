@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.mmoyo.analysis.counts.reader.CountsReader;
 
@@ -51,8 +51,8 @@ public class TabOcupAnalysis {
 			final String TAB = "\t";
 			final String CRL = "\n";
 			
-			Id stopId_1 = new IdImpl(strStop1);
-			Id stopId_2 = new IdImpl(strStop2);
+			Id<TransitStopFacility> stopId_1 = Id.create(strStop1, TransitStopFacility.class);
+			Id<TransitStopFacility> stopId_2 = Id.create(strStop2, TransitStopFacility.class);
 			
 			StringBuffer sBuff1 = new StringBuffer(strStop1 + CRL + "Combination" + TAB);
 			StringBuffer sBuff2 = new StringBuffer(strStop2 + CRL + "Combination" + TAB);

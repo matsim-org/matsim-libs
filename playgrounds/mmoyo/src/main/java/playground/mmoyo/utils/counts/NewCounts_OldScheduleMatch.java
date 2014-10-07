@@ -26,11 +26,11 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.mmoyo.utils.DataLoader;
 
@@ -51,7 +51,7 @@ public class NewCounts_OldScheduleMatch {
 			e.printStackTrace();
 		}
 		//create a map of tabCounts
-		TreeMap<Id, List<TabularCountRecord>> line_CountRecordMap = new TreeMap <Id, List<TabularCountRecord>>();
+		TreeMap<Id<TransitLine>, List<TabularCountRecord>> line_CountRecordMap = new TreeMap <>();
 		for (TabularCountRecord countRecord : tabCount_reader.getCountRecordMap().values()){
 			if (!line_CountRecordMap.keySet().contains(countRecord.getLineId())){
 				List<TabularCountRecord> countRecList = new ArrayList<TabularCountRecord>();
@@ -71,10 +71,10 @@ public class NewCounts_OldScheduleMatch {
 		String point = ".";
 		Map <String, String> linesMap = new TreeMap <String, String>();
 		for(TransitLine line :schedule.getTransitLines().values()){
-			Id lineId = line.getId();
+			Id<TransitLine> lineId = line.getId();
 			String newStopId = linesMap.get(lineId.toString()); 
 			if (newStopId !=null){
-				Id idnewStopId = new IdImpl(newStopId); 
+				Id<TransitStopFacility> idnewStopId = Id.create(newStopId, TransitStopFacility.class); 
 				List<TabularCountRecord> countList= line_CountRecordMap.get(idnewStopId);
 
 				for (TransitRoute route: line.getRoutes().values()){

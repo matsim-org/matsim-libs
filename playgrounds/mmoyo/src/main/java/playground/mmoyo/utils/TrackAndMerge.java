@@ -10,7 +10,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 //import org.matsim.pt.transitSchedule.api.TransitRoute;
 //import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -34,9 +33,9 @@ public class TrackAndMerge {
 		//Network net = dataLoader.readNetwork(networkFile);
 		
 		//track passengers
-		List<Id> transitLineIdList = new ArrayList<Id>();
+		List<Id<TransitLine>> transitLineIdList = new ArrayList<>();
 		transitLineIdList.add(line.getId());
-		List<Id> travelPersonList = new PassengerTracker2(transitLineIdList, /*net,*/ schedule).getTrackedPassengers(popArray);
+		List<Id<Person>> travelPersonList = new PassengerTracker2(transitLineIdList, /*net,*/ schedule).getTrackedPassengers(popArray);
 		
 		//create new Population extracting the agents from the pop array
 		Scenario scn = dataLoader.createScenario();
@@ -44,7 +43,7 @@ public class TrackAndMerge {
 		scn= null;
 
 		//merge supposing that all agents are in all plans
-		for (Id id : travelPersonList){
+		for (Id<Person> id : travelPersonList){
 			Person newPerson = popArray[0].getPersons().get(id);   //take the pop[0] as base
 			for (int i=1; i <popArray.length;i++){      //start from 1 because the 0 was taken as base
 				newPerson.addPlan(popArray[i].getPersons().get(id).getSelectedPlan());
@@ -87,7 +86,7 @@ public class TrackAndMerge {
 		//load data
 		DataLoader dataLoader = new DataLoader();
 		TransitSchedule schedule = dataLoader.readTransitSchedule(trScheduleFile);
-		TransitLine line = schedule.getTransitLines().get(new IdImpl(strLine));		
+		TransitLine line = schedule.getTransitLines().get(Id.create(strLine, TransitLine.class));		
 		
 		//execute
 		Population pop =  new TrackAndMerge().run(popFilesArray, schedule, netFilePath, line);

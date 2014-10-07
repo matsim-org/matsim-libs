@@ -3,7 +3,6 @@ package playground.mmoyo.algorithms;
 import java.io.File;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -13,6 +12,7 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.PlanMutateTimeAllocation;
+
 import playground.mmoyo.utils.DataLoader;
 import playground.mmoyo.utils.FirstPersonsExtractor;
 
@@ -24,7 +24,7 @@ public class ClonMutator {
 	
 	public void mutateClons (Population pop, int mutRange){
 		ClonDetector clonDetector = new ClonDetector(x);
-		List<Id> clons = clonDetector.run(pop);
+		List<Id<Person>> clons = clonDetector.run(pop);
 		
 		//create mutators with diff seeds
 		PlanAlgorithm[] mutatorArray = new PlanAlgorithm[max];
@@ -34,7 +34,7 @@ public class ClonMutator {
 		}
 		
 		//mutate clones according to diff mutation seed
-		for (Id clonId : clons){
+		for (Id<Person> clonId : clons){
 			Person clon = pop.getPersons().get(clonId);
 			int clonIndex= clonDetector.getClonIndex(clon.getId().toString());
 			for (Plan plan : clon.getPlans()){  

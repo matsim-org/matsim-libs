@@ -13,7 +13,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -149,7 +148,7 @@ public class PlansComparator4PtRoute {
 		final String tab = "\t";
 		final String strIdAgent= "M";
 		final String strPlan = "plan";
-		final Id idAgent= new IdImpl(strIdAgent);
+		final Id<Person> idAgent= Id.create(strIdAgent, Person.class);
 		Person person = pop.getPersons().get(idAgent);
 		for (int i=0; i< person.getPlans().size(); i++){
 			Plan plan_i=   person.getPlans().get(i);

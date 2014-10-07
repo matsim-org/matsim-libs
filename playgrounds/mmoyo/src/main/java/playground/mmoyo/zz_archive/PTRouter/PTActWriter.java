@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -98,7 +97,7 @@ public class PTActWriter {
 	public void simplifyPtLegs(){
 
 		for (Person person: population.getPersons().values()) {
-			//if (true){ Person person = population.getPersons().get(new IdImpl("3937204"));
+			//if (true){ Person person = population.getPersons().get(Id.create("3937204"));
 			System.out.println(person.getId());
 			this.transitLegsRemover.run(person.getPlans().get(0));
 		}
@@ -116,7 +115,7 @@ public class PTActWriter {
 
 		for (Person person: this.population.getPersons().values()) {
 		//if (true){
-			//PersonImpl person = population.getPersons().get(new IdImpl("2180188"));   //2180188
+			//PersonImpl person = population.getPersons().get(Id.create("2180188"));   //2180188
 
 			Plan plan = person.getPlans().get(0);
 	 		ActivityImpl act1 = (ActivityImpl)plan.getPlanElements().get(0);
@@ -149,7 +148,7 @@ public class PTActWriter {
 
 		for (Person person: this.population.getPersons().values()) {
 			//if ( true ) {
-			//PersonImpl person = population.getPersons().get(new IdImpl("905449")); // 5228308   5636428  2949483
+			//PersonImpl person = population.getPersons().get(Id.create("905449")); // 5228308   5636428  2949483
  			System.out.println(numPlans + " id:" + person.getId());
 			Plan plan = person.getPlans().get(0);
 
@@ -414,18 +413,18 @@ public class PTActWriter {
 	}
 
 	private void createWlinks(final Coord coord1, final Path path, final Coord coord2){
-		originNode= createWalkingNode(new IdImpl("W1"), coord1);
-		destinationNode= createWalkingNode(new IdImpl("W2"), coord2);
+		originNode= createWalkingNode(Id.create("W1", Node.class), coord1);
+		destinationNode= createWalkingNode(Id.create("W2", Node.class), coord2);
 		path.nodes.add(0, originNode);
 		path.nodes.add(destinationNode);
-		accessLink = logicNet.createAndAddLink( new IdImpl(PTValues.ACCESS_STR), originNode, path.nodes.get(1), CoordUtils.calcDistance(originNode.getCoord(), path.nodes.get(1).getCoord()), 3600, 1, 1, "0", PTValues.ACCESS_STR);
-		egressLink = logicNet.createAndAddLink( new IdImpl(PTValues.EGRESS_STR), path.nodes.get(path.nodes.size()-2), destinationNode, CoordUtils.calcDistance(path.nodes.get(path.nodes.size()-2).getCoord(), destinationNode.getCoord()), 3600, 1, 1, "0", PTValues.EGRESS_STR);
+		accessLink = logicNet.createAndAddLink( Id.create(PTValues.ACCESS_STR, Link.class), originNode, path.nodes.get(1), CoordUtils.calcDistance(originNode.getCoord(), path.nodes.get(1).getCoord()), 3600, 1, 1, "0", PTValues.ACCESS_STR);
+		egressLink = logicNet.createAndAddLink( Id.create(PTValues.EGRESS_STR, Link.class), path.nodes.get(path.nodes.size()-2), destinationNode, CoordUtils.calcDistance(path.nodes.get(path.nodes.size()-2).getCoord(), destinationNode.getCoord()), 3600, 1, 1, "0", PTValues.EGRESS_STR);
 	}
 
 	/**
 	 * Creates a temporary origin or destination node
 	 * avoids the method net.createNode because it is not necessary to rebuild the Quadtree*/
-	public NodeImpl createWalkingNode(final Id id, final Coord coord){
+	public NodeImpl createWalkingNode(final Id<Node> id, final Coord coord){
 		NodeImpl node = new Station(id, coord);
 		logicNet.getNodes().put(id, node);
 		return node;
@@ -433,7 +432,7 @@ public class PTActWriter {
 
 	/*
 	public LinkImpl createPTLink999(final String strIdLink, final Node fromNode, final Node toNode, final String type){
-		return logicNet.createAndAddLink( new IdImpl(strIdLink), (NodeImpl) fromNode, (NodeImpl) toNode, CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()), 3600, 1, 1, "0", type);
+		return logicNet.createAndAddLink( Id.create(strIdLink), (NodeImpl) fromNode, (NodeImpl) toNode, CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()), 3600, 1, 1, "0", type);
 	}
 	*/
 

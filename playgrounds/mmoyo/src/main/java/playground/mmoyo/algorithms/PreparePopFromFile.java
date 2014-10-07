@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -13,7 +14,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -105,23 +105,23 @@ public class PreparePopFromFile implements PersonAlgorithm{
 		
 		//create nodeLst
 		List<Node> nodeList = new ArrayList<Node>();
-		nodeList.add(ptNet.getNodes().get(new IdImpl("812020")));
-		nodeList.add(ptNet.getNodes().get(new IdImpl("812550")));
-		nodeList.add(ptNet.getNodes().get(new IdImpl("812030")));
-		nodeList.add(ptNet.getNodes().get(new IdImpl("812560")));
-		nodeList.add(ptNet.getNodes().get(new IdImpl("812570")));
-		nodeList.add(ptNet.getNodes().get(new IdImpl("812013")));
-		nodeList.add(ptNet.getNodes().get(new IdImpl("806520")));
-		nodeList.add(ptNet.getNodes().get(new IdImpl("806030")));
-		nodeList.add(ptNet.getNodes().get(new IdImpl("806010")));
-		nodeList.add(ptNet.getNodes().get(new IdImpl("806540")));
-		nodeList.add(ptNet.getNodes().get(new IdImpl("804070")));
-		nodeList.add(ptNet.getNodes().get(new IdImpl("804060")));
-		nodeList.add(ptNet.getNodes().get(new IdImpl("801020")));
-		nodeList.add(ptNet.getNodes().get(new IdImpl("801030")));
-		nodeList.add(ptNet.getNodes().get(new IdImpl("801530")));
-		nodeList.add(ptNet.getNodes().get(new IdImpl("801040")));
-		nodeList.add(ptNet.getNodes().get(new IdImpl("792050")));
+		nodeList.add(ptNet.getNodes().get(Id.create("812020", Node.class)));
+		nodeList.add(ptNet.getNodes().get(Id.create("812550", Node.class)));
+		nodeList.add(ptNet.getNodes().get(Id.create("812030", Node.class)));
+		nodeList.add(ptNet.getNodes().get(Id.create("812560", Node.class)));
+		nodeList.add(ptNet.getNodes().get(Id.create("812570", Node.class)));
+		nodeList.add(ptNet.getNodes().get(Id.create("812013", Node.class)));
+		nodeList.add(ptNet.getNodes().get(Id.create("806520", Node.class)));
+		nodeList.add(ptNet.getNodes().get(Id.create("806030", Node.class)));
+		nodeList.add(ptNet.getNodes().get(Id.create("806010", Node.class)));
+		nodeList.add(ptNet.getNodes().get(Id.create("806540", Node.class)));
+		nodeList.add(ptNet.getNodes().get(Id.create("804070", Node.class)));
+		nodeList.add(ptNet.getNodes().get(Id.create("804060", Node.class)));
+		nodeList.add(ptNet.getNodes().get(Id.create("801020", Node.class)));
+		nodeList.add(ptNet.getNodes().get(Id.create("801030", Node.class)));
+		nodeList.add(ptNet.getNodes().get(Id.create("801530", Node.class)));
+		nodeList.add(ptNet.getNodes().get(Id.create("801040", Node.class)));
+		nodeList.add(ptNet.getNodes().get(Id.create("792050", Node.class)));
 		
 		//create empty pop
 		Population newPop = dataLoader.createScenario().getPopulation();

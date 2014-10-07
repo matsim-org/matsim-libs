@@ -25,7 +25,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
@@ -57,7 +57,7 @@ public class UtilCorrectonReader implements TabularFileHandler {
 		@Override
 		public void startRow(String[] row) {
 			if (rowNum>0) {
-				Id agentId = new IdImpl(row[0]);
+				Id<Person> agentId = Id.create(row[0], Person.class);
 				
 				double correcArray[] = new double[5]; //it is the selected plan and 4 corrections
 				correcArray[0]= Double.parseDouble(row[1]);

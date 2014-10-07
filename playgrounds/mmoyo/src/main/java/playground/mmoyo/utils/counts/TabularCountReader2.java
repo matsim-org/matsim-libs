@@ -5,7 +5,7 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
@@ -43,7 +43,7 @@ public class TabularCountReader2 implements TabularFileHandler {
 		if (!this.isFirstLine) {
 			//For each station of tabular file
 			String strStop =row[0];
-			Id stopId =  new IdImpl(strStop);
+			Id<Link> stopId =  Id.create(strStop, Link.class);
 			String  str_cs_id= row[1];
 			counts.createAndAddCount(stopId, str_cs_id);
 			Count count = counts.getCount(stopId);

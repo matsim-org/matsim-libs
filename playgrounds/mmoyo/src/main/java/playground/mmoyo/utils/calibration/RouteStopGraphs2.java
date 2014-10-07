@@ -15,7 +15,8 @@ import java.util.zip.ZipFile;
 import javax.imageio.ImageIO;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -66,7 +67,7 @@ public class RouteStopGraphs2 {
 			addBufferedImage(graphics, fileName, 400*(i));
 
 			//set csId and coord below
-	    	Count count = this.counts.getCounts().get(new IdImpl(strStopId));
+	    	Count count = this.counts.getCounts().get(Id.create(strStopId, Link.class));
 	    	String cdId= count.getCsId();
 	    	Coord coord = count.getCoord();
 	    	Graphics infoGraphImg = bufferedImage.getGraphics();

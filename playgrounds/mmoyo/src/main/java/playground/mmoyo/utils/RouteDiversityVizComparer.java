@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.otfvis.OTFVis;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.population.PopulationUtils;
@@ -62,7 +61,7 @@ public class RouteDiversityVizComparer {
 		// look for the desired person in the array of populations
 		DataLoader dataLoader = new DataLoader();
 		 
-		Id idPerson = new IdImpl(strIdPerson);
+		Id<Person> idPerson = Id.create(strIdPerson, Person.class);
 		PopulationSecFilter populationSecFilter = new PopulationSecFilter();
 		populationSecFilter.getStrIdList().add(idPerson);
 		ScenarioImpl scn = (ScenarioImpl) dataLoader.createScenario();

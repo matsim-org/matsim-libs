@@ -19,26 +19,27 @@
 
 package playground.mmoyo.taste_variations;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.TreeMap;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+
 import playground.mmoyo.analysis.tools.PtPlanAnalyzer;
 import playground.mmoyo.analysis.tools.PtPlanAnalyzer.PtPlanAnalysisValues;
 import playground.mmoyo.io.TextFileWriter;
 import playground.mmoyo.utils.DataLoader;
 import playground.mmoyo.utils.calibration.StopNumberPerPassenger;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.TreeMap;
 
 //import java.util.Map.Entry;
 
@@ -247,7 +248,7 @@ public class ChoiceProba {
 		MatsimNetworkReader matsimNetReader = new MatsimNetworkReader(scn);
 		matsimNetReader.readFile(netFile);
 		TransitSchedule schedule = dataLoader.readTransitSchedule(scheduleFile) ;
-		TransitLine line = schedule.getTransitLines().get(new IdImpl(strLineId));
+		TransitLine line = schedule.getTransitLines().get(Id.create(strLineId, TransitLine.class));
 		
 		//invoke the calculation of probabilities
 		ChoiceProba choiceProba = new ChoiceProba(scn.getNetwork(), schedule, line);

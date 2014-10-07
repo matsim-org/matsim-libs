@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
@@ -49,15 +48,15 @@ public class MultimodalScnCreator {
 		
 		//add MIVS nodes and links
 		for (Node node : this.mivNet.getNodes().values()){
-			Id newId = new IdImpl(MIV + node.getId());
+			Id<Node> newId = Id.create(MIV + node.getId(), Node.class);
 			multiModalNet.createAndAddNode(newId, node.getCoord());
 		}
 		
 		for (Link l : this.mivNet.getLinks().values()){
-			Id newId = new IdImpl(MIV + l.getId());
-			Id fromNodeId = new IdImpl(MIV + l.getFromNode().getId()); 
+			Id<Link> newId = Id.create(MIV + l.getId(), Link.class);
+			Id<Node> fromNodeId = Id.create(MIV + l.getFromNode().getId(), Node.class); 
 			Node fromNode = multiModalNet.getNodes().get(fromNodeId); 
-			Id toNodeId = new IdImpl(MIV + l.getToNode().getId()); 
+			Id<Node> toNodeId = Id.create(MIV + l.getToNode().getId(), Node.class); 
 			Node toNode = multiModalNet.getNodes().get(toNodeId);
 			multiModalNet.createAndAddLink(newId, fromNode, toNode, l.getLength(), l.getFreespeed(), l.getCapacity(), l.getNumberOfLanes(), ((LinkImpl)l).getOrigId(), ((LinkImpl)l).getType());
 			LinkImpl newLink = (LinkImpl) multiModalNet.getLinks().get(newId);

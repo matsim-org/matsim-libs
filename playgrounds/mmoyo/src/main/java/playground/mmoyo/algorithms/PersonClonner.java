@@ -12,8 +12,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -23,7 +21,7 @@ import playground.mmoyo.utils.DataLoader;
 
 public class PersonClonner{
 
-	public Person run (final Person person, final Id newId){
+	public Person run (final Person person, final Id<Person> newId){
 		PersonImpl newPerson = new PersonImpl(newId);
 		PersonImpl personImpl = (PersonImpl)person; //to avoid many castings
 		newPerson.setAge(personImpl.getAge());
@@ -57,7 +55,7 @@ public class PersonClonner{
 					
 					newLeg.setRoute(leg.getRoute());			     			
 					if (leg.getRoute() != null){
-							newLeg.setRoute(((Route) leg.getRoute()).clone());
+							newLeg.setRoute(leg.getRoute().clone());
 					}
 					
 					newPlan.getPlanElements().add(newLeg);
@@ -82,7 +80,7 @@ public class PersonClonner{
 		PersonClonner personClonner = new PersonClonner();
 		List<Person> clonsList = new ArrayList<Person>();
 		for (Person person: pop.getPersons().values()){
-			Id clonId = new IdImpl(person.getId() + suf); 
+			Id<Person> clonId = Id.create(person.getId() + suf, Person.class); 
 			Person newPerson = personClonner.run(person, clonId);
 			clonsList.add(newPerson);
 		}

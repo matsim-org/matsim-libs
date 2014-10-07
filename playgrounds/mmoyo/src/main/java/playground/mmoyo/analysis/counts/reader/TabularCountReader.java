@@ -23,7 +23,7 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
@@ -31,6 +31,7 @@ import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.mmoyo.utils.DataLoader;
 
@@ -80,10 +81,10 @@ public class TabularCountReader implements TabularFileHandler {
 			this.isFirstLine = false;
 		}else{
 			//for each station
-			Id id =  new IdImpl(row[0]);
+			Id<Link> id =  Id.create(row[0], Link.class);
 			counts.createAndAddCount(id, row[1]); //id of station  with index 0     ,   //name of station with index 1
 			Count count = counts.getCount(id);
-			count.setCoord(this.transitSchedule.getFacilities().get(new IdImpl(row[0])).getCoord());  // look up the coordinate of the stop facility and set it to the count
+			count.setCoord(this.transitSchedule.getFacilities().get(Id.create(row[0], TransitStopFacility.class)).getCoord());  // look up the coordinate of the stop facility and set it to the count
 
 			int col= 0;
 			for (String s : row) {

@@ -24,11 +24,11 @@ import java.util.Collection;
 import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -92,11 +92,11 @@ public class AgentInPtRouteZoneFind extends AbstractPersonFilter {
 		matsimNetReader.readFile(netFilePath);  
 		
 		List<Node> nodeList = new ArrayList<Node>();
-		nodeList.add(scn.getNetwork().getNodes().get(new IdImpl("10000000")));
-		nodeList.add(scn.getNetwork().getNodes().get(new IdImpl("10000001")));
-		nodeList.add(scn.getNetwork().getNodes().get(new IdImpl("8400060")));
-		nodeList.add(scn.getNetwork().getNodes().get(new IdImpl("8338")));
-		nodeList.add(scn.getNetwork().getNodes().get(new IdImpl("7782")));
+		nodeList.add(scn.getNetwork().getNodes().get(Id.create("10000000", Node.class)));
+		nodeList.add(scn.getNetwork().getNodes().get(Id.create("10000001", Node.class)));
+		nodeList.add(scn.getNetwork().getNodes().get(Id.create("8400060", Node.class)));
+		nodeList.add(scn.getNetwork().getNodes().get(Id.create("8338", Node.class)));
+		nodeList.add(scn.getNetwork().getNodes().get(Id.create("7782", Node.class)));
 		
 		//AgentInPtRouteZoneFind agentInPtRouteZoneFind = new AgentInPtRouteZoneFind(nodeList, private );
 		//PopSecReader popSecReader = new PopSecReader (scn, agentInPtRouteZoneFind);

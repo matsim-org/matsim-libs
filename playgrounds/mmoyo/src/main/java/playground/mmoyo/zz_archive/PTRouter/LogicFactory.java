@@ -7,7 +7,6 @@ import java.util.Collection;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
@@ -63,7 +62,7 @@ public class LogicFactory{
 					//Creates nodes
 					Node plainNode= createPlainNode(transitStopFacility);
 
-					Station logicStation= new Station (new IdImpl(newStopId++), transitStopFacility.getCoord());
+					Station logicStation= new Station (Id.create(newStopId++, Node.class), transitStopFacility.getCoord());
 					logicStation.setTransitRoute(transitRoute);
 					logicStation.setTransitLine(transitLine);
 					logicStation.setTransitRouteStop(transitRouteStop);
@@ -74,7 +73,7 @@ public class LogicFactory{
 					//Creates links
 					if (transitStopIndex>0){
 						Link plainLink= createPlainLink(lastPlainNode, plainNode);
-						PTLink logicLink = new PTLink(new IdImpl(newLinkId++), lastLogicNode, logicStation, logicNet, PTValues.STANDARD_STR);
+						PTLink logicLink = new PTLink(Id.create(newLinkId++, Link.class), lastLogicNode, logicStation, logicNet, PTValues.STANDARD_STR);
 						logicLink.setTravelTime(transitRouteStop.getDepartureOffset() -lastDepartureOffset);
 						logicLink.setPlainLink(plainLink);
 						logicLink.setTransitLine(transitLine);
@@ -116,10 +115,10 @@ public class LogicFactory{
 				if (fromNode.getTransitLine() != toNode.getTransitLine()) {
 					if (!fromNode.isFirstStation() && !toNode.isLastStation()) {
 						if (fromNode.getTransitRouteStop().getStopFacility() != toNode.getTransitRouteStop().getStopFacility()) {
-							new PTLink(new IdImpl(DETTRANS_PREFIX + ++newDetTransfLinkId),centerNode, nearNode, logicNet, PTValues.DETTRANSFER_STR);
+							new PTLink(Id.create(DETTRANS_PREFIX + ++newDetTransfLinkId, Link.class),centerNode, nearNode, logicNet, PTValues.DETTRANSFER_STR);
 							detTransfers++;
 						}else{
-							new PTLink(new IdImpl(TRANS_PREFIX + ++newTransfLinkId), centerNode, nearNode, logicNet, PTValues.TRANSFER_STR);
+							new PTLink(Id.create(TRANS_PREFIX + ++newTransfLinkId, Link.class), centerNode, nearNode, logicNet, PTValues.TRANSFER_STR);
 							transfers++;
 						}
 					}
@@ -146,7 +145,7 @@ public class LogicFactory{
 			}
 		}
 		for (Tuple<Node, Node> tuple : toBeAdded) {
-			new PTLink(new IdImpl(TRANS_PREFIX + ++newTransfLinkId), tuple.getFirst(), tuple.getSecond(), logicNet, PTValues.TRANSFER_STR);
+			new PTLink(Id.create(TRANS_PREFIX + ++newTransfLinkId), tuple.getFirst(), tuple.getSecond(), logicNet, PTValues.TRANSFER_STR);
 		}
 		*/
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -162,7 +161,7 @@ public class LogicFactory{
 	private Link createPlainLink(Node fromNode, Node toNode){
 		Link linkImpl = null;
 		if (!((NodeImpl) fromNode).getOutNodes().containsValue(toNode)){
-			linkImpl= plainNet.createAndAddLink(new IdImpl(newPlainLinkId++), fromNode, toNode, CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()), 1.0, 1.0 , 1);
+			linkImpl= plainNet.createAndAddLink(Id.create(newPlainLinkId++, Link.class), fromNode, toNode, CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()), 1.0, 1.0 , 1);
 		}
 		else{
 			for (Link outLink : fromNode.getOutLinks().values()){
@@ -176,7 +175,7 @@ public class LogicFactory{
 
 	private Node createPlainNode(TransitStopFacility transitStopFacility){
 		Node plainNode = null;
-		Id id = transitStopFacility.getId();
+		Id<Node> id = Id.create(transitStopFacility.getId(), Node.class);
 		if (this.plainNet.getNodes().containsKey(id)){
 			plainNode = plainNet.getNodes().get(id);
 		}else{

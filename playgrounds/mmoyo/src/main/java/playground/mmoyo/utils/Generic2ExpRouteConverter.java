@@ -1,6 +1,6 @@
 package playground.mmoyo.utils;
 
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -20,10 +20,10 @@ public class Generic2ExpRouteConverter {
 		String[] strRouteEleme = genericRoute.getRouteDescription().split(SEP);
 		
 		//-> validate that it is a transit route
-		TransitStopFacility accesFacility = schedule.getFacilities().get(new IdImpl(strRouteEleme[1]));
-		TransitLine line = schedule.getTransitLines().get(new IdImpl(strRouteEleme[2]));
-		TransitRoute route = line.getRoutes().get(new IdImpl(strRouteEleme[3]));
-		TransitStopFacility egressFacility = schedule.getFacilities().get(new IdImpl(strRouteEleme[4]));
+		TransitStopFacility accesFacility = schedule.getFacilities().get(Id.create(strRouteEleme[1], TransitStopFacility.class));
+		TransitLine line = schedule.getTransitLines().get(Id.create(strRouteEleme[2], TransitLine.class));
+		TransitRoute route = line.getRoutes().get(Id.create(strRouteEleme[3], TransitRoute.class));
+		TransitStopFacility egressFacility = schedule.getFacilities().get(Id.create(strRouteEleme[4], TransitStopFacility.class));
 		return new ExperimentalTransitRoute (accesFacility, line, route, egressFacility);
 	}
 	

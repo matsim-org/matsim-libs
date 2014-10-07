@@ -1,5 +1,7 @@
 package playground.mmoyo.utils;
 
+import java.io.File;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -7,14 +9,11 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import java.io.File;
 
 /**Reads many populations and merges them adding a index to repeated persons**/ 
 public class PlansMerger {
@@ -75,7 +74,7 @@ public class PlansMerger {
 			
 			if (noNull== popsNum ){
 				for (byte i=0; i<popsNum; i++){
-                    ((PersonImpl) personArray[i]).setId(new IdImpl(id.toString() + (i+1)));
+                    ((PersonImpl) personArray[i]).setId(Id.create(id.toString() + (i+1), Person.class));
                     newPopulation.addPerson(personArray[i]);
 				}
 			}

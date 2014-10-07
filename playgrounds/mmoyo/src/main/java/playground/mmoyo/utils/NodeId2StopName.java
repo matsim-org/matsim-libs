@@ -24,8 +24,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsReaderMatsimV1;
@@ -45,7 +43,7 @@ public class NodeId2StopName {
 		String sep = "_";
 		for (Count count : this.counts.getCounts().values()){
 			String strCsId = count.getCsId().toString().substring(2, 10);
-			Id newCdId = new IdImpl(count.getLocId().toString() + sep + strCsId);
+			Id<Object> newCdId = Id.create(count.getLocId().toString() + sep + strCsId, Object.class);
 			stopNameMap.put(count.getLocId(), newCdId);
 		}
 	}

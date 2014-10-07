@@ -41,10 +41,10 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -90,7 +90,7 @@ public class IndividualPTvaluesFromEvents implements	PersonEntersVehicleEventHan
 	
 	@Override	 //to identify transit drivers and  transit routes related to each pt vehicle
 	public void handleEvent(TransitDriverStartsEvent event) {
-		TransitDriverStartsEvent transitDriverStartsEvent = (TransitDriverStartsEvent) event;
+		TransitDriverStartsEvent transitDriverStartsEvent = event;
 		this.transitDrivers.add(event.getDriverId());
 		Tuple<Id,Id> tuple = new Tuple<Id, Id>(transitDriverStartsEvent.getTransitLineId(), transitDriverStartsEvent.getTransitRouteId());
 		vehRouteMap.put(transitDriverStartsEvent.getVehicleId(), tuple );  // warning!  vehicles change route dynamically!!  route is updated here
@@ -285,7 +285,7 @@ public class IndividualPTvaluesFromEvents implements	PersonEntersVehicleEventHan
 		reader.parse(inputEventFile);
 		log.info("Events file read");
 		
-		Id agentId = new IdImpl("24140963X3");
+		Id<Person> agentId = Id.create("24140963X3", Person.class);
 		IndividualPTvalues status = ptEventsAnalyzer.getIndividualPTvalues(agentId);
 		System.out.println(status.getChanges());
 		System.out.println(status.getTrDistance());

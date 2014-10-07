@@ -1,15 +1,16 @@
 package playground.mmoyo.algorithms;
 
+import java.io.File;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
+
 import playground.mmoyo.utils.DataLoader;
 import playground.mmoyo.utils.FirstPersonsExtractor;
-
-import java.io.File;
 
 /** adds a suffix to all persons id's*/
 public class PersonIdSuffixAdder {
@@ -22,14 +23,14 @@ public class PersonIdSuffixAdder {
 	public void addSuffix(Population pop){
 		for (Person person: pop.getPersons().values()){
 			String newId = person.getId().toString()+ this.affix;
-            ((PersonImpl) person).setId(new IdImpl(newId));
+            ((PersonImpl) person).setId(Id.create(newId, Person.class));
         }
 	}
 	
 	public void addPrefix(Population pop){
 		for (Person person: pop.getPersons().values()){
 			String newId = this.affix+ person.getId().toString();
-            ((PersonImpl) person).setId(new IdImpl(newId));
+            ((PersonImpl) person).setId(Id.create(newId, Person.class));
         }
 	}
 	

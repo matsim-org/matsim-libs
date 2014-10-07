@@ -6,13 +6,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.population.algorithms.PlansFilterByLegMode;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.population.algorithms.PlansFilterByLegMode;
 
 import playground.mmoyo.utils.DataLoader;
 
@@ -20,18 +20,18 @@ import playground.mmoyo.utils.DataLoader;
 public class OriginalPersonFinder {
 
 	public void run (Population pop){
-		Map <String, List<Id>> personMap = new TreeMap <String, List<Id>>();
+		Map <String, List<Id<Person>>> personMap = new TreeMap<>();
 		final String SUF = "X";
 		ClonDetector clonDetector = new ClonDetector(SUF);
 		
-		for (Id id : pop.getPersons().keySet()){
+		for (Id<Person> id : pop.getPersons().keySet()){
 			String strId = id.toString();
 			int i = clonDetector.getClonIndex(strId);
 			
 			String root = (i>-1)?  strId.substring(0, strId.indexOf(SUF)): strId;
 			
 			if(!personMap.keySet().contains(root)){
-				List<Id> personsList = new ArrayList<Id>();
+				List<Id<Person>> personsList = new ArrayList<>();
 				
 				//add  original person 
 				if (root.equals(strId)){
@@ -42,7 +42,7 @@ public class OriginalPersonFinder {
 				int numClones=0;
 				int ii=9;
 				while(numClones<4 && ii>0){
-					Id possibleId = new IdImpl(root + SUF + ii);
+					Id<Person> possibleId = Id.create(root + SUF + ii, Person.class);
 					if (pop.getPersons().keySet().contains(possibleId)){
 						numClones++;
 						personsList.add(possibleId);
@@ -55,12 +55,12 @@ public class OriginalPersonFinder {
 
 				
 		//get persons
-		List<Id> retainIds = new ArrayList<Id>();
-		for(Map.Entry <String, List<Id>> entry: personMap.entrySet() ){
+		List<Id<Person>> retainIds = new ArrayList<>();
+		for(Map.Entry <String, List<Id<Person>>> entry: personMap.entrySet() ){
 			String key = entry.getKey(); 
-			List<Id> list = entry.getValue();
+			List<Id<Person>> list = entry.getValue();
 			System.out.println("key : " + key);
-			for (Id id : list){
+			for (Id<Person> id : list){
 				System.out.println("            " + id);
 				retainIds.add(id);
 			}

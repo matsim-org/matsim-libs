@@ -50,7 +50,7 @@ public class PlanRouteCalculator {
 	private String outputFile;
 	private String plansFile;
 	private DynamicConnection  dynamicConnection;
-	private Map <Id, List<StaticConnection>> connectionMap = new TreeMap <Id, List<StaticConnection>>();;
+	private Map <Id<StaticConnection>, List<StaticConnection>> connectionMap = new TreeMap<>();;
 	private TransitSchedule transitSchedule;
 	private Network net;
 	private Population population;
@@ -58,7 +58,7 @@ public class PlanRouteCalculator {
 	PlainTimeTable plainTimeTable;
 	private PlanValidator planValidator = new PlanValidator();
 
-	public PlanRouteCalculator(final TransitSchedule transitSchedule, final Network net, Map <Id, List<StaticConnection>> connectionMap, Population population, KroutesCalculator kRoutesCalculator){
+	public PlanRouteCalculator(final TransitSchedule transitSchedule, final Network net, Map <Id<StaticConnection>, List<StaticConnection>> connectionMap, Population population, KroutesCalculator kRoutesCalculator){
 		this.transitSchedule = transitSchedule;
 		this.net = net;
 		this.connectionMap = connectionMap;

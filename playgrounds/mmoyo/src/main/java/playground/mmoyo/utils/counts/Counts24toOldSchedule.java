@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
@@ -49,7 +48,7 @@ public class Counts24toOldSchedule {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		Map <Id, String> old_new_route_Map = tabularRouteFile_reader.getRouteMap(); 
+		Map <Id<TransitRoute>, String> old_new_route_Map = tabularRouteFile_reader.getRouteMap(); 
 		
 		//read new counts
 		String filePath= "../../input/newDemand/apr2012/cal192/input/bvg.run190.25pct.100.filtered.ptLineCounts.txt";

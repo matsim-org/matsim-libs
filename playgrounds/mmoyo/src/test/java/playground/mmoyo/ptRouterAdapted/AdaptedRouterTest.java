@@ -5,9 +5,10 @@ import java.util.List;
 
 import org.junit.Assert;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -15,6 +16,8 @@ import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -83,13 +86,13 @@ public class AdaptedRouterTest extends MatsimTestCase {
 		
 		ExperimentalTransitRoute expRoute = new Generic2ExpRouteConverter(scenarioImpl.getTransitSchedule()).convert((GenericRouteImpl) trLeg.getRoute());
 		assertNotNull(expRoute);
-		Assert.assertEquals("different route id:",new IdImpl("Blue Line.Blue.101.H"), expRoute.getRouteId());
+		Assert.assertEquals("different route id:",Id.create("Blue Line.Blue.101.H", TransitRoute.class), expRoute.getRouteId());
 		Assert.assertEquals("different route description:","PT1===stop1===Blue Line===Blue Line.Blue.101.H===stop4", expRoute.getRouteDescription());
 		Assert.assertEquals("different route type:","experimentalPt1", expRoute.getRouteType());
-		Assert.assertEquals("different route access stop:",new IdImpl("stop1"), expRoute.getAccessStopId());
-		Assert.assertEquals("different route egress stop:",new IdImpl("stop4"), expRoute.getEgressStopId());
-		Assert.assertEquals("different route start link:",new IdImpl("20"), expRoute.getStartLinkId());
-		Assert.assertEquals("different route end link:", new IdImpl("23"), expRoute.getEndLinkId());
+		Assert.assertEquals("different route access stop:",Id.create("stop1", TransitStopFacility.class), expRoute.getAccessStopId());
+		Assert.assertEquals("different route egress stop:",Id.create("stop4", TransitStopFacility.class), expRoute.getEgressStopId());
+		Assert.assertEquals("different route start link:",Id.create("20", Link.class), expRoute.getStartLinkId());
+		Assert.assertEquals("different route end link:", Id.create("23", Link.class), expRoute.getEndLinkId());
 		//Assert.assertEquals(0.0, expRoute.getDistance());
 		//Assert.assertEquals(null, expRoute.getTravelTime());
 		

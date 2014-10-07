@@ -20,7 +20,7 @@
 package playground.mmoyo.analysis.stopZoneOccupancyAnalysis;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 abstract class FacilityUtils{
 	final static char POINT = '.';
@@ -28,9 +28,9 @@ abstract class FacilityUtils{
 	/**
 	 * Converts the id of a stop facility into a stop Zone. (it is the same id, just without the point and suffix)
 	 */
-	static Id convertFacilitytoZoneId(Id facId) {
+	static Id<TransitStopFacility> convertFacilitytoZoneId(Id<TransitStopFacility> facId) {
 		String str = getStrUntilPoint(facId.toString());
-		return new IdImpl(str);
+		return Id.create(str, TransitStopFacility.class);
 	}
 	
 	static String getStrUntilPoint(String origStr){

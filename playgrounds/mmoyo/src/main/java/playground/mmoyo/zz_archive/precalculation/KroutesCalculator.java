@@ -8,7 +8,6 @@ import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -23,11 +22,11 @@ public class KroutesCalculator {
 	private AdjList adjList;
 	private TransitSchedule transitSchedule;
 	private NetworkImpl plainNet;
-	private Map <Id, List<StaticConnection>> connectionMap;
+	private Map <Id<StaticConnection>, List<StaticConnection>> connectionMap;
 	private Map <Coord, Collection<NodeImpl>> nearStopMap;
 
 	/**Calculates a set of connections between two coordinates*/
-	public KroutesCalculator(final TransitSchedule transitSchedule, final NetworkImpl plainNet, Map <Id, List<StaticConnection>> connectionMap, Map <Coord, Collection<NodeImpl>> nearStopMap) {
+	public KroutesCalculator(final TransitSchedule transitSchedule, final NetworkImpl plainNet, Map <Id<StaticConnection>, List<StaticConnection>> connectionMap, Map <Coord, Collection<NodeImpl>> nearStopMap) {
 		this.transitSchedule= transitSchedule;
 		this.plainNet = plainNet;
 		this.connectionMap = connectionMap;
@@ -60,7 +59,7 @@ public class KroutesCalculator {
 			for (Node node2: nearDestinationStops){
 				//System.out.print("\nOrigen: "+ node1.getId() + "    Destination: " + node2.getId());
 				String strConnId = node1.getId().toString() + "-" + node2.getId().toString();
-				Id connId= new IdImpl(strConnId);
+				Id<StaticConnection> connId= Id.create(strConnId, StaticConnection.class);
 				if (!connectionMap.containsKey(connId)){
 					List<StaticConnection> connections =findRoute(node1, node2);
 					connectionMap.put(connId, connections);
@@ -215,8 +214,8 @@ public class KroutesCalculator {
 	/**creates a PTtrip object*/
 	private PTtrip createTrip(final TransitRoute transitRoute, final Node nodeA, final Node nodeB){
 		/* calculates travelTime */
-		Id idA= nodeA.getId();
-		Id idB= nodeB.getId();
+		Id<Node> idA= nodeA.getId();
+		Id<Node> idB= nodeB.getId();
 		TransitStopFacility trStopFacilityA = transitSchedule.getFacilities().get(idA);
 		TransitStopFacility trStopFacilityB = transitSchedule.getFacilities().get(idB);
 		TransitRouteStop trStopA =transitRoute.getStop(trStopFacilityA);

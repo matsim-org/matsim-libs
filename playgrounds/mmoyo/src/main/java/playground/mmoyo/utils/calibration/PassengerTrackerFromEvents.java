@@ -15,14 +15,17 @@ import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 
 import playground.mmoyo.io.TextFileWriter;
 
@@ -35,16 +38,16 @@ public class PassengerTrackerFromEvents implements TransitDriverStartsEventHandl
 											VehicleDepartsAtFacilityEventHandler{
 
 	private static final Logger log = Logger.getLogger(PassengerTrackerFromEvents.class);
-	private final Map<Id, Id> veh_stops = new HashMap<Id, Id>();
-	private final Map<Id, List<Id>> veh_passengers = new HashMap<Id, List<Id>>();
-	public final Map<Id, List<Id>> stop_passengers = new HashMap<Id, List<Id>>();
+	private final Map<Id<Vehicle>, Id<TransitStopFacility>> veh_stops = new HashMap<>();
+	private final Map<Id<Vehicle>, List<Id<Person>>> veh_passengers = new HashMap<>();
+	public final Map<Id<TransitStopFacility>, List<Id<Person>>> stop_passengers = new HashMap<>();
 	public List<Tracker> trackerList = new ArrayList<Tracker>();
-	private List<Id> stopIdList;
+	private List<Id<TransitStopFacility>> stopIdList;
 	private String RouteId;
 	private double binTime=-1;
-	private final Map<Id, Id> vehToRouteId = new HashMap<Id, Id>();
+	private final Map<Id<Vehicle>, Id<TransitRoute>> vehToRouteId = new HashMap<>();
 	
-	public PassengerTrackerFromEvents(List<Id> stopIdList, String RouteId, final int bin) {
+	public PassengerTrackerFromEvents(List<Id<TransitStopFacility>> stopIdList, String RouteId, final int bin) {
 		log.setLevel( Level.INFO ) ;
 		this.stopIdList = stopIdList;
 		this.RouteId = RouteId;
@@ -64,27 +67,27 @@ public class PassengerTrackerFromEvents implements TransitDriverStartsEventHandl
 	
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		Id transitRouteId = this.vehToRouteId.get(event.getVehicleId());
+		Id<TransitRoute> transitRouteId = this.vehToRouteId.get(event.getVehicleId());
 		if (!transitRouteId.toString().contains(this.RouteId)) {
 			return ;
 		}
 		
-		Id vehId = event.getVehicleId(); 
+		Id<Vehicle> vehId = event.getVehicleId(); 
 		if (this.veh_passengers.get(vehId)==null){
-			this.veh_passengers.put(vehId, new ArrayList<Id>());
+			this.veh_passengers.put(vehId, new ArrayList<Id<Person>>());
 		}
 		this.veh_passengers.get(vehId).add(event.getPersonId());
 	}
 
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
-		Id transitRouteId = this.vehToRouteId.get(event.getVehicleId());
+		Id<TransitRoute> transitRouteId = this.vehToRouteId.get(event.getVehicleId());
 		if ( !transitRouteId.toString().contains(this.RouteId)) {
 			return ;
 		}
 		
 		
-		Id vehId = event.getVehicleId();
+		Id<Vehicle> vehId = event.getVehicleId();
 		int nPassengers = this.veh_passengers.get(vehId).size();
 		if (nPassengers == 0) {
 			throw new RuntimeException("no passengers in vehicle?");
@@ -98,28 +101,28 @@ public class PassengerTrackerFromEvents implements TransitDriverStartsEventHandl
 
 	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-		Id stopId = event.getFacilityId();
+		Id<TransitStopFacility> stopId = event.getFacilityId();
 		this.veh_stops.put(event.getVehicleId(), stopId);
 	}
 
 	@Override
 	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
-		Id stopId = event.getFacilityId();
-		Id vehId = event.getVehicleId();
+		Id<TransitStopFacility> stopId = event.getFacilityId();
+		Id<Vehicle> vehId = event.getVehicleId();
 		this.veh_stops.remove(vehId);
 
 		if (stopIdList.contains(stopId)){ //and veh belongs to route?
 		
 			if (this.veh_passengers.get(vehId)==null){
-				this.veh_passengers.put(vehId, new ArrayList<Id>());
+				this.veh_passengers.put(vehId, new ArrayList<Id<Person>>());
 			}
 			
 			if (stop_passengers.get(stopId)==null){
-				stop_passengers.put(stopId, new ArrayList<Id>());
+				stop_passengers.put(stopId, new ArrayList<Id<Person>>());
 			}
 			
 			//add all passengers of the bus to the list of stop-passenger list
-			for (Id passengerId: this.veh_passengers.get(vehId)){
+			for (Id<Person> passengerId: this.veh_passengers.get(vehId)){
 				if (binTime>-1){
 					double time = event.getTime();
 					log.info(time);
@@ -137,11 +140,11 @@ public class PassengerTrackerFromEvents implements TransitDriverStartsEventHandl
 	}
 	
 	class Tracker{
-		Id stationId;
+		Id<TransitStopFacility> stationId;
 		double time;
-		Id personId;
+		Id<Person> personId;
 
-		Tracker(Id stationId, double time, Id person){
+		Tracker(Id<TransitStopFacility> stationId, double time, Id<Person> person){
 			this.stationId = stationId;
 			this.time = time;
 			this.personId= person;
@@ -153,24 +156,24 @@ public class PassengerTrackerFromEvents implements TransitDriverStartsEventHandl
 		String eventFilePath = "../../input/juni/calibration/500/500.events.xml.gz";
 		EventsManager events = EventsUtils.createEventsManager();
 	
-		List<Id> stopList = new ArrayList<Id>();
-		stopList.add(new IdImpl("812020.3"));
-		stopList.add(new IdImpl("812550.1"));
-		stopList.add(new IdImpl("812030.1"));
-		stopList.add(new IdImpl("812560.1"));
-		stopList.add(new IdImpl("812570.1"));
-		stopList.add(new IdImpl("813013.1"));
-		stopList.add(new IdImpl("806520.1"));
-		stopList.add(new IdImpl("806030.1"));
-		stopList.add(new IdImpl("806010.1"));
-		stopList.add(new IdImpl("806540.1"));
-		stopList.add(new IdImpl("804070.3"));
-		stopList.add(new IdImpl("804060.2"));
-		stopList.add(new IdImpl("801020.1"));
-		stopList.add(new IdImpl("801030.3"));
-		stopList.add(new IdImpl("801530.1"));
-		stopList.add(new IdImpl("801040.1"));
-		stopList.add(new IdImpl("792050.3"));
+		List<Id<TransitStopFacility>> stopList = new ArrayList<>();
+		stopList.add(Id.create("812020.3", TransitStopFacility.class));
+		stopList.add(Id.create("812550.1", TransitStopFacility.class));
+		stopList.add(Id.create("812030.1", TransitStopFacility.class));
+		stopList.add(Id.create("812560.1", TransitStopFacility.class));
+		stopList.add(Id.create("812570.1", TransitStopFacility.class));
+		stopList.add(Id.create("813013.1", TransitStopFacility.class));
+		stopList.add(Id.create("806520.1", TransitStopFacility.class));
+		stopList.add(Id.create("806030.1", TransitStopFacility.class));
+		stopList.add(Id.create("806010.1", TransitStopFacility.class));
+		stopList.add(Id.create("806540.1", TransitStopFacility.class));
+		stopList.add(Id.create("804070.3", TransitStopFacility.class));
+		stopList.add(Id.create("804060.2", TransitStopFacility.class));
+		stopList.add(Id.create("801020.1", TransitStopFacility.class));
+		stopList.add(Id.create("801030.3", TransitStopFacility.class));
+		stopList.add(Id.create("801530.1", TransitStopFacility.class));
+		stopList.add(Id.create("801040.1", TransitStopFacility.class));
+		stopList.add(Id.create("792050.3", TransitStopFacility.class));
 		
 		String RouteId= "B-M44.101.901.H";
 		int bin = -1;

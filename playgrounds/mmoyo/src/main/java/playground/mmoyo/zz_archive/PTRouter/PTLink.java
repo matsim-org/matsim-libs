@@ -16,7 +16,7 @@ public class PTLink extends LinkImpl{
 	private double travelTime;
 	private byte aliasType ;   //1= access, 2= standard, 3= transfer 4= detTransfer 5= Egress
 	
-	public PTLink(final Id id, final Node from, final Node to, final NetworkImpl network, final String type) {
+	public PTLink(final Id<Link> id, final Node from, final Node to, final NetworkImpl network, final String type) {
 		super(id, from, to, network, CoordUtils.calcDistance(from.getCoord(), to.getCoord()), 99, 9999 , 99);
 		this.setType(type);
 	

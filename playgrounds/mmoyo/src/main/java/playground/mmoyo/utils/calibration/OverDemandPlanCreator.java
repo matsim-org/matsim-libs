@@ -20,24 +20,24 @@
 
 package playground.mmoyo.utils.calibration;
 
+import java.io.File;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+
 import playground.mmoyo.Validators.PlanValidator;
 import playground.mmoyo.algorithms.PersonClonner;
 import playground.mmoyo.utils.DataLoader;
 import playground.mmoyo.utils.FirstPersonsExtractor;
 import playground.mmoyo.utils.PlansMerger;
-
-import java.io.File;
 
 /**creates clones and stay home plans for each person*/
 public class OverDemandPlanCreator {
@@ -77,7 +77,7 @@ public class OverDemandPlanCreator {
 
 			//create and add clones
 			for (int i=0; i<cloneNum;i++){
-				Id newId = new IdImpl(person.getId().toString() + SEP + (i+2));
+				Id<Person> newId = Id.create(person.getId().toString() + SEP + (i+2), Person.class);
 				/*old, simple, ineffective cloning 
 				Person personClon = new PersonImpl(newId);
 				for (Plan plan :person.getPlans()){

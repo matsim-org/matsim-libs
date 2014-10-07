@@ -2,12 +2,12 @@ package playground.mmoyo.algorithms;
 
 import java.io.File;
 import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 
 import playground.mmoyo.io.TXT_IdReader;
 import playground.mmoyo.utils.DataLoader;
@@ -17,13 +17,13 @@ import playground.mmoyo.utils.FirstPersonsExtractor;
 public class AgentXIdClonner{
 	final private static String SEP = "_";
 	
-	public void run (Population pop, List<Id> persIdList, int numClones){
+	public void run (Population pop, List<Id<Person>> persIdList, int numClones){
 		PersonClonner clonner = new PersonClonner();
 		for (int i=0; i<=numClones; i++){
-			for (Id id :persIdList){
+			for (Id<Person> id :persIdList){
 				Person person = pop.getPersons().get(id);
 				for (int j=0; j<=numClones; j++){
-					Id newId = new IdImpl(person.getId().toString() + SEP + j); 
+					Id<Person> newId = Id.create(person.getId().toString() + SEP + j, Person.class); 
 					Person newPerson = clonner.run(person, newId);
 					pop.addPerson(newPerson);
 				}				
@@ -39,7 +39,7 @@ public class AgentXIdClonner{
 		
 		DataLoader dataLoader = new DataLoader();
 		Population pop = dataLoader.readPopulation(popFilePath);
-		List<Id> persIdList = new TXT_IdReader().readAgentFromTxtFile(idsFilePath);
+		List<Id<Person>> persIdList = new TXT_IdReader().readAgentFromTxtFile(idsFilePath);
 		new AgentXIdClonner().run(pop, persIdList, numClones);
 		
 		//write population in same Directory

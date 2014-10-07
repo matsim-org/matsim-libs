@@ -8,7 +8,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 
 import playground.mmoyo.utils.DataLoader;
 
@@ -20,11 +19,11 @@ public class ClonMutationReset  {
 	public void run (final Population originalPop, Population clonPop){
 		
 		ClonDetector detector = new ClonDetector("X");
-		List<Id> personList = detector.run(clonPop);
+		List<Id<Person>> personList = detector.run(clonPop);
 		
-		for(Id clonId : personList){
+		for(Id<Person> clonId : personList){
 			String strOrig = detector.getOriginalId(clonId.toString());
-			Id originalId = new IdImpl(strOrig);
+			Id<Person> originalId = Id.create(strOrig, Person.class);
 			if (originalPop.getPersons().keySet().contains(originalId)){
 				Person origPerson = originalPop.getPersons().get(originalId);
 				Person clonPerson = clonPop.getPersons().get(clonId);

@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.counts.Counts;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -18,7 +18,7 @@ import playground.mmoyo.utils.DataLoader;
 public class CountsStop_VS_ScheduleStop {
 	
 	void run (final TransitSchedule schedule, Counts counts){
-		Set<Id> pseudoScheduleStopIds = new HashSet<Id>();
+		Set<Id<Link>> pseudoScheduleStopIds = new HashSet<>();
 	
 		//create set of transit schedule "pseudo stops"
 		//final char point = '.';
@@ -27,13 +27,13 @@ public class CountsStop_VS_ScheduleStop {
 			//int pointPos = str_pseudoId.indexOf(point);
 			//str_pseudoId = str_pseudoId.substring(0, pointPos);
 			String str_pseudoId = Real2PseudoId.convertRealIdtoPseudo(stop.getId().toString());
-			Id pseudoId = new IdImpl(str_pseudoId);
+			Id<Link> pseudoId = Id.create(str_pseudoId, Link.class);
 			pseudoScheduleStopIds.add(pseudoId);
 		}
 	
 		//find counts ids that are not present in schedule
-		Set<Id> removableIds = new HashSet<Id>();
-		for(Id countId : counts.getCounts().keySet()){
+		Set<Id<Link>> removableIds = new HashSet<>();
+		for(Id<Link> countId : counts.getCounts().keySet()){
 			if (!pseudoScheduleStopIds.contains(countId)){
 				removableIds.add(countId);
 			}
@@ -42,7 +42,7 @@ public class CountsStop_VS_ScheduleStop {
 		//remove counts of stops that are not present in transit schedule
 		final String removing = "removing: ";
 		System.out.println(removableIds.size());
-		for(Id removableId : removableIds){
+		for(Id<Link> removableId : removableIds){
 			System.out.println(removing + removableId);
 			counts.getCounts().remove(removableId);
 		}
@@ -60,7 +60,7 @@ public class CountsStop_VS_ScheduleStop {
 			str_pseudoId = str_pseudoId.substring(0, pointPos);
 			//System.out.println(stop.getId() +  " " + str_pseudoId);
 		
-			Id pseudoId = new IdImpl(str_pseudoId);
+			Id pseudoId = Id.create(str_pseudoId);
 			Count count = counts.getCount(pseudoId);
 			if (count==null){
 				System.out.println(pseudoId);

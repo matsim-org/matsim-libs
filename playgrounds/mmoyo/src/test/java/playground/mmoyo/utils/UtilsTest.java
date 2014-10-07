@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -39,7 +39,6 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -66,7 +65,7 @@ public class UtilsTest extends MatsimTestCase {
 		Population pop2 = scn2.getPopulation();
 		Population pop3 = scn3.getPopulation();
 
-		Id id1 = new IdImpl("person1");
+		Id<Person> id1 = Id.create("person1", Person.class);
 		Person person1 = new PersonImpl(id1);
 		Plan plan1 = new PlanImpl();
 		Coord coord1 = new CoordImpl(1.0, 1.0);
@@ -89,7 +88,7 @@ public class UtilsTest extends MatsimTestCase {
 		person2.addPlan(plan2);
 		pop2.addPerson(person2);
 	
-		Id id3 = new IdImpl("person3");
+		Id<Person> id3 = Id.create("person3", Person.class);
 		Person person3 = new PersonImpl(id3);
 		Plan plan3 = new PlanImpl();
 		Coord coord3 = new CoordImpl(3.0, 3.0);

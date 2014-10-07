@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationUtils;
@@ -54,7 +53,7 @@ public class planInitializer {
 			String strId = person.getId().toString();
 			int suffix=0;
 			for (Plan plan : person.getPlans()){
-				Id initId= new IdImpl(strId + SEPARATOR + ++suffix);
+				Id<Person> initId= Id.create(strId + SEPARATOR + ++suffix, Person.class);
 				Person initPerson = new PersonImpl(initId);
 				initPerson.addPlan(plan);
 				initPopulation.addPerson(initPerson);

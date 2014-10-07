@@ -19,14 +19,14 @@
  * *********************************************************************** */
 package playground.mmoyo.ptRouterAdapted.precalculation;
 
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.population.LegImpl;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.routes.GenericRouteImpl;
 
 import playground.mmoyo.utils.DataLoader;
 
@@ -67,8 +67,8 @@ public class PlanPTRoutesComparator {
 		DataLoader loader = new DataLoader();
 		Population pop = loader.readPopulation(popFile1);
 		
-		Id person1Id = new IdImpl("11181922X4_cwalk4.0_dist0.5_tran120");
-		Id person2Id = new IdImpl("11181922X4_cwalk4.0_dist0.5_tran180");
+		Id<Person> person1Id = Id.create("11181922X4_cwalk4.0_dist0.5_tran120", Person.class);
+		Id<Person> person2Id = Id.create("11181922X4_cwalk4.0_dist0.5_tran180", Person.class);
 		
 		Plan plan1 = pop.getPersons().get(person1Id).getSelectedPlan();
 		Plan plan2 = pop.getPersons().get(person2Id).getSelectedPlan();

@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 
 /**parses a output text file containing counts comparisons*/
 public class CountsReader {
@@ -33,13 +33,13 @@ public class CountsReader {
 			BufferedReader bufferedReader = new BufferedReader(fileReader);
 			String row = bufferedReader.readLine();		//TODO : include the first row inside the iteration 
 			String[] values = row.split(SEPARATOR);				
-			Id id= new IdImpl (values[1]);
+			Id<Link> id= Id.create(values[1], Link.class);
 			while(row != null) {
 				row = bufferedReader.readLine();
 				if(row != null && row != NULL_STRING) {				
 					values = row.split(SEPARATOR); 
 					if (values[0].equals(STOP_ID_STRING_0)){     
-						id = new IdImpl (values[1]);
+						id = Id.create(values[1], Link.class);
 					}else if (values[0].equals(HEAD_STRING_0)){    
 					  //it does nothing, correct this condition	
 					}else{

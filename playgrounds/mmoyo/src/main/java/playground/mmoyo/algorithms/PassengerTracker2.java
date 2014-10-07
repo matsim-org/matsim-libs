@@ -3,8 +3,8 @@ package playground.mmoyo.algorithms;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.log4j.Logger;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -15,10 +15,10 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.population.filters.AbstractPersonFilter;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.mmoyo.utils.DataLoader;
@@ -28,19 +28,19 @@ import playground.mmoyo.utils.Generic2ExpRouteConverter;
 public class PassengerTracker2 extends AbstractPersonFilter {
 	private static final Logger log = Logger.getLogger(PassengerTracker2.class);
 	private Generic2ExpRouteConverter converter;
-	final List<Id> transitLineIdList;
+	final List<Id<TransitLine>> transitLineIdList;
 	int counter=0;
 	
-	public PassengerTracker2 (final List<Id> transitLineIdList, /*final Network net,*/ final TransitSchedule schedule){
+	public PassengerTracker2 (final List<Id<TransitLine>> transitLineIdList, /*final Network net,*/ final TransitSchedule schedule){
 		this.transitLineIdList = transitLineIdList;
 		converter = new Generic2ExpRouteConverter(schedule);
 	}
 	
-	public List<Id> getTrackedPassengers(Population[] popArray) {
-		List<Id> travelPersonList = new ArrayList<Id>();
+	public List<Id<Person>> getTrackedPassengers(Population[] popArray) {
+		List<Id<Person>> travelPersonList = new ArrayList<>();
 		for (Population pop : popArray){
-			List<Id> tmpPersonList = getTrackedPassengers(pop);
-			for (Id tmpId : tmpPersonList){
+			List<Id<Person>> tmpPersonList = getTrackedPassengers(pop);
+			for (Id<Person> tmpId : tmpPersonList){
 				if(!travelPersonList.contains(tmpId)){
 					travelPersonList.add(tmpId);
 				}
@@ -49,8 +49,8 @@ public class PassengerTracker2 extends AbstractPersonFilter {
 		return travelPersonList;
 	}
 	
-	public List<Id> getTrackedPassengers(final Population population) {
-		List<Id> travelPersonList = new ArrayList<Id>();
+	public List<Id<Person>> getTrackedPassengers(final Population population) {
+		List<Id<Person>> travelPersonList = new ArrayList<>();
 		for (Person person : population.getPersons().values()) {
 			if( judge(person)){
 				if(!travelPersonList.contains(person.getId())){
@@ -63,7 +63,7 @@ public class PassengerTracker2 extends AbstractPersonFilter {
 	
 	/** removes persons who do not travel in the given transit lines*/
 	private void removeNonTrackedPassengers(Population population) {
-		List<Id> trackedPersons = getTrackedPassengers(population);
+		List<Id<Person>> trackedPersons = getTrackedPassengers(population);
 		population.getPersons().keySet().retainAll(trackedPersons);
 	}
 	
@@ -117,10 +117,10 @@ public class PassengerTracker2 extends AbstractPersonFilter {
 		}
 		
 		//convert lines ids from string to Id objects
-		List <Id> transitLineIdList = new ArrayList<Id>();
+		List <Id<TransitLine>> transitLineIdList = new ArrayList<>();
 		String[] idArray = lineIdsList.split(",");
 		for (String strId: idArray){
-			transitLineIdList.add(new IdImpl(strId));
+			transitLineIdList.add(Id.create(strId, TransitLine.class));
 		}
 		
 		//read data

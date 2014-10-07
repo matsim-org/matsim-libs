@@ -20,21 +20,22 @@
 package playground.mmoyo.utils.counts;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.pt.transitSchedule.api.TransitLine;
 
 public class TabularCountRecord {
-	private Id lineId;
+	private Id<TransitLine> lineId;
 	private char direction;
 	private String stop;
 	private double count;
 		 
-	public TabularCountRecord (final Id lineId, final char direction, final String stop, final double count){
+	public TabularCountRecord (final Id<TransitLine> lineId, final char direction, final String stop, final double count){
 		this.lineId = lineId; 
 		this.direction = direction; 
 		this.stop = stop;
 		this.count = count; 
 	}
 
-	public Id getLineId() {
+	public Id<TransitLine> getLineId() {
 		return lineId;
 	}
 	

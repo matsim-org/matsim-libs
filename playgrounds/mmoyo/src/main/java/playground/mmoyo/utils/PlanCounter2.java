@@ -21,7 +21,6 @@ package playground.mmoyo.utils;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.PersonAlgorithm;
 
@@ -53,7 +52,7 @@ public class PlanCounter2 implements PersonAlgorithm {
 		DataLoader dataLoader = new DataLoader();
 		ScenarioImpl scn = (ScenarioImpl) dataLoader.createScenario();
 		
-		Id personId = new IdImpl("11140292");
+		Id<Person> personId = Id.create("11140292", Person.class);
 		PlanCounter2 planCounter2 = new PlanCounter2(personId);
 		PopSecReader popSecReader = new PopSecReader (scn, planCounter2);
 		popSecReader.readFile(popFilePath);

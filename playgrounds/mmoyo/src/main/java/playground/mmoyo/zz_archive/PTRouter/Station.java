@@ -23,7 +23,7 @@ public class Station extends NodeImpl {
 	private boolean isFirstStation;
 	private boolean isLastStation; 
 	
-	public Station(final Id id, final Coord coord) {
+	public Station(final Id<Node> id, final Coord coord) {
 		super(id, coord, null);
 	}
 

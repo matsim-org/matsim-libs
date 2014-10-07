@@ -25,11 +25,11 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.PersonAlgorithm;
+
 import playground.mmoyo.io.PopSecReader;
 
 /**
@@ -49,7 +49,7 @@ public class Plan2Person implements PersonAlgorithm{
 	public void run(Person person) {
 		char suffix = 'a';
 		for (Plan plan: person.getPlans()){
-			Id newId = new IdImpl (person.getId().toString() + SEP + (suffix++));
+			Id<Person> newId = Id.create (person.getId().toString() + SEP + (suffix++), Person.class);
 			Person newPerson = new PersonImpl(newId);
 			newPerson.addPlan(plan);
 			newPopulation.addPerson(newPerson);

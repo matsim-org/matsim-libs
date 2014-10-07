@@ -20,18 +20,6 @@
 
 package playground.mmoyo.ptRouterAdapted.precalculation;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
-import playground.mmoyo.utils.DataLoader;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -40,6 +28,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+
+import playground.mmoyo.utils.DataLoader;
 
 public class ptRouteAdder {
 
@@ -52,7 +52,7 @@ public class ptRouteAdder {
 		String basePopfile = "../playgrounds/mmoyo/output/precalculation/FragPersArea_812020_3.xml";
 		File plansDirfile = new File(plansDir);
 		String [] plansArray = plansDirfile.list();
-		Map <Id, List<Id>> clonsMap = new TreeMap <Id, List<Id>>();  //saves the original agent and his/her clons
+		Map <Id<Person>, List<Id<Person>>> clonsMap = new TreeMap <>();  //saves the original agent and his/her clons
 		
 		DataLoader loader= new DataLoader ();
 		Population basePop = loader.readPopulation(basePopfile); 
@@ -71,12 +71,12 @@ public class ptRouteAdder {
 				Plan planX = personX.getSelectedPlan();
 				
 				if(!clonsMap.containsKey(person.getId())){
-					clonsMap.put(person.getId(), new ArrayList<Id>());
+					clonsMap.put(person.getId(), new ArrayList<Id<Person>>());
 				}
-				List<Id> clonsList = clonsMap.get(person.getId());
+				List<Id<Person>> clonsList = clonsMap.get(person.getId());
 
 				boolean exists= false;
-				for (Id idClon: clonsList){ //validates that this pt  connection does not exist yet for this person
+				for (Id<Person> idClon: clonsList){ //validates that this pt  connection does not exist yet for this person
 					Plan clonPlan = newPop.getPersons().get(idClon).getSelectedPlan();
 					exists = exists || planPTRoutesComparator.haveSamePtRoutes(clonPlan, planX);
 					if(exists) break;
@@ -84,7 +84,7 @@ public class ptRouteAdder {
 				
 				if (!exists){
 					String strNewId = personX.getId().toString() +  strId;
-					Id newId = new IdImpl(strNewId);
+					Id<Person> newId = Id.create(strNewId, Person.class);
                     ((PersonImpl) personX).setId(newId);
                     newPop.addPerson(personX);
 					clonsMap.get(person.getId()).add(newId);

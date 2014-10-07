@@ -7,10 +7,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 public class TransitRouteUtil {
 	private final Network net;
@@ -28,7 +28,7 @@ public class TransitRouteUtil {
 	public List<Link> getAllLinks (){
 		List<Link> allLinkList  = new ArrayList<Link>();
 		allLinkList.add(this.net.getLinks().get(this.trRoute.getRoute().getStartLinkId()));
-		for (Id id : this.trRoute.getRoute().getLinkIds() ){
+		for (Id<Link> id : this.trRoute.getRoute().getLinkIds() ){
 			allLinkList.add(this.net.getLinks().get(id));	
 		}
 		allLinkList.add(this.net.getLinks().get(this.trRoute.getRoute().getEndLinkId()));
@@ -43,7 +43,7 @@ public class TransitRouteUtil {
 	}
 	
 	protected void printRouteLinkIds (){
-		for (Id linkId : this.trRoute.getRoute().getLinkIds()){
+		for (Id<Link> linkId : this.trRoute.getRoute().getLinkIds()){
 			log.info(linkId);
 		}
 	}
@@ -106,7 +106,7 @@ public class TransitRouteUtil {
 		
 		String str_stopId = "1003302.1";
 		System.out.println("========================== \n outgoing links of stop: " + str_stopId);
-		Id stopId = new IdImpl(str_stopId);
+		Id<TransitStopFacility> stopId = Id.create(str_stopId, TransitStopFacility.class);
 		TransitRouteStop stop = route.getStop(trSchedule.getFacilities().get(stopId));
 		List<Link> list = transitRouteUtil.getOutLinks(stop, route);
 		System.out.println("========================== \n outgoing links: " + list.size());

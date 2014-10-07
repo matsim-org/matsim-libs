@@ -7,7 +7,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -17,7 +16,7 @@ import org.matsim.core.scenario.ScenarioLoaderImpl;
 public class PersonRepeater {
 
 	
-	public PersonRepeater(final String config, final int repetitions, final Id selectedId) {
+	public PersonRepeater(final String config, final int repetitions, final Id<Person> selectedId) {
 		
 		final String SEPARATOR = "_";
 		
@@ -31,13 +30,13 @@ public class PersonRepeater {
 		person = population.getPersons().get(selectedId);
 		
 		//erase all persons
-		List<Id> idList = new ArrayList<Id>();
-		for (Id id: population.getPersons().keySet())	idList.add(id);
-		for (Id id: idList)       population.getPersons().remove(id);
+		List<Id<Person>> idList = new ArrayList<>();
+		for (Id<Person> id: population.getPersons().keySet())	idList.add(id);
+		for (Id<Person> id: idList)       population.getPersons().remove(id);
 		
 		//add the repeated plan x times
 		for (int i=0 ; i<repetitions ; i++) {
-			Id newId = new IdImpl(selectedId.toString() + SEPARATOR + i);
+			Id<Person> newId = Id.create(selectedId.toString() + SEPARATOR + i, Person.class);
 			Person personClon = new PersonImpl(newId);
 			
 			for (Plan plan: person.getPlans()){
@@ -56,7 +55,7 @@ public class PersonRepeater {
 	public static void main(String[] args) {
 		String config = "";
 		int repetitions= 10;
-		Id selectedId= new IdImpl("1");
+		Id<Person> selectedId= Id.create("1", Person.class);
 		new PersonRepeater(config, repetitions, selectedId);
 	}
 	

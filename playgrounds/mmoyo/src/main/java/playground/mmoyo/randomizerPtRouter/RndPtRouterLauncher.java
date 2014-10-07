@@ -19,12 +19,12 @@
 
 package playground.mmoyo.randomizerPtRouter;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
 import org.matsim.contrib.cadyts.pt.CadytsPtContext;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -84,14 +84,14 @@ public class RndPtRouterLauncher {
 		
 		//strategies settings
 		{ 
-		StrategySettings stratSets = new StrategySettings(new IdImpl(lastStrategyIdx+1));
+		StrategySettings stratSets = new StrategySettings(Id.create(lastStrategyIdx+1, StrategySettings.class));
 		stratSets.setModuleName("myCadyts");
 		stratSets.setProbability(0.9);
 		config.strategy().addStrategySettings(stratSets);
 		}
 		
 		{    //////!!!!!!!!!!!!!!!!!!!!!///////
-		StrategySettings stratSets2 = new StrategySettings(new IdImpl(lastStrategyIdx+2));
+		StrategySettings stratSets2 = new StrategySettings(Id.create(lastStrategyIdx+2, StrategySettings.class));
 		stratSets2.setModuleName("ReRoute"); // test that this does work.  Otherwise define this strategy in config file
 		stratSets2.setProbability(0.1);
 		stratSets2.setDisableAfter(400) ;

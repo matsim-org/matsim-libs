@@ -38,7 +38,7 @@ public class Controller {
 		new TransitScheduleReaderV1(transitSchedule, scenario.getNetwork()).readFile(TRANSITSCHEDULEFILE);
 		/*******************************************************/
 
-		Map <Id, List<StaticConnection>> connectionMap= new TreeMap <Id, List<StaticConnection>>();
+		Map <Id<StaticConnection>, List<StaticConnection>> connectionMap= new TreeMap<>();
 		Map <Coord, Collection<NodeImpl>> nearStopMap = new TreeMap <Coord, Collection<NodeImpl>>();
 
 		//read population

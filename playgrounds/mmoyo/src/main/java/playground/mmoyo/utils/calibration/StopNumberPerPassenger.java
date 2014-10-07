@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -150,7 +149,7 @@ public class StopNumberPerPassenger implements PersonAlgorithm{
 		MatsimNetworkReader matsimNetReader = new MatsimNetworkReader(scn);
 		matsimNetReader.readFile(netFile);
 		TransitSchedule schedule = dataLoader.readTransitSchedule(scheduleFile);
-		TransitLine line = schedule.getTransitLines().get(new IdImpl(strLineId));
+		TransitLine line = schedule.getTransitLines().get(Id.create(strLineId, TransitLine.class));
 		StopNumberPerPassenger stopNumberPerPassenger = new StopNumberPerPassenger(scn.getNetwork(), schedule, line);
 		
 		new PopSecReader(scn, stopNumberPerPassenger).readFile(popFile);

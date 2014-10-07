@@ -9,12 +9,12 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.BasicEventHandler;
@@ -32,7 +32,7 @@ public class TransitRoutePathValidator implements BasicEventHandler {
 	private static final Logger log = Logger.getLogger(TransitRoutePathValidator.class);
 	private ScenarioImpl scenario;
 	private Map<String, Tuple<Double, List<Id>>> tempLinkMap = new TreeMap <String, Tuple<Double, List<Id>>>();
-	private Map<Id, Tuple<Double, List<Id>>> simPathMap = new TreeMap <Id, Tuple<Double, List<Id>>>();
+	private Map<String, Tuple<Double, List<Id>>> simPathMap = new TreeMap <>();
 	private Map<String, Boolean> boolMap = new TreeMap <String, Boolean>();
 	private Map<Id, List<Double>> depsMap = new TreeMap <Id, List<Double>>();
 	
@@ -58,8 +58,8 @@ public class TransitRoutePathValidator implements BasicEventHandler {
 		
 		System.out.println("=====================================");
 		System.out.println("Validate routes");
-		for(Map.Entry <Id, Tuple<Double, List<Id>>> entry: simPathMap.entrySet() ){
-			Id id = entry.getKey(); 
+		for(Map.Entry <String, Tuple<Double, List<Id>>> entry: simPathMap.entrySet() ){
+			String id = entry.getKey(); 
 			double depTime= entry.getValue().getFirst();
 			List<Id> list = entry.getValue().getSecond();
 		
@@ -68,7 +68,7 @@ public class TransitRoutePathValidator implements BasicEventHandler {
 				//System.out.print(id2.toString() + SP);
 			}
 			
-			TransitRoute trRoute = getTransitRoute(id.toString(), list); 
+			TransitRoute trRoute = getTransitRoute(id, list); 
 			if (trRoute != null){
 				System.out.println("depTime: " + depTime + " " + Time.writeTime(depTime) + " corresponding Transit route: " + trRoute.getId());
 			}else{
@@ -97,7 +97,7 @@ public class TransitRoutePathValidator implements BasicEventHandler {
 
 			//print transitSchedule departures
 			System.out.print("\n" + id + " ");
-			TransitRoute trRoute = this.scenario.getTransitSchedule().getTransitLines().get(new IdImpl(id.toString().split(this.POINT)[0])).getRoutes().get(id);
+			TransitRoute trRoute = this.scenario.getTransitSchedule().getTransitLines().get(Id.create(id.toString().split(this.POINT)[0], TransitLine.class)).getRoutes().get(id);
 			for (Departure departure : trRoute.getDepartures().values()){
 				System.out.print(Time.writeTime(departure.getDepartureTime()) + " ");
 			}
@@ -164,7 +164,7 @@ public class TransitRoutePathValidator implements BasicEventHandler {
 		//Link Leave
 		}else if (event.getClass() == LinkLeaveEvent.class){
 			if ( boolMap.get(personAtr)){
-				Id linkId = new IdImpl((event.getAttributes().get(LINK))); 
+				Id<Link> linkId = Id.create((event.getAttributes().get(LINK)), Link.class); 
 				this.tempLinkMap.get(personAtr).getSecond().add(linkId);
 				//printAttributes (event);
 			}
@@ -173,7 +173,7 @@ public class TransitRoutePathValidator implements BasicEventHandler {
 		}else if (event.getClass() == PersonArrivalEvent.class){
 			boolean accept = boolMap.get(personAtr); 
 			if (accept){
-				Id simPathId= new IdImpl(personAtr + LOWLINE + Double.toString(timeAtr));
+				String simPathId= personAtr + LOWLINE + Double.toString(timeAtr);
 				
 				//remove first link and save in definitive route links map
 				Tuple<Double, List<Id>> tuple = this.tempLinkMap.get(personAtr);
@@ -200,7 +200,7 @@ public class TransitRoutePathValidator implements BasicEventHandler {
 	/**returns the transit route Id or null if not a transit route*/
 	private TransitRoute getTransitRoute(String personAtr, List<Id> linkIdlist ){
 		String[] pers_elements = personAtr.split(LOWLINE);
-		TransitLine line = this.scenario.getTransitSchedule().getTransitLines().get(new IdImpl(pers_elements[4]));
+		TransitLine line = this.scenario.getTransitSchedule().getTransitLines().get(Id.create(pers_elements[4], TransitLine.class));
 		Iterator <TransitRoute> iter = line.getRoutes().values().iterator();
 		Id transitRouteId= null;
 		
@@ -215,7 +215,7 @@ public class TransitRoutePathValidator implements BasicEventHandler {
 	}
 	
 	private TransitRoute getTransitRoute(Id id){
-		TransitRoute trRoute = this.scenario.getTransitSchedule().getTransitLines().get(new IdImpl(id.toString().split(this.POINT)[0])).getRoutes().get(id);
+		TransitRoute trRoute = this.scenario.getTransitSchedule().getTransitLines().get(Id.create(id.toString().split(this.POINT)[0], TransitLine.class)).getRoutes().get(id);
 		return trRoute;
 	}
 	

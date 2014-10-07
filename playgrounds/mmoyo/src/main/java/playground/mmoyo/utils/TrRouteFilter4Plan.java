@@ -12,14 +12,14 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 /**filters a population leaving only persons using some transit routes*/
 public class TrRouteFilter4Plan {
 
-	public Population filterPlan (Population population, List<Id> trRoutesIds ){
+	public Population filterPlan (Population population, List<Id<TransitRoute>> trRoutesIds ){
 		List<Id> personsToDel = new ArrayList<Id>();
 		for (Person person : population.getPersons().values()){
 			boolean keepPerson = false;
@@ -49,22 +49,22 @@ public class TrRouteFilter4Plan {
 	public static void main(String[] args) {
 		String netFilePath = null;
 		String popFilePath = null;
-		List<Id> trRoutesIds = new ArrayList<Id>();
+		List<Id<TransitRoute>> trRoutesIds = new ArrayList<>();
 		
 		if (args.length>0){
 			netFilePath = args[0];
 			popFilePath = args[1];
-			trRoutesIds.add(new IdImpl(args[2]));
-			trRoutesIds.add(new IdImpl(args[3]));
-			trRoutesIds.add(new IdImpl(args[4]));
-			trRoutesIds.add(new IdImpl(args[5]));
+			trRoutesIds.add(Id.create(args[2], TransitRoute.class));
+			trRoutesIds.add(Id.create(args[3], TransitRoute.class));
+			trRoutesIds.add(Id.create(args[4], TransitRoute.class));
+			trRoutesIds.add(Id.create(args[5], TransitRoute.class));
 		}else{
 			netFilePath = "../../multimodalNet.xml.gz";
 			popFilePath ="../../"; 
-			trRoutesIds.add(new IdImpl("B-M44.101.901.H"));
-			trRoutesIds.add(new IdImpl("B-M44.101.901.R"));
-			trRoutesIds.add(new IdImpl("B-M44.102.901.H"));
-			trRoutesIds.add(new IdImpl("B-M44.102.901.R"));
+			trRoutesIds.add(Id.create("B-M44.101.901.H", TransitRoute.class));
+			trRoutesIds.add(Id.create("B-M44.101.901.R", TransitRoute.class));
+			trRoutesIds.add(Id.create("B-M44.102.901.H", TransitRoute.class));
+			trRoutesIds.add(Id.create("B-M44.102.901.R", TransitRoute.class));
 		}
 		
 		DataLoader dloader = new DataLoader();

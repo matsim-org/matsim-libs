@@ -11,7 +11,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
@@ -58,8 +57,8 @@ public class PTRouter{
 		//this.multiNodeDijkstra = new MultiNodeDijkstra(this.logicNet, ptTravelCost, ptTravelTime);
 
 		Coord firstCoord = logicNet.getNodes().values().iterator().next().getCoord();
-		this.originNode=  new Station(new IdImpl(ORIGIN_ID), firstCoord);		//transitNetwork.getFactory().createNode(new IdImpl("W1"), null);
-		this.destinationNode=  new Station(new IdImpl(DESTINATION_ID), firstCoord);	//transitNetwork.getFactory().createNode(new IdImpl("W1"), null);
+		this.originNode=  new Station(Id.create(ORIGIN_ID, Node.class), firstCoord);		//transitNetwork.getFactory().createNode(Id.create("W1"), null);
+		this.destinationNode=  new Station(Id.create(DESTINATION_ID, Node.class), firstCoord);	//transitNetwork.getFactory().createNode(Id.create("W1"), null);
 		this.logicNet.addNode(originNode);
 		this.logicNet.addNode(destinationNode);
 
@@ -214,9 +213,9 @@ public class PTRouter{
 		int x=0;
 		for (Node node : nearNodes){
 			if (to){
-				newWalkLinks.add(new PTLink(new IdImpl(ACCESS_PREFIX + x++), walkNode, node, logicNet, PTValues.ACCESS_STR));
+				newWalkLinks.add(new PTLink(Id.create(ACCESS_PREFIX + x++, Link.class), walkNode, node, logicNet, PTValues.ACCESS_STR));
 			}else{
-				newWalkLinks.add(new PTLink(new IdImpl(EGRESS_PREFIX + x++), node, walkNode, logicNet, PTValues.EGRESS_STR));
+				newWalkLinks.add(new PTLink(Id.create(EGRESS_PREFIX + x++, Link.class), node, walkNode, logicNet, PTValues.EGRESS_STR));
 			}
 		}
 		return newWalkLinks;
@@ -307,7 +306,7 @@ public class PTRouter{
 	public void printRoute(Path path){
 		if (path!=null){
 			System.out.print("\nLinks: ");
-			Id transitRouteId = new IdImpl("");
+			Id<TransitRoute> transitRouteId = Id.create("", TransitRoute.class);
 			for (Node node : path.nodes){
 				Station ptNode= (Station)node;
 				if(ptNode.getTransitRoute().getId()==transitRouteId){

@@ -27,7 +27,6 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -46,7 +45,7 @@ public class Count_Line_Comparator {
 		
 		Set<Id<TransitStopFacility>> stopsIdSet = schedule.getFacilities().keySet();
 		for (TabularCountRecord tabularCountRecord : countRecordMap.values()){
-			Id tabStopId = new IdImpl(tabularCountRecord.getStop());
+			Id<TransitStopFacility> tabStopId = Id.create(tabularCountRecord.getStop(), TransitStopFacility.class);
 			if (!stopsIdSet.contains(tabStopId)){
 				System.out.println(tabStopId +  " not found");
 			}			
@@ -73,7 +72,7 @@ public class Count_Line_Comparator {
 		String h = "H";
 		String r = "R";
 		
-		Id line100Id = new IdImpl("100-B-100");
+		Id<TransitLine> line100Id = Id.create("100-B-100", TransitLine.class);
 		for (TabularCountRecord tabCountRecord: countRecordMap.values()){
 			TransitLine line = schedule.getTransitLines().get(tabCountRecord.getLineId());
 			if(!line.getId().equals(line100Id)){

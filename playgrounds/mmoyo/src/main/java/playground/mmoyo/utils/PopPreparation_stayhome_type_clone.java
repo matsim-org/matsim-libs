@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -64,7 +63,7 @@ public class PopPreparation_stayhome_type_clone {
 			((PlanImpl)person.getPlans().get(person.getPlans().size()-1)).setType(strStayHome);   // set type  "stay home"
 		
 			//create set of clones
-			Id newId = new IdImpl(person.getId().toString() + strCLON_SUFFIX);
+			Id<Person> newId = Id.create(person.getId().toString() + strCLON_SUFFIX, Person.class);
 			Person clon = clonner.run(person, newId);
 			clonsSet.add(clon);
 		}

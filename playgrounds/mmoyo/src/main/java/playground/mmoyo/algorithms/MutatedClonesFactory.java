@@ -10,7 +10,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -41,7 +40,7 @@ public class MutatedClonesFactory extends AbstractPersonAlgorithm{
 	public void run(Person person){
 		for (int i=0; i<cloneNum;i++){
 			//clone
-			Id newId = new IdImpl(person.getId().toString() + SEP + (i+2));
+			Id<Person> newId = Id.create(person.getId().toString() + SEP + (i+2), Person.class);
 			Person newPerson = new PersonClonner().run(person, newId);
 				
 			//mutate cloned plan

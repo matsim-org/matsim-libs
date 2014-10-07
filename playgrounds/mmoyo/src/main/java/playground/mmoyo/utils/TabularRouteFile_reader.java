@@ -6,10 +6,10 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 import playground.mmoyo.analysis.counts.reader.TabularCountReader;
 
@@ -19,7 +19,7 @@ public class TabularRouteFile_reader implements TabularFileHandler {
 	private static final String[] HEADER = {"oldRoute", "newRoute", "similarity"};
 	private final TabularFileParserConfig tabFileParserConfig;
 	private int rowNum=0;
-	Map <Id, String> routeMap = new TreeMap <Id, String>();
+	Map <Id<TransitRoute>, String> routeMap = new TreeMap <>();
 	
 	public TabularRouteFile_reader(){
 		this.tabFileParserConfig = new TabularFileParserConfig();
@@ -34,7 +34,7 @@ public class TabularRouteFile_reader implements TabularFileHandler {
 	@Override
 	public void startRow(String[] row) {
 		if (rowNum>0) {
-			Id oldRouteId = new IdImpl(row[0]); //
+			Id<TransitRoute> oldRouteId = Id.create(row[0], TransitRoute.class); //
 			String newRouteId = row[1]; 
 			routeMap.put(oldRouteId, newRouteId);
 		}else{
@@ -58,7 +58,7 @@ public class TabularRouteFile_reader implements TabularFileHandler {
 		rowNum++;
 	}
 	
-	public Map <Id, String> getRouteMap (){
+	public Map <Id<TransitRoute>, String> getRouteMap (){
 		return this.routeMap;
 	}
 	
@@ -69,7 +69,7 @@ public class TabularRouteFile_reader implements TabularFileHandler {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		Map <Id, String> old_new_route_Map = tabularRouteFile_reader.getRouteMap(); 
+		Map <Id<TransitRoute>, String> old_new_route_Map = tabularRouteFile_reader.getRouteMap(); 
 		
 		Map <String, Integer> new_route_Times_Map = new TreeMap <String, Integer>();;
 		for ( String  newRoute : old_new_route_Map.values() ){

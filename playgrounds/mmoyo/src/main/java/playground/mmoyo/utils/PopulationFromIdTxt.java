@@ -19,6 +19,9 @@
 
 package playground.mmoyo.utils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -28,11 +31,9 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.PersonAlgorithm;
+
 import playground.mmoyo.io.PopSecReader;
 import playground.mmoyo.io.TXT_IdReader;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**Reads a text file with agents Ids and creates a population object from them. Read sequentially*/ 
 public class PopulationFromIdTxt implements PersonAlgorithm {
@@ -47,9 +48,9 @@ public class PopulationFromIdTxt implements PersonAlgorithm {
     PopulationWriter populationWriter;
 	Network net;
 	String outdir;
-	private List<Id> persIds = new ArrayList<Id>();
+	private List<Id<Person>> persIds = new ArrayList<>();
 	
-	public PopulationFromIdTxt(final List<Id> persIds){
+	public PopulationFromIdTxt(final List<Id<Person>> persIds){
 		this.persIds = persIds; 
 	}
 	
@@ -87,7 +88,7 @@ public class PopulationFromIdTxt implements PersonAlgorithm {
 		MatsimNetworkReader matsimNetReader = new MatsimNetworkReader(scn);
 		matsimNetReader.readFile(netFile);
 		
-		List<Id> persIds = new TXT_IdReader().readAgentFromTxtFile(idsTxtFile);
+		List<Id<Person>> persIds = new TXT_IdReader().readAgentFromTxtFile(idsTxtFile);
 		PopulationFromIdTxt populationFromIdTxt = new PopulationFromIdTxt(persIds); 
 		populationFromIdTxt.setNet(scn.getNetwork());
 		populationFromIdTxt.setOutDir("../../");

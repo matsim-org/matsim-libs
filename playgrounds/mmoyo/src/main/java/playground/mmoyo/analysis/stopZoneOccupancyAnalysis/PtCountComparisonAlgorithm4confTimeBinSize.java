@@ -25,9 +25,9 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.CountSimComparison;
@@ -36,6 +36,7 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
 import org.matsim.pt.counts.OccupancyAnalyzer;
 import org.matsim.pt.counts.SimpleWriter;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /** 
  * PtCountComparisonAlgorithm is hard-coded to have 24 hours.  This is a copy of it to use the configurable time bin size
@@ -68,7 +69,7 @@ public class PtCountComparisonAlgorithm4confTimeBinSize {
 	void calculateComparison() {
 		double countValue;
 		for (Count count : this.counts.getCounts().values()) {
-			Id stopId = count.getLocId();
+			Id<TransitStopFacility> stopId = Id.create(count.getLocId(), TransitStopFacility.class);
 			if (!isInRange(count.getCoord())) {
 				continue;
 			}
@@ -106,7 +107,7 @@ public class PtCountComparisonAlgorithm4confTimeBinSize {
 					this.content.append(countValue);
 					this.content.append(this.CHR_NL);
 
-					this.countSimComp.add(new CountSimComparisonImpl(stopId, hour, countValue, simValue));
+					this.countSimComp.add(new CountSimComparisonImpl(Id.create(stopId, Link.class), hour, countValue, simValue));
 
 				} else {
 					countValue = 0.0;
@@ -116,7 +117,7 @@ public class PtCountComparisonAlgorithm4confTimeBinSize {
 		}
 	}
 
-	int[] getVolumesForStop(final Id stopId) {
+	int[] getVolumesForStop(final Id<TransitStopFacility> stopId) {
 		return this.oa.getOccupancyVolumesForStop(stopId);
 	}
 
@@ -135,7 +136,7 @@ public class PtCountComparisonAlgorithm4confTimeBinSize {
 
 	void setDistanceFilter(final Double distance, final String nodeId) {
 		this.distanceFilter = distance;
-		this.distanceFilterNode = this.network.getNodes().get(new IdImpl(nodeId));
+		this.distanceFilterNode = this.network.getNodes().get(Id.create(nodeId, Node.class));
 	}
 
 	void write(final String outputFilename) {

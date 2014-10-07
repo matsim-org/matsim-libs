@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 
 public class ClonDetector {
@@ -17,14 +18,14 @@ public class ClonDetector {
 	}
 	
 	/**return the list of clones of the population detecting them because they have "X" as suffix start*/
-	public List<Id> run (final Population pop){
-		final String strClon = "clon: ";
-		final String strNoClon = "no clon: ";
-		final String SEP = " ";
+	public List<Id<Person>> run (final Population pop){
+//		final String strClon = "clon: ";
+//		final String strNoClon = "no clon: ";
+//		final String SEP = " ";
 		int noClonsNum =0;
 			
-		List<Id> clonsList = new ArrayList<Id>();
-		for (Id id : pop.getPersons().keySet()){
+		List<Id<Person>> clonsList = new ArrayList<>();
+		for (Id<Person> id : pop.getPersons().keySet()){
 			int clonIndex = getClonIndex(id.toString());
 			if (clonIndex!=-1){
 				if (clonIndex>this.max){

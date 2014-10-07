@@ -25,7 +25,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
@@ -66,7 +66,7 @@ public class UtilCorrectonReader2 implements TabularFileHandler {
 		@Override
 		public void startRow(String[] row) {
 			if (rowNum>0) {
-				Id agentId = new IdImpl(row[0]);
+				Id<Person> agentId = Id.create(row[0], Person.class);
 				int corrNum = row.length-2;                             //only corrections
 				double correcArray[] = new double[corrNum]; 
 				for (int i=0; i<corrNum ; i++){                          // the row contains at the beginning:  [id, selindx,  .... ]  they are not put into the correcArray

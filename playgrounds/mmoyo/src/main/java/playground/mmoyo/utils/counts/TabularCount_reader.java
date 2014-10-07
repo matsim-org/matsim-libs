@@ -1,17 +1,16 @@
 package playground.mmoyo.utils.counts;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+
 import playground.mmoyo.analysis.counts.reader.TabularCountReader;
 
 /**
@@ -38,7 +37,7 @@ public class TabularCount_reader implements TabularFileHandler {
 	@Override
 	public void startRow(String[] row) {
 		if (rowNum>0) {
-			Id id = new IdImpl(row[0]); //line
+			Id<TransitLine> id = Id.create(row[0], TransitLine.class); //line
 			char direction = row[1].charAt(0); //direction
 			String stop = row[3]; //stop
 			double count = Double.parseDouble(row[4]);  //the file does not contain "haltestellnummer", so this is column 4

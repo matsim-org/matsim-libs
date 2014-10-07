@@ -1,22 +1,23 @@
 package playground.mmoyo.utils;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import playground.mmoyo.Validators.PlanValidator;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import playground.mmoyo.Validators.PlanValidator;
 
 /**Gets a population object and returns a sample population with first agents.
  * The difference with FirstPersonExtractorFromFile is that this class receives a population object, not a population file to read.
@@ -32,8 +33,9 @@ public class FirstPersonsExtractor {
 		if(selectBuslines){
 			String trLineId = "B-M44";
 			String trLineId2 = "B-344";
-			Id[] array = {new IdImpl(trLineId),new IdImpl(trLineId2)};
-			List <Id> trList  = Arrays.asList(array);
+			List<Id<TransitRoute>> trList = new ArrayList<>();
+			trList.add(Id.create(trLineId, TransitRoute.class));
+			trList.add(Id.create(trLineId2, TransitRoute.class));
 			new TrRouteFilter4Plan().filterPlan(pop,trList);
 		}
 		

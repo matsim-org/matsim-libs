@@ -21,7 +21,6 @@
 package playground.mmoyo.utils;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -36,11 +35,11 @@ public class NonRepeatedStopsValidator {
 		DataLoader dataLoader = new DataLoader();
 		TransitSchedule schedule = dataLoader.readTransitSchedule(scheduleFile);
 		
-		TransitLine line344 = schedule.getTransitLines().get(new IdImpl("B-344"));
-		TransitRoute route344H = line344.getRoutes().get(new IdImpl("B-344.101.901.H"));
-		TransitRoute route344R = line344.getRoutes().get(new IdImpl("B-344.101.901.R"));
+		TransitLine line344 = schedule.getTransitLines().get(Id.create("B-344", TransitLine.class));
+		TransitRoute route344H = line344.getRoutes().get(Id.create("B-344.101.901.H", TransitRoute.class));
+		TransitRoute route344R = line344.getRoutes().get(Id.create("B-344.101.901.R", TransitRoute.class));
 		
-		TransitLine lineM44 = schedule.getTransitLines().get(new IdImpl("B-M44"));
+		TransitLine lineM44 = schedule.getTransitLines().get(Id.create("B-M44", TransitLine.class));
 		
 		for (TransitRoute route: lineM44.getRoutes().values()){
 			for (TransitRouteStop stop : route.getStops()){

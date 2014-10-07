@@ -4,13 +4,13 @@ import java.io.File;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
@@ -32,7 +32,7 @@ public class ActLinkIdChanger extends AbstractPersonAlgorithm {
 			for (PlanElement pe :plan.getPlanElements()){
 				if (pe instanceof Activity) {
 					ActivityImpl act = (ActivityImpl)pe;
-					Id newId =  new IdImpl(this.prefix +  act.getLinkId()); 
+					Id<Link> newId = Id.create(this.prefix +  act.getLinkId(), Link.class); 
 
 					//verify that the link exists in net
 					if (!this.net.getLinks().keySet().contains(newId)){

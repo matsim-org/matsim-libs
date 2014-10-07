@@ -1,11 +1,19 @@
 package playground.mmoyo.utils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.*;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -13,9 +21,6 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**reads a pt routed population and convert each pt-connection into a plan, each new plan has a index suffix*/
 public class PlanFragmenter {
@@ -59,7 +64,7 @@ public class PlanFragmenter {
 							
 							//add the clonPerson if he/she has a pt-connection
 							if (leg.getMode().equals(TransportMode.transit_walk)){
-                                final Id id = new IdImpl(clonPerson.getId().toString() + (suffix++));
+                                final Id<Person> id = Id.create(clonPerson.getId().toString() + (suffix++), Person.class);
                                 ((PersonImpl) clonPerson).setId(id);
                                 personList.add(clonPerson);
 							}
@@ -67,7 +72,7 @@ public class PlanFragmenter {
 						}
 						//start new plan
 						numOfLegs=0;
-						clonPerson = new PersonImpl(new IdImpl(person.getId().toString() + STRTRIP));
+						clonPerson = new PersonImpl(Id.create(person.getId().toString() + STRTRIP, Person.class));
 						newPlan = new PlanImpl(clonPerson);
 						clonPerson.addPlan(newPlan);
 					}
@@ -92,7 +97,7 @@ public class PlanFragmenter {
 		for (Person person : population.getPersons().values() ){
 			int suffix = 1;
 			for (Plan plan : person.getPlans()){
-				Id newId = new IdImpl(person.getId().toString()+ SEP + suffix);
+				Id<Person> newId = Id.create(person.getId().toString()+ SEP + suffix, Person.class);
 				
 				Person newPerson = new PersonImpl(newId);
 				newPerson.addPlan(plan);

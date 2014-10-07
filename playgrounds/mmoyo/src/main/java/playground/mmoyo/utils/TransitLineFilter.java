@@ -6,7 +6,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -48,7 +47,7 @@ public class TransitLineFilter {
 
 		//filter, deleting the rest of lines
 		for (int i=0 ; i<linesArray.length ; i++){
-			Id idLine=  new IdImpl(linesArray[i]);
+			Id<TransitLine> idLine=  Id.create(linesArray[i], TransitLine.class);
 			TransitLine line= transitSchedule.getTransitLines().get(idLine);
 			if (line==null){
 				System.out.println("the line does not exist: " + linesArray[i]);

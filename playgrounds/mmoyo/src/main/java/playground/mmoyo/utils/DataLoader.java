@@ -23,7 +23,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -36,6 +35,7 @@ import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
+import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
@@ -110,8 +110,8 @@ public class DataLoader {
 	
 	//returns a transitRoute object of the schedule
 	public TransitRoute getTransitRoute(final String strRouteId, final TransitSchedule schedule){
-		Id lineId = new IdImpl(strRouteId.split("\\.")[0]);
-		return schedule.getTransitLines().get(lineId).getRoutes().get(new IdImpl(strRouteId));
+		Id<TransitLine> lineId = Id.create(strRouteId.split("\\.")[0], TransitLine.class);
+		return schedule.getTransitLines().get(lineId).getRoutes().get(Id.create(strRouteId, TransitRoute.class));
 	}
 
 	public Counts readCounts (String countFile){
