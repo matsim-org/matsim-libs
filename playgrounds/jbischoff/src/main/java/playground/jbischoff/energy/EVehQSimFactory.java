@@ -20,6 +20,7 @@
 package playground.jbischoff.energy;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionTracker;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.Mobsim;
@@ -45,10 +46,12 @@ import playground.jbischoff.energy.charging.ChargingHandler;
 public class EVehQSimFactory implements MobsimFactory {
 
     private ChargingHandler ch;
+    private EnergyConsumptionTracker ect;
 
-    public EVehQSimFactory(ChargingHandler ch)
+    public EVehQSimFactory(ChargingHandler ch, EnergyConsumptionTracker ect)
     {
         this.ch  = ch;
+        this.ect = ect;
     }
     
     @Override
@@ -59,7 +62,8 @@ public class EVehQSimFactory implements MobsimFactory {
         if (conf == null) {
             throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
         }
-
+        eventsManager.addHandler(ch);
+        eventsManager.addHandler(ect);
         final QSim qSim = new QSim( sc, eventsManager );
 
         final ActivityEngine activityEngine = new ActivityEngine();

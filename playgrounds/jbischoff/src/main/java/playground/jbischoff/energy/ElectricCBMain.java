@@ -75,31 +75,33 @@ public class ElectricCBMain
             if (pNoString.endsWith("00")){
                 
                 Id<Vehicle> vid =  Id.create(personId, Vehicle.class);
-                BatteryElectricVehicle bev = new BatteryElectricVehicleImpl(ecm, 20,vid);
+                BatteryElectricVehicle bev = new BatteryElectricVehicleImpl(ecm, 20*1000*3600,vid);
                 this.bevs.put(vid, bev);
+                
                 Activity act = (Activity)person.getPlans().get(0).getPlanElements().get(2);
                 Id<Link> linkId = act.getLinkId();
                 Id<Charger> chargerId = Id.create(linkId+"_"+pNoString, Charger.class);
                 ChargerImpl c = new ChargerImpl(chargerId, linkId, 4, 1);
                 ch.addCharger(c);
+                
             }
             
         }
-        EventHandlerGroup handlerGroup = new EventHandlerGroup();
+        ch.addVehicles(bevs);
         EnergyConsumptionTracker ect = new EnergyConsumptionTracker(bevs, scenario.getNetwork());
-        handlerGroup.addHandler(ect);
-        handlerGroup.addHandler(ch);
-        EventsManager em = EventsUtils.createEventsManager();
-        em.addHandler(handlerGroup);
-        EVehQSimFactory ev = new EVehQSimFactory(ch);
+        EVehQSimFactory ev = new EVehQSimFactory(ch,ect);
         
         Controler c = new Controler(scenario);
         c.setOverwriteFiles(true);
         c.addMobsimFactory("eveh", ev);
         config.controler().setMobsim("eveh");
         c.run();
+        ch.getChargerLog().writeToFiles(config.controler().getOutputDirectory());
+        ch.getSoCLog().writeToFiles(config.controler().getOutputDirectory());
         
         
     }
+    
+
 
 }

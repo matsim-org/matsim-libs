@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
@@ -74,9 +75,10 @@ PersonArrivalEventHandler, MobsimEngine
     @Override
     public void handleEvent(PersonArrivalEvent event)
     {
-     if (!event.getLegMode().equals("car")) return;
+     if (!event.getLegMode().equals(TransportMode.car)) return;
      Id<Vehicle> vid = Id.create(event.getPersonId(), Vehicle.class);
      if (!this.vehicleRegister.containsKey(vid)) return;
+     if (!this.chargerRegister.containsKey(event.getLinkId())) return;
      for (ChargerImpl c : this.chargerRegister.get(event.getLinkId()).values()){
          if (c.addToCharger(this.vehicleRegister.get(vid))){
             this.chargingRegister.put(vid, c.getId());
@@ -184,5 +186,22 @@ PersonArrivalEventHandler, MobsimEngine
         // TODO Auto-generated method stub
         
     }
+
+    public SoCLog getSoCLog()
+    {
+        return soCLog;
+    }
+
+    public ChargerLog getChargerLog()
+    {
+        return chargerLog;
+    }
+
+    public void addVehicles(HashMap<Id<Vehicle>, Vehicle> bevs)
+    {
+        this.vehicleRegister.putAll(bevs);
+    }
+    
+    
 
 }
