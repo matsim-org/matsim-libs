@@ -9,12 +9,12 @@ public class ActivityLocationMutatorFactory implements MutatorFactory {
 
 	private final String blacklist;
 	
-	private final DataPool facilities;
+	private final DataPool dataPool;
 	
 	private final Random random;
 	
-	public ActivityLocationMutatorFactory(DataPool facilities, String blacklist, Random random) {
-		this.facilities = facilities;
+	public ActivityLocationMutatorFactory(DataPool dataPool, String blacklist, Random random) {
+		this.dataPool = dataPool;
 		this.blacklist = blacklist;
 		this.random = random;
 	}
@@ -22,7 +22,7 @@ public class ActivityLocationMutatorFactory implements MutatorFactory {
 	@Override
 	public Mutator newInstance() {
 		Random rnd = new XORShiftRandom(random.nextLong());
-		return new RandomSelector(new ActivityLocationMutator(facilities, rnd, blacklist), rnd);
+		return new RandomSelector(new ActivityLocationMutator(dataPool, rnd, blacklist), rnd);
 	}
 
 }

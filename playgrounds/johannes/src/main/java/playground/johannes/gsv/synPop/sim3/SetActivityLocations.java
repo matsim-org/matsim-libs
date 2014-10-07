@@ -17,37 +17,28 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.sim2;
+package playground.johannes.gsv.synPop.sim3;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
-import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.io.DoubleSerializer;
-import playground.johannes.gsv.synPop.io.IntegerSerializer;
+import playground.johannes.gsv.synPop.data.DataPool;
+import playground.johannes.gsv.synPop.data.FacilityDataLoader;
+import playground.johannes.gsv.synPop.data.FacilityZoneValidator;
+import playground.johannes.gsv.synPop.data.LandUseDataLoader;
+import playground.johannes.gsv.synPop.invermo.sim.CopyHomeLocations;
 import playground.johannes.gsv.synPop.io.XMLParser;
-import playground.johannes.gsv.synPop.mid.MIDKeys;
 import playground.johannes.gsv.synPop.mid.PersonCloner;
-import playground.johannes.gsv.synPop.sim.ActivityLocationInitializer;
-import playground.johannes.gsv.synPop.sim2.HamiltonianLogger;
-import playground.johannes.gsv.synPop.sim3.ActivityLocationMutatorFactory;
-import playground.johannes.gsv.synPop.sim3.Hamiltonian;
-import playground.johannes.gsv.synPop.sim3.HamiltonianComposite;
-import playground.johannes.gsv.synPop.sim.Initializer;
-import playground.johannes.sna.gis.ZoneLayer;
-import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
+import playground.johannes.gsv.synPop.mid.run.ProxyTaskRunner;
+import playground.johannes.gsv.synPop.mid.sim.PersonLau2Inhabitants;
+import playground.johannes.gsv.synPop.mid.sim.PersonNuts1Name;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 
 /**
@@ -69,8 +60,6 @@ public class SetActivityLocations {
 		ConfigUtils.loadConfig(config, args[0]);
 		
 		XMLParser parser = new XMLParser();
-		parser.addSerializer(MIDKeys.PERSON_MUNICIPALITY_CLASS, IntegerSerializer.instance());
-		parser.addSerializer(CommonKeys.PERSON_WEIGHT, DoubleSerializer.instance());
 		parser.setValidating(false);
 	
 		logger.info("Loading persons...");
@@ -83,66 +72,67 @@ public class SetActivityLocations {
 		persons = PersonCloner.weightedClones(persons, Integer.parseInt(config.getParam(MODULE_NAME, "targetSize")), random);
 		logger.info(String.format("Generated %s persons.", persons.size()));
 		
-		logger.info("Loading GIS data...");
-		/*
-		 * load facilities
-		 */
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		FacilitiesReaderMatsimV1 facReader = new FacilitiesReaderMatsimV1(scenario);
-		facReader.readFile(config.getParam(MODULE_NAME, "facilities"));
-		ActivityFacilities facilities = scenario.getActivityFacilities();
-		
+		logger.info("Loading data...");
+		DataPool dataPool = new DataPool();
+		dataPool.register(new FacilityDataLoader(config.getParam(MODULE_NAME, "facilities"), random), FacilityDataLoader.KEY);
+//		dataPool.register(new LandUseDataLoader(config.getModule(MODULE_NAME)), LandUseDataLoader.KEY);
 		logger.info("Done.");
 		
+//		logger.info("Validation data...");
+//		FacilityZoneValidator.validate(dataPool, ActivityType.HOME, 3);
+//		FacilityZoneValidator.validate(dataPool, ActivityType.HOME, 1);
+//		logger.info("Done.");
+		/*
+		 * Assign random facilities to acts
+		 */
+		logger.info("Initializing activities...");
+		ProxyTaskRunner.run(new InitActivitLocations(dataPool, ActivityType.HOME), persons);
+		
 		logger.info("Setting up sampler...");
-		int numThreads = Integer.parseInt(config.findParam(MODULE_NAME, "numThreads"));
-		int logInterval = (int) Double.parseDouble(config.getParam(MODULE_NAME, "logInterval"));
+		/*
+		 * Build a hamiltonian to evaluate the target distance
+		 */
+		HamiltonianComposite H = new HamiltonianComposite();
+		TargetDistanceHamiltonian distance = new TargetDistanceHamiltonian();
+		H.addComponent(distance, 1);
+		/*
+		 * Build the move set and sampler
+		 */
+		ActivityLocationMutatorFactory factory = new ActivityLocationMutatorFactory(dataPool, ActivityType.HOME, random);
+		Sampler sampler = new Sampler(persons, H, factory, random);
+		/*
+		 * Build the listener
+		 */
+		SamplerListenerComposite lComposite = new SamplerListenerComposite();
+		/*
+		 * need to copy activity location user key to activity attributes
+		 */
 		int dumpInterval = (int) Double.parseDouble(config.getParam(MODULE_NAME, "dumpInterval"));
+		lComposite.addComponent(new BlockingSamplerListener(new CopyFacilityUserData(), dumpInterval));
+		/*
+		 * add a population writer
+		 */
 		String outputDir = config.getParam(MODULE_NAME, "outputDir");
-		long iters = (long) Double.parseDouble(config.getParam(MODULE_NAME, "iterations"));
-		
-		ActivityLocationMutatorFactory factory = null;//new ActivityLocationMutatorFactory(facilities, "home", random);
-		
-		HamiltonianComposite h = new HamiltonianComposite();
-		h.addComponent(new ActivityLocationHamiltonian(facilities), 100);
-//		h.addComponent(new HFacilityCapacity(null, facilities), 0.00001);
-		
-		Sampler sampler = null;//new Sampler(persons, h, factory, random);
-		
 		PopulationWriter popWriter = new PopulationWriter(outputDir);
 		popWriter.setDumpInterval(1);
-		
-		SamplerListenerComposite listeners = new SamplerListenerComposite();
-		listeners.addComponent(new BlockingSamplerListener(popWriter, dumpInterval));
-		
-		for(Hamiltonian hamil : h.getComponents()) {
-			listeners.addComponent(new HamiltonianLogger(hamil, logInterval, outputDir));
-		}
-		listeners.addComponent(new SamplerLogger());
-//		listeners.addComponent(new BlockingSamplerListener(new AnalyzerListener(facilities, outputDir), logInterval));
-		sampler.setSamplerListener(listeners);
+		lComposite.addComponent(new BlockingSamplerListener(popWriter, dumpInterval));
 		/*
-		 * initialize persons
+		 * add loggers
 		 */
-		logger.info("Initializing persons...");
-		List<Initializer> initializers = new ArrayList<Initializer>();
+		int logInterval = (int) Double.parseDouble(config.getParam(MODULE_NAME, "logInterval"));
+		lComposite.addComponent(new HamiltonianLogger(distance, logInterval, outputDir));
 		
-		ZoneLayer<Double> gemeinden = ZoneLayerSHP.read(config.findParam(MODULE_NAME, "popNuts3"), "EWZ");
-		initializers.add(new ActivityLocationInitializer(facilities, gemeinden, "home", random));
+		SamplerLogger slogger = new SamplerLogger();
+		lComposite.addComponent(slogger);
 		
-		for(Initializer initializer : initializers) {
-			for(ProxyPerson person : persons) {
-				initializer.init(person);
-			}
-		}
-		
+		sampler.setSamplerListener(lComposite);
+
 		logger.info("Running sampler...");
-		
+		long iters = (long) Double.parseDouble(config.getParam(MODULE_NAME, "iterations"));
+		int numThreads = Integer.parseInt(config.findParam(MODULE_NAME, "numThreads"));
 		sampler.run(iters, numThreads);
+		slogger.stop();
 		logger.info("Done.");
 		
 	}
-	
-	
-
 }
