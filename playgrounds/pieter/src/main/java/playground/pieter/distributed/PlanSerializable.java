@@ -1,21 +1,12 @@
 package playground.pieter.distributed;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -25,8 +16,12 @@ import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
+import org.matsim.vehicles.Vehicle;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 class PlanSerializable implements Serializable {
 	interface PlanElementSerializable extends Serializable {
@@ -53,9 +48,9 @@ class PlanSerializable implements Serializable {
 		}
 
 		public Activity getActivity() {
-			ActivityImpl activity = new ActivityImpl(type, coord.getCoord(), new IdImpl(linkIdString));
+			ActivityImpl activity = new ActivityImpl(type, coord.getCoord(), Id.createLinkId(linkIdString));
 			activity.setEndTime(endTime);
-			activity.setFacilityId(facIdString == null ? null : new IdImpl(facIdString));
+			activity.setFacilityId(facIdString == null ? null : Id.create(facIdString, ActivityFacility.class));
 			activity.setMaximumDuration(maximumDuration);
 			activity.setStartTime(startTime);
 			return activity;
@@ -135,15 +130,17 @@ class PlanSerializable implements Serializable {
 
 		@Override
 		public Route getRoute(String mode) {
-			NetworkRoute route = new LinkNetworkRouteImpl(new IdImpl(startLinkIdString), new IdImpl(endLinkIdString));
+            Id<Link> startLinkId = Id.createLinkId(startLinkIdString);
+            Id<Link> endLinkId = Id.createLinkId(endLinkIdString);
+			NetworkRoute route = new LinkNetworkRouteImpl(startLinkId, endLinkId);
 			route.setDistance(distance);
 			List<Id<Link>> linkIds = new ArrayList<>();
 			for (String linkId : linkIdStrings)
-				linkIds.add(new IdImpl(linkId));
-			route.setLinkIds(new IdImpl(startLinkIdString), linkIds, new IdImpl(endLinkIdString));
+				linkIds.add(Id.createLinkId(linkId));
+			route.setLinkIds(startLinkId, linkIds, endLinkId);
 			route.setTravelCost(travelCost);
 			route.setTravelTime(travelTime);
-			route.setVehicleId(vehicleIdString == null ? null : new IdImpl(vehicleIdString));
+			route.setVehicleId(vehicleIdString == null ? null : Id.create(vehicleIdString, Vehicle.class));
 			return route;
 		}
 
@@ -168,14 +165,16 @@ class PlanSerializable implements Serializable {
 		@Override
 		public Route getRoute(String mode) {
 			GenericRoute route;
-			if(!mode.equals(TransportMode.pt)){
-				route = new GenericRouteImpl(new IdImpl(startLinkIdString), new IdImpl(endLinkIdString));
+            Id<Link> startLinkId = Id.createLinkId(startLinkIdString);
+            Id<Link> endLinkId = Id.createLinkId(endLinkIdString);
+            if(!mode.equals(TransportMode.pt)){
+				route = new GenericRouteImpl(startLinkId, endLinkId);
 			}else{
-				route = (GenericRoute) new ExperimentalTransitRouteFactory().createRoute(new IdImpl(startLinkIdString), new IdImpl(endLinkIdString));
+				route = (GenericRoute) new ExperimentalTransitRouteFactory().createRoute(startLinkId, endLinkId);
 			}
 			route.setDistance(distance);
 			route.setTravelTime(travelTime);
-			route.setRouteDescription(new IdImpl(startLinkIdString), routeDescription, new IdImpl(endLinkIdString));
+			route.setRouteDescription(startLinkId, routeDescription, endLinkId);
 			return route;
 		}
 
@@ -199,7 +198,7 @@ class PlanSerializable implements Serializable {
 	}
 
 	public Plan getPlan(Population population) {
-		Plan plan = new PlanImpl(population.getPersons().get(new IdImpl(personId)));
+		Plan plan = new PlanImpl(population.getPersons().get(Id.createPersonId(personId)));
 		plan.setScore(score);
 		plan.setType(type);
 		for (PlanElementSerializable planElementSerializable : planElements)

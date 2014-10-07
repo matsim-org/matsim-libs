@@ -2,17 +2,23 @@ package playground.pieter.distributed;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.facilities.MatsimFacilitiesReader;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
 
+import org.matsim.core.utils.io.UncheckedIOException;
 import playground.pieter.pseudosimulation.mobsim.PSimFactory;
 import playground.singapore.transitRouterEventsBased.TransitRouterWSImplFactory;
 import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTime;
@@ -27,8 +33,12 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.*;
-
+//IMPORTANT: PSim produces events that are not in chronological order. This controler
+// will require serious overhaul if chronological order is enforced in all event manager implementations
 public class SlaveControler implements IterationStartsListener, BeforeMobsimListener {
+    private Scenario scenario;
+    private Config config;
+
     class TimesReceiver implements Runnable {
         Logger timesLogger = Logger.getLogger(this.getClass());
 
@@ -87,16 +97,22 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
         options.addOption("s", false, "Switch to indicate if this is the Singapore scenario, i.e. events-based routing");
         CommandLineParser parser = new BasicParser();
         CommandLine commandLine = parser.parse(options, args);
-        if (commandLine.hasOption("c"))
-            matsimControler = new Controler(ScenarioUtils.loadScenario(ConfigUtils.loadConfig(commandLine.getOptionValue("c"))));
+        if (commandLine.hasOption("c")) {
+            try{
+            config = ConfigUtils.loadConfig(commandLine.getOptionValue("c"));
+
+            }catch(UncheckedIOException e){
+                System.err.println("Config file not found");
+                System.out.println(options.toString());
+                System.exit(1);
+            }
+        }
         else {
             System.err.println("Config file not specified");
             System.out.println(options.toString());
             System.exit(1);
         }
-        matsimControler.setOverwriteFiles(true);
-        matsimControler.setCreateGraphs(false);
-        matsimControler.addControlerListener(this);
+
         Socket socket;
         int socketNumber = 12345;
         String hostname = "localhost";
@@ -119,12 +135,18 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
         this.reader = new ObjectInputStream(socket.getInputStream());
         this.writer = new ObjectOutputStream(socket.getOutputStream());
         int myNumber = reader.readInt();
-        matsimControler.getConfig().controler()
-                .setOutputDirectory(matsimControler.getConfig().controler().getOutputDirectory() + "_" + myNumber);
         slaveLogger.warn("About to receive agent ids for removal from master");
         List<String> idStrings = (List<String>) reader.readObject();
         slaveLogger.warn("RECEIVED agent ids for removal from master. Starting TimesReceiver thread.");
-        removeNonSimulatedAgents(idStrings);
+//      The following line will make the controler use the events manager that doesn't check for event order
+        config.parallelEventHandling().setSynchronizeOnSimSteps(false);
+        config.controler().setOutputDirectory(config.controler().getOutputDirectory() + "_" + myNumber);
+        scenario = ScenarioUtils.createScenario(config);
+        new SlaveScenarioLoaderImpl(scenario).loadScenario(idStrings);
+        matsimControler = new Controler(scenario);
+        matsimControler.setOverwriteFiles(true);
+        matsimControler.setCreateGraphs(false);
+        matsimControler.addControlerListener(this);
         new Thread(new TimesReceiver()).start();
         if (commandLine.hasOption("s")) {
             slaveLogger.warn("Singapore scenario: Doing events-based transit routing.");
@@ -166,6 +188,7 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
     public void notifyIterationStarts(IterationStartsEvent event) {
         // the time calculators are null until the master sends them, need
         // something to keep psim occupied until then
+//        pSimFactory = new PSimFactory();
         if (linkTravelTimes == null)
             pSimFactory.setTravelTime(matsimControler.getLinkTravelTimes());
         else
