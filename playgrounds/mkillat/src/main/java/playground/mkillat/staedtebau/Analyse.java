@@ -97,10 +97,10 @@ public class Analyse implements Runnable {
 		System.out.println(allAgents.size());
 		
 		
-		Map<Id, Double> agentsOnBergmann = PotsdamEventFileReaderPersonUseBridge.EventFileReader(configBase, eventsBase);
+		Map<Id<Person>, Double> agentsOnBergmann = PotsdamEventFileReaderPersonUseBridge.EventFileReader(configBase, eventsBase);
 		System.out.println(agentsOnBergmann.size());
 		
-		Map<Id, Double> agentsOnBergmann2 = PotsdamEventFileReaderPersonUseBridge.EventFileReader(configMeasure, eventsMeasure);
+		Map<Id<Person>, Double> agentsOnBergmann2 = PotsdamEventFileReaderPersonUseBridge.EventFileReader(configMeasure, eventsMeasure);
 		System.out.println(agentsOnBergmann2.size());
 		
 	}

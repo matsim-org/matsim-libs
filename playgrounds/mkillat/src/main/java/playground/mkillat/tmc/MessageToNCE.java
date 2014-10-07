@@ -2,13 +2,14 @@ package playground.mkillat.tmc;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 
@@ -17,9 +18,9 @@ public class MessageToNCE {
 
 	NetworkImpl net = NetworkImpl.createNetwork();
 	
-	IdImpl idN1 = new IdImpl("2");
-	IdImpl idN2 = new IdImpl("7");
-	IdImpl idN3 = new IdImpl("12");
+	Id<Node> idN1 = Id.create("2", Node.class);
+	Id<Node> idN2 = Id.create("7", Node.class);
+	Id<Node> idN3 = Id.create("12", Node.class);
 	
 	CoordImpl coord1 = new CoordImpl(13.0, 14.0);
 	CoordImpl coord2 = new CoordImpl(15.0, 16.0);
@@ -30,8 +31,8 @@ public class MessageToNCE {
 	Node node3 = net.createAndAddNode(idN3, coord3);
 	
 
-	IdImpl idL1 = new IdImpl("6");
-	IdImpl idL2 = new IdImpl("15");
+	Id<Link> idL1 = Id.create("6", Link.class);
+	Id<Link> idL2 = Id.create("15", Link.class);
 	
 	Link link1 = net.createAndAddLink(idL1, node1, node2, 10.0, 10.0, 10.0, 10.0);
 	String linkS1 = "6";

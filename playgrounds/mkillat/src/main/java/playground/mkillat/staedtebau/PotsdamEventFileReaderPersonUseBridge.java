@@ -1,14 +1,13 @@
 package playground.mkillat.staedtebau;
 
-import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -17,17 +16,17 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 public class PotsdamEventFileReaderPersonUseBridge  {
 
-	public static Map<Id, Double> EventFileReader(String configdatei, String inputFile) {
+	public static Map<Id<Person>, Double> EventFileReader(String configdatei, String inputFile) {
 		
 		
-		Id id1 = new IdImpl(65);
-		Id id2 = new IdImpl(67);
-		Id id3 = new IdImpl(69);
-		Id id4 = new IdImpl(73);
-		Id id5 = new IdImpl(64);
-		Id id6 = new IdImpl(68);
-		Id id7 = new IdImpl(55);
-		Id id8 = new IdImpl(54);
+		Id<Link> id1 = Id.create(65, Link.class);
+		Id<Link> id2 = Id.create(67, Link.class);
+		Id<Link> id3 = Id.create(69, Link.class);
+		Id<Link> id4 = Id.create(73, Link.class);
+		Id<Link> id5 = Id.create(64, Link.class);
+		Id<Link> id6 = Id.create(68, Link.class);
+		Id<Link> id7 = Id.create(55, Link.class);
+		Id<Link> id8 = Id.create(54, Link.class);
 		
 		
 		Config config = org.matsim.core.config.ConfigUtils.loadConfig(configdatei);
