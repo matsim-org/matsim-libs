@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.southafrica.projects.digicore;
+package playground.southafrica.projects.digicore.grid;
 
 import java.io.Serializable;
 import java.util.ArrayList;

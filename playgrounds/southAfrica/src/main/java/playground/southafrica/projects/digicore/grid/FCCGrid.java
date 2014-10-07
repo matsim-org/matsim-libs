@@ -1,9 +1,10 @@
 //Nico de Koker, University of Pretoria, August 2014
 
-package playground.southafrica.projects.digicore;
+package playground.southafrica.projects.digicore.grid;
 
 
-class FCCGrid {
+
+public class FCCGrid {
 
 	// Data Members
 	private GridPoint[] FcGrid;

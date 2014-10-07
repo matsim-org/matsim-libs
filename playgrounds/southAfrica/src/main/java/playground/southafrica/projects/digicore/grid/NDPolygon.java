@@ -1,8 +1,9 @@
 //Nico de Koker, University of Pretoria, August 2014
 
-package playground.southafrica.projects.digicore;
+package playground.southafrica.projects.digicore.grid;
 
-class NDPolygon {
+
+public class NDPolygon {
 
 	// Data Members
 	private GridPoint[] PolyFace;

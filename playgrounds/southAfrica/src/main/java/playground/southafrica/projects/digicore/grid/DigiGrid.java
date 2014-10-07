@@ -17,11 +17,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.southafrica.projects.digicore;
+package playground.southafrica.projects.digicore.grid;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,54 +48,52 @@ import org.jzy3d.plot3d.rendering.view.modes.ViewPositionMode;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 
-import playground.southafrica.utilities.Header;
+/**
+ * Class that acts as the container for the three-dimensional grid containing
+ * the centroids of the polyhedra that is used for the Digicore accelerometer
+ * research. Associated with the grid is the number of observations in each
+ * dodecahedron (cell) and also the rating of each cell.
+ *
+ * @author jwjoubert
+ */
+public class DigiGrid  extends AbstractAnalysis {
+	final private Logger LOG = Logger.getLogger(DigiGrid.class);
 
-public class AggregateData extends AbstractAnalysis{
-	private final static Logger LOG = Logger.getLogger(AggregateData.class);
-	private double scale;
 	private OcTree<Coord3d> ot;
-	private Map<Coord3d, Integer> map;
+
+	private Map<Coord3d, Double> map;
 	private Map<Coord3d, Integer> mapRating;
-	private double countMax;
-	private double maxLines;
+
+	private List<Double> riskThresholds;
+	
+	private final double scale;
+	private double pointsConsidered;
+	private Visual visual = Visual.NONE;
+	private boolean isPopulated = false;
+	private boolean isRanked = false;
 	
 	/* Specify colours */
-	private final static Color MY_GREEN = new Color(147, 214, 83, 255);
-	private final static Color MY_YELLOW = new Color(248, 215,85, 255);
-	private final static Color MY_ORANGE = new Color(250, 164, 54, 255);
-	private final static Color MY_RED = new Color(246, 43, 32, 255);
+	final static Color DIGI_GREEN = new Color(147, 214, 83, 255);
+	final static Color DIGI_YELLOW = new Color(248, 215, 85, 255);
+	final static Color DIGI_ORANGE = new Color(250, 164, 54, 255);
+	final static Color DIGI_RED = new Color(246, 43, 32, 255);
+	final static Color DIGI_GRAY = new Color(100, 100, 100, 255);
+	
 
-	public static void main(String[] args) {
-		Header.printHeader(AggregateData.class.toString(), args);
-		
-		AggregateData ad = new AggregateData();
-		ad.run(args);
-		
-		try {
-			AnalysisLauncher.open(ad);
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new RuntimeException("Cannot visualise!!");
-		}
-		
-		Header.printFooter();
+
+	public DigiGrid(final double scale) {
+		this.scale = scale;
 	}
 	
-	
-	private void run(String[] args){
-		String filename = args[0];
-		String rFile = args[1];
-		this.scale = Double.parseDouble(args[2]);
-		this.maxLines = Double.parseDouble(args[3]);
-		
-		List<Double> zoneThresholds = new ArrayList<Double>();
-		int argsIndex = 4;
-		while(args.length > argsIndex){
-			zoneThresholds.add(Double.parseDouble(args[argsIndex++]));
+
+	public void setupGrid(String filename){
+		/* Check that risk zone thresholds have been set. */
+		if(riskThresholds == null){
+			LOG.error("Cannot build the grid without risk thresholds.");
+			throw new RuntimeException("First set thresholds with setRiskThresholds() method.");
 		}
 		
-		/* Read the raw data. */
-		LOG.info("Parsing the data extent...");
+		LOG.info("Calculating the data extent...");
 		double minX = Double.POSITIVE_INFINITY;
 		double minY = Double.POSITIVE_INFINITY;
 		double minZ = Double.POSITIVE_INFINITY;
@@ -133,10 +130,9 @@ public class AggregateData extends AbstractAnalysis{
 			}
 		}
 		counter.printCounter();
-		counter.reset();
-		
+
 		/* Establish the centroid grid given the point extent. */
-		FCCGrid fccg = new FCCGrid(minX, maxX, minY, maxY, minZ, maxZ, this.scale);
+		FCCGrid fccg = new FCCGrid(minX, maxX, minY, maxY, minZ, maxZ, scale);
 		GridPoint[] ga = fccg.getFcGrid();
 		for(GridPoint gp : ga){
 			minX = Math.min(minX, gp.getX());
@@ -148,150 +144,162 @@ public class AggregateData extends AbstractAnalysis{
 		}
 
 		/* Establish and populate the OcTree given the centroid extent. */
-		map = new HashMap<Coord3d, Integer>(ga.length);
+		map = new HashMap<Coord3d, Double>(ga.length);
 		LOG.info("Building OcTree with dodecahedron centroids...");
 		ot = new OcTree<Coord3d>(minX, minY, minZ, maxX, maxY, maxZ);
 		for(GridPoint gp : ga){
 			Coord3d c = new Coord3d(gp.getX(), gp.getY(), gp.getZ());
 			ot.put(gp.getX(), gp.getY(), gp.getZ(), c);
-			map.put(c, new Integer(0));
+			map.put(c, new Double(0.0));
 		}
 		LOG.info("Done populating centroid grid: " + ga.length + " points.");
-		
-		/* Populate the Dodecahedra. */
-		LOG.info("Populating the dodecahedra with point observations...");
-		double pointsConsidered = 0.0;
-		br = IOUtils.getBufferedReader(filename);
-		try{
-			String line = null;
-			while( (line = br.readLine()) != null && counter.getCounter() < maxLines){
-				String[] sa = line.split(",");
-				String id = sa[1];
-				double x = Double.parseDouble(sa[5]);
-				double y = Double.parseDouble(sa[6]);
-				double z = Double.parseDouble(sa[7]);
-				double speed = Double.parseDouble(sa[8]);
-				double road = Double.parseDouble(sa[9]);
-				
-				/* Put data conditions here. */
-				if(
-//						id.equalsIgnoreCase("37ff9d8e04c164ee793e172a561c7b1e") &	/* Specific individual, A. */
-//						id.equalsIgnoreCase("9a01080c086096aaaaff7504a01ea9e3") &	/* Specific individual, B. */
-//						id.equalsIgnoreCase("0ae0c60759b410c2c38fa0ba135a8e16") &	/* Specific individual, C. */
-//						road <= 2 & 												/* Road is a highway */
-//						speed <= 60.0 &												/* Low speed */
-//						speed > 60.0 &												/* High speed */
-						true
-						){
-					Coord3d c = ot.get(x, y, z);
-					map.put(c, map.get(c)+1);
-					pointsConsidered++;
-				}
-				
-				counter.incCounter();
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Cannot read from " + filename);
-		} finally{
-			try {
-				br.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-				throw new RuntimeException("Cannot close " + filename);
-			}
-		}
-		counter.printCounter();
-		
-		
-		Comparator<Coord3d> coordComparator = new Comparator<Coord3d>() {
-
+	}
+	
+	/* Cells are ranked based on the number of records associated with them */  
+	private Comparator<Coord3d> getGridComparator(){
+		return new Comparator<Coord3d>() {
 			@Override
 			public int compare(Coord3d o1, Coord3d o2) {
 				return map.get(o2).compareTo(map.get(o1));
 			}
 		};
-		/* Sort the polyhedra based on their counts.*/
-		LOG.info("Ranking polyhedra based on point-counts only.");
-		List<Coord3d> sortedCoords = new ArrayList<Coord3d>(map.keySet());
-		Collections.sort(sortedCoords, coordComparator);
-		LOG.info("   10 polyhedra with largest number of observations:");
-		for(int i = 0; i < 10; i++){
-			LOG.info(String.format("      %d: %d observations", i+1, map.get(sortedCoords.get(i))));
+	}
+	
+	public double getCount(Coord3d c){
+		return this.map.get(c);
+	}
+	
+	
+	public void incrementCount(Coord3d c, double weight){
+		this.map.put(c, this.map.get(c)+weight);
+		this.pointsConsidered++;
+		this.isPopulated = true;
+	}
+	
+	
+	public double getScale(){
+		return this.scale;
+	}
+	
+	public Coord3d getClosest(double x, double y, double z){
+		return this.ot.get(x, y, z);
+	}
+	
+	public int getCellRisk(Coord3d c){
+		return this.mapRating.get(c);
+	}
+	
+	/** 
+	 * Sort the polyhedra based on their counts only.
+	 */
+	public void rankGridCells(){
+		if(map.size() == 0){
+			throw new RuntimeException("Cannot rank zero cells. Grid has possibly not been populated yet.");
 		}
-		double totalAdded = 0.0;
-		double cumulative = 0.0;
-		mapRating = new TreeMap<Coord3d, Integer>(coordComparator);
-		for(int i = 0; i < sortedCoords.size(); i++){
-			Coord3d c = sortedCoords.get(i);
-			int obs = map.get(c);
-			totalAdded += (double)obs;
-			cumulative = totalAdded / pointsConsidered;
-			
-			/* Get the rating class for this value. */
-			Integer ratingZone = null;
-			int zoneIndex = 0;
-			while(ratingZone == null && zoneIndex < zoneThresholds.size()){
-				if(cumulative <= zoneThresholds.get(zoneIndex)){
-					ratingZone = new Integer(zoneIndex);
-				} else{
-					zoneIndex++;
-				}
-			}
-			mapRating.put(c, ratingZone);
+		LOG.info("Ranking polyhedra cells based on point-counts only.");
+
+		List<Coord3d> sortedCoords = new ArrayList<Coord3d>(map.keySet());
+		Collections.sort(sortedCoords, getGridComparator());
+		
+		/* Report the top 20 cell values. */
+		LOG.info("   20 polyhedra with largest number of observations:");
+		for(int i = 0; i < 20; i++){
+			LOG.info(String.format("      %d: %.1f observations", i+1, map.get(sortedCoords.get(i))));
 		}
 		
-		/* Remove zero-count dodecahedra. */
+		double totalAdded = 0.0;
+		double cumulative = 0.0;
+		mapRating = new TreeMap<Coord3d, Integer>(getGridComparator());
+		
 		List<Coord3d> centroidsToRemove = new ArrayList<Coord3d>();
-		for(Coord3d c : map.keySet()){
-			int count = map.get(c);
-			countMax = Math.max(countMax, (double)count);
-			if(count == 0){
+
+		double maxValue = 0.0;
+		for(int i = 0; i < sortedCoords.size(); i++){
+			Coord3d c = sortedCoords.get(i);
+			double obs = map.get(c);
+			if(obs > 0){
+				maxValue = Math.max(maxValue, (double)obs);
+				totalAdded += (double)obs;
+				cumulative = totalAdded / pointsConsidered;
+				
+				/* Get the rating class for this value. */
+				Integer ratingZone = null;
+				int zoneIndex = 0;
+				while(ratingZone == null && zoneIndex < this.riskThresholds.size()){
+					if(cumulative <= this.riskThresholds.get(zoneIndex)){
+						ratingZone = new Integer(zoneIndex);
+					} else{
+						zoneIndex++;
+					}
+				}
+				mapRating.put(c, ratingZone);
+			} else{
 				centroidsToRemove.add(c);
 			}
 		}
+		
+		/* Remove zero-count dodecahedra. */
 		for(Coord3d c : centroidsToRemove){
 			map.remove(c);
 		}
 		
-		/* Write values out to file, for visualisation in R. */
-		LOG.info("Writing centroid counts to file...");
-		BufferedWriter bw = IOUtils.getBufferedWriter(rFile);
-		try{
-			for(Coord3d c : map.keySet()){
-				bw.write(c.toString());
-				bw.write(",");
-				bw.write(String.valueOf(map.get(c)));
-				bw.write(",");
-				bw.write(String.valueOf(mapRating.get(c)));
-				bw.newLine();
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Cannot write to " + rFile);
-		} finally{
+		this.isRanked = true;
+		LOG.info("Done ranking polyhedra cells.");
+		LOG.info("A total of " + map.size() + " dodecahedra contains points (max value: " + maxValue + ")");
+	}
+	
+	public void setRiskThresholds(List<Double> riskThresholds){
+		this.riskThresholds = riskThresholds;
+	}
+	
+	
+	public void visualiseGrid(){
+		LOG.info("Visualising results...");
+		if(this.visual == Visual.NONE){
+			LOG.error("Visualisation is switched off! First set using setVisualisation()");
+		} else{
 			try {
-				bw.close();
-			} catch (IOException e) {
+				AnalysisLauncher.open(this);
+			} catch (Exception e) {
 				e.printStackTrace();
-				throw new RuntimeException("Cannot close " + rFile);
+				throw new RuntimeException("Cannot visualise!!");
 			}
 		}
-		
-		LOG.info("A total of " + map.size() + " dodecahedra contains points (max value: " + countMax + ")");
+	}
+	
+	public void visualiseGrid(Visual visual){
+		if(visual != this.visual){
+			LOG.warn("Requested visualisation is different than set visualisation.");
+			LOG.warn("Set visualisation will be changed.");
+		}
+		setVisual(visual);
+		visualiseGrid();
 	}
 
+	public void setVisual(Visual visual){
+		this.visual = visual;
+	}
+	
+	
+	public static enum Visual{NONE,CENTROID,SLICE,POLYHEDRA}
 	
 	@Override
 	public void init() throws Exception {
-//		printCentroids();
-		printPolyhedra();
-//		printPolyhedraSlice();
+		switch (this.visual) {
+		case CENTROID:
+			printCentroids();
+			break;
+		case SLICE:
+			printPolyhedraSlice();
+			break;
+		case POLYHEDRA:
+			printPolyhedra();
+			break;
+		default:
+			throw new RuntimeException("Don't know how to visualise " + this.visual.toString());
+		}
 	}
 	
-	public AggregateData() {
-		this.countMax = 0.0;
-	}
 	
 	private void printCentroids(){
 		/* Cool, now let's plot the buggers. First as spheres. */
@@ -300,14 +308,14 @@ public class AggregateData extends AbstractAnalysis{
 		Color[] colors = new Color[map.size()];
 		for(Coord3d c : map.keySet()){
 			coords[index] = c;
-			float a = (float) (((double)map.get(c))/countMax);
-			colors[index++] = new Color(0, 0, 0, a);
+			colors[index++] = new Color(0, 0, 0, 255);
 		}
 		Scatter scatter = new Scatter(coords, colors, 6f);
 		chart = AWTChartComponentFactory.chart(Quality.Advanced, "awt");
 		chart.getView().updateBounds();
 		chart.getScene().add(scatter);
 	}
+	
 	
 	private void printPolyhedra(){
 		/* Set up the chart. */
@@ -330,32 +338,24 @@ public class AggregateData extends AbstractAnalysis{
 		chart.getView().updateBounds();
 		
 		for(Coord3d c : map.keySet()){
-			/* Set up polyhedra. */
+			/* Set up polyhedra shapes. */
 			ArrayList<org.jzy3d.plot3d.primitives.Polygon> body = new ArrayList<org.jzy3d.plot3d.primitives.Polygon>();
-			
-			/* Determine colour. */
-			float a = (float) (((double)map.get(c))/countMax);
-			Color lightGray = new Color(200, 200, 200, 255);
-			Color darkerGray = new Color(100, 100, 100, 255);
-			Color gray = Color.GRAY;
-			Color white = new Color(255, 255, 255, 255); 
-			Color yellow = new Color(255, 255, 180, 255);
 			
 			/* Change colour based on rating zone. */
 			Color fillColor = null;
 			int zone = mapRating.get(c);
 			switch (zone) {
 			case 0:
-				fillColor = MY_GREEN;
+				fillColor = DIGI_GREEN;
 				break;
 			case 1:
-				fillColor = MY_YELLOW;
+				fillColor = DIGI_YELLOW;
 				break;
 			case 2:
-				fillColor = MY_ORANGE;
+				fillColor = DIGI_ORANGE;
 				break;
 			case 3:
-				fillColor = MY_RED;
+				fillColor = DIGI_RED;
 				break;
 			default:
 			}
@@ -363,9 +363,9 @@ public class AggregateData extends AbstractAnalysis{
 				LOG.error("Something wrong!!");
 			}
 			
-			
-			/* Limit faces to certain colours. */
-			if(zone < 4){
+			/* TODO Change this as required. Limit faces to certain colours. */
+			int highestRiskZoneToDraw = 3;
+			if(zone <= highestRiskZoneToDraw){
 				/* Create faces. */
 				FCCPolyhedron poly = new FCCPolyhedron(c.x, c.y, c.z, scale);
 				for(NDPolygon face : poly.getFcPolyhedron()){
@@ -380,7 +380,7 @@ public class AggregateData extends AbstractAnalysis{
 				shape.setFaceDisplayed(true);
 				shape.setColor(fillColor);
 				shape.setFaceDisplayed(true);
-				shape.setWireframeColor(darkerGray);
+				shape.setWireframeColor(DIGI_GRAY);
 				chart.getScene().add(shape);
 			}
 
@@ -394,40 +394,35 @@ public class AggregateData extends AbstractAnalysis{
 		chart = AWTChartComponentFactory.chart(Quality.Advanced, "awt");
 		Light light = chart.addLight(new Coord3d(-1000f, -300f, 12000f));
 		light.setRepresentationRadius(100);
-		light.setEnabled(true);
 		light.setEnabled(false);
 		
 		chart.addKeyController();
-		Coord3d oldViewPoint = chart.getCanvas().getView().getViewPoint();
-		Coord3d newViewPoint = new Coord3d(2*Math.PI/2, Math.PI/2, 2000);
+		Coord3d viewPoint = new Coord3d(2*Math.PI/2, Math.PI/2, 2000);
 		
 		chart.getView().setSquared(false);
 		chart.getView().setSquared(true);
 		chart.getView().setMaximized(true);
-		chart.getView().setViewPoint(newViewPoint, true);
+		chart.getView().setViewPoint(viewPoint, true);
 		chart.getView().setViewPositionMode(ViewPositionMode.FREE);
 		chart.getView().setBoundManual(new BoundingBox3d(-600f, 600f, -700f, 700f, 600f, 1500f));
 		chart.getView().updateBounds();
 		
 		for(Coord3d c : map.keySet()){
-			/* Determine colour. */
-			Color darkerGray = new Color(100, 100, 100, 255);
-			
 			/* Change colour based on rating zone. */
 			Color fillColor = null;
 			int zone = mapRating.get(c);
 			switch (zone) {
 			case 0:
-				fillColor = MY_GREEN;
+				fillColor = DIGI_GREEN;
 				break;
 			case 1:
-				fillColor = MY_YELLOW;
+				fillColor = DIGI_YELLOW;
 				break;
 			case 2:
-				fillColor = MY_ORANGE;
+				fillColor = DIGI_ORANGE;
 				break;
 			case 3:
-				fillColor = MY_RED;
+				fillColor = DIGI_RED;
 				break;
 			default:
 			}
@@ -448,9 +443,11 @@ public class AggregateData extends AbstractAnalysis{
 				
 				poly.setFaceDisplayed(true);
 				poly.setColor(fillColor);
-				poly.setWireframeColor(darkerGray);
+				poly.setWireframeColor(DIGI_GRAY);
 				chart.getScene().add(poly);
 				chart.getView().shoot();
+				
+				/* FIXME Get a screenshot working!! */
 //				try {
 //					chart.screenshot(new File("/Users/jwjoubert/Pictures/Digicore/Slice_" + depth + ".png"));
 //				} catch (IOException e) {
@@ -461,6 +458,59 @@ public class AggregateData extends AbstractAnalysis{
 		}
 	}
 	
+	/**
+	 * Writes the accelerometer 'blob' results: the number of observations in
+	 * each cell (only those with a value greater than zero), and the risk class
+	 * of the cell. The output file with name <code>cellValuesAndRiskClasses.csv</code>
+	 * will be created in the output folder.
+	 * 
+	 * @param outputFolder
+	 */
+	public void writeCellCountsAndRiskClasses(String outputFolder){
+		if(map.size() == 0 || mapRating == null){
+			throw new RuntimeException("Insufficient data to write. Either no grids, or no ranking.");
+		}
+		String filename = outputFolder + (outputFolder.endsWith("/") ? "" : "/") + "cellValuesAndRiskClasses.csv";
+		LOG.info("Writing the cell values and risk classes to " + filename); 
+		
+		/* Report the risk thresholds for which this output holds. */
+		LOG.info("  \\_ Accelerometer risk thresholds:");
+		for(int i = 0; i < this.riskThresholds.size(); i++){
+			LOG.info(String.format("      \\_ Risk %d: %.4f", i, this.riskThresholds.get(i)));
+		}
+		
+		/* Write the cell values and their risk classes. */
+		BufferedWriter bw = IOUtils.getBufferedWriter(filename);
+		try{
+			/* Header. */
+			bw.write("x,y,z,count,class");
+			bw.newLine();
+			
+			for(Coord3d c : this.map.keySet()){
+				bw.write(String.format("%.4f, %.4f,%.4f,%.1f,%d\n", c.x, c.y, c.z, this.map.get(c), this.mapRating.get(c)));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Cannot write to " + filename);
+		} finally{
+			try {
+				bw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Cannot close " + filename);
+			}
+		}
+		LOG.info("Done writing cell values and risk classes.");
+	}
 	
+	public boolean isRanked(){
+		return this.isRanked;
+	}
+	
+	public boolean isPopulated(){
+		return this.isPopulated;
+	}
+
+
 
 }

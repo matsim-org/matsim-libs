@@ -17,10 +17,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.southafrica.projects.digicore;
+package playground.southafrica.projects.digicore.grid;
 
 
-class FCCPlanePolygon {
+public class FCCPlanePolygon {
 	
 	// Data Members
 	private NDPolygon FcPlanePolygon;
