@@ -19,8 +19,10 @@
 
 package playground.johannes.gsv.synPop.mid.run;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import playground.johannes.gsv.synPop.CommonKeys;
@@ -59,5 +61,23 @@ public class ProxyTaskRunner {
 		}
 		
 		return newPersons;
+	}
+	
+	public static void runAndDelete(ProxyPlanTask task, Collection<ProxyPerson> persons) {
+		run(task, persons);
+		
+		for(ProxyPerson person : persons) {
+			List<ProxyPlan> remove = new ArrayList<>();
+			for(ProxyPlan plan : person.getPlans()) {
+				if("true".equalsIgnoreCase(plan.getAttribute(CommonKeys.DELETE))) {
+					remove.add(plan);
+				}
+			}
+			
+			for(ProxyPlan plan : remove) {
+				person.getPlans().remove(plan);
+			}
+			
+		}
 	}
 }

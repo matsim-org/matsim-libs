@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.invermo.sim;
+package playground.johannes.gsv.synPop.sim3;
 
 import playground.johannes.gsv.synPop.ProxyPerson;
 
@@ -25,9 +25,10 @@ import playground.johannes.gsv.synPop.ProxyPerson;
  * @author johannes
  *
  */
-public interface Mutator {
+public interface SingleMutator {
 
-	public boolean modify(ProxyPerson person1, ProxyPerson person2);
+	public boolean mutate(ProxyPerson person);
 	
-	public void revert(ProxyPerson person1, ProxyPerson person2);
+	public void revert(ProxyPerson person);
+	
 }

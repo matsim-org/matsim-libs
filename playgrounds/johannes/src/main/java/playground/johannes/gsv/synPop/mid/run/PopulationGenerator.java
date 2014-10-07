@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 import playground.johannes.gsv.synPop.DeleteMissingTimesTask;
 import playground.johannes.gsv.synPop.DeleteNegativeDurationTask;
 import playground.johannes.gsv.synPop.DeleteOverlappingLegsTask;
-import playground.johannes.gsv.synPop.FixActivityTimesTask;
+import playground.johannes.gsv.synPop.FixMissingActTimesTask;
 import playground.johannes.gsv.synPop.InsertActivitiesTask;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPersonTaskComposite;
@@ -108,7 +108,7 @@ public class PopulationGenerator {
 		pComposite.addComponent(new DeleteMissingTimesTask());
 		pComposite.addComponent(new DeleteOverlappingLegsTask());
 		
-		logger.info("Filtering legs...");
+		logger.info(String.format("Filtering %s legs...", persons.size()));
 		persons = ProxyTaskRunner.runAndDelete(pComposite, persons);
 		logger.info(String.format("After filter: %s persons.", persons.size()));
 		/*
@@ -120,7 +120,7 @@ public class PopulationGenerator {
 		composite.addComponent(new SetFirstActivityTypeTask());
 		composite.addComponent(new RoundTripTask());
 		composite.addComponent(new SetActivityTimeTask());
-		composite.addComponent(new FixActivityTimesTask());
+		composite.addComponent(new FixMissingActTimesTask());
 		
 		logger.info("Applying person tasks...");
 		ProxyTaskRunner.run(composite, persons);

@@ -17,30 +17,28 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.invermo.sim;
+package playground.johannes.gsv.synPop.invermo;
 
-import java.util.Random;
-
-import playground.johannes.gsv.synPop.data.FacilityData;
+import playground.johannes.gsv.synPop.ActivityType;
+import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.gsv.synPop.ProxyPlan;
+import playground.johannes.gsv.synPop.ProxyPlanTask;
 
 /**
  * @author johannes
  *
  */
-public class MutateHomeLocFactory implements MutatorFactory {
+public class SetMissingActTypes implements ProxyPlanTask {
 
-	private FacilityData facilities;
-	
-	private Random random;
-	
-	public MutateHomeLocFactory(FacilityData facilities, Random random) {
-		this.facilities = facilities;
-		this.random = random;
-	}
-	
 	@Override
-	public Mutator newInstance() {
-		return null;// new MutateHomeLocation(facilities, random);
+	public void apply(ProxyPlan plan) {
+		for(ProxyObject act : plan.getActivities()) {
+			if(act.getAttribute(CommonKeys.ACTIVITY_TYPE) == null) {
+				act.setAttribute(CommonKeys.ACTIVITY_TYPE, ActivityType.LEISURE);
+			}
+		}
+		
 	}
 
 }

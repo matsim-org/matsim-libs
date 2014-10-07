@@ -19,33 +19,39 @@
 
 package playground.johannes.gsv.synPop.mid.run;
 
-import org.apache.log4j.Logger;
-
-import playground.johannes.gsv.synPop.DeleteLegs;
-import playground.johannes.gsv.synPop.ProxyPersonTaskComposite;
-import playground.johannes.gsv.synPop.io.XMLParser;
+import playground.johannes.gsv.synPop.ActivityType;
+import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.gsv.synPop.ProxyObject;
+import playground.johannes.gsv.synPop.ProxyPlan;
+import playground.johannes.gsv.synPop.ProxyPlanTask;
 
 /**
  * @author johannes
  *
  */
-public class PlanFilter {
+public class Convert2MiscType implements ProxyPlanTask {
 
-	private static final Logger logger = Logger.getLogger(PlanFilter.class);
-	/**
-	 * @param args
+	/* (non-Javadoc)
+	 * @see playground.johannes.gsv.synPop.ProxyPlanTask#apply(playground.johannes.gsv.synPop.ProxyPlan)
 	 */
-	public static void main(String[] args) {
-		XMLParser parser = new XMLParser();
-		parser.setValidating(false);
-		
-		parser.parse("/home/johannes/gsv/synpop/output/1400000000.pop.xml.gz");
-		logger.info(String.format("Loaded %s persons.", parser.getPersons().size()));
-		
-		ProxyPersonTaskComposite tasks = new ProxyPersonTaskComposite();
-		tasks.addComponent(new DeleteLegs("car"));
-		
+	@Override
+	public void apply(ProxyPlan plan) {
+		for(ProxyObject act : plan.getActivities()) {
+			String type = act.getAttribute(CommonKeys.ACTIVITY_TYPE);
+			if("pickdrop".equalsIgnoreCase(type)) {
+				act.setAttribute(CommonKeys.ACTIVITY_TYPE, ActivityType.MISC);
+			} else if("private".equalsIgnoreCase(type)) {
+				act.setAttribute(CommonKeys.ACTIVITY_TYPE, ActivityType.MISC);
+			} else if("intown".equalsIgnoreCase(type)) {
+				act.setAttribute(CommonKeys.ACTIVITY_TYPE, ActivityType.MISC);
+			} else if("outoftown".equalsIgnoreCase(type)) {
+				act.setAttribute(CommonKeys.ACTIVITY_TYPE, ActivityType.MISC);
+			} else if("unknown".equalsIgnoreCase(type)) {
+				act.setAttribute(CommonKeys.ACTIVITY_TYPE, ActivityType.MISC);
+			}
+			
+		}
+
 	}
 
-	
 }

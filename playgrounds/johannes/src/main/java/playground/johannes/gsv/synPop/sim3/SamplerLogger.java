@@ -17,49 +17,74 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.invermo.sim;
+package playground.johannes.gsv.synPop.sim3;
 
 import java.util.Collection;
+import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.apache.log4j.Logger;
 
-import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.sim3.SamplerListener;
-import playground.johannes.gsv.synPop.sim3.SwitchHomeLocation;
+
 
 /**
  * @author johannes
  *
  */
-public class CopyHomeLocations implements SamplerListener {
+public class SamplerLogger implements SamplerListener {
 
-	private final long interval;
+	private final Logger logger = Logger.getLogger(SamplerLogger.class);
 	
-	private long iter;
+	private Timer timer;
 	
-	public CopyHomeLocations(long interval) {
-		this.interval = interval;
+	private Task task;
+	
+	private boolean isRunning = false;
+	
+	public SamplerLogger() {
+		timer = new Timer();
+		task = new Task();
 	}
 	
 	@Override
 	public void afterStep(Collection<ProxyPerson> population, Collection<ProxyPerson> person, boolean accpeted) {
-		iter++;
-		if(iter % interval == 0) {
-			for(ProxyPerson thePerson : population) {
-				ActivityFacility home = (ActivityFacility) thePerson.getUserData(SwitchHomeLocation.USER_FACILITY_KEY);
-				ProxyPlan plan = thePerson.getPlans().get(0);
-				for(ProxyObject act : plan.getActivities()) {
-					if(ActivityType.HOME.equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
-						act.setAttribute(CommonKeys.ACTIVITY_FACILITY, home.getId().toString());
-					}
-				}
-			}
+		if(!isRunning) {
+			timer.schedule(task, 2000, 2000);
+			isRunning = true;
 		}
+		
+		task.afterStep(population, person, accpeted);
 
 	}
+	
+	public void stop() {
+		timer.cancel();
+	}
+	
+	private class Task extends TimerTask implements SamplerListener {
 
+		private long iter;
+		
+		private long accepts;
+		
+		private long iters2;
+		
+		@Override
+		public void run() {
+			logger.info(String.format(Locale.US, "[%s] Accepted %s of %s steps (%.2f %%).", iter, accepts, iters2, accepts/(double)iters2 * 100));
+			accepts = 0;
+			iters2 = 0;
+		}
+
+		@Override
+		public void afterStep(Collection<ProxyPerson> population, Collection<ProxyPerson> original, boolean accepted) {
+			iter++;
+			iters2++;
+			if(accepted)
+				accepts++;
+		}
+	}
 }

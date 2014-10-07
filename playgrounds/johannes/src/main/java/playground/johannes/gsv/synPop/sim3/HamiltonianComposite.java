@@ -17,49 +17,54 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.invermo.sim;
+package playground.johannes.gsv.synPop.sim3;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
-
-import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
-import playground.johannes.gsv.synPop.sim3.SamplerListener;
-import playground.johannes.gsv.synPop.sim3.SwitchHomeLocation;
+import playground.johannes.sna.util.Composite;
 
 /**
  * @author johannes
  *
  */
-public class CopyHomeLocations implements SamplerListener {
+public class HamiltonianComposite extends Composite<Hamiltonian> implements Hamiltonian {
 
-	private final long interval;
+	private List<Double> thetas = new ArrayList<Double>();
 	
-	private long iter;
+	public void addComponent(Hamiltonian h) {
+		super.addComponent(h);
+		thetas.add(1.0);
+	}
 	
-	public CopyHomeLocations(long interval) {
-		this.interval = interval;
+	public void addComponent(Hamiltonian h, double theta) {
+		super.addComponent(h);
+		thetas.add(theta);
+	}
+	
+	public void removeComponent(Hamiltonian h) {
+		int idx = components.indexOf(h);
+		super.removeComponent(h);
+		thetas.remove(idx);
+	}
+
+	/*
+	 * TODO: hide access?
+	 */
+	public List<Hamiltonian> getComponents() {
+		return components;
 	}
 	
 	@Override
-	public void afterStep(Collection<ProxyPerson> population, Collection<ProxyPerson> person, boolean accpeted) {
-		iter++;
-		if(iter % interval == 0) {
-			for(ProxyPerson thePerson : population) {
-				ActivityFacility home = (ActivityFacility) thePerson.getUserData(SwitchHomeLocation.USER_FACILITY_KEY);
-				ProxyPlan plan = thePerson.getPlans().get(0);
-				for(ProxyObject act : plan.getActivities()) {
-					if(ActivityType.HOME.equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
-						act.setAttribute(CommonKeys.ACTIVITY_FACILITY, home.getId().toString());
-					}
-				}
-			}
+	public double evaluate(ProxyPerson person) {
+		double sum = 0;
+		
+		for(int i = 0; i < components.size(); i++) {
+			sum += thetas.get(i) * components.get(i).evaluate(person);
 		}
-
+		
+		return sum;
 	}
 
 }

@@ -21,6 +21,8 @@ package playground.johannes.gsv.synPop.sim3;
 
 import java.util.Random;
 
+import playground.johannes.socialnetworks.utils.XORShiftRandom;
+
 public class SwitchHomeLocationFactory implements MutatorFactory {
 
 	private final Random random;
@@ -31,7 +33,7 @@ public class SwitchHomeLocationFactory implements MutatorFactory {
 	
 	@Override
 	public Mutator newInstance() {
-		return new SwitchOperator(new SwitchHomeLocation(), random);
+		return new SwitchOperator(new SwitchHomeLocation(), new XORShiftRandom(random.nextLong()));
 	}
 
 }

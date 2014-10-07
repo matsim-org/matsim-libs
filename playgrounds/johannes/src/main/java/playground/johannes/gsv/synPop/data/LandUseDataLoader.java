@@ -20,7 +20,11 @@
 package playground.johannes.gsv.synPop.data;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.matsim.core.config.Module;
 
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
@@ -28,35 +32,58 @@ import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
 
 /**
  * @author johannes
- *
+ * 
  */
 public class LandUseDataLoader implements DataLoader {
 
+	private static final Logger logger = Logger.getLogger(LandUseDataLoader.class);
+	
 	public static final String KEY = "landuse";
-	
-	private final String file;
-	
-	private final String populationKey;
-	
-	public LandUseDataLoader(String file, String populationKey) {
-		this.file = file;
-		this.populationKey = populationKey;
+
+	private final Module module;
+
+	public LandUseDataLoader(Module module) {
+		this.module = module;
 	}
-	
+
 	@Override
 	public Object load() {
-		try {
-			ZoneLayer<Map<String, Object>> zoneLayer = ZoneLayerSHP.read(file);
-			
-			for(Zone<Map<String, Object>> zone : zoneLayer.getZones()) {
-				zone.getAttribute().put(LandUseData.POPULATION_KEY, zone.getAttribute().get(populationKey));
+		logger.info("Loading land use data...");
+		LandUseData data = new LandUseData();
+		data.setNuts1Layer(loadLayer("nuts1"));
+		data.setNuts3Layer(loadLayer("nuts3"));
+		data.setLau2Layer(loadLayer("lau2"));
+		logger.info("Done.");
+		return data;
+	}
+
+	private ZoneLayer<Map<String, Object>> loadLayer(String type) {
+		Collection<? extends Module> modules = module.getParameterSets(type);
+		if (!modules.isEmpty()) {
+			Module m = modules.iterator().next();
+			String file = m.getValue("file");
+			String nameKey = m.getValue("namekey");
+			String popKey = m.getValue("popkey");
+
+			try {
+				ZoneLayer<Map<String, Object>> zoneLayer = ZoneLayerSHP.read(file);
+
+				for (Zone<Map<String, Object>> zone : zoneLayer.getZones()) {
+					zone.getAttribute().put(LandUseData.NAME_KEY, zone.getAttribute().get(nameKey));
+					Object value = zone.getAttribute().get(popKey);
+					if(value != null) {
+						double d = Double.parseDouble(value.toString());
+						zone.getAttribute().put(LandUseData.POPULATION_KEY, (int)d);
+					}
+				}
+
+				return zoneLayer;
+
+			} catch (IOException e) {
+				e.printStackTrace();
+				return null;
 			}
-			
-			LandUseData data = new LandUseData(zoneLayer);
-			
-			return data;
-		} catch (IOException e) {
-			e.printStackTrace();
+		} else {
 			return null;
 		}
 	}

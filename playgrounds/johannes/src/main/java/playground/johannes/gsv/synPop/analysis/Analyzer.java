@@ -20,9 +20,13 @@
 package playground.johannes.gsv.synPop.analysis;
 
 import java.io.IOException;
+import java.util.Set;
 
+import playground.johannes.coopsim.analysis.ActTypeShareTask;
+import playground.johannes.coopsim.analysis.TrajectoryAnalyzer;
+import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
+import playground.johannes.coopsim.pysical.Trajectory;
 import playground.johannes.gsv.synPop.io.XMLParser;
-import playground.johannes.gsv.synPop.mid.analysis.SeasonsTask;
 
 /**
  * @author johannes
@@ -36,9 +40,9 @@ public class Analyzer {
 	 */
 	public static void main(String[] args) throws IOException {
 //		String output = args[2];
-		String output = "/home/johannes/gsv/mid2008/analysis/car.wkday.wo3k.200K/";
+		String output = "/home/johannes/gsv/invermo/analysis/pop.mob/";
 //		String personFile = args[0];
-		String personFile = "/home/johannes/gsv/mid2008/pop/pop.car.wkday.wo3k.200K.xml";
+		String personFile = "/home/johannes/gsv/invermo/pop.mob.xml";
 		
 		XMLParser parser = new XMLParser();
 		parser.setValidating(false);
@@ -55,27 +59,27 @@ public class Analyzer {
 //		Config config = ConfigUtils.createConfig();
 //		Scenario scenario = ScenarioUtils.createScenario(config);
 //		FacilitiesReaderMatsimV1 facReader = new FacilitiesReaderMatsimV1(scenario);
-//		facReader.readFile(args[1]);
+//		facReader.readFile("/home/johannes/gsv/osm/facilities/facilities.all.xml");
 //		ActivityFacilities facilities = scenario.getActivityFacilities();
 	
 	
 		AnalyzerTaskComposite task = new AnalyzerTaskComposite();
 		task.addTask(new ActivityChainTask());
-		task.addTask(new LegTargetDistanceTask("car"));
-//		task.addTask(new ActivityDistanceTask(facilities));
-		task.addTask(new SpeedFactorAnalyzer());
-		task.addTask(new SeasonsTask());
-		task.addTask(new PkmTask());
+//		task.addTask(new LegTargetDistanceTask("car"));
+////		task.addTask(new ActivityDistanceTask(facilities));
+//		task.addTask(new SpeedFactorAnalyzer());
+//		task.addTask(new SeasonsTask());
+//		task.addTask(new PkmTask());
 //		task.addTask(new PopulationDensityTask(geometries, facilities, output));
 		
 		task.setOutputDirectory(output);
 		ProxyAnalyzer.analyze(parser.getPersons(), task, output);
 		
-//		Set<Trajectory> trajectories = TrajectoryProxyBuilder.buildTrajectories(parser.getPersons());
-//		TrajectoryAnalyzerTaskComposite ttask = new TrajectoryAnalyzerTaskComposite();
+		Set<Trajectory> trajectories = TrajectoryProxyBuilder.buildTrajectories(parser.getPersons());
+		TrajectoryAnalyzerTaskComposite ttask = new TrajectoryAnalyzerTaskComposite();
 //		ttask.addTask(new ActivityDurationTask());
 //		ttask.addTask(new ActivityLoadTask());
-//		ttask.addTask(new ActTypeShareTask());
+		ttask.addTask(new ActTypeShareTask());
 //		ttask.addTask(new ArrivalLoadTask());
 //		ttask.addTask(new DepartureLoadTask());
 //		ttask.addTask(new LegLoadTask());
@@ -83,8 +87,8 @@ public class Analyzer {
 //		ttask.addTask(new TripPurposeShareTask());
 //		ttask.addTask(new LegFrequencyTask());
 //		
-//		TrajectoryAnalyzer.setAppend(true);
-//		TrajectoryAnalyzer.analyze(trajectories, ttask, output);
+		TrajectoryAnalyzer.setAppend(true);
+		TrajectoryAnalyzer.analyze(trajectories, ttask, output);
 
 	}
 

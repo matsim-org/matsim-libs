@@ -17,32 +17,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.invermo.sim;
+package playground.johannes.gsv.synPop.invermo;
 
-import java.util.Random;
-
-import playground.johannes.gsv.synPop.data.FacilityData;
-import playground.johannes.gsv.synPop.sim2.Mutator;
-import playground.johannes.gsv.synPop.sim2.MutatorFactory;
+import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.gsv.synPop.ProxyPerson;
+import playground.johannes.gsv.synPop.ProxyPersonTask;
 
 /**
  * @author johannes
  *
  */
-public class StartLocationMutatorFactory implements MutatorFactory {
+public class DeleteNoPlans implements ProxyPersonTask {
 
-	private final FacilityData facilities;
-	
-	private final Random random;
-	
-	public StartLocationMutatorFactory(FacilityData facilities, Random random) {
-		this.facilities = facilities;
-		this.random = random;
-	}
-	
 	@Override
-	public Mutator newInstance() {
-		return new MutateStartLocation(facilities, random);
+	public void apply(ProxyPerson person) {
+		if(person.getPlans().size() == 0) {
+			person.setAttribute(CommonKeys.DELETE, "true");
+		}
+
 	}
 
 }

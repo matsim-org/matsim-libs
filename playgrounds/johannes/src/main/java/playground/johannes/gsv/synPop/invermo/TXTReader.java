@@ -31,9 +31,9 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 
 import playground.johannes.gsv.synPop.ApplySampleProbas;
-import playground.johannes.gsv.synPop.CommonKeys;
+import playground.johannes.gsv.synPop.DeleteModes;
 import playground.johannes.gsv.synPop.DeleteNoLegs;
-import playground.johannes.gsv.synPop.FixActivityTimesTask;
+import playground.johannes.gsv.synPop.FixMissingActTimesTask;
 import playground.johannes.gsv.synPop.InsertActivitiesTask;
 import playground.johannes.gsv.synPop.ProxyObject;
 import playground.johannes.gsv.synPop.ProxyPerson;
@@ -41,12 +41,17 @@ import playground.johannes.gsv.synPop.ProxyPersonTaskComposite;
 import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.ProxyPlanTaskComposite;
 import playground.johannes.gsv.synPop.SetActivityTimeTask;
+import playground.johannes.gsv.synPop.SetLegTimes;
+import playground.johannes.gsv.synPop.ValidateActTimesTask;
 import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.gsv.synPop.mid.PersonAttributeHandler;
 import playground.johannes.gsv.synPop.mid.PersonCloner;
 import playground.johannes.gsv.synPop.mid.RowHandler;
 import playground.johannes.gsv.synPop.mid.run.ProxyTaskRunner;
+import playground.johannes.socialnetworks.gis.io.FeatureSHP;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author johannes
@@ -276,7 +281,10 @@ public class TXTReader {
 		composite = new ProxyPlanTaskComposite();
 		composite.addComponent(new Date2TimeTask());
 		composite.addComponent(new SetActivityTimeTask());
-		composite.addComponent(new FixActivityTimesTask());
+		composite.addComponent(new FixMissingActTimesTask());
+		composite.addComponent(new ValidateActTimesTask());
+		composite.addComponent(new SetLegTimes());
+		composite.addComponent(new SetMissingActTypes());
 		
 		ProxyTaskRunner.run(composite, persons);
 		
@@ -286,14 +294,25 @@ public class TXTReader {
 		XMLWriter writer = new XMLWriter();
 		writer.write("/home/johannes/gsv/invermo/pop.xml", persons);
 		
+		logger.info("Deleting plans with out of bounds trips.");
+		Geometry bounds = (Geometry) FeatureSHP.readFeatures("/home/johannes/gsv/synpop/data/gis/nuts/de.nuts0.shp").iterator().next().getDefaultGeometry();
+		ProxyTaskRunner.runAndDelete(new DeleteOutOfBounds(bounds), persons);
+		persons = ProxyTaskRunner.runAndDelete(new DeleteNoPlans(), persons);
+		logger.info("Population size = " + persons.size());
+		
 		logger.info("Cloning persons...");
 		persons = PersonCloner.weightedClones(persons, 3000000, new XORShiftRandom());
 		new ApplySampleProbas(82000000).apply(persons);
-		
+		logger.info("Population size = " + persons.size());
+				
 		logger.info("Deleting person with no legs...");
 		persons = ProxyTaskRunner.runAndDelete(new DeleteNoLegs(), persons);
 		logger.info("Population size = " + persons.size());
 		
-		writer.write("/home/johannes/gsv/invermo/pop.mob.xml", persons);
+		logger.info("Deleting persons with no car legs...");
+		persons = ProxyTaskRunner.runAndDelete(new DeleteModes("car"), persons);
+		logger.info("Population size = " + persons.size());
+		
+		writer.write("/home/johannes/gsv/invermo/pop.de.car.xml", persons);
 	}
 }

@@ -62,23 +62,23 @@ public class MergeFacilities {
 					ActivityOption newOpt = all.getFactory().createActivityOption(opt.getType());
 					newFac.addActivityOption(newOpt);
 					
-					newOpt = all.getFactory().createActivityOption("private");
-					newFac.addActivityOption(newOpt);
-					
-					newOpt = all.getFactory().createActivityOption("pickdrop");
-					newFac.addActivityOption(newOpt);
+//					newOpt = all.getFactory().createActivityOption("private");
+//					newFac.addActivityOption(newOpt);
+//					
+//					newOpt = all.getFactory().createActivityOption("pickdrop");
+//					newFac.addActivityOption(newOpt);
 			
 					newOpt = all.getFactory().createActivityOption("misc");
 					newFac.addActivityOption(newOpt);
 					
-					newOpt = all.getFactory().createActivityOption("outoftown");
-					newFac.addActivityOption(newOpt);
-					
-					newOpt = all.getFactory().createActivityOption("unknown");
-					newFac.addActivityOption(newOpt);
-					
-					newOpt = all.getFactory().createActivityOption("intown");
-					newFac.addActivityOption(newOpt);
+//					newOpt = all.getFactory().createActivityOption("outoftown");
+//					newFac.addActivityOption(newOpt);
+//					
+//					newOpt = all.getFactory().createActivityOption("unknown");
+//					newFac.addActivityOption(newOpt);
+//					
+//					newOpt = all.getFactory().createActivityOption("intown");
+//					newFac.addActivityOption(newOpt);
 				}
 				all.addActivityFacility(newFac);
 			}

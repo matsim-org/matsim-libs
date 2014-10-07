@@ -48,7 +48,7 @@ public class FacilitiesSubSample {
 	
 		logger.info("Loading facilities...");
 		FacilitiesReaderMatsimV1 facReader = new FacilitiesReaderMatsimV1(scenario);
-		facReader.readFile("/home/johannes/gsv/osm/facilities.home.20.xml");
+		facReader.readFile("/home/johannes/gsv/osm/facilities/facilities.full.h20.xml");
 		
 		ActivityFacilities facilities = scenario.getActivityFacilities();
 		logger.info(String.format("Loaded %s facilities.", facilities.getFacilities().size()));

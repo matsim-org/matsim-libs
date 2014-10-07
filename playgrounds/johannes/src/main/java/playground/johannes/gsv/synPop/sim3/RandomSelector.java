@@ -17,14 +17,48 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.invermo.sim;
+package playground.johannes.gsv.synPop.sim3;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import playground.johannes.gsv.synPop.ProxyPerson;
 
 /**
  * @author johannes
  *
  */
-public interface MutatorFactory {
+public class RandomSelector implements Mutator {
 
-	public Mutator newInstance();
+	private final Random random;
 	
+	private final SingleMutator delegate;
+	
+	private final List<ProxyPerson> mutation;
+	
+	public RandomSelector(SingleMutator delegate, Random random) {
+		this.delegate = delegate;
+		this.random = random;
+		mutation = new ArrayList<>(1);
+		mutation.add(null);
+	}
+	
+	@Override
+	public List<ProxyPerson> select(List<ProxyPerson> persons) {
+		mutation.set(0, persons.get(random.nextInt(persons.size())));
+		return mutation;
+	}
+
+	@Override
+	public boolean modify(List<ProxyPerson> persons) {
+		return delegate.mutate(persons.get(0));
+	}
+
+	@Override
+	public void revert(List<ProxyPerson> persons) {
+		delegate.revert(persons.get(0));
+		
+	}
+
 }

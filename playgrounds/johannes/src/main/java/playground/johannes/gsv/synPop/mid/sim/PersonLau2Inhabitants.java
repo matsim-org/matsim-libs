@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.invermo.sim;
+package playground.johannes.gsv.synPop.mid.sim;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,6 +29,8 @@ import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.data.DataPool;
 import playground.johannes.gsv.synPop.data.LandUseData;
 import playground.johannes.gsv.synPop.data.LandUseDataLoader;
+import playground.johannes.gsv.synPop.mid.MIDKeys;
+import playground.johannes.gsv.synPop.mid.PersonMunicipalityClassHandler;
 import playground.johannes.gsv.synPop.sim3.Hamiltonian;
 import playground.johannes.gsv.synPop.sim3.SwitchHomeLocation;
 import playground.johannes.sna.gis.Zone;
@@ -38,49 +40,56 @@ import playground.johannes.sna.gis.ZoneLayer;
  * @author johannes
  *
  */
-public class PersonPopulationDenstiy implements Hamiltonian {
-
-	public static final Object TARGET_DENSITY = new Object();
+public class PersonLau2Inhabitants implements Hamiltonian {
+	
+	private static final Object USER_DAT_KEY = new Object();
+	
+	private final Map<ActivityFacility, Integer> inhabitants;
 	
 	private final LandUseData landUseData;
 	
-	private final Map<ActivityFacility, Double> densities;
-	
-	public PersonPopulationDenstiy(DataPool dataPool) {
+	public PersonLau2Inhabitants(DataPool dataPool) {
 		landUseData = (LandUseData) dataPool.get(LandUseDataLoader.KEY);
-		densities = new ConcurrentHashMap<>();
+		inhabitants = new ConcurrentHashMap<ActivityFacility, Integer>();
 	}
 	
 	@Override
 	public double evaluate(ProxyPerson person) {
 		ActivityFacility home = (ActivityFacility) person.getUserData(SwitchHomeLocation.USER_FACILITY_KEY);
-		Double density = densities.get(home);
-		if(density == null) {
-			attachDensity(home);
-			density = densities.get(home);
+		Integer inhabs = inhabitants.get(home);
+		if(inhabs == null) {
+			inhabs = attachInhabitants(home);
 		}
 		
-		if(Double.isNaN(density)) {
+		if(inhabs == null) {
 			return Double.POSITIVE_INFINITY;
 		}
 		
-		Double target = (Double) person.getUserData(TARGET_DENSITY);
 		
-		return Math.abs(density - target)/density;
+		Integer intObj = (Integer) person.getUserData(USER_DAT_KEY);
+		if(intObj == null) {
+			intObj = new Integer(person.getAttribute(MIDKeys.PERSON_MUNICIPALITY_CLASS));
+			person.setUserData(USER_DAT_KEY, intObj);
+		}
+		
+		double target = intObj;
+		int cat = PersonMunicipalityClassHandler.getCategory(inhabs);
+		
+		double err = Math.abs(target - cat);
+		
+		return err;
 	}
-	
-	private void attachDensity(ActivityFacility home) {
-		ZoneLayer<Map<String, Object>> zoneLayer = landUseData.getNuts3Layer();
+
+	private synchronized Integer attachInhabitants(ActivityFacility home) {
+		ZoneLayer<Map<String, Object>> zoneLayer = landUseData.getLau2Layer();
 		Zone<Map<String, Object>> zone = zoneLayer.getZone(MatsimCoordUtils.coordToPoint(home.getCoord()));
 		
 		if(zone == null) {
-			densities.put(home, Double.NaN);
+			return null;
 		} else {
-			Double inhabs = (Double)zone.getAttribute().get(LandUseData.POPULATION_KEY);
-			double area = zone.getGeometry().getArea();
-			
-			densities.put(home, inhabs/area);
+			Integer inhabs = (Integer)zone.getAttribute().get(LandUseData.POPULATION_KEY);
+			inhabitants.put(home, inhabs);
+			return inhabs;
 		}
 	}
-
 }

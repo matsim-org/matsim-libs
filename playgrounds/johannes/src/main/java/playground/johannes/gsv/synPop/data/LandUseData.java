@@ -31,13 +31,35 @@ public class LandUseData {
 
 	public static final String POPULATION_KEY = "population";
 	
-	private ZoneLayer<Map<String, Object>> zoneLayer;
+	public static final String NAME_KEY = "name";
 	
-	public LandUseData(ZoneLayer<Map<String, Object>> zoneLayer) {
-		this.zoneLayer = zoneLayer;
+	private ZoneLayer<Map<String, Object>> nuts1Layer;
+	
+	private ZoneLayer<Map<String, Object>> nuts3Layer;
+	
+	private ZoneLayer<Map<String, Object>> lau2Layer;
+	
+	void setNuts1Layer(ZoneLayer<Map<String, Object>> nuts1Layer) {
+		this.nuts1Layer = nuts1Layer;
 	}
 	
-	public ZoneLayer<Map<String, Object>> getZoneLayer() {
-		return zoneLayer;
+	void setNuts3Layer(ZoneLayer<Map<String, Object>> nuts2Layer) {
+		this.nuts3Layer = nuts2Layer;
+	}
+	
+	void setLau2Layer(ZoneLayer<Map<String, Object>> lau2Layer) {
+		this.lau2Layer = lau2Layer;
+	}
+	
+	public ZoneLayer<Map<String, Object>> getNuts1Layer() {
+		return nuts1Layer;
+	}
+
+	public ZoneLayer<Map<String, Object>> getNuts3Layer() {
+		return nuts3Layer;
+	}
+	
+	public ZoneLayer<Map<String, Object>> getLau2Layer() {
+		return lau2Layer;
 	}
 }

@@ -26,4 +26,9 @@ package playground.johannes.gsv.synPop;
 public interface ActivityType {
 
 	public static final String HOME = "home";
+	
+	public static final String LEISURE = "leisure";
+	
+	public static final String MISC = "misc";
+	
 }

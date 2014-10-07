@@ -17,49 +17,24 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.invermo.sim;
+package playground.johannes.gsv.synPop.sim3;
 
 import java.util.Collection;
 
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
-
-import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
-import playground.johannes.gsv.synPop.sim3.SamplerListener;
-import playground.johannes.gsv.synPop.sim3.SwitchHomeLocation;
+import playground.johannes.sna.util.Composite;
 
 /**
  * @author johannes
  *
  */
-public class CopyHomeLocations implements SamplerListener {
+public class SamplerListenerComposite extends Composite<SamplerListener> implements SamplerListener {
 
-	private final long interval;
-	
-	private long iter;
-	
-	public CopyHomeLocations(long interval) {
-		this.interval = interval;
-	}
-	
 	@Override
-	public void afterStep(Collection<ProxyPerson> population, Collection<ProxyPerson> person, boolean accpeted) {
-		iter++;
-		if(iter % interval == 0) {
-			for(ProxyPerson thePerson : population) {
-				ActivityFacility home = (ActivityFacility) thePerson.getUserData(SwitchHomeLocation.USER_FACILITY_KEY);
-				ProxyPlan plan = thePerson.getPlans().get(0);
-				for(ProxyObject act : plan.getActivities()) {
-					if(ActivityType.HOME.equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
-						act.setAttribute(CommonKeys.ACTIVITY_FACILITY, home.getId().toString());
-					}
-				}
-			}
+	public void afterStep(Collection<ProxyPerson> population, Collection<ProxyPerson> mutations, boolean accpeted) {
+		for(SamplerListener listener : components) {
+			listener.afterStep(population, mutations, accpeted);
 		}
 
 	}
-
 }

@@ -51,11 +51,11 @@ public class InitializeTargetDensity implements ProxyPersonTask {
 	@Override
 	public void apply(ProxyPerson person) {
 		ActivityFacility home = (ActivityFacility) person.getUserData(SwitchHomeLocation.USER_FACILITY_KEY);
-		ZoneLayer<Map<String, Object>> zoneLayer = landUseData.getZoneLayer();
+		ZoneLayer<Map<String, Object>> zoneLayer = landUseData.getNuts3Layer();
 		Zone<Map<String, Object>> zone = zoneLayer.getZone(MatsimCoordUtils.coordToPoint(home.getCoord()));
 		if(zone == null) {
 			zone = zoneLayer.getZones().iterator().next();
-			logger.warn("Zone not found. Drawing random zone.");
+			logger.debug("Zone not found. Drawing random zone.");
 		}
 	
 		Double inhabs = (Double)zone.getAttribute().get(LandUseData.POPULATION_KEY);

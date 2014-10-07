@@ -17,31 +17,34 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.invermo.sim;
-
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
-import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
-import playground.johannes.gsv.synPop.sim.Initializer;
+package playground.johannes.gsv.synPop;
 
 /**
  * @author johannes
  *
  */
-public class SetMissingActTypes implements Initializer {
+public class ValidateActTimesTask implements ProxyPlanTask {
 
 	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.sim.Initializer#init(playground.johannes.gsv.synPop.ProxyPerson)
+	 * @see playground.johannes.gsv.synPop.ProxyPlanTask#apply(playground.johannes.gsv.synPop.ProxyPlan)
 	 */
 	@Override
-	public void init(ProxyPerson person) {
-		ProxyPlan plan = person.getPlans().get(0);
-		
-		for(ProxyObject act : plan.getActivities()) {
-			if(act.getAttribute(CommonKeys.ACTIVITY_TYPE) == null) {
-				act.setAttribute(CommonKeys.ACTIVITY_TYPE, "leisure");
-			}
+	public void apply(ProxyPlan plan) {
+		int prev = 0;
+		for(int i = 0; i < plan.getActivities().size(); i++) {
+			ProxyObject act = plan.getActivities().get(i);
+			int start = Integer.parseInt(act.getAttribute(CommonKeys.ACTIVITY_START_TIME));
+			int end = Integer.parseInt(act.getAttribute(CommonKeys.ACTIVITY_END_TIME));
+			
+			start = Math.max(start, prev);
+
+			act.setAttribute(CommonKeys.ACTIVITY_START_TIME, String.valueOf(start));
+			
+			end = Math.max(start, end);
+			
+			act.setAttribute(CommonKeys.ACTIVITY_END_TIME, String.valueOf(end));
+			
+			prev = end;
 		}
 
 	}

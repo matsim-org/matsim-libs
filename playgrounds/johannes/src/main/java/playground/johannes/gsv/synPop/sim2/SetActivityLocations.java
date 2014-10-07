@@ -42,7 +42,9 @@ import playground.johannes.gsv.synPop.mid.MIDKeys;
 import playground.johannes.gsv.synPop.mid.PersonCloner;
 import playground.johannes.gsv.synPop.sim.ActivityLocationInitializer;
 import playground.johannes.gsv.synPop.sim2.HamiltonianLogger;
+import playground.johannes.gsv.synPop.sim3.ActivityLocationMutatorFactory;
 import playground.johannes.gsv.synPop.sim3.Hamiltonian;
+import playground.johannes.gsv.synPop.sim3.HamiltonianComposite;
 import playground.johannes.gsv.synPop.sim.Initializer;
 import playground.johannes.sna.gis.ZoneLayer;
 import playground.johannes.socialnetworks.gis.io.ZoneLayerSHP;
@@ -99,13 +101,13 @@ public class SetActivityLocations {
 		String outputDir = config.getParam(MODULE_NAME, "outputDir");
 		long iters = (long) Double.parseDouble(config.getParam(MODULE_NAME, "iterations"));
 		
-		ActivityLocationMutatorFactory factory = new ActivityLocationMutatorFactory(facilities, "home", random);
+		ActivityLocationMutatorFactory factory = null;//new ActivityLocationMutatorFactory(facilities, "home", random);
 		
 		HamiltonianComposite h = new HamiltonianComposite();
 		h.addComponent(new ActivityLocationHamiltonian(facilities), 100);
 //		h.addComponent(new HFacilityCapacity(null, facilities), 0.00001);
 		
-		Sampler sampler = new Sampler(persons, h, factory, random);
+		Sampler sampler = null;//new Sampler(persons, h, factory, random);
 		
 		PopulationWriter popWriter = new PopulationWriter(outputDir);
 		popWriter.setDumpInterval(1);

@@ -55,12 +55,14 @@ public class FacilityData {
 	private Map<String, QuadTree<ActivityFacility>> quadTrees = new HashMap<>();
 
 	private final Map<String, List<ActivityFacility>> facilitiesMap;
+	
+	private final ActivityFacilities facilities;
 
 	private final Random random;
 
 	public FacilityData(ActivityFacilities facilities, Random random) {
-		System.out.println("Loading random facilities...");
 		this.random = random;
+		this.facilities = facilities;
 		facilitiesMap = new HashMap<String, List<ActivityFacility>>();
 
 		for (ActivityFacility facility : facilities.getFacilities().values()) {
@@ -84,9 +86,12 @@ public class FacilityData {
 			entry.setValue(new ArrayList<ActivityFacility>(entry.getValue()));
 		}
 
-		System.out.println("Done.");
 	}
 
+	public ActivityFacilities getAll() {
+		return facilities;
+	}
+	
 	public ActivityFacility randomFacility(String type) {
 		List<ActivityFacility> list = facilitiesMap.get(type);
 		if (list != null) {

@@ -67,17 +67,17 @@ public class InitHomeLocations implements ProxyPersonsTask {
 	public void apply(Collection<ProxyPerson> persons) {
 		LandUseData landUseData = (LandUseData) dataPool.get(LandUseDataLoader.KEY);
 		
-		ZoneLayer<Map<String, Object>> zoneLayer = landUseData.getZoneLayer();
+		ZoneLayer<Map<String, Object>> zoneLayer = landUseData.getNuts3Layer();
 		List<Zone<Map<String, Object>>> zones = new ArrayList<>(zoneLayer.getZones());
 		TObjectDoubleHashMap<Zone<?>> zoneProba = new TObjectDoubleHashMap<>();
 		
 		double sum = 0;
 		for(Zone<Map<String, Object>> zone : zoneLayer.getZones()) {
-			sum += (Double)zone.getAttribute().get(LandUseData.POPULATION_KEY);
+			sum += (Integer)zone.getAttribute().get(LandUseData.POPULATION_KEY);
 		}
 		
 		for(Zone<Map<String, Object>> zone : zoneLayer.getZones()) {
-			double inhabs = (Double)zone.getAttribute().get(LandUseData.POPULATION_KEY);
+			double inhabs = (Integer)zone.getAttribute().get(LandUseData.POPULATION_KEY);
 			double p = inhabs/sum;
 			zoneProba.put(zone, p);
 		}
@@ -117,7 +117,7 @@ public class InitHomeLocations implements ProxyPersonsTask {
 		int j = 0;
 		for(int i = 0; i < zoneProba.size(); i++) {
 			it.advance();
-			int n = (int) (persons.size() * it.value());
+			int n = (int) Math.ceil(persons.size() * it.value());
 			List<ActivityFacility> facilities = zoneFacilities.get(it.key());
 			if(n+j > persons.size()) {
 				n = persons.size() - j;
@@ -128,6 +128,8 @@ public class InitHomeLocations implements ProxyPersonsTask {
 				
 				ProgressLogger.step();
 			}
+			
+			j += n;
 		}
 		
 		ProgressLogger.termiante();

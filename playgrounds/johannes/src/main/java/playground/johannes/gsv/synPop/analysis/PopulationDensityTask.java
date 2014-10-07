@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
@@ -51,6 +52,8 @@ import com.vividsolutions.jts.geom.Point;
  *
  */
 public class PopulationDensityTask extends AnalyzerTask {
+	
+	private static final Logger logger = Logger.getLogger(PopulationDensityTask.class);
 
 	private ZoneLayer<Integer> zones;
 	
@@ -79,12 +82,15 @@ public class PopulationDensityTask extends AnalyzerTask {
 	@Override
 	public void analyze(Collection<ProxyPerson> persons, Map<String, DescriptiveStatistics> results) {
 		ProgressLogger.init(persons.size(), 1, 10);
+
+		int nozone = 0;
+		
 		for(ProxyPerson person : persons) {
 			ProxyPlan plan = person.getPlans().get(0);
 			
 			ActivityFacility home = null;
 			for(ProxyObject act : plan.getActivities()) {
-				if(act.getAttribute(CommonKeys.ACTIVITY_TYPE).equals(ActivityType.HOME)) {
+				if(ActivityType.HOME.equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
 					String idStr = act.getAttribute(CommonKeys.ACTIVITY_FACILITY);
 					Id<ActivityFacility> id = Id.create(idStr, ActivityFacility.class);
 					home = facilities.getFacilities().get(id);
@@ -93,12 +99,6 @@ public class PopulationDensityTask extends AnalyzerTask {
 			}
 			
 			if (home != null) {
-				// double x = Double.parseDouble((String)
-				// person.getAttribute(CommonKeys.PERSON_HOME_COORD_X));
-				// double y = Double.parseDouble((String)
-				// person.getAttribute(CommonKeys.PERSON_HOME_COORD_Y));
-
-				// Point p = factory.createPoint(new Coordinate(x, y));
 				Point p = MatsimCoordUtils.coordToPoint(home.getCoord());
 
 				Zone<Integer> zone = zones.getZone(p);
@@ -114,12 +114,15 @@ public class PopulationDensityTask extends AnalyzerTask {
 			}
 			ProgressLogger.step();
 		}
+		
+		if(nozone > 0) {
+			logger.warn(String.format("%s home locations cound not be assigned to a zone.", nozone));
+		}
 
 		Set<Zone<Double>> newZones = new HashSet<Zone<Double>>();
 		for(Zone<Integer> zone : zones.getZones()) {
 			Zone<Double> newZone = new Zone<Double>(zone.getGeometry());
 			if(zone.getAttribute() != null) {
-//				newZone.setAttribute(zone.getAttribute() / zone.getGeometry().getArea() * 1000 * 1000);
 				newZone.setAttribute(zone.getAttribute() / (double)persons.size());
 			} else {
 				newZone.setAttribute(0.0);

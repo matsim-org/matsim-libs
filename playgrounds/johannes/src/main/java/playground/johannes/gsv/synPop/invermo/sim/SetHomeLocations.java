@@ -20,8 +20,6 @@
 package playground.johannes.gsv.synPop.invermo.sim;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
@@ -29,21 +27,23 @@ import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 
+import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.data.DataPool;
 import playground.johannes.gsv.synPop.data.FacilityDataLoader;
+import playground.johannes.gsv.synPop.data.FacilityZoneValidator;
 import playground.johannes.gsv.synPop.data.LandUseDataLoader;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.mid.PersonCloner;
 import playground.johannes.gsv.synPop.mid.run.ProxyTaskRunner;
-import playground.johannes.gsv.synPop.sim.Initializer;
-import playground.johannes.gsv.synPop.sim2.HamiltonianComposite;
-import playground.johannes.gsv.synPop.sim2.HamiltonianLogger;
-import playground.johannes.gsv.synPop.sim2.PopulationWriter;
-import playground.johannes.gsv.synPop.sim2.SamplerListenerComposite;
-import playground.johannes.gsv.synPop.sim2.SamplerLogger;
+import playground.johannes.gsv.synPop.sim3.BlockingSamplerListener;
+import playground.johannes.gsv.synPop.sim3.HamiltonianComposite;
+import playground.johannes.gsv.synPop.sim3.HamiltonianLogger;
 import playground.johannes.gsv.synPop.sim3.InitHomeLocations;
+import playground.johannes.gsv.synPop.sim3.PopulationWriter;
 import playground.johannes.gsv.synPop.sim3.Sampler;
+import playground.johannes.gsv.synPop.sim3.SamplerListenerComposite;
+import playground.johannes.gsv.synPop.sim3.SamplerLogger;
 import playground.johannes.gsv.synPop.sim3.SwitchHomeLocationFactory;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 
@@ -81,7 +81,11 @@ public class SetHomeLocations {
 		logger.info("Loading data...");
 		DataPool dataPool = new DataPool();
 		dataPool.register(new FacilityDataLoader(config.getParam(MODULE_NAME, "facilities"), random), FacilityDataLoader.KEY);
-		dataPool.register(new LandUseDataLoader(config.getParam(MODULE_NAME, ""), ""), LandUseDataLoader.KEY);
+		dataPool.register(new LandUseDataLoader(config.getModule(MODULE_NAME)), LandUseDataLoader.KEY);
+		logger.info("Done.");
+		
+		logger.info("Validation data...");
+		FacilityZoneValidator.validate(dataPool, ActivityType.HOME, 3);
 		logger.info("Done.");
 		
 		logger.info("Setting up sampler...");
@@ -97,70 +101,50 @@ public class SetHomeLocations {
 		 * Distribute population according to zone values.
 		 */
 		new InitHomeLocations(dataPool, random).apply(persons);
-		
+		/*
+		 * Build a hamiltonian to evaluate the target population density
+		 */
 		HamiltonianComposite H = new HamiltonianComposite();
-		PersonPopulationDenstiy persDen = null;//new PersonPopulationDenstiy(popDensity);
-		H.addComponent(persDen, 10000);
-		
-//		PopulationDensity popDen = new PopulationDensity(persons, popZone, persons.size(), random); 
-//		H.addComponent(popDen, 1000);
-		
-//		HFacilityCapacity cap = new HFacilityCapacity("home", facilities);
-//		H.addComponent(cap, 0.0001);
-		
-//		MutatorFactory factory = new StartLocationMutatorFactory(rFacilities, random);
-//		MutatorFactory factory = new SwitchHomeLocFactory();
+		PersonPopulationDenstiy persDen = new PersonPopulationDenstiy(dataPool);
+		H.addComponent(persDen, 20);
+		/*
+		 * Build the move set and sampler
+		 */
 		SwitchHomeLocationFactory factory = new SwitchHomeLocationFactory(random);
 		Sampler sampler = new Sampler(persons, H, factory, random);
-		
+		/*
+		 * Build the listener
+		 */
 		SamplerListenerComposite lComposite = new SamplerListenerComposite();
-		
+		/*
+		 * need to copy home location user key to activity attributes
+		 */
+		int dumpInterval = (int) Double.parseDouble(config.getParam(MODULE_NAME, "dumpInterval"));
+		lComposite.addComponent(new BlockingSamplerListener(new CopyHomeLocations(1), dumpInterval));
+		/*
+		 * add a population writer
+		 */
 		String outputDir = config.getParam(MODULE_NAME, "outputDir");
 		PopulationWriter popWriter = new PopulationWriter(outputDir);
-		int dumpInterval = (int) Double.parseDouble(config.getParam(MODULE_NAME, "dumpInterval"));
-		popWriter.setDumpInterval(dumpInterval);
-		
-		lComposite.addComponent(new CopyHomeLocations(dumpInterval));
-		lComposite.addComponent(popWriter);
+		popWriter.setDumpInterval(1);
+		lComposite.addComponent(new BlockingSamplerListener(popWriter, dumpInterval));
 		/*
 		 * add loggers
 		 */
 		int logInterval = (int) Double.parseDouble(config.getParam(MODULE_NAME, "logInterval"));
-//		lComposite.addComponent(popDen);
-//		lComposite.addComponent(new HamiltonianLogger(popDen, logInterval, outputDir));
 		lComposite.addComponent(new HamiltonianLogger(persDen, logInterval, outputDir));
-//		lComposite.addComponent(new HamiltonianLogger(cap, logInterval, outputDir + "/capacity.log"));
-		lComposite.addComponent(new SamplerLogger());
+		SamplerLogger slogger = new SamplerLogger();
+		lComposite.addComponent(slogger);
 		
 		sampler.setSamplerListener(lComposite);
-		/*
-		 * initialize persons
-		 */
-		logger.info("Initializing persons...");
-		List<Initializer> initializers = new ArrayList<Initializer>();
-		initializers.add(new SetMissingActTypes());
-		
-//		initializers.add(new InitializeStartLocation());
-//		initializers.add(new InitializeTargetDensity(popDensity));
-//		initializers.add(new InitHomeLocations(persons, popZone, rFacilities, random));
-		
-		
-		for(Initializer initializer : initializers) {
-			for(ProxyPerson person : persons) {
-				initializer.init(person);
-			}
-		}
-		
-		
-		
-//		popDen.initializeZones();
-//		popDen.writeZoneData(outputDir + "zones-start.shp");
+
+				
 		logger.info("Running sampler...");
 		long iters = (long) Double.parseDouble(config.getParam(MODULE_NAME, "iterations"));
 		int numThreads = Integer.parseInt(config.findParam(MODULE_NAME, "numThreads"));
 		sampler.run(iters, numThreads);
+		slogger.stop();
 		logger.info("Done.");
-//		popDen.writeZoneData(outputDir + "zones-end.shp");
 	}
 	
 	

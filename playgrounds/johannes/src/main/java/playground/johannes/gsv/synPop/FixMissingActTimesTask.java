@@ -23,14 +23,12 @@ package playground.johannes.gsv.synPop;
  * @author johannes
  *
  */
-public class FixActivityTimesTask implements ProxyPlanTask {
+public class FixMissingActTimesTask implements ProxyPlanTask {
 
 	private static final int MIN_LEG_DURATION = 1;
 	
 	private static final int MIN_ACT_DURATION = 1;
-	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.ProxyPlanTask#apply(playground.johannes.gsv.synPop.ProxyPlan)
-	 */
+
 	@Override
 	public void apply(ProxyPlan plan) {
 		for(int i = 0; i < plan.getActivities().size(); i++) {
@@ -44,7 +42,7 @@ public class FixActivityTimesTask implements ProxyPlanTask {
 					if(timeStr != null) {
 						int prevEndTime = Integer.parseInt(timeStr); 
 						act.setAttribute(CommonKeys.ACTIVITY_START_TIME, String.valueOf(prevEndTime + MIN_LEG_DURATION));
-					}else
+					} else
 						throw new RuntimeException("Insufficient information. End time of previous activity not set.");
 					
 				} else {

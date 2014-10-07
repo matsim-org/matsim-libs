@@ -17,40 +17,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.invermo.sim;
+package playground.johannes.gsv.synPop.sim3;
 
-import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
+import java.util.Collection;
+
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
-import playground.johannes.gsv.synPop.sim.Initializer;
 
 /**
  * @author johannes
  *
  */
-public class InitializeStartLocation implements Initializer {
+public interface SamplerListener {
 
-	@Override
-	public void init(ProxyPerson person) {
-		ProxyPlan plan = person.getPlans().get(0);
-
-		boolean hasHomeAct = false;
-		
-		for(ProxyObject act : plan.getActivities()) {
-			if(ActivityType.HOME.equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
-				act.setUserData(MutateStartLocation.START_FACILITY_KEY, true);
-				hasHomeAct = true;
-			}
-		}
-		
-		if(!hasHomeAct) {
-			plan.getActivities().get(0).setUserData(MutateStartLocation.START_FACILITY_KEY, true);
-		}
-		
-
-	}
-
+	public void afterStep(Collection<ProxyPerson> population, Collection<ProxyPerson> mutations, boolean accepted);
 	
 }

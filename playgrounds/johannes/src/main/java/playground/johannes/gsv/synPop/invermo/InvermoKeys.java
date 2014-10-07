@@ -46,4 +46,6 @@ public class InvermoKeys {
 	public static final String WORK = "work";
 	
 	public static final String LOCATION = "location";
+	
+	public static final String COORD = "coord";
 }

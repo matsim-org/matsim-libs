@@ -59,6 +59,8 @@ public class FacilityDataLoader implements DataLoader {
 		
 		Logger.getRootLogger().setLevel(level);
 		
+		logger.info(String.format("Loaded %s facilities.", data.getAll().getFacilities().size()));
+		
 		return data;
 	}
 

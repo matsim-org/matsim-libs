@@ -17,49 +17,48 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.invermo.sim;
+package playground.johannes.gsv.synPop.sim3;
 
 import java.util.Collection;
 
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.apache.log4j.Logger;
 
-import playground.johannes.gsv.synPop.ActivityType;
-import playground.johannes.gsv.synPop.CommonKeys;
-import playground.johannes.gsv.synPop.ProxyObject;
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPlan;
-import playground.johannes.gsv.synPop.sim3.SamplerListener;
-import playground.johannes.gsv.synPop.sim3.SwitchHomeLocation;
+import playground.johannes.gsv.synPop.io.XMLWriter;
 
 /**
  * @author johannes
  *
  */
-public class CopyHomeLocations implements SamplerListener {
+public class PopulationWriter implements SamplerListener {
+	
+	private static final Logger logger = Logger.getLogger(PopulationWriter.class);
 
-	private final long interval;
+	private String outputDir;
 	
-	private long iter;
+	private XMLWriter writer;
 	
-	public CopyHomeLocations(long interval) {
-		this.interval = interval;
+	private int dumpInterval = 100000;
+	
+	private long iteration = 0;
+	
+	public PopulationWriter(String outputDir) {
+		this.outputDir = outputDir;
+		writer = new XMLWriter();
+		
+	}
+	
+	public void setDumpInterval(int interval) {
+		dumpInterval = interval;
 	}
 	
 	@Override
-	public void afterStep(Collection<ProxyPerson> population, Collection<ProxyPerson> person, boolean accpeted) {
-		iter++;
-		if(iter % interval == 0) {
-			for(ProxyPerson thePerson : population) {
-				ActivityFacility home = (ActivityFacility) thePerson.getUserData(SwitchHomeLocation.USER_FACILITY_KEY);
-				ProxyPlan plan = thePerson.getPlans().get(0);
-				for(ProxyObject act : plan.getActivities()) {
-					if(ActivityType.HOME.equalsIgnoreCase(act.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
-						act.setAttribute(CommonKeys.ACTIVITY_FACILITY, home.getId().toString());
-					}
-				}
-			}
+	public void afterStep(Collection<ProxyPerson> population, Collection<ProxyPerson> mutations, boolean accepted) {
+		iteration++;
+		if(iteration % dumpInterval == 0) {
+			logger.info("Dumping population...");
+			writer.write(String.format("%s/%s.pop.xml.gz", outputDir, iteration), population);
+			logger.info("Done.");
 		}
-
 	}
-
 }

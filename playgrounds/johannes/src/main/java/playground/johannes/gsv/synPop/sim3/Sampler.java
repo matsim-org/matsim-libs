@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Random;
 
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.sim2.SamplerListener;
+import playground.johannes.gsv.synPop.sim3.SamplerListener;
 import playground.johannes.socialnetworks.utils.CollectionUtils;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 
@@ -146,24 +146,15 @@ public class Sampler {
 				}
 			}
 			
-//			listener.afterStep(Sampler.this.population, person1, accepted);
+			listener.afterStep(Sampler.this.population, mutations, accepted);
 		}
 
 	}
 	
 	private static class DefaultListener implements SamplerListener {
 
-		@Override
-		public void afterStep(Collection<ProxyPerson> population, ProxyPerson person, boolean accepted) {
-			// does nothing
-		}
-
-		/* (non-Javadoc)
-		 * @see playground.johannes.gsv.synPop.sim2.SamplerListener#afterModify(playground.johannes.gsv.synPop.ProxyPerson)
-		 */
-		@Override
-		public void afterModify(ProxyPerson person) {
-			// TODO Auto-generated method stub
+				@Override
+		public void afterStep(Collection<ProxyPerson> population, Collection<ProxyPerson> mutations, boolean accepted) {
 			
 		}
 		
