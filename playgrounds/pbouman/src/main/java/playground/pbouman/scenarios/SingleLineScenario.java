@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -226,12 +225,12 @@ public class SingleLineScenario
 		 * Initialize Strategy *
 		 * ******************* */
 		
-		StrategySettings stratSets = new StrategySettings(new IdImpl("1"));
+		StrategySettings stratSets = new StrategySettings(Id.create("1", StrategySettings.class));
 		//stratSets.setModuleName("BestScore");
 		stratSets.setModuleName("SelectExpBeta");
 		stratSets.setProbability(0.9);
 		config.strategy().addStrategySettings(stratSets);
-		stratSets = new StrategySettings(new IdImpl("2"));
+		stratSets = new StrategySettings(Id.create("2", StrategySettings.class));
 		stratSets.setModuleName("TransitTimeAllocationMutator");
 		stratSets.setProbability(0.1);
 		config.strategy().addStrategySettings(stratSets);

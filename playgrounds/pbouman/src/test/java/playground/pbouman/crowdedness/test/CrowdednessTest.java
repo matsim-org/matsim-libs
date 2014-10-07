@@ -39,7 +39,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -390,11 +389,11 @@ public class CrowdednessTest
 		 * Setup Strategy *
 		 * ************** */
 		
-		StrategySettings stratSets = new StrategySettings(new IdImpl("1"));
+		StrategySettings stratSets = new StrategySettings(Id.create("1", StrategySettings.class));
 		stratSets.setModuleName("SelectExpBeta");
 		stratSets.setProbability(0.8);
 		config.strategy().addStrategySettings(stratSets);
-		stratSets = new StrategySettings(new IdImpl("2"));
+		stratSets = new StrategySettings(Id.create("2", StrategySettings.class));
 		// Note: this used to be TransitTimeAllocationMutator, but this mutator does not exist any more (at least not by that name?).
 		// Anyway, the test does not really depend on the strategy module selected here.
 		stratSets.setModuleName("TimeAllocationMutator");
