@@ -38,8 +38,17 @@ public class TransitRouterWSImplFactory implements TransitRouterFactory {
 	private final TransitRouterConfig config;
 	private final TransitRouterNetworkWW routerNetwork;
 	private final Scenario scenario;
-	private final WaitTime waitTime;
-	private final StopStopTime stopStopTime;
+	private WaitTime waitTime;
+
+    public void setStopStopTime(StopStopTime stopStopTime) {
+        this.stopStopTime = stopStopTime;
+    }
+
+    public void setWaitTime(WaitTime waitTime) {
+        this.waitTime = waitTime;
+    }
+
+    private StopStopTime stopStopTime;
 	
 	public TransitRouterWSImplFactory(final Scenario scenario, final WaitTime waitTime, final StopStopTime stopStopTime) {
 		this.config = new TransitRouterConfig(scenario.getConfig().planCalcScore(),

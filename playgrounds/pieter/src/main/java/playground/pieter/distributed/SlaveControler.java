@@ -148,10 +148,21 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
         matsimControler.setCreateGraphs(false);
         matsimControler.addControlerListener(this);
         new Thread(new TimesReceiver()).start();
+        if (matsimControler.getConfig().scenario().isUseTransit()) {
+
+            stopStopTimes= new StopStopTimeCalculatorSerializable(matsimControler.getScenario().getTransitSchedule(),
+                        matsimControler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (matsimControler.getConfig()
+                        .qsim().getEndTime() - matsimControler.getConfig().qsim().getStartTime())).getStopStopTimes();
+
+            waitTimes=new WaitTimeCalculatorSerializable(matsimControler.getScenario().getTransitSchedule(),
+                        matsimControler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (matsimControler.getConfig()
+                        .qsim().getEndTime() - matsimControler.getConfig().qsim().getStartTime())).getWaitTimes();
+
+        }
         if (commandLine.hasOption("s")) {
             slaveLogger.warn("Singapore scenario: Doing events-based transit routing.");
             matsimControler.setTransitRouterFactory(new TransitRouterWSImplFactory(matsimControler.getScenario(), waitTimes, stopStopTimes));
-            matsimControler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(matsimControler.getScenario().getConfig().planCalcScore(), matsimControler.getScenario()));
+            matsimControler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(config.planCalcScore(), scenario));
         }
     }
 
@@ -193,19 +204,13 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
             pSimFactory.setTravelTime(matsimControler.getLinkTravelTimes());
         else
             pSimFactory.setTravelTime(linkTravelTimes);
-        if (matsimControler.getConfig().scenario().isUseTransit()) {
-            if (stopStopTimes == null)
-                pSimFactory.setStopStopTime(new StopStopTimeCalculatorSerializable(matsimControler.getScenario().getTransitSchedule(),
-                        matsimControler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (matsimControler.getConfig()
-                        .qsim().getEndTime() - matsimControler.getConfig().qsim().getStartTime())).getStopStopTimes());
-            else
-                pSimFactory.setStopStopTime(stopStopTimes);
-            if (waitTimes == null)
-                pSimFactory.setWaitTime(new WaitTimeCalculatorSerializable(matsimControler.getScenario().getTransitSchedule(),
-                        matsimControler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (matsimControler.getConfig()
-                        .qsim().getEndTime() - matsimControler.getConfig().qsim().getStartTime())).getWaitTimes());
-            else
-                pSimFactory.setWaitTime(waitTimes);
+        if(config.scenario().isUseTransit()){
+            pSimFactory.setStopStopTime(stopStopTimes);
+            pSimFactory.setWaitTime(waitTimes);
+            if(matsimControler.getTransitRouterFactory() instanceof TransitRouterWSImplFactory){
+                ((TransitRouterWSImplFactory)matsimControler.getTransitRouterFactory()).setStopStopTime(stopStopTimes);
+                ((TransitRouterWSImplFactory)matsimControler.getTransitRouterFactory()).setWaitTime(waitTimes);
+            }
         }
         Collection<Plan> plans = new ArrayList<>();
         for (Person person : matsimControler.getPopulation().getPersons().values())
