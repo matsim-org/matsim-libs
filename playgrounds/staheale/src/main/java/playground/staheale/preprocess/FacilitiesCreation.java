@@ -20,12 +20,6 @@
 
 package playground.staheale.preprocess;
 
-import playground.staheale.preprocess.AgentInteractionEnterpriseCensus;
-import playground.staheale.preprocess.AgentInteractionEnterpriseCensusParser;
-import playground.staheale.preprocess.FacilitiesProduction;
-import playground.staheale.preprocess.AgentInteractionEnterpriseCensus.ProductionSector;
-import playground.staheale.preprocess.FacilitiesProduction.KTIYear;
-
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Random;
@@ -33,13 +27,16 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.geometry.CoordImpl;
+
+import playground.staheale.preprocess.AgentInteractionEnterpriseCensus.ProductionSector;
+import playground.staheale.preprocess.FacilitiesProduction.KTIYear;
 
 
 
@@ -217,13 +214,13 @@ public class FacilitiesCreation {
 					tempFacilityId = tempFacilities_it.next();
 					attributeId = this.getAttributeIdFromTemporaryFacilityID(tempFacilityId);
 					f = facilities.createAndAddFacility(
-							new IdImpl(this.getNumberFromTemporaryFacilityID(tempFacilityId)),
+							Id.create(this.getNumberFromTemporaryFacilityID(tempFacilityId), ActivityFacility.class),
 							new CoordImpl(X, Y));
 
 					if (ktiYear.equals(KTIYear.KTI_YEAR_2007)) {
 						// create the work activity and its capacity according to all the computation done before
 						a = f.createActivityOption("work");
-						a.setCapacity((double) Math.max(1,tempFacilities.get(tempFacilityId)));
+						a.setCapacity(Math.max(1,tempFacilities.get(tempFacilityId)));
 
 						// create the other activities
 						if (this.facilityActivities.containsKey(attributeId)) {
@@ -249,10 +246,10 @@ public class FacilitiesCreation {
 						// set the capacity to the number of fulltime equivalents revealed
 						if (sector.equals(ProductionSector.SECTOR2)) {
 							a = f.createActivityOption(FacilitiesProduction.WORK_SECTOR2);
-							a.setCapacity((double) Math.max(1,tempFacilities.get(tempFacilityId)));
+							a.setCapacity(Math.max(1,tempFacilities.get(tempFacilityId)));
 						} else if(sector.equals(ProductionSector.SECTOR3)) {
 							a = f.createActivityOption(FacilitiesProduction.WORK_SECTOR3);
-							a.setCapacity((double) Math.max(1,tempFacilities.get(tempFacilityId)));
+							a.setCapacity(Math.max(1,tempFacilities.get(tempFacilityId)));
 						}
 
 						if (this.facilityActivities.containsKey(activityId)) {
@@ -266,26 +263,26 @@ public class FacilitiesCreation {
 
 						if (f.getActivityOptions().containsKey(FacilitiesProduction.SHOP_RETAIL_GT2500)) {
 							double n = Math.round(0.0675*(random.nextInt(4500) + 2501));
-							a.setCapacity((double) n);
+							a.setCapacity(n);
 							//log.info("capacity of shop retail gt2500 set to " +n);
 						} else if(f.getActivityOptions().containsKey(FacilitiesProduction.SHOP_RETAIL_GET1000)) {
 							double x = Math.round(0.0675*(1000 + random.nextInt(1501)));
-							a.setCapacity((double) x);
+							a.setCapacity(x);
 							log.info("capacity of shop retail get1000 set to " +x);
 						} else if(f.getActivityOptions().containsKey(FacilitiesProduction.SHOP_RETAIL_GET400)) {
-							a.setCapacity((double) Math.round(0.0675*(400 + random.nextInt(600))));
+							a.setCapacity(Math.round(0.0675*(400 + random.nextInt(600))));
 						} else if(f.getActivityOptions().containsKey(FacilitiesProduction.SHOP_RETAIL_GET100)) {
 							double z = Math.round(0.0675*(100 + random.nextInt(300)));
-							a.setCapacity((double) z);
+							a.setCapacity(z);
 							//log.info("capacity of shop retail get100 set to " +z);
 						} else if(f.getActivityOptions().containsKey(FacilitiesProduction.SHOP_RETAIL_LT100)) {
-							a.setCapacity((double) 20);
+							a.setCapacity(20);
 						}
 
 						//shop retail other sales area is assumed to vary between 150 and 1000 m2
 
 						else if(f.getActivityOptions().containsKey(FacilitiesProduction.SHOP_RETAIL_OTHER)) {
-							a.setCapacity((double) Math.round(0.0675*(150 + random.nextInt(851))));
+							a.setCapacity(Math.round(0.0675*(150 + random.nextInt(851))));
 						}
 
 						//-------------------------shop service capacity definition
@@ -294,7 +291,7 @@ public class FacilitiesCreation {
 
 						else if(f.getActivityOptions().containsKey(FacilitiesProduction.SHOP_SERVICE)) {
 							double v = Math.max(1,Math.round((tempFacilities.get(tempFacilityId)*0.7)));
-							a.setCapacity((double) v);
+							a.setCapacity(v);
 							//log.info("setting shop service capacity to " +v);
 						}
 
@@ -304,20 +301,20 @@ public class FacilitiesCreation {
 
 						else if(f.getActivityOptions().containsKey("B015540A") || f.getActivityOptions().containsKey("B019234B") || f.getActivityOptions().containsKey("B019234C")|| f.getActivityOptions().containsKey("B019271A")) {
 							double y = Math.max(1,Math.round((tempFacilities.get(tempFacilityId))*0.7*(10 + random.nextInt(11))));
-							a.setCapacity((double) y);
+							a.setCapacity(y);
 							//log.info("setting capacity for bar, disco, etc. with a value of: " +y);
 						}
 
 						//dancing school, other sportive activities like tennis or golf schools: capacity is assumed to depend on the number of people working there, one employee can serve between 20-30 customer, subtract 10% for vacancies and 20% for shift operation
 
 						else if(f.getActivityOptions().containsKey("B019234A") || f.getActivityOptions().containsKey("B019262B") || f.getActivityOptions().containsKey("B019272A")) {
-							a.setCapacity((double) Math.max(1,Math.round((tempFacilities.get(tempFacilityId))*0.7*(20 + random.nextInt(11)))));
+							a.setCapacity(Math.max(1,Math.round((tempFacilities.get(tempFacilityId))*0.7*(20 + random.nextInt(11)))));
 						}
 
 						//operation of sport facilities: 
 
 						else if(f.getActivityOptions().containsKey("B019261A")) {
-							a.setCapacity((double)Math.round(30+(0.7*(tempFacilities.get(tempFacilityId)))*(0.7*(tempFacilities.get(tempFacilityId)))));
+							a.setCapacity(Math.round(30+(0.7*(tempFacilities.get(tempFacilityId)))*(0.7*(tempFacilities.get(tempFacilityId)))));
 							//	log.info("setting capacity for sport facilities");
 
 						}
@@ -325,21 +322,21 @@ public class FacilitiesCreation {
 						//sport clubs:
 
 						else if(f.getActivityOptions().containsKey("B019262A")) {
-							a.setCapacity((double) Math.round(20+(tempFacilities.get(tempFacilityId))*0.7*(1 + random.nextInt(1))));
+							a.setCapacity(Math.round(20+(tempFacilities.get(tempFacilityId))*0.7*(1 + random.nextInt(1))));
 							//	log.info("setting capacity for sport club");
 						}
 
 						//sauna, solarium, gym, thermal bath, etc.:
 
 						else if(f.getActivityOptions().containsKey("B019304A")|| f.getActivityOptions().containsKey("B019304B") || f.getActivityOptions().containsKey("B019304C")) {
-							a.setCapacity((double) Math.max(1,Math.round((tempFacilities.get(tempFacilityId))*0.7*(2 + random.nextInt(9)))));
+							a.setCapacity(Math.max(1,Math.round((tempFacilities.get(tempFacilityId))*0.7*(2 + random.nextInt(9)))));
 							//	log.info("setting capacity for sauna, solarium, gym, etc.");
 						}
 
 						//amusement parks:
 
 						else if(f.getActivityOptions().containsKey("B019233A")) {
-							a.setCapacity((double) Math.round(100+(tempFacilities.get(tempFacilityId))*0.7*(1 + random.nextInt(25))));
+							a.setCapacity(Math.round(100+(tempFacilities.get(tempFacilityId))*0.7*(1 + random.nextInt(25))));
 						}
 
 						//-------------------------gastro & culture capacity definition
@@ -347,37 +344,37 @@ public class FacilitiesCreation {
 						//restaurant, canteen: arbitrary set to vary between 25 and 200
 
 						else if(f.getActivityOptions().containsKey("B015530A") || f.getActivityOptions().containsKey("B015551A")) {
-							a.setCapacity((double) Math.max(1,Math.min(1000,Math.round((tempFacilities.get(tempFacilityId))*0.7*(10 + random.nextInt(11))))));
+							a.setCapacity(Math.max(1,Math.min(1000,Math.round((tempFacilities.get(tempFacilityId))*0.7*(10 + random.nextInt(11))))));
 						}
 
 						//cinema:
 
 						else if(f.getActivityOptions().containsKey("B019213A")) {
-							a.setCapacity((double) Math.max(1,Math.min(800,Math.round(200+(tempFacilities.get(tempFacilityId))*0.7*(1 + random.nextInt(8))))));
+							a.setCapacity(Math.max(1,Math.min(800,Math.round(200+(tempFacilities.get(tempFacilityId))*0.7*(1 + random.nextInt(8))))));
 						}
 
 						//theater, orchestra, circus, etc.:
 
 						else if(f.getActivityOptions().containsKey("B019231A") || f.getActivityOptions().containsKey("B019231B") || f.getActivityOptions().containsKey("B019234D")) {
-							a.setCapacity((double) Math.round(50+(tempFacilities.get(tempFacilityId))*0.7*(1 + random.nextInt(8))));
+							a.setCapacity(Math.round(50+(tempFacilities.get(tempFacilityId))*0.7*(1 + random.nextInt(8))));
 						}
 
 						//libraries:
 
 						else if(f.getActivityOptions().containsKey("B019251A")) {
-							a.setCapacity((double) Math.round(20+(tempFacilities.get(tempFacilityId))*0.7*(1 + random.nextInt(5))));
+							a.setCapacity(Math.round(20+(tempFacilities.get(tempFacilityId))*0.7*(1 + random.nextInt(5))));
 						}
 
 						//museum:
 
 						else if(f.getActivityOptions().containsKey("B019252A")) {
-							a.setCapacity((double) Math.round(50+(tempFacilities.get(tempFacilityId))*0.7*(1 + random.nextInt(8))));
+							a.setCapacity(Math.round(50+(tempFacilities.get(tempFacilityId))*0.7*(1 + random.nextInt(8))));
 						}
 
 						//zoo, gardens, natural parks: arbitrary set to vary between 50 and 1000
 
 						else if(f.getActivityOptions().containsKey("B019253A")) {
-							a.setCapacity((double) Math.round(50+(tempFacilities.get(tempFacilityId))*0.7*(1 + random.nextInt(15))));
+							a.setCapacity(Math.round(50+(tempFacilities.get(tempFacilityId))*0.7*(1 + random.nextInt(15))));
 						}
 
 					}

@@ -22,7 +22,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -37,9 +36,9 @@ public class AdvancedPopulationGenerator {
 	private static Logger log = Logger.getLogger(AdvancedPopulationGenerator.class);
 	int idCounter = 1;	//new ids will start from this number
 	Id idTemp = null;
-	static List<Id> weekendList = new ArrayList<Id>(); //list containing all mz persons with activities reported on the weekend
-	List<Id> educationList = new ArrayList<Id>(); //list containing all mz persons being educated
-	List<Id> UnknownGroupList = new ArrayList<Id>(); //list containing all csv persons with an initially unknown mz group
+	static List<Id<Person>> weekendList = new ArrayList<>(); //list containing all mz persons with activities reported on the weekend
+	List<Id<Person>> educationList = new ArrayList<>(); //list containing all mz persons being educated
+	List<Id<Person>> UnknownGroupList = new ArrayList<>(); //list containing all csv persons with an initially unknown mz group
 	boolean isWorking = false;
 	int count = 0;
 	int countPop = 0;
@@ -123,7 +122,7 @@ public class AdvancedPopulationGenerator {
 			String[] entries = curr_line0.split(";");
 			String hhnr = entries[0].trim();
 			String zielpnr = entries[1].trim();
-			Id id = new IdImpl(hhnr.concat(zielpnr));
+			Id<Person> id = Id.create(hhnr.concat(zielpnr), Person.class);
 			String weight = entries[2].trim();
 			double mzWeight = Double.parseDouble(weight);
 			String weekend = entries[4].trim();
@@ -139,7 +138,7 @@ public class AdvancedPopulationGenerator {
 				educationList.add(id);
 			}
 			//set score value to weight
-			Id MZid = new IdImpl(hhnr.concat(zielpnr));
+			Id<Person> MZid = Id.create(hhnr.concat(zielpnr), Person.class);
 			if (mz_population.getPersons().containsKey(MZid)) {
 				Person p = mz_population.getPersons().get(MZid);
 				PersonImpl person = (PersonImpl) p;
@@ -182,7 +181,7 @@ public class AdvancedPopulationGenerator {
 			count += 1;
 			String[] entries = curr_line.split(",");
 			String recordId = entries[0].trim();
-			Id recId = new IdImpl(recordId);
+			Id<Person> recId = Id.create(recordId, Person.class);
 			//String nrHome = entries[1].trim();
 			String homeXcoord = entries[2].trim();
 			String homeYcoord = entries[3].trim();

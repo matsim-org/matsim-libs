@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 
@@ -47,13 +46,13 @@ public class MergeNetworks {
 		double capacityFactor = baseNetwork.getCapacityPeriod() / addNetwork.getCapacityPeriod();
 		NetworkFactory factory = baseNetwork.getFactory();
 		for (Node node : addNetwork.getNodes().values()) {
-			NodeImpl node2 = (NodeImpl) factory.createNode(new IdImpl(addPrefix + node.getId().toString()), node.getCoord());
+			NodeImpl node2 = (NodeImpl) factory.createNode(Id.create(addPrefix + node.getId().toString(), Node.class), node.getCoord());
 			baseNetwork.addNode(node2);
 		}
 		for (Link link : addNetwork.getLinks().values()) {
-			Id fromNodeId = new IdImpl(addPrefix + link.getFromNode().getId().toString());
-			Id toNodeId = new IdImpl(addPrefix + link.getToNode().getId().toString());
-			Link link2 = factory.createLink(new IdImpl(addPrefix + link.getId().toString()),
+			Id<Node> fromNodeId = Id.create(addPrefix + link.getFromNode().getId().toString(), Node.class);
+			Id<Node> toNodeId = Id.create(addPrefix + link.getToNode().getId().toString(), Node.class);
+			Link link2 = factory.createLink(Id.create(addPrefix + link.getId().toString(), Link.class),
 					fromNodeId, toNodeId);
 			link2.setAllowedModes(link.getAllowedModes());
 			link2.setCapacity(link.getCapacity() * capacityFactor);
@@ -78,13 +77,13 @@ public class MergeNetworks {
 		double capacityFactor = mergedNetwork.getCapacityPeriod() / networkA.getCapacityPeriod();
 		NetworkFactory factory = mergedNetwork.getFactory();
 		for (Node node : networkA.getNodes().values()) {
-			NodeImpl node2 = (NodeImpl) factory.createNode(new IdImpl(prefixA + node.getId().toString()), node.getCoord());
+			NodeImpl node2 = (NodeImpl) factory.createNode(Id.create(prefixA + node.getId().toString(), Node.class), node.getCoord());
 			mergedNetwork.getNodes().put(node2.getId(), node2);
 		}
 		for (Link link : networkA.getLinks().values()) {
-			Id fromNodeId = new IdImpl(prefixA + link.getFromNode().getId().toString());
-			Id toNodeId = new IdImpl(prefixA + link.getToNode().getId().toString());
-			Link link2 = factory.createLink(new IdImpl(prefixA + link.getId().toString()),
+			Id<Node> fromNodeId = Id.create(prefixA + link.getFromNode().getId().toString(), Node.class);
+			Id toNodeId = Id.create(prefixA + link.getToNode().getId().toString(), Node.class);
+			Link link2 = factory.createLink(Id.create(prefixA + link.getId().toString(), Link.class),
 					fromNodeId, toNodeId);
 			link2.setAllowedModes(link.getAllowedModes());
 			link2.setCapacity(link.getCapacity() * capacityFactor);
@@ -97,13 +96,13 @@ public class MergeNetworks {
 		}
 		capacityFactor = mergedNetwork.getCapacityPeriod() / networkB.getCapacityPeriod();
 		for (Node node : networkB.getNodes().values()) {
-			NodeImpl node2 = (NodeImpl) factory.createNode(new IdImpl(prefixB + node.getId().toString()), node.getCoord());
+			NodeImpl node2 = (NodeImpl) factory.createNode(Id.create(prefixB + node.getId().toString(), Node.class), node.getCoord());
 			mergedNetwork.getNodes().put(node2.getId(), node2);
 		}
 		for (Link link : networkB.getLinks().values()) {
-			Id fromNodeId = new IdImpl(prefixB + link.getFromNode().getId().toString());
-			Id toNodeId = new IdImpl(prefixB + link.getToNode().getId().toString());
-			Link link2 = factory.createLink(new IdImpl(prefixB + link.getId().toString()),
+			Id<Node> fromNodeId = Id.create(prefixB + link.getFromNode().getId().toString(), Node.class);
+			Id<Node> toNodeId = Id.create(prefixB + link.getToNode().getId().toString(), Node.class);
+			Link link2 = factory.createLink(Id.create(prefixB + link.getId().toString(), Link.class),
 					fromNodeId, toNodeId);
 			link2.setAllowedModes(link.getAllowedModes());
 			link2.setCapacity(link.getCapacity() * capacityFactor);

@@ -29,12 +29,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
-import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkWriter;
@@ -77,15 +76,15 @@ public class CreateNetwork {
 		for (int i = 0; i <= stepsPerSide ; i++) {
 
 			for (int j = 0; j <= stepsPerSide; j++) {
-				Id fromNodeId = new IdImpl(Integer.toString(i * (stepsPerSide + 1) + j));
+				Id<Node> fromNodeId = Id.create(Integer.toString(i * (stepsPerSide + 1) + j), Node.class);
 				Node fromNode = this.scenario.getNetwork().getNodes().get(fromNodeId);
 
 				if (j > 0) {
 					// create backward link
-					Id toNodeId = new IdImpl(Integer.toString(i * (stepsPerSide + 1) + j - 1));
+					Id<Node> toNodeId = Id.create(Integer.toString(i * (stepsPerSide + 1) + j - 1), Node.class);
 					Node toNode = this.scenario.getNetwork().getNodes().get(toNodeId);
 
-					Link l0 = networkFactory.createLink(new IdImpl(Integer.toString(linkCnt)), fromNode, toNode);
+					Link l0 = networkFactory.createLink(Id.create(Integer.toString(linkCnt), Link.class), fromNode, toNode);
 					l0.setCapacity(linkCapacity);
 					l0.setFreespeed(freeSpeed);				
 					l0.setLength(((CoordImpl)fromNode.getCoord()).calcDistance(toNode.getCoord()));
@@ -94,7 +93,7 @@ public class CreateNetwork {
 					this.addFacility(l0, facilityCnt);
 					facilityCnt++;						
 
-					Link l1 = networkFactory.createLink(new IdImpl(Integer.toString(linkCnt)), toNode, fromNode);
+					Link l1 = networkFactory.createLink(Id.create(linkCnt, Link.class), toNode, fromNode);
 					l1.setCapacity(linkCapacity);
 					l1.setFreespeed(freeSpeed);
 					l1.setLength(((CoordImpl)toNode.getCoord()).calcDistance(fromNode.getCoord()));
@@ -104,10 +103,10 @@ public class CreateNetwork {
 
 				if (i > 0) {
 					// create downward link
-					Id toNodeId = new IdImpl(Integer.toString((i - 1) * (stepsPerSide + 1) + j));
+					Id<Node> toNodeId = Id.create(Integer.toString((i - 1) * (stepsPerSide + 1) + j), Node.class);
 					Node toNode = this.scenario.getNetwork().getNodes().get(toNodeId);
 
-					Link l0 = networkFactory.createLink(new IdImpl(Integer.toString(linkCnt)), fromNode, toNode);
+					Link l0 = networkFactory.createLink(Id.create(Integer.toString(linkCnt), Link.class), fromNode, toNode);
 					l0.setCapacity(linkCapacity);
 					l0.setFreespeed(freeSpeed);
 					l0.setLength(((CoordImpl)fromNode.getCoord()).calcDistance(toNode.getCoord()));
@@ -117,7 +116,7 @@ public class CreateNetwork {
 					this.addFacility(l0, facilityCnt);						
 					facilityCnt++;
 
-					Link l1 = networkFactory.createLink(new IdImpl(Integer.toString(linkCnt)), toNode, fromNode);
+					Link l1 = networkFactory.createLink(Id.create(Integer.toString(linkCnt), Link.class), toNode, fromNode);
 					l1.setCapacity(linkCapacity);
 					l1.setFreespeed(freeSpeed);
 					l1.setLength(((CoordImpl)fromNode.getCoord()).calcDistance(toNode.getCoord()));
@@ -139,7 +138,7 @@ public class CreateNetwork {
 
 	private void addFacility(Link l, int facilityId) {
 		int idnumber = facilityId;
-		IdImpl id = new IdImpl(Integer.toString(facilityId));
+		Id<ActivityFacility> id = Id.create(Integer.toString(facilityId), ActivityFacility.class);
 		this.scenario.getActivityFacilities().addActivityFacility(this.scenario.getActivityFacilities().getFactory().createActivityFacility(id, l.getCoord()));
 
 		Random random = new Random(4711+idnumber);
@@ -171,19 +170,19 @@ public class CreateNetwork {
 		//    	}
 
 		ActivityOptionImpl actOptionWork = (ActivityOptionImpl)facility.getActivityOptions().get("work");
-		OpeningTimeImpl opentimeWork = new OpeningTimeImpl(DayType.wk, 6.0 * 3600.0, 20.0 * 3600);
+		OpeningTimeImpl opentimeWork = new OpeningTimeImpl(6.0 * 3600.0, 20.0 * 3600);
 		actOptionWork.addOpeningTime(opentimeWork);
 
 		if (facility.getActivityOptions().containsKey("shop_retail")){
 			ActivityOptionImpl actOptionShopRetail = (ActivityOptionImpl)facility.getActivityOptions().get("shop_retail");
-			OpeningTimeImpl opentimeShopRetail = new OpeningTimeImpl(DayType.wk, 7.5 * 3600.0, 19.0 * 3600);
+			OpeningTimeImpl opentimeShopRetail = new OpeningTimeImpl(7.5 * 3600.0, 19.0 * 3600);
 			actOptionShopRetail.addOpeningTime(opentimeShopRetail);
 			double cap = 2+random.nextInt(200);
 			actOptionShopRetail.setCapacity(cap);
 		}
 		if (facility.getActivityOptions().containsKey("shop_service")){
 			ActivityOptionImpl actOptionShopService = (ActivityOptionImpl)facility.getActivityOptions().get("shop_service");
-			OpeningTimeImpl opentimeShopService = new OpeningTimeImpl(DayType.wk, 8.0 * 3600.0, 19.0 * 3600);
+			OpeningTimeImpl opentimeShopService = new OpeningTimeImpl(8.0 * 3600.0, 19.0 * 3600);
 			actOptionShopService.addOpeningTime(opentimeShopService);
 			double cap = 2+random.nextInt(29);
 			actOptionShopService.setCapacity(cap);
@@ -191,14 +190,14 @@ public class CreateNetwork {
 		}
 		if (facility.getActivityOptions().containsKey("leisure_sports_fun")){
 			ActivityOptionImpl actOptionSportsFun = (ActivityOptionImpl)facility.getActivityOptions().get("leisure_sports_fun");
-			OpeningTimeImpl opentimeSportsFun = new OpeningTimeImpl(DayType.wk, 9.0 * 3600.0, 24.0 * 3600);
+			OpeningTimeImpl opentimeSportsFun = new OpeningTimeImpl(9.0 * 3600.0, 24.0 * 3600);
 			actOptionSportsFun.addOpeningTime(opentimeSportsFun);
 			double cap = 2+random.nextInt(44);
 			actOptionSportsFun.setCapacity(cap);
 		}
 		if (facility.getActivityOptions().containsKey("leisure_gastro_culture")){
 			ActivityOptionImpl actOptionGastroCulture = (ActivityOptionImpl)facility.getActivityOptions().get("leisure_gastro_culture");
-			OpeningTimeImpl opentimeGastroCulture = new OpeningTimeImpl(DayType.wk, 9.0 * 3600.0, 24.0 * 3600);
+			OpeningTimeImpl opentimeGastroCulture = new OpeningTimeImpl(9.0 * 3600.0, 24.0 * 3600);
 			actOptionGastroCulture.addOpeningTime(opentimeGastroCulture);
 			double cap = 2+random.nextInt(61);
 			actOptionGastroCulture.setCapacity(cap);
@@ -214,7 +213,7 @@ public class CreateNetwork {
 		int stepsPerSide = (int)(sideLength/ spacing);
 		for (int i = 0; i <= stepsPerSide ; i++) {
 			for (int j = 0; j <= stepsPerSide; j++) {
-				Node n = networkFactory.createNode(new IdImpl(Integer.toString(nodeCnt)), new CoordImpl(i * spacing, j * spacing));
+				Node n = networkFactory.createNode(Id.create(nodeCnt, Node.class), new CoordImpl(i * spacing, j * spacing));
 				this.scenario.getNetwork().addNode(n);
 				nodeCnt++;
 			}

@@ -16,7 +16,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -87,7 +86,6 @@ public class Connections2PTNetwork {
 		NetworkFactory factory = PTnetwork.getFactory();
 		TransitScheduleFactory scheduleFactory = PTschedule.getFactory();
 		VehiclesFactory vehicleFactory = PTvehicles.getFactory();
-		Id bezirkNodeIdVorher = null;
 
 		// ------------------- read in csv file -----------------------
 		log.info("Reading csv file...");		
@@ -124,7 +122,7 @@ public class Connections2PTNetwork {
 			//		", BezirkXAchse = " +bezirkXAchse+ ", Knotennummer = "
 			//		+knotenNummer);
 
-			Id bezirkNodeId = new IdImpl(bezirkNummer+knotenNummer);
+			Id<Node> bezirkNodeId = Id.create(bezirkNummer+knotenNummer, Node.class);
 
 			// add district as a node to network
 			double x = Double.parseDouble(bezirkXAchse);
@@ -138,7 +136,7 @@ public class Connections2PTNetwork {
 			//log.info("bezirkNode " +bezirkNode.getId()+ " added to network");
 
 			// create district as a stop facility to schedule
-			TransitStopFacility bezirkStop = scheduleFactory.createTransitStopFacility(bezirkNodeId, coords, false);
+			TransitStopFacility bezirkStop = scheduleFactory.createTransitStopFacility(Id.create(bezirkNodeId, TransitStopFacility.class), coords, false);
 			bezirkStop.setName(bezirkName);
 			//log.info("stop facility " +bezirkStop.getName()+ " created");
 
@@ -239,12 +237,10 @@ public class Connections2PTNetwork {
 				}
 				Id<TransitLine> newTransitLineId2 = Id.create("Anbindung" +bezirkNummer+knotenNummer+2, TransitLine.class);
 				TransitLine newLine2 = scheduleFactory.createTransitLine(newTransitLineId2);
-				newLine.addRoute(newTransitRoute2);
+				newLine2.addRoute(newTransitRoute2);
 //				PTscheduleAnbindungen.addTransitLine(newLine2);
 				//log.info("new line2 " +newLine2.getId()+ " added to schedule");
 			}
-
-			bezirkNodeIdVorher = bezirkNodeId;
 
 		}
 		bufRdr.close();
@@ -296,7 +292,7 @@ public class Connections2PTNetwork {
 					//log.info("link2 " +nLink2+ " added to network");
 
 					// add lines
-					TransitStopFacility currentStop1 = PTschedule.getFacilities().get(currentNodeId1);
+//					TransitStopFacility currentStop1 = PTschedule.getFacilities().get(currentNodeId1);
 					Id<TransitStopFacility> nStopId1 = Id.create(currentNodeId1.toString()+currentNodeId2.toString(), TransitStopFacility.class);
 					TransitStopFacility newddStop1 = scheduleFactory.createTransitStopFacility(nStopId1, currentNode1.getCoord(), false);
 					newddStop1.setName(nStopId1+"_Verbindung");
@@ -304,7 +300,7 @@ public class Connections2PTNetwork {
 					PTschedule.addStopFacility(newddStop1);
 					log.info("stop facility " +newddStop1+ " added to schedule");
 
-					TransitStopFacility currentStop2 = PTschedule.getFacilities().get(currentNodeId2);
+//					TransitStopFacility currentStop2 = PTschedule.getFacilities().get(currentNodeId2);
 					Id<TransitStopFacility> nStopId2 = Id.create(currentNodeId2.toString()+currentNodeId1.toString(), TransitStopFacility.class);
 					TransitStopFacility newddStop2 = scheduleFactory.createTransitStopFacility(nStopId2, currentNode2.getCoord(), false);
 					newddStop2.setName(nStopId2+"_Verbindung");
