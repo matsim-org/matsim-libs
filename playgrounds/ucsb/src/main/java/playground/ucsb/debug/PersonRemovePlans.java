@@ -28,9 +28,9 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 public class PersonRemovePlans extends AbstractPersonAlgorithm {
 
-	private final Set<Id> personIdsToKeep;
+	private final Set<Id<Person>> personIdsToKeep;
 	
-	public PersonRemovePlans(Set<Id> personIdsToKeep) {
+	public PersonRemovePlans(Set<Id<Person>> personIdsToKeep) {
 		super();
 		this.personIdsToKeep = personIdsToKeep;
 	}

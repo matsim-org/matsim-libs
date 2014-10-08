@@ -30,8 +30,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.opengis.feature.simple.SimpleFeature;
@@ -97,17 +95,17 @@ public class SCAGShp2Links implements NetworkRunnable {
 			// link id
 			Object id = f.getAttribute(ID);
 			if (id == null) { throw new RuntimeException("fCnt "+fCnt+": "+ID+" not found in feature."); }
-			Id linkId = new IdImpl(id.toString().trim());
+			Id<Link> linkId = Id.create(id.toString().trim(), Link.class);
 			
 			// from Node
 			Object fromNodeid = f.getAttribute(FROM_ID);
 			if (fromNodeid == null) { throw new RuntimeException("fCnt "+fCnt+": "+FROM_ID+" not found in feature."); }
-			Node fromNode = network.getNodes().get(new IdImpl(fromNodeid.toString().trim()));
+			Node fromNode = network.getNodes().get(Id.create(fromNodeid.toString().trim(), Node.class));
 			
 			// to Node
 			Object toNodeid = f.getAttribute(TOID_ID);
 			if (toNodeid == null) { throw new RuntimeException("fCnt "+fCnt+": "+TOID_ID+" not found in feature."); }
-			Node toNode = network.getNodes().get(new IdImpl(toNodeid.toString().trim()));
+			Node toNode = network.getNodes().get(Id.create(toNodeid.toString().trim(), Node.class));
 			
 			// ignore, if incident nodes do not exist (connector link)
 			if ((fromNode == null) || (toNode == null)) { continue; }
@@ -163,7 +161,7 @@ public class SCAGShp2Links implements NetworkRunnable {
 			int direction = Integer.parseInt(f.getAttribute(DIR).toString());
 
 			if ((direction == -1) || (direction == 0)) {
-				Link link = network.getFactory().createLink(new IdImpl(id.toString()+"TF"), toNode, fromNode);
+				Link link = network.getFactory().createLink(Id.create(id.toString()+"TF", Link.class), toNode, fromNode);
 				link.setLength(length);
 				link.setFreespeed(freespeedTF);
 				link.setNumberOfLanes(lanesTF);
@@ -175,7 +173,7 @@ public class SCAGShp2Links implements NetworkRunnable {
 
 			}
 			if ((direction == 1) || (direction == 0)) {
-				Link link = network.getFactory().createLink(new IdImpl(id.toString()+"FT"), fromNode, toNode);
+				Link link = network.getFactory().createLink(Id.create(id.toString()+"FT", Link.class), fromNode, toNode);
 				link.setLength(length);
 				link.setFreespeed(freespeedFT);
 				link.setNumberOfLanes(lanesFT);
@@ -193,13 +191,13 @@ public class SCAGShp2Links implements NetworkRunnable {
 	}
 	
 	private final void removePtLinks(Network network, ObjectAttributes linkObjectAttributes) {
-		Set<Id> linkIdsToRemove = new HashSet<Id>();
+		Set<Id<Link>> linkIdsToRemove = new HashSet<>();
 		for (Link l : network.getLinks().values()) {
 			if ((l.getAllowedModes().size() == 1) && (l.getAllowedModes().contains(TransportMode.pt))) {
 				linkIdsToRemove.add(l.getId());
 			}
 		}
-		for (Id lid : linkIdsToRemove) {
+		for (Id<Link> lid : linkIdsToRemove) {
 			network.removeLink(lid);
 			linkObjectAttributes.removeAllAttributes(lid.toString());
 		}

@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkWriteAsTable;
@@ -91,7 +90,7 @@ public class UCSBptNetworkParser {
 		for (Node node : scenario.getNetwork().getNodes().values()) {
 			if (!node.getId().toString().startsWith("pn-")) {
 				TransitStopFacility transitStopFacility =
-						transitSchedule.getFactory().createTransitStopFacility(new IdImpl("stop-"+node.getId().toString()), new CoordImpl(node.getCoord()), false);
+						transitSchedule.getFactory().createTransitStopFacility(Id.create("stop-"+node.getId().toString(), TransitStopFacility.class), new CoordImpl(node.getCoord()), false);
 				transitSchedule.addStopFacility(transitStopFacility);
 				transitStopFacility.setName((String)nodeObjectAttributes.getAttribute(node.getId().toString(),DESC_NAME));
 
@@ -211,8 +210,8 @@ public class UCSBptNetworkParser {
 	private final void handleIlinTripDistBlocks(TransitSchedule transitSchedule, List<IlinTripDistBlock> ilinTripDistBlocks) {
 		int ilin = ilinTripDistBlocks.get(0).ilin;
 		TransitScheduleFactory factory = transitSchedule.getFactory();
-		TransitLine transitLine = transitSchedule.getTransitLines().get(new IdImpl(ilin));
-		if (transitLine == null) { transitLine = factory.createTransitLine(new IdImpl(ilin)); transitSchedule.addTransitLine(transitLine); }
+		TransitLine transitLine = transitSchedule.getTransitLines().get(Id.create(ilin, TransitLine.class));
+		if (transitLine == null) { transitLine = factory.createTransitLine(Id.create(ilin, TransitLine.class)); transitSchedule.addTransitLine(transitLine); }
 
 		List<Integer> dists = new ArrayList<Integer>();
 		List<Integer> times = new ArrayList<Integer>();
@@ -221,20 +220,20 @@ public class UCSBptNetworkParser {
 			times.add(block.depTimes.get(0));
 		}
 		
-		Id transitRouteId = new IdImpl(ilin+".1");
+		Id<TransitRoute> transitRouteId = Id.create(ilin+".1", TransitRoute.class);
 		TransitRoute transitRoute = transitLine.getRoutes().get(transitRouteId);
 		if (transitRoute == null) {
 			
 			List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 			NetworkRoute networkRoute = new LinkNetworkRouteImpl(null,null);
-			Id routeStartLinkId = null;
+			Id<Link> routeStartLinkId = null;
 			List<Id<Link>> routeLinkIds = new ArrayList<Id<Link>>();
-			Id routeEndLinkId = null;
+			Id<Link> routeEndLinkId = null;
 			for (int i=0; i<dists.size(); i++) {
 				int dist = dists.get(i);
 				int time = times.get(i);
 
-				Id facilityId = new IdImpl("stop-"+ilin+"-"+dist);
+				Id<TransitStopFacility> facilityId = Id.create("stop-"+ilin+"-"+dist, TransitStopFacility.class);
 				TransitStopFacility facility = transitSchedule.getFacilities().get(facilityId);
 				if (facility == null) { log.warn("facility with id="+facilityId+" not found!"); }
 				TransitRouteStop transitRouteStop = factory.createTransitRouteStop(facility,time-times.get(0),time-times.get(0));
@@ -251,7 +250,7 @@ public class UCSBptNetworkParser {
 			transitLine.addRoute(transitRoute);
 			
 			for (int i=0; i<ilinTripDistBlocks.get(0).depTimes.size(); i++) {
-				Departure departure = factory.createDeparture(new IdImpl(transitRouteId.toString()+"."+i), ilinTripDistBlocks.get(0).depTimes.get(i));
+				Departure departure = factory.createDeparture(Id.create(transitRouteId.toString()+"."+i, Departure.class), ilinTripDistBlocks.get(0).depTimes.get(i));
 				transitRoute.addDeparture(departure);
 			}
 		}
@@ -261,8 +260,8 @@ public class UCSBptNetworkParser {
 		log.info("creating ptNodes from "+ptStopsFile+" shape file...");
 		Network network = scenario.getNetwork();
 		int fCnt = 0;
-		Set<Id> nodeIds = new HashSet<Id>();
-		Id prevNodeId = null;
+		Set<Id<Node>> nodeIds = new HashSet<>();
+		Id<Node> prevNodeId = null;
 		int prevIlinId = -1;
 		for (SimpleFeature f : ShapeFileReader.getAllFeatures(ptStopsFile)) {
 			fCnt++;
@@ -270,7 +269,7 @@ public class UCSBptNetworkParser {
 			// ilin dist and nodeId
 			int ilinId = Integer.parseInt(f.getAttribute(ILIN_NAME).toString().trim());
 			int distId = Integer.parseInt(f.getAttribute(DIST_NAME).toString().trim());
-			Id nodeId = new IdImpl(ilinId+"-"+distId);
+			Id<Node> nodeId = Id.create(ilinId+"-"+distId, Node.class);
 			if (!nodeIds.add(nodeId)) { throw new RuntimeException("fCnt "+fCnt+": nodeId="+nodeId+" already created before!"); }
 
 			// node type and switch to sister route flag 
@@ -344,7 +343,7 @@ public class UCSBptNetworkParser {
 
 				if (prevIlinId == ilinId) { // still the same line
 					// create link with Id := ilin-prevDist-dist
-					Link link = network.getFactory().createLink(new IdImpl(prevNodeId.toString()+"-"+distId), network.getNodes().get(prevNodeId), network.getNodes().get(nodeId));
+					Link link = network.getFactory().createLink(Id.create(prevNodeId.toString()+"-"+distId, Link.class), network.getNodes().get(prevNodeId), network.getNodes().get(nodeId));
 					double length = 100.0*0.3048*(distId-(Integer)nodeObjectAttributes.getAttribute(prevNodeId.toString(),DIST_NAME)); // differences of distIds in 100 feet converted to meters
 					link.setLength(length);
 					link.setFreespeed(999999.0); // default
@@ -355,7 +354,7 @@ public class UCSBptNetworkParser {
 					network.addLink(link);
 				}
 				else { // a new line: insert a pseudo link for the stop facility
-					Node pseudoNode = network.getFactory().createNode(new IdImpl("pn-"+nodeId.toString()),new CoordImpl(c.x,c.y));
+					Node pseudoNode = network.getFactory().createNode(Id.create("pn-"+nodeId.toString(), Node.class),new CoordImpl(c.x,c.y));
 					network.addNode(pseudoNode);
 					nodeObjectAttributes.putAttribute(nodeId.toString(),ILIN_NAME,ilinId);
 					nodeObjectAttributes.putAttribute(nodeId.toString(),DIST_NAME,-1); // -100 feet
@@ -368,7 +367,7 @@ public class UCSBptNetworkParser {
 					nodeObjectAttributes.putAttribute(nodeId.toString(),"alt",alt);
 					nodeObjectAttributes.putAttribute(nodeId.toString(),"direction",direction);
 					nodeObjectAttributes.putAttribute(nodeId.toString(),MODE_NAME,ptModeType);
-					Link link = network.getFactory().createLink(new IdImpl(pseudoNode.toString()+"-"+distId), pseudoNode, network.getNodes().get(nodeId));
+					Link link = network.getFactory().createLink(Id.create(pseudoNode.toString()+"-"+distId, Link.class), pseudoNode, network.getNodes().get(nodeId));
 					double length = 100.0*0.3048*1.0; // 100 feet converted to meters
 					link.setLength(length);
 					link.setFreespeed(100.0); // fast speed for speudo link

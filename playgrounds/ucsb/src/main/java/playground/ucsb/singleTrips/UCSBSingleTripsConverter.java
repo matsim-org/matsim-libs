@@ -30,6 +30,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
@@ -38,9 +39,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.opengis.feature.simple.SimpleFeature;
@@ -97,7 +96,7 @@ public class UCSBSingleTripsConverter {
 						}
 						if (ok) {
 							personCnt++;
-							Person person = population.getFactory().createPerson(new IdImpl(timeSlide+type+"-"+fromTAZ+"-"+toTAZ+"-"+i));
+							Person person = population.getFactory().createPerson(Id.create(timeSlide+type+"-"+fromTAZ+"-"+toTAZ+"-"+i, Person.class));
 							population.addPerson(person);
 							Plan plan = population.getFactory().createPlan();
 							person.addPlan(plan);

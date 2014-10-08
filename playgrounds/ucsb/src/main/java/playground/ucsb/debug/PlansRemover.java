@@ -65,7 +65,7 @@ public class PlansRemover {
 		log.info("inputPidFile: "+inputPidFile);
 		log.info("outputBase: "+outputBase);
 
-		Set<Id> pids = UCSBUtils.parseObjectIds(inputPidFile);
+		Set<Id<Person>> pids = UCSBUtils.parseObjectIds(inputPidFile, Person.class);
 
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new NetworkReaderMatsimV1(scenario).parse(inputNetworkfile);
@@ -83,11 +83,11 @@ public class PlansRemover {
 		pop.getPersons().clear();
 		pop.setIsStreaming(false);
 		new MatsimPopulationReader(scenario).readFile(outputBase+"/plans.tmp.xml.gz");
-		Set<Id> pidsToRemove = new HashSet<Id>();
+		Set<Id<Person>> pidsToRemove = new HashSet<>();
 		for (Person p : pop.getPersons().values()) {
 			if (p.getPlans().isEmpty()) { pidsToRemove.add(p.getId()); }
 		}
-		for (Id pid : pidsToRemove) {
+		for (Id<Person> pid : pidsToRemove) {
 			pop.getPersons().remove(pid);
 		}
 		new PopulationWriter(pop,scenario.getNetwork()).write(outputBase+"/plans.debug.xml.gz");

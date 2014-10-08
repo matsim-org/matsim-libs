@@ -25,8 +25,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -71,7 +69,7 @@ public class SCAGShp2Nodes implements NetworkRunnable {
 			// node id
 			Object id = f.getAttribute(ID_NAME);
 			if (id == null) { throw new RuntimeException("fCnt "+fCnt+": "+ID_NAME+" not found in feature."); }
-			Id nodeId = new IdImpl(id.toString().trim());
+			Id<Node> nodeId = Id.create(id.toString().trim(), Node.class);
 
 			// ignore node if it is a zone centroid
 			String zoneCentr = f.getAttribute(ZONE_CENTR).toString().trim(); // "Y" := centroid ; "" := not a centroid 

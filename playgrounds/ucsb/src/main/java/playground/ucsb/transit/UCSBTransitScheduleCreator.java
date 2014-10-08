@@ -42,7 +42,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.network.NetworkWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.algorithms.NetworkWriteAsTable;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -114,7 +113,7 @@ public class UCSBTransitScheduleCreator {
 		Network network = scenario.getNetwork();
 		
 		Vehicles vehicles = ((ScenarioImpl)scenario).getVehicles();
-		VehicleType defaultVehicleType = vehicles.getFactory().createVehicleType(new IdImpl(1));
+		VehicleType defaultVehicleType = vehicles.getFactory().createVehicleType(Id.create(1, VehicleType.class));
 		vehicles.addVehicleType(defaultVehicleType);
 		defaultVehicleType.setDescription("generic default");
 		defaultVehicleType.setLength(7.5);
@@ -129,7 +128,7 @@ public class UCSBTransitScheduleCreator {
 		defaultVehicleType.setCapacity(vehicleCapacity);
 		
 		for (PtLine ptLine : ptLines.values()) {
-			TransitLine transitLine = factory.createTransitLine(new IdImpl(ptLine.ilin));
+			TransitLine transitLine = factory.createTransitLine(Id.create(ptLine.ilin, TransitLine.class));
 			schedule.addTransitLine(transitLine);
 			
 			int ptRouteNr = 0;
@@ -141,7 +140,7 @@ public class UCSBTransitScheduleCreator {
 				PtPoint prevPtPoint = null; Node prevNode = null;
 				for (PtPoint ptPoint : ptRoute.ptPoints.values()) {
 					
-					Id facilityId = new IdImpl(FAC_ID_PREFIX+ptLine.ilin+"-"+ptRouteNr+"-"+ptPoint.dist);
+					Id<TransitStopFacility> facilityId = Id.create(FAC_ID_PREFIX+ptLine.ilin+"-"+ptRouteNr+"-"+ptPoint.dist, TransitStopFacility.class);
 					if (!schedule.getFacilities().containsKey(facilityId)) {
 						TransitStopFacility facility = factory.createTransitStopFacility(facilityId,new CoordImpl(ptPoint.coord),true);
 						schedule.addStopFacility(facility);
@@ -151,13 +150,13 @@ public class UCSBTransitScheduleCreator {
 					transitRouteStop.setAwaitDepartureTime(true);
 					transitRouteStops.add(transitRouteStop);
 					
-					Node node = network.getFactory().createNode(new IdImpl(ptLine.ilin+"-"+ptRouteNr+"-"+ptPoint.dist), new CoordImpl(ptPoint.coord));
+					Node node = network.getFactory().createNode(Id.create(ptLine.ilin+"-"+ptRouteNr+"-"+ptPoint.dist, Node.class), new CoordImpl(ptPoint.coord));
 					network.addNode(node);
 					Link link = null;
 					if (prevNode == null) { // first ptPoint
-						prevNode = network.getFactory().createNode(new IdImpl(PSEUDO_ID_PREFIX+ptLine.ilin+"-"+ptRouteNr+"-"+ptPoint.dist), new CoordImpl(ptPoint.coord));
+						prevNode = network.getFactory().createNode(Id.create(PSEUDO_ID_PREFIX+ptLine.ilin+"-"+ptRouteNr+"-"+ptPoint.dist, Node.class), new CoordImpl(ptPoint.coord));
 						network.addNode(prevNode);
-						link = network.getFactory().createLink(new IdImpl(prevNode.getId().toString()+"-"+ptPoint.dist),prevNode,node);
+						link = network.getFactory().createLink(Id.create(prevNode.getId().toString()+"-"+ptPoint.dist, Link.class),prevNode,node);
 						network.addLink(link);
 						Set<String> modes = new HashSet<String>(2); modes.add(TransportMode.pt); modes.add(ptRoute.modeType);
 						link.setAllowedModes(modes);
@@ -168,7 +167,7 @@ public class UCSBTransitScheduleCreator {
 						startLink = link;
 					}
 					else {
-						link = network.getFactory().createLink(new IdImpl(prevNode.getId().toString()+"-"+ptPoint.dist),prevNode,node);
+						link = network.getFactory().createLink(Id.create(prevNode.getId().toString()+"-"+ptPoint.dist, Link.class),prevNode,node);
 						network.addLink(link);
 						Set<String> modes = new HashSet<String>(2); modes.add(TransportMode.pt); modes.add(ptRoute.modeType);
 						link.setAllowedModes(modes);
@@ -190,13 +189,13 @@ public class UCSBTransitScheduleCreator {
 				linkIds.remove(linkIds.size()-1); // remove the end link
 				NetworkRoute networkRoute = new LinkNetworkRouteImpl(startLink.getId(),endLink.getId());
 				networkRoute.setLinkIds(startLink.getId(),linkIds,endLink.getId());
-				TransitRoute transitRoute = factory.createTransitRoute(new IdImpl(transitLine.getId()+"."+ptRouteNr), networkRoute, transitRouteStops,ptRoute.modeType);
+				TransitRoute transitRoute = factory.createTransitRoute(Id.create(transitLine.getId()+"."+ptRouteNr, TransitRoute.class), networkRoute, transitRouteStops,ptRoute.modeType);
 				transitLine.addRoute(transitRoute);
 				
 				int depNr = 0;
 				for (Integer depTime : ptRoute.depTimes) {
 					depNr++;
-					Departure departure = factory.createDeparture(new IdImpl(transitRoute.getId().toString()+"."+depNr),depTime);
+					Departure departure = factory.createDeparture(Id.create(transitRoute.getId().toString()+"."+depNr, Departure.class),depTime);
 					departure.setVehicleId(Id.create(departure.getId(), Vehicle.class));
 					Vehicle vehicle = vehicles.getFactory().createVehicle(Id.create(departure.getId(), Vehicle.class),defaultVehicleType);
 					vehicles.addVehicle(vehicle);

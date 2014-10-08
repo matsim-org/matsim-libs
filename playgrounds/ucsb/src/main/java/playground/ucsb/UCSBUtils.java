@@ -37,7 +37,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -88,12 +87,12 @@ public abstract class UCSBUtils {
 		return features;
 	}
 	
-	public static final Set<Id> parseObjectIds(String idFile) throws FileNotFoundException, IOException {
-		Set<Id> idSet = new HashSet<Id>();
+	public static final <T> Set<Id<T>> parseObjectIds(String idFile, Class<T> type) throws FileNotFoundException, IOException {
+		Set<Id<T>> idSet = new HashSet<>();
 		BufferedReader br = IOUtils.getBufferedReader(idFile);
 		String curr_line;
 		while ((curr_line = br.readLine()) != null) {
-			Id id = new IdImpl(curr_line.trim());
+			Id<T> id = Id.create(curr_line.trim(), type);
 			idSet.add(id);
 		}
 		return idSet;
