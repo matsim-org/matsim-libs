@@ -33,7 +33,6 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -59,11 +58,11 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
  */
 public class LinkCostOffsets2QGISWithArrowhead extends MATSimNet2QGIS {
 	public static class LinkCostOffsets2PolygonGraphWithArrowhead extends X2GraphImpl {
-		private final Set<Id> linkIds;
+		private final Set<Id<Link>> linkIds;
 		private PolygonFeatureFactory.Builder factoryBuilder;
 
 		public LinkCostOffsets2PolygonGraphWithArrowhead(final Network network,
-				final CoordinateReferenceSystem crs, final Set<Id> linkIds) {
+				final CoordinateReferenceSystem crs, final Set<Id<Link>> linkIds) {
 			this.network = network;
 			this.crs = crs;
 			this.linkIds = linkIds;
@@ -83,7 +82,7 @@ public class LinkCostOffsets2QGISWithArrowhead extends MATSimNet2QGIS {
 				factoryBuilder.addAttribute(att.getFirst(), att.getSecond());
 			}
 			PolygonFeatureFactory factory = factoryBuilder.create();
-			for (Id linkId : linkIds) {
+			for (Id<Link> linkId : linkIds) {
 				Link link = network.getLinks().get(linkId);
 				LinearRing lr = getLinearRing(link);
 				Polygon p = new Polygon(lr, null, geofac);
@@ -150,8 +149,8 @@ public class LinkCostOffsets2QGISWithArrowhead extends MATSimNet2QGIS {
 	}
 
 	private int countsStartTime = 1, countsEndTime = 24;
-	private List<Map<Id, Double>> linkCostOffsetsAbsoluts = null;
-	private List<Map<Id, Integer>> linkCostOffsetsSigns = null;
+	private List<Map<Id<Link>, Double>> linkCostOffsetsAbsoluts = null;
+	private List<Map<Id<Link>, Integer>> linkCostOffsetsSigns = null;
 
 	public LinkCostOffsets2QGISWithArrowhead(final int countsStartTime,
 			final int countsEndTime, String netFilename, String crs) {
@@ -165,7 +164,7 @@ public class LinkCostOffsets2QGISWithArrowhead extends MATSimNet2QGIS {
 
 	public LinkCostOffsets2QGISWithArrowhead(Network network,
 			String coordinateSystem, int countsStartTime, int countsEndTime) {
-		((ScenarioImpl) scenario).setNetwork((NetworkImpl) network);
+		((ScenarioImpl) scenario).setNetwork(network);
 		crs = MGC.getCRS(coordinateSystem);
 		n2g = new Network2PolygonGraph(scenario.getNetwork(), crs);
 		this.countsStartTime = countsStartTime;
@@ -174,31 +173,31 @@ public class LinkCostOffsets2QGISWithArrowhead extends MATSimNet2QGIS {
 
 	public void createLinkCostOffsets(final Collection<Link> links,
 			final DynamicData<Link> linkCostOffsets) {
-		linkCostOffsetsAbsoluts = new ArrayList<Map<Id, Double>>(countsEndTime
+		linkCostOffsetsAbsoluts = new ArrayList<>(countsEndTime
 				- countsStartTime + 1);
-		linkCostOffsetsSigns = new ArrayList<Map<Id, Integer>>(countsEndTime
+		linkCostOffsetsSigns = new ArrayList<>(countsEndTime
 				- countsStartTime + 1);
 		for (int i = 0; i <= countsEndTime - countsStartTime; i++) {
 			linkCostOffsetsAbsoluts.add(i, null);
 			linkCostOffsetsSigns.add(i, null);
 		}
 		for (Link link : links) {
-			Id linkId = link.getId();
+			Id<Link> linkId = link.getId();
 			for (int i = 0; i <= countsEndTime - countsStartTime; i++) {
 				double costOffset = linkCostOffsets.getSum(link, (i
 						+ countsStartTime - 1) * 3600,
 						(i + countsStartTime) * 3600 - 1);
-				Map<Id, Double> ma = linkCostOffsetsAbsoluts.get(i);
+				Map<Id<Link>, Double> ma = linkCostOffsetsAbsoluts.get(i);
 				if (ma == null) {
-					ma = new HashMap<Id, Double>();
+					ma = new HashMap<Id<Link>, Double>();
 					linkCostOffsetsAbsoluts.add(i, ma);
 				}
 				ma.put(linkId, Math.abs(costOffset)// / flowCapFactor
 						);
 
-				Map<Id, Integer> ms = linkCostOffsetsSigns.get(i);
+				Map<Id<Link>, Integer> ms = linkCostOffsetsSigns.get(i);
 				if (ms == null) {
-					ms = new HashMap<Id, Integer>();
+					ms = new HashMap<Id<Link>, Integer>();
 					linkCostOffsetsSigns.add(i, ms);
 				}
 				ms.put(linkId, (int) Math.signum(costOffset));
@@ -206,12 +205,12 @@ public class LinkCostOffsets2QGISWithArrowhead extends MATSimNet2QGIS {
 		}
 	}
 
-	public void setLinkIds(final Set<Id> linkIds) {
+	public void setLinkIds(final Set<Id<Link>> linkIds) {
 		setN2g(new LinkCostOffsets2PolygonGraphWithArrowhead(getNetwork(), crs,
 				linkIds));
 	}
 
-	public void output(final Set<Id> linkIds, final String outputBase) {
+	public void output(final Set<Id<Link>> linkIds, final String outputBase) {
 		for (int i = 0; i <= countsEndTime - countsStartTime; i++) {
 			setLinkIds(linkIds);
 			addParameter("costOffset", Double.class, linkCostOffsetsAbsoluts

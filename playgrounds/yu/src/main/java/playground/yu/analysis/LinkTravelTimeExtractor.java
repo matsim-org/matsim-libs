@@ -23,9 +23,10 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -85,7 +86,7 @@ public class LinkTravelTimeExtractor {
 					.write("TimeBin\tLinkTravelTime\t[s]\tLinkTravelTime\t[m]\tLinkTravelTime\t[h]\n");
 			for (int anI = 0; anI < 24 * 3600; anI = anI + timeBin) {
 				index = (anI) / timeBin;
-				ys[index] = ttc.getLinkTravelTimes().getLinkTravelTime(network.getLinks().get(new IdImpl("6760")), (double) anI, null, null);
+				ys[index] = ttc.getLinkTravelTimes().getLinkTravelTime(network.getLinks().get(Id.create("6760", Link.class)), anI, null, null);
 				writer.write(anI + "\t" + ys[index] + "\t[s]\t" + ys[index]
 						/ 60.0 + "\t[m]\t" + ys[index] / 3600.0 + "\t[h]\n");
 				ys[index] /= 60.0;

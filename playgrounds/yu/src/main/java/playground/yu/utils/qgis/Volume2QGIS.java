@@ -48,17 +48,17 @@ public class Volume2QGIS extends MATSimNet2QGIS {
 		super(netFilename, coordRefSys);
 	}
 
-	public static List<Map<Id, Integer>> createVolumes(Collection<Id<Link>> linkIds,
+	public static List<Map<Id<Link>, Integer>> createVolumes(Collection<Id<Link>> linkIds,
 			final VolumesAnalyzer va) {
-		List<Map<Id, Integer>> volumes = new ArrayList<Map<Id, Integer>>(24);
+		List<Map<Id<Link>, Integer>> volumes = new ArrayList<>(24);
 		for (int i = 0; i < 24; i++)
 			volumes.add(i, null);
-		for (Id linkId : linkIds) {
+		for (Id<Link> linkId : linkIds) {
 			int[] v = va.getVolumesForLink(linkId);
 			for (int i = 0; i < 24; i++) {
-				Map<Id, Integer> m = volumes.get(i);
+				Map<Id<Link>, Integer> m = volumes.get(i);
 				if (m == null) {
-					m = new HashMap<Id, Integer>();
+					m = new HashMap<>();
 					volumes.add(i, m);
 				}
 				m.put(linkId, (int) ((v != null ? v[i] : 0) / flowCapFactor));
@@ -103,8 +103,8 @@ public class Volume2QGIS extends MATSimNet2QGIS {
 		tollReader.parse(tollFilename);
 
 		Collection<Id<Link>> linkIds = rps.getTolledLinkIds();
-		List<Map<Id, Integer>> vols = createVolumes(linkIds, va);
-		List<Map<Id, Double>> sls = SaturationLevel2QGIS
+		List<Map<Id<Link>, Integer>> vols = createVolumes(linkIds, va);
+		List<Map<Id<Link>, Double>> sls = SaturationLevel2QGIS
 				.createSaturationLevels(net, rps, va);
 
 		for (int i = 0; i < 24; i++) {

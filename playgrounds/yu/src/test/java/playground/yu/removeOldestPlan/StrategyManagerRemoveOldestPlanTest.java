@@ -20,9 +20,10 @@ package playground.yu.removeOldestPlan;
 
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PersonImpl;
@@ -66,7 +67,7 @@ public class StrategyManagerRemoveOldestPlanTest extends MatsimTestCase {
 		manager.addStrategyForDefaultSubpopulation(new PlanStrategyImpl(new RandomPlanSelector()), 1.0);
 
 		// init Population
-		PersonImpl p = new PersonImpl(new IdImpl(1));
+		PersonImpl p = new PersonImpl(Id.create(1, Person.class));
 		PlanImpl[] plans = new PlanImpl[7];
 		for (int i = 0; i < plans.length; i++) {
 			plans[i] = p.createAndAddPlan(false);
@@ -101,7 +102,7 @@ public class StrategyManagerRemoveOldestPlanTest extends MatsimTestCase {
 		manager.addStrategyForDefaultSubpopulation(new PlanStrategyImpl(new RandomPlanSelector()), 1.0);
 
 		// init Population
-		p = new PersonImpl(new IdImpl(1));
+		p = new PersonImpl(Id.create(1, Person.class));
 		plans = new PlanImpl[7];
 		for (int i = 0; i < plans.length; i++) {
 			plans[i] = p.createAndAddPlan(false);

@@ -20,11 +20,11 @@ package playground.yu.visum.filter.finalFilters;
 
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 
 import playground.yu.visum.writer.UserDefAtt;
 
@@ -115,7 +115,7 @@ public class AveTraTimeCal extends LinkAveCalA {
 	@Override
 	protected double atxCal(String linkID, String s0) {
 		double att = getLinkTraTime(linkID, Integer.parseInt(s0) * 900);
-		Link l = network.getLinks().get(new IdImpl(linkID));
+		Link l = network.getLinks().get(Id.create(linkID, Link.class));
 		if (l == null) {
 			return 0.0;
 		}

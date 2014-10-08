@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 
 import playground.yu.utils.io.LinkUtilityOffsetsReader;
@@ -37,7 +38,7 @@ import playground.yu.utils.io.LinkUtilityOffsetsReader;
  */
 public class LinkUtilityOffset2QGIS implements X2QGIS {
 
-	private Map<Integer/* timeBin */, Map<Id/* linkId */, Double/* utiliyOffset */>> linkUtilityOffsets = new HashMap<Integer, Map<Id, Double>>();
+	private Map<Integer/* timeBin */, Map<Id<Link>/* linkId */, Double/* utiliyOffset */>> linkUtilityOffsets = new HashMap<>();
 	// private Set<Integer> timBins;
 	private Map<String/* linkId */, Id/* linkId */> stringIds = new HashMap<String, Id>();
 	private Network network;
@@ -46,7 +47,7 @@ public class LinkUtilityOffset2QGIS implements X2QGIS {
 	// return timBins;
 	// }
 
-	public Map<Integer, Map<Id, Double>> getLinkUtilityOffsets() {
+	public Map<Integer, Map<Id<Link>, Double>> getLinkUtilityOffsets() {
 		return linkUtilityOffsets;
 	}
 
@@ -61,7 +62,7 @@ public class LinkUtilityOffset2QGIS implements X2QGIS {
 	}
 
 	public LinkUtilityOffset2QGIS(
-			Map<Integer, Map<Id, Double>> linkUtilOffsets, Network network) {
+			Map<Integer, Map<Id<Link>, Double>> linkUtilOffsets, Network network) {
 		this.network = network;
 		this.linkUtilityOffsets = linkUtilOffsets;
 	}

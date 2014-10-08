@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
@@ -51,17 +51,18 @@ import org.matsim.counts.Volume;
 public class CountsWithUpdatedNetwork {
 
 	private static class CorrelationTableReaer implements TabularFileHandler {
-		private Set<Tuple<Id, Id>> correlations = new HashSet<Tuple<Id, Id>>();
+		private Set<Tuple<Id<Link>, Id<Link>>> correlations = new HashSet<>();
 
-		public Set<Tuple<Id, Id>> getCorrelations() {
+		public Set<Tuple<Id<Link>, Id<Link>>> getCorrelations() {
 			return correlations;
 		}
 
+		@Override
 		public void startRow(String[] row) {
 			if (row.length > 3)
 				if (row[0].length() > 1 && row[3].length() > 1) {
-					correlations.add(new Tuple<Id, Id>(new IdImpl(row[0]),
-							new IdImpl(row[3])));
+					correlations.add(new Tuple<Id<Link>, Id<Link>>(Id.create(row[0], Link.class),
+							Id.create(row[3], Link.class)));
 				}
 		}
 
@@ -79,16 +80,16 @@ public class CountsWithUpdatedNetwork {
 
 		CorrelationTableReaer ctr = new CorrelationTableReaer();
         new TabularFileParser().parse(tfpc, ctr);
-        Set<Tuple<Id, Id>> correlations = ctr.getCorrelations();
+        Set<Tuple<Id<Link>, Id<Link>>> correlations = ctr.getCorrelations();
 
 		Counts counts = new Counts();
 		new MatsimCountsReader(counts).readFile(oldCountsFilename);
 
-		Map<Id, Count> tmpCountsMap = new HashMap<Id, Count>();
+		Map<Id<Link>, Count> tmpCountsMap = new HashMap<Id<Link>, Count>();
 		tmpCountsMap.putAll(counts.getCounts());
 		counts.getCounts().clear();
-		for (Tuple<Id, Id> correl : correlations) {
-			Id oldCountLinkId = correl.getFirst();
+		for (Tuple<Id<Link>, Id<Link>> correl : correlations) {
+			Id<Link> oldCountLinkId = correl.getFirst();
 			Count oldCount = tmpCountsMap.remove(oldCountLinkId);
 			Count newCount = counts.createAndAddCount(correl.getSecond(),
 					oldCountLinkId.toString());

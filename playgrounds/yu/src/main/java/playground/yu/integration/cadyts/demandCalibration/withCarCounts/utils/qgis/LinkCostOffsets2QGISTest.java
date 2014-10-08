@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -42,9 +42,9 @@ import playground.yu.utils.qgis.X2QGIS;
 import utilities.misc.DynamicData;
 
 public class LinkCostOffsets2QGISTest {
-	private static boolean isInRange(final Id linkId, final Network net) {
+	private static boolean isInRange(final Id<Link> linkId, final Network net) {
 		Coord distanceFilterCenterNodeCoord = net.getNodes()
-				.get(new IdImpl("2531")).getCoord();
+				.get(Id.create("2531", Node.class)).getCoord();
 		double distanceFilter = 30000;
 		Link l = net.getLinks().get(linkId);
 		if (l == null) {
@@ -84,10 +84,10 @@ public class LinkCostOffsets2QGISTest {
 		new MatsimCountsReader(counts).readFile(countsFilename);
 
 		Collection<Link> countLinks = new HashSet<Link>();
-		Set<Id> countLinkIds = new HashSet<Id>();
+		Set<Id<Link>> countLinkIds = new HashSet<Id<Link>>();
 		// countLinkIds.addAll(counts.getCounts().keySet());
 		// Set<Id> countLinkIds2remove = new HashSet<Id>();
-		for (Id linkId : counts.getCounts().keySet()) {
+		for (Id<Link> linkId : counts.getCounts().keySet()) {
 			Link link = net.getLinks().get(linkId);
 			if (link != null && isInRange(linkId, net)) {
 				countLinks.add(link);

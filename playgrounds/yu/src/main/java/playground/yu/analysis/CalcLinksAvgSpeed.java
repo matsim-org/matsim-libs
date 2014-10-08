@@ -23,6 +23,15 @@
  */
 package playground.yu.analysis;
 
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -32,7 +41,6 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -43,22 +51,12 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.xml.sax.SAXException;
 
 import playground.yu.utils.io.SimpleWriter;
-
-import javax.xml.parsers.ParserConfigurationException;
-
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * @author ychen
@@ -74,7 +72,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 	 *            - a SpeedCounter object
 	 */
 	private final HashMap<String, SpeedCounter> speedCounters = new HashMap<String, SpeedCounter>();
-	private Set<Id> interestLinks = null;
+	private Set<Id<Link>> interestLinks = null;
 	private final int binSize, nofBins;
 	private double[] speeds;
 	private int[] speedsCount;
@@ -133,7 +131,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 		this(network);
 		this.toll = toll;
 		if (toll != null) {
-			interestLinks = new HashSet<Id>(toll.getTolledLinkIds());
+			interestLinks = new HashSet<Id<Link>>(toll.getTolledLinkIds());
 		}
 	}
 
@@ -197,7 +195,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 	 * @param time
 	 * @return avg. speed [km/h]
 	 */
-	public double getAvgSpeed(final Id linkId, final double time) {
+	public double getAvgSpeed(final Id<Link> linkId, final double time) {
 		SpeedCounter sc = speedCounters.get(linkId.toString());
 		return sc != null ? sc.getSpeed(getBinIdx(time)) : network.getLinks()
 				.get(linkId).getFreespeed(time) * 3.6;
@@ -218,7 +216,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 		if (sc == null) {
 			double[] freeSpeeds = new double[nofBins];
 			for (int i = 0; i < nofBins - 1; i++) {
-				freeSpeeds[i] = network.getLinks().get(new IdImpl(linkId))
+				freeSpeeds[i] = network.getLinks().get(Id.create(linkId, Link.class))
 						.getFreespeed(i * 86400.0 / nofBins);
 			}
 			sc = new SpeedCounter(freeSpeeds);
@@ -234,8 +232,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 		String linkId = leave.getLinkId().toString();
 		SpeedCounter sc = speedCounters.get(linkId);
 		if (sc != null) {
-			Double enterTime = sc.removeTmpEnterTime(leave.getPersonId()
-					.toString());
+			Double enterTime = sc.removeTmpEnterTime(leave.getPersonId().toString());
 			if (enterTime != null) {
 				Link l = network.getLinks().get(leave.getLinkId());
 				if (l != null) {
@@ -278,7 +275,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 			out.write(head.toString());
 			out.flush();
 
-			for (Id linkId : interestLinks == null ? network.getLinks()
+			for (Id<Link> linkId : interestLinks == null ? network.getLinks()
 					.keySet() : interestLinks) {
 				StringBuffer line = new StringBuffer(linkId.toString());
 				line.append('\t');
@@ -340,10 +337,9 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 		writer.close();
 	}
 
-	public Set<Id> getInterestLinkIds() {
-		Set<Id> interestLinkIds = new HashSet<Id>();
-		for (Id linkId : interestLinks == null ? network.getLinks().keySet()
-				: interestLinks) {
+	public Set<Id<Link>> getInterestLinkIds() {
+		Set<Id<Link>> interestLinkIds = new HashSet<>();
+		for (Id<Link> linkId : interestLinks == null ? network.getLinks().keySet() : interestLinks) {
 			interestLinkIds.add(linkId);
 		}
 		return interestLinkIds;

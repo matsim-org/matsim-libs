@@ -81,7 +81,7 @@ public class SimCountComparison2QGIS extends MATSimNet2QGIS {
 	 * @param network
 	 * @return
 	 */
-	private static boolean isInRange(final Id linkid, final NetworkImpl net) {
+	private static boolean isInRange(final Id<Link> linkid, final NetworkImpl net) {
 		// Link l = network.getLinks().get(linkid);
 		// if (l == null) {
 		// System.out.println("Cannot find requested link: "
@@ -93,18 +93,18 @@ public class SimCountComparison2QGIS extends MATSimNet2QGIS {
 		return net.getLinks().containsKey(linkid);
 	}
 
-	public static List<Map<Id, Integer>> createVolumes(Collection<Id<Link>> linkIds,
+	public static List<Map<Id<Link>, Integer>> createVolumes(Collection<Id<Link>> linkIds,
 			final VolumesAnalyzer va) {
-		List<Map<Id, Integer>> volumes = new ArrayList<Map<Id, Integer>>(24);
+		List<Map<Id<Link>, Integer>> volumes = new ArrayList<>(24);
 		for (int i = 0; i < 24; i++) {
 			volumes.add(i, null);
 		}
-		for (Id linkId : linkIds) {
+		for (Id<Link> linkId : linkIds) {
 			int[] v = va.getVolumesForLink(linkId);
 			for (int i = 0; i < 24; i++) {
-				Map<Id, Integer> m = volumes.get(i);
+				Map<Id<Link>, Integer> m = volumes.get(i);
 				if (m == null) {
-					m = new HashMap<Id, Integer>();
+					m = new HashMap<>();
 					volumes.add(i, m);
 				}
 				m
@@ -156,13 +156,13 @@ public class SimCountComparison2QGIS extends MATSimNet2QGIS {
 		mn2q.readEvents(eventsFilename, new EventHandler[] { volumeAnalyzer });
 
 		Set<Id<Link>> linkIds = new HashSet<Id<Link>>();
-		for (Id linkId : counts.getCounts().keySet()) {
+		for (Id<Link> linkId : counts.getCounts().keySet()) {
 			if (isInRange(linkId, (NetworkImpl) network)) {
 				linkIds.add(linkId);
 			}
 		}
 
-		List<Map<Id, Integer>> volumes = createVolumes(linkIds, volumeAnalyzer);
+		List<Map<Id<Link>, Integer>> volumes = createVolumes(linkIds, volumeAnalyzer);
 
 		SimCountComparison2Polygon
 				.setLinkWidthScaleFactor(linkWidthScaleFactor);
@@ -173,12 +173,12 @@ public class SimCountComparison2QGIS extends MATSimNet2QGIS {
 			scc2q.setLinkIds(linkIds);
 
 			String index = i + "-" + (i + 1) + "h";
-			Map<Id, Integer> diff = new TreeMap<Id, Integer>();
-			Map<Id, Integer> sign = new TreeMap<Id, Integer>();
+			Map<Id<Link>, Integer> diff = new TreeMap<>();
+			Map<Id<Link>, Integer> sign = new TreeMap<>();
 
 			// v2q.setCrs(ch1903, network, mn2q.crs, diff.keySet());
 
-			for (Id linkId : volumes.get(i).keySet()) {
+			for (Id<Link> linkId : volumes.get(i).keySet()) {
 				Volume countVolume = counts.getCount(linkId).getVolume(i + 1);
 				if (countVolume != null) {
 					int volDiff = (int) (volumes.get(i).get(linkId).intValue()/* simValue */

@@ -25,6 +25,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -62,7 +63,7 @@ public class ActivityLocationUtilOffset2QGIS4Distribution implements X2QGIS {
 	 * @param parameters
 	 */
 	public void addParameter(final String paraName, final Class<?> clazz,
-			final Map<Id, ?> parameters) {
+			final Map<Id<Link>, ?> parameters) {
 		g2g.addParameter(paraName, clazz, parameters);
 	}
 }

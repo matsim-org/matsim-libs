@@ -32,8 +32,8 @@ import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -61,7 +61,7 @@ public class CountsSimCompareTest {
 			return false;
 		}
 		return ((LinkImpl) l).calcDistance(net.getNodes()
-				.get(new IdImpl("2531")).getCoord()) < 30000;
+				.get(Id.create("2531", Node.class)).getCoord()) < 30000;
 	}
 
 	/**
@@ -101,7 +101,7 @@ public class CountsSimCompareTest {
 				// + "X\tY\tcountValue\tsimValue\tdeviation\n");
 				writer.write("simuliert-gemessen\tAnzahl\n");
 
-				for (Id linkId : counts.getCounts().keySet()) {
+				for (Id<Link> linkId : counts.getCounts().keySet()) {
 					if (isInRange(linkId, network)) {
 						Count count = counts.getCount(linkId);
 						Link link = network.getLinks().get(linkId);

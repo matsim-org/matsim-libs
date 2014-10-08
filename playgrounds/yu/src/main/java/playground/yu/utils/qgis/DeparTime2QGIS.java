@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -48,18 +49,18 @@ public class DeparTime2QGIS implements X2QGIS {
 		 * @param arg1
 		 *            sum of departuretimes
 		 */
-		private Map<Id, Double> dpTimes;
+		private Map<Id<Link>, Double> dpTimes;
 		/**
 		 * @param arg0
 		 *            a linkId
 		 * @param arg1
 		 *            counter of departure
 		 */
-		private Map<Id, Integer> dpCnt;
+		private Map<Id<Link>, Integer> dpCnt;
 
 		public LinkDeparTime() {
-			dpCnt = new HashMap<Id, Integer>();
-			dpTimes = new HashMap<Id, Double>();
+			dpCnt = new HashMap<>();
+			dpTimes = new HashMap<>();
 		}
 
 		@Override
@@ -67,11 +68,12 @@ public class DeparTime2QGIS implements X2QGIS {
 			run(person.getSelectedPlan());
 		}
 
+		@Override
 		public void run(Plan p) {
 			PlanImpl plan = (PlanImpl) p;
 			Activity fa = plan.getFirstActivity();
 			if (fa.getType().startsWith("h")) {
-				Id linkId = fa.getLinkId();
+				Id<Link> linkId = fa.getLinkId();
 				Integer c = dpCnt.get(linkId);
 				if (c == null)
 					c = Integer.valueOf(0);
@@ -84,9 +86,9 @@ public class DeparTime2QGIS implements X2QGIS {
 			}
 		}
 
-		public Map<Id, Double> getAvgDeparTime() {
-			Map<Id, Double> avgDpTimes = new TreeMap<Id, Double>();
-			for (Id linkId : dpCnt.keySet()) {
+		public Map<Id<Link>, Double> getAvgDeparTime() {
+			Map<Id<Link>, Double> avgDpTimes = new TreeMap<>();
+			for (Id<Link> linkId : dpCnt.keySet()) {
 				avgDpTimes.put(linkId, Double.valueOf(dpTimes.get(linkId)
 						.doubleValue()
 						/ dpCnt.get(linkId).doubleValue()));
@@ -124,8 +126,8 @@ public class DeparTime2QGIS implements X2QGIS {
 		mn2q.readPlans(args[1], lprA);
 		LinkDeparTime lprB = new LinkDeparTime();
 		mn2q.readPlans(args[2], lprB);
-		Map<Id, Double> diff = new TreeMap<Id, Double>();
-		for (Id linkId : lprB.getAvgDeparTime().keySet()) {
+		Map<Id<Link>, Double> diff = new TreeMap<>();
+		for (Id<Link> linkId : lprB.getAvgDeparTime().keySet()) {
 			Double B = lprB.getAvgDeparTime().get(linkId);
 			double b = (B != null) ? B.doubleValue() : 0.0;
 			Double A = lprA.getAvgDeparTime().get(linkId);

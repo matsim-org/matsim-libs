@@ -25,8 +25,9 @@ package playground.yu.replanning;
 
 import java.util.Random;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.ControlerEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -59,7 +60,7 @@ public class OnePersonPlanScoreMonitor implements BeforeMobsimListener,
 
 	private void writeOnePersonPlans(ControlerEvent event, int id) {
 		for (Plan plan : event.getControler().getPopulation().getPersons().get(
-				new IdImpl(id)).getPlans()) {
+				Id.create(id, Person.class)).getPlans()) {
 			writer.write("\t" + plan.getScore().toString());
 		}
 		writer.writeln();
@@ -72,7 +73,7 @@ public class OnePersonPlanScoreMonitor implements BeforeMobsimListener,
 		for (int i = 0; i < 10; i++) {
 			int id = r.nextInt(100);
 			Plan plan = event.getControler().getPopulation().getPersons().get(
-					new IdImpl(id)).getSelectedPlan();
+					Id.create(id, Person.class)).getSelectedPlan();
 			writer.write("\t" + id);
 			writer.write("\t" + plan.getScore().toString());
 		}
@@ -80,12 +81,14 @@ public class OnePersonPlanScoreMonitor implements BeforeMobsimListener,
 		writer.flush();
 	}
 
+	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		// writer.write("ITERATION " + event.getIteration());
 		// writePlans(event);
 		// writeOnePersonPlans(event, 62);
 	}
 
+	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		writer.write("ITERATION " + event.getIteration());
 		// writeFirstPlans(event);
@@ -93,12 +96,14 @@ public class OnePersonPlanScoreMonitor implements BeforeMobsimListener,
 		writeOnePersonPlans(event, 62);
 	}
 
+	@Override
 	public void notifyStartup(StartupEvent event) {
 		event.getControler();
 		writer = new SimpleWriter(event.getControler().getControlerIO()
 				.getOutputFilename("onePlanScores_ceb6_rop.txt"));
 	}
 
+	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		writer.close();
 	}

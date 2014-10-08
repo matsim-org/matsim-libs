@@ -38,8 +38,8 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -109,8 +109,8 @@ public class DestinationTripUtilOffsetDistributionWithoutGrids implements
 		return (int) time / timeBinSize + 1;
 	}
 
-	private static boolean isInRange(final Id linkId, final Network net) {
-		Node distanceFilterCenterNode = net.getNodes().get(new IdImpl("2531"));
+	private static boolean isInRange(final Id<Link> linkId, final Network net) {
+		Node distanceFilterCenterNode = net.getNodes().get(Id.create("2531", Node.class));
 		if (distanceFilterCenterNode == null) {
 			return true;
 		}
@@ -247,7 +247,7 @@ public class DestinationTripUtilOffsetDistributionWithoutGrids implements
 		return dTUO_List;
 	}
 
-	protected double getLinkUtilOffset(Id linkId, int time) {
+	protected double getLinkUtilOffset(Id<Link> linkId, int time) {
 		if (counts.getCounts().containsKey(linkId)) {
 			if (isInRange(linkId, net)) {
 				return linkUOs.getSum(net.getLinks().get(linkId), (time - 1)
@@ -263,7 +263,7 @@ public class DestinationTripUtilOffsetDistributionWithoutGrids implements
 		int timeStep = getTimeStep(event.getTime());
 		if (timeStep >= caliStartTime && timeStep <= caliEndTime) {
 			// trip arriving in appropriate time
-			Id agentId = event.getPersonId();
+			Id<Person> agentId = event.getPersonId();
 			Double tripUO = tmpAgent_TUOs./**/remove(agentId)/**/;
 			String actType = event.getActType().substring(0, 1);
 			// TODO
@@ -301,8 +301,8 @@ public class DestinationTripUtilOffsetDistributionWithoutGrids implements
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		Id linkId = event.getLinkId();
-		Id agentId = event.getPersonId();
+		Id<Link> linkId = event.getLinkId();
+		Id<Person> agentId = event.getPersonId();
 		int timeStep = getTimeStep(event.getTime());
 
 		// if (timeStep >= caliStartTime && timeStep <= caliEndTime) {

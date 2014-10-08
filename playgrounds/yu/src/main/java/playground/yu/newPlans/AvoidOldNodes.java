@@ -23,6 +23,7 @@ package playground.yu.newPlans;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -32,7 +33,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -56,7 +56,7 @@ public class AvoidOldNodes extends NewPopulation {
 	}
 
 	public void addLink(final String linkId) {
-		Link l = this.network.getLinks().get(new IdImpl(linkId));
+		Link l = this.network.getLinks().get(Id.create(linkId, Link.class));
 		this.nodeIds.add(l.getFromNode().getId().toString());
 		this.nodeIds.add(l.getToNode().getId().toString());
 	}

@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -48,7 +48,7 @@ public class CountsCutter {
 	private static Coord distanceFilterCenterNodeCoord;
 	private static double distanceFilter;
 
-	public static boolean isInRange(final Id linkid, final Network net) {
+	public static boolean isInRange(final Id<Link> linkid, final Network net) {
 		Link l = net.getLinks().get(linkid);
 		if (l == null) {
 			System.out.println("Cannot find requested link: "
@@ -75,7 +75,7 @@ public class CountsCutter {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
-		distanceFilterCenterNodeCoord = net.getNodes().get(new IdImpl(distanceFilterCenterNodeId))
+		distanceFilterCenterNodeCoord = net.getNodes().get(Id.create(distanceFilterCenterNodeId, Node.class))
 				.getCoord();
 
 		Counts originalCounts = new Counts();
@@ -105,7 +105,7 @@ public class CountsCutter {
 
 		for (int i = 0; i < countEntrys.size(); i++) {
 			Entry<Id<Link>, Count> entry = countEntrys.get(i);
-			Id linkId = entry.getKey();
+			Id<Link> linkId = entry.getKey();
 			Count originalCount = entry.getValue();
 			int idx = i % fragmentsNo;
 			Count count = countsArray[idx].createAndAddCount(linkId, originalCount

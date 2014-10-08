@@ -33,7 +33,8 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -54,10 +55,10 @@ public abstract class ActivityLocationUtilOffsetExtractor implements
 	private DynamicData<Link> linkUtilOffsets;
 	protected int caliStartTime, caliEndTime;
 	protected Map<Integer/* time */, Map<Coord/* actLoc */, Tuple<Integer/* cnt */, Double/* sum */>>> gridUtilOffsets = new HashMap<Integer, Map<Coord, Tuple<Integer, Double>>>();
-	protected Map<Id/* agentId */, Double/* planUtilOffset */> tmpAgentPlanUtilOffsets = new HashMap<Id, Double>();
+	protected Map<Id<Person>/* agentId */, Double/* planUtilOffset */> tmpAgentPlanUtilOffsets = new HashMap<>();
 	// time is not needed, because it should be determined by time of activity
 	// beginning or ending
-	protected Id tmpActLinkId = null;
+	protected Id<Link> tmpActLinkId = null;
 	private int lowerLimit;
 	protected double gridLength;
 
@@ -73,7 +74,7 @@ public abstract class ActivityLocationUtilOffsetExtractor implements
 		this.gridLength = gridLength;
 	}
 
-	protected double getLinkUtilOffset(Id linkId, int time) {
+	protected double getLinkUtilOffset(Id<Link> linkId, int time) {
 		if (counts.getCounts().containsKey(linkId)) {
 			if (isInRange(linkId, net)) {
 				return linkUtilOffsets.getSum(net.getLinks().get(linkId),
@@ -87,7 +88,7 @@ public abstract class ActivityLocationUtilOffsetExtractor implements
 		return gridLength;
 	}
 
-	protected Coord getActLocCoord(Id linkId) {
+	protected Coord getActLocCoord(Id<Link> linkId) {
 		return net.getLinks().get(linkId).getCoord();
 	}
 
@@ -98,14 +99,14 @@ public abstract class ActivityLocationUtilOffsetExtractor implements
 		return center;
 	}
 
-	protected Coord getGridCenterCoord(Id linkId) {
+	protected Coord getGridCenterCoord(Id<Link> linkId) {
 		return this.getGridCenterCoord(net.getLinks().get(linkId).getCoord());
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		Id linkId = event.getLinkId();
-		Id agentId = event.getPersonId();
+		Id<Link> linkId = event.getLinkId();
+		Id<Person> agentId = event.getPersonId();
 		int timeStep = getTimeStep(event.getTime());
 
 		double linkUtilOffset = getLinkUtilOffset(linkId, timeStep);
@@ -146,9 +147,9 @@ public abstract class ActivityLocationUtilOffsetExtractor implements
 		}
 	}
 
-	private static boolean isInRange(final Id linkId, final Network net) {
+	private static boolean isInRange(final Id<Link> linkId, final Network net) {
 		Coord distanceFilterCenterNodeCoord = net.getNodes().get(
-				new IdImpl("2531")).getCoord();
+				Id.create("2531", Node.class)).getCoord();
 		double distanceFilter = 30000;
 		Link l = net.getLinks().get(linkId);
 		if (l == null) {

@@ -23,15 +23,18 @@
  */
 package playground.yu.analysis;
 
+import java.util.HashMap;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -43,7 +46,6 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
@@ -51,8 +53,6 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import playground.yu.utils.TollTools;
 import playground.yu.utils.container.CollectionMath;
 import playground.yu.utils.io.SimpleWriter;
-
-import java.util.HashMap;
 
 /**
  * make time variation curve of average {@code Leg} travel time and their sum.
@@ -161,7 +161,7 @@ public class LegTravelTimeModalSplit implements PersonDepartureEventHandler,
 			travelTimes[binIdx] += travelTime;
 			arrCount[binIdx]++;
 
-			Plan selectedplan = plans.getPersons().get(new IdImpl(agentId))
+			Plan selectedplan = plans.getPersons().get(Id.create(agentId, Person.class))
 					.getSelectedPlan();
 			String mode = PlanModeJudger.getMode(selectedplan);
 			if (TransportMode.car.equals(mode)) {

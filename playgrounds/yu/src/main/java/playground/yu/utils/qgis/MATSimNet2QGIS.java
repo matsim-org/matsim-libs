@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -75,12 +74,12 @@ public class MATSimNet2QGIS implements X2QGIS {
 	}
 
 	public MATSimNet2QGIS(String netFilename, String coordRefSys,
-			Set<Id> linkIds2paint) {
+			Set<Id<Link>> linkIds2paint) {
 		this(netFilename, coordRefSys);
 		if (linkIds2paint != null) {
 			Set<Link> links2paint = new HashSet<Link>();
-			Map<Id<Link>, Link> linkImpls = (Map<Id<Link>, Link>) getNetwork().getLinks();
-			for (Id linkId : linkIds2paint) {
+			Map<Id<Link>, ? extends Link> linkImpls = getNetwork().getLinks();
+			for (Id<Link> linkId : linkIds2paint) {
 				links2paint.add(linkImpls.get(linkId));
 			}
 			((Network2PolygonGraph) n2g).setLinks2paint(links2paint);
@@ -101,7 +100,7 @@ public class MATSimNet2QGIS implements X2QGIS {
 
 	// /////////////////////////////
 	public void addParameter(final String paraName, final Class<?> clazz,
-			final Map<Id, ?> parameters) {
+			final Map<Id<Link>, ?> parameters) {
 		n2g.addParameter(paraName, clazz, parameters);
 	}
 	// /////////////////////////////
@@ -142,40 +141,40 @@ public class MATSimNet2QGIS implements X2QGIS {
 	public static void main(final String[] args) {
 		String netFilename = "../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
 
-		Set<Id> linkIds2paint = null;
+		Set<Id<Link>> linkIds2paint = null;
 		// -------------------------------------------------------------
-		linkIds2paint = new HashSet<Id>();
+		linkIds2paint = new HashSet<>();
 		// B-344 H
-		linkIds2paint.add(new IdImpl("initial_792040"));
-		linkIds2paint.add(new IdImpl("10292"));
-		linkIds2paint.add(new IdImpl("10294R"));
-		linkIds2paint.add(new IdImpl("3972"));
-		linkIds2paint.add(new IdImpl("3974"));
-		linkIds2paint.add(new IdImpl("3956R"));
-		linkIds2paint.add(new IdImpl("3955"));
-		linkIds2paint.add(new IdImpl("3959R"));
-		linkIds2paint.add(new IdImpl("3960"));
-		linkIds2paint.add(new IdImpl("3894R"));
-		linkIds2paint.add(new IdImpl("3893R"));
-		linkIds2paint.add(new IdImpl("3892R"));
-		linkIds2paint.add(new IdImpl("3889"));
-		linkIds2paint.add(new IdImpl("3891R"));
-		linkIds2paint.add(new IdImpl("3891"));
-		linkIds2paint.add(new IdImpl("3889R"));
+		linkIds2paint.add(Id.create("initial_792040", Link.class));
+		linkIds2paint.add(Id.create("10292", Link.class));
+		linkIds2paint.add(Id.create("10294R", Link.class));
+		linkIds2paint.add(Id.create("3972", Link.class));
+		linkIds2paint.add(Id.create("3974", Link.class));
+		linkIds2paint.add(Id.create("3956R", Link.class));
+		linkIds2paint.add(Id.create("3955", Link.class));
+		linkIds2paint.add(Id.create("3959R", Link.class));
+		linkIds2paint.add(Id.create("3960", Link.class));
+		linkIds2paint.add(Id.create("3894R", Link.class));
+		linkIds2paint.add(Id.create("3893R", Link.class));
+		linkIds2paint.add(Id.create("3892R", Link.class));
+		linkIds2paint.add(Id.create("3889", Link.class));
+		linkIds2paint.add(Id.create("3891R", Link.class));
+		linkIds2paint.add(Id.create("3891", Link.class));
+		linkIds2paint.add(Id.create("3889R", Link.class));
 
 		// B-344 R
-		linkIds2paint.add(new IdImpl("initial_781015"));
-		linkIds2paint.add(new IdImpl("3892"));
-		linkIds2paint.add(new IdImpl("3893"));
-		linkIds2paint.add(new IdImpl("3894"));
-		linkIds2paint.add(new IdImpl("3960R"));
-		linkIds2paint.add(new IdImpl("3959"));
-		linkIds2paint.add(new IdImpl("3955R"));
-		linkIds2paint.add(new IdImpl("3956"));
-		linkIds2paint.add(new IdImpl("3974R"));
-		linkIds2paint.add(new IdImpl("3972R"));
-		linkIds2paint.add(new IdImpl("3964R"));
-		linkIds2paint.add(new IdImpl("10289R"));
+		linkIds2paint.add(Id.create("initial_781015", Link.class));
+		linkIds2paint.add(Id.create("3892", Link.class));
+		linkIds2paint.add(Id.create("3893", Link.class));
+		linkIds2paint.add(Id.create("3894", Link.class));
+		linkIds2paint.add(Id.create("3960R", Link.class));
+		linkIds2paint.add(Id.create("3959", Link.class));
+		linkIds2paint.add(Id.create("3955R", Link.class));
+		linkIds2paint.add(Id.create("3956", Link.class));
+		linkIds2paint.add(Id.create("3974R", Link.class));
+		linkIds2paint.add(Id.create("3972R", Link.class));
+		linkIds2paint.add(Id.create("3964R", Link.class));
+		linkIds2paint.add(Id.create("10289R", Link.class));
 
 		// -------------------------------------------------------------
 		MATSimNet2QGIS mn2q = new MATSimNet2QGIS(netFilename, gk4,

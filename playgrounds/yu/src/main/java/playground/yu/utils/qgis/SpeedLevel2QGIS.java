@@ -77,7 +77,7 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 				factoryBuilder.addAttribute(att.getFirst(), att.getSecond());
 			}
 			PolygonFeatureFactory factory = factoryBuilder.create();
-			for (Id linkId : linkIds) {
+			for (Id<Link> linkId : linkIds) {
 				Link link = network.getLinks().get(linkId);
 				LinearRing lr = getLinearRing(link);
 				Polygon p = new Polygon(lr, null, geofac);
@@ -96,18 +96,18 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 
 	}
 
-	public static List<Map<Id, Double>> createSpeedLevels(
+	public static List<Map<Id<Link>, Double>> createSpeedLevels(
 			Collection<Id<Link>> linkIds, CalcLinksAvgSpeed clas, Network network) {
-		List<Map<Id, Double>> speeds = new ArrayList<Map<Id, Double>>(24);
+		List<Map<Id<Link>, Double>> speeds = new ArrayList<Map<Id<Link>, Double>>(24);
 		for (int i = 0; i < 24; i++) {
 			speeds.add(i, null);
 		}
 
-		for (Id linkId : linkIds) {
+		for (Id<Link> linkId : linkIds) {
 			for (int i = 0; i < 24; i++) {
-				Map<Id, Double> m = speeds.get(i);
+				Map<Id<Link>, Double> m = speeds.get(i);
 				if (m == null) {
-					m = new HashMap<Id, Double>();
+					m = new HashMap<Id<Link>, Double>();
 					speeds.add(i, m);
 				}
 				double speed = clas.getAvgSpeed(linkId, i * 3600)/* km/h */
@@ -182,7 +182,7 @@ public class SpeedLevel2QGIS extends MATSimNet2QGIS {
 		 */
 
 		Set<Id<Link>> links = net.getLinks().keySet();
-		List<Map<Id, Double>> sls = createSpeedLevels(links, clas, net);
+		List<Map<Id<Link>, Double>> sls = createSpeedLevels(links, clas, net);
 
 		// Set<Id> linkIds = rps.getLinkIdSet();
 

@@ -21,10 +21,10 @@ package playground.yu.scoring.withAttrRecorder;
 
 import java.util.Map;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -67,7 +67,7 @@ public class ScorAttrReader implements TabularFileHandler {
 						"There is not yet attributes name collection, was Filehead not read?");
 			}
 
-			Person person = population.getPersons().get(new IdImpl(row[0]));
+			Person person = population.getPersons().get(Id.create(row[0], Person.class));
 			Plan plan = person.getPlans().get(Integer.parseInt(row[1]));
 			Map<String, Object> attrs = plan.getCustomAttributes();
 			for (int i = 2; i < row.length; i++) {

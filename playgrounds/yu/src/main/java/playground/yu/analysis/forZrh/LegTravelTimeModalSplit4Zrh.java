@@ -19,11 +19,11 @@
  * *********************************************************************** */
 package playground.yu.analysis.forZrh;
 
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -80,7 +80,7 @@ public class LegTravelTimeModalSplit4Zrh extends LegTravelTimeModalSplit {
 			travelTimes[binIdx] += travelTime;
 			arrCount[binIdx]++;
 
-			Plan selectedplan = plans.getPersons().get(new IdImpl(agentId))
+			Plan selectedplan = plans.getPersons().get(Id.create(agentId, Person.class))
 					.getSelectedPlan();
 			if (Integer.parseInt(agentId) < 1000000000) {
 				if (PlanModeJudger.useCar(selectedplan)) {
@@ -168,7 +168,7 @@ public class LegTravelTimeModalSplit4Zrh extends LegTravelTimeModalSplit {
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
 				.createScenario(ConfigUtils.createConfig());
-		Network network = scenario.getNetwork();
+//		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFilename);
 
 		Population population = scenario.getPopulation();

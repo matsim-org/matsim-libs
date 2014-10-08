@@ -32,8 +32,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -71,9 +71,9 @@ public class BseUCControlerListener implements StartupListener,
 	private EventsToPlanSteps events2PlanSteps = null;
 
 	private static List<Link> links = new ArrayList<Link>();
-	private static Set<Id> linkIds = new HashSet<Id>();
+	private static Set<Id<Link>> linkIds = new HashSet<>();
 
-	private boolean isInRange(final Id linkid, final Network net) {
+	private boolean isInRange(final Id<Link> linkid, final Network net) {
 		Link l = net.getLinks().get(linkid);
 		if (l == null) {
 			System.out.println("Cannot find requested link: "
@@ -92,8 +92,8 @@ public class BseUCControlerListener implements StartupListener,
 		// set up center and radius of counts stations locations
 		distanceFilterCenterNodeCoord = network
 				.getNodes()
-				.get(new IdImpl(config.findParam("counts",
-						"distanceFilterCenterNode"))).getCoord();
+				.get(Id.create(config.findParam("counts",
+						"distanceFilterCenterNode"), Node.class)).getCoord();
 		distanceFilter = Double.parseDouble(config.findParam("counts",
 				"distanceFilter"));
 		arStartTime = Integer.parseInt(config.findParam("bse", "startTime"));

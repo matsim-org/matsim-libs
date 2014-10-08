@@ -23,9 +23,9 @@
  */
 package playground.yu.integration.cadyts.demandCalibration.withCarCounts;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.xml.sax.Attributes;
 
 import utilities.misc.DynamicData;
@@ -45,7 +45,7 @@ public class BseLinkCostOffsetsXMLFileIO extends DynamicDataXMLFileIO<Link> {
 	@Override
 	protected Link attrValue2key(String linkId) {
 		System.out.println("-----attrValue2key------:\t" + linkId);
-		Link link = net.getLinks().get(new IdImpl(linkId));
+		Link link = net.getLinks().get(Id.create(linkId, Link.class));
 		System.out.println("link :\t" + link);
 		return link;
 	}

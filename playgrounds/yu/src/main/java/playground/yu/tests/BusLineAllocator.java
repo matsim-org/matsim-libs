@@ -42,7 +42,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -101,7 +100,7 @@ public class BusLineAllocator {
 	}
 
 	private final NetworkImpl carNet;
-	private final Map<Id, List<Tuple<Link, Tuple<Coord, Coord>>>> coordPairs;// <ptRouteId,<ptLink<fromNodeCoord,toNodeCoord>>>
+	private final Map<Id<TransitRoute>, List<Tuple<Link, Tuple<Coord, Coord>>>> coordPairs;// <ptRouteId,<ptLink<fromNodeCoord,toNodeCoord>>>
 	// private Map<Id, List<Tuple<String, Tuple<Coord, Coord>>>>
 	// coordPairs4rtf;//
 	// <ptRouteId,<ptLinkId:next_ptLinkId<fromNodeCoord,toNodeCoord>>>
@@ -123,7 +122,7 @@ public class BusLineAllocator {
 	private final String outputFile;
 	private Dijkstra dijkstra;
 	private Link tmpPtLink = null;
-	private Id tmpPtRouteId = null;
+	private Id<TransitRoute> tmpPtRouteId = null;
 	private final Set<Link> startLinks = new HashSet<Link>(),
 			endLinks = new HashSet<Link>(),
 			// nullLinks = new HashSet<Link>(),
@@ -161,7 +160,7 @@ public class BusLineAllocator {
 	}
 
 	protected void allocateAllRouteLinks() {
-		for (Entry<Id, List<Tuple<Link, Tuple<Coord, Coord>>>> routeLinkCoordPair : this.coordPairs
+		for (Entry<Id<TransitRoute>, List<Tuple<Link, Tuple<Coord, Coord>>>> routeLinkCoordPair : this.coordPairs
 				.entrySet()) {
 			this.tmpPtRouteId = routeLinkCoordPair.getKey();
 			List<Tuple<Id, List<Id<Link>>/* path */>> ptLinkIdPaths = this.paths
@@ -507,13 +506,13 @@ public class BusLineAllocator {
 	 *         Map<TransitRouteId,List<Tuple<TransitLinkId,Tuple<fromCoord,toCoord
 	 *         >>>>
 	 */
-	private Map<Id, List<Tuple<Link, Tuple<Coord, Coord>>>> createCoordPairs(
+	private Map<Id<TransitRoute>, List<Tuple<Link, Tuple<Coord, Coord>>>> createCoordPairs(
 			TransitSchedule schedule) {
-		Map<Id, List<Tuple<Link, Tuple<Coord, Coord>>>> coordPairs = new HashMap<Id, List<Tuple<Link, Tuple<Coord, Coord>>>>();
+		Map<Id<TransitRoute>, List<Tuple<Link, Tuple<Coord, Coord>>>> coordPairs = new HashMap<>();
 		for (TransitLine ptLine : schedule.getTransitLines().values()) {
 			for (TransitRoute ptRoute : ptLine.getRoutes().values()) {
 				if (ptRoute.getTransportMode().equals("bus")) {
-					Id ptRouteId = ptRoute.getId();
+					Id<TransitRoute> ptRouteId = ptRoute.getId();
 					List<Tuple<Link, Tuple<Coord, Coord>>> ptLinkCoordPairs = coordPairs
 							.get(ptRouteId);
 					if (ptLinkCoordPairs == null)
@@ -527,7 +526,7 @@ public class BusLineAllocator {
 					createCoordPair(startLink, ptLinkCoordPairs);
 
 					// route. links
-					for (Id linkId : route.getLinkIds()) {
+					for (Id<Link> linkId : route.getLinkIds()) {
 						Link link = this.multiModalNetwork.getLinks().get(linkId);
 						createCoordPair(link, ptLinkCoordPairs);
 					}
@@ -579,13 +578,13 @@ public class BusLineAllocator {
 		// else/* nodeA==nodeB */{}
 
 		if (AoutOfRange) {
-			Id newLinkId = new IdImpl(this.tmpPtLink.getId() + "-2-"
-					+ nodeA.getId());
+			Id<Link> newLinkId = Id.create(this.tmpPtLink.getId() + "-2-"
+					+ nodeA.getId(), Link.class);
 			Link newLink = this.multiModalNetwork.getLinks().get(newLinkId);
 			if (newLink == null) {
 				Node A = this.tmpPtLink.getFromNode();
 				newLink = this.multiModalNetwork.getFactory().createLink(newLinkId,
-						A.getId(), nodeA.getId());
+						A, nodeA);
 				newLink.setLength(CoordUtils.calcDistance(coordA, nodeA
 						.getCoord()));
 				newLink.setFreespeed(this.tmpPtLink.getFreespeed());
@@ -597,8 +596,8 @@ public class BusLineAllocator {
 		}
 
 		if (BoutOfRange) {
-			Id newLinkId = new IdImpl(this.tmpPtLink.getId() + "-from-"
-					+ nodeB.getId());
+			Id<Link> newLinkId = Id.create(this.tmpPtLink.getId() + "-from-"
+					+ nodeB.getId(), Link.class);
 			Link newLink = this.multiModalNetwork.getLinks().get(newLinkId);
 			if (newLink == null) {
 				Node B = this.tmpPtLink.getToNode();

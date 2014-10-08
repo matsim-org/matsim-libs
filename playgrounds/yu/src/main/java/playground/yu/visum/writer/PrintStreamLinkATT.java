@@ -22,9 +22,9 @@ import java.io.IOException;
 import java.util.ConcurrentModificationException;
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 
 import playground.yu.visum.filter.finalFilters.FinalEventFilterA;
@@ -50,7 +50,7 @@ public class PrintStreamLinkATT extends PrintStreamATTA {
 	@Override
 	public void printRow(String linkID) throws IOException {
 		try {
-			Link link = network.getLinks().get(new IdImpl(linkID));
+			Link link = network.getLinks().get(Id.create(linkID, Link.class));
 			if (link == null) {
 				return;
 			}

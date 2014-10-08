@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -74,10 +73,12 @@ public class TripDurationHandler implements PersonDepartureEventHandler,
 		this.plans = plans;
 	}
 
+	@Override
 	public void handleEvent(final PersonDepartureEvent event) {
 		this.tmpDptTimes.put(event.getPersonId().toString(), event.getTime());
 	}
 
+	@Override
 	public void handleEvent(final PersonArrivalEvent event) {
 		double time = event.getTime();
 		String agentId = event.getPersonId().toString();
@@ -89,8 +90,7 @@ public class TripDurationHandler implements PersonDepartureEventHandler,
 			this.tmpDptTimes.remove(agentId);
 
 			// Type planType = event.agent.getSelectedPlan().getType();d
-			Plan selectedPlan = plans.getPersons().get(
-					new IdImpl(event.getPersonId().toString()))
+			Plan selectedPlan = plans.getPersons().get(event.getPersonId())
 					.getSelectedPlan();
 			if (
 			// planType != null && Plan.Type.UNDEFINED != planType
@@ -162,7 +162,7 @@ public class TripDurationHandler implements PersonDepartureEventHandler,
 		System.out.println("-->reading plansfile: " + plansFilename);
 		new MatsimPopulationReader(scenario).readFile(plansFilename);
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 
 		TripDurationHandler tdh = new TripDurationHandler(
 		// network,
@@ -179,6 +179,7 @@ public class TripDurationHandler implements PersonDepartureEventHandler,
 		System.exit(0);
 	}
 
+	@Override
 	public void reset(final int iteration) {
 
 	}

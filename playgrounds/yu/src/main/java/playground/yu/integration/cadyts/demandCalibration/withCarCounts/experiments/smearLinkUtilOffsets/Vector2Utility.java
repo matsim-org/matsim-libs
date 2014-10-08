@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.yu.utils.io.SimpleWriter;
@@ -52,7 +51,7 @@ public class Vector2Utility implements X2QGIS {
 	private Network network;
 	private int calibrationStartTimeBin, calibrationEndTimeBin;
 	private SimpleWriter writer;
-	private Map<Integer, Map<Id, Double>> timeBinLinkOffsets = null;
+	private Map<Integer, Map<Id<Link>, Double>> timeBinLinkOffsets = null;
 
 	public Vector2Utility(Network network, int calibrationStartTimeBin,
 			int calibrationEndTimeBin, String vectorFilename,
@@ -63,7 +62,7 @@ public class Vector2Utility implements X2QGIS {
 		writer = new SimpleWriter(utilityFilename);
 		writer.writeln("timeBin\tlinkId\tOffset");
 		if (toQGIS) {
-			timeBinLinkOffsets = new HashMap<Integer, Map<Id, Double>>();
+			timeBinLinkOffsets = new HashMap<Integer, Map<Id<Link>, Double>>();
 		}
 
 		Map<Integer/* line no. */, Double/* offset value */> vector = VectorUtils
@@ -71,7 +70,7 @@ public class Vector2Utility implements X2QGIS {
 
 		int idx = 0;
 		for (Link link : this.network.getLinks().values()) {
-			Id linkId = link.getId();
+			Id<Link> linkId = link.getId();
 			String linkIdStr = linkId.toString();
 			for (int tb = calibrationStartTimeBin; tb <= calibrationEndTimeBin; tb++) {
 				Double value = vector.get(idx);
@@ -83,10 +82,10 @@ public class Vector2Utility implements X2QGIS {
 					sb.append(value);
 					writer.writeln(sb);
 					if (toQGIS) {
-						Map<Id, Double> linkOffsets = timeBinLinkOffsets
+						Map<Id<Link>, Double> linkOffsets = timeBinLinkOffsets
 								.get(tb);
 						if (linkOffsets == null) {
-							linkOffsets = new HashMap<Id, Double>();
+							linkOffsets = new HashMap<Id<Link>, Double>();
 							timeBinLinkOffsets.put(tb, linkOffsets);
 						}
 						linkOffsets.put(link.getId(), value);
@@ -106,7 +105,7 @@ public class Vector2Utility implements X2QGIS {
 
 	public void output2QGIS(Scenario scenario, String shapeFilenameBase) {
 
-		for (Entry<Integer, Map<Id, Double>> timeBinLinkOffsetPair : timeBinLinkOffsets
+		for (Entry<Integer, Map<Id<Link>, Double>> timeBinLinkOffsetPair : timeBinLinkOffsets
 				.entrySet()) {
 			MATSimNet2QGIS mn2q = new MATSimNet2QGIS(scenario, ch1903);
 			int time = timeBinLinkOffsetPair.getKey();
@@ -131,7 +130,7 @@ public class Vector2Utility implements X2QGIS {
 		, utilityFilename = "../matsim-bse/outputs/4SE_DC/middle_um1/ITERS/it.1000/test/1000.timeBinLinkUtilOffsets.log.gz"//
 		, shapeFilenameBase = "../matsim-bse/outputs/4SE_DC/middle_um1/ITERS/it.1000/test/1000.timeBinLinkUtilOffsets.";
 
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(networkFilename);
 		Network network = scenario.getNetwork();
 

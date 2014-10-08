@@ -24,9 +24,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.matsim.analysis.VolumesAnalyzer;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -81,7 +82,7 @@ public class LinkTrafficVolumeExtractor {
 					+ " s]\tLinkVolume[veh/h]\n");
 			for (int anI = 0; anI < 24 * 3600; anI = anI + timeBin) {
 				index = (anI) / timeBin;
-				ys[index] = va.getVolumesForLink(new IdImpl("6760"))[index];
+				ys[index] = va.getVolumesForLink(Id.create("6760", Link.class))[index];
 				writer.write(anI + "\t" + ys[index] + "\t" + ys[index] * 3600.0
 						/ timeBin + "\n");
 				ys[index] = ys[index] * 3600.0 / timeBin;

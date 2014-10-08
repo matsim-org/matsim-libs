@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -153,11 +152,11 @@ public class LeftTurnIdentifier {
 		Network network = scenario.getNetwork();
 
 		Map<Id<Link>, ? extends Link> links = network.getLinks();
-		Link link1 = links.get(new IdImpl(1)), link2 = links.get(new IdImpl(2)), link10 = links
-				.get(new IdImpl(10)), link11 = links.get(new IdImpl(11)), link19 = links
-				.get(new IdImpl(19)), link20 = links.get(new IdImpl(20)), link21 = links
-				.get(new IdImpl(21)), link22 = links.get(new IdImpl(22)), link23 = links
-				.get(new IdImpl(23));
+		Link link1 = links.get(Id.create(1, Link.class)), link2 = links.get(Id.create(2, Link.class)), link10 = links
+				.get(Id.create(10, Link.class)), link11 = links.get(Id.create(11, Link.class)), link19 = links
+				.get(Id.create(19, Link.class)), link20 = links.get(Id.create(20, Link.class)), link21 = links
+				.get(Id.create(21, Link.class)), link22 = links.get(Id.create(22, Link.class)), link23 = links
+				.get(Id.create(23, Link.class));
 
 		System.out.println("link1->link2\t"
 				+ getDirection(isLeftTurn(link1, link2)));

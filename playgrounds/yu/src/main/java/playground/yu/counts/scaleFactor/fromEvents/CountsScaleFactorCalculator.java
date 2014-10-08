@@ -33,14 +33,13 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.CountsConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.Counts;
@@ -96,7 +95,7 @@ public class CountsScaleFactorCalculator {
 		 * @return <code>true</true> if the Link with the given Id is not farther away than the
 		 * distance specified by the distance filter from the center node of the filter.
 		 */
-		private boolean isInRange(final Id linkid) {
+		private boolean isInRange(final Id<Link> linkid) {
 			if (distanceFilterNode == null || distanceFilter == null) {
 				return true;
 			}
@@ -127,7 +126,7 @@ public class CountsScaleFactorCalculator {
 		 */
 		public void setDistanceFilter(final Double distance, final String nodeId) {
 			distanceFilter = distance;
-			distanceFilterNode = network.getNodes().get(new IdImpl(nodeId));
+			distanceFilterNode = network.getNodes().get(Id.create(nodeId, Node.class));
 		}
 
 		public void getBestScaleFactors(int startHour, int endHour) {

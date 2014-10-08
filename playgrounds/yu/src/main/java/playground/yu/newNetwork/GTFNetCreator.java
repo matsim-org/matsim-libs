@@ -26,9 +26,9 @@ package playground.yu.newNetwork;
 import java.util.HashMap;
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
@@ -55,7 +55,7 @@ public class GTFNetCreator {
 		g.readFile("../schweiz-ivtch/greentimes/ivtch.xml");
 
 		for (String linkId : g.getLinkgtfsMap().keySet()) {
-			Link l = network.getLinks().get(new IdImpl(linkId));
+			Link l = network.getLinks().get(Id.create(linkId, Link.class));
 			if (l != null) {
 				System.out
 						.println("#a-->linkId:\t"
@@ -70,7 +70,7 @@ public class GTFNetCreator {
 						.println("#b-->linkId:\t"
 								+ linkId
 								+ "\tcapacity:\t"
-								+ network.getLinks().get(new IdImpl(linkId)).getCapacity());
+								+ network.getLinks().get(Id.create(linkId, Link.class)).getCapacity());
 				System.out.println("-------------------------");
 			}
 		}

@@ -45,21 +45,21 @@ public class SaturationLevel2QGIS extends MATSimNet2QGIS {
 		super(netFilename, coordRefSys);
 	}
 
-	public static List<Map<Id, Double>> createSaturationLevels(Network net,
+	public static List<Map<Id<Link>, Double>> createSaturationLevels(Network net,
 			VolumesAnalyzer va) {
-		List<Map<Id, Double>> saturationLevels = new ArrayList<Map<Id, Double>>(
+		List<Map<Id<Link>, Double>> saturationLevels = new ArrayList<>(
 				24);
 		for (int i = 0; i < 24; i++) {
 			saturationLevels.add(i, null);
 		}
 		double capPeriod = net.getCapacityPeriod() / 3600.0;
 		for (Link link : net.getLinks().values()) {
-			Id linkId = link.getId();
+			Id<Link> linkId = link.getId();
 			int[] v = va.getVolumesForLink(linkId);
 			for (int i = 0; i < 24; i++) {
-				Map<Id, Double> m = saturationLevels.get(i);
+				Map<Id<Link>, Double> m = saturationLevels.get(i);
 				if (m == null) {
-					m = new HashMap<Id, Double>();
+					m = new HashMap<Id<Link>, Double>();
 				}
 				m.put(linkId,
 						Double.valueOf((v != null ? v[i] : 0) / flowCapFactor
@@ -70,20 +70,20 @@ public class SaturationLevel2QGIS extends MATSimNet2QGIS {
 		return saturationLevels;
 	}
 
-	public static List<Map<Id, Double>> createSaturationLevels(Network net,
+	public static List<Map<Id<Link>, Double>> createSaturationLevels(Network net,
 			RoadPricingScheme rps, VolumesAnalyzer va) {
-		List<Map<Id, Double>> saturationLevels = new ArrayList<Map<Id, Double>>(
+		List<Map<Id<Link>, Double>> saturationLevels = new ArrayList<>(
 				24);
 		for (int i = 0; i < 24; i++) {
 			saturationLevels.add(i, null);
 		}
 		double capPeriod = net.getCapacityPeriod() / 3600.0;
-		for (Id linkId : rps.getTolledLinkIds()) {
+		for (Id<Link> linkId : rps.getTolledLinkIds()) {
 			int[] v = va.getVolumesForLink(linkId);
 			for (int i = 0; i < 24; i++) {
-				Map<Id, Double> m = saturationLevels.get(i);
+				Map<Id<Link>, Double> m = saturationLevels.get(i);
 				if (m == null) {
-					m = new HashMap<Id, Double>();
+					m = new HashMap<Id<Link>, Double>();
 				}
 				m.put(linkId,
 						Double.valueOf((v != null ? v[i] : 0) / flowCapFactor
@@ -113,7 +113,7 @@ public class SaturationLevel2QGIS extends MATSimNet2QGIS {
 		mn2q.readEvents(
 				"../../runs-svn/run1532/ITERS/it.1900/1532.1900.events.xml.gz",
 				new EventHandler[] { va });
-		List<Map<Id, Double>> sls = createSaturationLevels(net, va);
+		List<Map<Id<Link>, Double>> sls = createSaturationLevels(net, va);
 		for (int i = 6; i < 20; i++) {/* 7-20 */
 			mn2q.addParameter("sl" + i + "-" + (i + 1) + "h", Double.class,
 					sls.get(i));

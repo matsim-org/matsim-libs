@@ -46,12 +46,12 @@ public class PersonRouteFilter extends PersonFilterA {
 	/**
 	 * The underlying list of link-IDs of this PersonRouteFilter.
 	 */
-	private final List<Id> criterionLinkIds;
+	private final List<Id<Link>> criterionLinkIds;
 
 	/**
 	 * The underlying list of node-IDs of this PersonRouteFilter.
 	 */
-	private final List<Id> criterionNodeIds;
+	private final List<Id<Node>> criterionNodeIds;
 
 	private final Network network;
 
@@ -65,7 +65,7 @@ public class PersonRouteFilter extends PersonFilterA {
 	 *            - a list of node-IDs, which should not exist in network-file
 	 * @param network
 	 */
-	public PersonRouteFilter(final List<Id> linkIds, final List<Id> nodeIds,
+	public PersonRouteFilter(final List<Id<Link>> linkIds, final List<Id<Node>> nodeIds,
 			final Network network) {
 		criterionLinkIds = linkIds;
 		criterionNodeIds = nodeIds;

@@ -24,14 +24,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 
 public class LinkUtilityOffsetsReader implements TabularFileHandler {
 	private TabularFileParserConfig parserConfig = new TabularFileParserConfig();
-	private Map<Integer/* timeBin */, Map<Id/* linkId */, Double/* utiliyOffset */>> linkUtilityOffsets = new HashMap<Integer/* timeBin */, Map<Id/* linkId */, Double/* utiliyOffset */>>();
+	private Map<Integer/* timeBin */, Map<Id<Link>/* linkId */, Double/* utiliyOffset */>> linkUtilityOffsets = new HashMap<>();
 
 	public LinkUtilityOffsetsReader(String inputFilename) {
 		// parserConfig.setCommentTags(new String[] { "?????" });
@@ -39,7 +39,7 @@ public class LinkUtilityOffsetsReader implements TabularFileHandler {
 		parserConfig.setFileName(inputFilename);
 	}
 
-	public Map<Integer, Map<Id, Double>> getLinkUtiliyOffsets() {
+	public Map<Integer, Map<Id<Link>, Double>> getLinkUtiliyOffsets() {
 		return linkUtilityOffsets;
 	}
 
@@ -48,13 +48,13 @@ public class LinkUtilityOffsetsReader implements TabularFileHandler {
 		String linkId = row[1];
 		int timeBin = Integer.parseInt(row[3]);
 		double utilityOffset = Double.parseDouble(row[5]);
-		Map<Id, Double> utilityOffsetsPerTimeBin = this.linkUtilityOffsets
+		Map<Id<Link>, Double> utilityOffsetsPerTimeBin = this.linkUtilityOffsets
 				.get(timeBin);
 		if (utilityOffsetsPerTimeBin == null) {
-			utilityOffsetsPerTimeBin = new HashMap<Id, Double>();
+			utilityOffsetsPerTimeBin = new HashMap<>();
 			this.linkUtilityOffsets.put(timeBin, utilityOffsetsPerTimeBin);
 		}
-		utilityOffsetsPerTimeBin.put(new IdImpl(linkId), utilityOffset);
+		utilityOffsetsPerTimeBin.put(Id.create(linkId, Link.class), utilityOffset);
 	}
 
 	public void parse() {

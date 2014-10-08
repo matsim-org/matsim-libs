@@ -38,7 +38,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
@@ -86,12 +86,12 @@ public class BseUCControlerListener4linkUtilOffset implements StartupListener,
 	private boolean writeQGISFile = false;
 
 	private static List<Link> links = new ArrayList<Link>();
-	private static Set<Id> linkIds = new HashSet<Id>();
+	private static Set<Id<Link>> linkIds = new HashSet<>();
 	private int strategyDisableAfter = 0;
 	private PopLinksTimeBinsMatrixCreator pltbmc = null;
 	private String MATRIX_CALCULATION = "Matrix Calculation";
 
-	private boolean isInRange(final Id linkid, final Network net) {
+	private boolean isInRange(final Id<Link> linkid, final Network net) {
 		Link l = net.getLinks().get(linkid);
 		if (l == null) {
 			System.out.println("Cannot find requested link: "
@@ -168,7 +168,7 @@ public class BseUCControlerListener4linkUtilOffset implements StartupListener,
 			// output unknown x
 			SimpleWriter writer = new SimpleWriter(io.getIterationFilename(
 					iter, "resultVectorX.log"));
-			Map<Integer/* timeBin */, Map<Id/* linkId */, Double/* utiliyOffset */>> linkUtilityOffsets = new HashMap<Integer, Map<Id, Double>>();
+			Map<Integer/* timeBin */, Map<Id<Link>/* linkId */, Double/* utiliyOffset */>> linkUtilityOffsets = new HashMap<>();
 			for (int rowIdx = 0; rowIdx < x.getRowDimension(); rowIdx++) {
 				String linkIdTimeBin = pltbmc.getLinkTimeBinSequence2().get(
 						rowIdx);
@@ -182,13 +182,13 @@ public class BseUCControlerListener4linkUtilOffset implements StartupListener,
 				String linkId = row[1];
 				int timeBin = Integer.parseInt(row[3]);
 
-				Map<Id/* linkId */, Double/* x */> utilOffsetsPerTimeBin = linkUtilityOffsets
+				Map<Id<Link>/* linkId */, Double/* x */> utilOffsetsPerTimeBin = linkUtilityOffsets
 						.get(timeBin);
 				if (utilOffsetsPerTimeBin == null) {
-					utilOffsetsPerTimeBin = new HashMap<Id, Double>();
+					utilOffsetsPerTimeBin = new HashMap<>();
 					linkUtilityOffsets.put(timeBin, utilOffsetsPerTimeBin);
 				}
-				utilOffsetsPerTimeBin.put(new IdImpl(linkId), x_rowIdx);
+				utilOffsetsPerTimeBin.put(Id.create(linkId, Link.class), x_rowIdx);
 			}
 			writer.close();
 			// x to QGIG
@@ -268,8 +268,8 @@ public class BseUCControlerListener4linkUtilOffset implements StartupListener,
 
 		// set up center and radius of counts stations locations
 		distanceFilterCenterNodeCoord = network.getNodes().get(
-				new IdImpl(config.findParam("counts",
-						"distanceFilterCenterNode"))).getCoord();
+				Id.create(config.findParam("counts",
+						"distanceFilterCenterNode"), Node.class)).getCoord();
 		distanceFilter = Double.parseDouble(config.findParam("counts",
 				"distanceFilter"));
 		arStartTime = Integer.parseInt(config.findParam("bse", "startTime"));

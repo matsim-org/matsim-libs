@@ -20,21 +20,28 @@
 
 package playground.yu.integration.cadyts.demandCalibration.withCarCounts.experiments.events2PlanStep;
 
-import cadyts.demand.Plan;
-import cadyts.demand.PlanBuilder;
-import cadyts.demand.PlanStep;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
@@ -45,7 +52,9 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-import java.util.*;
+import cadyts.demand.Plan;
+import cadyts.demand.PlanBuilder;
+import cadyts.demand.PlanStep;
 
 public class EventsToPlanSteps implements PersonDepartureEventHandler,
 		LinkEnterEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler {
@@ -80,7 +89,7 @@ public class EventsToPlanSteps implements PersonDepartureEventHandler,
 		return planStepFactory;
 	}
 
-	private Link getEventLink(Id linkId) {
+	private Link getEventLink(Id<Link> linkId) {
 		Link link = net.getLinks().get(linkId);
 		if (link == null) {
 			throw new RuntimeException(
@@ -93,7 +102,7 @@ public class EventsToPlanSteps implements PersonDepartureEventHandler,
 		return Math.min(MAX_TIME, time);
 	}
 
-	private PlanImpl getPlanFromEvent(Id personId) {
+	private PlanImpl getPlanFromEvent(Id<Person> personId) {
 		Person person = pop.getPersons().get(personId);
 		if (person == null) {
 			throw new RuntimeException(
@@ -256,16 +265,16 @@ public class EventsToPlanSteps implements PersonDepartureEventHandler,
 		NetworkImpl net = NetworkImpl.createNetwork();
 		Random r = MatsimRandom.getLocalInstance();
 		for (int i = 0; i < 10; i++) {
-			net.createAndAddLink(new IdImpl(i), net.createAndAddNode(
-					new IdImpl(i + "f"), new CoordImpl(r.nextDouble() * 50000d,
+			net.createAndAddLink(Id.create(i, Link.class), net.createAndAddNode(
+					Id.create(i + "f", Node.class), new CoordImpl(r.nextDouble() * 50000d,
 							r.nextDouble() * 50000d)), net.createAndAddNode(
-					new IdImpl(i + "t"), new CoordImpl(r.nextDouble() * 50000d,
+					Id.create(i + "t", Node.class), new CoordImpl(r.nextDouble() * 50000d,
 							r.nextDouble() * 50000d)), r.nextInt(1000), r
 					.nextInt(8) * 20, r.nextInt(10) * 200, 1);
 		}
         Population pop = PopulationUtils.createPopulation(((ScenarioImpl) null).getConfig(), ((ScenarioImpl) null).getNetwork());
 		for (int i = 0; i < 10; i++) {
-			Person person = new PersonImpl(new IdImpl(i));
+			Person person = new PersonImpl(Id.create(i, Person.class));
 			pop.addPerson(person);
 			person.addPlan(new PlanImpl());
 		}
@@ -274,9 +283,9 @@ public class EventsToPlanSteps implements PersonDepartureEventHandler,
 		EventsToPlanSteps e2p = new EventsToPlanSteps(net, pop);
 		events.addHandler(e2p);
 		loop: for (int i = 0; i < 10; i++) {
-			Id agentId = new IdImpl(i);
+			Id<Person> agentId = Id.create(i, Person.class);
 			double time = r.nextDouble() * 3600d * 30d;
-			Id actLinkId = new IdImpl(r.nextInt(10));
+			Id<Link> actLinkId = Id.create(r.nextInt(10), Link.class);
 			for (int c = 0; c < r.nextInt(5) + 1; c++) {
 				System.out.println("Person:\t" + agentId);
 				// departure
@@ -288,9 +297,9 @@ public class EventsToPlanSteps implements PersonDepartureEventHandler,
 				}
 				time += r.nextDouble() * 3d;
 				// enterS
-				Id linkId = null;
+				Id<Link> linkId = null;
 				for (int j = 0; j < r.nextInt(10); j++) {
-					linkId = new IdImpl(r.nextInt(10));
+					linkId = Id.create(r.nextInt(10), Link.class);
 					LinkImpl link = (LinkImpl) net.getLinks().get(linkId);
 					{
 						Event event = new LinkEnterEvent(time,

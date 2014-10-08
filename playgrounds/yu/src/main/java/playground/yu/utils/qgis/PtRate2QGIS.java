@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -48,12 +49,12 @@ public class PtRate2QGIS implements X2QGIS {
 	 */
 	public static class LinkPtRate extends AbstractPersonAlgorithm implements
 			PlanAlgorithm {
-		private Map<Id, Integer> ptUsers;
-		private Map<Id, Integer> agents;
+		private Map<Id<Link>, Integer> ptUsers;
+		private Map<Id<Link>, Integer> agents;
 
 		public LinkPtRate() {
-			ptUsers = new HashMap<Id, Integer>();
-			agents = new HashMap<Id, Integer>();
+			ptUsers = new HashMap<>();
+			agents = new HashMap<>();
 		}
 
 		@Override
@@ -61,9 +62,10 @@ public class PtRate2QGIS implements X2QGIS {
 			run(person.getSelectedPlan());
 		}
 
+		@Override
 		public void run(Plan plan) {
 			Activity fa = ((PlanImpl) plan).getFirstActivity();
-			Id linkId = fa.getLinkId();
+			Id<Link> linkId = fa.getLinkId();
 			if (fa.getType().startsWith("h")) {
 				Integer a = agents.get(linkId);
 				if (a == null)
@@ -80,9 +82,9 @@ public class PtRate2QGIS implements X2QGIS {
 			}
 		}
 
-		public Map<Id, Double> getPtRate() {
-			Map<Id, Double> ptRates = new TreeMap<Id, Double>();
-			for (Id linkId : ptUsers.keySet()) {
+		public Map<Id<Link>, Double> getPtRate() {
+			Map<Id<Link>, Double> ptRates = new TreeMap<>();
+			for (Id<Link> linkId : ptUsers.keySet()) {
 				double a = agents.get(linkId).intValue();
 				double ptRate = (ptUsers.get(linkId).intValue()) / a;
 				ptRates.put(linkId, Double.valueOf(ptRate));
@@ -93,14 +95,14 @@ public class PtRate2QGIS implements X2QGIS {
 		/**
 		 * @return the ptUsers
 		 */
-		public Map<Id, Integer> getPtUsers() {
+		public Map<Id<Link>, Integer> getPtUsers() {
 			return ptUsers;
 		}
 
 		/**
 		 * @return the agents
 		 */
-		public Map<Id, Integer> getAgents() {
+		public Map<Id<Link>, Integer> getAgents() {
 			return agents;
 		}
 	}
@@ -148,8 +150,8 @@ public class PtRate2QGIS implements X2QGIS {
 		LinkPtRate lprB = new LinkPtRate();
 		mn2q.readPlans(args[2], lprB);
 		// mn2q.readPlans("../runs/run466/500.plans.xml.gz", lprB);
-		Map<Id, Double> diff = new TreeMap<Id, Double>();
-		for (Id linkId : lprA.getAgents().keySet()) {
+		Map<Id<Link>, Double> diff = new TreeMap<>();
+		for (Id<Link> linkId : lprA.getAgents().keySet()) {
 			Double B = lprB.getPtRate().get(linkId);
 			double b = (B != null) ? B.doubleValue() : 0.0;
 			Double A = lprA.getPtRate().get(linkId);

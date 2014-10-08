@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -87,15 +86,11 @@ public class DoublePop extends NewPopulation {
 		// createNewPerson(oldId + "D");
 	}
 
-	private void createAndWriteNewPerson(String newId) {
-		createAndWriteNewPerson(new IdImpl(newId));
-	}
-
 	private void createAndWriteNewPerson(long newId) {
-		createAndWriteNewPerson(new IdImpl(newId));
+		createAndWriteNewPerson(Id.create(newId, Person.class));
 	}
 
-	private void createAndWriteNewPerson(Id newId) {
+	private void createAndWriteNewPerson(Id<Person> newId) {
         ((PersonImpl) tmpPerson).setId(newId);
         pw.writePerson(tmpPerson);
 	}

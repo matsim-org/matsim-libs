@@ -45,10 +45,10 @@ public abstract class X2GraphImpl implements X2Graph {
 
 	protected Collection<SimpleFeature> features;
 
-	protected List<Map<Id, ?>> parameters = new ArrayList<Map<Id, ?>>();
+	protected List<Map<Id<Link>, ?>> parameters = new ArrayList<>();
 	protected List<Tuple<String, Class<?>>> attrTypes = new ArrayList<Tuple<String, Class<?>>>();
 
-	public void addParameter(String paramName, Class<?> clazz, Map<Id, ?> params) {
+	public void addParameter(String paramName, Class<?> clazz, Map<Id<Link>, ?> params) {
 		attrTypes.add(new Tuple<String, Class<?>>(paramName, clazz));
 		parameters.add(params);
 	}

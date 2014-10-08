@@ -19,11 +19,12 @@
  * *********************************************************************** */
 package playground.yu.analysis.forMuc;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -82,7 +83,7 @@ public class LegTravelTimeModalSplit4Muc extends LegTravelTimeModalSplit
 			travelTimes[binIdx] += travelTime;
 			arrCount[binIdx]++;
 
-			Plan selectedplan = plans.getPersons().get(new IdImpl(agentId))
+			Plan selectedplan = plans.getPersons().get(Id.create(agentId, Person.class))
 					.getSelectedPlan();
 			String mode = PlanModeJudger.getMode(selectedplan);
 			if (TransportMode.car.equals(mode)) {

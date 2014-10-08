@@ -41,23 +41,23 @@ import playground.yu.analysis.CalcLinksAvgSpeed;
  */
 public class AvgSpeed2QGIS implements X2QGIS {
 
-	public static List<Map<Id, Double>> createSpeeds(Network net,
+	public static List<Map<Id<Link>, Double>> createSpeeds(Network net,
 			CalcLinksAvgSpeed clas) {
-		List<Map<Id, Double>> speeds = new ArrayList<Map<Id, Double>>(24);
+		List<Map<Id<Link>, Double>> speeds = new ArrayList<>(24);
 		for (int i = 0; i < 24; i++) {
 			speeds.add(i, null);
 		}
 		for (int i = 0; i < 24; i++) {
-			Map<Id, Double> aSpeeds = speeds.get(i);
+			Map<Id<Link>, Double> aSpeeds = speeds.get(i);
 			if (aSpeeds != null) {
 				for (Link link : net.getLinks().values()) {
-					Id linkId = link.getId();
+					Id<Link> linkId = link.getId();
 					aSpeeds.put(linkId, clas.getAvgSpeed(linkId, i * 3600.0));
 				}
 			} else {
 				for (Link link : net.getLinks().values()) {
-					Id linkId = link.getId();
-					aSpeeds = new HashMap<Id, Double>();
+					Id<Link> linkId = link.getId();
+					aSpeeds = new HashMap<>();
 					aSpeeds.put(linkId, clas.getAvgSpeed(linkId, i * 3600.0));
 					speeds.add(i, aSpeeds);
 				}
@@ -92,7 +92,7 @@ public class AvgSpeed2QGIS implements X2QGIS {
 		Network net = mn2q.getNetwork();
 		CalcLinksAvgSpeed clas = new CalcLinksAvgSpeed(net);
 		mn2q.readEvents(eventsFilename, new EventHandler[] { clas });
-		List<Map<Id, Double>> speeds = createSpeeds(net, clas);
+		List<Map<Id<Link>, Double>> speeds = createSpeeds(net, clas);
 		for (int i = 0; i < 24; i++) {
 			mn2q.addParameter("aS" + i + "-" + (i + 1) + "h", Double.class,
 					speeds.get(i));

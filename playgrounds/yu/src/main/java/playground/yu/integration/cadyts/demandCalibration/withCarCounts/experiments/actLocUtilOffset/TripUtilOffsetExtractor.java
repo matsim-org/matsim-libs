@@ -39,7 +39,8 @@ import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -57,13 +58,13 @@ public class TripUtilOffsetExtractor implements ActivityEndEventHandler,
 // AgentDepartureEventHandler,
 		LinkEnterEventHandler, ActivityStartEventHandler {
 	public static class TripEvents {
-		private Id agentId;
+		private Id<Person> agentId;
 		private ActivityEndEvent tripBegins = null;
 		// private AgentDepartureEvent tripBegins = null;
 		private List<LinkEnterEvent> enters = null;
 		private ActivityStartEvent tripEnds = null;
 
-		public TripEvents(Id agentId) {
+		public TripEvents(Id<Person> agentId) {
 			this.agentId = agentId;
 		}
 
@@ -165,7 +166,7 @@ public class TripUtilOffsetExtractor implements ActivityEndEventHandler,
 
 	}
 
-	private Map<Id/* agentId */, TripEvents> tripEvents = new HashMap<Id, TripEvents>();
+	private Map<Id<Person>/* agentId */, TripEvents> tripEvents = new HashMap<>();
 	protected Map<Tuple<Coord, Coord>, TripsWithUtilOffset> tripsWithUtilOffsetMap = new HashMap<Tuple<Coord, Coord>, TripsWithUtilOffset>();
 
 	private Counts counts;
@@ -201,7 +202,7 @@ public class TripUtilOffsetExtractor implements ActivityEndEventHandler,
 	// }
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		Id agentId = event.getPersonId();
+		Id<Person> agentId = event.getPersonId();
 		if (tripEvents.containsKey(agentId)) {
 			throw new RuntimeException(
 					"There should NOT be TripEvents with personId:\t" + agentId);
@@ -218,7 +219,7 @@ public class TripUtilOffsetExtractor implements ActivityEndEventHandler,
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		Id agentId = event.getPersonId();
+		Id<Person> agentId = event.getPersonId();
 		TripEvents tripEvents = this.tripEvents.get(agentId);
 		if (tripEvents == null) {
 			throw new RuntimeException(
@@ -230,7 +231,7 @@ public class TripUtilOffsetExtractor implements ActivityEndEventHandler,
 
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
-		Id agentId = event.getPersonId();
+		Id<Person> agentId = event.getPersonId();
 		TripEvents tripEvents = this.tripEvents.get(agentId);
 		if (tripEvents == null) {
 			throw new RuntimeException(
@@ -244,7 +245,7 @@ public class TripUtilOffsetExtractor implements ActivityEndEventHandler,
 		this.tripEvents.remove(agentId);
 	}
 
-	protected double getLinkUtilOffset(Id linkId, int time) {
+	protected double getLinkUtilOffset(Id<Link> linkId, int time) {
 		if (counts.getCounts().containsKey(linkId)) {
 			if (isInRange(linkId, net)) {
 				return linkUtilOffsets.getSum(net.getLinks().get(linkId),
@@ -275,9 +276,9 @@ public class TripUtilOffsetExtractor implements ActivityEndEventHandler,
 
 	}
 
-	private static boolean isInRange(final Id linkId, final Network net) {
+	private static boolean isInRange(final Id<Link> linkId, final Network net) {
 		Coord distanceFilterCenterNodeCoord = net.getNodes().get(
-				new IdImpl("2531")).getCoord();
+				Id.create("2531", Node.class)).getCoord();
 		double distanceFilter = 30000;
 		Link l = net.getLinks().get(linkId);
 		if (l == null) {
@@ -306,7 +307,7 @@ public class TripUtilOffsetExtractor implements ActivityEndEventHandler,
 			double utilOffset = 0;
 
 			for (LinkEnterEvent enter : enters) {
-				Id linkId = enter.getLinkId();
+				Id<Link> linkId = enter.getLinkId();
 				int timeStep = getTimeStep(enter.getTime());
 				if (timeStep >= caliStartTime && timeStep <= caliEndTime) {
 					utilOffset += getLinkUtilOffset(linkId, timeStep);
@@ -330,7 +331,7 @@ public class TripUtilOffsetExtractor implements ActivityEndEventHandler,
 		return center;
 	}
 
-	protected Coord getGridCenterCoord(Id linkId) {
+	protected Coord getGridCenterCoord(Id<Link> linkId) {
 		return this.getGridCenterCoord(net.getLinks().get(linkId).getCoord());
 	}
 

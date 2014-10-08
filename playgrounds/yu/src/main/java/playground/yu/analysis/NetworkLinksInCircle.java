@@ -43,7 +43,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
  *
  */
 public class NetworkLinksInCircle {
-	final private HashSet<Id> areaOfInterest = new HashSet<Id>();
+	final private HashSet<Id<Link>> areaOfInterest = new HashSet<>();
 	final private Network network;
 
 	public NetworkLinksInCircle(Network network) {
@@ -51,7 +51,7 @@ public class NetworkLinksInCircle {
 		this.network = network;
 	}
 
-	public Set<Id> getLinks(double x, double y, double radius) {
+	public Set<Id<Link>> getLinks(double x, double y, double radius) {
 		CoordImpl center = new CoordImpl(x, y);
 		System.out.println("--> extracting area of interest... at "
 				+ (new Date()));

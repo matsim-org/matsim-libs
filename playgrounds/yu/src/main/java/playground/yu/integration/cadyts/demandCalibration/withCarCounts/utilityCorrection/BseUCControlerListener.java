@@ -66,9 +66,9 @@ public class BseUCControlerListener implements StartupListener,
 	private boolean writeQGISFile = false;
 
 	private static List<Link> links = new ArrayList<Link>();
-	private static Set<Id> linkIds = new HashSet<Id>();
+	private static Set<Id<Link>> linkIds = new HashSet<>();
 
-	private boolean isInRange(final Id linkid, final Network net) {
+	private boolean isInRange(final Id<Link> linkid, final Network net) {
 		if(this.distanceFilterCenterNodeCoord==null)
 			return true;
 		Link l = net.getLinks().get(linkid);

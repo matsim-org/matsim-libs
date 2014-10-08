@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
@@ -35,7 +35,7 @@ public class ScoreModificationReader implements TabularFileHandler {
 	/**
 	 * Map<PersonId,scoreModification>
 	 */
-	private Map<Id, Double> personScoreModifications = new HashMap<Id, Double>();
+	private Map<Id<Person>, Double> personScoreModifications = new HashMap<>();
 
 	public ScoreModificationReader(String inputFilename) {
 		this.inputFilename = inputFilename;
@@ -44,17 +44,17 @@ public class ScoreModificationReader implements TabularFileHandler {
 		parserConfig.setFileName(this.inputFilename);
 	}
 
-	public double getPersonUtilityOffset(Id personId) {
+	public double getPersonUtilityOffset(Id<Person> personId) {
 		return this.personScoreModifications.get(personId);
 	}
 
-	public Map<Id, Double> getPersonScoreModifications() {
+	public Map<Id<Person>, Double> getPersonScoreModifications() {
 		return personScoreModifications;
 	}
 
 	@Override
 	public void startRow(String[] row) {
-		this.personScoreModifications.put(new IdImpl(row[0])/* person Id */,
+		this.personScoreModifications.put(Id.create(row[0], Person.class)/* person Id */,
 				Double.parseDouble(row[1])/* scoreModification */);
 	}
 

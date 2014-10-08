@@ -22,9 +22,9 @@ package playground.yu.newNetwork;
 
 import java.util.Set;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -79,7 +79,7 @@ public class OSMNetCreator {
 		OSMNetCreator osmNC = new OSMNetCreator(network);
 
 		for (String linkId : linkIdsInCircle) {
-			Link l = network.getLinks().get(new IdImpl(linkId));
+			Link l = network.getLinks().get(Id.create(linkId, Link.class));
 			if (l != null)
 				osmNC.resetCapacity((LinkImpl) l);
 		}
@@ -90,7 +90,7 @@ public class OSMNetCreator {
 		for (String linkId : osmP.getUpgradeLinks()) {
 			up++;
 			upgraded++;
-			Link l = network.getLinks().get(new IdImpl(linkId));
+			Link l = network.getLinks().get(Id.create(linkId, Link.class));
 			if (l != null)
 				if (l.getCapacity() / osmNC.capperiod < 2000.0) {
 					System.out.print("link "
@@ -107,7 +107,7 @@ public class OSMNetCreator {
 		for (String linkId : osmP.getDegradeLinks()) {
 			down++;
 			degraded++;
-			Link l = network.getLinks().get(new IdImpl(linkId));
+			Link l = network.getLinks().get(Id.create(linkId, Link.class));
 			if (l != null)
 				if (l.getCapacity()
 						/ osmNC.capperiod > 600.0) {

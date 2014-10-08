@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -72,11 +72,11 @@ public class CountsCapacityComparison {
 		SimpleWriter sw = new SimpleWriter(outputFilename);
 		sw.writeln("linkId\tx\ty\tCapacity [veh/h]\tmax Value of Counts");
 
-		Coord center = network.getNodes().get(new IdImpl("2531")).getCoord();
+		Coord center = network.getNodes().get(Id.create("2531", Node.class)).getCoord();
 		double capPeriod = network.getCapacityPeriod() / 3600.0 * 0.97;
 		int n_countStations = 0;
 
-		for (Id linkId : counts.getCounts().keySet()) {
+		for (Id<Link> linkId : counts.getCounts().keySet()) {
 
 			Link link = network.getLinks().get(linkId);
 			if (link != null) {

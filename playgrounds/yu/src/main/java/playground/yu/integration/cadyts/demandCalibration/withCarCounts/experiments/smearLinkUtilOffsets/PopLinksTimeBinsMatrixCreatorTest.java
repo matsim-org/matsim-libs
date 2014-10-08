@@ -47,10 +47,11 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.LinkImpl;
@@ -58,7 +59,6 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 
@@ -393,9 +393,9 @@ public class PopLinksTimeBinsMatrixCreatorTest implements LinkLeaveEventHandler 
 		return AT;
 	}
 
-	private boolean isInRange(final Id linkId, final Network net) {
+	private boolean isInRange(final Id<Link> linkId, final Network net) {
 		Coord distanceFilterCenterNodeCoord = net.getNodes().get(
-				new IdImpl(countsCenterNodeIdStr)).getCoord();
+				Id.create(countsCenterNodeIdStr, Node.class)).getCoord();
 		Link l = net.getLinks().get(linkId);
 		if (l == null) {
 			System.out.println("Cannot find requested link: "
