@@ -20,27 +20,16 @@
 
 package org.matsim.core.mobsim.qsim.agents;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.HasPerson;
-import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
-import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.*;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
@@ -48,6 +37,8 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.List;
 
 /**
  * @author dgrether, nagel
@@ -267,8 +258,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 				noRouteWrnCnt++ ;
 			}
 			this.state = MobsimAgent.State.ABORT ;
-			return;
-		} else {
+        } else {
 			this.cachedDestinationLinkId = route.getEndLinkId();
 
 			// set the route according to the next leg
@@ -276,8 +266,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 			this.cachedRouteLinkIds = null;
 			this.currentLinkIdIndex = 0;
 			this.cachedNextLinkId = null;
-			return;
-		}
+        }
 	}
 
 	private void initializeActivity(Activity act) {
@@ -382,7 +371,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 	 * Convenience method delegating to person's selected plan
 	 * @return list of {@link Activity}s and {@link Leg}s of this agent's plan
 	 */
-	private final List<PlanElement> getPlanElements() {
+	private List<PlanElement> getPlanElements() {
 		return this.getCurrentPlan().getPlanElements();
 	}
 
@@ -457,6 +446,9 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 		if (route.getVehicleId() != null) {
 			return route.getVehicleId();
 		} else {
+            if (!this.getMobsim().getScenario().getConfig().qsim().getUsePersonIdForMissingVehicleId()) {
+                throw new IllegalStateException("NetworkRoute without a specified vehicle id.");
+            }
 			return Id.create(this.getId(), Vehicle.class); // we still assume the vehicleId is the agentId if no vehicleId is given.
 		}
 	}

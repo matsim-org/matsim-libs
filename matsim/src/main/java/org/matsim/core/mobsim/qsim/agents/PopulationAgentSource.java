@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -38,9 +39,8 @@ public final class PopulationAgentSource implements AgentSource {
 	private final QSim qsim;
 	private Map<String, VehicleType> modeVehicleTypes;
 	private final Collection<String> mainModes;
-	private boolean insertVehicles = true;
 
-	public PopulationAgentSource(Population population, AgentFactory agentFactory, QSim qsim) {
+    public PopulationAgentSource(Population population, AgentFactory agentFactory, QSim qsim) {
 		this.population = population;
 		this.agentFactory = agentFactory;
 		this.qsim = qsim;  
@@ -57,12 +57,10 @@ public final class PopulationAgentSource implements AgentSource {
 			MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(p);
 			qsim.insertAgentIntoMobsim(agent);
 		}
-		if (insertVehicles) {
-			for (Person p : population.getPersons().values()) {
-				insertVehicles(p);
-			}
-		}
-	}
+        for (Person p : population.getPersons().values()) {
+            insertVehicles(p);
+        }
+    }
 
 	private void insertVehicles(Person p) {
 		Plan plan = p.getSelectedPlan();
@@ -73,9 +71,25 @@ public final class PopulationAgentSource implements AgentSource {
 				if (this.mainModes.contains(leg.getMode())) { // only simulated modes get vehicles
 					if (!seenModes.contains(leg.getMode())) { // create one vehicle per simulated mode, put it on the home location
 						Id<Link> vehicleLink = findVehicleLink(p);
-						qsim.createAndParkVehicleOnLink(
-								VehicleUtils.getFactory().createVehicle(Id.create(p.getId(), Vehicle.class), modeVehicleTypes.get(leg.getMode())), 
-								vehicleLink);
+                        Id<Vehicle> vehicleId;
+                        if (qsim.getScenario().getConfig().qsim().getUsePersonIdForMissingVehicleId()) {
+                            vehicleId = Id.create(p.getId(), Vehicle.class);
+                        } else {
+                            vehicleId = ((NetworkRoute) leg.getRoute()).getVehicleId();
+                            if (vehicleId == null) {
+                                throw new IllegalStateException("Found a network route without a vehicle id.");
+                            }
+                        }
+                        Vehicle vehicle;
+                        if (qsim.getScenario().getConfig().qsim().getUseDefaultVehicles()) {
+                            vehicle = VehicleUtils.getFactory().createVehicle(vehicleId, modeVehicleTypes.get(leg.getMode()));
+                        } else {
+                            vehicle = qsim.getScenario().getVehicles().getVehicles().get(vehicleId);
+                            if (vehicle == null) {
+                                throw new IllegalStateException("Referencing a vehicle id which is missing in the vehicles database.");
+                            }
+                        }
+                        qsim.createAndParkVehicleOnLink(vehicle, vehicleLink);
 						seenModes.add(leg.getMode());
 					}
 				}
@@ -108,10 +122,6 @@ public final class PopulationAgentSource implements AgentSource {
 
 	public void setModeVehicleTypes(Map<String, VehicleType> modeVehicleTypes) {
 		this.modeVehicleTypes = modeVehicleTypes;
-	}
-	
-	public void setInsertVehicles(boolean insertVehicles) {
-		this.insertVehicles = insertVehicles;
 	}
 
 }

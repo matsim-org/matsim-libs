@@ -22,15 +22,18 @@ package org.matsim.core.config.groups;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.config.Module;
+import org.matsim.core.config.experimental.ReflectiveModule;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.misc.Time;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
 
-public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
-	
-	public static enum LinkDynamics { FIFO, PassingQ }
+public class QSimConfigGroup extends ReflectiveModule implements MobsimConfigGroupI {
+
+    public static enum LinkDynamics { FIFO, PassingQ }
 	private LinkDynamics linkDynamics = LinkDynamics.FIFO ;
 	private static final String LINK_DYNAMICS = "linkDynamics" ;
 
@@ -50,6 +53,8 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	private static final String TRAFFIC_DYNAMICS = "trafficDynamics";
 	private static final String SIM_STARTTIME_INTERPRETATION = "simStarttimeInterpretation";
 	private static final String VEHICLE_BEHAVIOR = "vehicleBehavior";
+    private static final String USE_PERSON_ID_FOR_MISSING_VEHICLE_ID = "usePersonIdForMissingVehicleId";
+    private static final String USE_DEFAULT_VEHICLES = "useDefaultVehicles";
 
 	public static final String TRAFF_DYN_QUEUE = "queue";
 	public static final String TRAFF_DYN_W_HOLES = "withHoles";
@@ -71,7 +76,9 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	private double storageCapFactor = 1.0;
 	private double stuckTime = 10;
 	private boolean removeStuckVehicles = false;
-	private int numberOfThreads = 1;
+    private boolean usePersonIdForMissingVehicleId = true;
+    private boolean useDefaultVehicles = true;
+    private int numberOfThreads = 1;
 	private String trafficDynamics = TRAFF_DYN_QUEUE;
 	private String simStarttimeInterpretation = MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END;
 	private String vehicleBehavior = VEHICLE_BEHAVIOR_TELEPORT;
@@ -102,88 +109,59 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		super(GROUP_NAME);
 	}
 
-	@Override
-	public final void addParam(final String key, final String value) {
-		if (START_TIME.equals(key)) {
-			setStartTime(Time.parseTime(value));
-		} else if ( INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES.equals(key) ) {
-			setInsertingWaitingVehiclesBeforeDrivingVehicles(Boolean.parseBoolean(value));
-		} else if ( LINK_DYNAMICS.equals(key)) {
-			setLinkDynamics(value);
-		} else if (END_TIME.equals(key)) {
-			setEndTime(Time.parseTime(value));
-		} else if (TIME_STEP_SIZE.equals(key)) {
-			setTimeStepSize(Time.parseTime(value));
-		} else if (SNAPSHOT_PERIOD.equals(key)) {
-			setSnapshotPeriod(Time.parseTime(value));
-		} else if (SNAPSHOT_STYLE.equals(key)) {
-			setSnapshotStyle(value);
-		} else if (FLOW_CAPACITY_FACTOR.equals(key)) {
-			setFlowCapFactor(Double.parseDouble(value));
-		} else if (STORAGE_CAPACITY_FACTOR.equals(key)) {
-			setStorageCapFactor(Double.parseDouble(value));
-		} else if (STUCK_TIME.equals(key)) {
-			setStuckTime(Double.parseDouble(value));
-		} else if (REMOVE_STUCK_VEHICLES.equals(key)) {
-			setRemoveStuckVehicles(Boolean.parseBoolean(value));
-		} else if (NUMBER_OF_THREADS.equals(key)){
-		  setNumberOfThreads(Integer.parseInt(value)); 
-		} else if (TRAFFIC_DYNAMICS.equals(key)) {
-			setTrafficDynamics(value);
-		} else if (SIM_STARTTIME_INTERPRETATION.equals(key)) {
-			setSimStarttimeInterpretation(value);
-		} else if (VEHICLE_BEHAVIOR.equals(key)) {
-			setVehicleBehavior(value);
-		} else if (MAIN_MODE.equals(key)) {
-			setMainModes(Arrays.asList(value.split(",")));
-		} else if ("writeSnapshotsInterval".equals(key)) {
-			log.error("The config entry `writeSnapshotsInterval' was removed from the qsim config group. " +
-					"It is now in the controler config group; please move it there.  Aborting ...");
-			throw new IllegalArgumentException(key);
-		} else if ( "snapshotFormat".equals(key) ) {
-			log.error( "The config entry `snapshotFormat' was removed from the qsim config group. " +
-					"It is now in the controler config group; please move it there.  Aborting ...");
-			throw new IllegalArgumentException(key);
-		} else if (NODE_OFFSET.equalsIgnoreCase(key)){
-			this.nodeOffset = Double.parseDouble(value);
-		} 	else if (LINK_WIDTH.equalsIgnoreCase(key)) {
-			this.linkWidth = Float.parseFloat(value);
-		}else {
-			throw new IllegalArgumentException(key);
-		}
-	}
+    @StringSetter(MAIN_MODE)
+    private void setMainModes(String value) {
+        setMainModes(Arrays.asList(value.split(",")));
+    }
+
+    @StringSetter(SNAPSHOT_PERIOD)
+    private void setSnapshotPeriod(String value) {
+        setSnapshotPeriod(Time.parseTime(value));
+    }
+
+    @StringSetter(TIME_STEP_SIZE)
+    private void setTimeStepSize(String value) {
+        setTimeStepSize(Time.parseTime(value));
+    }
+
+    @StringSetter(END_TIME)
+    private void setEndTime(String value) {
+        setEndTime(Time.parseTime(value));
+    }
+
+    @StringSetter(START_TIME)
+    private void setStartTime(String value) {
+        setStartTime(Time.parseTime(value));
+    }
+
+    @StringGetter(MAIN_MODE)
+    private String getMainModesAsString() {
+        return CollectionUtils.setToString(new HashSet<>(getMainModes()));
+    }
+
+    @StringGetter(SNAPSHOT_PERIOD)
+    private String getSnapshotPeriodAsString() {
+        return Time.writeTime(getSnapshotPeriod());
+    }
+
+    @StringGetter(TIME_STEP_SIZE)
+    private String getTimeStepSizeAsString() {
+        return Time.writeTime(getTimeStepSize());
+    }
 
 
-	@Override
-	public final String getValue(final String key) {
-		throw new RuntimeException("Please don't use `getValue' for QSimConfigGroup; use direct getters instead.  kai, dec'10");
-	}
+    @StringGetter(END_TIME)
+    private String getEndTimeAsString() {
+        return Time.writeTime(getEndTime());
+    }
 
-	@Override
-	public final TreeMap<String, String> getParams() {
-		TreeMap<String, String> map = new TreeMap<>();
-		map.put(START_TIME, Time.writeTime(getStartTime()));
-		map.put(END_TIME, Time.writeTime(getEndTime()));
-		map.put(TIME_STEP_SIZE, Time.writeTime(getTimeStepSize()));
-		map.put(SNAPSHOT_PERIOD, Time.writeTime(getSnapshotPeriod()));
-		map.put(SNAPSHOT_STYLE, getSnapshotStyle());
-		map.put(FLOW_CAPACITY_FACTOR, String.valueOf(getFlowCapFactor()));
-		map.put(STORAGE_CAPACITY_FACTOR, String.valueOf(getStorageCapFactor()));
-		map.put(STUCK_TIME, String.valueOf(getStuckTime()));
-		map.put(REMOVE_STUCK_VEHICLES, String.valueOf(isRemoveStuckVehicles()));
-		map.put(NUMBER_OF_THREADS, String.valueOf(getNumberOfThreads()));
-		map.put(TRAFFIC_DYNAMICS, getTrafficDynamics());
-		map.put(SIM_STARTTIME_INTERPRETATION, getSimStarttimeInterpretation());
-		map.put(VEHICLE_BEHAVIOR, getVehicleBehavior());
-		map.put(MAIN_MODE, CollectionUtils.setToString(new HashSet<>(getMainModes())));
-		map.put(INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES, String.valueOf( isInsertingWaitingVehiclesBeforeDrivingVehicles() ) );
-		map.put(NODE_OFFSET, Double.toString(this.getNodeOffset()));
-		map.put(LINK_DYNAMICS, this.getLinkDynamics() ) ;
-		
-		return map;
-	}
 
-	// measure so that comments remain consistent between Simulation and QSim.  kai, aug'10
+    @StringGetter(START_TIME)
+    private String getStartTimeAsString() {
+        return Time.writeTime(getStartTime());
+    }
+
+    // measure so that comments remain consistent between Simulation and QSim.  kai, aug'10
 	/* package */ final static String REMOVE_STUCK_VEHICLES_STRING=
 		"Boolean. `true': stuck vehicles are removed, aborting the plan; `false': stuck vehicles are forced into the next link. `false' is probably the better choice.";
 	/* package */ final static String STUCK_TIME_STRING=
@@ -223,9 +201,10 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 			}
 			map.put(LINK_DYNAMICS, "default: FIFO; options:" + stb ) ;
 		}
-		return map;
+        map.put(USE_PERSON_ID_FOR_MISSING_VEHICLE_ID, "If a route does not reference a vehicle, agents will use the vehicle with the same id as their own.");
+		map.put(USE_DEFAULT_VEHICLES, "If this is true, we do not expect (or use) vehicles from the vehicles database, but create vehicles on the fly with default properties.");
+        return map;
 	}
-	/* direct access */
 
 	public void setStartTime(final double startTime) {
 		this.startTime = startTime;
@@ -250,7 +229,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	 *
 	 * @param seconds
 	 */
-	public void setTimeStepSize(final double seconds) {
+    public void setTimeStepSize(final double seconds) {
 		if ( seconds != 1.0 ) {
 			Logger.getLogger(this.getClass()).warn("there are nearly no tests for time step size != 1.0.  Please write such tests and remove "
 				+ "this warning. ") ;
@@ -263,7 +242,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		return this.timeStepSize;
 	}
 
-	public void setSnapshotPeriod(final double snapshotPeriod) {
+    public void setSnapshotPeriod(final double snapshotPeriod) {
 		this.snapshotPeriod = snapshotPeriod;
 	}
 
@@ -272,43 +251,51 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		return this.snapshotPeriod;
 	}
 
+    @StringSetter(FLOW_CAPACITY_FACTOR)
 	public void setFlowCapFactor(final double flowCapFactor) {
 		this.flowCapFactor = flowCapFactor;
 	}
 
 	@Override
+    @StringGetter(FLOW_CAPACITY_FACTOR)
 	public double getFlowCapFactor() {
 		return this.flowCapFactor;
 	}
 
+    @StringSetter(STORAGE_CAPACITY_FACTOR)
 	public void setStorageCapFactor(final double val) {
 		this.storageCapFactor = val;
 	}
 
 	@Override
+    @StringGetter(STORAGE_CAPACITY_FACTOR)
 	public double getStorageCapFactor() {
 		return this.storageCapFactor;
 	}
 
+    @StringSetter(STUCK_TIME)
 	public void setStuckTime(final double stuckTime) {
 		this.stuckTime = stuckTime;
 	}
 
 	@Override
+    @StringGetter(STUCK_TIME)
 	public double getStuckTime() {
 		return this.stuckTime;
 	}
 
+    @StringSetter(REMOVE_STUCK_VEHICLES)
 	public void setRemoveStuckVehicles(final boolean removeStuckVehicles) {
 		this.removeStuckVehicles = removeStuckVehicles;
 	}
 
 	@Override
+    @StringGetter(REMOVE_STUCK_VEHICLES)
 	public boolean isRemoveStuckVehicles() {
 		return this.removeStuckVehicles;
 	}
 
-	/** See {@link #getComments()} for options. */
+	@StringSetter(SNAPSHOT_STYLE)
 	public void setSnapshotStyle(final String style) {
 		this.snapshotStyle = style.intern();
 		if (!SNAPSHOT_EQUI_DIST.equals(this.snapshotStyle) && !SNAPSHOT_AS_QUEUE.equals(this.snapshotStyle)
@@ -319,10 +306,12 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	}
 
 	@Override
+    @StringGetter(SNAPSHOT_STYLE)
 	public String getSnapshotStyle() {
 		return this.snapshotStyle;
 	}
 
+    @StringSetter(TRAFFIC_DYNAMICS)
 	public void setTrafficDynamics(final String str) {
 		this.trafficDynamics = str;
 		if ( !TRAFF_DYN_QUEUE.equals(this.trafficDynamics) && !TRAFF_DYN_W_HOLES.equals(this.trafficDynamics) 
@@ -332,15 +321,17 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		}
 	}
 
+    @StringGetter(TRAFFIC_DYNAMICS)
 	public String getTrafficDynamics() {
 		return this.trafficDynamics;
 	}
 
+    @StringGetter(NUMBER_OF_THREADS)
 	public int getNumberOfThreads() {
 		return this.numberOfThreads;
 	}
 
-
+    @StringSetter(NUMBER_OF_THREADS)
 	public void setNumberOfThreads(final int numberOfThreads) {
 		if ( numberOfThreads < 1 ) {
 			throw new IllegalArgumentException( "Number of threads must be strictly positive, got "+numberOfThreads );
@@ -348,10 +339,12 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		this.numberOfThreads = numberOfThreads;
 	}
 
+    @StringGetter(SIM_STARTTIME_INTERPRETATION)
 	public String getSimStarttimeInterpretation() {
 		return simStarttimeInterpretation;
 	}
 
+    @StringSetter(SIM_STARTTIME_INTERPRETATION)
 	public void setSimStarttimeInterpretation(String str) {
 		this.simStarttimeInterpretation = str;
 		if ( !MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END.equals(str)
@@ -361,14 +354,16 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		}
 	}
 
+    @StringSetter(VEHICLE_BEHAVIOR)
 	public void setVehicleBehavior(String value) {
 		this.vehicleBehavior = value;
 	}
 
+    @StringGetter(VEHICLE_BEHAVIOR)
 	public String getVehicleBehavior() {
 		return this.vehicleBehavior;
 	}
-	
+
 	public void setMainModes(Collection<String> mainModes) {
 		this.mainModes = mainModes;
 	}
@@ -377,34 +372,64 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		return mainModes;
 	}
 
+    @StringGetter(INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES)
 	public boolean isInsertingWaitingVehiclesBeforeDrivingVehicles() {
 		return this.insertingWaitingVehiclesBeforeDrivingVehicles;
 	}
 
+    @StringSetter(INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES)
 	public void setInsertingWaitingVehiclesBeforeDrivingVehicles(boolean val) {
 		this.insertingWaitingVehiclesBeforeDrivingVehicles = val;
 	}
-	
+
+    @StringGetter(NODE_OFFSET)
 	public double getNodeOffset() {
 		return nodeOffset;
 	}
 	
-	public void setNodeOffset(double nodeOffset) {
+	@StringSetter(NODE_OFFSET)
+    public void setNodeOffset(double nodeOffset) {
 		this.nodeOffset = nodeOffset;
 	}
-	
+
+    @StringGetter(LINK_WIDTH)
 	public float getLinkWidth() {
 		return this.linkWidth;
 	}
 
+    @StringSetter(LINK_WIDTH)
 	public void setLinkWidth(final float linkWidth) {
 		this.linkWidth = linkWidth;
 	}
 
+    @StringGetter(LINK_DYNAMICS)
 	public String getLinkDynamics() {
 		return this.linkDynamics.toString() ;
 	}
+
+    @StringSetter(LINK_DYNAMICS)
 	public void setLinkDynamics( String str ) {
 		this.linkDynamics = LinkDynamics.valueOf( str ) ;
 	}
+
+    @StringGetter(USE_PERSON_ID_FOR_MISSING_VEHICLE_ID)
+    public boolean getUsePersonIdForMissingVehicleId() {
+        return usePersonIdForMissingVehicleId;
+    }
+
+    @StringSetter(USE_PERSON_ID_FOR_MISSING_VEHICLE_ID)
+    public void setUsePersonIdForMissingVehicleId(boolean value) {
+        this.usePersonIdForMissingVehicleId = value;
+    }
+
+    @StringGetter(USE_DEFAULT_VEHICLES)
+    public boolean getUseDefaultVehicles() {
+        return useDefaultVehicles;
+    }
+
+    @StringSetter(USE_DEFAULT_VEHICLES)
+    public void setUseDefaultVehicles(boolean useDefaultVehicles) {
+        this.useDefaultVehicles = useDefaultVehicles;
+    }
+
 }
