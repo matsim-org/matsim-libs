@@ -51,8 +51,8 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 public class ChoiceSet {
 	private int numberOfAlternatives;	
 	private ApproximationLevel approximationLevel;		
-	private List<Id> destinations = new Vector<Id>();
-	private List<Id> notYetVisited = new Vector<Id>();
+	private List<Id<ActivityFacility>> destinations = new Vector<Id<ActivityFacility>>();
+	private List<Id<ActivityFacility>> notYetVisited = new Vector<Id<ActivityFacility>>();
 	private final Network network;
 	private Config config;
 	private Scenario scenario;
@@ -61,12 +61,12 @@ public class ChoiceSet {
 	public String toString() {
 		StringBuilder stb = new StringBuilder() ;
 		stb.append("destinations:") ;
-		for ( Id id : destinations ) {
+		for ( Id<ActivityFacility> id : destinations ) {
 			stb.append( " "+id ) ;
 		}
 		stb.append("\n") ;
 		stb.append("notYetVisited:" ) ;
-		for ( Id id : notYetVisited ) {
+		for ( Id<ActivityFacility> id : notYetVisited ) {
 			stb.append( " "+id ) ;
 		}
 		return stb.toString() ;
@@ -93,7 +93,7 @@ public class ChoiceSet {
 		this.numberOfAlternatives = Integer.parseInt(config.locationchoice().getProbChoiceSetSize());
 	}
 	
-	public void addDestination(Id facilityId) {
+	public void addDestination(Id<ActivityFacility> facilityId) {
 		this.destinations.add(facilityId);
 		this.notYetVisited.add(facilityId);
 	}
@@ -103,14 +103,14 @@ public class ChoiceSet {
 		else return false;
 	}
 	
-	public Id visitNext() {
-		Id id = this.notYetVisited.get(0);
+	public Id<ActivityFacility> visitNext() {
+		Id<ActivityFacility> id = this.notYetVisited.get(0);
 		this.notYetVisited.remove(0);
 		return id;
 	}
 	
 	public void reset() {
-		for (Id id : this.destinations) {
+		for (Id<ActivityFacility> id : this.destinations) {
 			this.notYetVisited.add(id);
 		}
 	}
@@ -124,12 +124,12 @@ public class ChoiceSet {
 		Collections.shuffle(this.notYetVisited, rnd);
 	}
 	
-	public Id getWeightedRandomChoice(int actlegIndex, ActivityFacilities facilities,
+	public Id<ActivityFacility> getWeightedRandomChoice(int actlegIndex, ActivityFacilities facilities,
 			ScoringFunctionFactory scoringFunction, Plan plan, TripRouter tripRouter, double pKVal,
 			MultiNodeDijkstra forwardMultiNodeDijkstra, BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra,
 			int interation) {
 				
-		TreeMap<Double, Id> map;
+		TreeMap<Double, Id<ActivityFacility>> map;
 		
 		// if we have no destinations defined so far, we can shorten this
 		if (this.destinations.size() > 0) {
@@ -138,7 +138,7 @@ public class ChoiceSet {
 		} else {
 			// currently handled activity which should be re-located
 			Activity act = (Activity) plan.getPlanElements().get(actlegIndex);
-			Id facilityIdWithLargestScore = act.getFacilityId();
+			Id<ActivityFacility> facilityIdWithLargestScore = act.getFacilityId();
 			map = createEmptyChoiceMap(facilityIdWithLargestScore);
 		}
 				
@@ -169,8 +169,8 @@ public class ChoiceSet {
 		 * 
 		 * NOTE: Scores are not only normalized, but also accumulated!!!
 		 */
-		Id id = map.get(map.firstKey());		
-		for (Entry<Double, Id> entry : map.entrySet()) {
+		Id<ActivityFacility> id = map.get(map.firstKey());		
+		for (Entry<Double, Id<ActivityFacility>> entry : map.entrySet()) {
 	        if (entry.getKey() > randomScore + 0.000000000000000001) {
 	        	id = entry.getValue();
 	        }
@@ -201,7 +201,7 @@ public class ChoiceSet {
 		return id;
 	}
 	
-	private TreeMap<Double,Id> createReducedChoiceSetWithScores(
+	private TreeMap<Double, Id<ActivityFacility>> createReducedChoiceSetWithScores(
 			int actlegIndex,
 			ActivityFacilities facilities,
 			ScoringFunctionFactory scoringFunction,
@@ -209,59 +209,61 @@ public class ChoiceSet {
 			TripRouter router,
 			MultiNodeDijkstra forwardMultiNodeDijkstra,
 			BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra) {
-		
+
 		// currently handled activity which should be re-located
 		Activity act = (Activity) plan.getPlanElements().get(actlegIndex);
-		Node fromNode;
 		
-		/*
-		 * Assuming that both, forward and backward Dijkstra, route to the end nodes of links where
-		 * potential activities are located. Is this correct??
-		 * Otherwise, an ImaginaryNode for each routing direction has to be created.
-		 * cdobler, oct'13 
-		 */
-		List<InitialNode> destinationNodes = new ArrayList<InitialNode>();
-		for (Id destinationId : this.destinations) {
-			ActivityFacility destinationFacility = this.scenario.getActivityFacilities().getFacilities().get(destinationId);
-			Id linkId = destinationFacility.getLinkId();
-			Link destinationLink;
-			if (linkId != null) {
-				destinationLink = this.network.getLinks().get(linkId);				
-			} else destinationLink = ((NetworkImpl) this.network).getNearestLink(destinationFacility.getCoord());
+		// We need to calculate the multi node dijkstra stuff only in case LOCAL_ROUTING is used.
+		if (this.approximationLevel == ApproximationLevel.LOCAL_ROUTING) {
+			Node fromNode;
+			/*
+			 * Assuming that both, forward and backward Dijkstra, route to the end nodes of links where
+			 * potential activities are located. Is this correct??
+			 * Otherwise, an ImaginaryNode for each routing direction has to be created.
+			 * cdobler, oct'13 
+			 */
+			List<InitialNode> destinationNodes = new ArrayList<InitialNode>();
+			for (Id<ActivityFacility> destinationId : this.destinations) {
+				ActivityFacility destinationFacility = this.scenario.getActivityFacilities().getFacilities().get(destinationId);
+				Id<Link> linkId = destinationFacility.getLinkId();
+				Link destinationLink;
+				if (linkId != null) {
+					destinationLink = this.network.getLinks().get(linkId);				
+				} else destinationLink = ((NetworkImpl) this.network).getNearestLink(destinationFacility.getCoord());
+				
+				Node toNode = destinationLink.getToNode();
+				InitialNode initialToNode = new InitialNode(toNode, 0.0, 0.0);
+				destinationNodes.add(initialToNode);
+			}
+			ImaginaryNode destinationNode = forwardMultiNodeDijkstra.createImaginaryNode(destinationNodes);
 			
-			Node toNode = destinationLink.getToNode();
-			InitialNode initialToNode = new InitialNode(toNode, 0.0, 0.0);
-			destinationNodes.add(initialToNode);
-		}
-		ImaginaryNode destinationNode = forwardMultiNodeDijkstra.createImaginaryNode(destinationNodes);
-		
-		// ---
-		
-		Activity previousActivity = ((PlanImpl)plan).getPreviousActivity(((PlanImpl)plan).getPreviousLeg(act));
-		fromNode = this.network.getLinks().get(previousActivity.getLinkId()).getToNode();
-		
-		forwardMultiNodeDijkstra.calcLeastCostPath(fromNode, destinationNode, previousActivity.getEndTime(), plan.getPerson(), null);			
-
+			// ---
+			
+			Activity previousActivity = ((PlanImpl)plan).getPreviousActivity(((PlanImpl)plan).getPreviousLeg(act));
+			fromNode = this.network.getLinks().get(previousActivity.getLinkId()).getToNode();
+			
+			forwardMultiNodeDijkstra.calcLeastCostPath(fromNode, destinationNode, previousActivity.getEndTime(), plan.getPerson(), null);			
+			
 //		ForwardDijkstraMultipleDestinations leastCostPathCalculatorForward = new ForwardDijkstraMultipleDestinations(network, travelCost, travelTime);
 //		leastCostPathCalculatorForward.calcLeastCostTree(fromNode, previousActivity.getEndTime());
-		
-		// ---
-		
-		Activity nextActivity = ((PlanImpl)plan).getNextActivity(((PlanImpl)plan).getNextLeg(act));
-		fromNode = network.getLinks().get(nextActivity.getLinkId()).getToNode();
-
-		/*
-		 * The original code below uses the relocated activities end time as start time. Does this make sense?
-		 * Probably yes, since the trip to the next destination is short??
-		 * BUT: if we use that activities end time, we could also use another ForwardMultiNodeDijsktra...
-		 * Switched to nextActivity.startTime() since this time is also available in PlanTimesAdapter.computeTravelTimeFromLocalRouting()
-		 * where the path's created by the Dijkstra are used. So far (I think), the estimated start times
-		 * where used there (leastCostPathCalculatorBackward.setEstimatedStartTime(act.getEndTime())).
-		 * 
-		 * cdobler oct'13
-		 */
-		backwardMultiNodeDijkstra.calcLeastCostPath(fromNode, destinationNode, act.getEndTime(), plan.getPerson(), null);
-		
+			
+			// ---
+			
+			Activity nextActivity = ((PlanImpl)plan).getNextActivity(((PlanImpl)plan).getNextLeg(act));
+			fromNode = network.getLinks().get(nextActivity.getLinkId()).getToNode();
+			
+			/*
+			 * The original code below uses the relocated activities end time as start time. Does this make sense?
+			 * Probably yes, since the trip to the next destination is short??
+			 * BUT: if we use that activities end time, we could also use another ForwardMultiNodeDijsktra...
+			 * Switched to nextActivity.startTime() since this time is also available in PlanTimesAdapter.computeTravelTimeFromLocalRouting()
+			 * where the path's created by the Dijkstra are used. So far (I think), the estimated start times
+			 * where used there (leastCostPathCalculatorBackward.setEstimatedStartTime(act.getEndTime())).
+			 * 
+			 * cdobler oct'13
+			 */
+			backwardMultiNodeDijkstra.calcLeastCostPath(fromNode, destinationNode, act.getEndTime(), plan.getPerson(), null);
+			
 //		BackwardDijkstraMultipleDestinations leastCostPathCalculatorBackward = new BackwardDijkstraMultipleDestinations(network, travelCost, travelTime);
 //		leastCostPathCalculatorBackward.setEstimatedStartTime(act.getEndTime());
 //		// the backwards Dijkstra will expand from the _next_ activity location backwards to all locations in the system.  This is the time
@@ -270,8 +272,9 @@ public class ChoiceSet {
 //		leastCostPathCalculatorBackward.calcLeastCostTree(fromNode, -1.0);
 //		// "-1.0" is ignored.  It is not clear to me why we first set the (approximated) start time separately, and then ignore the startTime.
 //		// (The Dijkstra algo does not care if the start time is approximated or exact.)  kai, jan'13
-		
-		// ---
+			
+			// ---	
+		}
 		
 		// Handling duplicates. This was may the source for (small) random fluctuations
 		// yyyy which duplicates?  and how are they handled?  kai, jan'13
@@ -281,14 +284,14 @@ public class ChoiceSet {
 		// comment should be removed.
 		ArrayList<ScoredAlternative> list = new ArrayList<ScoredAlternative>();						
 		double largestValue = Double.NEGATIVE_INFINITY; 
-		Id facilityIdWithLargestScore = act.getFacilityId();
+		Id<ActivityFacility> facilityIdWithLargestScore = act.getFacilityId();
 		
 		/*
 		 * TODO: 
 		 * Can this be merged with the for loop above? So far, facilities are looked up twice.
 		 * cdobler, oct'13
 		 */
-		for (Id destinationId : this.destinations) {
+		for (Id<ActivityFacility> destinationId : this.destinations) {
 			// tentatively set 
 			((ActivityImpl)act).setFacilityId(destinationId);
 			((ActivityImpl)act).setCoord(facilities.getFacilities().get(destinationId).getCoord());
@@ -313,7 +316,7 @@ public class ChoiceSet {
 			}
 			list.add(new ScoredAlternative(score, destinationId));
 		}
-		TreeMap<Double,Id> mapCorrected = this.generateReducedChoiceSet(list);
+		TreeMap<Double, Id<ActivityFacility>> mapCorrected = this.generateReducedChoiceSet(list);
 		if (mapCorrected.size() > 0) {
 			return mapCorrected;
 		}
@@ -333,8 +336,8 @@ public class ChoiceSet {
 		}
 	}
 	
-	private TreeMap<Double, Id> createEmptyChoiceMap(Id facilityIdWithLargestScore) {
-		TreeMap<Double,Id> mapTmp = new TreeMap<Double,Id>();
+	private TreeMap<Double, Id<ActivityFacility>> createEmptyChoiceMap(Id<ActivityFacility> facilityIdWithLargestScore) {
+		TreeMap<Double, Id<ActivityFacility>> mapTmp = new TreeMap<Double, Id<ActivityFacility>>();
 		mapTmp.put(1.1, facilityIdWithLargestScore);
 		return mapTmp;
 	}
@@ -409,14 +412,14 @@ public class ChoiceSet {
 	 * (more than around 5 makes no sense actually)
 	 */
 	
-	private TreeMap<Double,Id> generateReducedChoiceSet(ArrayList<ScoredAlternative> list) {
+	private TreeMap<Double, Id<ActivityFacility>> generateReducedChoiceSet(ArrayList<ScoredAlternative> list) {
 		/* 
 		 * list is given here in descending order -> see compareTo in ScoredAlternative
 		 */		
 		Collections.sort(list);		
 		int nrElements = Math.min(list.size(), this.numberOfAlternatives);
 		
-		TreeMap<Double,Id> mapNormalized = new TreeMap<Double,Id>(java.util.Collections.reverseOrder());
+		TreeMap<Double, Id<ActivityFacility>> mapNormalized = new TreeMap<Double, Id<ActivityFacility>>(java.util.Collections.reverseOrder());
 		for (int index = 0; index < nrElements; index++)  {
 			double indexNormalized = 1.0 - Math.pow(0.4, (index + 1));
 			ScoredAlternative sa = list.get(index);				
