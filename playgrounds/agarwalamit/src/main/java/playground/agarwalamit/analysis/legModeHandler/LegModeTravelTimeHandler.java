@@ -20,8 +20,10 @@ package playground.agarwalamit.analysis.legModeHandler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -49,10 +51,14 @@ public class LegModeTravelTimeHandler implements PersonDepartureEventHandler, Pe
 	private Map<Id<Person>, Double> personId2DepartureTime;
 	private final int maxStuckAndAbortWarnCount=5;
 	private int warnCount = 0;
+	private Set<Id<Person>> stuckPersons;
+	private SortedMap<String, Double> mode2NumberOfLegs ;
 
 	public LegModeTravelTimeHandler() {
 		this.mode2PersonId2TravelTimes = new TreeMap<String, Map<Id<Person>,List<Double>>>();
 		this.personId2DepartureTime = new HashMap<Id<Person>, Double>();
+		this.stuckPersons = new HashSet<Id<Person>>();
+		this.mode2NumberOfLegs = new TreeMap<String, Double>();
 	}
 
 	@Override
@@ -97,20 +103,23 @@ public class LegModeTravelTimeHandler implements PersonDepartureEventHandler, Pe
 	}
 	
 	/**
-	 * @return  average travel time (averaged over all trips for that person) for each person segregated w.r.t. travel modes.
+	 * @return  Total travel time (summed for all trips for that person) for each person segregated w.r.t. travel modes.
 	 */
 	public SortedMap<String, Map<Id<Person>, Double>> getLegMode2PersonId2TotalTravelTime(){
 		SortedMap<String, Map<Id<Person>, Double>> mode2PersonId2TotalTravelTime = new TreeMap<String, Map<Id<Person>,Double>>();
 		for(String mode:this.mode2PersonId2TravelTimes.keySet()){
+			double noOfLeg =0;
 			Map<Id<Person>, Double> personId2TotalTravelTime = new HashMap<Id<Person>, Double>();
 			for(Id<Person> id:this.mode2PersonId2TravelTimes.get(mode).keySet()){
 				double travelTime=0;
 				for(double d:this.mode2PersonId2TravelTimes.get(mode).get(id)){
 					travelTime += d;
+					noOfLeg++;
 				}
 				personId2TotalTravelTime.put(id, travelTime);
 			}
 			mode2PersonId2TotalTravelTime.put(mode, personId2TotalTravelTime);
+			this.mode2NumberOfLegs.put(mode, noOfLeg);
 		}
 		return mode2PersonId2TotalTravelTime;
 	}
@@ -121,9 +130,18 @@ public class LegModeTravelTimeHandler implements PersonDepartureEventHandler, Pe
 	public SortedMap<String, Map<Id<Person>, List<Double>>> getLegMode2PesonId2TripTimes (){
 		return this.mode2PersonId2TravelTimes;
 	}
-
+	
+	public Set<Id<Person>> getStuckPersonsList (){
+		return stuckPersons;
+	}
+	
+	public SortedMap<String,Double> getTravelMode2NumberOfLegs(){
+		getLegMode2PersonId2TotalTravelTime();
+		return this.mode2NumberOfLegs;
+	}
 	@Override
 	public void handleEvent(PersonStuckEvent event) {
+		this.stuckPersons.add(event.getPersonId());
 		this.warnCount++;
 		if(this.warnCount<=this.maxStuckAndAbortWarnCount){
 		this.logger.warn("'StuckAndAbort' event is thrown for person "+event.getPersonId()+" on link "+event.getLinkId()+" at time "+event.getTime()+

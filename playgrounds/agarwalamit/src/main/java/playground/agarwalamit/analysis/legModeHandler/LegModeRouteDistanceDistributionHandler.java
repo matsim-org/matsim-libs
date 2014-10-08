@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
@@ -58,6 +57,7 @@ public class LegModeRouteDistanceDistributionHandler implements PersonDepartureE
 	private List<String> mainModes = new ArrayList<String>();
 	private Map<Id<Person>, String> personId2LegModes;
 	private double maxDist = Double.NEGATIVE_INFINITY;
+	private SortedMap<String, Double> mode2NumberOfLegs ;
 
 	public LegModeRouteDistanceDistributionHandler(Scenario scenario){
 		this.log.info("Route distance will be calculated based on events.");
@@ -69,6 +69,7 @@ public class LegModeRouteDistanceDistributionHandler implements PersonDepartureE
 		this.mode2PersonId2OneTripdist = new TreeMap<>();
 		this.mode2PersonId2TeleportDist = new TreeMap<>();
 		this.personId2LegModes = new HashMap<>();
+		this.mode2NumberOfLegs = new TreeMap<String, Double>();
 	}
 
 	@Override
@@ -184,5 +185,32 @@ public class LegModeRouteDistanceDistributionHandler implements PersonDepartureE
 		Map<Id<Person>, Double> person2Dist = mode2PersonId2TeleportDist.get(mode);
 		double teleportDist = event.getDistance();
 		person2Dist.put(personId, teleportDist);
+	}
+	
+	/**
+	 * @return  Total distance (summed for all trips for that person) for each person segregated w.r.t. travel modes.
+	 */
+	public SortedMap<String, Map<Id<Person>, Double>> getLegMode2PersonId2TotalTravelDistance(){
+		SortedMap<String, Map<Id<Person>, Double>> mode2PersonId2TotalTravelDistance = new TreeMap<String, Map<Id<Person>,Double>>();
+		for(String mode:this.mode2PersonId2distances.keySet()){
+			double noOfLeg =0;
+			Map<Id<Person>, Double> personId2TotalTravelDist = new HashMap<Id<Person>, Double>();
+			for(Id<Person> id:this.mode2PersonId2distances.get(mode).keySet()){
+				double travelDist=0;
+				for(double d:this.mode2PersonId2distances.get(mode).get(id)){
+					travelDist += d;
+					noOfLeg++;
+				}
+				personId2TotalTravelDist.put(id, travelDist);
+			}
+			mode2PersonId2TotalTravelDistance.put(mode, personId2TotalTravelDist);
+			this.mode2NumberOfLegs.put(mode, noOfLeg);
+		}
+		return mode2PersonId2TotalTravelDistance;
+	}
+	
+	public SortedMap<String,Double> getTravelMode2NumberOfLegs(){
+		getLegMode2PersonId2TotalTravelDistance();
+		return this.mode2NumberOfLegs;
 	}
 }
