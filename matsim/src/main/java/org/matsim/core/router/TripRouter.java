@@ -19,21 +19,11 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.utils.misc.Time;
+
+import java.util.*;
 
 /**
  * Class acting as an intermediate between clients needing to
@@ -45,7 +35,7 @@ import org.matsim.core.utils.misc.Time;
  */
 public final class TripRouter {
 	private final Map<String, RoutingModule> routingModules =
-		new HashMap<String , RoutingModule>();
+		new HashMap<>();
 	private final CompositeStageActivityTypes checker = new CompositeStageActivityTypes();
 
 	private MainModeIdentifier mainModeIdentifier = new MainModeIdentifierImpl();
@@ -278,7 +268,7 @@ public final class TripRouter {
 
 		// replace the trip and return the former one
 		List<PlanElement> seq = plan.subList( indexOfOrigin + 1 , indexOfDestination );
-		List<PlanElement> oldTrip = new ArrayList<PlanElement>( seq );
+		List<PlanElement> oldTrip = new ArrayList<>( seq );
 		seq.clear();
 		seq.addAll( trip );
 

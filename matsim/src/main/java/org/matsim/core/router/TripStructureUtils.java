@@ -19,17 +19,16 @@
  * *********************************************************************** */
 package org.matsim.core.router;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Helps to work on plans with complex trips.
@@ -48,18 +47,16 @@ import org.matsim.api.core.v01.population.PlanElement;
  * @author thibautd
  */
 public class TripStructureUtils {
-	private static final Logger log =
-		Logger.getLogger(TripStructureUtils.class);
 
-	private TripStructureUtils() {}
+    private TripStructureUtils() {}
 
 	// also need this for plain old fashioned legs.  kai
     public static List<Leg> getLegs(final Plan plan) {
 		return getLegs( plan.getPlanElements() );
 	}
 
-	public static List<Leg> getLegs( final List<PlanElement> planElements ) {
-		final List<Leg> legs = new ArrayList<Leg>();
+	public static List<Leg> getLegs( final List<? extends PlanElement> planElements ) {
+		final List<Leg> legs = new ArrayList<>();
 
 		for (PlanElement pe : planElements) {
 			if ( !(pe instanceof Leg) ) continue;
@@ -81,7 +78,7 @@ public class TripStructureUtils {
 	public static List<Activity> getActivities(
 			final List<PlanElement> planElements,
 			final StageActivityTypes stageActivities) {
-		final List<Activity> activities = new ArrayList<Activity>();
+		final List<Activity> activities = new ArrayList<>();
 
 		for (PlanElement pe : planElements) {
 			if ( !(pe instanceof Activity) ) continue;
@@ -107,7 +104,7 @@ public class TripStructureUtils {
 	public static List<Trip> getTrips(
 			final List<PlanElement> planElements,
 			final StageActivityTypes stageActivities) {
-		final List<Trip> trips = new ArrayList<Trip>();
+		final List<Trip> trips = new ArrayList<>();
 
 		int originActivityIndex = -1;
 		int currentIndex = -1;
@@ -126,7 +123,7 @@ public class TripStructureUtils {
 						// in an undefined behavior if the full sequence was modified
 						// (for instance by modifying another trip)
 						Collections.unmodifiableList(
-							new ArrayList<PlanElement>(
+							new ArrayList<>(
 								planElements.subList(
 									originActivityIndex + 1,
 									currentIndex))),
@@ -198,12 +195,12 @@ public class TripStructureUtils {
 			final List<PlanElement> planElements,
 			final StageActivityTypes stageActivityTypes,
 			final boolean useFacilitiesInsteadOfLinks) {
-		final List<Subtour> subtours = new ArrayList<Subtour>();
+		final List<Subtour> subtours = new ArrayList<>();
 
 		Id<?> destinationId = null;
-		final List<Id<?>> originIds = new ArrayList<Id<?>>();
+		final List<Id<?>> originIds = new ArrayList<>();
 		final List<Trip> trips = getTrips( planElements , stageActivityTypes );
-		final List<Trip> nonAllocatedTrips = new ArrayList<Trip>( trips );
+		final List<Trip> nonAllocatedTrips = new ArrayList<>( trips );
 		for (Trip trip : trips) {
 			final Id<?> originId = useFacilitiesInsteadOfLinks ?
 				trip.getOriginActivity().getFacilityId() :
@@ -238,7 +235,7 @@ public class TripStructureUtils {
 				final int subtourStartIndex = originIds.lastIndexOf( destinationId );
 				final int subtourEndIndex = originIds.size();
 
-				final List<Trip> subtour = new ArrayList<Trip>( trips.subList( subtourStartIndex , subtourEndIndex ) );
+				final List<Trip> subtour = new ArrayList<>( trips.subList( subtourStartIndex , subtourEndIndex ) );
 				nonAllocatedTrips.removeAll( subtour );
 
 				// do not consider the locations visited in finished subtours
@@ -270,7 +267,7 @@ public class TripStructureUtils {
 					new Subtour(
 						indexFirst,
 						indexLast,
-						new ArrayList<Trip>( trips.subList( indexFirst , indexLast ) ),
+						new ArrayList<>( trips.subList( indexFirst , indexLast ) ),
 						false));
 		}
 
@@ -323,7 +320,7 @@ public class TripStructureUtils {
 		}
 
 		private static List<Leg> extractLegs( final List<PlanElement> trip ) {
-			final List<Leg> legs = new ArrayList<Leg>();
+			final List<Leg> legs = new ArrayList<>();
 
 			for (PlanElement pe : trip) {
 				if ( pe instanceof Leg ) {
@@ -384,7 +381,7 @@ public class TripStructureUtils {
 		private final List<Trip> trips;
 		private final boolean isClosed;
 		Subtour parent = null;
-		final List<Subtour> children = new ArrayList<Subtour>();
+		final List<Subtour> children = new ArrayList<>();
 
 		// for tests
 		Subtour(final List<Trip> trips, final boolean isClosed) {
@@ -406,7 +403,7 @@ public class TripStructureUtils {
 		}
 
 		public List<Trip> getTripsWithoutSubSubtours() {
-			final List<Trip> list = new ArrayList<Trip>();
+			final List<Trip> list = new ArrayList<>();
 
 			for (Trip t : trips) {
 				boolean isInChildSt = false;
