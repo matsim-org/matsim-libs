@@ -231,7 +231,7 @@ class ScenarioXMLMask extends JPanel implements ActionListener {
 //		for (int i = 0; i < distTypeElements.length; i++)
 //			this.distTypeStrings[i] = distTypeElements[i].toString();
 		//TODO: think about this [GL Sep '14]
-		this.distTypeStrings = new String[]{"vehicular","pedestrian"};
+		this.distTypeStrings = new String[]{"normal","log-normal", "dirac-delta"};
 		
 		
 		
@@ -450,7 +450,7 @@ class ScenarioXMLMask extends JPanel implements ActionListener {
 				this.gcm.setNetworkFileName(osmfile);
 				this.gcm.setMainTrafficType(this.boxTrafficType.getSelectedItem().toString().toLowerCase());
 				DepartureTimeDistribution dtdt = new DepartureTimeDistribution();
-				dtdt.setDistribution(this.boxDepTime.getSelectedItem().toString().toUpperCase().replaceAll("-", "_"));
+				dtdt.setDistribution(this.boxDepTime.getSelectedItem().toString());
 				dtdt.setSigma(Double.valueOf(this.textFieldSigma.getText()));
 				dtdt.setMu(Double.valueOf(this.textFieldMu.getText()));
 				dtdt.setEarliest(Double.valueOf(this.textFieldEarliest.getText()));
