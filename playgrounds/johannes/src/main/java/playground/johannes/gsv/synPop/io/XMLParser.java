@@ -19,8 +19,10 @@
 
 package playground.johannes.gsv.synPop.io;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
@@ -49,12 +51,18 @@ public class XMLParser extends MatsimXmlParser {
 	
 	private ProxyPlan plan;
 	
+	private List<String> blacklist = new ArrayList<>();
+	
 	public Set<ProxyPerson> getPersons() {
 		return persons;
 	}
 	
 	public void addSerializer(String key, AttributeSerializer serializer) {
 		serializers.put(key, serializer);
+	}
+	
+	public void addToBlacklist(String key) {
+		blacklist.add(key);
 	}
 	
 	/* (non-Javadoc)
@@ -70,7 +78,9 @@ public class XMLParser extends MatsimXmlParser {
 			for(int i = 0; i < atts.getLength(); i++) {
 				String type = atts.getLocalName(i);
 				if(!type.equalsIgnoreCase(Constants.ID_KEY)) {
-					person.setAttribute(type, getAttribute(type, atts));
+					if(!blacklist.contains(type)) {
+						person.setAttribute(type, getAttribute(type, atts));
+					}
 				}
 			}
 		} else if (name.equalsIgnoreCase(Constants.PLAN_TAG)) {
@@ -79,7 +89,9 @@ public class XMLParser extends MatsimXmlParser {
 			ProxyObject act = new ProxyObject();
 			for(int i = 0; i < atts.getLength(); i++) {
 				String type = atts.getLocalName(i);
-				act.setAttribute(type, getAttribute(type, atts));
+				if(!blacklist.contains(type)) {
+					act.setAttribute(type, getAttribute(type, atts));
+				}
 			}
 			plan.addActivity(act);
 			
@@ -87,7 +99,9 @@ public class XMLParser extends MatsimXmlParser {
 			ProxyObject leg = new ProxyObject();
 			for(int i = 0; i < atts.getLength(); i++) {
 				String type = atts.getLocalName(i);
-				leg.setAttribute(type, getAttribute(type, atts));
+				if(!blacklist.contains(type)) {
+					leg.setAttribute(type, getAttribute(type, atts));
+				}
 			}
 			plan.addLeg(leg);
 			

@@ -22,6 +22,7 @@ package playground.johannes.gsv.synPop.sim3;
 import gnu.trove.TDoubleDoubleHashMap;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
@@ -128,9 +129,12 @@ public class HamiltonianLogger implements SamplerListener {
 			}
 			
 			TDoubleDoubleHashMap hist = Histogram.createHistogram(stats, FixedSampleSizeDiscretizer.create(stats.getValues(), 1, 100), true);
-			String file = String.format("%s/%s.%s.txt", outdir, h.getClass().getSimpleName(), iterNow);
+//			String file = String.format("%s/%s.%s.txt", outdir, h.getClass().getSimpleName(), iterNow);
+			String file = String.format("%s/%s", outdir, h.getClass().getSimpleName());
+			File afile = new File(file);
+			afile.mkdirs();
 			try {
-				TXTWriter.writeMap(hist, "value", "frequency", file);
+				TXTWriter.writeMap(hist, "value", "frequency", String.format("%s/%s.txt", file, iter));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

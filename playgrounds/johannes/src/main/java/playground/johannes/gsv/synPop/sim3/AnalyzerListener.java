@@ -17,45 +17,59 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.sim2;
+package playground.johannes.gsv.synPop.sim3;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Set;
 
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzer;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
+import playground.johannes.coopsim.analysis.TripDistanceTask;
 import playground.johannes.coopsim.pysical.Trajectory;
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.analysis.ActivityDistanceTask;
+import playground.johannes.gsv.synPop.analysis.AnalyzerTask;
+import playground.johannes.gsv.synPop.analysis.LegTargetDistanceTask;
+import playground.johannes.gsv.synPop.analysis.ProxyAnalyzer;
 import playground.johannes.gsv.synPop.analysis.TrajectoryProxyBuilder;
+import playground.johannes.gsv.synPop.data.DataPool;
+import playground.johannes.gsv.synPop.data.FacilityData;
+import playground.johannes.gsv.synPop.data.FacilityDataLoader;
+import playground.johannes.socialnetworks.gis.CartesianDistanceCalculator;
 
 /**
  * @author johannes
- *
+ * 
  */
 public class AnalyzerListener implements SamplerListener {
 
 	private final TrajectoryAnalyzerTaskComposite task;
+
+	private final AnalyzerTask pTask;
 	
 	private final String rootDir;
-	
+
 	private long iters;
-	
-	public AnalyzerListener(ActivityFacilities facilities, String rootDir) {
+
+	public AnalyzerListener(DataPool dataPool, String rootDir) {
 		this.rootDir = rootDir;
 		task = new TrajectoryAnalyzerTaskComposite();
-		task.addTask(new FacilityOccupancyTask(facilities));
-//		task.addTask(new ActivityDistanceTask(facilities));
-	
+
+		FacilityData data = (FacilityData) dataPool.get(FacilityDataLoader.KEY);
+		// task.addTask(new FacilityOccupancyTask(facilities));
+		task.addTask(new TripDistanceTask(data.getAll(), CartesianDistanceCalculator.getInstance()));
+		
+		pTask = new LegTargetDistanceTask("car");
+		ProxyAnalyzer.setAppend(true);
+
 	}
-	
+
 	@Override
-	public void afterStep(Collection<ProxyPerson> population, ProxyPerson person, boolean accpeted) {
+	public void afterStep(Collection<ProxyPerson> population, Collection<ProxyPerson> mutations, boolean accepted) {
 		iters++;
+		
+		new CopyFacilityUserData().afterStep(population, mutations, accepted);
 		
 		Set<Trajectory> trajectories = TrajectoryProxyBuilder.buildTrajectories(population);
 		String output = String.format("%s/%s", rootDir, String.valueOf(iters));
@@ -63,18 +77,11 @@ public class AnalyzerListener implements SamplerListener {
 		file.mkdirs();
 		try {
 			TrajectoryAnalyzer.analyze(trajectories, task, file.getAbsolutePath());
+			ProxyAnalyzer.analyze(population, pTask, file.getAbsolutePath());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.synPop.sim2.SamplerListener#afterModify(playground.johannes.gsv.synPop.ProxyPerson)
-	 */
-	@Override
-	public void afterModify(ProxyPerson person) {
-		// TODO Auto-generated method stub
-		
 	}
 
 }

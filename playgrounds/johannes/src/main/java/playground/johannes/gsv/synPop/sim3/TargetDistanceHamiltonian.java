@@ -72,7 +72,9 @@ public class TargetDistanceHamiltonian implements Hamiltonian {
 		Coord c1 = orgFac.getCoord();
 		Coord c2 = destFac.getCoord();
 
-		double d = Math.sqrt(c1.getX() * c2.getX() + c1.getY() * c2.getY()); 
+		double dx = c1.getX() - c2.getX();
+		double dy = c1.getY() - c2.getY();
+		double d = Math.sqrt(dx*dx + dy*dy); 
 		
 		return d;
 	}

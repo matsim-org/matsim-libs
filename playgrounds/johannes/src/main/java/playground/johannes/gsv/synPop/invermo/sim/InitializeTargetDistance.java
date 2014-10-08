@@ -89,14 +89,26 @@ public class InitializeTargetDistance implements ProxyPlanTask {
 		XMLParser parser = new XMLParser();
 		parser.setValidating(false);
 	
+		parser.addToBlacklist("workLoc");
+		parser.addToBlacklist("homeLoc");
+		parser.addToBlacklist("homeCoord");
+		parser.addToBlacklist("location");
+		parser.addToBlacklist("state");
+		parser.addToBlacklist("inhabClass");
+		parser.addToBlacklist("index");
+		parser.addToBlacklist("roundTrip");
+		parser.addToBlacklist("origin");
+		parser.addToBlacklist("purpose");
+		parser.addToBlacklist("delete");
+		
 		logger.info("Loading persons...");
-		parser.parse("/home/johannes/gsv/invermo/pop.de.car.xml");
+		parser.parse("/home/johannes/gsv/invermo/5.pop.xml");
 		Set<ProxyPerson> persons = parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons.size()));
 		
 		ProxyTaskRunner.run(new InitializeTargetDistance(), persons);
 		
 		XMLWriter writer = new XMLWriter();
-		writer.write("/home/johannes/gsv/invermo/pop.de.car.dist.xml", persons);
+		writer.write("/home/johannes/gsv/invermo/5.pop.dist.xml", persons);
 	}
 }

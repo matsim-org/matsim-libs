@@ -36,41 +36,65 @@ public class MergePopulations {
 		XMLParser parser = new XMLParser();
 		parser.setValidating(false);
 
+		parser.addToBlacklist("workLoc");
+		parser.addToBlacklist("homeLoc");
+		parser.addToBlacklist("homeCoord");
+		parser.addToBlacklist("location");
+		parser.addToBlacklist("coord");
+		parser.addToBlacklist("state");
+		parser.addToBlacklist("inhabClass");
+		parser.addToBlacklist("index");
+		parser.addToBlacklist("roundTrip");
+		parser.addToBlacklist("origin");
+		parser.addToBlacklist("purpose");
+		parser.addToBlacklist("delete");
+		
 		logger.info("Loading persons...");
-		parser.parse("");
+		parser.parse(args[0]);
 		Set<ProxyPerson> persons1 = parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons1.size()));
 
 		logger.info("Loading persons...");
-		parser.parse("");
+		parser.parse(args[1]);
 		Set<ProxyPerson> persons2 = parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons2.size()));
 
-		double proba1 = 0;
-		double proba2 = 0;
+		double w1 = 10;
+		double w2 = 1;
 		
-		proba1 = proba1/(proba1 + proba2);
-		proba2 = proba2/(proba1 + proba2);
+		double proba1 = w1/(w1 + w2);
+		double proba2 = w2/(w1 + w2);
 		
-		int N = 1000000;
+		logger.info(String.format("Probability for population 1: %s", proba1));
+		logger.info(String.format("Probability for population 2: %s", proba2));
+		
+		int N = Integer.parseInt(args[3]);
+		logger.info(String.format("Generating %s persons...", N));
 		
 		int n1 = (int) (N * proba1);
 		int n2 = N - n1;
 		
+		logger.info(String.format("Person from population 1: %s", n1));
+		logger.info(String.format("Person from population 2: %s", n2));
+		
 		Set<ProxyPerson> newPersons = new HashSet<>(N);
 		
+		logger.info("Merging population 1...");
 		Iterator<ProxyPerson> it = persons1.iterator();
 		for(int i = 0; i < n1; i++) {
 			newPersons.add(it.next());
 		}
 		
+		logger.info("Merging population 2...");
 		it = persons2.iterator();
 		for(int i = 0; i < n2; i++) {
 			newPersons.add(it.next());
 		}
 		
+		logger.info("Writing population...");
 		XMLWriter writer = new XMLWriter();
-		writer.write("", newPersons);
+		writer.write(args[2], newPersons);
+		logger.info("Done.");
 	}
 
 }

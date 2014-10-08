@@ -19,6 +19,7 @@
 
 package playground.johannes.gsv.synPop.sim3;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
 import playground.johannes.gsv.synPop.CommonKeys;
@@ -33,20 +34,23 @@ public class InitActivitLocations implements ProxyPlanTask {
 
 	private final FacilityData data;
 
-	private final String blacklist;
-	
-	public InitActivitLocations(DataPool dataPool, String blacklist) {
+	public InitActivitLocations(DataPool dataPool) {
 		this.data = (FacilityData) dataPool.get(FacilityDataLoader.KEY);
-		this.blacklist = blacklist;
 	}
 
 	@Override
 	public void apply(ProxyPlan plan) {
-		for(ProxyObject act : plan.getActivities()) {
-			String type = act.getAttribute(CommonKeys.ACTIVITY_TYPE);
-			if(blacklist == null || !blacklist.equalsIgnoreCase(type)) {
+		for (ProxyObject act : plan.getActivities()) {
+			String id = act.getAttribute(CommonKeys.ACTIVITY_FACILITY);
+			if (id != null) {
+				Id<ActivityFacility> idObj = Id.create(id, ActivityFacility.class);
+				ActivityFacility f = data.getAll().getFacilities().get(idObj);
+				act.setUserData(ActivityLocationMutator.USER_DATA_KEY, f);
+			} else {
+				String type = act.getAttribute(CommonKeys.ACTIVITY_TYPE);
 				ActivityFacility f = data.randomFacility(type);
 				act.setUserData(ActivityLocationMutator.USER_DATA_KEY, f);
+
 			}
 		}
 

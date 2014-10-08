@@ -38,6 +38,12 @@ import playground.johannes.gsv.synPop.ProxyPerson;
  *
  */
 public class ProxyAnalyzer {
+	
+	private static boolean append = false;
+	
+	public static void setAppend(boolean append) {
+		ProxyAnalyzer.append = append;
+	}
 
 	public static Map<String, DescriptiveStatistics> analyze(Collection<ProxyPerson> person, AnalyzerTask task) {
 		Map<String, DescriptiveStatistics> results = new HashMap<String, DescriptiveStatistics>();
@@ -52,7 +58,7 @@ public class ProxyAnalyzer {
 	}
 	
 	public static void writeStatistics(Map<String, DescriptiveStatistics> statsMap, String filename) throws IOException {
-		BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
+		BufferedWriter writer = new BufferedWriter(new FileWriter(filename, append));
 		
 		writer.write("property\tmean\tmin\tmax\tmedian\tN\tvar");
 		writer.newLine();

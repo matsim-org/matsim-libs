@@ -31,14 +31,9 @@ import playground.johannes.gsv.synPop.ActivityType;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.data.DataPool;
 import playground.johannes.gsv.synPop.data.FacilityDataLoader;
-import playground.johannes.gsv.synPop.data.FacilityZoneValidator;
-import playground.johannes.gsv.synPop.data.LandUseDataLoader;
-import playground.johannes.gsv.synPop.invermo.sim.CopyHomeLocations;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.mid.PersonCloner;
 import playground.johannes.gsv.synPop.mid.run.ProxyTaskRunner;
-import playground.johannes.gsv.synPop.mid.sim.PersonLau2Inhabitants;
-import playground.johannes.gsv.synPop.mid.sim.PersonNuts1Name;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 
 /**
@@ -62,6 +57,19 @@ public class SetActivityLocations {
 		XMLParser parser = new XMLParser();
 		parser.setValidating(false);
 	
+		parser.addToBlacklist("workLoc");
+		parser.addToBlacklist("homeLoc");
+		parser.addToBlacklist("homeCoord");
+		parser.addToBlacklist("location");
+		parser.addToBlacklist("coord");
+		parser.addToBlacklist("state");
+		parser.addToBlacklist("inhabClass");
+		parser.addToBlacklist("index");
+		parser.addToBlacklist("roundTrip");
+		parser.addToBlacklist("origin");
+		parser.addToBlacklist("purpose");
+		parser.addToBlacklist("delete");
+		
 		logger.info("Loading persons...");
 		parser.parse(config.findParam(MODULE_NAME, "popInputFile"));
 		Set<ProxyPerson> persons = parser.getPersons();
@@ -86,7 +94,7 @@ public class SetActivityLocations {
 		 * Assign random facilities to acts
 		 */
 		logger.info("Initializing activities...");
-		ProxyTaskRunner.run(new InitActivitLocations(dataPool, ActivityType.HOME), persons);
+		ProxyTaskRunner.run(new InitActivitLocations(dataPool), persons);
 		
 		logger.info("Setting up sampler...");
 		/*
@@ -94,7 +102,9 @@ public class SetActivityLocations {
 		 */
 		HamiltonianComposite H = new HamiltonianComposite();
 		TargetDistanceHamiltonian distance = new TargetDistanceHamiltonian();
-		H.addComponent(distance, 1);
+		H.addComponent(distance, 10000);
+//		TargetDistanceAbsolute distance = new TargetDistanceAbsolute();
+//		H.addComponent(distance, 1);
 		/*
 		 * Build the move set and sampler
 		 */
@@ -108,7 +118,9 @@ public class SetActivityLocations {
 		 * need to copy activity location user key to activity attributes
 		 */
 		int dumpInterval = (int) Double.parseDouble(config.getParam(MODULE_NAME, "dumpInterval"));
+		int logInterval = (int) Double.parseDouble(config.getParam(MODULE_NAME, "logInterval"));
 		lComposite.addComponent(new BlockingSamplerListener(new CopyFacilityUserData(), dumpInterval));
+//		lComposite.addComponent(new BlockingSamplerListener(new CopyFacilityUserData(), logInterval));
 		/*
 		 * add a population writer
 		 */
@@ -119,8 +131,10 @@ public class SetActivityLocations {
 		/*
 		 * add loggers
 		 */
-		int logInterval = (int) Double.parseDouble(config.getParam(MODULE_NAME, "logInterval"));
+		
 		lComposite.addComponent(new HamiltonianLogger(distance, logInterval, outputDir));
+		lComposite.addComponent(new HamiltonianLogger(new TargetDistanceAbsolute(), logInterval, outputDir));
+		lComposite.addComponent(new BlockingSamplerListener(new AnalyzerListener(dataPool, outputDir), dumpInterval));
 		
 		SamplerLogger slogger = new SamplerLogger();
 		lComposite.addComponent(slogger);

@@ -17,59 +17,67 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.sim2;
+package playground.johannes.gsv.synPop.sim3;
 
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.ActivityOption;
 
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyObject;
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.sim.MutateActivityLocation;
-import playground.johannes.gsv.synPop.sim3.Hamiltonian;
 
 /**
  * @author johannes
  *
  */
-public class HFacilityCapacity implements Hamiltonian {
+public class TargetDistanceAbsolute implements Hamiltonian {
+	
+	private final double detourFactor = 1.3;
 
-	private final String whitelist;
-	
-	private final ActivityFacilities facilities;
-	
-	public HFacilityCapacity(String whitelist, ActivityFacilities facilities) {
-		this.whitelist = whitelist;
-		this.facilities = facilities;
-	}
-	
-	@Override
+	private static final Object TARGET_DISTANCE_KEY = new Object();
+
 	public double evaluate(ProxyPerson person) {
-		double sum = 0;
+		double errSum = 0;
 		
-		for(int i = 0; i < person.getPlan().getActivities().size(); i++) {
-			ProxyObject act = person.getPlan().getActivities().get(i);
-			String type = act.getAttribute(CommonKeys.ACTIVITY_TYPE);
+		for (int i = 1; i < person.getPlan().getActivities().size(); i++) {
+			ProxyObject leg = person.getPlan().getLegs().get(i - 1);
+			Double targetDistance = (Double) leg.getUserData(TARGET_DISTANCE_KEY);
 			
-			if(whitelist == null || whitelist.equalsIgnoreCase(type)) {
-				
-				ActivityFacility facility = (ActivityFacility) act.getUserData(MutateActivityLocation.USER_DATA_KEY);
-				
-				if(facility == null) {
-					facility = facilities.getFacilities().get(new IdImpl(act.getAttribute(CommonKeys.ACTIVITY_FACILITY)));
-					act.setUserData(MutateActivityLocation.USER_DATA_KEY, facility);
+			if (targetDistance == null) {
+				String val = leg.getAttribute(CommonKeys.LEG_DISTANCE);
+				if (val != null) {
+					targetDistance = new Double(val);
 				}
+			}
+
+			if (targetDistance != null) {
+				ProxyObject prev = person.getPlan().getActivities().get(i - 1);
+				ProxyObject next = person.getPlan().getActivities().get(i);
 				
-				
-				ActivityOption option = facility.getActivityOptions().get(type);
-				
-				sum += option.getCapacity();
+				double dist = distance(prev, next);
+				dist = dist * detourFactor;
+				double delta = Math.abs(dist - targetDistance);
+//				if(targetDistance > 1000000)
+//					System.err.println();
+				errSum += delta;
 			}
 		}
-		 
-		return -sum;
+		
+		return errSum;
+	}
+	
+	private double distance(ProxyObject origin, ProxyObject destination) {
+		ActivityFacility orgFac = (ActivityFacility) origin.getUserData(ActivityLocationMutator.USER_DATA_KEY);
+		ActivityFacility destFac = (ActivityFacility) destination.getUserData(ActivityLocationMutator.USER_DATA_KEY);
+
+		Coord c1 = orgFac.getCoord();
+		Coord c2 = destFac.getCoord();
+
+		double dx = c1.getX() - c2.getX();
+		double dy = c1.getY() - c2.getY();
+		double d = Math.sqrt(dx*dx + dy*dy); 
+		
+		return d;
 	}
 
 }
