@@ -1,4 +1,5 @@
 package playground.toronto.gtfsutils;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -11,9 +12,11 @@ import java.util.HashSet;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.toronto.demand.util.TableReader;
 
@@ -36,23 +39,23 @@ public class CreateGTFSFrequencies {
 
 	private static final Logger log = Logger.getLogger(CreateGTFSFrequencies.class);
 	
-	private static HashMap<IdImpl, Trip> trips;
-	private static HashMap<IdImpl, TripGroup> groups;
-	private static HashMap<IdImpl, Period> frequencies;
+	private static HashMap<Id<Trip>, Trip> trips;
+	private static HashMap<Id<TripGroup>, TripGroup> groups;
+	private static HashMap<Id, Period> frequencies;
 	
 	private static boolean filesLoaded = false;
 	private static boolean tripsGrouped = false;
 	private static boolean frequenciesCreated = false;
 	
-	private static HashMap<String, IdImpl> stopSequenceTripGroupMap;
-	private static HashMap<IdImpl, String> tripGroupStopSequenceMap; //The above map in reverse.
-	private static HashMap<IdImpl, String> routeIdNameMap;
-	private static HashSet<IdImpl> tripGroupsWithOneTrip;
+	private static HashMap<String, Id> stopSequenceTripGroupMap;
+	private static HashMap<Id, String> tripGroupStopSequenceMap; //The above map in reverse.
+	private static HashMap<Id, String> routeIdNameMap;
+	private static HashSet<Id> tripGroupsWithOneTrip;
 	
 	private static void loadFiles(String folder, String service) throws FileNotFoundException, IOException{
 		
-		routeIdNameMap = new HashMap<IdImpl, String>();
-		trips = new HashMap<IdImpl, CreateGTFSFrequencies.Trip>();
+		routeIdNameMap = new HashMap<Id, String>();
+		trips = new HashMap<>();
 		TableReader tr;
 		
 		log.info("Opening GTFS files in folder " + folder);		
@@ -60,7 +63,7 @@ public class CreateGTFSFrequencies {
 		tr = new TableReader(folder + "/routes.txt");
 		tr.open();
 		tr.ignoreTrailingBlanks(true);
-		while (tr.next()) routeIdNameMap.put(new IdImpl(tr.current().get("route_id")), tr.current().get("route_short_name"));
+		while (tr.next()) routeIdNameMap.put(Id.create(tr.current().get("route_id"), TransitRoute.class), tr.current().get("route_short_name"));
 		tr.close();
 		log.info("routes.txt loaded.");
 		
@@ -72,10 +75,10 @@ public class CreateGTFSFrequencies {
 			String svc = tr.current().get("service_id");
 			if (!service.equals(svc)) continue;
 			
-			Trip T = new Trip(new IdImpl(tr.current().get("trip_id")));
+			Trip T = new Trip(Id.create(tr.current().get("trip_id"), Trip.class));
 			T.dir = tr.current().get("direction_id");
 			T.shape = tr.current().get("shape_id");
-			T.routeId = new IdImpl(tr.current().get("route_id"));
+			T.routeId = Id.create(tr.current().get("route_id"), TransitRoute.class);
 			T.headsign = tr.current().get("trip_headsign");
 			T.serviceId = "" + svc;
 			trips.put(T.id, T);
@@ -88,13 +91,13 @@ public class CreateGTFSFrequencies {
 		tr.open();
 		tr.ignoreTrailingBlanks(true);
 		while(tr.next()){
-			IdImpl tpId = new IdImpl(tr.current().get("trip_id"));
+			Id<Trip> tpId = Id.create(tr.current().get("trip_id"), Trip.class);
 			if (!trips.containsKey(tpId)) continue;//throw new IOException("Trip \"" + tpId.toString() + "\" could not be found! This is a problem with the data.");
 			Trip T = trips.get(tpId);
 
 			double dep = Time.parseTime(tr.current().get("departure_time"));
 			double arr = Time.parseTime(tr.current().get("arrival_time"));
-			IdImpl stopId = new IdImpl(tr.current().get("stop_id"));
+			Id<TransitStopFacility> stopId = Id.create(tr.current().get("stop_id"), TransitStopFacility.class);
 			Integer stopIndex = new Integer(tr.current().get("stop_sequence"));
 			Tuple<Double, Double> times = new Tuple<Double, Double>(dep, arr);
 			Tuple<String,String> stopCodes = new Tuple<String, String>(tr.current().get("pickup_type"), tr.current().get("drop_off_type"));
@@ -113,13 +116,13 @@ public class CreateGTFSFrequencies {
 	private static void buildGroups() throws IOException{
 		if(!filesLoaded) throw new IOException("Files have not been loaded!");
 		
-		groups = new HashMap<IdImpl, CreateGTFSFrequencies.TripGroup>();
-		stopSequenceTripGroupMap = new HashMap<String, IdImpl>();
-		tripGroupStopSequenceMap = new HashMap<IdImpl, String>();
+		groups = new HashMap<>();
+		stopSequenceTripGroupMap = new HashMap<String, Id>();
+		tripGroupStopSequenceMap = new HashMap<Id, String>();
 		
 		//Create a simple map to store the number of branches per direction per route. 
-		HashMap<IdImpl, HashMap<String, Integer>> routeBranchNumbersMap;routeBranchNumbersMap = new HashMap<IdImpl, HashMap<String,Integer>>();
-		for (IdImpl r : routeIdNameMap.keySet()) routeBranchNumbersMap.put(r, new HashMap<String, Integer>());
+		HashMap<Id, HashMap<String, Integer>> routeBranchNumbersMap;routeBranchNumbersMap = new HashMap<Id, HashMap<String,Integer>>();
+		for (Id r : routeIdNameMap.keySet()) routeBranchNumbersMap.put(r, new HashMap<String, Integer>());
 		
 		//Iterate through the trips
 		for (Trip T : trips.values()){
@@ -135,7 +138,7 @@ public class CreateGTFSFrequencies {
 				}else branchNum = routeBranchNumbersMap.get(T.routeId).get(T.dir) + 1;
 				routeBranchNumbersMap.get(T.routeId).put(T.dir, branchNum);
 				
-				IdImpl groupId = new IdImpl(routeName + "-D" + T.dir + "_B" + branchNum.toString());
+				Id<TripGroup> groupId = Id.create(routeName + "-D" + T.dir + "_B" + branchNum.toString(), TripGroup.class);
 				TripGroup g = new TripGroup(groupId);
 				
 				//I've assumed that the following properties are the same for all trips in a trip-group.
@@ -161,8 +164,8 @@ public class CreateGTFSFrequencies {
 	private static void buildFrequencies() throws Exception{
 		if (!tripsGrouped) throw new Exception("Trips have not been grouped!");
 		
-		frequencies = new HashMap<IdImpl, CreateGTFSFrequencies.Period>();
-		tripGroupsWithOneTrip = new HashSet<IdImpl>();
+		frequencies = new HashMap<>();
+		tripGroupsWithOneTrip = new HashSet<Id>();
 		int currentPeriod = 1;
 		
 		for (TripGroup group : groups.values()){
@@ -172,10 +175,10 @@ public class CreateGTFSFrequencies {
 			}
 			
 			ArrayList<Trip> tps = new ArrayList<CreateGTFSFrequencies.Trip>();
-			for (IdImpl t : group.trips) tps.add(trips.get(t));
+			for (Id t : group.trips) tps.add(trips.get(t));
 			Collections.sort(tps);
 			
-			Period f = new Period(new IdImpl(currentPeriod++));
+			Period f = new Period(Id.create(currentPeriod++, Period.class));
 			f.groupId = group.id;
 			f.startTime = tps.get(0).departure;
 			double prevDep = tps.get(1).departure;
@@ -193,7 +196,7 @@ public class CreateGTFSFrequencies {
 					
 					frequencies.put(f.id, f);
 					
-					f = new Period(new IdImpl(currentPeriod++));
+					f = new Period(Id.create(currentPeriod++, Period.class));
 					f.groupId = group.id;
 					f.startTime = T.departure;
 					prevHdwy = hdwy;
@@ -220,7 +223,7 @@ public class CreateGTFSFrequencies {
 		
 		for (TripGroup G : groups.values()){
 			String str = "\n" + G.id.toString() + ";[" + tripGroupStopSequenceMap.get(G.id) + "];[";
-			for (IdImpl T : G.trips) str += trips.get(T).id.toString() + ",";
+			for (Id T : G.trips) str += trips.get(T).id.toString() + ",";
 			str += "]";
 			
 			writer1.write(str);
@@ -246,7 +249,7 @@ public class CreateGTFSFrequencies {
 				//Print stop-times 'as-is'.
 				Trip T = trips.get(G.trips.toArray()[0]);
 				for (int i = 1; i <= T.stopOrder.size(); i++){
-					IdImpl stop = T.stopOrder.get(i);
+					Id stop = T.stopOrder.get(i);
 					
 					writer.write("\n" + G.id.toString() + "," //tip_id
 							+ Time.writeTime(T.stopTimes.get(stop).getFirst()) + "," //arrival
@@ -258,13 +261,13 @@ public class CreateGTFSFrequencies {
 			}else{
 				//Print average of stop offsets over all trips in the period.
 				ArrayList<Trip> tps = new ArrayList<CreateGTFSFrequencies.Trip>();
-				for (IdImpl t : G.trips) tps.add(trips.get(t));
-				HashMap<IdImpl, Tuple<Double, Double>> averageStopTimes = generateAverageStopTimes(tps);
+				for (Id t : G.trips) tps.add(trips.get(t));
+				HashMap<Id, Tuple<Double, Double>> averageStopTimes = generateAverageStopTimes(tps);
 				
 				//Assuming that all trips in the group have similar properties, at least in terms of stop times.
 				Trip T = tps.get(0);
 				for (int i = 1; i <= T.stopOrder.size(); i++){
-					IdImpl stop = T.stopOrder.get(i);
+					Id stop = T.stopOrder.get(i);
 					//Double arr = averageStopTimes.get(stop).getFirst();
 					//Double dep = averageStopTimes.get(stop).getSecond();
 					
@@ -348,14 +351,14 @@ public class CreateGTFSFrequencies {
 		System.exit(0);
 	}
 	
-	private static HashMap<IdImpl, Tuple<Double,Double>> generateAverageStopTimes(ArrayList<Trip> a){
-		HashMap<IdImpl, Tuple<Double, Double>> result = new HashMap<IdImpl, Tuple<Double,Double>>();
-		HashMap<IdImpl, Double> arrivalSums = new HashMap<IdImpl, Double>();
-		HashMap<IdImpl, Double> depSums = new HashMap<IdImpl, Double>();
+	private static HashMap<Id, Tuple<Double,Double>> generateAverageStopTimes(ArrayList<Trip> a){
+		HashMap<Id, Tuple<Double, Double>> result = new HashMap<Id, Tuple<Double,Double>>();
+		HashMap<Id, Double> arrivalSums = new HashMap<Id, Double>();
+		HashMap<Id, Double> depSums = new HashMap<Id, Double>();
 		
 		for (Trip T : a){
-			for (Entry<IdImpl, Tuple<Double, Double>> st : T.stopTimes.entrySet()){
-				IdImpl s = st.getKey();
+			for (Entry<Id, Tuple<Double, Double>> st : T.stopTimes.entrySet()){
+				Id s = st.getKey();
 				Double arr = st.getValue().getFirst();
 				Double dep = st.getValue().getSecond();
 				if (arrivalSums.containsKey(s)) arr += arrivalSums.get(s);
@@ -365,7 +368,7 @@ public class CreateGTFSFrequencies {
 			}
 		}
 		
-		for (IdImpl s : arrivalSums.keySet()){
+		for (Id s : arrivalSums.keySet()){
 			result.put(s, new Tuple<Double, Double>(arrivalSums.get(s) / a.size(), depSums.get(s) / a.size()));
 		}
 		
@@ -373,14 +376,14 @@ public class CreateGTFSFrequencies {
 	}
 	
 	private static class Period {
-		private IdImpl id;
-		protected IdImpl groupId;
+		private Id<Period> id;
+		protected Id<TripGroup> groupId;
 		protected double startTime;
 		protected double endTime;
 		protected int headway;
 		protected boolean exactTimes;
 
-		protected Period(IdImpl i){
+		protected Period(Id<Period> i){
 			this.id = i;
 		}
 		
@@ -395,18 +398,18 @@ public class CreateGTFSFrequencies {
 	}
 	
 	private static class TripGroup {
-		private IdImpl id;
-		protected IdImpl routeId; //Generally the same properties as a trip
+		private Id<TripGroup> id;
+		protected Id<TransitRoute> routeId; //Generally the same properties as a trip
 		protected String dir;
 		protected String shape;
 		protected String headsign;
 		protected String serviceId;
 		
-		protected HashSet<IdImpl> trips;
+		protected HashSet<Id<Trip>> trips;
 		
-		protected TripGroup(IdImpl i){
+		protected TripGroup(Id<TripGroup> i){
 			this.id = i;
-			this.trips = new HashSet<IdImpl>();
+			this.trips = new HashSet<>();
 		}
 		
 		/**
@@ -420,23 +423,23 @@ public class CreateGTFSFrequencies {
 	}
 	
 	private static class Trip implements Comparable<Trip> {
-		private IdImpl id;
-		protected IdImpl routeId;
+		private Id<Trip> id;
+		protected Id<TransitRoute> routeId;
 		protected String dir;
 		protected String shape;
 		protected double departure;
 		protected String headsign;
 		protected String serviceId;
 		
-		protected HashMap<IdImpl, Tuple<Double, Double>> stopTimes;
-		protected HashMap<Integer, IdImpl> stopOrder;
-		protected HashMap<IdImpl, Tuple<String, String>> stopCodes; //For pickup/dropoff types;
+		protected HashMap<Id, Tuple<Double, Double>> stopTimes;
+		protected HashMap<Integer, Id> stopOrder;
+		protected HashMap<Id, Tuple<String, String>> stopCodes; //For pickup/dropoff types;
 		
-		protected Trip(IdImpl i){
+		protected Trip(Id<Trip> i){
 			this.id = i;
-			this.stopOrder = new HashMap<Integer, IdImpl>();
-			this.stopTimes = new HashMap<IdImpl, Tuple<Double,Double>>();
-			this.stopCodes = new HashMap<IdImpl, Tuple<String,String>>();
+			this.stopOrder = new HashMap<Integer, Id>();
+			this.stopTimes = new HashMap<Id, Tuple<Double,Double>>();
+			this.stopCodes = new HashMap<Id, Tuple<String,String>>();
 			this.departure = Double.MAX_VALUE;
 		}
 

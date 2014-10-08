@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -94,8 +93,8 @@ public class CreatePlansFromTrips {
 			"egress_zone"});
 	
 	private HashMap<Id, String> personHouseholdMap; //person id, hhid
-	private HashMap<Id, Trip> trips; //trip_id, attributes
-	private HashMap<Id, HashSet<Id>> personTripsMap; //person id, list of trip ids.
+	private HashMap<Id<Trip>, Trip> trips; //trip_id, attributes
+	private HashMap<Id<Person>, HashSet<Id<Trip>>> personTripsMap; //person id, list of trip ids.
 	private HashMap<Id, Coord> stations; //station id, location
 	private HashMap<String, Double> householdWeights; //hhid, expansionfactor
 	
@@ -127,11 +126,11 @@ public class CreatePlansFromTrips {
 	 * @param personId - The Id of the person to look up.
 	 * @return
 	 */
-	public List<Tuple<String,String>> getTrips(Id personId){
+	public List<Tuple<String,String>> getTrips(Id<Person> personId){
 		if (!personTripsMap.containsKey(personId)) throw new IllegalArgumentException("Could not find person " + personId);
 		
 		ArrayList<Trip> tps =  new ArrayList<CreatePlansFromTrips.Trip>();
-		for (Id i : personTripsMap.get(personId)) tps.add(trips.get(i));
+		for (Id<Trip> i : personTripsMap.get(personId)) tps.add(trips.get(i));
 		sortTrips(tps);
 		
 		List<Tuple<String, String>> result = new ArrayList<Tuple<String,String>>();
@@ -193,7 +192,7 @@ public class CreatePlansFromTrips {
 		this.zones = new ZoneLayer();
 		
 		while (tr.next()){
-			this.zones.createZone(new IdImpl(tr.current().get("zone_id")), 
+			this.zones.createZone(Id.create(tr.current().get("zone_id"), Zone.class), 
 					tr.current().get("x"), 
 					tr.current().get("y"), 
 					null, null, null, null);
@@ -239,8 +238,8 @@ public class CreatePlansFromTrips {
 		if (tr.checkHeaders(additonalTripAttributeNames)) this.isUsingMixedModeTrips = true;
 		
 		this.personHouseholdMap = new HashMap<Id, String>();
-		this.trips = new HashMap<Id, CreatePlansFromTrips.Trip>();
-		this.personTripsMap = new HashMap<Id, HashSet<Id>>();
+		this.trips = new HashMap<>();
+		this.personTripsMap = new HashMap<>();
 		this.householdWeights = new HashMap<String, Double>();
 		
 		long tripNum = 0;
@@ -250,7 +249,7 @@ public class CreatePlansFromTrips {
 					new Double( tr.current().get("weight")));
 			
 			//Get the current person, create if necessary.
-			IdImpl pid = new IdImpl(tr.current().get("hhid") + "-" + tr.current().get("pid"));
+			Id<Person> pid = Id.create(tr.current().get("hhid") + "-" + tr.current().get("pid"), Person.class);
 			PersonImpl P;
 
 			if (!scenario.getPopulation().getPersons().containsKey(pid)) {
@@ -258,14 +257,14 @@ public class CreatePlansFromTrips {
 				scenario.getPopulation().addPerson(P);
 				personHouseholdMap.put(pid, tr.current().get("hhid"));
 								
-				personTripsMap.put(pid, new HashSet<Id>());
+				personTripsMap.put(pid, new HashSet<Id<Trip>>());
 			}
 			else{
 				P = (PersonImpl) scenario.getPopulation().getPersons().get(pid);
 			}
 			
 			//Map trips to persons
-			IdImpl tid = new IdImpl(tripNum++);
+			Id tid = Id.create(tripNum++, Trip.class);
 			Trip T = new Trip(tr.current().get("zone_o"), 
 					tr.current().get("zone_d"), 
 					tr.current().get("act_o"), 
@@ -303,8 +302,8 @@ public class CreatePlansFromTrips {
 		HashSet<String> missingZones = new HashSet<String>();
 		
 		for (Trip T : trips.values()){
-			BasicLocation zo = zones.getLocation(new IdImpl(T.zone_o));
-			BasicLocation zd = zones.getLocation(new IdImpl(T.zone_d));
+			BasicLocation zo = zones.getLocation(Id.create(T.zone_o, Zone.class));
+			BasicLocation zd = zones.getLocation(Id.create(T.zone_d, Zone.class));
 			
 			if (zo == null){
 				missingZones.add(T.zone_o);
@@ -466,15 +465,15 @@ public class CreatePlansFromTrips {
 							chainsWithNoZones.contains(pid)) continue;
 					
 					//Create the new person
-					IdImpl newPid = new IdImpl(newHhId + "-" + pid.toString().split("-")[1]); //Assumes that person Ids are formatted as "[hhid]-[person#]"
+					Id newPid = Id.create(newHhId + "-" + pid.toString().split("-")[1], Person.class); //Assumes that person Ids are formatted as "[hhid]-[person#]"
 					personHouseholdMap.put(newPid, newHhId); //Map the new person to the new household
 					Person P = new PersonImpl(newPid);
 					scenario.getPopulation().addPerson(P);
 					personsAdded++;
 					
 					//Copy original's set of trips
-					HashSet<Id> newTrips = new HashSet<Id>();
-					for (Id j : personTripsMap.get(pid)) newTrips.add(j);
+					HashSet<Id<Trip>> newTrips = new HashSet<Id<Trip>>();
+					for (Id<Trip> j : personTripsMap.get(pid)) newTrips.add(j);
 					personTripsMap.put(newPid, newTrips);
 				}
 			}
@@ -512,7 +511,7 @@ public class CreatePlansFromTrips {
 		
 		
 		//Remove highway links and non-car links from the network. DON'T EXPORT!!!
-		HashSet<Id> linksToRemove = new HashSet<Id>();
+		HashSet<Id<Link>> linksToRemove = new HashSet<>();
 		for (Link l : network.getLinks().values()){
 			LinkImpl L = (LinkImpl) l;
 			
@@ -521,20 +520,20 @@ public class CreatePlansFromTrips {
 			//Highway links (& on/off ramps)
 			if (L.getType().equals("Highway") || L.getType().equals("Toll Highway") 
 					|| L.getType().equals("On/Off Ramp") || L.getType().equals("Turn") ||
-					L.getType().equals("LOOP")) linksToRemove.add(new IdImpl(L.getId().toString()));
+					L.getType().equals("LOOP")) linksToRemove.add(L.getId());
 			
 			//Transit EX-ROW links
 			if (!L.getAllowedModes().contains("Car") || !L.getAllowedModes().contains("car")) linksToRemove.add(L.getId());
 			
 		}
-		for (Id i : linksToRemove) network.removeLink(i);
+		for (Id<Link> i : linksToRemove) network.removeLink(i);
 		
 		//Remove nodes with degree 0;
-		HashSet<Id> nodestoRemove = new HashSet<Id>();
+		HashSet<Id<Node>> nodestoRemove = new HashSet<>();
 		for (Node N : network.getNodes().values()){
 			if (N.getInLinks().size() == 0 && N.getOutLinks().size() == 0) nodestoRemove.add(N.getId());
 		}
-		for (Id i : nodestoRemove) network.removeNode(i);
+		for (Id<Node> i : nodestoRemove) network.removeNode(i);
 		
 		/*
 		MultimodalNetworkCleaner mmnc = new MultimodalNetworkCleaner(network);
@@ -592,7 +591,7 @@ public class CreatePlansFromTrips {
 			
 			for (int i = 0; i<pTrips.size(); i++){ //Decided against using a for each loop because ordering is important
 				T = pTrips.get(i); //The current trip
-				if ((zones.getLocation(new IdImpl(T.zone_o)) == null) || (zones.getLocation(new IdImpl(T.zone_d)) == null)) {
+				if ((zones.getLocation(Id.create(T.zone_o, Zone.class)) == null) || (zones.getLocation(Id.create(T.zone_d, Zone.class)) == null)) {
 					skipPerson = true;
 					continue;
 				}
@@ -605,22 +604,22 @@ public class CreatePlansFromTrips {
 					if(householdCoords.containsKey(personHouseholdMap.get(P.getId()))){ //Household coord already set
 						c = householdCoords.get(personHouseholdMap.get(P.getId()));
 					}else{ //Household coordinate not set.
-						c = getRandomCoordInZone(new IdImpl(T.zone_o));
+						c = getRandomCoordInZone(Id.create(T.zone_o, Zone.class));
 						householdCoords.put(personHouseholdMap.get(P.getId()), c);
 					}
 				}else if (act_o.equals("W")){ //Work activity
 					//Allows activity episodes occurring in the same zone to be assigned the same coordinate. Only applies to work or school activities.
 					String workZone = T.zone_o;
-					if (!workplaceZoneMap.containsKey(workZone)) workplaceZoneMap.put(workZone, getRandomCoordInZone(new IdImpl(T.zone_o)));
+					if (!workplaceZoneMap.containsKey(workZone)) workplaceZoneMap.put(workZone, getRandomCoordInZone(Id.create(T.zone_o, Zone.class)));
 					c = workplaceZoneMap.get(workZone);
 					
 				}else if (act_o.equals("S")){ //School activity
 					String schoolZone = T.zone_o;
-					if (!schoolZoneMap.containsKey(schoolZone)) schoolZoneMap.put(schoolZone, getRandomCoordInZone(new IdImpl(T.zone_o)));
+					if (!schoolZoneMap.containsKey(schoolZone)) schoolZoneMap.put(schoolZone, getRandomCoordInZone(Id.create(T.zone_o, Zone.class)));
 					c = schoolZoneMap.get(schoolZone);
 					
 				}else{
-					c = getRandomCoordInZone(new IdImpl(T.zone_o));
+					c = getRandomCoordInZone(Id.create(T.zone_o, Zone.class));
 				}
 				
 				ActivityImpl act = p.createAndAddActivity(act_o, c);
@@ -668,22 +667,22 @@ public class CreatePlansFromTrips {
 				if(householdCoords.containsKey(personHouseholdMap.get(P.getId()))){ //Household coord already set
 					c = householdCoords.get(personHouseholdMap.get(P.getId()));
 				}else{ //Household coordinate not set.
-					c = getRandomCoordInZone(new IdImpl(T.zone_d));
+					c = getRandomCoordInZone(Id.create(T.zone_d, Zone.class));
 					householdCoords.put(personHouseholdMap.get(P.getId()), c);
 				}
 			}else if (act_d.equals("W")){ //Work activity
 				//Allows activity episodes occurring in the same zone to be assigned the same coordinate. Only applies to work or school activities.
 				String workZone = T.zone_d;
-				if (!workplaceZoneMap.containsKey(workZone)) workplaceZoneMap.put(workZone, getRandomCoordInZone(new IdImpl(T.zone_d)));
+				if (!workplaceZoneMap.containsKey(workZone)) workplaceZoneMap.put(workZone, getRandomCoordInZone(Id.create(T.zone_d, Zone.class)));
 				c = workplaceZoneMap.get(workZone);
 				
 			}else if (act_d.equals("S")){ //School activity
 				String schoolZone = T.zone_d;
-				if (!schoolZoneMap.containsKey(schoolZone)) schoolZoneMap.put(schoolZone, getRandomCoordInZone(new IdImpl(T.zone_d)));
+				if (!schoolZoneMap.containsKey(schoolZone)) schoolZoneMap.put(schoolZone, getRandomCoordInZone(Id.create(T.zone_d, Zone.class)));
 				c = schoolZoneMap.get(schoolZone);
 				
 			}else{
-				c = getRandomCoordInZone(new IdImpl(T.zone_d));
+				c = getRandomCoordInZone(Id.create(T.zone_d, Zone.class));
 			}
 			
 			p.addActivity(new ActivityImpl(act_d, c));
@@ -724,7 +723,7 @@ public class CreatePlansFromTrips {
 	 */
 	private Coord getRandomCoordInZone(final Id zoneId) {
 		return WorldUtils.getRandomCoordInZone(
-				(Zone) this.zones.getLocation(zoneId), this.zones);
+				this.zones.getLocation(zoneId), this.zones);
 	}
 	
 	
@@ -753,8 +752,8 @@ public class CreatePlansFromTrips {
 	 */
 	private int checkTripChain(List<Trip> a){
 		
-		for (Trip T : a) if ((zones.getLocation(new IdImpl(T.zone_o)) == null) 
-				|| zones.getLocation(new IdImpl(T.zone_d)) == null) return 5; //could not find zone.
+		for (Trip T : a) if ((zones.getLocation(Id.create(T.zone_o, Zone.class)) == null) 
+				|| zones.getLocation(Id.create(T.zone_d, Zone.class)) == null) return 5; //could not find zone.
 		
 		if (a.size() == 1) return 4; //only one trip in trip chain
 		
@@ -783,12 +782,12 @@ public class CreatePlansFromTrips {
 		this.log.info("Encrypting person IDs, random seed = " + seed);
 		
 		//Init
-		Id[] scrambler = new Id[scenario.getPopulation().getPersons().size()];
+		Id<Person>[] scrambler = new Id[scenario.getPopulation().getPersons().size()];
 		LinkedHashMap<Id, Integer> tracer = new LinkedHashMap<Id, Integer>();
 		
 		int i = 0;
 		for (Person p : this.scenario.getPopulation().getPersons().values()){
-			scrambler[i] = new IdImpl(i);
+			scrambler[i] = Id.create(i, Person.class);
 			tracer.put(p.getId(), new Integer(i));
 			i++;
 		}
@@ -799,8 +798,8 @@ public class CreatePlansFromTrips {
 			int oldPos = tracer.get(p.getId()).intValue();
 			int newPos = rand.nextInt(scrambler.length);
 			
-			Id oldId = scrambler[oldPos];
-			Id newId = scrambler[newPos];
+			Id<Person> oldId = scrambler[oldPos];
+			Id<Person> newId = scrambler[newPos];
 			
 			scrambler[oldPos] = newId; //Swaps scrambler contents
 			scrambler[newPos] = oldId;

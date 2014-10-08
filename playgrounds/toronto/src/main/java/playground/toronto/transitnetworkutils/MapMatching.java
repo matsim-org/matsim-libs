@@ -1,49 +1,36 @@
 package playground.toronto.transitnetworkutils;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-
-import playground.toronto.transitnetworkutils.ScheduleParser;
-import playground.toronto.transitnetworkutils.ScheduledRoute;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-import org.matsim.core.utils.collections.CollectionUtils;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.utils.geometry.CoordImpl;
-
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NodeImpl;
-import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.population.PersonImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.matsim.core.utils.collections.CollectionUtils;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleImpl;
+import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
 
 
@@ -126,7 +113,7 @@ public class MapMatching {
 			System.out.println("Bus network contains " + BusNetwork.getLinks().size() + " links.");
 			System.out.println("Network filtering done.");
 				
-			//Node fromNode = this.network.getNodes().get(new IdImpl(stops.get(stopSequence.get(0))[3]));
+			//Node fromNode = this.network.getNodes().get(Id.create(stops.get(stopSequence.get(0))[3]));
 			//Path linkSequence = pather.calcLeastCostPath(fromNode, toNode, 0F);
 			
 		BufferedWriter xmlWriter = new BufferedWriter(new FileWriter(outFileFolder + "\\linksequences.xml"));
@@ -189,8 +176,8 @@ public class MapMatching {
 						continue;
 					}
 					
-					PersonImpl person = new PersonImpl(new IdImpl("transit driver"));
-					VehicleImpl veh = new VehicleImpl(new IdImpl("test vehicle"), new VehicleTypeImpl(new IdImpl("no type")));
+					PersonImpl person = new PersonImpl(Id.create("transit driver", Person.class));
+					VehicleImpl veh = new VehicleImpl(Id.create("test vehicle", Vehicle.class), new VehicleTypeImpl(Id.create("no type", VehicleType.class)));
 					
 					P = pather.calcLeastCostPath(fromNode, toNode, 0F, person, veh);
 					

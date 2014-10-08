@@ -12,7 +12,6 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkFactoryImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -261,7 +260,7 @@ public class oldEmme2MatsimConverter {
 				}
 				boolean isZone = cells[0].contains("*");
 				
-				NodeImpl n = new NodeImpl(new IdImpl(cells[1]));
+				NodeImpl n = new NodeImpl(Id.create(cells[1], Node.class));
 				n.setCoord(new CoordImpl(cells[2], 
 						cells[3].length() == 6 ? "4" + cells[3] : cells[3])); 
 				//Some EMME networks are restricted to using only 6 characters for the y-coordinate. This appends a '4' to the start if this is the case.
@@ -281,8 +280,8 @@ public class oldEmme2MatsimConverter {
 					continue;
 				}
 				
-				Node i = network.getNodes().get(new IdImpl(cells[1]));
-				Node j = network.getNodes().get(new IdImpl(cells[2]));
+				Node i = network.getNodes().get(Id.create(cells[1], Node.class));
+				Node j = network.getNodes().get(Id.create(cells[2], Node.class));
 				double length = Double.parseDouble(cells[3]) * 1000; //converts km to m
 				double speed = Double.parseDouble(cells[9]) / 3.6; //converts km/hr to m/s
 				double cap = Double.parseDouble(cells[10]);
@@ -291,9 +290,9 @@ public class oldEmme2MatsimConverter {
 				
 				LinkFactoryImpl factory = new LinkFactoryImpl();
 				
-				LinkImpl l = (LinkImpl) factory.createLink(new IdImpl(cells[1] + ">" + cells[2]), 
+				LinkImpl l = (LinkImpl) factory.createLink(Id.create(cells[1] + ">" + cells[2], Link.class), 
 						i, j, network, length, speed, cap, lanes);
-				Link L = (LinkImpl) factory.createLink(new IdImpl(cells[1] + ">" + cells[2]), 
+				Link L = factory.createLink(Id.create(cells[1] + ">" + cells[2], Link.class), 
 						i, j, network, length, speed, cap, lanes);
 				
 				L.setAllowedModes(convertMode(cells[4]));

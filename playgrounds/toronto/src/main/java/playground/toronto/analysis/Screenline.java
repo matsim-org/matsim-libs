@@ -9,7 +9,6 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -52,8 +51,8 @@ public class Screenline{
 	 * 		"Descr".
 	 * @return Map of {@link Id} : {@link Screenline}.
 	 */
-	public static Map<Id, Screenline> openShapefile(String shapefile){
-		HashMap<Id, Screenline> result = new HashMap<Id, Screenline>();
+	public static Map<Id<Screenline>, Screenline> openShapefile(String shapefile){
+		HashMap<Id<Screenline>, Screenline> result = new HashMap<>();
 		
 		ShapeFileReader reader = new ShapeFileReader();
 		reader.readFileAndInitialize(shapefile);
@@ -61,11 +60,11 @@ public class Screenline{
 		
 		for (SimpleFeature f : features){
 			
-			Id sid;
+			Id<Screenline> sid;
 			try{
-				sid = new IdImpl((Integer) f.getAttribute(Screenline.ID));
+				sid = Id.create((Integer) f.getAttribute(Screenline.ID), Screenline.class);
 			}catch (ClassCastException c){
-				sid = new IdImpl((String) f.getAttribute(Screenline.ID));
+				sid = Id.create((String) f.getAttribute(Screenline.ID), Screenline.class);
 			}
 				
 			Screenline s = new Screenline(sid,
@@ -95,8 +94,8 @@ public class Screenline{
 	 * @param network - The {@link Network} to load links from. 
 	 * @return Map of {@link Id} : {@link Screenline}.
 	 */
-	public static Map<Id, Screenline> openShapefile(String shapefile, Network network){
-		Map<Id, Screenline> result = Screenline.openShapefile(shapefile);
+	public static Map<Id<Screenline>, Screenline> openShapefile(String shapefile, Network network){
+		Map<Id<Screenline>, Screenline> result = Screenline.openShapefile(shapefile);
 		
 		for (Screenline s : result.values()){
 			s.loadLinksFromNetwork(network);
@@ -108,26 +107,26 @@ public class Screenline{
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	//Attributes
-	private final Id id;
+	private final Id<Screenline> id;
 	public String description;
 	public String plusName;
 	public String minusName;
 	
-	private List<Id> plusLinks;
-	private List<Id> minusLinks;
+	private List<Id<Link>> plusLinks;
+	private List<Id<Link>> minusLinks;
 	//private LineString geom;
 	private final MultiLineString geom2;
 	private GeometryFactory factory;
 	
 	
-	public Screenline(Id id, MultiLineString geometry, String plusName, String minusName){
+	public Screenline(Id<Screenline> id, MultiLineString geometry, String plusName, String minusName){
 		this.id = id;
 		this.plusName = plusName;
 		this.minusName = minusName;
 		this.geom2 = geometry;
 		
-		this.plusLinks = new ArrayList<Id>();
-		this.minusLinks = new ArrayList<Id>();
+		this.plusLinks = new ArrayList<>();
+		this.minusLinks = new ArrayList<>();
 		
 		this.factory = new GeometryFactory();
 	}
@@ -196,21 +195,21 @@ public class Screenline{
 		return (to1.x - from1.x) * (to2.y - from2.y) - (to1.y - from1.y) * (to2.x - from2.x);
 	}
 	
-	public Id getID(){
+	public Id<Screenline> getID(){
 		return this.id;
 	}
 	
 	/**
 	 * @return Ids of links crossing in the positive direction (right-to-left)
 	 */
-	public List<Id> getPlusLinks(){
+	public List<Id<Link>> getPlusLinks(){
 		return this.plusLinks;
 	}
 	
 	/**
 	 * @return Ids of links crossing in the negative direction (left-to-right)
 	 */
-	public List<Id> getMinusLinks(){
+	public List<Id<Link>> getMinusLinks(){
 		return this.minusLinks;
 	}
 	

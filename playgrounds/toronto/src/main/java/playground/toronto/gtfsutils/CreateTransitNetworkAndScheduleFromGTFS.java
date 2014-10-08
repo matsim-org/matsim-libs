@@ -18,7 +18,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -30,6 +29,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
+import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -67,8 +67,8 @@ public class CreateTransitNetworkAndScheduleFromGTFS {
 	private Vehicles vehicles;
 	private final CoordinateTransformation converter;
 	
-	private HashMap<Id, Set<Id>> linkRouteMap;
-
+	private HashMap<Id<Link>, Set<Id<TransitRoute>>> linkRouteMap;
+	
 	public CreateTransitNetworkAndScheduleFromGTFS(CoordinateTransformation converter){
 		this.converter = converter; //Need to have a coordinate converter to allow for euclidean distance.
 	}
@@ -90,22 +90,22 @@ public class CreateTransitNetworkAndScheduleFromGTFS {
 		Percenter percenter = new Percenter(this.gtfs.getStops().size(), 25);
 		String msg = null;
 		
-		for (Entry<Id, Stop> e : this.gtfs.getStops().entrySet()){
-			Id stopId = e.getKey();
+		for (Entry<Id<Stop>, Stop> e : this.gtfs.getStops().entrySet()){
+			Id<Stop> stopId = e.getKey();
 			Stop stop = e.getValue();
 			
 			//Create node
 			Coord coord = this.converter.transform(stop.getPoint());
-			Node n = netFact.createNode(stopId, coord);
+			Node n = netFact.createNode(Id.create(stopId, Node.class), coord);
 			this.network.addNode(n);
 			
 			//Create loop link at node
-			LinkImpl loopLink = (LinkImpl) netFact.createLink(new IdImpl(stopId +"_LOOP"), n, n, network, 0.0, 9999, 9999, 1.0);
+			LinkImpl loopLink = (LinkImpl) netFact.createLink(Id.create(stopId +"_LOOP", Link.class), n, n, network, 0.0, 9999, 9999, 1.0);
 			loopLink.setType("LOOP");
 			this.network.addLink(loopLink);
 			
 			//Create TransitStop, link it to the loop link
-			TransitStopFacility tStop = schedFact.createTransitStopFacility(stopId, coord, true);
+			TransitStopFacility tStop = schedFact.createTransitStopFacility(Id.create(stopId, TransitStopFacility.class), coord, true);
 			tStop.setLinkId(loopLink.getId());
 			tStop.setName(stop.getName());
 			this.schedule.addStopFacility(tStop);
@@ -122,20 +122,20 @@ public class CreateTransitNetworkAndScheduleFromGTFS {
 		TransitScheduleFactory schedFact = this.schedule.getFactory();
 		
 		int links = 0;
-		this.linkRouteMap = new HashMap<Id, Set<Id>>();
+		this.linkRouteMap = new HashMap<>();
 		
 		int progress = 0;
 		Percenter percenter = new Percenter(this.gtfs.getRoutes().size(), 10);
 		String msg = null;
 		
 		//Each GTFS route becomes one MATSim line
-		for (Entry<Id, Route> e : this.gtfs.getRoutes().entrySet()){
-			Id lineId = e.getKey();
+		for (Entry<Id<Route>, Route> e : this.gtfs.getRoutes().entrySet()){
+			Id<Route> lineId = e.getKey();
 			Route route = e.getValue();
 			
 			RouteTypes mode = route.getRouteType();
 			
-			TransitLine line = schedFact.createTransitLine(lineId);
+			TransitLine line = schedFact.createTransitLine(Id.create(lineId, TransitLine.class));
 			
 			//Each GTFS trip becomes one MATSim route
 			for (Entry<String, Trip> tpEntry : route.getTrips().entrySet()){
@@ -144,12 +144,12 @@ public class CreateTransitNetworkAndScheduleFromGTFS {
 					
 					ArrayList<TransitRouteStop> routeStops = new ArrayList<TransitRouteStop>(); //List of stops
 					ArrayList<Id<Link>> itinerary = new ArrayList<Id<Link>>(); //List of links
-					Id routeId = new IdImpl(tpEntry.getKey());
+					Id<TransitRoute> routeId = Id.create(tpEntry.getKey(), TransitRoute.class);
 					
 					//Prepare first stop in trip
 					StopTime previousST = trip.getStopTimes().get(1);
 					double departure = (int)(previousST.getDepartureTime().getTime() / 1000);
-					TransitStopFacility stop = this.schedule.getFacilities().get(new IdImpl(previousST.getStopId()));
+					TransitStopFacility stop = this.schedule.getFacilities().get(Id.create(previousST.getStopId(), TransitStopFacility.class));
 					itinerary.add(stop.getLinkId());
 					Node fromNode = this.network.getNodes().get(stop.getId());
 					
@@ -164,7 +164,7 @@ public class CreateTransitNetworkAndScheduleFromGTFS {
 							q++;
 							st = trip.getStopTimes().get(i + q);
 						}						
-						stop = this.schedule.getFacilities().get(new IdImpl(st.getStopId()));
+						stop = this.schedule.getFacilities().get(Id.create(st.getStopId(), TransitStopFacility.class));
 						Node toNode = this.network.getNodes().get(stop.getId());
 						
 						//Create TransitRouteStop
@@ -181,7 +181,7 @@ public class CreateTransitNetworkAndScheduleFromGTFS {
 						if (copyLinks){
 							//Have a link for each line
 							
-							Link l = netFact.createLink(new IdImpl(links++), fromNode, toNode, network, dist, freespeed, 9999, 1.0);
+							Link l = netFact.createLink(Id.create(links++, Link.class), fromNode, toNode, network, dist, freespeed, 9999, 1.0);
 							l.setAllowedModes(Collections.singleton(mode.toString()));
 							this.network.addLink(l);
 							
@@ -189,7 +189,7 @@ public class CreateTransitNetworkAndScheduleFromGTFS {
 						}else{
 							//Have only ONE link per node-pair per mode.
 							
-							Id linkId = new IdImpl(fromNode.getId().toString() + "-" + toNode.getId().toString() + "_" + mode.toString());
+							Id<Link> linkId = Id.create(fromNode.getId().toString() + "-" + toNode.getId().toString() + "_" + mode.toString(), Link.class);
 							Link l = this.network.getLinks().get(linkId);
 							
 							if (l == null){
@@ -197,7 +197,7 @@ public class CreateTransitNetworkAndScheduleFromGTFS {
 								l = netFact.createLink(linkId, fromNode, toNode, network, dist, freespeed, 9999, 1.0);
 								l.setAllowedModes(Collections.singleton(mode.toString()));
 								
-								HashSet<Id> s = new HashSet<Id>();
+								HashSet<Id<TransitRoute>> s = new HashSet<>();
 								s.add(routeId);
 								this.linkRouteMap.put(linkId, s);
 								
@@ -254,15 +254,15 @@ public class CreateTransitNetworkAndScheduleFromGTFS {
 								double endTime = f.getEndTime().getTime() / 1000.0;
 								
 								while (currentTime < endTime){									
-									tRoute.addDeparture(schedFact.createDeparture(new IdImpl(currentDepartureId++), currentTime));
+									tRoute.addDeparture(schedFact.createDeparture(Id.create(currentDepartureId++, Departure.class), currentTime));
 									currentTime += interval;
 								}
 							}
 						}else{
-							tRoute.addDeparture(schedFact.createDeparture(new IdImpl(0), departure));
+							tRoute.addDeparture(schedFact.createDeparture(Id.create(0, Departure.class), departure));
 						}
 					}else{
-						tRoute.addDeparture(schedFact.createDeparture(new IdImpl(0), departure));
+						tRoute.addDeparture(schedFact.createDeparture(Id.create(0, Departure.class), departure));
 					}
 					
 					line.addRoute(tRoute);
@@ -323,9 +323,9 @@ public class CreateTransitNetworkAndScheduleFromGTFS {
 	public void exportLinkRouteMap(String filename) throws IOException{
 		BufferedWriter bw = new BufferedWriter(new FileWriter(filename));
 		bw.write("linkId;[route1,route2,...]");
-		for (Entry<Id, Set<Id>> e : this.linkRouteMap.entrySet()){
+		for (Entry<Id<Link>, Set<Id<TransitRoute>>> e : this.linkRouteMap.entrySet()){
 			String s = "[";
-			for (Id i : e.getValue()){
+			for (Id<TransitRoute> i : e.getValue()){
 				s += i.toString() + ",";
 			}
 			s = s.substring(0, s.length() - 2);

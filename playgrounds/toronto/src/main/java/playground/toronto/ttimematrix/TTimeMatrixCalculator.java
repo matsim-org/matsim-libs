@@ -35,10 +35,12 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.utils.LeastCostPathTree;
+
+import playground.balmermi.world.Zone;
 
 public class TTimeMatrixCalculator implements PersonDepartureEventHandler, PersonArrivalEventHandler {
 
@@ -47,7 +49,7 @@ public class TTimeMatrixCalculator implements PersonDepartureEventHandler, Perso
 	//////////////////////////////////////////////////////////////////////
 	
 	private static final Logger log = Logger.getLogger(TTimeMatrixCalculator.class);
-	private final Map<Id,Id> l2zMapping;
+	private final Map<Id<Link>,Id<Zone>> l2zMapping;
 	private final Map<Id,Set<Id>> z2nMapping;
 	private final Set<Integer> hours;
 	private final LeastCostPathTree st;
@@ -63,7 +65,7 @@ public class TTimeMatrixCalculator implements PersonDepartureEventHandler, Perso
 	// constructor
 	//////////////////////////////////////////////////////////////////////
 	
-	public TTimeMatrixCalculator(final Map<Id,Id> l2zMapping, final int[] hours, final LeastCostPathTree st, final Network network) {
+	public TTimeMatrixCalculator(final Map<Id<Link>,Id<Zone>> l2zMapping, final int[] hours, final LeastCostPathTree st, final Network network) {
 		log.info("init...");
 		this.l2zMapping = l2zMapping;
 		this.st = st;
@@ -153,7 +155,7 @@ public class TTimeMatrixCalculator implements PersonDepartureEventHandler, Perso
 	 * @param tzone
 	 * @param ttime
 	 */
-	private final void addTTime(Id fzone, Id tzone, double ttime) {
+	private final void addTTime(Id<Zone> fzone, Id<Zone> tzone, double ttime) {
 		Map<Id,Tuple<Double,Integer>> tmap = ttimeMatrix.get(fzone);
 		Tuple<Double,Integer> tuple = tmap.get(tzone);
 		tmap.put(tzone,new Tuple<Double, Integer>(tuple.getFirst()+ttime,tuple.getSecond()+1));
@@ -253,8 +255,8 @@ public class TTimeMatrixCalculator implements PersonDepartureEventHandler, Perso
 		
 		if (hours.contains(hour)) {
 			double ttime = event.getTime() - dEvent.getTime();
-			Id fzone = l2zMapping.get(new IdImpl(dEvent.getLinkId().toString()));
-			Id tzone = l2zMapping.get(new IdImpl(event.getLinkId().toString()));
+			Id<Zone> fzone = l2zMapping.get(Id.create(dEvent.getLinkId().toString(), Link.class));
+			Id<Zone> tzone = l2zMapping.get(Id.create(event.getLinkId().toString(), Link.class));
 			addTTime(fzone,tzone,ttime);
 		}
 	}

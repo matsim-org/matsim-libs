@@ -33,8 +33,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.network.algorithms.NetworkExpandNode;
 import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
@@ -87,9 +85,9 @@ public class NetworkAddEmmeManeuverRestrictions {
 				String[] entries = curr_line.split("\t", -1);
 				// "a"  nodeid  fromnodeid  tonodeid  "0"
 				// 0    1       2           3         4
-				Id nid = new IdImpl(entries[1]);
-				Id fnid = new IdImpl(entries[2]);
-				Id tnid = new IdImpl(entries[3]);
+				Id<Node> nid = Id.create(entries[1], Node.class);
+				Id<Node> fnid = Id.create(entries[2], Node.class);
+				Id<Node> tnid = Id.create(entries[3], Node.class);
 				Node n = network.getNodes().get(nid);
 				Node fn = network.getNodes().get(fnid);
 				Node tn = network.getNodes().get(tnid);

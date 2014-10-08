@@ -8,7 +8,7 @@ import java.util.HashMap;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
@@ -39,8 +39,8 @@ public class CreateScheduleToMatchPseudoNetwork{
 		String NetworkFile = args[3];
 		String NetworkPrefix = "1";
 		
-		HashMap<Id,Coord> StopAndCoordinates = new HashMap<Id,Coord>();
-		HashMap<Tuple<Id,Id>,Id> Link_Nodes = new HashMap<Tuple<Id,Id>,Id>();
+		HashMap<Id<Node>,Coord> StopAndCoordinates = new HashMap<Id<Node>,Coord>();
+		HashMap<Tuple<Id<Node>,Id<Node>>,Id<Link>> Link_Nodes = new HashMap<Tuple<Id<Node>,Id<Node>>,Id<Link>>();
 		//List<Tuple<TransitLine, TransitRoute>> toBeRemoved = new LinkedList<Tuple<TransitLine, TransitRoute>>();
 		ArrayList<TransitRoute> RemoveRoute = new ArrayList<TransitRoute>();
     
@@ -52,7 +52,7 @@ public class CreateScheduleToMatchPseudoNetwork{
 		rdStops.ignoreTrailingBlanks(true);
 		
 		while (rdStops.next()){
-			IdImpl StopID = new IdImpl(rdStops.current().get("stop_id").toString());
+			Id<Node> StopID = Id.create(rdStops.current().get("stop_id").toString(), Node.class);
 			CoordImpl StopCoord = new CoordImpl(Double.parseDouble(rdStops.current().get("X").toString()), Double.parseDouble(rdStops.current().get("Y").toString()));
 			StopAndCoordinates.put(StopID, StopCoord);	
 		}//end of while loop

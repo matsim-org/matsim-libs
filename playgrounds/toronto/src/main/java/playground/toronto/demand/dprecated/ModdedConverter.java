@@ -9,11 +9,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -146,7 +146,7 @@ public class ModdedConverter {
 						// this line is about the same person as the line before.
 						// "extend" the plan of that person with a Leg and an Act
 
-						Plan pl = this.pop.getPersons().get(new IdImpl(personId)).getSelectedPlan();
+						Plan pl = this.pop.getPersons().get(Id.create(personId, Person.class)).getSelectedPlan();
 						endTime = convertTime(tabs[3]);
 						double dur = endTime - this.tmpEndTime;
 
@@ -174,7 +174,7 @@ public class ModdedConverter {
 						// then start the new person
 
 						if (!this.pop.getPersons().isEmpty()) {
-							Person p = this.pop.getPersons().get(new IdImpl(this.tmpPersonId));
+							Person p = this.pop.getPersons().get(Id.create(this.tmpPersonId, Person.class));
 							Plan tmpPl = p.getSelectedPlan();
 
 							LegImpl leg = ((PlanImpl) tmpPl).createAndAddLeg(TransportMode.car);
@@ -196,7 +196,7 @@ public class ModdedConverter {
 							ActivityImpl lastAct = ((PlanImpl) tmpPl).createAndAddActivity(this.tmpTabs[7], tmpCoord2);
 						}
 
-						PersonImpl p = new PersonImpl(new IdImpl(personId));
+						PersonImpl p = new PersonImpl(Id.create(personId, Person.class));
 						PlanImpl pl = new org.matsim.core.population.PlanImpl(p);
 						// ZoneXY zoneXY = zoneXYs.get(tabs[9]);
 						endTime = convertTime(tabs[3]);
@@ -243,7 +243,7 @@ public class ModdedConverter {
 				}
 			}
 		}else{
-			Person p = this.pop.getPersons().get(new IdImpl(this.tmpPersonId));
+			Person p = this.pop.getPersons().get(Id.create(this.tmpPersonId, Person.class));
 			PlanImpl tmpPl = (PlanImpl) p.getSelectedPlan();
 
 			LegImpl leg = tmpPl.createAndAddLeg(TransportMode.car);
@@ -269,7 +269,7 @@ public class ModdedConverter {
 
 	private Coord getRandomCoordInZone(final String zoneId) {
 		return WorldUtils.getRandomCoordInZone(
-				(Zone) this.zones.getLocation(new IdImpl(zoneId)), this.zones);
+				this.zones.getLocation(Id.create(zoneId, Zone.class)), this.zones);
 	}
 
 	public void createZones() {
@@ -280,7 +280,7 @@ public class ModdedConverter {
 	}
 
 	public void createZone(final ZoneXY zxy) {
-		this.zones.createZone(new IdImpl(zxy.getZoneId()), zxy.getX(), zxy.getY(), null, null,
+		this.zones.createZone(Id.create(zxy.getZoneId(), Zone.class), zxy.getX(), zxy.getY(), null, null,
 				null, null);
 	}
 
@@ -293,7 +293,7 @@ public class ModdedConverter {
 
 		ModdedConverter c = new ModdedConverter();
 
-		c.setZones((ZoneLayer) new World().createLayer(new IdImpl("zones")));
+		c.setZones((ZoneLayer) new World().createLayer(Id.create("zones", Layer.class)));
 
 		c.setZoneXYs(new HashMap<String, ZoneXY>());
 

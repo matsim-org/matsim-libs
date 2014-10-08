@@ -11,7 +11,6 @@ import javax.swing.JOptionPane;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -59,7 +58,7 @@ public class GetCommonStops {
 	
 	private static String lookupStopServices(String s){
 		
-		TransitStopFacility stop = schedule.getFacilities().get(new IdImpl(s));
+		TransitStopFacility stop = schedule.getFacilities().get(Id.create(s, TransitStopFacility.class));
 		if (stop == null) throw new IllegalArgumentException("Could not find stop " + s);
 		
 		String report = "DEPARTURE TIME REPORT\n" +

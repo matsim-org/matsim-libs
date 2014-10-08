@@ -12,19 +12,15 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
-import org.matsim.pt.transitSchedule.TransitScheduleImpl;
-import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
+
 import playground.toronto.demand.util.TableReader;
 
 public class CreateNetworkFromGTFS{
@@ -37,8 +33,8 @@ public class CreateNetworkFromGTFS{
 		//String NetworkPrefix = "17";
 		//String NetworkOutput = args[3];
 		
-        HashMap<Id,Coord> StopAndCoordinates = new HashMap<Id,Coord>();
-        HashMap<Id,Link> RemoveLinks = new HashMap<Id,Link>();
+        HashMap<Id<Node>,Coord> StopAndCoordinates = new HashMap<>();
+        HashMap<Id<Link>,Link> RemoveLinks = new HashMap<>();
         
         ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
         NetworkImpl network = (NetworkImpl) scenario.getNetwork();
@@ -52,7 +48,7 @@ public class CreateNetworkFromGTFS{
 		rdStops.ignoreTrailingBlanks(true);
 		
 		while (rdStops.next()){
-			IdImpl StopID = new IdImpl(rdStops.current().get("stop_id").toString());
+			Id<Node> StopID = Id.create(rdStops.current().get("stop_id").toString(), Node.class);
 			CoordImpl StopCoord = new CoordImpl(Double.parseDouble(rdStops.current().get("stop_lon").toString()), Double.parseDouble(rdStops.current().get("stop_lat").toString()));
 			network.createAndAddNode(StopID, StopCoord);
 			StopAndCoordinates.put(StopID, StopCoord);	
@@ -80,7 +76,7 @@ public class CreateNetworkFromGTFS{
 		double linkspeed = (90.0/3.6);
 		double linkcapacity = 9999;
 		double numlanes = 1;
-		ArrayList<Id> ListofLinks = new ArrayList<Id>();
+		ArrayList<Id<Link>> ListofLinks = new ArrayList<>();
 		
 		
 		while (rdStopSequence.next()){
@@ -89,15 +85,15 @@ public class CreateNetworkFromGTFS{
 			while (rdStopSequence.current().containsKey(""+nextStop) && rdStopSequence.current().get(""+nextStop).isEmpty()!= true){
 				//System.out.println(""+prevStop);
 				//System.out.println(""+nextStop);
-				IdImpl fromNodeID = new IdImpl(rdStopSequence.current().get(""+prevStop).toString());
-				IdImpl toNodeID = new IdImpl(rdStopSequence.current().get(""+nextStop).toString());
+				Id<Node> fromNodeID = Id.create(rdStopSequence.current().get(""+prevStop).toString(), Node.class);
+				Id<Node> toNodeID = Id.create(rdStopSequence.current().get(""+nextStop).toString(), Node.class);
 				//System.out.println(fromNodeID);
 				//System.out.println(toNodeID);
 				fromNode = network.getFactory().createNode(fromNodeID, StopAndCoordinates.get(fromNodeID));
 				toNode = network.getFactory().createNode(toNodeID, StopAndCoordinates.get(toNodeID));
 				//System.out.println(fromNode);
 				//System.out.println(toNode);
-				IdImpl linkID = new IdImpl(fromNodeID.toString()+"_"+toNodeID.toString());
+				Id<Link> linkID = Id.create(fromNodeID.toString()+"_"+toNodeID.toString(), Link.class);
 				if (ListofLinks.contains(linkID)!=true){
 					//System.out.println(linkID);
 					linklength = CoordUtils.calcDistance(fromNode.getCoord(),toNode.getCoord());

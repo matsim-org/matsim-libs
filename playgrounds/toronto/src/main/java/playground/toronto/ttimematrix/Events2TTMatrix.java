@@ -27,19 +27,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.utils.LeastCostPathTree;
+
+import playground.balmermi.world.Zone;
 
 
 public class Events2TTMatrix {
@@ -51,8 +52,8 @@ public class Events2TTMatrix {
 	 * @param infile
 	 * @return the Map<Id,Id> containing the key (=linkId) value (=zoneId) pairs
 	 */
-	private static final Map<Id,Id> parseL2ZMapping(String infile) {
-		Map<Id,Id> l2zMapping = new HashMap<Id,Id>();
+	private static final Map<Id<Link>,Id<Zone>> parseL2ZMapping(String infile) {
+		Map<Id<Link>,Id<Zone>> l2zMapping = new HashMap<>();
 		try {
 			FileReader fr = new FileReader(infile);
 			BufferedReader br = new BufferedReader(fr);
@@ -62,8 +63,8 @@ public class Events2TTMatrix {
 				String[] entries = curr_line.split("\t", -1);
 				// lid  zid
 				// 0    1
-				Id lid = new IdImpl(entries[0]);
-				Id zid = new IdImpl(entries[1]);
+				Id<Link> lid = Id.create(entries[0], Link.class);
+				Id<Zone> zid = Id.create(entries[1], Zone.class);
 				l2zMapping.put(lid,zid);
 			}
 		} catch (IOException e) {

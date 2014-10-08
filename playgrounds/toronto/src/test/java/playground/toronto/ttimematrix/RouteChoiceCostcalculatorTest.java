@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.TravelDisutility;
@@ -64,7 +63,7 @@ public class RouteChoiceCostcalculatorTest {
 		LeastCostPathTree spTime = new LeastCostPathTree(ttc, timeCostCalculator);
 		
 		assert(this.scenario.getNetwork() != null);
-		Node origin = this.scenario.getNetwork().getNodes().get(new IdImpl(1));
+		Node origin = this.scenario.getNetwork().getNodes().get(Id.create(1, Node.class));
 		assert(origin != null);
 		
 		// calculate spanning trees
@@ -72,7 +71,7 @@ public class RouteChoiceCostcalculatorTest {
 		spTime.calculate(this.scenario.getNetwork(), origin, 0);
 		
 		// get destination node
-		Node destination = this.scenario.getNetwork().getNodes().get(new IdImpl(4));
+		Node destination = this.scenario.getNetwork().getNodes().get(Id.create(4, Node.class));
 		assert( destination != null );
 		
 		// get results
@@ -128,16 +127,16 @@ public class RouteChoiceCostcalculatorTest {
 		NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
 		
 		// add nodes
-		Node node1 = network.createAndAddNode(new IdImpl(1), this.scenario.createCoord(0, 0));
-		Node node2 = network.createAndAddNode(new IdImpl(2), this.scenario.createCoord(50, 100));
-		Node node3 = network.createAndAddNode(new IdImpl(3), this.scenario.createCoord(50, 0));
-		Node node4 = network.createAndAddNode(new IdImpl(4), this.scenario.createCoord(100, 0));
+		Node node1 = network.createAndAddNode(Id.create(1, Node.class), this.scenario.createCoord(0, 0));
+		Node node2 = network.createAndAddNode(Id.create(2, Node.class), this.scenario.createCoord(50, 100));
+		Node node3 = network.createAndAddNode(Id.create(3, Node.class), this.scenario.createCoord(50, 0));
+		Node node4 = network.createAndAddNode(Id.create(4, Node.class), this.scenario.createCoord(100, 0));
 
 		// add links
-		network.createAndAddLink(new IdImpl(1), node1, node2, 500.0, 10.0, 3600.0, 1);
-		network.createAndAddLink(new IdImpl(2), node2, node4, 500.0, 10.0, 3600.0, 1);
-		network.createAndAddLink(new IdImpl(3), node1, node3, 50.0, 0.1, 3600.0, 1);
-		network.createAndAddLink(new IdImpl(4), node3, node4, 50.0, 0.1, 3600.0, 1);
+		network.createAndAddLink(Id.create(1, Link.class), node1, node2, 500.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(Id.create(2, Link.class), node2, node4, 500.0, 10.0, 3600.0, 1);
+		network.createAndAddLink(Id.create(3, Link.class), node1, node3, 50.0, 0.1, 3600.0, 1);
+		network.createAndAddLink(Id.create(4, Link.class), node3, node4, 50.0, 0.1, 3600.0, 1);
 	}
 
 	

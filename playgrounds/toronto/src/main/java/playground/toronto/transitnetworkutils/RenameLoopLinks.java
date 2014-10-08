@@ -6,7 +6,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkFactoryImpl;
 import org.matsim.core.network.LinkImpl;
@@ -46,11 +45,11 @@ public class RenameLoopLinks {
 		for (Link l : baseNetwork.getLinks().values()){
 			LinkImpl L = (LinkImpl) l;
 			
-			IdImpl linkId;
+			Id<Link> linkId;
 			if (L.getType().equals("LOOP")){
-				linkId = new IdImpl(L.getFromNode().getId().toString() + "_LOOP");
+				linkId = Id.create(L.getFromNode().getId().toString() + "_LOOP", Link.class);
 				loopNamesMap.put(L.getId(), linkId);
-			}else linkId = (IdImpl) L.getId();
+			}else linkId = L.getId();
 			Node fn = outNetwork.getNodes().get(L.getFromNode().getId());
 			Node tn = outNetwork.getNodes().get(L.getToNode().getId());
 			

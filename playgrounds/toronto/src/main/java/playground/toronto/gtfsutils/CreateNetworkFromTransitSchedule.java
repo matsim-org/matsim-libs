@@ -14,7 +14,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -45,8 +44,8 @@ public class CreateNetworkFromTransitSchedule {
 	private final Map<TransitStopFacility, List<TransitStopFacility>> facilityCopies = new HashMap<TransitStopFacility, List<TransitStopFacility>>();
 
 	//ivy's code
-	private final ArrayList<Id> Stop_Nodes = new ArrayList<Id>();
-	private final Map<Tuple<Id,Id>,Link> Connection_Link = new HashMap<Tuple<Id,Id>, Link>();
+	private final ArrayList<Id<Node>> Stop_Nodes = new ArrayList<>();
+	private final Map<Tuple<Id<Node>,Id<Node>>,Link> Connection_Link = new HashMap<>();
 	
 	private long linkIdCounter = 0;
 	private long nodeIdCounter = 0;
@@ -60,7 +59,7 @@ public class CreateNetworkFromTransitSchedule {
 		this.prefix = networkIdPrefix;
 	}
 
-	public void createNetwork(HashMap<Id,Coord> StopAndCoordinates) {
+	public void createNetwork(HashMap<Id<Node>,Coord> StopAndCoordinates) {
 
 		List<Tuple<TransitLine, TransitRoute>> toBeRemoved = new LinkedList<Tuple<TransitLine, TransitRoute>>();
 		 
@@ -98,13 +97,13 @@ public class CreateNetworkFromTransitSchedule {
 	 * 
 	 * */
 	////ivy's code////////////////////////////////////////////////////////////////////
-	public Link getNetworkStop(final TransitRouteStop fromStop, final TransitRouteStop toStop, HashMap<Id,Coord> StopAndCoordinates) {
+	public Link getNetworkStop(final TransitRouteStop fromStop, final TransitRouteStop toStop, HashMap<Id<Node>,Coord> StopAndCoordinates) {
 		Node fromNode;
 		Node toNode;
 		
-		IdImpl fromNodeId = new IdImpl(fromStop.getStopFacility().getId().toString());
-		//IdImpl fromNodeIdfinal = new IdImpl(fromStop.getStopFacility().getId().toString() + "_STOP");
-		IdImpl fromNodeIdfinal = new IdImpl(fromStop.getStopFacility().getId().toString());
+		Id<Node> fromNodeId = Id.create(fromStop.getStopFacility().getId().toString(), Node.class);
+		//IdImpl fromNodeIdfinal = Id.create(fromStop.getStopFacility().getId().toString() + "_STOP");
+		Id<Node> fromNodeIdfinal = Id.create(fromStop.getStopFacility().getId().toString(), Node.class);
 		Coord fromNodeCoord = StopAndCoordinates.get(fromNodeId);
 		fromNode = this.network.getFactory().createNode(fromNodeIdfinal, fromNodeCoord);
 		if (this.Stop_Nodes.contains(fromNodeIdfinal) != true){
@@ -113,9 +112,9 @@ public class CreateNetworkFromTransitSchedule {
 		}
 		
 		
-		IdImpl toNodeId = new IdImpl(toStop.getStopFacility().getId().toString());
-		//IdImpl toNodeIdfinal = new IdImpl(toStop.getStopFacility().getId().toString()+"_STOP");
-		IdImpl toNodeIdfinal = new IdImpl(toStop.getStopFacility().getId().toString());
+		Id<Node> toNodeId = Id.create(toStop.getStopFacility().getId().toString(), Node.class);
+		//IdImpl toNodeIdfinal = Id.create(toStop.getStopFacility().getId().toString()+"_STOP");
+		Id<Node> toNodeIdfinal = Id.create(toStop.getStopFacility().getId().toString(), Node.class);
 		Coord toNodeCoord = StopAndCoordinates.get(toNodeId);
 		toNode = this.network.getFactory().createNode(toNodeIdfinal, toNodeCoord);
 		if (this.Stop_Nodes.contains(toNodeIdfinal) != true){
@@ -125,7 +124,7 @@ public class CreateNetworkFromTransitSchedule {
 		
 		
 		Tuple<Node, Node> connection = new Tuple<Node, Node>(fromNode, toNode);
-		Tuple<Id, Id> Node_Link = new Tuple<Id,Id>(fromNodeIdfinal,toNodeIdfinal);
+		Tuple<Id<Node>, Id<Node>> Node_Link = new Tuple<>(fromNodeIdfinal,toNodeIdfinal);
 		//System.out.println(connection);
 		//System.out.println(connection.hashCode());
 		//check for repeated links
@@ -151,7 +150,7 @@ public class CreateNetworkFromTransitSchedule {
 			fromNode = this.startNodes.get(toFacility);
 			if (fromNode == null) {
 				Coord coord = new CoordImpl(toFacility.getCoord().getX() + 50, toFacility.getCoord().getY() + 50);
-				fromNode = this.network.getFactory().createNode(new IdImpl("startnode_" + toFacility.getId()), coord);
+				fromNode = this.network.getFactory().createNode(Id.create("startnode_" + toFacility.getId(), Node.class), coord);
 				this.network.addNode(fromNode);
 				++nodeIdCounter;
 				this.startNodes.put(toFacility, fromNode);
@@ -162,7 +161,7 @@ public class CreateNetworkFromTransitSchedule {
 
 		Node toNode = this.nodes.get(toFacility);
 		if (toNode == null) {
-			toNode = this.network.getFactory().createNode(new IdImpl(this.prefix + toFacility.getId()), toFacility.getCoord());
+			toNode = this.network.getFactory().createNode(Id.create(this.prefix + toFacility.getId(), Node.class), toFacility.getCoord());
 			this.network.addNode(toNode);
 			++nodeIdCounter;
 			this.nodes.put(toFacility, toNode);
@@ -185,7 +184,7 @@ public class CreateNetworkFromTransitSchedule {
 					copies = new ArrayList<TransitStopFacility>();
 					this.facilityCopies.put(toFacility, copies);
 				}
-				IdImpl newId = new IdImpl(toFacility.getId().toString() + "." + Integer.toString(copies.size() + 1));
+				Id<TransitStopFacility> newId = Id.create(toFacility.getId().toString() + "." + Integer.toString(copies.size() + 1), TransitStopFacility.class);
 				TransitStopFacility newFacility = this.schedule.getFactory().createTransitStopFacility(newId, toFacility.getCoord(), toFacility.getIsBlockingLane());
 				newFacility.setStopPostAreaId(toFacility.getId().toString());
 				newFacility.setLinkId(link.getId());
@@ -207,7 +206,7 @@ public class CreateNetworkFromTransitSchedule {
 		Link link;
 		//need to change link id naming
 		Long LinkId = Integer.parseInt(this.prefix) * (++this.linkIdCounter);
-		link = this.network.getFactory().createLink(new IdImpl(LinkId), fromNode, toNode);
+		link = this.network.getFactory().createLink(Id.create(LinkId, Link.class), fromNode, toNode);
 		link.setLength(CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord()));
 		//need to change it!
 		link.setFreespeed(30.0 / 3.6);

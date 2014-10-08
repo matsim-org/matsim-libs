@@ -14,32 +14,33 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.vehicles.Vehicle;
 
 public class LineBoardingAndAlightingsByTimeBines implements
 		PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
 		TransitDriverStartsEventHandler {
 
-	private HashMap<Id, Id> vehicleLineCache;
+	private HashMap<Id<Vehicle>, Id<TransitLine>> vehicleLineCache;
 	private final TreeMap<Double, Integer> timeBins;
-	private HashMap<Id, int[]> lineBoardings;
-	private HashMap<Id, int[]> lineAlightings;
+	private HashMap<Id<TransitLine>, int[]> lineBoardings;
+	private HashMap<Id<TransitLine>, int[]> lineAlightings;
 	
 	public LineBoardingAndAlightingsByTimeBines(String binsFile) throws IOException{
 		this.timeBins = generateBinsFromFile(binsFile);
-		this.vehicleLineCache = new HashMap<Id, Id>();
-		this.lineAlightings = new HashMap<Id, int[]>();
-		this.lineBoardings = new HashMap<Id, int[]>();
+		this.vehicleLineCache = new HashMap<>();
+		this.lineAlightings = new HashMap<>();
+		this.lineBoardings = new HashMap<>();
 	}
 	
 	private int[] getEmptyBins(){
 		return new int[this.timeBins.size()];
 	}
 	
-	public void printLineResults(Id lineId){
+	public void printLineResults(Id<TransitLine> lineId){
 		int[] boardings = this.lineBoardings.get(lineId);
 		int[] alightings = this.lineAlightings.get(lineId);
 		
@@ -83,6 +84,7 @@ public class LineBoardingAndAlightingsByTimeBines implements
 			
 			if (time != null) set.put(time, i++);
 		}
+		br.close();
 		
 		set.put(Double.MAX_VALUE, i);
 		return set;
@@ -98,10 +100,10 @@ public class LineBoardingAndAlightingsByTimeBines implements
 		String eventsFile = args[0];
 		String binsFile = args[1];
 		
-		IdImpl YUS = new IdImpl(21948);
-		IdImpl BLR = new IdImpl(21945);
-		IdImpl SHE = new IdImpl(21946);
-		IdImpl SRT = new IdImpl(21947);
+		Id<TransitLine> YUS = Id.create(21948, TransitLine.class);
+		Id<TransitLine> BLR = Id.create(21945, TransitLine.class);
+		Id<TransitLine> SHE = Id.create(21946, TransitLine.class);
+		Id<TransitLine> SRT = Id.create(21947, TransitLine.class);
 		
 		LineBoardingAndAlightingsByTimeBines handler = new LineBoardingAndAlightingsByTimeBines(binsFile);
 		
@@ -126,7 +128,7 @@ public class LineBoardingAndAlightingsByTimeBines implements
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
 		if (this.vehicleLineCache.containsKey(event.getVehicleId())){
-			Id lineId = this.vehicleLineCache.get(event.getVehicleId());
+			Id<TransitLine> lineId = this.vehicleLineCache.get(event.getVehicleId());
 			if (!this.lineAlightings.containsKey(lineId)){
 				this.lineAlightings.put(lineId, getEmptyBins());
 			}
@@ -137,7 +139,7 @@ public class LineBoardingAndAlightingsByTimeBines implements
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		if (this.vehicleLineCache.containsKey(event.getVehicleId())){
-			Id lineId = this.vehicleLineCache.get(event.getVehicleId());
+			Id<TransitLine> lineId = this.vehicleLineCache.get(event.getVehicleId());
 			if (!this.lineBoardings.containsKey(lineId)){
 				this.lineBoardings.put(lineId, getEmptyBins());
 			}

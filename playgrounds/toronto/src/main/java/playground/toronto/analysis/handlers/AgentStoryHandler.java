@@ -16,24 +16,26 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.vehicles.Vehicle;
 
 public class AgentStoryHandler implements TransitDriverStartsEventHandler, ActivityEndEventHandler, ActivityStartEventHandler, 
 	PersonDepartureEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, PersonArrivalEventHandler{
 
-	private final Id pid;
+	private final Id<Person> pid;
 	private String story;
-	private HashMap<Id, Id> vehicleLineMap;
+	private HashMap<Id<Vehicle>, Id<TransitLine>> vehicleLineMap;
 	
-	public AgentStoryHandler(Id pid){
+	public AgentStoryHandler(Id<Person> pid){
 		this.pid = pid;
-		this.vehicleLineMap = new HashMap<Id, Id>();
+		this.vehicleLineMap = new HashMap<>();
 		this.story = "Story for agent \"" + this.pid.toString() + "\":";
 	}
 	public AgentStoryHandler(String pid){
-		this.pid = new IdImpl(pid);
-		this.vehicleLineMap = new HashMap<Id, Id>();
+		this.pid = Id.create(pid, Person.class);
+		this.vehicleLineMap = new HashMap<>();
 		this.story = "Story for agent \"" + this.pid.toString() + "\":";
 	}
 	
@@ -43,7 +45,7 @@ public class AgentStoryHandler implements TransitDriverStartsEventHandler, Activ
 	
 	@Override
 	public void reset(int iteration) {
-		this.vehicleLineMap = new HashMap<Id, Id>();
+		this.vehicleLineMap = new HashMap<>();
 		this.story = "Story for agent \"" + this.pid.toString() + "\":";
 	}
 
@@ -82,7 +84,7 @@ public class AgentStoryHandler implements TransitDriverStartsEventHandler, Activ
 	public void handleEvent(
 			org.matsim.api.core.v01.events.PersonLeavesVehicleEvent event) {
 		if (event.getPersonId().equals(this.pid)){
-			Id lineId = this.vehicleLineMap.get(event.getVehicleId());
+			Id<TransitLine> lineId = this.vehicleLineMap.get(event.getVehicleId());
 			if (lineId != null){
 				this.story += "\n" + Time.writeTime(event.getTime()) + ": PersonLeavesVehicleEvent [line='" +
 						lineId.toString() + "']";
@@ -95,7 +97,7 @@ public class AgentStoryHandler implements TransitDriverStartsEventHandler, Activ
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		if (event.getPersonId().equals(this.pid)){
-			Id lineId = this.vehicleLineMap.get(event.getVehicleId());
+			Id<TransitLine> lineId = this.vehicleLineMap.get(event.getVehicleId());
 			if (lineId != null){
 				this.story += "\n" + Time.writeTime(event.getTime()) + ": PersonEntersVehicleEvent [line='" +
 						lineId.toString() + "']";

@@ -10,8 +10,6 @@ import java.util.Arrays;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkFactoryImpl;
 import org.matsim.core.network.LinkImpl;
@@ -43,12 +41,12 @@ public class LinkStopsToNearestNode {
 		new MatsimNetworkReader(scenario2).readFile(networkInFile);
 		
 		//Remove highways and on/off ramps. Should not affect routes which travel on highways since transit lines don't stop ON highways.	
-		ArrayList<Id> linksToRemove = new ArrayList<Id>();
+		ArrayList<Id<Link>> linksToRemove = new ArrayList<>();
 		for (Link l : noHighways.getLinks().values()){
 			LinkImpl L = (LinkImpl) l;
 			if (L.getType().equals("Highway") || L.getType().equals("Toll Highway") || L.getType().equals("On/Off Ramp")) linksToRemove.add(L.getId());
 		}
-		for (Id i : linksToRemove) noHighways.removeLink(i);
+		for (Id<Link> i : linksToRemove) noHighways.removeLink(i);
 		
 		// Create filtered networks, one for each of the four main modes.
 		NetworkImpl BusNetwork = NetworkImpl.createNetwork(); //for buses
@@ -119,7 +117,7 @@ public class LinkStopsToNearestNode {
 			}
 			
 			if(!loopedNodes.contains(N.getId())){//Loop link DNE
-				LinkImpl l = (LinkImpl) factory.createLink(new IdImpl(N.getId() + "_LOOP"), N, N, (Network) network, 0.0, 10.0, 999.0, 1.0);
+				LinkImpl l = (LinkImpl) factory.createLink(Id.create(N.getId() + "_LOOP", Link.class), N, N, network, 0.0, 10.0, 999.0, 1.0);
 				l.setType("LOOP");
 				
 				/*if(!modes.isEmpty()){
@@ -134,7 +132,7 @@ public class LinkStopsToNearestNode {
 				loopedNodes.add(N.getId());
 			}
 
-			fixedStopsWriter.write(network.getLinks().get(new IdImpl(N.getId().toString() + "_LOOP")).getId().toString() + "\n");
+			fixedStopsWriter.write(network.getLinks().get(Id.create(N.getId().toString() + "_LOOP", Link.class)).getId().toString() + "\n");
 			exportForEsriWriter.write(id + "," + stopLon + "," + stopLat + "," + N.getId().toString() + "," + N.getCoord().getX() + "," + N.getCoord().getY() + "\n");
 		}
 		

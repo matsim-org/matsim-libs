@@ -5,13 +5,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacityImpl;
+import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleType.DoorOperationMode;
 import org.matsim.vehicles.VehicleTypeImpl;
 import org.matsim.vehicles.VehicleWriterV1;
@@ -25,7 +25,7 @@ public class CreateMultipleVehicleTypesForSchedule {
 
 	private final Vehicles vehicles;
 	private final TransitSchedule schedule;
-	private Map<Id, Id> routeVehTypeMap;
+	private Map<Id<TransitRoute>, Id<VehicleType>> routeVehTypeMap;
 	
 	public CreateMultipleVehicleTypesForSchedule(final TransitSchedule schedule, final Vehicles vehicles){
 		this.vehicles = vehicles;
@@ -37,7 +37,7 @@ public class CreateMultipleVehicleTypesForSchedule {
 		TableReader tr = new TableReader(filename);
 		tr.open();
 		while (tr.next()){
-			IdImpl i = new IdImpl(tr.current().get("veh_id"));
+			Id<VehicleType> i = Id.create(tr.current().get("veh_id"), VehicleType.class);
 			VehicleTypeImpl type = new VehicleTypeImpl(i);
 			
 			type.setDescription(tr.current().get("description"));
@@ -72,13 +72,13 @@ public class CreateMultipleVehicleTypesForSchedule {
 	}
 	
 	public void ReadRouteVehicleMapping(String filename) throws FileNotFoundException, IOException{
-		this.routeVehTypeMap = new HashMap<Id, Id>();
+		this.routeVehTypeMap = new HashMap<>();
 		
 		TableReader tr = new TableReader(filename);
 		tr.open();
 		while (tr.next()){
-			IdImpl routeId = new IdImpl(tr.current().get("route_id"));
-			IdImpl vehTypeId = new IdImpl(tr.current().get("vehicle_type"));
+			Id<TransitRoute> routeId = Id.create(tr.current().get("route_id"), TransitRoute.class);
+			Id<VehicleType> vehTypeId = Id.create(tr.current().get("vehicle_type"), VehicleType.class);
 			
 			this.routeVehTypeMap.put(routeId, vehTypeId);
 		}
@@ -89,16 +89,16 @@ public class CreateMultipleVehicleTypesForSchedule {
 		
 		VehiclesFactory vb = this.vehicles.getFactory();
 		
-		HashMap<Id, Integer> numberOfVehiclesByType = new HashMap<Id, Integer>();
-		for (Id i : this.vehicles.getVehicleTypes().keySet()) numberOfVehiclesByType.put(i, new Integer(0));
+		HashMap<Id<VehicleType>, Integer> numberOfVehiclesByType = new HashMap<>();
+		for (Id<VehicleType> i : this.vehicles.getVehicleTypes().keySet()) numberOfVehiclesByType.put(i, new Integer(0));
 
 		for (TransitLine line : this.schedule.getTransitLines().values()) {
-			Id vehTypeId = this.routeVehTypeMap.get(line.getId());
+			Id<VehicleType> vehTypeId = this.routeVehTypeMap.get(line.getId());
 			
 			for (TransitRoute route : line.getRoutes().values()) {
 				for (Departure departure : route.getDepartures().values()) {
 					String i = "VehType" + vehTypeId.toString() + "_" + numberOfVehiclesByType.get(vehTypeId);
-					Vehicle v = vb.createVehicle(new IdImpl(i), this.vehicles.getVehicleTypes().get(vehTypeId));
+					Vehicle v = vb.createVehicle(Id.create(i, Vehicle.class), this.vehicles.getVehicleTypes().get(vehTypeId));
 					numberOfVehiclesByType.put(vehTypeId, numberOfVehiclesByType.get(vehTypeId) + 1);
 					this.vehicles.addVehicle( v);
 					departure.setVehicleId(v.getId());

@@ -8,7 +8,6 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.filter.NetworkLinkFilter;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
@@ -50,8 +49,8 @@ public class Cordon implements NetworkLinkFilter {
 	 * 		MUST include columns labelled "Id" and "Descr".
 	 * @return Map of {@link Id} : {@link Cordon}
 	 */
-	public static Map<Id, Cordon> openShapefile(String shapefile){
-		HashMap<Id, Cordon> result = new HashMap<Id, Cordon>();
+	public static Map<Id<Cordon>, Cordon> openShapefile(String shapefile){
+		HashMap<Id<Cordon>, Cordon> result = new HashMap<>();
 		
 		ShapeFileReader reader = new ShapeFileReader();
 		reader.readFileAndInitialize(shapefile);
@@ -59,11 +58,11 @@ public class Cordon implements NetworkLinkFilter {
 		
 		for (SimpleFeature f : features){
 			
-			Id cid;
+			Id<Cordon> cid;
 			try{
-				cid = new IdImpl((Integer) f.getAttribute(Cordon.ID));
+				cid = Id.create((Integer) f.getAttribute(Cordon.ID), Cordon.class);
 			}catch (ClassCastException c){
-				cid = new IdImpl((String) f.getAttribute(Cordon.ID));
+				cid = Id.create((String) f.getAttribute(Cordon.ID), Cordon.class);
 			}
 				
 			Cordon c = new Cordon(cid,
@@ -90,8 +89,8 @@ public class Cordon implements NetworkLinkFilter {
 	 * @param network - The {@link Network} to load links from. 
 	 * @return Map of {@link Id} : {@link Cordon}
 	 */
-	public static Map<Id, Cordon> openShapefile(String shapefile, Network network){
-		Map<Id, Cordon> result = Cordon.openShapefile(shapefile);
+	public static Map<Id<Cordon>, Cordon> openShapefile(String shapefile, Network network){
+		Map<Id<Cordon>, Cordon> result = Cordon.openShapefile(shapefile);
 		
 		for (Cordon c : result.values()){
 			c.loadLinksFromNetwork(network);
@@ -103,22 +102,22 @@ public class Cordon implements NetworkLinkFilter {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	//Attributes
-	private final Id id;
+	private final Id<Cordon> id;
 	public String description;
 	
-	private Collection<Id> inLinks;
-	private Collection<Id> outLinks;
-	private Collection<Id> interiorLinks;
+	private Collection<Id<Link>> inLinks;
+	private Collection<Id<Link>> outLinks;
+	private Collection<Id<Link>> interiorLinks;
 	private final MultiPolygon geom;
 	private GeometryFactory factory;
 	
-	public Cordon(Id id, MultiPolygon geometry){
+	public Cordon(Id<Cordon> id, MultiPolygon geometry){
 		this.id = id;
 		this.geom = geometry;
 		
-		this.inLinks = new ArrayList<Id>();
-		this.outLinks = new ArrayList<Id>();
-		this.interiorLinks = new ArrayList<Id>();
+		this.inLinks = new ArrayList<>();
+		this.outLinks = new ArrayList<>();
+		this.interiorLinks = new ArrayList<>();
 		
 		this.factory = new GeometryFactory();
 	}
@@ -170,28 +169,28 @@ public class Cordon implements NetworkLinkFilter {
 		}
 	}
 	
-	public Id getId(){
+	public Id<Cordon> getId(){
 		return this.id;
 	}
 	
 	/**
 	 * @return Ids of links crossing into the cordon
 	 */
-	public Collection<Id> getIncomingLinks(){
+	public Collection<Id<Link>> getIncomingLinks(){
 		return this.inLinks;
 	}
 	
 	/**
 	 * @return Ids of links crossing out from the cordon
 	 */
-	public Collection<Id> getOutgoingLinks(){
+	public Collection<Id<Link>> getOutgoingLinks(){
 		return this.outLinks;
 	}
 	
 	/**
 	 * @return Ids of links containted within the cordon
 	 */
-	public Collection<Id> getInteriorLinks(){
+	public Collection<Id<Link>> getInteriorLinks(){
 		return this.interiorLinks;
 	}
 

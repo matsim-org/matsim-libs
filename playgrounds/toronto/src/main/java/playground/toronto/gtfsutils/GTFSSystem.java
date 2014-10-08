@@ -10,7 +10,6 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 
@@ -103,20 +102,20 @@ public class GTFSSystem {
 			"shape_pt_sequence",
 			"shape_dist_traveled"});
 
-	private TreeMap<Id, Stop> stops;
-	private TreeMap<Id, Route> routes;
-	private TreeMap<Id, Service> services;
-	private TreeMap<Id, Shape> shapes;
-	private TreeMap<Id, Frequency> frequencies;
+	private TreeMap<Id<Stop>, Stop> stops;
+	private TreeMap<Id<Route>, Route> routes;
+	private TreeMap<Id<Service>, Service> services;
+	private TreeMap<Id<Shape>, Shape> shapes;
+	private TreeMap<Id<Frequency>, Frequency> frequencies;
 	private HashMap<String, Route> tripToRoute; //tripId -> routeId
 	
 	//CONSTRUCTOR--------------------------------------------------------------------------------------------------------------------------
 	
 	public GTFSSystem(){
-		this.stops = new TreeMap<Id, Stop>();
-		this.routes = new TreeMap<Id, Route>();
-		this.services = new TreeMap<Id, Service>();
-		this.shapes = new TreeMap<Id, Shape>();
+		this.stops = new TreeMap<>();
+		this.routes = new TreeMap<>();
+		this.services = new TreeMap<>();
+		this.shapes = new TreeMap<>();
 		this.tripToRoute = new HashMap<String, Route>();
 	}
 	
@@ -130,7 +129,7 @@ public class GTFSSystem {
 			
 			this.stops.clear();
 			while (tr.next()){
-				Id stopId = new IdImpl(tr.current().get("stop_id"));
+				Id<Stop> stopId = Id.create(tr.current().get("stop_id"), Stop.class);
 				CoordImpl coord = new CoordImpl(tr.current().get("stop_lon"), tr.current().get("stop_lat"));
 				
 				Stop s = new Stop(coord, tr.current().get("stop_name"), false);
@@ -146,7 +145,7 @@ public class GTFSSystem {
 			
 			this.services.clear();
 			while (tr.next()){
-				Id id = new IdImpl(tr.current().get("service_id"));
+				Id<Service> id = Id.create(tr.current().get("service_id"), Service.class);
 				boolean[] days = new boolean[7];
 				for (int i = 1; i < 8; i++){
 					String day = "";
@@ -177,7 +176,7 @@ public class GTFSSystem {
 			
 			this.routes.clear();
 			while (tr.next()){
-				Id routeId = new IdImpl(tr.current().get("route_id"));
+				Id<Route> routeId = Id.create(tr.current().get("route_id"), Route.class);
 				Route r = new Route(tr.current().get("route_short_name"), getWayType(Integer.parseInt(tr.current().get("route_type")))); 
 				this.routes.put(routeId, r);
 			}
@@ -192,15 +191,15 @@ public class GTFSSystem {
 			while (tr.next()){
 				String tripId = tr.current().get("trip_id");
 				
-				Id routeId = new IdImpl(tr.current().get("route_id"));
+				Id<Route> routeId = Id.create(tr.current().get("route_id"), Route.class);
 				Route r = this.routes.get(routeId);
 				if (r == null) throw new IOException("Cannot find a route for trip " + tripId + "!"); //this cannot be null
 				
-				Id serviceId = new IdImpl(tr.current().get("service_id"));
+				Id<Service> serviceId = Id.create(tr.current().get("service_id"), Service.class);
 				Service service = this.services.get(serviceId);
 				if (service == null) throw new IOException("Cannot find a service for trip " + tripId + "!"); //this cannot be null
 				
-				Id shapeId = new IdImpl(tr.current().get("shape_id"));
+				Id<Shape> shapeId = Id.create(tr.current().get("shape_id"), Shape.class);
 				Shape shape = this.shapes.get(shapeId); //This can be null.
 				
 				Trip t = new Trip(service, shape, tr.current().get("trip_headsign"));
@@ -326,20 +325,20 @@ public class GTFSSystem {
 			//optional: load transfer rules
 		}
 		
-		public TreeMap<Id, Stop> getStops(){
+		public TreeMap<Id<Stop>, Stop> getStops(){
 			return this.stops;
 		}
 		
-		public TreeMap<Id, Route> getRoutes(){
+		public TreeMap<Id<Route>, Route> getRoutes(){
 			return this.routes;
 		}
 		
-		public TreeMap<Id, Frequency> getFrequencies(){
+		public TreeMap<Id<Frequency>, Frequency> getFrequencies(){
 			return this.frequencies;
 		}
 		
 		public Service getService(String id){
-			return this.services.get(new IdImpl(id));
+			return this.services.get(Id.create(id, Service.class));
 		}
 		
 		private RouteTypes getWayType(int i){

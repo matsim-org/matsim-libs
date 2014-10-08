@@ -14,7 +14,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -148,7 +147,7 @@ public class ModdedConverterE {
 						// this line is about the same person as the line before.
 						// "extend" the plan of that person with a Leg and an Act
 
-						Plan pl = this.pop.getPersons().get(new IdImpl(personId)).getSelectedPlan();
+						Plan pl = this.pop.getPersons().get(Id.create(personId, Person.class)).getSelectedPlan();
 						endTime = convertTime(tabs[3]);
 						double dur = endTime - this.tmpEndTime;
 
@@ -159,12 +158,12 @@ public class ModdedConverterE {
 						if ((tabs[4].equals("H"))&&this.tmpGotH) { //if the trip starts at home and home coordinate has been set
 							tmpCoord = this.tmpHome;
 						}else if((tabs[4].equals("H"))&&!this.tmpGotH){ // if the trip starts at home but home coordinate hasn't been set
-							tmpCoord = getRandomCoordInZone(new IdImpl(tabs[6]));
+							tmpCoord = getRandomCoordInZone(Id.create(tabs[6], Zone.class));
 							this.tmpHome = tmpCoord;
 							this.tmpGotH = true;
 						}
 						else{ //if the trip starts away from home
-							tmpCoord = getRandomCoordInZone(new IdImpl(tabs[6]));
+							tmpCoord = getRandomCoordInZone(Id.create(tabs[6], Zone.class));
 						}
 						this.tmpType = tabs[7];
 						ActivityImpl act = ((PlanImpl) pl).createAndAddActivity(tabs[4], tmpCoord);
@@ -176,7 +175,7 @@ public class ModdedConverterE {
 						// then start the new person
 
 						if (!this.pop.getPersons().isEmpty()) {
-							Person p = this.pop.getPersons().get(new IdImpl(this.tmpPersonId));
+							Person p = this.pop.getPersons().get(Id.create(this.tmpPersonId, Person.class));
 							Plan tmpPl = p.getSelectedPlan();
 
 							LegImpl leg = ((PlanImpl) tmpPl).createAndAddLeg(TransportMode.car);
@@ -187,11 +186,11 @@ public class ModdedConverterE {
 							if ((this.tmpTabs[7].equals("H"))&&this.tmpGotH) { // the person's last trip ends at home and home coordinate has already been set
 								tmpCoord2 = this.tmpHome;
 							}else if ((this.tmpTabs[7].equals("H"))&&!this.tmpGotH){ // the person's last trip ends at home but home coordinate hasn't been set
-								tmpCoord2 = getRandomCoordInZone(new IdImpl(this.tmpTabs[9]));
+								tmpCoord2 = getRandomCoordInZone(Id.create(this.tmpTabs[9], Zone.class));
 								this.tmpHome = tmpCoord2;
 								this.tmpGotH = true;
 							}else{ //the person's last trip does not end at home
-								tmpCoord2 = getRandomCoordInZone(new IdImpl(this.tmpTabs[9]));
+								tmpCoord2 = getRandomCoordInZone(Id.create(this.tmpTabs[9], Zone.class));
 								this.count2+=1;
 								System.out.println(this.tmpPersonId);
 							}
@@ -199,26 +198,26 @@ public class ModdedConverterE {
 
 						}
 
-						PersonImpl p = new PersonImpl(new IdImpl(personId));
+						PersonImpl p = new PersonImpl(Id.create(personId, Person.class));
 						PlanImpl pl = new org.matsim.core.population.PlanImpl(p);
 						// ZoneXY zoneXY = zoneXYs.get(tabs[9]);
 						endTime = convertTime(tabs[3]);
 						this.tmpType = tabs[4];
 						Coord tmpCoord3;
 						if (!this.tmpHhldId.equals(hhldId)&&this.tmpType.equals("H")) {  //1st person of a household start first trip from home
-							this.tmpHome = getRandomCoordInZone(new IdImpl(tabs[6]));
+							this.tmpHome = getRandomCoordInZone(Id.create(tabs[6], Zone.class));
 							tmpCoord3 = this.tmpHome;
 							this.tmpGotH = true;
 						}else if (this.tmpHhldId.equals(hhldId)&&this.tmpType.equals("H")){ //other people of the same household start first trip from home
 							tmpCoord3 = this.tmpHome;
 							this.tmpGotH = true;
 						}else if (this.tmpHhldId.equals(hhldId)&&!this.tmpType.equals("H")){ //other people of the same household start first trip away from home
-							tmpCoord3 = getRandomCoordInZone(new IdImpl(tabs[6]));
+							tmpCoord3 = getRandomCoordInZone(Id.create(tabs[6], Zone.class));
 							this.tmpGotH = true;
 							this.count1 += 1;
 							System.out.println(personId);
 						}else{ //1st person of a household start first trip away from home
-							tmpCoord3 = getRandomCoordInZone(new IdImpl(tabs[6]));
+							tmpCoord3 = getRandomCoordInZone(Id.create(tabs[6], Zone.class));
 							this.tmpGotH = false;
 							this.count1 += 1;
 							System.out.println(personId);
@@ -247,7 +246,7 @@ public class ModdedConverterE {
 			}
 		}else{
 
-			Person p = this.pop.getPersons().get(new IdImpl(this.tmpPersonId));
+			Person p = this.pop.getPersons().get(Id.create(this.tmpPersonId, Person.class));
 			Plan tmpPl = p.getSelectedPlan();
 
 
@@ -258,11 +257,11 @@ public class ModdedConverterE {
 			if ((this.tmpTabs[7].equals("H"))&&this.tmpGotH) {
 				tmpCoord2 = this.tmpHome;
 			}else if ((this.tmpTabs[7].equals("H"))&&!this.tmpGotH){
-				tmpCoord2 = getRandomCoordInZone(new IdImpl(this.tmpTabs[9]));
+				tmpCoord2 = getRandomCoordInZone(Id.create(this.tmpTabs[9], Zone.class));
 				this.tmpHome = tmpCoord2;
 				this.tmpGotH = true;
 			}else{
-				tmpCoord2 = getRandomCoordInZone(new IdImpl(this.tmpTabs[9]));
+				tmpCoord2 = getRandomCoordInZone(Id.create(this.tmpTabs[9], Zone.class));
 				this.count2+=1;
 				System.out.println(this.tmpPersonId);
 			}
@@ -272,9 +271,9 @@ public class ModdedConverterE {
 		}
 	}
 
-	private Coord getRandomCoordInZone(final Id zoneId) {
+	private Coord getRandomCoordInZone(final Id<Zone> zoneId) {
 		return WorldUtils.getRandomCoordInZone(
-				(Zone) this.zones.getLocation(zoneId), this.zones);
+				this.zones.getLocation(zoneId), this.zones);
 	}
 
 	public void createZones() {
@@ -285,7 +284,7 @@ public class ModdedConverterE {
 	}
 
 	public void createZone(final ZoneXY zxy) {
-		this.zones.createZone(new IdImpl(zxy.getZoneId()), zxy.getX(), zxy.getY(), null, null,
+		this.zones.createZone(Id.create(zxy.getZoneId(), Zone.class), zxy.getX(), zxy.getY(), null, null,
 				null, null);
 	}
 
@@ -297,7 +296,7 @@ public class ModdedConverterE {
 
 		ModdedConverterE c = new ModdedConverterE();
 
-		c.setZones((ZoneLayer) new World().createLayer(new IdImpl("zones")));
+		c.setZones((ZoneLayer) new World().createLayer(Id.create("zones", Layer.class)));
 		c.setZoneXYs(new HashMap<String, ZoneXY>());
 
 		// reading zone.txt "zone,x,y" ...

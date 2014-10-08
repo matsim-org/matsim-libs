@@ -6,8 +6,8 @@ import java.io.IOException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -86,7 +86,7 @@ public class AnalyzeTripComponentsFromEvents {
 		TableReader tr = new TableReader(zonesFile);
 		tr.open();
 		while (tr.next()){
-			Id zoneId = new IdImpl(tr.current().get("zone_id"));
+			Id<Node> zoneId = Id.create(tr.current().get("zone_id"),Node.class);
 			double x = Double.parseDouble(tr.current().get("x"));
 			double y = Double.parseDouble(tr.current().get("y"));
 			

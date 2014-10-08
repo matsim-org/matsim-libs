@@ -20,8 +20,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkFactoryImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -456,7 +454,7 @@ public class Emme2MatsimConverter {
 				}*/
 				boolean isZone = cells[0].contains("*");
 				
-				NodeImpl n = new NodeImpl(new IdImpl(cells[1]));
+				NodeImpl n = new NodeImpl(Id.create(cells[1], Node.class));
 				n.setCoord(new CoordImpl(cells[2], 
 						cells[3].length() == 6 ? "4" + cells[3] : cells[3])); 
 				//Some EMME networks are restricted to using only 6 characters for the y-coordinate. This appends a '4' to the start if this is the case.
@@ -476,8 +474,8 @@ public class Emme2MatsimConverter {
 					continue;
 				}
 				
-				Node i = network.getNodes().get(new IdImpl(cells[1]));
-				Node j = network.getNodes().get(new IdImpl(cells[2]));
+				Node i = network.getNodes().get(Id.create(cells[1], Node.class));
+				Node j = network.getNodes().get(Id.create(cells[2], Node.class));
 				double length = Double.parseDouble(cells[3]) * 1000; //converts km to m
 				double speed = Double.parseDouble(cells[9]) / 3.6; //converts km/hr to m/s
 				double lanes = Double.parseDouble(cells[6]);
@@ -485,7 +483,7 @@ public class Emme2MatsimConverter {
 				String modes = cells[4];
 				if (lanes == 0.0) lanes = 1.0; //ensures that transit-only links have at least one lane.
 				
-				LinkImpl l = (LinkImpl) factory.createLink(new IdImpl(cells[1] + "-" + cells[2]), 
+				LinkImpl l = (LinkImpl) factory.createLink(Id.create(cells[1] + "-" + cells[2], Link.class), 
 						i, j, network, length, speed, cap, lanes);
 								
 				l.setAllowedModes(convertMode(modes));
@@ -495,7 +493,7 @@ public class Emme2MatsimConverter {
 				
 				//Special handling of "l" and "q" modes (LRT/BRT ROW-B)
 				if (modes.contains("l") || modes.contains("q")){
-					l = (LinkImpl) factory.createLink(new IdImpl(cells[1] + "-" + cells[2] + "_TrROW"),
+					l = (LinkImpl) factory.createLink(Id.create(cells[1] + "-" + cells[2] + "_TrROW", Link.class),
 							i, j, network, length, speed, 9999, 1.0); //Duplicate link for the ROW
 					
 					HashSet<String> modeSet = new HashSet<String>();

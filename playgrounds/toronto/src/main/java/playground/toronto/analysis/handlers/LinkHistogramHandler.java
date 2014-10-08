@@ -16,8 +16,8 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -47,11 +47,11 @@ public class LinkHistogramHandler implements LinkEnterEventHandler,
 			for (int i = 4; i < args.length; i++){
 				String[] idStr = args[i].split(",");
 				
-				IdImpl startId = new IdImpl(idStr[0]);
-				IdImpl endId = new IdImpl(idStr[idStr.length - 1]);
-				IdImpl[] inIds = new IdImpl[idStr.length - 2];
+				Id<Link> startId = Id.create(idStr[0], Link.class);
+				Id<Link> endId = Id.create(idStr[idStr.length - 1], Link.class);
+				Id<Link>[] inIds = new Id[idStr.length - 2];
 				for (int j = 0; j < inIds.length; j++){
-					inIds[j] = new IdImpl(idStr[j + 2]);
+					inIds[j] = Id.create(idStr[j + 2], Link.class);
 				}
 				
 				LinkNetworkRouteImpl nr = new LinkNetworkRouteImpl(startId, inIds, endId);
@@ -97,16 +97,16 @@ public class LinkHistogramHandler implements LinkEnterEventHandler,
 	private final double startTime;
 	private final double endTime;
 	
-	private Map<Id, NetworkRoute> enterLinks;
-	private Map<Id, NetworkRoute> exitLinks;
+	private Map<Id<Link>, NetworkRoute> enterLinks;
+	private Map<Id<Link>, NetworkRoute> exitLinks;
 	
 	public LinkHistogramHandler (double startTime, double endTime, Set<NetworkRoute> routes){
 		this.startTime =startTime;
 		this.endTime =endTime;
 		this.routes =routes;
 		
-		this.enterLinks = new HashMap<Id, NetworkRoute>();
-		this.exitLinks = new HashMap<Id, NetworkRoute>();
+		this.enterLinks = new HashMap<>();
+		this.exitLinks = new HashMap<>();
 		
 		this.entering = new TreeMap<NetworkRoute, List<Double>>();
 		this.exiting = new TreeMap<NetworkRoute, List<Double>>();
