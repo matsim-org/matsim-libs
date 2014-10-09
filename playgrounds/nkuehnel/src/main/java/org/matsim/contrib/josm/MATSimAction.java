@@ -147,7 +147,7 @@ class MATSimAction {
 		public static JDialog dlg;
 
 		public ConvertAction() {
-			super(tr("Convert to MATSim Network"), null,
+			super(tr("Convert to MATSim Layer"), null,
 					tr("Convert Osm layer to MATSim network layer"), Shortcut
 							.registerShortcut(
 									"menu:matsimConvert",

@@ -19,7 +19,7 @@ import org.openstreetmap.josm.Main;
 class ImportDialog extends JPanel {
 	// the JOptionPane that contains this dialog. required for the closeDialog()
 	// method.
-	
+
 	/**
 	 * Holds the path of the import file
 	 */

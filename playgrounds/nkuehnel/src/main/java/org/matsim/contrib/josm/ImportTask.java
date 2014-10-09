@@ -83,8 +83,9 @@ class ImportTask extends PleaseWaitRunnable {
 	protected void finish() {
 		// layer = null happens if Exception happens during import,
 		// as Exceptions are handled only after this method is called.
-		layer = new MATSimLayer(dataSet, ImportDialog.path.getText(),
-				new File(path), scenario, importSystem, way2Links, link2Segment, relation2Route);
+		layer = new MATSimLayer(dataSet, ImportDialog.path.getText(), new File(
+				path), scenario, importSystem, way2Links, link2Segment,
+				relation2Route);
 		if (layer != null) {
 			Main.main.addLayer(layer);
 			Main.map.mapView.setActiveLayer(layer);
@@ -100,7 +101,9 @@ class ImportTask extends PleaseWaitRunnable {
 		this.progressMonitor.setTicksCount(4);
 		this.progressMonitor.setTicks(0);
 
+		// prepare empty data set
 		dataSet = new DataSet();
+
 		importSystem = (String) ImportDialog.importSystem.getSelectedItem();
 		CoordinateTransformation ct = TransformationFactory
 				.getCoordinateTransformation(importSystem,
@@ -117,7 +120,7 @@ class ImportTask extends PleaseWaitRunnable {
 
 		way2Links = new HashMap<Way, List<Link>>();
 		link2Segment = new HashMap<Link, List<WaySegment>>();
-		
+
 		HashMap<Node, org.openstreetmap.josm.data.osm.Node> node2OsmNode = new HashMap<Node, org.openstreetmap.josm.data.osm.Node>();
 		this.progressMonitor.setTicks(3);
 		this.progressMonitor.setCustomText("creating nodes..");
@@ -125,6 +128,7 @@ class ImportTask extends PleaseWaitRunnable {
 			Coord tmpCoor = node.getCoord();
 			LatLon coor;
 
+			// convert coordinates into wgs84
 			if (importSystem.equals("WGS84")) {
 				coor = new LatLon(tmpCoor.getY(), tmpCoor.getX());
 			} else {
@@ -134,12 +138,17 @@ class ImportTask extends PleaseWaitRunnable {
 			}
 			org.openstreetmap.josm.data.osm.Node nodeOsm = new org.openstreetmap.josm.data.osm.Node(
 					coor);
+
+			// set id of MATSim node as tag, as actual id of new MATSim node is
+			// set as corresponding OSM node id
 			nodeOsm.put(NODE_TAG_ID, node.getId().toString());
 			node2OsmNode.put(node, nodeOsm);
 			dataSet.addPrimitive(nodeOsm);
-			Node newNode = scenario.getNetwork().getFactory().createNode(
-					Id.create(nodeOsm.getUniqueId(), Node.class),
-					node.getCoord());
+			Node newNode = scenario
+					.getNetwork()
+					.getFactory()
+					.createNode(Id.create(nodeOsm.getUniqueId(), Node.class),
+							node.getCoord());
 			((NodeImpl) newNode).setOrigId(node.getId().toString());
 			scenario.getNetwork().addNode(newNode);
 		}
@@ -154,6 +163,8 @@ class ImportTask extends PleaseWaitRunnable {
 			org.openstreetmap.josm.data.osm.Node toNode = node2OsmNode.get(link
 					.getToNode());
 			way.addNode(toNode);
+			// set id of link as tag, as actual id of new link is set as
+			// corresponding way id
 			way.put(WAY_TAG_ID, link.getId().toString());
 			way.put("freespeed", String.valueOf(link.getFreespeed()));
 			way.put("capacity", String.valueOf(link.getCapacity()));
@@ -161,6 +172,7 @@ class ImportTask extends PleaseWaitRunnable {
 			way.put("permlanes", String.valueOf(link.getNumberOfLanes()));
 			StringBuilder modes = new StringBuilder();
 
+			// multiple values are separated by ";"
 			for (String mode : link.getAllowedModes()) {
 				modes.append(mode);
 				if (link.getAllowedModes().size() > 1) {
@@ -170,12 +182,19 @@ class ImportTask extends PleaseWaitRunnable {
 			way.put("modes", modes.toString());
 
 			dataSet.addPrimitive(way);
-			Link newLink = scenario.getNetwork().getFactory().createLink(
-					Id.create(way.getUniqueId(), Link.class),
-					scenario.getNetwork().getNodes().get(
-							Id.create(fromNode.getUniqueId(), Node.class)),
-					scenario.getNetwork().getNodes().get(
-							Id.create(toNode.getUniqueId(), Node.class)));
+			Link newLink = scenario
+					.getNetwork()
+					.getFactory()
+					.createLink(
+							Id.create(way.getUniqueId(), Link.class),
+							scenario.getNetwork()
+									.getNodes()
+									.get(Id.create(fromNode.getUniqueId(),
+											Node.class)),
+							scenario.getNetwork()
+									.getNodes()
+									.get(Id.create(toNode.getUniqueId(),
+											Node.class)));
 			newLink.setFreespeed(link.getFreespeed());
 			newLink.setCapacity(link.getCapacity());
 			newLink.setLength(link.getLength());

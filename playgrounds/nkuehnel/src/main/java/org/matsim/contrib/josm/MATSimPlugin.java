@@ -38,7 +38,7 @@ import org.xml.sax.SAXException;
  */
 public class MATSimPlugin extends Plugin implements PreferenceChangedListener {
 	private MATSimAction MATSimAction;
-	
+
 	protected static MATSimToggleDialog toggleDialog;
 	private static boolean matsimRenderer = Main.pref.getBoolean(
 			"matsim_renderer", false);
@@ -46,16 +46,19 @@ public class MATSimPlugin extends Plugin implements PreferenceChangedListener {
 	public MATSimPlugin(PluginInformation info) throws IOException,
 			SAXException {
 		super(info);
+
+		// add xml exporter for matsim data
 		ExtensionFileFilter.exporters.add(0, new MATSimNetworkFileExporter());
 
+		// add commands to tools list
 		MATSimAction = new MATSimAction();
 		Main.main.menu.toolsMenu.add(MATSimAction.getImportAction());
 		Main.main.menu.toolsMenu.add(MATSimAction.getNewNetworkAction());
 		Main.main.menu.toolsMenu.add(MATSimAction.getConvertAction());
 
+		// read tagging preset
 		Reader reader = new InputStreamReader(getClass().getResourceAsStream(
 				"matsimPreset.xml"));
-
 		Collection<TaggingPreset> tps;
 		try {
 			tps = TaggingPresetReader.readAll(reader, true);
@@ -63,13 +66,11 @@ public class MATSimPlugin extends Plugin implements PreferenceChangedListener {
 			e.printStackTrace();
 			tps = Collections.emptyList();
 		}
-
 		for (TaggingPreset tp : tps) {
 			if (!(tp instanceof TaggingPresetSeparator)) {
 				Main.toolbar.register(tp);
 			}
 		}
-
 		AutoCompletionManager.cachePresets(tps);
 		HashMap<TaggingPresetMenu, JMenu> submenus = new HashMap<TaggingPresetMenu, JMenu>();
 		for (final TaggingPreset p : tps) {
@@ -90,6 +91,7 @@ public class MATSimPlugin extends Plugin implements PreferenceChangedListener {
 			}
 		}
 
+		// register map renderer
 		if (matsimRenderer) {
 			MapRendererFactory factory = MapRendererFactory.getInstance();
 			factory.register(MapRenderer.class, "MATSim Renderer",
@@ -97,18 +99,22 @@ public class MATSimPlugin extends Plugin implements PreferenceChangedListener {
 			factory.activate(MapRenderer.class);
 		}
 
+		// register for preference changed events
 		Main.pref.addPreferenceChangeListener(this);
 		Main.pref.addPreferenceChangeListener(MapRenderer.Properties
 				.getInstance());
 
+		// load default converting parameters
 		OsmConvertDefaults.load();
 	}
 
 	/**
 	 * Called when the JOSM map frame is created or destroyed.
 	 * 
-	 * @param oldFrame The old MapFrame. Null if a new one is created.
-	 * @param newFrame The new MapFrame. Null if the current is destroyed.
+	 * @param oldFrame
+	 *            The old MapFrame. Null if a new one is created.
+	 * @param newFrame
+	 *            The new MapFrame. Null if the current is destroyed.
 	 */
 	@Override
 	public void mapFrameInitialized(MapFrame oldFrame, MapFrame newFrame) {

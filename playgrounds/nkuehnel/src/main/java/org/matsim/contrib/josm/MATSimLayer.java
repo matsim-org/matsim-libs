@@ -36,10 +36,12 @@ class MATSimLayer extends OsmDataLayer {
 	private Scenario matsimScenario;
 	private String coordSystem;
 
+	// data mappings
 	private Map<Way, List<Link>> way2Links = new HashMap<Way, List<Link>>();
 	private Map<Link, List<WaySegment>> link2Segment = new HashMap<Link, List<WaySegment>>();
 	private Map<Relation, TransitRoute> relation2Route = new HashMap<Relation, TransitRoute>();
 
+	// get coord system of layer, currently always wgs84
 	public String getCoordSystem() {
 		return coordSystem;
 	}
@@ -47,18 +49,22 @@ class MATSimLayer extends OsmDataLayer {
 	public MATSimLayer(DataSet data, String name, File associatedFile,
 			Scenario scenario, String coordSystem,
 			HashMap<Way, List<Link>> way2Links,
-			Map<Link, List<WaySegment>> link2Segment, Map<Relation, TransitRoute> relation2Route) {
+			Map<Link, List<WaySegment>> link2Segment,
+			Map<Relation, TransitRoute> relation2Route) {
 		super(data, name, associatedFile);
 		this.matsimScenario = scenario;
 		this.coordSystem = coordSystem;
 		this.way2Links = way2Links;
 		this.link2Segment = link2Segment;
 		this.relation2Route = relation2Route;
-		
+
+		// attach listener to layer
 		NetworkListener listener;
 		try {
-			listener = new NetworkListener(scenario, way2Links, link2Segment, relation2Route);
-		} catch (IllegalArgumentException e) {
+			listener = new NetworkListener(scenario, way2Links, link2Segment,
+					relation2Route);
+		} catch (IllegalArgumentException e) { // create layer even if no
+												// listener can be attached
 			JOptionPane
 					.showMessageDialog(
 							Main.parent,
@@ -78,7 +84,7 @@ class MATSimLayer extends OsmDataLayer {
 	public Map<Link, List<WaySegment>> getLink2Segments() {
 		return link2Segment;
 	}
-	
+
 	public Map<Relation, TransitRoute> getRelation2Route() {
 		return relation2Route;
 	}

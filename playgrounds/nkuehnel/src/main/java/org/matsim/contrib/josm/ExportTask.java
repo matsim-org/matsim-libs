@@ -48,6 +48,7 @@ class ExportTask extends PleaseWaitRunnable {
 	 */
 	public ExportTask(File file) {
 		super("MATSim Export");
+		// set file paths in given directory path
 		this.networkFile = new File(file.getAbsolutePath() + "/network.xml");
 		this.scheduleFile = new File(file.getAbsolutePath()
 				+ "/transit_schedule.xml");
@@ -79,6 +80,7 @@ class ExportTask extends PleaseWaitRunnable {
 		this.progressMonitor.setTicksCount(3);
 		this.progressMonitor.setTicks(0);
 
+		// create empty data structures
 		Config config = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(config);
 		Network network = sc.getNetwork();
@@ -93,21 +95,32 @@ class ExportTask extends PleaseWaitRunnable {
 				this.progressMonitor.setTicks(1);
 				this.progressMonitor.setCustomText("rearranging data..");
 
+				// copy nodes with switched id fields
 				for (Node node : ((MATSimLayer) layer).getMatsimScenario()
 						.getNetwork().getNodes().values()) {
-					Node newNode = network.getFactory().createNode(
-							Id.create(((NodeImpl) node).getOrigId(), Node.class),
-							node.getCoord());
+					Node newNode = network.getFactory()
+							.createNode(
+									Id.create(((NodeImpl) node).getOrigId(),
+											Node.class), node.getCoord());
 					network.addNode(newNode);
 				}
+				// copy links with switched id fields
 				for (Link link : ((MATSimLayer) layer).getMatsimScenario()
 						.getNetwork().getLinks().values()) {
-					Link newLink = network.getFactory().createLink(
-							Id.create(((LinkImpl) link).getOrigId(), Link.class),
-							network.getNodes().get(
-									Id.create(((NodeImpl) link.getFromNode()).getOrigId(), Link.class)),
-							network.getNodes().get(
-									Id.create(((NodeImpl) link.getToNode()).getOrigId(), Node.class)));
+					Link newLink = network.getFactory()
+							.createLink(
+									Id.create(((LinkImpl) link).getOrigId(),
+											Link.class),
+									network.getNodes().get(
+											Id.create(
+													((NodeImpl) link
+															.getFromNode())
+															.getOrigId(),
+													Link.class)),
+									network.getNodes().get(
+											Id.create(((NodeImpl) link
+													.getToNode()).getOrigId(),
+													Node.class)));
 					newLink.setFreespeed(link.getFreespeed());
 					newLink.setCapacity(link.getCapacity());
 					newLink.setLength(link.getLength());
@@ -117,11 +130,14 @@ class ExportTask extends PleaseWaitRunnable {
 				}
 			}
 
+			// check for network cleaner
 			if (Main.pref.getBoolean("matsim_cleanNetwork")) {
 				this.progressMonitor.setTicks(2);
 				this.progressMonitor.setCustomText("cleaning network..");
 				new NetworkCleaner().run(network);
 			}
+
+			// write out paths
 			this.progressMonitor.setTicks(3);
 			this.progressMonitor.setCustomText("writing out xml file(s)..");
 			new NetworkWriter(network).write(networkFile.getAbsolutePath());

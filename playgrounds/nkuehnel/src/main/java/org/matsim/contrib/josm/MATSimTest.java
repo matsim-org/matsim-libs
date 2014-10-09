@@ -172,6 +172,7 @@ class MATSimTest extends Test {
 					}
 				}
 
+				// create error with message
 				String msg = "Duplicated Id "
 						+ (entry.getKey() + " not allowed.");
 				TestError error = new TestError(this, Severity.ERROR, msg,
@@ -184,6 +185,7 @@ class MATSimTest extends Test {
 		for (Entry<String, ArrayList<Node>> entry : nodeIds.entrySet()) {
 			if (entry.getValue().size() > 1) {
 
+				// create warning with message
 				String msg = "Duplicated Id "
 						+ (entry.getKey() + " not allowed.");
 				TestError error = new TestError(this, Severity.ERROR, msg,
@@ -214,6 +216,8 @@ class MATSimTest extends Test {
 		if (testError.getCode() == 3001 || testError.getCode() == 3002) {
 			int i = 1;
 			int j = 1;
+			// go through all affected elements and adjust id with incremental
+			// number
 			for (OsmPrimitive primitive : testError.getPrimitives()) {
 				if (primitive instanceof Way) {
 					if (links2Fix.containsKey(testError)) {
@@ -230,7 +234,8 @@ class MATSimTest extends Test {
 				} else if (primitive instanceof Node) {
 					org.matsim.api.core.v01.network.Node node = this.network
 							.getNodes()
-							.get(Id.create(((Node) primitive).getUniqueId(), org.matsim.api.core.v01.network.Node.class));
+							.get(Id.create(((Node) primitive).getUniqueId(),
+									org.matsim.api.core.v01.network.Node.class));
 					String origId = ((NodeImpl) node).getOrigId();
 					((NodeImpl) node).setOrigId(origId + "(" + j + ")");
 					j++;

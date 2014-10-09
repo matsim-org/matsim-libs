@@ -21,6 +21,7 @@ import static org.openstreetmap.josm.tools.I18n.tr;
  * @author nkuehnel
  * 
  */
+@SuppressWarnings("serial")
 class OsmConvertDefaultsDialog extends JPanel {
 	private JOptionPane optionPane;
 	private Map<String, JComponent> input = new HashMap<String, JComponent>();
@@ -43,21 +44,21 @@ class OsmConvertDefaultsDialog extends JPanel {
 					c.gridx = 0;
 					c.gridy = (i + 1);
 					String type = OsmConvertDefaults.types[i];
-					
+
 					ImageIcon icon;
 					try {
 						icon = ImageProvider.get("presets", type);
-					} catch(RuntimeException exception) {
+					} catch (RuntimeException exception) {
 						if (type.contains("_")) {
 							type = type.substring(0, type.indexOf("_"));
 						}
 						try {
 							icon = ImageProvider.get("presets", type);
-						} catch(RuntimeException exception2) {
+						} catch (RuntimeException exception2) {
 							type = "way_" + type;
 							try {
 								icon = ImageProvider.get("presets", type);
-							} catch(RuntimeException exception3) {
+							} catch (RuntimeException exception3) {
 								icon = null;
 							}
 						}
@@ -139,6 +140,7 @@ class OsmConvertDefaultsDialog extends JPanel {
 		this.optionPane = optionPane;
 	}
 
+	// processes the input given by user and stores values in preferences
 	protected void handleInput() {
 		for (int i = 0; i < OsmConvertDefaults.types.length; i++) {
 

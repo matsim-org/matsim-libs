@@ -71,6 +71,8 @@ final class MATSimNetworkFileExporter extends FileExporter {
 		MATSimTest test = new MATSimTest();
 		PleaseWaitProgressMonitor progMonitor = new PleaseWaitProgressMonitor(
 				"Validation");
+
+		// run validator tests
 		test.startTest(progMonitor);
 		test.visit(((OsmDataLayer) layer).data.allPrimitives());
 		test.endTest();
@@ -88,12 +90,13 @@ final class MATSimNetworkFileExporter extends FileExporter {
 								"Failure", JOptionPane.ERROR_MESSAGE,
 								new ImageProvider("warning-small").setWidth(16)
 										.get());
-				okToExport = false;
+				okToExport = false; // abort export when errors occur
 				break;
 			}
 		}
 
-		if (okToExport == true) {
+		if (okToExport == true) { // check if export should be continued when
+									// warnings occur
 			for (TestError error : test.getErrors()) {
 				if (error.getSeverity().equals(Severity.WARNING)) {
 					int proceed = JOptionPane.showConfirmDialog(Main.parent,
@@ -110,12 +113,14 @@ final class MATSimNetworkFileExporter extends FileExporter {
 			}
 		}
 
+		// start export task if not aborted
 		if (okToExport) {
 			file.mkdirs();
 			ExportTask task = new ExportTask(file);
 			Main.worker.execute(task);
 		}
 
+		// set up error layer
 		OsmValidator.initializeErrorLayer();
 		Main.map.validatorDialog.unfurlDialog();
 		Main.main.getEditLayer().validationErrors.clear();

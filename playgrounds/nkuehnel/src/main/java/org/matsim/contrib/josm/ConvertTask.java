@@ -38,7 +38,8 @@ import org.openstreetmap.josm.io.OsmTransferException;
 import org.xml.sax.SAXException;
 
 /**
- * The Task that handles the convert action
+ * The Task that handles the convert action. Creates new OSM primitives with
+ * MATSim Tag scheme
  * 
  * @author Nico
  * 
@@ -74,12 +75,16 @@ class ConvertTask extends PleaseWaitRunnable {
 		this.progressMonitor.setTicksCount(8);
 		this.progressMonitor.setTicks(0);
 
+		// get layer data
 		Layer layer = Main.main.getActiveLayer();
 
+		// scenario for converted data
 		Scenario tempScenario = ScenarioUtils.createScenario(ConfigUtils
 				.createConfig());
 		tempScenario.getConfig().scenario().setUseTransit(true);
 		tempScenario.getConfig().scenario().setUseVehicles(true);
+
+		// scenario for new MATSim layer
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils
 				.createConfig());
 		Network network = scenario.getNetwork();
@@ -89,10 +94,13 @@ class ConvertTask extends PleaseWaitRunnable {
 		this.progressMonitor.setTicks(1);
 		this.progressMonitor.setCustomText("converting osm data..");
 
+		// convert layer data
 		NewConverter.convertOsmLayer(((OsmDataLayer) layer), tempScenario,
 				new HashMap<Way, List<Link>>(),
 				new HashMap<Link, List<WaySegment>>(),
 				new HashMap<Relation, TransitRoute>());
+
+		// check if network should be cleaned
 		if (Main.pref.getBoolean("matsim_cleanNetwork")) {
 			this.progressMonitor.setTicks(2);
 			this.progressMonitor.setCustomText("cleaning network..");
@@ -101,8 +109,11 @@ class ConvertTask extends PleaseWaitRunnable {
 
 		this.progressMonitor.setTicks(3);
 		this.progressMonitor.setCustomText("preparing data set..");
+
+		// data set of new MATSim layer
 		DataSet dataSet = new DataSet();
 
+		// data mappings
 		HashMap<Way, List<Link>> way2Links = new HashMap<Way, List<Link>>();
 		HashMap<Link, List<WaySegment>> link2Segment = new HashMap<Link, List<WaySegment>>();
 		HashMap<Relation, TransitRoute> relation2Route = new HashMap<Relation, TransitRoute>();
@@ -113,6 +124,7 @@ class ConvertTask extends PleaseWaitRunnable {
 		this.progressMonitor.setTicks(4);
 		this.progressMonitor.setCustomText("loading nodes..");
 
+		// create new OSM and MATSim nodes out of converted network nodes
 		for (Node node : tempScenario.getNetwork().getNodes().values()) {
 
 			Coord tmpCoor = node.getCoord();
@@ -122,13 +134,15 @@ class ConvertTask extends PleaseWaitRunnable {
 			nodeOsm.put(ImportTask.NODE_TAG_ID, ((NodeImpl) node).getOrigId());
 			node2OsmNode.put(node, nodeOsm);
 			dataSet.addPrimitive(nodeOsm);
-			Node newNode = network.getFactory().createNode(
-					Id.create(Long.toString(nodeOsm.getUniqueId()), Node.class),
-					node.getCoord());
+			Node newNode = network.getFactory()
+					.createNode(
+							Id.create(Long.toString(nodeOsm.getUniqueId()),
+									Node.class), node.getCoord());
 			((NodeImpl) newNode).setOrigId(((NodeImpl) node).getOrigId());
 			network.addNode(newNode);
 		}
 
+		// create new ways and links out of converted network links
 		this.progressMonitor.setTicks(5);
 		this.progressMonitor.setCustomText("loading ways..");
 		for (Link link : tempScenario.getNetwork().getLinks().values()) {
@@ -158,9 +172,11 @@ class ConvertTask extends PleaseWaitRunnable {
 			Link newLink = network.getFactory().createLink(
 					Id.create(Long.toString(way.getUniqueId()), Link.class),
 					network.getNodes().get(
-							Id.create(Long.toString(fromNode.getUniqueId()), Node.class)),
+							Id.create(Long.toString(fromNode.getUniqueId()),
+									Node.class)),
 					network.getNodes().get(
-							Id.create(Long.toString(toNode.getUniqueId()), Node.class)));
+							Id.create(Long.toString(toNode.getUniqueId()),
+									Node.class)));
 			newLink.setFreespeed(link.getFreespeed());
 			newLink.setCapacity(link.getCapacity());
 			newLink.setLength(link.getLength());
@@ -176,10 +192,12 @@ class ConvertTask extends PleaseWaitRunnable {
 					Collections.singletonList(new WaySegment(way, 0)));
 		}
 
-
 		this.progressMonitor.setTicks(6);
 		this.progressMonitor
 				.setCustomText("loading transit line stops and route relations..");
+
+		// create new relations, transit routes and lines as well as stop
+		// facilities out of converted transit schedule
 		for (TransitLine line : tempScenario.getTransitSchedule()
 				.getTransitLines().values()) {
 			TransitLine newLine = scenario.getTransitSchedule().getFactory()
@@ -218,8 +236,8 @@ class ConvertTask extends PleaseWaitRunnable {
 
 				List<Link> startWay2Links = way2Links.get(linkId2Way.get(route
 						.getRoute().getStartLinkId()));
-				Id<Link> firstLinkId = startWay2Links.get(startWay2Links.size() - 1)
-						.getId();
+				Id<Link> firstLinkId = startWay2Links.get(
+						startWay2Links.size() - 1).getId();
 				RelationMember start = new RelationMember("stop_link",
 						linkId2Way.get(route.getRoute().getStartLinkId()));
 				relation.addMember(start);
@@ -265,10 +283,11 @@ class ConvertTask extends PleaseWaitRunnable {
 		node2OsmNode.clear();
 		stop2Stop.clear();
 		linkId2Way.clear();
-		
+
 		this.progressMonitor.setTicks(7);
 		this.progressMonitor.setCustomText("creating layer..");
 
+		// create layer
 		newLayer = new MATSimLayer(dataSet, null, null, scenario,
 				TransformationFactory.WGS84, way2Links, link2Segment,
 				relation2Route);
@@ -281,7 +300,8 @@ class ConvertTask extends PleaseWaitRunnable {
 	protected void finish() {
 		if (newLayer != null) {
 			Main.main.addLayer(newLayer);
-			Main.map.mapView.setActiveLayer(newLayer);
+			Main.map.mapView.setActiveLayer(newLayer); // invoke layer change
+														// event
 		}
 	}
 

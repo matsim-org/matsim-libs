@@ -1,5 +1,13 @@
 package org.matsim.contrib.josm;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.LinkImpl;
@@ -15,11 +23,6 @@ import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.gui.mappaint.LabelCompositionStrategy;
 import org.openstreetmap.josm.gui.mappaint.TextElement;
-
-import java.awt.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * The MATSim MapRenderer. Draws ways that correspond to existing MATSim link(s)
@@ -71,42 +74,53 @@ public class MapRenderer extends StyledMapRenderer {
 			BasicStroke dashes, Color dashedColor, float offset,
 			boolean showOrientation, boolean showHeadArrowOnly,
 			boolean showOneway, boolean onewayReversed) {
-//		if(!way2Links.containsKey(way)) {
-//			return;
-//		}
+
+		// could be used as filter for non converted ways in future releases
+		// if(!way2Links.containsKey(way)) {
+		// return;
+		// }
 
 		Layer layer = Main.main.getActiveLayer();
 		if (layer instanceof OsmDataLayer) {
 			if (way2Links.containsKey(way)) {
 				if (!way2Links.get(way).isEmpty()) {
 					if (!way.isSelected()) {
-						if (Properties.showIds) {
+						if (Properties.showIds) { // draw id on path
 							drawTextOnPath(way,
 									new TextElement(Properties.getInstance(),
 											Properties.FONT, 0,
 											textOffset(way),
 											Properties.MATSIMCOLOR, 0.f, null));
 						}
-						if(way.hasTag("modes", TransportMode.pt)) {
-							float[] dashPhase = {9.f};
-							BasicStroke trainDashes = new BasicStroke(2, 0, 1, 10.f, dashPhase, 9.f);
+						if (way.hasTag("modes", TransportMode.pt)) { // draw
+																		// dashed
+																		// lines
+																		// for
+																		// pt
+																		// links
+							float[] dashPhase = { 9.f };
+							BasicStroke trainDashes = new BasicStroke(2, 0, 1,
+									10.f, dashPhase, 9.f);
 							super.drawWay(way, Properties.MATSIMCOLOR, line,
-									trainDashes, Color.white, Properties.wayOffset * -1,
-									showOrientation, showHeadArrowOnly, !way
-											.hasTag("highway", OsmConvertDefaults
-													.getDefaults().keySet()),
-									onewayReversed);
-						} else {
+									trainDashes, Color.white,
+									Properties.wayOffset * -1, showOrientation,
+									showHeadArrowOnly, !way.hasTag("highway",
+											OsmConvertDefaults.getDefaults()
+													.keySet()), onewayReversed);
+						} else { // draw simple blue lines for other links, if
+									// way is not converted by highway tag, draw
+									// direction arrow for directed edge
 							super.drawWay(way, Properties.MATSIMCOLOR, line,
-									dashes, dashedColor, Properties.wayOffset * -1,
-									showOrientation, showHeadArrowOnly, !way
-											.hasTag("highway", OsmConvertDefaults
-													.getDefaults().keySet()),
-									onewayReversed);
+									dashes, dashedColor, Properties.wayOffset
+											* -1, showOrientation,
+									showHeadArrowOnly, !way.hasTag("highway",
+											OsmConvertDefaults.getDefaults()
+													.keySet()), onewayReversed);
 						}
 						return;
 					} else {
-						if (Properties.showIds) {
+						if (Properties.showIds) { // draw ids on selected ways
+													// also
 							drawTextOnPath(way,
 									new TextElement(Properties.getInstance(),
 											Properties.FONT, 0,
@@ -164,6 +178,7 @@ public class MapRenderer extends StyledMapRenderer {
 
 		@SuppressWarnings("rawtypes")
 		@Override
+		// listen for changes in preferences that concern renderer adjustments
 		public void preferenceChanged(PreferenceChangeEvent e) {
 			if (e.getKey().equalsIgnoreCase("matsim_showIds")) {
 				showIds = Main.pref.getBoolean("matsim_showIds");
