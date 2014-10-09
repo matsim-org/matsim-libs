@@ -61,7 +61,7 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
                         waitTimes = (WaitTime) reader.readObject();
                         timesLogger.warn("Checking to see if plans are ready to be sent");
                         while (!readyToSendPlans){
-                            int i = 0;
+                            Thread.sleep(10);
                         }
                         timesLogger.warn("Sending plans...");
                         writer.writeObject(plansCopyForSending);
@@ -71,6 +71,8 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
                         System.exit(0);
                     }
                 } catch (ClassNotFoundException | IOException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
