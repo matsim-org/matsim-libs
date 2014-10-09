@@ -34,6 +34,9 @@ public class CAEvent implements Comparable<CAEvent>{
 	private boolean isObsolete = false;
 
 	public CAEvent(double time, CAAgent agent, CANetworkEntity entity, CAEventType type){
+		if (Double.isNaN(time)) {
+			throw new RuntimeException("NaN");
+		}
 		this.time = time;
 		this.agent = agent;
 		this.entity = entity;

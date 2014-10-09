@@ -74,15 +74,6 @@ public class CASimpleAgent extends CAAgent {
 		return this.link;
 	}
 
-	@Override
-	public double getZ() {
-		return Z;
-	}
-
-	@Override
-	public double getD() {
-		return D;
-	}
 
 	@Override
 	public CANetworkEntity getCurrentCANetworkEntity() {
@@ -96,15 +87,4 @@ public class CASimpleAgent extends CAAgent {
 		
 	}
 
-	@Override
-	public double getCumWaitTime() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public void setCumWaitTime(double tFree) {
-		// TODO Auto-generated method stub
-		
-	}
 }

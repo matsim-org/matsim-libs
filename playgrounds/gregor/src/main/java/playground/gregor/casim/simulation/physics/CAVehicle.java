@@ -58,18 +58,6 @@ public class CAVehicle extends CAAgent {
 	}
 
 	@Override
-	public double getZ() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public double getD() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
 	public CANetworkEntity getCurrentCANetworkEntity() {
 		// TODO Auto-generated method stub
 		return null;
@@ -77,18 +65,6 @@ public class CAVehicle extends CAAgent {
 
 	@Override
 	public void moveToNode(CANode n) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public double getCumWaitTime() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public void setCumWaitTime(double tFree) {
 		// TODO Auto-generated method stub
 		
 	}

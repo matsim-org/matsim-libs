@@ -37,13 +37,13 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.gregor.casim.events.CASimAgentConstructEvent;
-import playground.gregor.casim.monitoring.CALinkMonitorAttachedToSim;
 import playground.gregor.casim.monitoring.CALinkMonitorII;
 import playground.gregor.casim.simulation.physics.CAEvent.CAEventType;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
@@ -64,7 +64,7 @@ public class CASimDynamicExperiment_ZhangJ2011 {
 	//	0.50 0.50 0.65 0.65 0.75 0.75 0.85 0.85 1.00 1.00 0.50 0.50 0.75 0.75 0.90 0.90 1.20 1.20 1.60 1.60 2.00 2.00 2.50 2.50
 	private static final List<Setting> settings = new ArrayList<Setting>();
 
-	public static final boolean VIS = true;
+	public static final boolean VIS = false;
 	private static BufferedWriter bw;
 	private static BufferedWriter bw2;
 	private static int it = 0;
@@ -137,23 +137,23 @@ public class CASimDynamicExperiment_ZhangJ2011 {
 			e.printStackTrace();
 		}
 		int i = 0;
-//		while ( i < 500) {
-//			double r0 = MatsimRandom.getRandom().nextGaussian()+2;
-//			double r1 = MatsimRandom.getRandom().nextGaussian()+2;
-//			double r2 = MatsimRandom.getRandom().nextGaussian()+2;
-//			if (r0 > 5 || r0 < 0.61) {
-//				continue;
-//			}
-//			if (r1 > 5 || r1 < 0.61) {
-//				continue;
-//			}
-//			if (r2 > 5 || r2 < 0.61) {
-//				continue;
-//			}
-//			settings.add(new Setting(r0,r1,r2/2));
-//			i++;
-//			
-//		}
+		while ( i < 500) {
+			double r0 = MatsimRandom.getRandom().nextGaussian()+2;
+			double r1 = MatsimRandom.getRandom().nextGaussian()+2;
+			double r2 = MatsimRandom.getRandom().nextGaussian()+2;
+			if (r0 > 5 || r0 < 0.61) {
+				continue;
+			}
+			if (r1 > 5 || r1 < 0.61) {
+				continue;
+			}
+			if (r2 > 5 || r2 < 0.61) {
+				continue;
+			}
+			settings.add(new Setting(r0,r1,r2/2));
+			i++;
+			
+		}
 //				settings.add(new Setting(1.8,1.8,.7));
 //				settings.add(new Setting(2.4,2.4,1.0));
 //				settings.add(new Setting(.5,1.8,1.8));
@@ -185,34 +185,34 @@ public class CASimDynamicExperiment_ZhangJ2011 {
 				
 				
 				
-				settings.add(new Setting(0.61,0.61,0.3));
-//				settings.add(new Setting(1.8,1.8,.7));
-//				settings.add(new Setting(3.,3.,1.5));
-//				settings.add(new Setting(3.,3.,0.5));
-//				settings.add(new Setting(1.8,1.8,.7));
-//				settings.add(new Setting(2.4,2.4,1.0));
-//				settings.add(new Setting(.5,1.8,1.8));
-//				settings.add(new Setting(.6,1.8,1.8));
-//				settings.add(new Setting(.7,1.8,1.8));
-//				settings.add(new Setting(1.,1.8,1.8));
-//				settings.add(new Setting(1.45,1.8,1.8));
-//				settings.add(new Setting(1.8,1.8,1.8));
-//				settings.add(new Setting(1.8,1.8,1.2));
-//				settings.add(new Setting(.65,2.4,2.4));
-//				settings.add(new Setting(.8,2.4,2.4));
-//				settings.add(new Setting(.95,2.4,2.4));
-//				settings.add(new Setting(1.45,2.4,2.4));
-//				settings.add(new Setting(1.9,2.4,2.4));
-//				settings.add(new Setting(2.4,2.4,2.4));
-//				settings.add(new Setting(2.4,2.4,1.6));
-//				settings.add(new Setting(2.4,2.4,1.3));
-//				settings.add(new Setting(.8,3.,3.));
-//				settings.add(new Setting(1.,3.,3.));
-//				settings.add(new Setting(1.8,3.,3.));
-//				settings.add(new Setting(2.4,3.,3.));
-//				settings.add(new Setting(3.,3.,3.));
-//				settings.add(new Setting(3.,3.,1.6));
-//				settings.add(new Setting(3.,3.,1.2));
+				settings.add(new Setting(3.,3.,0.5));
+				settings.add(new Setting(3.6,3.6,1.6));
+				settings.add(new Setting(1.8,1.8,.7));
+				settings.add(new Setting(3.,3.,1.5));
+				settings.add(new Setting(1.8,1.8,.7));
+				settings.add(new Setting(2.4,2.4,1.0));
+				settings.add(new Setting(.5,1.8,1.8));
+				settings.add(new Setting(.6,1.8,1.8));
+				settings.add(new Setting(.7,1.8,1.8));
+				settings.add(new Setting(1.,1.8,1.8));
+				settings.add(new Setting(1.45,1.8,1.8));
+				settings.add(new Setting(1.8,1.8,1.8));
+				settings.add(new Setting(1.8,1.8,1.2));
+				settings.add(new Setting(.65,2.4,2.4));
+				settings.add(new Setting(.8,2.4,2.4));
+				settings.add(new Setting(.95,2.4,2.4));
+				settings.add(new Setting(1.45,2.4,2.4));
+				settings.add(new Setting(1.9,2.4,2.4));
+				settings.add(new Setting(2.4,2.4,2.4));
+				settings.add(new Setting(2.4,2.4,1.6));
+				settings.add(new Setting(2.4,2.4,1.3));
+				settings.add(new Setting(.8,3.,3.));
+				settings.add(new Setting(1.,3.,3.));
+				settings.add(new Setting(1.8,3.,3.));
+				settings.add(new Setting(2.4,3.,3.));
+				settings.add(new Setting(3.,3.,3.));
+				settings.add(new Setting(3.,3.,1.6));
+				settings.add(new Setting(3.,3.,1.2));
 
 
 	}
@@ -230,6 +230,8 @@ public class CASimDynamicExperiment_ZhangJ2011 {
 	}
 
 	public static void main(String [] args) throws IOException {
+		
+		double timeOffset = 0;
 
 		for (Setting s : settings){
 
@@ -250,25 +252,38 @@ public class CASimDynamicExperiment_ZhangJ2011 {
 			Node n0 = fac.createNode(new IdImpl("0"), new CoordImpl(-100,0));
 			Node n1 = fac.createNode(new IdImpl("1"), new CoordImpl(0,0));
 			Node n2 = fac.createNode(new IdImpl("2"), new CoordImpl(4,0));
+			Node n2a = fac.createNode(new IdImpl("2a"), new CoordImpl(4+3,0));
+			Node n2b = fac.createNode(new IdImpl("2b"), new CoordImpl(4+3+2,0));
 			Node n2ex = fac.createNode(new IdImpl("2ex"), new CoordImpl(4,100));
 
 			//		Node n2a = fac.createNode(new IdImpl("2a"), new CoordImpl(4+3,0));
 			//		Node n2b = fac.createNode(new IdImpl("2b"), new CoordImpl(4+3+2,0));
 
 			Node n3 = fac.createNode(new IdImpl("3"), new CoordImpl(12,0));
-			Node n3ex = fac.createNode(new IdImpl("3ex"), new CoordImpl(12,-100));
+			
+			
+			
+			Node n3ex1 = fac.createNode(new IdImpl("3ex1"), new CoordImpl(12,-1));
+			Node n3ex2 = fac.createNode(new IdImpl("3ex2"), new CoordImpl(12,-2));
+			Node n3ex3 = fac.createNode(new IdImpl("3ex3"), new CoordImpl(12,-3));
+			Node n3ex4 = fac.createNode(new IdImpl("3ex4"), new CoordImpl(12,-100));
+
 			Node n4 = fac.createNode(new IdImpl("4"), new CoordImpl(16,0));
 			Node n5 = fac.createNode(new IdImpl("5"), new CoordImpl(116,0));
 
-			net.addNode(n3ex);net.addNode(n2ex);net.addNode(n5);net.addNode(n4);net.addNode(n3);net.addNode(n2);net.addNode(n1);net.addNode(n0);
+			net.addNode(n2b);net.addNode(n2a);net.addNode(n3ex1);net.addNode(n3ex2);net.addNode(n3ex3);net.addNode(n3ex4);net.addNode(n2ex);net.addNode(n5);net.addNode(n4);net.addNode(n3);net.addNode(n2);net.addNode(n1);net.addNode(n0);
 			//		net.addNode(n2a); net.addNode(n2b);
 
 			Link l0 = fac.createLink(new IdImpl("0"), n0, n1);
 			Link l0rev = fac.createLink(new IdImpl("0rev"), n1, n0);
 			Link l1 = fac.createLink(new IdImpl("1"), n1, n2);
 			Link l1rev = fac.createLink(new IdImpl("1rev"), n2, n1);
-			Link l2 = fac.createLink(new IdImpl("2"), n2, n3);
-			Link l2rev = fac.createLink(new IdImpl("2rev"), n3, n2);
+			Link l2 = fac.createLink(new IdImpl("2"), n2, n2a);
+			Link l2a = fac.createLink(new IdImpl("2a"), n2a, n2b);
+			Link l2b = fac.createLink(new IdImpl("2b"), n2b, n3);
+			Link l2rev = fac.createLink(new IdImpl("2rev"), n3, n2b);
+			Link l2reva = fac.createLink(new IdImpl("2reva"), n2b, n2a);
+			Link l2revb = fac.createLink(new IdImpl("2revb"), n2a, n2);
 
 			//		Link l2a = fac.createLink(new IdImpl("2a"), n2a, n2b);
 			//		Link l2arev = fac.createLink(new IdImpl("2arev"), n2b, n2a);
@@ -278,7 +293,10 @@ public class CASimDynamicExperiment_ZhangJ2011 {
 
 			Link l2ex = fac.createLink(new IdImpl("2ex"), n2, n2ex);
 			Link l3 = fac.createLink(new IdImpl("3"), n3, n4);
-			Link l3ex = fac.createLink(new IdImpl("3ex"), n3, n3ex);
+			Link l3ex1 = fac.createLink(new IdImpl("3ex1"), n3, n3ex1);
+			Link l3ex2 = fac.createLink(new IdImpl("3ex2"), n3ex1, n3ex2);
+			Link l3ex3 = fac.createLink(new IdImpl("3ex3"), n3ex2, n3ex3);
+			Link l3ex4 = fac.createLink(new IdImpl("3ex4"), n3ex3, n3ex4);
 			Link l3rev = fac.createLink(new IdImpl("3rev"), n4, n3);
 			Link l4 = fac.createLink(new IdImpl("4"), n4, n5);
 			Link l4rev = fac.createLink(new IdImpl("4rev"), n5, n4);
@@ -290,16 +308,23 @@ public class CASimDynamicExperiment_ZhangJ2011 {
 			l0.setLength(100);
 			l1.setLength(4);
 			l2ex.setLength(100);
-			l2.setLength(8);
+			l2.setLength(3);
+			l2a.setLength(2);
+			l2b.setLength(3);
 			//		l2a.setLength(2);
 			//		l2b.setLength(3);
-			l3ex.setLength(1000);
+			l3ex1.setLength(1);
+			l3ex2.setLength(1);
+			l3ex3.setLength(1);
+			l3ex4.setLength(1000);
 			l3.setLength(4);
 			l4.setLength(100);
 
 			l0rev.setLength(100);
 			l1rev.setLength(4);
-			l2rev.setLength(8);
+			l2rev.setLength(3);
+			l2reva.setLength(2);
+			l2revb.setLength(3);
 			//		l2arev.setLength(2);
 			//		l2brev.setLength(3);
 			l3rev.setLength(4);
@@ -309,7 +334,7 @@ public class CASimDynamicExperiment_ZhangJ2011 {
 			//		net.addLink(l4rev);net.addLink(l3rev);net.addLink(l2rev);net.addLink(l1rev);net.addLink(l0rev);
 			//		net.addLink(l2a);net.addLink(l2arev);net.addLink(l2b);net.addLink(l2brev);
 
-			net.addLink(l3ex);net.addLink(l2);net.addLink(l1);net.addLink(l0);
+			net.addLink(l2a);net.addLink(l2b);net.addLink(l3ex3);net.addLink(l3ex4);net.addLink(l3ex1);net.addLink(l3ex2);net.addLink(l2);net.addLink(l1);net.addLink(l0);
 			////		net.addLink(l4rev);net.addLink(l3rev);net.addLink(l2rev);net.addLink(l1rev);net.addLink(l0rev);
 			//		net.addLink(l2a);net.addLink(l2b);
 
@@ -326,7 +351,7 @@ public class CASimDynamicExperiment_ZhangJ2011 {
 
 
 
-			double size = 2000;
+			double size = 500;
 			double width = bL;
 			double ratio = CANetworkDynamic.PED_WIDTH/width;
 			double cellLength = ratio/(CANetworkDynamic.RHO_HAT*CANetworkDynamic.PED_WIDTH);
@@ -336,7 +361,7 @@ public class CASimDynamicExperiment_ZhangJ2011 {
 			double ratio2 = CANetworkDynamic.PED_WIDTH/width2;
 			double cellLength2 = ratio2/(CANetworkDynamic.RHO_HAT*CANetworkDynamic.PED_WIDTH);
 			double length2 = size/2*cellLength2;
-			l3ex.setLength(length2);
+			l3ex4.setLength(length2*8);
 
 			l0.setLength(length);;
 			l0rev.setLength(length);
@@ -344,6 +369,8 @@ public class CASimDynamicExperiment_ZhangJ2011 {
 			l0.setCapacity(bL);
 			l1.setCapacity(bL);
 			l2.setCapacity(bCor);
+			l2a.setCapacity(bCor);
+			l2b.setCapacity(bCor);
 			//			l2a.setCapacity(bCor);
 			//			l2arev.setCapacity(bCor);
 			//			l2b.setCapacity(bCor);
@@ -353,25 +380,32 @@ public class CASimDynamicExperiment_ZhangJ2011 {
 			l0rev.setCapacity(bL);
 			l1rev.setCapacity(bCor);
 			l2rev.setCapacity(bCor);
+			l2reva.setCapacity(bCor);
+			l2revb.setCapacity(bCor);
 			l3rev.setCapacity(bCor);
 			l4rev.setCapacity(B_r);
 			//			l2ex.setCapacity(B_exit);
 			//			l3ex.setCapacity(B_exit);
 			l2ex.setCapacity(bEx);
-			l3ex.setCapacity(bEx);
+			l3ex1.setCapacity(bEx);
+			l3ex2.setCapacity(bEx);
+			l3ex3.setCapacity(bEx);
+			l3ex4.setCapacity(bEx);
 
 			List<Link> linksLR = new ArrayList<Link>();
 			linksLR.add(l0);
 			linksLR.add(l1);
 			linksLR.add(l2);
-			//			linksLR.add(l2a);
-			//			linksLR.add(l2b);
-			linksLR.add(l3ex);
-
+			linksLR.add(l2a);
+			linksLR.add(l2b);
+			linksLR.add(l3ex1);
+			linksLR.add(l3ex2);
+			linksLR.add(l3ex3);
+			linksLR.add(l3ex4);
 
 			System.out.println(" " + bL + " " + bCor + " " + bEx +"\n");
 			
-			CALinkMonitorII mon = new CALinkMonitorII(l2.getId(), l2rev.getId(), l2.getLength(), l2.getCapacity());
+			CALinkMonitorII mon = new CALinkMonitorII(l2a.getId(), l2reva.getId(), l2a.getLength(), l2a.getCapacity(),timeOffset);
 			
 			
 			runIt(net,linksLR,sc,s,mon);
@@ -383,7 +417,7 @@ public class CASimDynamicExperiment_ZhangJ2011 {
 			//			System.out.println(app);
 			//			buf.append(app);
 			//			buf.append(" " + bL + " " + bCor + " " + bEx +"\n");
-			mon.report(bw2);
+			timeOffset = mon.report(bw2);
 			bw2.flush();
 			bw.flush();
 		}
@@ -419,9 +453,9 @@ public class CASimDynamicExperiment_ZhangJ2011 {
 			CAAgent[] particles = caLink.getParticles();
 			System.out.println("part left:" + particles.length);
 			for (int i = 0; i < particles.length-1; i++) {
-				if (i > 0) {
-					i+=3;
-				} 
+//				if (i > 0) {
+//					i+=3;
+//				} 
 				if (i >= particles.length) {
 					continue;
 				}
@@ -431,6 +465,9 @@ public class CASimDynamicExperiment_ZhangJ2011 {
 				particles[i] = a;
 				CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a);
 				em.processEvent(ee);
+				
+//				LinkEnterEvent eee = new LinkEnterEvent(0, a.getId(), caLink.getLink().getId(), a.getId());
+//				em.processEvent(eee);
 				CAEvent e = new CAEvent(1/(CANetworkDynamic.V_HAT*CANetworkDynamic.RHO_HAT), a,caLink, CAEventType.TTA);
 				caNet.pushEvent(e);
 			}
@@ -439,10 +476,7 @@ public class CASimDynamicExperiment_ZhangJ2011 {
 
 		//		em.addHandler(monitor);
 		//		monitor.setCALinkDynamic((CALinkDynamic)caNet.getCALink(new IdImpl("2")));
-		CALinkMonitorAttachedToSim m2 = new CALinkMonitorAttachedToSim((CALinkDynamic)caNet.getCALink(new IdImpl("2")),bw,s);
-		caNet.addMonitor(m2);
 		caNet.run();
-		m2.report();
 	}
 
 }

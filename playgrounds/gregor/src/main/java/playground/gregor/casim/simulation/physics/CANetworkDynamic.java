@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 
-import playground.gregor.casim.monitoring.CALinkMonitorAttachedToSim;
 import playground.gregor.sim2d_v4.events.XYVxVyEventImpl;
 import playground.gregor.sim2d_v4.events.debug.RectEvent;
 
@@ -72,7 +71,9 @@ public class CANetworkDynamic {
 	private final long eventCnt = 0;
 
 
-	private CALinkMonitorAttachedToSim m = null;
+
+
+	private final DensityObserver densityObserver;
 
 
 	private static int EXP_WARN_CNT;
@@ -80,13 +81,10 @@ public class CANetworkDynamic {
 	public CANetworkDynamic(Network net, EventsManager em) {
 		this.net = net;
 		this.em = em;
+		this.densityObserver = new DensityObserver(em);
 		init();
 	}
 
-	
-	public void addMonitor(CALinkMonitorAttachedToSim m) {
-		this.m  = m;
-	}
 	
 	private void init() {
 		for (Node n : this.net.getNodes().values()) {
@@ -109,11 +107,17 @@ public class CANetworkDynamic {
 					continue;
 				}
 			}
-			CALink caL = new CALinkDynamic(l,rev, ds, us, this);
+			CALinkDynamic caL = new CALinkDynamic(l,rev, ds, us, this);
+			this.densityObserver.registerCALink(caL);
 			us.addLink(caL);
 			ds.addLink(caL);
 			this.caLinks.put(l.getId(), caL);
 		}
+	}
+	
+	
+	public double getRho(CALinkDynamic l) {
+		return this.densityObserver.getRho(l.getDownstreamLink().getId());
 	}
 
 	public void runUntil(double time) {
@@ -159,9 +163,6 @@ public class CANetworkDynamic {
 				continue;
 			}
 			
-			if (this.m != null) {
-				this.m.trigger(e.getEventExcexutionTime());
-			}
 //			if (e.getCAAgent().getId().toString().equals("-3895") || e.getCAAgent().getId().toString().equals("1923")) {
 //				System.out.println("got you!!!");
 //			}

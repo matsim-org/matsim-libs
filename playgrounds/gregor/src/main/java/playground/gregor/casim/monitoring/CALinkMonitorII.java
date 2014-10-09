@@ -24,6 +24,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.LinkedList;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
@@ -33,6 +34,8 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 public class CALinkMonitorII implements LinkEnterEventHandler,
 LinkLeaveEventHandler {
 
+	
+	private static final Logger log = Logger.getLogger(CALinkMonitorII.class);
 	int dsCnt;
 	int usCnt;
 	long dsLeft;
@@ -47,14 +50,16 @@ LinkLeaveEventHandler {
 	private final LinkedList<Measure> measures = new LinkedList<Measure>();
 	private final double area;
 	private final double length;
+	private final double timeOffset;
 
 
-	public CALinkMonitorII(Id ds, Id us, double length, double width) {
+	public CALinkMonitorII(Id ds, Id us, double length, double width,double timeOffset) {
 		this.us = us;
 		this.ds = ds;
-		this.measures.add(new Measure(0));
+		this.measures.add(new Measure(timeOffset));
 		this.area = width*length;
 		this.length = length;
+		this.timeOffset = timeOffset;
 	}
 
 	@Override
@@ -70,7 +75,7 @@ LinkLeaveEventHandler {
 			
 			
 			Measure oldM = this.measures.getLast();
-			Measure newM = new Measure(event.getTime());
+			Measure newM = new Measure(event.getTime()+this.timeOffset);
 			newM.usTT = oldM.usTT;
 			newM.usCnt = oldM.usCnt;
 			this.dsCnt--;
@@ -81,7 +86,7 @@ LinkLeaveEventHandler {
 		} else if (event.getLinkId() == this.us){
 			LinkEnterEvent enter = this.dsQ.poll();
 			Measure oldM = this.measures.getLast();
-			Measure newM = new Measure(event.getTime());
+			Measure newM = new Measure(event.getTime()+this.timeOffset);
 			newM.dsTT = oldM.dsTT;
 			newM.dsCnt = oldM.dsCnt;
 			this.usCnt--;
@@ -105,9 +110,41 @@ LinkLeaveEventHandler {
 		}
 	}
 
-	public void report(BufferedWriter bw) throws IOException {
+	public double report(BufferedWriter bw) throws IOException {
+		
+		
+		
+		
+		
+		int from = (int) (this.measures.size()/2-this.measures.size()*.1);
+		int to = (int) (this.measures.size()/2+this.measures.size()*.1);
+		double avg = 0;
+		double range = to-from;
+		for (int i = from; i < to; i++) {
+			Measure m = this.measures.get(i);
+			double dsRho = m.dsCnt/this.area;
+			double usRho = m.usCnt/this.area;
+			avg += dsRho/range;
+		}
+		double var = 0;
+		for (int i = from; i < to; i++) {
+			Measure m = this.measures.get(i);
+			double dsRho = m.dsCnt/this.area;
+			double usRho = m.usCnt/this.area;
+			var += Math.pow(dsRho-avg,2)/range;
+		}
+		double sigma = Math.sqrt(var);
+		if (sigma > 0.05) {
+			log.warn("no stationarity!");
+			return this.timeOffset;
+		}
+		
+		int cnt = 0;
 		for (Measure m : this.measures) {
-
+			if (cnt++ < from || cnt > from+20) {
+				continue;
+			}
+			
 			double dsRho = m.dsCnt/this.area;
 			double usRho = m.usCnt/this.area;
 
@@ -120,8 +157,10 @@ LinkLeaveEventHandler {
 				usSpd = 0;
 			}
 			
-			bw.append(m.time + " " + m.dsCnt + " " + m.dsTT + " " + dsRho + " " + dsSpd+ " "+ m.usCnt + " " + m.usTT + " " + usRho + " " + usSpd + "\n");
+			bw.append(m.time + " " + m.dsCnt + " " + m.dsTT + " " + dsRho + " " + dsSpd+ " "+ m.usCnt + " " + m.usTT + " " + usRho + " " + usSpd + " " + sigma + "\n");
 		}
+		
+		return this.measures.getLast().time;
 	}
 	
 

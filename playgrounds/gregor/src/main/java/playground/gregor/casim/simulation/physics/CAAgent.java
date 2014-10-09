@@ -78,9 +78,6 @@ public abstract class CAAgent {
 		return this.id;
 	}
 
-	public abstract double getZ();
-
-	public abstract double getD();
 	
 	public abstract CANetworkEntity getCurrentCANetworkEntity();
 	
@@ -98,7 +95,4 @@ public abstract class CAAgent {
 		return "agent: " + getId() + " next event:" + this.currentEvent;
 	}
 	
-	public abstract double getCumWaitTime();
-
-	public abstract void setCumWaitTime(double tFree);
 }

@@ -29,7 +29,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.Tuple;
 
@@ -74,7 +73,7 @@ public class CANodeDynamic implements CANode{
 				width = l.getCapacity();
 			}
 		}
-		this.width = 3.6;//width;
+		this.width = width;
 		this.node = node;
 		this.net = net;
 		this.ratio = CANetworkDynamic.PED_WIDTH/this.width;
@@ -168,7 +167,7 @@ public class CANodeDynamic implements CANode{
 		//check pre-condition
 		if (nextLink.getParticles()[0] == null) {
 //			if (nextLink.getDsLastLeftTimes()[0] <= (time - a.getZ()/nextLink.getWidth())){
-			double z = a.getZ();
+			double z = nextLink.getZ();
 //			z *= CANetworkDynamic.PED_WIDTH;
 			z *= this.ratio;
 			if (nextLink.getDsLastLeftTimes()[0] <= (time - z)){
@@ -192,10 +191,6 @@ public class CANodeDynamic implements CANode{
 //			this.pollAgent(Double.NaN);	
 //			return;
 //		}
-
-		double timeGap = time-this.towardsLinkLastExitTimes.get(nextLink);
-		CASimpleDynamicAgent pred = this.towardsLinkLastExitAgents.get(nextLink);
-		a.updateMyDynamicQuantitiesOnAdvance(timeGap,time,this.cellLength,this.width);
 
 		this.towardsLinkLastExitTimes.put(nextLink, time);
 		this.towardsLinkLastExitAgents.put(nextLink, a);
@@ -222,7 +217,7 @@ public class CANodeDynamic implements CANode{
 		CAAgent inFrontOfMe = nextLink.getParticles()[1];
 		if (inFrontOfMe != null) {
 			if (inFrontOfMe.getDir() == -1) { //oncoming
-				double d = (a.getD() + inFrontOfMe.getD())/2;//TODO node vs. link width
+				double d = nextLink.getD();
 //				d *= CANetworkDynamic.PED_WIDTH;
 				d *= this.ratio;
 //				triggerSWAP(a,nextLink,time+d/nextLink.getWidth()+nextLink.getTFree());
@@ -239,7 +234,7 @@ public class CANodeDynamic implements CANode{
 	private void handleTTAEnterNextLinkFromUpstreamEndOnPrecondition2(
 			CALinkDynamic nextLink, CASimpleDynamicAgent a, double time) {
 //		double zStar = a.getZ()/this.width - (time - nextLink.getDsLastLeftTimes()[0]);
-		double z = a.getZ();
+		double z = nextLink.getZ();
 //		z *= CANetworkDynamic.PED_WIDTH;
 		z *= this.ratio;
 		double zStar = z - (time - nextLink.getDsLastLeftTimes()[0]);
@@ -255,13 +250,6 @@ public class CANodeDynamic implements CANode{
 
 	private void handleTTAOnPrecondition3(CASimpleDynamicAgent a, double time) {
 		// nothing to be done here
-		if (EXP_WARN_CNT++ < 10 ) {
-			log.warn("Experimental stuff!");
-			if (EXP_WARN_CNT == 10) {
-				log.warn(Gbl.FUTURE_SUPPRESSED);
-			}
-		}
-		a.setCumWaitTime(this.tFree);
 
 	}
 
@@ -272,7 +260,7 @@ public class CANodeDynamic implements CANode{
 		//check pre-condition
 		if (nextLink.getParticles()[nextLink.getNumOfCells()-1] == null) {
 //			if (nextLink.getUsLastLeftTimes()[nextLink.getNumOfCells()-1] <= (time - a.getZ()/nextLink.getWidth())){
-			double z = a.getZ();
+			double z = nextLink.getZ();
 //			z *= CANetworkDynamic.PED_WIDTH;
 			z *= this.ratio;
 			if (nextLink.getUsLastLeftTimes()[nextLink.getNumOfCells()-1] <= (time - z)){
@@ -296,10 +284,6 @@ public class CANodeDynamic implements CANode{
 //			this.pollAgent(Double.NaN);	
 //			return;
 //		}
-
-		double timeGap = time-this.towardsLinkLastExitTimes.get(nextLink);
-		CASimpleDynamicAgent pred = this.towardsLinkLastExitAgents.get(nextLink);
-		a.updateMyDynamicQuantitiesOnAdvance(timeGap,time,this.cellLength,this.width);
 
 		this.towardsLinkLastExitTimes.put(nextLink, time);
 		this.towardsLinkLastExitAgents.put(nextLink, a);
@@ -327,7 +311,7 @@ public class CANodeDynamic implements CANode{
 		CAAgent inFrontOfMe = nextLink.getParticles()[nextLink.getNumOfCells()-2];
 		if (inFrontOfMe != null) {
 			if (inFrontOfMe.getDir() == 1) { //oncoming
-				double d = (a.getD() + inFrontOfMe.getD())/2; //TODO node vs. link width
+				double d = nextLink.getD();
 //				d *= CANetworkDynamic.PED_WIDTH;
 				d *= this.ratio;
 //				triggerSWAP(a,nextLink,time+d/nextLink.getWidth()+nextLink.getTFree());
@@ -344,7 +328,7 @@ public class CANodeDynamic implements CANode{
 	private void handleTTAEnterNextLinkFromDownstreamEndOnPrecondition2(
 			CALinkDynamic nextLink, CASimpleDynamicAgent a, double time) {
 //		double zStar = a.getZ()/this.width - (time - nextLink.getUsLastLeftTimes()[nextLink.getNumOfCells()-1]);
-		double z = a.getZ();
+		double z = nextLink.getZ();
 //		z *= CANetworkDynamic.PED_WIDTH;
 		z *= this.ratio;
 		double zStar = z - (time - nextLink.getUsLastLeftTimes()[nextLink.getNumOfCells()-1]);
@@ -364,14 +348,7 @@ public class CANodeDynamic implements CANode{
 	}
 
 	private void triggerTTA(CAAgent toBeTriggered, CANetworkEntity ne, double time) {
-		if (EXP_WARN_CNT++ < 10 ) {
-			log.warn("Experimental stuff!");
-			if (EXP_WARN_CNT == 10) {
-				log.warn(Gbl.FUTURE_SUPPRESSED);
-			}
-		}
-		double cumWaitTime = toBeTriggered.getCumWaitTime();
-		CAEvent e = new CAEvent(time-cumWaitTime, toBeTriggered, ne, CAEventType.TTA);
+		CAEvent e = new CAEvent(time, toBeTriggered, ne, CAEventType.TTA);
 		this.net.pushEvent(e);
 
 	}
@@ -408,7 +385,7 @@ public class CANodeDynamic implements CANode{
 				//				CAEvent e = new CAEvent(time + this.z +  1/(this.vHat*this.rhoHat), t.getSecond(), t.getFirst(), CAEventType.TTA);
 //				double z = a.getZ();
 //				double z = t.getSecond().getZ();
-				double z = CALinkDynamic.getTriggerZ(a,t.getSecond());
+				double z = t.getFirst().getZ();
 //				z *= CANetworkDynamic.PED_WIDTH;
 				z *= this.ratio;
 //				double width = t.getFirst().getWidth();
@@ -492,7 +469,7 @@ public class CANodeDynamic implements CANode{
 		CAAgent inFrontOfMe = nextLink.getParticles()[0];
 		if ( inFrontOfMe != null) {
 			if (inFrontOfMe.getDir() == -1) {
-				double d = (swapA.getD() + inFrontOfMe.getD())/2;
+				double d = nextLink.getD();
 //				d *= CANetworkDynamic.PED_WIDTH;
 				d *= this.ratio;
 //				triggerSWAP(swapA, this, time+d/this.width+this.tFree);
@@ -511,7 +488,7 @@ public class CANodeDynamic implements CANode{
 		CAAgent inFrontOfMe = nextLink.getParticles()[nextLink.getNumOfCells()-1];
 		if ( inFrontOfMe != null) {
 			if (inFrontOfMe.getDir() == 1) {
-				double d = (swapA.getD() + inFrontOfMe.getD())/2;
+				double d = nextLink.getD();
 //				d *= CANetworkDynamic.PED_WIDTH;
 				d *= this.ratio;
 //				triggerSWAP(swapA, this, time+d/this.width+this.tFree);
