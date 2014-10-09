@@ -70,7 +70,13 @@ public final class PopulationAgentSource implements AgentSource {
 				Leg leg = (Leg) planElement;
 				if (this.mainModes.contains(leg.getMode())) { // only simulated modes get vehicles
 					if (!seenModes.contains(leg.getMode())) { // create one vehicle per simulated mode, put it on the home location
-						Id<Vehicle> vehicleId = ((NetworkRoute) leg.getRoute()).getVehicleId();
+                        NetworkRoute route = (NetworkRoute) leg.getRoute();
+                        Id<Vehicle> vehicleId;
+                        if (route != null) {
+                            vehicleId = route.getVehicleId();
+                        } else {
+                            vehicleId = null;
+                        }
                         if (vehicleId == null) {
                             if (qsim.getScenario().getConfig().qsim().getUsePersonIdForMissingVehicleId()) {
                                 vehicleId = Id.create(p.getId(), Vehicle.class);
