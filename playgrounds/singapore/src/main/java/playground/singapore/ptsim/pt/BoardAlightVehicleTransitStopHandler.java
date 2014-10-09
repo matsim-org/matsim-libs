@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.distribution.NormalDistributionImpl;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
@@ -26,7 +27,7 @@ public class BoardAlightVehicleTransitStopHandler implements TransitStopHandler 
 	private static final double ACC_DEC_DELAY = 0.0;
 	
 	//Attributes
-	private TransitStopFacility lastHandledStop = new TransitScheduleFactoryImpl().createTransitStopFacility(null, null, true);
+	private TransitStopFacility lastHandledStop = new TransitScheduleFactoryImpl().createTransitStopFacility(Id.create("", TransitStopFacility.class), null, true);
 
 	//Methods
 	@Override
