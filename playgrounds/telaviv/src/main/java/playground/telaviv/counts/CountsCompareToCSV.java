@@ -20,6 +20,7 @@
 
 package playground.telaviv.counts;
 
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -30,7 +31,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
@@ -110,7 +112,7 @@ public class CountsCompareToCSV {
 		counts.setYear(2012);
 		
 		for (List<Line> lines : countsMap.values()) {
-			Count count = counts.createAndAddCount(new IdImpl(lines.get(0).Link_Id), "");
+			Count count = counts.createAndAddCount(Id.create(lines.get(0).Link_Id, Link.class), "");
 			
 			for (Line line : lines) {
 				count.createVolume(Integer.valueOf(line.Hour), Double.valueOf(line.MATSIM_Volumes));

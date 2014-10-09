@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -38,9 +38,9 @@ public class TolledLinksFileParser {
 		this.separator = separator;
 	}
 	
-	public List<Tuple<Id, Id>> readFile(String fileName) throws IOException {
+	public List<Tuple<Id<Node>, Id<Node>>> readFile(String fileName) throws IOException {
 		
-		List<Tuple<Id, Id>> tuples = new ArrayList<Tuple<Id, Id>>();
+		List<Tuple<Id<Node>, Id<Node>>> tuples = new ArrayList<>();
 		
 		BufferedReader reader = IOUtils.getBufferedReader(fileName);
 		
@@ -52,10 +52,10 @@ public class TolledLinksFileParser {
 			
 			String[] cols = line.split(separator);
 			
-			Id fromNodeId = new IdImpl(cols[0]);
-			Id toNodeId = new IdImpl(cols[1]);
+			Id<Node> fromNodeId = Id.create(cols[0], Node.class);
+			Id<Node> toNodeId = Id.create(cols[1], Node.class);
 			
-			tuples.add(new Tuple<Id, Id>(fromNodeId, toNodeId));
+			tuples.add(new Tuple<Id<Node>, Id<Node>>(fromNodeId, toNodeId));
 		}
 		
 		return tuples;

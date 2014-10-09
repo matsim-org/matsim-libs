@@ -24,10 +24,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
@@ -90,21 +90,21 @@ public class TTAAgentSource implements AgentSource {
 		Map<String, VehicleType> modeVehicleTypes;
 		
 		modeVehicleTypes = new HashMap<String, VehicleType>();
-		VehicleType car = VehicleUtils.getFactory().createVehicleType(new IdImpl("car"));
+		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car", VehicleType.class));
 		car.setPcuEquivalents(TelAvivConfig.carPcuEquivalents);
 		car.setMaximumVelocity(TelAvivConfig.carMaximumVelocity);
 		modeVehicleTypes.put(TransportMode.car, car);
 		this.truckPopulationAgentSource.setModeVehicleTypes(modeVehicleTypes);
 		
 		modeVehicleTypes = new HashMap<String, VehicleType>();
-		VehicleType truck = VehicleUtils.getFactory().createVehicleType(new IdImpl("truck"));
+		VehicleType truck = VehicleUtils.getFactory().createVehicleType(Id.create("truck", VehicleType.class));
 		truck.setPcuEquivalents(TelAvivConfig.truckPcuEquivalents);
 		truck.setMaximumVelocity(TelAvivConfig.truckMaximumVelocity);
 		modeVehicleTypes.put(TransportMode.car, truck);
 		this.truckPopulationAgentSource.setModeVehicleTypes(modeVehicleTypes);
 		
 		modeVehicleTypes = new HashMap<String, VehicleType>();
-		VehicleType commercial = VehicleUtils.getFactory().createVehicleType(new IdImpl("commercial"));
+		VehicleType commercial = VehicleUtils.getFactory().createVehicleType(Id.create("commercial", VehicleType.class));
 		commercial.setPcuEquivalents(TelAvivConfig.commercialPcuEquivalents);
 		commercial.setMaximumVelocity(TelAvivConfig.commercialMaximumVelocity);
 		modeVehicleTypes.put(TransportMode.car, commercial);

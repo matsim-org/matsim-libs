@@ -125,15 +125,15 @@ public class TollXMLCreator {
 			Scenario originalScenario = ScenarioUtils.loadScenario(originalConfig);
 			Network originalNetwork = originalScenario.getNetwork();
 			
-			List<Tuple<Id, Id>> tuples = new TolledLinksFileParser(separator).readFile(basePath + tolledLinksFile);
+			List<Tuple<Id<Node>, Id<Node>>> tuples = new TolledLinksFileParser(separator).readFile(basePath + tolledLinksFile);
 			
 			QuadTree<Node> quadTree = LinkMappingTool.buildNodesQuadTree(scenario.getNetwork());
 			
 			List<Link> tolledLinks = new ArrayList<Link>();
 			Counter counter = new Counter("Tolled links mapped to MATSim network: #");
-			for (Tuple<Id, Id> tuple : tuples) {
-				Id fromNodeId = tuple.getFirst();
-				Id toNodeId = tuple.getSecond();
+			for (Tuple<Id<Node>, Id<Node>> tuple : tuples) {
+				Id<Node> fromNodeId = tuple.getFirst();
+				Id<Node> toNodeId = tuple.getSecond();
 
 				Node fromNode = network.getNodes().get(fromNodeId);
 				Node toNode = network.getNodes().get(toNodeId);
