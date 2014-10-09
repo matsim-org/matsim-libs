@@ -98,14 +98,7 @@ public abstract class CAAgent {
 		return "agent: " + getId() + " next event:" + this.currentEvent;
 	}
 	
-	public double getCumWaitTime() {
-		double ret = this.cumWaitTime;
-		this.cumWaitTime = 0;
-		return ret;
-	}
+	public abstract double getCumWaitTime();
 
-	public void setCumWaitTime(double tFree) {
-		this.cumWaitTime = tFree;
-		
-	}
+	public abstract void setCumWaitTime(double tFree);
 }

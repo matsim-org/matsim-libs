@@ -20,6 +20,7 @@
 
 package playground.gregor.casim.simulation.physics;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
@@ -36,7 +37,7 @@ public class CASimpleDynamicAgent extends CAAgent {
 
 	private double lastEnterTime = -1/(CANetworkDynamic.V_HAT*CANetworkDynamic.RHO_HAT);
 	private double myDirectionRho = 0;
-	private double myV;
+	private double myV = CANetworkDynamic.V_HAT;
 
 	private final double delta = 0.9; //decay
 	private double currentDecay = 1;
@@ -98,56 +99,53 @@ public class CASimpleDynamicAgent extends CAAgent {
 	}
 
 
-	public void updateMyDynamicQuantitiesOnAdvance(double timeGap, double time, double cellLength,double channelWidth) {
-		//		if (this.getId().toString().equals("1242") && this.getCurrentLink().getLink().getId().toString().equals("2")) {
-		//			System.out.println("got you!!!");
-		//		}
-		//		if (this.getCurrentLink().getLink().getId().toString().equals("2b")) {
-		////			System.out.println( + " " + this.myDirectionRho);
-		//		}
+	public void updateMyDynamicQuantitiesOnAdvance(double  gap, double time, double cellLength,double channelWidth) {
+		
+//		if (this.getId().toString().equals("246") && this.getCurrentLink().getLink().getId().toString().equals("2")) {
+//			System.out.println("got you!!!");
+//		}
 
 		double tt = time - this.lastEnterTime;
-		if (tt < 0.01) { //TODO use here tFree instead
+		if (tt < 0.0001) { //TODO use here tFree instead
 			this.lastEnterTime = time;
 			return;
 		}
-		//		if (tt <= 0) {
-		//			System.out.println("got you!!!");
-		//		}
 
-//		double w1 = this.lastUpdate-this.updateBeforeLastUpdate;
-//		double w2 = time-this.lastUpdate;
-//		double sum = (w1+w2);
-//		w1 /= sum;
-//		w2 /= sum;
-//		this.updateBeforeLastUpdate = this.lastUpdate;
-//		this.lastUpdate = time;
 
-		this.myV =cellLength/tt;//TODO maybe we need some smoothing here ...
-		//		this.myV = cellLength/tt;//TODO maybe we need some smoothing here ...
-//		this.myV = cellLength/tt;//TODO maybe we need some smoothing here ...
-		//		if (this.myV < 1) {
-		//			System.err.println(this.myV);
-		//		}
-		//		System.out.println(this.myV);
-		double predecessorDist = timeGap*this.myV;
-//		double widthRatio = CANetworkDynamic.PED_WIDTH/channelWidth;
-//		double widthRatio = 1/(channelWidth*CANetworkDynamic.PED_WIDTH);
-		double tmp = 1/(predecessorDist*channelWidth);
-		//		System.out.println(widthRatio*tmp);
-		//		this.myDirectionRho =0.5*this.myDirectionRho + 0.5*Math.min(widthRatio*tmp,CANetworkDynamic.RHO_HAT);
-		this.myDirectionRho =Math.min(tmp,CANetworkDynamic.RHO_HAT);
-		//		if (this.myDirectionRho > CANetworkDynamic.RHO_HAT) {
-		//			System.err.println("dd");
-		//		}
-//		if (this.getCurrentLink().getLink().getId().toString().equals("2a")) {
-//			msaRho = n/(n+1) * msaRho + 1/(1+n) * this.myDirectionRho;
-//			System.out.println(predecessorDist + " " + this.myV + " " + this.myDirectionRho +" " + msaRho + " " + cellLength * this.getCurrentLink().getNumOfCells());
-//			n++;
+		this.myV = cellLength/tt;//TODO maybe we need some smoothing here ...
+
+		double flow = 1/(channelWidth*gap);
+		this.myDirectionRho = flow/this.myV;
+		
+		
+//		if (pred != null && pred.getCurrentCANetworkEntity() == this.getCurrentCANetworkEntity()) {
+////			System.out.println(this.getId() + " " + pred.getId());
+//			
+//			int cells = (Math.abs(pred.getPos()-getPos()));
+//			if (cells <= 2) {
+//				cells -= .25;
+//			}
+////			else if (cells <=3) {
+////				cells -= 1;
+////			}
+//			
+//			double dist = cells*cellLength;
+//		
+//			double persSpace = dist*channelWidth;
+//			this.myDirectionRho = 1/persSpace;
+////			if (this.myDirectionRho > 4 ) {
+////				System.out.println("myRho" + this.myDirectionRho);
+////			}
+//			
 //		}
-//		if (this.myDirectionRho < 0) {
-//			System.out.println("got you!!!");
-//		}
+		
+//		double predecessorDist = 1*this.myV;
+
+//		double tmp = 1/(predecessorDist*channelWidth);
+		
+		
+//		this.myDirectionRho = tmp;
+
 		this.lastEnterTime = time;
 		this.currentDecay *= (this.delta); //TODO delta should be proportional to update time interval
 		
@@ -161,7 +159,7 @@ public class CASimpleDynamicAgent extends CAAgent {
 		this.lastOncommingAgent = time;
 		this.oncommingV = oncommingV;//TODO maybe we need some smoothing here ...
 		double widthRatio = CANetworkDynamic.PED_WIDTH/channelWidth;
-		this.theirDirectionRho = Math.min(CANetworkDynamic.RHO_HAT, widthRatio*this.oncomingAgentsRate/(this.myV+oncommingV));
+//		this.theirDirectionRho = Math.min(CANetworkDynamic.RHO_HAT, widthRatio*this.oncomingAgentsRate/(this.myV+oncommingV));
 		
 		this.currentDecay = 1;
 	}
@@ -172,21 +170,24 @@ public class CASimpleDynamicAgent extends CAAgent {
 
 	@Override
 	public double getD() {
-		double tmp = Math.pow(this.myDirectionRho*CANetworkDynamic.PED_WIDTH+this.theirDirectionRho*this.currentDecay*CANetworkDynamic.PED_WIDTH, CANetworkDynamic.GAMMA);
+		double tmp = Math.pow(this.getMyDirectionRho()*CANetworkDynamic.PED_WIDTH+this.getTheirDirectionRho()*this.currentDecay*CANetworkDynamic.PED_WIDTH, CANetworkDynamic.GAMMA);
 		return CANetworkDynamic.ALPHA + CANetworkDynamic.BETA*tmp;
 	}
 	@Override
 	public double getZ() {
 		double d = getD();
-		double z = d + 1/(CANetworkDynamic.RHO_HAT*CANetworkDynamic.PED_WIDTH*CANetworkDynamic.V_HAT);
-		//		if (z < 0) {
-		//			System.out.println("err!!");
-		//		}
-//		if (this.getCurrentLink().getLink().getId().toString().equals("2b")) {
-//			System.out.println(z + " " + this.myV + " " + this.myDirectionRho +" " + msaRho);
+		double z = d + 1/(CANetworkDynamic.RHO_HAT*CANetworkDynamic.V_HAT);
+//		double z = d + 1/(CANetworkDynamic.RHO_HAT*CANetworkDynamic.V_HAT);
+
+//		double gEq = 1/(this.myV*CANetworkDynamic.RHO_HAT);
+//		if (z < gEq ) {
+//			
+////			System.out.println(z + " " + gEq);
+//			return Math.min(gEq,CANetworkDynamic.MAX_Z);
 //		}
-		return z;
-//				return 0.6;
+		
+		return 0.61;
+//		return Math.min(0.5, z);
 	}
 
 	public double getV() {
@@ -199,7 +200,161 @@ public class CASimpleDynamicAgent extends CAAgent {
 	}
 
 	public double getMyDirectionRho() {
+		if (this.currentEntity instanceof CALinkDynamic && false) {
+			int d = this.getDir();
+			int p = this.getPos();
+			
+			double w = ((CALinkDynamic) this.currentEntity).getWidth();
+			
+			List<Double> spacings = new ArrayList<Double>();
+			int idx = p;
+			int last = idx;
+			//forward
+			while (spacings.size() < 1) {
+				idx += d;
+				if (idx < 0 || idx >= ((CALinkDynamic) this.currentEntity).getNumOfCells()){
+					break;
+				}
+				CAAgent part = ((CALinkDynamic) this.currentEntity).getParticles()[idx];
+				if (part != null) {
+					if (part.getDir() == d) {
+						int spaces = Math.abs(idx-last);
+						double dist = spaces * ((CALinkDynamic) this.currentEntity).getCellLength();
+						spacings.add(dist);
+						last = idx;
+					}
+				}
+			}
+			int sz = spacings.size();
+			//backward
+			idx = p;
+			last = idx;
+			while (spacings.size() < sz) {
+				idx -= d;
+				if (idx < 0 || idx >= ((CALinkDynamic) this.currentEntity).getNumOfCells()){
+					break;
+				}
+				CAAgent part = ((CALinkDynamic) this.currentEntity).getParticles()[idx];
+				if (part != null) {
+					if (part.getDir() == d) {
+						int spaces = Math.abs(idx-last);
+						double dist = spaces * ((CALinkDynamic) this.currentEntity).getCellLength();
+						spacings.add(dist);
+						last = idx;
+					}
+				}
+			}
+			
+			if (spacings.size() == 0) {
+				return 0;
+			}
+			
+
+			double rho = 0;
+//			if (((CALinkDynamic) this.currentEntity).getLink().getId().toString().equals("2") && spacings.size() > 2){
+//				System.out.println("got you!!!");
+//			}
+			double spSum = 0;
+//			for (Double sp : spacings) {
+//				rho += 1/(w*sp);
+//			}
+			for (Double sp : spacings) {
+				spSum += (w*sp);
+			}			
+			
+			rho = spacings.size()/(spSum);
+//			rho /= spacings.size();
+			this.myDirectionRho = 0.9*this.myDirectionRho + .1*rho;
+//			System.out.println(this.myDirectionRho);
+//			this.myDirectionRho;
+			
+		} 
 		return this.myDirectionRho;
+	}
+	
+	public double getTheirDirectionRho() {
+		if (this.currentEntity instanceof CALinkDynamic && false) {
+			int d = this.getDir();
+			int p = this.getPos();
+			
+			double w = ((CALinkDynamic) this.currentEntity).getWidth();
+			
+			List<Double> spacings = new ArrayList<Double>();
+			int idx = p;
+			int last = idx;
+			//forward
+			while (spacings.size() < 2) {
+				idx += d;
+				if (idx < 0 || idx >= ((CALinkDynamic) this.currentEntity).getNumOfCells()){
+					break;
+				}
+				CAAgent part = ((CALinkDynamic) this.currentEntity).getParticles()[idx];
+				if (part != null) {
+					if (part.getDir() == -d) {
+						int spaces = Math.abs(idx-last);
+						double dist = spaces * ((CALinkDynamic) this.currentEntity).getCellLength();
+						spacings.add(dist);
+						last = idx;
+					}
+				}
+			}
+			int sz = spacings.size();
+			//backward
+			idx = p;
+			last = idx;
+			while (spacings.size() < sz+1) {
+				idx -= d;
+				if (idx < 0 || idx >= ((CALinkDynamic) this.currentEntity).getNumOfCells()){
+					break;
+				}
+				CAAgent part = ((CALinkDynamic) this.currentEntity).getParticles()[idx];
+				if (part != null) {
+					if (part.getDir() == -d) {
+						int spaces = Math.abs(idx-last);
+						double dist = spaces * ((CALinkDynamic) this.currentEntity).getCellLength();
+						spacings.add(dist);
+						last = idx;
+					}
+				}
+			}
+			
+			if (spacings.size() == 0) {
+				return 0;
+			}
+			
+
+			double rho = 0;
+//			if (((CALinkDynamic) this.currentEntity).getLink().getId().toString().equals("2") && spacings.size() > 2){
+//				System.out.println("got you!!!");
+//			}
+			for (Double sp : spacings) {
+				rho += 1/(w*sp);
+			}
+			
+			rho /= spacings.size();
+			this.theirDirectionRho = 0.9*this.theirDirectionRho + 0.1*rho;
+//			System.out.println(this.myDirectionRho);
+//			this.myDirectionRho;
+			
+		} 
+		return this.theirDirectionRho;
+	}
+	
+	@Override
+	public double getCumWaitTime() {
+		double ret = this.cumWaitTime;
+		this.cumWaitTime = 0;
+//		if (ret > 0) {
+//			System.out.println(ret);
+//		}
+//		return ret;
+		return 0;
+	}
+
+	@Override
+	public void setCumWaitTime(double tFree) {
+		this.cumWaitTime = tFree;
+		this.myV = 0;
 	}
 
 }

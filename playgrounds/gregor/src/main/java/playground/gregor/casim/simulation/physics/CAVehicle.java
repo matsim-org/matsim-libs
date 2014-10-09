@@ -81,4 +81,16 @@ public class CAVehicle extends CAAgent {
 		
 	}
 
+	@Override
+	public double getCumWaitTime() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void setCumWaitTime(double tFree) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

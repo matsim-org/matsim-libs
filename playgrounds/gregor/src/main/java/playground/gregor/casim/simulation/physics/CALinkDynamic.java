@@ -42,7 +42,9 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 	private final CASimpleDynamicAgent [] particles;
 	private final double [] dsLastLeftTimes;
 	private final double [] usLastLeftTimes;
-
+	private final CASimpleDynamicAgent [] dsLastLeftAgent;
+	private final CASimpleDynamicAgent [] usLastLeftAgent;
+	
 	private final int size;
 
 	private final CANodeDynamic ds;
@@ -68,7 +70,7 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 		double z1 = a.getZ();
 		double z2 = toBeTriggered.getZ();
 //		return (z1+z2)/2;
-		return z1;
+		return z2;
 	}
 	
 	public CALinkDynamic(Link dsl, Link usl, CANodeDynamic ds, CANodeDynamic us, CANetworkDynamic net) {
@@ -82,6 +84,8 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 		this.particles = new CASimpleDynamicAgent[this.size];
 		this.usLastLeftTimes = new double[this.size];
 		this.dsLastLeftTimes = new double[this.size];
+		this.usLastLeftAgent = new CASimpleDynamicAgent[this.size];
+		this.dsLastLeftAgent = new CASimpleDynamicAgent[this.size];
 		this.ds = ds;
 		this.us = us;
 		this.tFree = this.cellLength/CANetworkDynamic.V_HAT;
@@ -165,9 +169,11 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 			CASimpleDynamicAgent a, double time, int idx) {
 
 		double timeGap = time-this.dsLastLeftTimes[idx];
+		CASimpleDynamicAgent pred = this.dsLastLeftAgent[idx];
 		a.updateMyDynamicQuantitiesOnAdvance(timeGap,time,this.cellLength,this.width);
 
 		this.dsLastLeftTimes[idx] = time;
+		this.dsLastLeftAgent[idx] = a;
 		this.particles[idx] = null;
 		this.particles[idx+1] = a;
 		a.proceed();
@@ -275,6 +281,7 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 				log.warn(Gbl.FUTURE_SUPPRESSED);
 			}
 		}
+		
 		a.setCumWaitTime(this.tFree);
 
 	}
@@ -301,20 +308,23 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 	private void handleTTAOnLinkUpStreamOnPreCondition1(
 			CASimpleDynamicAgent a, double time, int idx) {
 
-		double timeGap = time-this.usLastLeftTimes[idx];
-		a.updateMyDynamicQuantitiesOnAdvance(timeGap,time,this.cellLength,this.width);
-
-		this.usLastLeftTimes[idx] = time;
-		this.particles[idx] = null;
-		this.particles[idx-1] = a;
-		a.proceed();
-
-		//check post-condition and generate events
-		//first for persons behind
-		checkPostConditionForPersonBehindOnUpStreamAdvance(idx,a,time);
-
-		//second for oneself
-		checkPostConditionForAgentOnUpStreamAdvance(idx,a, time);
+		
+		throw new RuntimeException("not implemented!");
+		
+//		double timeGap = time-this.usLastLeftTimes[idx];
+//		a.updateMyDynamicQuantitiesOnAdvance(timeGap,time,this.cellLength,this.width);
+//
+//		this.usLastLeftTimes[idx] = time;
+//		this.particles[idx] = null;
+//		this.particles[idx-1] = a;
+//		a.proceed();
+//
+//		//check post-condition and generate events
+//		//first for persons behind
+//		checkPostConditionForPersonBehindOnUpStreamAdvance(idx,a,time);
+//
+//		//second for oneself
+//		checkPostConditionForAgentOnUpStreamAdvance(idx,a, time);
 
 	}
 
@@ -459,9 +469,11 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 	private void handleTTADownStreamNodeOnPreCondition1(CASimpleDynamicAgent a,
 			double time) {
 		double timeGap = time-this.dsLastLeftTimes[this.size-1];
+		CASimpleDynamicAgent pred = this.dsLastLeftAgent[this.size-1];
 		a.updateMyDynamicQuantitiesOnAdvance(timeGap,time,this.cellLength,this.width);
 
 		this.dsLastLeftTimes[this.size-1] = time;
+		this.dsLastLeftAgent[this.size-1] = a;
 		this.particles[this.size-1] = null;
 		this.ds.putAgent(a);
 
@@ -566,21 +578,25 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 
 	private void handleTTAUpStreamNodeOnPreCondition1(CASimpleDynamicAgent a,
 			double time) {
-		double timeGap = time-this.usLastLeftTimes[0];
-		a.updateMyDynamicQuantitiesOnAdvance(timeGap,time,this.cellLength,this.width);
-
-		this.usLastLeftTimes[0] = time;
-		this.particles[0] = null;
-		this.us.putAgent(a);
-
-		fireUpstreamLeft(a, time);
 		
-		//check post-condition and generate events
-		//first for persons behind
-		checkPostConditionForPersonBehindOnUpStreamAdvance(0,a,time);
-
-		//second for oneself
-		checkPostConditionForOneSelfOnNodeAdvance(this.us,a, time);
+		
+		throw new RuntimeException("not implemented!");
+		
+//		double timeGap = time-this.usLastLeftTimes[0];
+//		a.updateMyDynamicQuantitiesOnAdvance(timeGap,time,this.cellLength,this.width);
+//
+//		this.usLastLeftTimes[0] = time;
+//		this.particles[0] = null;
+//		this.us.putAgent(a);
+//
+//		fireUpstreamLeft(a, time);
+//		
+//		//check post-condition and generate events
+//		//first for persons behind
+//		checkPostConditionForPersonBehindOnUpStreamAdvance(0,a,time);
+//
+//		//second for oneself
+//		checkPostConditionForOneSelfOnNodeAdvance(this.us,a, time);
 
 	}
 
@@ -614,70 +630,73 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 
 	private void swapWithDownStreamNode(CASimpleDynamicAgent a, double time) {
 		
+		throw new RuntimeException("not implemented!");
 		
-		
-		CAAgent swapA = this.ds.pollAgent(time);
-		if (!(swapA instanceof CASimpleDynamicAgent)){
-			throw new RuntimeException("only agents of type " + CASimpleDynamicAgent.class.getName() + " are allowed here.");
-		}
-		double theirV = ((CASimpleDynamicAgent)swapA).getV();
-		double theirRho = ((CASimpleDynamicAgent)swapA).getMyDirectionRho();
-		double timeGap = time - this.dsLastLeftTimes[this.size-1];
-		a.updateMyDynamicQuantitiesOnAdvance(timeGap, time, this.cellLength, this.width);
-		a.updateMyDynamicQuantitiesOnSwap(theirV,time,this.width,theirRho);
-		swapA.moveOverNode(this,time);
-		swapA.materialize(this.size-1, -1);
-		
-		double myRho = a.getMyDirectionRho();
-		((CASimpleDynamicAgent)swapA).updateMyDynamicQuantitiesOnSwap(a.getV(),time,this.width,myRho);
-				
-		this.particles[this.size-1] = (CASimpleDynamicAgent) swapA;
-		this.dsLastLeftTimes[this.size-1] = time;
-		this.ds.putAgent(a);
-		
-		fireDownstreamLeft(a, time);
-		fireDownstreamEntered(swapA, time);
-		
-		
-		//check post-condition and generate events
-		//first for swapA
-		checkPostConditionForAgentOnUpStreamAdvance(this.size, ((CASimpleDynamicAgent)swapA), time);
-		
-		//second for oneself
-		checkPostConditionForOneSelfOnNodeAdvance(this.ds,a, time);
+//		CAAgent swapA = this.ds.pollAgent(time);
+//		if (!(swapA instanceof CASimpleDynamicAgent)){
+//			throw new RuntimeException("only agents of type " + CASimpleDynamicAgent.class.getName() + " are allowed here.");
+//		}
+//		double theirV = ((CASimpleDynamicAgent)swapA).getV();
+//		double theirRho = ((CASimpleDynamicAgent)swapA).getMyDirectionRho();
+//		double timeGap = time - this.dsLastLeftTimes[this.size-1];
+//		a.updateMyDynamicQuantitiesOnAdvance(timeGap, time, this.cellLength, this.width);
+//		a.updateMyDynamicQuantitiesOnSwap(theirV,time,this.width,theirRho);
+//		swapA.moveOverNode(this,time);
+//		swapA.materialize(this.size-1, -1);
+//		
+//		double myRho = a.getMyDirectionRho();
+//		((CASimpleDynamicAgent)swapA).updateMyDynamicQuantitiesOnSwap(a.getV(),time,this.width,myRho);
+//				
+//		this.particles[this.size-1] = (CASimpleDynamicAgent) swapA;
+//		this.dsLastLeftTimes[this.size-1] = time;
+//		this.dsLastLeftAgent[this.size-1] = a;
+//		this.ds.putAgent(a);
+//		
+//		fireDownstreamLeft(a, time);
+//		fireDownstreamEntered(swapA, time);
+//		
+//		
+//		//check post-condition and generate events
+//		//first for swapA
+//		checkPostConditionForAgentOnUpStreamAdvance(this.size, ((CASimpleDynamicAgent)swapA), time);
+//		
+//		//second for oneself
+//		checkPostConditionForOneSelfOnNodeAdvance(this.ds,a, time);
 	}
 	
 	private void swapWithUpStreamNode(CASimpleDynamicAgent a, double time) {
 		
-		CAAgent swapA = this.us.pollAgent(time);
-		if (!(swapA instanceof CASimpleDynamicAgent)){
-			throw new RuntimeException("only agents of type " + CASimpleDynamicAgent.class.getName() + " are allowed here.");
-		}
-		double theirV = ((CASimpleDynamicAgent)swapA).getV();
-		double theirRho = ((CASimpleDynamicAgent)swapA).getMyDirectionRho();
-		double timeGap = time - this.usLastLeftTimes[0];
-		a.updateMyDynamicQuantitiesOnAdvance(timeGap, time, this.cellLength, this.width);
-		a.updateMyDynamicQuantitiesOnSwap(theirV,time,this.width,theirRho);
-		swapA.moveOverNode(this,time);
-		swapA.materialize(0, 1);
+		throw new RuntimeException("not implemented!");
 		
-		double myRho = a.getMyDirectionRho();
-		
-		((CASimpleDynamicAgent)swapA).updateMyDynamicQuantitiesOnSwap(a.getV(),time,this.width,myRho);
-		
-		this.particles[0] = (CASimpleDynamicAgent) swapA;
-		this.usLastLeftTimes[0] = time;
-		this.us.putAgent(a);
-		
-		fireUpstreamLeft(a, time);
-		fireUpstreamEntered(swapA, time);
-		
-		//check post-condition and generate events
-		//first for swapA
-		checkPostConditionForAgentOnDownStreamAdvance(-1, ((CASimpleDynamicAgent)swapA), time);
-		
-		//second for oneself
-		checkPostConditionForOneSelfOnNodeAdvance(this.us,a, time);
+//		CAAgent swapA = this.us.pollAgent(time);
+//		if (!(swapA instanceof CASimpleDynamicAgent)){
+//			throw new RuntimeException("only agents of type " + CASimpleDynamicAgent.class.getName() + " are allowed here.");
+//		}
+//		double theirV = ((CASimpleDynamicAgent)swapA).getV();
+//		double theirRho = ((CASimpleDynamicAgent)swapA).getMyDirectionRho();
+//		double timeGap = time - this.usLastLeftTimes[0];
+//		a.updateMyDynamicQuantitiesOnAdvance(timeGap, time, this.cellLength, this.width);
+//		a.updateMyDynamicQuantitiesOnSwap(theirV,time,this.width,theirRho);
+//		swapA.moveOverNode(this,time);
+//		swapA.materialize(0, 1);
+//		
+//		double myRho = a.getMyDirectionRho();
+//		
+//		((CASimpleDynamicAgent)swapA).updateMyDynamicQuantitiesOnSwap(a.getV(),time,this.width,myRho);
+//		
+//		this.particles[0] = (CASimpleDynamicAgent) swapA;
+//		this.usLastLeftTimes[0] = time;
+//		this.us.putAgent(a);
+//		
+//		fireUpstreamLeft(a, time);
+//		fireUpstreamEntered(swapA, time);
+//		
+//		//check post-condition and generate events
+//		//first for swapA
+//		checkPostConditionForAgentOnDownStreamAdvance(-1, ((CASimpleDynamicAgent)swapA), time);
+//		
+//		//second for oneself
+//		checkPostConditionForOneSelfOnNodeAdvance(this.us,a, time);
 	}
 
 
@@ -728,56 +747,64 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 
 	private void swapOnLinkDownStream(CASimpleDynamicAgent a, int idx,
 			double time) {
-		int nbIdx = idx+1;
-		CASimpleDynamicAgent nb = this.particles[nbIdx];
-		this.particles[nbIdx] = a;
-		this.particles[idx] = nb;
-
-		double theirRho = nb.getMyDirectionRho();
-		double myRho = a.getMyDirectionRho();
 		
-		double onCommingTimeGap = time-this.usLastLeftTimes[nbIdx];
-		this.usLastLeftTimes[nbIdx] = time;
-		nb.updateMyDynamicQuantitiesOnAdvance(onCommingTimeGap,time,this.cellLength,this.width);
-		nb.updateMyDynamicQuantitiesOnSwap(a.getV(),time,this.width,myRho);
-
-		double timeGap = time-this.dsLastLeftTimes[idx];
-		this.dsLastLeftTimes[idx] = time;
-		a.updateMyDynamicQuantitiesOnAdvance(timeGap,time,this.cellLength,this.width);
-		a.updateMyDynamicQuantitiesOnSwap(nb.getV(),time,this.width,theirRho);
+		throw new RuntimeException("not implemented!");
 		
-		nb.proceed();
-		a.proceed();
-		
-		checkPostConditionForAgentOnDownStreamAdvance(idx, a, time);
-		checkPostConditionForAgentOnUpStreamAdvance(nbIdx, nb, time);
+//		int nbIdx = idx+1;
+//		CASimpleDynamicAgent nb = this.particles[nbIdx];
+//		this.particles[nbIdx] = a;
+//		this.particles[idx] = nb;
+//
+//		double theirRho = nb.getMyDirectionRho();
+//		double myRho = a.getMyDirectionRho();
+//		
+//		double onCommingTimeGap = time-this.usLastLeftTimes[nbIdx];
+//		this.usLastLeftTimes[nbIdx] = time;
+//		nb.updateMyDynamicQuantitiesOnAdvance(onCommingTimeGap,time,this.cellLength,this.width);
+//		nb.updateMyDynamicQuantitiesOnSwap(a.getV(),time,this.width,myRho);
+//
+//		double timeGap = time-this.dsLastLeftTimes[idx];
+//		this.dsLastLeftTimes[idx] = time;
+//		this.dsLastLeftAgent[idx] = a;
+//		a.updateMyDynamicQuantitiesOnAdvance(timeGap,time,this.cellLength,this.width);
+//		a.updateMyDynamicQuantitiesOnSwap(nb.getV(),time,this.width,theirRho);
+//		
+//		nb.proceed();
+//		a.proceed();
+//		
+//		checkPostConditionForAgentOnDownStreamAdvance(idx, a, time);
+//		checkPostConditionForAgentOnUpStreamAdvance(nbIdx, nb, time);
 		
 	}
 
 	private void swapOnLinkUpStream(CASimpleDynamicAgent a, int idx, double time) {
-		int nbIdx = idx-1;
-		CASimpleDynamicAgent nb = this.particles[nbIdx];
-		this.particles[nbIdx] = a;
-		this.particles[idx] = nb;
-
-		double theirRho = nb.getMyDirectionRho();
-		double myRho = a.getMyDirectionRho();
 		
-		double onCommingTimeGap = time-this.dsLastLeftTimes[nbIdx];
-		this.dsLastLeftTimes[nbIdx] = time;
-		nb.updateMyDynamicQuantitiesOnAdvance(onCommingTimeGap,time,this.cellLength,this.width);
-		nb.updateMyDynamicQuantitiesOnSwap(a.getV(),time,this.width,myRho);
-
-		double timeGap = time-this.usLastLeftTimes[idx];
-		this.usLastLeftTimes[idx] = time;
-		a.updateMyDynamicQuantitiesOnAdvance(timeGap,time,this.cellLength,this.width);
-		a.updateMyDynamicQuantitiesOnSwap(nb.getV(),time,this.width,theirRho);
+		throw new RuntimeException("not implemented!");
 		
-		nb.proceed();
-		a.proceed();
-		
-		checkPostConditionForAgentOnUpStreamAdvance(idx, a, time);
-		checkPostConditionForAgentOnDownStreamAdvance(nbIdx, nb, time);
+//		int nbIdx = idx-1;
+//		CASimpleDynamicAgent nb = this.particles[nbIdx];
+//		this.particles[nbIdx] = a;
+//		this.particles[idx] = nb;
+//
+//		double theirRho = nb.getMyDirectionRho();
+//		double myRho = a.getMyDirectionRho();
+//		
+//		double onCommingTimeGap = time-this.dsLastLeftTimes[nbIdx];
+//		this.dsLastLeftTimes[nbIdx] = time;
+//		this.dsLastLeftAgent[nbIdx] = nb;
+//		nb.updateMyDynamicQuantitiesOnAdvance(onCommingTimeGap,time,this.cellLength,this.width);
+//		nb.updateMyDynamicQuantitiesOnSwap(a.getV(),time,this.width,myRho);
+//
+//		double timeGap = time-this.usLastLeftTimes[idx];
+//		this.usLastLeftTimes[idx] = time;
+//		a.updateMyDynamicQuantitiesOnAdvance(timeGap,time,this.cellLength,this.width);
+//		a.updateMyDynamicQuantitiesOnSwap(nb.getV(),time,this.width,theirRho);
+//		
+//		nb.proceed();
+//		a.proceed();
+//		
+//		checkPostConditionForAgentOnUpStreamAdvance(idx, a, time);
+//		checkPostConditionForAgentOnDownStreamAdvance(nbIdx, nb, time);
 		
 	}
 

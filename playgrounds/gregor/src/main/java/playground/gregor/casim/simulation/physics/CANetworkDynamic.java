@@ -32,7 +32,9 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 
+import playground.gregor.casim.monitoring.CALinkMonitorAttachedToSim;
 import playground.gregor.sim2d_v4.events.XYVxVyEventImpl;
+import playground.gregor.sim2d_v4.events.debug.RectEvent;
 
 
 public class CANetworkDynamic {
@@ -44,14 +46,17 @@ public class CANetworkDynamic {
 	//Floetteroed Laemmel parameters
 	public static final double RHO_HAT = 6.69;
 	public static final double V_HAT = 1.27;
-	//	public static final double RHO_HAT = 5.09;
-	//	public static final double V_HAT = 1.26;
+//		public static final double RHO_HAT = 5.09;
+//		public static final double V_HAT = 1.26;
 
 	public static final double ALPHA = 0;
 	public static final double BETA = 0.39;
 	public static final double GAMMA = 1.43;
 
-	public static final double PED_WIDTH = 0.61;
+	
+	
+	public static final double PED_WIDTH = .61;
+	public static final double MAX_Z = ALPHA + BETA * Math.pow(RHO_HAT,GAMMA) + 1/(RHO_HAT*V_HAT);;
 
 	private static final Logger log = Logger.getLogger(CANetworkDynamic.class);
 
@@ -67,6 +72,9 @@ public class CANetworkDynamic {
 	private final long eventCnt = 0;
 
 
+	private CALinkMonitorAttachedToSim m = null;
+
+
 	private static int EXP_WARN_CNT;
 
 	public CANetworkDynamic(Network net, EventsManager em) {
@@ -75,6 +83,11 @@ public class CANetworkDynamic {
 		init();
 	}
 
+	
+	public void addMonitor(CALinkMonitorAttachedToSim m) {
+		this.m  = m;
+	}
+	
 	private void init() {
 		for (Node n : this.net.getNodes().values()) {
 			CANodeDynamic caNode = new CANodeDynamic(n, this);
@@ -121,7 +134,7 @@ public class CANetworkDynamic {
 			e.getCANetworkEntity().handleEvent(e);
 
 			if (e.getEventExcexutionTime() > this.globalTime) {
-				draw();
+				draw2();
 				this.globalTime = e.getEventExcexutionTime();
 			}
 		}
@@ -132,6 +145,10 @@ public class CANetworkDynamic {
 		this.globalTime = this.events.peek().getEventExcexutionTime();
 		while (this.events.size() > 0) {
 			CAEvent e = this.events.poll();
+			
+		
+			
+			
 			if (e.isObsolete()){
 				if (EXP_WARN_CNT++ < 10 ) {
 					log.info("dropping obsolete event: " + e);
@@ -140,6 +157,10 @@ public class CANetworkDynamic {
 					}
 				}
 				continue;
+			}
+			
+			if (this.m != null) {
+				this.m.trigger(e.getEventExcexutionTime());
 			}
 //			if (e.getCAAgent().getId().toString().equals("-3895") || e.getCAAgent().getId().toString().equals("1923")) {
 //				System.out.println("got you!!!");
@@ -193,15 +214,57 @@ public class CANetworkDynamic {
 
 			//			System.out.println(e);
 
-			if (CASimDynamicExperiment_ZhangJ2012a.VIS && e.getEventExcexutionTime() > this.globalTime+0.04) {
+			if (CASimDynamicExperiment_ZhangJ2011.VIS && e.getEventExcexutionTime() > this.globalTime+0.04) {
 
-				draw();
+				draw2();
 				this.globalTime = e.getEventExcexutionTime();
 			}
 		}
 	}
 
 
+	private void draw2() {
+		for (CALink l : this.caLinks.values()) {
+			double dx = l.getLink().getToNode().getCoord().getX()-l.getLink().getFromNode().getCoord().getX();
+			double dy = l.getLink().getToNode().getCoord().getY()-l.getLink().getFromNode().getCoord().getY();
+			double length = Math.sqrt(dx*dx+dy*dy);
+			dx /= length;
+			dy /= length;
+			double incr = l.getLink().getLength()/l.getNumOfCells();
+			dx *= incr;
+			dy *= incr;
+			double width =l.getLink().getCapacity();
+			double x = l.getLink().getFromNode().getCoord().getX();//+dx/2;
+			double y = l.getLink().getFromNode().getCoord().getY();//+dy/2;
+			for (int i = 0; i < l.getNumOfCells(); i++) {
+				if (l.getParticles()[i]!= null) {
+					double ddx = 1;
+					double ddy = 0;
+					if (l.getParticles()[i].getDir() == -1) {
+						ddx = -1;
+					};
+					XYVxVyEventImpl e = new XYVxVyEventImpl(l.getParticles()[i].getId(), x+dx/2, y+dy/2, ddx, ddy, this.globalTime);
+					
+					this.em.processEvent(e);
+//					System.out.println(l.getParticles()[i]);
+				} else {
+					RectEvent e = new RectEvent(this.globalTime, x, y+width/2, dx, width, false);
+					this.em.processEvent(e);
+				}
+				x+=dx;
+				y+=dy;
+			}
+		}
+		for (CANode n : this.caNodes.values()) {
+			if (n.peekForAgent() != null) {
+				double x = n.getNode().getCoord().getX();
+				double y = n.getNode().getCoord().getY();
+				XYVxVyEventImpl e = new XYVxVyEventImpl(n.peekForAgent().getId(), x, y, 0, 0, this.globalTime);
+				this.em.processEvent(e);
+			}
+		}
+	}
+	
 	private void draw() {
 		for (CALink l : this.caLinks.values()) {
 			double dx = l.getLink().getToNode().getCoord().getX()-l.getLink().getFromNode().getCoord().getX();
@@ -270,9 +333,9 @@ public class CANetworkDynamic {
 //		if (event.toString().equals("time:25.783212202329086 a:a:1923 SWAP")) {
 //			System.out.println("got you!!!");
 //		}
-		if (event.toString().equals("time:13.547189434599161 type:TTA obsolete:false")) {
-			System.out.println("got you!!!");
-		}		
+//		if (event.toString().equals("time:13.547189434599161 type:TTA obsolete:false")) {
+//			System.out.println("got you!!!");
+//		}		
 		
 //		CANetworkEntity e = event.getCANetworkEntity();
 //		if (e instanceof CALinkDynamic) {

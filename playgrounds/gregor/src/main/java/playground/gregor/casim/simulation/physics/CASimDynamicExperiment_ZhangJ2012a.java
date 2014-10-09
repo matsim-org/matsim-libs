@@ -43,7 +43,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.gregor.casim.events.CASimAgentConstructEvent;
-import playground.gregor.casim.monitoring.CALinkMonitorII;
+import playground.gregor.casim.monitoring.CALinkMonitorIII;
 import playground.gregor.casim.simulation.physics.CAEvent.CAEventType;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
@@ -125,7 +125,7 @@ public class CASimDynamicExperiment_ZhangJ2012a {
 		net.addLink(l3ex);net.addLink(l2ex);net.addLink(l4);net.addLink(l3);net.addLink(l2);net.addLink(l1);net.addLink(l0);
 		net.addLink(l4rev);net.addLink(l3rev);net.addLink(l2rev);net.addLink(l1rev);net.addLink(l0rev);
 
-		CALinkMonitorII monitor = new CALinkMonitorII(l2.getId(), l2rev.getId(),l2);
+		CALinkMonitorIII monitor = new CALinkMonitorIII(l2.getId(), l2rev.getId(),l2);
 
 		BufferedWriter buf = new BufferedWriter(new FileWriter(new File("/Users/laemmel/devel/bipedca/plot_dynamic/ZhangJ2012a_")));
 
@@ -195,7 +195,7 @@ public class CASimDynamicExperiment_ZhangJ2012a {
 		buf.close();
 	}
 
-	private static void runIt(Network net,CALinkMonitorII monitor,List<Link>linksLR,List<Link>linksRL, Scenario sc){
+	private static void runIt(Network net,CALinkMonitorIII monitor,List<Link>linksLR,List<Link>linksRL, Scenario sc){
 		//visualization stuff
 		EventsManager em = new EventsManagerImpl();
 
@@ -219,6 +219,7 @@ public class CASimDynamicExperiment_ZhangJ2012a {
 				agents++;
 				CAAgent a = new CASimpleDynamicAgent(linksLR, 1, new IdImpl(agents++), caLink);
 				a.materialize(i, 1);
+				particles[i] = a;
 				CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a);
 				em.processEvent(ee);
 				CAEvent e = new CAEvent(1/(CANetworkDynamic.V_HAT*CANetworkDynamic.RHO_HAT), a,caLink, CAEventType.TTA);
@@ -234,6 +235,7 @@ public class CASimDynamicExperiment_ZhangJ2012a {
 				agents++;
 				CAAgent a = new CASimpleDynamicAgent(linksRL, 1, new IdImpl(-(agents++)), caLink);
 				a.materialize(i, -1);
+				particles[i] = a;
 				CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a);
 				em.processEvent(ee);
 				CAEvent e = new CAEvent(1/(CANetworkDynamic.V_HAT*CANetworkDynamic.RHO_HAT), a,caLink, CAEventType.TTA);

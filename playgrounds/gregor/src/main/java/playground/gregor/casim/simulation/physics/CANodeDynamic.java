@@ -49,6 +49,7 @@ public class CANodeDynamic implements CANode{
 	private final List<CALinkDynamic> links = new ArrayList<CALinkDynamic>();
 
 	private final Map<CALink,Double> towardsLinkLastExitTimes = new HashMap<CALink,Double>();
+	private final Map<CALink,CASimpleDynamicAgent> towardsLinkLastExitAgents = new HashMap<CALink,CASimpleDynamicAgent>();
 
 	private final double width;
 
@@ -73,7 +74,7 @@ public class CANodeDynamic implements CANode{
 				width = l.getCapacity();
 			}
 		}
-		this.width = width;
+		this.width = 3.6;//width;
 		this.node = node;
 		this.net = net;
 		this.ratio = CANetworkDynamic.PED_WIDTH/this.width;
@@ -81,6 +82,10 @@ public class CANodeDynamic implements CANode{
 		this.tFree = this.cellLength/CANetworkDynamic.V_HAT;
 //		this.tFree = 0.0001;
 //		this.ratio = 0.0001;
+		
+//		double bwCellLength = 1/(CANetworkDynamic.RHO_HAT*CANetworkDynamic.PED_WIDTH);
+		
+		
 //		this.ratio = 1;
 		
 	}
@@ -189,9 +194,11 @@ public class CANodeDynamic implements CANode{
 //		}
 
 		double timeGap = time-this.towardsLinkLastExitTimes.get(nextLink);
+		CASimpleDynamicAgent pred = this.towardsLinkLastExitAgents.get(nextLink);
 		a.updateMyDynamicQuantitiesOnAdvance(timeGap,time,this.cellLength,this.width);
 
 		this.towardsLinkLastExitTimes.put(nextLink, time);
+		this.towardsLinkLastExitAgents.put(nextLink, a);
 
 		this.pollAgent(Double.NaN);
 
@@ -291,9 +298,11 @@ public class CANodeDynamic implements CANode{
 //		}
 
 		double timeGap = time-this.towardsLinkLastExitTimes.get(nextLink);
+		CASimpleDynamicAgent pred = this.towardsLinkLastExitAgents.get(nextLink);
 		a.updateMyDynamicQuantitiesOnAdvance(timeGap,time,this.cellLength,this.width);
 
 		this.towardsLinkLastExitTimes.put(nextLink, time);
+		this.towardsLinkLastExitAgents.put(nextLink, a);
 
 		this.pollAgent(Double.NaN);
 
@@ -435,30 +444,33 @@ public class CANodeDynamic implements CANode{
 
 	private void handleSwapWithUpStreamEnd(CASimpleDynamicAgent a, double time,
 			CALinkDynamic nextLink) {
-		CAAgent swapA = nextLink.getParticles()[0];
-		this.pollAgent(0);
-		this.putAgent(swapA);
-		nextLink.getParticles()[0] = a;
-		a.materialize(0, 1);
-		nextLink.fireUpstreamLeft(swapA, time);
-		nextLink.fireUpstreamEntered(a, time);
-		a.moveOverNode(nextLink,time);
-
-		double theirRho = ((CASimpleDynamicAgent)swapA).getMyDirectionRho();
-		double myRho = a.getMyDirectionRho();
 		
-		// update dynamic properties
-		double theirV = ((CASimpleDynamicAgent)swapA).getV();
-		a.updateMyDynamicQuantitiesOnSwap(theirV,time,this.width,theirRho);
-		double timeGap = time - nextLink.getUsLastLeftTimes()[0];
-		((CASimpleDynamicAgent)swapA).updateMyDynamicQuantitiesOnAdvance(timeGap, time, nextLink.getCellLength(), nextLink.getWidth());
-		((CASimpleDynamicAgent)swapA).updateMyDynamicQuantitiesOnSwap(a.getV(),time,this.width,myRho);
-		nextLink.getDsLastLeftTimes()[0]=time;
-		this.towardsLinkLastExitTimes.put(nextLink, time);
-
-		//TODO check post-conditions & new events
-		checkPostConditionForAgentEnteredLinkFromUpstreamEnd(nextLink, a, time);
-		checkPostConditionForAgentSwapedToNode(swapA,time);
+		throw new RuntimeException("not implemented!!");
+		
+//		CAAgent swapA = nextLink.getParticles()[0];
+//		this.pollAgent(0);
+//		this.putAgent(swapA);
+//		nextLink.getParticles()[0] = a;
+//		a.materialize(0, 1);
+//		nextLink.fireUpstreamLeft(swapA, time);
+//		nextLink.fireUpstreamEntered(a, time);
+//		a.moveOverNode(nextLink,time);
+//
+//		double theirRho = ((CASimpleDynamicAgent)swapA).getMyDirectionRho();
+//		double myRho = a.getMyDirectionRho();
+//		
+//		// update dynamic properties
+//		double theirV = ((CASimpleDynamicAgent)swapA).getV();
+//		a.updateMyDynamicQuantitiesOnSwap(theirV,time,this.width,theirRho);
+//		double timeGap = time - nextLink.getUsLastLeftTimes()[0];
+//		((CASimpleDynamicAgent)swapA).updateMyDynamicQuantitiesOnAdvance(timeGap, time, nextLink.getCellLength(), nextLink.getWidth());
+//		((CASimpleDynamicAgent)swapA).updateMyDynamicQuantitiesOnSwap(a.getV(),time,this.width,myRho);
+//		nextLink.getDsLastLeftTimes()[0]=time;
+//		this.towardsLinkLastExitTimes.put(nextLink, time);
+//
+//		//TODO check post-conditions & new events
+//		checkPostConditionForAgentEnteredLinkFromUpstreamEnd(nextLink, a, time);
+//		checkPostConditionForAgentSwapedToNode(swapA,time);
 
 	}
 
@@ -514,30 +526,33 @@ public class CANodeDynamic implements CANode{
 
 	private void handleSwapWithDownStreamEnd(CASimpleDynamicAgent a,
 			double time, CALinkDynamic nextLink) {
-		CAAgent swapA = nextLink.getParticles()[nextLink.getNumOfCells()-1];
-		this.pollAgent(0);
-		this.putAgent(swapA);
-		nextLink.getParticles()[nextLink.getNumOfCells()-1] = a;
-		a.materialize(nextLink.getNumOfCells()-1, -1);
-		nextLink.fireDownstreamLeft(swapA, time);
-		nextLink.fireDownstreamEntered(a, time);
-		a.moveOverNode(nextLink,time);
-
-		double theirRho = ((CASimpleDynamicAgent)swapA).getMyDirectionRho();
-		double myRho = a.getMyDirectionRho();
 		
-		// update dynamic properties
-		double theirV = ((CASimpleDynamicAgent)swapA).getV();
-		a.updateMyDynamicQuantitiesOnSwap(theirV,time,this.width,theirRho);
-		double timeGap = time - nextLink.getDsLastLeftTimes()[nextLink.getNumOfCells()-1];
-		((CASimpleDynamicAgent)swapA).updateMyDynamicQuantitiesOnAdvance(timeGap, time, nextLink.getCellLength(), nextLink.getWidth());
-		((CASimpleDynamicAgent)swapA).updateMyDynamicQuantitiesOnSwap(a.getV(),time,this.width,myRho);
-		nextLink.getDsLastLeftTimes()[nextLink.getNumOfCells()-1]=time;
-		this.towardsLinkLastExitTimes.put(nextLink, time);
+		throw new RuntimeException("not implemented");
 		
-		// check post-conditions & new events
-		checkPostConditionForAgentEnteredLinkFromDownstreamEnd(nextLink, a, time);
-		checkPostConditionForAgentSwapedToNode(swapA,time);
+//		CAAgent swapA = nextLink.getParticles()[nextLink.getNumOfCells()-1];
+//		this.pollAgent(0);
+//		this.putAgent(swapA);
+//		nextLink.getParticles()[nextLink.getNumOfCells()-1] = a;
+//		a.materialize(nextLink.getNumOfCells()-1, -1);
+//		nextLink.fireDownstreamLeft(swapA, time);
+//		nextLink.fireDownstreamEntered(a, time);
+//		a.moveOverNode(nextLink,time);
+//
+//		double theirRho = ((CASimpleDynamicAgent)swapA).getMyDirectionRho();
+//		double myRho = a.getMyDirectionRho();
+//		
+//		// update dynamic properties
+//		double theirV = ((CASimpleDynamicAgent)swapA).getV();
+//		a.updateMyDynamicQuantitiesOnSwap(theirV,time,this.width,theirRho);
+//		double timeGap = time - nextLink.getDsLastLeftTimes()[nextLink.getNumOfCells()-1];
+//		((CASimpleDynamicAgent)swapA).updateMyDynamicQuantitiesOnAdvance(timeGap, time, nextLink.getCellLength(), nextLink.getWidth());
+//		((CASimpleDynamicAgent)swapA).updateMyDynamicQuantitiesOnSwap(a.getV(),time,this.width,myRho);
+//		nextLink.getDsLastLeftTimes()[nextLink.getNumOfCells()-1]=time;
+//		this.towardsLinkLastExitTimes.put(nextLink, time);
+//		
+//		// check post-conditions & new events
+//		checkPostConditionForAgentEnteredLinkFromDownstreamEnd(nextLink, a, time);
+//		checkPostConditionForAgentSwapedToNode(swapA,time);
 	}
 
 	@Override
