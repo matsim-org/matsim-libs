@@ -45,11 +45,6 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>16.0.1</version>
-		</dependency>
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
@@ -120,16 +115,6 @@
 			<version>0.43-RELEASE</version>
 		</dependency>
 		<dependency>
-			<groupId>org.swinglabs</groupId>
-			<artifactId>swingx-ws</artifactId>
-			<version>1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.openstreetmap.osmosis</groupId>
-			<artifactId>osmosis-tagtransform-plugin</artifactId>
-			<version>0.1-20090508</version>
-		</dependency>
-		<dependency>
 			<groupId>org.opentripplanner</groupId>
 			<artifactId>opentripplanner-routing</artifactId>
 			<version>0.9.1</version>
@@ -154,11 +139,11 @@
 			<artifactId>jts</artifactId>
 			<version>1.11</version>
 		</dependency>
-		<dependency>
-			<groupId>org.matsim.contrib</groupId>
-			<artifactId>multimodal</artifactId>
-			<version>0.7.0-SNAPSHOT</version>
-		</dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.3</version>
+        </dependency>
 	</dependencies>
 	<modules>
 	</modules>

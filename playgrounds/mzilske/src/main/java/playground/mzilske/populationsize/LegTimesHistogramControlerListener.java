@@ -31,7 +31,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LegTimesHistogramControlerListener implements IterationEndsListener {
+class LegTimesHistogramControlerListener implements IterationEndsListener {
 
     @Inject
     CalcLegTimes calcLegTimes;

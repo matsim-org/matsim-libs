@@ -22,30 +22,35 @@
 
 package playground.mzilske.clones;
 
-import java.util.ArrayList;
-
-import javax.inject.Inject;
-
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.scoring.SumScoringFunction;
 
-import com.google.inject.Provider;
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
 
 class ClonesControlerListener implements Provider<ControlerListener> {
+
+    public static final String EMPTY_CLONE_PLAN = "emptyClonePlan";
 
     @Inject @com.google.inject.name.Named("clonefactor")
     double clonefactor;
 
     @Inject
     Scenario scenario;
+
+    @Inject
+    CloneService cloneService;
 
     @Override
     public ControlerListener get() {
@@ -56,13 +61,13 @@ class ClonesControlerListener implements Provider<ControlerListener> {
                 if (clonefactor > 1) {
                     for (Person person : scenario.getPopulation().getPersons().values()) {
                         Plan plan2 = scenario.getPopulation().getFactory().createPlan();
-                        plan2.setType("emptyClonePlan");
+                        plan2.setType(EMPTY_CLONE_PLAN);
                         person.addPlan(plan2);
                         person.setSelectedPlan(new RandomPlanSelector<Plan, Person>().selectPlan(person));
                     }
-                    for (Person person : new ArrayList<Person>(scenario.getPopulation().getPersons().values())) {
+                    for (Person person : new ArrayList<>(scenario.getPopulation().getPersons().values())) {
                         for (int i = 0; i < clonefactor - 1; i++) {
-                            Id personId = new IdImpl("I" + i + "_" + person.getId().toString());
+                            Id<Person> personId = Id.createPersonId("I" + i + "_" + person.getId().toString());
                             Person clone = scenario.getPopulation().getFactory().createPerson(personId);
                             for (Plan plan : person.getPlans()) {
                                 Plan clonePlan = scenario.getPopulation().getFactory().createPlan();
@@ -73,6 +78,17 @@ class ClonesControlerListener implements Provider<ControlerListener> {
                             scenario.getPopulation().addPerson(clone);
                         }
                     }
+                }
+                ExpBetaPlanSelector<Plan, Person> planSelector = new ExpBetaPlanSelector<>(scenario.getConfig().planCalcScore());
+                for (Person person : scenario.getPopulation().getPersons().values()) {
+                    List<Plan> plans = new ArrayList<>(person.getPlans());
+                    for (Plan plan : plans) {
+                        person.setSelectedPlan(plan);
+                        SumScoringFunction.BasicScoring scoring = cloneService.createNewScoringFunction(person);
+                        scoring.finish();
+                        plan.setScore(scoring.getScore());
+                    }
+                    person.setSelectedPlan(planSelector.selectPlan(person));
                 }
             }
 

@@ -83,11 +83,11 @@ public class CadytsRandomTrips {
 
     private static Config randomConfig() {
         Config config = ConfigUtils.createConfig();
-        config.controler().setOutputDirectory("wurst-full");
+        config.controler().setOutputDirectory("wurst");
         config.controler().setLastIteration(1000);
         PlanCalcScoreConfigGroup.ActivityParams sightingParam = new PlanCalcScoreConfigGroup.ActivityParams("sighting");
         sightingParam.setTypicalDuration(30.0 * 60);
-        config.controler().setMobsim("qsim");
+        config.controler().setMobsim("my-qsim");
         config.controler().setWritePlansInterval(10);
         config.counts().setWriteCountsInterval(10);
         config.global().setNumberOfThreads(8);
@@ -179,7 +179,7 @@ public class CadytsRandomTrips {
             protected void configure() {
                 bind(Config.class).toInstance(scenario.getConfig());
                 bind(Scenario.class).toInstance(scenario);
-                bind(ScoringFunctionFactory.class).to(CharyparNagelCadytsScoringFunctionFactory.class);
+                bind(ScoringFunctionFactory.class).to(CadytsAndCloneScoringFunctionFactory.class);
                 bind(Counts.class).annotatedWith(Names.named("allCounts")).toInstance(allCounts);
                 bind(Double.class).annotatedWith(Names.named("clonefactor")).toInstance(1.0);
                 bind(Counts.class).annotatedWith(Names.named("calibrationCounts")).toInstance(someCounts);

@@ -22,14 +22,7 @@
 
 package playground.mzilske.clones;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
-
+import com.google.common.collect.ImmutableMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
@@ -39,11 +32,15 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
-
 import playground.mzilske.ant2014.StreamingOutput;
 import playground.mzilske.util.IterationSummaryFileControlerListener;
 
-import com.google.common.collect.ImmutableMap;
+import javax.inject.Inject;
+import javax.inject.Provider;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Map;
 
 class CloneHistogramControlerListener implements Provider<ControlerListener> {
 
@@ -74,17 +71,17 @@ class CloneHistogramControlerListener implements Provider<ControlerListener> {
 
                             @Override
                             public StreamingOutput notifyIterationEnds(final IterationEndsEvent event) {
-                                final Map<String, Double> expectedNumberOfClones = new HashMap<String, Double>();
+                                final Map<Id<Person>, Double> expectedNumberOfClones = new HashMap<>();
                                 for (Person person : scenario.getPopulation().getPersons().values()) {
-                                    Id originalId = cloneService.resolveParentId(person.getId());
+                                    Id<Person> originalId = cloneService.resolveParentId(person.getId());
                                     for (Plan plan : person.getPlans()) {
                                         if (plan.getPlanElements().size() > 1) {
                                             double selectionProbability = ExpBetaPlanSelector.getSelectionProbability(new ExpBetaPlanSelector<Plan, Person>(1.0), person, plan);
                                             Double previous = expectedNumberOfClones.get(originalId);
                                             if (previous == null)
-                                                expectedNumberOfClones.put(originalId.toString(), selectionProbability);
+                                                expectedNumberOfClones.put(originalId, selectionProbability);
                                             else
-                                                expectedNumberOfClones.put(originalId.toString(), previous + selectionProbability);
+                                                expectedNumberOfClones.put(originalId, previous + selectionProbability);
 
                                         }
                                     }
@@ -92,7 +89,7 @@ class CloneHistogramControlerListener implements Provider<ControlerListener> {
                                 return new StreamingOutput() {
                                     @Override
                                     public void write(PrintWriter pw) throws IOException {
-                                        for (Map.Entry<String, Double> entry : expectedNumberOfClones.entrySet()) {
+                                        for (Map.Entry<Id<Person>, Double> entry : expectedNumberOfClones.entrySet()) {
                                             pw.printf("%s\t%s\t%d\n", entry.getKey(), entry.getValue(), event.getIteration());
                                         }
                                     }

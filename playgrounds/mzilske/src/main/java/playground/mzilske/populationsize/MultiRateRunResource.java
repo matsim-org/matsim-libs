@@ -26,6 +26,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import com.google.inject.multibindings.MapBinder;
 import com.google.inject.name.Names;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
@@ -40,10 +41,11 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -68,20 +70,21 @@ import java.util.*;
 
 class MultiRateRunResource {
 
-    private String WD;
+    private static final int LAST_ITERATION = 100;
+    private final String WD;
 
-    private String regime;
+    private final String regime;
 
     public MultiRateRunResource(String wd, String regime) {
         this.WD = wd;
         this.regime = regime;
     }
 
-    final static int TIME_BIN_SIZE = 60*60;
-    final static int MAX_TIME = 30 * TIME_BIN_SIZE - 1;
+    private final static int TIME_BIN_SIZE = 60*60;
+    private final static int MAX_TIME = 30 * TIME_BIN_SIZE - 1;
 
-    public Collection<String> getRates() {
-        final List<String> RATES = new ArrayList<String>();
+    Collection<String> getRates() {
+        final List<String> RATES = new ArrayList<>();
         RATES.add("0");
         RATES.add("5");
         return RATES;
@@ -102,19 +105,7 @@ class MultiRateRunResource {
             }
         }
         EventsManager events = EventsUtils.createEventsManager();
-        ZoneTracker.LinkToZoneResolver linkToZoneResolver = new ZoneTracker.LinkToZoneResolver() {
-
-            @Override
-            public Id resolveLinkToZone(Id linkId) {
-                return linkId;
-            }
-
-            @Override
-						public IdImpl chooseLinkInZone(String zoneId) {
-                return new IdImpl(zoneId);
-            }
-
-        };
+        ZoneTracker.LinkToZoneResolver linkToZoneResolver = new LinkIsZone();
         final CompareMain compareMain = new CompareMain(baseScenario, events, new CallBehavior() {
 
             @Override
@@ -146,19 +137,9 @@ class MultiRateRunResource {
 
         final Sightings allSightings = new SightingsImpl(compareMain.getSightingsPerPerson());
 
-        final Config config = phoneConfig();
-        config.controler().setOutputDirectory(WD + "/rates/" + rate);
-
-        final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
-        scenario.setNetwork(baseScenario.getNetwork());
-
-        // PopulationFromSightings.createPopulationWithRandomEndTimesInPermittedWindow(scenario, linkToZoneResolver, allSightings);
-        // PopulationFromSightings.preparePopulation(scenario, linkToZoneResolver, allSightings);
-
         String rateDir = WD + "/rates/" + rate;
         new File(rateDir).mkdirs();
 
-        // new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(rateDir + "/input_population.xml.gz");
         new SightingsWriter(allSightings).write(rateDir + "/sightings.txt");
         final Counts allCounts = CompareMain.volumesToCounts(baseScenario.getNetwork(), compareMain.getGroundTruthVolumes());
         allCounts.setYear(2012);
@@ -166,39 +147,21 @@ class MultiRateRunResource {
         final Counts someCounts = filterCounts(allCounts);
         someCounts.setYear(2012);
         new CountsWriter(someCounts).write(rateDir + "/calibration_counts.xml.gz");
-
     }
 
     public void simulateRate(String rate, final int cloneFactor) {
-        final Config config = phoneConfig();
+        final Config config = phoneConfig(cloneFactor);
 
-        if(cloneFactor == 1) {
-            config.controler().setLastIteration(0);
-            config.planCalcScore().setWriteExperiencedPlans(true);
-        }
         config.controler().setOutputDirectory(WD + "/rates/" + rate + "/" + cloneFactor);
 
         Scenario baseScenario = getBaseRun().getConfigAndNetwork();
         final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
         scenario.setNetwork(baseScenario.getNetwork());
 
-        // new MatsimPopulationReader(scenario).readFile(WD + "/rates/" + rate + "/input_population.xml.gz");
-        Sightings allSightings = new SightingsImpl(new HashMap<Id, List<Sighting>>());
+        final Sightings allSightings = new SightingsImpl(new HashMap<Id, List<Sighting>>());
         new SightingsReader(allSightings).read(IOUtils.getInputStream(WD + "/rates/" + rate + "/sightings.txt"));
-        ZoneTracker.LinkToZoneResolver linkToZoneResolver = new ZoneTracker.LinkToZoneResolver() {
-
-            @Override
-            public Id resolveLinkToZone(Id linkId) {
-                return linkId;
-            }
-
-            public IdImpl chooseLinkInZone(String zoneId) {
-                return new IdImpl(zoneId);
-            }
-
-        };
-        PopulationFromSightings.createPopulationWithRandomEndTimesInPermittedWindow(scenario, linkToZoneResolver, allSightings);
-        PopulationFromSightings.preparePopulation(scenario, linkToZoneResolver, allSightings);
+        ZoneTracker.LinkToZoneResolver linkToZoneResolver = new LinkIsZone();
+        PopulationFromSightings.createPopulationWithRandomRealization(scenario, allSightings, linkToZoneResolver);
 
 
         final Counts allCounts = new Counts();
@@ -207,7 +170,7 @@ class MultiRateRunResource {
         new CountsReaderMatsimV1(someCounts).parse(WD + "/rates/" + rate + "/calibration_counts.xml.gz");
 
 
-        List<Module> modules = new ArrayList<Module>();
+        List<Module> modules = new ArrayList<>();
         modules.add(new ControllerModule());
         modules.add(new CadytsModule());
         modules.add(new ClonesModule());
@@ -216,10 +179,15 @@ class MultiRateRunResource {
             protected void configure() {
                 bind(Config.class).toInstance(scenario.getConfig());
                 bind(Scenario.class).toInstance(scenario);
-                bind(ScoringFunctionFactory.class).to(CharyparNagelCadytsScoringFunctionFactory.class);
+                bind(Sightings.class).toInstance(allSightings);
+                bind(ZoneTracker.LinkToZoneResolver.class).to(LinkIsZone.class);
+                bind(ScoringFunctionFactory.class).to(CadytsAndCloneScoringFunctionFactory.class);
                 bind(Counts.class).annotatedWith(Names.named("allCounts")).toInstance(allCounts);
                 bind(Counts.class).annotatedWith(Names.named("calibrationCounts")).toInstance(someCounts);
                 bind(Double.class).annotatedWith(Names.named("clonefactor")).toInstance((double) cloneFactor);
+                MapBinder<String, PlanStrategyFactory> planStrategyFactoryBinder
+                        = MapBinder.newMapBinder(binder(), String.class, PlanStrategyFactory.class);
+                planStrategyFactoryBinder.addBinding("ReRealize").to(TrajectoryReRealizerFactory.class);
             }
         });
 
@@ -238,10 +206,10 @@ class MultiRateRunResource {
         return someCounts;
     }
 
-    private Config phoneConfig() {
+    private Config phoneConfig(int cloneFactor) {
         Config config = ConfigUtils.createConfig();
 
-        config.controler().setLastIteration(100);
+        config.controler().setLastIteration(LAST_ITERATION);
         ActivityParams sightingParam = new ActivityParams("sighting");
         sightingParam.setTypicalDuration(30.0 * 60);
         config.controler().setWritePlansInterval(10);
@@ -259,25 +227,31 @@ class MultiRateRunResource {
 
         cadytsConfig.setPreparatoryIterations(1);
 
-        QSimConfigGroup tmp = config.qsim();
-        tmp.setFlowCapFactor(100);
-        tmp.setStorageCapFactor(100);
-        tmp.setRemoveStuckVehicles(false);
+        config.qsim().setFlowCapFactor(100);
+        config.qsim().setStorageCapFactor(100);
+        config.qsim().setRemoveStuckVehicles(false);
 
         {
             StrategySettings stratSets = new StrategySettings(new IdImpl(1));
             stratSets.setModuleName("SelectExpBeta");
-
             stratSets.setProbability(1.0);
             config.strategy().addStrategySettings(stratSets);
         }
+//        {
+//            StrategySettings stratSets = new StrategySettings(new IdImpl(2));
+//            stratSets.setModuleName("SelectRandom");
+//            stratSets.setProbability(0.1);
+//            stratSets.setDisableAfter(30);
+//            config.strategy().addStrategySettings(stratSets);
+//        }
         {
-            StrategySettings stratSets = new StrategySettings(new IdImpl(2));
-            stratSets.setModuleName("SelectRandom");
-            stratSets.setProbability(0.1);
-            stratSets.setDisableAfter(30);
+            StrategyConfigGroup.StrategySettings stratSets = new StrategyConfigGroup.StrategySettings(new IdImpl(2));
+            stratSets.setModuleName("ReRealize");
+            stratSets.setProbability(0.3 / (double) cloneFactor);
+            stratSets.setDisableAfter((int) (LAST_ITERATION * 0.8));
             config.strategy().addStrategySettings(stratSets);
         }
+
         return config;
 
     }
@@ -361,7 +335,7 @@ class MultiRateRunResource {
                         dumpnonzero(pw, rate, "calibrated-CDR", km, baseScenario);
                     }
                     {
-                        ArrayList<Person> it0 = new ArrayList<Person>(getRateRun(rate, "10").getIteration(0).getPlans().getPersons().values());
+                        ArrayList<Person> it0 = new ArrayList<>(getRateRun(rate, "10").getIteration(0).getPlans().getPersons().values());
                         for (Iterator<Person> i = it0.iterator(); i.hasNext(); ) {
                             Person person = i.next();
                             if (person.getId().toString().startsWith("I")) {
@@ -394,12 +368,12 @@ class MultiRateRunResource {
         }
     }
 
-    public RunResource getRateRun(String rate, String variant) {
+    RunResource getRateRun(String rate, String variant) {
         return new RunResource(WD + "/rates/" + rate + "/" + variant, null);
     }
 
 
-    static int[] getVolumesForLink(VolumesAnalyzer volumesAnalyzer1, Id linkId) {
+    private static int[] getVolumesForLink(VolumesAnalyzer volumesAnalyzer1, Id linkId) {
         int maxSlotIndex = (MAX_TIME / TIME_BIN_SIZE) + 1;
         int[] maybeVolumes = volumesAnalyzer1.getVolumesForLink(linkId);
         if(maybeVolumes == null) {

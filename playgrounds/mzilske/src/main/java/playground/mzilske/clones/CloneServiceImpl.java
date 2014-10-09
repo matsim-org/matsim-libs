@@ -22,20 +22,58 @@
 
 package playground.mzilske.clones;
 
+import com.google.inject.name.Named;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.scoring.SumScoringFunction;
+
+import javax.inject.Inject;
 
 class CloneServiceImpl implements CloneService {
 
+    @Inject
+    @Named("clonefactor")
+    double clonefactor;
+
     @Override
-    public Id resolveParentId(Id cloneId) {
+    public Id<Person> resolveParentId(Id<Person> cloneId) {
         String id = cloneId.toString();
         String originalId;
         if (id.startsWith("I"))
             originalId = id.substring(id.indexOf("_") + 1);
         else
             originalId = id;
-        return new IdImpl(originalId);
+        return Id.create(originalId, Person.class);
+    }
+
+    @Override
+    public SumScoringFunction.BasicScoring createNewScoringFunction(Person person) {
+        return new CloneScoring(person);
+    }
+
+    private class CloneScoring implements SumScoringFunction.BasicScoring {
+        private Person person;
+
+        public CloneScoring(Person person) {
+            this.person = person;
+        }
+
+        @Override
+        public void finish() {}
+
+        @Override
+        public double getScore() {
+            if (clonefactor > 1.0 && !ClonesControlerListener.EMPTY_CLONE_PLAN.equals(person.getSelectedPlan().getType())) {
+                return scoreOffset();
+            } else {
+                return 0.0;
+            }
+        }
+
+        private double scoreOffset() {
+            return - Math.log( clonefactor - 1.0 );
+        }
+
     }
 
 }
