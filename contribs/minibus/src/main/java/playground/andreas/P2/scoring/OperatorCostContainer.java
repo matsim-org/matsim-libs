@@ -83,5 +83,17 @@ final class OperatorCostContainer {
 	public Id<Vehicle> getVehicleId(){
 		return this.transitDriverStartsE.getVehicleId();
 	}
+	
+	@Override
+	public String toString() {
+		StringBuffer strB = new StringBuffer();
+		strB.append("costPerVehicleAndDay " + costPerVehicleAndDay + "; ");
+		strB.append("expensesPerMeter " + expensesPerMeter + "; ");
+		strB.append("expensesPerSecond " + expensesPerSecond + "; ");
+		strB.append("transitDriverStartsE " + transitDriverStartsE + "; ");
+		strB.append("transitDriverAlightsE " + transitDriverAlightsE + "; ");
+		strB.append("meterTravelled " + meterTravelled + "; ");
+		return strB.toString();
+	}
 
 }

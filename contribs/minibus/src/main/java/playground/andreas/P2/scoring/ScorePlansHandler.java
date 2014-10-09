@@ -55,8 +55,17 @@ public final class ScorePlansHandler implements StageContainerHandler, OperatorC
 		if (this.vehicleId2ScoreMap.get(fareContainer.getVehicleId()) == null) {
 			this.vehicleId2ScoreMap.put(fareContainer.getVehicleId(), new ScoreContainer(fareContainer.getVehicleId(), this.ticketMachine));
 		}
-		
-		this.vehicleId2ScoreMap.get(fareContainer.getVehicleId()).handleStageContainer(fareContainer);
+
+		// TODO debugging, got a single null pointer here?! 
+		try {
+			this.vehicleId2ScoreMap.get(fareContainer.getVehicleId()).handleStageContainer(fareContainer);
+		} catch (Exception e) {
+			log.warn("Got a null pointer here...");
+			log.warn("FareContainer " + fareContainer);
+			log.warn("vehicleMap " + this.vehicleId2ScoreMap);
+		}
+
+
 	}
 
     @Override
@@ -65,7 +74,15 @@ public final class ScorePlansHandler implements StageContainerHandler, OperatorC
 			this.vehicleId2ScoreMap.put(operatorCostContainer.getVehicleId(), new ScoreContainer(operatorCostContainer.getVehicleId(), this.ticketMachine));
 		}
 		
-		this.vehicleId2ScoreMap.get(operatorCostContainer.getVehicleId()).handleOperatorCostContainer(operatorCostContainer);
+		// TODO debugging, got a single null pointer here?! 
+		try {
+			this.vehicleId2ScoreMap.get(operatorCostContainer.getVehicleId()).handleOperatorCostContainer(operatorCostContainer);
+		} catch (Exception e) {
+			log.warn("Got a null pointer here...");
+			log.warn("CostContainer " + operatorCostContainer);
+			log.warn("vehicleMap " + this.vehicleId2ScoreMap);
+		}
+			
 	}
 
 	@Override

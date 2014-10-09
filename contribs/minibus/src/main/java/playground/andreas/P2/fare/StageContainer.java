@@ -91,4 +91,18 @@ public final class StageContainer {
 	public Id<Person> getAgentId(){
 		return this.personLeavesVehE.getPersonId();
 	}
+	
+	@Override
+	public String toString() {
+		StringBuffer strB = new StringBuffer();
+		strB.append("StartStop " + getStopEntered());
+		strB.append("; EndStop " + getStopLeft());
+		strB.append("; TimeEntered " + getTimeEntered());
+		strB.append("; getTimeLeft " + getTimeLeft());
+		strB.append("; RouteId " + getRouteId());
+		strB.append("; distanceMeter " + getDistanceTravelledInMeter());
+		strB.append("; vehId " + getVehicleId());
+		strB.append("; agentId " + getAgentId());
+		return strB.toString();
+	}
 }
