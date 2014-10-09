@@ -3,12 +3,11 @@ package playground.vbmh.einzel_klassen_tests;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 
-import playground.vbmh.util.CSVReader;
 import playground.vbmh.util.CSVWriter;
 import playground.vbmh.util.ReadParkhistory;
-import playground.vbmh.util.RemoveDuplicate;
 import playground.vbmh.vmEV.EVControl;
 @SuppressWarnings("unused")
 
@@ -92,7 +91,7 @@ public class DiagnoseMoritz {
 			int i = 0;
 			int j = 0;
 			for(HashMap<String, String> event : hist.getAllEventByAttribute("eventtype", "agent_not_parked_within_default_distance")){
-				if(evControl.hasEV(new IdImpl(event.get("person")))){
+				if(evControl.hasEV(Id.create(event.get("person"), Person.class))) {
 					System.out.println(event.toString());
 					i++;
 				}else {

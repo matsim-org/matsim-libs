@@ -14,7 +14,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -32,7 +31,7 @@ import playground.vbmh.vmEV.EVListWriter;
 
 public class VMScenarioTool {
 
-	static HashMap <Id, LinkedList <Person>> homes = new HashMap <Id, LinkedList <Person>>();
+	static HashMap<Id<ActivityFacility>, LinkedList <Person>> homes = new HashMap<>();
 	static Scenario scenario;
 	static double xCoord = 678773;
 	static double yCoord = 4908813;
@@ -219,7 +218,7 @@ public class VMScenarioTool {
 	}
 	
 	static void move(Id facId){
-		IdImpl newFacId = new IdImpl(facId.toString()+"_B");
+		Id<ActivityFacility> newFacId = Id.create(facId.toString()+"_B", ActivityFacility.class);
 		for (Person person : homes.get(facId)){
 			PersonImpl personImpl = (PersonImpl) person;
 			for(PlanElement planElement : personImpl.getSelectedPlan().getPlanElements()){

@@ -15,15 +15,11 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.utils.charts.XYScatterChart;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import playground.vbmh.controler.VMConfig;
@@ -152,12 +148,12 @@ public class ParkControl {
 	
 	//--------------------------- P A R K ---------------------------------------------
 	public int park(ActivityStartEvent event) {
-		Id personId = event.getPersonId();
+		Id<Person> personId = event.getPersonId();
 		this.time=event.getTime();
 
 		
 		// FACILITY UND KOORDINATEN LADEN
-		IdImpl facilityid = new IdImpl(event.getAttributes().get("facility"));
+		Id<ActivityFacility> facilityid = Id.create(event.getAttributes().get("facility"), ActivityFacility.class);
 		Map<Id<ActivityFacility>, ? extends ActivityFacility> facilitymap = controller.getFacilities().getFacilities();
 		ActivityFacility facility = facilitymap.get(facilityid);
 		this.cordinate = facility.getCoord();
@@ -293,7 +289,7 @@ public class ParkControl {
 
 	
 	//--------------------------- SELECT PARKING --------Using Advanced Parking Choice Model-------------------------------------	
-	private void selectParkingAdvanced(LinkedList<ParkingSpot> spotsInArea, Id personId, double duration, double restOfDayDistance, boolean ev){
+	private void selectParkingAdvanced(LinkedList<ParkingSpot> spotsInArea, Id<Person> personId, double duration, double restOfDayDistance, boolean ev){
 		double stateOfCharge=0;
 		double neededBatteryPercentage=-1.0; //Stays -1 for NEVs which tells the Advanced Parking Choice that it is an NEV
 		boolean hasToCharge = false;

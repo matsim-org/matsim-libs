@@ -12,8 +12,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.api.experimental.facilities.Facility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
@@ -97,14 +95,14 @@ public class CreateDemoParking {
 		
 		Map<Id<ActivityFacility>, ? extends ActivityFacility> facility_map = scenario.getActivityFacilities().getFacilities();
 	
-		for (Facility facility : facility_map.values()){
+		for (ActivityFacility facility : facility_map.values()){
 			ActivityFacilityImpl actfacility = (ActivityFacilityImpl) facility;
 			for(String key : actfacility.getActivityOptions().keySet()){
 				ActivityOption activity = actfacility.getActivityOptions().get(key);
 				
 				double location_capacity= activity.getCapacity();
 				String location_type = activity.getType();
-				IdImpl location_id=(IdImpl)facility.getId();
+				Id<ActivityFacility> location_id= facility.getId();
 				CoordImpl location_coord = (CoordImpl) actfacility.getCoord();
 				
 				//System.out.println(location_type);
