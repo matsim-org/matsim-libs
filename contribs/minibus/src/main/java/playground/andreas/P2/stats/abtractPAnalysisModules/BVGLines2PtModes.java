@@ -27,6 +27,8 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeSet;
 
 
 /**
@@ -38,6 +40,13 @@ import java.util.Map.Entry;
 public final class BVGLines2PtModes implements PtMode2LineSetter{
 	
 	private final static Logger log = Logger.getLogger(BVGLines2PtModes.class);
+	
+	private final static String BUS = "bvg_bus";
+	private final static String TRAM = "bvg_tram";
+	private final static String SBAHN = "s-bahn";
+	private final static String UBAHN = "u-bahn";
+	private final static String OTHER = "other";
+	
 	private HashMap<Id<TransitLine>, String> lineId2ptMode;
 	private String pIdentifier;
 	
@@ -53,19 +62,29 @@ public final class BVGLines2PtModes implements PtMode2LineSetter{
 			if (transitLine.getId().toString().contains(this.pIdentifier)) {
 				this.lineId2ptMode.put(transitLine.getId(), new String(this.pIdentifier));
 			} else if (transitLine.getId().toString().contains("-B-") ) {
-				this.lineId2ptMode.put(transitLine.getId(), new String("bvg_bus"));
+				this.lineId2ptMode.put(transitLine.getId(), new String(BVGLines2PtModes.BUS));
 			} else if (transitLine.getId().toString().contains("-T-")) {
-				this.lineId2ptMode.put(transitLine.getId(), new String("bvg_tram"));
+				this.lineId2ptMode.put(transitLine.getId(), new String(BVGLines2PtModes.TRAM));
 			} else if (transitLine.getId().toString().contains("SB_")) {
-				this.lineId2ptMode.put(transitLine.getId(), new String("s-bahn"));
+				this.lineId2ptMode.put(transitLine.getId(), new String(BVGLines2PtModes.SBAHN));
 			} else if (transitLine.getId().toString().contains("-U-")) {
-				this.lineId2ptMode.put(transitLine.getId(), new String("u-bahn"));
+				this.lineId2ptMode.put(transitLine.getId(), new String(BVGLines2PtModes.UBAHN));
 			} else {
-				this.lineId2ptMode.put(transitLine.getId(), new String("other"));
+				this.lineId2ptMode.put(transitLine.getId(), new String(BVGLines2PtModes.OTHER));
 			}
 		}
 	}
 
+	
+	public Set<String> getTypesSupported(){
+		Set<String> types = new TreeSet<String>();
+		types.add(BVGLines2PtModes.BUS);
+		types.add(BVGLines2PtModes.TRAM);
+		types.add(BVGLines2PtModes.SBAHN);
+		types.add(BVGLines2PtModes.UBAHN);
+		types.add(BVGLines2PtModes.OTHER);
+		return types;
+	}
 	
 	public HashMap<Id<TransitLine>, String> getLineId2ptModeMap(){
 		return this.lineId2ptMode;
@@ -75,16 +94,16 @@ public final class BVGLines2PtModes implements PtMode2LineSetter{
 		String lineType = this.lineId2ptMode.get(lineId);
 		Color color;
 		if (lineType != null) {
-			if (lineType.equalsIgnoreCase("bvg_bus")) {
+			if (lineType.equalsIgnoreCase(BVGLines2PtModes.BUS)) {
 //				color = Color.MAGENTA;
 				color = new Color(149, 39, 110);
-			} else if (lineType.equalsIgnoreCase("bvg_tram")) {
+			} else if (lineType.equalsIgnoreCase(BVGLines2PtModes.TRAM)) {
 //				color = Color.RED;
 				color = new Color(190, 20, 20);
-			} else if (lineType.equalsIgnoreCase("s-bahn")) {
+			} else if (lineType.equalsIgnoreCase(BVGLines2PtModes.SBAHN)) {
 //				color = Color.GREEN;
 				color = new Color(64, 131, 53);
-			} else if (lineType.equalsIgnoreCase("u-bahn")) {
+			} else if (lineType.equalsIgnoreCase(BVGLines2PtModes.UBAHN)) {
 //				color = Color.BLUE;
 				color = new Color(17, 93, 145);
 			} else if (lineType.equalsIgnoreCase(this.pIdentifier)) {
