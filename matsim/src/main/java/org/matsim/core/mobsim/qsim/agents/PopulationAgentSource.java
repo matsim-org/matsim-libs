@@ -70,13 +70,11 @@ public final class PopulationAgentSource implements AgentSource {
 				Leg leg = (Leg) planElement;
 				if (this.mainModes.contains(leg.getMode())) { // only simulated modes get vehicles
 					if (!seenModes.contains(leg.getMode())) { // create one vehicle per simulated mode, put it on the home location
-						Id<Link> vehicleLink = findVehicleLink(p);
-                        Id<Vehicle> vehicleId;
-                        if (qsim.getScenario().getConfig().qsim().getUsePersonIdForMissingVehicleId()) {
-                            vehicleId = Id.create(p.getId(), Vehicle.class);
-                        } else {
-                            vehicleId = ((NetworkRoute) leg.getRoute()).getVehicleId();
-                            if (vehicleId == null) {
+						Id<Vehicle> vehicleId = ((NetworkRoute) leg.getRoute()).getVehicleId();
+                        if (vehicleId == null) {
+                            if (qsim.getScenario().getConfig().qsim().getUsePersonIdForMissingVehicleId()) {
+                                vehicleId = Id.create(p.getId(), Vehicle.class);
+                            } else {
                                 throw new IllegalStateException("Found a network route without a vehicle id.");
                             }
                         }
@@ -86,9 +84,10 @@ public final class PopulationAgentSource implements AgentSource {
                         } else {
                             vehicle = qsim.getScenario().getVehicles().getVehicles().get(vehicleId);
                             if (vehicle == null) {
-                                throw new IllegalStateException("Referencing a vehicle id which is missing in the vehicles database.");
+                                throw new IllegalStateException("Expecting a vehicle id which is missing in the vehicles database: " + vehicleId);
                             }
                         }
+                        Id<Link> vehicleLink = findVehicleLink(p);
                         qsim.createAndParkVehicleOnLink(vehicle, vehicleLink);
 						seenModes.add(leg.getMode());
 					}
