@@ -35,9 +35,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.network.NodeImpl;
@@ -72,8 +72,8 @@ public class CMCFPopulationConverter {
 			 String demand = commodity.getChildText("demand");
 			 //build  new Plans in the Population
 			 int dem = (int) Math.round(Double.parseDouble(demand));
-			 Node tonode = network.getNodes().get(new IdImpl(to));
-			 Node fromnode = network.getNodes().get(new IdImpl(from));
+			 Node tonode = network.getNodes().get(Id.create(to, Node.class));
+			 Node fromnode = network.getNodes().get(Id.create(from, Node.class));
 			 Coord coordfrom = fromnode.getCoord();
 			 Coord coordto = tonode.getCoord();
 			 Link fromlink = null;
@@ -95,7 +95,7 @@ public class CMCFPopulationConverter {
 
 			 }
 			 for (int i = 1 ; i<= dem ;i++) {
-				 Id matsimid  = new IdImpl(id+"."+i);
+				 Id<Person> matsimid  = Id.create(id+"."+i, Person.class);
 				 PersonImpl p = new PersonImpl(matsimid);
 				 PlanImpl plan = new org.matsim.core.population.PlanImpl(p);
 //				 BasicActivityImpl home = new BasicActivityImpl("home");

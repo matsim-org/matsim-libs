@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -65,7 +64,7 @@ public class NetGenMain {
 		for (int x = 0; x < params.xdim; x++) {
 			for (int y = 0; y < params.ydim; y++) {
 				String ids = "x"+x+"y"+y;				
-				IdImpl id = new IdImpl(ids);
+				Id<Node> id = Id.create(ids, Node.class);
 				CoordImpl coord = new CoordImpl(x,y);
 				gridNodes[x][y] = network.createAndAddNode(id, coord);								
 			}
@@ -188,7 +187,7 @@ public class NetGenMain {
 	private static void addLink(NetworkImpl network, Node[][] gridNodes, int x1, int y1, int x2, int y2, double length, double cap) {
 		Node fromNode = gridNodes[x1][y1];
 		Node toNode = gridNodes[x2][y2];
-		Id id = new IdImpl("x"+x1+"y"+y1+"x"+x2+"y"+y2);
+		Id<Link> id = Id.create("x"+x1+"y"+y1+"x"+x2+"y"+y2, Link.class);
 		//System.out.println(length + " " + cap);
 		network.createAndAddLink(id, fromNode, toNode, length, 1.0d, cap, 1.0d);		
 	}

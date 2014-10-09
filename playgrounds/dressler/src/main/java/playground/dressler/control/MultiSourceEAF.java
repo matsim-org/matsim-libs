@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkChangeEvent;
@@ -121,10 +120,11 @@ public class MultiSourceEAF {
 		String inline = null;
 		while ((inline = in.readLine()) != null) {
 			String[] line = inline.split(";");
-			Node node = network.getNodes().get(new IdImpl(line[0].trim()));
+			Node node = network.getNodes().get(Id.create(line[0].trim(), Node.class));
 			Integer d = Integer.valueOf(line[1].trim());
 			demands.put(node, d);
 		}
+		in.close();
 		return demands;
 	}
 
@@ -150,7 +150,7 @@ public class MultiSourceEAF {
 
 		for(Person person : scenario.getPopulation().getPersons().values() ){
 
-			Id id =
+			Id<Link> id =
 				((org.matsim.core.population.ActivityImpl)person.getPlans().get(0).getPlanElements().get(0)).getLinkId();
 			//Link link = scenario.getNetwork().getLinks().get(((PlanImpl) plan).getFirstActivity().getLinkId());
 			Link link = scenario.getNetwork().getLinks().get(id);
@@ -197,7 +197,7 @@ public class MultiSourceEAF {
 		String inline = null;
 		while ((inline = in.readLine()) != null) {
 			String[] line = inline.split(",");
-			Node node = network.getNodes().get(new IdImpl(line[0].trim()));
+			Node node = network.getNodes().get(Id.create(line[0].trim(), Node.class));
 			if(node==null){
 				continue;
 			}else{
@@ -207,7 +207,7 @@ public class MultiSourceEAF {
 				
 				if(addshelterlinks){
 					//create and add new shelternode
-					Id shelterid = new IdImpl("shelter"+nodeid);
+					Id<Node> shelterid = Id.create("shelter"+nodeid, Node.class);
 					if(network.getNodes().get(shelterid)==null){
 						NodeImpl shelter = new NodeImpl(shelterid);
 						shelter.setCoord(node.getCoord());
@@ -216,7 +216,7 @@ public class MultiSourceEAF {
 					}
 					Node shelter =network.getNodes().get(shelterid);
 					//create and add link from node to shelter
-					Id linkid = new IdImpl("shelterlink" + nodeid);
+					Id<Link> linkid = Id.create("shelterlink" + nodeid, Link.class);
 					Link link = network.getLinks().get(linkid);
 					if (link == null) {
 						//	link = new LinkImpl(linkid, node, shelter, network, 10.66, 1.66, flowcapacity, 1);
@@ -262,7 +262,7 @@ public class MultiSourceEAF {
 				}
 				//read a sourcestep
 				if(step[0].trim().equals("source")){
-					Id nodeid = new IdImpl(step[1].trim());
+					Id<Node> nodeid = Id.create(step[1].trim(), Node.class);
 					IndexedNodeI node = settings.getNetwork().getIndexedNode(nodeid);
 					int time = Integer.valueOf(step[2].trim());
 					boolean forward = Boolean.valueOf(step[3].trim());
@@ -271,7 +271,7 @@ public class MultiSourceEAF {
 				}
 				//read a sinkstep
 				if(step[0].trim().equals("sink")){
-					Id nodeid = new IdImpl(step[1].trim());
+					Id<Node> nodeid = Id.create(step[1].trim(), Node.class);
 					IndexedNodeI node = settings.getNetwork().getIndexedNode(nodeid);
 					int time = Integer.valueOf(step[2].trim());
 					boolean forward = Boolean.valueOf(step[3].trim());
@@ -280,7 +280,7 @@ public class MultiSourceEAF {
 				}
 				//read a edgestep
 				if(step[0].trim().equals("edge")){
-					Id edgeid = new IdImpl(step[1].trim());
+					Id<Link> edgeid = Id.create(step[1].trim(), Link.class);
 					IndexedLinkI link = settings.getNetwork().getIndexedLink(edgeid);	
 					
 					int starttime = Integer.valueOf(step[2].trim());
@@ -967,7 +967,7 @@ public class MultiSourceEAF {
 			network = (NetworkImpl) scenario.getNetwork();
 			MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
 			networkReader.readFile(networkfile);
-			sink = network.getNodes().get(new IdImpl(sinkid));
+			sink = network.getNodes().get(Id.create(sinkid, Node.class));
 			if (sink == null){
 				System.out.println("sink not found");
 			}
@@ -1006,7 +1006,7 @@ public class MultiSourceEAF {
 			// Hack for those networks with en1->en2
 			// set demand of en2 to 0, because it cannot be satisfied if en1 is the sink
 			if (sinkid.equals("en1")) {
-				Node sink2 = network.getNodes().get(new IdImpl("en2"));
+				Node sink2 = network.getNodes().get(Id.create("en2", Node.class));
 				if (sink2 != null) {
 					Integer d = demands.get(sink2);
 					if (d != null && d > 0) {
@@ -1136,7 +1136,7 @@ public class MultiSourceEAF {
 		settings.mapLinksToTEP = true; // remember which path uses an edge at a given time
 		settings.useHoldover = false; //only forward/reverse, no cost, no unwind
 		//settings.whenAvailable = new HashMap<Link, Interval>();
-		//settings.whenAvailable.put(network.getLinks().get(new IdImpl("1")), new Interval(2,3));
+		//settings.whenAvailable.put(network.getLinks().get(Id.create("1")), new Interval(2,3));
 
 		/* --------- the actual work starts --------- */
 
@@ -1248,8 +1248,8 @@ public class MultiSourceEAF {
 			PopulationCreator popcreator = new PopulationCreator(settings);
 			
 			// fix the final link
-			//popcreator.pathSuffix.put(new IdImpl("en1"), new IdImpl("el1"));
-			popcreator.autoFixSink(new IdImpl("en2"));			
+			//popcreator.pathSuffix.put(Id.create("en1"), Id.create("el1"));
+			popcreator.autoFixSink(Id.create("en2", Node.class));			
 			
 			Population output = popcreator.createPopulation(fluss.getPaths(), scenario);
 			new PopulationWriter(output, network).write(outputplansfile);

@@ -34,9 +34,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
@@ -46,7 +47,6 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.config.ConfigUtils;
 /**
  *
  * @author Manuel Schneider
@@ -62,12 +62,12 @@ public class CMCFtoEvacConverter {
 		NetworkImpl network = CMCFNetworkConverter.readCMCFNetwork(networkfile);
 		Coord coord1 = new CoordImpl("0","0");
 		Coord coord2 = new CoordImpl("1","1");
-		Id matsimid1  = new IdImpl("en1");
-		Id matsimid2  = new IdImpl("en2");
-		Id matsimid3  = new IdImpl("el1");
+		Id<Node> matsimid1  = Id.create("en1", Node.class);
+		Id<Node> matsimid2  = Id.create("en2", Node.class);
+		Id<Link> matsimid3  = Id.create("el1", Link.class);
 		network.createAndAddNode(matsimid1, coord1);
 		network.createAndAddNode(matsimid2, coord2);
-		network.createAndAddLink(matsimid3, network.getNodes().get(new IdImpl("en1")), network.getNodes().get(new IdImpl("en2")),
+		network.createAndAddLink(matsimid3, network.getNodes().get(Id.create("en1", Node.class)), network.getNodes().get(Id.create("en2", Node.class)),
 				 10.,100000. ,100000000000000000000.,1.);
 
 		//Add links to en1
@@ -87,8 +87,8 @@ public class CMCFtoEvacConverter {
 		 }
 		 Integer counter = 10;
 		 for(String id : evacnodes){
-			 Id matsimid  = new IdImpl("el"+counter.toString());
-			 network.createAndAddLink(matsimid, network.getNodes().get(new IdImpl(id)), network.getNodes().get(new IdImpl("en1")), 1.,100000. ,100000000000000000000.,1.);
+			 Id<Link> matsimid  = Id.create("el"+counter.toString(), Link.class);
+			 network.createAndAddLink(matsimid, network.getNodes().get(Id.create(id, Node.class)), network.getNodes().get(Id.create("en1", Node.class)), 1.,100000. ,100000000000000000000.,1.);
 			 counter++;
 		 }
 		return network;
@@ -112,8 +112,8 @@ public class CMCFtoEvacConverter {
 			 String demand = commodity.getChildText("demand");
 			 //build  new Plans in the Population
 			 int dem = (int) Math.round(Double.parseDouble(demand));
-			 Node tonode = network.getNodes().get(new IdImpl(to));
-			 Node fromnode = network.getNodes().get(new IdImpl(from));
+			 Node tonode = network.getNodes().get(Id.create(to, Node.class));
+			 Node fromnode = network.getNodes().get(Id.create(from, Node.class));
 			 Coord coordfrom = fromnode.getCoord();
 			 Coord coordto = tonode.getCoord();
 			 Link fromlink = null;
@@ -135,7 +135,7 @@ public class CMCFtoEvacConverter {
 
 			 }
 			 for (int i = 1 ; i<= dem ;i++) {
-				 Id matsimid  = new IdImpl(id+"."+i);
+				 Id<Person> matsimid  = Id.create(id+"."+i, Person.class);
 				 PersonImpl p = new PersonImpl(matsimid);
 				 PlanImpl plan = new org.matsim.core.population.PlanImpl(p);
 //				 BasicActivityImpl home = new BasicActivityImpl("home");

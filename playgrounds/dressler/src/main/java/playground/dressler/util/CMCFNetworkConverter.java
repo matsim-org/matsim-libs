@@ -27,10 +27,12 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
+
 /**
  *
  * @author Manuel Schneider
@@ -62,7 +64,7 @@ public class CMCFNetworkConverter {
 			 String y = node.getAttributeValue("y");
 			 //build a new node in the NetworkLayer
 			 Coord coord = new CoordImpl(x,y);
-			 Id matsimid  = new IdImpl(id);
+			 Id<Node> matsimid  = Id.create(id, Node.class);
 			 result.createAndAddNode(matsimid, coord);
 		 }
 		 //read the edges
@@ -76,9 +78,9 @@ public class CMCFNetworkConverter {
 			 String length = edge.getChildText("length");
 			 String capacity = edge.getChildText("capacity");
 			 //build a new edge in
-			 Id matsimid  = new IdImpl(id);
+			 Id<Link> matsimid  = Id.create(id, Link.class);
 			 //TODO free speed is set to 1.3 find something better
-			 result.createAndAddLink(matsimid, result.getNodes().get(new IdImpl(from)), result.getNodes().get(new IdImpl(to)),
+			 result.createAndAddLink(matsimid, result.getNodes().get(Id.create(from, Node.class)), result.getNodes().get(Id.create(to, Node.class)),
 					 Double.parseDouble(length),
 					  1.3 ,
 					 Double.parseDouble(capacity),

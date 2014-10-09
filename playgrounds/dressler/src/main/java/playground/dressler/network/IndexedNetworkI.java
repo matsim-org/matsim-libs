@@ -4,7 +4,6 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 
 public interface IndexedNetworkI {
@@ -17,10 +16,10 @@ public interface IndexedNetworkI {
 	public int getLargestIndexLinks();
 	
 	public IndexedNodeI getIndexedNode(Node node);
-	public IndexedNodeI getIndexedNode(Id id);
+	public IndexedNodeI getIndexedNode(Id<Node> id);
 	
 	public IndexedLinkI getIndexedLink(Link link);
-	public IndexedLinkI getIndexedLink(Id id);
+	public IndexedLinkI getIndexedLink(Id<Link> id);
 	
 	public int getIndex(Node node);
 	public int getIndex(Link link);

@@ -40,7 +40,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -79,7 +78,7 @@ public class Getagentcoords {
 
 
 		// get evac links
-		Node evac1node = network.getNodes().get(new IdImpl("en1"));
+		Node evac1node = network.getNodes().get(Id.create("en1", Node.class));
 		Map<Id<Link>,? extends Link> evaclinks = null;
 		if (evac1node != null) {
 			evaclinks = evac1node.getInLinks();
@@ -118,7 +117,7 @@ public class Getagentcoords {
 				// p.setVisualizerData(visualizerData)
 				if (plan == null) continue;
 
-				 Id i = ((PlanImpl) plan).getFirstActivity().getLinkId();
+				 Id<Link> i = ((PlanImpl) plan).getFirstActivity().getLinkId();
 				 Link l = network.getLinks().get(i);
 				 Coord c = l.getFromNode().getCoord();
 				//Coord c = plan.getFirstActivity().getCoord();

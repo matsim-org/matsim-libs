@@ -30,9 +30,9 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -141,7 +141,7 @@ public class ImportSimpleNetwork {
 				int u = Integer.valueOf(line[3].trim());
 				int t = Integer.valueOf(line[4].trim());
 				
-				Link link = _network.getFactory().createLink( new IdImpl(count), _newnodes.get(v).getId(), _newnodes.get(w).getId() ) ;
+				Link link = _network.getFactory().createLink( Id.create(count, Link.class), _newnodes.get(v).getId(), _newnodes.get(w).getId() ) ;
 				link.setLength(t);
 				link.setFreespeed(1.0) ;
 				link.setCapacity(u) ;
@@ -189,9 +189,9 @@ public class ImportSimpleNetwork {
 					//create link
 					// FIXME ... use the factory as above!
 
-					//Link link = new LinkImpl(new IdImpl(count), node, dummy, _network, 10.66, 1.66, demand, 1);
+					//Link link = new LinkImpl(Id.create(count), node, dummy, _network, 10.66, 1.66, demand, 1);
 
-					Link link = _network.getFactory().createLink( new IdImpl(count), node.getId(), dummy.getId() ) ;
+					Link link = _network.getFactory().createLink( Id.create(count, Link.class), node.getId(), dummy.getId() ) ;
 					link.setLength(10.66);
 					link.setFreespeed(1.66);
 					link.setCapacity(demand);
@@ -216,7 +216,7 @@ public class ImportSimpleNetwork {
 				dummyid++;
 			}
 		}
-		NodeImpl dummy = new NodeImpl(new IdImpl(dummyid));
+		NodeImpl dummy = new NodeImpl(Id.create(dummyid, Node.class));
 		Coord coord = new CoordImpl(0.0, 0.0);
 		dummy.setCoord(coord);
 		return dummy;
@@ -226,7 +226,7 @@ public class ImportSimpleNetwork {
 	private void addNodeIfNecessary(int v) {
 		if (!_newnodes.containsKey(v)) {
 			Coord coord = new CoordImpl(0.0, 0.0);
-			NodeImpl node = new NodeImpl(new IdImpl(v));
+			NodeImpl node = new NodeImpl(Id.create(v, Node.class));
 			node.setCoord(coord);
 			_newnodes.put(v, node);
 			_network.addNode(node);

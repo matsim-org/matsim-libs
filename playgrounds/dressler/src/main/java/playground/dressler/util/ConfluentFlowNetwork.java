@@ -28,9 +28,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
@@ -189,7 +189,7 @@ public class ConfluentFlowNetwork {
 	String inline = null;
 	while ((inline = in.readLine()) != null) {
 		String[] line = inline.split(";");
-		Node node = network.getNodes().get(new IdImpl(line[0].trim()));
+		Node node = network.getNodes().get(Id.create(line[0].trim(), Node.class));
 		Integer d = Integer.valueOf(line[1].trim());
 		demands.put(node, d);
 	}
@@ -219,7 +219,7 @@ public class ConfluentFlowNetwork {
 		HashMap<Node,Integer> demands = new HashMap<Node, Integer>();
 
 		//Node sink = network.getNode("supersink");
-		Node sink = network.getNodes().get(new IdImpl("en1"));
+		Node sink = network.getNodes().get(Id.create("en1", Node.class));
 
 		if (plansfile != null) {
 			try {

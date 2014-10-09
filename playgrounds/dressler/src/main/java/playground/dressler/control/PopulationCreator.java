@@ -13,7 +13,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -62,7 +61,7 @@ public class PopulationCreator {
 		 * Careful, this cannot deal with cycles!
 		 * @param sinkid the Id of the real final supersink
 		 */
-		public void autoFixSink(Id sinkid) {		
+		public void autoFixSink(Id<Node> sinkid) {		
 			IndexedNodeI sink = this._network.getIndexedNode(sinkid);
 			if (sink == null) {
 				System.out.println("Warning: autoFixSink could not find sink: '" + sinkid + "'. Skipping.");
@@ -139,7 +138,7 @@ public class PopulationCreator {
 					int nofpersons = path.getFlow();
 					// list of links in order of the path
 					
-					LinkedList<Id> ids = new LinkedList<Id>();
+					LinkedList<Id<Link>> ids = new LinkedList<>();
 					for (PathStep step : path.getPathSteps()){
 						if (step instanceof StepEdge) {
 							ids.add(((StepEdge) step).getEdge().getId());
@@ -150,10 +149,10 @@ public class PopulationCreator {
 					// e.g. from "1234->en1" to the true "en1->en2" link
 					
 					if (pathSuffix != null) {
-						Id currentLinkId = ids.getLast();
+						Id<Link> currentLinkId = ids.getLast();
 												
 						do {
-						  Id currentNodeId = this._network.getIndexedLink(currentLinkId).getToNode().getId();						  
+						  Id<Node> currentNodeId = this._network.getIndexedLink(currentLinkId).getToNode().getId();						  
 						  currentLinkId = pathSuffix.get(currentNodeId);
 						  
 						  if (currentLinkId != null) {
@@ -171,10 +170,10 @@ public class PopulationCreator {
 						
 						LinkNetworkRouteImpl route;
 						
-						Id pid = null;
+						Id<Person> pid = null;
 						Person person = null;
 						
-						Id startLinkId = null;
+						Id<Link> startLinkId = null;
 						int startindex = 0;
 											
 						boolean orgokay = false;
@@ -204,7 +203,7 @@ public class PopulationCreator {
 						} 
 
 						if (!orgokay) {
-							pid = new IdImpl("new" + String.valueOf(id));
+							pid = Id.create("new" + String.valueOf(id), Person.class);
 							person = new PersonImpl(pid);
 							id++;
 							//System.out.println("created person #" + i + "/" + nofpersons + " id " + pid + " at " + firstnode.getId());
@@ -217,7 +216,7 @@ public class PopulationCreator {
 						//System.out.println("starts on link " + startLinkId + " from " + this._network.getLinks().get(startLinkId).getFromNode().getId() + " --> " + this._network.getLinks().get(startLinkId).getToNode().getId());
 						
 						// add "sink flow"
-						Id endLinkId = ids.getLast();
+						Id<Link> endLinkId = ids.getLast();
 						int endindex = ids.size() - 1;
 						
 					
