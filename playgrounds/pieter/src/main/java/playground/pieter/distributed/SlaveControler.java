@@ -60,8 +60,9 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
                         stopStopTimes = (StopStopTime) reader.readObject();
                         waitTimes = (WaitTime) reader.readObject();
                         timesLogger.warn("Checking to see if plans are ready to be sent");
-                        while (!readyToSendPlans)
-                            ;
+                        while (!readyToSendPlans){
+                            int i = 0;
+                        }
                         timesLogger.warn("Sending plans...");
                         writer.writeObject(plansCopyForSending);
                         timesLogger.warn("Sending completed.");
