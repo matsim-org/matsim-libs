@@ -21,7 +21,6 @@ public class ReplacePlanFromSlaveFactory implements PlanStrategyFactory {
 	@Override
 	public PlanStrategy createPlanStrategy(Scenario scenario,
 			EventsManager eventsManager) {
-		Logger.getLogger(this.getClass()).warn("Replanning special way... OOOH LA  LAAAAAA!!");
 		return new ReplacePlanFromSlave(plans);
 	}
 

@@ -3,8 +3,12 @@ package playground.pieter.distributed;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -12,14 +16,18 @@ import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
 
 import org.matsim.core.utils.io.UncheckedIOException;
 import playground.pieter.pseudosimulation.mobsim.PSimFactory;
+import playground.singapore.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
 import playground.singapore.transitRouterEventsBased.TransitRouterWSImplFactory;
 import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTime;
 import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTimeCalculatorSerializable;
@@ -151,20 +159,45 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
         matsimControler.setCreateGraphs(false);
         matsimControler.addControlerListener(this);
         new Thread(new TimesReceiver()).start();
-        if (matsimControler.getConfig().scenario().isUseTransit()) {
+        if (config.scenario().isUseTransit()) {
 
-            stopStopTimes= new StopStopTimeCalculatorSerializable(matsimControler.getScenario().getTransitSchedule(),
-                        matsimControler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (matsimControler.getConfig()
-                        .qsim().getEndTime() - matsimControler.getConfig().qsim().getStartTime())).getStopStopTimes();
+            stopStopTimes= new StopStopTimeCalculatorSerializable(scenario.getTransitSchedule(),
+                        config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config
+                        .qsim().getEndTime() - config.qsim().getStartTime())).getStopStopTimes();
 
-            waitTimes=new WaitTimeCalculatorSerializable(matsimControler.getScenario().getTransitSchedule(),
-                        matsimControler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (matsimControler.getConfig()
-                        .qsim().getEndTime() - matsimControler.getConfig().qsim().getStartTime())).getWaitTimes();
+            waitTimes=new WaitTimeCalculatorSerializable(scenario.getTransitSchedule(),
+                        config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config
+                        .qsim().getEndTime() - config.qsim().getStartTime())).getWaitTimes();
 
         }
         if (commandLine.hasOption("s")) {
             slaveLogger.warn("Singapore scenario: Doing events-based transit routing.");
-            matsimControler.setTransitRouterFactory(new TransitRouterWSImplFactory(matsimControler.getScenario(), waitTimes, stopStopTimes));
+            //this is a fix for location choice to work with pt, very obscure
+            //in location choice, if the facility's link doesn't accommodate the mode you're using,
+            //then it won't allow you to go there
+            for(Link link:scenario.getNetwork().getLinks().values()) {
+                Set<String> modes = new HashSet<String>(link.getAllowedModes());
+                modes.add("pt");
+                link.setAllowedModes(modes);
+            }
+
+            //this is some more magic hacking to get location choice by car to work,
+            // figured out by that great genius, sergio "Mr. Java" ordonez.
+            //sergio creates a car-only network, then associates each activity and facility with a car link.
+            Set<String> carMode = new HashSet<String>();
+            carMode.add("car");
+            NetworkImpl justCarNetwork = NetworkImpl.createNetwork();
+            new TransportModeNetworkFilter(scenario.getNetwork()).filter(justCarNetwork, carMode);
+            for(Person person:scenario.getPopulation().getPersons().values())
+                for(PlanElement planElement:person.getSelectedPlan().getPlanElements())
+                    if(planElement instanceof Activity)
+                        ((ActivityImpl)planElement).setLinkId(justCarNetwork.getNearestLinkExactly(((ActivityImpl)planElement).getCoord()).getId());
+            for(ActivityFacility facility:scenario.getActivityFacilities().getFacilities().values())
+                ((ActivityFacilityImpl)facility).setLinkId(justCarNetwork.getNearestLinkExactly(facility.getCoord()).getId());
+            //the singapore scenario uses intelligent transit routing that takes account of information of the previous iteration,
+            //like the car router of standard matsim, where best response routing is ok for car, not transit... :)
+            matsimControler.setTransitRouterFactory(new TransitRouterWSImplFactory(scenario, waitTimes, stopStopTimes));
+            //the singapore scoring function
             matsimControler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(config.planCalcScore(), scenario));
         }
     }

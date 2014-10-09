@@ -6,31 +6,36 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
 
 import playground.pieter.pseudosimulation.util.CollectionUtils;
+import playground.singapore.ptsim.qnetsimengine.PTQSimFactory;
+import playground.singapore.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
 import playground.singapore.transitRouterEventsBased.TransitRouterWSImplFactory;
 import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTimeCalculator;
 import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTimeCalculatorSerializable;
@@ -38,6 +43,7 @@ import playground.singapore.transitRouterEventsBased.waitTimes.WaitTimeCalculato
 import playground.singapore.transitRouterEventsBased.waitTimes.WaitTimeStuckCalculator;
 
 public class MasterControler implements AfterMobsimListener, ShutdownListener {
+    private Config config;
     Logger masterLogger = Logger.getLogger(this.getClass());
     private Controler matsimControler;
     private Slave[] slaves;
@@ -84,8 +90,10 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
             slaves[i].sendNumber(i);
         }
         server.close();
-        if (commandLine.hasOption("c"))
-            matsimControler = new Controler(ScenarioUtils.loadScenario(ConfigUtils.loadConfig(commandLine.getOptionValue("c"))));
+        if (commandLine.hasOption("c")){
+            config = ConfigUtils.loadConfig(commandLine.getOptionValue("c"));
+            matsimControler = new Controler(ScenarioUtils.loadScenario(config));
+        }
         else {
             System.err.println("Config file not specified");
             System.out.println(options.toString());
@@ -102,14 +110,14 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
                 idStrings.add(id.toString());
             slaves[i].sendIds(idStrings);
         }
-        if (matsimControler.getConfig().scenario().isUseTransit()) {
+        if (config.scenario().isUseTransit()) {
             waitTimeCalculator = new WaitTimeCalculatorSerializable(matsimControler.getScenario().getTransitSchedule(), matsimControler
                     .getConfig().travelTimeCalculator().getTraveltimeBinSize(),
-                    (int) (matsimControler.getConfig().qsim().getEndTime() - matsimControler.getConfig().qsim().getStartTime()));
+                    (int) (config.qsim().getEndTime() - config.qsim().getStartTime()));
             matsimControler.getEvents().addHandler(waitTimeCalculator);
             stopStopTimeCalculator = new StopStopTimeCalculatorSerializable(matsimControler.getScenario().getTransitSchedule(),
-                    matsimControler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (matsimControler.getConfig().qsim()
-                    .getEndTime() - matsimControler.getConfig().qsim().getStartTime()));
+                    config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.qsim()
+                    .getEndTime() - config.qsim().getStartTime()));
             matsimControler.getEvents().addHandler(stopStopTimeCalculator);
         }
 
@@ -117,8 +125,10 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
         matsimControler.addControlerListener(this);
         if (commandLine.hasOption("s")) {
             masterLogger.warn("Singapore scenario: Doing events-based transit routing.");
-            matsimControler.setTransitRouterFactory(new TransitRouterWSImplFactory(matsimControler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
+            //our scoring function
             matsimControler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(matsimControler.getScenario().getConfig().planCalcScore(), matsimControler.getScenario()));
+            //this qsim engine uses our boarding and alighting model, derived from smart card data
+            matsimControler.setMobsimFactory(new PTQSimFactory());
         }
         masterLogger.warn("master inited");
     }
@@ -138,8 +148,8 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
 
     @Override
     public void notifyAfterMobsim(AfterMobsimEvent event) {
-        linkTravelTimes = new SerializableLinkTravelTimes(event.getControler().getLinkTravelTimes(), matsimControler.getConfig()
-                .travelTimeCalculator().getTraveltimeBinSize(), matsimControler.getConfig().qsim().getEndTime(), matsimControler
+        linkTravelTimes = new SerializableLinkTravelTimes(event.getControler().getLinkTravelTimes(), config
+                .travelTimeCalculator().getTraveltimeBinSize(), config.qsim().getEndTime(), matsimControler
                 .getNetwork().getLinks().values());
         numThreads = new AtomicInteger(slaves.length);
         for (Slave slave : slaves) new Thread(slave).start();
