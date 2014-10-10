@@ -54,33 +54,78 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 
 	private static final Logger log = Logger.getLogger(TestCANetworkDynamic.class);
 
+
+	@Test
+	public void testCANetworkDynamicTTForOncomingAgentsForDifferentLinkWidths(){
+
+		double freeSpeedCellTravelTime = 1/(CANetworkDynamic.RHO_HAT*CANetworkDynamic.V_HAT);
+
+		{
+			double linkLength = 10;//-1/CANetworkDynamic.RHO_HAT;;
+			int nrAgents1 = 2;
+			double w1 = 0.61;
+			double tts1[] = getAgentsBidirectionalTravelTimesForLinkOfWidthAngLength(w1,linkLength,nrAgents1);
+			double diffSum = 0;
+			for (int i = 0; i < tts1.length/2; i++) {
+				log.info("diff =\t" + (tts1[i]-tts1[i+tts1.length/2]) + " max allowd:\t" + freeSpeedCellTravelTime/w1);
+				assertEquals(tts1[i],tts1[i+tts1.length/2],2*freeSpeedCellTravelTime/w1);
+				diffSum += (tts1[i]-tts1[i+tts1.length/2]);
+			}
+			log.info("diffSum = \t" + diffSum);
+			assertTrue("abs diff sum smaller than cell travel time", Math.abs(diffSum) <= freeSpeedCellTravelTime/w1+EPSILON);
+		}
+		
+		{
+			double linkLength = 100;//-1/CANetworkDynamic.RHO_HAT;;
+			int nrAgents1 = 1000;
+			double w1 = 2.61;
+			double tts1[] = getAgentsBidirectionalTravelTimesForLinkOfWidthAngLength(w1,linkLength,nrAgents1);
+			double diffSum = 0;
+			for (int i = 0; i < tts1.length/2; i++) {
+				log.info("diff =\t" + (tts1[i]-tts1[i+tts1.length/2]) + " max allowd:\t" + freeSpeedCellTravelTime/w1);
+				assertEquals(tts1[i],tts1[i+tts1.length/2],2*freeSpeedCellTravelTime/w1);
+				diffSum += (tts1[i]-tts1[i+tts1.length/2]);
+			}
+			log.info("diffSum = \t" + diffSum);
+			assertTrue("abs diff sum smaller than cell travel time", Math.abs(diffSum) <= freeSpeedCellTravelTime/w1+EPSILON);
+		}
+		
+		{
+			double linkLength = 100;//-1/CANetworkDynamic.RHO_HAT;;
+			int nrAgents1 = 10;
+			double w1 = 2.61;
+			double tts1[] = getAgentsBidirectionalTravelTimesForLinkOfWidthAngLength(w1,linkLength,nrAgents1);
+			double diffSum = 0;
+			for (int i = 0; i < tts1.length/2; i++) {
+				log.info("diff =\t" + (tts1[i]-tts1[i+tts1.length/2]) + " max allowd:\t" + freeSpeedCellTravelTime/w1);
+				assertEquals(tts1[i],tts1[i+tts1.length/2],2*freeSpeedCellTravelTime/w1);
+				diffSum += (tts1[i]-tts1[i+tts1.length/2]);
+			}
+			log.info("diffSum = \t" + diffSum);
+			assertTrue("abs diff sum smaller than cell travel time", Math.abs(diffSum) <= freeSpeedCellTravelTime/w1+EPSILON);
+		}
+
+	}
+
+
+
 	@Test
 	public void testCANetworkDynamicTTInBothDirectionsOfAPairOfAgentsForDifferentLinkWidths(){
 		//free speed travel time must be independent of link width
 		double linkLength = 100;
-		
+
 		double [] tts1 = getAgentTravelTimesForLinkOfWidthAndLength(1,linkLength);
 		double [] tts1Rev = getAgentTravelTimesForLinkOfWidthAndLengthRev(1,linkLength);
 		for (int i = 0; i < tts1.length; i++) {
 			assertEquals(tts1[i],tts1Rev[i],EPSILON);
 		}
-		
+
 		double [] tts2 = getAgentTravelTimesForLinkOfWidthAndLength(2,linkLength); 
 		double [] tts2Rev = getAgentTravelTimesForLinkOfWidthAndLengthRev(2,linkLength);
 		for (int i = 0; i < tts1.length; i++) {
 			assertEquals(tts2[i],tts2Rev[i],EPSILON);
 		}
 	}
-	
-	
-	
-
-
-
-
-
-
-
 
 	@Test
 	public void testCANetworkDynamicFreespeedOnLinksOfDifferentWidth() {
@@ -135,7 +180,7 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 		Collections.reverse(links);
 		CALink caLink = caNet.getCALink(links.get(0).getId());
 		CAAgent[] particles = caLink.getParticles();
-		
+
 		for (int i = 0; i < 10; i++) {
 			CAAgent a = new CASimpleDynamicAgent(links, 1, Id.create(i, CAAgent.class), caLink);
 			CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a);
@@ -145,9 +190,9 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 			CAEvent e = new CAEvent(0, a,caLink, CAEventType.TTA);
 			caNet.pushEvent(e);
 		}
-		
+
 		caNet.runUntil(3*linkLength);
-		
+
 		Link ll = links.get(1);
 		Link llRev = null;
 		for (Link cand : ll.getToNode().getOutLinks().values()) {
@@ -157,17 +202,108 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 			}
 		}
 
-		
+
 		double [] tt = new double [10];
-		
+
 		for (int i = 0; i < 10; i++) {
-			
+
 			tt[i] = m.getAgentTravelTimeOnLink(Id.create(i, CAAgent.class), llRev.getId());
 			log.info("Travel time for agent:" + i + " was \t" + tt[i]);
 		}
-		
+
 		return tt;
-	
+
+	}
+	private double[] getAgentsBidirectionalTravelTimesForLinkOfWidthAngLength(
+			double width, double linkLength, int nrAgents) {
+		Scenario sc = createScenario();
+		Network net = sc.getNetwork();
+		for (Link l : net.getLinks().values()) {
+			l.setCapacity(width);
+			l.setLength(linkLength);
+		}
+
+		EventsManager em = new EventsManagerImpl();
+		Monitor m = new Monitor();
+		em.addHandler(m);
+		CANetworkDynamic caNet = new CANetworkDynamic(net, em);
+
+
+
+		//		//DEBUG
+		//		//VIS only
+		//		Sim2DConfig conf2d = Sim2DConfigUtils.createConfig();
+		//		Sim2DScenario sc2d = Sim2DScenarioUtils.createSim2dScenario(conf2d);
+		//		sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME,sc2d);
+		//		sc.getConfig().global().setCoordinateSystem("EPSG:3395");
+		//		EventBasedVisDebuggerEngine vis = new EventBasedVisDebuggerEngine(sc);
+		//		em.addHandler(vis);
+		//		QSimDensityDrawer qDbg = new QSimDensityDrawer(sc);
+		//		em.addHandler(qDbg);
+		//		vis.addAdditionalDrawer(new InfoBox(vis, sc));
+		//		vis.addAdditionalDrawer(qDbg);
+
+
+
+		List<Link> linksDS = getDSRoute(net);
+		linksDS.get(1).setLength(linkLength);
+		List<Link> linksUS = getDSRoute(net);
+		Collections.reverse(linksUS);
+
+		int numEachSide = nrAgents/2;
+
+		{
+			CALink caLink = caNet.getCALink(linksDS.get(0).getId());
+			CAAgent[] particles = caLink.getParticles();
+			log.info(particles.length);
+			for (int i = 0; i < numEachSide; i++) {
+				CAAgent a = new CASimpleDynamicAgent(linksDS, 1, Id.create(i, CAAgent.class), caLink);
+				CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a);
+				em.processEvent(ee);
+				a.materialize(i, 1);
+				particles[i] = a;
+				CAEvent e = new CAEvent(0, a,caLink, CAEventType.TTA);
+				caNet.pushEvent(e);
+			}
+		}
+		{
+			CALink caLink = caNet.getCALink(linksUS.get(0).getId());
+			CAAgent[] particles = caLink.getParticles();
+
+			for (int i = numEachSide; i < 2*numEachSide; i++) {
+				CAAgent a = new CASimpleDynamicAgent(linksUS, 1, Id.create(i, CAAgent.class), caLink);
+				CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a);
+				em.processEvent(ee);
+				a.materialize(particles.length-1-i+numEachSide, -1);
+				particles[particles.length-1-i+numEachSide] = a;
+				CAEvent e = new CAEvent(0, a,caLink, CAEventType.TTA);
+				caNet.pushEvent(e);
+			}
+
+
+		}
+
+		caNet.runUntil(3*linkLength);
+		double [] tt = new double [2*numEachSide];
+		Link ll = linksUS.get(1);
+		Link llRev = null;
+		for (Link cand : ll.getToNode().getOutLinks().values()) {
+			if (cand.getToNode() == ll.getFromNode()) {
+				llRev = cand;
+				break;
+			}
+		}
+		for (int i = 0; i < numEachSide; i++) {
+			tt[i] = m.getAgentTravelTimeOnLink(Id.create(i, CAAgent.class), linksDS.get(1).getId());
+			log.info("Travel time for agent:" + i + " was \t" + tt[i]);
+		}
+
+		for (int i = numEachSide; i < 2*numEachSide; i++) {
+			tt[i] = m.getAgentTravelTimeOnLink(Id.create(i, CAAgent.class), llRev.getId());
+			log.info("Travel time for agent:" + i + " was \t" + tt[i]);
+		}
+
+		return tt;
 	}
 
 	private double[] getAgentTravelTimesForLinkOfWidthAndLength(double width,
@@ -185,10 +321,10 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 
 		List<Link> links = getDSRoute(net);
 		links.get(1).setLength(linkLength);
-		
+
 		CALink caLink = caNet.getCALink(links.get(0).getId());
 		CAAgent[] particles = caLink.getParticles();
-		
+
 		for (int i = 0; i < 10; i++) {
 			CAAgent a = new CASimpleDynamicAgent(links, 1, Id.create(i, CAAgent.class), caLink);
 			CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a);
@@ -198,16 +334,16 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 			CAEvent e = new CAEvent(0, a,caLink, CAEventType.TTA);
 			caNet.pushEvent(e);
 		}
-		
+
 		caNet.runUntil(3*linkLength);
 		double [] tt = new double [10];
-		
+
 		for (int i = 0; i < 10; i++) {
-			
+
 			tt[i] = m.getAgentTravelTimeOnLink(Id.create(i, CAAgent.class), links.get(1).getId());
 			log.info("Travel time for agent:" + i + " was \t" + tt[i]);
 		}
-		
+
 		return tt;
 	}
 
@@ -257,7 +393,7 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 		List<Link> links = getDSRoute(net);
 		links.get(1).setLength(linkLength);		
 		Collections.reverse(links);
-		
+
 		CALink caLink = caNet.getCALink(links.get(0).getId());
 		CAAgent[] particles = caLink.getParticles();
 		CAAgent a = new CASimpleDynamicAgent(links, 1, Id.create("0", CAAgent.class), caLink);
@@ -268,8 +404,8 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 		CAEvent e = new CAEvent(0, a,caLink, CAEventType.TTA);
 		caNet.pushEvent(e);
 		caNet.runUntil(3*linkLength);
-		
-		
+
+
 		Link ll = links.get(1);
 		Link llRev = null;
 		for (Link cand : ll.getToNode().getOutLinks().values()) {
@@ -326,13 +462,13 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 		net.addLink(l3);
 		net.addLink(l4);
 		net.addLink(l5);
-		
+
 		for (Link l : net.getLinks().values()) {
 			l.setLength(10);
 		}
 		l2.setLength(100);
 		l3.setLength(100);
-		
+
 		return sc;
 	}
 

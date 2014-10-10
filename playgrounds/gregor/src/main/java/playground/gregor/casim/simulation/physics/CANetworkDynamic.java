@@ -126,8 +126,10 @@ public class CANetworkDynamic {
 		CAEvent e = this.events.poll();
 			
 		
-			
-			
+//			log.info("==>" + e);
+//			if (e.getCAEventType() == CAEventType.SWAP) {
+//				log.info("==>" + e);	
+//			}
 			if (e.isObsolete()){
 				if (EXP_WARN_CNT++ < 10 ) {
 					log.info("dropping obsolete event: " + e);
@@ -317,45 +319,6 @@ public class CANetworkDynamic {
 	}
 
 	public void pushEvent(CAEvent event) {
-		//		System.out.println("DEBUG");
-		//		if (event.getCANetworkEntity() instanceof CALink) {
-		//			if (((CASimpleAgent)event.getCAAgent()).getCurrentLink() != event.getCANetworkEntity()){
-		//				throw new RuntimeException("bug!");
-		//			}
-		//		} else if (event.getEventExcexutionTime() >= 309.3847106471648){
-		//			System.out.println("DEBUG");	
-		//		}
-		//		event.cnt = this.eventCnt++;
-		//		if (event.cnt == 53943){
-		//			System.out.println("DEBUG");
-		//		}
-		//		System.out.println("<-- " + event);
-		//		if (event.getCAAgent().getId().toString().equals("36")){
-		//			System.out.println("<-- " + event);
-		//		}
-
-		//		if ((event.getCAAgent().getId().toString().equals("-24") || event.getCAAgent().getId().toString().equals("-24"))&& event.getEventExcexutionTime() >= 1387.78){
-		//			System.out.println("<-- " + event);
-		//		}
-
-		//		if (event.getEventExcexutionTime() <= ((CASimpleDynamicAgent)event.getCAAgent()).getLastEnterTime()) {
-		//			throw new RuntimeException("a");
-		//		}
-
-//		if (event.toString().equals("time:25.783212202329086 a:a:1923 SWAP")) {
-//			System.out.println("got you!!!");
-//		}
-//		if (event.toString().equals("time:13.547189434599161 type:TTA obsolete:false")) {
-//			System.out.println("got you!!!");
-//		}		
-		
-//		CANetworkEntity e = event.getCANetworkEntity();
-//		if (e instanceof CALinkDynamic) {
-//			if (((CALinkDynamic) e).getParticles()[event.getCAAgent().getPos()] != event.getCAAgent() && event.getEventExcexutionTime() > 2){
-//				System.out.println("got you!!!");
-//			}
-//		}
-
 		event.getCAAgent().setCurrentEvent(event);
 		this.events.add(event);
 	}

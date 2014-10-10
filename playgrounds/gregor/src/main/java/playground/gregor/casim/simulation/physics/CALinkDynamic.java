@@ -668,63 +668,38 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 	private void swapOnLinkDownStream(CASimpleDynamicAgent a, int idx,
 			double time) {
 		
-		throw new RuntimeException("not implemented!");
+		int nbIdx = idx+1;
+		CASimpleDynamicAgent nb = this.particles[nbIdx];
+		this.particles[nbIdx] = a;
+		this.particles[idx] = nb;
+
 		
-//		int nbIdx = idx+1;
-//		CASimpleDynamicAgent nb = this.particles[nbIdx];
-//		this.particles[nbIdx] = a;
-//		this.particles[idx] = nb;
-//
-//		double theirRho = nb.getMyDirectionRho();
-//		double myRho = a.getMyDirectionRho();
-//		
-//		double onCommingTimeGap = time-this.usLastLeftTimes[nbIdx];
-//		this.usLastLeftTimes[nbIdx] = time;
-//		nb.updateMyDynamicQuantitiesOnAdvance(onCommingTimeGap,time,this.cellLength,this.width);
-//		nb.updateMyDynamicQuantitiesOnSwap(a.getV(),time,this.width,myRho);
-//
-//		double timeGap = time-this.dsLastLeftTimes[idx];
-//		this.dsLastLeftTimes[idx] = time;
-//		this.dsLastLeftAgent[idx] = a;
-//		a.updateMyDynamicQuantitiesOnAdvance(timeGap,time,this.cellLength,this.width);
-//		a.updateMyDynamicQuantitiesOnSwap(nb.getV(),time,this.width,theirRho);
-//		
-//		nb.proceed();
-//		a.proceed();
-//		
-//		checkPostConditionForAgentOnDownStreamAdvance(idx, a, time);
-//		checkPostConditionForAgentOnUpStreamAdvance(nbIdx, nb, time);
+		this.usLastLeftTimes[nbIdx] = time;
+		this.dsLastLeftTimes[idx] = time;
+		
+		nb.proceed();
+		a.proceed();
+		
+		checkPostConditionForAgentOnDownStreamAdvance(idx, a, time);
+		checkPostConditionForAgentOnUpStreamAdvance(nbIdx, nb, time);
 		
 	}
 
 	private void swapOnLinkUpStream(CASimpleDynamicAgent a, int idx, double time) {
 		
-		throw new RuntimeException("not implemented!");
+		int nbIdx = idx-1;
+		CASimpleDynamicAgent nb = this.particles[nbIdx];
+		this.particles[nbIdx] = a;
+		this.particles[idx] = nb;
 		
-//		int nbIdx = idx-1;
-//		CASimpleDynamicAgent nb = this.particles[nbIdx];
-//		this.particles[nbIdx] = a;
-//		this.particles[idx] = nb;
-//
-//		double theirRho = nb.getMyDirectionRho();
-//		double myRho = a.getMyDirectionRho();
-//		
-//		double onCommingTimeGap = time-this.dsLastLeftTimes[nbIdx];
-//		this.dsLastLeftTimes[nbIdx] = time;
-//		this.dsLastLeftAgent[nbIdx] = nb;
-//		nb.updateMyDynamicQuantitiesOnAdvance(onCommingTimeGap,time,this.cellLength,this.width);
-//		nb.updateMyDynamicQuantitiesOnSwap(a.getV(),time,this.width,myRho);
-//
-//		double timeGap = time-this.usLastLeftTimes[idx];
-//		this.usLastLeftTimes[idx] = time;
-//		a.updateMyDynamicQuantitiesOnAdvance(timeGap,time,this.cellLength,this.width);
-//		a.updateMyDynamicQuantitiesOnSwap(nb.getV(),time,this.width,theirRho);
-//		
-//		nb.proceed();
-//		a.proceed();
-//		
-//		checkPostConditionForAgentOnUpStreamAdvance(idx, a, time);
-//		checkPostConditionForAgentOnDownStreamAdvance(nbIdx, nb, time);
+		this.dsLastLeftTimes[nbIdx] = time;
+		this.usLastLeftTimes[idx] = time;
+		
+		nb.proceed();
+		a.proceed();
+		
+		checkPostConditionForAgentOnUpStreamAdvance(idx, a, time);
+		checkPostConditionForAgentOnDownStreamAdvance(nbIdx, nb, time);
 		
 	}
 

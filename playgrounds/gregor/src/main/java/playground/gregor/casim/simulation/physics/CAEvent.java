@@ -92,7 +92,7 @@ public class CAEvent implements Comparable<CAEvent>{
 	
 	@Override
 	public String toString() {
-		return "time:" + this.time + " type:" + this.type + " obsolete:" + isObsolete();
+		return "time:" + this.time + " type:" + this.type + " obsolete:" + isObsolete() + " agent:" + this.agent.getId() + " pos:" + this.agent.getPos();
 	}
 	
 	public class AgentState{
