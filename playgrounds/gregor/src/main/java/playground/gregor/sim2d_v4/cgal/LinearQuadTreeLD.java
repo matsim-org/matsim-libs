@@ -59,8 +59,8 @@ public class LinearQuadTreeLD {
 	private static final int TX = 0x15555555;
 	private static final int TY = 0x2aaaaaaa;
 
-	private static final int BLACK = 1;
-	private static final int WHITE = 0;
+	public static final int BLACK = 1;
+	public static final int WHITE = 0;
 
 	private static final int SW_QUADRANT = 0x0;
 	private static final int SE_QUADRANT = 0x1;
@@ -301,6 +301,9 @@ public class LinearQuadTreeLD {
 //				
 //			}
 			this.e = e;
+			if (e.getArea() == 0) {
+				throw new RuntimeException("Error: empty envelope!");
+			}
 			this.objs = objs;
 			this.locationCode = locationCode;
 			this.level = level;

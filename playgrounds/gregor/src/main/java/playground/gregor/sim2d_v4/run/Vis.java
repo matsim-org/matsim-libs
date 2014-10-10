@@ -103,9 +103,9 @@ public class Vis {
 //		controller.getEvents().addHandler(fa1);
 //		controller.getEvents().addHandler(fa2);
 //		controller.getEvents().addHandler(fa3);
+		QuadTreePath qtp = new QuadTreePath(e,"/Users/laemmel/devel/tjunction/KO/ko-240-240-240/ko-240-240-240_combined_MB_Quadtree_Path.txt");
+		e.addHandler(qtp);
 		if (args[2].equals("true")) {
-			QuadTreePath qtp = new QuadTreePath(e);
-			e.addHandler(qtp);
 //			VDPath vdp = new VDPath(controller.getEvents());
 //			controller.getEvents().addHandler(vdp);
 //			
@@ -177,6 +177,7 @@ public class Vis {
 //		reader.parse("/Users/laemmel/devel/hhw3/vis/0.events.xml");
 		HermesTrajectoryToEventsParser h = new HermesTrajectoryToEventsParser(e);
 		h.parse("/Users/laemmel/devel/tjunction/KO/ko-240-240-240/ko-240-240-240_combined_MB.txt");
+		qtp.finish();
 		
 //		controller.setCreateGraphs(false);
 //		controller.setTravelTimeCalculatorFactory(new MSATravelTimeCalculatorFactory());

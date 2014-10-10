@@ -21,10 +21,12 @@
 package playground.gregor.casim.simulation.physics;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -50,41 +52,33 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 
 	private static final double CA_TT_EPSILON = 0.05; //due to integer inaccuracy EPSILON needs to be relaxed
 
+	private static final Logger log = Logger.getLogger(TestCANetworkDynamic.class);
+
 	@Test
-	public void testCANetworkDynamicTimeGapTest() {
-
-		//resulting time gap at the end of a link must be independent of link length
-		double gap10 = timeGap2AgentsOnLinkWithLength(0.61,10.);
-
-		double gap1000 = timeGap2AgentsOnLinkWithLength(0.61,1000.);
-
-		assertEquals(gap10, gap1000,0.01);
+	public void testCANetworkDynamicTTInBothDirectionsOfAPairOfAgentsForDifferentLinkWidths(){
+		//free speed travel time must be independent of link width
+		double linkLength = 100;
+		
+		double [] tts1 = getAgentTravelTimesForLinkOfWidthAndLength(1,linkLength);
+		double [] tts1Rev = getAgentTravelTimesForLinkOfWidthAndLengthRev(1,linkLength);
+		for (int i = 0; i < tts1.length; i++) {
+			assertEquals(tts1[i],tts1Rev[i],EPSILON);
+		}
+		
+		double [] tts2 = getAgentTravelTimesForLinkOfWidthAndLength(2,linkLength); 
+		double [] tts2Rev = getAgentTravelTimesForLinkOfWidthAndLengthRev(2,linkLength);
+		for (int i = 0; i < tts1.length; i++) {
+			assertEquals(tts2[i],tts2Rev[i],EPSILON);
+		}
 	}
+	
+	
+	
 
 
 
 
 
-//	@Test
-//	public void testCANetworkDynamicOncommingTrafficTravelTimes(){
-//
-//		//		
-//		double diff2Agents = oncommingTrafficTravelTimeTest2AgentsDiff(1);
-//		assertEquals(0, diff2Agents, EPSILON);
-//
-//		double diff4Agents1st = oncommingTrafficTravelTimeTest4AgentsDiff1st(1);
-//		assertEquals(0, diff4Agents1st, EPSILON);
-//
-//		double diff4Agents2nd = oncommingTrafficTravelTimeTest4AgentsDiff2nd(1);
-//		assertEquals(0, diff4Agents2nd, EPSILON);
-//
-//		double tt2Agents = oncommingTrafficTravelTimeTest2AgentsTT(1);
-//		double t1 = freespeedForLinkOfXmWidth(1);
-//		assertEquals(true, tt2Agents>t1);
-//
-//
-//
-//	}
 
 
 
@@ -92,609 +86,145 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 	public void testCANetworkDynamicFreespeedOnLinksOfDifferentWidth() {
 
 		//free speed travel time must be independent of link width
-
+		double linkLength = 100;
 		//tt should be:
-		int numOfCells = (int) (100*CANetworkDynamic.RHO_HAT+0.5);
+		int numOfCells = (int) (linkLength*CANetworkDynamic.RHO_HAT+0.5);
 		double freeSpeedCellTravelTime = 1/(CANetworkDynamic.RHO_HAT*CANetworkDynamic.V_HAT);
 		double travelTime = numOfCells * freeSpeedCellTravelTime;
 
-		double t1 = freespeedForLinkOfXmWidth(1);
+		double t1 = freespeedForLinkOfXmWidth(1,linkLength);
 		assertEquals(travelTime, t1, EPSILON);
 
-		double t061 = freespeedForLinkOfXmWidth(0.61);
+		double t061 = freespeedForLinkOfXmWidth(0.61,linkLength);
 		assertEquals(travelTime, t061, CA_TT_EPSILON);
 
-		double t2 = freespeedForLinkOfXmWidth(2);
+		double t2 = freespeedForLinkOfXmWidth(2,linkLength);
 		assertEquals(travelTime, t2, CA_TT_EPSILON);
 
-		double t5 = freespeedForLinkOfXmWidth(5);
+		double t5 = freespeedForLinkOfXmWidth(5,linkLength);
 		assertEquals(travelTime, t5, CA_TT_EPSILON);
 
-		double t1Rev = freespeedForLinkOfXmWidthRev(1);
+		double t1Rev = freespeedForLinkOfXmWidthRev(1,linkLength);
 		assertEquals(t1, t1Rev, EPSILON);
 
-		double t061Rev = freespeedForLinkOfXmWidthRev(0.61);
+		double t061Rev = freespeedForLinkOfXmWidthRev(0.61,linkLength);
 		assertEquals(t061, t061Rev, EPSILON);
 
-		double t2Rev = freespeedForLinkOfXmWidthRev(2);
+		double t2Rev = freespeedForLinkOfXmWidthRev(2,linkLength);
 		assertEquals(t2, t2Rev, EPSILON);
 
-		double t5Rev = freespeedForLinkOfXmWidthRev(5);
+		double t5Rev = freespeedForLinkOfXmWidthRev(5,linkLength);
 		assertEquals(t5, t5Rev, EPSILON);
 	}
 
-	private double timeGap2AgentsOnLinkWithLength(double width, double length) {
-		Config c = ConfigUtils.createConfig();
-		Scenario sc = ScenarioUtils.createScenario(c);
+	private double[] getAgentTravelTimesForLinkOfWidthAndLengthRev(double width,
+			double linkLength) {
+		Scenario sc = createScenario();
 		Network net = sc.getNetwork();
-		NetworkFactory fac = net.getFactory();
-
-		Node n0 = fac.createNode(Id.create("0", Node.class), sc.createCoord(-10, 0));
-		Node n1 = fac.createNode(Id.create("1", Node.class), sc.createCoord(0, 0));
-		Node n2 = fac.createNode(Id.create("2", Node.class), sc.createCoord(10, 0));
-		Node n3 = fac.createNode(Id.create("3", Node.class), sc.createCoord(20, 0));
-		net.addNode(n0);
-		net.addNode(n1);
-		net.addNode(n2);
-		net.addNode(n3);
-
-		Link l0 = fac.createLink(Id.create("0", Link.class), n0, n1);
-		Link l1 = fac.createLink(Id.create("1", Link.class), n1, n0);
-		Link l2 = fac.createLink(Id.create("2", Link.class), n1, n2);
-		Link l3 = fac.createLink(Id.create("3", Link.class), n2, n1);
-		Link l4 = fac.createLink(Id.create("4", Link.class), n2, n3);
-		Link l5 = fac.createLink(Id.create("5", Link.class), n3, n2);
-
-		net.addLink(l0);
-		net.addLink(l1);
-		net.addLink(l2);
-		net.addLink(l3);
-		net.addLink(l4);
-		net.addLink(l5);
-
 		for (Link l : net.getLinks().values()) {
-			l.setLength(10);
 			l.setCapacity(width);
 		}
-		l2.setLength(length);
-		l3.setLength(length);
-
-		EventsManager em = new EventsManagerImpl();
-		Monitor m = new Monitor();
-		em.addHandler(m);
-		CANetworkDynamic caNet = new CANetworkDynamic(net, em);
-		List<Link> links = new ArrayList<Link>();
-		links.add(l0);links.add(l2);links.add(l4);
-
-		CAAgent a0;
-		{	
-
-			CALink caLink = caNet.getCALink(links.get(0).getId());
-			CAAgent[] particles = caLink.getParticles();
-			a0 = new CASimpleDynamicAgent(links, 1, Id.create("0", CAAgent.class), caLink);
-			CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a0);
-			em.processEvent(ee);
-			a0.materialize(0, 1);
-			particles[0] = a0;
-			CAEvent e = new CAEvent(0, a0,caLink, CAEventType.TTA);
-			caNet.pushEvent(e);
-		}
-		CAAgent a1;
-		{	
-
-			CALink caLink = caNet.getCALink(links.get(0).getId());
-			CAAgent[] particles = caLink.getParticles();
-			a1 = new CASimpleDynamicAgent(links, 1, Id.create("1", CAAgent.class), caLink);
-			CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a1);
-			em.processEvent(ee);
-			a1.materialize(1, 1);
-			particles[1] = a1;
-			CAEvent e = new CAEvent(0, a1,caLink, CAEventType.TTA);
-			caNet.pushEvent(e);
-		}
-
-
-		caNet.runUntil(3*length);
-
-		double tt1 = m.getAgentLinkExitTime(a0.getId(), l2.getId());
-		double tt2 = m.getAgentLinkExitTime(a1.getId(), l2.getId());
-		return tt1-tt2;
-	}
-
-	private double oncommingTrafficTravelTimeTest2AgentsDiff(double width) {
-		Config c = ConfigUtils.createConfig();
-		Scenario sc = ScenarioUtils.createScenario(c);
-		Network net = sc.getNetwork();
-		NetworkFactory fac = net.getFactory();
-
-		Node n0 = fac.createNode(Id.create("0", Node.class), sc.createCoord(-10, 0));
-		Node n1 = fac.createNode(Id.create("1", Node.class), sc.createCoord(0, 0));
-		Node n2 = fac.createNode(Id.create("2", Node.class), sc.createCoord(10, 0));
-		Node n3 = fac.createNode(Id.create("3", Node.class), sc.createCoord(20, 0));
-		net.addNode(n0);
-		net.addNode(n1);
-		net.addNode(n2);
-		net.addNode(n3);
-
-		Link l0 = fac.createLink(Id.create("0", Link.class), n0, n1);
-		Link l1 = fac.createLink(Id.create("1", Link.class), n1, n0);
-		Link l2 = fac.createLink(Id.create("2", Link.class), n1, n2);
-		Link l3 = fac.createLink(Id.create("3", Link.class), n2, n1);
-		Link l4 = fac.createLink(Id.create("4", Link.class), n2, n3);
-		Link l5 = fac.createLink(Id.create("5", Link.class), n3, n2);
-
-		net.addLink(l0);
-		net.addLink(l1);
-		net.addLink(l2);
-		net.addLink(l3);
-		net.addLink(l4);
-		net.addLink(l5);
-
-		for (Link l : net.getLinks().values()) {
-			l.setLength(10);
-			l.setCapacity(width);
-		}
-		l2.setLength(10);
-		l3.setLength(10);
 
 		EventsManager em = new EventsManagerImpl();
 		Monitor m = new Monitor();
 		em.addHandler(m);
 		CANetworkDynamic caNet = new CANetworkDynamic(net, em);
 
-		CAAgent a0;
-		{	
-			List<Link> links = new ArrayList<Link>();
-			links.add(l4);links.add(l2);links.add(l0);
-
-			CALink caLink = caNet.getCALink(links.get(0).getId());
-			CAAgent[] particles = caLink.getParticles();
-			a0 = new CASimpleDynamicAgent(links, 1, Id.create("0", CAAgent.class), caLink);
-			CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a0);
-			em.processEvent(ee);
-			a0.materialize(particles.length-1, -1);
-			particles[particles.length-1] = a0;
-			CAEvent e = new CAEvent(1, a0,caLink, CAEventType.TTA);
-			caNet.pushEvent(e);
-		}
-		CAAgent a1;
-		{	
-			List<Link> links = new ArrayList<Link>();
-			links.add(l0);links.add(l2);links.add(l4);
-
-			CALink caLink = caNet.getCALink(links.get(0).getId());
-			CAAgent[] particles = caLink.getParticles();
-			a1 = new CASimpleDynamicAgent(links, 1, Id.create("1", CAAgent.class), caLink);
-			CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a1);
-			em.processEvent(ee);
-			a1.materialize(0, 1);
-			particles[0] = a1;
-			CAEvent e = new CAEvent(1, a1,caLink, CAEventType.TTA);
-			caNet.pushEvent(e);
-		}
-
-
-//		//VIS only
-//		c.global().setCoordinateSystem("EPSG:3395");
-//		Sim2DConfig conf2d = Sim2DConfigUtils.createConfig();
-//		Sim2DScenario sc2d = Sim2DScenarioUtils.createSim2dScenario(conf2d);
-//		sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME,sc2d);
-//		EventBasedVisDebuggerEngine vis = new EventBasedVisDebuggerEngine(sc);
-//		em.addHandler(vis);
-//		QSimDensityDrawer qDbg = new QSimDensityDrawer(sc);
-//		em.addHandler(qDbg);
-//		vis.addAdditionalDrawer(new InfoBox(vis, sc));
-//		vis.addAdditionalDrawer(qDbg);
-//		{CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a0);
-//		em.processEvent(ee);}{CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a1);
-//		em.processEvent(ee);}
-
-		caNet.runUntil(3*100);
-
-		double tt1 = m.getAgentTravelTimeOnLink(a0.getId(), l3.getId());
-		double tt2 = m.getAgentTravelTimeOnLink(a1.getId(), l2.getId());
-		return tt1-tt2;
-	}
-
-	private double oncommingTrafficTravelTimeTest4AgentsDiff1st(double width) {
-		Config c = ConfigUtils.createConfig();
-		Scenario sc = ScenarioUtils.createScenario(c);
-		Network net = sc.getNetwork();
-		NetworkFactory fac = net.getFactory();
-
-		Node n0 = fac.createNode(Id.create("0", Node.class), sc.createCoord(-10, 0));
-		Node n1 = fac.createNode(Id.create("1", Node.class), sc.createCoord(0, 0));
-		Node n2 = fac.createNode(Id.create("2", Node.class), sc.createCoord(10, 0));
-		Node n3 = fac.createNode(Id.create("3", Node.class), sc.createCoord(20, 0));
-		net.addNode(n0);
-		net.addNode(n1);
-		net.addNode(n2);
-		net.addNode(n3);
-
-		Link l0 = fac.createLink(Id.create("0", Link.class), n0, n1);
-		Link l1 = fac.createLink(Id.create("1", Link.class), n1, n0);
-		Link l2 = fac.createLink(Id.create("2", Link.class), n1, n2);
-		Link l3 = fac.createLink(Id.create("3", Link.class), n2, n1);
-		Link l4 = fac.createLink(Id.create("4", Link.class), n2, n3);
-		Link l5 = fac.createLink(Id.create("5", Link.class), n3, n2);
-
-		net.addLink(l0);
-		net.addLink(l1);
-		net.addLink(l2);
-		net.addLink(l3);
-		net.addLink(l4);
-		net.addLink(l5);
-
-		for (Link l : net.getLinks().values()) {
-			l.setLength(10);
-			l.setCapacity(width);
-		}
-		l2.setLength(100);
-		l3.setLength(100);
-
-		EventsManager em = new EventsManagerImpl();
-		Monitor m = new Monitor();
-		em.addHandler(m);
-		CANetworkDynamic caNet = new CANetworkDynamic(net, em);
-
-		CAAgent a0;
-		{	
-			List<Link> links = new ArrayList<Link>();
-			links.add(l4);links.add(l2);links.add(l0);
-
-			CALink caLink = caNet.getCALink(links.get(0).getId());
-			CAAgent[] particles = caLink.getParticles();
-			a0 = new CASimpleDynamicAgent(links, 1, Id.create("0", CAAgent.class), caLink);
-			CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a0);
-			em.processEvent(ee);
-			a0.materialize(particles.length-1, -1);
-			particles[particles.length-1] = a0;
-			CAEvent e = new CAEvent(0, a0,caLink, CAEventType.TTA);
-			caNet.pushEvent(e);
-		}
-		CAAgent a1;
-		{	
-			List<Link> links = new ArrayList<Link>();
-			links.add(l4);links.add(l2);links.add(l0);
-
-			CALink caLink = caNet.getCALink(links.get(0).getId());
-			CAAgent[] particles = caLink.getParticles();
-			a1 = new CASimpleDynamicAgent(links, 1, Id.create("0", CAAgent.class), caLink);
-			CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a1);
-			em.processEvent(ee);
-			a1.materialize(particles.length-2, -1);
-			particles[particles.length-2] = a1;
-			CAEvent e = new CAEvent(0, a1,caLink, CAEventType.TTA);
-			caNet.pushEvent(e);
-		}
-		CAAgent a2;
-		{	
-			List<Link> links = new ArrayList<Link>();
-			links.add(l0);links.add(l2);links.add(l4);
-
-			CALink caLink = caNet.getCALink(links.get(0).getId());
-			CAAgent[] particles = caLink.getParticles();
-			a2 = new CASimpleDynamicAgent(links, 1, Id.create("1", CAAgent.class), caLink);
-			CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a2);
-			em.processEvent(ee);
-			a2.materialize(0, 1);
-			particles[0] = a2;
-			CAEvent e = new CAEvent(0, a2,caLink, CAEventType.TTA);
-			caNet.pushEvent(e);
-		}
-		CAAgent a3;
-		{	
-			List<Link> links = new ArrayList<Link>();
-			links.add(l0);links.add(l2);links.add(l4);
-
-			CALink caLink = caNet.getCALink(links.get(0).getId());
-			CAAgent[] particles = caLink.getParticles();
-			a3 = new CASimpleDynamicAgent(links, 1, Id.create("1", CAAgent.class), caLink);
-			CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a3);
-			em.processEvent(ee);
-			a3.materialize(1, 1);
-			particles[1] = a3;
-			CAEvent e = new CAEvent(0, a3,caLink, CAEventType.TTA);
-			caNet.pushEvent(e);
-		}
-
-		caNet.runUntil(3*100);
-
-		double tt1 = m.getAgentTravelTimeOnLink(a1.getId(), l3.getId());
-		double tt2 = m.getAgentTravelTimeOnLink(a3.getId(), l2.getId());
-		return tt1-tt2;
-	}
-
-	private double oncommingTrafficTravelTimeTest4AgentsDiff2nd(double width) {
-		Config c = ConfigUtils.createConfig();
-		Scenario sc = ScenarioUtils.createScenario(c);
-		Network net = sc.getNetwork();
-		NetworkFactory fac = net.getFactory();
-
-		Node n0 = fac.createNode(Id.create("0", Node.class), sc.createCoord(-10, 0));
-		Node n1 = fac.createNode(Id.create("1", Node.class), sc.createCoord(0, 0));
-		Node n2 = fac.createNode(Id.create("2", Node.class), sc.createCoord(10, 0));
-		Node n3 = fac.createNode(Id.create("3", Node.class), sc.createCoord(20, 0));
-		net.addNode(n0);
-		net.addNode(n1);
-		net.addNode(n2);
-		net.addNode(n3);
-
-		Link l0 = fac.createLink(Id.create("0", Link.class), n0, n1);
-		Link l1 = fac.createLink(Id.create("1", Link.class), n1, n0);
-		Link l2 = fac.createLink(Id.create("2", Link.class), n1, n2);
-		Link l3 = fac.createLink(Id.create("3", Link.class), n2, n1);
-		Link l4 = fac.createLink(Id.create("4", Link.class), n2, n3);
-		Link l5 = fac.createLink(Id.create("5", Link.class), n3, n2);
-
-		net.addLink(l0);
-		net.addLink(l1);
-		net.addLink(l2);
-		net.addLink(l3);
-		net.addLink(l4);
-		net.addLink(l5);
-
-		for (Link l : net.getLinks().values()) {
-			l.setLength(10);
-			l.setCapacity(width);
-		}
-		l2.setLength(100);
-		l3.setLength(100);
-
-		EventsManager em = new EventsManagerImpl();
-		Monitor m = new Monitor();
-		em.addHandler(m);
-		CANetworkDynamic caNet = new CANetworkDynamic(net, em);
-
-		CAAgent a0;
-		{	
-			List<Link> links = new ArrayList<Link>();
-			links.add(l4);links.add(l2);links.add(l0);
-
-			CALink caLink = caNet.getCALink(links.get(0).getId());
-			CAAgent[] particles = caLink.getParticles();
-			a0 = new CASimpleDynamicAgent(links, 1, Id.create("0", CAAgent.class), caLink);
-			CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a0);
-			em.processEvent(ee);
-			a0.materialize(particles.length-1, -1);
-			particles[particles.length-1] = a0;
-			CAEvent e = new CAEvent(0, a0,caLink, CAEventType.TTA);
-			caNet.pushEvent(e);
-		}
-		CAAgent a1;
-		{	
-			List<Link> links = new ArrayList<Link>();
-			links.add(l4);links.add(l2);links.add(l0);
-
-			CALink caLink = caNet.getCALink(links.get(0).getId());
-			CAAgent[] particles = caLink.getParticles();
-			a1 = new CASimpleDynamicAgent(links, 1, Id.create("0", CAAgent.class), caLink);
-			CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a1);
-			em.processEvent(ee);
-			a1.materialize(particles.length-2, -1);
-			particles[particles.length-2] = a1;
-			CAEvent e = new CAEvent(0, a1,caLink, CAEventType.TTA);
-			caNet.pushEvent(e);
-		}
-		CAAgent a2;
-		{	
-			List<Link> links = new ArrayList<Link>();
-			links.add(l0);links.add(l2);links.add(l4);
-
-			CALink caLink = caNet.getCALink(links.get(0).getId());
-			CAAgent[] particles = caLink.getParticles();
-			a2 = new CASimpleDynamicAgent(links, 1, Id.create("1", CAAgent.class), caLink);
-			CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a2);
-			em.processEvent(ee);
-			a2.materialize(0, 1);
-			particles[0] = a2;
-			CAEvent e = new CAEvent(0, a2,caLink, CAEventType.TTA);
-			caNet.pushEvent(e);
-		}
-		CAAgent a3;
-		{	
-			List<Link> links = new ArrayList<Link>();
-			links.add(l0);links.add(l2);links.add(l4);
-
-			CALink caLink = caNet.getCALink(links.get(0).getId());
-			CAAgent[] particles = caLink.getParticles();
-			a3 = new CASimpleDynamicAgent(links, 1, Id.create("1", CAAgent.class), caLink);
-			CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a3);
-			em.processEvent(ee);
-			a3.materialize(1, 1);
-			particles[1] = a3;
-			CAEvent e = new CAEvent(0, a3,caLink, CAEventType.TTA);
-			caNet.pushEvent(e);
-		}
-
-		caNet.runUntil(3*100);
-
-		double tt1 = m.getAgentTravelTimeOnLink(a0.getId(), l3.getId());
-		double tt2 = m.getAgentTravelTimeOnLink(a2.getId(), l2.getId());
-		return tt1-tt2;
-	}
-
-	private double oncommingTrafficTravelTimeTest2AgentsTT(double width) {
-		Config c = ConfigUtils.createConfig();
-		Scenario sc = ScenarioUtils.createScenario(c);
-		Network net = sc.getNetwork();
-		NetworkFactory fac = net.getFactory();
-
-		Node n0 = fac.createNode(Id.create("0", Node.class), sc.createCoord(-10, 0));
-		Node n1 = fac.createNode(Id.create("1", Node.class), sc.createCoord(0, 0));
-		Node n2 = fac.createNode(Id.create("2", Node.class), sc.createCoord(10, 0));
-		Node n3 = fac.createNode(Id.create("3", Node.class), sc.createCoord(20, 0));
-		net.addNode(n0);
-		net.addNode(n1);
-		net.addNode(n2);
-		net.addNode(n3);
-
-		Link l0 = fac.createLink(Id.create("0", Link.class), n0, n1);
-		Link l1 = fac.createLink(Id.create("1", Link.class), n1, n0);
-		Link l2 = fac.createLink(Id.create("2", Link.class), n1, n2);
-		Link l3 = fac.createLink(Id.create("3", Link.class), n2, n1);
-		Link l4 = fac.createLink(Id.create("4", Link.class), n2, n3);
-		Link l5 = fac.createLink(Id.create("5", Link.class), n3, n2);
-
-		net.addLink(l0);
-		net.addLink(l1);
-		net.addLink(l2);
-		net.addLink(l3);
-		net.addLink(l4);
-		net.addLink(l5);
-
-		for (Link l : net.getLinks().values()) {
-			l.setLength(10);
-			l.setCapacity(width);
-		}
-		l2.setLength(100);
-		l3.setLength(100);
-
-		EventsManager em = new EventsManagerImpl();
-		Monitor m = new Monitor();
-		em.addHandler(m);
-		CANetworkDynamic caNet = new CANetworkDynamic(net, em);
-
-		CAAgent a0;
-		{	
-			List<Link> links = new ArrayList<Link>();
-			links.add(l4);links.add(l2);links.add(l0);
-
-			CALink caLink = caNet.getCALink(links.get(0).getId());
-			CAAgent[] particles = caLink.getParticles();
-			a0 = new CASimpleDynamicAgent(links, 1, Id.create("0", CAAgent.class), caLink);
-			CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a0);
-			em.processEvent(ee);
-			a0.materialize(particles.length-1, -1);
-			particles[particles.length-1] = a0;
-			CAEvent e = new CAEvent(0, a0,caLink, CAEventType.TTA);
-			caNet.pushEvent(e);
-		}
-		CAAgent a1;
-		{	
-			List<Link> links = new ArrayList<Link>();
-			links.add(l0);links.add(l2);links.add(l4);
-
-			CALink caLink = caNet.getCALink(links.get(0).getId());
-			CAAgent[] particles = caLink.getParticles();
-			a1 = new CASimpleDynamicAgent(links, 1, Id.create("1", CAAgent.class), caLink);
-			CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a1);
-			em.processEvent(ee);
-			a1.materialize(0, 1);
-			particles[0] = a1;
-			CAEvent e = new CAEvent(0, a1,caLink, CAEventType.TTA);
-			caNet.pushEvent(e);
-		}
-
-
-		caNet.runUntil(3*100);
-
-		double tt1 = m.getAgentTravelTimeOnLink(a0.getId(), l3.getId());
-		return tt1;
-	}
-
-	private double freespeedForLinkOfXmWidthRev(double width) {
-		Config c = ConfigUtils.createConfig();
-		Scenario sc = ScenarioUtils.createScenario(c);
-		Network net = sc.getNetwork();
-		NetworkFactory fac = net.getFactory();
-
-		Node n0 = fac.createNode(Id.create("0", Node.class), sc.createCoord(-10, 0));
-		Node n1 = fac.createNode(Id.create("1", Node.class), sc.createCoord(0, 0));
-		Node n2 = fac.createNode(Id.create("2", Node.class), sc.createCoord(10, 0));
-		Node n3 = fac.createNode(Id.create("3", Node.class), sc.createCoord(20, 0));
-		net.addNode(n0);
-		net.addNode(n1);
-		net.addNode(n2);
-		net.addNode(n3);
-
-		Link l0 = fac.createLink(Id.create("0", Link.class), n0, n1);
-		Link l1 = fac.createLink(Id.create("1", Link.class), n1, n0);
-		Link l2 = fac.createLink(Id.create("2", Link.class), n1, n2);
-		Link l3 = fac.createLink(Id.create("3", Link.class), n2, n1);
-		Link l4 = fac.createLink(Id.create("4", Link.class), n2, n3);
-		Link l5 = fac.createLink(Id.create("5", Link.class), n3, n2);
-
-		net.addLink(l0);
-		net.addLink(l1);
-		net.addLink(l2);
-		net.addLink(l3);
-		net.addLink(l4);
-		net.addLink(l5);
-
-		for (Link l : net.getLinks().values()) {
-			l.setLength(10);
-			l.setCapacity(width);
-		}
-		l2.setLength(100);
-		l3.setLength(100);
-
-		EventsManager em = new EventsManagerImpl();
-		Monitor m = new Monitor();
-		em.addHandler(m);
-		CANetworkDynamic caNet = new CANetworkDynamic(net, em);
-
-		List<Link> links = new ArrayList<Link>();
-		links.add(l4);links.add(l2);links.add(l0);
-
+		List<Link> links = getDSRoute(net);
+		links.get(1).setLength(linkLength);
+		Collections.reverse(links);
 		CALink caLink = caNet.getCALink(links.get(0).getId());
 		CAAgent[] particles = caLink.getParticles();
-		CAAgent a = new CASimpleDynamicAgent(links, 1, Id.create("0", CAAgent.class), caLink);
-		CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a);
-		em.processEvent(ee);
-		a.materialize(particles.length-1, -1);
-		particles[particles.length-1] = a;
-		CAEvent e = new CAEvent(0, a,caLink, CAEventType.TTA);
-		caNet.pushEvent(e);
-		caNet.runUntil(3*100);
+		
+		for (int i = 0; i < 10; i++) {
+			CAAgent a = new CASimpleDynamicAgent(links, 1, Id.create(i, CAAgent.class), caLink);
+			CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a);
+			em.processEvent(ee);
+			a.materialize(particles.length-1-i, -1);
+			particles[particles.length-1-i] = a;
+			CAEvent e = new CAEvent(0, a,caLink, CAEventType.TTA);
+			caNet.pushEvent(e);
+		}
+		
+		caNet.runUntil(3*linkLength);
+		
+		Link ll = links.get(1);
+		Link llRev = null;
+		for (Link cand : ll.getToNode().getOutLinks().values()) {
+			if (cand.getToNode() == ll.getFromNode()) {
+				llRev = cand;
+				break;
+			}
+		}
 
-		double tt = m.getAgentTravelTimeOnLink(a.getId(), l3.getId());
+		
+		double [] tt = new double [10];
+		
+		for (int i = 0; i < 10; i++) {
+			
+			tt[i] = m.getAgentTravelTimeOnLink(Id.create(i, CAAgent.class), llRev.getId());
+			log.info("Travel time for agent:" + i + " was \t" + tt[i]);
+		}
+		
+		return tt;
+	
+	}
+
+	private double[] getAgentTravelTimesForLinkOfWidthAndLength(double width,
+			double linkLength) {
+		Scenario sc = createScenario();
+		Network net = sc.getNetwork();
+		for (Link l : net.getLinks().values()) {
+			l.setCapacity(width);
+		}
+
+		EventsManager em = new EventsManagerImpl();
+		Monitor m = new Monitor();
+		em.addHandler(m);
+		CANetworkDynamic caNet = new CANetworkDynamic(net, em);
+
+		List<Link> links = getDSRoute(net);
+		links.get(1).setLength(linkLength);
+		
+		CALink caLink = caNet.getCALink(links.get(0).getId());
+		CAAgent[] particles = caLink.getParticles();
+		
+		for (int i = 0; i < 10; i++) {
+			CAAgent a = new CASimpleDynamicAgent(links, 1, Id.create(i, CAAgent.class), caLink);
+			CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a);
+			em.processEvent(ee);
+			a.materialize(i, 1);
+			particles[i] = a;
+			CAEvent e = new CAEvent(0, a,caLink, CAEventType.TTA);
+			caNet.pushEvent(e);
+		}
+		
+		caNet.runUntil(3*linkLength);
+		double [] tt = new double [10];
+		
+		for (int i = 0; i < 10; i++) {
+			
+			tt[i] = m.getAgentTravelTimeOnLink(Id.create(i, CAAgent.class), links.get(1).getId());
+			log.info("Travel time for agent:" + i + " was \t" + tt[i]);
+		}
+		
 		return tt;
 	}
 
-	private double freespeedForLinkOfXmWidth(double width) {
-		Config c = ConfigUtils.createConfig();
-		Scenario sc = ScenarioUtils.createScenario(c);
+	private double freespeedForLinkOfXmWidth(double width, double linkLength) {
+		Scenario sc = createScenario();
 		Network net = sc.getNetwork();
-		NetworkFactory fac = net.getFactory();
-
-		Node n0 = fac.createNode(Id.create("0", Node.class), sc.createCoord(-10, 0));
-		Node n1 = fac.createNode(Id.create("1", Node.class), sc.createCoord(0, 0));
-		Node n2 = fac.createNode(Id.create("2", Node.class), sc.createCoord(10, 0));
-		Node n3 = fac.createNode(Id.create("3", Node.class), sc.createCoord(20, 0));
-		net.addNode(n0);
-		net.addNode(n1);
-		net.addNode(n2);
-		net.addNode(n3);
-
-		Link l0 = fac.createLink(Id.create("0", Link.class), n0, n1);
-		Link l1 = fac.createLink(Id.create("1", Link.class), n1, n0);
-		Link l2 = fac.createLink(Id.create("2", Link.class), n1, n2);
-		Link l3 = fac.createLink(Id.create("3", Link.class), n2, n1);
-		Link l4 = fac.createLink(Id.create("4", Link.class), n2, n3);
-		Link l5 = fac.createLink(Id.create("5", Link.class), n3, n2);
-
-		net.addLink(l0);
-		net.addLink(l1);
-		net.addLink(l2);
-		net.addLink(l3);
-		net.addLink(l4);
-		net.addLink(l5);
-
 		for (Link l : net.getLinks().values()) {
-			l.setLength(10);
 			l.setCapacity(width);
 		}
-		l2.setLength(100);
-		l3.setLength(100);
 
 		EventsManager em = new EventsManagerImpl();
 		Monitor m = new Monitor();
 		em.addHandler(m);
 		CANetworkDynamic caNet = new CANetworkDynamic(net, em);
 
-		List<Link> links = new ArrayList<Link>();
-		links.add(l0);links.add(l2);links.add(l4);
+		List<Link> links = getDSRoute(net);
+		links.get(1).setLength(linkLength);		
 
 		CALink caLink = caNet.getCALink(links.get(0).getId());
 		CAAgent[] particles = caLink.getParticles();
@@ -705,87 +235,106 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 		particles[0] = a;
 		CAEvent e = new CAEvent(0, a,caLink, CAEventType.TTA);
 		caNet.pushEvent(e);
-		caNet.runUntil(3*100);
+		caNet.runUntil(3*linkLength);
 
-		double tt = m.getAgentTravelTimeOnLink(a.getId(), l2.getId());
+		double tt = m.getAgentTravelTimeOnLink(a.getId(), links.get(1).getId());
 		return tt;
 	}
 
 
-	//	@Test
-	//	public void testCANetworkDynamicFreeSpeedLink(){
-	//		Config c = ConfigUtils.createConfig();
-	//		Scenario sc = ScenarioUtils.createScenario(c);
-	//		Network net = sc.getNetwork();
-	//		NetworkFactory fac = net.getFactory();
-	//		
-	//		Node n0 = fac.createNode(Id.create("0"), sc.createCoord(-10, 0));
-	//		Node n1 = fac.createNode(Id.create("1"), sc.createCoord(0, 0));
-	//		Node n2 = fac.createNode(Id.create("2"), sc.createCoord(10, 0));
-	//		Node n3 = fac.createNode(Id.create("3"), sc.createCoord(20, 0));
-	//		net.addNode(n0);
-	//		net.addNode(n1);
-	//		net.addNode(n2);
-	//		net.addNode(n3);
-	//		
-	//		Link l0 = fac.createLink(Id.create("0"), n0, n1);
-	//		Link l1 = fac.createLink(Id.create("1"), n1, n0);
-	//		Link l2 = fac.createLink(Id.create("2"), n1, n2);
-	//		Link l3 = fac.createLink(Id.create("3"), n2, n1);
-	//		Link l4 = fac.createLink(Id.create("4"), n2, n3);
-	//		Link l5 = fac.createLink(Id.create("5"), n3, n2);
-	//
-	//		net.addLink(l0);
-	//		net.addLink(l1);
-	//		net.addLink(l2);
-	//		net.addLink(l3);
-	//		net.addLink(l4);
-	//		net.addLink(l5);
-	//
-	//		for (Link l : net.getLinks().values()) {
-	//			l.setLength(10);
-	//			l.setCapacity(1);
-	//		}
-	//		
-	//		EventsManager em = new EventsManagerImpl();
-	//		Monitor m = new Monitor();
-	//		em.addHandler(m);
-	//		CANetworkDynamic caNet = new CANetworkDynamic(net, em);
-	//		
-	//		List<Link> links = new ArrayList<Link>();
-	//		links.add(l0);links.add(l2);links.add(l4);
-	//		
-	//		CALink caLink = caNet.getCALink(links.get(0).getId());
-	//		CAAgent[] particles = caLink.getParticles();
-	//		CAAgent a = new CASimpleDynamicAgent(links, 1, Id.create("0"), caLink);
-	//		CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a);
-	//		em.processEvent(ee);
-	//		a.materialize(0, 1);
-	//		particles[0] = a;
-	//		CAEvent e = new CAEvent(0, a,caLink, CAEventType.TTA);
-	//		caNet.pushEvent(e);
-	//		
-	////		//VIS only
-	////		c.global().setCoordinateSystem("EPSG:3395");
-	////		Sim2DConfig conf2d = Sim2DConfigUtils.createConfig();
-	////		Sim2DScenario sc2d = Sim2DScenarioUtils.createSim2dScenario(conf2d);
-	////		sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME,sc2d);
-	////		EventBasedVisDebuggerEngine vis = new EventBasedVisDebuggerEngine(sc);
-	////		em.addHandler(vis);
-	////		vis.addAdditionalDrawer(new InfoBox(vis, sc));
-	//		
-	//		//TODO move agent over node
-	//		caNet.runUntil(300);
-	//		
-	//		double tt = m.getAgentTravelTimeOnLink(a.getId(), l2.getId());
-	//		
-	//		//tt should be:
-	//		int numOfCells = (int) (l2.getLength()*l2.getCapacity()*CANetwork.RHO_HAT+0.5);
-	//		double freeSpeedCellTravelTime = 1/(l2.getCapacity()*CANetworkDynamic.RHO_HAT*CANetworkDynamic.V_HAT);
-	//		double travelTime = numOfCells * freeSpeedCellTravelTime;
-	//				
-	//		assertEquals(travelTime, tt, EPSILON);
-	//	}
+	private double freespeedForLinkOfXmWidthRev(double width, double linkLength) {
+		Scenario sc = createScenario();
+		Network net = sc.getNetwork();
+		for (Link l : net.getLinks().values()) {
+			l.setCapacity(width);
+		}
+
+		EventsManager em = new EventsManagerImpl();
+		Monitor m = new Monitor();
+		em.addHandler(m);
+		CANetworkDynamic caNet = new CANetworkDynamic(net, em);
+
+		List<Link> links = getDSRoute(net);
+		links.get(1).setLength(linkLength);		
+		Collections.reverse(links);
+		
+		CALink caLink = caNet.getCALink(links.get(0).getId());
+		CAAgent[] particles = caLink.getParticles();
+		CAAgent a = new CASimpleDynamicAgent(links, 1, Id.create("0", CAAgent.class), caLink);
+		CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a);
+		em.processEvent(ee);
+		a.materialize(particles.length-1, -1);
+		particles[particles.length-1] = a;
+		CAEvent e = new CAEvent(0, a,caLink, CAEventType.TTA);
+		caNet.pushEvent(e);
+		caNet.runUntil(3*linkLength);
+		
+		
+		Link ll = links.get(1);
+		Link llRev = null;
+		for (Link cand : ll.getToNode().getOutLinks().values()) {
+			if (cand.getToNode() == ll.getFromNode()) {
+				llRev = cand;
+				break;
+			}
+		}
+
+		double tt = m.getAgentTravelTimeOnLink(a.getId(),llRev.getId());
+		return tt;
+	}
+
+
+
+	private List<Link> getDSRoute(Network net) {
+		ArrayList<Link> links = new ArrayList<Link>();
+		Link l0 = net.getLinks().get(Id.createLinkId("0"));
+		Link l2 = net.getLinks().get(Id.createLinkId("2"));
+		Link l4 = net.getLinks().get(Id.createLinkId("4"));
+		links.add(l0);links.add(l2);links.add(l4);
+		return links;
+	}
+
+
+
+
+
+	private Scenario createScenario() {
+		Config c = ConfigUtils.createConfig();
+		Scenario sc = ScenarioUtils.createScenario(c);
+		Network net = sc.getNetwork();
+		NetworkFactory fac = net.getFactory();
+
+		Node n0 = fac.createNode(Id.create("0", Node.class), sc.createCoord(-10, 0));
+		Node n1 = fac.createNode(Id.create("1", Node.class), sc.createCoord(0, 0));
+		Node n2 = fac.createNode(Id.create("2", Node.class), sc.createCoord(10, 0));
+		Node n3 = fac.createNode(Id.create("3", Node.class), sc.createCoord(20, 0));
+		net.addNode(n0);
+		net.addNode(n1);
+		net.addNode(n2);
+		net.addNode(n3);
+
+		Link l0 = fac.createLink(Id.create("0", Link.class), n0, n1);
+		Link l1 = fac.createLink(Id.create("1", Link.class), n1, n0);
+		Link l2 = fac.createLink(Id.create("2", Link.class), n1, n2);
+		Link l3 = fac.createLink(Id.create("3", Link.class), n2, n1);
+		Link l4 = fac.createLink(Id.create("4", Link.class), n2, n3);
+		Link l5 = fac.createLink(Id.create("5", Link.class), n3, n2);
+
+		net.addLink(l0);
+		net.addLink(l1);
+		net.addLink(l2);
+		net.addLink(l3);
+		net.addLink(l4);
+		net.addLink(l5);
+		
+		for (Link l : net.getLinks().values()) {
+			l.setLength(10);
+		}
+		l2.setLength(100);
+		l3.setLength(100);
+		
+		return sc;
+	}
 
 
 	private final class Monitor implements LinkEnterEventHandler, LinkLeaveEventHandler {

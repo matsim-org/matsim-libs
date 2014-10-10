@@ -84,7 +84,7 @@ LinkLeaveEventHandler {
 			this.measures.add(newM);
 			
 		} else if (event.getLinkId() == this.us){
-			LinkEnterEvent enter = this.dsQ.poll();
+			LinkEnterEvent enter = this.usQ.poll();
 			Measure oldM = this.measures.getLast();
 			Measure newM = new Measure(event.getTime()+this.timeOffset);
 			newM.dsTT = oldM.dsTT;
@@ -119,23 +119,28 @@ LinkLeaveEventHandler {
 		int from = (int) (this.measures.size()/2-this.measures.size()*.1);
 		int to = (int) (this.measures.size()/2+this.measures.size()*.1);
 		double avg = 0;
+		double avgRev = 0;
 		double range = to-from;
 		for (int i = from; i < to; i++) {
 			Measure m = this.measures.get(i);
 			double dsRho = m.dsCnt/this.area;
 			double usRho = m.usCnt/this.area;
 			avg += dsRho/range;
+			avgRev += usRho/range;
 		}
 		double var = 0;
+		double varRev = 0;
 		for (int i = from; i < to; i++) {
 			Measure m = this.measures.get(i);
 			double dsRho = m.dsCnt/this.area;
 			double usRho = m.usCnt/this.area;
 			var += Math.pow(dsRho-avg,2)/range;
+			varRev += Math.pow(usRho-avgRev,2)/range;
 		}
 		double sigma = Math.sqrt(var);
-		if (sigma > 0.05) {
-			log.warn("no stationarity!");
+		double sigmaRev = Math.sqrt(varRev);
+		if (sigma > 0.05 || sigmaRev > 0.05) {
+			log.warn("no stationarity! simga=" + sigma + " sigmaRev=" + sigmaRev);
 			return this.timeOffset;
 		}
 		
@@ -144,7 +149,7 @@ LinkLeaveEventHandler {
 			if (cnt++ < from || cnt > from+20) {
 				continue;
 			}
-			
+//			
 			double dsRho = m.dsCnt/this.area;
 			double usRho = m.usCnt/this.area;
 

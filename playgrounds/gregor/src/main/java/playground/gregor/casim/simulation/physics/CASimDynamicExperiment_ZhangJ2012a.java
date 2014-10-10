@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -57,21 +58,18 @@ import playground.gregor.sim2d_v4.scenario.Sim2DScenarioUtils;
 public class CASimDynamicExperiment_ZhangJ2012a {
 
 
-	//BFR-DML-360 exp
-	private static final double ESPILON = 0.1;
-	private static final double B_r = 20;
 
 	//	0.50 0.50 0.65 0.65 0.75 0.75 0.85 0.85 1.00 1.00 0.50 0.50 0.75 0.75 0.90 0.90 1.20 1.20 1.60 1.60 2.00 2.00 2.50 2.50
 	private static final List<Setting> settings = new ArrayList<Setting>();
 
 	public static final boolean VIS = false;
-	private static BufferedWriter bw;
+	
 	private static BufferedWriter bw2;
 	private static int it = 0;
 
 	static {
 
-
+		CASimDynamicExperiment_ZhangJ2011.VIS = VIS;
 		//		settings.add(new Setting(1,1,1));
 		//		settings.add(new Setting(2,2,2));
 		//		settings.add(new Setting(10,10,1));
@@ -131,8 +129,7 @@ public class CASimDynamicExperiment_ZhangJ2012a {
 		////	
 
 		try {
-			bw =  new BufferedWriter(new FileWriter(new File("/Users/laemmel/devel/bipedca/plot_dynamicII/2newz")));
-			bw2 =  new BufferedWriter(new FileWriter(new File("/Users/laemmel/devel/bipedca/plot_dynamicII/zhangJ2011")));
+			bw2 =  new BufferedWriter(new FileWriter(new File("/Users/laemmel/devel/bipedca/plot_dynamicII/zhangJ2011_rev")));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -185,7 +182,7 @@ public class CASimDynamicExperiment_ZhangJ2012a {
 				
 				
 				
-				settings.add(new Setting(3.,3.,0.5));
+				settings.add(new Setting(0.61,0.61,0.61));
 				settings.add(new Setting(3.6,3.6,1.6));
 				settings.add(new Setting(1.8,1.8,.7));
 				settings.add(new Setting(3.,3.,1.5));
@@ -249,57 +246,53 @@ public class CASimDynamicExperiment_ZhangJ2012a {
 			((NetworkImpl)net).setCapacityPeriod(1);
 			NetworkFactory fac = net.getFactory();
 
-			Node n0 = fac.createNode(new IdImpl("0"), new CoordImpl(-100,0));
-			Node n1 = fac.createNode(new IdImpl("1"), new CoordImpl(0,0));
-			Node n2 = fac.createNode(new IdImpl("2"), new CoordImpl(4,0));
-			Node n2a = fac.createNode(new IdImpl("2a"), new CoordImpl(4+3,0));
-			Node n2b = fac.createNode(new IdImpl("2b"), new CoordImpl(4+3+2,0));
-			Node n2ex = fac.createNode(new IdImpl("2ex"), new CoordImpl(4,100));
-
-			//		Node n2a = fac.createNode(new IdImpl("2a"), new CoordImpl(4+3,0));
-			//		Node n2b = fac.createNode(new IdImpl("2b"), new CoordImpl(4+3+2,0));
-
-			Node n3 = fac.createNode(new IdImpl("3"), new CoordImpl(12,0));
+		
+			Node n0 = fac.createNode(Id.createNodeId("0"), new CoordImpl(-100,0));
+			Node n1 = fac.createNode(Id.createNodeId("1"), new CoordImpl(0,0));
+			Node n2 = fac.createNode(Id.createNodeId("2"), new CoordImpl(4,0));
+			Node n2a = fac.createNode(Id.createNodeId("2a"), new CoordImpl(4+3,0));
+			Node n2b = fac.createNode(Id.createNodeId("2b"), new CoordImpl(4+3+2,0));
+			Node n2ex1 = fac.createNode(Id.createNodeId("2ex1"), new CoordImpl(4,1));
+			Node n2ex2 = fac.createNode(Id.createNodeId("2ex2"), new CoordImpl(4,2));
+			Node n2ex3 = fac.createNode(Id.createNodeId("2ex3"), new CoordImpl(4,3));
+			Node n2ex4 = fac.createNode(Id.createNodeId("2ex4"), new CoordImpl(4,100));
 			
 			
+			Node n3 = fac.createNode(Id.createNodeId("3"), new CoordImpl(12,0));
+			Node n3ex1 = fac.createNode(Id.createNodeId("3ex1"), new CoordImpl(12,-1));
+			Node n3ex2 = fac.createNode(Id.createNodeId("3ex2"), new CoordImpl(12,-2));
+			Node n3ex3 = fac.createNode(Id.createNodeId("3ex3"), new CoordImpl(12,-3));
+			Node n3ex4 = fac.createNode(Id.createNodeId("3ex4"), new CoordImpl(12,-100));
+			Node n4 = fac.createNode(Id.createNodeId("4"), new CoordImpl(16,0));
+			Node n5 = fac.createNode(Id.createNodeId("5"), new CoordImpl(116,0));
+
+			net.addNode(n2ex4);net.addNode(n2ex3);net.addNode(n2ex2);net.addNode(n2ex1);net.addNode(n2b);net.addNode(n2a);net.addNode(n3ex1);net.addNode(n3ex2);net.addNode(n3ex3);net.addNode(n3ex4);;net.addNode(n5);net.addNode(n4);net.addNode(n3);net.addNode(n2);net.addNode(n1);net.addNode(n0);
+
+			Link l0 = fac.createLink(Id.createLinkId("0"), n0, n1);
+			Link l0rev = fac.createLink(Id.createLinkId("0rev"), n1, n0);
+			Link l1 = fac.createLink(Id.createLinkId("1"), n1, n2);
+			Link l1rev = fac.createLink(Id.createLinkId("1rev"), n2, n1);
+			Link l2 = fac.createLink(Id.createLinkId("2"), n2, n2a);
+			Link l2a = fac.createLink(Id.createLinkId("2a"), n2a, n2b);
+			Link l2b = fac.createLink(Id.createLinkId("2b"), n2b, n3);
+			Link l2rev = fac.createLink(Id.createLinkId("2rev"), n3, n2b);
+			Link l2reva = fac.createLink(Id.createLinkId("2reva"), n2b, n2a);
+			Link l2revb = fac.createLink(Id.createLinkId("2revb"), n2a, n2);
+
+
+			Link l2ex1 = fac.createLink(Id.createLinkId("2ex1"), n2, n2ex1);
+			Link l2ex2 = fac.createLink(Id.createLinkId("2ex2"), n2ex1, n2ex2);
+			Link l2ex3 = fac.createLink(Id.createLinkId("2ex3"), n2ex2, n2ex3);
+			Link l2ex4 = fac.createLink(Id.createLinkId("2ex4"), n2ex3, n2ex4);
 			
-			Node n3ex1 = fac.createNode(new IdImpl("3ex1"), new CoordImpl(12,-1));
-			Node n3ex2 = fac.createNode(new IdImpl("3ex2"), new CoordImpl(12,-2));
-			Node n3ex3 = fac.createNode(new IdImpl("3ex3"), new CoordImpl(12,-3));
-			Node n3ex4 = fac.createNode(new IdImpl("3ex4"), new CoordImpl(12,-100));
-
-			Node n4 = fac.createNode(new IdImpl("4"), new CoordImpl(16,0));
-			Node n5 = fac.createNode(new IdImpl("5"), new CoordImpl(116,0));
-
-			net.addNode(n2b);net.addNode(n2a);net.addNode(n3ex1);net.addNode(n3ex2);net.addNode(n3ex3);net.addNode(n3ex4);net.addNode(n2ex);net.addNode(n5);net.addNode(n4);net.addNode(n3);net.addNode(n2);net.addNode(n1);net.addNode(n0);
-			//		net.addNode(n2a); net.addNode(n2b);
-
-			Link l0 = fac.createLink(new IdImpl("0"), n0, n1);
-			Link l0rev = fac.createLink(new IdImpl("0rev"), n1, n0);
-			Link l1 = fac.createLink(new IdImpl("1"), n1, n2);
-			Link l1rev = fac.createLink(new IdImpl("1rev"), n2, n1);
-			Link l2 = fac.createLink(new IdImpl("2"), n2, n2a);
-			Link l2a = fac.createLink(new IdImpl("2a"), n2a, n2b);
-			Link l2b = fac.createLink(new IdImpl("2b"), n2b, n3);
-			Link l2rev = fac.createLink(new IdImpl("2rev"), n3, n2b);
-			Link l2reva = fac.createLink(new IdImpl("2reva"), n2b, n2a);
-			Link l2revb = fac.createLink(new IdImpl("2revb"), n2a, n2);
-
-			//		Link l2a = fac.createLink(new IdImpl("2a"), n2a, n2b);
-			//		Link l2arev = fac.createLink(new IdImpl("2arev"), n2b, n2a);
-			//
-			//		Link l2b = fac.createLink(new IdImpl("2b"), n2b, n3);
-			//		Link l2brev = fac.createLink(new IdImpl("2brev"), n3, n2b);
-
-			Link l2ex = fac.createLink(new IdImpl("2ex"), n2, n2ex);
-			Link l3 = fac.createLink(new IdImpl("3"), n3, n4);
-			Link l3ex1 = fac.createLink(new IdImpl("3ex1"), n3, n3ex1);
-			Link l3ex2 = fac.createLink(new IdImpl("3ex2"), n3ex1, n3ex2);
-			Link l3ex3 = fac.createLink(new IdImpl("3ex3"), n3ex2, n3ex3);
-			Link l3ex4 = fac.createLink(new IdImpl("3ex4"), n3ex3, n3ex4);
-			Link l3rev = fac.createLink(new IdImpl("3rev"), n4, n3);
-			Link l4 = fac.createLink(new IdImpl("4"), n4, n5);
-			Link l4rev = fac.createLink(new IdImpl("4rev"), n5, n4);
+			Link l3 = fac.createLink(Id.createLinkId("3"), n3, n4);
+			Link l3ex1 = fac.createLink(Id.createLinkId("3ex1"), n3, n3ex1);
+			Link l3ex2 = fac.createLink(Id.createLinkId("3ex2"), n3ex1, n3ex2);
+			Link l3ex3 = fac.createLink(Id.createLinkId("3ex3"), n3ex2, n3ex3);
+			Link l3ex4 = fac.createLink(Id.createLinkId("3ex4"), n3ex3, n3ex4);
+			Link l3rev = fac.createLink(Id.createLinkId("3rev"), n4, n3);
+			Link l4 = fac.createLink(Id.createLinkId("4"), n4, n5);
+			Link l4rev = fac.createLink(Id.createLinkId("4rev"), n5, n4);
 
 
 
@@ -307,12 +300,13 @@ public class CASimDynamicExperiment_ZhangJ2012a {
 
 			l0.setLength(100);
 			l1.setLength(4);
-			l2ex.setLength(100);
+			l2ex1.setLength(1);
+			l2ex2.setLength(1);
+			l2ex3.setLength(1);
+			l2ex4.setLength(100);
 			l2.setLength(3);
 			l2a.setLength(2);
 			l2b.setLength(3);
-			//		l2a.setLength(2);
-			//		l2b.setLength(3);
 			l3ex1.setLength(1);
 			l3ex2.setLength(1);
 			l3ex3.setLength(1);
@@ -325,23 +319,31 @@ public class CASimDynamicExperiment_ZhangJ2012a {
 			l2rev.setLength(3);
 			l2reva.setLength(2);
 			l2revb.setLength(3);
-			//		l2arev.setLength(2);
-			//		l2brev.setLength(3);
 			l3rev.setLength(4);
 			l4rev.setLength(100);
 
-			//		net.addLink(l3ex);net.addLink(l2ex);net.addLink(l4);net.addLink(l3);net.addLink(l2);net.addLink(l1);net.addLink(l0);
-			//		net.addLink(l4rev);net.addLink(l3rev);net.addLink(l2rev);net.addLink(l1rev);net.addLink(l0rev);
-			//		net.addLink(l2a);net.addLink(l2arev);net.addLink(l2b);net.addLink(l2brev);
 
-			net.addLink(l2a);net.addLink(l2b);net.addLink(l3ex3);net.addLink(l3ex4);net.addLink(l3ex1);net.addLink(l3ex2);net.addLink(l2);net.addLink(l1);net.addLink(l0);
-			////		net.addLink(l4rev);net.addLink(l3rev);net.addLink(l2rev);net.addLink(l1rev);net.addLink(l0rev);
-			//		net.addLink(l2a);net.addLink(l2b);
-
-			//		CALinkMonitorII monitor = new CALinkMonitorII(l2.getId(), l2rev.getId(),l2);
-
-			//		BufferedWriter buf = new BufferedWriter(new FileWriter(new File("/Users/laemmel/devel/bipedca/plot_dynamic/ZhangJ2011")));
-
+			net.addLink(l2a);
+			net.addLink(l2b);
+			net.addLink(l3ex3);
+			net.addLink(l3ex4);
+			net.addLink(l3ex1);
+			net.addLink(l3ex2);
+			net.addLink(l3);
+			net.addLink(l2);
+			net.addLink(l1);
+			net.addLink(l0);
+			net.addLink(l4);
+			
+			net.addLink(l4rev);
+			net.addLink(l3rev);
+			net.addLink(l2rev);
+			net.addLink(l2reva);
+			net.addLink(l2revb);
+			net.addLink(l2ex1);
+			net.addLink(l2ex2);
+			net.addLink(l2ex3);
+			net.addLink(l2ex4);
 
 
 
@@ -362,68 +364,75 @@ public class CASimDynamicExperiment_ZhangJ2012a {
 			double cellLength2 = ratio2/(CANetworkDynamic.RHO_HAT*CANetworkDynamic.PED_WIDTH);
 			double length2 = size/2*cellLength2;
 			l3ex4.setLength(length2*8);
+			l2ex4.setLength(length2*8);
 
 			l0.setLength(length);;
 			l0rev.setLength(length);
 			((CoordImpl)((NodeImpl)n0).getCoord()).setX(0-length);
+			((CoordImpl)((NodeImpl)n5).getCoord()).setX(16+length);
 			l0.setCapacity(bL);
-			l1.setCapacity(bL);
+			l4.setLength(length);
+			l4rev.setLength(length);
+			l4.setCapacity(bL);
+			l4rev.setCapacity(bL);
 			l2.setCapacity(bCor);
 			l2a.setCapacity(bCor);
 			l2b.setCapacity(bCor);
+			l1.setCapacity(bCor);
 			//			l2a.setCapacity(bCor);
 			//			l2arev.setCapacity(bCor);
 			//			l2b.setCapacity(bCor);
 			//			l2brev.setCapacity(bCor);
 			l3.setCapacity(bCor);
-			l4.setCapacity(B_r);
 			l0rev.setCapacity(bL);
 			l1rev.setCapacity(bCor);
 			l2rev.setCapacity(bCor);
 			l2reva.setCapacity(bCor);
 			l2revb.setCapacity(bCor);
 			l3rev.setCapacity(bCor);
-			l4rev.setCapacity(B_r);
 			//			l2ex.setCapacity(B_exit);
 			//			l3ex.setCapacity(B_exit);
-			l2ex.setCapacity(bEx);
+			l2ex1.setCapacity(bEx);
+			l2ex2.setCapacity(bEx);
+			l2ex3.setCapacity(bEx);
+			l2ex4.setCapacity(bEx);
 			l3ex1.setCapacity(bEx);
 			l3ex2.setCapacity(bEx);
 			l3ex3.setCapacity(bEx);
 			l3ex4.setCapacity(bEx);
 
-			List<Link> linksLR = new ArrayList<Link>();
-			linksLR.add(l0);
-			linksLR.add(l1);
-			linksLR.add(l2);
-			linksLR.add(l2a);
-			linksLR.add(l2b);
-			linksLR.add(l3ex1);
-			linksLR.add(l3ex2);
-			linksLR.add(l3ex3);
-			linksLR.add(l3ex4);
-
+//			List<Link> linksLR = new ArrayList<Link>();
+//			linksLR.add(l0);
+//			linksLR.add(l1);
+//			linksLR.add(l2);
+//			linksLR.add(l2a);
+//			linksLR.add(l2b);
+//			linksLR.add(l3ex1);
+//			linksLR.add(l3ex2);
+//			linksLR.add(l3ex3);
+//			linksLR.add(l3ex4);
+			
+			List<Link> linksRL = new ArrayList<Link>();
+			linksRL.add(l4);
+			linksRL.add(l3);
+			linksRL.add(l2b);
+			linksRL.add(l2a);
+			linksRL.add(l2);
+			linksRL.add(l2ex1);
+			linksRL.add(l2ex2);
+			linksRL.add(l2ex3);
+			linksRL.add(l2ex4);
+			
 			System.out.println(" " + bL + " " + bCor + " " + bEx +"\n");
 			
 			CALinkMonitorII mon = new CALinkMonitorII(l2a.getId(), l2reva.getId(), l2a.getLength(), l2a.getCapacity(),timeOffset);
 			
 			
-			runIt(net,linksLR,sc,s,mon);
+			runIt(net,linksRL,sc,s,mon);
 
-			//			monitor.save();
-			//			monitor.reset(0);
-			//					System.out.println(monitor);
-			//			String app = monitor.toString();
-			//			System.out.println(app);
-			//			buf.append(app);
-			//			buf.append(" " + bL + " " + bCor + " " + bEx +"\n");
 			timeOffset = mon.report(bw2);
 			bw2.flush();
-			bw.flush();
 		}
-		//		monitor.writeAMS(buf);
-		//		buf.close();
-		bw.close();
 		bw2.close();
 	}
 
@@ -452,7 +461,7 @@ public class CASimDynamicExperiment_ZhangJ2012a {
 			CALink caLink = caNet.getCALink(linksLR.get(0).getId());
 			CAAgent[] particles = caLink.getParticles();
 			System.out.println("part left:" + particles.length);
-			for (int i = 0; i < particles.length-1; i++) {
+			for (int i = particles.length-1; i > 0; i--) {
 //				if (i > 0) {
 //					i+=3;
 //				} 
@@ -461,7 +470,7 @@ public class CASimDynamicExperiment_ZhangJ2012a {
 				}
 				//				agents++;
 				CAAgent a = new CASimpleDynamicAgent(linksLR, 1, new IdImpl(agents++), caLink);
-				a.materialize(i, 1);
+				a.materialize(i, -1);
 				particles[i] = a;
 				CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a);
 				em.processEvent(ee);

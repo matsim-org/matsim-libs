@@ -64,7 +64,7 @@ public class CASimDynamicExperiment_ZhangJ2011 {
 	//	0.50 0.50 0.65 0.65 0.75 0.75 0.85 0.85 1.00 1.00 0.50 0.50 0.75 0.75 0.90 0.90 1.20 1.20 1.60 1.60 2.00 2.00 2.50 2.50
 	private static final List<Setting> settings = new ArrayList<Setting>();
 
-	public static final boolean VIS = false;
+	public static boolean VIS = false;
 	private static BufferedWriter bw;
 	private static BufferedWriter bw2;
 	private static int it = 0;

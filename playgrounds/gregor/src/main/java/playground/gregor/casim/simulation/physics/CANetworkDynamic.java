@@ -121,10 +121,13 @@ public class CANetworkDynamic {
 	}
 
 	public void runUntil(double time) {
-
+		this.globalTime = this.events.peek().getEventExcexutionTime();
 		while (this.events.size() > 0 && this.events.peek().getEventExcexutionTime() < time) {
-			CAEvent e = this.events.poll();
-//			System.out.println(e.getCAAgent() + " " + e);
+		CAEvent e = this.events.poll();
+			
+		
+			
+			
 			if (e.isObsolete()){
 				if (EXP_WARN_CNT++ < 10 ) {
 					log.info("dropping obsolete event: " + e);
@@ -134,10 +137,18 @@ public class CANetworkDynamic {
 				}
 				continue;
 			}
+			
+
+			if (e.isObsolete()){
+				log.info("dropping obsolete event: " + e);
+				continue;
+			}
 
 			e.getCANetworkEntity().handleEvent(e);
+			
 
-			if (e.getEventExcexutionTime() > this.globalTime) {
+			if (CASimDynamicExperiment_ZhangJ2011.VIS && e.getEventExcexutionTime() > this.globalTime+0.04) {
+
 				draw2();
 				this.globalTime = e.getEventExcexutionTime();
 			}

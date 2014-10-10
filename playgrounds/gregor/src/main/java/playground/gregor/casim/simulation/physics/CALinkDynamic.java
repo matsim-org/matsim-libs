@@ -288,22 +288,17 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 			CASimpleDynamicAgent a, double time, int idx) {
 
 		
-		throw new RuntimeException("not implemented!");
-		
-//		double timeGap = time-this.usLastLeftTimes[idx];
-//		a.updateMyDynamicQuantitiesOnAdvance(timeGap,time,this.cellLength,this.width);
-//
-//		this.usLastLeftTimes[idx] = time;
-//		this.particles[idx] = null;
-//		this.particles[idx-1] = a;
-//		a.proceed();
-//
-//		//check post-condition and generate events
-//		//first for persons behind
-//		checkPostConditionForPersonBehindOnUpStreamAdvance(idx,a,time);
-//
-//		//second for oneself
-//		checkPostConditionForAgentOnUpStreamAdvance(idx,a, time);
+		this.usLastLeftTimes[idx] = time;
+		this.particles[idx] = null;
+		this.particles[idx-1] = a;
+		a.proceed();
+
+		//check post-condition and generate events
+		//first for persons behind
+		checkPostConditionForPersonBehindOnUpStreamAdvance(idx,a,time);
+
+		//second for oneself
+		checkPostConditionForAgentOnUpStreamAdvance(idx,a, time);
 
 	}
 
@@ -517,24 +512,18 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 	private void handleTTAUpStreamNodeOnPreCondition1(CASimpleDynamicAgent a,
 			double time) {
 		
+		this.usLastLeftTimes[0] = time;
+		this.particles[0] = null;
+		this.us.putAgent(a);
+
+		fireUpstreamLeft(a, time);
 		
-		throw new RuntimeException("not implemented!");
-		
-//		double timeGap = time-this.usLastLeftTimes[0];
-//		a.updateMyDynamicQuantitiesOnAdvance(timeGap,time,this.cellLength,this.width);
-//
-//		this.usLastLeftTimes[0] = time;
-//		this.particles[0] = null;
-//		this.us.putAgent(a);
-//
-//		fireUpstreamLeft(a, time);
-//		
-//		//check post-condition and generate events
-//		//first for persons behind
-//		checkPostConditionForPersonBehindOnUpStreamAdvance(0,a,time);
-//
-//		//second for oneself
-//		checkPostConditionForOneSelfOnNodeAdvance(this.us,a, time);
+		//check post-condition and generate events
+		//first for persons behind
+		checkPostConditionForPersonBehindOnUpStreamAdvance(0,a,time);
+
+		//second for oneself
+		checkPostConditionForOneSelfOnNodeAdvance(this.us,a, time);
 
 	}
 

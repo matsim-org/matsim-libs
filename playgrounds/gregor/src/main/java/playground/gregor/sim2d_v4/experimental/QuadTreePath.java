@@ -20,11 +20,16 @@
 
 package playground.gregor.sim2d_v4.experimental;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.gbl.MatsimRandom;
 
 import playground.gregor.sim2d_v4.cgal.LineSegment;
 import playground.gregor.sim2d_v4.cgal.LinearQuadTreeLD;
@@ -41,16 +46,31 @@ public class QuadTreePath implements XYVxVyEventsHandler{
 
 
 	private final EventsManager em;
-	private final Envelope e = new Envelope(-6,5,-3,5);
+	private final Envelope e = new Envelope(-6,5,-6,5);
 
 
 	private double time = -1;
 	private final List<XYVxVyEventImpl> events = new ArrayList<XYVxVyEventImpl>();
 
 	private final Dijkstra d = new Dijkstra(new Envelope(-6,5,-3,5));
+	private final BufferedWriter bf;
 
-	public QuadTreePath(EventsManager em) {
+	public QuadTreePath(EventsManager em, String outFile) {
 		this.em = em;
+		try {
+			this.bf = new BufferedWriter(new FileWriter(new File (outFile)));
+			this.bf.append("#time id x y qx qy\n");
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	public void finish() {
+		try {
+			this.bf.close();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
@@ -88,20 +108,42 @@ public class QuadTreePath implements XYVxVyEventsHandler{
 			objs.add(s);
 			objs.add(t);
 			LinearQuadTreeLD q = new LinearQuadTreeLD(objs,this.e,this.em);
-			List<Quad> from = q.query(new Envelope(-5.1,-4.9,-1.9,-2.1));
 			List<Quad> to = q.query(new Envelope(-0.9,-1.1,3.9,4.1));
-			if (target != null) {
-				from = q.query(new Envelope(target.getX()-.1,target.getX()+.1,target.getY()-.1,target.getY()+.1));
-			}
-			if (to == null) {
-				from = q.query(new Envelope(19.49,19.51,9.99,10.1));
-			}
-			if (from.size() == 0 || to.size() == 0) {
 
-			} else {
-				LinkedList<Quad> path = this.d.computeShortestPath(q, from.get(0), to.get(0));
-				draw(path);
+
+			for (XYVxVyEventImpl ee : this.events) {
+				String frame = ee.getTime() + " " + ee.getPersonId() + " " + ee.getX() + " " + ee.getY() + " ";
+				
+				try {
+					this.bf.append(frame);
+					this.bf.append(ee.getX() + " " + ee.getY() + "\n");
+				} catch (IOException e1) {
+					throw new RuntimeException(e1);
+				}
+				List<Quad> from = q.query(new Envelope(ee.getX()-.1,ee.getX()+.1,ee.getY()-.1,ee.getY()+.1));
+				Quad f = null;
+				for (Quad qq : from){
+					if (qq.getEnvelope().contains(ee.getX(), ee.getY()) && qq.getColor() == LinearQuadTreeLD.BLACK) {
+//						if (qq.getColor() != LinearQuadTreeLD.BLACK) {
+//							throw new RuntimeException("error!!");
+//						}
+						f = qq;
+					}
+				}
+				LinkedList<Quad> path = this.d.computeShortestPath(q,f, to.get(0));
+				for (Quad pq : path) {
+					try {
+						this.bf.append(frame);
+						double x = pq.getEnvelope().getMaxX() - pq.getEnvelope().getWidth()/2;
+						double y = pq.getEnvelope().getMaxY() - pq.getEnvelope().getHeight()/2;
+						this.bf.append(x + " " + y + "\n");
+					} catch (IOException e1) {
+						throw new RuntimeException(e1);
+					}	
+				}
+				draw(ee,path);
 			}
+
 			this.time = event.getTime();
 			this.events.clear();
 		}
@@ -109,27 +151,34 @@ public class QuadTreePath implements XYVxVyEventsHandler{
 
 
 	}
-	private void draw(LinkedList<Quad> path) {
+	private void draw(XYVxVyEventImpl ee, LinkedList<Quad> path) {
 		if (path.size() == 0) {
 			return;
 		}
-//		for (Quad q : path) {
-//			draw(q);
-//		}
+		//		for (Quad q : path) {
+		//			draw(q);
+		//		}
 
 		Quad start = path.get(0);
 		double x = start.getEnvelope().getMinX()+start.getEnvelope().getWidth()/2;
 		double y = start.getEnvelope().getMinY()+start.getEnvelope().getHeight()/2;
-
+		
+		LineSegment first = new LineSegment();
+		first.x0 = ee.getX();
+		first.y0 = ee.getY();
+		first.x1 = x;
+		first.y1 = y;
+		
+		this.em.processEvent(new LineEvent(0, first, false, 192, 0,0, 255, 0));
 		for (int i = 1; i < path.size(); i++) {
 			Quad next = path.get(i);
 			LineSegment ls = new LineSegment();
-			ls.x0 = x;
-			ls.y0 = y;
+			ls.x0 = x+MatsimRandom.getRandom().nextDouble()*0.1-0.05;
+			ls.y0 = y+MatsimRandom.getRandom().nextDouble()*0.1-0.05;;
 			x = next.getEnvelope().getMinX()+next.getEnvelope().getWidth()/2;
 			y = next.getEnvelope().getMinY()+next.getEnvelope().getHeight()/2;
-			ls.x1 = x;
-			ls.y1 = y;
+			ls.x1 = x+MatsimRandom.getRandom().nextDouble()*0.1-0.05;;
+			ls.y1 = y+MatsimRandom.getRandom().nextDouble()*0.1-0.05;;
 			this.em.processEvent(new LineEvent(0, ls, false, 192, 0,0, 255, 0));
 		}
 
