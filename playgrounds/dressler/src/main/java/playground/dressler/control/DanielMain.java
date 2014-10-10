@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkChangeEvent;
@@ -266,7 +265,7 @@ public class DanielMain {
 			network = (NetworkImpl) scenario.getNetwork();
 			MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
 			networkReader.readFile(networkfile);
-			sink = network.getNodes().get(new IdImpl(sinkid));
+			sink = network.getNodes().get(Id.create(sinkid, Node.class));
 			if (sink == null){
 				System.out.println("sink not found");
 			}
@@ -323,7 +322,7 @@ public class DanielMain {
 			// Hack for those networks with en1->en2
 			// set demand of en2 to 0, because it cannot be satisfied if en1 is the sink
 			if (sinkid != null && sinkid.equals("en1")) {
-				Node sink2 = network.getNodes().get(new IdImpl("en2"));
+				Node sink2 = network.getNodes().get(Id.create("en2", Node.class));
 				if (sink2 != null) {
 					Integer d = demands.get(sink2);
 					if (d != null && d > 0) {
@@ -452,7 +451,7 @@ public class DanielMain {
 				PopulationCreator popcreator = new PopulationCreator(settings);
 
 				// fix the final link
-				popcreator.autoFixSink(new IdImpl("en2"));			
+				popcreator.autoFixSink(Id.create("en2", Node.class));			
 
 				Population output = popcreator.createPopulation(fluss.getPaths(), scenario);
 				new PopulationWriter(output, network).write(outplansfile);
