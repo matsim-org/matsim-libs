@@ -7,7 +7,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -18,8 +17,10 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleImpl;
+import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
@@ -33,23 +34,23 @@ public class CreateTestTransit {
 		
 		TransitScheduleFactoryImpl factory = new TransitScheduleFactoryImpl();
 		
-		TransitStopFacility stop1 = factory.createTransitStopFacility(new IdImpl("stop_1"), new CoordImpl(150,150), false);
-		stop1.setLinkId(new IdImpl(1));
-		TransitStopFacility stop3 = factory.createTransitStopFacility(new IdImpl("stop_3"), new CoordImpl(300,150), false);
-		stop3.setLinkId(new IdImpl(3));
-		TransitStopFacility stop5 = factory.createTransitStopFacility(new IdImpl("stop_5"), new CoordImpl(450,150), false);
-		stop5.setLinkId(new IdImpl(5));
-		TransitStopFacility stop7 = factory.createTransitStopFacility(new IdImpl("stop_7"), new CoordImpl(300,150), false);
-		stop7.setLinkId(new IdImpl(7));
+		TransitStopFacility stop1 = factory.createTransitStopFacility(Id.create("stop_1", TransitStopFacility.class), new CoordImpl(150,150), false);
+		stop1.setLinkId(Id.create(1, Link.class));
+		TransitStopFacility stop3 = factory.createTransitStopFacility(Id.create("stop_3", TransitStopFacility.class), new CoordImpl(300,150), false);
+		stop3.setLinkId(Id.create(3, Link.class));
+		TransitStopFacility stop5 = factory.createTransitStopFacility(Id.create("stop_5", TransitStopFacility.class), new CoordImpl(450,150), false);
+		stop5.setLinkId(Id.create(5, Link.class));
+		TransitStopFacility stop7 = factory.createTransitStopFacility(Id.create("stop_7", TransitStopFacility.class), new CoordImpl(300,150), false);
+		stop7.setLinkId(Id.create(7, Link.class));
 		
-		TransitStopFacility stop2 = factory.createTransitStopFacility(new IdImpl("stop_2"), new CoordImpl(0,150), false);
-		stop2.setLinkId(new IdImpl(2));
-		TransitStopFacility stop4 = factory.createTransitStopFacility(new IdImpl("stop_4"), new CoordImpl(150,150), false);
-		stop4.setLinkId(new IdImpl(4));
-		TransitStopFacility stop6 = factory.createTransitStopFacility(new IdImpl("stop_6"), new CoordImpl(300,150), false);
-		stop6.setLinkId(new IdImpl(6));
-		TransitStopFacility stop8 = factory.createTransitStopFacility(new IdImpl("stop_8"), new CoordImpl(450,150), false);
-		stop8.setLinkId(new IdImpl(8));
+		TransitStopFacility stop2 = factory.createTransitStopFacility(Id.create("stop_2", TransitStopFacility.class), new CoordImpl(0,150), false);
+		stop2.setLinkId(Id.create(2, Link.class));
+		TransitStopFacility stop4 = factory.createTransitStopFacility(Id.create("stop_4", TransitStopFacility.class), new CoordImpl(150,150), false);
+		stop4.setLinkId(Id.create(4, Link.class));
+		TransitStopFacility stop6 = factory.createTransitStopFacility(Id.create("stop_6", TransitStopFacility.class), new CoordImpl(300,150), false);
+		stop6.setLinkId(Id.create(6, Link.class));
+		TransitStopFacility stop8 = factory.createTransitStopFacility(Id.create("stop_8", TransitStopFacility.class), new CoordImpl(450,150), false);
+		stop8.setLinkId(Id.create(8, Link.class));
 		
 		TransitSchedule schedule = factory.createTransitSchedule();
 		
@@ -62,22 +63,22 @@ public class CreateTestTransit {
 		schedule.addStopFacility(stop7);
 		schedule.addStopFacility(stop8);
 		
-		TransitLine transitLine = factory.createTransitLine(new IdImpl(1));
+		TransitLine transitLine = factory.createTransitLine(Id.create(1, TransitLine.class));
 		
 		//hinrichtung
 		List<Id<Link>> routeLinkIds = new ArrayList<Id<Link>>();
-		routeLinkIds.add(new IdImpl(1));
-		routeLinkIds.add(new IdImpl(3));
-		routeLinkIds.add(new IdImpl(5));
-		routeLinkIds.add(new IdImpl(7));
+		routeLinkIds.add(Id.create(1, Link.class));
+		routeLinkIds.add(Id.create(3, Link.class));
+		routeLinkIds.add(Id.create(5, Link.class));
+		routeLinkIds.add(Id.create(7, Link.class));
 		NetworkRoute route1 = RouteUtils.createNetworkRoute(routeLinkIds, network);
 		
 		//rückrichtung
 //		routeLinkIds = new ArrayList<Id>();
-//		routeLinkIds.add(new IdImpl(8));
-//		routeLinkIds.add(new IdImpl(6));
-//		routeLinkIds.add(new IdImpl(4));
-//		routeLinkIds.add(new IdImpl(2));
+//		routeLinkIds.add(Id.create(8));
+//		routeLinkIds.add(Id.create(6));
+//		routeLinkIds.add(Id.create(4));
+//		routeLinkIds.add(Id.create(2));
 //		NetworkRoute route2 = RouteUtils.createNetworkRoute(routeLinkIds, network);
 		
 		//hinrichtung
@@ -116,14 +117,14 @@ public class CreateTestTransit {
 			
 			int departureCounter = 0;
 			
-			TransitRoute transitRoute = factory.createTransitRoute(new IdImpl("route_h_"+i), route1, transitRouteStops1, TransportMode.pt);
+			TransitRoute transitRoute = factory.createTransitRoute(Id.create("route_h_"+i, TransitRoute.class), route1, transitRouteStops1, TransportMode.pt);
 			
-			Departure dep1 = factory.createDeparture(new IdImpl(departureCounter), i*3600);
-			dep1.setVehicleId(new IdImpl(vehicle + vehicleCounter));
-//			Departure dep2 = factory.createDeparture(new IdImpl("dep_6"), 6*3600);
-//			dep1.setVehicleId(new IdImpl(vehicle + vehicleCounter+1));
-//			Departure dep3 = factory.createDeparture(new IdImpl("dep_6,5"), 6*3600+30*60);
-//			dep1.setVehicleId(new IdImpl(vehicle + vehicleCounter+2));
+			Departure dep1 = factory.createDeparture(Id.create(departureCounter, Departure.class), i*3600);
+			dep1.setVehicleId(Id.create(vehicle + vehicleCounter, Vehicle.class));
+//			Departure dep2 = factory.createDeparture(Id.create("dep_6"), 6*3600);
+//			dep1.setVehicleId(Id.create(vehicle + vehicleCounter+1));
+//			Departure dep3 = factory.createDeparture(Id.create("dep_6,5"), 6*3600+30*60);
+//			dep1.setVehicleId(Id.create(vehicle + vehicleCounter+2));
 			
 			transitRoute.addDeparture(dep1);
 //			transitRoute.addDeparture(dep2);
@@ -140,14 +141,14 @@ public class CreateTestTransit {
 		//rückrichtung
 //		for(int i = 0; i < nRoutes; i++){
 //					
-//			TransitRoute transitRoute = factory.createTransitRoute(new IdImpl("route_r_"+i), route2, transitRouteStops2, TransportMode.pt);
+//			TransitRoute transitRoute = factory.createTransitRoute(Id.create("route_r_"+i), route2, transitRouteStops2, TransportMode.pt);
 //					
-//			Departure dep1 = factory.createDeparture(new IdImpl("dep_17,5"), 17*3600+30*60);
-//			dep1.setVehicleId(new IdImpl(vehicle + vehicleCounter));
-//			Departure dep2 = factory.createDeparture(new IdImpl("dep_18"), 18*3600);
-//			dep1.setVehicleId(new IdImpl(vehicle + vehicleCounter+1));
-//			Departure dep3 = factory.createDeparture(new IdImpl("dep_18,5"), 18*3600+30*60);
-//			dep1.setVehicleId(new IdImpl(vehicle + vehicleCounter+2));
+//			Departure dep1 = factory.createDeparture(Id.create("dep_17,5"), 17*3600+30*60);
+//			dep1.setVehicleId(Id.create(vehicle + vehicleCounter));
+//			Departure dep2 = factory.createDeparture(Id.create("dep_18"), 18*3600);
+//			dep1.setVehicleId(Id.create(vehicle + vehicleCounter+1));
+//			Departure dep3 = factory.createDeparture(Id.create("dep_18,5"), 18*3600+30*60);
+//			dep1.setVehicleId(Id.create(vehicle + vehicleCounter+2));
 //					
 //			transitRoute.addDeparture(dep1);
 //			transitRoute.addDeparture(dep2);
@@ -167,7 +168,7 @@ public class CreateTestTransit {
 		
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 		
-		VehicleTypeImpl typeBus = new VehicleTypeImpl(new IdImpl("bus"));
+		VehicleType typeBus = new VehicleTypeImpl(Id.create("bus", VehicleType.class));
 		typeBus.setLength(12.);
 		typeBus.setWidth(2.5);
 		typeBus.setMaximumVelocity(80/3.6);
@@ -183,7 +184,7 @@ public class CreateTestTransit {
 		vehicles.addVehicleType( typeBus);
 		
 		for(int i = 0; i < vehicleCounter; i++){
-			VehicleImpl bus = new VehicleImpl(new IdImpl(vehicle + i),typeBus);
+			Vehicle bus = new VehicleImpl(Id.create(vehicle + i, Vehicle.class),typeBus);
 			vehicles.addVehicle( bus);
 		}
 		
