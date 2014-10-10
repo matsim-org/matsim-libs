@@ -164,7 +164,7 @@ public class CANetworkDynamic {
 			CAEvent e = this.events.poll();
 			
 		
-			
+//			log.info("==> " + e);
 			
 			if (e.isObsolete()){
 				if (EXP_WARN_CNT++ < 10 ) {
@@ -176,29 +176,6 @@ public class CANetworkDynamic {
 				continue;
 			}
 			
-//			if (e.getCAAgent().getId().toString().equals("-3895") || e.getCAAgent().getId().toString().equals("1923")) {
-//				System.out.println("got you!!!");
-//			}
-//			
-//			if (e.toString().equals("time:25.721895573043653 a:a:1917 TTA")) {
-//				System.out.println("got you!!!");
-//			}	
-			//			System.out.println(e);
-			//			if (Double.isNaN(e.getEventExcexutionTime())){
-			//				System.out.println("got you!!!");
-			//			}
-			//			if ((e.getCAAgent().getId().toString().equals("-1") || e.getCAAgent().getId().toString().equals("492"))&& this.globalTime >= 22.){
-			//				System.out.println("--> " + e);
-			//				checkBlockingOnLink();
-			//			}
-			//			checkConsitency();
-			//			
-			//			System.out.println("DEBUG");
-			//			if (e.getEventExcexutionTime() >= 309.38471064716487 && e.getCAAgent().getId().toString().equals("46")) {
-			//				System.out.println("DEBUG");
-			//				
-			//			}
-			//			256.356023511673
 
 			if (e.isObsolete()){
 				log.info("dropping obsolete event: " + e);
@@ -206,27 +183,7 @@ public class CANetworkDynamic {
 			}
 
 
-			//			System.out.println(e.getEventExcexutionTime());
-			//			if (e.getEventExcexutionTime() <= ((CASimpleDynamicAgent)e.getCAAgent()).getLastEnterTime() ) {
-			//				log.info("dropping inconsisten event");
-			//				continue;
-			//			}
-//			CALink l = this.getCALink(new IdImpl("2"));
-//			boolean aThereBefore = false;
-//			if (l.getParticles()[162] != null && l.getParticles()[162].getId().toString().equals("-3895")) {
-//				aThereBefore = true;
-//			}
 			e.getCANetworkEntity().handleEvent(e);
-			
-//			//DEBUG
-//			if (aThereBefore && l.getParticles()[162] == null) {
-//				System.out.println("got you!!!");
-//			}
-			
-			
-			//			checkConsitency();
-
-			//			System.out.println(e);
 
 			if (CASimDynamicExperiment_ZhangJ2011.VIS && e.getEventExcexutionTime() > this.globalTime+0.04) {
 
@@ -319,6 +276,7 @@ public class CANetworkDynamic {
 	}
 
 	public void pushEvent(CAEvent event) {
+//		log.info("<== " + event );
 		event.getCAAgent().setCurrentEvent(event);
 		this.events.add(event);
 	}

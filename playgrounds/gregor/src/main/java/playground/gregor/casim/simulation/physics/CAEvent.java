@@ -20,6 +20,7 @@
 
 package playground.gregor.casim.simulation.physics;
 
+
 public class CAEvent implements Comparable<CAEvent>{
 
 	public enum CAEventType {SWAP,TTA,TTE};

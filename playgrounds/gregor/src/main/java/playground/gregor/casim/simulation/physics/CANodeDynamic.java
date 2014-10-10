@@ -422,32 +422,21 @@ public class CANodeDynamic implements CANode{
 	private void handleSwapWithUpStreamEnd(CASimpleDynamicAgent a, double time,
 			CALinkDynamic nextLink) {
 		
-		throw new RuntimeException("not implemented!!");
-		
-//		CAAgent swapA = nextLink.getParticles()[0];
-//		this.pollAgent(0);
-//		this.putAgent(swapA);
-//		nextLink.getParticles()[0] = a;
-//		a.materialize(0, 1);
-//		nextLink.fireUpstreamLeft(swapA, time);
-//		nextLink.fireUpstreamEntered(a, time);
-//		a.moveOverNode(nextLink,time);
-//
-//		double theirRho = ((CASimpleDynamicAgent)swapA).getMyDirectionRho();
-//		double myRho = a.getMyDirectionRho();
-//		
-//		// update dynamic properties
-//		double theirV = ((CASimpleDynamicAgent)swapA).getV();
-//		a.updateMyDynamicQuantitiesOnSwap(theirV,time,this.width,theirRho);
-//		double timeGap = time - nextLink.getUsLastLeftTimes()[0];
-//		((CASimpleDynamicAgent)swapA).updateMyDynamicQuantitiesOnAdvance(timeGap, time, nextLink.getCellLength(), nextLink.getWidth());
-//		((CASimpleDynamicAgent)swapA).updateMyDynamicQuantitiesOnSwap(a.getV(),time,this.width,myRho);
-//		nextLink.getDsLastLeftTimes()[0]=time;
-//		this.towardsLinkLastExitTimes.put(nextLink, time);
-//
-//		//TODO check post-conditions & new events
-//		checkPostConditionForAgentEnteredLinkFromUpstreamEnd(nextLink, a, time);
-//		checkPostConditionForAgentSwapedToNode(swapA,time);
+		CAAgent swapA = nextLink.getParticles()[0];
+		this.pollAgent(0);
+		this.putAgent(swapA);
+		nextLink.getParticles()[0] = a;
+		a.materialize(0, 1);
+		nextLink.fireUpstreamLeft(swapA, time);
+		nextLink.fireUpstreamEntered(a, time);
+		a.moveOverNode(nextLink,time);
+
+		nextLink.getDsLastLeftTimes()[0]=time;
+		this.towardsLinkLastExitTimes.put(nextLink, time);
+
+		//TODO check post-conditions & new events
+		checkPostConditionForAgentEnteredLinkFromUpstreamEnd(nextLink, a, time);
+		checkPostConditionForAgentSwapedToNode(swapA,time);
 
 	}
 
@@ -504,32 +493,21 @@ public class CANodeDynamic implements CANode{
 	private void handleSwapWithDownStreamEnd(CASimpleDynamicAgent a,
 			double time, CALinkDynamic nextLink) {
 		
-		throw new RuntimeException("not implemented");
+		CAAgent swapA = nextLink.getParticles()[nextLink.getNumOfCells()-1];
+		this.pollAgent(0);
+		this.putAgent(swapA);
+		nextLink.getParticles()[nextLink.getNumOfCells()-1] = a;
+		a.materialize(nextLink.getNumOfCells()-1, -1);
+		nextLink.fireDownstreamLeft(swapA, time);
+		nextLink.fireDownstreamEntered(a, time);
+		a.moveOverNode(nextLink,time);
+
+		nextLink.getDsLastLeftTimes()[nextLink.getNumOfCells()-1]=time;
+		this.towardsLinkLastExitTimes.put(nextLink, time);
 		
-//		CAAgent swapA = nextLink.getParticles()[nextLink.getNumOfCells()-1];
-//		this.pollAgent(0);
-//		this.putAgent(swapA);
-//		nextLink.getParticles()[nextLink.getNumOfCells()-1] = a;
-//		a.materialize(nextLink.getNumOfCells()-1, -1);
-//		nextLink.fireDownstreamLeft(swapA, time);
-//		nextLink.fireDownstreamEntered(a, time);
-//		a.moveOverNode(nextLink,time);
-//
-//		double theirRho = ((CASimpleDynamicAgent)swapA).getMyDirectionRho();
-//		double myRho = a.getMyDirectionRho();
-//		
-//		// update dynamic properties
-//		double theirV = ((CASimpleDynamicAgent)swapA).getV();
-//		a.updateMyDynamicQuantitiesOnSwap(theirV,time,this.width,theirRho);
-//		double timeGap = time - nextLink.getDsLastLeftTimes()[nextLink.getNumOfCells()-1];
-//		((CASimpleDynamicAgent)swapA).updateMyDynamicQuantitiesOnAdvance(timeGap, time, nextLink.getCellLength(), nextLink.getWidth());
-//		((CASimpleDynamicAgent)swapA).updateMyDynamicQuantitiesOnSwap(a.getV(),time,this.width,myRho);
-//		nextLink.getDsLastLeftTimes()[nextLink.getNumOfCells()-1]=time;
-//		this.towardsLinkLastExitTimes.put(nextLink, time);
-//		
-//		// check post-conditions & new events
-//		checkPostConditionForAgentEnteredLinkFromDownstreamEnd(nextLink, a, time);
-//		checkPostConditionForAgentSwapedToNode(swapA,time);
+		// check post-conditions & new events
+		checkPostConditionForAgentEnteredLinkFromDownstreamEnd(nextLink, a, time);
+		checkPostConditionForAgentSwapedToNode(swapA,time);
 	}
 
 	@Override

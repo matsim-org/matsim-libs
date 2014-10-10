@@ -139,7 +139,7 @@ LinkLeaveEventHandler {
 		}
 		double sigma = Math.sqrt(var);
 		double sigmaRev = Math.sqrt(varRev);
-		if (sigma > 0.05 || sigmaRev > 0.05) {
+		if (sigma > 0.15 || sigmaRev > 0.15) {
 			log.warn("no stationarity! simga=" + sigma + " sigmaRev=" + sigmaRev);
 			return this.timeOffset;
 		}

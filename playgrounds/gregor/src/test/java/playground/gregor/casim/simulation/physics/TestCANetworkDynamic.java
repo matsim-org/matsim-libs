@@ -60,25 +60,25 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 
 		double freeSpeedCellTravelTime = 1/(CANetworkDynamic.RHO_HAT*CANetworkDynamic.V_HAT);
 
-		{
-			double linkLength = 10;//-1/CANetworkDynamic.RHO_HAT;;
-			int nrAgents1 = 2;
-			double w1 = 0.61;
-			double tts1[] = getAgentsBidirectionalTravelTimesForLinkOfWidthAngLength(w1,linkLength,nrAgents1);
-			double diffSum = 0;
-			for (int i = 0; i < tts1.length/2; i++) {
-				log.info("diff =\t" + (tts1[i]-tts1[i+tts1.length/2]) + " max allowd:\t" + freeSpeedCellTravelTime/w1);
-				assertEquals(tts1[i],tts1[i+tts1.length/2],2*freeSpeedCellTravelTime/w1);
-				diffSum += (tts1[i]-tts1[i+tts1.length/2]);
-			}
-			log.info("diffSum = \t" + diffSum);
-			assertTrue("abs diff sum smaller than cell travel time", Math.abs(diffSum) <= freeSpeedCellTravelTime/w1+EPSILON);
-		}
+//		{
+//			double linkLength = 10;//-1/CANetworkDynamic.RHO_HAT;;
+//			int nrAgents1 = 2;
+//			double w1 = 0.61;
+//			double tts1[] = getAgentsBidirectionalTravelTimesForLinkOfWidthAngLength(w1,linkLength,nrAgents1);
+//			double diffSum = 0;
+//			for (int i = 0; i < tts1.length/2; i++) {
+//				log.info("diff =\t" + (tts1[i]-tts1[i+tts1.length/2]) + " max allowd:\t" + freeSpeedCellTravelTime/w1);
+//				assertEquals(tts1[i],tts1[i+tts1.length/2],2*freeSpeedCellTravelTime/w1);
+//				diffSum += (tts1[i]-tts1[i+tts1.length/2]);
+//			}
+//			log.info("diffSum = \t" + diffSum);
+//			assertTrue("abs diff sum smaller than cell travel time", Math.abs(diffSum) <= freeSpeedCellTravelTime/w1+EPSILON);
+//		}
 		
 		{
 			double linkLength = 100;//-1/CANetworkDynamic.RHO_HAT;;
 			int nrAgents1 = 1000;
-			double w1 = 2.61;
+			double w1 = .61;
 			double tts1[] = getAgentsBidirectionalTravelTimesForLinkOfWidthAngLength(w1,linkLength,nrAgents1);
 			double diffSum = 0;
 			for (int i = 0; i < tts1.length/2; i++) {
@@ -164,7 +164,7 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 
 	private double[] getAgentTravelTimesForLinkOfWidthAndLengthRev(double width,
 			double linkLength) {
-		Scenario sc = createScenario();
+		Scenario sc = createScenario(10,linkLength);
 		Network net = sc.getNetwork();
 		for (Link l : net.getLinks().values()) {
 			l.setCapacity(width);
@@ -176,7 +176,6 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 		CANetworkDynamic caNet = new CANetworkDynamic(net, em);
 
 		List<Link> links = getDSRoute(net);
-		links.get(1).setLength(linkLength);
 		Collections.reverse(links);
 		CALink caLink = caNet.getCALink(links.get(0).getId());
 		CAAgent[] particles = caLink.getParticles();
@@ -216,11 +215,17 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 	}
 	private double[] getAgentsBidirectionalTravelTimesForLinkOfWidthAngLength(
 			double width, double linkLength, int nrAgents) {
-		Scenario sc = createScenario();
+		
+		double cellLength = 1/(width*CANetworkDynamic.RHO_HAT);
+		double minLength = cellLength*nrAgents/2;
+
+		
+		Scenario sc = createScenario(minLength,linkLength);
 		Network net = sc.getNetwork();
+		
+		
 		for (Link l : net.getLinks().values()) {
 			l.setCapacity(width);
-			l.setLength(linkLength);
 		}
 
 		EventsManager em = new EventsManagerImpl();
@@ -229,24 +234,24 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 		CANetworkDynamic caNet = new CANetworkDynamic(net, em);
 
 
-
-		//		//DEBUG
-		//		//VIS only
-		//		Sim2DConfig conf2d = Sim2DConfigUtils.createConfig();
-		//		Sim2DScenario sc2d = Sim2DScenarioUtils.createSim2dScenario(conf2d);
-		//		sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME,sc2d);
-		//		sc.getConfig().global().setCoordinateSystem("EPSG:3395");
-		//		EventBasedVisDebuggerEngine vis = new EventBasedVisDebuggerEngine(sc);
-		//		em.addHandler(vis);
-		//		QSimDensityDrawer qDbg = new QSimDensityDrawer(sc);
-		//		em.addHandler(qDbg);
-		//		vis.addAdditionalDrawer(new InfoBox(vis, sc));
-		//		vis.addAdditionalDrawer(qDbg);
+//
+//				//DEBUG
+//				//VIS only
+//				CASimDynamicExperiment_ZhangJ2011.VIS = true;
+//				Sim2DConfig conf2d = Sim2DConfigUtils.createConfig();
+//				Sim2DScenario sc2d = Sim2DScenarioUtils.createSim2dScenario(conf2d);
+//				sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME,sc2d);
+//				sc.getConfig().global().setCoordinateSystem("EPSG:3395");
+//				EventBasedVisDebuggerEngine vis = new EventBasedVisDebuggerEngine(sc);
+//				em.addHandler(vis);
+//				QSimDensityDrawer qDbg = new QSimDensityDrawer(sc);
+//				em.addHandler(qDbg);
+//				vis.addAdditionalDrawer(new InfoBox(vis, sc));
+//				vis.addAdditionalDrawer(qDbg);
 
 
 
 		List<Link> linksDS = getDSRoute(net);
-		linksDS.get(1).setLength(linkLength);
 		List<Link> linksUS = getDSRoute(net);
 		Collections.reverse(linksUS);
 
@@ -283,7 +288,7 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 
 		}
 
-		caNet.runUntil(3*linkLength);
+		caNet.run();//(3*linkLength + 3*minLength);
 		double [] tt = new double [2*numEachSide];
 		Link ll = linksUS.get(1);
 		Link llRev = null;
@@ -308,7 +313,7 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 
 	private double[] getAgentTravelTimesForLinkOfWidthAndLength(double width,
 			double linkLength) {
-		Scenario sc = createScenario();
+		Scenario sc = createScenario(10,linkLength);
 		Network net = sc.getNetwork();
 		for (Link l : net.getLinks().values()) {
 			l.setCapacity(width);
@@ -320,7 +325,6 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 		CANetworkDynamic caNet = new CANetworkDynamic(net, em);
 
 		List<Link> links = getDSRoute(net);
-		links.get(1).setLength(linkLength);
 
 		CALink caLink = caNet.getCALink(links.get(0).getId());
 		CAAgent[] particles = caLink.getParticles();
@@ -348,7 +352,7 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 	}
 
 	private double freespeedForLinkOfXmWidth(double width, double linkLength) {
-		Scenario sc = createScenario();
+		Scenario sc = createScenario(10,linkLength);
 		Network net = sc.getNetwork();
 		for (Link l : net.getLinks().values()) {
 			l.setCapacity(width);
@@ -360,7 +364,6 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 		CANetworkDynamic caNet = new CANetworkDynamic(net, em);
 
 		List<Link> links = getDSRoute(net);
-		links.get(1).setLength(linkLength);		
 
 		CALink caLink = caNet.getCALink(links.get(0).getId());
 		CAAgent[] particles = caLink.getParticles();
@@ -379,7 +382,7 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 
 
 	private double freespeedForLinkOfXmWidthRev(double width, double linkLength) {
-		Scenario sc = createScenario();
+		Scenario sc = createScenario(10,linkLength);
 		Network net = sc.getNetwork();
 		for (Link l : net.getLinks().values()) {
 			l.setCapacity(width);
@@ -391,7 +394,6 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 		CANetworkDynamic caNet = new CANetworkDynamic(net, em);
 
 		List<Link> links = getDSRoute(net);
-		links.get(1).setLength(linkLength);		
 		Collections.reverse(links);
 
 		CALink caLink = caNet.getCALink(links.get(0).getId());
@@ -434,16 +436,16 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 
 
 
-	private Scenario createScenario() {
+	private Scenario createScenario(double minLength, double linkLength) {
 		Config c = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(c);
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
 
-		Node n0 = fac.createNode(Id.create("0", Node.class), sc.createCoord(-10, 0));
-		Node n1 = fac.createNode(Id.create("1", Node.class), sc.createCoord(0, 0));
-		Node n2 = fac.createNode(Id.create("2", Node.class), sc.createCoord(10, 0));
-		Node n3 = fac.createNode(Id.create("3", Node.class), sc.createCoord(20, 0));
+		Node n0 = fac.createNode(Id.create("0", Node.class), sc.createCoord(0, 0));
+		Node n1 = fac.createNode(Id.create("1", Node.class), sc.createCoord(minLength, 0));
+		Node n2 = fac.createNode(Id.create("2", Node.class), sc.createCoord(minLength+linkLength, 0));
+		Node n3 = fac.createNode(Id.create("3", Node.class), sc.createCoord(minLength+linkLength+minLength, 0));
 		net.addNode(n0);
 		net.addNode(n1);
 		net.addNode(n2);
@@ -464,10 +466,10 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 		net.addLink(l5);
 
 		for (Link l : net.getLinks().values()) {
-			l.setLength(10);
+			l.setLength(minLength);
 		}
-		l2.setLength(100);
-		l3.setLength(100);
+		l2.setLength(linkLength);
+		l3.setLength(linkLength);
 
 		return sc;
 	}
