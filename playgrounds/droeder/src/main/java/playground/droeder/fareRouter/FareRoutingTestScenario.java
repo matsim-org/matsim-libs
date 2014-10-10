@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -43,6 +42,7 @@ import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
+import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -165,14 +165,14 @@ class FareRoutingTestScenario {
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		TransitScheduleFactory f = schedule.getFactory();
 		
-		TransitStopFacility f1 = f.createTransitStopFacility(new IdImpl("1"), new CoordImpl(0, 0), false);
-		TransitStopFacility f2 = f.createTransitStopFacility(new IdImpl("2"), new CoordImpl(500, 0), false);
-		TransitStopFacility f3 = f.createTransitStopFacility(new IdImpl("3"), new CoordImpl(1000, 0), false);
-		TransitStopFacility f4 = f.createTransitStopFacility(new IdImpl("4"), new CoordImpl(1500, 0), false);
-		TransitStopFacility f5 = f.createTransitStopFacility(new IdImpl("5"), new CoordImpl(2000, 0), false);
-		TransitStopFacility f6 = f.createTransitStopFacility(new IdImpl("6"), new CoordImpl(2500, 0), false);
-		TransitStopFacility f7 = f.createTransitStopFacility(new IdImpl("7"), new CoordImpl(3000, 0), false);
-		TransitStopFacility f8 = f.createTransitStopFacility(new IdImpl("8"), new CoordImpl(3500, 0), false);
+		TransitStopFacility f1 = f.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new CoordImpl(0, 0), false);
+		TransitStopFacility f2 = f.createTransitStopFacility(Id.create("2", TransitStopFacility.class), new CoordImpl(500, 0), false);
+		TransitStopFacility f3 = f.createTransitStopFacility(Id.create("3", TransitStopFacility.class), new CoordImpl(1000, 0), false);
+		TransitStopFacility f4 = f.createTransitStopFacility(Id.create("4", TransitStopFacility.class), new CoordImpl(1500, 0), false);
+		TransitStopFacility f5 = f.createTransitStopFacility(Id.create("5", TransitStopFacility.class), new CoordImpl(2000, 0), false);
+		TransitStopFacility f6 = f.createTransitStopFacility(Id.create("6", TransitStopFacility.class), new CoordImpl(2500, 0), false);
+		TransitStopFacility f7 = f.createTransitStopFacility(Id.create("7", TransitStopFacility.class), new CoordImpl(3000, 0), false);
+		TransitStopFacility f8 = f.createTransitStopFacility(Id.create("8", TransitStopFacility.class), new CoordImpl(3500, 0), false);
 		
 		schedule.addStopFacility(f1);
 		schedule.addStopFacility(f2);
@@ -194,21 +194,21 @@ class FareRoutingTestScenario {
 		
 		lineId ="1";
 		fareSingleBoarding = 1799.;
-		line = f.createTransitLine(new IdImpl(lineId));
+		line = f.createTransitLine(Id.create(lineId, TransitLine.class));
 		stops = new ArrayList<TransitRouteStop>();
 		stops.add(f.createTransitRouteStop(f1, Time.UNDEFINED_TIME, 0.0));
 		stops.add(f.createTransitRouteStop(f2, offset, Time.UNDEFINED_TIME));
 		
-		r1 = f.createTransitRoute(new IdImpl(lineId + ".1"), null, stops, "pt");
-		r1.addDeparture(f.createDeparture(new IdImpl("1"), time));
+		r1 = f.createTransitRoute(Id.create(lineId + ".1", TransitRoute.class), null, stops, "pt");
+		r1.addDeparture(f.createDeparture(Id.create("1", Departure.class), time));
 		schedule.getTransitLinesAttributes().putAttribute(r1.getId().toString(), SingleBoardingTicket.NAME, fareSingleBoarding);
 		line.addRoute(r1);
 		
 		stops = new ArrayList<TransitRouteStop>();
 		stops.add(f.createTransitRouteStop(f1, Time.UNDEFINED_TIME, 0.0));
 		stops.add(f.createTransitRouteStop(f2, offset, Time.UNDEFINED_TIME));
-		r2 = f.createTransitRoute(new IdImpl(lineId + ".2"), null, stops, "pt");
-		r2.addDeparture(f.createDeparture(new IdImpl("1"), time));
+		r2 = f.createTransitRoute(Id.create(lineId + ".2", TransitRoute.class), null, stops, "pt");
+		r2.addDeparture(f.createDeparture(Id.create("1", Departure.class), time));
 		line.addRoute(r2);
 		
 		schedule.getTransitLinesAttributes().putAttribute(r1.getId().toString(), TicketMachineImpl.ALLOWEDTICKETS, FlatRate.NAME + "," + SingleBoardingTicket.NAME);
@@ -219,21 +219,21 @@ class FareRoutingTestScenario {
 		time += offset;
 		lineId ="2";
 		fareSingleBoarding = 1801.;
-		line = f.createTransitLine(new IdImpl(lineId));
+		line = f.createTransitLine(Id.create(lineId, TransitLine.class));
 		stops = new ArrayList<TransitRouteStop>();
 		stops.add(f.createTransitRouteStop(f2, Time.UNDEFINED_TIME, 0.0));
 		stops.add(f.createTransitRouteStop(f3, offset, Time.UNDEFINED_TIME));
 		
-		r1 = f.createTransitRoute(new IdImpl(lineId + ".1"), null, stops, "pt");
-		r1.addDeparture(f.createDeparture(new IdImpl("1"), time));
+		r1 = f.createTransitRoute(Id.create(lineId + ".1", TransitRoute.class), null, stops, "pt");
+		r1.addDeparture(f.createDeparture(Id.create("1", Departure.class), time));
 		schedule.getTransitLinesAttributes().putAttribute(r1.getId().toString(), SingleBoardingTicket.NAME, fareSingleBoarding);
 		line.addRoute(r1);
 		
 		stops = new ArrayList<TransitRouteStop>();
 		stops.add(f.createTransitRouteStop(f2, Time.UNDEFINED_TIME, 0.0));
 		stops.add(f.createTransitRouteStop(f3, offset, Time.UNDEFINED_TIME));
-		r2 = f.createTransitRoute(new IdImpl(lineId + ".2"), null, stops, "pt");
-		r2.addDeparture(f.createDeparture(new IdImpl("1"), time));
+		r2 = f.createTransitRoute(Id.create(lineId + ".2", TransitRoute.class), null, stops, "pt");
+		r2.addDeparture(f.createDeparture(Id.create("1", Departure.class), time));
 		line.addRoute(r2);
 		
 		schedule.getTransitLinesAttributes().putAttribute(r1.getId().toString(), TicketMachineImpl.ALLOWEDTICKETS, FlatRate.NAME + "," + SingleBoardingTicket.NAME);
@@ -244,21 +244,21 @@ class FareRoutingTestScenario {
 		time += offset;
 		lineId ="3";
 		fareSingleBoarding =1799.;
-		line = f.createTransitLine(new IdImpl(lineId));
+		line = f.createTransitLine(Id.create(lineId, TransitLine.class));
 		stops = new ArrayList<TransitRouteStop>();
 		stops.add(f.createTransitRouteStop(f3, Time.UNDEFINED_TIME, 0.0));
 		stops.add(f.createTransitRouteStop(f4, offset, Time.UNDEFINED_TIME));
 		
-		r1 = f.createTransitRoute(new IdImpl(lineId + ".1"), null, stops, "pt");
-		r1.addDeparture(f.createDeparture(new IdImpl("1"), time));
+		r1 = f.createTransitRoute(Id.create(lineId + ".1", TransitRoute.class), null, stops, "pt");
+		r1.addDeparture(f.createDeparture(Id.create("1", Departure.class), time));
 		schedule.getTransitLinesAttributes().putAttribute(r1.getId().toString(), SingleBoardingTicket.NAME, fareSingleBoarding);
 		line.addRoute(r1);
 		
 		stops = new ArrayList<TransitRouteStop>();
 		stops.add(f.createTransitRouteStop(f3, Time.UNDEFINED_TIME, 0.0));
 		stops.add(f.createTransitRouteStop(f4, offset, Time.UNDEFINED_TIME));
-		r2 = f.createTransitRoute(new IdImpl(lineId + ".2"), null, stops, "pt");
-		r2.addDeparture(f.createDeparture(new IdImpl("1"), time));
+		r2 = f.createTransitRoute(Id.create(lineId + ".2", TransitRoute.class), null, stops, "pt");
+		r2.addDeparture(f.createDeparture(Id.create("1", Departure.class), time));
 		line.addRoute(r2);
 		
 		schedule.getTransitLinesAttributes().putAttribute(r1.getId().toString(), TicketMachineImpl.ALLOWEDTICKETS, FlatRate.NAME + "," + SingleBoardingTicket.NAME);
@@ -269,21 +269,21 @@ class FareRoutingTestScenario {
 		time += offset;
 		lineId ="4";
 		fareSingleBoarding = 1799.;
-		line = f.createTransitLine(new IdImpl(lineId));
+		line = f.createTransitLine(Id.create(lineId, TransitLine.class));
 		stops = new ArrayList<TransitRouteStop>();
 		stops.add(f.createTransitRouteStop(f4, Time.UNDEFINED_TIME, 0.0));
 		stops.add(f.createTransitRouteStop(f5, offset, Time.UNDEFINED_TIME));
 		
-		r1 = f.createTransitRoute(new IdImpl(lineId + ".1"), null, stops, "pt");
-		r1.addDeparture(f.createDeparture(new IdImpl("1"), time));
+		r1 = f.createTransitRoute(Id.create(lineId + ".1", TransitRoute.class), null, stops, "pt");
+		r1.addDeparture(f.createDeparture(Id.create("1", Departure.class), time));
 		schedule.getTransitLinesAttributes().putAttribute(r1.getId().toString(), SingleBoardingTicket.NAME, fareSingleBoarding);
 		line.addRoute(r1);
 		
 		stops = new ArrayList<TransitRouteStop>();
 		stops.add(f.createTransitRouteStop(f4, Time.UNDEFINED_TIME, 0.0));
 		stops.add(f.createTransitRouteStop(f5, offset, Time.UNDEFINED_TIME));
-		r2 = f.createTransitRoute(new IdImpl(lineId + ".2"), null, stops, "pt");
-		r2.addDeparture(f.createDeparture(new IdImpl("1"), time));
+		r2 = f.createTransitRoute(Id.create(lineId + ".2", TransitRoute.class), null, stops, "pt");
+		r2.addDeparture(f.createDeparture(Id.create("1", Departure.class), time));
 		line.addRoute(r2);
 		
 		schedule.getTransitLinesAttributes().putAttribute(r1.getId().toString(), TicketMachineImpl.ALLOWEDTICKETS, SingleBoardingTicket.NAME);
@@ -294,21 +294,21 @@ class FareRoutingTestScenario {
 		time += offset;
 		lineId ="5";
 		fareSingleBoarding = 1799.;
-		line = f.createTransitLine(new IdImpl(lineId));
+		line = f.createTransitLine(Id.create(lineId, TransitLine.class));
 		stops = new ArrayList<TransitRouteStop>();
 		stops.add(f.createTransitRouteStop(f5, Time.UNDEFINED_TIME, 0.0));
 		stops.add(f.createTransitRouteStop(f6, offset, Time.UNDEFINED_TIME));
 		
-		r1 = f.createTransitRoute(new IdImpl(lineId + ".1"), null, stops, "pt");
-		r1.addDeparture(f.createDeparture(new IdImpl("1"), time));
+		r1 = f.createTransitRoute(Id.create(lineId + ".1", TransitRoute.class), null, stops, "pt");
+		r1.addDeparture(f.createDeparture(Id.create("1", Departure.class), time));
 		schedule.getTransitLinesAttributes().putAttribute(r1.getId().toString(), SingleBoardingTicket.NAME, fareSingleBoarding);
 		line.addRoute(r1);
 		
 		stops = new ArrayList<TransitRouteStop>();
 		stops.add(f.createTransitRouteStop(f5, Time.UNDEFINED_TIME, 0.0));
 		stops.add(f.createTransitRouteStop(f6, offset, Time.UNDEFINED_TIME));
-		r2 = f.createTransitRoute(new IdImpl(lineId + ".2"), null, stops, "pt");
-		r2.addDeparture(f.createDeparture(new IdImpl("1"), time));
+		r2 = f.createTransitRoute(Id.create(lineId + ".2", TransitRoute.class), null, stops, "pt");
+		r2.addDeparture(f.createDeparture(Id.create("1", Departure.class), time));
 		line.addRoute(r2);
 		
 		schedule.getTransitLinesAttributes().putAttribute(r1.getId().toString(), TicketMachineImpl.ALLOWEDTICKETS, FlatRate.NAME + "," + SingleBoardingTicket.NAME);
@@ -319,7 +319,7 @@ class FareRoutingTestScenario {
 		time += offset;
 		lineId ="6";
 		fareSingleBoarding = 1799.;
-		line = f.createTransitLine(new IdImpl(lineId));
+		line = f.createTransitLine(Id.create(lineId, TransitLine.class));
 		stops = new ArrayList<TransitRouteStop>();
 		stops.add(f.createTransitRouteStop(f6, Time.UNDEFINED_TIME, 0.0));
 		stops.add(f.createTransitRouteStop(f7, offset, Time.UNDEFINED_TIME));
@@ -327,13 +327,13 @@ class FareRoutingTestScenario {
 		stops = new ArrayList<TransitRouteStop>();
 		stops.add(f.createTransitRouteStop(f6, Time.UNDEFINED_TIME, 0.0));
 		stops.add(f.createTransitRouteStop(f7, offset, Time.UNDEFINED_TIME));
-		r1 = f.createTransitRoute(new IdImpl(lineId + ".1"), null, stops, "pt");
-		r1.addDeparture(f.createDeparture(new IdImpl("1"), time));
+		r1 = f.createTransitRoute(Id.create(lineId + ".1", TransitRoute.class), null, stops, "pt");
+		r1.addDeparture(f.createDeparture(Id.create("1", Departure.class), time));
 		schedule.getTransitLinesAttributes().putAttribute(r1.getId().toString(), SingleBoardingTicket.NAME, fareSingleBoarding);
 		line.addRoute(r1);
 		
-		r2 = f.createTransitRoute(new IdImpl(lineId + ".2"), null, stops, "pt");
-		r2.addDeparture(f.createDeparture(new IdImpl("1"), time));
+		r2 = f.createTransitRoute(Id.create(lineId + ".2", TransitRoute.class), null, stops, "pt");
+		r2.addDeparture(f.createDeparture(Id.create("1", Departure.class), time));
 		line.addRoute(r2);
 		
 		schedule.getTransitLinesAttributes().putAttribute(r1.getId().toString(), TicketMachineImpl.ALLOWEDTICKETS, FlatRate.NAME + "," + SingleBoardingTicket.NAME);
@@ -344,21 +344,21 @@ class FareRoutingTestScenario {
 		time += offset;
 		lineId ="7";
 		fareSingleBoarding = 1801.;
-		line = f.createTransitLine(new IdImpl(lineId));
+		line = f.createTransitLine(Id.create(lineId, TransitLine.class));
 		stops = new ArrayList<TransitRouteStop>();
 		stops.add(f.createTransitRouteStop(f7, Time.UNDEFINED_TIME, 0.0));
 		stops.add(f.createTransitRouteStop(f8, offset, Time.UNDEFINED_TIME));
 		
-		r1 = f.createTransitRoute(new IdImpl(lineId + ".1"), null, stops, "pt");
-		r1.addDeparture(f.createDeparture(new IdImpl("1"), time));
+		r1 = f.createTransitRoute(Id.create(lineId + ".1", TransitRoute.class), null, stops, "pt");
+		r1.addDeparture(f.createDeparture(Id.create("1", Departure.class), time));
 		schedule.getTransitLinesAttributes().putAttribute(r1.getId().toString(), SingleBoardingTicket.NAME, fareSingleBoarding);
 		line.addRoute(r1);
 		
 		stops = new ArrayList<TransitRouteStop>();
 		stops.add(f.createTransitRouteStop(f7, Time.UNDEFINED_TIME, 0.0));
 		stops.add(f.createTransitRouteStop(f8, offset, Time.UNDEFINED_TIME));
-		r2 = f.createTransitRoute(new IdImpl(lineId + ".2"), null, stops, "pt");
-		r2.addDeparture(f.createDeparture(new IdImpl("1"), time));
+		r2 = f.createTransitRoute(Id.create(lineId + ".2", TransitRoute.class), null, stops, "pt");
+		r2.addDeparture(f.createDeparture(Id.create("1", Departure.class), time));
 		line.addRoute(r2);
 		
 		schedule.getTransitLinesAttributes().putAttribute(r1.getId().toString(), TicketMachineImpl.ALLOWEDTICKETS, SingleBoardingTicket.NAME);

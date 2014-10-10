@@ -37,7 +37,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkWriter;
@@ -190,10 +189,10 @@ class CreateTestScenario {
 
 	private Link createLink(Network net, NetworkFactory factory, String id,	Set<String> mode) {
 		Node from,to;
-		from = net.getNodes().get(new IdImpl(id.split("-")[0]));
-		to =  net.getNodes().get(new IdImpl(id.split("-")[1]));
+		from = net.getNodes().get(Id.create(id.split("-")[0], Node.class));
+		to =  net.getNodes().get(Id.create(id.split("-")[1], Node.class));
 		
-		Link l = factory.createLink(new IdImpl(id), from, to);
+		Link l = factory.createLink(Id.create(id, Link.class), from, to);
 		l.setAllowedModes(mode);
 		l.setCapacity(4000);
 		if(mode.contains("train")){
@@ -207,7 +206,7 @@ class CreateTestScenario {
 
 	private Link createReverse(Link l, NetworkFactory factory) {
 		Link ll = factory.createLink(
-				new IdImpl(l.getToNode().getId().toString() + "-" + l.getFromNode().getId().toString()), 
+				Id.create(l.getToNode().getId().toString() + "-" + l.getFromNode().getId().toString(), Link.class), 
 				l.getToNode(), 
 				l.getFromNode());
 		ll.setAllowedModes(l.getAllowedModes());
@@ -284,7 +283,7 @@ class CreateTestScenario {
 		stops.add(stop);
 		
 		//add other stops
-		for(Id linkId: route.getLinkIds()){
+		for(Id<Link> linkId: route.getLinkIds()){
 			link = sc.getNetwork().getLinks().get(linkId);
 			stop = f.createTransitRouteStop(sc.getTransitSchedule().getFacilities().get(link.getId()),	delay+=(link.getLength()/link.getFreespeed()*1.2), delay+=60);
 			stop.setAwaitDepartureTime(true);
@@ -296,7 +295,7 @@ class CreateTestScenario {
 		stop.setAwaitDepartureTime(true);
 		stops.add(stop);
 		
-		TransitRoute r = f.createTransitRoute(new IdImpl(mode + "1"), route, stops, mode);
+		TransitRoute r = f.createTransitRoute(Id.create(mode + "1", TransitRoute.class), route, stops, mode);
 		
 		Departure d;
 		int depCnt = 0;
@@ -310,22 +309,22 @@ class CreateTestScenario {
 		for(int i = (6*3600); i < (18.5 * 3600 + 1); i = i + (3600/6)){
 			if(vehicles.isEmpty()){
 				//currently we have no vehicle. create a new on, add to vehicles-container
-				v = new VehicleImpl(new IdImpl(mode + vehCnt++), vType);
+				v = new VehicleImpl(Id.create(mode + vehCnt++, Vehicle.class), vType);
 				((ScenarioImpl) sc).getVehicles().addVehicle( v);
 			}else{
 				//check, if the first vehicle of the queue should have finished its route. Poll it, if so
 				if(vehicles.peekFirst().getSecond() <= i){
 					v = vehicles.pollFirst().getFirst();
 				}
-				// otherwise create a new one and add to conatiner
+				// otherwise create a new one and add to container
 				else{
 					
-					v = new VehicleImpl(new IdImpl(mode + vehCnt++), vType);
+					v = new VehicleImpl(Id.create(mode + vehCnt++, Vehicle.class), vType);
 					((ScenarioImpl) sc).getVehicles().addVehicle( v);
 				}
 			}
 			
-			d = f.createDeparture(new IdImpl(depCnt++), i);
+			d = f.createDeparture(Id.create(depCnt++, Departure.class), i);
 			d.setVehicleId(v.getId());
 			r.addDeparture(d);
 			// add the vehicle to the queue
@@ -370,7 +369,7 @@ class CreateTestScenario {
 		stops.add(stop);
 		
 		//add other stops
-		for(Id linkId: route.getLinkIds()){
+		for(Id<Link> linkId: route.getLinkIds()){
 			link = sc.getNetwork().getLinks().get(linkId);
 			stop = f.createTransitRouteStop(sc.getTransitSchedule().getFacilities().get(link.getId()),	delay+=(link.getLength()/link.getFreespeed()*1.2), delay+=60);
 			stop.setAwaitDepartureTime(true);
@@ -382,7 +381,7 @@ class CreateTestScenario {
 		stop.setAwaitDepartureTime(true);
 		stops.add(stop);
 		
-		TransitRoute r = f.createTransitRoute(new IdImpl(mode + "1"), route, stops, mode);
+		TransitRoute r = f.createTransitRoute(Id.create(mode + "1", TransitRoute.class), route, stops, mode);
 		
 		Departure d;
 		int depCnt = 0;
@@ -396,7 +395,7 @@ class CreateTestScenario {
 		for(int i = (6*3600); i < (18.5 * 3600 + 1); i = i + (3600/6)){
 			if(vehicles.isEmpty()){
 				//currently we have no vehicle. create a new on, add to vehicles-container
-				v = new VehicleImpl(new IdImpl(mode + vehCnt++), vType);
+				v = new VehicleImpl(Id.create(mode + vehCnt++, Vehicle.class), vType);
 				((ScenarioImpl) sc).getVehicles().addVehicle( v);
 			}else{
 				//check, if the first vehicle of the queue should have finished its route. Poll it, if so
@@ -406,12 +405,12 @@ class CreateTestScenario {
 				// otherwise create a new one and add to conatiner
 				else{
 					
-					v = new VehicleImpl(new IdImpl(mode + vehCnt++), vType);
+					v = new VehicleImpl(Id.create(mode + vehCnt++, Vehicle.class), vType);
 					((ScenarioImpl) sc).getVehicles().addVehicle( v);
 				}
 			}
 			
-			d = f.createDeparture(new IdImpl(depCnt++), i);
+			d = f.createDeparture(Id.create(depCnt++, Departure.class), i);
 			d.setVehicleId(v.getId());
 			r.addDeparture(d);
 			// add the vehicle to the queue

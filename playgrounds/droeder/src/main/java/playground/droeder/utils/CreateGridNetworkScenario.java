@@ -38,7 +38,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.ActivityImpl;
@@ -62,14 +61,14 @@ class CreateGridNetworkScenario {
 	
 	@SuppressWarnings("serial")
 	private static List<Relation> relations = new ArrayList<Relation>(){{
-		add(new Relation(new IdImpl("A"), new IdImpl("B"), TransportMode.pt, 4000));
-		add(new Relation(new IdImpl("B"), new IdImpl("A"), TransportMode.pt, 4000));
+		add(new Relation(Id.create("A", Link.class), Id.create("B", Link.class), TransportMode.pt, 4000));
+		add(new Relation(Id.create("B", Link.class), Id.create("A", Link.class), TransportMode.pt, 4000));
 		
-		add(new Relation(new IdImpl("A"), new IdImpl("C"), TransportMode.pt, 2000));
-		add(new Relation(new IdImpl("C"), new IdImpl("A"), TransportMode.pt, 2000));
+		add(new Relation(Id.create("A", Link.class), Id.create("C", Link.class), TransportMode.pt, 2000));
+		add(new Relation(Id.create("C", Link.class), Id.create("A", Link.class), TransportMode.pt, 2000));
 		
-		add(new Relation(new IdImpl("B"), new IdImpl("C"), TransportMode.pt, 2000));
-		add(new Relation(new IdImpl("C"), new IdImpl("B"), TransportMode.pt, 2000));
+		add(new Relation(Id.create("B", Link.class), Id.create("C", Link.class), TransportMode.pt, 2000));
+		add(new Relation(Id.create("C", Link.class), Id.create("B", Link.class), TransportMode.pt, 2000));
 	}};
 	
 	/**
@@ -222,13 +221,13 @@ class CreateGridNetworkScenario {
 
 	private static class Relation{
 		
-		private Id from;
-		private Id to;
+		private Id<Link> from;
+		private Id<Link> to;
 		private double nr;
 		private double start = 8 * 3600;
 		private double end = 10 * 3600;
 	
-		public Relation(Id fromLink, Id toLink, String mode, double nrOfAgents){
+		public Relation(Id<Link> fromLink, Id<Link> toLink, String mode, double nrOfAgents){
 			this.from = fromLink;
 			this.to = toLink;
 			this.nr = nrOfAgents;
@@ -237,14 +236,14 @@ class CreateGridNetworkScenario {
 		/**
 		 * @return the from
 		 */
-		public Id getOriginLinkId() {
+		public Id<Link> getOriginLinkId() {
 			return from;
 		}
 	
 		/**
 		 * @return the to
 		 */
-		public Id getDestinationLinkId() {
+		public Id<Link> getDestinationLinkId() {
 			return to;
 		}
 	

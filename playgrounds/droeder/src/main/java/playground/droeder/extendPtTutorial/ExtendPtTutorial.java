@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -82,18 +81,18 @@ class ExtendPtTutorial {
 			private static final long serialVersionUID = 1L;
 
 		{
-			add(new IdImpl("1112"));
-			add(new IdImpl("1213"));
-			add(new IdImpl("1323"));
-			add(new IdImpl("2324"));
-			add(new IdImpl("2434"));
-			add(new IdImpl("3444"));
-			add(new IdImpl("4434"));
-			add(new IdImpl("3424"));
-			add(new IdImpl("2423"));
-			add(new IdImpl("2313"));
-			add(new IdImpl("1312"));
-			add(new IdImpl("1211"));
+			add(Id.create("1112", Link.class));
+			add(Id.create("1213", Link.class));
+			add(Id.create("1323", Link.class));
+			add(Id.create("2324", Link.class));
+			add(Id.create("2434", Link.class));
+			add(Id.create("3444", Link.class));
+			add(Id.create("4434", Link.class));
+			add(Id.create("3424", Link.class));
+			add(Id.create("2423", Link.class));
+			add(Id.create("2313", Link.class));
+			add(Id.create("1312", Link.class));
+			add(Id.create("1211", Link.class));
 		}};
 		
 		
@@ -119,7 +118,7 @@ class ExtendPtTutorial {
 		Departure d;
 		Vehicle v;
 		VehiclesFactory vFac = ((ScenarioImpl) sc).getVehicles().getFactory();
-		VehicleType type = vFac.createVehicleType(new IdImpl("bus"));
+		VehicleType type = vFac.createVehicleType(Id.create("bus", VehicleType.class));
 		((ScenarioImpl) sc).getVehicles().addVehicleType(type);
 		VehicleCapacity vCap = vFac.createVehicleCapacity();
 		vCap.setSeats(100);
