@@ -20,13 +20,13 @@
 
 package playground.acmarmol.matsim2030.network;
 
+import java.util.Map;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
-
-import java.util.Map;
 
 
 public class MyVisumNodesRowHandler implements VisumNetworkRowHandler {
@@ -40,7 +40,7 @@ public class MyVisumNodesRowHandler implements VisumNetworkRowHandler {
 	@Override
 	public void handleRow(Map<String, String> row) {
 		
-		Id id = new IdImpl(row.get("NR"));
+		Id<Node> id = Id.create(row.get("NR"), Node.class);
 
 		String xStr = row.get("XKOORD"), yStr = row.get("YKOORD");
 		if (xStr == null || yStr == null) {

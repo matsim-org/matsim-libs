@@ -2,17 +2,9 @@ package playground.acmarmol.matsim2030.microcensus2000;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.households.Households;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.acmarmol.matsim2030.microcensus2010.Etappe;
@@ -73,7 +65,7 @@ public class MZ2000EtappenParser {
 				//etappen number
 				String etnr = entries[4].trim();
 				
-				Id wid = new IdImpl((hhnr.concat(zielpnr)).concat("-").concat(wegnr));
+				String wid = (hhnr.concat(zielpnr)).concat("-").concat(wegnr);
 				
 				//wege mode
 				String mode = entries[6].trim();
@@ -134,9 +126,9 @@ public class MZ2000EtappenParser {
 				String zland = entries[41].trim();
 				
 				
-				int nr_etappen = (Integer) wegeAttributes.getAttribute(wid.toString(),MZConstants.NUMBER_STAGES)+1;
-				this.wegeAttributes.putAttribute(wid.toString(), MZConstants.STAGE.concat( String.valueOf(nr_etappen)) , new Etappe(departure, arrival, start_coord, end_coord, modeInt, sland,zland, carType));
-				this.wegeAttributes.putAttribute(wid.toString(), MZConstants.NUMBER_STAGES, nr_etappen);
+				int nr_etappen = (Integer) wegeAttributes.getAttribute(wid,MZConstants.NUMBER_STAGES)+1;
+				this.wegeAttributes.putAttribute(wid, MZConstants.STAGE.concat( String.valueOf(nr_etappen)) , new Etappe(departure, arrival, start_coord, end_coord, modeInt, sland,zland, carType));
+				this.wegeAttributes.putAttribute(wid, MZConstants.NUMBER_STAGES, nr_etappen);
 				
 				
 				

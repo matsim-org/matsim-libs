@@ -21,17 +21,11 @@ package playground.acmarmol.matsim2030.microcensus1989;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.HashSet;
-import java.util.Set;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.households.Households;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
@@ -303,7 +297,7 @@ public class MZ1989ZielPersonParser {
 		
 		
 		//creating matsim person
-		PersonImpl person = new PersonImpl(new IdImpl(intnr));
+		PersonImpl person = new PersonImpl(Id.create(intnr, Person.class));
 		person.setAge(Integer.parseInt(age));
 		person.setEmployed(employed);
 		person.setLicence(licence);

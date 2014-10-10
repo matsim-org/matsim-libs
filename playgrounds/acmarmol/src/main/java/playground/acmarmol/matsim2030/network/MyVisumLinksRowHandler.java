@@ -20,16 +20,18 @@
 
 package playground.acmarmol.matsim2030.network;
 
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.visum.VisumNetwork.EdgeType;
-
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.visum.VisumNetwork.EdgeType;
+
+import playground.acmarmol.matsim2030.network.MyVisumNetwork.ModeType;
 
 public class MyVisumLinksRowHandler implements VisumNetworkRowHandler {
 
@@ -58,16 +60,16 @@ public class MyVisumLinksRowHandler implements VisumNetworkRowHandler {
 	@Override
 	public void handleRow(Map<String, String> row) {
 		String nr = row.get(NUMBER[this.language]);
-		IdImpl id = new IdImpl(nr);
-		IdImpl fromNodeId = new IdImpl(row.get(FROMNODENO[this.language]));
-		IdImpl toNodeId = new IdImpl(row.get(TONODENO[this.language]));
+		Id<Link> id = Id.create(nr, Link.class);
+		Id<Node> fromNodeId = Id.create(row.get(FROMNODENO[this.language]), Node.class);
+		Id<Node> toNodeId = Id.create(row.get(TONODENO[this.language]), Node.class);
 		Node fromNode = network.getNodes().get(fromNodeId);
 		Node toNode = network.getNodes().get(toNodeId);
 		Link lastEdge = network.getLinks().get(id);
 		if (lastEdge != null) {
 			if (lastEdge.getFromNode().getId().equals(toNodeId)
 					&& lastEdge.getToNode().getId().equals(fromNodeId)) {
-				id = new IdImpl(nr + 'R');
+				id = Id.create(nr + 'R', Link.class);
 			} else {
 				throw new RuntimeException("Duplicate edge.");
 			}
@@ -76,7 +78,7 @@ public class MyVisumLinksRowHandler implements VisumNetworkRowHandler {
 		double length = Double.parseDouble(row.get(LENGTH[this.language]).replace(',', '.').substring(0, row.get(LENGTH[this.language]).indexOf('k'))) * 1000;
 		// double freespeed = 0.0;
 		String edgeTypeIdString = row.get(TYPENO[this.language]);
-		IdImpl edgeTypeId = new IdImpl(edgeTypeIdString);
+		Id<EdgeType> edgeTypeId = Id.create(edgeTypeIdString, EdgeType.class);
 
 		EdgeType edgeType = visumNetwork.edgeTypes.get(edgeTypeId);
 		
@@ -88,7 +90,7 @@ public class MyVisumLinksRowHandler implements VisumNetworkRowHandler {
 		String mode = null;
 	
 		for (String vsys : vsyss) {
-			try{mode = visumNetwork.getModeTypes().get(new IdImpl(vsys)).name;
+			try{mode = visumNetwork.getModeTypes().get(Id.create(vsys, ModeType.class)).name;
 				modes.add(mode);}
 			catch(java.lang.NullPointerException e){}
 		}

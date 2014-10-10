@@ -21,11 +21,8 @@
 package playground.acmarmol.matsim2030.network;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.visum.VisumNetwork;
 
@@ -37,7 +34,7 @@ import org.matsim.visum.VisumNetwork;
  */
 public class MyVisumNetwork extends VisumNetwork{
 
-	private final Map<Id, ModeType> modeTypes = new HashMap<Id, ModeType>();
+	private final Map<Id<ModeType>, ModeType> modeTypes = new HashMap<Id<ModeType>, ModeType>();
 	private int language;
 		
 	public void addModeType(final ModeType modeType) {
@@ -62,12 +59,12 @@ public class MyVisumNetwork extends VisumNetwork{
 
 
 	public static class ModeType {
-		public final Id id;
+		public final Id<ModeType> id;
 		public final String name;
 		public final String type;
 		public final String pcu;
 
-		public ModeType(Id id, String name, String type, String pcu) {
+		public ModeType(Id<ModeType> id, String name, String type, String pcu) {
 			super();
 			this.id = id;
 			this.name = name;
@@ -77,7 +74,7 @@ public class MyVisumNetwork extends VisumNetwork{
 
 	}
 
-	public Map<Id, ModeType> getModeTypes(){
+	public Map<Id<ModeType>, ModeType> getModeTypes(){
 		return this.modeTypes;
 	}
 	

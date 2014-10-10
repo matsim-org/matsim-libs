@@ -3,19 +3,12 @@ package playground.acmarmol.matsim2030.forecasts.p2030preparation;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.StringUtils;
 
 
 
@@ -62,7 +55,7 @@ public class OldP2030{
 //					entries[1]= "0".concat(entries[1]);
 //				}
 				
-				Id id = new IdImpl(entries[1]);
+				Id<Municipality> id = Id.create(entries[1], Municipality.class);
 				if(!municipalities.getMunicipalities().containsKey(id)){
 					municipality = new Municipality(id);
 					municipality.setName(entries[3]);
@@ -95,7 +88,7 @@ public class OldP2030{
 		BufferedWriter out = IOUtils.getBufferedWriter(filename);
 		
 		
-		Iterator<Id> it = municipalities.getMunicipalities().keySet().iterator();
+		Iterator<Id<Municipality>> it = municipalities.getMunicipalities().keySet().iterator();
 		 
 		out.write("ID \t NAME \t  <25 \t  25<55 \t >55 ");
 		out.newLine();

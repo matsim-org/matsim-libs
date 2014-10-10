@@ -27,20 +27,14 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.households.Households;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.acmarmol.matsim2030.microcensus2010.MZConstants;
@@ -77,11 +71,11 @@ public class MZ2005WegeParser {
 //private methods
 //////////////////////////////////////////////////////////////////////
 
-	public ArrayList<Set<Id>> parse(String wegeFile) throws Exception{
+	public ArrayList<Set<Id<Person>>> parse(String wegeFile) throws Exception{
 		
-		Set<Id> coord_err_pids = new HashSet<Id>();
-		Set<Id> time_err_pids = new HashSet<Id>();
-		Set<Id> neg_coord_pids = new HashSet<Id>();
+		Set<Id<Person>> coord_err_pids = new HashSet<>();
+		Set<Id<Person>> time_err_pids = new HashSet<>();
+		Set<Id<Person>> neg_coord_pids = new HashSet<>();
 		
 		
 		FileReader fr = new FileReader(wegeFile);
@@ -100,11 +94,11 @@ public class MZ2005WegeParser {
 						
 			//person number (zielpnr)
 			String zielpnr = entries[1].trim();
-			Id pid = new IdImpl(hhnr.concat(zielpnr));
+			Id<Person> pid = Id.create(hhnr.concat(zielpnr), Person.class);
 			
 			//wege number
 			String wegnr = entries[3].trim();
-			Id wid = new IdImpl(pid.toString().concat("-").concat(wegnr));
+			String wid = pid.toString().concat("-").concat(wegnr);
 			wegeAttributes.putAttribute(wid.toString(), "number", Integer.parseInt(wegnr));
 			
 			// initialize number of etappen
@@ -281,7 +275,7 @@ public class MZ2005WegeParser {
 		System.out.println("      # weges parsed = " + weg_counter  );
 		
 			
-		ArrayList<Set<Id>> err_pids = new ArrayList<Set<Id>>();
+		ArrayList<Set<Id<Person>>> err_pids = new ArrayList<Set<Id<Person>>>();
 		err_pids.add(coord_err_pids);
 		err_pids.add(time_err_pids);
 		err_pids.add(neg_coord_pids);

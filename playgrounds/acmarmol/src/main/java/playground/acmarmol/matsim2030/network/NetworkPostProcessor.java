@@ -1,7 +1,6 @@
 package playground.acmarmol.matsim2030.network;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Map.Entry;
@@ -13,8 +12,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 
 
@@ -22,15 +19,15 @@ public class NetworkPostProcessor {
 
 	private Network network;
 	private final static Logger log = Logger.getLogger(NetworkPostProcessor.class);
-	private LinkedList<Id> unresolved_capacity_links;
-	private LinkedList<Id> unresolved_freespeed_links;
-	private LinkedList<Id> unresolved_length_links;
+	private LinkedList<Id<Link>> unresolved_capacity_links;
+	private LinkedList<Id<Link>> unresolved_freespeed_links;
+	private LinkedList<Id<Link>> unresolved_length_links;
 	
 	public NetworkPostProcessor(Network network){
 		this.network = network;
-		this.unresolved_capacity_links = new LinkedList<Id>();
-		this.unresolved_freespeed_links = new LinkedList<Id>();
-		this.unresolved_length_links = new LinkedList<Id>();
+		this.unresolved_capacity_links = new LinkedList<>();
+		this.unresolved_freespeed_links = new LinkedList<>();
+		this.unresolved_length_links = new LinkedList<>();
 	}
 	
 	
@@ -63,7 +60,7 @@ public class NetworkPostProcessor {
 		
 		
 		//change links and nodes information 
-		ArrayList<Id> linksToRemove = new ArrayList<Id>();
+		ArrayList<Id<Link>> linksToRemove = new ArrayList<>();
 		int links_edited = 0;
 		
 		
@@ -96,7 +93,7 @@ public class NetworkPostProcessor {
 		
 		
 		System.out.println("			" +linksToRemove.size() + " links removed... ");
-		for(Id linkToRemoveID:linksToRemove){
+		for(Id<Link> linkToRemoveID:linksToRemove){
 			network.removeLink(linkToRemoveID);
 			this.unresolved_capacity_links.remove(linkToRemoveID);
 			this.unresolved_freespeed_links.remove(linkToRemoveID);
@@ -160,16 +157,16 @@ public class NetworkPostProcessor {
 	}
 
 
-	private void calculateMissingLengths(LinkedList<Id> link_ids) {
+	private void calculateMissingLengths(LinkedList<Id<Link>> link_ids) {
 		
 		System.out.println("calculating missing lenghts with euclidian distance...");
-		for(Id link_id : link_ids){
+		for(Id<Link> link_id : link_ids){
 			
 			Link link = network.getLinks().get(link_id);
 			Node fromNode = link.getFromNode();
 			Node toNode = link.getToNode();
 			
-			double length = (double) Math.sqrt(Math.pow((fromNode.getCoord().getX()-toNode.getCoord().getX()),2)+Math.pow(fromNode.getCoord().getY()-toNode.getCoord().getY(),2));
+			double length = Math.sqrt(Math.pow((fromNode.getCoord().getX()-toNode.getCoord().getX()),2)+Math.pow(fromNode.getCoord().getY()-toNode.getCoord().getY(),2));
 			link.setLength(length);
 			
 			
@@ -194,9 +191,9 @@ public class NetworkPostProcessor {
 
 
 	private void printNetworkStatus() {
-		this.unresolved_capacity_links = new LinkedList<Id>();
-		this.unresolved_freespeed_links = new LinkedList<Id>();
-		this.unresolved_length_links = new LinkedList<Id>();
+		this.unresolved_capacity_links = new LinkedList<>();
+		this.unresolved_freespeed_links = new LinkedList<>();
+		this.unresolved_length_links = new LinkedList<>();
 		printNumberOfZeroCapacityLinks();
 		printNumberOfZeroFreespeedLinks();
 		printNumberOfZeroLengthLinks();
@@ -254,7 +251,7 @@ public class NetworkPostProcessor {
 		Link returnLink = null;
 		if(!link.getId().toString().contains("R")){
 			
-			IdImpl id = new IdImpl(link.getId().toString()+"R");
+			Id<Link> id = Id.create(link.getId().toString()+"R", Link.class);
 			
 			if(network.getLinks().containsKey(id)){
 				
@@ -262,7 +259,7 @@ public class NetworkPostProcessor {
 			}
 		}else{
 			
-			IdImpl id = new IdImpl(link.getId().toString().substring(0,link.getId().toString().indexOf("R")));
+			Id id = Id.create(link.getId().toString().substring(0,link.getId().toString().indexOf("R")), Link.class);
 			
 			returnLink = network.getLinks().get(id);
 		}

@@ -9,11 +9,9 @@ import java.util.HashMap;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.acmarmol.matsim2030.forecasts.Loader;
-import playground.acmarmol.matsim2030.forecasts.mz2010sample.MZ2010SampleDataCreator;
 import playground.acmarmol.utils.MyCollectionUtils;
 
 public class P2030Creator {
@@ -40,8 +38,8 @@ public class P2030Creator {
 		
 		
 		Municipalities oldMunicipalities = Loader.loadOldP2030Totals(); //old group totals (<25, 25<55, >55)
-		TreeMap<Id, Integer> gem_type = Loader.loadGemeindetypologieARE(inputBase + "Gemeindetypen_ARE_2010_VZ.txt");
-		HashMap<Id, Id> mun_changes = Loader.loadEliminatedMunicipalitiesDatabase(inputBase + "eliminated municipalities 01.01.2000 - 31.12.2010.txt");
+		TreeMap<String, Integer> gem_type = Loader.loadGemeindetypologieARE(inputBase + "Gemeindetypen_ARE_2010_VZ.txt");
+		HashMap<String, String> mun_changes = Loader.loadEliminatedMunicipalitiesDatabase(inputBase + "eliminated municipalities 01.01.2000 - 31.12.2010.txt");
 				
 		String inputfile =  inputBase + "P2030/P2030Original.txt";
 		String outputfile = outputBase + "P2030/NEWP2030.txt";
@@ -59,7 +57,7 @@ public class P2030Creator {
 				
 				String[] entries = curr_line.split("\t", -1);
 				
-				Id id = new IdImpl(entries[1]);
+				Id<Municipality> id = Id.create(entries[1], Municipality.class);
 				
 				//update group size according to new totals
 				int group = Integer.parseInt(entries[5]);
@@ -87,8 +85,8 @@ public class P2030Creator {
 				
 				
 				String gem_nr = entries[1];
-				if(mun_changes.containsKey(new IdImpl(gem_nr))){
-				gem_nr = mun_changes.get(new IdImpl(gem_nr)).toString();
+				if(mun_changes.containsKey(gem_nr)){
+				gem_nr = mun_changes.get(gem_nr).toString();
 				entries[1]= gem_nr;
 				}
 				
@@ -98,8 +96,7 @@ public class P2030Creator {
 				
 							
 				
-				gem_type.get(new IdImpl(gem_nr));
-				int gem_type_nr = gem_type.get(new IdImpl(gem_nr));
+				int gem_type_nr = gem_type.get(gem_nr);
 				entries[22] = String.valueOf(gem_type_nr);
 				entries[22 + gem_type_nr] = "1";
 				
@@ -122,7 +119,7 @@ public class P2030Creator {
 		out.write("ID \t NAME \t  <25 \t  25<55 \t >55 ");
 		out.newLine();
 		
-		 for(Id id : municipalities.getMunicipalities().keySet()) {
+		 for(Id<Municipality> id : municipalities.getMunicipalities().keySet()) {
 			 Municipality m = municipalities.getMunicipality(id);
 			 out.write(m.getId() + "\t" + m.getName() +"\t" + m.getPopulation()[0] +"\t" + m.getPopulation()[1] +"\t" + m.getPopulation()[2] );
 			 out.newLine();

@@ -24,6 +24,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
@@ -38,8 +39,6 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.matsim.vehicles.Vehicles;
 
 import playground.acmarmol.matsim2030.microcensus2010.Etappe;
-import playground.acmarmol.matsim2030.microcensus2010.MZ2010EtappenParser;
-import playground.acmarmol.matsim2030.microcensus2010.MZ2010HouseholdPersonParser;
 import playground.acmarmol.matsim2030.microcensus2010.MZPopulationUtils;
 import playground.acmarmol.matsim2030.microcensus2010.objectAttributesConverters.CoordConverter;
 import playground.acmarmol.matsim2030.microcensus2010.objectAttributesConverters.EtappeConverter;
@@ -224,7 +223,7 @@ public class MZ2005ToXmlFiles {
 
 		System.out.println("-----------------------------------------------------------------------------------------------------------");
 		log.info("parsing wegeFile...");
-		ArrayList<Set<Id>> pids = new MZ2005WegeParser(population, wegeAttributes).parse(wegeFile);
+		ArrayList<Set<Id<Person>>> pids = new MZ2005WegeParser(population, wegeAttributes).parse(wegeFile);
 		log.info("done. (parsing wegeFile)");
 		
 		Gbl.printElapsedTime();
@@ -275,7 +274,7 @@ public class MZ2005ToXmlFiles {
 //////////////////////////////////////////////////////////////////////
 		System.out.println("-----------------------------------------------------------------------------------------------------------");
 		log.info("removing persons with coord inconsistencies...");
-		Set<Id> coord_err_pids = pids.get(0);
+		Set<Id<Person>> coord_err_pids = pids.get(0);
 		if(coord_err_pids.size()>0){
 			MZPopulationUtils.removePlans(population, coord_err_pids);
 			System.out.println("      done.");
@@ -290,7 +289,7 @@ public class MZ2005ToXmlFiles {
 ////////////////////////////////////////////////////////////////////////
 		System.out.println("-----------------------------------------------------------------------------------------------------------");
 		log.info("removing persons with time inconsistencies...");
-		Set<Id> time_err_pids = pids.get(1);
+		Set<Id<Person>> time_err_pids = pids.get(1);
 		if(time_err_pids.size()>0){
 		MZPopulationUtils.removePlans(population, time_err_pids);
 		System.out.println("      done.");
@@ -306,7 +305,7 @@ public class MZ2005ToXmlFiles {
 ////////////////////////////////////////////////////////////////////
 		System.out.println("-----------------------------------------------------------------------------------------------------------");
 		log.info("removing persons with all plan outside switzerland...");
-		Set<Id> out_pids = MZPopulationUtils.identifyPlansOutOfSwitzerland(population, wegeAttributes, "Schweiz");
+		Set<Id<Person>> out_pids = MZPopulationUtils.identifyPlansOutOfSwitzerland(population, wegeAttributes, "Schweiz");
 		if(out_pids.size()>0){
 		MZPopulationUtils.removePlans(population, out_pids);
 		System.out.println("      done.");
@@ -327,8 +326,8 @@ public class MZ2005ToXmlFiles {
 //		
 		System.out.println("-----------------------------------------------------------------------------------------------------------");
 		log.info("handling border-crossing trips...");
-		ArrayList<Set<Id>> border_crossing_plane_ids = MZPopulationUtils.identifyCrossBorderWeges(population, wegeAttributes, "Schweiz");
-		Set<Id> border_crossing_wids = border_crossing_plane_ids.get(1);
+		ArrayList<Set<?>> border_crossing_plane_ids = MZPopulationUtils.identifyCrossBorderWeges(population, wegeAttributes, "Schweiz");
+		Set<String> border_crossing_wids = (Set<String>) border_crossing_plane_ids.get(1);
 		if(border_crossing_wids.size()>0){
 		MZPopulationUtils.HandleBorderCrossingTrips(population, wegeAttributes, border_crossing_wids, "Schweiz");
 		System.out.println("      done.");
@@ -344,7 +343,7 @@ public class MZ2005ToXmlFiles {
 ////////////////////////////////////////////////////////////////////////
 		System.out.println("-----------------------------------------------------------------------------------------------------------");
 		log.info("removing persons with undefined coords...");
-		Set<Id> undef_neg_pids = MZPopulationUtils.identifyPlansWithUndefinedNegCoords(population);
+		Set<Id<Person>> undef_neg_pids = MZPopulationUtils.identifyPlansWithUndefinedNegCoords(population);
 		if(undef_neg_pids.size()>0){
 		MZPopulationUtils.removePlans(population, undef_neg_pids);
 		System.out.println("      done.");
@@ -361,7 +360,7 @@ public class MZ2005ToXmlFiles {
 
 		System.out.println("-----------------------------------------------------------------------------------------------------------");
 		log.info("removing persons with negative coords...");
-		Set<Id> neg_coord_pids = MZPopulationUtils.identifyPlansWithNegCoords(population);
+		Set<Id<Person>> neg_coord_pids = MZPopulationUtils.identifyPlansWithNegCoords(population);
 		if(neg_coord_pids.size()>0){
 		MZPopulationUtils.removePlans(population, neg_coord_pids);
 		System.out.println("      done.");

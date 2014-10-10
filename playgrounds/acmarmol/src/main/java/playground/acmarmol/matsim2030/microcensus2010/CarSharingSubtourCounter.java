@@ -22,7 +22,7 @@ public class CarSharingSubtourCounter{
 
 		private static void countCarSharingSubtours(Population population, ObjectAttributes wegeAttributes){
 			
-			Set<Id> ids;
+			Set<Id<Person>> ids;
 			ids = MZPopulationUtils.identifyPlansWithoutActivities(population);
 			MZPopulationUtils.removePlans(population, ids);
 			System.out.println("      Total persons removed: " + ids.size());

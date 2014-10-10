@@ -22,9 +22,9 @@ package playground.acmarmol.matsim2030.microcensus2005;
 import java.io.BufferedReader;
 import java.io.FileReader;
 
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.households.Household;
 import org.matsim.households.Households;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
@@ -108,11 +108,11 @@ public class MZ2005HouseholdPersonParser {
 					
 			
 			//filling person data into matsim households
-			IdImpl hhid = new IdImpl(hhnr);
+			Id<Household> hhid = Id.create(hhnr, Household.class);
 			if(!this.households.getHouseholds().containsKey(hhid)){
 				throw new RuntimeException("This should never happen!  Household hhnr: " + hhnr+ " doesn't exist");
 			}		
-			this.households.getHouseholds().get(hhid).getMemberIds().add(new IdImpl(hhnr.concat(hpnr)));  // id = hhnr + hpnr??
+			this.households.getHouseholds().get(hhid).getMemberIds().add(Id.create(hhnr.concat(hpnr), Person.class));  // id = hhnr + hpnr??
 		}
 		
 			

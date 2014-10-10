@@ -5,16 +5,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.TreeMap;
 
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.acmarmol.matsim2030.forecasts.p2030preparation.Municipalities;
@@ -34,8 +30,8 @@ public  class Loader {
 		
 	}
 	
-	public static TreeMap<Id, Integer> loadGemeindetypologieARE(String fileName) throws NumberFormatException, IOException {
-		TreeMap <Id, Integer> gemeinde_typen = new TreeMap <Id, Integer>();
+	public static TreeMap<String, Integer> loadGemeindetypologieARE(String fileName) throws NumberFormatException, IOException {
+		TreeMap <String, Integer> gemeinde_typen = new TreeMap<>();
 		
 		System.out.println("reading "+ fileName);
 		
@@ -47,23 +43,20 @@ public  class Loader {
 			counter++;
 			String[] entries = curr_line.split("\t", -1);
 			
-
-			gemeinde_typen.put(new IdImpl(entries[1]), Integer.parseInt(entries[8]));
-			
-			
-			
+			gemeinde_typen.put(entries[1], Integer.parseInt(entries[8]));
 		}
-		
+
+		br.close();
 		System.out.println("Number of municipalities Gemeindetypen file:" + counter );
 		return gemeinde_typen;
 		
 	}
 	
 	
-	public static TreeMap<Id, Integer> loadMunicipalityTotals(String fileName) throws IOException {
+	public static TreeMap<String, Integer> loadMunicipalityTotals(String fileName) throws IOException {
 		
 		System.out.println("reading "+ fileName);
-		TreeMap <Id, Integer> mun_totals = new TreeMap <Id, Integer>();
+		TreeMap <String, Integer> mun_totals = new TreeMap <>();
 
 		int counter=0;	
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), "ISO-8859-1"));
@@ -76,7 +69,7 @@ public  class Loader {
 			String[] entries = curr_line.split("\t", -1);
 			
 		
-			mun_totals.put(new IdImpl(Integer.parseInt(entries[0])), Integer.parseInt(entries[2]));
+			mun_totals.put(entries[0], Integer.parseInt(entries[2]));
 			
 			
 			
@@ -87,10 +80,10 @@ public  class Loader {
 	}
 	
 	
-	public static HashMap<Id, Id> loadEliminatedMunicipalitiesDatabase(String fileName) throws IOException, FileNotFoundException {
+	public static HashMap<String, String> loadEliminatedMunicipalitiesDatabase(String fileName) throws IOException, FileNotFoundException {
 		
 		System.out.println("reading "+ fileName);
-		HashMap<Id, Id> munic_changes = new HashMap<Id, Id>();		
+		HashMap<String, String> munic_changes = new HashMap<>();		
 		
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), "ISO-8859-1"));
 		
@@ -100,10 +93,10 @@ public  class Loader {
 			String[] entries = curr_line.split("\t", -1);
 			
 			//encoding: (old BFS nr, new BFS nummer)
-			munic_changes.put(new IdImpl(Integer.parseInt(	entries[3])), new IdImpl(entries[7]));
+			munic_changes.put(entries[3], entries[7]);
 				
 		}
-		
+		br.close();
 		return  munic_changes;
 		
 	}
@@ -119,7 +112,7 @@ public  class Loader {
 				
 				String[] entries = curr_line.split("\t", -1);
 				
-				Id id = new IdImpl(entries[1]);
+				Id<Municipality> id = Id.create(entries[1], Municipality.class);
 				if(!municipalities.getMunicipalities().containsKey(id)){
 					
 					Municipality municipality = new Municipality(id);
@@ -138,11 +131,11 @@ public  class Loader {
 	}
 	
 	
-	public static ArrayList<HashMap<Id, Id>> loadOZandMZDatabase(String fileName) throws IOException, FileNotFoundException {
+	public static ArrayList<HashMap<Id<Municipality>, Id<Municipality>>> loadOZandMZDatabase(String fileName) throws IOException, FileNotFoundException {
 		
-		ArrayList<HashMap<Id, Id>> OZandMZ = new ArrayList<HashMap<Id, Id>>();
-		HashMap<Id, Id> OZs = new HashMap<Id, Id>();
-		HashMap<Id, Id> MZs = new HashMap<Id, Id>();
+		ArrayList<HashMap<Id<Municipality>, Id<Municipality>>> OZandMZ = new ArrayList<HashMap<Id<Municipality>, Id<Municipality>>>();
+		HashMap<Id<Municipality>, Id<Municipality>> OZs = new HashMap<>();
+		HashMap<Id<Municipality>, Id<Municipality>> MZs = new HashMap<>();
 			
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), "ISO-8859-1"));
 		
@@ -161,8 +154,8 @@ public  class Loader {
 			OZ = entries[8].trim();
 			MZ = entries[4].trim();
 			
-			OZs.put(new IdImpl(hh_gem), new IdImpl(OZ));
-			MZs.put(new IdImpl(hh_gem), new IdImpl(MZ));
+			OZs.put(Id.create(hh_gem, Municipality.class), Id.create(OZ, Municipality.class));
+			MZs.put(Id.create(hh_gem, Municipality.class), Id.create(MZ, Municipality.class));
 				
 		}
 		
@@ -175,12 +168,12 @@ public  class Loader {
 		
 	}
 	
-public static TreeMap<String, Tuple<String, String>> loadTravelTimesToMZandOZ(String fileName, ArrayList<HashMap<Id, Id>> MZandOZ) throws IOException, FileNotFoundException {
+public static TreeMap<String, Tuple<String, String>> loadTravelTimesToMZandOZ(String fileName, ArrayList<HashMap<Id<Municipality>, Id<Municipality>>> MZandOZ) throws IOException, FileNotFoundException {
 		
 		TreeMap<String, Tuple<String, String>> travel_times = new TreeMap<String, Tuple<String, String>>();
 		
-		HashMap<Id, Id> ozs = MZandOZ.get(0);
-		HashMap<Id, Id> mzs = MZandOZ.get(1);
+		HashMap<Id<Municipality>, Id<Municipality>> ozs = MZandOZ.get(0);
+		HashMap<Id<Municipality>, Id<Municipality>> mzs = MZandOZ.get(1);
 		
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), "ISO-8859-1"));
 		
@@ -194,8 +187,8 @@ public static TreeMap<String, Tuple<String, String>> loadTravelTimesToMZandOZ(St
 			String[] entries = curr_line.split("\t", -1);
 			
 			code = entries[0].trim();
-			Id oz = ozs.get(new IdImpl(code));
-			Id mz = mzs.get(new IdImpl(code));
+			Id<Municipality> oz = ozs.get(Id.create(code, Municipality.class));
+			Id<Municipality> mz = mzs.get(Id.create(code, Municipality.class));
 			
 			if(oz==null || mz==null){
 				throw new RuntimeException("Could not found mz or oz for municipality nr: " + code);
@@ -214,7 +207,7 @@ public static TreeMap<String, Tuple<String, String>> loadTravelTimesToMZandOZ(St
 			travel_times.put(code, new Tuple<String,String>(oz_tt,mz_tt));
 
 		}
-
+		br.close();
 		return  travel_times;
 		
 	}
@@ -240,6 +233,7 @@ public static HashMap<String, Tuple<String, String>> loadCreatedMunicipalitiesDa
 		
 		code_pairs.put(before_code, new Tuple<String, String>(after_code, new_name));
 	}
+	br.close();
 	return code_pairs;
 }
 
@@ -266,29 +260,30 @@ public static HashMap<String, String> loadCreatedMunicipalitiesDatabase2(String 
 		code_pairs.put(after_code, before_code);
 		}
 	}
+	br.close();
 	return code_pairs;
 }
 
-public static HashMap<Id, Id> loadOZtoGrossZtr(String fileName) throws IOException {
+public static HashMap<Id<Municipality>, Id<Municipality>> loadOZtoGrossZtr(String fileName) throws IOException {
 	
 	BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), "ISO-8859-1"));
 	String curr_line = br.readLine(); // Skip headers
 
-	HashMap<Id, Id> ozToGrossZtr = new HashMap<Id, Id>();
+	HashMap<Id<Municipality>, Id<Municipality>> ozToGrossZtr = new HashMap<Id<Municipality>, Id<Municipality>>();
 	
 	while ((curr_line = br.readLine()) != null) {
 	
 		
 		String[] entries = curr_line.split("\t", -1);
 		
-		Id oz = new IdImpl(entries[0]);
-		Id grossZtr = new IdImpl(entries[1]);
+		Id<Municipality> oz = Id.create(entries[0], Municipality.class);
+		Id<Municipality> grossZtr = Id.create(entries[1], Municipality.class);
 
 		
 		ozToGrossZtr.put(oz, grossZtr);
 		
 	}
-	
+	br.close();
 	
 	return ozToGrossZtr;
 

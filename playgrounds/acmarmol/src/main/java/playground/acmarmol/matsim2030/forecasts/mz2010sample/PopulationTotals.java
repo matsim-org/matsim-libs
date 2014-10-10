@@ -5,8 +5,10 @@ import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import org.matsim.core.basic.v01.IdImpl;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.IOUtils;
+
 import playground.acmarmol.matsim2030.forecasts.p2030preparation.Municipalities;
 import playground.acmarmol.matsim2030.forecasts.p2030preparation.Municipality;
 
@@ -41,7 +43,7 @@ public class PopulationTotals {
 				name = entries[0].substring(entries[0].lastIndexOf("......")+11).trim();
 				population = entries[1].replaceAll("\\s","");
 			
-				Municipality municipality = new Municipality(new IdImpl(gem_nr));
+				Municipality municipality = new Municipality(Id.create(gem_nr, Municipality.class));
 				municipality.setName(name);
 				municipalities_web.addMunicipality(municipality);
 				

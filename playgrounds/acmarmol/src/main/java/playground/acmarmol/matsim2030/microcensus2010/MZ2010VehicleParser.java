@@ -22,11 +22,12 @@ package playground.acmarmol.matsim2030.microcensus2010;
 import java.io.BufferedReader;
 import java.io.FileReader;
 
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.households.Household;
 import org.matsim.households.Households;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
 import org.matsim.vehicles.Vehicles;
 
@@ -135,16 +136,16 @@ public class MZ2010VehicleParser {
 			
 						
 			// creating matsim vehicle
-			Vehicle vehicle = vehicles.getFactory().createVehicle(new IdImpl(hhnr.concat(fznr)), new VehicleTypeImpl(new IdImpl(type))); 
+			Vehicle vehicle = vehicles.getFactory().createVehicle(Id.create(hhnr.concat(fznr), Vehicle.class), new VehicleTypeImpl(Id.create(type, VehicleType.class))); 
 			vehicles.addVehicle( vehicle);
 			
 			
 			//filling vehicles data into matsim households
-			IdImpl hhid = new IdImpl(hhnr);
+			Id<Household> hhid = Id.create(hhnr, Household.class);
 			if(!this.households.getHouseholds().containsKey(hhid)){
 				throw new RuntimeException("This should never happen!  Household hhnr: " + hhnr+ " doesn't exist");
 			}		
-			this.households.getHouseholds().get(hhid).getVehicleIds().add(new IdImpl(hhnr.concat(fznr)));  // id = hhnr + fznr??
+			this.households.getHouseholds().get(hhid).getVehicleIds().add(Id.create(hhnr.concat(fznr), Vehicle.class));  // id = hhnr + fznr??
 			
 			
 		}//end while

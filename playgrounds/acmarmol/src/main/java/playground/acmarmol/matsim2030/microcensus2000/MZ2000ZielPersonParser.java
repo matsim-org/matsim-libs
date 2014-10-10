@@ -22,8 +22,9 @@ package playground.acmarmol.matsim2030.microcensus2000;
 import java.io.BufferedReader;
 import java.io.FileReader;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.households.Households;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -310,7 +311,7 @@ public class MZ2000ZielPersonParser {
 		
 		
 		//creating matsim person
-		PersonImpl person = new PersonImpl(new IdImpl(intnr));
+		PersonImpl person = new PersonImpl(Id.create(intnr, Person.class));
 		person.setAge(Integer.parseInt(age));
 		person.setEmployed(employed);
 		person.setLicence(licence);

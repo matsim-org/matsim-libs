@@ -21,7 +21,8 @@ package playground.acmarmol.matsim2030.microcensus2000;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import org.matsim.core.basic.v01.IdImpl;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
 import org.matsim.households.Income.IncomePeriod;
@@ -166,7 +167,7 @@ public class MZ2000HouseholdParser {
 		householdAttributes.putAttribute(hhnr, MZConstants.TOTAL_BICYCLES, nr_bikes);
 		
 		// creating matsim household
-		Household hh = households.getFactory().createHousehold(new IdImpl(hhnr));
+		Household hh = households.getFactory().createHousehold(Id.create(hhnr, Household.class));
 		hh.setIncome(new IncomeImpl(Double.parseDouble(income), IncomePeriod.month));
 		households.getHouseholds().put(hh.getId(), hh);
 		}

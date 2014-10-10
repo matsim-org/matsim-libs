@@ -27,20 +27,14 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.households.Households;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.acmarmol.matsim2030.microcensus2010.MZConstants;
@@ -100,12 +94,12 @@ public class MZ1989WegeParser {
 						
 			//person number (zielpnr)
 			String zielpnr = entries[2].trim();
-			Id pid = new IdImpl(hhnr.concat(zielpnr));
+			Id<Person> pid = Id.create(hhnr.concat(zielpnr), Person.class);
 			//Id pid = new IdImpl(intnr);
 			
 			//wege number
 			String wegnr = entries[3].trim();
-			Id wid = new IdImpl(pid.toString().concat("-").concat(wegnr));
+			String wid = pid.toString().concat("-").concat(wegnr);
 			wegeAttributes.putAttribute(wid.toString(), "number", Integer.parseInt(wegnr));
 			
 			// initialize number of etappen

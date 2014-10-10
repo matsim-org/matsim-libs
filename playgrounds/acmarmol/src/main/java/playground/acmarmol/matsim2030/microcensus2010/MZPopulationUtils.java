@@ -43,7 +43,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -81,8 +80,8 @@ public class MZPopulationUtils {
 //public methods
 //////////////////////////////////////////////////////////////////////	
 
-	public static void removePlans(final Population population, final Set<Id> ids) {
-		for (Id id : ids) {
+	public static void removePlans(final Population population, final Set<Id<Person>> ids) {
+		for (Id<Person> id : ids) {
 			Person p = population.getPersons().remove(id);
 			if (p == null) { throw new RuntimeException("pid="+id+": id not found in the plans DB!"); }
 		}
@@ -92,8 +91,8 @@ public class MZPopulationUtils {
 
 //////////////////////////////////////////////////////////////////////
 
-	public static Set<Id> identifyPlansWithoutActivities(final Population population) {
-		Set<Id> ids = new HashSet<Id>();
+	public static Set<Id<Person>> identifyPlansWithoutActivities(final Population population) {
+		Set<Id<Person>> ids = new HashSet<Id<Person>>();
 		for (Person person : population.getPersons().values()) {
 			if(person.getSelectedPlan()==null){
 			ids.add(person.getId());}
@@ -104,8 +103,8 @@ public class MZPopulationUtils {
 
 //////////////////////////////////////////////////////////////////////
 	
-	public static Set<Id> identifyNonHomeBasedPlans(final Population population) {
-		Set<Id> ids = new HashSet<Id>();
+	public static Set<Id<Person>> identifyNonHomeBasedPlans(final Population population) {
+		Set<Id<Person>> ids = new HashSet<>();
 		for (Person p : population.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
 			ActivityImpl last = (ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1);
@@ -117,8 +116,8 @@ public class MZPopulationUtils {
 	
 //////////////////////////////////////////////////////////////////////
 	
-	public static Set<Id> identifyNonRoundPlans(final Population population) {
-		Set<Id> ids = new HashSet<Id>();
+	public static Set<Id<Person>> identifyNonRoundPlans(final Population population) {
+		Set<Id<Person>> ids = new HashSet<>();
 		for (Person p : population.getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
 			ActivityImpl last = (ActivityImpl)plan.getPlanElements().get(plan.getPlanElements().size()-1);
@@ -130,8 +129,8 @@ public class MZPopulationUtils {
 
 //////////////////////////////////////////////////////////////////////
 
-	public static Set<Id> identifyPlansWithNegCoords(final Population population) {
-		Set<Id> ids = new HashSet<Id>();
+	public static Set<Id<Person>> identifyPlansWithNegCoords(final Population population) {
+		Set<Id<Person>> ids = new HashSet<>();
 		for (Person person : population.getPersons().values()) {
 			Plan plan = person.getSelectedPlan();
 			if(plan!=null){ //avoid persons without activities
@@ -148,8 +147,8 @@ public class MZPopulationUtils {
 
 //////////////////////////////////////////////////////////////////////
 
-	public static Set<Id> identifyPlansWithTooLongWalkTrips(final Population population) {
-	Set<Id> ids = new HashSet<Id>();
+	public static Set<Id<Person>> identifyPlansWithTooLongWalkTrips(final Population population) {
+	Set<Id<Person>> ids = new HashSet<>();
 	for (Person person : population.getPersons().values()) {
 		Plan plan = person.getSelectedPlan();
 		if(plan!=null){ //avoid persons without activities
@@ -222,8 +221,8 @@ public class MZPopulationUtils {
 //////////////////////////////////////////////////////////////////////
 	
 
-public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population population) {
-	Set<Id> ids = new HashSet<Id>();
+public static Set<Id<Person>> identifyPlansWithUndefinedNegCoords(final Population population) {
+	Set<Id<Person>> ids = new HashSet<>();
 		for (Person person : population.getPersons().values()) {
 			Plan plan = person.getSelectedPlan();
 			if(plan!=null){ //avoid persons without activities
@@ -242,8 +241,8 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 		
 //////////////////////////////////////////////////////////////////////
 
-	public static Set<Id> identifyPlansWithoutBestPrecision(final Population population) {
-	Set<Id> ids = new HashSet<Id>();
+	public static Set<Id<Person>> identifyPlansWithoutBestPrecision(final Population population) {
+	Set<Id<Person>> ids = new HashSet<>();
 	for (Person person : population.getPersons().values()) {	
 		Plan plan = person.getSelectedPlan();
 		if(plan!=null){ //avoid persons without activities
@@ -271,14 +270,14 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 	*/	
 	
 	
-	public static void HandleBorderCrossingTrips(final Population population, final ObjectAttributes wegeAttributes, Set<Id> border_crossing_wids, String countryCode) {	
+	public static void HandleBorderCrossingTrips(final Population population, final ObjectAttributes wegeAttributes, Set<String> border_crossing_wids, String countryCode) {	
 		
 	final String COUNTRY = countryCode;
 	HashMap<Id, ArrayList<Tuple<Integer, PlanElement>>> toAdd =  new HashMap<Id, ArrayList<Tuple<Integer, PlanElement>>>();
 	HashMap<Id,ArrayList<PlanElement>> toRemove = 	new HashMap<Id,ArrayList<PlanElement>>();
-	Set<Id> overnight_pids = new HashSet<Id>();
+	Set<Id<Person>> overnight_pids = new HashSet<>();
 		
-	for(Id wid: border_crossing_wids){
+	for(String wid: border_crossing_wids){
 		
 	
 	String sland = (String) wegeAttributes.getAttribute(wid.toString(), MZConstants.START_COUNTRY);
@@ -286,10 +285,10 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 
 		if(sland.equals(COUNTRY) &&  !zland.equals(COUNTRY)){
 			handleTripGoingOutOfCountry(population, wid, COUNTRY, wegeAttributes);
-			overnight_pids.add(new IdImpl(wid.toString().substring(0, wid.toString().indexOf('-')).trim()));
+			overnight_pids.add(Id.create(wid.toString().substring(0, wid.toString().indexOf('-')).trim(), Person.class));
 		}else if(!sland.equals(COUNTRY) &&  zland.equals(COUNTRY)){
 			handleTripEnteringCountry(population, wid, COUNTRY, wegeAttributes, toAdd, toRemove);
-			overnight_pids.remove(new IdImpl(wid.toString().substring(0, wid.toString().indexOf('-')).trim()));
+			overnight_pids.remove(Id.create(wid.toString().substring(0, wid.toString().indexOf('-')).trim(), Person.class));
 		}else{throw new RuntimeException("This should never happen! Wege "+ wid+ " doesn't cross the border");}
 		
 		
@@ -322,9 +321,9 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 */	
 
 	@SuppressWarnings("deprecation")
-	private static void handleTripEnteringCountry(Population population, Id wid, String country, ObjectAttributes wegeAttributes, HashMap<Id, ArrayList<Tuple<Integer, PlanElement>>> toAdd, HashMap<Id,ArrayList<PlanElement>> toRemove){
+	private static void handleTripEnteringCountry(Population population, String wid, String country, ObjectAttributes wegeAttributes, HashMap<Id, ArrayList<Tuple<Integer, PlanElement>>> toAdd, HashMap<Id,ArrayList<PlanElement>> toRemove){
 	
-		Id pid = new IdImpl(wid.toString().substring(0, wid.toString().indexOf('-')).trim());
+		Id<Person> pid = Id.create(wid.toString().substring(0, wid.toString().indexOf('-')).trim(), Person.class);
 		
 		if(pid.toString().equals("87011")){
 			System.out.println(pid);
@@ -498,9 +497,9 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 	 */	
 	
 	
-	private static void handleTripGoingOutOfCountry(Population population, Id wid, String country, ObjectAttributes wegeAttributes){
+	private static void handleTripGoingOutOfCountry(Population population, String wid, String country, ObjectAttributes wegeAttributes){
 	
-			Id pid = new IdImpl(wid.toString().substring(0, wid.toString().indexOf('-')).trim());
+			Id<Person> pid = Id.create(wid.toString().substring(0, wid.toString().indexOf('-')).trim(), Person.class);
 			int legNumber = Integer.parseInt(wid.toString().substring(wid.toString().indexOf('-')+1));
 			//maybe legNumber is not the best way to index, because some planElements are deleted (the ones outside Switzerland)
 			// to overcome this issue, all plan elements are stored first in toRemove, and only in the end are deleted.
@@ -554,9 +553,9 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 
 //////////////////////////////////////////////////////////////////////
 	
-	private static void removePlanElementsAfterLastBorderCrossing(Population population, Set<Id> overnight_pids){
+	private static void removePlanElementsAfterLastBorderCrossing(Population population, Set<Id<Person>> overnight_pids){
 		
-		for(Id id: overnight_pids){
+		for(Id<Person> id: overnight_pids){
 			List<PlanElement> planElements = population.getPersons().get(id).getSelectedPlan().getPlanElements();
 			
 			boolean cont = true;
@@ -613,8 +612,8 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 	
 //////////////////////////////////////////////////////////////////////
 
-	public static Set<Id> identifyPlansOutOfSwitzerland(final Population population, final ObjectAttributes wegeAttributes, String countryCode) {
-		Set<Id> ids = new HashSet<Id>();
+	public static Set<Id<Person>> identifyPlansOutOfSwitzerland(final Population population, final ObjectAttributes wegeAttributes, String countryCode) {
+		Set<Id<Person>> ids = new HashSet<>();
 		for (Person person : population.getPersons().values()) {	
 			Plan plan = person.getSelectedPlan();
 			if(plan!=null){ //avoid persons without activities
@@ -644,9 +643,9 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 
 //////////////////////////////////////////////////////////////////////
 
-	public static ArrayList<Set<Id>> identifyCrossBorderWeges(final Population population, final ObjectAttributes wegeAttributes, String countryCode) {
-		Set<Id> wids = new LinkedHashSet<Id>();
-		Set<Id> pids = new LinkedHashSet<Id>();
+	public static ArrayList<Set<?>> identifyCrossBorderWeges(final Population population, final ObjectAttributes wegeAttributes, String countryCode) {
+		Set<String> wids = new LinkedHashSet<String>();
+		Set<Id<Person>> pids = new LinkedHashSet<>();
 		
 		for (Person person : population.getPersons().values()) {	
 			
@@ -662,7 +661,7 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 						String sland = (String) wegeAttributes.getAttribute(wid,MZConstants.START_COUNTRY);
 						String zland = (String) wegeAttributes.getAttribute(wid,MZConstants.END_COUNTRY);
 						if((!sland.equals(countryCode) ^ !zland.equals(countryCode))){
-						 wids.add(new IdImpl(wid));
+						 wids.add(wid);
 						 pids.add(person.getId());
 							
 					}
@@ -672,7 +671,7 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 			
 			}
 		}
-		ArrayList<Set<Id>> ids = new ArrayList<Set<Id>>();
+		ArrayList<Set<?>> ids = new ArrayList<Set<?>>();
 		ids.add(pids);
 		ids.add(wids);
 		return ids;

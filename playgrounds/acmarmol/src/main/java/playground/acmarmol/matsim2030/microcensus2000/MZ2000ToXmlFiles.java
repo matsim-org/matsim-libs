@@ -25,6 +25,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
@@ -40,7 +41,6 @@ import org.matsim.vehicles.Vehicles;
 
 import playground.acmarmol.matsim2030.forecasts.timeSeriesUpdate.loaders.etappes.EtappenLoader;
 import playground.acmarmol.matsim2030.microcensus2010.Etappe;
-import playground.acmarmol.matsim2030.microcensus2010.MZ2010EtappenParser;
 import playground.acmarmol.matsim2030.microcensus2010.MZPopulationUtils;
 import playground.acmarmol.matsim2030.microcensus2010.objectAttributesConverters.CoordConverter;
 import playground.acmarmol.matsim2030.microcensus2010.objectAttributesConverters.EtappeConverter;
@@ -308,7 +308,7 @@ public class MZ2000ToXmlFiles {
 //////////////////////////////////////////////////////////////////////
 		System.out.println("-----------------------------------------------------------------------------------------------------------");
 		log.info("removing persons with all plan outside switzerland...");
-		Set<Id> out_pids = MZPopulationUtils.identifyPlansOutOfSwitzerland(population, wegeAttributes, "");
+		Set<Id<Person>> out_pids = MZPopulationUtils.identifyPlansOutOfSwitzerland(population, wegeAttributes, "");
 		if(out_pids.size()>0){
 		MZPopulationUtils.removePlans(population, out_pids);
 		System.out.println("      done.");

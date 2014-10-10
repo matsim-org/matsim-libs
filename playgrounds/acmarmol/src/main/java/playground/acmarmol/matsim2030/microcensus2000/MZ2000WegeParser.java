@@ -27,20 +27,14 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.households.Households;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.acmarmol.matsim2030.microcensus2010.MZConstants;
@@ -102,15 +96,15 @@ public class MZ2000WegeParser {
 			String zielpnr = entries[1].trim();
 			String intnr = entries[0].trim();
 			//Id pid = new IdImpl(hhnr.concat(zielpnr));
-			Id pid = new IdImpl(intnr);
+			Id<Person> pid = Id.create(intnr, Person.class);
 			
 			//wege number
 			String wegnr = entries[2].trim();
-			Id wid = new IdImpl(pid.toString().concat("-").concat(wegnr));
-			wegeAttributes.putAttribute(wid.toString(), "number", Integer.parseInt(wegnr));
+			String wid = pid.toString().concat("-").concat(wegnr);
+			wegeAttributes.putAttribute(wid, "number", Integer.parseInt(wegnr));
 			
 			// initialize number of etappen
-			wegeAttributes.putAttribute(wid.toString(), MZConstants.NUMBER_STAGES, 0); //initialize
+			wegeAttributes.putAttribute(wid, MZConstants.NUMBER_STAGES, 0); //initialize
 			
 			//mode
 			String mode = "undefined";
@@ -133,7 +127,7 @@ public class MZ2000WegeParser {
 //			else if(mode.equals("17")){mode =  MZConstants.OTHER;}
 //			else if(mode.equals("-99")){mode =  MZConstants.PSEUDOETAPPE;}
 //			else Gbl.errorMsg("This should never happen!  Mode: " +  mode + " doesn't exist");
-//			wegeAttributes.putAttribute(wid.toString(), MZConstants.PRINCIPAL_MODE, mode);
+//			wegeAttributes.putAttribute(wid, MZConstants.PRINCIPAL_MODE, mode);
 			
 			//start coordinate - CH1903 (18,19)
 			Coord start_coord = new CoordImpl(0,0);
@@ -145,18 +139,18 @@ public class MZ2000WegeParser {
 			//starting and ending country ( == "" for switzerland) - Startort im Ausland NUTS
 			String sland = entries[17].trim();
 			String zland = entries[24].trim();
-			wegeAttributes.putAttribute(wid.toString(), MZConstants.START_COUNTRY, sland);
-			wegeAttributes.putAttribute(wid.toString(), MZConstants.END_COUNTRY, zland);
+			wegeAttributes.putAttribute(wid, MZConstants.START_COUNTRY, sland);
+			wegeAttributes.putAttribute(wid, MZConstants.END_COUNTRY, zland);
 			
 			//starting point address
 			String street =  entries[15].trim();
 			String number =  entries[16].trim();
-			wegeAttributes.putAttribute(wid.toString(), MZConstants.ADDRESS_START, street+number);
+			wegeAttributes.putAttribute(wid, MZConstants.ADDRESS_START, street+number);
 			
 			//destination adress
 			street =  entries[22].trim();
 			number =  entries[23].trim();
-			wegeAttributes.putAttribute(wid.toString(), MZConstants.ADDRESS_END, street+number);
+			wegeAttributes.putAttribute(wid, MZConstants.ADDRESS_END, street+number);
 			
 			// 9999 = Ausland / undefiniert; 9999 = Grenze
 			String sort = entries[17].trim();
@@ -165,11 +159,11 @@ public class MZ2000WegeParser {
 				
 			// departure time (min => sec.)
 			int departure = Integer.parseInt(entries[8].trim())*60;
-			wegeAttributes.putAttribute(wid.toString(), MZConstants.DEPARTURE, departure);
+			wegeAttributes.putAttribute(wid, MZConstants.DEPARTURE, departure);
 			
 			// arrival time (min => sec.)
 			int arrival = Integer.parseInt(entries[9].trim())*60;
-			wegeAttributes.putAttribute(wid.toString(), MZConstants.ARRIVAL, arrival);		
+			wegeAttributes.putAttribute(wid, MZConstants.ARRIVAL, arrival);		
 			
 			
 				// time consistency check N°1

@@ -4,7 +4,7 @@ import org.matsim.api.core.v01.Id;
 
 public class Municipality {
 
-	private Id id;
+	private Id<Municipality> id;
 	private boolean isOZ;
 	private double rz_mz_ov;
 	private double rz_mz_iv;
@@ -15,17 +15,17 @@ public class Municipality {
 	private String name;
 	
 	
-	public Municipality(Id id){
+	public Municipality(Id<Municipality> id){
 		this.id = id;
 		this.population = new double[3];
 				
 	}
 	
 	
-	public Id getId() {
+	public Id<Municipality> getId() {
 		return id;
 	}
-	public void setId(Id id) {
+	public void setId(Id<Municipality> id) {
 		this.id = id;
 	}
 	public boolean isOZ() {

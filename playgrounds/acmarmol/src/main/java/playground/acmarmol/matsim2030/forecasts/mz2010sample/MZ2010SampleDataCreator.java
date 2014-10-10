@@ -12,7 +12,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
@@ -24,6 +23,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 import playground.acmarmol.matsim2030.forecasts.Loader;
+import playground.acmarmol.matsim2030.forecasts.p2030preparation.Municipality;
 import playground.acmarmol.matsim2030.forecasts.timeSeriesUpdate.loaders.etappes.Etappe;
 import playground.acmarmol.matsim2030.forecasts.timeSeriesUpdate.loaders.etappes.EtappenLoader;
 import playground.acmarmol.matsim2030.microcensus2010.MZConstants;
@@ -37,13 +37,13 @@ public class MZ2010SampleDataCreator {
 	private ObjectAttributes populationAttributes;
 	private ObjectAttributes householdAttributes;
 	private BufferedWriter out;
-	private TreeMap<Id, Integer> mun_totals;
-	private HashMap<Id, Id> mun_changes;
+	private TreeMap<String, Integer> mun_totals;
+	private HashMap<String, String> mun_changes;
 	private HashMap<String, String> mun_changes_const;
-	private TreeMap<Id, Integer> gemeinde_typen;
-	private HashMap<Id, Id> ozs;
-	private HashMap<Id, Id> mzs;
-	private HashMap<Id, Id> ozToGrossZtr;
+	private TreeMap<String, Integer> gemeinde_typen;
+	private HashMap<Id<Municipality>, Id<Municipality>> ozs;
+	private HashMap<Id<Municipality>, Id<Municipality>> mzs;
+	private HashMap<Id<Municipality>, Id<Municipality>> ozToGrossZtr;
 	private TreeMap<String, Tuple<String, String>> travel_times_IV;
 	private TreeMap<String, Tuple<String, String>> travel_times_OV;
 	private String inputBase;
@@ -79,7 +79,7 @@ public class MZ2010SampleDataCreator {
 		this.mun_changes = Loader.loadEliminatedMunicipalitiesDatabase( inputBase + "municipalities/eliminated municipalities 01.01.2010 - 01.07.2011.txt");
 		this.mun_changes_const = Loader.loadCreatedMunicipalitiesDatabase2(inputBase +"municipalities/nuovi costituzione 01.01.2000-31.12.2010.txt");
 		this.gemeinde_typen = Loader.loadGemeindetypologieARE(inputBase + "Gemeindetypen_ARE_2010_VZ.txt");
-		ArrayList<HashMap<Id, Id>> MZandOZ = Loader.loadOZandMZDatabase(inputBase + "updated Gemeindezuordnung MZ+OZ_ARE.txt");
+		ArrayList<HashMap<Id<Municipality>, Id<Municipality>>> MZandOZ = Loader.loadOZandMZDatabase(inputBase + "updated Gemeindezuordnung MZ+OZ_ARE.txt");
 		this.ozs = MZandOZ.get(0);
 		this.mzs = MZandOZ.get(1);
 		this.travel_times_IV = Loader.loadTravelTimesToMZandOZ(inputBase + "municipalities_TT0_01-DWV_2005MIV_Masternetz_LKW_Kalibriert2010_A1_AFTER_MATLAB.txt", MZandOZ);
@@ -144,8 +144,8 @@ public class MZ2010SampleDataCreator {
 			String HH_NR = (String)this.populationAttributes.getAttribute(person.getId().toString(), "household number");
 			String[]  HH_GEM= getHH_GEM(HH_NR);
 			
-			Id oz = ozs.get(new IdImpl(HH_GEM[0]));
-			Id grossZtr = ozToGrossZtr.get(oz);
+			Id<Municipality> oz = ozs.get(Id.create(HH_GEM[0], Municipality.class));
+			Id<Municipality> grossZtr = ozToGrossZtr.get(oz);
 			int Geschl = ((String)this.populationAttributes.getAttribute(person.getId().toString(), "gender")).equals("m")?1:0;
 			
 			int abo_ges  = (((String)this.populationAttributes.getAttribute(person.getId().toString(), "abonnement: GA first class")).equals(MZConstants.YES)
@@ -166,9 +166,9 @@ public class MZ2010SampleDataCreator {
 			
 			Integer RG_verkGr;
 			try{
-				RG_verkGr = this.gemeinde_typen.get(new IdImpl(HH_GEM[0]))*10;
+				RG_verkGr = this.gemeinde_typen.get(HH_GEM[0])*10;
 			} catch (NullPointerException e){
-				RG_verkGr = this.gemeinde_typen.get(new IdImpl(HH_GEM[1]))*10;
+				RG_verkGr = this.gemeinde_typen.get(HH_GEM[1])*10;
 			}
 			
 			if(RG_verkGr==10){ //is one of the Grosszentren
@@ -381,7 +381,7 @@ public class MZ2010SampleDataCreator {
 			out.write(Eink/1000 +"\t");
 			out.write(Math.log(Eink) +"\t");
 			
-			double bevolkerung = mun_totals.get(new IdImpl(HH_GEM[1]));
+			double bevolkerung = mun_totals.get(HH_GEM[1]);
 			out.write(bevolkerung +"\t");
 			out.write(bevolkerung/1000 +"\t");
 			out.write(Math.log(bevolkerung) +"\t");
@@ -389,9 +389,9 @@ public class MZ2010SampleDataCreator {
 			// RG_verk1 \t RG_verk2 \t RG_verk3 \t RG_verk4 \t RG_verk5 \t RG_verk6
 			String[] gem_type = {"0","0","0","0","0","0"};
 			try{
-				gem_type[this.gemeinde_typen.get(new IdImpl(HH_GEM[0]))-1] = "1";
+				gem_type[this.gemeinde_typen.get(HH_GEM[0])-1] = "1";
 			} catch (NullPointerException e){
-			gem_type[this.gemeinde_typen.get(new IdImpl(HH_GEM[1]))-1] = "1";
+			gem_type[this.gemeinde_typen.get(HH_GEM[1])-1] = "1";
 			}
 			out.write(MyCollectionUtils.arrayToTabSeparatedString(gem_type) +"\t");
 			
@@ -419,7 +419,7 @@ public class MZ2010SampleDataCreator {
 						
 			
 			String OZ;
-			OZ = HH_GEM[0].equals(ozs.get(new IdImpl(HH_GEM[0])).toString()) ? "1":"0";
+			OZ = HH_GEM[0].equals(ozs.get(Id.create(HH_GEM[0], Municipality.class)).toString()) ? "1":"0";
 			out.write(OZ + "\t");
 
 			
@@ -500,8 +500,8 @@ public class MZ2010SampleDataCreator {
 		String HH_GEM2 = HH_GEM1;
 		String HH_GEM3 = HH_GEM2;
 		 
-		 if(mun_changes.containsKey(new IdImpl(HH_GEM1))){
-			 HH_GEM2 = mun_changes.get(new IdImpl(HH_GEM1)).toString() ;
+		 if(mun_changes.containsKey(HH_GEM1)){
+			 HH_GEM2 = mun_changes.get(HH_GEM1);
 		 }else{
 			 
 		 }
