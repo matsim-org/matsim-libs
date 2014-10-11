@@ -4,7 +4,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -28,9 +29,9 @@ public class YoungPeopleIdentifier extends DuringLegIdentifier {
 			return set;
 		}
 		
-		NetsimLink tmpLink = mobsim.getNetsimNetwork().getNetsimLinks().get(new IdImpl("6"));
-//		Collection<QVehicle> tmpList=queueSim.getQNetwork().getLinks().get(new IdImpl("6")).getVehQueue();
-		Collection<MobsimVehicle> tmpList=mobsim.getNetsimNetwork().getNetsimLinks().get(new IdImpl("6")).getAllNonParkedVehicles();
+		NetsimLink tmpLink = mobsim.getNetsimNetwork().getNetsimLinks().get(Id.create("6", Link.class));
+//		Collection<QVehicle> tmpList=queueSim.getQNetwork().getLinks().get(Id.create("6")).getVehQueue();
+		Collection<MobsimVehicle> tmpList=mobsim.getNetsimNetwork().getNetsimLinks().get(Id.create("6", Link.class)).getAllNonParkedVehicles();
 
 		// select agents, which should be replanned within this time step
 		for (NetsimLink link:mobsim.getNetsimNetwork().getNetsimLinks().values()){

@@ -20,11 +20,11 @@
 
 package playground.christoph.burgdorf;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
@@ -40,7 +40,7 @@ public class CadytsRunner {
 		final CadytsContext cContext = new CadytsContext(controler.getConfig());
 		controler.addControlerListener(cContext);
 		
-		StrategySettings stratSets = new StrategySettings(new IdImpl(1));
+		StrategySettings stratSets = new StrategySettings(Id.create(1, StrategySettings.class));
 		stratSets.setModuleName("ccc") ;
 		stratSets.setProbability(1.0) ;
 		controler.getConfig().strategy().addStrategySettings(stratSets);

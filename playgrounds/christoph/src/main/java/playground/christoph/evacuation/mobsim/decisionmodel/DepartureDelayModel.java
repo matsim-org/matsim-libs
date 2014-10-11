@@ -26,7 +26,6 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
@@ -74,7 +73,7 @@ public class DepartureDelayModel implements HouseholdDecisionModel {
 		this.sumDelays += departureTimeDelay;
 	}
 	
-	private double calculateDepartureDelay(Id householdId) {
+	private double calculateDepartureDelay(Id<Household> householdId) {
 		
 		double rand = this.rng.idToRandomDouble(householdId);
 		
@@ -152,7 +151,7 @@ public class DepartureDelayModel implements HouseholdDecisionModel {
 		String line = null;
 		while ((line = modelReader.readLine()) != null) {
 			String[] columns = line.split(delimiter);
-			Id householdId = new IdImpl(columns[0]);
+			Id<Household> householdId = Id.create(columns[0], Household.class);
 			HouseholdDecisionData hdd = this.decisionDataProvider.getHouseholdDecisionData(householdId);
 			hdd.setDepartureTimeDelay(Double.valueOf(columns[1]));
 		}

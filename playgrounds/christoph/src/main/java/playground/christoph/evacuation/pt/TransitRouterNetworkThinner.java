@@ -37,7 +37,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
@@ -161,7 +160,7 @@ public class TransitRouterNetworkThinner {
 			
 			Counter nodesCounter = new Counter("# handled nodes: ");
 			Counter linksCounter = new Counter("# removed links: ");
-			Set<Id> handledNodes = new HashSet<Id>();
+			Set<Id<Node>> handledNodes = new HashSet<>();
 			for (TransitRouterNetworkNode node : network.getNodes().values()) {
 				nodesCounter.incCounter();
 				if (handledNodes.contains(node.getId())) continue;
@@ -256,7 +255,7 @@ public class TransitRouterNetworkThinner {
 					}
 					if (!linkExists) {
 						int nextId = nextLinkId.getAndIncrement();
-						Id linkId = new IdImpl(nextId);
+						Id<Link> linkId = Id.create(nextId, Link.class);
 						TransitRouterNetworkLink link = new TransitRouterNetworkLink(linkId, otherNode, node, null, null, 0.0);
 						
 						((Map<Id<Link>, TransitRouterNetworkLink>) network.getLinks()).put(linkId, link);
@@ -278,7 +277,7 @@ public class TransitRouterNetworkThinner {
 					}
 					if (!linkExists) {
 						int nextId = nextLinkId.getAndIncrement();
-						Id linkId = new IdImpl(nextId);
+						Id<Link> linkId = Id.create(nextId, Link.class);
 						TransitRouterNetworkLink link = new TransitRouterNetworkLink(linkId, node, otherNode, null, null, 0.0);
 						
 						((Map<Id<Link>, TransitRouterNetworkLink>) network.getLinks()).put(linkId, link);
@@ -374,13 +373,13 @@ public class TransitRouterNetworkThinner {
 
 			@Override
 			public int compare(Link l1, Link l2) {
-				Id from1 = l1.getFromNode().getId();
-				Id from2 = l2.getFromNode().getId();
+				Id<Node> from1 = l1.getFromNode().getId();
+				Id<Node> from2 = l2.getFromNode().getId();
 				
 				int c = from1.compareTo(from2);
 				if (c == 0) {
-					Id to1 = l1.getToNode().getId();
-					Id to2 = l2.getToNode().getId();
+					Id<Node> to1 = l1.getToNode().getId();
+					Id<Node> to2 = l2.getToNode().getId();
 					return to1.compareTo(to2);
 				} else {
 					return c;

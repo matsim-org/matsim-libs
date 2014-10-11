@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.router.TransitRouterNetwork;
@@ -130,21 +129,21 @@ public class TransitRouterNetworkReaderMatsimV1 extends MatsimXmlParser {
 //		Id linkId = Id.create(atts.getValue("id"));
 //		Id fromId = Id.create(atts.getValue("from"));
 //		Id toId = Id.create(atts.getValue("to"));
-		Id linkId = new IdImpl(atts.getValue("id"));
-		Id fromId = new IdImpl(atts.getValue("from"));
-		Id toId = new IdImpl(atts.getValue("to"));
+		Id<Link> linkId = Id.create(atts.getValue("id"), Link.class);
+		Id<Node> fromId = Id.create(atts.getValue("from"), Node.class);
+		Id<Node> toId = Id.create(atts.getValue("to"), Node.class);
 		
 		String string = null;
-		Id routeId = null;
-		Id lineId = null;
+		Id<TransitRoute> routeId = null;
+		Id<TransitLine> lineId = null;
 		
 		string = atts.getValue("route");
 //		if (string != null) routeId = Id.create(string);
-		if (string != null) routeId = new IdImpl(string);
+		if (string != null) routeId = Id.create(string, TransitRoute.class);
 		
 		string = atts.getValue("line");
 //		if (string != null) lineId = Id.create(string);
-		if (string != null) lineId = new IdImpl(string);
+		if (string != null) lineId = Id.create(string, TransitLine.class);
 		
 		TransitLine line = null;
 		TransitRoute route = null;

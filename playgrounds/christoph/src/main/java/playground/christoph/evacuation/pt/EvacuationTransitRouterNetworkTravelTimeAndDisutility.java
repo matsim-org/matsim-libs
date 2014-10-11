@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.router.util.RoutingNetworkLink;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -168,7 +167,7 @@ public class EvacuationTransitRouterNetworkTravelTimeAndDisutility implements Tr
 	
 	private static class DummyLink implements Link {
 
-		private final static Id id = new IdImpl("dummyLink");
+		private final static Id<Link> id = Id.create("dummyLink", Link.class);
 		private final double length;
 		private final Node fromNode;
 		private final Node toNode;
@@ -183,7 +182,7 @@ public class EvacuationTransitRouterNetworkTravelTimeAndDisutility implements Tr
 		public Coord getCoord() { return null; }
 
 		@Override
-		public Id getId() { return id; }
+		public Id<Link> getId() { return id; }
 
 		@Override
 		public boolean setFromNode(Node node) { return false; }

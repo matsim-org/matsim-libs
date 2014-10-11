@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkWriter;
@@ -257,11 +256,11 @@ public class TransitRouterNetworkCreator {
 		private static int nextInt = 0;
 		
 		private final Coord coord;
-		private final Id id;
+		private final Id<TransitStopFacility> id;
 		
 		public DummyTransitStopFacility(Coord coord) {
 			this.coord = coord;
-			this.id = new IdImpl("DummyTransitStopFacility_" + nextInt++);
+			this.id = Id.create("DummyTransitStopFacility_" + nextInt++, TransitStopFacility.class);
 		}
 		
 		@Override
@@ -316,14 +315,14 @@ public class TransitRouterNetworkCreator {
 
 		private static int nextInt = 0;
 		
-		private final Id id;
+		private final Id<TransitRoute> id;
 		
 		public DummyTransitRoute() {
-			this.id = new IdImpl("DummyTransitRoute_" + nextInt++);
+			this.id = Id.create("DummyTransitRoute_" + nextInt++, TransitRoute.class);
 		}
 		
 		@Override
-		public Id getId() {
+		public Id<TransitRoute> getId() {
 			return this.id;
 		}
 

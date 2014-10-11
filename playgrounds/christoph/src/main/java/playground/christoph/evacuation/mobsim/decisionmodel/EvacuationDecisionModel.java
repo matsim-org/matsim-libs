@@ -28,7 +28,7 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.IOUtils;
@@ -95,7 +95,7 @@ public class EvacuationDecisionModel implements HouseholdDecisionModel {
 		 * household members;
 		 */
 		Participating participating = hdd.getParticipating();
-		for (Id agentId : household.getMemberIds()) {
+		for (Id<Person> agentId : household.getMemberIds()) {
 			this.decisionDataProvider.getPersonDecisionData(agentId).setParticipating(participating);
 		}	
 	}
@@ -140,7 +140,7 @@ public class EvacuationDecisionModel implements HouseholdDecisionModel {
 		int immediately = 0;
 		int later = 0;
 		int never = 0;
-		for (Id personId : household.getMemberIds()) {
+		for (Id<Person> personId : household.getMemberIds()) {
 			PersonImpl person = (PersonImpl) scenario.getPopulation().getPersons().get(personId);
 			int age = person.getAge();
 			boolean drivingLicense = person.hasLicense();
@@ -306,7 +306,7 @@ public class EvacuationDecisionModel implements HouseholdDecisionModel {
 		String line = null;
 		while ((line = modelReader.readLine()) != null) {
 			String[] columns = line.split(delimiter);
-			Id householdId = new IdImpl(columns[0]);
+			Id<Household> householdId = Id.create(columns[0], Household.class);
 			HouseholdDecisionData hdd = this.decisionDataProvider.getHouseholdDecisionData(householdId);
 			if (columns[1].equals(EvacuationDecision.IMMEDIATELY.toString())) {
 				hdd.setEvacuationDecision(EvacuationDecision.IMMEDIATELY);
@@ -333,7 +333,7 @@ public class EvacuationDecisionModel implements HouseholdDecisionModel {
 			 */
 			Household household = ((ScenarioImpl) scenario).getHouseholds().getHouseholds().get(householdId);
 			Participating participating = hdd.getParticipating();
-			for (Id agentId : household.getMemberIds()) {
+			for (Id<Person> agentId : household.getMemberIds()) {
 				this.decisionDataProvider.getPersonDecisionData(agentId).setParticipating(participating);
 			}
 		}

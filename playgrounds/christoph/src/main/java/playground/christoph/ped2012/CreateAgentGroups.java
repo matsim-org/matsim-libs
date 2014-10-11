@@ -33,13 +33,12 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -53,8 +52,8 @@ public class CreateAgentGroups implements BasicEventHandler {
 	private static final String separator = "\t";
 
 	private final Set<String> observedModes;	
-	private final Map<Id, String> observedAgents = new HashMap<Id, String>();	// personId, transportMode
-	private final Map<String, Set<Id>> groups = new HashMap<String, Set<Id>>();
+	private final Map<Id<Person>, String> observedAgents = new HashMap<>();	// personId, transportMode
+	private final Map<String, Set<Id<Person>>> groups = new HashMap<String, Set<Id<Person>>>();
 
 	private EventWriterXML eventWriter;
 	private EventsManager eventsManager;
@@ -82,7 +81,7 @@ public class CreateAgentGroups implements BasicEventHandler {
 	
 	public void createAgentGroups(String inputEventsFile, String outputEventsFile, String ouptputPath) {
 		
-		for (String mode : observedModes) this.groups.put(mode, new LinkedHashSet<Id>());
+		for (String mode : observedModes) this.groups.put(mode, new LinkedHashSet<Id<Person>>());
 		
 		eventWriter = new EventWriterXML(outputEventsFile);
 		
@@ -101,14 +100,14 @@ public class CreateAgentGroups implements BasicEventHandler {
 		
 		if (event instanceof PersonDepartureEvent) {
 			PersonDepartureEvent agentDepartureEvent = (PersonDepartureEvent) event;
-			Id personId = agentDepartureEvent.getPersonId();
+			Id<Person> personId = agentDepartureEvent.getPersonId();
 			String mode = agentDepartureEvent.getLegMode();
 			
 			if (observedModes.contains(mode)) {
 				observedAgents.put(personId, mode);
 				
 				// clone event but change agent's id
-				Id agentGroupId = new IdImpl(personId.toString() + "_" + mode);
+				Id<Person> agentGroupId = Id.create(personId.toString() + "_" + mode, Person.class);
 				event = new PersonDepartureEvent(event.getTime(), agentGroupId, agentDepartureEvent.getLinkId(), mode);
 				
 				// register agent in its group
@@ -118,12 +117,12 @@ public class CreateAgentGroups implements BasicEventHandler {
 		
 		else if (event instanceof LinkEnterEvent) {
 			LinkEnterEvent linkEnterEvent = (LinkEnterEvent) event;
-			Id personId = linkEnterEvent.getPersonId();
+			Id<Person> personId = linkEnterEvent.getPersonId();
 			String mode = observedAgents.get(personId);
 			
 			if (mode != null) {
 				// clone event but change agent's id
-				Id agentGroupId = new IdImpl(personId.toString() + "_" + mode);
+				Id<Person> agentGroupId = Id.create(personId.toString() + "_" + mode, Person.class);
 				event = new LinkEnterEvent(event.getTime(), agentGroupId, linkEnterEvent.getLinkId(), linkEnterEvent.getVehicleId());
 			} else return;
 		}
@@ -131,12 +130,12 @@ public class CreateAgentGroups implements BasicEventHandler {
 		// create xy data for link trips of observed agents
 		else if (event instanceof LinkLeaveEvent) {
 			LinkLeaveEvent linkLeaveEvent = (LinkLeaveEvent) event;
-			Id personId = linkLeaveEvent.getPersonId();
+			Id<Person> personId = linkLeaveEvent.getPersonId();
 			String mode = observedAgents.get(personId);
 			
 			if (mode != null) {
 				// clone event but change agent's id
-				Id agentGroupId = new IdImpl(personId.toString() + "_" + mode);
+				Id<Person> agentGroupId = Id.create(personId.toString() + "_" + mode, Person.class);
 				event = new LinkLeaveEvent(event.getTime(), agentGroupId, linkLeaveEvent.getLinkId(), linkLeaveEvent.getVehicleId());
 			} else return;
 		}
@@ -144,12 +143,12 @@ public class CreateAgentGroups implements BasicEventHandler {
 		// create xy data for link trips of observed agents
 		else if (event instanceof PersonArrivalEvent) {
 			PersonArrivalEvent agentArrivalEvent = (PersonArrivalEvent) event;
-			Id personId = agentArrivalEvent.getPersonId();
+			Id<Person> personId = agentArrivalEvent.getPersonId();
 			String mode = observedAgents.remove(personId);
 			
 			if (mode != null) {
 				// clone event but change agent's id
-				Id agentGroupId = new IdImpl(personId.toString() + "_" + mode);
+				Id<Person> agentGroupId = Id.create(personId.toString() + "_" + mode, Person.class);
 				event = new PersonArrivalEvent(event.getTime(), agentGroupId, agentArrivalEvent.getLinkId(), mode);
 			} else return;
 		}
@@ -163,10 +162,10 @@ public class CreateAgentGroups implements BasicEventHandler {
 	private void writeGroups(String ouptputPath) {
 		try {
 			for (String mode : this.observedModes) {
-				Set<Id> agents = this.groups.get(mode);
+				Set<Id<Person>> agents = this.groups.get(mode);
 				BufferedWriter bufferedWriter = IOUtils.getBufferedWriter(ouptputPath + mode + "_grouped.txt.gz");
 				
-				for (Id agentId : agents) {
+				for (Id<Person> agentId : agents) {
 					bufferedWriter.write(agentId.toString() + "_" + mode);
 					bufferedWriter.write(newLine);
 				}			

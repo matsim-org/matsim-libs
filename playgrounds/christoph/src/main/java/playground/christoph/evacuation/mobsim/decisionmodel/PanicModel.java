@@ -29,8 +29,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -141,7 +139,7 @@ public class PanicModel implements PersonDecisionModel {
 		String line = null;
 		while ((line = modelReader.readLine()) != null) {
 			String[] columns = line.split(delimiter);
-			Id personId = new IdImpl(columns[0]);
+			Id<Person> personId = Id.create(columns[0], Person.class);
 			if (columns[1].equals("true")) {
 				this.decisionDataProvider.getPersonDecisionData(personId).setInPanic(true);
 				this.inPanic++;

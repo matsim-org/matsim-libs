@@ -23,38 +23,19 @@ package playground.christoph.evacuation.mobsim.decisionmodel;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Random;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.utils.objectattributes.ObjectAttributes;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
-import org.opengis.feature.simple.SimpleFeature;
 
-import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.config.EvacuationConfig;
-import playground.christoph.evacuation.config.EvacuationConfigReader;
-import playground.christoph.evacuation.mobsim.HouseholdsTracker;
-import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataGrabber;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisiondata.PersonDecisionData;
-import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
-
-import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * Decides which agents would pick up other agents and which ones would not.
@@ -91,6 +72,7 @@ public class PickupModel implements PersonDecisionModel {
 	 * always ... 57%
 	 * never ... 2%
 	 */
+	@Override
 	public void printStatistics() {
 		log.info("pickup decisions:");
 		log.info("if space\t" + ifSpace);
@@ -232,7 +214,7 @@ public class PickupModel implements PersonDecisionModel {
 		String line = null;
 		while ((line = modelReader.readLine()) != null) {
 			String[] columns = line.split(delimiter);
-			Id personId = new IdImpl(columns[0]);
+			Id<Person> personId = Id.create(columns[0], Person.class);
 			if (columns[1].equals(PickupDecision.ALWAYS.toString())) {
 				this.decisionDataProvider.getPersonDecisionData(personId).setPickupDecision(PickupDecision.ALWAYS);
 				this.always++;

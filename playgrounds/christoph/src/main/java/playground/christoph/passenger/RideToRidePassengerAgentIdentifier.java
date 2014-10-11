@@ -44,11 +44,11 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.multimodal.router.util.WalkTravelTime;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.JointDeparture;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.TravelTime;
@@ -158,13 +158,13 @@ public class RideToRidePassengerAgentIdentifier extends InitialIdentifier {
 			for (Leg leg : carLegs) {
 				double time = leg.getDepartureTime();
 				NetworkRoute route = (NetworkRoute) leg.getRoute();
-				List<Id> linkIds = new ArrayList<Id>();
+				List<Id<Link>> linkIds = new ArrayList<>();
 				linkIds.addAll(route.getLinkIds());
 				if (linkIds.size() > 0 || !route.getStartLinkId().equals(route.getEndLinkId())) linkIds.add(route.getEndLinkId());
 				
 				this.getLinkLeftList(time, route.getStartLinkId(), map).add(new LinkLeft(time, mobsimAgent, leg));
 				
-				for (Id linkId : linkIds) {
+				for (Id<Link> linkId : linkIds) {
 					Link link = this.network.getLinks().get(linkId);
 					double linkTravelTime = this.carTravelTime.getLinkTravelTime(link, time, person, null);
 					time += linkTravelTime;
@@ -188,7 +188,7 @@ public class RideToRidePassengerAgentIdentifier extends InitialIdentifier {
 		return bin;
 	}
 	
-	private List<LinkLeft> getLinkLeftList(double time, Id linkId, Map<Id, Map<Integer, List<LinkLeft>>> map) {
+	private List<LinkLeft> getLinkLeftList(double time, Id<Link> linkId, Map<Id, Map<Integer, List<LinkLeft>>> map) {
 		
 		Map<Integer, List<LinkLeft>> linkMap = map.get(linkId);
 		if (linkMap == null) {
@@ -295,7 +295,7 @@ public class RideToRidePassengerAgentIdentifier extends InitialIdentifier {
 						Id linkId = context.pickupLink.getId();
 						Set<Id<Person>> passengerIds = new LinkedHashSet<>();
 						passengerIds.add(agent.getId());
-						context.pickupDeparture = this.jointDepartureOrganizer.createJointDeparture(new IdImpl("jd" + jdCounter++), linkId, vehicleId, driverId, passengerIds);
+						context.pickupDeparture = this.jointDepartureOrganizer.createJointDeparture(Id.create("jd" + jdCounter++, JointDeparture.class), linkId, vehicleId, driverId, passengerIds);
 						
 						// schedule joint departure for drop off
 						linkId = context.dropOffLink.getId();

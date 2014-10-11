@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
@@ -62,13 +61,13 @@ public class CreateMultiModalNetwork {
 		double capacityFactor = baseNetwork.getCapacityPeriod() / addNetwork.getCapacityPeriod();
 		NetworkFactory factory = baseNetwork.getFactory();
 		for (Node node : addNetwork.getNodes().values()) {
-			NodeImpl node2 = (NodeImpl) factory.createNode(new IdImpl(addPrefix + node.getId().toString()), node.getCoord());
+			NodeImpl node2 = (NodeImpl) factory.createNode(Id.create(addPrefix + node.getId().toString(), Node.class), node.getCoord());
 			baseNetwork.addNode(node2);
 		}
 		for (Link link : addNetwork.getLinks().values()) {
-			Id fromNodeId = new IdImpl(addPrefix + link.getFromNode().getId().toString());
-			Id toNodeId = new IdImpl(addPrefix + link.getToNode().getId().toString());
-			Link link2 = factory.createLink(new IdImpl(addPrefix + link.getId().toString()),
+			Id<Node> fromNodeId = Id.create(addPrefix + link.getFromNode().getId().toString(), Node.class);
+			Id<Node> toNodeId = Id.create(addPrefix + link.getToNode().getId().toString(), Node.class);
+			Link link2 = factory.createLink(Id.create(addPrefix + link.getId().toString(), Link.class),
 					fromNodeId, toNodeId);
 			link2.setAllowedModes(link.getAllowedModes());
 			link2.setCapacity(link.getCapacity() * capacityFactor);
