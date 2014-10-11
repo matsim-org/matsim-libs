@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
@@ -96,7 +95,7 @@ public class NetworkVisum2Matsim {
 
 			@Override
 			public void handleRow(Map<String, String> row) {
-				Id id = new IdImpl(row.get("NR"));
+				Id<Node> id = Id.create(row.get("NR"), Node.class);
 				Coord coord = new CoordImpl(Double.parseDouble(row.get("XKOORD").replace(',', '.')), Double.parseDouble(row.get("YKOORD").replace(',', '.')));
 				network.createAndAddNode(id, coord);
 			}
@@ -109,15 +108,15 @@ public class NetworkVisum2Matsim {
 			@Override
 			public void handleRow(Map<String, String> row) {
 				String nr = row.get("NR");
-				IdImpl id = new IdImpl(nr);
-				IdImpl fromNodeId = new IdImpl(row.get("VONKNOTNR"));
-				IdImpl toNodeId = new IdImpl(row.get("NACHKNOTNR"));
+				Id<Link> id = Id.create(nr, Link.class);
+				Id<Node> fromNodeId = Id.create(row.get("VONKNOTNR"), Node.class);
+				Id<Node> toNodeId = Id.create(row.get("NACHKNOTNR"), Node.class);
 				Node fromNode = network.getNodes().get(fromNodeId);
 				Node toNode = network.getNodes().get(toNodeId);
 				Link lastEdge = network.getLinks().get(id);
 				if (lastEdge != null) {
 					if (lastEdge.getFromNode().getId().equals(toNodeId) && lastEdge.getToNode().getId().equals(fromNodeId)) {
-						id = new IdImpl(nr + 'R');
+						id = Id.create(nr + 'R', Link.class);
 					} else {
 						throw new RuntimeException("Duplicate edge.");
 					}
@@ -125,7 +124,7 @@ public class NetworkVisum2Matsim {
 				double length = Double.parseDouble(row.get("LAENGE").replace(',', '.')) * 1000;
 				double freespeed = 0.0;
 				String edgeTypeIdString = row.get("TYPNR");
-				IdImpl edgeTypeId = new IdImpl(edgeTypeIdString);
+				Id<EdgeType> edgeTypeId = Id.create(edgeTypeIdString, EdgeType.class);
 				double capacity = getCapacity(edgeTypeId);
 				int noOfLanes = getNoOfLanes(edgeTypeId);
 				// kick out all irrelevant edge types
@@ -137,12 +136,12 @@ public class NetworkVisum2Matsim {
 					//						// setting all streets with noOfLanes = 1 to Type 75
 					//						if(noOfLanes == 1){
 					//							edgeTypeIdString =  "75";
-					//							capacity = getCapacity(new IdImpl(edgeTypeIdString));
+					//							capacity = getCapacity(Id.create(edgeTypeIdString));
 					//						}
 					//						// setting all other streets to Type 83
 					//						else{
 					//							edgeTypeIdString =  "83";
-					//							capacity = getCapacity(new IdImpl(edgeTypeIdString));
+					//							capacity = getCapacity(Id.create(edgeTypeIdString));
 					//						}
 					//						network.createAndAddLink(id, fromNode, toNode, length, freespeed, capacity, noOfLanes, null, edgeTypeIdString);
 					//						usedIds.add(edgeTypeIdString);
@@ -185,7 +184,7 @@ public class NetworkVisum2Matsim {
 		network.setCapacityPeriod(16*3600);
 	}
 
-	private boolean isEdgeTypeRelevant(Id edgeTypeId) {
+	private boolean isEdgeTypeRelevant(Id<EdgeType> edgeTypeId) {
 		String idString = edgeTypeId.toString();
 		if (irrelevantIds.contains(idString)) {
 			return false;
@@ -207,7 +206,7 @@ public class NetworkVisum2Matsim {
 		return isInDetailedArea;
 	}
 
-	private boolean isEdgeTypeRelevantForPeriphery(Id edgeTypeId) {
+	private boolean isEdgeTypeRelevantForPeriphery(Id<EdgeType> edgeTypeId) {
 		String idString = edgeTypeId.toString();
 		if (additionalIrrelevantIdsPeriphery.contains(idString)) {
 			return false;
@@ -216,25 +215,25 @@ public class NetworkVisum2Matsim {
 		}
 	}
 
-	private double getCapacity(Id edgeTypeId) {
+	private double getCapacity(Id<EdgeType> edgeTypeId) {
 		VisumNetwork.EdgeType edgeType = findEdgeType(edgeTypeId);
 		double capacity = Double.parseDouble(edgeType.kapIV);
 		return capacity;
 	}
 
-	private int getNoOfLanes(Id edgeTypeId) {
+	private int getNoOfLanes(Id<EdgeType> edgeTypeId) {
 		VisumNetwork.EdgeType edgeType = findEdgeType(edgeTypeId);
 		int noOfLanes = Integer.parseInt(edgeType.noOfLanes);
 		return noOfLanes;
 	}
 
-	private double getFreespeedTravelTime(Id edgeTypeId) {
+	private double getFreespeedTravelTime(Id<EdgeType> edgeTypeId) {
 		VisumNetwork.EdgeType edgeType = findEdgeType(edgeTypeId);
 		double v0 = Double.parseDouble(edgeType.v0IV) / 3.6;
 		return v0;
 	}
 
-	private EdgeType findEdgeType(Id edgeTypeId) {
+	private EdgeType findEdgeType(Id<EdgeType> edgeTypeId) {
 		return visumNetwork.edgeTypes.get(edgeTypeId);
 	}
 

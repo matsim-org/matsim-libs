@@ -20,8 +20,6 @@
 package playground.benjamin.scenarios.zurich.analysis;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 
 
 public class AnalysisPublishIatbr09 {
@@ -47,11 +45,6 @@ public class AnalysisPublishIatbr09 {
 		String runid1String = "run" + runNumber1;
 		String runid2String = "run" + runNumber2;
 		
-		Id runid1 = new IdImpl(runid1String);
-		Id runid2 = new IdImpl(runid2String);
-			
-		String runiddot1 = runid1String + ".";
-		String runiddot2 = runid2String + ".";
 		
 		if (isTestscenario){
 //			netfile = DgPaths.RUNBASE + runid1String + "/" + runiddot1 + "output_network.xml.gz";

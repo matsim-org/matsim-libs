@@ -19,18 +19,19 @@
  * *********************************************************************** */
 package playground.benjamin.internalization;
 
-import org.apache.log4j.Logger;
+import java.util.Set;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.events.ColdEmissionEvent;
 import org.matsim.contrib.emissions.events.ColdEmissionEventHandler;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
-
-import java.util.Set;
 
 
 
@@ -39,13 +40,12 @@ import java.util.Set;
  *
  */
 public class EmissionInternalizationHandler implements WarmEmissionEventHandler, ColdEmissionEventHandler {
-	private static final Logger logger = Logger.getLogger(EmissionInternalizationHandler.class);
 
 	EventsManager eventsManager;
 	EmissionCostModule emissionCostModule;
-	Set<Id> hotspotLinks;
+	Set<Id<Link>> hotspotLinks;
 
-	public EmissionInternalizationHandler(Controler controler, EmissionCostModule emissionCostModule, Set<Id> hotspotLinks) {
+	public EmissionInternalizationHandler(Controler controler, EmissionCostModule emissionCostModule, Set<Id<Link>> hotspotLinks) {
 		this.eventsManager = controler.getEvents();
 		this.emissionCostModule = emissionCostModule;
 		this.hotspotLinks = hotspotLinks;
@@ -58,7 +58,7 @@ public class EmissionInternalizationHandler implements WarmEmissionEventHandler,
 
 	@Override
 	public void handleEvent(WarmEmissionEvent event) {
-		Id linkId = event.getLinkId();
+		Id<Link> linkId = event.getLinkId();
 		if(hotspotLinks == null){
 			// pricing applies for all links
 			calculateWarmEmissionCostsAndThrowEvent(event);
@@ -74,7 +74,7 @@ public class EmissionInternalizationHandler implements WarmEmissionEventHandler,
 
 	@Override
 	public void handleEvent(ColdEmissionEvent event) {
-		Id linkId = event.getLinkId();
+		Id<Link> linkId = event.getLinkId();
 		if(hotspotLinks == null){
 			// pricing applies for all links
 			calculateColdEmissionCostsAndThrowEvent(event);
@@ -89,7 +89,7 @@ public class EmissionInternalizationHandler implements WarmEmissionEventHandler,
 	}
 
 	private void calculateColdEmissionCostsAndThrowEvent(ColdEmissionEvent event) {
-		Id personId = event.getVehicleId();
+		Id<Person> personId = Id.create(event.getVehicleId(), Person.class);
 		double time = event.getTime();
 		double coldEmissionCosts = emissionCostModule.calculateColdEmissionCosts(event.getColdEmissions());
 		double amount2Pay = - coldEmissionCosts;
@@ -100,7 +100,7 @@ public class EmissionInternalizationHandler implements WarmEmissionEventHandler,
 	}
 
 	private void calculateWarmEmissionCostsAndThrowEvent(WarmEmissionEvent event) {
-		Id personId = event.getVehicleId();
+		Id<Person> personId = Id.create(event.getVehicleId(), Person.class);
 		double time = event.getTime();
 		double warmEmissionCosts = emissionCostModule.calculateWarmEmissionCosts(event.getWarmEmissions());
 		double amount2Pay = - warmEmissionCosts;

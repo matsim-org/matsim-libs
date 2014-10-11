@@ -21,7 +21,7 @@ package playground.benjamin.scenarios.munich.testroad;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
@@ -36,8 +36,8 @@ public class RunTestRoad {
 	static String outputPath = "../../detailedEval/teststrecke/sim/output/";
 	static String configName = "multipleRunsConfig.xml";
 
-	static Id enterLinkId = new IdImpl("590000822");
-	static Id leaveLinkId = new IdImpl("590000822");
+	static Id<Link> enterLinkId = Id.create("590000822", Link.class);
+	static Id<Link> leaveLinkId = Id.create("590000822", Link.class);
 
 	static Integer leaveLinkCapacity = 1400;
 

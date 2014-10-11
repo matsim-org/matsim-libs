@@ -25,7 +25,6 @@ import java.io.IOException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -52,20 +51,22 @@ public class BkHouseholdsCreatorTest {
 
 	public static void createHHForTestCase() throws FileNotFoundException, IOException {
     ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-    Id id1 = new IdImpl("1");
-    Id id2 = new IdImpl("2");
+    Id<Household> hhId1 = Id.create("1", Household.class);
+    Id<Household> hhId2 = Id.create("2", Household.class);
+    Id<Person> id1 = Id.create("1", Person.class);
+    Id<Person> id2 = Id.create("2", Person.class);
     Households hhs = sc.getHouseholds();
     HouseholdsFactory b = hhs.getFactory();
 
-    Household hh = b.createHousehold(id1);
+    Household hh = b.createHousehold(hhId1);
     hh.setIncome(b.createIncome(120000, Income.IncomePeriod.year));
     hh.getMemberIds().add(id1);
-    hhs.getHouseholds().put(id1, hh);
+    hhs.getHouseholds().put(hhId1, hh);
 
-    hh = b.createHousehold(id2);
+    hh = b.createHousehold(hhId2);
     hh.setIncome(b.createIncome(40000, Income.IncomePeriod.year));
     hh.getMemberIds().add(id2);
-    hhs.getHouseholds().put(id2, hh);
+    hhs.getHouseholds().put(hhId2, hh);
 
     HouseholdsWriterV10 hhwriter = new HouseholdsWriterV10(hhs);
     hhwriter.writeFile(BkPaths.SHAREDSVN + "test/input/playground/benjamin/BKickScoringTest/households.xml");

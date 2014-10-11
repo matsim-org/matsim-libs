@@ -42,7 +42,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup;
@@ -121,17 +120,17 @@ public class SpaceTimeProbability {
 				Double link9Score = null;
 				Double link11Score = null;
 				
-				Person worker = scenario.getPopulation().getPersons().get(new IdImpl("worker"));
+				Person worker = scenario.getPopulation().getPersons().get(Id.create("worker", Person.class));
 				for(Plan plan : worker.getPlans()){
 					for(PlanElement pe : plan.getPlanElements()){
 						if(pe instanceof Leg){
 							NetworkRoute route = (NetworkRoute) ((Leg) pe).getRoute();
-							for(Id id : route.getLinkIds()){
-								if(id.equals(new IdImpl(3))){
+							for(Id<Link> id : route.getLinkIds()){
+								if(id.equals(Id.create(3, Link.class))){
 									link3Score = plan.getScore();
-								} else if(id.equals(new IdImpl(9))){
+								} else if(id.equals(Id.create(9, Link.class))){
 									link9Score = plan.getScore();
-								} else if(id.equals(new IdImpl(11))){
+								} else if(id.equals(Id.create(11, Link.class))){
 									link11Score = plan.getScore();
 								}
 							}
@@ -208,11 +207,11 @@ public class SpaceTimeProbability {
 		// strategyConfigGroup
 		StrategyConfigGroup scg = config.strategy();
 
-		StrategySettings changePlan = new StrategySettings(new IdImpl("1"));
+		StrategySettings changePlan = new StrategySettings(Id.create("1", StrategySettings.class));
 		changePlan.setModuleName(entry.getValue().getChoiceModule());
 		changePlan.setProbability(1.0);
 
-//		StrategySettings reRoute = new StrategySettings(new IdImpl("2"));
+//		StrategySettings reRoute = new StrategySettings(Id.create("2"));
 //		reRoute.setModuleName("ReRoute");
 //		reRoute.setProbability(0.99);
 //		reRoute.setDisableAfter(2);

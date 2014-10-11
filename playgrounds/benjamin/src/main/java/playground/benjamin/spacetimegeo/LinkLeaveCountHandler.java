@@ -21,11 +21,11 @@ package playground.benjamin.spacetimegeo;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 
@@ -56,15 +56,15 @@ public class LinkLeaveCountHandler implements IterationStartsListener, LinkLeave
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		Id linkId = event.getLinkId();
+		Id<Link> linkId = event.getLinkId();
 		
-		if(linkId.equals(new IdImpl("3"))){
+		if(linkId.equals(Id.create("3", Link.class))){
 			logger.info("The agent is chosing route 3 in iteration " + this.iterationNo);
 			link3Counter++;
-		} else if(linkId.equals(new IdImpl("9"))){
+		} else if(linkId.equals(Id.create("9", Link.class))){
 			logger.info("The agent is chosing route 9 in iteration " + this.iterationNo);
 			link9Counter++;
-		} else if(linkId.equals(new IdImpl("11"))){
+		} else if(linkId.equals(Id.create("11", Link.class))){
 			logger.info("The agent is chosing route 11 in iteration " + this.iterationNo);
 			link11Counter++;
 		} else {

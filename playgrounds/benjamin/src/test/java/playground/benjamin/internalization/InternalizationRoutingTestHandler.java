@@ -20,9 +20,10 @@
 
 package playground.benjamin.internalization;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 /**
  * @author juliakern
  *
@@ -45,12 +46,12 @@ public class InternalizationRoutingTestHandler implements LinkLeaveEventHandler{
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if (event.getLinkId().equals(new IdImpl(Integer.toString(expectedRoad)))){
+		if (event.getLinkId().equals(Id.create(expectedRoad, Link.class))){
 			expectedRoadSelected = true;
 		} else {
-			if(event.getLinkId().equals(new IdImpl("9"))) 			actualRoadSelected = "9,";
-			else if(event.getLinkId().equals(new IdImpl("11")))		actualRoadSelected = "11";
-			else if(event.getLinkId().equals(new IdImpl("13"))) 	actualRoadSelected = "13";
+			if(event.getLinkId().equals(Id.create("9", Link.class))) 			actualRoadSelected = "9,";
+			else if(event.getLinkId().equals(Id.create("11", Link.class)))		actualRoadSelected = "11";
+			else if(event.getLinkId().equals(Id.create("13", Link.class))) 	actualRoadSelected = "13";
 		}
 	}
 

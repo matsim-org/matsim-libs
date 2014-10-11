@@ -23,12 +23,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.vehicles.EngineInformation;
 import org.matsim.vehicles.EngineInformation.FuelType;
 import org.matsim.vehicles.Vehicle;
@@ -59,7 +57,7 @@ public class VehicleGenerator {
 
 	private void run(String[] args) {
 		Config config1 = ConfigUtils.createConfig();
-		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(config1);
+		Scenario sc = ScenarioUtils.createScenario(config1);
 		Config config = sc.getConfig();
 		config.network().setInputFile(netFile);
 		config.plans().setInputFile(populationFile);
@@ -77,7 +75,7 @@ public class VehicleGenerator {
 		Vehicles vehicles =  VehicleUtils.createVehiclesContainer();
 		VehiclesFactory vehicleFactory = vehicles.getFactory();
 
-		VehicleType vehicleType = vehicleFactory.createVehicleType(new IdImpl("Mercedes"));
+		VehicleType vehicleType = vehicleFactory.createVehicleType(Id.create("Mercedes", VehicleType.class));
 		double gasConsumption = 7.5;
 
 		EngineInformation engineInfo = vehicleFactory.createEngineInformation(fuelType.diesel, gasConsumption);
@@ -85,7 +83,7 @@ public class VehicleGenerator {
 		vehicles.addVehicleType(vehicleType);
 		
 		for(Person person : population.getPersons().values()){
-			Id vehicleId = person.getId();
+			Id<Vehicle> vehicleId = Id.create(person.getId(), Vehicle.class);
 			
 			Vehicle vehicle = vehicleFactory.createVehicle(vehicleId, vehicleType);
 			

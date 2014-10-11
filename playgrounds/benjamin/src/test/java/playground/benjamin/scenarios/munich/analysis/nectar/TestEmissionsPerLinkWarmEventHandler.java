@@ -19,16 +19,18 @@
  * *********************************************************************** */
 package playground.benjamin.scenarios.munich.analysis.nectar;
 
-import junit.framework.Assert;
-import org.junit.Test;
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.emissions.events.WarmEmissionEvent;
-import org.matsim.contrib.emissions.types.WarmPollutant;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.testcases.MatsimTestUtils;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import junit.framework.Assert;
+
+import org.junit.Test;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.emissions.events.WarmEmissionEvent;
+import org.matsim.contrib.emissions.types.WarmPollutant;
+import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.Vehicle;
 
 public class TestEmissionsPerLinkWarmEventHandler {
 
@@ -69,8 +71,8 @@ public class TestEmissionsPerLinkWarmEventHandler {
 		// all possible values for pollutants set
 		double timeOfEvent1 = 5.0;
 		double expectedEndOfTimeInterval = getIntervalEnd(timeOfEvent1); // end of time interval should be 6.666...
-		Id linkId = new IdImpl("link1");
-		Id vehicleId = new IdImpl("veh 1");
+		Id<Link> linkId = Id.create("link1", Link.class);
+		Id<Vehicle> vehicleId = Id.create("veh 1", Vehicle.class);
 		Map<WarmPollutant, Double> warmEmissions1 = new HashMap<WarmPollutant, Double>();
 		event1 = setUpEvent(timeOfEvent1, linkId, vehicleId, warmEmissions1);
 		
@@ -108,7 +110,7 @@ public class TestEmissionsPerLinkWarmEventHandler {
 		Assert.assertTrue(excep); excep = false;
 		
 		try{
-			handler.getWarmEmissionsPerLinkAndTimeInterval().get(expectedEndOfTimeInterval).get(new IdImpl("unused link")).get(WarmPollutant.CO2_TOTAL);
+			handler.getWarmEmissionsPerLinkAndTimeInterval().get(expectedEndOfTimeInterval).get(Id.create("unused link", Link.class)).get(WarmPollutant.CO2_TOTAL);
 		}catch(NullPointerException e){
 			excep = true;
 		}
@@ -122,7 +124,7 @@ public class TestEmissionsPerLinkWarmEventHandler {
 		}
 		Assert.assertTrue(excep); excep = false;
 		
-		Assert.assertNull(handler.getTime2linkIdLeaveCount().get(expectedEndOfTimeInterval).get(new IdImpl("unused link")));
+		Assert.assertNull(handler.getTime2linkIdLeaveCount().get(expectedEndOfTimeInterval).get(Id.create("unused link", Link.class)));
 		
 		Map<WarmPollutant, Double> warmEmissions2= new HashMap<WarmPollutant, Double>();
 		// initialize event 2,3,4 and handle them
@@ -158,7 +160,7 @@ public class TestEmissionsPerLinkWarmEventHandler {
 		
 		double timeOfEvent5 = simulationEndTime/noOfTimeBins*14.3;
 		double intervalEndOfEvent5 = getIntervalEnd(timeOfEvent5);
-		Id linkId2 = new IdImpl("link 2");
+		Id<Link> linkId2 = Id.create("link 2", Link.class);
 
 		// event 5 has no map of emissions - should be handled like 0.0
 		event5 = new WarmEmissionEvent(timeOfEvent5, linkId2, vehicleId, null);
@@ -171,7 +173,7 @@ public class TestEmissionsPerLinkWarmEventHandler {
 		
 		//event 6 contains come pollutants but not all
 		
-		Id linkId3 = new IdImpl("link 3");
+		Id<Link> linkId3 = Id.create("link 3", Link.class);
 		Map<WarmPollutant, Double> warmEmissions6= new HashMap<WarmPollutant, Double>();
 		event6 = setUpEvent(simulationEndTime, linkId3, vehicleId, warmEmissions6);
 		warmEmissions6.remove(WarmPollutant.NMHC);
@@ -226,7 +228,7 @@ public class TestEmissionsPerLinkWarmEventHandler {
 		return intervalEnd;
 	}
 
-	private WarmEmissionEvent setUpEvent(double timeOfEvent1, Id linkId, Id vehicleId, Map<WarmPollutant, Double> warmEmissions) {
+	private WarmEmissionEvent setUpEvent(double timeOfEvent1, Id<Link> linkId, Id<Vehicle> vehicleId, Map<WarmPollutant, Double> warmEmissions) {
 		//warmEmissions = new HashMap<WarmPollutant, Double>();
 		warmEmissions.put(WarmPollutant.CO, new Double(coValue));
 		warmEmissions.put(WarmPollutant.CO2_TOTAL, new Double(c2Value));

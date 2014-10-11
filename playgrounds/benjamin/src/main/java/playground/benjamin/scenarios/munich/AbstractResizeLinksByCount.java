@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -132,9 +131,9 @@ public abstract class AbstractResizeLinksByCount {
 		tempCounts.setYear(2009);
 		
 		for(Entry<String, String> e : this.shortNameMap.entrySet()){
-			if(this.newNet.getNodes().containsKey(new IdImpl(e.getKey())) && this.origCounts.getCounts().containsKey(new IdImpl(e.getValue()))){
-				node =  this.oldNet.getNodes().get(new IdImpl(e.getKey()));
-				oldCount = this.origCounts.getCounts().get(new IdImpl(e.getValue()));
+			if(this.newNet.getNodes().containsKey(Id.create(e.getKey(), Node.class)) && this.origCounts.getCounts().containsKey(Id.create(e.getValue(), Link.class))){
+				node =  this.oldNet.getNodes().get(Id.create(e.getKey(), Node.class));
+				oldCount = this.origCounts.getCounts().get(Id.create(e.getValue(), Link.class));
 				
 				//nodes with countingStations on it contain only one outlink
 				for(Link l : node.getOutLinks().values()){

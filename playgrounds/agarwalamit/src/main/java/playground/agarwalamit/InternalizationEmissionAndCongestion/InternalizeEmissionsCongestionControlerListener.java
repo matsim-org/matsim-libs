@@ -55,7 +55,7 @@ public class InternalizeEmissionsCongestionControlerListener implements StartupL
 	private String emissionEventOutputFile;
 	private EventWriterXML emissionEventWriter;
 	private EmissionInternalizationHandler emissionInternalizationHandler;
-	private Set<Id> hotspotLinks;
+	private Set<Id<Link>> hotspotLinks;
 
 	int iteration;
 	int firstIt;
@@ -137,7 +137,7 @@ public class InternalizeEmissionsCongestionControlerListener implements StartupL
 		this.emissionModule.writeEmissionInformation(this.emissionEventOutputFile);
 	}
 
-	public void setHotspotLinks(Set<Id> hotspotLinks) {
+	public void setHotspotLinks(Set<Id<Link>> hotspotLinks) {
 		this.hotspotLinks = hotspotLinks;
 	}
 

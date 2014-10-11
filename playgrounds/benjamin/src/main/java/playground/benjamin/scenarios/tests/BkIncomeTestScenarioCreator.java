@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.PopulationWriter;
@@ -53,13 +52,13 @@ public class BkIncomeTestScenarioCreator {
 
 	private static final Logger log = Logger.getLogger(BkIncomeTestScenarioCreator.class);
 
-	private final Id id1 = new IdImpl(1);
-	private final Id id2 = new IdImpl(2);
-	private final Id id3 = new IdImpl(3);
-	private final Id id4 = new IdImpl(4);
-	private final Id id5 = new IdImpl(5);
-	private final Id id6 = new IdImpl(6);
-	private final Id id7 = new IdImpl(7);
+	private final Id<Link> id1 = Id.create(1, Link.class);
+	private final Id<Link> id2 = Id.create(2, Link.class);
+	private final Id<Link> id3 = Id.create(3, Link.class);
+	private final Id<Link> id4 = Id.create(4, Link.class);
+	private final Id<Link> id5 = Id.create(5, Link.class);
+	private final Id<Link> id6 = Id.create(6, Link.class);
+	private final Id<Link> id7 = Id.create(7, Link.class);
 
 	private final ScenarioImpl scenario;
 

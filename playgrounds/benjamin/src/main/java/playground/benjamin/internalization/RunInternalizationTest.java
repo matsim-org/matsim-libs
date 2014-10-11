@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
@@ -162,12 +161,12 @@ public class RunInternalizationTest {
 	// strategyConfigGroup
 		StrategyConfigGroup scg = controler.getConfig().strategy();
 		
-		StrategySettings changePlan = new StrategySettings(new IdImpl("1"));
+		StrategySettings changePlan = new StrategySettings(Id.create("1", StrategySettings.class));
 //		changePlan.setModuleName("BestScore");
 		changePlan.setModuleName("ChangeExpBeta");
 		changePlan.setProbability(0.7);
 		
-		StrategySettings reRoute = new StrategySettings(new IdImpl("2"));
+		StrategySettings reRoute = new StrategySettings(Id.create("2", StrategySettings.class));
 		reRoute.setModuleName("ReRoute");
 		reRoute.setProbability(0.3);
 		

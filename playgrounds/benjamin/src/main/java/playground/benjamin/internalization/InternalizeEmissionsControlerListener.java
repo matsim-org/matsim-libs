@@ -23,6 +23,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
@@ -50,7 +51,7 @@ public class InternalizeEmissionsControlerListener implements StartupListener, I
 	String emissionEventOutputFile;
 	EventWriterXML emissionEventWriter;
 	EmissionInternalizationHandler emissionInternalizationHandler;
-	Set<Id> hotspotLinks;
+	Set<Id<Link>> hotspotLinks;
 	
 	int iteration;
 	int firstIt;
@@ -112,7 +113,7 @@ public class InternalizeEmissionsControlerListener implements StartupListener, I
 		emissionModule.writeEmissionInformation(emissionEventOutputFile);
 	}
 
-	public void setHotspotLinks(Set<Id> hotspotLinks) {
+	public void setHotspotLinks(Set<Id<Link>> hotspotLinks) {
 		this.hotspotLinks = hotspotLinks;
 	}
 

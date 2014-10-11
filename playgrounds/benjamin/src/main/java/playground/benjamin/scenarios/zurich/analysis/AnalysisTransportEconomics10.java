@@ -19,23 +19,20 @@
  * *********************************************************************** */
 package playground.benjamin.scenarios.zurich.analysis;
 
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
 import playground.benjamin.BkPaths;
-
-import java.util.Map;
 
 public class AnalysisTransportEconomics10 {
 
@@ -54,13 +51,10 @@ public class AnalysisTransportEconomics10 {
 		String runid1String = "run" + runNumber1;
 		String runid2String = "run" + runNumber2;
 		
-		Id runid1 = new IdImpl(runNumber1);
-		Id runid2 = new IdImpl(runNumber2);
-		
 		String outputPath1 = BkPaths.RUNSSVN + runid1String;
 		String outputPath2 = BkPaths.RUNSSVN + runid2String;
-		OutputDirectoryHierarchy io1 = new OutputDirectoryHierarchy(outputPath1, runid1.toString(), false);
-		OutputDirectoryHierarchy io2 = new OutputDirectoryHierarchy(outputPath2, runid2.toString(), false);
+		OutputDirectoryHierarchy io1 = new OutputDirectoryHierarchy(outputPath1, runid1String, false);
+		OutputDirectoryHierarchy io2 = new OutputDirectoryHierarchy(outputPath2, runid2String, false);
 		
 
 		netfile = io1.getOutputFilename("output_network") + ".xml.gz";

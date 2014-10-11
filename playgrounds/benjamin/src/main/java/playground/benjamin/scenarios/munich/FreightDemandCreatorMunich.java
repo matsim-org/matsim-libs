@@ -30,6 +30,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
@@ -39,12 +40,10 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -79,7 +78,7 @@ public class FreightDemandCreatorMunich {
 
 	private void run(String[] args) throws IOException{
 		Config config = ConfigUtils.createConfig();
-		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		Scenario sc = ScenarioUtils.createScenario(config);
 		Config cf = sc.getConfig();
 		cf.network().setInputFile(netFile);
 		cf.plans().setInputFile(plansFile);
@@ -90,19 +89,19 @@ public class FreightDemandCreatorMunich {
 		Network network = sc.getNetwork();
 		
 		//instancing the new population
-		Scenario newScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario newScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		filteredPlans = newScenario.getPopulation();
 		
-		List<Id> nodesInBavaria = createListWithNodesInBavaria(vertexFile, shapeFile);
+		List<Id<Node>> nodesInBavaria = createListWithNodesInBavaria(vertexFile, shapeFile);
 		
 		for(Person person : population.getPersons().values()){
 			//getting nodes from route
-			Set<Id> nodesFromNodes = getNodesFromNodes(person, network);
+			Set<Id<Node>> nodesFromNodes = getNodesFromNodes(person, network);
 			//getting nodes from linkIds, if route is empty (origin/destination at same node)
-			Set<Id> nodesFromLinks = getNodesFromLinks(person, network);
+			Set<Id<Node>> nodesFromLinks = getNodesFromLinks(person, network);
 			
 			//checking if at least one node (or link) from a person's plan is in Bavaria
-			for (Id bavariaId : nodesInBavaria) {
+			for (Id<Node> bavariaId : nodesInBavaria) {
 				if (nodesFromNodes.contains(bavariaId)){
 					//check if population already contains person
 					if(filteredPlans.getPersons().keySet().contains(person.getId())){
@@ -143,8 +142,8 @@ public class FreightDemandCreatorMunich {
 	 * @return
 	 */
 	//muss ich erst noch verstehen...   -.-
-	private Set<Id> getNodesFromNodes(Person person, Network network) {
-		Set<Id> list = new HashSet<Id>();
+	private Set<Id<Node>> getNodesFromNodes(Person person, Network network) {
+		Set<Id<Node>> list = new HashSet<>();
 		for (Plan plan : person.getPlans()) {
 			for (PlanElement planElement : plan.getPlanElements()) {
 				if (planElement instanceof Leg){
@@ -167,17 +166,17 @@ public class FreightDemandCreatorMunich {
 	 * @param network 
 	 * @return
 	 */
-	private Set<Id> getNodesFromLinks(Person person, Network network) {
-		Set<Id> list = new HashSet<Id>();
+	private Set<Id<Node>> getNodesFromLinks(Person person, Network network) {
+		Set<Id<Node>> list = new HashSet<>();
 		for (Plan plan : person.getPlans()) {
 			for (PlanElement planElement : plan.getPlanElements()) {
 				if (planElement instanceof Activity){
 					Activity act = (Activity) planElement;
-					Id linkId = act.getLinkId();
+					Id<Link> linkId = act.getLinkId();
 					String link = linkId.toString();
 					String[] endNodes = link.split("-");
-					Id firstNode = new IdImpl(endNodes[0]);
-					Id secondNode = new IdImpl(endNodes[1]);
+					Id<Node> firstNode = Id.create(endNodes[0], Node.class);
+					Id<Node> secondNode = Id.create(endNodes[1], Node.class);
 					
 					list.add(firstNode);
 					list.add(secondNode);
@@ -193,16 +192,16 @@ public class FreightDemandCreatorMunich {
 	 * @return
 	 * @throws IOException 
 	 */
-	private List<Id> createListWithNodesInBavaria(String vertexFile, String shapeFile) throws IOException {
-		List<Id> list = new ArrayList<Id>();
+	private List<Id<Node>> createListWithNodesInBavaria(String vertexFile, String shapeFile) throws IOException {
+		List<Id<Node>> list = new ArrayList<>();
 		//getting a list of all regionIds in Bavaria
-		Set<Id> regionsInBavaria = getRegionsFromShape(shapeFile);
+		Set<String> regionsInBavaria = getRegionsFromShape(shapeFile);
 		//getting a map of "all nodeIds to Regions" in network 2004 (prognose_2025)
-		Map<Id, Id> allNodeIds2Region = getNodeIds2Region(vertexFile);
+		Map<Id<Node>, String> allNodeIds2Region = getNodeIds2Region(vertexFile);
 		
 		//nochmal nachvollziehen!
-		for(Id nodeId : allNodeIds2Region.keySet()){
-			Id regionId = allNodeIds2Region.get(nodeId);
+		for(Id<Node> nodeId : allNodeIds2Region.keySet()){
+			String regionId = allNodeIds2Region.get(nodeId);
 			if(regionsInBavaria.contains(regionId)){
 				list.add(nodeId);
 			}
@@ -215,8 +214,8 @@ public class FreightDemandCreatorMunich {
 	 * @return
 	 * @throws IOException 
 	 */
-	private Map<Id, Id> getNodeIds2Region(final String vertexFile) throws IOException {
-		final Map<Id, Id> nodeIds2Region = new HashMap<Id, Id>();
+	private Map<Id<Node>, String> getNodeIds2Region(final String vertexFile) throws IOException {
+		final Map<Id<Node>, String> nodeIds2Region = new HashMap<>();
 		TabularFileParserConfig tabFileParserConfig = new TabularFileParserConfig();
 		tabFileParserConfig.setFileName(vertexFile);
 		tabFileParserConfig.setDelimiterTags(new String[] {";"});
@@ -237,8 +236,8 @@ public class FreightDemandCreatorMunich {
 				}
 
 			private void parseAndAddNode(String[] row) {
-				Id nodeNumber = new IdImpl(row[KNOTENNUMMER]);
-				Id regionNumber = new IdImpl(row[ZONE]);
+				Id<Node> nodeNumber = Id.create(row[KNOTENNUMMER], Node.class);
+				String regionNumber = row[ZONE];
 				nodeIds2Region.put(nodeNumber, regionNumber);
 			}
 		});
@@ -250,12 +249,11 @@ public class FreightDemandCreatorMunich {
 	 * @return
 	 * @throws IOException 
 	 */
-	private Set<Id> getRegionsFromShape(String shapeFile) throws IOException {
-		Set<Id> regions = new HashSet<Id>();
+	private Set<String> getRegionsFromShape(String shapeFile) throws IOException {
+		Set<String> regions = new HashSet<>();
 		for (SimpleFeature ft : ShapeFileReader.getAllFeatures(shapeFile)){
 			String kkz = ft.getAttribute("KKZ").toString();
-			Id kkzId = new IdImpl(kkz);
-			regions.add(kkzId);
+			regions.add(kkz);
 		}
 		return regions;
 	}

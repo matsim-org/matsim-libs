@@ -40,7 +40,7 @@ public class EmissionTravelDisutilityCalculatorFactory implements TravelDisutili
 
 	private final EmissionModule emissionModule;
 	private final EmissionCostModule emissionCostModule;
-	private Set<Id> hotspotLinks;
+	private Set<Id<Link>> hotspotLinks;
 
 	public EmissionTravelDisutilityCalculatorFactory(EmissionModule emissionModule, EmissionCostModule emissionCostModule) {
 		this.emissionModule = emissionModule;
@@ -66,7 +66,7 @@ public class EmissionTravelDisutilityCalculatorFactory implements TravelDisutili
 		};
 	}
 
-	public void setHotspotLinks(Set<Id> hotspotLinks) {
+	public void setHotspotLinks(Set<Id<Link>> hotspotLinks) {
 		this.hotspotLinks = hotspotLinks;
 	}
 

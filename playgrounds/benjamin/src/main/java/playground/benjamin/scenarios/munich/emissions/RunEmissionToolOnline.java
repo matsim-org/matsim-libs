@@ -22,8 +22,8 @@ package playground.benjamin.scenarios.munich.emissions;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
@@ -122,7 +122,7 @@ public class RunEmissionToolOnline {
 
 	// strategy
 		StrategyConfigGroup scg = controler.getConfig().strategy();
-		StrategySettings strategySettings = new StrategySettings(new IdImpl("1"));
+		StrategySettings strategySettings = new StrategySettings(Id.create("1", StrategySettings.class));
 		strategySettings.setModuleName("ChangeExpBeta");
 		strategySettings.setProbability(1.0);
 		scg.addStrategySettings(strategySettings);

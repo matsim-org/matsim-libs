@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.emissions.EmissionModule;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
@@ -70,8 +69,8 @@ public class RunHotspotPricingMunich {
 //		considerCO2Costs = args[2];
 //		hotspotFile = args[3];
 		
-		Set<Id> hotspotLinks = createHotspotLinks(hotspotFile);
-		Set<Id> hotspotLinksMerged = findMergedLinks(hotspotLinks, configFile);
+		Set<Id<Link>> hotspotLinks = createHotspotLinks(hotspotFile);
+		Set<Id<Link>> hotspotLinksMerged = findMergedLinks(hotspotLinks, configFile);
 		
 		Config config = new Config();
 		config.addCoreModules();
@@ -100,9 +99,9 @@ public class RunHotspotPricingMunich {
 		controler.run();
 	}
 
-	private static Set<Id> findMergedLinks(Set<Id> hotspotLinks, String fileName) {
+	private static Set<Id<Link>> findMergedLinks(Set<Id<Link>> hotspotLinks, String fileName) {
 		logger.info("entering findMergedLinks ...");
-		Set<Id> hotspotLinksMerged = new HashSet<Id>();
+		Set<Id<Link>> hotspotLinksMerged = new HashSet<>();
 		
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.loadConfig(fileName));
 		new MatsimNetworkReader(sc).readFile(sc.getConfig().network().getInputFile());
@@ -110,7 +109,7 @@ public class RunHotspotPricingMunich {
 		
 		for(Link link : network.getLinks().values()){
 			String mergedLinkIdString = link.getId().toString();
-			for(Id hotspotLink : hotspotLinks){
+			for(Id<Link> hotspotLink : hotspotLinks){
 				String hotspoLinkString = hotspotLink.toString();
 				if(mergedLinkIdString.contains(hotspoLinkString)){
 					hotspotLinksMerged.add(link.getId());
@@ -125,10 +124,10 @@ public class RunHotspotPricingMunich {
 		return hotspotLinksMerged;
 	}
 
-	private static Set<Id> createHotspotLinks(String fileName) {
+	private static Set<Id<Link>> createHotspotLinks(String fileName) {
 		logger.info("entering createHotspotLinks ...");
 		
-		Set<Id> hotspotLinks = new HashSet<Id>();
+		Set<Id<Link>> hotspotLinks = new HashSet<Id<Link>>();
 		try{
 			BufferedReader br = IOUtils.getBufferedReader(fileName);
 			String strLine = br.readLine();
@@ -138,8 +137,8 @@ public class RunHotspotPricingMunich {
 				if ( strLine.contains("\"")) throw new RuntimeException("cannot handle this character in parsing") ;
 
 				String[] inputArray = strLine.split(";");
-				Id linkId1 = new IdImpl(inputArray[indexFromKey.get("linkId1")]);
-				Id linkId2 = new IdImpl(inputArray[indexFromKey.get("linkId2")]);
+				Id<Link> linkId1 = Id.create(inputArray[indexFromKey.get("linkId1")], Link.class);
+				Id<Link> linkId2 = Id.create(inputArray[indexFromKey.get("linkId2")], Link.class);
 				
 				hotspotLinks.add(linkId1);					
 				hotspotLinks.add(linkId2);
