@@ -21,16 +21,17 @@
 
 package playground.boescpa.converters.vissim.mains;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.utils.io.IOUtils;
-import playground.boescpa.converters.vissim.ConvEvents;
-import playground.boescpa.converters.vissim.tools.TripMatcher;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.HashMap;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.io.IOUtils;
+
+import playground.boescpa.converters.vissim.ConvEvents;
+import playground.boescpa.converters.vissim.tools.AbstractRouteConverter.Trip;
+import playground.boescpa.converters.vissim.tools.TripMatcher;
 
 /**
  * Matches the routes provided and creates a demand file.
@@ -49,24 +50,24 @@ public class MatchTrips {
 
 		for (int i = 0; i < 31; i++) {
 			// Read trips
-			HashMap<Id, Long[]> msTrips = MapRoutes.readRoutes(ConvEvents.insertVersNumInFilepath(path2MsRoutes,i));
+			HashMap<Id<Trip>, Long[]> msTrips = MapRoutes.readRoutes(ConvEvents.insertVersNumInFilepath(path2MsRoutes,i));
 			//HashMap<Id, Long[]> amTrips = MapRoutes.readRoutes(path2AmRoutes);
-			HashMap<Id, Long[]> inpTrips = MapRoutes.readRoutes(path2InpRoutes);
+			HashMap<Id<Trip>, Long[]> inpTrips = MapRoutes.readRoutes(path2InpRoutes);
 
 			// Match trips
 			ConvEvents.TripMatcher tripMatcher = new TripMatcher();
-			HashMap<Id, Integer> results = tripMatcher.matchTrips(msTrips, inpTrips);
+			HashMap<Id<Trip>, Integer> results = tripMatcher.matchTrips(msTrips, inpTrips);
 
 			writeTripDemands(results, ConvEvents.insertVersNumInFilepath(path2WriteDemands,i));
 		}
 	}
 
-	private static void writeTripDemands(HashMap<Id, Integer> results, String path2WriteDemands) {
+	private static void writeTripDemands(HashMap<Id<Trip>, Integer> results, String path2WriteDemands) {
 		try {
 			final String header = "RouteId, Demand";
 			final BufferedWriter out = IOUtils.getBufferedWriter(path2WriteDemands);
 			out.write(header); out.newLine();
-			for (Id routeId : results.keySet()) {
+			for (Id<Trip> routeId : results.keySet()) {
 				String line = routeId.toString();
 				line = line + delimiter + results.get(routeId).toString();
 				out.write(line); out.newLine();
@@ -78,17 +79,17 @@ public class MatchTrips {
 		}
 	}
 
-	public static HashMap<Id, Integer> readTripDemands(String path2DemandFile) {
-		HashMap<Id, Integer> demands = new HashMap<Id, Integer>();
+	public static HashMap<Id<Trip>, Integer> readTripDemands(String path2DemandFile) {
+		HashMap<Id<Trip>, Integer> demands = new HashMap<>();
 		try {
 			final BufferedReader in = IOUtils.getBufferedReader(path2DemandFile);
 			in.readLine(); // header
 			String line = in.readLine();
 			while (line != null) {
 				String[] route = line.split(delimiter);
-				Id routeId = new IdImpl(route[0]);
+				String routeId = route[0];
 				int routeDemand = Integer.parseInt(route[1]);
-				demands.put(routeId, routeDemand);
+				demands.put(Id.create(routeId, Trip.class), routeDemand);
 				line = in.readLine();
 			}
 		} catch (IOException e) {

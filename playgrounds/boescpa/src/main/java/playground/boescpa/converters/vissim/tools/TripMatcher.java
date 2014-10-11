@@ -21,12 +21,17 @@
 
 package playground.boescpa.converters.vissim.tools;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+
 import org.apache.commons.math.stat.regression.SimpleRegression;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import playground.boescpa.converters.vissim.ConvEvents;
 
-import java.util.*;
+import playground.boescpa.converters.vissim.ConvEvents;
+import playground.boescpa.converters.vissim.tools.AbstractRouteConverter.Trip;
 
 /**
  * Implements ConvEvents2Anm.TripMatcher with a simple linear regression as the similarity measure.
@@ -47,29 +52,29 @@ public class TripMatcher implements ConvEvents.TripMatcher {
 	private final static int NEG_OFFSET_IF_NOT_FOUNG = 1;
 
 	@Override
-	public HashMap<Id, Integer> matchTrips(HashMap<Id, Long[]> msTrips, HashMap<Id, Long[]> amTrips) {
+	public HashMap<Id<Trip>, Integer> matchTrips(HashMap<Id<Trip>, Long[]> msTrips, HashMap<Id<Trip>, Long[]> amTrips) {
 
 		int matchesWithHighScores = 0;
 		int matchesWithVeryHighScores = 0;
 		int progressCounter = 0;
 		int progressChecker = 2;
 
-		HashMap<Id, Integer> countsPerAnmTrip = new HashMap<Id, Integer>();
-		for (Id amTrip : amTrips.keySet()) {
+		HashMap<Id<Trip>, Integer> countsPerAnmTrip = new HashMap<>();
+		for (Id<Trip> amTrip : amTrips.keySet()) {
 			countsPerAnmTrip.put(amTrip, 0);
 		}
-		List<Id> amTripsKeySet = new ArrayList<Id>(amTrips.keySet());
+		List<Id<Trip>> amTripsKeySet = new ArrayList<>(amTrips.keySet());
 
-		for (Id msTrip : msTrips.keySet()) {
+		for (Id<Trip> msTrip : msTrips.keySet()) {
 			progressCounter++;
 			Long[] msTripZones = msTrips.get(msTrip);
 
-			Id bestMatchingAmTrip = null;
+			Id<Trip> bestMatchingAmTrip = null;
 			int bestMatchScore = Integer.MIN_VALUE;
 
 			// Shuffle key set:
 			Collections.shuffle(amTripsKeySet);
-			for (Id amTrip : amTripsKeySet) {
+			for (Id<Trip> amTrip : amTripsKeySet) {
 				Long[] amTripZones = amTrips.get(amTrip);
 
 				// Linear regression between the to trips:

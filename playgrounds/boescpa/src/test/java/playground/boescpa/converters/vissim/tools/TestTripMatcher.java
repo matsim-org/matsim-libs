@@ -21,14 +21,16 @@
 
 package playground.boescpa.converters.vissim.tools;
 
+import java.util.HashMap;
+
 import junit.framework.Assert;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-import playground.boescpa.converters.vissim.ConvEvents;
 
-import java.util.HashMap;
+import playground.boescpa.converters.vissim.ConvEvents;
+import playground.boescpa.converters.vissim.tools.AbstractRouteConverter.Trip;
 
 /**
  * Provides tests for TripMatcher.
@@ -38,29 +40,29 @@ import java.util.HashMap;
 public class TestTripMatcher {
 
 	ConvEvents.TripMatcher tripMatcher = new TripMatcher();
-	HashMap<Id, Long[]> msTrips = null;
-	HashMap<Id, Long[]> amTrips = null;
+	HashMap<Id<Trip>, Long[]> msTrips = null;
+	HashMap<Id<Trip>, Long[]> amTrips = null;
 
 	@Before
 
 	public void prepare() {
-		msTrips = new HashMap<Id, Long[]>();
-		amTrips = new HashMap<Id, Long[]>();
+		msTrips = new HashMap<>();
+		amTrips = new HashMap<>();
 
-		msTrips.put(new IdImpl(11l), new Long[]{1l,2l,3l,4l});
-		msTrips.put(new IdImpl(12l), new Long[]{2l,4l});
+		msTrips.put(Id.create("11", Trip.class), new Long[]{1l,2l,3l,4l});
+		msTrips.put(Id.create("12", Trip.class), new Long[]{2l,4l});
 
-		amTrips.put(new IdImpl(21l), new Long[]{2l,3l,4l,5l});
-		amTrips.put(new IdImpl(22l), new Long[]{2l,3l,4l});
-		amTrips.put(new IdImpl(23l), new Long[]{1l,2l,3l,4l});
+		amTrips.put(Id.create("21", Trip.class), new Long[]{2l,3l,4l,5l});
+		amTrips.put(Id.create("22", Trip.class), new Long[]{2l,3l,4l});
+		amTrips.put(Id.create("23", Trip.class), new Long[]{1l,2l,3l,4l});
 	}
 
 	@Test
 	public void testMatchTrips() {
-		HashMap<Id, Integer> results = tripMatcher.matchTrips(msTrips, amTrips);
-		Assert.assertEquals(0, results.get(new IdImpl(21l)).intValue());
-		Assert.assertEquals(1, results.get(new IdImpl(22l)).intValue());
-		Assert.assertEquals(1, results.get(new IdImpl(23l)).intValue());
+		HashMap<Id<Trip>, Integer> results = tripMatcher.matchTrips(msTrips, amTrips);
+		Assert.assertEquals(0, results.get(Id.create("21", Trip.class)).intValue());
+		Assert.assertEquals(1, results.get(Id.create("22", Trip.class)).intValue());
+		Assert.assertEquals(1, results.get(Id.create("23", Trip.class)).intValue());
 	}
 
 }

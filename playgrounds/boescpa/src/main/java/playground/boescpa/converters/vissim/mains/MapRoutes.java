@@ -21,19 +21,22 @@
 
 package playground.boescpa.converters.vissim.mains;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.utils.io.IOUtils;
-import playground.boescpa.converters.vissim.ConvEvents;
-import playground.boescpa.converters.vissim.ConvEvents2Anm;
-import playground.boescpa.converters.vissim.tools.InpRouteConverter;
-import playground.boescpa.converters.vissim.tools.MsRouteConverter;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.utils.io.IOUtils;
+
+import playground.boescpa.converters.vissim.ConvEvents;
+import playground.boescpa.converters.vissim.ConvEvents2Anm;
+import playground.boescpa.converters.vissim.tools.AbstractRouteConverter.Trip;
+import playground.boescpa.converters.vissim.tools.InpRouteConverter;
+import playground.boescpa.converters.vissim.tools.MsRouteConverter;
 
 /**
  * Creates routes from the matsim and the visum/vissim world and produces common representations of those.
@@ -61,9 +64,9 @@ public class MapRoutes {
 		String path2WriteInpRoutes = args[11];
 
 		// Create matsim routes:
-		HashMap<Id, Id[]> msKeyMap = PrepareNetworks.readKeyMaps(path2MsKeyMap);
+		HashMap<Id<Link>, Id<Node>[]> msKeyMap = PrepareNetworks.readKeyMaps(path2MsKeyMap);
 		ConvEvents2Anm.RouteConverter msRouteConverter = new MsRouteConverter();
-		List<HashMap<Id, Long[]>> msRoutes = msRouteConverter.convert(msKeyMap, path2EventsFile, path2MsNetwork, path2VissimZoneShp);
+		List<HashMap<Id<Trip>, Long[]>> msRoutes = msRouteConverter.convert(msKeyMap, path2EventsFile, path2MsNetwork, path2VissimZoneShp);
 		for (int i = 0; i < msRoutes.size(); i++) {
 			writeRoutes(msRoutes.get(i), ConvEvents.insertVersNumInFilepath(path2WriteMsRoutes, i));
 		}
@@ -79,20 +82,20 @@ public class MapRoutes {
 		*/
 
 		// Create visim routes:
-		HashMap<Id, Id[]> inpKeyMap = PrepareNetworks.readKeyMaps(path2InpKeyMap);
+		HashMap<Id<Link>, Id<Node>[]> inpKeyMap = PrepareNetworks.readKeyMaps(path2InpKeyMap);
 		ConvEvents.RouteConverter inpRouteConverter = new InpRouteConverter();
-		List<HashMap<Id, Long[]>> inpRoutes = inpRouteConverter.convert(inpKeyMap, path2InpFile, "", "");
+		List<HashMap<Id<Trip>, Long[]>> inpRoutes = inpRouteConverter.convert(inpKeyMap, path2InpFile, "", "");
 		for (int i = 0; i < inpRoutes.size(); i++) {
 			writeRoutes(inpRoutes.get(i), ConvEvents.insertVersNumInFilepath(path2WriteInpRoutes, i));
 		}
 	}
 
-	public static void writeRoutes(HashMap<Id, Long[]> routes, String path2WriteRoutes) {
+	public static void writeRoutes(HashMap<Id<Trip>, Long[]> routes, String path2WriteRoutes) {
 		try {
 			final String header = "RouteId, LinkIds...";
 			final BufferedWriter out = IOUtils.getBufferedWriter(path2WriteRoutes);
 			out.write(header); out.newLine();
-			for (Id routeId : routes.keySet()) {
+			for (Id<Trip> routeId : routes.keySet()) {
 				String line = routeId.toString();
 				for (Long linkId : routes.get(routeId)) {
 					line = line + delimiter + linkId.toString();
@@ -106,20 +109,20 @@ public class MapRoutes {
 		}
 	}
 
-	public static HashMap<Id, Long[]> readRoutes(String path2RoutesFile) {
-		HashMap<Id, Long[]> routes = new HashMap<Id, Long[]>();
+	public static HashMap<Id<Trip>, Long[]> readRoutes(String path2RoutesFile) {
+		HashMap<Id<Trip>, Long[]> routes = new HashMap<>();
 		try {
 			final BufferedReader in = IOUtils.getBufferedReader(path2RoutesFile);
 			in.readLine(); // header
 			String line = in.readLine();
 			while (line != null) {
 				String[] route = line.split(delimiter);
-				Id routeId = new IdImpl(route[0]);
+				String routeId = route[0];
 				Long[] linkIds = new Long[route.length-1];
 				for (int i = 1; i < route.length; i++) {
 					linkIds[i-1] = Long.parseLong(route[i]);
 				}
-				routes.put(routeId, linkIds);
+				routes.put(Id.create(routeId, Trip.class), linkIds);
 				line = in.readLine();
 			}
 		} catch (IOException e) {

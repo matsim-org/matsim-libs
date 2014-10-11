@@ -20,6 +20,7 @@
 package playground.boescpa.lib.tools.tripCreation.spatialCuttings;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 
 /**
@@ -38,6 +39,6 @@ public interface SpatialCuttingStrategy {
 	 * @param endLink	of the trip
 	 * @return	TRUE if the trip is to consider
 	 */
-	public boolean spatiallyConsideringTrip(Network network, Id startLink, Id endLink);
+	public boolean spatiallyConsideringTrip(Network network, Id<Link> startLink, Id<Link> endLink);
 
 }

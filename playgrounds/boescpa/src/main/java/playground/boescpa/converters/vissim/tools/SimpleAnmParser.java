@@ -21,15 +21,16 @@
 
 package playground.boescpa.converters.vissim.tools;
 
+import java.util.Stack;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Counter;
 import org.xml.sax.Attributes;
-
-import java.util.Stack;
 
 /**
  * Parses a Visum-ANM-File and returns all nodes and links to node- and link-handler respectively.
@@ -66,14 +67,14 @@ public class SimpleAnmParser extends MatsimXmlParser {
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		if ("NODE".equals(name) & this.nodeHandler != null) {
-			Id id = new IdImpl(Long.parseLong(atts.getValue("NO")));
+			Id<Node> id = Id.create(Long.parseLong(atts.getValue("NO")), Node.class);
 			double xcoord = Double.parseDouble(atts.getValue("XCOORD"));
 			double ycoord = Double.parseDouble(atts.getValue("YCOORD"));
 			this.currentNode = new AnmNode(id, new CoordImpl(xcoord, ycoord));
 		} else if ("LINK".equals(name) & this.linkHandler != null) {
-			Id id = new IdImpl(atts.getValue("ID"));
-			Id fromNode = new IdImpl(Long.parseLong(atts.getValue("FROMNODENO")));
-			Id toNode = new IdImpl(Long.parseLong(atts.getValue("TONODENO")));
+			Id<Link> id = Id.create(atts.getValue("ID"), Link.class);
+			Id<Node> fromNode = Id.create(Long.parseLong(atts.getValue("FROMNODENO")), Node.class);
+			Id<Node> toNode = Id.create(Long.parseLong(atts.getValue("TONODENO")), Node.class);
 			this.currentLink = new AnmLink(id, fromNode, toNode);
 		}
 	}
@@ -106,19 +107,19 @@ public class SimpleAnmParser extends MatsimXmlParser {
 	}
 
 	public static class AnmNode {
-		public final Id id;
+		public final Id<Node> id;
 		public final Coord coord;
-		public AnmNode(Id id, Coord coord) {
+		public AnmNode(Id<Node> id, Coord coord) {
 			this.id = id;
 			this.coord = coord;
 		}
 	}
 
 	public static class AnmLink {
-		public final Id id;
-		public final Id fromNode;
-		public final Id toNode;
-		public AnmLink(Id id, Id fromNode, Id toNode) {
+		public final Id<Link> id;
+		public final Id<Node> fromNode;
+		public final Id<Node> toNode;
+		public AnmLink(Id<Link> id, Id<Node> fromNode, Id<Node> toNode) {
 			this.id = id;
 			this.fromNode = fromNode;
 			this.toNode = toNode;

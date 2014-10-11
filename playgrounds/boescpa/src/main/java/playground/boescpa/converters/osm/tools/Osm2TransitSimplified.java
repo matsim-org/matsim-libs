@@ -38,7 +38,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -76,8 +75,8 @@ public class Osm2TransitSimplified {
 	/* package */final Set<Long> nodeIds = new HashSet<Long>();
 	/* package */final Set<Long> stopNodeIds = new HashSet<Long>();
 
-	/* package */final Map<Long, List<Id>> waysToLinks_DirA = new HashMap<Long, List<Id>>();
-	/* package */final Map<Long, List<Id>> waysToLinks_DirB = new HashMap<Long, List<Id>>();
+	/* package */final Map<Long, List<Id<Link>>> waysToLinks_DirA = new HashMap<>();
+	/* package */final Map<Long, List<Id<Link>>> waysToLinks_DirB = new HashMap<>();
 
 	public Osm2TransitSimplified(final TransitSchedule schedule,
 							final Network network) {
@@ -148,14 +147,14 @@ public class Osm2TransitSimplified {
 		return collector;
 	}
 
-	private void createNetworkOfTransitRoutes(final Map<Long, OsmParser.OsmNode> nodes, final Map<Long, OsmParser.OsmWay> ways,	final Map<Long, List<Id>> waysToLinks_DirA,	final Map<Long, List<Id>> waysToLinks_DirB, final Network network) {
+	private void createNetworkOfTransitRoutes(final Map<Long, OsmParser.OsmNode> nodes, final Map<Long, OsmParser.OsmWay> ways,	final Map<Long, List<Id<Link>>> waysToLinks_DirA,	final Map<Long, List<Id<Link>>> waysToLinks_DirB, final Network network) {
 		NetworkCreator creator = new NetworkCreator(nodes, ways,
 				waysToLinks_DirA, waysToLinks_DirB, network);
 		creator.createNodes();
 		creator.createLinks();
 	}
 
-	private void createSchedule(final Map<Long, OsmParser.OsmRelation> relations,	final Map<Long, OsmParser.OsmNode> stopNodes, final Map<Long, OsmParser.OsmWay> ways, final Map<Long, OsmParser.OsmNode> nodes, Map<Long, List<Id>> waysToLinks_DirA,	Map<Long, List<Id>> waysToLinks_DirB,
+	private void createSchedule(final Map<Long, OsmParser.OsmRelation> relations,	final Map<Long, OsmParser.OsmNode> stopNodes, final Map<Long, OsmParser.OsmWay> ways, final Map<Long, OsmParser.OsmNode> nodes, Map<Long, List<Id<Link>>> waysToLinks_DirA,	Map<Long, List<Id<Link>>> waysToLinks_DirB,
 								final TransitSchedule schedule, final Network network) {
 		ScheduleCreator creator = new ScheduleCreator(relations, stopNodes,	ways, nodes, waysToLinks_DirA, waysToLinks_DirB, schedule, network);
 		creator.createStops();
@@ -283,16 +282,16 @@ public class Osm2TransitSimplified {
 		private final Map<Long, OsmParser.OsmNode> nodes;
 		private final Map<Long, OsmParser.OsmWay> ways;
 
-		private final Map<Long, List<Id>> waysToLinks_DirA;
-		private final Map<Long, List<Id>> waysToLinks_DirB;
+		private final Map<Long, List<Id<Link>>> waysToLinks_DirA;
+		private final Map<Long, List<Id<Link>>> waysToLinks_DirB;
 
 		private final Network network;
 		private final NetworkFactory factory;
 
 		public NetworkCreator(final Map<Long, OsmParser.OsmNode> nodes,
 							  final Map<Long, OsmParser.OsmWay> ways,
-							  final Map<Long, List<Id>> waysToLinks_DirA,
-							  final Map<Long, List<Id>> waysToLinks_DirB,
+							  final Map<Long, List<Id<Link>>> waysToLinks_DirA,
+							  final Map<Long, List<Id<Link>>> waysToLinks_DirB,
 							  final Network network) {
 			this.nodes = nodes;
 			this.ways = ways;
@@ -304,7 +303,7 @@ public class Osm2TransitSimplified {
 
 		public void createNodes() {
 			for (OsmParser.OsmNode node : this.nodes.values()) {
-				Node netNode = this.factory.createNode(new IdImpl(node.id),
+				Node netNode = this.factory.createNode(Id.create(node.id, Node.class),
 						node.coord);
 				this.network.addNode(netNode);
 			}
@@ -312,20 +311,20 @@ public class Osm2TransitSimplified {
 
 		public void createLinks() {
 			for (OsmParser.OsmWay way : this.ways.values()) {
-				List<Id> links_DirA = new LinkedList<Id>();
-				List<Id> links_DirB = new LinkedList<Id>();
+				List<Id<Link>> links_DirA = new LinkedList<>();
+				List<Id<Link>> links_DirB = new LinkedList<>();
 
 				// first create all links in the same direction as coded in the
 				// way
 				Node fromNode = this.network.getNodes().get(
-						new IdImpl(way.nodes.get(0)));
+						Id.create(way.nodes.get(0), Node.class));
 				int linkCounter = 0;
 
 				for (int i = 1; i < way.nodes.size(); i++) {
 					Node toNode = this.network.getNodes().get(
-							new IdImpl(way.nodes.get(i)));
+							Id.create(way.nodes.get(i), Node.class));
 
-					Id linkId = new IdImpl(way.id + "_" + linkCounter + "A");
+					Id<Link> linkId = Id.create(way.id + "_" + linkCounter + "A", Link.class);
 					Link link = this.factory.createLink(linkId, fromNode, toNode);
 					//TODO:Calc and set link length
 					this.network.addLink(link);
@@ -339,9 +338,9 @@ public class Osm2TransitSimplified {
 
 				for (int i = way.nodes.size() - 2; i >= 0; i--) {
 					Node toNode = this.network.getNodes().get(
-							new IdImpl(way.nodes.get(i)));
+							Id.create(way.nodes.get(i), Node.class));
 
-					Id linkId = new IdImpl(way.id + "_" + linkCounter + "B");
+					Id<Link> linkId = Id.create(way.id + "_" + linkCounter + "B", Link.class);
 					Link link = this.factory.createLink(linkId, fromNode, toNode);
 					//TODO:Calc and set link length
 					this.network.addLink(link);
@@ -366,8 +365,8 @@ public class Osm2TransitSimplified {
 		private final Map<Long, OsmParser.OsmWay> ways;
 		private final Map<Long, OsmParser.OsmNode> nodes;
 
-		private final Map<Long, List<Id>> waysToLinks_DirA;
-		private final Map<Long, List<Id>> waysToLinks_DirB;
+		private final Map<Long, List<Id<Link>>> waysToLinks_DirA;
+		private final Map<Long, List<Id<Link>>> waysToLinks_DirB;
 
 		private final TransitSchedule schedule;
 		private final TransitScheduleFactory scheduleBuilder;
@@ -379,8 +378,8 @@ public class Osm2TransitSimplified {
 		public ScheduleCreator(final Map<Long, OsmParser.OsmRelation> relations,
 							   final Map<Long, OsmParser.OsmNode> stopNodes,
 							   final Map<Long, OsmParser.OsmWay> ways, final Map<Long, OsmParser.OsmNode> nodes,
-							   Map<Long, List<Id>> waysToLinks_DirA,
-							   Map<Long, List<Id>> waysToLinks_DirB,
+							   Map<Long, List<Id<Link>>> waysToLinks_DirA,
+							   Map<Long, List<Id<Link>>> waysToLinks_DirB,
 							   final TransitSchedule schedule, final Network network) {
 			this.relations = relations;
 			this.stopNodes = stopNodes;
@@ -480,10 +479,10 @@ public class Osm2TransitSimplified {
 					}
 
 					// create route profile
-					List<Id> relationStopIds = new ArrayList<Id>();
+					List<Id<TransitStopFacility>> relationStopIds = new ArrayList<>();
 					for (OsmParser.OsmNode node : relationStops) {
 
-						IdImpl nodeId = new IdImpl(node.id);
+						Id<TransitStopFacility> nodeId = Id.create(node.id, TransitStopFacility.class);
 						if (this.schedule.getFacilities().containsKey(nodeId)) {
 							relationStopIds.add(nodeId);
 						} else {
@@ -524,11 +523,11 @@ public class Osm2TransitSimplified {
 					//create stop route
 					log.info("sort stops for relation "+relation.id+", "+ relationName);
 					log.info("# stops = "+relationStops.size());
-					List<Id> sortedStops = sortStops(relationStopIds);
+					List<Id<TransitStopFacility>> sortedStops = sortStops(relationStopIds);
 
 					List<TransitRouteStop> stops = new LinkedList<TransitRouteStop>();
 
-					for (Id stopId : sortedStops) {
+					for (Id<TransitStopFacility> stopId : sortedStops) {
 						TransitStopFacility stop = this.schedule.getFacilities().get(stopId);
 						double departureOffset = calcDepartureOffSet(stops,	stop);
 						TransitRouteStop routeStop = scheduleBuilder.createTransitRouteStop(stop, departureOffset, departureOffset + 30);
@@ -538,7 +537,7 @@ public class Osm2TransitSimplified {
 
 
 					// create transit route
-					TransitRoute transitRoute = scheduleBuilder.createTransitRoute(new IdImpl("0"), route, stops, relation.tags.get("route"));
+					TransitRoute transitRoute = scheduleBuilder.createTransitRoute(Id.create("0", TransitRoute.class), route, stops, relation.tags.get("route"));
 
 					String routeName = relationName.concat("_directionA");
 					transitRoute.setDescription(routeName);
@@ -550,7 +549,7 @@ public class Osm2TransitSimplified {
 					// because if in doubt better have two than none!
 
 					// create transit line
-					IdImpl lineId = new IdImpl(relation.id);
+					Id<TransitLine> lineId = Id.create(relation.id, TransitLine.class);
 					TransitLine line = scheduleBuilder.createTransitLine(lineId);
 
 					line.addRoute(transitRoute);
@@ -569,8 +568,8 @@ public class Osm2TransitSimplified {
 
 
 		// sorting methods
-		private List<Id> sortStops(List<Id> stops) {
-			List<Id> sortedStops = new LinkedList<Id>();
+		private List<Id<TransitStopFacility>> sortStops(List<Id<TransitStopFacility>> stops) {
+			List<Id<TransitStopFacility>> sortedStops = new LinkedList<>();
 			// TODO: sort stops into correct order -> how?????
 			sortedStops = stops;
 			log.info("sorted stops: "+sortedStops);
@@ -708,8 +707,8 @@ public class Osm2TransitSimplified {
 			}
 			else {
 				sortedWays.add(unsortedWays.get(0));
-				List<Id> linkIds = translateWayToLinks(sortedWays.get(0), relationWays, relationWays.get(sortedWays.get(0)).getStartNode());
-				for (Id linkId : linkIds) {
+				List<Id<Link>> linkIds = translateWayToLinks(sortedWays.get(0), relationWays, relationWays.get(sortedWays.get(0)).getStartNode());
+				for (Id<Link> linkId : linkIds) {
 					sortedLinks.add(linkId);
 				}
 			}
@@ -868,11 +867,11 @@ public class Osm2TransitSimplified {
 			System.out.println("sortedWaysBeforeFork = "+sortedWaysBeforeFork);
 			System.out.println("sortedWaysAfterFork = "+sortedWaysAfterFork);
 
-			List<Id>sortedLinksBeforeFork = new ArrayList<Id>();
-			List<Id>sortedLinksAfterFork = new ArrayList<Id>();
+			List<Id<Link>>sortedLinksBeforeFork = new ArrayList<>();
+			List<Id<Link>>sortedLinksAfterFork = new ArrayList<>();
 			boolean beforeForkLinks = true;
 
-			for (Id linkId : sortedLinks) {
+			for (Id<Link> linkId : sortedLinks) {
 				if (beforeForkLinks) {
 					sortedLinksBeforeFork.add(linkId);
 				}
@@ -881,7 +880,7 @@ public class Osm2TransitSimplified {
 				}
 
 				Link link = network.getLinks().get(linkId);
-				if (link.getToNode().getId().equals(new IdImpl(nodeId))) {
+				if (link.getToNode().getId().equals(Id.create(nodeId, Node.class))) {
 					beforeForkLinks = false;
 				}
 			}
@@ -904,11 +903,11 @@ public class Osm2TransitSimplified {
 			//TODO: take into account when the fork merges back
 			double lengthAfterOld = 0;
 			double lengthAfterNew = 0;
-			for (Id linkId : sortedLinksAfterFork) {
+			for (Id<Link> linkId : sortedLinksAfterFork) {
 				Link link = network.getLinks().get(linkId);
 				lengthAfterOld += link.getLength();
 			}
-			for (Id linkId : sortedNewLinksAfterFork) {
+			for (Id<Link> linkId : sortedNewLinksAfterFork) {
 				Link link = network.getLinks().get(linkId);
 				lengthAfterNew += link.getLength();
 			}
@@ -928,10 +927,10 @@ public class Osm2TransitSimplified {
 				}
 
 				sortedLinks.clear();
-				for (Id link : sortedLinksBeforeFork) {
+				for (Id<Link> link : sortedLinksBeforeFork) {
 					sortedLinks.add(link);
 				}
-				for (Id link : sortedNewLinksAfterFork) {
+				for (Id<Link> link : sortedNewLinksAfterFork) {
 					sortedLinks.add(link);
 				}
 				System.out.println("New sorted ways = "+sortedWays);
@@ -946,7 +945,7 @@ public class Osm2TransitSimplified {
 			System.out.println("connected ways: "+connectedWays);
 
 
-			List<Id> linkIds = null;
+			List<Id<Link>> linkIds = null;
 
 			if (connectedWays.size() == 1) {
 				sortedWays.add(way.id);
@@ -980,7 +979,7 @@ public class Osm2TransitSimplified {
 				linkIds = translateWayToLinks(way.id, relationWays, way.getEndNode());
 			}
 
-			for (Id linkId : linkIds) {
+			for (Id<Link> linkId : linkIds) {
 				sortedLinks.add(linkId);
 			}
 
@@ -1020,9 +1019,9 @@ public class Osm2TransitSimplified {
 				endNodeId = nextNodeId;
 			}
 
-			List<Id> linkIds = translateLoopWayToLinks(way.id, relationWays, nodeId, endNodeId);
+			List<Id<Link>> linkIds = translateLoopWayToLinks(way.id, relationWays, nodeId, endNodeId);
 			if (!linkIds.isEmpty()) {
-				for (Id linkId : linkIds) {
+				for (Id<Link> linkId : linkIds) {
 					sortedLinks.add(linkId);
 				}
 			}
@@ -1041,23 +1040,23 @@ public class Osm2TransitSimplified {
 			long closestNeighbour = getClosestNeighbour(nodeId, unprocessedNodesAndConnectedWays);
 
 			// check if there is a link connecting the two nodes, if not create this link and add to network
-			Map<Id<Link>, ? extends Link> outLinks = network.getNodes().get(new IdImpl(nodeId)).getOutLinks();
-			Id nextLink = null;
+			Map<Id<Link>, ? extends Link> outLinks = network.getNodes().get(Id.create(nodeId, Node.class)).getOutLinks();
+			Id<Link> nextLink = null;
 			for (Link link : outLinks.values()) {
-				if (link.getToNode().getId().equals(new IdImpl(closestNeighbour))) {
+				if (link.getToNode().getId().equals(Id.create(closestNeighbour, Node.class))) {
 					nextLink = link.getId();
 				}
 			}
 
 			if (nextLink == null) {
 
-				Node node1 = network.getNodes().get(new IdImpl(nodeId));
-				Node node2 = network.getNodes().get(new IdImpl(closestNeighbour));
-				Id linkIdA = new IdImpl(nodeId + "To" +closestNeighbour +"_0A");
+				Node node1 = network.getNodes().get(Id.create(nodeId, Node.class));
+				Node node2 = network.getNodes().get(Id.create(closestNeighbour, Node.class));
+				Id<Link> linkIdA = Id.create(nodeId + "To" +closestNeighbour +"_0A", Link.class);
 				Link linkA = this.factory.createLink(linkIdA, node1, node2);
 				this.network.addLink(linkA);
 
-				Id linkIdB = new IdImpl(nodeId + "To" +closestNeighbour +"_0B");
+				Id<Link> linkIdB = Id.create(nodeId + "To" +closestNeighbour +"_0B", Link.class);
 				Link linkB = this.factory.createLink(linkIdB, node2, node1);
 				this.network.addLink(linkB);
 
@@ -1070,8 +1069,8 @@ public class Osm2TransitSimplified {
 			return closestNeighbour;
 		}
 
-		private List<Id> translateWayToLinks(long wayId, Map<Long, OsmParser.OsmWay> relationWays, long startNodeId) {
-			List<Id> linkIds = null;
+		private List<Id<Link>> translateWayToLinks(long wayId, Map<Long, OsmParser.OsmWay> relationWays, long startNodeId) {
+			List<Id<Link>> linkIds = null;
 			OsmParser.OsmWay way = relationWays.get(wayId);
 			if (startNodeId == way.getStartNode()) {
 				linkIds = waysToLinks_DirA.get(wayId);
@@ -1082,22 +1081,22 @@ public class Osm2TransitSimplified {
 			return linkIds;
 		}
 
-		private List<Id> translateLoopWayToLinks(long wayId, Map<Long, OsmParser.OsmWay> relationWays, long startNodeId, long endNodeId) {
-			Id startNode = new IdImpl(startNodeId);
-			Id endNode = new IdImpl(endNodeId);
+		private List<Id<Link>> translateLoopWayToLinks(long wayId, Map<Long, OsmParser.OsmWay> relationWays, long startNodeId, long endNodeId) {
+			Id<Node> startNode = Id.create(startNodeId, Node.class);
+			Id<Node> endNode = Id.create(endNodeId, Node.class);
 
-			List<Id> linkIds = new LinkedList<Id>();
+			List<Id<Link>> linkIds = new LinkedList<>();
 			OsmParser.OsmWay way = relationWays.get(wayId);
 
 			if (waysToLinks_DirA.containsKey(way.id) && !waysToLinks_DirA.get(way.id).isEmpty()) {
-				List<Id> lwLinkIds = waysToLinks_DirA.get(way.id);
+				List<Id<Link>> lwLinkIds = waysToLinks_DirA.get(way.id);
 
 
 				int i = 0;
 				boolean endNodeReached = false;
 				boolean afterStartNode = false;
 				while (!endNodeReached) {
-					Id linkId = lwLinkIds.get(i);
+					Id<Link> linkId = lwLinkIds.get(i);
 					Link link = network.getLinks().get(linkId);
 					if (link.getFromNode().getId().equals(startNode)) {
 						afterStartNode = true;
@@ -1174,10 +1173,10 @@ public class Osm2TransitSimplified {
 			long closestNeighbour = -1;
 			double shortestDistance = Double.MAX_VALUE;
 
-			Node node1 = network.getNodes().get(new IdImpl(nodeId));
+			Node node1 = network.getNodes().get(Id.create(nodeId, Node.class));
 
 			for (long node2Id : unprocessedNodesAndConnectedWays.keySet()) {
-				Node node2 = network.getNodes().get(new IdImpl(node2Id));
+				Node node2 = network.getNodes().get(Id.create(node2Id, Node.class));
 				double nodeDistance = calcWGS84CoordDistance(node1.getCoord(), node2.getCoord());
 				if (nodeDistance <= shortestDistance) {
 					closestNeighbour = node2Id;
@@ -1199,7 +1198,7 @@ public class Osm2TransitSimplified {
 		}
 
 		private TransitStopFacility createStop(OsmParser.OsmNode node) {
-			TransitStopFacility stopFacility = this.scheduleBuilder.createTransitStopFacility(new IdImpl(node.id), node.coord,false);
+			TransitStopFacility stopFacility = this.scheduleBuilder.createTransitStopFacility(Id.create(node.id, TransitStopFacility.class), node.coord,false);
 			stopFacility.setName(node.tags.get("name"));
 			return stopFacility;
 		}

@@ -21,14 +21,15 @@
 
 package playground.boescpa.converters.vissim.tools;
 
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.utils.io.IOUtils;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.utils.io.IOUtils;
 
 /**
  * Provides a vissim-inp specific implementation of RouteConverter.
@@ -73,14 +74,14 @@ public class InpRouteConverter extends AbstractRouteConverter {
 					if (currentTrip != null) {
 						trips.add(currentTrip);
 					}
-					currentTrip = new Trip(new IdImpl(routingDecision + "-" + lineVals[2]), 0.0);
+					currentTrip = new Trip(Id.create(routingDecision + "-" + lineVals[2], Trip.class), 0.0);
 					inTrip = true;
 				}
 				if (inTrip) {
 					if (oPattern.matcher(line).matches()) {
 						String[] lineVals = line.split(" +");
 						for (int i = 2; i < lineVals.length; i++) {
-							currentTrip.links.add(new IdImpl(Long.parseLong(lineVals[i])));
+							currentTrip.links.add(Id.create(Long.parseLong(lineVals[i]), Link.class));
 						}
 					} else if (nPattern.matcher(line).matches()) {
 						trips.add(currentTrip);
@@ -89,7 +90,7 @@ public class InpRouteConverter extends AbstractRouteConverter {
 					} else if (numPattern.matcher(line).matches()) {
 						String[] lineVals = line.split(" +");
 						for (int i = 1; i < lineVals.length; i++) {
-							currentTrip.links.add(new IdImpl(Long.parseLong(lineVals[i])));
+							currentTrip.links.add(Id.create(Long.parseLong(lineVals[i]), Link.class));
 						}
 					}
 				}

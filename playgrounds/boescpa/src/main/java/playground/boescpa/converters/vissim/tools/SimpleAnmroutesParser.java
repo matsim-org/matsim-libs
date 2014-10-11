@@ -21,15 +21,15 @@
 
 package playground.boescpa.converters.vissim.tools;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.core.utils.misc.Counter;
-import org.xml.sax.Attributes;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.misc.Counter;
+import org.xml.sax.Attributes;
 
 /**
  * Parses a Visum-ANMRoutes-File and returns all routes to route-handler.
@@ -56,10 +56,10 @@ public class SimpleAnmroutesParser extends MatsimXmlParser {
 		if ("ROUTE".equals(name)) {
 			String idString = atts.getValue("FROMZONENO") + "-"
 					+ atts.getValue("TOZONENO") + "-" + atts.getValue("INDEX");
-			this.currentRoute = new AnmRoute(new IdImpl(idString), 0.0);
+			this.currentRoute = new AnmRoute(Id.create(idString, AnmRoute.class), 0.0);
 		} else if ("ITEM".equals(name)) {
 			if (this.currentRoute != null) {
-				this.currentRoute.nodes.add(new IdImpl(Long.parseLong(atts.getValue("NODE"))));
+				this.currentRoute.nodes.add(Id.create(Long.parseLong(atts.getValue("NODE")), Node.class));
 			} else {
 				throw new IllegalStateException("In anmroutes-file node without route found.");
 			}
@@ -85,17 +85,17 @@ public class SimpleAnmroutesParser extends MatsimXmlParser {
 		/**
 		 * Consists of a String Fromzone-Tozone-Index.
 		 */
-		public final Id id;
+		public final Id<AnmRoute> id;
 		public final Double demand;
 		/**
 		 * Node-ids as Longs.
 		 */
-		public final List<Id> nodes;
+		public final List<Id<Node>> nodes;
 
-		public AnmRoute(Id id, Double demand) {
+		public AnmRoute(Id<AnmRoute> id, Double demand) {
 			this.id = id;
 			this.demand = demand;
-			this.nodes = new ArrayList<Id>();
+			this.nodes = new ArrayList<>();
 		}
 	}
 

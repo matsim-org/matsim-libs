@@ -21,11 +21,15 @@
 
 package playground.boescpa.converters.vissim;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
-
 import java.util.HashMap;
 import java.util.List;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
+
+import playground.boescpa.converters.vissim.tools.AbstractRouteConverter.Trip;
 
 /**
  * Provides the environment to convert MATSim-Events to an ANMRoutes file importable in VISSIM.
@@ -69,15 +73,15 @@ public abstract class ConvEvents {
 		String path2NewVissimRoutesFile = args[5];
 
 		Network mutualBaseGrid = this.baseGridCreator.createMutualBaseGrid(path2VissimZoneShp);
-		HashMap<Id, Id[]> keyMsNetwork = this.matsimNetworkMapper.mapNetwork(path2MATSimNetwork, mutualBaseGrid, path2VissimZoneShp);
-		HashMap<Id, Id[]> keyAmNetwork = this.vissimNetworkMapper.mapNetwork(path2VissimNetwork, mutualBaseGrid, "");
-		List<HashMap<Id, Long[]>> msTripsCol = this.matsimRouteConverter.convert(keyMsNetwork, path2EventsFile, path2MATSimNetwork, path2VissimZoneShp);
-		List<HashMap<Id, Long[]>> amTripsCol = this.vissimRouteConverter.convert(keyAmNetwork, path2VissimRoutesFile, "", "");
+		HashMap<Id<Link>, Id<Node>[]> keyMsNetwork = this.matsimNetworkMapper.mapNetwork(path2MATSimNetwork, mutualBaseGrid, path2VissimZoneShp);
+		HashMap<Id<Link>, Id<Node>[]> keyAmNetwork = this.vissimNetworkMapper.mapNetwork(path2VissimNetwork, mutualBaseGrid, "");
+		List<HashMap<Id<Trip>, Long[]>> msTripsCol = this.matsimRouteConverter.convert(keyMsNetwork, path2EventsFile, path2MATSimNetwork, path2VissimZoneShp);
+		List<HashMap<Id<Trip>, Long[]>> amTripsCol = this.vissimRouteConverter.convert(keyAmNetwork, path2VissimRoutesFile, "", "");
 
 		int hourCounter = 0;
-		for (HashMap<Id, Long[]> msTrips : msTripsCol) {
-			for (HashMap<Id, Long[]> amTrips : amTripsCol) {
-				HashMap<Id, Integer> demandPerAnmTrip = this.tripMatcher.matchTrips(msTrips, amTrips);
+		for (HashMap<Id<Trip>, Long[]> msTrips : msTripsCol) {
+			for (HashMap<Id<Trip>, Long[]> amTrips : amTripsCol) {
+				HashMap<Id<Trip>, Integer> demandPerAnmTrip = this.tripMatcher.matchTrips(msTrips, amTrips);
 				String newPath2NewVissimRoutesFile = insertVersNumInFilepath(path2NewVissimRoutesFile, hourCounter);
 				writeRoutes(demandPerAnmTrip, path2VissimRoutesFile, newPath2NewVissimRoutesFile);
 				hourCounter++;
@@ -104,7 +108,7 @@ public abstract class ConvEvents {
 	 *                        of the given VissimFile except for the demands stated at the routes. These are the new
 	 *                        demands given in demandPerVissimTrip.
 	 */
-	public abstract void writeRoutes(HashMap<Id, Integer> demandPerVissimTrip, String path2VissimRoutesFile, String path2NewVissimRoutesFile);
+	public abstract void writeRoutes(HashMap<Id<Trip>, Integer> demandPerVissimTrip, String path2VissimRoutesFile, String path2NewVissimRoutesFile);
 
 	public interface BaseGridCreator {
 
@@ -129,7 +133,7 @@ public abstract class ConvEvents {
 		 * @param path2VissimZoneShp
 		 * @return The key that matches the network (links) to the base grid.
 		 */
-		HashMap<Id,Id[]> mapNetwork(String path2Network, Network mutualBaseGrid, String path2VissimZoneShp);
+		HashMap<Id<Link>,Id<Node>[]> mapNetwork(String path2Network, Network mutualBaseGrid, String path2VissimZoneShp);
 
 	}
 
@@ -145,7 +149,7 @@ public abstract class ConvEvents {
 		 * @return	List of trip collections. Each entry of the list represents one hour simulation time. If there is
 		 * 			only one entry, no time was provided for the trips (e.g. the case for vissim trips).
 		 */
-		public List<HashMap<Id, Long[]>> convert(HashMap<Id, Id[]> networkKey, String path2RouteFile, String path2OrigNetwork, String path2VissimZoneShp);
+		public List<HashMap<Id<Trip>, Long[]>> convert(HashMap<Id<Link>, Id<Node>[]> networkKey, String path2RouteFile, String path2OrigNetwork, String path2VissimZoneShp);
 	}
 
 	public interface TripMatcher {
@@ -158,6 +162,6 @@ public abstract class ConvEvents {
 		 * @return A HashMap having for each ANM-trip (Id) the number (Integer) of MATSim-trips which were found to
 		 * 			to match this ANM-trip best.
 		 */
-		HashMap<Id,Integer> matchTrips(HashMap<Id, Long[]> msTrips, HashMap<Id, Long[]> amTrips);
+		HashMap<Id<Trip>,Integer> matchTrips(HashMap<Id<Trip>, Long[]> msTrips, HashMap<Id<Trip>, Long[]> amTrips);
 	}
 }

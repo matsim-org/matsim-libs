@@ -21,13 +21,14 @@
 
 package playground.boescpa.converters.vissim.tools;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.io.MatsimXmlParser;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Provides a visum-anmroutes specific implementation of RouteConverter.
@@ -67,10 +68,10 @@ public class AmRouteConverter extends AbstractRouteConverter {
 
 		// create trips:
 		for (SimpleAnmroutesParser.AnmRoute anmRoute : routes) {
-			Trip trip = new Trip(anmRoute.id, 0.0);
+			Trip trip = new Trip(Id.create(anmRoute.id, Trip.class), 0.0);
 			boolean addTrip = true;
 			for (int i = 0; i < anmRoute.nodes.size()-1; i++) { // the -1 from the size because we have one less links than nodes on a route.
-				Id linkId = findLinkId(anmRoute.nodes.get(i), anmRoute.nodes.get(i + 1));
+				Id<Link> linkId = findLinkId(anmRoute.nodes.get(i), anmRoute.nodes.get(i + 1));
 				if (linkId != null) {
 					trip.links.add(linkId);
 				} else {
@@ -87,7 +88,7 @@ public class AmRouteConverter extends AbstractRouteConverter {
 		return trips;
 	}
 
-	private Id findLinkId(Id fromNode, Id toNode) {
+	private Id<Link> findLinkId(Id<Node> fromNode, Id<Node> toNode) {
 		for (Link link : this.network.getLinks().values()) {
 			if (link.getFromNode().getId().toString().equals(fromNode.toString())
 					&& link.getToNode().getId().toString().equals(toNode.toString())) {

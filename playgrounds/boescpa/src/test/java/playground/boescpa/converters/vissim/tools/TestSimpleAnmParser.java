@@ -22,11 +22,14 @@
 package playground.boescpa.converters.vissim.tools;
 
 import junit.framework.Assert;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -51,13 +54,13 @@ public class TestSimpleAnmParser extends AmNetworkMapper {
 	public void testParser() {
 		// Test nodes:
 		Assert.assertEquals(network.getNodes().size(), 2);
-		Assert.assertEquals(network.getNodes().get(new IdImpl(1l)).getCoord().getX(), 1.1);
-		Assert.assertEquals(network.getNodes().get(new IdImpl(2l)).getCoord().getY(), 2.2);
+		Assert.assertEquals(network.getNodes().get(Id.create(1l, Node.class)).getCoord().getX(), 1.1);
+		Assert.assertEquals(network.getNodes().get(Id.create(2l, Node.class)).getCoord().getY(), 2.2);
 
 		// Test link:
 		Assert.assertEquals(network.getLinks().size(), 1);
-		Assert.assertEquals(network.getLinks().get(new IdImpl("1A")).getFromNode().getId().toString(),"1");
-		Assert.assertEquals(network.getLinks().get(new IdImpl("1A")).getToNode().getId().toString(),"2");
-		Assert.assertNull(network.getLinks().get(new IdImpl("2A")));
+		Assert.assertEquals(network.getLinks().get(Id.create("1A", Link.class)).getFromNode().getId().toString(),"1");
+		Assert.assertEquals(network.getLinks().get(Id.create("1A", Link.class)).getToNode().getId().toString(),"2");
+		Assert.assertNull(network.getLinks().get(Id.create("2A", Link.class)));
 	}
 }

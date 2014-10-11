@@ -21,19 +21,22 @@
 
 package playground.boescpa.converters.vissim.tools;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
+
 import playground.boescpa.converters.vissim.ConvEvents;
 
-import java.util.HashSet;
-import java.util.Set;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * Creates a square grid around considered area. The grid is represented by nodes in the network.
@@ -76,7 +79,7 @@ public class BaseGridCreator implements ConvEvents.BaseGridCreator {
 		do {
 			long longitude = sides[0];
 			do {
-				mutualRepresentation.addNode(networkFactory.createNode(new IdImpl(cellId++), new CoordImpl(longitude, latitude)));
+				mutualRepresentation.addNode(networkFactory.createNode(Id.create(cellId++, Node.class), new CoordImpl(longitude, latitude)));
 				longitude += gridcellsize;
 			} while (longitude < (maxLongitude + gridcellsize));
 			latitude += gridcellsize;

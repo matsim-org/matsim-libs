@@ -21,19 +21,21 @@
 
 package playground.boescpa.converters.vissim.mains;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.utils.io.IOUtils;
-import playground.boescpa.converters.vissim.ConvEvents;
-import playground.boescpa.converters.vissim.tools.BaseGridCreator;
-import playground.boescpa.converters.vissim.tools.InpNetworkMapper;
-import playground.boescpa.converters.vissim.tools.MsNetworkMapper;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.HashMap;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.utils.io.IOUtils;
+
+import playground.boescpa.converters.vissim.ConvEvents;
+import playground.boescpa.converters.vissim.tools.BaseGridCreator;
+import playground.boescpa.converters.vissim.tools.InpNetworkMapper;
+import playground.boescpa.converters.vissim.tools.MsNetworkMapper;
 
 /**
  * Creates key maps for a matsim and a visum/vissim network and writes the key maps to files.
@@ -60,23 +62,23 @@ public class PrepareNetworks {
 		ConvEvents.NetworkMapper msNetworkMapper = new MsNetworkMapper();
 		//ConvEvents2Anm.NetworkMapper amNetworkMapper = new AmNetworkMapper();
 		ConvEvents.NetworkMapper inpNetworkMapper = new InpNetworkMapper();
-		HashMap<Id, Id[]> keyMsNetwork = msNetworkMapper.mapNetwork(path2MATSimNetwork, mutualBaseGrid, path2VissimZoneShp);
+		HashMap<Id<Link>, Id<Node>[]> keyMsNetwork = msNetworkMapper.mapNetwork(path2MATSimNetwork, mutualBaseGrid, path2VissimZoneShp);
 		//HashMap<Id, Id[]> keyAmNetwork = amNetworkMapper.mapNetwork(path2VissimNetworkAnm, mutualBaseGrid, "");
-		HashMap<Id, Id[]> keyInpNetwork = inpNetworkMapper.mapNetwork(path2VissimNetworkInp, mutualBaseGrid, "");
+		HashMap<Id<Link>, Id<Node>[]> keyInpNetwork = inpNetworkMapper.mapNetwork(path2VissimNetworkInp, mutualBaseGrid, "");
 
 		writeKeyMaps(keyMsNetwork, path2WriteKeyMapMatsim);
 		//writeKeyMaps(keyAmNetwork, path2WriteKeyMapVisum);
 		writeKeyMaps(keyInpNetwork, path2WriteKeyMapVissim);
 	}
 
-	public static void writeKeyMaps(HashMap<Id, Id[]> keyNetwork, String path2WriteKeyMap) {
+	public static void writeKeyMaps(HashMap<Id<Link>, Id<Node>[]> keyNetwork, String path2WriteKeyMap) {
 		try {
 			final String header = "LinkId, ZoneIds...";
 			final BufferedWriter out = IOUtils.getBufferedWriter(path2WriteKeyMap);
 			out.write(header); out.newLine();
-			for (Id linkId : keyNetwork.keySet()) {
+			for (Id<Link> linkId : keyNetwork.keySet()) {
 				String line = linkId.toString();
-				for (Id zoneId : keyNetwork.get(linkId)) {
+				for (Id<Node> zoneId : keyNetwork.get(linkId)) {
 					line = line + delimiter + zoneId.toString();
 				}
 				out.write(line); out.newLine();
@@ -88,18 +90,18 @@ public class PrepareNetworks {
 		}
 	}
 
-	public static HashMap<Id, Id[]> readKeyMaps(String path2KeyMap) {
-		HashMap<Id, Id[]> keyMap = new HashMap<Id, Id[]>();
+	public static HashMap<Id<Link>, Id<Node>[]> readKeyMaps(String path2KeyMap) {
+		HashMap<Id<Link>, Id<Node>[]> keyMap = new HashMap<>();
 		try {
 			final BufferedReader in = IOUtils.getBufferedReader(path2KeyMap);
 			in.readLine(); // header
 			String line = in.readLine();
 			while (line != null) {
 				String[] keys = line.split(delimiter);
-				Id linkId = new IdImpl(keys[0]);
-				Id[] zoneId = new Id[keys.length-1];
+				Id<Link> linkId = Id.create(keys[0], Link.class);
+				Id<Node>[] zoneId = new Id[keys.length-1];
 				for (int i = 1; i < keys.length; i++) {
-					zoneId[i-1] = new IdImpl(Long.parseLong(keys[i]));
+					zoneId[i-1] = Id.create(Long.parseLong(keys[i]), Node.class);
 				}
 				keyMap.put(linkId, zoneId);
 				line = in.readLine();

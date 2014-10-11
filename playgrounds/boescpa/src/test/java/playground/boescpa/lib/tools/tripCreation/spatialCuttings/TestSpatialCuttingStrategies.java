@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -52,10 +51,10 @@ public class TestSpatialCuttingStrategies {
 		ScenarioImpl  scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		network = scenario.getNetwork();
 		// Coordinates Bellevue: 683518.0,246836.0
-		Node belNode = new DummyNode(new CoordImpl(683518.0,246836.0), new IdImpl("Bellevue"));
-		Node nulNode = new DummyNode(new CoordImpl(0,0), new IdImpl("Null"));
-		Link l1 = new DummyLink(new IdImpl(1), nulNode, nulNode);
-		Link l2 = new DummyLink(new IdImpl(2), belNode, belNode);
+		Node belNode = new DummyNode(new CoordImpl(683518.0,246836.0), Id.create("Bellevue", Node.class));
+		Node nulNode = new DummyNode(new CoordImpl(0,0), Id.create("Null", Node.class));
+		Link l1 = new DummyLink(Id.create(1, Link.class), nulNode, nulNode);
+		Link l2 = new DummyLink(Id.create(2, Link.class), belNode, belNode);
 		network.addNode(nulNode);
 		network.addNode(belNode);
 		network.addLink(l1);
@@ -67,7 +66,7 @@ public class TestSpatialCuttingStrategies {
 		strat = new NoCutting();
 		
 		Assert.assertTrue("No cutting strategy doesn't return TRUE.",
-				strat.spatiallyConsideringTrip(network, new IdImpl(1), new IdImpl(2)));
+				strat.spatiallyConsideringTrip(network, Id.create(1, Link.class), Id.create(2, Link.class)));
 	}
 	
 	@Test
@@ -75,22 +74,22 @@ public class TestSpatialCuttingStrategies {
 		strat = new CircleBellevueCutting(10);
 		
 		Assert.assertTrue("CircleBellevueCutting does not recognize link outside circle.",
-				!strat.spatiallyConsideringTrip(network, new IdImpl(1), new IdImpl(1)));
+				!strat.spatiallyConsideringTrip(network, Id.create(1, Link.class), Id.create(1, Link.class)));
 		Assert.assertTrue("CircleBellevueCutting does not recognize path going into the circle.",
-				strat.spatiallyConsideringTrip(network, new IdImpl(1), new IdImpl(2)));
+				strat.spatiallyConsideringTrip(network, Id.create(1, Link.class), Id.create(2, Link.class)));
 		Assert.assertTrue("CircleBellevueCutting does not recognize path going out of circle.",
-				strat.spatiallyConsideringTrip(network, new IdImpl(2), new IdImpl(1)));
+				strat.spatiallyConsideringTrip(network, Id.create(2, Link.class), Id.create(1, Link.class)));
 		Assert.assertTrue("CircleBellevueCutting does not recognize path within circle.",
-				strat.spatiallyConsideringTrip(network, new IdImpl(2), new IdImpl(2)));
+				strat.spatiallyConsideringTrip(network, Id.create(2, Link.class), Id.create(2, Link.class)));
 	}
 	
 	
 	private class DummyNode implements Node {
 
 		private final Coord coord;
-		private final Id id;
+		private final Id<Node> id;
 		
-		public DummyNode(Coord coord, Id id) {
+		public DummyNode(Coord coord, Id<Node> id) {
 			this.coord = coord;
 			this.id = id;
 		}
@@ -101,7 +100,7 @@ public class TestSpatialCuttingStrategies {
 		}
 
 		@Override
-		public Id getId() {
+		public Id<Node> getId() {
 			return this.id;
 		}
 
@@ -129,9 +128,9 @@ public class TestSpatialCuttingStrategies {
 	private class DummyLink implements Link {
 		private final Node to;
 		private final Node from;
-		private final Id id;
+		private final Id<Link> id;
 		
-		public DummyLink(Id id, Node from, Node to) {
+		public DummyLink(Id<Link> id, Node from, Node to) {
 			this.to = to;
 			this.from = from;
 			this.id = id;
@@ -146,7 +145,7 @@ public class TestSpatialCuttingStrategies {
 		}
 
 		@Override
-		public Id getId() {
+		public Id<Link> getId() {
 			return id;
 		}
 

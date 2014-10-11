@@ -21,13 +21,15 @@
 
 package playground.boescpa.converters.vissim;
 
+import java.util.HashMap;
+
 import org.matsim.api.core.v01.Id;
+
+import playground.boescpa.converters.vissim.tools.AbstractRouteConverter.Trip;
 import playground.boescpa.converters.vissim.tools.AmNetworkMapper;
 import playground.boescpa.converters.vissim.tools.AmRouteConverter;
 import playground.boescpa.converters.vissim.tools.MsNetworkMapper;
 import playground.boescpa.converters.vissim.tools.MsRouteConverter;
-
-import java.util.HashMap;
 
 /**
  * Extends and implements the abstract class ConvEvents for Anm-Files.
@@ -58,7 +60,7 @@ public class ConvEvents2Anm extends ConvEvents {
 	}
 
 	@Override
-	public void writeRoutes(HashMap<Id, Integer> demandPerVissimTrip, String path2AnmRoutesFile, String path2NewAnmRoutesFile) {
+	public void writeRoutes(HashMap<Id<Trip>, Integer> demandPerVissimTrip, String path2AnmRoutesFile, String path2NewAnmRoutesFile) {
 		// todo-boescpa Write export method...
 	}
 }

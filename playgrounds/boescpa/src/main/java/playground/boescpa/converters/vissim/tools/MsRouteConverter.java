@@ -21,7 +21,16 @@
 
 package playground.boescpa.converters.vissim.tools;
 
-import com.vividsolutions.jts.geom.Geometry;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
@@ -29,8 +38,8 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsReaderXMLv1;
@@ -41,13 +50,11 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.opengis.feature.simple.SimpleFeature;
+
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.*;
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * Provides a matsim-events specific implementation of RouteConverter.
@@ -72,7 +79,7 @@ public class MsRouteConverter extends AbstractRouteConverter {
 	@Override
 	public List<Trip> routes2Trips(String path2EventsFile, String path2MATSimNetwork, String path2VissimZoneShp) {
 		final List<Trip> trips = new ArrayList<Trip>();
-		final Map<Id,Trip> currentTrips = new HashMap<Id,Trip>();
+		final Map<Id<Person>,Trip> currentTrips = new HashMap<Id<Person>,Trip>();
 		final GeographicEventAnalyzer geographicEventAnalyzer = new GeographicEventAnalyzer(path2MATSimNetwork, path2VissimZoneShp);
 		final EventsManager events = EventsUtils.createEventsManager();
 		final BufferedWriter out = IOUtils.getBufferedWriter(path2EventsFile + "_onlyTrips.txt");
@@ -82,7 +89,7 @@ public class MsRouteConverter extends AbstractRouteConverter {
 				if (geographicEventAnalyzer.eventInArea(event)) {
 					Trip currentTrip = currentTrips.get(event.getPersonId());
 					if (currentTrip == null) {
-						Id tripId = new IdImpl(event.getPersonId().toString() + "_" + String.valueOf(event.getTime()));
+						Id<Trip> tripId = Id.create(event.getPersonId().toString() + "_" + String.valueOf(event.getTime()), Trip.class);
 						currentTrip = new Trip(tripId, event.getTime());
 						currentTrips.put(event.getPersonId(),currentTrip);
 					}

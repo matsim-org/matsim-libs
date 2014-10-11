@@ -21,6 +21,10 @@
 
 package playground.boescpa.converters.vissim.tools;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -28,11 +32,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
-import playground.boescpa.converters.vissim.ConvEvents;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import playground.boescpa.converters.vissim.ConvEvents;
 
 /**
  * Provides methods that create a key map from a given network to a given mutual base grid.
@@ -50,7 +51,7 @@ public abstract class AbstractNetworkMapper implements ConvEvents.NetworkMapper 
 	 * @return	A key map that maps the vissum network to the mutual base grid.
 	 */
 	@Override
-	public HashMap<Id, Id[]> mapNetwork(String path2Network, Network mutualBaseGrid, String path2VissimZoneShp) {
+	public HashMap<Id<Link>, Id<Node>[]> mapNetwork(String path2Network, Network mutualBaseGrid, String path2VissimZoneShp) {
 		Network network = providePreparedNetwork(path2Network, path2VissimZoneShp);
 		return getKeyMap(mutualBaseGrid, network);
 	}
@@ -64,16 +65,16 @@ public abstract class AbstractNetworkMapper implements ConvEvents.NetworkMapper 
 	 * @param network
 	 * @return
 	 */
-	protected final HashMap<Id, Id[]> getKeyMap(Network mutualBaseGrid, Network network) {
-		HashMap<Id, Id[]> mapKey = new HashMap<Id, Id[]>();
+	protected final HashMap<Id<Link>, Id<Node>[]> getKeyMap(Network mutualBaseGrid, Network network) {
+		HashMap<Id<Link>, Id<Node>[]> mapKey = new HashMap<>();
 		// follow all links and check which "zones" of mutual base grid are passed
 		for (Link link : network.getLinks().values()) {
-			List<Id> passedZones = new LinkedList<Id>();
+			List<Id<Node>> passedZones = new LinkedList<>();
 			Coord start = new CoordImpl(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY());
 			Coord end = new CoordImpl(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
 			double[] deltas = calculateDeltas(start, end);
 			for (int i = 0; i <= (int)deltas[2]; i++) {
-				Id presentSmallest = findZone(mutualBaseGrid, start, deltas, i);
+				Id<Node> presentSmallest = findZone(mutualBaseGrid, start, deltas, i);
 				if (presentSmallest != null) {
 					if (passedZones.isEmpty()) {
 						passedZones.add(presentSmallest);
@@ -89,9 +90,9 @@ public abstract class AbstractNetworkMapper implements ConvEvents.NetworkMapper 
 		return mapKey;
 	}
 
-	private Id findZone(Network mutualBaseGrid, Coord start, double[] deltas, int i) {
+	private Id<Node> findZone(Network mutualBaseGrid, Coord start, double[] deltas, int i) {
 		int gridcellsize = BaseGridCreator.getGridcellsize();
-		Id presentSmallest = null;
+		Id<Node> presentSmallest = null;
 		double presentSmallestDist = Double.MAX_VALUE;
 		for (Node zone : mutualBaseGrid.getNodes().values()) {
 			Double dist = CoordUtils.calcDistance(zone.getCoord(),

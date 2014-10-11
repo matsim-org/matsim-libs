@@ -21,13 +21,15 @@
 
 package playground.boescpa.converters.vissim.tools;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-import playground.boescpa.converters.vissim.ConvEvents;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
+
+import playground.boescpa.converters.vissim.ConvEvents;
 
 /**
  * Maps the trips of a given routes-file with the given network keys.
@@ -37,25 +39,25 @@ import java.util.List;
 public abstract class AbstractRouteConverter implements ConvEvents.RouteConverter {
 
 	@Override
-	public List<HashMap<Id, Long[]>> convert(HashMap<Id, Id[]> networkKey, String path2RouteFile, String path2OrigNetwork, String path2VissimZoneShp) {
+	public List<HashMap<Id<Trip>, Long[]>> convert(HashMap<Id<Link>, Id<Node>[]> networkKey, String path2RouteFile, String path2OrigNetwork, String path2VissimZoneShp) {
 		List<Trip> trips = routes2Trips(path2RouteFile, path2OrigNetwork, path2VissimZoneShp);
 		return trips2SimpleRoutes(trips, networkKey);
 	}
 
 	protected abstract List<Trip> routes2Trips(String path2RouteFile, String path2OrigNetwork, String path2VissimZoneShp);
 
-	private List<HashMap<Id, Long[]>> trips2SimpleRoutes(List<Trip> trips, HashMap<Id, Id[]> keyMsNetwork) {
-		List<HashMap<Id, Long[]>> routes = new ArrayList<HashMap<Id, Long[]>>();
+	private List<HashMap<Id<Trip>, Long[]>> trips2SimpleRoutes(List<Trip> trips, HashMap<Id<Link>, Id<Node>[]> keyMsNetwork) {
+		List<HashMap<Id<Trip>, Long[]>> routes = new ArrayList<>();
 
 		final int lastStartTime = (int)Math.floor(findLastStartTime(trips));
 		for (int i = 0; i <= lastStartTime; i++) {
-			HashMap<Id, Long[]> simpleRoutes = new HashMap<Id, Long[]>();
+			HashMap<Id<Trip>, Long[]> simpleRoutes = new HashMap<>();
 			routes.add(simpleRoutes);
 			for (Trip trip : trips) {
 				if (trip.startTime < ((i+1)*3600) && trip.endTime >= (i*3600)) {
 					ArrayList<Long> keyValsTrip = new ArrayList<Long>();
-					for (Id link : trip.links) {
-						Id[] keyValsLink = keyMsNetwork.get(link);
+					for (Id<Link> link : trip.links) {
+						Id<Node>[] keyValsLink = keyMsNetwork.get(link);
 						// Each time compare first value of keyValsLink with presently last value of keyValsTrip.
 						// Adding only if actually different.
 						int startIteration = 0;
@@ -87,29 +89,29 @@ public abstract class AbstractRouteConverter implements ConvEvents.RouteConverte
 		return lastStartTime/3600;
 	}
 
-	final class Trip {
-		final Id tripId;
+	public final class Trip {
+		final Id<Trip> tripId;
 		final double startTime;
 		double endTime;
-		final List<Id> links;
+		final List<Id<Link>> links;
 
 		public final static String delimiter = ", ";
 
-		Trip(Id tripId, double startTime) {
+		Trip(Id<Trip> tripId, double startTime) {
 			this.tripId = tripId;
 			this.startTime = startTime;
 			this.endTime = 0;
-			this.links = new ArrayList<Id>();
+			this.links = new ArrayList<>();
 		}
 
 		public Trip(String s) {
 			String[] vals = s.split(delimiter);
-			this.tripId = new IdImpl(vals[0]);
+			this.tripId = Id.create(vals[0], Trip.class);
 			this.startTime = Double.valueOf(vals[1]);
 			this.endTime = Double.valueOf(vals[2]);
-			this.links = new ArrayList<Id>();
+			this.links = new ArrayList<>();
 			for (int i = 3; i < vals.length; i++) {
-				this.links.add(new IdImpl(vals[i]));
+				this.links.add(Id.create(vals[i], Link.class));
 			}
 		}
 

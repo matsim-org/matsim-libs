@@ -21,14 +21,6 @@
 
 package playground.boescpa.converters.vissim;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.utils.io.IOUtils;
-import playground.boescpa.converters.vissim.tools.InpNetworkMapper;
-import playground.boescpa.converters.vissim.tools.InpRouteConverter;
-import playground.boescpa.converters.vissim.tools.MsNetworkMapper;
-import playground.boescpa.converters.vissim.tools.MsRouteConverter;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -36,6 +28,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.io.IOUtils;
+
+import playground.boescpa.converters.vissim.tools.AbstractRouteConverter.Trip;
+import playground.boescpa.converters.vissim.tools.InpNetworkMapper;
+import playground.boescpa.converters.vissim.tools.InpRouteConverter;
+import playground.boescpa.converters.vissim.tools.MsNetworkMapper;
+import playground.boescpa.converters.vissim.tools.MsRouteConverter;
 
 /**
  * Extends and implements the abstract class ConvEvents for Inp-Files.
@@ -70,7 +71,7 @@ public class ConvEvents2Inp extends ConvEvents {
 	}
 
 	@Override
-	public void writeRoutes(HashMap<Id, Integer> demandPerVissimTrip, String path2InpFile, String path2NewInpFile) {
+	public void writeRoutes(HashMap<Id<Trip>, Integer> demandPerVissimTrip, String path2InpFile, String path2NewInpFile) {
 		try {
 			final BufferedReader in = IOUtils.getBufferedReader(path2InpFile);
 			final BufferedWriter out = IOUtils.getBufferedWriter(path2NewInpFile);
@@ -116,7 +117,7 @@ public class ConvEvents2Inp extends ConvEvents {
 					}
 					// FRACTION of route:
 					if (fracPattern.matcher(line).matches()) {
-						double demand = demandPerVissimTrip.get(new IdImpl(currentRoutingDecision + "-" + currentRoute));
+						double demand = demandPerVissimTrip.get(currentRoutingDecision + "-" + currentRoute);
 						String fraction = "0.0";
 						if (totalPerRoutingDecision > 0) {
 							fraction = String.valueOf(demand/totalPerRoutingDecision);
@@ -189,11 +190,11 @@ public class ConvEvents2Inp extends ConvEvents {
 		return sb.toString();
 	}
 
-	private int calcTotalPerRoutingDecision(String routingDecision, HashMap<Id, Integer> demandPerVissimTrip) {
+	private int calcTotalPerRoutingDecision(String routingDecision, HashMap<Id<Trip>, Integer> demandPerVissimTrip) {
 		int totalPerRoutingDecision = 0;
 
 		String delimiter = "-";
-		for (Id tripId : demandPerVissimTrip.keySet()) {
+		for (Id<Trip> tripId : demandPerVissimTrip.keySet()) {
 			String[] vals = tripId.toString().split(delimiter);
 			if (vals[0].equals(routingDecision)) {
 				totalPerRoutingDecision += demandPerVissimTrip.get(tripId);

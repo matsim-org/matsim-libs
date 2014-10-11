@@ -22,13 +22,15 @@
 package playground.boescpa.converters.vissim.tools;
 
 import junit.framework.Assert;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestUtils;
+
 import playground.boescpa.converters.vissim.ConvEvents;
 
 /**
@@ -64,8 +66,8 @@ public class TestBaseGridCreator {
 	public void testMatchNetworks() {
 		Network network = baseGridCreator1.createMutualBaseGrid("");
 		Assert.assertTrue(network.getNodes().size() == 12);
-		Node minNode = network.getNodes().get(new IdImpl(1));
-		Node maxNode = network.getNodes().get(new IdImpl(network.getNodes().size()));
+		Node minNode = network.getNodes().get(Id.create(1, Node.class));
+		Node maxNode = network.getNodes().get(Id.create(network.getNodes().size(), Node.class));
 		Assert.assertEquals(minNode.getCoord().getX(),0.0);
 		Assert.assertEquals(minNode.getCoord().getY(),0.0);
 		Assert.assertEquals(maxNode.getCoord().getX(),201.0, BaseGridCreator.getGridcellsize() - 1);
@@ -76,8 +78,8 @@ public class TestBaseGridCreator {
 	public void testBoundingBoxOfZones() {
 		Network network = baseGridCreator2.createMutualBaseGrid(utils.getClassInputDirectory() + "TestNetworkMatcher_DummySHP.shp");
 		Assert.assertTrue(network.getNodes().size() == 17094);
-		Node minNode = network.getNodes().get(new IdImpl(1));
-		Node maxNode = network.getNodes().get(new IdImpl(network.getNodes().size()));
+		Node minNode = network.getNodes().get(Id.create(1, Node.class));
+		Node maxNode = network.getNodes().get(Id.create(network.getNodes().size(), Node.class));
 		Assert.assertEquals(minNode.getCoord().getX(),675666.0);
 		Assert.assertEquals(minNode.getCoord().getY(),242315.0);
 		Assert.assertEquals(maxNode.getCoord().getX(),690908.0, BaseGridCreator.getGridcellsize() - 1);
