@@ -23,19 +23,20 @@ package playground.jbischoff.lsacvs2kml;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.signalsystems.model.SignalSystem;
 
 public class LinkConversionData {
 
-	private Id ssid;
-	Map<Id,Id> convmap;
-	public Id getSsid() {
+	private Id<SignalSystem> ssid;
+	Map<Id<Link>,Id<Link>> convmap;
+	public Id<SignalSystem> getSsid() {
 		return ssid;
 	}
 	public void setSsid(String ssid) {
-		this.ssid = new IdImpl(ssid);
+		this.ssid = Id.create(ssid, SignalSystem.class);
 	}
-	public Map<Id, Id> getConvmap() {
+	public Map<Id<Link>, Id<Link>> getConvmap() {
 		return convmap;
 	}
 

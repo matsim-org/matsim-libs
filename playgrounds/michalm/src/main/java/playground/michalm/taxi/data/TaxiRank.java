@@ -22,7 +22,9 @@ package playground.michalm.taxi.data;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.BasicLocation;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
 
@@ -30,7 +32,7 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 public class TaxiRank
     implements BasicLocation
 {
-    private final Id id;
+    private final Id<TaxiRank> id;
     private final String name;
     private final Link link;
     private final static int STANDARDCAPACITY = 5;
@@ -39,7 +41,7 @@ public class TaxiRank
     private Queue<Vehicle> taxisInRank;
     
     
-    public TaxiRank(Id id, String name, Link link)
+    public TaxiRank(Id<TaxiRank> id, String name, Link link)
     {
         this.id = id;
         this.name = name;
@@ -48,7 +50,7 @@ public class TaxiRank
         this.taxisInRank = new LinkedList<Vehicle>();
     }
 
-    public TaxiRank(Id id, String name, Link link, int capacity)
+    public TaxiRank(Id<TaxiRank> id, String name, Link link, int capacity)
     {
         this.id = id;
         this.name = name;
@@ -59,7 +61,7 @@ public class TaxiRank
     }
 
     @Override
-    public Id getId()
+    public Id<TaxiRank> getId()
     {
         return id;
     }

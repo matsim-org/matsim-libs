@@ -27,7 +27,6 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.signalsystems.model.SignalController;
 import org.matsim.signalsystems.model.SignalGroup;
 import org.matsim.signalsystems.model.SignalGroupState;
@@ -141,12 +140,12 @@ public class JbSignalController implements SignalController {
 				// log.error(currentSecondinPlan+" on "+this.adaptiveOnsets.get(gId)+"for gid"+gId);
 				if (this.adaptiveOnsets.get(gId) == currentSecondinPlan) {
 					this.system.scheduleOnset(timeSeconds, gId);
-					if (this.system.getId().equals(new IdImpl("1")))
+					if (this.system.getId().equals(Id.create("1", SignalSystem.class)))
 						log.info("scheduling onset at "+timeSeconds+" at " + currentSecondinPlan + ", sg " + gId);
 				}
 				if (this.adaptiveDroppings.get(gId) == currentSecondinPlan) {
 					this.system.scheduleDropping(timeSeconds, gId);
-					if (this.system.getId().equals(new IdImpl("1")))
+					if (this.system.getId().equals(Id.create("1", SignalSystem.class)))
 						log.info("scheduling drop at "+timeSeconds+" at "+ currentSecondinPlan + ", sg " + gId);
 				}
 			}
@@ -167,7 +166,7 @@ public class JbSignalController implements SignalController {
 			if (oldmd < this.activePlan.getCycleTime() - 2)
 				
 				this.maxDrop.put(sgId, oldmd);
-			if (this.system.getId().equals(new IdImpl("1")))
+			if (this.system.getId().equals(Id.create("1", SignalSystem.class)))
 				log.info("maxdrop of "+sgId+ "is now " +oldmd);
 				
 		}

@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -56,8 +55,8 @@ public class MielecDemandExtender
     private String inputTaxiDemand = "C:\\local_jb\\Dropbox\\MasterOfDesaster\\jbischoff\\jbmielec\\taxiCustomers_05_pc.txt";
     private String outputTaxiDemandDir = "C:\\local_jb\\Dropbox\\MasterOfDesaster\\jbischoff\\jbmielec\\increaseddemand\\taxidemand\\";
 
-    private TreeSet<Id> customerIds = new TreeSet<Id>();
-    private HashSet<Id> agentIds;
+    private TreeSet<Id<Person>> customerIds = new TreeSet<>();
+    private HashSet<Id<Person>> agentIds;
     private int MAXIMUMDEMANDINPERCENT = 50;
 
 
@@ -81,7 +80,7 @@ public class MielecDemandExtender
         List<String> taxiCustomerIds;
         taxiCustomerIds = PersonCreatorWithRandomTaxiMode.readTaxiCustomerIds(inputTaxiDemand);
         for (String s : taxiCustomerIds) {
-            customerIds.add(new IdImpl(s));
+            customerIds.add(Id.create(s, Person.class));
         }
     }
 
@@ -113,7 +112,7 @@ public class MielecDemandExtender
 
             TreeSet<Integer> ints = new TreeSet<Integer>();
 
-            for (Id cid : customerIds) {
+            for (Id<Person> cid : customerIds) {
                 ints.add(Integer.parseInt(cid.toString()));
             }
 
@@ -139,7 +138,7 @@ public class MielecDemandExtender
     {
 
         do {
-            Id cid = new IdImpl(r.nextInt(agentIds.size()));
+            Id<Person> cid = Id.create(r.nextInt(agentIds.size()), Person.class);
             if (!customerIds.contains(cid)) {
                 if (agentIds.contains(cid)) {
                     customerIds.add(cid);
@@ -157,7 +156,7 @@ public class MielecDemandExtender
         Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         new MatsimNetworkReader(sc).readFile(inputNetFile);
         new MatsimPopulationReader(sc).readFile(inputPlansFile);
-        agentIds = new HashSet<Id>();
+        agentIds = new HashSet<>();
         for (Entry<Id<Person>, ? extends Person> e : sc.getPopulation().getPersons().entrySet()) {
             if (e.getKey().equals(Id.create("1398", Person.class)))
                 continue;

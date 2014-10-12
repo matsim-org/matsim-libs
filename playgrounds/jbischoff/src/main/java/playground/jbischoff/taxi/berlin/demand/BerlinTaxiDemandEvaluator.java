@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.matrices.Entry;
@@ -49,10 +48,10 @@ public class BerlinTaxiDemandEvaluator
 //        Date end = filenameformat.parse("20130421230000");
         Date end = filenameformat.parse("20140413230000");
         bte.read(fileprefix+"demandMatrices.xml",start, end);
-        Id alex = new IdImpl("01011303");
-        Id friedrichshain = new IdImpl("02040701");
-        Id zoo = new IdImpl("04030931");
-        Id txl = new IdImpl("12214125");
+//        Id alex = Id.create("01011303");
+//        Id friedrichshain = Id.create("02040701");
+//        Id zoo = Id.create("04030931");
+//        Id txl = Id.create("12214125");
         
         bte.analyse(fileprefix+"demandMatrices.xml", start, end, bte.initZones());
         

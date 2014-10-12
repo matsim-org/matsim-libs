@@ -6,7 +6,6 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
@@ -73,7 +72,7 @@ public class BerlinBrandenburgShape2ZoneConverter
     {
         Map<Id<Zone>, Zone> zoneMap = new HashMap<Id<Zone>, Zone>();
         for (Entry<String, MultiPolygon> e : polMap.entrySet()) {
-            Id zoneId = new IdImpl(e.getKey());
+            Id<Zone> zoneId = Id.create(e.getKey(), Zone.class);
             Zone zone = new Zone(zoneId, zoneId.toString(), e.getValue());
             zoneMap.put(zoneId, zone);
         }

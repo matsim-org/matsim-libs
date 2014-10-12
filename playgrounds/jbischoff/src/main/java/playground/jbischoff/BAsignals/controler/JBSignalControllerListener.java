@@ -10,7 +10,6 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -29,6 +28,7 @@ import org.matsim.signalsystems.data.SignalsScenarioWriter;
 import org.matsim.signalsystems.mobsim.QSimSignalEngine;
 import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.signalsystems.model.SignalGroupState;
+import org.matsim.signalsystems.model.SignalSystem;
 import org.matsim.signalsystems.model.SignalSystemsManager;
 
 import playground.dgrether.signalsystems.analysis.DgSignalGreenSplitHandler;
@@ -90,17 +90,18 @@ public class JBSignalControllerListener implements StartupListener, IterationSta
 	private void addControlerListeners(Controler c) {
 		// strange compilation error
 		signalGreenSplitHandler = new DgSignalGreenSplitHandler();
-		signalGreenSplitHandler.addSignalSystem(new IdImpl("18"));
-		signalGreenSplitHandler.addSignalSystem(new IdImpl("17"));
-		signalGreenSplitHandler.addSignalSystem(new IdImpl("1"));
-		signalGreenSplitHandler.addSignalSystem(new IdImpl("28"));
-		signalGreenSplitHandler.addSignalSystem(new IdImpl("27"));
-		signalGreenSplitHandler.addSignalSystem(new IdImpl("12"));
+		signalGreenSplitHandler.addSignalSystem(Id.create("18", SignalSystem.class));
+		signalGreenSplitHandler.addSignalSystem(Id.create("17", SignalSystem.class));
+		signalGreenSplitHandler.addSignalSystem(Id.create( "1", SignalSystem.class));
+		signalGreenSplitHandler.addSignalSystem(Id.create("28", SignalSystem.class));
+		signalGreenSplitHandler.addSignalSystem(Id.create("27", SignalSystem.class));
+		signalGreenSplitHandler.addSignalSystem(Id.create("12", SignalSystem.class));
 
 
 		c.getEvents().addHandler(signalGreenSplitHandler);
 		c.addControlerListener(new StartupListener() {
 
+			@Override
 			public void notifyStartup(StartupEvent e) {
 				e.getControler().getEvents()
 						.addHandler(signalGreenSplitHandler);
@@ -111,6 +112,7 @@ public class JBSignalControllerListener implements StartupListener, IterationSta
 		c.addControlerListener(new IterationEndsListener() {
 			private final Logger logg = Logger
 			.getLogger(IterationEndsListener.class);
+			@Override
 			public void notifyIterationEnds(IterationEndsEvent e) {
 				logg.info("Agents that passed an adaptive signal system (1,17 or 18) at least once: "
 						+ tch.getPassedAgents());
@@ -132,6 +134,7 @@ public class JBSignalControllerListener implements StartupListener, IterationSta
 			private final Logger logg = Logger
 					.getLogger(ShutdownListener.class);
 
+			@Override
 			public void notifyShutdown(ShutdownEvent e) {
 				try {
 					FileWriter fw = new FileWriter(e.getControler().getConfig().controler().getOutputDirectory()+"signal_statistic.csv");

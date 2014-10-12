@@ -1,24 +1,38 @@
 package playground.jbischoff.taxi.berlin.supply;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Queue;
+import java.util.Random;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.VehicleImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.*;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.*;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 
-import playground.jbischoff.taxi.berlin.demand.*;
+import playground.jbischoff.taxi.berlin.demand.LorShapeReader;
+import playground.jbischoff.taxi.berlin.demand.TaxiDemandWriter;
+import playground.michalm.zone.Zone;
 
-import com.vividsolutions.jts.geom.*;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 
 
 public class BerlinVehicleGeneratorV2
@@ -34,7 +48,7 @@ public class BerlinVehicleGeneratorV2
     private static final String DATADIR = "C:/local_jb/data/";
     private final static String NETWORKFILE = DATADIR + "network/berlin_brb.xml.gz";
     private final static int PAXPERCAR = 4;
-    private final static Id TXLLORID = new IdImpl("12214125");
+    private final static Id<Zone> TXLLORID = Id.create("12214125", Zone.class);
     private final static double EVSHARE = 1.0;
 
     private NetworkImpl network;
@@ -62,7 +76,7 @@ public class BerlinVehicleGeneratorV2
             String vid = v.vid.toString();
             if (rnd.nextDouble() < EVSHARE)
                 vid = "e" + vid;
-            vehicles.add(createTaxiFromLor(v.lor, new IdImpl(vid), v.t0, v.t1));
+            vehicles.add(createTaxiFromLor(v.lor, Id.create(vid, Vehicle.class), v.t0, v.t1));
         }
         return vehicles;
     }
@@ -135,7 +149,7 @@ public class BerlinVehicleGeneratorV2
             double shareOfTripsFromHere = (double)dpl.getFromLor() / (double)amountOfTrips;
             long taxiAmountFromHere = Math.round(amount * shareOfTripsFromHere);
             for (int i = 0; i < taxiAmountFromHere; i++) {
-                Id vid = new IdImpl("t_" + dpl.getFromId() + "_" + (hr % 24) + "_" + i);
+                Id<Vehicle> vid = Id.create("t_" + dpl.getFromId() + "_" + (hr % 24) + "_" + i, Vehicle.class);
                 VData v = new VData();
                 v.vid = vid;
                 v.lor = dpl.getFromId();
@@ -151,7 +165,7 @@ public class BerlinVehicleGeneratorV2
         int i = 0;
         int rest = amount - count;
         while (rest > 0) {
-            Id vid = new IdImpl("t_" + dpl[i % 2].getFromId() + "_" + (hr % 24) + "_x" + i);
+            Id<Vehicle> vid = Id.create("t_" + dpl[i % 2].getFromId() + "_" + (hr % 24) + "_x" + i, Vehicle.class);
             VData v = new VData();
             v.lor = dpl[i % 2].getFromId();
             v.vid = vid;
@@ -178,7 +192,7 @@ public class BerlinVehicleGeneratorV2
             double shareOfTripsFromHere = (double)dpl.getFromLor() / (double)amountOfTrips;
             long taxiAmountFromHere = Math.round(currentVeh * shareOfTripsFromHere);
             for (int i = 0; i < taxiAmountFromHere; i++) {
-                Id vid = new IdImpl("t_" + dpl.getFromId() + "_" + hr + "_" + i);
+                Id<Vehicle> vid = Id.create("t_" + dpl.getFromId() + "_" + hr + "_" + i, Vehicle.class);
                 VData v = new VData(vid, dpl.getFromId());
                 int start = (hr % 24) * 3600 - 1800;
                 int end = start + 7200 + rnd.nextInt(16 * 3600);
@@ -193,7 +207,7 @@ public class BerlinVehicleGeneratorV2
         int i = 0;
         int rest = currentVeh - count;
         while (rest > 0) {
-            Id vid = new IdImpl("t_" + dpl[i % 2].getFromId() + "_" + (hr % 24) + "_x" + i);
+            Id<Vehicle> vid = Id.create("t_" + dpl[i % 2].getFromId() + "_" + (hr % 24) + "_x" + i, Vehicle.class);
             VData v = new VData();
             i++;
             v.lor = dpl[i % 2].getFromId();
@@ -211,12 +225,12 @@ public class BerlinVehicleGeneratorV2
     }
 
 
-    private Vehicle createTaxiFromLor(Id lorId, Id vid, int t0, int t1)
+    private Vehicle createTaxiFromLor(Id<Zone> lorId, Id<Vehicle> vid, int t0, int t1)
     {
         Link link;
         if (lorId.equals(TXLLORID)) {
 
-            link = network.getLinks().get(new IdImpl("-35956"));
+            link = network.getLinks().get(Id.create("-35956", Link.class));
 
         }
         else {
@@ -229,7 +243,7 @@ public class BerlinVehicleGeneratorV2
     }
 
 
-    private Link getRandomLinkInLor(Id lorId)
+    private Link getRandomLinkInLor(Id<Zone> lorId)
     {
         Point p = TaxiDemandWriter.getRandomPointInFeature(this.rnd,
                 this.shapedata.get(lorId.toString()));
@@ -315,13 +329,13 @@ class VData
     implements Comparable<VData>
 {
 
-    Id vid;
+    Id<Vehicle> vid;
     Integer t0;
     Integer t1;
-    Id lor;
+    Id<Zone> lor;
 
 
-    VData(Id vid, Id lorId)
+    VData(Id<Vehicle> vid, Id<Zone> lorId)
     {
         this.vid = vid;
         this.lor = lorId;

@@ -30,7 +30,6 @@ import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -118,14 +117,14 @@ public class Demand2ShpWriter
 
     private void extractSym(String filename){
         Writer writer = IOUtils.getBufferedWriter(filename);
-        Set<Id> handledRelations = new HashSet<Id>();
+        Set<String> handledRelations = new HashSet<>();
         Matrix matrix = accmat.getMatrix("accmat");
 
         try{
         for (ArrayList<Entry> l : matrix.getFromLocations().values()) {
             for (Entry e : l) {
-            Id out = new IdImpl(e.getFromLocation().toString()+e.getToLocation().toString());
-            Id in = new IdImpl(e.getToLocation().toString()+e.getFromLocation().toString());
+            String out = e.getFromLocation().toString()+e.getToLocation().toString();
+            String in = e.getToLocation().toString()+e.getFromLocation().toString();
             if (handledRelations.contains(in)) continue; 
             if (handledRelations.contains(out)) continue; 
             double back = 0;

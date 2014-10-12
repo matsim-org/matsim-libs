@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
@@ -53,8 +52,8 @@ public class MyLinkGetter {
 	private static Logger log = Logger.getLogger(MyLinkGetter.class);
 	private LeastCostPathCalculator lcp;
 	private Network network;
-	private List<Id> stopLinkList;
-	private List<Id> routeLinkList;
+	private List<Id<Link>> stopLinkList;
+	private List<Id<Link>> routeLinkList;
 	
 	public	MyLinkGetter() {
 
@@ -83,7 +82,7 @@ public class MyLinkGetter {
 //		String out = "E:\\Cottbus\\Cottbus_pt\\Linien\\"+line+"\\"+line+dir+"_links.csv";
 //		
 //		mgl.run(in,out);
-		List<Link> ll = mgl.getLinks(new IdImpl(6546), new IdImpl(6549));
+		List<Link> ll = mgl.getLinks(Id.create(6546, Link.class), Id.create(6549, Link.class));
 		for (Link l : ll){
 			System.out.println(l.getId());
 		}
@@ -106,7 +105,7 @@ public class MyLinkGetter {
 		try {
 			log.info("Writing Links to "+outfile);
 			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(outfile)));
-			for (Id linkid : this.routeLinkList){
+			for (Id<Link> linkid : this.routeLinkList){
 				bw.append(linkid.toString());
 				bw.newLine();
 			}
@@ -121,8 +120,8 @@ public class MyLinkGetter {
 		
 	}
 
-	private List<Id> calculateRoutes() {
-		List<Id> linkids = new ArrayList<Id>();
+	private List<Id<Link>> calculateRoutes() {
+		List<Id<Link>> linkids = new ArrayList<>();
 		int size = this.stopLinkList.size();
 		linkids.add(this.stopLinkList.get(0));
 //		for the very first link, as routing is nodebased on toNodes
@@ -141,10 +140,10 @@ public class MyLinkGetter {
 		return linkids;
 	}
 
-	private List<Id> readStopLinks(String filename) {
+	private List<Id<Link>> readStopLinks(String filename) {
 		
 		log.info("Reading Links from "+filename);
-		List<Id> linkids = new ArrayList<Id>();
+		List<Id<Link>> linkids = new ArrayList<>();
 		
 		FileReader fr;
 		try {
@@ -154,11 +153,11 @@ public class MyLinkGetter {
 			while ((line = br.readLine()) != null) {
 			    line = line.replaceAll("\"", "");
 				String[] result = line.split(";");
-			    Id current = new IdImpl(result[6]);
+			    Id<Link> current = Id.create(result[6], Link.class);
 			    linkids.add(current);
 			}
 			
-			
+			br.close();
 			
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -173,7 +172,7 @@ public class MyLinkGetter {
 		return linkids;
 	}
 
-	private List<Link> getLinks(Id fromlink, Id tolink) {
+	private List<Link> getLinks(Id<Link> fromlink, Id<Link> tolink) {
 		
 		List<Link> route = null;
 		log.info("from: "+fromlink+" to: "+tolink);

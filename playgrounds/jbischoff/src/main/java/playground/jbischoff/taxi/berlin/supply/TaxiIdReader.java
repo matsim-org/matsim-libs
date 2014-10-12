@@ -15,11 +15,11 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
+import org.matsim.vehicles.Vehicle;
 
 public class TaxiIdReader {
 	
@@ -159,19 +159,19 @@ public class TaxiIdReader {
 
 
 class TaxiIdData{
-	private Id taxiId;
+	private Id<Vehicle> taxiId;
 	private Date startDate;
 	private Date endDate;
 	
 	
-	TaxiIdData(Id taxiId, Date startDate, Date endDate){
+	TaxiIdData(Id<Vehicle> taxiId, Date startDate, Date endDate){
 		this.taxiId = taxiId;
 		this.startDate = startDate;
 		this.endDate = endDate;
 
 	}
 
-	public Id getTaxiId() {
+	public Id<Vehicle> getTaxiId() {
 		return taxiId;
 	}
 
@@ -195,7 +195,7 @@ class TaxiIdParser implements TabularFileHandler{
 	@Override
 	public void startRow(String[] row) {
 	    try {
-		Id taxiId = new IdImpl(row[0]);
+		Id<Vehicle> taxiId = Id.create(row[0], Vehicle.class);
 		Date startDate = sdf.parse(row[1]);
 		Date endDate = sdf.parse(row[2]);
 		

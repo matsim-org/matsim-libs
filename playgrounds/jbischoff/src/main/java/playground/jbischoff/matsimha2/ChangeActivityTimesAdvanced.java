@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.replanning.ReplanningContext;
@@ -15,20 +16,22 @@ import org.matsim.core.replanning.ReplanningContext;
 public class ChangeActivityTimesAdvanced implements PlanStrategyModule, ActivityStartEventHandler {
 
 	
-	private Map<Id,Double> lastWorkActivitEndTimes;
+	private Map<Id<Person>,Double> lastWorkActivitEndTimes;
 	
 //	Variation in Seconds
 	
 	public ChangeActivityTimesAdvanced(){
-		this.lastWorkActivitEndTimes = new HashMap<Id, Double>(); 
+		this.lastWorkActivitEndTimes = new HashMap<>(); 
 		
 	}
 	
 	
+	@Override
 	public void prepareReplanning(ReplanningContext replanningContext) {
 		System.out.println("prepare.");
 	}
 
+	@Override
 	public void handlePlan(Plan plan) {
 				
 		Activity homeact = (Activity) plan.getPlanElements().get(0);
@@ -48,18 +51,21 @@ public class ChangeActivityTimesAdvanced implements PlanStrategyModule, Activity
 		
 	}
 
+	@Override
 	public void finishReplanning() {
 		System.out.println("Finish.");
 	}
 
+	@Override
 	public void reset(int iteration) {
 		System.out.println("Reset.");
 	}
 
+	@Override
 	public void handleEvent(ActivityStartEvent event) {
 		
 		
-		Id person = event.getPersonId();
+		Id<Person> person = event.getPersonId();
 		
 		
 		
@@ -72,7 +78,7 @@ public class ChangeActivityTimesAdvanced implements PlanStrategyModule, Activity
 	
 	
 	
-	public Double getLastWorkActivityStartTime(Id personId){
+	public Double getLastWorkActivityStartTime(Id<Person> personId){
 		double endtime = 0.;
 		if (this.lastWorkActivitEndTimes.containsKey(personId)){
 			endtime = this.lastWorkActivitEndTimes.get(personId);

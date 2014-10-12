@@ -41,7 +41,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
@@ -55,6 +54,8 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
+
+import playground.michalm.zone.Zone;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
@@ -77,15 +78,15 @@ public class TaxiDemandWriter
     private Random rnd = new Random(17);
     private final static String DATADIR = "C:/local_jb/data/";
     private final static String NETWORKFILE = DATADIR + "network/berlin_brb.xml.gz";
-    private final static Id TXLLORID = new IdImpl("12214125");
-    private final static Id SXFLORID = new IdImpl("12061433");
+    private final static Id<Zone> TXLLORID = Id.create("12214125", Zone.class);
+    private final static Id<Zone> SXFLORID = Id.create("12061433", Zone.class);
 
     private final static double SCALEFACTOR = 1.0;
     static int fromTXL = 0;
     static int toTXL = 0;
 
-    private Map<Id, Integer> oMap = new HashMap<Id, Integer>();
-    private Map<Id, Integer> dMap = new HashMap<Id, Integer>();
+    private Map<Id<Zone>, Integer> oMap = new HashMap<>();
+    private Map<Id<Zone>, Integer> dMap = new HashMap<>();
 
 
     public static void main(String[] args)
@@ -121,12 +122,12 @@ public class TaxiDemandWriter
 
     private void writeODbyZone(String outputFileName)
     {
-        Set<Id> allZones = new TreeSet<Id>();
+        Set<Id<Zone>> allZones = new TreeSet<>();
         allZones.addAll(this.dMap.keySet());
         allZones.addAll(this.oMap.keySet());
         BufferedWriter bw = IOUtils.getBufferedWriter(outputFileName);
         try {
-            for (Id zoneId : allZones) {
+            for (Id<Zone> zoneId : allZones) {
                 int o = getFromMapOrReturnZero(this.oMap, zoneId);
                 int d = getFromMapOrReturnZero(dMap, zoneId);
                 String s = zoneId.toString() + "\t" + o + "\t" + d + "\n";
@@ -144,7 +145,7 @@ public class TaxiDemandWriter
     }
 
 
-    private int getFromMapOrReturnZero(Map<Id, Integer> odMap, Id zoneId)
+    private int getFromMapOrReturnZero(Map<Id<Zone>, Integer> odMap, Id<Zone> zoneId)
     {
         int rv = 0;
         if (odMap.containsKey(zoneId))
@@ -282,7 +283,7 @@ public class TaxiDemandWriter
     }
 
 
-    private void incMap(Map<Id, Integer> odMap, Id fromId)
+    private void incMap(Map<Id<Zone>, Integer> odMap, Id<Zone> fromId)
     {
         Integer val;
         if (odMap.containsKey(fromId))
@@ -439,12 +440,12 @@ public class TaxiDemandWriter
 class TaxiDemandElement
     implements Comparable<TaxiDemandElement>
 {
-    Id fromId;
-    Id toId;
+    Id<Zone> fromId;
+    Id<Zone> toId;
     int amount;
 
 
-    TaxiDemandElement(Id from, Id to, int amount)
+    TaxiDemandElement(Id<Zone> from, Id<Zone> to, int amount)
     {
         this.fromId = from;
         this.toId = to;
@@ -452,13 +453,13 @@ class TaxiDemandElement
     }
 
 
-    public Id getFromId()
+    public Id<Zone> getFromId()
     {
         return fromId;
     }
 
 
-    public Id getToId()
+    public Id<Zone> getToId()
     {
         return toId;
     }
@@ -490,7 +491,7 @@ class DemandParser
     @Override
     public void startRow(String[] row)
     {
-        demand.add(new TaxiDemandElement(new IdImpl(row[0]), new IdImpl(row[1]), Integer
+        demand.add(new TaxiDemandElement(Id.create(row[0], Zone.class), Id.create(row[1], Zone.class), Integer
                 .parseInt(row[2])));
     }
 

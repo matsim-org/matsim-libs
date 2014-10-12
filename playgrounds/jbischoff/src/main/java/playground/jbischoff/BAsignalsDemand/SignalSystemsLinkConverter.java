@@ -33,7 +33,8 @@ import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
@@ -41,6 +42,7 @@ import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsDataImpl;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsReader20;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsWriter20;
+import org.matsim.signalsystems.model.SignalSystem;
 import org.xml.sax.SAXException;
 
 import playground.jbischoff.lsacvs2kml.LinkConversionsData;
@@ -57,7 +59,7 @@ public static void main (String args0[]) throws JAXBException, SAXException, Par
 	
 	SignalSystemsReader20 ssread = new SignalSystemsReader20(ssdata, MatsimSignalSystemsReader.SIGNALSYSTEMS20);
 	ssread.readFile(INPUTFILE);
-	Map<Id,LinkConversionsData> convmap = readConv("/Users/JB/Desktop/BA-Arbeit/sim/convdata.csv");
+	Map<Id<SignalSystem>,LinkConversionsData> convmap = readConv("/Users/JB/Desktop/BA-Arbeit/sim/convdata.csv");
 
 	for (SignalSystemData ssd : ssdata.getSignalSystemData().values()){
 		//if (convmap.get(ssd.getId())!=null){
@@ -71,7 +73,7 @@ public static void main (String args0[]) throws JAXBException, SAXException, Par
 			/*for (Id tmr : sd.getTurningMoveRestrictions()){
 				nsd.addTurningMoveRestriction(convmap.get(ssd.getId()).getConv(tmr));
 				}*/
-			for (Id lid : sd.getLaneIds()){
+			for (Id<Lane> lid : sd.getLaneIds()){
 				nsd.addLaneId(lid);
 			}
 			nssd.addSignalData(nsd);
@@ -90,8 +92,8 @@ public static void main (String args0[]) throws JAXBException, SAXException, Par
 	
 }
 
-public static  Map<Id,LinkConversionsData> readConv(String filename){
-	Map<Id,LinkConversionsData> cdata = new HashMap<Id,LinkConversionsData>();
+public static  Map<Id<SignalSystem>,LinkConversionsData> readConv(String filename){
+	Map<Id<SignalSystem>,LinkConversionsData> cdata = new HashMap<>();
 	FileReader fr;
 	BufferedReader br;
 	try {
@@ -102,16 +104,17 @@ public static  Map<Id,LinkConversionsData> readConv(String filename){
 		while ((line = br.readLine()) != null) {
 			
 			 String[] result = line.split(";");
-			 Id ssid = new IdImpl(result[0]);
+			 Id<SignalSystem> ssid = Id.create(result[0], SignalSystem.class);
 			 LinkConversionsData lcd;
 			 if (cdata.get(ssid)==null)
 			 	{lcd = new LinkConversionsData(ssid);
 			 	 cdata.put(ssid, lcd);}
-			 cdata.get(ssid).setConv(new IdImpl(result[1]), new IdImpl(result[2]));
+			 cdata.get(ssid).setConv(Id.create(result[1], Link.class), Id.create(result[2], Link.class));
 			 
 		}
+		br.close();
 		
-		System.out.println(cdata.get(new IdImpl("17")));
+		System.out.println(cdata.get(Id.create("17", Link.class)));
 		
 	} catch (FileNotFoundException e) {
 		// TODO Auto-generated catch block

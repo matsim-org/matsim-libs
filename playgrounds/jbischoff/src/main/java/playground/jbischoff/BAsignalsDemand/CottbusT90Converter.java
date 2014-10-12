@@ -24,7 +24,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlDataImpl;
@@ -33,6 +32,8 @@ import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlWriter20;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalGroupSettingsData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalSystemControllerData;
+import org.matsim.signalsystems.model.SignalPlan;
+import org.matsim.signalsystems.model.SignalSystem;
 import org.xml.sax.SAXException;
 
 import playground.jbischoff.BAsignals.JbBaPaths;
@@ -48,9 +49,9 @@ public class CottbusT90Converter {
 		SignalControlData nscd = new SignalControlDataImpl();
 
 		for(int i = 1; i<30; i++){
-			SignalSystemControllerData nsscd = nscd.getFactory().createSignalSystemControllerData(new IdImpl(String.valueOf(i)));
+			SignalSystemControllerData nsscd = nscd.getFactory().createSignalSystemControllerData(Id.create(String.valueOf(i), SignalSystem.class));
 			nsscd.setControllerIdentifier("DefaultPlanbasedSignalSystemController");
-			SignalPlanData nspd = nscd.getFactory().createSignalPlanData(new IdImpl("1"));
+			SignalPlanData nspd = nscd.getFactory().createSignalPlanData(Id.create("1", SignalPlan.class));
 			nspd.setCycleTime(90);
 			nspd.setStartTime(0.0);
 			nspd.setEndTime(0.0);
@@ -62,11 +63,11 @@ public class CottbusT90Converter {
 		SignalControlData scd = new SignalControlDataImpl();
 		SignalControlReader20 reader = new SignalControlReader20(scd, MatsimSignalSystemsReader.SIGNALCONTROL20);
 		reader.readFile(JbBaPaths.CBH+"originaldaten/signalControlCottbusT90_v2.0.xml");
-		SignalSystemControllerData oldsscd = scd.getSignalSystemControllerDataBySystemId().get(new IdImpl("1"));
-		SignalPlanData spd = oldsscd.getSignalPlanData().get(new IdImpl("1"));
+		SignalSystemControllerData oldsscd = scd.getSignalSystemControllerDataBySystemId().get(Id.create("1", SignalSystem.class));
+		SignalPlanData spd = oldsscd.getSignalPlanData().get(Id.create("1", SignalPlan.class));
 		for (SignalGroupSettingsData sgsd : spd.getSignalGroupSettingsDataByGroupId().values()){
 			Id ssid = CottbusT90Converter.returnProperSSID(sgsd.getSignalGroupId());
-			nscd.getSignalSystemControllerDataBySystemId().get(ssid).getSignalPlanData().get(new IdImpl("1")).addSignalGroupSettings(sgsd);
+			nscd.getSignalSystemControllerDataBySystemId().get(ssid).getSignalPlanData().get(Id.create("1", SignalPlan.class)).addSignalGroupSettings(sgsd);
 			
 		}
 		SignalControlWriter20 writer = new SignalControlWriter20(nscd);
@@ -75,44 +76,44 @@ public class CottbusT90Converter {
 		
 	}
 	
-	public static Id returnProperSSID(Id refid){
+	public static Id<SignalSystem> returnProperSSID(Id refid){
 		char[] refbeg ;
 		refbeg = new char[2];
 		refid.toString().getChars(0, 2, refbeg, 0);
 		String refbegst = String.valueOf(refbeg);
 		switch (Integer.parseInt(refbegst))  {
-		case 11 : return new IdImpl("14");
-		case 12 : return new IdImpl("16");
-		case 13 : return new IdImpl("15");
-		case 14 : return new IdImpl("12"); 
-		case 15 : return new IdImpl("6"); 
-		case 16 : return new IdImpl("8");
-		case 17 : return new IdImpl("2");
-		case 18 : return new IdImpl("5");
-		case 19 : return new IdImpl("1");
-		case 20 : return new IdImpl("18");
-		case 21 : return new IdImpl("17");
-		case 22 : return new IdImpl("19");
-		case 23 : return new IdImpl("20");
-		case 24 : return new IdImpl("21");
-		case 25 : return new IdImpl("22");
-		case 26 : return new IdImpl("23");
-		case 27 : return new IdImpl("24");
-		case 28 : return new IdImpl("25"); 
-		case 29 : return new IdImpl("26");
-		case 30 : return new IdImpl("27"); 
-		case 31 : return new IdImpl("29");
-		case 32 : return new IdImpl("28");
-		case 33 : return new IdImpl("7");
-		case 34 : return new IdImpl("9");
-		case 35 : return new IdImpl("3");
-		case 36 : return new IdImpl("4");
-		case 37 : return new IdImpl("13");
-		case 38 : return new IdImpl("11");
-		case 39 : return new IdImpl("10"); 
+		case 11 : return Id.create("14", SignalSystem.class);
+		case 12 : return Id.create("16", SignalSystem.class);
+		case 13 : return Id.create("15", SignalSystem.class);
+		case 14 : return Id.create("12", SignalSystem.class); 
+		case 15 : return Id.create( "6", SignalSystem.class); 
+		case 16 : return Id.create( "8", SignalSystem.class);
+		case 17 : return Id.create( "2", SignalSystem.class);
+		case 18 : return Id.create( "5", SignalSystem.class);
+		case 19 : return Id.create( "1", SignalSystem.class);
+		case 20 : return Id.create("18", SignalSystem.class);
+		case 21 : return Id.create("17", SignalSystem.class);
+		case 22 : return Id.create("19", SignalSystem.class);
+		case 23 : return Id.create("20", SignalSystem.class);
+		case 24 : return Id.create("21", SignalSystem.class);
+		case 25 : return Id.create("22", SignalSystem.class);
+		case 26 : return Id.create("23", SignalSystem.class);
+		case 27 : return Id.create("24", SignalSystem.class);
+		case 28 : return Id.create("25", SignalSystem.class); 
+		case 29 : return Id.create("26", SignalSystem.class);
+		case 30 : return Id.create("27", SignalSystem.class); 
+		case 31 : return Id.create("29", SignalSystem.class);
+		case 32 : return Id.create("28", SignalSystem.class);
+		case 33 : return Id.create( "7", SignalSystem.class);
+		case 34 : return Id.create( "9", SignalSystem.class);
+		case 35 : return Id.create( "3", SignalSystem.class);
+		case 36 : return Id.create( "4", SignalSystem.class);
+		case 37 : return Id.create("13", SignalSystem.class);
+		case 38 : return Id.create("11", SignalSystem.class);
+		case 39 : return Id.create("10", SignalSystem.class); 
 		}
 	System.err.println(refid + "- could not find proper ID for lane, will use 9999");
-	return new IdImpl("9999");
+	return Id.create("9999", SignalSystem.class);
 	}
 
 		

@@ -32,7 +32,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.lanes.data.v20.LaneData20;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
@@ -58,7 +58,7 @@ public class LinkLengths {
 		FileReader fr;
 		BufferedReader br;
 		String filename="/Users/JB/Desktop/BA-Arbeit/sim/faultylinks.csv";		
-		List<Id> fl = new ArrayList<Id>();
+		List<Id<Link>> fl = new ArrayList<>();
 		fr = new FileReader(new File (filename));
 		br = new BufferedReader(fr);
 		ScenarioLoaderImpl loader = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(config);
@@ -68,14 +68,15 @@ public class LinkLengths {
 		while ((line = br.readLine()) != null) {
 			
 	         String[] result = line.split(";");
-	         Id current = new IdImpl(result[1]);
+	         Id<Link> current = Id.create(result[1], Link.class);
 	         fl.add(current);
 	         
 	
 			}
+		br.close();
 		
-		//System.out.println(scenario.getNetwork().getLinks().get(new IdImpl(6667)).getLength());
-		for (Id lid : fl){
+		//System.out.println(scenario.getNetwork().getLinks().get(Id.create(6667)).getLength());
+		for (Id<Link> lid : fl){
 			System.out.println(lid + " length is "+scenario.getNetwork().getLinks().get(lid).getLength());
 			
 		}
@@ -89,8 +90,8 @@ public class LinkLengths {
 				
 				int lid = Integer.parseInt(a[0]);
 				try{
-				System.out.println(lid+" l: "+scenario.getNetwork().getLinks().get(new IdImpl(lid)).getLength());
-				la.setStartsAtMeterFromLinkEnd(scenario.getNetwork().getLinks().get(new IdImpl(lid)).getLength());
+				System.out.println(lid+" l: "+scenario.getNetwork().getLinks().get(Id.create(lid, Link.class)).getLength());
+				la.setStartsAtMeterFromLinkEnd(scenario.getNetwork().getLinks().get(Id.create(lid, Link.class)).getLength());
 				
 				} catch (Exception e){
 					System.err.println("Error while getting length for Link "+lid);

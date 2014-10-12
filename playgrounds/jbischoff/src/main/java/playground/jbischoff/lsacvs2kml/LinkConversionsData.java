@@ -23,29 +23,30 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.signalsystems.model.SignalSystem;
 
 public class LinkConversionsData {
-	private Map<Id,Id> cdata;
-	private Id ssid;
+	private Map<Id<Link>,Id<Link>> cdata;
+	private Id<SignalSystem> ssid;
 
-	public LinkConversionsData(Id ssid){
+	public LinkConversionsData(Id<SignalSystem> ssid){
 		this.ssid=ssid;
-		cdata = new HashMap<Id,Id>();
+		cdata = new HashMap<>();
 	}
 	
-	public Id getSsid() {
+	public Id<SignalSystem> getSsid() {
 		return ssid;
 	}	
 	
-	public Id getConv(Id olid){
+	public Id<Link> getConv(Id<Link> olid){
 		if (cdata.get(olid)==null) {
 			System.out.println("Link "+olid +" not found, will let untouched");
 			return olid;
 		}
 		return cdata.get(olid);
 	}
-	public void setConv(Id old, Id newid){
+	public void setConv(Id<Link> old, Id<Link> newid){
 		cdata.put(old, newid);
 	}
 

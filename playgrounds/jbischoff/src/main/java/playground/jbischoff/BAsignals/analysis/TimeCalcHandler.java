@@ -30,17 +30,18 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.handler.LaneEnterEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.lanes.data.v20.Lane;
 
 import playground.jbischoff.BAsignals.model.AdaptiveControllHead;
 
@@ -48,31 +49,31 @@ public class TimeCalcHandler implements LinkEnterEventHandler, LinkLeaveEventHan
 PersonArrivalEventHandler, PersonDepartureEventHandler, LaneEnterEventHandler  {
 	private static final Logger log = Logger.getLogger(TimeCalcHandler.class);
 
-	private Map<Id,Double> arrivaltimestofbspn;
-	private Map<Id,Double> arrivaltimestofbcb;
+	private Map<Id<Person>,Double> arrivaltimestofbspn;
+	private Map<Id<Person>,Double> arrivaltimestofbcb;
 
-	private Map<Id,Double> arrivaltimesfromfbspn;
-	private Map<Id,Double> arrivaltimesfromfbcb;
-	private Map<Id,Double> ttmap;
+	private Map<Id<Person>,Double> arrivaltimesfromfbspn;
+	private Map<Id<Person>,Double> arrivaltimesfromfbcb;
+	private Map<Id<Person>,Double> ttmap;
 	private AdaptiveControllHead ach;
 	private Set<Id> carsPassed;
-	private Set<Id> wannabeadaptiveLanes;
+	private Set<Id<Lane>> wannabeadaptiveLanes;
 
 
 public TimeCalcHandler(AdaptiveControllHead ach){
 	this.ach=ach;
-	this.ttmap = new TreeMap<Id,Double>();
-	this.carsPassed = new HashSet<Id>();
-	this.wannabeadaptiveLanes = new HashSet<Id>();
+	this.ttmap = new TreeMap<>();
+	this.carsPassed = new HashSet<>();
+	this.wannabeadaptiveLanes = new HashSet<>();
 	this.fillWannaBes();
-	this.arrivaltimesfromfbcb = new TreeMap<Id,Double>();
-	this.arrivaltimesfromfbspn = new TreeMap<Id,Double>();
-	this.arrivaltimestofbcb = new TreeMap<Id,Double>();
-	this.arrivaltimestofbspn = new TreeMap<Id,Double>();
-	this.arrivaltimesfromfbcb.put(new IdImpl(0),0.0);
-	this.arrivaltimestofbspn.put(new IdImpl(0),0.0);
-	this.arrivaltimestofbcb.put(new IdImpl(0),0.0);
-	this.arrivaltimesfromfbspn.put(new IdImpl(0),0.0);
+	this.arrivaltimesfromfbcb = new TreeMap<>();
+	this.arrivaltimesfromfbspn = new TreeMap<>();
+	this.arrivaltimestofbcb = new TreeMap<>();
+	this.arrivaltimestofbspn = new TreeMap<>();
+	this.arrivaltimesfromfbcb.put(Id.create(0, Person.class),0.0);
+	this.arrivaltimestofbspn.put(Id.create(0, Person.class),0.0);
+	this.arrivaltimestofbcb.put(Id.create(0, Person.class),0.0);
+	this.arrivaltimesfromfbspn.put(Id.create(0, Person.class),0.0);
 
 
 
@@ -140,20 +141,20 @@ public TimeCalcHandler(AdaptiveControllHead ach){
 
 
 	}
-	public Map<Id, Double> getTtmap() {
+	public Map<Id<Person>, Double> getTtmap() {
 		return ttmap;
 	}
 
 	private void fillWannaBes(){
 		//mock up adaptive lanes to create comparable travel times LSA-SLV
 		for (int i = 2100; i<2113; i++){ //Signalsystem 17
-				this.wannabeadaptiveLanes.add(new IdImpl(i));
+				this.wannabeadaptiveLanes.add(Id.create(i, Lane.class));
 		}
 		for (int i = 2000; i<2013; i++){ //Signalsystem 18
-			this.wannabeadaptiveLanes.add(new IdImpl(i));
+			this.wannabeadaptiveLanes.add(Id.create(i, Lane.class));
 		}
 		for (int i = 1900; i<1913; i++){ //Signalsystem 1
-			this.wannabeadaptiveLanes.add(new IdImpl(i));
+			this.wannabeadaptiveLanes.add(Id.create(i, Lane.class));
 		}
 
 
@@ -204,12 +205,12 @@ public TimeCalcHandler(AdaptiveControllHead ach){
 		}
 
 	}
-	private void exportMaptoCVS(Map<Id, Double> atmap,  String filename) {
+	private void exportMaptoCVS(Map<Id<Person>, Double> atmap,  String filename) {
 		try {
 			FileWriter writer = new FileWriter(filename);
 
-		for (Entry<Id,Double> e : atmap.entrySet()){
-		writer.append(e.getKey().toString()+";"+e.getValue()+";"+"\n");
+		for (Entry<Id<Person>,Double> e : atmap.entrySet()){
+			writer.append(e.getKey().toString()+";"+e.getValue()+";"+"\n");
 		}
 		writer.flush();
 		writer.close();
@@ -243,7 +244,7 @@ public TimeCalcHandler(AdaptiveControllHead ach){
 	public int getAverageTravelTime(){
 
 		Double att = 0.0;
-		for (Entry<Id,Double> entry : ttmap.entrySet()){
+		for (Entry<Id<Person>,Double> entry : ttmap.entrySet()){
 				att += entry.getValue();
 		}
 		att = att / ttmap.size();
@@ -252,7 +253,7 @@ public TimeCalcHandler(AdaptiveControllHead ach){
 	public int getAverageAdaptiveTravelTime(){
 		if (this.getPassedAgents() == 0) return 0;
 			Double att = 0.0;
-			for (Entry<Id,Double> entry : ttmap.entrySet()){
+			for (Entry<Id<Person>,Double> entry : ttmap.entrySet()){
 				if (this.getPassedCars().contains(entry.getKey())){
 					att += entry.getValue();
 				}

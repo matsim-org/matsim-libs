@@ -1,23 +1,35 @@
 package playground.jbischoff.taxi.berlin.supply;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.VehicleImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.*;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.*;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.io.tabularFileParser.*;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 
-import playground.jbischoff.taxi.berlin.demand.*;
+import playground.jbischoff.taxi.berlin.demand.LorShapeReader;
+import playground.jbischoff.taxi.berlin.demand.TaxiDemandWriter;
+import playground.michalm.zone.Zone;
 
-import com.vividsolutions.jts.geom.*;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 
 
 public class BerlinVehicleGenerator
@@ -65,7 +77,7 @@ public class BerlinVehicleGenerator
             double shareOfTripsFromHere = (double)dpl.getFromLor() / (double)amountOfTrips;
             long taxiAmountFromHere = Math.round(taxiAmount * shareOfTripsFromHere);
             for (int i = 0; i < taxiAmountFromHere; i++) {
-                Id vid = new IdImpl("t_" + dpl.getFromId() + "_" + i);
+                Id<Vehicle> vid = Id.create("t_" + dpl.getFromId() + "_" + i, Vehicle.class);
                 vehicles.add(createTaxiFromLor(dpl.getFromId(), vid));
 
             }
@@ -75,7 +87,7 @@ public class BerlinVehicleGenerator
     }
 
 
-    private Vehicle createTaxiFromLor(Id lorId, Id vid)
+    private Vehicle createTaxiFromLor(Id<Zone> lorId, Id<Vehicle> vid)
     {
         Link link = getRandomLinkInLor(lorId);
         Vehicle v = new VehicleImpl(vid, link, PAXPERCAR, T0, T1);
@@ -83,7 +95,7 @@ public class BerlinVehicleGenerator
     }
 
 
-    private Link getRandomLinkInLor(Id lorId)
+    private Link getRandomLinkInLor(Id<Zone> lorId)
     {
         Point p = TaxiDemandWriter.getRandomPointInFeature(this.rnd,
                 this.shapedata.get(lorId.toString()));
@@ -144,12 +156,12 @@ public class BerlinVehicleGenerator
 class TaxiDemandPerLor
     implements Comparable<TaxiDemandPerLor>
 {
-    private Id lorNo;
+    private Id<Zone> lorNo;
     private int toLor;
     private int fromLor;
 
 
-    TaxiDemandPerLor(Id from, int toLor, int fromLor)
+    TaxiDemandPerLor(Id<Zone> from, int toLor, int fromLor)
     {
         this.lorNo = from;
         this.toLor = toLor;
@@ -157,7 +169,7 @@ class TaxiDemandPerLor
     }
 
 
-    public Id getFromId()
+    public Id<Zone> getFromId()
     {
         return lorNo;
     }
@@ -195,7 +207,7 @@ class DemandPerLorParser
     @Override
     public void startRow(String[] row)
     {
-        demand.add(new TaxiDemandPerLor(new IdImpl(row[0]), Integer.parseInt(row[1]), Integer
+        demand.add(new TaxiDemandPerLor(Id.create(row[0], Zone.class), Integer.parseInt(row[1]), Integer
                 .parseInt(row[2])));
     }
 

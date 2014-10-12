@@ -1,18 +1,27 @@
 package playground.jbischoff.taxi.berlin.supply;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.network.*;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.*;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.*;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.io.tabularFileParser.*;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
+import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 
 import playground.michalm.taxi.data.TaxiRank;
 
@@ -124,9 +133,9 @@ class RankReader
     {
         Link link = network.getNearestRightEntryLink(stringtoCoord(row[2], row[1]));
         String name = row[4];
-        Id id = new IdImpl(row[5]);
+        Id<TaxiRank> id = Id.create(row[5], TaxiRank.class);
         if (id.equals("21"))
-            link = network.getLinks().get(new IdImpl("-35954"));
+            link = network.getLinks().get(Id.create("-35954", Link.class));
         //Exception for Tegel Airport
         TaxiRank rank = new TaxiRank(id, name, link);
         ranks.add(rank);

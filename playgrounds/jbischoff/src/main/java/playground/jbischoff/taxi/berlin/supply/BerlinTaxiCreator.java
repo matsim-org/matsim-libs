@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.data.VehicleImpl;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -90,12 +89,12 @@ public class BerlinTaxiCreator
     }
 
 
-    private Link getRandomLinkInLor(Id lorId)
+    private Link getRandomLinkInLor(Id<Zone> lorId)
     {
         log.info(lorId);
-        Id id = lorId;
+        Id<Zone> id = lorId;
         if (lorId.toString().length() == 7)
-            id = new IdImpl("0" + lorId.toString());
+            id = Id.create("0" + lorId.toString(), Zone.class);
         log.info(id);
         Point p = TaxiDemandWriter.getRandomPointInFeature(RND, this.zones.get(id)
                 .getMultiPolygon());
