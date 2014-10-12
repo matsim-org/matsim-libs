@@ -28,8 +28,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.network.NetworkWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
@@ -39,9 +39,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.LaneDefinitionsV11ToV20Conversion;
 import org.matsim.lanes.data.v11.LaneData11;
 import org.matsim.lanes.data.v11.LaneDefinitions11;
-import org.matsim.lanes.data.v11.LaneDefinitionsFactory11;
 import org.matsim.lanes.data.v11.LaneDefinitions11Impl;
+import org.matsim.lanes.data.v11.LaneDefinitionsFactory11;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 import org.matsim.signalsystems.SignalUtils;
@@ -58,6 +59,10 @@ import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.signalsystems.model.DefaultPlanbasedSignalSystemController;
+import org.matsim.signalsystems.model.Signal;
+import org.matsim.signalsystems.model.SignalGroup;
+import org.matsim.signalsystems.model.SignalPlan;
+import org.matsim.signalsystems.model.SignalSystem;
 
 import playground.dgrether.DgPaths;
 
@@ -78,8 +83,8 @@ public class DgFigure9ScenarioGenerator {
 	
 	public DgFigure9ScenarioGenerator(){}
 	
-	private Id id1, id2, id3, id4, id5, id6, id7, id8;
-	private Id id12, id21, id23, id32, id34, id43, id45, id54, id56, id65, id27, id72, id78, id87, id85, id58;
+	private Id<SignalSystem> id1, id2, id3, id4, id5, id6, id7, id8;
+	private Id<Link> id12, id21, id23, id32, id34, id43, id45, id54, id56, id65, id27, id72, id78, id87, id85, id58;
 	
 	private int onset1 = 0;
 	private int dropping1 = 55;
@@ -136,22 +141,22 @@ public class DgFigure9ScenarioGenerator {
 		this.createSystem5Control(control);
 		
 		//signal system 3, 4, 7, 8 control
-		List<Id> ids = new LinkedList<Id>();
+		List<Id<SignalSystem>> ids = new LinkedList<>();
 		ids.add(id3);
 		ids.add(id4);
-		for (Id id : ids){
+		for (Id<SignalSystem> id : ids){
 			SignalSystemControllerData controller = control.getFactory().createSignalSystemControllerData(id);
 			control.addSignalSystemControllerData(controller);
 			controller.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
-			SignalPlanData plan = control.getFactory().createSignalPlanData(id1);
+			SignalPlanData plan = control.getFactory().createSignalPlanData(Id.create(id1, SignalPlan.class));
 			controller.addSignalPlanData(plan);
 			plan.setCycleTime(this.cycle);
 			plan.setOffset(0);
-			SignalGroupSettingsData settings1 = control.getFactory().createSignalGroupSettingsData(id1);
+			SignalGroupSettingsData settings1 = control.getFactory().createSignalGroupSettingsData(Id.create(id1, SignalGroup.class));
 			plan.addSignalGroupSettings(settings1);
 			settings1.setOnset(this.onset1);
 			settings1.setDropping(this.dropping1);
-			SignalGroupSettingsData settings2 = control.getFactory().createSignalGroupSettingsData(id2);
+			SignalGroupSettingsData settings2 = control.getFactory().createSignalGroupSettingsData(Id.create(id2, SignalGroup.class));
 			plan.addSignalGroupSettings(settings2);
 			settings2.setOnset(this.onset1);
 			settings2.setDropping(this.dropping1);
@@ -159,19 +164,19 @@ public class DgFigure9ScenarioGenerator {
 		ids.clear();
 		ids.add(id7);
 		ids.add(id8);
-		for (Id id : ids){
+		for (Id<SignalSystem> id : ids){
 			SignalSystemControllerData controller = control.getFactory().createSignalSystemControllerData(id);
 			control.addSignalSystemControllerData(controller);
 			controller.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
-			SignalPlanData plan = control.getFactory().createSignalPlanData(id1);
+			SignalPlanData plan = control.getFactory().createSignalPlanData(Id.create(id1, SignalPlan.class));
 			controller.addSignalPlanData(plan);
 			plan.setCycleTime(this.cycle);
 			plan.setOffset(0);
-			SignalGroupSettingsData settings1 = control.getFactory().createSignalGroupSettingsData(id1);
+			SignalGroupSettingsData settings1 = control.getFactory().createSignalGroupSettingsData(Id.create(id1, SignalGroup.class));
 			plan.addSignalGroupSettings(settings1);
 			settings1.setOnset(this.onset1);
 			settings1.setDropping(this.dropping1);
-			SignalGroupSettingsData settings2 = control.getFactory().createSignalGroupSettingsData(id2);
+			SignalGroupSettingsData settings2 = control.getFactory().createSignalGroupSettingsData(Id.create(id2, SignalGroup.class));
 			plan.addSignalGroupSettings(settings2);
 			settings2.setOnset(this.onset1);
 			settings2.setDropping(this.dropping1);
@@ -186,23 +191,23 @@ public class DgFigure9ScenarioGenerator {
 		SignalSystemControllerData controller = control.getFactory().createSignalSystemControllerData(id5);
 		control.addSignalSystemControllerData(controller);
 		controller.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
-		SignalPlanData plan = control.getFactory().createSignalPlanData(id1);
+		SignalPlanData plan = control.getFactory().createSignalPlanData(Id.create(id1, SignalPlan.class));
 		controller.addSignalPlanData(plan);
 		plan.setCycleTime(this.cycle);
 		plan.setOffset(0);
-		SignalGroupSettingsData settings1 = control.getFactory().createSignalGroupSettingsData(id1);
+		SignalGroupSettingsData settings1 = control.getFactory().createSignalGroupSettingsData(Id.create(id1, SignalGroup.class));
 		plan.addSignalGroupSettings(settings1);
 		settings1.setOnset(this.onset2);
 		settings1.setDropping(this.dropping2);
-		SignalGroupSettingsData settings2 = control.getFactory().createSignalGroupSettingsData(id2);
+		SignalGroupSettingsData settings2 = control.getFactory().createSignalGroupSettingsData(Id.create(id2, SignalGroup.class));
 		plan.addSignalGroupSettings(settings2);
 		settings2.setOnset(this.onset2);
 		settings2.setDropping(this.dropping2);
-		SignalGroupSettingsData settings3 = control.getFactory().createSignalGroupSettingsData(id3);
+		SignalGroupSettingsData settings3 = control.getFactory().createSignalGroupSettingsData(Id.create(id3, SignalGroup.class));
 		plan.addSignalGroupSettings(settings3);
 		settings3.setOnset(this.onset1);
 		settings3.setDropping(this.dropping1);
-		SignalGroupSettingsData settings4 = control.getFactory().createSignalGroupSettingsData(id4);
+		SignalGroupSettingsData settings4 = control.getFactory().createSignalGroupSettingsData(Id.create(id4, SignalGroup.class));
 		plan.addSignalGroupSettings(settings4);
 		settings4.setOnset(this.onset1);
 		settings4.setDropping(this.dropping1);
@@ -213,36 +218,36 @@ public class DgFigure9ScenarioGenerator {
 		SignalSystemControllerData controller = control.getFactory().createSignalSystemControllerData(id2);
 		control.addSignalSystemControllerData(controller);
 		controller.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
-		SignalPlanData plan = control.getFactory().createSignalPlanData(id1);
+		SignalPlanData plan = control.getFactory().createSignalPlanData(Id.create(id1, SignalPlan.class));
 		controller.addSignalPlanData(plan);
 		plan.setCycleTime(this.cycle);
 		plan.setOffset(0);
-		SignalGroupSettingsData settings1 =  control.getFactory().createSignalGroupSettingsData(id1);
+		SignalGroupSettingsData settings1 =  control.getFactory().createSignalGroupSettingsData(Id.create(id1, SignalGroup.class));
 		plan.addSignalGroupSettings(settings1);
 		settings1.setOnset(this.onset1);
 		settings1.setDropping(this.dropping1);
-		SignalGroupSettingsData settings2 = control.getFactory().createSignalGroupSettingsData(id2);
+		SignalGroupSettingsData settings2 = control.getFactory().createSignalGroupSettingsData(Id.create(id2, SignalGroup.class));
 		plan.addSignalGroupSettings(settings2);
 		settings2.setOnset(this.onset1);
 		settings2.setDropping(this.dropping1);
-		SignalGroupSettingsData settings3 = control.getFactory().createSignalGroupSettingsData(id3);
+		SignalGroupSettingsData settings3 = control.getFactory().createSignalGroupSettingsData(Id.create(id3, SignalGroup.class));
 		plan.addSignalGroupSettings(settings3);
 		settings3.setOnset(this.onset2);
 		settings3.setDropping(this.dropping2);
-		SignalGroupSettingsData settings4 = control.getFactory().createSignalGroupSettingsData(id4);
+		SignalGroupSettingsData settings4 = control.getFactory().createSignalGroupSettingsData(Id.create(id4, SignalGroup.class));
 		plan.addSignalGroupSettings(settings4);
 		settings4.setOnset(this.onset2);
 		settings4.setDropping(this.dropping2);
 	}
 
-	private void createAndAddSignalGroups(Id signalSystemId, SignalGroupsData groups){
-		SignalGroupData group4signal = groups.getFactory().createSignalGroupData(signalSystemId, id1);
+	private void createAndAddSignalGroups(Id<SignalSystem> signalSystemId, SignalGroupsData groups){
+		SignalGroupData group4signal = groups.getFactory().createSignalGroupData(signalSystemId, Id.create(id1, SignalGroup.class));
 		groups.addSignalGroupData(group4signal);
-		group4signal.addSignalId(id1);
+		group4signal.addSignalId(Id.create(id1, Signal.class));
 		
-		group4signal = groups.getFactory().createSignalGroupData(signalSystemId, id2);
+		group4signal = groups.getFactory().createSignalGroupData(signalSystemId, Id.create(id2, SignalGroup.class));
 		groups.addSignalGroupData(group4signal);
-		group4signal.addSignalId(id2);
+		group4signal.addSignalId(Id.create(id2, Signal.class));
 	}
 
 	
@@ -250,63 +255,63 @@ public class DgFigure9ScenarioGenerator {
 		//signal system 2
 		SignalSystemData sys = systems.getFactory().createSignalSystemData(id2);
 		systems.addSignalSystemData(sys);
-		SignalData signal = systems.getFactory().createSignalData(id1);
+		SignalData signal = systems.getFactory().createSignalData(Id.create(id1, Signal.class));
 		sys.addSignalData(signal);
 		signal.setLinkId(id12);
-		signal.addLaneId(id1);
-		signal = systems.getFactory().createSignalData(id2);
+		signal.addLaneId(Id.create(id1, Lane.class));
+		signal = systems.getFactory().createSignalData(Id.create(id2, Signal.class));
 		sys.addSignalData(signal);
 		signal.setLinkId(id12);
-		signal.addLaneId(id2);
+		signal.addLaneId(Id.create(id2, Lane.class));
 		this.createAndAddSignalGroups(id2, groups);
-		signal = systems.getFactory().createSignalData(id3);
+		signal = systems.getFactory().createSignalData(Id.create(id3, Signal.class));
 		sys.addSignalData(signal);
 		signal.setLinkId(id32);
-		SignalGroupData group4signal = groups.getFactory().createSignalGroupData(id2, id3);
+		SignalGroupData group4signal = groups.getFactory().createSignalGroupData(Id.create(id2, SignalSystem.class), Id.create(id3, SignalGroup.class));
 		groups.addSignalGroupData(group4signal);
 //		SignalGroupData group4signal  = groups.getSignalGroupDataBySignalSystemId().get(sys.getId()).get(id1);
-		group4signal.addSignalId(id3);
-		signal = systems.getFactory().createSignalData(id4);
+		group4signal.addSignalId(Id.create(id3, Signal.class));
+		signal = systems.getFactory().createSignalData(Id.create(id4, Signal.class));
 		sys.addSignalData(signal);
 		signal.setLinkId(id72);
-		group4signal = groups.getFactory().createSignalGroupData(id2, id4);
+		group4signal = groups.getFactory().createSignalGroupData(Id.create(id2, SignalSystem.class), Id.create(id4, SignalGroup.class));
 		groups.addSignalGroupData(group4signal);
 //		group4signal  = groups.getSignalGroupDataBySignalSystemId().get(sys.getId()).get(id2);
-		group4signal.addSignalId(id4);
+		group4signal.addSignalId(Id.create(id4, Signal.class));
 	}
 	
 	private void createGroupsAndSystem5(SignalSystemsData systems, SignalGroupsData groups){
 		//signal system 5
 		SignalSystemData sys = systems.getFactory().createSignalSystemData(id5);
 		systems.addSignalSystemData(sys);
-		SignalData signal = systems.getFactory().createSignalData(id1);
+		SignalData signal = systems.getFactory().createSignalData(Id.create(id1, Signal.class));
 		sys.addSignalData(signal);
 		signal.setLinkId(id65);
-		signal.addLaneId(id1);
-		signal = systems.getFactory().createSignalData(id2);
+		signal.addLaneId(Id.create(id1, Lane.class));
+		signal = systems.getFactory().createSignalData(Id.create(id2, Signal.class));
 		sys.addSignalData(signal);
 		signal.setLinkId(id65);
-		signal.addLaneId(id2);
+		signal.addLaneId(Id.create(id2, Lane.class));
 		this.createAndAddSignalGroups(id5, groups);
 		//signals 3 and 4
-		signal = systems.getFactory().createSignalData(id3);
+		signal = systems.getFactory().createSignalData(Id.create(id3, Signal.class));
 		sys.addSignalData(signal);
 		signal.setLinkId(id45);
 		//creates a separate group for signal 3 
-		SignalGroupData group4signal = groups.getFactory().createSignalGroupData(id5, id3);
+		SignalGroupData group4signal = groups.getFactory().createSignalGroupData(Id.create(id5, SignalSystem.class), Id.create(id3, SignalGroup.class));
 		groups.addSignalGroupData(group4signal);
 		//eventually better: add them to existing group
 //		SignalGroupData group4signal = groups.getSignalGroupDataBySignalSystemId().get(sys.getId()).get(id1);
-		group4signal.addSignalId(id3);
-		signal = systems.getFactory().createSignalData(id4);
+		group4signal.addSignalId(Id.create(id3, Signal.class));
+		signal = systems.getFactory().createSignalData(Id.create(id4, Signal.class));
 		sys.addSignalData(signal);
 		signal.setLinkId(id85);
 		//creates a separate group for signal 4
-		group4signal = groups.getFactory().createSignalGroupData(id5, id4);
+		group4signal = groups.getFactory().createSignalGroupData(Id.create(id5, SignalSystem.class), Id.create(id4, SignalGroup.class));
 		groups.addSignalGroupData(group4signal);
 		//eventually better: add to existing group
 //		group4signal = groups.getSignalGroupDataBySignalSystemId().get(sys.getId()).get(id2);
-		group4signal.addSignalId(id4);
+		group4signal.addSignalId(Id.create(id4, Signal.class));
 	}
 	
 	/**
@@ -321,10 +326,10 @@ public class DgFigure9ScenarioGenerator {
 		//signal system 3
 		SignalSystemData sys = systems.getFactory().createSignalSystemData(id3);
 		systems.addSignalSystemData(sys);
-		SignalData signal = systems.getFactory().createSignalData(id1);
+		SignalData signal = systems.getFactory().createSignalData(Id.create(id1, Signal.class));
 		sys.addSignalData(signal);
 		signal.setLinkId(id23);
-		signal = systems.getFactory().createSignalData(id2);
+		signal = systems.getFactory().createSignalData(Id.create(id2, Signal.class));
 		sys.addSignalData(signal);
 		signal.setLinkId(id43);
 		SignalUtils.createAndAddSignalGroups4Signals(groups, sys);
@@ -332,10 +337,10 @@ public class DgFigure9ScenarioGenerator {
 		//signal system 4
 		sys = systems.getFactory().createSignalSystemData(id4);
 		systems.addSignalSystemData(sys);
-		signal = systems.getFactory().createSignalData(id1);
+		signal = systems.getFactory().createSignalData(Id.create(id1, Signal.class));
 		sys.addSignalData(signal);
 		signal.setLinkId(id34);
-		signal = systems.getFactory().createSignalData(id2);
+		signal = systems.getFactory().createSignalData(Id.create(id2, Signal.class));
 		sys.addSignalData(signal);
 		signal.setLinkId(id54);
 		SignalUtils.createAndAddSignalGroups4Signals(groups, sys);
@@ -343,10 +348,10 @@ public class DgFigure9ScenarioGenerator {
 		//signal system 7
 		sys = systems.getFactory().createSignalSystemData(id7);
 		systems.addSignalSystemData(sys);
-		signal = systems.getFactory().createSignalData(id1);
+		signal = systems.getFactory().createSignalData(Id.create(id1, Signal.class));
 		sys.addSignalData(signal);
 		signal.setLinkId(id27);
-		signal = systems.getFactory().createSignalData(id2);
+		signal = systems.getFactory().createSignalData(Id.create(id2, Signal.class));
 		sys.addSignalData(signal);
 		signal.setLinkId(id87);
 		SignalUtils.createAndAddSignalGroups4Signals(groups, sys);
@@ -354,10 +359,10 @@ public class DgFigure9ScenarioGenerator {
 		//signal system 8
 		sys = systems.getFactory().createSignalSystemData(id8);
 		systems.addSignalSystemData(sys);
-		signal = systems.getFactory().createSignalData(id1);
+		signal = systems.getFactory().createSignalData(Id.create(id1, Signal.class));
 		sys.addSignalData(signal);
 		signal.setLinkId(id78);
-		signal = systems.getFactory().createSignalData(id2);
+		signal = systems.getFactory().createSignalData(Id.create(id2, Signal.class));
 		sys.addSignalData(signal);
 		signal.setLinkId(id58);
 		SignalUtils.createAndAddSignalGroups4Signals(groups, sys);
@@ -372,12 +377,12 @@ public class DgFigure9ScenarioGenerator {
 		//lanes for link 12
 		LanesToLinkAssignment11 lanesForLink12 = factory.createLanesToLinkAssignment(id12);
 		lanes.addLanesToLinkAssignment(lanesForLink12);
-		LaneData11 link12lane1 = factory.createLane(id1);
+		LaneData11 link12lane1 = factory.createLane(Id.create(id1, Lane.class));
 		lanesForLink12.addLane(link12lane1);
 		link12lane1.addToLinkId(id23);
 		link12lane1.setStartsAtMeterFromLinkEnd(laneLenght);
 
-		LaneData11 link12lane2 = factory.createLane(id2);
+		LaneData11 link12lane2 = factory.createLane(Id.create(id2, Lane.class));
 		lanesForLink12.addLane(link12lane2);
 		link12lane2.addToLinkId(id27);
 		link12lane2.setStartsAtMeterFromLinkEnd(laneLenght);
@@ -385,12 +390,12 @@ public class DgFigure9ScenarioGenerator {
 		//lanes for link 65
 		LanesToLinkAssignment11 lanesForLink65 = factory.createLanesToLinkAssignment(id65);
 		lanes.addLanesToLinkAssignment(lanesForLink65);
-		LaneData11 link65lane1 = factory.createLane(id1);
+		LaneData11 link65lane1 = factory.createLane(Id.create(id1, Lane.class));
 		lanesForLink65.addLane(link65lane1);
 		link65lane1.addToLinkId(id54);
 		link65lane1.setStartsAtMeterFromLinkEnd(laneLenght);
 
-		LaneData11 link65lane2 = factory.createLane(id2);
+		LaneData11 link65lane2 = factory.createLane(Id.create(id2, Lane.class));
 		lanesForLink65.addLane(link65lane2);
 		link65lane2.addToLinkId(id58);
 		link65lane2.setStartsAtMeterFromLinkEnd(laneLenght);
@@ -414,92 +419,92 @@ public class DgFigure9ScenarioGenerator {
 		((NetworkImpl)net).setEffectiveLaneWidth(1.0);
 		NetworkFactory fac = net.getFactory();
 		double scale = 300.0;
-		net.addNode(fac.createNode(id1, sc.createCoord(0, 0)));
-		net.addNode(fac.createNode(id2, sc.createCoord(1.0*scale, 0)));
-		net.addNode(fac.createNode(id3, sc.createCoord(2.0*scale, 1.0*scale)));
-		net.addNode(fac.createNode(id4, sc.createCoord(3.0*scale, 1.0*scale)));
-		net.addNode(fac.createNode(id5, sc.createCoord(4.0*scale, 0)));
-		net.addNode(fac.createNode(id6, sc.createCoord(5.0*scale, 0)));
-		net.addNode(fac.createNode(id7, sc.createCoord(2.0*scale, -1.0*scale)));
-		net.addNode(fac.createNode(id8, sc.createCoord(3.0*scale, -1.0*scale)));
-		Link l = fac.createLink(id12, id1, id2);
+		net.addNode(fac.createNode(Id.create(1, Node.class), sc.createCoord(0, 0)));
+		net.addNode(fac.createNode(Id.create(2, Node.class), sc.createCoord(1.0*scale, 0)));
+		net.addNode(fac.createNode(Id.create(3, Node.class), sc.createCoord(2.0*scale, 1.0*scale)));
+		net.addNode(fac.createNode(Id.create(4, Node.class), sc.createCoord(3.0*scale, 1.0*scale)));
+		net.addNode(fac.createNode(Id.create(5, Node.class), sc.createCoord(4.0*scale, 0)));
+		net.addNode(fac.createNode(Id.create(6, Node.class), sc.createCoord(5.0*scale, 0)));
+		net.addNode(fac.createNode(Id.create(7, Node.class), sc.createCoord(2.0*scale, -1.0*scale)));
+		net.addNode(fac.createNode(Id.create(8, Node.class), sc.createCoord(3.0*scale, -1.0*scale)));
+		Link l = fac.createLink(id12, Id.create(id1, Node.class), Id.create(id2, Node.class));
 		l.setCapacity(capacity);
 		l.setFreespeed(fs);
 		l.setLength(linkLength);
 		net.addLink(l);
-		l = fac.createLink(id21, id2, id1);
-		l.setCapacity(capacity);
-		l.setFreespeed(fs);
-		l.setLength(linkLength);
-		l.setNumberOfLanes(2.0);
-		net.addLink(l);
-		l = fac.createLink(id23, id2, id3);
-		l.setCapacity(capacity);
-		l.setFreespeed(fs);
-		l.setLength(linkLength);
-		net.addLink(l);
-		l = fac.createLink(id32, id3, id2);
-		l.setCapacity(capacity);
-		l.setFreespeed(fs);
-		l.setLength(linkLength);
-		net.addLink(l);
-		l = fac.createLink(id34, id3, id4);
-		l.setCapacity(capacity);
-		l.setFreespeed(fs);
-		l.setLength(linkLength);
-		net.addLink(l);
-		l = fac.createLink(id43, id4, id3);
-		l.setCapacity(capacity);
-		l.setFreespeed(fs);
-		l.setLength(linkLength);
-		net.addLink(l);
-		l = fac.createLink(id45, id4, id5);
-		l.setCapacity(capacity);
-		l.setFreespeed(fs);
-		l.setLength(linkLength);
-		net.addLink(l);
-		l = fac.createLink(id54, id5, id4);
-		l.setCapacity(capacity);
-		l.setFreespeed(fs);
-		l.setLength(linkLength);
-		net.addLink(l);
-		l = fac.createLink(id56, id5, id6);
+		l = fac.createLink(id21, Id.create(id2, Node.class), Id.create(id1, Node.class));
 		l.setCapacity(capacity);
 		l.setFreespeed(fs);
 		l.setLength(linkLength);
 		l.setNumberOfLanes(2.0);
 		net.addLink(l);
-		l = fac.createLink(id65, id6, id5);
+		l = fac.createLink(id23, Id.create(id2, Node.class), Id.create(id3, Node.class));
 		l.setCapacity(capacity);
 		l.setFreespeed(fs);
 		l.setLength(linkLength);
 		net.addLink(l);
-		l = fac.createLink(id27, id2, id7);
+		l = fac.createLink(id32, Id.create(id3, Node.class), Id.create(id2, Node.class));
 		l.setCapacity(capacity);
 		l.setFreespeed(fs);
 		l.setLength(linkLength);
 		net.addLink(l);
-		l = fac.createLink(id72, id7, id2);
+		l = fac.createLink(id34, Id.create(id3, Node.class), Id.create(id4, Node.class));
 		l.setCapacity(capacity);
 		l.setFreespeed(fs);
 		l.setLength(linkLength);
 		net.addLink(l);
-		l = fac.createLink(id78, id7, id8);
+		l = fac.createLink(id43, Id.create(id4, Node.class), Id.create(id3, Node.class));
 		l.setCapacity(capacity);
 		l.setFreespeed(fs);
 		l.setLength(linkLength);
 		net.addLink(l);
-		l = fac.createLink(id87, id8, id7);
+		l = fac.createLink(id45, Id.create(id4, Node.class), Id.create(id5, Node.class));
 		l.setCapacity(capacity);
 		l.setFreespeed(fs);
 		l.setLength(linkLength);
 		net.addLink(l);
-		l = fac.createLink(id85, id8, id5);
+		l = fac.createLink(id54, Id.create(id5, Node.class), Id.create(id4, Node.class));
 		l.setCapacity(capacity);
 		l.setFreespeed(fs);
 		l.setLength(linkLength);
 		net.addLink(l);
-		l = fac.createLink(id58, id5, id8);
+		l = fac.createLink(id56, Id.create(id5, Node.class), Id.create(id6, Node.class));
+		l.setCapacity(capacity);
+		l.setFreespeed(fs);
+		l.setLength(linkLength);
+		l.setNumberOfLanes(2.0);
+		net.addLink(l);
+		l = fac.createLink(id65, Id.create(id6, Node.class), Id.create(id5, Node.class));
+		l.setCapacity(capacity);
+		l.setFreespeed(fs);
+		l.setLength(linkLength);
+		net.addLink(l);
+		l = fac.createLink(id27, Id.create(id2, Node.class), Id.create(id7, Node.class));
+		l.setCapacity(capacity);
+		l.setFreespeed(fs);
+		l.setLength(linkLength);
+		net.addLink(l);
+		l = fac.createLink(id72, Id.create(id7, Node.class), Id.create(id2, Node.class));
+		l.setCapacity(capacity);
+		l.setFreespeed(fs);
+		l.setLength(linkLength);
+		net.addLink(l);
+		l = fac.createLink(id78, Id.create(id7, Node.class), Id.create(id8, Node.class));
+		l.setCapacity(capacity);
+		l.setFreespeed(fs);
+		l.setLength(linkLength);
+		net.addLink(l);
+		l = fac.createLink(id87, Id.create(id8, Node.class), Id.create(id7, Node.class));
+		l.setCapacity(capacity);
+		l.setFreespeed(fs);
+		l.setLength(linkLength);
+		net.addLink(l);
+		l = fac.createLink(id85, Id.create(id8, Node.class), Id.create(id5, Node.class));
+		l.setCapacity(capacity);
+		l.setFreespeed(fs);
+		l.setLength(linkLength);
+		net.addLink(l);
+		l = fac.createLink(id58, Id.create(id5, Node.class), Id.create(id8, Node.class));
 		l.setCapacity(capacity);
 		l.setFreespeed(fs);
 		l.setLength(linkLength);
@@ -512,30 +517,30 @@ public class DgFigure9ScenarioGenerator {
 	}
 
 	private void initIds() {
-		this.id1 = new IdImpl("1");
-		this.id2 = new IdImpl("2");
-		this.id3 = new IdImpl("3");
-		this.id4 = new IdImpl("4");
-		this.id5 = new IdImpl("5");
-		this.id6 = new IdImpl("6");
-		this.id7 = new IdImpl("7");
-		this.id8 = new IdImpl("8");
-		this.id12 = new IdImpl("12");
-		this.id21 = new IdImpl("21");
-		this.id23 = new IdImpl("23");
-		this.id32 = new IdImpl("32");
-		this.id34 = new IdImpl("34");
-		this.id43 = new IdImpl("43");
-		this.id45 = new IdImpl("45");
-		this.id54 = new IdImpl("54");
-		this.id56 = new IdImpl("56");
-		this.id65 = new IdImpl("65");
-		this.id27 = new IdImpl("27");
-		this.id72 = new IdImpl("72");
-		this.id78 = new IdImpl("78");
-		this.id87 = new IdImpl("87");
-		this.id58 = new IdImpl("58");
-		this.id85 = new IdImpl("85");
+		this.id1 = Id.create("1", SignalSystem.class);
+		this.id2 = Id.create("2", SignalSystem.class);
+		this.id3 = Id.create("3", SignalSystem.class);
+		this.id4 = Id.create("4", SignalSystem.class);
+		this.id5 = Id.create("5", SignalSystem.class);
+		this.id6 = Id.create("6", SignalSystem.class);
+		this.id7 = Id.create("7", SignalSystem.class);
+		this.id8 = Id.create("8", SignalSystem.class);
+		this.id12 = Id.create("12", Link.class);
+		this.id21 = Id.create("21", Link.class);
+		this.id23 = Id.create("23", Link.class);
+		this.id32 = Id.create("32", Link.class);
+		this.id34 = Id.create("34", Link.class);
+		this.id43 = Id.create("43", Link.class);
+		this.id45 = Id.create("45", Link.class);
+		this.id54 = Id.create("54", Link.class);
+		this.id56 = Id.create("56", Link.class);
+		this.id65 = Id.create("65", Link.class);
+		this.id27 = Id.create("27", Link.class);
+		this.id72 = Id.create("72", Link.class);
+		this.id78 = Id.create("78", Link.class);
+		this.id87 = Id.create("87", Link.class);
+		this.id58 = Id.create("58", Link.class);
+		this.id85 = Id.create("85", Link.class);
 	}
 	
 	public static void main(String[] args) {

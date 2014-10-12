@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.network.NetworkWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -69,7 +68,7 @@ public class DgOsmJunctionsPostprocessing {
 		Map<String, Set<Node>> signalSystemId2NodesMap = this.getSignalSystemId2NodeMap(signalNodeCollector, signalSystemKey, network);
 		
 		
-		Map<Id, Set<Id>> removedLinkIdToLinkIdsMap = this.removeJunctions(network, signalSystemId2NodesMap);
+		Map<Id<Link>, Set<Id<Link>>> removedLinkIdToLinkIdsMap = this.removeJunctions(network, signalSystemId2NodesMap);
 		
 		LaneDefinitions20 lanes = this.handleLanes((LaneDefinitions20)scenario.getScenarioElement(LaneDefinitions20.ELEMENT_NAME), removedLinkIdToLinkIdsMap);
 		
@@ -78,23 +77,23 @@ public class DgOsmJunctionsPostprocessing {
 		log.info("done!");
 	}
 	
-	private LaneDefinitions20 handleLanes(LaneDefinitions20 laneDefinitions20, Map<Id, Set<Id>> removedLinkIdToLinkIdsMap) {
+	private LaneDefinitions20 handleLanes(LaneDefinitions20 laneDefinitions20, Map<Id<Link>, Set<Id<Link>>> removedLinkIdToLinkIdsMap) {
 		for (LanesToLinkAssignment20 l2l : laneDefinitions20.getLanesToLinkAssignments().values()){
 			if (removedLinkIdToLinkIdsMap.containsKey(l2l.getLinkId())){
 				throw new IllegalStateException("Link Id " + l2l.getLinkId() + " was removed but has lanes attached, can't handle this automatically!");
 			}
 			for (LaneData20 lane : l2l.getLanes().values()){
-				Set<Id> toLinkIds2Remove = new HashSet<Id>();
+				Set<Id<Link>> toLinkIds2Remove = new HashSet<>();
 				if (lane.getToLinkIds() != null && !lane.getToLinkIds().isEmpty()){
-					for (Id toLinkId : lane.getToLinkIds()){
+					for (Id<Link> toLinkId : lane.getToLinkIds()){
 						if (removedLinkIdToLinkIdsMap.containsKey(toLinkId)){
 							toLinkIds2Remove.add(toLinkId);
 						}
 					}
-					for (Id id : toLinkIds2Remove){
+					for (Id<Link> id : toLinkIds2Remove){
 						lane.getToLinkIds().remove(id);
-						Set<Id> toLinkIds = removedLinkIdToLinkIdsMap.get(id);
-						for (Id toLinkId : toLinkIds){
+						Set<Id<Link>> toLinkIds = removedLinkIdToLinkIdsMap.get(id);
+						for (Id<Link> toLinkId : toLinkIds){
 							if (!removedLinkIdToLinkIdsMap.containsKey(toLinkId) && !lane.getToLinkIds().contains(toLinkId)){
 								lane.getToLinkIds().add(toLinkId);
 							}
@@ -106,8 +105,8 @@ public class DgOsmJunctionsPostprocessing {
 		return laneDefinitions20;
 	}
 
-	private Map<Id, Set<Id>> removeJunctions(Network network, Map<String, Set<Node>> signalSystemId2NodesMap){
-		Map<Id, Set<Id>> removedLinks = new HashMap<Id, Set<Id>>();
+	private Map<Id<Link>, Set<Id<Link>>> removeJunctions(Network network, Map<String, Set<Node>> signalSystemId2NodesMap){
+		Map<Id<Link>, Set<Id<Link>>> removedLinks = new HashMap<>();
 		for (String signalSystem : signalSystemId2NodesMap.keySet()){
 			Set<Node> signalizedNodes = signalSystemId2NodesMap.get(signalSystem);
 			if (signalizedNodes.size() > 1){
@@ -120,12 +119,12 @@ public class DgOsmJunctionsPostprocessing {
 				Set<Link> linksBetweenSignalizedNodes = this.getLinksBetweenSignalizedNodes(signalizedNodes);
 				//create and add new node
 				Coord coord = this.getCoordBetweenSignalizedNodes(signalizedNodes);
-				Id id = this.getId4NewNode4SignalizedNodes(signalizedNodes);
+				Id<Node> id = this.getId4NewNode4SignalizedNodes(signalizedNodes);
 				Node newNode = network.getFactory().createNode(id, coord);
 				network.addNode(newNode);
 				//remove the links between the signalized nodes
 				for (Link link : linksBetweenSignalizedNodes){
-					Set<Id> set = new HashSet<Id>();
+					Set<Id<Link>> set = new HashSet<>();
 					for (Link toLink  : link.getToNode().getOutLinks().values()){ //persist the outlinks for lane postprocessing
 						if (!linksBetweenSignalizedNodes.contains(toLink)){
 							set.add(toLink.getId());
@@ -152,13 +151,13 @@ public class DgOsmJunctionsPostprocessing {
 	}
 	
 	
-	private Id getId4NewNode4SignalizedNodes(Set<Node> signalizedNodes){
+	private Id<Node> getId4NewNode4SignalizedNodes(Set<Node> signalizedNodes){
 		StringBuilder builder = new StringBuilder();
 		for (Node node : signalizedNodes){
 			builder.append(node.getId().toString() + "_");
 		}
 		String id = builder.toString();
-		return new IdImpl(id.substring(0, id.length() -1));
+		return Id.create(id.substring(0, id.length() -1), Node.class);
 	}
 	
 	
@@ -187,7 +186,7 @@ public class DgOsmJunctionsPostprocessing {
 //				log.error("  tags: " + tag);
 				if (tag.getKey().equalsIgnoreCase(signalSystemKey)){
 					String signalSystemId = tag.getValue();
-					Node matsimNode = network.getNodes().get(new IdImpl(node.getId()));
+					Node matsimNode = network.getNodes().get(Id.create(node.getId(), Node.class));
 					if (matsimNode == null){
 						log.error("Matsim network has no node with id " + node.getId() + " of signal system id " + signalSystemId);
 						log.error("Removing node from postprocessing.");

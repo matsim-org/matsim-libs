@@ -23,15 +23,17 @@ package playground.dgrether.cmcf;
 import java.util.Arrays;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -44,7 +46,6 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.dgrether.DgPaths;
-import playground.dgrether.utils.IdFactory;
 import playground.dgrether.utils.MatsimIo;
 
 /**
@@ -137,13 +138,13 @@ public class CMCFScenarioGeneratorNoReroute {
 		// configure strategies for replanning
 		this.config.strategy().setMaxAgentPlanMemorySize(4);
 		StrategyConfigGroup.StrategySettings selectExp = new StrategyConfigGroup.StrategySettings(
-				IdFactory.get(1));
+				Id.create(1, StrategySettings.class));
 		selectExp.setProbability(0.9);
 		selectExp.setModuleName("SelectExpBeta");
 		this.config.strategy().addStrategySettings(selectExp);
 
 		StrategyConfigGroup.StrategySettings reRoute = new StrategyConfigGroup.StrategySettings(
-				IdFactory.get(2));
+				Id.create(2, StrategySettings.class));
 		reRoute.setProbability(0.10);
 		reRoute.setModuleName("ReRoute");
 		reRoute.setDisableAfter(iterations);
@@ -175,11 +176,11 @@ public class CMCFScenarioGeneratorNoReroute {
 		this.plans = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
 		int firstHomeEndTime = 0;// 6 * 3600;
 		int homeEndTime = firstHomeEndTime;
-		Link l1 = this.network.getLinks().get(IdFactory.get(1));
-		Link l6 = this.network.getLinks().get(IdFactory.get(6));
+		Link l1 = this.network.getLinks().get(Id.create(1, Link.class));
+		Link l6 = this.network.getLinks().get(Id.create(6, Link.class));
 
 		for (int i = 1; i <= 7200; i++) {
-			PersonImpl p = new PersonImpl(new IdImpl(i));
+			PersonImpl p = new PersonImpl(Id.create(i, Person.class));
 			PlanImpl plan = new org.matsim.core.population.PlanImpl(p);
 			p.addPlan(plan);
 			// home % 2

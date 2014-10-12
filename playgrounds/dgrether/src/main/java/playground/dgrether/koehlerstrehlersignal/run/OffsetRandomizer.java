@@ -22,7 +22,7 @@ package playground.dgrether.koehlerstrehlersignal.run;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlDataImpl;
@@ -30,6 +30,7 @@ import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlReader20;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlWriter20;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalSystemControllerData;
+import org.matsim.signalsystems.model.SignalPlan;
 
 import playground.dgrether.DgPaths;
 
@@ -52,7 +53,7 @@ public class OffsetRandomizer {
 		Random random = MatsimRandom.getLocalInstance();
 		
 		for (SignalSystemControllerData controlerData : data.getSignalSystemControllerDataBySystemId().values()) {
-			SignalPlanData plan = controlerData.getSignalPlanData().get(new IdImpl("1"));
+			SignalPlanData plan = controlerData.getSignalPlanData().get(Id.create("1", SignalPlan.class));
 			int cycle = plan.getCycleTime();
 			log.debug("cycle: " + cycle);
 			double r = random.nextDouble();

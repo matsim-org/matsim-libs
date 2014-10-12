@@ -22,7 +22,6 @@ package playground.dgrether.analysis.charts;
 import java.awt.BasicStroke;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.jfree.chart.ChartColor;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.ValueAxis;
@@ -31,7 +30,6 @@ import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.utils.collections.Tuple;
 
@@ -47,7 +45,6 @@ import playground.dgrether.analysis.population.DgPersonDataIncomeComparator;
  */
 public class DgAvgDeltaUtilsModeQuantilesChart implements DgXYChart {
 	
-	private static final Logger log = Logger.getLogger(DgAvgDeltaUtilsModeQuantilesChart.class);
 	protected DgAnalysisPopulation ana;
 	
 	protected int nQuantiles = 10;
@@ -59,14 +56,14 @@ public class DgAvgDeltaUtilsModeQuantilesChart implements DgXYChart {
 	private DgXYLabelGenerator labelGenerator;
 	private int threshold;
 
-	public DgAvgDeltaUtilsModeQuantilesChart(DgAnalysisPopulation ana, int threshold, Id runId1, Id runId2) {
+	public DgAvgDeltaUtilsModeQuantilesChart(DgAnalysisPopulation ana, int threshold, String runId1, String runId2) {
 		this.ana = ana;
 		this.threshold = threshold;
 		this.labelGenerator = new DgXYLabelGenerator();
 		this.dataset = this.createDatasets(runId1, runId2);
 	}
 	
-	private XYSeriesCollection createDatasets(Id runId1, Id runId2) {
+	private XYSeriesCollection createDatasets(String runId1, String runId2) {
 		List<DgAnalysisPopulation> quantiles = this.ana.getQuantiles(this.nQuantiles, new DgPersonDataIncomeComparator());
 		XYSeries car2carSeries = new XYSeries("Mean "+  '\u0394' + "Utility Car2Car", false, true);
 		XYSeries pt2ptSeries = new XYSeries("Mean "+  '\u0394' + "Utility Pt2Pt", false, true);
@@ -80,10 +77,10 @@ public class DgAvgDeltaUtilsModeQuantilesChart implements DgXYChart {
 			xLoc = quantile /this.nQuantiles;
 			xLoc*=100.0;
 			DgModeSwitchPlanTypeAnalyzer modeSwitchAnalysis = new DgModeSwitchPlanTypeAnalyzer(p, runId1, runId2);
-			DgAnalysisPopulation car2carPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(TransportMode.car, TransportMode.car));
-			DgAnalysisPopulation pt2ptPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(TransportMode.pt, TransportMode.pt));
-			DgAnalysisPopulation pt2carPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(TransportMode.pt, TransportMode.car));
-			DgAnalysisPopulation car2ptPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(TransportMode.car, TransportMode.pt));
+			DgAnalysisPopulation car2carPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple<String, String>(TransportMode.car, TransportMode.car));
+			DgAnalysisPopulation pt2ptPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple<String, String>(TransportMode.pt, TransportMode.pt));
+			DgAnalysisPopulation pt2carPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple<String, String>(TransportMode.pt, TransportMode.car));
+			DgAnalysisPopulation car2ptPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple<String, String>(TransportMode.car, TransportMode.pt));
 			if ((car2carPop  != null) && (car2carPop.getPersonData().size() >= threshold)) {
 				avgUtil = car2carPop.calcAverageScoreDifference(runId1, runId2);
 				car2carSeries.add(xLoc, avgUtil);
@@ -109,6 +106,7 @@ public class DgAvgDeltaUtilsModeQuantilesChart implements DgXYChart {
 		return ds;
 	}
 
+	@Override
 	public JFreeChart createChart() {
 		XYPlot plot = new XYPlot();
 		ValueAxis xAxis = this.axisBuilder.createValueAxis("% of Population Sorted by Income");
@@ -137,6 +135,7 @@ public class DgAvgDeltaUtilsModeQuantilesChart implements DgXYChart {
 		return chart;
 	}
 	
+	@Override
 	public XYSeriesCollection getDataset() {
 		return dataset;
 	}

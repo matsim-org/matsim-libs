@@ -30,7 +30,6 @@ import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
-import org.matsim.api.core.v01.Id;
 
 import playground.dgrether.analysis.charts.utils.DgColorScheme;
 import playground.dgrether.analysis.population.DgAnalysisPopulation;
@@ -49,11 +48,11 @@ public class DgModalSplitQuantilesChart {
 	private String xLabel = "Income [CHF / Year] up to...";
 	private String yLabel = "% of Travellers";
 
-	private Id runId; 
+	private String runId; 
 	
 	private DgAxisBuilder axisBuilder = new DgDefaultAxisBuilder();
 	
-	public DgModalSplitQuantilesChart(DgAnalysisPopulation ana, Id runid) {
+	public DgModalSplitQuantilesChart(DgAnalysisPopulation ana, String runid) {
 		this.ana = ana;
 		this.runId = runid;
 		this.ana.calculateMinMaxIncome();

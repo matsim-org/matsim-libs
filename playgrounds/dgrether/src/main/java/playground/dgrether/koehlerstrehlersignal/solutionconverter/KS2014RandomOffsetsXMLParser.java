@@ -10,8 +10,6 @@ import java.util.Map;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -66,9 +64,9 @@ public class KS2014RandomOffsetsXMLParser extends MatsimXmlParser {
 			this.randomOffsets.put(currentList, new ArrayList<KS2010CrossingSolution>());
 		}
 		else if (elementName.equals(CROSSING)){
-			Id crossingId = new IdImpl(atts.getValue(ID));
+			String crossingId = atts.getValue(ID);
 			int offsetSeconds = Integer.parseInt(atts.getValue(OFFSET));
-			Id programId = new IdImpl(atts.getValue(PROG)); 
+			String programId = atts.getValue(PROG); 
 			KS2010CrossingSolution crossing = new KS2010CrossingSolution(crossingId);
 			crossing.addOffset4Program(programId, offsetSeconds);
 			this.randomOffsets.get(currentList).add(crossing);

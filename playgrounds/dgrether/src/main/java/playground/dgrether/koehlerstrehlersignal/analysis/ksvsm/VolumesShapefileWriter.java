@@ -54,7 +54,7 @@ public class VolumesShapefileWriter{
 		this.crs = crs;
 	}
 
-	public void writeShape(String outfile, Map<Id, Double> ks2010Volumes, Map<Id, Double> matsimVolumes, double scalingFactor){
+	public void writeShape(String outfile, Map<Id<Link>, Double> ks2010Volumes, Map<Id<Link>, Double> matsimVolumes, double scalingFactor){
 		PolygonFeatureFactory factory = createFeatureType(this.crs);
 		GeometryFactory geofac = new GeometryFactory();
 		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();

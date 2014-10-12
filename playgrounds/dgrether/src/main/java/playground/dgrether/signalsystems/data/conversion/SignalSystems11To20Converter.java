@@ -29,7 +29,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.jaxb.signalgroups20.XMLSignalGroupType;
 import org.matsim.jaxb.signalgroups20.XMLSignalGroups;
@@ -48,6 +48,7 @@ import org.matsim.lanes.data.v11.LaneDefinitions11;
 import org.matsim.lanes.data.v11.LaneDefinitions11Impl;
 import org.matsim.lanes.data.v11.LaneDefinitionsReader11;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.signalsystems.MatsimSignalSystemsReader;
 import org.matsim.signalsystems.SignalSystemsReader11;
 import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsWriter20;
@@ -167,7 +168,7 @@ public class SignalSystems11To20Converter {
 			}
 			//set the turning move restrictions
 			if (signalgroupdef11.getToLink() != null){
-				LanesToLinkAssignment11 l2link = laneDefs.getLanesToLinkAssignments().get(new IdImpl(signal20.getLinkIdRef()));
+				LanesToLinkAssignment11 l2link = laneDefs.getLanesToLinkAssignments().get(Id.create(signal20.getLinkIdRef(), Link.class));
 				if (!this.checkSignalGroupToLinkEqualLaneToLink(signalgroupdef11, l2link)){
 					signal20.setTurningMoveRestrictions(signals20ObjectFactory.createXMLSignalTypeXMLTurningMoveRestrictions());
 					for (XMLIdRefType toLinkId : signalgroupdef11.getToLink()){
@@ -194,14 +195,14 @@ public class SignalSystems11To20Converter {
 	private boolean checkSignalGroupToLinkEqualLaneToLink(
 			XMLSignalGroupDefinitionType signalGroup, LanesToLinkAssignment11 l2link) {
 		List<XMLIdRefType> sgToLinkIdRefTypes = signalGroup.getToLink();
-		Set<Id> sgToLinkIds = new HashSet<Id>();
+		Set<Id<Link>> sgToLinkIds = new HashSet<>();
 		for (XMLIdRefType idreftype : sgToLinkIdRefTypes){
-			sgToLinkIds.add(new IdImpl(idreftype.getRefId()));
+			sgToLinkIds.add(Id.create(idreftype.getRefId(), Link.class));
 		}
 		
-		Set<Id> laneToLinksIds = new HashSet<Id>();
+		Set<Id<Link>> laneToLinksIds = new HashSet<>();
 		for (XMLIdRefType sgLaneId : signalGroup.getLane()){
-			LaneData11 lane = l2link.getLanes().get(new IdImpl(sgLaneId.getRefId()));
+			LaneData11 lane = l2link.getLanes().get(Id.create(sgLaneId.getRefId(), Lane.class));
 			laneToLinksIds.addAll(lane.getToLinkIds());
 		}
 		

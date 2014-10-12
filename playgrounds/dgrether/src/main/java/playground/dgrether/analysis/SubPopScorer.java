@@ -25,9 +25,10 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -59,12 +60,12 @@ public class SubPopScorer {
 		this.scenario = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(config);
 		this.scenario.loadScenario();
 		this.linkIds = linkIds;
-		Set<Id> idSet = filterPlans(this.scenario.getScenario().getPopulation());
+		Set<Id<Person>> idSet = filterPlans(this.scenario.getScenario().getPopulation());
 		calculateScore(idSet, this.scenario.getScenario().getConfig());
 
 	}
 
-  private void calculateScore(Set<Id> idSet, Config config) {
+  private void calculateScore(Set<Id<Person>> idSet, Config config) {
   	String eventsFilePath = null /*filename not specified*/;
   	EventsFilterManagerImpl events = new EventsFilterManagerImpl();
   	MatsimEventsReader reader = new MatsimEventsReader(events);
@@ -81,16 +82,16 @@ public class SubPopScorer {
   	log.info("Score of subpopulation: " + scorer.getAveragePlanPerformance());
 	}
 
-	private Set<Id> filterPlans(Population plans) {
+	private Set<Id<Person>> filterPlans(Population plans) {
 		PlanCollectFromAlgorithm collector = new PlanCollectFromAlgorithm();
 		RouteLinkFilter linkFilter = new RouteLinkFilter(collector);
 		for (String id : this.linkIds) {
-			linkFilter.addLink(new IdImpl(id));
+			linkFilter.addLink(Id.create(id, Link.class));
 		}
 		SelectedPlanFilter selectedPlanFilter = new SelectedPlanFilter(linkFilter);
 		selectedPlanFilter.run(plans);
 		Set<Plan> planSet = collector.getPlans();
-		Set<Id> idSet = new HashSet<Id>(planSet.size());
+		Set<Id<Person>> idSet = new HashSet<>(planSet.size());
 		for (Plan p : planSet) {
 			idSet.add(p.getPerson().getId());
 		}

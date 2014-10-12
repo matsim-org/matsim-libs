@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
@@ -56,7 +57,7 @@ public class DgAnalysisPopulationReader {
 	public DgAnalysisPopulationReader() {
 	}
 
-	public DgAnalysisPopulation readAnalysisPopulation(DgAnalysisPopulation analysisPopulation, final Id runId, final String networkPath, final String firstPlanPath) {
+	public DgAnalysisPopulation readAnalysisPopulation(DgAnalysisPopulation analysisPopulation, final String runId, final String networkPath, final String firstPlanPath) {
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population population;
 		Network net;
@@ -76,7 +77,7 @@ public class DgAnalysisPopulationReader {
 		// new PlanCalcType().run(population);
 		Plan plan;
 		Activity act;
-		for (Id id : population.getPersons().keySet()) {
+		for (Id<Person> id : population.getPersons().keySet()) {
 			if (this.filterList != null){
 				boolean doContinue = false;
 				for (DgAnalysisReaderFilter f : this.filterList){

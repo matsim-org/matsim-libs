@@ -21,7 +21,6 @@ package playground.dgrether.analysis.charts;
 
 import java.awt.BasicStroke;
 
-import org.apache.log4j.Logger;
 import org.jfree.chart.ChartColor;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.ValueAxis;
@@ -29,7 +28,6 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.utils.collections.Tuple;
 
@@ -42,19 +40,17 @@ import playground.dgrether.analysis.population.DgModeSwitchPlanTypeAnalyzer;
  */
 public class DgAvgDeltaUtilsModeGroupChart extends DgAvgDeltaUtilsGroupChart {
 	
-	private static final Logger log = Logger.getLogger(DgAvgDeltaUtilsModeGroupChart.class);
-	
-	public DgAvgDeltaUtilsModeGroupChart(DgAnalysisPopulation ana, int threshold, Id runId1, Id runId2) {
+	public DgAvgDeltaUtilsModeGroupChart(DgAnalysisPopulation ana, int threshold, String runId1, String runId2) {
 		super(ana, threshold, runId1, runId2);
 	}
 
 	@Override
-	protected XYSeriesCollection createDatasets(Id runId1, Id runId2) {
+	protected XYSeriesCollection createDatasets(String runId1, String runId2) {
 		DgModeSwitchPlanTypeAnalyzer modeSwitchAnalysis = new DgModeSwitchPlanTypeAnalyzer(this.ana, runId1, runId2);
-		DgAnalysisPopulation car2carPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(TransportMode.car, TransportMode.car));
-		DgAnalysisPopulation pt2ptPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(TransportMode.pt, TransportMode.pt));
-		DgAnalysisPopulation pt2carPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(TransportMode.pt, TransportMode.car));
-		DgAnalysisPopulation car2ptPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple(TransportMode.car, TransportMode.pt));
+		DgAnalysisPopulation car2carPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple<String, String>(TransportMode.car, TransportMode.car));
+		DgAnalysisPopulation pt2ptPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple<String, String>(TransportMode.pt, TransportMode.pt));
+		DgAnalysisPopulation pt2carPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple<String, String>(TransportMode.pt, TransportMode.car));
+		DgAnalysisPopulation car2ptPop = modeSwitchAnalysis.getPersonsForModeSwitch(new Tuple<String, String>(TransportMode.car, TransportMode.pt));
 		XYSeriesCollection ds = new XYSeriesCollection();
 		ds.addSeries(this.createXYSeries("Mean "+  '\u0394' + "Utility Car2Car", car2carPop, runId1, runId2).getFirst());
 		ds.addSeries(this.createXYSeries("Mean "+  '\u0394' + "Utility Pt2Pt", pt2ptPop, runId1, runId2).getFirst());

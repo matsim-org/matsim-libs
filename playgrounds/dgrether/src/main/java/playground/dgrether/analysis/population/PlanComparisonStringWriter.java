@@ -21,7 +21,6 @@
 package playground.dgrether.analysis.population;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 
 
 /**
@@ -35,11 +34,11 @@ public class PlanComparisonStringWriter {
 	 */
 	private StringBuffer _buffer;
 
-	public PlanComparisonStringWriter(DgAnalysisPopulation pop, Id runId1, Id runId2) {
+	public PlanComparisonStringWriter(DgAnalysisPopulation pop, String runId1, String runId2) {
 		write(pop, runId1, runId2);
 	}
 
-	private void write(DgAnalysisPopulation pc, Id runId1, Id runId2) {
+	private void write(DgAnalysisPopulation pc, String runId1, String runId2) {
 		double score1, score2;
 		String linesep = System.getProperty("line.separator");
 		Coord coordinates;

@@ -35,7 +35,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlDataFactory;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlDataImpl;
@@ -47,6 +46,8 @@ import org.matsim.signalsystems.data.signalcontrol.v20.SignalSystemControllerDat
 import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsData;
 import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsDataImpl;
 import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsReader20;
+import org.matsim.signalsystems.model.SignalPlan;
+import org.matsim.signalsystems.model.SignalSystem;
 import org.xml.sax.SAXException;
 
 import playground.dgrether.DgPaths;
@@ -71,18 +72,18 @@ public class DgSylviaPreprocessData {
 
 	private int minGreenSeconds = 5; //see RILSA pp. 28
 
-	private Set<Id> signalSystemIds = new HashSet<Id>();
+	private Set<Id<SignalSystem>> signalSystemIds = new HashSet<>();
 	
 	private boolean createAll = true;
 	
 	public DgSylviaPreprocessData(){
-//			this.signalSystemIds.add(new IdImpl(1));
-//			this.signalSystemIds.add(new IdImpl(17));
-//			this.signalSystemIds.add(new IdImpl(18));
-//			this.signalSystemIds.add(new IdImpl(28));
-//			this.signalSystemIds.add(new IdImpl(12));
-//			this.signalSystemIds.add(new IdImpl(14));
-		this.signalSystemIds.add(new IdImpl(8));
+//			this.signalSystemIds.add(Id.create(1));
+//			this.signalSystemIds.add(Id.create(17));
+//			this.signalSystemIds.add(Id.create(18));
+//			this.signalSystemIds.add(Id.create(28));
+//			this.signalSystemIds.add(Id.create(12));
+//			this.signalSystemIds.add(Id.create(14));
+		this.signalSystemIds.add(Id.create(8, SignalSystem.class));
 	}
 
 
@@ -145,7 +146,7 @@ public class DgSylviaPreprocessData {
 				log.debug("system: " + controllerData.getSignalSystemId());
 				for (SignalPlanData signalPlan : controllerData.getSignalPlanData().values()){
 					//add a copy of the old plan
-					newControllerData.addSignalPlanData(DgSignalsUtils.copySignalPlanData(signalPlan, new IdImpl(FIXED_TIME_PREFIX + signalPlan.getId().toString()), cd.getFactory()));
+					newControllerData.addSignalPlanData(DgSignalsUtils.copySignalPlanData(signalPlan, Id.create(FIXED_TIME_PREFIX + signalPlan.getId().toString(), SignalPlan.class), cd.getFactory()));
 					newControllerData.addSignalPlanData(this.convertSignalPlanData(signalPlan, cd.getFactory()));
 				}
 			}
@@ -213,7 +214,7 @@ public class DgSylviaPreprocessData {
 	}
 	
 	private SignalPlanData convertSignalPlanData(final SignalPlanData fixedTimePlan, SignalControlDataFactory factory) {
-		SignalPlanData newPlan = DgSignalsUtils.copySignalPlanData(fixedTimePlan, new IdImpl(SYLVIA_PREFIX + fixedTimePlan.getId().toString()), factory);
+		SignalPlanData newPlan = DgSignalsUtils.copySignalPlanData(fixedTimePlan, Id.create(SYLVIA_PREFIX + fixedTimePlan.getId().toString(), SignalPlan.class), factory);
 		List<SignalGroupSettingsData> groupSettingsList = new ArrayList<SignalGroupSettingsData>();
 		groupSettingsList.addAll(newPlan.getSignalGroupSettingsDataByGroupId().values());
 		//filter allGreenSettings

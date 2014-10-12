@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.jfree.chart.ChartColor;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.ValueAxis;
@@ -37,7 +36,6 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.dgrether.analysis.charts.utils.DgColorScheme;
@@ -52,8 +50,6 @@ import playground.dgrether.analysis.population.DgPersonData;
  */
 public class DgAvgDeltaMoneyGroupChart {
 	
-	private static final Logger log = Logger.getLogger(DgAvgDeltaMoneyGroupChart.class);
-	
 	protected DgAnalysisPopulation ana;
 	
 	protected int numberOfClasses = 10;
@@ -66,7 +62,7 @@ public class DgAvgDeltaMoneyGroupChart {
 
 	private LabelGenerator labelGenerator;
 	
-	public DgAvgDeltaMoneyGroupChart(DgAnalysisPopulation ana, int threshold,  Id runId1, Id runId2) {
+	public DgAvgDeltaMoneyGroupChart(DgAnalysisPopulation ana, int threshold,  String runId1, String runId2) {
 		this.ana = ana;
 		this.labelGenerator = new LabelGenerator();
 		this.groupThreshold = threshold;
@@ -74,7 +70,7 @@ public class DgAvgDeltaMoneyGroupChart {
 		this.dataset = this.createDatasets(runId1, runId2);
 	}
 	
-	protected Tuple<XYSeries,List<String>> createXYSeries(String title, DgAnalysisPopulation pop,  Id runId1, Id runId2) {
+	protected Tuple<XYSeries,List<String>> createXYSeries(String title, DgAnalysisPopulation pop,  String runId1, String runId2) {
 		// calculate thresholds for income classes
 		DgIncomeClass[] incomeThresholds = new DgIncomeClass[this.numberOfClasses];
 		DgAnalysisPopulation[] groups = new DgAnalysisPopulation[this.numberOfClasses];
@@ -114,7 +110,7 @@ public class DgAvgDeltaMoneyGroupChart {
 	
 
 	
-	protected XYSeriesCollection createDatasets(Id runId1, Id runId2) {
+	protected XYSeriesCollection createDatasets(String runId1, String runId2) {
 		XYSeriesCollection ds = new XYSeriesCollection();
 		Tuple<XYSeries, List<String>> seriesLabels = this.createXYSeries("Mean "+  '\u0394' + "Delta Money", this.ana, runId1, runId2);
 		ds.addSeries(seriesLabels.getFirst());
@@ -176,6 +172,7 @@ public class DgAvgDeltaMoneyGroupChart {
 			this.labels.put(series, labels);
 		}
 
+		@Override
 		public String generateLabel(XYDataset dataset, int series, int item) {
 			return this.labels.get(series).get(item);
 		}

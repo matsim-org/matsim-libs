@@ -56,7 +56,7 @@ public class KS2010Solution2Matsim {
 		for (KS2010CrossingSolution sol : solutionCrossings){
 			Id mId = idConverter.getSymbolicId(Integer.valueOf(sol.getCrossingId().toString()));
 			Id nodeId = idConverter.convertCrossingId2NodeId(mId);
-			sol.setCrossingId(nodeId);
+			sol.setCrossingId(nodeId.toString());
 			newMap.put(nodeId, sol);
 		}
 		return newMap;
@@ -80,7 +80,7 @@ public class KS2010Solution2Matsim {
 		// overwrite zero offsets with the ones from solutionCrossings
 		for (KS2010CrossingSolution solution : solutionCrossings) {
 			if (! solution.getProgramIdOffsetMap().containsKey(M2KS2010NetworkConverter.DEFAULT_PROGRAM_ID)) {
-				Id programId = solution.getProgramIdOffsetMap().keySet().iterator().next();
+				String programId = solution.getProgramIdOffsetMap().keySet().iterator().next();
 				if (! signalControl.getSignalSystemControllerDataBySystemId().containsKey(programId)) {
 					throw new IllegalStateException(" something's wrong");
 				}
@@ -107,7 +107,7 @@ public class KS2010Solution2Matsim {
 			KS2010CrossingSolution solutionCrossing = solutionCrossingByIdMap.get(controllerData.getSignalSystemId());
 			log.debug("  solution crossing : " + solutionCrossing.getCrossingId());
 			for (SignalPlanData signalPlan : controllerData.getSignalPlanData().values()){
-				Integer offset = solutionCrossing.getProgramIdOffsetMap().get(signalPlan.getId());
+				Integer offset = solutionCrossing.getProgramIdOffsetMap().get(signalPlan.getId().toString());
 				log.debug("  processing plan: " + signalPlan.getId() + " offset: " + offset);
 				signalPlan.setOffset(offset);
 			}

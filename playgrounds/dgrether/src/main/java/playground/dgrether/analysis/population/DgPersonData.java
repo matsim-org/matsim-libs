@@ -25,6 +25,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.households.Income;
 
 /**
@@ -37,16 +38,16 @@ public class DgPersonData {
 
 	private Activity homeActivity;
 
-	private Map<Id, DgPlanData> planData;
+	private Map<String, DgPlanData> planData; // run number
 
-	private Id personId;
+	private Id<Person> personId;
 
 	private Income income;
 	
 	private Double toll = null;
 
 	public DgPersonData() {
-		this.planData = new HashMap<Id, DgPlanData>();
+		this.planData = new HashMap<String, DgPlanData>();
 	}
 
 /**
@@ -71,16 +72,16 @@ public class DgPersonData {
 	}
 
 
-	public Map<Id, DgPlanData> getPlanData() {
+	public Map<String, DgPlanData> getPlanData() {
 		return planData;
 	}
 
-	public Id getPersonId() {
+	public Id<Person> getPersonId() {
 		return personId;
 	}
 
 
-	public void setPersonId(Id personId) {
+	public void setPersonId(Id<Person> personId) {
 		this.personId = personId;
 	}
 
@@ -95,7 +96,7 @@ public class DgPersonData {
 	/**
 	 * Score difference plan runid 2 - runid 1
 	 */
-	public double getDeltaScore(Id runId1, Id runId2) {
+	public double getDeltaScore(String runId1, String runId2) {
 		DgPlanData plan1 = this.planData.get(runId1);
 		DgPlanData plan2 = this.planData.get(runId2);
 		if ((plan1 != null) && (plan2 != null)) {

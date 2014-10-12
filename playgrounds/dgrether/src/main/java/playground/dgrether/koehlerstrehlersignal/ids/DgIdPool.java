@@ -28,7 +28,6 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 
@@ -45,9 +44,9 @@ public class DgIdPool {
 	private Map<String, Integer> ids = new HashMap<String, Integer>();
 	private Map<Integer, String> intStringMap = new HashMap<Integer, String>();
 	
-	public Id createId(String idString) {
+	public <T> Id<T> createId(String idString, Class<T> type) {
 		Integer i = this.createIntegerId(idString);
-		return new IdImpl(Integer.toString(i));
+		return Id.create(Integer.toString(i), type);
 	}
 	
 	public Integer createIntegerId(String idString) {

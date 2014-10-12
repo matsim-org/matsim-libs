@@ -31,8 +31,9 @@ import net.opengis.kml._2.ObjectFactory;
 import net.opengis.kml._2.ScreenOverlayType;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -124,8 +125,8 @@ public class KmlPlansVisualizer {
 
 		RouteLinkFilter linkFilter = new RouteLinkFilter(collector);
 		for (Tuple<String, String> t : this.linkTuples) {
-			linkFilter.addLink(new IdImpl(t.getFirst()));
-			linkFilter.addLink(new IdImpl(t.getSecond()));
+			linkFilter.addLink(Id.create(t.getFirst(), Link.class));
+			linkFilter.addLink(Id.create(t.getSecond(), Link.class));
 		}
 
 		SelectedPlanFilter selectedPlanFilter = new SelectedPlanFilter(linkFilter);

@@ -29,10 +29,10 @@ import org.jfree.chart.JFreeChart;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.SignalGroupStateChangedEvent;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.signalsystems.model.SignalSystem;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.signalsystems.utils.DgSignalEventsCollector;
@@ -53,10 +53,10 @@ public class DgCottbusSignalPlanChartGenerator {
 	public static void main(String[] args) {
 		//parameters
 		//cottbus
-		IdImpl runId = new IdImpl("1224");
+		String runId = "1224";
 		String baseDir = DgPaths.REPOS + "runs-svn/";
 		int iteration = 500;
-		Id signalSystemId = new IdImpl(18);
+		Id<SignalSystem> signalSystemId = Id.create(18, SignalSystem.class);
 		double startSecond = 23135.0;
 		double endSecond = startSecond + 3600.0;
 		startSecond = 8.0 * 3600.0;
@@ -64,18 +64,18 @@ public class DgCottbusSignalPlanChartGenerator {
 		baseDir = baseDir + "run" + runId;
 		
 		//cottbus football
-		runId = new IdImpl("1222_100_football_fans");
+		runId = "1222_100_football_fans";
 		baseDir = DgPaths.REPOS + "runs-svn/run1222/100_football_fans";
 		iteration = 500;
 		startSecond = 17.0  * 3600.0;
 		endSecond = startSecond + 3600.0;
-		signalSystemId = new IdImpl(1);
+		signalSystemId = Id.create(1, SignalSystem.class);
 		
 //		koehler strehler 2010
 //		runId = null;
 //		baseDir = "/media/data/work/matsimOutput/koehlerStrehler2010Scenario5SelectBest/";
 //		iteration = 20;
-//		signalSystemId = new IdImpl(5);
+//		signalSystemId = Id.create(5);
 //		startSecond = 0.0;
 //		endSecond = 900.0;
 //		

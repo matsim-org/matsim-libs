@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
@@ -68,7 +67,7 @@ public class CMCFPlansMerger {
 		for (Person person : plansCmcf.getPersons().values()) {
 			String idstring = person.getId().toString();
 			String[] idLegNumber = idstring.split("leg");
-			Id id = new IdImpl(idLegNumber[0]);
+			Id<Person> id = Id.create(idLegNumber[0], Person.class);
 			Person p = plans.getPersons().get(id);
 			Plan plan = p.getSelectedPlan();
 			int legNumber = Integer.parseInt(idLegNumber[1]);

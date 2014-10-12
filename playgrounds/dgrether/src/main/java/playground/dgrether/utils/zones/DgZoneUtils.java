@@ -28,7 +28,6 @@ import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -56,7 +55,7 @@ public class DgZoneUtils {
 		DgZones zones= new DgZones();
 		for (Polygon p : grid){
 			idint++;
-			Id  id = new IdImpl(Integer.toString(idint));
+			Id<DgZone> id = Id.create(Integer.toString(idint), DgZone.class);
 			DgZone cell = new DgZone(id, p);
 			zones.put(id, cell);
 			log.info("Envelope of cell " + id + " is " + cell.getEnvelope());

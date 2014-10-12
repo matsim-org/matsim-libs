@@ -20,6 +20,7 @@
 package playground.dgrether.koehlerstrehlersignal.conversion;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -62,12 +63,12 @@ public class DgKSNet2MatsimNet  {
 		}
 		Node from = net.getNodes().get(fromNode.getId());
 		if (from == null) {
-			from = net.getFactory().createNode(fromNode.getId(), fromNode.getCoordinate());
+			from = net.getFactory().createNode(Id.create(fromNode.getId(), Node.class), fromNode.getCoordinate());
 			net.addNode(from);
 		}
 		Node to = net.getNodes().get(toNode.getId());
 		if (to == null) {
-			to = net.getFactory().createNode(toNode.getId(), toNode.getCoordinate());
+			to = net.getFactory().createNode(Id.create(toNode.getId(), Node.class), toNode.getCoordinate());
 			net.addNode(to);
 		}
 		Link link = net.getFactory().createLink(street.getId(), from, to);

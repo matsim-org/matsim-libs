@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodities;
@@ -54,10 +53,10 @@ public class TtSignalizedNodeShortestPath {
 	public Set<Id<Link>> calcShortestPathLinkIdsBetweenSignalizedNodes(Network network, Set<Id<Node>> signalizedNodes, boolean useFreeSpeedTravelTime){
 		//create commodities between all signal-pairs
 		DgCommodities signalCommodities = new DgCommodities();
-		for (Id fromSignalId : signalizedNodes){
-			for (Id toSignalId : signalizedNodes){
+		for (Id<Node> fromSignalId : signalizedNodes){
+			for (Id<Node> toSignalId : signalizedNodes){
 				if (!fromSignalId.equals(toSignalId)){
-					DgCommodity signalCom = new DgCommodity(new IdImpl("signalCommodity_" + fromSignalId + "-" + toSignalId));
+					DgCommodity signalCom = new DgCommodity(Id.create("signalCommodity_" + fromSignalId + "-" + toSignalId, DgCommodity.class));
 					signalCom.setSourceNode(fromSignalId, null, 1.0);
 					signalCom.setDrainNode(toSignalId, null);
 					signalCommodities.addCommodity(signalCom);

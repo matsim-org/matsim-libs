@@ -24,13 +24,13 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.utils.collections.Tuple;
 
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodities;
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodity;
@@ -55,20 +55,20 @@ public class M2KS2010SimpleDemandConverter {
 
 		// the array contains the from node id, the to node id, the from link id and the to link id in this order
 		// the Double contains the flow value of this origin destination pair
-		Map<Id[], Double> fromNodeToNodeCountMap = new HashMap<Id[], Double>();
+		Map<Id<?>[], Double> fromNodeToNodeCountMap = new HashMap<>();
 		
 		for (Person p : population.getPersons().values()){
 			Plan plan = p.getSelectedPlan();
 			for (PlanElement pe : plan.getPlanElements()){
 				if (pe instanceof Leg){
 					Leg leg = (Leg)pe;
-					Id fromLinkId = leg.getRoute().getStartLinkId();
+					Id<Link> fromLinkId = leg.getRoute().getStartLinkId();
 					DgStreet startStreet = net.getStreets().get(fromLinkId);
-					Id fromNodeId = startStreet.getToNode().getId();
-					Id toLinkId = leg.getRoute().getEndLinkId();
+					Id<Node> fromNodeId = Id.create(startStreet.getToNode().getId(), Node.class);
+					Id<Link> toLinkId = leg.getRoute().getEndLinkId();
 					DgStreet endStreet = net.getStreets().get(toLinkId);
-					Id toNodeId = endStreet.getFromNode().getId();
-					Id[] index = new Id[]{fromNodeId, toNodeId, fromLinkId, toLinkId};
+					Id<Node> toNodeId = Id.create(endStreet.getFromNode().getId(), Node.class);
+					Id<?>[] index = new Id[]{fromNodeId, toNodeId, fromLinkId, toLinkId};
 					if (!fromNodeToNodeCountMap.containsKey(index)){
 						fromNodeToNodeCountMap.put(index, 0.0);
 					}
@@ -80,13 +80,13 @@ public class M2KS2010SimpleDemandConverter {
 		}
 		
 		int comId = 0;
-		for (Id[] index : fromNodeToNodeCountMap.keySet()){
+		for (Id<?>[] index : fromNodeToNodeCountMap.keySet()){
 			comId++;
-			Id coId = new IdImpl(comId);
+			Id<DgCommodity> coId = Id.create(comId, DgCommodity.class);
 			DgCommodity co = new DgCommodity(coId);
 			coms.addCommodity(co);
-			co.setSourceNode(index[0], index[2], fromNodeToNodeCountMap.get(index));
-			co.setDrainNode(index[1], index[3]);
+			co.setSourceNode((Id<Node>) index[0], (Id<Link>) index[2], fromNodeToNodeCountMap.get(index));
+			co.setDrainNode((Id<Node>) index[1], (Id<Link>) index[3]);
 		}
 		
 		return coms;

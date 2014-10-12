@@ -20,7 +20,6 @@
 package playground.dgrether.koehlerstrehlersignal.analysis.ksvsm;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,39 +29,20 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.filter.NetworkFilterManager;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.gis.PolygonFeatureFactory;
-import org.matsim.core.utils.gis.ShapeFileWriter;
-import org.matsim.counts.CountSimComparison;
-import org.matsim.signalsystems.data.SignalsData;
-import org.matsim.signalsystems.data.SignalsScenarioLoader;
-import org.matsim.signalsystems.data.SignalsScenarioWriter;
-import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import com.vividsolutions.jts.geom.GeometryFactory;
-
-import playground.dgrether.DgPaths;
-import playground.dgrether.analysis.eventsfilter.FeatureNetworkLinkCenterCoordFilter;
-import playground.dgrether.analysis.simsimanalyser.CountsShapefileWriter;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdConverter;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdPool;
-import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2010CrossingSolution;
-import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2010Solution2Matsim;
-import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2010SolutionTXTParser10;
 import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2014SolutionXMLParser;
-import playground.dgrether.signalsystems.cottbus.CottbusUtils;
 
 /**
  * @author dgrether
@@ -71,7 +51,7 @@ import playground.dgrether.signalsystems.cottbus.CottbusUtils;
  */
 public class KS2010VsMatimVolumes {
 
-	private static Map<Id, Double> loadKS2010Volumes(String directory,
+	private static Map<Id<Link>, Double> loadKS2010Volumes(String directory,
 			String inputFile) {
 //		KS2010SolutionTXTParser10 solutionParser = new KS2010SolutionTXTParser10();
 		KS2014SolutionXMLParser solutionParser = new KS2014SolutionXMLParser();
@@ -81,33 +61,33 @@ public class KS2010VsMatimVolumes {
 				+ "id_conversions.txt");
 		DgIdConverter dgIdConverter = new DgIdConverter(idPool);
 
-		Map<Id, Double> ks2010StreetIdFlow = solutionParser
+		Map<Id<Link>, Double> ks2010StreetIdFlow = solutionParser
 				.getStreetFlow();
 
-		Map<Id, Double> ks2010volumes = convertKS2010Volumes(idPool,
+		Map<Id<Link>, Double> ks2010volumes = convertKS2010Volumes(idPool,
 				dgIdConverter, ks2010StreetIdFlow);
 		return ks2010volumes;
 	}
 
-	private static Map<Id, Double> convertKS2010Volumes(DgIdPool idPool,
-			DgIdConverter dgIdConverter, Map<Id, Double> ks2010StreetIdFlow) {
+	private static Map<Id<Link>, Double> convertKS2010Volumes(DgIdPool idPool,
+			DgIdConverter dgIdConverter, Map<Id<Link>, Double> ks2010StreetIdFlow) {
 		// convert ks2010_id to matsim_id in the unsimplified network
-		Map<Id, Double> matsimLinkIdFlow = new HashMap<Id, Double>();
-		for (Id streetId : ks2010StreetIdFlow.keySet()) {
+		Map<Id<Link>, Double> matsimLinkIdFlow = new HashMap<>();
+		for (Id<Link> streetId : ks2010StreetIdFlow.keySet()) {
 			Integer ksIntStreetId = Integer.parseInt(streetId.toString());
 			String matsimStringStreetId = idPool.getStringId(ksIntStreetId);
-			Id linkId = dgIdConverter.convertStreetId2LinkId(new IdImpl(
-					matsimStringStreetId));
+			Id<Link> linkId = dgIdConverter.convertStreetId2LinkId(Id.create(
+					matsimStringStreetId, Link.class));
 			// assign the flow to all links that belongs to the simplified link
 			String[] unsimplifiedLinks = linkId.toString().split("-");
 			for (int i = 0; i < unsimplifiedLinks.length; i++)
-				matsimLinkIdFlow.put(new IdImpl(unsimplifiedLinks[i]),
+				matsimLinkIdFlow.put(Id.create(unsimplifiedLinks[i], Link.class),
 						ks2010StreetIdFlow.get(streetId));
 		}
 		return matsimLinkIdFlow;
 	}
 
-	private static Map<Id, Double> loadMatsimVolumes(Network matsimNetwork,
+	private static Map<Id<Link>, Double> loadMatsimVolumes(Network matsimNetwork,
 			Network ks2010Network, String matsimEventsFile, int startTime,
 			int endTime, double scalingFactor) {
 
@@ -115,7 +95,7 @@ public class KS2010VsMatimVolumes {
 				matsimNetwork);
 
 		// convert matsim flow volumes
-		Map<Id, Double> matsimVolumes = new HashMap<Id, Double>();
+		Map<Id<Link>, Double> matsimVolumes = new HashMap<>();
 		for (Link l : matsimNetwork.getLinks().values()) {
 
 			// bound matsim flow volumes to KS2010 region
@@ -157,7 +137,7 @@ public class KS2010VsMatimVolumes {
 	}
 
 	private static void writeFlowVolumesShp(Network ks2010Network, String srs,
-			Map<Id, Double> ks2010Volumes, Map<Id, Double> matsimVolumes,
+			Map<Id<Link>, Double> ks2010Volumes, Map<Id<Link>, Double> matsimVolumes,
 			String outputFile, double scalingFactor) {
 
 		CoordinateReferenceSystem networkSrs = MGC.getCRS(srs);
@@ -226,9 +206,9 @@ public class KS2010VsMatimVolumes {
 			Network matsimNetwork = loadNetwork(matsimNetworkFile);
 			Network ks2010Network = loadNetwork(ks2010NetworkFile);
 
-			Map<Id, Double> ks2010Volumes = loadKS2010Volumes(ksSolutionDirectory,
+			Map<Id<Link>, Double> ks2010Volumes = loadKS2010Volumes(ksSolutionDirectory,
 					ksSolutionFile);
-			Map<Id, Double> matsimVolumes = loadMatsimVolumes(matsimNetwork,
+			Map<Id<Link>, Double> matsimVolumes = loadMatsimVolumes(matsimNetwork,
 					ks2010Network, matsimEventsFile, startTime, endTime,
 					scalingFactor);
 

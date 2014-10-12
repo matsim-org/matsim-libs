@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.network.NetworkWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -57,7 +56,7 @@ public class DgCottbusNetworkFix {
 		String line = linksReader.readLine();
 		while (line != null){
 			log.info("Changing link id " + line);
-			Id id = new IdImpl(line.trim());
+			Id<Link> id = Id.create(line.trim(), Link.class);
 			Link link = network.getLinks().get(id);
 			link.setNumberOfLanes(2.0);
 //			double capacity = link.getCapacity();

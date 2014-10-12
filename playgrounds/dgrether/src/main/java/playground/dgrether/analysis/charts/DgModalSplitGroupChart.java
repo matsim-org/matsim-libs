@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.dgrether.analysis.charts;
 
-import org.apache.log4j.Logger;
 import org.jfree.chart.ChartColor;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryAxis;
@@ -28,7 +27,6 @@ import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
-import org.matsim.api.core.v01.Id;
 
 import playground.dgrether.analysis.charts.utils.DgColorScheme;
 import playground.dgrether.analysis.population.DgAnalysisPopulation;
@@ -38,8 +36,6 @@ import playground.dgrether.analysis.population.DgPersonData;
 
 
 public class DgModalSplitGroupChart {
-	
-	private static final Logger log = Logger.getLogger(DgModalSplitGroupChart.class);
 	
 	private DgAnalysisPopulation ana;
 	
@@ -52,11 +48,11 @@ public class DgModalSplitGroupChart {
 	private String xLabel = "Income [CHF / Year] up to...";
 	private String yLabel = "% of Travellers";
 
-	private Id runId; 
+	private String runId; 
 	
 	private DgAxisBuilder axisBuilder = new DgDefaultAxisBuilder();
 	
-	public DgModalSplitGroupChart(DgAnalysisPopulation ana, Id runid, int threshold) {
+	public DgModalSplitGroupChart(DgAnalysisPopulation ana, String runid, int threshold) {
 		this.ana = ana;
 		this.runId = runid;
 		this.groupThreshold = threshold;

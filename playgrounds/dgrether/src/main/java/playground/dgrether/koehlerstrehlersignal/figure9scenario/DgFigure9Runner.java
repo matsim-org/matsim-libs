@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -86,13 +86,14 @@ public class DgFigure9Runner {
 	private void addControlerListener(Controler c) {
 		
 		//add some EventHandler to the EventsManager after the controler is started
-		handler23 = new TTInOutflowEventHandler(new IdImpl("23"));
-		handler27 = new TTInOutflowEventHandler(new IdImpl("27"));
-		handler54 = new TTInOutflowEventHandler(new IdImpl("54"));
-		handler58 = new TTInOutflowEventHandler(new IdImpl("58"));
+		handler23 = new TTInOutflowEventHandler(Id.create("23", Link.class));
+		handler27 = new TTInOutflowEventHandler(Id.create("27", Link.class));
+		handler54 = new TTInOutflowEventHandler(Id.create("54", Link.class));
+		handler58 = new TTInOutflowEventHandler(Id.create("58", Link.class));
 		
 		
 		c.addControlerListener(new StartupListener() {
+			@Override
 			public void notifyStartup(StartupEvent e) {
 				mfdHandler = new DgMfd(e.getControler().getScenario().getNetwork(), 1.0);
 				e.getControler().getEvents().addHandler(handler23);
@@ -106,6 +107,7 @@ public class DgFigure9Runner {
 
 		//write some output after each iteration
 		c.addControlerListener(new IterationEndsListener() {
+			@Override
 			public void notifyIterationEnds(IterationEndsEvent e) {
 				handler23.iterationsEnds(e.getIteration());
 				handler27.iterationsEnds(e.getIteration());
@@ -116,25 +118,25 @@ public class DgFigure9Runner {
 					DgTravelTimeCalculatorChart ttcalcChart = new DgTravelTimeCalculatorChart((TravelTimeCalculator)e.getControler().getLinkTravelTimes());
 					ttcalcChart.setStartTime(0.0);
 					ttcalcChart.setEndTime(3600.0 * 1.5);
-					List<Id> list = new ArrayList<Id>();
-					list.add(new IdImpl("23"));
-					list.add(new IdImpl("34"));
-					list.add(new IdImpl("45"));
+					List<Id<Link>> list = new ArrayList<>();
+					list.add(Id.create("23", Link.class));
+					list.add(Id.create("34", Link.class));
+					list.add(Id.create("45", Link.class));
 					ttcalcChart.addLinkId(list);
-					list = new ArrayList<Id>();
-					list.add(new IdImpl("27"));
-					list.add(new IdImpl("78"));
-					list.add(new IdImpl("85"));
+					list = new ArrayList<>();
+					list.add(Id.create("27", Link.class));
+					list.add(Id.create("78", Link.class));
+					list.add(Id.create("85", Link.class));
 					ttcalcChart.addLinkId(list);
-					list = new ArrayList<Id>();
-					list.add(new IdImpl("54"));
-					list.add(new IdImpl("43"));
-					list.add(new IdImpl("32"));
+					list = new ArrayList<>();
+					list.add(Id.create("54", Link.class));
+					list.add(Id.create("43", Link.class));
+					list.add(Id.create("32", Link.class));
 					ttcalcChart.addLinkId(list);
-					list = new ArrayList<Id>();
-					list.add(new IdImpl("58"));
-					list.add(new IdImpl("87"));
-					list.add(new IdImpl("72"));
+					list = new ArrayList<>();
+					list.add(Id.create("58", Link.class));
+					list.add(Id.create("87", Link.class));
+					list.add(Id.create("72", Link.class));
 					ttcalcChart.addLinkId(list);
 					DgChartWriter.writeChart(e.getControler().getControlerIO().getIterationFilename(e.getIteration(), "ttcalculator"), 
 							ttcalcChart.createChart());
@@ -153,6 +155,7 @@ public class DgFigure9Runner {
 		});
   	//write some output at shutdown
 		c.addControlerListener(new ShutdownListener() {
+			@Override
 			public void notifyShutdown(ShutdownEvent e) {
 				DgCountPerIterationGraph chart = new DgCountPerIterationGraph(e.getControler().getConfig().controler());
 				chart.addCountEventHandler(handler23, "Number of cars on link 23");

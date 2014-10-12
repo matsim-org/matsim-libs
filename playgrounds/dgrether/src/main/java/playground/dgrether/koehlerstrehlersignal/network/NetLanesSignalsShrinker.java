@@ -28,6 +28,7 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
@@ -65,7 +66,7 @@ public class NetLanesSignalsShrinker {
 
 	private DgSignalsBoundingBox cuttingBoundingBox;
 	
-	private Map<Id, Id> originalToSimplifiedLinkIdMatching;
+	private Map<Id<Link>, Id<Link>> originalToSimplifiedLinkIdMatching;
 
 	private Network shrinkedNetwork;
 
@@ -159,7 +160,7 @@ public class NetLanesSignalsShrinker {
 		return this.cuttingBoundingBox;
 	}
 	
-	public Map<Id, Id> getOriginalToSimplifiedLinkIdMatching(){
+	public Map<Id<Link>, Id<Link>> getOriginalToSimplifiedLinkIdMatching(){
 		return this.originalToSimplifiedLinkIdMatching;
 	}
 	

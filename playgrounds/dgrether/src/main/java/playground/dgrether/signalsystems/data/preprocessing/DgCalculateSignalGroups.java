@@ -25,16 +25,14 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
@@ -45,6 +43,7 @@ import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupsDataImpl;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
+import org.matsim.signalsystems.model.SignalGroup;
 
 
 /**
@@ -159,7 +158,7 @@ public class DgCalculateSignalGroups {
 	
 	private SignalGroupData createAndAddSignalGroup(SignalGroupsData groupsData, Id systemId, int groupId){
 		SignalGroupsDataFactory groupsFactory = groupsData.getFactory();
-		SignalGroupData group = groupsFactory.createSignalGroupData(systemId, new IdImpl(groupId));
+		SignalGroupData group = groupsFactory.createSignalGroupData(systemId, Id.create(groupId, SignalGroup.class));
 		groupsData.addSignalGroupData(group);
 		log.debug("created signal group id " + group.getId() + " for system id " + group.getSignalSystemId());
 		return group;

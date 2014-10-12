@@ -29,8 +29,6 @@ import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.SchemaException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -59,33 +57,31 @@ public class DgIncomeDistributionAnalysis {
 		//run number creation
 		String runNumber1 = "749";
 		String runNumber2 = "869";
-		Id runid1 = new IdImpl(runNumber1);
-		Id runid2 = new IdImpl(runNumber2);
 		// scenario files
-		String netfile = DgPaths.RUNBASE + "run" +  runid1.toString() + "/" + runid1 + "." + "output_network.xml.gz";
-		String plans1file = DgPaths.RUNBASE + "run" +runid1.toString() + "/" + runid1 + "."  + "output_plans.xml.gz";
-		String plans2file = DgPaths.RUNBASE + "run" +runid2.toString() + "/" + runid2 + "."  + "output_plans.xml.gz";
+		String netfile = DgPaths.RUNBASE + "run" +  runNumber1 + "/" + runNumber1 + "." + "output_network.xml.gz";
+		String plans1file = DgPaths.RUNBASE + "run" +runNumber1 + "/" + runNumber1 + "."  + "output_plans.xml.gz";
+		String plans2file = DgPaths.RUNBASE + "run" +runNumber2 + "/" + runNumber2 + "."  + "output_plans.xml.gz";
 		//		String housholdsfile = DgPaths.SHAREDSVN + "studies/bkick/oneRouteTwoModeIncomeTest/households.xml";
 		String housholdsfile = DgPaths.STUDIESDG + "einkommenSchweiz/households_all_zrh30km_transitincl_10pct.xml.gz";
-		String gridFile = DgPaths.RUNBASE + "run" + runid2.toString() + "/" + runid1.toString() + "vs" + runid2.toString()+ "grid450x375.shp";
-		String singlePersonsFile = DgPaths.RUNBASE + "run" + runid2.toString() + "/" + runid1.toString() + "vs" + runid2.toString()+ "singlePersonsFrom100000.shp";
+		String gridFile = DgPaths.RUNBASE + "run" + runNumber2 + "/" + runNumber1 + "vs" + runNumber2+ "grid450x375.shp";
+		String singlePersonsFile = DgPaths.RUNBASE + "run" + runNumber2 + "/" + runNumber1 + "vs" + runNumber2+ "singlePersonsFrom100000.shp";
 		//file io
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		DgAnalysisPopulation pop = new DgAnalysisPopulation();
 		DgAnalysisPopulationReader pc = new DgAnalysisPopulationReader();
 		pc.addFilter(new ExcludeZurichTransitFilter());
-		pc.readAnalysisPopulation(pop, runid1, netfile, plans1file);
-		pc.readAnalysisPopulation(pop, runid2, netfile, plans2file);
+		pc.readAnalysisPopulation(pop, runNumber1, netfile, plans1file);
+		pc.readAnalysisPopulation(pop, runNumber2, netfile, plans2file);
 		//households io
 		DgHouseholdsAnalysisReader hhr = new DgHouseholdsAnalysisReader(pop);
 		hhr.readHousholds(housholdsfile);
 		
 //		writeGrid(pop, gridFile, runid1, runid2);
-		writePersons(pop, singlePersonsFile, runid1, runid2);
+		writePersons(pop, singlePersonsFile, runNumber1, runNumber2);
 		log.info("ya esta");
 	}
 
-	private static void writePersons(DgAnalysisPopulation pop, String file, Id runid1, Id runid2) throws SchemaException, IllegalArgumentException, IOException {
+	private static void writePersons(DgAnalysisPopulation pop, String file, String runid1, String runid2) throws SchemaException, IllegalArgumentException, IOException {
 		CoordinateReferenceSystem targetCRS = MGC.getCRS(TransformationFactory.CH1903_LV03_GT);
 		PointFeatureFactory factory = new PointFeatureFactory.Builder().
 				setCrs(targetCRS).
@@ -108,7 +104,7 @@ public class DgIncomeDistributionAnalysis {
 
 	
 	
-	private static void writeGrid(DgAnalysisPopulation pop, String file, Id runid1, Id runid2) throws SchemaException, IllegalArgumentException, IOException {
+	private static void writeGrid(DgAnalysisPopulation pop, String file, String runid1, String runid2) throws SchemaException, IllegalArgumentException, IOException {
 		//create grid
 		DgGrid grid = new DgGrid(450, 375, pop.getBoundingBox());
 		//fill quad tree

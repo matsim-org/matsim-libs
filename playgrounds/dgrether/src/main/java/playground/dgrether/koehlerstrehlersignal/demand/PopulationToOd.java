@@ -22,6 +22,7 @@ package playground.dgrether.koehlerstrehlersignal.demand;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -42,7 +43,7 @@ import playground.dgrether.utils.zones.DgZones;
 public class PopulationToOd {
 
 	private double matsimPopSampleSize = 1.0;
-	private Map<Id, Id> originalToSimplifiedLinkIdMatching;
+	private Map<Id<Link>, Id<Link>> originalToSimplifiedLinkIdMatching;
 	
 	public void convertPopulation2OdPairs(DgZones zones, Network fullNetwork, Population population, CoordinateReferenceSystem crs, 
 			Network smallNetwork, DgSignalsBoundingBox signalsBoundingBox, 
@@ -76,7 +77,7 @@ public class PopulationToOd {
 		this.matsimPopSampleSize = matsimPopSampleSize;
 	}
 
-	public void setOriginalToSimplifiedLinkMapping(Map<Id, Id> originalToSimplifiedLinkIdMatching) {
+	public void setOriginalToSimplifiedLinkMapping(Map<Id<Link>, Id<Link>> originalToSimplifiedLinkIdMatching) {
 		this.originalToSimplifiedLinkIdMatching = originalToSimplifiedLinkIdMatching;
 	}
 	

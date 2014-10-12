@@ -21,8 +21,6 @@ package playground.dgrether.utils;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-
 
 /**
  * @author dgrether
@@ -30,14 +28,9 @@ import org.matsim.core.basic.v01.IdImpl;
  */
 public class IdFactory {
 
-	
-	public static Id get(int i) {
-		return new IdImpl(i);
-	}
-
-	public static void generateIds(int number, List<Id> idList) {
+	public static <T> void generateIds(int number, List<Id<T>> idList, Class<T> type) {
 		for (int i = 1; i <= number; i++) {
-			idList.add(IdFactory.get(i));
+			idList.add(Id.create(i, type));
 		}
 	}
 	

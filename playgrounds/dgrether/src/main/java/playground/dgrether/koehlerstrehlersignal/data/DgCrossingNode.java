@@ -21,6 +21,7 @@ package playground.dgrether.koehlerstrehlersignal.data;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Node;
 
 
 /**
@@ -29,15 +30,15 @@ import org.matsim.api.core.v01.Id;
  */
 public class DgCrossingNode {
 
-	private Id id;
+	private Id<Node> id;
 	
 	private Coord coordinate;
 
-	public DgCrossingNode(Id id) {
+	public DgCrossingNode(Id<Node> id) {
 		this.id = id;
 	}
 
-	public Id getId() {
+	public Id<Node> getId() {
 		return this.id;
 	}
 

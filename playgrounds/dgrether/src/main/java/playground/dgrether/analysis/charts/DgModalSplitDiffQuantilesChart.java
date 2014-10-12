@@ -31,7 +31,6 @@ import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.data.category.DefaultCategoryDataset;
-import org.matsim.api.core.v01.Id;
 
 import playground.dgrether.analysis.charts.utils.DgCategoryLabelGenerator;
 import playground.dgrether.analysis.charts.utils.DgColorScheme;
@@ -53,15 +52,15 @@ public class DgModalSplitDiffQuantilesChart {
 	private String xLabel = "Income [CHF / Year] up to...";
 	private String yLabel = "% of Travellers";
 
-	private Id runId1; 
+	private String runId1; 
 	
 	private DgAxisBuilder axisBuilder = new DgDefaultAxisBuilder();
 
-	private Id runId2;
+	private String runId2;
 
 	private DgCategoryLabelGenerator labelgenerator;
 	
-	public DgModalSplitDiffQuantilesChart(DgAnalysisPopulation ana, Id runid1, Id runid2) {
+	public DgModalSplitDiffQuantilesChart(DgAnalysisPopulation ana, String runid1, String runid2) {
 		this.ana = ana;
 		this.runId1 = runid1;
 		this.runId2 = runid2;

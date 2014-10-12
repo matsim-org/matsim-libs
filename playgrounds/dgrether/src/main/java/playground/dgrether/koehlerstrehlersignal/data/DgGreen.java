@@ -28,15 +28,15 @@ import org.matsim.api.core.v01.Id;
  */
 public class DgGreen {
 
-	private Id lightId;
+	private Id<DgGreen> lightId;
 	private int offset;
 	private int length;
 	
-	public DgGreen(Id lightId){
+	public DgGreen(Id<DgGreen> lightId){
 		this.lightId = lightId;
 	}
 	
-	public Id getLightId() {
+	public Id<DgGreen> getLightId() {
 		return this.lightId;
 	}
 

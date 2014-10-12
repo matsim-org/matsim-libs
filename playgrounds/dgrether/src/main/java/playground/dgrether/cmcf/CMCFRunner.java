@@ -20,10 +20,10 @@ package playground.dgrether.cmcf;
 
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.otfvis.OTFVis;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -52,13 +52,13 @@ public class CMCFRunner {
 	public CMCFRunner() {
 		Config config = null;
 		CMCFScenarioGenerator.main(null);
-		final TTInOutflowEventHandler myHandler = new TTInOutflowEventHandler(new IdImpl("4"));
+		final TTInOutflowEventHandler myHandler = new TTInOutflowEventHandler(Id.create("4", Link.class));
 		
 		if (!visualizationOnly) {			
 			Controler controler = new Controler(CMCFScenarioGenerator.configOut);
 			final LinkSensorManager lsm = new LinkSensorManager();
-			lsm.addLinkSensor(new IdImpl("3"));
-			lsm.addLinkSensor(new IdImpl("4"));
+			lsm.addLinkSensor(Id.create("3", Link.class));
+			lsm.addLinkSensor(Id.create("4", Link.class));
 			controler.setOverwriteFiles(true);
 //			controler.addControlerListener(new StartupListener() {
 //				public void notifyStartup(StartupEvent e) {
@@ -70,12 +70,13 @@ public class CMCFRunner {
 			
 			
 
-			final TTInOutflowEventHandler handler3 = new TTInOutflowEventHandler(new IdImpl("3"), new IdImpl("5"));
-			final TTInOutflowEventHandler handler4 = new TTInOutflowEventHandler(new IdImpl("4"));
+			final TTInOutflowEventHandler handler3 = new TTInOutflowEventHandler(Id.create("3", Link.class), Id.create("5", Link.class));
+			final TTInOutflowEventHandler handler4 = new TTInOutflowEventHandler(Id.create("4", Link.class));
 			
 			
 			
 			controler.addControlerListener(new StartupListener() {
+				@Override
 				public void notifyStartup(StartupEvent e) {
 					e.getControler().getEvents().addHandler(handler3);
 					e.getControler().getEvents().addHandler(handler4);
@@ -86,6 +87,7 @@ public class CMCFRunner {
 			 
 			controler.addControlerListener(new IterationEndsListener() {
 
+				@Override
 				public void notifyIterationEnds(IterationEndsEvent event) {
 					TTGraphWriter ttWriter = new TTGraphWriter();
 					ttWriter.addTTEventHandler(handler3);
@@ -102,10 +104,10 @@ public class CMCFRunner {
 			
 			controler.run();
 			Network net = controler.getNetwork();
-			Link link2 = net.getLinks().get(new IdImpl("2"));
-			Link link3 = net.getLinks().get(new IdImpl("3"));
-			Link link4 = net.getLinks().get(new IdImpl("4"));
-			Link link5 = net.getLinks().get(new IdImpl("5"));
+			Link link2 = net.getLinks().get(Id.create("2", Link.class));
+			Link link3 = net.getLinks().get(Id.create("3", Link.class));
+			Link link4 = net.getLinks().get(Id.create("4", Link.class));
+			Link link5 = net.getLinks().get(Id.create("5", Link.class));
 
 //			double tt2 = controler.getTravelTimeCalculator().getLinkTravelTime(link2, 7.0 * 3600.0);
 //			double tt3 = controler.getTravelTimeCalculator().getLinkTravelTime(link3, 7.0 * 3600.0);

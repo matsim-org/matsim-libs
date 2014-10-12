@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
@@ -86,7 +85,7 @@ public class CottbusTramLinkCreator {
 			    if (result[0].equals("b")){
 			    	
 			    	Coord xy =ct.transform(new CoordImpl(Double.parseDouble(result[4]), Double.parseDouble(result[5])));
-			    	Id nodeId = new IdImpl("pt"+result[1]);
+			    	Id<Node> nodeId = Id.create("pt"+result[1], Node.class);
 			    	Node n = network.getFactory().createNode(nodeId, xy);
 			    	nodeList.add(n);
 			    	network.addNode(n);
@@ -94,7 +93,7 @@ public class CottbusTramLinkCreator {
 			    }
 			    else if (result[0].equals("c")){
 			    	if (!result[1].equals("0")){
-			    	Node n = network.getNodes().get(new IdImpl(result[1]));
+			    	Node n = network.getNodes().get(Id.create(result[1], Node.class));
 			    	nodeList.add(n);
 			    	}
 			
@@ -104,10 +103,10 @@ public class CottbusTramLinkCreator {
 			BufferedReader brr = new BufferedReader(frr);
 			String ine = null;
 			int i = 0;
-			Id lastId = new IdImpl("243180738");
+			Id<Node> lastId = Id.create("243180738", Node.class);
 			Set<String> modes = new HashSet<String>();
 			modes.add("tram");
-			Id currentId = null;
+			Id<Node> currentId = null;
 			while ((ine = brr.readLine()) != null) {
 					
 					
@@ -116,18 +115,18 @@ public class CottbusTramLinkCreator {
 					
 					if (esult[0].equals("c")){
 						
-						currentId = new IdImpl(esult[1]);
+						currentId = Id.create(esult[1], Node.class);
 						lastId = currentId;
 						System.out.println(currentId);
 						
 					}
 					else if (esult[0].equals("b")){
 						lastId = currentId;
-						currentId = new IdImpl("pt"+esult[1]);
+						currentId = Id.create("pt"+esult[1], Node.class);
 					}
 					else if (esult[0].equals("e")){
 						lastId = currentId;
-						currentId = new IdImpl(esult[1]);
+						currentId = Id.create(esult[1], Node.class);
 					}
 					else {
 						
@@ -140,7 +139,7 @@ public class CottbusTramLinkCreator {
 				
 					
 					try{
-					 l = network.getFactory().createLink(new IdImpl("ptl"+i), network.getNodes().get(currentId), network.getNodes().get(lastId));
+					 l = network.getFactory().createLink(Id.create("ptl"+i, Link.class), network.getNodes().get(currentId), network.getNodes().get(lastId));
 					 
 					}
 					catch (NullPointerException ee){
@@ -149,7 +148,7 @@ public class CottbusTramLinkCreator {
 					}
 					System.out.println(l.getFromNode().getId()+" to "+l.getToNode().getId());
 					
-					Link ll = network.getFactory().createLink(new IdImpl("ptb"+i), network.getNodes().get(lastId), network.getNodes().get(currentId));
+					Link ll = network.getFactory().createLink(Id.create("ptb"+i, Link.class), network.getNodes().get(lastId), network.getNodes().get(currentId));
 					
 					
 					Double d = CoordUtils.calcDistance(l.getFromNode().getCoord(), l.getToNode().getCoord());
@@ -172,11 +171,11 @@ public class CottbusTramLinkCreator {
 									
 			    
 //			manual fixes
-			network.removeLink(new IdImpl("ptb45"));
-			network.removeLink(new IdImpl("ptl45"));
-			Link l = network.getFactory().createLink(new IdImpl("ptl999"), network.getNodes().get(new IdImpl("26999281")), network.getNodes().get(new IdImpl("243180738")));
+			network.removeLink(Id.create("ptb45", Link.class));
+			network.removeLink(Id.create("ptl45", Link.class));
+			Link l = network.getFactory().createLink(Id.create("ptl999", Link.class), network.getNodes().get(Id.create("26999281", Node.class)), network.getNodes().get(Id.create("243180738", Node.class)));
 			
-			Link ll = network.getFactory().createLink(new IdImpl("ptb999"), network.getNodes().get(new IdImpl("243180738")), network.getNodes().get(new IdImpl("26999281")));
+			Link ll = network.getFactory().createLink(Id.create("ptb999", Link.class), network.getNodes().get(Id.create("243180738", Node.class)), network.getNodes().get(Id.create("26999281", Node.class)));
 			Double d = CoordUtils.calcDistance(l.getFromNode().getCoord(), l.getToNode().getCoord());
 
 			l.setCapacity(30);

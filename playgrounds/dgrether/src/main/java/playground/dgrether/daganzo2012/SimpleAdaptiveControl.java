@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
@@ -44,7 +44,7 @@ public class SimpleAdaptiveControl implements MobsimEngine, LinkEnterEventHandle
 	private Queue<Double> vehicleExitTimesOnLink5 = new LinkedList<Double>() ;
 	
 	private InternalInterface internalInterface;
-	private Id id5 = new IdImpl("5");
+	private Id<Link> id5 = Id.create("5", Link.class);
 
 	private SignalizeableItem link4;
 
@@ -76,8 +76,8 @@ public class SimpleAdaptiveControl implements MobsimEngine, LinkEnterEventHandle
 
 	@Override
 	public void onPrepareSim() {
-		link4 = (SignalizeableItem) this.getMobsim().getNetsimNetwork().getNetsimLink(new IdImpl("4")) ;
-		link5 = (SignalizeableItem) this.getMobsim().getNetsimNetwork().getNetsimLink(new IdImpl("5")) ;
+		link4 = (SignalizeableItem) this.getMobsim().getNetsimNetwork().getNetsimLink(Id.create("4", Link.class)) ;
+		link5 = (SignalizeableItem) this.getMobsim().getNetsimNetwork().getNetsimLink(Id.create("5", Link.class)) ;
 		link4.setSignalized(true);
 		link5.setSignalized(true);
 	}

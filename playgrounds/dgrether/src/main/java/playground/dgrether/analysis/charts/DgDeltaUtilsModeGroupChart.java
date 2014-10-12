@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.XYPlot;
@@ -31,7 +30,6 @@ import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.collections.Tuple;
@@ -42,11 +40,7 @@ import playground.dgrether.analysis.population.DgPersonData;
 import playground.dgrether.analysis.population.DgPersonDataIncomeComparator;
 import playground.dgrether.analysis.population.DgPlanData;
 
-
-
 public class DgDeltaUtilsModeGroupChart implements DgChart {
-	
-	private static final Logger log = Logger.getLogger(DgDeltaUtilsModeGroupChart.class);
 	
 	private DgAnalysisPopulation ana;
 	
@@ -54,12 +48,12 @@ public class DgDeltaUtilsModeGroupChart implements DgChart {
 	
 	private XYSeriesCollection dataset;
 	
-	public DgDeltaUtilsModeGroupChart(DgAnalysisPopulation ana,  Id runId1, Id runId2) {
+	public DgDeltaUtilsModeGroupChart(DgAnalysisPopulation ana,  String runId1, String runId2) {
 		this.ana = ana;
 		this.dataset = createDeltaScoreIncomeModeChoiceDataset(runId1, runId2);
 	}
 
-	public XYSeriesCollection createDeltaScoreIncomeModeChoiceDataset(Id runId1, Id runId2) {
+	public XYSeriesCollection createDeltaScoreIncomeModeChoiceDataset(String runId1, String runId2) {
 		List<Tuple<Double, Double>> valuesCarCar = new ArrayList<Tuple<Double, Double>>();
 		List<Tuple<Double, Double>> valuesPtPt = new ArrayList<Tuple<Double, Double>>();
 		List<Tuple<Double, Double>> valuesPtCar = new ArrayList<Tuple<Double, Double>>();
@@ -109,6 +103,7 @@ public class DgDeltaUtilsModeGroupChart implements DgChart {
 	/**
 	 * @see playground.dgrether.analysis.charts.interfaces.DgChart#createChart()
 	 */
+	@Override
 	public JFreeChart createChart() {
 		XYPlot plot = new XYPlot(this.dataset, new NumberAxis("Income"), new NumberAxis("Delta utils"), null);
 		XYItemRenderer renderer = new XYLineAndShapeRenderer(false, true);

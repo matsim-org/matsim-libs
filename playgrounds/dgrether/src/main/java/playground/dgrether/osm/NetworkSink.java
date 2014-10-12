@@ -24,9 +24,9 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -76,11 +76,11 @@ public class NetworkSink implements SinkSource {
 			WayNode fromNode = wayNodes.get(0);
 			for (int i = 1, n = wayNodes.size(); i < n; i++) {
 				WayNode toNode = wayNodes.get(i);
-				org.matsim.api.core.v01.network.Node fromMatsimNode = network.getNodes().get(new IdImpl(fromNode.getNodeId()));
+				org.matsim.api.core.v01.network.Node fromMatsimNode = network.getNodes().get(Id.create(fromNode.getNodeId(), org.matsim.api.core.v01.network.Node.class));
 				if (fromMatsimNode == null) {
 					throw new RuntimeException("Missing node: "+fromNode.getNodeId());
 				}
-				org.matsim.api.core.v01.network.Node toMatsimNode = network.getNodes().get(new IdImpl(toNode.getNodeId()));
+				org.matsim.api.core.v01.network.Node toMatsimNode = network.getNodes().get(Id.create(toNode.getNodeId(), org.matsim.api.core.v01.network.Node.class));
 				if (toMatsimNode == null) {
 					throw new RuntimeException("Missing node: "+toNode.getNodeId());
 				}
@@ -95,7 +95,7 @@ public class NetworkSink implements SinkSource {
 	private void readNode(Node osmNode) {
 		CoordImpl osmCoord = new CoordImpl(osmNode.getLongitude(), osmNode.getLatitude());
 		Coord transformedCoord = transform.transform(osmCoord);
-		org.matsim.api.core.v01.network.Node node = network.getFactory().createNode(new IdImpl(osmNode.getId()), transformedCoord);
+		org.matsim.api.core.v01.network.Node node = network.getFactory().createNode(Id.create(osmNode.getId(), org.matsim.api.core.v01.network.Node.class), transformedCoord);
 		network.addNode(node);
 		osmNode.getTags().add(new Tag("matsim:node-id", node.getId().toString()));
 	}
@@ -165,9 +165,9 @@ public class NetworkSink implements SinkSource {
 		long fromNodeNumber = fromNode.getNodeId();
 		long toNodeNumber = toNode.getNodeId();
 		if (!onewayReverse) {
-			IdImpl id = new IdImpl(Long.toString(way.getId())+"_"+Long.toString(fromNodeNumber)+"_"+Long.toString(toNodeNumber));
+			Id<Link> id = Id.create(Long.toString(way.getId())+"_"+Long.toString(fromNodeNumber)+"_"+Long.toString(toNodeNumber), Link.class);
 			if (!network.getLinks().containsKey(id)) {
-				Link l = network.createAndAddLink(id, network.getNodes().get(new IdImpl(fromNodeNumber)), network.getNodes().get(new IdImpl(toNodeNumber)), length, freespeed, capacity, nofLanes);
+				Link l = network.createAndAddLink(id, network.getNodes().get(Id.create(fromNodeNumber, org.matsim.api.core.v01.network.Node.class)), network.getNodes().get(Id.create(toNodeNumber, org.matsim.api.core.v01.network.Node.class)), length, freespeed, capacity, nofLanes);
 				((LinkImpl) l).setOrigId(origId);
 				tagWayForward(way, l);
 			} else {
@@ -175,9 +175,9 @@ public class NetworkSink implements SinkSource {
 			}
 		}
 		if (!oneway) {
-			IdImpl id = new IdImpl(Long.toString(way.getId())+"_"+Long.toString(fromNodeNumber)+"_"+Long.toString(toNodeNumber)+"_R");
+			Id<Link> id = Id.create(Long.toString(way.getId())+"_"+Long.toString(fromNodeNumber)+"_"+Long.toString(toNodeNumber)+"_R", Link.class);
 			if (!network.getLinks().containsKey(id)) {
-				Link l = network.createAndAddLink(id, network.getNodes().get(new IdImpl(toNodeNumber)), network.getNodes().get(new IdImpl(fromNodeNumber)), length, freespeed, capacity, nofLanes);
+				Link l = network.createAndAddLink(id, network.getNodes().get(Id.create(toNodeNumber, org.matsim.api.core.v01.network.Node.class)), network.getNodes().get(Id.create(fromNodeNumber, org.matsim.api.core.v01.network.Node.class)), length, freespeed, capacity, nofLanes);
 				((LinkImpl) l).setOrigId(origId);
 				tagWayBackward(way, l);
 			} else {

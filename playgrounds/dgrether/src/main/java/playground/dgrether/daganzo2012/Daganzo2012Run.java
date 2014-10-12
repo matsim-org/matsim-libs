@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -35,6 +35,7 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.signalsystems.model.SignalGroupState;
+import org.matsim.signalsystems.model.SignalSystem;
 
 import playground.dgrether.linkanalysis.TTInOutflowEventHandler;
 import playground.dgrether.signalsystems.analysis.DgGreenSplitWriter;
@@ -78,12 +79,13 @@ public class Daganzo2012Run {
 	}
 
 	private void addControlerListener(Controler c) {
-		handler3 = new TTInOutflowEventHandler(new IdImpl("3"), new IdImpl("5"));
-		handler4 = new TTInOutflowEventHandler(new IdImpl("4"));
+		handler3 = new TTInOutflowEventHandler(Id.create("3", Link.class), Id.create("5", Link.class));
+		handler4 = new TTInOutflowEventHandler(Id.create("4", Link.class));
 		greenSplitHandler = new DgSignalGreenSplitHandler();
-		greenSplitHandler.addSignalSystem(new IdImpl("1"));
+		greenSplitHandler.addSignalSystem(Id.create("1", SignalSystem.class));
 		
 		c.addControlerListener(new StartupListener() {
+			@Override
 			public void notifyStartup(StartupEvent e) {
 				e.getControler().getEvents().addHandler(handler3);
 				e.getControler().getEvents().addHandler(handler4);
@@ -115,6 +117,7 @@ public class Daganzo2012Run {
 		});
 
 		c.addControlerListener(new IterationEndsListener() {
+			@Override
 			public void notifyIterationEnds(IterationEndsEvent e) {
 				handler3.iterationsEnds(e.getIteration());
 				handler4.iterationsEnds(e.getIteration());
@@ -166,6 +169,7 @@ public class Daganzo2012Run {
 		});
 		
 		c.addControlerListener(new ShutdownListener() {
+			@Override
 			public void notifyShutdown(ShutdownEvent e) {
 				try {
 					writer.flush();

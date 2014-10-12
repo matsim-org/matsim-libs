@@ -38,11 +38,11 @@ import javax.swing.tree.TreeSelectionModel;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalSystemControllerData;
+import org.matsim.signalsystems.model.SignalSystem;
 
 import playground.dgrether.xvis.control.XVisControl;
 import playground.dgrether.xvis.control.events.ShowPanelEvent;
@@ -179,8 +179,8 @@ public class SignalsTreePanel extends JPanel implements TreeSelectionListener {
 		
 	}
 	
-	private Id getSignalSystemIdFromNodeString(String nodeString){
-		Id signalSystemId = new IdImpl(nodeString.substring(SIGNAL_SYSTEM_PREFIX.length()));
+	private Id<SignalSystem> getSignalSystemIdFromNodeString(String nodeString){
+		Id<SignalSystem> signalSystemId = Id.create(nodeString.substring(SIGNAL_SYSTEM_PREFIX.length()), SignalSystem.class);
 		log.error("Node string: " + nodeString + " id " + signalSystemId);
 		return signalSystemId;
 	}

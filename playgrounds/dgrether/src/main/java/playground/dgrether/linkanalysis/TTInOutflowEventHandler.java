@@ -23,20 +23,19 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 
 public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
 	
-	private static final Logger log = Logger.getLogger(TTInOutflowEventHandler.class);
-	
-	private Id linkIdIn;
+	private Id<Link> linkIdIn;
 
-	private Map<Id, LinkEnterEvent> enterEvents;
+	private Map<Id<Person>, LinkEnterEvent> enterEvents;
 	
 	private SortedMap<Double, Integer> inflow;
 	
@@ -46,19 +45,19 @@ public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeave
 	
 	private SortedMap<Integer, Integer> countPerItertation;
 
-	private Id linkIdOut;
+	private Id<Link> linkIdOut;
 	
 	private int count = 0;
 	
-	public TTInOutflowEventHandler(Id linkId){
+	public TTInOutflowEventHandler(Id<Link> linkId){
 	  this(linkId, linkId);
 	}
 	
 	
-	public TTInOutflowEventHandler(Id linkIdIn, Id linkIdOut) {
+	public TTInOutflowEventHandler(Id<Link> linkIdIn, Id<Link> linkIdOut) {
 		this.linkIdIn = linkIdIn;
 		this.linkIdOut = linkIdOut;
-		this.enterEvents = new HashMap<Id, LinkEnterEvent>();
+		this.enterEvents = new HashMap<Id<Person>, LinkEnterEvent>();
 		this.inflow = new TreeMap<Double, Integer>();
 		this.outflow =  new TreeMap<Double, Integer>();
 		this.travelTimes = new TreeMap<Double, Double>();
@@ -67,6 +66,7 @@ public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeave
 
 	
 	
+	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		if (linkIdIn.equals(event.getLinkId())) {
 			//inflow
@@ -84,6 +84,7 @@ public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeave
 		}
 	}
 	
+	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		if (linkIdOut.equals(event.getLinkId())) {
 			//flow
@@ -113,6 +114,7 @@ public class TTInOutflowEventHandler implements LinkEnterEventHandler, LinkLeave
 		}
 	}
 
+	@Override
 	public void reset(int iteration) {
 		//reset again to avoid errors in case iterationEnds() isn't called
 		this.count = 0;

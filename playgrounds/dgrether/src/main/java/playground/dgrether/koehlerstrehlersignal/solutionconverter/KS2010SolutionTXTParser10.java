@@ -28,7 +28,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.io.IOUtils;
 
 
@@ -45,11 +45,11 @@ public class KS2010SolutionTXTParser10 {
 	private static final Logger log = Logger.getLogger(KS2010SolutionTXTParser10.class);
 	
 	private List<KS2010CrossingSolution> solutions;
-	private Map<Id, Double> streetFlow;
+	private Map<Id<Link>, Double> streetFlow;
 	
 	public void readFile(String filename) {
 		solutions = new ArrayList<KS2010CrossingSolution>();
-		streetFlow = new HashMap<Id, Double>();
+		streetFlow = new HashMap<Id<Link>, Double>();
 		BufferedReader br = IOUtils.getBufferedReader(filename);
 		String line;
 		try {
@@ -65,8 +65,8 @@ public class KS2010SolutionTXTParser10 {
 	
 	private void parseKreuzungLine(String line) {
 		String[] s = line.split(" ");
-		Id crossingId = new IdImpl(s[1]);
-		Id programId = new IdImpl(s[4]);
+		String crossingId = s[1];
+		String programId = s[4];
 		int offset = Integer.valueOf(s[7]);
 		log.debug("Crossing " + crossingId + " program " + programId + " offset " + offset);
 		KS2010CrossingSolution c = new KS2010CrossingSolution(crossingId);
@@ -76,7 +76,7 @@ public class KS2010SolutionTXTParser10 {
 
 	private void parseStrasseLine(String line) {
 		String[] s = line.split(" ");
-		Id streetId = new IdImpl(s[1]);
+		Id<Link> streetId = Id.create(s[1], Link.class);
 		double commodityFlow = Double.valueOf(s[4]);
 		log.debug("Street " + streetId + " flow of one commodity " + commodityFlow);
 		if (!this.streetFlow.containsKey(streetId))
@@ -104,7 +104,7 @@ public class KS2010SolutionTXTParser10 {
 		return solutions;
 	}
 
-	public Map<Id, Double> getStreetFlow() {
+	public Map<Id<Link>, Double> getStreetFlow() {
 		return streetFlow;
 	}
 	

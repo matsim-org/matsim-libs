@@ -23,7 +23,6 @@ import java.awt.BasicStroke;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.jfree.chart.ChartColor;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.ValueAxis;
@@ -32,7 +31,6 @@ import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.dgrether.analysis.charts.utils.DgColorScheme;
@@ -47,8 +45,6 @@ import playground.dgrether.analysis.population.DgPersonDataIncomeComparator;
  */
 public class DgAvgDeltaUtilsQuantilesChart {
 	
-	private static final Logger log = Logger.getLogger(DgAvgDeltaUtilsQuantilesChart.class);
-	
 	protected DgAnalysisPopulation ana;
 	
 	protected int nQuantiles = 10;
@@ -59,13 +55,13 @@ public class DgAvgDeltaUtilsQuantilesChart {
 
 	private DgXYLabelGenerator labelGenerator;
 	
-	public DgAvgDeltaUtilsQuantilesChart(DgAnalysisPopulation ana, Id runId1, Id runId2) {
+	public DgAvgDeltaUtilsQuantilesChart(DgAnalysisPopulation ana, String runId1, String runId2) {
 		this.ana = ana;
 		this.labelGenerator = new DgXYLabelGenerator();
 		this.dataset = this.createDatasets(runId1, runId2);
 	}
 	
-	private Tuple<XYSeries,List<String>> createXYSeries(String title, DgAnalysisPopulation pop, Id runId1, Id runId2) {
+	private Tuple<XYSeries,List<String>> createXYSeries(String title, DgAnalysisPopulation pop, String runId1, String runId2) {
 		List<DgAnalysisPopulation> quantiles = pop.getQuantiles(this.nQuantiles, new DgPersonDataIncomeComparator());
 		XYSeries series = new XYSeries(title, false, true);
 		List<String> labels = new ArrayList<String>();
@@ -85,7 +81,7 @@ public class DgAvgDeltaUtilsQuantilesChart {
 	
 
 	
-	private XYSeriesCollection createDatasets(Id runId1, Id runId2) {
+	private XYSeriesCollection createDatasets(String runId1, String runId2) {
 		XYSeriesCollection ds = new XYSeriesCollection();
 		Tuple<XYSeries, List<String>> seriesLabels = this.createXYSeries("Mean "+  '\u0394' + "Utility", this.ana, runId1, runId2);
 		ds.addSeries(seriesLabels.getFirst());

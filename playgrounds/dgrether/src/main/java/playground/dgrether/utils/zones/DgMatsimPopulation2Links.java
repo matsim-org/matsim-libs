@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -64,9 +63,9 @@ public class DgMatsimPopulation2Links {
 
 	private Network smallNetwork;
 
-	private Map<Id, Id> originalToSimplifiedLinkIdMatching;
+	private Map<Id<Link>, Id<Link>> originalToSimplifiedLinkIdMatching;
 	
-	public DgZones convert2Links(Network network, Network smallNetwork, Map<Id, Id> originalToSimplifiedLinkIdMatching, Population pop, DgZones cells, 
+	public DgZones convert2Links(Network network, Network smallNetwork, Map<Id<Link>, Id<Link>> originalToSimplifiedLinkIdMatching, Population pop, DgZones cells, 
 			Envelope networkBoundingBox, double startTime, double endTime) {
 		this.fullNetwork = network;
 		this.smallNetwork = smallNetwork; 
@@ -153,16 +152,16 @@ public class DgMatsimPopulation2Links {
 	}
 
 	private List<Link> createFullRoute(NetworkRoute route) {
-		List<Id> linkIds = new ArrayList<Id>();
+		List<Id<Link>> linkIds = new ArrayList<>();
 		linkIds.add(route.getStartLinkId());
 		linkIds.addAll(route.getLinkIds());
 		linkIds.add(route.getEndLinkId());
 		List<Link> links = new ArrayList<Link>();
-		for (Id linkId : linkIds){
+		for (Id<Link> linkId : linkIds) {
 			Link currentLink = this.fullNetwork.getLinks().get(linkId);
 			if (currentLink == null) {
-				if (linkId.equals(new IdImpl("5635"))){
-					currentLink = this.fullNetwork.getLinks().get(new IdImpl("5892"));
+				if (linkId.equals(Id.create("5635", Link.class))){
+					currentLink = this.fullNetwork.getLinks().get(Id.create("5892", Link.class));
 				}
 				else {
 					log.error("Network does not contain link id " + linkId);
@@ -181,7 +180,7 @@ public class DgMatsimPopulation2Links {
 		//search first link that is in the small network
 		while (! route.isEmpty()){
 			currentLink = route.remove(0);
-			Id linkId = currentLink.getId();
+			Id<Link> linkId = currentLink.getId();
 			if (this.originalToSimplifiedLinkIdMatching.containsKey(linkId)) {
 				linkId = this.originalToSimplifiedLinkIdMatching.get(linkId);
 				currentLink = smallNetwork.getLinks().get(linkId);
@@ -194,7 +193,7 @@ public class DgMatsimPopulation2Links {
 		//search last link that is in the small network
 		while (! route.isEmpty()){
 			currentLink = route.remove(route.size()-1);
-			Id linkId = currentLink.getId();
+			Id<Link> linkId = currentLink.getId();
 			if (this.originalToSimplifiedLinkIdMatching.containsKey(linkId)) {
 				linkId = this.originalToSimplifiedLinkIdMatching.get(linkId);
 				currentLink = smallNetwork.getLinks().get(linkId);

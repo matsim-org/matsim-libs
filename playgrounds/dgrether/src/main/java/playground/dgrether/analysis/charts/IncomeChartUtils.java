@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package playground.dgrether.analysis.charts;
 
-import org.matsim.api.core.v01.Id;
-
 import playground.dgrether.analysis.population.DgAnalysisPopulation;
 import playground.dgrether.analysis.population.DgPersonData;
 import playground.dgrether.analysis.population.DgPlanData;
@@ -32,7 +30,7 @@ import playground.dgrether.analysis.population.DgPlanData;
  */
 public class IncomeChartUtils {
 
-	public static Double calcAverageMoneyDifference(DgAnalysisPopulation group, int groupThreshold,  Id runId1, Id runId2) {
+	public static Double calcAverageMoneyDifference(DgAnalysisPopulation group, int groupThreshold,  String runId1, String runId2) {
 		Double deltaMoneySum = 0.0;
 		double deltaM = 0.0;
 		for (DgPersonData d : group.getPersonData().values()){

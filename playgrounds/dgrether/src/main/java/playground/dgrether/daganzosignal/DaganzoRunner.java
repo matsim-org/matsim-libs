@@ -22,9 +22,8 @@ package playground.dgrether.daganzosignal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -35,6 +34,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.signalsystems.model.SignalSystem;
 
 import playground.dgrether.analysis.charts.DgTravelTimeCalculatorChart;
 import playground.dgrether.analysis.charts.utils.DgChartWriter;
@@ -50,8 +50,6 @@ import playground.dgrether.signalsystems.analysis.DgSignalGreenSplitHandler;
  *
  */
 public class DaganzoRunner {
-
-	private static final Logger log = Logger.getLogger(DaganzoRunner.class);
 
 	private TTInOutflowEventHandler handler3, handler4;
 
@@ -88,16 +86,17 @@ public class DaganzoRunner {
 
 	private void addControlerListener(Controler c) {
 		//add some EventHandler to the EventsManager after the controler is started
-		handler3 = new TTInOutflowEventHandler(new IdImpl("3"), new IdImpl("5"));
-		handler4 = new TTInOutflowEventHandler(new IdImpl("4"));
+		handler3 = new TTInOutflowEventHandler(Id.create("3", Link.class), Id.create("5", Link.class));
+		handler4 = new TTInOutflowEventHandler(Id.create("4", Link.class));
 
 		signalGreenSplitHandler = new DgSignalGreenSplitHandler();
-		signalGreenSplitHandler.addSignalSystem(new IdImpl("1"));
+		signalGreenSplitHandler.addSignalSystem(Id.create("1", SignalSystem.class));
 		
-		greenSplitPerIterationGraph = new DgGreenSplitPerIterationGraph(c.getConfig().controler(), new IdImpl("1"));
+		greenSplitPerIterationGraph = new DgGreenSplitPerIterationGraph(c.getConfig().controler(), Id.create("1", SignalSystem.class));
 		
 		c.addControlerListener(new StartupListener() {
 
+			@Override
 			public void notifyStartup(StartupEvent e) {
 				e.getControler().getEvents().addHandler(handler3);
 				e.getControler().getEvents().addHandler(handler4);
@@ -108,6 +107,7 @@ public class DaganzoRunner {
 
 		//write some output after each iteration
 		c.addControlerListener(new IterationEndsListener() {
+			@Override
 			public void notifyIterationEnds(IterationEndsEvent e) {
 				handler3.iterationsEnds(e.getIteration());
 				handler4.iterationsEnds(e.getIteration());
@@ -126,15 +126,15 @@ public class DaganzoRunner {
 					DgTravelTimeCalculatorChart ttcalcChart = new DgTravelTimeCalculatorChart((TravelTimeCalculator)e.getControler().getLinkTravelTimes());
 					ttcalcChart.setStartTime(10.0);
 					ttcalcChart.setEndTime(3600.0 * 2.5);
-					List<Id> list = new ArrayList<Id>();
-					list.add(new IdImpl("2"));
+					List<Id<Link>> list = new ArrayList<>();
+					list.add(Id.create("2", Link.class));
 					ttcalcChart.addLinkId(list);
-					list = new ArrayList<Id>();
-					list.add(new IdImpl("4"));
+					list = new ArrayList<>();
+					list.add(Id.create("4", Link.class));
 					ttcalcChart.addLinkId(list);
-					list = new ArrayList<Id>();
-					list.add(new IdImpl("3"));
-					list.add(new IdImpl("5"));
+					list = new ArrayList<>();
+					list.add(Id.create("3", Link.class));
+					list.add(Id.create("5", Link.class));
 					ttcalcChart.addLinkId(list);
 					DgChartWriter.writeChart(e.getControler().getControlerIO().getIterationFilename(e.getIteration(), "ttcalculator"), 
 							ttcalcChart.createChart());
@@ -149,6 +149,7 @@ public class DaganzoRunner {
 		});
   	//write some output at shutdown
 		c.addControlerListener(new ShutdownListener() {
+			@Override
 			public void notifyShutdown(ShutdownEvent e) {
 				DgCountPerIterationGraph chart = new DgCountPerIterationGraph(e.getControler().getConfig().controler());
 				chart.addCountEventHandler(handler3, "count on link 3 & 5");
@@ -165,7 +166,7 @@ public class DaganzoRunner {
 //	//add the adaptive controller as events listener
 //	public void notifySimulationInitialized(SimulationInitializedEvent<QSim> e) {
 //		QSim qs = e.getQueueSimulation();
-//		AdaptiveController adaptiveController = (AdaptiveController) qs.getQSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
+//		AdaptiveController adaptiveController = (AdaptiveController) qs.getQSimSignalEngine().getSignalSystemControlerBySystemId().get(Id.create("1"));
 //		controler.getEvents().addHandler(adaptiveController);
 //	}
 //});
@@ -173,7 +174,7 @@ public class DaganzoRunner {
 //controler.getQueueSimulationListener().add(new SimulationBeforeCleanupListener<QSim>() {
 //	public void notifySimulationBeforeCleanup(SimulationBeforeCleanupEvent<QSim> e) {
 //		QSim qs = e.getQueueSimulation();
-//		AdaptiveController adaptiveController = (AdaptiveController) qs.getQSimSignalEngine().getSignalSystemControlerBySystemId().get(new IdImpl("1"));
+//		AdaptiveController adaptiveController = (AdaptiveController) qs.getQSimSignalEngine().getSignalSystemControlerBySystemId().get(Id.create("1"));
 //		controler.getEvents().removeHandler(adaptiveController);
 //	}
 //});

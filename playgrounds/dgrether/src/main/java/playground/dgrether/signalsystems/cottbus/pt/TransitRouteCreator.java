@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
@@ -53,8 +52,8 @@ public class TransitRouteCreator {
 	private static Logger log = Logger.getLogger(TransitRouteCreator.class);
 	private LeastCostPathCalculator lcp;
 	private Network network;
-	private List<Id> stopLinkList;
-	private List<Id> routeLinkList;
+	private List<Id<Link>> stopLinkList;
+	private List<Id<Link>> routeLinkList;
 
 	private String cbdir;
 
@@ -145,7 +144,7 @@ public class TransitRouteCreator {
 		try {
 			log.info("Writing Links to "+outfile);
 			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(outfile)));
-			for (Id linkid : this.routeLinkList){
+			for (Id<Link> linkid : this.routeLinkList){
 				bw.append(linkid.toString());
 				bw.newLine();
 			}
@@ -160,14 +159,14 @@ public class TransitRouteCreator {
 		
 	}
 
-	private List<Id> calculateRoutes() throws Exception {
-		List<Id> linkids = new ArrayList<Id>();
+	private List<Id<Link>> calculateRoutes() throws Exception {
+		List<Id<Link>> linkids = new ArrayList<>();
 		int size = this.stopLinkList.size();
 		linkids.add(this.stopLinkList.get(0));
 //		for the very first link, as routing is nodebased on toNodes
 		
 		for (int i = 0; i<(size-1);i++){
-			Id lastlink = new IdImpl("xyyyy");
+			Id<Link> lastlink = Id.create("xyyyy", Link.class);
 			
 			for (Link link : this.getLinks(this.stopLinkList.get(i), this.stopLinkList.get(i+1))){
 				if (lastlink.equals(link.getId())) continue;
@@ -183,10 +182,10 @@ public class TransitRouteCreator {
 		return linkids;
 	}
 
-	private List<Id> readStopLinks(String filename) {
+	private List<Id<Link>> readStopLinks(String filename) {
 		
 		log.info("Reading Links from "+filename);
-		List<Id> linkids = new ArrayList<Id>();
+		List<Id<Link>> linkids = new ArrayList<>();
 		
 		FileReader fr;
 		try {
@@ -196,7 +195,7 @@ public class TransitRouteCreator {
 			while ((line = br.readLine()) != null) {
 			    line = line.replaceAll("\"", "");
 				String[] result = line.split(";");
-			    Id current = new IdImpl(result[6]);
+			    Id<Link> current = Id.create(result[6], Link.class);
 			    linkids.add(current);
 			}
 			br.close();
@@ -216,7 +215,7 @@ public class TransitRouteCreator {
 		return linkids;
 	}
 
-	private List<Link> getLinks(Id fromlink, Id tolink) throws Exception {
+	private List<Link> getLinks(Id<Link> fromlink, Id<Link> tolink) throws Exception {
 		
 		List<Link> route = null;
 		log.info("from: "+fromlink+" to: "+tolink);

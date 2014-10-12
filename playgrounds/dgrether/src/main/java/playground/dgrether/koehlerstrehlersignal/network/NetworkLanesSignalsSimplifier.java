@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
@@ -60,25 +59,25 @@ public class NetworkLanesSignalsSimplifier {
 	private static final Logger log = Logger.getLogger(NetworkLanesSignalsSimplifier.class);
 	private Set<Integer> nodeTopoToMerge = new TreeSet<Integer>();
 
-	private Map<Id, Id> originalToSimplifiedLinkIdMatching = new HashMap<Id, Id>();
-	private Map<Id, List<Id>> simplifiedToOriginalLinkIdMatching = new HashMap<Id, List<Id>>();
+	private Map<Id<Link>, Id<Link>> originalToSimplifiedLinkIdMatching = new HashMap<>();
+	private Map<Id<Link>, List<Id<Link>>> simplifiedToOriginalLinkIdMatching = new HashMap<Id<Link>, List<Id<Link>>>();
 
 	private Set<Id<Node>> nodeIdsToRemove = new HashSet<>();
 	private boolean simplifySignalizedNodes;
 
-	private Id createId(Id inLink, Id outLink) {
-		Id id = new IdImpl(inLink + "-" + outLink);
+	private Id<Link> createId(Id<Link> inLink, Id<Link> outLink) {
+		Id<Link> id = Id.create(inLink + "-" + outLink, Link.class);
 //		log.error("created id mapping: " + id.toString());
-		this.simplifiedToOriginalLinkIdMatching.put(id, new ArrayList<Id>());
-		List<Id> ids = new ArrayList<Id>();
+		this.simplifiedToOriginalLinkIdMatching.put(id, new ArrayList<Id<Link>>());
+		List<Id<Link>> ids = new ArrayList<>();
 		ids.add(inLink);
 		ids.add(outLink);
-		for (Id idOld : ids) {
+		for (Id<Link> idOld : ids) {
 			if (simplifiedToOriginalLinkIdMatching.containsKey(idOld)) { // the old Id was already simplified before
-				List<Id> originalLinkIds = this.simplifiedToOriginalLinkIdMatching.remove(idOld);
+				List<Id<Link>> originalLinkIds = this.simplifiedToOriginalLinkIdMatching.remove(idOld);
 				this.simplifiedToOriginalLinkIdMatching.get(id).addAll(originalLinkIds);
 				
-				for (Id originalId : originalLinkIds)
+				for (Id<Link> originalId : originalLinkIds)
 					this.originalToSimplifiedLinkIdMatching.put(originalId, id);		
 			}
 			else {
@@ -222,7 +221,7 @@ public class NetworkLanesSignalsSimplifier {
 		return this.nodeIdsToRemove;
 	}
 	
-	public Map<Id, Id> getOriginalToSimplifiedLinkIdMatching(){
+	public Map<Id<Link>, Id<Link>> getOriginalToSimplifiedLinkIdMatching(){
 		return this.originalToSimplifiedLinkIdMatching;
 	}
 
@@ -266,18 +265,18 @@ public class NetworkLanesSignalsSimplifier {
 	public static void main(String[] args){
 		//some kind of unit test for id matchings ;-)
 		NetworkLanesSignalsSimplifier ns = new NetworkLanesSignalsSimplifier();
-		Id id1 = new IdImpl("1");
-		Id id2 = new IdImpl("2");
-		Id id12 = ns.createId(id1, id2);
+		Id<Link> id1 = Id.create("1", Link.class);
+		Id<Link> id2 = Id.create("2", Link.class);
+		Id<Link> id12 = ns.createId(id1, id2);
 		log.error(ns.simplifiedToOriginalLinkIdMatching);
 		log.error(ns.originalToSimplifiedLinkIdMatching);
-		Id id3 = new IdImpl("3");
-		Id id123 = ns.createId(id12, id3);
+		Id<Link> id3 = Id.create("3", Link.class);
+		Id<Link> id123 = ns.createId(id12, id3);
 		log.error(ns.simplifiedToOriginalLinkIdMatching);
 		log.error(ns.originalToSimplifiedLinkIdMatching);
-		Id id4 = new IdImpl("4");
-		Id id5 = new IdImpl("5");
-		Id id45 = ns.createId(id4, id5);
+		Id<Link> id4 = Id.create("4", Link.class);
+		Id<Link> id5 = Id.create("5", Link.class);
+		Id<Link> id45 = ns.createId(id4, id5);
 		log.error(ns.simplifiedToOriginalLinkIdMatching);
 		log.error(ns.originalToSimplifiedLinkIdMatching);
 		log.error("");

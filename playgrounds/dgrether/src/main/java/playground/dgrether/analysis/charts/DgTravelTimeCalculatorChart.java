@@ -35,6 +35,7 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
 import playground.dgrether.analysis.charts.interfaces.DgChart;
@@ -52,7 +53,7 @@ public class DgTravelTimeCalculatorChart implements DgChart {
   
   private TravelTimeCalculator calculator;
 
-  private Map<List<Id>, XYSeries> linkIds = new HashMap<List<Id>, XYSeries>();
+  private Map<List<Id<Link>>, XYSeries> linkIds = new HashMap<>();
 
   private double endTime = Double.POSITIVE_INFINITY;
 
@@ -63,10 +64,10 @@ public class DgTravelTimeCalculatorChart implements DgChart {
     this.calculator = travelTimeCalculator;
   }
 
-  public void addLinkId(List<Id> ids) {
+  public void addLinkId(List<Id<Link>> ids) {
     StringBuilder title = new StringBuilder();
     title.append("Link");
-    for (Id id : ids) {
+    for (Id<Link> id : ids) {
       title.append(" ");
       title.append(id);
     }
@@ -92,13 +93,13 @@ public class DgTravelTimeCalculatorChart implements DgChart {
     
     double tt;
     XYSeries series;
-    for (Entry<List<Id>, XYSeries> e : this.linkIds.entrySet()){
+    for (Entry<List<Id<Link>>, XYSeries> e : this.linkIds.entrySet()){
       series = e.getValue();
       dataset.addSeries(series);
 //      log.error("link: "+ e.getKey());
       for (double i = startSecond; i < endSecond; i++) {
         tt = 0;
-        for (Id id : e.getKey()){
+        for (Id<Link> id : e.getKey()){
           tt += this.calculator.getLinkTravelTime(id, i);
         }
 //        log.error("time: " + i + " tt " + tt);
@@ -110,7 +111,8 @@ public class DgTravelTimeCalculatorChart implements DgChart {
   }
   
 
-  public JFreeChart createChart() {
+  @Override
+	public JFreeChart createChart() {
     XYSeriesCollection dataset = this.createDataSet();
     XYPlot plot = new XYPlot();
     DgAxisBuilder axisBuilder = new DgDefaultAxisBuilder();

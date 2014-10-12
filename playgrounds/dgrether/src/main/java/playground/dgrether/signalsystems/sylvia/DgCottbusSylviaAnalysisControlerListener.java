@@ -20,7 +20,7 @@
 package playground.dgrether.signalsystems.sylvia;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -29,6 +29,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.signalsystems.model.SignalSystem;
 
 import playground.dgrether.signalsystems.analysis.DgGreenSplitWriter;
 import playground.dgrether.signalsystems.analysis.DgSignalGreenSplitHandler;
@@ -85,12 +86,12 @@ public class DgCottbusSylviaAnalysisControlerListener implements StartupListener
 	
 	private void initGreenSplitHandler(){
 		this.signalGreenSplitHandler = new DgSignalGreenSplitHandler();
-		this.signalGreenSplitHandler.addSignalSystem(new IdImpl("18"));
-		this.signalGreenSplitHandler.addSignalSystem(new IdImpl("17"));
-		this.signalGreenSplitHandler.addSignalSystem(new IdImpl("1"));
-		this.signalGreenSplitHandler.addSignalSystem(new IdImpl("28"));
-		this.signalGreenSplitHandler.addSignalSystem(new IdImpl("27"));
-		this.signalGreenSplitHandler.addSignalSystem(new IdImpl("12"));
+		this.signalGreenSplitHandler.addSignalSystem(Id.create("18", SignalSystem.class));
+		this.signalGreenSplitHandler.addSignalSystem(Id.create("17", SignalSystem.class));
+		this.signalGreenSplitHandler.addSignalSystem(Id.create("1", SignalSystem.class));
+		this.signalGreenSplitHandler.addSignalSystem(Id.create("28", SignalSystem.class));
+		this.signalGreenSplitHandler.addSignalSystem(Id.create("27", SignalSystem.class));
+		this.signalGreenSplitHandler.addSignalSystem(Id.create("12", SignalSystem.class));
 	}
 
 	

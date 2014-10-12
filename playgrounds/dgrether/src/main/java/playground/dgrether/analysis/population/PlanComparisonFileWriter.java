@@ -23,8 +23,6 @@ package playground.dgrether.analysis.population;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-
-import org.matsim.api.core.v01.Id;
 /**
  * This class can be used to write a PlanComparison to a file.
  * @author dgrether
@@ -39,11 +37,11 @@ public class PlanComparisonFileWriter {
 		this.pop = pop;
 	}
 	
-	public void write(String filename, Id runId1, Id runId2) {
+	public void write(String filename, String runId1, String runId2) {
 		this.write(filename, this.pop, runId1, runId2);
 	}
 	
-	private void write(String filename, DgAnalysisPopulation pc, Id runId1, Id runId2) {
+	private void write(String filename, DgAnalysisPopulation pc, String runId1, String runId2) {
 		try {
 			this.writer = new BufferedWriter(new FileWriter(filename));
 		} catch (IOException e) {

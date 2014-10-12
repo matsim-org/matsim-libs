@@ -41,11 +41,11 @@ import com.vividsolutions.jts.geom.Polygon;
 public class DgZone extends DgOriginImpl implements DgOrigin{
 
 	private Polygon polygon;
-	private Id id;
+	private Id<DgZone> id;
 	private Map<Id, DgZoneFromLink> fromLinks = new HashMap<Id, DgZoneFromLink>();
 	private Link zoneNetworkConnectionLink;
 	
-	public DgZone(Id id, Polygon p) {
+	public DgZone(Id<DgZone> id, Polygon p) {
 		this.id = id;
 		polygon = p;
 	}

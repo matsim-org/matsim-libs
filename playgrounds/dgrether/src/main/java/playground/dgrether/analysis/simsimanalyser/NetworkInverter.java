@@ -8,7 +8,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 
@@ -53,7 +52,7 @@ public class NetworkInverter {
 	}
 
 	private int createInvertedLink(Link inLink, Link outLink, int numberOfLinksGenerated){
-		Link link = this.invertedNetwork.createAndAddLink(new IdImpl(inLink.getId().toString() + "zzz" + outLink.getId().toString()), // start counting link ids with 1 instead of 0
+		Link link = this.invertedNetwork.createAndAddLink(Id.create(inLink.getId().toString() + "zzz" + outLink.getId().toString(), Link.class), // start counting link ids with 1 instead of 0
 				this.invertedNetwork.getNodes().get(inLink.getId()), this.invertedNetwork.getNodes().get(outLink.getId()),
 				outLink.getLength(),
 				outLink.getFreespeed(),

@@ -24,8 +24,6 @@ import java.util.List;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -75,9 +73,8 @@ public class KS2010SolutionXMLParser10 extends MatsimXmlParser {
 					String crossingString = nameParts[1];
 					String programString = nameParts[2];
 					int offsetSeconds = Integer.parseInt(nameParts[3]);
-					Id crossingId = new IdImpl(crossingString);
-					KS2010CrossingSolution crossing = new KS2010CrossingSolution(crossingId);
-					crossing.addOffset4Program(new IdImpl(programString), offsetSeconds);
+					KS2010CrossingSolution crossing = new KS2010CrossingSolution(crossingString);
+					crossing.addOffset4Program(programString, offsetSeconds);
 					this.solutionCrossingByIdMap.add(crossing);
 				}
 			}

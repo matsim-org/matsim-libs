@@ -38,6 +38,7 @@ import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.signalsystems.model.Signal;
 import org.matsim.signalsystems.model.SignalGroup;
+import org.matsim.signalsystems.model.SignalPlan;
 import org.matsim.signalsystems.model.SignalSystem;
 
 
@@ -52,7 +53,7 @@ public class DgSignalsUtils {
 	}
 	
 	
-	public static SignalPlanData copySignalPlanData(final SignalPlanData signalPlan, Id planId, SignalControlDataFactory factory) {
+	public static SignalPlanData copySignalPlanData(final SignalPlanData signalPlan, Id<SignalPlan> planId, SignalControlDataFactory factory) {
 		SignalPlanData newPlan = factory.createSignalPlanData(planId);
 		newPlan.setCycleTime(signalPlan.getCycleTime());
 		newPlan.setEndTime(signalPlan.getEndTime());
@@ -109,7 +110,7 @@ public class DgSignalsUtils {
 		Link link;
 		Node node;
 		for (SignalData signal : ss.getSignalData().values()){
-			Id linkId = signal.getLinkId();
+			Id<Link> linkId = signal.getLinkId();
 			link = net.getLinks().get(linkId);
 			node = link.getToNode();
 			nodes.add(node);
@@ -130,7 +131,7 @@ public class DgSignalsUtils {
 	 * 
 	 * @return null if the signal is not attached to a group
 	 */
-	public static SignalGroupData getSignalGroup4SignalId(Id signalSystemId, Id signalId, SignalGroupsData signalGroups){
+	public static SignalGroupData getSignalGroup4SignalId(Id<SignalSystem> signalSystemId, Id<Signal> signalId, SignalGroupsData signalGroups){
 		Map<Id<SignalGroup>, SignalGroupData> signalGroups4System = signalGroups.getSignalGroupDataBySystemId(signalSystemId);
 		for (SignalGroupData group : signalGroups4System.values()){
 			if (group.getSignalIds().contains(signalId)){
@@ -170,12 +171,12 @@ public class DgSignalsUtils {
 		return signalizedLinksPerSystem;
 	}
 	
-	public static Set<Id> calculateSignalizedLinkIds4SignalGroup(SignalSystemData system, SignalGroupData signalGroup){
-		Set<Id> linkIds = new HashSet<Id>();
+	public static Set<Id<Link>> calculateSignalizedLinkIds4SignalGroup(SignalSystemData system, SignalGroupData signalGroup){
+		Set<Id<Link>> linkIds = new HashSet<>();
 		if (!system.getId().equals(signalGroup.getSignalSystemId())){
 			throw new IllegalArgumentException("System Id: " + system.getId() + " is not equal to signal group Id: " + signalGroup.getId());
 		}
-		for (Id signalId : signalGroup.getSignalIds()){
+		for (Id<Signal> signalId : signalGroup.getSignalIds()){
 			SignalData signal = system.getSignalData().get(signalId);
 			linkIds.add(signal.getLinkId());
 		}

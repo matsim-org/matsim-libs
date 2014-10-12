@@ -21,7 +21,13 @@ package playground.dgrether.koehlerstrehlersignal.ids;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.lanes.data.v20.Lane;
+
+import playground.dgrether.koehlerstrehlersignal.data.DgCrossing;
+import playground.dgrether.koehlerstrehlersignal.data.DgCrossingNode;
+import playground.dgrether.koehlerstrehlersignal.data.DgGreen;
 
 
 /**
@@ -51,9 +57,9 @@ public class DgIdConverter {
 	 * @param linkId the id of the link in the matsim network
 	 * @return the id for the crossing node of the links from crossing
 	 */
-	public  Id convertLinkId2FromCrossingNodeId(Id linkId){
+	public  Id<Node> convertLinkId2FromCrossingNodeId(Id<Link> linkId){
 		String idString = linkId.toString() + "11";
-		return idPool.createId(idString);
+		return idPool.createId(idString, Node.class);
 	}
 	
 	/**
@@ -64,9 +70,9 @@ public class DgIdConverter {
 	 * @param linkId the id of the link in the matsim network
 	 * @return the id for the crossing node of the links to crossing
 	 */
-	public  Id convertLinkId2ToCrossingNodeId(Id linkId){
+	public Id<Node> convertLinkId2ToCrossingNodeId(Id<Link> linkId){
 		String idString = linkId.toString() + "99";
-		return idPool.createId(idString);
+		return idPool.createId(idString, Node.class);
 	}
 	
 	/**
@@ -75,10 +81,10 @@ public class DgIdConverter {
 	 * @param toCrossingNodeId the id of the crossing node in the ks-model network
 	 * @return the id of the matsim link corresponding to the street ending in this crossing node
 	 */
-	public Id convertToCrossingNodeId2LinkId(Id toCrossingNodeId){
+	public Id<Link> convertToCrossingNodeId2LinkId(Id<DgCrossingNode> toCrossingNodeId){
 		String sid = toCrossingNodeId.toString();
 		if (sid.endsWith("99")){
-			Id id = new IdImpl(sid.substring(0, sid.length() - 2));
+			Id<Link> id = Id.create(sid.substring(0, sid.length() - 2), Link.class);
 			return id;
 		}
 		throw new IllegalStateException("Can not convert " + sid + " to link id");
@@ -90,14 +96,14 @@ public class DgIdConverter {
 	 * @param fromCrossingNodeId the id of the crossing node in the ks-model network
 	 * @return the id of the matsim link corresponding to the street starting in this crossing node
 	 */
-	public Id convertFromCrossingNodeId2LinkId(Id fromCrossingNodeId){
-		String sid = fromCrossingNodeId.toString();
-		if (sid.endsWith("11")){
-			Id id = new IdImpl(sid.substring(0, sid.length() - 2));
-			return id;
-		}
-		throw new IllegalStateException("Can not convert " + sid + " to link id");
-	}
+//	public Id convertFromCrossingNodeId2LinkId(Id fromCrossingNodeId){
+//		String sid = fromCrossingNodeId.toString();
+//		if (sid.endsWith("11")){
+//			Id id = Id.create(sid.substring(0, sid.length() - 2));
+//			return id;
+//		}
+//		throw new IllegalStateException("Can not convert " + sid + " to link id");
+//	}
 	
 	/**
 	 * creates a light id for a link to link relationship
@@ -107,16 +113,16 @@ public class DgIdConverter {
 	 * @param toLinkId
 	 * @return the light id
 	 */
-	public  Id convertFromLinkIdToLinkId2LightId(Id fromLinkId, Id fromLaneId, Id toLinkId){
-		Id id =  null;
+	public Id<DgGreen> convertFromLinkIdToLinkId2LightId(Id<Link> fromLinkId, Id<Lane> fromLaneId, Id<Link> toLinkId){
+		String id =  null;
 		if (fromLaneId == null){
-			id = new IdImpl(fromLinkId.toString()  + "55" + toLinkId.toString());
+			id = fromLinkId.toString()  + "55" + toLinkId.toString();
 		}
 		else {
-			id = new IdImpl(fromLinkId.toString() + "66" + fromLaneId.toString() + "55" + toLinkId.toString());
+			id = fromLinkId.toString() + "66" + fromLaneId.toString() + "55" + toLinkId.toString();
 		}
 		String idString = id.toString();
-		return idPool.createId(idString);
+		return idPool.createId(idString, DgGreen.class);
 	}
 	
 	/**
@@ -125,9 +131,9 @@ public class DgIdConverter {
 	 * @param nodeId the matsim node id
 	 * @return the corresponding crossing id in the ks-model
 	 */
-	public  Id convertNodeId2CrossingId(Id nodeId){
+	public  Id<DgCrossing> convertNodeId2CrossingId(Id<Node> nodeId){
 		String idString = nodeId.toString() + "77";
-		return idPool.createId(idString);
+		return idPool.createId(idString, DgCrossing.class);
 	}
 	
 	/**
@@ -136,10 +142,10 @@ public class DgIdConverter {
 	 * @param crossingId the crossing id in the ks-model
 	 * @return the corresponding node id in the matsim network
 	 */
-	public Id convertCrossingId2NodeId(Id crossingId){
+	public Id<Node> convertCrossingId2NodeId(Id<DgCrossing> crossingId){
 		String sid = crossingId.toString();
 		if (sid.endsWith("77")){
-			Id  id = new IdImpl(sid.substring(0, sid.length() - 2));
+			Id<Node> id = Id.create(sid.substring(0, sid.length() - 2), Node.class);
 			return id;
 		}
 		throw new IllegalStateException("Can not convert " + sid + " to node id");
@@ -154,9 +160,9 @@ public class DgIdConverter {
 	 * @return the crossing node id in the ks-model representing the single crossing node 
 	 * of the not expanded crossing corresponding to the matsim node
 	 */
-	public Id convertNodeId2NotExpandedCrossingNodeId(Id nodeId){
+	public Id<Node> convertNodeId2NotExpandedCrossingNodeId(Id<Node> nodeId){
 		String idString = nodeId.toString();
-		return idPool.createId(idString);
+		return idPool.createId(idString, Node.class);
 	}
 	
 	/**
@@ -166,9 +172,9 @@ public class DgIdConverter {
 	 * @return the id of the matsim node corresponding to the not expanded crossing 
 	 * in the ks-model containing this crossing node
 	 */
-	public Id convertNotExpandedCrossingNodeId2NodeId(Id crossingNodeId){
+	public Id<Node> convertNotExpandedCrossingNodeId2NodeId(Id<Node> crossingNodeId){
 		String sid = crossingNodeId.toString();
-		return new IdImpl(sid);
+		return Id.create(sid, Node.class);
 	}
 	
 	/**
@@ -177,9 +183,9 @@ public class DgIdConverter {
 	 * @param linkId the link id in the matsim network
 	 * @return the street id for the ks-model
 	 */
-	public Id convertLinkId2StreetId(Id linkId){
+	public Id<Link> convertLinkId2StreetId(Id<Link> linkId){
 		String idString = linkId.toString() + "88";
-		return idPool.createId(idString);
+		return idPool.createId(idString, Link.class);
 	}
 
 	/**
@@ -188,35 +194,35 @@ public class DgIdConverter {
 	 * @param streetId the street id in the ks-model
 	 * @return the corresponding link id in the matsim network
 	 */
-	public Id convertStreetId2LinkId(Id streetId){
+	public Id<Link> convertStreetId2LinkId(Id<Link> streetId){
 		String sid = streetId.toString();
 		if (sid.endsWith("88")){
-			Id  id = new IdImpl(sid.substring(0, sid.length() - 2));
+			Id<Link>  id = Id.create(sid.substring(0, sid.length() - 2), Link.class);
 			return id;
 		}
 		throw new IllegalStateException("Can not convert " + sid + " to link id");
 	}
 
-	
-	public Id createFromZone2ToZoneId(Id from, Id to){
-		String idString = from + "22" + to;
-		return idPool.createId(idString);
-	}
+//	
+//	public Id createFromZone2ToZoneId(Id from, Id to){
+//		String idString = from + "22" + to;
+//		return idPool.createId(idString);
+//	}
 
-	public Id createFromLink2ToLinkId(Id from, Id to){
+	public Id<Link> createFromLink2ToLinkId(Id<Link> from, Id<Link> to){
 		String idString = from + "33" + to;
-		return idPool.createId(idString);
+		return idPool.createId(idString, Link.class);
 	}
-	
-	public Id createFrom2ToId(Id from, Id to){
-		String idString = from + "44" + to;
-		return idPool.createId(idString);
-	}
+//	
+//	public Id createFrom2ToId(Id from, Id to){
+//		String idString = from + "44" + to;
+//		return idPool.createId(idString);
+//	}
 
-	public Id getSymbolicId(Integer crossingId) {
+	public Id<DgCrossing> getSymbolicId(Integer crossingId) {
 		String idString = idPool.getStringId(crossingId);
 		log.debug("Matched " + Integer.toString(crossingId) + " -> " + idString);
-		return new IdImpl(idString);
+		return Id.create(idString, DgCrossing.class);
 	}
 
 	

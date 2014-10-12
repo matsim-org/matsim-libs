@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -35,6 +34,7 @@ import org.matsim.signalsystems.data.SignalsScenarioWriter;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalSystemControllerData;
+import org.matsim.signalsystems.model.SignalPlan;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.signalsystems.utils.DgSignalsUtils;
@@ -73,7 +73,7 @@ public class SignalsMorningEveningMergeTool {
 			List<SignalPlanData> morningPlans = new ArrayList<SignalPlanData>(morningController.getSignalPlanData().values());
 			morningController.getSignalPlanData().clear();
 			for (SignalPlanData morningPlan : morningPlans) {
-				Id newId = new IdImpl(morningPlan.getId().toString() + "_m");
+				Id<SignalPlan> newId = Id.create(morningPlan.getId().toString() + "_m", SignalPlan.class);
 				SignalPlanData newPlan = DgSignalsUtils.copySignalPlanData(morningPlan, newId, morningControl.getFactory());
 				newPlan.setStartTime(0.0);
 				newPlan.setEndTime(12.0 * 3600.0);
@@ -81,7 +81,7 @@ public class SignalsMorningEveningMergeTool {
 			}
 			SignalSystemControllerData ecd = eveningControl.getSignalSystemControllerDataBySystemId().get(morningController.getSignalSystemId());
 			for (SignalPlanData eplan : ecd.getSignalPlanData().values()) {
-				Id newId = new IdImpl(eplan.getId().toString() + "_e");
+				Id<SignalPlan> newId = Id.create(eplan.getId().toString() + "_e", SignalPlan.class);
 				SignalPlanData newPlan = DgSignalsUtils.copySignalPlanData(eplan, newId, morningControl.getFactory());
 				newPlan.setStartTime(12.0 * 3600.0);
 				newPlan.setEndTime((23.0 * 3600.0) + (59.0 * 60.0) + 59.0);

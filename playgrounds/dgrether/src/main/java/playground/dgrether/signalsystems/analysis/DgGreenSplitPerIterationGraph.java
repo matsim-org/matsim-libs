@@ -36,6 +36,7 @@ import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.signalsystems.model.SignalGroupState;
+import org.matsim.signalsystems.model.SignalSystem;
 
 import playground.dgrether.analysis.charts.DgAxisBuilder;
 import playground.dgrether.analysis.charts.DgDefaultAxisBuilder;
@@ -53,11 +54,11 @@ public class DgGreenSplitPerIterationGraph {
 
   private ControlerConfigGroup controllerConfig;
 
-  private Id signalSystemId;
+  private Id<SignalSystem> signalSystemId;
 
   private SortedMap<Integer, DgSignalSystemAnalysisData> iterationSystemDataMap;
   
-  public DgGreenSplitPerIterationGraph(ControlerConfigGroup controlerConfigGroup, Id signalSystemId){
+  public DgGreenSplitPerIterationGraph(ControlerConfigGroup controlerConfigGroup, Id<SignalSystem> signalSystemId){
     this.controllerConfig =  controlerConfigGroup;
     this.signalSystemId = signalSystemId;
     this.iterationSystemDataMap = new TreeMap<Integer, DgSignalSystemAnalysisData>();

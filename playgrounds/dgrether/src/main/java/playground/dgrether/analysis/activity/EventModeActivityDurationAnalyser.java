@@ -18,6 +18,12 @@
  * *********************************************************************** */
 package playground.dgrether.analysis.activity;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -25,9 +31,9 @@ import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
@@ -40,9 +46,8 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.BarChart;
 import org.matsim.core.utils.misc.Time;
-import playground.dgrether.utils.IntegerCountMap;
 
-import java.util.*;
+import playground.dgrether.utils.IntegerCountMap;
 
 
 /**
@@ -99,7 +104,7 @@ public class EventModeActivityDurationAnalyser {
 
 	private static class ActivityDurationHandler implements ActivityEndEventHandler, ActivityStartEventHandler{
 
-		Map<Id, ActivityStartEvent> eventMap = new HashMap<Id, ActivityStartEvent>();
+		Map<Id<Person>, ActivityStartEvent> eventMap = new HashMap<>();
 
 		IntegerCountMap<Double> ptStartTimeMap = new IntegerCountMap<Double>();
 		IntegerCountMap<Double> carStartTimeMap = new IntegerCountMap<Double>();
@@ -154,8 +159,8 @@ public class EventModeActivityDurationAnalyser {
 
 		@Override
 		public void handleEvent(final ActivityStartEvent event) {
-			this.eventMap.put(new IdImpl(event.getPersonId().toString()), event);
-			Plan p = this.plans.getPersons().get(new IdImpl(event.getPersonId().toString())).getSelectedPlan();
+			this.eventMap.put(event.getPersonId(), event);
+			Plan p = this.plans.getPersons().get(event.getPersonId()).getSelectedPlan();
 			if (event.getActType().equalsIgnoreCase("w")) {
 				if (((PlanImpl) p).getType().equals(TransportMode.pt)) {
 					this.ptStartTimeMap.incrementValue(event.getTime());

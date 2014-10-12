@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Node;
 
 
 /**
@@ -35,18 +36,18 @@ public class DgCrossing {
 
 	private static final Logger log = Logger.getLogger(DgCrossing.class);
 	
-	private Id id;
+	private Id<DgCrossing> id;
 	private boolean signalized;
-	private Map<Id, DgCrossingNode> nodes = new HashMap<Id, DgCrossingNode>();
-	private Map<Id, DgStreet> lights = new HashMap<Id, DgStreet>();
-	private Map<Id, DgProgram> programs = new HashMap<Id, DgProgram>();
+	private Map<Id<Node>, DgCrossingNode> nodes = new HashMap<>();
+	private Map<Id, DgStreet> lights = new HashMap<>();
+	private Map<String, DgProgram> programs = new HashMap<>();
 	private String type;
 
-	public DgCrossing(Id id) {
+	public DgCrossing(Id<DgCrossing> id) {
 		this.id = id;
 	}
 
-	public Id getId() {
+	public Id<DgCrossing> getId() {
 		return this.id;
 	}
 
@@ -57,7 +58,7 @@ public class DgCrossing {
 		this.nodes.put(crossingNode.getId(), crossingNode);
 	}
 	
-	public Map<Id, DgCrossingNode> getNodes(){
+	public Map<Id<Node>, DgCrossingNode> getNodes(){
 		return this.nodes;
 	}
 	
@@ -80,7 +81,7 @@ public class DgCrossing {
 		this.programs.put(p.getId(), p);
 	}
 	
-	public Map<Id, DgProgram> getPrograms(){
+	public Map<String, DgProgram> getPrograms(){
 		return this.programs;
 	}
 	

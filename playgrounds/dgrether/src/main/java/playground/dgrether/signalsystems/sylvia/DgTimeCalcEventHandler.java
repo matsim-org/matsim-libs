@@ -22,40 +22,38 @@ package playground.dgrether.signalsystems.sylvia;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.handler.LaneEnterEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.lanes.data.v20.Lane;
 
 public class DgTimeCalcEventHandler implements LaneEnterEventHandler {
 
-	private static final Logger log = Logger.getLogger(DgTimeCalcEventHandler.class);
-
-	private Set<Id> carsPassed;
-	private Set<Id> wannabeadaptiveLanes;
+	private Set<Id<Person>> carsPassed;
+	private Set<Id<Lane>> wannabeadaptiveLanes;
 
 	public DgTimeCalcEventHandler() {
-		this.wannabeadaptiveLanes = new HashSet<Id>();
+		this.wannabeadaptiveLanes = new HashSet<>();
 		this.fillWannaBes();
 		this.reset(0);
 	}
 
 	@Override
 	public void reset(int iteration) {
-		this.carsPassed = new HashSet<Id>();
+		this.carsPassed = new HashSet<>();
 	}
 
 	private void fillWannaBes() {
 		// mock up adaptive lanes to create comparable travel times LSA-SLV
 		for (int i = 2100; i < 2113; i++) { // Signalsystem 17
-			this.wannabeadaptiveLanes.add(new IdImpl(i));
+			this.wannabeadaptiveLanes.add(Id.create(i, Lane.class));
 		}
 		for (int i = 2000; i < 2013; i++) { // Signalsystem 18
-			this.wannabeadaptiveLanes.add(new IdImpl(i));
+			this.wannabeadaptiveLanes.add(Id.create(i, Lane.class));
 		}
 		for (int i = 1900; i < 1913; i++) { // Signalsystem 1
-			this.wannabeadaptiveLanes.add(new IdImpl(i));
+			this.wannabeadaptiveLanes.add(Id.create(i, Lane.class));
 		}
 
 	}
@@ -74,7 +72,7 @@ public class DgTimeCalcEventHandler implements LaneEnterEventHandler {
 		return this.carsPassed.size();
 	}
 
-	public Set<Id> getPassedCars() {
+	public Set<Id<Person>> getPassedCars() {
 		return carsPassed;
 	}
 

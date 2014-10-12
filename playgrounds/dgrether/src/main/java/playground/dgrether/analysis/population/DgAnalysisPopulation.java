@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -50,16 +51,16 @@ public class DgAnalysisPopulation {
 
 	private Envelope boundingBox = null;
 	
-	private Map<Id, DgPersonData> table;
+	private Map<Id<Person>, DgPersonData> table;
 	/**
 	 * Creates a PlanComparison Object with the initial size
 	 * @param size
 	 */
 	public DgAnalysisPopulation() {
-     table = new LinkedHashMap<Id, DgPersonData>();
+     table = new LinkedHashMap<Id<Person>, DgPersonData>();
 	}
 	
-	public Map<Id, DgPersonData> getPersonData() {
+	public Map<Id<Person>, DgPersonData> getPersonData() {
 		return table;
 	}
 	
@@ -86,7 +87,7 @@ public class DgAnalysisPopulation {
 		return result;
 	}
 	
-	public int calculateNumberOfCarPlans(Id runId) {
+	public int calculateNumberOfCarPlans(String runId) {
 		int carplans = 0;
 		for (DgPersonData d : table.values()) {
 			if (((PlanImpl) d.getPlanData().get(runId).getPlan()).getType().equals(TransportMode.car)){
@@ -125,7 +126,7 @@ public class DgAnalysisPopulation {
 		}
 	}
 
-	public Double calcAverageScoreDifference(Id runId1, Id runId2) {
+	public Double calcAverageScoreDifference(String runId1, String runId2) {
 		Double deltaScoreSum = 0.0;
 		for (DgPersonData d : this.getPersonData().values()){
 			DgPlanData planDataRun1 = d.getPlanData().get(runId1);

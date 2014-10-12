@@ -40,7 +40,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.network.KmlNetworkWriter;
@@ -187,9 +186,9 @@ public class TollSchemeGenerator {
 		this.usedCoords = parseGoogleEarthCoord(this.config);
 
 		//prepare data
-		List<Id> linkIdsToFilter = new ArrayList<Id>(this.usedLinkIdsToFilterArray.length);
+		List<Id<Link>> linkIdsToFilter = new ArrayList<>(this.usedLinkIdsToFilterArray.length);
 		for (int i = 0; i < this.usedLinkIdsToFilterArray.length; i++) {
-			linkIdsToFilter.add(new IdImpl(this.usedLinkIdsToFilterArray[i]));
+			linkIdsToFilter.add(Id.create(this.usedLinkIdsToFilterArray[i], Link.class));
 		}
 
 
@@ -236,8 +235,8 @@ public class TollSchemeGenerator {
 
 
 	private Network applyLinkIdFilter(Network tollNetwork,
-			List<Id> linkIdsToFilter) {
-		for (Id i : linkIdsToFilter) {
+			List<Id<Link>> linkIdsToFilter) {
+		for (Id<Link> i : linkIdsToFilter) {
 			tollNetwork.removeLink(i);
 		}
 		return tollNetwork;

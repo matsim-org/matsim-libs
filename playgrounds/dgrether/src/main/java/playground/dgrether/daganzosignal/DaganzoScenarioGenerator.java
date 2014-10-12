@@ -40,6 +40,7 @@ import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -60,7 +61,6 @@ import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.DgPlaygroundJobfileCreator;
-import playground.dgrether.utils.IdFactory;
 
 /**
  * @author dgrether
@@ -406,7 +406,7 @@ public class DaganzoScenarioGenerator {
 		config.strategy().setMaxAgentPlanMemorySize(4);
 
 		StrategyConfigGroup.StrategySettings selectExp = new StrategyConfigGroup.StrategySettings(
-				IdFactory.get(1));
+				Id.create(1, StrategySettings.class));
 		selectExp.setModuleName("ChangeExpBeta");
 //		selectExp.setModuleName("BestScore");
 		config.strategy().addStrategySettings(selectExp);
@@ -416,7 +416,7 @@ public class DaganzoScenarioGenerator {
 		else {
 		  selectExp.setProbability(0.9);
 		  StrategyConfigGroup.StrategySettings reRoute = new StrategyConfigGroup.StrategySettings(
-		      IdFactory.get(2));
+		      Id.create(2, StrategySettings.class));
 		  reRoute.setProbability(0.1);
 		  reRoute.setModuleName("ReRoute");
 		  reRoute.setDisableAfter(iterations);

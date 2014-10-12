@@ -22,8 +22,6 @@ package playground.dgrether.koehlerstrehlersignal.solutionconverter;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.api.core.v01.Id;
-
 
 /**
  * Data structure for the solution of a KS2010 traffic signal optimization
@@ -32,26 +30,26 @@ import org.matsim.api.core.v01.Id;
  */
 public class KS2010CrossingSolution {
 
-	private Id id = null;
-	private Map<Id, Integer> programIdOffsetMap = new HashMap<Id, Integer>();
+	private String id = null;
+	private Map<String, Integer> programIdOffsetMap = new HashMap<>();
 	
-	public KS2010CrossingSolution(Id crossingId) {
+	public KS2010CrossingSolution(String crossingId) {
 		this.id = crossingId;
 	}
 
-	public void addOffset4Program(Id programId, int offsetSeconds) {
+	public void addOffset4Program(String programId, int offsetSeconds) {
 		this.programIdOffsetMap.put(programId, offsetSeconds);
 	}
 	
-	public Map<Id, Integer> getProgramIdOffsetMap(){
+	public Map<String, Integer> getProgramIdOffsetMap(){
 		return this.programIdOffsetMap;
 	}
 
-	public Id getCrossingId() {
+	public String getCrossingId() {
 		return this.id;
 	}
 	
-	public void setCrossingId(Id id){
+	public void setCrossingId(String id){
 		this.id = id;
 	}
 

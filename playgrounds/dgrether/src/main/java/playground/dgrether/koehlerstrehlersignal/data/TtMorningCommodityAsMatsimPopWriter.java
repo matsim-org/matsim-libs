@@ -13,11 +13,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.internal.MatsimWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import playground.dgrether.koehlerstrehlersignal.ids.DgIdConverter;
 
 /**
  * @author tthunig
@@ -47,7 +44,7 @@ public class TtMorningCommodityAsMatsimPopWriter {
 		// create a person for each flow unit of each commodity (source-drain pairs) in the morning peak as single dummy-dummy trip
 		for (DgCommodity com : commodities.getCommodities().values()){
 			for (int i=0; i<com.getFlow(); i++){
-				Person person = population.getFactory().createPerson(new IdImpl(com.getId().toString()+i));
+				Person person = population.getFactory().createPerson(Id.create(com.getId().toString()+i, Person.class));
 				Plan plan = population.getFactory().createPlan();
 				plan.addActivity(createDummySourceAct(com));
 				plan.addLeg(population.getFactory().createLeg(TransportMode.car));
@@ -77,7 +74,7 @@ public class TtMorningCommodityAsMatsimPopWriter {
 		// assume that the persons drive home in the evening peak 
 		for (DgCommodity com : commodities.getCommodities().values()){
 			for (int i=0; i<com.getFlow(); i++){
-				Person person = population.getFactory().createPerson(new IdImpl(com.getId().toString()+i));
+				Person person = population.getFactory().createPerson(Id.create(com.getId().toString()+i, Person.class));
 				Plan plan = population.getFactory().createPlan();
 				plan.addActivity(createHomeAct(com, false));
 				plan.addLeg(population.getFactory().createLeg(TransportMode.car));

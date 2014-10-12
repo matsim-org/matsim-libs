@@ -33,10 +33,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.lanes.data.v20.Lane;
 import org.matsim.lanes.data.v20.LaneData20;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
@@ -48,6 +48,7 @@ import org.matsim.signalsystems.data.signalgroups.v20.SignalGroupData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
+import org.matsim.signalsystems.model.Signal;
 import org.matsim.signalsystems.model.SignalSystem;
 import org.matsim.vis.vecmathutils.VectorUtils;
 
@@ -76,7 +77,7 @@ public class M2KS2010NetworkConverter {
 	private static final Logger log = Logger.getLogger(M2KS2010NetworkConverter.class);
 	
 	private Integer cycle = null;
-	public static final Id DEFAULT_PROGRAM_ID = new IdImpl("4711");
+	public static final String DEFAULT_PROGRAM_ID = "4711";
 
 	private DgKSNetwork dgNetwork;
 	private double timeInterval;
@@ -162,7 +163,7 @@ public class M2KS2010NetworkConverter {
 			if (!crossing.getType().equals(TtCrossingType.NOTEXPAND)){
 				//prepare some objects/data
 				Link backLink = this.getBackLink(link);
-				Id backLinkId = (backLink == null) ?  null : backLink.getId();
+				Id<Link> backLinkId = (backLink == null) ?  null : backLink.getId();
 				DgCrossingNode inLinkToNode = crossing.getNodes().get(this.idConverter.convertLinkId2ToCrossingNodeId(link.getId()));
 				LanesToLinkAssignment20 l2l = lanes.getLanesToLinkAssignments().get(link.getId());
 				//create crossing layout
@@ -333,7 +334,7 @@ public class M2KS2010NetworkConverter {
 		return Math.sqrt(Math.pow(deltaLink.x, 2) + Math.pow(deltaLink.y, 2));
 	}
 	
-	private Tuple<SignalPlanData, SignalGroupSettingsData> getPlanAndSignalGroupSettings4Signal(Id signalSystemId, Id signalId, SignalsData signalsData){
+	private Tuple<SignalPlanData, SignalGroupSettingsData> getPlanAndSignalGroupSettings4Signal(Id<SignalSystem> signalSystemId, Id<Signal> signalId, SignalsData signalsData){
 		SignalSystemControllerData controllData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(signalSystemId);
 		SignalPlanData signalPlan = controllData.getSignalPlanData().values().iterator().next();
 		SignalGroupData signalGroup = DgSignalsUtils.getSignalGroup4SignalId(signalSystemId, signalId, signalsData.getSignalGroupsData());
@@ -354,13 +355,13 @@ public class M2KS2010NetworkConverter {
 	 * @param crossing the target crossing of the fromLink
 	 * @return the id of the created light
 	 */
-	private Id createLights(Id fromLinkId, Id fromLaneId, Id outLinkId, Id backLinkId, DgCrossingNode inLinkToNode, DgCrossing crossing){
+	private Id<DgGreen> createLights(Id<Link> fromLinkId, Id<Lane> fromLaneId, Id<Link> outLinkId, Id<Link> backLinkId, DgCrossingNode inLinkToNode, DgCrossing crossing){
 		if (backLinkId != null && backLinkId.equals(outLinkId)){
 			return null; //do nothing if it is the backlink
 		}
-		Id lightId = this.idConverter.convertFromLinkIdToLinkId2LightId(fromLinkId, fromLaneId, outLinkId);
+		Id<DgGreen> lightId = this.idConverter.convertFromLinkIdToLinkId2LightId(fromLinkId, fromLaneId, outLinkId);
 		log.debug("    light id: " + lightId);
-		Id convertedOutLinkId = this.idConverter.convertLinkId2FromCrossingNodeId(outLinkId);
+		Id<Link> convertedOutLinkId = Id.create(this.idConverter.convertLinkId2FromCrossingNodeId(outLinkId), Link.class);
 		log.debug("    outLinkId : " + outLinkId + " converted id: " + convertedOutLinkId);
 		DgCrossingNode outLinkFromNode = crossing.getNodes().get(convertedOutLinkId);
 		if (outLinkFromNode == null){
@@ -368,7 +369,7 @@ public class M2KS2010NetworkConverter {
 			throw new IllegalStateException("outLinkFromNode not found.");
 //			return null;
 		}
-		DgStreet street = new DgStreet(lightId, inLinkToNode, outLinkFromNode);
+		DgStreet street = new DgStreet(Id.create(lightId, Link.class), inLinkToNode, outLinkFromNode);
 		street.setCost(0);
 		crossing.addLight(street);
 		return lightId;
@@ -394,7 +395,7 @@ public class M2KS2010NetworkConverter {
 	 * @param system
 	 * @param signalsData
 	 */
-	private void createCrossing4SignalizedLink(DgCrossing crossing, Link link, DgCrossingNode inLinkToNode, Id backLinkId, 
+	private void createCrossing4SignalizedLink(DgCrossing crossing, Link link, DgCrossingNode inLinkToNode, Id<Link> backLinkId, 
 			LanesToLinkAssignment20 l2l, SignalSystemData system, SignalsData signalsData) {
 		//remove default program
 		if ( crossing.getPrograms().containsKey(this.DEFAULT_PROGRAM_ID)) {
@@ -403,7 +404,7 @@ public class M2KS2010NetworkConverter {
 		//create program if not existing...
 		DgProgram program = null;
 		if (! crossing.getPrograms().containsKey(system.getId())){
-			program = new DgProgram(system.getId());
+			program = new DgProgram(system.getId().toString());
 			program.setCycle(this.cycle);
 			crossing.addProgram(program);
 		}
@@ -415,7 +416,7 @@ public class M2KS2010NetworkConverter {
 		//first get the outlinks that are controlled by the signal
 		for (SignalData signal : signals4Link){
 			log.debug("    signal: " + signal.getId() + " system: " + system.getId());
-			Id lightId = null;
+			Id<DgGreen> lightId = null;
 			if (l2l == null) {
 				Set<Id<Link>> outLinkIds = new HashSet<>();
 				if (signals4Link.size() > 1 && (signal.getTurningMoveRestrictions() == null || signal.getTurningMoveRestrictions().isEmpty())){
@@ -428,7 +429,7 @@ public class M2KS2010NetworkConverter {
 					outLinkIds = signal.getTurningMoveRestrictions();
 				}
 				//create lights and green settings
-				for (Id outLinkId : outLinkIds){
+				for (Id<Link> outLinkId : outLinkIds){
 					log.debug("    outLinkId: " + outLinkId);
 					lightId = this.createLights(link.getId(), null, outLinkId, backLinkId, inLinkToNode, crossing);
 					log.debug("    created Light " + lightId);
@@ -517,7 +518,7 @@ public class M2KS2010NetworkConverter {
 	}
 
 	//TODO check this again which offset is needed for green
-	private void createAndAddGreen4Settings(Id lightId, DgProgram program,
+	private void createAndAddGreen4Settings(Id<DgGreen> lightId, DgProgram program,
 		SignalGroupSettingsData groupSettings, SignalPlanData signalPlan) {
 		DgGreen green = new DgGreen(lightId);
 		green.setOffset(groupSettings.getOnset());

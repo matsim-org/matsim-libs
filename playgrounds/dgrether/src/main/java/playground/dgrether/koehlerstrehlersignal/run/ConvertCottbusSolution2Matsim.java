@@ -24,13 +24,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsScenarioLoader;
 import org.matsim.signalsystems.data.SignalsScenarioWriter;
+import org.matsim.signalsystems.model.SignalSystem;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdPool;
@@ -101,11 +101,11 @@ public class ConvertCottbusSolution2Matsim {
 		// Currently we get two offsets for signal system 13. This is due to
 		// different data modelling approaches
 		// at tub / btu that might be resolved in further studies
-		removeSignalSystems(signalsData, new IdImpl("13"));
+		removeSignalSystems(signalsData, Id.create("13", SignalSystem.class));
 	}
 
-	private void removeSignalSystems(SignalsData signalData, Id... ids) {
-		for (Id id : ids) {
+	private void removeSignalSystems(SignalsData signalData, Id<SignalSystem>... ids) {
+		for (Id<SignalSystem> id : ids) {
 			signalData.getSignalSystemsData().getSignalSystemData().remove(id);
 			signalData.getSignalGroupsData()
 					.getSignalGroupDataBySignalSystemId().remove(id);

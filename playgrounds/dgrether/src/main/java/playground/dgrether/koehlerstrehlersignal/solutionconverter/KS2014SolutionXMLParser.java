@@ -8,7 +8,7 @@ import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -33,7 +33,7 @@ public class KS2014SolutionXMLParser extends MatsimXmlParser {
 	private final static String TOTALFLOW = "totalFlow";
 	
 	private List<KS2010CrossingSolution> crossingSolutions = new ArrayList<KS2010CrossingSolution>();
-	private Map<Id, Double> streetFlow = new HashMap<Id, Double>();
+	private Map<Id<Link>, Double> streetFlow = new HashMap<>();
 	
 	public void readFile(final String filename) {
 		this.setValidating(false);
@@ -50,16 +50,16 @@ public class KS2014SolutionXMLParser extends MatsimXmlParser {
 	public void startTag(String elementName, Attributes atts, Stack<String> context) {
 		// read the crossings program offset
 		if (elementName.equals(FIXEDCROSSING)){
-			Id crossingId = new IdImpl(atts.getValue(ID));
+			String crossingId = atts.getValue(ID);
 			int offsetSeconds = Integer.parseInt(atts.getValue(OFFSET));
-			Id programId = new IdImpl(atts.getValue(PROG));
+			String programId = atts.getValue(PROG);
 			KS2010CrossingSolution crossing = new KS2010CrossingSolution(crossingId);
 			crossing.addOffset4Program(programId, offsetSeconds);
 			this.crossingSolutions.add(crossing);
 		}
 		// read the flow per street
 		if (elementName.equals(EDGEFLOW)){
-			Id streetId = new IdImpl(atts.getValue(ORIG_ID));
+			Id<Link> streetId = Id.create(atts.getValue(ORIG_ID), Link.class);
 			Double streetFlow = Double.parseDouble(atts.getValue(TOTALFLOW));
 			this.streetFlow.put(streetId, streetFlow);
 		}
@@ -69,7 +69,7 @@ public class KS2014SolutionXMLParser extends MatsimXmlParser {
 		return this.crossingSolutions;
 	}
 	
-	public Map<Id, Double> getStreetFlow(){
+	public Map<Id<Link>, Double> getStreetFlow(){
 		return this.streetFlow;
 	}
 }

@@ -20,6 +20,8 @@
 package playground.dgrether.koehlerstrehlersignal.data;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 
 
 /**
@@ -28,29 +30,29 @@ import org.matsim.api.core.v01.Id;
  */
 public class DgCommodity {
 
-	private Id id;
-	private Id sourceNode; 
-	private Id drainNode;
-	private Id sourceLink;
-	private Id drainLink;
+	private Id<DgCommodity> id;
+	private Id<Node> sourceNode; 
+	private Id<Node> drainNode;
+	private Id<Link> sourceLink;
+	private Id<Link> drainLink;
 	private Double flow;
 	
-	public DgCommodity(Id id){
+	public DgCommodity(Id<DgCommodity> id){
 		this.id = id;
 	}
 
-	public Id getId() {
+	public Id<DgCommodity> getId() {
 		return this.id;
 	}
 
 
-	public void setSourceNode(Id fromNodeId, Id fromLinkId, Double flow) {
+	public void setSourceNode(Id<Node> fromNodeId, Id<Link> fromLinkId, Double flow) {
 		this.sourceNode = fromNodeId;
 		this.sourceLink = fromLinkId;
 		this.flow = flow;
 	}
 	
-	public void setDrainNode(Id toNodeId, Id toLinkId){
+	public void setDrainNode(Id<Node> toNodeId, Id<Link> toLinkId){
 		this.drainNode = toNodeId;
 		this.drainLink = toLinkId;
 	}
@@ -60,19 +62,19 @@ public class DgCommodity {
 	}
 	
 	
-	public Id getDrainNodeId(){
+	public Id<Node> getDrainNodeId(){
 		return this.drainNode;
 	}
 	
-	public Id getSourceNodeId(){
+	public Id<Node> getSourceNodeId(){
 		return this.sourceNode;
 	}
 	
-	public Id getSourceLinkId() {
+	public Id<Link> getSourceLinkId() {
 		return sourceLink;
 	}
 
-	public Id getDrainLinkId() {
+	public Id<Link> getDrainLinkId() {
 		return drainLink;
 	}
 
