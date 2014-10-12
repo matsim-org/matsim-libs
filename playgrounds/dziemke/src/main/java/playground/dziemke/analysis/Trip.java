@@ -4,18 +4,23 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.households.Household;
+
+import playground.dziemke.demand.Zone;
 
 
 public class Trip {
-	private Id householdId;
-	private Id personId;
-	private Id tripId;
+	private Id<Household> householdId;
+	private Id<Person> personId;
+	private Id<Trip> tripId;
 	private String activityEndActType;
-	private Id departureLinkId;
-	private Id departureZoneId;
+	private Id<Link> departureLinkId;
+	private Id<Zone> departureZoneId;
 	private double departureTime;
 	private String departureLegMode;
-	private List<Id> links = new LinkedList<Id>();
+	private List<Id<Link>> links = new LinkedList<>();
 	private int useHouseholdCar;
 	private int useOtherCar;
 	private int useHouseholdCarPool;
@@ -26,8 +31,8 @@ public class Trip {
 	private double distanceRoutedShortest;
 	private double speed;
 	private double duration;
-	private Id arrivalLinkId;
-	private Id arrivalZoneId;
+	private Id<Link> arrivalLinkId;
+	private Id<Zone> arrivalZoneId;
 	private double arrivalTime;
 	private String arrivalLegMode;
 	private String activityStartActType;
@@ -42,27 +47,27 @@ public class Trip {
 
 	
 	// get and set methods
-	public Id getHouseholdId() {
+	public Id<Household> getHouseholdId() {
 		return this.householdId;
 	}
 
-	public void setHouseholdId(Id householdId) {
+	public void setHouseholdId(Id<Household> householdId) {
 		this.householdId = householdId;
 	}
 	
-	public Id getPersonId() {
+	public Id<Person> getPersonId() {
 		return this.personId;
 	}
 
-	public void setPersonId(Id personId) {
+	public void setPersonId(Id<Person> personId) {
 		this.personId = personId;
 	}
 	
-	public Id getTripId() {
+	public Id<Trip> getTripId() {
 		return this.tripId;
 	}
 
-	public void setTripId(Id tripId) {
+	public void setTripId(Id<Trip> tripId) {
 		this.tripId = tripId;
 	}
 	
@@ -75,19 +80,19 @@ public class Trip {
 		this.activityEndActType = activityEndActType;
 	}	
 
-	public Id getDepartureLinkId() {
+	public Id<Link> getDepartureLinkId() {
 		return this.departureLinkId;
 	}
 
-	public void setDepartureLinkId(Id departureLinkId) {
+	public void setDepartureLinkId(Id<Link> departureLinkId) {
 		this.departureLinkId = departureLinkId;
 	}
 	
-	public Id getDepartureZoneId() {
+	public Id<Zone> getDepartureZoneId() {
 		return this.departureZoneId;
 	}
 
-	public void setDepartureZoneId(Id departureZoneId) {
+	public void setDepartureZoneId(Id<Zone> departureZoneId) {
 		this.departureZoneId = departureZoneId;
 	}
 	
@@ -107,11 +112,11 @@ public class Trip {
 		this.departureLegMode = departureLegMode;
 	}
 	
-	public List<Id> getLinks() {
+	public List<Id<Link>> getLinks() {
 		return this.links;
 	}
 	
-	public void setLinks(List<Id> links) {
+	public void setLinks(List<Id<Link>> links) {
 		this.links = links;
 	}
 	
@@ -195,19 +200,19 @@ public class Trip {
 		this.duration = duration;
 	}
 	
-	public Id getArrivalLinkId() {
+	public Id<Link> getArrivalLinkId() {
 		return this.arrivalLinkId;
 	}
 
-	public void setArrivalLinkId(Id arrivalLinkId) {
+	public void setArrivalLinkId(Id<Link> arrivalLinkId) {
 		this.arrivalLinkId = arrivalLinkId;
 	}
 	
-	public Id getArrivalZoneId() {
+	public Id<Zone> getArrivalZoneId() {
 		return this.arrivalZoneId;
 	}
 
-	public void setArrivalZoneId(Id arrivalZoneId) {
+	public void setArrivalZoneId(Id<Zone> arrivalZoneId) {
 		this.arrivalZoneId = arrivalZoneId;
 	}
 		

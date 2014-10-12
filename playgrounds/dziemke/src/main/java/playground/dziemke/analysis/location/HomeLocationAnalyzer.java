@@ -25,7 +25,7 @@ public class HomeLocationAnalyzer {
 	
 	
 	public static void main(String[] args) {
-		Map <Id, Coord> homeCoords = new HashMap <Id, Coord>();
+		Map <Id<Person>, Coord> homeCoords = new HashMap <Id<Person>, Coord>();
 
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -38,7 +38,7 @@ public class HomeLocationAnalyzer {
 		for (Person person : population.getPersons().values()) {
 			consideredAgents++;
 			Plan selectedPlan = person.getSelectedPlan();
-			Id id = person.getId();
+			Id<Person> id = person.getId();
 			//TODO Now using 0th activity as home activity. Change it to what is specifically needed...
 			Activity activity = (Activity) selectedPlan.getPlanElements().get(0);
 			homeCoords.put(id, activity.getCoord());

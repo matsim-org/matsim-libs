@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -78,12 +78,12 @@ public class CadytsControllerEquil {
 		config.controler().setSnapshotFormat(snapshotFormat);
 		
 		// strategy
-		StrategySettings strategySettings1 = new StrategySettings(new IdImpl(1));
+		StrategySettings strategySettings1 = new StrategySettings(Id.create(1, StrategySettings.class));
 		strategySettings1.setModuleName("ChangeExpBeta");
 		strategySettings1.setProbability(1.);
 		config.strategy().addStrategySettings(strategySettings1);
 		
-		StrategySettings strategySettings2 = new StrategySettings(new IdImpl(2));
+		StrategySettings strategySettings2 = new StrategySettings(Id.create(2, StrategySettings.class));
 		strategySettings2.setModuleName("ReRoute");
 		strategySettings2.setProbability(1.);
 		//strategySettings2.setProbability(.5);

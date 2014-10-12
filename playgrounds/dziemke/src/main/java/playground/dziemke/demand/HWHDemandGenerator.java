@@ -17,7 +17,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -116,7 +115,7 @@ public class HWHDemandGenerator {
 				Geometry workGeometry = zoneGeometries.get(locationOfWork);
 								
 				//Person person = population.getFactory().createPerson(createId(source, sink, j));
-				Id id = new IdImpl(source + "_" + sink + "_" + j);
+				Id<Person> id = Id.create(source + "_" + sink + "_" + j, Person.class);
 				Person person = population.getFactory().createPerson(id);
 				Plan plan = population.getFactory().createPlan();
 				

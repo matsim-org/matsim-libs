@@ -28,11 +28,13 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.households.Household;
 
 import playground.dziemke.analysis.Trip;
+import playground.dziemke.demand.Zone;
 
 /**
  * @author dziemke
@@ -43,7 +45,7 @@ public class SrVTripParser {
 
 	private final static Logger log = Logger.getLogger(SrVTripParser.class);
 	
-	private Map<Id, Trip> trips = new HashMap<Id, Trip>();
+	private Map<Id<Trip>, Trip> trips = new HashMap<Id<Trip>, Trip>();
 	
 	private static final String HOUSEHOLD_ID = "HHNR";
 	private static final String PERSON_ID = "PNR";
@@ -107,12 +109,12 @@ public class SrVTripParser {
 				}
 				
 				Trip trip = new Trip();
-				Id householdId = new IdImpl(entries[columnNumbers.get(HOUSEHOLD_ID)]);
-				Id personId = new IdImpl(entries[columnNumbers.get(PERSON_ID)]);
-				Id tripId = new IdImpl(entries[columnNumbers.get(TRIP_ID)]);
+				Id<Household> householdId = Id.create(entries[columnNumbers.get(HOUSEHOLD_ID)], Household.class);
+				Id<Person> personId = Id.create(entries[columnNumbers.get(PERSON_ID)], Person.class);
+				Id<Trip> tripId = Id.create(entries[columnNumbers.get(TRIP_ID)], Trip.class);
 				//String activityEndActType = new String(entries[columnNumbers.get(ACTIVITY_END_ACT_TYPE)]);
 				String activityEndActType = transformActType(new Integer(entries[columnNumbers.get(ACTIVITY_END_ACT_TYPE)]));
-				Id departureZoneId = new IdImpl(entries[columnNumbers.get(DEPARTURE_ZONE_ID)]);
+				Id<Zone> departureZoneId = Id.create(entries[columnNumbers.get(DEPARTURE_ZONE_ID)], Zone.class);
 				Double departureTime = new Double(entries[columnNumbers.get(DEPARTURE_TIME)]);
 				Integer useHouseholdCar = new Integer(entries[columnNumbers.get(USE_HOUSEHOLD_CAR)]);
 				Integer useOtherCar = new Integer(entries[columnNumbers.get(USE_OTHER_CAR)]);
@@ -124,7 +126,7 @@ public class SrVTripParser {
 				Double distanceRoutedShortest = new Double(entries[columnNumbers.get(DISTANCE_ROUTED_SHORTEST)]);
 				Double speed= new Double(entries[columnNumbers.get(SPEED)]);
 				Double duration = new Double(entries[columnNumbers.get(DURATION)]);
-				Id arrivalZoneId = new IdImpl(entries[columnNumbers.get(ARRIVAL_ZONE_ID)]);
+				Id<Zone> arrivalZoneId = Id.create(entries[columnNumbers.get(ARRIVAL_ZONE_ID)], Zone.class);
 				Double arrivalTime = new Double(entries[columnNumbers.get(ARRIVAL_TIME)]);
 				// String activityStartActType = new String(entries[columnNumbers.get(ACTIVITY_START_ACT_TYPE)]);
 				String activityStartActType = transformActType(new Integer(entries[columnNumbers.get(ACTIVITY_START_ACT_TYPE)]));
@@ -132,9 +134,9 @@ public class SrVTripParser {
 				Double weight = new Double(entries[columnNumbers.get(WEIGHT)]);
 				
 								
-				personId = new IdImpl(householdId + "_" + personId);
+				personId = Id.create(householdId + "_" + personId, Person.class);
 				trip.setPersonId(personId);
-				tripId = new IdImpl(personId + "_" + tripId);
+				tripId = Id.create(personId + "_" + tripId, Trip.class);
 				trip.setTripId(tripId);
 				trip.setActivityEndActType(activityEndActType);
 				trip.setDepartureZoneId(departureZoneId);
@@ -221,7 +223,7 @@ public class SrVTripParser {
 	}
 	
 	
-	public Map<Id, Trip> getTrips() {
+	public Map<Id<Trip>, Trip> getTrips() {
 		return this.trips;
 	}
 }

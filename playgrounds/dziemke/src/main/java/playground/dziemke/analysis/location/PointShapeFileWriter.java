@@ -18,7 +18,7 @@ public class PointShapeFileWriter {
 	private static PointFeatureFactory pointFeatureFactory;
 	
 	
-	public static void writeShapeFilePoints(String outputShapeFile, Map <Id,Coord> coords, String attributeLabel) {
+	public static <T> void writeShapeFilePoints(String outputShapeFile, Map <Id<T>,Coord> coords, String attributeLabel) {
 		if (coords.isEmpty()==true) {
 			System.out.println("Map ist leer!");
 		} else {
@@ -51,9 +51,9 @@ public class PointShapeFileWriter {
 	}	
 	
 	
-	private static Collection <SimpleFeature> createFeatures(Map<Id,Coord> coords) {
+	private static <T> Collection <SimpleFeature> createFeatures(Map<Id<T>,Coord> coords) {
 		List <SimpleFeature> features = new ArrayList <SimpleFeature>();
-		for (Id id : coords.keySet()){
+		for (Id<?> id : coords.keySet()){
 			Coord coord = coords.get(id);
 			//features.add(getFeature(coords.get(i), i));
 			Object[] attributes = new Object[]{id};

@@ -4,13 +4,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.contrib.cadyts.general.ExpBetaPlanChangerWithCadytsPlanRegistration;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -20,8 +20,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
-import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -86,13 +84,13 @@ public class CadytsControllerEquilOld {
 //		strategySettings1.setProbability(0.9);
 //		config.strategy().addStrategySettings(strategySettings1);
 		
-		StrategySettings strategySettings2 = new StrategySettings(new IdImpl(2));
+		StrategySettings strategySettings2 = new StrategySettings(Id.create(2, StrategySettings.class));
 		strategySettings2.setModuleName("ReRoute");
 		strategySettings2.setProbability(0.9);
 		strategySettings2.setDisableAfter(70);
 		config.strategy().addStrategySettings(strategySettings2);
 				
-		StrategySettings strategySettings3 = new StrategySettings(new IdImpl(1));
+		StrategySettings strategySettings3 = new StrategySettings(Id.create(1, StrategySettings.class));
 		strategySettings3.setModuleName("cadytsCar");
 		strategySettings3.setProbability(0.9);
 		config.strategy().addStrategySettings(strategySettings3);

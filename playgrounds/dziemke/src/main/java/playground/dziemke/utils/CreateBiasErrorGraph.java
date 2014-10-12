@@ -11,7 +11,7 @@ import org.jfree.chart.ChartRenderingInfo;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.entity.StandardEntityCollection;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.CountSimComparisonImpl;
@@ -58,7 +58,7 @@ public class CreateBiasErrorGraph {
 			while ((currentLine = bufferedReader.readLine()) != null) {
 				String[] entries = currentLine.split("\t", -1);
 								
-				Id linkId = new IdImpl(entries[0]);
+				Id<Link> linkId = Id.create(entries[0], Link.class);
 				int hour = Integer.parseInt(entries[1]);
 				double matsimVolume = Double.parseDouble(entries[2]);
 				double countVolume = Double.parseDouble(entries[3]);

@@ -35,7 +35,7 @@ public class StayHomePlansLocationAnalyzer {
 	
 	
 	public static void main(String[] args) {
-		Map <Id, Coord> homeCoords = new HashMap <Id, Coord>();
+		Map <Id<Person>, Coord> homeCoords = new HashMap <Id<Person>, Coord>();
 
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -54,7 +54,7 @@ public class StayHomePlansLocationAnalyzer {
 				//double score = selectedPlan.getScore();
 				//System.out.println("Score of stay-home plan is " + score);
 				
-				Id id = person.getId();
+				Id<Person> id = person.getId();
 				//TODO Now using 0th activity as home activity. Change it to what is specifically needed...
 				Activity activity = (Activity) selectedPlan.getPlanElements().get(0);
 				

@@ -11,7 +11,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationReaderMatsimV5;
@@ -23,7 +22,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class AgentLocationAnalyzer {
 	// Parameters
-	private static Id id = new IdImpl("2000_200001");
+	private static Id<Plan> id = Id.create("2000_200001", Plan.class);
 	private static String activityLocationType = "home";
 	
 	// Input file and output directory
@@ -32,7 +31,7 @@ public class AgentLocationAnalyzer {
 		
 	
 	public static void main(String[] args) {
-		Map <Id, Coord> coords = new HashMap <Id, Coord>();
+		Map <Id<Plan>, Coord> coords = new HashMap <Id<Plan>, Coord>();
 
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -44,7 +43,7 @@ public class AgentLocationAnalyzer {
 		
 		for (int planNumber = 0; planNumber < person.getPlans().size(); planNumber++) {
 			Plan plan = person.getPlans().get(planNumber);
-			Id planId = new IdImpl(planNumber);
+			Id<Plan> planId = Id.create(planNumber, Plan.class);
 			
 			boolean firstSuitableActivityLocationAlreadyFound = false;
 			

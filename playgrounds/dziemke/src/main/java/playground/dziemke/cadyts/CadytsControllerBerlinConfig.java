@@ -21,13 +21,13 @@
 package playground.dziemke.cadyts;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.contrib.cadyts.general.ExpBetaPlanChangerWithCadytsPlanRegistration;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -51,7 +51,7 @@ public class CadytsControllerBerlinConfig {
 		final Config config = ConfigUtils.loadConfig(configFile);
 		
 		// strategy
-		StrategySettings strategySetinngs = new StrategySettings(new IdImpl(2));
+		StrategySettings strategySetinngs = new StrategySettings(Id.create(2, StrategySettings.class));
 		strategySetinngs.setModuleName("cadytsCar") ;
 		strategySetinngs.setProbability(1.0) ;
 		config.strategy().addStrategySettings(strategySetinngs);

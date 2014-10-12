@@ -10,10 +10,11 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 
 public class TripHandler implements ActivityEndEventHandler, ActivityStartEventHandler, LinkLeaveEventHandler {
-	private Map<Id, Trip> trips = new HashMap<Id, Trip>();
+	private Map<Id<Trip>, Trip> trips = new HashMap<>();
 	
 	private Map<Id, Integer> activityEndCount = new HashMap <Id, Integer>();
 	private Map<Id, Integer> activityStartCount = new HashMap <Id, Integer>();
@@ -25,9 +26,9 @@ public class TripHandler implements ActivityEndEventHandler, ActivityStartEventH
 	public void handleEvent(ActivityEndEvent event) {
 		// store information from event to variables and print the information on console
 		//String eventType = event.getEventType();
-		Id linkId = event.getLinkId();
+		Id<Link> linkId = event.getLinkId();
 		//String linkShortened = linkId.toString().substring(0, 10) + "...";
-		Id personId = event.getPersonId();
+		Id<Person> personId = event.getPersonId();
 		double time = event.getTime();
 		String actType = event.getActType();
 		//Id facilityId =	event.getFacilityId();
@@ -48,7 +49,7 @@ public class TripHandler implements ActivityEndEventHandler, ActivityStartEventH
 		// create an instance of the object "Trip"
 		//Trip trip = new Trip(personId);
 		Trip trip = new Trip();
-		Id tripId = new IdImpl(personId + "_" + activityEndCount.get(personId));
+		Id<Trip> tripId = Id.create(personId + "_" + activityEndCount.get(personId), Trip.class);
 		trip.setTripId(tripId);
 		trip.setPersonId(personId);
 		trip.setDepartureLinkId(linkId);
@@ -61,7 +62,7 @@ public class TripHandler implements ActivityEndEventHandler, ActivityStartEventH
 		// check if activity end link is the same as previous activity start link
 		if (activityEndCount.get(personId) >= 2) {
 			int numberOfLastArrival = activityStartCount.get(personId);
-			Id lastTripId = new IdImpl(personId + "_" + numberOfLastArrival);
+			Id<Trip> lastTripId = Id.create(personId + "_" + numberOfLastArrival, Trip.class);
 			if (!trips.get(tripId).getDepartureLinkId().equals(trips.get(lastTripId).getArrivalLinkId())) {
 				System.err.println("Activity end link differs from previous activity start link.");
 			} 
@@ -71,7 +72,7 @@ public class TripHandler implements ActivityEndEventHandler, ActivityStartEventH
 		// check if type of ending activity is the same as type of previously started activity
 		if (activityEndCount.get(personId) >= 2) {
 			int numberOfLastArrival = activityStartCount.get(personId);
-			Id lastTripId = new IdImpl(personId + "_" + numberOfLastArrival);
+			Id<Trip> lastTripId = Id.create(personId + "_" + numberOfLastArrival, Trip.class);
 			if (!trips.get(tripId).getActivityEndActType().equals(trips.get(lastTripId).getActivityStartActType())) {
 				System.err.println("Type of ending activity is not the same as type of previously started activity.");
 			} 
@@ -83,9 +84,9 @@ public class TripHandler implements ActivityEndEventHandler, ActivityStartEventH
 	public void handleEvent(ActivityStartEvent event) {
 		// store information from event to variables and print the information on console
 		//String eventType = event.getEventType();
-		Id linkId = event.getLinkId();
+		Id<Link> linkId = event.getLinkId();
 		//String linkShortened = linkId.toString().substring(0, 10) + "...";
-		Id personId = event.getPersonId();
+		Id<Person> personId = event.getPersonId();
 		double time = event.getTime();
 		String actType = event.getActType();
 		//Id facilityId =	event.getFacilityId();
@@ -104,7 +105,7 @@ public class TripHandler implements ActivityEndEventHandler, ActivityStartEventH
 		
 		
 		// add information to the object "Trip"
-		Id tripId = new IdImpl(personId + "_" + activityStartCount.get(personId));
+		Id<Trip> tripId = Id.create(personId + "_" + activityStartCount.get(personId), Trip.class);
 		if (trips.get(tripId) != null) {
 			trips.get(tripId).setArrivalLinkId(linkId);
 			trips.get(tripId).setArrivalTime(time);
@@ -130,15 +131,15 @@ public class TripHandler implements ActivityEndEventHandler, ActivityStartEventH
 	public void handleEvent(LinkLeaveEvent event) {
 		// store information from event to variables
 		//String eventType = event.getEventType();
-		Id linkId = event.getLinkId();
+		Id<Link> linkId = event.getLinkId();
 		//String linkShortened = linkId.toString().substring(0, 10) + "...";
-		Id personId = event.getPersonId();
+		Id<Person> personId = event.getPersonId();
 		//double time = event.getTime();
 		//Id vehicleId = event.getVehicleId();
 		
 		
 		// add information to the object "Trip"
-		Id tripId = new IdImpl(personId + "_" + activityEndCount.get(personId));
+		Id<Trip> tripId = Id.create(personId + "_" + activityEndCount.get(personId), Trip.class);
 		//if (trips2.get(tripId) != null) {
 		if (trips.get(tripId).getLinks().isEmpty()) {
 			if (trips.get(tripId).getDepartureLinkId().equals(linkId)) {
@@ -160,7 +161,7 @@ public class TripHandler implements ActivityEndEventHandler, ActivityStartEventH
 	}
 	
 	
-	public Map<Id, Trip> getTrips() {
+	public Map<Id<Trip>, Trip> getTrips() {
 		return this.trips;
 	}
 	
