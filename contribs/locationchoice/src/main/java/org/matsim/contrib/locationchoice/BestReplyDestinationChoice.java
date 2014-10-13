@@ -69,8 +69,9 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 	private final Scenario scenario;
 	private DestinationChoiceBestResponseContext lcContext;
 	private HashSet<String> flexibleTypes;
-	private LeastCostPathCalculatorFactory forwardMultiNodeDijsktaFactory;
-	private LeastCostPathCalculatorFactory backwardMultiNodeDijsktaFactory;
+	private final LeastCostPathCalculatorFactory forwardMultiNodeDijsktaFactory;
+	private final LeastCostPathCalculatorFactory backwardMultiNodeDijsktaFactory;
+	private final Map<Id<ActivityFacility>, Id<Link>> nearestLinks; 
 	
 	public static double useScaleEpsilonFromConfig = -99.0;
 
@@ -84,6 +85,13 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 		this.personsMaxEpsUnscaled = personsMaxDCScoreUnscaled;
 		this.forwardMultiNodeDijsktaFactory = new FastMultiNodeDijkstraFactory(true);
 		this.backwardMultiNodeDijsktaFactory = new BackwardsFastMultiNodeDijkstraFactory(true);
+		
+		// create cache which is used in ChoiceSet
+		// instead of just the nearest link we probably should check whether the facility is attached to a link? cdobler, oct'14
+		this.nearestLinks = new HashMap<>();
+		for (ActivityFacility facility : this.scenario.getActivityFacilities().getFacilities().values()) {
+			this.nearestLinks.put(facility.getId(), ((NetworkImpl) this.scenario.getNetwork()).getNearestLink(facility.getCoord()).getId());
+		}
 		
 		initLocal();
 	}
@@ -166,7 +174,7 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 		int iteration = replanningContext.getIteration();
 		
 		this.planAlgoInstances.add(new BestResponseLocationMutator(this.quadTreesOfType, this.facilitiesOfType, this.personsMaxEpsUnscaled, 
-				this.lcContext, this.sampler, tripRouter, forwardMultiNodeDijkstra, backwardMultiNodeDijkstra, scoringFunctionFactory, iteration));
+				this.lcContext, this.sampler, tripRouter, forwardMultiNodeDijkstra, backwardMultiNodeDijkstra, scoringFunctionFactory, iteration, this.nearestLinks));
 		return this.planAlgoInstances.get(this.planAlgoInstances.size()-1);
 	}
 	

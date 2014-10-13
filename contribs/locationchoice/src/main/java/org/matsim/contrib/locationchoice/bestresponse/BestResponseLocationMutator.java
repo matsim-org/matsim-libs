@@ -21,11 +21,13 @@ package org.matsim.contrib.locationchoice.bestresponse;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -38,16 +40,16 @@ import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.PlanUtils;
 import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.BackwardFastMultiNodeDijkstra;
 import org.matsim.core.router.MultiNodeDijkstra;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 public final class BestResponseLocationMutator extends RecursiveLocationMutator {
@@ -61,7 +63,8 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 	private final BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra;
 	private final ScoringFunctionFactory scoringFunctionFactory;
 	private final int iteration;
-
+	private final Map<Id<ActivityFacility>, Id<Link>> nearestLinks;
+	
 	/*
 	 * This is not nice! We hide the object of the super-super class since
 	 * it expects a QuadTreeRing<ActivityFacility>. Find a better solution for this...
@@ -75,7 +78,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 			ObjectAttributes personsMaxDCScoreUnscaled, DestinationChoiceBestResponseContext lcContext,
 			DestinationSampler sampler, TripRouter tripRouter, MultiNodeDijkstra forwardMultiNodeDijkstra,
 			BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra, ScoringFunctionFactory scoringFunctionFactory,
-			int iteration) {
+			int iteration, Map<Id<ActivityFacility>, Id<Link>> nearestLinks) {
 		// TODO: first null argument should be quad_trees...
 		super(lcContext.getScenario(), tripRouter, null, facilities_of_type, null);
 		this.facilities = lcContext.getScenario().getActivityFacilities();
@@ -88,6 +91,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		this.backwardMultiNodeDijkstra = backwardMultiNodeDijkstra;
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		this.iteration = iteration;
+		this.nearestLinks = nearestLinks;
 		
 		this.quadTreesOfType = quad_trees;
 	}
@@ -148,7 +152,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 					final Activity actPre = (Activity)actslegs.get(actlegIndex - 2);
 
 					final Activity actPost = (Activity)actslegs.get(actlegIndex + 2);					
-					double distanceDirect = ((CoordImpl)actPre.getCoord()).calcDistance(actPost.getCoord());
+					double distanceDirect = CoordUtils.calcDistance(actPre.getCoord(), actPost.getCoord());
 					double maximumDistance = this.convertEpsilonIntoDistance(plan.getPerson(), 
 							this.actTypeConverter.convertType(actToMove.getType()));
 
@@ -166,11 +170,11 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 					// maybe repeat this a couple of times
 					// yy why? kai, feb'13
 
-					final Id choice = cs.getWeightedRandomChoice(
-							actlegIndex, this.facilities, scoringFunctionFactory, plan, this.getTripRouter(), this.lcContext.getPersonsKValuesArray()[personIndex],
+					final Id<ActivityFacility> choice = cs.getWeightedRandomChoice(
+							actlegIndex, scoringFunctionFactory, plan, this.getTripRouter(), this.lcContext.getPersonsKValuesArray()[personIndex],
 							this.forwardMultiNodeDijkstra, this.backwardMultiNodeDijkstra, this.iteration);
 
-					this.setLocation(actToMove, choice);	
+					this.setLocation(actToMove, choice);
 					
 //					printTentativePlanToConsole(plan);
 
@@ -190,11 +194,10 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 			ApproximationLevel travelTimeApproximationLevel,
 			final Activity actToMove, double maxRadius, Coord center) {
 
-		ChoiceSet cs = new ChoiceSet(travelTimeApproximationLevel, scenario);
+		ChoiceSet cs = new ChoiceSet(travelTimeApproximationLevel, this.scenario, this.nearestLinks);
 
 		final String convertedType = this.actTypeConverter.convertType(actToMove.getType());
 		Collection<ActivityFacilityWithIndex> list = this.quadTreesOfType.get(convertedType).get( center.getX(), center.getY(), maxRadius );
-		
 		
 		for (ActivityFacilityWithIndex facility : list) {
 //			int facilityIndex = this.lcContext.getFacilityIndex(facility.getId());
@@ -204,7 +207,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 				// only add destination if it can be reached with the chosen mode
 				String mode = ((PlanImpl)plan).getPreviousLeg(actToMove).getMode();	
 				
-				Id linkId = null;
+				Id<Link> linkId = null;
 				// try to get linkId from facility, else get it from act. other options not allowed!
 				if (facility.getLinkId() != null) {
 					linkId = facility.getLinkId();
@@ -222,23 +225,25 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 				}	
 			}
 		}
+		
 		return cs;
 	}
 
-	private void setLocation(Activity act2, Id facilityId) {
-		ActivityImpl act = (ActivityImpl) act2 ;
+	private void setLocation(Activity act2, Id<ActivityFacility> facilityId) {
+		ActivityImpl act = (ActivityImpl) act2;
 		act.setFacilityId(facilityId);
+		ActivityFacility facility = this.facilities.getFacilities().get(facilityId);
 		
-		Id linkId = null;
+		Id<Link> linkId = null;
 		// try to get linkId from facility, else get it from coords. other options not allowed!
-		if (this.facilities.getFacilities().get(facilityId).getLinkId() != null) {
-			linkId = this.facilities.getFacilities().get(facilityId).getLinkId();
+		if (facility.getLinkId() != null) {
+			linkId = facility.getLinkId();
 		}
 		else {
-			linkId = ((NetworkImpl) this.scenario.getNetwork()).getNearestLink(this.facilities.getFacilities().get(facilityId).getCoord()).getId();
+			linkId = this.nearestLinks.get(facilityId);
 		}	
 		act.setLinkId(linkId);
-		act.setCoord(this.facilities.getFacilities().get(facilityId).getCoord());
+		act.setCoord(facility.getCoord());
 	}
 	
 	private void evaluateAndAdaptPlans(Plan plan, Plan bestPlanSoFar, ChoiceSet cs, ScoringFunctionFactory scoringFunction) {		

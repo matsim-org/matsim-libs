@@ -42,6 +42,7 @@ public class ComputeMaxDCScorePlanAlgo implements PlanAlgorithm {
 	private DestinationScoring scorer;
 	private DestinationSampler sampler;
 	private DestinationChoiceBestResponseContext lcContext;
+	private final Id<Link> dummyLinkId = Id.createLinkId(1);
 	
 	public ComputeMaxDCScorePlanAlgo(String type, TreeMap<Id<ActivityFacility>, ActivityFacilityWithIndex> typedFacilities,
 			DestinationScoring scorer, DestinationSampler sampler, DestinationChoiceBestResponseContext lcContext) {		
@@ -71,11 +72,11 @@ public class ComputeMaxDCScorePlanAlgo implements PlanAlgorithm {
 						int facilityIndex = f.getArrayIndex();
 						if (!this.sampler.sample(facilityIndex, personIndex)) continue;
 						
-						ActivityImpl act = new ActivityImpl(type, Id.create(1, Link.class));
+						ActivityImpl act = new ActivityImpl(type, this.dummyLinkId);
 						act.setFacilityId(f.getId());
 						
 						double epsilonScaleFactor = 1.0; // no scaling back needed here anymore
-						double dcScore = scorer.getDestinationScore((PlanImpl)p.getSelectedPlan(), act, epsilonScaleFactor);
+						double dcScore = scorer.getDestinationScore((PlanImpl) p.getSelectedPlan(), act, epsilonScaleFactor);
 										
 						if (dcScore > maxDCScore) {
 							maxDCScore = dcScore;

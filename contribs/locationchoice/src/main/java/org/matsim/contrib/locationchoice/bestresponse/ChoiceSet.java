@@ -22,6 +22,7 @@ package org.matsim.contrib.locationchoice.bestresponse;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.TreeMap;
@@ -49,13 +50,17 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
 public class ChoiceSet {
+	
 	private int numberOfAlternatives;	
 	private ApproximationLevel approximationLevel;		
 	private List<Id<ActivityFacility>> destinations = new Vector<Id<ActivityFacility>>();
 	private List<Id<ActivityFacility>> notYetVisited = new Vector<Id<ActivityFacility>>();
 	private final Network network;
+	private final ActivityFacilities facilities;
 	private Config config;
 	private Scenario scenario;
+	
+	private final Map<Id<ActivityFacility>, Id<Link>> nearestLinks;
 	
 	@Override
 	public String toString() {
@@ -72,12 +77,14 @@ public class ChoiceSet {
 		return stb.toString() ;
 	}
 			
-	ChoiceSet(ApproximationLevel approximationLevel, Scenario scenario) {
+	ChoiceSet(ApproximationLevel approximationLevel, Scenario scenario, Map<Id<ActivityFacility>, Id<Link>> nearestLinks) {
 		this.approximationLevel = approximationLevel;
 		this.network = scenario.getNetwork();
+		this.facilities = scenario.getActivityFacilities();
 		this.config = scenario.getConfig();
 		this.scenario = scenario;
-		
+		this.nearestLinks = nearestLinks;
+				
 //		this.exponent = Double.parseDouble(config.locationchoice().getProbChoiceExponent());
 //		if ( wrnCnt < 1 ) {
 //			wrnCnt++ ;
@@ -124,7 +131,7 @@ public class ChoiceSet {
 		Collections.shuffle(this.notYetVisited, rnd);
 	}
 	
-	public Id<ActivityFacility> getWeightedRandomChoice(int actlegIndex, ActivityFacilities facilities,
+	public Id<ActivityFacility> getWeightedRandomChoice(int actlegIndex,
 			ScoringFunctionFactory scoringFunction, Plan plan, TripRouter tripRouter, double pKVal,
 			MultiNodeDijkstra forwardMultiNodeDijkstra, BackwardFastMultiNodeDijkstra backwardMultiNodeDijkstra,
 			int interation) {
@@ -293,9 +300,10 @@ public class ChoiceSet {
 		 */
 		for (Id<ActivityFacility> destinationId : this.destinations) {
 			// tentatively set 
+			ActivityFacility facility = facilities.getFacilities().get(destinationId);
 			((ActivityImpl)act).setFacilityId(destinationId);
-			((ActivityImpl)act).setCoord(facilities.getFacilities().get(destinationId).getCoord());
-			((ActivityImpl)act).setLinkId(((NetworkImpl) this.network).getNearestLink(facilities.getFacilities().get(destinationId).getCoord()).getId());
+			((ActivityImpl)act).setCoord(facility.getCoord());
+			((ActivityImpl)act).setLinkId(this.nearestLinks.get(destinationId));
 			
 			PlanImpl planTmp = new PlanImpl();
 			planTmp.copyFrom(plan);
@@ -416,14 +424,14 @@ public class ChoiceSet {
 		/* 
 		 * list is given here in descending order -> see compareTo in ScoredAlternative
 		 */		
-		Collections.sort(list);		
+		Collections.sort(list);
 		int nrElements = Math.min(list.size(), this.numberOfAlternatives);
 		
 		TreeMap<Double, Id<ActivityFacility>> mapNormalized = new TreeMap<Double, Id<ActivityFacility>>(java.util.Collections.reverseOrder());
 		for (int index = 0; index < nrElements; index++)  {
 			double indexNormalized = 1.0 - Math.pow(0.4, (index + 1));
 			ScoredAlternative sa = list.get(index);				
-			mapNormalized.put(indexNormalized , sa.getAlternativeId());	
+			mapNormalized.put(indexNormalized, sa.getAlternativeId());	
 		}
 		return mapNormalized;
 	}

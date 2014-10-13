@@ -50,9 +50,13 @@ public class ReadOrComputeMaxDCScore {
 		this.flexibleTypes = lcContext.getFlexibleTypes();
 		this.lcContext = lcContext;
 	}
-				
-	public void readOrCreateMaxDCScore(Controler controler, boolean arekValsRead) {		 		
-  		String maxEpsValuesFileName = controler.getConfig().locationchoice().getMaxEpsFile();
+	
+	public void readOrCreateMaxDCScore(Controler controler, boolean arekValsRead) {
+		this.readOrCreateMaxDCScore(controler.getConfig(), arekValsRead);
+	}
+	
+	public void readOrCreateMaxDCScore(Config config, boolean arekValsRead) {		 		
+  		String maxEpsValuesFileName = config.locationchoice().getMaxEpsFile();
 		if (!maxEpsValuesFileName.equals("null") && arekValsRead) {			
 			ObjectAttributesXmlReader maxEpsReader = new ObjectAttributesXmlReader(this.personsMaxDCScoreUnscaled);
 			try {

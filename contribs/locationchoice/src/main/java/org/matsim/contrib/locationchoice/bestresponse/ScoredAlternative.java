@@ -20,13 +20,17 @@
 package org.matsim.contrib.locationchoice.bestresponse;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
 public class ScoredAlternative implements Comparable<ScoredAlternative> {
+
+	// numerics
+	private final static double epsilon = 0.000001;
 	
 	private double score;
-	private Id alternativeId;
+	private Id<ActivityFacility> alternativeId;
 	
-	public ScoredAlternative(double score, Id alternativeId) {
+	public ScoredAlternative(double score, Id<ActivityFacility> alternativeId) {
 		this.score = score;
 		this.alternativeId = alternativeId;
 	}
@@ -37,10 +41,10 @@ public class ScoredAlternative implements Comparable<ScoredAlternative> {
 	public void setScore(double score) {
 		this.score = score;
 	}
-	public Id getAlternativeId() {
+	public Id<ActivityFacility> getAlternativeId() {
 		return alternativeId;
 	}
-	public void setAlternativeId(Id alternativeId) {
+	public void setAlternativeId(Id<ActivityFacility> alternativeId) {
 		this.alternativeId = alternativeId;
 	}
 
@@ -50,8 +54,6 @@ public class ScoredAlternative implements Comparable<ScoredAlternative> {
 	 */
 	@Override
 	public int compareTo(ScoredAlternative o) {
-		// numerics
-		double epsilon = 0.000001;
 		
 		// usually it is:
 		// this >  o  -> + 1
