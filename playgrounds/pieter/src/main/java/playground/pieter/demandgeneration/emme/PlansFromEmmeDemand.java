@@ -35,7 +35,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.io.IOUtils;
@@ -160,7 +159,7 @@ public class PlansFromEmmeDemand {
 	public void readZones(){
 		World w = new World();
 
-		ZoneLayer zl =  (ZoneLayer) w.createLayer(new IdImpl("zones"));
+		ZoneLayer zl =  (ZoneLayer) w.createLayer(Id.create("zones",ZoneLayer.class));
 //		ZoneLayer layer = new ZoneLayer(new IdImpl("zones"), "emme");
 		this.zones = zl;
 		this.zoneXYs = new HashMap<String, ZoneXY>();
@@ -173,7 +172,7 @@ public class PlansFromEmmeDemand {
 				if (zoneLine != null) {
 					String[] zoneLines = zoneLine.split(",");
 					this.getZoneXYs().put(zoneLines[0],
-							new ZoneXY(new IdImpl(zoneLines[0]), zoneLines[1], zoneLines[2]));
+							new ZoneXY(Id.create(zoneLines[0],ZoneXY.class), zoneLines[1], zoneLines[2]));
 				}
 			} while (zoneLine != null);
 			zoneReader.close();
@@ -217,7 +216,7 @@ public class PlansFromEmmeDemand {
 			
 			long numberOfPeopleInZone = Math.round(this.demand.getRowTotal(zoneNumber))/this.PERSON_SCALER;
 			for (long i = 0; i < numberOfPeopleInZone; i++) {
-				Point point = getRandomizedCoordInZone(new IdImpl(zoneNumber));
+				Point point = getRandomizedCoordInZone(Id.create(zoneNumber,Point.class));
 				Object [] fta = {persId++,zoneNumber, 9999,
 						point.getCoordinate().x, point.getCoordinate().y,0,0};
 				SimpleFeature ft = this.factory.createPoint(point.getCoordinate(), fta, null);
@@ -241,7 +240,7 @@ public class PlansFromEmmeDemand {
 		for(SimpleFeature person : this.homeLocationCollection) {
 			int homeTAZ = (Integer)person.getAttribute(2);
 			int workTAZ = getWorkTAZ(homeTAZ);
-			Point workPoint = getRandomizedCoordInZone(new IdImpl(workTAZ));
+			Point workPoint = getRandomizedCoordInZone(Id.create(workTAZ,Point.class));
 			//update home locations with new info
 			person.setAttribute(3, workTAZ);
 			person.setAttribute(6, workPoint.getCoordinate().x);

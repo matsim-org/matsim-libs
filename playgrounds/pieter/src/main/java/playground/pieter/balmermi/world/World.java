@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 
 public class World {
 
@@ -51,7 +50,7 @@ public class World {
 
 	@Deprecated
 	public final Layer getLayer(final String layer_type) {
-		return this.layers.get(new IdImpl(layer_type));
+		return this.layers.get(Id.create(layer_type,Layer.class));
 	}
 
 	@Override

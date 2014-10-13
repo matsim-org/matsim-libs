@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
@@ -47,8 +48,8 @@ public class PSimControler {
 
 
 	private LinkedHashSet<Plan> plansForPseudoSimulation = new LinkedHashSet<Plan>();
-	private LinkedHashSet<IdImpl> agentsForPseudoSimulation = new LinkedHashSet<IdImpl>();
-	private HashMap<IdImpl,Double> nonSimulatedAgentSelectedPlanScores = new HashMap<IdImpl, Double>(); 
+	private LinkedHashSet<Id> agentsForPseudoSimulation = new LinkedHashSet<Id>();
+	private HashMap<Id,Double> nonSimulatedAgentSelectedPlanScores = new HashMap<Id, Double>();
 	public static String AGENT_ATT = "PseudoSimAgent";
 	private WaitTimeStuckCalculator waitTimeCalculator;
 	private StopStopTimeCalculator stopStopTimeCalculator;
@@ -123,7 +124,7 @@ public class PSimControler {
 
 	public void addPlanForPseudoSimulation(Plan p){
 		plansForPseudoSimulation.add(p);
-		agentsForPseudoSimulation.add((IdImpl) p.getPerson().getId());
+		agentsForPseudoSimulation.add((Id) p.getPerson().getId());
 	}
 
 
@@ -135,19 +136,19 @@ public class PSimControler {
 
 	public void clearPlansForPseudoSimulation(){
 		plansForPseudoSimulation = new LinkedHashSet<Plan>();
-		agentsForPseudoSimulation = new LinkedHashSet<IdImpl>();
-		nonSimulatedAgentSelectedPlanScores = new HashMap<IdImpl, Double>();
+		agentsForPseudoSimulation = new LinkedHashSet<Id>();
+		nonSimulatedAgentSelectedPlanScores = new HashMap<Id, Double>();
 	}
 
 
 
-	public LinkedHashSet<IdImpl> getAgentsForPseudoSimulation() {
+	public LinkedHashSet<Id> getAgentsForPseudoSimulation() {
 		return agentsForPseudoSimulation;
 	}
 
 
 
-	public HashMap<IdImpl,Double> getNonSimulatedAgentSelectedPlanScores() {
+	public HashMap<Id,Double> getNonSimulatedAgentSelectedPlanScores() {
 		return nonSimulatedAgentSelectedPlanScores;
 	}
 
