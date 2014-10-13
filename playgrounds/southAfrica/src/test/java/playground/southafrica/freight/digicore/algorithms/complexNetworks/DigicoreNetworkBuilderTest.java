@@ -80,7 +80,7 @@ public class DigicoreNetworkBuilderTest{
 		Assert.assertTrue("Should accept the chain.", dfg.checkChain(chain, filter4));
 
 		List<Id<ActivityFacility>> list2 = new ArrayList<Id<ActivityFacility>>(2);
-		list2.add(Id.create(1, ActivityFacility.class));
+		list2.add(Id.create(2, ActivityFacility.class));
 		list2.add(Id.create(3, ActivityFacility.class));
 		List<Id<ActivityFacility>> filter5 = list2;
 		Assert.assertFalse("Should not accept the chain.", dfg.checkChain(chain, filter5));

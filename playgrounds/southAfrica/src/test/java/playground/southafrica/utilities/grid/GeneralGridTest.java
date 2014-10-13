@@ -89,12 +89,12 @@ public class GeneralGridTest {
 		GeneralGrid g1 = new GeneralGrid(10.0, GridType.SQUARE);
 		g1.generateGrid(p);
 		g1.writeGrid(utils.getOutputDirectory(), null);
-		Assert.assertTrue("File does not exist.", new File(utils.getOutputDirectory() + "/SQUARE.csv").exists());
+		Assert.assertTrue("File does not exist.", new File(utils.getOutputDirectory() + "/SQUARE_10.csv").exists());
 
 		GeneralGrid g2 = new GeneralGrid(10.0, GridType.HEX);
 		g2.generateGrid(p);
 		g2.writeGrid(utils.getOutputDirectory(), null);
-		Assert.assertTrue("File does not exist.", new File(utils.getOutputDirectory() + "/HEX.csv").exists());
+		Assert.assertTrue("File does not exist.", new File(utils.getOutputDirectory() + "/HEX_10.csv").exists());
 	}
 	
 	@Test

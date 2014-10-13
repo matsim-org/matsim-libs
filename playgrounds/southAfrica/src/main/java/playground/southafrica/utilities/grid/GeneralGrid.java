@@ -199,8 +199,8 @@ public class GeneralGrid{
 	 * </ul>
 	 * 
 	 * @param folder where the output will be written. The final output filename
-	 * 		  will be dependent of the {@link GridType}, followed by the 
-	 * 		  <code>.csv</code> extension. 
+	 * 		  will be dependent of the {@link GridType}, the grid's width, 
+	 * 		  followed by the <code>.csv</code> extension. 
 	 * @param originalCRS a string, allowably <code>null</code> describing the 
 	 * 		  coordinate reference system (CRS) of the original geometry 
 	 * 		  provided. If <code>null</code> then no transformation will be done 
