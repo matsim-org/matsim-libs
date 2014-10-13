@@ -23,13 +23,13 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.NetworkImpl;
@@ -48,8 +48,8 @@ public class TestXmls {
 		
 		for(int i=1; i<11; i++){
 			for(int j = 1; j<11; j++){
-			Id agentId = new IdImpl("person_"+i+"_"+j);
-			Id linkId = new IdImpl("link_"+i+"_"+j);
+			Id<Person> agentId = Id.create("person_"+i+"_"+j, Person.class);
+			Id<Link> linkId = Id.create("link_"+i+"_"+j, Link.class);
 			Event event = new ActivityStartEvent(0, agentId, linkId, null, "home");
 			mxw.handleEvent(event);
 			}
@@ -70,7 +70,7 @@ public class TestXmls {
 				Coord coordB = sc.createCoord(i*10+6, j*10+6);
 				String nodeBs = "Node "+i+"_"+j+"B";
 				Node nodeB = network.createAndAddNode(Id.create(nodeBs, Node.class), coordB);
-				Id linkId = new IdImpl("link_"+i+"_"+j);
+				Id<Link> linkId = Id.create("link_"+i+"_"+j, Link.class);
 				network.createAndAddLink(linkId, nodeA, nodeB, 20., 30., 3600, 1, null, null);
 			}
 		}
@@ -82,7 +82,7 @@ public class TestXmls {
 		Population pop = sc.getPopulation();
 		for(int i=1; i<11; i++){
 			for(int j = 1; j<11; j++){
-				Person person = pop.getFactory().createPerson(new IdImpl("person" +i+"_"+j));
+				Person person = pop.getFactory().createPerson(Id.create("person" +i+"_"+j, Person.class));
 				Coord coord = sc.createCoord(i*10-5, j*10-5);
 				Activity homeAct = pop.getFactory().createActivityFromCoord("home", coord );
 				Plan plan = pop.getFactory().createPlan();

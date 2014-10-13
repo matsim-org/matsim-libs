@@ -19,13 +19,12 @@
 
 package playground.juliakern.toi;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.NetworkConfigGroup;
-import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
@@ -80,27 +79,27 @@ public class FirstSimulation {
 		config.qsim().setRemoveStuckVehicles(true);
 		
 		// find a shortest route
-		StrategySettings reRoute = new StrategySettings(new IdImpl(1));
+		StrategySettings reRoute = new StrategySettings(Id.create(1, StrategySettings.class));
 		reRoute.setModuleName("ReRoute");
 		reRoute.setProbability(0.2);
 		reRoute.setDisableAfter(50);
 		config.strategy().addStrategySettings(reRoute);
 		
 		// choose one of existing plans
-		StrategySettings change = new StrategySettings(new IdImpl(2));
+		StrategySettings change = new StrategySettings(Id.create(2, StrategySettings.class));
 		change.setModuleName("ChangeExpBeta");
 		change.setProbability(0.3); //TODO decrease later
 		config.strategy().addStrategySettings(change);
 		
 		// change leg mode of a plan
-		StrategySettings modechoice = new StrategySettings(new IdImpl(3));
+		StrategySettings modechoice = new StrategySettings(Id.create(3, StrategySettings.class));
 		modechoice.setModuleName("ChangeLegMode");
 		modechoice.setProbability(0.05);
 		modechoice.setDisableAfter(50);
 		config.strategy().addStrategySettings(modechoice);
 		
 		// shift start times 
-		StrategySettings timeAll = new StrategySettings(new IdImpl(4));
+		StrategySettings timeAll = new StrategySettings(Id.create(4, StrategySettings.class));
 		timeAll.setModuleName("TimeAllocationMutator");
 		timeAll.setProbability(0.1);
 		timeAll.setDisableAfter(50);
@@ -109,7 +108,7 @@ public class FirstSimulation {
 		config.setParam("TimeAllocationMutator", "mutationRange", mutationRange);
 		
 		// keep last plan = do nothing
-		StrategySettings keep = new StrategySettings(new IdImpl(5));
+		StrategySettings keep = new StrategySettings(Id.create(5, StrategySettings.class));
 		keep.setModuleName("KeepLastSelected");
 		keep.setProbability(0.3);
 		config.strategy().addStrategySettings(keep);

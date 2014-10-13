@@ -38,7 +38,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
@@ -190,11 +189,11 @@ public class TestEmissionPricing {
 
 	// strategy
 //		StrategyConfigGroup scg = controler.getConfig().strategy();
-//		StrategySettings strategySettings = new StrategySettings(new IdImpl("1"));
+//		StrategySettings strategySettings = new StrategySettings(Id.create("1"));
 //		strategySettings.setModuleName("BestScore");
 //		strategySettings.setProbability(0.01);
 //		scg.addStrategySettings(strategySettings);
-//		StrategySettings strategySettingsR = new StrategySettings(new IdImpl("2"));
+//		StrategySettings strategySettingsR = new StrategySettings(Id.create("2"));
 //		strategySettingsR.setModuleName("ReRoute");
 //		strategySettingsR.setProbability(1.0);
 //		strategySettingsR.setDisableAfter(10);
@@ -202,13 +201,13 @@ public class TestEmissionPricing {
 		
 		StrategyConfigGroup scg = controler.getConfig().strategy();
 
-		StrategySettings strategySettingsR = new StrategySettings(new IdImpl("1"));
+		StrategySettings strategySettingsR = new StrategySettings(Id.create("1", StrategySettings.class));
 		strategySettingsR.setModuleName("ReRoute");
 		strategySettingsR.setProbability(0.999);
 		strategySettingsR.setDisableAfter(10);
 		scg.addStrategySettings(strategySettingsR);
 		
-		StrategySettings strategySettings = new StrategySettings(new IdImpl("2"));
+		StrategySettings strategySettings = new StrategySettings(Id.create("2", StrategySettings.class));
 		strategySettings.setModuleName("ChangeExpBeta");
 		strategySettings.setProbability(0.001);
 		scg.addStrategySettings(strategySettings);
@@ -262,7 +261,7 @@ public class TestEmissionPricing {
 		
 		controler.run();
 		
-		Person activeAgent = scenario.getPopulation().getPersons().get(new IdImpl("567417.1#12424"));
+		Person activeAgent = scenario.getPopulation().getPersons().get(Id.create("567417.1#12424", Person.class));
 		Double scoreOfSelectedPlan;
 		Plan selectedPlan = activeAgent.getSelectedPlan();
 		
@@ -272,10 +271,10 @@ public class TestEmissionPricing {
 				if(pe instanceof Leg){
 					Leg leg = (Leg)pe;
 					LinkNetworkRouteImpl lnri = (LinkNetworkRouteImpl) leg.getRoute();
-					if(lnri.getLinkIds().contains(new IdImpl("39"))){
+					if(lnri.getLinkIds().contains(Id.create("39", Link.class))){
 						logger.info("Selected route should not use link 39."); //System.out.println("39 contained");
 					}else{
-						if(lnri.getLinkIds().contains(new IdImpl("38"))){
+						if(lnri.getLinkIds().contains(Id.create("38", Link.class))){
 							logger.info("Selected route avoids node 9 as it is supposed to. " +
 									"It's score is " + selectedPlan.getScore());
 						}
@@ -290,10 +289,10 @@ public class TestEmissionPricing {
 					if(pe instanceof Leg){
 						Leg leg = (Leg)pe;
 						LinkNetworkRouteImpl lnri = (LinkNetworkRouteImpl) leg.getRoute();
-						if(lnri.getLinkIds().contains(new IdImpl("39"))){
+						if(lnri.getLinkIds().contains(Id.create("39", Link.class))){
 							logger.info("This plan uses node 9 and has score " + p.getScore()+ ". Selected = " + p.isSelected());
 						}
-						if(lnri.getLinkIds().contains(new IdImpl("38"))){
+						if(lnri.getLinkIds().contains(Id.create("38", Link.class))){
 							logger.info("This plan uses node 8 and has score " + p.getScore() + ". Selected = " + p.isSelected());
 						}
 					}
@@ -361,7 +360,7 @@ public class TestEmissionPricing {
 				
 				String idpart = i.toString()+j.toString();
 				
-				Person person = pFactory.createPerson(Id.create("passive_"+idpart, Person.class)); //new PersonImpl (new IdImpl(i));
+				Person person = pFactory.createPerson(Id.create("passive_"+idpart, Person.class)); //new PersonImpl (Id.create(i));
 
 				double xCoord = 6563. + (i+1)*625;
 				double yCoord = 7188. + (j-1)*625;

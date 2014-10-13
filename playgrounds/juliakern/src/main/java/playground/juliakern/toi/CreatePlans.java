@@ -33,8 +33,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.*;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -92,7 +96,7 @@ public class CreatePlans {
 			
 			BufferedReader br = null;
 			String line = "";
-			Map<Id, ArrayList<String>> person2lines = new HashMap<Id, ArrayList<String>>();
+			Map<Id<Person>, ArrayList<String>> person2lines = new HashMap<>();
 		 
 			try {
 		 
@@ -103,7 +107,7 @@ public class CreatePlans {
 				    // use comma as separator
 					String[] trip = new String[line.split(cvsSplitBy).length];
 					trip = line.split(cvsSplitBy);
-					Id personId = new IdImpl(trip[0]);
+					Id<Person> personId = Id.create(trip[0], Person.class);
 					if(!person2lines.containsKey(personId)){
 						person2lines.put(personId, new ArrayList<String>());
 					}

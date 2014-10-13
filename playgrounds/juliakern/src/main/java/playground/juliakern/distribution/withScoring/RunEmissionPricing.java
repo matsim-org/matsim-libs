@@ -22,11 +22,10 @@ package playground.juliakern.distribution.withScoring;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.contrib.emissions.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.NetworkConfigGroup;
@@ -131,11 +130,11 @@ public class RunEmissionPricing {
 
 	// strategy
 		StrategyConfigGroup scg = controler.getConfig().strategy();
-		StrategySettings strategySettings = new StrategySettings(new IdImpl("1"));
+		StrategySettings strategySettings = new StrategySettings(Id.create("1", StrategySettings.class));
 		strategySettings.setModuleName("ChangeExpBeta");
 		strategySettings.setProbability(1.0);
 		scg.addStrategySettings(strategySettings);
-		StrategySettings strategySettingsR = new StrategySettings(new IdImpl("2"));
+		StrategySettings strategySettingsR = new StrategySettings(Id.create("2", StrategySettings.class));
 		strategySettingsR.setModuleName("ReRoute");
 		strategySettingsR.setProbability(1.0);
 		strategySettingsR.setDisableAfter(5);

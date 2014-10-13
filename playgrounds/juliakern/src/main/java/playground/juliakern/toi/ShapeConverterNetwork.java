@@ -28,8 +28,8 @@ import org.geotools.feature.simple.SimpleFeatureTypeImpl;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkImpl;
@@ -86,10 +86,10 @@ public class ShapeConverterNetwork {
 				String fromNode = Long.toString(fromNodeLong);
 				Node node1;
 				
-				if(!network.getNodes().containsKey(new IdImpl(fromNode))){
+				if(!network.getNodes().containsKey(Id.create(fromNode, Node.class))){
 					node1 = network.createAndAddNode(Id.create(fromNode, Node.class), fromCoord);
 				}else{
-					node1=network.getNodes().get(new IdImpl(fromNode));
+					node1=network.getNodes().get(Id.create(fromNode, Node.class));
 					
 				}
 				
@@ -101,10 +101,10 @@ public class ShapeConverterNetwork {
 				String toNode = Long.toString(toNodeLong);
 				Node node2;
 				
-				if(!network.getNodes().containsKey(new IdImpl(toNode))){
+				if(!network.getNodes().containsKey(Id.create(toNode, Node.class))){
 					node2 = network.createAndAddNode(Id.create(toNode, Node.class), toCoord);
 				}else{
-					node2 = network.getNodes().get(new IdImpl(toNode));
+					node2 = network.getNodes().get(Id.create(toNode, Node.class));
 					
 				}
 				
@@ -112,8 +112,8 @@ public class ShapeConverterNetwork {
 				//network.createAndAddLink(scenario.createId("12"), node1, node2, 1000, 30.00, 3600, 1, null, "22");
 				//network.createAndAddLink(id, fromNode, toNode, length, freespeed, capacity, numLanes);
 				//network.createAndAddLink(id, fromNode, toNode, length, freespeed, capacity, numLanes, origId, type);
-				Id linkId1 = new IdImpl(fromCoord+"_"+toCoord);
-				Id linkId2 = new IdImpl(toCoord+"_"+fromCoord);
+				Id<Link> linkId1 = Id.create(fromCoord+"_"+toCoord, Link.class);
+				Id<Link> linkId2 = Id.create(toCoord+"_"+fromCoord, Link.class);
 				if(node1.equals(node2)){
 					logger.warn("nodes equal");
 				}

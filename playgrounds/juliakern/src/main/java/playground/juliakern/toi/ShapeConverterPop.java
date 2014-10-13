@@ -22,34 +22,26 @@ package playground.juliakern.toi;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Category;
 import org.apache.log4j.Logger;
-import org.geotools.feature.simple.SimpleFeatureTypeImpl;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
 
 public class ShapeConverterPop {
 
@@ -106,7 +98,7 @@ public class ShapeConverterPop {
 		
 		PopulationFactory populationFactory = population.getFactory();
 		
-		Map<Id, List<Trip>> personid2trips= new HashMap<Id, List<Trip>>();
+		Map<Id<Person>, List<Trip>> personid2trips= new HashMap<>();
 		
 		for(SimpleFeature sf: features){
 			
@@ -137,7 +129,7 @@ public class ShapeConverterPop {
 			if (time>=0.0) {
 				
 																																																																																																																																																																																																									String ids = Long.toString((Long)sf.getAttribute("ID2"));
-				Id personId = new IdImpl(ids);
+				Id<Person> personId = Id.create(ids, Person.class);
 				
 				Double startx = new Double((Integer) sf.getAttribute("START_X"));
 				Double starty = new Double((Integer) sf.getAttribute("START_Y"));
@@ -192,7 +184,7 @@ public class ShapeConverterPop {
 			
 		}
 		
-		for(Id id: personid2trips.keySet()){
+		for(Id<Person> id: personid2trips.keySet()){
 			
 			Trip sortedTrips[] = getSortedTrips(personid2trips.get(id));
 			

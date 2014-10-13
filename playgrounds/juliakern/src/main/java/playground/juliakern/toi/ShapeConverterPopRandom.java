@@ -22,17 +22,13 @@ package playground.juliakern.toi;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Category;
 import org.apache.log4j.Logger;
-import org.geotools.feature.simple.SimpleFeatureTypeImpl;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -41,17 +37,13 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
 
 public class ShapeConverterPopRandom {
 
@@ -112,7 +104,7 @@ public class ShapeConverterPopRandom {
 		
 		newPersons = new ArrayList<Person>();
 		
-		Map<Id, List<Trip>> personid2trips= new HashMap<Id, List<Trip>>();
+		Map<Id<Person>, List<Trip>> personid2trips= new HashMap<>();
 		
 		for(SimpleFeature sf: features){
 			
@@ -122,7 +114,7 @@ public class ShapeConverterPopRandom {
 				
 				Double idd = (Double) sf.getAttribute("ID_NUM2");
 				String ids = Double.toString(idd);
-				Id personId = new IdImpl(ids);
+				Id<Person> personId = Id.create(ids, Person.class);
 				
 				Double startx = (Double) sf.getAttribute("start_x_ny");
 				Double starty = (Double) sf.getAttribute("start_y_ny");
@@ -161,7 +153,7 @@ public class ShapeConverterPopRandom {
 			}			
 		}
 		
-		for(Id id: personid2trips.keySet()){
+		for(Id<Person> id: personid2trips.keySet()){
 			Trip sortedTrips[] = getSortedTrips(personid2trips.get(id));
 			
 			
@@ -208,7 +200,7 @@ public class ShapeConverterPopRandom {
 		int additionalNumber = (int) Math.floor(factor);
 		double randomNumber = factor - additionalNumber;
 		
-		for(Id personId: population.getPersons().keySet()){
+		for(Id<Person> personId: population.getPersons().keySet()){
 			for(int i=0; i<additionalNumber; i++){
 				createNewRandomPerson(population, popfac, population.getPersons().get(personId), i);
 			}
@@ -221,7 +213,7 @@ public class ShapeConverterPopRandom {
 	}
 
 	private static void createNewRandomPerson(Population population, PopulationFactory popfac, Person person, int i) {
-		Person newPerson = popfac.createPerson(new IdImpl(person.getId().toString()+"-"+i));
+		Person newPerson = popfac.createPerson(Id.create(person.getId().toString()+"-"+i, Person.class));
 		
 		Plan originalPlan = person.getSelectedPlan();
 		Plan newPlan = popfac.createPlan();
