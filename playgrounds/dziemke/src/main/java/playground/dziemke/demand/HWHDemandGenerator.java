@@ -43,17 +43,23 @@ public class HWHDemandGenerator {
 		double carShareBE = 0.37;
 		double carShareBB = 0.55;
 		double socialSecurityFactor = 1.52;
-		double adultsWorkersFactor = 1.9;
+		// double adultsWorkersFactor = 1.9;
+		double adultsWorkersFactor = 1.;
 		double expansionFactor = 1.;
+		
+		// new
+		int numberOfNonStayHomePlansPerPerson = 7;
+		boolean addStayHomePlan = true;
+		// end new
 		
 		// Gemeindeschluessel of Berlin is 11000000
 		Integer planningAreaId = 11000000;
 		
 		// Input and output files
-		String outputFile = "D:/Workspace/container/demand/input/hwh/population3.xml";
+		String outputFile = "D:/Workspace/container/demand/input/hwh/population6.xml";
 		
-		String commuterFileIn = "D:/VSP/Masterarbeit/Data/BA-Pendlerstatistik/Berlin2009/B2009Ge.txt";
-		String commuterFileOut = "D:/VSP/Masterarbeit/Data/BA-Pendlerstatistik/Berlin2009/B2009Ga.txt";
+		String commuterFileIn = "D:/VSP/CemdapMatsimCadyts/Data/BA-Pendlerstatistik/Berlin2009/B2009Ge.txt";
+		String commuterFileOut = "D:/VSP/CemdapMatsimCadyts/Data/BA-Pendlerstatistik/Berlin2009/B2009Ga.txt";
 
 		// maybe not in correct coordinate projection... does this matter here?
 		String shapeFileMunicipalities = "D:/Workspace/container/demand/input/shapefiles/gemeindenBerlin.shp";
@@ -97,51 +103,80 @@ public class HWHDemandGenerator {
 	       	
 			for (int j = 0; j<quantity; j++){
 				int homeTSZLocation;
-				int locationOfWork;
+				// int locationOfWork;
 				
 				if (source == planningAreaId){
 					homeTSZLocation = getRandomLor(lors);
 				} else {
 					homeTSZLocation = source;
 				}
-								
-				if (sink == planningAreaId){
-					locationOfWork = getRandomLor(lors);
-				} else {
-					locationOfWork = sink;
-				}
 				
+				// new
 				Geometry homeGeometry = zoneGeometries.get(homeTSZLocation);
-				Geometry workGeometry = zoneGeometries.get(locationOfWork);
-								
-				//Person person = population.getFactory().createPerson(createId(source, sink, j));
+				
 				Id<Person> id = Id.create(source + "_" + sink + "_" + j, Person.class);
 				Person person = population.getFactory().createPerson(id);
-				Plan plan = population.getFactory().createPlan();
+				// Plan plan = population.getFactory().createPlan();
 				
 				Coord homeLocation = shoot(homeGeometry);
-				Coord workLocation = shoot(workGeometry);
 				
-				Activity homeActivity = population.getFactory().createActivityFromCoord("home", homeLocation);
-				int random = (int) (Math.random() * 7200) - 3600;
-				homeActivity.setEndTime(7.5*60*60 + random);
-				plan.addActivity(homeActivity);
+				for (int k=1; k<=numberOfNonStayHomePlansPerPerson; k++) {
+					Plan plan = population.getFactory().createPlan();
+										
+					int locationOfWork;
+					// end new
+					
+					if (sink == planningAreaId){
+						locationOfWork = getRandomLor(lors);
+					} else {
+						locationOfWork = sink;
+					}
+					
+					// Geometry homeGeometry = zoneGeometries.get(homeTSZLocation);
+					Geometry workGeometry = zoneGeometries.get(locationOfWork);
+									
+					// Id id = new IdImpl(source + "_" + sink + "_" + j);
+					// Person person = population.getFactory().createPerson(id);
+					// Plan plan = population.getFactory().createPlan();
+					
+					// Coord homeLocation = shoot(homeGeometry);
+					Coord workLocation = shoot(workGeometry);
+					
+					Activity homeActivity = population.getFactory().createActivityFromCoord("home", homeLocation);
+					//int random = (int) (Math.random() * 7200) - 3600;
+					int random = (int) (Math.random() * 10800) - 5400;
+					// homeActivity.setEndTime(7.5*60*60 + random);
+					homeActivity.setEndTime(8*60*60 + random);
+					plan.addActivity(homeActivity);
+					
+					Leg legToWork = population.getFactory().createLeg(TransportMode.car);
+					plan.addLeg(legToWork);
+					
+					Activity workActivity = population.getFactory().createActivityFromCoord("work", workLocation);
+					//int random2 = (int) (Math.random() * 7200) - 3600;
+					int random2 = (int) (Math.random() * 10800) - 5400;
+					//workActivity.setEndTime(16*60*60 + random2);
+					workActivity.setEndTime(16.5*60*60 + random2);
+					plan.addActivity(workActivity);
+					
+					Leg legToHome = population.getFactory().createLeg(TransportMode.car);
+					plan.addLeg(legToHome);
+					
+					Activity homeActivity2 = population.getFactory().createActivityFromCoord("home", homeLocation);
+					plan.addActivity(homeActivity2);
+					
+					person.addPlan(plan);
+				}
 				
-				Leg legToWork = population.getFactory().createLeg(TransportMode.car);
-				plan.addLeg(legToWork);
-				
-				Activity workActivity = population.getFactory().createActivityFromCoord("work", workLocation);
-				int random2 = (int) (Math.random() * 7200) - 3600;
-				workActivity.setEndTime(16*60*60 + random2);				
-				plan.addActivity(workActivity);
-				
-				Leg legToHome = population.getFactory().createLeg(TransportMode.car);
-				plan.addLeg(legToHome);
-				
-				Activity homeActivity2 = population.getFactory().createActivityFromCoord("home", homeLocation);
-				plan.addActivity(homeActivity2);
-				
-				person.addPlan(plan);
+				// new
+				if (addStayHomePlan == true) {
+					Plan plan = population.getFactory().createPlan();
+					Activity homeActivity = population.getFactory().createActivityFromCoord("home", homeLocation);
+					plan.addActivity(homeActivity);
+					person.addPlan(plan);
+				}
+				// end new
+			
 				population.addPerson(person);
 			}
 		}
