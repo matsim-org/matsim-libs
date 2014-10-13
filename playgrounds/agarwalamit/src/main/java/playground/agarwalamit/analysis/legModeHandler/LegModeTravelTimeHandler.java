@@ -65,6 +65,8 @@ public class LegModeTravelTimeHandler implements PersonDepartureEventHandler, Pe
 	public void reset(int iteration) {
 		this.mode2PersonId2TravelTimes.clear();
 		this.personId2DepartureTime.clear();
+		this.stuckPersons.clear();
+		this.mode2NumberOfLegs.clear();
 	}
 
 	@Override

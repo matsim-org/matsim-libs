@@ -30,12 +30,15 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 
+import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
+import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
+
 /**
  * @author amit
  */
 public class UserGroupUtilsExtended {
 	private final Logger logger = Logger.getLogger(UserGroupUtilsExtended.class);
-	
+
 	public SortedMap<String, Double> calculateTravelMode2Mean(Map<String, Map<Id<Person>, Double>> inputMap, Population relavantPop){	
 		this.logger.info("Calculating mean(average) ...");
 		SortedMap<String, Double> mode2Mean = new TreeMap<String, Double>();
@@ -53,7 +56,7 @@ public class UserGroupUtilsExtended {
 		mode2Mean.put("allModes", calculateMean(allQty));
 		return mode2Mean;
 	}
-	
+
 	public SortedMap<String, Double> calculateTravelMode2MeanFromLists(Map<String, Map<Id<Person>, List<Double>>> inputMap, Population relavantPop){	
 		this.logger.info("Calculating mean(average) ...");
 		SortedMap<String, Double> mode2Mean = new TreeMap<String, Double>();
@@ -89,7 +92,7 @@ public class UserGroupUtilsExtended {
 		mode2Median.put("allModes", calculateMedian(allQty));
 		return mode2Median;
 	}
-	
+
 	public SortedMap<String, Double> calculateTravelMode2MedianFromLists(Map<String, Map<Id<Person>, List<Double>>> inputMap, Population relavantPop){
 		this.logger.info("Calculating median ...");
 		SortedMap<String, Double> mode2Median = new TreeMap<String, Double>();
@@ -106,6 +109,16 @@ public class UserGroupUtilsExtended {
 		}
 		mode2Median.put("allModes", calculateMedian(allQty));
 		return mode2Median;
+	}
+
+	public List<Double> getTotalStatListForBoxPlot(Map<Id<Person>, Double> inputMap, Population relevantPop){
+		List<Double> data = new ArrayList<Double>();
+		for(Id<Person> id :inputMap.keySet()){
+			if(relevantPop.getPersons().keySet().contains(id)){
+				data.add(inputMap.get(id));
+			}
+		}
+		return data;
 	}
 
 	public double calculateMedian(List<Double> inputList){

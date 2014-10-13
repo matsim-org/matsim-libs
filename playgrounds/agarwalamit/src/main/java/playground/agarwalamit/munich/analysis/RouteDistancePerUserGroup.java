@@ -48,6 +48,7 @@ public class RouteDistancePerUserGroup {
 		super();
 		this.sc = LoadMyScenarios.loadScenarioFromNetworkPlansAndConfig(plansFile, networkFile, configFile);
 		this.usrGrpExtended = new UserGroupUtilsExtended();
+		userGrpToBoxPlotData = new TreeMap<UserGroup, List<Double>>();
 	}
 
 	private Logger logger = Logger.getLogger(RouteDistancePerUserGroup.class);
@@ -62,7 +63,9 @@ public class RouteDistancePerUserGroup {
 	private SortedMap<UserGroup, SortedMap<String, Double>> usrGrp2Mode2MeanDistance = new TreeMap<UserGroup, SortedMap<String,Double>>();
 	private SortedMap<UserGroup, SortedMap<String, Double>> usrGrp2Mode2MedianDistance = new TreeMap<UserGroup, SortedMap<String,Double>>();
 	private SortedMap<String, Map<Id<Person>, List<Double>>> mode2PersonId2RouteDist;
-
+	private SortedMap<UserGroup, List<Double>> userGrpToBoxPlotData;
+	private final String mainMode = "car";
+	
 	public static void main(String[] args) {
 		RouteDistancePerUserGroup routeDistUG = new RouteDistancePerUserGroup();
 		routeDistUG.run();
@@ -78,6 +81,7 @@ public class RouteDistancePerUserGroup {
 		
 		this.mode2PersonId2RouteDist = lmdfed.getMode2PersonId2TravelDistances();
 		getUserGroupDistanceMeanAndMeadian();
+		createBoxPlotData(lmdfed.getLegMode2PersonId2TotalTravelDistance().get(mainMode));
 		writeResults(this.outputDir+"/analysis/");
 	}
 
@@ -95,8 +99,31 @@ public class RouteDistancePerUserGroup {
 			throw new RuntimeException("Data is not written to a file.");
 		}
 		this.logger.info("Data writing is finished.");
+		
+		
+		try {
+			for(UserGroup ug :this.userGrpToBoxPlotData.keySet()){
+				writer = IOUtils.getBufferedWriter(outputFolder+"/usrGrp2TravelDistanceBoxPlotData_"+ug+".txt");
+				writer.write(ug+"\n");
+				for(double d :this.userGrpToBoxPlotData.get(ug)){
+					writer.write(d+"\n");
+				}
+				writer.close();
+			}
+			
+		} catch (Exception e) {
+			throw new RuntimeException("Data is not written to a file.");
+		}
 	}
-
+	
+	private void createBoxPlotData (Map<Id<Person>, Double> map){
+		PersonFilter pf = new PersonFilter();
+		
+		for(UserGroup ug:UserGroup.values()){
+			Population relevantPop = pf.getPopulation(sc.getPopulation(), ug);
+			userGrpToBoxPlotData.put(ug, this.usrGrpExtended.getTotalStatListForBoxPlot(map, relevantPop));
+		}
+	}
 	private void getUserGroupDistanceMeanAndMeadian(){
 		PersonFilter pf = new PersonFilter();
 		for(UserGroup ug:UserGroup.values()){

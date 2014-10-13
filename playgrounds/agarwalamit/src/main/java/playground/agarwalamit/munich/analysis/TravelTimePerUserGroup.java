@@ -53,6 +53,7 @@ public class TravelTimePerUserGroup extends AbstractAnalyisModule {
 		this.lastIteration = LoadMyScenarios.getLastIteration(this.configFile);
 		this.eventsFile = this.outputDir+"/ITERS/it."+this.lastIteration+"/"+this.lastIteration+".events.xml.gz";
 		this.usrGrpExtended = new UserGroupUtilsExtended();
+		userGrpToBoxPlotData = new TreeMap<UserGroup, List<Double>>();
 	}
 
 	private LegModeTravelTimeHandler travelTimeHandler;
@@ -68,6 +69,8 @@ public class TravelTimePerUserGroup extends AbstractAnalyisModule {
 	private SortedMap<UserGroup, SortedMap<String, Double>> usrGrp2Mode2MeanTime = new TreeMap<UserGroup, SortedMap<String,Double>>();
 	private SortedMap<UserGroup, SortedMap<String, Double>> usrGrp2Mode2MedianTime = new TreeMap<UserGroup, SortedMap<String,Double>>();
 	private UserGroupUtilsExtended usrGrpExtended;
+	private SortedMap<UserGroup, List<Double>> userGrpToBoxPlotData;
+	private final String mainMode = "car";
 
 	public static void main(String[] args) {
 
@@ -98,6 +101,7 @@ public class TravelTimePerUserGroup extends AbstractAnalyisModule {
 	public void postProcessData() {
 		this.mode2PersonId2TravelTimes = this.travelTimeHandler.getLegMode2PesonId2TripTimes();
 		getUserGroupTravelMeanAndMeadian();
+		createBoxPlotData(this.travelTimeHandler.getLegMode2PersonId2TotalTravelTime().get(mainMode));
 	}
 
 	@Override
@@ -115,8 +119,30 @@ public class TravelTimePerUserGroup extends AbstractAnalyisModule {
 			throw new RuntimeException("Data is not written to a file.");
 		}
 		this.logger.info("Data writing is finished.");
+
+		
+		try {
+			for(UserGroup ug :this.userGrpToBoxPlotData.keySet()){
+				writer = IOUtils.getBufferedWriter(outputFolder+"/usrGrp2TravelTimeBoxPlotData_"+ug+".txt");
+				writer.write(ug+"\n");
+				for(double d :this.userGrpToBoxPlotData.get(ug)){
+					writer.write(d+"\n");
+				}
+				writer.close();
+			}
+			
+		} catch (Exception e) {
+			throw new RuntimeException("Data is not written to a file.");
+		}
 	}
 
+	private void createBoxPlotData (Map<Id<Person>, Double> map){
+		PersonFilter pf = new PersonFilter();
+		for(UserGroup ug:UserGroup.values()){
+			Population relevantPop = pf.getPopulation(sc.getPopulation(), ug);
+			userGrpToBoxPlotData.put(ug, this.usrGrpExtended.getTotalStatListForBoxPlot(map, relevantPop));
+		}
+	}
 	
 	private void getUserGroupTravelMeanAndMeadian(){
 		PersonFilter pf = new PersonFilter();

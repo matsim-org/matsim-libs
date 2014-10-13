@@ -74,7 +74,12 @@ public class LegModeRouteDistanceDistributionHandler implements PersonDepartureE
 
 	@Override
 	public void reset(int iteration) {
-
+		this.mode2NumberOfLegs.clear();
+		this.mode2PersonId2OneTripdist.clear();
+		this.mode2PersonId2TeleportDist.clear();
+		this.mainModes.clear();
+		this.personId2LegModes.clear();
+		this.mode2NumberOfLegs.clear();
 	}
 
 	@Override
@@ -142,7 +147,7 @@ public class LegModeRouteDistanceDistributionHandler implements PersonDepartureE
 		String travelMode = event.getLegMode();
 		Id<Person> personId = event.getPersonId();
 		if(!travelMode.equals(this.personId2LegModes.get(personId))) throw new RuntimeException("Person is leaving and arriving with different travel modes. Can not happen.");
-		
+
 		Map<Id<Person>, List<Double>> personId2Dists = mode2PersonId2distances.get(travelMode);
 		if(mainModes.contains(travelMode)){
 			if(personId2Dists.containsKey(personId) ){
@@ -166,13 +171,13 @@ public class LegModeRouteDistanceDistributionHandler implements PersonDepartureE
 	public SortedMap<String,Map<Id<Person>,List<Double>>> getMode2PersonId2TravelDistances (){
 		return this.mode2PersonId2distances;
 	}
-	
+
 	public SortedSet<String> getUsedModes (){
 		SortedSet<String> modes = new TreeSet<String>();
 		modes.addAll(mode2PersonId2distances.keySet());
 		return modes;
 	}
-	
+
 	public double getLongestDistance(){
 		return maxDist;
 	}
@@ -186,7 +191,7 @@ public class LegModeRouteDistanceDistributionHandler implements PersonDepartureE
 		double teleportDist = event.getDistance();
 		person2Dist.put(personId, teleportDist);
 	}
-	
+
 	/**
 	 * @return  Total distance (summed for all trips for that person) for each person segregated w.r.t. travel modes.
 	 */
@@ -208,7 +213,7 @@ public class LegModeRouteDistanceDistributionHandler implements PersonDepartureE
 		}
 		return mode2PersonId2TotalTravelDistance;
 	}
-	
+
 	public SortedMap<String,Double> getTravelMode2NumberOfLegs(){
 		getLegMode2PersonId2TotalTravelDistance();
 		return this.mode2NumberOfLegs;
