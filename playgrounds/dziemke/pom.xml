@@ -34,7 +34,7 @@
 	</dependency>
 	<dependency>
 		<groupId>playground</groupId>
-		<artifactId>kai</artifactId>
+		<artifactId>andreas</artifactId>
 		<version>0.7.0-SNAPSHOT</version>
 		<scope>compile</scope>
 	</dependency>
