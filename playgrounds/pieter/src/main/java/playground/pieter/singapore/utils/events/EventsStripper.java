@@ -1,26 +1,18 @@
 package playground.pieter.singapore.utils.events;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.TreeSet;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -31,8 +23,8 @@ public class EventsStripper {
 
 	private class FindTransitDriverIdsFromVehicleIds implements
 			TransitDriverStartsEventHandler {
-		HashSet<String> transitDriverIds = new HashSet<String>();
-		HashSet<String> transitVehicleIds;
+		final HashSet<String> transitDriverIds = new HashSet<>();
+		final HashSet<String> transitVehicleIds;
 
 		public FindTransitDriverIdsFromVehicleIds(
 				HashSet<String> transitVehicleIds) {
@@ -65,16 +57,15 @@ public class EventsStripper {
 
 	}
 
-	String[] choiceSet;
-	private EventsManager events;
-	Scenario scenario = ScenarioUtils
+	private String[] choiceSet;
+    private Scenario scenario = ScenarioUtils
 			.createScenario(ConfigUtils.createConfig());
 
 	public EventsStripper(List<String> ids) {
 
 		this.populateList(ids);
 	}
-	public EventsStripper(String[] ids) {
+	private EventsStripper(String[] ids) {
 		choiceSet = ids;
 		
 	}
@@ -87,7 +78,7 @@ public class EventsStripper {
 
 		choiceSet = new String[ids.size()];
 		for (int i = 0; i < choiceSet.length; i++) {
-			choiceSet[i] = ids.get(i).toString();
+			choiceSet[i] = ids.get(i);
 		}
 
 		scenario = null;
@@ -96,7 +87,7 @@ public class EventsStripper {
 	private void populateList(String plansFile) {
 		MatsimPopulationReader pn = new MatsimPopulationReader(scenario);
 		pn.readFile(plansFile);
-		ArrayList<Id> ids = new ArrayList<Id>();
+		ArrayList<Id> ids = new ArrayList<>();
 		CollectionUtils.addAll(ids, scenario.getPopulation().getPersons()
 				.keySet().iterator());
 		choiceSet = new String[ids.size()];
@@ -107,10 +98,10 @@ public class EventsStripper {
 
 	public void stripEvents(String inFileName, String outfileName,
 			double frequency, boolean listenForTransitDrivers) {
-		this.events = EventsUtils.createEventsManager();
+        EventsManager events = EventsUtils.createEventsManager();
 		int N = choiceSet.length;
 		int M = (int) ((double) N * frequency);
-		HashSet<String> sampledIds = new HashSet<String>();
+		HashSet<String> sampledIds = new HashSet<>();
 		for (int i : Sample.sampleMfromN(M, N)) {
 			sampledIds.add(choiceSet[i]);
 		}

@@ -23,7 +23,6 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
@@ -49,7 +48,7 @@ public class PersonsAffectedbyLinkToSQL {
 	 */
 	public static void main(String[] args) throws InstantiationException, IllegalAccessException, ClassNotFoundException, IOException, SQLException {
 		DataBaseAdmin dba = new DataBaseAdmin(new File("f:\\data\\matsim2postgres.properties"));
-		HashSet<String> linkIds = new HashSet<String>();
+		HashSet<String> linkIds = new HashSet<>();
 		linkIds.add("25755");
 		linkIds.add("58340");
 		linkIds.add("61153");
@@ -69,7 +68,7 @@ public class PersonsAffectedbyLinkToSQL {
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
 		reader.parse("F:\\data\\sing2.2\\40.events.xml.gz");
 		String actTableName = "u_fouriep.idsforlinkanalysis";
-		List<PostgresqlColumnDefinition> columns = new ArrayList<PostgresqlColumnDefinition>();
+		List<PostgresqlColumnDefinition> columns = new ArrayList<>();
 		columns.add(new PostgresqlColumnDefinition("person_id",
 				PostgresType.TEXT));
 		PostgresqlCSVWriter idwriter = new PostgresqlCSVWriter("ACTS",

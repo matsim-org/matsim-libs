@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 
-public class PlansExtractSingleMode {
+class PlansExtractSingleMode {
 
 	public void run(Scenario s, String fileName) {
 		PopulationImpl plans = (PopulationImpl) s.getPopulation();

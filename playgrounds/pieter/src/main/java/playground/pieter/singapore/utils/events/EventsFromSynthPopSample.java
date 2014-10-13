@@ -20,7 +20,7 @@ public class EventsFromSynthPopSample {
 				"where d_demandgen_input.sample_selector.synth_hh_id =" +
 				" d_demandgen_input.matsim2pt1_assignment_09112012.synth_hh_id " +
 				"and sample_01pct=1;");
-		ArrayList<String> list = new ArrayList<String>();
+		ArrayList<String> list = new ArrayList<>();
 		while(rs.next()){
 			list.add(rs.getString("synth_person_id"));
 		}

@@ -39,7 +39,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
  */
 public class LayerImpl implements Layer {
 
-	final TreeMap<Id, BasicLocation> locations = new TreeMap<Id,BasicLocation>();
+	private final TreeMap<Id, BasicLocation> locations = new TreeMap<>();
 
 	//////////////////////////////////////////////////////////////////////
 	// get methods
@@ -78,17 +78,21 @@ public class LayerImpl implements Layer {
 	 */
 	@Override
 	public final ArrayList<BasicLocation> getNearestLocations(final Coord coord, final BasicLocation excludeLocation) {
-		ArrayList<BasicLocation> locs = new ArrayList<BasicLocation>();
+		ArrayList<BasicLocation> locs = new ArrayList<>();
 		double shortestDistance = Double.MAX_VALUE;
-		Iterator<BasicLocation> loc_it = this.locations.values().iterator();
-		while (loc_it.hasNext()) {
-			BasicLocation loc = loc_it.next();
-			if (loc != excludeLocation) {
-				double distance = CoordUtils.calcDistance(loc.getCoord(), coord);
-				if (distance == shortestDistance) { locs.add(loc); }
-				if (distance < shortestDistance) { shortestDistance = distance; locs.clear(); locs.add(loc); }
-			}
-		}
+        for (BasicLocation loc : this.locations.values()) {
+            if (loc != excludeLocation) {
+                double distance = CoordUtils.calcDistance(loc.getCoord(), coord);
+                if (distance == shortestDistance) {
+                    locs.add(loc);
+                }
+                if (distance < shortestDistance) {
+                    shortestDistance = distance;
+                    locs.clear();
+                    locs.add(loc);
+                }
+            }
+        }
 		return locs;
 	}
 

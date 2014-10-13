@@ -32,29 +32,26 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.network.Link;
 
-public class OutFlowInfoCollectorWithPt implements LinkLeaveEventHandler, LinkEnterEventHandler,
+class OutFlowInfoCollectorWithPt implements LinkLeaveEventHandler, LinkEnterEventHandler,
 		PersonArrivalEventHandler {
 
-	private int binSizeInSeconds; // set the length of interval
-	public HashMap<Id<Link>, int[]> linkOutFlow; // define
-	private Map<Id<Link>, ? extends Link> filteredEquilNetLinks; // define
+	private final int binSizeInSeconds; // set the length of interval
+	private HashMap<Id<Link>, int[]> linkOutFlow; // define
+	private final Map<Id<Link>, ? extends Link> filteredEquilNetLinks; // define
 	
 	// personId, linkId
-	private HashMap<Id, Id> lastEnteredLink=new HashMap<Id, Id>(); // define
-	
-	private boolean isOldEventFile;
+	private final HashMap<Id, Id> lastEnteredLink=new HashMap<>(); // define
 
-	public OutFlowInfoCollectorWithPt(Map<Id<Link>, ? extends Link> filteredEquilNetLinks,
+    public OutFlowInfoCollectorWithPt(Map<Id<Link>, ? extends Link> filteredEquilNetLinks,
 			boolean isOldEventFile,int binSizeInSeconds) { // to create the class FlowInfoCollector
 		// and give the link set
 		this.filteredEquilNetLinks = filteredEquilNetLinks;
-		this.isOldEventFile = isOldEventFile;
 		this.binSizeInSeconds = binSizeInSeconds;
 	}
 
 	@Override
 	public void reset(int iteration) {
-		linkOutFlow = new HashMap<Id<Link>, int[]>(); // reset the variables (private
+		linkOutFlow = new HashMap<>(); // reset the variables (private
 												// ones)
 	}
 
@@ -95,9 +92,9 @@ public class OutFlowInfoCollectorWithPt implements LinkLeaveEventHandler, LinkEn
 			Link link = filteredEquilNetLinks.get(linkId);
 			System.out.print(linkId + " - " + link.getCoord() + ": ");
 
-			for (int i = 0; i < bins.length; i++) {
-				System.out.print(bins[i] * 3600 / binSizeInSeconds + "\t");
-			}
+            for (int bin : bins) {
+                System.out.print(bin * 3600 / binSizeInSeconds + "\t");
+            }
 
 			System.out.println();
 		}

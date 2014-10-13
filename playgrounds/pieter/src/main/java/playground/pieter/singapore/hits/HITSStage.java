@@ -7,35 +7,33 @@ import java.sql.SQLException;
 
 import org.matsim.api.core.v01.Coord;
 
-import com.sun.xml.bind.v2.runtime.RuntimeUtil.ToStringAdapter;
 
-
-public class HITSStage extends HITSElement implements Serializable {
+class HITSStage extends HITSElement implements Serializable {
 	/**
 	 * 
 	 */
 	HITSTrip trip;
-	int msno_main;
-	String h1_hhid;
+	private int msno_main;
+	private String h1_hhid;
 	int pax_id;
 	int trip_id;
 	int stage_id;
 	String t10_mode;
 	int t10a_walktime;
-	String t10i_modeother;
+	private String t10i_modeother;
 	String t11_boardsvcstn;
 	String t12_alightstn;
 	int t12a_paxinveh;
 	int t13_waittime;
 	int t14_invehtime;
-	double t15_taxifare;
-	String t16_taxireimb;
-	double t17_erpcost;
-	String t18_erpreimb;
-	double t19_parkfee;
-	String t19a_parkftyp;
-	String t20_parkreimb;
-	int stageDuration;
+	private double t15_taxifare;
+	private String t16_taxireimb;
+	private double t17_erpcost;
+	private String t18_erpreimb;
+	private double t19_parkfee;
+	private String t19a_parkftyp;
+	private String t20_parkreimb;
+	private int stageDuration;
 	HITSStage prevStage;
 	HITSStage nextStage;
 	Coord stageOrigCoord;

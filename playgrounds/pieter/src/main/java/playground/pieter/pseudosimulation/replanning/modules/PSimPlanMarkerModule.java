@@ -8,7 +8,7 @@ import playground.pieter.pseudosimulation.controler.PSimControler;
 
 public class PSimPlanMarkerModule implements PlanStrategyModule {
 
-	private PSimControler controler;
+	private final PSimControler controler;
 
 	public PSimPlanMarkerModule(PSimControler controler) {
 		this.controler = controler;

@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.Id;
 
 public class World {
 
-	private final Map<Id, Layer> layers = new TreeMap<Id, Layer>();
+	private final Map<Id, Layer> layers = new TreeMap<>();
 
 	@Deprecated
 	public final Layer createLayer(final Id type) {
@@ -38,7 +38,7 @@ public class World {
 	}
 
 	@Deprecated
-	private final ZoneLayer createZoneLayer(final Id type) {
+	private ZoneLayer createZoneLayer(final Id type) {
 		ZoneLayer l = new ZoneLayer();
 		this.layers.put(type,l);
 		return l;

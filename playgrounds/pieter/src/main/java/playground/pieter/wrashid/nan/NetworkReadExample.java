@@ -50,8 +50,8 @@ public class NetworkReadExample {
 		}
 
 	}
-	public static Map<Id<Link>, ? extends Link> getLinksWithinRadius(Map<Id<Link>, ? extends Link> links, double radius, Coord center){
-		HashMap<Id<Link>,Link> filteredLinks=new HashMap<Id<Link>, Link>();
+	private static Map<Id<Link>, ? extends Link> getLinksWithinRadius(Map<Id<Link>, ? extends Link> links, double radius, Coord center){
+		HashMap<Id<Link>,Link> filteredLinks=new HashMap<>();
 
 		for (Id<Link> linkId:links.keySet()){
 			Link link = links.get(linkId); //find all the links
@@ -62,7 +62,7 @@ public class NetworkReadExample {
 		}
 		return filteredLinks;
 	}
-	public static double getDistance(Coord coordA, Coord coordB){
+	private static double getDistance(Coord coordA, Coord coordB){
 		return Math.sqrt(((coordA.getX()-coordB.getX())*(coordA.getX()-coordB.getX()) + (coordA.getY()-coordB.getY())*(coordA.getY()-coordB.getY())));
 	} //filter algorithm
 

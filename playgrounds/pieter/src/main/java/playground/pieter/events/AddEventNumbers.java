@@ -22,21 +22,17 @@ package playground.pieter.events;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.sql.Connection;
-import java.util.ArrayList;
 import java.util.Map;
-import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.core.events.*;
 import org.matsim.core.events.algorithms.EventWriter;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
 public class AddEventNumbers implements EventWriter, BasicEventHandler {
 	private BufferedWriter out = null;
-	long eventCounter =0;
+	private long eventCounter =0;
 
 	public void reset(int iteration) {
 		closeFile();
@@ -84,7 +80,7 @@ public class AddEventNumbers implements EventWriter, BasicEventHandler {
 		init(outputFilename);
 	}
 
-	public void init(final String outfilename) {
+	void init(final String outfilename) {
 		closeFile();
 		try {
 			this.out = IOUtils.getBufferedWriter(outfilename);

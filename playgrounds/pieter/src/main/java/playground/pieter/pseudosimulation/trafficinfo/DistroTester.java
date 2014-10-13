@@ -30,7 +30,6 @@ import org.apache.commons.math.distribution.ExponentialDistributionImpl;
 import org.apache.commons.math.distribution.GammaDistributionImpl;
 import org.apache.commons.math.distribution.NormalDistributionImpl;
 import org.apache.commons.math.distribution.WeibullDistributionImpl;
-import org.apache.commons.math.distribution.ZipfDistributionImpl;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
@@ -40,8 +39,6 @@ import org.jfree.data.statistics.HistogramType;
 
 import cern.jet.random.*;
 import cern.jet.random.engine.MersenneTwister;
-
-;
 
 public class DistroTester {
 	public static void main(String[] args) throws MathException {

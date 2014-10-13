@@ -1,21 +1,17 @@
 package playground.pieter.network;
 
-import java.util.ArrayList;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class NetworkCapacityChanger {
 
-	public void run(final String[] args) {
+	void run(final String[] args) {
 		Scenario scenario;
 		MatsimRandom.reset(123);
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());

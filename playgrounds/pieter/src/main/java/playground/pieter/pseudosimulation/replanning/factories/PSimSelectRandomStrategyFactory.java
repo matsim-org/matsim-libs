@@ -24,8 +24,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.modules.SelectRandomStrategyFactory;
-import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 import playground.pieter.pseudosimulation.replanning.selectors.PSimRandomPlanSelector;
 
@@ -33,8 +31,7 @@ public class PSimSelectRandomStrategyFactory implements PlanStrategyFactory {
 
 	@Override
 	public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
-		PlanStrategy strategy = new PlanStrategyImpl(new PSimRandomPlanSelector());
-		return strategy;
+		return new PlanStrategyImpl(new PSimRandomPlanSelector());
 	}
 
 }

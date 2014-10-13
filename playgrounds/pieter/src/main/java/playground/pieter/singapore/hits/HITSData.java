@@ -17,8 +17,8 @@ public class HITSData implements Serializable{
 	private ArrayList<HITSStage> stages;
 	private ArrayList<String> householdIds;
 	private ArrayList<String> personIds;
-	private boolean limited;
-	DateFormat dfm = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	private final boolean limited;
+	private final DateFormat dfm = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 
 	public HITSData(Connection sqlConn, boolean limitedRows) {
@@ -28,7 +28,7 @@ public class HITSData implements Serializable{
 		setPersonIds();
 	}
 
-	public void setHouseholds(Connection conn, DateFormat dfm) {
+	void setHouseholds(Connection conn, DateFormat dfm) {
 		
 		try {
 			Statement hs = conn.createStatement ();
@@ -62,7 +62,7 @@ public class HITSData implements Serializable{
 					";");
 			ResultSet hrs = hs.getResultSet ();
 			int count = 0;
-			ArrayList<HITSHousehold> households = new ArrayList<HITSHousehold>();
+			ArrayList<HITSHousehold> households = new ArrayList<>();
 			while (hrs.next())
 			{
 				if(count % 1000 == 0)  System.out.println(count);
@@ -85,7 +85,7 @@ public class HITSData implements Serializable{
 	}
 
 	private void setHouseholdIds() {
-		this.householdIds = new ArrayList<String>();
+		this.householdIds = new ArrayList<>();
 		for(HITSHousehold hh:this.households){
 			this.householdIds.add(hh.h1_hhid);
 		}
@@ -93,7 +93,7 @@ public class HITSData implements Serializable{
 	}
 	
 	private void setPersonIds() {
-		this.personIds = new ArrayList<String>();
+		this.personIds = new ArrayList<>();
 		for(HITSPerson hh:this.persons){
 			this.personIds.add(hh.pax_idx);
 		}
@@ -116,7 +116,7 @@ public class HITSData implements Serializable{
 	}
 	
 	private void getPersonsFromHouseholds() {
-		this.persons = new ArrayList<HITSPerson>();
+		this.persons = new ArrayList<>();
 		for(HITSHousehold household:this.households){
 			this.persons.addAll(household.getPersons());
 		}
@@ -124,7 +124,7 @@ public class HITSData implements Serializable{
 	}
 	
 	private void getTripsFromHouseholds() {
-		this.trips = new ArrayList<HITSTrip>();
+		this.trips = new ArrayList<>();
 		for(HITSHousehold household:this.households){
 			this.trips.addAll(household.getTrips());
 		}
@@ -132,7 +132,7 @@ public class HITSData implements Serializable{
 	}
 	
 	private void getStagesFromHouseholds() {
-		this.stages = new ArrayList<HITSStage>();
+		this.stages = new ArrayList<>();
 		for(HITSHousehold household:this.households){
 			this.stages.addAll(household.getStages());
 		}

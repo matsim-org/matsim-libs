@@ -13,10 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.matsim.analysis.CalcLegTimes;
-import org.matsim.analysis.CalcLinkStats;
 import org.matsim.analysis.ScoreStatsControlerListener;
-import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -25,27 +22,18 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.SimulationConfigGroup;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.AbstractController;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.controler.PlanSelectorFactoryRegister;
 import org.matsim.core.controler.PlanStrategyFactoryRegister;
-import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
 import org.matsim.core.controler.corelisteners.EventsHandling;
-import org.matsim.core.controler.corelisteners.LegHistogramListener;
-import org.matsim.core.controler.corelisteners.LegTimesListener;
-import org.matsim.core.controler.corelisteners.LinkStatsControlerListener;
-import org.matsim.core.controler.corelisteners.PlansDumping;
 import org.matsim.core.controler.corelisteners.PlansReplanning;
 import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.mobsim.external.ExternalMobsim;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.replanning.StrategyManager;
@@ -53,15 +41,12 @@ import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
-import org.matsim.counts.CountControlerListener;
-import org.matsim.counts.Counts;
-import org.matsim.population.VspPlansCleaner;
-import org.matsim.pt.counts.PtCountControlerListener;
 
 import playground.pieter.pseudosimulation.mobsim.PSimFactory;
 
 public class SlaveControlerTrimmedDown extends AbstractController implements IterationStartsListener, BeforeMobsimListener {
-	class TimesReceiver implements Runnable {
+
+    private class TimesReceiver implements Runnable {
 
 		@Override
 		public void run() {
@@ -101,15 +86,12 @@ public class SlaveControlerTrimmedDown extends AbstractController implements Ite
 	private EventsManager events;
 	private PlanStrategyFactoryRegister planStrategyFactoryRegister;
 	private PlanSelectorFactoryRegister planSelectorFactoryRegister;
-	private StrategyManager strategyManager;
-	private Population population;
+    private Population population;
 	private Config config;
-	private ScoreStatsControlerListener scoreStats;
-	private boolean scenarioLoaded;
+    private boolean scenarioLoaded;
 	private Network network;
-	private MobsimFactory mobsimFactory;
 
-	public SlaveControlerTrimmedDown(String[] args) throws NumberFormatException, UnknownHostException, IOException, ClassNotFoundException {
+    private SlaveControlerTrimmedDown(String[] args) throws NumberFormatException, IOException, ClassNotFoundException {
 		this.addControlerListener(this);
 		Socket socket = new Socket(args[1], Integer.parseInt(args[2]));
 		this.reader = new ObjectInputStream(socket.getInputStream());
@@ -137,7 +119,7 @@ public class SlaveControlerTrimmedDown extends AbstractController implements Ite
 		return population;
 	}
 
-	public static void main(String[] args) throws NumberFormatException, UnknownHostException, IOException, ClassNotFoundException {
+	public static void main(String[] args) throws NumberFormatException, IOException, ClassNotFoundException {
 		SlaveControlerTrimmedDown slave = new SlaveControlerTrimmedDown(args);
 		slave.run();
 	}
@@ -151,7 +133,7 @@ public class SlaveControlerTrimmedDown extends AbstractController implements Ite
 	}
 
 	private void setMobsimFactory(MobsimFactory mobsimFactory) {
-		this.mobsimFactory = mobsimFactory;
+        MobsimFactory mobsimFactory1 = mobsimFactory;
 
 	}
 
@@ -180,7 +162,7 @@ public class SlaveControlerTrimmedDown extends AbstractController implements Ite
 	protected final void runMobSim(int iteration) {
 		runMobSim();
 	}
-	protected void runMobSim() {
+	void runMobSim() {
 		Mobsim sim = pSimFactory.createMobsim(scenarioData, events);
 		sim.run();
 	}
@@ -197,7 +179,7 @@ public class SlaveControlerTrimmedDown extends AbstractController implements Ite
 		return false;
 	}
 
-	protected StrategyManager loadStrategyManager() {
+	StrategyManager loadStrategyManager() {
 		StrategyManager manager = new StrategyManager();
 		StrategyManagerConfigLoader.load(getScenario(), getControlerIO(), getEvents(), manager, this.planStrategyFactoryRegister,
 				this.planSelectorFactoryRegister);
@@ -237,8 +219,8 @@ public class SlaveControlerTrimmedDown extends AbstractController implements Ite
 		PlansScoring plansScoring = new PlansScoring(this.scenarioData, this.events, getControlerIO(), this.scoringFunctionFactory);
 		this.addCoreControlerListener(plansScoring);
 
-		this.strategyManager = loadStrategyManager();
-		this.addCoreControlerListener(new PlansReplanning(this.strategyManager, population));
+        StrategyManager strategyManager = loadStrategyManager();
+		this.addCoreControlerListener(new PlansReplanning(strategyManager, population));
 
 		this.addCoreControlerListener(new EventsHandling(this.events, this.getConfig().controler().getWriteEventsInterval(), this
 				.getConfig().controler().getEventsFileFormats(), this.getControlerIO()));
@@ -253,16 +235,16 @@ public class SlaveControlerTrimmedDown extends AbstractController implements Ite
 	 * core ControlerListeners the order in which the listeners of this method
 	 * are added must not affect the correctness of the code.
 	 */
-	protected void loadControlerListeners() {
+    void loadControlerListeners() {
 
 		// optional: score stats
-		this.scoreStats = new ScoreStatsControlerListener(config, this.population, this.getControlerIO().getOutputFilename(
-				Controler.FILENAME_SCORESTATS), this.config.controler().isCreateGraphs());
-		this.addControlerListener(this.scoreStats);
+        ScoreStatsControlerListener scoreStats = new ScoreStatsControlerListener(config, this.population, this.getControlerIO().getOutputFilename(
+                Controler.FILENAME_SCORESTATS), this.config.controler().isCreateGraphs());
+		this.addControlerListener(scoreStats);
 
 	}
 
-	public final Config getConfig() {
+	final Config getConfig() {
 		return this.config;
 	}
 

@@ -2,24 +2,23 @@ package playground.pieter.network;
 
 import java.util.ArrayList;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class NetworkMinimumCapacityChanger {
 
-	public void run(final String[] args) {
+	void run(final String[] args) {
 		Scenario scenario;
 		MatsimRandom.reset(123);
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(args[0]);
-		ArrayList<String> linkChangeList = new ArrayList<String>();
+		ArrayList<String> linkChangeList = new ArrayList<>();
 		int carLinkCount = 0;
 		double originalCapacity = 0d;
 		double newCapacity = 0d;
@@ -40,7 +39,7 @@ public class NetworkMinimumCapacityChanger {
 		}
 
 		for (String id : linkChangeList) {
-			Link l = scenario.getNetwork().getLinks().get(new IdImpl(id));
+			Link l = scenario.getNetwork().getLinks().get(Id.createLinkId(id));
 			l.setCapacity(Double.parseDouble(args[1]) * l.getNumberOfLanes());
 			newCapacity += l.getCapacity();
 		}

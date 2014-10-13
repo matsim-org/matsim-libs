@@ -13,7 +13,7 @@ import org.matsim.core.population.LegImpl;
  * @author fouriep Utility to strip out transit plans, for running e.g.
  *         SelectedPlans2ESRIShape
  */
-public class PlansRemoveRoute {
+class PlansRemoveRoute {
 
 	public void run(Population plans) {
 		int planCount = 0;

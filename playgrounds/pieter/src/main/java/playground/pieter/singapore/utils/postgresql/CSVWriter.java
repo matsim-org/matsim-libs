@@ -2,36 +2,22 @@ package playground.pieter.singapore.utils.postgresql;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.PushbackReader;
-import java.io.StringReader;
-import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.utils.io.IOUtils;
-import org.postgresql.PGConnection;
-import org.postgresql.copy.CopyManager;
 import org.supercsv.io.CsvListWriter;
 import org.supercsv.prefs.CsvPreference;
 
-import others.sergioo.util.dataBase.DataBaseAdmin;
-import others.sergioo.util.dataBase.NoConnectionException;
+
+public class CSVWriter extends TableWriter {
 
 
+	private final String path;
+     private CsvListWriter csvListWriter;
 
- public class CSVWriter extends TableWriter {
-
-
-	private String path;
-	private BufferedWriter writer;
-	private CsvListWriter csvListWriter;
-
-	public CSVWriter(String tableName, String path,
-			int batchSize, List<PostgresqlColumnDefinition> columns) {
+	private CSVWriter(String tableName, String path,
+                      int batchSize, List<PostgresqlColumnDefinition> columns) {
 		super(tableName, batchSize, columns);
 		this.tableName = tableName.toLowerCase().endsWith(".csv")?tableName:tableName+".csv";
 		
@@ -51,16 +37,15 @@ import others.sergioo.util.dataBase.NoConnectionException;
 
 	public void init() {
 
-		
-			writer = IOUtils.getBufferedWriter(path+"/"+tableName);
+
+        BufferedWriter writer = IOUtils.getBufferedWriter(path + "/" + tableName);
 			csvListWriter = new CsvListWriter(writer, CsvPreference.STANDARD_PREFERENCE);
 
 		try {
-			ArrayList<String> colnames=  new ArrayList<String>();
-			for (int i = 0; i < columns.size(); i++) {
-				PostgresqlColumnDefinition col = columns.get(i);
-				colnames.add(col.name);
-			}
+			ArrayList<String> colnames=  new ArrayList<>();
+            for (PostgresqlColumnDefinition col : columns) {
+                colnames.add(col.name);
+            }
 			// drop the last comma
 			String[] header = null;
 			csvListWriter.write(colnames);

@@ -37,7 +37,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
@@ -70,23 +69,22 @@ public class HITSToMATSim {
 
 	private LeastCostPathCalculator leastCostPathCalculator;
 	private HashMap<String, Double> personShortestPathDayTotals;
-	private XY2Links xY2Links;
-	private Map<Id<Link>, Link> links;
+    private Map<Id<Link>, Link> links;
 
-	public HITSToMATSim(HITSData h2, Connection conn2) throws ParseException {
+	private HITSToMATSim(HITSData h2, Connection conn2) throws ParseException {
 		this();
 		this.conn = conn2;
 		this.setHitsData(h2);
 	}
 
-	public HITSToMATSim() throws ParseException {
+	private HITSToMATSim() throws ParseException {
 		DateFormat outdfm = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		// outdfm.setTimeZone(TimeZone.getTimeZone("SGT"));
 		referenceDate = outdfm.parse("2008-09-01 00:00:00");
 	}
 
-	public void generatePopulation(int sampleSize, boolean dummyActs,
-			String populationXMLFileName, String mixed) throws InstantiationException,
+	void generatePopulation(int sampleSize, boolean dummyActs,
+                            String populationXMLFileName, String mixed) throws InstantiationException,
 			IllegalAccessException, ClassNotFoundException, SQLException,
 			FileNotFoundException {
 
@@ -107,26 +105,28 @@ public class HITSToMATSim {
 		this.setDGP2Zip(conn);
 		this.setZip2Coord(conn);
 		this.setDGP2Type2Zip(conn);
-		if (mixed.equals("mixed")) {
-			generateCarAndTransitMixedPlans(conn, sampleSize, dummyActs);
-		} else if (mixed.equals("transit")){
-			generateCarAndTransitOnlyPlans(conn, sampleSize, dummyActs,true);
-		}
-		
-		else {
-			generateCarAndTransitOnlyPlans(conn, sampleSize, dummyActs,false);
-		}
+        switch (mixed) {
+            case "mixed":
+                generateCarAndTransitMixedPlans(conn, sampleSize, dummyActs);
+                break;
+            case "transit":
+                generateCarAndTransitOnlyPlans(conn, sampleSize, dummyActs, true);
+                break;
+            default:
+                generateCarAndTransitOnlyPlans(conn, sampleSize, dummyActs, false);
+                break;
+        }
 		PopulationWriter populationWriter = new PopulationWriter(
 				scenario.getPopulation(), scenario.getNetwork());
 		populationWriter.write(populationXMLFileName);
 
 	}
 
-	public HITSData getHitsData() {
+	HITSData getHitsData() {
 		return hitsData;
 	}
 
-	public void setHitsData(HITSData hitsData) {
+	void setHitsData(HITSData hitsData) {
 		this.hitsData = hitsData;
 	}
 
@@ -205,19 +205,27 @@ public class HITSToMATSim {
 			// if the plan calls for a mix of modes,then read the main mode of
 			// the trip, otherwise stick to one mode
 			if (legmode.equals("either")) {
-				if (t.mainmode.equals("carDrv")) {
-					plan.addLeg(createDriveLeg());
-				} else if (t.mainmode.equals("pt")) {
-					plan.addLeg(createTransitLeg());
-				} else
-					return null;
+                switch (t.mainmode) {
+                    case "carDrv":
+                        plan.addLeg(createDriveLeg());
+                        break;
+                    case "pt":
+                        plan.addLeg(createTransitLeg());
+                        break;
+                    default:
+                        return null;
+                }
 			} else {
-				if (legmode.equals("car")) {
-					plan.addLeg(createDriveLeg());
-				} else if (legmode.equals("pt")) {
-					plan.addLeg(createTransitLeg());
-				} else
-					return null;
+                switch (legmode) {
+                    case "car":
+                        plan.addLeg(createDriveLeg());
+                        break;
+                    case "pt":
+                        plan.addLeg(createTransitLeg());
+                        break;
+                    default:
+                        return null;
+                }
 			}
 
 			// if this is also the last trip, then end with the destination
@@ -249,13 +257,13 @@ public class HITSToMATSim {
 	}
 
 	private Leg createDriveLeg() {
-		Leg leg = population.getFactory().createLeg(TransportMode.car);
-		return leg;
+		return population.getFactory().createLeg(TransportMode.car);
+
 	}
 
 	private Leg createTransitLeg() {
-		Leg leg = population.getFactory().createLeg(TransportMode.pt);
-		return leg;
+		return population.getFactory().createLeg(TransportMode.pt);
+
 	}
 
 	private void generateCarAndTransitOnlyPlans(Connection conn,
@@ -276,7 +284,7 @@ public class HITSToMATSim {
 		int carPlans = 0;
 		double transitPlansinflated = 0;
 		int transitPlans = 0;
-		this.personShortestPathDayTotals = new HashMap<String, Double>();
+		this.personShortestPathDayTotals = new HashMap<>();
 
 		// start iterating
 		for (HITSPerson p : hp) {
@@ -293,27 +301,32 @@ public class HITSToMATSim {
 			boolean ptSwitch = false;
 			boolean otherSwitch = false;
 			boolean nullModes = false;
-			for (HITSTrip t : ht) {
-				// first, check for null modes, and skip if they exist
-				if (t.mainmode == null) {
-					nullModes = true;
-					break;
-				}
-				// check the trip for having car mode, if it trips the 'other'
-				// switch, it's passed over
-				if (t.mainmode.equals("carDrv")) {
-					carSwitch = true;
-				} else if (t.mainmode.equals("publBus")
-						|| t.mainmode.equals("mrt") || t.mainmode.equals("lrt")) {
-					ptSwitch = true;
-				} else {
-					otherSwitch = true;
-					otherModes++;
-					otherModesInflated += p.scheduleFactor;
-					break;
-				}
+            label:
+            for (HITSTrip t : ht) {
+                // first, check for null modes, and skip if they exist
+                if (t.mainmode == null) {
+                    nullModes = true;
+                    break;
+                }
+                // check the trip for having car mode, if it trips the 'other'
+                // switch, it's passed over
+                switch (t.mainmode) {
+                    case "carDrv":
+                        carSwitch = true;
+                        break;
+                    case "publBus":
+                    case "mrt":
+                    case "lrt":
+                        ptSwitch = true;
+                        break;
+                    default:
+                        otherSwitch = true;
+                        otherModes++;
+                        otherModesInflated += p.scheduleFactor;
+                        break label;
+                }
 
-			}
+            }
 			if (nullModes) {
 				continue;
 			}
@@ -354,11 +367,11 @@ public class HITSToMATSim {
 				String fullID = p.h1_hhid + "_" + p.pax_id + "_" + i;
 				// generate a matsim person and plan for this rep
 				Person matsimPerson = population.getFactory().createPerson(
-						new IdImpl(fullID));
+						Id.createPersonId(fullID));
 				Plan matsimPlan = null;
 
 				matsimPlan = createCarOrTransitPlan(p, dummyActs, legmode,
-						i == 1 ? true : false);
+                        i == 1);
 
 				if (matsimPlan != null) {
 //					xY2Links.run(matsimPlan);
@@ -436,7 +449,7 @@ public class HITSToMATSim {
 		int transitPlans = 0;
 		double carTransitPlansinflated = 0;
 		int carTransitPlans = 0;
-		this.personShortestPathDayTotals = new HashMap<String, Double>();
+		this.personShortestPathDayTotals = new HashMap<>();
 
 		// start iterating
 		for (HITSPerson p : hp) {
@@ -453,29 +466,34 @@ public class HITSToMATSim {
 			boolean ptSwitch = false;
 			boolean otherSwitch = false;
 			boolean nullModes = false;
-			for (HITSTrip t : ht) {
-				// first, check for null modes, and skip if they exist
-				if (t.mainmode == null) {
-					nullModes = true;
-					break;
-				}
-				// check the trip for having car mode, if it trips the 'other'
-				// switch, it's passed over
-				if (t.mainmode.equals("carDrv")) {
-					carSwitch = true;
-				} else if (t.mainmode.equals("publBus")
-						|| t.mainmode.equals("mrt") || t.mainmode.equals("lrt")) {
-					//change the mode of this trip to transit (non-permanent)
-					t.mainmode = "pt";
-					ptSwitch = true;
-				} else {
-					otherSwitch = true;
-					otherModes++;
-					otherModesInflated += p.scheduleFactor;
-					break;
-				}
+            label:
+            for (HITSTrip t : ht) {
+                // first, check for null modes, and skip if they exist
+                if (t.mainmode == null) {
+                    nullModes = true;
+                    break;
+                }
+                // check the trip for having car mode, if it trips the 'other'
+                // switch, it's passed over
+                switch (t.mainmode) {
+                    case "carDrv":
+                        carSwitch = true;
+                        break;
+                    case "publBus":
+                    case "mrt":
+                    case "lrt":
+                        //change the mode of this trip to transit (non-permanent)
+                        t.mainmode = "pt";
+                        ptSwitch = true;
+                        break;
+                    default:
+                        otherSwitch = true;
+                        otherModes++;
+                        otherModesInflated += p.scheduleFactor;
+                        break label;
+                }
 
-			}
+            }
 			if (nullModes) {
 				continue;
 			}
@@ -509,11 +527,11 @@ public class HITSToMATSim {
 				String fullID = p.h1_hhid + "_" + p.pax_id + "_" + i;
 				// generate a matsim person and plan for this rep
 				Person matsimPerson = population.getFactory().createPerson(
-						new IdImpl(fullID));
+						Id.createPersonId(fullID));
 				Plan matsimPlan = null;
 
 				matsimPlan = createCarOrTransitPlan(p, dummyActs, legmode,
-						i == 1 ? true : false);
+                        i == 1);
 
 				if (matsimPlan != null) {
 //					xY2Links.run(matsimPlan);
@@ -644,8 +662,7 @@ public class HITSToMATSim {
 
 	private int getRandomIndex(int maxIdx) {
 		// returns a random integer smaller than maxIdx
-		double maxIdxD = maxIdx;
-		return (int) Math.floor(Math.random() * maxIdxD);
+		return (int) Math.floor(Math.random() * maxIdx);
 	}
 
 	private double getShortestPathTotalDistance(Plan plan) {
@@ -695,7 +712,7 @@ public class HITSToMATSim {
 	 * pre-processes the network for astar, and associating acts with links
 	 */
 	private void preProcessNetwork() {
-		this.xY2Links = new XY2Links(network);
+        XY2Links xY2Links = new XY2Links(network);
 		this.links = network.getLinks();
 	}
 
@@ -706,14 +723,14 @@ public class HITSToMATSim {
 
 	private void setDGP2Type2Zip(Connection conn2) throws SQLException {
 		// Init the overall hasmap
-		this.DGP2Type2Zip = new HashMap<Integer, HashMap<String, ArrayList<Integer>>>();
+		this.DGP2Type2Zip = new HashMap<>();
 		Statement s = conn2.createStatement();
 		// get the list of DGPs;
 		s.executeQuery("select distinct DGP from hits2type2zip2dgp;");
 		ResultSet rsDgp = s.getResultSet();
 		while (rsDgp.next()) {
 			int dgp = rsDgp.getInt("DGP");
-			HashMap<String, ArrayList<Integer>> types2Zips = new HashMap<String, ArrayList<Integer>>();
+			HashMap<String, ArrayList<Integer>> types2Zips = new HashMap<>();
 			// then, get all the hitstypes in this dgp
 			Statement s1 = conn2.createStatement();
 			s1.executeQuery("select distinct hits_type from hits2type2zip2dgp where DGP="
@@ -721,7 +738,7 @@ public class HITSToMATSim {
 			ResultSet rsHitsType = s1.getResultSet();
 			while (rsHitsType.next()) {
 				String ht = rsHitsType.getString("hits_type");
-				ArrayList<Integer> zips = new ArrayList<Integer>();
+				ArrayList<Integer> zips = new ArrayList<>();
 				// then, all the zip codes associated with this hits type in the
 				// dgp
 				Statement s2 = conn2.createStatement();
@@ -741,7 +758,7 @@ public class HITSToMATSim {
 
 	private void setZip2DGP(Connection conn) throws SQLException {
 		// init the hashmap
-		this.zip2DGP = new HashMap<Integer, Integer>();
+		this.zip2DGP = new HashMap<>();
 		Statement s;
 		s = conn.createStatement();
 		s.executeQuery("select zip, DGP from pcodes_zone_xycoords ;");
@@ -754,7 +771,7 @@ public class HITSToMATSim {
 
 	private void setZip2Coord(Connection conn) throws SQLException {
 		// init the hashmap
-		this.zip2Coord = new HashMap<Integer, Coord>();
+		this.zip2Coord = new HashMap<>();
 		Statement s;
 		s = conn.createStatement();
 		s.executeQuery("select zip, x_utm48n, y_utm48n from pcodes_zone_xycoords ;");
@@ -772,14 +789,14 @@ public class HITSToMATSim {
 		Statement s;
 		s = conn.createStatement();
 		// get the list of DGPs, and associate a list of postal codes with each
-		this.DGP2Zip = new HashMap<Integer, ArrayList<Integer>>();
+		this.DGP2Zip = new HashMap<>();
 		s.executeQuery("select distinct DGP from pcodes_zone_xycoords where DGP is not null;");
 		ResultSet rs = s.getResultSet();
 		// iterate through the list of DGPs, create an arraylist for each, then
 		// fill that arraylist with all its associated postal codes
-		this.DGPs = new ArrayList<Integer>();
+		this.DGPs = new ArrayList<>();
 		while (rs.next()) {
-			ArrayList<Integer> zipsInDGP = new ArrayList<Integer>();
+			ArrayList<Integer> zipsInDGP = new ArrayList<>();
 			Statement zs1 = conn.createStatement();
 			zs1.executeQuery(String.format(
 					"select zip from pcodes_zone_xycoords where DGP= %d;",

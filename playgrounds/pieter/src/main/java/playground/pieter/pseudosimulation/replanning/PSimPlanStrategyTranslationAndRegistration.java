@@ -2,23 +2,11 @@ package playground.pieter.pseudosimulation.replanning;
 
 import java.util.ArrayList;
 
-import org.matsim.core.controler.PlanStrategyFactoryRegister;
-import org.matsim.core.controler.PlanStrategyRegistrar;
-import org.matsim.core.controler.PlanStrategyRegistrar.Selector;
-import org.matsim.core.replanning.modules.ChangeExpBetaPlanStrategyFactory;
-import org.matsim.core.replanning.modules.KeepLastSelectedPlanStrategyFactory;
-import org.matsim.core.replanning.modules.ReRoutePlanStrategyFactory;
-import org.matsim.core.replanning.modules.SelectBestPlanStrategyFactory;
-import org.matsim.core.replanning.modules.SelectExpBetaPlanStrategyFactory;
-import org.matsim.core.replanning.modules.SelectPathSizeLogitStrategyFactory;
-import org.matsim.core.replanning.modules.SelectRandomStrategyFactory;
-
 import playground.pieter.pseudosimulation.controler.PSimControler;
 import playground.pieter.pseudosimulation.replanning.factories.PSimBestScorePlanStrategyFactory;
 import playground.pieter.pseudosimulation.replanning.factories.PSimChangeExpBetaPlanStrategyFactory;
 import playground.pieter.pseudosimulation.replanning.factories.PSimChangeLegModeStrategyFactory;
 import playground.pieter.pseudosimulation.replanning.factories.PSimChangeSingleLegModeStrategyFactory;
-import playground.pieter.pseudosimulation.replanning.factories.PSimChangeTripModeStrategyFactory;
 import playground.pieter.pseudosimulation.replanning.factories.PSimDoNothingPlanStrategyFactory;
 import playground.pieter.pseudosimulation.replanning.factories.PSimKeepLastSelectedPlanStrategyFactory;
 import playground.pieter.pseudosimulation.replanning.factories.PSimLocationChoicePlanStrategyFactory;
@@ -29,7 +17,6 @@ import playground.pieter.pseudosimulation.replanning.factories.PSimSelectRandomS
 import playground.pieter.pseudosimulation.replanning.factories.PSimSubtourModeChoiceStrategyFactory;
 import playground.pieter.pseudosimulation.replanning.factories.PSimTimeAllocationMutatorPlanStrategyFactory;
 import playground.pieter.pseudosimulation.replanning.factories.PSimTripSubtourModeChoiceStrategyFactory;
-import playground.pieter.pseudosimulation.replanning.factories.PSimTripTimeAllocationMutatorStrategyFactory;
 import playground.pieter.pseudosimulation.replanning.modules.PSimPlanMarkerModule;
 
 import org.matsim.core.controler.PlanStrategyRegistrar;
@@ -65,7 +52,7 @@ import org.matsim.core.controler.PlanStrategyRegistrar;
  */
 public class PSimPlanStrategyTranslationAndRegistration {
 
-	private ArrayList<String> compatibleStrategies = new ArrayList<String>();
+	private final ArrayList<String> compatibleStrategies = new ArrayList<>();
 
 	public PSimPlanStrategyTranslationAndRegistration(PSimControler controler) {
 		String strategyName = PlanStrategyRegistrar.Selector.BestScore

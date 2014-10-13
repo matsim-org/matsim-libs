@@ -53,20 +53,19 @@ import playground.pieter.wrashid.nan.NetworkReadExample;
 
 public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 
-	private JPanel contentPane;
-	private JTextField schemaNameComponent;
-	private JTextField postgresPropertiesComponent;
-	private JTextField tableSuffixComponent;
-	private JTextField eventsToLinkFlowAndDensityToSQLPropertiesFileComponent;
-	private JTextField networkFileComponent;
-	private JTextField eventsFileComponent;
+    private final JTextField schemaNameComponent;
+	private final JTextField postgresPropertiesComponent;
+	private final JTextField tableSuffixComponent;
+	private final JTextField eventsToLinkFlowAndDensityToSQLPropertiesFileComponent;
+	private final JTextField networkFileComponent;
+	private final JTextField eventsFileComponent;
 	private Properties defaultProperties;
-	private EventsToLinkFlowAndDensityToSQLgui self = this;
+	private final EventsToLinkFlowAndDensityToSQLgui self = this;
 	private String defaultpath = "";
-	private JTextField centreYCoordComponent;
-	private JTextField radiusComponent;
-	private JTextField centreXCoordComponent;
-	private JTextField binSizeComponent;
+	private final JTextField centreYCoordComponent;
+	private final JTextField radiusComponent;
+	private final JTextField centreXCoordComponent;
+	private final JTextField binSizeComponent;
 	private String schemaName;
 	private String postgresProperties;
 	private String tableSuffix;
@@ -75,12 +74,12 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 	private String centreYCoord;
 	private String centreXCoord;
 	private String radius;
-	private JTextPane commentComponent;
+	private final JTextPane commentComponent;
 	private String comment;
 	private String binSize;
-	private HashMap<MultiModalFlowAndDensityCollector.FlowType, HashMap<Id<Link>, int[]>> linkOutFlowsByType = new HashMap<MultiModalFlowAndDensityCollector.FlowType, HashMap<Id<Link>, int[]>>();
-	private HashMap<MultiModalFlowAndDensityCollector.FlowType, HashMap<Id, int[]>> instantaneousLinkOccupancyByType = new HashMap<MultiModalFlowAndDensityCollector.FlowType, HashMap<Id, int[]>>();
-	private HashMap<MultiModalFlowAndDensityCollector.FlowType, HashMap<Id, double[]>> averageLinkOccupancyByType = new HashMap<MultiModalFlowAndDensityCollector.FlowType, HashMap<Id, double[]>>();
+	private final HashMap<MultiModalFlowAndDensityCollector.FlowType, HashMap<Id<Link>, int[]>> linkOutFlowsByType = new HashMap<>();
+	private final HashMap<MultiModalFlowAndDensityCollector.FlowType, HashMap<Id, int[]>> instantaneousLinkOccupancyByType = new HashMap<>();
+	private final HashMap<MultiModalFlowAndDensityCollector.FlowType, HashMap<Id, double[]>> averageLinkOccupancyByType = new HashMap<>();
 	private Map<Id<Link>, ? extends Link> links;
 	private int numberOfTimeBins;
 
@@ -104,11 +103,11 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public EventsToLinkFlowAndDensityToSQLgui() {
+    private EventsToLinkFlowAndDensityToSQLgui() {
 		setTitle("Events to Link flows and densities written to PostgreSQL / CSV tables");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 764, 403);
-		contentPane = new JPanel();
+        JPanel contentPane = new JPanel();
 		contentPane.setBackground(UIManager.getColor("Panel.background"));
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -415,7 +414,7 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 		contentPane.add(btnStartEventsProcessing, gbc_btnStartEventsProcessing);
 	}
 
-	public void saveDefaultProperties() {
+	void saveDefaultProperties() {
 		this.defaultProperties = new Properties();
 
 		this.defaultProperties.setProperty("schemaName", schemaNameComponent.getText());
@@ -441,7 +440,7 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 		}
 	}
 
-	public void runEventsProcessing() throws InstantiationException, IllegalAccessException, ClassNotFoundException,
+	void runEventsProcessing() throws InstantiationException, IllegalAccessException, ClassNotFoundException,
 			IOException, SQLException {
 		String networkFile = networkFileComponent.getText();
 		String eventsFile = eventsFileComponent.getText();
@@ -525,7 +524,7 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 		String formattedDate = df.format(new Date());
 		// start with activities
 		String densityTableName = "matsim_link_flow_and_density" + tableSuffixComponent.getText();
-		List<PostgresqlColumnDefinition> columns = new ArrayList<PostgresqlColumnDefinition>();
+		List<PostgresqlColumnDefinition> columns = new ArrayList<>();
 		columns.add(new PostgresqlColumnDefinition("link_id", PostgresType.TEXT));
 		columns.add(new PostgresqlColumnDefinition("length", PostgresType.FLOAT8));
 		columns.add(new PostgresqlColumnDefinition("lanes", PostgresType.FLOAT8));
@@ -568,9 +567,9 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 			for (int i = 0; i < this.numberOfTimeBins; i++) {
 				Object[] args = new Object[columns.size()];
 				args[0] = id.toString();
-				args[1] = new Double(links.get(id).getLength());
-				args[2] = new Double(links.get(id).getNumberOfLanes());
-				args[3] = new Integer(i * Integer.parseInt(this.binSizeComponent.getText()));
+				args[1] = links.get(id).getLength();
+				args[2] = links.get(id).getNumberOfLanes();
+				args[3] = i * Integer.parseInt(this.binSizeComponent.getText());
 				String modeString="";
 				for(String mode:links.get(id).getAllowedModes()){
 					modeString += mode + " ";
@@ -587,11 +586,11 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 					int[] flows = linkOutFlow.get(id);
 					int[] occupancy = instantaneousLinkOccupancy.get(id);
 					double[] avgOccup = averageLinkDensities.get(id);
-					args[argsIndex] = flows == null ? 0 : new Integer(flows[i]);
+					args[argsIndex] = flows == null ? 0 : flows[i];
 					flowSum += (Integer)args[argsIndex++];
-					args[argsIndex] = occupancy == null ? 0 : new Integer(occupancy[i]);
+					args[argsIndex] = occupancy == null ? 0 : occupancy[i];
 					flowSum += (Integer)args[argsIndex++];
-					args[argsIndex] = avgOccup == null ? 0 : new Double(avgOccup[i]);
+					args[argsIndex] = avgOccup == null ? 0 : avgOccup[i];
 					flowSum += (Double)args[argsIndex++];
 				}
 				if(flowSum>0){
@@ -603,7 +602,7 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 		densityWriter.finish();
 	}
 
-	public void loadDefaultProperties(File defaultPropertiesFile) {
+	void loadDefaultProperties(File defaultPropertiesFile) {
 		this.defaultProperties = new Properties();
 		try {
 			this.defaultProperties.load(new FileInputStream(defaultPropertiesFile));
@@ -616,21 +615,10 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 					Field aField = getClass().getDeclaredField(property);
 					aField.set(this, propertyValue);
 					setComponentValues();
-				} catch (NullPointerException e) {
-					e.printStackTrace();
-				} catch (IllegalArgumentException e) {
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					e.printStackTrace();
-				} catch (NoSuchFieldException e) {
-					e.printStackTrace();
-				} catch (SecurityException e) {
-
+				} catch (NullPointerException | SecurityException | NoSuchFieldException | IllegalAccessException | IllegalArgumentException e) {
 					e.printStackTrace();
 				}
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+            }
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -649,7 +637,7 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 		binSizeComponent.setText(binSize);
 	}
 
-	public File fileSelect(String path, String title) {
+	File fileSelect(String path, String title) {
 		boolean validPath = false;
 		File file = null;
 		try {

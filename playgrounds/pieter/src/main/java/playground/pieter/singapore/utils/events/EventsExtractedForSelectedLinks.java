@@ -1,24 +1,17 @@
 package playground.pieter.singapore.utils.events;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.TreeSet;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.pieter.singapore.utils.Sample;
@@ -27,13 +20,12 @@ import playground.pieter.singapore.utils.events.listeners.TrimEventsWithPersonId
 
 public class EventsExtractedForSelectedLinks {
 
-	private EventsManager events;
-	Scenario scenario = ScenarioUtils
+    private final Scenario scenario = ScenarioUtils
 			.createScenario(ConfigUtils.createConfig());
-	HashSet<String> linkIds = new HashSet<String>();
+	private final HashSet<String> linkIds = new HashSet<>();
 
-	public EventsExtractedForSelectedLinks(String idFile, String networkFile,
-			String eventsINPUTFile, String eventsOUTPUTFile) throws IOException {
+	private EventsExtractedForSelectedLinks(String idFile, String networkFile,
+                                            String eventsINPUTFile, String eventsOUTPUTFile) throws IOException {
 
 		this.populateList(idFile, networkFile);
 		this.stripEvents(eventsINPUTFile, eventsOUTPUTFile, 0.1);
@@ -53,9 +45,9 @@ public class EventsExtractedForSelectedLinks {
 		}
 	}
 
-	public void stripEvents(String inFileName, String outfileName,
-			double frequency) {
-		this.events = EventsUtils.createEventsManager();
+	void stripEvents(String inFileName, String outfileName,
+                     double frequency) {
+        EventsManager events = EventsUtils.createEventsManager();
 		// first, read through the events file and get all person ids crossing
 		// the link set
 		GetPersonIdsCrossingLinkSelection idFinder = new GetPersonIdsCrossingLinkSelection(
@@ -63,17 +55,17 @@ public class EventsExtractedForSelectedLinks {
 		events.addHandler(idFinder);
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
 		reader.parse(inFileName);
-		ArrayList<String> personIds = new ArrayList<String>();
+		ArrayList<String> personIds = new ArrayList<>();
 		personIds.addAll(idFinder.getPersonIds());
 		int N = personIds.size();
 		int M = (int) ((double) N * frequency);
-		HashSet<String> sampledIds = new HashSet<String>();
+		HashSet<String> sampledIds = new HashSet<>();
 		for (int i : Sample.sampleMfromN(M, N)) {
 			sampledIds.add(personIds.get(i));
 		}
 		// re-initialise the events manager to fileter events by person id
 		events = null;
-		this.events = EventsUtils.createEventsManager();
+		events = EventsUtils.createEventsManager();
 		TrimEventsWithPersonIds trimmer = new TrimEventsWithPersonIds(
 				outfileName, sampledIds,false);
 		events.addHandler(trimmer);

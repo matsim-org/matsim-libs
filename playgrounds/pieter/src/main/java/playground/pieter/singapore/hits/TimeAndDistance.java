@@ -1,8 +1,8 @@
 package playground.pieter.singapore.hits;
 
 public class TimeAndDistance {
-	double time;
-	double distance;
+	final double time;
+	final double distance;
 
 	public TimeAndDistance(double time, double distance) {
 		super();

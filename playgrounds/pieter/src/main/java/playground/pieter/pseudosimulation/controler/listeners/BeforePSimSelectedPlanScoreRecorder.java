@@ -2,9 +2,8 @@ package playground.pieter.pseudosimulation.controler.listeners;
 
 import java.util.LinkedHashSet;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 
@@ -31,7 +30,7 @@ import playground.pieter.pseudosimulation.controler.PSimControler;
  */
 public class BeforePSimSelectedPlanScoreRecorder implements
 		BeforeMobsimListener {
-	private PSimControler c;
+	private final PSimControler c;
 
 	public BeforePSimSelectedPlanScoreRecorder(PSimControler c) {
 		super();
@@ -42,12 +41,12 @@ public class BeforePSimSelectedPlanScoreRecorder implements
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		if (MobSimSwitcher.isQSimIteration)
 			return;
-		LinkedHashSet<IdImpl> agentsForMentalSimulation = c
+		LinkedHashSet<Id> agentsForMentalSimulation = c
 				.getAgentsForPseudoSimulation();
 		for (Person p : c.getMATSimControler().getPopulation().getPersons().values()) {
-			if (!agentsForMentalSimulation.contains((IdImpl) p.getId())) {
+			if (!agentsForMentalSimulation.contains((Id) p.getId())) {
 				c.getNonSimulatedAgentSelectedPlanScores().put(
-						(IdImpl) p.getId(), p.getSelectedPlan().getScore());
+						(Id) p.getId(), p.getSelectedPlan().getScore());
 			}
 		}
 

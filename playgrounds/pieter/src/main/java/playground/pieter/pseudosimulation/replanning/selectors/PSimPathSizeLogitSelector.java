@@ -34,7 +34,7 @@ import playground.pieter.pseudosimulation.replanning.PSimPlanStrategyTranslation
  * Plan selector for PSim. See {@link PSimPlanStrategyTranslationAndRegistration}.
  */
 public class PSimPathSizeLogitSelector implements PlanSelector{
-	private PathSizeLogitSelector delegate;
+	private final PathSizeLogitSelector delegate;
 	public PSimPathSizeLogitSelector(PlanCalcScoreConfigGroup planCalcScore,
 			Network network) {
 		delegate=new PathSizeLogitSelector(planCalcScore, network);

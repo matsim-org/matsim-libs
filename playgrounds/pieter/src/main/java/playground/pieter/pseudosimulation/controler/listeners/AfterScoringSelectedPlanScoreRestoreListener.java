@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.population.PersonImpl;
@@ -31,7 +30,7 @@ import playground.pieter.pseudosimulation.controler.PSimControler;
  */
 public class AfterScoringSelectedPlanScoreRestoreListener implements
 		ScoringListener {
-	PSimControler c;
+	private final PSimControler c;
 
 	public AfterScoringSelectedPlanScoreRestoreListener(PSimControler c) {
 		super();
@@ -60,7 +59,7 @@ public class AfterScoringSelectedPlanScoreRestoreListener implements
 			// } catch (NullPointerException e) {
 			// selectedPlanScoreAvg += 0;
 			// }
-			((PersonImpl) persons.get(id)).getSelectedPlan().setScore(
+			persons.get(id).getSelectedPlan().setScore(
 					nSASS.get(id));
 		}
 		// Logger.getLogger(getClass()).error(selectedPlanScoreAvg / (double) i

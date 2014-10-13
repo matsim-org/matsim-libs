@@ -31,13 +31,13 @@ import org.matsim.vehicles.Vehicle;
 import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;
 
-public class PlanFindLegDistances {
-	ScenarioImpl scenario;
-	Map<Id<ActivityFacility>, ? extends ActivityFacility> facilities;
-	NetworkImpl network;
-	ModeRouteFactory routeFactory;
-	DataBaseAdmin dba;
-	private FastAStarLandmarks leastCostPathCalculator;
+class PlanFindLegDistances {
+	private final ScenarioImpl scenario;
+	private final Map<Id<ActivityFacility>, ? extends ActivityFacility> facilities;
+	private final NetworkImpl network;
+	private final ModeRouteFactory routeFactory;
+	private final DataBaseAdmin dba;
+	private final FastAStarLandmarks leastCostPathCalculator;
 
 	public PlanFindLegDistances(Scenario scenario, DataBaseAdmin dba) {
 		super();
@@ -105,7 +105,7 @@ public class PlanFindLegDistances {
 		
 		ResultSet rs = dba.executeQuery("select distinct `id` from hits.synthpoptripdistances" );
 		rs.beforeFirst();
-		LinkedHashSet<Integer> procids = new LinkedHashSet<Integer>();
+		LinkedHashSet<Integer> procids = new LinkedHashSet<>();
 		
 		while(rs.next()){
 			procids.add(rs.getInt(1));
@@ -114,7 +114,7 @@ public class PlanFindLegDistances {
 				.getPersons().values();
 		int j = 1;
 		for (Person pax : persons) {
-			if(procids.contains((Integer) Integer.parseInt(pax.getId().toString()))){
+			if(procids.contains(Integer.parseInt(pax.getId().toString()))){
 				
 				j++;
 				continue;

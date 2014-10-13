@@ -10,7 +10,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -21,11 +20,11 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 
 public class StochasticRouter implements LeastCostPathCalculator {
-	Network network;
-	TravelDisutility travelCosts;
-	TravelTime travelTimes;
+	private final Network network;
+	private final TravelDisutility travelCosts;
+	private final TravelTime travelTimes;
 	// sensitivity parameter
-	double beta;
+    private final double beta;
 
 	public StochasticRouter(Network network, TravelDisutility travelCosts,
 			TravelTime travelTimes, double beta) {
@@ -39,23 +38,11 @@ public class StochasticRouter implements LeastCostPathCalculator {
 	@Override
 	public Path calcLeastCostPath(Node fromNode, Node toNode, double starttime,
 			Person person, Vehicle vehicle) {
-		// Collection<? extends Node> nodes = network.getNodes().values();
 
-		// create a reduced network and add only certain links to it
-		// NetworkImpl reducedNetwork = NetworkImpl.createNetwork();
-		// NetworkFactoryImpl nwfac = new NetworkFactoryImpl(reducedNetwork);
-		// for(Node node:nodes){
-		// nwfac.createNode(new IdImpl("f"+node.getId().toString()),
-		// node.getCoord());
-		// }
-		// HashMap<Id,Link> linksForRouting = new HashMap<Id, Link>();
-		// for(Link link:network.getLinks().values()){
-		// link.setCapacity(1000000000);
-		// }
 		// we are going to tag attributes to links and nodes
-		HashMap<Link, Double> linkCosts = new HashMap<Link, Double>();
-		HashMap<Node, Double> nodeCosts = new HashMap<Node, Double>();
-		ArrayList<Node> nodesToVisit = new ArrayList<Node>();
+		HashMap<Link, Double> linkCosts = new HashMap<>();
+		HashMap<Node, Double> nodeCosts = new HashMap<>();
+		ArrayList<Node> nodesToVisit = new ArrayList<>();
 		int nodeIndex = -1;
 
 		// iterate through the list of nodes
@@ -74,16 +61,7 @@ public class StochasticRouter implements LeastCostPathCalculator {
 					double linkCost = travelCosts.getLinkTravelDisutility(link,
 							0, person, vehicle);
 					linkCosts.put(link, nodeCost + linkCost);
-					// reducedNetwork.addLink(link);
-					// linksForRouting.put(link.getId(), link);
-					// Node fNode = reducedNetwork.getNodes().get(new
-					// IdImpl("f"+link.getFromNode().getId().toString()));
-					// Node tNode = reducedNetwork.getNodes().get(new
-					// IdImpl("f"+link.getToNode().getId().toString()));
-					// Link newLink = nwfac.createLink(link.getId(),
-					// fNode,tNode);
-					// link.setCapacity(nodeCost+linkCost);
-					// reducedNetwork.addLink(link);
+
 					Node nextNode = link.getFromNode();
 					if (nodeCosts.containsKey(nextNode)) {
 						if (nodeCosts.get(nextNode) > nodeCost + linkCost) {
@@ -100,14 +78,14 @@ public class StochasticRouter implements LeastCostPathCalculator {
 		}
 
 		// do the actual routing
-		List<Node> nodes = new ArrayList<Node>();
-		List<Link> links = new ArrayList<Link>();
+		List<Node> nodes = new ArrayList<>();
+		List<Link> links = new ArrayList<>();
 		double travelTime = starttime;
 		double travelCost = 0;
 		currentNode = fromNode;
 		double linkCost = 0;
 		while (currentNode != toNode) {
-			List<Link> outLinks = new ArrayList<Link>();
+			List<Link> outLinks = new ArrayList<>();
 			outLinks.addAll(currentNode.getOutLinks().values());
 			double[] utils = new double[outLinks.size()];
 			// double[] probs = new double[outLinks.size()];
@@ -186,11 +164,8 @@ public class StochasticRouter implements LeastCostPathCalculator {
 						return link.getLength() / link.getFreespeed();
 					}
 				}, 0.0001);
-		// stochasticRouter.calcLeastCostPath(network.getNodes().get(new
-		// IdImpl(1)), network.getNodes().get(new IdImpl(13)), 0, null,null);
-		stochasticRouter.calcLeastCostPath(
-				network.getNodes().get(new IdImpl(11242)), network.getNodes()
-						.get(new IdImpl(5412)), 0, null, null);
+
+
 
 	}
 }

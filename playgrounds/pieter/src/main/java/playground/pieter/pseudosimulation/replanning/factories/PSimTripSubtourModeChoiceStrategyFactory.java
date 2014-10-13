@@ -12,7 +12,7 @@ import playground.pieter.pseudosimulation.replanning.modules.PSimPlanMarkerModul
 public class PSimTripSubtourModeChoiceStrategyFactory extends
 		TripSubtourModeChoiceStrategyFactory {
 
-	private PSimControler controler;
+	private final PSimControler controler;
 
 	public PSimTripSubtourModeChoiceStrategyFactory(PSimControler controler) {
 		super();

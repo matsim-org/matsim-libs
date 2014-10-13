@@ -2,7 +2,7 @@ package playground.pieter.demandgeneration.emme;
 
 import org.matsim.api.core.v01.Id;
 
-public class ZoneXY {
+class ZoneXY {
 	private final String x, y;
 	private final Id zoneId;
 

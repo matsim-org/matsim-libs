@@ -6,11 +6,10 @@ import java.io.PushbackReader;
 import java.io.StringReader;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Iterator;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
@@ -29,8 +28,8 @@ import others.sergioo.util.dataBase.NoConnectionException;
 
 
 public class FacilitiesToSQL {
-	DataBaseAdmin dba;
-	ScenarioImpl scenario;
+	private final DataBaseAdmin dba;
+	private final ScenarioImpl scenario;
 	
 	public FacilitiesToSQL(DataBaseAdmin dba, ScenarioImpl scenario) {
 		super();
@@ -68,12 +67,10 @@ public class FacilitiesToSQL {
 					+ "id VARCHAR(45)," + "x_utm48n real," + "y_utm48n real" +
 					// "description VARCHAR(255)" +
 					")", tableName));
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (NoConnectionException e) {
+		} catch (SQLException | NoConnectionException e) {
 			e.printStackTrace();
 		}
-		System.out.println("Filling the table");
+        System.out.println("Filling the table");
 		ActivityFacilities facs = scenario.getActivityFacilities();
 		int modfactor = 1;
 		int counter = 0;
@@ -114,12 +111,10 @@ public class FacilitiesToSQL {
 					reader);
 			sb.delete(0, sb.length());
 			System.out.println("Processed facility no " + counter);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (SQLException | IOException e) {
 			e.printStackTrace();
 		}
-		
+
 //		dba.executeStatement("SELECT AddGeometryColumn( '"
 //				+ tableName.split("\\.")[0] + "', '"
 //				+ tableName.split("\\.")[1]
@@ -295,18 +290,7 @@ public class FacilitiesToSQL {
 				" ON "+ tableName + "(id);");
 	}
 	
-	/**
-	 * @param args
-	 * @throws SQLException 
-	 * @throws IOException 
-	 * @throws ClassNotFoundException 
-	 * @throws IllegalAccessException 
-	 * @throws InstantiationException 
-	 * @throws NoConnectionException 
-	 * @deprecated
-	 * 
-	 * Oh no, cannot set the activity type for activities at a facility anymore
-	 */
+
 	
 	public void mapActFromSQLtoXML(ResultSet rs) throws SQLException{
 		rs.beforeFirst();
@@ -314,12 +298,11 @@ public class FacilitiesToSQL {
 			String id = rs.getString("id");
 			String actType = rs.getString("classification");
 			ActivityFacility facility = this.scenario.getActivityFacilities().
-					getFacilities().get(new IdImpl(id));
-			Iterator<ActivityOption> ao =facility.getActivityOptions().values().iterator();
-			while(ao.hasNext()){
-				ActivityOptionImpl i = (ActivityOptionImpl) ao.next();
+					getFacilities().get(Id.create(id,ActivityFacility.class));
+            for (ActivityOption activityOption : facility.getActivityOptions().values()) {
+                ActivityOptionImpl i = (ActivityOptionImpl) activityOption;
 //				i.setType(actType);
-			}
+            }
 		}
 	}
 	
@@ -332,17 +315,16 @@ public class FacilitiesToSQL {
 			String actType = rs.getString("acttype");
 			String dayType = rs.getString("day");
 			ActivityFacility facility = this.scenario.getActivityFacilities().
-					getFacilities().get(new IdImpl(id));
-			Iterator<ActivityOption> ao =facility.getActivityOptions().values().iterator();
-			while(ao.hasNext()){
-				ActivityOptionImpl i = (ActivityOptionImpl) ao.next();
-				if(i.getType().equals(actType)){
-					
-					i.getOpeningTimes().clear();
-					i.getOpeningTimes().add(new OpeningTimeImpl(start, end));
-				}
-					
-			}
+					getFacilities().get(Id.create(id, ActivityFacility.class));
+            for (ActivityOption activityOption : facility.getActivityOptions().values()) {
+                ActivityOptionImpl i = (ActivityOptionImpl) activityOption;
+                if (i.getType().equals(actType)) {
+
+                    i.getOpeningTimes().clear();
+                    i.getOpeningTimes().add(new OpeningTimeImpl(start, end));
+                }
+
+            }
 		}
 	}
 //	function specifically created to strip the leading number from facility description

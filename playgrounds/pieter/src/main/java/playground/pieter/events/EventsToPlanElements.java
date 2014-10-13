@@ -14,10 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.bcel.generic.ISUB;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -39,27 +37,14 @@ import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.TeleportationArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.matsim.vehicles.VehicleReaderV1;
-import org.matsim.vehicles.VehicleUtils;
-import org.matsim.vehicles.Vehicles;
-import org.matsim.vehicles.VehiclesFactory;
 
 import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;
@@ -83,7 +68,7 @@ import playground.singapore.travelsummary.travelcomponents.Walk;
  *         modes.
  */
 
-public class EventsToPlanElements implements TransitDriverStartsEventHandler,
+class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
 		PersonDepartureEventHandler, PersonArrivalEventHandler,
 		ActivityStartEventHandler, ActivityEndEventHandler,
@@ -94,10 +79,10 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 	private class PTVehicle {
 
 		// Attributes
-		private Id transitLineId;
-		private Id transitRouteId;
+		private final Id transitLineId;
+		private final Id transitRouteId;
 		boolean in = false;
-		private Map<Id, Double> passengers = new HashMap<Id, Double>();
+		private final Map<Id, Double> passengers = new HashMap<>();
 		private double distance;
 		Id lastStop;
 		private double linkEnterTime = 0.0;
@@ -134,21 +119,20 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 
 
 
-	private Map<Id, Integer> acts = new HashMap<Id, Integer>();
+	private Map<Id, Integer> acts = new HashMap<>();
 	// Attributes
-	private Map<Id, TravellerChain> chains = new HashMap<Id, TravellerChain>();
-	private Map<Id, Coord> locations = new HashMap<Id, Coord>();
+	private final Map<Id, TravellerChain> chains = new HashMap<>();
+	private final Map<Id, Coord> locations = new HashMap<>();
 	private String eventsFileName;
 	// a writer to record the ids entering and exiting each link
 	private PostgresqlCSVWriter linkWriter;
-	private Network network;
-	private Map<Id, PTVehicle> ptVehicles = new HashMap<Id, PTVehicle>();
+	private final Network network;
+	private final Map<Id, PTVehicle> ptVehicles = new HashMap<>();
 	private int stuck = 0;
 	private TransitSchedule transitSchedule;
 	private final double walkSpeed;
-	private HashSet<Id> personIdsForLinks;
-	private String schemaName;
-	private HashSet<Id> transitDriverIds = new HashSet<Id>();
+    private final String schemaName;
+	private final HashSet<Id> transitDriverIds = new HashSet<>();
 	private boolean isTransitScenario = false;
 
 	public EventsToPlanElements(TransitSchedule transitSchedule,
@@ -178,7 +162,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 //		this(transitSchedule, network, config, suffix, transitVehiclesfile);
 		this(transitSchedule, network, config, suffix, schemaName);
 		samplePersonIdsForLinkWriting(connectionProperties);
-		List<PostgresqlColumnDefinition> columns = new ArrayList<PostgresqlColumnDefinition>();
+		List<PostgresqlColumnDefinition> columns = new ArrayList<>();
 		columns.add(new PostgresqlColumnDefinition("link_id", PostgresType.TEXT));
 		columns.add(new PostgresqlColumnDefinition("person_id",
 				PostgresType.TEXT));
@@ -192,19 +176,10 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 			linkWriter = new PostgresqlCSVWriter("LINKWRITER",
 					"" + schemaName + ".matsim_link_traffic" + suffix,
 					new DataBaseAdmin(connectionProperties), 1000, columns);
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-
-			e.printStackTrace();
-		} catch (SQLException e) {
+		} catch (InstantiationException | SQLException | IOException | ClassNotFoundException | IllegalAccessException e) {
 			e.printStackTrace();
 		}
-	}
+    }
 
 
 
@@ -213,26 +188,16 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 			DataBaseAdmin dba = new DataBaseAdmin(connectionProperties);
 			String idSelectionStatement = "SELECT person_id FROM " + schemaName + ".matsim_persons where sample_selector <= 0.01";
 			ResultSet rs = dba.executeQuery(idSelectionStatement);
-			this.personIdsForLinks = new HashSet<Id>();
+            HashSet<Id> personIdsForLinks = new HashSet<>();
 			while(rs.next()){
-				personIdsForLinks.add(new IdImpl(rs.getString("person_id")));
+				personIdsForLinks.add(Id.createPersonId(rs.getString("person_id")));
 			}
 			
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (NoConnectionException e) {
+		} catch (InstantiationException | NoConnectionException | SQLException | IOException | ClassNotFoundException | IllegalAccessException e) {
 			e.printStackTrace();
 		}
-		
-	}
+
+    }
 
 
 	public PostgresqlCSVWriter getLinkWriter() {
@@ -635,15 +600,15 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 
 	}
 
-	public void writeSimulationResultsToSQL(File connectionProperties,
-			String suffix) throws InstantiationException,
+	void writeSimulationResultsToSQL(File connectionProperties,
+                                     String suffix) throws InstantiationException,
 			IllegalAccessException, ClassNotFoundException, IOException,
 			SQLException, NoConnectionException {
 		DateFormat df = new SimpleDateFormat("yyyy_MM_dd");
 		String formattedDate = df.format(new Date());
 		// start with activities
 		String actTableName = "" + schemaName + ".matsim_activities" + suffix;
-		List<PostgresqlColumnDefinition> columns = new ArrayList<PostgresqlColumnDefinition>();
+		List<PostgresqlColumnDefinition> columns = new ArrayList<>();
 		columns.add(new PostgresqlColumnDefinition("activity_id",
 				PostgresType.INT, "primary key"));
 		columns.add(new PostgresqlColumnDefinition("person_id",
@@ -664,7 +629,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				eventsFileName, formattedDate));
 
 		String journeyTableName = "" + schemaName + ".matsim_journeys" + suffix;
-		columns = new ArrayList<PostgresqlColumnDefinition>();
+		columns = new ArrayList<>();
 		columns.add(new PostgresqlColumnDefinition("journey_id",
 				PostgresType.INT, "primary key"));
 		columns.add(new PostgresqlColumnDefinition("person_id",
@@ -712,7 +677,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				eventsFileName, formattedDate));
 
 		String tripTableName = "" + schemaName + ".matsim_trips" + suffix;
-		columns = new ArrayList<PostgresqlColumnDefinition>();
+		columns = new ArrayList<>();
 		columns.add(new PostgresqlColumnDefinition("trip_id", PostgresType.INT));
 		columns.add(new PostgresqlColumnDefinition("journey_id",
 				PostgresType.INT));
@@ -738,7 +703,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				eventsFileName, formattedDate));
 
 		String transferTableName = "" + schemaName + ".matsim_transfers" + suffix;
-		columns = new ArrayList<PostgresqlColumnDefinition>();
+		columns = new ArrayList<>();
 		columns.add(new PostgresqlColumnDefinition("transfer_id",
 				PostgresType.INT, "primary key"));
 		columns.add(new PostgresqlColumnDefinition("journey_id",
@@ -769,73 +734,72 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 			TravellerChain chain = entry.getValue();
 			for (Activity act : chain.getActs()) {
 				try {
-					Object[] args = { new Integer(act.getElementId()), pax_id,
+					Object[] args = {act.getElementId(), pax_id,
 							act.getFacility(), act.getType(),
-							new Integer((int) act.getStartTime()),
-							new Integer((int) act.getEndTime()),
-							new Double(Math.random()) };
+                            (int) act.getStartTime(),
+                            (int) act.getEndTime(),
+                            Math.random()};
 					activityWriter.addLine(args);
 				} catch (Exception e) {
 					System.out.println("HARK!");
 //					System.err.println(act);
-					;
-				}
+                }
 			}
 			for (Journey journey : chain.getJourneys()) {
 				try {
 
 					Object[] journeyArgs = {
-							new Integer(journey.getElementId()), pax_id,
-							new Integer((int) journey.getStartTime()),
-							new Integer((int) journey.getEndTime()),
-							new Integer((int) journey.getDistance()),
+                            journey.getElementId(), pax_id,
+                            (int) journey.getStartTime(),
+                            (int) journey.getEndTime(),
+                            (int) journey.getDistance(),
 							journey.getMainMode(),
-							new Integer(journey.getFromAct().getElementId()),
-							new Integer(journey.getToAct().getElementId()),
-							new Integer((int) journey.getInVehDistance()),
-							new Integer((int) journey.getInVehTime()),
-							new Integer((int) journey.getAccessWalkDistance()),
-							new Integer((int) journey.getAccessWalkTime()),
-							new Integer((int) journey.getAccessWaitTime()),
+                            journey.getFromAct().getElementId(),
+                            journey.getToAct().getElementId(),
+                            (int) journey.getInVehDistance(),
+                            (int) journey.getInVehTime(),
+                            (int) journey.getAccessWalkDistance(),
+                            (int) journey.getAccessWalkTime(),
+                            (int) journey.getAccessWaitTime(),
 							journey.getFirstBoardingStop(),
-							new Integer((int) journey.getEgressWalkDistance()),
-							new Integer((int) journey.getEgressWalkTime()),
+                            (int) journey.getEgressWalkDistance(),
+                            (int) journey.getEgressWalkTime(),
 							journey.getLastAlightingStop(),
-							new Integer((int) journey.getTransferWalkDistance()),
-							new Integer((int) journey.getTransferWalkTime()),
-							new Integer((int) journey.getTransferWaitTime()),
-							new Double(Math.random())
+                            (int) journey.getTransferWalkDistance(),
+                            (int) journey.getTransferWalkTime(),
+                            (int) journey.getTransferWaitTime(),
+                            Math.random()
 
 					};
 					journeyWriter.addLine(journeyArgs);
 					if (!journey.isCarJourney()) {
 						for (Trip trip : journey.getTrips()) {
 							Object[] tripArgs = {
-									new Integer(trip.getElementId()),
-									new Integer(journey.getElementId()),
-									new Integer((int) trip.getStartTime()),
-									new Integer((int) trip.getEndTime()),
-									new Integer((int) trip.getDistance()),
+                                    trip.getElementId(),
+                                    journey.getElementId(),
+                                    (int) trip.getStartTime(),
+                                    (int) trip.getEndTime(),
+                                    (int) trip.getDistance(),
 									trip.getMode().trim(), trip.getLine(),
 									trip.getRoute(), trip.getBoardingStop(),
 									trip.getAlightingStop(),
-									new Double(Math.random()) };
+                                    Math.random()};
 							tripWriter.addLine(tripArgs);
 						}
 						for (Transfer transfer : journey.getTransfers()) {
 							Object[] transferArgs = {
-									new Integer(transfer.getElementId()),
-									new Integer(journey.getElementId()),
-									new Integer((int) transfer.getStartTime()),
-									new Integer((int) transfer.getEndTime()),
-									new Integer(transfer.getFromTrip()
-											.getElementId()),
-									new Integer(transfer.getToTrip()
-											.getElementId()),
-									new Integer((int) transfer.getWalkDistance()),
-									new Integer((int) transfer.getWalkTime()),
-									new Integer((int) transfer.getWaitTime()),
-									new Double(Math.random()) };
+                                    transfer.getElementId(),
+                                    journey.getElementId(),
+                                    (int) transfer.getStartTime(),
+                                    (int) transfer.getEndTime(),
+                                    transfer.getFromTrip()
+                                            .getElementId(),
+                                    transfer.getToTrip()
+                                            .getElementId(),
+                                    (int) transfer.getWalkDistance(),
+                                    (int) transfer.getWalkTime(),
+                                    (int) transfer.getWaitTime(),
+                                    Math.random()};
 							transferWriter.addLine(transferArgs);
 						}
 					}
@@ -857,7 +821,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		// list
 
 
-		HashMap<String, String[]> idxNames = new HashMap<String, String[]>();
+		HashMap<String, String[]> idxNames = new HashMap<>();
 		String[] idx1 = { "person_id", "facility_id", "type" };
 		idxNames.put(actTableName, idx1);
 		String[] idx2 = { "person_id", "from_act", "to_act", "main_mode" };
@@ -915,7 +879,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		String formattedDate = df.format(new Date());
 		// start with activities
 		String actTableName = "matsim_activities" + suffix;
-		List<PostgresqlColumnDefinition> columns = new ArrayList<PostgresqlColumnDefinition>();
+		List<PostgresqlColumnDefinition> columns = new ArrayList<>();
 		columns.add(new PostgresqlColumnDefinition("activity_id",
 				PostgresType.INT, "primary key"));
 		columns.add(new PostgresqlColumnDefinition("person_id",
@@ -935,7 +899,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				eventsFileName, formattedDate));
 
 		String journeyTableName =  "matsim_journeys" + suffix;
-		columns = new ArrayList<PostgresqlColumnDefinition>();
+		columns = new ArrayList<>();
 		columns.add(new PostgresqlColumnDefinition("journey_id",
 				PostgresType.INT, "primary key"));
 		columns.add(new PostgresqlColumnDefinition("person_id",
@@ -982,7 +946,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				eventsFileName, formattedDate));
 
 		String tripTableName ="matsim_trips" + suffix;
-		columns = new ArrayList<PostgresqlColumnDefinition>();
+		columns = new ArrayList<>();
 		columns.add(new PostgresqlColumnDefinition("trip_id", PostgresType.INT));
 		columns.add(new PostgresqlColumnDefinition("journey_id",
 				PostgresType.INT));
@@ -1007,7 +971,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				eventsFileName, formattedDate));
 
 		String transferTableName = "matsim_transfers" + suffix;
-		columns = new ArrayList<PostgresqlColumnDefinition>();
+		columns = new ArrayList<>();
 		columns.add(new PostgresqlColumnDefinition("transfer_id",
 				PostgresType.INT, "primary key"));
 		columns.add(new PostgresqlColumnDefinition("journey_id",
@@ -1037,87 +1001,86 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 			TravellerChain chain = entry.getValue();
 			for (Activity act : chain.getActs()) {
 				try {
-					Object[] args = { new Integer(act.getElementId()), pax_id,
+					Object[] args = {act.getElementId(), pax_id,
 							act.getFacility(), act.getType(),
-							new Integer((int) act.getStartTime()),
-							new Integer((int) act.getEndTime()),
-							new Double(Math.random()) };
+                            (int) act.getStartTime(),
+                            (int) act.getEndTime(),
+                            Math.random()};
 					activityWriter.addLine(args);
 				} catch (Exception e) {
 					System.out.println("HARK!");
 //					System.err.println(act);
-					;
-				}
+                }
 			}
 			for (Journey journey : chain.getJourneys()) {
 				try {
 
 					Object[] journeyArgs = {
-							new Integer(journey.getElementId()), pax_id,
-							new Integer((int) journey.getStartTime()),
-							new Integer((int) journey.getEndTime()),
-							new Integer((int) journey.getDistance()),
+                            journey.getElementId(), pax_id,
+                            (int) journey.getStartTime(),
+                            (int) journey.getEndTime(),
+                            (int) journey.getDistance(),
 							journey.getMainMode(),
-							new Integer(journey.getFromAct().getElementId()),
-							new Integer(journey.getToAct().getElementId()),
-							new Integer((int) journey.getInVehDistance()),
-							new Integer((int) journey.getInVehTime()),
-							new Integer((int) journey.getAccessWalkDistance()),
-							new Integer((int) journey.getAccessWalkTime()),
-							new Integer((int) journey.getAccessWaitTime()),
+                            journey.getFromAct().getElementId(),
+                            journey.getToAct().getElementId(),
+                            (int) journey.getInVehDistance(),
+                            (int) journey.getInVehTime(),
+                            (int) journey.getAccessWalkDistance(),
+                            (int) journey.getAccessWalkTime(),
+                            (int) journey.getAccessWaitTime(),
 							journey.getFirstBoardingStop(),
-							new Integer((int) journey.getEgressWalkDistance()),
-							new Integer((int) journey.getEgressWalkTime()),
+                            (int) journey.getEgressWalkDistance(),
+                            (int) journey.getEgressWalkTime(),
 							journey.getLastAlightingStop(),
-							new Integer((int) journey.getTransferWalkDistance()),
-							new Integer((int) journey.getTransferWalkTime()),
-							new Integer((int) journey.getTransferWaitTime()),
-							new Double(Math.random())
+                            (int) journey.getTransferWalkDistance(),
+                            (int) journey.getTransferWalkTime(),
+                            (int) journey.getTransferWaitTime(),
+                            Math.random()
 
 					};
 					journeyWriter.addLine(journeyArgs);
 					if (!(journey.isCarJourney() || journey.isTeleportJourney())) {
 						for (Trip trip : journey.getTrips()) {
 							Object[] tripArgs = {
-									new Integer(trip.getElementId()),
-									new Integer(journey.getElementId()),
-									new Integer((int) trip.getStartTime()),
-									new Integer((int) trip.getEndTime()),
-									new Integer((int) trip.getDistance()),
+                                    trip.getElementId(),
+                                    journey.getElementId(),
+                                    (int) trip.getStartTime(),
+                                    (int) trip.getEndTime(),
+                                    (int) trip.getDistance(),
 									trip.getMode(), trip.getLine(),
 									trip.getRoute(), trip.getBoardingStop(),
 									trip.getAlightingStop(),
-									new Double(Math.random()) };
+                                    Math.random()};
 							tripWriter.addLine(tripArgs);
 						}
 						for (Transfer transfer : journey.getTransfers()) {
 							Object[] transferArgs = {
-									new Integer(transfer.getElementId()),
-									new Integer(journey.getElementId()),
-									new Integer((int) transfer.getStartTime()),
-									new Integer((int) transfer.getEndTime()),
-									new Integer(transfer.getFromTrip()
-											.getElementId()),
-									new Integer(transfer.getToTrip()
-											.getElementId()),
-									new Integer((int) transfer.getWalkDistance()),
-									new Integer((int) transfer.getWalkTime()),
-									new Integer((int) transfer.getWaitTime()),
-									new Double(Math.random()) };
+                                    transfer.getElementId(),
+                                    journey.getElementId(),
+                                    (int) transfer.getStartTime(),
+                                    (int) transfer.getEndTime(),
+                                    transfer.getFromTrip()
+                                            .getElementId(),
+                                    transfer.getToTrip()
+                                            .getElementId(),
+                                    (int) transfer.getWalkDistance(),
+                                    (int) transfer.getWalkTime(),
+                                    (int) transfer.getWaitTime(),
+                                    Math.random()};
 							transferWriter.addLine(transferArgs);
 						}
 					}else{
 						for (Trip trip : journey.getTrips()) {
 							Object[] tripArgs = {
-									new Integer(trip.getElementId()),
-									new Integer(journey.getElementId()),
-									new Integer((int) trip.getStartTime()),
-									new Integer((int) trip.getEndTime()),
-									journey.isTeleportJourney()? new Integer((int) trip.getDistance()):null,
+                                    trip.getElementId(),
+                                    journey.getElementId(),
+                                    (int) trip.getStartTime(),
+                                    (int) trip.getEndTime(),
+									journey.isTeleportJourney()? (int) trip.getDistance() :null,
 									trip.getMode(), null,
 									null, null,
 									null,
-									new Double(Math.random()) };
+                                    Math.random()};
 							tripWriter.addLine(tripArgs);
 						}
 					}
@@ -1138,7 +1101,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		return stuck;
 	}
 
-	public void setStuck(int stuck) {
+	void setStuck(int stuck) {
 		this.stuck = stuck;
 	}
 

@@ -38,8 +38,7 @@ public class Sample {
 
         
         int[] out = new int[M];
-        for (int i = 0; i < M; i++)
-            out[i] = perm[i];
+        System.arraycopy(perm, 0, out, 0, M);
         return out;
     }
 }

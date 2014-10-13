@@ -1,6 +1,5 @@
 package playground.pieter.network.clustering;
 
-import java.util.ArrayList;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
@@ -10,8 +9,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 
-public class ClusterLink implements Link {
-	private LinkImpl link;
+class ClusterLink implements Link {
+	private final LinkImpl link;
 	private NodeCluster rootCluster;
 	// set this to true if the link is an interlink
 	private boolean isInterLink = false;
@@ -28,7 +27,7 @@ public class ClusterLink implements Link {
 				+ (this.rootCluster == null ? "[]" : this.rootCluster.getId());
 	}
 	
-	public boolean isInterLink() {
+	boolean isInterLink() {
 		return isInterLink;
 	}
 
@@ -106,7 +105,7 @@ public class ClusterLink implements Link {
 		return link.getCapacity() * link.getFreespeed();
 	}
 
-	public double getCapacity(Double time) {
+	double getCapacity(Double time) {
 		return this.getCapacity(time);
 	}
 

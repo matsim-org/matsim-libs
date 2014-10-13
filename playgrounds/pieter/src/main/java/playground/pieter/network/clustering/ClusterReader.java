@@ -12,18 +12,13 @@ import java.lang.reflect.Method;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.utils.io.IOUtils;
 
-public class ClusterReader {
-	private NodeClusteringAlgorithm nca;
-	private Network network;
+class ClusterReader {
 
-	public void readClusters(String fileName, Network network,
+    public void readClusters(String fileName, Network network,
 			NodeClusteringAlgorithm nca) {
-		this.nca = nca;
-		this.network = network;
 		BufferedReader reader = IOUtils.getBufferedReader(fileName);
 //		if (true) {
 //			throw new RuntimeException("Commented out non-compiling code. Please check your code. mrieser/14dec2012");
@@ -73,7 +68,7 @@ public class ClusterReader {
 					}
 					String[] split = line.split("\t");
 					if (split.length == 3) {
-						Id nodeId = new IdImpl(split[1]);
+						Id nodeId = Id.createNodeId(split[1]);
 						ClusterNode cn = new ClusterNode((NodeImpl) network
 								.getNodes().get(nodeId));
 						NodeCluster nc = new NodeCluster(cn, nca, 0,

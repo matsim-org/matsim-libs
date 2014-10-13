@@ -74,7 +74,7 @@ public class MATSimUtils {
 	private Config config;
 	private Scenario scenario;
 	private Population population;
-	private String networkFile;
+	private final String networkFile;
 	private String plansFile;
 	private DataBaseAdmin dba;
 	private NetworkImpl network;
@@ -87,7 +87,7 @@ public class MATSimUtils {
 		this.networkFile = network;
 	}
 
-	public MATSimUtils(String networkFile) {
+	private MATSimUtils(String networkFile) {
 		this.networkFile = networkFile;
 	}
 	
@@ -99,8 +99,7 @@ public class MATSimUtils {
 	
 	/** Starts the assignment of links to activities.
 	 *
-	 * @param args command-line arguments
-	 */
+     */
 	public void countPlans() {
 		
 		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -184,11 +183,9 @@ public class MATSimUtils {
 //		multiplies network free speed by factor
 		if(network==null) initNetwork();
 		Map<Id<Link>, Link> links = network.getLinks();
-		Iterator<Link> linkIt = links.values().iterator();
-		while(linkIt.hasNext()){
-			Link currLink = linkIt.next();
-			currLink.setFreespeed(currLink.getFreespeed()*factor);
-		}
+        for (Link currLink : links.values()) {
+            currLink.setFreespeed(currLink.getFreespeed() * factor);
+        }
 		new NetworkWriter(network).write(outfile);
 	}
 
@@ -200,11 +197,11 @@ public class MATSimUtils {
 	 * @param outFile
 	 * @throws IOException
 	 */
-	public void changeNetworkSpeedCaps(String csvFile, String outFile) throws IOException {
+    void changeNetworkSpeedCaps(String csvFile, String outFile) throws IOException {
 
 		if(network==null) initNetwork();
 		BufferedReader reader = IOUtils.getBufferedReader(csvFile);
-		HashMap<String,String[]> remapString = new HashMap<String,String[]> ();
+		HashMap<String,String[]> remapString = new HashMap<>();
 		reader.readLine(); //just skip the headings, trying to have this procedure behave dynamically requires reflection
 		String line = reader.readLine();
 		while(line!=null){
@@ -213,27 +210,25 @@ public class MATSimUtils {
 			line = reader.readLine();
 		}
 		Map<Id<Link>, Link> links = network.getLinks();
-		Iterator<Link> linkIt = links.values().iterator();
-		while(linkIt.hasNext()){
-			Link currLink = linkIt.next();
-			if(currLink.getId().toString().equals("SW7_SW8")){
-				System.out.println();
-			}
-			String type = Double.toString(roundOneDecimal(currLink
-					.getFreespeed()))
-					+ "_"
-					+ Double.toString(roundOneDecimal(currLink.getCapacity()))
-					+ "_"
-					+ Double.toString(roundOneDecimal(currLink
-							.getNumberOfLanes()));
-			String[] newValues = remapString.get(type);
-			if (newValues != null) {
-				currLink.setFreespeed(Double.parseDouble(newValues[0]));
-				currLink.setCapacity(Double.parseDouble(newValues[1]));
-				currLink.setNumberOfLanes(Double.parseDouble(newValues[2]));
-			}
-			
-		}
+        for (Link currLink : links.values()) {
+            if (currLink.getId().toString().equals("SW7_SW8")) {
+                System.out.println();
+            }
+            String type = Double.toString(roundOneDecimal(currLink
+                    .getFreespeed()))
+                    + "_"
+                    + Double.toString(roundOneDecimal(currLink.getCapacity()))
+                    + "_"
+                    + Double.toString(roundOneDecimal(currLink
+                    .getNumberOfLanes()));
+            String[] newValues = remapString.get(type);
+            if (newValues != null) {
+                currLink.setFreespeed(Double.parseDouble(newValues[0]));
+                currLink.setCapacity(Double.parseDouble(newValues[1]));
+                currLink.setNumberOfLanes(Double.parseDouble(newValues[2]));
+            }
+
+        }
 		new NetworkWriter(network).write(outFile);
 	}
 	
@@ -241,7 +236,7 @@ public class MATSimUtils {
 		DecimalFormat oneDForm = new DecimalFormat("#.#");
 		return Double.valueOf(oneDForm.format(d));
 	}
-	public void writeLinkInfoToSQL(DataBaseAdmin dba) throws SQLException, NoConnectionException{
+	void writeLinkInfoToSQL(DataBaseAdmin dba) throws SQLException, NoConnectionException{
 		if(network==null) initNetwork();
 		Map<Id<Link>, Link> links = network.getLinks();
 		Iterator<Link> linkIt = links.values().iterator();

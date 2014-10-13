@@ -32,9 +32,9 @@ public abstract class TableWriter {
 	int lineCounter = 0;
 	int batchSize = 1000;
 	int pushBackSize = 200000;
-	StringBuilder sb = new StringBuilder();
-	List<PostgresqlColumnDefinition> columns;
-	protected PushbackReader reader;
+	final StringBuilder sb = new StringBuilder();
+	final List<PostgresqlColumnDefinition> columns;
+	PushbackReader reader;
 	private String comment;
 
 	/**
@@ -47,8 +47,8 @@ public abstract class TableWriter {
 	 *            column definitions, assuming only the 4 basic data types for
 	 *            now.
 	 */
-	public TableWriter(String tableName, int batchSize,
-			List<PostgresqlColumnDefinition> columns) {
+    TableWriter(String tableName, int batchSize,
+                List<PostgresqlColumnDefinition> columns) {
 		this.tableName = tableName;
 		this.batchSize = batchSize;
 		this.columns = columns;

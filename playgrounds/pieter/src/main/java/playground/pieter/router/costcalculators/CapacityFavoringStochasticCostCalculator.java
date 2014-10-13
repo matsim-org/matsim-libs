@@ -8,7 +8,7 @@ import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDi
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
-public class CapacityFavoringStochasticCostCalculator extends
+class CapacityFavoringStochasticCostCalculator extends
 		TravelTimeAndDistanceBasedTravelDisutility {
 
 	public CapacityFavoringStochasticCostCalculator(TravelTime timeCalculator,

@@ -14,7 +14,7 @@ import org.matsim.core.events.EventsUtils;
 
 public class FindOutAgentsUsingPt implements ActivityStartEventHandler, LinkEnterEventHandler {
 
-	HashMap<Id,Id> usingPt=new HashMap<Id, Id>();
+	private final HashMap<Id,Id> usingPt=new HashMap<>();
 	
 	/**
 	 * @param args
@@ -23,7 +23,7 @@ public class FindOutAgentsUsingPt implements ActivityStartEventHandler, LinkEnte
 
 		FindOutAgentsUsingPt findOutPt=new FindOutAgentsUsingPt();
 		
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();  //create new object of events-manager class
+		EventsManager events = EventsUtils.createEventsManager();  //create new object of events-manager class
 		
 		events.addHandler(findOutPt);
 		

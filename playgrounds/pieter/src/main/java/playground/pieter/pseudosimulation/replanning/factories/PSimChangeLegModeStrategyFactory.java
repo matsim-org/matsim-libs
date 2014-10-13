@@ -16,7 +16,7 @@ public class PSimChangeLegModeStrategyFactory extends
 		this.controler = controler;
 	}
 
-	private PSimControler controler;
+	private final PSimControler controler;
 
 	@Override
 	public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager ) {

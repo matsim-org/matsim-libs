@@ -20,7 +20,6 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
@@ -38,32 +37,32 @@ import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;
 import playground.pieter.singapore.utils.FacilitiesToSQL;
 
-public class InputDataCollection implements Serializable {
-	transient DataBaseAdmin dba;
-	transient Properties diverseScriptProperties;
+class InputDataCollection implements Serializable {
+	private transient DataBaseAdmin dba;
+	private transient Properties diverseScriptProperties;
 	transient MatsimFacilitiesReader facilitiesReader;
 	public static final double EARLIEST_START_TIME = Time.parseTime("00:10:00");
 	public static final double DEFAULT_START_TIME = Time.parseTime("07:30:00");
 	public static final double LATEST_END_TIME = Time.parseTime("23:50:00");
 	public static final double DEFAULT_END_TIME = Time.parseTime("19:00:00");
-	HashMap<String, String> facilityIdDescLookup = new HashMap<String, String>();
-	HashMap<String, String> landUseToHITSTypeLookup = new HashMap<String, String>();
-	HashMap<String, HashMap<String, Double>> workLandUseSecondaryActCapacities = new HashMap<String, HashMap<String, Double>>();
-	HashMap<Integer, HouseholdSG> households;
+	final HashMap<String, String> facilityIdDescLookup = new HashMap<>();
+	private final HashMap<String, String> landUseToHITSTypeLookup = new HashMap<>();
+	private final HashMap<String, HashMap<String, Double>> workLandUseSecondaryActCapacities = new HashMap<>();
+	private HashMap<Integer, HouseholdSG> households;
 //	HashMap<String, HashMap<String, Double>> landUseGivenOccupation = new HashMap<String, HashMap<String, Double>>();
-	HashSet<String> landUseTypes = new HashSet<String>();
-	HashMap<String, LocationSampler> locationSamplers = new HashMap<String, LocationSampler>();
-	HashMap<Integer, LocationSampler> subdgpWorkFlowSamplers = new HashMap<Integer, LocationSampler>();
-	HashSet<String> mainActivityTypes = new HashSet<String>();
-	HashMap<String, ArrayList<PaxSG>> mainActPaxCollection = new HashMap<String, ArrayList<PaxSG>>();
-	HashSet<String> occupationTypes = new HashSet<String>();
+	HashSet<String> landUseTypes = new HashSet<>();
+	final HashMap<String, LocationSampler> locationSamplers = new HashMap<>();
+	HashMap<Integer, LocationSampler> subdgpWorkFlowSamplers = new HashMap<>();
+	final HashSet<String> mainActivityTypes = new HashSet<>();
+	final HashMap<String, ArrayList<PaxSG>> mainActPaxCollection = new HashMap<>();
+	HashSet<String> occupationTypes = new HashSet<>();
 	HashMap<Integer, PaxSG> persons;
 
-	HashMap<Integer, HashMap<Integer, HashMap<String, HashMap<String, Double>>>> bizActFrequencies = new HashMap<Integer, HashMap<Integer, HashMap<String, HashMap<String, Double>>>>();
-	HashMap<Integer, HashMap<Integer, HashMap<String, HashMap<String, Double>>>> leisureActFrequencies = new HashMap<Integer, HashMap<Integer, HashMap<String, HashMap<String, Double>>>>();
+	private final HashMap<Integer, HashMap<Integer, HashMap<String, HashMap<String, Double>>>> bizActFrequencies = new HashMap<>();
+	private final HashMap<Integer, HashMap<Integer, HashMap<String, HashMap<String, Double>>>> leisureActFrequencies = new HashMap<>();
 
-	transient ScenarioImpl scenario;
-	transient Logger inputLog;
+	private transient ScenarioImpl scenario;
+	private transient Logger inputLog;
 	HashMap<Integer, HashMap<String, LocationSampler>> subDGPActivityLocationSamplers;
 	HashMap<String, Integer> facilityToSubDGP;
 
@@ -112,7 +111,7 @@ public class InputDataCollection implements Serializable {
 										activityGroup));
 				while (rs_income.next()) {
 					int income = rs_income.getInt("income_hh");
-					HashMap<Integer, HashMap<String, HashMap<String, Double>>> incomeMap = new HashMap<Integer, HashMap<String, HashMap<String, Double>>>();
+					HashMap<Integer, HashMap<String, HashMap<String, Double>>> incomeMap = new HashMap<>();
 					relevantMap.put(income, incomeMap);
 					ResultSet rs_age = dba
 							.executeQuery(String
@@ -122,7 +121,7 @@ public class InputDataCollection implements Serializable {
 					inputLog.info("\t finished income_hh "+income);
 					while (rs_age.next()) {
 						int age = rs_age.getInt("age");
-						HashMap<String, HashMap<String, Double>> ageMap = new HashMap<String, HashMap<String, Double>>();
+						HashMap<String, HashMap<String, Double>> ageMap = new HashMap<>();
 						incomeMap.put(age, ageMap);
 						ResultSet rs_occup = dba
 								.executeQuery(String
@@ -131,7 +130,7 @@ public class InputDataCollection implements Serializable {
 												activityGroup));
 						while (rs_occup.next()) {
 							String occup = rs_occup.getString("occup");
-							HashMap<String, Double> occupMap = new HashMap<String, Double>();
+							HashMap<String, Double> occupMap = new HashMap<>();
 							ageMap.put(occup, occupMap);
 							ResultSet rs_purpose = dba
 									.executeQuery(String
@@ -157,12 +156,10 @@ public class InputDataCollection implements Serializable {
 					}
 				}
 
-			} catch (SQLException e) {
-				e.printStackTrace();
-			} catch (NoConnectionException e) {
+			} catch (SQLException | NoConnectionException e) {
 				e.printStackTrace();
 			}
-		}
+        }
 		inputLog.info("DONE: Loading secondary act frequencies");
 	}
 
@@ -176,7 +173,7 @@ public class InputDataCollection implements Serializable {
 					masterplanSecondaryActCapacitiesTable));
 			while (rs.next()) {
 				String currenttype = rs.getString("description");
-				HashMap<String, Double> activityCaps = new HashMap<String, Double>();
+				HashMap<String, Double> activityCaps = new HashMap<>();
 				workLandUseSecondaryActCapacities
 						.put(currenttype, activityCaps);
 				ResultSet rs2 = dba.executeQuery(String.format(
@@ -188,12 +185,10 @@ public class InputDataCollection implements Serializable {
 							rs2.getDouble("activitycap"));
 				}
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (NoConnectionException e) {
+		} catch (SQLException | NoConnectionException e) {
 			e.printStackTrace();
 		}
-		inputLog.info("DONE: Loading masterplan land use types to HITS activity type frequencies.");
+        inputLog.info("DONE: Loading masterplan land use types to HITS activity type frequencies.");
 	}
 	
 	private void loadSubDGPWorkTripFlows() {
@@ -201,7 +196,7 @@ public class InputDataCollection implements Serializable {
 		String workTripFlowTable = diverseScriptProperties
 				.getProperty("workTripFlows");
 		
-		this.subdgpWorkFlowSamplers = new HashMap<Integer, LocationSampler>();
+		this.subdgpWorkFlowSamplers = new HashMap<>();
 		try {
 			ResultSet rs = dba.executeQuery(String.format(
 					"select distinct origsubdgp from %s order by origsubdgp",
@@ -212,7 +207,7 @@ public class InputDataCollection implements Serializable {
 				ResultSet rs2 = dba.executeQuery(String.format(
 						"select destsubdgp,predict from %s where origsubdgp = %d",
 						workTripFlowTable, origsubdgp));
-				HashMap<Integer,Double> tripflows = new HashMap<Integer, Double>();
+				HashMap<Integer,Double> tripflows = new HashMap<>();
 				while (rs2.next()) {
 					tripflows.put(rs2.getInt("destsubdgp"),
 							rs2.getDouble("predict"));
@@ -232,23 +227,21 @@ public class InputDataCollection implements Serializable {
 				LocationSampler ls = new LocationSampler(Integer.toString(origsubdgp), ids, caps);
 				this.subdgpWorkFlowSamplers.put(origsubdgp, ls);
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (NoConnectionException e) {
+		} catch (SQLException | NoConnectionException e) {
 			e.printStackTrace();
 		}
-		inputLog.info("DONE: Loading work trip flows for weighted assignment");
+        inputLog.info("DONE: Loading work trip flows for weighted assignment");
 	}
 	
 	private void loadSubDGPLocationSamplers() {
 		inputLog.info("Loading locationsamplers for each subdgp and work activity type");
 		String facilityToSubDGPTable = diverseScriptProperties
 				.getProperty("workFacilitiesToSubDGP");
-		HashMap<String, Integer> facilityToSubDGP = new HashMap<String, Integer>();
+		HashMap<String, Integer> facilityToSubDGP = new HashMap<>();
 		HashMap<Integer, HashMap<String,Tuple<ArrayList<String>,ArrayList<Double>>>> subDGPActivityMapping = 
-				new HashMap<Integer, HashMap<String,Tuple<ArrayList<String>,ArrayList<Double>>>>();
+				new HashMap<>();
 		HashMap<Integer, HashMap<String,LocationSampler>> subDGPActivityLocationSamplers = 
-				new HashMap<Integer, HashMap<String,LocationSampler>>();
+				new HashMap<>();
 		try {
 //		start by mapping facilities to subdgps
 			inputLog.info("\tMapping facilities to subdgps");
@@ -275,14 +268,12 @@ public class InputDataCollection implements Serializable {
 						"select distinct subdgp  from %s order by subdgp", facilityToSubDGPTable));
 				while(rs.next()){
 					subDGPActivityMapping.get(rs.getInt("subdgp")).put(activityType, 
-							new Tuple<ArrayList<String>, ArrayList<Double>>(
+							new Tuple<>(
 									new ArrayList<String>(), new ArrayList<Double>()));
 					
 				}
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (NoConnectionException e) {
+		} catch (SQLException | NoConnectionException e) {
 			e.printStackTrace();
 		}
 //		then, go through the facilities for each work activity, find the subdgp theyre in
@@ -292,9 +283,9 @@ public class InputDataCollection implements Serializable {
 //			only look at work activities
 			if(!activityType.startsWith("w_"))
 				continue;
-			TreeMap<Id<ActivityFacility>, ? extends ActivityFacility> facilities = ((ActivityFacilitiesImpl) this.scenario
-					.getActivityFacilities()).getFacilitiesForActivityType(
-							activityType);
+			TreeMap<Id<ActivityFacility>, ? extends ActivityFacility> facilities = this.scenario
+					.getActivityFacilities().getFacilitiesForActivityType(
+                            activityType);
 			for (Entry<Id<ActivityFacility>, ? extends ActivityFacility> e : facilities.entrySet()) {
 				String currid = e.getKey().toString();
 				double currcap = e.getValue().getActivityOptions().get(activityType).getCapacity();
@@ -306,8 +297,7 @@ public class InputDataCollection implements Serializable {
 					subDGPActivityMapping.get(subDGP).get(activityType).getSecond().add(currcap);
 					
 				}catch(NullPointerException ne){
-					continue;
-				}
+                }
 			}
 		}
 //		now, convert all the arraylists to arrays, and create location samplers
@@ -369,20 +359,19 @@ public class InputDataCollection implements Serializable {
 
 	private void createFacilityIdtoDescriptionLookup() {
 		inputLog.info("Creating facility ID to land use type or description lookup table.");
-		Iterator<? extends ActivityFacility> it = this.scenario.getActivityFacilities()
-				.getFacilities().values().iterator();
-		while (it.hasNext()) {
-			ActivityFacilityImpl f = (ActivityFacilityImpl) it.next();
-			this.facilityIdDescLookup.put(f.getId().toString(), f.getDesc());
-		}
+        for (ActivityFacility activityFacility : this.scenario.getActivityFacilities()
+                .getFacilities().values()) {
+            ActivityFacilityImpl f = (ActivityFacilityImpl) activityFacility;
+            this.facilityIdDescLookup.put(f.getId().toString(), f.getDesc());
+        }
 	}
 
 	private void createLocationSamplers() {
 		inputLog.info("Creating weighted samplers for each activity type,\n indexing the relevant facility ids and their capacity for the particular activity.");
 		for (String activityType : this.mainActivityTypes) {
-			TreeMap<Id<ActivityFacility>, ActivityFacility> facilities = ((ActivityFacilitiesImpl) this.scenario
-					.getActivityFacilities()).getFacilitiesForActivityType(
-							activityType);
+			TreeMap<Id<ActivityFacility>, ActivityFacility> facilities = this.scenario
+					.getActivityFacilities().getFacilitiesForActivityType(
+                            activityType);
 			Iterator<Entry<Id<ActivityFacility>, ActivityFacility>> fi = facilities.entrySet()
 					.iterator();
 			String[] ids = new String[facilities.entrySet().size()];
@@ -415,7 +404,7 @@ public class InputDataCollection implements Serializable {
 		inputLog.info("DONE: Creating collections of people participating in each major activity type.");
 	}
 
-	public void dumpFacilitiesToSQL() throws SQLException,
+	void dumpFacilitiesToSQL() throws SQLException,
 			NoConnectionException {
 		FacilitiesToSQL fc2sql = new FacilitiesToSQL(this.dba, this.scenario);
 		fc2sql.createCompleteFacilityAndActivityTablePostgres(diverseScriptProperties.getProperty("completeFacilitiesSQLTable"));
@@ -436,13 +425,12 @@ public class InputDataCollection implements Serializable {
 
 	private void getMainActivityTypes() {
 		inputLog.info("Listing the main activity types in the scenario.");
-		Iterator<? extends ActivityFacility> fi = this.scenario.getActivityFacilities().getFacilities().values().iterator();
-		while (fi.hasNext()) {
-			ActivityFacilityImpl f = (ActivityFacilityImpl) fi.next();
-			Set<String> actops = f.getActivityOptions().keySet();
-			this.mainActivityTypes.addAll(actops);
+        for (ActivityFacility activityFacility : this.scenario.getActivityFacilities().getFacilities().values()) {
+            ActivityFacilityImpl f = (ActivityFacilityImpl) activityFacility;
+            Set<String> actops = f.getActivityOptions().keySet();
+            this.mainActivityTypes.addAll(actops);
 
-		}
+        }
 	}
 
 //	private void getOccupationAndLandUseTypes() {
@@ -455,7 +443,7 @@ public class InputDataCollection implements Serializable {
 		return persons;
 	}
 
-	public void loadData(boolean facilitiesAllInOneXML) throws SQLException,
+	void loadData(boolean facilitiesAllInOneXML) throws SQLException,
 			NoConnectionException {
 		loadHouseholdsAndPersons();
 		loadFacilities(facilitiesAllInOneXML);
@@ -477,7 +465,7 @@ public class InputDataCollection implements Serializable {
 				ActivityFacilityImpl facility = ((ActivityFacilitiesImpl) scenario
 						.getActivityFacilities())
 						.createAndAddFacility(
-								new IdImpl(new String("leisure_" + counter)),
+								Id.create("leisure_" + counter, ActivityFacility.class),
 								TransformationFactory
 										.getCoordinateTransformation(
 												TransformationFactory.WGS84,
@@ -495,8 +483,8 @@ public class InputDataCollection implements Serializable {
 			while (rs.next()) {
 				ActivityFacilityImpl facility = ((ActivityFacilitiesImpl) scenario
 						.getActivityFacilities()).createAndAddFacility(
-								new IdImpl(new String("home_"
-										+ rs.getInt("id_res_facility"))),
+								Id.create("home_"
+                                        + rs.getInt("id_res_facility"), ActivityFacility.class),
 								new CoordImpl(rs.getDouble("x_utm48n"), rs
 										.getDouble("y_utm48n")));
 				facility.setDesc(rs.getString("property_type"));
@@ -505,12 +493,10 @@ public class InputDataCollection implements Serializable {
 				actOption.setCapacity((double) rs.getInt("units"));
 
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (NoConnectionException e) {
+		} catch (SQLException | NoConnectionException e) {
 			e.printStackTrace();
 		}
-	}
+    }
 
 	void loadFacilities(boolean completeFile) {
 		if (completeFile) {
@@ -528,18 +514,16 @@ public class InputDataCollection implements Serializable {
 			dumpFacilitiesToXML();
 			try {
 				dumpFacilitiesToSQL();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			} catch (NoConnectionException e) {
+			} catch (SQLException | NoConnectionException e) {
 				e.printStackTrace();
 			}
-		}
+        }
 	}
 
 	private void loadHouseholdsAndPersons() {
 		inputLog.info("Loading persons and households");
-		households = new HashMap<Integer, HouseholdSG>();
-		persons = new HashMap<Integer, PaxSG>();
+		households = new HashMap<>();
+		persons = new HashMap<>();
 		String synthHouseholdIdField = diverseScriptProperties
 				.getProperty("synthHouseholdId");
 		String carAvailabilityField = diverseScriptProperties
@@ -630,8 +614,8 @@ public class InputDataCollection implements Serializable {
 					break;
 				int synthHouseholdId = rs.getInt(synthHouseholdIdField);
 				int carAvailability = rs.getInt(carAvailabilityField);
-				String homeFacilityId = new String("home_"
-						+ rs.getInt(homeFacilityIdField));
+				String homeFacilityId = "home_"
+                        + rs.getInt(homeFacilityIdField);
 				HouseholdSG currentHousehold = new HouseholdSG(
 						synthHouseholdId, carAvailability, homeFacilityId);
 				households.put(synthHouseholdId, currentHousehold);
@@ -653,7 +637,7 @@ public class InputDataCollection implements Serializable {
 					int paxId = rspax.getInt(paxIdField);
 					String foreigner = rspax.getString(foreignerField);
 					boolean carLicenseHolder = rspax
-							.getInt(carLicenseHolderField) > 0 ? true : false;
+                            .getInt(carLicenseHolderField) > 0;
 					String chain = rspax.getString(chainField);
 					int age = 0;
 					if (rspax.getString(ageField).equals("age65_up"))
@@ -702,12 +686,10 @@ public class InputDataCollection implements Serializable {
 				}
 				counter++;
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (NoConnectionException e) {
+		} catch (SQLException | NoConnectionException e) {
 			e.printStackTrace();
 		}
-		inputLog.info("DONE: Loading persons and households");
+        inputLog.info("DONE: Loading persons and households");
 	}
 
 	private Tuple<String[], double[]> assignSecondaryActFrequencies(
@@ -730,7 +712,7 @@ public class InputDataCollection implements Serializable {
 			activityFrequencies[i] = e.getValue();
 			i++;
 		}
-		return new Tuple<String[], double[]>(activityTypes, activityFrequencies);
+		return new Tuple<>(activityTypes, activityFrequencies);
 	}
 	
 
@@ -746,12 +728,10 @@ public class InputDataCollection implements Serializable {
 				this.landUseToHITSTypeLookup.put(rs.getString("description"),
 						rs.getString("hits_type"));
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (NoConnectionException e) {
+		} catch (SQLException | NoConnectionException e) {
 			e.printStackTrace();
 		}
-		inputLog.info("DONE: Loading masterplan land use to HITS place type lookup.");
+        inputLog.info("DONE: Loading masterplan land use to HITS place type lookup.");
 	}
 
 //	private void loadOccupationLandUseProbabilities() {
@@ -791,15 +771,15 @@ public class InputDataCollection implements Serializable {
 		inputLog = Logger.getLogger("InputData");
 	}
 
-	public void setDba(DataBaseAdmin dba) {
+	void setDba(DataBaseAdmin dba) {
 		this.dba = dba;
 	}
 
-	public void setDiverseScriptProperties(Properties diverseScriptProperties) {
+	void setDiverseScriptProperties(Properties diverseScriptProperties) {
 		this.diverseScriptProperties = diverseScriptProperties;
 	}
 
-	public void setScenario(ScenarioImpl scenario) {
+	void setScenario(ScenarioImpl scenario) {
 		this.scenario = scenario;
 	}
 

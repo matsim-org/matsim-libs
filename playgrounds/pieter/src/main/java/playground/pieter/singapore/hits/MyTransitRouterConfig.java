@@ -7,7 +7,7 @@ import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.pt.config.TransitRouterConfigGroup;
 import org.matsim.pt.router.TransitRouterConfig;
 
-public class MyTransitRouterConfig extends TransitRouterConfig {
+class MyTransitRouterConfig extends TransitRouterConfig {
 
 	public MyTransitRouterConfig(Config config) {
 		super(config);

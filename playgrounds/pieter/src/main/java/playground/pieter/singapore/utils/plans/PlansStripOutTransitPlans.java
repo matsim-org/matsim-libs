@@ -13,14 +13,14 @@ import org.matsim.core.population.LegImpl;
  * @author fouriep Utility to strip out transit plans, for running e.g.
  *         SelectedPlans2ESRIShape
  */
-public class PlansStripOutTransitPlans {
+class PlansStripOutTransitPlans {
 
 	public void run(Population plans) {
 		int planCount = 0;
 		System.out.println("    running " + this.getClass().getName()
 				+ " algorithm...");
 
-		TreeSet<Id<Person>> pid_set = new TreeSet<Id<Person>>(); // ids of persons to remove
+		TreeSet<Id<Person>> pid_set = new TreeSet<>(); // ids of persons to remove
 		Iterator<Id<Person>> pid_it = plans.getPersons().keySet().iterator();
 		while (pid_it.hasNext()) {
 			Id<Person> personId = pid_it.next();

@@ -19,33 +19,31 @@ import org.matsim.core.replanning.StrategyManager;
  *         performs geometric
  * 
  */
-public class SimpleAnnealer implements IterationStartsListener,
+class SimpleAnnealer implements IterationStartsListener,
 		ControlerListener {
 
-	final static String START_PROPORTION = "startProportion";
-	final static String END_PROPORTION = "endProportion";
-	final static String ANNEAL_TYPE = "annealType";
-	final static String GEOMETRIC_FACTOR = "geometricFactor";
-	final static String HALF_LIFE = "halfLife";
-	final static String modName = "SimpleAnnealer";
-	static double startProportion = -1;
-	static double endProportion = 0.001;
-	static double currentProportion = 0.1;
-	static double geoFactor = 0.9;
-	static int halfLife = 100;
-	static double slope = -1;
-	static int currentIter = 0;
-	static boolean isGeometric = false;
-	static boolean isExponential;
-	static boolean annealSwitch = true;
-	Logger log = Logger.getLogger(getClass());
-	private Controler controler;
-	private Config config;
+	private final static String START_PROPORTION = "startProportion";
+	private final static String END_PROPORTION = "endProportion";
+	private final static String ANNEAL_TYPE = "annealType";
+	private final static String GEOMETRIC_FACTOR = "geometricFactor";
+	private final static String HALF_LIFE = "halfLife";
+	private final static String modName = "SimpleAnnealer";
+	private static double startProportion = -1;
+	private static double endProportion = 0.001;
+	private static double currentProportion = 0.1;
+	private static double geoFactor = 0.9;
+	private static int halfLife = 100;
+	private static double slope = -1;
+	private static int currentIter = 0;
+	private static boolean isGeometric = false;
+	private static boolean isExponential;
+	private static boolean annealSwitch = true;
+	private final Logger log = Logger.getLogger(getClass());
 
-	@Override
+    @Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		controler = event.getControler();
-		config = controler.getConfig();
+        Controler controler = event.getControler();
+        Config config = controler.getConfig();
 
 		if (!annealSwitch) {
 			log.error("No simulated annealing of replanning.");
@@ -133,7 +131,7 @@ public class SimpleAnnealer implements IterationStartsListener,
 	 *            re-planning in total.
 	 * @throws InterruptedException
 	 */
-	public static void anneal(IterationStartsEvent event, double proportion) {
+	private static void anneal(IterationStartsEvent event, double proportion) {
 		StrategyManager stratMan = event.getControler().getStrategyManager();
 		List<GenericPlanStrategy<Plan, Person>> strategies = stratMan.getStrategiesOfDefaultSubpopulation();
 		double totalWeights = 0.0;

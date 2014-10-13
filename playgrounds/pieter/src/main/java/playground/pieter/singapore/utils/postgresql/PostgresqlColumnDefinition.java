@@ -18,7 +18,7 @@ public class PostgresqlColumnDefinition {
 		this.extraParams = "";
 	}
 
-	String extraParams;
-	String name;
-	PostgresType type;
+	final String extraParams;
+	final String name;
+	final PostgresType type;
 }

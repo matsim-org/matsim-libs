@@ -4,13 +4,11 @@ package playground.pieter.singapore.hits;
 //import java.util.ArrayList;
 //import java.util.List;
 //import java.util.TimeZone;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
@@ -24,7 +22,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -43,22 +40,18 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.router.AStarEuclidean;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PreProcessDijkstra;
-import org.matsim.core.router.util.PreProcessEuclidean;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -89,49 +82,39 @@ public class HITSAnalyser {
 
 	private HITSData hitsData;
 	static Scenario shortestPathCarNetworkOnlyScenario;
-	static NetworkImpl carFreeSpeedNetwork;
-	static NetworkImpl fullCongestedNetwork;
+	private static NetworkImpl carFreeSpeedNetwork;
+	private static NetworkImpl fullCongestedNetwork;
 	private static HashMap<Integer, Integer> zip2DGP;
-	private HashMap<Integer, Integer> zip2SubDGP;
-	private static HashMap<Integer, ArrayList<Integer>> DGP2Zip;
-	static Connection conn;
+    private static Connection conn;
 
 	public static Connection getConn() {
 		return conn;
 	}
 
-	public static void setConn(Connection conn) {
+	private static void setConn(Connection conn) {
 		HITSAnalyser.conn = conn;
 	}
 
 	private java.util.Date referenceDate; // all dates were referenced against a
 											// starting Date of 1st September,
 											// 2008, 00:00:00 SGT
-	static HashMap<Integer, Coord> zip2Coord;
+	private static HashMap<Integer, Coord> zip2Coord;
 
-	private static ArrayList<Integer> DGPs;
-
-	static PreProcessDijkstra preProcessData;
+    private static PreProcessDijkstra preProcessData;
 	private static LeastCostPathCalculator shortestCarNetworkPathCalculator;
-	static XY2Links xY2Links;
+	private static XY2Links xY2Links;
 	static Map<Id, Link> links;
 	private static Dijkstra carCongestedDijkstra;
 	private static TransitRouterVariableImpl transitRouter;
-	private static TransitRouterImpl transitScheduleRouter;
-	private static Scenario scenario;
+    private static Scenario scenario;
 	private static TransitRouterNetworkTravelTimeAndDisutilityWW transitTravelFunction;
-	private static TransitRouterNetworkWW transitRouterNetwork;
-	private static MyTransitRouterConfig transitRouterConfig;
+    private static MyTransitRouterConfig transitRouterConfig;
 	private static HashSet<TransitLine> mrtLines;
 	private static HashSet<TransitLine> lrtLines;
-	private static String[] MRT_LINES;
-	private static String[] LRT_LINES;
-	private static HashMap<String, Coord> mrtCoords;
+    private static HashMap<String, Coord> mrtCoords;
 	private static HashMap<String, Coord> lrtCoords;
-	private static boolean freeSpeedRouting;
 
-	static void createRouters(String[] args, boolean fSR) {
-		freeSpeedRouting = fSR;
+    private static void createRouters(String[] args, boolean freeSpeedRouting) {
 		scenario = ScenarioUtils
 				.createScenario(ConfigUtils.loadConfig(args[0]));
 		(new MatsimNetworkReader(scenario)).readFile(args[1]);
@@ -158,9 +141,9 @@ public class HITSAnalyser {
 				.planCalcScore(), scenario.getConfig().plansCalcRoute(),
 				scenario.getConfig().transitRouter(), scenario.getConfig()
 						.vspExperimental());
-		transitRouterNetwork = TransitRouterNetworkWW.createFromSchedule(
-				scenario.getNetwork(), scenario.getTransitSchedule(),
-				transitRouterConfig.beelineWalkConnectionDistance);
+        TransitRouterNetworkWW transitRouterNetwork = TransitRouterNetworkWW.createFromSchedule(
+                scenario.getNetwork(), scenario.getTransitSchedule(),
+                transitRouterConfig.beelineWalkConnectionDistance);
 		TransitRouterNetwork transitScheduleRouterNetwork = TransitRouterNetwork.createFromSchedule(scenario.getTransitSchedule(), transitRouterConfig.beelineWalkConnectionDistance);
 		PreparedTransitSchedule preparedTransitSchedule = new PreparedTransitSchedule(scenario.getTransitSchedule());
 		transitTravelFunction = new TransitRouterNetworkTravelTimeAndDisutilityWW(transitRouterConfig, scenario.getNetwork(), transitRouterNetwork, travelTimeCalculator.getLinkTravelTimes(), waitTimeCalculator.getWaitTimes(), scenario.getConfig().travelTimeCalculator(), startTime, endTime, preparedTransitSchedule);
@@ -168,22 +151,22 @@ public class HITSAnalyser {
 				transitTravelFunction, transitRouterNetwork,
 				scenario.getNetwork());
 		TransitRouterNetworkTravelTimeAndDisutility routerNetworkTravelTimeAndDisutility = new TransitRouterNetworkTravelTimeAndDisutility(transitRouterConfig, preparedTransitSchedule);
-		transitScheduleRouter = new TransitRouterImpl(transitRouterConfig, preparedTransitSchedule, 
-				transitScheduleRouterNetwork, routerNetworkTravelTimeAndDisutility, 
-				routerNetworkTravelTimeAndDisutility);
+        TransitRouterImpl transitScheduleRouter = new TransitRouterImpl(transitRouterConfig, preparedTransitSchedule,
+                transitScheduleRouterNetwork, routerNetworkTravelTimeAndDisutility,
+                routerNetworkTravelTimeAndDisutility);
 		// get the set of mrt and lrt lines for special case routing
-		mrtLines = new HashSet<TransitLine>();
-		lrtLines = new HashSet<TransitLine>();
+		mrtLines = new HashSet<>();
+		lrtLines = new HashSet<>();
 		Collection<TransitLine> lines = scenario.getTransitSchedule()
 				.getTransitLines().values();
-		MRT_LINES = new String[] { "EW", "NS", "NE", "CC" };
-		LRT_LINES = new String[] { "SW", "SE", "PE", "BP" };
+        String[] MRT_LINES = new String[]{"EW", "NS", "NE", "CC"};
+        String[] LRT_LINES = new String[]{"SW", "SE", "PE", "BP"};
 		Arrays.sort(MRT_LINES);
 		Arrays.sort(LRT_LINES);
-		List<TransitRouteStop> mrtStops = new ArrayList<TransitRouteStop>();
-		List<TransitRouteStop> lrtStops = new ArrayList<TransitRouteStop>();
-		mrtCoords = new HashMap<String, Coord>();
-		lrtCoords = new HashMap<String, Coord>();
+		List<TransitRouteStop> mrtStops = new ArrayList<>();
+		List<TransitRouteStop> lrtStops = new ArrayList<>();
+		mrtCoords = new HashMap<>();
+		lrtCoords = new HashMap<>();
 
 		for (TransitLine line : lines) {
 			if (line.getRoutes().size() != 0) {
@@ -221,7 +204,7 @@ public class HITSAnalyser {
 						.planCalcScore());
 		carCongestedDijkstra = new Dijkstra(scenario.getNetwork(),
 				travelDisutility, travelTimeCalculator.getLinkTravelTimes());
-		HashSet<String> modeSet = new HashSet<String>();
+		HashSet<String> modeSet = new HashSet<>();
 		modeSet.add("car");
 		carCongestedDijkstra.setModeRestriction(modeSet);
 		fullCongestedNetwork = (NetworkImpl) scenario.getNetwork();
@@ -230,7 +213,7 @@ public class HITSAnalyser {
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(
 				scenario.getNetwork());
 		HITSAnalyser.carFreeSpeedNetwork = NetworkImpl.createNetwork();
-		HashSet<String> modes = new HashSet<String>();
+		HashSet<String> modes = new HashSet<>();
 		modes.add(TransportMode.car);
 		filter.filter(carFreeSpeedNetwork, modes);
 		TravelDisutility travelMinCost = new TravelDisutility() {
@@ -262,28 +245,28 @@ public class HITSAnalyser {
 		xY2Links = new XY2Links(carFreeSpeedNetwork, null);
 	}
 
-	public HITSAnalyser() throws ParseException {
+	private HITSAnalyser() throws ParseException {
 
 		DateFormat outdfm = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		// outdfm.setTimeZone(TimeZone.getTimeZone("SGT"));
 		referenceDate = outdfm.parse("2008-09-01 00:00:00");
 	}
 
-	public HITSAnalyser(HITSData h2) throws ParseException, SQLException {
+	private HITSAnalyser(HITSData h2) throws ParseException, SQLException {
 
 		this();
 		this.setHitsData(h2);
 	}
 
-	public void setHitsData(HITSData hitsData) {
+	void setHitsData(HITSData hitsData) {
 		this.hitsData = hitsData;
 	}
 
-	public HITSData getHitsData() {
+	HITSData getHitsData() {
 		return hitsData;
 	}
 
-	public static void initXrefs() throws SQLException {
+	private static void initXrefs() throws SQLException {
 		// fillZoneData();
 		setZip2DGP(conn);
 		setDGP2Zip(conn);
@@ -312,8 +295,8 @@ public class HITSAnalyser {
 		out.close();
 	}
 
-	public static TimeAndDistance getCarFreeSpeedShortestPathTimeAndDistance(
-			Coord startCoord, Coord endCoord) {
+	private static TimeAndDistance getCarFreeSpeedShortestPathTimeAndDistance(
+            Coord startCoord, Coord endCoord) {
 		double distance = 0;
 		Node startNode = carFreeSpeedNetwork.getNearestNode(startCoord);
 		Node endNode = carFreeSpeedNetwork.getNearestNode(endCoord);
@@ -327,8 +310,8 @@ public class HITSAnalyser {
 		return new TimeAndDistance(path.travelTime, distance);
 	}
 
-	public static TimeAndDistance getCarCongestedShortestPathDistance(
-			Coord startCoord, Coord endCoord, double time) {
+	private static TimeAndDistance getCarCongestedShortestPathDistance(
+            Coord startCoord, Coord endCoord, double time) {
 		double distance = 0;
 
 		Node startNode = carFreeSpeedNetwork.getNearestNode(startCoord);
@@ -343,8 +326,8 @@ public class HITSAnalyser {
 		return new TimeAndDistance(path.travelTime, distance);
 	}
 
-	public static double getStraightLineDistance(Coord startCoord,
-			Coord endCoord) {
+	private static double getStraightLineDistance(Coord startCoord,
+                                                  Coord endCoord) {
 		double x1 = startCoord.getX();
 		double x2 = endCoord.getX();
 		double y1 = startCoord.getY();
@@ -354,9 +337,9 @@ public class HITSAnalyser {
 		return (Math.sqrt(xsq + ysq));
 	}
 
-	static void setZip2DGP(Connection conn) throws SQLException {
+	private static void setZip2DGP(Connection conn) throws SQLException {
 		// init the hashmap
-		zip2DGP = new HashMap<Integer, Integer>();
+		zip2DGP = new HashMap<>();
 		Statement s;
 		s = conn.createStatement();
 		s.executeQuery("select zip, DGP from pcodes_zone_xycoords ;");
@@ -369,7 +352,7 @@ public class HITSAnalyser {
 
 	private static void setZip2Coord(Connection conn) throws SQLException {
 		// init the hashmap
-		zip2Coord = new HashMap<Integer, Coord>();
+		zip2Coord = new HashMap<>();
 		Statement s;
 		s = conn.createStatement();
 		s.executeQuery("select zip, x_utm48n, y_utm48n from pcodes_zone_xycoords where x_utm48n is not null;");
@@ -390,18 +373,18 @@ public class HITSAnalyser {
 		}
 	}
 
-	static void setDGP2Zip(Connection conn) throws SQLException {
+	private static void setDGP2Zip(Connection conn) throws SQLException {
 		Statement s;
 		s = conn.createStatement();
 		// get the list of DGPs, and associate a list of postal codes with each
-		DGP2Zip = new HashMap<Integer, ArrayList<Integer>>();
+        HashMap<Integer, ArrayList<Integer>> DGP2Zip = new HashMap<>();
 		s.executeQuery("select distinct DGP from pcodes_zone_xycoords where DGP is not null;");
 		ResultSet rs = s.getResultSet();
 		// iterate through the list of DGPs, create an arraylist for each, then
 		// fill that arraylist with all its associated postal codes
-		DGPs = new ArrayList<Integer>();
+        ArrayList<Integer> DGPs = new ArrayList<>();
 		while (rs.next()) {
-			ArrayList<Integer> zipsInDGP = new ArrayList<Integer>();
+			ArrayList<Integer> zipsInDGP = new ArrayList<>();
 			Statement zs1 = conn.createStatement();
 			zs1.executeQuery(String.format(
 					"select zip from pcodes_zone_xycoords where DGP= %d;",
@@ -424,7 +407,7 @@ public class HITSAnalyser {
 
 	private void getZip2SubDGP(Connection conn) throws SQLException {
 		// init the hashmap
-		this.zip2SubDGP = new HashMap<Integer, Integer>();
+        HashMap<Integer, Integer> zip2SubDGP = new HashMap<>();
 		Statement s;
 		s = conn.createStatement();
 		s.executeQuery("select " + "zip, SubDGP from pcodes_zone_xycoords "
@@ -432,7 +415,7 @@ public class HITSAnalyser {
 		ResultSet rs = s.getResultSet();
 		// iterate through the resultset and populate the hashmap
 		while (rs.next()) {
-			this.zip2SubDGP.put(rs.getInt("zip"), rs.getInt("SubDGP"));
+			zip2SubDGP.put(rs.getInt("zip"), rs.getInt("SubDGP"));
 
 		}
 	}
@@ -579,11 +562,9 @@ public class HITSAnalyser {
 							// route transit-only trips using the transit router
 							
 							if (t.stageChainSimple.equals(t.stageChainTransit)) {
-								Set<TransitLine> lines = new HashSet<TransitLine>();
-								Coord orig = origCoord;
-								Coord dest = destCoord;
-								Coord interimOrig = orig;
-								Coord interimDest = dest;
+								Set<TransitLine> lines = new HashSet<>();
+								Coord interimOrig = origCoord;
+								Coord interimDest = destCoord;
 								Path path = null;
 								// deal with the 7 most common cases for now
 								HITSStage stage = t.getStages().get(0);
@@ -591,7 +572,7 @@ public class HITSAnalyser {
 										.equals("publBus");
 								boolean mrtCheck = stage.t10_mode.equals("mrt");
 								boolean lrtCheck = stage.t10_mode.equals("lrt");
-								List<TransitStageRoutingInput> transitStages = new ArrayList<TransitStageRoutingInput>();
+								List<TransitStageRoutingInput> transitStages = new ArrayList<>();
 								boolean doneCompilingTransitStages = false;
 								STAGES: while (!doneCompilingTransitStages) {
 									// System.out.println(p.pax_idx + "_"
@@ -600,13 +581,13 @@ public class HITSAnalyser {
 										lines.add(HITSAnalyser.scenario
 												.getTransitSchedule()
 												.getTransitLines()
-												.get(new IdImpl(
-														stage.t11_boardsvcstn)));
+												.get(Id.create(
+														stage.t11_boardsvcstn,TransitLine.class)));
 										if (stage.nextStage != null) {
 											if (stage.nextStage.t10_mode
 													.equals("publBus")) {
 												stage = stage.nextStage;
-												continue STAGES;
+												continue;
 											} else {
 
 												// going to an lrt or mrt
@@ -626,11 +607,11 @@ public class HITSAnalyser {
 															interimOrig,
 															interimDest, lines,
 															true));
-											lines = new HashSet<TransitLine>();
+											lines = new HashSet<>();
 											interimOrig = interimDest;
-											interimDest = dest;
+											interimDest = destCoord;
 											stage = stage.nextStage;
-											continue STAGES;
+											continue;
 										}// next stage is null
 										transitStages
 												.add(new TransitStageRoutingInput(
@@ -659,12 +640,11 @@ public class HITSAnalyser {
 													.equals("mrt");
 											lrtCheck = stage.nextStage.t10_mode
 													.equals("lrt");
-											lines = new HashSet<TransitLine>();
+											lines = new HashSet<>();
 											interimOrig = interimDest;
-											interimDest = dest;
+											interimDest = destCoord;
 											stage = stage.nextStage;
-											continue STAGES;
-										} else {
+                                        } else {
 											doneCompilingTransitStages = true;
 
 										}
@@ -674,7 +654,7 @@ public class HITSAnalyser {
 								// traverse the list of transitStages and
 								// generate paths
 								double linkStartTime = startTime;
-								Coord walkOrigin = orig;
+								Coord walkOrigin = origCoord;
 
 								String insertString2 = "INSERT INTO transit_coords_refactored"
 										+ "(pax_idx, trip_idx, stage_id, substage_id,"
@@ -722,16 +702,16 @@ public class HITSAnalyser {
 									if (path == null) {
 										System.out.println("Cannot route " + t.h1_hhid + "_"
 												+ t.pax_id + "_" + t.trip_id
-												+ "\t" + orig + "\t" + dest
+												+ "\t" + origCoord + "\t" + destCoord
 												+ "\t line: " + lines);
-										break PATHS;
+										break;
 									}
 
 									if (i == 0) {
 										Coord boardCoord = path.nodes.get(0)
 												.getCoord();
 										walkDistanceAccessFromRouter = CoordUtils
-												.calcDistance(orig, boardCoord);
+												.calcDistance(origCoord, boardCoord);
 										walkTimeAccessFromRouter = walkDistanceAccessFromRouter
 												/ transitRouterConfig
 														.getBeelineWalkSpeed();
@@ -750,8 +730,8 @@ public class HITSAnalyser {
 														stage_id,
 														substage_id,
 														"accessWalk",
-														orig.getX(),
-														orig.getY(),
+														origCoord.getX(),
+														origCoord.getY(),
 														boardCoord.getX(),
 														boardCoord.getY(),
 														"",
@@ -965,7 +945,7 @@ public class HITSAnalyser {
 										substage_id++;
 
 										walkDistanceEgressFromRouter = CoordUtils
-												.calcDistance(alightCoord, dest);
+												.calcDistance(alightCoord, destCoord);
 										walkTimeEgressFromRouter = walkDistanceEgressFromRouter
 												/ transitRouterConfig
 														.getBeelineWalkSpeed();
@@ -984,8 +964,8 @@ public class HITSAnalyser {
 														"egressWalk",
 														alightCoord.getX(),
 														alightCoord.getY(),
-														dest.getX(),
-														dest.getY(),
+														destCoord.getX(),
+														destCoord.getY(),
 														"",
 														"",
 														walkDistanceEgressFromRouter,
@@ -1085,8 +1065,8 @@ public class HITSAnalyser {
 					+ ");");
 			for (HITSHousehold hh : this.hitsData.getHouseholds()) {
 				String hhid = hh.h1_hhid;
-				ArrayList<HITSStage> psgrStages = new ArrayList<HITSStage>();
-				ArrayList<HITSTrip> dropOffTrips = new ArrayList<HITSTrip>();
+				ArrayList<HITSStage> psgrStages = new ArrayList<>();
+				ArrayList<HITSTrip> dropOffTrips = new ArrayList<>();
 				for (HITSStage stage : hh.getStages()) {
 					// first find all the passenger stages
 					if (stage.t10_mode.endsWith("Psgr"))

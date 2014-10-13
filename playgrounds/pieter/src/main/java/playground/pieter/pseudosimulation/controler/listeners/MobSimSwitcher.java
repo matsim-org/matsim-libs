@@ -8,10 +8,6 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulationFactory;
 import org.matsim.core.mobsim.qsim.QSimFactory;
 
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-
 
 import playground.pieter.pseudosimulation.controler.PSimControler;
 import playground.pieter.pseudosimulation.mobsim.PSimFactory;
@@ -36,35 +32,35 @@ import java.util.ArrayList;
 public class MobSimSwitcher implements ControlerListener,
 		IterationStartsListener {
 	public static boolean isQSimIteration = true;
-	final static String START_RATE = "startRate";
-	final static String END_RATE = "endRate";
-	final static String SWITCH_TYPE = "switchType";
-	final static String START_ITER = "startIter";
-	final static String END_ITER = "endIter";
-	final static String INCREASE_EVERY_N = "increaseEveryNExpensiveIters";
+	private final static String START_RATE = "startRate";
+	private final static String END_RATE = "endRate";
+	private final static String SWITCH_TYPE = "switchType";
+	private final static String START_ITER = "startIter";
+	private final static String END_ITER = "endIter";
+	private final static String INCREASE_EVERY_N = "increaseEveryNExpensiveIters";
 	private int increaseEveryNExpensiveIters = 1;
 	private static int qsimIterCount = 0;
 	private int cheapIterCount = 0;
 	private int currentRate = 0;
-	private int startRate = 0;
-	private int endRate = 0;
+    private int endRate = 0;
 	private int startIter;
 	private int endIter;
-	static ArrayList<Integer> qsimIters = new ArrayList<Integer>();
-	private PSimControler psimControler;
+	private static final ArrayList<Integer> qsimIters = new ArrayList<>();
+	private final PSimControler psimControler;
 
 	private enum SwitchType {
 		incrementing, doubling
 	}
 
 	private SwitchType switchType = SwitchType.incrementing;
-	Logger log = Logger.getLogger(this.getClass());
-	private Controler matsimControler;
+	private final Logger log = Logger.getLogger(this.getClass());
+	private final Controler matsimControler;
 
 	public MobSimSwitcher(PSimControler p) {
 		this.psimControler = p;
 		this.matsimControler = p.getMATSimControler();
-		if (matsimControler.getConfig().getParam("MobSimSwitcher", START_RATE) != null)
+        int startRate = 0;
+        if (matsimControler.getConfig().getParam("MobSimSwitcher", START_RATE) != null)
 			startRate = Math.max(
 					0,
 					Integer.parseInt(matsimControler.getConfig().getParam("MobSimSwitcher",
@@ -102,7 +98,7 @@ public class MobSimSwitcher implements ControlerListener,
 
 	}
 
-	protected static ArrayList<Integer> getQSimIters() {
+	static ArrayList<Integer> getQSimIters() {
 		return qsimIters;
 	}
 
@@ -163,13 +159,13 @@ public class MobSimSwitcher implements ControlerListener,
 		}
 		if (cheapIterCount >= currentRate - 1) {
 			isQSimIteration = true;
-			this.qsimIters.add(iteration);
+			qsimIters.add(iteration);
 			cheapIterCount = 0;
 			qsimIterCount++;
 			return isQSimIteration;
 		}
 		if (isQSimIteration) {
-			this.qsimIters.add(iteration);
+			qsimIters.add(iteration);
 			qsimIterCount++;
 		} else {
 			cheapIterCount++;

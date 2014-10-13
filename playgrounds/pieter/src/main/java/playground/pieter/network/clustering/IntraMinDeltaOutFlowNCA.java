@@ -1,13 +1,7 @@
 package playground.pieter.network.clustering;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.Writer;
 import java.util.HashSet;
 import java.util.TreeMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -18,14 +12,14 @@ import org.matsim.core.utils.collections.Tuple;
 
 
 public class IntraMinDeltaOutFlowNCA extends NodeClusteringAlgorithm {
-	public static String ALGORITHMNAME = "IntraMinDeltaOutFlowNCA";
+	private static final String ALGORITHMNAME = "IntraMinDeltaOutFlowNCA";
 	public static int NUMTHREADS = 4;
 	private Tuple<Integer, Double> averageForThisClusterStep;
 
-	public IntraMinDeltaOutFlowNCA(Network network, String linkMethodName,
-			String[] argTypes, Object[] args) {
+	private IntraMinDeltaOutFlowNCA(Network network, String linkMethodName,
+                                    String[] argTypes, Object[] args) {
 		super(ALGORITHMNAME, network, linkMethodName, argTypes, args);
-		averageForThisClusterStep = new Tuple<Integer, Double>(
+		averageForThisClusterStep = new Tuple<>(
 				Integer.MIN_VALUE, Double.NaN);
 	}
 
@@ -39,13 +33,12 @@ public class IntraMinDeltaOutFlowNCA extends NodeClusteringAlgorithm {
 			sum += nc.getOutLinks().size();
 		}
 
-		averageForThisClusterStep = new Tuple<Integer, Double>(clusterSteps,
-				(double)sum / clusters.size());
-		return;
+		averageForThisClusterStep = new Tuple<>(clusterSteps,
+				sum / clusters.size());
 
-	}
+    }
 
-	public IntraMinDeltaOutFlowNCA(Network network) {
+	private IntraMinDeltaOutFlowNCA(Network network) {
 		super(ALGORITHMNAME, network);
 	}
 
@@ -64,8 +57,8 @@ public class IntraMinDeltaOutFlowNCA extends NodeClusteringAlgorithm {
 					newCluster = new NodeCluster(cl.getFromCluster(), nc,
 							internalFlowMethod, internalFlowMethodParameters,
 							clusterSteps, cl.getFromCluster().getId());
-					if (Math.abs((double)newCluster.getOutFlowSum()-target) < minDeltaOutLinksCount) {
-						minDeltaOutLinksCount = Math.abs((double)newCluster.getOutFlowSum()-target) ;
+					if (Math.abs(newCluster.getOutFlowSum() -target) < minDeltaOutLinksCount) {
+						minDeltaOutLinksCount = Math.abs(newCluster.getOutFlowSum() -target) ;
 						outCluster = newCluster;
 					}
 				}
@@ -93,8 +86,8 @@ public class IntraMinDeltaOutFlowNCA extends NodeClusteringAlgorithm {
 //					- nc.getChild1().getInternalFlow()
 //					- nc.getChild2().getInternalFlow();
 
-			if (Math.abs((double)newCluster.getOutFlowSum()-target) < minDeltaOutLinksCount) {
-				minDeltaOutLinksCount = Math.abs((double)newCluster.getOutFlowSum()-target) ;
+			if (Math.abs(newCluster.getOutFlowSum() -target) < minDeltaOutLinksCount) {
+				minDeltaOutLinksCount = Math.abs(newCluster.getOutFlowSum() -target) ;
 				outCluster = newCluster;
 			}
 

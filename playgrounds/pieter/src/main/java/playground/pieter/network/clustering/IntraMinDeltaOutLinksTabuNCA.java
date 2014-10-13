@@ -1,15 +1,7 @@
 package playground.pieter.network.clustering;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.TreeMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -20,15 +12,15 @@ import org.matsim.core.utils.collections.Tuple;
 
 
 public class IntraMinDeltaOutLinksTabuNCA extends NodeClusteringAlgorithm {
-	public static String ALGORITHMNAME = "IntraMinDeltaOutLinksTabuNCA";
+	private static final String ALGORITHMNAME = "IntraMinDeltaOutLinksTabuNCA";
 	public static int NUMTHREADS = 4;
 	private Tuple<Integer, Double> averageForThisClusterStep;
 //	private ArrayList<Integer> tabuList;
 
-	public IntraMinDeltaOutLinksTabuNCA(Network network, String linkMethodName,
-			String[] argTypes, Object[] args) {
+	private IntraMinDeltaOutLinksTabuNCA(Network network, String linkMethodName,
+                                         String[] argTypes, Object[] args) {
 		super(ALGORITHMNAME, network, linkMethodName, argTypes, args);
-		averageForThisClusterStep = new Tuple<Integer, Double>(
+		averageForThisClusterStep = new Tuple<>(
 				Integer.MIN_VALUE, Double.NaN);
 	}
 
@@ -42,13 +34,12 @@ public class IntraMinDeltaOutLinksTabuNCA extends NodeClusteringAlgorithm {
 			sum += nc.getOutLinks().size();
 		}
 
-		averageForThisClusterStep = new Tuple<Integer, Double>(clusterSteps,
-				(double)sum / clusters.size());
-		return;
+		averageForThisClusterStep = new Tuple<>(clusterSteps,
+				sum / clusters.size());
 
-	}
+    }
 
-	public IntraMinDeltaOutLinksTabuNCA(Network network) {
+	private IntraMinDeltaOutLinksTabuNCA(Network network) {
 		super(ALGORITHMNAME, network);
 	}
 
@@ -60,7 +51,7 @@ public class IntraMinDeltaOutLinksTabuNCA extends NodeClusteringAlgorithm {
 		double target = 0;
 		NodeCluster outCluster = null;
 		if(tabuList == null)
-			tabuList = new HashSet<Integer>();
+			tabuList = new HashSet<>();
 		
 		
 		for (int i : clusters.keySet()) {
@@ -160,9 +151,9 @@ public class IntraMinDeltaOutLinksTabuNCA extends NodeClusteringAlgorithm {
 		}
 	}
 	
-	protected HashSet<ClusterCombo> getViableClusterCombos(
-			TreeMap<Integer, NodeCluster> nodeClusters, boolean tabu){
-		HashSet<ClusterCombo> clusterCheck = new HashSet<ClusterCombo>();
+	HashSet<ClusterCombo> getViableClusterCombos(
+            TreeMap<Integer, NodeCluster> nodeClusters, boolean tabu){
+		HashSet<ClusterCombo> clusterCheck = new HashSet<>();
 		if(!tabu){
 			return getViableClusterCombos(nodeClusters);
 		}
@@ -179,7 +170,7 @@ public class IntraMinDeltaOutLinksTabuNCA extends NodeClusteringAlgorithm {
 		}
 		// System.out.println("Clustercombos: " + clusterCheck.size());
 		if(clusterCheck.size() == 0 ){//all tabu
-			tabuList = new HashSet<Integer>();
+			tabuList = new HashSet<>();
 			System.err.println("All tabu, cleaning up");
 			return getViableClusterCombos(nodeClusters);
 		}

@@ -18,7 +18,7 @@ import playground.pieter.pseudosimulation.controler.PSimControler;
 
 public class QSimScoreWriter implements IterationEndsListener,
 		ShutdownListener, StartupListener {
-	PSimControler controler;
+	private final PSimControler controler;
 	private BufferedWriter out;
 	final private static int INDEX_WORST = 0;
 	final private static int INDEX_BEST = 1;

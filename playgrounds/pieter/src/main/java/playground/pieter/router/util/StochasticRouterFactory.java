@@ -8,8 +8,8 @@ import org.matsim.core.router.util.TravelTime;
 
 import playground.pieter.router.StochasticRouter;
 
-public class StochasticRouterFactory implements LeastCostPathCalculatorFactory{
-	double beta = 0.0001;
+class StochasticRouterFactory implements LeastCostPathCalculatorFactory{
+	private double beta = 0.0001;
 	public double getBeta() {
 		return beta;
 	}

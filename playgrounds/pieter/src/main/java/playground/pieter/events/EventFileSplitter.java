@@ -1,34 +1,20 @@
 package playground.pieter.events;
 
 import java.io.File;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.TreeSet;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioUtils;
-
-import playground.pieter.singapore.utils.events.listeners.TrimEventsWithPersonIds;
 
 public class EventFileSplitter {
-	String inFileName;
-	String outFileName;
-	String numberedEventsFileName;
-	String outputPath;
-	private EventsManager events;
-	
-	
-	
-	public EventFileSplitter(String inFileName, String outFileName) {
+	private final String inFileName;
+	private final String outFileName;
+	private final String numberedEventsFileName;
+	private final String outputPath;
+
+
+    private EventFileSplitter(String inFileName, String outFileName) {
 		super();
 		this.inFileName = inFileName;
 		this.outFileName = outFileName;
@@ -55,7 +41,7 @@ public class EventFileSplitter {
 //	}
 	
 	private void splitEventsToMultipleSortedFiles() {
-		this.events = EventsUtils.createEventsManager();
+        EventsManager events = EventsUtils.createEventsManager();
 		SplitEventsToMultipleSortedFiles setmsf = new SplitEventsToMultipleSortedFiles(outputPath+"\\sorted_", 100000);
 		events.addHandler(setmsf);
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);

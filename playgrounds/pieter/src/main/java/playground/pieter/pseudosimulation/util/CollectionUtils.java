@@ -47,7 +47,7 @@ public class CollectionUtils {
 			
 			for(int i = 0; i < n - 1; i++) {
 				int segmentSize = stop - start;
-				List<T> segment = new ArrayList<T>(segmentSize);
+				List<T> segment = new ArrayList<>(segmentSize);
 				for(int k = 0; k < segmentSize; k++) {
 					segment.add(it.next());
 				}
@@ -57,7 +57,7 @@ public class CollectionUtils {
 			}
 			
 			int segmentSize = set.size() - start;
-			List<T> segment = new ArrayList<T>(segmentSize);
+			List<T> segment = new ArrayList<>(segmentSize);
 			for(int k = 0; k < segmentSize; k++) {
 				segment.add(it.next());
 			}

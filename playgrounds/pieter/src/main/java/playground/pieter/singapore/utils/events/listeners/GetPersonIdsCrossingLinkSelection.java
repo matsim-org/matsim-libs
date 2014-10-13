@@ -21,24 +21,16 @@
 package playground.pieter.singapore.utils.events.listeners;
 
 import java.io.BufferedWriter;
-import java.io.IOException;
-import java.sql.Connection;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.TreeSet;
 
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.*;
-import org.matsim.core.events.algorithms.EventWriter;
 import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.utils.io.IOUtils;
 
 public class GetPersonIdsCrossingLinkSelection implements BasicEventHandler {
 	private BufferedWriter out = null;
-	private HashSet<String> linkIds;
-	private HashSet<String> personIds;
+	private final HashSet<String> linkIds;
+	private final HashSet<String> personIds;
 
 	public void reset(int iteration) {
 		
@@ -54,7 +46,7 @@ public class GetPersonIdsCrossingLinkSelection implements BasicEventHandler {
 
 	public GetPersonIdsCrossingLinkSelection(HashSet<String> linkIds2) {
 		this.linkIds = linkIds2;
-		this.personIds = new HashSet<String>();
+		this.personIds = new HashSet<>();
 	}
 
 

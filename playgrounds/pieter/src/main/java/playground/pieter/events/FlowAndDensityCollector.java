@@ -22,8 +22,6 @@ package playground.pieter.events;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -37,10 +35,6 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
-import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
-import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
-import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
 
 /**
  * @author fouriep, wrashid
@@ -48,8 +42,8 @@ import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityE
  *         track the average density and flow inside a link
  * 
  */
-public class FlowAndDensityCollector implements LinkLeaveEventHandler, LinkEnterEventHandler, PersonArrivalEventHandler, Wait2LinkEventHandler {
-	private int binSizeInSeconds; // set the length of interval
+class FlowAndDensityCollector implements LinkLeaveEventHandler, LinkEnterEventHandler, PersonArrivalEventHandler, Wait2LinkEventHandler {
+	private final int binSizeInSeconds; // set the length of interval
 	private HashMap<Id, int[]> linkOutFlow; // define
 	private HashMap<Id, int[]> linkInFlow;
 	// store the times when thenumber of vehicles on each link changes,
@@ -57,11 +51,11 @@ public class FlowAndDensityCollector implements LinkLeaveEventHandler, LinkEnter
 	private HashMap<Id, TreeMap<Integer, Integer>> deltaFlow;
 	// average the flows from the deltaflow map for each time bin
 	private HashMap<Id, double[]> avgDeltaFlow;
-	private Map<Id, ? extends Link> filteredEquilNetLinks; // define
+	private final Map<Id, ? extends Link> filteredEquilNetLinks; // define
 	private int lastBinIndex = 0;
 
 	// personId, linkId
-	private HashMap<Id, Id> lastEnteredLink = new HashMap<Id, Id>(); // define
+	private final HashMap<Id, Id> lastEnteredLink = new HashMap<>(); // define
 
 	public FlowAndDensityCollector(Map<Id, ? extends Link> filteredEquilNetLinks, int binSizeInSeconds) {
 		this.filteredEquilNetLinks = filteredEquilNetLinks;
@@ -70,10 +64,10 @@ public class FlowAndDensityCollector implements LinkLeaveEventHandler, LinkEnter
 
 	@Override
 	public void reset(int iteration) {
-		linkOutFlow = new HashMap<Id, int[]>(); // reset the variables (private
-		linkInFlow = new HashMap<Id, int[]>();
-		deltaFlow = new HashMap<Id, TreeMap<Integer, Integer>>();
-		avgDeltaFlow = new HashMap<Id, double[]>();
+		linkOutFlow = new HashMap<>(); // reset the variables (private
+		linkInFlow = new HashMap<>();
+		deltaFlow = new HashMap<>();
+		avgDeltaFlow = new HashMap<>();
 	}
 
 	@Override
@@ -152,7 +146,7 @@ public class FlowAndDensityCollector implements LinkLeaveEventHandler, LinkEnter
 	private void calculateAverageDeltaFlowsAndReinitialize(double time, int binIndex) {
 
 		for (Id id : deltaFlow.keySet()) {
-			ArrayList<Integer> times = new ArrayList<Integer>();
+			ArrayList<Integer> times = new ArrayList<>();
 			times.addAll(deltaFlow.get(id).keySet());
 			Collections.sort(times);
 			int endTime = (int) time - 1; // the bin ends one second before the

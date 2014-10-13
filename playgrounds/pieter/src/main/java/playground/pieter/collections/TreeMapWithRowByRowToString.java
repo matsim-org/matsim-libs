@@ -23,7 +23,7 @@ import java.util.Iterator;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
-public class TreeMapWithRowByRowToString<K, V> extends TreeMap<K, V> {
+class TreeMapWithRowByRowToString<K, V> extends TreeMap<K, V> {
 
 	@Override
 	public String toString() {

@@ -3,11 +3,8 @@ package playground.pieter.pseudosimulation.replanning.factories;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.replanning.modules.TimeAllocationMutatorPlanStrategyFactory;
-import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 import playground.pieter.pseudosimulation.controler.PSimControler;
 import playground.pieter.pseudosimulation.replanning.modules.PSimPlanMarkerModule;
@@ -15,7 +12,7 @@ import playground.pieter.pseudosimulation.replanning.modules.PSimPlanMarkerModul
 public class PSimTimeAllocationMutatorPlanStrategyFactory extends
 TimeAllocationMutatorPlanStrategyFactory {
 
-	private PSimControler controler;
+	private final PSimControler controler;
 
 	public PSimTimeAllocationMutatorPlanStrategyFactory(
 			PSimControler controler) {

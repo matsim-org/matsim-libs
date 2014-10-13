@@ -52,8 +52,8 @@ import others.sergioo.util.dataBase.NoConnectionException;
 public class PlansFilterNoRoute {
 	Scenario localScenario = ScenarioUtils.createScenario(ConfigUtils
 			.createConfig());
-	PopulationImpl badPop;
-	PopulationWriter pw;
+	private PopulationImpl badPop;
+	private PopulationWriter pw;
 
 	public void run(Population plans, String badPopFileName, Network network) {
 		badPop = (PopulationImpl) plans;
@@ -144,25 +144,10 @@ public class PlansFilterNoRoute {
 			System.out.println("Number of plans removed:   " + planCount);
 			System.out.println("Number of persons removed: " + pid_set.size());
 			pw.closeStreaming();
-		} catch (SQLException e1) {
+		} catch (SQLException | IOException | ClassNotFoundException | IllegalAccessException | InstantiationException | NoConnectionException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
-		} catch (NoConnectionException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 
-	}
+    }
 }

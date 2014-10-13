@@ -42,7 +42,7 @@ import java.sql.SQLException;
  */
 public class MyPlansToPlans {
 
-	public void run(final String[] args) throws InstantiationException, IllegalAccessException, ClassNotFoundException, IOException, SQLException, NoConnectionException  {
+	void run(final String[] args) throws InstantiationException, IllegalAccessException, ClassNotFoundException, IOException, SQLException, NoConnectionException  {
 		Scenario scenario;
 		MatsimRandom.reset(123);
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());

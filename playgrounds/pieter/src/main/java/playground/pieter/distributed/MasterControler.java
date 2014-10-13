@@ -13,12 +13,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -26,34 +22,27 @@ import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.mobsim.qsim.QSimFactory;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.pieter.pseudosimulation.util.CollectionUtils;
 import playground.singapore.ptsim.qnetsimengine.PTQSimFactory;
 import playground.singapore.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
-import playground.singapore.transitRouterEventsBased.TransitRouterWSImplFactory;
-import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTimeCalculator;
 import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTimeCalculatorSerializable;
 import playground.singapore.transitRouterEventsBased.waitTimes.WaitTimeCalculatorSerializable;
-import playground.singapore.transitRouterEventsBased.waitTimes.WaitTimeStuckCalculator;
 
 public class MasterControler implements AfterMobsimListener, ShutdownListener {
     private Config config;
-    Logger masterLogger = Logger.getLogger(this.getClass());
+    private final Logger masterLogger = Logger.getLogger(this.getClass());
     private Controler matsimControler;
     private Slave[] slaves;
     private WaitTimeCalculatorSerializable waitTimeCalculator;
     private StopStopTimeCalculatorSerializable stopStopTimeCalculator;
     private SerializableLinkTravelTimes linkTravelTimes;
     private AtomicInteger numThreads;
-    private HashMap<String, Plan> newPlans = new HashMap<>();
+    private final HashMap<String, Plan> newPlans = new HashMap<>();
 
-    public MasterControler(String[] args) throws NumberFormatException, IOException, ParseException {
+    private MasterControler(String[] args) throws NumberFormatException, IOException, ParseException {
         Options options = new Options();
         options.addOption("c", true, "Config file location");
         options.addOption("p", true, "Port number of MasterControler");
@@ -142,7 +131,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
         return matsimControler;
     }
 
-    public void run() {
+    void run() {
         matsimControler.run();
     }
 
@@ -180,10 +169,10 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
     }
 
     private class Slave implements Runnable {
-        Logger slaveLogger = Logger.getLogger(this.getClass());
+        final Logger slaveLogger = Logger.getLogger(this.getClass());
         ObjectInputStream reader;
         ObjectOutputStream writer;
-        Map<String, Plan> plans = new HashMap<>();
+        final Map<String, Plan> plans = new HashMap<>();
 
         public Slave(Socket socket) throws IOException {
             super();

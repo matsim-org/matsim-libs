@@ -24,8 +24,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.modules.SelectExpBetaPlanStrategyFactory;
-import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 
 import playground.pieter.pseudosimulation.replanning.selectors.PSimExpBetaPlanSelector;
 
@@ -34,8 +32,7 @@ public class PSimSelectExpBetaPlanStrategyFactory implements
 
 	@Override
 	public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
-		PlanStrategy strategy = new PlanStrategyImpl(new PSimExpBetaPlanSelector(scenario.getConfig().planCalcScore()));
-		return strategy;
+		return new PlanStrategyImpl(new PSimExpBetaPlanSelector(scenario.getConfig().planCalcScore()));
 	}
 
 }

@@ -1,13 +1,7 @@
 package playground.pieter.network.clustering;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.Writer;
 import java.util.HashSet;
 import java.util.TreeMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -18,14 +12,14 @@ import org.matsim.core.utils.collections.Tuple;
 
 
 public class IntraMinDeltaAvgNCA extends NodeClusteringAlgorithm {
-	public static String ALGORITHMNAME = "IntraMINDeltaAverage";
+	private static final String ALGORITHMNAME = "IntraMINDeltaAverage";
 	public static int NUMTHREADS = 4;
 	private Tuple<Integer, Double> averageForThisClusterStep;
 
-	public IntraMinDeltaAvgNCA(Network network, String linkMethodName,
-			String[] argTypes, Object[] args) {
+	private IntraMinDeltaAvgNCA(Network network, String linkMethodName,
+                                String[] argTypes, Object[] args) {
 		super(ALGORITHMNAME, network, linkMethodName, argTypes, args);
-		averageForThisClusterStep = new Tuple<Integer, Double>(
+		averageForThisClusterStep = new Tuple<>(
 				Integer.MIN_VALUE, Double.NaN);
 	}
 
@@ -39,13 +33,12 @@ public class IntraMinDeltaAvgNCA extends NodeClusteringAlgorithm {
 			sum += nc.getInternalFlow();
 		}
 
-		averageForThisClusterStep = new Tuple<Integer, Double>(clusterSteps,
+		averageForThisClusterStep = new Tuple<>(clusterSteps,
 				sum / clusters.size());
-		return;
 
-	}
+    }
 
-	public IntraMinDeltaAvgNCA(Network network) {
+	private IntraMinDeltaAvgNCA(Network network) {
 		super(ALGORITHMNAME, network);
 	}
 

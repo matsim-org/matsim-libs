@@ -24,7 +24,7 @@ import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class PSimReRoute extends AbstractMultithreadedModule {
-	private Scenario scenario;
+	private final Scenario scenario;
 
 	public PSimReRoute(Scenario scenario) {
 		super(scenario.getConfig().global());

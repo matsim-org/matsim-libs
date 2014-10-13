@@ -5,22 +5,21 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.roadpricing.RoadPricingWriterXMLv1;
 
 public class RoadPriceFromCapacity {
-	Scenario sc;
-	Network network;
-	RoadPricingSchemeImpl rps;
-	double startTime = Time.convertHHMMInteger(700);
-	double endTime = Time.convertHHMMInteger(900);
-	double roadCostPerMeter = 0.0025;
-	double linkMinimumCapacity = 4000;
+	private final Scenario sc;
+	private final Network network;
+	private final RoadPricingSchemeImpl rps;
+	private final double startTime = Time.convertHHMMInteger(700);
+	private final double endTime = Time.convertHHMMInteger(900);
+	private final double roadCostPerMeter = 0.0025;
+	private final double linkMinimumCapacity = 4000;
 
-	public RoadPriceFromCapacity(String networkFileName) {
+	private RoadPriceFromCapacity(String networkFileName) {
 		sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader nwr = new MatsimNetworkReader(sc);
 		nwr.readFile(networkFileName);
@@ -28,7 +27,7 @@ public class RoadPriceFromCapacity {
 		network = sc.getNetwork();
 	}
 	
-	public void run(String rpsFileName){
+	void run(String rpsFileName){
 		for(Link link:network.getLinks().values()){
 			if(link.getCapacity()>= linkMinimumCapacity){
 				rps.addLinkCost(link.getId(), startTime, endTime, link.getLength()*roadCostPerMeter);

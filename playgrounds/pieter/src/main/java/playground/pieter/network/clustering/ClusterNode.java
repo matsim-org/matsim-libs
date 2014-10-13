@@ -9,10 +9,9 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NodeImpl;
 
 public class ClusterNode implements Node {
-	private NodeImpl node;
-	private NodeCluster rootCluster;
-	
-	public ClusterNode(NodeImpl n ) {
+	private final NodeImpl node;
+
+    public ClusterNode(NodeImpl n ) {
 		this.node = n;
 	}
 	
@@ -112,7 +111,7 @@ public class ClusterNode implements Node {
 	 * @param root
 	 */
 	public void setNewRoot(NodeCluster root){
-		this.rootCluster = root;
+
 	}
 
 

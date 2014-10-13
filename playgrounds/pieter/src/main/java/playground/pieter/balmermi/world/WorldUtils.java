@@ -21,7 +21,6 @@
 package playground.pieter.balmermi.world;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Coord;
@@ -56,7 +55,7 @@ public abstract class WorldUtils {
 	 *
 	 * @author mrieser
 	 */
-	public static final Coord getRandomCoordInZone(final Zone zone, final Layer layer) {
+	public static Coord getRandomCoordInZone(final Zone zone, final Layer layer) {
 		Coord min = zone.getMin();
 
 		if ((min != null) && (!(min.equals(zone.getMax())))) {
@@ -73,23 +72,22 @@ public abstract class WorldUtils {
 		Coord center = zone.getCoord();
 		ArrayList<? extends BasicLocation> nearestZones = layer.getNearestLocations(center, zone);
 		double shortestDistance = Double.MAX_VALUE;
-		Iterator<? extends BasicLocation> zoneIter = nearestZones.iterator();
-		while (zoneIter.hasNext()) {
-			Zone aZone = (Zone)zoneIter.next();
-			Coord zoneMin = aZone.getMin();
-			Coord zoneCenter = aZone.getCoord();
-			double radius;
-			if (zoneMin == null || zoneMin.equals(aZone.getMax())) {
-				// the distance is center-to-center, only take 0.7 times the distance as radius
-				radius = 0.7*CoordUtils.calcDistance(zoneCenter, center);
-			} else {
-				// the other zone has an extent(min/max), so just use the full distance
-				radius = CoordUtils.calcDistance(aZone.getCoord(), center);
-			}
-			if (radius < shortestDistance) {
-				shortestDistance = radius;
-			}
-		}
+        for (BasicLocation nearestZone : nearestZones) {
+            Zone aZone = (Zone) nearestZone;
+            Coord zoneMin = aZone.getMin();
+            Coord zoneCenter = aZone.getCoord();
+            double radius;
+            if (zoneMin == null || zoneMin.equals(aZone.getMax())) {
+                // the distance is center-to-center, only take 0.7 times the distance as radius
+                radius = 0.7 * CoordUtils.calcDistance(zoneCenter, center);
+            } else {
+                // the other zone has an extent(min/max), so just use the full distance
+                radius = CoordUtils.calcDistance(aZone.getCoord(), center);
+            }
+            if (radius < shortestDistance) {
+                shortestDistance = radius;
+            }
+        }
 		if (shortestDistance < Double.MAX_VALUE) {
 			// choose a 'random' point within the circle around 'center' with radius 'shortestDistance'
 			// by choosing a random polar coordinate, the densitiy of points in the center area should

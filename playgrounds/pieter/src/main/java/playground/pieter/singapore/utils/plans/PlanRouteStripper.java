@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.LegImpl;
 import org.matsim.pt.router.TransitActsRemover;
 
-public class PlanRouteStripper {
+class PlanRouteStripper {
 	public void run(Population plans) {
 		int planCount = 0;
 		System.out.println("    running " + this.getClass().getName()

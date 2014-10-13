@@ -13,7 +13,7 @@ import javax.management.timer.Timer;
 
 import org.matsim.api.core.v01.Coord;
 
-public class HITSTrip extends HITSElement implements Serializable{
+class HITSTrip extends HITSElement implements Serializable{
 	HITSPerson person;
 	String h1_hhid;
 	int pax_id;
@@ -24,24 +24,24 @@ public class HITSTrip extends HITSElement implements Serializable{
 	Date t4_endtime_24h;
 	String t5_placetype;
 	String t6_purpose;
-	double t22_lastwlktime;
-	int t23_tripfreq;
-	int t24_compjtime;
-	int t25_estjtime;
-	String t27_flextimetyp;
-	String p28a_fastrbypt;
-	String p28b_cheaprbypt;
-	String p28c_easrtoacc;
-	String p28d_needntpark;
-	String p28e_lessstress;
-	String p28f_othrmmbrusecar;
-	String p28g_opconly;
-	String p28h_envfrndly;
-	String p28i_othrreasnchck;
+	private double t22_lastwlktime;
+	private int t23_tripfreq;
+	private int t24_compjtime;
+	private int t25_estjtime;
+	private String t27_flextimetyp;
+	private String p28a_fastrbypt;
+	private String p28b_cheaprbypt;
+	private String p28c_easrtoacc;
+	private String p28d_needntpark;
+	private String p28e_lessstress;
+	private String p28f_othrmmbrusecar;
+	private String p28g_opconly;
+	private String p28h_envfrndly;
+	private String p28i_othrreasnchck;
 	double tripfactorsstgfinal;
 	private ArrayList<HITSStage> stages;
 	
-	DateFormat dfm;
+	private DateFormat dfm;
 	
 	public HITSTrip() {
 		
@@ -85,8 +85,8 @@ public class HITSTrip extends HITSElement implements Serializable{
 
 
 	
-	public void setStages(Connection conn) {
-		ArrayList<HITSStage> s = new ArrayList<HITSStage>();
+	void setStages(Connection conn) {
+		ArrayList<HITSStage> s = new ArrayList<>();
 		Statement ss;
 		try {
 			ss = conn.createStatement();
@@ -147,35 +147,35 @@ public class HITSTrip extends HITSElement implements Serializable{
 	}
 	
 //	 (calculated) fields
-	 boolean transientsCalculated;
+private boolean transientsCalculated;
 	
 	 String mainmode;
-	 String stageChainFull; //i.e. walk - wait - bus - walk - wait - mrt - walk
+	 private String stageChainFull; //i.e. walk - wait - bus - walk - wait - mrt - walk
 	 String stageChainSimple; // i.e. bus - mrt
 	 String stageChainTransit;
 	
 	 int totalWalkTimeTrip;
-	 int transitWalkTimeTrip;
+	 private int transitWalkTimeTrip;
 	 int numberOfWalkStagesTrip;
-	 int transitWaitTimeTrip;
+	 private int transitWaitTimeTrip;
 	
 	 int inVehTimeTrip;
-	 int inVehTimeTransit;
+	 private int inVehTimeTransit;
 	
-	 int transitJourneyTimeBetweenFirstBoardAndLastAlight;
+	 private int transitJourneyTimeBetweenFirstBoardAndLastAlight;
 	 int calculatedJourneyTime;
 	 int estimatedJourneyTime;
-	 int subjTimeError;
-	 Date transitStartTime;
-	 Date transitEndTime;
+	 private int subjTimeError;
+	 private Date transitStartTime;
+	 private Date transitEndTime;
 	 
 	 double busDistance;
 	 double trainDistance;
 	 double busTrainDistance;
 	private double freeSpeedCarJourneyDistance;
-	public double straightLineDistance;
+	private double straightLineDistance;
 	
-	 static public final String FORMATSTRING = "%s,%d,%d," +
+	 private static final String FORMATSTRING = "%s,%d,%d," +
 			"%s,%s,%s,%s," +
 			"%d,%d,%d,%d," +
 			"%d,%d," +
@@ -213,7 +213,7 @@ public class HITSTrip extends HITSElement implements Serializable{
 
 	public String toString(){
 		if(!transientsCalculated) calcTransients(); //ensures you don't run this unnecessarily
-		return String.format(this.FORMATSTRING, 
+		return String.format(FORMATSTRING,
 				h1_hhid, pax_id, trip_id 
 				
 				,mainmode

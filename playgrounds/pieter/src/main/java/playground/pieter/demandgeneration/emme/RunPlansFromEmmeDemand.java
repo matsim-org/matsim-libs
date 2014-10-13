@@ -8,12 +8,9 @@ import org.geotools.referencing.CRS;
 import playground.pieter.demandgeneration.utilities.EmmeStringBuilder;
 
 public class RunPlansFromEmmeDemand {
-	private static Logger log = Logger.getLogger(RunPlansFromEmmeDemand.class);
-	private static int studyArea;
-	private static String studyAreaName;
-	private static String root;
-	private static String date;
-	private static String proj;
+	private static final Logger log = Logger.getLogger(RunPlansFromEmmeDemand.class);
+    private static String studyAreaName;
+    private static String proj;
 
 	/**
 	 * Implementation of the <code>playground.pieter.demandgeneration.emme.PlansFromEmmeDemand</code>. 
@@ -26,9 +23,9 @@ public class RunPlansFromEmmeDemand {
 	 */
 	public static void main(String[] args) throws Exception {
 		if(args.length == 3){
-			studyArea = Integer.parseInt(args[0]);
-			root = args[1];
-			date = args[2];
+            int studyArea = Integer.parseInt(args[0]);
+            String root = args[1];
+            String date = args[2];
 			
 			String matrix;
 			String coords;

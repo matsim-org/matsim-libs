@@ -21,30 +21,22 @@
 package playground.pieter.singapore.utils.events.listeners;
 
 import java.io.BufferedWriter;
-import java.io.IOException;
-import java.sql.Connection;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.bcel.generic.NEW;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.events.*;
-import org.matsim.core.events.algorithms.EventWriter;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.utils.io.IOUtils;
 
 public class TravelTimeListener implements BasicEventHandler {
 	private BufferedWriter out = null;
 
-	private HashMap<String,Double> paxTravelTimes = new HashMap<String, Double>();
+	private final HashMap<String,Double> paxTravelTimes = new HashMap<>();
 	public HashMap<String, Double> getPaxTravelTimes() {
 		return paxTravelTimes;
 	}
-	private HashMap<String,Double> paxTempTravelTimes = new HashMap<String, Double>();
-	private HashMap<String,String> paxModes = new HashMap<String, String>();
+	private final HashMap<String,Double> paxTempTravelTimes = new HashMap<>();
+	private final HashMap<String,String> paxModes = new HashMap<>();
 	public HashMap<String, String> getPaxModes() {
 		return paxModes;
 	}

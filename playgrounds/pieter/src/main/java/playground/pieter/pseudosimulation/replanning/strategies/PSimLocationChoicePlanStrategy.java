@@ -13,7 +13,7 @@ import playground.singapore.transitLocationChoice.TransitLocationChoiceStrategy;
 
 public class PSimLocationChoicePlanStrategy implements PlanStrategy {
 
-	private TransitLocationChoiceStrategy delegate;
+	private final TransitLocationChoiceStrategy delegate;
 
 	// private static int locachoiceWrnCnt;
 

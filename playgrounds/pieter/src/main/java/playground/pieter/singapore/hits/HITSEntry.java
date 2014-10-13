@@ -2,7 +2,7 @@ package playground.pieter.singapore.hits;
 
 import java.util.Date;
 
-public class HITSEntry {
+class HITSEntry {
 /*	msno_main					 int
 	h1_hhid					 varchar
 	h1_pcode					 int

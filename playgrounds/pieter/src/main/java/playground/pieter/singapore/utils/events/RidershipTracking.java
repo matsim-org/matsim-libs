@@ -29,45 +29,32 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
-import org.matsim.api.core.v01.events.Wait2LinkEvent;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.transitSchedule.TransitRouteImpl;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
 import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;
-import playground.pieter.events.EventsMergeSort;
-import playground.pieter.singapore.utils.events.listeners.IncrementEventWriterXML;
 import playground.pieter.singapore.utils.postgresql.PostgresType;
 import playground.pieter.singapore.utils.postgresql.PostgresqlCSVWriter;
 import playground.pieter.singapore.utils.postgresql.PostgresqlColumnDefinition;
@@ -75,13 +62,13 @@ import playground.pieter.singapore.utils.postgresql.PostgresqlColumnDefinition;
 public class RidershipTracking {
 
 	class RidershipTracker {
-		FullDeparture fullDeparture;
-		Id driverId;
-		TransitRoute route;
+		final FullDeparture fullDeparture;
+		final Id driverId;
+		final TransitRoute route;
 
 		int ridership = 0;
 		int stopsVisited = 0;
-		Id fullDepartureId;
+		final Id fullDepartureId;
 		int lastRidership = 0;
 
 		public RidershipTracker(FullDeparture fullDeparture, Id driverId) {
@@ -116,11 +103,11 @@ public class RidershipTracking {
 	}
 
 	class FullDeparture {
-		Id fullDepartureId;
-		Id lineId;
-		Id routeId;
-		Id vehicleId;
-		Id departureId;
+		final Id fullDepartureId;
+		final Id lineId;
+		final Id routeId;
+		final Id vehicleId;
+		final Id departureId;
 
 		public FullDeparture(Id lineId, Id routeId, Id vehicleId, Id departureId) {
 			super();
@@ -128,15 +115,15 @@ public class RidershipTracking {
 			this.routeId = routeId;
 			this.vehicleId = vehicleId;
 			this.departureId = departureId;
-			fullDepartureId = new IdImpl(lineId.toString() + "_" + routeId.toString() + "_" + vehicleId.toString()
-					+ "_" + departureId.toString());
+			fullDepartureId = Id.create(lineId.toString() + "_" + routeId.toString() + "_" + vehicleId.toString()
+                    + "_" + departureId.toString(), Departure.class);
 		}
 	}
 
 	class RidershipHandler implements BasicEventHandler {
 		private final Set<String> filteredEvents;
 		{
-			filteredEvents = new HashSet<String>();
+			filteredEvents = new HashSet<>();
 			filteredEvents.add(TransitDriverStartsEvent.EVENT_TYPE);
 			filteredEvents.add(VehicleArrivesAtFacilityEvent.EVENT_TYPE);
 			filteredEvents.add(VehicleDepartsAtFacilityEvent.EVENT_TYPE);
@@ -169,9 +156,9 @@ public class RidershipTracking {
 							tracker.fullDeparture.vehicleId, 
 							tracker.fullDeparture.routeId,
 							tracker.fullDeparture.lineId, 
-							vehArr.getFacilityId(), 
-							new Integer(tracker.stopsVisited),
-							new Double(vehArr.getTime()), 
+							vehArr.getFacilityId(),
+                            tracker.stopsVisited,
+                            vehArr.getTime(),
 							tracker.ridership ,
 							tracker.getIncrement()};
 					ridershipWriter.addLine(args);
@@ -182,9 +169,9 @@ public class RidershipTracking {
 							tracker.fullDeparture.vehicleId, 
 							tracker.fullDeparture.routeId,
 							tracker.fullDeparture.lineId, 
-							vehDep.getFacilityId(), 
-							new Integer(tracker.stopsVisited),
-							new Double(vehDep.getTime()), 
+							vehDep.getFacilityId(),
+                            tracker.stopsVisited,
+                            vehDep.getTime(),
 							tracker.ridership,
 							tracker.getIncrement()};
 					ridershipWriter.addLine(args);
@@ -202,29 +189,28 @@ public class RidershipTracking {
 
 	}
 
-	private ScenarioImpl loRes;
+	private final ScenarioImpl loRes;
 
-	private File outpath;
-	private Map<String, RidershipTracker> vehicletrackers;
+    private final Map<String, RidershipTracker> vehicletrackers;
 
-	private String eventsFile;
+	private final String eventsFile;
 	private HashMap<Id, TransitRoute> departureIdToRoute;
 	private final double maxSpeed = 80 / 3.6;
 
 	private PostgresqlCSVWriter ridershipWriter;
 
-	public RidershipTracking(String loResNetwork, String loResSchedule, String loResEvents) {
+	private RidershipTracking(String loResNetwork, String loResSchedule, String loResEvents) {
 		loRes = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		loRes.getConfig().scenario().setUseTransit(true);
 		new MatsimNetworkReader(loRes).readFile(loResNetwork);
 		new TransitScheduleReader(loRes).readFile(loResSchedule);
-		outpath = new File(new File(loResEvents).getParent() + "/temp");
+        File outpath = new File(new File(loResEvents).getParent() + "/temp");
 		outpath.mkdir();
-		vehicletrackers = new HashMap<String, RidershipTracking.RidershipTracker>();
+		vehicletrackers = new HashMap<>();
 		this.eventsFile = loResEvents;
 	}
 
-	public void run() {
+	void run() {
 
 		identifyVehicleRoutes();
 		readEvents();
@@ -240,14 +226,14 @@ public class RidershipTracking {
 
 	}
 
-	public void initWriter(File connectionProperties, String schemaName, String suffix)
+	void initWriter(File connectionProperties, String schemaName, String suffix)
 			throws InstantiationException, IllegalAccessException, ClassNotFoundException, IOException, SQLException,
 			NoConnectionException {
 		DateFormat df = new SimpleDateFormat("yyyy_MM_dd");
 		String formattedDate = df.format(new Date());
 		// start with activities
 		String actTableName = "" + schemaName + ".matsim_ridership" + suffix;
-		List<PostgresqlColumnDefinition> columns = new ArrayList<PostgresqlColumnDefinition>();
+		List<PostgresqlColumnDefinition> columns = new ArrayList<>();
 		columns.add(new PostgresqlColumnDefinition("veh_id", PostgresType.TEXT));
 		columns.add(new PostgresqlColumnDefinition("route_id", PostgresType.TEXT));
 		columns.add(new PostgresqlColumnDefinition("line_id", PostgresType.TEXT));
@@ -263,7 +249,7 @@ public class RidershipTracking {
 	}
 
 	private void identifyVehicleRoutes() {
-		departureIdToRoute = new HashMap<Id, TransitRoute>();
+		departureIdToRoute = new HashMap<>();
 		Collection<TransitLine> lines = loRes.getTransitSchedule().getTransitLines().values();
 		for (TransitLine line : lines) {
 			Collection<TransitRoute> routes = line.getRoutes().values();

@@ -8,10 +8,10 @@ import org.matsim.core.utils.collections.Tuple;
 
 
 public class LocationSampler implements Serializable {
-	String activityName;
-	String[] facilityIds;
-	double[] facilityCaps;
-	double[] probabilities;
+	private final String activityName;
+	private final String[] facilityIds;
+	private final double[] facilityCaps;
+	private final double[] probabilities;
 
 	// double[] cumulativeProbs;
 	public LocationSampler(String activityName, String[] facilityIds,
@@ -29,11 +29,11 @@ public class LocationSampler implements Serializable {
 		double min = 100000000000000000000d;
 		// double cumTotal[] = new double[facilityCaps.length];
 		double total = 0d;
-		for (int i = 0; i < facilityCaps.length; i++) {
-			if (facilityCaps[i] < min && facilityCaps[i] > 0)
-				min = facilityCaps[i];
-			total += facilityCaps[i];
-		}
+        for (double facilityCap : facilityCaps) {
+            if (facilityCap < min && facilityCap > 0)
+                min = facilityCap;
+            total += facilityCap;
+        }
 //		min = 0.1*min;
 		for (int i = 0; i < facilityCaps.length; i++) {
 			if (facilityCaps[i] < min)
@@ -45,7 +45,7 @@ public class LocationSampler implements Serializable {
 	Tuple<String[], double[]> sampleLocations(int noLocations) {
 		// if there are too many requested, return the full list of faciltiies
 		if (noLocations >= this.facilityIds.length)
-			return new Tuple<String[], double[]>(facilityIds, facilityCaps);
+			return new Tuple<>(facilityIds, facilityCaps);
 
 		WeightedRandPerm wrp = new WeightedRandPerm(new Random(), facilityCaps);
 		wrp.reset(facilityCaps.length);
@@ -56,8 +56,7 @@ public class LocationSampler implements Serializable {
 			ids[i] = facilityIds[idx];
 			caps[i] = facilityCaps[idx];
 		}
-		Tuple<String[], double[]> t = new Tuple<String[], double[]>(ids, caps);
-		return t;
+		return new Tuple<>(ids, caps);
 
 	}
 
@@ -98,11 +97,10 @@ public class LocationSampler implements Serializable {
 //
 //	}
 
-	Tuple<String[], double[]> sampleLocationsNoWeight(int noLocations) {
+	Tuple<String[], double[]> sampleLocationsNoWeight(int numberOfLocations) {
 		// if there are too many requested, return the full list of faciltiies
-		if (noLocations >= this.facilityIds.length)
-			return new Tuple<String[], double[]>(facilityIds, facilityCaps);
-		int M = noLocations; // choose this many elements
+		if (numberOfLocations >= this.facilityIds.length)
+			return new Tuple<>(facilityIds, facilityCaps);
 		int N = this.facilityCaps.length; // from 0, 1, ..., N-1
 
 		// create permutation 0, 1, ..., N-1
@@ -111,7 +109,7 @@ public class LocationSampler implements Serializable {
 			perm[i] = i;
 
 		// create random sample in perm[0], perm[1], ..., perm[M-1]
-		for (int i = 0; i < M; i++) {
+		for (int i = 0; i < numberOfLocations; i++) {
 
 			// random integer between i and N-1
 			int r = i + (int) (Math.random() * (N - i));
@@ -123,15 +121,14 @@ public class LocationSampler implements Serializable {
 		}
 
 		// print results
-		String[] ids = new String[noLocations];
-		double[] caps = new double[noLocations];
-		for (int i = 0; i < M; i++) {
+		String[] ids = new String[numberOfLocations];
+		double[] caps = new double[numberOfLocations];
+		for (int i = 0; i < numberOfLocations; i++) {
 			ids[i] = facilityIds[perm[i]];
 			caps[i] = facilityCaps[perm[i]];
 		}
 
-		Tuple<String[], double[]> t = new Tuple<String[], double[]>(ids, caps);
-		return t;
+		return new Tuple<>(ids, caps);
 
 	}
 

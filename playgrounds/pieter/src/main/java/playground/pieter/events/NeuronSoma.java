@@ -23,8 +23,8 @@ import java.awt.*;
 
 
 class NeuronSoma extends Canvas {
-  double Weight [];
-  double Threshold;
+  private final double[] Weight ;
+  private double Threshold;
   
   NeuronSoma () {
     super ();

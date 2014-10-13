@@ -12,31 +12,31 @@ public class HITSHousehold extends HITSElement implements Serializable{
 	private static final long serialVersionUID = 1L;
 	// int msno_main;
 	String h1_hhid;
-	int h1_pcode;
+	private int h1_pcode;
 	String h2_dwell;
-	String h3_ethnic;
-	String h3a_other;
-	int h4_totpax;
+	private String h3_ethnic;
+	private String h3a_other;
+	private int h4_totpax;
 	// String h4b_u4yrs;
-	String h4c_eligible;
-	String h4d_nereason;
-	String h5_vehavail;
-	int xqty_carncom;
-	int xqty_carnind;
-	int xqty_carnrent;
-	int xqty_caropcom;
-	int xqty_caropind;
-	int xqty_caroprent;
-	int xqty_buscoach;
-	int xqty_hgv;
-	int xqty_lgvgoods;
-	int xqty_lgvpsgr;
-	int xqty_minibus;
-	int xqty_motocom;
-	int xqty_motoind;
-	int xqty_taxi;
+    private String h4c_eligible;
+	private String h4d_nereason;
+	private String h5_vehavail;
+	private int xqty_carncom;
+	private int xqty_carnind;
+	private int xqty_carnrent;
+	private int xqty_caropcom;
+	private int xqty_caropind;
+	private int xqty_caroprent;
+	private int xqty_buscoach;
+	private int xqty_hgv;
+	private int xqty_lgvgoods;
+	private int xqty_lgvpsgr;
+	private int xqty_minibus;
+	private int xqty_motocom;
+	private int xqty_motoind;
+	private int xqty_taxi;
 	// String h7_bike;
-	int h8_bikeqty;
+    private int h8_bikeqty;
 
 	private ArrayList<HITSPerson> persons;
 	private ArrayList<HITSTrip> trips;	
@@ -79,8 +79,8 @@ public class HITSHousehold extends HITSElement implements Serializable{
 		getStagesFromPersons();
 	}
 
-	public void setPersons(Connection conn, DateFormat dfm) {
-		ArrayList<HITSPerson> p = new ArrayList<HITSPerson>();
+	void setPersons(Connection conn, DateFormat dfm) {
+		ArrayList<HITSPerson> p = new ArrayList<>();
 		Statement ps;
 		String sqlQuery;
 		try {
@@ -147,14 +147,14 @@ public class HITSHousehold extends HITSElement implements Serializable{
 	}
 
 	private void getTripsFromPersons() {
-		this.trips = new ArrayList<HITSTrip>();
+		this.trips = new ArrayList<>();
 		for(HITSPerson person:this.persons){
 			this.trips.addAll(person.getTrips());
 		}
 		this.trips.trimToSize();
 	}
 	private void getStagesFromPersons() {
-		this.stages = new ArrayList<HITSStage>();
+		this.stages = new ArrayList<>();
 		for(HITSPerson person:this.persons){
 			this.stages.addAll(person.getStages());
 		}

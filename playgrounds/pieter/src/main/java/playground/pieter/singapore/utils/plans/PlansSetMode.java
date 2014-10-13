@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 
-public class PlansSetMode {
+class PlansSetMode {
 
 	public void run(Population plans) {
 		System.out.println("    running " + this.getClass().getName()
@@ -33,8 +33,8 @@ public class PlansSetMode {
 					}
 
 					if (carDriver)
-						leg.setMode("car");;
-				}
+						leg.setMode("car");
+                }
 			}
 
 		}

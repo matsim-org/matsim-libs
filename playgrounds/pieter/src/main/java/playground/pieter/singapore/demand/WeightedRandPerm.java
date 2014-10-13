@@ -78,8 +78,8 @@ public WeightedRandPerm( Random r, double[] weights ) {
 
 	this.r=r;
 	w = weights.clone();
-	wsum = weights.clone();;
-	this.weights = new double[w.length];
+	wsum = weights.clone();
+    this.weights = new double[w.length];
 	buffer = new int[w.length];
 	
 	for(int i=0; i<w.length; ++i)
@@ -165,7 +165,7 @@ public int next() {
 
 // -------------------------------------------------------------------
 
-public boolean hasNext() { return pointer > 0; }
+boolean hasNext() { return pointer > 0; }
 
 // -------------------------------------------------------------------
 

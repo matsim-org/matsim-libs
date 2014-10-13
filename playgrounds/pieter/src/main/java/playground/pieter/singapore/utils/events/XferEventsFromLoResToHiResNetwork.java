@@ -40,12 +40,12 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -62,30 +62,30 @@ import playground.pieter.singapore.utils.events.listeners.IncrementEventWriterXM
 
 public class XferEventsFromLoResToHiResNetwork{
 	class FullDeparture{
-		Id fullDepartureId;
-		Id lineId;
-		Id routeId;
-		Id vehicleId;
-		Id departureId;
+		final Id fullDepartureId;
+		final Id lineId;
+		final Id routeId;
+		final Id vehicleId;
+		final Id departureId;
 		public FullDeparture(Id lineId, Id routeId, Id vehicleId, Id departureId) {
 			super();
 			this.lineId = lineId;
 			this.routeId = routeId;
 			this.vehicleId = vehicleId;
 			this.departureId = departureId;
-			fullDepartureId = new IdImpl(lineId.toString()+"_"+routeId.toString()+"_"+vehicleId.toString()+"_"+departureId.toString());
+			fullDepartureId = Id.create(lineId.toString() + "_" + routeId.toString() + "_" + vehicleId.toString() + "_" + departureId.toString(), Departure.class);
 		}
 	}
 	class EventSplitter implements BasicEventHandler {
-		private IncrementEventWriterXML nonLinkEventWriter;
-		private EventWriterXML linkEventWriter;
+		private final IncrementEventWriterXML nonLinkEventWriter;
+		private final EventWriterXML linkEventWriter;
 
 		int eventCounter = 0;
-		EventsManager nonLinkEvents = EventsUtils.createEventsManager();
+		final EventsManager nonLinkEvents = EventsUtils.createEventsManager();
 		private final Set<String> filteredEvents;
-		private EventsManager linkEvents = EventsUtils.createEventsManager();
+		private final EventsManager linkEvents = EventsUtils.createEventsManager();
 		{
-			filteredEvents = new HashSet<String>();
+			filteredEvents = new HashSet<>();
 			filteredEvents.add(Wait2LinkEvent.EVENT_TYPE);
 			filteredEvents.add(LinkEnterEvent.EVENT_TYPE);
 			filteredEvents.add(LinkLeaveEvent.EVENT_TYPE);
@@ -118,7 +118,7 @@ public class XferEventsFromLoResToHiResNetwork{
 				if (eventList == null) {
 					// it's a transit driver starts event, so has a different
 					// attribute for vehid
-					eventList = new LinkedList<Event>();
+					eventList = new LinkedList<>();
 					vehicleLinkEvents.put(event.getAttributes().get("vehicleId"), eventList);
 				}
 				// arrive at facility events are merely there to punctuate the
@@ -144,7 +144,7 @@ public class XferEventsFromLoResToHiResNetwork{
 
 	}
 	
-	class VehicleLinkEventLoader implements BasicEventHandler {
+	private class VehicleLinkEventLoader implements BasicEventHandler {
 
 		@Override
 		public void reset(int iteration) {
@@ -158,7 +158,7 @@ public class XferEventsFromLoResToHiResNetwork{
 			if (eventList == null) {
 				// it's a transit driver starts event, so has a different
 				// attribute for vehid
-				eventList = new LinkedList<Event>();
+				eventList = new LinkedList<>();
 				vehicleLinkEvents.put(event.getAttributes().get("vehicleId"), eventList);
 			}
 			// arrive at facility events are merely there to punctuate the
@@ -171,20 +171,18 @@ public class XferEventsFromLoResToHiResNetwork{
 		}
 	}
 
-	private ScenarioImpl loRes;
-	private ScenarioImpl hiRes;
+	private final ScenarioImpl loRes;
+	private final ScenarioImpl hiRes;
 	
-	private File outpath;
-	private Map<String, LinkedList<Event>> vehicleLinkEvents;
+	private final File outpath;
+	private final Map<String, LinkedList<Event>> vehicleLinkEvents;
 	
-	private String loResEvents;
-	private HashMap<Id, TransitRoute> loResDepartureIdToRouteIds;
-	private HashMap<Id, TransitRoute> hiResDepartureIdToRouteIds;
-	private final double maxSpeed = 80 / 3.6;
-	private File linkEventPath;
+	private final String loResEvents;
+    private HashMap<Id, TransitRoute> hiResDepartureIdToRouteIds;
+    private File linkEventPath;
 
-	public XferEventsFromLoResToHiResNetwork(String loResNetwork, String hiResNetwork, String loResSchedule,
-			String hiResSchedule, String loResEvents) {
+	private XferEventsFromLoResToHiResNetwork(String loResNetwork, String hiResNetwork, String loResSchedule,
+                                              String hiResSchedule, String loResEvents) {
 		loRes = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		hiRes = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		loRes.getConfig().scenario().setUseTransit(true);
@@ -195,11 +193,11 @@ public class XferEventsFromLoResToHiResNetwork{
 		new TransitScheduleReader(hiRes).readFile(hiResSchedule);
 		outpath = new File(new File(loResEvents).getParent() + "/temp");
 		outpath.mkdir();
-		vehicleLinkEvents = new HashMap<String, LinkedList<Event>>();
+		vehicleLinkEvents = new HashMap<>();
 		this.loResEvents = loResEvents;
 	}
 
-	public void run(boolean deserialize) {
+	void run(boolean deserialize) {
 		if(!deserialize){
 			splitEvents();
 				
@@ -239,7 +237,7 @@ public class XferEventsFromLoResToHiResNetwork{
 	}
 
 	private void identifyVehicleRoutes() {
-		loResDepartureIdToRouteIds = new HashMap<Id, TransitRoute>();
+        HashMap<Id, TransitRoute> loResDepartureIdToRouteIds = new HashMap<>();
 		Collection<TransitLine> lines = loRes.getTransitSchedule().getTransitLines().values();
 		for (TransitLine line : lines) {
 			Collection<TransitRoute> routes = line.getRoutes().values();
@@ -250,7 +248,7 @@ public class XferEventsFromLoResToHiResNetwork{
 				}
 			}
 		}
-		hiResDepartureIdToRouteIds = new HashMap<Id, TransitRoute>();
+		hiResDepartureIdToRouteIds = new HashMap<>();
 		lines = hiRes.getTransitSchedule().getTransitLines().values();
 		for (TransitLine line : lines) {
 			Collection<TransitRoute> routes = line.getRoutes().values();
@@ -268,9 +266,9 @@ public class XferEventsFromLoResToHiResNetwork{
 		linkEventPath.mkdir();
 		for (String vehIdString : this.vehicleLinkEvents.keySet()) {
 			System.out.println("handling vehicle: "+vehIdString);
-			Id vehId = new IdImpl(vehIdString);
+			Id vehId = Id.create(vehIdString, TransitVehicle.class);
 			LinkedList<Event> loResEvents = vehicleLinkEvents.get(vehId.toString());
-			LinkedList<Event> hiResEvents = new LinkedList<Event>();
+			LinkedList<Event> hiResEvents = new LinkedList<>();
 			Map<Id<Link>, ? extends Link> links = hiRes.getNetwork().getLinks();
 			// the first event will always contain the departure info
 			TransitDriverStartsEvent tDSE = (TransitDriverStartsEvent) loResEvents.getFirst();
@@ -279,7 +277,7 @@ public class XferEventsFromLoResToHiResNetwork{
 			loResEvents.removeFirst();
 			Id departureId = new FullDeparture(tDSE.getTransitLineId(), tDSE.getTransitRouteId(), tDSE.getVehicleId(), tDSE.getDepartureId()).fullDepartureId;
 			TransitRouteImpl hiResRoute = (TransitRouteImpl) this.hiResDepartureIdToRouteIds.get(departureId);
-			LinkedList<TransitRouteStop> stops = new LinkedList<TransitRouteStop>();
+			LinkedList<TransitRouteStop> stops = new LinkedList<>();
 			stops.addAll(hiResRoute.getStops());
 			NetworkRoute route = hiResRoute.getRoute();
 			Iterator<TransitRouteStop> stopIterator = stops.iterator();
@@ -297,9 +295,10 @@ public class XferEventsFromLoResToHiResNetwork{
 
 				Id toLinkId = stopIterator.next().getStopFacility().getLinkId();
 				NetworkRoute subRoute = route.getSubRoute(fromLinkId, toLinkId);
-				LinkedList<Double> linkTravelTimes = new LinkedList<Double>();
+				LinkedList<Double> linkTravelTimes = new LinkedList<>();
 				double totalExpectedtravelTime = 0;
-				for (Id linkId : subRoute.getLinkIds()) {
+                double maxSpeed = 80 / 3.6;
+                for (Id linkId : subRoute.getLinkIds()) {
 					Link link = links.get(linkId);
 					linkTravelTimes.add(link.getLength() / Math.min(link.getFreespeed(), maxSpeed));
 					totalExpectedtravelTime += linkTravelTimes.getLast();

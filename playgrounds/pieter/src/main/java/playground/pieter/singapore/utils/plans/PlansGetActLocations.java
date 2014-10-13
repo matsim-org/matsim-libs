@@ -3,7 +3,6 @@ package playground.pieter.singapore.utils.plans;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -23,7 +22,7 @@ import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;
 
 public class PlansGetActLocations {
-	public void run(Population plans, DataBaseAdmin dba, String tableName) {
+	void run(Population plans, DataBaseAdmin dba, String tableName) {
 		System.out.println("    running " + this.getClass().getName()
 				+ " algorithm...");
 		int counter=0;
@@ -32,42 +31,37 @@ public class PlansGetActLocations {
 			dba.executeStatement("create table "
 					+ tableName
 					+ "(full_pop_pid varchar(45),facility_id varchar(45), activity varchar(45)) ");
-			Iterator<Id<Person>> pid_it = plans.getPersons().keySet().iterator();
-			while (pid_it.hasNext()) {
-				Id<Person> personId = pid_it.next();
-				PersonImpl person = (PersonImpl) plans.getPersons().get(
-						personId);
+            for (Id<Person> personId : plans.getPersons().keySet()) {
+                PersonImpl person = (PersonImpl) plans.getPersons().get(
+                        personId);
 
-				for (int i = person.getPlans().size() - 1; i >= 0; i--) {
-					Plan plan = person.getPlans().get(i);
-					for (int j = 0; j < plan.getPlanElements().size(); j += 2) {
-						ActivityImpl act = (ActivityImpl) plan
-								.getPlanElements().get(j);
-						if (!act.getType().equals("home") && !act.getType().equals("pt interaction")) {
-							dba.executeUpdate(String
-									.format("insert into %s values (\'%s\',\'%s\',\'%s\');",
-											tableName, personId.toString(),
-											act.getFacilityId(), act.getType()));
-						}
+                for (int i = person.getPlans().size() - 1; i >= 0; i--) {
+                    Plan plan = person.getPlans().get(i);
+                    for (int j = 0; j < plan.getPlanElements().size(); j += 2) {
+                        ActivityImpl act = (ActivityImpl) plan
+                                .getPlanElements().get(j);
+                        if (!act.getType().equals("home") && !act.getType().equals("pt interaction")) {
+                            dba.executeUpdate(String
+                                    .format("insert into %s values (\'%s\',\'%s\',\'%s\');",
+                                            tableName, personId.toString(),
+                                            act.getFacilityId(), act.getType()));
+                        }
 
-					}
+                    }
 
-				}
-				counter++;
-				if(counter%1000==0){
-					Logger.getLogger("PGA").info("Handled "+counter+" plans...");
-				}
+                }
+                counter++;
+                if (counter % 1000 == 0) {
+                    Logger.getLogger("PGA").info("Handled " + counter + " plans...");
+                }
 
-			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoConnectionException e) {
+            }
+		} catch (SQLException | NoConnectionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		System.out.println("    done.");
+        System.out.println("    done.");
 
 	}
 	public static void main(String[] args) throws InstantiationException, IllegalAccessException, ClassNotFoundException, IOException, SQLException{

@@ -18,8 +18,8 @@ import others.sergioo.util.dataBase.NoConnectionException;
 
 public class EventStripperHITSPlans {
 	private ArrayList<String> origIds;
-	private DataBaseAdmin dba;
-	private HITSData hitsData;
+	private final DataBaseAdmin dba;
+	private final HITSData hitsData;
 	private EventsManager events;
 	
 	public EventStripperHITSPlans(HITSData hitsData, DataBaseAdmin dba) throws SQLException{
@@ -28,7 +28,7 @@ public class EventStripperHITSPlans {
 		this.populateList();
 	}
 	
-	public EventStripperHITSPlans(DataBaseAdmin dba) throws SQLException{
+	private EventStripperHITSPlans(DataBaseAdmin dba) throws SQLException{
 		this.dba = dba;
 		this.hitsData = null;
 		this.populateList();
@@ -38,7 +38,7 @@ public class EventStripperHITSPlans {
 		ResultSet rs;
 		try {
 			rs = dba.executeQuery("select distinct pax_idx from hitsshort where t10_mode is not null;");
-			this.origIds = new ArrayList<String>();
+			this.origIds = new ArrayList<>();
 			while(rs.next()){
 				origIds.add(rs.getString(1));
 			}
@@ -49,7 +49,7 @@ public class EventStripperHITSPlans {
 		}
 	}
 	
-	public void stripEvents(String inFileName, String outfileName){
+	void stripEvents(String inFileName, String outfileName){
 		this.events = EventsUtils.createEventsManager();
 		TrimEventWriterHITS filteredWriter = new TrimEventWriterHITS(outfileName,this.origIds);
 		events.addHandler(filteredWriter);
@@ -76,23 +76,12 @@ public class EventStripperHITSPlans {
 			dba = new DataBaseAdmin(new File("data/hitsdb.properties"));
 			EventStripperHITSPlans es = new EventStripperHITSPlans(dba);
 			es.stripEvents("data/0.events.xml.gz", "data/0.events_stripped.xml.gz");
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (SQLException e) {
+		} catch (IOException | SQLException | ClassNotFoundException | IllegalAccessException | InstantiationException e) {
 			e.printStackTrace();
 		}
 
-		
-		
 
-		
-	}
+    }
 
 
 

@@ -23,18 +23,14 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkChangeEventsParser;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.TimeVariantLinkFactory;
-import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.MatsimFileTypeGuesser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.households.HouseholdsReaderV10;
@@ -58,7 +54,7 @@ import java.util.List;
  *
  * @author dgrether
  */
-public class SlaveScenarioLoaderImpl {
+class SlaveScenarioLoaderImpl {
 
 	private static final Logger log = Logger.getLogger(SlaveScenarioLoaderImpl.class);
 
@@ -106,7 +102,7 @@ public class SlaveScenarioLoaderImpl {
 	 *
 	 */
 	@Deprecated
-	public void loadNetwork() {
+    void loadNetwork() {
 		String networkFileName = null;
 		if ((this.config.network() != null) && (this.config.network().getInputFile() != null)) {
 			networkFileName = this.config.network().getInputFile();
@@ -135,7 +131,7 @@ public class SlaveScenarioLoaderImpl {
 	 *
 	 */
 	@Deprecated
-	public void loadActivityFacilities() {
+    void loadActivityFacilities() {
 		if ((this.config.facilities() != null) && (this.config.facilities().getInputFile() != null)) {
 			String facilitiesFileName = this.config.facilities().getInputFile();
 			log.info("loading facilities from " + facilitiesFileName);
@@ -161,7 +157,7 @@ public class SlaveScenarioLoaderImpl {
 	 *
 	 */
 	@Deprecated
-	public void loadPopulation(List<String> idStrings) {
+    void loadPopulation(List<String> idStrings) {
 		if ((this.config.plans() != null) && (this.config.plans().getInputFile() != null)) {
 			String populationFileName = this.config.plans().getInputFile();
 			log.info("loading population from " + populationFileName);

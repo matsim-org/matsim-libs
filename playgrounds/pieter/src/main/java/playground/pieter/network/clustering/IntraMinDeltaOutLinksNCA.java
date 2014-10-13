@@ -1,13 +1,7 @@
 package playground.pieter.network.clustering;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.Writer;
 import java.util.HashSet;
 import java.util.TreeMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -18,14 +12,14 @@ import org.matsim.core.utils.collections.Tuple;
 
 
 public class IntraMinDeltaOutLinksNCA extends NodeClusteringAlgorithm {
-	public static String ALGORITHMNAME = "IntraMinDeltaOutLinksNCA";
+	private static final String ALGORITHMNAME = "IntraMinDeltaOutLinksNCA";
 	public static int NUMTHREADS = 4;
 	private Tuple<Integer, Double> averageForThisClusterStep;
 
-	public IntraMinDeltaOutLinksNCA(Network network, String linkMethodName,
-			String[] argTypes, Object[] args) {
+	private IntraMinDeltaOutLinksNCA(Network network, String linkMethodName,
+                                     String[] argTypes, Object[] args) {
 		super(ALGORITHMNAME, network, linkMethodName, argTypes, args);
-		averageForThisClusterStep = new Tuple<Integer, Double>(
+		averageForThisClusterStep = new Tuple<>(
 				Integer.MIN_VALUE, Double.NaN);
 	}
 
@@ -39,13 +33,12 @@ public class IntraMinDeltaOutLinksNCA extends NodeClusteringAlgorithm {
 			sum += nc.getOutLinks().size();
 		}
 
-		averageForThisClusterStep = new Tuple<Integer, Double>(clusterSteps,
-				(double)sum / clusters.size());
-		return;
+		averageForThisClusterStep = new Tuple<>(clusterSteps,
+				sum / clusters.size());
 
-	}
+    }
 
-	public IntraMinDeltaOutLinksNCA(Network network) {
+	private IntraMinDeltaOutLinksNCA(Network network) {
 		super(ALGORITHMNAME, network);
 	}
 

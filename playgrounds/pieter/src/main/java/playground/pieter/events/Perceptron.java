@@ -21,29 +21,28 @@ package playground.pieter.events;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.geom.*;
 import java.awt.event.*;
 
-public class Perceptron extends JPanel implements ActionListener {
-  NeuronIn Input;
-  NeuronOut Output;
-  NeuronSoma Soma;
-  ControlPanel Controls;
-  double Weight [];
-  int X [];
-  double Threshold;
-  int X1 [];
-  int X2 [];
-  int Step;
-  int Epoch;
-  int Error;
-  double Delta [];
-  double Old [];
-  double Alpha;
-  int Out;
-  double Potential;
-  int Target;
-  int Errors;
+class Perceptron extends JPanel implements ActionListener {
+  private final NeuronIn Input;
+  private final NeuronOut Output;
+  private final NeuronSoma Soma;
+  private final ControlPanel Controls;
+  private final double[] Weight ;
+  private final int[] X ;
+  private double Threshold;
+  private final int[] X1 ;
+  private final int[] X2 ;
+  private int Step;
+  private int Epoch;
+  private int Error;
+  private final double[] Delta ;
+  private final double[] Old ;
+  private final double Alpha;
+  private int Out;
+  private double Potential;
+  private int Target;
+  private int Errors;
   
   public Perceptron () {
     int i;
@@ -184,11 +183,11 @@ public class Perceptron extends JPanel implements ActionListener {
 }
 
 class ControlPanel extends JPanel {
-  JButton Initialize;
-  JButton Step;
-  JButton Epoch;
-  JButton Learn;
-  LayoutManager Layout;
+  private final JButton Initialize;
+  private final JButton Step;
+  private final JButton Epoch;
+  private final JButton Learn;
+  private final LayoutManager Layout;
   
   ControlPanel () {
     Layout = new BoxLayout (this, BoxLayout.Y_AXIS);
@@ -212,41 +211,41 @@ class ControlPanel extends JPanel {
 }
 
 class NeuronIn extends JPanel {
-  int X[];
+  private final int[] X;
   double Weight[];
-  double Threshold;
-  JLabel StepTag;
-  JLabel StepValue;
-  JLabel EpochTag;
-  JLabel EpochValue;
-  JLabel ThresholdTag;
-  JLabel ThresholdValue;
-  JLabel TargetTag;
-  JLabel TargetValue;
-  JLabel ActualTag;
-  JLabel ActualValue;
-  JLabel ErrorTag;
-  JLabel ErrorValue;
-  JLabel ErrorsTag;
-  JLabel ErrorsValue;
-  JLabel InputTag[];
-  JLabel InputValue[];
-  JLabel PotentialTag;
-  JLabel PotentialValue;
-  JLabel WeightTag[];
-  JLabel WeightValue[];
-  JLabel OldWeightTag[];
-  JLabel OldWeightValue[];
-  JLabel DeltaTag[];
-  JLabel DeltaValue[];
-  LayoutManager Layout;
-  int Step;
-  int Epoch;
-  int Target;
-  int Actual;
-  int Error;
-  int Errors;
-  double Potential;
+  private double Threshold;
+  private final JLabel StepTag;
+  private final JLabel StepValue;
+  private final JLabel EpochTag;
+  private final JLabel EpochValue;
+  private final JLabel ThresholdTag;
+  private final JLabel ThresholdValue;
+  private final JLabel TargetTag;
+  private final JLabel TargetValue;
+  private final JLabel ActualTag;
+  private final JLabel ActualValue;
+  private final JLabel ErrorTag;
+  private final JLabel ErrorValue;
+  private final JLabel ErrorsTag;
+  private final JLabel ErrorsValue;
+  private final JLabel[] InputTag;
+  private final JLabel[] InputValue;
+  private final JLabel PotentialTag;
+  private final JLabel PotentialValue;
+  private final JLabel[] WeightTag;
+  private final JLabel[] WeightValue;
+  private final JLabel[] OldWeightTag;
+  private final JLabel[] OldWeightValue;
+  private final JLabel[] DeltaTag;
+  private final JLabel[] DeltaValue;
+  private final LayoutManager Layout;
+  private int Step;
+  private int Epoch;
+  private int Target;
+  private int Actual;
+  private int Error;
+  private int Errors;
+  private double Potential;
   
   public NeuronIn () {
     int Count = 2;
@@ -402,9 +401,9 @@ class NeuronIn extends JPanel {
 }
 
 class NeuronOut extends JPanel {
-  JLabel ThresholdTag;
-  JLabel ThresholdValue;
-  double Threshold;
+  private final JLabel ThresholdTag;
+  private final JLabel ThresholdValue;
+  private double Threshold;
   
   public NeuronOut () {
     ThresholdTag = new JLabel("Threshold");

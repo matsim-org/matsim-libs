@@ -19,8 +19,6 @@
 
 package playground.pieter.pseudosimulation.replanning.modules;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.router.PlanRouter;
@@ -28,7 +26,7 @@ import org.matsim.core.router.TripRouter;
 
 import playground.pieter.pseudosimulation.controler.listeners.MobSimSwitcher;
 
-public class PSimPlanRouter extends PlanRouter {
+class PSimPlanRouter extends PlanRouter {
 
 	public PSimPlanRouter(TripRouter routingHandler, ActivityFacilities facilities) {
 		super(routingHandler, facilities);

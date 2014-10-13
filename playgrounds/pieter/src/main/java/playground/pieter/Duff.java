@@ -58,7 +58,7 @@ public class Duff {
 				+ " WHERE last_alighting_stop = matsim_stop ";
 		dba.executeUpdate(update);
 
-		HashMap<String, String[]> idxNames = new HashMap<String, String[]>();
+		HashMap<String, String[]> idxNames = new HashMap<>();
 		String[] idx1 = { "person_id", "facility_id", "type" };
 		idxNames.put("u_sergioo.matsim_activities_realsched_m2plans", idx1);
 		String[] idx2 = { "person_id", "from_act", "to_act", "main_mode" };

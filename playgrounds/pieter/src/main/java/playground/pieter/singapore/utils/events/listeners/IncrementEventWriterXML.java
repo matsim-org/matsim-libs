@@ -39,7 +39,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 public class IncrementEventWriterXML implements EventWriter, BasicEventHandler {
 	private BufferedWriter out = null;
-	Map<String,Double>typeToIncrementMap = new HashMap<String, Double>();
+	private final Map<String,Double>typeToIncrementMap = new HashMap<>();
 	int eventCounter=0;
 	double eventIncrement = 1e-9;
 	public IncrementEventWriterXML(final String filename) {
@@ -82,7 +82,7 @@ public class IncrementEventWriterXML implements EventWriter, BasicEventHandler {
 			}
 	}
 
-	public void init(final String outfilename) {
+	void init(final String outfilename) {
 		closeFile();
 
 		try {
@@ -109,7 +109,7 @@ public class IncrementEventWriterXML implements EventWriter, BasicEventHandler {
 				if(typeToIncrementMap.keySet().contains(event.getEventType()) && entry.getKey().equals("time")){
 					double time = Double.parseDouble(encodeAttributeValue(entry.getValue()));
 					time += typeToIncrementMap.get(event.getEventType());
-					this.out.append(encodeAttributeValue(new Double(time).toString()));
+					this.out.append(encodeAttributeValue(Double.toString(time)));
 				}else{
 					
 					this.out.append(encodeAttributeValue(entry.getValue()));
@@ -155,7 +155,7 @@ public class IncrementEventWriterXML implements EventWriter, BasicEventHandler {
 			}
 		}
 		if (encode) {
-			StringBuffer bf = new StringBuffer();
+			StringBuilder bf = new StringBuilder();
 			for (int pos = 0; pos < len; pos++) {
 				char ch = attributeValue.charAt(pos);
 				if (ch == '<') {

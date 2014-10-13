@@ -84,7 +84,6 @@ public class Zone extends AbstractLocation {
 	 * </p>
 	 *
 	 * @param coord
-	 * @see playground.balmermi.world.AbstractLocation#calcDistance(org.matsim.api.core.v01.Coord)
 	 * @return distance to that zone
 	 */
 	public final double calcDistance(final Coord coord) {
@@ -143,23 +142,19 @@ public class Zone extends AbstractLocation {
 	public final boolean contains(final Coord coord) {
 		double x = coord.getX();
 		double y = coord.getY();
-		if ((this.min.getX() <= x) && (x <= this.max.getX()) && (this.min.getY() <= y) && (y <= this.max.getY())) {
-			// case 1
-			return true;
-		}
-		return false;
-	}
+        return (this.min.getX() <= x) && (x <= this.max.getX()) && (this.min.getY() <= y) && (y <= this.max.getY());
+    }
 
 	//////////////////////////////////////////////////////////////////////
 	// set methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final void setMin(final Coord min) {
+	final void setMin(final Coord min) {
 		if ((min != null) && (min.getX() <= this.center.getX()) && (min.getY() <= this.center.getY())) { this.min = min; }
 		else { this.min = this.center; }
 	}
 
-	public final void setMax(final Coord max) {
+	final void setMax(final Coord max) {
 		if ((max != null) && (max.getX() >= this.center.getX()) && (max.getY() >= this.center.getY())) { this.max = max; }
 		else { this.max = this.center; }
 	}

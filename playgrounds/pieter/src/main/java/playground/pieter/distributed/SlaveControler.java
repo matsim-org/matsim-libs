@@ -17,12 +17,9 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.MatsimFacilitiesReader;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -44,11 +41,10 @@ import java.util.*;
 //IMPORTANT: PSim produces events that are not in chronological order. This controler
 // will require serious overhaul if chronological order is enforced in all event manager implementations
 public class SlaveControler implements IterationStartsListener, BeforeMobsimListener {
-    private Scenario scenario;
     private Config config;
 
     class TimesReceiver implements Runnable {
-        Logger timesLogger = Logger.getLogger(this.getClass());
+        final Logger timesLogger = Logger.getLogger(this.getClass());
 
         @Override
         public void run() {
@@ -78,9 +74,7 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
                         System.out.println("Master terminated. Exiting.");
                         System.exit(0);
                     }
-                } catch (ClassNotFoundException | IOException e) {
-                    e.printStackTrace();
-                } catch (InterruptedException e) {
+                } catch (ClassNotFoundException | IOException | InterruptedException e) {
                     e.printStackTrace();
                 }
             }
@@ -88,8 +82,8 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
 
     }
 
-    Controler matsimControler;
-    Logger slaveLogger = Logger.getLogger(this.getClass());
+    private Controler matsimControler;
+    private final Logger slaveLogger = Logger.getLogger(this.getClass());
     private SerializableLinkTravelTimes linkTravelTimes;
     private WaitTime waitTimes;
     private StopStopTime stopStopTimes;
@@ -100,7 +94,7 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
     private boolean readyToSendPlans = false;
 
 
-    public SlaveControler(String[] args) throws UnknownHostException, IOException, ClassNotFoundException, ParseException {
+    private SlaveControler(String[] args) throws IOException, ClassNotFoundException, ParseException {
         Options options = new Options();
         options.addOption("c", true, "Config file location");
         options.addOption("h", true, "Host name or IP");
@@ -152,7 +146,7 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
 //      The following line will make the controler use the events manager that doesn't check for event order
         config.parallelEventHandling().setSynchronizeOnSimSteps(false);
         config.controler().setOutputDirectory(config.controler().getOutputDirectory() + "_" + myNumber);
-        scenario = ScenarioUtils.createScenario(config);
+        Scenario scenario = ScenarioUtils.createScenario(config);
         new SlaveScenarioLoaderImpl(scenario).loadScenario(idStrings);
         matsimControler = new Controler(scenario);
         matsimControler.setOverwriteFiles(true);
@@ -175,8 +169,8 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
             //this is a fix for location choice to work with pt, very obscure
             //in location choice, if the facility's link doesn't accommodate the mode you're using,
             //then it won't allow you to go there
-            for(Link link:scenario.getNetwork().getLinks().values()) {
-                Set<String> modes = new HashSet<String>(link.getAllowedModes());
+            for(Link link: scenario.getNetwork().getLinks().values()) {
+                Set<String> modes = new HashSet<>(link.getAllowedModes());
                 modes.add("pt");
                 link.setAllowedModes(modes);
             }
@@ -184,15 +178,15 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
             //this is some more magic hacking to get location choice by car to work,
             // figured out by that great genius, sergio "Mr. Java" ordonez.
             //sergio creates a car-only network, then associates each activity and facility with a car link.
-            Set<String> carMode = new HashSet<String>();
+            Set<String> carMode = new HashSet<>();
             carMode.add("car");
             NetworkImpl justCarNetwork = NetworkImpl.createNetwork();
             new TransportModeNetworkFilter(scenario.getNetwork()).filter(justCarNetwork, carMode);
-            for(Person person:scenario.getPopulation().getPersons().values())
+            for(Person person: scenario.getPopulation().getPersons().values())
                 for(PlanElement planElement:person.getSelectedPlan().getPlanElements())
                     if(planElement instanceof Activity)
                         ((ActivityImpl)planElement).setLinkId(justCarNetwork.getNearestLinkExactly(((ActivityImpl)planElement).getCoord()).getId());
-            for(ActivityFacility facility:scenario.getActivityFacilities().getFacilities().values())
+            for(ActivityFacility facility: scenario.getActivityFacilities().getFacilities().values())
                 ((ActivityFacilityImpl)facility).setLinkId(justCarNetwork.getNearestLinkExactly(facility.getCoord()).getId());
             //the singapore scenario uses intelligent transit routing that takes account of information of the previous iteration,
             //like the car router of standard matsim, where best response routing is ok for car, not transit... :)
@@ -215,7 +209,7 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
 
     }
 
-    public static void main(String[] args) throws UnknownHostException, IOException, ClassNotFoundException, ParseException {
+    public static void main(String[] args) throws IOException, ClassNotFoundException, ParseException {
         SlaveControler slave = new SlaveControler(args);
         slave.run();
     }
@@ -259,7 +253,7 @@ public class SlaveControler implements IterationStartsListener, BeforeMobsimList
         createPlansCopyForMaster();
     }
 
-    public void createPlansCopyForMaster() {
+    void createPlansCopyForMaster() {
         Map<String, PlanSerializable> tempPlansCopyForSending = new HashMap<>();
         for (Person person : matsimControler.getPopulation().getPersons().values())
             tempPlansCopyForSending.put(person.getId().toString(), new PlanSerializable(person.getSelectedPlan()));

@@ -20,7 +20,7 @@ import others.sergioo.util.dataBase.NoConnectionException;
  * @author fouriep
  * 
  */
-public class PlanExtractorFix {
+class PlanExtractorFix {
 
 	/**
 	 * @param assignedMode
@@ -38,14 +38,12 @@ public class PlanExtractorFix {
 		if (suggestedMode.equals("car") && assignedMode.equals("pt"))
 			return false;
 		// keep 50% of plans that were assigned mix of pt and car as passenger
-		if (assignedMode.equals("ptmix"))
-			return Math.random() > 0.5;
+        return assignedMode.equals("ptmix") && Math.random() > 0.5;
 
-		return false;
-	}
+    }
 
 	public void run(Population plans) {
-		HashMap<Integer, String> paxTravelLookup = new HashMap<Integer, String>();
+		HashMap<Integer, String> paxTravelLookup = new HashMap<>();
 		try {
 			DataBaseAdmin dba = new DataBaseAdmin(new File(
 					"data/matsim2.properties"));
@@ -100,25 +98,9 @@ public class PlanExtractorFix {
 			System.out.println("    done.");
 			System.out.println("Number of persons removed: " + pid_set.size() + " out of " + planCount);
 			System.out.println("of which were car plans:   " + carRemovalCount + " out of " + carCount);
-		} catch (InstantiationException e1) {
+		} catch (InstantiationException | NoConnectionException | SQLException | IOException | ClassNotFoundException | IllegalAccessException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
-		} catch (IllegalAccessException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (ClassNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			
-		} catch (NoConnectionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
-	}
+    }
 }

@@ -20,20 +20,20 @@ public class HashMatrix{
 	 * @param args
 	 */
 	private HashMap<Integer,HashMap<Integer, Integer>> intMatrix;
-	private HashMap<Integer,HashMap<Integer, Double>> dblMatrix;
-	private HashMap<Integer,HashMap<Integer, Double>> normalizedMatrix;
-	private HashMap<Integer,HashMap<Integer, Double>> cumulativeProbMatrix;
+	private final HashMap<Integer,HashMap<Integer, Double>> dblMatrix;
+	private final HashMap<Integer,HashMap<Integer, Double>> normalizedMatrix;
+	private final HashMap<Integer,HashMap<Integer, Double>> cumulativeProbMatrix;
 	private String headers[];
 	private Connection sqlConnection;
 	private String sqlTable, fromField, toField, valueField;
 	private Set<Integer> headerSet;
 
-	public HashMatrix(String sqlServer, String sqlUser, String sqlPassword, String sqlTable,
-			String fromField, String toField, String valueField) throws SQLException {
+	private HashMatrix(String sqlServer, String sqlUser, String sqlPassword, String sqlTable,
+                       String fromField, String toField, String valueField) throws SQLException {
 		super();
-		this.dblMatrix=new HashMap<Integer,HashMap<Integer, Double>>();
-		this.normalizedMatrix=new HashMap<Integer,HashMap<Integer, Double>>();
-		this.cumulativeProbMatrix=new HashMap<Integer,HashMap<Integer, Double>>();
+		this.dblMatrix=new HashMap<>();
+		this.normalizedMatrix=new HashMap<>();
+		this.cumulativeProbMatrix=new HashMap<>();
 		this.sqlTable = sqlTable;
 		this.fromField=fromField;
 		this.toField = toField;
@@ -48,27 +48,27 @@ public class HashMatrix{
 
 	public HashMatrix(String matrixFileWithHeaders) throws Exception {
 		super();
-		this.dblMatrix=new HashMap<Integer,HashMap<Integer, Double>>();
-		this.normalizedMatrix=new HashMap<Integer,HashMap<Integer, Double>>();
-		this.cumulativeProbMatrix=new HashMap<Integer,HashMap<Integer, Double>>();
+		this.dblMatrix=new HashMap<>();
+		this.normalizedMatrix=new HashMap<>();
+		this.cumulativeProbMatrix=new HashMap<>();
 		populateMatrix(matrixFileWithHeaders);
 		this.headerSet = this.dblMatrix.keySet();
 		normalizeMatrix();
 	}
 	public int getInt(int key1, int key2){
-		return this.intMatrix.get(key1).get(key2).intValue(); 
+		return this.intMatrix.get(key1).get(key2);
 	}
 
-	public double getEntry(int key1, int key2){
-		return this.dblMatrix.get(key1).get(key2).doubleValue(); 
+	double getEntry(int key1, int key2){
+		return this.dblMatrix.get(key1).get(key2);
 	}
 
-	public double getProb(int key1, int key2){
-		return this.normalizedMatrix.get(key1).get(key2).doubleValue();
+	double getProb(int key1, int key2){
+		return this.normalizedMatrix.get(key1).get(key2);
 	}
 
-	public double getCumProb(int key1, int key2){
-		return this.cumulativeProbMatrix.get(key1).get(key2).doubleValue();
+	double getCumProb(int key1, int key2){
+		return this.cumulativeProbMatrix.get(key1).get(key2);
 	}
 
 	public Set<Integer> getHeaderSet(){
@@ -86,36 +86,33 @@ public class HashMatrix{
 	public double getRowTotal(int key){
 		HashMap<Integer,Double> rowMap = this.dblMatrix.get(key);
 		double rowTotal = 0.0;
-		Iterator<Double> valueIt = rowMap.values().iterator();
-		while (valueIt.hasNext()){
-			rowTotal += valueIt.next().doubleValue();
-		}
+        for (Double aDouble : rowMap.values()) {
+            rowTotal += aDouble;
+        }
 
 		return rowTotal;
 
 	}
 
 	private void normalizeMatrix() {
-		Iterator<Integer> fromKeys = this.dblMatrix.keySet().iterator();
-		while(fromKeys.hasNext()){
-			Integer fromKey = fromKeys.next();
-			double rowTotal = getRowTotal(fromKey);
-			//now get the keys for each column in this row
-			Iterator<Entry<Integer,Double>> columns = this.dblMatrix.get(fromKey).entrySet().iterator();
-			double cumulProb = 0.0;
-			while(columns.hasNext()){
-				Entry<Integer,Double> columnAndValue = columns.next();
-				Integer toKey = columnAndValue.getKey();
-				double dblValue = columnAndValue.getValue().doubleValue();
-				double prob=0;
-				if(rowTotal>0){
-					prob = dblValue/rowTotal;
-				}
-				cumulProb += prob;
-				this.normalizedMatrix.get(fromKey).put(toKey, prob);
-				this.cumulativeProbMatrix.get(fromKey).put(toKey, cumulProb);
-			}
-		}
+        for (Integer fromKey : this.dblMatrix.keySet()) {
+            double rowTotal = getRowTotal(fromKey);
+            //now get the keys for each column in this row
+            Iterator<Entry<Integer, Double>> columns = this.dblMatrix.get(fromKey).entrySet().iterator();
+            double cumulProb = 0.0;
+            while (columns.hasNext()) {
+                Entry<Integer, Double> columnAndValue = columns.next();
+                Integer toKey = columnAndValue.getKey();
+                double dblValue = columnAndValue.getValue();
+                double prob = 0;
+                if (rowTotal > 0) {
+                    prob = dblValue / rowTotal;
+                }
+                cumulProb += prob;
+                this.normalizedMatrix.get(fromKey).put(toKey, prob);
+                this.cumulativeProbMatrix.get(fromKey).put(toKey, cumulProb);
+            }
+        }
 
 	}
 
@@ -138,7 +135,7 @@ public class HashMatrix{
 			}
 		}
 		catch (Exception sqlEx){
-			System.err.println(sqlEx);
+			sqlEx.printStackTrace();
 		}
 	}
 
@@ -150,7 +147,7 @@ public class HashMatrix{
 			//	              "pfourie","koos");
 			this.sqlConnection = DriverManager.getConnection(server, user, password);
 		}catch (Exception sqlEx){
-			System.err.println(sqlEx);
+			sqlEx.printStackTrace();
 		}
 	}
 
@@ -186,7 +183,7 @@ public class HashMatrix{
 			}
 		}
 		catch (Exception sqlEx){
-			System.err.println(sqlEx);
+			sqlEx.printStackTrace();
 		}	
 	}
 
@@ -254,7 +251,7 @@ public class HashMatrix{
 		Iterator<Integer> fromKeys = this.dblMatrix.keySet().iterator();
 		int keycount=0;
 		while(fromKeys.hasNext()){
-			keys[keycount++]=fromKeys.next().intValue();
+			keys[keycount++]= fromKeys.next();
 		}
 		Arrays.sort(keys);
 		//print top row
@@ -300,7 +297,7 @@ public class HashMatrix{
 		Iterator<Integer> fromKeys = this.dblMatrix.keySet().iterator();
 		int keycount=0;
 		while(fromKeys.hasNext()){
-			keys[keycount++]=fromKeys.next().intValue();
+			keys[keycount++]= fromKeys.next();
 		}
 		Arrays.sort(keys);
 		BufferedWriter output = IOUtils.getBufferedWriter(fileName);
@@ -349,7 +346,7 @@ public class HashMatrix{
 		Iterator<Integer> fromKeys = this.dblMatrix.keySet().iterator();
 		int keycount=0;
 		while(fromKeys.hasNext()){
-			keys[keycount++]=fromKeys.next().intValue();
+			keys[keycount++]= fromKeys.next();
 		}
 		Arrays.sort(keys);
 		BufferedWriter output = IOUtils.getBufferedWriter(fileName);

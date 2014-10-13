@@ -51,7 +51,7 @@ import java.util.Stack;
  * @author mrieser
  * @author balmermi
  */
-public class SlavePopulationReaderMatsimV5 extends MatsimXmlParser implements PopulationReader {
+class SlavePopulationReaderMatsimV5 extends MatsimXmlParser implements PopulationReader {
 
     private final static String POPULATION = "population";
     private final static String PERSON = "person";
@@ -110,20 +110,27 @@ public class SlavePopulationReaderMatsimV5 extends MatsimXmlParser implements Po
 
     @Override
     public void startTag(final String name, final Attributes atts, final Stack<String> context) {
-        if (POPULATION.equals(name)) {
-            startPopulation(atts);
-        } else if (PERSON.equals(name)) {
-            startPerson(atts);
-        } else if (PLAN.equals(name)) {
-            startPlan(atts);
-        } else if (ACT.equals(name)) {
-            startAct(atts);
-        } else if (LEG.equals(name)) {
-            startLeg(atts);
-        } else if (ROUTE.equals(name)) {
-            startRoute(atts);
-        } else {
-            throw new RuntimeException(this + "[tag=" + name + " not known or not supported]");
+        switch (name) {
+            case POPULATION:
+                startPopulation(atts);
+                break;
+            case PERSON:
+                startPerson(atts);
+                break;
+            case PLAN:
+                startPlan(atts);
+                break;
+            case ACT:
+                startAct(atts);
+                break;
+            case LEG:
+                startLeg(atts);
+                break;
+            case ROUTE:
+                startRoute(atts);
+                break;
+            default:
+                throw new RuntimeException(this + "[tag=" + name + " not known or not supported]");
         }
     }
 
@@ -131,19 +138,24 @@ public class SlavePopulationReaderMatsimV5 extends MatsimXmlParser implements Po
     public void endTag(final String name, final String content, final Stack<String> context) {
         if (currperson == null)
             return;
-        if (PERSON.equals(name)) {
-            this.plans.addPerson(this.currperson);
-            this.currperson = null;
-        } else if (PLAN.equals(name)) {
-            if (this.currplan.getPlanElements() instanceof ArrayList<?>) {
-                ((ArrayList<?>) this.currplan.getPlanElements()).trimToSize();
-            }
-            this.currplan = null;
-        } else if (ACT.equals(name)) {
-            this.prevAct = this.curract;
-            this.curract = null;
-        } else if (ROUTE.equals(name)) {
-            this.routeDescription = content;
+        switch (name) {
+            case PERSON:
+                this.plans.addPerson(this.currperson);
+                this.currperson = null;
+                break;
+            case PLAN:
+                if (this.currplan.getPlanElements() instanceof ArrayList<?>) {
+                    ((ArrayList<?>) this.currplan.getPlanElements()).trimToSize();
+                }
+                this.currplan = null;
+                break;
+            case ACT:
+                this.prevAct = this.curract;
+                this.curract = null;
+                break;
+            case ROUTE:
+                this.routeDescription = content;
+                break;
         }
     }
 
@@ -187,13 +199,16 @@ public class SlavePopulationReaderMatsimV5 extends MatsimXmlParser implements Po
             return;
         String sel = atts.getValue(ATTR_PLAN_SELECTED);
         boolean selected;
-        if (VALUE_YES.equals(sel)) {
-            selected = true;
-        } else if (VALUE_NO.equals(sel)) {
-            selected = false;
-        } else {
-            throw new IllegalArgumentException(
-                    "Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no'.");
+        switch (sel) {
+            case VALUE_YES:
+                selected = true;
+                break;
+            case VALUE_NO:
+                selected = false;
+                break;
+            default:
+                throw new IllegalArgumentException(
+                        "Attribute 'selected' of Element 'Plan' is neither 'yes' nor 'no'.");
         }
         this.routeDescription = null;
         this.currplan = this.currperson.createAndAddPlan(selected);

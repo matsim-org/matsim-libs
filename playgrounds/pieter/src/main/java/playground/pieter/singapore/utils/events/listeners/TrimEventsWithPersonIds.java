@@ -22,23 +22,17 @@ package playground.pieter.singapore.utils.events.listeners;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.sql.Connection;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.TreeSet;
 
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.core.events.*;
 import org.matsim.core.events.algorithms.EventWriter;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
 public class TrimEventsWithPersonIds implements EventWriter, BasicEventHandler {
 	private BufferedWriter out = null;
-	private HashSet<String> sampledIds;
+	private final HashSet<String> sampledIds;
 	private HashSet<String> transitVehicleIds;
 	private boolean listenForTransitDrivers = false;
 
@@ -74,10 +68,10 @@ public class TrimEventsWithPersonIds implements EventWriter, BasicEventHandler {
 		else if(sampledIds.contains(vehicleId) && driverId.startsWith("pt"))
 			copyEvent = true;
 		if (copyEvent) {
-			if (listenForTransitDrivers = true && attr.get("vehicle") != null
-					&& attr.get("vehicle").startsWith("tr_")) {
+			if (listenForTransitDrivers = attr.get("vehicle") != null
+                    && attr.get("vehicle").startsWith("tr_")) {
 				if (transitVehicleIds == null) {
-					transitVehicleIds = new HashSet<String>();
+					transitVehicleIds = new HashSet<>();
 				}
 				transitVehicleIds.add(attr.get("vehicle"));
 			}
@@ -104,7 +98,7 @@ public class TrimEventsWithPersonIds implements EventWriter, BasicEventHandler {
 		this.listenForTransitDrivers = listenForTransitDrivers;
 	}
 
-	public void init(final String outfilename) {
+	void init(final String outfilename) {
 
 		try {
 			this.out = IOUtils.getBufferedWriter(outfilename);

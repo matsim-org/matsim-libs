@@ -1,13 +1,7 @@
 package playground.pieter.network.clustering;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.Writer;
 import java.util.HashSet;
 import java.util.TreeMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -17,13 +11,13 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 
 public class IntraMaxNCA extends NodeClusteringAlgorithm {
-	public static String ALGORITHMNAME = "IntraMAX";
+	private static final String ALGORITHMNAME = "IntraMAX";
 	public static int NUMTHREADS=4;
-	public IntraMaxNCA(Network network, String linkMethodName,
-			String[] argTypes, Object[] args){
+	private IntraMaxNCA(Network network, String linkMethodName,
+                        String[] argTypes, Object[] args){
 		super(ALGORITHMNAME,network,linkMethodName,argTypes,args);
 	}
-	public IntraMaxNCA(Network network){
+	private IntraMaxNCA(Network network){
 		super(ALGORITHMNAME, network);
 	}
 	@Override

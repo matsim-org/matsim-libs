@@ -11,7 +11,7 @@ import org.matsim.core.controler.events.IterationStartsEvent;
  *         <P>
  *         Ideally, leg histograms should only be drawn during qsim iters
  */
-public class PSimLegHistogramListener extends LegHistogramListener {
+class PSimLegHistogramListener extends LegHistogramListener {
 
 	public PSimLegHistogramListener(EventsManager events, OutputDirectoryHierarchy controlerIO, boolean outputGraph) {
 		super(events, controlerIO, outputGraph);
@@ -23,8 +23,7 @@ public class PSimLegHistogramListener extends LegHistogramListener {
 		if (!MobSimSwitcher.isQSimIteration) {
 			super.notifyIterationStarts(event);
 		}else{
-			return;
-		}
+        }
 		
 	}
 
@@ -34,8 +33,7 @@ public class PSimLegHistogramListener extends LegHistogramListener {
 		if (!MobSimSwitcher.isQSimIteration) {
 			super.notifyIterationEnds(event);
 		}else{
-			return;
-		}
+        }
 	}
 
 }

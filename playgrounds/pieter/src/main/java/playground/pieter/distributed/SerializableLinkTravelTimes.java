@@ -6,17 +6,16 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
-public class SerializableLinkTravelTimes implements Serializable, TravelTime {
+class SerializableLinkTravelTimes implements Serializable, TravelTime {
 
-	private double[][] times;
-	Map<String, Integer> indices = new HashMap<>();
-	private int travelTimeBinSize;
+	private final double[][] times;
+	private final Map<String, Integer> indices = new HashMap<>();
+	private final int travelTimeBinSize;
 
 	public SerializableLinkTravelTimes(TravelTime linkTravelTimes,
 			int traveltimeBinSize, double endTime,

@@ -1,12 +1,11 @@
 package playground.pieter.distributed;
 
-import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 
 public class ControlerReference {
-	Controler delegate;
+	private final Controler delegate;
 
-	public ControlerReference(String config) {
+	private ControlerReference(String config) {
 		this.delegate = new Controler(config);
 		delegate.setOverwriteFiles(true);
 	}

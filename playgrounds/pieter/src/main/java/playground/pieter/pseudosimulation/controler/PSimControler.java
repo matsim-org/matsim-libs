@@ -7,11 +7,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
 import org.matsim.pt.router.TransitRouterFactory;
@@ -24,7 +22,6 @@ import playground.pieter.pseudosimulation.replanning.PSimPlanStrategyTranslation
 import playground.pieter.pseudosimulation.trafficinfo.PSimStopStopTimeCalculator;
 import playground.pieter.pseudosimulation.trafficinfo.PSimTravelTimeCalculator;
 import playground.pieter.pseudosimulation.trafficinfo.PSimWaitTimeCalculator;
-import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterWSImplFactory;
 import playground.sergioo.singapore2012.transitRouterVariable.stopStopTimes.*;
 import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.*;
 
@@ -40,21 +37,21 @@ import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.*;
  */
 public class PSimControler {
 	
-	private Controler matsimControler;
+	private final Controler matsimControler;
 	public Controler getMATSimControler() {
 		return matsimControler;
 	}
 
 
 
-	private LinkedHashSet<Plan> plansForPseudoSimulation = new LinkedHashSet<Plan>();
-	private LinkedHashSet<Id> agentsForPseudoSimulation = new LinkedHashSet<Id>();
-	private HashMap<Id,Double> nonSimulatedAgentSelectedPlanScores = new HashMap<Id, Double>();
+	private LinkedHashSet<Plan> plansForPseudoSimulation = new LinkedHashSet<>();
+	private LinkedHashSet<Id> agentsForPseudoSimulation = new LinkedHashSet<>();
+	private HashMap<Id,Double> nonSimulatedAgentSelectedPlanScores = new HashMap<>();
 	public static String AGENT_ATT = "PseudoSimAgent";
 	private WaitTimeStuckCalculator waitTimeCalculator;
 	private StopStopTimeCalculator stopStopTimeCalculator;
-	private PSimTravelTimeCalculator carTravelTimeCalculator;
-	private PSimPlanStrategyTranslationAndRegistration psimStrategies;
+	private final PSimTravelTimeCalculator carTravelTimeCalculator;
+	private final PSimPlanStrategyTranslationAndRegistration psimStrategies;
 
 
 
@@ -135,9 +132,9 @@ public class PSimControler {
 
 
 	public void clearPlansForPseudoSimulation(){
-		plansForPseudoSimulation = new LinkedHashSet<Plan>();
-		agentsForPseudoSimulation = new LinkedHashSet<Id>();
-		nonSimulatedAgentSelectedPlanScores = new HashMap<Id, Double>();
+		plansForPseudoSimulation = new LinkedHashSet<>();
+		agentsForPseudoSimulation = new LinkedHashSet<>();
+		nonSimulatedAgentSelectedPlanScores = new HashMap<>();
 	}
 
 

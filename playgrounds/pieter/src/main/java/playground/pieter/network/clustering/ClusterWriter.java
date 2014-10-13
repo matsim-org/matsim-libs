@@ -8,15 +8,15 @@ import java.util.HashSet;
 
 import org.matsim.core.utils.io.IOUtils;
 
-public class ClusterWriter {
+class ClusterWriter {
 	public void writeClusters(String fileName, NodeClusteringAlgorithm nca) {
 		BufferedWriter bw = IOUtils.getBufferedWriter(fileName);
 		StringBuilder sb = new StringBuilder(nca.clusterSteps);
-		ArrayList<String> clusterSequence = new ArrayList<String>();
+		ArrayList<String> clusterSequence = new ArrayList<>();
 		// read the clusters from the top down, to reverse the entire array at
 		// the end
-		HashSet<NodeCluster> outClusters = new HashSet<NodeCluster>();
-		ArrayList<NodeCluster> tempClusters = new ArrayList<NodeCluster>();
+		HashSet<NodeCluster> outClusters = new HashSet<>();
+		ArrayList<NodeCluster> tempClusters = new ArrayList<>();
 		tempClusters.addAll(nca.getRootClusters().values());
 		int currentLevel = 0;
 		// first, find the highest nodecluster in the set
@@ -25,20 +25,20 @@ public class ClusterWriter {
 				currentLevel = nc.getClusterStepFormed();
 		}
 		boolean done = false;
-		sb.append(nca.getAlgorithmName()+"\n");
-		sb.append(nca.internalFlowMethod.getName() +"\n");
-		sb.append(nca.internalFlowMethodParameterTypes +"\n");
-		sb.append(nca.internalFlowMethodParameters +"\n");
+		sb.append(nca.getAlgorithmName()).append("\n");
+		sb.append(nca.internalFlowMethod.getName()).append("\n");
+		sb.append(nca.internalFlowMethodParameterTypes).append("\n");
+		sb.append(nca.internalFlowMethodParameters).append("\n");
 		sb.append("STEP\tID1\tID2\tID_OUT\n");
 		int currentPoint = 0;
 		while (!done) {
 			if (currentLevel == 0) {
 				done = true;
 			} else {
-				ArrayList<NodeCluster> tempClusters2 = new ArrayList<NodeCluster>();
+				ArrayList<NodeCluster> tempClusters2 = new ArrayList<>();
 				outClusters.addAll(tempClusters);
 				tempClusters2.addAll(tempClusters);
-				tempClusters = new ArrayList<NodeCluster>();
+				tempClusters = new ArrayList<>();
 				for (NodeCluster nc : tempClusters2) {
 					if (nc.getClusterStepFormed() < currentLevel || nc.isLeaf())
 						tempClusters.add(nc);
@@ -51,7 +51,7 @@ public class ClusterWriter {
 		}
 		outClusters.addAll(tempClusters);
 		//hashset is not comparable
-		tempClusters = new ArrayList<NodeCluster>();
+		tempClusters = new ArrayList<>();
 		tempClusters.addAll(outClusters);
 		Collections.sort(tempClusters, new NodeCluster.StepFormedComparator());
 		for (NodeCluster nc : tempClusters) {

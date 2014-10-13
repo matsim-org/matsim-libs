@@ -5,7 +5,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 import playground.pieter.pseudosimulation.controler.PSimControler;
@@ -13,7 +12,7 @@ import playground.pieter.pseudosimulation.replanning.modules.PSimPlanMarkerModul
 
 public class PSimDoNothingPlanStrategyFactory implements PlanStrategyFactory {
 
-	private PSimControler controler;
+	private final PSimControler controler;
 
 	public PSimDoNothingPlanStrategyFactory(PSimControler controler) {
 		this.controler = controler;

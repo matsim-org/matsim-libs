@@ -39,8 +39,7 @@ public class NodeCluster {
 	private double deltaFlow;
 	private double inFlowSum;
 	private double outFlowSum = Double.NaN;
-	private HashSet<NodeCluster> outBoundClusters;
-	private LinkedHashMap<Id, ClusterLink> newInterlinks;
+    private LinkedHashMap<Id, ClusterLink> newInterlinks;
 	private static long invocations = 0;
 
 	//
@@ -64,9 +63,9 @@ public class NodeCluster {
 		isLeaf = true;
 		this.algo = nca;
 		leafNode = n;
-		inLinks = new LinkedHashMap<Id, ClusterLink>(n.getInLinks().size());
-		outLinks = new LinkedHashMap<Id, ClusterLink>(n.getOutLinks().size());
-		this.nodes = new LinkedHashMap<Id, ClusterNode>();
+		inLinks = new LinkedHashMap<>(n.getInLinks().size());
+		outLinks = new LinkedHashMap<>(n.getOutLinks().size());
+		this.nodes = new LinkedHashMap<>();
 		this.nodes.put(n.getId(), n);
 		for (Link l : n.getInLinks().values()) {
 			inLinks.put(l.getId(), algo.getLinks().get(l.getId()));
@@ -108,8 +107,8 @@ public class NodeCluster {
 		return getOutLinksTemp().size();
 		
 	}
-	public LinkedHashMap<Id,ClusterLink> getOutLinksTemp(){
-		LinkedHashMap<Id, ClusterLink> ols = new LinkedHashMap<Id, ClusterLink>();
+	LinkedHashMap<Id,ClusterLink> getOutLinksTemp(){
+		LinkedHashMap<Id, ClusterLink> ols = new LinkedHashMap<>();
 		if(this.isLeaf()){
 			return (LinkedHashMap<Id, ClusterLink>) this.getOutLinks();
 		}else{
@@ -128,12 +127,12 @@ public class NodeCluster {
 	}
 	public void freezeCluster() {
 
-		inLinks = new LinkedHashMap<Id, ClusterLink>();
-		outLinks = new LinkedHashMap<Id, ClusterLink>();
-		interLinks = new LinkedHashMap<Id, ClusterLink>();
+		inLinks = new LinkedHashMap<>();
+		outLinks = new LinkedHashMap<>();
+		interLinks = new LinkedHashMap<>();
 		NodeCluster nc1 = this.getChild1();
 		NodeCluster nc2 = this.getChild2();
-		nodes = new LinkedHashMap<Id, ClusterNode>(nc1.getNodes().size()
+		nodes = new LinkedHashMap<>(nc1.getNodes().size()
 				+ nc2.getNodes().size(), 1f);
 		// first add all in and out links, then subtract them using the set of
 		// interlinks
@@ -176,7 +175,7 @@ public class NodeCluster {
 	 */
 	private LinkedHashMap<Id, ClusterLink> findInterLInks(NodeCluster nc1,
 			NodeCluster nc2) {
-		LinkedHashMap<Id, ClusterLink> newInterlinks = new LinkedHashMap<Id, ClusterLink>();
+		LinkedHashMap<Id, ClusterLink> newInterlinks = new LinkedHashMap<>();
 		for (ClusterLink l : nc1.getInLinks().values()) {
 			if (nc2.getOutLinks().get(l.getId()) != null) {
 				// interLinks.put(l.getId(), l);
@@ -195,10 +194,9 @@ public class NodeCluster {
 	/**
 	 * Checks if any newly formed interlinks are in the outerlink or innerlink
 	 * collections
-	 * 
-	 * @param newInterlinks
-	 */
-	public void removeInterLinksFromOtherLinkMaps() {
+	 *
+     */
+    void removeInterLinksFromOtherLinkMaps() {
 		for (ClusterLink l : newInterlinks.values()) {
 			// if (newInterlinks.get(l.getId()) != null) {
 			inLinks.remove(l.getId());
@@ -214,16 +212,13 @@ public class NodeCluster {
 	 * the link method supplied. The sum should be castable to double.
 	 * <p>
 	 * This method is called after the cluster has been initialized, and is more
-	 * expensive than the {@link #getinternalFlow()} method, as it is recursive
+	 * expensive than the  method, as it is recursive
 	 * on all the clusters in clusters.
 	 * 
 	 * @param nc1
 	 *            the first NodeCluster
 	 * @param nc2
 	 *            the second NodeCluster
-	 * @param linkMethodAndParameters
-	 *            an array of strings, starting with the link method name, and
-	 *            its required parameters
 	 * @return the internal sum, cast to double
 	 * @throws InvocationTargetException
 	 * @throws IllegalArgumentException
@@ -236,14 +231,10 @@ public class NodeCluster {
 		for (Link l : this.interLinks.values()) {
 			try {
 				result += (Double) linkMethod.invoke(l, args);
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
+			} catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
 				e.printStackTrace();
 			}
-		}
+        }
 		return result;
 	}
 
@@ -258,9 +249,6 @@ public class NodeCluster {
 	 * @param nc2
 	 *            the second NodeCluster
 	 * @param newInterlinks
-	 * @param linkMethodAndParameters
-	 *            an array of strings, starting with the link method name, and
-	 *            its required parameters
 	 * @throws InvocationTargetException
 	 * @throws IllegalArgumentException
 	 * @throws IllegalAccessException
@@ -276,17 +264,11 @@ public class NodeCluster {
 		for (Link l : newInterlinks.values()) {
 			try {
 				result += (Double) linkMethod.invoke(l, args);
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
+			} catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}
+        }
 		// }
 		this.internalFlow = result;
 	}
@@ -296,17 +278,11 @@ public class NodeCluster {
 		for (ClusterLink l : this.getInLinks().values()) {
 			try {
 				result += (Double) linkMethod.invoke(l, args);
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
+			} catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}
+        }
 		this.inFlowSum = result;
 
 	}
@@ -316,17 +292,11 @@ public class NodeCluster {
 		for (ClusterLink l : this.getOutLinks().values()) {
 			try {
 				result += (Double) linkMethod.invoke(l, args);
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (InvocationTargetException e) {
+			} catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}
+        }
 		this.outFlowSum = result;
 
 	}
@@ -402,14 +372,14 @@ public class NodeCluster {
 	public HashSet<NodeCluster> getOutBoundClusters() {
 		// check first if this set has been calculated yet
 		// if(this.outBoundClusters == null){
-		this.outBoundClusters = new HashSet<NodeCluster>();
+        HashSet<NodeCluster> outBoundClusters = new HashSet<>();
 		for (ClusterLink l : this.outLinks.values()) {
 			// if(l.getToCluster()==null)
 			// continue;
 			outBoundClusters.add(l.getToCluster());
 		}
 		// }
-		return this.outBoundClusters;
+		return outBoundClusters;
 
 	}
 
@@ -427,17 +397,11 @@ public class NodeCluster {
 			for (ClusterLink l : this.getOutLinksTemp().values()) {
 				try {
 					result += (Double) linkMethod.invoke(l, args);
-				} catch (IllegalAccessException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IllegalArgumentException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (InvocationTargetException e) {
+				} catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-			}
+            }
 			return result;
 			
 		}
@@ -466,7 +430,7 @@ public class NodeCluster {
 
 		TreeMap<Integer, NodeCluster> childClusters = null;
 		if (!isLeaf) {
-			childClusters = new TreeMap<Integer, NodeCluster>();
+			childClusters = new TreeMap<>();
 			childClusters.put(child1.getId(), child1);
 			childClusters.put(child2.getId(), child2);
 
@@ -474,11 +438,11 @@ public class NodeCluster {
 		return childClusters;
 	}
 
-	public int getClusterStepParented() {
+	int getClusterStepParented() {
 		return clusterStepParented;
 	}
 
-	public void setClusterStepParented(int clusterStepParented) {
+	void setClusterStepParented(int clusterStepParented) {
 		this.clusterStepParented = clusterStepParented;
 	}
 

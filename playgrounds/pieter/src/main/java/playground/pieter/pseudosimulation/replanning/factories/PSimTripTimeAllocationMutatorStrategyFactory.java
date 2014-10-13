@@ -9,10 +9,10 @@ import org.matsim.core.replanning.modules.TimeAllocationMutatorPlanStrategyFacto
 import playground.pieter.pseudosimulation.controler.PSimControler;
 import playground.pieter.pseudosimulation.replanning.modules.PSimPlanMarkerModule;
 
-public class PSimTripTimeAllocationMutatorStrategyFactory extends
+class PSimTripTimeAllocationMutatorStrategyFactory extends
 		TimeAllocationMutatorPlanStrategyFactory {
 
-	private PSimControler controler;
+	private final PSimControler controler;
 
 	public PSimTripTimeAllocationMutatorStrategyFactory(
 			PSimControler controler) {

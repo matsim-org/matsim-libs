@@ -1,6 +1,5 @@
 package playground.pieter.events;
 
-import java.awt.BorderLayout;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -8,14 +7,10 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JButton;
 import javax.swing.JTextField;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
 
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
-import javax.swing.JCheckBox;
 
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
@@ -44,24 +39,17 @@ import java.util.Properties;
 
 public class EventsToTravelSummaryRelationalTablesGUI extends JFrame {
 
-	private JPanel contentPane;
-	private JTextField schemaNameComponent;
-	private JTextField transitScheduleFileComponent;
-	private JTextField postgresPropertiesComponent;
-	private JTextField tableSuffixComponent;
-	private JTextField configFileComponent;
-	private JTextField eventsToSQLPropertiesFileComponent;
-	private JTextField networkFileComponent;
-	private JTextField eventsFileComponent;
+    private final JTextField schemaNameComponent;
+	private final JTextField transitScheduleFileComponent;
+	private final JTextField postgresPropertiesComponent;
+	private final JTextField tableSuffixComponent;
+	private final JTextField configFileComponent;
+	private final JTextField eventsToSQLPropertiesFileComponent;
+	private final JTextField networkFileComponent;
+	private final JTextField eventsFileComponent;
 	private Properties defaultProperties;
-	private String transitScheduleFile = "examples/pt-tutorial/transitschedule.xml";
-	private String networkFile = "examples/pt-tutorial/multimodalnetwork.xml";
-	private String eventsFile = "output/pt-tutorial/ITERS/it.0/0.events.xml.gz";
-	private String configFile = "examples/pt-tutorial/0.config.xml";
-	private String tableSuffix = "_ezlinksim";
-	private String schemaName = "u_fouriep";
-	private String postgresProperties = "data/matsim2postgres.properties";
-	private EventsToTravelSummaryRelationalTablesGUI self = this;
+    private final String tableSuffix = "_ezlinksim";
+    private final EventsToTravelSummaryRelationalTablesGUI self = this;
 	private String defaultpath = "";
 
 	/**
@@ -85,11 +73,11 @@ public class EventsToTravelSummaryRelationalTablesGUI extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public EventsToTravelSummaryRelationalTablesGUI() {
+    private EventsToTravelSummaryRelationalTablesGUI() {
 		setTitle("Events to PostgreSQL tables");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 764, 300);
-		contentPane = new JPanel();
+        JPanel contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		GridBagLayout gbl_contentPane = new GridBagLayout();
@@ -130,7 +118,7 @@ public class EventsToTravelSummaryRelationalTablesGUI extends JFrame {
 		gbc_txtDataeventstosqlproperties.gridx = 1;
 		gbc_txtDataeventstosqlproperties.gridy = 0;
 		contentPane.add(eventsToSQLPropertiesFileComponent,
-				gbc_txtDataeventstosqlproperties);
+                gbc_txtDataeventstosqlproperties);
 		eventsToSQLPropertiesFileComponent.setColumns(10);
 
 		JLabel lblSchemaName = new JLabel(
@@ -245,7 +233,7 @@ public class EventsToTravelSummaryRelationalTablesGUI extends JFrame {
 		gbc_lblpropertiesForPostgresql.gridx = 0;
 		gbc_lblpropertiesForPostgresql.gridy = 5;
 		contentPane.add(lblpropertiesForPostgresql,
-				gbc_lblpropertiesForPostgresql);
+                gbc_lblpropertiesForPostgresql);
 
 		postgresPropertiesComponent = new JTextField();
 		postgresPropertiesComponent.addMouseListener(new MouseAdapter() {
@@ -352,7 +340,7 @@ public class EventsToTravelSummaryRelationalTablesGUI extends JFrame {
 		contentPane.add(btnStartEventsProcessing, gbc_btnStartEventsProcessing);
 	}
 
-	public void saveDefaultProperties() {
+	void saveDefaultProperties() {
 		this.defaultProperties = new Properties();
 
 		this.defaultProperties.setProperty("schemaName",
@@ -382,7 +370,7 @@ public class EventsToTravelSummaryRelationalTablesGUI extends JFrame {
 		}
 	}
 
-	public void runEventsProcessing() {
+	void runEventsProcessing() {
 		boolean isTransit = false;
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
 				.createScenario(ConfigUtils.loadConfig(configFileComponent
@@ -432,30 +420,15 @@ public class EventsToTravelSummaryRelationalTablesGUI extends JFrame {
 						eventsFileComponent.getText(), tableSuffixComponent
 								.getText());
 			}
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoConnectionException e) {
+		} catch (InstantiationException | NoConnectionException | SQLException | IOException | ClassNotFoundException | IllegalAccessException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println(test.getStuck());
+        System.out.println(test.getStuck());
 
 	}
 
-	public void loadDefaultProperties(File defaultPropertiesFile) {
+	void loadDefaultProperties(File defaultPropertiesFile) {
 		this.defaultProperties = new Properties();
 		try {
 			this.defaultProperties.load(new FileInputStream(
@@ -471,38 +444,33 @@ public class EventsToTravelSummaryRelationalTablesGUI extends JFrame {
 					Field aField = getClass().getDeclaredField(property);
 					aField.set(this, propertyValue);
 					setComponentValues();
-				} catch (NullPointerException e) {
-					e.printStackTrace();
-				} catch (IllegalArgumentException e) {
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					e.printStackTrace();
-				} catch (NoSuchFieldException e) {
-					e.printStackTrace();
-				} catch (SecurityException e) {
-
+				} catch (NullPointerException | SecurityException | NoSuchFieldException | IllegalAccessException | IllegalArgumentException e) {
 					e.printStackTrace();
 				}
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+            }
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
 	private void setComponentValues() {
-		schemaNameComponent.setText(schemaName);
-		transitScheduleFileComponent.setText(transitScheduleFile);
-		postgresPropertiesComponent.setText(postgresProperties);
+        String schemaName = "u_fouriep";
+        schemaNameComponent.setText(schemaName);
+        String transitScheduleFile = "examples/pt-tutorial/transitschedule.xml";
+        transitScheduleFileComponent.setText(transitScheduleFile);
+        String postgresProperties = "data/matsim2postgres.properties";
+        postgresPropertiesComponent.setText(postgresProperties);
 		tableSuffixComponent.setText(tableSuffix);
-		configFileComponent.setText(configFile);
-		networkFileComponent.setText(networkFile);
-		eventsFileComponent.setText(eventsFile);
+        String configFile = "examples/pt-tutorial/0.config.xml";
+        configFileComponent.setText(configFile);
+        String networkFile = "examples/pt-tutorial/multimodalnetwork.xml";
+        networkFileComponent.setText(networkFile);
+        String eventsFile = "output/pt-tutorial/ITERS/it.0/0.events.xml.gz";
+        eventsFileComponent.setText(eventsFile);
 		// linkTrafficComponent.setSelected(Boolean.parseBoolean(linkTraffic));
 	}
 
-	public File fileSelect(String path, String title) {
+	File fileSelect(String path, String title) {
 		boolean validPath = false;
 		File file = null;
 		try {

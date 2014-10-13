@@ -19,11 +19,11 @@ import others.sergioo.util.dataBase.NoConnectionException;
 
  public class PostgresqlCSVWriter  extends TableWriter {
 
-	private DataBaseAdmin dba;
+	private final DataBaseAdmin dba;
 	private CopyManager cpManager;
 
-	public PostgresqlCSVWriter(String tableName, DataBaseAdmin dba,
-			int batchSize, List<PostgresqlColumnDefinition> columns) {
+	private PostgresqlCSVWriter(String tableName, DataBaseAdmin dba,
+                                int batchSize, List<PostgresqlColumnDefinition> columns) {
 		super(tableName, batchSize, columns);
 		this.tableName = tableName;
 		this.dba = dba;
@@ -46,44 +46,36 @@ import others.sergioo.util.dataBase.NoConnectionException;
 			dba.executeStatement(String.format("ALTER TABLE %s RENAME TO %s;",
 					tableName,tableName.split("\\.")[1]+"_replaced_on_"+formattedDate));
 		} catch (SQLException e) {
-			System.err.println("Table "+tableName+" doesn't exist.");;
-		} catch (NoConnectionException e) {
+			System.err.println("Table "+tableName+" doesn't exist.");
+        } catch (NoConnectionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		try {
 			StringBuilder createString = new StringBuilder(String.format(
 					"CREATE TABLE %s(", tableName));
-			for (int i = 0; i < columns.size(); i++) {
-				PostgresqlColumnDefinition col = columns.get(i);
-				createString.append(col.name + " " + col.type + " "
-						+ col.extraParams + " ,");
-			}
+            for (PostgresqlColumnDefinition col : columns) {
+                createString.append(col.name).append(" ").append(col.type).append(" ").append(col.extraParams).append(" ,");
+            }
 			// drop the last comma
 			createString.deleteCharAt(createString.length() - 1);
 			createString.append(");");
 			dba.executeStatement(createString.toString());
 			cpManager = ((PGConnection) dba.getConnection()).getCopyAPI();
 			reader = new PushbackReader(new StringReader(""), pushBackSize*4);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoConnectionException e) {
+		} catch (SQLException | NoConnectionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
+    }
 	public void addComment(String comment){
 		try {
 			dba.executeStatement(String.format("COMMENT ON TABLE %s IS \'%s\';", tableName,comment));
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoConnectionException e) {
+		} catch (SQLException | NoConnectionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
+    }
 
 	public void addLine(Object[] args) {
 		lineCounter++;
@@ -93,14 +85,14 @@ import others.sergioo.util.dataBase.NoConnectionException;
 						"not the same number of parameters sent as there are columns in the table");
 			}
 			String sqlInserter = "";
-			for (int i = 0; i < args.length; i++) {
-				// if(columns.get(i).type != PostgresType.TEXT){
-				// sqlInserter += args[i].toString()+",";
-				// }else{
-				// sqlInserter += "\'"+args[i].toString()+"\',";
-				// }
-				sqlInserter += (args[i]==null?"NULL":args[i].toString()) + ",";
-			}
+            for (Object arg : args) {
+                // if(columns.get(i).type != PostgresType.TEXT){
+                // sqlInserter += args[i].toString()+",";
+                // }else{
+                // sqlInserter += "\'"+args[i].toString()+"\',";
+                // }
+                sqlInserter += (arg == null ? "NULL" : arg.toString()) + ",";
+            }
 			// trim the last comma, add a newline
 			sb.append(sqlInserter);
 			sb.deleteCharAt(sb.length() - 1);
@@ -117,14 +109,11 @@ import others.sergioo.util.dataBase.NoConnectionException;
 				modfactor = lineCounter;
 			}
 
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
+		} catch (SQLException | IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
+    }
 
 	public void finish() {
 		// write out the rest
@@ -132,14 +121,11 @@ import others.sergioo.util.dataBase.NoConnectionException;
 			reader.unread(sb.toString().toCharArray());
 			cpManager.copyIn("COPY " + tableName + " FROM STDIN WITH CSV",
 					reader);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SQLException e) {
+		} catch (IOException | SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		sb.delete(0, sb.length());
+        sb.delete(0, sb.length());
 		System.out.println(writerName + ": Processed line no " + lineCounter);
 	}
 

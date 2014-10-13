@@ -24,7 +24,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.selectors.PathSizeLogitSelector;
 
 import playground.pieter.pseudosimulation.replanning.selectors.PSimPathSizeLogitSelector;
 
@@ -33,8 +32,7 @@ public class PSimSelectPathSizeLogitStrategyFactory implements
 
 	@Override
 	public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
-		PlanStrategy strategy = new PlanStrategyImpl(new PSimPathSizeLogitSelector(scenario.getConfig().planCalcScore(), scenario.getNetwork()));
-		return strategy;
+		return new PlanStrategyImpl(new PSimPathSizeLogitSelector(scenario.getConfig().planCalcScore(), scenario.getNetwork()));
 	}
 
 }

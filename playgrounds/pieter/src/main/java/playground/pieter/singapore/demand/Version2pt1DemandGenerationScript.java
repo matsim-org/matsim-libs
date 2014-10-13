@@ -2,7 +2,6 @@ package playground.pieter.singapore.demand;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -22,7 +21,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
@@ -46,15 +45,15 @@ public class Version2pt1DemandGenerationScript {
 			.parseTime("01:00:00");
 	private static final double DEFAULT_LEISURE_HOME_DEPARTTIME = Time
 			.parseTime("09:00:00");
-	InputDataCollection inputData;
-	ScenarioImpl scenario;
-	DataBaseAdmin dba;
-	Properties diverseScriptProperties;
-	Logger scriptLog;
+	private InputDataCollection inputData;
+	private ScenarioImpl scenario;
+	private DataBaseAdmin dba;
+	private Properties diverseScriptProperties;
+	private Logger scriptLog;
 
-	public Version2pt1DemandGenerationScript(String dbaProperties,
-			String otherProperties, boolean deserialize,
-			boolean facilitiesAllInOneXML) throws InstantiationException,
+	private Version2pt1DemandGenerationScript(String dbaProperties,
+                                              String otherProperties, boolean deserialize,
+                                              boolean facilitiesAllInOneXML) throws InstantiationException,
 			IllegalAccessException, ClassNotFoundException, IOException,
 			SQLException {
 		this.dba = new DataBaseAdmin(new File(dbaProperties));
@@ -99,19 +98,13 @@ public class Version2pt1DemandGenerationScript {
 			ObjectInputStream ois = new ObjectInputStream(fis);
 			this.inputData = (InputDataCollection) ois.readObject();
 			ois.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
+		} catch (ClassNotFoundException | IOException e) {
 			e.printStackTrace();
 		}
-	}
+    }
 
-	/**
-	 * @param args
-	 */
-	public void run() {
+
+	void run() {
 
 		assignPrimaryActLocation();
 		createPlans();
@@ -134,9 +127,9 @@ public class Version2pt1DemandGenerationScript {
 			if (pax.modeSuggestion.equals("notravel"))
 				continue;
 			PersonImpl person = (PersonImpl) popFactory
-					.createPerson(new IdImpl((long) pax.paxId));
+					.createPerson(Id.createPersonId((long) pax.paxId));
 			person.setAge(pax.age);
-			person.setEmployed(pax.occup.equals("XXX") ? false : true);
+			person.setEmployed(!pax.occup.equals("XXX"));
 			// the ptmix plans allowed through should have car assigned too if
 			// they have a license and have a car available
 			person.setCarAvail(pax.modeSuggestion.equals("car")
@@ -169,7 +162,7 @@ public class Version2pt1DemandGenerationScript {
 				if (actType.equals("h")) {
 					act = (ActivityImpl) popFactory.createActivityFromCoord(
 							"home", null);
-					act.setFacilityId(new IdImpl(pax.household.homeFacilityId));
+					act.setFacilityId(Id.create(pax.household.homeFacilityId, ActivityFacility.class));
 					if (lastAct == null) {
 						act.setEndTime(dayStartTime);
 					} else if (actNumber < chainLength) {
@@ -182,7 +175,7 @@ public class Version2pt1DemandGenerationScript {
 				if (actType.equals("w")) {
 					act = (ActivityImpl) popFactory.createActivityFromCoord(
 							pax.mainActType, null);
-					act.setFacilityId(new IdImpl(pax.mainActFacility));
+					act.setFacilityId(Id.create(pax.mainActFacility, ActivityFacility.class));
 					if (pax.chainType.equals("workOnly")
 							|| pax.chainType.equals("actAfterWork")) {
 						act.setEndTime(pax.mainActStart + pax.mainActDur);
@@ -197,7 +190,7 @@ public class Version2pt1DemandGenerationScript {
 						act = (ActivityImpl) popFactory
 								.createActivityFromCoord("s_tertiary", null);
 						String destinationFacilityId = assignSchoolActivity(pax);
-						act.setFacilityId(new IdImpl(destinationFacilityId));
+						act.setFacilityId(Id.create(destinationFacilityId, ActivityFacility.class));
 						// default duration of 4 hours' school
 						act.setEndTime(getEndTime(lastActEndTime, dayEndTime,
 								Time.parseTime("02:00:00"), chainLength,
@@ -205,7 +198,7 @@ public class Version2pt1DemandGenerationScript {
 					} else {
 						act = (ActivityImpl) popFactory
 								.createActivityFromCoord(pax.mainActType, null);
-						act.setFacilityId(new IdImpl(pax.mainActFacility));
+						act.setFacilityId(Id.create(pax.mainActFacility, ActivityFacility.class));
 						// default duration of 4 hours' school
 						act.setEndTime(getEndTime(lastActEndTime, dayEndTime,
 								(pax.mainActStart + pax.mainActDur), chainLength,
@@ -219,7 +212,7 @@ public class Version2pt1DemandGenerationScript {
 							actType, null);
 					String destinationFacilityId = assignSecondaryActivityLocation(
 							actType, pax, lastAct.getFacilityId());
-					act.setFacilityId(new IdImpl(destinationFacilityId));
+					act.setFacilityId(Id.create(destinationFacilityId, ActivityFacility.class));
 					if (pax.chainType.equals("secOnly")) {
 						act.setEndTime(getSecondarActsEndTime(lastActEndTime,
 								dayEndTime, chainLength, actNumber));
@@ -259,7 +252,7 @@ public class Version2pt1DemandGenerationScript {
 	}
 
 	private Coord getFacilityCoordById(String mainActFacility) {
-		return scenario.getActivityFacilities().getFacilities().get(new IdImpl(mainActFacility)).getCoord();
+		return scenario.getActivityFacilities().getFacilities().get(Id.create(mainActFacility, ActivityFacility.class)).getCoord();
 	}
 
 	private double getDayEndTime(PaxSG pax, int chainLength) {
@@ -400,8 +393,6 @@ public class Version2pt1DemandGenerationScript {
 			oos.writeObject(this.inputData);
 			oos.flush();
 			oos.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -449,8 +440,7 @@ public class Version2pt1DemandGenerationScript {
 						// work subdgp
 						LocationSampler workFacilitySampler = inputData.subDGPActivityLocationSamplers
 								.get(workSubDGP).get(actType);
-						String workFacilityId = workFacilitySampler.sampleLocations(1).getFirst()[0];
-						p.mainActFacility = workFacilityId;
+                        p.mainActFacility  = workFacilitySampler.sampleLocations(1).getFirst()[0];
 						assigned = true;
 					} catch (NullPointerException ne) {
 						// something went wrong, either the home or the work was
@@ -574,22 +564,19 @@ public class Version2pt1DemandGenerationScript {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-		} catch (SQLException e1) {
-			e1.printStackTrace();
-		} catch (NoConnectionException e1) {
+		} catch (SQLException | NoConnectionException e1) {
 			e1.printStackTrace();
 		}
-	}
+    }
 
 	private double interFacilityDistance(String originFacilityId,
 			String destinationFacilityId) {
 		ActivityFacilityImpl origin = (ActivityFacilityImpl) this.scenario
 				.getActivityFacilities().getFacilities().get(
-						new IdImpl(originFacilityId));
+						Id.create(originFacilityId, ActivityFacility.class));
 		BasicLocation destination = this.scenario.getActivityFacilities()
-				.getFacilities().get(new IdImpl(destinationFacilityId));
-		double distance = origin.calcDistance(destination.getCoord());
-		return distance;
+				.getFacilities().get(Id.create(destinationFacilityId, ActivityFacility.class));
+		return origin.calcDistance(destination.getCoord());
 	}
 	private double getGravityFactor(PaxSG p,
 			String originFacilityId, String destinationFacilityId,
@@ -727,12 +714,10 @@ public class Version2pt1DemandGenerationScript {
 					this.diverseScriptProperties, this.scenario,
 					facilitiesAllInOneXML);
 			System.out.println("Input data loaded.");
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (NoConnectionException e) {
+		} catch (SQLException | NoConnectionException e) {
 			e.printStackTrace();
 		}
-	}
+    }
 
 	public static void main(String[] args) throws InstantiationException,
 			IllegalAccessException, ClassNotFoundException, IOException,

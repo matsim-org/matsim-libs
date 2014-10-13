@@ -3,12 +3,8 @@ package playground.pieter.pseudosimulation.replanning.factories;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.modules.ReRoute;
-import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.replanning.modules.SubtourModeChoiceStrategyFactory;
-import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 import playground.pieter.pseudosimulation.controler.PSimControler;
 import playground.pieter.pseudosimulation.replanning.modules.PSimPlanMarkerModule;
@@ -16,7 +12,7 @@ import playground.pieter.pseudosimulation.replanning.modules.PSimPlanMarkerModul
 public class PSimSubtourModeChoiceStrategyFactory extends
 SubtourModeChoiceStrategyFactory {
 
-	private PSimControler controler;
+	private final PSimControler controler;
 
 	public PSimSubtourModeChoiceStrategyFactory(PSimControler controler) {
 		super();

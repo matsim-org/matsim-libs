@@ -56,16 +56,14 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class PlansFromEmmeDemand {
+class PlansFromEmmeDemand {
 
 	/**
 	 * @param args
 	 */
 	private final Logger log = Logger.getLogger(PlansFromEmmeDemand.class);
-	private final int PERSON_SCALER = 10;
-	private final CoordinateReferenceSystem outputCRS; 
-	private final String matrixFileName;
-	private final String zoneCoordsFileName;
+    private final CoordinateReferenceSystem outputCRS;
+    private final String zoneCoordsFileName;
 	private final String departureTime;
 	private HashMatrix demand;
 	private String outputPath;
@@ -85,7 +83,6 @@ public class PlansFromEmmeDemand {
 			String departureTime, String outPath, CoordinateReferenceSystem CRS) throws Exception{
 		
 		this.outputCRS = CRS;
-		this.matrixFileName = matrixFileName;
 		this.zoneCoordsFileName = zoneCoordsFileName;
 		this.departureTime = departureTime;
 		this.demand = new HashMatrix(matrixFileName);
@@ -103,7 +100,7 @@ public class PlansFromEmmeDemand {
 		ShapeFileWriter.writeGeometries(this.workLocationCollection, (this.outputPath + "workLocations.shp"));
 	}
 	
-	public void createPlansXML() throws FileNotFoundException, IOException {
+	public void createPlansXML() throws IOException {
 		BufferedWriter output = IOUtils.getBufferedWriter((this.outputPath+"plans.xml.gz"));
 		output.write("<?xml version=\"1.0\" ?>\n");
 		output.write("<!DOCTYPE plans SYSTEM \"http://www.matsim.org/files/dtd/plans_v4.dtd\">\n");
@@ -135,7 +132,7 @@ public class PlansFromEmmeDemand {
 	///////////////////////////////////////
 
 
-	public Map<String, ZoneXY> getZoneXYs() {
+	Map<String, ZoneXY> getZoneXYs() {
 		return this.zoneXYs;
 	}
 
@@ -156,13 +153,10 @@ public class PlansFromEmmeDemand {
 	}
 
 
-	public void readZones(){
+	void readZones(){
 		World w = new World();
-
-		ZoneLayer zl =  (ZoneLayer) w.createLayer(Id.create("zones",ZoneLayer.class));
-//		ZoneLayer layer = new ZoneLayer(new IdImpl("zones"), "emme");
-		this.zones = zl;
-		this.zoneXYs = new HashMap<String, ZoneXY>();
+		this.zones = (ZoneLayer) w.createLayer(Id.create("zones",ZoneLayer.class));
+		this.zoneXYs = new HashMap<>();
 		BufferedReader zoneReader;
 		try {
 			zoneReader = IOUtils.getBufferedReader(this.zoneCoordsFileName);
@@ -176,8 +170,6 @@ public class PlansFromEmmeDemand {
 				}
 			} while (zoneLine != null);
 			zoneReader.close();
-		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
@@ -194,47 +186,44 @@ public class PlansFromEmmeDemand {
 	private Point getRandomizedCoordInZone(Id zoneId) {
 		Coord zoneCoord = WorldUtils.getRandomCoordInZone(
 				(Zone) this.zones.getLocation(zoneId), this.zones);
-		Point p = this.geofac.createPoint(new Coordinate(zoneCoord.getX(),zoneCoord.getY()));	
-		return p;
+		return this.geofac.createPoint(new Coordinate(zoneCoord.getX(),zoneCoord.getY()));
 	}
 
 	private void createHomeLocations() throws Exception {
 		log.info("Creating home locations:");
-		this.homeLocationCollection = new ArrayList<SimpleFeature>();
+		this.homeLocationCollection = new ArrayList<>();
 		
 		/*
 		 * Get the HashMatrix's set of headers, generate the row total number of people.
 		 */
 		int persId = 0;
 		int personMultiplier = 1;
-		Iterator<Integer> zones = this.demand.getHeaderSet().iterator();
-		while (zones.hasNext()) {
-			/*
+        for (Integer zoneNumber : this.demand.getHeaderSet()) {
+            /*
 			 * Read the SP_CODE as string, same as HashMap keys.
 			 */
-			int zoneNumber = zones.next();
-			
-			long numberOfPeopleInZone = Math.round(this.demand.getRowTotal(zoneNumber))/this.PERSON_SCALER;
-			for (long i = 0; i < numberOfPeopleInZone; i++) {
-				Point point = getRandomizedCoordInZone(Id.create(zoneNumber,Point.class));
-				Object [] fta = {persId++,zoneNumber, 9999,
-						point.getCoordinate().x, point.getCoordinate().y,0,0};
-				SimpleFeature ft = this.factory.createPoint(point.getCoordinate(), fta, null);
-				this.homeLocationCollection.add(ft);
-				// Report progress.
-				if(persId == personMultiplier){
-					log.info("   home locations created: " + persId);
-					personMultiplier *= 2;
-				}
-			}
-		}
+            int PERSON_SCALER = 10;
+            long numberOfPeopleInZone = Math.round(this.demand.getRowTotal(zoneNumber)) / PERSON_SCALER;
+            for (long i = 0; i < numberOfPeopleInZone; i++) {
+                Point point = getRandomizedCoordInZone(Id.create(zoneNumber, Point.class));
+                Object[] fta = {persId++, zoneNumber, 9999,
+                        point.getCoordinate().x, point.getCoordinate().y, 0, 0};
+                SimpleFeature ft = this.factory.createPoint(point.getCoordinate(), fta, null);
+                this.homeLocationCollection.add(ft);
+                // Report progress.
+                if (persId == personMultiplier) {
+                    log.info("   home locations created: " + persId);
+                    personMultiplier *= 2;
+                }
+            }
+        }
 		log.info("   home locations created: " + persId + " (Done)");
 	}
 
 	private void createWorkLocations() throws ArrayIndexOutOfBoundsException{
 		//creates a work location for each person in personCollection
 		System.out.println("Creating work locations:");
-		this.workLocationCollection = new ArrayList<SimpleFeature>();
+		this.workLocationCollection = new ArrayList<>();
 		int persId = 0;
 		int personMultiplier = 1;
 		for(SimpleFeature person : this.homeLocationCollection) {

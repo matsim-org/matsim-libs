@@ -10,9 +10,9 @@ import java.util.HashMap;
 import javax.management.timer.Timer;
 
 public class HITSPerson extends HITSElement implements Serializable{
-	static HashMap<String, Integer> actSwitcher;
+	private static HashMap<String, Integer> actSwitcher;
 	static {
-		HITSPerson.actSwitcher = new HashMap<String, Integer>();
+		HITSPerson.actSwitcher = new HashMap<>();
 		actSwitcher.put("home", 1);
 		actSwitcher.put("work", 2);
 		actSwitcher.put("edu",3);
@@ -34,41 +34,41 @@ public class HITSPerson extends HITSElement implements Serializable{
 		actSwitcher.put("xfer", 0);
 		actSwitcher.put("homeOther", 0);
 	}
-	HITSHousehold household;
+	private HITSHousehold household;
 	String h1_hhid;
 	int pax_id;
 	String pax_idx;
-	String p1_age;
-	String p2_gender;
-	String p3c_nolic;
-	String p3_car_lic;
-	String p3a_moto_lic;
-	String p3b_vanbus_lic;
-	String p4_mobility;
-	String p4a_aids;
-	String p4b_aidsoth;
-	String p5a_edu;
-	String p5_econactivity;
-	String p5i_econactoth;
-	String p6_occup;
-	String p6i_occupoth;
-	String p6a_fixedwkpl;
-	int p6c_fwkplpcode;
-	String p7_workhrs;
-	String p8_income;
-	String p9_day;
-	Date p9_date;
-	String p10_maketrip;
-	String p11_notripreason;
-	String p11a_notripreasoth;
-	String p12_lasttravelday;
-	String p13_1sttriporig_home;
-	int p13b_1storigpcode;
-	int p14_1sttripstarttime;
-	String p29_futrptuse;
-	double p30_spendpt;
-	double p31_spendschshtlbus;
-	int p32_ptreimb;
+	private String p1_age;
+	private String p2_gender;
+	private String p3c_nolic;
+	private String p3_car_lic;
+	private String p3a_moto_lic;
+	private String p3b_vanbus_lic;
+	private String p4_mobility;
+	private String p4a_aids;
+	private String p4b_aidsoth;
+	private String p5a_edu;
+	private String p5_econactivity;
+	private String p5i_econactoth;
+	private String p6_occup;
+	private String p6i_occupoth;
+	private String p6a_fixedwkpl;
+	private int p6c_fwkplpcode;
+	private String p7_workhrs;
+	private String p8_income;
+	private String p9_day;
+	private Date p9_date;
+	private String p10_maketrip;
+	private String p11_notripreason;
+	private String p11a_notripreasoth;
+	private String p12_lasttravelday;
+	private String p13_1sttriporig_home;
+	private int p13b_1storigpcode;
+	private int p14_1sttripstarttime;
+	private String p29_futrptuse;
+	private double p30_spendpt;
+	private double p31_spendschshtlbus;
+	private int p32_ptreimb;
 
 	private ArrayList<HITSTrip> trips;
 	private ArrayList<HITSStage> stages;
@@ -126,8 +126,8 @@ public class HITSPerson extends HITSElement implements Serializable{
 	}
 
 
-	public void setTrips(Connection conn, DateFormat dfm) {
-		ArrayList<HITSTrip> t = new ArrayList<HITSTrip>();
+	void setTrips(Connection conn, DateFormat dfm) {
+		ArrayList<HITSTrip> t = new ArrayList<>();
 		Statement ts;
 		try {
 			ts = conn.createStatement();
@@ -181,7 +181,7 @@ public class HITSPerson extends HITSElement implements Serializable{
 	}
 
 	private void getStagesFromTrips() {
-		this.stages = new ArrayList<HITSStage>();
+		this.stages = new ArrayList<>();
 		for(HITSTrip trip:this.trips){
 			this.stages.addAll(trip.getStages());
 		}
@@ -196,7 +196,7 @@ public class HITSPerson extends HITSElement implements Serializable{
 		return trips;
 	}
 
-	public void serializeTimes(){
+	void serializeTimes(){
 		for(int i=0; i<this.trips.size(); i++){
 			if (i > 0){
 				//				if the current trip's start time is before that of the previous trip, 
@@ -228,7 +228,7 @@ public class HITSPerson extends HITSElement implements Serializable{
 	 double totalWalkTimePax;
 	double scheduleFactor;
 	
-	 static public final String FORMATSTRING = "%s, %s, %d, %d, %f, %s, %s, %s \n"; 
+	 private static final String FORMATSTRING = "%s, %s, %d, %d, %f, %s, %s, %s \n";
 	 static public final String HEADERSTRING = "h1_hhid, pax_idx, numberOfTrips, numberOfWalkStagesPax, totalWalkTimePax, actMainModeChainPax, actStageChainPax, actChainPax \n";
 	
 	

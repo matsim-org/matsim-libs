@@ -6,8 +6,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.api.experimental.facilities.Facility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
@@ -24,18 +22,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 class PlanSerializable implements Serializable {
-	interface PlanElementSerializable extends Serializable {
+	private interface PlanElementSerializable extends Serializable {
 
 	}
 
 	class ActivitySerializable implements PlanElementSerializable {
-		private CoordSerializable coord;
-		private double endTime;
-		private String facIdString;
-		private String linkIdString;
-		private double maximumDuration;
-		private double startTime;
-		private String type;
+		private final CoordSerializable coord;
+		private final double endTime;
+		private final String facIdString;
+		private final String linkIdString;
+		private final double maximumDuration;
+		private final double startTime;
+		private final String type;
 
 		public ActivitySerializable(Activity act) {
 			coord = new CoordSerializable(act.getCoord());
@@ -58,9 +56,9 @@ class PlanSerializable implements Serializable {
 	}
 
 	class LegSerializable implements PlanElementSerializable {
-		private double departureTime;
-		private String mode;
-		private double travelTime;
+		private final double departureTime;
+		private final String mode;
+		private final double travelTime;
 		private RouteSerializable route;
 
 		public LegSerializable(Leg leg) {
@@ -87,8 +85,8 @@ class PlanSerializable implements Serializable {
 	}
 
 	class CoordSerializable implements Serializable {
-		private double x;
-		private double y;
+		private final double x;
+		private final double y;
 
 		public CoordSerializable(Coord coord) {
 			x = coord.getX();
@@ -107,13 +105,13 @@ class PlanSerializable implements Serializable {
 
 	class LinkNetworkRouteSerializable implements RouteSerializable {
 
-		private double distance;
-		private String endLinkIdString;
-		private String startLinkIdString;
-		private double travelCost;
-		private double travelTime;
-		private String vehicleIdString;
-		private List<String> linkIdStrings;
+		private final double distance;
+		private final String endLinkIdString;
+		private final String startLinkIdString;
+		private final double travelCost;
+		private final double travelTime;
+		private final String vehicleIdString;
+		private final List<String> linkIdStrings;
 
 		public LinkNetworkRouteSerializable(NetworkRoute route) {
 			distance = route.getDistance();
@@ -148,11 +146,11 @@ class PlanSerializable implements Serializable {
 
 	class GenericRouteSerializable implements RouteSerializable {
 
-		private double distance;
-		private String endLinkIdString;
-		private String routeDescription;
-		private String startLinkIdString;
-		private double travelTime;
+		private final double distance;
+		private final String endLinkIdString;
+		private final String routeDescription;
+		private final String startLinkIdString;
+		private final double travelTime;
 
 		public GenericRouteSerializable(GenericRoute route) {
 			distance = route.getDistance();
@@ -180,10 +178,10 @@ class PlanSerializable implements Serializable {
 
 	}
 
-	private ArrayList<PlanElementSerializable> planElements;
-	private String personId;
-	private Double score;
-	private String type;
+	private final ArrayList<PlanElementSerializable> planElements;
+	private final String personId;
+	private final Double score;
+	private final String type;
 
 	public PlanSerializable(Plan plan) {
 		planElements = new ArrayList<>();

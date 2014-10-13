@@ -1,6 +1,5 @@
 package playground.pieter.singapore.hits;
 
-import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -12,9 +11,9 @@ public class HITSIndexingProcedures {
 	/**
 	 * @param args
 	 */
-	private Connection conn;
+	private final Connection conn;
 	
-	public HITSIndexingProcedures(Connection conn) {
+	private HITSIndexingProcedures(Connection conn) {
 		super();
 		this.conn = conn;
 	}

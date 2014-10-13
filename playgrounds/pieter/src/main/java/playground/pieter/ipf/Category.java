@@ -2,16 +2,16 @@ package playground.pieter.ipf;
 
 import java.util.TreeSet;
 
-public class Category {
+class Category {
 	private final String name;
 	private final TreeSet<String> levels;
 
 	public Category(String name) {
 		this.name = name;
-		this.levels = new TreeSet<String>();
+		this.levels = new TreeSet<>();
 	}
 
-	protected String getName() {
+	String getName() {
 		return name;
 	}
 
@@ -24,10 +24,6 @@ public class Category {
 	}
 
 	public boolean equals(Category o) {
-		if (this.name.equals(o.getName())) {
-			return true;
-		} else {
-			return false;
-		}
+        return this.name.equals(o.getName());
 	}
 }

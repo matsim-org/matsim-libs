@@ -34,7 +34,7 @@ import org.xml.sax.Attributes;
  * @author mrieser
  * @author balmermi
  */
-public class WorldReaderMatsimV2 extends MatsimXmlParser {
+class WorldReaderMatsimV2 extends MatsimXmlParser {
 
 	private final static String WORLD = "world";
 	private final static String LAYER = "layer";
@@ -42,12 +42,11 @@ public class WorldReaderMatsimV2 extends MatsimXmlParser {
 	private final static String ZONE = "zone";
 	private final static String REF = "ref";
 
-	private Scenario scenario;
-	private World world;
+    private World world;
 	private ZoneLayer currLayer = null;
 
 	public WorldReaderMatsimV2(final ScenarioImpl scenario, World world) {
-		this.scenario = scenario;
+        Scenario scenario1 = scenario;
 		this.world = world;
 	}
 

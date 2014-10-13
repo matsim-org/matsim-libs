@@ -29,26 +29,23 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
 
-public class InFlowInfoCollectorWithPt implements LinkEnterEventHandler,
+class InFlowInfoCollectorWithPt implements LinkEnterEventHandler,
 		Wait2LinkEventHandler {
 
-	private int binSizeInSeconds; // set the length of interval
+	private final int binSizeInSeconds; // set the length of interval
 
-	public HashMap<Id<Link>, int[]> linkInFlow;
-	private Map<Id<Link>, ? extends Link> filteredEquilNetLinks; //
+	private HashMap<Id<Link>, int[]> linkInFlow;
+	private final Map<Id<Link>, ? extends Link> filteredEquilNetLinks; //
 
-	private boolean isOldEventFile;
-
-	public InFlowInfoCollectorWithPt(Map<Id<Link>, ? extends Link> filteredEquilNetLinks,
+    public InFlowInfoCollectorWithPt(Map<Id<Link>, ? extends Link> filteredEquilNetLinks,
 			boolean isOldEventFile, int binSizeInSeconds) {
 		this.filteredEquilNetLinks = filteredEquilNetLinks;
-		this.isOldEventFile = isOldEventFile;
 		this.binSizeInSeconds=binSizeInSeconds;
 	}
 
 	@Override
 	public void reset(int iteration) {
-		linkInFlow = new HashMap<Id<Link>, int[]>(); // reset the variables (private
+		linkInFlow = new HashMap<>(); // reset the variables (private
 												// ones)
 	}
 
@@ -90,9 +87,9 @@ public class InFlowInfoCollectorWithPt implements LinkEnterEventHandler,
 
 			System.out.print(linkId + " - " + link.getCoord() + ": ");
 
-			for (int i = 0; i < bins.length; i++) {
-				System.out.print(bins[i] * 3600 / binSizeInSeconds + "\t");
-			}
+            for (int bin : bins) {
+                System.out.print(bin * 3600 / binSizeInSeconds + "\t");
+            }
 
 			System.out.println();
 		}

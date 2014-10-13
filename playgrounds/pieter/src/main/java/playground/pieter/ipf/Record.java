@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import org.matsim.core.utils.collections.Tuple;
-
-public class Record {
+class Record {
 	private String id;
 	private Record parent;
 	private ArrayList<Record> children;
@@ -20,12 +18,12 @@ public class Record {
 	
 	
 	private class ControlWeightHistory {
-		private ControlTotal control;
-		private ArrayList<Double> controlSpecificWeights;
+		private final ControlTotal control;
+		private final ArrayList<Double> controlSpecificWeights;
 
 		public ControlWeightHistory(ControlTotal control) {
 			this.control = control;
-			this.controlSpecificWeights = new ArrayList<Double>();
+			this.controlSpecificWeights = new ArrayList<>();
 		}
 
 		protected ControlTotal getControl() {

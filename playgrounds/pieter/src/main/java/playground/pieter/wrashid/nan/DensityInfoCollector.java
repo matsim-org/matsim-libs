@@ -21,7 +21,6 @@
 package playground.pieter.wrashid.nan;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -39,8 +38,8 @@ public class DensityInfoCollector implements LinkEnterEventHandler, LinkLeaveEve
 	}
 	
 	
-	HashMap<Id, Double> linkEntranceTime=new HashMap<Id, Double>();
-	HashMap<Id, Double> linkTravelTime=new HashMap<Id, Double>();
+	private final HashMap<Id, Double> linkEntranceTime=new HashMap<>();
+	HashMap<Id, Double> linkTravelTime=new HashMap<>();
 	
 	// TODO:
 	// statistics per link per time bin (matrix).
@@ -75,12 +74,8 @@ public class DensityInfoCollector implements LinkEnterEventHandler, LinkLeaveEve
 		
 	}
 
-	
-	private void registerEnteringLink(){
-		
-	}
-	
-	@Override
+
+    @Override
 	public void handleEvent(LinkEnterEvent event) {
 		linkEntranceTime.put(event.getPersonId(), event.getTime());
 	}

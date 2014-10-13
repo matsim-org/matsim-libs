@@ -9,14 +9,14 @@ import org.matsim.core.replanning.modules.ChangeTripModeStrategyFactory;
 import playground.pieter.pseudosimulation.controler.PSimControler;
 import playground.pieter.pseudosimulation.replanning.modules.PSimPlanMarkerModule;
 
-public class PSimChangeTripModeStrategyFactory extends
+class PSimChangeTripModeStrategyFactory extends
 		ChangeTripModeStrategyFactory {
 
 	public PSimChangeTripModeStrategyFactory(PSimControler controler) {
 		this.controler = controler;
 	}
 
-	private PSimControler controler;
+	private final PSimControler controler;
 
 	@Override
 	public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager ) {

@@ -2,25 +2,24 @@ package playground.pieter.network;
 
 import java.util.ArrayList;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class NetworkCarLinkRules {
 
-	public void run(final String[] args) {
+	void run(final String[] args) {
 		Scenario scenario;
 		MatsimRandom.reset(123);
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(args[0]);
-		ArrayList<String> normalLinkLaneCountChangeList = new ArrayList<String>();
-		ArrayList<String> clLinkLaneCountChangeList = new ArrayList<String>();
+		ArrayList<String> normalLinkLaneCountChangeList = new ArrayList<>();
+		ArrayList<String> clLinkLaneCountChangeList = new ArrayList<>();
 		int carLinkCount = 0;
 		double originalStorageCapacity = 0d;
 		double newStorageCapacity = 0d;
@@ -52,12 +51,12 @@ public class NetworkCarLinkRules {
 		}
 
 		for (String id : normalLinkLaneCountChangeList) {
-			Link l = scenario.getNetwork().getLinks().get(new IdImpl(id));
+			Link l = scenario.getNetwork().getLinks().get(Id.createLinkId(id));
 			l.setNumberOfLanes((int) (l.getCapacity() / capacityperLane));
 			newStorageCapacity += l.getLength() * l.getNumberOfLanes();
 		}
 		for (String id : clLinkLaneCountChangeList) {
-			Link l = scenario.getNetwork().getLinks().get(new IdImpl(id));
+			Link l = scenario.getNetwork().getLinks().get(Id.createLinkId(id));
 			l.setNumberOfLanes(l.getNumberOfLanes() + 1);
 			newStorageCapacity += l.getLength() * l.getNumberOfLanes();
 			// add some extra capacity if there is too few lanes for the flow

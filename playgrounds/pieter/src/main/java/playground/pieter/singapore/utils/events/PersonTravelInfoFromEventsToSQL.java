@@ -2,17 +2,14 @@ package playground.pieter.singapore.utils.events;
 
 import playground.pieter.singapore.hits.HITSData;
 import playground.pieter.singapore.utils.events.listeners.TravelTimeListener;
-import playground.pieter.singapore.utils.events.listeners.TrimEventWriterHITS;
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
@@ -27,21 +24,20 @@ public class PersonTravelInfoFromEventsToSQL {
 	private HashMap<String, Double> paxTravelTimes;
 	private HashMap<String, Double> paxTravelDists;
 	private HashMap<String,String> paxModes;
-	private DataBaseAdmin dba;
-	private EventsManager events;
+	private final DataBaseAdmin dba;
 
-	public PersonTravelInfoFromEventsToSQL(HITSData hitsData, DataBaseAdmin dba)
+    public PersonTravelInfoFromEventsToSQL(HITSData hitsData, DataBaseAdmin dba)
 			throws SQLException {
 		this.dba = dba;
 	}
 
-	public PersonTravelInfoFromEventsToSQL(DataBaseAdmin dba)
+	private PersonTravelInfoFromEventsToSQL(DataBaseAdmin dba)
 			throws SQLException {
 		this.dba = dba;
 	}
 
-	public void readTravelTimes(String inFileName) {
-		this.events = EventsUtils.createEventsManager();
+	void readTravelTimes(String inFileName) {
+        EventsManager events = EventsUtils.createEventsManager();
 		TravelTimeListener ttl = new TravelTimeListener();
 		events.addHandler(ttl);
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
@@ -50,7 +46,7 @@ public class PersonTravelInfoFromEventsToSQL {
 		this.paxModes = ttl.getPaxModes();
 	}
 
-	public void writePersonSummary(DataBaseAdmin dba, String tableName) {
+	void writePersonSummary(DataBaseAdmin dba, String tableName) {
 		try {
 			dba.executeStatement(String.format("DROP TABLE IF EXISTS %s;",
 					tableName));
@@ -62,14 +58,11 @@ public class PersonTravelInfoFromEventsToSQL {
 				dba.executeUpdate(String.format(sqlInserter,tableName,e.getKey(),e.getValue(),paxModes.get(e.getKey())));
 				
 			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoConnectionException e) {
+		} catch (SQLException | NoConnectionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
+    }
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -82,7 +75,7 @@ public class PersonTravelInfoFromEventsToSQL {
 //		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		chooser.showOpenDialog(new JPanel());
 		simPath = chooser.getSelectedFile().getPath();
-		String s = (String)JOptionPane.showInputDialog("set the name of the output table");
+		String s = JOptionPane.showInputDialog("set the name of the output table");
 
 
 		
@@ -92,23 +85,11 @@ public class PersonTravelInfoFromEventsToSQL {
 					dba);
 			es.readTravelTimes(simPath);
 			es.writePersonSummary(dba, s);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SQLException e) {
+		} catch (IOException | SQLException | ClassNotFoundException | IllegalAccessException | InstantiationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-	}
+    }
 
 }

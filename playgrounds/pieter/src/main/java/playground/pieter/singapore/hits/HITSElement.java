@@ -23,7 +23,7 @@ import java.io.Serializable;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class HITSElement implements Serializable {
+class HITSElement implements Serializable {
 	/**
 	 * Awful hack to return trimmed strings
 	 * 

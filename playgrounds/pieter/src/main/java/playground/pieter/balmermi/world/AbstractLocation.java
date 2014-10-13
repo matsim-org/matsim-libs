@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 
 /**
@@ -34,14 +33,14 @@ import org.matsim.core.network.LinkImpl;
  * @see Zone
  * @author Michael Balmer
  */
-public abstract class AbstractLocation implements BasicLocation {
+abstract class AbstractLocation implements BasicLocation {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
 	//////////////////////////////////////////////////////////////////////
 
-	protected final Id id;
-	protected final Coord center;
+	private final Id id;
+	final Coord center;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructor
@@ -52,7 +51,7 @@ public abstract class AbstractLocation implements BasicLocation {
 	 * @param id The unique id of that location.
 	 * @param center The center of that location. Does not have to be the middle of the location object.
 	 */
-	protected AbstractLocation(final Id id, final Coord center) {
+    AbstractLocation(final Id id, final Coord center) {
 		this.id = id;
 		this.center = center;
 		if (this.center == null) {

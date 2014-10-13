@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.vehicles.Vehicles;
 
 import playground.pieter.pseudosimulation.controler.listeners.MobSimSwitcher;
 import playground.sergioo.singapore2012.transitRouterVariable.stopStopTimes.*;

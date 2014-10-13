@@ -4,22 +4,22 @@ import java.io.Serializable;
 
 import org.matsim.core.utils.collections.Tuple;
 
-public class PaxSG implements Serializable{
-	int paxId;
-	String foreigner;
-	HouseholdSG household;
-	boolean carLicenseHolder;
-	int age;
-	String sex;
-	int income;
-	String occup;
-	String chain;
-	String chainType;
-	double mainActStart;
-	double mainActDur;
-	String mainActType;
+class PaxSG implements Serializable{
+	final int paxId;
+	final String foreigner;
+	final HouseholdSG household;
+	final boolean carLicenseHolder;
+	final int age;
+	final String sex;
+	final int income;
+	final String occup;
+	final String chain;
+	final String chainType;
+	final double mainActStart;
+	final double mainActDur;
+	final String mainActType;
 	String mainActFacility;
-	String modeSuggestion;
+	final String modeSuggestion;
 	Tuple<String[],double[]> bizActFrequencies;
 	Tuple<String[],double[]> leisureActFrequencies;
 	double distanceToWork;

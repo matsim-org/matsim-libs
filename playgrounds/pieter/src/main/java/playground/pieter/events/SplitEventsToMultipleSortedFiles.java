@@ -22,28 +22,23 @@ package playground.pieter.events;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.sql.Connection;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Queue;
-import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.core.events.*;
 import org.matsim.core.events.algorithms.EventWriter;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
 public class SplitEventsToMultipleSortedFiles implements EventWriter, BasicEventHandler {
 	private BufferedWriter out = null;
-	String outputPrefix;
-	LinkedList<Event> eventQueue;
-	long eventCounter =0;
-	long numberOfLines=1000000;
-	int fileCounter=0;
+	private final String outputPrefix;
+	private LinkedList<Event> eventQueue;
+	private long eventCounter =0;
+	private long numberOfLines=1000000;
+	private int fileCounter=0;
 
 	public void reset(int iteration) {
 		closeFile();
@@ -110,9 +105,9 @@ public class SplitEventsToMultipleSortedFiles implements EventWriter, BasicEvent
 		init(String.format("%s_%d.xml", outputPrefix,this.fileCounter));
 	}
 
-	public void init(final String outfilename) {
+	void init(final String outfilename) {
 		closeFile();
-		this.eventQueue = new LinkedList<Event>();
+		this.eventQueue = new LinkedList<>();
 		try {
 			this.out = IOUtils.getBufferedWriter(outfilename);
 			this.out.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<events version=\"1.0\">\n");

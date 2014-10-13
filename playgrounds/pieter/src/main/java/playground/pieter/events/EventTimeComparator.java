@@ -6,7 +6,7 @@ import java.util.Comparator;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.internal.MatsimComparator;
 
-public class EventTimeComparator implements Comparator<Event>, Serializable, MatsimComparator {
+class EventTimeComparator implements Comparator<Event>, Serializable, MatsimComparator {
 
 	/*
 	 * (non-Javadoc)

@@ -25,25 +25,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
 
-import org.apache.commons.io.filefilter.FileFilterUtils;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsReaderXMLv1;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.MatsimXmlParser;
 
 public class EventsMergeSort {
-	private String outputEventsPath;
-	private String inputEventsPath;
+	private final String outputEventsPath;
+	private final String inputEventsPath;
 	private ArrayList<String> inputFiles;
-	private ArrayList<String> intermediaryFiles;
-	int counter = 0;
+    private int counter = 0;
 
 	public EventsMergeSort(String outputEventsPath, String inputEventsPath) {
 		super();
@@ -53,7 +42,7 @@ public class EventsMergeSort {
 	}
 
 	public void run() throws IOException {
-		intermediaryFiles = new ArrayList<String>();
+        ArrayList<String> intermediaryFiles = new ArrayList<>();
 		int numberOfFiles = inputFiles.size();
 		if (numberOfFiles % 2 != 0){
 			intermediaryFiles.add(inputFiles.get(numberOfFiles - 1));
@@ -136,10 +125,10 @@ public class EventsMergeSort {
 		}
 	}
 
-	public void getInputFileList() {
+	void getInputFileList() {
 		File f = new File(inputEventsPath);
-		inputFiles = new ArrayList<String>(Arrays.asList(f.list()));
-		ArrayList<String> removeFiles = new ArrayList<String>();
+		inputFiles = new ArrayList<>(Arrays.asList(f.list()));
+		ArrayList<String> removeFiles = new ArrayList<>();
 		for (String fileName : inputFiles) {
 			if (!(fileName.endsWith("xml") || fileName.endsWith("xml.gz")) || fileName.startsWith("merge")|| fileName.startsWith("OUT")) {
 				removeFiles.add(fileName);

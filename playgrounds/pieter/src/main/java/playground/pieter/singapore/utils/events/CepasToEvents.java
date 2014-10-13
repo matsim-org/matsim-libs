@@ -95,7 +95,7 @@ public class CepasToEvents {
 			}
 		}
 
-		HashMap<Id, VehicleErrors> veherrs = new HashMap<>();
+		final HashMap<Id, VehicleErrors> veherrs = new HashMap<>();
 		private boolean calledBefore = false;
 
 		public void stopIdNotInRoute(Id vehicleId) {
@@ -174,7 +174,7 @@ public class CepasToEvents {
 
 	private class ValueComparator implements Comparator<Id> {
 
-		Map<Id, Integer> base;
+		final Map<Id, Integer> base;
 
 		public ValueComparator(Map<Id, Integer> base) {
 			this.base = base;
@@ -204,12 +204,12 @@ public class CepasToEvents {
 			this.lineId = lineId;
 		}
 
-		Id lineId;
+		final Id lineId;
 		/**
 		 * a Cepas line has a maximum of two routes, traveling in opposite
 		 * directions, distinguished by 0 and 1.
 		 */
-		HashMap<Integer, CepasRoute> routes = new HashMap<>();
+        final HashMap<Integer, CepasRoute> routes = new HashMap<>();
 
 		@Override
 		public String toString() {
@@ -238,9 +238,9 @@ public class CepasToEvents {
 			this.line = cepasLine;
 		}
 
-		int direction;
-		CepasLine line;
-		HashMap<Id, CepasVehicle> vehicles = new HashMap<>();
+		final int direction;
+		final CepasLine line;
+		final HashMap<Id, CepasVehicle> vehicles = new HashMap<>();
 
 		@Override
 		public String toString() {
@@ -248,15 +248,15 @@ public class CepasToEvents {
 		}
 	}
 
-	public int departureId = 0;
-	public static final int minimumNumberOfDwellEventsForProcessing = 2;
+	private int departureId = 0;
+	private static final int minimumNumberOfDwellEventsForProcessing = 2;
 
 	private class CepasVehicle {
 		/**
 		 * Clusters dwell events together into a route.
 		 */
 		private class CepasVehicleDwellEventCluster {
-			private TreeMap<Integer, CepasVehicleDwellEvent> orderedDwellEvents = new TreeMap<>();
+			private final TreeMap<Integer, CepasVehicleDwellEvent> orderedDwellEvents = new TreeMap<>();
 			private Id routeId;
 
 			public CepasVehicleDwellEventCluster(List<CepasVehicleDwellEvent> orderedDwellEvents) {
@@ -363,7 +363,7 @@ public class CepasToEvents {
 		private class CepasVehicleDwellEvent implements Comparable<CepasVehicleDwellEvent> {
 			int arrivalTime;
 			int departureTime;
-			Id stopId;
+			final Id stopId;
 
 			/*
 			 * if the arrival event is triggered by alighting event, mark the
@@ -371,7 +371,7 @@ public class CepasToEvents {
 			 * time, if any tap-ins occurred
 			 */
 
-			ArrayList<CepasTransaction> cepasTransactions = new ArrayList<>();
+			final ArrayList<CepasTransaction> cepasTransactions = new ArrayList<>();
 
 			public double getDwellTime() {
 				return departureTime - arrivalTime;
@@ -417,8 +417,7 @@ public class CepasToEvents {
 					double avgtime = (arrivalTime + departureTime) / 2;
 					arrivalTime = (int) (avgtime - minDwellTime / 2);
 					departureTime = (int) (avgtime + minDwellTime / 2);
-					return;
-				}
+                }
 			}
 
 			public void findTrueDwellTime() {
@@ -480,8 +479,7 @@ public class CepasToEvents {
 				if (targetCluster == null) {
 					// no clusters bigger than 1, run the simplified procedure;
 					simpleDwellTimeAdjustment();
-					return;
-				} else {
+                } else {
 					this.arrivalTime = (int) targetCluster.get(0).time;
 					this.departureTime = (int) targetCluster.get(targetCluster.size() - 1).time;
 					if (getDwellTime() < minDwellTime) {
@@ -489,8 +487,7 @@ public class CepasToEvents {
 						arrivalTime = avgtime - minDwellTime / 2;
 						departureTime = avgtime + minDwellTime / 2;
 					}
-					return;
-				}
+                }
 			}
 
 			private void updateTransactionTimes() {
@@ -520,10 +517,10 @@ public class CepasToEvents {
 
 		}
 
-		private Id vehicleId;
-		private Id transitLineId;
-		private CepasLine cepasLine;
-		private CepasRoute cepasRoute;
+		private final Id vehicleId;
+		private final Id transitLineId;
+		private final CepasLine cepasLine;
+		private final CepasRoute cepasRoute;
 		/**
 		 * All possible routes in both directions from the transit schedule.
 		 */
@@ -532,15 +529,15 @@ public class CepasToEvents {
 		/**
 		 * Dwell events, ordered by arrival time.
 		 */
-		private TreeMap<Integer, CepasVehicleDwellEvent> orderedDwellEvents = new TreeMap<>();
+		private final TreeMap<Integer, CepasVehicleDwellEvent> orderedDwellEvents = new TreeMap<>();
 		/**
 		 * Created by handlePassengers method, then used to create dwell events.
 		 */
-		private HashMap<Id, ArrayList<CepasTransaction>> cepasTransactionsByStopId = new HashMap<>();
+		private final HashMap<Id, ArrayList<CepasTransaction>> cepasTransactionsByStopId = new HashMap<>();
 		private TreeSet<Id> routesSortedByNumberOfTransactions;
 		private List<CepasVehicleDwellEventCluster> dwellEventClusters;
-		private ArrayList<CepasTransaction> cepasTransactions = new ArrayList<>();
-		private LinkedList<Event> eventQueue;
+		private final ArrayList<CepasTransaction> cepasTransactions = new ArrayList<>();
+		private final LinkedList<Event> eventQueue;
 		private final double maxSpeed = 80 / 3.6;
 
 		// Constructors
@@ -1236,7 +1233,7 @@ public class CepasToEvents {
 			StringBuilder sb = new StringBuilder(
 					"veh_id\tstop_id\ttransaction_type\ttime\tspeedFromPrevious\tspeedToNext\n");
 			for (CepasTransaction transaction : this.cepasTransactions) {
-				sb.append(this.vehicleId.toString() + "\t" + transaction.toString() + "\n");
+				sb.append(this.vehicleId.toString()).append("\t").append(transaction.toString()).append("\n");
 			}
 
 			return sb.toString();
@@ -1435,7 +1432,7 @@ public class CepasToEvents {
 	private class CepasTransaction implements Comparable<CepasTransaction> {
 		public double speedToNext;
 		public double speedFromPrevious;
-		CepasVehiclePassenger passenger;
+		final CepasVehiclePassenger passenger;
 		Id stopId;
 
 		public CepasTransaction(CepasVehiclePassenger passenger, CepasTransactionType type, double time, Id stopId) {
@@ -1446,7 +1443,7 @@ public class CepasToEvents {
 			this.time = time;
 		}
 
-		CepasTransactionType type;
+		final CepasTransactionType type;
 		double time;
 
 		@Override
@@ -1467,7 +1464,7 @@ public class CepasToEvents {
 	}
 
 	private class CepasVehiclePassenger implements Comparable<CepasVehiclePassenger> {
-		Id personId;
+		final Id personId;
 
 		public CepasVehiclePassenger(Id personId, Id boardingStopId, Id alightingStopId, int boardingTime,
 				int alightingTime) {
@@ -1500,22 +1497,22 @@ public class CepasToEvents {
 	private static final int minTransactionClusterSize = 4;
 
 	// fields
-	DataBaseAdmin dba;
-	Scenario scenario;
-	String outputEventsPath;
+    private DataBaseAdmin dba;
+	private Scenario scenario;
+	private String outputEventsPath;
 	private String stopLookupTableName;
 	private String tripTableName;
     /**
 	 * Cepas vehicles distinguished by an id composed as line_route_busRegNum.
 	 */
-	private HashMap<String, CepasVehicle> cepasVehicles = new HashMap<>();
-    private HashMap<String, Id> cepasStoptoMatsimStopLookup = new HashMap<>();
+	private final HashMap<String, CepasVehicle> cepasVehicles = new HashMap<>();
+    private final HashMap<String, Id> cepasStoptoMatsimStopLookup = new HashMap<>();
 	/**
 	 * Iterate through the stops in a route quite often, so easier to have the
 	 * ids in a map than have to call getId() every time
 	 */
 	private HashMap<Id, ArrayList<Id>> routeIdToStopIdSequence;
-	private ErrorTracker errorTracker;
+	private final ErrorTracker errorTracker;
 	private ArrayList<String> alreadyCompletedVehicles = new ArrayList<>();
 
 	// constructors
@@ -1539,8 +1536,8 @@ public class CepasToEvents {
 	 * @throws IOException
 	 * @throws SQLException
 	 */
-	public CepasToEvents(String databaseProperties, String transitSchedule, String networkFile,
-			String outputEventsPath, String tripTableName, String stopLookupTableName) throws InstantiationException,
+    private CepasToEvents(String databaseProperties, String transitSchedule, String networkFile,
+                          String outputEventsPath, String tripTableName, String stopLookupTableName) throws InstantiationException,
 			IllegalAccessException, ClassNotFoundException, IOException, SQLException {
 		this.errorTracker = new ErrorTracker();
 		this.dba = new DataBaseAdmin(new File(databaseProperties));
@@ -1558,7 +1555,7 @@ public class CepasToEvents {
 
 	}
 
-	public void run(boolean continueFromBreak) throws SQLException, NoConnectionException, IOException {
+	void run(boolean continueFromBreak) throws SQLException, NoConnectionException, IOException {
 		generateRouteIdToStopIdSequence();
 		createVehiclesByCepasLineDirectionAndBusRegNum();
 		createCepasToMatsimStopLookupTable();
@@ -1859,8 +1856,7 @@ public class CepasToEvents {
 					+ " as select distinct srvc_number, direction, bus_reg_num from " + this.tripTableName
 					+ " where srvc_number is not null");
 			createVehiclesByCepasLineDirectionAndBusRegNum();
-			return;
-		}
+        }
 
 	}
 
