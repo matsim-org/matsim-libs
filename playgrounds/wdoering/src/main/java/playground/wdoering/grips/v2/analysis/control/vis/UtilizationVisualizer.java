@@ -27,14 +27,13 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.utils.collections.Tuple;
 
 import playground.wdoering.grips.scenariomanager.model.Constants.Mode;
 import playground.wdoering.grips.v2.analysis.control.Clusterizer;
 import playground.wdoering.grips.v2.analysis.data.AttributeData;
 import playground.wdoering.grips.v2.analysis.data.ColorationMode;
 import playground.wdoering.grips.v2.analysis.data.EventData;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.utils.collections.Tuple;
 
 public class UtilizationVisualizer {
 
@@ -96,18 +95,18 @@ public class UtilizationVisualizer {
 				double enterTime = enterTimes.size();
 
 				if (enterTime < clusters.get(0).getSecond()) {
-					coloration.setAttribute((IdImpl) link.getId(), new Tuple<Float, Color>(0f, Coloration.getColor(0, colorationMode, cellTransparency)));
+					coloration.setAttribute(link.getId(), new Tuple<Float, Color>(0f, Coloration.getColor(0, colorationMode, cellTransparency)));
 					continue;
 				}
 				for (int i = 1; i < k; i++) {
 					if ((enterTime >= clusters.get(i - 1).getSecond()) && enterTime < clusters.get(i).getSecond()) {
 						float ik = (float) i / (float) k;
-						coloration.setAttribute((IdImpl) link.getId(), new Tuple<Float, Color>(ik, Coloration.getColor(ik, colorationMode, cellTransparency)));
+						coloration.setAttribute(link.getId(), new Tuple<Float, Color>(ik, Coloration.getColor(ik, colorationMode, cellTransparency)));
 						break;
 					}
 				}
 				if (enterTime >= clusters.get(k - 1).getSecond())
-					coloration.setAttribute((IdImpl) link.getId(), new Tuple<Float, Color>(1f, Coloration.getColor(1f, colorationMode, cellTransparency)));
+					coloration.setAttribute(link.getId(), new Tuple<Float, Color>(1f, Coloration.getColor(1f, colorationMode, cellTransparency)));
 			}
 		}
 

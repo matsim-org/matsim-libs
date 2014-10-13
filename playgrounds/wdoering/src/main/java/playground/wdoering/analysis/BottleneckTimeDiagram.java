@@ -8,13 +8,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -55,7 +56,7 @@ public class BottleneckTimeDiagram implements XYVxVyEventsHandler, DoubleValueSt
 	private int arrivalCount = 0;
 	private double measurementEndTime;
 	private static int personCount;
-	private static IdImpl bottleneckEnterLink; 
+	private static Id<Link> bottleneckEnterLink; 
 
 
 	public BottleneckTimeDiagram(Envelope e) {
@@ -250,7 +251,7 @@ public class BottleneckTimeDiagram implements XYVxVyEventsHandler, DoubleValueSt
 //		String config = "/Users/laemmel/devel/oval/input/config.xml";
 		
 		LinkedList<Series> seriesList = new LinkedList<Series>();
-		bottleneckEnterLink = new IdImpl(4);
+		bottleneckEnterLink = Id.create(4, Link.class);
 		
 		int model = 9;
 		

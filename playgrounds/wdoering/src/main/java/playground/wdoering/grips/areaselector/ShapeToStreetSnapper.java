@@ -28,13 +28,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.grips.control.helper.Algorithms;
 import org.matsim.contrib.grips.control.helper.shapetostreetsnapper.LinkSorter;
 import org.matsim.contrib.grips.control.helper.shapetostreetsnapper.TravelCost;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -175,7 +175,7 @@ public class ShapeToStreetSnapper {
 				}
 			}
 			if (oneWay) {
-				Link reverse = this.sc.getNetwork().getFactory().createLink(new IdImpl(link.getId().toString()+"reverse"), link.getToNode(), link.getFromNode());
+				Link reverse = this.sc.getNetwork().getFactory().createLink(Id.create(link.getId().toString()+"reverse", Link.class), link.getToNode(), link.getFromNode());
 				reverse.setFreespeed(link.getFreespeed());
 				reverse.setLength(link.getLength());
 				reverse.setNumberOfLanes(link.getNumberOfLanes());

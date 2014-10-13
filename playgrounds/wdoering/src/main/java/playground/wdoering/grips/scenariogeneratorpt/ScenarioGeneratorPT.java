@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.grips.model.config.GripsConfigModule;
 import org.matsim.contrib.grips.model.events.InfoEvent;
 import org.matsim.contrib.grips.scenariogenerator.ScenarioGenerator;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -206,7 +205,7 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 		for (SimpleFeature ft : fts) {
 			long id = (Long)ft.getAttribute("id");
-			TransitStopFacility facility = fac.createTransitStopFacility(new IdImpl(id), MGC.coordinate2Coord(((Geometry) ft.getDefaultGeometry()).getCoordinate()), false);
+			TransitStopFacility facility = fac.createTransitStopFacility(Id.create(id, TransitStopFacility.class), MGC.coordinate2Coord(((Geometry) ft.getDefaultGeometry()).getCoordinate()), false);
 			schedule.addStopFacility(facility);
 			TransitRouteStop rs = fac.createTransitRouteStop(facility, 0, 0);
 			stops.add(rs);
@@ -270,17 +269,17 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 			allLinksIds.add(link.getId());
 		}
 		
-		TransitLine line = fac.createTransitLine(new IdImpl("evac_line0"));
+		TransitLine line = fac.createTransitLine(Id.create("evac_line0", TransitLine.class));
 		NetworkRoute route = new LinkNetworkRouteImpl(allLinks.get(0).getId(), allLinks.get(allLinks.size()-1).getId());
 		route.setLinkIds(allLinksIds.get(0), allLinksIds.subList(1, allLinksIds.size()-1), allLinksIds.get(allLinksIds.size()-1));
-		TransitRoute tr = fac.createTransitRoute(new IdImpl("er0"), route, stops, "bus");
+		TransitRoute tr = fac.createTransitRoute(Id.create("er0", TransitRoute.class), route, stops, "bus");
 
 		
 		
 		//Vehicles
 		Vehicles vehicles = ((ScenarioImpl)this.matsimScenario).getVehicles();
 		VehiclesFactory vf = vehicles.getFactory();
-		VehicleType vt = vf.createVehicleType(new IdImpl("bus"));
+		VehicleType vt = vf.createVehicleType(Id.create("bus", VehicleType.class));
 		VehicleCapacity vc = vf.createVehicleCapacity();
 		vc.setSeats(50);
 		vc.setStandingRoom(0);
@@ -291,9 +290,9 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 		
 		//Departures w/ vehicles
 		for (int i =0; i < 30; i++) {
-			Vehicle veh = vf.createVehicle(new IdImpl("bus_"+(i*5)*60), vt);
+			Vehicle veh = vf.createVehicle(Id.create("bus_"+(i*5)*60, Vehicle.class), vt);
 			vehicles.addVehicle( veh);
-			Departure dep = fac.createDeparture(new IdImpl(i), (i*5)*60);
+			Departure dep = fac.createDeparture(Id.create(i, Departure.class), (i*5)*60);
 			dep.setVehicleId(veh.getId());
 			tr.addDeparture(dep);
 		

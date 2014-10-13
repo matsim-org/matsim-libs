@@ -39,7 +39,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.grips.model.config.ToolConfig;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.collections.Tuple;
@@ -130,8 +129,8 @@ public class GridRenderer extends AbstractRenderLayer {
 				Color linkColor = Color.BLUE;
 
 				if (data.getLinkUtilizationVisData() != null) {
-					if (data.getLinkUtilizationVisData().getAttribute((IdImpl) link.getId()) != null) {
-						Tuple<Float, Color> currentColoration = data.getLinkUtilizationVisData().getAttribute((IdImpl) link.getId());
+					if (data.getLinkUtilizationVisData().getAttribute(link.getId()) != null) {
+						Tuple<Float, Color> currentColoration = data.getLinkUtilizationVisData().getAttribute(link.getId());
 						strokeWidth = ((currentColoration.getFirst() * 35f) / (float) Math.pow(2, this.controller.getZoom()));
 						linkColor = currentColoration.getSecond();
 					}
@@ -206,12 +205,12 @@ public class GridRenderer extends AbstractRenderLayer {
 					this.imageContainer.setColor(ToolConfig.COLOR_DISABLED_TRANSPARENT); // default
 
 					if (mode.equals(Mode.EVACUATION)) {
-						visData = (AttributeData<Color>) data.getEvacuationTimeVisData();
+						visData = data.getEvacuationTimeVisData();
 						if ((cell.getCount() > 0))
 							this.imageContainer.setColor(visData.getAttribute(cell.getId()));
 
 					} else if (mode.equals(Mode.CLEARING)) {
-						visData = (AttributeData<Color>) data.getClearingTimeVisData();
+						visData = data.getClearingTimeVisData();
 						if (cell.getClearingTime() > 0)
 							this.imageContainer.setColor(visData.getAttribute(cell.getId()));
 					}
@@ -288,7 +287,7 @@ public class GridRenderer extends AbstractRenderLayer {
 		int minY = (int) Math.min(fromGridPoint.getY(), toGridPoint.getY());
 		int maxY = (int) Math.max(fromGridPoint.getY(), toGridPoint.getY());
 
-		BufferedImage bImage = gc.createCompatibleImage((int) (maxX - minX), (int) (maxY - minY), Transparency.TRANSLUCENT);
+		BufferedImage bImage = gc.createCompatibleImage(maxX - minX, maxY - minY, Transparency.TRANSLUCENT);
 
 		Graphics IG = bImage.getGraphics();
 		Graphics2D IG2D = (Graphics2D) IG;

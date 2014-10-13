@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.grips.scenariogenerator.PopulationFromESRIShapeFileGenerator;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -108,8 +107,8 @@ public class PopulationFromESRIShapeFielGeneratorPT extends
 //		Leg leg2 = pb.createLeg("pt");
 //		plan.addLeg(leg2);
 		
-		Link lll = net.getLinks().get(new IdImpl("el1"));
-		Activity act3 = pb.createActivityFromLinkId("post-evac", new IdImpl("el1"));
+		Link lll = net.getLinks().get(Id.create("el1", Link.class));
+		Activity act3 = pb.createActivityFromLinkId("post-evac", Id.create("el1", Link.class));
 		((ActivityImpl)act3).setCoord(lll.getCoord());
 		act3.setEndTime(0);
 		plan.addActivity(act3);

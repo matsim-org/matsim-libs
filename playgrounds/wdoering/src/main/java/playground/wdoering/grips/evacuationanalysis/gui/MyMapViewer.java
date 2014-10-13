@@ -41,34 +41,22 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
-
-import javax.imageio.ImageIO;
 
 import org.jdesktop.swingx.JXMapViewer;
 import org.jdesktop.swingx.mapviewer.GeoPosition;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.grips.model.config.ToolConfig;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkQuadTree;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.collections.QuadTree.Rect;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 
@@ -79,7 +67,6 @@ import playground.wdoering.grips.evacuationanalysis.data.AttributeData;
 import playground.wdoering.grips.evacuationanalysis.data.Cell;
 import playground.wdoering.grips.evacuationanalysis.data.ColorationMode;
 import playground.wdoering.grips.evacuationanalysis.data.EventData;
-import playground.wdoering.grips.evacuationanalysis.data.MetaData;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -434,9 +421,9 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 				
 				if (data.getLinkUtilizationVisData()!=null)
 				{
-					if (data.getLinkUtilizationVisData().getAttribute((IdImpl)link.getId())!=null)
+					if (data.getLinkUtilizationVisData().getAttribute(link.getId())!=null)
 					{
-						Tuple<Float,Color> currentColoration = data.getLinkUtilizationVisData().getAttribute((IdImpl)link.getId());
+						Tuple<Float,Color> currentColoration = data.getLinkUtilizationVisData().getAttribute(link.getId());
 						strokeWidth = ((currentColoration.getFirst() *35f) / (float)Math.pow(2,zoom) );
 						linkColor = currentColoration.getSecond();
 					}
@@ -512,13 +499,13 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 					
 					if (mode.equals(Mode.EVACUATION))
 					{
-						visData = (AttributeData<Color>) data.getEvacuationTimeVisData();
+						visData = data.getEvacuationTimeVisData();
 						if ((cell.getCount()>0))
 							g2D.setColor(visData.getAttribute(cell.getId()));
 					}
 					else if (mode.equals(Mode.CLEARING))
 					{
-						visData = (AttributeData<Color>) data.getClearingTimeVisData();
+						visData = data.getClearingTimeVisData();
 						if (cell.getClearingTime()>0)
 							g2D.setColor(visData.getAttribute(cell.getId()));
 					}
@@ -611,7 +598,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 
 		
 
-		BufferedImage bImage = gc.createCompatibleImage((int)(maxX-minX), (int)(maxY-minY), Transparency.TRANSLUCENT);
+		BufferedImage bImage = gc.createCompatibleImage(maxX-minX, maxY-minY, Transparency.TRANSLUCENT);
 		
 		Graphics IG = bImage.getGraphics();
 		Graphics2D IG2D = (Graphics2D) IG;

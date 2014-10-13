@@ -22,37 +22,21 @@ package playground.wdoering.grips.evacuationanalysis.gui;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.geom.Rectangle2D;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.data.statistics.HistogramDataset;
-import org.jfree.data.statistics.HistogramType;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.wdoering.grips.evacuationanalysis.EvacuationAnalysis;
 import playground.wdoering.grips.evacuationanalysis.EvacuationAnalysis.Mode;
 import playground.wdoering.grips.evacuationanalysis.EvacuationAnalysis.Unit;
-import playground.wdoering.grips.evacuationanalysis.data.AttributeData;
 
 public class KeyPanel extends AbstractDataPanel {
 	
@@ -96,18 +80,18 @@ public class KeyPanel extends AbstractDataPanel {
 		{
 			if (mode.equals(Mode.EVACUATION))
 			{
-				classColor[i] =this.data.getEvacuationTimeVisData().getAttribute((IdImpl)clusters.get(i).getFirst());
+				classColor[i] =this.data.getEvacuationTimeVisData().getAttribute(clusters.get(i).getFirst());
 				
 				classVal[i] =  EvacuationAnalysis.getReadableTime(clusters.get(i).getSecond(), Unit.TIME);
 			}
 			else if (mode.equals(Mode.CLEARING))
 			{
-				classColor[i] = this.data.getClearingTimeVisData().getAttribute((IdImpl)clusters.get(i).getFirst());
+				classColor[i] = this.data.getClearingTimeVisData().getAttribute(clusters.get(i).getFirst());
 				classVal[i] = EvacuationAnalysis.getReadableTime(clusters.get(i).getSecond(), Unit.TIME);
 			}
 			else 
 			{
-				classColor[i] = this.data.getLinkUtilizationVisData().getAttribute((IdImpl)clusters.get(i).getFirst()).getSecond();
+				classColor[i] = this.data.getLinkUtilizationVisData().getAttribute(clusters.get(i).getFirst()).getSecond();
 				classVal[i] = EvacuationAnalysis.getReadableTime(clusters.get(i).getSecond(), Unit.PEOPLE);
 			}
 			

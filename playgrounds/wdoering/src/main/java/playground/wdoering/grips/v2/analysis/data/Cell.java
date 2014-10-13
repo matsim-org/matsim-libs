@@ -26,7 +26,6 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -39,7 +38,7 @@ public class Cell {
 	private List<Tuple<Tuple<Id, Id>, Double>> linkEnterTimes;
 	private CoordImpl coord;
 	private double clearingTime;
-	private IdImpl id;
+	private Id<Cell> id;
 
 	private static int currentId = 0;
 
@@ -53,7 +52,7 @@ public class Cell {
 		this.clearingTime = 0d;
 
 		currentId++;
-		this.id = new IdImpl(currentId);
+		this.id = Id.create(currentId, Cell.class);
 	}
 
 	public double getTimeSum() {
@@ -139,7 +138,7 @@ public class Cell {
 		return clearingTime;
 	}
 
-	public IdImpl getId() {
+	public Id<Cell> getId() {
 		return this.id;
 	}
 

@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -167,9 +166,9 @@ public class PTLinesGenerator {
 
 		// departures
 		for (int i = 0; i < (Integer) stop.numDepSpinnerValue; i++) {
-			Vehicle veh = vf.createVehicle(new IdImpl(id.toString() + "_veh_" + i), vt);
+			Vehicle veh = vf.createVehicle(Id.create(id.toString() + "_veh_" + i, Vehicle.class), vt);
 			vehicles.addVehicle( veh);
-			Departure dep = this.fac.createDeparture(new IdImpl(id.toString() + "_dep_" + i), depTime);
+			Departure dep = this.fac.createDeparture(Id.create(id.toString() + "_dep_" + i, Departure.class), depTime);
 			dep.setVehicleId(veh.getId());
 			tr.addDeparture(dep);
 			depTime += 5 * 30;

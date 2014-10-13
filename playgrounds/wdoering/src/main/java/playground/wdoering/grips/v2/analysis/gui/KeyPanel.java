@@ -31,7 +31,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.wdoering.grips.scenariomanager.model.Constants.Mode;
@@ -76,19 +75,19 @@ public class KeyPanel extends AbstractDataPanel
 		{
 			if (mode.equals(Mode.EVACUATION))
 			{
-				classColor[i] = this.data.getEvacuationTimeVisData().getAttribute((IdImpl) clusters.get(i).getFirst());
+				classColor[i] = this.data.getEvacuationTimeVisData().getAttribute(clusters.get(i).getFirst());
 				classVal[i] = getReadableTime(clusters.get(i).getSecond(), Unit.TIME);
 				
 			}
 			else if (mode.equals(Mode.CLEARING))
 			{
-				classColor[i] = this.data.getClearingTimeVisData().getAttribute((IdImpl) clusters.get(i).getFirst());
+				classColor[i] = this.data.getClearingTimeVisData().getAttribute(clusters.get(i).getFirst());
 				classVal[i] = getReadableTime(clusters.get(i).getSecond(), Unit.TIME);
 				
 			}
 			else
 			{
-				classColor[i] = this.data.getLinkUtilizationVisData().getAttribute((IdImpl) clusters.get(i).getFirst()).getSecond();
+				classColor[i] = this.data.getLinkUtilizationVisData().getAttribute(clusters.get(i).getFirst()).getSecond();
 				classVal[i] = getReadableTime(clusters.get(i).getSecond(), Unit.PEOPLE);
 			}
 

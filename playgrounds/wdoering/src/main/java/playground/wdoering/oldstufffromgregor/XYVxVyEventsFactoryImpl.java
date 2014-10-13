@@ -19,8 +19,9 @@
  * *********************************************************************** */
 package playground.wdoering.oldstufffromgregor;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author laemmel
@@ -42,7 +43,7 @@ public class XYVxVyEventsFactoryImpl {
 	 * @return
 	 */
 	public Event createXYZAzimuthEvent(String x, String y, String vx, String vy, String id, String time) {
-		XYVxVyEventImpl e = new XYVxVyEventImpl(new IdImpl(id), Double.parseDouble(x), Double.parseDouble(y), Double.parseDouble(vx), Double.parseDouble(vy), Double.parseDouble(time));
+		XYVxVyEventImpl e = new XYVxVyEventImpl(Id.create(id, Person.class), Double.parseDouble(x), Double.parseDouble(y), Double.parseDouble(vx), Double.parseDouble(vy), Double.parseDouble(time));
 		return e;
 	}
 

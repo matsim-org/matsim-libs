@@ -9,13 +9,13 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -318,13 +318,13 @@ public class Bottleneck
 			Coordinate c0 = MGC.coord2Coordinate(n0.getCoord());
 			Coordinate c1 = MGC.coord2Coordinate(n1.getCoord());
 
-			Id lid = new IdImpl(linkId++);
+			Id<Link> lid = Id.create(linkId++, Link.class);
 			if (c1.distance(countingStation) == 0)
 				System.out.println("Counting station link:" + lid);
 
 			//create link between the current and the next node
 			Link l = network.createLink(lid, n0, n1, (NetworkImpl) scenario.getNetwork(), c0.distance(c1), 1.34, 1, 1);
-			Id lid1 = new IdImpl(linkId++);
+			Id<Link> lid1 = Id.create(linkId++, Link.class);
 			Link l1 = network.createLink(lid1, n1, n0, (NetworkImpl) scenario.getNetwork(), c0.distance(c1), 1.34, 1, 1);
 			//add to network
 			scenario.getNetwork().addLink(l);
@@ -347,7 +347,7 @@ public class Bottleneck
 
 	private static NodeImpl createNode(NetworkFactoryImpl network, int id, double x, double y)
 	{
-		Id nodeID = new IdImpl(id);
+		Id<Node> nodeID = Id.create(id, Node.class);
 		CoordImpl coord = new CoordImpl(x, y);
 		NodeImpl n = network.createNode(nodeID, coord);
 

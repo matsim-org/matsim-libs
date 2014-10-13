@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.population.Person;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -43,12 +44,12 @@ public class ArrowEvent extends Event {
 	private final Coordinate from;
 	private final Coordinate to;
 	private final int type;
-	private final Id persId;
+	private final Id<Person> persId;
 	private final float r;
 	private final float g;
 	private final float b;
 
-	public ArrowEvent(Id personId, Coordinate from, Coordinate to, float r, float g, float b, int type, double time) {
+	public ArrowEvent(Id<Person> personId, Coordinate from, Coordinate to, float r, float g, float b, int type, double time) {
 		super(time);
 		this.persId = personId;
 		this.from = from;

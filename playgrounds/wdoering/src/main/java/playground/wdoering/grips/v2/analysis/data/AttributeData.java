@@ -23,7 +23,6 @@ package playground.wdoering.grips.v2.analysis.data;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 
 public class AttributeData<T> {
 
@@ -41,11 +40,11 @@ public class AttributeData<T> {
 		this.attributeData = attributeData;
 	}
 
-	public void setAttribute(IdImpl id, T data) {
+	public void setAttribute(Id id, T data) {
 		attributeData.put(id, data);
 	}
 
-	public T getAttribute(IdImpl id) {
+	public T getAttribute(Id id) {
 		return attributeData.get(id);
 	}
 

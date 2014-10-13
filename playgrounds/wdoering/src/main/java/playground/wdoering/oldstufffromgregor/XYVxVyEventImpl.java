@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.population.Person;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -40,7 +41,7 @@ public class XYVxVyEventImpl extends Event implements XYVxVyEvent {
 	private final double vx;
 	private final double vy;
 
-	public XYVxVyEventImpl(Id id, double x, double y, double vx, double vy, double time) {
+	public XYVxVyEventImpl(Id<Person> id, double x, double y, double vx, double vy, double time) {
 		super(time);
 		this.personId = id;
 		this.c = new Coordinate(x, y);
@@ -50,7 +51,7 @@ public class XYVxVyEventImpl extends Event implements XYVxVyEvent {
 		this.vy = vy;
 	}
 
-	public XYVxVyEventImpl(Id id, Coordinate c, double vx, double vy, double time) {
+	public XYVxVyEventImpl(Id<Person> id, Coordinate c, double vx, double vy, double time) {
 		super(time);
 		this.personId = id;
 		this.c = c;
@@ -82,50 +83,27 @@ public class XYVxVyEventImpl extends Event implements XYVxVyEvent {
 		return attr;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see playground.gregor.sim2d.events.XYZAzimuthEvent#getX()
-	 */
 	@Override
 	public double getX() {
 		return this.x;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see playground.gregor.sim2d.events.XYZAzimuthEvent#getY()
-	 */
 	@Override
 	public double getY() {
 		return this.y;
 	}
 
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see playground.gregor.sim2d.events.XYZAzimuthEvent#getCoordinate()
-	 */
 	@Override
 	public Coordinate getCoordinate() {
 		return this.c;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see playground.gregor.sim2d_v2.events.XYZAzimuthEvent#getVX()
-	 */
 	@Override
 	public double getVX() {
 		return this.vx;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see playground.gregor.sim2d_v2.events.XYZAzimuthEvent#getVY()
-	 */
 	@Override
 	public double getVY() {
 		return this.vy;
@@ -133,7 +111,7 @@ public class XYVxVyEventImpl extends Event implements XYVxVyEvent {
 	
 	public static final String ATTRIBUTE_PERSON = "person";
 
-	private final Id personId;
+	private final Id<Person> personId;
 
 
 	@Override
