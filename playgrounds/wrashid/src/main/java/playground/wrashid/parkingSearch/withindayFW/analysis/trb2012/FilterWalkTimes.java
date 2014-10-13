@@ -20,11 +20,9 @@
 package playground.wrashid.parkingSearch.withindayFW.analysis.trb2012;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
-import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
 import org.matsim.contrib.parking.lib.obj.Matrix;
-import org.matsim.core.basic.v01.IdImpl;
 
 
 public class FilterWalkTimes {
@@ -44,7 +42,7 @@ public class FilterWalkTimes {
 		for (int i = 1; i < walkTimesMatrix.getNumberOfRows(); i++) {
 			String parkingIdString = walkTimesMatrix.getString(i, 1);
 			if (parkingIdString.contains("gp") || parkingIdString.contains("stp")) {
-				IdImpl personId = new IdImpl(walkTimesMatrix.getString(i, 0));
+				Id<Person> personId = Id.create(walkTimesMatrix.getString(i, 0), Person.class);
 				double walkTime = walkTimesMatrix.getDouble(i, 2);
 				
 				System.out.println(parkingIdString + "\t" + walkTime);

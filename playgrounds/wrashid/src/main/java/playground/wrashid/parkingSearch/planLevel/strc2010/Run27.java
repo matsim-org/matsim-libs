@@ -1,7 +1,8 @@
 package playground.wrashid.parkingSearch.planLevel.strc2010;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 
 import playground.wrashid.lib.GlobalRegistry;
@@ -31,7 +32,7 @@ public class Run27  extends IncomeRelevantForParking implements ParkingPriceMapp
 	}
 
 	@Override
-	public ParkingPrice getParkingPrice(Id facilityId) {
+	public ParkingPrice getParkingPrice(Id<ActivityFacility> facilityId) {
 		if (isPartOfParkingSetCloseToHomeWithin4500Meters(facilityId) || isPartOfParkingSetCloseToWorkWithin4500Meters(facilityId)){
 			return getExpensiveParking();
 		} else {
@@ -45,13 +46,14 @@ public class Run27  extends IncomeRelevantForParking implements ParkingPriceMapp
 	
 	public ParkingPrice getExpensiveParking(){
 		return new ParkingPrice() {
+			@Override
 			public double getPrice(double startParkingTime, double endParkingTime) {
 				return 10*getCheapParking().getPrice(startParkingTime, endParkingTime);
 			}
 		};
 	}
 	
-	public double getIncome(Id personId){
+	public double getIncome(Id<Person> personId){
 		int personIdInt=Integer.parseInt(personId.toString());
 		if (personIdInt %2==0){
 			return 50000;
@@ -60,7 +62,7 @@ public class Run27  extends IncomeRelevantForParking implements ParkingPriceMapp
 		}
 	}
 	
-	public static boolean isPartOfParkingSetCloseToHomeWithin4500Meters(Id facilityId){
+	public static boolean isPartOfParkingSetCloseToHomeWithin4500Meters(Id<ActivityFacility> facilityId){
 		int facilityIdInt=Integer.parseInt(facilityId.toString());
 		if (facilityIdInt>=1 && facilityIdInt<=5){
 			return true;
@@ -71,7 +73,7 @@ public class Run27  extends IncomeRelevantForParking implements ParkingPriceMapp
 		return false;
 	}
 	
-	public static boolean isPartOfParkingSetCloseToWorkWithin4500Meters(Id facilityId){
+	public static boolean isPartOfParkingSetCloseToWorkWithin4500Meters(Id<ActivityFacility> facilityId){
 		int facilityIdInt=Integer.parseInt(facilityId.toString());
 		if (facilityIdInt>=15 && facilityIdInt<=18){
 			return true;
@@ -87,7 +89,7 @@ public class Run27  extends IncomeRelevantForParking implements ParkingPriceMapp
 
 		for (int i = 1; i <= 1000; i++) {
 				personGroupsForStatistics.addPersonToGroup(
-						"Group-" + i%2, new IdImpl(i));
+						"Group-" + i%2, Id.create(i, Person.class));
 		}
 
 		ParkingRoot.setPersonGroupsForStatistics(personGroupsForStatistics);

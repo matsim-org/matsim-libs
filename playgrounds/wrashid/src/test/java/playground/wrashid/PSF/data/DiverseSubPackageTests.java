@@ -1,24 +1,23 @@
 package playground.wrashid.PSF.data;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 
+import junit.framework.TestCase;
+
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 
 import playground.wrashid.PSF.data.hubCoordinates.hubLinkMapper.GenerateTableHubLinkMapping;
-
-import junit.framework.TestCase;
 
 public class DiverseSubPackageTests extends TestCase {
 
 	public void testEliminateDuplicates(){
-		LinkedList<Id> list=new LinkedList<Id>();
+		LinkedList<Id<Link>> list=new LinkedList<>();
 		
-		list.add(new IdImpl("1"));
-		list.add(new IdImpl("1"));
-		list.add(new IdImpl("a"));
-		list.add(new IdImpl("a"));
+		list.add(Id.create("1", Link.class));
+		list.add(Id.create("1", Link.class));
+		list.add(Id.create("a", Link.class));
+		list.add(Id.create("a", Link.class));
 		
 		assertEquals(4, list.size());
 		

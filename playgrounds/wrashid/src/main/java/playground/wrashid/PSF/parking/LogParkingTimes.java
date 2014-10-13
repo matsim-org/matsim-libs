@@ -7,12 +7,13 @@ import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
 
 public class LogParkingTimes implements ActivityStartEventHandler, ActivityEndEventHandler {
 
 	Controler controler;
-	HashMap<Id, ParkingTimes> parkingTimes = new HashMap<Id, ParkingTimes>();
+	HashMap<Id<Person>, ParkingTimes> parkingTimes = new HashMap<>();
 
 	public LogParkingTimes(Controler controler) {
 		super();
@@ -22,7 +23,7 @@ public class LogParkingTimes implements ActivityStartEventHandler, ActivityEndEv
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
 		// log the (start) time when the car departs
-		Id personId = event.getPersonId();
+		Id<Person> personId = event.getPersonId();
 		if (event.getActType().equalsIgnoreCase("parkingDeparture")) {
 			ParkingTimes pTime = parkingTimes.get(personId);
 
@@ -50,13 +51,13 @@ public class LogParkingTimes implements ActivityStartEventHandler, ActivityEndEv
 
 	@Override
 	public void reset(int iteration) {
-		parkingTimes = new HashMap<Id, ParkingTimes>();
+		parkingTimes = new HashMap<>();
 	}
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
 		// log the (end) time when the car has been parked
-		Id personId = event.getPersonId();
+		Id<Person> personId = event.getPersonId();
 		if (event.getActType().equalsIgnoreCase("parkingArrival")) {
 			ParkingTimes pTime = parkingTimes.get(personId);
 			if (pTime == null) {
@@ -83,7 +84,7 @@ public class LogParkingTimes implements ActivityStartEventHandler, ActivityEndEv
 	// controler.getPopulation().getPersons().get(personId).getSelectedPlan().getNextLeg(act)
 	// }
 
-	public HashMap<Id, ParkingTimes> getParkingTimes() {
+	public HashMap<Id<Person>, ParkingTimes> getParkingTimes() {
 		return parkingTimes;
 	}
 

@@ -12,7 +12,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -51,7 +50,7 @@ public class FilterEventsForCommunity {
 		LinkedList<Person> persons=new LinkedList<Person>();
 		
 		System.out.println("personId selected for filtered plans file");
-		for (Id personId:filterAgentsWithHomeLocationInPredefinedAreas.getIncludedAgents()){
+		for (Id<Person> personId:filterAgentsWithHomeLocationInPredefinedAreas.getIncludedAgents()){
 			persons.add(scenario.getPopulation().getPersons().get(personId));
 			System.out.println(personId);
 		}
@@ -79,11 +78,11 @@ public class FilterEventsForCommunity {
 
 		private final ComplexRectangularSelectionArea complexRectangularSelectionArea;
 		
-		private HashSet<Id> includedAgents=new HashSet<Id>();
+		private HashSet<Id<Person>> includedAgents=new HashSet<>();
 
 		private final Network network;
 
-		public HashSet<Id> getIncludedAgents() {
+		public HashSet<Id<Person>> getIncludedAgents() {
 			return includedAgents;
 		}
 

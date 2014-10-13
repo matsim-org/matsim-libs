@@ -31,16 +31,17 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 
 public class OutFlowInfoCollectorWithPt implements LinkLeaveEventHandler, LinkEnterEventHandler,
 		PersonArrivalEventHandler {
 
 	private int binSizeInSeconds; // set the length of interval
-	public HashMap<Id, int[]> linkOutFlow; // define
+	public HashMap<Id<Link>, int[]> linkOutFlow; // define
 	private Map<Id<Link>, ? extends Link> filteredEquilNetLinks; // define
 	
 	// personId, linkId
-	private HashMap<Id, Id> lastEnteredLink=new HashMap<Id, Id>(); // define
+	private HashMap<Id<Person>, Id<Link>> lastEnteredLink=new HashMap<>(); // define
 	
 	private boolean isOldEventFile;
 
@@ -54,7 +55,7 @@ public class OutFlowInfoCollectorWithPt implements LinkLeaveEventHandler, LinkEn
 
 	@Override
 	public void reset(int iteration) {
-		linkOutFlow = new HashMap<Id, int[]>(); // reset the variables (private
+		linkOutFlow = new HashMap<>(); // reset the variables (private
 												// ones)
 	}
 
@@ -64,7 +65,7 @@ public class OutFlowInfoCollectorWithPt implements LinkLeaveEventHandler, LinkEn
 		linkLeave(event.getLinkId(), event.getTime());
 	}
 
-	private void linkLeave(Id linkId, double time) {
+	private void linkLeave(Id<Link> linkId, double time) {
 		if (!filteredEquilNetLinks.containsKey(linkId)) {
 			return; // if the link is not in the link set, then exit the method
 		}
@@ -89,7 +90,7 @@ public class OutFlowInfoCollectorWithPt implements LinkLeaveEventHandler, LinkEn
 	}
 
 	public void printLinkFlows() { // print
-		for (Id linkId : linkOutFlow.keySet()) {
+		for (Id<Link> linkId : linkOutFlow.keySet()) {
 			int[] bins = linkOutFlow.get(linkId);
 
 			Link link = filteredEquilNetLinks.get(linkId);
@@ -103,7 +104,7 @@ public class OutFlowInfoCollectorWithPt implements LinkLeaveEventHandler, LinkEn
 		}
 	}
 
-	public HashMap<Id, int[]> getLinkOutFlow() {
+	public HashMap<Id<Link>, int[]> getLinkOutFlow() {
 		return linkOutFlow;
 	}
 

@@ -22,7 +22,7 @@ package playground.wrashid.parkingSearch.planLevel.scoring;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -52,10 +52,10 @@ public class ParkingScoreListenerTest extends MatsimTestCase implements Iteratio
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		HashMap<Id, Double> hm = ParkingScoreExecutor.getScoreHashMap();
-		assertEquals(-2.0, hm.get(new IdImpl(1)).doubleValue());
-		assertEquals(-2.0, hm.get(new IdImpl(2)).doubleValue());
-		assertEquals(-2.0, hm.get(new IdImpl(3)).doubleValue());
+		HashMap<Id<Person>, Double> hm = ParkingScoreExecutor.getScoreHashMap();
+		assertEquals(-2.0, hm.get(Id.create(1, Person.class)).doubleValue());
+		assertEquals(-2.0, hm.get(Id.create(2, Person.class)).doubleValue());
+		assertEquals(-2.0, hm.get(Id.create(3, Person.class)).doubleValue());
 	}
 
 }

@@ -1,6 +1,7 @@
 package playground.wrashid.artemis.hubs;
 
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 
 public class Main {
 
@@ -9,7 +10,7 @@ public class Main {
 	
 		LinkHubMapping linkHubMapping=new LinkHubMapping(linkHubMappingFile); 
 		
-		if (!linkHubMapping.getHubIdForLinkId(new IdImpl("17560001380400TF")).toString().equalsIgnoreCase("2")){
+		if (!linkHubMapping.getHubIdForLinkId(Id.create("17560001380400TF", Link.class)).toString().equalsIgnoreCase("2")){
 			throw new RuntimeException("bad");
 		}
 		

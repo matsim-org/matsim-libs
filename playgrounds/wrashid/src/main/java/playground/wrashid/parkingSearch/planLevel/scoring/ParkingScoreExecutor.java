@@ -25,6 +25,7 @@ import java.util.LinkedList;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.population.ActivityImpl;
 
@@ -35,9 +36,9 @@ import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 
 public class ParkingScoreExecutor {
 
-	private static HashMap<Id, Double> scoreHashMap = new HashMap<Id, Double>();
+	private static HashMap<Id<Person>, Double> scoreHashMap = new HashMap<>();
 
-	public static HashMap<Id, Double> getScoreHashMap() {
+	public static HashMap<Id<Person>, Double> getScoreHashMap() {
 		return scoreHashMap;
 	}
 
@@ -50,7 +51,7 @@ public class ParkingScoreExecutor {
 					.getParkingTargetActivities(person.getSelectedPlan());
 
 			for (ActivityImpl targetActivity : parkingTargetActivities) {
-				Id parkingFacilityId = ParkingGeneralLib.getArrivalParkingAct(
+				Id<ActivityFacility> parkingFacilityId = ParkingGeneralLib.getArrivalParkingAct(
 						person.getSelectedPlan(), targetActivity)
 						.getFacilityId();
 				score += ParkingRoot.getParkingScoringFunction().getScore(
@@ -79,7 +80,7 @@ public class ParkingScoreExecutor {
 		}
 	}
 
-	private void updateParkingScoreSumInPersonGroupsForPerson(int iteration, Id personId,
+	private void updateParkingScoreSumInPersonGroupsForPerson(int iteration, Id<Person> personId,
 			Double sumOfParkingScoresForPerson) {
 		if (ParkingRoot.getPersonGroupsForStatistics() != null) {
 			PersonGroups personGroupsStatistics = ParkingRoot

@@ -22,7 +22,7 @@ package playground.wrashid.PSF.converter.addingParkings;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -68,9 +68,9 @@ class OptimizedChargerTestGeneral implements ParametersPSFMutator {
 		OptimizedCharger optimizedCharger = new OptimizedCharger(logEnergyConsumption.getEnergyConsumption(),
 				logParkingTimes.getParkingTimes(), Double.parseDouble(controler.getConfig().findParam("PSF",
 						"default.maxBatteryCapacity")));
-		HashMap<Id, ChargingTimes> chargingTimes = optimizedCharger.getChargingTimes();
+		HashMap<Id<Person>, ChargingTimes> chargingTimes = optimizedCharger.getChargingTimes();
 
-		ChargingTimes chargingTimesOfAgentOne = chargingTimes.get(new IdImpl("66805"));
+		ChargingTimes chargingTimesOfAgentOne = chargingTimes.get(Id.create("66805", Person.class));
 
 		// the agent charges once at home in the evening (during off peak time),
 		// because the energy consumption

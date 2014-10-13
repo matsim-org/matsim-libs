@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.lib.DebugLib;
@@ -22,12 +23,12 @@ public class ActivityDurationEstimator implements ActivityStartEventHandler, Per
 
 	private final Controler controler;
 	private final LinkedList<Double> activityDurationEstimations = new LinkedList<Double>();
-	private final Id selectedPersonId;
+	private final Id<Person> selectedPersonId;
 	//private int indexOfActivity = 0;
 	//private Double startTimeFirstAct = null;
 	private final ActDurationEstimationContainer actDurationEstimationContainer=new ActDurationEstimationContainer();
 
-	public ActivityDurationEstimator(final Controler controler, final Id selectedPersonId) {
+	public ActivityDurationEstimator(final Controler controler, final Id<Person> selectedPersonId) {
 		this.controler = controler;
 		this.selectedPersonId = selectedPersonId;
 	}

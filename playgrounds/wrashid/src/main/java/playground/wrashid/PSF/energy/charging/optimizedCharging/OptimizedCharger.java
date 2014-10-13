@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 
 import playground.wrashid.PSF.ParametersPSF;
@@ -31,11 +32,11 @@ public class OptimizedCharger {
 
 	// TODO: perhaps add EnergyChargeInfo later here as an object...
 
-	private HashMap<Id, EnergyConsumption> energyConsumption;
-	private HashMap<Id, ParkingTimes> parkingTimes;
-	private HashMap<Id, ChargingTimes> chargingTimes = new HashMap<Id, ChargingTimes>();
+	private HashMap<Id<Person>, EnergyConsumption> energyConsumption;
+	private HashMap<Id<Person>, ParkingTimes> parkingTimes;
+	private HashMap<Id<Person>, ChargingTimes> chargingTimes = new HashMap<>();
 
-	public OptimizedCharger(HashMap<Id, EnergyConsumption> energyConsumption, HashMap<Id, ParkingTimes> parkingTimes, double defaultMaxBatteryCapacity) {
+	public OptimizedCharger(HashMap<Id<Person>, EnergyConsumption> energyConsumption, HashMap<Id<Person>, ParkingTimes> parkingTimes, double defaultMaxBatteryCapacity) {
 		this.energyConsumption = energyConsumption;
 		this.parkingTimes = parkingTimes;
 		performOptimizedCharging(defaultMaxBatteryCapacity);
@@ -49,11 +50,11 @@ public class OptimizedCharger {
 	// TODO: this operation could be parallelized later...
 	private void performOptimizedCharging(final double defaultMaxBatteryCapacity) {
 
-		Iterator<Id> iter = energyConsumption.keySet().iterator();
+		Iterator<Id<Person>> iter = energyConsumption.keySet().iterator();
 
 		// iterate through all vehicles and find their optimal charging time
 		while (iter.hasNext()) {
-			Id personId = iter.next();
+			Id<Person> personId = iter.next();
 
 			// initialize the Charging times
 			// TODO: later for each individual car we should be able to read the
@@ -135,7 +136,7 @@ public class OptimizedCharger {
 		}
 	}
 
-	public HashMap<Id, ChargingTimes> getChargingTimes() {
+	public HashMap<Id<Person>, ChargingTimes> getChargingTimes() {
 		return chargingTimes;
 	}
 

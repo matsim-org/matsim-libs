@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
@@ -36,7 +37,7 @@ import playground.wrashid.parkingSearch.planLevel.parkingType.ParkingAttribute;
 
 public class LinkFacilityAssociation {
 
-	protected HashMap<Id, ArrayList<ActivityFacilityImpl>> linkFacilityMapping = new HashMap<Id, ArrayList<ActivityFacilityImpl>>();
+	protected HashMap<Id<Link>, ArrayList<ActivityFacilityImpl>> linkFacilityMapping = new HashMap<>();
 	protected NetworkImpl network;
 
 	protected LinkFacilityAssociation() {
@@ -68,7 +69,7 @@ public class LinkFacilityAssociation {
 	 * @param facility
 	 */
 	private void addFacilityToHashMap(ActivityFacilityImpl facility) {
-		Id facilityLink = getClosestLink(facility);
+		Id<Link> facilityLink = getClosestLink(facility);
 
 		assureHashMapInitializedForLink(facilityLink);
 
@@ -84,7 +85,7 @@ public class LinkFacilityAssociation {
 	 * 
 	 * @return
 	 */
-	protected Id getClosestLink(ActivityFacilityImpl facility) {
+	protected Id<Link> getClosestLink(ActivityFacilityImpl facility) {
 		if (facility.getLinkId() == null) {
 			return network.getNearestLink(facility.getCoord()).getId();
 		} else {
@@ -97,7 +98,7 @@ public class LinkFacilityAssociation {
 	 * 
 	 * @param linkId
 	 */
-	protected void assureHashMapInitializedForLink(Id linkId) {
+	protected void assureHashMapInitializedForLink(Id<Link> linkId) {
 		if (!linkFacilityMapping.containsKey(linkId)) {
 			linkFacilityMapping.put(linkId, new ArrayList<ActivityFacilityImpl>());
 		}
@@ -108,7 +109,7 @@ public class LinkFacilityAssociation {
 	 * @param linkId
 	 * @return
 	 */
-	public ArrayList<ActivityFacilityImpl> getFacilities(Id linkId) {
+	public ArrayList<ActivityFacilityImpl> getFacilities(Id<Link> linkId) {
 		ArrayList<ActivityFacilityImpl> result = linkFacilityMapping.get(linkId);
 		if (result == null) {
 			result = new ArrayList<ActivityFacilityImpl>();
@@ -121,13 +122,13 @@ public class LinkFacilityAssociation {
 	 * @param linkId
 	 * @return
 	 */
-	public ArrayList<ActivityFacilityImpl> getFacilitiesHavingParkingAttribute(Id linkId, ParkingAttribute parkingAttribute) {
+	public ArrayList<ActivityFacilityImpl> getFacilitiesHavingParkingAttribute(Id<Link> linkId, ParkingAttribute parkingAttribute) {
 		ArrayList<ActivityFacilityImpl> result = linkFacilityMapping.get(linkId);
 		if (result == null) {
 			result = new ArrayList<ActivityFacilityImpl>();
 		} else if (parkingAttribute!=null) {
 			for (int i=0;i<result.size();i++){
-				Id facilityId=result.get(i).getId();
+				Id<ActivityFacility> facilityId=result.get(i).getId();
 				ArrayList<ActivityFacilityImpl> filteredResult=new ArrayList<ActivityFacilityImpl>();
 				if (ParkingGeneralLib.containsParkingAttribute(ParkingRoot.getParkingFacilityAttributes().getParkingFacilityAttributes(facilityId), parkingAttribute)){
 					filteredResult.add(result.get(i));

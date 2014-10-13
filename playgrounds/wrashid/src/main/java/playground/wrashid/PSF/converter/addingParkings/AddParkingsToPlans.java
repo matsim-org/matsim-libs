@@ -3,12 +3,13 @@ package playground.wrashid.PSF.converter.addingParkings;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
@@ -74,8 +75,8 @@ public class AddParkingsToPlans {
 
 
 					// set the facility of the activities also
-					previousActivity.setFacilityId(new IdImpl("facility_" + previousActivity.getLinkId().toString()));
-					nextActivity.setFacilityId(new IdImpl("facility_" + previousActivity.getLinkId().toString()));
+					previousActivity.setFacilityId(Id.create("facility_" + previousActivity.getLinkId().toString(), ActivityFacility.class));
+					nextActivity.setFacilityId(Id.create("facility_" + previousActivity.getLinkId().toString(), ActivityFacility.class));
 
 				} else {
 					// add every thing else the new plan without change
@@ -124,7 +125,7 @@ public class AddParkingsToPlans {
 
 		parkingActivity.setType(activityType);
 		parkingActivity.setMaximumDuration(parkingActivityDuration);
-		parkingActivity.setFacilityId(new IdImpl("facility_" + activity.getLinkId().toString()));
+		parkingActivity.setFacilityId(Id.create("facility_" + activity.getLinkId().toString(), ActivityFacility.class));
 
 		return parkingActivity;
 	}

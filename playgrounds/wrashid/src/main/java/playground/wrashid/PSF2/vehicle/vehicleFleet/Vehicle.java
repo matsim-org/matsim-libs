@@ -22,23 +22,24 @@ package playground.wrashid.PSF2.vehicle.vehicleFleet;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.vehicles.VehicleType;
 
 import playground.wrashid.PSF2.vehicle.energyStateMaintainance.EnergyStateMaintainer;
 
 public abstract class Vehicle {
 
 	private final EnergyStateMaintainer energyStateMaintainer;
-	private Id vehicleClassId;
+	private Id<VehicleType> vehicleClassId;
 	
 	protected double energyConcumptionForWholeDayInJoule;
 
-	public Vehicle(EnergyStateMaintainer energyStateMaintainer, Id vehicleClassId){
+	public Vehicle(EnergyStateMaintainer energyStateMaintainer, Id<VehicleType> vehicleClassId){
 		this.energyStateMaintainer = energyStateMaintainer;
 		this.vehicleClassId=vehicleClassId;
 	}
 	
-	public Vehicle(Id vehicleClassId){
+	public Vehicle(Id<VehicleType> vehicleClassId){
 		this.vehicleClassId=vehicleClassId;
 		energyStateMaintainer=null;
 	}
@@ -51,7 +52,7 @@ public abstract class Vehicle {
 
 	
 
-	public Id getVehicleClassId() {
+	public Id<VehicleType> getVehicleClassId() {
 		return vehicleClassId;
 	}
 	
@@ -75,7 +76,7 @@ public abstract class Vehicle {
 		return link.getLength()/timeSpentOnLink;
 	}
 	
-	public static Id getPlaceholderForUnmappedPersonIds(){
-		return new IdImpl("all-unmapped");
+	public static Id<Person> getPlaceholderForUnmappedPersonIds(){
+		return Id.create("all-unmapped", Person.class);
 	}
 }

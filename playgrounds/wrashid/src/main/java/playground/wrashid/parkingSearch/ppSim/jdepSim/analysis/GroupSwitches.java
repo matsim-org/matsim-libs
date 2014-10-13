@@ -4,10 +4,10 @@ import java.util.HashSet;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.contrib.parking.lib.obj.TwoKeyHashMapWithDouble;
-import org.matsim.core.basic.v01.IdImpl;
 
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 
@@ -37,12 +37,12 @@ public class GroupSwitches extends CompareSelectedParkingPropertyOneRun {
 			Matrix eventsMatrixNextIter = GeneralLib
 					.readStringMatrix(getEventsFileName(outputFolder, i + 1));
 
-			TwoHashMapsConcatenated<Id, Integer, Integer> indexMatrixB = getIndex(eventsMatrixNextIter);
+			TwoHashMapsConcatenated<Id<Person>, Integer, Integer> indexMatrixB = getIndex(eventsMatrixNextIter);
 
 			for (int j = 1; j < currentIterationMatrix.getNumberOfRows(); j++) {
 				String facilityId = currentIterationMatrix.getString(j, 6);
-				Id personId = new IdImpl(currentIterationMatrix.getString(j,
-						indexPersonId));
+				Id<Person> personId = Id.create(currentIterationMatrix.getString(j,
+						indexPersonId), Person.class);
 				int legIndex = currentIterationMatrix.getInteger(j, indexLeg);
 				String groupNameCurrentIter = currentIterationMatrix.getString(
 						j, indexGroupName);

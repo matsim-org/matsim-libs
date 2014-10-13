@@ -20,12 +20,11 @@ package playground.wrashid.parkingSearch.ppSim.ttmatrix;
 
 import java.util.HashMap;
 
-import org.geotools.metadata.iso.identification.IdentificationImpl;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.Matrix;
-import org.matsim.core.basic.v01.IdImpl;
 
 public class TTMatrixFromStoredTable extends TTMatrix {
 	
@@ -57,11 +56,11 @@ public class TTMatrixFromStoredTable extends TTMatrix {
 			}
 		}
 		
-		linkTravelTimes=new HashMap<Id, double[]>();
+		linkTravelTimes=new HashMap<Id<Link>, double[]>();
 		int numberOfBins = getNumberOfBins();
 		
 		for (int i=1;i<sm.getNumberOfRows();i++){
-			Id linkId=new IdImpl(sm.getString(i, 0));
+			Id<Link> linkId=Id.create(sm.getString(i, 0), Link.class);
 			double[] d=new double[numberOfBins];
 			for (int j=1;j<sm.getNumberOfColumnsInRow(i);j++){
 				 d[j-1]= sm.getDouble(i, j);

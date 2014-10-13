@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import org.apache.commons.math.stat.descriptive.moment.Mean;
 import org.apache.commons.math.stat.descriptive.moment.StandardDeviation;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.GeneralLib;
 
 import playground.wrashid.lib.obj.Collections;
@@ -15,7 +16,7 @@ public class ParkingWalkingDistanceMeanAndStandardDeviationGraph {
 
 	LinkedList<StatisticalValues> statisticalValues=new LinkedList<ParkingWalkingDistanceMeanAndStandardDeviationGraph.StatisticalValues>();
 	
-	public void updateStatisticsForIteration(int iternationNumber, HashMap<Id, Double> parkingWalkingDistance) {
+	public void updateStatisticsForIteration(int iternationNumber, HashMap<Id<Person>, Double> parkingWalkingDistance) {
 		if (statisticalValues.size()!=iternationNumber){
 			throw new Error("the iteration number is wrong!!!!");
 		}
@@ -36,7 +37,7 @@ public class ParkingWalkingDistanceMeanAndStandardDeviationGraph {
 			double sumOfWalkingDistanceIncrease=0;
 			double sumOfWalkingDistanceDecrease=0;
 			
-			for (Id personId:parkingWalkingDistance.keySet()){
+			for (Id<Person> personId:parkingWalkingDistance.keySet()){
 				double walkingDistanceDifference=parkingWalkingDistance.get(personId)-ParkingRoot.getParkingWalkingDistanceOfPreviousIteration().get(personId);
 			
 				if (walkingDistanceDifference>=0){

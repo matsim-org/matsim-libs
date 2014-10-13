@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.PriorityQueue;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.GeneralLib;
 
 import playground.wrashid.PSF.ParametersPSF;
@@ -196,13 +197,13 @@ public class ChargingTimes {
 	 * @param chargingTimes
 	 * @param outputFilePath
 	 */
-	public static void writeChargingTimes(HashMap<Id, ChargingTimes> chargingTimes, String outputFilePath) {
+	public static void writeChargingTimes(HashMap<Id<Person>, ChargingTimes> chargingTimes, String outputFilePath) {
 
 		ArrayList<String> list = new ArrayList<String>();
 //TODO: use string buffer...
 		list.add("linkId\tagentId\tstartChargingTime\tendChargingTime\tstartSOC\tendSOC");
 
-		for (Id personId : chargingTimes.keySet()) {
+		for (Id<Person> personId : chargingTimes.keySet()) {
 			ChargingTimes curChargingTime = chargingTimes.get(personId);
 			String line = "";
 
@@ -236,7 +237,7 @@ public class ChargingTimes {
 		PSFGeneralLib.writeEnergyUsageStatisticsData(fileName, energyUsageStatistics);
 	}
 
-	public static void printEnergyUsageStatistics(HashMap<Id, ChargingTimes> chargingTimes, HubLinkMapping hubLinkMapping) {
+	public static void printEnergyUsageStatistics(HashMap<Id<Person>, ChargingTimes> chargingTimes, HubLinkMapping hubLinkMapping) {
 		double[][] energyUsageStatistics = getEnergyUsageStatistics(chargingTimes, hubLinkMapping);
 
 		// write header
@@ -266,10 +267,10 @@ public class ChargingTimes {
 	 * 
 	 * TODO: write tests for it!
 	 */
-	public static double[][] getEnergyUsageStatistics(HashMap<Id, ChargingTimes> chargingTimes, HubLinkMapping hubLinkMapping) {
+	public static double[][] getEnergyUsageStatistics(HashMap<Id<Person>, ChargingTimes> chargingTimes, HubLinkMapping hubLinkMapping) {
 		double[][] energyUsageStatistics = new double[numberOfTimeBins][hubLinkMapping.getNumberOfHubs()];
 
-		for (Id personId : chargingTimes.keySet()) {
+		for (Id<Person> personId : chargingTimes.keySet()) {
 			ChargingTimes curChargingTime = chargingTimes.get(personId);
 
 			for (ChargeLog chargeLog : curChargingTime.getChargingTimes()) {

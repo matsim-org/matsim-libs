@@ -2,11 +2,11 @@ package playground.wrashid.PHEV.co2emissions;
 
 import java.util.HashMap;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 
 /**
  * This class computes the summary of co2 emissions for one specified link, for an interval specified in seconds
@@ -24,10 +24,11 @@ public class OneLinkHandler implements LinkLeaveEventHandler {
 	public OneLinkHandler(double CO2EmissionsGrammPerkm, Network network, String linkId, int interval) {
 		// initialize 
 		this.CO2EmissionsGrammPerkm =CO2EmissionsGrammPerkm;
-		this.link = network.getLinks().get(new IdImpl(linkId));
+		this.link = network.getLinks().get(Id.create(linkId, Link.class));
 		this.interval=interval;
 	}
 	
+	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		if (event.getLinkId().equals(link.getId())){
 			long hour= Math.round(event.getTime()/interval);
@@ -40,6 +41,7 @@ public class OneLinkHandler implements LinkLeaveEventHandler {
 
 	}
 
+	@Override
 	public void reset(int iteration) {
 		// TODO Auto-generated method stub
 		

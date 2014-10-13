@@ -38,9 +38,9 @@ public class RegressionModel {
 			DoubleValueHashMap<Id> numberOfStreetParkingsPerHub, DoubleValueHashMap<Id> numberOfGarageParkingsPerHub) {
 		System.out.println("hubId\tnumberOfKilometersOfStreetsPerHub\tnumberOfStreetParkingsPerHub\tnumberOfGarageParkingsPerHub");
 		
-		List<Id> hubIds = playground.wrashid.lib.obj.Collections.getSortedKeySet(linkHubMapping.getHubs());
+		List<Id<Link>> hubIds = playground.wrashid.lib.obj.Collections.getSortedKeySet(linkHubMapping.getHubs());
 
-		for (Id hubId:hubIds){
+		for (Id<Link> hubId:hubIds){
 			double nuberOfKilometersOfStreet=numberOfKilometersOfStreetsPerHub.keySet().contains(hubId)?numberOfKilometersOfStreetsPerHub.get(hubId):0;
 			double numberOfStreetParkings=numberOfStreetParkingsPerHub.keySet().contains(hubId)?numberOfStreetParkingsPerHub.get(hubId):0;
 			double numberOfGarageParkings=numberOfGarageParkingsPerHub.keySet().contains(hubId)?numberOfGarageParkingsPerHub.get(hubId):0;

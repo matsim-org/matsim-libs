@@ -4,9 +4,10 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -25,7 +26,7 @@ public class PlanGeneratorWithParkingActivitiesTest extends TestCase{
 		
 		ScenarioImpl scenario = pghc.getScenario();
 		
-		Plan planOfPersonOne=scenario.getPopulation().getPersons().get(new IdImpl(1)).getSelectedPlan();	
+		Plan planOfPersonOne=scenario.getPopulation().getPersons().get(Id.create(1, Person.class)).getSelectedPlan();	
 		
 		List<PlanElement> planElements=planOfPersonOne.getPlanElements();
 		

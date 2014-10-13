@@ -13,12 +13,12 @@ import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingOccupancyBins
 
 public class ParkingOccupancyAnalysis {
 
-	private final HashMap<Id, ParkingOccupancyBins> parkingOccupancyBins;
+	private final HashMap<Id<ActivityFacility>, ParkingOccupancyBins> parkingOccupancyBins;
 	private final ParkingCapacity parkingCapacity;
 	private static LinkedList<Double> numberOfParkingViolationSlotsInIteration;
 
 	public ParkingOccupancyAnalysis(
-			HashMap<Id, ParkingOccupancyBins> parkingOccupancyBins,
+			HashMap<Id<ActivityFacility>, ParkingOccupancyBins> parkingOccupancyBins,
 			ParkingCapacity parkingCapacity) {
 		super();
 		this.parkingOccupancyBins = parkingOccupancyBins;

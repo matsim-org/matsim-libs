@@ -19,7 +19,6 @@
 package playground.wrashid.parkingSearch.ppSim.jdepSim.routing;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
@@ -27,15 +26,15 @@ import org.matsim.vehicles.VehicleTypeImpl;
 public class DummyVehicle implements Vehicle {
 
 
-	private final VehicleType vt = new VehicleTypeImpl(new IdImpl("dummy"));
-	private final IdImpl id;
+	private final VehicleType vt = new VehicleTypeImpl(Id.create("dummy", VehicleType.class));
+	private final Id<Vehicle> id;
 
 	public DummyVehicle() {
-		this.id = new IdImpl("dummy");
+		this.id = Id.create("dummy", Vehicle.class);
 	}
 
 	@Override
-	public Id getId() {
+	public Id<Vehicle> getId() {
 		return this.id;
 	}
 

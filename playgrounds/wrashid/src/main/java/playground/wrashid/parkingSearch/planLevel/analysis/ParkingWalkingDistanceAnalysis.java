@@ -3,15 +3,16 @@ package playground.wrashid.parkingSearch.planLevel.analysis;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.GeneralLib;
 
 import playground.wrashid.parkingSearch.planLevel.init.ParkingRoot;
 
 public class ParkingWalkingDistanceAnalysis {
 
-	private final HashMap<Id, Double> parkingWalkingDistance;
+	private final HashMap<Id<Person>, Double> parkingWalkingDistance;
 
-	public ParkingWalkingDistanceAnalysis(HashMap<Id, Double> parkingWalkingTime) {
+	public ParkingWalkingDistanceAnalysis(HashMap<Id<Person>, Double> parkingWalkingTime) {
 		super();
 		this.parkingWalkingDistance = parkingWalkingTime;
 	}

@@ -24,10 +24,11 @@ import java.util.LinkedList;
 
 import org.geotools.math.Statistics;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
 import org.matsim.contrib.parking.lib.obj.Matrix;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 
 import playground.wrashid.lib.tools.txtConfig.TxtConfig;
@@ -38,9 +39,9 @@ import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 public class AssignParkingLinkIds {
 
 	// key: personId
-	private static LinkedListValueHashMap<Id, ParkingInfo> parkingInfo;
+	private static LinkedListValueHashMap<Id<Person>, ParkingInfo> parkingInfo;
 	private static NetworkImpl network;
-	private static HashMap<Id, Parking> parkings;
+	private static HashMap<Id<Parking>, Parking> parkings;
 	private static TxtConfig config;
 
 	/**
@@ -71,7 +72,7 @@ public class AssignParkingLinkIds {
 		Matrix chargingLog = GeneralLib.readStringMatrix(chargingLogInputFileName, "\t");
 
 		for (int i = 1; i < chargingLog.getNumberOfRows(); i++) {
-			Id personId = new IdImpl(chargingLog.getString(i, 1));
+			Id<Person> personId = Id.create(chargingLog.getString(i, 1), Person.class);
 			double chargingStartTime = chargingLog.getDouble(i, 2);
 
 			LinkedList<ParkingInfo> parkingInf = parkingInfo.get(personId);
@@ -103,9 +104,9 @@ public class AssignParkingLinkIds {
 		Statistics statisticsOnDistanceBetweenParkingAndActivity=new Statistics();
 		
 		for (int i = 1; i < parkingTimes.getNumberOfRows(); i++) {
-			Id personId = new IdImpl(parkingTimes.getString(i, 0));
+			Id<Person> personId = Id.create(parkingTimes.getString(i, 0), Person.class);
 			double arrivalTime = parkingTimes.getDouble(i, 1);
-			Id activityLinkId =new IdImpl(parkingTimes.getString(i, 3));
+			Id<Link> activityLinkId =Id.create(parkingTimes.getString(i, 3), Link.class);
 			
 			LinkedList<ParkingInfo> parkingInf = parkingInfo.get(personId);
 
@@ -119,7 +120,7 @@ public class AssignParkingLinkIds {
 				}
 			}
 
-			Id closestLinkFromParking = getClosestLinkFromParking(parkings.get(selectedParking.getParkingId()));
+			Id<Link> closestLinkFromParking = getClosestLinkFromParking(parkings.get(selectedParking.getParkingId()));
 			parkingTimes.replaceString(i, 3, closestLinkFromParking.toString());
 
 			statisticsOnDistanceBetweenParkingAndActivity.add(GeneralLib.getDistance(network.getLinks().get(closestLinkFromParking).getCoord(), network.getLinks().get(activityLinkId).getCoord()));
@@ -136,11 +137,11 @@ public class AssignParkingLinkIds {
 		
 	}
 
-	private static Id getClosestLinkFromParking(Parking parking) {
+	private static Id<Link> getClosestLinkFromParking(Parking parking) {
 		return network.getNearestLink(parking.getCoord()).getId();
 	}
 
-	private static HashMap<Id, Parking> readParkings() {
+	private static HashMap<Id<Parking>, Parking> readParkings() {
 		LinkedList<Parking> parkingCollection = new LinkedList<Parking>();
 		
 		int i=1;
@@ -151,7 +152,7 @@ public class AssignParkingLinkIds {
 			parkingFileFlatFormat=config.getParameterValue("parkingFileFlatFormat_" + i);
 		}
 
-		HashMap<Id, Parking> parkingHashmap = new HashMap<Id, Parking>();
+		HashMap<Id<Parking>, Parking> parkingHashmap = new HashMap<>();
 
 		for (Parking parking : parkingCollection) {
 			parkingHashmap.put(parking.getId(), parking);

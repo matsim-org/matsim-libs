@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 
 //the program is currently calculating the destination flows
 //public class OutFlowInfoCollectorWithPt implements LinkEnterEventHandler,LinkLeaveEventHandler
@@ -17,9 +18,9 @@ public class OutFlowInfoCollectorWithPt implements LinkEnterEventHandler, Person
 //public class OutFlowInfoCollectorWithPt implements LinkEnterEventHandler,LinkLeaveEventHandler,AgentArrivalEventHandler 
 {
 	private int binSizeInSeconds; // set the length of interval
-	public HashMap<Id, int[]> linkOutFlow; // define
+	public HashMap<Id<Link>, int[]> linkOutFlow; // define
 	private Map<Id<Link>, Link> filteredEquilNetLinks; // define personId, linkId
-	private HashMap<Id, Id> lastEnteredLink=new HashMap<Id, Id>(); // define
+	private HashMap<Id<Person>, Id<Link>> lastEnteredLink=new HashMap<>(); // define
 	private boolean isOldEventFile;
 	private double networkLength=0;
 	int setAggregationLevel=5; // do not forget to set the aggregation level!!!!!!
@@ -33,7 +34,7 @@ public class OutFlowInfoCollectorWithPt implements LinkEnterEventHandler, Person
 	}
 
 	@Override
-	public void reset(int iteration) {linkOutFlow = new HashMap<Id, int[]>();} // reset the variables (private
+	public void reset(int iteration) {linkOutFlow = new HashMap<>();} // reset the variables (private
 //												// ones)
 //	public void handleEvent(LinkLeaveEvent event) {  
 //		linkLeave(event.getLinkId(), event.getTime());
@@ -128,7 +129,7 @@ public class OutFlowInfoCollectorWithPt implements LinkEnterEventHandler, Person
 //		}
 //	}
 
-	public HashMap<Id, int[]> getLinkOutFlow() {
+	public HashMap<Id<Link>, int[]> getLinkOutFlow() {
 		return linkOutFlow;
 	}
 

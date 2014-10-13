@@ -22,7 +22,8 @@ package playground.wrashid.parkingSearch.planLevel;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -46,27 +47,27 @@ public class LinkFacilityAssociationTest extends MatsimTestCase {
 
 		// parking is possible at facility 19
 
-		assertEquals("19", lfa.getFacilities(new IdImpl("1")).get(0).getId().toString());
-		assertEquals(1, lfa.getFacilities(new IdImpl("1")).size());
+		assertEquals("19", lfa.getFacilities(Id.create("1", Link.class)).get(0).getId().toString());
+		assertEquals(1, lfa.getFacilities(Id.create("1", Link.class)).size());
 
 		// only leisure is possible at facility 42 => used in the parking test
 		// afterwards for verification
-		assertEquals("42", lfa.getFacilities(new IdImpl("50")).get(0).getId().toString());
-		assertEquals(1, lfa.getFacilities(new IdImpl("50")).size());
+		assertEquals("42", lfa.getFacilities(Id.create("50", Link.class)).get(0).getId().toString());
+		assertEquals(1, lfa.getFacilities(Id.create("50", Link.class)).size());
 		
 		// save state of static variable
 		ParkingFacilityAttributes tempParkingFacilityAttributes = ParkingRoot.getParkingFacilityAttributes();
 		
 		ParkingRoot.setParkingFacilityAttributes(new ParkingFacilityAttributes() {
 			@Override
-			public LinkedList<ParkingAttribute> getParkingFacilityAttributes(Id facilityId) {
+			public LinkedList<ParkingAttribute> getParkingFacilityAttributes(Id<ActivityFacility> facilityId) {
 				LinkedList<ParkingAttribute> result=new LinkedList<ParkingAttribute>();
 				result.add(ParkingAttribute.HAS_DEFAULT_ELECTRIC_PLUG);
 				return result;
 			}
 		});
 		
-		assertEquals(1, lfa.getFacilitiesHavingParkingAttribute(new IdImpl("50"), ParkingAttribute.HAS_DEFAULT_ELECTRIC_PLUG).size());
+		assertEquals(1, lfa.getFacilitiesHavingParkingAttribute(Id.create("50", Link.class), ParkingAttribute.HAS_DEFAULT_ELECTRIC_PLUG).size());
 		
 		// reset static variable
 		ParkingRoot.setParkingFacilityAttributes(tempParkingFacilityAttributes);
@@ -81,12 +82,12 @@ public class LinkFacilityAssociationTest extends MatsimTestCase {
 
 		// parking is possible at facility 19
 
-		assertEquals("19", lpfa.getFacilities(new IdImpl("1")).get(0).getId().toString());
-		assertEquals(1, lpfa.getFacilities(new IdImpl("1")).size());
+		assertEquals("19", lpfa.getFacilities(Id.create("1", Link.class)).get(0).getId().toString());
+		assertEquals(1, lpfa.getFacilities(Id.create("1", Link.class)).size());
 
 		// only shopping is possible at facility 42 => no parking available at
 		// link 50
-		assertEquals(0, lpfa.getFacilities(new IdImpl("50")).size());
+		assertEquals(0, lpfa.getFacilities(Id.create("50", Link.class)).size());
 	}
 
 }

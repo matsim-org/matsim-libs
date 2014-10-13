@@ -3,6 +3,7 @@ package playground.wrashid.PSF.V2G;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.GeneralLib;
 
 import playground.wrashid.PSF.ParametersPSF;
@@ -22,12 +23,12 @@ public class BatteryStatistics {
 	 * @param numberOfHubs
 	 * @return
 	 */
-	public static double[][] getGridConnectedEnergy(HashMap<Id, ChargingTimes> chargingTimes, HashMap<Id, ParkingTimes> parkingTimes){
+	public static double[][] getGridConnectedEnergy(HashMap<Id<Person>, ChargingTimes> chargingTimes, HashMap<Id<Person>, ParkingTimes> parkingTimes){
 		double[][] gridConnectedEnergy=new double[numberOfTimeBins][ParametersPSF.getNumberOfHubs()];
 		double[][] curGridConnectedEnergy;
 		
 		
-		for (Id personId : parkingTimes.keySet()) {
+		for (Id<Person> personId : parkingTimes.keySet()) {
 			ParkingTimes curParkingTimes = parkingTimes.get(personId);
 			ChargingTimes curChargingTimes=chargingTimes.get(personId);
 			
@@ -72,13 +73,13 @@ public class BatteryStatistics {
 	 * 
 	 * vehicle2GridPower: How much energy can be supplied from on connected vehicle to the grid.
 	 */
-	public static double[][] getGridConnectedPower(HashMap<Id, ParkingTimes> parkingTimes, double vehicle2GridPower){
+	public static double[][] getGridConnectedPower(HashMap<Id<Person>, ParkingTimes> parkingTimes, double vehicle2GridPower){
 		double[][] gridConnectedPower=new double[numberOfTimeBins][ParametersPSF.getNumberOfHubs()];
 		
 		//removed for performance reasons (not needed)
 		//gridConnectedPower=GeneralLib.initializeMatrix(gridConnectedPower);
 		
-		for (Id personId : parkingTimes.keySet()) {
+		for (Id<Person> personId : parkingTimes.keySet()) {
 			ParkingTimes curParkingTimes = parkingTimes.get(personId);
 			boolean[][] parkedAtHub=curParkingTimes.wasParkedAtHub();
 			

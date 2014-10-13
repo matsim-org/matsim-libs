@@ -23,13 +23,13 @@ import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.vehicles.VehicleType;
 
 import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionModel;
 import playground.wrashid.PSF2.pluggable.energyConsumption.EnergyConsumptionModelPSL;
@@ -92,7 +92,7 @@ public class ExportParkingTimesAndEnergyConsumptions {
 			EnergyConsumptionPlugin energyConsumptionPlugin) {
 		System.out
 				.println("agentId\tstartParking\tendParking\tlinkId\tactType\tenergyConsumptionsInJoules\ttripLengthInMeters");
-		for (Id personId : parkingTimesPlugin.getParkingTimeIntervals()
+		for (Id<Person> personId : parkingTimesPlugin.getParkingTimeIntervals()
 				.getKeySet()) {
 			LinkedList<ParkingIntervalInfo> parkingIntervals = parkingTimesPlugin
 					.getParkingTimeIntervals().get(personId);
@@ -128,9 +128,9 @@ public class ExportParkingTimesAndEnergyConsumptions {
 			String networkFile) {
 		EnergyConsumptionModel energyConsumptionModel = new EnergyConsumptionModelPSL(
 				140);
-		LinkedListValueHashMap<Id, Vehicle> vehicles = new LinkedListValueHashMap<Id, Vehicle>();
-		vehicles.put(Vehicle.getPlaceholderForUnmappedPersonIds(),
-				new PlugInHybridElectricVehicle(new IdImpl(1)));
+		LinkedListValueHashMap<Id<Vehicle>, Vehicle> vehicles = new LinkedListValueHashMap<>();
+		vehicles.put(Id.create(Vehicle.getPlaceholderForUnmappedPersonIds(), Vehicle.class),
+				new PlugInHybridElectricVehicle(Id.create(1, VehicleType.class)));
 		Network network = GeneralLib.readNetwork(networkFile);
 		EnergyConsumptionPlugin energyConsumptionPlugin = new EnergyConsumptionPlugin(
 				energyConsumptionModel, vehicles, network);

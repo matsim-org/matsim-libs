@@ -1,10 +1,9 @@
 package playground.wrashid.lib.tools.plan;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonImpl;
 
 
@@ -28,17 +27,17 @@ public class PlanCloner {
 		
 		Scenario scenario= GeneralLib.readScenario(inputPlansFile, inputNetworkFile);
 		
-		Person selectedPersonForCloning=scenario.getPopulation().getPersons().get(new IdImpl(idOfPersonForCloning));
+		Person selectedPersonForCloning=scenario.getPopulation().getPersons().get(Id.create(idOfPersonForCloning, Person.class));
 		
 		scenario.getPopulation().getPersons().clear();
 		
 		for (int i=1;i<=numberOfClones;i++){
 			Person person=GeneralLib.copyPerson(selectedPersonForCloning);
-            ((PersonImpl) person).setId(new IdImpl(i));
+            ((PersonImpl) person).setId(Id.create(i, Person.class));
             scenario.getPopulation().addPerson(person);
 		}
 		
-		GeneralLib.writePersons(scenario.getPopulation().getPersons().values(), outputPlansFile, (NetworkImpl) scenario.getNetwork());
+		GeneralLib.writePersons(scenario.getPopulation().getPersons().values(), outputPlansFile, scenario.getNetwork());
 	}
 	
 	

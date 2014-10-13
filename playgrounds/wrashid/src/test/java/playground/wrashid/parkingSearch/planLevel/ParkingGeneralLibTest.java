@@ -22,7 +22,8 @@ package playground.wrashid.parkingSearch.planLevel;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
@@ -36,8 +37,8 @@ public class ParkingGeneralLibTest extends MatsimTestCase {
 
 		BaseNonControlerScenario.loadNetwork(sc);
 
-		LinkedList<Id> parkingFacilityIds = ParkingGeneralLib.getAllParkingFacilityIds(sc.getPopulation().getPersons()
-				.get(new IdImpl(1)).getSelectedPlan());
+		LinkedList<Id<ActivityFacility>> parkingFacilityIds = ParkingGeneralLib.getAllParkingFacilityIds(sc.getPopulation().getPersons()
+				.get(Id.create(1, Person.class)).getSelectedPlan());
 
 		assertEquals(2, parkingFacilityIds.size());
 		assertEquals("36", parkingFacilityIds.get(0).toString());
@@ -50,7 +51,7 @@ public class ParkingGeneralLibTest extends MatsimTestCase {
 		BaseNonControlerScenario.loadNetwork(sc);
 		
 		double parkingRelatedWalkingDistance=ParkingGeneralLib.getParkingRelatedWalkingDistanceOfWholeDayAveragePerLeg(sc.getPopulation().getPersons()
-				.get(new IdImpl(1)).getSelectedPlan(),sc.getActivityFacilities());
+				.get(Id.create(1, Person.class)).getSelectedPlan(),sc.getActivityFacilities());
 		
 		assertEquals(0.0, parkingRelatedWalkingDistance);
 		

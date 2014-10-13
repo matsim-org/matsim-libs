@@ -1,14 +1,12 @@
 package playground.wrashid.thelma.y2030.psl;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.Matrix;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.wrashid.lib.tools.kml.BasicPointVisualizer;
@@ -27,7 +25,7 @@ public class TransitAgentAnalyis {
 
 		for (int i = 0; i < parkingTimesEC.getNumberOfRows(); i++) {
 			String actType = parkingTimesEC.getString(i, 4);
-			Id linkId=new IdImpl(parkingTimesEC.getString(i, 3));
+			Id<Link> linkId=Id.create(parkingTimesEC.getString(i, 3), Link.class);
 			Link link=network.getLinks().get(linkId);
 			if (actType.equalsIgnoreCase("tta")) {
 				agentIds.put(parkingTimesEC.getString(i, 0), null);

@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
 
 /*
@@ -24,15 +25,16 @@ public class LogEnergyConsumption implements LinkEnterEventHandler, LinkLeaveEve
 
 	private static final Logger log = Logger.getLogger(LogEnergyConsumption.class);
 	Controler controler;
-	HashMap<Id, EnergyConsumption> energyConsumption = new HashMap<Id, EnergyConsumption>();
+	HashMap<Id<Person>, EnergyConsumption> energyConsumption = new HashMap<>();
 
 	/*
 	 * Register the time, when the vehicle entered the link (non-Javadoc)
 	 * 
 	 * @see org.matsim.core.events.handler.LinkEnterEventHandler#handleEvent(org.matsim.core.events.LinkEnterEvent)
 	 */
+	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		Id personId = event.getPersonId();
+		Id<Person> personId = event.getPersonId();
 
 		if (!energyConsumption.containsKey(personId)) {
 			energyConsumption.put(personId, new EnergyConsumption());
@@ -43,12 +45,14 @@ public class LogEnergyConsumption implements LinkEnterEventHandler, LinkLeaveEve
 		eConsumption.setTempEnteranceTimeOfLastLink(event.getTime());
 	}
 
+	@Override
 	public void reset(int iteration) {
-		energyConsumption = new HashMap<Id, EnergyConsumption>();
+		energyConsumption = new HashMap<>();
 	}
 
+	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		Id personId = event.getPersonId();
+		Id<Person> personId = event.getPersonId();
 
 		EnergyConsumption eConsumption = energyConsumption.get(personId);
 
@@ -66,7 +70,7 @@ public class LogEnergyConsumption implements LinkEnterEventHandler, LinkLeaveEve
 		this.controler = controler;
 	}
 
-	public HashMap<Id, EnergyConsumption> getEnergyConsumption() {
+	public HashMap<Id<Person>, EnergyConsumption> getEnergyConsumption() {
 		return energyConsumption;
 	}
 
@@ -78,8 +82,9 @@ public class LogEnergyConsumption implements LinkEnterEventHandler, LinkLeaveEve
 	 * 
 	 * @see org.matsim.core.events.handler.AgentWait2LinkEventHandler#handleEvent(org.matsim.core.events.AgentWait2LinkEvent)
 	 */
+	@Override
 	public void handleEvent(Wait2LinkEvent event) {
-		Id personId = event.getPersonId();
+		Id<Person> personId = event.getPersonId();
 		if (!energyConsumption.containsKey(personId)) {
 			energyConsumption.put(personId, new EnergyConsumption());
 		}

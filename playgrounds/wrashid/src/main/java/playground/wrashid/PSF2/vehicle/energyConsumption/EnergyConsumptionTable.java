@@ -20,13 +20,10 @@
 
 package playground.wrashid.PSF2.vehicle.energyConsumption;
 
-import java.util.HashMap;
-
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.Matrix;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.vehicles.VehicleType;
 
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 import playground.wrashid.lib.obj.math.Polynomial;
@@ -37,13 +34,13 @@ public class EnergyConsumptionTable {
 	// Double: Free speed on link
 	// Polynomial: polynomial, where the driven average speed can be given as input
 	// in order to get the energy consumption as output
-	TwoHashMapsConcatenated<Id,Double, Polynomial> energyConsumptionRegressionModel=new TwoHashMapsConcatenated<Id, Double, Polynomial>();
+	TwoHashMapsConcatenated<Id<VehicleType>,Double, Polynomial> energyConsumptionRegressionModel=new TwoHashMapsConcatenated<>();
 	
 	public EnergyConsumptionTable(String filePathName){		
 		Matrix stringMatrix = GeneralLib.readStringMatrix(filePathName);
 		
 		for (int i=1;i<stringMatrix.getNumberOfRows();i++){
-			Id vehicleClassId=new IdImpl(stringMatrix.getString(i, 0));
+			Id<VehicleType> vehicleClassId=Id.create(stringMatrix.getString(i, 0), VehicleType.class);
 			double linkFreeSpeed=stringMatrix.getDouble(i, 1);
 			
 			int numberOfCoefficients=stringMatrix.getNumberOfColumnsInRow(i)-2;
@@ -61,7 +58,7 @@ public class EnergyConsumptionTable {
 		
 	}
 	
-	public double getEnergyConsumptionInJoule(Id vehicleClassId, double averageDrivenSpeedOnLinkInKmPerHour, double linkFreeSpeedInMetersPerSecond, double linkLengthInMeters){
+	public double getEnergyConsumptionInJoule(Id<VehicleType> vehicleClassId, double averageDrivenSpeedOnLinkInKmPerHour, double linkFreeSpeedInMetersPerSecond, double linkLengthInMeters){
 		
 		double linkLengthInKm=linkLengthInMeters/1000;
 		double linkFreeSpeedInKmPerHour=linkFreeSpeedInMetersPerSecond/1000*3600;

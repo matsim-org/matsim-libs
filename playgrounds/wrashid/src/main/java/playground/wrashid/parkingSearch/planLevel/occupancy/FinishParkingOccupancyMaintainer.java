@@ -22,6 +22,7 @@ package playground.wrashid.parkingSearch.planLevel.occupancy;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -37,6 +38,7 @@ public class FinishParkingOccupancyMaintainer implements AfterMobsimListener {
 
 	private ParkingOccupancyMaintainer parkingOccupancyMaintainer;
 
+	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		// close handler processing
 		ParkingRoot.getParkingOccupancyMaintainer().closeAllLastParkings();
@@ -83,9 +85,9 @@ public class FinishParkingOccupancyMaintainer implements AfterMobsimListener {
 		}
 		
 		
-		HashMap<Id, Double> parkingRelatedWalkDistance = ParkingRoot.getParkingOccupancyMaintainer().getParkingRelatedWalkDistance();
+		HashMap<Id<Person>, Double> parkingRelatedWalkDistance = ParkingRoot.getParkingOccupancyMaintainer().getParkingRelatedWalkDistance();
 		
-		for (Id personId:parkingRelatedWalkDistance.keySet()){
+		for (Id<Person> personId:parkingRelatedWalkDistance.keySet()){
 			int iterationNumber=iteration;
 			String attribute=PersonGroupWalkingDistanceGraphGenerator.iterationWalkingDistanceSum+iterationNumber;
 			

@@ -24,16 +24,16 @@ import java.util.HashSet;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -45,33 +45,33 @@ public class FilterAgents {
 		
 		String outputEventsFile="c:/tmp/output-events1.xml.gz";
 		
-		HashSet<Id> agentIds = new HashSet<Id>();
+		HashSet<Id<Person>> agentIds = new HashSet<>();
 		
-		agentIds.add(new IdImpl("7223866"));
-		agentIds.add(new IdImpl("2781839"));
-		agentIds.add(new IdImpl("3220050"));
-		agentIds.add(new IdImpl("3463142"));
-		agentIds.add(new IdImpl("3702380"));
-		agentIds.add(new IdImpl("1691781"));
-		agentIds.add(new IdImpl("5023315"));
+		agentIds.add(Id.create("7223866", Person.class));
+		agentIds.add(Id.create("2781839", Person.class));
+		agentIds.add(Id.create("3220050", Person.class));
+		agentIds.add(Id.create("3463142", Person.class));
+		agentIds.add(Id.create("3702380", Person.class));
+		agentIds.add(Id.create("1691781", Person.class));
+		agentIds.add(Id.create("5023315", Person.class));
 		
 		
 		FilterAgents.keepAgents(agentIds, inputEventsFile, outputEventsFile);
 	}
 
-	public static void keepAgents(HashSet<Id> agentIds, String inputEventsFilePath, String outputEventsFilePath) {
+	public static void keepAgents(HashSet<Id<Person>> agentIds, String inputEventsFilePath, String outputEventsFilePath) {
 		boolean keepAgentsInFilter = true;
 
 		startFiltering(agentIds, inputEventsFilePath, outputEventsFilePath, keepAgentsInFilter);
 	}
 
-	public static void removeAgents(HashSet<Id> agentIds, String inputEventsFilePath, String outputEventsFilePath) {
+	public static void removeAgents(HashSet<Id<Person>> agentIds, String inputEventsFilePath, String outputEventsFilePath) {
 		boolean keepAgentsInFilter = false;
 
 		startFiltering(agentIds, inputEventsFilePath, outputEventsFilePath, keepAgentsInFilter);
 	}
 
-	private static void startFiltering(HashSet<Id> agentIds, String inputEventsFilePath, String outputEventsFilePath,
+	private static void startFiltering(HashSet<Id<Person>> agentIds, String inputEventsFilePath, String outputEventsFilePath,
 			boolean keepAgentsInFilter) {
 		EventsManager events = EventsUtils.createEventsManager();
 
@@ -91,13 +91,13 @@ public class FilterAgents {
 	// TODO: make switch between txt/xml general.
 	//private static class EventsFilter extends EventWriterTXT {
 	private static class EventsFilter extends EventWriterXML {
-		private HashSet<Id> filterPersonsSet;
+		private HashSet<Id<Person>> filterPersonsSet;
 		boolean keepAgentsInFilter;
 
 		// true: keep only agents provided,
 		// false: remove agents provided in filter set
 
-		public EventsFilter(String filename, HashSet<Id> filterAgentIds, boolean keepAgentsInFilter) {
+		public EventsFilter(String filename, HashSet<Id<Person>> filterAgentIds, boolean keepAgentsInFilter) {
 			super(filename);
 			this.filterPersonsSet = filterAgentIds;
 			this.keepAgentsInFilter = keepAgentsInFilter;
@@ -107,13 +107,13 @@ public class FilterAgents {
 		@Override
 		public void handleEvent(final Event event) {
 			//System.out.println(event.toString());
-			Id personId=null;
+			Id<Person> personId=null;
 			if (event.toString().split("driverId=\"").length<2){
 				if (event.toString().split("person=\"").length>=2){
-					personId = new IdImpl(event.toString().split("person=\"")[1].split("\"")[0]);
+					personId = Id.create(event.toString().split("person=\"")[1].split("\"")[0], Person.class);
 				}
 			} else {
-				personId = new IdImpl(event.toString().split("driverId=\"")[1].split("\"")[0]);
+				personId = Id.create(event.toString().split("driverId=\"")[1].split("\"")[0], Person.class);
 			}
 
 			if (keepAgentsInFilter) {
@@ -129,7 +129,7 @@ public class FilterAgents {
 		
 		
 		public void handleEvent(ActivityEndEvent event) {
-			Id personId = event.getPersonId();
+			Id<Person> personId = event.getPersonId();
 
 			if (keepAgentsInFilter) {
 				if (filterPersonsSet.contains(personId)) {
@@ -144,7 +144,7 @@ public class FilterAgents {
 		}
 
 		public void handleEvent(ActivityStartEvent event) {
-			Id personId = event.getPersonId();
+			Id<Person> personId = event.getPersonId();
 
 			if (filterPersonsSet.contains(personId)) {
 				return;
@@ -154,7 +154,7 @@ public class FilterAgents {
 		}
 
 		public void handleEvent(PersonArrivalEvent event) {
-			Id personId = event.getPersonId();
+			Id<Person> personId = event.getPersonId();
 
 			if (filterPersonsSet.contains(personId)) {
 				return;
@@ -164,7 +164,7 @@ public class FilterAgents {
 		}
 
 		public void handleEvent(PersonDepartureEvent event) {
-			Id personId = event.getPersonId();
+			Id<Person> personId = event.getPersonId();
 
 			if (filterPersonsSet.contains(personId)) {
 				return;
@@ -174,7 +174,7 @@ public class FilterAgents {
 		}
 
 		public void handleEvent(PersonStuckEvent event) {
-			Id personId = event.getPersonId();
+			Id<Person> personId = event.getPersonId();
 
 			if (keepAgentsInFilter) {
 				if (filterPersonsSet.contains(personId)) {
@@ -188,7 +188,7 @@ public class FilterAgents {
 		}
 
 		public void handleEvent(PersonMoneyEvent event) {
-			Id personId = event.getPersonId();
+			Id<Person> personId = event.getPersonId();
 
 			if (keepAgentsInFilter) {
 				if (filterPersonsSet.contains(personId)) {
@@ -202,7 +202,7 @@ public class FilterAgents {
 		}
 
 		public void handleEvent(Wait2LinkEvent event) {
-			Id personId = event.getPersonId();
+			Id<Person> personId = event.getPersonId();
 
 			if (keepAgentsInFilter) {
 				if (filterPersonsSet.contains(personId)) {
@@ -216,7 +216,7 @@ public class FilterAgents {
 		}
 
 		public void handleEvent(LinkEnterEvent event) {
-			Id personId = event.getPersonId();
+			Id<Person> personId = event.getPersonId();
 
 			if (keepAgentsInFilter) {
 				if (filterPersonsSet.contains(personId)) {
@@ -230,7 +230,7 @@ public class FilterAgents {
 		}
 
 		public void handleEvent(LinkLeaveEvent event) {
-			Id personId = event.getPersonId();
+			Id<Person> personId = event.getPersonId();
 
 			if (keepAgentsInFilter) {
 				if (filterPersonsSet.contains(personId)) {

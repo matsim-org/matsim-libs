@@ -12,6 +12,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
 
@@ -24,49 +25,49 @@ public class ParkingOccupancyMaintainer {
 
 	// id: facilityId
 	// value: occupancy (integer)
-	IntegerValueHashMap<Id> currentParkingOccupancy = new IntegerValueHashMap<Id>();
+	IntegerValueHashMap<Id<ActivityFacility>> currentParkingOccupancy = new IntegerValueHashMap<>();
 
 	// id: personId
 	// value: Plan
 	// this last selected plan is needed during replanning
-	HashMap<Id, Plan> lastSelectedPlan = new HashMap<Id, Plan>();
+	HashMap<Id<Person>, Plan> lastSelectedPlan = new HashMap<>();
 
 	// id: personId
 	// value: time
-	HashMap<Id, Double> endTimeOfFirstParking = new HashMap<Id, Double>();
-	DoubleValueHashMap<Id> startTimeOfCurrentParking = new DoubleValueHashMap<Id>();
+	HashMap<Id<Person>, Double> endTimeOfFirstParking = new HashMap<>();
+	DoubleValueHashMap<Id<Person>> startTimeOfCurrentParking = new DoubleValueHashMap<>();
 
 	// id: personId
 	// value: travel distance whole day
-	HashMap<Id, Double> parkingRelatedWalkDistance = new HashMap<Id, Double>();
+	HashMap<Id<Person>, Double> parkingRelatedWalkDistance = new HashMap<>();
 
 	// id: personId
 	// value: facilityId
-	HashMap<Id, Id> currentParkingFacilityId = new HashMap<Id, Id>();
+	HashMap<Id<Person>, Id<ActivityFacility>> currentParkingFacilityId = new HashMap<>();
 
 	// id: personId
 	// value: ParkingArrivalLog
-	HashMap<Id, ParkingArrivalDepartureLog> parkingArrivalDepartureLog = new HashMap<Id, ParkingArrivalDepartureLog>();
+	HashMap<Id<Person>, ParkingArrivalDepartureLog> parkingArrivalDepartureLog = new HashMap<>();
 
 	// id: facilityId
 	// value: ParkingOccupancyBins
-	HashMap<Id, ParkingOccupancyBins> parkingOccupancyBins = new HashMap<Id, ParkingOccupancyBins>();
+	HashMap<Id<ActivityFacility>, ParkingOccupancyBins> parkingOccupancyBins = new HashMap<>();
 
 	// id: facilityId
 	// value: ParkingCapacityFullLogger
-	HashMap<Id, ParkingCapacityFullLogger> parkingCapacityFullTimes = new HashMap<Id, ParkingCapacityFullLogger>();
+	HashMap<Id<ActivityFacility>, ParkingCapacityFullLogger> parkingCapacityFullTimes = new HashMap<>();
 
-	public HashMap<Id, Plan> getLastSelectedPlan() {
+	public HashMap<Id<Person>, Plan> getLastSelectedPlan() {
 		return lastSelectedPlan;
 	}
 
-	public HashMap<Id, Double> getParkingRelatedWalkDistance() {
+	public HashMap<Id<Person>, Double> getParkingRelatedWalkDistance() {
 		return parkingRelatedWalkDistance;
 	}
 
 	public LinkedList<ActivityImpl> getActivitiesWithParkingConstraintViolations(Plan plan) {
-		Id personId = plan.getPerson().getId();
-		LinkedList<Id> parkingFacilityIds = ParkingGeneralLib.getAllParkingFacilityIds(plan);
+		Id<Person> personId = plan.getPerson().getId();
+		LinkedList<Id<ActivityFacility>> parkingFacilityIds = ParkingGeneralLib.getAllParkingFacilityIds(plan);
 		// this list is initialized with all parking target activities and later
 		// filtered
 		LinkedList<ActivityImpl> targetActivitiesWithParkingCapacityViolations = ParkingGeneralLib
@@ -90,7 +91,7 @@ public class ParkingOccupancyMaintainer {
 		ListElementMarkForRemoval listElementToRemove = new ListElementMarkForRemoval();
 
 		for (int i = 0; i < parkingFacilityIds.size(); i++) {
-			Id parkingFacilityId = parkingFacilityIds.get(i);
+			Id<ActivityFacility> parkingFacilityId = parkingFacilityIds.get(i);
 
 			ParkingTimeInfo pai = parkingArrivalDepartureLog.get(personId).getParkingArrivalDepartureList().get(i);
 
@@ -114,19 +115,19 @@ public class ParkingOccupancyMaintainer {
 		return targetActivitiesWithParkingCapacityViolations;
 	}
 
-	public HashMap<Id, ParkingCapacityFullLogger> getParkingCapacityFullTimes() {
+	public HashMap<Id<ActivityFacility>, ParkingCapacityFullLogger> getParkingCapacityFullTimes() {
 		return parkingCapacityFullTimes;
 	}
 
-	public HashMap<Id, ParkingOccupancyBins> getParkingOccupancyBins() {
+	public HashMap<Id<ActivityFacility>, ParkingOccupancyBins> getParkingOccupancyBins() {
 		return parkingOccupancyBins;
 	}
 
-	public HashMap<Id, ParkingArrivalDepartureLog> getParkingArrivalDepartureLog() {
+	public HashMap<Id<Person>, ParkingArrivalDepartureLog> getParkingArrivalDepartureLog() {
 		return parkingArrivalDepartureLog;
 	}
 
-	public void setParkingArrivalLog(HashMap<Id, ParkingArrivalDepartureLog> parkingArrivalLog) {
+	public void setParkingArrivalLog(HashMap<Id<Person>, ParkingArrivalDepartureLog> parkingArrivalLog) {
 		this.parkingArrivalDepartureLog = parkingArrivalLog;
 	}
 
@@ -140,7 +141,7 @@ public class ParkingOccupancyMaintainer {
 
 	public void performInitializationsAfterLoadingControlerData() {
 		for (Person person : controler.getPopulation().getPersons().values()) {
-			Id firstParkingFacilityId = ParkingGeneralLib.getFirstParkingFacilityId(person.getSelectedPlan());
+			Id<ActivityFacility> firstParkingFacilityId = ParkingGeneralLib.getFirstParkingFacilityId(person.getSelectedPlan());
 			if (firstParkingFacilityId != null) {
 				currentParkingOccupancy.increment(firstParkingFacilityId);
 			}
@@ -153,8 +154,8 @@ public class ParkingOccupancyMaintainer {
 	}
 
 	public void logArrivalAtParking(ActivityStartEvent event) {
-		Id personId = event.getPersonId();
-		Id parkingFacilityId = event.getFacilityId();
+		Id<Person> personId = event.getPersonId();
+		Id<ActivityFacility> parkingFacilityId = event.getFacilityId();
 		double time = GeneralLib.projectTimeWithin24Hours(event.getTime());
 		startTimeOfCurrentParking.put(personId, event.getTime());
 		currentParkingOccupancy.increment(parkingFacilityId);
@@ -173,15 +174,15 @@ public class ParkingOccupancyMaintainer {
 
 	}
 
-	private void assureParkingOccupancyIsNonNegative(Id facilityId) {
+	private void assureParkingOccupancyIsNonNegative(Id<ActivityFacility> facilityId) {
 		if (currentParkingOccupancy.get(facilityId) < 0) {
 			throw new Error("parking occupancy cannot be negative");
 		}
 	}
 
 	public void logDepartureFromParking(ActivityEndEvent event) {
-		Id personId = event.getPersonId();
-		Id parkingFacilityId = event.getFacilityId();
+		Id<Person> personId = event.getPersonId();
+		Id<ActivityFacility> parkingFacilityId = event.getFacilityId();
 		double time = GeneralLib.projectTimeWithin24Hours(event.getTime());
 		
 		if (parkingFacilityId==null){
@@ -227,7 +228,7 @@ public class ParkingOccupancyMaintainer {
 
 	}
 
-	private ParkingOccupancyBins getOccupancyBins(Id facilityId) {
+	private ParkingOccupancyBins getOccupancyBins(Id<ActivityFacility> facilityId) {
 		if (!parkingOccupancyBins.containsKey(facilityId)) {
 			parkingOccupancyBins.put(facilityId, new ParkingOccupancyBins());
 		}
@@ -244,11 +245,11 @@ public class ParkingOccupancyMaintainer {
 	public void closeAllLastParkings() {
 		// update all bins and
 
-		Iterator iter = endTimeOfFirstParking.keySet().iterator();
+		Iterator<Id<Person>> iter = endTimeOfFirstParking.keySet().iterator();
 
 		while (iter.hasNext()) {
-			Id personId = (Id) iter.next();
-			Id parkingFacilityId = currentParkingFacilityId.get(personId);
+			Id<Person> personId = iter.next();
+			Id<ActivityFacility> parkingFacilityId = currentParkingFacilityId.get(personId);
 
 			if (parkingFacilityId==null){
 				System.out.println();

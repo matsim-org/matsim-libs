@@ -28,21 +28,16 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.wrashid.parkingChoice.infrastructure.PublicParking;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.Message;
 import playground.wrashid.parkingSearch.ppSim.ttmatrix.TTMatrix;
 import playground.wrashid.parkingSearch.ppSim.ttmatrix.TTMatrixFromStoredTable;
 import playground.wrashid.parkingSearch.withindayFW.interfaces.ParkingCostCalculator;
-import playground.wrashid.parkingSearch.withindayFW.util.GlobalParkingSearchParams;
 import playground.wrashid.parkingSearch.withindayFW.zhCity.CityZones;
-import playground.wrashid.parkingSearch.withindayFW.zhCity.ParkingInfrastructureZH;
 
 public class ParkingLoader {
 
@@ -128,11 +123,11 @@ public class ParkingLoader {
 
 		ParkingCostCalculator parkingCostCalculator = new ParkingCostCalculatorZH(new CityZones(cityZonesFilePath), parkings);
 
-		HashMap<String, HashSet<Id>> parkingTypes = new HashMap<String, HashSet<Id>>();
+		HashMap<String, HashSet<Id<Parking>>> parkingTypes = new HashMap<>();
 
-		HashSet<Id> streetParking = new HashSet<Id>();
-		HashSet<Id> garageParking = new HashSet<Id>();
-		HashSet<Id> illegalParking = new HashSet<Id>();
+		HashSet<Id<Parking>> streetParking = new HashSet<>();
+		HashSet<Id<Parking>> garageParking = new HashSet<>();
+		HashSet<Id<Parking>> illegalParking = new HashSet<>();
 		parkingTypes.put("streetParking", streetParking);
 		parkingTypes.put("garageParking", garageParking);
 		parkingTypes.put("illeagalParking", illegalParking);
@@ -182,14 +177,14 @@ public class ParkingLoader {
 	private static void addDummyParking(LinkedList<Parking> parkings) {
 		PublicParking parking = new PublicParking(new CoordImpl(100000000,100000000));
 		parking.setMaxCapacity(100000000000.0);
-		parking.setParkingId(new IdImpl("backupParking"));
+		parking.setParkingId(Id.create("backupParking", Parking.class));
 		parking.setType("public");
 		parkings.add(parking);
 		
 		
 		parking = new PublicParking(new CoordImpl(100000000,100000000));
 		parking.setMaxCapacity(100000000000.0);
-		parking.setParkingId(new IdImpl("gp-bkp"));
+		parking.setParkingId(Id.create("gp-bkp", Parking.class));
 		parking.setType("public");
 		parkings.add(parking);
 	}
@@ -204,7 +199,7 @@ public class ParkingLoader {
 			if (GeneralLib.getDistance(coordinatesLindenhofZH, link.getCoord()) < 7000 && rand.nextDouble()<shareOfLinksWithIllegalParking) {
 				PublicParking parking = new PublicParking(link.getCoord());
 				parking.setMaxCapacity(1.0);
-				parking.setParkingId(new IdImpl("illegal-" + i));
+				parking.setParkingId(Id.create("illegal-" + i, Parking.class));
 				parking.setType("public");
 				parkings.add(parking);
 				i++;

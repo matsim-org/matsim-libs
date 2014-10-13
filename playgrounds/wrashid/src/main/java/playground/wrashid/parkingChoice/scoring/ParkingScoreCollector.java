@@ -6,11 +6,14 @@ import java.util.Set;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
 import org.matsim.contrib.parking.lib.obj.list.Lists;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 
 import playground.wrashid.parkingChoice.events.ParkingArrivalEvent;
@@ -27,22 +30,22 @@ import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingOccupancyBins
 
 public class ParkingScoreCollector implements ParkingArrivalEventHandler, ParkingDepartureEventHandler {
 
-	public LinkedListValueHashMap<Id, ParkingInfo> parkingLog;
+	public LinkedListValueHashMap<Id<Person>, ParkingInfo> parkingLog;
 	
 	private HashMap<Id, Double> firstParkingDepartureTime;
 
-	private HashMap<Id, Double> currentArrivalTime;
+	private HashMap<Id<Person>, Double> currentArrivalTime;
 
-	private HashMap<Id, Parking> currentParking;
+	private HashMap<Id<Person>, Parking> currentParking;
 
 	private DoubleValueHashMap<Id> sumOfParkingDurations;
 
-	public HashMap<Id, ParkingOccupancyBins> parkingOccupancies = new HashMap<Id, ParkingOccupancyBins>();
+	public HashMap<Id<Parking>, ParkingOccupancyBins> parkingOccupancies = new HashMap<Id<Parking>, ParkingOccupancyBins>();
 
 	private boolean finishHandlingCalled;
 
-	private LinkedListValueHashMap<Id, Double> walkingTimesAtParkingArrival;
-	private LinkedListValueHashMap<Id, Double> walkingTimesAtParkingDeparture;
+	private LinkedListValueHashMap<Id<Person>, Double> walkingTimesAtParkingArrival;
+	private LinkedListValueHashMap<Id<Person>, Double> walkingTimesAtParkingDeparture;
 
 	private final Controler controler;
 
@@ -53,18 +56,18 @@ public class ParkingScoreCollector implements ParkingArrivalEventHandler, Parkin
 
 	@Override
 	public void reset(int iteration) {
-		currentParking=new HashMap<Id, Parking>();
-		parkingLog=new LinkedListValueHashMap<Id, ParkingInfo>();
-		firstParkingDepartureTime = new HashMap<Id, Double>();
-		currentArrivalTime = new HashMap<Id, Double>();
-		walkingTimesAtParkingArrival = new LinkedListValueHashMap<Id, Double>();
-		walkingTimesAtParkingDeparture = new LinkedListValueHashMap<Id, Double>();
-		sumOfParkingDurations = new DoubleValueHashMap<Id>();
+		currentParking=new HashMap<>();
+		parkingLog=new LinkedListValueHashMap<>();
+		firstParkingDepartureTime = new HashMap<>();
+		currentArrivalTime = new HashMap<>();
+		walkingTimesAtParkingArrival = new LinkedListValueHashMap<>();
+		walkingTimesAtParkingDeparture = new LinkedListValueHashMap<>();
+		sumOfParkingDurations = new DoubleValueHashMap<>();
 		finishHandlingCalled = false;
 		parkingOccupancies.clear();
 	}
 
-	public Set<Id> getPersonIdsWhoUsedCar() {
+	public Set<Id<Person>> getPersonIdsWhoUsedCar() {
 		if (!finishHandlingCalled) {
 			DebugLib.stopSystemAndReportInconsistency("finish handling must be called before calling this method");
 		}
@@ -74,7 +77,7 @@ public class ParkingScoreCollector implements ParkingArrivalEventHandler, Parkin
 
 	@Override
 	public void handleEvent(ParkingArrivalEvent event) {
-		Id personId = event.getActStartEvent().getPersonId();
+		Id<Person> personId = event.getActStartEvent().getPersonId();
 		currentArrivalTime.put(personId, event.getActStartEvent().getTime());
 
 		currentParking.put(event.getActStartEvent().getPersonId(), event.getParking());
@@ -95,7 +98,7 @@ public class ParkingScoreCollector implements ParkingArrivalEventHandler, Parkin
 		}
 	}
 
-	private void updateWalkingTime(ParkingArrivalEvent event, Id personId) {
+	private void updateWalkingTime(ParkingArrivalEvent event, Id<Person> personId) {
 		Coord activityCoord = getActivityCoordinate(event.getActStartEvent().getFacilityId(), event.getActStartEvent()
 				.getLinkId());
 		double walkingTime = GeneralLib.getDistance(event.getParking().getCoord(), activityCoord)
@@ -103,7 +106,7 @@ public class ParkingScoreCollector implements ParkingArrivalEventHandler, Parkin
 		walkingTimesAtParkingArrival.put(personId, walkingTime);
 	}
 
-	private Coord getActivityCoordinate(Id facilityId, Id linkId) {
+	private Coord getActivityCoordinate(Id<ActivityFacility> facilityId, Id<Link> linkId) {
 		Coord activityCoord = null;
 
 		if (facilityId != null) {
@@ -119,7 +122,7 @@ public class ParkingScoreCollector implements ParkingArrivalEventHandler, Parkin
 
 	@Override
 	public void handleEvent(ParkingDepartureEvent event) {
-		Id personId = event.getAgentDepartureEvent().getPersonId();
+		Id<Person> personId = event.getAgentDepartureEvent().getPersonId();
 		if (firstDepartureTimeNotInitializedYet(personId)) {
 			initializeFirstDepartureTime(event, personId);
 		} else {
@@ -154,19 +157,19 @@ public class ParkingScoreCollector implements ParkingArrivalEventHandler, Parkin
 	public void finishHandling() {
 		finishHandlingCalled = true;
 
-		for (Id personId : currentArrivalTime.keySet()) {
+		for (Id<Person> personId : currentArrivalTime.keySet()) {
 			Double arrivalTime = currentArrivalTime.get(personId);
 			Double departureTime = firstParkingDepartureTime.get(personId);
 			Double parkingInterval = GeneralLib.getIntervalDuration(arrivalTime, departureTime);
 			sumOfParkingDurations.incrementBy(personId, parkingInterval);
 			updateParkingOccupancy(personId, arrivalTime, departureTime);
 			
-			parkingLog.put(personId, new ParkingInfo(currentParking.get(personId).getId(), arrivalTime, departureTime));
+			parkingLog.put(personId, new ParkingInfo(currentParking.get(personId).getId(), arrivalTime.doubleValue(), departureTime));
 		}
 
 	}
 
-	private void updateParkingOccupancy(Id personId, Double arrivalTime, Double departureTime) {
+	private void updateParkingOccupancy(Id<Person> personId, Double arrivalTime, Double departureTime) {
 		Parking parking = currentParking.get(personId);
 		if (!parkingOccupancies.containsKey(parking.getId())) {
 			parkingOccupancies.put(parking.getId(), new ParkingOccupancyBins());
@@ -176,7 +179,7 @@ public class ParkingScoreCollector implements ParkingArrivalEventHandler, Parkin
 		parkingOccupancyBins.inrementParkingOccupancy(arrivalTime, departureTime);
 	}
 
-	public double getSumOfWalkingTimes(Id personId) {
+	public double getSumOfWalkingTimes(Id<Person> personId) {
 		double walkingTimes = 0;
 
 		walkingTimes += Lists.getSum(walkingTimesAtParkingArrival.get(personId));
@@ -185,7 +188,7 @@ public class ParkingScoreCollector implements ParkingArrivalEventHandler, Parkin
 		return walkingTimes;
 	}
 
-	public double getSumOfParkingDurations(Id personId) {
+	public double getSumOfParkingDurations(Id<Person> personId) {
 		return sumOfParkingDurations.get(personId);
 	}
 

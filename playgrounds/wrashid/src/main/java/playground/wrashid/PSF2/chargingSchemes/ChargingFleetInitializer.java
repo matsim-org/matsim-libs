@@ -26,7 +26,7 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.vehicles.VehicleType;
 
 import playground.wrashid.PSF2.vehicle.energyStateMaintainance.EnergyStateMaintainer;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.FleetInitializer;
@@ -36,8 +36,8 @@ import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 public class ChargingFleetInitializer implements FleetInitializer {
 
 	@Override
-	public LinkedListValueHashMap<Id, Vehicle> getVehicles(Set<Id<Person>> personIds, EnergyStateMaintainer energyStateMaintainer) {
-		LinkedListValueHashMap<Id, Vehicle> result = new LinkedListValueHashMap<Id, Vehicle>();
+	public LinkedListValueHashMap<Id<Person>, Vehicle> getVehicles(Set<Id<Person>> personIds, EnergyStateMaintainer energyStateMaintainer) {
+		LinkedListValueHashMap<Id<Person>, Vehicle> result = new LinkedListValueHashMap<>();
 
 		Iterator<Id<Person>> iter = personIds.iterator();
 
@@ -53,7 +53,7 @@ public class ChargingFleetInitializer implements FleetInitializer {
 	}
 
 	private PlugInHybridElectricVehicle getInitializedPHEV(EnergyStateMaintainer energyStateMaintainer) {
-		PlugInHybridElectricVehicle phev = new PlugInHybridElectricVehicle(energyStateMaintainer, new IdImpl(1));
+		PlugInHybridElectricVehicle phev = new PlugInHybridElectricVehicle(energyStateMaintainer, Id.create(1, VehicleType.class));
 		double joulesInOneKWH = 3600*1000;
 		phev.setBatterySizeInJoule(10 * joulesInOneKWH);
 		phev.setBatteryMinThresholdInJoule(phev.getBatterySizeInJoule() * 0.035);

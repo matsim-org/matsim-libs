@@ -3,10 +3,10 @@ package playground.wrashid.PSF2.tools.chargingLog.timeLine;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.Matrix;
-import org.matsim.core.basic.v01.IdImpl;
 
 
 public class EnergyConsumptionAtAllLinksTimeLine {
@@ -16,12 +16,12 @@ public class EnergyConsumptionAtAllLinksTimeLine {
 	public static void main(String[] args) {
 		String chargingLogFileNamePath = "c:/tmp/chargingLog.txt";
 		//String chargingLogFileNamePath="H:/data/experiments/ARTEMIS/zh/dumb charging/output/run6/ITERS/it.0/0.chargingLog.txt";
-		HashMap<Id, double[]> energyConsumptionPerLink = readChargingLog(chargingLogFileNamePath);
+		HashMap<Id<Link>, double[]> energyConsumptionPerLink = readChargingLog(chargingLogFileNamePath);
 		
 		printEnergyConsumptionAtAllLinksDuringTheDay(energyConsumptionPerLink);
 	}
 
-	private static void printEnergyConsumptionAtAllLinksDuringTheDay(HashMap<Id, double[]> energyConsumptionPerLink) {
+	private static void printEnergyConsumptionAtAllLinksDuringTheDay(HashMap<Id<Link>, double[]> energyConsumptionPerLink) {
 		System.out.println("energyConsumptionAtAllLinksDuringTheDay");
 		double[] sumOfAllChargingsAtAllLinksDuringTheDay = getSumOfAllChargingsAtAllLinksDuringTheDay(energyConsumptionPerLink);
 		
@@ -30,10 +30,10 @@ public class EnergyConsumptionAtAllLinksTimeLine {
 		}
 	}
 	
-	public static double[] getSumOfAllChargingsAtAllLinksDuringTheDay(HashMap<Id, double[]> energyConsumptionPerLink){
+	public static double[] getSumOfAllChargingsAtAllLinksDuringTheDay(HashMap<Id<Link>, double[]> energyConsumptionPerLink){
 		double[] result=getNewTimeBinArray() ;
 		
-		for (Id linkId:energyConsumptionPerLink.keySet()){
+		for (Id<Link> linkId:energyConsumptionPerLink.keySet()){
 			for (int i=0;i<getNumberOfSlotsInBin();i++){
 				result[i]+=energyConsumptionPerLink.get(linkId)[i];
 			}
@@ -43,13 +43,13 @@ public class EnergyConsumptionAtAllLinksTimeLine {
 	
 	
 
-	public static HashMap<Id,double[]> readChargingLog(String chargingLogFileNamePath) {
+	public static HashMap<Id<Link>,double[]> readChargingLog(String chargingLogFileNamePath) {
 		Matrix matrix=GeneralLib.readStringMatrix(chargingLogFileNamePath);
-		HashMap<Id,double[]> energyConsumptionPerLinkDuringTheDay=new HashMap<Id, double[]>();
+		HashMap<Id<Link>,double[]> energyConsumptionPerLinkDuringTheDay=new HashMap<>();
 		
 		// starting with index 1 (ignoring first line)
 		for (int i=1;i<matrix.getNumberOfRows();i++){
-			Id linkId=new IdImpl(matrix.getString(i, 0));
+			Id<Link> linkId=Id.create(matrix.getString(i, 0), Link.class);
 			Double startChargingTime=matrix.getDouble(i, 2);
 			Double endChargingTime=matrix.getDouble(i, 3);
 			Double startSOC=matrix.getDouble(i, 4);
@@ -94,8 +94,8 @@ public class EnergyConsumptionAtAllLinksTimeLine {
 		return GeneralLib.getTimeBinIndex(time,timeBinSizeInSeconds);
 	}
 	
-	private static void initializeEnergyConsumptionPerLink(HashMap<Id, double[]> energyConsumptionPerLinkDuringTheDay,
-			Id linkId) {
+	private static void initializeEnergyConsumptionPerLink(HashMap<Id<Link>, double[]> energyConsumptionPerLinkDuringTheDay,
+			Id<Link> linkId) {
 		if (!energyConsumptionPerLinkDuringTheDay.containsKey(linkId)){
 			energyConsumptionPerLinkDuringTheDay.put(linkId, getNewTimeBinArray());
 		}

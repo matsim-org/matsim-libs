@@ -37,10 +37,10 @@ import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
 import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
 import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.contrib.parking.lib.obj.Pair;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 
 import playground.wrashid.lib.obj.Collections;
+import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingChoice.trb2011.ParkingHerbieControler;
 import playground.wrashid.parkingChoice.trb2011.counts.SingleDayGarageParkingsCount;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingOccupancyBins;
@@ -112,7 +112,7 @@ public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 		int[] sumRealParkingCapacities = new int[96];
 		int numberOfColumns = 4;
 		for (String parkingName : selectedParkings) {
-			IdImpl parkingId = new IdImpl(mappingOfParkingNameToParkingId.get(parkingName));
+			Id<Parking> parkingId = Id.create(mappingOfParkingNameToParkingId.get(parkingName), Parking.class);
 			ParkingOccupancyBins parkingOccupancyBins = parkingOccupancy.parkingOccupancies.get(parkingId);
 
 			if (parkingOccupancyBins == null) {
@@ -432,7 +432,7 @@ public class ParkingAnalysisHandlerZH extends ParkingAnalysisHandler {
 		ArrayList<String> list = new ArrayList<String>();
 		list.add(headerLine);
 
-		for (Id personnId : inputLog.getKeySet()) {
+		for (Id<Person> personnId : inputLog.getKeySet()) {
 			for (Pair<Id, Double> pair : inputLog.get(personnId)) {
 				Id parkingFacilityId = pair.getFistValue();
 				double value = pair.getSecondValue();

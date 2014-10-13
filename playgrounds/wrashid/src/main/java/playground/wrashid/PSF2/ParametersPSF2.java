@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
 import org.matsim.core.controler.Controler;
 
@@ -43,9 +44,9 @@ public class ParametersPSF2 {
 	
 	public static FleetInitializer fleetInitializer;
 	//key: personId, value: vehicle
-	public static LinkedListValueHashMap<Id, Vehicle> vehicles;
+	public static LinkedListValueHashMap<Id<Person>, Vehicle> vehicles;
 	
-	public static HashMap<Id, ChargingTimes> chargingTimes;
+	public static HashMap<Id<Person>, ChargingTimes> chargingTimes;
 
 
 	public static EnergyConsumptionTable energyConsumptionTable;

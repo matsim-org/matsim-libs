@@ -38,7 +38,6 @@ import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -248,7 +247,7 @@ public class MainPPSimZurich30km {
 					if (privateParkingFacilityIdMapping.get(act.getFacilityId(), act.getType()) == null) {
 						ActInfo actInfo = new ActInfo(act.getFacilityId(), act.getType());
 						PrivateParking privateParking = new PrivateParking(act.getCoord(), actInfo);
-						privateParking.setParkingId(new IdImpl("privateParkings-x-" + j));
+						privateParking.setParkingId(Id.create("privateParkings-x-" + j, Parking.class));
 						privateParking.setType("private");
 						j++;
 

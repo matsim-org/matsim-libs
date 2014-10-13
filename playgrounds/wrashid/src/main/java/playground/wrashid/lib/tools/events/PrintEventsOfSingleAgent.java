@@ -3,24 +3,24 @@ package playground.wrashid.lib.tools.events;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 
@@ -34,9 +34,9 @@ public class PrintEventsOfSingleAgent {
 		String eventsFile="C:/data/parkingSearch/psim/zurich/output/basic output with 300 sec bins/events.xml.gz";
 		
 		
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 
-		SingleAgentEventsPrinter singleAgentEventsPrinter = new SingleAgentEventsPrinter(new IdImpl("65802"));
+		SingleAgentEventsPrinter singleAgentEventsPrinter = new SingleAgentEventsPrinter(Id.create("65802", Person.class));
 		
 		events.addHandler(singleAgentEventsPrinter);
 		
@@ -52,9 +52,9 @@ public class PrintEventsOfSingleAgent {
 	PersonDepartureEventHandler, PersonStuckEventHandler, PersonMoneyEventHandler, 
 	Wait2LinkEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler{
 
-		private final Id filterEventsForAgentId;
+		private final Id<Person> filterEventsForAgentId;
 
-		public SingleAgentEventsPrinter(Id agentId){
+		public SingleAgentEventsPrinter(Id<Person> agentId){
 			this.filterEventsForAgentId = agentId;
 		}
 		

@@ -5,8 +5,10 @@ import java.util.HashMap;
 import java.util.PriorityQueue;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -198,8 +200,8 @@ public abstract class ParkingScoringFunction {
 		return false;
 	}
 
-	public boolean isParkingFullAtTime(Id parkingFacilityId, double time) {
-		HashMap<Id, ParkingCapacityFullLogger> parkingCapacityFullTimes = ParkingRoot.getParkingOccupancyMaintainer()
+	public boolean isParkingFullAtTime(Id<ActivityFacility> parkingFacilityId, double time) {
+		HashMap<Id<ActivityFacility>, ParkingCapacityFullLogger> parkingCapacityFullTimes = ParkingRoot.getParkingOccupancyMaintainer()
 				.getParkingCapacityFullTimes();
 
 		time = GeneralLib.projectTimeWithin24Hours(time);
@@ -211,8 +213,8 @@ public abstract class ParkingScoringFunction {
 		return false;
 	}
 
-	public boolean isParkingNotFullDuringIntervall(Id parkingFacilityId, double arrivalTime, double delta) {
-		HashMap<Id, ParkingCapacityFullLogger> parkingCapacityFullTimes = ParkingRoot.getParkingOccupancyMaintainer()
+	public boolean isParkingNotFullDuringIntervall(Id<ActivityFacility> parkingFacilityId, double arrivalTime, double delta) {
+		HashMap<Id<ActivityFacility>, ParkingCapacityFullLogger> parkingCapacityFullTimes = ParkingRoot.getParkingOccupancyMaintainer()
 				.getParkingCapacityFullTimes();
 
 		double startTime = GeneralLib.projectTimeWithin24Hours(arrivalTime - delta);
@@ -237,7 +239,7 @@ public abstract class ParkingScoringFunction {
 		
 	}
 
-	public double getScore(ActivityImpl targetActivity, Plan plan, Id parkingFacilityId, boolean forRanking) {
+	public double getScore(ActivityImpl targetActivity, Plan plan, Id<ActivityFacility> parkingFacilityId, boolean forRanking) {
 		ActivityImpl arrivalParkingAct = ParkingGeneralLib.getArrivalParkingAct(plan, targetActivity);
 		ActivityImpl departureParkingAct = ParkingGeneralLib.getDepartureParkingAct(plan, targetActivity);
 
@@ -264,7 +266,7 @@ public abstract class ParkingScoringFunction {
 	 * @param forRanking
 	 * @return
 	 */
-	public abstract double getScore(ActivityImpl targetActivity, Id parkingFacilityId, ParkingTimeInfo parkingTimeInfo,
-			Id personId, double parkingArrivalDuration, double parkingDepartureDuration, Plan plan, double delta,
+	public abstract double getScore(ActivityImpl targetActivity, Id<ActivityFacility> parkingFacilityId, ParkingTimeInfo parkingTimeInfo,
+			Id<Person> personId, double parkingArrivalDuration, double parkingDepartureDuration, Plan plan, double delta,
 			boolean forRanking);
 }

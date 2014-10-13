@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -69,20 +68,20 @@ public class MainDensityAnalysisWithPt {
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
 		reader.parse(eventsFile);
 		
-		HashMap<Id, int[]> linkInFlow = inflowHandler.getLinkInFlow();	//get the matrix
-		HashMap<Id, int[]> linkOutFlow = outflowHandler.getLinkOutFlow();	
+		HashMap<Id<Link>, int[]> linkInFlow = inflowHandler.getLinkInFlow();	//get the matrix
+		HashMap<Id<Link>, int[]> linkOutFlow = outflowHandler.getLinkOutFlow();	
 		
-		HashMap<Id, int[]> deltaFlow = deltaFlow(linkInFlow, linkOutFlow);
-		HashMap<Id, double[]> density = calculateDensity(deltaFlow,links);
+		HashMap<Id<Link>, int[]> deltaFlow = deltaFlow(linkInFlow, linkOutFlow);
+		HashMap<Id<Link>, double[]> density = calculateDensity(deltaFlow,links);
 		
 		printDensity(density,links);
 		
 	}
 	
-	public static HashMap<Id, int[]> deltaFlow(HashMap<Id, int[]> linkInFlow,HashMap<Id, int[]> linkOutFlow){
+	public static HashMap<Id<Link>, int[]> deltaFlow(HashMap<Id<Link>, int[]> linkInFlow,HashMap<Id<Link>, int[]> linkOutFlow){
 		
-		HashMap<Id, int[]> result=new HashMap<Id, int[]>();
-		for (Id linkId:linkInFlow.keySet())	{
+		HashMap<Id<Link>, int[]> result=new HashMap<>();
+		for (Id<Link> linkId:linkInFlow.keySet())	{
 			int[] inflowBins = linkInFlow.get(linkId);
 			int[] outflowBins = linkOutFlow.get(linkId);
 			int[] deltaflowBins = new int[inflowBins.length];
@@ -98,7 +97,7 @@ public class MainDensityAnalysisWithPt {
 				
 				
 			}
-			if (linkId.equals(new IdImpl(126323))){
+			if (linkId.equals(Id.create(126323, Link.class))){
 				System.out.println();
 			}
 		}	
@@ -106,18 +105,18 @@ public class MainDensityAnalysisWithPt {
 		return result;
 	}
 	
-	public static HashMap<Id, double[]> calculateDensity(HashMap<Id, int[]> deltaFlow, Map<Id<Link>, ? extends Link> links){
+	public static HashMap<Id<Link>, double[]> calculateDensity(HashMap<Id<Link>, int[]> deltaFlow, Map<Id<Link>, ? extends Link> links){
 			//send actual link info.)
-		HashMap<Id, double[]> density=new HashMap<Id, double[]>();
+		HashMap<Id<Link>, double[]> density=new HashMap<>();
 		
-		for (Id linkId:deltaFlow.keySet()){
+		for (Id<Link> linkId:deltaFlow.keySet()){
 			density.put(linkId,null);
 		}
 		
 		
-		for (Id linkId:density.keySet()){
+		for (Id<Link> linkId:density.keySet()){
 			
-			if (linkId.equals(new IdImpl(126216))){
+			if (linkId.equals(Id.create(126216, Link.class))){
 				System.out.println();
 			}
 			
@@ -140,7 +139,7 @@ public class MainDensityAnalysisWithPt {
 		return density;
 	}
 	
-	public static void printDensity(HashMap<Id, double[]> density, Map<Id<Link>, ? extends Link> links) { // print
+	public static void printDensity(HashMap<Id<Link>, double[]> density, Map<Id<Link>, ? extends Link> links) { // print
 		for (Id<Link> linkId : density.keySet()) {
 			double[] bins = density.get(linkId);
 

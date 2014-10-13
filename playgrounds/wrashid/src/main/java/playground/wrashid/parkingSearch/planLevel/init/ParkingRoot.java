@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -39,7 +40,7 @@ public class ParkingRoot {
 	private static ArrayList<String> parkingLog;
 	private static BasicPointVisualizer mapDebugTrace;
 	private static ParkingWalkingDistanceMeanAndStandardDeviationGraph parkingWalkingDistanceGraph;
-	private static HashMap<Id, Double> parkingWalkingDistanceOfPreviousIteration=null;
+	private static HashMap<Id<Person>, Double> parkingWalkingDistanceOfPreviousIteration=null;
 	private static PersonGroups personGroupsForStatistics=null;
 	private static Double parkingWalkingDistanceScalingFactorForOutput;
 	private static ParkingFacilityAttributes parkingFacilityAttributes=null;
@@ -178,11 +179,11 @@ public class ParkingRoot {
 	}
 
 	public static void setParkingWalkingDistanceOfPreviousIteration(
-			HashMap<Id, Double> parkingWalkingDistanceOfPreviousIteration) {
+			HashMap<Id<Person>, Double> parkingWalkingDistanceOfPreviousIteration) {
 		ParkingRoot.parkingWalkingDistanceOfPreviousIteration = parkingWalkingDistanceOfPreviousIteration;
 	}
 
-	public static HashMap<Id, Double> getParkingWalkingDistanceOfPreviousIteration() {
+	public static HashMap<Id<Person>, Double> getParkingWalkingDistanceOfPreviousIteration() {
 		return parkingWalkingDistanceOfPreviousIteration;
 	}
 

@@ -1,25 +1,18 @@
 package playground.wrashid.lib.tools.events;
 
-import java.util.HashSet;
-
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonMoneyEvent;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
-import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -33,7 +26,7 @@ public class FilterEventsOfSingleLink {
 	public static void main(String[] args) {
 		String inputEventsFilePath="\\\\kosrae.ethz.ch\\ivt-home\\simonimi\\thesis\\output_no_pricing_v5_subtours_JDEQSim_squeeze60\\ITERS\\it.50\\50.events.xml.gz";
 		String outputEventsFilePath="C:/data/workspace3/playgrounds/wrashid/events.xml/events_filtered2.xml";
-		EventsFilter eventsFilter = new EventsFilter(outputEventsFilePath, new IdImpl("17560001228443FT"));
+		EventsFilter eventsFilter = new EventsFilter(outputEventsFilePath, Id.create("17560001228443FT", Link.class));
 		EventsManager events = EventsUtils.createEventsManager();
 
 
@@ -47,10 +40,10 @@ public class FilterEventsOfSingleLink {
 	}
 	
 	private static class EventsFilter implements PersonDepartureEventHandler, PersonArrivalEventHandler,Wait2LinkEventHandler,LinkEnterEventHandler,LinkLeaveEventHandler {
-		private Id filterLinkId;
+		private Id<Link> filterLinkId;
 		private EventWriterXML eventWriter;
 
-		public EventsFilter(String outputFileName, Id filterLinkId) {
+		public EventsFilter(String outputFileName, Id<Link> filterLinkId) {
 			eventWriter = new EventWriterXML(outputFileName);
 			this.filterLinkId = filterLinkId;
 		}

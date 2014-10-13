@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.basic.v01.IdImpl;
 
 import playground.wrashid.lib.tools.kml.BasicPointVisualizer;
 import playground.wrashid.lib.tools.kml.Color;
@@ -37,27 +36,27 @@ public class VisualizeSetOfLinksInNetwork {
 		String inputNetworkPath="H:/data/experiments/ARTEMIS/zh/dumb charging/output/run2/output_network.xml.gz";
 		String outputFilePath="H:/data/experiments/ARTEMIS/zh/dumb charging/output/run2/analysis/linksWithEnergyConsumpHigherThanThreshholdValue.kml";
 		
-		LinkedList<Id> selectedLinks=new LinkedList<Id>();
+		LinkedList<Id<Link>> selectedLinks=new LinkedList<Id<Link>>();
 		
-		selectedLinks.add(new IdImpl("17560000662724TF"));
-		selectedLinks.add(new IdImpl("17560002226916TF"));
-		selectedLinks.add(new IdImpl("17560000114875TF"));
-		selectedLinks.add(new IdImpl("17560000082333TF"));
-		selectedLinks.add(new IdImpl("17560002149918FT"));
-		selectedLinks.add(new IdImpl("17560000368213FT"));
-		selectedLinks.add(new IdImpl("17560002188272FT"));
-		selectedLinks.add(new IdImpl("17560001856956FT"));
-		selectedLinks.add(new IdImpl("17560001229496TF"));
-		selectedLinks.add(new IdImpl("17560001363425TF"));
-		selectedLinks.add(new IdImpl("17560001607380FT-1"));
-		selectedLinks.add(new IdImpl("17560000045386TF"));
-		selectedLinks.add(new IdImpl("17560000109095TF"));
-		selectedLinks.add(new IdImpl("17560001227588FT"));
-		selectedLinks.add(new IdImpl("17560000043382FT"));
-		selectedLinks.add(new IdImpl("17560000105015FT"));
-		selectedLinks.add(new IdImpl("17560000109323TF"));
-		selectedLinks.add(new IdImpl("17560001594646FT"));
-		selectedLinks.add(new IdImpl("17560001380278TF"));
+		selectedLinks.add(Id.create("17560000662724TF", Link.class));
+		selectedLinks.add(Id.create("17560002226916TF", Link.class));
+		selectedLinks.add(Id.create("17560000114875TF", Link.class));
+		selectedLinks.add(Id.create("17560000082333TF", Link.class));
+		selectedLinks.add(Id.create("17560002149918FT", Link.class));
+		selectedLinks.add(Id.create("17560000368213FT", Link.class));
+		selectedLinks.add(Id.create("17560002188272FT", Link.class));
+		selectedLinks.add(Id.create("17560001856956FT", Link.class));
+		selectedLinks.add(Id.create("17560001229496TF", Link.class));
+		selectedLinks.add(Id.create("17560001363425TF", Link.class));
+		selectedLinks.add(Id.create("17560001607380FT-1", Link.class));
+		selectedLinks.add(Id.create("17560000045386TF", Link.class));
+		selectedLinks.add(Id.create("17560000109095TF", Link.class));
+		selectedLinks.add(Id.create("17560001227588FT", Link.class));
+		selectedLinks.add(Id.create("17560000043382FT", Link.class));
+		selectedLinks.add(Id.create("17560000105015FT", Link.class));
+		selectedLinks.add(Id.create("17560000109323TF", Link.class));
+		selectedLinks.add(Id.create("17560001594646FT", Link.class));
+		selectedLinks.add(Id.create("17560001380278TF", Link.class));
 		
 		BasicPointVisualizer basicPointVisualizer=new BasicPointVisualizer();
 		

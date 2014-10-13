@@ -21,9 +21,10 @@ package playground.wrashid.parkingSearch.planLevel.initDemand;
 
 import java.util.HashMap;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -63,8 +64,8 @@ public class MainPerLinkParkingFacilityGenerator {
 			// don't do this change - will be done later probably
 			int parkingCapacity = (int) Math.round(Math.ceil(link.getLength() / 2.0 / 5.0/100.0/2));
 			totalNumberOfParkingsAdded+=parkingCapacity;
-			ActivityFacilityImpl activityFacility = activityFacilities.createAndAddFacility(new IdImpl(parkPlatzId), link.getCoord());
-			activityFacility.createActivityOption("parking").setCapacity((double) parkingCapacity);
+			ActivityFacilityImpl activityFacility = activityFacilities.createAndAddFacility(Id.create(parkPlatzId, ActivityFacility.class), link.getCoord());
+			activityFacility.createActivityOption("parking").setCapacity(parkingCapacity);
 			parkPlatzId++;
 		}
 		

@@ -1,23 +1,25 @@
 package playground.wrashid.parkingChoice;
 
+import junit.framework.TestCase;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.basic.v01.IdImpl;
 
 import playground.wrashid.parkingChoice.infrastructure.ActInfo;
-import junit.framework.TestCase;
 
 public class ParkingChoiceLibTest extends TestCase {
 
 	public void testGetLastActivity(){
 		Scenario scenario = getScenario();
 	
-		ActInfo lastActivityInfo = ParkingChoiceLib.getLastActivityInfo(scenario.getPopulation().getPersons().get(new IdImpl(1)).getSelectedPlan());
+		ActInfo lastActivityInfo = ParkingChoiceLib.getLastActivityInfo(scenario.getPopulation().getPersons().get(Id.create(1, Person.class)).getSelectedPlan());
 		
 		assertEquals("1", lastActivityInfo.getFacilityId().toString());
 		assertEquals("home", lastActivityInfo.getActType().toString());
 		
-		lastActivityInfo = ParkingChoiceLib.getLastActivityInfo(scenario.getPopulation().getPersons().get(new IdImpl(177)).getSelectedPlan());
+		lastActivityInfo = ParkingChoiceLib.getLastActivityInfo(scenario.getPopulation().getPersons().get(Id.create(177, Person.class)).getSelectedPlan());
 		
 		assertEquals("20", lastActivityInfo.getFacilityId().toString());
 		assertEquals("home", lastActivityInfo.getActType().toString());
@@ -26,12 +28,12 @@ public class ParkingChoiceLibTest extends TestCase {
 	public void testGetLastActivityPreecededByCardLeg(){
 		Scenario scenario = getScenario();
 	
-		ActInfo lastActivityInfo = ParkingChoiceLib.getLastActivityInfoPreceededByCarLeg(scenario.getPopulation().getPersons().get(new IdImpl(1)).getSelectedPlan());
+		ActInfo lastActivityInfo = ParkingChoiceLib.getLastActivityInfoPreceededByCarLeg(scenario.getPopulation().getPersons().get(Id.create(1, Person.class)).getSelectedPlan());
 		
 		assertEquals("1", lastActivityInfo.getFacilityId().toString());
 		assertEquals("home", lastActivityInfo.getActType().toString());
 		
-		lastActivityInfo = ParkingChoiceLib.getLastActivityInfoPreceededByCarLeg(scenario.getPopulation().getPersons().get(new IdImpl(177)).getSelectedPlan());
+		lastActivityInfo = ParkingChoiceLib.getLastActivityInfoPreceededByCarLeg(scenario.getPopulation().getPersons().get(Id.create(177, Person.class)).getSelectedPlan());
 		
 		assertEquals("20", lastActivityInfo.getFacilityId().toString());
 		assertEquals("home", lastActivityInfo.getActType().toString());

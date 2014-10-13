@@ -24,6 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -67,9 +68,9 @@ public class PeakParkingDemandPerHub {
 	private static void printPeakOccupancyStatistics(HashMap<Id, ParkingOccupancyBins> hubIdParkingOccupancies, LinkHubMapping linkHubMapping) {
 		System.out.println("hubId\tpeakParkingOccupancy");
 		
-		List<Id> hubIds = playground.wrashid.lib.obj.Collections.getSortedKeySet(linkHubMapping.getHubs());
+		List<Id<Link>> hubIds = playground.wrashid.lib.obj.Collections.getSortedKeySet(linkHubMapping.getHubs());
 		
-		for (Id hubId:hubIds){
+		for (Id<Link> hubId:hubIds){
 			int peakOccupancy=0;
 			if (hubIdParkingOccupancies.containsKey(hubId)){
 				peakOccupancy=hubIdParkingOccupancies.get(hubId).getPeakOccupanyOfDay();

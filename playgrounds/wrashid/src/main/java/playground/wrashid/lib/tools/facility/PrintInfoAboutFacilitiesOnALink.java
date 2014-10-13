@@ -21,9 +21,10 @@
 package playground.wrashid.lib.tools.facility;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -38,7 +39,7 @@ public class PrintInfoAboutFacilitiesOnALink {
 		String networkFile = basePath + "networks/teleatlas-ivtcheu-zrhCutC/network.xml.gz";
 		String facilititiesPath = basePath + "facilities/facilities.zrhCutC.xml.gz";
 		
-		Id idOfLinkForWhichFacilitiesShouldBePrinted=new IdImpl("17560001856956FT");
+		Id<Link> idOfLinkForWhichFacilitiesShouldBePrinted=Id.create("17560001856956FT", Link.class);
 		
 		
 		ScenarioImpl scenario = (ScenarioImpl) GeneralLib.readScenario(plansFile, networkFile, facilititiesPath);
@@ -46,9 +47,9 @@ public class PrintInfoAboutFacilitiesOnALink {
 		NetworkImpl network=(NetworkImpl) scenario.getNetwork();
 		ActivityFacilities facilities=scenario.getActivityFacilities();
 				
-		for (Id facilityId:facilities.getFacilities().keySet()){
+		for (Id<ActivityFacility> facilityId:facilities.getFacilities().keySet()){
 			ActivityFacilityImpl facility=(ActivityFacilityImpl) facilities.getFacilities().get(facilityId);
-			Id linkOfFacility=network.getNearestLink(facility.getCoord()).getId();
+			Id<Link> linkOfFacility=network.getNearestLink(facility.getCoord()).getId();
 			
 			if (linkOfFacility.equals(idOfLinkForWhichFacilitiesShouldBePrinted)){
 				FacilityLib.printActivityFacilityImpl(facility);

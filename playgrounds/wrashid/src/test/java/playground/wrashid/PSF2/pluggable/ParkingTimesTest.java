@@ -22,9 +22,9 @@ package playground.wrashid.PSF2.pluggable;
 
 import java.util.LinkedList;
 
-import org.junit.Ignore;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.testcases.MatsimTestCase;
@@ -37,31 +37,31 @@ public class ParkingTimesTest extends MatsimTestCase {
 		String eventsFile=getPackageInputDirectory() + "0.events.txt.gz";
 		ParkingTimesPlugin parkingTimesPlugin = getParkintTimes(eventsFile);
 		
-		assertEquals(2, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(1)).size());
-		assertEquals(22500, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(1)).get(0).getArrivalTime(),1.0);
-		assertEquals(35700, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(1)).get(0).getDepartureTime(),1.0);
-		assertEquals(38040, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(1)).get(1).getArrivalTime(),1.0);
-		assertEquals(21600, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(1)).get(1).getDepartureTime(),1.0);
+		assertEquals(2, parkingTimesPlugin.getParkingTimeIntervals().get(Id.create(1, Person.class)).size());
+		assertEquals(22500, parkingTimesPlugin.getParkingTimeIntervals().get(Id.create(1, Person.class)).get(0).getArrivalTime(),1.0);
+		assertEquals(35700, parkingTimesPlugin.getParkingTimeIntervals().get(Id.create(1, Person.class)).get(0).getDepartureTime(),1.0);
+		assertEquals(38040, parkingTimesPlugin.getParkingTimeIntervals().get(Id.create(1, Person.class)).get(1).getArrivalTime(),1.0);
+		assertEquals(21600, parkingTimesPlugin.getParkingTimeIntervals().get(Id.create(1, Person.class)).get(1).getDepartureTime(),1.0);
 	}
 	
 	public void testAgent2HasNoCarLegs(){
 		String eventsFile=getPackageInputDirectory() +"agent2HasNoCarLeg.events.txt";
 		ParkingTimesPlugin parkingTimesPlugin = getParkintTimes(eventsFile);
 		
-		assertEquals(0, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(2)).size());
+		assertEquals(0, parkingTimesPlugin.getParkingTimeIntervals().get(Id.create(2, Person.class)).size());
 	}
 	
 	public void testAgent2UsesCarNotAsModeForFirstLeg(){
 		String eventsFile=getPackageInputDirectory() +"agent2UsesCarNotAsModeForFirstLeg.events.txt";
 		ParkingTimesPlugin parkingTimesPlugin = getParkintTimes(eventsFile);
 		
-		assertEquals(1, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(2)).size());
-		assertEquals(38040, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(2)).get(0).getArrivalTime(),1.0);
-		assertEquals(35700, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(2)).get(0).getDepartureTime(),1.0);
+		assertEquals(1, parkingTimesPlugin.getParkingTimeIntervals().get(Id.create(2, Person.class)).size());
+		assertEquals(38040, parkingTimesPlugin.getParkingTimeIntervals().get(Id.create(2, Person.class)).get(0).getArrivalTime(),1.0);
+		assertEquals(35700, parkingTimesPlugin.getParkingTimeIntervals().get(Id.create(2, Person.class)).get(0).getDepartureTime(),1.0);
 	}
 	
 	private ParkingTimesPlugin getParkintTimes(String eventsFile) {
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 
 		ParkingTimesPlugin parkingTimesPlugin = new ParkingTimesPlugin();
 		
@@ -77,7 +77,7 @@ public class ParkingTimesTest extends MatsimTestCase {
 	
 	public void testWithParkingLocationsFilterHome(){
 		String eventsFile=getPackageInputDirectory() +"0.events.txt.gz";
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 
 		ParkingTimesPlugin parkingTimesPlugin = new ParkingTimesPlugin();
 		
@@ -93,16 +93,16 @@ public class ParkingTimesTest extends MatsimTestCase {
 		
 		parkingTimesPlugin.closeLastAndFirstParkingIntervals();
 		
-		assertEquals(1, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(1)).size());
-		assertEquals("h", parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(1)).getFirst().getActTypeOfFirstActDuringParking());
-		assertEquals(38040, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(1)).get(0).getArrivalTime(),1.0);
-		assertEquals(21600, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(1)).get(0).getDepartureTime(),1.0);
+		assertEquals(1, parkingTimesPlugin.getParkingTimeIntervals().get(Id.create(1, Person.class)).size());
+		assertEquals("h", parkingTimesPlugin.getParkingTimeIntervals().get(Id.create(1, Person.class)).getFirst().getActTypeOfFirstActDuringParking());
+		assertEquals(38040, parkingTimesPlugin.getParkingTimeIntervals().get(Id.create(1, Person.class)).get(0).getArrivalTime(),1.0);
+		assertEquals(21600, parkingTimesPlugin.getParkingTimeIntervals().get(Id.create(1, Person.class)).get(0).getDepartureTime(),1.0);
 	}
 	
 	
 	public void testWithParkingLocationsFilterWork(){
 		String eventsFile=getPackageInputDirectory() +"0.events.txt.gz";
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 
 		ParkingTimesPlugin parkingTimesPlugin = new ParkingTimesPlugin();
 		
@@ -118,10 +118,10 @@ public class ParkingTimesTest extends MatsimTestCase {
 		
 		parkingTimesPlugin.closeLastAndFirstParkingIntervals();
 		
-		assertEquals(1, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(1)).size());
-		assertEquals("w", parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(1)).getFirst().getActTypeOfFirstActDuringParking());
-		assertEquals(22500, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(1)).get(0).getArrivalTime(),1.0);
-		assertEquals(35700, parkingTimesPlugin.getParkingTimeIntervals().get(new IdImpl(1)).get(0).getDepartureTime(),1.0);
+		assertEquals(1, parkingTimesPlugin.getParkingTimeIntervals().get(Id.create(1, Person.class)).size());
+		assertEquals("w", parkingTimesPlugin.getParkingTimeIntervals().get(Id.create(1, Person.class)).getFirst().getActTypeOfFirstActDuringParking());
+		assertEquals(22500, parkingTimesPlugin.getParkingTimeIntervals().get(Id.create(1, Person.class)).get(0).getArrivalTime(),1.0);
+		assertEquals(35700, parkingTimesPlugin.getParkingTimeIntervals().get(Id.create(1, Person.class)).get(0).getDepartureTime(),1.0);
 	}
 	
 }

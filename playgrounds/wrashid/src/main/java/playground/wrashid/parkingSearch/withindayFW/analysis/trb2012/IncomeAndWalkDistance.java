@@ -19,14 +19,12 @@
 
 package playground.wrashid.parkingSearch.withindayFW.analysis.trb2012;
 
-import java.util.HashMap;
-
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
 import org.matsim.contrib.parking.lib.obj.Matrix;
-import org.matsim.core.basic.v01.IdImpl;
 
 
 public class IncomeAndWalkDistance {
@@ -35,7 +33,7 @@ public class IncomeAndWalkDistance {
 		String basePath = "H:/data/experiments/TRBAug2012/runs/run77/output/";
 		String fileName = basePath + "houseHoldIncome.txt";
 
-		DoubleValueHashMap<Id> income = readIncome(fileName);
+		DoubleValueHashMap<Id<Person>> income = readIncome(fileName);
 
 		int iterationNumber = 35;
 
@@ -51,7 +49,7 @@ public class IncomeAndWalkDistance {
 		for (int i = 1; i < walkTimesMatrix.getNumberOfRows(); i++) {
 			String parkingIdString = walkTimesMatrix.getString(i, 1);
 			if (parkingIdString.contains("gp") || parkingIdString.contains("stp")) {
-				IdImpl personId = new IdImpl(walkTimesMatrix.getString(i, 0));
+				Id<Person> personId = Id.create(walkTimesMatrix.getString(i, 0), Person.class);
 				double walkTime = walkTimesMatrix.getDouble(i, 2);
 				
 				if (walkTime!=0){
@@ -61,14 +59,14 @@ public class IncomeAndWalkDistance {
 			}
 		}
 
-		for (Id personId : walkTimes.keySet()) {
+		for (Id<Person> personId : walkTimes.keySet()) {
 			double averageWalkTime = walkTimes.get(personId) / numberOfParkingActs.get(personId);
 			walkTimes.put(personId, averageWalkTime);
 		}
 
 		IntegerValueHashMap<Integer> categoryFrequency = new IntegerValueHashMap<Integer>();
 		DoubleValueHashMap<Integer> categorySum = new DoubleValueHashMap<Integer>();
-		for (Id personId : walkTimes.keySet()) {
+		for (Id<Person> personId : walkTimes.keySet()) {
 			int incomeCategory = getIncomeCategory(income.get(personId));
 			categorySum.incrementBy(incomeCategory, walkTimes.get(personId));
 			categoryFrequency.increment(incomeCategory);
@@ -82,13 +80,13 @@ public class IncomeAndWalkDistance {
 
 	}
 
-	public static DoubleValueHashMap<Id> readIncome(String fileName) {
-		DoubleValueHashMap<Id> houseHoldIncome = new DoubleValueHashMap<Id>();
+	public static DoubleValueHashMap<Id<Person>> readIncome(String fileName) {
+		DoubleValueHashMap<Id<Person>> houseHoldIncome = new DoubleValueHashMap<>();
 
 		Matrix morningMatrix = GeneralLib.readStringMatrix(fileName, "\t");
 
 		for (int i = 1; i < morningMatrix.getNumberOfRows(); i++) {
-			Id id = new IdImpl(morningMatrix.getString(i, 0));
+			Id<Person> id = Id.create(morningMatrix.getString(i, 0), Person.class);
 			double income = morningMatrix.getDouble(i, 1);
 			houseHoldIncome.put(id, income);
 		}

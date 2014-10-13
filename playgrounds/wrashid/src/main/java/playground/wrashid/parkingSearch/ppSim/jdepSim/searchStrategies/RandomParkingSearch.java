@@ -31,16 +31,17 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.multimodal.router.util.WalkTravelTime;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 
+import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.EditRoute;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.threads.RerouteTaskDuringSim;
@@ -116,7 +117,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 
 				String filterParkingType = getParkingFilterType(personId);
 
-				Id parkingId = getParkingLinkId(aem, filterParkingType);
+				Id<Parking> parkingId = getParkingLinkId(aem, filterParkingType);
 
 			//	boolean isInvalidLink = aem.isLastLinkOfRouteInvalidLinkForParking();
 
@@ -199,7 +200,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		return parkingId;
 	}
 
-	public Id injectBackupGarageParkingIfNeeded(AgentWithParking aem, Id personId, Id parkingId) {
+	public Id injectBackupGarageParkingIfNeeded(AgentWithParking aem, Id<Person> personId, Id<Parking> parkingId) {
 		if (getSearchTime(aem)>maxSearchDuration){
 			ActivityImpl nextNonParkAct = (ActivityImpl) aem.getPerson().getSelectedPlan().getPlanElements()
 					.get(aem.getPlanElementIndex() + 3);
@@ -224,7 +225,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 					}
 				}
 			} else {
-				parkingId=new IdImpl("backupParking");
+				parkingId=Id.create("backupParking", Parking.class);
 			}
 			
 			//startSearchTime.put(personId, -1.0);

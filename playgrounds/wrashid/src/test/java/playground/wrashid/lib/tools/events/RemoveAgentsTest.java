@@ -23,7 +23,7 @@ import java.io.File;
 import java.util.HashSet;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.testcases.MatsimTestCase;
 
 public class RemoveAgentsTest extends MatsimTestCase {
@@ -33,9 +33,9 @@ public class RemoveAgentsTest extends MatsimTestCase {
 		
 		String outputEventsFile=getOutputDirectory() + "output-events.txt.gz";
 		
-		HashSet<Id> agentIds = new HashSet<Id>();
+		HashSet<Id<Person>> agentIds = new HashSet<>();
 		
-		agentIds.add(new IdImpl("1"));
+		agentIds.add(Id.create("1", Person.class));
 		
 		FilterAgents.removeAgents(agentIds, inputEventsFile, outputEventsFile);
 		

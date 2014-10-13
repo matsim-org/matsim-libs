@@ -1,8 +1,10 @@
 package playground.wrashid.parkingSearch.planLevel.replanning;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
@@ -35,7 +37,7 @@ public class ParkingPlanAlgorithmTest extends MatsimTestCase implements Iteratio
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		Plan plan = GlobalRegistry.controler.getPopulation().getPersons().get(new IdImpl("1")).getSelectedPlan();
+		Plan plan = GlobalRegistry.controler.getPopulation().getPersons().get(Id.create("1", Person.class)).getSelectedPlan();
 
 		// confirm the parking before the change (and compare it after the change)
 
@@ -45,7 +47,7 @@ public class ParkingPlanAlgorithmTest extends MatsimTestCase implements Iteratio
 		// change the parking for the work activity to facility 35, instead of 36
 
 		ActivityFacilityImpl newParking = (ActivityFacilityImpl) GlobalRegistry.controler.getFacilities().getFacilities()
-				.get(new IdImpl("35"));
+				.get(Id.create("35", ActivityFacility.class));
 
 		ParkingPlanAlgorithm.replaceParking(plan, (ActivityImpl) plan.getPlanElements().get(6), newParking,
 				GlobalRegistry.controler, (NetworkImpl) GlobalRegistry.controler.getNetwork());

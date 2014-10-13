@@ -20,17 +20,15 @@
 
 package playground.wrashid.lib.tools.plan;
 
-import java.util.HashMap;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
 import org.matsim.contrib.parking.lib.obj.TwoKeyHashMapWithDouble;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 
@@ -47,10 +45,10 @@ public class GetActStatisticsAtLinks {
 		String facilititiesPath = basePath + "facilities/facilities.zrhCutC.xml.gz";
 		Scenario scenario = GeneralLib.readScenario(plansFile, networkFile, facilititiesPath);
 		
-		TwoKeyHashMapWithDouble<Id,String> numberOfActivitiesAtLinks=new TwoKeyHashMapWithDouble<Id,String>();
+		TwoKeyHashMapWithDouble<Id<Link>,String> numberOfActivitiesAtLinks=new TwoKeyHashMapWithDouble<Id<Link>,String>();
 		//IntegerValueHashMap<Id> numberOfAcitivitesAtLink=new IntegerValueHashMap<Id>();
 		
-		for (Id personId:scenario.getPopulation().getPersons().keySet()){
+		for (Id<Person> personId:scenario.getPopulation().getPersons().keySet()){
 			Person p=scenario.getPopulation().getPersons().get(personId);
 			
 			List<PlanElement> planElements = p.getSelectedPlan().getPlanElements();
@@ -69,7 +67,7 @@ public class GetActStatisticsAtLinks {
 						depLegMode=((LegImpl) planElements.get(i+1)).getMode();
 					}
 					
-					Id linkId=((ActivityImpl) pe).getLinkId();
+					Id<Link> linkId=((ActivityImpl) pe).getLinkId();
 					numberOfActivitiesAtLinks.incrementBy(linkId,arrLegMode  + "-" +  ((ActivityImpl) pe).getType() + "-" + depLegMode  , 1.0);
 				}
 			}
@@ -77,7 +75,7 @@ public class GetActStatisticsAtLinks {
 		
 		//numberOfAcitivitesAtLink.printToConsole();
 		
-		Id linkOfInterestId=new IdImpl("17560001856956FT");
+		Id<Link> linkOfInterestId=Id.create("17560001856956FT", Link.class);
 		
 		BasicPointVisualizer basicPointVisualizer=new BasicPointVisualizer();
 		basicPointVisualizer.addPointCoordinate(scenario.getNetwork().getLinks().get(linkOfInterestId).getFromNode().getCoord(), "from-node", Color.BLACK);

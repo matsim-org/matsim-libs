@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 
 /*
@@ -52,7 +52,7 @@ public class GenerateParkingFacilities {
 				if (person.getSelectedPlan().getPlanElements().get(i) instanceof Activity) {
 					Activity act = (Activity) person.getSelectedPlan()
 							.getPlanElements().get(i);
-					Id facilityId=new IdImpl( "facility_" + act.getLinkId().toString());
+					Id<ActivityFacility> facilityId=Id.create( "facility_" + act.getLinkId().toString(), ActivityFacility.class);
 					
 					// add facility only, if it does not already exist
 					if (!facilities.getFacilities().containsKey(facilityId)){

@@ -9,7 +9,7 @@ import playground.wrashid.parkingChoice.infrastructure.api.PriceScheme;
 
 // TODO: make it also mandatory in the constructor to set the capacity
 public class ParkingImpl implements Comparable<ParkingImpl>,Parking {
-	public void setParkingId(Id parkingId) {
+	public void setParkingId(Id<Parking> parkingId) {
 		this.parkingId = parkingId;
 	}
 
@@ -37,7 +37,7 @@ public class ParkingImpl implements Comparable<ParkingImpl>,Parking {
 		this.coord = coord;
 	}
 
-	Id parkingId = null;
+	Id<Parking> parkingId = null;
 	double maxCapacity =0;
 	int currentOccupancy = 0;
 	Double Price = null;
@@ -59,6 +59,7 @@ public class ParkingImpl implements Comparable<ParkingImpl>,Parking {
 		this.score = score;
 	}
 
+	@Override
 	public double getCapacity() {
 		return maxCapacity;
 	}
@@ -91,6 +92,7 @@ public class ParkingImpl implements Comparable<ParkingImpl>,Parking {
 		currentOccupancy--;
 	}
 
+	@Override
 	public Coord getCoord() {
 		return coord;
 	}
@@ -118,14 +120,12 @@ public class ParkingImpl implements Comparable<ParkingImpl>,Parking {
 	}
 
 	@Override
-	public Id getId() {
-		// TODO Auto-generated method stub
+	public Id<Parking> getId() {
 		return this.parkingId;
 	}
 
 	@Override
 	public String getType() {
-		// TODO Auto-generated method stub
 		return parkingType;
 	}
 

@@ -22,10 +22,10 @@ package playground.wrashid.artemis.checks;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
 import org.matsim.contrib.parking.lib.obj.Matrix;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
@@ -55,7 +55,7 @@ public class NumberOfParkingsPerLinkAndHub {
 		
 		
 		for (int i=1;i<stringMatrix.getNumberOfRows();i++){
-			Id linkId=new IdImpl(stringMatrix.getString(i, 1));
+			Id<Link> linkId=Id.create(stringMatrix.getString(i, 1), Link.class);
 			
 			stringMatrix.putString(i, 2, Integer.toString(numberOfPrivateParkingsAttachedToLinks.get(linkId)));
 			stringMatrix.putString(i, 3, Integer.toString(numberOfStreetParkingsAttachedToLinks.get(linkId)));

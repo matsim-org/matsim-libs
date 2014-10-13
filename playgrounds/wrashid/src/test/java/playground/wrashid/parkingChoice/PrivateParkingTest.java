@@ -21,7 +21,8 @@ package playground.wrashid.parkingChoice;
 
 import java.util.LinkedList;
 
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -62,7 +63,7 @@ public class PrivateParkingTest extends MatsimTestCase {
 			}
 		}
 			 
-		PrivateParking privateParking=new PrivateParking(new CoordImpl(8500.0,9000),new ActInfo(new IdImpl(36), "work"));
+		PrivateParking privateParking=new PrivateParking(new CoordImpl(8500.0,9000),new ActInfo(Id.create(36, ActivityFacility.class), "work"));
 		privateParking.setMaxCapacity(parkingCapacity);
 		parkingCollection.add(privateParking);
 		
@@ -91,7 +92,7 @@ public class PrivateParkingTest extends MatsimTestCase {
 			}
 		}
 			 
-		PrivateParking privateParking=new PrivateParking(new CoordImpl(8500.0,9000),new ActInfo(new IdImpl(36), "home"));
+		PrivateParking privateParking=new PrivateParking(new CoordImpl(8500.0,9000),new ActInfo(Id.create(36, ActivityFacility.class), "home"));
 		privateParking.setMaxCapacity(1);
 		parkingCollection.add(privateParking);
 		

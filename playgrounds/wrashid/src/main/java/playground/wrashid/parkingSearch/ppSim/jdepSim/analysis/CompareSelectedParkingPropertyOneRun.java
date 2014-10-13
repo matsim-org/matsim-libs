@@ -1,9 +1,9 @@
 package playground.wrashid.parkingSearch.ppSim.jdepSim.analysis;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.Matrix;
-import org.matsim.core.basic.v01.IdImpl;
 
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 
@@ -78,7 +78,7 @@ public class CompareSelectedParkingPropertyOneRun {
 			Matrix matrixB, String fieldName, boolean ignoreCasesWithBothPPUse) {
 		
 		// persondId, legIndex, rowId
-		TwoHashMapsConcatenated<Id, Integer, Integer> indexMatrixB=getIndex(matrixB);
+		TwoHashMapsConcatenated<Id<Person>, Integer, Integer> indexMatrixB=getIndex(matrixB);
 		
 		int indexPersonId=matrixA.getColumnIndex("personId");
 		int indexLeg=matrixA.getColumnIndex("legIndex");
@@ -88,7 +88,7 @@ public class CompareSelectedParkingPropertyOneRun {
 		int totalNumberOfParkingOperations=0;
 		int numberOfTimesSameParkingFacilityChosen=0;
 		for (int i=1;i<matrixA.getNumberOfRows();i++){
-			Id personId=new IdImpl(matrixA.getString(i, indexPersonId));
+			Id<Person> personId=Id.create(matrixA.getString(i, indexPersonId), Person.class);
 			int legIndex=matrixA.getInteger(i, indexLeg);
 			
 			String selectedFieldIdA=matrixA.getString(i, indexSelectedField);
@@ -116,31 +116,31 @@ public class CompareSelectedParkingPropertyOneRun {
 		return (1-(1.0*numberOfTimesSameParkingFacilityChosen/totalNumberOfParkingOperations))*100;
 	}
 
-	public static TwoHashMapsConcatenated<Id, Integer, Integer> getIndex(
+	public static TwoHashMapsConcatenated<Id<Person>, Integer, Integer> getIndex(
 			Matrix matrix) {
-		TwoHashMapsConcatenated<Id, Integer, Integer> index = new TwoHashMapsConcatenated<Id, Integer, Integer>();
+		TwoHashMapsConcatenated<Id<Person>, Integer, Integer> index = new TwoHashMapsConcatenated<>();
 
 		int indexPersonId = matrix.getColumnIndex("personId");
 		int indexLeg = matrix.getColumnIndex("legIndex");
 
 		for (int i = 1; i < matrix.getNumberOfRows(); i++) {
-			index.put(new IdImpl(matrix.getString(i, indexPersonId)),
+			index.put(Id.create(matrix.getString(i, indexPersonId), Person.class),
 					matrix.getInteger(i, indexLeg), i);
 		}
 
 		return index;
 	}
 	
-	public static TwoHashMapsConcatenated<Id, Integer, String> getColumnValues(
+	public static TwoHashMapsConcatenated<Id<Person>, Integer, String> getColumnValues(
 			Matrix matrix, int columnIndex) {
 		
-		TwoHashMapsConcatenated<Id, Integer, String> values = new TwoHashMapsConcatenated<Id, Integer, String>();
+		TwoHashMapsConcatenated<Id<Person>, Integer, String> values = new TwoHashMapsConcatenated<>();
 		
 		int indexPersonId=matrix.getColumnIndex("personId");
 		int indexLeg=matrix.getColumnIndex("legIndex");
 		
 		for (int i=1;i<matrix.getNumberOfRows();i++){
-			Id personId=new IdImpl(matrix.getString(i, indexPersonId));
+			Id<Person> personId=Id.create(matrix.getString(i, indexPersonId), Person.class);
 			int legIndex=matrix.getInteger(i, indexLeg);
 			values.put(personId, legIndex, matrix.getString(i, columnIndex));
 		}	

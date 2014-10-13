@@ -22,7 +22,7 @@ package playground.wrashid.parkingChoice;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -40,9 +40,9 @@ public class ReservedParkingTest extends MatsimTestCase {
 		ReservedParkingManager reservedParkingManager = new ReservedParkingManager() {
 
 			@Override
-			public boolean considerForChoiceSet(ReservedParking reservedParking, Id personId, double OPTIONALtimeOfDayInSeconds,
+			public boolean considerForChoiceSet(ReservedParking reservedParking, Id<Person> personId, double OPTIONALtimeOfDayInSeconds,
 					ActInfo targetActInfo) {
-				if (personId.equals(new IdImpl(1)) && reservedParking.getAttributes().contains("EV")) {
+				if (personId.equals(Id.create(1, Person.class)) && reservedParking.getAttributes().contains("EV")) {
 					return true;
 				}
 				return false;
@@ -56,15 +56,15 @@ public class ReservedParkingTest extends MatsimTestCase {
 		ReservedParkingManager reservedParkingManager = new ReservedParkingManager() {
 
 			@Override
-			public boolean considerForChoiceSet(ReservedParking reservedParking, Id personId, double OPTIONALtimeOfDayInSeconds,
+			public boolean considerForChoiceSet(ReservedParking reservedParking, Id<Person> personId, double OPTIONALtimeOfDayInSeconds,
 					ActInfo targetActInfo) {
-				if (personId.equals(new IdImpl(1)) && reservedParking.getAttributes().contains("EV")) {
+				if (personId.equals(Id.create(1, Person.class)) && reservedParking.getAttributes().contains("EV")) {
 					return true;
 				}
-				if (personId.equals(new IdImpl(2)) && reservedParking.getAttributes().contains("disabled")) {
+				if (personId.equals(Id.create(2, Person.class)) && reservedParking.getAttributes().contains("disabled")) {
 					return true;
 				}
-				if (personId.equals(new IdImpl(3)) && reservedParking.getAttributes().contains("EV")) {
+				if (personId.equals(Id.create(3, Person.class)) && reservedParking.getAttributes().contains("EV")) {
 					return true;
 				}
 				return false;

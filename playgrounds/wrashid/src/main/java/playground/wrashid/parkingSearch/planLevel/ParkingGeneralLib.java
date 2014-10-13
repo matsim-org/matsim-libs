@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.population.ActivityImpl;
 
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingArrivalDepartureLog;
@@ -77,7 +78,7 @@ public class ParkingGeneralLib {
 	 * @param plan
 	 * @return
 	 */
-	public static Id getFirstParkingFacilityId(Plan plan) {
+	public static Id<ActivityFacility> getFirstParkingFacilityId(Plan plan) {
 
 		for (int i = 0; i < plan.getPlanElements().size(); i++) {
 			if (plan.getPlanElements().get(i) instanceof ActivityImpl) {
@@ -100,8 +101,8 @@ public class ParkingGeneralLib {
 	 * @param plan
 	 * @return
 	 */
-	public static LinkedList<Id> getAllParkingFacilityIds(Plan plan) {
-		LinkedList<Id> parkingFacilityIds = new LinkedList<Id>();
+	public static LinkedList<Id<ActivityFacility>> getAllParkingFacilityIds(Plan plan) {
+		LinkedList<Id<ActivityFacility>> parkingFacilityIds = new LinkedList<>();
 
 		// recognize parking arrival patterns (this means, there is car leg
 		// after which there is
@@ -124,7 +125,7 @@ public class ParkingGeneralLib {
 	}
 
 	public static void printAllParkingFacilityIds(Plan plan) {
-		LinkedList<Id> allParkingFacilityIds = getAllParkingFacilityIds(plan);
+		LinkedList<Id<ActivityFacility>> allParkingFacilityIds = getAllParkingFacilityIds(plan);
 
 		System.out.println(plan.getPerson().getId());
 

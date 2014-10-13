@@ -19,7 +19,8 @@
 
 package playground.wrashid.parkingSearch.planLevel.occupancy;
 
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -36,8 +37,8 @@ public class ParkingCapacityTest extends MatsimTestCase {
 
 		ParkingCapacity pc = new ParkingCapacity(sc.getActivityFacilities());
 
-		assertEquals(1, pc.getParkingCapacity(new IdImpl(8)));
-		assertEquals(5, pc.getParkingCapacity(new IdImpl(9)));
+		assertEquals(1, pc.getParkingCapacity(Id.create(8, ActivityFacility.class)));
+		assertEquals(5, pc.getParkingCapacity(Id.create(9, ActivityFacility.class)));
 
 	}
 

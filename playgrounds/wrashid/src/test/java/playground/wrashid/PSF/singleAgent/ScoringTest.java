@@ -1,6 +1,7 @@
 package playground.wrashid.PSF.singleAgent;
 
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.PSF.ParametersPSF;
@@ -16,6 +17,7 @@ public class ScoringTest extends MatsimTestCase {
 	// this test has unveiled a bug in the optimized charger, therefore it is added.
 	public void testScoring1() {
 		ParametersPSFMutator paramMutator=new ParametersPSFMutator() {
+			@Override
 			public void mutateParameters() {
 				ParametersPSF.setHubPriceInfo(new HubPriceInfo(45000,65000,0.18,0.09));
 			}
@@ -24,7 +26,7 @@ public class ScoringTest extends MatsimTestCase {
 		PSSControler pssControler=new PSSControler("test/input/playground/wrashid/PSF/singleAgent/config9.xml", paramMutator);
 		pssControler.runMATSimIterations();
 		
-		ChargingTimes chargingTimesOfAgentOne = AfterSimulationListener.getChargingTimes().get(new IdImpl("1"));
+		ChargingTimes chargingTimesOfAgentOne = AfterSimulationListener.getChargingTimes().get(Id.create("1", Person.class));
 		ChargeLog chargeLogOfAgentOne;
 		
 		// TODO: has problem with update of jdeqsim/ empty car routes -> why, unknown at the moment

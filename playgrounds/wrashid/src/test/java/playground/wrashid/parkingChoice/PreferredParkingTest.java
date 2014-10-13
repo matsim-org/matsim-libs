@@ -22,7 +22,7 @@ package playground.wrashid.parkingChoice;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -53,7 +53,7 @@ public class PreferredParkingTest extends MatsimTestCase {
 			@Override
 			public boolean isPersonLookingForCertainTypeOfParking(Id personId, double oPTIONALtimeOfDayInSeconds,
 					ActInfo targetActInfo) {
-				if (personId.equals(new IdImpl(1))) {
+				if (personId.equals(Id.create(1, Person.class))) {
 					return true;
 				}
 				return false;

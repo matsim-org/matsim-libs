@@ -34,7 +34,7 @@ public class InFlowInfoCollectorWithPt implements LinkEnterEventHandler,
 
 	private int binSizeInSeconds; // set the length of interval
 
-	public HashMap<Id, int[]> linkInFlow;
+	public HashMap<Id<Link>, int[]> linkInFlow;
 	private Map<Id<Link>, ? extends Link> filteredEquilNetLinks; //
 
 	private boolean isOldEventFile;
@@ -48,7 +48,7 @@ public class InFlowInfoCollectorWithPt implements LinkEnterEventHandler,
 
 	@Override
 	public void reset(int iteration) {
-		linkInFlow = new HashMap<Id, int[]>(); // reset the variables (private
+		linkInFlow = new HashMap<>(); // reset the variables (private
 												// ones)
 	}
 
@@ -58,7 +58,7 @@ public class InFlowInfoCollectorWithPt implements LinkEnterEventHandler,
 		enterLink(event.getLinkId(), event.getTime());
 	}
 
-	private void enterLink(Id linkId, double time) {
+	private void enterLink(Id<Link> linkId, double time) {
 		if (!filteredEquilNetLinks.containsKey(linkId)) {
 			return; // if the link is not in the link set, then exit the method
 		}
@@ -83,7 +83,7 @@ public class InFlowInfoCollectorWithPt implements LinkEnterEventHandler,
 	}
 
 	public void printLinkInFlow() { // print
-		for (Id linkId : linkInFlow.keySet()) {
+		for (Id<Link> linkId : linkInFlow.keySet()) {
 			int[] bins = linkInFlow.get(linkId);
 
 			Link link = filteredEquilNetLinks.get(linkId);
@@ -98,7 +98,7 @@ public class InFlowInfoCollectorWithPt implements LinkEnterEventHandler,
 		}
 	}
 
-	public HashMap<Id, int[]> getLinkInFlow() {
+	public HashMap<Id<Link>, int[]> getLinkInFlow() {
 		return linkInFlow;
 	}
 

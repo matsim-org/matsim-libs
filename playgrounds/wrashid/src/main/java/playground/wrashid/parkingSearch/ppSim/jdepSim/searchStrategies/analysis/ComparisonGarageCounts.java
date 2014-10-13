@@ -29,13 +29,9 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.labels.BoxAndWhiskerToolTipGenerator;
-import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.renderer.category.BoxAndWhiskerRenderer;
 import org.jfree.data.statistics.DefaultBoxAndWhiskerCategoryDataset;
 import org.matsim.api.core.v01.Id;
@@ -43,11 +39,10 @@ import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.lib.obj.Matrix;
-import org.matsim.core.basic.v01.IdImpl;
 
+import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingChoice.trb2011.counts.SingleDayGarageParkingsCount;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingOccupancyBins;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.MainPPSimZurich30km;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.scoring.ParkingActivityAttributes;
 
@@ -190,7 +185,7 @@ public class ComparisonGarageCounts {
 				measuredOccupancySum += countsScalingFactor *occupancyBins[i];
 			}
 			
-			Id parkingId = new IdImpl( mappingOfParkingNameToParkingId.get(parkingName));
+			Id<Parking> parkingId = Id.create( mappingOfParkingNameToParkingId.get(parkingName), Parking.class);
 			ParkingOccupancyBins pob=parkingOccupancyBins.get(parkingId);
 			
 			double simulatedOccupancySum=0;
@@ -237,9 +232,9 @@ public class ComparisonGarageCounts {
         Arrays.sort(numArray);
         double median;
         if (numArray.length%2==0)
-            median = ((double)numArray[numArray.length/2] + (double)numArray[numArray.length/2+1])/2;
+            median = (numArray[numArray.length/2] + numArray[numArray.length/2+1])/2;
         else
-            median = (double) numArray[numArray.length/2];
+            median = numArray[numArray.length/2];
         log.info("median rel. error:" + median);
 	}
 

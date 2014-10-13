@@ -19,7 +19,9 @@
 
 package playground.wrashid.parkingSearch.planLevel.occupancy;
 
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
@@ -49,26 +51,26 @@ public class ParkingOccupancyMaintainerTest extends MatsimTestCase implements Sh
 	 */
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-		ParkingOccupancyBins pob=parkingBookKeeper.getParkingOccupancyMaintainer().getParkingOccupancyBins().get(new IdImpl(36));
+		ParkingOccupancyBins pob=parkingBookKeeper.getParkingOccupancyMaintainer().getParkingOccupancyBins().get(Id.create(36, ActivityFacility.class));
 
 		assertEquals(3, pob.getOccupancy(38000));
 
-		pob=parkingBookKeeper.getParkingOccupancyMaintainer().getParkingOccupancyBins().get(new IdImpl(1));
+		pob=parkingBookKeeper.getParkingOccupancyMaintainer().getParkingOccupancyBins().get(Id.create(1, ActivityFacility.class));
 		assertEquals(3, pob.getOccupancy(0));
 
-		ParkingCapacityFullLogger pcfl=parkingBookKeeper.getParkingOccupancyMaintainer().getParkingCapacityFullTimes().get(new IdImpl(36));
+		ParkingCapacityFullLogger pcfl=parkingBookKeeper.getParkingOccupancyMaintainer().getParkingCapacityFullTimes().get(Id.create(36, ActivityFacility.class));
 		assertEquals(true, pcfl.isParkingFullAtTime(38000));
 
 		assertEquals(false, pcfl.isParkingFullAtTime(0));
 
-		pcfl=parkingBookKeeper.getParkingOccupancyMaintainer().getParkingCapacityFullTimes().get(new IdImpl(1));
+		pcfl=parkingBookKeeper.getParkingOccupancyMaintainer().getParkingCapacityFullTimes().get(Id.create(1, ActivityFacility.class));
 
 		assertEquals(true, pcfl.isParkingFullAtTime(0));
 
 		assertEquals(false, pcfl.isParkingFullAtTime(38000));
 
 
-		ParkingArrivalDepartureLog pal=parkingBookKeeper.getParkingOccupancyMaintainer().getParkingArrivalDepartureLog().get(new IdImpl(1));
+		ParkingArrivalDepartureLog pal=parkingBookKeeper.getParkingOccupancyMaintainer().getParkingArrivalDepartureLog().get(Id.create(1, Person.class));
 
 		assertEquals(2, pal.getParkingArrivalDepartureList().size());
 

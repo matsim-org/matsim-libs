@@ -1,25 +1,8 @@
 package playground.wrashid.PSF2.vehicle.energyConsumption;
 
-import java.util.Set;
-
-import junit.framework.TestCase;
-
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.testcases.MatsimTestCase;
-
-import playground.wrashid.PSF.ParametersPSF;
-import playground.wrashid.PSF.ParametersPSFMutator;
-import playground.wrashid.PSF.PSS.PSSControler;
-import playground.wrashid.PSF.data.HubPriceInfo;
-import playground.wrashid.PSF.energy.AfterSimulationListener;
-import playground.wrashid.PSF.energy.charging.ChargeLog;
-import playground.wrashid.PSF.energy.charging.ChargingTimes;
-import playground.wrashid.PSF2.vehicle.energyConsumption.EnergyConsumptionTable;
+import org.matsim.vehicles.VehicleType;
 
 public class EnergyConsumptionTableTest extends MatsimTestCase {
 	
@@ -29,7 +12,7 @@ public class EnergyConsumptionTableTest extends MatsimTestCase {
 		double linkLengthInMeters=1000;
 		
 		// trying to use first line in file.
-		Id vehicleClassId=new IdImpl(1);
+		Id<VehicleType> vehicleClassId=Id.create(1, VehicleType.class);
 		double linkFreeSpeedInKmPerHour=30.0;
 		double linkFreeSpeedInMetersPerSecond=linkFreeSpeedInKmPerHour*1000/3600;
 		double averageDrivenSpeedOnLinkInKmPerHour=25.0;

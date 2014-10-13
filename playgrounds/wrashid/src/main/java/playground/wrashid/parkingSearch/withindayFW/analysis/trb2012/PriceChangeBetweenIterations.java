@@ -20,14 +20,11 @@
 package playground.wrashid.parkingSearch.withindayFW.analysis.trb2012;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.lib.obj.Matrix;
-import org.matsim.contrib.parking.lib.obj.TwoKeyHashMapWithDouble;
-import org.matsim.core.basic.v01.IdImpl;
 
-import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
+import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 
 public class PriceChangeBetweenIterations {
 
@@ -38,7 +35,7 @@ public class PriceChangeBetweenIterations {
 		int lastIteration=18;
 		
 		String fileName= basePath + "it.0/0.publicParkingPricePerHourInTheMorning.txt";
-		DoubleValueHashMap<Id> oldPrices = readPrices(fileName);
+		DoubleValueHashMap<Id<Parking>> oldPrices = readPrices(fileName);
 		
 		System.out.print("iterationNumber\t");
 		System.out.print("numberOfRisingStreetParkingPrices\t");
@@ -49,7 +46,7 @@ public class PriceChangeBetweenIterations {
 		System.out.println("numberOfStableGarageParkingPrices");
 		
 		for (int i=firstIteration;i<=lastIteration;i+=outputInterval){
-			DoubleValueHashMap<Id> newPrices = readPrices(basePath + "it." + i + "/" + i + ".publicParkingPricePerHourInTheMorning.txt");
+			DoubleValueHashMap<Id<Parking>> newPrices = readPrices(basePath + "it." + i + "/" + i + ".publicParkingPricePerHourInTheMorning.txt");
 			
 			
 			
@@ -61,7 +58,7 @@ public class PriceChangeBetweenIterations {
 			int numberOfFallingGarageParkingPrices=0;
 			int numberOfStableGarageParkingPrices=0;
 			
-			for (Id parkingId:oldPrices.keySet()){
+			for (Id<Parking> parkingId:oldPrices.keySet()){
 				if (parkingId.toString().contains("stp")){
 					if(newPrices.get(parkingId)>oldPrices.get(parkingId)){
 						numberOfRisingStreetParkingPrices++;
@@ -96,13 +93,13 @@ public class PriceChangeBetweenIterations {
 		
 	}
 
-	private static DoubleValueHashMap<Id> readPrices(String fileName) {
-		DoubleValueHashMap<Id> parkingPrice=new DoubleValueHashMap<Id>();
+	private static DoubleValueHashMap<Id<Parking>> readPrices(String fileName) {
+		DoubleValueHashMap<Id<Parking>> parkingPrice=new DoubleValueHashMap<>();
 		
 		Matrix morningMatrix = GeneralLib.readStringMatrix(fileName,"\t");
 		
 		for (int i=1;i<morningMatrix.getNumberOfRows();i++){
-			Id id=new IdImpl(morningMatrix.getString(i, 0));
+			Id<Parking> id=Id.create(morningMatrix.getString(i, 0), Parking.class);
 			double price=morningMatrix.getDouble(i, 1);
 			parkingPrice.put(id, price);
 		}

@@ -20,17 +20,13 @@
 
 package playground.wrashid.PSF2.pluggable.energyConsumption;
 
-import java.util.ArrayList;
-
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.parking.lib.DebugLib;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.vehicles.VehicleType;
 
 import playground.wrashid.PSF.data.energyConsumption.AverageEnergyConsumptionGalus;
-import playground.wrashid.PSF.lib.PSFGeneralLib;
-import playground.wrashid.PSF2.ParametersPSF2;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
-import playground.wrashid.lib.obj.GeneralLogObject;
 
 public class EnergyConsumptionModelPSL implements EnergyConsumptionModel {
 
@@ -53,11 +49,11 @@ public class EnergyConsumptionModelPSL implements EnergyConsumptionModel {
 			return 0;
 		}
 
-		if (vehicle.getVehicleClassId().equals(new IdImpl(1))) {
+		if (vehicle.getVehicleClassId().equals(Id.create(1, VehicleType.class))) {
 			// NOTE: phevs must have class Id one in this case
 			return phevEnergyConsumptionModel.getEnergyConsumption(
 					Vehicle.getAverageSpeedOfVehicleOnLinkInMetersPerSecond(timeSpentOnLink, link), link.getLength());
-		} else if (vehicle.getVehicleClassId().equals(new IdImpl(2))) {
+		} else if (vehicle.getVehicleClassId().equals(Id.create(2, VehicleType.class))) {
 			return 0;
 		} else {
 			DebugLib

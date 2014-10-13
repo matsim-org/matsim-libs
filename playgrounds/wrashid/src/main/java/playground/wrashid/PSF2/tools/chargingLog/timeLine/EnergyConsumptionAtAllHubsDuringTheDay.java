@@ -3,9 +3,7 @@ package playground.wrashid.PSF2.tools.chargingLog.timeLine;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
-import org.matsim.contrib.parking.lib.obj.Matrix;
+import org.matsim.api.core.v01.network.Link;
 
 import playground.wrashid.artemis.hubs.LinkHubMapping;
 
@@ -17,7 +15,7 @@ public class EnergyConsumptionAtAllHubsDuringTheDay {
 		
 		String linkHubMappingTable = "H:/data/experiments/ARTEMIS/zh/dumb charging/input/run1/linkHub_orig.mappingTable.txt";
 		
-		HashMap<Id, double[]> energyConsumptionPerLink = EnergyConsumptionAtAllLinksTimeLine.readChargingLog(chargingLogFileNamePath);
+		HashMap<Id<Link>, double[]> energyConsumptionPerLink = EnergyConsumptionAtAllLinksTimeLine.readChargingLog(chargingLogFileNamePath);
 		
 		LinkHubMapping linkHubMapping=new LinkHubMapping(linkHubMappingTable);
 		
@@ -34,10 +32,10 @@ public class EnergyConsumptionAtAllHubsDuringTheDay {
 		}		
 	}
 
-	private static double[] getEnergyConsumptionForAllHubsDuringTheDay(HashMap<Id, double[]> energyConsumptionPerLink, LinkHubMapping linkHubMapping){
+	private static double[] getEnergyConsumptionForAllHubsDuringTheDay(HashMap<Id<Link>, double[]> energyConsumptionPerLink, LinkHubMapping linkHubMapping){
 		double[] result=EnergyConsumptionAtAllLinksTimeLine.getNewTimeBinArray();
 		
-		for (Id linkId:energyConsumptionPerLink.keySet()){
+		for (Id<Link> linkId:energyConsumptionPerLink.keySet()){
 			if (linkHubMapping.getHubIdForLinkId(linkId)!=null){
 			for (int i=0;i<EnergyConsumptionAtAllLinksTimeLine.getNumberOfSlotsInBin();i++){
 					result[i]+=energyConsumptionPerLink.get(linkId)[i];

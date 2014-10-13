@@ -3,7 +3,8 @@ package playground.wrashid.parkingSearch.planLevel.strc2010;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
 
@@ -36,8 +37,9 @@ public class Run18 {
 
 	public static ParkingFacilityAttributPersonPreferences getParkingFacilityAttributPersonPreferences() {
 		return new ParkingFacilityAttributPersonPreferences() {
+			@Override
 			public ParkingAttribute getParkingFacilityAttributPreferencesOfPersonForActivity(
-					Id personId, ActivityImpl activity) {
+					Id<Person> personId, ActivityImpl activity) {
 				if (belongsToElectricVehilcleOwnerGroup(personId)) {
 					return ParkingAttribute.HAS_DEFAULT_ELECTRIC_PLUG;
 				} else {
@@ -49,8 +51,9 @@ public class Run18 {
 
 	private static ParkingFacilityAttributes getParkingFacilityAttributes() {
 		return new ParkingFacilityAttributes() {
+			@Override
 			public LinkedList<ParkingAttribute> getParkingFacilityAttributes(
-					Id facilityId) {
+					Id<ActivityFacility> facilityId) {
 				LinkedList<ParkingAttribute> result = new LinkedList<ParkingAttribute>();
 
 				int facilityIdInt = new Integer(facilityId.toString());
@@ -69,7 +72,7 @@ public class Run18 {
 		};
 	}
 
-	private static boolean belongsToElectricVehilcleOwnerGroup(Id personId) {
+	private static boolean belongsToElectricVehilcleOwnerGroup(Id<Person> personId) {
 		int personIdInt = new Integer(personId.toString());
 		if (personIdInt % 5 == 0) {
 			return true;
@@ -81,7 +84,7 @@ public class Run18 {
 		PersonGroups personGroupsForStatistics = new PersonGroups();
 
 		for (int i = 1; i <= 1000; i++) {
-			Id personId = new IdImpl(i);
+			Id<Person> personId = Id.create(i, Person.class);
 			int groupId = belongsToElectricVehilcleOwnerGroup(personId) ? 0 : 1;
 			personGroupsForStatistics.addPersonToGroup("Group-" + groupId,
 					personId);

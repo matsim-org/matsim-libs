@@ -9,13 +9,11 @@ import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.transEnergySim.charging.ChargingUponArrival;
 import org.matsim.contrib.transEnergySim.chargingInfrastructure.road.InductiveStreetCharger;
 import org.matsim.contrib.transEnergySim.controllers.InductiveChargingController;
-import org.matsim.contrib.transEnergySim.vehicles.VehicleUtils;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionTracker;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.galus.EnergyConsumptionModelGalus;
 import org.matsim.contrib.transEnergySim.vehicles.impl.InductivelyChargableBatteryElectricVehicle;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 
@@ -31,7 +29,7 @@ public class InductiveCharging {
 	
 		EnergyConsumptionModel ecm=new EnergyConsumptionModelGalus();
 		
-		HashMap<Id<Vehicle>, Vehicle> vehicles=new HashMap<Id<Vehicle>, Vehicle>();
+		HashMap<Id<Vehicle>, Vehicle> vehicles=new HashMap<>();
 		
 		
 		
@@ -44,7 +42,7 @@ public class InductiveCharging {
 			vehicles.put(agentId, new IC_BEV(ecm,batteryCapacityInJoules));
 		}
 		*/
-		IdImpl agentId = new IdImpl("pid" + 0);
+		Id<Vehicle> agentId = Id.create("pid" + 0, Vehicle.class);
 		vehicles.put(agentId, new InductivelyChargableBatteryElectricVehicle(ecm,batteryCapacityInJoules));
 		
 		InductiveChargingController controller = new InductiveChargingController(config,vehicles);

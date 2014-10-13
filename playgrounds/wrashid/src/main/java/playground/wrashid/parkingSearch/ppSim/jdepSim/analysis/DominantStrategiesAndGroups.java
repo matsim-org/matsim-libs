@@ -1,9 +1,9 @@
 package playground.wrashid.parkingSearch.ppSim.jdepSim.analysis;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.Matrix;
-import org.matsim.core.basic.v01.IdImpl;
 
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 
@@ -81,12 +81,12 @@ CompareSelectedParkingPropertyOneRun {
 		int indexGroupName=eventsMatrixCurrentIter.getColumnIndex("groupName");
 		int indexFacilityId=eventsMatrixCurrentIter.getColumnIndex("FacilityId");
 		
-		TwoHashMapsConcatenated<Id, Integer, String> strategies=getColumnValues(eventsMatrixCurrentIter,indexStrategy);
-		TwoHashMapsConcatenated<Id, Integer, String> strategyGroups=getColumnValues(eventsMatrixCurrentIter,indexGroupName);
-		TwoHashMapsConcatenated<Id, Integer, String> facilityIds=getColumnValues(eventsMatrixCurrentIter,indexFacilityId);
+		TwoHashMapsConcatenated<Id<Person>, Integer, String> strategies=getColumnValues(eventsMatrixCurrentIter,indexStrategy);
+		TwoHashMapsConcatenated<Id<Person>, Integer, String> strategyGroups=getColumnValues(eventsMatrixCurrentIter,indexGroupName);
+		TwoHashMapsConcatenated<Id<Person>, Integer, String> facilityIds=getColumnValues(eventsMatrixCurrentIter,indexFacilityId);
 		
 		if (ignoreCasesWithPPUse){
-			for (Id personId:facilityIds.getKeySet1()){
+			for (Id<Person> personId:facilityIds.getKeySet1()){
 				for (Integer legIndex:facilityIds.getKeySet2(personId)){
 					if (facilityIds.get(personId, legIndex).contains("private") || facilityIds.get(personId, legIndex).contains("publicPOutside")){
 						strategies.removeValue(personId, legIndex);
@@ -106,7 +106,7 @@ CompareSelectedParkingPropertyOneRun {
 			
 			
 			for (int j=1;j<eventsMatrixCurrentIter.getNumberOfRows();j++){
-				Id personId=new IdImpl(eventsMatrixCurrentIter.getString(j, indexPersonId));
+				Id<Person> personId=Id.create(eventsMatrixCurrentIter.getString(j, indexPersonId), Person.class);
 				int legIndex=eventsMatrixCurrentIter.getInteger(j, indexLeg);
 				
 				if (strategies.get(personId, legIndex)!=null){

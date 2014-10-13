@@ -30,8 +30,8 @@ public class Collections {
 		return doubleArray;
 	}
 	
-	public static List getSortedKeySet(Collection keySet){
-		List keys = new ArrayList(keySet); 
+	public static <T extends Comparable<T>> List<T> getSortedKeySet(Collection<T> keySet){
+		List<T> keys = new ArrayList<T>(keySet); 
 		keys.remove(null);
 		java.util.Collections.sort(keys);
 		return keys;

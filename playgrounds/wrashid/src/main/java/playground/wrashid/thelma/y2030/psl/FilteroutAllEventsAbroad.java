@@ -30,13 +30,13 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.Matrix;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
 import playground.wrashid.lib.tools.kml.BasicPointVisualizer;
 import playground.wrashid.lib.tools.kml.Color;
 
+import com.sun.syndication.feed.atom.Person;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -82,8 +82,8 @@ public class FilteroutAllEventsAbroad {
 		HashMap<Id,Id> foreignActAgents=new HashMap<Id,Id>();
 		for (int i=1;i<parkingTimesMatrix.getNumberOfRows();i++){
 			
-			Id agentId=new IdImpl(parkingTimesMatrix.getString(i, 0));
-			Id linkId=new IdImpl(parkingTimesMatrix.getString(i, 3));
+			Id<Person> agentId=Id.create(parkingTimesMatrix.getString(i, 0), Person.class);
+			Id<Link> linkId=Id.create(parkingTimesMatrix.getString(i, 3), Link.class);
 				
 				if (foreignLinks.containsKey(linkId)){
 					foreignActAgents.put(agentId,null);
@@ -94,8 +94,8 @@ public class FilteroutAllEventsAbroad {
 		HashMap<Id,Id> usedLinks=new HashMap<Id,Id>();
         int i=1;
 		while (i<parkingTimesMatrix.getNumberOfRows()){
-			Id agentId=new IdImpl(parkingTimesMatrix.getString(i, 0));
-			Id linkId=new IdImpl(parkingTimesMatrix.getString(i, 3));
+			Id<Person> agentId=Id.create(parkingTimesMatrix.getString(i, 0), Person.class);
+			Id<Link> linkId=Id.create(parkingTimesMatrix.getString(i, 3), Link.class);
 			
 			if (foreignActAgents.containsKey(agentId)){
 				parkingTimesMatrix.deleteRow(i);
@@ -133,7 +133,7 @@ public class FilteroutAllEventsAbroad {
 			
 			if (!parkingTimesMatrix.getString(i, 4).equalsIgnoreCase("tta")){
 				
-				Id linkId=new IdImpl(parkingTimesMatrix.getString(i, 3));
+				Id linkId=Id.create(parkingTimesMatrix.getString(i, 3));
 				
 				if (!linkIds.containsKey(linkId)){
 					linkIds.put(linkId,null);

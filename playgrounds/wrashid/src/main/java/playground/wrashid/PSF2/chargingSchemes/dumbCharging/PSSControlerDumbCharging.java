@@ -22,7 +22,6 @@ package playground.wrashid.PSF2.chargingSchemes.dumbCharging;
 
 import java.util.HashMap;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -97,6 +96,7 @@ public class PSSControlerDumbCharging extends PSSControler {
 		addAfterSimulationListener(controler);
 
 		controler.addControlerListener(new ShutdownListener() {
+			@Override
 			public void notifyShutdown(ShutdownEvent event) {
 				ParametersPSF2.getPSFGeneralLog().writeFileAndCloseStream(event.getControler().getConfig().controler().getLastIteration() + 1);
 			}
@@ -107,6 +107,7 @@ public class PSSControlerDumbCharging extends PSSControler {
 		controler.run();
 	}
 	
+	@Override
 	public void runMATSimIterations() {
 
 		prepareMATSimIterations();
@@ -157,12 +158,13 @@ public class PSSControlerDumbCharging extends PSSControler {
 		ParametersPSF2.fleetInitializer = new ChargingFleetInitializer();
 		
 		
-		ParametersPSF2.chargingTimes = new HashMap<Id, ChargingTimes>();
+		ParametersPSF2.chargingTimes = new HashMap<>();
 
 		ParametersPSF2.controler = controler;
 		ParametersPSF2.activityIntervalTracker = new ActivityIntervalTracker_NonParallelizableHandler();
 
 		controler.addControlerListener(new StartupListener() {
+			@Override
 			public void notifyStartup(StartupEvent event) {
 				
 				ParametersPSF2.setPSFGeneralLog(new GeneralLogObject(event.getControler(),"PSFGeneralLog.txt"));
@@ -183,6 +185,7 @@ public class PSSControlerDumbCharging extends PSSControler {
 		});
 
 		controler.addControlerListener(new BeforeMobsimListener() {
+			@Override
 			public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 				GeneralLogObject iterationLog = new GeneralLogObject(event.getControler(), "PSFIterationLog.txt");
 				ParametersPSF2.setPSFIterationLog(iterationLog);
@@ -190,6 +193,7 @@ public class PSSControlerDumbCharging extends PSSControler {
 		});
 
 		controler.addControlerListener(new AfterMobsimListener() {
+			@Override
 			public void notifyAfterMobsim(AfterMobsimEvent event) {
 				ParametersPSF2.getPSFIterationLog().writeFileAndCloseStream(event.getIteration());
 			}

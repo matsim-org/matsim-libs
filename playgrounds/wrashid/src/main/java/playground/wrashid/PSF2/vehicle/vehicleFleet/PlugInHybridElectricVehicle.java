@@ -21,8 +21,11 @@
 package playground.wrashid.PSF2.vehicle.vehicleFleet;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.vehicles.VehicleType;
 
 import playground.wrashid.PSF.energy.charging.ChargeLog;
 import playground.wrashid.PSF.energy.charging.ChargingTimes;
@@ -38,11 +41,11 @@ public class PlugInHybridElectricVehicle extends Vehicle {
 
 	protected double electricEnergyUseInJouleDuringDayForDriving;
 
-	public PlugInHybridElectricVehicle(EnergyStateMaintainer energyStateMaintainer, Id vehicleClassId) {
+	public PlugInHybridElectricVehicle(EnergyStateMaintainer energyStateMaintainer, Id<VehicleType> vehicleClassId) {
 		super(energyStateMaintainer, vehicleClassId);
 	}
 
-	public PlugInHybridElectricVehicle(Id vehicleClassId) {
+	public PlugInHybridElectricVehicle(Id<VehicleType> vehicleClassId) {
 		super(vehicleClassId);
 	}
 
@@ -83,16 +86,16 @@ public class PlugInHybridElectricVehicle extends Vehicle {
 		}
 	}
 
-	public void centralizedCharging(double arrivalTime, double chargingDuration, double plugSizeInWatt, Id linkId, Id facilityId) {
+	public void centralizedCharging(double arrivalTime, double chargingDuration, double plugSizeInWatt, Id<Link> linkId, Id facilityId) {
 		double chargeInJoule = chargingDuration * plugSizeInWatt;
 
-		logChargingTime(arrivalTime, chargingDuration, chargeInJoule, linkId, facilityId);
+		logChargingTime(arrivalTime, chargingDuration, chargeInJoule, linkId);
 
 		chargeVehicle(chargeInJoule);
 	}
 
-	private void logChargingTime(double arrivalTime, double chargingDuration, double chargeInJoule, Id linkId, Id facilityId) {
-		Id personId = ParametersPSF2.vehicles.getKey(this);
+	private void logChargingTime(double arrivalTime, double chargingDuration, double chargeInJoule, Id<Link> linkId) {
+		Id<Person> personId = ParametersPSF2.vehicles.getKey(this);
 		double endChargingTime = GeneralLib.projectTimeWithin24Hours(arrivalTime + chargingDuration);
 		
 

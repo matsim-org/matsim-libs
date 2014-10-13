@@ -32,7 +32,7 @@ public class ParkingCapacity {
 	/*
 	 * id: facilityId value: capacity of the facility
 	 */
-	private HashMap<Id, Integer> facilityCapacity = new HashMap<Id, Integer>();
+	private HashMap<Id<ActivityFacility>, Integer> facilityCapacity = new HashMap<>();
 	private ArrayList<ActivityFacility> parkingFacilities=new ArrayList<ActivityFacility>();
 
 	public ArrayList<ActivityFacility> getParkingFacilities() {
@@ -56,7 +56,7 @@ public class ParkingCapacity {
 
 	}
 
-	public int getParkingCapacity(Id facilityId) {
+	public int getParkingCapacity(Id<ActivityFacility> facilityId) {
 		return facilityCapacity.get(facilityId);
 	}
 	

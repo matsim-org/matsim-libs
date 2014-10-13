@@ -1,5 +1,10 @@
 package playground.wrashid.parkingChoice.scoring;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Set;
+
 import org.apache.commons.math.stat.descriptive.moment.Mean;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -10,7 +15,6 @@ import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.lib.obj.Matrix;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -20,7 +24,12 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.functions.*;
+import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
+import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
+import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
+import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+
 import playground.wrashid.lib.obj.Collections;
 import playground.wrashid.parkingChoice.ParkingChoiceLib;
 import playground.wrashid.parkingChoice.ParkingManager;
@@ -30,11 +39,6 @@ import playground.wrashid.parkingChoice.trb2011.counts.SingleDayGarageParkingsCo
 import playground.wrashid.parkingSearch.planLevel.analysis.ParkingWalkingDistanceMeanAndStandardDeviationGraph;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingOccupancyBins;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Set;
-
 
 public class ParkingScoreAccumulator implements StartupListener, AfterMobsimListener {
 
@@ -42,8 +46,8 @@ public class ParkingScoreAccumulator implements StartupListener, AfterMobsimList
     private static double[] sumOfOccupancyCountsOfSelectedParkings;
     private final ParkingScoreCollector parkingScoreCollector;
     private Double averageWalkingDistance = null;
-    public static DoubleValueHashMap<Id> scores = new DoubleValueHashMap<Id>();
-    public static HashMap<Id, Double> parkingWalkDistances=new HashMap<Id, Double>();
+    public static DoubleValueHashMap<Id<Person>> scores = new DoubleValueHashMap<>();
+    public static HashMap<Id<Person>, Double> parkingWalkDistances=new HashMap<>();
     public static LinkedList<Double> parkingWalkDistancesInZHCity=new LinkedList<Double>();
 
     public Double getAverageWalkingDistance() {
@@ -84,9 +88,9 @@ public class ParkingScoreAccumulator implements StartupListener, AfterMobsimList
         private final Config config;
         private CharyparNagelActivityScoring activityScoring;
         private CharyparNagelMoneyScoring moneyScoring;
-        private Id personId;
+        private Id<Person> personId;
 
-        ParkingScoring(Config config, CharyparNagelScoringParameters params, Id personId) {
+        ParkingScoring(Config config, CharyparNagelScoringParameters params, Id<Person> personId) {
             this.config = config;
             this.activityScoring = new CharyparNagelActivityScoring(params);
             this.moneyScoring = new CharyparNagelMoneyScoring(params);
@@ -162,12 +166,12 @@ public class ParkingScoreAccumulator implements StartupListener, AfterMobsimList
 
     @Override
     public void notifyAfterMobsim(AfterMobsimEvent event) {
-        HashMap<Id, Double> sumOfParkingWalkDistances = new HashMap<Id, Double>();
+        HashMap<Id<Person>, Double> sumOfParkingWalkDistances = new HashMap<>();
         parkingScoreCollector.finishHandling();
 
         Controler controler = event.getControler();
 
-        for (Id personId : parkingScoreCollector.getPersonIdsWhoUsedCar()) {
+        for (Id<Person> personId : parkingScoreCollector.getPersonIdsWhoUsedCar()) {
 
             double sumOfWalkingTimes = parkingScoreCollector.getSumOfWalkingTimes(personId);
             System.err.println(" walkingTimes: " + sumOfWalkingTimes );
@@ -215,9 +219,9 @@ public class ParkingScoreAccumulator implements StartupListener, AfterMobsimList
 
         // eventsToScore.finish();
         findLargestWalkingDistance(parkingWalkDistances);
-        parkingWalkDistances=new HashMap<Id, Double>();
+        parkingWalkDistances=new HashMap<>();
         parkingWalkDistancesInZHCity=new LinkedList<Double>();
-        scores=new DoubleValueHashMap<Id>();
+        scores=new DoubleValueHashMap<>();
 
         if (event.getIteration()==0 || event.getIteration()%10==0){
             logParkingUsed(controler, event.getIteration());
@@ -261,11 +265,11 @@ public class ParkingScoreAccumulator implements StartupListener, AfterMobsimList
         GeneralLib.writeList(list, iterationFilename);
     }
 
-    private void findLargestWalkingDistance(HashMap<Id, Double> parkingWalkDistances) {
+    private void findLargestWalkingDistance(HashMap<Id<Person>, Double> parkingWalkDistances) {
 
 
         int numberOfLongDistanceWalks=0;
-        for (Id personId:parkingWalkDistances.keySet()){
+        for (Id<Person> personId:parkingWalkDistances.keySet()){
             Double walkingDistance = parkingWalkDistances.get(personId);
             if (walkingDistance> 300){
 //				System.out.println(personId + "\t" + walkingDistance);
@@ -278,7 +282,7 @@ public class ParkingScoreAccumulator implements StartupListener, AfterMobsimList
         // 1000055924
     }
 
-    private void updateAverageValue(HashMap<Id, Double> sumOfParkingWalkDistances) {
+    private void updateAverageValue(HashMap<Id<Person>, Double> sumOfParkingWalkDistances) {
         if ( sumOfParkingWalkDistances.isEmpty() ) {
             Logger.getLogger(this.getClass()).warn("sumOfParkingWalkDistances is empty; averaging will produce NaN") ;
         }
@@ -297,8 +301,8 @@ public class ParkingScoreAccumulator implements StartupListener, AfterMobsimList
         int[] sumOfSelectedParkingSimulatedCounts = new int[96];
         int numberOfColumns=2;
         for (String parkingName : selectedParkings) {
-            ParkingOccupancyBins parkingOccupancyBins = parkingScoreCollector.parkingOccupancies.get(new IdImpl(
-                    mappingOfParkingNameToParkingId.get(parkingName)));
+            ParkingOccupancyBins parkingOccupancyBins = parkingScoreCollector.parkingOccupancies.get(Id.create(
+                    mappingOfParkingNameToParkingId.get(parkingName), Parking.class));
 
             if (parkingOccupancyBins == null) {
                 continue;
@@ -348,7 +352,7 @@ public class ParkingScoreAccumulator implements StartupListener, AfterMobsimList
         int numberOfColumns=4;
         double matrix[][] = new double[96][numberOfColumns];
 
-        for (Id parkingId : parkingScoreCollector.parkingOccupancies.keySet()) {
+        for (Id<Parking> parkingId : parkingScoreCollector.parkingOccupancies.keySet()) {
             Parking parking = parkingManager.getParkingsHashMap().get(parkingId);
             int graphIndex = -1;
             if (parking.getId().toString().startsWith("gp")) {
@@ -398,7 +402,7 @@ public class ParkingScoreAccumulator implements StartupListener, AfterMobsimList
 
         ArrayList<String> list = new ArrayList<String>();
 
-        for (Id parkingId : parkingScoreCollector.parkingOccupancies.keySet()) {
+        for (Id<Parking> parkingId : parkingScoreCollector.parkingOccupancies.keySet()) {
             Parking parking = parkingManager.getParkingsHashMap().get(parkingId);
             StringBuffer row = new StringBuffer(parking.getId().toString());
 
@@ -415,7 +419,7 @@ public class ParkingScoreAccumulator implements StartupListener, AfterMobsimList
         GeneralLib.writeList(list, iterationFilename);
     }
 
-    private void printWalkingDistanceHistogramm(Controler controler, int iteration, HashMap<Id, Double> walkingDistance) {
+    private void printWalkingDistanceHistogramm(Controler controler, int iteration, HashMap<Id<Person>, Double> walkingDistance) {
         double[] values = Collections.convertDoubleCollectionToArray(walkingDistance.values());
 
         if (values.length == 0) {
@@ -453,7 +457,7 @@ public class ParkingScoreAccumulator implements StartupListener, AfterMobsimList
         GeneralLib.writeArrayToFile(values, fileName, "parkingWalkingDistances [m]");
     }
 
-    private void writeWalkingDistanceStatisticsGraph(Controler controler, int iteration, HashMap<Id, Double> walkingDistance) {
+    private void writeWalkingDistanceStatisticsGraph(Controler controler, int iteration, HashMap<Id<Person>, Double> walkingDistance) {
         parkingWalkingDistanceGraph.updateStatisticsForIteration(iteration, walkingDistance);
         String fileName = controler.getControlerIO().getOutputFilename("walkingDistanceOverIterations.png");
         parkingWalkingDistanceGraph.writeGraphic(fileName);

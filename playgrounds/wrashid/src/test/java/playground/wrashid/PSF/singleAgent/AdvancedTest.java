@@ -3,7 +3,7 @@ package playground.wrashid.PSF.singleAgent;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestCase;
@@ -32,7 +32,7 @@ public class AdvancedTest extends MatsimTestCase {
 	SimulationStartupListener simulationStartupListener;
 	LogEnergyConsumption logEnergyConsumption;
 	LogParkingTimes logParkingTimes;
-	HashMap<Id, ChargingTimes> chargingTimes;
+	HashMap<Id<Person>, ChargingTimes> chargingTimes;
 
 	private void initTest(String configFile) {
 		Config config = loadConfig(configFile);
@@ -58,6 +58,7 @@ public class AdvancedTest extends MatsimTestCase {
 		initTest("test/input/playground/wrashid/PSF/singleAgent/config.xml");
 
 		simulationStartupListener.addParameterPSFMutator(new ParametersPSFMutator() {
+			@Override
 			public void mutateParameters() {
 				ParametersPSF.setTestingPeakPriceEndTime(60000);
 			}
@@ -96,6 +97,7 @@ public class AdvancedTest extends MatsimTestCase {
 		initTest("test/input/playground/wrashid/PSF/singleAgent/config.xml");
 
 		simulationStartupListener.addParameterPSFMutator(new ParametersPSFMutator() {
+			@Override
 			public void mutateParameters() {
 				ParametersPSF.setTestingPeakPriceStartTime(20000);
 			}
@@ -105,9 +107,9 @@ public class AdvancedTest extends MatsimTestCase {
 
 		OptimizedCharger optimizedCharger = new OptimizedCharger(logEnergyConsumption.getEnergyConsumption(), logParkingTimes
 				.getParkingTimes(), Double.parseDouble(controler.getConfig().findParam("PSF", "default.maxBatteryCapacity")));
-		HashMap<Id, ChargingTimes> chargingTimes = optimizedCharger.getChargingTimes();
+		HashMap<Id<Person>, ChargingTimes> chargingTimes = optimizedCharger.getChargingTimes();
 
-		ChargingTimes chargingTimesOfAgentOne = chargingTimes.get(new IdImpl("1"));
+		ChargingTimes chargingTimesOfAgentOne = chargingTimes.get(Id.create("1", Person.class));
 		ChargeLog chargeLogOfAgentOne = chargingTimesOfAgentOne.getChargingTimes().get(0);
 
 		assertEquals(72000,chargeLogOfAgentOne.getStartChargingTime(),  1);
@@ -129,6 +131,7 @@ public class AdvancedTest extends MatsimTestCase {
 		initTest("test/input/playground/wrashid/PSF/singleAgent/" + "config.xml");
 
 		simulationStartupListener.addParameterPSFMutator(new ParametersPSFMutator() {
+			@Override
 			public void mutateParameters() {
 				ParametersPSF.setTestingPeakPriceStartTime(0);
 				ParametersPSF.setTestingPeakPriceEndTime(86400);
@@ -167,6 +170,7 @@ public class AdvancedTest extends MatsimTestCase {
 		initTest("test/input/playground/wrashid/PSF/singleAgent/config.xml");
 
 		simulationStartupListener.addParameterPSFMutator(new ParametersPSFMutator() {
+			@Override
 			public void mutateParameters() {
 				ParametersPSF.setTestingPeakPriceStartTime(20000);
 				ParametersPSF.setTestingPeakPriceEndTime(72000);
@@ -252,6 +256,7 @@ public class AdvancedTest extends MatsimTestCase {
 		initTest("test/input/playground/wrashid/PSF/singleAgent/config2.xml");
 
 		simulationStartupListener.addParameterPSFMutator(new ParametersPSFMutator() {
+			@Override
 			public void mutateParameters() {
 				ParametersPSF.setTestingPeakPriceStartTime(20000);
 				ParametersPSF.setTestingPeakPriceEndTime(72000);
@@ -350,7 +355,7 @@ public class AdvancedTest extends MatsimTestCase {
 				.getParkingTimes(), Double.parseDouble(controler.getConfig().findParam("PSF", "default.maxBatteryCapacity")));
 		chargingTimes = optimizedCharger.getChargingTimes();
 
-		ChargingTimes chargingTimesOfAgent = chargingTimes.get(new IdImpl(agentId));
+		ChargingTimes chargingTimesOfAgent = chargingTimes.get(Id.create(agentId, Person.class));
 		return chargingTimesOfAgent;
 	}
 
@@ -362,6 +367,7 @@ public class AdvancedTest extends MatsimTestCase {
 		initTest("test/input/playground/wrashid/PSF/singleAgent/config3.xml");
 
 		simulationStartupListener.addParameterPSFMutator(new ParametersPSFMutator() {
+			@Override
 			public void mutateParameters() {
 
 			}
@@ -409,6 +415,7 @@ public class AdvancedTest extends MatsimTestCase {
 		initTest("test/input/playground/wrashid/PSF/singleAgent/config6.xml");
 
 		simulationStartupListener.addParameterPSFMutator(new ParametersPSFMutator() {
+			@Override
 			public void mutateParameters() {
 				ParametersPSF.setTestingPeakPriceStartTime(600);
 				ParametersPSF.setTestingPeakPriceEndTime(1200);
@@ -440,6 +447,7 @@ public class AdvancedTest extends MatsimTestCase {
 		initTest("test/input/playground/wrashid/PSF/singleAgent/config8.xml");
 
 		simulationStartupListener.addParameterPSFMutator(new ParametersPSFMutator() {
+			@Override
 			public void mutateParameters() {
 				ParametersPSF.setTestingPeakPriceStartTime(20000);
 				ParametersPSF.setTestingPeakPriceEndTime(86000);

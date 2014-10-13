@@ -1,6 +1,5 @@
 package playground.wrashid.parkingSearch.ppSim.ttmatrix;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
@@ -11,11 +10,8 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 
@@ -47,9 +43,9 @@ public class TTMatrixFromEvents extends TTMatrix {
 		network = GeneralLib.readNetwork(networkFile);
 		this.timeBinSizeInSeconds = timeBinSizeInSeconds;
 
-		linkTravelTimes = new HashMap<Id, double[]>();
+		linkTravelTimes = new HashMap<>();
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 
 		TTMatrixTimesHandler tTMatrixTimesHandler = new TTMatrixTimesHandler(simulatedTimePeriod,timeBinSizeInSeconds,this);
 
@@ -67,7 +63,7 @@ public class TTMatrixFromEvents extends TTMatrix {
 
 	private class TTMatrixTimesHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, Wait2LinkEventHandler {
 
-		private HashMap<Id, double[]> linkTravelTimes;
+		private HashMap<Id<Link>, double[]> linkTravelTimes;
 		private HashMap<Id, int[]> numberOfSamples;
 
 		private HashMap<Id, Double> agentEnterLinkTime=new HashMap<Id, Double>();
@@ -75,12 +71,12 @@ public class TTMatrixFromEvents extends TTMatrix {
 
 		public TTMatrixTimesHandler( int simulatedTimePeriod, int timeBinSizeInSecond, TTMatrix ttMatrix) {
 			this.ttMatrix = ttMatrix;
-			linkTravelTimes=new HashMap<Id, double[]>();
+			linkTravelTimes=new HashMap<>();
 			numberOfSamples=new HashMap<Id, int[]>();
 		}
 		
-		public HashMap<Id, double[]> getLinkTravelTimes(){
-			for (Id linkId:linkTravelTimes.keySet()){
+		public HashMap<Id<Link>, double[]> getLinkTravelTimes(){
+			for (Id<Link> linkId:linkTravelTimes.keySet()){
 				double[] ds = linkTravelTimes.get(linkId);
 				Link link = network.getLinks().get(linkId);
 				

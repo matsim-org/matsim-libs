@@ -13,10 +13,10 @@ public class  TTMatrix {
 	
 	protected int timeBinSizeInSeconds;
 	protected int simulatedTimePeriod;
-	protected HashMap<Id, double[]> linkTravelTimes;
+	protected HashMap<Id<Link>, double[]> linkTravelTimes;
 	protected Network network;
 	
-	public double getTravelTime(double time, Id linkId) {
+	public double getTravelTime(double time, Id<Link> linkId) {
 		double travelTime;
 
 		int timeBinIndex = (int) (Math.round(GeneralLib.projectTimeWithin24Hours(time)) / timeBinSizeInSeconds);
@@ -45,7 +45,7 @@ public class  TTMatrix {
 		row.add("timeBinSizeInSeconds=" + timeBinSizeInSeconds);
 		sm.addRow(row);
 		
-		for (Id linkId:linkTravelTimes.keySet()){
+		for (Id<Link> linkId:linkTravelTimes.keySet()){
 			row=new ArrayList<String>();
 			double[] ds = linkTravelTimes.get(linkId);
 			row.add(linkId.toString());

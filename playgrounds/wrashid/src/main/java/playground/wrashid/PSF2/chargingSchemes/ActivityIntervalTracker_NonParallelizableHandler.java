@@ -24,25 +24,16 @@ import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.parking.lib.DebugLib;
-import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 
 import playground.wrashid.PSF.ParametersPSF;
-import playground.wrashid.PSF.energy.charging.ChargingTimes;
 import playground.wrashid.PSF2.ParametersPSF2;
 import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
-import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 
 /**
  * 
@@ -88,7 +79,7 @@ public class ActivityIntervalTracker_NonParallelizableHandler implements Activit
 
 		firstActivityAfterParkingCar = new HashMap<Id, ActivityStartEvent>();
 
-		ParametersPSF2.chargingTimes = new HashMap<Id, ChargingTimes>();
+		ParametersPSF2.chargingTimes = new HashMap<>();
 
 		stillBeforeFristEnterLinkEvent = new HashMap<Id, Boolean>();
 

@@ -19,8 +19,9 @@
 
 package playground.wrashid.parkingChoice.util;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.EventHandlerAtStartupAdder;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestCase;
@@ -83,7 +84,7 @@ public class ActivityDurationEstimatorTest extends MatsimTestCase {
 		EventHandlerAtStartupAdder eventHandlerAtStartupAdder = new EventHandlerAtStartupAdder();
 		controler.addControlerListener(eventHandlerAtStartupAdder);
 		
-		ActivityDurationEstimator activityDurationEstimator = new ActivityDurationEstimator(controler, new IdImpl(1));
+		ActivityDurationEstimator activityDurationEstimator = new ActivityDurationEstimator(controler, Id.create(1, Person.class));
 		eventHandlerAtStartupAdder.addEventHandler(activityDurationEstimator);
 		
 		controler.setOverwriteFiles(true);

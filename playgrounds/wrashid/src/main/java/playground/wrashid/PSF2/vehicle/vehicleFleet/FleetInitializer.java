@@ -36,6 +36,6 @@ public interface FleetInitializer {
 	 * @param energyStateMaintainer
 	 * @return
 	 */
-	public LinkedListValueHashMap<Id, Vehicle> getVehicles(Set<Id<Person>> personIds, EnergyStateMaintainer energyStateMaintainer);
+	public LinkedListValueHashMap<Id<Person>, Vehicle> getVehicles(Set<Id<Person>> personIds, EnergyStateMaintainer energyStateMaintainer);
 	
 }

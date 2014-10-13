@@ -19,10 +19,10 @@
 
 package playground.wrashid.PSF.converter.addingParkings;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -51,7 +51,7 @@ public class AddParkingsToPlansTest extends MatsimTestCase {
 		assertEquals(3, population.getPersons().size());
 		
 		// check number of acts and legs (for one agent)
-		Person person=population.getPersons().get(new IdImpl("66128"));
+		Person person=population.getPersons().get(Id.create("66128", Person.class));
 		assertEquals(13, person.getSelectedPlan().getPlanElements().size());
 		
 		// check that departing activity from home parking is there
@@ -68,7 +68,7 @@ public class AddParkingsToPlansTest extends MatsimTestCase {
 		// TODO: the facility Ids seem to be missing...
 		
 		// check, that the agent with walk legs did not convert them to additional legs with parkings...
-		person=population.getPersons().get(new IdImpl("1"));
+		person=population.getPersons().get(Id.create("1", Person.class));
 		assertEquals(9, person.getSelectedPlan().getPlanElements().size());
 		
 	} 

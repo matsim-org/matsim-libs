@@ -14,7 +14,7 @@ public class InFlowInfoCollectorWithPt implements LinkEnterEventHandler
 ,Wait2LinkEventHandler 
 	{
 	private int binSizeInSeconds; // set the length of interval
-	public HashMap<Id, int[]> linkInFlow;
+	public HashMap<Id<Link>, int[]> linkInFlow;
 	private Map<Id<Link>, Link> filteredEquilNetLinks; //
 	private boolean isOldEventFile;
 	int setAggregationLevel=5; // do not forget to set the aggregation level!!!!!!
@@ -27,14 +27,14 @@ public class InFlowInfoCollectorWithPt implements LinkEnterEventHandler
 	}
 
 	@Override
-	public void reset(int iteration) {linkInFlow = new HashMap<Id, int[]>();} // reset the variables (private ones)
+	public void reset(int iteration) {linkInFlow = new HashMap<>();} // reset the variables (private ones)
 	
 	@Override
 	public void handleEvent(LinkEnterEvent event) {enterLink(event.getLinkId(), event.getTime());}
    @Override
 	public void handleEvent(Wait2LinkEvent event) {enterLink(event.getLinkId(), event.getTime());}
     
-	private void enterLink(Id linkId, double time) {
+	private void enterLink(Id<Link> linkId, double time) {
 		if (!filteredEquilNetLinks.containsKey(linkId)) {return;} // if the link is not in the link set, then exit the method
 		if (!linkInFlow.containsKey(linkId)) {
 			linkInFlow.put(linkId, new int[(86400 / binSizeInSeconds) + 1]); // set the number of intervals
@@ -47,7 +47,7 @@ public class InFlowInfoCollectorWithPt implements LinkEnterEventHandler
 	}
 
 	public void printLinkInFlow() { // print
-		for (Id linkId : linkInFlow.keySet()) {
+		for (Id<Link> linkId : linkInFlow.keySet()) {
 			
 			Link link = filteredEquilNetLinks.get(linkId);
 			System.out.print(linkId + " - " + link.getCoord() + ": ");
@@ -70,7 +70,7 @@ public class InFlowInfoCollectorWithPt implements LinkEnterEventHandler
 		}
 	}
 
-	public HashMap<Id, int[]> getLinkInFlow() {
+	public HashMap<Id<Link>, int[]> getLinkInFlow() {
 		return linkInFlow;
 	}
 }

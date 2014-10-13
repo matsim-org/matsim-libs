@@ -24,23 +24,19 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
-import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
 
 
 /**
@@ -60,9 +56,9 @@ public class ParkingTimesPlugin implements Wait2LinkEventHandler, PersonArrivalE
 		ActivityStartEventHandler {
 
 	// agent Id, linked list of parkingInterval
-	LinkedListValueHashMap<Id, ParkingIntervalInfo> parkingTimeIntervals;
+	LinkedListValueHashMap<Id<Person>, ParkingIntervalInfo> parkingTimeIntervals;
 	// agent Id, linkId
-	HashMap<Id, Id> lastLinkEntered;
+	HashMap<Id<Person>, Id<Link>> lastLinkEntered;
 	// act types
 	LinkedList<String> actTypesFilter = null;
 
@@ -74,7 +70,7 @@ public class ParkingTimesPlugin implements Wait2LinkEventHandler, PersonArrivalE
 		this.actTypesFilter = actTypesFilter;
 	}
 
-	public LinkedListValueHashMap<Id, ParkingIntervalInfo> getParkingTimeIntervals() {
+	public LinkedListValueHashMap<Id<Person>, ParkingIntervalInfo> getParkingTimeIntervals() {
 		return parkingTimeIntervals;
 	}
 
@@ -91,7 +87,7 @@ public class ParkingTimesPlugin implements Wait2LinkEventHandler, PersonArrivalE
 	}
 
 	public void closeLastAndFirstParkingIntervals() {
-		for (Id personId : parkingTimeIntervals.getKeySet()) {
+		for (Id<Person> personId : parkingTimeIntervals.getKeySet()) {
 			if (parkingTimeIntervals.get(personId).size()==0){
 				return;
 			}
@@ -112,15 +108,16 @@ public class ParkingTimesPlugin implements Wait2LinkEventHandler, PersonArrivalE
 		return lastParkingInterval.getDepartureTime() > 0.0;
 	}
 
-	private void checkFirstLastLinkConsistency(Id firstParkingIntervalLinkId, Id lastParkingIntervalLinkId) {
+	private void checkFirstLastLinkConsistency(Id<Link> firstParkingIntervalLinkId, Id<Link> lastParkingIntervalLinkId) {
 		if (!firstParkingIntervalLinkId.equals(lastParkingIntervalLinkId)) {
 			DebugLib.stopSystemAndReportInconsistency();
 		}
 	}
 
+	@Override
 	public void reset(int iteration) {
-		parkingTimeIntervals = new LinkedListValueHashMap<Id, ParkingIntervalInfo>();
-		lastLinkEntered = new HashMap<Id, Id>();
+		parkingTimeIntervals = new LinkedListValueHashMap<>();
+		lastLinkEntered = new HashMap<>();
 	}
 
 	@Override
@@ -136,11 +133,11 @@ public class ParkingTimesPlugin implements Wait2LinkEventHandler, PersonArrivalE
 		}
 	}
 
-	private void resetLastLinkEntered(Id personId) {
+	private void resetLastLinkEntered(Id<Person> personId) {
 		lastLinkEntered.put(personId, null);
 	}
 
-	private boolean isValidArrivalEventWithCar(Id personId, Id linkId) {
+	private boolean isValidArrivalEventWithCar(Id<Person> personId, Id<Link> linkId) {
 		return lastLinkEntered.containsKey(personId) && lastLinkEntered.get(personId) != null
 				&& lastLinkEntered.get(personId).equals(linkId);
 	}
@@ -161,13 +158,13 @@ public class ParkingTimesPlugin implements Wait2LinkEventHandler, PersonArrivalE
 	}
 
 
-	private void initializeParkingTimeIntervalsForPerson(Id personId, Id linkId) {
+	private void initializeParkingTimeIntervalsForPerson(Id<Person> personId, Id<Link> linkId) {
 		ParkingIntervalInfo parkingIntervalInfo = new ParkingIntervalInfo();
 		parkingIntervalInfo.setLinkId(linkId);
 		parkingTimeIntervals.put(personId, parkingIntervalInfo);
 	}
 
-	private boolean leavingFirstParking(Id personId) {
+	private boolean leavingFirstParking(Id<Person> personId) {
 		return !parkingTimeIntervals.containsKey(personId);
 	}
 

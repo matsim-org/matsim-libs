@@ -3,7 +3,7 @@ package playground.wrashid.PSF.singleAgent;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestCase;
@@ -56,9 +56,9 @@ public class BasicTest extends MatsimTestCase {
 
 		OptimizedCharger optimizedCharger = new OptimizedCharger(logEnergyConsumption.getEnergyConsumption(), logParkingTimes
 				.getParkingTimes(), Double.parseDouble(controler.getConfig().findParam("PSF", "default.maxBatteryCapacity")));
-		HashMap<Id, ChargingTimes> chargingTimes = optimizedCharger.getChargingTimes();
+		HashMap<Id<Person>, ChargingTimes> chargingTimes = optimizedCharger.getChargingTimes();
 
-		ChargingTimes chargingTimesOfAgentOne = chargingTimes.get(new IdImpl("1"));
+		ChargingTimes chargingTimesOfAgentOne = chargingTimes.get(Id.create("1", Person.class));
 		ChargeLog chargeLogOfAgentOne = chargingTimesOfAgentOne.getChargingTimes().get(0);
 
 		// the first charging opportunity at work is used (it has low tariff)
@@ -98,7 +98,7 @@ public class BasicTest extends MatsimTestCase {
 
 		controler.run();
 
-		ParkingTimes parkingTimes = logParkingTimes.getParkingTimes().get(new IdImpl("1"));
+		ParkingTimes parkingTimes = logParkingTimes.getParkingTimes().get(Id.create("1", Person.class));
 
 		// allow small delta of one second (because the output time in the log
 		// file is truncated
@@ -119,7 +119,7 @@ public class BasicTest extends MatsimTestCase {
 
 		controler.run();
 
-		EnergyConsumption energyConsumption = logEnergyConsumption.getEnergyConsumption().get(new IdImpl("1"));
+		EnergyConsumption energyConsumption = logEnergyConsumption.getEnergyConsumption().get(Id.create("1", Person.class));
 
 		// allow small delta of one second (because the output time in the log
 		// file is truncated

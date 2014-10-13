@@ -5,15 +5,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.parking.parkingChoice.carsharing.DummyParkingModuleWithFreeFloatingCarSharing;
 import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingCoordInfo;
-import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingModuleWithFreeFloatingCarSharing;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -26,9 +25,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.balac.freefloating.config.FreeFloatingConfigGroup;
-import playground.balac.freefloating.controler.listener.FFListener;
 import playground.balac.freefloating.qsimParkingModule.FreeFloatingQsimFactory;
-import playground.balac.freefloating.router.FreeFloatingParkingRoutingModule;
 import playground.balac.freefloating.routerparkingmodule.FreeFloatingRoutingModule;
 import playground.balac.freefloating.scoring.FreeFloatingScoringFunctionFactory;
 
@@ -132,10 +129,10 @@ public class FreeFloatingWithParkingControler extends Controler{
  		    	
  		    	String[] arr = s.split("\t", -1);
  		    
- 		    	Link l = controler.getNetwork().getLinks().get(new IdImpl(arr[0]));	    	
+ 		    	Link l = controler.getNetwork().getLinks().get(Id.create(arr[0], Link.class));	    	
  		    	
  		    	for (int k = 0; k < Integer.parseInt(arr[1]); k++) {
- 		    		ParkingCoordInfo parkingInfo = new ParkingCoordInfo(new IdImpl(Integer.toString(i)), l.getCoord());
+ 		    		ParkingCoordInfo parkingInfo = new ParkingCoordInfo(Id.create(i, Person.class), l.getCoord());
  		    		freefloatingCars.add(parkingInfo);
  		    		i++;
  		    	}

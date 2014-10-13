@@ -20,9 +20,10 @@
 
 package playground.wrashid.lib.tools.network;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.basic.v01.IdImpl;
 
 
 public class GetLinkInfo {
@@ -33,8 +34,8 @@ public class GetLinkInfo {
 		
 		Network network = GeneralLib.readNetwork(networkFilePath);
 		
-		System.out.println(network.getLinks().get(new IdImpl(linkIdString)).toString());
-		System.out.println(network.getLinks().get(new IdImpl(linkIdString)).getCoord().toString());
+		System.out.println(network.getLinks().get(Id.create(linkIdString, Link.class)).toString());
+		System.out.println(network.getLinks().get(Id.create(linkIdString, Link.class)).getCoord().toString());
 	}
 	
 }

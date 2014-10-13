@@ -4,11 +4,10 @@ import java.io.File;
 import java.util.ArrayList;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.parking.lib.DebugLib;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.Matrix;
 import org.matsim.contrib.parking.lib.obj.list.Lists;
-import org.matsim.core.basic.v01.IdImpl;
 
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 
@@ -127,7 +126,7 @@ public class PrepareCumulativeGraphForTwoRuns_DifferenceFloatFields {
 			boolean ignoreCasesWithBothPPUse, ArrayList<Float> outputArray) {
 
 		// persondId, legIndex, rowId
-		TwoHashMapsConcatenated<Id, Integer, Integer> indexMatrixB = CompareSelectedParkingPropertyOneRun
+		TwoHashMapsConcatenated<Id<Person>, Integer, Integer> indexMatrixB = CompareSelectedParkingPropertyOneRun
 				.getIndex(matrixB);
 
 		int indexPersonId = matrixA.getColumnIndex("personId");
@@ -136,7 +135,7 @@ public class PrepareCumulativeGraphForTwoRuns_DifferenceFloatFields {
 		int indexSelectedField = matrixA.getColumnIndex(fieldName);
 
 		for (int i = 1; i < matrixA.getNumberOfRows(); i++) {
-			Id personId = new IdImpl(matrixA.getString(i, indexPersonId));
+			Id<Person> personId = Id.create(matrixA.getString(i, indexPersonId), Person.class);
 			int legIndex = matrixA.getInteger(i, indexLeg);
 
 			Float selectedFieldA = matrixA.getFloat(i, indexSelectedField);

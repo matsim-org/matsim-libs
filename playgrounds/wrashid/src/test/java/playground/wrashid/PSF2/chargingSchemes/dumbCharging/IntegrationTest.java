@@ -20,19 +20,15 @@
 
 package playground.wrashid.PSF2.chargingSchemes.dumbCharging;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.PSF.PSS.PSSControler;
 import playground.wrashid.PSF.energy.charging.ChargeLog;
-import playground.wrashid.PSF.energy.charging.ChargingTimes;
-import playground.wrashid.PSF.lib.PSFGeneralLib;
 import playground.wrashid.PSF2.ParametersPSF2;
-import playground.wrashid.PSF2.chargingSchemes.dumbCharging.PSSControlerDumbCharging;
 
 public class IntegrationTest extends MatsimTestCase {
 
@@ -47,11 +43,11 @@ public class IntegrationTest extends MatsimTestCase {
 		PSSControler pssControler=new PSSControlerDumbCharging( getPackageInputDirectory() + "config.xml", null);
 		pssControler.runMATSimIterations();
 		
-		LinkedList<ChargeLog> chargingTimesForAgent255 = ParametersPSF2.chargingTimes.get(new IdImpl(255)).getChargingTimes();
+		LinkedList<ChargeLog> chargingTimesForAgent255 = ParametersPSF2.chargingTimes.get(Id.create(255, Person.class)).getChargingTimes();
 		assertEquals(2, chargingTimesForAgent255.size());
 		assertEquals(10*3600*1000.0, chargingTimesForAgent255.getLast().getEndSOC());
 		
-		LinkedList<ChargeLog> chargingTimesForAgent253 = ParametersPSF2.chargingTimes.get(new IdImpl(253)).getChargingTimes();
+		LinkedList<ChargeLog> chargingTimesForAgent253 = ParametersPSF2.chargingTimes.get(Id.create(253, Person.class)).getChargingTimes();
 		assertEquals(2, chargingTimesForAgent255.size());
 		assertEquals(10*3600*1000.0, chargingTimesForAgent253.getFirst() .getEndSOC());
 		
@@ -62,7 +58,7 @@ public class IntegrationTest extends MatsimTestCase {
 		PSSControler pssControler=new PSSControlerDumbCharging(getPackageInputDirectory() +  "config-event-file-based.xml", null);
 		pssControler.runMATSimIterations();
 		
-		LinkedList<ChargeLog> chargingTimesForAgent1 = ParametersPSF2.chargingTimes.get(new IdImpl(1)).getChargingTimes();
+		LinkedList<ChargeLog> chargingTimesForAgent1 = ParametersPSF2.chargingTimes.get(Id.create(1, Person.class)).getChargingTimes();
 		assertEquals(2, chargingTimesForAgent1.size());
 		
 		assertEquals(22846, chargingTimesForAgent1.get(0).getStartChargingTime(),1.0);
@@ -79,7 +75,7 @@ public class IntegrationTest extends MatsimTestCase {
 	public void testEventFileBasedOneAgent(){
 		performSingleAgentRun();
 		
-		LinkedList<ChargeLog> chargingTimesForAgent1 = ParametersPSF2.chargingTimes.get(new IdImpl(1)).getChargingTimes();
+		LinkedList<ChargeLog> chargingTimesForAgent1 = ParametersPSF2.chargingTimes.get(Id.create(1, Person.class)).getChargingTimes();
 		assertEquals(2, chargingTimesForAgent1.size());
 		
 		assertEquals(22500, chargingTimesForAgent1.get(0).getStartChargingTime(),1.0);
@@ -92,7 +88,7 @@ public class IntegrationTest extends MatsimTestCase {
 		addLocationFilter("h");
 		performSingleAgentRun();
 		
-		LinkedList<ChargeLog> chargingTimesForAgent1 = ParametersPSF2.chargingTimes.get(new IdImpl(1)).getChargingTimes();
+		LinkedList<ChargeLog> chargingTimesForAgent1 = ParametersPSF2.chargingTimes.get(Id.create(1, Person.class)).getChargingTimes();
 		assertEquals(1, chargingTimesForAgent1.size());
 		
 		assertEquals(38040, chargingTimesForAgent1.get(0).getStartChargingTime(),1.0);
@@ -106,7 +102,7 @@ public class IntegrationTest extends MatsimTestCase {
 		addLocationFilter("w");
 		performSingleAgentRun();
 		
-		LinkedList<ChargeLog> chargingTimesForAgent1 = ParametersPSF2.chargingTimes.get(new IdImpl(1)).getChargingTimes();
+		LinkedList<ChargeLog> chargingTimesForAgent1 = ParametersPSF2.chargingTimes.get(Id.create(1, Person.class)).getChargingTimes();
 		assertEquals(1, chargingTimesForAgent1.size());
 		
 		assertEquals(22500, chargingTimesForAgent1.get(0).getStartChargingTime(),1.0);

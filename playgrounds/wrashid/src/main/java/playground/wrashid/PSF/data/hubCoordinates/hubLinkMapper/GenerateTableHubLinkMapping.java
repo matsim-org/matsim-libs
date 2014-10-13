@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.LinkedListValueHashMap;
 import org.matsim.contrib.parking.lib.obj.Matrix;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.wrashid.lib.obj.GenericResult;
@@ -44,7 +43,7 @@ public class GenerateTableHubLinkMapping {
 		Matrix matrix = GeneralLib
 				.readStringMatrix("C:/Users/Admin/Desktop/psl-temp/GIS_coordinates_of_managers.txt");
 		// key: hub number, value: linkIds
-		LinkedListValueHashMap<Integer, Id> hubLinkMapping = new LinkedListValueHashMap<Integer, Id>();
+		LinkedListValueHashMap<Integer, Id<Link>> hubLinkMapping = new LinkedListValueHashMap<>();
 		BasicPointVisualizer basicPointVisualizer = new BasicPointVisualizer();
 		
 
@@ -80,10 +79,10 @@ public class GenerateTableHubLinkMapping {
 
 	}
 
-	private static void writeResultToConsole(LinkedListValueHashMap<Integer, Id> hubLinkMapping) {
+	private static void writeResultToConsole(LinkedListValueHashMap<Integer, Id<Link>> hubLinkMapping) {
 		System.out.println("hubNumber" + "\t" +"linkId");
 		for (Integer hubNumber:hubLinkMapping.getKeySet()){
-			LinkedList<Id> linkIds = hubLinkMapping.get(hubNumber);
+			LinkedList<Id<Link>> linkIds = hubLinkMapping.get(hubNumber);
 			
 			linkIds=eliminateDuplicates(linkIds);
 			
@@ -93,16 +92,16 @@ public class GenerateTableHubLinkMapping {
 		}		
 	}
 
-	public static LinkedList<Id> eliminateDuplicates(LinkedList<Id> linkIds) {
-		LinkedList<Id> resultIds=new LinkedList<Id>();
+	public static LinkedList<Id<Link>> eliminateDuplicates(LinkedList<Id<Link>> linkIds) {
+		LinkedList<Id<Link>> resultIds=new LinkedList<>();
 		HashMap<String,Integer> hm=new HashMap<String, Integer>();
 		
-		for (Id linkId:linkIds){
+		for (Id<Link> linkId:linkIds){
 			hm.put(linkId.toString(), null);
 		}
 		
 		for (String linkIdString:hm.keySet()){
-			resultIds.add(new IdImpl(linkIdString));
+			resultIds.add(Id.create(linkIdString, Link.class));
 		}
 		
 		return resultIds;
