@@ -22,6 +22,7 @@ package playground.vsptelematics.ha2;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 
 
@@ -31,7 +32,7 @@ import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
  */
 public interface Guidance extends LinkEnterEventHandler, LinkLeaveEventHandler, MobsimAfterSimStepListener {
 
-	Id getNextLink(double time);
+	Id<Link> getNextLink(double time);
 
 	void notifyShutdown();
 

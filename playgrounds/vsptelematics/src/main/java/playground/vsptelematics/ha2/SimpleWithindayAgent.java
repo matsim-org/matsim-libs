@@ -20,8 +20,8 @@
 package playground.vsptelematics.ha2;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
@@ -39,17 +39,17 @@ public class SimpleWithindayAgent extends PersonDriverAgentImpl {
 	}
 
 	@Override
-	public Id chooseNextLinkId(){
-		Id currentLinkId  = this.getCurrentLinkId();
-		Id nextLink = null;
-		if (currentLinkId.equals(new IdImpl("1"))){
-			nextLink = new IdImpl("2");
+	public Id<Link> chooseNextLinkId(){
+		Id<Link> currentLinkId  = this.getCurrentLinkId();
+		Id<Link> nextLink = null;
+		if (currentLinkId.equals(Id.create("1", Link.class))){
+			nextLink = Id.create("2", Link.class);
 		}
-		else if (currentLinkId.equals(new IdImpl("2"))){
-			nextLink = new IdImpl("4");
+		else if (currentLinkId.equals(Id.create("2", Link.class))){
+			nextLink = Id.create("4", Link.class);
 		}
-		else if (currentLinkId.equals(new IdImpl("4"))){
-			nextLink = new IdImpl("6");
+		else if (currentLinkId.equals(Id.create("4", Link.class))){
+			nextLink = Id.create("6", Link.class);
 		}
 		return nextLink;
 	}

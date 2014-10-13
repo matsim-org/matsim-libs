@@ -30,14 +30,13 @@ import java.util.Set;
 
 import org.apache.commons.math.stat.StatUtils;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -85,10 +84,12 @@ public class GuidanceRouteTTObserver implements PersonDepartureEventHandler, Per
 		this.reset(0);
 	}
 
+	@Override
 	public void handleEvent(PersonDepartureEvent event) {
 		departureTimes.put(event.getPersonId(), event.getTime());
 	}
 
+	@Override
 	public void reset(int iteration) {
 		route1 = new HashSet<Id>();
 		route2 = new HashSet<Id>();
@@ -100,6 +101,7 @@ public class GuidanceRouteTTObserver implements PersonDepartureEventHandler, Per
 		guidedAgentIds = new HashSet<Id>();
 	}
 
+	@Override
 	public void handleEvent(PersonArrivalEvent event) {
 		double depTime = departureTimes.get(event.getPersonId());
 		if (depTime == 0)
@@ -115,6 +117,7 @@ public class GuidanceRouteTTObserver implements PersonDepartureEventHandler, Per
 		}
 	}
 
+	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		if (event.getLinkId().toString().equals("4")) {
 			route1.add(event.getPersonId());
@@ -124,6 +127,7 @@ public class GuidanceRouteTTObserver implements PersonDepartureEventHandler, Per
 		}
 	}
 
+	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		try {
 			writer = org.matsim.core.utils.io.IOUtils.getBufferedWriter(filename);
@@ -166,6 +170,7 @@ public class GuidanceRouteTTObserver implements PersonDepartureEventHandler, Per
 		}
 	}
 
+	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		List<Double> route1TTs = new ArrayList<Double>();
 		List<Double> route2TTs = new ArrayList<Double>();
@@ -185,19 +190,19 @@ public class GuidanceRouteTTObserver implements PersonDepartureEventHandler, Per
 
 		if (Double.isNaN(avr_route1TTs)) {
 			avr_route1TTs = getFreespeedTravelTime(event.getControler().getNetwork().getLinks()
-					.get(new IdImpl("2")));
+					.get(Id.create("2", Link.class)));
 			avr_route1TTs += getFreespeedTravelTime(event.getControler().getNetwork().getLinks()
-					.get(new IdImpl("4")));
+					.get(Id.create("4", Link.class)));
 			avr_route1TTs += getFreespeedTravelTime(event.getControler().getNetwork().getLinks()
-					.get(new IdImpl("6")));
+					.get(Id.create("6", Link.class)));
 		}
 		if (Double.isNaN(avr_route2TTs)) {
 			avr_route2TTs = getFreespeedTravelTime(event.getControler().getNetwork().getLinks()
-					.get(new IdImpl("3")));
+					.get(Id.create("3", Link.class)));
 			avr_route2TTs += getFreespeedTravelTime(event.getControler().getNetwork().getLinks()
-					.get(new IdImpl("5")));
+					.get(Id.create("5", Link.class)));
 			avr_route2TTs += getFreespeedTravelTime(event.getControler().getNetwork().getLinks()
-					.get(new IdImpl("6")));
+					.get(Id.create("6", Link.class)));
 		}
 	
 		this.avgGuidedTTs = 0.0;

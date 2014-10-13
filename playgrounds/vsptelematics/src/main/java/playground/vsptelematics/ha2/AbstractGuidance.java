@@ -20,18 +20,18 @@
 package playground.vsptelematics.ha2;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 
 public abstract class AbstractGuidance implements Guidance {
 
-	protected Id id2 = new IdImpl("2");
-	protected Id id3 = new IdImpl("3");
-	protected Id id4 = new IdImpl("4");
-	protected Id id5 = new IdImpl("5");
+	protected Id<Link> id2 = Id.create("2", Link.class);
+	protected Id<Link> id3 = Id.create("3", Link.class);
+	protected Id<Link> id4 = Id.create("4", Link.class);
+	protected Id<Link> id5 = Id.create("5", Link.class);
 	protected double ttFs1;
 	protected double ttFs2;
-	protected Id guidance = id2;
+	protected Id<Link> guidance = id2;
 	protected Network network;
 	protected String outputFilename;
 
