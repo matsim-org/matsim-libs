@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playgrund.vsp.analysis.modules.emissions;
+package playground.vsp.analysis.modules.emissions;
 
 import org.junit.Assert;
 import org.junit.Test;
