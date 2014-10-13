@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.networkProcessing;
+package playground.agarwalamit.utils.networkProcessing;
 
 import java.util.Collection;
 import java.util.HashMap;
