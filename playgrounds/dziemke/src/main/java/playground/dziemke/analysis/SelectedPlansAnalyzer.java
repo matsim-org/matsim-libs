@@ -23,7 +23,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class SelectedPlansAnalyzer {
 	// Parameters
-	static String runId = "run_145f";
+	static String runId = "run_157";
 	static int numberOfIterations = 150;
 	static int plansFileInterval = 50;
 	static boolean useInterimPlans = true;

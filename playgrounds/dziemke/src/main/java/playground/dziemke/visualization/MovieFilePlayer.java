@@ -9,9 +9,10 @@ public class MovieFilePlayer {
 	
 	public static void main(String[] args) {
 		// Parameters
-		String runId = "run_127b";
+		String runId = "run_132";
 		int iteration = 150;
-		boolean createScreenshots = true;
+		boolean createScreenshots = false;
+		// Snapshots will be stored at "D:/Workspace/playgrounds/dziemke"
 		
 		// Input file			
 		String mviFile = "D:/Workspace/container/demand/output/" + runId + "/ITERS/it." + iteration

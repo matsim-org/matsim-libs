@@ -1,5 +1,7 @@
 package playground.dziemke.other;
 
+import org.junit.Assert;
+
 
 public class TestStuff2 {
 
@@ -10,7 +12,9 @@ public class TestStuff2 {
 		double value = 1.62345234523;
 		
 		value++;
-		
+				
 		System.out.println(value);
+		
+		Assert.assertNotNull(value);
 	}
 }

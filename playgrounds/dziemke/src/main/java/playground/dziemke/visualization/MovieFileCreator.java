@@ -15,13 +15,14 @@ public class MovieFileCreator {
 
 	public static void main(String[] args) {
 		// Parameters
-		String runId = "run_132c";
-		int iteration = 150;
+		String inputOutputRoot = "D:/Workspace/container/stockholm/";
+		String runId = "02";
+		int iteration = 100;
 		
 		// Input and output files				
-		String eventFile = "D:/Workspace/container/demand/output/" + runId + "/ITERS/it." + iteration + "/" + runId + "." + iteration + ".events.xml.gz";
-		String networkFile = "D:/Workspace/container/demand/input/iv_counts/network.xml";
-		String mviFile = "D:/Workspace/container/demand/output/" + runId + "/ITERS/it." + iteration + "/" + runId + "." + iteration + ".otfvis.mvi";
+		String eventFile = inputOutputRoot + "output/" + runId + "/ITERS/it." + iteration + "/" + runId + "." + iteration + ".events.xml.gz";
+		String networkFile = "../../shared-svn/projects/stockholm/network_cleaned_simplified.xml";
+		String mviFile = inputOutputRoot + "output/" + runId + "/ITERS/it." + iteration + "/" + runId + "." + iteration + ".otfvis.mvi";
 		double snapshotPeriod = 60;
 		
 		// Initiating conversion				

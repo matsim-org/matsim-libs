@@ -49,24 +49,12 @@ public class SrVTripAnalyzer {
 		boolean useWeights = true;			//wt
 		boolean onlyCar = false;			//car
 		boolean onlyCarAndCarPool = true;	//carp
-//		double distanceFilter = 100000;		//dist
+		boolean onlyHomeAndWork = true;		//hw
 		boolean distanceFilter = true;		//dist
 		double minDistance = 0;
 		double maxDistance = 100;
-			    
-//	    int maxBinDuration = 120;
-//	    int binWidthDuration = 5;
-//	    
-//	    int maxBinTime = 23;
-//	    int binWidthTime = 1;
-//	    
-//	    int maxBinDistance = 60;
-//	    int binWidthDistance = 5;
-//	    	    
-//	    int maxBinSpeed = 60;
-//	    int binWidthSpeed = 5;
 	    
-	    int maxBinDuration = 120;
+		int maxBinDuration = 120;
 	    int binWidthDuration = 1;
 	    
 	    int maxBinTime = 23;
@@ -80,22 +68,35 @@ public class SrVTripAnalyzer {
 	    
 	    
 		// Input and output files
-	    // As opposed to "TripAnalyzer", the ending of the directory (e.g. "wt") needs to be manually adjusted!
 		String inputFile = "D:/Workspace/container/srv/input/W2008_Berlin_Weekday.dat";
-		//String outputDirectory = "D:/Workspace/container/srv/output/wd_all_wt/";
-//		String outputDirectory = "D:/Workspace/container/srv/output/wd_all_dist_wt/";
 		
-		//--------------------------------------------------------------------------------------------------------------
-		String outputDirectory = "D:/Workspace/container/srv/output/wd_carp";
+		String outputDirectory = "D:/Workspace/container/srv/output/wd";
 		
+		if (useWeights == true) {
+			outputDirectory = outputDirectory + "_wt";
+		}
+		
+		if (onlyCar == true) {
+			outputDirectory = outputDirectory + "_car";
+		}
+		
+		if (onlyCarAndCarPool == true) {
+			outputDirectory = outputDirectory + "_carp";
+		}
+		
+		if (onlyCar == false && onlyCarAndCarPool == false) {
+			outputDirectory = outputDirectory + "_all";
+		}
+				
 		if (distanceFilter == true) {
 			outputDirectory = outputDirectory + "_dist";
 		}
 		
-		outputDirectory = outputDirectory + "_wt";
-		outputDirectory = outputDirectory + "_new";
+		if (onlyHomeAndWork == true) {
+			outputDirectory = outputDirectory + "_hw";
+		}		
+				
 		outputDirectory = outputDirectory + "/";
-		//--------------------------------------------------------------------------------------------------------------
 		
 		
 		// parse the input file
@@ -163,20 +164,45 @@ public class SrVTripAnalyzer {
 		    // reliant on variable "V_ANDPKW_MF": 0/1
 		    int useOtherCarPool = trip.getUseOtherCarPool();
 		    
+		    // new
+		    String activityEndActType = trip.getActivityEndActType();
+		    String activityStartActType = trip.getActivityStartActType();
+		    // end new
+		    
 		    boolean considerTrip = false;
-		    if (onlyCar == true) {
-		    	if (useHouseholdCar == 1 || useOtherCar == 1) {		 
-		    		considerTrip = true;
-		    	}
-		    } else if (onlyCarAndCarPool == true) {
-		    	if (useHouseholdCar == 1 || useOtherCar == 1 || 
-		    			useHouseholdCarPool == 1 || useOtherCarPool == 1) {		 
-		    		considerTrip = true;
+		    if (onlyHomeAndWork == true) {
+		    	// Variable has value "home" if activity is "home" and "???" if activity is "work"
+		    	if ((activityEndActType.equals("home") && activityStartActType.equals("work")) || 
+		    			(activityEndActType.equals("work") && activityStartActType.equals("home"))) {
+		    	// if (activityStartActType.equals("home") || activityStartActType.equals("work")) {
+		    	// if (activityEndActType.equals("home") && activityStartActType.equals("work")) {
+				    if (onlyCar == true) {
+				    	if (useHouseholdCar == 1 || useOtherCar == 1) {		 
+				    		considerTrip = true;
+				    	}
+				    } else if (onlyCarAndCarPool == true) {
+				    	if (useHouseholdCar == 1 || useOtherCar == 1 || 
+				    			useHouseholdCarPool == 1 || useOtherCarPool == 1) {		 
+				    		considerTrip = true;
+				    	}
+				    } else {
+				    	considerTrip = true;
+				    }
 		    	}
 		    } else {
-		    	considerTrip = true;
+		    	if (onlyCar == true) {
+			    	if (useHouseholdCar == 1 || useOtherCar == 1) {		 
+			    		considerTrip = true;
+			    	}
+			    } else if (onlyCarAndCarPool == true) {
+			    	if (useHouseholdCar == 1 || useOtherCar == 1 || 
+			    			useHouseholdCarPool == 1 || useOtherCarPool == 1) {		 
+			    		considerTrip = true;
+			    	}
+			    } else {
+			    	considerTrip = true;
+			    }
 		    }
-		    
 		    
 		    // distance filter
 		    double tripDistanceBeeline = trip.getDistanceBeeline();

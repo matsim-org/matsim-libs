@@ -30,13 +30,13 @@ public class TripAnalyzer {
 	public static void main(String[] args) {
 	    // Parameters
 		boolean onlyInterior = false;		//int
-		boolean onlyBerlinBased = true;		//ber
-		boolean distanceFilter = true;		//dist
+		boolean onlyBerlinBased = true;		//ber	usually varied for analysis
+		boolean distanceFilter = true;		//dist		usually varied for analysis
 		double maxDistance = 100;
 		double minDistance = 0;
 		Integer planningAreaId = 11000000;
 		
-		String runId = "run_145";
+		String runId = "run_145f";
 		//String runId = "run_20";
 	    String usedIteration = "150";
 	    //String usedIteration = "100";
@@ -95,11 +95,6 @@ public class TripAnalyzer {
 		if (distanceFilter == true) {
 			outputDirectory = outputDirectory + "_dist";
 		}
-		
-		//--------------------------------------------------------------------------------------------------------------
-		outputDirectory = outputDirectory + "_new";
-		//--------------------------------------------------------------------------------------------------------------
-	    	        
 
 		// Create an EventsManager instance (MATSim infrastructure)
 	    EventsManager eventsManager = EventsUtils.createEventsManager();
