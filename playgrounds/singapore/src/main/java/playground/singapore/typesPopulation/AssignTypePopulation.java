@@ -1,8 +1,8 @@
 package playground.singapore.typesPopulation;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.*;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -64,7 +64,7 @@ public class AssignTypePopulation {
 	private static Population getPopulationTypesTransitLine(Scenario scenario, String[] args) {
 		scenario.getConfig().scenario().setUseTransit(true);
 		(new TransitScheduleReader(scenario)).readFile(args[4]);
-		TransitLine line = scenario.getTransitSchedule().getTransitLines().get(new IdImpl(args[5]));
+		TransitLine line = scenario.getTransitSchedule().getTransitLines().get(Id.create(args[5],TransitLine.class));
         ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
         Population population = PopulationUtils.createPopulation(sc.getConfig(), sc.getNetwork());
 		for(Person person:scenario.getPopulation().getPersons().values())

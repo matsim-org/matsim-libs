@@ -24,10 +24,11 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.PlanStrategyFactoryRegister;
@@ -74,7 +75,7 @@ public final class StrategyManagerPopsConfigLoader {
 		StrategyPopsConfigGroup strategyPops = (StrategyPopsConfigGroup) config.getModule(StrategyPopsConfigGroup.GROUP_NAME);
 		manager.setMaxPlansPerAgent(0);
 		for(String populationId:strategyPops.getPopulationIds()) {
-			manager.setMaxPlansPerAgent(strategyPops.getMaxAgentPlanMemorySize(populationId), new IdImpl(populationId));
+			manager.setMaxPlansPerAgent(strategyPops.getMaxAgentPlanMemorySize(populationId), Id.create(populationId, Population.class));
 			
 			int globalInnovationDisableAfter = (int) ( (config.controler().getLastIteration() - config.controler().getFirstIteration()) 
 					* strategyPops.getFractionOfIterationsToDisableInnovation(populationId) + config.controler().getFirstIteration() ) ;
@@ -97,7 +98,7 @@ public final class StrategyManagerPopsConfigLoader {
 					throw new RuntimeException("Could not initialize strategy named " + moduleName);
 				}
 	
-				manager.addStrategy(strategy, rate, new IdImpl(populationId));
+				manager.addStrategy(strategy, rate, Id.create(populationId,Population.class));
 	
 				// now check if this modules should be disabled after some iterations
 				int maxIter = settings.getDisableAfter();
@@ -122,7 +123,7 @@ public final class StrategyManagerPopsConfigLoader {
 					} else {
 						/* The controler starts at a later iteration than this change request is scheduled for.
 						 * make the change right now.					 */
-						manager.changeWeightOfStrategy(strategy, 0.0, new IdImpl(populationId));
+						manager.changeWeightOfStrategy(strategy, 0.0, Id.create(populationId,Population.class));
 					}
 				}
 			}
@@ -152,7 +153,7 @@ public final class StrategyManagerPopsConfigLoader {
 				} else {
 					throw new RuntimeException("Unknown 'plan selector for removal'.");
 				}
-				manager.setPlanSelectorForRemoval(planSelector, new IdImpl(populationId)) ;
+				manager.setPlanSelectorForRemoval(planSelector, Id.create(populationId,Population.class)) ;
 			}
 		}
 	}

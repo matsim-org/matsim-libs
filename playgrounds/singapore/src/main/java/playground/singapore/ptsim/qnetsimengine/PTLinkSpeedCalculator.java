@@ -2,12 +2,13 @@ package playground.singapore.ptsim.qnetsimengine;
 
 import org.apache.commons.math.MathException;
 import org.apache.commons.math.distribution.NormalDistributionImpl;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.qnetsimengine.LinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import playground.singapore.ptsim.TransitSheduleToNetwork;
 import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTime;
 
@@ -34,17 +35,17 @@ public class PTLinkSpeedCalculator implements LinkSpeedCalculator {
 		double travelTime = 0;
 		if(stopStopTime!=null) {
 			if(parts.length==2) {
-				double variance = stopStopTime.getStopStopTimeVariance(new IdImpl(parts[0]), new IdImpl(parts[1]), time);
+				double variance = stopStopTime.getStopStopTimeVariance(Id.create(parts[0],TransitStopFacility.class), Id.create(parts[1],TransitStopFacility.class), time);
 				if(variance!=0) {
 					try {
 						double r = MatsimRandom.getRandom().nextDouble();
-						travelTime = new NormalDistributionImpl(stopStopTime.getStopStopTime(new IdImpl(parts[0]), new IdImpl(parts[1]), time), Math.sqrt(variance)).inverseCumulativeProbability(r);
+						travelTime = new NormalDistributionImpl(stopStopTime.getStopStopTime(Id.create(parts[0],TransitStopFacility.class), Id.create(parts[1],TransitStopFacility.class), time), Math.sqrt(variance)).inverseCumulativeProbability(r);
 					} catch (MathException e) {
 						e.printStackTrace();
 					}
 				}
 				else
-					travelTime = stopStopTime.getStopStopTime(new IdImpl(parts[0]), new IdImpl(parts[1]), time);
+					travelTime = stopStopTime.getStopStopTime(Id.create(parts[0], TransitStopFacility.class), Id.create(parts[1], TransitStopFacility.class), time);
 			}
 			else
 				travelTime = link.getLength()/3.0;

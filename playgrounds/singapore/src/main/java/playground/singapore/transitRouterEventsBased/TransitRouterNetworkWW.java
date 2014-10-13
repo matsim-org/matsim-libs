@@ -33,15 +33,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.*;
 
 /**
  * Transit router network with travel, transfer, and waiting links
@@ -258,7 +254,7 @@ public final class TransitRouterNetworkWW implements Network {
 		if(line==null && route==null)
 			id = stop.getStopFacility().getId();
 		else
-			id = new IdImpl("number:"+nextNodeId++);
+			id = Id.create("number:" + nextNodeId++, TransitStopFacility.class);
 		final TransitRouterNetworkNode node = new TransitRouterNetworkNode(id, stop, route, line);
 		if(this.nodes.get(node.getId())!=null)
 			throw new RuntimeException();
@@ -267,14 +263,14 @@ public final class TransitRouterNetworkWW implements Network {
 	}
 
 	public TransitRouterNetworkLink createLink(final Network network, final TransitRouterNetworkNode fromNode, final TransitRouterNetworkNode toNode) {
-		final TransitRouterNetworkLink link = new TransitRouterNetworkLink(new IdImpl(this.nextLinkId++), fromNode, toNode, null, null, network);
+		final TransitRouterNetworkLink link = new TransitRouterNetworkLink(Id.create(this.nextLinkId++,TransitRouterNetworkLink.class), fromNode, toNode, null, null, network);
 		this.links.put(link.getId(), link);
 		fromNode.outgoingLinks.put(link.getId(), link);
 		toNode.ingoingLinks.put(link.getId(), link);
 		return link;
 	}
 	public TransitRouterNetworkLink createLink(final Network network, final TransitRouterNetworkNode fromNode, final TransitRouterNetworkNode toNode, final TransitRoute route, final TransitLine line) {
-		final TransitRouterNetworkLink link = new TransitRouterNetworkLink(new IdImpl(this.nextLinkId++), fromNode, toNode, route, line, network);
+		final TransitRouterNetworkLink link = new TransitRouterNetworkLink(Id.create(this.nextLinkId++,TransitRouterNetworkLink.class), fromNode, toNode, route, line, network);
 		this.getLinks().put(link.getId(), link);
 		fromNode.outgoingLinks.put(link.getId(), link);
 		toNode.ingoingLinks.put(link.getId(), link);

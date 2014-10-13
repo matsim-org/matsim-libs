@@ -28,7 +28,6 @@ import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimParameters;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Module;
 import org.matsim.core.gbl.Gbl;
 
@@ -90,7 +89,7 @@ public class StrategyPopsConfigGroup extends Module {
 				throw new RuntimeException("please use direct getter") ;
 			else if(parts.length == 2)
 				parts = new String[]{parts[0],PersonImplPops.DEFAULT_POP,parts[1]};
-			StrategySettings settings = getStrategySettings(parts[1], new IdImpl(parts[2]), false);
+			StrategySettings settings = getStrategySettings(parts[1], Id.create(parts[2],StrategySettings.class), false);
 			if (settings == null)
 				return null;
 			else {
@@ -129,7 +128,7 @@ public class StrategyPopsConfigGroup extends Module {
 			else {
 				if(parts.length == 2)
 					parts = new String[]{parts[0],PersonImplPops.DEFAULT_POP,parts[1]};
-				StrategySettings settings = getStrategySettings(parts[1], new IdImpl(parts[2]), true);
+				StrategySettings settings = getStrategySettings(parts[1], Id.create(parts[2],StrategySettings.class), true);
 				if (settings != null) {
 					if(parts[0].equals(MODULE))
 						settings.setModuleName(value);
@@ -206,7 +205,7 @@ public class StrategyPopsConfigGroup extends Module {
 		for(Entry<String, LinkedHashMap<Id, StrategySettings>> popSettingsE:this.settings.entrySet()) {
 			int nofStrategies = popSettingsE.getValue().size();
 			for (int i = 1; i <= nofStrategies; i++) {
-				StrategySettings settings = getStrategySettings(popSettingsE.getKey(), new IdImpl(Integer.toString(i)), false);
+				StrategySettings settings = getStrategySettings(popSettingsE.getKey(), Id.create(Integer.toString(i),StrategySettings.class), false);
 				if (settings == null) {
 					throw new RuntimeException("Loaded " + nofStrategies + " strategies which should be numbered from 1 to n, but could not find strategy " + i);
 				}

@@ -35,16 +35,11 @@ import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.transitSchedule.api.Departure;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.*;
 
 /**
  * Save waiting times of agents while mobsim is running
@@ -160,7 +155,7 @@ public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, Per
 				if(planElement instanceof Leg)
 					if(currentLeg==legs) {
 						String[] leg = ((GenericRoute)((Leg)planElement).getRoute()).getRouteDescription().split(SEPARATOR);
-						WaitTimeData data = waitTimes.get(new Tuple<Id, Id>(new IdImpl(leg[2]), new IdImpl(leg[3]))).get(new IdImpl(leg[1]));
+						WaitTimeData data = waitTimes.get(new Tuple<Id, Id>(Id.create(leg[2],TransitLine.class), Id.create(leg[3], TransitRoute.class))).get(Id.create(leg[1], TransitStopFacility.class));
 						data.addWaitTime((int) (startWaitingTime/timeSlot), event.getTime()-startWaitingTime);
 						agentsWaitingData.remove(event.getPersonId());
 						break PLAN_ELEMENTS;
@@ -180,7 +175,7 @@ public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, Per
 				if(planElement instanceof Leg)
 					if(currentLeg==legs) {
 						String[] leg = ((GenericRoute)((Leg)planElement).getRoute()).getRouteDescription().split(SEPARATOR);
-						WaitTimeData data = waitTimes.get(new Tuple<Id, Id>(new IdImpl(leg[2]), new IdImpl(leg[3]))).get(new IdImpl(leg[1]));
+						WaitTimeData data = waitTimes.get(new Tuple<Id, Id>(Id.create(leg[2],TransitLine.class), Id.create(leg[3],TransitRoute.class))).get(Id.create(leg[1],TransitStopFacility.class));
 						if(data!=null)
 							data.addWaitTime((int) (startWaitingTime/timeSlot), event.getTime()-startWaitingTime);
 						agentsWaitingData.remove(event.getPersonId());

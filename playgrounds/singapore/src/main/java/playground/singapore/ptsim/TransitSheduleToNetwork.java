@@ -12,7 +12,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkFactoryImpl;
@@ -62,7 +61,7 @@ public class TransitSheduleToNetwork {
 					Id idO = route.getStops().get(s).getStopFacility().getId();
 					Id idD = route.getStops().get(s+1).getStopFacility().getId();
 					Id linkId = route.getRoute().getLinkIds().get(linkPos);
-					id = new IdImpl(route.getStops().get(s).getStopFacility().getId()+SEPARATOR+route.getStops().get(s+1).getStopFacility().getId());
+					id = Id.createLinkId(route.getStops().get(s).getStopFacility().getId()+SEPARATOR+route.getStops().get(s+1).getStopFacility().getId());
 					if(sId==null)
 						sId = idO;
 					else
@@ -77,7 +76,7 @@ public class TransitSheduleToNetwork {
 					}
 					Link link = network.getLinks().get(id);
 					if(link==null) {
-						link = factory.createLink(id, network.getNodes().get(new IdImpl("e-"+idO)), network.getNodes().get(new IdImpl("s-"+idD)));
+						link = factory.createLink(id, network.getNodes().get(Id.createNodeId("e-"+idO)), network.getNodes().get(Id.createNodeId("s-"+idD)));
 						link.setLength(length);
 						link.setFreespeed(20);
 						link.setCapacity(10000);
