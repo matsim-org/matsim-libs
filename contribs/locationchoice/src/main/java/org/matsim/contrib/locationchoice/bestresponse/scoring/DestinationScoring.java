@@ -23,7 +23,9 @@ import java.util.Collection;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -69,7 +71,7 @@ public class DestinationScoring {
 	/*
 	 * linear at the moment
 	 */
-	private double getAttributesScore(Id facilityId, Id personId) {
+	private double getAttributesScore(Id<ActivityFacility> facilityId, Id<Person> personId) {
 		double accumulatedScore = 0.0;
 		
 		if (this.lcContext.getPersonsBetas() != null && this.lcContext.getFacilitiesAttributes() != null) {
@@ -87,7 +89,7 @@ public class DestinationScoring {
 		return accumulatedScore;
 	}
 	
-	private double getEpsilonAlternative(Id facilityId, PersonImpl person, int actIndex) {
+	private double getEpsilonAlternative(Id<ActivityFacility> facilityId, PersonImpl person, int actIndex) {
 		/*
 		 * k values are uniform in [0..1[, see class ReadOrCreateKVals.
 		 */		

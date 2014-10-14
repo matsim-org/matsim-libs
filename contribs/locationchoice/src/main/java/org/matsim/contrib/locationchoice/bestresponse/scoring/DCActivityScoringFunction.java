@@ -42,7 +42,6 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.misc.Time;
@@ -60,11 +59,17 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 	private ObjectAttributes prefs;
 	private DestinationChoiceBestResponseContext dcContext;
 	private List<ScoringPenalty> penalty = null;
-		
+	
+	public DCActivityScoringFunction(Plan plan, DestinationChoiceBestResponseContext dcContext) {
+		this(plan, null, dcContext);
+	}
+	
+	// argument facilityPenalties is never used
+	@Deprecated
 	public DCActivityScoringFunction(Plan plan, final TreeMap<Id, FacilityPenalty> facilityPenalties, DestinationChoiceBestResponseContext dcContext) {
 		super(dcContext.getParams());
 		this.destinationChoiceScoring = new DestinationScoring(dcContext);
-		this.facilities = ((ScenarioImpl)dcContext.getScenario()).getActivityFacilities();
+		this.facilities = dcContext.getScenario().getActivityFacilities();
 		this.plan = plan;
 		this.params = dcContext.getParams();
 		this.converter = dcContext.getConverter();

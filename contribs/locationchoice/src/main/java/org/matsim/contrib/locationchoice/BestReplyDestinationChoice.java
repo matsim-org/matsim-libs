@@ -21,11 +21,9 @@ package org.matsim.contrib.locationchoice;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
-import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -61,7 +59,6 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 
     private static final Logger log = Logger.getLogger(BestReplyDestinationChoice.class);
 
-    private final List<PlanAlgorithm>  planAlgoInstances = new Vector<PlanAlgorithm>();
 	private ObjectAttributes personsMaxEpsUnscaled;
 	private DestinationSampler sampler;
 	protected TreeMap<String, QuadTreeRing<ActivityFacilityWithIndex>> quadTreesOfType = new TreeMap<String, QuadTreeRing<ActivityFacilityWithIndex>>();
@@ -147,12 +144,7 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 
 	@Override
 	protected final void beforeFinishReplanningHook() {
-		Gbl.printMemoryUsage() ;
-	}
-
-	@Override
-	protected final void afterFinishReplanningHook() {
-		this.planAlgoInstances.clear();
+		Gbl.printMemoryUsage();
 	}
 
 	@Override
@@ -173,9 +165,8 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 		ScoringFunctionFactory scoringFunctionFactory = replanningContext.getScoringFunctionFactory();
 		int iteration = replanningContext.getIteration();
 		
-		this.planAlgoInstances.add(new BestResponseLocationMutator(this.quadTreesOfType, this.facilitiesOfType, this.personsMaxEpsUnscaled, 
-				this.lcContext, this.sampler, tripRouter, forwardMultiNodeDijkstra, backwardMultiNodeDijkstra, scoringFunctionFactory, iteration, this.nearestLinks));
-		return this.planAlgoInstances.get(this.planAlgoInstances.size()-1);
+		return new BestResponseLocationMutator(this.quadTreesOfType, this.facilitiesOfType, this.personsMaxEpsUnscaled, 
+				this.lcContext, this.sampler, tripRouter, forwardMultiNodeDijkstra, backwardMultiNodeDijkstra, scoringFunctionFactory, iteration, this.nearestLinks);
 	}
 	
 

@@ -240,10 +240,10 @@ public class PlanTimesAdapter {
 		Activity actPre = plan.getPreviousActivity(plan.getPreviousLeg(pe));
 		String mode = plan.getPreviousLeg(pe).getMode();
 		PathCosts pathCosts = new PathCostsGeneric(this.network);
-				
+		
 		// TODO: as soon as plansCalcRoute provides defaults for all modes use them 
 		// I do not want users having to set dc parameters in other config modules!
-		double speed = Double.parseDouble(this.config.locationchoice().getTravelSpeed_car());
+		double speed = Double.parseDouble(this.config.locationchoice().getTravelSpeed_car());	// seems to be overwritten in any case? cdobler, oct'14
 		
 		if (mode.equals(TransportMode.pt)) {
 			speed = Double.parseDouble(this.config.locationchoice().getTravelSpeed_pt());	
