@@ -37,7 +37,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsUtils;
@@ -55,6 +54,7 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 
@@ -65,8 +65,8 @@ public class WalkDistanceEstimator {
 	private Scenario sPt;
 	public M2UStringbuilder sb;
 	private List<MyZone> spList;
-	private Map<Id, Double> distanceMap;
-	private Map<Id, Double> ptMap;
+	private Map<Id<MyZone>, Double> distanceMap;
+	private Map<Id<MyZone>, Double> ptMap;
 
 
 	/**
@@ -167,8 +167,8 @@ public class WalkDistanceEstimator {
 							allPt += link[8];
 							ptCounter++;
 							Path p = null;
-							Node oNode = sAll.getNetwork().getNodes().get(new IdImpl(link[1]));
-							Node dNode = sAll.getNetwork().getNodes().get(new IdImpl(link[2]));
+							Node oNode = sAll.getNetwork().getNodes().get(Id.create(link[1], Node.class));
+							Node dNode = sAll.getNetwork().getNodes().get(Id.create(link[2], Node.class));
 							if(oNode != null && dNode != null){
 								p = router.calcLeastCostPath(oNode, dNode, 21600, null, null); // at 06:00 in the morning.
 								// Set all links in path.
@@ -218,8 +218,8 @@ public class WalkDistanceEstimator {
 		spList = mzr.getZoneList();
 		log.info("Done reading sub-place shapefile: " + spList.size() + " entries for " + studyArea);
 		
-		distanceMap = new TreeMap<Id, Double>();
-		ptMap = new TreeMap<Id, Double>();
+		distanceMap = new TreeMap<>();
+		ptMap = new TreeMap<>();
 		
 		// First read the public transport sub place table.
 		log.info("Reading sub-place table from " + sb.getSubPlaceTable());
@@ -236,7 +236,7 @@ public class WalkDistanceEstimator {
 				while((line = br.readLine()) != null){
 					String[] entries = line.split(",");
 					if(entries.length == 3){
-						ptMap.put(new IdImpl(entries[idIndex]), Double.parseDouble(entries[ptIndex]));
+						ptMap.put(Id.create(entries[idIndex], MyZone.class), Double.parseDouble(entries[ptIndex]));
 					} else{
 						log.warn(" Found a line with " + entries.length + " items; expected 3.");
 					}
@@ -264,7 +264,7 @@ public class WalkDistanceEstimator {
 		for(MyZone sp : spList){
 			CoordImpl centroid = new CoordImpl(sp.getCentroid().getX(), sp.getCentroid().getY());
 			Node closest = ni.getNearestNode(centroid);
-			Double d = centroid.calcDistance(closest.getCoord());
+			Double d = CoordUtils.calcDistance(centroid, closest.getCoord());
 			distanceMap.put(sp.getId(), d);			
 			
 			// Report progress.

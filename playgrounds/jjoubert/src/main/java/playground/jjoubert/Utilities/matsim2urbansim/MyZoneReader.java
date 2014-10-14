@@ -28,7 +28,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
@@ -45,7 +44,7 @@ public class MyZoneReader {
 	private final Logger log = Logger.getLogger(MyZoneReader.class);
 	private String shapefile;
 	private List<MyZone> zoneList;
-	private Map<Id, MyZone> zoneMap;
+	private Map<Id<MyZone>, MyZone> zoneMap;
 	private QuadTree<SAZone> quadTree;
 
 	private double xMin = Double.POSITIVE_INFINITY;
@@ -90,7 +89,7 @@ public class MyZoneReader {
 	public void readZones (int idField){
 		log.info("Reading shapefile " + this.shapefile);		
 		this.zoneList = new ArrayList<MyZone>();
-		this.zoneMap = new HashMap<Id, MyZone>();
+		this.zoneMap = new HashMap<>();
 		MultiPolygon mp = null;
 		for (SimpleFeature f: ShapeFileReader.getAllFeatures(this.shapefile)) {
 			String name = String.valueOf(f.getAttribute(idField));
@@ -111,7 +110,7 @@ public class MyZoneReader {
 						log.warn("Subset of multipolygon is NOT a polygon.");
 					}
 				}
-				MyZone newZone = new MyZone(polygonArray, mp.getFactory(), new IdImpl(name));
+				MyZone newZone = new MyZone(polygonArray, mp.getFactory(), Id.create(name, MyZone.class));
 				zoneList.add(newZone);
 				zoneMap.put(newZone.getId(), newZone);
 
@@ -156,7 +155,7 @@ public class MyZoneReader {
 		return this.zoneList;
 	}
 	
-	public Map<Id,MyZone> getZoneMap(){
+	public Map<Id<MyZone>,MyZone> getZoneMap(){
 		return this.zoneMap;
 	}
 

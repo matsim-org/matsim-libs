@@ -24,16 +24,15 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
@@ -57,7 +56,7 @@ public class MyOsmNetworkCleanerTest extends MatsimTestCase{
 
 		assertEquals("Polygon is not a square.", 5, mp.getNumPoints());
 
-		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader nr = new MatsimNetworkReader(sc);
 		nr.parse(getOutputDirectory() + "network.xml.gz");
 
@@ -71,10 +70,10 @@ public class MyOsmNetworkCleanerTest extends MatsimTestCase{
 		 */
 		assertEquals("Wrong number of remaining links.", 4, monc.getNewNetwork().getLinks().size());
 		Network n = monc.getNewNetwork();
-		assertEquals("Link 3-4 is not in network.", true, n.getLinks().containsKey(new IdImpl("34")));
-		assertEquals("Link 4-3 is not in network.", true, n.getLinks().containsKey(new IdImpl("43")));
-		assertEquals("Link 4-5 is not in network.", true, n.getLinks().containsKey(new IdImpl("45")));
-		assertEquals("Link 5-4 is not in network.", true, n.getLinks().containsKey(new IdImpl("54")));
+		assertEquals("Link 3-4 is not in network.", true, n.getLinks().containsKey(Id.create("34", Link.class)));
+		assertEquals("Link 4-3 is not in network.", true, n.getLinks().containsKey(Id.create("43", Link.class)));
+		assertEquals("Link 4-5 is not in network.", true, n.getLinks().containsKey(Id.create("45", Link.class)));
+		assertEquals("Link 5-4 is not in network.", true, n.getLinks().containsKey(Id.create("54", Link.class)));
 	}
 
 	/**
@@ -92,7 +91,7 @@ public class MyOsmNetworkCleanerTest extends MatsimTestCase{
 		MyShapefileReader msr = new MyShapefileReader(getInputDirectory() + "Test.shp");
 		MultiPolygon mp = msr.readMultiPolygon();
 
-		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader nr = new MatsimNetworkReader(sc);
 		nr.parse(getOutputDirectory() + "network.xml.gz");
 
@@ -129,42 +128,42 @@ public class MyOsmNetworkCleanerTest extends MatsimTestCase{
 		super.setUp();
 
 		// Build the test network.
-		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network n = sc.getNetwork();
 		NetworkFactory nf = n.getFactory();
 		// Nodes
-		Node n1 = nf.createNode(new IdImpl("1"), new CoordImpl(0.0, 5.0));
+		Node n1 = nf.createNode(Id.create("1", Node.class), new CoordImpl(0.0, 5.0));
 		n.addNode(n1);
-		Node n2 = nf.createNode(new IdImpl("2"), new CoordImpl(11.0, 5.0));
+		Node n2 = nf.createNode(Id.create("2", Node.class), new CoordImpl(11.0, 5.0));
 		n.addNode(n2);
-		Node n3 = nf.createNode(new IdImpl("3"), new CoordImpl(6.0, 2.0));
+		Node n3 = nf.createNode(Id.create("3", Node.class), new CoordImpl(6.0, 2.0));
 		n.addNode(n3);
-		Node n4 = nf.createNode(new IdImpl("4"), new CoordImpl(6.0, 8.0));
+		Node n4 = nf.createNode(Id.create("4", Node.class), new CoordImpl(6.0, 8.0));
 		n.addNode(n4);
-		Node n5 = nf.createNode(new IdImpl("5"), new CoordImpl(6.0, 13.0));
+		Node n5 = nf.createNode(Id.create("5", Node.class), new CoordImpl(6.0, 13.0));
 		n.addNode(n5);
-		Node n6 = nf.createNode(new IdImpl("6"), new CoordImpl(8.0, 13.0));
+		Node n6 = nf.createNode(Id.create("6", Node.class), new CoordImpl(8.0, 13.0));
 		n.addNode(n6);
 
-		Link l12 = nf.createLink(new IdImpl("12"), n1, n2);
+		Link l12 = nf.createLink(Id.create("12", Link.class), n1, n2);
 		n.addLink(l12);
-		Link l21 = nf.createLink(new IdImpl("21"), n2, n1);
+		Link l21 = nf.createLink(Id.create("21", Link.class), n2, n1);
 		n.addLink(l21);
 
-		Link l34 = nf.createLink(new IdImpl("34"), n3, n4);
+		Link l34 = nf.createLink(Id.create("34", Link.class), n3, n4);
 		n.addLink(l34);
-		Link l43 = nf.createLink(new IdImpl("43"), n4, n3);
+		Link l43 = nf.createLink(Id.create("43", Link.class), n4, n3);
 		n.addLink(l43);
 		
 		
-		Link l45 = nf.createLink(new IdImpl("45"), n4, n5);
+		Link l45 = nf.createLink(Id.create("45", Link.class), n4, n5);
 		n.addLink(l45);
-		Link l54 = nf.createLink(new IdImpl("54"), n5, n4);
+		Link l54 = nf.createLink(Id.create("54", Link.class), n5, n4);
 		n.addLink(l54);
 		
-		Link l56 = nf.createLink(new IdImpl("56"), n5, n6);
+		Link l56 = nf.createLink(Id.create("56", Link.class), n5, n6);
 		n.addLink(l56);
-		Link l65 = nf.createLink(new IdImpl("65"), n6, n5);
+		Link l65 = nf.createLink(Id.create("65", Link.class), n6, n5);
 		n.addLink(l65);
 
 		// Write network to file.

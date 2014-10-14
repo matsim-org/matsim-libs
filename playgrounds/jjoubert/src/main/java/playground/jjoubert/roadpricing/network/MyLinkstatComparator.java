@@ -32,11 +32,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+
+import com.sun.syndication.feed.atom.Link;
 
 public class MyLinkstatComparator {
 	private final static Logger log = Logger.getLogger(MyLinkstatComparator.class);
@@ -45,7 +46,7 @@ public class MyLinkstatComparator {
 	private String compareField;
 	private int baselineIndex;
 	private int compareIndex;
-	private Map<Id, Double> differenceMap;
+	private Map<Id<Link>, Double> differenceMap;
 
 	/**
 	 * <P><i>Note:</i> there seems to be 154 columns in the 
@@ -187,7 +188,7 @@ public class MyLinkstatComparator {
 			e.printStackTrace();
 		}
 		
-		differenceMap = new TreeMap<Id, Double>();
+		differenceMap = new TreeMap<>();
 		log.info("The MyLinkstatComparator successfully instantiated.");
 	}
 	
@@ -220,13 +221,13 @@ public class MyLinkstatComparator {
 					}
 					// Now just do the comparison.
 					if(lanes > 1){
-						if(network.getLinks().get(new IdImpl(sa1[0])).getNumberOfLanes() >= lanes){
+						if(network.getLinks().get(Id.create(sa1[0], Link.class)).getNumberOfLanes() >= lanes){
 							comparisonCounter++;
 							double baseValue = Double.parseDouble(sa1[baselineIndex]);
 							double compareValue = Double.parseDouble(sa2[compareIndex]);
 							double difference = (compareValue - baseValue) / baseValue;
 							if(Math.abs(difference) > threshold){
-								differenceMap.put(new IdImpl(sa1[0]), difference);
+								differenceMap.put(Id.create(sa1[0], Link.class), difference);
 							}
 						}						
 					} else{
@@ -235,7 +236,7 @@ public class MyLinkstatComparator {
 						double compareValue = Double.parseDouble(sa2[compareIndex]);
 						double difference = (compareValue - baseValue) / baseValue;
 						if(Math.abs(difference) > threshold){
-							differenceMap.put(new IdImpl(sa1[0]), difference);
+							differenceMap.put(Id.create(sa1[0], Link.class), difference);
 						}						
 					}
 
@@ -283,7 +284,7 @@ public class MyLinkstatComparator {
 				try{
 					bw.write("LinkId,Diff");
 					bw.newLine();
-					for(Id id : differenceMap.keySet()){
+					for(Id<Link> id : differenceMap.keySet()){
 						bw.write(id.toString());
 						bw.write(",");
 						bw.write(String.valueOf(differenceMap.get(id)));

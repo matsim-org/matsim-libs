@@ -26,14 +26,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -89,7 +88,7 @@ public class SaturnNetworkBuilder {
 		snb.parseLinks(args[1]);
 		snb.writeNetwork(args[2], "WGS84_UTM35S");
 		
-		double density = ((double) snb.sc.getNetwork().getLinks().size()) / Math.pow((double)snb.sc.getNetwork().getNodes().size(), 2) * 100;
+		double density = (snb.sc.getNetwork().getLinks().size()) / Math.pow(snb.sc.getNetwork().getNodes().size(), 2) * 100;
 		log.info(String.format("  Nodes: %d", snb.sc.getNetwork().getNodes().size()));
 		log.info(String.format("  Links: %d", snb.sc.getNetwork().getLinks().size()));
 		log.info(String.format("Density: %2.6f%%", density));
@@ -102,7 +101,7 @@ public class SaturnNetworkBuilder {
 	
 	
 	public SaturnNetworkBuilder() {
-		sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	}
 
 
@@ -125,7 +124,7 @@ public class SaturnNetworkBuilder {
 				String line = null;
 				while((line = br.readLine()) != null){
 					String [] entries = line.split("\t");
-					Node n = nf.createNode(new IdImpl(entries[0]), new CoordImpl(entries[1], entries[2]));
+					Node n = nf.createNode(Id.create(entries[0], Node.class), new CoordImpl(entries[1], entries[2]));
 					sc.getNetwork().addNode(n);
 					
 					/* Report progress */
@@ -170,13 +169,13 @@ public class SaturnNetworkBuilder {
 					if(entries.length != 4){
 						log.warn("entries length: " + entries.length);
 					}
-					Node fromNode = sc.getNetwork().getNodes().get(new IdImpl(entries[0]));
-					Node toNode = sc.getNetwork().getNodes().get(new IdImpl(entries[1]));
+					Node fromNode = sc.getNetwork().getNodes().get(Id.create(entries[0], Node.class));
+					Node toNode = sc.getNetwork().getNodes().get(Id.create(entries[1], Node.class));
 					if(fromNode == null || toNode == null){
 						log.warn("fromNode: " + fromNode);
 						log.warn("  toNode: " + toNode);
 					}
-					Link l = nf.createLink(new IdImpl(counter), fromNode, toNode);
+					Link l = nf.createLink(Id.create(counter, Link.class), fromNode, toNode);
 					l.setLength(Double.parseDouble(entries[2]));
 					sc.getNetwork().addLink(l);
 					

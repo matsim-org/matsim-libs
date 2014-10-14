@@ -20,13 +20,10 @@
 
 package playground.jjoubert.roadpricing.analysis;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -34,12 +31,10 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.roadpricing.RoadPricingReaderXMLv1;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
-import org.xml.sax.SAXException;
 
 /**
  * A class to evaluate the patronage of agents on a given set of links. Agents
@@ -81,17 +76,17 @@ public class MyPatronComparator {
 		String compareFilename = args[1];
 		String linksFilename = args[2];
 		
-		List<Id> breakList = new ArrayList<Id>();
+		List<Id<Person>> breakList = new ArrayList<>();
 		for(int i = 3; i < args.length; i++){
-			breakList.add(new IdImpl(args[i]));
+			breakList.add(Id.create(args[i], Person.class));
 		}
 		
 		MyPatronComparator mpc = new MyPatronComparator();
-		List<Id> linkList = mpc.readLinksFromRoadPicing(linksFilename);
+		List<Id<Link>> linkList = mpc.readLinksFromRoadPicing(linksFilename);
 		
 		/* Read the baseline file and perform some analysis. */
 		log.info("-------------------------------------------------------------------------------");
-		List<Map<Id,Integer>> baseMaps= mpc.processEventsFile(baseFilename, linkList, breakList);
+		List<Map<Id<Person>,Integer>> baseMaps= mpc.processEventsFile(baseFilename, linkList, breakList);
 		mpc.reportOccurences(baseMaps);
 		log.info("-------------------------------------------------------------------------------");
 //		List<Map<Id,Integer>> compareMaps= mpc.processEventsFile(compareFilename, linkList, breakList);
@@ -120,31 +115,31 @@ public class MyPatronComparator {
 	 * links once, twice, etc.
 	 * @param maps output from {@link MyPatronComparator#processEventsFile(String, List, List)}
 	 */
-	public void reportOccurences(List<Map<Id,Integer>> maps){
+	public void reportOccurences(List<Map<Id<Person>,Integer>> maps){
 		for(int m = 0; m < maps.size(); m++){
-			Map<Id,Integer> theMap = maps.get(m);
+			Map<Id<Person>,Integer> theMap = maps.get(m);
 			log.info(" Map " + (m+1) + " (" + theMap.size() + " agents)");
 			
 			/* Check what the minimum and maximum usage was by any one agent. */
 			Integer min = Integer.MAX_VALUE;
 			Integer max = Integer.MIN_VALUE;
-			for(Id id : theMap.keySet()){
+			for(Id<Person> id : theMap.keySet()){
 				min = Math.min(min, theMap.get(id));
 				max = Math.max(max, theMap.get(id));				
 			}
 			log.info("    Min usage: " + min + "; Max usage: " + max);
 			
 			/* Create a histogram of link usages. */
-			List<Id> histList = new ArrayList<Id>();
-			Map<Id,Integer> histMap = new HashMap<Id, Integer>();
+			List<Id<Link>> histList = new ArrayList<>();
+			Map<Id<Link>,Integer> histMap = new HashMap<Id<Link>, Integer>();
 			for(long h = min; h <= max; h++){
-				Id id = new IdImpl(h);
+				Id<Link> id = Id.create(h, Link.class);
 				histList.add(id);
 				histMap.put(id, new Integer(0));
 			}
-			for(Id id : theMap.keySet()){
+			for(Id<Person> id : theMap.keySet()){
 				int value = theMap.get(id);
-				histMap.put(new IdImpl(value), new Integer(histMap.get(new IdImpl(value))+1));
+				histMap.put(Id.create(value, Link.class), new Integer(histMap.get(Id.create(value, Link.class))+1));
 			}
 			String s = "";
 			for(Id id: histList){
@@ -171,7 +166,7 @@ public class MyPatronComparator {
 	 * 		the	<i>number</i> of times that agent entered observed links.
 	 * @see MyPatronLinkEntryHandler
 	 */
-	public List<Map<Id,Integer>> processEventsFile(String eventsFile, List<Id> linkList, List<Id> breakList){
+	public List<Map<Id<Person>,Integer>> processEventsFile(String eventsFile, List<Id<Link>> linkList, List<Id<Person>> breakList){
 		log.info("Processing events from " + eventsFile);
 		EventsManager em = EventsUtils.createEventsManager();
 		MyPatronLinkEntryHandler eh = new MyPatronLinkEntryHandler(linkList, breakList);
@@ -189,13 +184,13 @@ public class MyPatronComparator {
 	 * @param linksFile
 	 * @return {@link List} of {@link Id}s of {@link Link}s to observe.
 	 */
-	public List<Id> readLinksFromRoadPicing(String linksFile){
+	public List<Id<Link>> readLinksFromRoadPicing(String linksFile){
 		log.info("Reading tolled links to compare from " + linksFile);		
-		List<Id> list = new ArrayList<Id>();
+		List<Id<Link>> list = new ArrayList<>();
 		RoadPricingSchemeImpl rps = new RoadPricingSchemeImpl();
 		RoadPricingReaderXMLv1 rpr = new RoadPricingReaderXMLv1(rps);
 		rpr.parse(linksFile);
-		for(Id i : rps.getTolledLinkIds()){
+		for(Id<Link> i : rps.getTolledLinkIds()){
 			list.add(i);
 		}
 		log.info("Read " + list.size() + " tolled link Ids");

@@ -22,7 +22,7 @@ package playground.jjoubert.Utilities.matsim2urbansim.controler;
 
 import java.util.Arrays;
 
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -91,17 +91,17 @@ public class MyBasicConfig {
 		// Strategy.
 		config.strategy().setMaxAgentPlanMemorySize(5);
 		//---------------------------------------------------------------------
-		StrategySettings s1 = new StrategySettings(new IdImpl("1"));
+		StrategySettings s1 = new StrategySettings(Id.create("1", StrategySettings.class));
 		s1.setModuleName("SelectExpBeta");
 		s1.setProbability(0.80);
 		config.strategy().addStrategySettings(s1);
 		//---------------------------------------------------------------------
-		StrategySettings s2 = new StrategySettings(new IdImpl("2"));
+		StrategySettings s2 = new StrategySettings(Id.create("2", StrategySettings.class));
 		s2.setModuleName("ReRoute");
 		s2.setProbability(0.10);
 		config.strategy().addStrategySettings(s2);
 		//---------------------------------------------------------------------
-		StrategySettings s3 = new StrategySettings(new IdImpl("3"));
+		StrategySettings s3 = new StrategySettings(Id.create("3", StrategySettings.class));
 		s3.setModuleName("TimeAllocationMutator");
 		s3.setProbability(0.10);
 		config.strategy().addStrategySettings(s3);

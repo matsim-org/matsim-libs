@@ -29,10 +29,11 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkFactory;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -190,7 +191,7 @@ public class MyEmmeNetworkBuilder {
 					} else{
 						cNew = cOld;
 					}
-					scenario.getNetwork().addNode(f.createNode(new IdImpl(nodeId), cNew));
+					scenario.getNetwork().addNode(f.createNode(Id.create(nodeId, Node.class), cNew));
 				}
 			} finally{
 				br.close();
@@ -237,14 +238,14 @@ public class MyEmmeNetworkBuilder {
 					
 					
 					String suffix = "a";
-					if(scenario.getNetwork().getLinks().containsKey(new IdImpl(String.valueOf(id) + suffix))){
+					if(scenario.getNetwork().getLinks().containsKey(Id.create(String.valueOf(id) + suffix, Link.class))){
 						suffix = "b";
 					}
 
 					Link l = f.createLink(
-							new IdImpl(String.valueOf(id) + suffix), 
-							scenario.getNetwork().getNodes().get(new IdImpl(from)), 
-							scenario.getNetwork().getNodes().get(new IdImpl(to)));
+							Id.create(String.valueOf(id) + suffix, Link.class), 
+							scenario.getNetwork().getNodes().get(Id.create(from, Node.class)), 
+							scenario.getNetwork().getNodes().get(Id.create(to, Node.class)));
 					l.setLength(len*1000); 					// Nelson Mandela data is in km
 					l.setFreespeed(speed*1000.0/3600.0); 		// Nelson Mandela data in in km/h
 					l.setCapacity(cap); 

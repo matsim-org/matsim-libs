@@ -21,12 +21,9 @@ package playground.jjoubert.projects.gfipAnalysis;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.handler.EventHandler;
@@ -58,7 +55,7 @@ public class FilterVlnByGantryPair {
 			String line = null;
 			while((line = br.readLine()) != null){
 				String[] sa = line.split(",");
-				Id vln = new IdImpl(sa[0]);
+//				Id vln = new IdImpl(sa[0]);
 				String dateTime = sa[1];
 				String tollClass = sa[2];
 				String gantry = sa[3];

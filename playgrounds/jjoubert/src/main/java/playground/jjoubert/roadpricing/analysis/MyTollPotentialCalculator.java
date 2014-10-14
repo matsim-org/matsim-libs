@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
@@ -68,13 +67,13 @@ public class MyTollPotentialCalculator {
 		String linksFilename = args[1];
 		String outputFolder = args[2];
 		
-		List<Id> breakList = new ArrayList<Id>();
+		List<Id<Person>> breakList = new ArrayList<>();
 		for(int i = 3; i < args.length; i++){
-			breakList.add(new IdImpl(args[i]));
+			breakList.add(Id.create(args[i], Person.class));
 		}
 
 		MyTollPotentialCalculator mtpc = new MyTollPotentialCalculator();
-		List<Id> linkList = mtpc.readLinkIdsFromRoadPricingScheme(linksFilename);
+		List<Id<Link>> linkList = mtpc.readLinkIdsFromRoadPricingScheme(linksFilename);
 		
 		/* Read the baseline file and perform some analysis. */
 		log.info("-------------------------------------------------------------------------------");
@@ -145,12 +144,12 @@ public class MyTollPotentialCalculator {
 	}
 	
 	
-	private List<Id> readLinkIdsFromRoadPricingScheme(String roadpricingFilename){
+	private List<Id<Link>> readLinkIdsFromRoadPricingScheme(String roadpricingFilename){
 		log.info("Reading tolled links from " + roadpricingFilename);		
 		RoadPricingReaderXMLv1 rpr = new RoadPricingReaderXMLv1(scheme);
 		rpr.parse(roadpricingFilename);		
-		List<Id> list = new ArrayList<Id>();
-		for(Id i : this.scheme.getTolledLinkIds()){
+		List<Id<Link>> list = new ArrayList<>();
+		for(Id<Link> i : this.scheme.getTolledLinkIds()){
 			list.add(i);
 		}
 		log.info("Read " + list.size() + " tolled link Ids");
@@ -173,7 +172,7 @@ public class MyTollPotentialCalculator {
 	 * 		the	<i>number</i> of times that agent entered observed links.
 	 * @see MyTollPotentialEventHandler
 	 */
-	public void processEventsFile(String eventsFile, List<Id> linkList, List<Id> breakList, RoadPricingScheme scheme){
+	public void processEventsFile(String eventsFile, List<Id<Link>> linkList, List<Id<Person>> breakList, RoadPricingScheme scheme){
 		log.info("Processing events from " + eventsFile);
 		EventsManager em = EventsUtils.createEventsManager();
 		MyTollPotentialEventHandler eh = new MyTollPotentialEventHandler(linkList, breakList, scheme);

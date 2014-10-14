@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -49,7 +48,7 @@ import playground.jjoubert.Utilities.FileSampler.MyFileFilter;
  */
 public class MyCountingStationCleaner {
 	private Logger log = Logger.getLogger(MyCountingStationCleaner.class);
-	private Map<Id, Id> linkMap;
+	private Map<Id<Link>, Id<Link>> linkMap;
 	
 
 	/**
@@ -101,7 +100,7 @@ public class MyCountingStationCleaner {
 	 */
 	private void readLinkIds(String linkFile){
 		log.info("Reading link Ids from " + linkFile + "...");
-		linkMap = new HashMap<Id, Id>();
+		linkMap = new HashMap<>();
 		try {
 			BufferedReader br = IOUtils.getBufferedReader(linkFile);
 			try{
@@ -109,8 +108,8 @@ public class MyCountingStationCleaner {
 				while((line = br.readLine()) != null){
 					String [] entry = line.split(",");
 					if(entry.length == 2){
-						Id station = new IdImpl(entry[0]);
-						Id link = new IdImpl(entry[1]);
+						Id<Link> station = Id.create(entry[0], Link.class);
+						Id<Link> link = Id.create(entry[1], Link.class);
 						linkMap.put(station, link);
 					}else{
 						log.error("There seems to be something wrong with line " + line);							
@@ -153,7 +152,7 @@ public class MyCountingStationCleaner {
 			/*
 			 * Now, clean the counting stations.
 			 */
-			for (Id id : all) {
+			for (Id<Link> id : all) {
 				if(linkMap.containsKey(id)){
 					// It is a station that must remain.
 					Count c = cs.getCount(id);

@@ -40,7 +40,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -49,7 +49,6 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Counter;
 import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
@@ -85,8 +84,8 @@ public class OsmNetworkReaderJohan {
 
 	private final static Logger log = Logger.getLogger(OsmNetworkReaderJohan.class);
 
-	private final Map<String, OsmNode> nodes = new HashMap<String, OsmNode>();
-	private final Map<String, OsmWay> ways = new HashMap<String, OsmWay>();
+	private final Map<Long, OsmNode> nodes = new HashMap<>();
+	private final Map<Long, OsmWay> ways = new HashMap<>();
 	private final Set<String> unknownHighways = new HashSet<String>();
 	private long id = 0;
 	private final Map<String, OsmHighwayDefaults> highwayDefaults = new HashMap<String, OsmHighwayDefaults>();
@@ -296,10 +295,10 @@ public class OsmNetworkReaderJohan {
 	private void convert() {
 		this.network.setCapacityPeriod(3600);
 
-		Iterator<Entry<String, OsmWay>> it = ways.entrySet().iterator();
+		Iterator<Entry<Long, OsmWay>> it = ways.entrySet().iterator();
 		while (it.hasNext()) {
-			Entry<String, OsmWay> entry = it.next();
-			for (String nodeId : entry.getValue().nodes) {
+			Entry<Long, OsmWay> entry = it.next();
+			for (Long nodeId : entry.getValue().nodes) {
 				if (this.nodes.get(nodeId) == null) {
 					it.remove();
 					break;
@@ -318,7 +317,7 @@ public class OsmNetworkReaderJohan {
 				this.nodes.get(way.nodes.get(0)).ways++;
 				this.nodes.get(way.nodes.get(way.nodes.size()-1)).ways++;
 
-				for (String nodeId : way.nodes) {
+				for (Long nodeId : way.nodes) {
 					OsmNode node = this.nodes.get(nodeId);
 					if(this.hierarchyLayers.isEmpty()){
 						node.used = true;
@@ -379,7 +378,7 @@ public class OsmNetworkReaderJohan {
 		// create the required nodes
 		for (OsmNode node : this.nodes.values()) {
 			if (node.used) {
-				this.network.createAndAddNode(node.id, node.coord);
+				this.network.createAndAddNode(Id.create(node.id, Node.class), node.coord);
 			}
 		}
 
@@ -509,12 +508,12 @@ public class OsmNetworkReaderJohan {
 		if(network.getNodes().get(fromNode.id) != null && network.getNodes().get(toNode.id) != null){
 
 			if (!onewayReverse) {
-				Link l = network.createAndAddLink(new IdImpl(this.id), network.getNodes().get(fromNode.id), network.getNodes().get(toNode.id), length, freespeed, capacity, nofLanes);
+				Link l = network.createAndAddLink(Id.create(this.id, Link.class), network.getNodes().get(fromNode.id), network.getNodes().get(toNode.id), length, freespeed, capacity, nofLanes);
 				((LinkImpl) l).setOrigId(origId);
 				this.id++;
 			}
 			if (!oneway) {
-				Link l = network.createAndAddLink(new IdImpl(this.id), network.getNodes().get(toNode.id), network.getNodes().get(fromNode.id), length, freespeed, capacity, nofLanes);
+				Link l = network.createAndAddLink(Id.create(this.id, Link.class), network.getNodes().get(toNode.id), network.getNodes().get(fromNode.id), length, freespeed, capacity, nofLanes);
 				((LinkImpl) l).setOrigId(origId);
 				this.id++;
 			}
@@ -544,12 +543,12 @@ public class OsmNetworkReaderJohan {
 	}
 
 	private static class OsmNode {
-		public final Id id;
+		public final long id;
 		public boolean used = false;
 		public int ways = 0;
 		public final Coord coord;
 
-		public OsmNode(final Id id, final Coord coord) {
+		public OsmNode(final long id, final Coord coord) {
 			this.id = id;
 			this.coord = coord;
 		}
@@ -557,7 +556,7 @@ public class OsmNetworkReaderJohan {
 
 	private static class OsmWay {
 		public final long id;
-		public final List<String> nodes = new ArrayList<String>();
+		public final List<Long> nodes = new ArrayList<>();
 		public final Map<String, String> tags = new HashMap<String, String>();
 		public int hierarchy = -1;
 
@@ -588,8 +587,8 @@ public class OsmNetworkReaderJohan {
 	private class OsmXmlParser extends MatsimXmlParser {
 
 		private OsmWay currentWay = null;
-		private final Map<String, OsmNode> nodes;
-		private final Map<String, OsmWay> ways;
+		private final Map<Long, OsmNode> nodes;
+		private final Map<Long, OsmWay> ways;
 		/*package*/ final Counter nodeCounter = new Counter("node ");
 		/*package*/ final Counter wayCounter = new Counter("way ");
 		private final CoordinateTransformation transform;
@@ -598,7 +597,7 @@ public class OsmNetworkReaderJohan {
 		private boolean mergeNodes = false;
 		private boolean collectNodes = false;
 
-		public OsmXmlParser(final Map<String, OsmNode> nodes, final Map<String, OsmWay> ways, final CoordinateTransformation transform) {
+		public OsmXmlParser(final Map<Long, OsmNode> nodes, final Map<Long, OsmWay> ways, final CoordinateTransformation transform) {
 			super();
 			this.nodes = nodes;
 			this.ways = ways;
@@ -624,10 +623,10 @@ public class OsmNetworkReaderJohan {
 			if ("node".equals(name)) {
 				if (this.loadNodes) {
 					String idString = StringCache.get(atts.getValue("id"));
-					Id id = new IdImpl(idString);
+					long id = Long.parseLong(idString);
 					double lat = Double.parseDouble(atts.getValue("lat"));
 					double lon = Double.parseDouble(atts.getValue("lon"));
-					this.nodes.put(idString, new OsmNode(id, this.transform.transform(new CoordImpl(lon, lat))));
+					this.nodes.put(id, new OsmNode(id, this.transform.transform(new CoordImpl(lon, lat))));
 					this.nodeCounter.incCounter();
 				} else if (this.mergeNodes) {
 					OsmNode node = this.nodes.get(atts.getValue("id"));
@@ -643,7 +642,7 @@ public class OsmNetworkReaderJohan {
 				this.currentWay = new OsmWay(Long.parseLong(atts.getValue("id")));
 			} else if ("nd".equals(name)) {
 				if (this.currentWay != null) {
-					String nodeId = StringCache.get(atts.getValue("ref"));
+					long nodeId = Long.parseLong(atts.getValue("ref"));
 					this.currentWay.nodes.add(nodeId);
 				}
 			} else if ("tag".equals(name)) {
@@ -675,7 +674,7 @@ public class OsmNetworkReaderJohan {
 						used = true;
 					} else {
 						for (OsmFilter osmFilter : hierarchyLayers) {
-							for (String nodeId : this.currentWay.nodes) {
+							for (Long nodeId : this.currentWay.nodes) {
 								OsmNode node = nodes.get(nodeId);
 								if(node != null && osmFilter.coordInFilter(node.coord, this.currentWay.hierarchy)){
 									used = true;
@@ -690,11 +689,11 @@ public class OsmNetworkReaderJohan {
 				}
 				if (used) {
 					if (this.collectNodes) {
-						for (String id : this.currentWay.nodes) {
-							this.nodes.put(id, new OsmNode(new IdImpl(id), new CoordImpl(0, 0)));
+						for (Long id : this.currentWay.nodes) {
+							this.nodes.put(id, new OsmNode(id, new CoordImpl(0, 0)));
 						}
 					} else if (this.loadWays) {
-						this.ways.put(Long.toString(this.currentWay.id), this.currentWay);
+						this.ways.put(this.currentWay.id, this.currentWay);
 						this.wayCounter.incCounter();
 					}
 				}

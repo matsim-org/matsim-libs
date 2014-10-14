@@ -29,6 +29,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.roadpricing.RoadPricingScheme;
 
 import playground.jjoubert.roadpricing.senozon.SanralTollFactor;
@@ -36,13 +38,13 @@ import playground.jjoubert.roadpricing.senozon.SanralTollFactor;
 public class MyTollPotentialEventHandler implements LinkEnterEventHandler{
 
 	private Logger log = Logger.getLogger(MyPatronLinkEntryHandler.class);
-	private List<Id> breaks;
-	private List<Id> linkIds;
+	private List<Id<Person>> breaks;
+	private List<Id<Link>> linkIds;
 	private List<Map<Id,Double>> valueMaps;
 	private List<Map<Id,Integer>> countMaps;
 	private RoadPricingScheme scheme;
 
-	public MyTollPotentialEventHandler(List<Id> linkIds, List<Id> breaks, RoadPricingScheme scheme) {
+	public MyTollPotentialEventHandler(List<Id<Link>> linkIds, List<Id<Person>> breaks, RoadPricingScheme scheme) {
 		this.linkIds = linkIds;
 		this.breaks = breaks;
 		valueMaps = new ArrayList<Map<Id,Double>>(breaks.size());

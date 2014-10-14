@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
@@ -105,7 +104,7 @@ public class SanralPopulationConverter {
 		for(Person person : sc.getPopulation().getPersons().values()){
 			if(MatsimRandom.getRandom().nextDouble() <= fraction){
 				/* Create new person. */
-				Id newId = (new IdImpl(idPrefix + "_" + id++));
+				Id<Person> newId = Id.create(idPrefix + "_" + id++, Person.class);
 				Person newPerson = pf.createPerson(newId);
 				
 				for(Plan plan : person.getPlans()){

@@ -29,7 +29,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.io.IOUtils;
 
 public class LimitCarOwners {
@@ -39,7 +39,7 @@ public class LimitCarOwners {
 	 */
 	public static void main(String[] args) {
 		Logger log = Logger.getLogger(LimitCarOwners.class);
-		List<Id> persons = new ArrayList<Id>();
+		List<Id<Person>> persons = new ArrayList<>();
 		try {
 			BufferedReader people = IOUtils.getBufferedReader("C:/temp/GIS/OlderPersons.csv");
 			BufferedReader cars = IOUtils.getBufferedReader("C:/temp/R/WithCars.csv");
@@ -57,7 +57,7 @@ public class LimitCarOwners {
 					String[] values = line.split(",");
 					int numCars = Integer.parseInt(values[5]);
 					if(numCars == 1){
-						persons.add(new IdImpl(values[1]));
+						persons.add(Id.create(values[1], Person.class));
 					}
 					// Report progress.
 					if(++counter == multiplier){
@@ -74,7 +74,7 @@ public class LimitCarOwners {
 				line = people.readLine();
 				while((line = people.readLine()) != null){
 					String[] values = line.split(",");
-					if(persons.contains(new IdImpl(values[0]))){
+					if(persons.contains(Id.create(values[0], Person.class))){
 						output.write(values[0]);
 						output.write(",");
 						output.write(values[1]);

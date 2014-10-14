@@ -34,9 +34,9 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
@@ -104,7 +104,7 @@ public class MyDemandGenerator {
 		}		
 	}
 
-	public void generateDemand(Map<Id, MyZone> zones){
+	public void generateDemand(Map<Id<MyZone>, MyZone> zones){
 		// TODO Complete.
 		log.info("Generating a synthetic population:");
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -123,7 +123,7 @@ public class MyDemandGenerator {
 				while((line = br.readLine()) != null){
 					String[] entry = line.split(",");
 					String agentId = entry[0];
-					PersonImpl agent = new PersonImpl(new IdImpl(agentId));
+					PersonImpl agent = new PersonImpl(Id.create(agentId, Person.class));
 					agent.setEmployed(true);
 
 					Plan plan = new PlanImpl(agent);
@@ -134,7 +134,7 @@ public class MyDemandGenerator {
 					 * TODO Check that "interiorpoint" is a random point
 					 */
 					String homeId = entry[1]; 
-					MyZone homeZone = zones.get(new IdImpl(homeId));
+					MyZone homeZone = zones.get(Id.create(homeId, MyZone.class));
 					if(homeZone == null){
 						log.error("Agent Id: " + agentId + "; Null homezone (Id: " + homeId + ")");
 					}
@@ -172,7 +172,7 @@ public class MyDemandGenerator {
 					 *  - set to start at 07h00;
 					 */
 					String workId = entry[2];
-					MyZone workZone = zones.get(new IdImpl(workId));
+					MyZone workZone = zones.get(Id.create(workId, MyZone.class));
 					Point pWork = workZone.getInteriorPoint();
 					Coord cWork = new CoordImpl(pWork.getX(), pWork.getY());
 					Link lWork = ni.getNearestRightEntryLink(cWork);
@@ -240,7 +240,7 @@ public class MyDemandGenerator {
 		MyDemandGenerator mdg = new MyDemandGenerator(args[0], args[1], args[2], args[3], Boolean.parseBoolean(args[4]));
 		MyZoneReader mzr = new MyZoneReader(mdg.shapefile.getAbsolutePath());
 		mzr.readZones(1);
-		Map<Id,MyZone> zoneMap = mzr.getZoneMap();
+		Map<Id<MyZone>,MyZone> zoneMap = mzr.getZoneMap();
 		
 		mdg.generateDemand(zoneMap);
 		

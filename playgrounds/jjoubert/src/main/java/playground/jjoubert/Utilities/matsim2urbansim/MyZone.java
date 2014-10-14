@@ -20,7 +20,6 @@
 
 package playground.jjoubert.Utilities.matsim2urbansim;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -28,23 +27,19 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class MyZone extends MultiPolygon{
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-	private final Logger log = Logger.getLogger(MyZone.class);
-	private Id id;
 
-	public MyZone(Polygon[] polygons, GeometryFactory factory, Id id) {
+	private static final long serialVersionUID = 1L;
+
+	private Id<MyZone> id;
+
+	public MyZone(Polygon[] polygons, GeometryFactory factory, Id<MyZone> id) {
 		super(polygons, factory);
 		this.id = id;
 	}
 	
-	public Id getId(){
+	public Id<MyZone> getId(){
 		return this.id;
 	}
-	
-
 
 }
 

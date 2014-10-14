@@ -26,11 +26,11 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 
@@ -120,7 +120,7 @@ public class CarTimeEstimator {
 		boolean empties = cte.estimateCarTime(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7], true);
 		
 		String result = empties ? "Unsuccessful" : "Successful";
-		double time = (double)(System.currentTimeMillis() - tNow)/1000.0;
+		double time = (System.currentTimeMillis() - tNow)/1000.0;
 		log.info("----------------------------------------------------------");
 		log.info(String.format("Process complete for %s (%s)", args[1], result));
 		log.info("----------------------------------------------------------");
@@ -175,7 +175,7 @@ public class CarTimeEstimator {
 		r.readZones(Integer.parseInt(zoneIdField));
 		zones = r.getZoneList();
 		// 1b. Create new scenario.
-		Scenario s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		// 1c. Read the network.
 		MatsimNetworkReader nr = new MatsimNetworkReader(s);
 		nr.readFile(networkFilename);
@@ -193,7 +193,7 @@ public class CarTimeEstimator {
 		 */
 		// 2a. Read link statistics.
 		MyLinkStatsReader mlsr = new MyLinkStatsReader(linkstatsFilename);
-		Map<Id,Double> linkstats = mlsr.readSingleHour(hours);
+		Map<Id<Link>,Double> linkstats = mlsr.readSingleHour(hours);
 		// 2b. Prepare zone-to-zone travel time.
 		MyZoneToZoneRouter mzzr = new MyZoneToZoneRouter(s, zones);
 		mapZoneIdToListEntry = mzzr.getZoneToMatrixMap();

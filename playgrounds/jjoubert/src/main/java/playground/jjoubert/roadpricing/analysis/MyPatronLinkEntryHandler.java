@@ -41,27 +41,27 @@ import org.matsim.api.core.v01.population.Person;
  */
 public class MyPatronLinkEntryHandler implements LinkEnterEventHandler{
 	private Logger log = Logger.getLogger(MyPatronLinkEntryHandler.class);
-	private List<Id> breaks;
-	private List<Id> linkIds;
-	private List<Map<Id,Integer>> maps;
+	private List<Id<Person>> breaks;
+	private List<Id<Link>> linkIds;
+	private List<Map<Id<Person>,Integer>> maps;
 
-	public MyPatronLinkEntryHandler(List<Id> linkIds, List<Id> breaks) {
+	public MyPatronLinkEntryHandler(List<Id<Link>> linkIds, List<Id<Person>> breaks) {
 		this.linkIds = linkIds;
 		this.breaks = breaks;
-		maps = new ArrayList<Map<Id,Integer>>(breaks.size());
+		maps = new ArrayList<>(breaks.size());
 		for(int i = 0; i < breaks.size(); i++){
-			maps.add(new HashMap<Id, Integer>());
+			maps.add(new HashMap<Id<Person>, Integer>());
 		}
 	}
 	
-	public List<Map<Id, Integer>> getMaps(){
+	public List<Map<Id<Person>, Integer>> getMaps(){
 		return maps;
 	}
 	
 	
 	@Override
 	public void reset(int iteration) {
-		maps = new ArrayList<Map<Id,Integer>>(this.breaks.size());
+		maps = new ArrayList<>(this.breaks.size());
 	}
 
 	@Override

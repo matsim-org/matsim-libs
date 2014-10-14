@@ -38,7 +38,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.population.ActivityImpl;
@@ -104,25 +103,25 @@ public class MyPlansProcessorTest extends MatsimTestCase{
 		Network n = scenario.getNetwork();
 		NetworkFactory nf = n.getFactory();
 
-		Node n1 = nf.createNode(new IdImpl("1"), new CoordImpl(2,3));
-		Node n2 = nf.createNode(new IdImpl("2"), new CoordImpl(8,3));
-		Node n3 = nf.createNode(new IdImpl("3"), new CoordImpl(7,7));
-		Node n4 = nf.createNode(new IdImpl("4"), new CoordImpl(3,7));
+		Node n1 = nf.createNode(Id.create("1", Node.class), new CoordImpl(2,3));
+		Node n2 = nf.createNode(Id.create("2", Node.class), new CoordImpl(8,3));
+		Node n3 = nf.createNode(Id.create("3", Node.class), new CoordImpl(7,7));
+		Node n4 = nf.createNode(Id.create("4", Node.class), new CoordImpl(3,7));
 
 		n.addNode(n1); n.addNode(n2); n.addNode(n3); n.addNode(n4);
 
-		n.addLink(nf.createLink(new IdImpl("12"), n1.getId(), n2.getId()));
-		n.addLink(nf.createLink(new IdImpl("13"), n1.getId(), n3.getId()));
-		n.addLink(nf.createLink(new IdImpl("14"), n1.getId(), n4.getId()));
-		n.addLink(nf.createLink(new IdImpl("21"), n2.getId(), n1.getId()));
-		n.addLink(nf.createLink(new IdImpl("23"), n2.getId(), n3.getId()));
-		n.addLink(nf.createLink(new IdImpl("24"), n2.getId(), n4.getId()));
-		n.addLink(nf.createLink(new IdImpl("31"), n3.getId(), n1.getId()));
-		n.addLink(nf.createLink(new IdImpl("32"), n3.getId(), n2.getId()));
-		n.addLink(nf.createLink(new IdImpl("34"), n3.getId(), n4.getId()));
-		n.addLink(nf.createLink(new IdImpl("41"), n4.getId(), n1.getId()));
-		n.addLink(nf.createLink(new IdImpl("42"), n4.getId(), n2.getId()));
-		n.addLink(nf.createLink(new IdImpl("43"), n4.getId(), n3.getId()));
+		n.addLink(nf.createLink(Id.create("12", Link.class), n1, n2));
+		n.addLink(nf.createLink(Id.create("13", Link.class), n1, n3));
+		n.addLink(nf.createLink(Id.create("14", Link.class), n1, n4));
+		n.addLink(nf.createLink(Id.create("21", Link.class), n2, n1));
+		n.addLink(nf.createLink(Id.create("23", Link.class), n2, n3));
+		n.addLink(nf.createLink(Id.create("24", Link.class), n2, n4));
+		n.addLink(nf.createLink(Id.create("31", Link.class), n3, n1));
+		n.addLink(nf.createLink(Id.create("32", Link.class), n3, n2));
+		n.addLink(nf.createLink(Id.create("34", Link.class), n3, n4));
+		n.addLink(nf.createLink(Id.create("41", Link.class), n4, n1));
+		n.addLink(nf.createLink(Id.create("42", Link.class), n4, n2));
+		n.addLink(nf.createLink(Id.create("43", Link.class), n4, n3));
 
 		NetworkWriter nw = new NetworkWriter(n);
 		nw.write(getOutputDirectory() + "/networkTest.xml");
@@ -137,17 +136,17 @@ public class MyPlansProcessorTest extends MatsimTestCase{
 		//---------------------------------------------------------------------
 		// Person 1.
 		//---------------------------------------------------------------------
-		Person p1 = pf.createPerson(new IdImpl("0"));
+		Person p1 = pf.createPerson(Id.create("0", Person.class));
 		Plan plan = pf.createPlan();
 		// Home.
 		Activity a1 = new ActivityImpl("home", new CoordImpl(1.0, 1.0)); a1.setEndTime(6*3600);
 		plan.addActivity(a1);
 		// Home -> work.
 		Leg l1 = new LegImpl(TransportMode.car);
-		Link homeLink = n.getLinks().get(new IdImpl("12"));
-		Link workLink = n.getLinks().get(new IdImpl("43"));
+		Link homeLink = n.getLinks().get(Id.create("12", Link.class));
+		Link workLink = n.getLinks().get(Id.create("43", Link.class));
 		List<Id<Link>> hwLinks = new ArrayList<Id<Link>>();
-		hwLinks.add(n.getLinks().get(new IdImpl("24")).getId());
+		hwLinks.add(n.getLinks().get(Id.create("24", Link.class)).getId());
 		NetworkRoute nr1 = new LinkNetworkRouteImpl(homeLink.getId(), workLink.getId());
 		nr1.setLinkIds(homeLink.getId(), hwLinks, workLink.getId());
 		l1.setRoute(nr1);
@@ -176,17 +175,17 @@ public class MyPlansProcessorTest extends MatsimTestCase{
 		// Person 2. Same characteristics as Person 1, but he (or SHE, rather)
 		// travels a bit slower ;-)
 		//---------------------------------------------------------------------
-		Person p2 = pf.createPerson(new IdImpl("1"));
+		Person p2 = pf.createPerson(Id.create("1", Person.class));
 		plan = pf.createPlan();
 		// Home.
 		a1 = new ActivityImpl("home", new CoordImpl(1.0, 1.0)); a1.setEndTime(6*3600);
 		plan.addActivity(a1);
 		// Home -> work.
 		l1 = new LegImpl(TransportMode.car);
-		homeLink = n.getLinks().get(new IdImpl("12"));
-		workLink = n.getLinks().get(new IdImpl("43"));
+		homeLink = n.getLinks().get(Id.create("12", Link.class));
+		workLink = n.getLinks().get(Id.create("43", Link.class));
 		hwLinks = new ArrayList<Id<Link>>();
-		hwLinks.add(n.getLinks().get(new IdImpl("24")).getId());
+		hwLinks.add(n.getLinks().get(Id.create("24", Link.class)).getId());
 		nr1 = new LinkNetworkRouteImpl(homeLink.getId(), workLink.getId());
 		nr1.setLinkIds(homeLink.getId(), hwLinks, workLink.getId());
 		l1.setRoute(nr1);

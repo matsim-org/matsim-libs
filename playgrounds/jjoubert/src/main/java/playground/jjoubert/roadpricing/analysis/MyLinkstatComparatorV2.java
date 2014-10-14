@@ -47,8 +47,8 @@ import nl.knaw.dans.common.dbflib.Version;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -162,7 +162,7 @@ public class MyLinkstatComparatorV2 {
 					if(!sa1[0].equalsIgnoreCase(sa2[0])){
 						log.error("Two line entries do not have the same link Id.");
 					} else{
-						if(this.network.getLinks().get(new IdImpl(sa1[0])).getNumberOfLanes() >= minimumLanes){
+						if(this.network.getLinks().get(Id.create(sa1[0], Link.class)).getNumberOfLanes() >= minimumLanes){
 							linkscompared++;
 							
 							boolean exceedsThreshold = false;
@@ -182,7 +182,7 @@ public class MyLinkstatComparatorV2 {
 								maximumDifference = Math.max(maximumDifference, difference);							
 							}
 							if(exceedsThreshold){
-								linkMap.put(new IdImpl(sa1[0]), entry);	
+								linkMap.put(Id.create(sa1[0], Link.class), entry);	
 								valuesAdded++;
 							}
 						}
@@ -238,7 +238,7 @@ public class MyLinkstatComparatorV2 {
 				bw.newLine();
 
 				/* Write entries from linkMap. */
-				for(Id linkId : linkMap.keySet()){
+				for(Id<Link> linkId : linkMap.keySet()){
 					bw.write(linkId.toString());
 					bw.write(",");
 					for(int i = 0; i < fieldList.size(); i++){ 
@@ -307,7 +307,7 @@ public class MyLinkstatComparatorV2 {
 			t = new Table(new File(filename), Version.DBASE_4, listOfFields);
 			t.open(IfNonExistent.CREATE);
 			try{
-				for(Id linkId : linkMap.keySet()){
+				for(Id<Link> linkId : linkMap.keySet()){
 					double dailyMin = Double.MAX_VALUE;
 					double dailyMax = Double.MIN_VALUE;
 					map = new HashMap<String, Value>();
@@ -434,7 +434,7 @@ public class MyLinkstatComparatorV2 {
 			break;
 		case 2:
 			/* Calculate the difference in volume-to-capacity ratio. */
-			capacity = this.network.getLinks().get(new IdImpl(sa1[0])).getCapacity();
+			capacity = this.network.getLinks().get(Id.create(sa1[0], Link.class)).getCapacity();
 			baseVolume = Double.parseDouble(sa1[fieldMap.get(field)]) / this.scaleFactor;
 			compareVolume = Double.parseDouble(sa2[fieldMap.get(field)]) / this.scaleFactor;
 			statistic = (compareVolume - baseVolume) / capacity;
@@ -443,7 +443,7 @@ public class MyLinkstatComparatorV2 {
 			/* Calculate the difference in Average Annual Daily Traffic (AADT) 
 			 * volume-to-capacity ratio. The statistic categorizes the change
 			 * into specified transition classes. */
-			capacity = this.network.getLinks().get(new IdImpl(sa1[0])).getCapacity();
+			capacity = this.network.getLinks().get(Id.create(sa1[0], Link.class)).getCapacity();
 			baseVolume = Double.parseDouble(sa1[fieldMap.get(field)]) / this.scaleFactor;
 			compareVolume = Double.parseDouble(sa2[fieldMap.get(field)]) / this.scaleFactor;
 			double vtc1 = 0.10*baseVolume / capacity;
@@ -470,7 +470,7 @@ public class MyLinkstatComparatorV2 {
 			 * one to identify in exactly which state-of-congestion class a 
 			 * link was before and after toll.
 			 */
-			capacity = this.network.getLinks().get(new IdImpl(sa1[0])).getCapacity();
+			capacity = this.network.getLinks().get(Id.create(sa1[0], Link.class)).getCapacity();
 			baseVolume = Double.parseDouble(sa1[fieldMap.get(field)]) / this.scaleFactor;
 			compareVolume = Double.parseDouble(sa2[fieldMap.get(field)]) / this.scaleFactor;
 			double vtc11 = 0.10*baseVolume / capacity;

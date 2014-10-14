@@ -17,7 +17,7 @@ import nl.knaw.dans.common.dbflib.Table;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.io.IOUtils;
@@ -80,14 +80,14 @@ public class MyGantryComparatorTest extends MatsimTestCase{
 		assertEquals("Wrong number of links in compared map.", 9, mgc.getCompareMap().size());
 
 		/* Check that links 2, 6 & 10 have the right AVG totals in base file. */
-		assertEquals("Wrong number of vehicles for link 2 in base file.", 13.0, mgc.getBaseMap().get(new IdImpl(2)).doubleValue(), 1.e-8);
-		assertEquals("Wrong number of vehicles for link 6 in base file.", 11.0, mgc.getBaseMap().get(new IdImpl(6)), 1.e-8);
-		assertEquals("Wrong number of vehicles for link 10 in base file.", 12.0, mgc.getBaseMap().get(new IdImpl(10)), 1.e-8);
+		assertEquals("Wrong number of vehicles for link 2 in base file.", 13.0, mgc.getBaseMap().get(Id.create(2, Link.class)).doubleValue(), 1.e-8);
+		assertEquals("Wrong number of vehicles for link 6 in base file.", 11.0, mgc.getBaseMap().get(Id.create(6, Link.class)), 1.e-8);
+		assertEquals("Wrong number of vehicles for link 10 in base file.", 12.0, mgc.getBaseMap().get(Id.create(10, Link.class)), 1.e-8);
 
 		/* Check that links 2, 6 & 10 have the right AVG totals in comparison file. */
-		assertEquals("Wrong number of vehicles for link 2 in compare file.", 12.0, mgc.getCompareMap().get(new IdImpl(2)), 1.e-8);
-		assertEquals("Wrong number of vehicles for link 6 in compare file.", 11.0, mgc.getCompareMap().get(new IdImpl(6)), 1.e-8);
-		assertEquals("Wrong number of vehicles for link 10 in compare file.", 15.0, mgc.getCompareMap().get(new IdImpl(10)), 1.e-8);
+		assertEquals("Wrong number of vehicles for link 2 in compare file.", 12.0, mgc.getCompareMap().get(Id.create(2, Link.class)), 1.e-8);
+		assertEquals("Wrong number of vehicles for link 6 in compare file.", 11.0, mgc.getCompareMap().get(Id.create(6, Link.class)), 1.e-8);
+		assertEquals("Wrong number of vehicles for link 10 in compare file.", 15.0, mgc.getCompareMap().get(Id.create(10, Link.class)), 1.e-8);
 
 	}
 	
@@ -107,14 +107,14 @@ public class MyGantryComparatorTest extends MatsimTestCase{
 		mgc.writeComparisonToFile(getOutputDirectory() + "comparison.txt");
 		
 		List<String> list = new ArrayList<String>();
-		Map<Id, String> map = new HashMap<Id, String>();
+		Map<Id<Link>, String> map = new HashMap<Id<Link>, String>();
 		try {
 			BufferedReader br = IOUtils.getBufferedReader(getOutputDirectory() + "comparison.txt");
 			try{
 				String line = null;
 				while((line = br.readLine()) != null){
 					list.add(line);
-					map.put(new IdImpl(line.split(",")[0]), line);
+					map.put(Id.create(line.split(",")[0], Link.class), line);
 				}
 			} finally{
 				br.close();
@@ -125,24 +125,24 @@ public class MyGantryComparatorTest extends MatsimTestCase{
 			fail("Incorrect `IOException' thrown.");
 		}
 		
-		assertTrue("Could not find link 2.", map.containsKey(new IdImpl(2)));
-		assertEquals("Wrong values for link 2.", "2,13.0,12.0,-0.0769", map.get(new IdImpl(2)));
-		assertTrue("Could not find link 3.", map.containsKey(new IdImpl(3)));
-		assertEquals("Wrong values for link 3.", "3,9.0,19.0,1.1111", map.get(new IdImpl(3)));
-		assertTrue("Could not find link 4.", map.containsKey(new IdImpl(4)));
-		assertEquals("Wrong values for link 4.", "4,7.0,11.0,0.5714", map.get(new IdImpl(4)));
-		assertTrue("Could not find link 5.", map.containsKey(new IdImpl(5)));
-		assertEquals("Wrong values for link 5.", "5,15.0,11.0,-0.2667", map.get(new IdImpl(5)));
-		assertTrue("Could not find link 6.", map.containsKey(new IdImpl(6)));
-		assertEquals("Wrong values for link 6.", "6,11.0,11.0,0.0000", map.get(new IdImpl(6)));
-		assertTrue("Could not find link 7.", map.containsKey(new IdImpl(7)));
-		assertEquals("Wrong values for link 7.", "7,9.0,12.0,0.3333", map.get(new IdImpl(7)));
-		assertTrue("Could not find link 8.", map.containsKey(new IdImpl(8)));
-		assertEquals("Wrong values for link 8.", "8,7.0,13.0,0.8571", map.get(new IdImpl(8)));
-		assertTrue("Could not find link 9.", map.containsKey(new IdImpl(9)));
-		assertEquals("Wrong values for link 9.", "9,17.0,6.0,-0.6471", map.get(new IdImpl(9)));
-		assertTrue("Could not find link 10.", map.containsKey(new IdImpl(10)));
-		assertEquals("Wrong values for link 10.", "10,12.0,15.0,0.2500", map.get(new IdImpl(10)));
+		assertTrue("Could not find link 2.", map.containsKey(Id.create(2, Link.class)));
+		assertEquals("Wrong values for link 2.", "2,13.0,12.0,-0.0769", map.get(Id.create(2, Link.class)));
+		assertTrue("Could not find link 3.", map.containsKey(Id.create(3, Link.class)));
+		assertEquals("Wrong values for link 3.", "3,9.0,19.0,1.1111", map.get(Id.create(3, Link.class)));
+		assertTrue("Could not find link 4.", map.containsKey(Id.create(4, Link.class)));
+		assertEquals("Wrong values for link 4.", "4,7.0,11.0,0.5714", map.get(Id.create(4, Link.class)));
+		assertTrue("Could not find link 5.", map.containsKey(Id.create(5, Link.class)));
+		assertEquals("Wrong values for link 5.", "5,15.0,11.0,-0.2667", map.get(Id.create(5, Link.class)));
+		assertTrue("Could not find link 6.", map.containsKey(Id.create(6, Link.class)));
+		assertEquals("Wrong values for link 6.", "6,11.0,11.0,0.0000", map.get(Id.create(6, Link.class)));
+		assertTrue("Could not find link 7.", map.containsKey(Id.create(7, Link.class)));
+		assertEquals("Wrong values for link 7.", "7,9.0,12.0,0.3333", map.get(Id.create(7, Link.class)));
+		assertTrue("Could not find link 8.", map.containsKey(Id.create(8, Link.class)));
+		assertEquals("Wrong values for link 8.", "8,7.0,13.0,0.8571", map.get(Id.create(8, Link.class)));
+		assertTrue("Could not find link 9.", map.containsKey(Id.create(9, Link.class)));
+		assertEquals("Wrong values for link 9.", "9,17.0,6.0,-0.6471", map.get(Id.create(9, Link.class)));
+		assertTrue("Could not find link 10.", map.containsKey(Id.create(10, Link.class)));
+		assertEquals("Wrong values for link 10.", "10,12.0,15.0,0.2500", map.get(Id.create(10, Link.class)));
 	}
 	
 	

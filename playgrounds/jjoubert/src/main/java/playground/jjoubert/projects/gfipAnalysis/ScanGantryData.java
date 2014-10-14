@@ -31,7 +31,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.counts.Count;
@@ -152,7 +152,7 @@ public class ScanGantryData {
 				 * code converts it to start with 'TG'. */
 				s_gantry = "TG" + s_gantry.substring(1, 4);
 				
-				Id gantryId = new IdImpl(s_gantry);
+				Id<Link> gantryId = Id.create(s_gantry, Link.class);
 				/* Initialise the gantry if it doesn't exist yet. */
 				Count count = null;
 				if(counts.getCount(gantryId) == null){

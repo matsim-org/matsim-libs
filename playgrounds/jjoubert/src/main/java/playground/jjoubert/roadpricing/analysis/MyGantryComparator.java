@@ -26,7 +26,6 @@ import nl.knaw.dans.common.dbflib.Version;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 public class MyGantryComparator {
@@ -186,7 +185,7 @@ public class MyGantryComparator {
 			try{
 				String line = null;
 				while((line = br.readLine()) != null){
-					linkList.add(new IdImpl(line));
+					linkList.add(Id.create(line, Link.class));
 					counter++;
 				}
 			}finally{
@@ -211,7 +210,7 @@ public class MyGantryComparator {
 				String line = br.readLine();
 				while((line = br.readLine()) != null){
 					String[] entry = line.split("\t");
-					Id id = new IdImpl(entry[0]);
+					Id<Link> id = Id.create(entry[0], Link.class);
 					if(linkList.contains(id)){
 						map.put(id, Double.parseDouble(entry[80]));						
 					}

@@ -26,12 +26,11 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeData;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.jjoubert.Utilities.matsim2urbansim.MyLinkStatsReader;
@@ -69,10 +68,10 @@ public class MyLinkStatsReaderTest extends MatsimTestCase{
 	public void testReadSingleHour(){
 		String f = (new File(getInputDirectory())).getParent() + "/linkstats.txt";
 		MyLinkStatsReader m = new MyLinkStatsReader(f);
-		Map<Id,Double> map = m.readSingleHour("6-7");
-		assertEquals("Wrong travel time read for link 10.", "361.67", String.format("%3.2f", map.get(new IdImpl("10"))));
-		assertEquals("Wrong travel time read for link 18.", "192.33", String.format("%3.2f", map.get(new IdImpl("18"))));
-		assertEquals("Wrong travel time read for link 22.", "1259.90", String.format("%4.2f", map.get(new IdImpl("22"))));
+		Map<Id<Link>,Double> map = m.readSingleHour("6-7");
+		assertEquals("Wrong travel time read for link 10.", "361.67", String.format("%3.2f", map.get(Id.create("10", Link.class))));
+		assertEquals("Wrong travel time read for link 18.", "192.33", String.format("%3.2f", map.get(Id.create("18", Link.class))));
+		assertEquals("Wrong travel time read for link 22.", "1259.90", String.format("%4.2f", map.get(Id.create("22", Link.class))));
 	}
 	
 	/**
@@ -82,25 +81,25 @@ public class MyLinkStatsReaderTest extends MatsimTestCase{
 		setupTest();
 		String f = (new File(getInputDirectory())).getParent() + "/linkstats.txt";
 		MyLinkStatsReader m = new MyLinkStatsReader(f);
-		Map<Id,TravelTimeData> map1 = m.buildTravelTimeDataObject(scenario, "min");
-		Map<Id,TravelTimeData> map2 = m.buildTravelTimeDataObject(scenario, "avg");
-		Map<Id,TravelTimeData> map3 = m.buildTravelTimeDataObject(scenario, "max");
+		Map<Id<Link>,TravelTimeData> map1 = m.buildTravelTimeDataObject(scenario, "min");
+		Map<Id<Link>,TravelTimeData> map2 = m.buildTravelTimeDataObject(scenario, "avg");
+		Map<Id<Link>,TravelTimeData> map3 = m.buildTravelTimeDataObject(scenario, "max");
 		
-		assertEquals("Wrong entry for link 2; 6-7; min.", "360.44", String.format("%3.2f", map1.get(new IdImpl("2")).getTravelTime(6, EPSILON)));
-		assertEquals("Wrong entry for link 2; 6-7; avg.", "360.65", String.format("%3.2f", map2.get(new IdImpl("2")).getTravelTime(6, EPSILON)));
-		assertEquals("Wrong entry for link 2; 6-7; max.", "360.70", String.format("%3.2f", map3.get(new IdImpl("2")).getTravelTime(6, EPSILON)));
+		assertEquals("Wrong entry for link 2; 6-7; min.", "360.44", String.format("%3.2f", map1.get(Id.create("2", Link.class)).getTravelTime(6, EPSILON)));
+		assertEquals("Wrong entry for link 2; 6-7; avg.", "360.65", String.format("%3.2f", map2.get(Id.create("2", Link.class)).getTravelTime(6, EPSILON)));
+		assertEquals("Wrong entry for link 2; 6-7; max.", "360.70", String.format("%3.2f", map3.get(Id.create("2", Link.class)).getTravelTime(6, EPSILON)));
 
-		assertEquals("Wrong entry for link 22; 9-10; max.", "1259.90", String.format("%4.2f", map3.get(new IdImpl("22")).getTravelTime(9, EPSILON)));
-		assertEquals("Wrong entry for link 22; 10-11; min.", "1260.00", String.format("%4.2f", map1.get(new IdImpl("22")).getTravelTime(10, EPSILON)));
+		assertEquals("Wrong entry for link 22; 9-10; max.", "1259.90", String.format("%4.2f", map3.get(Id.create("22", Link.class)).getTravelTime(9, EPSILON)));
+		assertEquals("Wrong entry for link 22; 10-11; min.", "1260.00", String.format("%4.2f", map1.get(Id.create("22", Link.class)).getTravelTime(10, EPSILON)));
 		
-		assertEquals("Wrong entry for link 12; 6-7; min.", "183.60", String.format("%3.2f", map1.get(new IdImpl("12")).getTravelTime(6, EPSILON)));
-		assertEquals("Wrong entry for link 12; 6-7; avg.", "185.43", String.format("%3.2f", map2.get(new IdImpl("12")).getTravelTime(6, EPSILON)));
-		assertEquals("Wrong entry for link 12; 6-7; max.", "187.00", String.format("%3.2f", map3.get(new IdImpl("12")).getTravelTime(6, EPSILON)));
+		assertEquals("Wrong entry for link 12; 6-7; min.", "183.60", String.format("%3.2f", map1.get(Id.create("12", Link.class)).getTravelTime(6, EPSILON)));
+		assertEquals("Wrong entry for link 12; 6-7; avg.", "185.43", String.format("%3.2f", map2.get(Id.create("12", Link.class)).getTravelTime(6, EPSILON)));
+		assertEquals("Wrong entry for link 12; 6-7; max.", "187.00", String.format("%3.2f", map3.get(Id.create("12", Link.class)).getTravelTime(6, EPSILON)));
 }	
 
 
 	private void setupTest() {
-		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		String f = (new File(getInputDirectory())).getParent() + "/network.xml";
 		MatsimNetworkReader mnr = new MatsimNetworkReader(scenario);
 		mnr.readFile(f);

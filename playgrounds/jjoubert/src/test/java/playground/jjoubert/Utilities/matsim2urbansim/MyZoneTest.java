@@ -21,7 +21,6 @@
 package playground.jjoubert.Utilities.matsim2urbansim;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -32,12 +31,11 @@ import com.vividsolutions.jts.geom.Polygon;
 public class MyZoneTest extends MatsimTestCase{
 	private GeometryFactory gf = new GeometryFactory();
 	private Polygon[] ps = setupPolygon();
-	private Id id = new IdImpl("0");
+	private Id<MyZone> id = Id.create("0", MyZone.class);
 
 	public void testMyZoneConstructor(){
 		MyZone mz = new MyZone(ps, gf, id);
 		assertEquals("MyZone not created.", true, mz != null);
-		assertEquals("Id of MyZone of wrong type.", IdImpl.class, mz.getId().getClass());
 	}
 	
 	public void testGetId(){

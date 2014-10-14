@@ -30,7 +30,6 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -52,7 +51,7 @@ public class GautengGantryParser {
 		Header.printHeader(GautengGantryParser.class.toString(), args);
 		
 		String csvfile = args[0];
-		Map<Id, Coord> coordMap = new TreeMap<Id, Coord>();
+		Map<Id<Coord>, Coord> coordMap = new TreeMap<>();
 		
 		BufferedReader br = IOUtils.getBufferedReader(csvfile);
 		try{
@@ -62,7 +61,7 @@ public class GautengGantryParser {
 				Double lon = Double.parseDouble(sa[0]);
 				Double lat = Double.parseDouble(sa[1]);
 				String name = sa[2];
-				coordMap.put(new IdImpl(name), new CoordImpl(lon, lat));
+				coordMap.put(Id.create(name, Coord.class), new CoordImpl(lon, lat));
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -77,7 +76,7 @@ public class GautengGantryParser {
 		}
 		
 		/* Just write coordinates out to console. */
-		for(Id id : coordMap.keySet()){
+		for(Id<Coord> id : coordMap.keySet()){
 			LOG.info(String.format("%s: (%.4f, %.4f)", id.toString(), coordMap.get(id).getX(), coordMap.get(id).getY()));
 		}
 		

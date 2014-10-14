@@ -33,7 +33,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
@@ -48,7 +48,7 @@ public class MyCountingStationParser {
 	private static String extension;
 	private static String abnormal;
 	private List<GregorianCalendar> abnormalList;
-	private Map<Id,Counts> countsMap;
+	private Map<String, Counts> countsMap;
 
 	/**
 	 * Creates and runs an instance of the traffic counts parser. 
@@ -131,7 +131,7 @@ public class MyCountingStationParser {
 	 */
 	public MyCountingStationParser() {
 		log = Logger.getLogger(MyCountingStationParser.class);
-		countsMap = new HashMap<Id, Counts>();
+		countsMap = new HashMap<>();
 		abnormalList = new ArrayList<GregorianCalendar>();
 	}
 
@@ -194,7 +194,7 @@ public class MyCountingStationParser {
 			try{
 				String stationId = f.getName().split("_")[0];
 				
-				Map<Id, Map<Id,List<Integer>>> cMap = new HashMap<Id, Map<Id,List<Integer>>>();
+				Map<String, Map<Integer, List<Integer>>> cMap = new HashMap<>();
 								
 				String line = br.readLine();
 				line = br.readLine();
@@ -243,47 +243,44 @@ public class MyCountingStationParser {
 							// Create new counts instances if it doesn't already exist.
 							// For light vehicles.
 							String countsNameLightA = "Day_" + dayOfWeek + "_" + stationId + "_Light_a";
-							Id countsIdLightA = new IdImpl(countsNameLightA);
-							if(!cMap.containsKey(countsIdLightA)){
-								cMap.put(countsIdLightA, buildCountsMap());
+							if(!cMap.containsKey(countsNameLightA)){
+								cMap.put(countsNameLightA, buildCountsMap());
 							}
 							// For heavy vehicles.
 							String countsNameHeavyA = "Day_" + dayOfWeek + "_" + stationId + "_Heavy_a";
-							Id countsIdHeavyA = new IdImpl(countsNameHeavyA);
-							if(!cMap.containsKey(countsIdHeavyA)){
-								cMap.put(countsIdHeavyA, buildCountsMap());
+							if(!cMap.containsKey(countsNameHeavyA)){
+								cMap.put(countsNameHeavyA, buildCountsMap());
 							}
 							// For the combination of light and heavy vehicles.
 							String countsNameTotalA = "Day_" + dayOfWeek + "_" + stationId + "_Total_a";
-							Id countsIdTotalA = new IdImpl(countsNameTotalA);
-							if(!cMap.containsKey(countsIdTotalA)){
-								cMap.put(countsIdTotalA, buildCountsMap());
+							if(!cMap.containsKey(countsNameTotalA)){
+								cMap.put(countsNameTotalA, buildCountsMap());
 							}
 							
 							int lvA = Integer.parseInt(entry[8]);
-							lvA = (int) Math.round(((double)lvA ) / factor); // Account for non-full hours.
+							lvA = (int) Math.round((lvA ) / factor); // Account for non-full hours.
 
 							int hvA = Integer.parseInt(entry[9]);
 							hvA += Integer.parseInt(entry[10]);
 							hvA += Integer.parseInt(entry[11]);
-							hvA = (int) Math.round(((double)hvA ) / factor); // Account for non-full hours.
+							hvA = (int) Math.round((hvA ) / factor); // Account for non-full hours.
 
 							int tA = lvA + hvA;
 							
-//							int wasLightA = countsMap.get(countsIdLightA).get(new IdImpl(hour)).get(0);
+//							int wasLightA = countsMap.get(countsIdLightA).get(Id.create(hour)).get(0);
 //							System.out.println("Counter: " + ++counter);
 							if(counter == 24){
 //								log.warn("WARNING");
 							}
-							cMap.get(countsIdLightA).get(new IdImpl(hour)).set(0, cMap.get(countsIdLightA).get(new IdImpl(hour)).get(0) + lvA);
-							cMap.get(countsIdLightA).get(new IdImpl(hour)).set(1, cMap.get(countsIdLightA).get(new IdImpl(hour)).get(1) + 1);
+							cMap.get(countsNameLightA).get(hour).set(0, cMap.get(countsNameLightA).get(hour).get(0) + lvA);
+							cMap.get(countsNameLightA).get(hour).set(1, cMap.get(countsNameLightA).get(hour).get(1) + 1);
 							
-//							int wasHeavyA = countsMap.get(countsIdHeavyA).get(new IdImpl(hour)).get(0);
-							cMap.get(countsIdHeavyA).get(new IdImpl(hour)).set(0, cMap.get(countsIdHeavyA).get(new IdImpl(hour)).get(0) + hvA);
-							cMap.get(countsIdHeavyA).get(new IdImpl(hour)).set(1, cMap.get(countsIdHeavyA).get(new IdImpl(hour)).get(1) + 1);
+//							int wasHeavyA = countsMap.get(countsIdHeavyA).get(Id.create(hour)).get(0);
+							cMap.get(countsNameHeavyA).get(hour).set(0, cMap.get(countsNameHeavyA).get(hour).get(0) + hvA);
+							cMap.get(countsNameHeavyA).get(hour).set(1, cMap.get(countsNameHeavyA).get(hour).get(1) + 1);
 							
-							cMap.get(countsIdTotalA).get(new IdImpl(hour)).set(0, cMap.get(countsIdTotalA).get(new IdImpl(hour)).get(0) + tA);
-							cMap.get(countsIdTotalA).get(new IdImpl(hour)).set(1, cMap.get(countsIdTotalA).get(new IdImpl(hour)).get(1) + 1);
+							cMap.get(countsNameTotalA).get(hour).set(0, cMap.get(countsNameTotalA).get(hour).get(0) + tA);
+							cMap.get(countsNameTotalA).get(hour).set(1, cMap.get(countsNameTotalA).get(hour).get(1) + 1);
 
 							/*
 							 * The following is just code to verify that counts 
@@ -291,8 +288,8 @@ public class MyCountingStationParser {
 							 */
 //							if(countsNameLightA.startsWith("Day_2_2520_") && hour==1){
 //								System.out.println("Station " + stationId + "; day " + dayOfWeek + "; direction A at time " + hour + ": Light: " + lvA + "; Heavy: " + hvA);
-//								System.out.println("   light was " + wasLightA + ", now " + countsMap.get(countsIdLightA).get(new IdImpl(hour)).get(0) + " (counted: " + countsMap.get(countsIdLightA).get(new IdImpl(hour)).get(1) + ")");
-//								System.out.println("   heavy was " + wasHeavyA + ", now " + countsMap.get(countsIdHeavyA).get(new IdImpl(hour)).get(0) + " (counted: " + countsMap.get(countsIdHeavyA).get(new IdImpl(hour)).get(1) + ")");
+//								System.out.println("   light was " + wasLightA + ", now " + countsMap.get(countsIdLightA).get(Id.create(hour)).get(0) + " (counted: " + countsMap.get(countsIdLightA).get(Id.create(hour)).get(1) + ")");
+//								System.out.println("   heavy was " + wasHeavyA + ", now " + countsMap.get(countsIdHeavyA).get(Id.create(hour)).get(0) + " (counted: " + countsMap.get(countsIdHeavyA).get(Id.create(hour)).get(1) + ")");
 //							}
 							
 							
@@ -304,43 +301,40 @@ public class MyCountingStationParser {
 								 */
 								// For light vehicles.
 								String countsNameLightB = "Day_" + dayOfWeek + "_" + stationId + "_Light_b";
-								Id countsIdLightB = new IdImpl(countsNameLightB);
-								if(!cMap.containsKey(countsIdLightB)){
-									cMap.put(countsIdLightB, buildCountsMap());
+								if(!cMap.containsKey(countsNameLightB)){
+									cMap.put(countsNameLightB, buildCountsMap());
 								}
 								// For heavy vehicles.
 								String countsNameHeavyB = "Day_" + dayOfWeek + "_" + stationId + "_Heavy_b";
-								Id countsIdHeavyB = new IdImpl(countsNameHeavyB);
-								if(!cMap.containsKey(countsIdHeavyB)){
-									cMap.put(countsIdHeavyB, buildCountsMap());
+								if(!cMap.containsKey(countsNameHeavyB)){
+									cMap.put(countsNameHeavyB, buildCountsMap());
 								}
 								// For the combination of light and heavy vehicles.
 								String countsNameTotalB = "Day_" + dayOfWeek + "_" + stationId + "_Total_b";
-								Id countsIdTotalB = new IdImpl(countsNameTotalB);
-								if(!cMap.containsKey(countsIdTotalB)){
-									cMap.put(countsIdTotalB, buildCountsMap());
+								if(!cMap.containsKey(countsNameTotalB)){
+									cMap.put(countsNameTotalB, buildCountsMap());
 								}
 								
 								int lvB = Integer.parseInt(entry[13]);
-								lvB = (int) Math.round(((double)lvB ) / factor); // Account for non-full hours.
+								lvB = (int) Math.round((lvB ) / factor); // Account for non-full hours.
 								
 								int hvB = Integer.parseInt(entry[14]);
 								hvB += Integer.parseInt(entry[15]);
 								hvB += Integer.parseInt(entry[16]);
-								hvB = (int) Math.round(((double) hvB) / factor); // Account for non-full hours.
+								hvB = (int) Math.round((hvB) / factor); // Account for non-full hours.
 								
 								int tB = lvB + hvB;
 								
-//								int wasLightB = countsMap.get(countsIdLightB).get(new IdImpl(hour)).get(0);
-								cMap.get(countsIdLightB).get(new IdImpl(hour)).set(0, cMap.get(countsIdLightB).get(new IdImpl(hour)).get(0) + lvB);
-								cMap.get(countsIdLightB).get(new IdImpl(hour)).set(1, cMap.get(countsIdLightB).get(new IdImpl(hour)).get(1) + 1);
+//								int wasLightB = countsMap.get(countsIdLightB).get(Id.create(hour)).get(0);
+								cMap.get(countsNameLightB).get(hour).set(0, cMap.get(countsNameLightB).get(hour).get(0) + lvB);
+								cMap.get(countsNameLightB).get(hour).set(1, cMap.get(countsNameLightB).get(hour).get(1) + 1);
 								
-//								int wasHeavyB = countsMap.get(countsIdHeavyB).get(new IdImpl(hour)).get(0);
-								cMap.get(countsIdHeavyB).get(new IdImpl(hour)).set(0, cMap.get(countsIdHeavyB).get(new IdImpl(hour)).get(0) + hvB);
-								cMap.get(countsIdHeavyB).get(new IdImpl(hour)).set(1, cMap.get(countsIdHeavyB).get(new IdImpl(hour)).get(1) + 1);
+//								int wasHeavyB = countsMap.get(countsIdHeavyB).get(Id.create(hour)).get(0);
+								cMap.get(countsNameHeavyB).get(hour).set(0, cMap.get(countsNameHeavyB).get(hour).get(0) + hvB);
+								cMap.get(countsNameHeavyB).get(hour).set(1, cMap.get(countsNameHeavyB).get(hour).get(1) + 1);
 								
-								cMap.get(countsIdTotalB).get(new IdImpl(hour)).set(0, cMap.get(countsIdTotalB).get(new IdImpl(hour)).get(0) + tB);
-								cMap.get(countsIdTotalB).get(new IdImpl(hour)).set(1, cMap.get(countsIdTotalB).get(new IdImpl(hour)).get(1) + 1);
+								cMap.get(countsNameTotalB).get(hour).set(0, cMap.get(countsNameTotalB).get(hour).get(0) + tB);
+								cMap.get(countsNameTotalB).get(hour).set(1, cMap.get(countsNameTotalB).get(hour).get(1) + 1);
 
 								/*
 								 * The following is just code to verify that counts 
@@ -348,8 +342,8 @@ public class MyCountingStationParser {
 								 */
 //								if(countsNameLightB.startsWith("Day_2_340_") && hour==1){
 //									System.out.println("Station " + stationId + "; day " + dayOfWeek + "; direction B at time " + hour + ": Light: " + lvB + "; Heavy: " + hvB);
-//									System.out.println("   light was " + wasLightB + ", now " + countsMap.get(countsIdLightB).get(new IdImpl(hour)).get(0) + " (counted: " + countsMap.get(countsIdLightB).get(new IdImpl(hour)).get(1) + ")");
-//									System.out.println("   heavy was " + wasHeavyB + ", now " + countsMap.get(countsIdHeavyB).get(new IdImpl(hour)).get(0) + " (counted: " + countsMap.get(countsIdHeavyB).get(new IdImpl(hour)).get(1) + ")");
+//									System.out.println("   light was " + wasLightB + ", now " + countsMap.get(countsIdLightB).get(Id.create(hour)).get(0) + " (counted: " + countsMap.get(countsIdLightB).get(Id.create(hour)).get(1) + ")");
+//									System.out.println("   heavy was " + wasHeavyB + ", now " + countsMap.get(countsIdHeavyB).get(Id.create(hour)).get(0) + " (counted: " + countsMap.get(countsIdHeavyB).get(Id.create(hour)).get(1) + ")");
 //								}
 								
 							}
@@ -366,7 +360,7 @@ public class MyCountingStationParser {
 					 * Alright, we (should) have a complete counts map. Now we 
 					 * need to create Counts and Count objects from the map.
 					 */
-					for (Id cId : cMap.keySet()) {
+					for (String cId : cMap.keySet()) {
 						String [] sa = cId.toString().split("_");
 						String dayName = getDayDescription(Integer.parseInt(sa[1]));
 						String stationName = sa[2];
@@ -374,22 +368,22 @@ public class MyCountingStationParser {
 						String directionName = sa[4];
 						String name = dayName + "_" + typeName;
 						
-						if(!countsMap.containsKey(new IdImpl(name))){
+						if(!countsMap.containsKey(name)){
 							Counts cs = new Counts();
 							cs.setName(name);
 							cs.setYear(Integer.parseInt(MyCountingStationParser.year));
-							countsMap.put(new IdImpl(name), cs);
+							countsMap.put(name, cs);
 						}
-						Counts cs = countsMap.get(new IdImpl(name));
+						Counts cs = countsMap.get(name);
 						
 						String entryName = stationName + directionName;
 						Count c = null;
-						if(!cs.getCounts().containsKey(new IdImpl(entryName))){
+						if(!cs.getCounts().containsKey(Id.create(entryName, Link.class))){
 							//							log.warn("Multiple entries for station " + entryName + " in " + name);
-							c = cs.createAndAddCount(new IdImpl(entryName), entryName);
+							c = cs.createAndAddCount(Id.create(entryName, Link.class), entryName);
 						} 
-						c = cs.getCount(new IdImpl(entryName));
-						for(Id hourName : cMap.get(cId).keySet()){
+						c = cs.getCount(Id.create(entryName, Link.class));
+						for(Integer hourName : cMap.get(cId).keySet()){
 							if (cMap.get(cId).get(hourName).get(1) > 0){
 								c.createVolume(
 										Integer.parseInt(hourName.toString()), 			// hour
@@ -427,7 +421,7 @@ public class MyCountingStationParser {
 	 */
 	private void writeCountsXml(String root){
 		log.info("Writing counts files to xml.");
-		for (Id cId : countsMap.keySet()) {
+		for (String cId : countsMap.keySet()) {
 			Counts c = countsMap.get(cId);
 			
 			String filename = root + "Counts_" + c.getName() + ".xml.gz";
@@ -486,12 +480,12 @@ public class MyCountingStationParser {
 	 * {@link Integer}s: firstly the total counts observed; and secondly the
 	 * number of observations.
 	 */
-	private Map<Id, List<Integer>> buildCountsMap(){
-		Map<Id, List<Integer>> obs = new HashMap<Id, List<Integer>>();
+	private Map<Integer, List<Integer>> buildCountsMap(){
+		Map<Integer, List<Integer>> obs = new HashMap<>();
 		for(int i = 0; i < 24; i++ ){
 			List<Integer> l = new ArrayList<Integer>(2);
 			l.add(0); l.add(0);
-			obs.put(new IdImpl(i+1), l);
+			obs.put(i+1, l);
 		}
 		return obs;	
 	}

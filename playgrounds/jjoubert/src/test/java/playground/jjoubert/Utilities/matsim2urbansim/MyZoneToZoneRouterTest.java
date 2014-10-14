@@ -24,14 +24,13 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.Dijkstra;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
 
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
@@ -100,7 +99,7 @@ public class MyZoneToZoneRouterTest extends MatsimTestCase{
 		Coordinate c4 = new Coordinate(-25500, 500);
 		Coordinate[] ca1 = {c1,c2,c3,c4,c1};
 		Polygon[] p1 = {gf.createPolygon(gf.createLinearRing(ca1), null)};
-		MyZone z1 = new MyZone(p1, gf, new IdImpl("1"));
+		MyZone z1 = new MyZone(p1, gf, Id.create("1", MyZone.class));
 		zones.add(z1);
 
 		// Zone 2.
@@ -110,21 +109,21 @@ public class MyZoneToZoneRouterTest extends MatsimTestCase{
 		Coordinate c8 = new Coordinate(-9000, 6500);
 		Coordinate[] ca2 = {c5,c6,c7,c8,c5};
 		Polygon[] p2 = {gf.createPolygon(gf.createLinearRing(ca2), null)};
-		MyZone z2 = new MyZone(p2, gf, new IdImpl("2"));
+		MyZone z2 = new MyZone(p2, gf, Id.create("2", MyZone.class));
 		zones.add(z2);
 
 		// Zone 3.
 		Coordinate c9 = new Coordinate(1000, 500);
 		Coordinate[] ca3 = {c3,c9,c6,c5,c3};
 		Polygon[] p3 = {gf.createPolygon(gf.createLinearRing(ca3), null)};
-		MyZone z3 = new MyZone(p3, gf, new IdImpl("3"));
+		MyZone z3 = new MyZone(p3, gf, Id.create("3", MyZone.class));
 		zones.add(z3);
 
 		// Zone 4.
 		Coordinate c10 = new Coordinate(1000, -10500);
 		Coordinate[] ca4 = {c2,c10,c9,c3,c2};
 		Polygon[] p4 = {gf.createPolygon(gf.createLinearRing(ca4), null)};
-		MyZone z4 = new MyZone(p4, gf, new IdImpl("4"));
+		MyZone z4 = new MyZone(p4, gf, Id.create("4", MyZone.class));
 		zones.add(z4);
 
 		// Zone 5.
@@ -132,10 +131,10 @@ public class MyZoneToZoneRouterTest extends MatsimTestCase{
 		Coordinate c12 = new Coordinate(5500, 6500);
 		Coordinate[] ca5 = {c10,c11,c12,c7,c10};
 		Polygon[] p5 = {gf.createPolygon(gf.createLinearRing(ca5), null)};
-		MyZone z5 = new MyZone(p5, gf, new IdImpl("5"));
+		MyZone z5 = new MyZone(p5, gf, Id.create("5", MyZone.class));
 		zones.add(z5);	
 
-		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()); 
+		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig()); 
 		// Read plans and network.
 		MatsimNetworkReader nr = new MatsimNetworkReader(scenario);
 		nr.readFile(inputFolder + "/output_network.xml.gz");

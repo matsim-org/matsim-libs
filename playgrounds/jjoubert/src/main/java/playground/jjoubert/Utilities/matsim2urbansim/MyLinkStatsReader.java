@@ -31,7 +31,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.trafficmonitoring.TravelTimeData;
 import org.matsim.core.trafficmonitoring.TravelTimeDataArray;
 import org.matsim.core.utils.io.IOUtils;
@@ -53,10 +52,10 @@ public class MyLinkStatsReader {
 	 * @param hour for which the travel time is read.
 	 * @return
 	 */
-	public Map<Id, Double> readSingleHour(final String hour){
+	public Map<Id<Link>, Double> readSingleHour(final String hour){
 		log.info("Reading link statistics for hour " + hour + " from " + this.file.getAbsolutePath());
 		
-		Map<Id,Double> travelTimes = new TreeMap<Id, Double>();
+		Map<Id<Link>,Double> travelTimes = new TreeMap<Id<Link>, Double>();
 		Integer index = null;
 		BufferedReader input;
 		int linkCounter = 0;
@@ -91,7 +90,7 @@ public class MyLinkStatsReader {
 				while( (theLine = input.readLine()) != null ){
 					String line[] = theLine.split("\t");
 					if(line.length == header.length){
-						travelTimes.put(new IdImpl(line[0]), Double.parseDouble(line[index]));
+						travelTimes.put(Id.create(line[0], Link.class), Double.parseDouble(line[index]));
 					}
 					
 					// Report progress.
@@ -120,10 +119,10 @@ public class MyLinkStatsReader {
 	 * @param stat the summary statistic to use. Acceptable values are "min", 
 	 * 		"avg" and "max".
 	 */
-	public Map<Id, TravelTimeData> buildTravelTimeDataObject(Scenario s, String stat) {
+	public Map<Id<Link>, TravelTimeData> buildTravelTimeDataObject(Scenario s, String stat) {
 		log.info("Creating TravelTimeData map using " + stat + " travel times from " + file.getAbsolutePath());
 		
-		Map<Id, TravelTimeData> ttm = new TreeMap<Id, TravelTimeData>();
+		Map<Id<Link>, TravelTimeData> ttm = new TreeMap<Id<Link>, TravelTimeData>();
 		Integer index = null;
 		int linkCounter = 0;
 		int linkMultiplier = 1;
@@ -148,7 +147,7 @@ public class MyLinkStatsReader {
 				String line = null;
 				while((line = br.readLine()) != null){
 					String[] values = line.split("\t");
-					Id linkId = new IdImpl(values[0]);
+					Id<Link> linkId = Id.create(values[0], Link.class);
 					Link l = s.getNetwork().getLinks().get(linkId);
 					TravelTimeData ttd = new TravelTimeDataArray(l, 24);
 					try{
@@ -178,10 +177,10 @@ public class MyLinkStatsReader {
 		return ttm;
 	}
 	
-	public Map<Id, Double> readTotal(){
+	public Map<Id<Link>, Double> readTotal(){
 		log.info("Reading total volume link statistics from " + this.file.getAbsolutePath());
 		
-		Map<Id,Double> volToCap = new TreeMap<Id, Double>();
+		Map<Id<Link>,Double> volToCap = new TreeMap<>();
 		Integer index = null;
 		BufferedReader input;
 		int linkCounter = 0;
@@ -216,7 +215,7 @@ public class MyLinkStatsReader {
 				while( (theLine = input.readLine()) != null ){
 					String line[] = theLine.split("\t");
 					if(line.length == header.length){
-						volToCap.put(new IdImpl(line[0]), Double.parseDouble(line[index]));
+						volToCap.put(Id.create(line[0], Link.class), Double.parseDouble(line[index]));
 					}
 					
 					// Report progress.

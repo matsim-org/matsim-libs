@@ -54,8 +54,8 @@ import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelDisutility;
@@ -115,7 +115,7 @@ public class MyZoneToZoneRouter {
 		log.info("Zone to zone router prepared.");
 	}
 	
-	public boolean processZones(DenseDoubleMatrix2D matrix, Map<Id,Double> linkstats){
+	public boolean processZones(DenseDoubleMatrix2D matrix, Map<Id<Link>,Double> linkstats){
 		/* Create a list of zone Ids with links within them. This list will be 
 		 * used to generate the intra-zonal travel time for those zones without
 		 * any links by taking the mode of this list. */

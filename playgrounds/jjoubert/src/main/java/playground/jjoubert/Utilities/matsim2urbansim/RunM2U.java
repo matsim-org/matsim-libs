@@ -32,15 +32,13 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.config.ConfigUtils;
 
 import cern.colt.matrix.impl.DenseDoubleMatrix2D;
 
@@ -81,7 +79,7 @@ public class RunM2U {
 		/*
 		 * Next, get the public transport network.
 		 */
-		Scenario sPt = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario sPt = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader nr = new MatsimNetworkReader(sPt);
 //TODO		nr.readFile(cte.sb.getPtNetworkFilename());
 		
@@ -93,7 +91,7 @@ public class RunM2U {
 		Map<Id,Double> distanceToPt = new TreeMap<Id, Double>();
 		GeometryFactory gf = new GeometryFactory();
 		for(MyZone z : zones){
-			NodeImpl c = new NodeImpl(new IdImpl("dummy"));
+			NodeImpl c = new NodeImpl(Id.create("dummy", Node.class));
 			c.setCoord(new CoordImpl(z.getCentroid().getX(), z.getCentroid().getY()));
 			Node n = nPt.getNearestNode(c.getCoord());
 			if(n != null){

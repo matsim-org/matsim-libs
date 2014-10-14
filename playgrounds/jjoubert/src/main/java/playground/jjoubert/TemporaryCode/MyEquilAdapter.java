@@ -3,12 +3,16 @@ package playground.jjoubert.TemporaryCode;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.api.experimental.network.NetworkWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class MyEquilAdapter {
@@ -43,7 +47,7 @@ public class MyEquilAdapter {
 		int counter = 0;
 		int multiplier = 1;
 		
-		for(Id id : sc.getNetwork().getLinks().keySet()){
+		for(Id<Link> id : sc.getNetwork().getLinks().keySet()){
 			double old = sc.getNetwork().getLinks().get(id).getCapacity();
 			sc.getNetwork().getLinks().get(id).setCapacity(old*fraction);
 			
@@ -61,17 +65,17 @@ public class MyEquilAdapter {
 
 
 	private void createPlans(String plansfile, int numberOfPlans) {
-        PopulationFactory pf = (PopulationFactoryImpl) sc.getPopulation().getFactory();
+        PopulationFactory pf = sc.getPopulation().getFactory();
 		for(int i = 0; i < numberOfPlans; i++){
 			Plan plan = pf.createPlan();
-			Activity h1 = pf.createActivityFromLinkId("home", new IdImpl("1"));
+			Activity h1 = pf.createActivityFromLinkId("home", Id.create("1", Link.class));
 			h1.setEndTime(21600); // 06:00:00
 			plan.addActivity(h1);
 			
 			Leg l1 = pf.createLeg("car");
 			plan.addLeg(l1);
 			
-			Activity w = pf.createActivityFromLinkId("work", new IdImpl("20"));
+			Activity w = pf.createActivityFromLinkId("work", Id.create("20", Link.class));
 			w.setStartTime(25200); // 07:00:00
 			w.setEndTime(61200); // 17:00:00
 			plan.addActivity(w);
@@ -79,11 +83,11 @@ public class MyEquilAdapter {
 			Leg l2 = pf.createLeg("car");
 			plan.addLeg(l2);
 			
-			Activity h2 = pf.createActivityFromLinkId("home", new IdImpl("1"));
+			Activity h2 = pf.createActivityFromLinkId("home", Id.create("1", Link.class));
 			h2.setStartTime(64800); // 18:00:00
 			plan.addActivity(h2);
 			
-			Person p = pf.createPerson(new IdImpl(i));
+			Person p = pf.createPerson(Id.create(i, Person.class));
 			p.addPlan(plan);
 			sc.getPopulation().addPerson(p);
 		}
