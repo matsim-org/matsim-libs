@@ -100,5 +100,10 @@ public class TaxiRank
     public Vehicle getFirstTaxiFromRank(){
         return  this.taxisInRank.poll();
     }
+
+    public boolean hasCapacity()
+    {
+        return (taxisInRank.size()<this.capacity);
+    }
     
 }

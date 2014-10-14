@@ -140,6 +140,12 @@ public Id<Link> getLinkId()
 {
     return this.chargerLinkId;
 }
+public boolean hasCapacity(){
+    if (this.chargingVehicles.size()<this.CAPACITY){
+        return true;
+    }
+    else return false;
+}
 
 
 }

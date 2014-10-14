@@ -19,9 +19,7 @@
 
 package playground.jbischoff.taxi.optimizer.rank;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
@@ -99,6 +97,20 @@ public class TaxiRankHandler
     private boolean isRankLocation(Id linkId)
     {
         return (this.ranks.containsKey(linkId));
+    }
+
+
+    public boolean hasCapacityAtRank(Id linkId)
+    {
+        if (!isRankLocation(linkId))
+            throw new IllegalStateException(linkId + "has no taxirank");
+        return (this.ranks.get(linkId).hasCapacity());
+    }
+
+
+    public Map<Id, TaxiRank> getRanks()
+    {
+        return ranks;
     }
 
 }

@@ -86,6 +86,7 @@ public class ElectroCabLaunchUtils
                         20 * 1000 * 3600,Id.create(aid,org.matsim.contrib.transEnergySim.vehicles.api.Vehicle.class));
                 bevs.put(bev.getId(), bev);
                 ecabhandler.addVehicle(new ElectricTaxi(bev, v));
+                
             }
 
         }
@@ -112,8 +113,9 @@ public class ElectroCabLaunchUtils
         }
 
         events.addHandler(handlerGroup);
-
+        optimizer.setRankHandler(rankhandler);
         optimizer.setEcabhandler(ecabhandler);
+        optimizer.createNearestRankDb();
         optimizer.createNearestChargerDb();
 
         ElectricTaxiSimEngine taxiSimEngine = new ElectricTaxiSimEngine(optimizer, ecabhandler);

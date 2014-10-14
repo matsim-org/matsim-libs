@@ -60,6 +60,7 @@ public class VehicleGenerator
             removeVehiclesOnT1();
 
             int vehsToAdd = calculateNumberOfVehiclesToAdd(vehicleCounts[i]);
+            
             if (vehsToAdd > 0) {
                 addVehicles(vehsToAdd);
             }
@@ -102,7 +103,7 @@ public class VehicleGenerator
     {
         double maxT1 = currentTimePeriod + periodDuration;
         while (!activeVehicles.isEmpty()) {
-            if (activeVehicles.peek().getT1() < maxT1) {
+            if (activeVehicles.peek().getT1() > maxT1) {
                 return;
             }
 
@@ -128,6 +129,7 @@ public class VehicleGenerator
             double t0 = uniform.nextDouble(currentTimePeriod, maxT0);
             double workTime = uniform.nextDouble(minWorkTime, maxWorkTime);
             Vehicle veh = vehicleCreator.createVehicle(t0, t0 + workTime);
+            
             activeVehicles.add(veh);
             vehicles.add(veh);
         }

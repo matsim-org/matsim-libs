@@ -31,8 +31,7 @@ import org.matsim.signalsystems.model.SignalGroupState;
 import org.matsim.signalsystems.model.SignalSystem;
 import org.matsim.signalsystems.model.SignalSystemsManager;
 
-import playground.dgrether.signalsystems.analysis.DgSignalGreenSplitHandler;
-import playground.dgrether.signalsystems.analysis.DgSignalGroupAnalysisData;
+
 import playground.jbischoff.BAsignals.analysis.TimeCalcHandler;
 import playground.jbischoff.BAsignals.builder.JbSignalBuilder;
 import playground.jbischoff.BAsignals.model.AdaptiveControllHead;
@@ -52,7 +51,6 @@ public class JBSignalControllerListener implements StartupListener, IterationSta
 	private AdaptiveControllHead ach;
 
 	
-	private DgSignalGreenSplitHandler signalGreenSplitHandler;
 
 	public JBSignalControllerListener() {
 		this.collh = new CarsOnLaneHandler();
@@ -89,24 +87,30 @@ public class JBSignalControllerListener implements StartupListener, IterationSta
 
 	private void addControlerListeners(Controler c) {
 		// strange compilation error
-		signalGreenSplitHandler = new DgSignalGreenSplitHandler();
-		signalGreenSplitHandler.addSignalSystem(Id.create("18", SignalSystem.class));
-		signalGreenSplitHandler.addSignalSystem(Id.create("17", SignalSystem.class));
-		signalGreenSplitHandler.addSignalSystem(Id.create( "1", SignalSystem.class));
-		signalGreenSplitHandler.addSignalSystem(Id.create("28", SignalSystem.class));
-		signalGreenSplitHandler.addSignalSystem(Id.create("27", SignalSystem.class));
-		signalGreenSplitHandler.addSignalSystem(Id.create("12", SignalSystem.class));
-
-
-		c.getEvents().addHandler(signalGreenSplitHandler);
-		c.addControlerListener(new StartupListener() {
-
-			@Override
-			public void notifyStartup(StartupEvent e) {
-				e.getControler().getEvents()
-						.addHandler(signalGreenSplitHandler);
-			}
-		});
+//		signalGreenSplitHandler = new DgSignalGreenSplitHandler();
+//		signalGreenSplitHandler.addSignalSystem(new IdImpl("18"));
+//		signalGreenSplitHandler.addSignalSystem(new IdImpl("17"));
+//		signalGreenSplitHandler.addSignalSystem(new IdImpl("1"));
+//		signalGreenSplitHandler.addSignalSystem(new IdImpl("28"));
+//		signalGreenSplitHandler.addSignalSystem(new IdImpl("27"));
+//		signalGreenSplitHandler.addSignalSystem(new IdImpl("12"));
+//
+//
+//		c.getEvents().addHandler(signalGreenSplitHandler);
+//		c.addControlerListener(new StartupListener() {
+//
+//			public void notifyStartup(StartupEvent e) {
+//				e.getControler().getEvents()
+//						.addHandler(signalGreenSplitHandler);
+//			}
+//		});
+//		signalGreenSplitHandler = new DgSignalGreenSplitHandler();
+//		signalGreenSplitHandler.addSignalSystem(Id.create("18", SignalSystem.class));
+//		signalGreenSplitHandler.addSignalSystem(Id.create("17", SignalSystem.class));
+//		signalGreenSplitHandler.addSignalSystem(Id.create( "1", SignalSystem.class));
+//		signalGreenSplitHandler.addSignalSystem(Id.create("28", SignalSystem.class));
+//		signalGreenSplitHandler.addSignalSystem(Id.create("27", SignalSystem.class));
+//		signalGreenSplitHandler.addSignalSystem(Id.create("12", SignalSystem.class));
 
 		
 		c.addControlerListener(new IterationEndsListener() {
@@ -136,33 +140,33 @@ public class JBSignalControllerListener implements StartupListener, IterationSta
 
 			@Override
 			public void notifyShutdown(ShutdownEvent e) {
-				try {
-					FileWriter fw = new FileWriter(e.getControler().getConfig().controler().getOutputDirectory()+"signal_statistic.csv");
-					for (Id ssid : signalGreenSplitHandler.getSystemIdAnalysisDataMap().keySet()) {
-						for (Entry<Id, DgSignalGroupAnalysisData> entry : signalGreenSplitHandler
-								.getSystemIdAnalysisDataMap().get(ssid)
-								.getSystemGroupAnalysisDataMap().entrySet()) {
-							// logg.info("for signalgroup: "+entry.getKey());
-							for (Entry<SignalGroupState, Double> ee : entry
-									.getValue().getStateTimeMap().entrySet()) {
-								// logg.info(ee.getKey()+": "+ee.getValue());
-							fw.append(ssid + ";" + entry.getKey() + ";"
-										+ ee.getKey() + ";" + ee.getValue()+";\n");
-
-							}
-						}
-					}				
-				fw.flush();
-				fw.close();
-				logg.info("Wrote signalsystemstats.");
-				
-				
-				
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-
+//				try {
+//					FileWriter fw = new FileWriter(e.getControler().getConfig().controler().getOutputDirectory()+"signal_statistic.csv");
+//					for (Id ssid : signalGreenSplitHandler.getSystemIdAnalysisDataMap().keySet()) {
+//						for (Entry<Id, DgSignalGroupAnalysisData> entry : signalGreenSplitHandler
+//								.getSystemIdAnalysisDataMap().get(ssid)
+//								.getSystemGroupAnalysisDataMap().entrySet()) {
+//							// logg.info("for signalgroup: "+entry.getKey());
+//							for (Entry<SignalGroupState, Double> ee : entry
+//									.getValue().getStateTimeMap().entrySet()) {
+//								// logg.info(ee.getKey()+": "+ee.getValue());
+//							fw.append(ssid + ";" + entry.getKey() + ";"
+//										+ ee.getKey() + ";" + ee.getValue()+";\n");
+//
+//							}
+//						}
+//					}				
+//				fw.flush();
+//				fw.close();
+//				logg.info("Wrote signalsystemstats.");
+//				
+//				
+//				
+//				} catch (IOException e1) {
+//					// TODO Auto-generated catch block
+//					e1.printStackTrace();
+//				}
+//
 
 			}
 		}

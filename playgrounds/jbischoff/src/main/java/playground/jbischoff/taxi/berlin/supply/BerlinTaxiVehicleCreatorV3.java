@@ -64,6 +64,7 @@ public class BerlinTaxiVehicleCreatorV3
 
     double evShare;
     double maxTime;
+    double minTime;
 
 
     public static void main(String[] args)
@@ -79,7 +80,8 @@ public class BerlinTaxiVehicleCreatorV3
 
         BerlinTaxiVehicleCreatorV3 btv = new BerlinTaxiVehicleCreatorV3();
         btv.evShare = 1.0;
-        btv.maxTime = 14.0 * 3600;
+        btv.maxTime = 20.0 * 3600;
+        btv.minTime = 15.0 * 3600;
         btv.readTaxisOverTime(taxisOverTimeFile);
         btv.createAverages(SDF.parse("2013-04-16 04:00:00"), 1);
         btv.prepareNetwork(networkFile, zoneShpFile, zoneXmlFile);
@@ -135,18 +137,25 @@ public class BerlinTaxiVehicleCreatorV3
         taxisOverTimeHourlyAverage = new double[24];
         int sum = 0;
         int hour = 0;
+        int n = 0;
 
         for (long t = startTime; t < endTime; t++) {
-            sum += this.taxisOverTime.get(new Date(t * 1000));//seconds -> milliseconds
-
+            if (this.taxisOverTime.containsKey(new Date(t * 1000))){
+                sum += this.taxisOverTime.get(new Date(t * 1000));//seconds -> milliseconds
+                n++;
+            }
             if ( (t + 1) % 3600 == 0) {
-                taxisOverTimeHourlyAverage[hour % 24] += (double)sum / 3600 / days;
+                taxisOverTimeHourlyAverage[hour % 24] += (double)sum / n / days;
                 sum = 0;
                 hour++;
+                n = 0;
             }
         }
 
-        System.out.println(Arrays.asList(taxisOverTimeHourlyAverage));
+        for (int i = 0; i<24;i++){
+            System.out.println(i+ " : "+ taxisOverTimeHourlyAverage[i]);
+            
+        }
     }
 
 
@@ -164,7 +173,7 @@ public class BerlinTaxiVehicleCreatorV3
     private void createVehicles()
     {
         BerlinTaxiCreator btc = new BerlinTaxiCreator(scenario, zones, wrs, evShare);
-        VehicleGenerator vg = new VehicleGenerator(maxTime, maxTime, btc);
+        VehicleGenerator vg = new VehicleGenerator(4*3600, maxTime, btc);
         vg.generateVehicles(taxisOverTimeHourlyAverage, 4 * 3600, 3600);
         vehicles = vg.getVehicles();
     }

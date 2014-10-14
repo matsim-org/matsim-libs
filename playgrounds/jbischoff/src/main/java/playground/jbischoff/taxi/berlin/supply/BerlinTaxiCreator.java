@@ -84,18 +84,18 @@ public class BerlinTaxiCreator
         Id<Vehicle> vehId = Id.create(vehIdString, Vehicle.class);
 
         Link link = getRandomLinkInLor(lorId);
-        Vehicle v = new VehicleImpl(vehId, link, PAXPERCAR, t0, t1);
+        Vehicle v = new VehicleImpl(vehId, link, PAXPERCAR, Math.round(t0), Math.round(t1));
         return v;
     }
 
 
     private Link getRandomLinkInLor(Id<Zone> lorId)
     {
-        log.info(lorId);
+//        log.info(lorId);
         Id<Zone> id = lorId;
         if (lorId.toString().length() == 7)
             id = Id.create("0" + lorId.toString(), Zone.class);
-        log.info(id);
+//        log.info(id);
         Point p = TaxiDemandWriter.getRandomPointInFeature(RND, this.zones.get(id)
                 .getMultiPolygon());
         Coord coord = ct.transform(new CoordImpl(p.getX(), p.getY()));

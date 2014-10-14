@@ -24,7 +24,7 @@ public class ElectricTaxi
     {
         this.bev = bev;
         this.veh = veh;
-        this.vehicleId = Id.create(veh.getId(),ElectricTaxi.class);
+        this.vehicleId = Id.create(bev.getId(),ElectricTaxi.class);
         this.isElectric = true;
     }
 

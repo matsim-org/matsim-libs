@@ -167,6 +167,7 @@ public class ElectricTaxiChargingHandler
     public void addVehicle(ElectricTaxi taxi)
     {
         this.vehicles.put(taxi.getVehicleId(), taxi);
+        log.info("added vehicle "+taxi.getVehicleId());
     }
 
 
