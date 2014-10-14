@@ -43,7 +43,7 @@ public class DemandGeneratorOnePersonV2 {
 		String shapeFileMunicipalities = "D:/Workspace/data/cemdapMatsimCadyts/input/shapefiles/gemeindenBerlin.shp";
 		String shapeFileLors = "D:/Workspace/data/cemdapMatsimCadyts/input/shapefiles/Bezirksregion_EPSG_25833.shp";
 		
-		String outputBase = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/test/04/";
+		String outputBase = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/test/";
 		//String outputBase = "D:/Workspace/container/demand/input/cemdap_berlin/test/04/";
 		
 		// create a PendlerMatrixReader and store its output to a list

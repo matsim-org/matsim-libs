@@ -31,9 +31,10 @@ import com.vividsolutions.jts.geom.Point;
  * @author dziemke
  * 
  * This class takes a given population/plans file and matches all activities of all plans of all persons to a given
- * shapefile. The feature keys, i.e. zone IDs are stored for each activity as facility id.
- * Note: No facilities are used. The facility id field is simply used to get the information on zones into the plans
- * file.
+ * shapefile. The feature keys, i.e. zone ids are stored for each activity as facility id (sic!) in a modified plans
+ * file (=the output of this class).
+ * Note: No "real" facilities are used. The facility id field is simply used to get the information on zones into
+ * the plans file.
  * 
  */
 public class AddZoneToOutputPlan {
@@ -45,9 +46,13 @@ public class AddZoneToOutputPlan {
 	static int iteration = 150;
 	
 	/// input and output files
-	static String inputPlansFile = "D:/Workspace/data/cemdapMatsimCadyts/output/" + runId + "/ITERS/it." + iteration
+//	static String inputPlansFile = "D:/Workspace/data/cemdapMatsimCadyts/output/" + runId + "/ITERS/it." + iteration
+//			+ "/" + runId + "." + iteration + ".plans.xml.gz";
+//	static String outputPlansFile = "D:/Workspace/data/cemdapMatsimCadyts/output/" + runId + "/ITERS/it." + iteration
+//			+ "/" + runId + "." + iteration + ".plansWithZonesAsFacilities.xml.gz";
+	static String inputPlansFile = "D:/Workspace/runs-svn/cemdapCadyts/output/" + runId + "/ITERS/it." + iteration
 			+ "/" + runId + "." + iteration + ".plans.xml.gz";
-	static String outputPlansFile = "D:/Workspace/data/cemdapMatsimCadyts/output/" + runId + "/ITERS/it." + iteration
+	static String outputPlansFile = "D:/Workspace/runs-svn/cemdapCadyts/output/" + runId + "/ITERS/it." + iteration
 			+ "/" + runId + "." + iteration + ".plansWithZonesAsFacilities.xml.gz";
 	
 	static String combinedShapeFile = "D:/Workspace/data/cemdapMatsimCadyts/input/shapefiles/gemeindenLOR_DHDN_GK4.shp";
