@@ -17,9 +17,9 @@ import org.matsim.core.scenario.ScenarioUtils;
  * @author dziemke
  * 
  * Reads in a plans file and copies person with their plans into a new plans file according to a
- * configurable {@values electionProbability}. Then writes new plans file to a given location.
+ * configurable {@values selectionProbability}. Then writes new plans file to a given location.
  */
-public class PlanFileModifier {
+public class RandomPlanSelector {
 	// Parameters
 	//static double selectionProbability = 0.01;
 	static double selectionProbability = 1.;

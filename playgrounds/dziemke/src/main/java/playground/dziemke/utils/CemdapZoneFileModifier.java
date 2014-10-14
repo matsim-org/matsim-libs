@@ -27,69 +27,59 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-/**
- * @author dziemke
- * 
- * extracts weekday and weekend specific entries of SrV household/person/trip dataset and writes then to separate files
- */
-public class SrVFileModifier {
 
-	// specify in- and output files
-	private static String inputFile = new String("D:/VSP/Masterarbeit/Data/SrV2008/Scientific/Neukodiert/H2008_Berlin2.csv");
-	private static String outputFileWeekday = new String("D:/VSP/Masterarbeit/Data/SrV2008/Scientific/Neukodiert/H2008_Berlin_Weekday.dat");
-	private static String outputFileWeekend = new String("D:/VSP/Masterarbeit/Data/SrV2008/Scientific/Neukodiert/H2008_Berlin_Weekend.dat");
+public class CemdapZoneFileModifier {
+
+	// specify in- and output files and number of last column that stays unchanged
+	// start counting column with 1 (not with 0).
+	private static String inputFile = new String("D:/Workspace/container/demand/input/cemdap_samples/zones.dat");
+	private static String outputFile = new String("D:/Workspace/container/demand/input/cemdap_samples_reduced/zones.dat");
 	
-		
+	// private int numberOfLastUnchangedColumn = 14; 
+	
+	
 	public static void main(String[] args) {
 		FileReader fileReader;
 		BufferedReader bufferedReader;
-		
-		int lineCounter = 0;
 				
-		BufferedWriter bufferedWriterWeekday = null;
-		BufferedWriter bufferedWriterWeekend = null;
+		BufferedWriter bufferedWriter = null;
 		
 		try {
 			fileReader = new FileReader(inputFile);
 			bufferedReader = new BufferedReader(fileReader);
 					
-			File outputWeekday = new File(outputFileWeekday);
-    		FileWriter fileWriterWeekday = new FileWriter(outputWeekday);
-    		bufferedWriterWeekday = new BufferedWriter(fileWriterWeekday);
-    		
-    		
-    		File outputWeekend = new File(outputFileWeekend);
-    		FileWriter fileWriterWeekend = new FileWriter(outputWeekend);
-    		bufferedWriterWeekend = new BufferedWriter(fileWriterWeekend);
+			File output = new File(outputFile);
+    		FileWriter fileWriter = new FileWriter(output);
+    		bufferedWriter = new BufferedWriter(fileWriter);
 			
 			String line = null;
 						
 			
 			while ((line = bufferedReader.readLine()) != null) {
-				String[] entry = line.split(";");
-				String entryLine = line;
+				String[] entry = line.split("\t");
 				
-				lineCounter++;
+				// (re-)write original entries
 				
-				if (lineCounter == 1) {
-					bufferedWriterWeekday.write(entryLine);
-					bufferedWriterWeekday.newLine();
-					bufferedWriterWeekend.write(entryLine);
-					bufferedWriterWeekend.newLine();
-				} else {
-					// first entry is "ST_CODE"
-					// "1" = weekday, "111" = weekend
-					if (Integer.parseInt(entry[0]) == 1) {
-						bufferedWriterWeekday.write(entryLine);
-						bufferedWriterWeekday.newLine();
-					} else if (Integer.parseInt(entry[0]) == 111) {
-						bufferedWriterWeekend.write(entryLine);
-						bufferedWriterWeekend.newLine();
-					} else {
-						System.err.println("Error!");
-					}
+				// gradually put non-required (according to documentation) variables to zero
+				// which are in columns before column 14
+				
+				// for (int i=0; i<numberOfLastUnchangedColumn; i++) {
+					// bufferedWriter.write(entry[0] + "\t" + 0 + "\t" + entry[2] + "\t" + entry[3] + "\t" + entry[4]
+					//		+ "\t" + entry[5] + "\t" + entry[6] + "\t" + entry[7] + "\t" + 0 + "\t" + 0
+					//		+ "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t");
+					bufferedWriter.write(entry[0] + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0
+								+ "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0
+								+ "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t" + 0 + "\t");
+				//}
+				
+				// write zeros
+				// here number hard-coded
+				for (int i=14; i<entry.length-1; i++) {
+					bufferedWriter.write(0 + "\t");
 				}
-				
+				// write last entry without tab split
+				bufferedWriter.write("0");				
+        		bufferedWriter.newLine();
         			
 			}
 		
@@ -101,14 +91,9 @@ public class SrVFileModifier {
         } finally {
             //Close the BufferedWriter
             try {
-                if (bufferedWriterWeekday != null) {
+                if (bufferedWriter != null) {
                     // bufferedWriter.flush();
-                    bufferedWriterWeekday.close();
-                }
-                
-                if (bufferedWriterWeekend != null) {
-                    // bufferedWriter.flush();
-                    bufferedWriterWeekend.close();
+                    bufferedWriter.close();
                 }
             } catch (IOException ex) {
                 ex.printStackTrace();

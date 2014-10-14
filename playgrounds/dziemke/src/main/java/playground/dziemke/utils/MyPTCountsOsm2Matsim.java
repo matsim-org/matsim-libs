@@ -35,7 +35,7 @@ import playground.andreas.osmBB.osm2counts.Osm2Counts;
 
 // based on "package playground.andreas.osmBB.PTCountsOsm2Matsim"
 
-public class PTCountsOsm2Matsim {
+public class MyPTCountsOsm2Matsim {
 	
 
 	public static void main(String[] args) {
