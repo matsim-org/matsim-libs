@@ -35,7 +35,7 @@ public class GroupSizePreferencesConfigGroup extends ReflectiveModule {
 	private int minPref = 0;
 	private int maxPref = 0;
 
-	private double utilityOfMissingContact_util_s = -6;
+	private double utilityOfMissingContact_util_s = -6 / 3600d;
 
 	public GroupSizePreferencesConfigGroup() {
 		super( GROUP_NAME );
