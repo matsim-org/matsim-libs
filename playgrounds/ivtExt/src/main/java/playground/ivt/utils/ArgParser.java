@@ -28,36 +28,35 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 
 /**
  * @author thibautd
  */
 public class ArgParser {
 	private final Switches switchFactory = new Switches();
-	private final Map<Id, String> defaultValues = new LinkedHashMap<Id, String>();
-	private final Map<Id, List<String>> defaultMultipleValues = new LinkedHashMap<Id, List<String>>();
-	private final Set<Id> switches = new HashSet<Id>();
+	private final Map<Id<Switches>, String> defaultValues = new LinkedHashMap<>();
+	private final Map<Id<Switches>, List<String>> defaultMultipleValues = new LinkedHashMap<>();
+	private final Set<Id<Switches>> switches = new HashSet<>();
 
 	private boolean locked = false;
 
 	public void setDefaultValue( final String longName, final String shortName, final String v ) {
 		checkLock();
-		final Id id = switchFactory.addSwitch( longName , shortName );
+		final Id<Switches> id = switchFactory.addSwitch( longName , shortName );
 		final String old = defaultValues.put( id , v );
 		if ( old != null ) throw new IllegalStateException( longName+" "+shortName );
 	}
 
 	public void setDefaultValue( final String name, final String v ) {
 		checkLock();
-		final Id id = switchFactory.addSwitch( name );
+		final Id<Switches> id = switchFactory.addSwitch( name );
 		final String old = defaultValues.put( id , v );
 		if ( old != null ) throw new IllegalStateException( name );
 	}
 
 	public void setDefaultMultipleValue( final String name, final List<String> v ) {
 		checkLock();
-		final Id id = switchFactory.addSwitch( name );
+		final Id<Switches> id = switchFactory.addSwitch( name );
 		final List<String> old = defaultMultipleValues.put( id , v );
 		if ( old != null ) throw new IllegalStateException( name );
 	}
@@ -67,7 +66,7 @@ public class ArgParser {
 			final String shortName,
 			final List<String> v ) {
 		checkLock();
-		final Id id = switchFactory.addSwitch( longName , shortName );
+		final Id<Switches> id = switchFactory.addSwitch( longName , shortName );
 		final List<String> old = defaultMultipleValues.put( id , v );
 		if ( old != null ) throw new IllegalStateException( longName+" "+shortName );
 	}
@@ -96,7 +95,7 @@ public class ArgParser {
 		}
 
 		public String getValue(final String name) {
-			final Id id = switchFactory.getSwitch( name );
+			final Id<Switches> id = switchFactory.getSwitch( name );
 			if ( id.equals( Switches.unknown ) ) throw new IllegalArgumentException( name+" not in "+switchFactory.getNames() );
 
 			for ( int i=0; i < args.length; i++ ) {
@@ -129,7 +128,7 @@ public class ArgParser {
 		public List<String> getValues(final String name) {
 			final List<String> values = new ArrayList<String>();
 
-			final Id id = switchFactory.getSwitch( name );
+			final Id<Switches> id = switchFactory.getSwitch( name );
 			if ( id.equals( Switches.unknown ) ) throw new IllegalArgumentException( name+" not in "+switchFactory.getNames() );
 
 			for ( int i=0; i < args.length; i++ ) {
@@ -142,7 +141,7 @@ public class ArgParser {
 		}
 
 		public boolean isSwitched(final String name) {
-			final Id id = switchFactory.getSwitch( name );
+			final Id<Switches> id = switchFactory.getSwitch( name );
 			if ( id.equals( Switches.unknown ) ) throw new IllegalArgumentException( name+" not in "+switchFactory.getNames() );
 
 			for ( String a : args ) {
@@ -174,21 +173,21 @@ public class ArgParser {
 }
 
 class Switches {
-	private final Map<String, Id> name2id = new HashMap<String, Id>();
-	public static final Id unknown = new IdImpl( "unknown" );
+	private final Map<String, Id<Switches>> name2id = new HashMap<>();
+	public static final Id<Switches> unknown = Id.create( "unknown" , Switches.class);
 	private int c = 0;
 
-	public Id addSwitch( final String... names ) {
-		final Id id = new IdImpl( c++ );
+	public Id<Switches> addSwitch( final String... names ) {
+		final Id<Switches> id = Id.create( c++, Switches.class );
 		for ( String n : names ) {
-			final Id old = name2id.put( n , id );
+			final Id<Switches> old = name2id.put( n , id );
 			if ( old != null ) throw new IllegalStateException( old.toString() );
 		}
 		return id;
 	}
 
-	public Id getSwitch( final String name ) {
-		final Id id = name2id.get( name );
+	public Id<Switches> getSwitch( final String name ) {
+		final Id<Switches> id = name2id.get( name );
 		return id != null ? id : unknown;
 	}
 

@@ -23,15 +23,14 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
@@ -135,12 +134,12 @@ public class GenerateDummyFacilitiesForHomeAndWork {
 
 	private static ActivityFacility getFacility(
 			final Coord coord,
-			final Id linkId,
+			final Id<Link> linkId,
 			final String type,
 			final double opening,
 			final double closing,
 			final ActivityFacilities facilities ) {
-		final Id id = new IdImpl( type+"Facility-"+coord.getX()+"_"+coord.getY() );
+		final Id<ActivityFacility> id = Id.create( type+"Facility-"+coord.getX()+"_"+coord.getY() , ActivityFacility.class);
 		ActivityFacility facility = facilities.getFacilities().get( id );
 
 		if ( facility == null ) {
