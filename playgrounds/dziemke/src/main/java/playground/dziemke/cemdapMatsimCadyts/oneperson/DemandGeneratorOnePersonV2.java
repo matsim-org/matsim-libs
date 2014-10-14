@@ -15,7 +15,7 @@ import org.apache.log4j.Logger;
 
 import playground.dziemke.cemdapMatsimCadyts.CommuterFileReader;
 import playground.dziemke.cemdapMatsimCadyts.CommuterRelation;
-import playground.dziemke.utils.LORShapeReader;
+import playground.dziemke.cemdapMatsimCadyts.MyShapeReader;
 
 public class DemandGeneratorOnePersonV2 {
 	private static final Logger log = Logger.getLogger(DemandGeneratorOnePersonV2.class);
@@ -37,13 +37,13 @@ public class DemandGeneratorOnePersonV2 {
 		Integer planningAreaId = 11000000;
 		
 		// input and output files
-		String commuterFileIn = "D:/VSP/Masterarbeit/Data/BA-Pendlerstatistik/Berlin2009/B2009Ge.txt";
-		String commuterFileOut = "D:/VSP/Masterarbeit/Data/BA-Pendlerstatistik/Berlin2009/B2009Ga.txt";
+		String commuterFileIn = "D:/VSP/CemdapMatsimCadyts/Data/BA-Pendlerstatistik/Berlin2009/B2009Ge.txt";
+		String commuterFileOut = "D:/VSP/CemdapMatsimCadyts/Data/BA-Pendlerstatistik/Berlin2009/B2009Ga.txt";
 		
-		String shapeFileMunicipalities = "D:/Workspace/container/demand/input/shapefiles/gemeindenBerlin.shp";
-		String shapeFileLors = "D:/Workspace/container/demand/input/shapefiles/Bezirksregion_EPSG_25833.shp";
+		String shapeFileMunicipalities = "D:/Workspace/data/cemdapMatsimCadyts/input/shapefiles/gemeindenBerlin.shp";
+		String shapeFileLors = "D:/Workspace/data/cemdapMatsimCadyts/input/shapefiles/Bezirksregion_EPSG_25833.shp";
 		
-		String outputBase = "D:/Workspace/container/demand/input/cemdap_berlin/test/";
+		String outputBase = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/test/04/";
 		//String outputBase = "D:/Workspace/container/demand/input/cemdap_berlin/test/04/";
 		
 		// create a PendlerMatrixReader and store its output to a list
@@ -62,7 +62,7 @@ public class DemandGeneratorOnePersonV2 {
 		
 		// read in LORs	
 		// readShape(shapeFileLors, lors);
-		LORShapeReader.readShape(shapeFileLors, lors);
+		MyShapeReader.readShape(shapeFileLors, lors, "SCHLUESSEL", "LOR");
 		
 		// create households and persons
 		int householdIdCounter = 1;
@@ -154,8 +154,8 @@ public class DemandGeneratorOnePersonV2 {
 			}
 		}
 		
-
-//	private static void readShape(String shapeFileLors, Map<Integer, String> lors) {
+	
+//	public static void readShape(String shapeFileLors, Map<Integer, String> lors) {
 //		Collection<SimpleFeature> allLors = ShapeFileReader.getAllFeatures(shapeFileLors);
 //	
 //		for (SimpleFeature lor : allLors) {

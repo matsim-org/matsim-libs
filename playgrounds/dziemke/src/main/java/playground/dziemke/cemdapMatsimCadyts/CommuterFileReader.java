@@ -32,6 +32,7 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.opengis.feature.simple.SimpleFeature;
 
+
 /**
  * @author dziemke
  * Based on "playground.vsp.demandde.pendlermatrix.PendlerMatrixReader.java"
@@ -60,24 +61,26 @@ public class CommuterFileReader {
 		this.commuterFileOut = commuterFileOut;
 		this.carShareBE = carShareBE;
 		this.factor = factor;
-		readShape();
+		//readShape();
+		// NR = Gemeindeschluessel
+		MyShapeReader.readShape(this.shapeFile, municipalitiesMap, "NR", "NAME");
 		readFile(commuterFileIn, planningAreaId);
 		readFile(commuterFileOut, planningAreaId);
 	}
 	
 	
 	// read in municipality shapefile and store keys and names to a map
-	private void readShape() {
-		Collection<SimpleFeature> municipalities = ShapeFileReader.getAllFeatures(this.shapeFile);
-		for (SimpleFeature municipality : municipalities) {
-			// municipalityKey = Gemeindeschluessel
-			Integer municipalityKey = Integer.parseInt((String) municipality.getAttribute("NR"));
-			String name = (String) municipality.getAttribute("NAME");
-			municipalitiesMap.put(municipalityKey, name);			
-		}
-	}
+//	private void readShape() {
+//		Collection<SimpleFeature> municipalities = ShapeFileReader.getAllFeatures(this.shapeFile);
+//		for (SimpleFeature municipality : municipalities) {
+//			// municipalityKey = Gemeindeschluessel
+//			Integer municipalityKey = Integer.parseInt((String) municipality.getAttribute("NR"));
+//			String name = (String) municipality.getAttribute("NAME");
+//			municipalitiesMap.put(municipalityKey, name);			
+//		}
+//	}
 	
-	
+		
 	// read in the commuter file and extract and store relevant information
 	private void readFile(final String filename, final String planningAreaId) {
 		log.info("======================" + "\n"
