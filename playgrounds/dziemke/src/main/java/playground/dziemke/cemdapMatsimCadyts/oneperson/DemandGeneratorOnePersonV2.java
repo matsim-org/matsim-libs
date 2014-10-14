@@ -15,7 +15,7 @@ import org.apache.log4j.Logger;
 
 import playground.dziemke.cemdapMatsimCadyts.CommuterFileReader;
 import playground.dziemke.cemdapMatsimCadyts.CommuterRelation;
-import playground.dziemke.cemdapMatsimCadyts.MyShapeReader;
+import playground.dziemke.utils.TwoAttributeShapeReader;
 
 public class DemandGeneratorOnePersonV2 {
 	private static final Logger log = Logger.getLogger(DemandGeneratorOnePersonV2.class);
@@ -62,7 +62,7 @@ public class DemandGeneratorOnePersonV2 {
 		
 		// read in LORs	
 		// readShape(shapeFileLors, lors);
-		MyShapeReader.readShape(shapeFileLors, lors, "SCHLUESSEL", "LOR");
+		TwoAttributeShapeReader.readShape(shapeFileLors, lors, "SCHLUESSEL", "LOR");
 		
 		// create households and persons
 		int householdIdCounter = 1;

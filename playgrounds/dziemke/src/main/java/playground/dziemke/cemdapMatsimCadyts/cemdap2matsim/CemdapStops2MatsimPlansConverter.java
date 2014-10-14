@@ -78,24 +78,24 @@ public class CemdapStops2MatsimPlansConverter {
 		new NetworkReaderMatsimV1(scenario).parse(networkFile);
 		
 		// write all (geographic) features of planning area to a map
-		Map<String,SimpleFeature> cemdapTazFeatures = new HashMap<String, SimpleFeature>();
+		Map<String,SimpleFeature> combinedFeatures = new HashMap<String, SimpleFeature>();
 		for (SimpleFeature feature: ShapeFileReader.getAllFeatures(tazShapeFile)) {
 			Integer schluessel = Integer.parseInt((String) feature.getAttribute("NR"));
 			String id = schluessel.toString();
-			cemdapTazFeatures.put(id,feature);
+			combinedFeatures.put(id,feature);
 		}
 
 		// parse cemdap stops file
 		for (int i=0; i<numberOfPlans; i++) {
 			new CemdapStopsParser().parse(cemdapStopFilesMap.get(i), i, scenario, personObjectAttributesMap.get(i), false);
-			new Feature2Coord().assignCoords(scenario, i, personObjectAttributesMap.get(i), cemdapTazFeatures);
+			new Feature2Coord().assignCoords(scenario, i, personObjectAttributesMap.get(i), combinedFeatures);
 		}
 				
 		// if applicable, add a stay-home plan
 		if (addStayHomePlan == true) {
 			int planNumber = numberOfPlans;
 			new CemdapStopsParser().parse(cemdapStopFilesMap.get(0), planNumber, scenario, personObjectAttributesMap.get(0), true);
-			new Feature2Coord().assignCoords(scenario, planNumber, personObjectAttributesMap.get(0), cemdapTazFeatures);
+			new Feature2Coord().assignCoords(scenario, planNumber, personObjectAttributesMap.get(0), combinedFeatures);
 		}
 			
 		// check if number of plans that each agent has is correct

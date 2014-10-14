@@ -32,6 +32,8 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.opengis.feature.simple.SimpleFeature;
 
+import playground.dziemke.utils.TwoAttributeShapeReader;
+
 
 /**
  * @author dziemke
@@ -63,7 +65,7 @@ public class CommuterFileReader {
 		this.factor = factor;
 		//readShape();
 		// NR = Gemeindeschluessel
-		MyShapeReader.readShape(this.shapeFile, municipalitiesMap, "NR", "NAME");
+		TwoAttributeShapeReader.readShape(this.shapeFile, municipalitiesMap, "NR", "NAME");
 		readFile(commuterFileIn, planningAreaId);
 		readFile(commuterFileOut, planningAreaId);
 	}
