@@ -34,7 +34,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.households.Household;
 
 import playground.dziemke.analysis.Trip;
-import playground.dziemke.demand.Zone;
+import playground.dziemke.cemdapMatsimCadyts.Zone;
 
 /**
  * @author dziemke
