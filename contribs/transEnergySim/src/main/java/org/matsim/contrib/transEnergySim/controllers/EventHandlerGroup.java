@@ -136,7 +136,7 @@ PersonDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, Perso
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
 		for (EventHandler h : handler) {
-			if (h instanceof Wait2LinkEventHandler) {
+			if (h instanceof ActivityEndEventHandler) {
 				((ActivityEndEventHandler) h).handleEvent(event);
 			}
 		}	
