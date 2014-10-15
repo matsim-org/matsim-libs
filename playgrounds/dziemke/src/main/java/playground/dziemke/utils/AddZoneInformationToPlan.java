@@ -37,15 +37,16 @@ import com.vividsolutions.jts.geom.Point;
  * the plans file.
  * 
  */
+
 public class AddZoneInformationToPlan {
-	// private static final Logger log = Logger.getLogger(AddZoneToOutputPlan.class);
+	private static final Logger log = Logger.getLogger(AddZoneInformationToPlan.class);
 	private final static GeometryFactory geometryFactory = new GeometryFactory();
 	
 	// parameters
-	static String runId = "run_145f";
+	static String runId = "run_145";
 	static int iteration = 150;
 	
-	/// input and output files
+	// input and output files
 //	static String inputPlansFile = "D:/Workspace/data/cemdapMatsimCadyts/output/" + runId + "/ITERS/it." + iteration
 //			+ "/" + runId + "." + iteration + ".plans.xml.gz";
 //	static String outputPlansFile = "D:/Workspace/data/cemdapMatsimCadyts/output/" + runId + "/ITERS/it." + iteration
@@ -53,9 +54,9 @@ public class AddZoneInformationToPlan {
 	static String inputPlansFile = "D:/Workspace/runs-svn/cemdapCadyts/" + runId + "/ITERS/it." + iteration
 			+ "/" + runId + "." + iteration + ".plans.xml.gz";
 	static String outputPlansFile = "D:/Workspace/runs-svn/cemdapCadyts/" + runId + "/ITERS/it." + iteration
-			+ "/" + runId + "." + iteration + ".plansWithZonesAsFacilities.xml.gz";
-	
+			+ "/" + runId + "." + iteration + ".plansWithZonesAsFacilities2.xml.gz";
 	static String combinedShapeFile = "D:/Workspace/data/cemdapMatsimCadyts/input/shapefiles/gemeindenLOR_DHDN_GK4.shp";
+	
 	
 	public static void main(String[] args) {
 		// write all (geographic) features of planning area to a map
@@ -68,8 +69,7 @@ public class AddZoneInformationToPlan {
 			
 			combinedFeatures.put(zoneId,feature);
 		}
-		
-			
+					
 		// load output plans/population
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -107,12 +107,12 @@ public class AddZoneInformationToPlan {
 							Geometry geometry = (Geometry) feature.getDefaultGeometry();
 						
 							if (activityCoordAsPoint.within(geometry)) {
+								if (modifiedActivity.getFacilityId() != null) {
+									new RuntimeException("Faciliy ID should be empty since each activity can only" +
+											"fall within one zone!");
+								}
 								modifiedActivity.setFacilityId(id);
 							}							
-						}
-						
-						if (modifiedActivity == null) {
-							new RuntimeException("Modified activity must not be null!");
 						}
 						
 						if (modifiedActivity.getFacilityId() == null) {
@@ -137,8 +137,6 @@ public class AddZoneInformationToPlan {
 		// write population file
 		new PopulationWriter(modifiedScenario.getPopulation(), null).write(outputPlansFile);
 		
-	//		System.out.println("Analysis file " + outputPlansFile + " written.");
+	log.info("Modified plans file " + outputPlansFile + " written.");
 	}
-	
-	
 }
