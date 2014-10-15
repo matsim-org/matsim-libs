@@ -37,7 +37,7 @@ import com.vividsolutions.jts.geom.Point;
  * the plans file.
  * 
  */
-public class AddZoneToOutputPlan {
+public class AddZoneInformationToPlan {
 	// private static final Logger log = Logger.getLogger(AddZoneToOutputPlan.class);
 	private final static GeometryFactory geometryFactory = new GeometryFactory();
 	
