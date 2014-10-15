@@ -4,8 +4,10 @@ package playground.pieter.distributed;
 import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -14,11 +16,13 @@ import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.pieter.pseudosimulation.util.CollectionUtils;
 import playground.singapore.ptsim.qnetsimengine.PTQSimFactory;
 import playground.singapore.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
 import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTimeCalculatorSerializable;
+import playground.singapore.transitRouterEventsBased.waitTimes.WaitTimeCalculatorSerializable;
 import playground.singapore.transitRouterEventsBased.waitTimes.WaitTimeStuckCalculator;
 
 import java.io.IOException;
@@ -36,7 +40,7 @@ public class RepeatableMasterControler implements AfterMobsimListener, ShutdownL
     private final Logger masterLogger = Logger.getLogger(this.getClass());
     private Controler matsimControler;
     private Slave[] slaves;
-    private WaitTimeStuckCalculator waitTimeCalculator;
+    private WaitTimeCalculatorSerializable waitTimeCalculator;
     private StopStopTimeCalculatorSerializable stopStopTimeCalculator;
     private SerializableLinkTravelTimes linkTravelTimes;
     private AtomicInteger numThreads;
@@ -49,6 +53,7 @@ public class RepeatableMasterControler implements AfterMobsimListener, ShutdownL
         options.addOption("s", false, "Switch to indicate if this is the Singapore scenario, i.e. events-based routing");
         options.addOption("n", true, "Number of slaves to distribute to.");
         options.addOption("i", true, "Number of PSim iterations for every QSim iteration.");
+        options.addOption("r", false, "Perform initial routing of plans on slaves.");
         CommandLineParser parser = new BasicParser();
         CommandLine commandLine = parser.parse(options, args);
         int numSlaves = 0;
@@ -109,7 +114,7 @@ public class RepeatableMasterControler implements AfterMobsimListener, ShutdownL
             slaves[i].sendIds(idStrings);
         }
         if (config.scenario().isUseTransit()) {
-            waitTimeCalculator = new WaitTimeStuckCalculator(matsimControler.getPopulation(),matsimControler.getScenario().getTransitSchedule(), config.travelTimeCalculator().getTraveltimeBinSize(),
+            waitTimeCalculator = new WaitTimeCalculatorSerializable(matsimControler.getScenario().getTransitSchedule(), config.travelTimeCalculator().getTraveltimeBinSize(),
                     (int) (config.qsim().getEndTime() - config.qsim().getStartTime()));
             matsimControler.getEvents().addHandler(waitTimeCalculator);
             stopStopTimeCalculator = new StopStopTimeCalculatorSerializable(matsimControler.getScenario().getTransitSchedule(),
@@ -126,6 +131,24 @@ public class RepeatableMasterControler implements AfterMobsimListener, ShutdownL
             matsimControler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(config.planCalcScore(), matsimControler.getScenario()));
             //this qsim engine uses our boarding and alighting model, derived from smart card data
             matsimControler.setMobsimFactory(new PTQSimFactory());
+        }
+        if(commandLine.hasOption("r")) {
+        //initialize link travel times if you want to do remote routing
+            masterLogger.warn("ROUTING initial plans on slaves; received plans will be subjected to" + numberOfPSimIterations +
+                    " PSim iterations before executing on master.");
+            FreespeedTravelTimeAndDisutility disutility = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
+            linkTravelTimes = new SerializableLinkTravelTimes(disutility, config
+                    .travelTimeCalculator().getTraveltimeBinSize(), config.qsim().getEndTime(), matsimControler
+                    .getNetwork().getLinks().values());
+            numThreads = new AtomicInteger(slaves.length);
+            for (Slave slave : slaves) new Thread(slave).start();
+            while (numThreads.get() > 0)
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            mergePlansFromSlaves();
         }
         masterLogger.warn("master inited");
     }

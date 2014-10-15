@@ -62,6 +62,16 @@ class SlaveScenarioLoaderImpl {
 
 	private final ScenarioImpl scenario;
 
+    public boolean isValidating() {
+        return isValidating;
+    }
+
+    public void setValidating(boolean isValidating) {
+        this.isValidating = isValidating;
+    }
+
+    private boolean isValidating = true;
+
 	public SlaveScenarioLoaderImpl(Scenario scenario) {
 		this.scenario = (ScenarioImpl) scenario;
 		this.config = this.scenario.getConfig();
@@ -115,7 +125,9 @@ class SlaveScenarioLoaderImpl {
 			if (this.config.scenario().isUseTransit()) {
 				((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 			}
-			new MatsimNetworkReader(this.scenario).parse(networkFileName);
+            MatsimNetworkReader reader = new MatsimNetworkReader(this.scenario);
+            reader.setValidating(isValidating);
+            reader.parse(networkFileName);
 			if ((this.config.network().getChangeEventsInputFile() != null) && this.config.network().isTimeVariantNetwork()) {
 				log.info("loading network change events from " + this.config.network().getChangeEventsInputFile());
 				NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network);
@@ -135,7 +147,9 @@ class SlaveScenarioLoaderImpl {
 		if ((this.config.facilities() != null) && (this.config.facilities().getInputFile() != null)) {
 			String facilitiesFileName = this.config.facilities().getInputFile();
 			log.info("loading facilities from " + facilitiesFileName);
-			new MatsimFacilitiesReader(this.scenario).parse(facilitiesFileName);
+            MatsimFacilitiesReader facilitiesReader = new MatsimFacilitiesReader(this.scenario);
+            facilitiesReader.setValidating(isValidating);
+            facilitiesReader.parse(facilitiesFileName);
 			log.info("loaded " + this.scenario.getActivityFacilities().getFacilities().size() + " facilities from " + facilitiesFileName);
 		}
 		else {
@@ -161,7 +175,8 @@ class SlaveScenarioLoaderImpl {
 		if ((this.config.plans() != null) && (this.config.plans().getInputFile() != null)) {
 			String populationFileName = this.config.plans().getInputFile();
 			log.info("loading population from " + populationFileName);
-			new SlavePopulationReaderMatsimV5(this.scenario,idStrings).parse(populationFileName);
+            SlavePopulationReaderMatsimV5 slavePopulationReader = new SlavePopulationReaderMatsimV5(this.scenario, idStrings);
+            slavePopulationReader.parse(populationFileName);
 
 			if (this.scenario.getPopulation() instanceof PopulationImpl) {
 				((PopulationImpl)this.scenario.getPopulation()).printPlansCount();

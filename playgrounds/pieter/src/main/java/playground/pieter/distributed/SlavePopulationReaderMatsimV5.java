@@ -51,7 +51,7 @@ import java.util.Stack;
  * @author mrieser
  * @author balmermi
  */
-class SlavePopulationReaderMatsimV5 extends MatsimXmlParser implements PopulationReader {
+class SlavePopulationReaderMatsimV5 extends MatsimXmlParserLocalDTDs implements PopulationReader {
 
     private final static String POPULATION = "population";
     private final static String PERSON = "person";

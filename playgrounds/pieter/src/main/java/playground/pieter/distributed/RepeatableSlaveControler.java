@@ -101,6 +101,7 @@ public class RepeatableSlaveControler implements IterationStartsListener, Iterat
         options.addOption("p", true, "Port number of MasterControler");
         options.addOption("s", false, "Switch to indicate if this is the Singapore scenario, i.e. events-based routing");
         options.addOption("t", true, "Number of threads for parallel events handling.");
+        options.addOption("v", false, "Switch to disable validation of xml. Use for testing only.");
         CommandLineParser parser = new BasicParser();
         CommandLine commandLine = parser.parse(options, args);
         if (commandLine.hasOption("c")) {
@@ -163,7 +164,9 @@ public class RepeatableSlaveControler implements IterationStartsListener, Iterat
         config.parallelEventHandling().setNumberOfThreads(numThreadsForEventsHandling);
         config.controler().setOutputDirectory(config.controler().getOutputDirectory() + "_" + myNumber);
         Scenario scenario = ScenarioUtils.createScenario(config);
-        new SlaveScenarioLoaderImpl(scenario).loadScenario(idStrings);
+        SlaveScenarioLoaderImpl scenarioLoader = new SlaveScenarioLoaderImpl(scenario);
+        scenarioLoader.setValidating(commandLine.hasOption("v"));
+        scenarioLoader.loadScenario(idStrings);
         matsimControler = new Controler(scenario);
         matsimControler.setOverwriteFiles(true);
         matsimControler.setCreateGraphs(false);
