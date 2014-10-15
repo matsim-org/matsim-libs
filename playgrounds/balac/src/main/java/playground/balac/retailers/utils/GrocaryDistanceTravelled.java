@@ -4,12 +4,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -20,11 +20,13 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.balac.retailers.data.Retailer;
+
 public class GrocaryDistanceTravelled {
 
 	public static void main(String[] args) throws IOException {
 		
-		ArrayList<IdImpl> retailers = new ArrayList<IdImpl>();
+		ArrayList<Id<Retailer>> retailers = new ArrayList<>();
 		final BufferedReader readLink = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/Avignon/AvignonResults_1pc/retailersWithoutRepeatedLinks_MinDistCosts.txt");
 		
 		int numberOfFirstRetailer = 29;
@@ -36,7 +38,7 @@ public class GrocaryDistanceTravelled {
 		
 			String s = readLink.readLine();
 			String[] arr = s.split("\t");
-			retailers.add(new IdImpl(arr[1]));
+			retailers.add(Id.create(arr[1], Retailer.class));
 			
 			
 		}
@@ -45,7 +47,7 @@ public class GrocaryDistanceTravelled {
 			
 			String s = readLink.readLine();
 			String[] arr = s.split("\t");
-			retailers.add(new IdImpl(arr[1]));
+			retailers.add(Id.create(arr[1], Retailer.class));
 		}
 		
 		
@@ -82,7 +84,7 @@ public class GrocaryDistanceTravelled {
 		
 		}
 		
-		System.out.println((double)distance/(double)numberOfLegs);
+		System.out.println(distance/numberOfLegs);
 	}
 
 }

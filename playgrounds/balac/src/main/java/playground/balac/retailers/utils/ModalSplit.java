@@ -4,15 +4,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
@@ -35,7 +34,7 @@ public class ModalSplit {
 		populationReader.readFile(plansFilePath);
 		networkReader.readFile(networkFilePath);
 
-		ArrayList<IdImpl> a = new ArrayList<IdImpl>();
+		ArrayList<Id<ActivityFacility>> a = new ArrayList<>();
 		int count = 0;
 		int countCar = 0;
 		int countBike = 0;
@@ -49,8 +48,8 @@ public class ModalSplit {
 			
 				String s = readLink.readLine();
 				String[] arr = s.split("\t");
-				a.add(new IdImpl(arr[1]));
-				//scenario_new.getActivityFacilities().getFacilities().put(new IdImpl(arr[1]), f);
+				a.add(Id.create(arr[1], ActivityFacility.class));
+				//scenario_new.getActivityFacilities().getFacilities().put(Id.create(arr[1]), f);
 				
 			}
 			
@@ -58,7 +57,7 @@ public class ModalSplit {
 				
 				String s = readLink.readLine();
 				String[] arr = s.split("\t");
-				a.add(new IdImpl(arr[1]));
+				a.add(Id.create(arr[1], ActivityFacility.class));
 			}
 			double distance = 0.0;
 		Population pop = scenario.getPopulation();	

@@ -4,12 +4,14 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+
+import com.sun.syndication.feed.atom.Link;
 
 public class MunicipalitiesCSUsersCount {
 
@@ -38,8 +40,8 @@ public class MunicipalitiesCSUsersCount {
 		
 			if (true) {
 				
-				double x = scenario.getNetwork().getLinks().get(new IdImpl(arr[3])).getCoord().getX();
-				double y = scenario.getNetwork().getLinks().get(new IdImpl(arr[3])).getCoord().getY();
+				double x = scenario.getNetwork().getLinks().get(Id.create(arr[3], Link.class)).getCoord().getX();
+				double y = scenario.getNetwork().getLinks().get(Id.create(arr[3], Link.class)).getCoord().getY();
 				
 				if (x >= originX && y <= originY && x <= endX && y >= endY) {
 					

@@ -5,29 +5,21 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PointFeatureFactory;
-import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.io.IOUtils;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-import com.vividsolutions.jts.geom.Coordinate;
 
 public class CreateFacilitiesSHP {
 
@@ -43,9 +35,9 @@ public class CreateFacilitiesSHP {
 
 		final BufferedReader readLinkNoRetailers = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/RetailersSummary_noret");
 
-    	HashMap<IdImpl, Integer> beforeMove = new HashMap<IdImpl, Integer>();
-    	HashMap<IdImpl, Integer> afterMove = new HashMap<IdImpl, Integer>();
-    	HashMap<IdImpl, Boolean> moved = new HashMap<IdImpl, Boolean>();
+    	HashMap<Id<ActivityFacility>, Integer> beforeMove = new HashMap<>();
+    	HashMap<Id<ActivityFacility>, Integer> afterMove = new HashMap<>();
+    	HashMap<Id<ActivityFacility>, Boolean> moved = new HashMap<>();
 		
     	for(int j = 1; j <= numberOfIterations; j++) {
 			
@@ -54,41 +46,41 @@ public class CreateFacilitiesSHP {
 				String s = readLinkRetailers.readLine();
 				String[] arr = s.split("\t");
 			
-				afterMove.put(new IdImpl(arr[1]), Integer.parseInt(arr[5]));
+				afterMove.put(Id.create(arr[1], ActivityFacility.class), Integer.parseInt(arr[5]));
 				CoordImpl coord1 = new CoordImpl(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
 				s = readLinkNoRetailers.readLine();
 				arr = s.split("\t");
 			
-				beforeMove.put(new IdImpl(arr[1]), Integer.parseInt(arr[5]));
+				beforeMove.put(Id.create(arr[1], ActivityFacility.class), Integer.parseInt(arr[5]));
 				CoordImpl coord2 = new CoordImpl(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
 				if (coord1.getX() == coord2.getX() && coord1.getY() == coord2.getY()) {
 					
-					moved.put(new IdImpl(arr[1]), false);
+					moved.put(Id.create(arr[1], ActivityFacility.class), false);
 					
 				}
 				else
-					moved.put(new IdImpl(arr[1]), true);
+					moved.put(Id.create(arr[1], ActivityFacility.class), true);
 			}
 			for(int i = 0; i < numberOfSecondRetailer; i++) {
 			
 				String s = readLinkRetailers.readLine();
 				String[] arr = s.split("\t");
 			
-				afterMove.put(new IdImpl(arr[1]), Integer.parseInt(arr[5]));
+				afterMove.put(Id.create(arr[1], ActivityFacility.class), Integer.parseInt(arr[5]));
 				CoordImpl coord1 = new CoordImpl(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
 
 				s = readLinkNoRetailers.readLine();
 				arr = s.split("\t");
 			
-				beforeMove.put(new IdImpl(arr[1]), Integer.parseInt(arr[5]));
+				beforeMove.put(Id.create(arr[1], ActivityFacility.class), Integer.parseInt(arr[5]));
 				CoordImpl coord2 = new CoordImpl(Double.parseDouble(arr[2]), Double.parseDouble(arr[3]));
 				if (coord1.getX() == coord2.getX() && coord1.getY() == coord2.getY()) {
 					
-					moved.put(new IdImpl(arr[1]), false);
+					moved.put(Id.create(arr[1], ActivityFacility.class), false);
 					
 				}
 				else
-					moved.put(new IdImpl(arr[1]), true);
+					moved.put(Id.create(arr[1], ActivityFacility.class), true);
 			}
     	}
     	
@@ -100,11 +92,10 @@ public class CreateFacilitiesSHP {
         ActivityFacilities f = scenario.getActivityFacilities();     
         CoordinateReferenceSystem crs = MGC.getCRS("EPSG:21781");    // EPSG Code for Swiss CH1903_LV03 coordinate system
 
-        Collection featuresMovedIncrease = new ArrayList();
-        Collection featuresMovedDecrease = new ArrayList();
-        Collection featuresNotMovedIncrease = new ArrayList();
-        Collection featuresNotMovedDecrease = new ArrayList();
-        featuresMovedIncrease = new ArrayList();
+        Collection<SimpleFeature> featuresMovedIncrease = new ArrayList<>();
+        Collection<SimpleFeature> featuresMovedDecrease = new ArrayList<>();
+        Collection<SimpleFeature> featuresNotMovedIncrease = new ArrayList<>();
+        Collection<SimpleFeature> featuresNotMovedDecrease = new ArrayList<>();
         PointFeatureFactory nodeFactory = new PointFeatureFactory.Builder().
                 setCrs(crs).
                 setName("nodes").

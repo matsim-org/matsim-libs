@@ -7,9 +7,9 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
@@ -25,9 +25,9 @@ public class MinTravelCostModelNew extends RetailerModelImpl
 {
   private static final Logger log = Logger.getLogger(MaxActivityModel.class);
 
-  private TreeMap<Id, LinkRetailersImpl> availableLinks = new TreeMap<Id, LinkRetailersImpl>();
+  private TreeMap<Id<Link>, LinkRetailersImpl> availableLinks = new TreeMap<>();
 
-  public MinTravelCostModelNew(Controler controler, Map<Id, ActivityFacilityImpl> retailerFacilities)
+  public MinTravelCostModelNew(Controler controler, Map<Id<ActivityFacility>, ActivityFacilityImpl> retailerFacilities)
   {
     this.controler = controler;
     this.retailerFacilities = retailerFacilities;
@@ -62,7 +62,7 @@ public class MinTravelCostModelNew extends RetailerModelImpl
     for (Integer i = Integer.valueOf(0); i.intValue() < first.size(); i = Integer.valueOf(i.intValue() + 1)) {
       String linkId = this.first.get(i);
       //double scoreSum = 0.0D;
-      LinkRetailersImpl link = new LinkRetailersImpl(this.controler.getNetwork().getLinks().get(new IdImpl(linkId)), this.controler.getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
+      LinkRetailersImpl link = new LinkRetailersImpl(this.controler.getNetwork().getLinks().get(Id.create(linkId, Link.class)), this.controler.getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
       Collection<PersonPrimaryActivity> primaryActivities = Utils.getPersonPrimaryActivityQuadTree().get(link.getCoord().getX(), link.getCoord().getY(), 3000.0D);
       
       
@@ -96,8 +96,8 @@ public class MinTravelCostModelNew extends RetailerModelImpl
       }*/
       //TODO:at the moment the travel time is not cosidered in the fitness function
       
-      link.setScoreSum(1.0/(double)primaryActivities.size());
-      link.setPotentialCustomers(1.0/(double)primaryActivities.size());
+      link.setScoreSum(1.0/primaryActivities.size());
+      link.setPotentialCustomers(1.0/primaryActivities.size());
       this.availableLinks.put(link.getId(), link);
     }
   }
@@ -106,7 +106,7 @@ public class MinTravelCostModelNew extends RetailerModelImpl
 	  for (Integer i = Integer.valueOf(0); i.intValue() < first.size(); i = Integer.valueOf(i.intValue() + 1)) {
 	      String linkId = this.first.get(i);
 	     
-	      LinkRetailersImpl link = new LinkRetailersImpl(this.controler.getNetwork().getLinks().get(new IdImpl(linkId)), this.controler.getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
+	      LinkRetailersImpl link = new LinkRetailersImpl(this.controler.getNetwork().getLinks().get(Id.create(linkId, Link.class)), this.controler.getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
 	      
 	      Collection<ActivityFacility> facilities = Utils.getShopsQuadTree().get(link.getCoord().getX(), link.getCoord().getY(), 3000.0D);
 	      int numberShops = facilities.size();
@@ -114,7 +114,7 @@ public class MinTravelCostModelNew extends RetailerModelImpl
 	      if (numberShops == 1 || numberShops == 0)
 	    	  link.setPotentialCustomers(availableLinks.get(link.getId()).getScoreSum());
 	      else{
-	    	  link.setPotentialCustomers(availableLinks.get(link.getId()).getScoreSum() * (double)(numberShops));
+	    	  link.setPotentialCustomers(availableLinks.get(link.getId()).getScoreSum() * (numberShops));
 	      }
 	      
 	      link.setScoreSum(availableLinks.get(link.getId()).getScoreSum());
@@ -184,23 +184,23 @@ public class MinTravelCostModelNew extends RetailerModelImpl
 	  for (int s = 0; s < this.retailerFacilities.size(); ++s) {
 		  String linkId = this.first.get(solution.get(s));
 		 // Coord coord = new CoordImpl(1,1);
-		  Utils.addShopToShopsQuadTree(this.availableLinks.get(new IdImpl(linkId)).getCoord().getX(), this.availableLinks.get(new IdImpl(linkId)).getCoord().getY(), af);
+		  Utils.addShopToShopsQuadTree(this.availableLinks.get(Id.create(linkId, Link.class)).getCoord().getX(), this.availableLinks.get(Id.create(linkId, Link.class)).getCoord().getY(), af);
 	  }
 	  computePotentialCustomers();
 	  //log.info("computed potential");
 	  for (int s = 0; s < this.retailerFacilities.size(); ++s) {
 		  String linkId = this.first.get(solution.get(s));
-		  Fitness +=  this.availableLinks.get(new IdImpl(linkId)).getPotentialCustomers();
+		  Fitness +=  this.availableLinks.get(Id.create(linkId, Link.class)).getPotentialCustomers();
 	  }
 
 	  for (int s = 0; s < this.retailerFacilities.size(); ++s) {
 		  String linkId = this.first.get(solution.get(s));		 
-		  Utils.removeShopFromShopsQuadTree(this.availableLinks.get(new IdImpl(linkId)).getCoord().getX(), this.availableLinks.get(new IdImpl(linkId)).getCoord().getY(), af);
+		  Utils.removeShopFromShopsQuadTree(this.availableLinks.get(Id.create(linkId, Link.class)).getCoord().getX(), this.availableLinks.get(Id.create(linkId, Link.class)).getCoord().getY(), af);
 	  }
 	  return Fitness;
   }
 
-  public Map<Id, ActivityFacilityImpl> getScenarioShops() {
+  public Map<Id<ActivityFacility>, ActivityFacilityImpl> getScenarioShops() {
     return this.shops;
   }
 }

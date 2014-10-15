@@ -5,8 +5,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -35,7 +36,7 @@ public class RentalLocationsSHSP {
 			final BufferedReader readLink = IOUtils.getBufferedReader(args[1]);
 			
 			
-			 Collection featuresMovedIncrease = new ArrayList();
+			 Collection<SimpleFeature> featuresMovedIncrease = new ArrayList<>();
 		        featuresMovedIncrease = new ArrayList<SimpleFeature>();
 		        PointFeatureFactory nodeFactory = new PointFeatureFactory.Builder().
 		                setCrs(crs).
@@ -46,7 +47,7 @@ public class RentalLocationsSHSP {
 		                
 		                create();
 		        
-		        Collection featuresMovedIncrease2 = new ArrayList();
+		        Collection<SimpleFeature> featuresMovedIncrease2 = new ArrayList<>();
 		        featuresMovedIncrease2 = new ArrayList<SimpleFeature>();
 		        PointFeatureFactory nodeFactory2 = new PointFeatureFactory.Builder().
 		                setCrs(crs).
@@ -66,11 +67,11 @@ public class RentalLocationsSHSP {
 				
 				if (arr[1].contains("c")) {
 				
-				SimpleFeature ft = nodeFactory.createPoint(network.getLinks().get(new IdImpl(arr[4])).getCoord(), new Object[] {Integer.toString(i)}, null);
+				SimpleFeature ft = nodeFactory.createPoint(network.getLinks().get(Id.create(arr[4], Link.class)).getCoord(), new Object[] {Integer.toString(i)}, null);
     			featuresMovedIncrease.add(ft);
 				}
 				else {
-					SimpleFeature ft = nodeFactory2.createPoint(network.getLinks().get(new IdImpl(arr[4])).getCoord(), new Object[] {Integer.toString(i)}, null);
+					SimpleFeature ft = nodeFactory2.createPoint(network.getLinks().get(Id.create(arr[4], Link.class)).getCoord(), new Object[] {Integer.toString(i)}, null);
 	    			featuresMovedIncrease2.add(ft);
 				}
     			s = readLink.readLine();

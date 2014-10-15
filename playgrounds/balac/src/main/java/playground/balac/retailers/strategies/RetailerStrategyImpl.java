@@ -5,6 +5,8 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -16,7 +18,7 @@ public class RetailerStrategyImpl
   implements RetailerStrategy
 {
 	  private static final Logger log = Logger.getLogger(RetailerStrategyImpl.class);
-	  protected Map<Id, ActivityFacilityImpl> retailerFacilities;
+	  protected Map<Id<ActivityFacility>, ActivityFacilityImpl> retailerFacilities;
 	  protected Controler controler;
 	
 	  public RetailerStrategyImpl(Controler controler)
@@ -26,12 +28,12 @@ public class RetailerStrategyImpl
 	  }
 	
 	  @Override
-		public Map<Id, ActivityFacilityImpl> moveFacilities(Map<Id, ActivityFacilityImpl> facilities, TreeMap<Id, LinkRetailersImpl> links)
+		public Map<Id<ActivityFacility>, ActivityFacilityImpl> moveFacilities(Map<Id<ActivityFacility>, ActivityFacilityImpl> facilities, TreeMap<Id<Link>, LinkRetailersImpl> links)
 	  {
 	    return null;
 	  }
 	
-	  protected TreeMap<Integer, String> createInitialLocationsForGA(TreeMap<Id, LinkRetailersImpl> availableLinks) {
+	  protected TreeMap<Integer, String> createInitialLocationsForGA(TreeMap<Id<Link>, LinkRetailersImpl> availableLinks) {
 	    TreeMap<Integer, String> locations = new TreeMap<Integer, String>();
 	    int intCount = 0;
 	    for (ActivityFacilityImpl af : this.retailerFacilities.values())
@@ -55,12 +57,12 @@ public class RetailerStrategyImpl
 	    return locations;
 	  }
 	
-	  protected TreeMap<Id, LinkRetailersImpl> mergeLinks(TreeMap<Id, LinkRetailersImpl> freeLinks, Map<Id, ActivityFacilityImpl> retailerFacilities)
+	  protected TreeMap<Id<Link>, LinkRetailersImpl> mergeLinks(TreeMap<Id<Link>, LinkRetailersImpl> freeLinks, Map<Id<ActivityFacility>, ActivityFacilityImpl> retailerFacilities)
 	  {
 	    this.retailerFacilities = retailerFacilities;
-	    TreeMap<Id,LinkRetailersImpl> availableLinks = new TreeMap<Id,LinkRetailersImpl>();
+	    TreeMap<Id<Link>,LinkRetailersImpl> availableLinks = new TreeMap<>();
 	    for (ActivityFacilityImpl af : this.retailerFacilities.values()) {
-	    	Id id = af.getLinkId();
+	    	Id<Link> id = af.getLinkId();
 	    	LinkRetailersImpl link = new LinkRetailersImpl(this.controler.getNetwork().getLinks().get(id), this.controler.getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
 	    	availableLinks.put(id, link);
 	    }

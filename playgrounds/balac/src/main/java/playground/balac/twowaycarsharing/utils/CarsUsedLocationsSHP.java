@@ -9,8 +9,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -25,7 +25,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 public class CarsUsedLocationsSHP {
 
 	public static void main(String[] args) throws IOException {
-		// TODO Auto-generated method stub
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
 		networkReader.readFile(args[0]);
@@ -44,7 +43,7 @@ public class CarsUsedLocationsSHP {
 			HashMap<String, String> mapa = new HashMap<String, String>();
 
 			
-			 Collection featuresMovedIncrease = new ArrayList();
+			 Collection<SimpleFeature> featuresMovedIncrease = new ArrayList<>();
 		        featuresMovedIncrease = new ArrayList<SimpleFeature>();
 		        PointFeatureFactory nodeFactory = new PointFeatureFactory.Builder().
 		                setCrs(crs).
@@ -55,7 +54,7 @@ public class CarsUsedLocationsSHP {
 		                
 		                create();
 		        
-		        Collection featuresMovedIncrease2 = new ArrayList();
+		        Collection<SimpleFeature> featuresMovedIncrease2 = new ArrayList<>();
 		        featuresMovedIncrease2 = new ArrayList<SimpleFeature>();
 		        PointFeatureFactory nodeFactory2 = new PointFeatureFactory.Builder().
 		                setCrs(crs).
@@ -85,7 +84,7 @@ public class CarsUsedLocationsSHP {
 				if (arr[1].contains("c")) {
 					String b = arr[1].substring(0,4);
 					if (mapa.containsKey(b)) {
-					SimpleFeature ft = nodeFactory.createPoint(network.getLinks().get(new IdImpl(mapa.get(b))).getCoord(), new Object[] {Integer.toString(i)}, null);
+					SimpleFeature ft = nodeFactory.createPoint(network.getLinks().get(Id.create(mapa.get(b), Link.class)).getCoord(), new Object[] {Integer.toString(i)}, null);
 					featuresMovedIncrease.add(ft);
 					
 					mapa.remove(b);
@@ -98,7 +97,7 @@ public class CarsUsedLocationsSHP {
 			int count = 0;
 			for(String ss:mapa.values()) {
 				count++;
-				SimpleFeature ft = nodeFactory2.createPoint(network.getLinks().get(new IdImpl(ss)).getCoord(), new Object[] {Integer.toString(i)}, null);
+				SimpleFeature ft = nodeFactory2.createPoint(network.getLinks().get(Id.create(ss, Link.class)).getCoord(), new Object[] {Integer.toString(i)}, null);
 				featuresMovedIncrease2.add(ft);
 				i++;
 			}

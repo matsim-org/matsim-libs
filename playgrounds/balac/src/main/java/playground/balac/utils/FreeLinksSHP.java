@@ -8,14 +8,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.io.IOUtils;
@@ -38,14 +35,14 @@ public class FreeLinksSHP {
         CoordinateReferenceSystem crs = MGC.getCRS("EPSG:21781");    // EPSG Code for Swiss CH1903_LV03 coordinate system
 
         
-        ArrayList<IdImpl> a = new ArrayList<IdImpl>();
+        ArrayList<Id<Link>> a = new ArrayList<>();
         
         
         	
         	String s = readLinkRetailers.readLine();
 			String[] arr = s.split("\\s");
 			for(int i = 0; i < arr.length; i++) {
-				a.add(new IdImpl(arr[i]));
+				a.add(Id.create(arr[i], Link.class));
         }
         
         Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
@@ -62,7 +59,7 @@ public class FreeLinksSHP {
                 create();
 
         for (Link link : network.getLinks().values()) {
-        	if (a.contains((IdImpl)link.getId())) {
+        	if (a.contains(link.getId())) {
         		Coordinate fromNodeCoordinate = new Coordinate(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY());
         		Coordinate toNodeCoordinate = new Coordinate(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY());
         		Coordinate linkCoordinate = new Coordinate(link.getCoord().getX(), link.getCoord().getY());

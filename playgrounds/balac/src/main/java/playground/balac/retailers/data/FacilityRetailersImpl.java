@@ -21,19 +21,20 @@ package playground.balac.retailers.data;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 
 public class FacilityRetailersImpl extends ActivityFacilityImpl
 {
-  private static final long serialVersionUID = 1L;
 
   private boolean retailer = true;
-  public FacilityRetailersImpl(Id id, Coord center)
+  public FacilityRetailersImpl(Id<ActivityFacility> id, Coord center)
   {
     super(id, center);
     retailer = true;
   }
-  public FacilityRetailersImpl(Id id, Coord center, Id linkId)
+  public FacilityRetailersImpl(Id<ActivityFacility> id, Coord center, Id<Link> linkId)
   {
     super(id, center);
     super.setLinkId(linkId);

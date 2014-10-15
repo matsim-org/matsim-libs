@@ -17,7 +17,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
@@ -40,6 +40,7 @@ import org.matsim.core.router.TripRouterFactoryInternal;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.vehicles.Vehicle;
 
 import playground.balac.freefloating.scenario.FreeFloatingFacilityImpl;
 
@@ -53,7 +54,7 @@ public class FreeFloatingPersonDriverAgentImpl implements MobsimDriverAgent, Mob
 
 	private MobsimVehicle vehicle;
 
-	Id cachedNextLinkId = null;
+	Id<Link> cachedNextLinkId = null;
 
 	// This agent never seriously calls the simulation back! (That's good.)
 	// It is only held to get to the EventManager and to the Scenario, and, 
@@ -62,13 +63,13 @@ public class FreeFloatingPersonDriverAgentImpl implements MobsimDriverAgent, Mob
 
 	private double activityEndTime = Time.UNDEFINED_TIME;
 
-	private Id currentLinkId = null;
+	private Id<Link> currentLinkId = null;
 
 	int currentPlanElementIndex = 0;
 
 	private final Plan plan;
 
-	private transient Id cachedDestinationLinkId;
+	private transient Id<Link> cachedDestinationLinkId;
 
 	private Leg currentLeg;
 
@@ -160,14 +161,14 @@ public class FreeFloatingPersonDriverAgentImpl implements MobsimDriverAgent, Mob
 	// -----------------------------------------------------------------------------------------------------------------------------
 
 	@Override
-	public final void notifyArrivalOnLinkByNonNetworkMode(final Id linkId) {
+	public final void notifyArrivalOnLinkByNonNetworkMode(final Id<Link> linkId) {
 		this.currentLinkId = linkId;
 		double distance = ((Leg) getCurrentPlanElement()).getRoute().getDistance();
 		this.simulation.getEventsManager().processEvent(new TeleportationArrivalEvent(this.simulation.getSimTimer().getTimeOfDay(), person.getId(), distance));
 	}
 
 	@Override
-	public final void notifyMoveOverNode(Id newLinkId) {
+	public final void notifyMoveOverNode(Id<Link> newLinkId) {
 		if (expectedLinkWarnCount < 10 && !newLinkId.equals(this.cachedNextLinkId)) {
 			log.warn("Agent did not end up on expected link. Ok for within-day replanning agent, otherwise not.  Continuing " +
 					"anyway ... This warning is suppressed after the first 10 warnings.") ;
@@ -184,7 +185,7 @@ public class FreeFloatingPersonDriverAgentImpl implements MobsimDriverAgent, Mob
 	 * @return The next link the vehicle will drive on, or null if an error has happened.
 	 */
 	@Override
-	public Id chooseNextLinkId() {
+	public Id<Link> chooseNextLinkId() {
 		
 		// Please, let's try, amidst all checking and caching, to have this method return the same thing
 		// if it is called several times in a row. Otherwise, you get Heisenbugs.
@@ -226,7 +227,7 @@ public class FreeFloatingPersonDriverAgentImpl implements MobsimDriverAgent, Mob
 		}
 
 
-		Id nextLinkId = this.cachedRouteLinkIds.get(this.currentLinkIdIndex);
+		Id<Link> nextLinkId = this.cachedRouteLinkIds.get(this.currentLinkIdIndex);
 		Link currentLink = this.simulation.getScenario().getNetwork().getLinks().get(this.currentLinkId);
 		Link nextLink = this.simulation.getScenario().getNetwork().getLinks().get(nextLinkId);
 		if (currentLink.getToNode().equals(nextLink.getFromNode())) {
@@ -342,10 +343,10 @@ public class FreeFloatingPersonDriverAgentImpl implements MobsimDriverAgent, Mob
 		
 		CoordImpl coordStart = new CoordImpl(l.getCoord());
 		
-		FreeFloatingFacilityImpl startFacility = new FreeFloatingFacilityImpl(new IdImpl("1000000000"), coordStart, l.getId());
+		FreeFloatingFacilityImpl startFacility = new FreeFloatingFacilityImpl(Id.create("1000000000", Facility.class), coordStart, l.getId());
 		
 		CoordImpl coordEnd = new CoordImpl(scenario.getNetwork().getLinks().get(leg.getRoute().getEndLinkId()).getCoord());
-		FreeFloatingFacilityImpl endFacility = new FreeFloatingFacilityImpl(new IdImpl("1000000001"), coordEnd, leg.getRoute().getEndLinkId());
+		FreeFloatingFacilityImpl endFacility = new FreeFloatingFacilityImpl(Id.create("1000000001", Facility.class), coordEnd, leg.getRoute().getEndLinkId());
 		
 		
 		for(PlanElement pe1: tripRouter.calcRoute("car", startFacility, endFacility, now, person)) {
@@ -362,7 +363,7 @@ public class FreeFloatingPersonDriverAgentImpl implements MobsimDriverAgent, Mob
 		LinkNetworkRouteImpl route = (LinkNetworkRouteImpl) ((PopulationFactoryImpl)scenario.getPopulation().getFactory()).getModeRouteFactory().createRoute("car", l.getId(), leg.getRoute().getEndLinkId());
 		route.setLinkIds( l.getId(), ids, leg.getRoute().getEndLinkId());
 		route.setTravelTime( travelTime);
-		route.setVehicleId(new IdImpl("FF_" + (vehID)));
+		route.setVehicleId(Id.create("FF_" + (vehID), Vehicle.class));
 		carLeg.setRoute(route);
 		this.cachedDestinationLinkId = route.getEndLinkId();
 
@@ -379,7 +380,7 @@ public class FreeFloatingPersonDriverAgentImpl implements MobsimDriverAgent, Mob
 	}
 	
 
-	private FreeFloatingStation findClosestAvailableCar(Id linkId) {		
+	private FreeFloatingStation findClosestAvailableCar(Id<Link> linkId) {		
 		
 		//find the closest available car in the quad tree(?) reserve it (make it unavailable)
 		Link link = scenario.getNetwork().getLinks().get(linkId);
@@ -541,7 +542,7 @@ public class FreeFloatingPersonDriverAgentImpl implements MobsimDriverAgent, Mob
 	}
 
 	@Override
-	public final Id getCurrentLinkId() {
+	public final Id<Link> getCurrentLinkId() {
 		// note: the method is really only defined for DriverAgent!  kai, oct'10
 		return this.currentLinkId;
 	}
@@ -571,24 +572,24 @@ public class FreeFloatingPersonDriverAgentImpl implements MobsimDriverAgent, Mob
 	}
 
 	@Override
-	public final Id getPlannedVehicleId() {
+	public final Id<Vehicle> getPlannedVehicleId() {
 		PlanElement currentPlanElement = this.getCurrentPlanElement();
 		NetworkRoute route = (NetworkRoute) ((Leg) currentPlanElement).getRoute(); // if casts fail: illegal state.
 		
 		if (((Leg)currentPlanElement).getMode().equals("freefloating")){
 			
-			return new IdImpl("FF_"+ (vehID));	
+			return Id.create("FF_"+ (vehID), Vehicle.class);	
 		
 		}
 		else if (route.getVehicleId() != null) {
 			return route.getVehicleId();
 		} else {
-			return this.getId(); // we still assume the vehicleId is the agentId if no vehicleId is given.
+			return Id.create(this.getId(), Vehicle.class); // we still assume the vehicleId is the agentId if no vehicleId is given.
 		}
 	}
 
 	@Override
-	public final Id getDestinationLinkId() {
+	public final Id<Link> getDestinationLinkId() {
 		return this.cachedDestinationLinkId;
 	}
 
@@ -598,7 +599,7 @@ public class FreeFloatingPersonDriverAgentImpl implements MobsimDriverAgent, Mob
 	}
 
 	@Override
-	public final Id getId() {
+	public final Id<Person> getId() {
 		return this.person.getId();
 	}
 

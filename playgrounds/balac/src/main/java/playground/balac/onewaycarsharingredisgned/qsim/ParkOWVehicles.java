@@ -4,11 +4,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
@@ -43,7 +44,7 @@ public class ParkOWVehicles implements AgentSource {
 		for (OneWayCarsharingRDStation owstation: owvehiclesLocationqt.getQuadTree().values()) {
 			
 			for (String id:owstation.getIDs()) {
-				qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(new IdImpl("OW_"+(id)), modeVehicleTypes.get("onewaycarsharing")), owstation.getLink().getId());
+				qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("OW_"+(id), Vehicle.class), modeVehicleTypes.get("onewaycarsharing")), owstation.getLink().getId());
 
 			}
 			

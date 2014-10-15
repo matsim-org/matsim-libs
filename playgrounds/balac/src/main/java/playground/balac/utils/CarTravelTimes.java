@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -13,7 +14,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
@@ -130,7 +130,7 @@ public class CarTravelTimes {
 			CoordImpl coordEnd = new CoordImpl(arr[7], arr[8]);
 			Link lEnd = MyLinkUtils.getClosestLink(network, coordEnd);
 			
-			PersonImpl person = new PersonImpl(new IdImpl(arr[0]));
+			PersonImpl person = new PersonImpl(Id.create(arr[0], Person.class));
 			
 			PlanImpl plan = (PlanImpl) sc.getPopulation().getFactory().createPlan();
 			ActivityImpl act = new ActivityImpl("home", lStart.getId());

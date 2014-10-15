@@ -5,21 +5,19 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -27,7 +25,6 @@ import org.matsim.core.utils.io.IOUtils;
 public class IncomeCarSharing {
 
 	public static void main(String[] args) throws IOException {
-		// TODO Auto-generated method stub
 		
 		final BufferedReader readLink = IOUtils.getBufferedReader(args[0]);
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -57,7 +54,7 @@ public class IncomeCarSharing {
 			
 			double startTime = Double.parseDouble(arr[2]);
 			double endTime = Double.parseDouble(arr[3]);
-			IdImpl personId = new IdImpl(arr[0]);
+			Id<Person> personId = Id.create(arr[0], Person.class);
 			
 			if (previous == null || !previous.equals(arr[0])) {
 				counterrb = 0;
@@ -128,7 +125,7 @@ public class IncomeCarSharing {
 									
 									for (int i = 0; i < arr1.length; i++) {
 										
-										distance += network.getLinks().get(new IdImpl(arr1[i])).getLength();
+										distance += network.getLinks().get(Id.create(arr1[i], Link.class)).getLength();
 									}
 								
 								}
@@ -170,7 +167,7 @@ public class IncomeCarSharing {
 									
 									for (int i = 0; i < arr1.length; i++) {
 										
-										distance += network.getLinks().get(new IdImpl(arr1[i])).getLength();
+										distance += network.getLinks().get(Id.create(arr1[i])).getLength();
 									}
 									
 									//write here the distance

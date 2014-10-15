@@ -11,9 +11,8 @@ import java.util.TreeMap;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -31,8 +30,8 @@ public class FindAccessibility
   private String personsfilePath;
   private String stationsfilePath;
   private QuadTree<Station> stations;
-  private TreeMap<Id, PersonWithClosestStations> personsWithClosestStations = new TreeMap();
-  private TreeMap<Id, Station> stations_origin = new TreeMap();
+  private TreeMap<Id<Person>, PersonWithClosestStations> personsWithClosestStations = new TreeMap<>();
+  private TreeMap<Id<Station>, Station> stations_origin = new TreeMap<>();
   private WGS84toCH1903LV03 coordTranformer = new WGS84toCH1903LV03();
 
   private static final Logger log = Logger.getLogger(MembershipMain.class);
@@ -99,7 +98,7 @@ public class FindAccessibility
     while ((line = reader.readLine()) != null) {
       PersonWithClosestStations pwcs = new PersonWithClosestStations();
       String[] parts = StringUtils.explode(line, '\t');
-      IdImpl id = new IdImpl(Integer.parseInt(parts[0]));
+      Id<Person> id = Id.create(Integer.parseInt(parts[0]), Person.class);
       log.info("Id = " + id);
       pwcs.setId(id);
       CoordImpl coordHome = new CoordImpl(Double.parseDouble(parts[1]), Double.parseDouble(parts[2]));
@@ -119,7 +118,7 @@ public class FindAccessibility
       Station station = new Station();
       String[] parts = StringUtils.explode(line, '\t');
 
-      IdImpl id = new IdImpl(Integer.parseInt(parts[0]));
+      Id<Station> id = Id.create(Integer.parseInt(parts[0]), Station.class);
       CoordImpl coord = new CoordImpl(Double.parseDouble(parts[1]), Double.parseDouble(parts[2]));
       int cars = Integer.parseInt(parts[3]);
       station.setCoord(this.coordTranformer.transform(coord));
@@ -140,7 +139,7 @@ public class FindAccessibility
       if (station2.getCoord().getY() > maxy) maxy = station2.getCoord().getY();
     }
     minx -= 1.0D; miny -= 1.0D; maxx += 1.0D; maxy += 1.0D;
-    this.stations = new QuadTree(minx, miny, maxx, maxy);
+    this.stations = new QuadTree<>(minx, miny, maxx, maxy);
     for (Station station3 : this.stations_origin.values()) {
       this.stations.put(station3.getCoord().getX(), station3.getCoord().getY(), station3);
     }
@@ -193,7 +192,7 @@ public class FindAccessibility
       else if (orderedClosestStationsWork.size() < 3) {
         while (orderedClosestStationsWork.size() < 3) {
           Station nullStationWork = new Station();
-          nullStationWork.setId(new IdImpl(0L));
+          nullStationWork.setId(Id.create(0L, Station.class));
           nullStationWork.setCoord(new CoordImpl(0.0D, 0.0D));
           orderedClosestStationsWork.add(orderedClosestStationsWork.size(), nullStationWork);
         }
@@ -203,8 +202,8 @@ public class FindAccessibility
       else {
         List oCS = orderedClosestStationsWork.subList(0, 3);
         Vector finalOrderedClosestStationsWork = new Vector();
-        ((Vector)finalOrderedClosestStationsWork).addAll(oCS);
-        pwcs.setOrderedClosestStationsWork((Vector)finalOrderedClosestStationsWork);
+        finalOrderedClosestStationsWork.addAll(oCS);
+        pwcs.setOrderedClosestStationsWork(finalOrderedClosestStationsWork);
       }
 
       for (Object finalOrderedClosestStationsWork = allClosestStationsHome.iterator(); ((Iterator)finalOrderedClosestStationsWork).hasNext(); ) { Station stationHome = (Station)((Iterator)finalOrderedClosestStationsWork).next();
@@ -234,7 +233,7 @@ public class FindAccessibility
       else if (orderedClosestStationsHome.size() < 3) {
         while (orderedClosestStationsHome.size() < 3) {
           Station nullStationHome = new Station();
-          nullStationHome.setId(new IdImpl(0L));
+          nullStationHome.setId(Id.create(0L, Station.class));
           nullStationHome.setCoord(new CoordImpl(0.0D, 0.0D));
           orderedClosestStationsHome.add(orderedClosestStationsHome.size(), nullStationHome);
         }
@@ -244,8 +243,8 @@ public class FindAccessibility
       {
         List oCS = orderedClosestStationsHome.subList(0, 3);
         Vector finalOrderedClosestStationsHome = new Vector();
-        ((Vector)finalOrderedClosestStationsHome).addAll(oCS);
-        pwcs.setOrderedClosestStationsHome((Vector)finalOrderedClosestStationsHome);
+        finalOrderedClosestStationsHome.addAll(oCS);
+        pwcs.setOrderedClosestStationsHome(finalOrderedClosestStationsHome);
       }
 
       for (Object finalOrderedClosestStationsHome = pwcs.getOrderedClosestStationsHome().iterator(); ((Iterator)finalOrderedClosestStationsHome).hasNext(); ) { Station stationHome = (Station)((Iterator)finalOrderedClosestStationsHome).next();

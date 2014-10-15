@@ -8,11 +8,10 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.gbl.Gbl;
 
 import playground.balac.retailers.data.Retailer;
 import playground.balac.retailers.data.Retailers;
@@ -25,8 +24,8 @@ public class FileRetailerReader {
 	private Map<Id<ActivityFacility>, ? extends ActivityFacility> controlerFacilities;
 	private String facilityIdFile;
 	private Retailers retailers = new Retailers();
-	private ArrayList<Id> retailersLinks = new ArrayList<Id>();
-	private ArrayList<Id> retailersFacilities = new ArrayList<Id>();
+	private ArrayList<Id<Link>> retailersLinks = new ArrayList<>();
+	private ArrayList<Id<ActivityFacility>> retailersFacilities = new ArrayList<>();
 	
 	public FileRetailerReader(Map<Id<ActivityFacility>, ? extends ActivityFacility> controlerFacilities, String facilityIdFile) {
 		this.controlerFacilities = controlerFacilities;
@@ -49,8 +48,8 @@ public class FileRetailerReader {
 				String[] entries = curr_line.split("\t", -1);
 				// header: r_id  f_id  strategy linkId capacity
 				// index:     0     1      2	   3	  4
-				Id rId = new IdImpl(entries[0]);
-				Id fId = new IdImpl (entries[1]);
+				Id<Retailer> rId = Id.create(entries[0], Retailer.class);
+				Id<ActivityFacility> fId = Id.create(entries[1], ActivityFacility.class);
 								
 					if (controlerFacilities.get(fId) != null) {
 					if (this.retailers.getRetailers().containsKey(rId)) { // retailer exists already
@@ -75,6 +74,7 @@ public class FileRetailerReader {
 					log.warn("The facility " + fId + " has not been found" );
 				}
 			}
+			br.close();
 			log.warn(notFoundFacilities + " facilities have not been found");
 		} 
 		catch (IOException e) {
@@ -82,7 +82,7 @@ public class FileRetailerReader {
 		return this.retailers;
 	}
 	
-	public ArrayList<Id> readRetailersFacilities() {
+	public ArrayList<Id<ActivityFacility>> readRetailersFacilities() {
 		try { 
 			FileReader fr = new FileReader(this.facilityIdFile);
 			BufferedReader br = new BufferedReader(fr);
@@ -93,10 +93,11 @@ public class FileRetailerReader {
 				String[] entries = curr_line.split("\t", -1);
 				// header: r_id  f_id  strategy linkId capacity
 				// index:     0     1      2	   3	  4
-				Id fId = new IdImpl (entries[1]);
+				Id<ActivityFacility> fId = Id.create (entries[1], ActivityFacility.class);
 				this.retailersFacilities.add(fId);		
 						
 			}
+			br.close();
 		} 
 		catch (IOException e) {
 		}

@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.Id;
 
 public class Retailers {
 	
-	private final Map<Id,Retailer> retailers = new LinkedHashMap<Id, Retailer>();
+	private final Map<Id<Retailer>,Retailer> retailers = new LinkedHashMap<>();
 	//private final ArrayList<RetailersAlgorithm> algorithms = new ArrayList<RetailersAlgorithm>();
 	
 	public final boolean addRetailer(final Retailer retailer) {
@@ -17,7 +17,7 @@ public class Retailers {
 		return true;
 	}
 	
-	public Map<Id,Retailer> getRetailers() {
+	public Map<Id<Retailer>,Retailer> getRetailers() {
 		return this.retailers;
 	}
 //TODO: should be removed since it is not used anywhere

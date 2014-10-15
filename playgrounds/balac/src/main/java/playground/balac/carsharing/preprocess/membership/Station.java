@@ -6,7 +6,7 @@ import org.matsim.api.core.v01.Id;
 public class Station
 {
   private Coord coord;
-  private Id id;
+  private Id<Station> id;
   private int cars;
 
   public int getCars()
@@ -22,10 +22,10 @@ public class Station
   public void setCoord(Coord coord) {
     this.coord = coord;
   }
-  public Id getId() {
+  public Id<Station> getId() {
     return this.id;
   }
-  public void setId(Id id) {
+  public void setId(Id<Station> id) {
     this.id = id;
   }
 }

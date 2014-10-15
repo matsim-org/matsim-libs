@@ -6,10 +6,10 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.network.LinkImpl;
 
 import playground.balac.retailers.data.LinkRetailersImpl;
 
@@ -45,9 +45,10 @@ public class CustomersFeedbackStrategy implements RetailerStrategy {
 		return null;
 	}
 
-	public Map<Id, ActivityFacilityImpl> moveFacilities(
-			Map<Id, ActivityFacilityImpl> facilities,
-			TreeMap<Id, LinkRetailersImpl> links) {
+	@Override
+	public Map<Id<ActivityFacility>, ActivityFacilityImpl> moveFacilities(
+			Map<Id<ActivityFacility>, ActivityFacilityImpl> facilities,
+			TreeMap<Id<Link>, LinkRetailersImpl> links) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -1,5 +1,9 @@
 package playground.balac.onewaycarsharingredisgned.qsim;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.ArrayList;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -7,7 +11,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimFactory;
@@ -26,11 +29,8 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
-import playground.balac.onewaycarsharingredisgned.config.OneWayCarsharingRDConfigGroup;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.ArrayList;
+import playground.balac.onewaycarsharingredisgned.config.OneWayCarsharingRDConfigGroup;
 
 public class OneWayCarsharingRDQsimFactory implements MobsimFactory{
 
@@ -150,7 +150,7 @@ public class OneWayCarsharingRDQsimFactory implements MobsimFactory{
 		public LinkImpl getClosestLink(Coord coord) {
 			
 			double distance = (1.0D / 0.0D);
-		    Id closestLinkId = new IdImpl(0L);
+		    Id<Link> closestLinkId = Id.create(0L, Link.class);
 		    for (Link link : network.getLinks().values()) {
 		      LinkImpl mylink = (LinkImpl)link;
 		      Double newDistance = Double.valueOf(mylink.calcDistance(coord));

@@ -9,8 +9,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -25,7 +25,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 public class CarsUsedLocationsffSHP {
 
 	public static void main(String[] args) throws IOException {
-		// TODO Auto-generated method stub
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario);
 		networkReader.readFile(args[0]);
@@ -43,7 +42,7 @@ public class CarsUsedLocationsffSHP {
 			HashMap<String, String> mapa = new HashMap<String, String>();
 
 			
-			 Collection featuresMovedIncrease = new ArrayList();
+			 Collection<SimpleFeature> featuresMovedIncrease = new ArrayList<>();
 		        featuresMovedIncrease = new ArrayList<SimpleFeature>();
 		        PointFeatureFactory nodeFactory = new PointFeatureFactory.Builder().
 		                setCrs(crs).
@@ -63,7 +62,7 @@ public class CarsUsedLocationsffSHP {
 				String[] arr = s.split("\\s");
 			
 					
-					SimpleFeature ft = nodeFactory.createPoint(network.getLinks().get(new IdImpl(arr[3])).getCoord(), new Object[] {Integer.toString(i)}, null);
+					SimpleFeature ft = nodeFactory.createPoint(network.getLinks().get(Id.create(arr[3], Link.class)).getCoord(), new Object[] {Integer.toString(i)}, null);
 					featuresMovedIncrease.add(ft);
 					
 				

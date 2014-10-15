@@ -1,10 +1,14 @@
 package playground.balac.freefloating.qsim;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.ArrayList;
+
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimFactory;
@@ -21,11 +25,8 @@ import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.core.utils.io.IOUtils;
-import playground.balac.freefloating.config.FreeFloatingConfigGroup;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.ArrayList;
+import playground.balac.freefloating.config.FreeFloatingConfigGroup;
 
 
 public class FreeFloatingQsimFactory implements MobsimFactory{
@@ -60,7 +61,7 @@ public class FreeFloatingQsimFactory implements MobsimFactory{
 		    	
 		    	String[] arr = s.split("\t", -1);
 		    
-		    	Link l = controler.getNetwork().getLinks().get(new IdImpl(arr[0]));
+		    	Link l = controler.getNetwork().getLinks().get(Id.create(arr[0], Link.class));
 		    	
 		    	ArrayList<String> vehIDs = new ArrayList<String>();
 		    	

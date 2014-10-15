@@ -5,12 +5,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
@@ -52,7 +52,7 @@ public class ParkCSVehicles implements AgentSource {
 		for (FreeFloatingStation ffstation: ffvehiclesLocationqt.getQuadTree().values()) {
 			
 			for (String id:ffstation.getIDs()) {
-				qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(new IdImpl("FF_"+(id)), modeVehicleTypes.get("freefloating")), ffstation.getLink().getId());
+				qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("FF_"+(id), Vehicle.class), modeVehicleTypes.get("freefloating")), ffstation.getLink().getId());
 
 			}
 			
@@ -61,7 +61,7 @@ public class ParkCSVehicles implements AgentSource {
 			for (OneWayCarsharingRDWithParkingStation owstation: owvehiclesLocationqt.getQuadTree().values()) {
 				
 				for (String id:owstation.getIDs()) {
-					qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(new IdImpl("OW_"+(id)), modeVehicleTypes.get("onewaycarsharing")), owstation.getLink().getId());
+					qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("OW_"+(id), Vehicle.class), modeVehicleTypes.get("onewaycarsharing")), owstation.getLink().getId());
 
 				}
 				
@@ -72,7 +72,7 @@ public class ParkCSVehicles implements AgentSource {
 				
 				for (String id : twstation.getIDs()) {
 					
-					qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(new IdImpl("TW_"+id), modeVehicleTypes.get("twowaycarsharing")), twstation.getLink().getId());
+					qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("TW_"+id, Vehicle.class), modeVehicleTypes.get("twowaycarsharing")), twstation.getLink().getId());
 					counterTW++;
 				}
 				

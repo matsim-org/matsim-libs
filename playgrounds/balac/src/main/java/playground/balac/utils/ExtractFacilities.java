@@ -3,8 +3,8 @@ package playground.balac.utils;
 import java.io.BufferedReader;
 import java.io.IOException;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.facilities.FacilitiesWriter;
@@ -50,7 +50,7 @@ public class ExtractFacilities {
 			
 				String s = readLink.readLine();
 				String[] arr = s.split("\t");
-				ActivityFacility f = scenario.getActivityFacilities().getFacilities().get(new IdImpl(arr[1]));
+				ActivityFacility f = scenario.getActivityFacilities().getFacilities().get(Id.create(arr[1], ActivityFacility.class));
 				
 				landPrice += CoordUtils.calcDistance(f.getCoord(), coord) * (-0.00001) + 1.0;
 				if (CoordUtils.calcDistance(coord, f.getCoord()) < 5000) {
@@ -64,7 +64,7 @@ public class ExtractFacilities {
 					outside++;
 					
 				}
-				//scenario_new.getActivityFacilities().getFacilities().put(new IdImpl(arr[1]), f);
+				//scenario_new.getActivityFacilities().getFacilities().put(Id.create(arr[1]), f);
 				scenario_new.getActivityFacilities().addActivityFacility(f);
 				
 			}
@@ -73,9 +73,9 @@ public class ExtractFacilities {
 				
 				String s = readLink.readLine();
 				String[] arr = s.split("\t");
-				ActivityFacility f = scenario.getActivityFacilities().getFacilities().get(new IdImpl(arr[1]));
+				ActivityFacility f = scenario.getActivityFacilities().getFacilities().get(Id.create(arr[1], ActivityFacility.class));
 				landPrice += CoordUtils.calcDistance(f.getCoord(), coord) * (-0.00001) + 1.0;
-				//scenario_new.getActivityFacilities().getFacilities().put(new IdImpl(arr[1]), f);
+				//scenario_new.getActivityFacilities().getFacilities().put(Id.create(arr[1]), f);
 				if (CoordUtils.calcDistance(coord, f.getCoord()) < 5000) {
 					
 					insideCust +=  Integer.parseInt(arr[5]);

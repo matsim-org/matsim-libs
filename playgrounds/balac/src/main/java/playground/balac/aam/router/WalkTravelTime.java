@@ -11,10 +11,10 @@ import org.matsim.vehicles.Vehicle;
 
 public class WalkTravelTime implements TravelTime {
 
-	HashMap<Id, Double> linkWalkTravelTimes = new HashMap<Id, Double>(); 
+	HashMap<Id<Link>, Double> linkWalkTravelTimes = new HashMap<Id<Link>, Double>(); 
 //	private static final Logger log = Logger.getLogger(WalkTravelTime.class);
 
-	public WalkTravelTime (Scenario scenario, HashMap<Id, Double> linkSpeeds)  {
+	public WalkTravelTime (Scenario scenario, HashMap<Id<Link>, Double> linkSpeeds)  {
 		
 		for (Link l : scenario.getNetwork().getLinks().values()) {
 			if (linkSpeeds.containsKey(l.getId()))

@@ -10,7 +10,6 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.LinkImpl;
 
 import playground.balac.retailers.data.FacilityRetailersImpl;
 import playground.balac.retailers.data.LinkRetailersImpl;
@@ -102,9 +101,10 @@ public class LogitMaxLinkRetailerStrategy implements RetailerStrategy {
 		return null;
 	}
 
-	public Map<Id, ActivityFacilityImpl> moveFacilities(
-			Map<Id, ActivityFacilityImpl> facilities,
-			TreeMap<Id, LinkRetailersImpl> links) {
+	@Override
+	public Map<Id<ActivityFacility>, ActivityFacilityImpl> moveFacilities(
+			Map<Id<ActivityFacility>, ActivityFacilityImpl> facilities,
+			TreeMap<Id<Link>, LinkRetailersImpl> links) {
 		// TODO Auto-generated method stub
 		return null;
 	}

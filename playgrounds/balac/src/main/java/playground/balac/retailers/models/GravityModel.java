@@ -7,14 +7,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -33,14 +29,14 @@ public class GravityModel extends RetailerModelImpl
   private boolean isSimplifiedGravityModel = false;
   private double[] betas;
   private final RetailZones retailZones = new RetailZones();
-  private final Map<Id, ActivityFacilityImpl> retailerFacilities;
+  private final Map<Id<ActivityFacility>, ActivityFacilityImpl> retailerFacilities;
   private int counter = 0;
   private int operationCount = 0;
   private int nextCounterMsg = 1;
   private ArrayList<Integer> incumbentSolution;
-  private ArrayList<Double> incumbentFitness = new ArrayList();
+  private ArrayList<Double> incumbentFitness = new ArrayList<>();
 
-  public GravityModel(Controler controler, Map<Id, ActivityFacilityImpl> retailerFacilities)
+  public GravityModel(Controler controler, Map<Id<ActivityFacility>, ActivityFacilityImpl> retailerFacilities)
   {
     this.controler = controler;
     log.info("Controler" + this.controler);
@@ -81,8 +77,8 @@ public class GravityModel extends RetailerModelImpl
 
     for (ActivityFacility c : this.retailerFacilities.values())
     {
-      String linkId = (String)this.first.get(solution.get(a));
-      Coord coord = ((Link)this.controler.getNetwork().getLinks().get(new IdImpl(linkId))).getCoord();
+      String linkId = this.first.get(solution.get(a));
+      Coord coord = ((Link)this.controler.getNetwork().getLinks().get(Id.create(linkId, Link.class))).getCoord();
 
       double loc_likelihood = 0.0D;
 
@@ -92,12 +88,12 @@ public class GravityModel extends RetailerModelImpl
         double pers_potential = 0.0D;
         double pers_likelihood = 0.0D;
 
-        ActivityFacility firstFacility = (ActivityFacility)this.controlerFacilities.getFacilities().get(((PlanImpl)pr.getSelectedPlan()).getFirstActivity().getFacilityId());
+        ActivityFacility firstFacility = this.controlerFacilities.getFacilities().get(((PlanImpl)pr.getSelectedPlan()).getFirstActivity().getFacilityId());
         double dist1 = ((ActivityFacilityImpl)firstFacility).calcDistance(coord);
         if (dist1 == 0.0D) {
           dist1 = 10.0D;
         }
-        pers_potential = Math.pow(dist1, this.betas[0]) + Math.pow(((ActivityOption)c.getActivityOptions().get("shopgrocery")).getCapacity(), this.betas[1]);
+        pers_potential = Math.pow(dist1, this.betas[0]) + Math.pow(c.getActivityOptions().get("shopgrocery").getCapacity(), this.betas[1]);
 
         if (pr.getGlobalShopsUtility() == 0.0D) {
           processPerson();
@@ -109,7 +105,7 @@ public class GravityModel extends RetailerModelImpl
             for (ActivityFacility af : this.retailerFacilities.values()) {
               if (af.equals(s)) {
                 int index = count;
-                Coord coord1 = ((Link)this.controler.getNetwork().getLinks().get(new IdImpl((String)this.first.get(solution.get(index))))).getCoord();
+                Coord coord1 = ((Link)this.controler.getNetwork().getLinks().get(Id.create(this.first.get(solution.get(index)), Link.class))).getCoord();
 
                 dist = ((ActivityFacilityImpl)firstFacility).calcDistance(coord1);
                 if (dist == 0.0D) {
@@ -126,7 +122,7 @@ public class GravityModel extends RetailerModelImpl
               ++count;
             }
 
-            double potential = Math.pow(dist, this.betas[0]) + Math.pow(((ActivityOption)s.getActivityOptions().get("shopgrocery")).getCapacity(), this.betas[1]);
+            double potential = Math.pow(dist, this.betas[0]) + Math.pow(s.getActivityOptions().get("shopgrocery").getCapacity(), this.betas[1]);
 
             pers_sum_potential += potential;
           }
@@ -144,7 +140,8 @@ public class GravityModel extends RetailerModelImpl
     return newFitness;
   }
 
-  public double computePotential(ArrayList<Integer> solution)
+  @Override
+	public double computePotential(ArrayList<Integer> solution)
   {
     double fitness = 0.0D;
     if (this.isSimplifiedGravityModel)
@@ -176,11 +173,11 @@ public class GravityModel extends RetailerModelImpl
 
     for (ActivityFacility c : this.retailerFacilities.values())
     {
-      String linkId = (String)this.first.get(solution.get(a));
-      Coord coord = ((Link)this.controler.getNetwork().getLinks().get(new IdImpl(linkId))).getCoord();
+      String linkId = this.first.get(solution.get(a));
+      Coord coord = ((Link)this.controler.getNetwork().getLinks().get(Id.create(linkId, Link.class))).getCoord();
 
       double loc_likelihood = 0.0D;
-      if (!(((Integer)solution.get(a)).equals(incumbentSolution.get(a))))
+      if (!(solution.get(a).equals(incumbentSolution.get(a))))
       {
         for (PersonRetailersImpl pr : this.retailersPersons.values())
         {
@@ -188,12 +185,12 @@ public class GravityModel extends RetailerModelImpl
           double pers_potential = 0.0D;
           double pers_likelihood = 0.0D;
 
-          ActivityFacility firstFacility = (ActivityFacility)this.controlerFacilities.getFacilities().get(((PlanImpl)pr.getSelectedPlan()).getFirstActivity().getFacilityId());
+          ActivityFacility firstFacility = this.controlerFacilities.getFacilities().get(((PlanImpl)pr.getSelectedPlan()).getFirstActivity().getFacilityId());
           double dist1 = ((ActivityFacilityImpl)firstFacility).calcDistance(coord);
           if (dist1 == 0.0D) {
             dist1 = 10.0D;
           }
-          pers_potential = Math.pow(dist1, this.betas[0]) + Math.pow(((ActivityOption)c.getActivityOptions().get("shopgrocery")).getCapacity(), this.betas[1]);
+          pers_potential = Math.pow(dist1, this.betas[0]) + Math.pow(c.getActivityOptions().get("shopgrocery").getCapacity(), this.betas[1]);
 
           if (pr.getGlobalShopsUtility() == 0.0D) {
             processPerson();
@@ -207,7 +204,7 @@ public class GravityModel extends RetailerModelImpl
                 this.operationCount += 1;
                 if (af.equals(s)) {
                   int index = count;
-                  Coord coord1 = ((Link)this.controler.getNetwork().getLinks().get(new IdImpl((String)this.first.get(solution.get(index))))).getCoord();
+                  Coord coord1 = ((Link)this.controler.getNetwork().getLinks().get(Id.create(this.first.get(solution.get(index)), Link.class))).getCoord();
                   dist = ((ActivityFacilityImpl)firstFacility).calcDistance(coord1);
                   if (dist == 0.0D) {
                     dist = 10.0D;
@@ -223,7 +220,7 @@ public class GravityModel extends RetailerModelImpl
                 ++count;
               }
 
-              double potential = Math.pow(dist, this.betas[0]) + Math.pow(((ActivityOption)s.getActivityOptions().get("shopgrocery")).getCapacity(), this.betas[1]);
+              double potential = Math.pow(dist, this.betas[0]) + Math.pow(s.getActivityOptions().get("shopgrocery").getCapacity(), this.betas[1]);
 
               pers_sum_potential += potential;
             }
@@ -235,7 +232,7 @@ public class GravityModel extends RetailerModelImpl
         newFitness.add(a, Double.valueOf(loc_likelihood));
       }
       else {
-        newFitness.add(a, (Double)incumbentFitness.get(a));
+        newFitness.add(a, incumbentFitness.get(a));
       }
       ++a;
     }
@@ -278,7 +275,7 @@ public class GravityModel extends RetailerModelImpl
       int j = 0;
       while (j < n) {
         Coord c;
-        Id id = new IdImpl(a);
+        Id<RetailZone> id = Id.create(a, RetailZone.class);
         double x1 = minx + i * x_width;
         double x2 = x1 + x_width;
         double y1 = miny + j * y_width;
@@ -332,7 +329,7 @@ public class GravityModel extends RetailerModelImpl
       int j = 0;
       while (j < n) {
         Coord c;
-        Id id = new IdImpl(a);
+        Id<RetailZone> id = Id.create(a, RetailZone.class);
         double x1 = minx + i * x_width;
         double x2 = x1 + x_width;
         double y1 = miny + j * y_width;
@@ -392,7 +389,7 @@ public class GravityModel extends RetailerModelImpl
       int j = 0;
       while (j < n) {
         Coord c;
-        Id id = new IdImpl(a);
+        Id<RetailZone> id = Id.create(a, RetailZone.class);
         double x1 = minx + i * x_width;
         double x2 = x1 + x_width;
         double y1 = miny + j * y_width;
@@ -445,7 +442,7 @@ public class GravityModel extends RetailerModelImpl
     Gbl.printMemoryUsage();
   }
 
-  public Map<Id, ActivityFacilityImpl> getScenarioShops() {
+  public Map<Id<ActivityFacility>, ActivityFacilityImpl> getScenarioShops() {
     return this.shops; }
 
   public RetailZones getRetailZones() {

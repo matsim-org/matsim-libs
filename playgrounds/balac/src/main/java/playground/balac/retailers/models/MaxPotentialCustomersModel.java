@@ -8,12 +8,12 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
@@ -30,10 +30,10 @@ import playground.balac.retailers.utils.Utils;
 
 public class MaxPotentialCustomersModel extends RetailerModelImpl {
 
-	  private TreeMap<Id, LinkRetailersImpl> availableLinks = new TreeMap<Id, LinkRetailersImpl>();
+	  private TreeMap<Id<Link>, LinkRetailersImpl> availableLinks = new TreeMap<>();
 	  private static final Logger log = Logger.getLogger(MaxPotentialCustomersModel.class);
 
-	public MaxPotentialCustomersModel(Controler controler, Map<Id, ActivityFacilityImpl> retailerFacilities)
+	public MaxPotentialCustomersModel(Controler controler, Map<Id<ActivityFacility>, ActivityFacilityImpl> retailerFacilities)
 	  {
 	    this.controler = controler;
 	    this.retailerFacilities = retailerFacilities;
@@ -62,21 +62,21 @@ public class MaxPotentialCustomersModel extends RetailerModelImpl {
 	    
 	    //set inside and outside shops
 	    
-	    Utils.setShopsQuadTree(Utils.createShopsQuadTreeWIthoutRetailers(this.controler, this.retailerFacilities));
+	    Utils.setShopsQuadTree(Utils.createShopsQuadTreeWithoutRetailers(this.controler, this.retailerFacilities));
 	    Utils.setInsideShopsQuadTree(Utils.createInsideShopsQuadTreeWIthoutRetailers(this.controler, this.retailerFacilities));
 	    Utils.setOutsideShopsQuadTree(Utils.createOutsideShopsQuadTreeWIthoutRetailers(this.controler, this.retailerFacilities));
 
 	    for (Integer i = Integer.valueOf(0); i.intValue() < first.size(); i = Integer.valueOf(i.intValue() + 1)) {
 	      String linkId = this.first.get(i);
 	      //double scoreSum = 0.0D;
-	      LinkRetailersImpl link = new LinkRetailersImpl(this.controler.getNetwork().getLinks().get(new IdImpl(linkId)), this.controler.getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
+	      LinkRetailersImpl link = new LinkRetailersImpl(this.controler.getNetwork().getLinks().get(Id.create(linkId, Link.class)), this.controler.getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
 	      Collection<PersonPrimaryActivity> primaryActivities = Utils.getPersonPrimaryActivityQuadTree().get(link.getCoord().getX(), link.getCoord().getY(), 3000.0D);
 	      
 	      
 	    
 	      
-	      link.setScoreSum(1.0/(double)primaryActivities.size());
-	      link.setPotentialCustomers(1.0/(double)primaryActivities.size());
+	      link.setScoreSum(1.0/primaryActivities.size());
+	      link.setPotentialCustomers(1.0/primaryActivities.size());
 	      this.availableLinks.put(link.getId(), link);
 	    }
 	  }
@@ -94,7 +94,7 @@ public class MaxPotentialCustomersModel extends RetailerModelImpl {
 	      for (PersonPrimaryActivity ppa : primaryActivities) {
 	      
 			  Coord c = new CoordImpl(netowrk.getLinks().get(ppa.getActivityLinkId()).getCoord());
-			  FacilityRetailersImpl af = new FacilityRetailersImpl(new IdImpl("010"), c, ppa.getActivityLinkId());
+			  FacilityRetailersImpl af = new FacilityRetailersImpl(Id.create("010", ActivityFacility.class), c, ppa.getActivityLinkId());
 			  ActivityFacility af1 = Utils.getInsideShopsQuadTree().get(c.getX(), c.getY());
 			  ActivityFacility af2 = Utils.getOutsideShopsQuadTree().get(c.getX(), c.getY());
 			  
@@ -160,10 +160,10 @@ public class MaxPotentialCustomersModel extends RetailerModelImpl {
 		  ArrayList<FacilityRetailersImpl> temp = new ArrayList<FacilityRetailersImpl>();
 		  for (int s = 0; s < this.retailerFacilities.size(); ++s) {
 			  String linkId = this.first.get(solution.get(s));
-			  FacilityRetailersImpl af = new FacilityRetailersImpl(new IdImpl("010"), new CoordImpl(this.availableLinks.get(new IdImpl(linkId)).getCoord().getX(), this.availableLinks.get(new IdImpl(linkId)).getCoord().getY()), new IdImpl(linkId));
+			  FacilityRetailersImpl af = new FacilityRetailersImpl(Id.create("010", ActivityFacility.class), new CoordImpl(this.availableLinks.get(Id.create(linkId, Link.class)).getCoord().getX(), this.availableLinks.get(Id.create(linkId, Link.class)).getCoord().getY()), Id.create(linkId, Link.class));
 			  temp.add(af);
 			  
-			  Utils.addShopToShopsQuadTree(this.availableLinks.get(new IdImpl(linkId)).getCoord().getX(), this.availableLinks.get(new IdImpl(linkId)).getCoord().getY(), af);
+			  Utils.addShopToShopsQuadTree(this.availableLinks.get(Id.create(linkId, Link.class)).getCoord().getX(), this.availableLinks.get(Id.create(linkId, Link.class)).getCoord().getY(), af);
 		  }
 		  Fitness = (double) computePotentialCustomers();
 		  log.info(Fitness);
@@ -176,7 +176,7 @@ public class MaxPotentialCustomersModel extends RetailerModelImpl {
 		  return Fitness;
 	  }
 
-	  public Map<Id, ActivityFacilityImpl> getScenarioShops() {
+	  public Map<Id<ActivityFacility>, ActivityFacilityImpl> getScenarioShops() {
 	    return this.shops;
 	  }
 

@@ -1,20 +1,21 @@
 package playground.balac.utils;
 
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.population.routes.RouteUtils;
 
 public class UtilsRetailers {
 
@@ -199,7 +200,7 @@ public class UtilsRetailers {
 						shop = false;
 					
 						if (((Activity) pe).getType().equals( "shopgrocery" ) && scenario.getActivityFacilities().getFacilities().containsKey(((Activity) pe).getFacilityId())) {
-							if (((Activity) pe).getFacilityId().equals(new IdImpl("10220636")))
+							if (((Activity) pe).getFacilityId().equals(Id.create("10220636", ActivityFacility.class)))
 								count++;
 							if (car == true) {
 							distanceTobike += previousDistance;

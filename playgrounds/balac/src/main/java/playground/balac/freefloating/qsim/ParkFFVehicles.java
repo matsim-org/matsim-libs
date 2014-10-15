@@ -4,16 +4,14 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
-
-import playground.balac.freefloating.qsim.FreeFloatingStation;
-import playground.balac.freefloating.qsim.FreeFloatingVehiclesLocation;
 
 
 public class ParkFFVehicles implements AgentSource {
@@ -44,7 +42,7 @@ public class ParkFFVehicles implements AgentSource {
 		for (FreeFloatingStation ffstation: ffvehiclesLocationqt.getQuadTree().values()) {
 			
 			for (String id:ffstation.getIDs()) {
-				qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(new IdImpl("FF_"+(id)), modeVehicleTypes.get("freefloating")), ffstation.getLink().getId());
+				qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("FF_"+(id), Vehicle.class), modeVehicleTypes.get("freefloating")), ffstation.getLink().getId());
 
 			}
 			

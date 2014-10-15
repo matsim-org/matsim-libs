@@ -10,7 +10,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingCoordInfo;
 import org.matsim.core.config.Config;
@@ -23,6 +22,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.vehicles.Vehicle;
 
 import playground.balac.freefloating.config.FreeFloatingConfigGroup;
 import playground.balac.freefloating.qsimParkingModule.FreeFloatingQsimFactory;
@@ -132,7 +132,7 @@ public class FreeFloatingWithParkingControler extends Controler{
  		    	Link l = controler.getNetwork().getLinks().get(Id.create(arr[0], Link.class));	    	
  		    	
  		    	for (int k = 0; k < Integer.parseInt(arr[1]); k++) {
- 		    		ParkingCoordInfo parkingInfo = new ParkingCoordInfo(Id.create(i, Person.class), l.getCoord());
+ 		    		ParkingCoordInfo parkingInfo = new ParkingCoordInfo(Id.create(i, Vehicle.class), l.getCoord());
  		    		freefloatingCars.add(parkingInfo);
  		    		i++;
  		    	}

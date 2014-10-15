@@ -14,7 +14,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.Facility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.Dijkstra;
@@ -31,13 +30,13 @@ public class AAMRoutingModule implements RoutingModule {
 
 	private Scenario scenario;
 	private	WalkTravelTime timeObject;
-	HashMap<Id, Double> linkSpeeds;
-	TreeSet<Id> pathwayLinks = new TreeSet<Id>();
+	HashMap<Id<Link>, Double> linkSpeeds;
+	TreeSet<Id<Link>> pathwayLinks = new TreeSet<>();
 	
 	public AAMRoutingModule (Scenario scenario) {
 		
 		this.scenario = scenario;
-		linkSpeeds = new HashMap<Id, Double>();
+		linkSpeeds = new HashMap<>();
 
 		BufferedReader reader;
 		reader = IOUtils.getBufferedReader(this.scenario.getConfig().getModule("MovingPathways").getParams().get("movingPathwaysInputFile"));
@@ -49,8 +48,8 @@ public class AAMRoutingModule implements RoutingModule {
 			
 				String[] array = s.split("\t", -1);
 				if (array.length != 2) throw (new IOException("Error parsing a line " + s +" from the input file, check the length of the line"));
-				linkSpeeds.put(new IdImpl(array[0]), Double.parseDouble(array[1]));
-				pathwayLinks.add(new IdImpl(array[0]));
+				linkSpeeds.put(Id.create(array[0], Link.class), Double.parseDouble(array[1]));
+				pathwayLinks.add(Id.create(array[0], Link.class));
 				s = reader.readLine();
 			}
 		

@@ -7,6 +7,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
@@ -19,23 +20,24 @@ public class RetailerModelImpl
   implements RetailerModel
 {
   protected static final Logger log = Logger.getLogger(RetailerModelImpl.class);
-  protected final Map<Id, PersonImpl> persons = new TreeMap<Id, PersonImpl>();
+  protected final Map<Id<Person>, PersonImpl> persons = new TreeMap<Id<Person>, PersonImpl>();
   protected final Map<Id, PersonRetailersImpl> retailersPersons = new TreeMap<Id, PersonRetailersImpl>();
   protected Controler controler;
-  protected Map<Id, ActivityFacilityImpl> retailerFacilities;
+  protected Map<Id<ActivityFacility>, ActivityFacilityImpl> retailerFacilities;
   protected ActivityFacilities controlerFacilities;
-  protected Map<Id, ActivityFacilityImpl> shops;
+  protected Map<Id<ActivityFacility>, ActivityFacilityImpl> shops;
   protected TreeMap<Integer, String> first;
   protected ArrayList<Integer> initialSolution = new ArrayList<Integer>();
 
-  public double computePotential(ArrayList<Integer> solution)
+  @Override
+	public double computePotential(ArrayList<Integer> solution)
   {
     return 0.0D;
   }
 
-  protected Map<Id, ActivityFacilityImpl> findScenarioShops(Collection<? extends ActivityFacility> controlerFacilities)
+  protected Map<Id<ActivityFacility>, ActivityFacilityImpl> findScenarioShops(Collection<? extends ActivityFacility> controlerFacilities)
   {
-    Map<Id, ActivityFacilityImpl> shops = new TreeMap<Id, ActivityFacilityImpl>();
+    Map<Id<ActivityFacility>, ActivityFacilityImpl> shops = new TreeMap<>();
     for (ActivityFacility f : controlerFacilities) {
       if (f.getActivityOptions().entrySet().toString().contains("shopgrocery")) {
         shops.put(f.getId(), (ActivityFacilityImpl)f);
@@ -55,7 +57,8 @@ public class RetailerModelImpl
       this.initialSolution.add(Integer.valueOf(i));
   }
 
-  public ArrayList<Integer> getInitialSolution()
+  @Override
+	public ArrayList<Integer> getInitialSolution()
   {
     return this.initialSolution;
   }

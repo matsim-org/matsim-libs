@@ -5,29 +5,17 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.Config;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.QuadTree;
@@ -44,7 +32,7 @@ public class LinksCSReader
   public static final String CONFIG_LINKS_PAR = "freeLinksParameter";
   public static final String CONFIG_GROUP = "CsPreprocess";
   private String linkIdFile;
-  protected TreeMap<Id, LinkImpl> allLinks = new TreeMap();
+  protected TreeMap<Id<Link>, LinkImpl> allLinks = new TreeMap<>();
   //protected TreeMap<Id, LinkImpl> freeLinks = new TreeMap();
   protected ArrayList<LinkImpl> freeLinks = new ArrayList<LinkImpl>();
   private ArrayList<LinkImpl> currentLinks = new ArrayList<LinkImpl>();
@@ -85,12 +73,13 @@ public class LinksCSReader
       while ((curr_line = br.readLine()) != null) {
         String[] entries = curr_line.split("\t", -1);
 
-        Id lId = new IdImpl(entries[0]);
-        LinkRetailersImpl l = new LinkRetailersImpl((Link)this.scenario.getNetwork().getLinks().get(lId), (NetworkImpl)this.scenario.getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
+        Id<Link> lId = Id.create(entries[0], Link.class);
+        LinkRetailersImpl l = new LinkRetailersImpl(this.scenario.getNetwork().getLinks().get(lId), this.scenario.getNetwork(), Double.valueOf(0.0D), Double.valueOf(0.0D));
 
         this.freeLinks.add( l);
         this.allLinks.put(l.getId(), l);
       }
+      br.close();
     }
     catch (IOException e) {
     }
@@ -127,7 +116,7 @@ public class LinksCSReader
     	  rd++;
     	  LinkImpl link = (LinkImpl)list.get(rd);
     	  
-        if (this.currentLinks.contains(((LinkImpl)link))) {
+        if (this.currentLinks.contains((link))) {
         	log.info("On the link " + link.getId() + " there is already a Station"); 
         }
         else if (this.freeLinks.contains(link)) {
@@ -139,7 +128,7 @@ public class LinksCSReader
         		this.freeLinks.add(link);
         		log.info("the link " + link.getId() + " has been added to the free links");
         		log.info("free links are" + this.freeLinks);
-        		this.allLinks.put(link.getId(), (LinkImpl)link);
+        		this.allLinks.put(link.getId(), link);
           }
         }   
     	  
@@ -173,7 +162,7 @@ public class LinksCSReader
       if (f.getCoord().getY() > maxy) maxy = f.getCoord().getY();
     }
     minx -= 1.0D; miny -= 1.0D; maxx += 1.0D; maxy += 1.0D;
-    QuadTree personQuadTree = new QuadTree(minx, miny, maxx, maxy);
+    QuadTree<Person> personQuadTree = new QuadTree<>(minx, miny, maxx, maxy);
     for (Person p : this.scenario.getPopulation().getPersons().values()) {
       Coord c = ((ActivityFacility)this.scenario.getActivityFacilities().getFacilities().get(((PlanImpl)p.getSelectedPlan()).getFirstActivity().getFacilityId())).getCoord();
       personQuadTree.put(c.getX(), c.getY(), p);

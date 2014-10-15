@@ -16,7 +16,6 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.LinkImpl;
 
 import playground.balac.retailers.data.LinkRetailersImpl;
 import playground.balac.retailers.utils.Utils;
@@ -127,9 +126,9 @@ public class MaxLinkRetailerStrategy implements RetailerStrategy {
 
 
 	@Override
-	public Map<Id, ActivityFacilityImpl> moveFacilities(
-			Map<Id, ActivityFacilityImpl> paramMap,
-			TreeMap<Id, LinkRetailersImpl> paramTreeMap) {
+	public Map<Id<ActivityFacility>, ActivityFacilityImpl> moveFacilities(
+			Map<Id<ActivityFacility>, ActivityFacilityImpl> paramMap,
+			TreeMap<Id<Link>, LinkRetailersImpl> paramTreeMap) {
 		// TODO Auto-generated method stub
 		return null;
 	}
