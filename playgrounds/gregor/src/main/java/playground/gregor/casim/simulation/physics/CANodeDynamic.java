@@ -364,12 +364,12 @@ public class CANodeDynamic implements CANode{
 			if (l.getDownstreamCANode() == this) {
 				if (l.getParticles()[l.getNumOfCells()-1] != null && l.getParticles()[l.getNumOfCells()-1].getDir() == 1) {
 					cands.add(new Tuple<CALinkDynamic,CAAgent>(l,l.getParticles()[l.getNumOfCells()-1]));
-					cap += l.getLink().getCapacity();
+					cap += 1;//l.getLink().getCapacity();
 				}
 			} else if (l.getUpstreamCANode() == this) {
 				if (l.getParticles()[0] != null && l.getParticles()[0].getDir() == -1) {
 					cands.add(new Tuple<CALinkDynamic,CAAgent>(l,l.getParticles()[0]));
-					cap += l.getLink().getCapacity();
+					cap += 1;//l.getLink().getCapacity();
 				}
 			}
 		}

@@ -37,7 +37,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -180,8 +179,8 @@ public class CASimDynamicExperiment_ZhangJ2012a {
 				
 				
 				for (double cor = 5; cor > 1; cor -= 8) {
-					for (double d = 1.8; d < cor/2; d+=0.001) {
-						settings.add(new Setting(d,cor,d+MatsimRandom.getRandom().nextDouble()/10));	
+					for (double d = 1.8; d < 2; d+=0.001) {
+						settings.add(new Setting(d,cor,d));	
 					}					
 				}
 		
@@ -291,10 +290,10 @@ public class CASimDynamicExperiment_ZhangJ2012a {
 			Link l2revb = fac.createLink(Id.createLinkId("2revb"), n2a, n2);
 
 
-			Link l2ex = fac.createLink(Id.createLinkId("2ex"), n2, n2ex);
+			Link l2ex = fac.createLink(Id.createLinkId("2ex"), n1, n2ex);
 			
 			Link l3 = fac.createLink(Id.createLinkId("3"), n3, n4);
-			Link l3ex = fac.createLink(Id.createLinkId("3ex"), n3, n3ex);
+			Link l3ex = fac.createLink(Id.createLinkId("3ex"), n4, n3ex);
 			Link l3rev = fac.createLink(Id.createLinkId("3rev"), n4, n3);
 			
 			Link l4a = fac.createLink(Id.createLinkId("4a"), n4, n4a);
@@ -359,7 +358,7 @@ public class CASimDynamicExperiment_ZhangJ2012a {
 
 
 			double size = 500;
-			double width = bL;
+			double width = 2*bL;
 			double ratio = CANetworkDynamic.PED_WIDTH/width;
 			double cellLength = ratio/(CANetworkDynamic.RHO_HAT*CANetworkDynamic.PED_WIDTH);
 			double length = size*cellLength;
@@ -375,11 +374,12 @@ public class CASimDynamicExperiment_ZhangJ2012a {
 			l0rev.setLength(length);
 			((CoordImpl)((NodeImpl)n0).getCoord()).setX(0-length);
 			((CoordImpl)((NodeImpl)n5).getCoord()).setX(16+length);
-			l0.setCapacity(bL);
+			l0.setCapacity(2*bL);
+			l0rev.setCapacity(2*bL);
 			l4.setLength(length);
 			l4rev.setLength(length);
-			l4.setCapacity(bR);
-			l4rev.setCapacity(bR);
+			l4.setCapacity(2*bR);
+			l4rev.setCapacity(2*bR);
 			l4a.setCapacity(bR);
 			l4arev.setCapacity(bR);
 			
@@ -389,22 +389,21 @@ public class CASimDynamicExperiment_ZhangJ2012a {
 			l2.setCapacity(bCor);
 			l2a.setCapacity(bCor);
 			l2b.setCapacity(bCor);
-			l1.setCapacity(bCor);
+			l1.setCapacity(4*bCor);
 			//			l2a.setCapacity(bCor);
 			//			l2arev.setCapacity(bCor);
 			//			l2b.setCapacity(bCor);
 			//			l2brev.setCapacity(bCor);
-			l3.setCapacity(bCor);
-			l0rev.setCapacity(bL);
-			l1rev.setCapacity(bCor);
+			l3.setCapacity(4*bCor);
+			l1rev.setCapacity(4*bCor);
 			l2rev.setCapacity(bCor);
 			l2reva.setCapacity(bCor);
 			l2revb.setCapacity(bCor);
-			l3rev.setCapacity(bCor);
+			l3rev.setCapacity(4*bCor);
 			//			l2ex.setCapacity(B_exit);
 			//			l3ex.setCapacity(B_exit);
-			l2ex.setCapacity(bCor);
-			l3ex.setCapacity(bCor);
+			l2ex.setCapacity(4*bCor);
+			l3ex.setCapacity(4*bCor);
 
 			List<Link> linksLR = new ArrayList<Link>();
 			linksLR.add(l0);
@@ -413,6 +412,7 @@ public class CASimDynamicExperiment_ZhangJ2012a {
 			linksLR.add(l2);
 			linksLR.add(l2a);
 			linksLR.add(l2b);
+			linksLR.add(l3);
 			linksLR.add(l3ex);
 			
 			
@@ -424,6 +424,7 @@ public class CASimDynamicExperiment_ZhangJ2012a {
 			linksRL.add(l2b);
 			linksRL.add(l2a);
 			linksRL.add(l2);
+			linksRL.add(l1);
 			linksRL.add(l2ex);
 			
 			System.out.println(" " + bL + " " + bCor + " " + bR +"\n");
