@@ -44,6 +44,7 @@ public class SpeedAndAccelDigiScorer implements DigiScorer{
 	/* Other variables. */
 	private int maxLines = Integer.MAX_VALUE;
 	private int noSpeedLimitWarningCount = 0;
+	private int noRiskWarningCount = 0;
 	private double[] speedObservations = {0, 0, 0, 0};
 	private final double SPEED_ZERO = 1.0;
 	private final double SPEED_ONE = 1.1;
@@ -247,10 +248,6 @@ public class SpeedAndAccelDigiScorer implements DigiScorer{
 				result = accelRisk;
 			}
 		}
-		//FIXME remove if this never occurs.
-		if(id.equalsIgnoreCase("15bfc08796f69d6aa94ef11952619467")){
-			LOG.debug("Customer with no risky behaviour?!");
-		}
 		
 		return result;
 	}
@@ -338,6 +335,14 @@ public class SpeedAndAccelDigiScorer implements DigiScorer{
 			for(String id : personMap.keySet()){
 				Integer[] thisArray = personMap.get(id);
 				bw.write(String.format("%s,%d,%d,%d,%d\n", id, thisArray[0], thisArray[1], thisArray[2], thisArray[3]));
+
+				if(thisArray[1] + thisArray[2] + thisArray[3] == 0 && noRiskWarningCount < 10){
+					LOG.warn("No risk customer: " + id);
+					noRiskWarningCount++;
+					if(noRiskWarningCount == 10){
+						LOG.warn("Future occurences of this warning will be surpressed.");
+					}
+				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

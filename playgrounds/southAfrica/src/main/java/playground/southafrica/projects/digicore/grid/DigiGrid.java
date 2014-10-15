@@ -19,8 +19,11 @@
 
 package playground.southafrica.projects.digicore.grid;
 
+import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,6 +32,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+
+import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
 import org.jzy3d.analysis.AbstractAnalysis;
@@ -281,6 +286,17 @@ public class DigiGrid  extends AbstractAnalysis {
 	}
 	
 	
+	/**
+	 * Currently four visualisations are supported:
+	 * <ul>
+	 * 	<li><b>NONE</b>: no visualisation;
+	 * 	<li><b>CENTROID</b>: only draws the centroids of each cell;
+	 * 	<li><b>SLICE</b>: takes a horizontal slice at z=? (currently this z-value is hard-coded);
+	 * 	<li><b>POLYHEDRA</b>: draws all the dodecahedra.
+	 * </ul>
+	 * 
+	 * @author jwjoubert
+	 */
 	public static enum Visual{NONE,CENTROID,SLICE,POLYHEDRA}
 	
 	@Override
@@ -445,9 +461,18 @@ public class DigiGrid  extends AbstractAnalysis {
 				poly.setColor(fillColor);
 				poly.setWireframeColor(DIGI_GRAY);
 				chart.getScene().add(poly);
-				chart.getView().shoot();
 				
 				/* FIXME Get a screenshot working!! */
+				try {
+					File temp = File.createTempFile("myTempImage", ".tmp");
+					chart.screenshot(temp);
+					BufferedImage img = ImageIO.read(temp);
+					ImageIO.write( img, "png", new File("/User/jwjoubert/Desktop/png.png"));
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				chart.getView().shoot();
 //				try {
 //					chart.screenshot(new File("/Users/jwjoubert/Pictures/Digicore/Slice_" + depth + ".png"));
 //				} catch (IOException e) {
@@ -510,7 +535,92 @@ public class DigiGrid  extends AbstractAnalysis {
 	public boolean isPopulated(){
 		return this.isPopulated;
 	}
+	
+	public void populateFromGridFile(String filename){
+		LOG.info("Building grid from " + filename);
+		double maxValue = Double.NEGATIVE_INFINITY;
 
+		LOG.info("Calculating the data extent...");
+		double minX = Double.POSITIVE_INFINITY;
+		double minY = Double.POSITIVE_INFINITY;
+		double minZ = Double.POSITIVE_INFINITY;
+		double maxX = Double.NEGATIVE_INFINITY;
+		double maxY = Double.NEGATIVE_INFINITY;
+		double maxZ = Double.NEGATIVE_INFINITY;
+		
+		Counter counter = new Counter("   lines # ");
+		BufferedReader br = IOUtils.getBufferedReader(filename);
+		try{
+			String line = br.readLine();
+			while( (line = br.readLine()) != null){
+				String[] sa = line.split(",");
+				double x = Double.parseDouble(sa[0]);
+				double y = Double.parseDouble(sa[1]);
+				double z = Double.parseDouble(sa[2]);
+				minX = Math.min(minX, x-2*scale);
+				minY = Math.min(minY, y-2*scale);
+				minZ = Math.min(minZ, z-2*scale);
+				maxX = Math.max(maxX, x+2*scale);
+				maxY = Math.max(maxY, y+2*scale);
+				maxZ = Math.max(maxZ, z+2*scale);
+				counter.incCounter();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Cannot read from " + filename);
+		} finally{
+			try {
+				br.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Cannot close " + filename);
+			}
+		}
+		counter.printCounter();
 
-
+		/* Populate the grid. */
+		LOG.info("Building and populating the OcTree with dodecahedron centroids...");
+		map = new HashMap<Coord3d, Double>((int) counter.getCounter());
+		mapRating = new TreeMap<Coord3d, Integer>(getGridComparator());
+		ot = new OcTree<Coord3d>(minX, minY, minZ, maxX, maxY, maxZ);
+		
+		counter.reset();
+		br = IOUtils.getBufferedReader(filename);
+		try{
+			String line = br.readLine();
+			while( (line = br.readLine()) != null){
+				String[] sa = line.split(",");
+				double x = Double.parseDouble(sa[0]);
+				double y = Double.parseDouble(sa[1]);
+				double z = Double.parseDouble(sa[2]);
+				double count = Double.parseDouble(sa[3]);
+				int riskClass = Integer.parseInt(sa[4]);
+				
+				maxValue = Math.max(maxValue, count);
+				Coord3d c = new Coord3d(x, y, z);
+				ot.put(x, y,z, c);
+				map.put(c, count);
+				mapRating.put(c, riskClass);
+				
+				counter.incCounter();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Cannot read from " + filename);
+		} finally{
+			try {
+				br.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Cannot close " + filename);
+			}
+		}
+		counter.printCounter();
+		
+		LOG.info("Done building grid");
+		this.isPopulated = true;
+		this.isRanked = true;
+		
+		LOG.info("A total of " + map.size() + " dodecahedra contains points (max value: " + maxValue + ")");
+	}
 }
