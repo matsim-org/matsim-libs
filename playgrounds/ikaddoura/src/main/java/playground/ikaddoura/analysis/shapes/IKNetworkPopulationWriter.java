@@ -38,9 +38,9 @@ import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.PopulationReaderMatsimV5;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
-
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -94,13 +94,13 @@ public class IKNetworkPopulationWriter {
 		tbuilder.setName("shape");
 		tbuilder.add("geometry", Point.class);
 		tbuilder.add("type", String.class);
-		
+		tbuilder.setCRS(MGC.getCRS(TransformationFactory.WGS84));
 		builder = new SimpleFeatureBuilder(tbuilder.buildFeatureType());
 		
 		Set<SimpleFeature> features = new HashSet<SimpleFeature>();
 		
 		GeometryFactory gf = new GeometryFactory();
-		
+
 		int i = 0;
 		
 		for(Person p : scenario.getPopulation().getPersons().values()){
@@ -135,6 +135,7 @@ public class IKNetworkPopulationWriter {
 		}
 				
 		SimpleFeatureTypeBuilder tbuilder = new SimpleFeatureTypeBuilder();
+		tbuilder.setCRS(MGC.getCRS(TransformationFactory.WGS84));
 		tbuilder.setName("shape");
 		tbuilder.add("geometry", LineString.class);
 		tbuilder.add("id", String.class);
