@@ -77,19 +77,19 @@ public class FacilityChoiceSetDistribution {
 		DistanceCalculator calculator = new CartesianDistanceCalculator();
 		Discretizer discretizer = new LinearDiscretizer(1000.0);
 
-		Map<String, Map<SocialVertex, List<Id>>> choicesets = new HashMap<String, Map<SocialVertex, List<Id>>>();
+		Map<String, Map<SocialVertex, List<Id<ActivityFacility>>>> choicesets = new HashMap<>();
 
 		choicesets.put("culture", FacilityChoiceSetGenerator.read("/Users/jillenberger/Work/socialnets/locationChoice/data/choiceset.culture.txt", graph));
 		choicesets.put("gastro", FacilityChoiceSetGenerator.read("/Users/jillenberger/Work/socialnets/locationChoice/data/choiceset.gastro.txt", graph));
 		choicesets.put("sports", FacilityChoiceSetGenerator.read("/Users/jillenberger/Work/socialnets/locationChoice/data/choiceset.sports.txt", graph));
 
-		for (Entry<String, Map<SocialVertex, List<Id>>> entry2 : choicesets.entrySet()) {
-			Map<SocialVertex, List<Id>> map = entry2.getValue();
+		for (Entry<String, Map<SocialVertex, List<Id<ActivityFacility>>>> entry2 : choicesets.entrySet()) {
+			Map<SocialVertex, List<Id<ActivityFacility>>> map = entry2.getValue();
 
 			TDoubleDoubleHashMap hist = new TDoubleDoubleHashMap();
-			for (Entry<SocialVertex, List<Id>> entry : map.entrySet()) {
+			for (Entry<SocialVertex, List<Id<ActivityFacility>>> entry : map.entrySet()) {
 				Point p1 = entry.getKey().getPoint();
-				for (Id id : entry.getValue()) {
+				for (Id<ActivityFacility> id : entry.getValue()) {
 					ActivityFacility f = facilities.getFacilities().get(id);
 					Point p2 = MatsimCoordUtils.coordToPoint(f.getCoord());
 

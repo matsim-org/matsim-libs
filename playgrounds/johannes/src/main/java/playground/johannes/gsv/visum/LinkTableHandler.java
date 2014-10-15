@@ -86,11 +86,11 @@ public class LinkTableHandler extends TableHandler {
 	 */
 	@Override
 	public void handleRow(Map<String, String> record) {
-		Node from = network.getNodes().get(idGenerator.generateId(record.get(FROM_KEY)));
-		Node to = network.getNodes().get(idGenerator.generateId(record.get(TO_KEY)));
+		Node from = network.getNodes().get(idGenerator.generateId(record.get(FROM_KEY), Node.class));
+		Node to = network.getNodes().get(idGenerator.generateId(record.get(TO_KEY), Node.class));
 		
 		if(from != null && to != null) {
-			Id id = idGenerator.generateId(record.get(NodeTableHandler.ID_KEY));
+			Id<Link> id = idGenerator.generateId(record.get(NodeTableHandler.ID_KEY), Link.class);
 			
 			Link link = network.getLinks().get(id);
 			if(link == null) {
@@ -103,7 +103,7 @@ public class LinkTableHandler extends TableHandler {
 				 * link already exists, check if return link
 				 */
 				if(link.getFromNode().equals(to) && link.getToNode().equals(from)) {
-					id = idGenerator.generateId(record.get(NodeTableHandler.ID_KEY) + "R");
+					id = idGenerator.generateId(record.get(NodeTableHandler.ID_KEY) + "R", Link.class);
 					link = network.getFactory().createLink(id, from, to);
 				} else {
 					throw new RuntimeException("Link with already existing id but not the return link.");

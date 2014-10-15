@@ -27,18 +27,15 @@ import gnu.trove.TObjectDoubleHashMap;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.MatsimXmlWriter;
@@ -62,7 +59,7 @@ public class RailCounts {
 		this.lineAttribs = attribs;
 	}
 	
-	public void addCounts(Id linkId, Id lineId, double counts) {
+	public void addCounts(Id<Link> linkId, Id lineId, double counts) {
 		RailCountsContainer container = countsMap.get(linkId);
 		
 		if(container == null) {
@@ -73,7 +70,7 @@ public class RailCounts {
 		container.addCount(lineId, counts);
 	}
 	
-	public double counts(Id linkId) {
+	public double counts(Id<Link> linkId) {
 		RailCountsContainer container = countsMap.get(linkId);
 		if(container == null) {
 			return 0;
@@ -86,7 +83,7 @@ public class RailCounts {
 		}
 	}
 	
-	public double counts(Id linkId, Id lineId) {
+	public double counts(Id<Link> linkId, Id lineId) {
 		RailCountsContainer container = countsMap.get(linkId);
 		if(container == null) {
 			return 0;
@@ -95,7 +92,7 @@ public class RailCounts {
 		}
 	}
 	
-	public double counts(Id linkId, String tSys) {
+	public double counts(Id<Link> linkId, String tSys) {
 		RailCountsContainer container = countsMap.get(linkId);
 		if(container == null) {
 			return 0;
@@ -116,7 +113,7 @@ public class RailCounts {
 		}
 	}
 	
-	public Id[] lines(Id linkId) {
+	public Id[] lines(Id<Link> linkId) {
 		RailCountsContainer container = countsMap.get(linkId);
 		if(container == null) {
 			return null;
@@ -209,9 +206,9 @@ public class RailCounts {
 		@Override
 		public void startTag(String name, Attributes atts, Stack<String> context) {
 			if(name.equalsIgnoreCase("link")) {
-				currentLink = network.getLinks().get(new IdImpl(atts.getValue("id")));
+				currentLink = network.getLinks().get(Id.create(atts.getValue("id"), Link.class));
 			} else if(name.equalsIgnoreCase("line")) {
-				TransitLine line = schedule.getTransitLines().get(new IdImpl(atts.getValue("id")));
+				TransitLine line = schedule.getTransitLines().get(Id.create(atts.getValue("id"), TransitLine.class));
 				if(line != null && currentLink != null) {
 					railCounts.addCounts(currentLink.getId(), line.getId(), Double.parseDouble(atts.getValue("count")));
 				}

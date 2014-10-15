@@ -20,10 +20,10 @@
 package playground.johannes.gsv.synPop.osm;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityOption;
@@ -56,7 +56,7 @@ public class MergeFacilities {
 			logger.info("Merging facilities...");
 			ActivityFacilities facilities = scenario.getActivityFacilities();
 			for(ActivityFacility fac : facilities.getFacilities().values()) {
-				ActivityFacility newFac = all.getFactory().createActivityFacility(new IdImpl(counter), fac.getCoord());
+				ActivityFacility newFac = all.getFactory().createActivityFacility(Id.create(counter, ActivityFacility.class), fac.getCoord());
 				counter++;
 				for(ActivityOption opt : fac.getActivityOptions().values()) {
 					ActivityOption newOpt = all.getFactory().createActivityOption(opt.getType());

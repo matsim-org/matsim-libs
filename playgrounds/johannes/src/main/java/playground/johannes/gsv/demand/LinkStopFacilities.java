@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -72,12 +71,12 @@ public class LinkStopFacilities {
 		modes.add("pt");
 		
 		for(TransitStopFacility facility : schedule.getFacilities().values()) {
-			Node node = network.getNodes().get(idGenerator.generateId(facility.getId().toString()));
+			Node node = network.getNodes().get(idGenerator.generateId(facility.getId().toString(), Node.class));
 			
 			if(node == null)
 				throw new RuntimeException("Node not found.");
 			
-			Id id = new IdImpl("stop." + facility.getId().toString());
+			Id<Link> id = Id.create("stop." + facility.getId().toString(), Link.class);
 			Link link = network.getLinks().get(id);
 			
 			if(link == null) {

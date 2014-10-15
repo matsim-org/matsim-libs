@@ -30,5 +30,5 @@ import org.matsim.api.core.v01.Id;
  */
 public interface IdGenerator {
 
-	public Id generateId(String str);
+	public <T> Id<T> generateId(String str, Class<T> idType);
 }

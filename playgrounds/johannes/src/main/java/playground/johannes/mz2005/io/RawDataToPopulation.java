@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -163,7 +162,7 @@ public class RawDataToPopulation {
 			if(trip.duration != -99)
 				route.setTravelTime(trip.duration * 60);
 			
-			route.setLinkIds(new IdImpl(0), new ArrayList<Id<Link>>(0), new IdImpl(0));
+			route.setLinkIds(Id.create(0, Link.class), new ArrayList<Id<Link>>(0), Id.create(0, Link.class));
 			leg.setRoute(route);
 			
 			if(trip.accompanists > 0)

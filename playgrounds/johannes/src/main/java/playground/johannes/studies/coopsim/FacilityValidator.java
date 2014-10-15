@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -57,7 +56,7 @@ public class FacilityValidator {
 		for(SocialVertex v : graph.getVertices()) {
 			Person person = v.getPerson().getPerson();
 			
-			Id id = new IdImpl(HOME_PREFIX + person.getId().toString());
+			Id<ActivityFacility> id = Id.create(HOME_PREFIX + person.getId().toString(), ActivityFacility.class);
 			ActivityFacilityImpl homeFac = ((ActivityFacilitiesImpl) facilities).createAndAddFacility(id, MatsimCoordUtils.pointToCoord(v.getPoint()));
 			homeFac.createActivityOption("visit");
 			Link link = network.getNearestLink(homeFac.getCoord());

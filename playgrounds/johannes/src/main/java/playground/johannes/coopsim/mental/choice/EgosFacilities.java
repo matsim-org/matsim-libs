@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
@@ -34,22 +35,22 @@ import playground.johannes.socialnetworks.graph.social.SocialVertex;
  */
 public class EgosFacilities implements FacilityChoiceSetGenerator {
 
-	private final Map<SocialVertex, List<Id>> choiceSets;
+	private final Map<SocialVertex, List<Id<ActivityFacility>>> choiceSets;
 	
 	private final Random random;
 	
-	public EgosFacilities(Map<SocialVertex, List<Id>> choiceSets, Random random) {
+	public EgosFacilities(Map<SocialVertex, List<Id<ActivityFacility>>> choiceSets, Random random) {
 		this.choiceSets = choiceSets;
 		this.random = random;
 	}
 	
 	@Override
-	public ChoiceSet<Id> generate(Collection<SocialVertex> egos) {
-		ChoiceSet<Id> choiceSet = new ChoiceSet<Id>(random);
+	public ChoiceSet<Id<ActivityFacility>> generate(Collection<SocialVertex> egos) {
+		ChoiceSet<Id<ActivityFacility>> choiceSet = new ChoiceSet<>(random);
 		
 		for(SocialVertex ego : egos) {
-			List<Id> facilityIds = choiceSets.get(ego);
-			for(Id id : facilityIds)
+			List<Id<ActivityFacility>> facilityIds = choiceSets.get(ego);
+			for(Id<ActivityFacility> id : facilityIds)
 				choiceSet.addChoice(id);
 		}
 		

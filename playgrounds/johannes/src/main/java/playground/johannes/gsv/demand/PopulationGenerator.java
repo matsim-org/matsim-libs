@@ -31,16 +31,15 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.PopulationWriter;
 import org.opengis.feature.simple.SimpleFeature;
 
-import playground.johannes.gsv.demand.tasks.PlanPrimaryActivity;
 import playground.johannes.sna.gis.CRSUtils;
 import playground.johannes.sna.gis.Zone;
 import playground.johannes.sna.gis.ZoneLayer;
@@ -169,7 +168,7 @@ public class PopulationGenerator {
 		
 		Population pop = PopulationUtils.createPopulation(ConfigUtils.createConfig());
 		for(long i = 0; i < n; i++) {
-			Person p = pop.getFactory().createPerson(new IdImpl(i));
+			Person p = pop.getFactory().createPerson(Id.create(i, Person.class));
 			pop.addPerson(p);
 		}
 		

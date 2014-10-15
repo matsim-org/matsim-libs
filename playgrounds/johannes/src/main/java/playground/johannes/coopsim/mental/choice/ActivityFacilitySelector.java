@@ -68,8 +68,8 @@ public class ActivityFacilitySelector implements ChoiceSelector {
 		@SuppressWarnings("unchecked")
 		List<SocialVertex> egos = (List<SocialVertex>) choices.get(ActivityGroupSelector.KEY);
 		
-		ChoiceSet<Id> choiceSet = generator.generate(egos);
-		Id facility = choiceSet.randomChoice();
+		ChoiceSet<Id<ActivityFacility>> choiceSet = generator.generate(egos);
+		Id<ActivityFacility> facility = choiceSet.randomChoice();
 		
 		choices.put(KEY, facility);
 		

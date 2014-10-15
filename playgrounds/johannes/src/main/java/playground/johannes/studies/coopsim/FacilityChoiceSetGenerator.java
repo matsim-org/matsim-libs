@@ -35,7 +35,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityOption;
 
 import playground.johannes.coopsim.util.MatsimCoordUtils;
@@ -72,12 +71,12 @@ public class FacilityChoiceSetGenerator {
 		this.calculator = calculator;
 	}
 	
-	public Map<SocialVertex, List<Id>> generate(SocialGraph graph, ActivityFacilities facilities, String type) {
+	public Map<SocialVertex, List<Id<ActivityFacility>>> generate(SocialGraph graph, ActivityFacilities facilities, String type) {
 		logger.info("Generating facility choice set...");
 		
 		List<ActivityFacility> facList = filterFacilities(facilities, type);
 		logger.info(String.format("%1$s facilities of type %2$s.", facList.size(), type));
-		Map<SocialVertex, List<Id>> choiceSets = new HashMap<SocialVertex, List<Id>>(graph.getVertices().size());
+		Map<SocialVertex, List<Id<ActivityFacility>>> choiceSets = new HashMap<>(graph.getVertices().size());
 		
 		ProgressLogger.init(graph.getVertices().size(), 1, 5);
 		for(SocialVertex ego : graph.getVertices()) {
@@ -92,7 +91,7 @@ public class FacilityChoiceSetGenerator {
 			/*
 			 * draw facilities
 			 */
-			List<Id> choiceSet = new ArrayList<Id>((int) (numChoices * 1.5));
+			List<Id<ActivityFacility>> choiceSet = new ArrayList<>((int) (numChoices * 1.5));
 			for(ActivityFacility facility : facList) {
 				double d = calculator.distance(ego.getPoint(), MatsimCoordUtils.coordToPoint(facility.getCoord()));
 				double p = numChoices/norm * Math.pow(d, gamma);
@@ -129,15 +128,15 @@ public class FacilityChoiceSetGenerator {
 		return facList;
 	}
 	
-	public static void write(Map<SocialVertex, List<Id>> choiceSets, String file) throws IOException {
+	public static void write(Map<SocialVertex, List<Id<ActivityFacility>>> choiceSets, String file) throws IOException {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 		
-		for(Entry<SocialVertex, List<Id>> entry : choiceSets.entrySet()) {
+		for(Entry<SocialVertex, List<Id<ActivityFacility>>> entry : choiceSets.entrySet()) {
 			SocialVertex ego = entry.getKey();
 			writer.write(ego.getPerson().getPerson().getId().toString());
 			
-			List<Id> choiceSet = entry.getValue();
-			for(Id id : choiceSet) {
+			List<Id<ActivityFacility>> choiceSet = entry.getValue();
+			for(Id<ActivityFacility> id : choiceSet) {
 				writer.write("\t");
 				writer.write(id.toString());
 			}
@@ -147,29 +146,29 @@ public class FacilityChoiceSetGenerator {
 		writer.close();
 	}
 	
-	public static Map<SocialVertex, List<Id>> read(String file, SocialGraph graph) throws IOException {
+	public static Map<SocialVertex, List<Id<ActivityFacility>>> read(String file, SocialGraph graph) throws IOException {
 		Map<String, SocialVertex> idVertexMap = new HashMap<String, SocialVertex>(graph.getVertices().size());
 		for(SocialVertex v : graph.getVertices()) {
 			idVertexMap.put(v.getPerson().getPerson().getId().toString(), v);
 			
 		}
 		
-		Map<SocialVertex, List<Id>> choiceSets = new HashMap<SocialVertex, List<Id>>(graph.getVertices().size());
+		Map<SocialVertex, List<Id<ActivityFacility>>> choiceSets = new HashMap<SocialVertex, List<Id<ActivityFacility>>>(graph.getVertices().size());
 		BufferedReader reader = new BufferedReader(new FileReader(file));
 		String line = null;
 		while((line = reader.readLine()) != null) {
 			String[] tokens = line.split("\t");
 			SocialVertex ego = idVertexMap.get(tokens[0]);
 			
-			List<Id> choiceSet = new ArrayList<Id>();
+			List<Id<ActivityFacility>> choiceSet = new ArrayList<>();
 			for(int i = 1; i < tokens.length; i++) {
-				Id Id = new IdImpl(tokens[i]);
-				choiceSet.add(Id);
+				Id<ActivityFacility> id = Id.create(tokens[i], ActivityFacility.class);
+				choiceSet.add(id);
 			}
 			
 			choiceSets.put(ego, choiceSet);
 		}
-		
+		reader.close();
 		return choiceSets;
 	}
 

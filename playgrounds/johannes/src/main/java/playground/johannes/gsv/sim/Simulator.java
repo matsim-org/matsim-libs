@@ -29,6 +29,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -38,7 +39,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
@@ -102,7 +102,7 @@ public class Simulator {
 		 */
 		Random random = new XORShiftRandom(controler.getConfig().global().getRandomSeed());
 		
-		StrategySettings settings = new StrategySettings(new IdImpl(1));
+		StrategySettings settings = new StrategySettings(Id.create(1, StrategySettings.class));
 		settings.setModuleName("activityLocations");
 		settings.setProbability(1.0);
 		int numThreads = controler.getConfig().global().getNumberOfThreads();

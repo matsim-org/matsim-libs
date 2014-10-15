@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
@@ -55,7 +54,7 @@ public class Visum2MatsimRoadNetwork {
 
 			@Override
 			public void handleRow(Map<String, String> row) {
-				Id id = new IdImpl(row.get("NR"));
+				Id<Node> id = Id.create(row.get("NR"), Node.class);
 				Coord coord = new CoordImpl(Double.parseDouble(row.get("XKOORD").replace(',', '.')), Double.parseDouble(row.get("YKOORD").replace(',', '.')));
 				network.createAndAddNode(id, coord);
 			}
@@ -68,9 +67,9 @@ public class Visum2MatsimRoadNetwork {
 			@Override
 			public void handleRow(Map<String, String> row) {
 				String nr = row.get("NR");
-				IdImpl id = new IdImpl(nr);
-				IdImpl fromNodeId = new IdImpl(row.get("VONKNOTNR"));
-				IdImpl toNodeId = new IdImpl(row.get("NACHKNOTNR"));
+				Id<Link> id = Id.create(nr, Link.class);
+				Id<Node> fromNodeId = Id.create(row.get("VONKNOTNR"), Node.class);
+				Id<Node> toNodeId = Id.create(row.get("NACHKNOTNR"), Node.class);
 		
 				Node fromNode = network.getNodes().get(fromNodeId);
 				Node toNode = network.getNodes().get(toNodeId);
@@ -79,7 +78,7 @@ public class Visum2MatsimRoadNetwork {
 				
 				if (lastEdge != null) {
 					if (lastEdge.getFromNode().getId().equals(toNodeId) && lastEdge.getToNode().getId().equals(fromNodeId)) {
-						id = new IdImpl(nr + 'R');
+						id = Id.create(nr + 'R', Link.class);
 					} else {
 						throw new RuntimeException("Duplicate edge.");
 					}

@@ -23,7 +23,6 @@
 package playground.johannes.gsv.visum;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 
 /**
  * @author johannes
@@ -31,12 +30,9 @@ import org.matsim.core.basic.v01.IdImpl;
  */
 public class IdentityIdGenerator implements IdGenerator {
 
-	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.visum.IdGenerator#generateId(java.lang.String)
-	 */
 	@Override
-	public Id generateId(String str) {
-		return new IdImpl(str);
+	public <T> Id<T> generateId(String str, Class<T> idType) {
+		return Id.create(str, idType);
 	}
 
 }

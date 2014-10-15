@@ -105,8 +105,8 @@ public class ScheduleNetworkMatcher {
 				List<Id<Link>> linkIds = new ArrayList<Id<Link>>(items.size());
 				
 				for(int i = 1; i < items.size(); i++) {
-					Node from = network.getNodes().get(idGenerator.generateId(items.get(i-1).nodeId.toString()));
-					Node to = network.getNodes().get(idGenerator.generateId(items.get(i).nodeId.toString()));
+					Node from = network.getNodes().get(idGenerator.generateId(items.get(i-1).nodeId.toString(), Node.class));
+					Node to = network.getNodes().get(idGenerator.generateId(items.get(i).nodeId.toString(), Node.class));
 					
 					Link link = NetworkUtils.getConnectingLink(from, to);
 					if(link == null)

@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.FacilitiesUtils;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -117,14 +116,14 @@ public class BuildingSynthesizer {
 				
 				for(int i = 0; i < n2; i++) {
 					Coord c = generateRandomCoordinate(area.getGeometry());
-					ActivityFacility facility = facilities.getFactory().createActivityFacility(new IdImpl("new"+idCounter++), c);
+					ActivityFacility facility = facilities.getFactory().createActivityFacility(Id.create("new"+idCounter++, ActivityFacility.class), c);
 					facilities.addActivityFacility(facility);
 				}
 			}
 			
 			for(OSMObject building : entry.getValue()) {
 				Coord c = MatsimCoordUtils.pointToCoord(building.getGeometry().getCentroid());
-				Id id = new IdImpl(building.getId());
+				Id<ActivityFacility> id = Id.create(building.getId(), ActivityFacility.class);
 				if(facilities.getFacilities().get(id) == null) {
 					ActivityFacility facility = facilities.getFactory().createActivityFacility(id, c);
 					facilities.addActivityFacility(facility);
@@ -144,7 +143,7 @@ public class BuildingSynthesizer {
 			if(building.getType().equalsIgnoreCase(OSMObject.BUILDING)) {
 				try {
 				Coord c = MatsimCoordUtils.pointToCoord(building.getGeometry().getCentroid());
-				ActivityFacility facility = facilities.getFactory().createActivityFacility(new IdImpl(building.getId()), c);
+				ActivityFacility facility = facilities.getFactory().createActivityFacility(Id.create(building.getId(), ActivityFacility.class), c);
 				facilities.addActivityFacility(facility);
 				
 				buildingTree.insert(building.getGeometry().getEnvelopeInternal(), building);
@@ -182,7 +181,7 @@ public class BuildingSynthesizer {
 				
 				if(!hit) {
 					Coord c = MatsimCoordUtils.pointToCoord(poi.getGeometry().getCentroid());
-					ActivityFacility facility = facilities.getFactory().createActivityFacility(new IdImpl("poi"+poi.getId()), c);
+					ActivityFacility facility = facilities.getFactory().createActivityFacility(Id.create("poi"+poi.getId(), ActivityFacility.class), c);
 					facilities.addActivityFacility(facility);
 				}
 			}

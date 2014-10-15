@@ -29,7 +29,6 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 
 import playground.johannes.coopsim.util.MatsimCoordUtils;
 import playground.johannes.gsv.synPop.CommonKeys;
@@ -69,10 +68,10 @@ public class ActivityDistanceTask extends AnalyzerTask {
 			
 				if (purpose == null	|| purpose.equalsIgnoreCase(thisAct.getAttribute(CommonKeys.ACTIVITY_TYPE))) {
 					ProxyObject prevAct = plan.getActivities().get(i - 1);
-					Id prevId = new IdImpl(prevAct.getAttribute(CommonKeys.ACTIVITY_FACILITY));
+					Id<ActivityFacility> prevId = Id.create(prevAct.getAttribute(CommonKeys.ACTIVITY_FACILITY), ActivityFacility.class);
 					ActivityFacility prevFac = facilities.getFacilities().get(prevId);
 
-					Id thisId = new IdImpl(thisAct.getAttribute(CommonKeys.ACTIVITY_FACILITY));
+					Id<ActivityFacility> thisId = Id.create(thisAct.getAttribute(CommonKeys.ACTIVITY_FACILITY), ActivityFacility.class);
 					ActivityFacility thisFac = facilities.getFacilities().get(thisId);
 
 					Point p1 = MatsimCoordUtils.coordToPoint(prevFac.getCoord());

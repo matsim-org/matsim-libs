@@ -12,7 +12,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
@@ -98,7 +98,7 @@ public class Analyzer {
 			for(Plan plan : person.getPlans()) {
 				for(int i = 0; i < plan.getPlanElements().size(); i+=2) {
 					Activity act = (Activity) plan.getPlanElements().get(i);
-					Id id = new IdImpl("autofacility_"+ i +"_" + person.getId().toString());
+					Id<ActivityFacility> id = Id.create("autofacility_"+ i +"_" + person.getId().toString(), ActivityFacility.class);
 					ActivityFacilityImpl fac = ((ActivityFacilitiesImpl)facilities).createAndAddFacility(id, act.getCoord());
 					fac.createActivityOption(act.getType());
 					

@@ -23,7 +23,6 @@
 package playground.johannes.gsv.visum;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 
 /**
  * @author johannes
@@ -36,12 +35,9 @@ public class PrefixIdGenerator implements IdGenerator {
 	public PrefixIdGenerator(String prefix) {
 		this.prefix = prefix;
 	}
-	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.visum.IdGenerator#generateId(java.lang.String)
-	 */
 	@Override
-	public Id generateId(String str) {
-		return new IdImpl(prefix + str);
+	public <T> Id<T> generateId(String str, Class<T> idType) {
+		return Id.create(prefix + str, idType);
 	}
 
 }

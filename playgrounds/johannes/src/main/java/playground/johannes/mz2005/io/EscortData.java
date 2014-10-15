@@ -31,10 +31,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 
 /**
  * @author illenberger
@@ -95,7 +95,7 @@ public class EscortData {
 		while ((line = reader.readLine()) != null) {
 			String[] tokens = line.split("\t");
 
-			Person person = population.getPersons().get(new IdImpl(tokens[0]));
+			Person person = population.getPersons().get(Id.create(tokens[0], Person.class));
 			if (person != null) {
 				int legIndex = Integer.parseInt(tokens[1]);
 				int escorts = Integer.parseInt(tokens[2]);
@@ -108,7 +108,8 @@ public class EscortData {
 				data.add(person, legIndex, escorts);
 			}
 		}
-
+		reader.close();
+		
 		return data;
 	}
 }

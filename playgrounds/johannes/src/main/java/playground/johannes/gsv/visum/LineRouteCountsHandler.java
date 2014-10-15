@@ -95,7 +95,7 @@ public class LineRouteCountsHandler extends TableHandler {
 		String line = record.get(LINE_KEY);
 		String route = record.get(ROUTE_KEY);
 		String dcode = record.get(DCODE_KEY);
-		Node toNode = network.getNodes().get(idGenerator.generateId(record.get(NODE_KEY)));
+		Node toNode = network.getNodes().get(idGenerator.generateId(record.get(NODE_KEY), Node.class));
 		
 		
 		if(index - 1 == lastIndex) {

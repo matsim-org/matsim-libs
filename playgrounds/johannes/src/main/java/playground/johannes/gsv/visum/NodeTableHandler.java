@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
@@ -66,16 +65,13 @@ public class NodeTableHandler extends TableHandler {
 		this.idGenerator = idGenerator;
 	}
 	
-	/* (non-Javadoc)
-	 * @see playground.johannes.gsv.visum.NetFileReader.TableHandler#handleRow(java.util.Map)
-	 */
 	@Override
 	public void handleRow(Map<String, String> record) {
-		Id id;
+		Id<Node> id;
 		if(idGenerator == null)
-			id = new IdImpl(record.get(ID_KEY));
+			id = Id.create(record.get(ID_KEY), Node.class);
 		else
-			id = idGenerator.generateId(record.get(ID_KEY));
+			id = idGenerator.generateId(record.get(ID_KEY), Node.class);
 		
 		Coord c = new CoordImpl(Double.parseDouble(record.get(XCOORD)), Double.parseDouble(record.get(YCOORD)));
 		Node node = network.getFactory().createNode(id, transform.transform(c));

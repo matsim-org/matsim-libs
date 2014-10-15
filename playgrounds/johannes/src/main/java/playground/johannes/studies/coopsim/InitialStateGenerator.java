@@ -19,16 +19,20 @@
  * *********************************************************************** */
 package playground.johannes.studies.coopsim;
 
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.scenario.ScenarioUtils;
+
 import playground.johannes.socialnetworks.graph.social.SocialGraph;
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
@@ -39,7 +43,7 @@ import playground.johannes.socialnetworks.graph.social.SocialVertex;
 public class InitialStateGenerator {
 
 	public static void generate(SocialGraph graph, ActivityFacilities facilities, NetworkLegRouter router) {
-        PopulationFactory factory = (PopulationFactoryImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation().getFactory();
+        PopulationFactory factory = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation().getFactory();
 		/*
 		 * delete all plans
 		 */
@@ -52,7 +56,7 @@ public class InitialStateGenerator {
 		for(SocialVertex v : graph.getVertices()) {
 			Person person = v.getPerson().getPerson();
 			
-			ActivityFacility homeFac = facilities.getFacilities().get(new IdImpl(FacilityValidator.HOME_PREFIX + person.getId().toString())); 
+			ActivityFacility homeFac = facilities.getFacilities().get(Id.create(FacilityValidator.HOME_PREFIX + person.getId().toString(), ActivityFacility.class)); 
 			
 			Plan plan = factory.createPlan();
 			

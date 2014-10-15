@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 
 /**
@@ -45,7 +44,7 @@ public class FacilityFromActivity {
 					if(act.getCoord() == null) 
 						throw new NullPointerException("Activity has no coordinate.");
 					
-					Id id = new IdImpl(String.format("tmp.%1$s.%2$s.%3$s", person.getId().toString(), k, i));
+					Id<ActivityFacility> id = Id.create(String.format("tmp.%1$s.%2$s.%3$s", person.getId().toString(), k, i), ActivityFacility.class);
 					ActivityFacility facility = facilities.getFactory().createActivityFacility(id, act.getCoord());
 					facilities.addActivityFacility(facility);
 					((ActivityImpl)act).setFacilityId(facility.getId());

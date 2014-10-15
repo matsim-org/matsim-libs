@@ -24,6 +24,7 @@ import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
@@ -40,8 +41,8 @@ public class AltersHome implements FacilityChoiceSetGenerator {
 	}
 	
 	@Override
-	public ChoiceSet<Id> generate(Collection<SocialVertex> egos) {
-		ChoiceSet<Id> choiceSet = new ChoiceSet<Id>(random);
+	public ChoiceSet<Id<ActivityFacility>> generate(Collection<SocialVertex> egos) {
+		ChoiceSet<Id<ActivityFacility>> choiceSet = new ChoiceSet<>(random);
 		
 		for(SocialVertex ego : egos) {
 			for(SocialVertex alter : ego.getNeighbours()) {

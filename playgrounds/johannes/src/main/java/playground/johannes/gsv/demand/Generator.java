@@ -25,12 +25,12 @@ package playground.johannes.gsv.demand;
 import java.io.IOException;
 import java.util.Random;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
@@ -130,7 +130,7 @@ public class Generator {
 	private static Population create(int N) {
 		Population pop = PopulationUtils.createPopulation(ConfigUtils.createConfig());
 		for(long i = 0; i < N; i++) {
-			Person p = pop.getFactory().createPerson(new IdImpl(i));
+			Person p = pop.getFactory().createPerson(Id.create(i, Person.class));
 			pop.addPerson(p);
 			
 			Plan plan = pop.getFactory().createPlan();

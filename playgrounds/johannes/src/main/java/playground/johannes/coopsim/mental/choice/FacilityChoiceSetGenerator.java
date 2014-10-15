@@ -22,6 +22,7 @@ package playground.johannes.coopsim.mental.choice;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
 import playground.johannes.socialnetworks.graph.social.SocialVertex;
 
@@ -31,6 +32,6 @@ import playground.johannes.socialnetworks.graph.social.SocialVertex;
  */
 public interface FacilityChoiceSetGenerator {
 
-	public ChoiceSet<Id> generate(Collection<SocialVertex> egos);
+	public ChoiceSet<Id<ActivityFacility>> generate(Collection<SocialVertex> egos);
 	
 }

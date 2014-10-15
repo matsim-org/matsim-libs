@@ -24,10 +24,10 @@ import java.util.Collection;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacilitiesFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesFactoryImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.FacilitiesUtils;
@@ -73,7 +73,7 @@ public class OSM2Facility {
 				Point p = CRSUtils.transformPoint(geo.getCentroid(), tranform);
 				Coord coord = MatsimCoordUtils.pointToCoord(p);
 				ActivityFacility facility = factory.createActivityFacility(
-						new IdImpl(String.valueOf(cnt)), coord);
+						Id.create(String.valueOf(cnt), ActivityFacility.class), coord);
 				ActivityOption option = factory.createActivityOption(actOption);
 				facility.addActivityOption(option);
 				facilities.addActivityFacility(facility);

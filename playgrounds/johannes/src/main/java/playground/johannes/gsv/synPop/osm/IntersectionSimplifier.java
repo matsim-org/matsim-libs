@@ -28,18 +28,17 @@ import java.util.Queue;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.NetworkRunnable;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -135,14 +134,14 @@ public class IntersectionSimplifier implements NetworkRunnable {
 			quadTree.put(centerNode.getCoord().getX(), centerNode.getCoord().getY(), centerNode);
 			
 			for(Node source : sourceNodes) {
-				Link newLink = factory.createLink(new IdImpl(linkIdCounter++), source, centerNode);
+				Link newLink = factory.createLink(Id.create(linkIdCounter++, Link.class), source, centerNode);
 				network.addLink(newLink);
 				Set<Link> origLinks = inLinks.get(source);
 				assignProps(origLinks, newLink);
 			}
 			
 			for(Node target : targetNodes) {
-				Link newLink = factory.createLink(new IdImpl(linkIdCounter++), centerNode, target);
+				Link newLink = factory.createLink(Id.create(linkIdCounter++, Link.class), centerNode, target);
 				network.addLink(newLink);
 				Set<Link> origLinks = outLinks.get(target);
 				assignProps(origLinks, newLink);
@@ -182,7 +181,7 @@ public class IntersectionSimplifier implements NetworkRunnable {
 	}
 	
 	public static void main(String args[]) {
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile("/home/johannes/gsv/osm/germany-network-cat5.simplified3.xml");
 

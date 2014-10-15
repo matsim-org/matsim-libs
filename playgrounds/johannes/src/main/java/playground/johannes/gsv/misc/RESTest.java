@@ -28,9 +28,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -100,8 +100,8 @@ public class RESTest {
 			
 			Tuple<String, String> tuple = handler.train2LineRoute.get(trainId);
 			if(tuple != null) {
-				Link link = scenario.getNetwork().getLinks().get(new IdImpl(container.linkeId));
-				TransitLine line = schedule.getTransitLines().get(new IdImpl(tuple.getSecond()));
+				Link link = scenario.getNetwork().getLinks().get(Id.create(container.linkeId, Link.class));
+				TransitLine line = schedule.getTransitLines().get(Id.create(tuple.getSecond(), TransitLine.class));
 				railCounts.addCounts(link.getId(), line.getId(), container.count);
 				match++;
 				matchedTrains.add(trainId);

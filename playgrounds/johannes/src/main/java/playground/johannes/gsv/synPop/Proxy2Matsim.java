@@ -19,6 +19,7 @@
 
 package playground.johannes.gsv.synPop;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -27,7 +28,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
@@ -65,7 +65,7 @@ public class Proxy2Matsim {
 		ProgressLogger.init(parser.getPersons().size(), 1, 10);
 		
 		for(ProxyPerson proxyPerson : parser.getPersons()) {
-			Person person = factory.createPerson(new IdImpl(proxyPerson.getId()));
+			Person person = factory.createPerson(Id.create(proxyPerson.getId(), Person.class));
 			pop.addPerson(person);
 			
 			ProxyPlan proxyPlan = proxyPerson.getPlan();
@@ -83,10 +83,10 @@ public class Proxy2Matsim {
 //					act = (ActivityImpl) factory.createActivityFromCoord(type, new CoordImpl(x, y));
 //					
 //				} else {
-//					ActivityFacility facility = facilities.getFacilities().get(new IdImpl(proxyAct.getAttribute(CommonKeys.ACTIVITY_FACILITY)));
+//					ActivityFacility facility = facilities.getFacilities().get(Id.create(proxyAct.getAttribute(CommonKeys.ACTIVITY_FACILITY)));
 //					act = factory.createActivityFromCoord(type, facility.getCoord());
 //				}
-				ActivityFacility facility = facilities.getFacilities().get(new IdImpl(proxyAct.getAttribute(CommonKeys.ACTIVITY_FACILITY)));
+				ActivityFacility facility = facilities.getFacilities().get(Id.create(proxyAct.getAttribute(CommonKeys.ACTIVITY_FACILITY), ActivityFacility.class));
 				act = (ActivityImpl) factory.createActivityFromCoord(type, facility.getCoord());
 				act.setFacilityId(facility.getId());
 				act.setStartTime(Integer.parseInt(proxyAct.getAttribute(CommonKeys.ACTIVITY_START_TIME)));

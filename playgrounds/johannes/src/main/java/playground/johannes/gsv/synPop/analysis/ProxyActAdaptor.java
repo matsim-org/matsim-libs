@@ -21,8 +21,9 @@ package playground.johannes.gsv.synPop.analysis;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
 import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyObject;
@@ -96,14 +97,14 @@ public class ProxyActAdaptor implements Activity {
 	}
 
 	@Override
-	public Id getLinkId() {
+	public Id<Link> getLinkId() {
 		// TODO Currently not implemented, yet is possible.
 		return null;
 	}
 
 	@Override
-	public Id getFacilityId() {
-		return new IdImpl(delegate.getAttribute(CommonKeys.ACTIVITY_FACILITY));
+	public Id<ActivityFacility> getFacilityId() {
+		return Id.create(delegate.getAttribute(CommonKeys.ACTIVITY_FACILITY), ActivityFacility.class);
 	}
 
 }

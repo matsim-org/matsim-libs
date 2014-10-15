@@ -34,12 +34,12 @@ import java.util.concurrent.Future;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityOption;
@@ -196,7 +196,7 @@ public class MergeFacilitiesToLink {
 		long idCounter = 0;
 		for(Entry<Link, Set<ActivityFacility>> entry : fac2Link.entrySet()) {
 			Link link = entry.getKey();
-			ActivityFacility newFac = facilities.getFactory().createActivityFacility(new IdImpl(idCounter++), link.getCoord());
+			ActivityFacility newFac = facilities.getFactory().createActivityFacility(Id.create(idCounter++, ActivityFacility.class), link.getCoord());
 			facilities.addActivityFacility(newFac);
 			
 			for(ActivityFacility origFac : entry.getValue()) {
