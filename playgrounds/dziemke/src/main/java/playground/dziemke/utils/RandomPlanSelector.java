@@ -21,25 +21,22 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class RandomPlanSelector {
 	// Parameters
-	//static double selectionProbability = 0.01;
-	static double selectionProbability = 1.;
+	static double selectionProbability = 0.01;
 	static boolean onlyTransferSelectedPlan = false;
 	static boolean considerHomeStayingAgents = true;
 	static boolean includeStayHomePlans = true;
 	static int limitNumberOfAgents = 10000000;
 	static String runId = "run_145";
-	//static int iteration = 250;
+	static int iteration = 150;
 	
 	
 	// Input and output files
-	//static String inputPlansFile = "D:/Workspace/container/demand/input/cemdap2matsim/24/plans.xml.gz";
-	//static String inputPlansFile = "D:/Workspace/container/demand/output/" + runId + "/ITERS/it." + iteration
-	//		+ "/" + runId + "." + iteration + ".plans.xml.gz";
-	static String inputPlansFile = "D:/Workspace/container/demand/output/" + runId + "/" + runId + ".output_plans.xml.gz";
-	//static String outputPlansFile = "D:/Workspace/container/demand/input/cemdap2matsim/24/plans_modified.xml.gz";
-	//static String outputPlansFile = "D:/Workspace/container/demand/output/" + runId + "/ITERS/it." + iteration
-	//		+ "/" + runId + "." + iteration + ".plans_modified.xml.gz";
-	static String outputPlansFile = "D:/Workspace/container/demand/output/" + runId + "/" + runId + ".output_plans_modified.xml.gz";
+	static String inputPlansFile = "D:/Workspace/runs-svn/cemdapCadyts/" + runId + "/ITERS/it." + iteration
+			+ "/" + runId + "." + iteration + ".plans.xml.gz";
+	//static String inputPlansFile = "D:/Workspace/container/demand/output/" + runId + "/" + runId + ".output_plans.xml.gz";
+	static String outputPlansFile = "D:/Workspace/runs-svn/cemdapCadyts/" + runId + "/ITERS/it." + iteration
+			+ "/" + runId + "." + iteration + ".plans_modified.xml.gz";
+	//static String outputPlansFile = "D:/Workspace/container/demand/output/" + runId + "/" + runId + ".output_plans_modified.xml.gz";
 	
 	
 	public static void main(String[] args) {

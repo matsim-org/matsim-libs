@@ -42,7 +42,7 @@ public class AddZoneToOutputPlan {
 	private final static GeometryFactory geometryFactory = new GeometryFactory();
 	
 	// parameters
-	static String runId = "run_145";
+	static String runId = "run_145f";
 	static int iteration = 150;
 	
 	/// input and output files
@@ -50,9 +50,9 @@ public class AddZoneToOutputPlan {
 //			+ "/" + runId + "." + iteration + ".plans.xml.gz";
 //	static String outputPlansFile = "D:/Workspace/data/cemdapMatsimCadyts/output/" + runId + "/ITERS/it." + iteration
 //			+ "/" + runId + "." + iteration + ".plansWithZonesAsFacilities.xml.gz";
-	static String inputPlansFile = "D:/Workspace/runs-svn/cemdapCadyts/output/" + runId + "/ITERS/it." + iteration
+	static String inputPlansFile = "D:/Workspace/runs-svn/cemdapCadyts/" + runId + "/ITERS/it." + iteration
 			+ "/" + runId + "." + iteration + ".plans.xml.gz";
-	static String outputPlansFile = "D:/Workspace/runs-svn/cemdapCadyts/output/" + runId + "/ITERS/it." + iteration
+	static String outputPlansFile = "D:/Workspace/runs-svn/cemdapCadyts/" + runId + "/ITERS/it." + iteration
 			+ "/" + runId + "." + iteration + ".plansWithZonesAsFacilities.xml.gz";
 	
 	static String combinedShapeFile = "D:/Workspace/data/cemdapMatsimCadyts/input/shapefiles/gemeindenLOR_DHDN_GK4.shp";
