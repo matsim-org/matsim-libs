@@ -72,19 +72,19 @@ public class LegModeDistributionForActivityEndTimeAndActivityDuration extends Ab
 	}
 
 	public static void main(String[] args) {
-		String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMC/";
-		String [] runs = {"run33","run201","run202","run203","run204"};
+		String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/output/mcd/";
+		String [] runs = {"baseCaseCtd",  "ci",  "eci",  "ei"};
 
 		for(String run:runs){
-			String configFile = runDir+run+"/output_config.xml";
+			String configFile = runDir+run+"/output_config.xml.gz";
 			int lastIteration = LoadMyScenarios.getLastIteration(configFile);
 			String eventsFile = runDir+run+"/ITERS/it."+lastIteration+"/"+lastIteration+".events.xml.gz";
 			String plansFile = runDir+run+"/output_plans.xml";
 			LegModeDistributionForActivityEndTimeAndActivityDuration lmdatd = new LegModeDistributionForActivityEndTimeAndActivityDuration(eventsFile, configFile,plansFile);
 			lmdatd.preProcessData();
 			lmdatd.postProcessData();
-			new File(runDir+run+"/analysis/legModeDistributions/").mkdir();
-			lmdatd.writeResults(runDir+"/analysis500Its/legModeDistributions/"+run);
+			new File(runDir+run+"/analysis/legModeDistributions/").mkdirs();
+			lmdatd.writeResults(runDir+"/analysis/legModeDistributions/"+run);
 		}
 	}
 
