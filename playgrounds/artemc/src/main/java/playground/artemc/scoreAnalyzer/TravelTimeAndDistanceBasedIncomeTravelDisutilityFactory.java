@@ -22,6 +22,7 @@ package playground.artemc.scoreAnalyzer;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -34,9 +35,9 @@ import org.matsim.core.router.util.TravelTime;
  */
 public class TravelTimeAndDistanceBasedIncomeTravelDisutilityFactory implements TravelDisutilityFactory {
 
-	HashMap<Id, Double> factorMap;
+	HashMap<Id<Person>, Double> factorMap;
 	
-	public TravelTimeAndDistanceBasedIncomeTravelDisutilityFactory(HashMap<Id, Double> factorMap){
+	public TravelTimeAndDistanceBasedIncomeTravelDisutilityFactory(HashMap<Id<Person>, Double> factorMap){
 		this.factorMap = factorMap;
 	}
 	

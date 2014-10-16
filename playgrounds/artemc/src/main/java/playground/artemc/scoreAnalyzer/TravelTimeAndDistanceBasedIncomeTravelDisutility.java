@@ -41,11 +41,11 @@ public class TravelTimeAndDistanceBasedIncomeTravelDisutility implements TravelD
 	protected final TravelTime timeCalculator;
 	private final double marginalCostOfTime;
 	private final double marginalCostOfDistance;
-	private HashMap<Id, Double> factorMap;
+	private HashMap<Id<Person>, Double> factorMap;
 	
 	private static int wrnCnt = 0 ;
 
-	public TravelTimeAndDistanceBasedIncomeTravelDisutility(final TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, HashMap<Id, Double> factorMap) {
+	public TravelTimeAndDistanceBasedIncomeTravelDisutility(final TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, HashMap<Id<Person>, Double> factorMap) {
 		this.timeCalculator = timeCalculator;
 		this.factorMap = factorMap;
 		/* Usually, the travel-utility should be negative (it's a disutility)
