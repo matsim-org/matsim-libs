@@ -31,10 +31,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -42,6 +42,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleReaderV1;
 
 /**
@@ -50,13 +51,13 @@ import org.matsim.vehicles.VehicleReaderV1;
  */
 public class InVehicleDelayHandlerTest extends MatsimTestCase {
 
-	private Id vehicleId1 = new IdImpl("vehicleId1");
-	private Id vehicleId2 = new IdImpl("vehicleId2");
-	private Id ptDriverId1 = new IdImpl("driverId1");
-	private Id ptDriverId2 = new IdImpl("driverId2");
-	private Id testAgent1 = new IdImpl("testAgent1");
-	private Id testAgent2 = new IdImpl("testAgent2");
-	private Id testAgent3 = new IdImpl("testAgent3");
+	private Id<Vehicle> vehicleId1 = Id.create("vehicleId1", Vehicle.class);
+	private Id<Vehicle> vehicleId2 = Id.create("vehicleId2", Vehicle.class);
+	private Id<Person> ptDriverId1 = Id.create("driverId1", Person.class);
+	private Id<Person> ptDriverId2 = Id.create("driverId2", Person.class);
+	private Id<Person> testAgent1 = Id.create("testAgent1", Person.class);
+	private Id<Person> testAgent2 = Id.create("testAgent2", Person.class);
+	private Id<Person> testAgent3 = Id.create("testAgent3", Person.class);
 
 	
 	List<TransferDelayInVehicleEvent> inVehDelayEvents;
@@ -92,26 +93,26 @@ public class InVehicleDelayHandlerTest extends MatsimTestCase {
 		
 		// Bus1 fährt los
 		TransferDelayInVehicleHandler inVehDelayHandler = new TransferDelayInVehicleHandler(events, scenario);
-		inVehDelayHandler.handleEvent(new TransitDriverStartsEvent((double) 0, ptDriverId1, vehicleId1, null, null, null));
+		inVehDelayHandler.handleEvent(new TransitDriverStartsEvent(0, ptDriverId1, vehicleId1, null, null, null));
 		// Bus1 kommt an und Person1 steigt in den leeren Bus.
-		inVehDelayHandler.handleEvent(new VehicleArrivesAtFacilityEvent((double) 1, vehicleId1, null, 0.));
-		inVehDelayHandler.handleEvent(new PersonEntersVehicleEvent((double) 2, testAgent1, vehicleId1));
+		inVehDelayHandler.handleEvent(new VehicleArrivesAtFacilityEvent(1, vehicleId1, null, 0.));
+		inVehDelayHandler.handleEvent(new PersonEntersVehicleEvent(2, testAgent1, vehicleId1));
 		// Person2 steigt in Bus1, in dem eine Person sitzt
-		inVehDelayHandler.handleEvent(new PersonEntersVehicleEvent((double) 2, testAgent2, vehicleId1));
+		inVehDelayHandler.handleEvent(new PersonEntersVehicleEvent(2, testAgent2, vehicleId1));
 		// Person3 steigt in Bus1, in dem zwei Personen sitzen
-		inVehDelayHandler.handleEvent(new PersonEntersVehicleEvent((double) 2, testAgent3, vehicleId1));
+		inVehDelayHandler.handleEvent(new PersonEntersVehicleEvent(2, testAgent3, vehicleId1));
 		// Bus1 fährt los, dadurch werden die extra delay events geworfen
-		inVehDelayHandler.handleEvent(new VehicleDepartsAtFacilityEvent((double) 3, vehicleId1, null, 0.));
+		inVehDelayHandler.handleEvent(new VehicleDepartsAtFacilityEvent(3, vehicleId1, null, 0.));
 		
 		// Bus1 kommt an und Person1 steigt aus Bus1, in dem 2 Personen sitzen.
-		inVehDelayHandler.handleEvent(new VehicleArrivesAtFacilityEvent((double) 5, vehicleId1, null, 0.));
-		inVehDelayHandler.handleEvent(new PersonLeavesVehicleEvent((double) 6, testAgent1, vehicleId1));
+		inVehDelayHandler.handleEvent(new VehicleArrivesAtFacilityEvent(5, vehicleId1, null, 0.));
+		inVehDelayHandler.handleEvent(new PersonLeavesVehicleEvent(6, testAgent1, vehicleId1));
 		// Person 2 steigt aus Bus1, in dem eine Person sitzt
-		inVehDelayHandler.handleEvent(new PersonLeavesVehicleEvent((double) 6, testAgent2, vehicleId1));
+		inVehDelayHandler.handleEvent(new PersonLeavesVehicleEvent(6, testAgent2, vehicleId1));
 		// Person 3 steigt aus Bus1, in dem keiner mehr sitzt
-		inVehDelayHandler.handleEvent(new PersonLeavesVehicleEvent((double) 6, testAgent3, vehicleId1));
+		inVehDelayHandler.handleEvent(new PersonLeavesVehicleEvent(6, testAgent3, vehicleId1));
 		// Bus1 fährt los, dadurch werden die extra delay events geworfen
-		inVehDelayHandler.handleEvent(new VehicleDepartsAtFacilityEvent((double) 7, vehicleId1, null, 0.));
+		inVehDelayHandler.handleEvent(new VehicleDepartsAtFacilityEvent(7, vehicleId1, null, 0.));
 		
 		for (TransferDelayInVehicleEvent delay : this.inVehDelayEvents){
 
@@ -239,24 +240,24 @@ public class InVehicleDelayHandlerTest extends MatsimTestCase {
 			
 			// Bus1 fährt los
 			TransferDelayInVehicleHandler inVehDelayHandler = new TransferDelayInVehicleHandler(events, scenario);
-			inVehDelayHandler.handleEvent(new TransitDriverStartsEvent((double) 0, ptDriverId1, vehicleId1, null, null, null));
+			inVehDelayHandler.handleEvent(new TransitDriverStartsEvent(0, ptDriverId1, vehicleId1, null, null, null));
 			// Bus1 kommt an und Person1 steigt in den leeren Bus.
-			inVehDelayHandler.handleEvent(new VehicleArrivesAtFacilityEvent((double) 1, vehicleId1, null, 0.));
-			inVehDelayHandler.handleEvent(new PersonEntersVehicleEvent((double) 2, testAgent1, vehicleId1));
+			inVehDelayHandler.handleEvent(new VehicleArrivesAtFacilityEvent(1, vehicleId1, null, 0.));
+			inVehDelayHandler.handleEvent(new PersonEntersVehicleEvent(2, testAgent1, vehicleId1));
 			// Person2 steigt in Bus1, in dem eine Person sitzt
-			inVehDelayHandler.handleEvent(new PersonEntersVehicleEvent((double) 2, testAgent2, vehicleId1));
+			inVehDelayHandler.handleEvent(new PersonEntersVehicleEvent(2, testAgent2, vehicleId1));
 			// Person3 steigt in Bus1, in dem zwei Personen sitzen
-			inVehDelayHandler.handleEvent(new PersonEntersVehicleEvent((double) 2, testAgent3, vehicleId1));
+			inVehDelayHandler.handleEvent(new PersonEntersVehicleEvent(2, testAgent3, vehicleId1));
 			// Bus1 fährt los, dadurch werden die extra delay events geworfen
-			inVehDelayHandler.handleEvent(new VehicleDepartsAtFacilityEvent((double) 3, vehicleId1, null, 0.));
+			inVehDelayHandler.handleEvent(new VehicleDepartsAtFacilityEvent(3, vehicleId1, null, 0.));
 			
 			// Bus1 kommt an und Person1 steigt aus Bus1, in dem 2 Personen sitzen.
-			inVehDelayHandler.handleEvent(new VehicleArrivesAtFacilityEvent((double) 5, vehicleId1, null, 0.));
-			inVehDelayHandler.handleEvent(new PersonLeavesVehicleEvent((double) 6, testAgent1, vehicleId1));
+			inVehDelayHandler.handleEvent(new VehicleArrivesAtFacilityEvent(5, vehicleId1, null, 0.));
+			inVehDelayHandler.handleEvent(new PersonLeavesVehicleEvent(6, testAgent1, vehicleId1));
 			// Person 2 steigt aus Bus1, in dem eine Person sitzt
-			inVehDelayHandler.handleEvent(new PersonLeavesVehicleEvent((double) 6, testAgent2, vehicleId1));
+			inVehDelayHandler.handleEvent(new PersonLeavesVehicleEvent(6, testAgent2, vehicleId1));
 			// Bus1 fährt los, dadurch werden die extra delay events geworfen
-			inVehDelayHandler.handleEvent(new VehicleDepartsAtFacilityEvent((double) 7, vehicleId1, null, 0.));
+			inVehDelayHandler.handleEvent(new VehicleDepartsAtFacilityEvent(7, vehicleId1, null, 0.));
 			
 			for (TransferDelayInVehicleEvent delay : this.inVehDelayEvents){
 

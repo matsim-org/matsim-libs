@@ -42,7 +42,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -54,6 +53,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.Vehicle;
 
 import playground.ikaddoura.internalizationCar.old.MarginalCongestionHandlerV1;
 
@@ -69,14 +69,18 @@ public class MarginalCongestionHandlerV1Test {
 	private EventsManager events;
 	private ScenarioImpl scenario;
 	
-	private Id testAgent1 = new IdImpl("testAgent1");
-	private Id testAgent2 = new IdImpl("testAgent2");
-	private Id testAgent3 = new IdImpl("testAgent3");
+	private Id<Person> testAgent1 = Id.create("testAgent1", Person.class);
+	private Id<Person> testAgent2 = Id.create("testAgent2", Person.class);
+	private Id<Person> testAgent3 = Id.create("testAgent3", Person.class);
+
+	private Id<Vehicle> testVehicle1 = Id.create("testAgent1", Vehicle.class);
+	private Id<Vehicle> testVehicle2 = Id.create("testAgent2", Vehicle.class);
+	private Id<Vehicle> testVehicle3 = Id.create("testAgent3", Vehicle.class);
 	
-	private Id linkId1 = new IdImpl("link1");
-	private Id linkId2 = new IdImpl("link2");
-	private Id linkId3 = new IdImpl("link3");
-	private Id linkId4 = new IdImpl("link4");
+	private Id<Link> linkId1 = Id.create("link1", Link.class);
+	private Id<Link> linkId2 = Id.create("link2", Link.class);
+	private Id<Link> linkId3 = Id.create("link3", Link.class);
+	private Id<Link> linkId4 = Id.create("link4", Link.class);
 	
 	// 2 agenten mit 5 sec Verzögerung
 	@Test
@@ -104,20 +108,20 @@ public class MarginalCongestionHandlerV1Test {
 
 		// start agent 1...
 		congestionHandler.handleEvent(new PersonDepartureEvent(0, testAgent1, linkId1, "car"));
-		congestionHandler.handleEvent(new LinkLeaveEvent(1, testAgent1, linkId1, testAgent1));
-		congestionHandler.handleEvent(new LinkEnterEvent(1, testAgent1, linkId2, testAgent1));
+		congestionHandler.handleEvent(new LinkLeaveEvent(1, testAgent1, linkId1, testVehicle1));
+		congestionHandler.handleEvent(new LinkEnterEvent(1, testAgent1, linkId2, testVehicle1));
 		// start agent 2...
 		congestionHandler.handleEvent(new PersonDepartureEvent(5, testAgent2, linkId1, "car"));
-		congestionHandler.handleEvent(new LinkLeaveEvent(6, testAgent2, linkId1, testAgent2));
-		congestionHandler.handleEvent(new LinkEnterEvent(6, testAgent2, linkId2, testAgent2));
+		congestionHandler.handleEvent(new LinkLeaveEvent(6, testAgent2, linkId1, testVehicle2));
+		congestionHandler.handleEvent(new LinkEnterEvent(6, testAgent2, linkId2, testVehicle2));
 		
 		// agent 1 kann ohne Probleme link 2 verlassen...
-		congestionHandler.handleEvent(new LinkLeaveEvent(52, testAgent1, linkId2, testAgent1));
-		congestionHandler.handleEvent(new LinkEnterEvent(52, testAgent1, linkId3, testAgent1));
+		congestionHandler.handleEvent(new LinkLeaveEvent(52, testAgent1, linkId2, testVehicle1));
+		congestionHandler.handleEvent(new LinkEnterEvent(52, testAgent1, linkId3, testVehicle1));
 		
 		// agent 2 muss allerdings durch die flow capacity warten.
-		congestionHandler.handleEvent(new LinkLeaveEvent(52 + 10, testAgent2, linkId2, testAgent2));
-		congestionHandler.handleEvent(new LinkEnterEvent(52 + 10, testAgent2, linkId3, testAgent2));
+		congestionHandler.handleEvent(new LinkLeaveEvent(52 + 10, testAgent2, linkId2, testVehicle2));
+		congestionHandler.handleEvent(new LinkEnterEvent(52 + 10, testAgent2, linkId3, testVehicle2));
 		
 		// *****************
 		
@@ -156,20 +160,20 @@ public class MarginalCongestionHandlerV1Test {
 
 		// start agent 1...
 		congestionHandler.handleEvent(new PersonDepartureEvent(0, testAgent1, linkId1, "car"));
-		congestionHandler.handleEvent(new LinkLeaveEvent(1, testAgent1, linkId1, testAgent1));
-		congestionHandler.handleEvent(new LinkEnterEvent(1, testAgent1, linkId2, testAgent1));
+		congestionHandler.handleEvent(new LinkLeaveEvent(1, testAgent1, linkId1, testVehicle1));
+		congestionHandler.handleEvent(new LinkEnterEvent(1, testAgent1, linkId2, testVehicle1));
 		// start agent 2...
 		congestionHandler.handleEvent(new PersonDepartureEvent(10, testAgent2, linkId1, "car"));
-		congestionHandler.handleEvent(new LinkLeaveEvent(11, testAgent2, linkId1, testAgent2));
-		congestionHandler.handleEvent(new LinkEnterEvent(11, testAgent2, linkId2, testAgent2));
+		congestionHandler.handleEvent(new LinkLeaveEvent(11, testAgent2, linkId1, testVehicle2));
+		congestionHandler.handleEvent(new LinkEnterEvent(11, testAgent2, linkId2, testVehicle2));
 		
 		// agent 1 kann ohne Probleme link 2 verlassen...
-		congestionHandler.handleEvent(new LinkLeaveEvent(51, testAgent1, linkId2, testAgent1));
-		congestionHandler.handleEvent(new LinkEnterEvent(51, testAgent1, linkId3, testAgent1));
+		congestionHandler.handleEvent(new LinkLeaveEvent(51, testAgent1, linkId2, testVehicle1));
+		congestionHandler.handleEvent(new LinkEnterEvent(51, testAgent1, linkId3, testVehicle1));
 		
 		// agent 2 muss allerdings durch die flow capacity warten.
-		congestionHandler.handleEvent(new LinkLeaveEvent(51 + 10, testAgent2, linkId2, testAgent2));
-		congestionHandler.handleEvent(new LinkEnterEvent(51 + 10, testAgent2, linkId3, testAgent2));
+		congestionHandler.handleEvent(new LinkLeaveEvent(51 + 10, testAgent2, linkId2, testVehicle2));
+		congestionHandler.handleEvent(new LinkEnterEvent(51 + 10, testAgent2, linkId3, testVehicle2));
 		
 		// *****************
 		
@@ -202,25 +206,25 @@ public class MarginalCongestionHandlerV1Test {
 
 		// agent 3 blockiert link3
 		congestionHandler.handleEvent(new PersonDepartureEvent(0, testAgent3, linkId2, "car"));
-		congestionHandler.handleEvent(new LinkLeaveEvent(1, testAgent3, linkId2, testAgent3));
-		congestionHandler.handleEvent(new LinkEnterEvent(1, testAgent3, linkId3, testAgent3));
+		congestionHandler.handleEvent(new LinkLeaveEvent(1, testAgent3, linkId2, testVehicle3));
+		congestionHandler.handleEvent(new LinkEnterEvent(1, testAgent3, linkId3, testVehicle3));
 
 		// start agent 1...
 		congestionHandler.handleEvent(new PersonDepartureEvent(0, testAgent1, linkId1, "car"));
-		congestionHandler.handleEvent(new LinkLeaveEvent(1, testAgent1, linkId1, testAgent1));
-		congestionHandler.handleEvent(new LinkEnterEvent(1, testAgent1, linkId2, testAgent1));
+		congestionHandler.handleEvent(new LinkLeaveEvent(1, testAgent1, linkId1, testVehicle1));
+		congestionHandler.handleEvent(new LinkEnterEvent(1, testAgent1, linkId2, testVehicle1));
 		// start agent 2...
 		congestionHandler.handleEvent(new PersonDepartureEvent(5, testAgent2, linkId1, "car"));
-		congestionHandler.handleEvent(new LinkLeaveEvent(6, testAgent2, linkId1, testAgent2));
-		congestionHandler.handleEvent(new LinkEnterEvent(6, testAgent2, linkId2, testAgent2));
+		congestionHandler.handleEvent(new LinkLeaveEvent(6, testAgent2, linkId1, testVehicle2));
+		congestionHandler.handleEvent(new LinkEnterEvent(6, testAgent2, linkId2, testVehicle2));
 		
 		// agent 1 kann ohne Probleme link 2 verlassen...
-		congestionHandler.handleEvent(new LinkLeaveEvent(52, testAgent1, linkId2, testAgent1));
-		congestionHandler.handleEvent(new LinkEnterEvent(52, testAgent1, linkId3, testAgent1));
+		congestionHandler.handleEvent(new LinkLeaveEvent(52, testAgent1, linkId2, testVehicle1));
+		congestionHandler.handleEvent(new LinkEnterEvent(52, testAgent1, linkId3, testVehicle1));
 		
 		// agent 2 muss allerdings durch die flow capacity warten (51 + 10) plus durch die storage capacity (35)
-		congestionHandler.handleEvent(new LinkLeaveEvent(52 + 10 + 35, testAgent2, linkId2, testAgent2));
-		congestionHandler.handleEvent(new LinkEnterEvent(52 + 10 + 35, testAgent2, linkId3, testAgent2));
+		congestionHandler.handleEvent(new LinkLeaveEvent(52 + 10 + 35, testAgent2, linkId2, testVehicle2));
+		congestionHandler.handleEvent(new LinkEnterEvent(52 + 10 + 35, testAgent2, linkId3, testVehicle2));
 		
 		// *****************
 
@@ -269,28 +273,28 @@ public class MarginalCongestionHandlerV1Test {
 
 		// start agent 1...
 		congestionHandler.handleEvent(new PersonDepartureEvent(0, testAgent1, linkId1, "car"));
-		congestionHandler.handleEvent(new LinkLeaveEvent(1, testAgent1, linkId1, testAgent1));
-		congestionHandler.handleEvent(new LinkEnterEvent(1, testAgent1, linkId2, testAgent1));
+		congestionHandler.handleEvent(new LinkLeaveEvent(1, testAgent1, linkId1, testVehicle1));
+		congestionHandler.handleEvent(new LinkEnterEvent(1, testAgent1, linkId2, testVehicle1));
 		// start agent 2...
 		congestionHandler.handleEvent(new PersonDepartureEvent(4, testAgent2, linkId1, "car"));
-		congestionHandler.handleEvent(new LinkLeaveEvent(5, testAgent2, linkId1, testAgent2));
-		congestionHandler.handleEvent(new LinkEnterEvent(5, testAgent2, linkId2, testAgent2));
+		congestionHandler.handleEvent(new LinkLeaveEvent(5, testAgent2, linkId1, testVehicle2));
+		congestionHandler.handleEvent(new LinkEnterEvent(5, testAgent2, linkId2, testVehicle2));
 		// start agent 3...
 		congestionHandler.handleEvent(new PersonDepartureEvent(8, testAgent3, linkId1, "car"));
-		congestionHandler.handleEvent(new LinkLeaveEvent(9, testAgent3, linkId1, testAgent3));
-		congestionHandler.handleEvent(new LinkEnterEvent(9, testAgent3, linkId2, testAgent3));
+		congestionHandler.handleEvent(new LinkLeaveEvent(9, testAgent3, linkId1, testVehicle3));
+		congestionHandler.handleEvent(new LinkEnterEvent(9, testAgent3, linkId2, testVehicle3));
 		
 		// agent 1 kann ohne Probleme link 2 verlassen...
-		congestionHandler.handleEvent(new LinkLeaveEvent(52, testAgent1, linkId2, testAgent1));
-		congestionHandler.handleEvent(new LinkEnterEvent(52, testAgent1, linkId3, testAgent1));
+		congestionHandler.handleEvent(new LinkLeaveEvent(52, testAgent1, linkId2, testVehicle1));
+		congestionHandler.handleEvent(new LinkEnterEvent(52, testAgent1, linkId3, testVehicle1));
 		
 		// agent 2 muss allerdings durch die flow capacity warten.
-		congestionHandler.handleEvent(new LinkLeaveEvent(52 + 10, testAgent2, linkId2, testAgent2));
-		congestionHandler.handleEvent(new LinkEnterEvent(52 + 10, testAgent2, linkId3, testAgent2));
+		congestionHandler.handleEvent(new LinkLeaveEvent(52 + 10, testAgent2, linkId2, testVehicle2));
+		congestionHandler.handleEvent(new LinkEnterEvent(52 + 10, testAgent2, linkId3, testVehicle2));
 		
 		// auch agent 3 muss durch die flow capacity warten.
-		congestionHandler.handleEvent(new LinkLeaveEvent(52 + 20, testAgent3, linkId2, testAgent3));
-		congestionHandler.handleEvent(new LinkEnterEvent(52 + 20, testAgent3, linkId3, testAgent3));
+		congestionHandler.handleEvent(new LinkLeaveEvent(52 + 20, testAgent3, linkId2, testVehicle3));
+		congestionHandler.handleEvent(new LinkEnterEvent(52 + 20, testAgent3, linkId3, testVehicle3));
 		
 		// *****************
 		
@@ -379,11 +383,11 @@ public class MarginalCongestionHandlerV1Test {
 		network.setEffectiveCellSize(7.5);
 		network.setCapacityPeriod(3600.);
 		
-		Node node0 = network.getFactory().createNode(new IdImpl("0"), scenario.createCoord(0., 0.));
-		Node node1 = network.getFactory().createNode(new IdImpl("1"), scenario.createCoord(100., 0.));
-		Node node2 = network.getFactory().createNode(new IdImpl("2"), scenario.createCoord(200., 0.));
-		Node node3 = network.getFactory().createNode(new IdImpl("3"), scenario.createCoord(300., 0.));
-		Node node4 = network.getFactory().createNode(new IdImpl("4"), scenario.createCoord(400., 0.));
+		Node node0 = network.getFactory().createNode(Id.create("0", Node.class), scenario.createCoord(0., 0.));
+		Node node1 = network.getFactory().createNode(Id.create("1", Node.class), scenario.createCoord(100., 0.));
+		Node node2 = network.getFactory().createNode(Id.create("2", Node.class), scenario.createCoord(200., 0.));
+		Node node3 = network.getFactory().createNode(Id.create("3", Node.class), scenario.createCoord(300., 0.));
+		Node node4 = network.getFactory().createNode(Id.create("4", Node.class), scenario.createCoord(400., 0.));
 		
 		Link link1 = network.getFactory().createLink(this.linkId1, node0, node1);
 		Link link2 = network.getFactory().createLink(this.linkId2, node1, node2);

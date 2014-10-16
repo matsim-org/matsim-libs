@@ -27,12 +27,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
+import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleType.DoorOperationMode;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
-import org.matsim.vehicles.VehicleType.DoorOperationMode;
 
 /**
  * @author ikaddoura
@@ -98,7 +99,7 @@ public class ScheduleVehcileWriter {
 //		int busSeats = (int) (capacity * 1.) + 1; // plus one seat because a seat for the driver is expected
 //		int standingRoom = (int) (capacity * 0.); // for future functionality (e.g. disutility for standing in bus)
 		
-		svw.setVehTypeId(new IdImpl("bus"));
+		svw.setVehTypeId(Id.create("bus", VehicleType.class));
 		svw.setAccessSeconds(2);
 		svw.setEgressSeconds(1.5);
 		svw.setDoorOperationMode(DoorOperationMode.parallel);
@@ -115,7 +116,7 @@ public class ScheduleVehcileWriter {
 		sfn.createTransitSchedule(this.transitRouteMode, this.isBlocking, this.awaitDeparture, this.scheduleSpeed_m_sec, this.stopTime_sec);
 		this.schedule = sfn.getTransitSchedule();
 
-		List<Id> lineIDs = new ArrayList<Id>();
+		List<Id<TransitLine>> lineIDs = new ArrayList<>();
 		lineIDs.addAll(this.schedule.getTransitLines().keySet());
 		
 		DeparturesGenerator dg = new DeparturesGenerator();
@@ -198,7 +199,7 @@ public class ScheduleVehcileWriter {
 		this.length = length;
 	}
 
-	public void setVehTypeId(Id vehTypeId) {
+	public void setVehTypeId(Id<VehicleType> vehTypeId) {
 		this.vehTypeId = vehTypeId;
 	}
 

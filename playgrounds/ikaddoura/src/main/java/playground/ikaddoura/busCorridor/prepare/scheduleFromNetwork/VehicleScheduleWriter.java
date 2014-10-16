@@ -29,8 +29,11 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
 
 /**
  * @author Ihab
@@ -46,7 +49,7 @@ public class VehicleScheduleWriter {
 	private int busSeats;
 	private int standingRoom;
 	private TransitSchedule schedule;
-	private List<Id> vehicleIDs;
+	private List<Id<Vehicle>> vehicleIDs;
 	private Map<Integer, TimePeriod> day;
 	private Map<Integer, TimePeriod> newDay;
 	
@@ -87,11 +90,11 @@ public class VehicleScheduleWriter {
 		generator.setScheduleFile(this.directoryExtIt+"/scheduleFile.xml");
 		generator.setVehicleFile(this.directoryExtIt+"/vehiclesFile.xml");
 		
-		generator.setTransitLineId(new IdImpl("Bus Line"));
-		generator.setRouteId1(new IdImpl("West-Ost"));
-		generator.setRouteId2(new IdImpl("Ost-West"));
+		generator.setTransitLineId(Id.create("Bus Line", TransitLine.class));
+		generator.setRouteId1(Id.create("West-Ost", TransitRoute.class));
+		generator.setRouteId2(Id.create("Ost-West", TransitRoute.class));
 		
-		generator.setVehTypeId(new IdImpl("Bus"));
+		generator.setVehTypeId(Id.create("Bus", VehicleType.class));
 		generator.setAccessSeconds(2.0); // seconds per person for entering a vehicle 
 		generator.setEgressSeconds(1.5); // seconds per person for leaving a vehicle
 		generator.setSeats(busSeats);
@@ -112,7 +115,7 @@ public class VehicleScheduleWriter {
 		return schedule;
 	}
 	
-	public List<Id> getVehicleIDs() {
+	public List<Id<Vehicle>> getVehicleIDs() {
 		return vehicleIDs;
 	}
 

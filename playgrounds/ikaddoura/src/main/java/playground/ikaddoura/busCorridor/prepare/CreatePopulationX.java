@@ -36,10 +36,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 
 public class CreatePopulationX implements Runnable {
 	private Map<String, Coord> zoneGeometries = new HashMap<String, Coord>();
@@ -54,6 +53,7 @@ public class CreatePopulationX implements Runnable {
 		
 	}
 
+	@Override
 	public void run(){
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		population = scenario.getPopulation();
@@ -215,8 +215,8 @@ public class CreatePopulationX implements Runnable {
 		return activity;
 	}
 
-	private Id createId(String zone1, String zone2, int i, String transportMode) {
-		return new IdImpl(transportMode + "_" + zone1 + "_" + zone2 + "_" + i);
+	private Id<Person> createId(String zone1, String zone2, int i, String transportMode) {
+		return Id.create(transportMode + "_" + zone1 + "_" + zone2 + "_" + i, Person.class);
 	}
 	
 }

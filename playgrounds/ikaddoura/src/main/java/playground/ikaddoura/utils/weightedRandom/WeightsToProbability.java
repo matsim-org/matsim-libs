@@ -29,7 +29,7 @@ import java.util.Random;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 
 /**
  * @author Ihab
@@ -39,13 +39,13 @@ public class WeightsToProbability {
 
 	public static void main(String[] args) {
         
-       Map<Id, Double> unsortedMap = new HashMap<Id, Double>();
+       Map<Id<StrategySettings>, Double> unsortedMap = new HashMap<>();
        ValueComparator vc = new ValueComparator(unsortedMap);
-       TreeMap<Id, Double> sortedMap = new TreeMap(vc); // id, weight
+       TreeMap<Id<StrategySettings>, Double> sortedMap = new TreeMap<>(vc); // id, weight
        
-       unsortedMap.put(new IdImpl("1"), 0.2);
-       unsortedMap.put(new IdImpl("2"), 0.1);
-       unsortedMap.put(new IdImpl("3"), 0.7);
+       unsortedMap.put(Id.create("1", StrategySettings.class), 0.2);
+       unsortedMap.put(Id.create("2", StrategySettings.class), 0.1);
+       unsortedMap.put(Id.create("3", StrategySettings.class), 0.7);
               
        sortedMap.putAll(unsortedMap);
        

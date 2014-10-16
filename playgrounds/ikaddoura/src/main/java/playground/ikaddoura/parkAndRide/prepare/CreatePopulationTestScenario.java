@@ -21,25 +21,21 @@
 package playground.ikaddoura.parkAndRide.prepare;
 
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 
 public class CreatePopulationTestScenario implements Runnable {
 
@@ -53,6 +49,7 @@ public class CreatePopulationTestScenario implements Runnable {
 		populationCreator.run();
 	}
 
+	@Override
 	public void run(){
 		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.population = this.scenario.getPopulation();
@@ -224,8 +221,8 @@ public class CreatePopulationTestScenario implements Runnable {
 		return activity;
 	}
 
-	private Id createId(String name, String zone1, String zone2, int i) {
-		return new IdImpl(name + zone1 + "_" + zone2 + "_" + i);
+	private Id<Person> createId(String name, String zone1, String zone2, int i) {
+		return Id.create(name + zone1 + "_" + zone2 + "_" + i, Person.class);
 	}
 	
 }

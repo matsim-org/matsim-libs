@@ -5,10 +5,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,14 +19,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.population.PopulationReaderMatsimV5;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -65,12 +58,12 @@ public class LKCsvReaderTwoColumnsToMap {
 		
 		loadScenario();
 		
-		Map<Id, Double> pointId2x = readDouble("/Users/Lars/Desktop/VERSUCH/Sioux250.csv", "pointId", "xCoord");
-		Map<Id, Double> pointId2y = readDouble("/Users/Lars/Desktop/VERSUCH/Sioux250.csv", "pointId", "yCoord");
-		Map<Id,Double> id2counter = readDouble("/Users/Lars/Desktop/VERSUCH/Sioux250.csv", "pointId", "counter");
+		Map<Id<Coord>, Double> pointId2x = readDouble("/Users/Lars/Desktop/VERSUCH/Sioux250.csv", "pointId", "xCoord");
+		Map<Id<Coord>, Double> pointId2y = readDouble("/Users/Lars/Desktop/VERSUCH/Sioux250.csv", "pointId", "yCoord");
+		Map<Id<Coord>,Double> id2counter = readDouble("/Users/Lars/Desktop/VERSUCH/Sioux250.csv", "pointId", "counter");
 		
-		Map<Id,Coord> coords = new HashMap<Id, Coord>();
-		for(Id id : pointId2x.keySet()) {
+		Map<Id<Coord>,Coord> coords = new HashMap<Id<Coord>, Coord>();
+		for(Id<Coord> id : pointId2x.keySet()) {
 			Coord coord = new CoordImpl(pointId2x.get(id), pointId2y.get(id));
 			coords.put(id,coord);
 		}
@@ -100,7 +93,7 @@ public class LKCsvReaderTwoColumnsToMap {
 		exportCoords2Shp(coords,id2counter);
 	}
 	
-private static void exportCoords2Shp(Map<Id,Coord> coords, Map<Id,Double> id2counter ){
+private static void exportCoords2Shp(Map<Id<Coord>,Coord> coords, Map<Id<Coord>,Double> id2counter ){
 		
 		
 	
@@ -117,7 +110,7 @@ private static void exportCoords2Shp(Map<Id,Coord> coords, Map<Id,Double> id2cou
 		
 		int i = 0;
 	
-		for(Id id : coords.keySet()) {
+		for(Id<Coord> id : coords.keySet()) {
 					
 			SimpleFeature feature = builder.buildFeature(Integer.toString(i),new Object[]{
 				gf.createPoint(MGC.coord2Coordinate(coords.get(id))),
@@ -138,9 +131,9 @@ private static void exportCoords2Shp(Map<Id,Coord> coords, Map<Id,Double> id2cou
 		scenario = ScenarioUtils.createScenario(config);
 	}
 	
-	public static Map<Id, Double> readDouble(String fileName , String header1 , String header2){
+	public static Map<Id<Coord>, Double> readDouble(String fileName , String header1 , String header2){
 		
-		Map <Id,Double> id2value = new HashMap<Id, Double>();
+		Map <Id<Coord>,Double> id2value = new HashMap<>();
 		
 //		this.fileName = fileName;
 		ID = header1;
@@ -168,7 +161,7 @@ private static void exportCoords2Shp(Map<Id,Coord> coords, Map<Id,Double> id2cou
 				
 				parts = line.split(SEPARATOR_SEMIKOLON);
 				
-				Id id = new IdImpl(parts[idId]);
+				Id<Coord> id = Id.create(parts[idId], Coord.class);
 				double value = Double.parseDouble(parts[idValue]);
 			
 				id2value.put(id,value);
@@ -188,7 +181,7 @@ private static void exportCoords2Shp(Map<Id,Coord> coords, Map<Id,Double> id2cou
 	
 	// ************************************************************
 	
-	public static void exportNetwork2Shp(Network network , Map<Id,Double> linkId2noiseEmission){
+	public static void exportNetwork2Shp(Network network , Map<Id<Link>,Double> linkId2noiseEmission){
 
 		if (scenario.getNetwork().getLinks().size() == 0) {
 			new NetworkReaderMatsimV1(scenario).parse(networkFile);
@@ -257,7 +250,7 @@ private static void exportCoords2Shp(Map<Id,Coord> coords, Map<Id,Double> id2cou
 		for (Integer nr : zoneId2geometry.keySet()){
 			features.add(getFeature(nr, zoneId2geometry.get(nr), factory));
 		}
-		return (HashSet<SimpleFeature>) features;
+		return features;
 		
 	}
 

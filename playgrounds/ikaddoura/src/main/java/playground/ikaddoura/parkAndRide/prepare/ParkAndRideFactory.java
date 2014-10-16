@@ -35,10 +35,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+
+import playground.ikaddoura.parkAndRide.pR.ParkAndRideFacility;
 
 /**
  * @author Ihab
@@ -58,7 +59,7 @@ public class ParkAndRideFactory {
 	
 	private boolean useInputFile = false;
 	private String prInputDataFile;
-	private Map<Id, PRInputData> id2prInputData = new HashMap<Id, PRInputData>();
+	private Map<Id<ParkAndRideFacility>, PRInputData> id2prInputData = new HashMap<>();
 
 	private boolean useScheduleFile = false;
 	private int constantPRcapacity;
@@ -235,7 +236,7 @@ public class ParkAndRideFactory {
 		return id2transitStops;
 	}
 	
-	private void setId2prCarLinkToNode_fromInputFile(Map<Id, PRInputData> id2prInputData){
+	private void setId2prCarLinkToNode_fromInputFile(Map<Id<ParkAndRideFacility>, PRInputData> id2prInputData){
 				
 		List<Id> idsNoNodeFound = new ArrayList<Id>();
 		
@@ -384,7 +385,7 @@ public class ParkAndRideFactory {
 		if (this.useInputFile == true) {
 			int i = 0;
 			for (Id id : this.id2nextCarLinkToNode.keySet()){
-				Id prFacilitiyId = new IdImpl(i);
+				Id<ParkAndRideFacility> prFacilitiyId = Id.create(i, ParkAndRideFacility.class);
 				prFacilityCreator.createPRFacility(prFacilitiyId, this.id2nextCarLinkToNode.get(id), this.id2prInputData.get(id).getStopName(), this.id2prInputData.get(id).getCapacity());
 				i++;
 			}
@@ -393,7 +394,7 @@ public class ParkAndRideFactory {
 		if (this.useScheduleFile == true) {
 			int i = 0;
 			for (Id id : this.id2nextCarLinkToNode.keySet()){
-				Id prFacilitiyId = new IdImpl(i);
+				Id<ParkAndRideFacility> prFacilitiyId = Id.create(i, ParkAndRideFacility.class);
 				String name;
 				if (this.scenario.getTransitSchedule().getFacilities().get(id).getName() == null) {
 					name = id.toString(); // using the Id instead of the name

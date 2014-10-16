@@ -37,8 +37,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -285,7 +283,7 @@ public class SpatialInfo {
 //		HashMap<Id,Double> id2yCoord = new HashMap<Id, Double>();
 //		HashMap<Id,Double> id2density = new HashMap<Id, Double>();
 //		for(Coord coord : activityCoords2densityValue.keySet()) {
-//			Id id = new IdImpl(coord.toString());
+//			Id id = Id.create(coord.toString());
 //			double x = coord.getX();
 //			double y = coord.getY();
 //			double density = activityCoords2densityValue.get(coord);
@@ -318,7 +316,7 @@ public class SpatialInfo {
 //		for(double y = yCoordMax + 100. ; y > yCoordMin - 100. - receiverPointGap ; y = y - receiverPointGap) {
 //			for(double x = xCoordMin - 100. ; x < xCoordMax + 100. + receiverPointGap ; x = x + receiverPointGap) {
 //				Coord newCoord = new CoordImpl(x, y);
-//				Id newId = new IdImpl("coordId"+counter);
+//				Id newId = Id.create("coordId"+counter);
 //				receiverPointId2Coord.put(newId, newCoord);
 //				counter++;
 //							
@@ -381,7 +379,7 @@ public class SpatialInfo {
 			}
 			if(relevantReceiverPointIds.size()==0) {
 				Coord newCoord = new CoordImpl(actCoord.getX(), actCoord.getY());
-				Id newId = new IdImpl("coordId"+counter);
+				Id<Coord> newId = Id.create("coordId"+counter, Coord.class);
 				receiverPointId2Coord.put(newId, newCoord);
 				counter++;
 				
@@ -417,7 +415,7 @@ public class SpatialInfo {
 				
 				if (newCoordNecessary == true) {
 					Coord newCoord = new CoordImpl(actCoord.getX(), actCoord.getY());
-					Id newId = new IdImpl("coordId"+counter);
+					Id<Coord> newId = Id.create("coordId"+counter, Coord.class);
 					receiverPointId2Coord.put(newId, newCoord);
 					counter++;
 					
@@ -626,8 +624,8 @@ public class SpatialInfo {
 			coords.add(scenario.getNetwork().getLinks().get(linkId).getToNode().getCoord());
 			
 			for(int i = 1 ; i<parts ; i++) {
-				double x = fromX + (i*((1./((double)parts))*vectorX));
-				double y = fromY + (i*((1./((double)parts))*vectorY));
+				double x = fromX + (i*((1./(parts))*vectorX));
+				double y = fromY + (i*((1./(parts))*vectorY));
 				Coord  coordTmp = new CoordImpl(x,y);
 				coords.add(coordTmp);
 			}

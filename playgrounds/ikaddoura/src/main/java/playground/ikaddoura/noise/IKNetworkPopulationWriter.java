@@ -31,7 +31,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
-import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -40,14 +39,11 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.PopulationReaderMatsimV5;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.ArrayBasedDataContainerProvider;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -69,7 +65,7 @@ public class IKNetworkPopulationWriter {
 	private static Scenario scenario;
 	private static SimpleFeatureBuilder builder;
 	
-	static Map<Id,Coord> receiverPoints = new HashMap<Id,Coord>();
+	static Map<Id<Coord>,Coord> receiverPoints = new HashMap<>();
 	
 //	private String networkFile = "C:/MA_Noise/Zwischenpraesentation/Testszenarien/input/network01.xml";
 //	private static String populationFile = "C:/MA_Noise/Zwischenpraesentation/Testszenarien/input/populationDay.xml";
@@ -159,7 +155,7 @@ public class IKNetworkPopulationWriter {
 		double yMin = Double.MAX_VALUE;
 		double yMax = Double.MIN_VALUE;
 		
-		for(Id linkId : scenario.getNetwork().getLinks().keySet()) {
+		for(Id<Link> linkId : scenario.getNetwork().getLinks().keySet()) {
 			Link link = scenario.getNetwork().getLinks().get(linkId);
 			Coord fromNodeCoord = link.getFromNode().getCoord();
 			Coord toNodeCoord = link.getToNode().getCoord();
@@ -195,7 +191,7 @@ public class IKNetworkPopulationWriter {
 //		for(double y = yMax ; y > yMin ; y = y - receiverPointGap) {
 //			for(double x = xMin ; x < xMax ; x = x + receiverPointGap) {
 //				Coord newCoord = new CoordImpl(x, y);
-//				receiverPoints.put(new IdImpl("coordId"+counter), newCoord);
+//				receiverPoints.put(Id.create("coordId"+counter), newCoord);
 //				counter++;
 //			}
 //		}
@@ -205,7 +201,7 @@ public class IKNetworkPopulationWriter {
 //		for(double y = 4832500. ; y > 4818500 ; y = y - receiverPointGap) {
 //			for(double x = 678000 ; x < 688000 ; x = x + receiverPointGap) {
 //				Coord newCoord = new CoordImpl(x, y);
-//				receiverPoints.put(new IdImpl("coordId"+counter), newCoord);
+//				receiverPoints.put(Id.create("coordId"+counter), newCoord);
 //				counter++;
 //			}
 //		}
@@ -214,7 +210,7 @@ public class IKNetworkPopulationWriter {
 		for(double y = 4828500. ; y > 4827500 ; y = y - receiverPointGap) {
 			for(double x = 682000 ; x < 683000 ; x = x + receiverPointGap) {
 				Coord newCoord = new CoordImpl(x, y);
-				receiverPoints.put(new IdImpl("coordId"+counter), newCoord);
+				receiverPoints.put(Id.create("coordId"+counter, Coord.class), newCoord);
 				counter++;
 			}
 		}
@@ -303,7 +299,7 @@ public class IKNetworkPopulationWriter {
 		
 		for(Coord coord : sortedList) {
 			double minDistance = Double.MAX_VALUE;
-			for (Id coordId : receiverPoints.keySet()) {
+			for (Id<Coord> coordId : receiverPoints.keySet()) {
 				double x1 = receiverPoints.get(coordId).getX();
 				double y1 = receiverPoints.get(coordId).getY();
 				double x2 = coord.getX();
@@ -314,7 +310,7 @@ public class IKNetworkPopulationWriter {
 				}
 				
 				if(distance<150.0) {
-					receiverPoints.put(new IdImpl("coordId"+counter+"_"+coord.getX()+"_"+coord.getY()), coord);
+					receiverPoints.put(Id.create("coordId"+counter+"_"+coord.getX()+"_"+coord.getY(), Coord.class), coord);
 					counter++;
 					System.out.println("receiverPointCounter: "+counter);
 				}
@@ -343,20 +339,20 @@ public class IKNetworkPopulationWriter {
 //						}
 //					}
 //					if ((b==0)&&(c==0)&&(d==0)) {
-//						receiverPoints.put(new IdImpl("coordId"+counter+"_"+newCoord.getX()+"_"+newCoord.getY()), newCoord);
+//						receiverPoints.put(Id.create("coordId"+counter+"_"+newCoord.getX()+"_"+newCoord.getY()), newCoord);
 //						counter++;
 //						System.out.println("receiverPointCounter: "+counter);
 //					} else if ((b==0)&&(c==1)) {
 //						double random = Math.random();
 //						if(random<0.02) {
-//							receiverPoints.put(new IdImpl("coordId"+counter+"_"+newCoord.getX()+"_"+newCoord.getY()), newCoord);
+//							receiverPoints.put(Id.create("coordId"+counter+"_"+newCoord.getX()+"_"+newCoord.getY()), newCoord);
 //							counter++;
 //							System.out.println("receiverPointCounter: "+counter);
 //						}
 //					} else if ((b==0)&&(c==0)&&(d==1)) {
 //						double random = Math.random();
 //						if(random<0.005) {
-//							receiverPoints.put(new IdImpl("coordId"+counter+"_"+newCoord.getX()+"_"+newCoord.getY()), newCoord);
+//							receiverPoints.put(Id.create("coordId"+counter+"_"+newCoord.getX()+"_"+newCoord.getY()), newCoord);
 //							counter++;
 //							System.out.println("receiverPointCounter: "+counter);
 //						}
@@ -380,7 +376,7 @@ public class IKNetworkPopulationWriter {
 		
 		int i = 0;
 		
-		for(Id receiverPointId : receiverPoints.keySet()){
+		for(Id<Coord> receiverPointId : receiverPoints.keySet()){
 	
 			SimpleFeature feature = builder.buildFeature(receiverPointId.toString(),new Object[]{
 				gf.createPoint(MGC.coord2Coordinate(receiverPoints.get(receiverPointId))),

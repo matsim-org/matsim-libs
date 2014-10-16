@@ -27,6 +27,9 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * @author Ihab
@@ -34,35 +37,35 @@ import org.matsim.api.core.v01.Id;
  */
 public class FacilityWaitTimeInfo {
 	
-	private Id facilityId;
+	private Id<TransitStopFacility> facilityId;
 	private int numberOfWaitingTimesMoreThanHeadway;
 	private int numberOfMissedVehicles;
-	private SortedMap<Id, Double> waitingEvent2WaitingTime = new TreeMap<Id, Double>();
-	private SortedMap<Id, Double> waitingEvent2DayTime = new TreeMap<Id, Double>();
-	private SortedMap<Id, Id> waitingEvent2PersonId = new TreeMap<Id, Id>();
+	private SortedMap<Id<Event>, Double> waitingEvent2WaitingTime = new TreeMap<>();
+	private SortedMap<Id<Event>, Double> waitingEvent2DayTime = new TreeMap<>();
+	private SortedMap<Id<Event>, Id<Person>> waitingEvent2PersonId = new TreeMap<>();
 	
-	public Id getFacilityId() {
+	public Id<TransitStopFacility> getFacilityId() {
 		return facilityId;
 	}
 	
-	public void setFacilityId(Id facilityId) {
+	public void setFacilityId(Id<TransitStopFacility> facilityId) {
 		this.facilityId = facilityId;
 	}
 	
-	public SortedMap<Id, Double> getWaitingEvent2WaitingTime() {
+	public SortedMap<Id<Event>, Double> getWaitingEvent2WaitingTime() {
 		return waitingEvent2WaitingTime;
 	}
 	
 	public void setWaitingEvent2WaitingTime(
-			SortedMap<Id, Double> waitingEvent2WaitingTime) {
+			SortedMap<Id<Event>, Double> waitingEvent2WaitingTime) {
 		this.waitingEvent2WaitingTime = waitingEvent2WaitingTime;
 	}
 	
-	public SortedMap<Id, Double> getWaitingEvent2DayTime() {
+	public SortedMap<Id<Event>, Double> getWaitingEvent2DayTime() {
 		return waitingEvent2DayTime;
 	}
 	
-	public void setWaitingEvent2DayTime(SortedMap<Id, Double> waitingEvent2DayTime) {
+	public void setWaitingEvent2DayTime(SortedMap<Id<Event>, Double> waitingEvent2DayTime) {
 		this.waitingEvent2DayTime = waitingEvent2DayTime;
 	}
 	
@@ -75,7 +78,7 @@ public class FacilityWaitTimeInfo {
 	}
 	
 	public Double getAvgWaitingTime() {
-		return (Double) (this.getSumOfWaitingTimes() / this.waitingEvent2WaitingTime.size());
+		return this.getSumOfWaitingTimes() / this.waitingEvent2WaitingTime.size();
 	}
 
 	public void setNumberOfWaitingTimesMoreThanHeadway(
@@ -95,11 +98,11 @@ public class FacilityWaitTimeInfo {
 		return numberOfMissedVehicles;
 	}
 
-	public void setWaitingEvent2PersonId(SortedMap<Id, Id> waitingEvent2PersonId) {
+	public void setWaitingEvent2PersonId(SortedMap<Id<Event>, Id<Person>> waitingEvent2PersonId) {
 		this.waitingEvent2PersonId = waitingEvent2PersonId;
 	}
 
-	public SortedMap<Id, Id> getWaitingEvent2PersonId() {
+	public SortedMap<Id<Event>, Id<Person>> getWaitingEvent2PersonId() {
 		return waitingEvent2PersonId;
 	}
 	

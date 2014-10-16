@@ -22,6 +22,11 @@
  */
 package playground.ikaddoura.internalizationCar;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -30,9 +35,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
@@ -50,12 +58,8 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
-import playground.ikaddoura.internalizationCar.old.MarginalCongestionHandlerV1;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import playground.ikaddoura.internalizationCar.old.MarginalCongestionHandlerV1;
 
 /**
  * @author ikaddoura
@@ -68,15 +72,15 @@ public class MarginalCongestionHandlerV1QsimTest {
 	
 	private EventsManager events;
 	
-	private Id testAgent1 = new IdImpl("testAgent1");
-	private Id testAgent2 = new IdImpl("testAgent2");
-	private Id testAgent3 = new IdImpl("testAgent3");
-	private Id testAgent4 = new IdImpl("testAgent4");
+	private Id<Person> testAgent1 = Id.create("testAgent1", Person.class);
+	private Id<Person> testAgent2 = Id.create("testAgent2", Person.class);
+	private Id<Person> testAgent3 = Id.create("testAgent3", Person.class);
+	private Id<Person> testAgent4 = Id.create("testAgent4", Person.class);
 	
-	private Id linkId1 = new IdImpl("link1");
-	private Id linkId2 = new IdImpl("link2");
-	private Id linkId3 = new IdImpl("link3");
-	private Id linkId4 = new IdImpl("link4");
+	private Id<Link> linkId1 = Id.create("link1", Link.class);
+	private Id<Link> linkId2 = Id.create("link2", Link.class);
+	private Id<Link> linkId3 = Id.create("link3", Link.class);
+	private Id<Link> linkId4 = Id.create("link4", Link.class);
 	
 	@Test
 	public final void testFlowCongestion_4agents(){
@@ -407,11 +411,11 @@ public class MarginalCongestionHandlerV1QsimTest {
 		network.setEffectiveCellSize(7.5);
 		network.setCapacityPeriod(3600.);
 		
-		Node node0 = network.getFactory().createNode(new IdImpl("0"), scenario.createCoord(0., 0.));
-		Node node1 = network.getFactory().createNode(new IdImpl("1"), scenario.createCoord(100., 0.));
-		Node node2 = network.getFactory().createNode(new IdImpl("2"), scenario.createCoord(200., 0.));
-		Node node3 = network.getFactory().createNode(new IdImpl("3"), scenario.createCoord(300., 0.));
-		Node node4 = network.getFactory().createNode(new IdImpl("4"), scenario.createCoord(400., 0.));
+		Node node0 = network.getFactory().createNode(Id.create("0", Node.class), scenario.createCoord(0., 0.));
+		Node node1 = network.getFactory().createNode(Id.create("1", Node.class), scenario.createCoord(100., 0.));
+		Node node2 = network.getFactory().createNode(Id.create("2", Node.class), scenario.createCoord(200., 0.));
+		Node node3 = network.getFactory().createNode(Id.create("3", Node.class), scenario.createCoord(300., 0.));
+		Node node4 = network.getFactory().createNode(Id.create("4", Node.class), scenario.createCoord(400., 0.));
 		
 		Link link1 = network.getFactory().createLink(this.linkId1, node0, node1);
 		Link link2 = network.getFactory().createLink(this.linkId2, node1, node2);
@@ -479,11 +483,11 @@ public class MarginalCongestionHandlerV1QsimTest {
 		network.setEffectiveCellSize(7.5);
 		network.setCapacityPeriod(3600.);
 		
-		Node node0 = network.getFactory().createNode(new IdImpl("0"), scenario.createCoord(0., 0.));
-		Node node1 = network.getFactory().createNode(new IdImpl("1"), scenario.createCoord(100., 0.));
-		Node node2 = network.getFactory().createNode(new IdImpl("2"), scenario.createCoord(200., 0.));
-		Node node3 = network.getFactory().createNode(new IdImpl("3"), scenario.createCoord(300., 0.));
-		Node node4 = network.getFactory().createNode(new IdImpl("4"), scenario.createCoord(400., 0.));
+		Node node0 = network.getFactory().createNode(Id.create("0", Node.class), scenario.createCoord(0., 0.));
+		Node node1 = network.getFactory().createNode(Id.create("1", Node.class), scenario.createCoord(100., 0.));
+		Node node2 = network.getFactory().createNode(Id.create("2", Node.class), scenario.createCoord(200., 0.));
+		Node node3 = network.getFactory().createNode(Id.create("3", Node.class), scenario.createCoord(300., 0.));
+		Node node4 = network.getFactory().createNode(Id.create("4", Node.class), scenario.createCoord(400., 0.));
 		
 		Link link1 = network.getFactory().createLink(this.linkId1, node0, node1);
 		Link link2 = network.getFactory().createLink(this.linkId2, node1, node2);

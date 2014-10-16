@@ -26,21 +26,23 @@ package playground.ikaddoura.parkAndRide.prepare;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 
+import playground.ikaddoura.parkAndRide.pR.ParkAndRideFacility;
+
 /**
  * @author Ihab
  *
  */
 public class PRInputData {
 	
-	private Id id;
+	private Id<ParkAndRideFacility> id;
 	private String stopName;
 	private int capacity;
 	private Coord coord;
 	
-	public Id getId() {
+	public Id<ParkAndRideFacility> getId() {
 		return id;
 	}
-	public void setId(Id id) {
+	public void setId(Id<ParkAndRideFacility> id) {
 		this.id = id;
 	}
 	public String getStopName() {

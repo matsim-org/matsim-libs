@@ -30,17 +30,19 @@ import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author Ihab
@@ -50,13 +52,13 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Pers
 	private final List <Double> waitingTimes = new ArrayList<Double>();
 	private final List <Double> waitingTimesMissed = new ArrayList<Double>();
 	private final List <Double> waitingTimesNotMissed = new ArrayList<Double>();
-	private Map <Id, List<Double>> personId2waitingTimes = new HashMap<Id, List<Double>>();
+	private Map <Id<Person>, List<Double>> personId2waitingTimes = new HashMap<>();
 
-	private final Map <Id, Double> personId2PersonEntersVehicleTime = new HashMap<Id, Double>();
-	private final Map <Id, Double> personId2AgentDepartureTime = new HashMap<Id, Double>();
-	private final Map <Id, Double> personId2InVehicleTime = new HashMap<Id, Double>();
-	private final Map <Id, Id> busId2currentFacilityId = new HashMap<Id, Id>();
-	private final Map <Id, FacilityWaitTimeInfo> facilityId2facilityInfos = new HashMap<Id, FacilityWaitTimeInfo>();
+	private final Map <Id<Person>, Double> personId2PersonEntersVehicleTime = new HashMap<>();
+	private final Map <Id<Person>, Double> personId2AgentDepartureTime = new HashMap<>();
+	private final Map <Id<Person>, Double> personId2InVehicleTime = new HashMap<>();
+	private final Map <Id<Vehicle>, Id<TransitStopFacility>> busId2currentFacilityId = new HashMap<>();
+	private final Map <Id<TransitStopFacility>, FacilityWaitTimeInfo> facilityId2facilityInfos = new HashMap<>();
 
 	private int numberOfMissedVehicles;
 		
@@ -84,8 +86,8 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Pers
 	
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		Id personId = event.getPersonId();
-		Id vehId = event.getVehicleId();
+		Id<Person> personId = event.getPersonId();
+		Id<Vehicle> vehId = event.getVehicleId();
 		
 		if (personId.toString().contains("person") && vehId.toString().contains("bus")){
 			personId2PersonEntersVehicleTime.put(personId, event.getTime());
@@ -131,20 +133,20 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Pers
 			
 			// save waitingTime per stop
 			
-			Id currentFacilityId = this.busId2currentFacilityId.get(vehId);
+			Id<TransitStopFacility> currentFacilityId = this.busId2currentFacilityId.get(vehId);
 
 			if (this.facilityId2facilityInfos.get(currentFacilityId) == null){
 				FacilityWaitTimeInfo facilityInfo = new FacilityWaitTimeInfo();
-				SortedMap<Id, Double> waitingEvent2WaitingTime = new TreeMap<Id, Double>();
-				SortedMap<Id, Double> waitingEvent2DayTime = new TreeMap<Id, Double>(); // daytime when person enters vehicle
-				SortedMap<Id, Id> waitingEvent2PersonId = new TreeMap<Id, Id>();
+				SortedMap<Id<Event>, Double> waitingEvent2WaitingTime = new TreeMap<>();
+				SortedMap<Id<Event>, Double> waitingEvent2DayTime = new TreeMap<>(); // daytime when person enters vehicle
+				SortedMap<Id<Event>, Id<Person>> waitingEvent2PersonId = new TreeMap<>();
 
 				facilityInfo.setFacilityId(currentFacilityId);
-				waitingEvent2WaitingTime.put(new IdImpl(waitingTimeCounter), waitingTime);
+				waitingEvent2WaitingTime.put(Id.create(waitingTimeCounter, Event.class), waitingTime);
 				facilityInfo.setWaitingEvent2WaitingTime(waitingEvent2WaitingTime);
-				waitingEvent2DayTime.put(new IdImpl(waitingTimeCounter), event.getTime());
+				waitingEvent2DayTime.put(Id.create(waitingTimeCounter, Event.class), event.getTime());
 				facilityInfo.setWaitingEvent2DayTime(waitingEvent2DayTime);
-				waitingEvent2PersonId.put(new IdImpl(waitingTimeCounter), event.getPersonId());
+				waitingEvent2PersonId.put(Id.create(waitingTimeCounter, Event.class), event.getPersonId());
 				facilityInfo.setWaitingEvent2PersonId(waitingEvent2PersonId);
 								
 				if (waitingTime > this.headway){
@@ -157,13 +159,13 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Pers
 				
 			} else {
 				FacilityWaitTimeInfo facilityInfo = this.facilityId2facilityInfos.get(currentFacilityId);
-				SortedMap<Id, Double> waitingEvent2WaitingTime = facilityInfo.getWaitingEvent2WaitingTime();
-				SortedMap<Id, Double> waitingEvent2DayTime = facilityInfo.getWaitingEvent2DayTime();
-				SortedMap<Id, Id> waitingEvent2PersonId = facilityInfo.getWaitingEvent2PersonId();
+				SortedMap<Id<Event>, Double> waitingEvent2WaitingTime = facilityInfo.getWaitingEvent2WaitingTime();
+				SortedMap<Id<Event>, Double> waitingEvent2DayTime = facilityInfo.getWaitingEvent2DayTime();
+				SortedMap<Id<Event>, Id<Person>> waitingEvent2PersonId = facilityInfo.getWaitingEvent2PersonId();
 				
-				waitingEvent2WaitingTime.put(new IdImpl(waitingTimeCounter), waitingTime);
-				waitingEvent2DayTime.put(new IdImpl(waitingTimeCounter), event.getTime());
-				waitingEvent2PersonId.put(new IdImpl(waitingTimeCounter), event.getPersonId());
+				waitingEvent2WaitingTime.put(Id.create(waitingTimeCounter, Event.class), waitingTime);
+				waitingEvent2DayTime.put(Id.create(waitingTimeCounter, Event.class), event.getTime());
+				waitingEvent2PersonId.put(Id.create(waitingTimeCounter, Event.class), event.getPersonId());
 
 				facilityInfo.setWaitingEvent2WaitingTime(waitingEvent2WaitingTime);
 				facilityInfo.setWaitingEvent2DayTime(waitingEvent2DayTime);
@@ -187,7 +189,7 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Pers
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		Id personId = event.getPersonId();
+		Id<Person> personId = event.getPersonId();
 		
 		if (event.getLegMode().toString().equals("pt")){
 			personId2AgentDepartureTime.put(personId, event.getTime());
@@ -199,7 +201,7 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Pers
 
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
-		Id personId = event.getPersonId();
+		Id<Person> personId = event.getPersonId();
 		
 		if (event.getLegMode().toString().equals("pt")){
 
@@ -226,14 +228,14 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Pers
 		return waitingTimes;
 	}
 
-	public Map<Id, Double> getPersonId2InVehicleTime() {
+	public Map<Id<Person>, Double> getPersonId2InVehicleTime() {
 		return personId2InVehicleTime;
 	}
 	
 	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-		Id busId = event.getVehicleId();
-		Id facilityId = event.getFacilityId();
+		Id<Vehicle> busId = event.getVehicleId();
+		Id<TransitStopFacility> facilityId = event.getFacilityId();
 //		System.out.println("Bus " + busId + " arrives at " + facilityId + ".");
 		this.busId2currentFacilityId.put(busId, facilityId);
 	}
@@ -242,7 +244,7 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Pers
 		return numberOfMissedVehicles;
 	}
 
-	public Map<Id, FacilityWaitTimeInfo> getFacilityId2facilityInfos() {
+	public Map<Id<TransitStopFacility>, FacilityWaitTimeInfo> getFacilityId2facilityInfos() {
 		return facilityId2facilityInfos;
 	}
 
@@ -254,7 +256,7 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Pers
 		return waitingTimesNotMissed;
 	}
 
-	public Map <Id, List<Double>> getPersonId2waitingTimes() {
+	public Map <Id<Person>, List<Double>> getPersonId2waitingTimes() {
 		return personId2waitingTimes;
 	}
 	

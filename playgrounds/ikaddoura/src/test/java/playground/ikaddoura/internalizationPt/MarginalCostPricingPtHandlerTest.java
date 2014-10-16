@@ -44,7 +44,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -77,24 +76,24 @@ public class MarginalCostPricingPtHandlerTest  {
 	
 	private EventsManager events;
 	
-	private Id testAgent1 = new IdImpl("testAgent1");
-	private Id testAgent2 = new IdImpl("testAgent2");
-	private Id testAgent3 = new IdImpl("testAgent3");
-	private Id testAgent4 = new IdImpl("testAgent4");
-	private Id testAgent5 = new IdImpl("testAgent5");
+	private Id<Person> testAgent1 = Id.create("testAgent1", Person.class);
+	private Id<Person> testAgent2 = Id.create("testAgent2", Person.class);
+	private Id<Person> testAgent3 = Id.create("testAgent3", Person.class);
+	private Id<Person> testAgent4 = Id.create("testAgent4", Person.class);
+	private Id<Person> testAgent5 = Id.create("testAgent5", Person.class);
 	
-	private Id linkId1 = new IdImpl("1");
-	private Id linkId2 = new IdImpl("2");
-	private Id linkId3 = new IdImpl("3");
-	private Id linkId4 = new IdImpl("4");
-	private Id linkId5 = new IdImpl("5");
-	private Id linkId6 = new IdImpl("6");
-	private Id linkId7 = new IdImpl("7");
-	private Id linkId8 = new IdImpl("8");
-	private Id linkId9 = new IdImpl("9");
-	private Id linkId10 = new IdImpl("10");
-	private Id linkId11 = new IdImpl("11");
-	private Id linkId12 = new IdImpl("12");
+	private Id<Link> linkId1 = Id.create("1", Link.class);
+	private Id<Link> linkId2 = Id.create("2", Link.class);
+	private Id<Link> linkId3 = Id.create("3", Link.class);
+	private Id<Link> linkId4 = Id.create("4", Link.class);
+	private Id<Link> linkId5 = Id.create("5", Link.class);
+	private Id<Link> linkId6 = Id.create("6", Link.class);
+	private Id<Link> linkId7 = Id.create("7", Link.class);
+	private Id<Link> linkId8 = Id.create("8", Link.class);
+	private Id<Link> linkId9 = Id.create("9", Link.class);
+	private Id<Link> linkId10 = Id.create("10", Link.class);
+	private Id<Link> linkId11 = Id.create("11", Link.class);
+	private Id<Link> linkId12 = Id.create("12", Link.class);
 	
 	//one agent from start (stop 1) to finish (stop 6)
 	//another agent gets on (stop 2) and off (stop 3)
@@ -1669,20 +1668,20 @@ public class MarginalCostPricingPtHandlerTest  {
 		network.setEffectiveCellSize(7.5);
 		network.setCapacityPeriod(3600.);
 		
-		Node node0 = network.getFactory().createNode(new IdImpl("0"), new CoordImpl (0., 0.));
-		Node node1 = network.getFactory().createNode(new IdImpl("1"), new CoordImpl (500., 0.));
-		Node node2 = network.getFactory().createNode(new IdImpl("2"), new CoordImpl (1000., 0.));
-		Node node3 = network.getFactory().createNode(new IdImpl("3"), new CoordImpl (1500., 0.));
-		Node node4 = network.getFactory().createNode(new IdImpl("4"), new CoordImpl (2000., 0.));
-		Node node5 = network.getFactory().createNode(new IdImpl("5"), new CoordImpl (2500., 0.));
-		Node node6 = network.getFactory().createNode(new IdImpl("6"), new CoordImpl (3000., 0.));
+		Node node0 = network.getFactory().createNode(Id.create("0", Node.class), new CoordImpl (0., 0.));
+		Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new CoordImpl (500., 0.));
+		Node node2 = network.getFactory().createNode(Id.create("2", Node.class), new CoordImpl (1000., 0.));
+		Node node3 = network.getFactory().createNode(Id.create("3", Node.class), new CoordImpl (1500., 0.));
+		Node node4 = network.getFactory().createNode(Id.create("4", Node.class), new CoordImpl (2000., 0.));
+		Node node5 = network.getFactory().createNode(Id.create("5", Node.class), new CoordImpl (2500., 0.));
+		Node node6 = network.getFactory().createNode(Id.create("6", Node.class), new CoordImpl (3000., 0.));
 		
-		Link link1 = network.getFactory().createLink(new IdImpl("1"), node0, node1);
-		Link link2 = network.getFactory().createLink(new IdImpl("2"), node1, node2);
-		Link link3 = network.getFactory().createLink(new IdImpl("3"), node2, node3);
-		Link link4 = network.getFactory().createLink(new IdImpl("4"), node3, node4);
-		Link link5 = network.getFactory().createLink(new IdImpl("5"), node4, node5);
-		Link link6 = network.getFactory().createLink(new IdImpl("6"), node5, node6);
+		Link link1 = network.getFactory().createLink(Id.create("1", Link.class), node0, node1);
+		Link link2 = network.getFactory().createLink(Id.create("2", Link.class), node1, node2);
+		Link link3 = network.getFactory().createLink(Id.create("3", Link.class), node2, node3);
+		Link link4 = network.getFactory().createLink(Id.create("4", Link.class), node3, node4);
+		Link link5 = network.getFactory().createLink(Id.create("5", Link.class), node4, node5);
+		Link link6 = network.getFactory().createLink(Id.create("6", Link.class), node5, node6);
 		
 		Set<String> modes = new HashSet<String>();
 		modes.add("bus");
@@ -1747,26 +1746,26 @@ public class MarginalCostPricingPtHandlerTest  {
 		network.setEffectiveCellSize(7.5);
 		network.setCapacityPeriod(3600.);
 		
-		Node node0 = network.getFactory().createNode(new IdImpl("0"), new CoordImpl (0., 0.));
-		Node node1 = network.getFactory().createNode(new IdImpl("1"), new CoordImpl (500., 0.));
-		Node node2 = network.getFactory().createNode(new IdImpl("2"), new CoordImpl (1000., 0.));
-		Node node3 = network.getFactory().createNode(new IdImpl("3"), new CoordImpl (1500., 0.));
-		Node node4 = network.getFactory().createNode(new IdImpl("4"), new CoordImpl (2000., 0.));
-		Node node5 = network.getFactory().createNode(new IdImpl("5"), new CoordImpl (2500., 0.));
-		Node node6 = network.getFactory().createNode(new IdImpl("6"), new CoordImpl (3000., 0.));
+		Node node0 = network.getFactory().createNode(Id.create("0", Node.class), new CoordImpl (0., 0.));
+		Node node1 = network.getFactory().createNode(Id.create("1", Node.class), new CoordImpl (500., 0.));
+		Node node2 = network.getFactory().createNode(Id.create("2", Node.class), new CoordImpl (1000., 0.));
+		Node node3 = network.getFactory().createNode(Id.create("3", Node.class), new CoordImpl (1500., 0.));
+		Node node4 = network.getFactory().createNode(Id.create("4", Node.class), new CoordImpl (2000., 0.));
+		Node node5 = network.getFactory().createNode(Id.create("5", Node.class), new CoordImpl (2500., 0.));
+		Node node6 = network.getFactory().createNode(Id.create("6", Node.class), new CoordImpl (3000., 0.));
 		
-		Link link1 = network.getFactory().createLink(new IdImpl("1"), node0, node1);
-		Link link2 = network.getFactory().createLink(new IdImpl("2"), node1, node2);
-		Link link3 = network.getFactory().createLink(new IdImpl("3"), node2, node3);
-		Link link4 = network.getFactory().createLink(new IdImpl("4"), node3, node4);
-		Link link5 = network.getFactory().createLink(new IdImpl("5"), node4, node5);
-		Link link6 = network.getFactory().createLink(new IdImpl("6"), node5, node6);
-		Link link7 = network.getFactory().createLink(new IdImpl("7"), node6, node5);
-		Link link8 = network.getFactory().createLink(new IdImpl("8"), node5, node4);
-		Link link9 = network.getFactory().createLink(new IdImpl("9"), node4, node3);
-		Link link10 = network.getFactory().createLink(new IdImpl("10"), node3, node2);
-		Link link11 = network.getFactory().createLink(new IdImpl("11"), node2, node1);
-		Link link12 = network.getFactory().createLink(new IdImpl("12"), node1, node0);
+		Link link1 = network.getFactory().createLink(Id.create("1", Link.class), node0, node1);
+		Link link2 = network.getFactory().createLink(Id.create("2", Link.class), node1, node2);
+		Link link3 = network.getFactory().createLink(Id.create("3", Link.class), node2, node3);
+		Link link4 = network.getFactory().createLink(Id.create("4", Link.class), node3, node4);
+		Link link5 = network.getFactory().createLink(Id.create("5", Link.class), node4, node5);
+		Link link6 = network.getFactory().createLink(Id.create("6", Link.class), node5, node6);
+		Link link7 = network.getFactory().createLink(Id.create("7", Link.class), node6, node5);
+		Link link8 = network.getFactory().createLink(Id.create("8", Link.class), node5, node4);
+		Link link9 = network.getFactory().createLink(Id.create("9", Link.class), node4, node3);
+		Link link10 = network.getFactory().createLink(Id.create("10", Link.class), node3, node2);
+		Link link11 = network.getFactory().createLink(Id.create("11", Link.class), node2, node1);
+		Link link12 = network.getFactory().createLink(Id.create("12", Link.class), node1, node0);
 		
 		Set<String> modes = new HashSet<String>();
 		modes.add("bus");
@@ -2031,12 +2030,12 @@ public class MarginalCostPricingPtHandlerTest  {
 		TransitScheduleFactory sf = schedule.getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
-		Id Stop1 = new IdImpl("Stop1Id");
-		Id Stop2 = new IdImpl("Stop2Id");
-		Id Stop3 = new IdImpl("Stop3Id");
-		Id Stop4 = new IdImpl("Stop4Id");
-		Id Stop5 = new IdImpl("Stop5Id");
-		Id Stop6 = new IdImpl("Stop6Id");
+		Id<TransitStopFacility> Stop1 = Id.create("Stop1Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop2 = Id.create("Stop2Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop3 = Id.create("Stop3Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop4 = Id.create("Stop4Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop5 = Id.create("Stop5Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop6 = Id.create("Stop6Id", TransitStopFacility.class);
 		TransitStopFacility StopFacility1;
 		TransitStopFacility StopFacility2;
 		TransitStopFacility StopFacility3;
@@ -2057,13 +2056,13 @@ public class MarginalCostPricingPtHandlerTest  {
 		StopFacility6.setLinkId(linkId6);
 		
 		TransitLine TransitLine1 = null;
-		Id Line1 = new IdImpl("line1Id");
+		Id<TransitLine> Line1 = Id.create("line1Id", TransitLine.class);
 		TransitLine1 = sf.createTransitLine(Line1);
 		
-		List<Id<Link>> lineIds = new ArrayList<Id<Link>>();
+		List<Id<TransitLine>> lineIds = new ArrayList<Id<TransitLine>>();
 		lineIds.add(Line1);
 		
-		Id Route1 = new IdImpl("Route1Id");
+		Id<TransitRoute> Route1 = Id.create("Route1Id", TransitRoute.class);
 		NetworkRoute NetworkRoute1 = null;
 		NetworkRoute1 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId6);
 		List<Id<Link>> LinkIds = new ArrayList<Id<Link>>();
@@ -2098,9 +2097,9 @@ public class MarginalCostPricingPtHandlerTest  {
 		TransitRoute1 = sf.createTransitRoute(Route1, NetworkRoute1, Stops, "pt");
 		
 		Departure Departure1 = null;
-		Id DepartureId1 = new IdImpl("DepartureId_1");
+		Id<Departure> DepartureId1 = Id.create("DepartureId_1", Departure.class);
 		Departure1 = sf.createDeparture(DepartureId1, 200);
-		Id veh_1 = new IdImpl("veh_1");
+		Id<Vehicle> veh_1 = Id.create("veh_1", Vehicle.class);
 		Departure1.setVehicleId(veh_1);
 		
 		TransitRoute1.addDeparture(Departure1);
@@ -2120,8 +2119,8 @@ public class MarginalCostPricingPtHandlerTest  {
 	private void fillVehicleTestInVehicleDelay01(ScenarioImpl scenario) {
 		Vehicles veh = scenario.getVehicles();
 
-		Id vehTypeId1 = new IdImpl("type_1");
-		Id vehId1 = new IdImpl("veh_1");
+		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
+		Id<Vehicle> vehId1 = Id.create("veh_1", Vehicle.class);
 		VehicleType type = veh.getFactory().createVehicleType(vehTypeId1);
 		VehicleCapacity cap = veh.getFactory().createVehicleCapacity();
 		cap.setSeats(50);
@@ -2230,12 +2229,12 @@ public class MarginalCostPricingPtHandlerTest  {
 		TransitScheduleFactory sf = schedule.getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
-		Id Stop1 = new IdImpl("Stop1Id");
-		Id Stop2 = new IdImpl("Stop2Id");
-		Id Stop3 = new IdImpl("Stop3Id");
-		Id Stop4 = new IdImpl("Stop4Id");
-		Id Stop5 = new IdImpl("Stop5Id");
-		Id Stop6 = new IdImpl("Stop6Id");
+		Id<TransitStopFacility> Stop1 = Id.create("Stop1Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop2 = Id.create("Stop2Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop3 = Id.create("Stop3Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop4 = Id.create("Stop4Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop5 = Id.create("Stop5Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop6 = Id.create("Stop6Id", TransitStopFacility.class);
 		TransitStopFacility StopFacility1;
 		TransitStopFacility StopFacility2;
 		TransitStopFacility StopFacility3;
@@ -2256,13 +2255,13 @@ public class MarginalCostPricingPtHandlerTest  {
 		StopFacility6.setLinkId(linkId6);
 		
 		TransitLine TransitLine1 = null;
-		Id Line1 = new IdImpl("line1Id");
+		Id<TransitLine> Line1 = Id.create("line1Id", TransitLine.class);
 		TransitLine1 = sf.createTransitLine(Line1);
 		
-		List<Id<Link>> lineIds = new ArrayList<Id<Link>>();
+		List<Id<TransitLine>> lineIds = new ArrayList<Id<TransitLine>>();
 		lineIds.add(Line1);
 		
-		Id Route1 = new IdImpl("Route1Id");
+		Id<TransitRoute> Route1 = Id.create("Route1Id", TransitRoute.class);
 		NetworkRoute NetworkRoute1 = null;
 		NetworkRoute1 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId6);
 		List<Id<Link>> LinkIds = new ArrayList<Id<Link>>();
@@ -2297,9 +2296,9 @@ public class MarginalCostPricingPtHandlerTest  {
 		TransitRoute1 = sf.createTransitRoute(Route1, NetworkRoute1, Stops, "pt");
 		
 		Departure Departure1 = null;
-		Id DepartureId1 = new IdImpl("DepartureId_1");
+		Id<Departure> DepartureId1 = Id.create("DepartureId_1", Departure.class);
 		Departure1 = sf.createDeparture(DepartureId1, 200);
-		Id veh_1 = new IdImpl("veh_1");
+		Id<Vehicle> veh_1 = Id.create("veh_1", Vehicle.class);
 		Departure1.setVehicleId(veh_1);
 		
 		TransitRoute1.addDeparture(Departure1);
@@ -2319,8 +2318,8 @@ public class MarginalCostPricingPtHandlerTest  {
 	private void fillVehicleTestInVehicleDelay02(ScenarioImpl scenario) {
 		Vehicles veh = scenario.getVehicles();
 	
-		Id vehTypeId1 = new IdImpl("type_1");
-		Id vehId1 = new IdImpl("veh_1");
+		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
+		Id<Vehicle> vehId1 = Id.create("veh_1", Vehicle.class);
 	
 		VehicleType type = veh.getFactory().createVehicleType(vehTypeId1);
 		VehicleCapacity cap = veh.getFactory().createVehicleCapacity();
@@ -2545,12 +2544,12 @@ public class MarginalCostPricingPtHandlerTest  {
 		TransitScheduleFactory sf = schedule.getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
-		Id Stop1 = new IdImpl("Stop1Id");
-		Id Stop2 = new IdImpl("Stop2Id");
-		Id Stop3 = new IdImpl("Stop3Id");
-		Id Stop4 = new IdImpl("Stop4Id");
-		Id Stop5 = new IdImpl("Stop5Id");
-		Id Stop6 = new IdImpl("Stop6Id");
+		Id<TransitStopFacility> Stop1 = Id.create("Stop1Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop2 = Id.create("Stop2Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop3 = Id.create("Stop3Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop4 = Id.create("Stop4Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop5 = Id.create("Stop5Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop6 = Id.create("Stop6Id", TransitStopFacility.class);
 		TransitStopFacility StopFacility1;
 		TransitStopFacility StopFacility2;
 		TransitStopFacility StopFacility3;
@@ -2571,13 +2570,13 @@ public class MarginalCostPricingPtHandlerTest  {
 		StopFacility6.setLinkId(linkId6);
 		
 		TransitLine TransitLine1 = null;
-		Id Line1 = new IdImpl("line1Id");
+		Id<TransitLine> Line1 = Id.create("line1Id", TransitLine.class);
 		TransitLine1 = sf.createTransitLine(Line1);
 		
-		List<Id<Link>> lineIds = new ArrayList<Id<Link>>();
+		List<Id<TransitLine>> lineIds = new ArrayList<Id<TransitLine>>();
 		lineIds.add(Line1);
 		
-		Id Route1 = new IdImpl("Route1Id");
+		Id<TransitRoute> Route1 = Id.create("Route1Id", TransitRoute.class);
 		NetworkRoute NetworkRoute1 = null;
 		NetworkRoute1 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId6);
 		List<Id<Link>> LinkIds = new ArrayList<Id<Link>>();
@@ -2612,9 +2611,9 @@ public class MarginalCostPricingPtHandlerTest  {
 		TransitRoute1 = sf.createTransitRoute(Route1, NetworkRoute1, Stops, "pt");
 		
 		Departure Departure1 = null;
-		Id DepartureId1 = new IdImpl("DepartureId_1");
+		Id<Departure> DepartureId1 = Id.create("DepartureId_1", Departure.class);
 		Departure1 = sf.createDeparture(DepartureId1, 200);
-		Id veh_1 = new IdImpl("veh_1");
+		Id<Vehicle> veh_1 = Id.create("veh_1", Vehicle.class);
 		Departure1.setVehicleId(veh_1);
 		
 		TransitRoute1.addDeparture(Departure1);
@@ -2634,8 +2633,8 @@ public class MarginalCostPricingPtHandlerTest  {
 	private void fillVehicleTestInVehicleDelay03(ScenarioImpl scenario) {
 		Vehicles veh = scenario.getVehicles();
 
-		Id vehTypeId1 = new IdImpl("type_1");
-		Id vehId1 = new IdImpl("veh_1");
+		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
+		Id<Vehicle> vehId1 = Id.create("veh_1", Vehicle.class);
 
 		VehicleType type = veh.getFactory().createVehicleType(vehTypeId1);
 		VehicleCapacity cap = veh.getFactory().createVehicleCapacity();
@@ -2820,12 +2819,12 @@ public class MarginalCostPricingPtHandlerTest  {
 		TransitScheduleFactory sf = schedule.getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
-		Id Stop1 = new IdImpl("Stop1Id");
-		Id Stop2 = new IdImpl("Stop2Id");
-		Id Stop3 = new IdImpl("Stop3Id");
-		Id Stop4 = new IdImpl("Stop4Id");
-		Id Stop5 = new IdImpl("Stop5Id");
-		Id Stop6 = new IdImpl("Stop6Id");
+		Id<TransitStopFacility> Stop1 = Id.create("Stop1Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop2 = Id.create("Stop2Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop3 = Id.create("Stop3Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop4 = Id.create("Stop4Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop5 = Id.create("Stop5Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop6 = Id.create("Stop6Id", TransitStopFacility.class);
 		TransitStopFacility StopFacility1;
 		TransitStopFacility StopFacility2;
 		TransitStopFacility StopFacility3;
@@ -2846,13 +2845,13 @@ public class MarginalCostPricingPtHandlerTest  {
 		StopFacility6.setLinkId(linkId6);
 		
 		TransitLine TransitLine1 = null;
-		Id Line1 = new IdImpl("line1Id");
+		Id<TransitLine> Line1 = Id.create("line1Id", TransitLine.class);
 		TransitLine1 = sf.createTransitLine(Line1);
 		
-		List<Id<Link>> lineIds = new ArrayList<Id<Link>>();
+		List<Id<TransitLine>> lineIds = new ArrayList<Id<TransitLine>>();
 		lineIds.add(Line1);
 		
-		Id Route1 = new IdImpl("Route1Id");
+		Id<TransitRoute> Route1 = Id.create("Route1Id", TransitRoute.class);
 		NetworkRoute NetworkRoute1 = null;
 		NetworkRoute1 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId6);
 		List<Id<Link>> LinkIds = new ArrayList<Id<Link>>();
@@ -2887,9 +2886,9 @@ public class MarginalCostPricingPtHandlerTest  {
 		TransitRoute1 = sf.createTransitRoute(Route1, NetworkRoute1, Stops, "pt");
 		
 		Departure Departure1 = null;
-		Id DepartureId1 = new IdImpl("DepartureId_1");
+		Id<Departure> DepartureId1 = Id.create("DepartureId_1", Departure.class);
 		Departure1 = sf.createDeparture(DepartureId1, 200);
-		Id veh_1 = new IdImpl("veh_1");
+		Id<Vehicle> veh_1 = Id.create("veh_1", Vehicle.class);
 		Departure1.setVehicleId(veh_1);
 		
 		TransitRoute1.addDeparture(Departure1);
@@ -2909,8 +2908,8 @@ public class MarginalCostPricingPtHandlerTest  {
 	private void fillVehicleTestWaitingDelay01(ScenarioImpl scenario) {
 		Vehicles veh = scenario.getVehicles();
 
-		Id vehTypeId1 = new IdImpl("type_1");
-		Id vehId1 = new IdImpl("veh_1");
+		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
+		Id<Vehicle> vehId1 = Id.create("veh_1", Vehicle.class);
 
 		VehicleType type = veh.getFactory().createVehicleType(vehTypeId1);
 		VehicleCapacity cap = veh.getFactory().createVehicleCapacity();
@@ -3095,12 +3094,12 @@ public class MarginalCostPricingPtHandlerTest  {
 		TransitScheduleFactory sf = schedule.getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
-		Id Stop1 = new IdImpl("Stop1Id");
-		Id Stop2 = new IdImpl("Stop2Id");
-		Id Stop3 = new IdImpl("Stop3Id");
-		Id Stop4 = new IdImpl("Stop4Id");
-		Id Stop5 = new IdImpl("Stop5Id");
-		Id Stop6 = new IdImpl("Stop6Id");
+		Id<TransitStopFacility> Stop1 = Id.create("Stop1Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop2 = Id.create("Stop2Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop3 = Id.create("Stop3Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop4 = Id.create("Stop4Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop5 = Id.create("Stop5Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop6 = Id.create("Stop6Id", TransitStopFacility.class);
 		TransitStopFacility StopFacility1;
 		TransitStopFacility StopFacility2;
 		TransitStopFacility StopFacility3;
@@ -3121,13 +3120,13 @@ public class MarginalCostPricingPtHandlerTest  {
 		StopFacility6.setLinkId(linkId6);
 		
 		TransitLine TransitLine1 = null;
-		Id Line1 = new IdImpl("line1Id");
+		Id<TransitLine> Line1 = Id.create("line1Id", TransitLine.class);
 		TransitLine1 = sf.createTransitLine(Line1);
 		
-		List<Id<Link>> lineIds = new ArrayList<Id<Link>>();
+		List<Id<TransitLine>> lineIds = new ArrayList<Id<TransitLine>>();
 		lineIds.add(Line1);
 		
-		Id Route1 = new IdImpl("Route1Id");
+		Id<TransitRoute> Route1 = Id.create("Route1Id", TransitRoute.class);
 		NetworkRoute NetworkRoute1 = null;
 		NetworkRoute1 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId6);
 		List<Id<Link>> LinkIds = new ArrayList<Id<Link>>();
@@ -3162,9 +3161,9 @@ public class MarginalCostPricingPtHandlerTest  {
 		TransitRoute1 = sf.createTransitRoute(Route1, NetworkRoute1, Stops, "pt");
 		
 		Departure Departure1 = null;
-		Id DepartureId1 = new IdImpl("DepartureId_1");
+		Id<Departure> DepartureId1 = Id.create("DepartureId_1", Departure.class);
 		Departure1 = sf.createDeparture(DepartureId1, 200);
-		Id veh_1 = new IdImpl("veh_1");
+		Id<Vehicle> veh_1 = Id.create("veh_1", Vehicle.class);
 		Departure1.setVehicleId(veh_1);
 		
 		TransitRoute1.addDeparture(Departure1);
@@ -3184,8 +3183,8 @@ public class MarginalCostPricingPtHandlerTest  {
 	private void fillVehicleTestWaitingDelay02(ScenarioImpl scenario) {
 		Vehicles veh = scenario.getVehicles();
 
-		Id vehTypeId1 = new IdImpl("type_1");
-		Id vehId1 = new IdImpl("veh_1");
+		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
+		Id<Vehicle> vehId1 = Id.create("veh_1", Vehicle.class);
 
 		VehicleType type = veh.getFactory().createVehicleType(vehTypeId1);
 		VehicleCapacity cap = veh.getFactory().createVehicleCapacity();
@@ -3370,12 +3369,12 @@ public class MarginalCostPricingPtHandlerTest  {
 		TransitScheduleFactory sf = schedule.getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
-		Id Stop1 = new IdImpl("Stop1Id");
-		Id Stop2 = new IdImpl("Stop2Id");
-		Id Stop3 = new IdImpl("Stop3Id");
-		Id Stop4 = new IdImpl("Stop4Id");
-		Id Stop5 = new IdImpl("Stop5Id");
-		Id Stop6 = new IdImpl("Stop6Id");
+		Id<TransitStopFacility> Stop1 = Id.create("Stop1Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop2 = Id.create("Stop2Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop3 = Id.create("Stop3Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop4 = Id.create("Stop4Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop5 = Id.create("Stop5Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop6 = Id.create("Stop6Id", TransitStopFacility.class);
 		TransitStopFacility StopFacility1;
 		TransitStopFacility StopFacility2;
 		TransitStopFacility StopFacility3;
@@ -3396,13 +3395,13 @@ public class MarginalCostPricingPtHandlerTest  {
 		StopFacility6.setLinkId(linkId6);
 		
 		TransitLine TransitLine1 = null;
-		Id Line1 = new IdImpl("line1Id");
+		Id<TransitLine> Line1 = Id.create("line1Id", TransitLine.class);
 		TransitLine1 = sf.createTransitLine(Line1);
 		
-		List<Id<Link>> lineIds = new ArrayList<Id<Link>>();
+		List<Id<TransitLine>> lineIds = new ArrayList<Id<TransitLine>>();
 		lineIds.add(Line1);
 		
-		Id Route1 = new IdImpl("Route1Id");
+		Id<TransitRoute> Route1 = Id.create("Route1Id", TransitRoute.class);
 		NetworkRoute NetworkRoute1 = null;
 		NetworkRoute1 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId6);
 		List<Id<Link>> LinkIds = new ArrayList<Id<Link>>();
@@ -3437,15 +3436,15 @@ public class MarginalCostPricingPtHandlerTest  {
 		TransitRoute1 = sf.createTransitRoute(Route1, NetworkRoute1, Stops, "pt");
 		
 		Departure Departure1 = null;
-		Id DepartureId1 = new IdImpl("DepartureId_1");
+		Id<Departure> DepartureId1 = Id.create("DepartureId_1", Departure.class);
 		Departure1 = sf.createDeparture(DepartureId1, 200);
-		Id veh_1 = new IdImpl("veh_1");
+		Id<Vehicle> veh_1 = Id.create("veh_1", Vehicle.class);
 		Departure1.setVehicleId(veh_1);
 		
 		Departure Departure2 = null;
-		Id DepartureId2 = new IdImpl("DepartureId_2");
+		Id<Departure> DepartureId2 = Id.create("DepartureId_2", Departure.class);
 		Departure2 = sf.createDeparture(DepartureId2, 800);
-		Id veh_2 = new IdImpl("veh_2");
+		Id<Vehicle> veh_2 = Id.create("veh_2", Vehicle.class);
 		Departure2.setVehicleId(veh_2);
 		
 		TransitRoute1.addDeparture(Departure1);
@@ -3466,9 +3465,9 @@ public class MarginalCostPricingPtHandlerTest  {
 	private void fillVehicleTestWaitingDelay03(ScenarioImpl scenario) {
 		Vehicles veh = scenario.getVehicles();
 
-		Id vehTypeId1 = new IdImpl("type_1");
-		Id vehId1 = new IdImpl("veh_1");
-		Id vehId2 = new IdImpl("veh_2");
+		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
+		Id<Vehicle> vehId1 = Id.create("veh_1", Vehicle.class);
+		Id<Vehicle> vehId2 = Id.create("veh_2", Vehicle.class);
 
 		VehicleType type = veh.getFactory().createVehicleType(vehTypeId1);
 		VehicleCapacity cap = veh.getFactory().createVehicleCapacity();
@@ -3656,12 +3655,12 @@ public class MarginalCostPricingPtHandlerTest  {
 		TransitScheduleFactory sf = schedule.getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
-		Id Stop1 = new IdImpl("Stop1Id");
-		Id Stop2 = new IdImpl("Stop2Id");
-		Id Stop3 = new IdImpl("Stop3Id");
-		Id Stop4 = new IdImpl("Stop4Id");
-		Id Stop5 = new IdImpl("Stop5Id");
-		Id Stop6 = new IdImpl("Stop6Id");
+		Id<TransitStopFacility> Stop1 = Id.create("Stop1Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop2 = Id.create("Stop2Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop3 = Id.create("Stop3Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop4 = Id.create("Stop4Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop5 = Id.create("Stop5Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop6 = Id.create("Stop6Id", TransitStopFacility.class);
 		TransitStopFacility StopFacility1;
 		TransitStopFacility StopFacility2;
 		TransitStopFacility StopFacility3;
@@ -3682,13 +3681,13 @@ public class MarginalCostPricingPtHandlerTest  {
 		StopFacility6.setLinkId(linkId6);
 		
 		TransitLine TransitLine1 = null;
-		Id Line1 = new IdImpl("line1Id");
+		Id<TransitLine> Line1 = Id.create("line1Id", TransitLine.class);
 		TransitLine1 = sf.createTransitLine(Line1);
 		
-		List<Id<Link>> lineIds = new ArrayList<Id<Link>>();
+		List<Id<TransitLine>> lineIds = new ArrayList<Id<TransitLine>>();
 		lineIds.add(Line1);
 		
-		Id Route1 = new IdImpl("Route1Id");
+		Id<TransitRoute> Route1 = Id.create("Route1Id", TransitRoute.class);
 		NetworkRoute NetworkRoute1 = null;
 		NetworkRoute1 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId6);
 		List<Id<Link>> LinkIds = new ArrayList<Id<Link>>();
@@ -3723,15 +3722,15 @@ public class MarginalCostPricingPtHandlerTest  {
 		TransitRoute1 = sf.createTransitRoute(Route1, NetworkRoute1, Stops, "pt");
 		
 		Departure Departure1 = null;
-		Id DepartureId1 = new IdImpl("DepartureId_1");
+		Id<Departure> DepartureId1 = Id.create("DepartureId_1", Departure.class);
 		Departure1 = sf.createDeparture(DepartureId1, 200);
-		Id veh_1 = new IdImpl("veh_1");
+		Id<Vehicle> veh_1 = Id.create("veh_1", Vehicle.class);
 		Departure1.setVehicleId(veh_1);
 		
 		Departure Departure2 = null;
-		Id DepartureId2 = new IdImpl("DepartureId_2");
+		Id<Departure> DepartureId2 = Id.create("DepartureId_2", Departure.class);
 		Departure2 = sf.createDeparture(DepartureId2, 800);
-		Id veh_2 = new IdImpl("veh_2");
+		Id<Vehicle> veh_2 = Id.create("veh_2", Vehicle.class);
 		Departure2.setVehicleId(veh_2);
 		
 		TransitRoute1.addDeparture(Departure1);
@@ -3752,9 +3751,9 @@ public class MarginalCostPricingPtHandlerTest  {
 	private void fillVehicleTestWaitingDelay03b(ScenarioImpl scenario) {
 		Vehicles veh = scenario.getVehicles();
 
-		Id vehTypeId1 = new IdImpl("type_1");
-		Id vehId1 = new IdImpl("veh_1");
-		Id vehId2 = new IdImpl("veh_2");
+		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
+		Id<Vehicle> vehId1 = Id.create("veh_1", Vehicle.class);
+		Id<Vehicle> vehId2 = Id.create("veh_2", Vehicle.class);
 
 		VehicleType type = veh.getFactory().createVehicleType(vehTypeId1);
 		VehicleCapacity cap = veh.getFactory().createVehicleCapacity();
@@ -3955,12 +3954,12 @@ public class MarginalCostPricingPtHandlerTest  {
 		TransitScheduleFactory sf = schedule.getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
-		Id Stop1 = new IdImpl("Stop1Id");
-		Id Stop2 = new IdImpl("Stop2Id");
-		Id Stop3 = new IdImpl("Stop3Id");
-		Id Stop4 = new IdImpl("Stop4Id");
-		Id Stop5 = new IdImpl("Stop5Id");
-		Id Stop6 = new IdImpl("Stop6Id");
+		Id<TransitStopFacility> Stop1 = Id.create("Stop1Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop2 = Id.create("Stop2Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop3 = Id.create("Stop3Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop4 = Id.create("Stop4Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop5 = Id.create("Stop5Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop6 = Id.create("Stop6Id", TransitStopFacility.class);
 		TransitStopFacility StopFacility1;
 		TransitStopFacility StopFacility2;
 		TransitStopFacility StopFacility3;
@@ -3981,13 +3980,13 @@ public class MarginalCostPricingPtHandlerTest  {
 		StopFacility6.setLinkId(linkId6);
 		
 		TransitLine TransitLine1 = null;
-		Id Line1 = new IdImpl("line1Id");
+		Id<TransitLine> Line1 = Id.create("line1Id", TransitLine.class);
 		TransitLine1 = sf.createTransitLine(Line1);
 		
-		List<Id<Link>> lineIds = new ArrayList<Id<Link>>();
+		List<Id<TransitLine>> lineIds = new ArrayList<Id<TransitLine>>();
 		lineIds.add(Line1);
 		
-		Id Route1 = new IdImpl("Route1Id");
+		Id<TransitRoute> Route1 = Id.create("Route1Id", TransitRoute.class);
 		NetworkRoute NetworkRoute1 = null;
 		NetworkRoute1 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId6);
 		List<Id<Link>> LinkIds = new ArrayList<Id<Link>>();
@@ -4022,9 +4021,9 @@ public class MarginalCostPricingPtHandlerTest  {
 		TransitRoute1 = sf.createTransitRoute(Route1, NetworkRoute1, Stops, "pt");
 		
 		Departure Departure1 = null;
-		Id DepartureId1 = new IdImpl("DepartureId_1");
+		Id<Departure> DepartureId1 = Id.create("DepartureId_1", Departure.class);
 		Departure1 = sf.createDeparture(DepartureId1, 200);
-		Id veh_1 = new IdImpl("veh_1");
+		Id<Vehicle> veh_1 = Id.create("veh_1", Vehicle.class);
 		Departure1.setVehicleId(veh_1);
 		
 		TransitRoute1.addDeparture(Departure1);
@@ -4044,8 +4043,8 @@ public class MarginalCostPricingPtHandlerTest  {
 	private void fillVehicleTestWaitingDelay04(ScenarioImpl scenario) {
 		Vehicles veh = scenario.getVehicles();
 
-		Id vehTypeId1 = new IdImpl("type_1");
-		Id vehId1 = new IdImpl("veh_1");
+		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
+		Id<Vehicle> vehId1 = Id.create("veh_1", Vehicle.class);
 
 		VehicleType type = veh.getFactory().createVehicleType(vehTypeId1);
 		VehicleCapacity cap = veh.getFactory().createVehicleCapacity();
@@ -4243,12 +4242,12 @@ public class MarginalCostPricingPtHandlerTest  {
 		TransitScheduleFactory sf = schedule.getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
-		Id Stop1 = new IdImpl("Stop1Id");
-		Id Stop2 = new IdImpl("Stop2Id");
-		Id Stop3 = new IdImpl("Stop3Id");
-		Id Stop4 = new IdImpl("Stop4Id");
-		Id Stop5 = new IdImpl("Stop5Id");
-		Id Stop6 = new IdImpl("Stop6Id");
+		Id<TransitStopFacility> Stop1 = Id.create("Stop1Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop2 = Id.create("Stop2Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop3 = Id.create("Stop3Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop4 = Id.create("Stop4Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop5 = Id.create("Stop5Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop6 = Id.create("Stop6Id", TransitStopFacility.class);
 		TransitStopFacility StopFacility1;
 		TransitStopFacility StopFacility2;
 		TransitStopFacility StopFacility3;
@@ -4269,13 +4268,13 @@ public class MarginalCostPricingPtHandlerTest  {
 		StopFacility6.setLinkId(linkId6);
 		
 		TransitLine TransitLine1 = null;
-		Id Line1 = new IdImpl("line1Id");
+		Id<TransitLine> Line1 = Id.create("line1Id", TransitLine.class);
 		TransitLine1 = sf.createTransitLine(Line1);
 		
-		List<Id<Link>> lineIds = new ArrayList<Id<Link>>();
+		List<Id<TransitLine>> lineIds = new ArrayList<Id<TransitLine>>();
 		lineIds.add(Line1);
 		
-		Id Route1 = new IdImpl("Route1Id");
+		Id<TransitRoute> Route1 = Id.create("Route1Id", TransitRoute.class);
 		NetworkRoute NetworkRoute1 = null;
 		NetworkRoute1 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId6);
 		List<Id<Link>> LinkIds = new ArrayList<Id<Link>>();
@@ -4310,9 +4309,9 @@ public class MarginalCostPricingPtHandlerTest  {
 		TransitRoute1 = sf.createTransitRoute(Route1, NetworkRoute1, Stops, "pt");
 		
 		Departure Departure1 = null;
-		Id DepartureId1 = new IdImpl("DepartureId_1");
+		Id<Departure> DepartureId1 = Id.create("DepartureId_1", Departure.class);
 		Departure1 = sf.createDeparture(DepartureId1, 200);
-		Id veh_1 = new IdImpl("veh_1");
+		Id<Vehicle> veh_1 = Id.create("veh_1", Vehicle.class);
 		Departure1.setVehicleId(veh_1);
 		
 		TransitRoute1.addDeparture(Departure1);
@@ -4332,8 +4331,8 @@ public class MarginalCostPricingPtHandlerTest  {
 	private void fillVehicleTestWaitingDelay05(ScenarioImpl scenario) {
 		Vehicles veh = scenario.getVehicles();
 
-		Id vehTypeId1 = new IdImpl("type_1");
-		Id vehId1 = new IdImpl("veh_1");
+		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
+		Id<Vehicle> vehId1 = Id.create("veh_1", Vehicle.class);
 
 		VehicleType type = veh.getFactory().createVehicleType(vehTypeId1);
 		VehicleCapacity cap = veh.getFactory().createVehicleCapacity();
@@ -4554,18 +4553,18 @@ public class MarginalCostPricingPtHandlerTest  {
 		TransitScheduleFactory sf = schedule.getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
-		Id Stop1 = new IdImpl("Stop1Id");
-		Id Stop2 = new IdImpl("Stop2Id");
-		Id Stop3 = new IdImpl("Stop3Id");
-		Id Stop4 = new IdImpl("Stop4Id");
-		Id Stop5 = new IdImpl("Stop5Id");
-		Id Stop6 = new IdImpl("Stop6Id");
-		Id Stop7 = new IdImpl("Stop7Id");
-		Id Stop8 = new IdImpl("Stop8Id");
-		Id Stop9 = new IdImpl("Stop9Id");
-		Id Stop10 = new IdImpl("Stop10Id");
-		Id Stop11 = new IdImpl("Stop11Id");
-		Id Stop12 = new IdImpl("Stop12Id");
+		Id<TransitStopFacility> Stop1 = Id.create("Stop1Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop2 = Id.create("Stop2Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop3 = Id.create("Stop3Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop4 = Id.create("Stop4Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop5 = Id.create("Stop5Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop6 = Id.create("Stop6Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop7 = Id.create("Stop7Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop8 = Id.create("Stop8Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop9 = Id.create("Stop9Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop10 = Id.create("Stop10Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop11 = Id.create("Stop11Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop12 = Id.create("Stop12Id", TransitStopFacility.class);
 		
 		TransitStopFacility StopFacility1;
 		TransitStopFacility StopFacility2;
@@ -4608,14 +4607,14 @@ public class MarginalCostPricingPtHandlerTest  {
 		StopFacility12.setLinkId(linkId12);
 		
 		TransitLine TransitLine1 = null;
-		Id Line1 = new IdImpl("line1Id");
+		Id<TransitLine> Line1 = Id.create("line1Id", TransitLine.class);
 		TransitLine1 = sf.createTransitLine(Line1);
 		
 		TransitLine TransitLine2 = null;
-		Id Line2 = new IdImpl("line2Id");
+		Id<TransitLine> Line2 = Id.create("line2Id", TransitLine.class);
 		TransitLine2 = sf.createTransitLine(Line2);
 		
-		Id Route1 = new IdImpl("Route1Id");
+		Id<TransitRoute> Route1 = Id.create("Route1Id", TransitRoute.class);
 		NetworkRoute NetworkRoute1 = null;
 		NetworkRoute1 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId7);
 		List<Id<Link>> LinkIds1 = new ArrayList<Id<Link>>();
@@ -4626,7 +4625,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		LinkIds1.add(linkId6);
 		NetworkRoute1.setLinkIds(linkId1, LinkIds1, linkId7);
 		
-		Id Route2 = new IdImpl("Route2Id");
+		Id<TransitRoute> Route2 = Id.create("Route2Id", TransitRoute.class);
 		NetworkRoute NetworkRoute2 = null;
 		NetworkRoute2 = (NetworkRoute) routeFactory.createRoute(linkId7, linkId1);
 		List<Id<Link>> LinkIds2 = new ArrayList<Id<Link>>();
@@ -4688,18 +4687,18 @@ public class MarginalCostPricingPtHandlerTest  {
 		TransitRoute2 = sf.createTransitRoute(Route2, NetworkRoute2, Stops2, "pt");
 		
 		Departure Departure1 = null;
-		Id DepartureId1 = new IdImpl("DepartureId_1");
+		Id<Departure> DepartureId1 = Id.create("DepartureId_1", Departure.class);
 		Departure1 = sf.createDeparture(DepartureId1, 200);
-		Id veh_1 = new IdImpl("veh_1");
+		Id<Vehicle> veh_1 = Id.create("veh_1", Vehicle.class);
 		Departure1.setVehicleId(veh_1);
 		
 		Departure Departure2 = null;
-		Id DepartureId2 = new IdImpl("DepartureId_2");
+		Id<Departure> DepartureId2 = Id.create("DepartureId_2", Departure.class);
 		Departure2 = sf.createDeparture(DepartureId2, 800);
 		Departure2.setVehicleId(veh_1);
 		
 		Departure Departure3 = null;
-		Id DepartureId3 = new IdImpl("DepartureId_3");
+		Id<Departure> DepartureId3 = Id.create("DepartureId_3", Departure.class);
 		Departure3 = sf.createDeparture(DepartureId3, 1400);
 		Departure3.setVehicleId(veh_1);
 		
@@ -4732,10 +4731,10 @@ public class MarginalCostPricingPtHandlerTest  {
 	private void fillVehicleTestWaitingDelay06(ScenarioImpl scenario) {
 		Vehicles veh = scenario.getVehicles();
 
-		Id vehTypeId1 = new IdImpl("type_1");
-		Id vehId1 = new IdImpl("veh_1");
-		Id vehId2 = new IdImpl("veh_2");
-		Id vehId3 = new IdImpl("veh_3");
+		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
+		Id<Vehicle> vehId1 = Id.create("veh_1", Vehicle.class);
+		Id<Vehicle> vehId2 = Id.create("veh_2", Vehicle.class);
+		Id<Vehicle> vehId3 = Id.create("veh_3", Vehicle.class);
 
 		VehicleType type = veh.getFactory().createVehicleType(vehTypeId1);
 		VehicleCapacity cap = veh.getFactory().createVehicleCapacity();
@@ -4939,12 +4938,12 @@ public class MarginalCostPricingPtHandlerTest  {
 		TransitScheduleFactory sf = schedule.getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
-		Id Stop1 = new IdImpl("Stop1Id");
-		Id Stop2 = new IdImpl("Stop2Id");
-		Id Stop3 = new IdImpl("Stop3Id");
-		Id Stop4 = new IdImpl("Stop4Id");
-		Id Stop5 = new IdImpl("Stop5Id");
-		Id Stop6 = new IdImpl("Stop6Id");
+		Id<TransitStopFacility> Stop1 = Id.create("Stop1Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop2 = Id.create("Stop2Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop3 = Id.create("Stop3Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop4 = Id.create("Stop4Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop5 = Id.create("Stop5Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop6 = Id.create("Stop6Id", TransitStopFacility.class);
 		TransitStopFacility StopFacility1;
 		TransitStopFacility StopFacility2;
 		TransitStopFacility StopFacility3;
@@ -4965,13 +4964,13 @@ public class MarginalCostPricingPtHandlerTest  {
 		StopFacility6.setLinkId(linkId6);
 		
 		TransitLine TransitLine1 = null;
-		Id Line1 = new IdImpl("line1Id");
+		Id<TransitLine> Line1 = Id.create("line1Id", TransitLine.class);
 		TransitLine1 = sf.createTransitLine(Line1);
 		
-		List<Id<Link>> lineIds = new ArrayList<Id<Link>>();
+		List<Id<TransitLine>> lineIds = new ArrayList<Id<TransitLine>>();
 		lineIds.add(Line1);
 		
-		Id Route1 = new IdImpl("Route1Id");
+		Id<TransitRoute> Route1 = Id.create("Route1Id", TransitRoute.class);
 		NetworkRoute NetworkRoute1 = null;
 		NetworkRoute1 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId6);
 		List<Id<Link>> LinkIds = new ArrayList<Id<Link>>();
@@ -5006,21 +5005,21 @@ public class MarginalCostPricingPtHandlerTest  {
 		TransitRoute1 = sf.createTransitRoute(Route1, NetworkRoute1, Stops, "pt");
 		
 		Departure Departure1 = null;
-		Id DepartureId1 = new IdImpl("DepartureId_1");
+		Id<Departure> DepartureId1 = Id.create("DepartureId_1", Departure.class);
 		Departure1 = sf.createDeparture(DepartureId1, 200);
-		Id veh_1 = new IdImpl("veh_1");
+		Id<Vehicle> veh_1 = Id.create("veh_1", Vehicle.class);
 		Departure1.setVehicleId(veh_1);
 		
 		Departure Departure2 = null;
-		Id DepartureId2 = new IdImpl("DepartureId_2");
+		Id<Departure> DepartureId2 = Id.create("DepartureId_2", Departure.class);
 		Departure2 = sf.createDeparture(DepartureId2, 600);
-		Id veh_2 = new IdImpl("veh_2");
+		Id<Vehicle> veh_2 = Id.create("veh_2", Vehicle.class);
 		Departure2.setVehicleId(veh_2);
 		
 		Departure Departure3 = null;
-		Id DepartureId3 = new IdImpl("DepartureId_3");
+		Id<Departure> DepartureId3 = Id.create("DepartureId_3", Departure.class);
 		Departure3 = sf.createDeparture(DepartureId3, 800);
-		Id veh_3 = new IdImpl("veh_3");
+		Id<Vehicle> veh_3 = Id.create("veh_3", Vehicle.class);
 		Departure3.setVehicleId(veh_3);
 		
 		TransitRoute1.addDeparture(Departure1);
@@ -5042,10 +5041,10 @@ public class MarginalCostPricingPtHandlerTest  {
 	private void fillVehicleTestCapacityDelay01(ScenarioImpl scenario) {
 		Vehicles veh = scenario.getVehicles();
 
-		Id vehTypeId1 = new IdImpl("type_1");
-		Id vehId1 = new IdImpl("veh_1");
-		Id vehId2 = new IdImpl("veh_2");
-		Id vehId3 = new IdImpl("veh_3");
+		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
+		Id<Vehicle> vehId1 = Id.create("veh_1", Vehicle.class);
+		Id<Vehicle> vehId2 = Id.create("veh_2", Vehicle.class);
+		Id<Vehicle> vehId3 = Id.create("veh_3", Vehicle.class);
 
 		VehicleType type = veh.getFactory().createVehicleType(vehTypeId1);
 		VehicleCapacity cap = veh.getFactory().createVehicleCapacity();
@@ -5249,12 +5248,12 @@ public class MarginalCostPricingPtHandlerTest  {
 		TransitScheduleFactory sf = schedule.getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
-		Id Stop1 = new IdImpl("Stop1Id");
-		Id Stop2 = new IdImpl("Stop2Id");
-		Id Stop3 = new IdImpl("Stop3Id");
-		Id Stop4 = new IdImpl("Stop4Id");
-		Id Stop5 = new IdImpl("Stop5Id");
-		Id Stop6 = new IdImpl("Stop6Id");
+		Id<TransitStopFacility> Stop1 = Id.create("Stop1Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop2 = Id.create("Stop2Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop3 = Id.create("Stop3Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop4 = Id.create("Stop4Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop5 = Id.create("Stop5Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop6 = Id.create("Stop6Id", TransitStopFacility.class);
 		TransitStopFacility StopFacility1;
 		TransitStopFacility StopFacility2;
 		TransitStopFacility StopFacility3;
@@ -5275,13 +5274,13 @@ public class MarginalCostPricingPtHandlerTest  {
 		StopFacility6.setLinkId(linkId6);
 		
 		TransitLine TransitLine1 = null;
-		Id Line1 = new IdImpl("line1Id");
+		Id<TransitLine> Line1 = Id.create("line1Id", TransitLine.class);
 		TransitLine1 = sf.createTransitLine(Line1);
 		
-		List<Id<Link>> lineIds = new ArrayList<Id<Link>>();
+		List<Id<TransitLine>> lineIds = new ArrayList<Id<TransitLine>>();
 		lineIds.add(Line1);
 		
-		Id Route1 = new IdImpl("Route1Id");
+		Id<TransitRoute> Route1 = Id.create("Route1Id", TransitRoute.class);
 		NetworkRoute NetworkRoute1 = null;
 		NetworkRoute1 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId6);
 		List<Id<Link>> LinkIds = new ArrayList<Id<Link>>();
@@ -5316,21 +5315,21 @@ public class MarginalCostPricingPtHandlerTest  {
 		TransitRoute1 = sf.createTransitRoute(Route1, NetworkRoute1, Stops, "pt");
 		
 		Departure Departure1 = null;
-		Id DepartureId1 = new IdImpl("DepartureId_1");
+		Id<Departure> DepartureId1 = Id.create("DepartureId_1", Departure.class);
 		Departure1 = sf.createDeparture(DepartureId1, 200);
-		Id veh_1 = new IdImpl("veh_1");
+		Id<Vehicle> veh_1 = Id.create("veh_1", Vehicle.class);
 		Departure1.setVehicleId(veh_1);
 		
 		Departure Departure2 = null;
-		Id DepartureId2 = new IdImpl("DepartureId_2");
+		Id<Departure> DepartureId2 = Id.create("DepartureId_2", Departure.class);
 		Departure2 = sf.createDeparture(DepartureId2, 600);
-		Id veh_2 = new IdImpl("veh_2");
+		Id<Vehicle> veh_2 = Id.create("veh_2", Vehicle.class);
 		Departure2.setVehicleId(veh_2);
 		
 		Departure Departure3 = null;
-		Id DepartureId3 = new IdImpl("DepartureId_3");
+		Id<Departure> DepartureId3 = Id.create("DepartureId_3", Departure.class);
 		Departure3 = sf.createDeparture(DepartureId3, 800);
-		Id veh_3 = new IdImpl("veh_3");
+		Id<Vehicle> veh_3 = Id.create("veh_3", Vehicle.class);
 		Departure3.setVehicleId(veh_3);
 		
 		TransitRoute1.addDeparture(Departure1);
@@ -5352,10 +5351,10 @@ public class MarginalCostPricingPtHandlerTest  {
 	private void fillVehicleTestCapacityDelay02(ScenarioImpl scenario) {
 		Vehicles veh = scenario.getVehicles();
 
-		Id vehTypeId1 = new IdImpl("type_1");
-		Id vehId1 = new IdImpl("veh_1");
-		Id vehId2 = new IdImpl("veh_2");
-		Id vehId3 = new IdImpl("veh_3");
+		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
+		Id<Vehicle> vehId1 = Id.create("veh_1", Vehicle.class);
+		Id<Vehicle> vehId2 = Id.create("veh_2", Vehicle.class);
+		Id<Vehicle> vehId3 = Id.create("veh_3", Vehicle.class);
 
 		VehicleType type = veh.getFactory().createVehicleType(vehTypeId1);
 		VehicleCapacity cap = veh.getFactory().createVehicleCapacity();
@@ -5585,12 +5584,12 @@ public class MarginalCostPricingPtHandlerTest  {
 		TransitScheduleFactory sf = schedule.getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
-		Id Stop1 = new IdImpl("Stop1Id");
-		Id Stop2 = new IdImpl("Stop2Id");
-		Id Stop3 = new IdImpl("Stop3Id");
-		Id Stop4 = new IdImpl("Stop4Id");
-		Id Stop5 = new IdImpl("Stop5Id");
-		Id Stop6 = new IdImpl("Stop6Id");
+		Id<TransitStopFacility> Stop1 = Id.create("Stop1Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop2 = Id.create("Stop2Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop3 = Id.create("Stop3Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop4 = Id.create("Stop4Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop5 = Id.create("Stop5Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop6 = Id.create("Stop6Id", TransitStopFacility.class);
 		TransitStopFacility StopFacility1;
 		TransitStopFacility StopFacility2;
 		TransitStopFacility StopFacility3;
@@ -5611,13 +5610,13 @@ public class MarginalCostPricingPtHandlerTest  {
 		StopFacility6.setLinkId(linkId6);
 		
 		TransitLine TransitLine1 = null;
-		Id Line1 = new IdImpl("line1Id");
+		Id<TransitLine> Line1 = Id.create("line1Id", TransitLine.class);
 		TransitLine1 = sf.createTransitLine(Line1);
 		
-		List<Id<Link>> lineIds = new ArrayList<Id<Link>>();
+		List<Id<TransitLine>> lineIds = new ArrayList<Id<TransitLine>>();
 		lineIds.add(Line1);
 		
-		Id Route1 = new IdImpl("Route1Id");
+		Id<TransitRoute> Route1 = Id.create("Route1Id", TransitRoute.class);
 		NetworkRoute NetworkRoute1 = null;
 		NetworkRoute1 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId6);
 		List<Id<Link>> LinkIds = new ArrayList<Id<Link>>();
@@ -5652,21 +5651,21 @@ public class MarginalCostPricingPtHandlerTest  {
 		TransitRoute1 = sf.createTransitRoute(Route1, NetworkRoute1, Stops, "pt");
 		
 		Departure Departure1 = null;
-		Id DepartureId1 = new IdImpl("DepartureId_1");
+		Id<Departure> DepartureId1 = Id.create("DepartureId_1", Departure.class);
 		Departure1 = sf.createDeparture(DepartureId1, 200);
-		Id veh_1 = new IdImpl("veh_1");
+		Id<Vehicle> veh_1 = Id.create("veh_1", Vehicle.class);
 		Departure1.setVehicleId(veh_1);
 		
 		Departure Departure2 = null;
-		Id DepartureId2 = new IdImpl("DepartureId_2");
+		Id<Departure> DepartureId2 = Id.create("DepartureId_2", Departure.class);
 		Departure2 = sf.createDeparture(DepartureId2, 600);
-		Id veh_2 = new IdImpl("veh_2");
+		Id<Vehicle> veh_2 = Id.create("veh_2", Vehicle.class);
 		Departure2.setVehicleId(veh_2);
 		
 		Departure Departure3 = null;
-		Id DepartureId3 = new IdImpl("DepartureId_3");
+		Id<Departure> DepartureId3 = Id.create("DepartureId_3", Departure.class);
 		Departure3 = sf.createDeparture(DepartureId3, 800);
-		Id veh_3 = new IdImpl("veh_3");
+		Id<Vehicle> veh_3 = Id.create("veh_3", Vehicle.class);
 		Departure3.setVehicleId(veh_3);
 		
 		TransitRoute1.addDeparture(Departure1);
@@ -5688,10 +5687,10 @@ public class MarginalCostPricingPtHandlerTest  {
 	private void fillVehicleTestCapacityDelay03(ScenarioImpl scenario) {
 		Vehicles veh = scenario.getVehicles();
 
-		Id vehTypeId1 = new IdImpl("type_1");
-		Id vehId1 = new IdImpl("veh_1");
-		Id vehId2 = new IdImpl("veh_2");
-		Id vehId3 = new IdImpl("veh_3");
+		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
+		Id<Vehicle> vehId1 = Id.create("veh_1", Vehicle.class);
+		Id<Vehicle> vehId2 = Id.create("veh_2", Vehicle.class);
+		Id<Vehicle> vehId3 = Id.create("veh_3", Vehicle.class);
 
 		VehicleType type = veh.getFactory().createVehicleType(vehTypeId1);
 		VehicleCapacity cap = veh.getFactory().createVehicleCapacity();
@@ -5908,12 +5907,12 @@ public class MarginalCostPricingPtHandlerTest  {
 		TransitScheduleFactory sf = schedule.getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
-		Id Stop1 = new IdImpl("Stop1Id");
-		Id Stop2 = new IdImpl("Stop2Id");
-		Id Stop3 = new IdImpl("Stop3Id");
-		Id Stop4 = new IdImpl("Stop4Id");
-		Id Stop5 = new IdImpl("Stop5Id");
-		Id Stop6 = new IdImpl("Stop6Id");
+		Id<TransitStopFacility> Stop1 = Id.create("Stop1Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop2 = Id.create("Stop2Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop3 = Id.create("Stop3Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop4 = Id.create("Stop4Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop5 = Id.create("Stop5Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop6 = Id.create("Stop6Id", TransitStopFacility.class);
 		TransitStopFacility StopFacility1;
 		TransitStopFacility StopFacility2;
 		TransitStopFacility StopFacility3;
@@ -5934,13 +5933,13 @@ public class MarginalCostPricingPtHandlerTest  {
 		StopFacility6.setLinkId(linkId6);
 		
 		TransitLine TransitLine1 = null;
-		Id Line1 = new IdImpl("line1Id");
+		Id<TransitLine> Line1 = Id.create("line1Id", TransitLine.class);
 		TransitLine1 = sf.createTransitLine(Line1);
 		
-		List<Id<Link>> lineIds = new ArrayList<Id<Link>>();
+		List<Id<TransitLine>> lineIds = new ArrayList<Id<TransitLine>>();
 		lineIds.add(Line1);
 		
-		Id Route1 = new IdImpl("Route1Id");
+		Id<TransitRoute> Route1 = Id.create("Route1Id", TransitRoute.class);
 		NetworkRoute NetworkRoute1 = null;
 		NetworkRoute1 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId6);
 		List<Id<Link>> LinkIds = new ArrayList<Id<Link>>();
@@ -5975,21 +5974,21 @@ public class MarginalCostPricingPtHandlerTest  {
 		TransitRoute1 = sf.createTransitRoute(Route1, NetworkRoute1, Stops, "pt");
 		
 		Departure Departure1 = null;
-		Id DepartureId1 = new IdImpl("DepartureId_1");
+		Id<Departure> DepartureId1 = Id.create("DepartureId_1", Departure.class);
 		Departure1 = sf.createDeparture(DepartureId1, 200);
-		Id veh_1 = new IdImpl("veh_1");
+		Id<Vehicle> veh_1 = Id.create("veh_1", Vehicle.class);
 		Departure1.setVehicleId(veh_1);
 		
 		Departure Departure2 = null;
-		Id DepartureId2 = new IdImpl("DepartureId_2");
+		Id<Departure> DepartureId2 = Id.create("DepartureId_2", Departure.class);
 		Departure2 = sf.createDeparture(DepartureId2, 600);
-		Id veh_2 = new IdImpl("veh_2");
+		Id<Vehicle> veh_2 = Id.create("veh_2", Vehicle.class);
 		Departure2.setVehicleId(veh_2);
 		
 		Departure Departure3 = null;
-		Id DepartureId3 = new IdImpl("DepartureId_3");
+		Id<Departure> DepartureId3 = Id.create("DepartureId_3", Departure.class);
 		Departure3 = sf.createDeparture(DepartureId3, 800);
-		Id veh_3 = new IdImpl("veh_3");
+		Id<Vehicle> veh_3 = Id.create("veh_3", Vehicle.class);
 		Departure3.setVehicleId(veh_3);
 		
 		TransitRoute1.addDeparture(Departure1);
@@ -6011,10 +6010,10 @@ public class MarginalCostPricingPtHandlerTest  {
 	private void fillVehicleTestCapacityDelay04(ScenarioImpl scenario) {
 		Vehicles veh = scenario.getVehicles();
 
-		Id vehTypeId1 = new IdImpl("type_1");
-		Id vehId1 = new IdImpl("veh_1");
-		Id vehId2 = new IdImpl("veh_2");
-		Id vehId3 = new IdImpl("veh_3");
+		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
+		Id<Vehicle> vehId1 = Id.create("veh_1", Vehicle.class);
+		Id<Vehicle> vehId2 = Id.create("veh_2", Vehicle.class);
+		Id<Vehicle> vehId3 = Id.create("veh_3", Vehicle.class);
 
 		VehicleType type = veh.getFactory().createVehicleType(vehTypeId1);
 		VehicleCapacity cap = veh.getFactory().createVehicleCapacity();
@@ -6244,12 +6243,12 @@ public class MarginalCostPricingPtHandlerTest  {
 		TransitScheduleFactory sf = schedule.getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
-		Id Stop1 = new IdImpl("Stop1Id");
-		Id Stop2 = new IdImpl("Stop2Id");
-		Id Stop3 = new IdImpl("Stop3Id");
-		Id Stop4 = new IdImpl("Stop4Id");
-		Id Stop5 = new IdImpl("Stop5Id");
-		Id Stop6 = new IdImpl("Stop6Id");
+		Id<TransitStopFacility> Stop1 = Id.create("Stop1Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop2 = Id.create("Stop2Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop3 = Id.create("Stop3Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop4 = Id.create("Stop4Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop5 = Id.create("Stop5Id", TransitStopFacility.class);
+		Id<TransitStopFacility> Stop6 = Id.create("Stop6Id", TransitStopFacility.class);
 		TransitStopFacility StopFacility1;
 		TransitStopFacility StopFacility2;
 		TransitStopFacility StopFacility3;
@@ -6270,13 +6269,13 @@ public class MarginalCostPricingPtHandlerTest  {
 		StopFacility6.setLinkId(linkId6);
 		
 		TransitLine TransitLine1 = null;
-		Id Line1 = new IdImpl("line1Id");
+		Id<TransitLine> Line1 = Id.create("line1Id", TransitLine.class);
 		TransitLine1 = sf.createTransitLine(Line1);
 		
-		List<Id<Link>> lineIds = new ArrayList<Id<Link>>();
+		List<Id<TransitLine>> lineIds = new ArrayList<Id<TransitLine>>();
 		lineIds.add(Line1);
 		
-		Id Route1 = new IdImpl("Route1Id");
+		Id<TransitRoute> Route1 = Id.create("Route1Id", TransitRoute.class);
 		NetworkRoute NetworkRoute1 = null;
 		NetworkRoute1 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId6);
 		List<Id<Link>> LinkIds = new ArrayList<Id<Link>>();
@@ -6311,21 +6310,21 @@ public class MarginalCostPricingPtHandlerTest  {
 		TransitRoute1 = sf.createTransitRoute(Route1, NetworkRoute1, Stops, "pt");
 		
 		Departure Departure1 = null;
-		Id DepartureId1 = new IdImpl("DepartureId_1");
+		Id<Departure> DepartureId1 = Id.create("DepartureId_1", Departure.class);
 		Departure1 = sf.createDeparture(DepartureId1, 200);
-		Id veh_1 = new IdImpl("veh_1");
+		Id<Vehicle> veh_1 = Id.create("veh_1", Vehicle.class);
 		Departure1.setVehicleId(veh_1);
 		
 		Departure Departure2 = null;
-		Id DepartureId2 = new IdImpl("DepartureId_2");
+		Id<Departure> DepartureId2 = Id.create("DepartureId_2", Departure.class);
 		Departure2 = sf.createDeparture(DepartureId2, 600);
-		Id veh_2 = new IdImpl("veh_2");
+		Id<Vehicle> veh_2 = Id.create("veh_2", Vehicle.class);
 		Departure2.setVehicleId(veh_2);
 		
 		Departure Departure3 = null;
-		Id DepartureId3 = new IdImpl("DepartureId_3");
+		Id<Departure> DepartureId3 = Id.create("DepartureId_3", Departure.class);
 		Departure3 = sf.createDeparture(DepartureId3, 800);
-		Id veh_3 = new IdImpl("veh_3");
+		Id<Vehicle> veh_3 = Id.create("veh_3", Vehicle.class);
 		Departure3.setVehicleId(veh_3);
 		
 		TransitRoute1.addDeparture(Departure1);
@@ -6347,10 +6346,10 @@ public class MarginalCostPricingPtHandlerTest  {
 	private void fillVehicleTestCapacityDelay05(ScenarioImpl scenario) {
 		Vehicles veh = scenario.getVehicles();
 
-		Id vehTypeId1 = new IdImpl("type_1");
-		Id vehId1 = new IdImpl("veh_1");
-		Id vehId2 = new IdImpl("veh_2");
-		Id vehId3 = new IdImpl("veh_3");
+		Id<VehicleType> vehTypeId1 = Id.create("type_1", VehicleType.class);
+		Id<Vehicle> vehId1 = Id.create("veh_1", Vehicle.class);
+		Id<Vehicle> vehId2 = Id.create("veh_2", Vehicle.class);
+		Id<Vehicle> vehId3 = Id.create("veh_3", Vehicle.class);
 
 		VehicleType type = veh.getFactory().createVehicleType(vehTypeId1);
 		VehicleCapacity cap = veh.getFactory().createVehicleCapacity();

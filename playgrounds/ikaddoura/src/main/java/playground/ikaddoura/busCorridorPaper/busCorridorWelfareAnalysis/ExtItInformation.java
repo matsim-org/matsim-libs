@@ -27,6 +27,8 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * @author ihab and benjamin
@@ -60,9 +62,9 @@ public class ExtItInformation {
 	private SortedMap <Integer, AnalysisPeriod> analysisPeriods = new TreeMap<Integer, AnalysisPeriod>();
 		
 	private int numberOfMissedVehicles;
-	private Map <Id, FacilityWaitTimeInfo> id2facilityWaitInfo = new HashMap<Id, FacilityWaitTimeInfo>();
+	private Map <Id<TransitStopFacility>, FacilityWaitTimeInfo> id2facilityWaitInfo = new HashMap<>();
 	
-	private Map <Id, List<Double>> personId2waitingTimes = new HashMap<Id, List<Double>>();
+	private Map <Id<Person>, List<Double>> personId2waitingTimes = new HashMap<>();
 	
 	public List <Double> getWaitingTimes() {
 		return waitingTimes;
@@ -194,11 +196,11 @@ public class ExtItInformation {
 		return numberOfMissedVehicles;
 	}
 
-	protected void setId2facilityWaitInfo(Map <Id, FacilityWaitTimeInfo> facilityId2facilityInfos) {
+	protected void setId2facilityWaitInfo(Map <Id<TransitStopFacility>, FacilityWaitTimeInfo> facilityId2facilityInfos) {
 		this.id2facilityWaitInfo = facilityId2facilityInfos;
 	}
 	
-	protected Map <Id, FacilityWaitTimeInfo> getId2facilityWaitInfo() {
+	protected Map <Id<TransitStopFacility>, FacilityWaitTimeInfo> getId2facilityWaitInfo() {
 		return id2facilityWaitInfo;
 	}
 	
@@ -260,11 +262,11 @@ public class ExtItInformation {
 		return analysisPeriods;
 	}
 
-	public void setPersonId2waitingTimes(Map <Id, List<Double>> personId2waitingTimes) {
+	public void setPersonId2waitingTimes(Map <Id<Person>, List<Double>> personId2waitingTimes) {
 		this.personId2waitingTimes = personId2waitingTimes;
 	}
 
-	public Map <Id, List<Double>> getPersonId2waitingTimes() {
+	public Map <Id<Person>, List<Double>> getPersonId2waitingTimes() {
 		return personId2waitingTimes;
 	}
 

@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -70,10 +69,10 @@ public class ScheduleVehiclesGenerator {
 	private String networkFile;
 	private String scheduleFile;
 	private String vehicleFile;
-	private Id transitLineId;
-	private Id routeId1;
-	private Id routeId2;
-	private Id vehTypeId;
+	private Id<TransitLine> transitLineId;
+	private Id<TransitRoute> routeId1;
+	private Id<TransitRoute> routeId2;
+	private Id<VehicleType> vehTypeId;
 	private Map<Integer, TimePeriod> day;
 	private Map<Integer, TimePeriod> newDay = new HashMap<Integer, TimePeriod>();
 
@@ -110,21 +109,21 @@ public class ScheduleVehiclesGenerator {
 		scen.getConfig().scenario().setUseTransit(true);
 		scen.getConfig().scenario().setUseVehicles(true);
 		
-		Map<Id,List<Id<Link>>> routeID2linkIDs = getIDs(network);
+		Map<Id<TransitRoute>,List<Id<Link>>> routeID2linkIDs = getIDs(network);
 		
-		Map<Id, List<TransitStopFacility>> routeId2transitStopFacilities = getStopLinkIDs(routeID2linkIDs, network);
+		Map<Id<TransitRoute>, List<TransitStopFacility>> routeId2transitStopFacilities = getStopLinkIDs(routeID2linkIDs, network);
 			
-		Map<Id, NetworkRoute> routeId2networkRoute = getRouteId2NetworkRoute(routeID2linkIDs);
-		Map<Id, List<TransitRouteStop>> routeId2TransitRouteStops = getRouteId2TransitRouteStops(routeId2transitStopFacilities, network, this.stopTime);
+		Map<Id<TransitRoute>, NetworkRoute> routeId2networkRoute = getRouteId2NetworkRoute(routeID2linkIDs);
+		Map<Id<TransitRoute>, List<TransitRouteStop>> routeId2TransitRouteStops = getRouteId2TransitRouteStops(routeId2transitStopFacilities, network, this.stopTime);
 			
-		Map<Id, TransitRoute> routeId2transitRoute = getRouteId2TransitRoute(routeId2networkRoute, routeId2TransitRouteStops);
+		Map<Id<TransitRoute>, TransitRoute> routeId2transitRoute = getRouteId2TransitRoute(routeId2networkRoute, routeId2TransitRouteStops);
 		setTransitLine(routeId2transitRoute);
 		
 		setDepartures(routeId2transitRoute);
 	}
 
-	private Map<Id,List<Id<Link>>> getIDs(Network network) {
-		Map<Id, List<Id<Link>>> routeID2linkIDs = new HashMap<Id, List<Id<Link>>>();
+	private Map<Id<TransitRoute>,List<Id<Link>>> getIDs(Network network) {
+		Map<Id<TransitRoute>, List<Id<Link>>> routeID2linkIDs = new HashMap<>();
 		List<Id<Link>> linkIDsRoute1 = new LinkedList<Id<Link>>();
 		List<Id<Link>> linkIDsRoute2 = new LinkedList<Id<Link>>();
 		
@@ -168,20 +167,21 @@ public class ScheduleVehiclesGenerator {
 		return routeID2linkIDs;
 	}
 
-	private Map<Id,List<TransitStopFacility>> getStopLinkIDs(Map<Id, List<Id<Link>>> routeID2linkIDs, Network network) {
-		Map<Id, List<TransitStopFacility>> routeId2transitStopFacilities = new HashMap<Id, List<TransitStopFacility>>();
+	private Map<Id<TransitRoute>,List<TransitStopFacility>> getStopLinkIDs(Map<Id<TransitRoute>, List<Id<Link>>> routeID2linkIDs, Network network) {
+		Map<Id<TransitRoute>, List<TransitStopFacility>> routeId2transitStopFacilities = new HashMap<>();
 			
-		for (Id routeID : routeID2linkIDs.keySet()){
+		for (Id<TransitRoute> routeID : routeID2linkIDs.keySet()){
 			List<TransitStopFacility> stopFacilitiesRoute = new ArrayList<TransitStopFacility>();
 
-			for (Id linkID : routeID2linkIDs.get(routeID)){				
-				if (schedule.getFacilities().containsKey(linkID)){
-					TransitStopFacility transitStopFacility = schedule.getFacilities().get(linkID);
+			for (Id<Link> linkID : routeID2linkIDs.get(routeID)){				
+				Id<TransitStopFacility> stopId = Id.create(linkID, TransitStopFacility.class);
+				if (schedule.getFacilities().containsKey(stopId)){
+					TransitStopFacility transitStopFacility = schedule.getFacilities().get(stopId);
 					stopFacilitiesRoute.add(transitStopFacility);
 					// don't create transitStopFacility!
 				}
 				else {
-					TransitStopFacility transitStopFacility = sf.createTransitStopFacility(linkID, network.getLinks().get(linkID).getToNode().getCoord(), false);
+					TransitStopFacility transitStopFacility = sf.createTransitStopFacility(stopId, network.getLinks().get(linkID).getToNode().getCoord(), false);
 					transitStopFacility.setLinkId(linkID);
 					stopFacilitiesRoute.add(transitStopFacility);
 					schedule.addStopFacility(transitStopFacility);
@@ -192,9 +192,9 @@ public class ScheduleVehiclesGenerator {
 		return routeId2transitStopFacilities;
 	}
 	
-	private Map<Id, NetworkRoute> getRouteId2NetworkRoute(Map<Id, List<Id<Link>>> routeID2linkIDs) {
-		Map<Id, NetworkRoute> routeId2NetworkRoute = new HashMap<Id, NetworkRoute>();
-		for (Id<Link> routeId : routeID2linkIDs.keySet()){
+	private Map<Id<TransitRoute>, NetworkRoute> getRouteId2NetworkRoute(Map<Id<TransitRoute>, List<Id<Link>>> routeID2linkIDs) {
+		Map<Id<TransitRoute>, NetworkRoute> routeId2NetworkRoute = new HashMap<>();
+		for (Id<TransitRoute> routeId : routeID2linkIDs.keySet()){
 			NetworkRoute netRoute = new LinkNetworkRouteImpl(routeID2linkIDs.get(routeId).get(0), routeID2linkIDs.get(routeId).get(routeID2linkIDs.get(routeId).size()-1));	// Start-Link, End-Link	
 			netRoute.setLinkIds(routeID2linkIDs.get(routeId).get(0), getMiddleRouteLinkIDs(routeID2linkIDs.get(routeId)), routeID2linkIDs.get(routeId).get(routeID2linkIDs.get(routeId).size()-1)); // Start-link, link-Ids als List, End-link
 			routeId2NetworkRoute.put(routeId, netRoute);
@@ -202,11 +202,11 @@ public class ScheduleVehiclesGenerator {
 		return routeId2NetworkRoute;
 	}
 
-	private Map<Id, List<TransitRouteStop>> getRouteId2TransitRouteStops(Map<Id, List<TransitStopFacility>> routeId2transitStopFacilities, Network network, double stopTime) {
+	private Map<Id<TransitRoute>, List<TransitRouteStop>> getRouteId2TransitRouteStops(Map<Id<TransitRoute>, List<TransitStopFacility>> routeId2transitStopFacilities, Network network, double stopTime) {
 
-		Map<Id, List<TransitRouteStop>> routeId2transitRouteStops = new HashMap<Id, List<TransitRouteStop>>();
+		Map<Id<TransitRoute>, List<TransitRouteStop>> routeId2transitRouteStops = new HashMap<>();
 		
-		for (Id routeId : routeId2transitStopFacilities.keySet()){
+		for (Id<TransitRoute> routeId : routeId2transitStopFacilities.keySet()){
 			double arrivalTime = 0;
 			double departureTime = 0;
 			List<TransitRouteStop> transitRouteStops = new ArrayList<TransitRouteStop>();
@@ -244,24 +244,24 @@ public class ScheduleVehiclesGenerator {
 	}
 
 	
-	private Map<Id, TransitRoute> getRouteId2TransitRoute(Map<Id, NetworkRoute> routeId2networkRoute, Map<Id, List<TransitRouteStop>> routeId2TransitRouteStops) {
+	private Map<Id<TransitRoute>, TransitRoute> getRouteId2TransitRoute(Map<Id<TransitRoute>, NetworkRoute> routeId2networkRoute, Map<Id<TransitRoute>, List<TransitRouteStop>> routeId2TransitRouteStops) {
 		
-		Map<Id, TransitRoute> routeId2transitRoute = new HashMap<Id, TransitRoute>();			
-		for (Id routeId : routeId2networkRoute.keySet()){
+		Map<Id<TransitRoute>, TransitRoute> routeId2transitRoute = new HashMap<Id<TransitRoute>, TransitRoute>();			
+		for (Id<TransitRoute> routeId : routeId2networkRoute.keySet()){
 			TransitRoute transitRoute = sf.createTransitRoute(routeId, routeId2networkRoute.get(routeId), routeId2TransitRouteStops.get(routeId), "bus");
 			routeId2transitRoute.put(routeId, transitRoute);
 		}
 		return routeId2transitRoute;
 	}
 	
-	private void setTransitLine(Map<Id, TransitRoute> routeId2transitRoute) {
+	private void setTransitLine(Map<Id<TransitRoute>, TransitRoute> routeId2transitRoute) {
 		TransitLine transitLine = sf.createTransitLine(this.transitLineId);
 		schedule.addTransitLine(transitLine);
 		transitLine.addRoute(routeId2transitRoute.get(this.routeId1));
 		transitLine.addRoute(routeId2transitRoute.get(this.routeId2));
 	}
 	
-	private void setDepartures(Map<Id, TransitRoute> routeId2transitRoute) {
+	private void setDepartures(Map<Id<TransitRoute>, TransitRoute> routeId2transitRoute) {
 		
 		int lastStop = routeId2transitRoute.get(routeId1).getStops().size()-1;
 		double routeTravelTime = routeId2transitRoute.get(routeId1).getStops().get(lastStop).getArrivalOffset() + this.stopTime;
@@ -301,7 +301,7 @@ public class ScheduleVehiclesGenerator {
 		}		
 	}
 	
-	private void setDepartureIDs(Map<Id, TransitRoute> routeId2transitRoute, String zeitraum, double endTime, double startTime, int numberOfBusesZeitraum, List<Id> vehicleIDsZeitraum) {	
+	private void setDepartureIDs(Map<Id<TransitRoute>, TransitRoute> routeId2transitRoute, String zeitraum, double endTime, double startTime, int numberOfBusesZeitraum, List<Id<Vehicle>> vehicleIDsZeitraum) {	
 		this.periodNr++;
 		System.out.println("+++++ Beginn von period "+ periodNr+" - lastPeriod: VehNr2DepTime: "+this.vehNr2lastPeriodDepTimeHin);
 		System.out.println("VehicleIDs of this timePeriod: "+vehicleIDsZeitraum.toString());
@@ -325,7 +325,7 @@ public class ScheduleVehiclesGenerator {
 			double lastDepartureTime = 0;
 			int routeNrCounter = 0;
 			int vehicleIndex = 0;
-			for (Id routeId : routeId2transitRoute.keySet()){
+			for (Id<TransitRoute> routeId : routeId2transitRoute.keySet()){
 				routeNrCounter++;
 				if (this.periodNr > 1 && routeNrCounter == 1){  // nicht der erste Zeitraum, hin
 					
@@ -357,7 +357,7 @@ public class ScheduleVehiclesGenerator {
 							Map<Integer,Double> vehNr2minimalFirstDeparture = new HashMap<Integer, Double>();
 							
 							int vehNr = 0;
-							for (Id vehID : vehicleIDsZeitraum){
+							for (Id<Vehicle> vehID : vehicleIDsZeitraum){
 								System.out.println("vehNr: "+vehNr);
 								double depNotBefore = 24*3600;
 								if (!this.vehNr2lastPeriodDepTimeHin.containsKey(vehNr)){
@@ -438,7 +438,7 @@ public class ScheduleVehiclesGenerator {
 				departureTime = firstDepartureTime;
 				System.out.println("add First Departure at: "+Time.writeTime(departureTime, Time.TIMEFORMAT_HHMMSS));
 					for (int depNr=1 ; departureTime <= lastDepartureTime - umlaufzeit ; depNr++){
-						Departure departure = sf.createDeparture(new IdImpl(zeitraum+"_"+depNr), departureTime);
+						Departure departure = sf.createDeparture(Id.create(zeitraum+"_"+depNr, Departure.class), departureTime);
 						departure.setVehicleId(vehicleIDsZeitraum.get(vehicleIndex));
 						routeId2transitRoute.get(routeId).addDeparture(departure);
 						
@@ -473,8 +473,8 @@ public class ScheduleVehiclesGenerator {
 		return turnedArroundList;
 	}
 
-	public List<Id> createVehicles(int numberOfBusesZeitraum) {
-		List<Id> vehicleIdList = new ArrayList<Id>();
+	public List<Id<Vehicle>> createVehicles(int numberOfBusesZeitraum) {
+		List<Id<Vehicle>> vehicleIdList = new ArrayList<>();
 		// Vehicle-Typ: Bus
 		VehicleType type = veh.getFactory().createVehicleType(this.vehTypeId);
 		VehicleCapacity cap = veh.getFactory().createVehicleCapacity();
@@ -487,10 +487,10 @@ public class ScheduleVehiclesGenerator {
 		veh.addVehicleType( type); 
 		
 		for (int vehicleNr=1 ; vehicleNr<=numberOfBusesZeitraum ; vehicleNr++){
-			vehicleIdList.add(new IdImpl("bus_"+vehicleNr));
+			vehicleIdList.add(Id.create("bus_"+vehicleNr, Vehicle.class));
 		}
 
-		for (Id vehicleId : vehicleIdList){
+		for (Id<Vehicle> vehicleId : vehicleIdList){
 			Vehicle vehicle = veh.getFactory().createVehicle(vehicleId, veh.getVehicleTypes().get(vehTypeId));
 			veh.addVehicle( vehicle);
 		}
@@ -541,19 +541,19 @@ public class ScheduleVehiclesGenerator {
 		this.busSeats = seats;
 	}
 
-	public void setTransitLineId(Id transitLineId) {
+	public void setTransitLineId(Id<TransitLine> transitLineId) {
 		this.transitLineId = transitLineId;
 	}
 
-	public void setRouteId1(Id routeId1) {
+	public void setRouteId1(Id<TransitRoute> routeId1) {
 		this.routeId1 = routeId1;
 	}
 
-	public void setRouteId2(Id routeId2) {
+	public void setRouteId2(Id<TransitRoute> routeId2) {
 		this.routeId2 = routeId2;
 	}
 
-	public void setVehTypeId(Id vehTypeId) {
+	public void setVehTypeId(Id<VehicleType> vehTypeId) {
 		this.vehTypeId = vehTypeId;
 	}
 

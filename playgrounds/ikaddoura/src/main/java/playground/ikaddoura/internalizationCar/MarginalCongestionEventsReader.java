@@ -22,8 +22,9 @@ package playground.ikaddoura.internalizationCar;
 import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -70,9 +71,9 @@ public class MarginalCongestionEventsReader extends MatsimXmlParser{
 		String eventType = attributes.getValue("type");
 
 		Double time = 0.0;
-		Id linkId = null;
-		Id causingAgentId = null;
-		Id affectedAgentId = null;
+		Id<Link> linkId = null;
+		Id<Person> causingAgentId = null;
+		Id<Person> affectedAgentId = null;
 		Double delay = 0.0;
 		String constraint = null;
 		Double emergenceTime = 0.0;
@@ -86,13 +87,13 @@ public class MarginalCongestionEventsReader extends MatsimXmlParser{
 					eventType = attributes.getValue(i);
 				}
 				else if(attributes.getQName(i).equals(MarginalCongestionEvent.ATTRIBUTE_LINK)){
-					linkId = new IdImpl((attributes.getValue(i)));
+					linkId = Id.create((attributes.getValue(i)), Link.class);
 				}
 				else if(attributes.getQName(i).equals(MarginalCongestionEvent.ATTRIBUTE_PERSON)){
-					causingAgentId = new IdImpl((attributes.getValue(i)));
+					causingAgentId = Id.create((attributes.getValue(i)), Person.class);
 				}
 				else if(attributes.getQName(i).equals(MarginalCongestionEvent.ATTRIBUTE_AFFECTED_AGENT)){
-					affectedAgentId = new IdImpl((attributes.getValue(i)));
+					affectedAgentId = Id.create((attributes.getValue(i)), Person.class);
 				}
 				else if(attributes.getQName(i).equals(MarginalCongestionEvent.ATTRIBUTE_DELAY)){
 					delay = Double.parseDouble(attributes.getValue(i));

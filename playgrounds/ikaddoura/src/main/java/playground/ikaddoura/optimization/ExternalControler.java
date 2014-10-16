@@ -34,17 +34,18 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
+import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType.DoorOperationMode;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
-import org.matsim.vehicles.VehicleType.DoorOperationMode;
 
 import playground.ikaddoura.optimization.io.OptSettings;
 import playground.ikaddoura.optimization.io.OptSettingsReader;
@@ -377,7 +378,7 @@ class ExternalControler {
 			double startService = 4. * 3600.;
 			double endService = 24. * 3600.;
 			double slackTime = 1200.;
-			Id ptVehId = new IdImpl("bus");
+			Id<Vehicle> ptVehId = Id.create("bus", Vehicle.class);
 			double alightingTime = 0.75;
 			double boardingTime = 1.0;
 			DoorOperationMode doorOperationMode = DoorOperationMode.serial;
@@ -392,7 +393,7 @@ class ExternalControler {
 			sfn.createTransitSchedule(transitRouteMode, isBlocking, awaitDeparture, scheduledTravelTime, scheduledStopTime);
 			schedule = sfn.getTransitSchedule();
 			
-			List<Id> lineIDs = new ArrayList<Id>();
+			List<Id<TransitLine>> lineIDs = new ArrayList<Id<TransitLine>>();
 			lineIDs.addAll(schedule.getTransitLines().keySet());
 			 
 			DeparturesGenerator dg = new DeparturesGenerator();

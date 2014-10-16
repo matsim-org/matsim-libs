@@ -36,10 +36,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 
 public class CreatePopulation_WorkOther_whiteBlue implements Runnable {
 
@@ -53,6 +52,7 @@ public class CreatePopulation_WorkOther_whiteBlue implements Runnable {
 		population.run();
 	}
 
+	@Override
 	public void run(){
 		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.population = this.scenario.getPopulation();
@@ -88,7 +88,7 @@ public class CreatePopulation_WorkOther_whiteBlue implements Runnable {
 			// 3 * Standardabweichung --> 99,73%
 			double homeEndTimeRnd = calculateNormallyDistributedTime(8.0*3600.0, 10*60);
 
-			if (i <= ((double)quantity / 2.0)){
+			if (i <= (quantity / 2.0)){
 				Person person = this.population.getFactory().createPerson(createId("person_WorkBluePt_", String.valueOf((int)homeLocation.getX()), String.valueOf((int)workLocation.getX()), i));
 				Plan plan = this.population.getFactory().createPlan();
 	
@@ -101,7 +101,7 @@ public class CreatePopulation_WorkOther_whiteBlue implements Runnable {
 				this.population.addPerson(person);
 			}
 			
-			if (i > ((double)quantity / 2.0)){
+			if (i > (quantity / 2.0)){
 				Person person = this.population.getFactory().createPerson(createId("person_WorkBlueCar_", String.valueOf((int)homeLocation.getX()), String.valueOf((int)workLocation.getX()), i));
 				Plan plan = this.population.getFactory().createPlan();
 	
@@ -123,7 +123,7 @@ public class CreatePopulation_WorkOther_whiteBlue implements Runnable {
 			
 			double homeEndTimeRnd = calculateNormallyDistributedTime(8.0*3600.0, 3600.0);
 
-			if (i <= ((double)quantity / 2.0)){
+			if (i <= (quantity / 2.0)){
 				Person person = this.population.getFactory().createPerson(createId("person_WorkWhitePt_", String.valueOf((int)homeLocation.getX()), String.valueOf((int)workLocation.getX()), i));
 				Plan plan = this.population.getFactory().createPlan();
 	
@@ -136,7 +136,7 @@ public class CreatePopulation_WorkOther_whiteBlue implements Runnable {
 				this.population.addPerson(person);
 			}
 			
-			if (i > ((double)quantity / 2.0)){
+			if (i > (quantity / 2.0)){
 				Person person = this.population.getFactory().createPerson(createId("person_WorkWhiteCar_", String.valueOf((int)homeLocation.getX()), String.valueOf((int)workLocation.getX()), i));
 				Plan plan = this.population.getFactory().createPlan();
 	
@@ -158,7 +158,7 @@ public class CreatePopulation_WorkOther_whiteBlue implements Runnable {
 			double homeEndTimeRnd = calculateRandomlyDistributedValue(12.5 * 60*60, 4.5*60*60); // 8 - 17 Uhr
 //			double homeEndTimeRnd = calculateRandomlyDistributedValue(14 * 60*60, 6*60*60); // 8 - 20 Uhr
 
-			if (i <= ((double)quantity / 2.0)){
+			if (i <= (quantity / 2.0)){
 				Person person = this.population.getFactory().createPerson(createId("person_OtherPt_", String.valueOf((int)homeLocation.getX()), String.valueOf((int)otherLocation.getX()), i));
 				Plan plan = this.population.getFactory().createPlan();
 	
@@ -171,7 +171,7 @@ public class CreatePopulation_WorkOther_whiteBlue implements Runnable {
 				this.population.addPerson(person);
 			}
 			
-			if (i > ((double)quantity / 2.0)){
+			if (i > (quantity / 2.0)){
 				Person person = this.population.getFactory().createPerson(createId("person_OtherCar_", String.valueOf((int)homeLocation.getX()), String.valueOf((int)otherLocation.getX()), i));
 				Plan plan = this.population.getFactory().createPlan();
 	
@@ -274,8 +274,8 @@ public class CreatePopulation_WorkOther_whiteBlue implements Runnable {
 		return activity;
 	}
 
-	private Id createId(String name, String zone1, String zone2, int i) {
-		return new IdImpl(name + zone1 + "_" + zone2 + "_" + i);
+	private Id<Person> createId(String name, String zone1, String zone2, int i) {
+		return Id.create(name + zone1 + "_" + zone2 + "_" + i, Person.class);
 	}
 	
 }

@@ -25,8 +25,11 @@ package playground.ikaddoura.busCorridorPaper.busCorridorWelfareAnalysis;
 
 import java.io.IOException;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleType.DoorOperationMode;
 
 /**
@@ -71,11 +74,11 @@ public class VehicleScheduleWriter {
 		generator.setScheduleFile(this.outputDir + "/scheduleFile.xml");
 		generator.setVehicleFile(this.outputDir + "/vehiclesFile.xml");
 		
-		generator.setTransitLineId(new IdImpl("busLine"));
-		generator.setRouteId1(new IdImpl("west-east"));
-		generator.setRouteId2(new IdImpl("east-west"));
+		generator.setTransitLineId(Id.create("busLine", TransitLine.class));
+		generator.setRouteId1(Id.create("west-east", TransitRoute.class));
+		generator.setRouteId2(Id.create("east-west", TransitRoute.class));
 		
-		generator.setVehTypeId(new IdImpl("bus"));
+		generator.setVehTypeId(Id.create("bus", VehicleType.class));
 		generator.setAccessSeconds(2.0); 	// [sec/person]
 		generator.setEgressSeconds(1.5); 	// [sec/person]
 		generator.setDoorOperationMode(DoorOperationMode.parallel);

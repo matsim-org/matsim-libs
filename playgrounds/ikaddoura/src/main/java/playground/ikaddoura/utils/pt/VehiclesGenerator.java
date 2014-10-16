@@ -30,6 +30,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicle;
@@ -54,7 +55,7 @@ public class VehiclesGenerator {
 	 * If the pcu value is not 0.0 the length is ignored and has no effect.
 	 * 
 	 */
-	public void createVehicles(TransitSchedule schedule, List<Id> lineIDs, int busSeats, int standingRoom, double length, Id vehTypeId, double egressSeconds, double accessSeconds, DoorOperationMode doorOperationMode, double pcu, double maxVelocity) {
+	public void createVehicles(TransitSchedule schedule, List<Id<TransitLine>> lineIDs, int busSeats, int standingRoom, double length, Id vehTypeId, double egressSeconds, double accessSeconds, DoorOperationMode doorOperationMode, double pcu, double maxVelocity) {
 		
 		if (pcu==0.){
 			log.info("Passenger car equivalents (pcu) is 0.0. Calculating a pcu value based on the given vehicle length of " + length + " meters.");
@@ -65,7 +66,7 @@ public class VehiclesGenerator {
 			log.warn("Ignoring vehicle length. Using pcu instead.");
 		}
 		
-		for (Id transitLineId : lineIDs){
+		for (Id<TransitLine> transitLineId : lineIDs){
 			log.info("Creating transit vehicles for transit line " + transitLineId);
 			List<Id> vehicleIDs = new ArrayList<Id>();
 			

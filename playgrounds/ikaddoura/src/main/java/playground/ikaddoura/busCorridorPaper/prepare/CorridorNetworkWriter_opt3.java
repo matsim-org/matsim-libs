@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -86,10 +85,10 @@ public class CorridorNetworkWriter_opt3 {
 		for (int aa= 0; aa<= linkNr-1; aa++){
 			Node nodeA = nodes.get(nodeNr);
 			Node nodeB = nodes.get(nodeNr+1);
-			Id linkIdAB = new IdImpl(nodeA.getId()+"to"+nodeB.getId()+"_bus");
+			Id<Link> linkIdAB = Id.create(nodeA.getId()+"to"+nodeB.getId()+"_bus", Link.class);
 			Link linkAB = network.getFactory().createLink(linkIdAB, nodeA, nodeB);
 			network.addLink(linkAB);
-			Id linkIdBA = new IdImpl(nodeB.getId()+"to"+nodeA.getId()+"_bus");
+			Id<Link> linkIdBA = Id.create(nodeB.getId()+"to"+nodeA.getId()+"_bus", Link.class);
 			Link linkBA = network.getFactory().createLink(linkIdBA, nodeB, nodeA);
 			network.addLink(linkBA);	
 			
@@ -109,10 +108,10 @@ public class CorridorNetworkWriter_opt3 {
 		for (int aa= 0; aa<= linkNr-1; aa++){
 			Node nodeA = nodes.get(nodeNr);
 			Node nodeB = nodes.get(nodeNr+1);
-			Id linkIdAB = new IdImpl(nodeA.getId()+"to"+nodeB.getId()+"_car");
+			Id<Link> linkIdAB = Id.create(nodeA.getId()+"to"+nodeB.getId()+"_car", Link.class);
 			Link linkAB = network.getFactory().createLink(linkIdAB, nodeA, nodeB);
 			network.addLink(linkAB);
-			Id linkIdBA = new IdImpl(nodeB.getId()+"to"+nodeA.getId()+"_car");
+			Id<Link> linkIdBA = Id.create(nodeB.getId()+"to"+nodeA.getId()+"_car", Link.class);
 			Link linkBA = network.getFactory().createLink(linkIdBA, nodeB, nodeA);
 			network.addLink(linkBA);	
 			
@@ -147,7 +146,7 @@ public class CorridorNetworkWriter_opt3 {
 		double xCoord = 0.0;
 		int nodeNr = 0;
 		for (int ii=0; ii<=linkNr; ii++){
-				Id nodeIdA = new IdImpl(nodeNr);
+				Id<Node> nodeIdA = Id.create(nodeNr, Node.class);
 				Coord fromNodeCoord = scenario.createCoord(xCoord, 0);
 				Node nodeA = network.getFactory().createNode(nodeIdA, fromNodeCoord);
 				network.addNode(nodeA);

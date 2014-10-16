@@ -29,13 +29,14 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Generates or modifies transit departures.
@@ -52,16 +53,16 @@ public class DeparturesGenerator {
 	 * Creates departures for each given transit line of a given schedule according to the given headway, the start and end time of service and the slack time.
 	 * 
 	 */
-	public void addDepartures(TransitSchedule schedule, List<Id> lineIDs, double headway_sec, double startTime, double endTime, double pausenzeit) {
+	public void addDepartures(TransitSchedule schedule, List<Id<TransitLine>> lineIDs, double headway_sec, double startTime, double endTime, double pausenzeit) {
 		this.transitSchedule = schedule;
 		
 		if (headway_sec < 1){
 			throw new RuntimeException("Headway is less than 1 sec. Aborting...");
 		}
 		
-		for (Id transitLineId : lineIDs){
+		for (Id<TransitLine> transitLineId : lineIDs){
 			log.info("Transit line Id: " + transitLineId);
-			Map<Id, TransitRoute> routeId2transitRoute = new HashMap<Id, TransitRoute>();
+			Map<Id<TransitRoute>, TransitRoute> routeId2transitRoute = new HashMap<>();
 			
 			for (TransitRoute transitRoute : this.transitSchedule.getTransitLines().get(transitLineId).getRoutes().values()){
 				routeId2transitRoute.put(transitRoute.getId(), transitRoute);
@@ -77,7 +78,7 @@ public class DeparturesGenerator {
 						" transit routes (one for each direction). Can't garantee correct calculation of departure times. Aborting...");
 			}
 						
-			List<Id> routeIDs = new ArrayList<Id>();
+			List<Id<TransitRoute>> routeIDs = new ArrayList<>();
 			routeIDs.addAll(routeId2transitRoute.keySet());
 			
 			int lastStop0 = routeId2transitRoute.get(routeIDs.get(0)).getStops().size()-1;
@@ -99,10 +100,10 @@ public class DeparturesGenerator {
 			log.info("Takt: "+ Time.writeTime(headway_sec, Time.TIMEFORMAT_HHMMSS));
 			log.info("Required number of public vehicles: " + numberOfBuses);
 			
-			List<Id> vehicleIDs = createVehicleIDs(numberOfBuses, transitLineId);
+			List<Id<Vehicle>> vehicleIDs = createVehicleIDs(numberOfBuses, transitLineId);
 				
 			int routeNr = 0;
-			for (Id routeId : routeId2transitRoute.keySet()){
+			for (Id<TransitRoute> routeId : routeId2transitRoute.keySet()){
 				double firstDepartureTime = 0.0;
 				if (routeNr == 1){
 					firstDepartureTime = startTime;
@@ -116,7 +117,7 @@ public class DeparturesGenerator {
 				int vehicleIndex = 0;
 				int depNr = 0;
 				for (double departureTime = firstDepartureTime; departureTime < endTime ; ){
-					Departure departure = this.sf.createDeparture(new IdImpl(depNr), departureTime);
+					Departure departure = this.sf.createDeparture(Id.create(depNr, Departure.class), departureTime);
 					departure.setVehicleId(vehicleIDs.get(vehicleIndex));
 					routeId2transitRoute.get(routeId).addDeparture(departure);
 					departureTime = departureTime + headway_sec;
@@ -133,10 +134,10 @@ public class DeparturesGenerator {
 		}	
 	}
 
-	public List<Id> createVehicleIDs(int numberOfBuses, Id transitLineId){
-		List<Id> vehicleIDs = new ArrayList<Id>();
+	public List<Id<Vehicle>> createVehicleIDs(int numberOfBuses, Id<TransitLine> transitLineId){
+		List<Id<Vehicle>> vehicleIDs = new ArrayList<>();
 		for (int vehicleNr=1 ; vehicleNr <= numberOfBuses ; vehicleNr++){
-			vehicleIDs.add(new IdImpl(transitLineId + "_bus_" + vehicleNr));
+			vehicleIDs.add(Id.create(transitLineId + "_bus_" + vehicleNr, Vehicle.class));
 		}
 		return vehicleIDs;
 	}

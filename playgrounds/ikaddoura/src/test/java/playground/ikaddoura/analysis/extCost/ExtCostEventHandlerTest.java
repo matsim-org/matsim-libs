@@ -35,13 +35,11 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -58,10 +56,10 @@ public class ExtCostEventHandlerTest {
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 	
-	private Id link1 = new IdImpl("link1");
-	private Id link2 = new IdImpl("link2");
-	private Id link3 = new IdImpl("link3");
-	private Id link4 = new IdImpl("link4");
+	private Id<Link> link1 = Id.create("link1", Link.class);
+	private Id<Link> link2 = Id.create("link2", Link.class);
+	private Id<Link> link3 = Id.create("link3", Link.class);
+	private Id<Link> link4 = Id.create("link4", Link.class);
 	
 	private EventsManager events;
 
@@ -214,16 +212,16 @@ public class ExtCostEventHandlerTest {
 		qSimConfigGroup.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
 		qSimConfigGroup.setRemoveStuckVehicles(true);
 		qSimConfigGroup.setStuckTime(3600.0);
-		Scenario scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
+		Scenario scenario = (ScenarioUtils.createScenario(config));
 	
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setEffectiveCellSize(7.5);
 		network.setCapacityPeriod(3600.);
 		
-		Node node1 = network.getFactory().createNode(new IdImpl("nodeId1"), scenario.createCoord(0., 0.));
-		Node node2 = network.getFactory().createNode(new IdImpl("nodeId2"), scenario.createCoord(1000., 0.));
-		Node node3 = network.getFactory().createNode(new IdImpl("nodeId3"), scenario.createCoord(1000., 1000.));
-		Node node4 = network.getFactory().createNode(new IdImpl("nodeId4"), scenario.createCoord(0., 1000.));
+		Node node1 = network.getFactory().createNode(Id.create("nodeId1", Node.class), scenario.createCoord(0., 0.));
+		Node node2 = network.getFactory().createNode(Id.create("nodeId2", Node.class), scenario.createCoord(1000., 0.));
+		Node node3 = network.getFactory().createNode(Id.create("nodeId3", Node.class), scenario.createCoord(1000., 1000.));
+		Node node4 = network.getFactory().createNode(Id.create("nodeId4", Node.class), scenario.createCoord(0., 1000.));
 		
 		Link link1 = network.getFactory().createLink(this.link1, node1, node2);
 		Link link2 = network.getFactory().createLink(this.link2, node2, node3);

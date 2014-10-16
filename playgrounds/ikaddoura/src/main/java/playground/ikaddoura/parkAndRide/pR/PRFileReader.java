@@ -33,7 +33,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 
 /**
  * @author Ihab
@@ -62,13 +62,13 @@ public class PRFileReader {
 	                if (lineCounter > 0) {
 	                	String[] parts = line.split(" ; "); 
 	                	ParkAndRideFacility prFacility = new ParkAndRideFacility();
-	                	prFacility.setId(new IdImpl(parts[0]));
-	                	prFacility.setPrLink1in(new IdImpl(parts[1]));
-	                	prFacility.setPrLink1out(new IdImpl(parts[2]));
-	                	prFacility.setPrLink2in(new IdImpl(parts[3]));
-	                	prFacility.setPrLink2out(new IdImpl(parts[4]));
-	                	prFacility.setPrLink3in(new IdImpl(parts[5]));
-	                	prFacility.setPrLink3out(new IdImpl(parts[6]));
+	                	prFacility.setId(Id.create(parts[0], ParkAndRideFacility.class));
+	                	prFacility.setPrLink1in(Id.create(parts[1], Link.class));
+	                	prFacility.setPrLink1out(Id.create(parts[2], Link.class));
+	                	prFacility.setPrLink2in(Id.create(parts[3], Link.class));
+	                	prFacility.setPrLink2out(Id.create(parts[4], Link.class));
+	                	prFacility.setPrLink3in(Id.create(parts[5], Link.class));
+	                	prFacility.setPrLink3out(Id.create(parts[6], Link.class));
 	                	prFacility.setStopFacilityName(parts[7]);
 	                	prFacility.setCapacity(Integer.valueOf(parts[8]));
 	                	this.id2prFacility.put(prFacility.getId(), prFacility);
