@@ -47,6 +47,7 @@ public class RepeatableMasterControler implements AfterMobsimListener, ShutdownL
     private final HashMap<String, Plan> newPlans = new HashMap<>();
 
     private RepeatableMasterControler(String[] args) throws NumberFormatException, IOException, ParseException {
+        System.setProperty("matsim.preferLocalDtds", "true");
         Options options = new Options();
         options.addOption("c", true, "Config file location");
         options.addOption("p", true, "Port number of MasterControler");
@@ -134,7 +135,7 @@ public class RepeatableMasterControler implements AfterMobsimListener, ShutdownL
         }
         if(commandLine.hasOption("r")) {
         //initialize link travel times if you want to do remote routing
-            masterLogger.warn("ROUTING initial plans on slaves; received plans will be subjected to" + numberOfPSimIterations +
+            masterLogger.warn("ROUTING initial plans on slaves; received plans will be subjected to " + numberOfPSimIterations +
                     " PSim iterations before executing on master.");
             FreespeedTravelTimeAndDisutility disutility = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
             linkTravelTimes = new SerializableLinkTravelTimes(disutility, config
@@ -153,8 +154,14 @@ public class RepeatableMasterControler implements AfterMobsimListener, ShutdownL
         masterLogger.warn("master inited");
     }
 
-    public static void main(String[] args) throws NumberFormatException, IOException, ParseException {
-        RepeatableMasterControler master = new RepeatableMasterControler(args);
+    public static void main(String[] args)   {
+        RepeatableMasterControler master = null;
+        try {
+            master = new RepeatableMasterControler(args);
+        } catch (IOException  | ParseException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
         master.run();
     }
 

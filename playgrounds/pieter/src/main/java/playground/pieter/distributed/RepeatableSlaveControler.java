@@ -2,6 +2,7 @@ package playground.pieter.distributed;
 
 import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
@@ -39,6 +40,7 @@ import java.util.*;
 //IMPORTANT: PSim produces events that are not in chronological order. This controler
 // will require serious overhaul if chronological order is enforced in all event manager implementations
 public class RepeatableSlaveControler implements IterationStartsListener, IterationEndsListener {
+    private final boolean initialRouting;
     private int numberOfPSimIterations;
     private int numberOfIterations=-1;
     private Config config;
@@ -95,15 +97,17 @@ public class RepeatableSlaveControler implements IterationStartsListener, Iterat
 
 
     private RepeatableSlaveControler(String[] args) throws IOException, ClassNotFoundException, ParseException {
+        System.setProperty("matsim.preferLocalDtds", "true");
         Options options = new Options();
         options.addOption("c", true, "Config file location");
         options.addOption("h", true, "Host name or IP");
         options.addOption("p", true, "Port number of MasterControler");
         options.addOption("s", false, "Switch to indicate if this is the Singapore scenario, i.e. events-based routing");
         options.addOption("t", true, "Number of threads for parallel events handling.");
-        options.addOption("v", false, "Switch to disable validation of xml. Use for testing only.");
+        options.addOption("r", false, "Perform slave-based initial routing of plans.");
         CommandLineParser parser = new BasicParser();
         CommandLine commandLine = parser.parse(options, args);
+        initialRouting = commandLine.hasOption("r");
         if (commandLine.hasOption("c")) {
             try{
             config = ConfigUtils.loadConfig(commandLine.getOptionValue("c"));
@@ -163,11 +167,9 @@ public class RepeatableSlaveControler implements IterationStartsListener, Iterat
         }
         config.parallelEventHandling().setNumberOfThreads(numThreadsForEventsHandling);
         config.controler().setOutputDirectory(config.controler().getOutputDirectory() + "_" + myNumber);
-        Scenario scenario = ScenarioUtils.createScenario(config);
-        SlaveScenarioLoaderImpl scenarioLoader = new SlaveScenarioLoaderImpl(scenario);
-        scenarioLoader.setValidating(commandLine.hasOption("v"));
-        scenarioLoader.loadScenario(idStrings);
+        Scenario scenario = ScenarioUtils.loadScenario(config);
         matsimControler = new Controler(scenario);
+        removeNonSimulatedAgents(idStrings);
         matsimControler.setOverwriteFiles(true);
         matsimControler.setCreateGraphs(false);
         matsimControler.addControlerListener(this);
@@ -235,7 +237,7 @@ public class RepeatableSlaveControler implements IterationStartsListener, Iterat
 
     @Override
     public void notifyIterationStarts(IterationStartsEvent event) {
-        if(numberOfIterations>0 && numberOfIterations % numberOfPSimIterations==0)
+        if(initialRouting || (numberOfIterations > 0 && numberOfIterations % numberOfPSimIterations == 0))
             updateTravelTimesAndSendPlans();
         // the time calculators are null until the master sends them, need
         // something to keep psim occupied until then
@@ -259,7 +261,18 @@ public class RepeatableSlaveControler implements IterationStartsListener, Iterat
 
 
     }
+    private void removeNonSimulatedAgents(List<String> idStrings) {
+        Set<Id<Person>> noIds = new HashSet<>(matsimControler.getPopulation().getPersons().keySet());
+        Set<String> noIdStrings = new HashSet<>();
+        for (Id<Person> id : noIds)
+            noIdStrings.add(id.toString());
+        noIdStrings.removeAll(idStrings);
+        slaveLogger.warn("removing ids");
+        for (String idString : noIdStrings) {
+            matsimControler.getPopulation().getPersons().remove(Id.create(idString, Person.class));
+        }
 
+    }
     public void updateTravelTimesAndSendPlans() {
 
         Map<String, PlanSerializable> tempPlansCopyForSending = new HashMap<>();
