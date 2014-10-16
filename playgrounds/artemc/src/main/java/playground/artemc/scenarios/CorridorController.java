@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -40,7 +41,7 @@ import playground.artemc.transitRouterEventsBased.waitTimes.WaitTimeStuckCalcula
 
 public class CorridorController {
 	
-	private static HashMap<Id, Double> factorMap = new HashMap<Id, Double>();
+	private static HashMap<Id<Person>, Double> factorMap = new HashMap<Id<Person>, Double>();
 
 	public static void main(String[] args){
 
@@ -58,22 +59,22 @@ public class CorridorController {
 		incomesReader.parse(path + "/income_1000.xml");
 
 
-		HashMap<Id, Integer> incomeMap = new HashMap<Id, Integer>();
+		HashMap<Id<Person>, Integer> incomeMap = new HashMap<Id<Person>, Integer>();
 		
-		for(Id personId:scenario.getPopulation().getPersons().keySet()){
+		for(Id<Person> personId:scenario.getPopulation().getPersons().keySet()){
 			incomeMap.put(personId, (Integer) (incomes.getAttribute(personId.toString(),"income")));
 		}
 
 		/*Calculate Income Statistics*/
 		Integer sum=0;
 		Double mean = 0.0;
-		for(Id id:incomeMap.keySet()){
+		for(Id<Person> id:incomeMap.keySet()){
 			sum = sum + incomeMap.get(id);
 			mean = (double) sum / (double) incomeMap.size();
 		}
 
 		/*Create map of personal income factors*/
-		for(Id id:incomeMap.keySet()){
+		for(Id<Person> id:incomeMap.keySet()){
 			Integer personIncome = incomeMap.get(id);
 			factorMap.put(id, Math.log((double) personIncome/mean + 1));
 		}
@@ -98,10 +99,8 @@ public class CorridorController {
 		//controler.setTransitRouterFactory(new TransitRouterWSVImplFactory(controler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes(), vehicleOccupancyCalculator.getVehicleOccupancy()));
 		controler.setTransitRouterFactory(new TransitRouterWSImplFactory(controler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
 		
-		
 		controler.setOverwriteFiles(true);
 		controler.run();
-
 
 		//Logger root = Logger.getRootLogger();
 		//root.setLevel(Level.ALL);
@@ -130,7 +129,6 @@ public class CorridorController {
 			MeanTravelTimeCalculator mttc = new MeanTravelTimeCalculator(controler.getScenario(), transportModes);
 			controler.addControlerListener(mttc);
 			controler.getEvents().addHandler(mttc);
-
 
 			// initialize the social costs disutility calculator
 			TravelTimeAndDistanceBasedIncomeTravelDisutilityFactory factory = new TravelTimeAndDistanceBasedIncomeTravelDisutilityFactory(factorMap);

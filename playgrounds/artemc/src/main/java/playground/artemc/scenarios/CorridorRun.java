@@ -144,8 +144,8 @@ public class CorridorRun {
 
 
 			// initialize the social costs disutility calculator
-			TravelTimeAndDistanceBasedIncomeTravelDisutilityFactory factory = new TravelTimeAndDistanceBasedIncomeTravelDisutilityFactory(factorMap);
-			controler.setTravelDisutilityFactory(factory);
+			//TravelTimeAndDistanceBasedIncomeTravelDisutilityFactory factory = new TravelTimeAndDistanceBasedIncomeTravelDisutilityFactory(factorMap);
+			//controler.setTravelDisutilityFactory(factory);
 			
 			//	ScoringFunctionFactoryExtended scoringFunctionFactoryExtended = new ScoringFunctionFactoryExtended(controler.getConfig().planCalcScore(), controler.getNetwork());
 			//	PlansScoringExtended plansScoringExtended = new PlansScoringExtended(controler.getScenario(), controler.getEvents(), controler.getControlerIO(), scoringFunctionFactoryExtended);
