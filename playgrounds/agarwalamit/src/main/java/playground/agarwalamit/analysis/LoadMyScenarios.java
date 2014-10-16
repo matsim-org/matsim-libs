@@ -66,6 +66,7 @@ public class LoadMyScenarios {
 		MatsimConfigReader configReader = new MatsimConfigReader(config);
 		configReader.readFile(configFile);
 		config.network().setInputFile(networkFile);
+		config.plans().setInputFile(null);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		return scenario;
 	}
@@ -105,7 +106,7 @@ public class LoadMyScenarios {
 	}
 	
 	/**
-	 * Returns scenario from config and contains only plans file location.
+	 * Returns scenario from config and contains only plans.
 	 */
 	public static Scenario loadScenarioFromPlansAndConfig(String plansFile, String configFile) {
 		Config config = new Config();
@@ -113,6 +114,7 @@ public class LoadMyScenarios {
 		MatsimConfigReader configReader = new MatsimConfigReader(config);
 		configReader.readFile(configFile);
 		config.plans().setInputFile(plansFile);
+		config.network().setInputFile(null);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		return scenario;
 	}

@@ -19,6 +19,7 @@
 package playground.agarwalamit.munich.analysis;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -106,6 +107,7 @@ public class TravelTimePerUserGroup extends AbstractAnalyisModule {
 
 	@Override
 	public void writeResults(String outputFolder) {
+		logger.info("Writing user group to travel mode to mean and mediam time.");
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFolder+"/usrGrp2TravelMode2MeanAndMedianTravelTime.txt");
 		try {
 			writer.write("UserGroup \t travelMode \t MeanTravelTime \t MedianTravelTime \n");
@@ -118,12 +120,13 @@ public class TravelTimePerUserGroup extends AbstractAnalyisModule {
 		} catch (Exception e) {
 			throw new RuntimeException("Data is not written to a file.");
 		}
-		this.logger.info("Data writing is finished.");
 
-		
+		logger.info("Writing data for box plots for each user group.");
 		try {
+			String outputFile = outputFolder+"/boxPlot/";
+			new File(outputFile).mkdirs();
 			for(UserGroup ug :this.userGrpToBoxPlotData.keySet()){
-				writer = IOUtils.getBufferedWriter(outputFolder+"/usrGrp2TravelTimeBoxPlotData_"+ug+".txt");
+				writer = IOUtils.getBufferedWriter(outputFile+"/travelTime_"+ug+".txt");
 				writer.write(ug+"\n");
 				for(double d :this.userGrpToBoxPlotData.get(ug)){
 					writer.write(d+"\n");
@@ -134,6 +137,7 @@ public class TravelTimePerUserGroup extends AbstractAnalyisModule {
 		} catch (Exception e) {
 			throw new RuntimeException("Data is not written to a file.");
 		}
+		logger.info("Writing data is finished.");
 	}
 
 	private void createBoxPlotData (Map<Id<Person>, Double> map){

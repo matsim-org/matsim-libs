@@ -19,6 +19,7 @@
 package playground.agarwalamit.munich.analysis;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -52,7 +53,7 @@ public class RouteDistancePerUserGroup {
 	}
 
 	private Logger logger = Logger.getLogger(RouteDistancePerUserGroup.class);
-	private  String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/ci/";/*"./output/run2/";*/
+	private  String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/ei/";/*"./output/run2/";*/
 	private  String networkFile =outputDir+ "/output_network.xml.gz";//"/network.xml";
 	private  String plansFile =outputDir+ "/output_plans.xml.gz";//"/network.xml";
 	private String configFile = outputDir+"/output_config.xml";
@@ -98,12 +99,13 @@ public class RouteDistancePerUserGroup {
 		} catch (Exception e) {
 			throw new RuntimeException("Data is not written to a file.");
 		}
-		this.logger.info("Data writing is finished.");
 		
-		
+		logger.info("Writing data for box plots for each user group.");
 		try {
+			String outputFile = outputFolder+"/boxPlot/";
+			new File(outputFile).mkdirs();
 			for(UserGroup ug :this.userGrpToBoxPlotData.keySet()){
-				writer = IOUtils.getBufferedWriter(outputFolder+"/usrGrp2TravelDistanceBoxPlotData_"+ug+".txt");
+				writer = IOUtils.getBufferedWriter(outputFile+"/travelDistance_"+ug+".txt");
 				writer.write(ug+"\n");
 				for(double d :this.userGrpToBoxPlotData.get(ug)){
 					writer.write(d+"\n");
@@ -114,6 +116,7 @@ public class RouteDistancePerUserGroup {
 		} catch (Exception e) {
 			throw new RuntimeException("Data is not written to a file.");
 		}
+		this.logger.info("Data writing is finished.");
 	}
 	
 	private void createBoxPlotData (Map<Id<Person>, Double> map){
