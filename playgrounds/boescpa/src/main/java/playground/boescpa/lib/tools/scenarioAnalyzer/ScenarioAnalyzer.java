@@ -22,7 +22,12 @@
 package playground.boescpa.lib.tools.scenarioAnalyzer;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
+import playground.boescpa.lib.tools.scenarioAnalyzer.eventHandlers.ScenarioAnalyzerEventHandler;
+import playground.boescpa.lib.tools.scenarioAnalyzer.eventHandlers.TripAnalyzer;
 import playground.boescpa.lib.tools.scenarioAnalyzer.spatialEventCutters.SpatialEventCutter;
 
 import java.io.BufferedWriter;
@@ -31,8 +36,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * WHAT IS IT FOR?
- * WHAT DOES IT?
+ * Analyzes a given events file for given handlers and lets you read out the handlers for several areas.
  *
  * @author boescpa
  */
@@ -40,20 +44,37 @@ public class ScenarioAnalyzer {
 	private static Logger log = Logger.getLogger(ScenarioAnalyzer.class);
 
 	private final String eventsFile;
-	private final SpatialEventCutter spatialEventCutter;
+	private final ScenarioAnalyzerEventHandler[] scenarioAnalyzerEventHandlers;
 
-	public ScenarioAnalyzer(String eventsFile, SpatialEventCutter spatialEventCutter) {
+	public ScenarioAnalyzer(String eventsFile, ScenarioAnalyzerEventHandler[] scenarioAnalyzerEventHandlers) {
 		this.eventsFile = eventsFile;
-		this.spatialEventCutter = spatialEventCutter;
+		this.scenarioAnalyzerEventHandlers = scenarioAnalyzerEventHandlers;
 	}
 
-	public void analyzeScenario(String pathToResultsfile) {
-		Results results = new Results();
+	public void analyzeScenario() {
+		EventsManager eventsManager= EventsUtils.createEventsManager();
 
-		// TODO-boescpa Write actual analyze...
+		// Add all handlers:
+		for (ScenarioAnalyzerEventHandler handler : scenarioAnalyzerEventHandlers) {
+			handler.reset(0);
+			eventsManager.addHandler(handler);
+		}
+
+		// Read the events file:
+		MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
+		reader.readFile(eventsFile);
+	}
+
+	public void createResults(String pathToResultsFile, SpatialEventCutter spatialEventCutter) {
+		Results results = new Results(spatialEventCutter);
+
+		// Ask handlers for the results:
+		for (ScenarioAnalyzerEventHandler handler : scenarioAnalyzerEventHandlers) {
+			handler.createResults(results, spatialEventCutter);
+		}
 
 		showResultsOnTerminal(results);
-		writeResultsToFile(pathToResultsfile, results);
+		writeResultsToFile(pathToResultsFile, results);
 	}
 
 	private void showResultsOnTerminal(Results results) {
@@ -84,10 +105,15 @@ public class ScenarioAnalyzer {
 	 o	Mean and variance of durations [min]
 	 -	Number of active agents in the area []
 	 */
-	protected class Results {
+	public class Results {
 		private Map<String, Double[]> modes = new HashMap<>();
 		private Map<String, Double[]> activities = new HashMap<>();
 		private int numberOfAgents = 0;
+		private String analyzedArea;
+
+		public Results(SpatialEventCutter spatialEventCutter) {
+			this.analyzedArea = spatialEventCutter.toString();
+		}
 
 		public void setNumberOfAgents(int numberOfAgents) {
 			this.numberOfAgents = numberOfAgents;
@@ -173,7 +199,7 @@ public class ScenarioAnalyzer {
 			String results;
 
 			// Area:
-			results = spatialEventCutter.toString() + nl;
+			results = analyzedArea + nl;
 			results += nl;
 
 			// Number of Agents:
