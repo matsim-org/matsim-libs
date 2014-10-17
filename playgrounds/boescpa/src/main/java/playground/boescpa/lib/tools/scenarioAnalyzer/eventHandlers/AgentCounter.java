@@ -21,18 +21,40 @@
 
 package playground.boescpa.lib.tools.scenarioAnalyzer.eventHandlers;
 
-import org.matsim.core.events.handler.EventHandler;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import playground.boescpa.lib.tools.scenarioAnalyzer.ScenarioAnalyzer;
 import playground.boescpa.lib.tools.scenarioAnalyzer.spatialEventCutters.SpatialEventCutter;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
- * Any new analysis to be done as part of the ScenarioAnalyzer-process has to implement this interface.
+ * Counts the number of agents in an events file.
  *
  * @author boescpa
  */
-public interface ScenarioAnalyzerEventHandler extends EventHandler {
-	/**
-	 * @param spatialEventCutter
-	 * @return Results of the analysis in form of a (multiline) string.
-	 */
-	public String createResults(SpatialEventCutter spatialEventCutter);
+public class AgentCounter implements ScenarioAnalyzerEventHandler, ActivityEndEventHandler {
+
+	private final Set<String> numberOfAgents = new HashSet<>();
+
+	public AgentCounter() {
+		this.reset(0);
+	}
+
+	@Override
+	public void handleEvent(ActivityEndEvent event) {
+		numberOfAgents.add(event.getPersonId().toString());
+	}
+
+	@Override
+	public String createResults(SpatialEventCutter spatialEventCutter) {
+		// todo-boescpa: Add spatial restriction...
+		return "Number of Agents: " + this.numberOfAgents.size() + ScenarioAnalyzer.NL;
+	}
+
+	@Override
+	public void reset(int iteration) {
+		numberOfAgents.clear();
+	}
 }
