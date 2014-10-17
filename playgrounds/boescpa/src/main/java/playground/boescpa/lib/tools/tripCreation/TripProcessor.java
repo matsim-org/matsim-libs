@@ -199,7 +199,7 @@ public abstract class TripProcessor {
 	 * @param endLink	of the trip
 	 * @return	path length of the trip [m]
 	 */
-	protected int calcTravelDistance(LinkedList<Id> path, Network network, Id startLink, Id endLink) {
+	public static int calcTravelDistance(LinkedList<Id> path, Network network, Id startLink, Id endLink) {
 		// If the trip wasn't finished (endLink == null), the path length is not calculated.
 		if (endLink == null) {
 			return 0;
@@ -229,7 +229,7 @@ public abstract class TripProcessor {
 	 * @param endTime	of the trip [sec]
 	 * @return	total travel time of the trip [sec]
 	 */
-	protected double calcTravelTime(Double startTime, Double endTime) {
+	public static double calcTravelTime(Double startTime, Double endTime) {
 		return endTime - startTime;
 	}
 
