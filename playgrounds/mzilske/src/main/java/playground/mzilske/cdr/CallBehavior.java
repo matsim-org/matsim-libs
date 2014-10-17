@@ -3,6 +3,7 @@ package playground.mzilske.cdr;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.population.Person;
 
 public interface CallBehavior {
 
@@ -12,6 +13,6 @@ public interface CallBehavior {
 
 	boolean makeACall(Id id, double time);
 
-	boolean makeACallAtMorningAndNight();
+	boolean makeACallAtMorningAndNight(Id<Person> id);
 
 }

@@ -46,7 +46,7 @@ class RegimeResource {
 	}
 
 	public MultiRateRunResource getMultiRateRun(String alternative) {
-		return new MultiRateRunResource(WD + "/alternatives/" + alternative, regime);
+		return new MultiRateRunResource(WD + "/alternatives/" + alternative, regime, alternative);
 	}
 
     public void durationsSimulated() {

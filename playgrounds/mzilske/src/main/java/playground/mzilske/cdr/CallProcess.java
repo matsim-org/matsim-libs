@@ -52,18 +52,22 @@ public class CallProcess implements ActivityStartEventHandler, ActivityEndEventH
 		for (Sighting sighting : sightings) {
 			System.out.println(sighting);
 		}
+
 		for (Person p : population.getPersons().values()) {
+            if (callBehavior.makeACallAtMorningAndNight(p.getId())) {
+                handleNight(p);
+            }
 			System.out.println(agents.get(p.getId()).nCalls);
 		}
-		if (callBehavior.makeACallAtMorningAndNight()) {
-			handleNight();
-		}
+
 	}
 
 	public void doSimStep(double time) {
-		if (callBehavior.makeACallAtMorningAndNight()) {
-			if (time == 0.0) {
-				handleMorning();
+        if (time == 0.0) {
+                for (Person p : population.getPersons().values()) {
+                    if (callBehavior.makeACallAtMorningAndNight(p.getId())) {
+				    handleMorning(p);
+                }
 			}
 		}
 		for (Person p : population.getPersons().values()) {
@@ -76,23 +80,15 @@ public class CallProcess implements ActivityStartEventHandler, ActivityEndEventH
 		lastTime = time;
 	}
 
-	private void handleNight() {
-		for (Person p : population.getPersons().values()) {
-			CallingAgent agent = agents.get(p.getId());
-			agent.nCalls++;
-			call(lastTime, p.getId());
-		}
+	private void handleNight(Person p) {
+		call(lastTime, p.getId());
 	}
 
-	private void handleMorning() {
-		for (Person p : population.getPersons().values()) {
-			CallingAgent agent = agents.get(p.getId());
-			agent.nCalls++;
-			call(0.0, p.getId());
-		}
+	private void handleMorning(Person p) {
+		call(0.0, p.getId());
 	}
 
-	public void call(double time, Id personId) {
+	private void call(double time, Id personId) {
 		String cellId = null;
 		if (zoneTracker != null) {
 			cellId = zoneTracker.getZoneForPerson(personId).toString();
@@ -102,6 +98,8 @@ public class CallProcess implements ActivityStartEventHandler, ActivityEndEventH
 		if (eventsManager != null) {
 			eventsManager.processEvent(sighting);
 		}
+        CallingAgent agent = agents.get(personId);
+        agent.nCalls++;
 	}
 
 	public List<Sighting>  getSightings() {

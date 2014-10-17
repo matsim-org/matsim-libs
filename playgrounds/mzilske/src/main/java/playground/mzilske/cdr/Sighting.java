@@ -2,9 +2,9 @@ package playground.mzilske.cdr;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.core.utils.misc.Time;
 
 import java.util.Comparator;
-import java.util.Date;
 
 public class Sighting extends Event {
 
@@ -21,15 +21,13 @@ public class Sighting extends Event {
 		
 	}
 
-	private long dateTime;
-	private String cellTowerId;
+    private String cellTowerId;
 	private Id agentId;
 
 	public Sighting(Id agentId, long timeInSeconds, String cellTowerId) {
 		super(timeInSeconds);
 		this.agentId = agentId;
-		this.dateTime = timeInSeconds;
-		this.cellTowerId = cellTowerId;
+        this.cellTowerId = cellTowerId;
 	}
 
 	public String getCellTowerId() {
@@ -38,7 +36,7 @@ public class Sighting extends Event {
 
 	@Override
 	public String toString() {
-		return new Date(dateTime * 1000) + " - Person: "+agentId + "  at zone: " + cellTowerId;
+		return Time.writeTime(getTime()) + " - Person: "+agentId + "  at zone: " + cellTowerId;
 	}
 
 	@Override

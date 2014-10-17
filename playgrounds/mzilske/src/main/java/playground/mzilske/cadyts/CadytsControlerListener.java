@@ -98,25 +98,23 @@ class CadytsControlerListener implements StartupListener, BeforeMobsimListener, 
 
     @Override
     public void notifyAfterMobsim(AfterMobsimEvent event) {
-        if (event.getIteration() > 1) {
-            for (Person person : scenario.getPopulation().getPersons().values()) {
-                this.calibrator.addToDemand(ptStep.getPlanSteps(person.getSelectedPlan()));
-            }
-            this.calibrator.afterNetworkLoading(new SimResults<Link>() {
-
-                @Override
-                public double getSimValue(final Link link, final int startTime_s, final int endTime_s, final TYPE type) {
-                    int hour = startTime_s / 3600;
-                    Id linkId = link.getId();
-                    double[] values = volumesAnalyzer.getVolumesPerHourForLink(linkId);
-                    if (values == null) {
-                        return 0;
-                    }
-                    return values[hour] * countsScaleFactor;
-                }
-
-            });
+        for (Person person : scenario.getPopulation().getPersons().values()) {
+            this.calibrator.addToDemand(ptStep.getPlanSteps(person.getSelectedPlan()));
         }
+        this.calibrator.afterNetworkLoading(new SimResults<Link>() {
+
+            @Override
+            public double getSimValue(final Link link, final int startTime_s, final int endTime_s, final TYPE type) {
+                int hour = startTime_s / 3600;
+                Id<Link> linkId = link.getId();
+                double[] values = volumesAnalyzer.getVolumesPerHourForLink(linkId);
+                if (values == null) {
+                    return 0;
+                }
+                return values[hour] * countsScaleFactor;
+            }
+
+        });
     }
 	
 	@Override

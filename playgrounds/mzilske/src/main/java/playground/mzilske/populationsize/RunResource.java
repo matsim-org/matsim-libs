@@ -42,7 +42,11 @@ import java.io.PrintWriter;
 
 class RunResource {
 
-	private String wd;
+    public String getWd() {
+        return wd;
+    }
+
+    private String wd;
 	private String runId;
 
 	public RunResource(String wd, String runId) {

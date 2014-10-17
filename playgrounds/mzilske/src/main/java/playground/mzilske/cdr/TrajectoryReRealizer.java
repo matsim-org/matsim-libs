@@ -27,14 +27,14 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.population.algorithms.PlanAlgorithm;
 import playground.mzilske.clones.CloneService;
 
 import javax.inject.Inject;
 
-class TrajectoryReRealizer implements PlanStrategyModule {
+class TrajectoryReRealizer extends AbstractMultithreadedModule {
 
     private Sightings sightings;
     private Scenario scenario;
@@ -45,33 +45,29 @@ class TrajectoryReRealizer implements PlanStrategyModule {
 
     @Inject
     public TrajectoryReRealizer(Sightings sightings, Scenario scenario, ZoneTracker.LinkToZoneResolver zones) {
+        super(scenario.getConfig().global());
         this.sightings = sightings;
         this.scenario = scenario;
         this.zones = zones;
     }
 
     @Override
-    public void prepareReplanning(ReplanningContext replanningContext) {
-
-    }
-
-    @Override
-    public void handlePlan(Plan plan) {
-        Id personId = plan.getPerson().getId();
-        Id originalPersonId = cloneService.resolveParentId(personId);
-        Plan newPlan = PopulationFromSightings.createPlanWithRandomEndTimesInPermittedWindow(scenario, zones, sightings.getSightingsPerPerson().get(originalPersonId));
-        plan.getPlanElements().clear();
-        ((PlanImpl) plan).copyFrom(newPlan);
-        for (PlanElement pe : plan.getPlanElements()) {
-            if (pe instanceof Leg) {
-                ((Leg) pe).setMode("car");
+    public PlanAlgorithm getPlanAlgoInstance() {
+        return new PlanAlgorithm() {
+            @Override
+            public void run(Plan plan) {
+                Id personId = plan.getPerson().getId();
+                Id originalPersonId = cloneService.resolveParentId(personId);
+                Plan newPlan = PopulationFromSightings.createPlanWithRandomEndTimesInPermittedWindow(scenario, zones, sightings.getSightingsPerPerson().get(originalPersonId));
+                plan.getPlanElements().clear();
+                ((PlanImpl) plan).copyFrom(newPlan);
+                for (PlanElement pe : plan.getPlanElements()) {
+                    if (pe instanceof Leg) {
+                        ((Leg) pe).setMode("car");
+                    }
+                }
             }
-        }
-    }
-
-    @Override
-    public void finishReplanning() {
-
+        };
     }
 
 }

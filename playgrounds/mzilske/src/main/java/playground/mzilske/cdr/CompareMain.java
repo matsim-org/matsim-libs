@@ -273,7 +273,7 @@ public class CompareMain {
 		scenario2.setNetwork(network);
 
 		PopulationFromSightings.createPopulationWithTwoPlansEach(scenario2, linkToZoneResolver, allSightings);
-		PopulationFromSightings.preparePopulation(scenario2, linkToZoneResolver, allSightings);
+//		PopulationFromSightings.preparePopulation(scenario2, linkToZoneResolver, allSightings);
 
 		final CadytsContext context = new CadytsContext(config, counts) ;
 		Controler controler = new Controler(scenario2);

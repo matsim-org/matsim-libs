@@ -27,18 +27,43 @@ public class Main2 {
 	public static void main(String[] args) {
 		final ExperimentResource experiment = new ExperimentResource("/Users/michaelzilske/runs-svn/synthetic-cdr/transportation/berlin/");
 		final RegimeResource uncongested = experiment.getRegime("uncongested");
-        uncongested.getMultiRateRun("wurst").twoRates("0");
-        uncongested.getMultiRateRun("wurst").simulateRate("0", 1);
+
+
+//        uncongested.getMultiRateRun("cutoffexact").cutOffExact(1.0, 1.0);
+
+//        uncongested.getMultiRateRun("cutoffexact").simulateRate("100-100", 3);
+//        uncongested.getMultiRateRun("cutoff").simulateRate("100-100", 3);
+//        uncongested.getMultiRateRun("cutoff").simulateRate("100-0", 3);
+//        uncongested.getMultiRateRun("cutoff").simulateRate("50-50", 3);
+//        uncongested.getMultiRateRun("cutoff").simulateRate("70-30", 3);
+//        uncongested.getMultiRateRun("cutoff").simulateRate("90-10", 3);
+//        uncongested.getMultiRateRun("cutoff").simulateRate("90-10", 10);
+
+
+//        uncongested.getMultiRateRun("wurst").persodisthisto();
+//        uncongested.getMultiRateRun("wurst").summary();
+
+
+//
+//        uncongested.getMultiRateRun("cutoff").cutoffRate(0.9, 0.1);
+//        uncongested.getMultiRateRun("cutoff").simulateRate("90-10", 3);
+//        uncongested.getMultiRateRun("cutoff").simulateRate("90-10", 10);
+
+
+
+//        uncongested.getMultiRateRun("wurst").twoRates("0");
+//        uncongested.getMultiRateRun("wurst").simulateRate("0", 10);
         uncongested.getMultiRateRun("wurst").simulateRate("0", 3);
-        uncongested.getMultiRateRun("wurst").twoRates("5");
-        uncongested.getMultiRateRun("wurst").simulateRate("5", 1);
+//        uncongested.getMultiRateRun("wurst").twoRates("5");
+//        uncongested.getMultiRateRun("wurst").simulateRate("5", 10);
         uncongested.getMultiRateRun("wurst").simulateRate("5", 3);
 
 //        uncongested.getMultiRateRun("wurst").twoRates("0");
 //        uncongested.getMultiRateRun("wurst").simulateRate("0", 10);
 
 
-//        uncongested.getMultiRateRun("wurst").persodisthisto();
+//        uncongested.getMultiRateRun("cutoff").summary();
+//        uncongested.getMultiRateRun("wurst").summary();
 //        Scenario baseScenario = uncongested.getBaseRun().getOutputScenario();
 //        Population basePopulation = baseScenario.getPopulation();
 

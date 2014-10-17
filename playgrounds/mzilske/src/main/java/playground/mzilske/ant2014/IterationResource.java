@@ -14,8 +14,12 @@ import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 
 public class IterationResource {
-	
-	private String wd;
+
+    public String getWd() {
+        return wd;
+    }
+
+    private String wd;
 	
 	private int iteration;
 

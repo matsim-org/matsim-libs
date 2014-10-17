@@ -74,20 +74,34 @@ class MultiRateRunResource {
     private final String WD;
 
     private final String regime;
+    private final String alternative;
 
-    public MultiRateRunResource(String wd, String regime) {
+    public MultiRateRunResource(String wd, String regime, String alternative) {
         this.WD = wd;
         this.regime = regime;
+        this.alternative = alternative;
     }
 
     private final static int TIME_BIN_SIZE = 60*60;
     private final static int MAX_TIME = 30 * TIME_BIN_SIZE - 1;
 
     Collection<String> getRates() {
-        final List<String> RATES = new ArrayList<>();
-        RATES.add("0");
-        RATES.add("5");
-        return RATES;
+        if (alternative.equals("cutoff")) {
+            final List<String> rates = new ArrayList<>();
+            rates.add("70-30");
+            rates.add("100-100");
+            rates.add("50-50");
+            rates.add("90-10");
+            rates.add("100-0");
+            return rates;
+        } else if (alternative.equals("wurst")) {
+            final List<String> rates = new ArrayList<>();
+            rates.add("0");
+            rates.add("5");
+            return rates;
+        } else {
+            throw new RuntimeException("Unknown alternative.");
+        }
     }
 
     private RunResource getBaseRun() {
@@ -126,7 +140,7 @@ class MultiRateRunResource {
             }
 
             @Override
-            public boolean makeACallAtMorningAndNight() {
+            public boolean makeACallAtMorningAndNight(Id<Person> id) {
                 return false;
             }
 
@@ -161,8 +175,8 @@ class MultiRateRunResource {
         final Sightings allSightings = new SightingsImpl(new HashMap<Id, List<Sighting>>());
         new SightingsReader(allSightings).read(IOUtils.getInputStream(WD + "/rates/" + rate + "/sightings.txt"));
         ZoneTracker.LinkToZoneResolver linkToZoneResolver = new LinkIsZone();
-        PopulationFromSightings.createPopulationWithRandomRealization(scenario, allSightings, linkToZoneResolver);
 
+        PopulationFromSightings.createPopulationWithRandomRealization(scenario, allSightings, linkToZoneResolver);
 
         final Counts allCounts = new Counts();
         new CountsReaderMatsimV1(allCounts).parse(WD + "/rates/" + rate + "/all_counts.xml.gz");
@@ -212,7 +226,7 @@ class MultiRateRunResource {
         config.controler().setLastIteration(LAST_ITERATION);
         ActivityParams sightingParam = new ActivityParams("sighting");
         sightingParam.setTypicalDuration(30.0 * 60);
-        config.controler().setWritePlansInterval(10);
+        config.controler().setWritePlansInterval(1);
         config.planCalcScore().addActivityParams(sightingParam);
         config.planCalcScore().setTraveling_utils_hr(-6);
         config.planCalcScore().setPerforming_utils_hr(0);
@@ -319,6 +333,35 @@ class MultiRateRunResource {
         return result / num;
     }
 
+    public void summary() {
+        final String filename = WD + "/summary.txt";
+        final Scenario baseScenario = getBaseRun().getLastIteration().getExperiencedPlansAndNetwork();
+        FileIO.writeToFile(filename, new StreamingOutput() {
+            @Override
+            public void write(PrintWriter pw) throws IOException {
+                pw.printf("rate\tkilometers\tpeople\n");
+                for (String rate : getRates()) {
+                    Scenario scenario = getRateRun(rate, "3").getOutputScenario();
+                    dumpSums(pw, rate, scenario);
+                }
+                dumpSums(pw, "base", baseScenario);
+            }
+        });
+    }
+
+    private void dumpSums(PrintWriter pw, String rate, Scenario scenario) {
+        Map<Id, Double> km = PowerPlans.travelledDistancePerPerson(scenario.getPopulation(), scenario.getNetwork());
+        double kmSum = 0.0;
+        int nPeople = 0;
+        for (double ikm : km.values()) {
+            kmSum += ikm;
+            if (ikm != 0.0) {
+                nPeople++;
+            }
+        }
+        pw.printf("%s\t%d\t%d\n",rate, (int) (kmSum / 1000.0), nPeople);
+    }
+
     public void persodisthisto() {
         final String filename = WD + "/perso-dist-histo.txt";
         final Scenario baseScenario = getBaseRun().getLastIteration().getExperiencedPlansAndNetwork();
@@ -328,14 +371,14 @@ class MultiRateRunResource {
                 pw.printf("person\trate\tCase\tstatus\tkilometers\n");
                 for (String rate : getRates()) {
                     final Map<Id, Double> baseKm = PowerPlans.travelledDistancePerPerson(baseScenario.getPopulation(), baseScenario.getNetwork());
-                    dumpnonzero(pw, rate, "base", baseKm, baseScenario);
+                    dumpnonzero(pw, rate, "truth", baseKm, baseScenario);
                     {
-                        Scenario scenario = getRateRun(rate, "10").getOutputScenario();
+                        Scenario scenario = getRateRun(rate, "3").getOutputScenario();
                         Map<Id, Double> km = PowerPlans.travelledDistancePerPerson(scenario.getPopulation(), baseScenario.getNetwork());
-                        dumpnonzero(pw, rate, "calibrated-CDR", km, baseScenario);
+                        dumpnonzero(pw, rate, "calibrated", km, baseScenario);
                     }
                     {
-                        ArrayList<Person> it0 = new ArrayList<>(getRateRun(rate, "10").getIteration(0).getPlans().getPersons().values());
+                        ArrayList<Person> it0 = new ArrayList<>(getRateRun(rate, "3").getIteration(0).getPlans().getPersons().values());
                         for (Iterator<Person> i = it0.iterator(); i.hasNext(); ) {
                             Person person = i.next();
                             if (person.getId().toString().startsWith("I")) {
@@ -345,7 +388,7 @@ class MultiRateRunResource {
                             }
                         }
                         Map<Id, Double> km = PowerPlans.travelledDistancePerPerson(baseScenario.getNetwork(), it0);
-                        dumpnonzero(pw, rate, "raw-CDR", km, baseScenario);
+                        dumpnonzero(pw, rate, "initial", km, baseScenario);
                     }
                 }
             }
@@ -380,6 +423,109 @@ class MultiRateRunResource {
             return new int[maxSlotIndex + 1];
         }
         return maybeVolumes;
+    }
+
+    public void cutoffRate(double worker, double nonworker) {
+        final Scenario baseScenario = getBaseRun().getLastIteration().getExperiencedPlansAndNetwork();
+        for (Person person : baseScenario.getPopulation().getPersons().values()) {
+            double shareOfOftenCallers = CountWorkers.isWorker(person) ? worker : nonworker;
+            person.getCustomAttributes().put("phonerate", Math.random() < shareOfOftenCallers ? 50 : 0);
+        }
+        EventsManager events = EventsUtils.createEventsManager();
+        ZoneTracker.LinkToZoneResolver linkToZoneResolver = new LinkIsZone();
+        final CompareMain compareMain = new CompareMain(baseScenario, events, new CallBehavior() {
+
+            @Override
+            public boolean makeACall(ActivityEndEvent event) {
+                return false;
+            }
+
+            @Override
+            public boolean makeACall(ActivityStartEvent event) {
+                return false;
+            }
+
+            @Override
+            public boolean makeACall(Id id, double time) {
+                Person person = baseScenario.getPopulation().getPersons().get(id);
+                double secondlyProbability = (Integer) person.getCustomAttributes().get("phonerate") / (double) (24*60*60);
+                return Math.random() < secondlyProbability;
+            }
+
+            @Override
+            public boolean makeACallAtMorningAndNight(Id<Person> id) {
+                return false;
+            }
+
+        }, linkToZoneResolver);
+        new MatsimEventsReader(events).readFile(getBaseRun().getLastIteration().getEventsFileName());
+        compareMain.close();
+
+
+        final Sightings allSightings = new SightingsImpl(compareMain.getSightingsPerPerson());
+
+        String rateDir = WD + "/rates/" + (int) (worker*100) + "-" + (int) (nonworker*100);
+        new File(rateDir).mkdirs();
+
+        new SightingsWriter(allSightings).write(rateDir + "/sightings.txt");
+        final Counts allCounts = CompareMain.volumesToCounts(baseScenario.getNetwork(), compareMain.getGroundTruthVolumes());
+        allCounts.setYear(2012);
+        new CountsWriter(allCounts).write(rateDir + "/all_counts.xml.gz");
+        final Counts someCounts = filterCounts(allCounts);
+        someCounts.setYear(2012);
+        new CountsWriter(someCounts).write(rateDir + "/calibration_counts.xml.gz");
+    }
+
+    public void cutOffExact(double worker, double nonworker) {
+        final Scenario baseScenario = getBaseRun().getLastIteration().getExperiencedPlansAndNetwork();
+        for (Person person : baseScenario.getPopulation().getPersons().values()) {
+            double shareOfOftenCallers = CountWorkers.isWorker(person) ? worker : nonworker;
+            person.getCustomAttributes().put("phonerate", Math.random() < shareOfOftenCallers ? 50 : 0);
+        }
+        EventsManager events = EventsUtils.createEventsManager();
+        ZoneTracker.LinkToZoneResolver linkToZoneResolver = new LinkIsZone();
+        final CompareMain compareMain = new CompareMain(baseScenario, events, new CallBehavior() {
+
+            @Override
+            public boolean makeACall(ActivityEndEvent event) {
+                Person person = baseScenario.getPopulation().getPersons().get(event.getPersonId());
+                return (Integer) person.getCustomAttributes().get("phonerate") == 50;
+            }
+
+            @Override
+            public boolean makeACall(ActivityStartEvent event) {
+                Person person = baseScenario.getPopulation().getPersons().get(event.getPersonId());
+                return (Integer) person.getCustomAttributes().get("phonerate") == 50;
+            }
+
+            @Override
+            public boolean makeACall(Id id, double time) {
+                return false;
+            }
+
+            @Override
+            public boolean makeACallAtMorningAndNight(Id<Person> id) {
+                Person person = baseScenario.getPopulation().getPersons().get(id);
+                return (Integer) person.getCustomAttributes().get("phonerate") == 50;
+            }
+
+        }, linkToZoneResolver);
+        new MatsimEventsReader(events).readFile(getBaseRun().getLastIteration().getEventsFileName());
+        compareMain.close();
+
+
+        final Sightings allSightings = new SightingsImpl(compareMain.getSightingsPerPerson());
+
+        String rateDir = WD + "/rates/" + (int) (worker*100) + "-" + (int) (nonworker*100);
+        new File(rateDir).mkdirs();
+
+        new SightingsWriter(allSightings).write(rateDir + "/sightings.txt");
+        final Counts allCounts = CompareMain.volumesToCounts(baseScenario.getNetwork(), compareMain.getGroundTruthVolumes());
+        allCounts.setYear(2012);
+        new CountsWriter(allCounts).write(rateDir + "/all_counts.xml.gz");
+        final Counts someCounts = filterCounts(allCounts);
+        someCounts.setYear(2012);
+        new CountsWriter(someCounts).write(rateDir + "/calibration_counts.xml.gz");
     }
 
 }

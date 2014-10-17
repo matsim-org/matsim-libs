@@ -105,7 +105,7 @@ public class PopulationFromSightings {
         Plan plan = scenario.getPopulation().getFactory().createPlan();
         boolean first = true;
         Map<Activity, String> cellsOfSightings;
-        cellsOfSightings = new HashMap<Activity, String>();
+        cellsOfSightings = new HashMap<>();
         for (Sighting sighting : sightingsForThisPerson) {
             String zoneId = sighting.getCellTowerId();
             Activity activity = createActivityInZone(scenario, zones,
@@ -118,7 +118,7 @@ public class PopulationFromSightings {
             } else {
                 Activity lastActivity = (Activity) plan.getPlanElements().get(plan.getPlanElements().size()-1);
                 if ( !(zoneId.equals(cellsOfSightings.get(lastActivity))) ) {
-                    Leg leg = scenario.getPopulation().getFactory().createLeg("unknown");
+                    Leg leg = scenario.getPopulation().getFactory().createLeg("car");
                     plan.addLeg(leg);
                     plan.addActivity(activity);
                 } else {
@@ -148,12 +148,12 @@ public class PopulationFromSightings {
             } else {
                 Activity lastActivity = (Activity) plan.getPlanElements().get(plan.getPlanElements().size()-1);
                 if ( !(zoneId.equals(cellsOfSightings.get(lastActivity))) ) {
-                    Leg leg = scenario.getPopulation().getFactory().createLeg("unknown");
+                    Leg leg = scenario.getPopulation().getFactory().createLeg("car");
                     plan.addLeg(leg);
                     plan.addActivity(activity);
                     TripRouter tripRouter = new TripRouter();
-                    tripRouter.setRoutingModule("unknown", new NetworkRoutingModule(scenario.getPopulation().getFactory(), scenario.getNetwork(), new FreeSpeedTravelTime()));
-                    List<? extends PlanElement> route = tripRouter.calcRoute("unknown", new ActivityWrapperFacility(lastActivity), new ActivityWrapperFacility(activity), sighting.getTime(), null);
+                    tripRouter.setRoutingModule("car", new NetworkRoutingModule(scenario.getPopulation().getFactory(), scenario.getNetwork(), new FreeSpeedTravelTime()));
+                    List<? extends PlanElement> route = tripRouter.calcRoute("car", new ActivityWrapperFacility(lastActivity), new ActivityWrapperFacility(activity), sighting.getTime(), null);
                     double travelTime = ((Leg) route.get(0)).getTravelTime();
                     lastActivity.setEndTime(sighting.getTime() - travelTime);
                 } else {
@@ -169,7 +169,7 @@ public class PopulationFromSightings {
         Plan plan = scenario.getPopulation().getFactory().createPlan();
         boolean first = true;
         Map<Activity, String> cellsOfSightings;
-        cellsOfSightings = new HashMap<Activity, String>();
+        cellsOfSightings = new HashMap<>();
         for (Sighting sighting : sightingsForThisPerson) {
             String zoneId = sighting.getCellTowerId();
             Activity activity = createActivityInZone(scenario, zones,
@@ -182,14 +182,17 @@ public class PopulationFromSightings {
             } else {
                 Activity lastActivity = (Activity) plan.getPlanElements().get(plan.getPlanElements().size()-1);
                 if ( !(zoneId.equals(cellsOfSightings.get(lastActivity))) ) {
-                    Leg leg = scenario.getPopulation().getFactory().createLeg("unknown");
+                    Leg leg = scenario.getPopulation().getFactory().createLeg("car");
                     plan.addLeg(leg);
                     plan.addActivity(activity);
                     TripRouter tripRouter = new TripRouter();
-                    tripRouter.setRoutingModule("unknown", new NetworkRoutingModule(scenario.getPopulation().getFactory(), scenario.getNetwork(), new FreeSpeedTravelTime()));
-                    List<? extends PlanElement> route = tripRouter.calcRoute("unknown", new ActivityWrapperFacility(lastActivity), new ActivityWrapperFacility(activity), sighting.getTime(), null);
-                    double travelTime = ((Leg) route.get(0)).getTravelTime();
-                    double latestStartTime = sighting.getTime() - travelTime;
+                    FreeSpeedTravelTime linkTravelTime = new FreeSpeedTravelTime();
+                    tripRouter.setRoutingModule("car", new NetworkRoutingModule(scenario.getPopulation().getFactory(), scenario.getNetwork(), linkTravelTime));
+                    List<? extends PlanElement> route = tripRouter.calcRoute("car", new ActivityWrapperFacility(lastActivity), new ActivityWrapperFacility(activity), sighting.getTime(), null);
+                    Leg routerLeg = (Leg) route.get(0);
+                    double travelTime = routerLeg.getTravelTime();
+                    double correctedTravelTime = travelTime + linkTravelTime.getLinkTravelTime(scenario.getNetwork().getLinks().get(activity.getLinkId()), routerLeg.getDepartureTime() + travelTime, null, null);
+                    double latestStartTime = sighting.getTime() - correctedTravelTime;
                     double earliestStartTime = lastActivity.getEndTime();
                     double startTime = earliestStartTime + (Math.random() * (latestStartTime - earliestStartTime));
                     lastActivity.setEndTime(startTime);
@@ -215,7 +218,7 @@ public class PopulationFromSightings {
             @Override
             public PersonAlgorithm getPersonAlgorithm() {
                 TripRouter tripRouter = new TripRouter();
-                tripRouter.setRoutingModule("unknown", new NetworkRoutingModule(scenario.getPopulation().getFactory(), scenario.getNetwork(), new FreeSpeedTravelTime()));
+                tripRouter.setRoutingModule("car", new NetworkRoutingModule(scenario.getPopulation().getFactory(), scenario.getNetwork(), new FreeSpeedTravelTime()));
                 return new PlanRouter(tripRouter);
             }
 

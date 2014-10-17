@@ -182,7 +182,7 @@ class MultiRateRunResource {
             }
 
             @Override
-            public boolean makeACallAtMorningAndNight() {
+            public boolean makeACallAtMorningAndNight(Id<Person> id) {
                 return true;
             }
 
@@ -232,7 +232,7 @@ class MultiRateRunResource {
             }
 
             @Override
-            public boolean makeACallAtMorningAndNight() {
+            public boolean makeACallAtMorningAndNight(Id<Person> id) {
                 return false;
             }
 

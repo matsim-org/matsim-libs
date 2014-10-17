@@ -71,7 +71,7 @@ class CloneServiceImpl implements CloneService {
         }
 
         private double scoreOffset() {
-            return - Math.log( clonefactor - 1.0 );
+            return - Math.log( (clonefactor - 1.0) * (person.getPlans().size() - 1.0) );
         }
 
     }
