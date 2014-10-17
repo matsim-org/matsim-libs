@@ -58,12 +58,6 @@
 			<source>${project.build.directory}/${project.build.finalName}.jar</source>
 			<outputDirectory>/</outputDirectory>
 		</file>
-		<!-- reuires running mvn sources:jar before assembly! -->
-		<!-- TODO: find a way to automate that! -->
-		<file>
-			<source>${project.build.directory}/${project.build.finalName}-sources.jar</source>
-			<outputDirectory>/</outputDirectory>
-		</file>
 	</files>
 	
 	<dependencySets>
