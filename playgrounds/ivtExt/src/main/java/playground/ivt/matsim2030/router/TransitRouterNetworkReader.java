@@ -38,7 +38,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.xml.sax.Attributes;
 
 /**
- * This is copied from ph's playground, to avoid depending on it
+ * This is copied from Christoph's playground, to avoid depending on it
  * and have some control over it, in particular put the dtd in jar
  * @author thibautd
  */
