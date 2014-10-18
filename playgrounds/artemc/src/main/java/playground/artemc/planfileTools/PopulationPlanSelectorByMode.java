@@ -18,7 +18,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 public class PopulationPlanSelectorByMode {
 
-	private static final Logger log = Logger.getLogger(PlanFilesSelector.class);
+	private static final Logger log = Logger.getLogger(PlanSelector.class);
 
 	public static void main(String[] args) {
 		

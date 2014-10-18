@@ -16,9 +16,9 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
-public class PlanFilesSelector {
+public class PlanSelector {
 
-	private static final Logger log = Logger.getLogger(PlanFilesSelector.class);
+	private static final Logger log = Logger.getLogger(PlanSelector.class);
 	private static String inputPopulationFile = "C:/Workspace/roadpricingSingapore/output_Corridor/CorridorOutput_20000PT_shortDay_2000it_walk/output_plans.xml.gz";
 	private static String outputPopulationFile = "C:/Workspace/roadpricingSingapore/output_Corridor/CorridorOutput_20000PT_shortDay_2000it_walk/onyPtPlans.xml";
 
