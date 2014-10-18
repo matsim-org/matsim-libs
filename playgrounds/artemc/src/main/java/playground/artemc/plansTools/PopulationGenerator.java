@@ -1,4 +1,4 @@
-package playground.artemc.planfileTools;
+package playground.artemc.plansTools;
 
 import java.io.IOException;
 import java.util.Collection;

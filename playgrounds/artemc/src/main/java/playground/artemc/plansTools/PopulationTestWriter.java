@@ -1,4 +1,4 @@
-package playground.artemc.planfileTools;
+package playground.artemc.plansTools;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;

@@ -1,4 +1,4 @@
-package playground.artemc.planfileTools;
+package playground.artemc.plansTools;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;

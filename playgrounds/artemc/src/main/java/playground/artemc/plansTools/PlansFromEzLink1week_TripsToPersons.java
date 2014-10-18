@@ -1,4 +1,4 @@
-package playground.artemc.planfileTools;
+package playground.artemc.plansTools;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,7 +20,7 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
 import playground.artemc.utils.DataBaseAdmin;
 import playground.artemc.utils.NoConnectionException;
 
-public class PlansFromEzLink extends MatsimXmlWriter{
+public class PlansFromEzLink1week_TripsToPersons extends MatsimXmlWriter{
 
 	/**
 	 * @param args
@@ -32,14 +32,13 @@ public class PlansFromEzLink extends MatsimXmlWriter{
 	 * @throws NoConnectionException 
 	 * @throws ParseException 
 	 */
-
 	  
 	
 	public static void main(String[] args) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException, ParseException {
-		DataBaseAdmin dba = new DataBaseAdmin(new File("./data/dataBases/Ezlink_1week_DataBase.properties"));
+		DataBaseAdmin dba = new DataBaseAdmin(new File("./data/dataBases/Ezlink_1week_DataBase_local.properties"));
 			
 		String StartTime="";
-		String Duration="";
+		Float Ride_Time=0f;
 		String EndTime="";
 		String newTime="";
 		Double StartLat=0.0;
@@ -47,48 +46,79 @@ public class PlansFromEzLink extends MatsimXmlWriter{
 		Double EndLat=0.0;
 		Double EndLon=0.0;
 //		Integer PlanID=0;
-		Long CARD_ID=0L;
+		Long TripID=0L;
 		String EndTimeLastLeg="";
 		Double previousEndLat=0.0;
 		Double previousEndLon=0.0;
+		String journeyID="";
+		Integer journeysCount=0;
 		
 		
-		PlansFromEzLink plansFileFromEzLink = new PlansFromEzLink();
+		PlansFromEzLink1week_TripsToPersons plansFileFromEzLink = new PlansFromEzLink1week_TripsToPersons();
 		plansFileFromEzLink.writeHeader();
+		
+		//MATSim object for coordinate transformation
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84", "WGS84_UTM48N"); 
-		ResultSet agents = dba.executeQuery("SELECT DISTINCT CARD_ID FROM trips_ver1 ORDER BY RAND() LIMIT 10");
-		//444406
+		
+		//Read cardIDs for one day
+		//25% sample
+		ResultSet agents = dba.executeQuery("SELECT TripID, CARD_ID FROM v2_trips12042011 ORDER BY RAND() LIMIT 1320247");
+		//ResultSet agents = dba.executeQuery("SELECT DISTINCT CARD_ID FROM v2_card_ids12042011 ORDER BY RAND() LIMIT 1000");
+		System.out.println("Reading of all Card IDs done!");
 		int k=0,i=0;
+		//Loop through obtained cardIDs
 		while(agents.next()){
 			i=i+1;
-			CARD_ID = agents.getLong(1);
+			TripID = agents.getLong(1);
 //			PlanID = i;
 //			PlanID = agents.getInt(2);
 			Boolean newPerson=true;
-			if(i==100000){
-			 k=k+100000;
+			if(i==1000){
+			 k=k+1000;
 			 System.out.println("Agents: "+k);
 			 i=0;
 			}
-			ResultSet rs = dba.executeQuery("SELECT CARD_ID,Journey_Start_Time, Journey_Time_Full, Journey_End_Time, start_lat,start_lon, end_lat,end_lon FROM trips_geo_clean WHERE CARD_ID="+Long.toString(CARD_ID)+" ORDER BY Journey_Start_Time");
-			plansFileFromEzLink .writeNewPerson(Long.toString(CARD_ID));
+			
+			//Read all trips of one cardID
+			ResultSet rs = dba.executeQuery("SELECT CARD_ID,Ride_Start_Time, Ride_Time, start_lat,start_lon, end_lat,end_lon FROM v2_trips12042011 WHERE TripID="+Long.toString(TripID)+" ORDER BY Ride_Start_Time");
+			//ResultSet rs = dba.executeQuery("SELECT CARD_ID,Ride_Start_Time, Ride_Time, start_lat,start_lon, end_lat,end_lon FROM v2_trips12042011 WHERE CARD_ID="+Long.toString(CARD_ID)+" ORDER BY Ride_Start_Time");
+			
+			journeysCount=0;
 			while(rs.next()) {
-				CARD_ID = rs.getLong(1);
+				newPerson=true;
+//				if(!journeyID.equals(rs.getString("JOURNEY_ID"))){
+//					if(journeysCount!=0){
+//						plansFileFromEzLink.writeClosePerson(EndTime, Double.toString(EndLat),Double.toString(EndLon));
+//						newPerson=true;
+//						plansFileFromEzLink.writeNewPerson(Long.toString(CARD_ID)+"_"+journeysCount);
+//					}
+//					journeysCount++;
+//				}
+				
+//				plansFileFromEzLink.writeNewPerson(Long.toString(CARD_ID)+"_"+journeysCount);
+				plansFileFromEzLink.writeNewPerson(Long.toString(TripID));
+				
+//				CARD_ID = rs.getLong(1);
 				StartTime = rs.getString(2);
-				Duration = rs.getString(3);
-				EndTime = rs.getString(4);
-				StartLat = rs.getDouble(5);
-				StartLon = rs.getDouble(6);
-				EndLat = rs.getDouble(7);
-				EndLon = rs.getDouble(8);
+				Ride_Time = rs.getFloat(3);
+				StartLat = rs.getDouble(4);
+				StartLon = rs.getDouble(5);
+				EndLat = rs.getDouble(6);
+				EndLon = rs.getDouble(7);
+//				journeyID = rs.getString("JOURNEY_ID");
 //				TripID = rs.getInt(9);		
 				
+				String rideDuration = plansFileFromEzLink.transformMinutesToTime(Ride_Time);
+				EndTime = plansFileFromEzLink.calculateEndTime(StartTime,rideDuration);
+						
+				//If endtime after midnight, add 24 hours 
 				if(EndTime.substring(0,2).equals("00") && !StartTime.substring(0,2).equals("00") ){
 			    	 newTime="24"+EndTime.substring(2,8);
 			    	 EndTime=newTime;
 			     }
 				
-			
+				
+				//Transform coordinates to UTM48N
 				Coord coordStart =new CoordImpl(StartLon, StartLat);
 				Coord coordEnd =new CoordImpl(EndLon, EndLat);
 				Coord UTMStart = ct.transform(coordStart);
@@ -97,14 +127,16 @@ public class PlansFromEzLink extends MatsimXmlWriter{
 				StartLat=UTMStart.getY();
 				EndLon=UTMEnd.getX();
 				EndLat=UTMEnd.getY();		
-				plansFileFromEzLink .writeTrip(Long.toString(CARD_ID),StartTime,Duration,EndTimeLastLeg,Double.toString(StartLat),Double.toString(StartLon),Double.toString(EndLat),Double.toString(EndLon),newPerson,Double.toString(previousEndLat),Double.toString(previousEndLon));
+				plansFileFromEzLink .writeTrip(Long.toString(TripID),StartTime,rideDuration,EndTimeLastLeg,Double.toString(StartLat),Double.toString(StartLon),Double.toString(EndLat),Double.toString(EndLon),newPerson,Double.toString(previousEndLat),Double.toString(previousEndLon));
 				newPerson=false;
 				EndTimeLastLeg=EndTime;
 				previousEndLat=EndLat;
-				previousEndLon=EndLon;
+				previousEndLon=EndLon;				
+				plansFileFromEzLink.writeClosePerson(EndTime, Double.toString(EndLat),Double.toString(EndLon));
+				journeysCount++;
 			}
-			
-			plansFileFromEzLink .writeClosePerson(EndTime, Double.toString(EndLat),Double.toString(EndLon));
+			//plansFileFromEzLink.writeClosePerson(EndTime, Double.toString(EndLat),Double.toString(EndLon));
+			rs.close();
 		}
 	    dba.close();
 	    plansFileFromEzLink .writeEnd();
@@ -127,7 +159,7 @@ public class PlansFromEzLink extends MatsimXmlWriter{
 	
 
 	public void writeNewPerson(String PlanID) throws IOException{
-	//	this.appendFile("./data/ezLinkDataSimulation/plans25Pct.xml");
+	//	this.appendFile("./data/ezLinkDataSimulation/plans1000.xml");
 		
 		List<Tuple<String, String>> listEmpty = new ArrayList<Tuple<String,String>>();
 		List<Tuple<String, String>> listPerson = new ArrayList<Tuple<String,String>>();
@@ -215,7 +247,7 @@ public class PlansFromEzLink extends MatsimXmlWriter{
  public void writeHeader() throws IOException {
 	 	this.useCompression(true);
 	 	List<Tuple<String, String>> listEmpty = new ArrayList<Tuple<String,String>>();
-	 	this.openFile("./data/ezLinkPlans/plans_test.xml");
+	 	this.openFile("./data/ezLinkPlans/plans_25pct.xml");
 		this.writeXmlHead();
 		this.writeDoctype("plans", "http://www.matsim.org/files/dtd/plans_v4.dtd");
 		this.writeStartTag("plans", listEmpty);
@@ -227,4 +259,46 @@ public class PlansFromEzLink extends MatsimXmlWriter{
 	 	this.writeEndTag("plans");
 	 	this.close();
  }
+ 
+ public String transformMinutesToTime(float minutes) throws ParseException{
+		
+	    Integer durationInSeconds = Math.round(minutes * 60);
+		Integer durationHours = durationInSeconds / 3600;
+		Integer remainder = durationInSeconds % 3600;
+		Integer durationMinutes = remainder / 60;
+		Integer durationSeconds = remainder % 60;
+		String durationFull = durationHours+":"+durationMinutes+":"+durationSeconds;
+	
+		sdf = new SimpleDateFormat("HH:mm:ss");
+		Date durationFull_df = sdf.parse(durationFull);
+		durationFull = sdf.format(durationFull_df);
+		
+		return durationFull; 
+	}
+ 
+ public String calculateEndTime (String startTime, String duration) throws ParseException{
+	 
+		Integer startHours = Integer.parseInt(startTime.substring(0,2));
+		Integer startMinutes = Integer.parseInt(startTime.substring(3,5));
+		Integer startSeconds = Integer.parseInt(startTime.substring(6,8));
+		Integer startInSeconds = startHours*3600+startMinutes*60+startSeconds;
+		
+		Integer durationHours = Integer.parseInt(duration.substring(0,2));
+		Integer durationMinutes = Integer.parseInt(duration.substring(3,5));
+		Integer durationSeconds = Integer.parseInt(duration.substring(6,8));
+		Integer durationInSeconds = durationHours*3600+durationMinutes*60+durationSeconds;
+		
+		Integer endTimeInSeconds = startInSeconds+durationInSeconds;
+		Integer endTimeHours = endTimeInSeconds / 3600;
+		Integer remainder = endTimeInSeconds % 3600;
+		Integer endTimeMinutes = remainder / 60;
+		Integer endTimeSeconds = remainder % 60;
+		String endTime = endTimeHours+":"+endTimeMinutes+":"+endTimeSeconds;
+	
+		sdf = new SimpleDateFormat("HH:mm:ss");
+		Date endTime_df= sdf.parse(endTime);
+		endTime=sdf.format(endTime_df);
+		
+		return endTime;
+	 }
 }
