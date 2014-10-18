@@ -25,16 +25,12 @@ import java.io.*;
 import java.util.*;
 import java.util.Map.Entry;
 
-import javax.naming.ConfigurationException;
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.matsim.api.core.v01.*;
 import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.matrices.Matrix;
-import org.xml.sax.SAXException;
 
 import pl.poznan.put.util.random.*;
 import playground.michalm.demand.*;
@@ -160,7 +156,6 @@ public class PoznanLanduseDemandGeneration
 
 
     public void generate(String dirName)
-        throws ConfigurationException, SAXException, ParserConfigurationException, IOException
     {
         String networkFile = dirName + "network.xml";
         String zonesXmlFile = dirName + "zones.xml";
@@ -206,22 +201,25 @@ public class PoznanLanduseDemandGeneration
 
 
     private void readValidatedZones(String validatedZonesFile)
-        throws FileNotFoundException
     {
         zoneLanduseValidation = new HashMap<>();
-        Scanner scanner = new Scanner(new File(validatedZonesFile));
 
-        scanner.nextLine();// skip the header
+        try (Scanner scanner = new Scanner(new File(validatedZonesFile))) {
+            scanner.nextLine();// skip the header
 
-        while (scanner.hasNext()) {
-            Id<Zone> zoneId = Id.create(scanner.next(), Zone.class);
-            boolean residential = scanner.nextInt() != 0;
-            boolean industrial = scanner.nextInt() != 0;
+            while (scanner.hasNext()) {
+                Id<Zone> zoneId = Id.create(scanner.next(), Zone.class);
+                boolean residential = scanner.nextInt() != 0;
+                boolean industrial = scanner.nextInt() != 0;
 
-            zoneLanduseValidation.put(zoneId, new ZoneLanduseValidation(residential, industrial));
+                zoneLanduseValidation.put(zoneId,
+                        new ZoneLanduseValidation(residential, industrial));
+            }
+
         }
-
-        scanner.close();
+        catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
@@ -273,24 +271,26 @@ public class PoznanLanduseDemandGeneration
 
 
     static EnumMap<ActivityPair, Double> readPrtCoeffs(String put2PrtRatiosFile)
-        throws FileNotFoundException
     {
         EnumMap<ActivityPair, Double> prtCoeffs = new EnumMap<>(ActivityPair.class);
-        Scanner scanner = new Scanner(new File(put2PrtRatiosFile));
 
-        while (scanner.hasNext()) {
-            ActivityPair pair = ActivityPair.valueOf(scanner.next());
-            double putShare = scanner.nextDouble();
-            double prtShare = scanner.nextDouble();
-            double coeff = prtShare / (putShare + prtShare) / PEOPLE_PER_VEHICLE;
+        try (Scanner scanner = new Scanner(new File(put2PrtRatiosFile))) {
+            while (scanner.hasNext()) {
+                ActivityPair pair = ActivityPair.valueOf(scanner.next());
+                double putShare = scanner.nextDouble();
+                double prtShare = scanner.nextDouble();
+                double coeff = prtShare / (putShare + prtShare) / PEOPLE_PER_VEHICLE;
 
-            if (prtCoeffs.put(pair, coeff) != null) {
-                scanner.close();
-                throw new RuntimeException("Pair respecified: " + pair);
+                if (prtCoeffs.put(pair, coeff) != null) {
+                    scanner.close();
+                    throw new RuntimeException("Pair respecified: " + pair);
+                }
             }
-        }
 
-        scanner.close();
+        }
+        catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
 
         if (prtCoeffs.size() != ActivityPair.values().length) {
             throw new RuntimeException("Not all pairs have been specified");
@@ -301,7 +301,6 @@ public class PoznanLanduseDemandGeneration
 
 
     private void generateAll(String odMatrixFilePrefix)
-        throws FileNotFoundException
     {
         LanduseLocationGeneratorStrategy strategy = new LanduseLocationGeneratorStrategy();
         ActivityCreator ac = new DefaultActivityCreator(scenario, strategy, strategy);
@@ -315,7 +314,6 @@ public class PoznanLanduseDemandGeneration
 
 
     private void generate(String filePrefix, ActivityPair actPair)
-        throws FileNotFoundException
     {
         double flowCoeff = prtCoeffs.get(actPair);
         String actTypeFrom = actPair.from.name();
@@ -341,7 +339,6 @@ public class PoznanLanduseDemandGeneration
 
 
     public static void main(String[] args)
-        throws ConfigurationException, IOException, SAXException, ParserConfigurationException
     {
         new PoznanLanduseDemandGeneration().generate("d:\\michalm\\eTaxi\\Poznan_MATSim\\");
     }

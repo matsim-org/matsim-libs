@@ -22,6 +22,7 @@ package org.matsim.contrib.dvrp.vrpagent;
 import java.util.List;
 
 import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
@@ -64,12 +65,14 @@ public class VrpAgentSource
         VehiclesFactory qSimVehicleFactory = VehicleUtils.getFactory();
 
         for (Vehicle vrpVeh : vehicles) {
-            Id id = vrpVeh.getId();
-            Id startLinkId = vrpVeh.getStartLink().getId();
+            Id<Vehicle> id = vrpVeh.getId();
+            Id<Link> startLinkId = vrpVeh.getStartLink().getId();
 
             VrpAgentLogic vrpAgentLogic = new VrpAgentLogic(optimizer, nextActionCreator, vrpVeh);
-            DynAgent vrpAgent = new DynAgent(id, startLinkId, qSim, vrpAgentLogic);
-            QVehicle mobsimVehicle = new QVehicle(qSimVehicleFactory.createVehicle(id,
+            DynAgent vrpAgent = new DynAgent(Id.createPersonId(id), startLinkId, qSim,
+                    vrpAgentLogic);
+            QVehicle mobsimVehicle = new QVehicle(qSimVehicleFactory.createVehicle(
+                    Id.create(id, org.matsim.vehicles.Vehicle.class),
                     VehicleUtils.getDefaultVehicleType()));
             vrpAgent.setVehicle(mobsimVehicle);
             mobsimVehicle.setDriver(vrpAgent);

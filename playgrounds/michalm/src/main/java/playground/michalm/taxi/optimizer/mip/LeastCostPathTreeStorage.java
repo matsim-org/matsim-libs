@@ -19,18 +19,14 @@
 
 package playground.michalm.taxi.optimizer.mip;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.*;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-import org.matsim.utils.LeastCostPathTree;
+import org.matsim.utils.*;
 import org.matsim.utils.LeastCostPathTree.NodeData;
 
 

@@ -21,14 +21,10 @@ package playground.michalm.util.matrices;
 
 import java.util.Map;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.matrices.Entry;
-import org.matsim.matrices.Matrices;
-import org.matsim.matrices.Matrix;
-import org.matsim.matrices.MatsimMatricesReader;
+import org.matsim.matrices.*;
 
 import playground.michalm.zone.Zone;
 
@@ -45,8 +41,8 @@ public class MatrixUtils
         new MatsimMatricesReader(matrices, scenario).readFile(file);
         return matrices;
     }
-    
-    
+
+
     public static Matrix createDenseMatrix(String id, Iterable<Id<Zone>> ids, double[][] values)
     {
         return createMatrix(id, ids, values, true);
@@ -125,7 +121,8 @@ public class MatrixUtils
     }
 
 
-    public static Matrices aggregateMatrices(Matrices input, Function<? super String, String> keyAggregator)
+    public static Matrices aggregateMatrices(Matrices input,
+            Function<? super String, String> keyAggregator)
     {
         Matrices output = new Matrices();
 
@@ -141,8 +138,8 @@ public class MatrixUtils
 
         return output;
     }
-    
-    
+
+
     public static void scaleMatrices(Matrices matrices, double factor)
     {
         for (Matrix m : matrices.getMatrices().values()) {

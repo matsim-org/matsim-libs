@@ -19,16 +19,13 @@
 
 package playground.michalm.zone.poznan;
 
-import java.util.Collection;
-import java.util.Map;
+import java.util.*;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.*;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
-import playground.michalm.zone.Zone;
-import playground.michalm.zone.Zones;
+import playground.michalm.zone.*;
 
 import com.vividsolutions.jts.geom.MultiPolygon;
 
@@ -49,12 +46,12 @@ public class PoznanZones
         String zonesShpFile = "d:/PP-rad/taxi/poznan-supply/dane/rejony/taxi_zones.shp";
         return Zones.readZones(scenario, zonesXmlFile, zonesShpFile);
     }
-    
-    
+
+
     public static MultiPolygon readAgglomerationArea()
     {
         String agglomerationShpFile = "d:/eTaxi/Poznan_MATSim/GIS/agglomeration.shp";
-        
+
         Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(agglomerationShpFile);
         if (features.size() != 1) {
             throw new RuntimeException();

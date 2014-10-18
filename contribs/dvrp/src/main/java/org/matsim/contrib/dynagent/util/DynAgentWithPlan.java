@@ -20,10 +20,12 @@
 package org.matsim.contrib.dynagent.util;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.core.mobsim.framework.*;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.vehicles.Vehicle;
 
 
 /**
@@ -95,42 +97,42 @@ public class DynAgentWithPlan
 
 
     @Override
-    public void notifyArrivalOnLinkByNonNetworkMode(Id linkId)
+    public void notifyArrivalOnLinkByNonNetworkMode(Id<Link> linkId)
     {
         dynAgent.notifyArrivalOnLinkByNonNetworkMode(linkId);
     }
 
 
     @Override
-    public Id getCurrentLinkId()
+    public Id<Link> getCurrentLinkId()
     {
         return dynAgent.getCurrentLinkId();
     }
 
 
     @Override
-    public Id getDestinationLinkId()
+    public Id<Link> getDestinationLinkId()
     {
         return dynAgent.getDestinationLinkId();
     }
 
 
     @Override
-    public Id getId()
+    public Id<Person> getId()
     {
         return dynAgent.getId();
     }
 
 
     @Override
-    public Id chooseNextLinkId()
+    public Id<Link> chooseNextLinkId()
     {
         return dynAgent.chooseNextLinkId();
     }
 
 
     @Override
-    public void notifyMoveOverNode(Id newLinkId)
+    public void notifyMoveOverNode(Id<Link> newLinkId)
     {
         dynAgent.notifyMoveOverNode(newLinkId);
     }
@@ -151,7 +153,7 @@ public class DynAgentWithPlan
 
 
     @Override
-    public Id getPlannedVehicleId()
+    public Id<Vehicle> getPlannedVehicleId()
     {
         return dynAgent.getPlannedVehicleId();
     }

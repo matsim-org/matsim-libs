@@ -31,7 +31,7 @@ public interface DynActivity
     /**
      * DynActivity is performed at steps: now == beginTime + 1, ..., endTime
      * 
-     * @param now current time 
+     * @param now current time
      */
     //TODO this method may possibly be pulled up to DynAction since even when travelling (either by
     //PuT or PrT) an agent may think, talk (also on the phone), collaborate etc.

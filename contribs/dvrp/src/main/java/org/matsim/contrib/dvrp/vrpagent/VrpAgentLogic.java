@@ -64,8 +64,8 @@ public class VrpAgentLogic
     {
         return agent;
     }
-    
-    
+
+
     public Vehicle getVehicle()
     {
         return vehicle;

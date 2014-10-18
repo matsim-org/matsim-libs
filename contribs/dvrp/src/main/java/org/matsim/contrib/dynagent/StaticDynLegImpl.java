@@ -43,14 +43,14 @@ public class StaticDynLegImpl
 
 
     @Override
-    public void movedOverNode(Id newLinkId)
+    public void movedOverNode(Id<Link> newLinkId)
     {
         currentLinkIdx++;
     }
 
 
     @Override
-    public Id getCurrentLinkId()
+    public Id<Link> getCurrentLinkId()
     {
         if (currentLinkIdx == -1) {
             return route.getStartLinkId();
@@ -67,7 +67,7 @@ public class StaticDynLegImpl
 
 
     @Override
-    public Id getNextLinkId()
+    public Id<Link> getNextLinkId()
     {
         List<Id<Link>> linkIds = route.getLinkIds();
 
@@ -84,7 +84,7 @@ public class StaticDynLegImpl
 
 
     @Override
-    public Id getDestinationLinkId()
+    public Id<Link> getDestinationLinkId()
     {
         return route.getEndLinkId();
     }
@@ -103,7 +103,7 @@ public class StaticDynLegImpl
 
 
     @Override
-    public void arrivedOnLinkByNonNetworkMode(Id linkId)
+    public void arrivedOnLinkByNonNetworkMode(Id<Link> linkId)
     {
         if (!getDestinationLinkId().equals(linkId)) {
             throw new IllegalStateException();

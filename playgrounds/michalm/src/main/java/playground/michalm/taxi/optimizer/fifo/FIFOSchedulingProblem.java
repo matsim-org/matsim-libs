@@ -19,7 +19,7 @@
 
 package playground.michalm.taxi.optimizer.fifo;
 
-import java.util.*;
+import java.util.Queue;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;

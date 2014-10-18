@@ -21,10 +21,8 @@ package org.matsim.contrib.dynagent.examples.random;
 
 import java.util.Map;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.dynagent.DynLeg;
 import org.matsim.core.gbl.MatsimRandom;
 
@@ -34,12 +32,12 @@ public class RandomDynLeg
 {
     private final Network network;
 
-    private Id currentLinkId;
-    private Id nextLinkId;
-    private Id destinationLinkId;
+    private Id<Link> currentLinkId;
+    private Id<Link> nextLinkId;
+    private Id<Link> destinationLinkId;
 
 
-    public RandomDynLeg(Id fromLinkId, Network network)
+    public RandomDynLeg(Id<Link> fromLinkId, Network network)
     {
         this.network = network;
         currentLinkId = fromLinkId;
@@ -54,7 +52,7 @@ public class RandomDynLeg
 
 
     @Override
-    public void movedOverNode(Id newLinkId)
+    public void movedOverNode(Id<Link> newLinkId)
     {
         currentLinkId = newLinkId;
         doRandomChoice();
@@ -62,21 +60,21 @@ public class RandomDynLeg
 
 
     @Override
-    public Id getCurrentLinkId()
+    public Id<Link> getCurrentLinkId()
     {
         return currentLinkId;
     }
 
 
     @Override
-    public Id getNextLinkId()
+    public Id<Link> getNextLinkId()
     {
         return nextLinkId;
     }
 
 
     @Override
-    public Id getDestinationLinkId()
+    public Id<Link> getDestinationLinkId()
     {
         return destinationLinkId;
     }
@@ -111,14 +109,14 @@ public class RandomDynLeg
 
 
     @Override
-    public void arrivedOnLinkByNonNetworkMode(Id linkId)
+    public void arrivedOnLinkByNonNetworkMode(Id<Link> linkId)
     {
         currentLinkId = linkId;
     }
 
 
     @Override
-		public Double getExpectedTravelTime()
+    public Double getExpectedTravelTime()
     {
         return MatsimRandom.getRandom().nextDouble() * 3600;
     }

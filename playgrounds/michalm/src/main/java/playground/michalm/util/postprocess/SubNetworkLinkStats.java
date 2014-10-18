@@ -19,14 +19,10 @@
 
 package playground.michalm.util.postprocess;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Map;
-import java.util.StringTokenizer;
+import java.io.*;
+import java.util.*;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -42,7 +38,6 @@ import com.vividsolutions.jts.geom.Geometry;
 public class SubNetworkLinkStats
 {
     public static void main(String[] args)
-        throws IOException
     {
         String dir = "d:\\PP-rad\\poznan\\";
         String networkFile = dir + "network.xml";
@@ -75,6 +70,9 @@ public class SubNetworkLinkStats
                     pw.println(line);
                 }
             }
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

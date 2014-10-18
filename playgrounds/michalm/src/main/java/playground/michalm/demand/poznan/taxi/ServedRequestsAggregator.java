@@ -19,24 +19,18 @@
 
 package playground.michalm.demand.poznan.taxi;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Map;
+import java.text.*;
+import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.*;
 import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.matrices.Matrices;
 
-import playground.michalm.demand.aggregator.DemandAggregator;
-import playground.michalm.demand.aggregator.FormatBasedDateDiscretizer;
-import playground.michalm.util.matrices.MatricesTxtWriter;
-import playground.michalm.util.matrices.MatrixUtils;
-import playground.michalm.zone.Zone;
-import playground.michalm.zone.ZoneFinder;
+import playground.michalm.demand.aggregator.*;
+import playground.michalm.util.matrices.*;
+import playground.michalm.zone.*;
 import playground.michalm.zone.poznan.PoznanZones;
 
 import com.google.common.base.Function;
@@ -77,7 +71,7 @@ public class ServedRequestsAggregator
         w1.setKeyHeader(header);
         w1.setKeyFormatter(new Function<String, String>() {
             @Override
-						public String apply(String key)
+            public String apply(String key)
             {
                 Date date = hourlyDateDiscretizer.parseDiscretizedDate(key);
                 return tabDateFormat.format(date);
@@ -88,10 +82,10 @@ public class ServedRequestsAggregator
         Matrices aggregatedMatrices = MatrixUtils.aggregateMatrices(demandAggregator.getMatrices(),
                 new Function<String, String>() {
                     @Override
-										public String apply(String key)
+                    public String apply(String key)
                     {
-                        return StringUtils.leftPad(hourlyDateDiscretizer
-                                .parseDiscretizedDate(key).getHours() + "", 2);
+                        return StringUtils.leftPad(hourlyDateDiscretizer.parseDiscretizedDate(key)
+                                .getHours() + "", 2);
                     };
                 });
 

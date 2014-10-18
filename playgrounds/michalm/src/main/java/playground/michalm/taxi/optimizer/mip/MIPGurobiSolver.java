@@ -49,11 +49,9 @@ public class MIPGurobiSolver
 
 
     private static final double W_MAX = 30 * 60 * 60;//30 hours
-    
+
     private static final double TW_MAX = 1.5 * 60 * 60;// 1.5 hours 
     private static final double TP_MAX = 20 * 60;// 20 minutes
-
-
 
     private final TaxiOptimizerConfiguration optimConfig;
     private final PathTreeBasedTravelTimeCalculator pathTravelTimeCalc;
@@ -218,7 +216,7 @@ public class MIPGurobiSolver
             Link toLink = rData.requests[i].getFromLink();
 
             for (int k = 0; k < m; k++) {
-                VehicleData.Entry departure = vData.entries.get(k); 
+                VehicleData.Entry departure = vData.entries.get(k);
 
                 double a_k = departure.time;
                 double t_O_ki = pathTravelTimeCalc.calcTravelTime(departure.link, toLink);

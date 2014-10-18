@@ -54,8 +54,7 @@ public class TravelTimeUtils
             }
 
             for (int j = firstIdx; j <= lastIdx; j++) {
-                timesOnArrival[j] = prevArcTime + gradient
-                        * (j * interval - prevArrivalTime);
+                timesOnArrival[j] = prevArcTime + gradient * (j * interval - prevArrivalTime);
             }
 
             if (lastIdx == timesOnArrival.length - 1) {

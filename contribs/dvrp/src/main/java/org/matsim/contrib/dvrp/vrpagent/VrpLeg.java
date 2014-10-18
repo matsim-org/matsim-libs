@@ -20,6 +20,7 @@
 package org.matsim.contrib.dvrp.vrpagent;
 
 import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.router.*;
 import org.matsim.contrib.dvrp.tracker.*;
 
@@ -58,7 +59,7 @@ public class VrpLeg
 
 
     @Override
-    public void movedOverNode(Id newLinkId)
+    public void movedOverNode(Id<Link> newLinkId)
     {
         currentLinkIdx++;
         askedAboutNextLink = false;
@@ -101,14 +102,14 @@ public class VrpLeg
 
 
     @Override
-    public Id getCurrentLinkId()
+    public Id<Link> getCurrentLinkId()
     {
         return path.getLink(currentLinkIdx).getId();
     }
 
 
     @Override
-    public Id getNextLinkId()
+    public Id<Link> getNextLinkId()
     {
         askedAboutNextLink = true;
 
@@ -121,7 +122,7 @@ public class VrpLeg
 
 
     @Override
-    public Id getDestinationLinkId()
+    public Id<Link> getDestinationLinkId()
     {
         return path.getToLink().getId();
     }
@@ -140,7 +141,7 @@ public class VrpLeg
 
 
     @Override
-    public void arrivedOnLinkByNonNetworkMode(Id linkId)
+    public void arrivedOnLinkByNonNetworkMode(Id<Link> linkId)
     {
         if (!getDestinationLinkId().equals(linkId)) {
             throw new IllegalStateException();

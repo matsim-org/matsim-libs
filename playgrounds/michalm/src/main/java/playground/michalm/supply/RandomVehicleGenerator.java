@@ -19,29 +19,22 @@
 
 package playground.michalm.supply;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.data.VehicleImpl;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.data.file.VehicleWriter;
 import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import pl.poznan.put.util.random.RandomUtils;
-import pl.poznan.put.util.random.UniformRandom;
+import pl.poznan.put.util.random.*;
 
 
 public class RandomVehicleGenerator
 {
     public static void generateVehicles(String networkFile, String vehiclesFile, int count, int t1)
-        throws IOException
     {
         Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
         MatsimNetworkReader nr = new MatsimNetworkReader(scenario);
@@ -65,7 +58,6 @@ public class RandomVehicleGenerator
 
 
     public static void main(String[] args)
-        throws IOException
     {
         int count = 5000;
         int t1 = 30 * 60 * 60;

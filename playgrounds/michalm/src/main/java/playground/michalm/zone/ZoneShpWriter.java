@@ -19,14 +19,11 @@
 
 package playground.michalm.zone;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.PolygonFeatureFactory;
-import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.core.utils.gis.*;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 

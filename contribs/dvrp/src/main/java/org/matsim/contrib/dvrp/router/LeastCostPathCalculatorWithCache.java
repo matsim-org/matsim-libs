@@ -36,7 +36,7 @@ public class LeastCostPathCalculatorWithCache
 
     private final TimeDiscretizer timeDiscretizer;
 
-    private final Table<Id, Id, Path>[] pathCache;
+    private final Table<Id<Node>, Id<Node>, Path>[] pathCache;
 
     private int cacheHits = 0;
     private int cacheMisses = 0;
@@ -61,7 +61,7 @@ public class LeastCostPathCalculatorWithCache
     public Path calcLeastCostPath(Node fromNode, Node toNode, double starttime, Person person,
             Vehicle vehicle)
     {
-        Table<Id, Id, Path> spCacheSlice = pathCache[timeDiscretizer.getIdx(starttime)];
+        Table<Id<Node>, Id<Node>, Path> spCacheSlice = pathCache[timeDiscretizer.getIdx(starttime)];
         Path path = spCacheSlice.get(fromNode.getId(), toNode.getId());
 
         if (path == null) {

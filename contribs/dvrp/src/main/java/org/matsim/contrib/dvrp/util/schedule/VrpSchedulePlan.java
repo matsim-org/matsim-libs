@@ -100,8 +100,8 @@ public class VrpSchedulePlan
         VrpPath path = task.getPath();
         Leg leg = populFactory.createLeg(TransportMode.car);
 
-        Id fromLinkId = path.getFromLink().getId();
-        Id toLinkId = path.getToLink().getId();
+        Id<Link> fromLinkId = path.getFromLink().getId();
+        Id<Link> toLinkId = path.getToLink().getId();
 
         NetworkRoute netRoute = (NetworkRoute) ((PopulationFactoryImpl)populFactory).createRoute(
                 TransportMode.car, fromLinkId, toLinkId);

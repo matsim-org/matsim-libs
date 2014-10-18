@@ -21,6 +21,7 @@ package playground.michalm.taxi.run;
 
 import org.junit.Test;
 
+
 public class KaiTaxiLauncherTest
 {
     @Test
@@ -28,7 +29,7 @@ public class KaiTaxiLauncherTest
     {
         String file = "./src/main/resources/mielec-2-peaks_2014_02/params.in";
         KaiTaxiLauncher.run(file, false, false);//equivalent to (file, false, true)        
-        KaiTaxiLauncher.run(file, true, false);        
-        KaiTaxiLauncher.run(file, true, true);        
+        KaiTaxiLauncher.run(file, true, false);
+        KaiTaxiLauncher.run(file, true, true);
     }
 }

@@ -19,13 +19,10 @@
 
 package playground.michalm.taxi.run;
 
-import java.io.IOException;
 import java.util.Map;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
 
 import playground.michalm.taxi.TaxiRequestCreator;
@@ -61,7 +58,6 @@ class KaiTaxiLauncher
 
 
     public static void main(String... args)
-        throws IOException
     {
         //demands: 10, 15, 20, 25, 30, 35, 40
         //supplies: 25, 50

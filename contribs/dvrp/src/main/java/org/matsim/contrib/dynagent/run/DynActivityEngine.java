@@ -22,6 +22,7 @@ package org.matsim.contrib.dynagent.run;
 import java.util.*;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.core.mobsim.framework.*;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
@@ -49,7 +50,7 @@ public class DynActivityEngine
     }
 
 
-    private final Map<Id, EndTimeEntry> activityEndTimes;
+    private final Map<Id<Person>, EndTimeEntry> activityEndTimes;
 
     private InternalInterface internalInterface;
 

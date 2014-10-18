@@ -19,12 +19,9 @@
 
 package playground.michalm.taxi.data;
 
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
 
-import org.matsim.api.core.v01.BasicLocation;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
 
@@ -37,10 +34,10 @@ public class TaxiRank
     private final Link link;
     private final static int STANDARDCAPACITY = 5;
     private int capacity;
-    
+
     private Queue<Vehicle> taxisInRank;
-    
-    
+
+
     public TaxiRank(Id<TaxiRank> id, String name, Link link)
     {
         this.id = id;
@@ -49,6 +46,7 @@ public class TaxiRank
         this.capacity = STANDARDCAPACITY;
         this.taxisInRank = new LinkedList<>();
     }
+
 
     public TaxiRank(Id<TaxiRank> id, String name, Link link, int capacity)
     {
@@ -59,6 +57,7 @@ public class TaxiRank
         this.taxisInRank = new LinkedList<>();
 
     }
+
 
     @Override
     public Id<TaxiRank> getId()
@@ -84,26 +83,34 @@ public class TaxiRank
     {
         return link;
     }
-    
-    public boolean addTaxi(Vehicle veh){
-        if (taxisInRank.size()<this.capacity) {
+
+
+    public boolean addTaxi(Vehicle veh)
+    {
+        if (taxisInRank.size() < this.capacity) {
             taxisInRank.add(veh);
             return true;
-            }
-        else return false;
+        }
+        else
+            return false;
     }
-    
-    public void removeTaxi(Vehicle veh){
+
+
+    public void removeTaxi(Vehicle veh)
+    {
         this.taxisInRank.remove(veh);
     }
-    
-    public Vehicle getFirstTaxiFromRank(){
-        return  this.taxisInRank.poll();
+
+
+    public Vehicle getFirstTaxiFromRank()
+    {
+        return this.taxisInRank.poll();
     }
+
 
     public boolean hasCapacity()
     {
-        return (taxisInRank.size()<this.capacity);
+        return (taxisInRank.size() < this.capacity);
     }
-    
+
 }

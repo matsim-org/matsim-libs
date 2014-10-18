@@ -21,7 +21,7 @@ package playground.michalm.demand.poznan;
 
 import java.io.*;
 import java.lang.reflect.Array;
-import java.util.*;
+import java.util.Map;
 
 import playground.michalm.demand.poznan.PoznanLanduseDemandGeneration.ActivityPair;
 import playground.michalm.util.visum.VisumODMatrixReader;
@@ -38,7 +38,6 @@ public class PoznanODMatrixAdder
 
 
     public static void main(String[] args)
-        throws IOException
     {
         prtCoeffs = PoznanLanduseDemandGeneration.readPrtCoeffs(put2PrtRatiosFile);
 
@@ -53,7 +52,6 @@ public class PoznanODMatrixAdder
 
 
     private static void readMatrix(String filePrefix, ActivityPair actPair)
-        throws FileNotFoundException
     {
         double flowCoeff = prtCoeffs.get(actPair);
 
@@ -79,7 +77,6 @@ public class PoznanODMatrixAdder
 
 
     private static void writeMatricesByHour(String filePrefix)
-        throws IOException
     {
         for (int i = 0; i < 24; i++) {
             String odMatrixFile = filePrefix + "_" + i + "-" + (i + 1);
@@ -92,7 +89,6 @@ public class PoznanODMatrixAdder
 
 
     private static void writeMatrix(double[][] array, String file)
-        throws IOException
     {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             for (int i = 0; i < array.length; i++) {
@@ -102,6 +98,9 @@ public class PoznanODMatrixAdder
 
                 writer.newLine();
             }
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

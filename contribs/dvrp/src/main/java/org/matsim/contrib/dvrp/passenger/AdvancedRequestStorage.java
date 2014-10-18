@@ -22,6 +22,8 @@ package org.matsim.contrib.dvrp.passenger;
 import java.util.*;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Requests;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -29,7 +31,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 
 public class AdvancedRequestStorage
 {
-    private final Map<Id, Queue<PassengerRequest>> advanceRequests = new HashMap<>();
+    private final Map<Id<Person>, Queue<PassengerRequest>> advanceRequests = new HashMap<>();
     private final MatsimVrpContext context;
 
 
@@ -41,7 +43,7 @@ public class AdvancedRequestStorage
 
     public void storeAdvancedRequest(PassengerRequest request)
     {
-        Id passengerId = request.getPassenger().getId();
+        Id<Person> passengerId = request.getPassenger().getId();
         Queue<PassengerRequest> passengerAdvReqs = advanceRequests.get(passengerId);
 
         if (passengerAdvReqs == null) {
@@ -53,8 +55,8 @@ public class AdvancedRequestStorage
     }
 
 
-    public PassengerRequest retrieveAdvancedRequest(MobsimAgent passenger, Id fromLinkId,
-            Id toLinkId)
+    public PassengerRequest retrieveAdvancedRequest(MobsimAgent passenger, Id<Link> fromLinkId,
+            Id<Link> toLinkId)
     {
         Queue<PassengerRequest> passengerAdvReqs = advanceRequests.get(passenger.getId());
 

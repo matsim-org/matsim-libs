@@ -32,8 +32,8 @@ class MultiThreadTaxiLauncher
     //reverse order of iteration (--> start with bigger tasks)
     private static final int[] DEMANDS = { 40, 35, 30, 25, 20, 15, 10 };
     private static final int[] SUPPLIES = { 50, 25 };
-//    private static final int[] DEMANDS = { 10 };
-//    private static final int[] SUPPLIES = { 25 };
+    //    private static final int[] DEMANDS = { 10 };
+    //    private static final int[] SUPPLIES = { 25 };
 
     private static final int RUNS = 20;
 

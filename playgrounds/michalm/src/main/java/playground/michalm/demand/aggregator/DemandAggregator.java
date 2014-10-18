@@ -19,18 +19,14 @@
 
 package playground.michalm.demand.aggregator;
 
-import java.util.Date;
-import java.util.EnumMap;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.matrices.Matrices;
-import org.matsim.matrices.Matrix;
+import org.matsim.matrices.*;
 
 import playground.michalm.util.matrices.MatrixUtils;
-import playground.michalm.zone.Zone;
-import playground.michalm.zone.ZoneFinder;
+import playground.michalm.zone.*;
 
 
 public class DemandAggregator
@@ -45,8 +41,7 @@ public class DemandAggregator
     private final DateDiscretizer dateDiscretizer;
     private final Matrices matrices = new Matrices();
 
-    private final Map<TripType, MutableInt> counters = new EnumMap<>(
-            TripType.class);
+    private final Map<TripType, MutableInt> counters = new EnumMap<>(TripType.class);
 
 
     public DemandAggregator(ZoneFinder zoneFinder, DateDiscretizer dateDiscretizer)
@@ -68,7 +63,8 @@ public class DemandAggregator
         counters.get(type).increment();
 
         if (type == TripType.INTERNAL) {
-            addTrip(dateDiscretizer.discretize(date), fromZone.getId().toString(), toZone.getId().toString());
+            addTrip(dateDiscretizer.discretize(date), fromZone.getId().toString(), toZone.getId()
+                    .toString());
         }
     }
 

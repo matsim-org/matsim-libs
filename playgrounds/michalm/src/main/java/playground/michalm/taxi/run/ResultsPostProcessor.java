@@ -125,16 +125,18 @@ public class ResultsPostProcessor
 
 
     private void readFile(String file, Experiment experiment)
-        throws FileNotFoundException
     {
-        Scanner sc = new Scanner(new File(file));
+        try (Scanner sc = new Scanner(new File(file))) {
+            // header
+            // cfg n   m   PW  PWmax   PD  DD  PS  DS  W   Comp
+            sc.nextLine();
 
-        // header
-        // cfg n   m   PW  PWmax   PD  DD  PS  DS  W   Comp
-        sc.nextLine();
-
-        while (sc.hasNext()) {
-            experiment.stats.add(readLine(sc));
+            while (sc.hasNext()) {
+                experiment.stats.add(readLine(sc));
+            }
+        }
+        catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -169,7 +171,6 @@ public class ResultsPostProcessor
 
 
     private void writeValues(String filename, String field)
-        throws FileNotFoundException
     {
         try (PrintWriter pw = new PrintWriter(filename)) {
             pw.printf("%s", field);
@@ -246,6 +247,10 @@ public class ResultsPostProcessor
                 pw.println();
             }
         }
+        catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
 
@@ -254,7 +259,6 @@ public class ResultsPostProcessor
 
 
     public void go(String filename)
-        throws FileNotFoundException
     {
         for (Experiment e : experiments) {
             readFile(DIR + SUBDIR_PREFIX + e.demand + '-' + e.taxis + "\\" + filename, e);
@@ -272,7 +276,6 @@ public class ResultsPostProcessor
 
 
     public static void main(String[] args)
-        throws FileNotFoundException
     {
         new ResultsPostProcessor().go("stats");
     }

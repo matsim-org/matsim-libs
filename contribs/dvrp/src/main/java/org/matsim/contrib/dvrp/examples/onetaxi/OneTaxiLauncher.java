@@ -19,8 +19,6 @@
 
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
-import java.io.IOException;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.MatsimVrpContextImpl;
 import org.matsim.contrib.dvrp.data.VrpData;
@@ -98,7 +96,6 @@ public class OneTaxiLauncher
 
 
     public static void main(String... args)
-        throws IOException
     {
         new OneTaxiLauncher(true).go();
     }

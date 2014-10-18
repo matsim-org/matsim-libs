@@ -53,7 +53,7 @@ class MIPSolutionFinder
     {
         final int m = vData.dimension;
         final int n = rData.dimension;
-        
+
         final boolean[][] x = new boolean[m + n][m + n];
         final double[] w = new double[n];
 

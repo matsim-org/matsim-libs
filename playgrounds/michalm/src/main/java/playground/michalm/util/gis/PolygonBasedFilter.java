@@ -102,10 +102,15 @@ public class PolygonBasedFilter
 
 
     public static Geometry readPolygonGeometry(String file)
-        throws IOException
     {
         SimpleFeatureSource fts = ShapeFileReader.readDataFile(file);
-        SimpleFeatureCollection ftColl = fts.getFeatures();
+        SimpleFeatureCollection ftColl;
+        try {
+            ftColl = fts.getFeatures();
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         if (ftColl.size() != 1) {
             throw new RuntimeException("No. of Features: " + ftColl.size() + "; should be 1");

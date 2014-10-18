@@ -21,6 +21,7 @@ package org.matsim.contrib.dvrp.schedule;
 
 import org.matsim.contrib.dvrp.tracker.TaskTracker;
 
+
 public interface Task
 {
     public enum TaskType
@@ -31,7 +32,7 @@ public interface Task
 
     public enum TaskStatus
     {
-        PLANNED, STARTED, PERFORMED,//
+        PLANNED, STARTED, PERFORMED, //
         CANCELLED;//used for ongoing tasks (DriveTask)
     }
 
@@ -61,7 +62,8 @@ public interface Task
 
 
     void setEndTime(double endTime);
-    
+
+
     //
     TaskTracker getTaskTracker();
 

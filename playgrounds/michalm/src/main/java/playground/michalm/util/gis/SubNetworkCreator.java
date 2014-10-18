@@ -19,7 +19,6 @@
 
 package playground.michalm.util.gis;
 
-import java.io.IOException;
 import java.util.*;
 
 import org.matsim.api.core.v01.Scenario;
@@ -36,7 +35,6 @@ import com.vividsolutions.jts.geom.Geometry;
 public class SubNetworkCreator
 {
     public static void main(String[] args)
-        throws IOException
     {
         String dir = "D:\\PP-rad\\poznan\\";
         String networkFile = dir + "network.xml";

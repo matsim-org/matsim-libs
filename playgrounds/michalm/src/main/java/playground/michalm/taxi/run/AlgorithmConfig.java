@@ -107,7 +107,7 @@ enum AlgorithmConfig
     APS_DSE_24H(AP_SCHEDULING, DEMAND_SUPPLY_EQUIL, EVENTS_24_H, TIME),
 
     APS_DSE_15M(AP_SCHEDULING, DEMAND_SUPPLY_EQUIL, EVENTS_15_MIN, TIME),
-    
+
     MIP_FF(MIP_SCHEDULING, MIN_WAIT_TIME, FREE_FLOW_SPEED, TIME);
 
     static enum AlgorithmType
@@ -126,8 +126,8 @@ enum AlgorithmConfig
     final AlgorithmType algorithmType;
 
 
-    AlgorithmConfig(AlgorithmType algorithmType, Goal goal,
-            TravelTimeSource ttimeSource, TravelDisutilitySource tdisSource)
+    AlgorithmConfig(AlgorithmType algorithmType, Goal goal, TravelTimeSource ttimeSource,
+            TravelDisutilitySource tdisSource)
     {
         this.ttimeSource = ttimeSource;
         this.goal = goal;
@@ -150,7 +150,7 @@ enum AlgorithmConfig
 
             case AP_SCHEDULING:
                 return new APSTaxiOptimizer(optimConfig);
-                
+
             case MIP_SCHEDULING:
                 return new MIPTaxiOptimizer(optimConfig);
 

@@ -19,16 +19,13 @@
 
 package org.matsim.contrib.dynagent.examples.random;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.network.*;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleUtils;
-import org.matsim.vehicles.VehiclesFactory;
+import org.matsim.vehicles.*;
 
 
 public class RandomDynAgentSource
@@ -55,13 +52,14 @@ public class RandomDynAgentSource
         for (int i = 0; i < agentCount; i++) {
             RandomDynAgentLogic agentLogic = new RandomDynAgentLogic(network);
 
-            Id<DynAgent> id = Id.create(i, DynAgent.class);
-            Id<Link> startLinkId = RandomDynAgentLogic.chooseRandomElement(network.getLinks().keySet());
+            Id<Person> id = Id.createPersonId(i);
+            Id<Link> startLinkId = RandomDynAgentLogic.chooseRandomElement(network.getLinks()
+                    .keySet());
             DynAgent agent = new DynAgent(id, startLinkId, qSim, agentLogic);
 
             qSim.createAndParkVehicleOnLink(
-                    qSimVehicleFactory.createVehicle(Id.create(id, Vehicle.class), VehicleUtils.getDefaultVehicleType()),
-                    startLinkId);
+                    qSimVehicleFactory.createVehicle(Id.create(id, Vehicle.class),
+                            VehicleUtils.getDefaultVehicleType()), startLinkId);
             qSim.insertAgentIntoMobsim(agent);
         }
     }

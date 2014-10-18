@@ -21,10 +21,13 @@ package org.matsim.contrib.dynagent;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.*;
 import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.vehicles.Vehicle;
 
 
 public class DynAgent
@@ -32,7 +35,7 @@ public class DynAgent
 {
     private DynAgentLogic agentLogic;
 
-    private Id id;
+    private Id<Person> id;
 
     private MobsimVehicle veh;
 
@@ -44,7 +47,7 @@ public class DynAgent
 
     private DynLeg dynLeg;
 
-    private Id currentLinkId;
+    private Id<Link> currentLinkId;
 
     // =====
 
@@ -53,7 +56,7 @@ public class DynAgent
 
     // =====
 
-    public DynAgent(Id id, Id startLinkId, Netsim netsim, DynAgentLogic agentLogic)
+    public DynAgent(Id<Person> id, Id<Link> startLinkId, Netsim netsim, DynAgentLogic agentLogic)
     {
         this.id = id;
         this.currentLinkId = startLinkId;
@@ -129,7 +132,7 @@ public class DynAgent
 
 
     @Override
-    public Id getId()
+    public Id<Person> getId()
     {
         return id;
     }
@@ -150,7 +153,7 @@ public class DynAgent
 
 
     @Override
-    public final Id getPlannedVehicleId()
+    public final Id<Vehicle> getPlannedVehicleId()
     {
         if (state != State.LEG) {
             throw new IllegalStateException();// return null;
@@ -158,7 +161,7 @@ public class DynAgent
 
         // according to PersonDriverAgentImpl:
         // we still assume the vehicleId is the agentId if no vehicleId is given.
-        return id;
+        return Id.create(id, Vehicle.class);
     }
 
 
@@ -177,28 +180,28 @@ public class DynAgent
 
 
     @Override
-    public Id getCurrentLinkId()
+    public Id<Link> getCurrentLinkId()
     {
         return currentLinkId;
     }
 
 
     @Override
-    public Id getDestinationLinkId()
+    public Id<Link> getDestinationLinkId()
     {
         return dynLeg.getDestinationLinkId();
     }
 
 
     @Override
-    public Id chooseNextLinkId()
+    public Id<Link> chooseNextLinkId()
     {
         return dynLeg.getNextLinkId();
     }
 
 
     @Override
-    public void notifyMoveOverNode(Id newLinkId)
+    public void notifyMoveOverNode(Id<Link> newLinkId)
     {
         dynLeg.movedOverNode(newLinkId);
         currentLinkId = newLinkId;
@@ -219,7 +222,7 @@ public class DynAgent
 
 
     @Override
-    public void notifyArrivalOnLinkByNonNetworkMode(Id linkId)
+    public void notifyArrivalOnLinkByNonNetworkMode(Id<Link> linkId)
     {
         dynLeg.arrivedOnLinkByNonNetworkMode(linkId);
         currentLinkId = linkId;

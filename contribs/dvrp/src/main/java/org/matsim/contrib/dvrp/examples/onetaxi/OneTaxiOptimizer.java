@@ -130,7 +130,7 @@ public class OneTaxiOptimizer
         }
 
         currentTask.setEndTime(now);
-        
+
         List<AbstractTask> tasks = schedule.getTasks();
         int nextTaskIdx = currentTask.getTaskIdx() + 1;
 
@@ -140,12 +140,12 @@ public class OneTaxiOptimizer
             task.setBeginTime(task.getBeginTime() + diff);
             task.setEndTime(task.getEndTime() + diff);
         }
-        
+
         //wait task
         if (nextTaskIdx != tasks.size()) {
             Task waitTask = tasks.get(tasks.size() - 1);
             waitTask.setBeginTime(waitTask.getBeginTime() + diff);
-            
+
             double tEnd = Math.max(waitTask.getBeginTime(), vehicle.getT1());
             waitTask.setEndTime(tEnd);
         }

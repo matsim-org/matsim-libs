@@ -19,10 +19,7 @@
 
 package playground.michalm.zone.util;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.geotools.geometry.jts.GeometryCollector;
 import org.matsim.api.core.v01.Id;
@@ -30,10 +27,7 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import playground.michalm.zone.Zone;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.geom.TopologyException;
+import com.vividsolutions.jts.geom.*;
 import com.vividsolutions.jts.geom.util.PolygonExtracter;
 
 
@@ -66,11 +60,11 @@ public class SubzoneUtils
         }
 
         //TODO check out if geometries overlay one another!!!
-        
+
         if (topologyExceptionCount > 0) {
             System.err.println(topologyExceptionCount + " ignored TopologyExceptions");
         }
-        
+
         return polygonsByZone;
     }
 }

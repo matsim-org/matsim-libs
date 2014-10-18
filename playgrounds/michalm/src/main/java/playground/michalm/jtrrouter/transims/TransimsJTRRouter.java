@@ -82,7 +82,6 @@ public class TransimsJTRRouter
 
 
     protected void writePlans(String dir)
-        throws IOException
     {
         Collections.sort(plans);
 
@@ -106,14 +105,17 @@ public class TransimsJTRRouter
 
 
     private PrintWriter initWriter(String dir, String file)
-        throws IOException
     {
-        return new PrintWriter(new BufferedWriter(new FileWriter(dir + "\\" + file)));
+        try {
+            return new PrintWriter(new BufferedWriter(new FileWriter(dir + "\\" + file)));
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
     public static void main(String[] args)
-        throws Exception
     {
         String dir = System.getProperty("dir");
         String flowsFile = System.getProperty("flows");

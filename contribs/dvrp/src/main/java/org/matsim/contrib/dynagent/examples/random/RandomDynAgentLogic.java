@@ -64,7 +64,7 @@ public class RandomDynAgentLogic
         if (MatsimRandom.getRandom().nextInt(100) == 0) {
             return new StaticDynActivity("Laziness", Double.POSITIVE_INFINITY);
         }
-        
+
         //Do I want to stay or drive? (50-50 choice)
         if (MatsimRandom.getRandom().nextBoolean()) {
             return new RandomDynActivity(now);
@@ -75,7 +75,7 @@ public class RandomDynAgentLogic
     }
 
 
-     static <E> E chooseRandomElement(Set<E> set)
+    static <E> E chooseRandomElement(Set<E> set)
     {
         int randomIndex = MatsimRandom.getRandom().nextInt(set.size());
         return Iterators.get(set.iterator(), randomIndex);

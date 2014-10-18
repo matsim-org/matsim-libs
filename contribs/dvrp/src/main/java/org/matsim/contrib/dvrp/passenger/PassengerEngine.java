@@ -125,7 +125,7 @@ public class PassengerEngine
 
 
     @Override
-    public boolean handleDeparture(double now, MobsimAgent agent, Id fromLinkId)
+    public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> fromLinkId)
     {
         if (!agent.getMode().equals(mode)) {
             return false;

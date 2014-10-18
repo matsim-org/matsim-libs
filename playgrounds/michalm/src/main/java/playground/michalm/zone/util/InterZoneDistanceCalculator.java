@@ -64,24 +64,26 @@ public class InterZoneDistanceCalculator
 
 
     private void readZoneCentroids(String filename)
-        throws FileNotFoundException
     {
         NetworkImpl network = (NetworkImpl)scenario.getNetwork();
         List<ZoneCentroid> zoneCentroidList = new ArrayList<>();
 
-        Scanner scanner = new Scanner(new File(filename));
-        scanner.nextLine();// skip the header line
+        try (Scanner scanner = new Scanner(new File(filename))) {
+            scanner.nextLine();// skip the header line
 
-        while (scanner.hasNext()) {
-            int zoneId = scanner.nextInt();
-            double x = scanner.nextDouble();
-            double y = scanner.nextDouble();
-            Node node = network.getNearestNode(scenario.createCoord(x, y));
+            while (scanner.hasNext()) {
+                int zoneId = scanner.nextInt();
+                double x = scanner.nextDouble();
+                double y = scanner.nextDouble();
+                Node node = network.getNearestNode(scenario.createCoord(x, y));
 
-            zoneCentroidList.add(new ZoneCentroid(zoneId, node));
+                zoneCentroidList.add(new ZoneCentroid(zoneId, node));
+            }
+        }
+        catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
         }
 
-        scanner.close();
         zoneCentroids = zoneCentroidList.toArray(new ZoneCentroid[zoneCentroidList.size()]);
     }
 
@@ -98,39 +100,39 @@ public class InterZoneDistanceCalculator
 
 
     private void writeDistances(String filename)
-        throws IOException
     {
         File file = new File(filename);
-        BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
 
-        // Header line
-        bw.write("\t");
-        for (ZoneCentroid j : zoneCentroids) {
-            bw.write(j.zoneId + "\t");
-        }
-
-        bw.newLine();
-
-        // normal lines
-        for (ZoneCentroid i : zoneCentroids) {
-            System.out.println(i.zoneId + "...");
-
-            bw.write(i.zoneId + "\t");
+            // Header line
+            bw.write("\t");
             for (ZoneCentroid j : zoneCentroids) {
-                Path path = router.calcLeastCostPath(i.node, j.node, 0, null, null);
-                bw.write(path.travelCost + "\t");
+                bw.write(j.zoneId + "\t");
             }
 
             bw.newLine();
-        }
 
-        bw.close();
+            // normal lines
+            for (ZoneCentroid i : zoneCentroids) {
+                System.out.println(i.zoneId + "...");
+
+                bw.write(i.zoneId + "\t");
+                for (ZoneCentroid j : zoneCentroids) {
+                    Path path = router.calcLeastCostPath(i.node, j.node, 0, null, null);
+                    bw.write(path.travelCost + "\t");
+                }
+
+                bw.newLine();
+            }
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
     public void go(String networkFilename, String centroidsFilename, String distancesFilename,
             boolean distanceMode)
-        throws IOException
     {
         readNetwork(networkFilename);
         readZoneCentroids(centroidsFilename);
@@ -140,7 +142,6 @@ public class InterZoneDistanceCalculator
 
 
     public static void main(String[] args)
-        throws IOException
     {
         String networkFilename = "d:\\PP-rad\\poznan\\network.xml";
         String centroidsFilename = "d:\\PP-rad\\poznan\\wspol_centr.txt";

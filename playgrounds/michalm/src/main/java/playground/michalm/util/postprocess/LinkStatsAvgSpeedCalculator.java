@@ -28,7 +28,6 @@ import playground.michalm.util.postprocess.LinkStatsReader.LinkStats;
 public class LinkStatsAvgSpeedCalculator
 {
     public static void main(String[] args)
-        throws IOException
     {
         String dir = "d:\\PP-rad\\poznan\\";
         String linkStatsFile = dir + "40.linkstats-filtered.txt.gz";
@@ -51,6 +50,9 @@ public class LinkStatsAvgSpeedCalculator
                 double avgSpeed = 3.6 * hrsLengthSum[i] / hrsTTSum[i];
                 pw.println(i + "\t" + avgSpeed);
             }
+        }
+        catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
         }
     }
 }

@@ -46,12 +46,15 @@ public class PoznanTaxiZoneReader
 
 
     private void read(String txtFile)
-        throws IOException
     {
-        reader = new BufferedReader(new FileReader(txtFile));
-        Map<String, Coord> coords = readCoords();
-        readZones(coords);
-        reader.close();
+        try (BufferedReader r = new BufferedReader(new FileReader(txtFile))) {
+            this.reader = r;
+            Map<String, Coord> coords = readCoords();
+            readZones(coords);
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
@@ -130,7 +133,6 @@ public class PoznanTaxiZoneReader
 
 
     public static void main(String[] args)
-        throws IOException
     {
         String input = "d:/PP-rad/taxi/poznan-supply/dane/rejony/gps.txt";
         String zonesXmlFile = "d:/PP-rad/taxi/poznan-supply/dane/rejony/taxi_zones.xml";

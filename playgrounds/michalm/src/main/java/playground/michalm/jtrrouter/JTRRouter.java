@@ -19,7 +19,6 @@
 
 package playground.michalm.jtrrouter;
 
-import java.io.IOException;
 import java.util.*;
 
 import org.apache.commons.configuration.*;
@@ -62,7 +61,6 @@ public abstract class JTRRouter
 
 
     public void generate(String dir, String flowsFile, String turnsFile)
-        throws Exception
     {
         readConfigs(dir, flowsFile, turnsFile);
         // long t1 = System.currentTimeMillis();
@@ -77,7 +75,6 @@ public abstract class JTRRouter
 
 
     protected void readConfigs(String dir, String flowsFile, String turnsFile)
-        throws ConfigurationException, IOException
     {
 
         // process flows.xml
@@ -87,25 +84,30 @@ public abstract class JTRRouter
         // ....
         // </flows>
 
-        HierarchicalConfiguration flowCfg = new XMLConfiguration(dir + "\\" + flowsFile);
+        try {
+            HierarchicalConfiguration flowCfg = new XMLConfiguration(dir + "\\" + flowsFile);
 
-        genStartTime = flowCfg.getInt("[@startTime]");
-        genStopTime = flowCfg.getInt("[@stopTime]");
-        genPeriod = genStopTime - genStartTime;
+            genStartTime = flowCfg.getInt("[@startTime]");
+            genStopTime = flowCfg.getInt("[@stopTime]");
+            genPeriod = genStopTime - genStartTime;
 
-        flowFactor = flowCfg.getDouble("[@flowFactor]");
+            flowFactor = flowCfg.getDouble("[@flowFactor]");
 
-        int count = flowCfg.getMaxIndex("flow") + 1;
-        for (int i = 0; i < count; i++) {
-            initFlow((HierarchicalConfiguration)flowCfg.subset("flow(" + i + ')'));
+            int count = flowCfg.getMaxIndex("flow") + 1;
+            for (int i = 0; i < count; i++) {
+                initFlow((HierarchicalConfiguration)flowCfg.subset("flow(" + i + ')'));
+            }
+
+            // process turns.xml
+            HierarchicalConfiguration nodeCfg = new XMLConfiguration(dir + "\\" + turnsFile);
+
+            count = nodeCfg.getMaxIndex("turn") + 1;
+            for (int i = 0; i < count; i++) {
+                initTurn((HierarchicalConfiguration)nodeCfg.subset("turn(" + i + ')'));
+            }
         }
-
-        // process turns.xml
-        HierarchicalConfiguration nodeCfg = new XMLConfiguration(dir + "\\" + turnsFile);
-
-        count = nodeCfg.getMaxIndex("turn") + 1;
-        for (int i = 0; i < count; i++) {
-            initTurn((HierarchicalConfiguration)nodeCfg.subset("turn(" + i + ')'));
+        catch (ConfigurationException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -238,6 +240,5 @@ public abstract class JTRRouter
     protected abstract void addPlan(int id, int startTime, Route route, int subFlow);
 
 
-    protected abstract void writePlans(String dir)
-        throws IOException, Exception;
+    protected abstract void writePlans(String dir);
 }

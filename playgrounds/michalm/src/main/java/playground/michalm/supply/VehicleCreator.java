@@ -21,6 +21,7 @@ package playground.michalm.supply;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
 
+
 public interface VehicleCreator
 {
     Vehicle createVehicle(double t0, double t1);

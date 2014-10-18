@@ -29,9 +29,10 @@ import org.matsim.core.mobsim.qsim.QSim;
 
 
 /**
- * This does, if I see it correctly, prebook a trip for every passenger already at the beginning of the simulation.  
- * For taxis, I would think that it is only useful as a benchmark.  It may be realistic for certain types of
- * courier services (where all requests are known before the day starts). kai, jul'14
+ * This does, if I see it correctly, prebook a trip for every passenger already at the beginning of
+ * the simulation. For taxis, I would think that it is only useful as a benchmark. It may be
+ * realistic for certain types of courier services (where all requests are known before the day
+ * starts). kai, jul'14
  */
 public class BeforeSimulationTripPrebooker
     implements MobsimInitializedListener

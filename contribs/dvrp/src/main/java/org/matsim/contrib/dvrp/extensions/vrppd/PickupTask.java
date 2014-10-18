@@ -19,8 +19,6 @@
 
 package org.matsim.contrib.dvrp.extensions.vrppd;
 
-
-
 public interface PickupTask
     extends VRPPDTask
 {

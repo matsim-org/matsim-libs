@@ -19,30 +19,20 @@
 
 package playground.michalm.jtrrouter.matsim;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.io.*;
+import java.util.*;
 
 import org.apache.commons.configuration.HierarchicalConfiguration;
-import org.apache.velocity.Template;
-import org.apache.velocity.VelocityContext;
+import org.apache.velocity.*;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.context.Context;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.network.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.michalm.jtrrouter.JTRRouter;
-import playground.michalm.jtrrouter.Route;
+import playground.michalm.jtrrouter.*;
 
 
 /**
@@ -66,7 +56,7 @@ public class MATSimJTRRouter
 
 
     @Override
-		protected void initFlow(HierarchicalConfiguration flowCfg)
+    protected void initFlow(HierarchicalConfiguration flowCfg)
     {
         // int node = flowCfg.getInt("[@node]");
 
@@ -100,15 +90,14 @@ public class MATSimJTRRouter
 
 
     @Override
-		protected void addPlan(int id, int startTime, Route route, int subFlow)
+    protected void addPlan(int id, int startTime, Route route, int subFlow)
     {
         plans.add(new MATSimPlan(id, route, startTime, startTime + TRAVEL_TIME));
     }
 
 
     @Override
-		protected void writePlans(String dir)
-        throws Exception
+    protected void writePlans(String dir)
     {
         Properties p = new Properties();
         p.setProperty("resource.loader", "class");
@@ -123,14 +112,16 @@ public class MATSimJTRRouter
                 .getTemplate("pl/poznan/put/transims/demand/matsim/plans.xml.vm");
         File planFile = new File(dir + "\\plans.xml");
 
-        Writer writer = new BufferedWriter(new FileWriter(planFile));
-        template.merge(context, writer);
-        writer.close();
+        try (Writer writer = new BufferedWriter(new FileWriter(planFile))) {
+            template.merge(context, writer);
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
     public static void main(String[] args)
-        throws Exception
     {
         String dir = System.getProperty("dir");
         String flowsFile = System.getProperty("flows");

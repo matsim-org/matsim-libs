@@ -41,8 +41,7 @@ public class VehicleGenerator
     private double currentTimePeriod;
 
 
-    public VehicleGenerator(double minWorkTime, double maxWorkTime,
-            VehicleCreator vehicleCreator)
+    public VehicleGenerator(double minWorkTime, double maxWorkTime, VehicleCreator vehicleCreator)
     {
         this.minWorkTime = minWorkTime;
         this.maxWorkTime = maxWorkTime;
@@ -60,7 +59,7 @@ public class VehicleGenerator
             removeVehiclesOnT1();
 
             int vehsToAdd = calculateNumberOfVehiclesToAdd(vehicleCounts[i]);
-            
+
             if (vehsToAdd > 0) {
                 addVehicles(vehsToAdd);
             }
@@ -129,7 +128,7 @@ public class VehicleGenerator
             double t0 = uniform.nextDouble(currentTimePeriod, maxT0);
             double workTime = uniform.nextDouble(minWorkTime, maxWorkTime);
             Vehicle veh = vehicleCreator.createVehicle(t0, t0 + workTime);
-            
+
             activeVehicles.add(veh);
             vehicles.add(veh);
         }

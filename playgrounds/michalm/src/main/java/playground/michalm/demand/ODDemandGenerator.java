@@ -21,21 +21,12 @@ package playground.michalm.demand;
 
 import java.util.Map;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.matrices.Entry;
-import org.matsim.matrices.Matrix;
+import org.matsim.matrices.*;
 
-import pl.poznan.put.util.random.RandomUtils;
-import pl.poznan.put.util.random.UniformRandom;
+import pl.poznan.put.util.random.*;
 import playground.michalm.util.matrices.MatrixUtils;
 import playground.michalm.zone.Zone;
 
@@ -97,8 +88,7 @@ public class ODDemandGenerator
                     Route r = new GenericRouteImpl(startAct.getLinkId(), endAct.getLinkId());
                     leg.setRoute(r);
                 }
-                leg.setDepartureTime(startAct.getEndTime());     
-
+                leg.setDepartureTime(startAct.getEndTime());
 
                 plan.addActivity(startAct);
                 plan.addLeg(leg);

@@ -232,7 +232,7 @@ public class ScheduleImpl<T extends AbstractTask>
         }
         else { // STARTED
             currentTask.status = TaskStatus.PERFORMED;
-// TODO ??            currentTask.setTaskTracker(null);
+            // TODO ??            currentTask.setTaskTracker(null);
             nextIdx = currentTask.taskIdx + 1;
         }
 

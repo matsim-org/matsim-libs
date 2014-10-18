@@ -22,8 +22,7 @@ package playground.michalm.taxi.optimizer.mip;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.network.*;
 import org.matsim.utils.LeastCostPathTree.NodeData;
 
 
@@ -46,11 +45,11 @@ public class PathTreeBasedTravelTimeCalculator
 
         Map<Id<Node>, NodeData> tree = leastCostPathTrees.getTree(fromLink);
         NodeData nodeData = tree.get(toLink.getFromNode().getId());
-        
+
         double tt = 1;//getting over the first node
         tt += nodeData.getTime();//travelling along the path
         tt += toLink.getLength() / toLink.getFreespeed();//travelling the last link (approx.)
-        
+
         return tt;
     }
 }

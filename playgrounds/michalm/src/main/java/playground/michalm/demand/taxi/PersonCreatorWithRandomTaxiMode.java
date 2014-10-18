@@ -75,7 +75,6 @@ public class PersonCreatorWithRandomTaxiMode
 
 
     public void writeTaxiCustomers(String taxiCustomersFile)
-        throws IOException
     {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(taxiCustomersFile)))) {
             for (Person p : taxiCustomers) {

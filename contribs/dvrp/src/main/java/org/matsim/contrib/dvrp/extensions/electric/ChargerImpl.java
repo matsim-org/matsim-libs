@@ -19,8 +19,7 @@
 
 package org.matsim.contrib.dvrp.extensions.electric;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
 
 

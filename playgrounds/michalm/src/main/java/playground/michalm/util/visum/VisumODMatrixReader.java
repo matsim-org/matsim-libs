@@ -27,63 +27,63 @@ import java.util.*;
 public class VisumODMatrixReader
 {
     public static double[][] readMatrixFile(File file)
-        throws FileNotFoundException
     {
-        Scanner scanner = new Scanner(file);
-        scanner.useLocale(Locale.US);
+        try (Scanner scanner = new Scanner(file)) {
+            scanner.useLocale(Locale.US);
 
-        scanner.nextLine(); // $V;D2;Y5
-        scanner.nextLine(); // *
-        scanner.nextLine(); // * time interval
-        scanner.nextLine(); // 0.00 0.00
-        scanner.nextLine(); // * factor
-        scanner.nextLine(); // 1.000000
-        scanner.nextLine(); // * Number of zones
-        int nZones = scanner.nextInt(); // 417
+            scanner.nextLine(); // $V;D2;Y5
+            scanner.nextLine(); // *
+            scanner.nextLine(); // * time interval
+            scanner.nextLine(); // 0.00 0.00
+            scanner.nextLine(); // * factor
+            scanner.nextLine(); // 1.000000
+            scanner.nextLine(); // * Number of zones
+            int nZones = scanner.nextInt(); // 417
 
-        // =================
+            // =================
 
-        scanner.next(); // *
-        scanner.next(); // Zone
-        scanner.next(); // numbers
-
-        // Id[] zoneIds = new Id[nZones];
-
-        for (int i = 0; i < nZones; i++) {
-            // zoneIds[i] = scenario.createId(scanner.next());
-            scanner.next();
-        }
-
-        // =================
-
-        for (int i = 0; i < nZones;) {
-            if (scanner.next().charAt(0) != '*') {
-                i++;
-            }
-        }
-
-        // =================
-
-        double[][] odMatrix = (double[][])Array.newInstance(double.class, nZones, nZones);
-
-        for (int i = 0; i < nZones; i++) {
             scanner.next(); // *
-            scanner.next(); // 1
-            scanner.next(); // 0.00
+            scanner.next(); // Zone
+            scanner.next(); // numbers
 
-            for (int j = 0; j < nZones; j++) {
-                odMatrix[i][j] = scanner.nextDouble();
+            // Id[] zoneIds = new Id[nZones];
+
+            for (int i = 0; i < nZones; i++) {
+                // zoneIds[i] = scenario.createId(scanner.next());
+                scanner.next();
             }
+
+            // =================
+
+            for (int i = 0; i < nZones;) {
+                if (scanner.next().charAt(0) != '*') {
+                    i++;
+                }
+            }
+
+            // =================
+
+            double[][] odMatrix = (double[][])Array.newInstance(double.class, nZones, nZones);
+
+            for (int i = 0; i < nZones; i++) {
+                scanner.next(); // *
+                scanner.next(); // 1
+                scanner.next(); // 0.00
+
+                for (int j = 0; j < nZones; j++) {
+                    odMatrix[i][j] = scanner.nextDouble();
+                }
+            }
+
+            return odMatrix;
         }
-
-        scanner.close();
-
-        return odMatrix;
+        catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
     public static void main(String[] args)
-        throws IOException
     {
         readMatrixFile(new File("d:\\eTaxi\\Poznan_MATSim\\odMatricesByType\\D_I_0-1"));
     }
