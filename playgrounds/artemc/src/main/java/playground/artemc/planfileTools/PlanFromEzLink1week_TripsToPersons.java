@@ -20,7 +20,7 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
 import playground.artemc.utils.DataBaseAdmin;
 import playground.artemc.utils.NoConnectionException;
 
-public class plansFileFromEzLink1week_TripsToPersons extends MatsimXmlWriter{
+public class PlanFromEzLink1week_TripsToPersons extends MatsimXmlWriter{
 
 	/**
 	 * @param args
@@ -54,7 +54,7 @@ public class plansFileFromEzLink1week_TripsToPersons extends MatsimXmlWriter{
 		Integer journeysCount=0;
 		
 		
-		plansFileFromEzLink1week_TripsToPersons plansFileFromEzLink = new plansFileFromEzLink1week_TripsToPersons();
+		PlanFromEzLink1week_TripsToPersons plansFileFromEzLink = new PlanFromEzLink1week_TripsToPersons();
 		plansFileFromEzLink.writeHeader();
 		
 		//MATSim object for coordinate transformation

@@ -41,7 +41,7 @@ import playground.artemc.utils.DataBaseAdmin;
 import playground.artemc.utils.NoConnectionException;
 
 
-public class plansFileFromEzLink_JourneysToPersons_Routed extends MatsimXmlWriter{
+public class PlansFileFromEzLink_JourneysToPersons_Routed extends MatsimXmlWriter{
 
 	static String outputPlanFilePath; 
 
@@ -107,7 +107,7 @@ public class plansFileFromEzLink_JourneysToPersons_Routed extends MatsimXmlWrite
 		scenario.getConfig().scenario().setUseTransit(true);
 		new TransitScheduleReader(scenario).readFile("C:/Work/MATSim/inputMATSimSingapore2.2/transit/transitSchedule.xml.gz");		
 
-		plansFileFromEzLink_JourneysToPersons_Routed plansFileFromEzLink = new plansFileFromEzLink_JourneysToPersons_Routed();
+		PlansFileFromEzLink_JourneysToPersons_Routed plansFileFromEzLink = new PlansFileFromEzLink_JourneysToPersons_Routed();
 		plansFileFromEzLink.writeHeader();
 
 		//MATSim object for coordinate transformation

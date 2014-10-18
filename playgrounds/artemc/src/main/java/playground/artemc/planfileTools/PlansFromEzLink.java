@@ -20,7 +20,7 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
 import playground.artemc.utils.DataBaseAdmin;
 import playground.artemc.utils.NoConnectionException;
 
-public class plansFileFromEzLink extends MatsimXmlWriter{
+public class PlansFromEzLink extends MatsimXmlWriter{
 
 	/**
 	 * @param args
@@ -53,7 +53,7 @@ public class plansFileFromEzLink extends MatsimXmlWriter{
 		Double previousEndLon=0.0;
 		
 		
-		plansFileFromEzLink plansFileFromEzLink = new plansFileFromEzLink();
+		PlansFromEzLink plansFileFromEzLink = new PlansFromEzLink();
 		plansFileFromEzLink.writeHeader();
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation("WGS84", "WGS84_UTM48N"); 
 		ResultSet agents = dba.executeQuery("SELECT DISTINCT CARD_ID FROM trips_ver1 ORDER BY RAND() LIMIT 10");
