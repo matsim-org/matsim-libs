@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.artemc.scoreAnalyzer;
+package playground.artemc.scoring;
 
 import java.util.HashMap;
 

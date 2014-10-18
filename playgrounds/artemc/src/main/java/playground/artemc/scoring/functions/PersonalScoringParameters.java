@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.artemc.scoreAnalyzer.functions;
+package playground.artemc.scoring.functions;
 
 import java.util.Collections;
 import java.util.Map;

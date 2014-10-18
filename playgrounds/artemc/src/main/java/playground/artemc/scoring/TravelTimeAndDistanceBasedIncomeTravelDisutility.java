@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.artemc.scoreAnalyzer;
+package playground.artemc.scoring;
 
 import java.util.HashMap;
 

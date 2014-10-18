@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.artemc.scoreAnalyzer.functions;
+package playground.artemc.scoring.functions;
 
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;

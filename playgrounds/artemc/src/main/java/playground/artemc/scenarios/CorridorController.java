@@ -23,12 +23,12 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 import playground.artemc.annealing.SimpleAnnealer;
 import playground.artemc.dwellTimeModel.QSimFactory;
-import playground.artemc.scoreAnalyzer.DisaggIncomeCharyparNagelScoringFunctionFactory;
-import playground.artemc.scoreAnalyzer.DisaggIncomeScoreAnalyzer;
-import playground.artemc.scoreAnalyzer.DisaggregatedCharyparNagelScoringFunctionFactory;
-import playground.artemc.scoreAnalyzer.DisaggregatedScoreAnalyzer;
-import playground.artemc.scoreAnalyzer.TravelTimeAndDistanceBasedIncomeTravelDisutility;
-import playground.artemc.scoreAnalyzer.TravelTimeAndDistanceBasedIncomeTravelDisutilityFactory;
+import playground.artemc.scoring.DisaggIncomeCharyparNagelScoringFunctionFactory;
+import playground.artemc.scoring.DisaggIncomeScoreAnalyzer;
+import playground.artemc.scoring.DisaggregatedCharyparNagelScoringFunctionFactory;
+import playground.artemc.scoring.DisaggregatedScoreAnalyzer;
+import playground.artemc.scoring.TravelTimeAndDistanceBasedIncomeTravelDisutility;
+import playground.artemc.scoring.TravelTimeAndDistanceBasedIncomeTravelDisutilityFactory;
 import playground.artemc.socialCost.MeanTravelTimeCalculator;
 import playground.artemc.socialCost.WelfareAnalysisControlerListener;
 import playground.artemc.socialCost.vehicleOccupancy.VehicleOccupancy;

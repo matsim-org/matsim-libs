@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.artemc.scoreAnalyzer.functions;
+package playground.artemc.scoring.functions;
 
 import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.MoneyScoring;

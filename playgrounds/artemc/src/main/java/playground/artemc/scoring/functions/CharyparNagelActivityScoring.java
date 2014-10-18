@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.artemc.scoreAnalyzer.functions;
+package playground.artemc.scoring.functions;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;

@@ -1,4 +1,4 @@
-package playground.artemc.scoreAnalyzer;
+package playground.artemc.scoring;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

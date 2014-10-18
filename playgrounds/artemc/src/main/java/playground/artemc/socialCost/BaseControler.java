@@ -15,8 +15,8 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.artemc.annealing.SimpleAnnealer;
-import playground.artemc.scoreAnalyzer.DisaggregatedCharyparNagelScoringFunctionFactory;
-import playground.artemc.scoreAnalyzer.DisaggregatedScoreAnalyzer;
+import playground.artemc.scoring.DisaggregatedCharyparNagelScoringFunctionFactory;
+import playground.artemc.scoring.DisaggregatedScoreAnalyzer;
 
 
 public class BaseControler {
