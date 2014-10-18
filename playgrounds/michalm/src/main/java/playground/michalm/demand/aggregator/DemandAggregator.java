@@ -45,7 +45,7 @@ public class DemandAggregator
     private final DateDiscretizer dateDiscretizer;
     private final Matrices matrices = new Matrices();
 
-    private final Map<TripType, MutableInt> counters = new EnumMap<TripType, MutableInt>(
+    private final Map<TripType, MutableInt> counters = new EnumMap<>(
             TripType.class);
 
 

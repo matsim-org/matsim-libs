@@ -67,7 +67,7 @@ public class InterZoneDistanceCalculator
         throws FileNotFoundException
     {
         NetworkImpl network = (NetworkImpl)scenario.getNetwork();
-        List<ZoneCentroid> zoneCentroidList = new ArrayList<ZoneCentroid>();
+        List<ZoneCentroid> zoneCentroidList = new ArrayList<>();
 
         Scanner scanner = new Scanner(new File(filename));
         scanner.nextLine();// skip the header line

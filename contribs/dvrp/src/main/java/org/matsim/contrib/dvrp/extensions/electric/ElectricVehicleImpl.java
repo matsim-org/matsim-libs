@@ -21,7 +21,7 @@ package org.matsim.contrib.dvrp.extensions.electric;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.VehicleImpl;
+import org.matsim.contrib.dvrp.data.*;
 
 
 public class ElectricVehicleImpl
@@ -31,7 +31,7 @@ public class ElectricVehicleImpl
     private Battery battery;
 
 
-    public ElectricVehicleImpl(Id id, Link startLink, double capacity, double t0, double t1)
+    public ElectricVehicleImpl(Id<Vehicle> id, Link startLink, double capacity, double t0, double t1)
     {
         super(id, startLink, capacity, t0, t1);
     }

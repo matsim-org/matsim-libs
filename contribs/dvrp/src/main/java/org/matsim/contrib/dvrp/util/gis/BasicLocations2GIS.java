@@ -29,7 +29,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 
 // taken from org.matsim.utils.gis.matsim2esri.network.Nodes2ESRIShape
-public class BasicLocations2GIS<T extends BasicLocation>
+public class BasicLocations2GIS<T extends BasicLocation<T>>
 {
     private List<T> basicLocations;
     private String filename;
@@ -46,9 +46,9 @@ public class BasicLocations2GIS<T extends BasicLocation>
 
     public void write()
     {
-        Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+        Collection<SimpleFeature> features = new ArrayList<>();
 
-        for (BasicLocation bl : basicLocations) {
+        for (BasicLocation<T> bl : basicLocations) {
             features.add(getFeature(bl.getCoord()));
         }
 

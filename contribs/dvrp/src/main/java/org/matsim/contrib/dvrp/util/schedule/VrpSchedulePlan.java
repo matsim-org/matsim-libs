@@ -50,7 +50,7 @@ public class VrpSchedulePlan
     {
         this.vehicle = vehicle;
 
-        actsLegs = new ArrayList<PlanElement>();
+        actsLegs = new ArrayList<>();
         unmodifiableActsLegs = Collections.unmodifiableList(actsLegs);
 
         populFactory = scenario.getPopulation().getFactory();
@@ -110,7 +110,7 @@ public class VrpSchedulePlan
         if (length > 1) {// means: fromLink != toLink
 
             // all except the first and last ones (== fromLink and toLink)
-            ArrayList<Id<Link>> linkIdList = new ArrayList<Id<Link>>(length - 1);
+            ArrayList<Id<Link>> linkIdList = new ArrayList<>(length - 1);
 
             for (int i = 1; i < length - 1; i++) {
                 linkIdList.add(path.getLink(i).getId());

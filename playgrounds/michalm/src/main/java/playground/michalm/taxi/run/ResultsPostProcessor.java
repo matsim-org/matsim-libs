@@ -36,7 +36,7 @@ public class ResultsPostProcessor
         {
             this.demand = demand;
             this.taxis = taxis;
-            this.stats = new ArrayList<Stats>();
+            this.stats = new ArrayList<>();
         }
     }
 

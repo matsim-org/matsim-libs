@@ -74,9 +74,13 @@ public class AssignmentProblem
 
     private List<VrpPathWithTravelData[]> createVrpPaths()
     {
-        List<VrpPathWithTravelData[]> paths = new ArrayList<VrpPathWithTravelData[]>(
+        List<VrpPathWithTravelData[]> paths = new  ArrayList<>(
                 rData.urgentReqCount);
 
+        //TODO this does not make sense
+        //if only imm reqs then rMin = rData.urgentReqCount = rData.dimension
+        //if both imm+adv then rMin should be urgentReqCount + soonUrgentReqCount
+        
         int rMin = Math.max(rData.urgentReqCount, Math.min(rData.dimension, vData.dimension));
         Max maxArrivalTimeForRMinRequests = new Max();
 

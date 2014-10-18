@@ -36,7 +36,7 @@ public class ZoneXmlWriter
     private void writeZones()
     {
         for (Zone z : zones.values()) {
-            List<Tuple<String, String>> atts = new ArrayList<Tuple<String, String>>();
+            List<Tuple<String, String>> atts = new ArrayList<>();
             atts.add(new Tuple<String, String>("id", z.getId().toString()));
             atts.add(new Tuple<String, String>("type", z.getType()));
             writeStartTag("zone", atts, true);

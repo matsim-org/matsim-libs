@@ -48,6 +48,6 @@ public class Flow
         this.isInFlow = isInFlow;
         this.isOutFlow = isOutFlow;
 
-        routes = new ArrayList<Route>();
+        routes = new ArrayList<>();
     }
 }

@@ -19,22 +19,13 @@
 
 package playground.michalm.demand.poznan.taxi;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Scanner;
+import java.io.*;
+import java.text.*;
+import java.util.*;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.data.Request;
-import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.api.core.v01.*;
+import org.matsim.core.utils.geometry.*;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.vehicles.Vehicle;
 
 
 public class ServedRequestsReader
@@ -44,15 +35,13 @@ public class ServedRequestsReader
     private final CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(
             TransformationFactory.WGS84, TransformationFactory.WGS84_UTM33N);
 
-    private final Scenario scenario;
     private final List<ServedRequest> requests;
 
     private Scanner scanner;
 
 
-    public ServedRequestsReader(Scenario scenario, List<ServedRequest> requests)
+    public ServedRequestsReader(List<ServedRequest> requests)
     {
-        this.scenario = scenario;
         this.requests = requests;
     }
 
@@ -71,12 +60,12 @@ public class ServedRequestsReader
 
         while (scanner.hasNext()) {
             //2014_02_000001  01-02-2014 00:00:26  01-02-2014 00:00:22  16.964106  52.401409  16.898370  52.428270  329
-            Id<Request> id = Id.create(scanner.next(), Request.class);
+            Id<ServedRequest> id = Id.create(scanner.next(), ServedRequest.class);
             Date accepted = getNextDate();
             Date assigned = getNextDate();
             Coord from = getNextCoord();
             Coord to = getNextCoord();
-            Id<Vehicle> taxiId = Id.create(scanner.next(), Vehicle.class);
+            Id<String> taxiId = Id.create(scanner.next(), String.class);
             requests.add(new ServedRequest(id, accepted, assigned, from, to, taxiId));
         }
 

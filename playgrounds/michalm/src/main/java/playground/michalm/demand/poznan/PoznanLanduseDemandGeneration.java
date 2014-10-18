@@ -19,30 +19,16 @@
 
 package playground.michalm.demand.poznan;
 
-import static playground.michalm.demand.poznan.PoznanLanduseDemandGeneration.ActivityType.EDUCATION;
-import static playground.michalm.demand.poznan.PoznanLanduseDemandGeneration.ActivityType.HOME;
-import static playground.michalm.demand.poznan.PoznanLanduseDemandGeneration.ActivityType.NON_HOME;
-import static playground.michalm.demand.poznan.PoznanLanduseDemandGeneration.ActivityType.OTHER;
-import static playground.michalm.demand.poznan.PoznanLanduseDemandGeneration.ActivityType.SHOPPING;
-import static playground.michalm.demand.poznan.PoznanLanduseDemandGeneration.ActivityType.WORK;
+import static playground.michalm.demand.poznan.PoznanLanduseDemandGeneration.ActivityType.*;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.EnumMap;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Scanner;
 
 import javax.naming.ConfigurationException;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.*;
 import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -50,24 +36,16 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.matrices.Matrix;
 import org.xml.sax.SAXException;
 
-import pl.poznan.put.util.random.RandomUtils;
-import pl.poznan.put.util.random.WeightedRandomSelectionTable;
-import playground.michalm.demand.ActivityCreator;
-import playground.michalm.demand.DefaultActivityCreator;
+import pl.poznan.put.util.random.*;
+import playground.michalm.demand.*;
 import playground.michalm.demand.DefaultActivityCreator.GeometryProvider;
 import playground.michalm.demand.DefaultActivityCreator.PointAcceptor;
-import playground.michalm.demand.DefaultPersonCreator;
-import playground.michalm.demand.ODDemandGenerator;
-import playground.michalm.demand.PersonCreator;
 import playground.michalm.util.matrices.MatrixUtils;
 import playground.michalm.util.visum.VisumODMatrixReader;
-import playground.michalm.zone.Zone;
-import playground.michalm.zone.Zones;
+import playground.michalm.zone.*;
 import playground.michalm.zone.util.SubzoneUtils;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.*;
 
 
 public class PoznanLanduseDemandGeneration
@@ -164,21 +142,21 @@ public class PoznanLanduseDemandGeneration
 
     private Scenario scenario;
     private Map<Id<Zone>, Zone> zones;
-    private Map<Id, ZoneLanduseValidation> zoneLanduseValidation;
+    private Map<Id<Zone>, ZoneLanduseValidation> zoneLanduseValidation;
     private EnumMap<ActivityPair, Double> prtCoeffs;
 
-    private Map<Id, List<Polygon>> forestByZone;
-    private Map<Id, List<Polygon>> industrialByZone;
-    private Map<Id, List<Polygon>> residentialByZone;
-    private Map<Id, List<Polygon>> schoolByZone;
-    private Map<Id, List<Polygon>> shopByZone;
+    private Map<Id<Zone>, List<Polygon>> forestByZone;
+    private Map<Id<Zone>, List<Polygon>> industrialByZone;
+    private Map<Id<Zone>, List<Polygon>> residentialByZone;
+    private Map<Id<Zone>, List<Polygon>> schoolByZone;
+    private Map<Id<Zone>, List<Polygon>> shopByZone;
 
     private ODDemandGenerator dg;
 
     private final EnumSet<ActivityType> constrainedActivities = EnumSet.of(HOME, WORK, EDUCATION,
             SHOPPING);
 
-    private WeightedRandomSelectionTable<Id, ActivityType, Polygon> selectionTable;
+    private WeightedRandomSelectionTable<Id<Zone>, ActivityType, Polygon> selectionTable;
 
 
     public void generate(String dirName)
@@ -230,7 +208,7 @@ public class PoznanLanduseDemandGeneration
     private void readValidatedZones(String validatedZonesFile)
         throws FileNotFoundException
     {
-        zoneLanduseValidation = new HashMap<Id, ZoneLanduseValidation>();
+        zoneLanduseValidation = new HashMap<>();
         Scanner scanner = new Scanner(new File(validatedZonesFile));
 
         scanner.nextLine();// skip the header
@@ -247,7 +225,7 @@ public class PoznanLanduseDemandGeneration
     }
 
 
-    private Map<Id, List<Polygon>> getLandusePolygonsByZone(String shpFile)
+    private Map<Id<Zone>, List<Polygon>> getLandusePolygonsByZone(String shpFile)
     {
         System.out.println("getLanduseByZone() for: " + shpFile);
         return SubzoneUtils.extractSubzonePolygons(zones, ShapeFileReader.getAllFeatures(shpFile));
@@ -259,8 +237,8 @@ public class PoznanLanduseDemandGeneration
         selectionTable = WeightedRandomSelectionTable.createWithArrayTable(
                 zoneLanduseValidation.keySet(), constrainedActivities);
 
-        for (Entry<Id, ZoneLanduseValidation> e : zoneLanduseValidation.entrySet()) {
-            Id zoneId = e.getKey();
+        for (Entry<Id<Zone>, ZoneLanduseValidation> e : zoneLanduseValidation.entrySet()) {
+            Id<Zone> zoneId = e.getKey();
             ZoneLanduseValidation validation = e.getValue();
             Zone zone = zones.get(zoneId);
 
@@ -297,8 +275,7 @@ public class PoznanLanduseDemandGeneration
     static EnumMap<ActivityPair, Double> readPrtCoeffs(String put2PrtRatiosFile)
         throws FileNotFoundException
     {
-        EnumMap<ActivityPair, Double> prtCoeffs = new EnumMap<ActivityPair, Double>(
-                ActivityPair.class);
+        EnumMap<ActivityPair, Double> prtCoeffs = new EnumMap<>(ActivityPair.class);
         Scanner scanner = new Scanner(new File(put2PrtRatiosFile));
 
         while (scanner.hasNext()) {

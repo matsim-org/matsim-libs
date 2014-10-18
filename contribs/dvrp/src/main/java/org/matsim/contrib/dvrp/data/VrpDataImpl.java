@@ -28,8 +28,8 @@ import java.util.*;
 public class VrpDataImpl
     implements VrpData
 {
-    private final List<Vehicle> vehicles = new ArrayList<Vehicle>();
-    private final List<Request> requests = new ArrayList<Request>();
+    private final List<Vehicle> vehicles = new ArrayList<>();
+    private final List<Request> requests = new ArrayList<>();
 
     private final List<Vehicle> unmodifiableVehicles = Collections.unmodifiableList(vehicles);
     private final List<Request> unmodifiableRequests = Collections.unmodifiableList(requests);

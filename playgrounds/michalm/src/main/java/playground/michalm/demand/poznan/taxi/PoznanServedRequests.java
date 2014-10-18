@@ -21,8 +21,6 @@ package playground.michalm.demand.poznan.taxi;
 
 import java.util.*;
 
-import org.matsim.api.core.v01.Scenario;
-
 import playground.michalm.demand.poznan.taxi.ServedRequests.WeekDay;
 import playground.michalm.zone.poznan.PoznanZones;
 
@@ -34,13 +32,13 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 public class PoznanServedRequests
 {
     //e.g. months = "234"
-    public static List<ServedRequest> readRequests(Scenario scenario, int... months)
+    public static List<ServedRequest> readRequests(int... months)
     {
-        List<ServedRequest> requests = new ArrayList<ServedRequest>();
+        List<ServedRequest> requests = new ArrayList<>();
         String path = "d:/PP-rad/taxi/poznan-supply/zlecenia_obsluzone/Zlecenia_obsluzone_2014-0";
 
         for (int m : months) {
-            new ServedRequestsReader(scenario, requests).readFile(path + m + ".csv");
+            new ServedRequestsReader(requests).readFile(path + m + ".csv");
         }
 
         return requests;
@@ -65,11 +63,15 @@ public class PoznanServedRequests
         //TODO WEIRD JAVAC COMPILER PROBLEM:
         //necessary casting from Predicate<ServedRequest> to Predicate<? super ServedRequest>
         Predicate<? super ServedRequest> orPredicate = Predicates.or(
-                (Predicate<? super ServedRequest>)ServedRequests.createBetweenDatesPredicate(midnight("01-03"), midnight("02-03")),
-                (Predicate<? super ServedRequest>)ServedRequests.createBetweenDatesPredicate(midnight("30-03"), midnight("01-04")),
-                (Predicate<? super ServedRequest>)ServedRequests.createBetweenDatesPredicate(midnight("15-04"), midnight("23-04")),
-                (Predicate<? super ServedRequest>)ServedRequests.createBetweenDatesPredicate(midnight("30-04"), midnight("01-05")));
-        
+                (Predicate<? super ServedRequest>)ServedRequests.createBetweenDatesPredicate(
+                        midnight("01-03"), midnight("02-03")),
+                (Predicate<? super ServedRequest>)ServedRequests.createBetweenDatesPredicate(
+                        midnight("30-03"), midnight("01-04")),
+                (Predicate<? super ServedRequest>)ServedRequests.createBetweenDatesPredicate(
+                        midnight("15-04"), midnight("23-04")),
+                (Predicate<? super ServedRequest>)ServedRequests.createBetweenDatesPredicate(
+                        midnight("30-04"), midnight("01-05")));
+
         return Iterables.filter(requests, Predicates.not(orPredicate));
     }
 

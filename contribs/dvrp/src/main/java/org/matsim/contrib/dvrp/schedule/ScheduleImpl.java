@@ -43,7 +43,7 @@ public class ScheduleImpl<T extends AbstractTask>
     {
         this.vehicle = vehicle;
 
-        tasks = new ArrayList<T>();
+        tasks = new ArrayList<>();
         unmodifiableTasks = (List)Collections.unmodifiableList(tasks);
 
         status = ScheduleStatus.UNPLANNED;

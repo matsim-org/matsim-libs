@@ -56,7 +56,7 @@ public class DynActivityEngine
 
     public DynActivityEngine()
     {
-        activityEndTimes = new HashMap<Id, EndTimeEntry>();
+        activityEndTimes = new HashMap<>();
     }
 
 

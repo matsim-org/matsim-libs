@@ -28,7 +28,7 @@ import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 public class VehicleImpl
     implements Vehicle
 {
-    private final Id id;
+    private final Id<Vehicle> id;
     private final Link startLink;
     private final double capacity;
 
@@ -41,7 +41,7 @@ public class VehicleImpl
     private VrpAgentLogic agentLogic;
 
 
-    public VehicleImpl(Id id, Link startLink, double capacity, double t0, double t1)
+    public VehicleImpl(Id<Vehicle> id, Link startLink, double capacity, double t0, double t1)
     {
         this.id = id;
         this.startLink = startLink;
@@ -54,7 +54,7 @@ public class VehicleImpl
 
 
     @Override
-    public Id getId()
+    public Id<Vehicle> getId()
     {
         return id;
     }

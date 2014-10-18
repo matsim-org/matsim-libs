@@ -96,7 +96,7 @@ public class TaxiOptimizerWithPreassignment
         }
 
         List<Vehicle> vehicles = context.getVrpData().getVehicles();
-        Map<Id<Request>, Vehicle> reqIdToVehMap = new HashMap<Id<Request>, Vehicle>();
+        Map<Id<Request>, Vehicle> reqIdToVehMap = new HashMap<>();
 
         while (scanner.hasNext()) {
             Id<Request> reqId = Id.create(scanner.next(), Request.class);

@@ -22,21 +22,17 @@ package org.matsim.contrib.dvrp.passenger;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
+import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.*;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.mobsim.qsim.interfaces.*;
 
 
 public class PassengerEngine
@@ -95,12 +91,14 @@ public class PassengerEngine
 
 
     /**
-     * This is to register an advance booking.  The method is called when, in reality, the request is made.
+     * This is to register an advance booking. The method is called when, in reality, the request is
+     * made.
      * 
      * @param now -- time when trip is booked
      * @param passenger
-     * @param leg -- contains information about the departure time. yyyy Michal, Joschka, note that in MATSim leg departure times may
-     * be meaningless; the only thing that truly matters is the activity end time.  Is your code defensive against that? kai, jul'14
+     * @param leg -- contains information about the departure time. yyyy Michal, Joschka, note that
+     *        in MATSim leg departure times may be meaningless; the only thing that truly matters is
+     *        the activity end time. Is your code defensive against that? kai, jul'14
      * @return
      */
     public boolean prebookTrip(double now, MobsimPassengerAgent passenger, Leg leg)
@@ -171,7 +169,7 @@ public class PassengerEngine
         Map<Id<Link>, ? extends Link> links = context.getScenario().getNetwork().getLinks();
         Link fromLink = links.get(fromLinkId);
         Link toLink = links.get(toLinkId);
-        Id<PassengerRequest> id = Id.create(mode + "_" + nextId++, PassengerRequest.class);
+        Id<Request> id = Id.create(mode + "_" + nextId++, Request.class);
 
         PassengerRequest request = requestCreator.createRequest(id, passenger, fromLink, toLink,
                 departureTime, departureTime, now);
@@ -186,7 +184,7 @@ public class PassengerEngine
             MobsimDriverAgent driver, PassengerRequest request, double now)
     {
         MobsimPassengerAgent passenger = request.getPassenger();
-        Id linkId = driver.getCurrentLinkId();
+        Id<Link> linkId = driver.getCurrentLinkId();
 
         if (passenger.getCurrentLinkId() != linkId || passenger.getState() != State.LEG
                 || !passenger.getMode().equals(mode)) {

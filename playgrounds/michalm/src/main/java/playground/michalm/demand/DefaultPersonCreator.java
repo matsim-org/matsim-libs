@@ -31,7 +31,6 @@ import playground.michalm.zone.Zone;
 public class DefaultPersonCreator
     implements PersonCreator
 {
-    private final Scenario scenario;
     private final PopulationFactory pf;
     private final String idFormat;
     private int currentAgentId = 0;
@@ -46,7 +45,6 @@ public class DefaultPersonCreator
     //idFormat: e.g. "%07d", "taxi_customer_%04d"... 
     public DefaultPersonCreator(Scenario scenario, String idFormat)
     {
-        this.scenario = scenario;
         this.pf = scenario.getPopulation().getFactory();
         this.idFormat = idFormat;
     }

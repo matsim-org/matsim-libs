@@ -19,21 +19,17 @@
 
 package playground.michalm.zone;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.*;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.TransformException;
+import org.opengis.referencing.operation.*;
 
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.*;
 import com.vividsolutions.jts.geom.util.PolygonExtracter;
 
 
@@ -42,7 +38,7 @@ public class Zones
     public static Map<Id<Zone>, Zone> readZones(Scenario scenario, String zonesXmlFile,
             String zonesShpFile)
     {
-        ZoneXmlReader xmlReader = new ZoneXmlReader(scenario);
+        ZoneXmlReader xmlReader = new ZoneXmlReader();
         xmlReader.parse(zonesXmlFile);
         Map<Id<Zone>, Zone> zones = xmlReader.getZones();
 
@@ -60,7 +56,7 @@ public class Zones
     }
 
 
-    public static void transformZones(Map<Id, Zone> zones, String fromCoordSystem,
+    public static void transformZones(Map<Id<Zone>, Zone> zones, String fromCoordSystem,
             String toCoordSystem)
     {
         MathTransform transform = getTransform(fromCoordSystem, toCoordSystem);

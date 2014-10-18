@@ -25,21 +25,21 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 
 
 public class Zone
-    implements Identifiable
+    implements Identifiable<Zone>
 {
-    private final Id id;
+    private final Id<Zone> id;
     private final String type;
     private MultiPolygon multiPolygon;
 
 
-    public Zone(Id id, String type)
+    public Zone(Id<Zone> id, String type)
     {
         this.id = id;
         this.type = type;
     }
 
 
-    public Zone(Id id, String type, MultiPolygon multiPolygon)
+    public Zone(Id<Zone> id, String type, MultiPolygon multiPolygon)
     {
         this.id = id;
         this.type = type;
@@ -48,7 +48,7 @@ public class Zone
 
 
     @Override
-    public Id getId()
+    public Id<Zone> getId()
     {
         return id;
     }

@@ -29,7 +29,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 
 public class AdvancedRequestStorage
 {
-    private final Map<Id, Queue<PassengerRequest>> advanceRequests = new HashMap<Id, Queue<PassengerRequest>>();
+    private final Map<Id, Queue<PassengerRequest>> advanceRequests = new HashMap<>();
     private final MatsimVrpContext context;
 
 
@@ -45,7 +45,7 @@ public class AdvancedRequestStorage
         Queue<PassengerRequest> passengerAdvReqs = advanceRequests.get(passengerId);
 
         if (passengerAdvReqs == null) {
-            passengerAdvReqs = new PriorityQueue<PassengerRequest>(3, Requests.T0_COMPARATOR);
+            passengerAdvReqs = new PriorityQueue<>(3, Requests.T0_COMPARATOR);
             advanceRequests.put(passengerId, passengerAdvReqs);
         }
 

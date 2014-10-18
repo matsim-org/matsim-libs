@@ -22,9 +22,10 @@ package playground.michalm.taxi.optimizer.mip;
 import java.util.*;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.dvrp.data.Request;
 
 import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.optimizer.*;
+import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
 
 import com.google.common.collect.Iterables;
 
@@ -32,7 +33,7 @@ import com.google.common.collect.Iterables;
 class MIPRequestData
 {
     final TaxiRequest[] requests;
-    final Map<Id, Integer> reqIdToIdx = new HashMap<Id, Integer>();
+    final Map<Id<Request>, Integer> reqIdToIdx = new HashMap<>();
     final int dimension;
 
 

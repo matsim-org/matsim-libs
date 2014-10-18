@@ -21,7 +21,7 @@ package org.matsim.contrib.dvrp.examples.onetaxi;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.RequestImpl;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
@@ -38,7 +38,7 @@ public class OneTaxiRequest
     private OneTaxiServeTask dropoffTask;
 
 
-    public OneTaxiRequest(Id id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
+    public OneTaxiRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
             double time)
     {
         //I want a taxi now: t0 == t1 == submissionTime

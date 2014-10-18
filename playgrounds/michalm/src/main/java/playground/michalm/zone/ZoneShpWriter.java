@@ -53,7 +53,7 @@ public class ZoneShpWriter
         PolygonFeatureFactory factory = new PolygonFeatureFactory.Builder()
                 .addAttribute(ID_HEADER, String.class).setCrs(crs).setName("zone").create();
 
-        List<SimpleFeature> features = new ArrayList<SimpleFeature>();
+        List<SimpleFeature> features = new ArrayList<>();
         for (Zone z : zones.values()) {
             String id = z.getId() + "";
             features.add(factory.createPolygon(z.getMultiPolygon(), new Object[] { id }, id));

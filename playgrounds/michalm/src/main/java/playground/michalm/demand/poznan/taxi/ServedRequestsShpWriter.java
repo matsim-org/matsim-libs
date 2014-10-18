@@ -21,9 +21,6 @@ package playground.michalm.demand.poznan.taxi;
 
 import java.util.*;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.run.VrpConfigUtils;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.*;
@@ -37,8 +34,7 @@ public class ServedRequestsShpWriter
     private final String coordinateSystem;
 
 
-    public ServedRequestsShpWriter(Iterable<ServedRequest> servedRequests,
-            String coordinateSystem)
+    public ServedRequestsShpWriter(Iterable<ServedRequest> servedRequests, String coordinateSystem)
     {
         this.servedRequests = servedRequests;
         this.coordinateSystem = coordinateSystem;
@@ -58,8 +54,8 @@ public class ServedRequestsShpWriter
                 addAttribute("taxi_id", String.class).//
                 setCrs(crs).setName("point").create();
 
-        List<SimpleFeature> origins = new ArrayList<SimpleFeature>();
-        List<SimpleFeature> destinations = new ArrayList<SimpleFeature>();
+        List<SimpleFeature> origins = new ArrayList<>();
+        List<SimpleFeature> destinations = new ArrayList<>();
         for (ServedRequest r : servedRequests) {
             String id = r.id + "";
 
@@ -82,16 +78,14 @@ public class ServedRequestsShpWriter
 
     public static void main(String[] args)
     {
-        Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
-
-        Iterable<ServedRequest> requests = PoznanServedRequests.readRequests(scenario, 2);
+        Iterable<ServedRequest> requests = PoznanServedRequests.readRequests(2);
         requests = PoznanServedRequests.filterRequestsWithinAgglomeration(requests);
 
         String shpPath = "d:/PP-rad/taxi/poznan-supply/zlecenia_obsluzone/GIS/";
         String originsShpFile = shpPath + "origins_2014_02.shp";
         String destinationsShpFile = shpPath + "destinations_2014_02.shp";
 
-        new ServedRequestsShpWriter(requests, TransformationFactory.WGS84_UTM33N)
-                .write(originsShpFile, destinationsShpFile);
+        new ServedRequestsShpWriter(requests, TransformationFactory.WGS84_UTM33N).write(
+                originsShpFile, destinationsShpFile);
     }
 }

@@ -62,7 +62,7 @@ public class Schedules2GIS
 
         for (Vehicle v : vehicles) {
             Iterable<DriveTask> drives = Schedules.createDriveTaskIter(v.getSchedule());
-            Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+            Collection<SimpleFeature> features = new ArrayList<>();
 
             for (DriveTask drive : drives) {
                 Coordinate[] coords = createLineString(drive);
@@ -88,7 +88,7 @@ public class Schedules2GIS
             return null;
         }
 
-        List<Coordinate> coordList = new ArrayList<Coordinate>();
+        List<Coordinate> coordList = new ArrayList<>();
 
         for (Link l : path) {
             Coord c = l.getToNode().getCoord();

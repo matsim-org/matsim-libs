@@ -57,7 +57,7 @@ class MIPSolutionFinder
         final boolean[][] x = new boolean[m + n][m + n];
         final double[] w = new double[n];
 
-        Queue<TaxiRequest> queue = new PriorityQueue<TaxiRequest>(n, Requests.T0_COMPARATOR);
+        Queue<TaxiRequest> queue = new PriorityQueue<>(n, Requests.T0_COMPARATOR);
         Collections.addAll(queue, rData.requests);
 
         new FIFOSchedulingProblem(optimConfig).scheduleUnplannedRequests(queue);

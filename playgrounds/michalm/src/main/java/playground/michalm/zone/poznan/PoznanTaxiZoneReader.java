@@ -19,32 +19,17 @@
 
 package playground.michalm.zone.poznan;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.TreeMap;
+import java.io.*;
+import java.util.*;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.run.VrpConfigUtils;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.api.core.v01.*;
+import org.matsim.core.utils.geometry.*;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
-import playground.michalm.zone.Zone;
-import playground.michalm.zone.Zones;
+import playground.michalm.zone.*;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.*;
 
 
 public class PoznanTaxiZoneReader
@@ -52,14 +37,7 @@ public class PoznanTaxiZoneReader
     private BufferedReader reader;
     private GeometryFactory geometryFactory = new GeometryFactory();
 
-    private final Scenario scenario;
-    private final Map<Id<Zone>, Zone> zones = new TreeMap<Id<Zone>, Zone>();
-
-
-    public PoznanTaxiZoneReader(Scenario scenario)
-    {
-        this.scenario = scenario;
-    }
+    private final Map<Id<Zone>, Zone> zones = new TreeMap<>();
 
 
     public Map<Id<Zone>, Zone> getZones()
@@ -83,7 +61,7 @@ public class PoznanTaxiZoneReader
     {
         CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(
                 TransformationFactory.WGS84, TransformationFactory.WGS84_UTM33N);
-        Map<String, Coord> coords = new HashMap<String, Coord>();
+        Map<String, Coord> coords = new HashMap<>();
 
         String firstLine = reader.readLine();
         if (!firstLine.equals("PUNKTY")) {
@@ -159,8 +137,7 @@ public class PoznanTaxiZoneReader
         String zonesXmlFile = "d:/PP-rad/taxi/poznan-supply/dane/rejony/taxi_zones.xml";
         String zonesShpFile = "d:/PP-rad/taxi/poznan-supply/dane/rejony/taxi_zones.shp";
 
-        Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
-        PoznanTaxiZoneReader zoneReader = new PoznanTaxiZoneReader(scenario);
+        PoznanTaxiZoneReader zoneReader = new PoznanTaxiZoneReader();
         zoneReader.read(input);
         Map<Id<Zone>, Zone> zones = zoneReader.getZones();
         Zones.writeZones(zones, TransformationFactory.WGS84_UTM33N, zonesXmlFile, zonesShpFile);

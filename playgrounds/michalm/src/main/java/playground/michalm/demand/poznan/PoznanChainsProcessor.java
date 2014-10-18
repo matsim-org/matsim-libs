@@ -32,7 +32,7 @@ import org.apache.poi.ss.usermodel.*;
 
 public class PoznanChainsProcessor
 {
-    private Map<String, MutableInt> chainToOccurenceMap = new HashMap<String, MutableInt>();
+    private Map<String, MutableInt> chainToOccurenceMap = new HashMap<>();
     private Sheet currentSheet;
 
 

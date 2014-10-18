@@ -51,7 +51,7 @@ public class ServedRequestsAggregator
         //Map<Id, Zone> zones = PoznanZones.readTaxiZones(scenario);
         Map<Id<Zone>, Zone> zones = PoznanZones.readVisumZones(scenario);
 
-        Iterable<ServedRequest> requests = PoznanServedRequests.readRequests(scenario, 2, 3, 4);
+        Iterable<ServedRequest> requests = PoznanServedRequests.readRequests(2, 3, 4);
         requests = PoznanServedRequests.filterNormalPeriods(requests);
         requests = PoznanServedRequests.filterWorkDaysPeriods(requests);
         requests = PoznanServedRequests.filterRequestsWithinAgglomeration(requests);

@@ -30,7 +30,7 @@ import pl.poznan.put.util.random.*;
 public class VehicleGenerator
 {
     private final UniformRandom uniform = RandomUtils.getGlobalUniform();
-    private final List<Vehicle> vehicles = new ArrayList<Vehicle>();
+    private final List<Vehicle> vehicles = new ArrayList<>();
 
     private final double minWorkTime;
     private final double maxWorkTime;
@@ -89,7 +89,7 @@ public class VehicleGenerator
     private void initQueue(double[] vehicleCounts)
     {
         int queueCapacity = (int)new Max().evaluate(vehicleCounts) + 1;
-        activeVehicles = new PriorityQueue<Vehicle>(queueCapacity, new Comparator<Vehicle>() {
+        activeVehicles = new PriorityQueue<>(queueCapacity, new Comparator<Vehicle>() {
             public int compare(Vehicle v1, Vehicle v2)
             {
                 int diff = Double.compare(v1.getT1(), v2.getT1());

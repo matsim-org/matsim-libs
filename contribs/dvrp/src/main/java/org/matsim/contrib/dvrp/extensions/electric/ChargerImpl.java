@@ -40,7 +40,7 @@ public class ChargerImpl
         this.powerInWatts = powerInWatts;
         this.link = link;
 
-        schedule = new ChargingScheduleImpl<ChargeTask>(this);
+        schedule = new ChargingScheduleImpl<>(this);
     }
 
 

@@ -19,12 +19,9 @@
 
 package playground.michalm.zone;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -34,14 +31,7 @@ public class ZoneXmlReader
 {
     private final static String ZONE = "zone";
 
-    private final Scenario scenario;
-    private final Map<Id<Zone>, Zone> zones = new LinkedHashMap<Id<Zone>, Zone>();
-
-
-    public ZoneXmlReader(Scenario scenario)
-    {
-        this.scenario = scenario;
-    }
+    private final Map<Id<Zone>, Zone> zones = new LinkedHashMap<>();
 
 
     public Map<Id<Zone>, Zone> getZones()

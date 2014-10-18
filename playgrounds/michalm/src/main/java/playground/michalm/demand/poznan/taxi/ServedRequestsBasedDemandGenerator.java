@@ -19,17 +19,10 @@
 
 package playground.michalm.demand.poznan.taxi;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.PopulationWriter;
+import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -50,7 +43,7 @@ public class ServedRequestsBasedDemandGenerator
 
 
     private int curentAgentId = 0;
-    private Map<Id, Integer> prebookingTimes = new HashMap<Id, Integer>();
+    private Map<Id<Person>, Integer> prebookingTimes = new HashMap<>();
 
 
     public void generatePlansFor(Iterable<ServedRequest> requests, Date timeZero)
@@ -75,7 +68,7 @@ public class ServedRequestsBasedDemandGenerator
             plan.addActivity(pf.createActivityFromCoord("dummy", r.to));
 
             String strId = String.format("taxi_customer_%d", curentAgentId++);
-            Person person = pf.createPerson(Id.create(strId, Person.class));
+            Person person = pf.createPerson(Id.createPersonId(strId));
 
             person.addPlan(plan);
             scenario.getPopulation().addPerson(person);
@@ -103,7 +96,7 @@ public class ServedRequestsBasedDemandGenerator
     {
         Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
 
-        Iterable<ServedRequest> requests = PoznanServedRequests.readRequests(scenario, 4);
+        Iterable<ServedRequest> requests = PoznanServedRequests.readRequests(4);
         Date zeroDate = ServedRequestsReader.parseDate("09-04-2014 00:00:00");
         Date fromDate = ServedRequestsReader.parseDate("09-04-2014 04:00:00");
         Iterable<ServedRequest> filteredRequests = PoznanServedRequests.filterNext24Hours(requests,

@@ -53,7 +53,7 @@ public class MATSimJTRRouter
 {
     private static final int TRAVEL_TIME = 1800;
 
-    private final List<MATSimPlan> plans = new ArrayList<MATSimPlan>();
+    private final List<MATSimPlan> plans = new ArrayList<>();
     private Map<Id<Link>, ? extends Link> idToLinkMap;
 
 

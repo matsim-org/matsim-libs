@@ -44,7 +44,7 @@ public abstract class JTRRouter
     private final UniformRandom uniform;
 
     // temp var for route constraction
-    private List<Integer> seq = new ArrayList<Integer>();
+    private List<Integer> seq = new ArrayList<>();
     private Flow inFlow;
 
 

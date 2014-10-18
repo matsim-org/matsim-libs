@@ -152,7 +152,7 @@ public class RouteChartUtils
         Iterable<DriveTask> tasks = Schedules.createDriveTaskIter(schedule);
 
         // creating lists of DriveTasks
-        Map<TaskStatus, List<DriveTask>> taskListByStatus = new EnumMap<TaskStatus, List<DriveTask>>(
+        Map<TaskStatus, List<DriveTask>> taskListByStatus = new EnumMap<>(
                 TaskStatus.class);
 
         for (TaskStatus ts : TaskStatus.values()) {
@@ -164,7 +164,7 @@ public class RouteChartUtils
         }
 
         // creating LinkSources
-        Map<TaskStatus, CoordSource> linkSourceByStatus = new EnumMap<TaskStatus, CoordSource>(
+        Map<TaskStatus, CoordSource> linkSourceByStatus = new EnumMap<>(
                 TaskStatus.class);
 
         for (TaskStatus ts : TaskStatus.values()) {

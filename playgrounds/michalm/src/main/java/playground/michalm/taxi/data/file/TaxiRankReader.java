@@ -19,20 +19,16 @@
 
 package playground.michalm.taxi.data.file;
 
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.file.ReaderUtils;
-import org.matsim.contrib.dvrp.extensions.electric.Charger;
-import org.matsim.contrib.dvrp.extensions.electric.ChargerImpl;
+import org.matsim.contrib.dvrp.extensions.electric.*;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
-import playground.michalm.taxi.data.TaxiData;
-import playground.michalm.taxi.data.TaxiRank;
+import playground.michalm.taxi.data.*;
 
 
 public class TaxiRankReader
@@ -41,7 +37,6 @@ public class TaxiRankReader
     private final static String RANK = "rank";
     private final static String CHARGER = "charger";
 
-    private final Scenario scenario;
     private final TaxiData data;
     private Map<Id<Link>, ? extends Link> links;
 
@@ -50,9 +45,7 @@ public class TaxiRankReader
 
     public TaxiRankReader(Scenario scenario, TaxiData data)
     {
-        this.scenario = scenario;
         this.data = data;
-
         links = scenario.getNetwork().getLinks();
     }
 

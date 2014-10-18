@@ -48,7 +48,7 @@ public class SubNetworkCreator
         nr.readFile(networkFile);
 
         Network network = scenario.getNetwork();
-        List<Link> allLinks = new ArrayList<Link>(network.getLinks().values());
+        List<Link> allLinks = new ArrayList<>(network.getLinks().values());
 
         Geometry polygonGeometry = PolygonBasedFilter.readPolygonGeometry(polygonFile);
         Iterable<? extends Link> outerLinks = PolygonBasedFilter.filterLinksOutsidePolygon(

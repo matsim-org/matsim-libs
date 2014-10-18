@@ -39,10 +39,10 @@ import com.vividsolutions.jts.geom.util.PolygonExtracter;
 
 public class SubzoneUtils
 {
-    public static Map<Id, List<Polygon>> extractSubzonePolygons(Map<Id<Zone>, Zone> zones,
+    public static Map<Id<Zone>, List<Polygon>> extractSubzonePolygons(Map<Id<Zone>, Zone> zones,
             Collection<SimpleFeature> subzonePattern)
     {
-        Map<Id, List<Polygon>> polygonsByZone = new HashMap<Id, List<Polygon>>();
+        Map<Id<Zone>, List<Polygon>> polygonsByZone = new HashMap<>();
         int topologyExceptionCount = 0;
 
         for (Zone z : zones.values()) {

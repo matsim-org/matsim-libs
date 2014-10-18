@@ -35,7 +35,7 @@ public class PersonCreatorWithRandomTaxiMode
 {
     private final UniformRandom uniform = RandomUtils.getGlobalUniform();
 
-    private final List<Person> taxiCustomers = new ArrayList<Person>();
+    private final List<Person> taxiCustomers = new ArrayList<>();
     private final double taxiProbability;
 
 
@@ -92,7 +92,7 @@ public class PersonCreatorWithRandomTaxiMode
     {
         try {
             BufferedReader br = new BufferedReader(new FileReader(new File(taxiCustomersFile)));
-            List<String> taxiCustomerIds = new ArrayList<String>();
+            List<String> taxiCustomerIds = new ArrayList<>();
 
             String line;
             while ( (line = br.readLine()) != null) {

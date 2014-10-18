@@ -52,7 +52,7 @@ public class RandomVehicleGenerator
         Link[] links = linkCollection.toArray(new Link[linkCollection.size()]);
         UniformRandom uniform = RandomUtils.getGlobalUniform();
 
-        List<Vehicle> vehicles = new ArrayList<Vehicle>(count);
+        List<Vehicle> vehicles = new ArrayList<>(count);
         for (int i = 0; i < count; i++) {
             Id<Vehicle> id = Id.create(i + "", Vehicle.class);
             Link startLink = links[uniform.nextInt(0, links.length - 1)];

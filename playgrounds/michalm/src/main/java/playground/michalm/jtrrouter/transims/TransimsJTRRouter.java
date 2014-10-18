@@ -35,8 +35,8 @@ public class TransimsJTRRouter
 {
     private static final int TRAVEL_TIME = 1800;
 
-    private final List<TransimsPlan> plans = new ArrayList<TransimsPlan>();
-    private final List<TransimsVehicle> vehicles = new ArrayList<TransimsVehicle>();
+    private final List<TransimsPlan> plans = new ArrayList<>();
+    private final List<TransimsVehicle> vehicles = new ArrayList<>();
 
 
     // <flow node="10" inParking="1" outParking="2" next="2">

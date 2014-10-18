@@ -5,7 +5,7 @@ import java.util.Comparator;
 
 public class VehicleRequestPaths
 {
-    //    public static final Predicate<VehicleRequestPath> BELOW_TRIP_TIME_LIMIT = new Predicate<VehicleRequestPath>() {
+    //    public static final Predicate<VehicleRequestPath> BELOW_TRIP_TIME_LIMIT = new Predicate<>() {
     //        @Override
     //        public boolean apply(VehicleRequestPath vrp)
     //        {

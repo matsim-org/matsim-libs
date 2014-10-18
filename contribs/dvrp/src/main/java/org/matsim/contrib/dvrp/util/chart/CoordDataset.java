@@ -40,8 +40,8 @@ public class CoordDataset
 
     public CoordDataset()
     {
-        seriesKeys = new ArrayList<Comparable<String>>();
-        seriesList = new ArrayList<CoordSource>();
+        seriesKeys = new ArrayList<>();
+        seriesList = new ArrayList<>();
     }
 
 

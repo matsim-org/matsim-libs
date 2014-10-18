@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.Id;
 public class AwaitingPickupStorage
 {
     //passenger's request id -> driver's stay task
-    private final Map<Id, PassengerPickupActivity> awaitingPickups = new HashMap<Id, PassengerPickupActivity>();
+    private final Map<Id, PassengerPickupActivity> awaitingPickups = new HashMap<>();
 
 
     public void storeAwaitingPickup(PassengerRequest request, PassengerPickupActivity pickupActivity)

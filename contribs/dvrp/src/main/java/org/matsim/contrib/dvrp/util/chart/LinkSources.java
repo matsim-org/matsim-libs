@@ -59,7 +59,7 @@ public class LinkSources
     }
 
 
-    public static <T extends BasicLocation> CoordSource createFromBasicLocations(
+    public static <T extends BasicLocation<T>> CoordSource createFromBasicLocations(
             final List<T> basicLocations)
     {
         return new AbstractCoordSource<T>(basicLocations) {

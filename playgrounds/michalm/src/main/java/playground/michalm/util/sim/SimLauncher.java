@@ -26,6 +26,7 @@ import org.matsim.core.controler.Controler;
 
 public class SimLauncher
 {
+    @SuppressWarnings("deprecation")
     public static void main(String[] args)
     {
         String dirName;

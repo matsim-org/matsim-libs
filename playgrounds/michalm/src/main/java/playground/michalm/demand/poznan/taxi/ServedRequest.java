@@ -26,15 +26,16 @@ import org.matsim.api.core.v01.*;
 
 public class ServedRequest
 {
-    public final Id id;
+    public final Id<ServedRequest> id;
     public final Date accepted;
     public final Date assigned;
     public final Coord from;
     public final Coord to;
-    public final Id taxiId;
+    public final Id<String> taxiId;
 
 
-    public ServedRequest(Id id, Date accepted, Date assigned, Coord from, Coord to, Id taxiId)
+    public ServedRequest(Id<ServedRequest> id, Date accepted, Date assigned, Coord from, Coord to,
+            Id<String> taxiId)
     {
         this.id = id;
         this.accepted = accepted;

@@ -22,8 +22,6 @@ package playground.michalm.demand.aggregator;
 import java.text.*;
 import java.util.Date;
 
-import org.apache.commons.lang3.StringUtils;
-
 
 public class FormatBasedDateDiscretizer
     implements DateDiscretizer

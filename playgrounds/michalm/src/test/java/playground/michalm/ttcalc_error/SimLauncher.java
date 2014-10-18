@@ -29,6 +29,7 @@ import org.matsim.core.router.util.TravelTime;
 
 public class SimLauncher
 {
+    @SuppressWarnings("deprecation")
     public static void main(String[] args)
     {
         String cfg = "src/test/java/playground/michalm/ttcalc_error/error_1/config.xml";

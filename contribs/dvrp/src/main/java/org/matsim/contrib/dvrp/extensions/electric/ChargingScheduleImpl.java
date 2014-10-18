@@ -38,7 +38,7 @@ public class ChargingScheduleImpl<T extends ChargeTask>
     {
         this.chargingStation = chargingStation;
 
-        tasks = new ArrayList<T>();
+        tasks = new ArrayList<>();
         unmodifiableTasks = (List)Collections.unmodifiableList(tasks);
 
         currentTask = null;

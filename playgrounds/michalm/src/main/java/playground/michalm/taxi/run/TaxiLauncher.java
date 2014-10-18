@@ -99,7 +99,7 @@ class TaxiLauncher
 
     static Map<String, String> getDefaultParams()
     {
-        Map<String, String> params = new HashMap<String, String>();
+        Map<String, String> params = new HashMap<>();
 
         params.put("dir", "D:\\PP-rad\\taxi\\mielec-2-peaks\\");
         params.put("netFile", "network.xml");

@@ -26,7 +26,6 @@ import java.util.*;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
 import org.matsim.contrib.dvrp.schedule.*;
-import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.*;
@@ -102,7 +101,7 @@ public class NOSTaxiOptimizer
 
     private void initIdleVehicles()
     {
-        idleVehicles = new HashSet<Vehicle>();
+        idleVehicles = new HashSet<>();
 
         for (Vehicle veh : optimConfig.context.getVrpData().getVehicles()) {
             if (optimConfig.scheduler.isIdle(veh)) {

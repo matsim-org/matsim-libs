@@ -60,7 +60,7 @@ public class EliminateExcessiveNodes
         Network network = scenario.getNetwork();
         new MatsimNetworkReader(scenario).readFile(inNetworkFile);
 
-        List<Node> nodesToBeRemoved = new ArrayList<Node>();
+        List<Node> nodesToBeRemoved = new ArrayList<>();
 
         for (Node node : network.getNodes().values()) {
             if (node.getInLinks().size() == 1 && node.getOutLinks().size() == 1) {

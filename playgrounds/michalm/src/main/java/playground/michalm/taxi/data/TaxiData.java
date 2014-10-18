@@ -29,8 +29,8 @@ public class TaxiData
     extends VrpDataImpl
     implements ElectricVrpData
 {
-    private final List<TaxiRank> taxiRanks = new ArrayList<TaxiRank>();
-    private final List<Charger> chargers = new ArrayList<Charger>();
+    private final List<TaxiRank> taxiRanks = new ArrayList<>();
+    private final List<Charger> chargers = new ArrayList<>();
 
     private final List<TaxiRank> unmodifiableTaxiRanks = Collections.unmodifiableList(taxiRanks);
     private final List<Charger> unmodifiableChargers = Collections.unmodifiableList(chargers);

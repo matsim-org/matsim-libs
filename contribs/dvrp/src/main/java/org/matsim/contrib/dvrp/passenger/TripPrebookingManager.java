@@ -55,7 +55,7 @@ public class TripPrebookingManager
     };
 
     private final PassengerEngine passengerEngine;
-    private final Queue<PrebookingEntry> prebookingQueue = new PriorityQueue<PrebookingEntry>(111,
+    private final Queue<PrebookingEntry> prebookingQueue = new PriorityQueue<>(111,
             BOOKING_COMPARATOR);
 
 

@@ -29,7 +29,7 @@ import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
  * @author michalm
  */
 public interface Vehicle
-    extends Identifiable
+    extends Identifiable<Vehicle>
 {
     Link getStartLink();// TODO or just BasicLocation getStartLocation()?? and getEndLocation()??
 

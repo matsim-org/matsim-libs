@@ -19,18 +19,13 @@
 
 package playground.michalm.taxi.data.file;
 
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.VrpData;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.data.file.ReaderUtils;
-import org.matsim.contrib.dvrp.extensions.electric.Battery;
-import org.matsim.contrib.dvrp.extensions.electric.BatteryImpl;
-import org.matsim.contrib.dvrp.extensions.electric.ElectricVehicle;
-import org.matsim.contrib.dvrp.extensions.electric.ElectricVehicleImpl;
+import org.matsim.contrib.dvrp.extensions.electric.*;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -40,16 +35,13 @@ public class ElectricVehicleReader
 {
     private final static String VEHICLE = "vehicle";
 
-    private Scenario scenario;
     private VrpData data;
     private Map<Id<Link>, ? extends Link> links;
 
 
     public ElectricVehicleReader(Scenario scenario, VrpData data)
     {
-        this.scenario = scenario;
         this.data = data;
-
         links = scenario.getNetwork().getLinks();
     }
 
@@ -70,7 +62,7 @@ public class ElectricVehicleReader
 
     private void startVehicle(Attributes atts)
     {
-        Id<ElectricVehicle> id = Id.create(atts.getValue("id"), ElectricVehicle.class);
+        Id<Vehicle> id = Id.create(atts.getValue("id"), Vehicle.class);
 
         Id<Link> startLinkId = Id.create(atts.getValue("start_link"), Link.class);
         Link startLink = links.get(startLinkId);

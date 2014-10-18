@@ -63,7 +63,8 @@ public class MatrixUtils
             boolean denseMatrix)
     {
         Matrix matrix = new Matrix(id, null);
-        Id[] idArray = Iterables.toArray(ids, Id.class);
+        @SuppressWarnings("unchecked")
+        Id<Zone>[] idArray = Iterables.toArray(ids, Id.class);
 
         for (int i = 0; i < idArray.length; i++) {
             for (int j = 0; j < idArray.length; j++) {

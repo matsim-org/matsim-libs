@@ -30,7 +30,7 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 
 
 public class TaxiRank
-    implements BasicLocation
+    implements BasicLocation<TaxiRank>
 {
     private final Id<TaxiRank> id;
     private final String name;
@@ -47,7 +47,7 @@ public class TaxiRank
         this.name = name;
         this.link = link;
         this.capacity = STANDARDCAPACITY;
-        this.taxisInRank = new LinkedList<Vehicle>();
+        this.taxisInRank = new LinkedList<>();
     }
 
     public TaxiRank(Id<TaxiRank> id, String name, Link link, int capacity)
@@ -56,7 +56,7 @@ public class TaxiRank
         this.name = name;
         this.link = link;
         this.capacity = capacity;
-        this.taxisInRank = new LinkedList<Vehicle>();
+        this.taxisInRank = new LinkedList<>();
 
     }
 

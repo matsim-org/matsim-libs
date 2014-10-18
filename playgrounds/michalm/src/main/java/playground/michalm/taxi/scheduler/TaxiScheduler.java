@@ -426,7 +426,7 @@ public class TaxiScheduler
 
     public List<TaxiRequest> removePlannedRequestsFromAllSchedules()
     {
-        removedRequests = new ArrayList<TaxiRequest>();
+        removedRequests = new ArrayList<>();
 
         for (Vehicle veh : context.getVrpData().getVehicles()) {
             removePlannedRequestsImpl(TaxiSchedules.getSchedule(veh));
@@ -438,7 +438,7 @@ public class TaxiScheduler
 
     public List<TaxiRequest> removePlannedRequests(Schedule<TaxiTask> schedule)
     {
-        removedRequests = new ArrayList<TaxiRequest>();
+        removedRequests = new ArrayList<>();
         removePlannedRequestsImpl(schedule);
         return removedRequests;
     }
