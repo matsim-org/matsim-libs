@@ -74,7 +74,7 @@ public class TravelTimeAndDistanceBasedIncomeTravelDisutility implements TravelD
 //		}
 		// commenting this out since we think it is not (no longer?) necessary.  kai/benjamin, jun'11
 		
-		return this.marginalCostOfTime * travelTime + this.marginalCostOfDistance * link.getLength();
+		return this.marginalCostOfTime * (1.0/this.factorMap.get(person.getId())) * travelTime + this.marginalCostOfDistance * this.factorMap.get(person.getId()) * link.getLength();
 	}
 
 	@Override

@@ -22,7 +22,6 @@ package playground.artemc.scoreAnalyzer.functions;
 
 import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.MoneyScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 /**
  * This is a re-implementation of the original CharyparNagel function, based on a
@@ -30,7 +29,7 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
  * @see <a href="http://www.matsim.org/node/263">http://www.matsim.org/node/263</a>
  * @author rashid_waraich
  */
-public class CharyparNagelIncomeMoneyScoring implements MoneyScoring, BasicScoring, org.matsim.core.scoring.SumScoringFunction.MoneyScoring{
+public class CharyparNagelMoneyScoring implements MoneyScoring, BasicScoring, org.matsim.core.scoring.SumScoringFunction.MoneyScoring {
 
 	private static final double INITIAL_SCORE = 0.0;
 
@@ -38,13 +37,13 @@ public class CharyparNagelIncomeMoneyScoring implements MoneyScoring, BasicScori
 
 	private final double marginalUtilityOfMoney;
 
-	public CharyparNagelIncomeMoneyScoring(final CharyparNagelScoringParameters params, Double incomeFactor) {
-		this.marginalUtilityOfMoney = params.marginalUtilityOfMoney * incomeFactor;
+	public CharyparNagelMoneyScoring(final PersonalScoringParameters params) {
+		this.marginalUtilityOfMoney = params.marginalUtilityOfMoney;
 		this.reset();
 	}
 
-	public CharyparNagelIncomeMoneyScoring(final double marginalUtilityOfMoney, Double incomeFactor) {
-		this.marginalUtilityOfMoney = marginalUtilityOfMoney * incomeFactor;
+	public CharyparNagelMoneyScoring(final double marginalUtilityOfMoney) {
+		this.marginalUtilityOfMoney = marginalUtilityOfMoney;
 		this.reset();
 	}
 

@@ -32,11 +32,11 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.ArbitraryEventScoring;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.LegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters.Mode;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+
+import playground.artemc.scoreAnalyzer.functions.PersonalScoringParameters.Mode;
 
 /**
  * This is a re-implementation of the original CharyparNagel function, based on a
@@ -44,7 +44,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  * @see <a href="http://www.matsim.org/node/263">http://www.matsim.org/node/263</a>
  * @author rashid_waraich
  */
-public class CharyparNagelIncomeLegScoring implements LegScoring, ArbitraryEventScoring, org.matsim.core.scoring.SumScoringFunction.LegScoring, org.matsim.core.scoring.SumScoringFunction.ArbitraryEventScoring {
+public class CharyparNagelLegScoring implements LegScoring, ArbitraryEventScoring, org.matsim.core.scoring.SumScoringFunction.LegScoring, org.matsim.core.scoring.SumScoringFunction.ArbitraryEventScoring {
 
 	protected double score;
 	private double lastTime;
@@ -53,25 +53,23 @@ public class CharyparNagelIncomeLegScoring implements LegScoring, ArbitraryEvent
 	private static final double INITIAL_SCORE = 0.0;
 
 	/** The parameters used for scoring */
-	protected final CharyparNagelScoringParameters params;
+	protected final PersonalScoringParameters params;
 	private Leg currentLeg;
 	protected Network network;
 	private TransitSchedule transitSchedule;
-	private double incomeFactor;
 	private boolean nextEnterVehicleIsFirstOfTrip = true ;
 	private boolean nextStartPtLegIsFirstOfTrip = true ;
 	private boolean currentLegIsPtLeg = false;
 	private double lastActivityEndTime = Time.UNDEFINED_TIME ;
 	
-	public CharyparNagelIncomeLegScoring(final CharyparNagelScoringParameters params, Network network, Double incomeFactor) {
+	public CharyparNagelLegScoring(final PersonalScoringParameters params, Network network) {
 		this.params = params;
 		this.network = network;
-		this.incomeFactor = incomeFactor;
 		this.reset();
 	}
 	
-	public CharyparNagelIncomeLegScoring(final CharyparNagelScoringParameters params, Network network, TransitSchedule transitSchedule, Double incomeFactor) {
-		this(params, network, incomeFactor);
+	public CharyparNagelLegScoring(final PersonalScoringParameters params, Network network, TransitSchedule transitSchedule) {
+		this(params, network);
 		this.transitSchedule = transitSchedule;
 	}
 
@@ -123,7 +121,7 @@ public class CharyparNagelIncomeLegScoring implements LegScoring, ArbitraryEvent
 				modeParams = this.params.modeParams.get(TransportMode.other);
 			}
 		}
-		tmpScore += travelTime * modeParams.marginalUtilityOfTraveling_s*incomeFactor;
+		tmpScore += travelTime * modeParams.marginalUtilityOfTraveling_s;
 		if (modeParams.marginalUtilityOfDistance_m != 0.0
 				|| modeParams.monetaryDistanceCostRate != 0.0) {
 			Route route = leg.getRoute();
@@ -140,7 +138,7 @@ public class CharyparNagelIncomeLegScoring implements LegScoring, ArbitraryEvent
 				}
 			}
 			tmpScore += modeParams.marginalUtilityOfDistance_m * dist;
-			tmpScore += modeParams.monetaryDistanceCostRate * this.params.marginalUtilityOfMoney * dist * incomeFactor;
+			tmpScore += modeParams.monetaryDistanceCostRate * this.params.marginalUtilityOfMoney * dist;
 		}
 		tmpScore += modeParams.constant;
 		// (yyyy once we have multiple legs without "real" activities in between, this will produce wrong results.  kai, dec'12)
@@ -166,7 +164,7 @@ public class CharyparNagelIncomeLegScoring implements LegScoring, ArbitraryEvent
 			}
 			this.nextEnterVehicleIsFirstOfTrip = false ;
 			// add score of waiting, _minus_ score of travelling (since it is added in the legscoring above):
-			this.score += (event.getTime() - this.lastActivityEndTime) * (this.params.marginalUtilityOfWaitingPt_s - this.params.modeParams.get(TransportMode.pt).marginalUtilityOfTraveling_s)  * incomeFactor;
+			this.score += (event.getTime() - this.lastActivityEndTime) * (this.params.marginalUtilityOfWaitingPt_s - this.params.modeParams.get(TransportMode.pt).marginalUtilityOfTraveling_s) ;
 		}
 
 		if ( event instanceof PersonDepartureEvent ) {

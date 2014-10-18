@@ -74,21 +74,23 @@ public class CorridorController {
 		}
 
 		/*Create map of personal income factors*/
+		double labmda_inc = -0.1697; 
 		for(Id<Person> id:incomeMap.keySet()){
 			Integer personIncome = incomeMap.get(id);
-			factorMap.put(id, Math.log((double) personIncome/mean + 1));
+			//factorMap.put(id, Math.log((double) personIncome/mean + 1));
+			factorMap.put(id, Math.pow((double) personIncome/mean,labmda_inc));
 		}
 
 		// Additional analysis
 		ScenarioImpl scenarioImpl = (ScenarioImpl) controler.getScenario();
 		//controler.setScoringFunctionFactory(new DisaggIncomeCharyparNagelScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getNetwork(), factorMap));
-		controler.setScoringFunctionFactory(new DisaggregatedCharyparNagelScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getNetwork()));
+		controler.setScoringFunctionFactory(new DisaggregatedCharyparNagelScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getNetwork(), factorMap));
 		//controler.addControlerListener(new DisaggIncomeScoreAnalyzer(scenarioImpl));
 		controler.addControlerListener(new DisaggregatedScoreAnalyzer(scenarioImpl));
 		controler.addControlerListener(new SimpleAnnealer());
 		controler.addControlerListener(new WelfareAnalysisControlerListener((ScenarioImpl) controler.getScenario()));
 		
-		controler.setMobsimFactory(new QSimFactory());
+		//controler.setMobsimFactory(new QSimFactory());
 		
 		WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(controler.getPopulation(), controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
 		controler.getEvents().addHandler(waitTimeCalculator);
