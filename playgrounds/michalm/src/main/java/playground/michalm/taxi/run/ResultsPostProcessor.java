@@ -171,85 +171,81 @@ public class ResultsPostProcessor
     private void writeValues(String filename, String field)
         throws FileNotFoundException
     {
-        PrintWriter pw = new PrintWriter(filename);
+        try (PrintWriter pw = new PrintWriter(filename)) {
+            pw.printf("%s", field);
 
-        pw.printf("%s", field);
+            {
+                int prevTaxis = experiments[0].taxis;
 
-        {
-            int prevTaxis = experiments[0].taxis;
+                for (Experiment e : experiments) {
+                    if (prevTaxis != e.taxis) {
+                        pw.print('\t');
+                    }
+                    prevTaxis = e.taxis;
 
-            for (Experiment e : experiments) {
-                if (prevTaxis != e.taxis) {
-                    pw.print('\t');
+                    double ratio = (double)e.stats.get(0).n / e.taxis;
+                    pw.printf("\t%f", ratio);
                 }
-                prevTaxis = e.taxis;
-
-                double ratio = (double)e.stats.get(0).n / e.taxis;
-                pw.printf("\t%f", ratio);
-            }
-        }
-
-        pw.println();
-
-        int count = experiments[0].stats.size();
-
-        for (int i = 0; i < count; i++) {
-            String name = experiments[0].stats.get(i).name;
-
-            pw.printf("%s", name);
-
-            int prevTaxis = experiments[0].taxis;
-
-            for (Experiment e : experiments) {
-                double value;
-                Stats s = e.stats.get(i);
-
-                if (!name.equals(s.name)) {
-                    pw.close();
-                    throw new RuntimeException();
-                }
-
-                if ("T_W".equals(field)) {
-                    value = s.T_W;
-                }
-                else if ("T_W_95".equals(field)) {
-                    value = s.T_W_95;
-                }
-                else if ("T_W_MAX".equals(field)) {
-                    value = s.T_W_MAX;
-                }
-                else if ("T_P".equals(field)) {
-                    value = s.T_P;
-                }
-                else if ("T_P_95".equals(field)) {
-                    value = s.T_P_95;
-                }
-                else if ("T_P_MAX".equals(field)) {
-                    value = s.T_P_MAX;
-                }
-                else if ("T_W-T_P".equals(field)) {
-                    value = s.T_W - s.T_P;
-                }
-                else if ("R_NI".equals(field)) {
-                    value = s.R_NI;
-                }
-                else {
-                    pw.close();
-                    throw new RuntimeException();
-                }
-
-                if (prevTaxis != e.taxis) {
-                    pw.print('\t');
-                }
-                prevTaxis = e.taxis;
-
-                pw.printf("\t%f", value);
             }
 
             pw.println();
-        }
 
-        pw.close();
+            int count = experiments[0].stats.size();
+
+            for (int i = 0; i < count; i++) {
+                String name = experiments[0].stats.get(i).name;
+
+                pw.printf("%s", name);
+
+                int prevTaxis = experiments[0].taxis;
+
+                for (Experiment e : experiments) {
+                    double value;
+                    Stats s = e.stats.get(i);
+
+                    if (!name.equals(s.name)) {
+                        throw new RuntimeException();
+                    }
+
+                    if ("T_W".equals(field)) {
+                        value = s.T_W;
+                    }
+                    else if ("T_W_95".equals(field)) {
+                        value = s.T_W_95;
+                    }
+                    else if ("T_W_MAX".equals(field)) {
+                        value = s.T_W_MAX;
+                    }
+                    else if ("T_P".equals(field)) {
+                        value = s.T_P;
+                    }
+                    else if ("T_P_95".equals(field)) {
+                        value = s.T_P_95;
+                    }
+                    else if ("T_P_MAX".equals(field)) {
+                        value = s.T_P_MAX;
+                    }
+                    else if ("T_W-T_P".equals(field)) {
+                        value = s.T_W - s.T_P;
+                    }
+                    else if ("R_NI".equals(field)) {
+                        value = s.R_NI;
+                    }
+                    else {
+                        throw new RuntimeException();
+                    }
+
+                    if (prevTaxis != e.taxis) {
+                        pw.print('\t');
+                    }
+                    prevTaxis = e.taxis;
+
+                    pw.printf("\t%f", value);
+                }
+
+                pw.println();
+            }
+        }
     }
 
 

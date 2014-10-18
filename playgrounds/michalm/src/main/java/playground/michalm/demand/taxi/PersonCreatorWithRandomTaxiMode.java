@@ -77,21 +77,21 @@ public class PersonCreatorWithRandomTaxiMode
     public void writeTaxiCustomers(String taxiCustomersFile)
         throws IOException
     {
-        BufferedWriter bw = new BufferedWriter(new FileWriter(new File(taxiCustomersFile)));
-
-        for (Person p : taxiCustomers) {
-            bw.write(p.getId().toString());
-            bw.newLine();
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(taxiCustomersFile)))) {
+            for (Person p : taxiCustomers) {
+                bw.write(p.getId().toString());
+                bw.newLine();
+            }
         }
-
-        bw.close();
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
     public static List<String> readTaxiCustomerIds(String taxiCustomersFile)
     {
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(new File(taxiCustomersFile)));
+        try (BufferedReader br = new BufferedReader(new FileReader(new File(taxiCustomersFile)))) {
             List<String> taxiCustomerIds = new ArrayList<>();
 
             String line;
@@ -99,7 +99,6 @@ public class PersonCreatorWithRandomTaxiMode
                 taxiCustomerIds.add(line);
             }
 
-            br.close();
             return taxiCustomerIds;
         }
         catch (IOException e) {

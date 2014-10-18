@@ -46,13 +46,11 @@ public class LinkStatsAvgSpeedCalculator
             }
         }
 
-        PrintWriter pw = new PrintWriter(new File(avgSpeedFile));
-
-        for (int i = 0; i < 24; i++) {
-            double avgSpeed = 3.6 * hrsLengthSum[i] / hrsTTSum[i];
-            pw.println(i + "\t" + avgSpeed);
+        try (PrintWriter pw = new PrintWriter(new File(avgSpeedFile))) {
+            for (int i = 0; i < 24; i++) {
+                double avgSpeed = 3.6 * hrsLengthSum[i] / hrsTTSum[i];
+                pw.println(i + "\t" + avgSpeed);
+            }
         }
-
-        pw.close();
     }
 }

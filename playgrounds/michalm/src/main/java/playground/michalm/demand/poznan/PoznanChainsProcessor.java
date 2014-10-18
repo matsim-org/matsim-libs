@@ -205,14 +205,12 @@ public class PoznanChainsProcessor
     private void writeChainStats(String file)
         throws IOException
     {
-        BufferedWriter bw = new BufferedWriter(new FileWriter(new File(file)));
-
-        for (Entry<String, MutableInt> e : chainToOccurenceMap.entrySet()) {
-            bw.write(e.getKey() + "\t" + e.getValue());
-            bw.newLine();
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(new File(file)))) {
+            for (Entry<String, MutableInt> e : chainToOccurenceMap.entrySet()) {
+                bw.write(e.getKey() + "\t" + e.getValue());
+                bw.newLine();
+            }
         }
-
-        bw.close();
     }
 
 

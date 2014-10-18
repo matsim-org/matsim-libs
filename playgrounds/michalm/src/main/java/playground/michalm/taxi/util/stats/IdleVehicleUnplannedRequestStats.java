@@ -70,16 +70,12 @@ public class IdleVehicleUnplannedRequestStats
     @Override
     public void notifyMobsimBeforeCleanup(@SuppressWarnings("rawtypes") MobsimBeforeCleanupEvent e)
     {
-        try {
-            PrintWriter pw = new PrintWriter(filename);
-
+        try (PrintWriter pw = new PrintWriter(filename)) {
             pw.println("time\tidleVehs\tunplReqs");
 
             for (int i = 0; i < idleVehs.length; i++) {
                 pw.println(i + "\t" + idleVehs[i] / STEP + "\t" + unplannedReqs[i] / STEP);
             }
-
-            pw.close();
         }
         catch (FileNotFoundException e1) {
             throw new RuntimeException(e1);

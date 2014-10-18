@@ -94,16 +94,14 @@ public class PoznanODMatrixAdder
     private static void writeMatrix(double[][] array, String file)
         throws IOException
     {
-        BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+            for (int i = 0; i < array.length; i++) {
+                for (int j = 0; j < array[i].length; j++) {
+                    writer.write(array[i][j] + "\t");
+                }
 
-        for (int i = 0; i < array.length; i++) {
-            for (int j = 0; j < array[i].length; j++) {
-                writer.write(array[i][j] + "\t");
+                writer.newLine();
             }
-
-            writer.newLine();
         }
-
-        writer.close();
     }
 }

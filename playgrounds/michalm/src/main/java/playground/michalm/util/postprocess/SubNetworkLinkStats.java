@@ -61,23 +61,20 @@ public class SubNetworkLinkStats
 
         Map<Id<Link>, ? extends Link> linkMap = scenario.getNetwork().getLinks();
 
-        BufferedReader br = IOUtils.getBufferedReader(linkStats);
-        PrintWriter pw = new PrintWriter(IOUtils.getBufferedWriter(filteredLinkStats));
+        try (BufferedReader br = IOUtils.getBufferedReader(linkStats);
+                PrintWriter pw = new PrintWriter(IOUtils.getBufferedWriter(filteredLinkStats))) {
+            String header = br.readLine();
+            pw.println(header);
 
-        String header = br.readLine();
-        pw.println(header);
+            String line;
+            while ( (line = br.readLine()) != null) {
+                String linkId = new StringTokenizer(line).nextToken();// linkId - first column
+                Link link = linkMap.get(Id.create(linkId, Link.class));
 
-        String line;
-        while ( (line = br.readLine()) != null) {
-            String linkId = new StringTokenizer(line).nextToken();// linkId - first column
-            Link link = linkMap.get(Id.create(linkId, Link.class));
-
-            if (linkInsidePolygonPredicate.apply(link)) {
-                pw.println(line);
+                if (linkInsidePolygonPredicate.apply(link)) {
+                    pw.println(line);
+                }
             }
         }
-
-        br.close();
-        pw.close();
     }
 }

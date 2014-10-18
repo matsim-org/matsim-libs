@@ -19,28 +19,19 @@
 
 package playground.michalm.taxi.optimizer.fifo;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.io.*;
+import java.util.*;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
-import org.matsim.contrib.dvrp.data.Request;
-import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.router.VrpPathCalculator;
 
 import playground.michalm.taxi.data.TaxiRequest;
-import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration;
+import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.TaxiOptimizerConfiguration.Goal;
-import playground.michalm.taxi.scheduler.TaxiScheduler;
-import playground.michalm.taxi.scheduler.TaxiSchedulerParams;
-import playground.michalm.taxi.vehreqpath.VehicleRequestPath;
-import playground.michalm.taxi.vehreqpath.VehicleRequestPathCost;
-import playground.michalm.taxi.vehreqpath.VehicleRequestPathFinder;
+import playground.michalm.taxi.scheduler.*;
+import playground.michalm.taxi.vehreqpath.*;
 
 
 /**
@@ -86,25 +77,20 @@ public class TaxiOptimizerWithPreassignment
     private static Map<Id<Request>, Vehicle> readReqIdToVehMap(MatsimVrpContext context,
             String reqIdToVehIdFile)
     {
-        Scanner scanner = null;
+        try (Scanner scanner = new Scanner(new File(reqIdToVehIdFile))) {
+            List<Vehicle> vehicles = context.getVrpData().getVehicles();
+            Map<Id<Request>, Vehicle> reqIdToVehMap = new HashMap<>();
 
-        try {
-            scanner = new Scanner(new File(reqIdToVehIdFile));
+            while (scanner.hasNext()) {
+                Id<Request> reqId = Id.create(scanner.next(), Request.class);
+                Vehicle veh = vehicles.get(scanner.nextInt());
+                reqIdToVehMap.put(reqId, veh);
+            }
+
+            return reqIdToVehMap;
         }
         catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
-
-        List<Vehicle> vehicles = context.getVrpData().getVehicles();
-        Map<Id<Request>, Vehicle> reqIdToVehMap = new HashMap<>();
-
-        while (scanner.hasNext()) {
-            Id<Request> reqId = Id.create(scanner.next(), Request.class);
-            Vehicle veh = vehicles.get(scanner.nextInt());
-            reqIdToVehMap.put(reqId, veh);
-        }
-
-        scanner.close();
-        return reqIdToVehMap;
     }
 }

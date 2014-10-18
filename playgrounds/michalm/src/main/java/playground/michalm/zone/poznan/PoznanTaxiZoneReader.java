@@ -36,7 +36,6 @@ public class PoznanTaxiZoneReader
 {
     private BufferedReader reader;
     private GeometryFactory geometryFactory = new GeometryFactory();
-
     private final Map<Id<Zone>, Zone> zones = new TreeMap<>();
 
 

@@ -54,26 +54,20 @@ public class MatricesTxtWriter
 
     public void write(String file)
     {
-        PrintWriter pw;
+        try (PrintWriter pw = new PrintWriter(file)) {
+            pw.println(keyHeader + "\tfrom\tto\tvalue");
 
-        try {
-            pw = new PrintWriter(file);
+            for (Map.Entry<String, Matrix> mapEntry : matrices.getMatrices().entrySet()) {
+                String key = formatter.apply(mapEntry.getKey());
+
+                for (Entry e : MatrixUtils.createEntryIterable(mapEntry.getValue())) {
+                    pw.printf("%s\t%s\t%s\t%f\n", key, e.getFromLocation(), e.getToLocation(),
+                            e.getValue());
+                }
+            }
         }
         catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
-
-        pw.println(keyHeader + "\tfrom\tto\tvalue");
-
-        for (Map.Entry<String, Matrix> mapEntry : matrices.getMatrices().entrySet()) {
-            String key = formatter.apply(mapEntry.getKey());
-
-            for (Entry e : MatrixUtils.createEntryIterable(mapEntry.getValue())) {
-                pw.printf("%s\t%s\t%s\t%f\n", key, e.getFromLocation(), e.getToLocation(),
-                        e.getValue());
-            }
-        }
-
-        pw.close();
     }
 }

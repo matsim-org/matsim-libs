@@ -142,14 +142,15 @@ public class MIPProblem
 
 
     private MIPTaxiStats stats;
-    
+
+
     private void findInitialSolution()
     {
         initialSolution = new MIPSolutionFinder(optimConfig, rData, vData).findInitialSolution();
 
         stats = new MIPTaxiStats(optimConfig.context.getVrpData());
         stats.calcInitial();
-        
+
         optimConfig.scheduler.removePlannedRequestsFromAllSchedules();
     }
 
@@ -165,13 +166,11 @@ public class MIPProblem
     {
         new MIPSolutionScheduler(optimConfig, rData, vData).updateSchedules(finalSolution);
         unplannedRequests.removeAll(Arrays.asList(rData.requests));
-        
+
         stats.calcSolved();
-        
-        try {
-            PrintWriter pw = new PrintWriter(optimConfig.workingDirectory + "MIP_stats");
+
+        try (PrintWriter pw = new PrintWriter(optimConfig.workingDirectory + "MIP_stats")) {
             stats.print(pw);
-            pw.close();
         }
         catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -181,60 +180,53 @@ public class MIPProblem
 
     private void loadSolution(String filename)
     {
-        Scanner s;
-        try {
-            s = new Scanner(new File(filename));
+        try (Scanner s = new Scanner(new File(filename))) {
+            //header
+            if (!s.nextLine().startsWith("# Objective value = ")) {
+                throw new RuntimeException();
+            }
+
+            int n = rData.dimension;
+            int m = vData.dimension;
+
+            boolean[][] x = new boolean[m + n][m + n];
+            for (int u = 0; u < m + n; u++) {
+                for (int v = 0; v < m + n; v++) {
+
+                    //line format: x_430,430 0
+                    if (!s.next().equals("x_" + u + "," + v)) {
+                        throw new RuntimeException();
+                    }
+
+                    x[u][v] = s.nextDouble() >= 0.5;
+                }
+            }
+
+            double[] w = new double[n];
+            for (int i = 0; i < n; i++) {
+
+                //line format: w_0 22096
+                if (!s.next().equals("w_" + i)) {
+                    throw new RuntimeException();
+                }
+
+                w[i] = s.nextDouble();
+            }
+
+            finalSolution = new MIPSolution(x, w);
         }
         catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
-
-        //header
-        if (!s.nextLine().startsWith("# Objective value = ")) {
-            s.close();
-            throw new RuntimeException();
-        }
-
-        int n = rData.dimension;
-        int m = vData.dimension;
-
-        boolean[][] x = new boolean[m + n][m + n];
-        for (int u = 0; u < m + n; u++) {
-            for (int v = 0; v < m + n; v++) {
-
-                //line format: x_430,430 0
-                if (!s.next().equals("x_" + u + "," + v)) {
-                    s.close();
-                    throw new RuntimeException();
-                }
-
-                x[u][v] = s.nextDouble() >= 0.5;
-            }
-        }
-
-        double[] w = new double[n];
-        for (int i = 0; i < n; i++) {
-
-            //line format: w_0 22096
-            if (!s.next().equals("w_" + i)) {
-                s.close();
-                throw new RuntimeException();
-            }
-
-            w[i] = s.nextDouble();
-        }
-
-        s.close();
-        finalSolution = new MIPSolution(x, w);
     }
-    
-    
+
+
     int getPlanningHorizon()
     {
         return vData.dimension * mode.reqsPerVeh;
     }
-    
-    
+
+
     int getPlannedRequestCount()
     {
         return rData.dimension;
