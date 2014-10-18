@@ -21,12 +21,14 @@ package playground.jbischoff.taxi.optimizer.rank;
 
 import java.util.*;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.MatsimVrpContext;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.util.*;
 
-import playground.jbischoff.energy.charging.taxi.ElectricTaxiChargingHandler;
+import playground.jbischoff.energy.charging.taxi.*;
+import playground.jbischoff.taxi.vehicles.ElectricTaxi;
 import playground.michalm.taxi.data.TaxiRequest;
 import playground.michalm.taxi.optimizer.query.*;
 import playground.michalm.taxi.scheduler.*;
@@ -82,7 +84,7 @@ public class IdleRankVehicleFinder
 
     private double getVehicleSoc(Vehicle veh)
     {
-        return this.ecabHandler.getRelativeTaxiSoC(veh.getId());
+        return this.ecabHandler.getRelativeTaxiSoC(Id.create(veh.getId(),ElectricTaxi.class));
     }
 
 
