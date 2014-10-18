@@ -9,11 +9,13 @@ package playground.artemc.scenarioTools;
 
 
 import java.io.IOException;
-
+import java.util.HashMap;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.Bins;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
@@ -30,6 +32,8 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
+import playground.artemc.utils.Writer;
+
 public class SimplePopulationGenerator {
 
 	private static Integer populationSize = 20000;
@@ -38,9 +42,10 @@ public class SimplePopulationGenerator {
 	
 	private Random random = new Random(102830259L);
 	private ObjectAttributes incomes = new ObjectAttributes();
-	private Bins incomeBins = new Bins(5000, 200000, "incomes");
+	private HashMap<Id<Person>,Integer> incomeData = new HashMap<Id<Person>,Integer>();
+	
+	Bins incomeBins = new Bins(5000, 200000, "incomes");
 	private final static Logger log = Logger.getLogger(SimplePopulationGenerator.class);
-
 	
 	public static void main(String[] args) throws IOException {
 
@@ -55,6 +60,7 @@ public class SimplePopulationGenerator {
 		population.setIsStreaming(true);
 		PopulationWriter popWriter = new PopulationWriter(population, scenario.getNetwork());
 		popWriter.startStreaming(outputPath+"/corridorPopulation_"+populationSize+".xml");
+		
 
 		Random generator = new Random();	
 
@@ -69,8 +75,7 @@ public class SimplePopulationGenerator {
 			Double y=0.0;
 			CoordImpl homeLocation;
 			CoordImpl workLocation;
-			Integer income;
-
+			
 			do{
 				/*Home location*/
 				do{
@@ -99,6 +104,8 @@ public class SimplePopulationGenerator {
 			}
 			person.setEmployed(true);
 			simplePopulationGenerator.createIncome(person);
+			
+
 
 			//Add home location to the plan
 			ActivityImpl actHome = (ActivityImpl) pf.createActivityFromCoord("home", homeLocation);
@@ -122,15 +129,17 @@ public class SimplePopulationGenerator {
 		}
 		popWriter.closeStreaming();
 		simplePopulationGenerator.writeIncomes(outputPath);
-		
-
 	}
 	
 	private void createIncome(PersonImpl person){
-		Double mean=Math.log(19600.0);
-		Double std=0.78;
+//		Double mean=Math.log(19600.0);
+//		Double std=0.78;
+		//Values from working population of Sioux Falls Scenario
+		Double mean=10.954092187;
+		Double std= 0.730406478;
 		Integer income = (int) Math.round(Math.exp(mean+std*random.nextGaussian()));			
-		incomes.putAttribute(person.getId().toString(), "income", income);		
+		incomes.putAttribute(person.getId().toString(), "income", income);	
+		incomeData.put(person.getId(), income);
 		incomeBins.addVal(income, 1.0);
 	}
 	
@@ -139,5 +148,15 @@ public class SimplePopulationGenerator {
 		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(incomes);
 		attributesWriter.writeFile(outputPath+"/income_"+populationSize+".xml");
 		incomeBins.plotBinnedDistribution(outputPath+"/", "income", "money");	
+		
+		Writer writer = new Writer();
+		writer.creteFile(outputPath+"/incomeData.txt");
+		for(Id<Person> id:incomeData.keySet()){
+			writer.writeLine(id.toString()+","+incomeData.get(id).toString());
+		}
+		writer.close();
+
 	}
+		
+
 }
