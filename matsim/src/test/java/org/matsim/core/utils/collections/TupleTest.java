@@ -57,7 +57,7 @@ public class TupleTest extends TestCase {
 		assertFalse(t8.equals(t7));
 
 		// ensure the comparison with null and other objects
-		assertFalse(t1.equals(null));
+		assertNotNull(t1);
 		assertFalse(t1.equals(Integer.valueOf(1)));
 	}
 

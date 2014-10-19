@@ -481,14 +481,14 @@ public class NetworkExpandNodeTest {
 		TurnInfo ti22 = new TurnInfo(id1, id2, modes1);
 		TurnInfo ti44 = new TurnInfo(id2, id1);
 		
-		Assert.assertFalse(ti1.equals(null));
+		Assert.assertNotNull(ti1);
 		Assert.assertFalse(ti1.equals(ti2));
 		Assert.assertFalse(ti1.equals(ti3));
 		Assert.assertFalse(ti1.equals(ti4));
 		Assert.assertFalse(ti1.equals(ti5));
 		Assert.assertFalse(ti1.equals(ti6));
 		
-		Assert.assertFalse(ti2.equals(null));
+		Assert.assertNotNull(ti2);
 		Assert.assertFalse(ti2.equals(ti1));
 		Assert.assertFalse(ti2.equals(ti3));
 		Assert.assertFalse(ti2.equals(ti4));

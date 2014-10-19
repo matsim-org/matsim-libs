@@ -106,7 +106,7 @@ public class EventsToScore implements BasicEventHandler {
 				* config.vspExperimental().getFractionOfIterationsToStartScoreMSA() + config.controler().getFirstIteration());
 		}
 		
-		if ( tmp!=null && tmp2!=null && tmp!=tmp2 ) {
+		if ( tmp!=null && tmp2!=null && !tmp.equals(tmp2) ) {
 			throw new RuntimeException( "inconsistent" ) ;
 		}
 		
