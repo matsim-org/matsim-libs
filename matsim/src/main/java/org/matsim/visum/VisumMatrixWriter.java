@@ -65,11 +65,8 @@ public class VisumMatrixWriter {
 	}
 
 	public void writeFile(final String filename) {
-		BufferedWriter out = null;
 
-		try {
-			out = new BufferedWriter(new FileWriter(filename));
-
+		try (BufferedWriter out = new BufferedWriter(new FileWriter(filename))) {
 			out.write("$VN;Y5\n");
 			out.write("*\n");
 			out.write("*\tAnzahl Bezirke\n");
@@ -108,11 +105,6 @@ public class VisumMatrixWriter {
 
 		} catch (IOException e) {
 			e.printStackTrace();
-		} finally {
-			if (out != null) {
-				try { out.close(); }
-				catch (IOException e) { log.warn("Could not close output-stream.", e); }
-			}
 		}
 	}
 }

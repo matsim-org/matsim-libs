@@ -131,15 +131,11 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 	 * @param filename The name of a file where to write the gathered data.
 	 */
 	public void write(final String filename) {
-		PrintStream stream;
-		try {
-			stream = new PrintStream(new File(filename));
+		try (PrintStream stream = new PrintStream(new File(filename))) {
+			write(stream);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-			return;
 		}
-		write(stream);
-		stream.close();
 	}
 
 	/**

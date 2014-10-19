@@ -78,18 +78,11 @@ public abstract class Gbl {
 		String date = null;
 		URL url = Gbl.class.getResource(resourceFilename);
 		if (url != null) {
-			BufferedReader reader = null;
-			try {
-				reader = new BufferedReader(new InputStreamReader(url.openStream()));
+			try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
 				revision = reader.readLine();
 				date = reader.readLine();
 			} catch (IOException e) {
 				e.printStackTrace();
-			} finally {
-				if (reader != null) {
-					try { reader.close(); }
-					catch (IOException e) { log.warn("Could not close stream.", e); }
-				}
 			}
 			if (revision == null) {
 				return component + "-Build: unknown";

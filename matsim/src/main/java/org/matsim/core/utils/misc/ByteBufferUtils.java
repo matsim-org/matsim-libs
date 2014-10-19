@@ -76,17 +76,15 @@ public class ByteBufferUtils {
 	 * 
 	 */
 	public static void putObject(final ByteBuffer buffer, Serializable o){
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		try {
-			ObjectOutput oout = new ObjectOutputStream(bos);   
-			oout.writeObject(o);
-			byte[] laneBytes = bos.toByteArray(); 
-			buffer.putInt(laneBytes.length);
-			for (int i = 0; i < laneBytes.length; i++) {
-				buffer.put(laneBytes[i]);
+		try (ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+			try (ObjectOutput oout = new ObjectOutputStream(bos)) {
+				oout.writeObject(o);
+				byte[] laneBytes = bos.toByteArray();
+				buffer.putInt(laneBytes.length);
+				for (int i = 0; i < laneBytes.length; i++) {
+					buffer.put(laneBytes[i]);
+				}
 			}
-			oout.close();
-			bos.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		} 
@@ -104,10 +102,8 @@ public class ByteBufferUtils {
 			bytes[i] = buffer.get();
 		}
 		ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
-		ObjectInput oin;
 		Object o = null;
-		try {
-			oin = new ObjectInputStream(bis);
+		try (ObjectInputStream oin = new ObjectInputStream(bis)) {
 			o = oin.readObject();
 			bis.close();
 			oin.close();

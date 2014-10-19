@@ -84,8 +84,8 @@ public class MixedLaneTestFixture {
 	public MixedLaneTestFixture(boolean useLanes, double timeStepSize){
 		Config config = ConfigUtils.createConfig();
 		config.scenario().setUseLanes(useLanes);
-		
-		config.qsim().setTimeStepSize(timeStepSize); 
+
+		config.qsim().setTimeStepSize(timeStepSize);
 
 		sc = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		id0 = Id.create("0", Link.class);
@@ -93,7 +93,8 @@ public class MixedLaneTestFixture {
 		id2 = Id.create("2", Link.class);
 		id3 = Id.create("3", Link.class);
 		id4 = Id.create("4", Link.class);
-		link1FirstLaneId = Id.create("1.ol", Object.class);
+		laneId1 = Id.create("1", Lane.class);
+		link1FirstLaneId = Id.create("1.ol", Lane.class);
 
 		init();
 	}

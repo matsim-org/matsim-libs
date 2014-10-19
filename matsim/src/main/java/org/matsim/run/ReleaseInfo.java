@@ -39,11 +39,9 @@ public class ReleaseInfo {
 		String date = null;
 		URL url = ReleaseInfo.class.getResource("/revision.txt");
 		if (url != null) {
-			try {
-				BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+			try (BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()))) {
 				revision = reader.readLine();
 				date = reader.readLine();
-				reader.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

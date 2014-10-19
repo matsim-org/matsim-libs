@@ -34,9 +34,8 @@ public class CRCChecksum {
 	private static long getCRCFromStream(final InputStream in) {
 		long check = 0;
 		if (in == null) return 0;
-		try {
-			CRC32 crc = new CRC32();
-			CheckedInputStream cis = new CheckedInputStream(in, crc);
+		CRC32 crc = new CRC32();
+		try (CheckedInputStream cis = new CheckedInputStream(in, crc)) {
 			byte[] buffer = new byte[4096];
 			while (cis.read(buffer) != -1) {
 				/* Read until the end of the stream is reached. */
@@ -45,9 +44,6 @@ public class CRCChecksum {
 		}
 		catch (IOException e) {
 			throw new RuntimeException(e);
-		}
-		finally {
-			try { in.close(); } catch (IOException e) { e.printStackTrace(); }
 		}
 		return check;
 	}

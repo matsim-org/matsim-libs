@@ -56,9 +56,7 @@ public class WorldConnectLocations {
 
 	private final void connectByFile(final ActivityFacilities facilities, final Network network, final String file, final Set<Id<ActivityFacility>> remainingFacilities) {
 		log.info("    connecting facilities with links via "+CONFIG_F2L_INPUTF2LFile+"="+file);
-		BufferedReader br = null;
-		try {
-			br = new BufferedReader(new FileReader(file));
+		try (BufferedReader br = new BufferedReader(new FileReader(file))) {
 			int lineCnt = 0;
 			String currLine;
 			br.readLine(); lineCnt++; // Skip header
@@ -81,15 +79,6 @@ public class WorldConnectLocations {
 		} catch (IOException e) {
 			throw new RuntimeException("Error while reading given inputF2LFile='"+file+"'.", e);
 		}
-		finally {
-			if (br != null) {
-				try {
-					br.close();
-				} catch (IOException e) {
-					log.warn(e);
-				}
-			}
-		}
 		log.info("      number of facilities that are still not connected to a link = "+remainingFacilities.size());
 		log.info("    done. (connecting facilities with links via "+CONFIG_F2L_INPUTF2LFile+"="+file+")");
 	}
@@ -100,20 +89,13 @@ public class WorldConnectLocations {
 
 	private final void writeF2LFile(final ActivityFacilities facilities, final String file) {
 		log.info("    writing f<-->l connections to  "+CONFIG_F2L_OUTPUTF2LFile+"="+file);
-		BufferedWriter bw = null;
-		try {
-			bw = new BufferedWriter(new FileWriter(file));
+		try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
 			bw.write("fid\tlid\n");
 			for (ActivityFacility f : facilities.getFacilities().values()) {
 				bw.write(f.getId().toString()+"\t"+f.getLinkId().toString()+"\n");
 			}
 		} catch (IOException e) {
 			throw new RuntimeException("Error while writing given outputF2LFile='"+file+"'.", e);
-		} finally {
-			if (bw != null) {
-				try { bw.close(); }
-				catch (IOException e) { log.warn("Could not close stream.", e); }
-			}
 		}
 		log.info("    done. (writing f<-->l connections to  "+CONFIG_F2L_OUTPUTF2LFile+"="+file+")");
 	}

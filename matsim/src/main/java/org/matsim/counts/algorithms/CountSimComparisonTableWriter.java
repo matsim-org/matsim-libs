@@ -91,9 +91,7 @@ public class CountSimComparisonTableWriter extends CountSimComparisonWriter {
 	@Override
 	public void writeFile(final String filename) {
 		log.info("Writing CountsSimComparison to " + filename);
-		BufferedWriter out = null;
-		try {
-			out = new BufferedWriter(new FileWriter(filename));
+		try (BufferedWriter out = new BufferedWriter(new FileWriter(filename))) {
 			for (int i = 0; i < COLUMNHEADERS.length; i++) {
 				out.write(COLUMNHEADERS[i]);
 				out.write(SEPARATOR);
@@ -116,15 +114,6 @@ public class CountSimComparisonTableWriter extends CountSimComparisonWriter {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		finally {
-			if (out != null) {
-				try {
-					out.close();
-				} catch (IOException e) {
-					log.warn("could not close file.", e);
-				}
-			}
-		}
 
 		// writing the 'average weekday traffic volume' table:
 		this.writeAWTVTable(filename);
@@ -140,10 +129,7 @@ public class CountSimComparisonTableWriter extends CountSimComparisonWriter {
 		CountSimComparisonLinkFilter linkFilter=new CountSimComparisonLinkFilter(
 				this.countComparisonFilter.getCountsForHour(null));
 
-		BufferedWriter out = null;
-
-		try {
-			out = new BufferedWriter(new FileWriter(filename));
+		try (BufferedWriter out = new BufferedWriter(new FileWriter(filename))) {
 			out.write("Link Id\tMATSIM volumes\tCount volumes");
 			out.write(NEWLINE);
 
@@ -161,15 +147,6 @@ public class CountSimComparisonTableWriter extends CountSimComparisonWriter {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-		finally {
-			if (out != null) {
-				try {
-					out.close();
-				} catch (IOException e) {
-					log.warn("could not close file.", e);
-				}
-			}
 		}
 	}
 }
