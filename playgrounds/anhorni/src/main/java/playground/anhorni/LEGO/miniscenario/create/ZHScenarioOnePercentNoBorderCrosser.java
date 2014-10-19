@@ -22,21 +22,21 @@ package playground.anhorni.LEGO.miniscenario.create;
 import java.io.File;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 
+import playground.anhorni.utils.FacilitiesAdderAndModifier;
 import playground.anhorni.utils.PlansRemoverById;
 import playground.anhorni.utils.PlansSampler;
-import playground.anhorni.utils.FacilitiesAdderAndModifier;
 
 
 public class ZHScenarioOnePercentNoBorderCrosser {
@@ -73,7 +73,7 @@ public class ZHScenarioOnePercentNoBorderCrosser {
 	private void removeBoderCrosser() {
 		log.info("Removing border crossers ...");
 		PlansRemoverById remover = new PlansRemoverById();
-		Population cleanedPop = remover.remove(this.scenario.getPopulation(), new IdImpl(1000000000));
+		Population cleanedPop = remover.remove(this.scenario.getPopulation(), Id.create(1000000000, Person.class));
 		this.scenario.setPopulation(cleanedPop);
 	}
 	

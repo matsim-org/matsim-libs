@@ -19,9 +19,15 @@
 
 package playground.anhorni.locationchoice.preprocess.plans.modifications;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.population.*;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -29,8 +35,6 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import java.util.List;
 
 public class AddBorderCrossingTraffic {
 
@@ -65,7 +69,7 @@ public class AddBorderCrossingTraffic {
 				//if (act.getType().startsWith("tta") || act.getType().startsWith("shop")) {
 				if (act.getType().startsWith("tta")) {
 					String id = "20" + person.getId().toString();
-                    ((PersonImpl) person).setId(new IdImpl(id));
+                    ((PersonImpl) person).setId(Id.create(id, Person.class));
                     ((PersonImpl) person).createDesires("tta");
 					((PersonImpl) person).getDesires().putActivityDuration("tta", 8 * 3600);
 					plans.addPerson(person);

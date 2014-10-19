@@ -6,7 +6,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -46,18 +45,18 @@ public class SurveyCleaner {
 	
 	public void filter(TreeMap<Id<Person>, EstimationPerson> population) { // stopped survey
 		log.info("clean filter ...");
-		population.remove(new IdImpl(1225));
-		population.remove(new IdImpl(1984));	
+		population.remove(Id.create(1225, Person.class));
+		population.remove(Id.create(1984, Person.class));	
 		
-		population.remove(new IdImpl(1897)); // Amriswil
-		population.remove(new IdImpl(1756)); // Niederglatt
-		population.remove(new IdImpl(1277)); //Küsnacht
+		population.remove(Id.create(1897, Person.class)); // Amriswil
+		population.remove(Id.create(1756, Person.class)); // Niederglatt
+		population.remove(Id.create(1277, Person.class)); //Küsnacht
 	}
 	
 	public void cleanIncome(TreeMap<Id<Person>, EstimationPerson> population) {
-		population.get(new IdImpl(1298)).setHhIncome(
-				(int)(population.get(new IdImpl(1298)).getHhIncome() / 12.0));
-		population.get(new IdImpl(1512)).setHhIncome(
-				(int)(population.get(new IdImpl(1512)).getHhIncome() / 12.0));
+		population.get(Id.create(1298, Person.class)).setHhIncome(
+				(int)(population.get(Id.create(1298, Person.class)).getHhIncome() / 12.0));
+		population.get(Id.create(1512, Person.class)).setHhIncome(
+				(int)(population.get(Id.create(1512, Person.class)).getHhIncome() / 12.0));
 	}
 }

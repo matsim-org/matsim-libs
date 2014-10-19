@@ -20,12 +20,12 @@
 package playground.anhorni.LEGO.miniscenario.create;
 
 import java.util.Vector;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.utils.RandomFromVarDistr;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -71,7 +71,7 @@ public class CreatePopulation {
 			}
 						
 			for (int j = 0; j < personsPerLocation; j++) {
-				PersonImpl p = new PersonImpl(new IdImpl(personCnt + offset));
+				PersonImpl p = new PersonImpl(Id.create(personCnt + offset, Person.class));
 				personCnt++;
 				p.createAndAddPlan(true);
 				ActivityImpl act = new ActivityImpl("home", facility.getCoord());

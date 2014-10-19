@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -93,7 +93,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 	private void handleFacility(ZHFacility facility, ChoiceSet choiceSet, Controler controler, int tt) {
 		Network network = controler.getNetwork();
 
-		Id linkId = facility.getLinkId();
+		Id<Link> linkId = facility.getLinkId();
 
 		//--------------------------------------------------
 		/*
@@ -141,13 +141,13 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 
 		Iterator<Id<Link>> routeLinkBefore_it = ((NetworkRoute) legBefore.getRoute()).getLinkIds().iterator();
 		while (routeLinkBefore_it.hasNext()) {
-			Id lId = routeLinkBefore_it.next();
+			Id<Link> lId = routeLinkBefore_it.next();
 			totalTravelDist += network.getLinks().get(lId).getLength();
 		}
 
 		Iterator<Id<Link>> routeLinkAfter_it = ((NetworkRoute) legAfter.getRoute()).getLinkIds().iterator();
 		while (routeLinkAfter_it.hasNext()) {
-			Id lId = routeLinkAfter_it.next();
+			Id<Link> lId = routeLinkAfter_it.next();
 			totalTravelDist += network.getLinks().get(lId).getLength();
 		}
 
@@ -169,7 +169,7 @@ public class ExtractChoiceSetsRouting extends ChoiceSetExtractor implements Afte
 
 
 	private LegImpl computeLeg(ActivityImpl fromAct, ActivityImpl toAct, Controler controler) {
-		PersonImpl person = new PersonImpl(new IdImpl("1"));
+		PersonImpl person = new PersonImpl(Id.create("1", Person.class));
 		LegImpl leg = new org.matsim.core.population.LegImpl(TransportMode.car);
 		PlanRouterAdapter router = new PlanRouterAdapter( controler );
 		router.handleLeg(person, leg, fromAct, toAct, fromAct.getEndTime());

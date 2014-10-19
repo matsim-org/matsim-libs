@@ -6,7 +6,7 @@ import org.matsim.api.core.v01.Id;
 
 public class Agent {
 
-	Id id;
+	Id<Agent> id;
 	double tripStartTime;
 	String routeTo;
 	String actType;
@@ -16,13 +16,13 @@ public class Agent {
 	Route tmpRoute;
 	double actStartTime;
 	
-	public Agent(Id id,double tripStartTime){
+	public Agent(Id<Agent> id,double tripStartTime){
 		tmpRoute=new Route();
 		this.tripStartTime=tripStartTime;
 		this.id=id;
 	}
 	
-	public Agent(Id id, double tripStartTime, String routeTo, String actType, double actDur, String routeAway){
+	public Agent(Id<Agent> id, double tripStartTime, String routeTo, String actType, double actDur, String routeAway){
 		this.id = id;
 		this.tripStartTime = tripStartTime;
 		this.routeTo = routeTo;

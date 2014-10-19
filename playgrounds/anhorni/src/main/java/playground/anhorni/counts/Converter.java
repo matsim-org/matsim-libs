@@ -22,7 +22,8 @@ package playground.anhorni.counts;
 import java.util.Iterator;
 import java.util.List;
 
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 
@@ -39,20 +40,20 @@ public class Converter {
 			CountStation countStation = countStation_it.next();
 			
 			this.createCounts(countStation, countsIVTCH, 
-					new IdImpl(countStation.getLink1().getLinkidIVTCH()),
-					new IdImpl(countStation.getLink2().getLinkidIVTCH()));
+					Id.create(countStation.getLink1().getLinkidIVTCH(), Link.class),
+					Id.create(countStation.getLink2().getLinkidIVTCH(), Link.class));
 									
 			this.createCounts(countStation, countsNavteq, 
-					new IdImpl(countStation.getLink1().getLinkidNavteq()),
-					new IdImpl(countStation.getLink2().getLinkidNavteq()));
+					Id.create(countStation.getLink1().getLinkidNavteq(), Link.class),
+					Id.create(countStation.getLink2().getLinkidNavteq(), Link.class));
 			
 			this.createCounts(countStation, countsTeleatlas, 
-					new IdImpl(countStation.getLink1().getLinkidTeleatlas()),
-					new IdImpl(countStation.getLink2().getLinkidTeleatlas()));			
+					Id.create(countStation.getLink1().getLinkidTeleatlas(), Link.class),
+					Id.create(countStation.getLink2().getLinkidTeleatlas(), Link.class));			
 		}		
 	}
 	
-	private void createCounts(CountStation countStation, Counts counts, IdImpl locId1, IdImpl locId2) {
+	private void createCounts(CountStation countStation, Counts counts, Id<Link> locId1, Id<Link> locId2) {
 		
 //		if (countStation.getId().equals("ASTRA066")) {
 //			log.info("SIZE ----------: " + countStation.getLink1().getAggregator().getSize(0));
@@ -61,7 +62,7 @@ public class Converter {
 //			log.info("STUNDE7: " + countStation.getLink1().getAggregator().getAvg()[7]);
 //		}
 				
-		if (locId1.compareTo(new IdImpl("-")) == 0 || locId2.compareTo(new IdImpl("-")) == 0) {
+		if (locId1.compareTo(Id.create("-", Link.class)) == 0 || locId2.compareTo(Id.create("-", Link.class)) == 0) {
 			return;
 		}
 		

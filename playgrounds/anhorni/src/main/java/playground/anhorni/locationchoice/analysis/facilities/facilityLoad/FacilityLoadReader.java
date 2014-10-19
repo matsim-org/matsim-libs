@@ -26,14 +26,13 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 
 public class FacilityLoadReader {
 	
-	TreeMap<Id, FacilityLoad> facilityLoads = new TreeMap<Id, FacilityLoad>();
+	TreeMap<Id<ActivityFacility>, FacilityLoad> facilityLoads = new TreeMap<Id<ActivityFacility>, FacilityLoad>();
 	private final static Logger log = Logger.getLogger(FacilityLoadReader.class);
 	
 	public void readFiles() {
@@ -50,7 +49,7 @@ public class FacilityLoadReader {
 			while ((curr_line = bufferedReader.readLine()) != null) {
 				String[] entries = curr_line.split("\t", -1);
 				
-				IdImpl facilityId = new IdImpl(entries[0].trim());
+				Id<ActivityFacility> facilityId = Id.create(entries[0].trim(), ActivityFacility.class);
 				double x = Double.parseDouble(entries[1].trim());
 				double y = Double.parseDouble(entries[2].trim());
 				CoordImpl coord = new CoordImpl(x,y);
@@ -83,11 +82,11 @@ public class FacilityLoadReader {
 		log.info("Number of facility loads: " + this.facilityLoads.size());
 	}
 
-	public TreeMap<Id, FacilityLoad> getFacilityLoads() {
+	public TreeMap<Id<ActivityFacility>, FacilityLoad> getFacilityLoads() {
 		return facilityLoads;
 	}
 
-	public void setFacilityLoads(TreeMap<Id, FacilityLoad> facilityLoads) {
+	public void setFacilityLoads(TreeMap<Id<ActivityFacility>, FacilityLoad> facilityLoads) {
 		this.facilityLoads = facilityLoads;
 	}
 }

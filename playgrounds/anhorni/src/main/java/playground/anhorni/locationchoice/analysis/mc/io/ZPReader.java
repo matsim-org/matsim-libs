@@ -26,8 +26,7 @@ import java.util.List;
 import java.util.Vector;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.api.core.v01.population.Person;
 
 import playground.anhorni.locationchoice.analysis.mc.filters.DateFilter;
 
@@ -49,7 +48,7 @@ public class ZPReader {
 				String HHNR = entries[0].trim();
 				String ZIELPNR = entries[1].trim();
 				if (ZIELPNR.length() == 1) ZIELPNR = "0" + ZIELPNR; 
-				Id personId = new IdImpl(HHNR+ZIELPNR);
+				Id<Person> personId = Id.create(HHNR+ZIELPNR, Person.class);
 				
 				String[] date = entries[2].trim().split("/", -1);
 				String day = date[1].trim();

@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 
@@ -43,7 +42,7 @@ public class UniversalChoiceSetReader {
 			while ((curr_line = br.readLine()) != null) {
 				String[] entrs = curr_line.split("\t", -1);
 				
-				Id<Location> id = new IdImpl(Integer.parseInt(entrs[0].trim()));
+				Id<Location> id = Id.create(Integer.parseInt(entrs[0].trim()), Location.class);
 				ShopLocation shop = new ShopLocation(id);
 				// lat -> 1 | lon -> 0
 				CoordImpl coord = new CoordImpl(Double.parseDouble(entrs[5]), Double.parseDouble(entrs[4]));

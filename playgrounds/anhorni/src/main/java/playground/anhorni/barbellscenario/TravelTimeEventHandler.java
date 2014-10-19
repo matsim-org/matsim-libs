@@ -25,20 +25,21 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 
 
 public class TravelTimeEventHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler {
-	private final Map<Id, PersonDepartureEvent> pendantDepartureEvent = new HashMap<Id, PersonDepartureEvent>();
-	private final Map<Id, LinkEnterEvent> pendantLinkEnterEvent = new HashMap<Id, LinkEnterEvent>();
+	private final Map<Id<Person>, PersonDepartureEvent> pendantDepartureEvent = new HashMap<>();
+	private final Map<Id<Person>, LinkEnterEvent> pendantLinkEnterEvent = new HashMap<>();
 	
 	private List<Double> netTTs = new Vector<Double>();
 	private List<Double> linkTTs = new Vector<Double>();
@@ -62,14 +63,14 @@ public class TravelTimeEventHandler implements PersonDepartureEventHandler, Pers
 	
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (event.getLinkId().compareTo(new IdImpl(3)) == 0) {
+		if (event.getLinkId().compareTo(Id.create(3, Link.class)) == 0) {
 			this.pendantLinkEnterEvent.put(event.getPersonId(), event);
 		}
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if (event.getLinkId().compareTo(new IdImpl(3)) == 0) {
+		if (event.getLinkId().compareTo(Id.create(3, Link.class)) == 0) {
 			double linkTT = event.getTime() - this.pendantLinkEnterEvent.get(event.getPersonId()).getTime();
 			this.linkTTs.add(linkTT);
 		}

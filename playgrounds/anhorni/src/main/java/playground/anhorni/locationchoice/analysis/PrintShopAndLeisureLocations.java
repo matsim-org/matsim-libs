@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -47,9 +46,11 @@ public class PrintShopAndLeisureLocations implements StartupListener, IterationE
 
 	private SimpleFeatureBuilder builder;
 	
+	@Override
 	public void notifyStartup(final StartupEvent event) {	
 	}
 
+	@Override
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		
 		if (event.getIteration() % 10 != 0) return;
@@ -71,7 +72,7 @@ public class PrintShopAndLeisureLocations implements StartupListener, IterationE
 				ActivityImpl act = (ActivityImpl)actslegs.get(j);
 				
 				Coord coord = act.getCoord();
-				SimpleFeature feature = this.createFeature(coord, (IdImpl)person.getId());
+				SimpleFeature feature = this.createFeature(coord, person.getId().toString());
 				
 				if (act.getType().startsWith("shop")) {
 					featuresShop.add(feature);
@@ -85,6 +86,7 @@ public class PrintShopAndLeisureLocations implements StartupListener, IterationE
 		ShapeFileWriter.writeGeometries(featuresLeisure, leisureFile);
 	}
 
+	@Override
 	public void notifyShutdown(final ShutdownEvent controlerShudownEvent) {
 	}
 		
@@ -96,7 +98,7 @@ public class PrintShopAndLeisureLocations implements StartupListener, IterationE
 		builder = new SimpleFeatureBuilder(b.buildFeatureType());
 	}
 	
-	private SimpleFeature createFeature(Coord coord, IdImpl id) {
-		return this.builder.buildFeature(id.toString(), new Object [] {MGC.coord2Point(coord), id.toString()});
+	private SimpleFeature createFeature(Coord coord, String id) {
+		return this.builder.buildFeature(id, new Object [] {MGC.coord2Point(coord), id.toString()});
 	}
 }

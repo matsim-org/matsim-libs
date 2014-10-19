@@ -24,8 +24,8 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -60,7 +60,7 @@ public class AnalyzeZHScenario {
 	
 	private TreeSet<Id<ActivityFacility>> getZHfacilityIds() {
 		TreeSet<Id<ActivityFacility>> zhFacilityIds = new TreeSet<Id<ActivityFacility>>();
-		NodeImpl centerNode = (NodeImpl) this.scenario.getNetwork().getNodes().get(new IdImpl("2531"));
+		NodeImpl centerNode = (NodeImpl) this.scenario.getNetwork().getNodes().get(Id.create("2531", Node.class));
 		double radius = 30000;
 		for (ActivityFacility facility : this.scenario.getActivityFacilities().getFacilities().values()) {
 			if (((CoordImpl)centerNode.getCoord()).calcDistance(facility.getCoord()) < radius) {

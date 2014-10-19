@@ -20,8 +20,9 @@
 package playground.anhorni.PLOC;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
@@ -51,10 +52,10 @@ public class SinglePlanGenerator {
 			homeIndex = 8;
 			facilityIndex = 2;
 		}
-		Id facilityId = new IdImpl(facilityIndex);
+		Id<ActivityFacility> facilityId = Id.create(facilityIndex, ActivityFacility.class);
 		
 		PlanImpl plan = new PlanImpl();
-		ActivityImpl actH = new ActivityImpl("h", new IdImpl(homeIndex));
+		ActivityImpl actH = new ActivityImpl("h", Id.create(homeIndex, Link.class));
 		actH.setFacilityId(facilityId);
 		actH.setCoord(this.facilities.getFacilities().get(facilityId).getCoord());
 		
@@ -65,7 +66,7 @@ public class SinglePlanGenerator {
 		plan.addActivity(actH);
 		plan.addLeg(new LegImpl("walk"));
 		
-		ActivityImpl actH1 = new ActivityImpl("h", new IdImpl(homeIndex));
+		ActivityImpl actH1 = new ActivityImpl("h", Id.create(homeIndex, Link.class));
 		
 		actH1.setStartTime(1.0 * 3600);
 		actH1.setFacilityId(facilityId);
@@ -84,10 +85,10 @@ public class SinglePlanGenerator {
 			homeIndex = 8;
 			facilityIndex = 2;
 		}
-		Id facilityId = new IdImpl(facilityIndex);
+		Id<ActivityFacility> facilityId = Id.create(facilityIndex, ActivityFacility.class);
 		
 		PlanImpl plan = new PlanImpl();
-		ActivityImpl actH = new ActivityImpl("h", new IdImpl(homeIndex));
+		ActivityImpl actH = new ActivityImpl("h", Id.create(homeIndex, Link.class));
 		actH.setFacilityId(facilityId);
 		actH.setCoord(this.facilities.getFacilities().get(facilityId).getCoord());
 		
@@ -98,7 +99,7 @@ public class SinglePlanGenerator {
 		plan.addActivity(actH);		
 		plan.addLeg(new LegImpl("car"));
 				
-		ActivityImpl actS = new ActivityImpl("s", new IdImpl(homeIndex));
+		ActivityImpl actS = new ActivityImpl("s", Id.create(homeIndex, Link.class));
 		
 		actS.setStartTime(10.0 * 3600.0);
 		actS.setMaximumDuration(90.0 * 60.0);
@@ -109,7 +110,7 @@ public class SinglePlanGenerator {
 		plan.addActivity(actS);
 		plan.addLeg(new LegImpl("car"));
 		
-		ActivityImpl actH2 = new ActivityImpl("h", new IdImpl(homeIndex));
+		ActivityImpl actH2 = new ActivityImpl("h", Id.create(homeIndex, Link.class));
 		
 		actH2.setStartTime(11.5 * 3600);
 		actH2.setFacilityId(facilityId);
@@ -126,12 +127,12 @@ public class SinglePlanGenerator {
 			homeIndex = 8;
 			facilityIndex = 2;
 		}
-		Id facilityId = new IdImpl(facilityIndex);
+		Id<ActivityFacility> facilityId = Id.create(facilityIndex, ActivityFacility.class);
 		
 		double time = 0.0;
 		
 		PlanImpl plan = new PlanImpl();
-		ActivityImpl actH = new ActivityImpl("h", new IdImpl(homeIndex));
+		ActivityImpl actH = new ActivityImpl("h", Id.create(homeIndex, Link.class));
 		actH.setFacilityId(facilityId);
 		actH.setCoord(this.facilities.getFacilities().get(facilityId).getCoord());
 		
@@ -147,8 +148,8 @@ public class SinglePlanGenerator {
 		int workIndex = 17; 
 		int workFacilityIndex = 3;
 
-		Id workFacilityId = new IdImpl(workFacilityIndex);
-		ActivityImpl actW = new ActivityImpl("w", new IdImpl(workIndex));
+		Id<ActivityFacility> workFacilityId = Id.create(workFacilityIndex, ActivityFacility.class);
+		ActivityImpl actW = new ActivityImpl("w", Id.create(workIndex, Link.class));
 		actW.setFacilityId(workFacilityId);
 		actW.setCoord(this.facilities.getFacilities().get(workFacilityId).getCoord());
 		
@@ -163,7 +164,7 @@ public class SinglePlanGenerator {
 		
 		plan.addLeg(new LegImpl("car"));
 		
-		ActivityImpl actS = new ActivityImpl("s", new IdImpl(homeIndex));
+		ActivityImpl actS = new ActivityImpl("s", Id.create(homeIndex, Link.class));
 		actS.setFacilityId(facilityId);
 		actS.setCoord(this.facilities.getFacilities().get(facilityId).getCoord());
 		actS.setStartTime(time);
@@ -175,7 +176,7 @@ public class SinglePlanGenerator {
 		
 		plan.addLeg(new LegImpl("car"));
 		
-		ActivityImpl actH2 = new ActivityImpl("h", new IdImpl(homeIndex));
+		ActivityImpl actH2 = new ActivityImpl("h", Id.create(homeIndex, Link.class));
 		actH2.setFacilityId(facilityId);
 		actH2.setCoord(this.facilities.getFacilities().get(facilityId).getCoord());
 		actH2.setStartTime(time);

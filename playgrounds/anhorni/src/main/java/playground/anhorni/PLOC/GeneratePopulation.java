@@ -19,8 +19,9 @@
 
 package playground.anhorni.PLOC;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 
 public class GeneratePopulation {
@@ -31,7 +32,7 @@ public class GeneratePopulation {
 	public void generatePopulation(int populationSize, ExpenditureAssigner expenditureAssigner,  Population staticPopulation) {
 		
 		for (int i = 0; i < populationSize; i++) {
-			PersonImpl p = new PersonImpl(new IdImpl(i));
+			PersonImpl p = new PersonImpl(Id.create(i, Person.class));
 
 			// assign home town
 			int townId = 0;

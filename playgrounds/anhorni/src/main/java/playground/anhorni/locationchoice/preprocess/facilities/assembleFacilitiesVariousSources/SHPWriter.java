@@ -29,7 +29,8 @@ import java.util.List;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.io.IOUtils;
@@ -133,31 +134,31 @@ public class SHPWriter {
 			String shop = facility.getId() +"\t" + mapMZ.get(facility.getRetailerID().toString()) +"\t" +
 				facility.getName() + "\t" + facility.getSize_descr();
 
-			if (facility.getRetailerID().compareTo(new IdImpl("1")) == 0) {
+			if (facility.getRetailerID().compareTo(Id.create("1", Person.class)) == 0) {
 				featuresCoop.add(this.createFeature(coord, shop));
 			}
-			else if (facility.getRetailerID().compareTo(new IdImpl("2")) == 0) {
+			else if (facility.getRetailerID().compareTo(Id.create("2", Person.class)) == 0) {
 				featuresMigros.add(this.createFeature(coord, shop));
 			}
-			else if (facility.getRetailerID().compareTo(new IdImpl("3")) == 0) {
+			else if (facility.getRetailerID().compareTo(Id.create("3", Person.class)) == 0) {
 				featuresDenner.add(this.createFeature(coord, shop));
 			}
-			else if (facility.getRetailerID().compareTo(new IdImpl("4")) == 0) {
+			else if (facility.getRetailerID().compareTo(Id.create("4", Person.class)) == 0) {
 				featuresSpar.add(this.createFeature(coord, shop));
 			}
-			else if (facility.getRetailerID().compareTo(new IdImpl("5")) == 0) {
+			else if (facility.getRetailerID().compareTo(Id.create("5", Person.class)) == 0) {
 				featuresPickPay.add(this.createFeature(coord, shop));
 			}
-			else if (facility.getRetailerID().compareTo(new IdImpl("6")) == 0) {
+			else if (facility.getRetailerID().compareTo(Id.create("6", Person.class)) == 0) {
 				featuresPrimo.add(this.createFeature(coord, shop));
 			}
-			else if (facility.getRetailerID().compareTo(new IdImpl("7")) == 0) {
+			else if (facility.getRetailerID().compareTo(Id.create("7", Person.class)) == 0) {
 				featuresVolg.add(this.createFeature(coord, shop));
 			}
-			else if (facility.getRetailerID().compareTo(new IdImpl("8")) == 0) {
+			else if (facility.getRetailerID().compareTo(Id.create("8", Person.class)) == 0) {
 				featuresWarehouses.add(this.createFeature(coord, shop));
 			}
-			else if (facility.getRetailerID().compareTo(new IdImpl("9")) == 0) {
+			else if (facility.getRetailerID().compareTo(Id.create("9", Person.class)) == 0) {
 				featuresSupermarkets.add(this.createFeature(coord, shop));
 			}
 			else {

@@ -28,7 +28,6 @@ import java.util.Vector;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 
 public class Relation {
@@ -126,7 +125,7 @@ public class Relation {
 		Iterator<Integer> n_it = this.fromZone.getNodes().iterator();
 		while (n_it.hasNext()) {
 			Integer n_i=n_it.next();
-			Node node=network.getNodes().get(new IdImpl(Integer.toString(n_i)));
+			Node node=network.getNodes().get(Id.create(n_i, Node.class));
 
 			for (Link l : node.getOutLinks().values()) {
 				if (this.totalOutLinkCapacity>0.0) {
@@ -141,7 +140,7 @@ public class Relation {
 		n_it = this.toZone.getNodes().iterator();
 		while (n_it.hasNext()) {
 			Integer n_i=n_it.next();
-			Node node=network.getNodes().get(new IdImpl(Integer.toString(n_i)));
+			Node node=network.getNodes().get(Id.create(n_i, Node.class));
 
 			for (Link l : node.getInLinks().values()) {
 				if (this.totalInLinkCapacity>0.0) {
@@ -161,7 +160,7 @@ public class Relation {
 		Iterator<Integer> n_it = this.fromZone.getNodes().iterator();
 		while (n_it.hasNext()) {
 			Integer n_i=n_it.next();
-			Node node=network.getNodes().get(new IdImpl(Integer.toString(n_i)));
+			Node node=network.getNodes().get(Id.create(n_i, Node.class));
 
 			for (Link l : node.getOutLinks().values()) {
 				this.totalOutLinkCapacity+=l.getCapacity();
@@ -171,7 +170,7 @@ public class Relation {
 		n_it = this.toZone.getNodes().iterator();
 		while (n_it.hasNext()) {
 			Integer n_i=n_it.next();
-			Node node=network.getNodes().get(new IdImpl(Integer.toString(n_i)));
+			Node node=network.getNodes().get(Id.create(n_i, Node.class));
 
 			for (Link l : node.getInLinks().values()) {
 				this.totalInLinkCapacity+=l.getCapacity();

@@ -30,8 +30,7 @@ import java.util.Vector;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -167,7 +166,7 @@ public class CompareTrips {
 				if (ZIELPNR.length() == 1) ZIELPNR = "0" + ZIELPNR; 
 				String tripNr = entries[3].trim();
 				
-				Id id = new IdImpl(HHNR + ZIELPNR + tripNr);
+				Id<Person> id = Id.create(HHNR + ZIELPNR + tripNr, Person.class);
 				
 				Coord coord = new CoordImpl(
 						Double.parseDouble(entries[30].trim()), Double.parseDouble(entries[31].trim()));
@@ -246,7 +245,7 @@ public class CompareTrips {
 			outString = "Tram";
 		}
 		else if (inString.equals("-97")) {
-			outString = "unvollst�ndiger Ausgang";
+			outString = "unvollständiger Ausgang";
 		}
 		else if (inString.equals("5")) {
 			outString = "bus";
@@ -262,7 +261,7 @@ public class CompareTrips {
 	
 	private MZTrip getNextTrip(String tripId) {
 		String followingTrip = String.valueOf(Integer.parseInt(tripId) + 1);
-		return this.mzTrips.get(new IdImpl(followingTrip)); 
+		return this.mzTrips.get(Id.create(followingTrip, Person.class)); 
 	}
 	
 }

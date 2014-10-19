@@ -26,8 +26,10 @@ import java.util.List;
 import java.util.Vector;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.anhorni.choiceSetGeneration.helper.ZHFacility;
@@ -73,12 +75,12 @@ public class ZHFacilitiesReader {
 				String name = entries[6].trim();
 				
 				facilities.add(new ZHFacility(
-									new IdImpl(shopID),
+									Id.create(shopID, ActivityFacility.class),
 									name,
 									new CoordImpl(0.0, 0.0),
 									exactPosition, 
-									new IdImpl("0"),
-									new IdImpl(retailerID),
+									Id.create("0", Link.class),
+									Id.create(retailerID, Person.class),
 									size_descr,
 									0.0,
 									0.0));	

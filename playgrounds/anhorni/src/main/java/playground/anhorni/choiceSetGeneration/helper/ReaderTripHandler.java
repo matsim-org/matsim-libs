@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -35,7 +35,7 @@ public class ReaderTripHandler {
 	private final static Logger log = Logger.getLogger(ReaderTripHandler.class);
 	private Trip trip;
 	private double travelTimeBudget;
-	private Id chosenFacilityId;
+	private Id<ActivityFacility> chosenFacilityId;
 
 
 	public void constructTrip(String [] entries, NetworkImpl network, ZHFacilities facilities,
@@ -49,7 +49,7 @@ public class ReaderTripHandler {
 		beforeShoppingAct.setEndTime(endTimeBeforeShoppingAct);
 		beforeShoppingAct.setLinkId(network.getNearestLink(beforeShoppingCoord).getId());
 
-		Id chosenFacilityId = new IdImpl(entries[2].trim());
+		Id<ActivityFacility> chosenFacilityId = Id.create(entries[2].trim(), ActivityFacility.class);
 
 		ZHFacility chosenFacility = facilities.getZhFacilities().get(chosenFacilityId);
 		Link link = network.getLinks().get(chosenFacility.getLinkId());
@@ -93,7 +93,7 @@ public class ReaderTripHandler {
 		this.travelTimeBudget = travelTimeBudget;
 	}
 
-	public Id getChosenFacilityId() {
+	public Id<ActivityFacility> getChosenFacilityId() {
 		return chosenFacilityId;
 	}
 }

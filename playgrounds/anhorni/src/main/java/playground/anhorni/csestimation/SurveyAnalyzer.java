@@ -10,7 +10,6 @@ import org.matsim.analysis.Bins;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 public class SurveyAnalyzer {
@@ -60,7 +59,7 @@ public class SurveyAnalyzer {
 				else {	
 					frequentlyCnt++;
 					ShopLocation store = this.ucs.get(storeId);
-					if (storeId.compareTo(new IdImpl("200023"))==0 || storeId.compareTo(new IdImpl("200025"))==0) continue;
+					if (storeId.compareTo(Id.create("200023", Location.class))==0 || storeId.compareTo(Id.create("200025", Location.class))==0) continue;
 					dist2Home.add(CoordUtils.calcDistance(p.getHomeLocation().getCoord(), store.getCoord()));					
 				}
 			}

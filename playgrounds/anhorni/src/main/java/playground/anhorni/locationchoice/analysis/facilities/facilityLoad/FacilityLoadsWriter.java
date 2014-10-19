@@ -21,14 +21,13 @@
 package playground.anhorni.locationchoice.analysis.facilities.facilityLoad;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.TreeMap;
 
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
@@ -39,7 +38,7 @@ public class FacilityLoadsWriter {
 
 	private SimpleFeatureBuilder builder;
 	
-	public void write(TreeMap<Id, FacilityLoad> facilityLoads) {
+	public void write(TreeMap<Id<ActivityFacility>, FacilityLoad> facilityLoads) {
 		this.initGeometries();
 		String shopFileIncreased = "output/postprocessing/shopLoads_Increased.shp";
 		String shopFileDecreased = "output/postprocessing/shopLoads_Decreased.shp";
@@ -59,10 +58,10 @@ public class FacilityLoadsWriter {
 			}
 		}
 		if (featuresIncreased.size() > 0) {
-			ShapeFileWriter.writeGeometries((Collection<SimpleFeature>)featuresIncreased, shopFileIncreased);
+			ShapeFileWriter.writeGeometries(featuresIncreased, shopFileIncreased);
 		}
 		if (featuresDecreased.size() > 0) { 
-			ShapeFileWriter.writeGeometries((Collection<SimpleFeature>)featuresDecreased, shopFileDecreased);
+			ShapeFileWriter.writeGeometries(featuresDecreased, shopFileDecreased);
 		}
 	}
 		
@@ -75,7 +74,7 @@ public class FacilityLoadsWriter {
 		this.builder = new SimpleFeatureBuilder(b.buildFeatureType());
 	}
 	
-	private SimpleFeature createFeature(Coord coord, IdImpl id, double loadDiff ) {
+	private SimpleFeature createFeature(Coord coord, Id<ActivityFacility> id, double loadDiff ) {
 		return this.builder.buildFeature(id.toString(), new Object [] {MGC.coord2Point(coord), id.toString(), Double.toString(loadDiff)});
 	}
 }

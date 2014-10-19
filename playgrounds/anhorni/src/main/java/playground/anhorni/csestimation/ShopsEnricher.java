@@ -26,7 +26,6 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -83,7 +82,7 @@ public class ShopsEnricher {
 				sum += v;
 			}
 			if (sum > 0) {
-				Id<Location> id = new IdImpl(Integer.parseInt(entries[0].trim()));
+				Id<Location> id = Id.create(Integer.parseInt(entries[0].trim()), Location.class);
 				BZShop bzShop = new BZShop(id);
 				Coord coord = new CoordImpl(x, y);
 				bzShop.setCoord(coord);			
@@ -101,25 +100,25 @@ public class ShopsEnricher {
 						
 			if (CoordUtils.calcDistance(closestBZShop.getCoord(), shop.getCoord()) < 200) {
 				if (closestBZShop.sizeMultiplyDefined()) {					
-					if (shop.getId() == new IdImpl(40051)) {
+					if (shop.getId() == Id.create(40051, Location.class)) {
 						shop.setSize(4);
 					}
-					else if (shop.getId().compareTo(new IdImpl(40011)) == 0) {
+					else if (shop.getId().compareTo(Id.create(40011, Location.class)) == 0) {
 						shop.setSize(1);
 					}
-					else if (shop.getId().compareTo(new IdImpl(40014)) == 0) {
+					else if (shop.getId().compareTo(Id.create(40014, Location.class)) == 0) {
 						shop.setSize(3);
 					}
-					else if (shop.getId().compareTo(new IdImpl(100002)) == 0) {
+					else if (shop.getId().compareTo(Id.create(100002, Location.class)) == 0) {
 						shop.setSize(0);
 					}
-					else if (shop.getId().compareTo(new IdImpl(10002)) == 0) {
+					else if (shop.getId().compareTo(Id.create(10002, Location.class)) == 0) {
 						shop.setSize(4);
 					}
-					else if (shop.getId().compareTo(new IdImpl(100111)) == 0) {
+					else if (shop.getId().compareTo(Id.create(100111, Location.class)) == 0) {
 						shop.setSize(4);
 					}
-					else if (shop.getId().compareTo(new IdImpl(100165)) == 0) {
+					else if (shop.getId().compareTo(Id.create(100165, Location.class)) == 0) {
 						shop.setSize(0);
 					}
 					else {

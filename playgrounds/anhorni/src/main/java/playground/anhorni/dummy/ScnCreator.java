@@ -19,33 +19,40 @@
 
 package playground.anhorni.dummy;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.*;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.api.experimental.facilities.ActivityFacilitiesFactory;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.*;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.io.IOUtils;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.TreeMap;
-import java.util.Vector;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacilitiesFactory;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.io.IOUtils;
 
 public class ScnCreator {
 	
@@ -68,7 +75,7 @@ public class ScnCreator {
 	private String pusPersonsOutFile = "C:/l/andreasrep/coding/input/tutorial/travelsurvey_persons.txt";
 	private String pusTripsOutFile = "C:/l/andreasrep/coding/input/tutorial/travelsurvey_trips.txt";
 	
-	private TreeMap<Id, Coord> municipalities = new TreeMap<Id, Coord>();
+	private TreeMap<Id<Coord>, Coord> municipalities = new TreeMap<>();
 	
 	// --------------------------------------------------------------------------
 	public static void main(String[] args) {
@@ -81,7 +88,7 @@ public class ScnCreator {
 		this.smearFacilities();
 		this.smearPlans();	
 		this.writeFacilities();
-		List<Id> sampledPersons = this.writePUSPersons();
+		List<Id<Person>> sampledPersons = this.writePUSPersons();
 		this.writePUSTrips(sampledPersons);
 		this.writeCensus();
 		log.info("Creation finished ......................");
@@ -92,7 +99,7 @@ public class ScnCreator {
 		this.newScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		new MatsimNetworkReader(this.origScenario).readFile(networkFile);
-		new FacilitiesReaderMatsimV1((ScenarioImpl)this.origScenario).readFile(this.facilitiesFile);
+		new FacilitiesReaderMatsimV1(this.origScenario).readFile(this.facilitiesFile);
 		MatsimPopulationReader populationReader = new MatsimPopulationReader(this.origScenario);
 		populationReader.readFile(this.plansFile);
 		log.info("Original population size " + this.origScenario.getPopulation().getPersons().size());
@@ -107,7 +114,7 @@ public class ScnCreator {
 					
 			while ((line = bufferedReader.readLine()) != null) {
 				String parts[] = line.split("\t");
-				Id id = new IdImpl(parts[0]);
+				Id<Coord> id = Id.create(parts[0], Coord.class);
 				Coord coord = new CoordImpl(Double.parseDouble(parts[1]), Double.parseDouble(parts[2]));
 				this.municipalities.put(id, coord);;
 			}
@@ -120,7 +127,7 @@ public class ScnCreator {
 	private void smearPlans() {
 		int cnt = 0;
 		for (Person p : this.origScenario.getPopulation().getPersons().values()) {
-            ((PersonImpl) p).setId(new IdImpl(cnt));
+            ((PersonImpl) p).setId(Id.create(cnt, Person.class));
             Plan plan = p.getSelectedPlan();
 			
 			ActivityImpl homeAct = (ActivityImpl)plan.getPlanElements().get(0);
@@ -200,7 +207,7 @@ public class ScnCreator {
 				int zgde = random.nextInt(10);
 				int gebId = random.nextInt(10000);
 				int hhnr = random.nextInt(10000000);
-				Id personId = new IdImpl(cnt);
+				Id<Person> personId = Id.create(cnt, Person.class);
 				int gemt = random.nextInt(1000);
 				int age  = 1 + random.nextInt(100);
 				int gorthaus = random.nextInt(1000);				
@@ -249,8 +256,8 @@ public class ScnCreator {
 		}
 		if (workCoord != null) {
 			double minDistance = 999999999999999999.0;
-			Id closestMunicipality = this.municipalities.firstKey();
-			for (Id id : this.municipalities.keySet()) {
+			Id<Coord> closestMunicipality = this.municipalities.firstKey();
+			for (Id<Coord> id : this.municipalities.keySet()) {
 				CoordImpl coord = (CoordImpl) this.municipalities.get(id);
 				if (coord.calcDistance(workCoord) < minDistance) {
 					minDistance = coord.calcDistance(workCoord);
@@ -262,10 +269,10 @@ public class ScnCreator {
 		return municipality;
 	}
 	
-	private List<Id> writePUSPersons() {
+	private List<Id<Person>> writePUSPersons() {
 		
 		// only take every third person! PUS is smaller than census!
-		List<Id> sampledPersons = new Vector<Id>();
+		List<Id<Person>> sampledPersons = new ArrayList<>();
 		
 		log.info("Writing PUS persons");
 		try {	
@@ -292,7 +299,7 @@ public class ScnCreator {
 		return sampledPersons;
 	}
 			
-	private void writePUSTrips(List<Id> sampledPersons) {
+	private void writePUSTrips(List<Id<Person>> sampledPersons) {
 		log.info("Writing PUS trips");
 		try {	
 			String header = "PersonId\tTripId\txCoordOrigin\tyCoordOrigin\txCoordDestination\tyCoordDestination\tactivityDuration\tmode\tactivityType";
@@ -355,7 +362,7 @@ public class ScnCreator {
 			
 			int counter = 0;
 			for (ActivityFacility facility : ((ScenarioImpl) this.newScenario).getActivityFacilities().getFacilities().values()) {
-				out.write(new IdImpl(counter) + "\t" + facility.getCoord().getX() + "\t" + facility.getCoord().getY() + "\t");
+				out.write(counter + "\t" + facility.getCoord().getX() + "\t" + facility.getCoord().getY() + "\t");
 				
 				int cnt = 0;
 				for (ActivityOption actOption : facility.getActivityOptions().values()) {

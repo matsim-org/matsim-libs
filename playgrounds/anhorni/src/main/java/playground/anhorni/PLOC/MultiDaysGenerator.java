@@ -19,9 +19,15 @@
 
 package playground.anhorni.PLOC;
 
+import java.io.File;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+import java.util.Vector;
+
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonImpl;
@@ -29,12 +35,6 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
-
-import java.io.File;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-import java.util.Vector;
 
 public class MultiDaysGenerator {
 	
@@ -85,10 +85,10 @@ public class MultiDaysGenerator {
 	private void generatePlan(List<Integer> keyList, double limit, int day) {
 		int cnt = 0;
 		for (Integer id : keyList) {
-			PersonImpl p = (PersonImpl)staticPopulation.getPersons().get(new IdImpl(id));
+			PersonImpl p = (PersonImpl)staticPopulation.getPersons().get(Id.create(id, Person.class));
 
 			// copy person -------
-			PersonImpl pTmp = new PersonImpl(new IdImpl(id));
+			PersonImpl pTmp = new PersonImpl(Id.create(id, Person.class));
 			// copy person -------
 			
 			boolean worker = false;

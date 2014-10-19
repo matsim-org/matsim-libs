@@ -25,19 +25,20 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 public class ChoiceSet {
 
-	private Id id = null;
+	private Id<ChoiceSet> id = null;
 	private double travelTimeBudget = -1.0;
 	private Trip trip;	
 	private TreeMap<Id, ChoiceSetFacility> choiceSetFacilities = new TreeMap<Id, ChoiceSetFacility>();
 	private PersonAttributes personAttributes;
-	private Id chosenFacilityId;
+	private Id<ActivityFacility> chosenFacilityId;
 	//private final static Logger log = Logger.getLogger(ChoiceSet.class);
 		
-	public ChoiceSet(Id id, Trip trip, Id chosenFacilityId) {
+	public ChoiceSet(Id<ChoiceSet> id, Trip trip, Id<ActivityFacility> chosenFacilityId) {
 		this.id = id;
 		this.trip = trip;	
 		this.chosenFacilityId = chosenFacilityId;

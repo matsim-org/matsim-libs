@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -103,7 +102,7 @@ public class ConvertThurgau2Plans {
 		Map<Id,String> person_strings = new TreeMap<Id, String>();
 		int id = Integer.MIN_VALUE;
 		int prev_id = Integer.MIN_VALUE;
-		Id prev_pid = new IdImpl(prev_id);
+		Id<Person> prev_pid = Id.create(prev_id, Person.class);
 		String person_string = "";
 		log.info("      parsing persons...");
 
@@ -128,7 +127,7 @@ public class ConvertThurgau2Plans {
 				}
 				person_string = curr_line + "\n";
 				prev_id = id;
-				prev_pid = new IdImpl(prev_id);
+				prev_pid = Id.create(prev_id, Person.class);
 			}
 		}
 		if (person_strings.put(prev_pid, person_string) != null) {
@@ -165,7 +164,7 @@ public class ConvertThurgau2Plans {
 		while ((curr_line = br.readLine()) != null) {
 			String[] entrs = curr_line.split("\t", -1);
 
-			Id id = new IdImpl(Integer.parseInt(entrs[0].trim())); //p_nr
+			Id<Person> id = Id.create(Integer.parseInt(entrs[0].trim()), Person.class); //p_nr
 			
 			// person age
 			int age = Integer.parseInt(entrs[4].trim()); //age

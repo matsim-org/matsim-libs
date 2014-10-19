@@ -8,7 +8,6 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.WGS84toCH1903LV03;
 
@@ -38,7 +37,7 @@ public class SurveyReader {
 			String curr_line;
 			while ((curr_line = br.readLine()) != null) {
 				String[] entrs = curr_line.split(";", -1);
-				Id userId = new IdImpl(entrs[0].trim().substring(4, 8));
+				Id<Person> userId = Id.create(entrs[0].trim().substring(4, 8), Person.class);
 				
 				EstimationPerson person = new EstimationPerson(userId);
 				this.population.put(userId, person);
@@ -67,7 +66,7 @@ public class SurveyReader {
 				person.setNbrPersonShoppingTripsMonth(Integer.parseInt(entrs[5].trim()));
 				person.setNbrShoppingTripsMonth(entrs[6].trim());
 
-				Location hlocation = new Location(new IdImpl(-1));
+				Location hlocation = new Location(Id.create(-1, Location.class));
 				person.setHomeLocation(hlocation);
 				hlocation.setCity(entrs[10].trim());
 				
@@ -83,7 +82,7 @@ public class SurveyReader {
 				boolean hasJob = entrs[17].trim().equals("yes");
 				
 				if (hasJob) {
-					Location wlocation = new Location(new IdImpl(-2));
+					Location wlocation = new Location(Id.create(-2, Location.class));
 					person.setEmployed(hasJob);
 					person.setWorkLocation(wlocation);
 					wlocation.setCity(entrs[21].trim());
@@ -115,13 +114,13 @@ public class SurveyReader {
 			FileReader fr = new FileReader(file);
 			BufferedReader br = new BufferedReader(fr);
 			String curr_line;
-			Id prevId = new IdImpl(-99);
+			Id<Person> prevId = Id.create(-99, Person.class);
 			int countAware = 0;
 			int countVisited = 0;
 			while ((curr_line = br.readLine()) != null) {
 				String[] entrs = curr_line.split(";", -1);
-				Id shopId = new IdImpl(entrs[1].trim());
-				Id userId = new IdImpl(entrs[2].trim().substring(4, 8));
+				Id<Location> shopId = Id.create(entrs[1].trim(), Location.class);
+				Id<Person> userId = Id.create(entrs[2].trim().substring(4, 8), Person.class);
 				
 				EstimationPerson person = this.population.get(userId);
 				ShopLocation store = new ShopLocation(shopId);				
@@ -166,12 +165,12 @@ public class SurveyReader {
 						person.addStore(store, aware, visited);	
 					}
 				}
-				if (prevId.compareTo(userId) != 0 && prevId.compareTo(new IdImpl(-99)) != 0) {
+				if (prevId.compareTo(userId) != 0 && prevId.compareTo(Id.create(-99, Person.class)) != 0) {
 					log.info("parsed user: " + prevId + " " + countAware + " aware stores " + countVisited + " visited stores");
 					countAware = 0;
 					countVisited = 0;
 				}
-				prevId = new IdImpl(entrs[2].trim().substring(4, 8));
+				prevId = Id.create(entrs[2].trim().substring(4, 8), Person.class);
 				
 			}
 		} catch (IOException e) {

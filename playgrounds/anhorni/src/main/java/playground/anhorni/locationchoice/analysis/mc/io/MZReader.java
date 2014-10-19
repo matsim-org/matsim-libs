@@ -26,8 +26,7 @@ import java.util.List;
 import java.util.Vector;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.anhorni.locationchoice.analysis.mc.MZTrip;
@@ -41,9 +40,7 @@ public class MZReader {
 	
 	public List<MZTrip> read(String file) {
 						
-		try {
-			FileReader fileReader = new FileReader(file);
-			BufferedReader bufferedReader = new BufferedReader(fileReader);
+		try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
 			String curr_line = bufferedReader.readLine(); // Skip header
 						
 			while ((curr_line = bufferedReader.readLine()) != null) {
@@ -53,12 +50,12 @@ public class MZReader {
 				String ZIELPNR = entries[1].trim();
 				if (ZIELPNR.length() == 1) ZIELPNR = "0" + ZIELPNR; 
 				//String tripNr = entries[3].trim();
-				//Id id = new IdImpl(HHNR + ZIELPNR + tripNr);
-				Id personId = new IdImpl(HHNR+ZIELPNR);
+				//Id id = Id.create(HHNR + ZIELPNR + tripNr);
+				Id<Person> personId = Id.create(HHNR+ZIELPNR, Person.class);
 				
 				// filter inplausible persons
 				// 6177302: unbezahlte Arbeit
-				//if (personId.compareTo(new IdImpl("6177302")) == 0) continue; 
+				//if (personId.compareTo(Id.create("6177302")) == 0) continue; 
 				
 				CoordImpl coordEnd = new CoordImpl(
 						Double.parseDouble(entries[30].trim()), Double.parseDouble(entries[31].trim()));

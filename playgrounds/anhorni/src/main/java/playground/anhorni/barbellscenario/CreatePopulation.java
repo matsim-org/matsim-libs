@@ -20,8 +20,9 @@
 package playground.anhorni.barbellscenario;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -72,18 +73,18 @@ public class CreatePopulation {
 		ActivityFacility workFacility;
 		
 		for (int i = 0; i<nPersons; i++) {
-			PersonImpl p = new PersonImpl(new IdImpl(i));
+			PersonImpl p = new PersonImpl(Id.create(i, Person.class));
 			p.setEmployed(true);
 			
 			if (i % 3 == 0) {
-				homeFacility = this.scenario.getActivityFacilities().getFacilities().get(new IdImpl(0));
-				workFacility = this.scenario.getActivityFacilities().getFacilities().get(new IdImpl(3));
+				homeFacility = this.scenario.getActivityFacilities().getFacilities().get(Id.create(0, ActivityFacility.class));
+				workFacility = this.scenario.getActivityFacilities().getFacilities().get(Id.create(3, ActivityFacility.class));
 			} else if (i % 3 == 1) {
-				homeFacility = this.scenario.getActivityFacilities().getFacilities().get(new IdImpl(1));
-				workFacility = this.scenario.getActivityFacilities().getFacilities().get(new IdImpl(4));
+				homeFacility = this.scenario.getActivityFacilities().getFacilities().get(Id.create(1, ActivityFacility.class));
+				workFacility = this.scenario.getActivityFacilities().getFacilities().get(Id.create(4, ActivityFacility.class));
 			} else {
-				homeFacility = this.scenario.getActivityFacilities().getFacilities().get(new IdImpl(2));
-				workFacility = this.scenario.getActivityFacilities().getFacilities().get(new IdImpl(5));
+				homeFacility = this.scenario.getActivityFacilities().getFacilities().get(Id.create(2, ActivityFacility.class));
+				workFacility = this.scenario.getActivityFacilities().getFacilities().get(Id.create(5, ActivityFacility.class));
 			}
 			double timeOffset = i * (3600.0 / nPersons);
 			this.scenario.getPopulation().addPerson(p);

@@ -21,11 +21,12 @@ package playground.anhorni.locationchoice.analysis.mc;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 public class MZTrip {
 	
-	private Id personId = null;
+	private Id<Person> personId = null;
 	private CoordImpl home = null;
 	private CoordImpl coordEnd = null;
 	private CoordImpl coordStart = null;
@@ -40,7 +41,7 @@ public class MZTrip {
 	private String purpose;
 	private String wzweck2;
 	
-	public MZTrip(Id personId, Coord coordStart, Coord coordEnd, double startTime, double endTime) {
+	public MZTrip(Id<Person> personId, Coord coordStart, Coord coordEnd, double startTime, double endTime) {
 		super();
 		this.personId = personId;
 		this.coordStart = new CoordImpl(coordStart.getX(), coordStart.getY());
@@ -49,10 +50,10 @@ public class MZTrip {
 		this.endTime = endTime;
 	}
 
-	public Id getPersonId() {
+	public Id<Person> getPersonId() {
 		return personId;
 	}
-	public void setPersonId(Id personId) {
+	public void setPersonId(Id<Person> personId) {
 		this.personId = personId;
 	}
 	public CoordImpl getCoordEnd() {

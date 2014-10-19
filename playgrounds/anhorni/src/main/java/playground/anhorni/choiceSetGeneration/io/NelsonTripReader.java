@@ -29,8 +29,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 
@@ -50,7 +49,7 @@ public class NelsonTripReader {
 	
 	private List<ChoiceSet> choiceSets;
 	private final static Logger log = Logger.getLogger(NelsonTripReader.class);
-	private TreeMap<Id, MZTrip> mzTrips = null; 
+	private TreeMap<Id<Person>, MZTrip> mzTrips = null; 
 	private final NetworkImpl network;
 	private final ZHFacilities facilities;
 		
@@ -60,7 +59,7 @@ public class NelsonTripReader {
 	}
 	
 	public List<ChoiceSet> readFiles(final String file0, final String file1, String mode)  {
-		this.mzTrips = new TreeMap<Id, MZTrip>();
+		this.mzTrips = new TreeMap<>();
 		this.choiceSets = new Vector<ChoiceSet>();
 		
 		read0(file0, mode);
@@ -95,7 +94,7 @@ public class NelsonTripReader {
 				if (!(walk || car )) continue;
 								
 				// get the after shopping trip:	
-				MZTrip mzTrip = this.mzTrips.get(new IdImpl(line.getNextTrip()));
+				MZTrip mzTrip = this.mzTrips.get(Id.create(line.getNextTrip(), Person.class));
 				
 				// mode change: e.g. auto -> bike 43179022
 				if (mzTrip == null) {
@@ -103,7 +102,7 @@ public class NelsonTripReader {
 				}
 				
 				line.constructTrip(entries, network, this.facilities, mzTrip);
-				ChoiceSet choiceSet = new ChoiceSet(new IdImpl(line.getTripId()), line.getTrip(), line.getChosenFacilityId());
+				ChoiceSet choiceSet = new ChoiceSet(Id.create(line.getTripId(), ChoiceSet.class), line.getTrip(), line.getChosenFacilityId());
 				choiceSet.setPersonAttributes(line.getPersonAttributes());
 				choiceSet.setTravelTimeBudget(line.getTravelTimeBudget());
 				
@@ -142,7 +141,7 @@ public class NelsonTripReader {
 				if (ZIELPNR.length() == 1) ZIELPNR = "0" + ZIELPNR; 
 				String tripNr = entries[3].trim();
 				
-				Id id = new IdImpl(HHNR + ZIELPNR + tripNr);
+				Id<Person> id = Id.create(HHNR + ZIELPNR + tripNr, Person.class);
 				
 				Coord coord = new CoordImpl(
 						Double.parseDouble(entries[30].trim()), Double.parseDouble(entries[31].trim()));
@@ -157,6 +156,8 @@ public class NelsonTripReader {
 				MZTrip mzTrip = new MZTrip(id, null, coord, startTime, endTime);
 				this.mzTrips.put(id, mzTrip);
 			}
+			
+			bufferedReader.close();
 		} catch (IOException e) {
 				throw new RuntimeException(e);
 		}

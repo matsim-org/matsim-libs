@@ -21,9 +21,9 @@
 package playground.anhorni;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -62,7 +62,7 @@ public class ExpBetaPlanForRemovalSelectorTest extends AbstractPlanSelectorTest 
 	 */
 	public void testExpBeta2() {
 		this.config.planCalcScore().setBrainExpBeta(2.0);
-		PersonImpl person = new PersonImpl(new IdImpl(1));
+		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
 		// TODO [AH] Update to newest formula
 		// weight = Math.exp(this.beta * 5 * (plan.getScore() / maxScore));
 		PlanImpl plan1 = person.createAndAddPlan(false); // weight: 14764.781
@@ -115,7 +115,7 @@ public class ExpBetaPlanForRemovalSelectorTest extends AbstractPlanSelectorTest 
 	 */
 	public void testExpBeta1() {
 		this.config.planCalcScore().setBrainExpBeta(1.0);
-		PersonImpl person = new PersonImpl(new IdImpl(1));
+		PersonImpl person = new PersonImpl(Id.create(1, Person.class));
 		// TODO [AH] update to newest formula
 		// weight = Math.exp(this.beta * (plan.getScore() - maxScore));
 		// weight: 121.5104175

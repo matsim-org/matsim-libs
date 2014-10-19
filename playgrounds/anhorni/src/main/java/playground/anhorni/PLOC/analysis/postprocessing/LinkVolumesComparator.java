@@ -31,8 +31,8 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 public class LinkVolumesComparator {
@@ -41,7 +41,7 @@ public class LinkVolumesComparator {
 	private int numberOfAnalyses;
 	private String outpath;
 	private Network network;
-	private TreeMap<Id, EnsemblePerLink> ensembles = new TreeMap<Id, EnsemblePerLink>();
+	private TreeMap<Id<Link>, EnsemblePerLink> ensembles = new TreeMap<Id<Link>, EnsemblePerLink>();
 	
 	private final static Logger log = Logger.getLogger(LinkVolumesComparator.class);
 	
@@ -105,7 +105,7 @@ public class LinkVolumesComparator {
 	          String line = bufferedReader.readLine(); //skip header
 	          while ((line = bufferedReader.readLine()) != null) {
 	        	  String parts[] = line.split("\t");
-	        	  Id id = new IdImpl(parts[0]);
+	        	  Id<Link> id = Id.create(parts[0], Link.class);
 	        	  double simVal = Double.parseDouble(parts[1]);
 	        	  for (int i = 0; i < 24; i++) {
 	        		  this.addSimVal(id, i, simVal);
@@ -118,12 +118,11 @@ public class LinkVolumesComparator {
 	}
 	
 	private void readCountsCompare(String p) {
-		try {
-	          BufferedReader bufferedReader = new BufferedReader(new FileReader(p));
+		try (BufferedReader bufferedReader = new BufferedReader(new FileReader(p))) {
 	          String line = bufferedReader.readLine(); //skip header
 	          while ((line = bufferedReader.readLine()) != null) {
 	        	  String parts[] = line.split("\t");
-	        	  Id id = new IdImpl(parts[0]);
+	        	  Id<Link> id = Id.create(parts[0], Link.class);
 	        	  int hour = Integer.parseInt(parts[1]) - 1;
 	        	  double simVal = Double.parseDouble(parts[2]);
 	        	  this.addSimVal(id, hour, simVal);
@@ -134,7 +133,7 @@ public class LinkVolumesComparator {
       }		
 	}
 	
-	private void addSimVal(Id id, int hour, double volume) {
+	private void addSimVal(Id<Link> id, int hour, double volume) {
 		if (this.ensembles.get(id) == null) this.ensembles.put(id, new EnsemblePerLink(id));
 		this.ensembles.get(id).addVolume(hour, volume);
 	}

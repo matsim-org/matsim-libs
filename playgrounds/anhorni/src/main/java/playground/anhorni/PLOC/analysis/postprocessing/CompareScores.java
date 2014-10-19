@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.basic.v01.IdImpl;
 
 public class CompareScores {
 	 
@@ -172,7 +171,7 @@ public class CompareScores {
 	          while ((line = bufferedReader.readLine()) != null) {
 	        	  String parts[] = line.split("\t");
 	        	  for (int i = 0; i < parts.length; i+=3) {
-	        		  Id agentId = new IdImpl(parts[i]);
+	        		  Id<Person> agentId = Id.create(parts[i], Person.class);
 	        		  double bestScore = Double.parseDouble(parts[i + 1]);
 	        		  double executedScore = Double.parseDouble(parts[i + 2]);
 	        		  if (agentsBestScores.get(agentId) == null) agentsBestScores.put(agentId, new AgentsScores(agentId));

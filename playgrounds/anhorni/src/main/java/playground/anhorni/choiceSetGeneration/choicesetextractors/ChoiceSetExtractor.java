@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.Controler;
 
 import playground.anhorni.choiceSetGeneration.helper.ChoiceSet;
@@ -70,26 +70,26 @@ public abstract class ChoiceSetExtractor {
 			/*
 			 * change choice set list to TreeMap or similar
 			 */
-			if (choiceSet.getId().equals(new IdImpl("8160012")) ||
-				choiceSet.getId().equals(new IdImpl("58690014")) ||
-				choiceSet.getId().equals(new IdImpl("30195012")) ||
-				choiceSet.getId().equals(new IdImpl("31953012")) ||
-				choiceSet.getId().equals(new IdImpl("55926012")) ||
-				choiceSet.getId().equals(new IdImpl("58650012")) ||
-				choiceSet.getId().equals(new IdImpl("55443011")) ||
-				choiceSet.getId().equals(new IdImpl("44971012")) ) {
+			if (choiceSet.getId().equals(Id.create("8160012", ChoiceSet.class)) ||
+				choiceSet.getId().equals(Id.create("58690014", ChoiceSet.class)) ||
+				choiceSet.getId().equals(Id.create("30195012", ChoiceSet.class)) ||
+				choiceSet.getId().equals(Id.create("31953012", ChoiceSet.class)) ||
+				choiceSet.getId().equals(Id.create("55926012", ChoiceSet.class)) ||
+				choiceSet.getId().equals(Id.create("58650012", ChoiceSet.class)) ||
+				choiceSet.getId().equals(Id.create("55443011", ChoiceSet.class)) ||
+				choiceSet.getId().equals(Id.create("44971012", ChoiceSet.class)) ) {
 				
 				choiceSets2Remove.add(choiceSet);				
 			}
 			
 			// remove trips with a walk TTB >= 7200 s:
-			if (choiceSet.getId().equals(new IdImpl("27242011")) ||
-				choiceSet.getId().equals(new IdImpl("27898011")) ||
-				choiceSet.getId().equals(new IdImpl("42444011")) ||
-				choiceSet.getId().equals(new IdImpl("65064011")) ||
-				choiceSet.getId().equals(new IdImpl("15359011")) ||
-				choiceSet.getId().equals(new IdImpl("27691011")) ||
-				choiceSet.getId().equals(new IdImpl("65679015"))) {
+			if (choiceSet.getId().equals(Id.create("27242011", ChoiceSet.class)) ||
+				choiceSet.getId().equals(Id.create("27898011", ChoiceSet.class)) ||
+				choiceSet.getId().equals(Id.create("42444011", ChoiceSet.class)) ||
+				choiceSet.getId().equals(Id.create("65064011", ChoiceSet.class)) ||
+				choiceSet.getId().equals(Id.create("15359011", ChoiceSet.class)) ||
+				choiceSet.getId().equals(Id.create("27691011", ChoiceSet.class)) ||
+				choiceSet.getId().equals(Id.create("65679015", ChoiceSet.class))) {
 				
 				choiceSets2Remove.add(choiceSet);
 			}

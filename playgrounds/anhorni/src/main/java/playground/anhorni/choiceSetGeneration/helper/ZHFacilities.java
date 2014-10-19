@@ -24,27 +24,29 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 public class ZHFacilities {
 	
-	private TreeMap<Id, ZHFacility> zhFacilities = new TreeMap<Id, ZHFacility>();	
-	private TreeMap<Id, ArrayList<Id>> zhFacilitiesByLink = new TreeMap<Id, ArrayList<Id>>();
+	private TreeMap<Id<ActivityFacility>, ZHFacility> zhFacilities = new TreeMap<Id<ActivityFacility>, ZHFacility>();	
+	private TreeMap<Id<Link>, ArrayList<Id<ActivityFacility>>> zhFacilitiesByLink = new TreeMap<Id<Link>, ArrayList<Id<ActivityFacility>>>();
 	private int numberOfFacilities;
 	
 	
 	public ZHFacilities() {
-		this.zhFacilities = new TreeMap<Id, ZHFacility>();
-		this.zhFacilitiesByLink = new TreeMap<Id, ArrayList<Id>>();
+		this.zhFacilities = new TreeMap<>();
+		this.zhFacilitiesByLink = new TreeMap<>();
 	}
 	
-	public void addFacilityByLink(Id linkId, ZHFacility facility) {
+	public void addFacilityByLink(Id<Link> linkId, ZHFacility facility) {
 	
 		if (this.zhFacilitiesByLink.containsKey(linkId)) {
 			this.zhFacilitiesByLink.get(linkId).add(facility.getId());
 		}
 		else {
-			ArrayList<Id> list = new ArrayList<Id>();
+			ArrayList<Id<ActivityFacility>> list = new ArrayList<>();
 			list.add(facility.getId());
 			this.zhFacilitiesByLink.put(linkId,list);
 		}
@@ -55,41 +57,41 @@ public class ZHFacilities {
 		}			
 	}
 	
-	public ArrayList<ZHFacility> getFacilitiesByLinkId(Id linkId) {
-		ArrayList<Id> idList = this.zhFacilitiesByLink.get(linkId);
+	public ArrayList<ZHFacility> getFacilitiesByLinkId(Id<Link> linkId) {
+		ArrayList<Id<ActivityFacility>> idList = this.zhFacilitiesByLink.get(linkId);
 		
 		ArrayList<ZHFacility> facilitiesList = new ArrayList<ZHFacility>();
 		
-		Iterator<Id> idList_it = idList.iterator();
+		Iterator<Id<ActivityFacility>> idList_it = idList.iterator();
 		while (idList_it.hasNext()) {
-			Id id = idList_it.next();
+			Id<ActivityFacility> id = idList_it.next();
 			facilitiesList.add(this.zhFacilities.get(id));					
 		}
 		return facilitiesList;
 	}
 	
 	
-	public void addFacilitiesByLink(Id linkId, ArrayList<ZHFacility> facilitiesList) {		
+	public void addFacilitiesByLink(Id<Link> linkId, ArrayList<ZHFacility> facilitiesList) {		
 		Iterator<ZHFacility> facility_it = facilitiesList.iterator();
 		while (facility_it.hasNext()) {
 			ZHFacility facility = facility_it.next();
-			this.addFacilityByLink(facility.getId(), facility);					
+			this.addFacilityByLink(linkId /*facility.getId()*/, facility);					
 		}
 	}
 
-	public TreeMap<Id, ZHFacility> getZhFacilities() {
+	public TreeMap<Id<ActivityFacility>, ZHFacility> getZhFacilities() {
 		return zhFacilities;
 	}
 
-	public void setZhFacilities(TreeMap<Id, ZHFacility> zhFacilities) {
+	public void setZhFacilities(TreeMap<Id<ActivityFacility>, ZHFacility> zhFacilities) {
 		this.zhFacilities = zhFacilities;
 	}
 
-	public TreeMap<Id, ArrayList<Id>> getZhFacilitiesByLink() {
+	public TreeMap<Id<Link>, ArrayList<Id<ActivityFacility>>> getZhFacilitiesByLink() {
 		return zhFacilitiesByLink;
 	}
 
-	public void setZhFacilitiesByLink(TreeMap<Id, ArrayList<Id>> zhFacilitiesByLink) {
+	public void setZhFacilitiesByLink(TreeMap<Id<Link>, ArrayList<Id<ActivityFacility>>> zhFacilitiesByLink) {
 		this.zhFacilitiesByLink = zhFacilitiesByLink;
 	}
 

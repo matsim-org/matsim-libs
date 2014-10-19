@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -55,7 +54,7 @@ public class SpanningTree {
 
 	private final TravelTime ttFunction;
 	private final TravelDisutility tcFunction;
-	private HashMap<Id,NodeData> nodeData;
+	private HashMap<Id<Node>,NodeData> nodeData;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -88,8 +87,8 @@ public class SpanningTree {
 	}
 
 	static class ComparatorCost implements Comparator<Node> {
-		protected Map<Id, ? extends NodeData> nodeData;
-		ComparatorCost(final Map<Id, ? extends NodeData> nodeData) { this.nodeData = nodeData; }
+		protected Map<Id<Node>, ? extends NodeData> nodeData;
+		ComparatorCost(final Map<Id<Node>, ? extends NodeData> nodeData) { this.nodeData = nodeData; }
 		@Override
 		public int compare(final Node n1, final Node n2) {
 			double c1 = getCost(n1);
@@ -117,13 +116,13 @@ public class SpanningTree {
 	// get methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final HashMap<Id,NodeData> getTree() {
+	public final HashMap<Id<Node>,NodeData> getTree() {
 		return this.nodeData;
 	}
 
 	public final void getNodesByTravelTimeBudget(double travelTimeBudget, List<Node>  nodesList, List<Double> travelTimesList) {
-		HashMap<Id,NodeData> tree = this.nodeData;
-		for (Id id : tree.keySet()) {
+		HashMap<Id<Node>,NodeData> tree = this.nodeData;
+		for (Id<Node> id : tree.keySet()) {
 			NodeData d = tree.get(id);
 			if ((d.getPrevNode() != null) && (d.getCost() <= travelTimeBudget)) {
 					// TODO: Check if this is ok 'prev'!
@@ -161,7 +160,7 @@ public class SpanningTree {
 
 	public void run(final Network network) {
 
-		nodeData = new HashMap<Id,NodeData>((int)(network.getNodes().size()*1.1),0.95f);
+		nodeData = new HashMap<>((int)(network.getNodes().size()*1.1),0.95f);
 		NodeData d = new NodeData();
 		d.time = dTime;
 		d.cost = 0;
@@ -187,12 +186,12 @@ public class SpanningTree {
 		Config conf = scenario.getConfig();
 		TravelTime ttc = new TravelTimeCalculator(network,60,30*3600, conf.travelTimeCalculator()).getLinkTravelTimes();
 		SpanningTree st = new SpanningTree(ttc,new TravelTimeAndDistanceBasedTravelDisutility(ttc, conf.planCalcScore()));
-		Node origin = network.getNodes().get(new IdImpl(1));
+		Node origin = network.getNodes().get(Id.create(1, Node.class));
 		st.setOrigin(origin);
 		st.setDepartureTime(8*3600);
 		st.run(network);
-		HashMap<Id,NodeData> tree = st.getTree();
-		for (Id id : tree.keySet()) {
+		HashMap<Id<Node>,NodeData> tree = st.getTree();
+		for (Id<Node> id : tree.keySet()) {
 			NodeData d = tree.get(id);
 			if (d.getPrevNode() != null) {
 				System.out.println(id+"\t"+d.getTime()+"\t"+d.getCost()+"\t"+d.getPrevNode().getId());

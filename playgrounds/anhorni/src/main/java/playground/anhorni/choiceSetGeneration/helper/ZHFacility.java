@@ -21,17 +21,20 @@ package playground.anhorni.choiceSetGeneration.helper;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 public class ZHFacility  {
 	
-	private Id id = null;
+	private Id<ActivityFacility> id = null;
 	private Coord mappedPosition = null;	
 	private Coord exactPosition = null;
-	private Id linkId;
+	private Id<Link> linkId;
 	private String name;
 	
-	private Id retailerID = null;
+	private Id<Person> retailerID = null;
 	private int size_descr;
 	private double dHalt;
 	private double hrs_week;
@@ -41,8 +44,8 @@ public class ZHFacility  {
 	private double accessibility20;
 	
 
-	public ZHFacility(Id id, String name, Coord mappedPosition, Coord exactPosition,
-			Id linkId, Id retID, int size_descr, double halt, double hrs_week) {
+	public ZHFacility(Id<ActivityFacility> id, String name, Coord mappedPosition, Coord exactPosition,
+			Id<Link> linkId, Id<Person> retID, int size_descr, double halt, double hrs_week) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -55,11 +58,11 @@ public class ZHFacility  {
 		this.hrs_week = hrs_week;
 	}
 
-	public Id getId() {
+	public Id<ActivityFacility> getId() {
 		return id;
 	}
 
-	public void setId(Id id) {
+	public void setId(Id<ActivityFacility> id) {
 		this.id = id;
 	}
 
@@ -88,11 +91,11 @@ public class ZHFacility  {
 		this.exactPosition = exactPosition;
 	}
 
-	public Id getLinkId() {
+	public Id<Link> getLinkId() {
 		return linkId;
 	}
 
-	public void setLinkId(Id linkId) {
+	public void setLinkId(Id<Link> linkId) {
 		this.linkId = linkId;
 	}
 
@@ -104,11 +107,11 @@ public class ZHFacility  {
 		this.mappedPosition = mappedPosition;
 	}
 
-	public Id getRetailerID() {
+	public Id<Person> getRetailerID() {
 		return retailerID;
 	}
 
-	public void setRetailerID(Id retailerID) {
+	public void setRetailerID(Id<Person> retailerID) {
 		this.retailerID = retailerID;
 	}
 

@@ -19,9 +19,9 @@
 
 package playground.anhorni.choiceSetGeneration.helper;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -29,8 +29,6 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import playground.anhorni.locationchoice.analysis.mc.MZTrip;
 
 public class Line {
-	
-	private final static Logger log = Logger.getLogger(Line.class);
 	
 	private String tripId;
 	private String wmittel;
@@ -214,7 +212,7 @@ public class Line {
 	public void setPersonAttributes(PersonAttributes personAttributes) {
 		this.personAttributes = personAttributes;
 	}	
-	public Id getChosenFacilityId() {
+	public Id<ActivityFacility> getChosenFacilityId() {
 		return this.tripHandler.getChosenFacilityId();
 	}
 }

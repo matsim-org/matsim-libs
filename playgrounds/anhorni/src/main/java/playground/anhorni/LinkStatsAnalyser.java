@@ -23,29 +23,27 @@ package playground.anhorni;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Vector;
 
 import org.matsim.analysis.CalcLinkStats;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.counts.Count;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.Counts;
 import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
 import org.matsim.counts.algorithms.CountSimComparisonTableWriter;
 import org.matsim.counts.algorithms.CountsComparisonAlgorithm;
-import org.matsim.counts.algorithms.CountsComparisonAlgorithm.VolumesForId;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * This class is able to produce a crapy kml file to compare the link volumes
@@ -79,7 +77,7 @@ public class LinkStatsAnalyser {
 	private String networkFilename;
 	private double scaleFactor;
 	private double vol_scale_factor;
-	private List<Id> selectedLinks;
+	private List<Id<Link>> selectedLinks;
 
 	/**
 	 *
@@ -128,8 +126,8 @@ public class LinkStatsAnalyser {
 		}
 	}
 
-	private List<Id> readSelectedLinks() {
-		List<Id> links=new Vector<Id>();
+	private List<Id<Link>> readSelectedLinks() {
+		List<Id<Link>> links=new ArrayList<Id<Link>>();
 
 		try {
 			FileReader file_reader = new FileReader(this.selectedLinksFilename);
@@ -139,7 +137,7 @@ public class LinkStatsAnalyser {
 			String curr_line = buffered_reader.readLine();
 
 			while ((curr_line = buffered_reader.readLine()) != null) {
-				links.add(new IdImpl(curr_line.trim()));
+				links.add(Id.create(curr_line.trim(), Link.class));
 			}
 
 			buffered_reader.close();
@@ -165,8 +163,8 @@ public class LinkStatsAnalyser {
 
 
 
-		for (Id linkId: this.selectedLinks) {
-			Count count = counts.createAndAddCount(new IdImpl(linkId.toString()), "-");
+		for (Id<Link> linkId: this.selectedLinks) {
+			Count count = counts.createAndAddCount(linkId, "-");
 			double linkVolumes []=this.linkStats0.getAvgLinkVolumes(linkId);
 
 			for (int i=0; i<24; i++) {
@@ -181,8 +179,8 @@ public class LinkStatsAnalyser {
 		CountsComparisonAlgorithm cca = new CountsComparisonAlgorithm(new CountsComparisonAlgorithm.VolumesForId() {
 		
 			@Override
-			public double[] getVolumesForStop(Id locationId) {
-				return linkStats1.getAvgLinkVolumes(locationId);
+			public double[] getVolumesForStop(Id<TransitStopFacility> locationId) {
+				return linkStats1.getAvgLinkVolumes(Id.create(locationId, Link.class));
 			}
 		
 		}, counts, this.network,
@@ -216,7 +214,7 @@ public class LinkStatsAnalyser {
 	 */
 	protected NetworkImpl loadNetwork() {
 		printNote("", "  creating network layer... ");
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		printNote("", "  done");
 

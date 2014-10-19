@@ -20,19 +20,20 @@
 package playground.anhorni.locationchoice.analysis.facilities.facilityLoad;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
 public class FacilityLoad {
 	
-	private IdImpl facilityId;
+	private Id<ActivityFacility> facilityId;
 	private Coord coord;
 	private double load0 = 0.0;
 	private double load1 = 0.0;
 	
-	public IdImpl getFacilityId() {
+	public Id<ActivityFacility> getFacilityId() {
 		return facilityId;
 	}
-	public void setFacilityId(IdImpl facilityId) {
+	public void setFacilityId(Id<ActivityFacility> facilityId) {
 		this.facilityId = facilityId;
 	}
 	public double getLoad0() {
