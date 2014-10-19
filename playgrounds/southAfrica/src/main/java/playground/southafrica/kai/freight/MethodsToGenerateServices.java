@@ -21,9 +21,9 @@ package playground.southafrica.kai.freight;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.TimeWindow;
-import org.matsim.core.basic.v01.IdImpl;
 
 class MethodsToGenerateServices {
 	private MethodsToGenerateServices() {} // only static methods, do not instantiate
@@ -31,10 +31,10 @@ class MethodsToGenerateServices {
 	static void createServicesMethod1(Collection<CarrierService> services) {
 		for ( int ii=0 ; ii<10 ; ii++ ) { // go through shipments to generate
 			// service IDs correspond to ii:
-			Id id = new IdImpl(ii) ; 
+			Id<CarrierService> id = Id.create(ii, CarrierService.class) ; 
 	
 			// yy this must become the linkID where the good needs to go. 
-			Id locationLinkId = null ; 
+			Id<Link> locationLinkId = null ; 
 	
 			// objects are constructed by builders:
 			CarrierService.Builder builder = CarrierService.Builder.newInstance(id, locationLinkId) ;
@@ -53,10 +53,10 @@ class MethodsToGenerateServices {
 	static void createServicesMethod2(Collection<CarrierService> services) {
 		for ( int ii=0 ; ii<10 ; ii++ ) { // go through shipments to generate
 			// service IDs correspond to ii:
-			Id id = new IdImpl(ii) ; 
+			Id<CarrierService> id = Id.create(ii, CarrierService.class) ; 
 	
 			// yy this must become the linkID where the good needs to go. 
-			Id locationLinkId = null ; 
+			Id<Link> locationLinkId = null ; 
 	
 			// objects are constructed by builders:
 			CarrierService.Builder builder = CarrierService.Builder.newInstance(id, locationLinkId) ;

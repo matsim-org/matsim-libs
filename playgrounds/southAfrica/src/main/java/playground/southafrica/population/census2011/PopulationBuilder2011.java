@@ -13,7 +13,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationWriter;
@@ -100,7 +99,7 @@ public class PopulationBuilder2011 {
 		LOG.info("Checking that each subplace population has a shapefile associated with it...");
 		for(File file: files){
 			/* Get subplace Id. */
-			Id zoneId = new IdImpl(file.getName().substring(0, file.getName().indexOf("_")));
+			Id<MyZone> zoneId = Id.create(file.getName().substring(0, file.getName().indexOf("_")), MyZone.class);
 			MyZone thisZone = mmfr.getZone(zoneId);
 			if(thisZone == null){
 				LOG.error("Could not find a subplace geometry for zone " + zoneId.toString());
@@ -124,7 +123,7 @@ public class PopulationBuilder2011 {
 		int householdId = 0;
 		for(File file : files){
 			/* Parse the zone from the filename. */
-			Id zoneId = new IdImpl(file.getName().substring(0, file.getName().indexOf("_")));
+			Id<MyZone> zoneId = Id.create(file.getName().substring(0, file.getName().indexOf("_")), MyZone.class);
 			MyZone thisZone = mmfr.getZone(zoneId);
 			
 			BufferedReader br = IOUtils.getBufferedReader(file.getAbsolutePath());
@@ -140,7 +139,7 @@ public class PopulationBuilder2011 {
 				 * FIXME There remains the possibility, albeit small, that the
 				 * same household may have been repeated in the IPF stage. That
 				 * will not be picked up here! (JWJ, June 2014) */
-				Id currentHouseholdId = null;
+				Id<Household> currentHouseholdId = null;
 				String previousHhid = null;
 				
 				while((line=br.readLine()) != null){
@@ -161,7 +160,7 @@ public class PopulationBuilder2011 {
 					/* Establish the household if it doesn't exist yet. */
 					Household household = null;
 					if(previousHhid == null || !hhid.equalsIgnoreCase(previousHhid) ){
-						household = hhf.createHousehold(new IdImpl(householdId++));
+						household = hhf.createHousehold(Id.create(householdId++, Household.class));
 						household.setIncome(Income2011.getIncome(Income2011.getIncome2011(householdIncome)));
 						
 						/* Give it a home coordinate. Currently this does not 
@@ -184,7 +183,7 @@ public class PopulationBuilder2011 {
 					}
 					
 					/* Create the person. */
-					Person person = pf.createPerson(new IdImpl(personId++));
+					Person person = pf.createPerson(Id.create(personId++, Person.class));
 					
 					/* Set the hard coded attributes. This will, however, be 
 					 * duplicated in the person attributes to be more 

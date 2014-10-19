@@ -23,14 +23,11 @@ package playground.southafrica.population.analysis;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -47,7 +44,7 @@ public class SubplaceCountChecker {
 		Header.printHeader(SubplaceCountChecker.class.toString(), args);
 		String inputFile = args[0];
 		String outputFile = args[1];
-		Map<Id, Tuple<Integer, Integer>> map = new HashMap<Id, Tuple<Integer,Integer>>();
+		Map<Id<Object>, Tuple<Integer, Integer>> map = new HashMap<>();
 		
 		LOG.info("Reading lines...");
 		Counter counter = new Counter("  lines # ");
@@ -57,7 +54,7 @@ public class SubplaceCountChecker {
 			while((line = br.readLine()) != null){
 				String[] sa = line.split(",");
 				int mn = Integer.parseInt(sa[6]);
-				Id sp = new IdImpl(sa[12]);
+				Id<Object> sp = Id.create(sa[12], Object.class);
 				
 				if(!map.containsKey(sp)){
 					map.put(sp, new Tuple<Integer, Integer>(0, 0));
@@ -91,7 +88,7 @@ public class SubplaceCountChecker {
 		try {
 			bw.write("SPCode,Hhs,Persons");
 			bw.newLine();
-			for(Id id : map.keySet()){
+			for(Id<Object> id : map.keySet()){
 				bw.write(id.toString());
 				bw.write(",");
 				bw.write(String.valueOf(map.get(id).getFirst()));

@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -64,7 +63,7 @@ public class NmbmSurveyParser {
 	private final static Logger LOG = Logger.getLogger(NmbmSurveyParser.class);
 	private Scenario sc;
 	private MyMultiFeatureReader zones;
-	private Map<Id, Integer> locationlessPersons;
+	private Map<Id<Person>, Integer> locationlessPersons;
 	private Map<String, Integer> locationlessType;
 	private boolean removeNullLocationPersons = true;
 
@@ -96,7 +95,7 @@ public class NmbmSurveyParser {
 	public NmbmSurveyParser() {
 		this.sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		((ScenarioImpl)sc).createHouseholdsContainer();
-		this.locationlessPersons = new HashMap<Id, Integer>();
+		this.locationlessPersons = new HashMap<>();
 		this.locationlessType = new HashMap<String, Integer>();
 	}
 	
@@ -133,7 +132,7 @@ public class NmbmSurveyParser {
 				Income income = IncomeTravelSurvey2004.getIncome(IncomeTravelSurvey2004.parseIncomeFromSurveyCode(sa[6]));
 				
 				/* Create the household. */
-				Id id = new IdImpl(String.format("%03d%03d", enu, hhNo));
+				Id<Household> id = Id.create(String.format("%03d%03d", enu, hhNo), Household.class);
 				Household hh = sc.getHouseholds().getFactory().createHousehold(id);
 				hh.setIncome(income);
 				
@@ -223,7 +222,7 @@ public class NmbmSurveyParser {
 				
 				String mode = getMode(Integer.parseInt(sa[14]));
 
-				Id personId = new IdImpl(String.format("%03d%03d%03d", enu, hhn, hhPerson));
+				Id<Person> personId = Id.create(String.format("%03d%03d%03d", enu, hhn, hhPerson), Person.class);
 				
 				/* ========== Perform some validation. ==========*/
 				/* Warn if kids are working. Change status to unemployed. The 
@@ -248,7 +247,7 @@ public class NmbmSurveyParser {
 							population.addPerson(person);
 							
 							/* Add person to household. */
-							Id hhId = new IdImpl(String.format("%03d%03d", enu, hhn));
+							Id<Household> hhId = Id.create(String.format("%03d%03d", enu, hhn), Household.class);
 							if(!sc.getHouseholds().getHouseholds().containsKey(hhId)){
 								LOG.error("Could not find the household " + hhId.toString());
 							}
@@ -349,7 +348,7 @@ public class NmbmSurveyParser {
 		}
 		
 		LOG.info("People with location-less activities: " + locationlessPersons.size());
-		for(Id id : locationlessPersons.keySet()){
+		for(Id<Person> id : locationlessPersons.keySet()){
 			LOG.info("   " + id.toString() + ": " + locationlessPersons.get(id));
 		}
 		for(String s : locationlessType.keySet()){
@@ -360,7 +359,7 @@ public class NmbmSurveyParser {
 			LOG.info("Removing persons with location-less activities from population and households...");
 			LOG.info("  original population size: " + population.getPersons().size());
 			int cleaned = 0;
-			for(Id id : locationlessPersons.keySet()){
+			for(Id<Person> id : locationlessPersons.keySet()){
 				/* Clean population. */
 				population.getPersons().remove(id);
 				cleaned++;
@@ -369,7 +368,7 @@ public class NmbmSurveyParser {
 				sc.getPopulation().getPersonAttributes().removeAllAttributes(id.toString());
 				
 				/* Clean households. */
-				for(Id hhid : sc.getHouseholds().getHouseholds().keySet()){
+				for(Id<Household> hhid : sc.getHouseholds().getHouseholds().keySet()){
 					List<Id<Person>> memberIds = sc.getHouseholds().getHouseholds().get(hhid).getMemberIds();
 					if(memberIds.contains(id)){
 						memberIds.remove(id);
@@ -574,7 +573,7 @@ public class NmbmSurveyParser {
 	
 	
 	private Coord getCoord(String zone){
-		MyZone mz = this.zones.getZone(new IdImpl(zone));
+		MyZone mz = this.zones.getZone(Id.create(zone, MyZone.class));
 		if(mz == null){
 			return null;
 		}

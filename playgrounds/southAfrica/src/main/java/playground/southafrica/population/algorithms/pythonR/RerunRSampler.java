@@ -11,12 +11,11 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 
 import playground.southafrica.utilities.Header;
+import playground.southafrica.utilities.containers.MyZone;
 
 public class RerunRSampler {
 	private final static Logger LOG = Logger.getLogger(RerunRSampler.class);
@@ -35,7 +34,7 @@ public class RerunRSampler {
 		String rFile = args[4];
 		
 		/* Parse the control totals */
-		Map<Id, Integer> householdCountMap = parseHouseholdCountFromControlTotals(controlTotalsFile);		
+		Map<Id<MyZone>, Integer> householdCountMap = parseHouseholdCountFromControlTotals(controlTotalsFile);		
 		
 		/* Get all the subplaces from their weights file. */
 		FileFilter weightFileFilter = new FileFilter() {
@@ -54,7 +53,7 @@ public class RerunRSampler {
 		Counter counter = new Counter(" subplaces # ");
 		for(File f : weightFiles){
 			String zoneCode = f.getName().substring(f.getName().indexOf("_")+1, f.getName().indexOf("."));
-			Id zoneId = new IdImpl(zoneCode);
+			Id<MyZone> zoneId = Id.create(zoneCode, MyZone.class);
 			if(householdCountMap.containsKey(zoneId)){
 				int numberOfHouseholdsToCreate = householdCountMap.get(zoneId);
 				String script = "Rscript " + rFile + " " +
@@ -101,8 +100,8 @@ public class RerunRSampler {
 	 * @param file
 	 * @return
 	 */
-	public static Map<Id,Integer> parseHouseholdCountFromControlTotals(String file){
-		Map<Id, Integer> map = new HashMap<Id, Integer>();
+	public static Map<Id<MyZone>,Integer> parseHouseholdCountFromControlTotals(String file){
+		Map<Id<MyZone>, Integer> map = new HashMap<>();
 		BufferedReader br = IOUtils.getBufferedReader(file);
 		try{
 			String line = br.readLine(); /* Header */
@@ -114,7 +113,7 @@ public class RerunRSampler {
 						count += ((int) Math.round(Double.parseDouble(sa[i])));
 					}
 				}
-				map.put(new IdImpl(sa[0]), count);
+				map.put(Id.create(sa[0], MyZone.class), count);
 			}
 		} catch (IOException e) {
 			throw new RuntimeException("Couldn't read from BufferedReader " + file);

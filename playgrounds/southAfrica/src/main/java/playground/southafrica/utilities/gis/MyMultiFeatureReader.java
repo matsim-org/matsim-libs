@@ -29,7 +29,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
@@ -116,7 +115,7 @@ public class MyMultiFeatureReader {
 						LOG.warn("Subset of multipolygon is NOT a polygon.");
 					}
 				}
-				MyZone newZone = new MyZone(polygonArray, gf, new IdImpl(name));
+				MyZone newZone = new MyZone(polygonArray, gf, Id.create(name, MyZone.class));
 
 				this.zones.add( newZone );
 			} else{

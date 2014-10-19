@@ -28,8 +28,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -129,7 +127,7 @@ public class GeneralGrid{
 		double y = startY;
 		int row = 0;
 		while(y <= envelope.getCoordinates()[2].y){
-			Id fromId = new IdImpl(row);
+//			Id fromId = new IdImpl(row);
 			double x = startX;
 			int col = 0;
 			while(x <= envelope.getCoordinates()[2].x){
@@ -249,7 +247,7 @@ public class GeneralGrid{
 			}
 		}
 		LOG.info("Done writing file.");
-		LOG.info(String.format("Avg length (in decimal degrees) of 1000m: %.8f (%d observations)", sum / ((int)count), count));
+		LOG.info(String.format("Avg length (in decimal degrees) of 1000m: %.8f (%d observations)", sum / (count), count));
 	}
 
 

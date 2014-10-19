@@ -30,9 +30,9 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -63,9 +63,9 @@ import playground.southafrica.utilities.Header;
 
 public class Census2011SampleParser {
 	static final Logger LOG = Logger.getLogger(Census2011SampleParser.class);
-	private Map<Id,String> householdMap = new HashMap<Id, String>();
-	private Map<Id,String> personMap = new HashMap<Id, String>();
-	private Map<Id,String> geographyMap = new HashMap<Id, String>();
+	private Map<Id<Household>,String> householdMap = new HashMap<>();
+	private Map<Id<Person>,String> personMap = new HashMap<>();
+	private Map<Id<Household>,String> geographyMap = new HashMap<>();
 	private Scenario sc;
 	private HouseholdsImpl households;
 	private ObjectAttributes householdAttributes = new ObjectAttributes();
@@ -136,7 +136,7 @@ public class Census2011SampleParser {
 				String population = line.substring(80, 81);
 				String income = line.substring(81, 83);
 				
-				householdMap.put(new IdImpl(serial), size.replaceAll(" ", "") + "," 
+				householdMap.put(Id.create(serial, Household.class), size.replaceAll(" ", "") + "," 
 						+ HousingType2011.parseTypeFromCensusCode(type) + "," 
 						+ MainDwellingType2011.parseTypeFromCensusCode(dwelling) + "," 
 						+ PopulationGroup2011.parseTypeFromCensusCode(population) + "," 
@@ -145,7 +145,7 @@ public class Census2011SampleParser {
 				String province = line.substring(58, 59);
 				String district = line.substring(59, 62);
 				String municipality = line.substring(62, 65);
-				geographyMap.put(new IdImpl(serial), province + "," + district + "," + municipality);
+				geographyMap.put(Id.create(serial, Household.class), province + "," + district + "," + municipality);
 				
 				counter.incCounter();
 			}
@@ -208,7 +208,7 @@ public class Census2011SampleParser {
 						School2011.parseEducationFromCensusCode(school, educationInstitution) + "," + 
 						Employment2011.parseEmploymentFromCensusCode(employment) + "," + 
 						Income2011.parseIncome2011FromCensusCode(income);
-				personMap.put(new IdImpl(serial + "_" + String.valueOf(Integer.parseInt(person.replaceAll(" ", "")))), s);
+				personMap.put(Id.create(serial + "_" + String.valueOf(Integer.parseInt(person.replaceAll(" ", ""))), Person.class), s);
 				
 				counter.incCounter();
 			}
@@ -235,10 +235,10 @@ public class Census2011SampleParser {
 		
 		LOG.info("Checking that each person has an associated household in the map...");
 		int noHouseholdCount = 0;
-		List<Id> personsToRemove = new ArrayList<Id>();
-		for(Id i : personMap.keySet()){
+		List<Id<Person>> personsToRemove = new ArrayList<>();
+		for(Id<Person> i : personMap.keySet()){
 			String s = i.toString().split("_")[0];
-			if(!householdMap.containsKey(new IdImpl(s))){
+			if(!householdMap.containsKey(Id.create(s, Household.class))){
 //				LOG.warn("Could not find household " + s);
 				noHouseholdCount++;
 //				LOG.info("   ---> " + personMap.get(i));
@@ -252,7 +252,7 @@ public class Census2011SampleParser {
 		/* Currently, Apr 2014 (JWJ), persons without a household
 		 * affiliation will be removed. */
 		LOG.warn("Persons with no household association will be ignored.");
-		for(Id id : personsToRemove){
+		for(Id<Person> id : personsToRemove){
 			personMap.remove(id);
 		}
 		
@@ -261,7 +261,7 @@ public class Census2011SampleParser {
 		
 		Population population = sc.getPopulation();
 		PopulationFactoryImpl pf = (PopulationFactoryImpl) population.getFactory();
-		for(Id personId : personMap.keySet()){
+		for(Id<Person> personId : personMap.keySet()){
 			String[] sa = personMap.get(personId).split(",");
 			int age = Integer.parseInt(sa[0]);
 			
@@ -303,7 +303,7 @@ public class Census2011SampleParser {
 			population.addPerson(person);
 			
 			/* Add to household */
-			Id hid = new IdImpl(personId.toString().split("_")[0]);
+			Id<Household> hid = Id.create(personId.toString().split("_")[0], Household.class);
 			if(!this.households.getHouseholds().containsKey(hid)){
 				/* Household data */
 				String[] hsa = householdMap.get(hid).split(",");
@@ -399,7 +399,7 @@ public class Census2011SampleParser {
 	class SAHouseholdsFactory implements HouseholdsFactory{
 
 		@Override
-		public Household createHousehold(Id householdId) {
+		public Household createHousehold(Id<Household> householdId) {
 			// TODO Auto-generated method stub
 			return null;
 		}

@@ -22,7 +22,7 @@ package playground.southafrica.projects.complexNetworks.pathDependence;
 import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Counter;
@@ -45,8 +45,8 @@ public class DigicorePathDependentNetworkReader_v1 extends MatsimXmlParser {
 	
 	private PathDependentNetwork network = null;
 	
-	private Id currentNodeId = null;
-	private Id currentPrecedingId = null;
+	private Id<Node> currentNodeId = null;
+	private Id<Node> currentPrecedingId = null;
 	
 	private final Counter counter = new Counter("  vertices # ");
 	
@@ -81,14 +81,14 @@ public class DigicorePathDependentNetworkReader_v1 extends MatsimXmlParser {
 				network.setDescription(descr);
 			}
 		} else if(NODE.equals(name)){
-			currentNodeId = new IdImpl(atts.getValue(ATTR_NODE_ID));
+			currentNodeId = Id.create(atts.getValue(ATTR_NODE_ID), Node.class);
 			String x = atts.getValue(ATTR_X);
 			String y = atts.getValue(ATTR_Y);
 			network.addNewPathDependentNode(currentNodeId, new CoordImpl(x, y));
 		} else if(PRECEDING.equals(name)){
-			currentPrecedingId = new IdImpl(atts.getValue(ATTR_PRECEDING_ID));
+			currentPrecedingId = Id.create(atts.getValue(ATTR_PRECEDING_ID), Node.class);
 		} else if (FOLLOWING.equals(name)){
-			Id nextId = new IdImpl(atts.getValue(ATTR_FOLLOWING_ID));
+			Id<Node> nextId = Id.create(atts.getValue(ATTR_FOLLOWING_ID), Node.class);
 			double weight = Double.parseDouble(atts.getValue(ATTR_WEIGHT));
 			this.network.setPathDependentEdgeWeight(currentPrecedingId, currentNodeId, nextId, weight);
 		} else{

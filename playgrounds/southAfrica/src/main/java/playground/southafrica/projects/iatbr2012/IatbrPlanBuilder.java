@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -59,7 +59,7 @@ public class IatbrPlanBuilder {
 	private final static Logger LOG = Logger.getLogger(IatbrPlanBuilder.class);
 	private static QuadTree<Coord> spot5QT;
 	private static int spotId = 0;
-	private static Map<Coord, Id> facilityIdMap = new HashMap<Coord, Id>();
+	private static Map<Coord, Id<ActivityFacility>> facilityIdMap = new HashMap<Coord, Id<ActivityFacility>>();
 	private static ActivityFacilitiesImpl activityFacilities;
 	private static QuadTree<ActivityFacilityImpl> sacscQT;
 	private static QuadTree<ActivityFacilityImpl> amenityQT;
@@ -174,7 +174,7 @@ public class IatbrPlanBuilder {
 		int h = 0;
 		int w = 0;
 		int e = 0;
-		for(Id id : facilities.getFacilities().keySet()){
+		for(Id<ActivityFacility> id : facilities.getFacilities().keySet()){
 			ActivityFacilityImpl  af = (ActivityFacilityImpl) facilities.getFacilities().get(id);
 			for(String ao : af.getActivityOptions().keySet()){
 				if(ao.equalsIgnoreCase("h")){ h++;
@@ -234,7 +234,7 @@ public class IatbrPlanBuilder {
 		List<Id<Person>> agentsToRemove = new ArrayList<Id<Person>>();
 		Iterator<Id<Person>> iterator = population.getPersons().keySet().iterator();
 		while(iterator.hasNext()){
-			Id id = iterator.next();
+			Id<Person> id = iterator.next();
 			PersonImpl person = (PersonImpl) population.getPersons().get(id);
 			ActivityImpl firstActivity = ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(0));
 			ActivityImpl lastActivity = ((ActivityImpl) person.getSelectedPlan().getPlanElements().get(person.getSelectedPlan().getPlanElements().size()-1));
@@ -244,7 +244,7 @@ public class IatbrPlanBuilder {
 				ActivityFacilityImpl home = null;
 				Coord closestBuilding = spot5QT.get(firstActivity.getCoord().getX(), firstActivity.getCoord().getY());
 				if(!facilityIdMap.containsKey(closestBuilding)){
-					Id newFacility = new IdImpl("spot_" + spotId++);
+					Id<ActivityFacility> newFacility = Id.create("spot_" + spotId++, ActivityFacility.class);
 					home = activityFacilities.createAndAddFacility(newFacility, closestBuilding);
 					home.createActivityOption("h");
 					/* This should not be necessary, but is inconsistent with other containers. */
@@ -285,7 +285,7 @@ public class IatbrPlanBuilder {
 									ActivityFacilityImpl work;
 									Coord closestBuildingCoord = spot5QT.get(act.getCoord().getX(), act.getCoord().getY());
 									if(!facilityIdMap.containsKey(closestBuildingCoord)){
-										Id newFacility = new IdImpl("spot_" + spotId++);
+										Id<ActivityFacility> newFacility = Id.create("spot_" + spotId++, ActivityFacility.class);
 										ActivityFacilityImpl afi = activityFacilities.createAndAddFacility(newFacility, closestBuildingCoord);
 										afi.createActivityOption("w");
 										facilityIdMap.put(closestBuildingCoord, newFacility);
@@ -328,7 +328,7 @@ public class IatbrPlanBuilder {
 			} 
 		}
 		LOG.info("   Removing " + agentsToRemove.size() + " agents whose plans do not start AND end with `h..'");
-		for(Id id : agentsToRemove){
+		for(Id<Person> id : agentsToRemove){
 			population.getPersons().remove(id);
 		}
 		LOG.info("Number of facilities    : " + activityFacilities.getFacilities().size());
@@ -341,9 +341,9 @@ public class IatbrPlanBuilder {
 		leisureQT = new QuadTree<ActivityFacilityImpl>(spot5QT.getMinEasting(), spot5QT.getMinNorthing(), spot5QT.getMaxEasting(), spot5QT.getMaxNorthing());
 		shoppingQT = new QuadTree<ActivityFacilityImpl>(spot5QT.getMinEasting(), spot5QT.getMinNorthing(), spot5QT.getMaxEasting(), spot5QT.getMaxNorthing());
 		
-		for(Id id : sc.getActivityFacilities().getFacilities().keySet()){
+		for(Id<ActivityFacility> id : sc.getActivityFacilities().getFacilities().keySet()){
 			ActivityFacilityImpl af = (ActivityFacilityImpl) sc.getActivityFacilities().getFacilities().get(id);
-			ActivityFacilityImpl afNew = activityFacilities.createAndAddFacility(new IdImpl("sacsc_" + id.toString()), af.getCoord());
+			ActivityFacilityImpl afNew = activityFacilities.createAndAddFacility(Id.create("sacsc_" + id.toString(), ActivityFacility.class), af.getCoord());
 			afNew.getActivityOptions().putAll(af.getActivityOptions());
 			sacscQT.put(afNew.getCoord().getX(), afNew.getCoord().getY(), afNew);
 			shoppingQT.put(afNew.getCoord().getX(), afNew.getCoord().getY(), afNew);
@@ -361,7 +361,7 @@ public class IatbrPlanBuilder {
 		educationQT = new QuadTree<ActivityFacilityImpl>(spot5QT.getMinEasting(), spot5QT.getMinNorthing(), spot5QT.getMaxEasting(), spot5QT.getMaxNorthing());
 		int droppedCounter = 0;
 		double amenityToShoppingCentreThreshold = 100;
-		for(Id id: sc.getActivityFacilities().getFacilities().keySet()){
+		for(Id<ActivityFacility> id: sc.getActivityFacilities().getFacilities().keySet()){
 			ActivityFacilityImpl af = (ActivityFacilityImpl) sc.getActivityFacilities().getFacilities().get(id);
 			ActivityFacilityImpl closestMall = sacscQT.get(af.getCoord().getX(), af.getCoord().getY());
 			if(af.calcDistance(closestMall.getCoord()) > amenityToShoppingCentreThreshold){
@@ -369,7 +369,7 @@ public class IatbrPlanBuilder {
 				Coord closestBuildingCoord = spot5QT.get(af.getCoord().getX(), af.getCoord().getY());
 				ActivityFacilityImpl afNew;
 				if(!facilityIdMap.containsKey(closestBuildingCoord)){
-					afNew = activityFacilities.createAndAddFacility(new IdImpl("osm_" + id.toString()), closestBuildingCoord);
+					afNew = activityFacilities.createAndAddFacility(Id.create("osm_" + id.toString(), ActivityFacility.class), closestBuildingCoord);
 					afNew.getActivityOptions().putAll(af.getActivityOptions());
 					facilityIdMap.put(closestBuildingCoord, afNew.getId());
 				} else{

@@ -28,36 +28,38 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 public class GfipTravelEventsHandler implements LinkEnterEventHandler{
 	private final static Logger LOG = Logger.getLogger(GfipTravelEventsHandler.class);
 	private final Scenario sc;
-	private final List<Id> links;
-	private Map<Id, Map<Id, Double>> map = new TreeMap<Id, Map<Id,Double>>();
+	private final List<Id<Link>> links;
+	private Map<Id<VehicleType>, Map<Id<Vehicle>, Double>> map = new TreeMap<>();
 	
-	public GfipTravelEventsHandler(Scenario sc, List<Id> links) {
+	public GfipTravelEventsHandler(Scenario sc, List<Id<Link>> links) {
 		this.sc = sc;
 		this.links = links;
 	}
 
 	@Override
 	public void reset(int iteration) {
-		map = new TreeMap<Id, Map<Id,Double>>();
+		map = new TreeMap<>();
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		Id linkId = event.getLinkId();
-		Id vehicleId = event.getVehicleId();
+		Id<Link> linkId = event.getLinkId();
+		Id<Vehicle> vehicleId = event.getVehicleId();
 		
 		if(links.contains(linkId)){
 			double linkDistance = this.sc.getNetwork().getLinks().get(linkId).getLength();
 			VehicleType vehicleType = this.sc.getVehicles().getVehicles().get(vehicleId).getType();
 			if(!map.containsKey(vehicleType.getId())){
-				map.put(vehicleType.getId(), new TreeMap<Id, Double>());
+				map.put(vehicleType.getId(), new TreeMap<Id<Vehicle>, Double>());
 			}
-			Map<Id, Double> vehicleMap = map.get(vehicleType.getId());
+			Map<Id<Vehicle>, Double> vehicleMap = map.get(vehicleType.getId());
 			if(vehicleMap.containsKey(vehicleId)){
 				double oldValue = vehicleMap.get(vehicleId);
 				vehicleMap.put(vehicleId, oldValue + linkDistance);
@@ -69,13 +71,13 @@ public class GfipTravelEventsHandler implements LinkEnterEventHandler{
 		}
 	}
 	
-	public Map<Id, Map<Id, Double>> getMap(){
+	public Map<Id<VehicleType>, Map<Id<Vehicle>, Double>> getMap(){
 		return this.map;
 	}
 	
 	public void reportAggregateStatistics(){
 		LOG.info("Statistics of GFIP travel (by vehicle type);");
-		for(Id id : map.keySet()){
+		for(Id<VehicleType> id : map.keySet()){
 			Double sum = 0.0;
 			for(Double d : map.get(id).values()){
 				sum += d;

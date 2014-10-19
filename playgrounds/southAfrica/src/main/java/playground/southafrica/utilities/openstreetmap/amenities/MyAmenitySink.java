@@ -28,11 +28,10 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
-import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -62,7 +61,7 @@ public class MyAmenitySink implements Sink {
 	private Map<Long, RelationContainer> relationMap;
 	private ActivityFacilitiesImpl facilities;
 	private ObjectAttributes facilityAttributes;
-	private Map<Id,Integer> educationLevelMap;
+	private Map<String,Integer> educationLevelMap;
 	
 	private int errorCounter = 0;
 	private int warningCounter = 0;
@@ -83,11 +82,11 @@ public class MyAmenitySink implements Sink {
 		facilityAttributes = new ObjectAttributes();
 		
 		/* Keep track of the different education level facilities. */
-		educationLevelMap = new HashMap<Id, Integer>();
-		educationLevelMap.put(new IdImpl("primary"), 0);
-		educationLevelMap.put(new IdImpl("secondary"), 0);
-		educationLevelMap.put(new IdImpl("tertiary"), 0);
-		educationLevelMap.put(new IdImpl("unknown"), 0);
+		educationLevelMap = new HashMap<>();
+		educationLevelMap.put("primary", 0);
+		educationLevelMap.put("secondary", 0);
+		educationLevelMap.put("tertiary", 0);
+		educationLevelMap.put("unknown", 0);
 	}
 
 	
@@ -120,7 +119,7 @@ public class MyAmenitySink implements Sink {
 
 				/* Facility identified. Now get the centroid of all members. */ 
 				Coord coord = ct.transform(new CoordImpl(node.getLongitude(), node.getLatitude()));
-				Id newId = new IdImpl(node.getId());
+				Id<ActivityFacility> newId = Id.create(node.getId(), ActivityFacility.class);
 				ActivityFacilityImpl af;
 				if(!facilities.getFacilities().containsKey(newId)){
 					af = facilities.createAndAddFacility(newId, coord);					
@@ -142,7 +141,7 @@ public class MyAmenitySink implements Sink {
 
 				/* Facility identified. Now get the centroid of all members. */ 
 				Coord coord = ct.transform(new CoordImpl(node.getLongitude(), node.getLatitude()));
-				Id newId = new IdImpl(node.getId());
+				Id<ActivityFacility> newId = Id.create(node.getId(), ActivityFacility.class);
 				ActivityFacilityImpl af;
 				if(!facilities.getFacilities().containsKey(newId)){
 					af = facilities.createAndAddFacility(newId, coord);					
@@ -178,7 +177,7 @@ public class MyAmenitySink implements Sink {
 
 				/* Facility identified. Now get the centroid of all members. */ 
 				Coord coord = getWayCentroid(way);
-				Id newId = new IdImpl(way.getId());
+				Id<ActivityFacility> newId = Id.create(way.getId(), ActivityFacility.class);
 				ActivityFacilityImpl af;
 				if(!facilities.getFacilities().containsKey(newId)){
 					af = facilities.createAndAddFacility(newId, coord);					
@@ -200,7 +199,7 @@ public class MyAmenitySink implements Sink {
 
 				/* Facility identified. Now get the centroid of all members. */ 
 				Coord coord = getWayCentroid(way);
-				Id newId = new IdImpl(way.getId());
+				Id<ActivityFacility> newId = Id.create(way.getId(), ActivityFacility.class);
 				ActivityFacilityImpl af;
 				if(!facilities.getFacilities().containsKey(newId)){
 					af = facilities.createAndAddFacility(newId, coord);					
@@ -235,7 +234,7 @@ public class MyAmenitySink implements Sink {
 
 				/* Facility identified. Now get the centroid of all members. */ 
 				Coord coord = getRelationCentroid(relationMap.get(r).getEntity());
-				Id newId = new IdImpl(relation.getId());
+				Id<ActivityFacility> newId = Id.create(relation.getId(), ActivityFacility.class);
 				ActivityFacilityImpl af;
 				if(!facilities.getFacilities().containsKey(newId)){
 					af = facilities.createAndAddFacility(newId, coord);					
@@ -257,7 +256,7 @@ public class MyAmenitySink implements Sink {
 
 				/* Facility identified. Now get the centroid of all members. */ 
 				Coord coord = getRelationCentroid(relationMap.get(r).getEntity());
-				Id newId = new IdImpl(relation.getId());
+				Id<ActivityFacility> newId = Id.create(relation.getId(), ActivityFacility.class);
 				ActivityFacilityImpl af;
 				if(!facilities.getFacilities().containsKey(newId)){
 					af = facilities.createAndAddFacility(newId, coord);					
@@ -286,10 +285,10 @@ public class MyAmenitySink implements Sink {
 		log.info("  other      : " + otherCounter);
 		log.info("------------------------------------------------");
 		log.info("Level of education:");
-		log.info(" primary  : " + educationLevelMap.get(new IdImpl("primary")) );
-		log.info(" secondary: " + educationLevelMap.get(new IdImpl("secondary")) );
-		log.info(" tertiary : " + educationLevelMap.get(new IdImpl("tertiary")));
-		log.info(" unknown  : " + educationLevelMap.get(new IdImpl("unknown")));
+		log.info(" primary  : " + educationLevelMap.get("primary") );
+		log.info(" secondary: " + educationLevelMap.get("secondary") );
+		log.info(" tertiary : " + educationLevelMap.get("tertiary"));
+		log.info(" unknown  : " + educationLevelMap.get("unknown"));
 		log.info("------------------------------------------------");
 		log.info("Errors and warnings:");
 		log.info("  errors  : " + errorCounter);
@@ -303,7 +302,7 @@ public class MyAmenitySink implements Sink {
 			double starttime = Math.round(r1)*28800 + (1-Math.round(r1))*32400; // either 08:00 or 09:00
 			double r2 = MatsimRandom.getRandom().nextDouble();
 			double closingtime = Math.round(r2)*54000 + (1-Math.round(r2))*68400; // either 17:00 or 19:00
-			ao.addOpeningTime(new OpeningTimeImpl(DayType.wkday, starttime, closingtime));
+			ao.addOpeningTime(new OpeningTimeImpl(starttime, closingtime));
 			
 			double r3 = MatsimRandom.getRandom().nextDouble();
 			double capacity = (200 + r3*800) / 10; // random surface between 200 and 1000 m^2.
@@ -313,7 +312,7 @@ public class MyAmenitySink implements Sink {
 			double starttime = Math.round(r1)*28800 + (1-Math.round(r1))*32400; // either 08:00 or 09:00
 			double r2 = MatsimRandom.getRandom().nextDouble();
 			double closingtime = Math.round(r2)*64800 + (1-Math.round(r2))*79200; // either 18:00 or 22:00
-			ao.addOpeningTime(new OpeningTimeImpl(DayType.wkday, starttime, closingtime));
+			ao.addOpeningTime(new OpeningTimeImpl(starttime, closingtime));
 			
 			double r3 = MatsimRandom.getRandom().nextDouble();
 			double capacity = (50 + r3*1950) / 10; // random surface between 50 and 2000 m^2.
@@ -323,7 +322,7 @@ public class MyAmenitySink implements Sink {
 			double starttime = Math.round(r1)*28800 + (1-Math.round(r1))*32400; // either 08:00 or 09:00
 			double r2 = MatsimRandom.getRandom().nextDouble();
 			double closingtime = Math.round(r2)*54000 + (1-Math.round(r2))*68400; // either 17:00 or 19:00
-			ao.addOpeningTime(new OpeningTimeImpl(DayType.wkday, starttime, closingtime));
+			ao.addOpeningTime(new OpeningTimeImpl(starttime, closingtime));
 			
 			double r3 = MatsimRandom.getRandom().nextDouble();
 			double capacity = (200 + r3*800) / 10; // random number between 200 and 1000 m^2.
@@ -615,8 +614,7 @@ public class MyAmenitySink implements Sink {
 			level = "tertiary";
 		} 
 
-		Id id = new IdImpl(level);
-		educationLevelMap.put(id, educationLevelMap.get(id)+1);
+		educationLevelMap.put(level, educationLevelMap.get(level)+1);
 	}
 
 

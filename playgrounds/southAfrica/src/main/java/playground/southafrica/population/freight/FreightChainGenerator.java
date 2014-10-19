@@ -35,11 +35,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
@@ -132,7 +133,7 @@ public class FreightChainGenerator {
 		try {
 			int i = 0;
 			for(Future<Plan> job : listOfJobs){
-				Person vehicle = new PersonImpl( new IdImpl(prefix + "_" + i++) );
+				Person vehicle = new PersonImpl( Id.create(prefix + "_" + i++, Person.class) );
 				Plan plan;
 				plan = job.get();
 
@@ -185,12 +186,12 @@ public class FreightChainGenerator {
 			PlanImpl plan = (PlanImpl) pf.createPlan();
 			
 			/* Generate the first activity. */
-			Id previousId = new IdImpl("source");
-			Id currentId = network.sampleChainStartNode();
-			Id nextId = network.getPathDependentNode(currentId).sampleBiasedNextPathDependentNode(previousId);
+			Id<Node> previousId = Id.create("source", Node.class);
+			Id<Node> currentId = network.sampleChainStartNode();
+			Id<Node> nextId = network.getPathDependentNode(currentId).sampleBiasedNextPathDependentNode(previousId);
 			Coord coord = network.getPathDependentNode(currentId).getCoord();
 			ActivityImpl activity = new ActivityImpl("major", coord);
-			activity.setFacilityId(new IdImpl(currentId.toString()));
+			activity.setFacilityId(Id.create(currentId.toString(), ActivityFacility.class));
 			activity.setEndTime(ChainStartTime.getStartTimeInSeconds(RANDOM.nextDouble()));
 			plan.addActivity(activity);
 			
@@ -205,8 +206,8 @@ public class FreightChainGenerator {
 				
 				/* Update the node sequence, but only if the current activity
 				 * is not the end-of-chain activity. */
-				previousId = new IdImpl(currentId.toString());
-				currentId = new IdImpl(nextId.toString());
+				previousId = Id.create(currentId.toString(), Node.class);
+				currentId = Id.create(nextId.toString(), Node.class);
 				chainLength++;
 				
 				/* Generate the next node, given the current node. */
@@ -222,7 +223,7 @@ public class FreightChainGenerator {
 				/* Create and add the activity from the identified node. */
 				Coord thisCoord = network.getPathDependentNode(currentId).getCoord();
 				ActivityImpl thisActivity = new ActivityImpl(activityType, thisCoord);
-				thisActivity.setFacilityId(currentId);
+				thisActivity.setFacilityId(Id.create(currentId, ActivityFacility.class));
 				
 				double duration = ActivityDuration.getDurationInSeconds(RANDOM.nextDouble());
 

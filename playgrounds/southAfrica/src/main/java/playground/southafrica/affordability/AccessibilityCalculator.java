@@ -20,7 +20,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -43,6 +42,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.households.Household;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsReaderV10;
@@ -134,7 +134,7 @@ public class AccessibilityCalculator {
 		/* Add attributes to population. */
 		for(Id id : sc.getPopulation().getPersons().keySet()){
 			String hhId = (String) oa.getAttribute(id.toString(), "householdId");
-			sc.getPopulation().getPersons().get(id).getCustomAttributes().put("householdId", new IdImpl(hhId));
+			sc.getPopulation().getPersons().get(id).getCustomAttributes().put("householdId", Id.create(hhId, Household.class));
 			Double hhIncome = (Double) oa.getAttribute(id.toString(), "householdIncome");
 			sc.getPopulation().getPersons().get(id).getCustomAttributes().put("householdIncome", hhIncome);
 			String race = (String) oa.getAttribute(id.toString(), "race");

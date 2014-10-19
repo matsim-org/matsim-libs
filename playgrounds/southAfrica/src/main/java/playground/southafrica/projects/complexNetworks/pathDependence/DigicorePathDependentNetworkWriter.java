@@ -25,8 +25,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
 
@@ -48,9 +48,9 @@ public class DigicorePathDependentNetworkWriter extends MatsimXmlWriter implemen
 		LOG.info("Cleaning up the network... this may take some time.");
 		int nodesCleaned = 0;
 		for(PathDependentNode node : this.network.getPathDependentNodes().values()){
-			for(Map<Id, Double> map : node.getPathDependence().values()){
+			for(Map<Id<Node>, Double> map : node.getPathDependence().values()){
 				if(map.isEmpty()){
-					map.put(new IdImpl("sink"), 1.0);
+					map.put(Id.create("sink", Node.class), 1.0);
 					nodesCleaned++;
 				}
 			}
@@ -78,11 +78,11 @@ public class DigicorePathDependentNetworkWriter extends MatsimXmlWriter implemen
 			handler.startNetwork(network, writer);
 			for(PathDependentNode node : network.getPathDependentNodes().values()){
 				handler.startNode(node, writer);
-				for(Id id : node.getPathDependence().keySet()){
+				for(Id<Node> id : node.getPathDependence().keySet()){
 					handler.startPreceding(id, writer);
 					
 					/* Write the following nodes. */
-					Map<Id, Double> map = node.getNextNodes(id);
+					Map<Id<Node>, Double> map = node.getNextNodes(id);
 					handler.startFollowing(map, writer);
 					handler.endFollowing(writer);
 					

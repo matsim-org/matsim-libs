@@ -30,6 +30,7 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -48,7 +49,6 @@ import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.contrib.cadyts.general.PlanSelectionByCadyts;
 import org.matsim.contrib.cadyts.utils.CalibrationStatReader;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -93,7 +93,7 @@ public class CadytsFreightChainTest {
 
 		config.planCalcScore().setBrainExpBeta(beta);
 
-		StrategySettings strategySettings = new StrategySettings(new IdImpl("1"));
+		StrategySettings strategySettings = new StrategySettings(Id.create("1", StrategySettings.class));
 		strategySettings.setModuleName("ccc");
 		strategySettings.setProbability(1.0);
 		config.strategy().addStrategySettings(strategySettings);
@@ -237,21 +237,21 @@ public class CadytsFreightChainTest {
 	private static void createTestNetwork( Network net ) {
 		NetworkFactory nf = net.getFactory() ;
 
-		Node node1 = nf.createNode( new IdImpl(1), new CoordImpl(0.,0.)) ;
+		Node node1 = nf.createNode( Id.create(1, Node.class), new CoordImpl(0.,0.)) ;
 		net.addNode(node1) ;
-		Node node2 = nf.createNode( new IdImpl(2), new CoordImpl(10.,0.)) ;
+		Node node2 = nf.createNode( Id.create(2, Node.class), new CoordImpl(10.,0.)) ;
 		net.addNode(node2);
 		
-		Link link1 = nf.createLink( new IdImpl("1-2") , node1, node2 ) ;
+		Link link1 = nf.createLink( Id.create("1-2", Link.class) , node1, node2 ) ;
 		net.addLink(link1); 
-		Link link2 = nf.createLink( new IdImpl( "2-1") , node2, node1 ) ;
+		Link link2 = nf.createLink( Id.create("2-1", Link.class) , node2, node1 ) ;
 		net.addLink(link2) ;
 	}
 
 	private static void createTestPopulation( Population pop ) {
 		PopulationFactory pf = pop.getFactory();
 		for ( int ii=0 ; ii<=20 ; ii++ ) {
-			Person person = pf.createPerson( new IdImpl(ii) ) ;
+			Person person = pf.createPerson( Id.create(ii, Person.class) ) ;
 			for ( int pp=1 ; pp<=5 ; pp++ ) {
 				int last = pp ;
 				Plan plan = pf.createPlan() ;

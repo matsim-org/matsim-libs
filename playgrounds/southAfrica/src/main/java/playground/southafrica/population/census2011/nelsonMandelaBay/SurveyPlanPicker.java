@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -159,7 +158,7 @@ public class SurveyPlanPicker {
 			/* Get the person's demographic 'signature' */
 			String a = SaDemographicsEmployment.convertNmbm2004Employment( ((PersonImpl)person).isEmployed() ).toString();
 			String b = SaDemographicsAge.getAgeClass(((PersonImpl)person).getAge()).toString();
-			Id hhid = new IdImpl((String) surveyPopulation.getScenario().getPopulation().getPersonAttributes().getAttribute(personId.toString(), "householdId"));
+			Id<Household> hhid = Id.create((String) surveyPopulation.getScenario().getPopulation().getPersonAttributes().getAttribute(personId.toString(), "householdId"), Household.class);
 			Household household = surveyPopulation.getScenario().getHouseholds().getHouseholds().get(hhid);
 			String c = SaDemographicsHouseholdSize.getHouseholdSizeClass( household.getMemberIds().size() ).toString();
 			String d = SaDemographicsIncome.convertNmbm2004Income( IncomeTravelSurvey2004.getIncomeEnum(household.getIncome()) ).toString();
@@ -201,7 +200,7 @@ public class SurveyPlanPicker {
 			person.getPlans().clear();
 			
 			/* Get the household's home coordinate. */
-			Id hhid = new IdImpl( (String) censusPopulation.getScenario().getPopulation().getPersonAttributes().getAttribute(personId.toString(), "householdId") );
+			Id<Household> hhid = Id.create( (String) censusPopulation.getScenario().getPopulation().getPersonAttributes().getAttribute(personId.toString(), "householdId") , Household.class);
 			Coord home = (Coord) censusPopulation.getScenario().getHouseholds().getHouseholdAttributes().getAttribute(hhid.toString(), "homeCoord");
 			
 			/* Get person's demographic 'signature' */

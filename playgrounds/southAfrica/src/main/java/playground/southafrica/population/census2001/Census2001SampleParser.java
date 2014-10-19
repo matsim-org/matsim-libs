@@ -28,9 +28,9 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -51,9 +51,9 @@ import playground.southafrica.utilities.Header;
 
 public class Census2001SampleParser {
 	private static final Logger LOG = Logger.getLogger(Census2001SampleParser.class);
-	private Map<Id,String> householdMap = new HashMap<Id, String>();
-	private Map<Id,String> personMap = new HashMap<Id, String>();
-	private Map<Id,String> geographyMap = new HashMap<Id, String>();
+	private Map<Id<Household>,String> householdMap = new HashMap<>();
+	private Map<Id<Person>,String> personMap = new HashMap<>();
+	private Map<Id<Household>,String> geographyMap = new HashMap<>();
 	private Scenario sc;
 	private HouseholdsImpl households;
 	private ObjectAttributes householdAttributes = new ObjectAttributes();
@@ -111,7 +111,7 @@ public class Census2001SampleParser {
 				String population = line.substring(39, 40);
 				String income = line.substring(40, 42);
 				
-				householdMap.put(new IdImpl(serial), size + "," + this.getDwellingType(type) + "," + this.getPopulation(population) + "," + this.getIncome(income));
+				householdMap.put(Id.create(serial, Household.class), size + "," + this.getDwellingType(type) + "," + this.getPopulation(population) + "," + this.getIncome(income));
 				counter.incCounter();
 			}
 		} catch (IOException e) {
@@ -163,7 +163,7 @@ public class Census2001SampleParser {
 				String provinceName = line.substring(111, 128);
 				String eaType = line.substring(128, 129);
 				
-				geographyMap.put(new IdImpl(serial), municipalCode + "," + municipalName + "," + 
+				geographyMap.put(Id.create(serial, Household.class), municipalCode + "," + municipalName + "," + 
 						magisterialCode + "," + magisterialName + "," + 
 						districtCode + "," + districtName + "," + 
 						provinceCode + "," + provinceName + "," +
@@ -245,7 +245,7 @@ public class Census2001SampleParser {
 						getMainPlaceOfWork(mainPlaceOfWork) + "," +
 						getMainModeToPrimary(travel) + "," +
 						getIncome(income);
-				personMap.put(new IdImpl(serial + "_" + String.valueOf(Integer.parseInt(person))), s);
+				personMap.put(Id.create(serial + "_" + String.valueOf(Integer.parseInt(person)), Person.class), s);
 				counter.incCounter();
 			}
 		} catch (IOException e) {
@@ -270,9 +270,9 @@ public class Census2001SampleParser {
 		}
 		
 		LOG.info("Checking that each person has an associated household in the map...");
-		for(Id i : personMap.keySet()){
+		for(Id<Person> i : personMap.keySet()){
 			String s = i.toString().split("_")[0];
-			if(!householdMap.containsKey(new IdImpl(s))){
+			if(!householdMap.containsKey(Id.create(s, Household.class))){
 				LOG.warn("Could not find household " + s);
 			}
 		}
@@ -283,7 +283,7 @@ public class Census2001SampleParser {
 		
 		Population population = sc.getPopulation();
 		PopulationFactoryImpl pf = (PopulationFactoryImpl) population.getFactory();
-		for(Id pid : personMap.keySet()){
+		for(Id<Person> pid : personMap.keySet()){
 			String[] sa = personMap.get(pid).split(",");
 			String quarterType = sa[0];
 			int age = Integer.parseInt(sa[1]);
@@ -310,7 +310,7 @@ public class Census2001SampleParser {
 			population.addPerson(person);
 			
 			/* Add to household */
-			Id hid = new IdImpl(pid.toString().split("_")[0]);
+			Id<Household> hid = Id.create(pid.toString().split("_")[0], Household.class);
 			if(!this.households.getHouseholds().containsKey(hid)){
 				/* Household data */
 				String[] hsa = householdMap.get(hid).split(",");
@@ -429,7 +429,7 @@ public class Census2001SampleParser {
 	class SAHouseholdsFactory implements HouseholdsFactory{
 
 		@Override
-		public Household createHousehold(Id householdId) {
+		public Household createHousehold(Id<Household> householdId) {
 			// TODO Auto-generated method stub
 			return null;
 		}

@@ -15,10 +15,8 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
@@ -28,7 +26,6 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.households.Household;
-import org.matsim.households.HouseholdImpl;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsReaderV10;
@@ -77,9 +74,9 @@ public class AffordabilityCalculator {
 		ObjectAttributesXmlReader oar = new ObjectAttributesXmlReader(oa);
 		oar.parse(personAttributesFile);
 		/* Add attributes to population. */
-		for(Id id : sc.getPopulation().getPersons().keySet()){
+		for(Id<Person> id : sc.getPopulation().getPersons().keySet()){
 			String hhId = (String) oa.getAttribute(id.toString(), "householdId");
-			sc.getPopulation().getPersons().get(id).getCustomAttributes().put("householdId", new IdImpl(hhId));
+			sc.getPopulation().getPersons().get(id).getCustomAttributes().put("householdId", Id.create(hhId, Household.class));
 			Double hhIncome = (Double) oa.getAttribute(id.toString(), "householdIncome");
 			sc.getPopulation().getPersons().get(id).getCustomAttributes().put("householdIncome", hhIncome);
 			String race = (String) oa.getAttribute(id.toString(), "race");
@@ -118,7 +115,7 @@ public class AffordabilityCalculator {
 			String line = br.readLine(); /* Header. */
 			while((line = br.readLine()) != null){
 				String [] sa = line.split(",");
-				Id hhId = new IdImpl(sa[0]);
+				Id<Household> hhId = Id.create(sa[0], Household.class);
 				double score = Double.parseDouble(sa[3]);
 				Household hh = this.hhs.getHouseholds().get(hhId);
 				if(hh != null){

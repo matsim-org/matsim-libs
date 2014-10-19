@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Node;
 
 import playground.southafrica.projects.complexNetworks.pathDependence.PathDependentNetwork.PathDependentNode;
 
@@ -78,9 +79,9 @@ public class DigicorePathDependentNetworkWriterHandlerImpl_v1 implements
 	}
 
 	@Override
-	public void startFollowing(Map<Id, Double> following, BufferedWriter out)
+	public void startFollowing(Map<Id<Node>, Double> following, BufferedWriter out)
 			throws IOException {
-		for(Id id : following.keySet()){
+		for(Id<Node> id : following.keySet()){
 			out.write("\t\t\t<following");
 			out.write(" id=\"" + id.toString() + "\"");
 			out.write(" weight=\"" + String.format("%.2f", following.get(id)));

@@ -32,10 +32,9 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
@@ -55,9 +54,9 @@ public class NmbmCountParser {
 	private Counts counts_medium;
 	private Counts counts_long;
 	private Counts counts_total;
-	private Map<Id, List<Integer[]>> countMap = new TreeMap<Id, List<Integer[]>>();
-	private Map<Id, Double[]> avgCountMap = new TreeMap<Id, Double[]>();
-	private Map<Id, Double[]> classCountMap = new TreeMap<Id, Double[]>();
+	private Map<Id<Link>, List<Integer[]>> countMap = new TreeMap<>();
+	private Map<Id<Link>, Double[]> avgCountMap = new TreeMap<>();
+	private Map<Id<Link>, Double[]> classCountMap = new TreeMap<Id<Link>, Double[]>();
 
 	
 	private final int[] setLight = {1,2,3};
@@ -181,7 +180,7 @@ public class NmbmCountParser {
 					ia[i] = Integer.parseInt(sa[7+i]);
 				}
 				
-				Id id = new IdImpl(stationId + "_" + lane + "_" + hourOfDay);
+				Id<Link> id = Id.create(stationId + "_" + lane + "_" + hourOfDay, Link.class);
 				if(!countMap.containsKey(id)){
 					countMap.put(id, new ArrayList<Integer[]>());
 				}
@@ -210,7 +209,7 @@ public class NmbmCountParser {
 		
 		/* Calculate the average. */
 		LOG.info("Calculating the averages for each station...");
-		for(Id id : countMap.keySet()){
+		for(Id<Link> id : countMap.keySet()){
 			List<Integer[]> list = countMap.get(id);
 			Double[] avg = new Double[17];
 			for(int i = 0; i < 17; i++){
@@ -218,7 +217,7 @@ public class NmbmCountParser {
 				for(Integer[] ia : list){
 					sum += ia[i];
 				}
-				avg[i] = sum / ((double) list.size());
+				avg[i] = sum / (list.size());
 			}
 			avgCountMap.put(id, avg);
 		}
@@ -226,7 +225,7 @@ public class NmbmCountParser {
 		
 		/* Aggregate into vehicle classes. */
 		LOG.info("Aggregate counts to toll classes.");
-		for(Id id : avgCountMap.keySet()){
+		for(Id<Link> id : avgCountMap.keySet()){
 			Double[] classCounts = {0.0, 0.0, 0.0, 0.0};
 			Double[] ia = avgCountMap.get(id);
 			/* Light vehicles. */
@@ -253,7 +252,7 @@ public class NmbmCountParser {
 		LOG.info("Writing validation data to file...");
 		BufferedWriter bw = IOUtils.getBufferedWriter(folder + "aaa.csv");
 		try {
-			for(Id id : countMap.keySet()){
+			for(Id<Link> id : countMap.keySet()){
 				List<Integer[]> list = countMap.get(id);
 				String[] sa = id.toString().split("_");
 				for(Integer[] ia : list){
@@ -277,7 +276,7 @@ public class NmbmCountParser {
 		}
 		BufferedWriter bw2 = IOUtils.getBufferedWriter(folder + "bbb.csv");
 		try {
-			for(Id id : avgCountMap.keySet()){
+			for(Id<Link> id : avgCountMap.keySet()){
 				Double[] da = avgCountMap.get(id);
 				String[] sa = id.toString().split("_");
 				bw2.write(String.format("%s,%s,%s,", sa[0], sa[1], sa[2]));
@@ -299,7 +298,7 @@ public class NmbmCountParser {
 		}
 		BufferedWriter bw3 = IOUtils.getBufferedWriter(folder + "ccc.csv");
 		try {
-			for(Id id : classCountMap.keySet()){
+			for(Id<Link> id : classCountMap.keySet()){
 				Double[] da = classCountMap.get(id);
 				String[] sa = id.toString().split("_");
 				bw3.write(String.format("%s,%s,%s,", sa[0], sa[1], sa[2]));
@@ -322,10 +321,10 @@ public class NmbmCountParser {
 		LOG.info("Done writing validation data.");
 		
 		/* Sort out those stations that only has two lanes. */
-		Map<Id, List<String>> laneList = new TreeMap<Id, List<String>>();
-		for(Id id : classCountMap.keySet()){
+		Map<Id<Link>, List<String>> laneList = new TreeMap<>();
+		for(Id<Link> id : classCountMap.keySet()){
 			String[] sa = id.toString().split("_");
-			Id tmpId = new IdImpl(sa[0]);
+			Id<Link> tmpId = Id.create(sa[0], Link.class);
 			if(!laneList.containsKey(tmpId)){
 				List<String> list = new ArrayList<String>();
 				list.add(sa[1]);
@@ -347,7 +346,7 @@ public class NmbmCountParser {
 //				
 //				String[] sa = {"a","b"};
 //				for(String suffix : sa){
-//					Id dummyLinkId = new IdImpl("dummy" + dummyCounter++);
+//					Id dummyLinkId = Id.create("dummy" + dummyCounter++);
 //					String direction = suffix.equalsIgnoreCase("a") ? "1" : "2";
 //					Count count_light = counts_light.createCount(dummyLinkId, id.toString() + suffix);
 //					Count count_short = counts_short.createCount(dummyLinkId, id.toString() + suffix);
@@ -355,7 +354,7 @@ public class NmbmCountParser {
 //					Count count_long = counts_long.createCount(dummyLinkId, id.toString() + suffix);
 //					Count count_total = counts_total.createCount(dummyLinkId, id.toString() + suffix);
 //					for(int hour = 1; hour <= 24; hour++){
-//						Id classId = new IdImpl(id.toString() + "_" + direction + "_" + (hour-1));
+//						Id classId = Id.create(id.toString() + "_" + direction + "_" + (hour-1));
 //						idToRemove.add(classId);
 //						Double[] ia = classCountMap.get(classId);
 //						double light = ia[0];
@@ -561,8 +560,8 @@ public class NmbmCountParser {
 	}
 	
 	private void addCounts(String station, String[] lanes, String suffix){
-		List<Id> idToRemove = new ArrayList<Id>();
-		Id dummyLinkId = new IdImpl("dummy" + dummyCounter++);
+		List<Id<Link>> idToRemove = new ArrayList<>();
+		Id<Link> dummyLinkId = Id.create("dummy" + dummyCounter++, Link.class);
 		Count count_light = counts_light.createAndAddCount(dummyLinkId, station + suffix);
 		Count count_short = counts_short.createAndAddCount(dummyLinkId, station + suffix);
 		Count count_medium = counts_medium.createAndAddCount(dummyLinkId, station + suffix);
@@ -575,7 +574,7 @@ public class NmbmCountParser {
 			double m = 0.0;
 			double l = 0.0;
 			for(String lane : lanes){
-				Id classId = new IdImpl(station + "_" + lane + "_" + (hour-1));
+				Id<Link> classId = Id.create(station + "_" + lane + "_" + (hour-1), Link.class);
 				idToRemove.add(classId);
 				Double[] ia = classCountMap.get(classId);
 				light += ia[0];
@@ -591,7 +590,7 @@ public class NmbmCountParser {
 		}
 		
 		/* Clean up the class count map. */
-		for(Id id : idToRemove){
+		for(Id<Link> id : idToRemove){
 			classCountMap.remove(id);
 		}
 	}

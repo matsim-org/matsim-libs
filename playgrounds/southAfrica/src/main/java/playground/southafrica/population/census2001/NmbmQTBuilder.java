@@ -40,7 +40,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkReaderMatsimV1;
@@ -81,7 +80,7 @@ import com.vividsolutions.jts.geom.Polygon;
 public class NmbmQTBuilder {
 	private final static Logger LOG = Logger.getLogger(NmbmQTBuilder.class);
 	private final String inputFolder;
-	private Map<Id, QuadTree<Plan>> qtMap; 
+	private Map<Id<QuadTree>, QuadTree<Plan>> qtMap; 
 	private ComprehensivePopulationReader cr;
 	
 	private final String[] employmentClasses = {"1", "0"};
@@ -97,13 +96,13 @@ public class NmbmQTBuilder {
 	private Households inputHouseholds;
 	private Population outputPopulation;
 	private Households outputHouseholds;
-	private Map<Id, MyZone> zones;
+	private Map<Id<MyZone>, MyZone> zones;
 	
 	/*TODO Remove the dummy check variables. */
 	int nullQtCount = 0;
 	private List<Integer> hammingDistanceChanges;
 	private List<Double> distanceList = new ArrayList<Double>();
-	private Map<Id, Tuple<Integer, Integer>> zoneCounts = new HashMap<Id, Tuple<Integer,Integer>>();
+	private Map<Id<MyZone>, Tuple<Integer, Integer>> zoneCounts = new HashMap<>();
 	private List<Coord> homeCoords2 = new ArrayList<Coord>();
 	private List<Coord> homeCoords = new ArrayList<Coord>();
 	private Coord checkCoord = null;
@@ -149,7 +148,7 @@ public class NmbmQTBuilder {
 		
 		this.inputPopulation = cr.getScenario().getPopulation();
 		this.inputHouseholds = cr.getScenario().getHouseholds();
-		this.qtMap = new TreeMap<Id, QuadTree<Plan>>();
+		this.qtMap = new TreeMap<>();
 		
 		/* Parse the zones for which the population is being generated. */
 		MyMultiFeatureReader mfr = new MyMultiFeatureReader();
@@ -158,7 +157,7 @@ public class NmbmQTBuilder {
 		} catch (IOException e) {
 			throw new RuntimeException("Could not parse the zones for the region from " + shapefile);
 		}
-		this.zones = new TreeMap<Id, MyZone>();
+		this.zones = new TreeMap<>();
 		for(MyZone zone : mfr.getAllZones()){
 			this.zones.put(zone.getId(), zone);
 		}
@@ -186,7 +185,7 @@ public class NmbmQTBuilder {
 	
 	public void buildProfiledQuadTree(){
 		/*TODO Remove dummy variables and counters */
-		Map<Id, Integer> localQtMap = new HashMap<Id, Integer>();
+		Map<Id<QuadTree>, Integer> localQtMap = new HashMap<>();
 		
 		/* Determine the extent of the QuadTree. */
 		LOG.info("Determine QuadTree extent...");
@@ -195,7 +194,7 @@ public class NmbmQTBuilder {
 		double xMax = Double.NEGATIVE_INFINITY;
 		double yMax = Double.NEGATIVE_INFINITY;
 		
-		for(Id id : this.zones.keySet()){
+		for(Id<MyZone> id : this.zones.keySet()){
 			Geometry envelope = zones.get(id).getEnvelope();
 			xMin = Math.min(xMin, (envelope.getCoordinates())[0].x);
 			xMax = Math.max(xMax, (envelope.getCoordinates())[2].x);
@@ -207,9 +206,9 @@ public class NmbmQTBuilder {
 		LOG.info("Process each person...");
 		Counter counter = new Counter("  person # ");
 		
-		for(Id householdId : inputHouseholds.getHouseholds().keySet()){
+		for(Id<Household> householdId : inputHouseholds.getHouseholds().keySet()){
 			Household household = inputHouseholds.getHouseholds().get(householdId);
-			for(Id personId : inputHouseholds.getHouseholds().get(householdId).getMemberIds()){
+			for(Id<Person> personId : inputHouseholds.getHouseholds().get(householdId).getMemberIds()){
 				PersonImpl person = (PersonImpl) inputPopulation.getPersons().get(personId);
 				if(person != null){
 					int householdSize = household.getMemberIds().size();
@@ -225,7 +224,7 @@ public class NmbmQTBuilder {
 									SouthAfricaInflationCorrector.convert(surveyIncome.getIncome(), travelActivityYear, populationYear), 
 									surveyIncome.getIncomePeriod());
 							
-							Id qtId = getQtId(person.isEmployed(), householdSize, age, currentIncome);
+							Id<QuadTree> qtId = getQtId(person.isEmployed(), householdSize, age, currentIncome);
 							/* Check that there is a viable QuadTree definition */
 							if(qtId != null){
 								/* Create the QuadTree if it doesn't exist yet */
@@ -268,7 +267,7 @@ public class NmbmQTBuilder {
 		LOG.info("QuadTree map size: " + qtMap.size());
 		
 		int j = 1;
-		for(Id id : localQtMap.keySet()){
+		for(Id<QuadTree> id : localQtMap.keySet()){
 			LOG.info("   " + (j++) + ". " + id.toString() + " (" + localQtMap.get(id) + ")");
 		}
 	}
@@ -298,14 +297,14 @@ public class NmbmQTBuilder {
 		}
 		
 		/* Parse persons. */
-		Map<Id,List<String>> personMap = parsePersons(pf.getAbsolutePath());
+		Map<Id<Household>,List<String>> personMap = parsePersons(pf.getAbsolutePath());
 		
 		LOG.info("Generating population...");
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		outputPopulation = sc.getPopulation();
 		outputHouseholds = new HouseholdsImpl();
 		int personCounter = 0;
-		for(Id hhId : personMap.keySet()){
+		for(Id<Household> hhId : personMap.keySet()){
 			/* Create the household. */
 			Household hh = outputHouseholds.getFactory().createHousehold(hhId);
 			boolean firstMember = true;
@@ -317,18 +316,18 @@ public class NmbmQTBuilder {
 				String[] sa = s.split(",");
 
 				/* Check household counts, and add first if not. */
-				Id homeZone = new IdImpl(sa[12]);
+				Id<MyZone> homeZone = Id.create(sa[12], MyZone.class);
 				if (!zoneCounts.containsKey(homeZone)){
 					zoneCounts.put(homeZone, new Tuple<Integer, Integer>(0, 0));
 				}
 				
 				
 				/* Get the home location of the household. */
-				Point homePoint = this.zones.get(new IdImpl(sa[12])).getInteriorPoint();
-				Point altHomePoint = getRandomInteriorPoint(this.zones.get(new IdImpl(sa[12])));
+				Point homePoint = this.zones.get(Id.create(sa[12], MyZone.class)).getInteriorPoint();
+				Point altHomePoint = getRandomInteriorPoint(this.zones.get(Id.create(sa[12], MyZone.class)));
 				Coord homeCoord = new CoordImpl(altHomePoint.getX(), altHomePoint.getY());
 				
-				PersonImpl p = (PersonImpl) sc.getPopulation().getFactory().createPerson(new IdImpl(personCounter++));
+				PersonImpl p = (PersonImpl) sc.getPopulation().getFactory().createPerson(Id.create(personCounter++, Person.class));
 				
 				
 				
@@ -429,7 +428,7 @@ public class NmbmQTBuilder {
 					p.addPlan(plan);
 					
 					/*TODO Remove after debugging */
-					if(p.getId().equals(new IdImpl("48548"))){
+					if(p.getId().equals(Id.create("48548", Person.class))){
 						checkCoord = ((ActivityImpl)p.getSelectedPlan().getPlanElements().get(0)).getCoord();
 						created = true;
 					}
@@ -455,7 +454,7 @@ public class NmbmQTBuilder {
 			}
 			
 			if(created){
-				if(!((ActivityImpl) sc.getPopulation().getPersons().get(new IdImpl(48548)).getSelectedPlan().getPlanElements().get(0)).getCoord().equals(checkCoord)){
+				if(!((ActivityImpl) sc.getPopulation().getPersons().get(Id.create(48548, Person.class)).getSelectedPlan().getPlanElements().get(0)).getCoord().equals(checkCoord)){
 					LOG.error("GOTCHA!!");
 				}
 			}
@@ -710,18 +709,18 @@ public class NmbmQTBuilder {
 	}
 
 	
-	private Map<Id,List<String>> parsePersons(String filename){
+	private Map<Id<Household>,List<String>> parsePersons(String filename){
 		int personCounter = 0;
 		int householdCounter = 0;
 		
-		Map<Id,List<String>> personMap = new TreeMap<Id, List<String>>();
+		Map<Id<Household>,List<String>> personMap = new TreeMap<>();
 		BufferedReader br = IOUtils.getBufferedReader(filename);
 		try {
 			String line = br.readLine(); /* Header */
 			while((line=br.readLine()) != null){
 				String[] sa = line.split(",");
 				if(sa.length == 13){
-					Id hhID = new IdImpl(householdCounter++);
+					Id<Household> hhID = Id.create(householdCounter++, Household.class);
 					int numberOfHouseholdMembers = Integer.parseInt(sa[2]);
 					List<String> memberList = new ArrayList<String>(numberOfHouseholdMembers);
 					memberList.add(line);
@@ -748,7 +747,7 @@ public class NmbmQTBuilder {
 	}
 	
 		
-	private Id getQtId(boolean isEmployed, int householdSize, int age, Income income){
+	private Id<QuadTree> getQtId(boolean isEmployed, int householdSize, int age, Income income){
 		/* Gender */
 //		String genderCode = gender.equalsIgnoreCase("m") ? "m" : "f";
 //		genderCode = "u"; // Override
@@ -803,7 +802,7 @@ public class NmbmQTBuilder {
 				i = incomeClasses.length-1;
 			}
 			String incomeCode = incomeClasses[i];
-			return new IdImpl(employment + "_" + ageCode + "_" + incomeCode + "_" + householdSizeCode) ;
+			return Id.create(employment + "_" + ageCode + "_" + incomeCode + "_" + householdSizeCode, QuadTree.class) ;
 		} else{
 			return null;
 		}			
@@ -822,7 +821,7 @@ public class NmbmQTBuilder {
 	 * @param id
 	 * @return
 	 */
-	public Id searchForQtId(Id id){
+	public Id<QuadTree> searchForQtId(Id<QuadTree> id){
 		/* TODO Remove after debugging. */
 //		if(id.toString().equalsIgnoreCase("0_12_800_30")){
 //			String s = "";
@@ -881,7 +880,7 @@ public class NmbmQTBuilder {
 					tmpIdString += qtSpace.get(i)[tmpIndices[i]] + "_";
 				}
 				tmpIdString += qtSpace.get(tmpIndices.length-1)[tmpIndices[tmpIndices.length-1]];
-				Id tmpId = new IdImpl(tmpIdString);
+				Id<QuadTree> tmpId = Id.create(tmpIdString, QuadTree.class);
 				
 				newId = qtMap.containsKey(tmpId) ? tmpId : null; 
 				
@@ -907,7 +906,7 @@ public class NmbmQTBuilder {
 		}
 
 		/* Shuffle each position in the array with a random other position. */
-		int[] b = (int[])a.clone();
+		int[] b = a.clone();
 		for(int c = b.length-1; c >= 0; c--){
 			int d = (int)Math.floor(MatsimRandom.getRandom().nextDouble() * (c+1));
 			int tmp = b[d];

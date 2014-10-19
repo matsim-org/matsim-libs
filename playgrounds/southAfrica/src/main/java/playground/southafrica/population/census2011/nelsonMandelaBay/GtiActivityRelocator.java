@@ -15,7 +15,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.utils.collections.QuadTree;
@@ -164,7 +163,7 @@ public class GtiActivityRelocator {
 				Coord cc = ct.transform(c);
 				
 				/* Establish a facility for the point. */
-				ActivityFacility facility = facilities.getFactory().createActivityFacility(new IdImpl(facilityId++), cc);
+				ActivityFacility facility = facilities.getFactory().createActivityFacility(Id.create(facilityId++, ActivityFacility.class), cc);
 	
 				mainLanduseCode = Integer.parseInt((String)om);
 				secondaryLanduseCode = (String)os;

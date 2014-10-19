@@ -29,46 +29,48 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.roadpricing.RoadPricingSchemeUsingTollFactor;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
+import org.matsim.roadpricing.RoadPricingSchemeUsingTollFactor;
 
 
 public class MyTollPotentialEventHandler implements LinkEnterEventHandler{
 
 	private Logger log = Logger.getLogger(MyPatronLinkEntryHandler.class);
-	private List<Id> breaks;
-	private List<Id> linkIds;
-	private List<Map<Id,Double>> valueMaps;
-	private List<Map<Id,Integer>> countMaps;
+	private List<Id<Link>> breaks;
+	private List<Id<Link>> linkIds;
+	private List<Map<Id<Person>,Double>> valueMaps;
+	private List<Map<Id<Person>,Integer>> countMaps;
 	private RoadPricingSchemeUsingTollFactor scheme;
 
-	public MyTollPotentialEventHandler(List<Id> linkIds, List<Id> breaks, RoadPricingSchemeUsingTollFactor scheme) {
+	public MyTollPotentialEventHandler(List<Id<Link>> linkIds, List<Id<Link>> breaks, RoadPricingSchemeUsingTollFactor scheme) {
 		this.linkIds = linkIds;
 		this.breaks = breaks;
-		valueMaps = new ArrayList<Map<Id,Double>>(breaks.size());
-		countMaps = new ArrayList<Map<Id,Integer>>(breaks.size());
+		valueMaps = new ArrayList<>(breaks.size());
+		countMaps = new ArrayList<>(breaks.size());
 		for(int i = 0; i < breaks.size(); i++){
-			valueMaps.add(new HashMap<Id, Double>());
-			countMaps.add(new HashMap<Id, Integer>());
+			valueMaps.add(new HashMap<Id<Person>, Double>());
+			countMaps.add(new HashMap<Id<Person>, Integer>());
 		}
 		this.scheme = scheme;
 	}
 	
 	
-	public List<Map<Id, Double>> getValueMaps(){
+	public List<Map<Id<Person>, Double>> getValueMaps(){
 		return valueMaps;
 	}
 	
 	
-	public List<Map<Id, Integer>> getCountMaps(){
+	public List<Map<Id<Person>, Integer>> getCountMaps(){
 		return countMaps;
 	}
 	
 	
 	@Override
 	public void reset(int iteration) {
-		valueMaps = new ArrayList<Map<Id,Double>>(this.breaks.size());
-		countMaps = new ArrayList<Map<Id,Integer>>(this.breaks.size());
+		valueMaps = new ArrayList<>(this.breaks.size());
+		countMaps = new ArrayList<>(this.breaks.size());
 	}
 
 	@Override

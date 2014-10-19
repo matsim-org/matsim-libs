@@ -33,8 +33,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 
@@ -53,7 +51,7 @@ public class PythonRIntegrator {
 	private final static Logger LOG = Logger.getLogger(PythonRIntegrator.class);
 	private final String baseFolder;
 	private final String outputFolder;
-	private Map<Id, String> controlTotalsMap;
+	private Map<String, String> controlTotalsMap;
 	private List<String> zoneList;
 	
 	/**
@@ -139,8 +137,8 @@ public class PythonRIntegrator {
 		this.outputFolder = of.getAbsolutePath() + "/";
 		this.controlTotalsMap = parseControlTotals(this.baseFolder + "template/controlTotals.csv");
 		this.zoneList = new ArrayList<String>();
-		for(Id id : this.controlTotalsMap.keySet()){
-			this.zoneList.add(id.toString());
+		for(String id : this.controlTotalsMap.keySet()){
+			this.zoneList.add(id);
 		}
 	}
 	
@@ -276,7 +274,7 @@ public class PythonRIntegrator {
 	 * @param zone
 	 */
 	private void writeControlTotals(String folder, String zone){
-		String[] sa = this.controlTotalsMap.get(new IdImpl(zone)).split(",");
+		String[] sa = this.controlTotalsMap.get(zone).split(",");
 		BufferedWriter bw = null;
 		
 		/* Write the individual control totals. */
@@ -411,9 +409,9 @@ public class PythonRIntegrator {
 	 * @param filename
 	 * @return
 	 */
-	private Map<Id, String> parseControlTotals(String filename){
+	private Map<String, String> parseControlTotals(String filename){
 		LOG.info("Parsing control totals from " + filename);
-		Map<Id, String> map = new TreeMap<Id, String>();
+		Map<String, String> map = new TreeMap<>();
 		
 		BufferedReader br = IOUtils.getBufferedReader(filename);
 		try{
@@ -421,7 +419,7 @@ public class PythonRIntegrator {
 			while((line = br.readLine()) != null){
 				String[] sa = line.split(",");
 				if(sa.length == 17){
-					map.put(new IdImpl(sa[0]), line);					
+					map.put(sa[0], line);					
 				} else{
 					LOG.warn("Zone " + sa[0] + " does not have 17 field - zone will be ignored.");
 				}

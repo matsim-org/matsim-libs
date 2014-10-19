@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Node;
 
 import playground.southafrica.projects.complexNetworks.pathDependence.PathDependentNetwork.PathDependentNode;
 
@@ -39,11 +40,11 @@ public interface DigicorePathDependentNetworkWriterHandler {
 	public void endNode(final PathDependentNode node, final BufferedWriter out) throws IOException;
 	
 	/* <preceding> ... </preceding> */
-	public void startPreceding(final Id id, final BufferedWriter out) throws IOException;
+	public void startPreceding(final Id<Node> id, final BufferedWriter out) throws IOException;
 	public void endPreceding(final BufferedWriter out) throws IOException;
 	
 	/* <following> ... </following> */
-	public void startFollowing(final Map<Id, Double> following, final BufferedWriter out) throws IOException;
+	public void startFollowing(final Map<Id<Node>, Double> following, final BufferedWriter out) throws IOException;
 	public void endFollowing(final BufferedWriter out) throws IOException;
 	
 	public void writeSeparator(final BufferedWriter out) throws IOException;

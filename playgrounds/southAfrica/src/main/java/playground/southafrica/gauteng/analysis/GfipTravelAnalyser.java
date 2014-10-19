@@ -30,25 +30,26 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleReaderV1;
+import org.matsim.vehicles.VehicleType;
 
 import playground.southafrica.utilities.Header;
 
 public class GfipTravelAnalyser {
 	private final static Logger LOG = Logger.getLogger(GfipTravelAnalyser.class);
-	private static List<Id> links = null;
+	private static List<Id<Link>> links = null;
 	
 	private static GfipTravelEventsHandler handler;
 
@@ -95,8 +96,8 @@ public class GfipTravelAnalyser {
 	protected GfipTravelAnalyser() {
 	}
 	
-	public static List<Id> parseGfipLinkIds(){
-		List<Id> links = new ArrayList<Id>();
+	public static List<Id<Link>> parseGfipLinkIds(){
+		List<Id<Link>> links = new ArrayList<>();
 		String latestFile = "input/gauteng/gfip/GFIP_link_ids_201403.txt.gz";
 		
 		BufferedReader br = IOUtils.getBufferedReader(new File(latestFile).getAbsolutePath()
@@ -104,7 +105,7 @@ public class GfipTravelAnalyser {
 		try{
 			String line = null;
 			while((line = br.readLine()) != null){
-				Id id = new IdImpl(line);
+				Id<Link> id = Id.create(line, Link.class);
 				if(!links.contains(id)){
 					links.add(id);
 				} else{
@@ -138,14 +139,14 @@ public class GfipTravelAnalyser {
 	
 	public static void writeGfipTravelToFile(String outputFile){
 		LOG.info("Writing vehicle kilometers travelled to " + outputFile);
-		Map<Id, Map<Id, Double>> map = handler.getMap();
+		Map<Id<VehicleType>, Map<Id<Vehicle>, Double>> map = handler.getMap();
 		BufferedWriter bw = IOUtils.getBufferedWriter(outputFile);
 		try{
 			bw.write("Id,Type,Distance");
 			bw.newLine();
-			for(Id id : map.keySet()){
-				Map<Id, Double> classMap = map.get(id);
-				for(Id vehId : classMap.keySet()){
+			for(Id<VehicleType> id : map.keySet()){
+				Map<Id<Vehicle>, Double> classMap = map.get(id);
+				for(Id<Vehicle> vehId : classMap.keySet()){
 					bw.write(String.format("%s,%s,%.0f\n", vehId.toString(), id.toString(), classMap.get(vehId) ));
 				}
 			}

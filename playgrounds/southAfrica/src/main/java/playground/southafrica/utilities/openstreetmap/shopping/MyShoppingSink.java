@@ -27,11 +27,11 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
-import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -99,20 +99,20 @@ public class MyShoppingSink implements Sink {
 					}else{
 						/* Shopping mall identified. Now get the centroid of all members. */ 
 						Coord coord = getRelationCentroid(relationMap.get(r).getEntity());
-						ActivityFacilityImpl mall = facilities.createAndAddFacility(new IdImpl(relation.getId()), coord);
+						ActivityFacilityImpl mall = facilities.createAndAddFacility(Id.create(relation.getId(), ActivityFacility.class), coord);
 						mall.setDesc(name);
 						/* Shopping */
 						ActivityOptionImpl shopping = mall.createActivityOption("s");
-						shopping.addOpeningTime(new OpeningTimeImpl(DayType.wkday, 32400, 61200)); // 09:00 - 17:00
+						shopping.addOpeningTime(new OpeningTimeImpl(32400, 61200)); // 09:00 - 17:00
 						shopping.setCapacity(Double.parseDouble(gla) / 10);
 
 						/* Work */
 						ActivityOptionImpl work = mall.createActivityOption("w");
-						work.addOpeningTime(new OpeningTimeImpl(DayType.wkday, 28800, 72000)); // 08:00 - 20:00
+						work.addOpeningTime(new OpeningTimeImpl(28800, 72000)); // 08:00 - 20:00
 						work.setCapacity(Double.parseDouble(gla) / 20);
 						
 						ActivityOptionImpl leisure = mall.createActivityOption("l");
-						leisure.addOpeningTime(new OpeningTimeImpl(DayType.wkday, 28800, 72000)); // 08:00 - 20:00
+						leisure.addOpeningTime(new OpeningTimeImpl(28800, 72000)); // 08:00 - 20:00
 						leisure.setCapacity(Double.parseDouble(gla) / 10);
 
 						ActivityOptionImpl minor = mall.createActivityOption("minor");

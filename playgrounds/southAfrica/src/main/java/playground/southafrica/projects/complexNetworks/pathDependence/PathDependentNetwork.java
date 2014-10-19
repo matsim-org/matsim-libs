@@ -31,7 +31,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.misc.Counter;
 
@@ -41,7 +41,7 @@ import playground.southafrica.freight.digicore.io.DigicoreVehicleReader_v1;
 
 public class PathDependentNetwork {
 	private final Logger LOG = Logger.getLogger(PathDependentNetwork.class);
-	private Map<Id, PathDependentNode> network;
+	private Map<Id<Node>, PathDependentNode> network;
 	private Random random;
 	private String description = null;
 	private long buildStartTime;
@@ -70,11 +70,11 @@ public class PathDependentNetwork {
 	public PathDependentNetwork(long seed) {
 		MatsimRandom.reset(seed);
 		this.random = MatsimRandom.getRandom();
-		this.network = new TreeMap<Id, PathDependentNetwork.PathDependentNode>();
+		this.network = new TreeMap<>();
 	}
 	
 	
-	public Map<Id, PathDependentNode> getPathDependentNodes(){
+	public Map<Id<Node>, PathDependentNode> getPathDependentNodes(){
 		return this.network;
 	}
 	
@@ -99,9 +99,9 @@ public class PathDependentNetwork {
 	public void processActivityChain(DigicoreChain chain){
 		/* Process the first activity pair, but only if both activities are 
 		 * associated with a facility. */
-		Id previousNodeId = null;
-		Id currentNodeId = chain.get(0).getFacilityId();
-		Id nextNodeId = chain.get(1).getFacilityId();
+		Id<Node> previousNodeId = null;
+		Id<Node> currentNodeId = Id.create(chain.get(0).getFacilityId(), Node.class);
+		Id<Node> nextNodeId = Id.create(chain.get(1).getFacilityId(), Node.class);
 		
 		if(currentNodeId != null && nextNodeId != null){
 			/* Add the current node to the network if it doesn't already exist. */
@@ -122,12 +122,12 @@ public class PathDependentNetwork {
 			 * reached from the currentNode. */
 			this.network.get(nextNodeId).establishPathDependence(currentNodeId);
 		}
-		previousNodeId = currentNodeId == null ? new IdImpl("unknown") : currentNodeId;
+		previousNodeId = currentNodeId == null ? Id.create("unknown", Node.class) : currentNodeId;
 
 		/* Process the remainder of the (minor) activity pairs. */
 		for(int i = 1; i < chain.size()-1; i++){
-			currentNodeId = chain.get(i).getFacilityId();
-			nextNodeId = chain.get(i+1).getFacilityId();
+			currentNodeId = Id.create(chain.get(i).getFacilityId(), Node.class);
+			nextNodeId = Id.create(chain.get(i+1).getFacilityId(), Node.class);
 
 			if(currentNodeId != null && nextNodeId != null){
 				/* Add the current node to the network if it doesn't already exist. */
@@ -149,14 +149,14 @@ public class PathDependentNetwork {
 				 * reached from the currentNode. */
 				this.network.get(nextNodeId).establishPathDependence(currentNodeId);
 			}
-			previousNodeId = currentNodeId == null ? new IdImpl("unknown") : currentNodeId;
+			previousNodeId = currentNodeId == null ? Id.create("unknown", Node.class) : currentNodeId;
 		}
 
 		/* Process the last activity pair. No link needs to be added, but we 
 		 * just have to make sure it is indicated as sink. This is only 
 		 * necessary if the node already exists in the network. If not, it means
 		 * it was never part of a link that was added to the network anyway. */
-		currentNodeId = chain.get(chain.size()-1).getFacilityId();
+		currentNodeId = Id.create(chain.get(chain.size()-1).getFacilityId(), Node.class);
 		if(currentNodeId != null && this.network.containsKey(currentNodeId)){
 			this.network.get(currentNodeId).setAsSink(previousNodeId);
 		}
@@ -177,17 +177,17 @@ public class PathDependentNetwork {
 	}
 	
 	
-	public PathDependentNode getPathDependentNode(Id id){
+	public PathDependentNode getPathDependentNode(Id<Node> id){
 		return this.network.get(id);
 	}
 	
 	
-	public double getPathDependentWeight(Id previousId, Id currentId, Id nextId){
+	public double getPathDependentWeight(Id<Node> previousId, Id<Node> currentId, Id<Node> nextId){
 		double d = 0.0;
 		
 		/* Sort out null Ids for sources and sinks. */
-		if(previousId == null) previousId = new IdImpl("source");
-		if(nextId == null) nextId = new IdImpl("sink");
+		if(previousId == null) previousId = Id.create("source", Node.class);
+		if(nextId == null) nextId = Id.create("sink", Node.class);
 		if(currentId == null){
 			throw new IllegalArgumentException("Cannot have a 'null' Id for current node.");
 		}
@@ -199,7 +199,7 @@ public class PathDependentNetwork {
 		return d;
 	}
 	
-	public double getWeight(Id fromId, Id toId){
+	public double getWeight(Id<Node> fromId, Id<Node> toId){
 		double d = 0.0;
 		if(this.network.containsKey(fromId)){
 			d = this.network.get(fromId).getWeight(toId);
@@ -232,7 +232,7 @@ public class PathDependentNetwork {
 	}
 
 	
-	public void addNewPathDependentNode(Id id, Coord coord){
+	public void addNewPathDependentNode(Id<Node> id, Coord coord){
 		if(this.network.containsKey(id)){
 			LOG.warn("Could not add a new node " + id.toString() + " - it already exists.");
 		} else{
@@ -241,7 +241,7 @@ public class PathDependentNetwork {
 	}
 	
 	
-	public void setPathDependentEdgeWeight(Id previousId, Id currentId, Id nextId, double weight){
+	public void setPathDependentEdgeWeight(Id<Node> previousId, Id<Node> currentId, Id<Node> nextId, double weight){
 		if(!this.network.containsKey(currentId)){
 			LOG.error("Oops... there doesn't seem to be a node " + currentId.toString() + " yet.");
 		}
@@ -254,8 +254,8 @@ public class PathDependentNetwork {
 	 * @param randomValue
 	 * @return
 	 */
-	public Id sampleChainStartNode(double randomValue){
-		Id id = null;
+	public Id<Node> sampleChainStartNode(double randomValue){
+		Id<Node> id = null;
 		
 		/* Determine the total source weight. */
 		double totalWeight = 0.0;
@@ -282,12 +282,12 @@ public class PathDependentNetwork {
 	 * 
 	 * @return
 	 */
-	public Id sampleChainStartNode(){
+	public Id<Node> sampleChainStartNode(){
 		return sampleChainStartNode(random.nextDouble());
 	}
 	
 	
-	public double getSourceWeight(Id nodeId){
+	public double getSourceWeight(Id<Node> nodeId){
 		if(this.network.containsKey(nodeId)){
 			return this.getPathDependentNode(nodeId).getSourceWeight();
 		} else{
@@ -300,27 +300,27 @@ public class PathDependentNetwork {
 		LOG.info("---------------------  Graph statistics  -------------------");
 		LOG.info("     Number of vertices: " + this.getNumberOfNodes());
 		LOG.info("         Number of arcs: " + this.getNumberOfEdges());
-		LOG.info("            Density (%): " + String.format("%01.6f", ( (double)this.getNumberOfEdges() ) / Math.pow((double)getNumberOfNodes(), 2)*100.0 ) );
+		LOG.info("            Density (%): " + String.format("%01.6f", ( this.getNumberOfEdges() ) / Math.pow(getNumberOfNodes(), 2)*100.0 ) );
 		LOG.info(" Network build time (s): " + String.format("%.2f", ((double)this.buildEndTime - (double)this.buildStartTime)/1000));
 		LOG.info("------------------------------------------------------------");
 	}
 	
 
-	public class PathDependentNode implements Identifiable{
-		private final Id id;
+	public class PathDependentNode implements Identifiable<Node> {
+		private final Id<Node> id;
 		private final Coord coord;
 		private double source = 0.0;
 		private double sink = 0.0;
-		private Map<Id, Map<Id, Double>> pathDependence;
+		private Map<Id<Node>, Map<Id<Node>, Double>> pathDependence;
 		
-		public PathDependentNode(Id id, Coord coord) {
+		public PathDependentNode(Id<Node> id, Coord coord) {
 			this.id = id;
 			this.coord = coord;
-			this.pathDependence = new TreeMap<Id, Map<Id,Double>>();
+			this.pathDependence = new TreeMap<>();
 		}
 
 		@Override
-		public Id getId() {
+		public Id<Node> getId() {
 			return this.id;
 		}
 		
@@ -332,25 +332,25 @@ public class PathDependentNetwork {
 			source += 1.0;
 		}
 		
-		public void setPathDependentEdgeWeight(Id previousId, Id nextId, double weight){
+		public void setPathDependentEdgeWeight(Id<Node> previousId, Id<Node> nextId, double weight){
 			if(!pathDependence.containsKey(previousId)){
-				pathDependence.put(previousId, new TreeMap<Id, Double>());
+				pathDependence.put(previousId, new TreeMap<Id<Node>, Double>());
 			}
 			this.pathDependence.get(previousId).put(nextId, weight);
 		}
 		
 		
-		public void setAsSink(Id previousId){
+		public void setAsSink(Id<Node> previousId){
 			sink += 1.0;
-			Map<Id, Double> map = null;
+			Map<Id<Node>, Double> map = null;
 			if(!pathDependence.containsKey(previousId)){
-				map = new TreeMap<Id, Double>();
+				map = new TreeMap<Id<Node>, Double>();
 				pathDependence.put(previousId, map);
 			} else{
 				map = pathDependence.get(previousId);
 			}
 			
-			Id sinkId = new IdImpl("sink");
+			Id<Node> sinkId = Id.create("sink", Node.class);
 			if(!map.containsKey(sinkId)){
 				map.put(sinkId, 1.0);
 			} else{
@@ -359,7 +359,7 @@ public class PathDependentNetwork {
 		}
 		
 		
-		public Id sampleBiasedNextPathDependentNode(Id previousNodeId){
+		public Id<Node> sampleBiasedNextPathDependentNode(Id<Node> previousNodeId){
 			return sampleBiasedNextPathDependentNode(previousNodeId, random.nextDouble());
 		}
 		
@@ -372,9 +372,9 @@ public class PathDependentNetwork {
 		 * @param randomValue
 		 * @return
 		 */
-		protected Id sampleBiasedNextPathDependentNode(Id previousNodeId, double randomValue){
+		protected Id<Node> sampleBiasedNextPathDependentNode(Id<Node> previousNodeId, double randomValue){
 			
-			previousNodeId = previousNodeId == null ? new IdImpl("source") : previousNodeId;
+			previousNodeId = previousNodeId == null ? Id.create("source", Node.class) : previousNodeId;
 			
 			/* Check that the path-dependent sequence exist. */
 			if(!pathDependence.containsKey(previousNodeId)){
@@ -384,19 +384,19 @@ public class PathDependentNetwork {
 			}			
 			
 			/* Determine the total weighted out-degree. */
-			Map<Id, Double> map = pathDependence.get(previousNodeId);
+			Map<Id<Node>, Double> map = pathDependence.get(previousNodeId);
 			double total = 0.0;
-			for(Id id : map.keySet()){
+			for(Id<Node> id : map.keySet()){
 				total += map.get(id);
 			}
 			
 			/* Sample next node. */
 			double cumulativeTotal = 0.0;
-			Id nextId = null;
-			Iterator<Id> iterator = map.keySet().iterator();
+			Id<Node> nextId = null;
+			Iterator<Id<Node>> iterator = map.keySet().iterator();
 			
 			while(nextId == null){
-				Id id = iterator.next();
+				Id<Node> id = iterator.next();
 				cumulativeTotal += map.get(id);
 				if( (cumulativeTotal / total) >= randomValue){
 					nextId = id;
@@ -413,22 +413,22 @@ public class PathDependentNetwork {
 		
 		
 		
-		public void addPathDependentLink(Id previousNodeId, Id nextNodeId){
+		public void addPathDependentLink(Id<Node> previousNodeId, Id<Node> nextNodeId){
 			/* DEBUG Remove after problem sorted... why are there links from
 			 * a node to itself if the network has already been cleaned?! */
 			if(this.getId().toString().equalsIgnoreCase(nextNodeId.toString())){
 				LOG.debug("Link from node to itself.");
 			}		
 			
-			Id id = previousNodeId == null ? new IdImpl("source") : previousNodeId;
+			Id<Node> id = previousNodeId == null ? Id.create("source", Node.class) : previousNodeId;
 			if(previousNodeId == null){
 				this.setAsSource();
 			}
 			
 			/* Add the path-dependency if it doesn't exist yet. */
-			Map<Id, Double> map = null;
+			Map<Id<Node>, Double> map = null;
 			if(!pathDependence.containsKey(id)){
-				map = new TreeMap<Id, Double>();
+				map = new TreeMap<>();
 				pathDependence.put(id, map);
 			} else{
 				map = pathDependence.get(id);
@@ -443,7 +443,7 @@ public class PathDependentNetwork {
 		}
 		
 		
-		public Id sampleNextNode(Id pastNode){
+		public Id<Node> sampleNextNode(Id<Node> pastNode){
 			//TODO Complete
 			return null;
 		}
@@ -454,7 +454,7 @@ public class PathDependentNetwork {
 		 * @param pastNode
 		 * @return
 		 */
-		public Map<Id, Double> getNextNodes(Id pastNode){
+		public Map<Id<Node>, Double> getNextNodes(Id<Node> pastNode){
 			return this.pathDependence.get(pastNode);
 		}
 		
@@ -466,8 +466,8 @@ public class PathDependentNetwork {
 		 */
 		public int getInDegree(){
 			int inDegree = 0;
-			for(Id id : this.pathDependence.keySet()){
-				if(!id.equals(new IdImpl("source")) && !id.equals(new IdImpl("unknown"))){
+			for(Id<Node> id : this.pathDependence.keySet()){
+				if(!id.equals(Id.create("source", Node.class)) && !id.equals(Id.create("unknown", Node.class))){
 					inDegree++;
 				}
 			}
@@ -482,23 +482,23 @@ public class PathDependentNetwork {
 		 * {@link #getPathDependentOutDegree(Id)}.
 		 */
 		public int getOutDegree(){
-			List<Id> outNodes = new ArrayList<Id>();
-			for(Id inId : pathDependence.keySet()){
-				for(Id outId : pathDependence.get(inId).keySet()){
+			List<Id<Node>> outNodes = new ArrayList<>();
+			for(Id<Node> inId : pathDependence.keySet()){
+				for(Id<Node> outId : pathDependence.get(inId).keySet()){
 					if(!outNodes.contains(outId)){
 						outNodes.add(outId);
 					}
 				}
 			}
-			outNodes.remove(new IdImpl("sink"));			
+			outNodes.remove(Id.create("sink", Node.class));			
 			
 			return outNodes.size();
 		}
 		
 		
-		private void establishPathDependence(Id previousId){
+		private void establishPathDependence(Id<Node> previousId){
 			if(!pathDependence.containsKey(previousId)){
-				pathDependence.put(previousId, new TreeMap<Id, Double>());
+				pathDependence.put(previousId, new TreeMap<Id<Node>, Double>());
 			}
 		}
 
@@ -509,26 +509,26 @@ public class PathDependentNetwork {
 		 * taken into account. If you want the overall out-degree, rather use
 		 * {@link #getOutDegree()}.
 		 */
-		public int getPathDependentOutDegree(Id inId){
-			if(inId == null) inId = new IdImpl("source");
+		public int getPathDependentOutDegree(Id<Node> inId){
+			if(inId == null) inId = Id.create("source", Node.class);
 			
-			List<Id> outNodes = new ArrayList<Id>();
-			for(Id outId : pathDependence.get(inId).keySet()){
+			List<Id<Node>> outNodes = new ArrayList<>();
+			for(Id<Node> outId : pathDependence.get(inId).keySet()){
 				if(!outNodes.contains(outId)){
 					outNodes.add(outId);
 				}
 			}
-			outNodes.remove(new IdImpl("sink"));			
+			outNodes.remove(Id.create("sink", Node.class));			
 			
 			return outNodes.size();
 		}
 		
-		public Map<Id, Double> getPathDependentNextNodes(Id previousId){
+		public Map<Id<Node>, Double> getPathDependentNextNodes(Id<Node> previousId){
 			return this.pathDependence.get(previousId);
 		}
 		
 		
-		public Map<Id, Map<Id, Double>> getPathDependence(){
+		public Map<Id<Node>, Map<Id<Node>, Double>> getPathDependence(){
 			return this.pathDependence;
 		}
 		
@@ -540,10 +540,10 @@ public class PathDependentNetwork {
 		 * @return weight of the link, given the path dependence, or zero if the
 		 * 		   particular link does not exist. 
 		 */
-		private double getPathDependentWeight(Id previousId, Id nextId){
+		private double getPathDependentWeight(Id<Node> previousId, Id<Node> nextId){
 			double weight = 0;
 			if(pathDependence.containsKey(previousId)){
-				Map<Id, Double> map = pathDependence.get(previousId);
+				Map<Id<Node>, Double> map = pathDependence.get(previousId);
 				if(map.containsKey(nextId)){
 					weight = map.get(nextId);
 				}
@@ -551,9 +551,9 @@ public class PathDependentNetwork {
 			return weight;
 		}
 		
-		private double getWeight(Id nextId){
+		private double getWeight(Id<Node> nextId){
 			double weight = 0.0;
-			for(Map<Id, Double> map : pathDependence.values()){
+			for(Map<Id<Node>, Double> map : pathDependence.values()){
 				if(map.containsKey(nextId)){
 					weight += map.get(nextId);
 				}
@@ -564,7 +564,7 @@ public class PathDependentNetwork {
 		
 		private double getSourceWeight(){
 			double weight = 0.0;
-			Id sourceId = new IdImpl("source");
+			Id<Node> sourceId = Id.create("source", Node.class);
 			if(pathDependence.containsKey(sourceId)){
 				for(Double d : pathDependence.get(sourceId).values()){
 					weight += d;

@@ -4,10 +4,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -66,7 +65,7 @@ public class GenerateFreightSubpopulations {
 					for(PlanElement pe : plan.getPlanElements()){
 						if(pe instanceof Activity){
 							Activity activity = (Activity)pe;
-							((ActivityImpl)activity).setFacilityId(new IdImpl("cn_" + activity.getFacilityId().toString()));
+							((ActivityImpl)activity).setFacilityId(Id.create("cn_" + activity.getFacilityId().toString(), ActivityFacility.class));
 						}
 					}
 				}

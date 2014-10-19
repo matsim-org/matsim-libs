@@ -28,7 +28,9 @@ import java.util.TimeZone;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -80,49 +82,49 @@ public class PathDependentNetworkTest {
 		Assert.assertEquals("Wrong number of nodes.", 5, pdn.getNumberOfNodes());
 		
 		/* Node 'A' */
-		PathDependentNode A = pdn.getPathDependentNode(new IdImpl("A"));
+		PathDependentNode A = pdn.getPathDependentNode(Id.create("A", Node.class));
 		Assert.assertEquals("Wrong in-degree for 'A'.", 0, A.getInDegree() );
 		Assert.assertEquals("Wrong out-degree for 'A'.", 1, A.getOutDegree());
 		Assert.assertEquals("Wrong path-dependent out-degree for 'A'.", 1, A.getPathDependentOutDegree(null));
-		Assert.assertEquals("Wrong weight '(source) A -> C'", 2, pdn.getPathDependentWeight(null, new IdImpl("A"), new IdImpl("C")), 0.001);
-		Assert.assertEquals("Wrong weight '(from C) A -> C'", 0, pdn.getPathDependentWeight(new IdImpl("C"), new IdImpl("A"), new IdImpl("C")), 0.001);
+		Assert.assertEquals("Wrong weight '(source) A -> C'", 2, pdn.getPathDependentWeight(null, Id.create("A", Node.class), Id.create("C", Node.class)), 0.001);
+		Assert.assertEquals("Wrong weight '(from C) A -> C'", 0, pdn.getPathDependentWeight(Id.create("C", Node.class), Id.create("A", Node.class), Id.create("C", Node.class)), 0.001);
 		
 		/* Node 'B' */
-		PathDependentNode B = pdn.getPathDependentNode(new IdImpl("B"));
+		PathDependentNode B = pdn.getPathDependentNode(Id.create("B", Node.class));
 		Assert.assertEquals("Wrong in-degree for 'B'", 0, B.getInDegree() );
 		Assert.assertEquals("Wrong out-degree for 'B'.", 1, B.getOutDegree());
 		Assert.assertEquals("Wrong path-dependent out-degree for 'B'.", 1, B.getPathDependentOutDegree(null));
-		Assert.assertEquals("Wrong weight '(source) B -> C'", 1, pdn.getPathDependentWeight(null, new IdImpl("B"), new IdImpl("C")), 0.001);
-		Assert.assertEquals("Wrong weight '(from C) B -> C'", 0, pdn.getPathDependentWeight(new IdImpl("C"), new IdImpl("B"), new IdImpl("C")), 0.001);
+		Assert.assertEquals("Wrong weight '(source) B -> C'", 1, pdn.getPathDependentWeight(null, Id.create("B", Node.class), Id.create("C", Node.class)), 0.001);
+		Assert.assertEquals("Wrong weight '(from C) B -> C'", 0, pdn.getPathDependentWeight(Id.create("C", Node.class), Id.create("B", Node.class), Id.create("C", Node.class)), 0.001);
 		
 		/* Node 'C' */
-		PathDependentNode C = pdn.getPathDependentNode(new IdImpl("C"));
+		PathDependentNode C = pdn.getPathDependentNode(Id.create("C", Node.class));
 		Assert.assertEquals("Wrong in-degree for 'C'.", 2, C.getInDegree());
 		Assert.assertEquals("Wrong path-dependent ('A') out-degree for 'C'.", 2, C.getPathDependentOutDegree(A.getId()));
 		Assert.assertEquals("Wrong path-dependent ('B') out-degree for 'C'.", 1, C.getPathDependentOutDegree(B.getId()));
 		Assert.assertEquals("Wrong out-degree for 'C'.", 2, C.getOutDegree());
-		Assert.assertEquals("Wrong weight '(A) C -> D'", 1, pdn.getPathDependentWeight(new IdImpl("A"), new IdImpl("C"), new IdImpl("D")), 0.001);
-		Assert.assertEquals("Wrong weight '(A) C -> E'", 1, pdn.getPathDependentWeight(new IdImpl("A"), new IdImpl("C"), new IdImpl("E")), 0.001);
-		Assert.assertEquals("Wrong weight '(B) C -> D'", 1, pdn.getPathDependentWeight(new IdImpl("B"), new IdImpl("C"), new IdImpl("D")), 0.001);
+		Assert.assertEquals("Wrong weight '(A) C -> D'", 1, pdn.getPathDependentWeight(Id.create("A", Node.class), Id.create("C", Node.class), Id.create("D", Node.class)), 0.001);
+		Assert.assertEquals("Wrong weight '(A) C -> E'", 1, pdn.getPathDependentWeight(Id.create("A", Node.class), Id.create("C", Node.class), Id.create("E", Node.class)), 0.001);
+		Assert.assertEquals("Wrong weight '(B) C -> D'", 1, pdn.getPathDependentWeight(Id.create("B", Node.class), Id.create("C", Node.class), Id.create("D", Node.class)), 0.001);
 		
 		/* Node 'D' */
-		PathDependentNode D = pdn.getPathDependentNode(new IdImpl("D"));
+		PathDependentNode D = pdn.getPathDependentNode(Id.create("D", Node.class));
 		Assert.assertEquals("Wrong in-degree for 'D'.", 1, D.getInDegree());
 		Assert.assertEquals("Wrong out-degree for 'D'.", 0, D.getOutDegree());
-		Assert.assertEquals("Wrong path-dependent ('C') out-degree for 'D'.", 0, D.getPathDependentOutDegree(new IdImpl("C")));
+		Assert.assertEquals("Wrong path-dependent ('C') out-degree for 'D'.", 0, D.getPathDependentOutDegree(Id.create("C", Node.class)));
 		
 		/* Node 'E' */
-		PathDependentNode E = pdn.getPathDependentNode(new IdImpl("E"));
+		PathDependentNode E = pdn.getPathDependentNode(Id.create("E", Node.class));
 		Assert.assertEquals("Wrong in-degree for 'E'.", 1, E.getInDegree());
 		Assert.assertEquals("Wrong out-degree for 'E'.", 0, E.getOutDegree());
-		Assert.assertEquals("Wrong path-dependent ('C') out-degree for 'E'.", 0, E.getPathDependentOutDegree(new IdImpl("C")));
+		Assert.assertEquals("Wrong path-dependent ('C') out-degree for 'E'.", 0, E.getPathDependentOutDegree(Id.create("C", Node.class)));
 		
 		/* Test edge weights. */
-		Assert.assertEquals("Wrong edge weight: A-B", 0, pdn.getWeight(new IdImpl("A"), new IdImpl("B")), 0.001);
-		Assert.assertEquals("Wrong edge weight: A-C", 2, pdn.getWeight(new IdImpl("A"), new IdImpl("C")), 0.001);
-		Assert.assertEquals("Wrong edge weight: B-C", 2, pdn.getWeight(new IdImpl("B"), new IdImpl("C")), 0.001);
-		Assert.assertEquals("Wrong edge weight: C-D", 2, pdn.getWeight(new IdImpl("C"), new IdImpl("D")), 0.001);
-		Assert.assertEquals("Wrong edge weight: C-E", 1, pdn.getWeight(new IdImpl("C"), new IdImpl("E")), 0.001);
+		Assert.assertEquals("Wrong edge weight: A-B", 0, pdn.getWeight(Id.create("A", Node.class), Id.create("B", Node.class)), 0.001);
+		Assert.assertEquals("Wrong edge weight: A-C", 2, pdn.getWeight(Id.create("A", Node.class), Id.create("C", Node.class)), 0.001);
+		Assert.assertEquals("Wrong edge weight: B-C", 2, pdn.getWeight(Id.create("B", Node.class), Id.create("C", Node.class)), 0.001);
+		Assert.assertEquals("Wrong edge weight: C-D", 2, pdn.getWeight(Id.create("C", Node.class), Id.create("D", Node.class)), 0.001);
+		Assert.assertEquals("Wrong edge weight: C-E", 1, pdn.getWeight(Id.create("C", Node.class), Id.create("E", Node.class)), 0.001);
 	}
 	
 	@Test
@@ -134,21 +136,21 @@ public class PathDependentNetworkTest {
 			pdn.processActivityChain(chain);
 		}
 
-		PathDependentNode C = pdn.getPathDependentNode(new IdImpl("C"));
-		Assert.assertEquals("Wrong next Id.", new IdImpl("D"), C.sampleBiasedNextPathDependentNode(new IdImpl("A"), 0.25));
-		Assert.assertEquals("Wrong next Id.", new IdImpl("E"), C.sampleBiasedNextPathDependentNode(new IdImpl("A"), 0.75));
+		PathDependentNode C = pdn.getPathDependentNode(Id.create("C", Node.class));
+		Assert.assertEquals("Wrong next Id.", Id.create("D", Node.class), C.sampleBiasedNextPathDependentNode(Id.create("A", Node.class), 0.25));
+		Assert.assertEquals("Wrong next Id.", Id.create("E", Node.class), C.sampleBiasedNextPathDependentNode(Id.create("A", Node.class), 0.75));
 
-		Assert.assertEquals("Wrong next Id.", new IdImpl("D"), C.sampleBiasedNextPathDependentNode(new IdImpl("B"), 0.1));
-		Assert.assertEquals("Wrong next Id.", new IdImpl("D"), C.sampleBiasedNextPathDependentNode(new IdImpl("B"), 0.25));
-		Assert.assertEquals("Wrong next Id.", new IdImpl("D"), C.sampleBiasedNextPathDependentNode(new IdImpl("B"), 0.5));
-		Assert.assertEquals("Wrong next Id.", new IdImpl("D"), C.sampleBiasedNextPathDependentNode(new IdImpl("B"), 0.75));
-		Assert.assertEquals("Wrong next Id.", new IdImpl("D"), C.sampleBiasedNextPathDependentNode(new IdImpl("B"), 0.9));
+		Assert.assertEquals("Wrong next Id.", Id.create("D", Node.class), C.sampleBiasedNextPathDependentNode(Id.create("B", Node.class), 0.1));
+		Assert.assertEquals("Wrong next Id.", Id.create("D", Node.class), C.sampleBiasedNextPathDependentNode(Id.create("B", Node.class), 0.25));
+		Assert.assertEquals("Wrong next Id.", Id.create("D", Node.class), C.sampleBiasedNextPathDependentNode(Id.create("B", Node.class), 0.5));
+		Assert.assertEquals("Wrong next Id.", Id.create("D", Node.class), C.sampleBiasedNextPathDependentNode(Id.create("B", Node.class), 0.75));
+		Assert.assertEquals("Wrong next Id.", Id.create("D", Node.class), C.sampleBiasedNextPathDependentNode(Id.create("B", Node.class), 0.9));
 		
-		PathDependentNode D = pdn.getPathDependentNode(new IdImpl("D"));
-		Assert.assertNull("Wrong next Id.", D.sampleBiasedNextPathDependentNode(new IdImpl("C"), 0.5));
+		PathDependentNode D = pdn.getPathDependentNode(Id.create("D", Node.class));
+		Assert.assertNull("Wrong next Id.", D.sampleBiasedNextPathDependentNode(Id.create("C", Node.class), 0.5));
 		
-		PathDependentNode E = pdn.getPathDependentNode(new IdImpl("E"));
-		Assert.assertNull("Wrong next Id.", E.sampleBiasedNextPathDependentNode(new IdImpl("C"), 0.5));
+		PathDependentNode E = pdn.getPathDependentNode(Id.create("E", Node.class));
+		Assert.assertNull("Wrong next Id.", E.sampleBiasedNextPathDependentNode(Id.create("C", Node.class), 0.5));
 	}
 	
 	@Test
@@ -160,11 +162,11 @@ public class PathDependentNetworkTest {
 			pdn.processActivityChain(chain);
 		}
 		
-		Assert.assertEquals("Wrong source weight for 'A'.", 2, pdn.getSourceWeight(new IdImpl("A")), 0.001);
-		Assert.assertEquals("Wrong source weight for 'B'.", 1, pdn.getSourceWeight(new IdImpl("B")), 0.001);
-		Assert.assertEquals("Wrong source weight for 'C'.", 0, pdn.getSourceWeight(new IdImpl("C")), 0.001);
-		Assert.assertEquals("Wrong source weight for 'D'.", 0, pdn.getSourceWeight(new IdImpl("D")), 0.001);
-		Assert.assertEquals("Wrong source weight for 'E'.", 0, pdn.getSourceWeight(new IdImpl("E")), 0.001);
+		Assert.assertEquals("Wrong source weight for 'A'.", 2, pdn.getSourceWeight(Id.create("A", Node.class)), 0.001);
+		Assert.assertEquals("Wrong source weight for 'B'.", 1, pdn.getSourceWeight(Id.create("B", Node.class)), 0.001);
+		Assert.assertEquals("Wrong source weight for 'C'.", 0, pdn.getSourceWeight(Id.create("C", Node.class)), 0.001);
+		Assert.assertEquals("Wrong source weight for 'D'.", 0, pdn.getSourceWeight(Id.create("D", Node.class)), 0.001);
+		Assert.assertEquals("Wrong source weight for 'E'.", 0, pdn.getSourceWeight(Id.create("E", Node.class)), 0.001);
 	}
 	
 	@Test
@@ -176,11 +178,11 @@ public class PathDependentNetworkTest {
 			pdn.processActivityChain(chain);
 		}
 		
-		Assert.assertEquals("Wrong source node: ratio A:B should be 2:1.", new IdImpl("A"), pdn.sampleChainStartNode(0.25));
-		Assert.assertEquals("Wrong source node: ratio A:B should be 2:1.", new IdImpl("A"), pdn.sampleChainStartNode(0.5));
-		Assert.assertEquals("Wrong source node: ratio A:B should be 2:1.", new IdImpl("A"), pdn.sampleChainStartNode(0.65));
-		Assert.assertEquals("Wrong source node: ratio A:B should be 2:1.", new IdImpl("B"), pdn.sampleChainStartNode(0.67));
-		Assert.assertEquals("Wrong source node: ratio A:B should be 2:1.", new IdImpl("B"), pdn.sampleChainStartNode(0.90));
+		Assert.assertEquals("Wrong source node: ratio A:B should be 2:1.", Id.create("A", Node.class), pdn.sampleChainStartNode(0.25));
+		Assert.assertEquals("Wrong source node: ratio A:B should be 2:1.", Id.create("A", Node.class), pdn.sampleChainStartNode(0.5));
+		Assert.assertEquals("Wrong source node: ratio A:B should be 2:1.", Id.create("A", Node.class), pdn.sampleChainStartNode(0.65));
+		Assert.assertEquals("Wrong source node: ratio A:B should be 2:1.", Id.create("B", Node.class), pdn.sampleChainStartNode(0.67));
+		Assert.assertEquals("Wrong source node: ratio A:B should be 2:1.", Id.create("B", Node.class), pdn.sampleChainStartNode(0.90));
 	}
 	
 	
@@ -209,13 +211,13 @@ public class PathDependentNetworkTest {
 		List<DigicoreChain> list = new ArrayList<DigicoreChain>();
 		/* Chain A -> C -> D */
 		DigicoreActivity da1_A = new DigicoreActivity("test", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH); 
-		da1_A.setFacilityId(new IdImpl("A"));
+		da1_A.setFacilityId(Id.create("A", ActivityFacility.class));
 		da1_A.setCoord(new CoordImpl(0, 10));
 		DigicoreActivity da1_C = new DigicoreActivity("test", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH); 
-		da1_C.setFacilityId(new IdImpl("C"));
+		da1_C.setFacilityId(Id.create("C", ActivityFacility.class));
 		da1_C.setCoord(new CoordImpl(5, 5));
 		DigicoreActivity da1_D = new DigicoreActivity("test", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH); 
-		da1_D.setFacilityId(new IdImpl("D"));
+		da1_D.setFacilityId(Id.create("D", ActivityFacility.class));
 		da1_D.setCoord(new CoordImpl(10, 10));
 		DigicoreChain c1 = new DigicoreChain();
 		c1.add(da1_A);
@@ -225,13 +227,13 @@ public class PathDependentNetworkTest {
 		
 		/* Chain A -> C -> E */
 		DigicoreActivity da2_A = new DigicoreActivity("test", TimeZone.getDefault(), Locale.ENGLISH); 
-		da2_A.setFacilityId(new IdImpl("A"));
+		da2_A.setFacilityId(Id.create("A", ActivityFacility.class));
 		da2_A.setCoord(new CoordImpl(0, 10));
 		DigicoreActivity da2_C = new DigicoreActivity("test", TimeZone.getDefault(), Locale.ENGLISH); 
-		da2_C.setFacilityId(new IdImpl("C"));
+		da2_C.setFacilityId(Id.create("C", ActivityFacility.class));
 		da2_C.setCoord(new CoordImpl(5, 5));
 		DigicoreActivity da2_E = new DigicoreActivity("test", TimeZone.getDefault(), Locale.ENGLISH); 
-		da2_E.setFacilityId(new IdImpl("E"));
+		da2_E.setFacilityId(Id.create("E", ActivityFacility.class));
 		da2_E.setCoord(new CoordImpl(10, 0));
 		DigicoreChain c2 = new DigicoreChain();
 		c2.add(da2_A);
@@ -241,13 +243,13 @@ public class PathDependentNetworkTest {
 		
 		/* Chain B -> C -> D */
 		DigicoreActivity da3_B = new DigicoreActivity("test", TimeZone.getDefault(), Locale.ENGLISH); 
-		da3_B.setFacilityId(new IdImpl("B"));
+		da3_B.setFacilityId(Id.create("B", ActivityFacility.class));
 		da3_B.setCoord(new CoordImpl(0, 0));
 		DigicoreActivity da3_C = new DigicoreActivity("test", TimeZone.getDefault(), Locale.ENGLISH); 
-		da3_C.setFacilityId(new IdImpl("C"));
+		da3_C.setFacilityId(Id.create("C", ActivityFacility.class));
 		da3_C.setCoord(new CoordImpl(5, 5));
 		DigicoreActivity da3_D = new DigicoreActivity("test", TimeZone.getDefault(), Locale.ENGLISH); 
-		da3_D.setFacilityId(new IdImpl("D"));
+		da3_D.setFacilityId(Id.create("D", ActivityFacility.class));
 		da3_D.setCoord(new CoordImpl(10, 10));
 		DigicoreChain c3 = new DigicoreChain();
 		c3.add(da3_B);
@@ -257,15 +259,15 @@ public class PathDependentNetworkTest {
 		
 		/* A -> ?? -> B -> C -> ?? */
 		DigicoreActivity da4_A = new DigicoreActivity("test", TimeZone.getDefault(), Locale.ENGLISH); 
-		da4_A.setFacilityId(new IdImpl("A"));
+		da4_A.setFacilityId(Id.create("A", ActivityFacility.class));
 		da4_A.setCoord(new CoordImpl(0, 10));
 		DigicoreActivity da4_dummy1 = new DigicoreActivity("test", TimeZone.getDefault(), Locale.ENGLISH); 
 		da4_dummy1.setCoord(new CoordImpl(20, 10));
 		DigicoreActivity da4_B = new DigicoreActivity("test", TimeZone.getDefault(), Locale.ENGLISH); 
-		da4_B.setFacilityId(new IdImpl("B"));
+		da4_B.setFacilityId(Id.create("B", ActivityFacility.class));
 		da4_B.setCoord(new CoordImpl(0, 0));
 		DigicoreActivity da4_C = new DigicoreActivity("test", TimeZone.getDefault(), Locale.ENGLISH); 
-		da4_C.setFacilityId(new IdImpl("C"));
+		da4_C.setFacilityId(Id.create("C", ActivityFacility.class));
 		da4_C.setCoord(new CoordImpl(5, 5));
 		DigicoreActivity da4_dummy2 = new DigicoreActivity("test", TimeZone.getDefault(), Locale.ENGLISH); 
 		da4_dummy2.setCoord(new CoordImpl(20, 10));

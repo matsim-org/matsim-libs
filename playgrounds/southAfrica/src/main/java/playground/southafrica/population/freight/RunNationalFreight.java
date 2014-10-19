@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -144,7 +143,7 @@ public class RunNationalFreight {
 		
 		/* Set the population as "subpopulation", and create a vehicle for each. */
 		Vehicles vehicles = ((ScenarioImpl)sc).getVehicles();
-		VehicleType truckType = new VehicleTypeImpl(new IdImpl("commercial"));
+		VehicleType truckType = new VehicleTypeImpl(Id.create("commercial", VehicleType.class));
 		truckType.setMaximumVelocity(100./3.6);
 		truckType.setLength(18.);
 		vehicles.addVehicleType(truckType);

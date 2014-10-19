@@ -22,7 +22,6 @@
  */
 package playground.southafrica.gauteng;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.apache.log4j.Logger;
@@ -34,7 +33,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
@@ -287,17 +285,17 @@ public class GautengControler_subpopulations {
 		/* Create vehicle types. */
 		VehiclesFactory vf = VehicleUtils.getFactory();
 		LOG.info("Creating vehicle types.");
-		VehicleType vehicle_A2 = vf.createVehicleType(new IdImpl("A2"));
+		VehicleType vehicle_A2 = vf.createVehicleType(Id.create("A2", VehicleType.class));
 		vehicle_A2.setDescription("Light vehicle with SANRAL toll class `A2'");
 		sc.getVehicles().addVehicleType(vehicle_A2);
 
-		VehicleType vehicle_B = vf.createVehicleType(new IdImpl("B"));
+		VehicleType vehicle_B = vf.createVehicleType(Id.create("B", VehicleType.class));
 		vehicle_B.setDescription("Short commercial vehicle with SANRAL toll class `B'");
 		vehicle_B.setMaximumVelocity(100.0 / 3.6);
 		vehicle_B.setLength(10.0);
 		sc.getVehicles().addVehicleType(vehicle_B);
 
-		VehicleType vehicle_C = vf.createVehicleType(new IdImpl("C"));
+		VehicleType vehicle_C = vf.createVehicleType(Id.create("C", VehicleType.class));
 		vehicle_C.setDescription("Medium/long commercial vehicle with SANRAL toll class `C'");
 		vehicle_C.setMaximumVelocity(80.0 / 3.6);
 		vehicle_C.setLength(15.0);

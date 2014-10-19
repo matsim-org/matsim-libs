@@ -5,10 +5,11 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.households.Household;
 import org.matsim.households.Households;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
@@ -44,9 +45,9 @@ public class IpfWriter2011 {
 		try{
 			bw.write(String.format("HHNR\tPNR\tHHS\tHT\tMDT\tPOP\tINC\tPNRHH\tAGE\tGEN\tREL\tEMPL\tSCH\n"));
 			int personNumber = 1;
-			for(Id personId : population.getPersons().keySet()){
+			for(Id<Person> personId : population.getPersons().keySet()){
 				
-				Id householdId = new IdImpl(personId.toString().split("_")[0]);
+				Id<Household> householdId = Id.create(personId.toString().split("_")[0], Household.class);
 
 				/* Only add the person if the household income class is known. */
 				Income2011 income = Income2011.getIncomeEnum(households.getHouseholds().get(householdId).getIncome());

@@ -28,13 +28,13 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.general.CadytsBuilder;
 import org.matsim.contrib.cadyts.general.CadytsContextI;
 import org.matsim.contrib.cadyts.general.CadytsCostOffsetsXMLFileIO;
 import org.matsim.contrib.cadyts.general.LookUp;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -95,7 +95,7 @@ class CadytsFreightChainsContext implements CadytsContextI<Item>, BeforeMobsimLi
 
 	private final SimResultsImpl<Item> simResults ;
 
-	private final Map<Id,Item> itemContainer = new HashMap<Id,Item>() ;
+	private final Map<Id<Item>,Item> itemContainer = new HashMap<>() ;
 
 	private final LookUp<Item> lookUp = new LookUp<Item>() {
 		@Override
@@ -108,14 +108,15 @@ class CadytsFreightChainsContext implements CadytsContextI<Item>, BeforeMobsimLi
 		// define and register the observations:
 		Counts counts = new Counts() ;
 		for ( int ii=0 ; ii<nChainsOfLength.size() ; ii++ ) {
-			Id id = new IdImpl(ii) ;
+			Id<Link> id = Id.create(ii, Link.class) ;
 			Count count = counts.createAndAddCount( id, "chain_of_length_" + Integer.toString(ii) ) ;
 			int time = 1 ; // dummy
 			long cnt = nChainsOfLength.get(ii) ;
 			count.createVolume(time, cnt ) ;
 
 			// also produce the "items" since we don't have any objects in the simulation to which we can attach the count values:
-			itemContainer.put( id, new Item( id ) ) ;
+			Id<Item> itemId = Id.create(id, Item.class);
+			itemContainer.put( itemId, new Item( itemId ) ) ;
 		}
 
 		// build the calibrator. This is a static method, and in consequence has no side effects
@@ -127,7 +128,7 @@ class CadytsFreightChainsContext implements CadytsContextI<Item>, BeforeMobsimLi
 
 	private Item getCorrectItemFromPlan(org.matsim.api.core.v01.population.Plan plan) {
 		int numberOfActs = PopulationUtils.getActivities(plan, null ).size();
-		final Item item = itemContainer.get( new IdImpl(numberOfActs) );
+		final Item item = itemContainer.get( Id.create(numberOfActs, Link.class) );
 		if ( item==null ) {
 			log.error("don't have a prepared item for numberOfActs=" + numberOfActs );
 			throw new RuntimeException("error") ;

@@ -21,13 +21,13 @@ package playground.southafrica.projects.complexNetworks.utils;
 
 import java.util.Iterator;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.network.NetworkWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -36,8 +36,6 @@ import org.matsim.testcases.MatsimTestCase;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Graph;
 import com.tinkerpop.blueprints.Vertex;
-
-import playground.southafrica.projects.complexNetworks.utils.GraphMLConverter;;
 
 public class GraphMLConverterTest extends MatsimTestCase{
 	
@@ -95,22 +93,22 @@ public class GraphMLConverterTest extends MatsimTestCase{
 		NetworkFactory nf = network.getFactory();
 		
 		/* Nodes */
-		Node n1 = nf.createNode(new IdImpl(1), new CoordImpl(0, 5));
-		Node n2 = nf.createNode(new IdImpl(2), new CoordImpl(5, 10));
-		Node n3 = nf.createNode(new IdImpl(3), new CoordImpl(5, 0));
-		Node n4 = nf.createNode(new IdImpl(4), new CoordImpl(10, 5));
+		Node n1 = nf.createNode(Id.create(1, Node.class), new CoordImpl(0, 5));
+		Node n2 = nf.createNode(Id.create(2, Node.class), new CoordImpl(5, 10));
+		Node n3 = nf.createNode(Id.create(3, Node.class), new CoordImpl(5, 0));
+		Node n4 = nf.createNode(Id.create(4, Node.class), new CoordImpl(10, 5));
 		network.addNode(n1);
 		network.addNode(n2);
 		network.addNode(n3);
 		network.addNode(n4);
 		
 		/* Links */
-		Link la = nf.createLink(new IdImpl("a"), n1, n2); la.setNumberOfLanes(1.0);
-		Link lb = nf.createLink(new IdImpl("b"), n2, n4); lb.setNumberOfLanes(1.0);
-		Link lc = nf.createLink(new IdImpl("c"), n4, n3); lc.setNumberOfLanes(1.0);
-		Link ld = nf.createLink(new IdImpl("d"), n3, n1); ld.setNumberOfLanes(1.0);
-		Link le = nf.createLink(new IdImpl("e"), n3, n2); le.setNumberOfLanes(2.0);
-		Link lf = nf.createLink(new IdImpl("f"), n2, n3); lf.setNumberOfLanes(2.0);
+		Link la = nf.createLink(Id.create("a", Link.class), n1, n2); la.setNumberOfLanes(1.0);
+		Link lb = nf.createLink(Id.create("b", Link.class), n2, n4); lb.setNumberOfLanes(1.0);
+		Link lc = nf.createLink(Id.create("c", Link.class), n4, n3); lc.setNumberOfLanes(1.0);
+		Link ld = nf.createLink(Id.create("d", Link.class), n3, n1); ld.setNumberOfLanes(1.0);
+		Link le = nf.createLink(Id.create("e", Link.class), n3, n2); le.setNumberOfLanes(2.0);
+		Link lf = nf.createLink(Id.create("f", Link.class), n2, n3); lf.setNumberOfLanes(2.0);
 		network.addLink(la);
 		network.addLink(lb);
 		network.addLink(lc);
