@@ -82,12 +82,12 @@ public class VisumMatrixWriter {
 				if (cnt > 1) {
 					out.write("\t");
 				}
-				out.write(value.toString());
+				out.write(value);
 			}
 			out.write("\n");
 
 			for (String from : this.ids) {
-				out.write("*\t" + from.toString() + "\n");
+				out.write("*\t" + from + "\n");
 				cnt = 0;
 				for (String to : this.ids) {
 					cnt++;

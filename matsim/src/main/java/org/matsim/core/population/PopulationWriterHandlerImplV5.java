@@ -263,7 +263,7 @@ import org.matsim.core.utils.misc.Time;
 		out.write(Time.writeTime(route.getTravelTime()));
 		out.write("\"");
 		out.write(" distance=\"");
-		out.write(Double.toString(route.getDistance()).toString());
+		out.write(Double.toString(route.getDistance()));
 		out.write("\"");
 		out.write(">");
 		String rd = route.getRouteDescription();

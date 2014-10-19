@@ -316,9 +316,7 @@ public class IterationStopWatch {
 		}
 		if (iterationData != null) {
 			double[] otherData = new double[iterations];
-			for (int i = 0; i < iterations; i++) {
-				otherData[i] = iterationData[i];
-			}
+			System.arraycopy(iterationData, 0, otherData, 0, iterations);
 			chart.addSeries(OPERATION_OTHER, otherData);
 		}
 
