@@ -51,7 +51,7 @@ public class WorstPlanForRemovalSelector implements GenericPlanSelector<Plan, Pe
 
 		// count how many plans per type an agent has:
 		for (Plan plan : person.getPlans()) {
-			String type = ((PlanImpl) plan).getType();
+			String type = plan.getType();
 			if ( type==null ) {
 				type = UNDEFINED_TYPE ;
 			}
@@ -67,7 +67,7 @@ public class WorstPlanForRemovalSelector implements GenericPlanSelector<Plan, Pe
 		double worstScore = Double.POSITIVE_INFINITY;
 		for (Plan plan : person.getPlans()) {
 
-			String type = ((PlanImpl) plan).getType();
+			String type = plan.getType();
 			if ( type==null ) {
 				type = UNDEFINED_TYPE;
 			}

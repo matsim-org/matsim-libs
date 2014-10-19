@@ -128,7 +128,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		d1.setVehicleId(Id.create("V1", Vehicle.class));
 		route1.addDeparture(d1);
 
-		Vehicles vehicles = ((ScenarioImpl) scenario).getVehicles();
+		Vehicles vehicles = scenario.getVehicles();
 		VehicleType vehicleType = vehicles.getFactory().createVehicleType(Id.create("VT1", VehicleType.class));
 		VehicleCapacity vehicleCapacity = vehicles.getFactory().createVehicleCapacity();
 		vehicleCapacity.setSeats(30);

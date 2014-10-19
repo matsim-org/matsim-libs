@@ -82,6 +82,6 @@ public class ScenarioLoaderImplTest {
 		config.scenario().setUseHouseholds(true);
 		config.households().addParam("inputHouseholdAttributesFile", this.util.getClassInputDirectory() + "householdAttributes.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Assert.assertEquals("world", ((ScenarioImpl) scenario).getHouseholds().getHouseholdAttributes().getAttribute("1", "hello"));
+		Assert.assertEquals("world", scenario.getHouseholds().getHouseholdAttributes().getAttribute("1", "hello"));
 	}
 }

@@ -274,7 +274,7 @@ public class NonAlternativingPlanElementsIntegrationTest {
 			route1.addDeparture(f.createDeparture(Id.create(i, Departure.class), 6.0 * 3600 + i * 600));
 		}
 		
-		new CreateVehiclesForSchedule(schedule, ((ScenarioImpl) scenario).getVehicles()).run();
+		new CreateVehiclesForSchedule(schedule, scenario.getVehicles()).run();
 	}
 
 }
