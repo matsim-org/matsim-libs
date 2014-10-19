@@ -70,7 +70,7 @@ public class MixedLaneTest {
 		Assert.assertEquals(2.0 , lane1ol.getNumberOfRepresentedLanes() );
 		Assert.assertEquals(fixture.id1 , lane1ol.getToLaneIds().get(0));
 		Assert.assertNull(lane1ol.getToLinkIds());
-		LaneData20 lane1 = lanesLink1.getLanes().get(fixture.id1);
+		LaneData20 lane1 = lanesLink1.getLanes().get(fixture.laneId1);
 		Assert.assertNotNull(lane1);
 		Assert.assertEquals(50.0, lane1.getStartsAtMeterFromLinkEnd());
 		Assert.assertEquals(7200.0, lane1.getCapacityVehiclesPerHour());
@@ -124,7 +124,7 @@ public class MixedLaneTest {
 		fixture.sc.getConfig().qsim().setStartTime(3500.0);
 		fixture.sc.getConfig().qsim().setEndTime(7200.0);
 		LaneDefinitions20 lanes = (LaneDefinitions20) fixture.sc.getScenarioElement(LaneDefinitions20.ELEMENT_NAME);
-		LaneData20 lane1 = lanes.getLanesToLinkAssignments().get(fixture.id1).getLanes().get(fixture.id1);
+		LaneData20 lane1 = lanes.getLanesToLinkAssignments().get(fixture.id1).getLanes().get(fixture.laneId1);
 		lane1.setCapacityVehiclesPerHour(1800.0);
 		LaneData20 lane1ol = lanes.getLanesToLinkAssignments().get(fixture.id1).getLanes().get(fixture.link1FirstLaneId);
 		lane1ol.setCapacityVehiclesPerHour(1800.0);
@@ -251,7 +251,7 @@ public class MixedLaneTest {
 	public void testMixedLane2AgentsDrivingCapacityRestriction() {
 		fixture.create2PersonPopulation();
 		LaneDefinitions20 lanes = (LaneDefinitions20) fixture.sc.getScenarioElement(LaneDefinitions20.ELEMENT_NAME);
-		LaneData20 lane1 = lanes.getLanesToLinkAssignments().get(fixture.id1).getLanes().get(fixture.id1);
+		LaneData20 lane1 = lanes.getLanesToLinkAssignments().get(fixture.id1).getLanes().get(fixture.laneId1);
 		lane1.setCapacityVehiclesPerHour(1800.0);
 		
 		EventsManager events = EventsUtils.createEventsManager();
@@ -323,7 +323,7 @@ public class MixedLaneTest {
 
 		@Override
 		public void handleEvent(LaneEnterEvent event) {
-			if (this.fixture.id1.equals(event.getLaneId())){
+			if (this.fixture.laneId1.equals(event.getLaneId())){
 				lane1EnterEvent = event;
 				System.err.println(event);
 			}
@@ -334,7 +334,7 @@ public class MixedLaneTest {
 
 		@Override
 		public void handleEvent(LaneLeaveEvent event) {
-			if (this.fixture.id1.equals(event.getLaneId())){
+			if (this.fixture.laneId1.equals(event.getLaneId())){
 				lane1LeaveEvent = event;
 			}
 			else if (this.fixture.link1FirstLaneId.equals((event.getLaneId()))){

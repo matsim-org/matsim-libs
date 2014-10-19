@@ -41,7 +41,7 @@ public abstract class AbstractNetworkTest {
 		Fixture f = new Fixture(getEmptyTestNetwork());
 
 		Assert.assertTrue(f.network.getLinks().containsKey(f.linkIds[1]));
-		Assert.assertEquals(1, f.network.getNodes().get(f.linkIds[1]).getInLinks().size());
+		Assert.assertEquals(1, f.network.getNodes().get(f.nodeIds[1]).getInLinks().size());
 		f.network.removeLink(f.linkIds[1]);
 		Assert.assertFalse(f.network.getLinks().containsKey(f.linkIds[1]));
 		Assert.assertEquals(0, f.network.getNodes().get(f.nodeIds[1]).getInLinks().size());
@@ -51,7 +51,7 @@ public abstract class AbstractNetworkTest {
 		f.network.removeLink(f.linkIds[2]);
 		Assert.assertFalse(f.network.getLinks().containsKey(f.linkIds[2]));
 
-		Assert.assertTrue(f.network.getNodes().containsKey(f.linkIds[1]));
+		Assert.assertTrue(f.network.getNodes().containsKey(f.nodeIds[1]));
 		Assert.assertEquals(0, f.network.getNodes().get(f.nodeIds[1]).getOutLinks().size());
 
 		Assert.assertEquals(2, f.network.getNodes().get(f.nodeIds[5]).getOutLinks().size());

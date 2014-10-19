@@ -58,6 +58,9 @@ public class SignalGroups20ReaderWriterTest {
 	private Id<Signal> id4 = Id.create("4", Signal.class);
 	private Id<Signal> id5 = Id.create("5", Signal.class);
 	private Id<SignalSystem> id42 = Id.create("42", SignalSystem.class);
+
+	private Id<SignalGroup> idSg1 = Id.create("1", SignalGroup.class);
+	private Id<SignalGroup> idSg2 = Id.create("2", SignalGroup.class);
 	Set<Id<Signal>> sg;
 
 
@@ -105,19 +108,19 @@ public class SignalGroups20ReaderWriterTest {
 		
 		//sg23
 		Map<Id<SignalGroup>,SignalGroupData> ss23 = sgd.getSignalGroupDataBySystemId(id23);
-		Assert.assertEquals(id23,ss23.get(id1).getSignalSystemId());
+		Assert.assertEquals(id23,ss23.get(idSg1).getSignalSystemId());
 
-		sg =  ss23.get(id1).getSignalIds();
+		sg =  ss23.get(idSg1).getSignalIds();
 		Assert.assertTrue(sg.contains(id1));
 		
 		//sg42
 		Assert.assertNotNull(sgd.getSignalGroupDataBySystemId(id42));
 		Map<Id<SignalGroup>,SignalGroupData> ss42 = sgd.getSignalGroupDataBySystemId(id42);
-		Assert.assertEquals(id42,ss42.get(id1).getSignalSystemId());
+		Assert.assertEquals(id42,ss42.get(idSg1).getSignalSystemId());
 
-		sg =  ss42.get(id1).getSignalIds();
+		sg =  ss42.get(idSg1).getSignalIds();
 		Assert.assertTrue(sg.contains(id1));
-		sg =  ss42.get(id2).getSignalIds();
+		sg =  ss42.get(idSg2).getSignalIds();
 		Assert.assertTrue(sg.contains(id1));
 		Assert.assertTrue(sg.contains(id4));
 		Assert.assertTrue(sg.contains(id5));

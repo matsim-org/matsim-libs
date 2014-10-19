@@ -132,8 +132,8 @@ public class InvertedNetworkLegRouter implements LegRouter {
 			route.setDistance(0.0);
 		}
 		else {
-			Node fromINode = this.invertedNetwork.getNodes().get(fromLinkId);
-			Node toINode = this.invertedNetwork.getNodes().get(toLinkId);
+			Node fromINode = this.invertedNetwork.getNodes().get(Id.create(fromLinkId, Node.class));
+			Node toINode = this.invertedNetwork.getNodes().get(Id.create(toLinkId, Node.class));
 			Path path = null;
 			path = this.leastCostPathCalculator.calcLeastCostPath(fromINode, toINode, departureTime, person, null);
 			if (path == null)

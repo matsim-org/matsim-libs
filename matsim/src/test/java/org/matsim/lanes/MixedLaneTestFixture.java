@@ -62,7 +62,8 @@ public class MixedLaneTestFixture {
 	public final Id<Link> id2;
 	public final Id<Link> id3;
 	public final Id<Link> id4;
-	public final Id<Object> link1FirstLaneId;
+	public final Id<Lane> laneId1;
+	public final Id<Lane> link1FirstLaneId;
 	
 	public MixedLaneTestFixture(){
 		Config config = ConfigUtils.createConfig();
@@ -71,10 +72,11 @@ public class MixedLaneTestFixture {
 		sc = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		id0 = Id.create("0", Link.class);
 		id1 = Id.create("1", Link.class);
+		laneId1 = Id.create("1", Lane.class);
 		id2 = Id.create("2", Link.class);
 		id3 = Id.create("3", Link.class);
 		id4 = Id.create("4", Link.class);
-		link1FirstLaneId = Id.create("1.ol", Object.class);
+		link1FirstLaneId = Id.create("1.ol", Lane.class);
 
 		init();
 	}

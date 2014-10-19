@@ -50,14 +50,14 @@ public class MultimodalNetworkCleanerTest {
 		cleaner.run(createHashSet(TransportMode.car));
 		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
 		Assert.assertEquals("wrong number of nodes.", 6, network.getNodes().size());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.nodeIds[1]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.nodeIds[2]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.nodeIds[3]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.nodeIds[4]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.nodeIds[5]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.nodeIds[6]).getAllowedModes());
-		Assert.assertEquals(f.modesC, network.getLinks().get(f.nodeIds[7]).getAllowedModes());
-		Assert.assertEquals(f.modesW, network.getLinks().get(f.nodeIds[8]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[1]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[2]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[3]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[4]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[5]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[6]).getAllowedModes());
+		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[7]).getAllowedModes());
+		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[8]).getAllowedModes());
 	}
 
 	@Test
@@ -181,8 +181,8 @@ public class MultimodalNetworkCleanerTest {
 	public void testRun_singleMode_singleSinkIntegrated() {
 		Fixture f = new Fixture();
 		Network network = f.scenario.getNetwork();
-		network.getLinks().get(f.nodeIds[1]).setAllowedModes(f.modesCW); // integrate the sinks into the existing network
-		network.getLinks().get(f.nodeIds[8]).setAllowedModes(f.modesCW);
+		network.getLinks().get(f.linkIds[1]).setAllowedModes(f.modesCW); // integrate the sinks into the existing network
+		network.getLinks().get(f.linkIds[8]).setAllowedModes(f.modesCW);
 
 		MultimodalNetworkCleaner cleaner = new MultimodalNetworkCleaner(network);
 		Assert.assertEquals("wrong number of links.", 8, network.getLinks().size());
@@ -401,8 +401,8 @@ public class MultimodalNetworkCleanerTest {
 		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[6]).getAllowedModes());
 		Assert.assertEquals(f.modesC, network.getLinks().get(f.linkIds[7]).getAllowedModes());
 		Assert.assertEquals(f.modesW, network.getLinks().get(f.linkIds[8]).getAllowedModes());
-		Assert.assertNull(network.getLinks().get(f.nodeIds[10]));
-		Assert.assertNull(network.getLinks().get(f.nodeIds[11]));
+		Assert.assertNull(network.getLinks().get(f.linkIds[10]));
+		Assert.assertNull(network.getLinks().get(f.linkIds[11]));
 	}
 
 	@Test

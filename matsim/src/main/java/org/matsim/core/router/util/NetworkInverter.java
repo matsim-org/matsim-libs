@@ -79,7 +79,7 @@ public class NetworkInverter {
 
 	private int createInvertedLink(Link inLink, Link outLink, int numberOfLinksGenerated, Set<String> modes){
 		Link link = this.invertedNetwork.createAndAddLink(Id.create(numberOfLinksGenerated + 1, Link.class), // start counting link ids with 1 instead of 0
-				this.invertedNetwork.getNodes().get(inLink.getId()), this.invertedNetwork.getNodes().get(outLink.getId()),
+				this.invertedNetwork.getNodes().get(Id.create(inLink.getId(), Node.class)), this.invertedNetwork.getNodes().get(Id.create(outLink.getId(), Node.class)),
 				outLink.getLength(),
 				outLink.getFreespeed(),
 				outLink.getCapacity(),
@@ -93,7 +93,7 @@ public class NetworkInverter {
 	public List<Link> convertInvertedNodesToLinks(List<Node> nodes) {
 		List<Link> ret = new ArrayList<Link>(nodes.size());
 		for (Node n : nodes){
-			ret.add(this.originalNetwork.getLinks().get(n.getId()));
+			ret.add(this.originalNetwork.getLinks().get(Id.create(n.getId(), Link.class)));
 		}
 		return ret;
 	}

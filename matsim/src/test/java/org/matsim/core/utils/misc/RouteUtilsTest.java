@@ -161,22 +161,22 @@ public class RouteUtilsTest {
 
 		Assert.assertEquals(0, links.size());
 
-		nodes.add(f.network.getNodes().get(f.linkIds[3]));
+		nodes.add(f.network.getNodes().get(f.nodeIds[3]));
 		links = RouteUtils.getLinksFromNodes(nodes);
 		Assert.assertEquals(0, links.size());
 
-		nodes.add(f.network.getNodes().get(f.linkIds[4]));
+		nodes.add(f.network.getNodes().get(f.nodeIds[4]));
 		links = RouteUtils.getLinksFromNodes(nodes);
 		Assert.assertEquals(1, links.size());
 		Assert.assertEquals(f.linkIds[3], links.get(0).getId());
 
-		nodes.add(f.network.getNodes().get(f.linkIds[5]));
+		nodes.add(f.network.getNodes().get(f.nodeIds[5]));
 		links = RouteUtils.getLinksFromNodes(nodes);
 		Assert.assertEquals(2, links.size());
 		Assert.assertEquals(f.linkIds[3], links.get(0).getId());
 		Assert.assertEquals(f.linkIds[4], links.get(1).getId());
 
-		nodes.add(0, f.network.getNodes().get(f.linkIds[2]));
+		nodes.add(0, f.network.getNodes().get(f.nodeIds[2]));
 		links = RouteUtils.getLinksFromNodes(nodes);
 		Assert.assertEquals(3, links.size());
 		Assert.assertEquals(f.linkIds[2], links.get(0).getId());
@@ -192,7 +192,7 @@ public class RouteUtilsTest {
 		Collections.addAll(linkIds, f.linkIds[1], f.linkIds[2], f.linkIds[3], f.linkIds[4]);
 		route.setLinkIds(f.linkIds[0], linkIds, f.linkIds[5]);
 
-		NetworkRoute subRoute = RouteUtils.getSubRoute(route, f.network.getNodes().get(f.linkIds[3]), f.network.getNodes().get(f.linkIds[5]), f.network);
+		NetworkRoute subRoute = RouteUtils.getSubRoute(route, f.network.getNodes().get(f.nodeIds[3]), f.network.getNodes().get(f.nodeIds[5]), f.network);
 		Assert.assertEquals(2, subRoute.getLinkIds().size());
 		Assert.assertEquals(f.linkIds[2], subRoute.getStartLinkId());
 		Assert.assertEquals(f.linkIds[3], subRoute.getLinkIds().get(0));
@@ -208,7 +208,7 @@ public class RouteUtilsTest {
 		Collections.addAll(linkIds, f.linkIds[1], f.linkIds[2], f.linkIds[3], f.linkIds[4]);
 		route.setLinkIds(f.linkIds[0], linkIds, f.linkIds[5]);
 
-		NetworkRoute subRoute = RouteUtils.getSubRoute(route, f.network.getNodes().get(f.linkIds[1]), f.network.getNodes().get(f.linkIds[5]), f.network);
+		NetworkRoute subRoute = RouteUtils.getSubRoute(route, f.network.getNodes().get(f.nodeIds[1]), f.network.getNodes().get(f.nodeIds[5]), f.network);
 		Assert.assertEquals(4, subRoute.getLinkIds().size());
 		Assert.assertEquals(f.linkIds[0], subRoute.getStartLinkId());
 		Assert.assertEquals(f.linkIds[1], subRoute.getLinkIds().get(0));
@@ -226,7 +226,7 @@ public class RouteUtilsTest {
 		Collections.addAll(linkIds, f.linkIds[1], f.linkIds[2], f.linkIds[3], f.linkIds[4]);
 		route.setLinkIds(f.linkIds[0], linkIds, f.linkIds[5]);
 
-		NetworkRoute subRoute = RouteUtils.getSubRoute(route, f.network.getNodes().get(f.linkIds[4]), f.network.getNodes().get(f.linkIds[4]), f.network);
+		NetworkRoute subRoute = RouteUtils.getSubRoute(route, f.network.getNodes().get(f.nodeIds[4]), f.network.getNodes().get(f.nodeIds[4]), f.network);
 		Assert.assertEquals(0, subRoute.getLinkIds().size());
 		Assert.assertEquals(f.linkIds[3], subRoute.getStartLinkId());
 		Assert.assertEquals(f.linkIds[4], subRoute.getEndLinkId());
@@ -240,7 +240,7 @@ public class RouteUtilsTest {
 		Collections.addAll(linkIds, f.linkIds[1], f.linkIds[2], f.linkIds[3], f.linkIds[4]);
 		route.setLinkIds(f.linkIds[0], linkIds, f.linkIds[5]);
 
-		NetworkRoute subRoute = RouteUtils.getSubRoute(route, f.network.getNodes().get(f.linkIds[5]), f.network.getNodes().get(f.linkIds[4]), f.network);
+		NetworkRoute subRoute = RouteUtils.getSubRoute(route, f.network.getNodes().get(f.nodeIds[5]), f.network.getNodes().get(f.nodeIds[4]), f.network);
 		Assert.assertEquals(0, subRoute.getLinkIds().size());
 		Assert.assertEquals(f.linkIds[4], subRoute.getStartLinkId());
 		Assert.assertEquals(f.linkIds[4], subRoute.getEndLinkId());

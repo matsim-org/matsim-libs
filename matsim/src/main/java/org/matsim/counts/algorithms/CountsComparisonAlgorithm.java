@@ -97,7 +97,7 @@ public class CountsComparisonAlgorithm {
 
 			@Override
 			public double[] getVolumesForStop(Id<TransitStopFacility> locationId) {
-				return volumesPerLinkPerHour.get(locationId);
+				return volumesPerLinkPerHour.get(Id.create(locationId, Link.class));
 			}
 
 		};

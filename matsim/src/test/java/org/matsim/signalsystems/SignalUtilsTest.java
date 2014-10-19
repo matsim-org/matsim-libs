@@ -43,6 +43,8 @@ public class SignalUtilsTest {
 	@Test
 	public final void testCreateAndAddSignalGroups4Signals() {
 		Id<SignalSystem> id1 = Id.create("1", SignalSystem.class);
+		Id<SignalGroup> idSg1 = Id.create("1", SignalGroup.class);
+		Id<SignalGroup> idSg3 = Id.create("3", SignalGroup.class);
 		Id<Signal> id3 = Id.create("3", Signal.class);
 		SignalsData signals = new SignalsDataImpl(ConfigUtils.createConfig().signalSystems());
 		SignalSystemsDataFactory fac = signals.getSignalSystemsData().getFactory();
@@ -60,14 +62,14 @@ public class SignalUtilsTest {
 		Assert.assertNotNull(system1Groups);
 		Assert.assertEquals(2, system1Groups.size());
 		
-		Assert.assertTrue(system1Groups.containsKey(id1));
-		SignalGroupData group4sys = system1Groups.get(id1);
+		Assert.assertTrue(system1Groups.containsKey(idSg1));
+		SignalGroupData group4sys = system1Groups.get(idSg1);
 		Assert.assertNotNull(group4sys);
 		Assert.assertEquals(id1, group4sys.getId());
 		Assert.assertNotNull(group4sys.getSignalIds());
 		Assert.assertEquals(id1, group4sys.getSignalIds().iterator().next());
 		
-		group4sys = system1Groups.get(id3);
+		group4sys = system1Groups.get(idSg3);
 		Assert.assertNotNull(group4sys);
 		Assert.assertEquals(id3, group4sys.getId());
 		Assert.assertNotNull(group4sys.getSignalIds());

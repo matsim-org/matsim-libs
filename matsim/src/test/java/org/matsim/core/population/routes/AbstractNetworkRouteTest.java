@@ -329,7 +329,7 @@ public abstract class AbstractNetworkRouteTest {
 	public void testGetSubRoute_circleInRoute() {
 		NetworkImpl network = createTestNetwork();
 		network.createAndAddLink(Id.create(-3, Link.class),
-				network.getNodes().get(Id.create(4, Link.class)), network.getNodes().get(Id.create(3, Link.class)),
+				network.getNodes().get(Id.create(4, Node.class)), network.getNodes().get(Id.create(3, Node.class)),
 				1000.0, 100.0, 3600.0, 1);
 		Id<Link> id11 = Id.create("11", Link.class);
 		Id<Link> id15 = Id.create("15", Link.class);
@@ -354,7 +354,7 @@ public abstract class AbstractNetworkRouteTest {
 	public void testGetSubRoute_startInCircle() {
 		NetworkImpl network = createTestNetwork();
 		network.createAndAddLink(Id.create(-3, Link.class),
-				network.getNodes().get(Id.create(4, Link.class)), network.getNodes().get(Id.create(3, Link.class)),
+				network.getNodes().get(Id.create(4, Node.class)), network.getNodes().get(Id.create(3, Node.class)),
 				1000.0, 100.0, 3600.0, 1);
 		Id<Link> id11 = Id.create("11", Link.class);
 		Id<Link> id15 = Id.create("15", Link.class);
@@ -376,7 +376,7 @@ public abstract class AbstractNetworkRouteTest {
 	public void testGetSubRoute_startInCircle_CircleInEnd() {
 		NetworkImpl network = createTestNetwork();
 		network.createAndAddLink(Id.create(-3, Link.class),
-				network.getNodes().get(Id.create(4, Link.class)), network.getNodes().get(Id.create(3, Link.class)),
+				network.getNodes().get(Id.create(4, Node.class)), network.getNodes().get(Id.create(3, Node.class)),
 				1000.0, 100.0, 3600.0, 1);
 		Id<Link> id11 = Id.create("11", Link.class);
 		Id<Link> id13 = Id.create("13", Link.class);
@@ -397,7 +397,7 @@ public abstract class AbstractNetworkRouteTest {
 	public void testGetSubRoute_CircleAtStart() {
 		NetworkImpl network = createTestNetwork();
 		network.createAndAddLink(Id.create(-3, Link.class),
-				network.getNodes().get(Id.create(4, Link.class)), network.getNodes().get(Id.create(3, Link.class)),
+				network.getNodes().get(Id.create(4, Node.class)), network.getNodes().get(Id.create(3, Node.class)),
 				1000.0, 100.0, 3600.0, 1);
 		Id<Link> id13 = Id.create("13", Link.class);
 		Id<Link> id15 = Id.create("15", Link.class);

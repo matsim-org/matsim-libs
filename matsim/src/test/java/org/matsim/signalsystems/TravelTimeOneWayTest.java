@@ -43,10 +43,7 @@ import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalSystemControllerData;
 import org.matsim.signalsystems.mobsim.QSimSignalEngine;
 import org.matsim.signalsystems.mobsim.SignalEngine;
-import org.matsim.signalsystems.model.Signal;
-import org.matsim.signalsystems.model.SignalGroup;
-import org.matsim.signalsystems.model.SignalSystem;
-import org.matsim.signalsystems.model.SignalSystemsManager;
+import org.matsim.signalsystems.model.*;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -117,7 +114,7 @@ public class TravelTimeOneWayTest {
 			eventHandler.reset(1);
 
 			SignalSystemControllerData controllerData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(Id.create(2, SignalSystem.class));
-			SignalPlanData signalPlan = controllerData.getSignalPlanData().get(Id.create(2, Signal.class));
+			SignalPlanData signalPlan = controllerData.getSignalPlanData().get(Id.create(2, SignalPlan.class));
 			signalPlan.setCycleTime(circulationTime);
 			signalPlan.getSignalGroupSettingsDataByGroupId().get(Id.create(100, SignalGroup.class)).setDropping(dropping);
 			signalPlan.setStartTime(0.0);

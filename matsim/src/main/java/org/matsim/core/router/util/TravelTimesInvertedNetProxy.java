@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.core.router.util;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -49,8 +50,8 @@ public class TravelTimesInvertedNetProxy implements TravelTime {
 	 */
 	@Override
 	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-		Link fromLink = this.originalNetwork.getLinks().get(link.getFromNode().getId());
-		Link toLink = this.originalNetwork.getLinks().get(link.getToNode().getId());
+		Link fromLink = this.originalNetwork.getLinks().get(Id.create(link.getFromNode().getId(), Link.class));
+		Link toLink = this.originalNetwork.getLinks().get(Id.create(link.getToNode().getId(), Link.class));
 		return this.linkToLinkTravelTime.getLinkToLinkTravelTime(fromLink, toLink, time);
 	}
 

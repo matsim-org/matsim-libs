@@ -22,6 +22,7 @@ package tutorial.programming.example18MultipleSubpopulations;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -154,11 +155,11 @@ public class SubpopulationsExample {
 			
 			/* Create basic home-work-home activities on equil network. */
 			Plan plan = pf.createPlan();
-			Activity h1 = pf.createActivityFromCoord("h", scenario.getNetwork().getNodes().get(Id.create("1", Person.class)).getCoord());
+			Activity h1 = pf.createActivityFromCoord("h", scenario.getNetwork().getNodes().get(Id.create("1", Node.class)).getCoord());
 			h1.setEndTime(6*3600);
-			Activity w = pf.createActivityFromCoord("w", scenario.getNetwork().getNodes().get(Id.create("2", Person.class)).getCoord());
+			Activity w = pf.createActivityFromCoord("w", scenario.getNetwork().getNodes().get(Id.create("2", Node.class)).getCoord());
 			w.setEndTime(17*3600);
-			Activity h2 = pf.createActivityFromCoord("h", scenario.getNetwork().getNodes().get(Id.create("3", Person.class)).getCoord());
+			Activity h2 = pf.createActivityFromCoord("h", scenario.getNetwork().getNodes().get(Id.create("3", Node.class)).getCoord());
 			h2.setStartTime(18*3600);
 			
 			/* Add the activities to the plan. */
