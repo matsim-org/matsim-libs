@@ -36,8 +36,8 @@ import playground.artemc.utils.Writer;
 
 public class SimplePopulationGenerator {
 
-	private static Integer populationSize = 20000;
-	private static Double noCarPercentage = 0.1;
+	private static Integer populationSize = 15000;
+	private static Double noCarPercentage = 0.0;
 	private static Integer corridorLength = 20000;
 	
 	private Random random = new Random(102830259L);
@@ -50,9 +50,7 @@ public class SimplePopulationGenerator {
 	public static void main(String[] args) throws IOException {
 
 		String outputPath = args[0];
-
 		SimplePopulationGenerator simplePopulationGenerator = new SimplePopulationGenerator();
-		
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		PopulationImpl population = (PopulationImpl) scenario.getPopulation();
@@ -150,13 +148,10 @@ public class SimplePopulationGenerator {
 		incomeBins.plotBinnedDistribution(outputPath+"/", "income", "money");	
 		
 		Writer writer = new Writer();
-		writer.creteFile(outputPath+"/incomeData.txt");
+		writer.creteFile(outputPath+"/incomeData_"+populationSize+".csv");
 		for(Id<Person> id:incomeData.keySet()){
 			writer.writeLine(id.toString()+","+incomeData.get(id).toString());
 		}
 		writer.close();
-
 	}
-		
-
 }

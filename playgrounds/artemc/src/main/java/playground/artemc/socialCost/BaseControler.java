@@ -76,7 +76,7 @@ public class BaseControler {
 		Config config = ConfigUtils.loadConfig(input+"config.xml");
 		config.controler().setOutputDirectory(output);
 		config.network().setInputFile(input+"network.xml");
-		config.plans().setInputFile(input+"population.xml.gz");
+		config.plans().setInputFile(input+"population.xml");
 		config.transit().setTransitScheduleFile(input+"transitSchedule.xml");
 		config.transit().setVehiclesFile(input+"vehicles.xml");
 
