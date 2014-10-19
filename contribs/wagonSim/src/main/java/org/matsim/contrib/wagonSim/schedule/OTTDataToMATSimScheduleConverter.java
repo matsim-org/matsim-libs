@@ -90,7 +90,7 @@ public class OTTDataToMATSimScheduleConverter {
 		}
 
 		for (Id<TransitStopFacility> stationId : stationIds) {
-			Node node = infraNetwork.getNodes().get(stationId);
+			Node node = infraNetwork.getNodes().get(Id.create(stationId, Node.class));
 			if (node != null) {
 				TransitStopFacility stopFacility = factory.createTransitStopFacility(stationId,node.getCoord(),false);
 				stopFacility.setName(node.getId().toString());

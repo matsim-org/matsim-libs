@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
@@ -225,8 +226,8 @@ class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandler, Pers
 		// write content
 		for (Id<TransitStopFacility> stopId : stopIds) {
 			// get count data
-			Count count = occupCounts.getCounts().get(stopId);
-			if (!occupCounts.getCounts().containsKey(stopId)) {
+			Count count = occupCounts.getCounts().get(Id.create(stopId, Link.class));
+			if (!occupCounts.getCounts().containsKey(Id.create(stopId, Link.class))) {
 				continue;
 			}
 

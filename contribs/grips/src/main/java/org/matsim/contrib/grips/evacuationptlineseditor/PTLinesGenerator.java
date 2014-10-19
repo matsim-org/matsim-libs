@@ -121,7 +121,7 @@ public class PTLinesGenerator {
 
 		Link safeLink = p.links.get(p.links.size() - 1);
 
-		TransitStopFacility safeFacility = this.schedule.getFacilities().get(safeLink.getId());
+		TransitStopFacility safeFacility = this.schedule.getFacilities().get(Id.create(safeLink.getId(), TransitStopFacility.class));
 
 		if (safeFacility == null) {
 			safeFacility = this.fac.createTransitStopFacility(Id.create(safeLink.getId(), TransitStopFacility.class), safeLink.getToNode().getCoord(), false);

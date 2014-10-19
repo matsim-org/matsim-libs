@@ -43,7 +43,7 @@ public class DataMap<K> /*implements Map<K,Double>*/{
 		return delegate.containsKey(key);
 	}
 
-	public boolean containsDoublealue(Object value) {
+	public boolean containsDoubleValue(Object value) {
 		return delegate.containsValue(value);
 	}
 

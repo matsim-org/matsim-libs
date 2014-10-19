@@ -99,7 +99,7 @@ public class ShuntingTableToMATSimScheduleEnricher {
 					if (dwellTime < 1.0) { dwellTime = 1.0; }
 
 					if (shuntingInfoMap != null) {
-						Boolean shuntingAllowed = shuntingInfoMap.get(stop.getStopFacility().getId());
+						Boolean shuntingAllowed = shuntingInfoMap.get(Id.create(stop.getStopFacility().getId(), Node.class));
 						if (shuntingAllowed != null) {
 							if (!shuntingAllowed) {
 								replaceShuntingWithDwelling = true;
@@ -114,7 +114,7 @@ public class ShuntingTableToMATSimScheduleEnricher {
 					}
 					
 					if (replaceShuntingWithDwelling) {
-						Link dwellLink = scenario.getNetwork().getLinks().get(stop.getStopFacility().getId());
+						Link dwellLink = scenario.getNetwork().getLinks().get(Id.create(stop.getStopFacility().getId(), Link.class));
 						if (dwellLink == null) {
 							Node node = scenario.getNetwork().getLinks().get(stop.getStopFacility().getLinkId()).getToNode();
 							dwellLink = factory.createLink(Id.create(stop.getStopFacility().getId(), Link.class), node, node);

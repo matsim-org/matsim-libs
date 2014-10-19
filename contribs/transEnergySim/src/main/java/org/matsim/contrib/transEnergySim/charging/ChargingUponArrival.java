@@ -218,8 +218,8 @@ public class ChargingUponArrival implements ActivityStartEventHandler, PersonArr
 	}
 
 	private void initFirstActivityAfterCarArrival(PersonArrivalEvent event) {
-		firstActivityTypeAfterCarArrival.remove(event.getPersonId());
-		firstFacilityIdAfterCarArrival.remove(event.getPersonId());
+		firstActivityTypeAfterCarArrival.remove(Id.create(event.getPersonId(), Vehicle.class));
+		firstFacilityIdAfterCarArrival.remove(Id.create(event.getPersonId(), Vehicle.class));
 	}
 
 	@Override

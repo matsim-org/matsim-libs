@@ -135,7 +135,7 @@ public class ProductionParser {
 			int deliveryTypeId = Integer.parseInt(Utils.removeSurroundingQuotes(row[lookup.get(ID_VERSANDTYP)].trim()));
 			String desc = Utils.removeSurroundingQuotes(row[lookup.get(BEZEICHNUNG)].trim());
 			
-			if (dataContainer.rcpDeliveryTypes.containsKey(Id.create(deliveryTypeId, String.class))) { throw new RuntimeException("row "+currRow+": delivery type '"+deliveryTypeId+"' already exists. Bailing out."); }
+			if (dataContainer.rcpDeliveryTypes.containsKey(deliveryTypeId)) { throw new RuntimeException("row "+currRow+": delivery type '"+deliveryTypeId+"' already exists. Bailing out."); }
 			RcpDeliveryType rcpDeliveryType = new RcpDeliveryType(deliveryTypeId,desc);
 			dataContainer.rcpDeliveryTypes.put(rcpDeliveryType.id,rcpDeliveryType);
 		}
