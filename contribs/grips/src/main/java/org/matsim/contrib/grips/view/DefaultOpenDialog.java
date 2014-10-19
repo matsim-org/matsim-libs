@@ -50,7 +50,7 @@ public class DefaultOpenDialog extends JFileChooser {
 	}
 
 	public void setCurrentDirectory(String dir) {
-		this.setCurrentDirectory(dir);
+		super.setCurrentDirectory(new File(dir));
 	}
 
 }
