@@ -86,10 +86,6 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 		final DestinationChoiceBestResponseContext locationChoiceContext = (DestinationChoiceBestResponseContext)
 			scenario.getScenarioElement( DestinationChoiceBestResponseContext.ELEMENT_NAME );
 		final ObjectAttributes personAttributes =
-			locationChoiceContext != null ?
-				// XXX should always be taken from the population ---
-				// just wait for a better format for that (no underscores)
-				locationChoiceContext.getPrefsAttributes() :
 				scenario.getPopulation().getPersonAttributes();
 
 		final SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
@@ -177,7 +173,13 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 
 		for ( Collection<? extends Module> sets : config.getParameterSets().values() ) {
 			for ( Module set : sets ) {
-				dummyGroup.addParameterSet( set );
+				final Module dummySet = dummyGroup.createParameterSet( set.getName() );
+
+				for ( Map.Entry<String, String> e : set.getParams().entrySet() ) {
+					dummySet.addParam( e.getKey() , e.getValue() );
+				}
+
+				dummyGroup.addParameterSet( dummySet );
 			}
 		}
 
