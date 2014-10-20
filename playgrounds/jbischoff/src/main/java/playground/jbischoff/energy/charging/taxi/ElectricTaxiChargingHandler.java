@@ -174,7 +174,8 @@ public class ElectricTaxiChargingHandler
 
     public boolean isAtCharger(Id<Link> linkId)
     {
-        return this.chargers.containsKey(Id.create(linkId,TaxiCharger.class));
+        boolean isAtCharger = this.chargers.containsKey(Id.create(linkId,TaxiCharger.class));
+        return isAtCharger;
     }
 
 
@@ -252,7 +253,7 @@ public class ElectricTaxiChargingHandler
         return chargers;
     }
     
-    public double getRelativeTaxiSoC(Id<ElectricTaxi> vid){
+    public double getRelativeTaxiSoC(Id vid){
         double rsoc = 1.;
         if (this.vehicles.containsKey(vid)){
             ElectricTaxi taxi = this.vehicles.get(vid);

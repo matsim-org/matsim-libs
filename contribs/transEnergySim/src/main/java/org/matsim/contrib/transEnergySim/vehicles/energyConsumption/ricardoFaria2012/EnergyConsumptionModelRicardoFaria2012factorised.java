@@ -23,35 +23,27 @@ import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.AbstractInte
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumption;
 
 /**
- * TODO: explain, that the model is based on the following paper:
- * http://www2.isr.uc.pt/~carlospatrao/VE/A_sustainability_assessment_of_EVs.pdf
- * 
- * A sustainability assessment of electric vehicles as a personal mobility
- * system R Faria, P Moura, J Delgado, AT de Almeida - Energy Conversion and …,
- * 2012 - Elsevier
- * This model is used in several studies for VSP (Mielec, Berlin)
- * Attention: values are very optimistic, typically resulting in a range of ~180-200km for a 20kWh battery as in the paper almost no aux energy is consumed 
- * @author Zain Ul Abedin
+ * Given the very optimistic Value of the original Ricardo/Faria profile, values are multiplied by a factor here.
  * 
  */
-public class EnergyConsumptionModelRicardoFaria2012 extends AbstractInterpolatedEnergyConsumptionModel {
+public class EnergyConsumptionModelRicardoFaria2012factorised extends AbstractInterpolatedEnergyConsumptionModel {
 
-	public EnergyConsumptionModelRicardoFaria2012() {
-		initModell();
+	public EnergyConsumptionModelRicardoFaria2012factorised(double scalefactor) {
+		initModell(scalefactor);
 	}
 
-	private void initModell() {
-		queue.add(new EnergyConsumption(5.555555556, 3.19E+02));
-		queue.add(new EnergyConsumption(8.333333333, 3.10E+02));
-		queue.add(new EnergyConsumption(11.11111111, 3.29E+02));
-		queue.add(new EnergyConsumption(13.88888889, 3.56E+02));
-		queue.add(new EnergyConsumption(16.66666667, 4.14E+02));
-		queue.add(new EnergyConsumption(19.44444444, 4.50E+02));
-		queue.add(new EnergyConsumption(22.22222222, 5.13E+02));
-		queue.add(new EnergyConsumption(25, 5.85E+02));
-		queue.add(new EnergyConsumption(27.77777778, 6.62E+02));
-		queue.add(new EnergyConsumption(30.55555556, 7.52E+02));
-		queue.add(new EnergyConsumption(33.33333333, 8.46E+02));
+	private void initModell(double scalefactor) {
+		queue.add(new EnergyConsumption(5.555555556, scalefactor *3.19E+02));
+		queue.add(new EnergyConsumption(8.333333333, scalefactor *3.10E+02));
+		queue.add(new EnergyConsumption(11.11111111, scalefactor *3.29E+02));
+		queue.add(new EnergyConsumption(13.88888889, scalefactor *3.56E+02));
+		queue.add(new EnergyConsumption(16.66666667, scalefactor *4.14E+02));
+		queue.add(new EnergyConsumption(19.44444444, scalefactor *4.50E+02));
+		queue.add(new EnergyConsumption(22.22222222, scalefactor *5.13E+02));
+		queue.add(new EnergyConsumption(25, scalefactor *5.85E+02));
+		queue.add(new EnergyConsumption(27.77777778, scalefactor *6.62E+02));
+		queue.add(new EnergyConsumption(30.55555556, scalefactor *7.52E+02));
+		queue.add(new EnergyConsumption(33.33333333, scalefactor *8.46E+02));
 	}
 
 }

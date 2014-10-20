@@ -48,6 +48,7 @@ public class IdleRankVehicleFinder
     private ElectricTaxiChargingHandler ecabHandler;
     private boolean IsElectric;
     private boolean useChargeOverTime;
+    private boolean includeDriversWill = false;
     Random rnd;
     private static double MINIMUMSOCFORDISPATCH = 0.25;
 
@@ -74,6 +75,7 @@ public class IdleRankVehicleFinder
     {
         this.useChargeOverTime = useChargeOverDistance;
     }
+    
 
 
     private boolean hasEnoughCapacityForTask(Vehicle veh)
@@ -232,11 +234,59 @@ public class IdleRankVehicleFinder
                 if (veh.getSchedule().getCurrentTask().getBeginTime() < bestVeh.getSchedule()
                         .getCurrentTask().getBeginTime())
                     bestVeh = veh;
+                
                 //FIFO, if distance is equal	
             }
         }
 
         return bestVeh;
+    }
+
+    
+    private Vehicle findClosestWillingVehicle(TaxiRequest req)
+    {
+        List<Vehicle> vehicles = new ArrayList<Vehicle>(context.getVrpData().getVehicles());
+        Collections.shuffle(vehicles, rnd);
+
+        Vehicle bestVeh = null;
+        //          double bestDistance = Double.MAX_VALUE;
+        double bestDistance = Double.MAX_VALUE / 2;
+        for (Vehicle veh : Iterables.filter(vehicles, TaxiSchedulerUtils.createIsIdle(scheduler))) {
+            if (this.IsElectric)
+                if (!this.hasEnoughCapacityForTask(veh))
+                    continue;
+            if (! vehicleWillingToServeRequest(veh,req)) continue;
+            double distance = calculateSquaredDistance(req, veh);
+            if (distance < bestDistance) {
+                
+                bestDistance = distance;
+                bestVeh = veh;
+                
+            }
+            else if (distance == bestDistance) {
+
+                if (bestVeh == null) {
+                    bestVeh = veh;
+                    continue;
+                }
+                if (veh.getSchedule().getCurrentTask().getBeginTime() < bestVeh.getSchedule()
+                        .getCurrentTask().getBeginTime())
+                    bestVeh = veh;
+                
+                //FIFO, if distance is equal    
+            }
+        }
+
+        return bestVeh;
+    }
+    /**
+     * 
+     */
+    private boolean vehicleWillingToServeRequest(Vehicle veh, TaxiRequest req)
+    {
+        
+        return true;
+        
     }
 
 

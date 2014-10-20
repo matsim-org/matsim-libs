@@ -28,6 +28,7 @@ import org.matsim.contrib.transEnergySim.controllers.EventHandlerGroup;
 import org.matsim.contrib.transEnergySim.vehicles.api.BatteryElectricVehicle;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.*;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.ricardoFaria2012.EnergyConsumptionModelRicardoFaria2012;
+import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.ricardoFaria2012.EnergyConsumptionModelRicardoFaria2012factorised;
 import org.matsim.contrib.transEnergySim.vehicles.impl.BatteryElectricVehicleImpl;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -72,7 +73,7 @@ public class ElectroCabLaunchUtils
 
         EventHandlerGroup handlerGroup = new EventHandlerGroup();
 
-        EnergyConsumptionModel ecm = new EnergyConsumptionModelRicardoFaria2012();
+        EnergyConsumptionModel ecm = new EnergyConsumptionModelRicardoFaria2012factorised(2);
 
         travelDistanceEvaluator = new TravelDistanceTimeEvaluator(scenario.getNetwork());
         ecabhandler = new ElectricTaxiChargingHandler(events);
@@ -109,7 +110,10 @@ public class ElectroCabLaunchUtils
 
         for (TaxiRank r : ((TaxiData)context.getVrpData()).getTaxiRanks()) {
             rankhandler.addRank(r);
-            ecabhandler.addCharger(new TaxiCharger(1000, 50, r.getLink().getId()));
+//            ecabhandler.addCharger(new TaxiCharger(1000, 50, r.getLink().getId()));
+            if (r.getId().toString().equals("249")) ecabhandler.addCharger(new TaxiCharger(2, 50, r.getLink().getId()));
+            if (r.getId().toString().equals("246")) ecabhandler.addCharger(new TaxiCharger(2, 50, r.getLink().getId()));
+
         }
 
         events.addHandler(handlerGroup);

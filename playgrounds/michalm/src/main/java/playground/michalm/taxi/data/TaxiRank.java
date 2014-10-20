@@ -32,7 +32,7 @@ public class TaxiRank
     private final Id<TaxiRank> id;
     private final String name;
     private final Link link;
-    private final static int STANDARDCAPACITY = 5;
+    private final static int STANDARDCAPACITY = 5000;
     private int capacity;
 
     private Queue<Vehicle> taxisInRank;
