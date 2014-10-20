@@ -131,10 +131,10 @@ public class CemdapMatsimCadytsControllerConfig {
 //		config.controler().setSnapshotFormat(snapshotFormat);
 				
 		// strategy
-		StrategySettings strategySettings1 = new StrategySettings(new IdImpl(2));
-		strategySettings1.setModuleName("ChangeExpBeta");
-		strategySettings1.setProbability(1.0);
-		config.strategy().addStrategySettings(strategySettings1);
+//		StrategySettings strategySettings1 = new StrategySettings(new IdImpl(2));
+//		strategySettings1.setModuleName("ChangeExpBeta");
+//		strategySettings1.setProbability(1.0);
+//		config.strategy().addStrategySettings(strategySettings1);
 		
 //		StrategySettings strategySettings2 = new StrategySettings(new IdImpl(2));
 //		strategySettings2.setModuleName("ReRoute");
