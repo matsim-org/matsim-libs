@@ -24,11 +24,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.matsim.api.core.v01.Id;
-
 
 class ScenarioForEvalData {
-		private Map<Id,Values> values = new TreeMap<Id,Values>();
+		private Map<String,Values> values = new TreeMap<>();
 		ScenarioForEvalData() {
 //			for ( Id id : values.keySet() ) {
 //				Values vals = new Values() ;
@@ -37,26 +35,27 @@ class ScenarioForEvalData {
 		}
 		ScenarioForEvalData createDeepCopy() {
 			ScenarioForEvalData nnn = new ScenarioForEvalData() ;
-			for ( Id id : values.keySet() ) {
+			for ( String id : values.keySet() ) {
 				Values oldValues = this.getByODRelation(id) ;
 				Values newValues = oldValues.createDeepCopy() ;
 				nnn.values.put( id, newValues ) ;
 			}
 			return nnn ;
 		}
-		Values getByODRelation( Id id ) {
+		Values getByODRelation( String id ) {
 			return values.get(id) ;
 		}
-		void setValuesForODRelation( Id id , Values tmp ) {
+		void setValuesForODRelation( String id , Values tmp ) {
 			values.put( id, tmp ) ;
 		}
-		Set<Id> getAllRelations() {
+		Set<String> getAllRelations() {
 			return Collections.unmodifiableSet(values.keySet()) ;
 		}
 		
+		@Override
 		public String toString() {
 			StringBuilder strb = new StringBuilder() ;
-			for ( Id id : values.keySet() ) {
+			for ( String id : values.keySet() ) {
 				strb.append( id + ": ") ;
 				Values vals = this.getByODRelation(id) ;
 				strb.append( vals.toString() ) ;

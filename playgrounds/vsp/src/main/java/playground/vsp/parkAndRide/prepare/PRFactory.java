@@ -35,10 +35,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+
+import playground.vsp.parkAndRide.PRFacility;
 
 /**
  * @author Ihab
@@ -58,7 +59,7 @@ public class PRFactory {
 	
 	private boolean useInputFile;
 	private String prInputDataFile;
-	private Map<Id, PRInputData> id2prInputData = new HashMap<Id, PRInputData>();
+	private Map<Id<PRFacility>, PRInputData> id2prInputData = new HashMap<>();
 
 	private boolean useScheduleFile;
 	private int constantPRcapacity;
@@ -155,11 +156,11 @@ public class PRFactory {
 		return nextCarLinkToNode;
 	}
 	
-	private void setId2prCarLinkToNode_fromInputFile(Map<Id, PRInputData> id2prInputData){
+	private void setId2prCarLinkToNode_fromInputFile(Map<Id<PRFacility>, PRInputData> id2prInputData){
 				
 		List<Id> idsNoNodeFound = new ArrayList<Id>();
 		
-        for (Id id : id2prInputData.keySet()){
+        for (Id<PRFacility> id : id2prInputData.keySet()){
         	Node nextCarLinkToNode = null;
         	boolean nodeFound = false;
         	
@@ -241,7 +242,7 @@ public class PRFactory {
 					coordinates = stop.getCoord();
 				} else {
 					log.info("Transit stop " + name + " has a reference link Id. Using the coordinates of the toNode...");
-					Id stopLinkId = stop.getLinkId();
+					Id<Link> stopLinkId = stop.getLinkId();
 					Link stopLink = scenario.getNetwork().getLinks().get(stopLinkId);
 					coordinates = stopLink.getToNode().getCoord();
 				}
@@ -304,7 +305,7 @@ public class PRFactory {
 		if (this.useInputFile == true) {
 			int i = 0;
 			for (Id id : this.id2nextCarLinkToNode.keySet()){
-				Id prFacilitiyId = new IdImpl(i);
+				Id<PRFacility> prFacilitiyId = Id.create(i, PRFacility.class);
 				prFacilityCreator.createPRFacility(prFacilitiyId, this.id2nextCarLinkToNode.get(id), this.id2prInputData.get(id).getStopName(), this.id2prInputData.get(id).getCapacity());
 				i++;
 			}
@@ -313,7 +314,7 @@ public class PRFactory {
 		if (this.useScheduleFile == true) {
 			int i = 0;
 			for (Id id : this.id2nextCarLinkToNode.keySet()){
-				Id prFacilitiyId = new IdImpl(i);
+				Id<PRFacility> prFacilitiyId = Id.create(i, PRFacility.class);
 				String name;
 				if (this.scenario.getTransitSchedule().getFacilities().get(id).getName() == null) {
 					name = id.toString(); // using the Id instead of the name

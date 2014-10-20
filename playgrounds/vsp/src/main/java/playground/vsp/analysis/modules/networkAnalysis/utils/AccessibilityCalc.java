@@ -24,7 +24,7 @@ private SpatialGrid freeSpeedGrid;
 	
 	private ScenarioImpl scenario;
 	
-	private ZoneLayer<Id> measuringPoints;
+	private ZoneLayer<Id<Zone>> measuringPoints;
 	
 	protected AggregationObject[] aggregatedOpportunities;
 	
@@ -32,7 +32,7 @@ private SpatialGrid freeSpeedGrid;
 	
 	private Geometry boundary;
 	
-	public AccessibilityCalc(ZoneLayer<Id> measuringPoints, SpatialGrid freeSpeedGrid, ScenarioImpl scenario, Geometry boundary) {
+	public AccessibilityCalc(ZoneLayer<Id<Zone>> measuringPoints, SpatialGrid freeSpeedGrid, ScenarioImpl scenario, Geometry boundary) {
 		
 		this.freeSpeedGrid = freeSpeedGrid;
 		this.scenario = scenario;
@@ -47,7 +47,7 @@ private SpatialGrid freeSpeedGrid;
 		
 		ProgressBar bar = new ProgressBar( this.measuringPoints.getZones().size() );
 		
-		for(Zone<Id> measurePoint : this.measuringPoints.getZones()){
+		for(Zone<Id<Zone>> measurePoint : this.measuringPoints.getZones()){
 			
 			bar.update();
 			

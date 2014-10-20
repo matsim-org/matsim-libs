@@ -45,7 +45,7 @@ import playground.vsp.parkAndRide.PRFacility;
 public class EllipseSearch {
 	private static final Logger log = Logger.getLogger(EllipseSearch.class);
 
-	public List<PRWeight> getPrWeights(int nrPrFacilities, Network net, Map<Id, PRFacility> id2prFacility, Coord homeCoord, Coord workCoord, double gravity) {
+	public List<PRWeight> getPrWeights(int nrPrFacilities, Network net, Map<Id<PRFacility>, PRFacility> id2prFacility, Coord homeCoord, Coord workCoord, double gravity) {
 		
 		List <PRWeight> prWeights = new ArrayList<PRWeight>();
 		
@@ -56,7 +56,7 @@ public class EllipseSearch {
 		if (nrPrFacilities == 0) {
 			log.info("Getting weights for all park-and-ride facilities...");
 			for (PRFacility pr : id2prFacility.values()) {
-				Id prLinkId = pr.getPrLink3in();
+				Id<Link> prLinkId = pr.getPrLink3in();
 				Coord prCoord = net.getLinks().get(prLinkId).getToNode().getCoord();
 				double weight = calculateWeight(homeCoord, workCoord, prCoord, gravity);
 				prWeights.add(new PRWeight(pr.getId(), weight));
@@ -72,7 +72,7 @@ public class EllipseSearch {
 			List<PRFacility> prFacilityList = new ArrayList<PRFacility>();
 			prFacilityList.addAll(prFacilities);
 
-			List<Id> insertedPrIds = new ArrayList<Id>();
+			List<Id<PRFacility>> insertedPrIds = new ArrayList<>();
 			for (int n = 0; n < nrPrFacilities; ){
 			
 				int rndKey = (int) (MatsimRandom.getRandom().nextDouble() * prFacilities.size());
@@ -83,7 +83,7 @@ public class EllipseSearch {
 				} else {
 					log.info("Calculating weight for ParkAndRide Facility " + pr.getId().toString() + "...");					
 
-					Id prLinkId = pr.getPrLink3in();
+					Id<Link> prLinkId = pr.getPrLink3in();
 					Coord prCoord = net.getLinks().get(prLinkId).getToNode().getCoord();
 					double weight = calculateWeight(homeCoord, workCoord, prCoord, gravity);
 					
@@ -120,7 +120,7 @@ public class EllipseSearch {
 		return Math.sqrt(aSquare + bSquare);
 	}
 	
-	public Link getRndPrLink(Network net, Map<Id, PRFacility> id2prFacility, List<PRWeight> prWeights) {
+	public Link getRndPrLink(Network net, Map<Id<PRFacility>, PRFacility> id2prFacility, List<PRWeight> prWeights) {
 		if (prWeights.isEmpty()){
 			throw new RuntimeException("For no park-and-ride facility a weight is calculated. Aborting...");
 		}
@@ -141,7 +141,7 @@ public class EllipseSearch {
 
 		double rnd = MatsimRandom.getRandom().nextDouble() * weightSum;
 
-		Id chosenPrId = null;
+		Id<PRFacility> chosenPrId = null;
 		double cumulatedWeight = 0.0;
 		for (PRWeight entry : prWeights) {
 			cumulatedWeight = cumulatedWeight + entry.getWeight();

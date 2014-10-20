@@ -20,7 +20,9 @@ package playground.vsp.analysis.modules.ptRoutes2paxAnalysis;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 /**
  * @author droeder
@@ -28,17 +30,16 @@ import org.matsim.core.basic.v01.IdImpl;
  */
 public class AnalysisVehicle {
 
-	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(AnalysisVehicle.class);
 	private double seatsOccupied;
 	private double capacity;
 	private Id locationId;
 	private Id id;
-	private Id lineId;
-	private Id routeId;
+	private Id<TransitLine> lineId;
+	private Id<TransitRoute> routeId;
 	private int stopIndex = -1;
 
-	public AnalysisVehicle(Id id, Id locationId, double capacity, Id lineId, Id routeId) {
+	public AnalysisVehicle(Id id, Id locationId, double capacity, Id<TransitLine> lineId, Id<TransitRoute> routeId) {
 		this.id = id;
 		this.locationId = locationId;
 		this.capacity = capacity;
@@ -61,8 +62,8 @@ public class AnalysisVehicle {
 		}
 	}
 	
-	public Id getStopIndexId(){
-		return new IdImpl(this.stopIndex);
+	public Id<Link> getStopIndexId(){
+		return Id.create(this.stopIndex, Link.class);
 	}
 
 	/**
@@ -105,14 +106,14 @@ public class AnalysisVehicle {
 	/**
 	 * @return the lineId
 	 */
-	public final Id getLineId() {
+	public final Id<TransitLine> getLineId() {
 		return lineId;
 	}
 
 	/**
 	 * @return the routeId
 	 */
-	public final Id getRouteId() {
+	public final Id<TransitRoute> getRouteId() {
 		return routeId;
 	}
 	

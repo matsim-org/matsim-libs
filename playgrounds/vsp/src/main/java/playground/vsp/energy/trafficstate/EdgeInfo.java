@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 
 
 /**
@@ -31,15 +32,15 @@ import org.matsim.api.core.v01.Id;
  */
 public class EdgeInfo {
 
-	private Id edgeId;
+	private Id<Link> edgeId;
 	
 	private List<TimeBin> timebins = new ArrayList<TimeBin>();
 	
-	public EdgeInfo(Id id){
+	public EdgeInfo(Id<Link> id){
 		this.edgeId = id;
 	}
 	
-	public Id getId(){
+	public Id<Link> getId(){
 		return this.edgeId;
 	}
 	

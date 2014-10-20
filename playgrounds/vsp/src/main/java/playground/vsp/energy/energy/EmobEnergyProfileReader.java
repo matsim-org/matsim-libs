@@ -26,7 +26,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
@@ -42,7 +42,7 @@ public class EmobEnergyProfileReader {
 		Set<String[]> values = readFileContent(file, "\t", true);
 		
 		for(String[] s: values){
-			p.addValue(new IdImpl(s[0]), Double.parseDouble(s[1]), Double.parseDouble(s[2]), Double.parseDouble(s[3]));
+			p.addValue(Id.create(s[0], ChargingProfile.class), Double.parseDouble(s[1]), Double.parseDouble(s[2]), Double.parseDouble(s[3]));
 		}
 		return p;
 	}
@@ -54,7 +54,7 @@ public class EmobEnergyProfileReader {
 		Double f = 500.;
 		log.warn("currently a factor of " + f + " is used for the discharging-Profiles, because the given values are to low...");
 		for(String[] s: values){
-			p.addValue(new IdImpl(s[0]), Double.parseDouble(s[2]), Double.parseDouble(s[1]), f * Double.parseDouble(s[3]));
+			p.addValue(Id.create(s[0], DisChargingProfile.class), Double.parseDouble(s[2]), Double.parseDouble(s[1]), f * Double.parseDouble(s[3]));
 		}
 		return p;
 	}

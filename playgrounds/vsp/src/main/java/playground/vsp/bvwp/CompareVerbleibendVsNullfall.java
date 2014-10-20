@@ -21,14 +21,11 @@ package playground.vsp.bvwp;
 
 import java.io.Writer;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
@@ -38,9 +35,9 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 public class CompareVerbleibendVsNullfall
 {
     private static final Logger log = Logger.getLogger(CompareVerbleibendVsNullfall.class);
-    Map<Id,Double> verbleibend;
-    Map<Id,Double> nullnull;
-    Set<Id> diffIds;
+    Map<String,Double> verbleibend;
+    Map<String,Double> nullnull;
+    Set<String> diffIds;
     IVVReaderConfigGroup config;
     
     /**
@@ -71,13 +68,13 @@ public class CompareVerbleibendVsNullfall
 
        private void compareAndPrint(String fileName)
     {
-        Set<Id> allOdId = new TreeSet<Id>();
+        Set<String> allOdId = new TreeSet<>();
         
         allOdId.addAll(this.verbleibend.keySet());
         allOdId.addAll(this.nullnull.keySet());
         Writer writer = IOUtils.getBufferedWriter(fileName);
         try{
-        for (Id odId : allOdId){
+        for (String odId : allOdId){
             double verblV = 0.;
             double nullV = 0.;
             if (this.verbleibend.containsKey(odId)) verblV = this.verbleibend.get(odId);
@@ -108,9 +105,9 @@ public class CompareVerbleibendVsNullfall
 
     public CompareVerbleibendVsNullfall(IVVReaderConfigGroup config)
     {
-          this.verbleibend = new HashMap<Id, Double>();
-          this.nullnull = new HashMap<Id, Double>();
-          this.diffIds = new TreeSet<Id>();
+          this.verbleibend = new HashMap<>();
+          this.nullnull = new HashMap<>();
+          this.diffIds = new TreeSet<>();
           this.config = config;
     }
     
@@ -124,8 +121,8 @@ public class CompareVerbleibendVsNullfall
         log.info("done. (parsing " + file + ")");
     }
     
-    private static Id getODId(String from, String to){
-        return new IdImpl(from + "---" + to);
+    private static String getODId(String from, String to){
+        return from + "---" + to;
     }
     private static boolean comment(String[] row) {
         if(row[0].startsWith("#")){
@@ -138,11 +135,8 @@ public class CompareVerbleibendVsNullfall
     private static class DemandRemainingHandler implements TabularFileHandler{
         
         
-        /**
-         * @param data
-         */
-        Map<Id,Double> verbleibend;
-        public DemandRemainingHandler(Map<Id,Double> verbleibend) {
+        Map<String ,Double> verbleibend;
+        public DemandRemainingHandler(Map<String,Double> verbleibend) {
         this.verbleibend = verbleibend;
             
         }
@@ -154,7 +148,7 @@ public class CompareVerbleibendVsNullfall
             
             String from = row[0].trim();
             String to = row[1].trim();
-            Id odId = getODId(from, to);
+            String odId = getODId(from, to);
             double v = Double.parseDouble(row[6]);
             this.verbleibend.put(odId, v);
             //2 beruf
@@ -169,8 +163,8 @@ public class CompareVerbleibendVsNullfall
     private static class DemandHandler implements TabularFileHandler{
 
 
-        Map<Id,Double> nullnull;
-        public DemandHandler(Map<Id,Double> nullnull) {
+        Map<String,Double> nullnull;
+        public DemandHandler(Map<String,Double> nullnull) {
             this.nullnull = nullnull;
         }
 
@@ -180,7 +174,7 @@ public class CompareVerbleibendVsNullfall
 
             String from = row[0].trim();
             String to = row[1].trim();
-            Id odId = getODId(from, to);
+            String odId = getODId(from, to);
                      
             double v = Double.parseDouble(row[13].trim());
             //8 beruf
@@ -196,12 +190,12 @@ public class CompareVerbleibendVsNullfall
     }
     private static class IndexFromImpendanceFileHandler implements TabularFileHandler{
 
-        private Set<Id> allOdRelations;
+        private Set<String> allOdRelations;
 
         /**
          * @param nullfalldata
          */
-        public IndexFromImpendanceFileHandler(Set<Id> allOdRelations) {
+        public IndexFromImpendanceFileHandler(Set<String> allOdRelations) {
             this.allOdRelations = allOdRelations;
         }
 

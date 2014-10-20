@@ -19,6 +19,7 @@
 package playground.vsp.energy.ePlans;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author droeder
@@ -26,14 +27,8 @@ import org.matsim.api.core.v01.Id;
  */
 public interface EVehiclePlanElement {
 
-	/**
-	 * @return
-	 */
-	public Id getPersonId();
+	public Id<Person> getPersonId();
 
-	/**
-	 * @return
-	 */
 	public Id getProfileId();
 
 }

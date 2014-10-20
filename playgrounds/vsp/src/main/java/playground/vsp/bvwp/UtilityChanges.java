@@ -5,8 +5,6 @@ import static playground.vsp.bvwp.Key.makeKey;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.matsim.api.core.v01.Id;
-
 import playground.vsp.bvwp.MultiDimensionalArray.Attribute;
 import playground.vsp.bvwp.MultiDimensionalArray.DemandSegment;
 import playground.vsp.bvwp.MultiDimensionalArray.Mode;
@@ -69,7 +67,7 @@ abstract class UtilityChanges {
 		double utilsUserFromRoHNewUsers= 0. ;
 
 		
-		for ( Id id : nullfall.getAllRelations() ) { // for all OD relations
+		for ( String id : nullfall.getAllRelations() ) { // for all OD relations
 			Values nullfallForODRelation = nullfall.getByODRelation(id) ;
 			Utils.initializeOutputTables(html);				
 			
@@ -214,7 +212,7 @@ abstract class UtilityChanges {
 		// ROH et al:
 		Map<Mode,Double> operatorProfits = new HashMap<MultiDimensionalArray.Mode, Double>();
 		double operatorProfit = 0. ;
-		for ( Id id : nullfall.getAllRelations() ) { // for all OD relations
+		for ( String id : nullfall.getAllRelations() ) { // for all OD relations
 			Values nullfallForODRelation = nullfall.getByODRelation(id) ;
 			Values planfallForODRelation = planfall.getByODRelation(id) ;
 			for ( Mode mode : Mode.values() ) {

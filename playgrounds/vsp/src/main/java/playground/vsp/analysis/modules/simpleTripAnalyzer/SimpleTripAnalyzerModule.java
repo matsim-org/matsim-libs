@@ -25,12 +25,13 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
@@ -97,7 +98,7 @@ public class SimpleTripAnalyzerModule extends AbstractAnalyisModule{
 	/**
 	 * @param traveller
 	 */
-	public static Map<String, Map<Integer, Integer>> calcAndWriteTTDistribution(Map<Id, Traveller> traveller) {
+	public static Map<String, Map<Integer, Integer>> calcAndWriteTTDistribution(Map<Id<Person>, Traveller> traveller) {
 		@SuppressWarnings("serial")
 		List<Integer> distribution =  new ArrayList<Integer>(){{
 			add(0);
@@ -123,7 +124,7 @@ public class SimpleTripAnalyzerModule extends AbstractAnalyisModule{
 		return map;
 	}
 	
-	public static Map<String, Map<Integer, Integer>> calcWriteDistanceDistribution(Map<Id, Traveller> traveller) {
+	public static Map<String, Map<Integer, Integer>> calcWriteDistanceDistribution(Map<Id<Person>, Traveller> traveller) {
 		@SuppressWarnings("serial")
 		List<Integer> distribution =  new ArrayList<Integer>(){{
 			add(0);

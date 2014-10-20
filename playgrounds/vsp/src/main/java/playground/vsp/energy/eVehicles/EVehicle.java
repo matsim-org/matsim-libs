@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 
 import playground.vsp.energy.ePlans.EVehiclePlan;
 import playground.vsp.energy.poi.PoiList;
@@ -34,11 +35,11 @@ public class EVehicle {
 	private StateStore store;
 	private Double currentSoC;
 	private EVehiclePlan vPlan;
-	private Id id;
+	private Id<Person> id;
 	private double lengthOfLastLink;
 	private double linkEnterTime;
 
-	public EVehicle(Id id, EVehiclePlan vPlan, Double initialSoC){
+	public EVehicle(Id<Person> id, EVehiclePlan vPlan, Double initialSoC){
 		this.id = id;
 		this.vPlan = vPlan;
 		this.currentSoC = initialSoC;
@@ -47,18 +48,11 @@ public class EVehicle {
 		this.store = new StateStore();
 	}
 
-	/**
-	 * @return
-	 */
-	public Id getId() {
+	public Id<Person> getId() {
 		return this.id;
 	}
 
-	/**
-	 * @param personId
-	 * @return
-	 */
-	public boolean rightPerson(Id personId) {
+	public boolean rightPerson(Id<Person> personId) {
 		return this.vPlan.expectedPerson(personId);
 	}
 

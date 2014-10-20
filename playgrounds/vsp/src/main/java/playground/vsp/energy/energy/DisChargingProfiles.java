@@ -22,29 +22,28 @@ package playground.vsp.energy.energy;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 
 /**
  * @author droeder
  *
  */
 public class DisChargingProfiles {
-	public static final Id NONE = new IdImpl("none");
+	public static final Id<DisChargingProfile> NONE = Id.create("none", DisChargingProfile.class);
 
-	private HashMap<Id, DisChargingProfile> profiles;
+	private HashMap<Id<DisChargingProfile>, DisChargingProfile> profiles;
 
 	public DisChargingProfiles(){
-		this.profiles = new HashMap<Id , DisChargingProfile>();
+		this.profiles = new HashMap<Id<DisChargingProfile> , DisChargingProfile>();
 	}
 	
-	public void addValue(Id id, Double slope, Double speed, double usagePerKm){
+	public void addValue(Id<DisChargingProfile> id, Double slope, Double speed, double usagePerKm){
 		if(!this.profiles.containsKey(id)){
 			this.profiles.put(id, new DisChargingProfile(id));
 		}
 		this.profiles.get(id).addNewEntry(slope, speed, usagePerKm);
 	}
 	
-	public Double getJoulePerKm(Id id, Double  speed, Double slope){
+	public Double getJoulePerKm(Id<DisChargingProfile> id, Double  speed, Double slope){
 		if(this.profiles.containsKey(id)){
 			return this.profiles.get(id).getNewState(speed, slope);
 		}else{
@@ -57,7 +56,7 @@ public class DisChargingProfiles {
 //		Set<String[]> values = DaFileReader.readFileContent(inputFile, "\t", true);
 //		
 //		for(String[] s: values){
-//			this.addValue(new IdImpl(s[0]), Double.parseDouble(s[2]), Double.parseDouble(s[1]), Double.parseDouble(s[3]));
+//			this.addValue(Id.create(s[0]), Double.parseDouble(s[2]), Double.parseDouble(s[1]), Double.parseDouble(s[3]));
 //		}
 //	}
 	
@@ -78,7 +77,7 @@ public class DisChargingProfiles {
 		DisChargingProfiles profiles = EmobEnergyProfileReader.readDisChargingProfiles(inputFile);
 		
 		System.out.println(profiles.toString());
-		System.out.println(profiles.getJoulePerKm(new IdImpl("LOW"), 21.773336, 22.));
-		System.out.println(profiles.getJoulePerKm(new IdImpl("LOW"), 21.773336, 20.));
+		System.out.println(profiles.getJoulePerKm(Id.create("LOW", DisChargingProfile.class), 21.773336, 22.));
+		System.out.println(profiles.getJoulePerKm(Id.create("LOW", DisChargingProfile.class), 21.773336, 20.));
 	}
 }

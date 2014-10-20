@@ -1,7 +1,5 @@
 package playground.vsp.zzArchive.bvwpOld;
 
-import org.matsim.api.core.v01.Id;
-
 import playground.vsp.zzArchive.bvwpOld.Values.Attribute;
 import playground.vsp.zzArchive.bvwpOld.Values.DemandSegment;
 import playground.vsp.zzArchive.bvwpOld.Values.Mode;
@@ -35,7 +33,7 @@ abstract class UtilityChanges {
 		double utils = 0. ;
 		double utilsUserFromRoH = 0. ;
 		double operatorProfit = 0. ;
-		for ( Id id : nullfall.getAllRelations() ) { // for all OD relations
+		for ( String id : nullfall.getAllRelations() ) { // for all OD relations
 			Values nullfallForODRelation = nullfall.getByODRelation(id) ;
 			Values planfallForODRelation = planfall.getByODRelation(id) ;
 			for ( DemandSegment demandSegment : DemandSegment.values() ) { // for all types (e.g. PV or GV)

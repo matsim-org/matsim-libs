@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.vsp.parkAndRide.PRFacility;
@@ -87,16 +86,16 @@ public class PRFacilityCreator {
 		return parkAndRideFacilities;
 	}
 	
-	public void createPRFacility(Id id, Node node, String stopName, int capacity) {
+	public void createPRFacility(Id<PRFacility> id, Node node, String stopName, int capacity) {
 		
 		PRFacility prFacility = new PRFacility();
 		prFacility.setId(id);
 		prFacility.setStopFacilityName(stopName);
 		prFacility.setCapacity(capacity);
 		
-		Id pRnodeId1 = new IdImpl("PR1_"+id);
-		Id pRnodeId2 = new IdImpl("PR2_"+id);
-		Id pRnodeId3 = new IdImpl("PR3_"+id);
+		Id<Node> pRnodeId1 = Id.create("PR1_"+id, Node.class);
+		Id<Node> pRnodeId2 = Id.create("PR2_"+id, Node.class);
+		Id<Node> pRnodeId3 = Id.create("PR3_"+id, Node.class);
 		
 		Coord coord1 = scenario.createCoord(node.getCoord().getX(), node.getCoord().getY() - this.length);
 		Coord coord2 = scenario.createCoord(node.getCoord().getX() + 10, node.getCoord().getY() - this.length);
@@ -110,19 +109,19 @@ public class PRFacilityCreator {
 		scenario.getNetwork().addNode(prNode2);
 		scenario.getNetwork().addNode(prNode3);
 		
-		Link prLink1in = scenario.getNetwork().getFactory().createLink(new IdImpl("prLink1in_" + id), node, prNode1);
+		Link prLink1in = scenario.getNetwork().getFactory().createLink(Id.create("prLink1in_" + id, Link.class), node, prNode1);
 		scenario.getNetwork().addLink(setPRLink(prLink1in));
-		Link prLink1out = scenario.getNetwork().getFactory().createLink(new IdImpl("prLink1out_" + id), prNode1, node);
+		Link prLink1out = scenario.getNetwork().getFactory().createLink(Id.create("prLink1out_" + id, Link.class), prNode1, node);
 		scenario.getNetwork().addLink(setPRLink(prLink1out));	
 		
-		Link prLink2in = scenario.getNetwork().getFactory().createLink(new IdImpl("prLink2in_" + id), prNode1, prNode2);
+		Link prLink2in = scenario.getNetwork().getFactory().createLink(Id.create("prLink2in_" + id, Link.class), prNode1, prNode2);
 		scenario.getNetwork().addLink(setPseudePRLink(prLink2in));
-		Link prLink2out = scenario.getNetwork().getFactory().createLink(new IdImpl("prLink2out_" + id), prNode2, prNode1);
+		Link prLink2out = scenario.getNetwork().getFactory().createLink(Id.create("prLink2out_" + id, Link.class), prNode2, prNode1);
 		scenario.getNetwork().addLink(setPseudePRLink(prLink2out));
 		
-		Link prLink3in = scenario.getNetwork().getFactory().createLink(new IdImpl("prLink3in_" + id), prNode2, prNode3);
+		Link prLink3in = scenario.getNetwork().getFactory().createLink(Id.create("prLink3in_" + id, Link.class), prNode2, prNode3);
 		scenario.getNetwork().addLink(setPseudePRLink(prLink3in));
-		Link prLink3out = scenario.getNetwork().getFactory().createLink(new IdImpl("prLink3out_" + id), prNode3, prNode2);
+		Link prLink3out = scenario.getNetwork().getFactory().createLink(Id.create("prLink3out_" + id, Link.class), prNode3, prNode2);
 		scenario.getNetwork().addLink(setPseudePRLink(prLink3out));	
 		
 		prFacility.setPrLink1in(prLink1in.getId());
@@ -138,7 +137,7 @@ public class PRFacilityCreator {
 	private Link setPRLink(Link link) {
 		Set<String> modes = new HashSet<String>();
 		modes.add("car");		
-		link.setAllowedModes((Set<String>) modes);
+		link.setAllowedModes(modes);
 		link.setCapacity(linkCapacity);
 		link.setFreespeed(freeSpeed);
 		link.setLength(length);
@@ -149,7 +148,7 @@ public class PRFacilityCreator {
 	private Link setPseudePRLink(Link link) {
 		Set<String> modes = new HashSet<String>();
 		modes.add("car");		
-		link.setAllowedModes((Set<String>) modes);
+		link.setAllowedModes(modes);
 		link.setCapacity(linkCapacity);
 		link.setFreespeed(100.0);
 		link.setLength(1.0);

@@ -65,7 +65,7 @@ public final class SimpleTripAnalyzer extends AbstractPersonAlgorithm
 	private static final Logger log = Logger
 			.getLogger(SimpleTripAnalyzer.class);
 	private double distFactor;
-	private Map<Id, Traveller> traveller;
+	private Map<Id<Person>, Traveller> traveller;
 	private Network net;
 	private Set<Id<Person>> pIds;
 	
@@ -81,7 +81,7 @@ public final class SimpleTripAnalyzer extends AbstractPersonAlgorithm
 
 	@Override
 	public void reset(int iteration) {
-		traveller = new HashMap<Id, Traveller>();
+		traveller = new HashMap<>();
 	}
 
 	@Override
@@ -198,7 +198,7 @@ public final class SimpleTripAnalyzer extends AbstractPersonAlgorithm
 
 //##################getter/setter###############################
 	
-	public final Map<Id, Traveller> getTraveller(){
+	public final Map<Id<Person>, Traveller> getTraveller(){
 		return traveller;
 	}
 	

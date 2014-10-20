@@ -35,7 +35,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -110,7 +110,7 @@ public abstract class BuildingEnergyRunnerMain {
 		log.warn("removing agents");
 		Scenario sc = ScenarioUtils.loadScenario(c);
 		int removed = 0;
-		for(Id id : getAgents2Exclude(agents2exclude)){
+		for(Id<Person> id : getAgents2Exclude(agents2exclude)){
 			if(sc.getPopulation().getPersons().remove(id) != null){
 				removed++;
 			}
@@ -123,13 +123,13 @@ public abstract class BuildingEnergyRunnerMain {
 	 * @param agents2exclude
 	 * @return
 	 */
-	private static Set<Id>getAgents2Exclude(String agents2exclude) {
+	private static Set<Id<Person>> getAgents2Exclude(String agents2exclude) {
 		BufferedReader r = IOUtils.getBufferedReader(agents2exclude);
-		Set<Id> ids = new HashSet<Id>();
+		Set<Id<Person>> ids = new HashSet<>();
 		try {
 			String line = r.readLine();
 			while(line!=null){
-				ids.add(new IdImpl(line));
+				ids.add(Id.create(line,Person.class ));
 				line = r.readLine();
 			}
 			r.close();
@@ -172,7 +172,7 @@ public abstract class BuildingEnergyRunnerMain {
 		/**
 		 * @param traveller
 		 */
-		private void calcAndWriteTTDistribution(Map<Id, Traveller> traveller, String file) {
+		private void calcAndWriteTTDistribution(Map<Id<Person>, Traveller> traveller, String file) {
 			@SuppressWarnings("serial")
 			List<Integer> distribution =  new ArrayList<Integer>(){{
 				add(0);
@@ -201,7 +201,7 @@ public abstract class BuildingEnergyRunnerMain {
 		/**
 		 * @param traveller
 		 */
-		private void calcWriteDistanceDistribution(Map<Id, Traveller> traveller, String file) {
+		private void calcWriteDistanceDistribution(Map<Id<Person>, Traveller> traveller, String file) {
 			@SuppressWarnings("serial")
 			List<Integer> distribution =  new ArrayList<Integer>(){{
 				add(0);

@@ -1,7 +1,5 @@
 package playground.vsp.zzArchive.bvwpOld;
 
-import org.matsim.core.basic.v01.IdImpl;
-
 import playground.vsp.zzArchive.bvwpOld.Values.Attribute;
 import playground.vsp.zzArchive.bvwpOld.Values.DemandSegment;
 import playground.vsp.zzArchive.bvwpOld.Values.Mode;
@@ -20,7 +18,7 @@ public class IllustrationFictiveExamplePVwithoutOldUsers {
 
 		// create the base case:
 		nullfall = ScenarioFictiveExamplePV.createNullfall1();
-		Values nullfallForOD = nullfall.getByODRelation(new IdImpl("BC")) ;
+		Values nullfallForOD = nullfall.getByODRelation("BC");
 		
 		// construct values for the rail mode for this OD relation:
 		ValuesForAMode railValues = nullfallForOD.getByMode(Mode.rail) ;

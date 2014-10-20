@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 
@@ -35,15 +36,15 @@ public class TransitLineContainer {
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger
 			.getLogger(TransitLineContainer.class);
-	private Id id;
-	private Map<Id, TransitRouteContainer> routeContainer;
+	private Id<TransitLine> id;
+	private Map<Id<TransitRoute>, TransitRouteContainer> routeContainer;
 
 	public TransitLineContainer(TransitLine l, double countsInterval, int maxSlice) {
 		this.id = l.getId();
 		this.routeContainer = getRouteContainer(l, countsInterval, maxSlice);
 	}
 	
-	public Id getId(){
+	public Id<TransitLine> getId(){
 		return this.id;
 	}
 
@@ -51,27 +52,27 @@ public class TransitLineContainer {
 	 * @param l
 	 * @return
 	 */
-	private Map<Id, TransitRouteContainer> getRouteContainer(TransitLine l, double countsInterval, int maxSlice) {
-		Map<Id, TransitRouteContainer> rc = new HashMap<Id, TransitRouteContainer>();
+	private Map<Id<TransitRoute>, TransitRouteContainer> getRouteContainer(TransitLine l, double countsInterval, int maxSlice) {
+		Map<Id<TransitRoute>, TransitRouteContainer> rc = new HashMap<Id<TransitRoute>, TransitRouteContainer>();
 		for(TransitRoute r: l.getRoutes().values()){
 			rc.put(r.getId(), new TransitRouteContainer(r, countsInterval, maxSlice));
 		}
 		return rc;
 	}
 	
-	public void paxBoarding(Id routeId, Id facilityId, double time){
-		this.routeContainer.get(routeId).paxBoarding(facilityId, time);
+	public void paxBoarding(Id<TransitRoute> routeId, Id<Link> stopIndexId, double time){
+		this.routeContainer.get(routeId).paxBoarding(stopIndexId, time);
 	}
 	
-	public void paxAlighting(Id routeId, Id facilityId, double time){
-		this.routeContainer.get(routeId).paxAlighting(facilityId, time);
+	public void paxAlighting(Id<TransitRoute> routeId, Id<Link> stopIndexId, double time){
+		this.routeContainer.get(routeId).paxAlighting(stopIndexId, time);
 	}
 	
-	public void vehicleDeparts(double time, double vehCapacity, double nrSeatsInUse, Id facilityId, Id routeId){
-		this.routeContainer.get(routeId).vehicleDeparts(time, vehCapacity, nrSeatsInUse, facilityId);
+	public void vehicleDeparts(double time, double vehCapacity, double nrSeatsInUse, Id<Link> stopIndexId, Id<TransitRoute> routeId){
+		this.routeContainer.get(routeId).vehicleDeparts(time, vehCapacity, nrSeatsInUse, stopIndexId);
 	}
 	
-	public Map<Id, TransitRouteContainer> getTransitRouteContainer(){
+	public Map<Id<TransitRoute>, TransitRouteContainer> getTransitRouteContainer(){
 		return this.routeContainer;
 	}
 }

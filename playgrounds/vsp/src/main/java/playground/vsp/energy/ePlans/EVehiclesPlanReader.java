@@ -28,12 +28,15 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.vsp.energy.EPostProcessor;
 import playground.vsp.energy.eVehicles.EVehicle;
 import playground.vsp.energy.eVehicles.EVehicles;
+import playground.vsp.energy.energy.ChargingProfile;
+import playground.vsp.energy.energy.DisChargingProfile;
+import playground.vsp.energy.poi.Poi;
 
 /**
  * @author droeder
@@ -60,30 +63,30 @@ public class EVehiclesPlanReader {
 		EVehicle v = null;
 		EVehiclePlan plan;
 		List<EVehiclePlanElement> elements = null;
-		Id id = null;
+		Id<Person> id = null;
 		Double initialSoC = null;
 		EChargingAct ca;
 		EDisChargingAct da;
 		
 		for(String[] s: appointments ){
 			if(id == null){
-				id = new IdImpl(EPostProcessor.IDENTIFIER + s[0]);
-			}else if(!id.equals(new IdImpl(EPostProcessor.IDENTIFIER + s[0]))){
+				id = Id.create(EPostProcessor.IDENTIFIER + s[0], Person.class);
+			}else if(!id.equals(Id.create(EPostProcessor.IDENTIFIER + s[0], Person.class))){
 				plan = new EVehiclePlan(elements);
 				v = new EVehicle(id, plan, initialSoC);
 				this.vehicles.addVehicle(v);
 				elements = null;
-				id = new IdImpl(EPostProcessor.IDENTIFIER + s[0]);
+				id = Id.create(EPostProcessor.IDENTIFIER + s[0], Person.class);
 			}
 			if(elements == null){
 				elements = new ArrayList<EVehiclePlanElement>();
 				//dummy-activity
-				elements.add(new EChargingAct(0, 0, new IdImpl("NONE"), new IdImpl("NONE"), new IdImpl("NONE")));
+				elements.add(new EChargingAct(0, 0, Id.create("NONE", ChargingProfile.class), Id.create("NONE", Person.class), Id.create("NONE", Poi.class)));
 				initialSoC = Double.parseDouble(s[3]);
 			}
-			da = new EDisChargingAct(new IdImpl(s[8]), id);
+			da = new EDisChargingAct(Id.create(s[8], DisChargingProfile.class), id);
 			elements.add(da);
-			ca = new EChargingAct(getTime(s[5]), getTime(s[6]), new IdImpl(s[7]), id, new IdImpl(s[4]));
+			ca = new EChargingAct(getTime(s[5]), getTime(s[6]), Id.create(s[7], ChargingProfile.class), id, Id.create(s[4], Poi.class));
 			elements.add(ca);
 		}
 		if(!(elements == null)){

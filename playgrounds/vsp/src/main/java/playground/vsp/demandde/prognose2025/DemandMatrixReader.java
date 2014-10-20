@@ -34,7 +34,6 @@ import org.matsim.contrib.accessibility.gis.Zone;
 import org.matsim.core.api.experimental.facilities.ActivityFacilitiesFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.facilities.Facility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -79,8 +78,8 @@ public class DemandMatrixReader {
 	private final Map<Id<Zone>, NodesAndDistances> zoneToConnectorsMap = new HashMap<>();
 
 	class NodesAndDistances {
-		private final Map<Id,Double> nodesAndDistances = new HashMap<>();
-		Map<Id,Double> getNodesAndDistances() {
+		private final Map<Id<Node>,Double> nodesAndDistances = new HashMap<>();
+		Map<Id<Node>,Double> getNodesAndDistances() {
 			return this.nodesAndDistances ;
 		}
 	}
@@ -169,7 +168,7 @@ public class DemandMatrixReader {
 			Double xcoordinate = coordinate.x;
 			Double ycoordinate = coordinate.y;
 			Coord coord = new CoordImpl(xcoordinate.toString(), ycoordinate.toString());
-			ActivityFacility facility = factory.createActivityFacility(new IdImpl(gemeindeschluessel), coord);
+			ActivityFacility facility = factory.createActivityFacility(Id.create(gemeindeschluessel, ActivityFacility.class), coord);
 			{
 				ActivityOption option = factory.createActivityOption("work");
 				option.setCapacity(1.);

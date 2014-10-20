@@ -25,14 +25,9 @@ import junit.framework.Assert;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.testcases.MatsimTestUtils;
-
-import playground.vsp.energy.trafficstate.EdgeInfo;
-import playground.vsp.energy.trafficstate.TimeBin;
-import playground.vsp.energy.trafficstate.TrafficState;
-import playground.vsp.energy.trafficstate.TrafficStateXmlReader;
-import playground.vsp.energy.trafficstate.TrafficStateXmlWriter;
 
 
 /**
@@ -51,14 +46,14 @@ public class TrafficStateXmlWriterTest {
 	
 	private final String writeFile(){
 		TrafficState ts = new TrafficState();
-		EdgeInfo ei = new EdgeInfo(new IdImpl("23"));
+		EdgeInfo ei = new EdgeInfo(Id.create("23", Link.class));
 		TimeBin timeBin = new TimeBin(0.0, 3600.0 , 24.3);
 		ei.getTimeBins().add(timeBin);
 		timeBin = new TimeBin(3600.0, 7200.0 , 23.3);
 		ei.getTimeBins().add(timeBin);
 		ts.addEdgeInfo(ei);
 		
-		ei = new EdgeInfo(new IdImpl("42"));
+		ei = new EdgeInfo(Id.create("42", Link.class));
 		timeBin = new TimeBin(0.0, 3600.0 , 21.3);
 		ei.getTimeBins().add(timeBin);
 		timeBin = new TimeBin(3600.0, 7200.0 , 20.3);

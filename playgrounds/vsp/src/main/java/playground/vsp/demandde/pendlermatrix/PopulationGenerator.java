@@ -13,7 +13,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.facilities.Facility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -106,8 +105,8 @@ public class PopulationGenerator implements TripFlowSink {
 		return endTimeInSec;
 	}
 
-	private Id createId(Facility source, Facility sink, int i, String transportMode) {
-		return new IdImpl(transportMode + "_" + source.getId() + "_" + sink.getId() + "_" + i);
+	private Id<Person> createId(Facility source, Facility sink, int i, String transportMode) {
+		return Id.create(transportMode + "_" + source.getId() + "_" + sink.getId() + "_" + i, Person.class);
 	}
 
 	public void setSink(PersonSink personSink) {

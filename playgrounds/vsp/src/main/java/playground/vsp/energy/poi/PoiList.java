@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 
 import playground.vsp.energy.validation.PoiInfo;
 import playground.vsp.energy.validation.PoiTimeInfo;
@@ -37,15 +36,15 @@ import playground.vsp.energy.validation.ValidationInformation;
 public class PoiList {
 
 	private int slotSize;
-	private HashMap<Id, List<Slot>> slots;
+	private HashMap<Id<Poi>, List<Slot>> slots;
 
 	public PoiList(ValidationInformation info, int slotSize){
-		this.slots = new HashMap<Id, List<Slot>>();
+		this.slots = new HashMap<Id<Poi>, List<Slot>>();
 		this.initSlotMap(0, info);
 		this.slotSize = slotSize;
 	}
 	
-	public boolean plug(Id id, double time){
+	public boolean plug(Id<Poi> id, double time){
 		if(!this.slots.containsKey(id)){
 			return false;
 		}
@@ -56,7 +55,7 @@ public class PoiList {
 		return this.slots.get(id).get(slot).plug();
 	}
 	
-	public void unplug(Id id, double time){
+	public void unplug(Id<Poi> id, double time){
 //		if(!this.slots.containsKey(id)){
 //			return false;
 //		}
@@ -71,7 +70,7 @@ public class PoiList {
 	 * @param id
 	 * @param slot
 	 */
-	private void initSlot(Id id, int slot) {
+	private void initSlot(Id<Poi> id, int slot) {
 		List<Slot> slots = this.slots.get(id);
 		Slot s = slots.get(slots.size() -1);
 		for(int i = (s.getSlotIndex()+1); i < (slot + 1); i++){
@@ -88,7 +87,7 @@ public class PoiList {
 		for(PoiInfo i: info.getValidationInformationList()){
 			List<Slot> list = new ArrayList<Slot>();
 			list.add(new Slot(i.getMaximumCapacity(), slot, 0.));
-			this.slots.put(new IdImpl(i.getPoiID()), list);
+			this.slots.put(Id.create(i.getPoiID(), Poi.class), list);
 		}
 	}
 
@@ -101,12 +100,12 @@ public class PoiList {
 		PoiTimeInfo ti;
 		int start, end;
 		for(PoiInfo i: info.getValidationInformationList()){
-			if(this.slots.containsKey(new IdImpl(i.getPoiID()))){
-				slots = this.slots.get(new IdImpl(i.getPoiID()));
+			if(this.slots.containsKey(Id.create(i.getPoiID(), Poi.class))){
+				slots = this.slots.get(Id.create(i.getPoiID(), Poi.class));
 				for(Slot s: slots){
 					ti = new PoiTimeInfo();
-					start = (int) (this.slotSize * s.getSlotIndex());
-					end = (int) (start + this.slotSize);
+					start = this.slotSize * s.getSlotIndex();
+					end = start + this.slotSize;
 					ti.setStartTime(new GregorianCalendar(1979, 01, 01, 0, 0, start));
 					ti.setEndTime(new GregorianCalendar(1979, 01, 01, 0, 0, end));
 					ti.setUsedCapacity(s.getMaxOccupation());

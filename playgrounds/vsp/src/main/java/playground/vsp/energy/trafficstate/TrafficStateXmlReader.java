@@ -31,7 +31,8 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.events.XMLEvent;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 
 /**
  * @author dgrether
@@ -90,7 +91,7 @@ public class TrafficStateXmlReader {
 //					 log.debug("start element: " + name);
 					 if ("edge_info".compareTo(name) == 0){
 						 String id = xmlr.getAttributeValue(""	, "id");
-						 this.currentEdgeInfo =  new EdgeInfo(new IdImpl(id));
+						 this.currentEdgeInfo =  new EdgeInfo(Id.create(id, Link.class));
 					 }
 					 else if ("start_time".compareTo(name ) == 0){
 						 String text = xmlr.getElementText();

@@ -1,7 +1,5 @@
 package playground.vsp.zzArchive.bvwpOld;
 
-import org.matsim.core.basic.v01.IdImpl;
-
 import playground.vsp.zzArchive.bvwpOld.Values.Attribute;
 import playground.vsp.zzArchive.bvwpOld.Values.DemandSegment;
 import playground.vsp.zzArchive.bvwpOld.Values.Mode;
@@ -19,7 +17,7 @@ class ScenarioAP200PV { // Relationsbezogen_mit_generalisierten_Kosten
 	
 		// construct values for one OD relation:
 		Values nullfallForOD = new Values() ;
-		nullfall.setValuesForODRelation(new IdImpl("BC"), nullfallForOD ) ;
+		nullfall.setValuesForODRelation("BC", nullfallForOD ) ;
 		{
 			// construct values for the road mode for this OD relation:
 			ValuesForAMode roadValues = nullfallForOD.getByMode(Mode.road) ;
@@ -61,7 +59,7 @@ class ScenarioAP200PV { // Relationsbezogen_mit_generalisierten_Kosten
 		ScenarioForEvalData planfall = nullfall.createDeepCopy() ;
 		
 		// we are now looking at one specific OD relation (for this scenario, there is only one!)
-		Values planfallForOD = planfall.getByODRelation(new IdImpl("BC")) ;
+		Values planfallForOD = planfall.getByODRelation("BC") ;
 		{
 			// modify the travel times for the rail mode:
 			ValuesForAMode railValues = planfallForOD.getByMode( Mode.rail ) ;
@@ -70,7 +68,7 @@ class ScenarioAP200PV { // Relationsbezogen_mit_generalisierten_Kosten
 			// modify some demand (presumably as a result):
 			double delta = 90. ;
 			railValues.getByDemandSegment(DemandSegment.PV_NON_COMMERCIAL).incByEntry( Attribute.XX, delta ) ;
-			planfall.getByODRelation(new IdImpl("BC")).getByMode(Mode.road).getByDemandSegment(DemandSegment.PV_NON_COMMERCIAL).incByEntry(Attribute.XX, -delta ) ;
+			planfall.getByODRelation("BC").getByMode(Mode.road).getByDemandSegment(DemandSegment.PV_NON_COMMERCIAL).incByEntry(Attribute.XX, -delta ) ;
 		}
 		return planfall;
 	}
@@ -85,7 +83,7 @@ class ScenarioAP200PV { // Relationsbezogen_mit_generalisierten_Kosten
 		ScenarioForEvalData planfall = nullfall.createDeepCopy() ;
 		
 		// we are now looking at one specific OD relation (for this scenario, there is only one!)
-		Values planfallForOD = planfall.getByODRelation(new IdImpl("BC")) ;
+		Values planfallForOD = planfall.getByODRelation("BC") ;
 		{
 			// modify the travel times for the rail mode:
 			ValuesForAMode railValues = planfallForOD.getByMode( Mode.rail ) ;
@@ -94,7 +92,7 @@ class ScenarioAP200PV { // Relationsbezogen_mit_generalisierten_Kosten
 			// modify some demand (presumably as a result):
 			double delta = 90. ;
 			railValues.getByDemandSegment(DemandSegment.PV_NON_COMMERCIAL).incByEntry( Attribute.XX, delta ) ;
-			planfall.getByODRelation(new IdImpl("BC")).getByMode(Mode.road).getByDemandSegment(DemandSegment.PV_NON_COMMERCIAL).incByEntry(Attribute.XX, -0. ) ;
+			planfall.getByODRelation("BC").getByMode(Mode.road).getByDemandSegment(DemandSegment.PV_NON_COMMERCIAL).incByEntry(Attribute.XX, -0. ) ;
 		}
 		return planfall;
 	}
@@ -109,7 +107,7 @@ class ScenarioAP200PV { // Relationsbezogen_mit_generalisierten_Kosten
 		ScenarioForEvalData planfall = nullfall.createDeepCopy() ;
 		
 		// we are now looking at one specific OD relation (for this scenario, there is only one!)
-		Values planfallForOD = planfall.getByODRelation(new IdImpl("BC")) ;
+		Values planfallForOD = planfall.getByODRelation("BC") ;
 		{
 			// modify the travel times for the rail mode:
 			ValuesForAMode railValues = planfallForOD.getByMode( Mode.rail ) ;
@@ -118,7 +116,7 @@ class ScenarioAP200PV { // Relationsbezogen_mit_generalisierten_Kosten
 			// modify some demand (presumably as a result):
 			double delta = 90. ;
 			railValues.getByDemandSegment(DemandSegment.PV_NON_COMMERCIAL).incByEntry( Attribute.XX, delta ) ;
-			planfall.getByODRelation(new IdImpl("BC")).getByMode(Mode.road).getByDemandSegment(DemandSegment.PV_NON_COMMERCIAL).incByEntry(Attribute.XX, -delta / 2 ) ;
+			planfall.getByODRelation("BC").getByMode(Mode.road).getByDemandSegment(DemandSegment.PV_NON_COMMERCIAL).incByEntry(Attribute.XX, -delta / 2 ) ;
 		}
 		return planfall;
 	}

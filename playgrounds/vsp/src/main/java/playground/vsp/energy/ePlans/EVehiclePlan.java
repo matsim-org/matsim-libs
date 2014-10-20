@@ -22,9 +22,11 @@ import java.util.List;
 import java.util.ListIterator;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 
+import playground.vsp.energy.energy.ChargingProfile;
 import playground.vsp.energy.energy.ChargingProfiles;
+import playground.vsp.energy.poi.Poi;
 
 /**
  * @author droeder
@@ -40,29 +42,19 @@ public class EVehiclePlan {
 		this.currentElement = this.elements.next();
 	}
 
-	/**
-	 * 
-	 */
 	public void increase() {
 		if(this.elements.hasNext()){
 			this.currentElement = this.elements.next();
 		}else{
-			this.currentElement = new EChargingAct(0., 0., ChargingProfiles.NONE, new IdImpl("NONE"), new IdImpl("NONE"));
+			this.currentElement = new EChargingAct(0., 0., ChargingProfiles.NONE, Id.create("NONE", Person.class), Id.create("NONE", Poi.class));
 		}
 	}
 
-	/**
-	 * @param personId
-	 * @return
-	 */
-	public boolean expectedPerson(Id personId) {
+	public boolean expectedPerson(Id<Person> personId) {
 //		System.out.println(this.currentElement.getPersonId());
 		return this.currentElement.getPersonId().equals(personId);
 	}
 
-	/**
-	 * @return
-	 */
 	public double getStart() {
 		if(this.currentElement instanceof EChargingAct){
 			return ((EChargingAct)this.currentElement).getStart();
@@ -71,9 +63,6 @@ public class EVehiclePlan {
 		}
 	}
 
-	/**
-	 * @return
-	 */
 	public double getEnd() {
 		if(this.currentElement instanceof EChargingAct){
 			return ((EChargingAct)this.currentElement).getEnd();
@@ -82,18 +71,15 @@ public class EVehiclePlan {
 		}
 	}
 	
-	public Id getPoiId(){
+	public Id<Poi> getPoiId(){
 		if(this.currentElement instanceof EChargingAct){
 			return ((EChargingAct)this.currentElement).getPoiId();
 		}else{
-			return new IdImpl("NONE");
+			return Id.create("NONE", Poi.class);
 		}
 	}
 
-	/**
-	 * @return
-	 */
-	public Id getProfileId() {
+	public Id<ChargingProfile> getProfileId() {
 		return this.currentElement.getProfileId();
 	}
 

@@ -22,22 +22,17 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import junit.framework.Assert;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
-import org.omg.CORBA.portable.RemarshalException;
 
 import playground.vsp.bvwp.MultiDimensionalArray.Attribute;
 import playground.vsp.bvwp.MultiDimensionalArray.DemandSegment;
@@ -73,7 +68,7 @@ public class IVVReaderV2 {
 	}
 	
 	void read(){
-		List<Id> odRelations = new ArrayList<Id>();
+		List<String> odRelations = new ArrayList<>();
 		log.info("Creating Index using Production & Operations' file : "+config.getImpedanceMatrixFile() );
 		read(config.getImpedanceMatrixFile(), new IndexFromImpendanceFileHandler(odRelations));
 		log.info("Handling  "+odRelations.size() +" OD-Relations");
@@ -125,13 +120,13 @@ public class IVVReaderV2 {
 		
 		log.info("Dumping Planfall Magdeburg-->Stendal");
 		System.out.println(planfallData.getByODRelation(getODId("1500301", "1509001")));
-		Map<Id,ScenarioForEvalData> nullFallDataByFromId = splitDataByFromId(nullfallData);
-		Map<Id,ScenarioForEvalData> planFallDataByFromId = splitDataByFromId(planfallData);
+		Map<String,ScenarioForEvalData> nullFallDataByFromId = splitDataByFromId(nullfallData);
+		Map<String,ScenarioForEvalData> planFallDataByFromId = splitDataByFromId(planfallData);
 		if ( nullFallDataByFromId.size() != planFallDataByFromId.size()){
 		System.err.println("Null und Planfall haben verschiedene Anzahl an Von-Ids. Das kann nicht sein");
 		throw new IllegalStateException();
 		}
-		for (Id fromId : nullFallDataByFromId.keySet()){
+		for (String fromId : nullFallDataByFromId.keySet()){
 //			runBVWP2015(nullFallDataByFromId.get(fromId),planFallDataByFromId.get(fromId), fromId.toString());
 		}
 		analyse(nullfallData, planfallData);
@@ -143,7 +138,7 @@ public class IVVReaderV2 {
     {
 	    log.info("Analysiere Widerstandsunterschiede bei gleicher Nutzerzahl");
 	    int x = 0;
-	    for (Id odId : planfallData.getAllRelations()){
+	    for (String odId : planfallData.getAllRelations()){
 	        double diffXX = 0.0;
 	        for (DemandSegment ds : DemandSegment.values()){
 	            double xxPlan = planfallData.getByODRelation(odId).getAttributes(Mode.Strasse, ds).getByEntry(Attribute.XX);
@@ -188,11 +183,11 @@ public class IVVReaderV2 {
         }
 	}
 	
-	Map<Id,ScenarioForEvalData> splitDataByFromId(ScenarioForEvalData data){
+	Map<String,ScenarioForEvalData> splitDataByFromId(ScenarioForEvalData data){
 	
-		Map <Id, ScenarioForEvalData> returnMap = new HashMap<Id, ScenarioForEvalData>();
-		for (Id id : data.getAllRelations()){
-			Id fromId = getFromId(id);
+		Map <String, ScenarioForEvalData> returnMap = new HashMap<>();
+		for (String id : data.getAllRelations()){
+			String fromId = getFromId(id);
 			ScenarioForEvalData currentData;
 			if (!returnMap.containsKey(fromId)) {
 				 currentData = new ScenarioForEvalData();
@@ -209,18 +204,16 @@ public class IVVReaderV2 {
 		return returnMap;
 	} 
 	
-	Id getFromId (Id id){
-		String idString = id.toString();
+	String getFromId (String idString){
 		idString = idString.split("---")[0];
-		
-		return new IdImpl(idString);
+		return idString;
 	}
 	
 	void checkCosts(ScenarioForEvalData data){
 		
 		for (DemandSegment seg : DemandSegment.values()){
 			int usercostsTooLow = 0;
-		for (Id id: data.getAllRelations()){
+		for (String id: data.getAllRelations()){
 			double pu = data.getByODRelation(id).getAttributes(Mode.Strasse, seg).getByEntry(Attribute.Nutzerkosten_Eu);
 			double cop = data.getByODRelation(id).getAttributes(Mode.Strasse, seg).getByEntry(Attribute.Produktionskosten_Eu);
 			if (pu<cop) usercostsTooLow++;
@@ -301,12 +294,12 @@ public class IVVReaderV2 {
 	private static class DemandHandler implements TabularFileHandler{
 
 		private ScenarioForEvalData data;
-		private final List<Id> odRelations;
+		private final List<String> odRelations;
 		/**
 		 * @param data
 		 * @param odRelations 
 		 */
-		public DemandHandler(ScenarioForEvalData data, List<Id> odRelations) {
+		public DemandHandler(ScenarioForEvalData data, List<String> odRelations) {
 			this.data = data;
 			this.odRelations=odRelations;
 		}
@@ -317,7 +310,7 @@ public class IVVReaderV2 {
 
 			String from = row[0].trim();
 			String to = row[1].trim();
-			Id odId = getODId(from, to);
+			String odId = getODId(from, to);
 			if (this.odRelations.contains(odId)){
 			
 			Mode mode = Mode.Bahn;
@@ -345,12 +338,12 @@ public class IVVReaderV2 {
     private static class DemandNewOrDroppedHandler implements TabularFileHandler{
 
 		private ScenarioForEvalData data;
-		private final List<Id> odRelations;
+		private final List<String> odRelations;
 
 		/**
 		 * @param data
 		 */
-		public DemandNewOrDroppedHandler(List<Id> odRelations, ScenarioForEvalData data) {
+		public DemandNewOrDroppedHandler(List<String> odRelations, ScenarioForEvalData data) {
 			this.data = data;
 			this.odRelations = odRelations;
 		}
@@ -361,7 +354,7 @@ public class IVVReaderV2 {
 
 			String from = row[0].trim();
 			String to = row[1].trim();
-			Id odid = getODId(from, to);
+			String odid = getODId(from, to);
 			if (this.odRelations.contains(odid)){
 			data.getByODRelation(odid).inc(Key.makeKey(Mode.Strasse, DemandSegment.PV_ARBEIT, Attribute.XX), Double.parseDouble(row[2].trim()));
 			data.getByODRelation(odid).inc(Key.makeKey(Mode.Strasse, DemandSegment.PV_AUSBILDUNG, Attribute.XX), Double.parseDouble(row[3].trim()));
@@ -376,12 +369,9 @@ public class IVVReaderV2 {
 	private static class DemandRemainingHandler implements TabularFileHandler{
 
 		private ScenarioForEvalData data;
-        private final List<Id> odRelations;
+        private final List<String> odRelations;
 
-		/**
-		 * @param data
-		 */
-		public DemandRemainingHandler(List<Id> odRelations, ScenarioForEvalData data) {
+		public DemandRemainingHandler(List<String> odRelations, ScenarioForEvalData data) {
 			this.data = data;
 	        this.odRelations = odRelations;
 
@@ -393,7 +383,7 @@ public class IVVReaderV2 {
 
 			String from = row[0].trim();
 			String to = row[1].trim();
-			Id odId = getODId(from, to);
+			String odId = getODId(from, to);
 			if (this.odRelations.contains(odId)){
             setValuesForODRelation(odId, Key.makeKey(Mode.Strasse, DemandSegment.PV_ARBEIT, Attribute.XX),  Double.parseDouble(row[2]),	data);
 			setValuesForODRelation(odId, Key.makeKey(Mode.Strasse, DemandSegment.PV_AUSBILDUNG, Attribute.XX),  Double.parseDouble(row[3]),	data);
@@ -465,7 +455,7 @@ public class IVVReaderV2 {
 		        
 		    }
 		  
-		  double getBesetzungsgrad(ScenarioForEvalData data, DemandSegment segment, Id odId){
+		  double getBesetzungsgrad(ScenarioForEvalData data, DemandSegment segment, String odId){
 		        
 		        double distance = data.getByODRelation(odId).getAttributes(Mode.Strasse,segment).getByEntry(Attribute.Distanz_km);
 		        double besetzungsgrad;
@@ -481,7 +471,7 @@ public class IVVReaderV2 {
 			
 			String from = row[0].trim();
 			String to = row[1].trim();
-			Id odId = getODId(from, to);
+			String odId = getODId(from, to);
 
 			
 			// VARIANTE EINS
@@ -536,12 +526,12 @@ public class IVVReaderV2 {
 	
 	private static class IndexFromImpendanceFileHandler implements TabularFileHandler{
 
-        private List<Id> allOdRelations;
+        private List<String> allOdRelations;
 
         /**
          * @param nullfalldata
          */
-        public IndexFromImpendanceFileHandler(List<Id> allOdRelations) {
+        public IndexFromImpendanceFileHandler(List<String> allOdRelations) {
             this.allOdRelations = allOdRelations;
         }
 
@@ -558,13 +548,10 @@ public class IVVReaderV2 {
 	
 	private static class GetToIdsForFromIdsFromImpFileHandler implements TabularFileHandler{
 
-        private List<Id> allOdRelations;
-        private Id fromId;
+        private List<String> allOdRelations;
+        private String fromId;
 
-        /**
-         * @param nullfalldata
-         */
-        public GetToIdsForFromIdsFromImpFileHandler(Id fromId, List<Id> allOdRelations) {
+        public GetToIdsForFromIdsFromImpFileHandler(String fromId, List<String> allOdRelations) {
             this.allOdRelations = allOdRelations;
             this.fromId = fromId;
         }
@@ -575,7 +562,7 @@ public class IVVReaderV2 {
             
             String from = row[0].trim();
             String to = row[1].trim();
-            Id currentFromId = new IdImpl(from);
+            String currentFromId = from;
 
             if (currentFromId.equals(fromId)){
             this.allOdRelations.add(getODId(from, to));
@@ -587,12 +574,12 @@ public class IVVReaderV2 {
 	
 	private static class AllFromIdsFromImpendanceFileHandler implements TabularFileHandler{
 
-        private Set<Id> allFromIds;
+        private Set<String> allFromIds;
 
         /**
          * @param nullfalldata
          */
-        public AllFromIdsFromImpendanceFileHandler(Set<Id> allFromIds) {
+        public AllFromIdsFromImpendanceFileHandler(Set<String> allFromIds) {
             this.allFromIds = allFromIds;
         }
 
@@ -600,7 +587,7 @@ public class IVVReaderV2 {
         public void startRow(String[] row) {
             if(comment(row)) return;
             String from = row[0].trim();
-            this.allFromIds.add(new IdImpl(from));
+            this.allFromIds.add(from);
             }
         
         
@@ -610,17 +597,12 @@ public class IVVReaderV2 {
 
 		private ScenarioForEvalData planfalldata;
 		private ScenarioForEvalData nullfalldata;
-		private final List<Id> odRelations;
+		private final List<String> odRelations;
 
-		/**
-		 * @param nullfalldata
-		 */
-		public ImpedanceShiftedHandler(List<Id> odRelations, ScenarioForEvalData planfalldata, ScenarioForEvalData nullfalldata) {
+		public ImpedanceShiftedHandler(List<String> odRelations, ScenarioForEvalData planfalldata, ScenarioForEvalData nullfalldata) {
 			this.planfalldata = planfalldata;
 			this.nullfalldata = nullfalldata;
 			this.odRelations = odRelations;
-
-			
 		}
 
 		@Override
@@ -628,7 +610,7 @@ public class IVVReaderV2 {
 			if(comment(row)) return;
 			String from = row[0].trim();
 			String to = row[2].trim();
-			Id odId = getODId(from, to);
+			String odId = getODId(from, to);
 			// Annahme: Wegezwecke fuer Verlagerungen sind identisch mit Wegezwecken im Bahn fuer OD-Relation im Nullfall
 			
 			if (this.odRelations.contains(odId)){
@@ -665,13 +647,13 @@ public class IVVReaderV2 {
 
 		private ScenarioForEvalData data;
 		boolean includeRail;
-		private final List<Id> odRelations;
+		private final List<String> odRelations;
 		private long count;
 		/**
 		 * @param data
 		 * @param odRelations 
 		 */
-		public TravelTimeHandler(ScenarioForEvalData data, List<Id> odRelations, boolean includeRail) {
+		public TravelTimeHandler(ScenarioForEvalData data, List<String> odRelations, boolean includeRail) {
 			this.data = data;
 			this.includeRail = includeRail;
 			this.odRelations=odRelations;
@@ -683,8 +665,8 @@ public class IVVReaderV2 {
 			if(comment(row)) return;
 			
 			String[] myRow = myRowSplit(row[0]);
-			Id odId = getODId(getIdForTTfiles(myRow[2]), getIdForTTfiles(myRow[3]));
-			Id reverseOd = getODId(getIdForTTfiles(myRow[3]), getIdForTTfiles(myRow[2]));
+			String odId = getODId(getIdForTTfiles(myRow[2]), getIdForTTfiles(myRow[3]));
+			String reverseOd = getODId(getIdForTTfiles(myRow[3]), getIdForTTfiles(myRow[2]));
 			if ((this.odRelations.contains(odId)||this.odRelations.contains(reverseOd)) ){
 			for (DemandSegment ds : DemandSegment.values()){
 				if (ds.equals(DemandSegment.GV)) continue;
@@ -730,7 +712,7 @@ public class IVVReaderV2 {
 	 * @param double1
 	 * @param data2 
 	 */
-	private static void setValuesForODRelation(Id odId, Key key, Double value, ScenarioForEvalData data2) {
+	private static void setValuesForODRelation(String odId, Key key, Double value, ScenarioForEvalData data2) {
 		
 		Values v = data2.getByODRelation(odId);
 		if(v == null){
@@ -762,8 +744,8 @@ public class IVVReaderV2 {
 		return s;
 	}
 	
-	private static Id getODId(String from, String to){
-		return new IdImpl(from + "---" + to);
+	private static String getODId(String from, String to){
+		return from + "---" + to;
 	}
 	
 	 static String getIdForTTfiles(String col){

@@ -26,12 +26,12 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.facilities.ActivityFacilitiesFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.facilities.Facility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -91,7 +91,7 @@ public class PendlerMatrixReader {
 			Double xcoordinate = coordinate.x;
 			Double ycoordinate = coordinate.y;
 			Coord coord = new CoordImpl(xcoordinate.toString(), ycoordinate.toString());
-			ActivityFacility facility = factory.createActivityFacility(new IdImpl(gemeindeschluessel), coord);
+			ActivityFacility facility = factory.createActivityFacility(Id.create(gemeindeschluessel, ActivityFacility.class), coord);
 			{
 				ActivityOption option = factory.createActivityOption("work");
 				option.setCapacity(1.);

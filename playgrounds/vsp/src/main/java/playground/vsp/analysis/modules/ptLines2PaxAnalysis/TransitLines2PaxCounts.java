@@ -28,7 +28,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
@@ -37,6 +37,7 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * @author sfuerbas (parts taken from droeder)
@@ -48,7 +49,7 @@ public class TransitLines2PaxCounts {
 	private static final Logger log = Logger
 			.getLogger(TransitLines2PaxCounts.class);
 	private Double interval;
-	private Id id;
+	private Id<TransitLine> id;
 	private Integer maxSlice;
 	private Counts boarding;
 	private Counts alighting;
@@ -74,13 +75,14 @@ public class TransitLines2PaxCounts {
 			int numberOfStops = tr.getStops().size();
 			for (int ii=0; ii < numberOfStops; ii++) {
 				TransitRouteStop s = tr.getStops().get(ii);
-				Id stopFacilId = s.getStopFacility().getId();
+				Id<TransitStopFacility> stopFacilId = s.getStopFacility().getId();
 				if (this.boarding.getCounts().get(stopFacilId)==null) {
-					this.boarding.createAndAddCount(stopFacilId, stopFacilId.toString());
-					this.alighting.createAndAddCount(stopFacilId, stopFacilId.toString());
-					this.capacity.createAndAddCount(stopFacilId, stopFacilId.toString());
-					this.totalPax.createAndAddCount(stopFacilId, stopFacilId.toString());
-					this.occupancy.createAndAddCount(stopFacilId, stopFacilId.toString());
+					Id<Link> convertedId = Id.create(stopFacilId, Link.class);
+					this.boarding.createAndAddCount(convertedId, stopFacilId.toString());
+					this.alighting.createAndAddCount(convertedId, stopFacilId.toString());
+					this.capacity.createAndAddCount(convertedId, stopFacilId.toString());
+					this.totalPax.createAndAddCount(convertedId, stopFacilId.toString());
+					this.occupancy.createAndAddCount(convertedId, stopFacilId.toString());
 				}
 			}
 		}	
@@ -98,6 +100,7 @@ public class TransitLines2PaxCounts {
 	}
 
 	public class RouteSizeComparator implements Comparator<TransitRoute> {
+		@Override
 		public int compare(TransitRoute route1, TransitRoute route2) {
 			Integer stopSize1 = route1.getStops().size();
 			Integer stopSize2 = route2.getStops().size();
@@ -111,7 +114,7 @@ public class TransitLines2PaxCounts {
 
 	
 	private void createRouteSegments () {
-		List<Id> comparedRoutes = new ArrayList<Id>();
+		List<Id> comparedRoutes = new ArrayList<>();
 		List<TransitRoute> noFittingSchemeRoutes = new ArrayList<TransitRoute>();
 		List<TransitRoute> dupeRoutes = new ArrayList<TransitRoute>();
 		List<TransitRoute> routeFragments = new ArrayList<TransitRoute>(); // Liste der Routenfragmente
@@ -156,7 +159,7 @@ public class TransitLines2PaxCounts {
 									routeFragmentStopList.add(tr2.getStops().get(rr));
 									//wenn letzter Stop von tr2 erreicht: Fragment-Route aus Stop-Liste erstellen
 									if (rr == tr2Length-1) {
-										Id fragmentId = new IdImpl(tr2.getId().toString()+"_"+routeFragments.size());
+										Id<TransitRoute> fragmentId = Id.create(tr2.getId().toString()+"_"+routeFragments.size(), TransitRoute.class);
 										TransitRoute frag = this.tsf.createTransitRoute(fragmentId, tr2.getRoute(), routeFragmentStopList, tr2.getTransportMode());
 										routeFragments.add(frag);
 										if (!dupeRoutes.contains(tr2)) {
@@ -193,7 +196,7 @@ public class TransitLines2PaxCounts {
 									//wenn letzter Stop von tr2 erreicht: Fragment-Route aus Stop-Liste erstellen
 									if (rr == 0) {
 										Collections.reverse(routeFragmentStopList);
-										Id fragmentId = new IdImpl(tr2.getId().toString()+"_"+routeFragments.size());
+										Id<TransitRoute> fragmentId = Id.create(tr2.getId().toString()+"_"+routeFragments.size(), TransitRoute.class);
 										TransitRoute frag = this.tsf.createTransitRoute(fragmentId, tr2.getRoute(), routeFragmentStopList, tr2.getTransportMode());
 										routeFragments.add(frag);
 									}
@@ -278,7 +281,7 @@ public class TransitLines2PaxCounts {
 	}
 	
 
-	public Id getId(){
+	public Id<TransitLine> getId(){
 		return this.id;
 	}
 
@@ -286,7 +289,7 @@ public class TransitLines2PaxCounts {
 	 * @param facilityId
 	 * @param time
 	 */
-	public void paxBoarding(Id facilityId, double time) {
+	public void paxBoarding(Id<TransitStopFacility> facilityId, double time) {
 		increase(this.boarding, facilityId, time, 1.);
 	}
 
@@ -294,7 +297,7 @@ public class TransitLines2PaxCounts {
 	 * @param facilityId
 	 * @param time
 	 */
-	public void paxAlighting(Id facilityId, double time) {
+	public void paxAlighting(Id<TransitStopFacility> facilityId, double time) {
 		increase(this.alighting, facilityId, time, 1.);
 	}
 
@@ -304,22 +307,23 @@ public class TransitLines2PaxCounts {
 	 * @param nrSeatsInUse
 	 * @param stopIndexId
 	 */
-	public void vehicleDeparts(double time, double vehCapacity,	double nrSeatsInUse, Id stopFacilityId) {
-		if(this.alighting.getCount(stopFacilityId).getVolume(getTimeSlice(time)) == null){
+	public void vehicleDeparts(double time, double vehCapacity,	double nrSeatsInUse, Id<TransitStopFacility> stopFacilityId) {
+		Id<Link> convertedId = Id.create(stopFacilityId, Link.class);
+		if(this.alighting.getCount(convertedId).getVolume(getTimeSlice(time)) == null){
 			set(this.alighting, stopFacilityId, time, 0);
 		}
-		if(this.boarding.getCount(stopFacilityId).getVolume(getTimeSlice(time)) == null){
+		if(this.boarding.getCount(convertedId).getVolume(getTimeSlice(time)) == null){
 			set(this.boarding, stopFacilityId, time, 0);
 		}
 		increase(this.capacity, stopFacilityId, time, vehCapacity);
 		increase(this.totalPax, stopFacilityId, time, nrSeatsInUse);
 		Integer slice = getTimeSlice(time);
-		set(this.occupancy, stopFacilityId, time, this.totalPax.getCount(stopFacilityId).getVolume(slice).getValue() /
-				this.capacity.getCount(stopFacilityId).getVolume(slice).getValue());
+		set(this.occupancy, stopFacilityId, time, this.totalPax.getCount(convertedId).getVolume(slice).getValue() /
+				this.capacity.getCount(convertedId).getVolume(slice).getValue());
 	}
 	
-	private void increase(Counts counts, Id stopFacilityId, Double time, double increaseBy){
-		Count count = counts.getCount(stopFacilityId);
+	private void increase(Counts counts, Id<TransitStopFacility> stopFacilityId, Double time, double increaseBy){
+		Count count = counts.getCount(Id.create(stopFacilityId, Link.class));
 		Integer slice = getTimeSlice(time);
 		Volume v;
 		if(count.getVolumes().containsKey(slice)){
@@ -330,8 +334,8 @@ public class TransitLines2PaxCounts {
 		v.setValue(v.getValue() + increaseBy);
 	}
 	
-	private void set(Counts counts, Id stopFacilityId, Double time, double value){
-		Count count =  counts.getCount(stopFacilityId);
+	private void set(Counts counts, Id<TransitStopFacility> stopFacilityId, Double time, double value){
+		Count count =  counts.getCount(Id.create(stopFacilityId, Link.class));
 		Integer slice = getTimeSlice(time);
 		Volume v;
 		if(count.getVolumes().containsKey(slice)){

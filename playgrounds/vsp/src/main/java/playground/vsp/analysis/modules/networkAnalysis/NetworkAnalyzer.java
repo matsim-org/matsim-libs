@@ -28,7 +28,6 @@ import org.matsim.contrib.accessibility.gis.Zone;
 import org.matsim.contrib.accessibility.gis.ZoneLayer;
 import org.matsim.contrib.accessibility.utils.ProgressBar;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -228,7 +227,7 @@ public class NetworkAnalyzer extends AbstractAnalyisModule{
 			}
 		}
 		
-		for(Id nodeId : this.network.getNodes().keySet()){
+		for(Id<Node> nodeId : this.network.getNodes().keySet()){
 			
 			if(!biggestCluster.containsKey(nodeId)){
 				Node node = this.network.getNodes().get(nodeId);
@@ -259,7 +258,7 @@ public class NetworkAnalyzer extends AbstractAnalyisModule{
 		double resolution = 100;
 		
 		//set measuring points from which the accessibility is measured
-		ZoneLayer<Id> measuringPoints = NetworkAnalyzer.createGridLayerByGridSizeByNetwork(resolution, bbox.getBoundingBox());
+		ZoneLayer<Id<Zone>> measuringPoints = NetworkAnalyzer.createGridLayerByGridSizeByNetwork(resolution, bbox.getBoundingBox());
 
 		//initialize grid that stores the accessibility values
 		this.freeSpeedGrid = new SpatialGrid(bbox.getXMin(),bbox.getYMin(),bbox.getXMax(),bbox.getYMax(), resolution, Double.NaN);
@@ -443,7 +442,7 @@ public class NetworkAnalyzer extends AbstractAnalyisModule{
 	 * @param boundingBox The corners of the bounding box for the given network.
 	 * @return
 	 */
-	public static ZoneLayer<Id> createGridLayerByGridSizeByNetwork(double gridSize, double [] boundingBox) {
+	public static ZoneLayer<Id<Zone>> createGridLayerByGridSizeByNetwork(double gridSize, double [] boundingBox) {
 		
 //		log.info("Setting starting points for accessibility measure ...");
 
@@ -452,7 +451,7 @@ public class NetworkAnalyzer extends AbstractAnalyisModule{
 		
 		GeometryFactory factory = new GeometryFactory();
 		
-		Set<Zone<Id>> zones = new HashSet<Zone<Id>>();
+		Set<Zone<Id<Zone>>> zones = new HashSet<>();
 
 		double xmin = boundingBox[0];
 		double ymin = boundingBox[1];
@@ -490,8 +489,8 @@ public class NetworkAnalyzer extends AbstractAnalyisModule{
 					Polygon polygon = factory.createPolygon(linearRing, null);
 					// polygon.setSRID( srid ); // tnicolai: this is not needed to match the grid layer with locations / facilities from UrbanSim
 					
-					Zone<Id> zone = new Zone<Id>(polygon);
-					zone.setAttribute( new IdImpl( setPoints ) );
+					Zone<Id<Zone>> zone = new Zone<Id<Zone>>(polygon);
+					zone.setAttribute( Id.create( setPoints, Zone.class ) );
 					zones.add(zone);
 					
 					setPoints++;
@@ -503,7 +502,7 @@ public class NetworkAnalyzer extends AbstractAnalyisModule{
 //		log.info("Having " + setPoints + " inside the shape file boundary (and " + skippedPoints + " outside).");
 //		log.info("Done with setting starting points!");
 		
-		ZoneLayer<Id> layer = new ZoneLayer<Id>(zones);
+		ZoneLayer<Id<Zone>> layer = new ZoneLayer<>(zones);
 		return layer;
 	}
 	
@@ -563,7 +562,7 @@ public class NetworkAnalyzer extends AbstractAnalyisModule{
 			for(Id nodeId : this.nodeTypes.get(nodeType)){
 
 				Point p = MGC.coord2Point(this.network.getNodes().get(nodeId).getCoord());
-				features.add(this.builder.buildFeature(null, new Object[]{p,((IdImpl)nodeId).toString(),nodeType}));
+				features.add(this.builder.buildFeature(null, new Object[]{p,nodeId.toString(),nodeType}));
 				
 			}
 			

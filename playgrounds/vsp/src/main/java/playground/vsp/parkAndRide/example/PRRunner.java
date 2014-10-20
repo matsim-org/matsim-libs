@@ -80,7 +80,7 @@ public class PRRunner {
 		controler.setScoringFunctionFactory(new PRScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getNetwork(), prSettings.getIntermodalTransferPenalty()));
 		
 		PRFileReader prReader = new PRFileReader(prSettings.getInputFile());
-		Map<Id, PRFacility> id2prFacility = prReader.getId2prFacility();
+		Map<Id<PRFacility>, PRFacility> id2prFacility = prReader.getId2prFacility();
 		final PRAdaptiveCapacityControl adaptiveControl = new PRAdaptiveCapacityControl(id2prFacility);
 
 		PRControlerListener prControlerListener = new PRControlerListener(controler, adaptiveControl);

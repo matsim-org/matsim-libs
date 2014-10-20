@@ -1,7 +1,5 @@
 package playground.vsp.zzArchive.bvwpOld;
 
-import org.matsim.core.basic.v01.IdImpl;
-
 import playground.vsp.zzArchive.bvwpOld.Values.Attribute;
 import playground.vsp.zzArchive.bvwpOld.Values.DemandSegment;
 import playground.vsp.zzArchive.bvwpOld.Values.Mode;
@@ -16,7 +14,7 @@ class ScenarioKarlsruheBaselGV {
 	
 		// construct values for one OD relation:
 		Values nullfallForOD = new Values() ;
-		nullfall.setValuesForODRelation(new IdImpl(relation), nullfallForOD ) ;
+		nullfall.setValuesForODRelation(relation, nullfallForOD ) ;
 		{
 			{
 				ValuesForAMode valuesForAMode = nullfallForOD.getByMode(Mode.road) ;
@@ -73,7 +71,7 @@ class ScenarioKarlsruheBaselGV {
 	static ScenarioForEvalData createPlanfall1(ScenarioForEvalData nullfall) {
 		ScenarioForEvalData planfall = nullfall.createDeepCopy() ;
 		
-		Values planfallForOD = planfall.getByODRelation(new IdImpl(relation)) ;
+		Values planfallForOD = planfall.getByODRelation(relation) ;
 		{
 			ValuesForAMode valuesForAMode = planfallForOD.getByMode( Mode.rail ) ;
 			{
@@ -90,7 +88,7 @@ class ScenarioKarlsruheBaselGV {
 				// modify some demand (presumably as a result):
 				double delta = 100. ;
 				vv.incByEntry( Attribute.XX, delta ) ;
-				planfall.getByODRelation(new IdImpl(relation)).getByMode(Mode.road).getByDemandSegment(DemandSegment.GV).incByEntry(Attribute.XX, -delta ) ;
+				planfall.getByODRelation(relation).getByMode(Mode.road).getByDemandSegment(DemandSegment.GV).incByEntry(Attribute.XX, -delta ) ;
 			}
 		}
 		return planfall;

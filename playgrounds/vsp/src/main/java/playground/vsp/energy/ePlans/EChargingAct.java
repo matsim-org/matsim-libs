@@ -19,6 +19,10 @@
 package playground.vsp.energy.ePlans;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+
+import playground.vsp.energy.energy.ChargingProfile;
+import playground.vsp.energy.poi.Poi;
 
 
 /**
@@ -28,12 +32,12 @@ import org.matsim.api.core.v01.Id;
 public class EChargingAct implements EVehiclePlanElement {
 
 	private double start;
-	private Id personId;
-	private Id profileId;
+	private Id<Person> personId;
+	private Id<ChargingProfile> profileId;
 	private double end;
-	private Id poiId;
+	private Id<Poi> poiId;
 
-	public EChargingAct(double start, double end, Id profileId, Id personId, Id poiId){
+	public EChargingAct(double start, double end, Id<ChargingProfile> profileId, Id<Person> personId, Id<Poi> poiId){
 		this.start = start;
 		this.end = end;
 		this.profileId = profileId;
@@ -46,12 +50,12 @@ public class EChargingAct implements EVehiclePlanElement {
 	}
 
 	@Override
-	public Id getPersonId() {
+	public Id<Person> getPersonId() {
 		return this.personId;
 	}
 
 	@Override
-	public Id getProfileId() {
+	public Id<ChargingProfile> getProfileId() {
 		return this.profileId;
 	}
 
@@ -62,7 +66,7 @@ public class EChargingAct implements EVehiclePlanElement {
 	/**
 	 * @return
 	 */
-	public Id getPoiId() {
+	public Id<Poi> getPoiId() {
 		return this.poiId;
 	}
 

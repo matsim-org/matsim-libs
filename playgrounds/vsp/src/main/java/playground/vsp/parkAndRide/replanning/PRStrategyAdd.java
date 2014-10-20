@@ -51,7 +51,7 @@ public class PRStrategyAdd implements PlanStrategy {
 		
 		PRConfigGroup prSettings = (PRConfigGroup) controler.getConfig().getModule(PRConfigGroup.GROUP_NAME);
 		PRFileReader prReader = new PRFileReader(prSettings.getInputFile());
-		Map<Id, PRFacility> id2prFacility = prReader.getId2prFacility();
+		Map<Id<PRFacility>, PRFacility> id2prFacility = prReader.getId2prFacility();
 		
 		RandomPlanSelector planSelector = new RandomPlanSelector();
 		planStrategyDelegate = new PlanStrategyImpl( planSelector );

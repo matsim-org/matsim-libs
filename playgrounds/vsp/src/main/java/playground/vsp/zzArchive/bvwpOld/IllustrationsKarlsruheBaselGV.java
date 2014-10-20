@@ -1,7 +1,5 @@
 package playground.vsp.zzArchive.bvwpOld;
 
-import org.matsim.api.core.v01.Id;
-
 import playground.vsp.zzArchive.bvwpOld.Values.Attribute;
 import playground.vsp.zzArchive.bvwpOld.Values.DemandSegment;
 import playground.vsp.zzArchive.bvwpOld.Values.Mode;
@@ -65,7 +63,7 @@ public class IllustrationsKarlsruheBaselGV {
 			System.out.println("\n==================================================================================================================================");
 			html.multiFmtComment("bvwp2015 w/ implicit utl. and w/ road price as user price for rail in nullfall:") ;
 			ScenarioForEvalData nullfallTmp = nullfall.createDeepCopy() ;
-			for ( Id id : nullfallTmp.getAllRelations() ) {
+			for ( String id : nullfallTmp.getAllRelations() ) {
 				final Values attribsForOd = nullfall.getByODRelation(id);
 				double roadPrice = attribsForOd.getByMode(Mode.road).getByDemandSegment(DemandSegment.GV).getByEntry(Attribute.priceUser) ;
 				attribsForOd.getByMode(Mode.rail).getByDemandSegment(DemandSegment.GV).setByEntry(Attribute.priceUser, roadPrice ) ;

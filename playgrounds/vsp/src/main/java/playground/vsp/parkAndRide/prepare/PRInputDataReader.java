@@ -33,8 +33,9 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
+
+import playground.vsp.parkAndRide.PRFacility;
 
 /**
  * @author Ihab
@@ -46,9 +47,9 @@ import org.matsim.core.utils.geometry.CoordImpl;
 public class PRInputDataReader {
 	private static final Logger log = Logger.getLogger(PRInputDataReader.class);
 	
-	private Map<Id, PRInputData> id2PRInputData = new HashMap<Id, PRInputData>();
+	private Map<Id<PRFacility>, PRInputData> id2PRInputData = new HashMap<>();
 	
-	public Map<Id, PRInputData> getId2prInputData(String prInputDataFile) {
+	public Map<Id<PRFacility>, PRInputData> getId2prInputData(String prInputDataFile) {
 		BufferedReader br = null;
 	    try {
 	        br = new BufferedReader(new FileReader(new File(prInputDataFile)));
@@ -66,7 +67,7 @@ public class PRInputDataReader {
 	            	
 	            	PRInputData prInputData = new PRInputData();
 	            	
-	            	Id id = new IdImpl(parts[0]);
+	            	Id<PRFacility> id = Id.create(parts[0], PRFacility.class);
 	            	String name = parts[1];
 	            	double xCoord = Double.valueOf(parts[2]);
 	            	double yCoord = Double.valueOf(parts[3]);

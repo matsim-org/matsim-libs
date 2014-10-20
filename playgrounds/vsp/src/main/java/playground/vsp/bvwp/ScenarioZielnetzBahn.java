@@ -1,13 +1,10 @@
 package playground.vsp.bvwp;
 
+import static playground.vsp.bvwp.Key.makeKey;
 import junit.framework.Assert;
-
-import org.matsim.core.basic.v01.IdImpl;
-
 import playground.vsp.bvwp.MultiDimensionalArray.Attribute;
 import playground.vsp.bvwp.MultiDimensionalArray.DemandSegment;
 import playground.vsp.bvwp.MultiDimensionalArray.Mode;
-import static playground.vsp.bvwp.Key.*;
 
 
 /**
@@ -24,7 +21,7 @@ class ScenarioZielnetzBahn {
 		// induced traffic:
 		{
 			final Values nullfallForInduced = new Values() ;
-			nullfall.setValuesForODRelation(new IdImpl("induziert"), nullfallForInduced ) ;
+			nullfall.setValuesForODRelation("induziert", nullfallForInduced ) ;
 			{
 				{
 					Mode mode = Mode.Bahn ;
@@ -82,7 +79,7 @@ class ScenarioZielnetzBahn {
 		// verlagert:
 		{
 			final Values nullfallForSwitched = new Values() ;
-			nullfall.setValuesForODRelation( new IdImpl("verlagert"), nullfallForSwitched ) ;
+			nullfall.setValuesForODRelation( "verlagert", nullfallForSwitched ) ;
 			{
 				Mode mode = Mode.Bahn ;
 				{
@@ -128,7 +125,7 @@ class ScenarioZielnetzBahn {
 		}
 		{
 			final Values nullfallForOld = new Values() ;
-			nullfall.setValuesForODRelation( new IdImpl("verbleibend"), nullfallForOld ) ;
+			nullfall.setValuesForODRelation( "verbleibend", nullfallForOld ) ;
 			{
 				Mode mode = Mode.Bahn ;
 				{
@@ -186,7 +183,7 @@ class ScenarioZielnetzBahn {
 		ScenarioForEvalData planfall = nullfall.createDeepCopy() ;
 
 		{
-			Values planfallValuesForOD = planfall.getByODRelation(new IdImpl("induziert")) ;
+			Values planfallValuesForOD = planfall.getByODRelation("induziert") ;
 			Assert.assertNotNull(planfallValuesForOD) ;
 			{
 				// modify the travel times for the rail mode:
@@ -210,7 +207,7 @@ class ScenarioZielnetzBahn {
 			}
 		}
 		{
-			Values planfallValuesForOD = planfall.getByODRelation(new IdImpl("verlagert")) ;
+			Values planfallValuesForOD = planfall.getByODRelation("verlagert") ;
 			Assert.assertNotNull(planfallValuesForOD) ;
 			{
 				double xx_verlagert = 2.5 * 1000. * 1000. ;
@@ -242,7 +239,7 @@ class ScenarioZielnetzBahn {
 			}
 		}
 		{
-			Values planfallValuesForOD = planfall.getByODRelation(new IdImpl("verbleibend")) ;
+			Values planfallValuesForOD = planfall.getByODRelation("verbleibend") ;
 			Assert.assertNotNull(planfallValuesForOD) ;
 			{
 				// modify the travel times for the rail mode:

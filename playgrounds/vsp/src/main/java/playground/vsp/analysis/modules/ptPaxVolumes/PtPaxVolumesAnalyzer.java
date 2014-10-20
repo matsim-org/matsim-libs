@@ -32,7 +32,6 @@ import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -52,7 +51,7 @@ public class PtPaxVolumesAnalyzer extends AbstractAnalyisModule{
 
 	private PtPaxVolumesHandler handler;
 	private Scenario sc;
-	private Map<Id, Collection<SimpleFeature>> lineId2features;
+	private Map<Id<TransitLine>, Collection<SimpleFeature>> lineId2features;
 	private final String targetCoordinateSystem;
 
 	public PtPaxVolumesAnalyzer(Scenario sc, Double interval, String targetCoordinateSystem) {
@@ -76,11 +75,11 @@ public class PtPaxVolumesAnalyzer extends AbstractAnalyisModule{
 
 	@Override
 	public void postProcessData() {
-		this.lineId2features = new HashMap<Id, Collection<SimpleFeature>>();
+		this.lineId2features = new HashMap<>();
 		for(TransitLine l: this.sc.getTransitSchedule().getTransitLines().values()){
 			this.lineId2features.put(l.getId(), getTransitLineFeatures(l, this.targetCoordinateSystem));
 		}
-		this.lineId2features.put(new IdImpl("all"), getAll(this.targetCoordinateSystem));
+		this.lineId2features.put(Id.create("all", TransitLine.class), getAll(this.targetCoordinateSystem));
 	}
 	
 	private Collection<SimpleFeature> getAll(String targetCoordinateSystem) {
@@ -165,7 +164,7 @@ public class PtPaxVolumesAnalyzer extends AbstractAnalyisModule{
 	 * @param objects
 	 * @return
 	 */
-	private Object[] getLinkFeatureAttribs(Link link, Id lineId, Object[] objects) {
+	private Object[] getLinkFeatureAttribs(Link link, Id<TransitLine> lineId, Object[] objects) {
 		Double paxValue = this.handler.getPaxCountForLinkId(link.getId(), lineId);
 		if(paxValue <= 0) return null;
 		Coordinate[] coord =  new Coordinate[2];
@@ -184,7 +183,7 @@ public class PtPaxVolumesAnalyzer extends AbstractAnalyisModule{
 
 	@Override
 	public void writeResults(String outputFolder) {
-		for(Entry<Id, Collection<SimpleFeature>> ee: this.lineId2features.entrySet()){
+		for(Entry<Id<TransitLine>, Collection<SimpleFeature>> ee: this.lineId2features.entrySet()){
 			try{
 				if(ee.getValue().size() <= 0) continue;
 				ShapeFileWriter.writeGeometries(ee.getValue(), outputFolder + ee.getKey().toString()+ ".shp");

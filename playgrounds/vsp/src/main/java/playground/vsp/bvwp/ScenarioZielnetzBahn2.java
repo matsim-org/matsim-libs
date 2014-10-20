@@ -1,13 +1,10 @@
 package playground.vsp.bvwp;
 
+import static playground.vsp.bvwp.Key.makeKey;
 import junit.framework.Assert;
-
-import org.matsim.core.basic.v01.IdImpl;
-
 import playground.vsp.bvwp.MultiDimensionalArray.Attribute;
 import playground.vsp.bvwp.MultiDimensionalArray.DemandSegment;
 import playground.vsp.bvwp.MultiDimensionalArray.Mode;
-import static playground.vsp.bvwp.Key.*;
 
 
 /**
@@ -64,7 +61,7 @@ class ScenarioZielnetzBahn2 {
 	
 		// construct values for one OD relation:
 		Values nullfallForOD = new Values() ;
-		nullfall.setValuesForODRelation(new IdImpl("BC"), nullfallForOD ) ;
+		nullfall.setValuesForODRelation("BC", nullfallForOD ) ;
 		{
 			System.out.println(" distance: " + distance );
 			{
@@ -121,7 +118,7 @@ class ScenarioZielnetzBahn2 {
 		ScenarioForEvalData planfall = nullfall.createDeepCopy() ;
 		
 		// we are now looking at one specific OD relation (for this scenario, there is only one!)
-		Values planfallValuesForOD = planfall.getByODRelation(new IdImpl("BC")) ;
+		Values planfallValuesForOD = planfall.getByODRelation("BC") ;
 		Assert.assertNotNull(planfallValuesForOD) ;
 		{
 			// modify the travel times for the rail mode:
@@ -151,7 +148,7 @@ class ScenarioZielnetzBahn2 {
 		ScenarioForEvalData planfall = nullfall.createDeepCopy() ;
 		
 		// we are now looking at one specific OD relation (for this scenario, there is only one!)
-		Values planfallValuesForOD = planfall.getByODRelation(new IdImpl("BC")) ;
+		Values planfallValuesForOD = planfall.getByODRelation("BC") ;
 		Assert.assertNotNull(planfallValuesForOD) ;
 		{
 			// modify the travel times for the rail mode:

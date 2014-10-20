@@ -1,5 +1,5 @@
 /* *********************************************************************** *
- * project: org.matsim.*                                                   *
+. * project: org.matsim.*                                                   *
  * TestEmission.java                                                       *
  *                                                                         *
  * *********************************************************************** *
@@ -20,18 +20,20 @@
 
 package playground.vsp.analysis.modules.emissions;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.events.ColdEmissionEvent;
 import org.matsim.contrib.emissions.types.ColdPollutant;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestUtils;
-import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsPerPersonColdEventHandler;
+import org.matsim.vehicles.Vehicle;
 
-import java.util.HashMap;
-import java.util.Map;
+import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsPerPersonColdEventHandler;
 
 /**
  * test for playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsPerPersonColdEventHandler
@@ -51,10 +53,10 @@ public class TestColdEmissionHandler {
 		EmissionsPerPersonColdEventHandler handler = new EmissionsPerPersonColdEventHandler();
 		
 		//create vehicles
-		IdImpl vehicle1 = new IdImpl("v1");
-		IdImpl vehicle2 = new IdImpl("v2");
-		IdImpl link1 = new IdImpl("1");
-		IdImpl link2 = new IdImpl("2");
+		Id<Vehicle> vehicle1 = Id.create("v1", Vehicle.class);
+		Id<Vehicle> vehicle2 = Id.create("v2", Vehicle.class);
+		Id<Link> link1 = Id.create("1", Link.class);
+		Id<Link> link2 = Id.create("2", Link.class);
 		Double time1 = .0, time2 = 2.0;
 		
 		//first event: create and handle
@@ -92,12 +94,12 @@ public class TestColdEmissionHandler {
 		Map<Id<Person>, Map<ColdPollutant, Double>> cepp = handler.getColdEmissionsPerPerson(); 
 		Double actualCO1 =0.0, actualNOX1 =0.0, actualPM1=0.0, actualCO2=.0, actualNOX2=.0, actualPM2 =0.0;
 		
-		if(cepp.get(new IdImpl("v1")).containsKey(ColdPollutant.CO))actualCO1 = cepp.get(new IdImpl("v1")).get(ColdPollutant.CO);  
-		if(cepp.get(new IdImpl("v1")).containsKey(ColdPollutant.NOX))actualNOX1 = cepp.get(new IdImpl("v1")).get(ColdPollutant.NOX); 
-		if(cepp.get(new IdImpl("v1")).containsKey(ColdPollutant.PM))actualPM1 = cepp.get(new IdImpl("v1")).get(ColdPollutant.PM); 
-		if(cepp.get(new IdImpl("v2")).containsKey(ColdPollutant.CO))actualCO2 = cepp.get(new IdImpl("v2")).get(ColdPollutant.CO); 
-		if(cepp.get(new IdImpl("v2")).containsKey(ColdPollutant.NOX))actualNOX2 = cepp.get(new IdImpl("v2")).get(ColdPollutant.NOX); 
-		if(cepp.get(new IdImpl("v2")).containsKey(ColdPollutant.PM))actualPM2 = cepp.get(new IdImpl("v2")).get(ColdPollutant.PM); 
+		if(cepp.get(Id.create("v1", Person.class)).containsKey(ColdPollutant.CO))actualCO1 = cepp.get(Id.create("v1", Person.class)).get(ColdPollutant.CO);  
+		if(cepp.get(Id.create("v1", Person.class)).containsKey(ColdPollutant.NOX))actualNOX1 = cepp.get(Id.create("v1", Person.class)).get(ColdPollutant.NOX); 
+		if(cepp.get(Id.create("v1", Person.class)).containsKey(ColdPollutant.PM))actualPM1 = cepp.get(Id.create("v1", Person.class)).get(ColdPollutant.PM); 
+		if(cepp.get(Id.create("v2", Person.class)).containsKey(ColdPollutant.CO))actualCO2 = cepp.get(Id.create("v2", Person.class)).get(ColdPollutant.CO); 
+		if(cepp.get(Id.create("v2", Person.class)).containsKey(ColdPollutant.NOX))actualNOX2 = cepp.get(Id.create("v2", Person.class)).get(ColdPollutant.NOX); 
+		if(cepp.get(Id.create("v2", Person.class)).containsKey(ColdPollutant.PM))actualPM2 = cepp.get(Id.create("v2", Person.class)).get(ColdPollutant.PM); 
 		
 		// assert that values were set correctly
 		Assert.assertEquals("CO of vehicle 1 should be 17.1 but was "+actualCO1, new Double(17.1), actualCO1, MatsimTestUtils.EPSILON);
@@ -109,11 +111,11 @@ public class TestColdEmissionHandler {
 		
 		// nothing else in the map
 		Assert.assertEquals("There should be two types of emissions in this map but " +
-				"there were " + cepp.get(new IdImpl("v1")).size()+".", 
-				2, cepp.get(new IdImpl("v1")).keySet().size());
+				"there were " + cepp.get(Id.create("v1", Person.class)).size()+".", 
+				2, cepp.get(Id.create("v1", Person.class)).keySet().size());
 		Assert.assertEquals("There should be two types of emissions in this map but " +
-				"there were " + cepp.get(new IdImpl("v2")).size()+".",
-				2, cepp.get(new IdImpl("v2")).keySet().size());
+				"there were " + cepp.get(Id.create("v2", Person.class)).size()+".",
+				2, cepp.get(Id.create("v2", Person.class)).keySet().size());
 	}
 }
 	

@@ -22,7 +22,6 @@ package playground.vsp.energy.energy;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 
 /**
  * @author droeder
@@ -30,22 +29,22 @@ import org.matsim.core.basic.v01.IdImpl;
  */
 public class ChargingProfiles {
 	
-	public static final Id NONE = new IdImpl("none");
+	public static final Id<ChargingProfile> NONE = Id.create("none", ChargingProfile.class);
 	
-	private HashMap<Id, ChargingProfile> profiles;
+	private HashMap<Id<ChargingProfile>, ChargingProfile> profiles;
 
 	public ChargingProfiles(){
-		this.profiles = new HashMap<Id , ChargingProfile>();
+		this.profiles = new HashMap<>();
 	}
 	
-	public void addValue(Id id, Double currentState, Double duration, double newState){
+	public void addValue(Id<ChargingProfile> id, Double currentState, Double duration, double newState){
 		if(!this.profiles.containsKey(id)){
 			this.profiles.put(id, new ChargingProfile(id));
 		}
 		this.profiles.get(id).addNewEntry(currentState, duration, newState);
 	}
 	
-	public Double getNewState(Id id, Double  duration, Double currentState){
+	public Double getNewState(Id<ChargingProfile> id, Double  duration, Double currentState){
 		if(this.profiles.containsKey(id)){
 			return this.profiles.get(id).getNewState(duration, currentState);
 		}else{
@@ -58,7 +57,7 @@ public class ChargingProfiles {
 //		Set<String[]> values = DaFileReader.readFileContent(inputFile, "\t", true);
 //		
 //		for(String[] s: values){
-//			this.addValue(new IdImpl(s[0]), Double.parseDouble(s[1]), Double.parseDouble(s[2]), Double.parseDouble(s[3]));
+//			this.addValue(Id.create(s[0]), Double.parseDouble(s[1]), Double.parseDouble(s[2]), Double.parseDouble(s[3]));
 //		}
 //		
 //	}
@@ -80,7 +79,7 @@ public class ChargingProfiles {
 		ChargingProfiles profiles = EmobEnergyProfileReader.readChargingProfiles(inputFile);
 		
 //		System.out.println(profiles.toString());
-		System.out.println(profiles.getNewState(new IdImpl("SLOW"), 60., 20.));
+		System.out.println(profiles.getNewState(Id.create("SLOW", ChargingProfile.class), 60., 20.));
 	}
 
 }

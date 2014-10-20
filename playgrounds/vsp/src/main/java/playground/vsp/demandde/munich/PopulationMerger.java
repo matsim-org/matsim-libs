@@ -26,13 +26,11 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -81,7 +79,7 @@ public class PopulationMerger {
 
 	private void run(String[] args) {
 		Config config = ConfigUtils.createConfig();
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		Scenario scenario = ScenarioUtils.createScenario(config);
 		PopulationImpl mergedPopulation = (PopulationImpl) scenario.getPopulation();
 
 		mergedPopulation.setIsStreaming(true);
@@ -137,7 +135,7 @@ public class PopulationMerger {
 
 	private static Population getPopulation(String demandFile, String networkFile) {
 		Config config1 = ConfigUtils.createConfig();
-		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(config1);
+		Scenario sc = ScenarioUtils.createScenario(config1);
 		Config config = sc.getConfig();
 		config.network().setInputFile(networkFile);
 		config.plans().setInputFile(demandFile);
@@ -162,15 +160,15 @@ public class PopulationMerger {
 	}
 
 	private static void addFreightPrefix(Person person) {
-		Id id = person.getId();
-		Id newId = new IdImpl("gv_" + id.toString());
+		Id<Person> id = person.getId();
+		Id<Person> newId = Id.create("gv_" + id.toString(), Person.class);
         ((PersonImpl) person).setId(newId);
 
     }
 
 	private static void addCommuterPrefix(Person person) {
-		Id id = person.getId();
-		Id newId = new IdImpl("pv_" + id.toString());
+		Id<Person> id = person.getId();
+		Id<Person> newId = Id.create("pv_" + id.toString(), Person.class);
         ((PersonImpl) person).setId(newId);
 
     }

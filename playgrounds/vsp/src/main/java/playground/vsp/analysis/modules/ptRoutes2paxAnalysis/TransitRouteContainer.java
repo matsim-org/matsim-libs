@@ -20,12 +20,13 @@ package playground.vsp.analysis.modules.ptRoutes2paxAnalysis;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * @author droeder
@@ -67,11 +68,11 @@ public class TransitRouteContainer {
 		this.maxSlice = maxSlice;
 		for(int i= 0; i < r.getStops().size() ; i++){
 			TransitRouteStop s = r.getStops().get(i);
-			create(this.boarding, new IdImpl(i), s.getStopFacility().getId(), 0., 0.);
-			create(this.alighting, new IdImpl(i), s.getStopFacility().getId(), 0., 0.);
-			create(this.capacity, new IdImpl(i), s.getStopFacility().getId(), 0., 0.);
-			create(this.totalPax, new IdImpl(i), s.getStopFacility().getId(), 0., 0.);
-			create(this.occupancy, new IdImpl(i), s.getStopFacility().getId(), 0., 0.);
+			create(this.boarding, Id.create(i, Link.class), s.getStopFacility().getId(), 0., 0.);
+			create(this.alighting, Id.create(i, Link.class), s.getStopFacility().getId(), 0., 0.);
+			create(this.capacity, Id.create(i, Link.class), s.getStopFacility().getId(), 0., 0.);
+			create(this.totalPax, Id.create(i, Link.class), s.getStopFacility().getId(), 0., 0.);
+			create(this.occupancy, Id.create(i, Link.class), s.getStopFacility().getId(), 0., 0.);
 		}
 	}
 	
@@ -83,16 +84,16 @@ public class TransitRouteContainer {
 	 * @param facilityId
 	 * @param time
 	 */
-	public void paxBoarding(Id facilityId, double time) {
-		increase(this.boarding, facilityId, time, 1.);
+	public void paxBoarding(Id<Link> stopIndexId, double time) {
+		increase(this.boarding, stopIndexId, time, 1.);
 	}
 
 	/**
 	 * @param facilityId
 	 * @param time
 	 */
-	public void paxAlighting(Id facilityId, double time) {
-		increase(this.alighting, facilityId, time, 1.);
+	public void paxAlighting(Id<Link> stopIndexId, double time) {
+		increase(this.alighting, stopIndexId, time, 1.);
 	}
 
 	/**
@@ -101,7 +102,7 @@ public class TransitRouteContainer {
 	 * @param nrSeatsInUse
 	 * @param stopIndexId
 	 */
-	public void vehicleDeparts(double time, double vehCapacity,	double nrSeatsInUse, Id stopIndexId) {
+	public void vehicleDeparts(double time, double vehCapacity,	double nrSeatsInUse, Id<Link> stopIndexId) {
 		if(this.alighting.getCount(stopIndexId).getVolume(getTimeSlice(time)) == null){
 			set(this.alighting, stopIndexId, time, 0);
 		}
@@ -115,7 +116,7 @@ public class TransitRouteContainer {
 				this.capacity.getCount(stopIndexId).getVolume(slice).getValue());
 	}
 	
-	private void increase(Counts counts, Id stopId, Double time, double increaseBy){
+	private void increase(Counts counts, Id<Link> stopId, Double time, double increaseBy){
 		//create a new count
 		Count count = counts.createAndAddCount(stopId, stopId.toString());
 		if(count == null){
@@ -135,7 +136,7 @@ public class TransitRouteContainer {
 		v.setValue(v.getValue() + increaseBy);
 	}
 	
-	private void set(Counts counts, Id stopIndexId, Double time, double value){
+	private void set(Counts counts, Id<Link> stopIndexId, Double time, double value){
 		//create a new count
 		Count count = counts.createAndAddCount(stopIndexId, stopIndexId.toString());
 		if(count == null){
@@ -155,7 +156,7 @@ public class TransitRouteContainer {
 		v.setValue(value);
 	}
 	
-	private void create(Counts counts, Id stopIndexId, Id stationName, Double time, double value){
+	private void create(Counts counts, Id<Link> stopIndexId, Id<TransitStopFacility> stationName, Double time, double value){
 		//create a new count
 		Count count = counts.createAndAddCount(stopIndexId, stationName.toString());
 //		if(count == null){

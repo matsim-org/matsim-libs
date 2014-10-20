@@ -1,13 +1,10 @@
 package playground.vsp.bvwp;
 
+import static playground.vsp.bvwp.Key.makeKey;
 import junit.framework.Assert;
-
-import org.matsim.core.basic.v01.IdImpl;
-
 import playground.vsp.bvwp.MultiDimensionalArray.Attribute;
 import playground.vsp.bvwp.MultiDimensionalArray.DemandSegment;
 import playground.vsp.bvwp.MultiDimensionalArray.Mode;
-import static playground.vsp.bvwp.Key.*;
 
 
 /**
@@ -66,7 +63,7 @@ class ScenarioA14WolfsburgRoebel {
 		// Wolfsburg--Roebel:
 		{
 			final Values nullfallForOD = new Values() ;
-			nullfall.setValuesForODRelation( new IdImpl(WolfsburgRoebel), nullfallForOD ) ;
+			nullfall.setValuesForODRelation(WolfsburgRoebel, nullfallForOD ) ;
 			{
 				Mode mode = Mode.Strasse ;
 				//aus P2030_2010_A14_induz_ME2.wid
@@ -106,7 +103,7 @@ class ScenarioA14WolfsburgRoebel {
 
 		// Wolfsburg--Roebel:
 		{
-			Values planfallValuesForOD = planfall.getByODRelation(new IdImpl(WolfsburgRoebel)) ;
+			Values planfallValuesForOD = planfall.getByODRelation(WolfsburgRoebel) ;
 			Assert.assertNotNull(planfallValuesForOD) ;
 			{
 				DemandSegment segm = DemandSegment.PV_SONST ;

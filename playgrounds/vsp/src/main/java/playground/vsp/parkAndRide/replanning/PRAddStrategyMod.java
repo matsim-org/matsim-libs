@@ -58,7 +58,7 @@ public class PRAddStrategyMod implements PlanStrategyModule {
 	private ScenarioImpl sc;
 	private Network net;
 	private Population pop;
-	private Map<Id, PRFacility> id2prFacility = new HashMap<Id, PRFacility>();
+	private Map<Id<PRFacility>, PRFacility> id2prFacility = new HashMap<>();
 	private int nrOfPrFacilitiesForReplanning = 0; // 0 means all P+R-Facilities are used for replanning
 	private double gravity;
 	private double typicalDuration;
@@ -70,7 +70,7 @@ public class PRAddStrategyMod implements PlanStrategyModule {
 	 * @param gravity
 	 * @param typicalDuration 
 	 */
-	public PRAddStrategyMod(Controler controler, Map<Id, PRFacility> id2prFacility, double gravity, double typicalDuration) {
+	public PRAddStrategyMod(Controler controler, Map<Id<PRFacility>, PRFacility> id2prFacility, double gravity, double typicalDuration) {
 		this.sc = (ScenarioImpl) controler.getScenario();
 		this.net = this.sc.getNetwork();
 		this.pop = this.sc.getPopulation();

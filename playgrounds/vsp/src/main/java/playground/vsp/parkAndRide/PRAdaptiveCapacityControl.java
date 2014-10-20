@@ -44,18 +44,18 @@ public class PRAdaptiveCapacityControl implements MobsimEngine, LinkEnterEventHa
 //	private static final Logger log = Logger.getLogger(PRAdaptiveCapacityControl.class);
 	private Map<Id, Integer> prId2vehicles = new HashMap<Id, Integer>();
 	private Map<Id, SignalizeableItem> prId2ampel = new HashMap<Id, SignalizeableItem>();
-	private Map<Id, PRFacility> id2prFacility = new HashMap<Id, PRFacility>();
+	private Map<Id<PRFacility>, PRFacility> id2prFacility = new HashMap<>();
 	
 	private InternalInterface internalInterface;
 	
-	public PRAdaptiveCapacityControl(Map<Id, PRFacility> id2prFacility) {
+	public PRAdaptiveCapacityControl(Map<Id<PRFacility>, PRFacility> id2prFacility) {
 		this.id2prFacility = id2prFacility;
 	}
 
 	@Override
 	public void doSimStep(double time) {
 		
-		for (Id prId : this.prId2ampel.keySet()){
+		for (Id<PRFacility> prId : this.prId2ampel.keySet()){
 			if (this.prId2vehicles.get(prId) >= this.id2prFacility.get(prId).getCapacity()){
 				this.prId2ampel.get(prId).setSignalStateAllTurningMoves(SignalGroupState.RED);
 			} else {

@@ -32,7 +32,6 @@ import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -134,7 +133,7 @@ public class TransitVehicleVolumeAnalyzer extends AbstractAnalyisModule {
 		for(Count c: counts.getCounts().values()){
 			featureAttribs = new Object[2 + this.handler.getMaxTimeSlice() + 1];
 			//create linestring from link
-			Link l = this.sc.getNetwork().getLinks().get(new IdImpl(c.getCsId()));
+			Link l = this.sc.getNetwork().getLinks().get(Id.create(c.getCsId(), Link.class));
 			if(l == null){
 				log.debug("can not find link " + c.getLocId());
 				log.debug("links #" + this.sc.getNetwork().getLinks().size());

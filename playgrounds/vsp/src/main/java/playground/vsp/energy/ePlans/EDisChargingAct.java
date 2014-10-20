@@ -19,6 +19,9 @@
 package playground.vsp.energy.ePlans;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+
+import playground.vsp.energy.energy.DisChargingProfile;
 
 
 /**
@@ -27,21 +30,21 @@ import org.matsim.api.core.v01.Id;
  */
 public class EDisChargingAct implements EVehiclePlanElement{
 
-	private Id personId;
-	private Id profileId;
+	private Id<Person> personId;
+	private Id<DisChargingProfile> profileId;
 	
-	public EDisChargingAct(Id profileId, Id personId){
+	public EDisChargingAct(Id<DisChargingProfile> profileId, Id<Person> personId){
 		this.personId =  personId;
 		this.profileId = profileId;
 	}
 
 	@Override
-	public Id getPersonId() {
+	public Id<Person> getPersonId() {
 		return this.personId;
 	}
 
 	@Override
-	public Id getProfileId() {
+	public Id<DisChargingProfile> getProfileId() {
 		return this.profileId;
 	}
 

@@ -137,7 +137,7 @@ class Utils {
 		html.endTableRow();
 	}
 	
-	static void writeSubHeaderVerlagert(Html html, Id id, DemandSegment segm, Mode mode, final double deltaAmounts) {
+	static void writeSubHeaderVerlagert(Html html, String id, DemandSegment segm, Mode mode, final double deltaAmounts) {
 		
 		System.out.printf("====================%16s; %16s; %16s; verlagerter Verkehr: %16.1f Personen/Tonnen ====================\n", 
 				id, mode, segm, deltaAmounts ) ;
@@ -146,7 +146,7 @@ class Utils {
 		html.endTableRow();
 	}
 	
-	static void writeSubHeaderInduziert(Html html, Id id, DemandSegment segm, Mode mode, final double deltaAmounts) {
+	static void writeSubHeaderInduziert(Html html, String id, DemandSegment segm, Mode mode, final double deltaAmounts) {
 		
 		System.out.printf("====================%16s; %16s; %16s;  induzierter Verkehr: %16.1f Personen/Tonnen ====================\n", 
 				id, mode, segm, deltaAmounts ) ;
@@ -157,7 +157,7 @@ class Utils {
 	
 	
 
-	static void writeSubHeaderVerbleibend(Html html, Id id, DemandSegment segm, Mode mode, double amountAltnutzer) {
+	static void writeSubHeaderVerbleibend(Html html, String id, DemandSegment segm, Mode mode, double amountAltnutzer) {
 		System.out.printf("====================%16s; %16s; %16s;             verbleibender Verkehr: %16.1f Personen/Tonnen ====================\n", 
 				id, mode, segm, amountAltnutzer );
 	
