@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -33,7 +34,6 @@ import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.contrib.cadyts.general.ExpBetaPlanChangerWithCadytsPlanRegistration;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
@@ -130,12 +130,12 @@ public class CemdapMatsimCadytsController {
 		config.controler().setSnapshotFormat(snapshotFormat);
 				
 		// strategy
-//		StrategySettings strategySettings1 = new StrategySettings(new IdImpl(1));
+//		StrategySettings strategySettings1 = new StrategySettings(Id.create(1));
 //		strategySettings1.setModuleName("ChangeExpBeta");
 //		strategySettings1.setProbability(1.0);
 //		config.strategy().addStrategySettings(strategySettings1);
 		
-		StrategySettings strategySettings2 = new StrategySettings(new IdImpl(2));
+		StrategySettings strategySettings2 = new StrategySettings(Id.create(2, StrategySettings.class));
 		strategySettings2.setModuleName("ReRoute");
 		//strategySettings2.setProbability(1.0);
 		strategySettings2.setProbability(0.5);
@@ -143,7 +143,7 @@ public class CemdapMatsimCadytsController {
 		//strategySettings2.setDisableAfter(50);
 		config.strategy().addStrategySettings(strategySettings2);
 		
-		StrategySettings strategySetinngs3 = new StrategySettings(new IdImpl(1));
+		StrategySettings strategySetinngs3 = new StrategySettings(Id.create(1, StrategySettings.class));
 		strategySetinngs3.setModuleName("cadytsCar");
 		strategySetinngs3.setProbability(1.0);
 		config.strategy().addStrategySettings(strategySetinngs3);
