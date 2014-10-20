@@ -110,8 +110,8 @@ public class Module {
 
 	@Override
 	public final String toString() {
-		return "[name=" + this.name + "]" +
-				"[nOfParams=" + this.params.size() + "]";
+		return "[name=" + this.getName() + "]" +
+				"[nOfParams=" + this.getParams().size() + "]";
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
