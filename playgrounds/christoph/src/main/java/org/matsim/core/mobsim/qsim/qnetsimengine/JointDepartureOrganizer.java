@@ -47,34 +47,34 @@ public class JointDepartureOrganizer {
 	 * Package protected to allow test cases to check whether all departures have
 	 * been processed as expected. 
 	 */
-	/*package*/ final Map<Id, Map<Leg, JointDeparture>> scheduledDeparturesMap;	// agentId
-	/*package*/ final Map<Id, JointDeparture> scheduledDepartures;
+	/*package*/ final Map<Id<Person>, Map<Leg, JointDeparture>> scheduledDeparturesMap;	// agentId
+	/*package*/ final Map<Id<JointDeparture>, JointDeparture> scheduledDepartures;
 	
 	private final AtomicInteger jointDepartureCounter = new AtomicInteger(0);
 	
 	public JointDepartureOrganizer() {
 		// needs this to be thread-safe?
-		this.scheduledDeparturesMap = new ConcurrentHashMap<Id, Map<Leg, JointDeparture>>();
+		this.scheduledDeparturesMap = new ConcurrentHashMap<>();
 		
 		/*
 		 * This is only to check whether all departures have been processed.
 		 * I think this needs to be thread-safe, too since it is accessed
 		 * from replanners.
 		 */
-		this.scheduledDepartures = new ConcurrentHashMap<Id, JointDeparture>();
+		this.scheduledDepartures = new ConcurrentHashMap<>();
 	}
 	
-	/*package*/ Map<Leg, JointDeparture> getJointDepartures(Id agentId) {
+	/*package*/ Map<Leg, JointDeparture> getJointDepartures(Id<Person> agentId) {
 		return this.scheduledDeparturesMap.get(agentId);
 	}
 	
-	public JointDeparture getJointDepartureForLeg(Id agentId, Leg leg) {
+	public JointDeparture getJointDepartureForLeg(Id<Person> agentId, Leg leg) {
 		Map<Leg, JointDeparture> map = this.scheduledDeparturesMap.get(agentId);
 		if (map == null) return null;
 		else return map.get(leg);
 	}
 	
-	public JointDeparture removeJointDepartureForLeg(Id agentId, Leg leg) {
+	public JointDeparture removeJointDepartureForLeg(Id<Person> agentId, Leg leg) {
 		Map<Leg, JointDeparture> map = this.scheduledDeparturesMap.get(agentId);
 		if (map == null) return null;
 		else return map.remove(leg);
@@ -84,14 +84,14 @@ public class JointDepartureOrganizer {
 		return this.scheduledDepartures.remove(jointDeparture.getId()) != null;
 	}
 	
-	public JointDeparture createJointDeparture(Id<JointDeparture> id, Id<Link> linkId, Id<Vehicle> vehicleId, Id driverId, 
+	public JointDeparture createJointDeparture(Id<JointDeparture> id, Id<Link> linkId, Id<Vehicle> vehicleId, Id<Person> driverId, 
 			Set<Id<Person>> passengerIds) {		
 		JointDeparture jointDeparture = new JointDeparture(id, linkId, vehicleId, driverId, passengerIds);
 		
 		return jointDeparture;
 	}
 	
-	public JointDeparture createJointDeparture(Id<Link> linkId, Id<Vehicle> vehicleId, Id driverId, 
+	public JointDeparture createJointDeparture(Id<Link> linkId, Id<Vehicle> vehicleId, Id<Person> driverId, 
 			Set<Id<Person>> passengerIds) {		
 		JointDeparture jointDeparture = new JointDeparture(getNextId(), linkId, vehicleId, driverId, passengerIds);
 		
@@ -102,7 +102,7 @@ public class JointDepartureOrganizer {
 		return Id.create("id" + jointDepartureCounter.getAndIncrement(), JointDeparture.class);
 	}
 	
-	public void assignAgentToJointDeparture(Id agentId, Leg leg, JointDeparture jointDeparture) {
+	public void assignAgentToJointDeparture(Id<Person> agentId, Leg leg, JointDeparture jointDeparture) {
 		Map<Leg, JointDeparture> jointDepartures = this.scheduledDeparturesMap.get(agentId);
 		if (jointDepartures == null) {
 			jointDepartures = new HashMap<Leg, JointDeparture>();

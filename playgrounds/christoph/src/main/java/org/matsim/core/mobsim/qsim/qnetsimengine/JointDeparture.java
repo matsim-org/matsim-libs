@@ -36,12 +36,12 @@ public class JointDeparture {
 	private final Id<JointDeparture> id;
 	private final Id<Link> linkId;
 	private final Id<Vehicle> vehicleId;
-	private final Id driverId;
+	private final Id<Person> driverId;
 	private final Set<Id<Person>> passengerIds;
 	
 	private boolean departed = false;
 	
-	/*package*/ JointDeparture(Id<JointDeparture> id, Id<Link> linkId, Id<Vehicle> vehicleId, Id driverId, Set<Id<Person>> passengerIds) {
+	/*package*/ JointDeparture(Id<JointDeparture> id, Id<Link> linkId, Id<Vehicle> vehicleId, Id<Person> driverId, Set<Id<Person>> passengerIds) {
 		this.id = id;
 		this.linkId = linkId;
 		this.vehicleId = vehicleId;
@@ -74,7 +74,7 @@ public class JointDeparture {
 		return this.vehicleId;
 	}
 	
-	public Id getDriverId() {
+	public Id<Person> getDriverId() {
 		return this.driverId;
 	}
 	
@@ -91,7 +91,7 @@ public class JointDeparture {
 		b.append("[linkId=").append(this.linkId.toString()).append("]");
 		b.append("[departed=").append(this.departed).append("]");
 		int i = 0;
-		for (Id passengerId : this.passengerIds) {
+		for (Id<Person> passengerId : this.passengerIds) {
 			b.append("[passengerId").append(i).append("=").append(passengerId.toString()).append("]");
 			i++;
 		}

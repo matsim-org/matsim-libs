@@ -43,10 +43,10 @@ public class JointDepartureEvent extends Event {
 	private final Id<JointDeparture> jointDepartureId;
 	private final Id<Link> linkId;
 	private final Id<Vehicle> vehicleId;
-	private final Id driverId;
+	private final Id<Person> driverId;
 	private final Set<Id<Person>> passengerIds;
 
-	public JointDepartureEvent(final double time, final Id<JointDeparture> jointDepartureId, Id<Link> linkId, Id driverId, Id<Vehicle> vehicleId,  
+	public JointDepartureEvent(final double time, final Id<JointDeparture> jointDepartureId, Id<Link> linkId, Id<Person> driverId, Id<Vehicle> vehicleId,  
 			Set<Id<Person>> passengerIds) {
 		super(time);
 		this.jointDepartureId = jointDepartureId;
@@ -67,7 +67,7 @@ public class JointDepartureEvent extends Event {
 		return attr;
 	}
 
-	public Id getJointDepartureId() {
+	public Id<JointDeparture> getJointDepartureId() {
 		return this.jointDepartureId;
 	}
 

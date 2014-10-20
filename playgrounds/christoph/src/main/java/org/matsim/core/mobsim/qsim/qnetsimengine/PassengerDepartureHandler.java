@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -35,6 +36,7 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
+import org.matsim.vehicles.Vehicle;
 
 public class PassengerDepartureHandler implements DepartureHandler {
 
@@ -60,7 +62,7 @@ public class PassengerDepartureHandler implements DepartureHandler {
 	}
 
 	@Override
-	public boolean handleDeparture(double now, MobsimAgent agent, Id linkId) {
+	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
 		
 		String mode = agent.getMode();
 		if (mode == null) {
@@ -98,7 +100,7 @@ public class PassengerDepartureHandler implements DepartureHandler {
 	private void handleDriverDeparture(JointDeparture jointDeparture, QVehicle vehicle,
 			QLinkInternalI qlink, MobsimDriverAgent driver, double now) {
 		boolean canDepart = true;
-		Id vehicleId = driver.getPlannedVehicleId();
+		Id<Vehicle> vehicleId = driver.getPlannedVehicleId();
 		
 		if (!vehicleId.equals(jointDeparture.getVehicleId())) {
 			throw new RuntimeException("The planned vehicle " + vehicleId.toString() +
