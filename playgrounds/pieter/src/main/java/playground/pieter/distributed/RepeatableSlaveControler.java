@@ -21,6 +21,7 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import playground.pieter.pseudosimulation.mobsim.PSimFactory;
@@ -39,11 +40,12 @@ import java.util.*;
 
 //IMPORTANT: PSim produces events that are not in chronological order. This controler
 // will require serious overhaul if chronological order is enforced in all event manager implementations
-public class RepeatableSlaveControler implements IterationStartsListener, IterationEndsListener {
+public class RepeatableSlaveControler implements IterationStartsListener {
     private final boolean initialRouting;
     private int numberOfPSimIterations;
-    private int numberOfIterations=-1;
+    private int numberOfIterations = -1;
     private Config config;
+    private double averageIterationTime;
 
     class PlansSender implements Runnable {
         final Logger timesLogger = Logger.getLogger(this.getClass());
@@ -59,7 +61,7 @@ public class RepeatableSlaveControler implements IterationStartsListener, Iterat
 //                    System.out.println("Master terminated. Exiting.");
 //                    System.exit(0);
 //                }
-                try {
+            try {
 //                    if (res) {
 //                        timesLogger.warn("Receiving travel times.");
 //                        linkTravelTimes = (SerializableLinkTravelTimes) reader.readObject();
@@ -69,16 +71,16 @@ public class RepeatableSlaveControler implements IterationStartsListener, Iterat
 //                        while (!readyToSendPlans){
 //                            Thread.sleep(10);
 //                        }
-                        timesLogger.warn("SENDING plans...");
-                        writer.writeObject(plansCopyForSending);
-                        timesLogger.warn("SENDING completed.");
+                timesLogger.warn("SENDING plans...");
+                writer.writeObject(plansCopyForSending);
+                timesLogger.warn("SENDING completed.");
 //                    } else {
 //                        System.out.println("Master terminated. Exiting.");
 //                        System.exit(0);
 //                    }
-                } catch ( IOException  e) {
-                    e.printStackTrace();
-                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 //            }
         }
 
@@ -94,6 +96,8 @@ public class RepeatableSlaveControler implements IterationStartsListener, Iterat
     private PSimFactory pSimFactory;
     private Map<String, PlanSerializable> plansCopyForSending;
     private boolean readyToSendPlans = false;
+    private List<Long> iterationTimes = new ArrayList<>();
+    private long lastIterationStartTime;
 
 
     private RepeatableSlaveControler(String[] args) throws IOException, ClassNotFoundException, ParseException {
@@ -109,16 +113,15 @@ public class RepeatableSlaveControler implements IterationStartsListener, Iterat
         CommandLine commandLine = parser.parse(options, args);
         initialRouting = commandLine.hasOption("r");
         if (commandLine.hasOption("c")) {
-            try{
-            config = ConfigUtils.loadConfig(commandLine.getOptionValue("c"));
+            try {
+                config = ConfigUtils.loadConfig(commandLine.getOptionValue("c"));
 
-            }catch(UncheckedIOException e){
+            } catch (UncheckedIOException e) {
                 System.err.println("Config file not found");
                 System.out.println(options.toString());
                 System.exit(1);
             }
-        }
-        else {
+        } else {
             System.err.println("Config file not specified");
             System.out.println(options.toString());
             System.exit(1);
@@ -153,7 +156,7 @@ public class RepeatableSlaveControler implements IterationStartsListener, Iterat
 //      The following line will make the controler use the events manager that doesn't check for event order
         config.parallelEventHandling().setSynchronizeOnSimSteps(false);
         //if you don't set the number of threads, org.matsim.core.events.EventsUtils will just use the simstepmanager
-        int numThreadsForEventsHandling=1;
+        int numThreadsForEventsHandling = 1;
         if (commandLine.hasOption("t"))
             try {
                 numThreadsForEventsHandling = Integer.parseInt(commandLine.getOptionValue("t"));
@@ -176,13 +179,13 @@ public class RepeatableSlaveControler implements IterationStartsListener, Iterat
 //        new Thread(new TimesReceiver()).start();
         if (config.scenario().isUseTransit()) {
 
-            stopStopTimes= new StopStopTimeCalculatorSerializable(scenario.getTransitSchedule(),
-                        config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config
-                        .qsim().getEndTime() - config.qsim().getStartTime())).getStopStopTimes();
+            stopStopTimes = new StopStopTimeCalculatorSerializable(scenario.getTransitSchedule(),
+                    config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config
+                    .qsim().getEndTime() - config.qsim().getStartTime())).getStopStopTimes();
 
-            waitTimes=new WaitTimeCalculatorSerializable(scenario.getTransitSchedule(),
-                        config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config
-                        .qsim().getEndTime() - config.qsim().getStartTime())).getWaitTimes();
+            waitTimes = new WaitTimeCalculatorSerializable(scenario.getTransitSchedule(),
+                    config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config
+                    .qsim().getEndTime() - config.qsim().getStartTime())).getWaitTimes();
 
         }
         if (commandLine.hasOption("s")) {
@@ -190,7 +193,7 @@ public class RepeatableSlaveControler implements IterationStartsListener, Iterat
             //this is a fix for location choice to work with pt, very obscure
             //in location choice, if the facility's link doesn't accommodate the mode you're using,
             //then it won't allow you to go there
-            for(Link link: scenario.getNetwork().getLinks().values()) {
+            for (Link link : scenario.getNetwork().getLinks().values()) {
                 Set<String> modes = new HashSet<>(link.getAllowedModes());
                 modes.add("pt");
                 link.setAllowedModes(modes);
@@ -203,12 +206,12 @@ public class RepeatableSlaveControler implements IterationStartsListener, Iterat
             carMode.add("car");
             NetworkImpl justCarNetwork = NetworkImpl.createNetwork();
             new TransportModeNetworkFilter(scenario.getNetwork()).filter(justCarNetwork, carMode);
-            for(Person person: scenario.getPopulation().getPersons().values())
-                for(PlanElement planElement:person.getSelectedPlan().getPlanElements())
-                    if(planElement instanceof Activity)
-                        ((ActivityImpl)planElement).setLinkId(justCarNetwork.getNearestLinkExactly(((ActivityImpl)planElement).getCoord()).getId());
-            for(ActivityFacility facility: scenario.getActivityFacilities().getFacilities().values())
-                ((ActivityFacilityImpl)facility).setLinkId(justCarNetwork.getNearestLinkExactly(facility.getCoord()).getId());
+            for (Person person : scenario.getPopulation().getPersons().values())
+                for (PlanElement planElement : person.getSelectedPlan().getPlanElements())
+                    if (planElement instanceof Activity)
+                        ((ActivityImpl) planElement).setLinkId(justCarNetwork.getNearestLinkExactly(((ActivityImpl) planElement).getCoord()).getId());
+            for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values())
+                ((ActivityFacilityImpl) facility).setLinkId(justCarNetwork.getNearestLinkExactly(facility.getCoord()).getId());
             //the singapore scenario uses intelligent transit routing that takes account of information of the previous iteration,
             //like the car router of standard matsim, where best response routing is ok for car, not transit... :)
             matsimControler.setTransitRouterFactory(new TransitRouterWSImplFactory(scenario, waitTimes, stopStopTimes));
@@ -216,7 +219,6 @@ public class RepeatableSlaveControler implements IterationStartsListener, Iterat
             matsimControler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(config.planCalcScore(), scenario));
         }
     }
-
 
 
     public static void main(String[] args) throws IOException, ClassNotFoundException, ParseException {
@@ -237,8 +239,17 @@ public class RepeatableSlaveControler implements IterationStartsListener, Iterat
 
     @Override
     public void notifyIterationStarts(IterationStartsEvent event) {
-        if(initialRouting || (numberOfIterations > 0 && numberOfIterations % numberOfPSimIterations == 0))
+        if (numberOfIterations >= 0)
+            iterationTimes.add(System.currentTimeMillis() - lastIterationStartTime);
+
+        if (initialRouting || (numberOfIterations > 0 && numberOfIterations % numberOfPSimIterations == 0)) {
+            this.averageIterationTime = getAverageIterationTime();
             updateTravelTimesAndSendPlans();
+            loadBalance();
+            iterationTimes = new ArrayList<>();
+            iterationTimes.add(System.currentTimeMillis() - lastIterationStartTime);
+        }
+        lastIterationStartTime = System.currentTimeMillis();
         // the time calculators are null until the master sends them, need
         // something to keep psim occupied until then
 //        pSimFactory = new PSimFactory();
@@ -246,21 +257,24 @@ public class RepeatableSlaveControler implements IterationStartsListener, Iterat
             pSimFactory.setTravelTime(matsimControler.getLinkTravelTimes());
         else
             pSimFactory.setTravelTime(linkTravelTimes);
-        if(config.scenario().isUseTransit()){
+        if (config.scenario().isUseTransit()) {
             pSimFactory.setStopStopTime(stopStopTimes);
             pSimFactory.setWaitTime(waitTimes);
-            if(matsimControler.getTransitRouterFactory() instanceof TransitRouterWSImplFactory){
-                ((TransitRouterWSImplFactory)matsimControler.getTransitRouterFactory()).setStopStopTime(stopStopTimes);
-                ((TransitRouterWSImplFactory)matsimControler.getTransitRouterFactory()).setWaitTime(waitTimes);
+            if (matsimControler.getTransitRouterFactory() instanceof TransitRouterWSImplFactory) {
+                ((TransitRouterWSImplFactory) matsimControler.getTransitRouterFactory()).setStopStopTime(stopStopTimes);
+                ((TransitRouterWSImplFactory) matsimControler.getTransitRouterFactory()).setWaitTime(waitTimes);
             }
         }
         Collection<Plan> plans = new ArrayList<>();
         for (Person person : matsimControler.getPopulation().getPersons().values())
             plans.add(person.getSelectedPlan());
         pSimFactory.setPlans(plans);
+        numberOfIterations++;
 
 
     }
+
+
     private void removeNonSimulatedAgents(List<String> idStrings) {
         Set<Id<Person>> noIds = new HashSet<>(matsimControler.getPopulation().getPersons().keySet());
         Set<String> noIdStrings = new HashSet<>();
@@ -273,6 +287,59 @@ public class RepeatableSlaveControler implements IterationStartsListener, Iterat
         }
 
     }
+    public double getAverageIterationTime(){
+        double sumTimes=0;
+        for(long t:iterationTimes){
+            sumTimes += t;
+        }
+        return sumTimes/iterationTimes.size();
+    }
+    private void loadBalance() {
+//read an integer from the master. if it's positive, yous hould send the master that number of plans
+        //if negative, thene receive that number of plans
+//        if zero, then do notthing
+        int diff=0;
+        try {
+            slaveLogger.warn("Load balancing...");
+            diff= reader.readInt();
+        } catch (IOException e) {
+            slaveLogger.error("Master terminated. Exiting.");
+            System.exit(0);
+        }
+        try {
+            if (diff > 0) {
+                List<PersonSerializable> personsToSend = getPersonsToSend(diff);
+                writer.writeObject(personsToSend);
+            }
+            if (diff < 0){
+                addPersons((List<PersonSerializable>)reader.readObject());
+            }
+            //nothing else to do
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+
+    private void addPersons(List<PersonSerializable> persons) {
+        for(PersonSerializable person:persons){
+            matsimControler.getPopulation().addPerson(person.getPerson());
+        }
+    }
+
+    private List<PersonSerializable> getPersonsToSend(int diff) {
+        int i=0;
+        List<PersonSerializable> personsToSend = new ArrayList<>();
+        Set<Id<Person>> personIdsToRemove  =new HashSet<>();
+        for (Id<Person> personId : matsimControler.getPopulation().getPersons().keySet()) {
+            if(i++>=diff) break;
+            personsToSend.add(new PersonSerializable((PersonImpl) matsimControler.getPopulation().getPersons().get(personId)));
+            personIdsToRemove.add(personId);
+        }
+        for (Id<Person> personId:personIdsToRemove) matsimControler.getPopulation().getPersons().remove(personId);
+        return personsToSend;
+    }
+
     public void updateTravelTimesAndSendPlans() {
 
         Map<String, PlanSerializable> tempPlansCopyForSending = new HashMap<>();
@@ -289,11 +356,17 @@ public class RepeatableSlaveControler implements IterationStartsListener, Iterat
         }
         try {
             if (res) {
+                slaveLogger.warn("Spent an average of " +averageIterationTime+
+                        " running " +plansCopyForSending.size()+
+                        " person plans for " + numberOfPSimIterations+
+                        " PSim iterations.");
+                writer.writeDouble(averageIterationTime);
                 slaveLogger.warn("RECEIVING travel times.");
                 linkTravelTimes = (SerializableLinkTravelTimes) reader.readObject();
-                if(config.scenario().isUseTransit()){
-                stopStopTimes = (StopStopTime) reader.readObject();
-                waitTimes = (WaitTime) reader.readObject();}
+                if (config.scenario().isUseTransit()) {
+                    stopStopTimes = (StopStopTime) reader.readObject();
+                    waitTimes = (WaitTime) reader.readObject();
+                }
                 slaveLogger.warn("RECEIVING completed.");
 //                slaveLogger.warn("Sending plans...");
 //                writer.writeObject(plansCopyForSending);
@@ -309,8 +382,4 @@ public class RepeatableSlaveControler implements IterationStartsListener, Iterat
 
     }
 
-    @Override
-    public void notifyIterationEnds(IterationEndsEvent event) {
-        numberOfIterations++;
-    }
-}
+ }

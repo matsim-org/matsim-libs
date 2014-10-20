@@ -4,10 +4,8 @@ package playground.pieter.distributed;
 import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -23,7 +21,6 @@ import playground.singapore.ptsim.qnetsimengine.PTQSimFactory;
 import playground.singapore.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
 import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTimeCalculatorSerializable;
 import playground.singapore.transitRouterEventsBased.waitTimes.WaitTimeCalculatorSerializable;
-import playground.singapore.transitRouterEventsBased.waitTimes.WaitTimeStuckCalculator;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -45,6 +42,7 @@ public class RepeatableMasterControler implements AfterMobsimListener, ShutdownL
     private SerializableLinkTravelTimes linkTravelTimes;
     private AtomicInteger numThreads;
     private final HashMap<String, Plan> newPlans = new HashMap<>();
+    private LoadBalancer loadBalancer;
 
     private RepeatableMasterControler(String[] args) throws NumberFormatException, IOException, ParseException {
         System.setProperty("matsim.preferLocalDtds", "true");
@@ -85,14 +83,17 @@ public class RepeatableMasterControler implements AfterMobsimListener, ShutdownL
         else {
             masterLogger.warn("Will accept connections on default port number 12345");
         }
+        loadBalancer = new LoadBalancer();
         ServerSocket server = new ServerSocket(socketNumber);
         for (int i = 0; i < numSlaves; i++) {
             Socket s = server.accept();
             masterLogger.warn("Slave " + i + " out of " + numSlaves + " accepted.");
             slaves[i] = new Slave(s, i);
+
             //order is important
             slaves[i].sendNumber(i);
             slaves[i].sendNumber(numberOfPSimIterations);
+            loadBalancer.addSlave(slaves[i]);
         }
         server.close();
         if (commandLine.hasOption("c")) {
@@ -133,10 +134,9 @@ public class RepeatableMasterControler implements AfterMobsimListener, ShutdownL
             //this qsim engine uses our boarding and alighting model, derived from smart card data
             matsimControler.setMobsimFactory(new PTQSimFactory());
         }
-        if(commandLine.hasOption("r")) {
-        //initialize link travel times if you want to do remote routing
-            masterLogger.warn("ROUTING initial plans on slaves; received plans will be subjected to " + numberOfPSimIterations +
-                    " PSim iterations before executing on master.");
+        if (commandLine.hasOption("r")) {
+            //initialize link travel times if you want to do remote routing
+            masterLogger.warn("ROUTING initial plans on slaves.");
             FreespeedTravelTimeAndDisutility disutility = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
             linkTravelTimes = new SerializableLinkTravelTimes(disutility, config
                     .travelTimeCalculator().getTraveltimeBinSize(), config.qsim().getEndTime(), matsimControler
@@ -152,13 +152,14 @@ public class RepeatableMasterControler implements AfterMobsimListener, ShutdownL
             mergePlansFromSlaves();
         }
         masterLogger.warn("master inited");
+
     }
 
-    public static void main(String[] args)   {
+    public static void main(String[] args) {
         RepeatableMasterControler master = null;
         try {
             master = new RepeatableMasterControler(args);
-        } catch (IOException  | ParseException e) {
+        } catch (IOException | ParseException e) {
             e.printStackTrace();
             System.exit(1);
         }
@@ -187,6 +188,11 @@ public class RepeatableMasterControler implements AfterMobsimListener, ShutdownL
                 e.printStackTrace();
             }
         mergePlansFromSlaves();
+        masterLogger.warn("Plans from al slaves merged together. About to start load balancing.");
+        List<Integer> loadBalanceNumbers = loadBalanceNumbers();
+        masterLogger.warn("loadbalanceNumbers() returns: \n" + loadBalanceNumbers.toString());
+        loadBalancer.balance(loadBalanceNumbers);
+
     }
 
     private void mergePlansFromSlaves() {
@@ -195,6 +201,40 @@ public class RepeatableMasterControler implements AfterMobsimListener, ShutdownL
             newPlans.putAll(slave.plans);
         }
 
+    }
+
+    private List<Integer> loadBalanceNumbers() {
+        List<Double> timesPerPlan = new ArrayList<>();
+        List<Integer> personsPerSlave = new ArrayList<>();
+        List<Integer> optimalNumberPerSlave = new ArrayList<>();
+        double sumOfReciprocals = 0.0;
+        int totalAllocated = 0;
+        int largestAllocation = 0;
+        int largestAllocationIndex = 0;
+
+        for (Slave slave : slaves) {
+            timesPerPlan.add(slave.averageIterationTime / slave.plans.size());
+            personsPerSlave.add(slave.plans.size());
+            sumOfReciprocals += slave.averageIterationTime / slave.plans.size();
+        }
+//        find number of plans that should be allocated to each slave
+        for (int i = 0; i < timesPerPlan.size(); i++) {
+            optimalNumberPerSlave.add((int) (matsimControler.getPopulation().getPersons().size() / timesPerPlan.get(i) / sumOfReciprocals));
+            totalAllocated += optimalNumberPerSlave.get(i);
+            if (optimalNumberPerSlave.get(i) > largestAllocation) {
+                largestAllocation = optimalNumberPerSlave.get(i);
+                largestAllocationIndex = i;
+            }
+
+        }
+        int remainder = matsimControler.getPopulation().getPersons().size() - totalAllocated;
+        int newval = optimalNumberPerSlave.get(largestAllocationIndex) + remainder;
+        optimalNumberPerSlave.set(largestAllocationIndex, newval);
+        List<Integer> differences = new ArrayList<>();
+        for (int i = 0; i < optimalNumberPerSlave.size(); i++) {
+            differences.add(personsPerSlave.get(i) - optimalNumberPerSlave.get(i));
+        }
+        return differences;
     }
 
     @Override
@@ -216,6 +256,7 @@ public class RepeatableMasterControler implements AfterMobsimListener, ShutdownL
         ObjectOutputStream writer;
         final Map<String, Plan> plans = new HashMap<>();
         private int myNumber;
+        double averageIterationTime;
 
         public Slave(Socket socket, int i) throws IOException {
             super();
@@ -227,8 +268,9 @@ public class RepeatableMasterControler implements AfterMobsimListener, ShutdownL
         @Override
         public void run() {
             try {
-                slaveLogger.warn("About to send travel times to slave number " + myNumber);
                 writer.writeBoolean(true);
+                averageIterationTime = this.reader.readDouble();
+                slaveLogger.warn("About to send travel times to slave number " + myNumber);
                 writer.writeObject(linkTravelTimes);
                 if (config.scenario().isUseTransit()) {
                     writer.writeObject(stopStopTimeCalculator.getStopStopTimes());
@@ -263,4 +305,116 @@ public class RepeatableMasterControler implements AfterMobsimListener, ShutdownL
         }
 
     }
+
+    private class LoadBalancer {
+
+        private List<PersonSerializable> personPool = new LinkedList<>();
+        private List<LoadBalancingThread> loadBalanceThreads = new ArrayList<>();
+        private AtomicInteger loadBalanceNumThreads;
+        Logger loadBalanceLogger = Logger.getLogger(this.getClass());
+
+        public LoadBalancer() {
+            loadBalanceThreads = new ArrayList<>();
+        }
+
+        public void addSlave(Slave slave) {
+            loadBalanceThreads.add(new LoadBalancingThread(slave));
+        }
+
+        public void balance(List<Integer> loadBalanceNumbers) {
+            loadBalanceLogger.warn("Starting load balancing...");
+            loadBalanceNumThreads = new AtomicInteger(loadBalanceThreads.size());
+            for (int i = 0; i < loadBalanceThreads.size(); i++) {
+                loadBalanceThreads.get(i).sendTarget=true;
+                loadBalanceThreads.get(i).setPool(null);
+                loadBalanceThreads.get(i).target = loadBalanceNumbers.get(i);
+                new Thread(loadBalanceThreads.get(i)).start();
+            }
+            while (numThreads.get() > 0)
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            mergePersonsFromSlaves();
+            //run again to distribute to slaves
+            for (int i = 0; i < loadBalanceThreads.size(); i++) {
+                loadBalanceThreads.get(i).sendTarget=false;
+                loadBalanceThreads.get(i).setPool(this.getFromPool(loadBalanceNumbers.get(i)));
+                new Thread(loadBalanceThreads.get(i)).start();
+            }
+            while (numThreads.get() > 0)
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+        }
+
+        private List<PersonSerializable> getFromPool(int diff) {
+            List<PersonSerializable> outList = new ArrayList<>();
+            if (diff < 0) {
+                for (int i = 0; i > diff; i--) {
+                    outList.add(personPool.get(0));
+                    personPool.remove(0);
+                }
+                return outList;
+            } else {
+                return null;
+            }
+
+        }
+
+        private void mergePersonsFromSlaves() {
+            personPool.clear();
+            for (LoadBalancingThread loadBalanceThread : loadBalanceThreads) {
+                personPool.addAll(loadBalanceThread.getPersons());
+            }
+
+
+        }
+    }
+
+
+    class LoadBalancingThread implements Runnable {
+        Slave mySlave;
+        Integer target = 0;
+        List<PersonSerializable> personPool = null;
+        public boolean sendTarget =false;
+        Logger lbtLogger = Logger.getLogger(this.getClass());
+        public LoadBalancingThread(Slave slave) {
+            mySlave = slave;
+        }
+
+        @Override
+        public void run() {
+            lbtLogger.warn("Starting load balancing on thread " + mySlave.myNumber);
+                    lbtLogger.warn("Target is " + target);
+            try {
+                if(sendTarget)
+                mySlave.writer.writeInt(target);
+            if (target > 0) {
+               //getr persons
+                personPool = (List<PersonSerializable>) mySlave.reader.readObject();
+            }
+            if(target <0 && !sendTarget){
+                mySlave.writer.writeObject(personPool);
+            }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+
+        public List<PersonSerializable> getPersons() {
+            return personPool;
+        }
+
+        public void setPool(List<PersonSerializable> personPool) {
+            this.personPool=personPool;
+        }
+    }
+
 }

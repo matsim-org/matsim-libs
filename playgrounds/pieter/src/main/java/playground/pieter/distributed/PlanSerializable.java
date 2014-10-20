@@ -206,5 +206,16 @@ class PlanSerializable implements Serializable {
 				plan.addLeg(((LegSerializable) planElementSerializable).getLeg());
 		return plan;
 	}
+    public Plan getPlan() {
+        Plan plan = new PlanImpl();
+        plan.setScore(score);
+        plan.setType(type);
+        for (PlanElementSerializable planElementSerializable : planElements)
+            if (planElementSerializable instanceof ActivitySerializable)
+                plan.addActivity(((ActivitySerializable) planElementSerializable).getActivity());
+            else
+                plan.addLeg(((LegSerializable) planElementSerializable).getLeg());
+        return plan;
+    }
 
 }
