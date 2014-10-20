@@ -46,6 +46,9 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 	}
 	
 	public static <T> Id<T> create(final Id<?> id, final Class<T> type) {
+		if (id == null) {
+			return null;
+		}
 		return create(id.toString(), type);
 	}
 	

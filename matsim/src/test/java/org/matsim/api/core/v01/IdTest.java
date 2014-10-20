@@ -14,6 +14,20 @@ public class IdTest {
 		Assert.assertEquals("1", linkId1.toString());
 		Assert.assertEquals("2", linkId2.toString());
 	}
+
+	@Test
+	public void testIdConstructor() {
+		Id<TNode> nodeId1 = Id.create("1", TNode.class);
+		Id<TLink> linkId1 = Id.create(nodeId1, TLink.class);
+		
+		Assert.assertEquals("1", linkId1.toString());
+	}
+	
+	@Test
+	public void testIdConstructor_Null() {
+		Id<TLink> linkId1 = Id.create((Id) null, TLink.class);
+		Assert.assertNull(linkId1);
+	}
 	
 	@Test
 	public void testObjectIdentity_cache() {
