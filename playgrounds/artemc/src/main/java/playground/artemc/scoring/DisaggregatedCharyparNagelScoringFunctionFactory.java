@@ -34,6 +34,7 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
+import playground.artemc.heterogeneity.HeterogeneityConfig;
 import playground.artemc.scoring.functions.CharyparNagelActivityScoring;
 import playground.artemc.scoring.functions.CharyparNagelAgentStuckScoring;
 import playground.artemc.scoring.functions.CharyparNagelLegScoring;
@@ -60,7 +61,7 @@ public class DisaggregatedCharyparNagelScoringFunctionFactory implements Scoring
 	private final PlanCalcScoreConfigGroup config;
 	private PersonalScoringParameters params = null;
 	private HashMap<Id, ScoringFunction> personScoringFunctions;
-	private HashMap<Id<Person>, Double> incomeFactorMap = null;
+	private HashMap<Id<Person>, Double> incomeFactors = null;
 
 	
 	public DisaggregatedCharyparNagelScoringFunctionFactory(final PlanCalcScoreConfigGroup config, Network network) {
@@ -69,11 +70,11 @@ public class DisaggregatedCharyparNagelScoringFunctionFactory implements Scoring
 		this.personScoringFunctions = new HashMap<Id, ScoringFunction>();
 	}
 	
-	public DisaggregatedCharyparNagelScoringFunctionFactory(final PlanCalcScoreConfigGroup config, Network network, HashMap<Id<Person>, Double> incomeFactors) {
+	public DisaggregatedCharyparNagelScoringFunctionFactory(final PlanCalcScoreConfigGroup config, Network network, HeterogeneityConfig heterogeneityConfig) {
 		this.config = config;
 		this.network = network;
 		this.personScoringFunctions = new HashMap<Id, ScoringFunction>();
-		this.incomeFactorMap = incomeFactors;
+		this.incomeFactors = heterogeneityConfig.getIncomeFactors();
 	}
 
 	/**
@@ -106,12 +107,12 @@ public class DisaggregatedCharyparNagelScoringFunctionFactory implements Scoring
 			 */
 			this.params = new PersonalScoringParameters(this.config);
 			
-			if(incomeFactorMap!=null){
-				this.params.marginalUtilityOfMoney = this.params.marginalUtilityOfMoney * incomeFactorMap.get(person.getId());
-				this.params.marginalUtilityOfPerforming_s = this.params.marginalUtilityOfPerforming_s * (1.0/incomeFactorMap.get(person.getId()));
+			if(incomeFactors!=null){
+				this.params.marginalUtilityOfMoney = this.params.marginalUtilityOfMoney * incomeFactors.get(person.getId());
+				this.params.marginalUtilityOfPerforming_s = this.params.marginalUtilityOfPerforming_s * (1.0/incomeFactors.get(person.getId()));
 
 				for (Entry<String, Mode> mode : this.params.modeParams.entrySet()) {
-					mode.getValue().marginalUtilityOfTraveling_s = mode.getValue().marginalUtilityOfTraveling_s  * (1.0/incomeFactorMap.get(person.getId()));
+					mode.getValue().marginalUtilityOfTraveling_s = mode.getValue().marginalUtilityOfTraveling_s  * (1.0/incomeFactors.get(person.getId()));
 				}
 			}
 		}

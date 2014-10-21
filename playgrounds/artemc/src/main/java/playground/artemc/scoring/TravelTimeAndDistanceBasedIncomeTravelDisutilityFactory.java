@@ -28,6 +28,8 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
+import playground.artemc.heterogeneity.HeterogeneityConfig;
+
 
 /**
  * @author dgrether
@@ -35,15 +37,15 @@ import org.matsim.core.router.util.TravelTime;
  */
 public class TravelTimeAndDistanceBasedIncomeTravelDisutilityFactory implements TravelDisutilityFactory {
 
-	HashMap<Id<Person>, Double> factorMap;
+	HeterogeneityConfig heterogeneityConfig;
 	
-	public TravelTimeAndDistanceBasedIncomeTravelDisutilityFactory(HashMap<Id<Person>, Double> factorMap){
-		this.factorMap = factorMap;
+	public TravelTimeAndDistanceBasedIncomeTravelDisutilityFactory(HeterogeneityConfig heterogeneityConfig){
+		this.heterogeneityConfig = heterogeneityConfig;
 	}
 	
 	@Override
 	public TravelDisutility createTravelDisutility(TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup) {
-		return new TravelTimeAndDistanceBasedIncomeTravelDisutility(timeCalculator, cnScoringGroup, factorMap);
+		return new TravelTimeAndDistanceBasedIncomeTravelDisutility(timeCalculator, cnScoringGroup, heterogeneityConfig);
 	}
 
 }

@@ -31,6 +31,8 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
+import playground.artemc.heterogeneity.HeterogeneityConfig;
+
 /**
  * A simple cost calculator which only respects time and distance to calculate generalized costs
  *
@@ -41,13 +43,13 @@ public class TravelTimeAndDistanceBasedIncomeTravelDisutility implements TravelD
 	protected final TravelTime timeCalculator;
 	private final double marginalCostOfTime;
 	private final double marginalCostOfDistance;
-	private HashMap<Id<Person>, Double> factorMap;
+	private HashMap<Id<Person>, Double> incomeFactors;
 	
 	private static int wrnCnt = 0 ;
 
-	public TravelTimeAndDistanceBasedIncomeTravelDisutility(final TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, HashMap<Id<Person>, Double> factorMap) {
+	public TravelTimeAndDistanceBasedIncomeTravelDisutility(final TravelTime timeCalculator, PlanCalcScoreConfigGroup cnScoringGroup, HeterogeneityConfig heterogeneityConfig) {
 		this.timeCalculator = timeCalculator;
-		this.factorMap = factorMap;
+		this.incomeFactors = heterogeneityConfig.getIncomeFactors();
 		/* Usually, the travel-utility should be negative (it's a disutility)
 		 * but the cost should be positive. Thus negate the utility.
 		 */
@@ -74,7 +76,7 @@ public class TravelTimeAndDistanceBasedIncomeTravelDisutility implements TravelD
 //		}
 		// commenting this out since we think it is not (no longer?) necessary.  kai/benjamin, jun'11
 		
-		return this.marginalCostOfTime * (1.0/this.factorMap.get(person.getId())) * travelTime + this.marginalCostOfDistance * this.factorMap.get(person.getId()) * link.getLength();
+		return this.marginalCostOfTime * (1.0/this.incomeFactors.get(person.getId())) * travelTime + this.marginalCostOfDistance * this.incomeFactors.get(person.getId()) * link.getLength();
 	}
 
 	@Override

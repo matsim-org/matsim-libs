@@ -36,4 +36,18 @@
   	<version>5.1.24</version>
   </dependency>
   </dependencies>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.4</version>
+        <configuration>
+          <descriptor>src/main/assembly/assembly-release.xml</descriptor>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  
+
 </project>
