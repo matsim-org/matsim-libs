@@ -28,7 +28,7 @@ import org.matsim.contrib.transEnergySim.controllers.EventHandlerGroup;
 import org.matsim.contrib.transEnergySim.vehicles.api.BatteryElectricVehicle;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.*;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.ricardoFaria2012.EnergyConsumptionModelRicardoFaria2012;
-import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.ricardoFaria2012.EnergyConsumptionModelRicardoFaria2012factorised;
+//import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.ricardoFaria2012.EnergyConsumptionModelRicardoFaria2012factorised;
 import org.matsim.contrib.transEnergySim.vehicles.impl.BatteryElectricVehicleImpl;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -73,7 +73,7 @@ public class ElectroCabLaunchUtils
 
         EventHandlerGroup handlerGroup = new EventHandlerGroup();
 
-        EnergyConsumptionModel ecm = new EnergyConsumptionModelRicardoFaria2012factorised(2);
+        EnergyConsumptionModel ecm = new EnergyConsumptionModelRicardoFaria2012();
 
         travelDistanceEvaluator = new TravelDistanceTimeEvaluator(scenario.getNetwork());
         ecabhandler = new ElectricTaxiChargingHandler(events);
