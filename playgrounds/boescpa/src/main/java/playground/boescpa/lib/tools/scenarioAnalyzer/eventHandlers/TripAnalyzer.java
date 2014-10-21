@@ -21,6 +21,7 @@
 
 package playground.boescpa.lib.tools.scenarioAnalyzer.eventHandlers;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.events.handler.*;
@@ -50,10 +51,13 @@ import java.util.Map;
 public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,
 		ActivityStartEventHandler, PersonStuckEventHandler, LinkLeaveEventHandler {
 
+	private static Logger log = Logger.getLogger(TripAnalyzer.class);
+
 	private final TripHandler tripHandler;
 	private final Network network;
 	private Map<String, ModeResult> modes = new HashMap<>();
 	private Map<String, ActivityResult> activities = new HashMap<>();
+	private SpatialEventCutter spatialEventCutter = null;
 
 	public TripAnalyzer(Network network) {
 		this.tripHandler = new TripHandler();
@@ -138,6 +142,12 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 	}
 
 	private void analyzeEvents(SpatialEventCutter spatialEventCutter) {
+		if (spatialEventCutter.equals(null)) {
+			log.warn("No spatial event cutter provided. Will analyze the full network.");
+		} else {
+			this.spatialEventCutter = spatialEventCutter;
+		}
+
 		for (Id personId : tripHandler.getStartLink().keySet()) {
 			if (!personId.toString().contains("pt")) {
 				ArrayList<Id> startLinks = tripHandler.getStartLink().getValues(personId);
@@ -148,29 +158,42 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 				ArrayList<Double> endTimes = tripHandler.getEndTime().getValues(personId);
 				ArrayList<LinkedList<Id>> pathList = tripHandler.getPath().getValues(personId);
 
-				// todo-boescpa: Account for possibility that there is no endLink...
-
 				// Trip analysis:
 				for (int i = 0; i < startLinks.size(); i++) {
-					// todo-boescpa: Add spatial restriction...
-					ModeResult modeVals = getMode(modes.get(i));
-					modeVals.modeDistances.add((double)TripProcessor.calcTravelDistance(pathList.get(i), network, startLinks.get(i), endLinks.get(i)));
-					modeVals.modeDurations.add(TripProcessor.calcTravelTime(startTimes.get(i),endTimes.get(i)));
+					if (!endLinks.get(i).equals(null)) {
+						if (considerLink(startLinks.get(i)) || considerLink(endLinks.get(i))) {
+							ModeResult modeVals = getMode(modes.get(i));
+							modeVals.modeDistances.add((double) TripProcessor.calcTravelDistance(pathList.get(i), network, startLinks.get(i), endLinks.get(i)));
+							modeVals.modeDurations.add(TripProcessor.calcTravelTime(startTimes.get(i), endTimes.get(i)));
+						}
+					}
 				}
 
 				// Activity analysis:
-				// todo-boescpa: Add spatial restriction...
-				ActivityResult actVals = getActivity("home");
-				actVals.actDurations.add(startTimes.get(0));
-				for (int i = 1; i < startTimes.size(); i++) {
-					actVals = getActivity(purposes.get(i-1));
-					actVals.actDurations.add(startTimes.get(i) - endTimes.get(i-1));
+				ActivityResult actVals;
+				if (considerLink(startLinks.get(0))) {
+					actVals = getActivity("home");
+					actVals.actDurations.add(startTimes.get(0));
 				}
-				if (endTimes.get(endTimes.size()-1) < 24*60) {
+				for (int i = 1; i < startTimes.size(); i++) {
+					if (!endLinks.get(i).equals(null) && considerLink(endLinks.get(i))) {
+						actVals = getActivity(purposes.get(i - 1));
+						actVals.actDurations.add(startTimes.get(i) - endTimes.get(i - 1));
+					}
+				}
+				if (!endLinks.get(endLinks.size()-1).equals(null) && endTimes.get(endTimes.size()-1) < 24*60 && considerLink(endLinks.get(endLinks.size()-1))) {
 					actVals = getActivity("home");
 					actVals.actDurations.add(24*60 - endTimes.get(endTimes.size()-1));
 				}
 			}
+		}
+	}
+
+	private boolean considerLink(Id id) {
+		if (spatialEventCutter.equals(null)) {
+			return true; // if no spatial event cutter provided, always consider link.
+		} else {
+			return spatialEventCutter.spatiallyConsideringLink(network.getLinks().get(id));
 		}
 	}
 
