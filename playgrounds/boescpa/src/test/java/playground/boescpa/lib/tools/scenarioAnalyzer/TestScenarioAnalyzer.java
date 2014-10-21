@@ -61,10 +61,10 @@ public class TestScenarioAnalyzer {
 
 		// Analyze the events:
 		ScenarioAnalyzerEventHandler[] handlers = {
-				new AgentCounter(),
+				new AgentCounter(network),
 				new TripAnalyzer(network)
 		};
-		scenarioAnalyzer = new ScenarioAnalyzer(eventFile, handlers);
+		scenarioAnalyzer = new ScenarioAnalyzer(eventFile, 1, handlers);
 		scenarioAnalyzer.analyzeScenario();
 	}
 

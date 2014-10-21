@@ -44,10 +44,12 @@ public class ScenarioAnalyzer {
 	public static String DEL = "; ";
 
 	private final String eventsFile;
+	private final int scaleFactor;
 	private final ScenarioAnalyzerEventHandler[] scenarioAnalyzerEventHandlers;
 
-	public ScenarioAnalyzer(String eventsFile, ScenarioAnalyzerEventHandler[] scenarioAnalyzerEventHandlers) {
+	public ScenarioAnalyzer(String eventsFile, int scaleFactor, ScenarioAnalyzerEventHandler[] scenarioAnalyzerEventHandlers) {
 		this.eventsFile = eventsFile;
+		this.scaleFactor = scaleFactor;
 		this.scenarioAnalyzerEventHandlers = scenarioAnalyzerEventHandlers;
 	}
 
@@ -70,7 +72,7 @@ public class ScenarioAnalyzer {
 
 		// Ask handlers for the results:
 		for (ScenarioAnalyzerEventHandler handler : scenarioAnalyzerEventHandlers) {
-			results += handler.createResults(spatialEventCutter) + NL;
+			results += handler.createResults(spatialEventCutter, scaleFactor) + NL;
 		}
 
 		showResultsOnTerminal(results);

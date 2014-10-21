@@ -34,5 +34,5 @@ public interface ScenarioAnalyzerEventHandler extends EventHandler {
 	 * @param spatialEventCutter
 	 * @return Results of the analysis in form of a (multiline) string.
 	 */
-	public String createResults(SpatialEventCutter spatialEventCutter);
+	public String createResults(SpatialEventCutter spatialEventCutter, int scaleFactor);
 }

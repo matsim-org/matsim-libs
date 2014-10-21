@@ -218,6 +218,8 @@ public abstract class TripProcessor {
 			travelDistance += (int) Math.sqrt(
 					((coordsEndLink.getX() - coordsStartLink.getX())*(coordsEndLink.getX() - coordsStartLink.getX()))
 					+ ((coordsEndLink.getY() - coordsStartLink.getY())*(coordsEndLink.getY() - coordsStartLink.getY())));
+			// and scale it with a factor to account for non-euclidian detours on "real" path
+			travelDistance *= 1.51; // 1.51 was estimated by comparing euclidian and non-euclidian distances for a large scenario (ToPDAd)...
 		}
 		return travelDistance;
 	}

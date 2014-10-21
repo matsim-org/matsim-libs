@@ -55,6 +55,7 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 
 	private final TripHandler tripHandler;
 	private final Network network;
+	private int scaleFactor = 1;
 	private Map<String, ModeResult> modes = new HashMap<>();
 	private Map<String, ActivityResult> activities = new HashMap<>();
 	private SpatialEventCutter spatialEventCutter = null;
@@ -107,7 +108,9 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 	 * @return A multiline String containing the above listed results.
 	 */
 	@Override
-	public String createResults(SpatialEventCutter spatialEventCutter) {
+	public String createResults(SpatialEventCutter spatialEventCutter, int scaleFactor) {
+		this.scaleFactor = scaleFactor;
+
 		analyzeEvents(spatialEventCutter);
 		String results = getTripResults();
 		results += ScenarioAnalyzer.NL;
@@ -116,9 +119,12 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 	}
 
 	private String getTripResults() {
-		String results = "Mode; NumberOfTrips; TotalDistance; MeanDistance; VarianceDistance; TotalDuration; MeanDuration; Variance Duration" + ScenarioAnalyzer.NL;
+		String results = "Mode; NumberOfTrips; TotalDuration; MeanDuration; Variance Duration; TotalDistance; MeanDistance; VarianceDistance" + ScenarioAnalyzer.NL;
 		for (String mode : modes.keySet()) {
 			Double[] modeVals = modes.get(mode).getModeVals();
+			if (mode.contains("pt")) {
+				correctForAdditionalDistancePT(modeVals);
+			}
 			results += mode + ScenarioAnalyzer.DEL;
 			for (int i = 0; i < (modeVals.length - 1); i++) {
 				results += modeVals[i] + ScenarioAnalyzer.DEL;
@@ -126,6 +132,12 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 			results += modeVals[modeVals.length - 1] + ScenarioAnalyzer.NL;
 		}
 		return results;
+	}
+
+	private void correctForAdditionalDistancePT(Double[] modeVals) {
+		for (int i = 4; i < 7; i++) {
+			modeVals[i] *= 1.2;
+		}
 	}
 
 	private String getActivityResults() {
@@ -207,7 +219,7 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 		public ArrayList<Double> modeDurations = new ArrayList<>();
 
 		/**
-		 * @return NumberOfTrips; TotalDistance; MeanDistance; VarianceDistance; TotalDuration; MeanDuration; Variance Duration;
+		 * @return NumberOfTrips; TotalDuration; MeanDuration; Variance Duration; TotalDistance; MeanDistance; VarianceDistance
 		 */
 		public Double[] getModeVals() {
 			Double[] modeVals = new Double[7];
@@ -215,21 +227,26 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 			// Number of Trips:
 			modeVals[0] = (double)modeDistances.size();
 
-			// Distance [km]: Total, Mean and Variance
-			modeVals[1] = total(modeDistances);
+			// Duration [min]: Total, Mean and Variance
+			modeVals[1] = total(modeDurations);
 			modeVals[2] = modeVals[1]/modeVals[0];
-			modeVals[3] = var(modeDistances, modeVals[2]);
+			modeVals[3] = var(modeDurations, modeVals[2]);
 			for (int i = 1; i < 4; i++) {
+				modeVals[i] /= 60;
+			}
+
+			// Distance [km]: Total, Mean and Variance
+			modeVals[4] = total(modeDistances);
+			modeVals[5] = modeVals[4]/modeVals[0];
+			modeVals[6] = var(modeDistances, modeVals[5]);
+			for (int i = 4; i < 7; i++) {
 				modeVals[i] /= 1000;
 			}
 
-			// Duration [min]: Total, Mean and Variance
-			modeVals[4] = total(modeDurations);
-			modeVals[5] = modeVals[4]/modeVals[0];
-			modeVals[6] = var(modeDurations, modeVals[5]);
-			for (int i = 4; i < 7; i++) {
-				modeVals[i] /= 60;
-			}
+			// Scale mode vals:
+			modeVals[0] *= scaleFactor;
+			modeVals[1] *= scaleFactor;
+			modeVals[4] *= scaleFactor;
 
 			return modeVals;
 		}
@@ -248,7 +265,7 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 		public ArrayList<Double> actDurations = new ArrayList<>();
 
 		/**
-		 * @return NumberOfExecutions; TotalDuration; MeanDuration; Variance Duration;
+		 * @return NumberOfExecutions; TotalDuration; MeanDuration; Variance Duration
 		 */
 		public Double[] getActVals() {
 			Double[] actVals = new Double[4];
@@ -263,6 +280,10 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 			for (int i = 1; i < 4; i++) {
 				actVals[i] /= 60;
 			}
+
+			// Scale act vals:
+			actVals[0] *= scaleFactor;
+			actVals[1] *= scaleFactor;
 
 			return actVals;
 		}
