@@ -148,7 +148,9 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 				scoringFunction.handleActivity(activity);
 			}
 			else{
-				FreightActivity freightActivity = new FreightActivity(activity, getTourActivity().getTimeWindow());
+				TourActivity tourActivity = getTourActivity();
+				assert activity.getLinkId().toString().equals(tourActivity.getLocation().toString()) : "linkId of activity is not equal to linkId of tourActivity. This must not be.";
+				FreightActivity freightActivity = new FreightActivity(activity, tourActivity.getTimeWindow());
 				currentActivity = freightActivity; 
 			}
 		}
@@ -160,6 +162,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 		 * @param time
 		 */
 		private void activityFinished(String activityType, double time) {
+			if(FreightConstants.START.equals(activityType) || FreightConstants.END.equals(activityType)) return;
 			Tour tour = this.scheduledTour.getTour();
 			if (FreightConstants.PICKUP.equals(activityType)) {
 				Pickup tourElement = (Pickup) tour.getTourElements().get(activityCounter);
@@ -169,6 +172,10 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 			} else if (FreightConstants.DELIVERY.equals(activityType)) {
 				Delivery tourElement = (Delivery) tour.getTourElements().get(activityCounter);
 				notifyDelivery(driverId,tourElement.getShipment(), time);
+				activityCounter += 2;
+			}
+			else{
+				//notify activity ends ??
 				activityCounter += 2;
 			}
 		}
