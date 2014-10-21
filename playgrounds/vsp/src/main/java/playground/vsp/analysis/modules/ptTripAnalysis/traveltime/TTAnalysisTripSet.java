@@ -248,39 +248,39 @@ public class TTAnalysisTripSet extends AbstractAnalysisTripSet{
 		
 		//[0]inside, [1]leaving Zone, [2]entering Zone, [3] outSide
 		//print header
-		b.append(";inside Zone;leaving Zone;entering Zone;outside Zone; \n");
+		b.append("#;inside Zone;leaving Zone;entering Zone;outside Zone \n");
 		
 		//values for all modes	
-		b.append("sumTTime;"); super.println(this.sumTTime, b);
-		b.append("tripCnt;"); super.println(this.tripCnt, b);
+		b.append("sumTTime"); super.println(this.sumTTime, b);
+		b.append("tripCnt"); super.println(this.tripCnt, b);
 		
 		//values for pt
 		if(this.ptModes.contains(super.getMode())){
-			b.append("accesWalkCnt;"); super.println(this.accesWalkCnt, b);
-			b.append("accesWaitCnt;"); super.println(this.accesWaitCnt, b);
-			b.append("egressWalkCnt;"); super.println(this.egressWalkCnt, b);
-			b.append("switchWalkCnt;"); super.println(this.switchWalkCnt, b);
-			b.append("switchWaitCnt;"); super.println(this.switchWaitCnt, b);
-			b.append("lineCnt;"); super.println(this.lineCnt, b);
+			b.append("accesWalkCnt"); super.println(this.accesWalkCnt, b);
+			b.append("accesWaitCnt"); super.println(this.accesWaitCnt, b);
+			b.append("egressWalkCnt"); super.println(this.egressWalkCnt, b);
+			b.append("switchWalkCnt"); super.println(this.switchWalkCnt, b);
+			b.append("switchWaitCnt"); super.println(this.switchWaitCnt, b);
+			b.append("lineCnt"); super.println(this.lineCnt, b);
 			
-			b.append("accesWalkTTime;"); super.println(this.accesWalkTTime, b);
-			b.append("accesWaitTime;"); super.println(this.accesWaitTime, b);
-			b.append("egressWalkTTime;"); super.println(this.egressWalkTTime, b);
-			b.append("switchWalkTTime;"); super.println(this.switchWalkTTime, b);
-			b.append("switchWaitTime;"); super.println(this.switchWaitTime, b);
-			b.append("lineTTime;"); super.println(this.lineTTime, b);
+			b.append("accesWalkTTime"); super.println(this.accesWalkTTime, b);
+			b.append("accesWaitTime"); super.println(this.accesWaitTime, b);
+			b.append("egressWalkTTime"); super.println(this.egressWalkTTime, b);
+			b.append("switchWalkTTime"); super.println(this.switchWalkTTime, b);
+			b.append("switchWaitTime"); super.println(this.switchWaitTime, b);
+			b.append("lineTTime"); super.println(this.lineTTime, b);
 			
-			b.append("line1cnt;"); super.println(this.line1cnt, b);
-			b.append("line2cnt;"); super.println(this.line2cnt, b);
-			b.append("line3cnt;");super.println(this.line3cnt, b);
-			b.append("line4cnt;");super.println(this.line4cnt, b);
-			b.append("line5cnt;");super.println(this.line5cnt, b);
-			b.append("line6cnt;");super.println(this.line6cnt, b);
-			b.append("line7cnt;");super.println(this.line7cnt, b);
-			b.append("line8cnt;");super.println(this.line8cnt, b);
-			b.append("line9cnt;");super.println(this.line9cnt, b);
-			b.append("line10cnt;");super.println(this.line10cnt, b);
-			b.append("lineGt10cnt;");super.println(this.lineGt10cnt, b);
+			b.append("line1cnt"); super.println(this.line1cnt, b);
+			b.append("line2cnt"); super.println(this.line2cnt, b);
+			b.append("line3cnt");super.println(this.line3cnt, b);
+			b.append("line4cnt");super.println(this.line4cnt, b);
+			b.append("line5cnt");super.println(this.line5cnt, b);
+			b.append("line6cnt");super.println(this.line6cnt, b);
+			b.append("line7cnt");super.println(this.line7cnt, b);
+			b.append("line8cnt");super.println(this.line8cnt, b);
+			b.append("line9cnt");super.println(this.line9cnt, b);
+			b.append("line10cnt");super.println(this.line10cnt, b);
+			b.append("lineGt10cnt");super.println(this.lineGt10cnt, b);
 		}
 		return b.toString();
 	}
