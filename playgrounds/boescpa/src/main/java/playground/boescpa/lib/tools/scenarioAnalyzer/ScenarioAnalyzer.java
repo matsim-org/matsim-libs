@@ -27,13 +27,10 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
 import playground.boescpa.lib.tools.scenarioAnalyzer.eventHandlers.ScenarioAnalyzerEventHandler;
-import playground.boescpa.lib.tools.scenarioAnalyzer.eventHandlers.TripAnalyzer;
 import playground.boescpa.lib.tools.scenarioAnalyzer.spatialEventCutters.SpatialEventCutter;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Analyzes a given events file for given handlers and lets you read out the handlers for several areas.
