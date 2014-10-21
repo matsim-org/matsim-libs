@@ -85,7 +85,7 @@ public abstract class AbstractAnalysisTripSet {
 	 */
 	public void println(Number[] d, StringBuffer b){
 		for(int i = 0; i< d.length; i++){
-			b.append(String.valueOf(d[i]) + ";");
+			b.append(";" + String.valueOf(d[i]));
 		}
 		b.append("\n");
 	}
