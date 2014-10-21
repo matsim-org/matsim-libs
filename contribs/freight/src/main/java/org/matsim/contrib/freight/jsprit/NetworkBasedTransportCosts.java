@@ -361,6 +361,8 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		private Network network;
 		
 		private Map<String,VehicleTypeVarCosts> typeSpecificCosts = new HashMap<String, NetworkBasedTransportCosts.VehicleTypeVarCosts>();
+
+		private boolean isFIFO = false;
 		
 		/**
 		 * Creates the builder requiring {@link Network} and a collection of {@link CarrierVehicleType}.
@@ -414,7 +416,8 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		/**
 		 * Ensures FIFO. ! NOT YET ENABLED.
 		 */
-		Builder setFIFO(boolean isFIFO){
+		public Builder setFIFO(boolean isFIFO){
+			this.isFIFO =isFIFO;
 			return this;
 		}
 
@@ -451,6 +454,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		 */
 		public NetworkBasedTransportCosts build(){
 			if(baseDisutility == null){
+				if(isFIFO) travelTime = new FiFoTravelTime(travelTime, timeSliceWidth);
 				baseDisutility = new BaseVehicleTransportCosts(typeSpecificCosts, travelTime);
 			}
 			if(withToll){
