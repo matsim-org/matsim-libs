@@ -71,7 +71,6 @@ public class TestScenarioAnalyzer {
 	@Test
 	public void testAnalyzer() {
 		// Return the results:
-		SpatialEventCutter spatialEventCutter = null;
-		scenarioAnalyzer.createResults(utils.getOutputDirectory() + "scenarioAnalyzerResults.txt", spatialEventCutter);
+		scenarioAnalyzer.createResults(utils.getOutputDirectory() + "scenarioAnalyzerResults.txt", null);
 	}
 }
