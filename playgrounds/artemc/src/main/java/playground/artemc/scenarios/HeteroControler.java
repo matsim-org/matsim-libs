@@ -28,9 +28,9 @@ import playground.artemc.transitRouterEventsBased.TransitRouterWSImplFactory;
 import playground.artemc.transitRouterEventsBased.stopStopTimes.StopStopTimeCalculator;
 import playground.artemc.transitRouterEventsBased.waitTimes.WaitTimeStuckCalculator;
 
-public class CorridorController {
+public class HeteroControler {
 
-	private static final Logger log = Logger.getLogger(CorridorController.class);
+	private static final Logger log = Logger.getLogger(HeteroControler.class);
 
 	private static String input;
 	private static String output;
@@ -51,7 +51,7 @@ public class CorridorController {
 				heteroSwitch=true;
 		}
 
-		CorridorController  runner = new CorridorController();
+		HeteroControler  runner = new HeteroControler();
 		runner.run();
 	}
 
