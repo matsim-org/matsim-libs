@@ -59,7 +59,9 @@ public class CorridorController {
 
 		Controler controler = null;
 		Scenario scenario = initSampleScenario();
+		System.setProperty("matsim.preferLocalDtds", "true");
 		controler = new Controler(scenario);
+		
 
 		Initializer initializer = new Initializer();
 		controler.addControlerListener(initializer);
