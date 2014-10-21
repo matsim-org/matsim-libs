@@ -25,10 +25,8 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import java.awt.*;
-import java.util.HashMap;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeSet;
 
 
 /**
@@ -76,13 +74,26 @@ public final class BVGLines2PtModes implements PtMode2LineSetter{
 	}
 
 	
-	public Set<String> getTypesSupported(){
-		Set<String> types = new TreeSet<String>();
-		types.add(BVGLines2PtModes.BUS);
-		types.add(BVGLines2PtModes.TRAM);
-		types.add(BVGLines2PtModes.SBAHN);
-		types.add(BVGLines2PtModes.UBAHN);
-		types.add(BVGLines2PtModes.OTHER);
+	public LinkedList<String> getTypesPresentInIncreasingImportance(){
+		LinkedList<String> types = new LinkedList<String>();
+		if(this.lineId2ptMode.containsValue(BVGLines2PtModes.OTHER)) {
+			types.add(BVGLines2PtModes.OTHER);
+		}
+		if(this.lineId2ptMode.containsValue(BVGLines2PtModes.SBAHN)) {
+			types.add(BVGLines2PtModes.SBAHN);
+		}
+		if(this.lineId2ptMode.containsValue(BVGLines2PtModes.UBAHN)) {
+			types.add(BVGLines2PtModes.UBAHN);
+		}
+		if(this.lineId2ptMode.containsValue(BVGLines2PtModes.TRAM)) {
+			types.add(BVGLines2PtModes.TRAM);
+		}
+		if(this.lineId2ptMode.containsValue(BVGLines2PtModes.BUS)) {
+			types.add(BVGLines2PtModes.BUS);
+		}
+		if(this.lineId2ptMode.containsValue(this.pIdentifier)) {
+			types.add(this.pIdentifier);
+		}
 		return types;
 	}
 	
@@ -92,21 +103,25 @@ public final class BVGLines2PtModes implements PtMode2LineSetter{
 	
 	public Color getColorForLine(Id<TransitLine> lineId) {
 		String lineType = this.lineId2ptMode.get(lineId);
+		return this.getColorForType(lineType);
+	}
+	
+	public Color getColorForType(String type) {
 		Color color;
-		if (lineType != null) {
-			if (lineType.equalsIgnoreCase(BVGLines2PtModes.BUS)) {
+		if (type != null) {
+			if (type.equalsIgnoreCase(BVGLines2PtModes.BUS)) {
 //				color = Color.MAGENTA;
 				color = new Color(149, 39, 110);
-			} else if (lineType.equalsIgnoreCase(BVGLines2PtModes.TRAM)) {
+			} else if (type.equalsIgnoreCase(BVGLines2PtModes.TRAM)) {
 //				color = Color.RED;
 				color = new Color(190, 20, 20);
-			} else if (lineType.equalsIgnoreCase(BVGLines2PtModes.SBAHN)) {
+			} else if (type.equalsIgnoreCase(BVGLines2PtModes.SBAHN)) {
 //				color = Color.GREEN;
 				color = new Color(64, 131, 53);
-			} else if (lineType.equalsIgnoreCase(BVGLines2PtModes.UBAHN)) {
+			} else if (type.equalsIgnoreCase(BVGLines2PtModes.UBAHN)) {
 //				color = Color.BLUE;
 				color = new Color(17, 93, 145);
-			} else if (lineType.equalsIgnoreCase(this.pIdentifier)) {
+			} else if (type.equalsIgnoreCase(this.pIdentifier)) {
 //				color = Color.CYAN;
 				color = new Color(82, 141, 186);
 			} else {
