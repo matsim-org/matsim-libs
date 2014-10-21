@@ -56,8 +56,7 @@ public class TransitRouterNetworkWriter extends MatsimXmlWriter implements Matsi
 	}
 
 	public void writeFileV1(final String filename) throws UncheckedIOException {
-//		String dtd = "http://www.matsim.org/files/dtd/transitRouterNetwork_v1.dtd";
-		String dtd = "./src/main/resources/playground/christoph/evacuation/pt/transitRouterNetwork_v1.dtd";
+		String dtd = "transitRouterNetwork_v1.dtd";
 
 		nodesCounter.reset();
 		linksCounter.reset();
