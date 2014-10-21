@@ -51,6 +51,9 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
@@ -85,17 +88,22 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		eventsManager.addHandler(new EventsPrinter());
 		
 		makeNetwork(scenario.getNetwork());
-		Person driver = makeNonStopDriver(Id.create("p1", Person.class), Id.create("v1", Vehicle.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		final Person driver = makeNonStopDriver(Id.create("p1", Person.class), Id.create("v1", Vehicle.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
 
 		Tuple<QSim, JointDepartureOrganizer> tuple = makeQSim(scenario, eventsManager); 
-		QSim qSim = tuple.getFirst();
-		JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
+		final QSim qSim = tuple.getFirst();
+		final JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
 		
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
-		Set<Id<Person>> passengerIds = new LinkedHashSet<>();
-		JointDeparture jointDeparture = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
-		assignJointDeparture(driver, 1, jointDeparture, jointDepartureOrganizer);
+		qSim.addQueueSimulationListeners(new MobsimInitializedListener() {
+			@Override
+			public void notifyMobsimInitialized(MobsimInitializedEvent e) {
+				Set<Id<Person>> passengerIds = new LinkedHashSet<>();
+				JointDeparture jointDeparture = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
+				assignJointDeparture(qSim, driver, 1, jointDeparture, jointDepartureOrganizer);				
+			}
+		});
 		
 		boolean caughtException = false;
 		try {
@@ -117,32 +125,38 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		eventsManager.addHandler(new EventsPrinter());
 		
 		makeNetwork(scenario.getNetwork());
-		Person driver = makeNonStopDriver(Id.create("p1", Person.class), Id.create("v1", Vehicle.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
-		Person passenger1 = makeNonStopPassenger(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
-		Person passenger2 = makeNonStopPassenger(Id.create("p3", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
-		Person passenger3 = makeNonStopPassenger(Id.create("p4", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
-		Person passenger4 = makeNonStopPassenger(Id.create("p5", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
-		Person passenger5 = makeNonStopPassenger(Id.create("p6", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		final Person driver = makeNonStopDriver(Id.create("p1", Person.class), Id.create("v1", Vehicle.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		final Person passenger1 = makeNonStopPassenger(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		final Person passenger2 = makeNonStopPassenger(Id.create("p3", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		final Person passenger3 = makeNonStopPassenger(Id.create("p4", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		final Person passenger4 = makeNonStopPassenger(Id.create("p5", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		final Person passenger5 = makeNonStopPassenger(Id.create("p6", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
 		
 		Tuple<QSim, JointDepartureOrganizer> tuple = makeQSim(scenario, eventsManager); 
-		QSim qSim = tuple.getFirst();
-		JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
+		final QSim qSim = tuple.getFirst();
+		final JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
 		
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
-		Set<Id<Person>> passengerIds = new LinkedHashSet<>();
-		passengerIds.add(Id.create("p2", Person.class));
-		passengerIds.add(Id.create("p3", Person.class));
-		passengerIds.add(Id.create("p4", Person.class));
-		passengerIds.add(Id.create("p5", Person.class));
-		passengerIds.add(Id.create("p6", Person.class));
-		JointDeparture jointDeparture = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
-		assignJointDeparture(driver, 1, jointDeparture, jointDepartureOrganizer);
-		assignJointDeparture(passenger1, 1, jointDeparture, jointDepartureOrganizer);
-		assignJointDeparture(passenger2, 1, jointDeparture, jointDepartureOrganizer);
-		assignJointDeparture(passenger3, 1, jointDeparture, jointDepartureOrganizer);
-		assignJointDeparture(passenger4, 1, jointDeparture, jointDepartureOrganizer);
-		assignJointDeparture(passenger5, 1, jointDeparture, jointDepartureOrganizer);
+		qSim.addQueueSimulationListeners(new MobsimInitializedListener() {
+			@Override
+			public void notifyMobsimInitialized(MobsimInitializedEvent e) {
+				Set<Id<Person>> passengerIds = new LinkedHashSet<>();
+				passengerIds.add(Id.create("p2", Person.class));
+				passengerIds.add(Id.create("p3", Person.class));
+				passengerIds.add(Id.create("p4", Person.class));
+				passengerIds.add(Id.create("p5", Person.class));
+				passengerIds.add(Id.create("p6", Person.class));
+				JointDeparture jointDeparture = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
+				assignJointDeparture(qSim, driver, 1, jointDeparture, jointDepartureOrganizer);
+				assignJointDeparture(qSim, passenger1, 1, jointDeparture, jointDepartureOrganizer);
+				assignJointDeparture(qSim, passenger2, 1, jointDeparture, jointDepartureOrganizer);
+				assignJointDeparture(qSim, passenger3, 1, jointDeparture, jointDepartureOrganizer);
+				assignJointDeparture(qSim, passenger4, 1, jointDeparture, jointDepartureOrganizer);
+				assignJointDeparture(qSim, passenger5, 1, jointDeparture, jointDepartureOrganizer);
+			}
+		});
+		
 		
 		boolean caughtException = false;
 		try {
@@ -167,17 +181,22 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		eventsManager.addHandler(eventsCounter);
 		
 		makeNetwork(scenario.getNetwork());
-		Person driver = makeNonStopDriver(Id.create("p1", Person.class), Id.create("v1", Vehicle.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		final Person driver = makeNonStopDriver(Id.create("p1", Person.class), Id.create("v1", Vehicle.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
 		
 		Tuple<QSim, JointDepartureOrganizer> tuple = makeQSim(scenario, eventsManager); 
-		QSim qSim = tuple.getFirst();
-		JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
+		final QSim qSim = tuple.getFirst();
+		final JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
 		
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
-		Set<Id<Person>> passengerIds = new LinkedHashSet<>();
-		JointDeparture jointDeparture = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
-		assignJointDeparture(driver, 1, jointDeparture, jointDepartureOrganizer);
+		qSim.addQueueSimulationListeners(new MobsimInitializedListener() {
+			@Override
+			public void notifyMobsimInitialized(MobsimInitializedEvent e) {	
+				Set<Id<Person>> passengerIds = new LinkedHashSet<>();
+				JointDeparture jointDeparture = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
+				assignJointDeparture(qSim, driver, 1, jointDeparture, jointDepartureOrganizer);
+			}
+		});
 		
 		qSim.run();
 		
@@ -210,20 +229,25 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		eventsManager.addHandler(eventsCounter);
 		
 		makeNetwork(scenario.getNetwork());
-		Person driver = makeNonStopDriver(Id.create("p1", Person.class), Id.create("v1", Vehicle.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
-		Person passenger = makeNonStopPassenger(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3660.0);
+		final Person driver = makeNonStopDriver(Id.create("p1", Person.class), Id.create("v1", Vehicle.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		final Person passenger = makeNonStopPassenger(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3660.0);
 		
 		Tuple<QSim, JointDepartureOrganizer> tuple = makeQSim(scenario, eventsManager); 
-		QSim qSim = tuple.getFirst();
-		JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
+		final QSim qSim = tuple.getFirst();
+		final JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
 		
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
-		Set<Id<Person>> passengerIds = new LinkedHashSet<>();
-		passengerIds.add(Id.create("p2", Person.class));
-		JointDeparture jointDeparture = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
-		assignJointDeparture(driver, 1, jointDeparture, jointDepartureOrganizer);
-		assignJointDeparture(passenger, 1, jointDeparture, jointDepartureOrganizer);
+		qSim.addQueueSimulationListeners(new MobsimInitializedListener() {
+			@Override
+			public void notifyMobsimInitialized(MobsimInitializedEvent e) {	
+				Set<Id<Person>> passengerIds = new LinkedHashSet<>();
+				passengerIds.add(Id.create("p2", Person.class));
+				JointDeparture jointDeparture = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
+				assignJointDeparture(qSim, driver, 1, jointDeparture, jointDepartureOrganizer);
+				assignJointDeparture(qSim, passenger, 1, jointDeparture, jointDepartureOrganizer);
+			}
+		});
 		
 		qSim.run();
 		
@@ -259,20 +283,25 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		eventsManager.addHandler(eventsCounter);
 		
 		makeNetwork(scenario.getNetwork());
-		Person driver = makeNonStopDriver(Id.create("p1", Person.class), Id.create("v1", Vehicle.class), scenario.getPopulation(), scenario.getNetwork(), 3660.0);
-		Person passenger = makeNonStopPassenger(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		final Person driver = makeNonStopDriver(Id.create("p1", Person.class), Id.create("v1", Vehicle.class), scenario.getPopulation(), scenario.getNetwork(), 3660.0);
+		final Person passenger = makeNonStopPassenger(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
 		
 		Tuple<QSim, JointDepartureOrganizer> tuple = makeQSim(scenario, eventsManager); 
-		QSim qSim = tuple.getFirst();
-		JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
+		final QSim qSim = tuple.getFirst();
+		final JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
 		
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
-		Set<Id<Person>> passengerIds = new LinkedHashSet<>();
-		passengerIds.add(Id.create("p2", Person.class));
-		JointDeparture jointDeparture = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
-		assignJointDeparture(driver, 1, jointDeparture, jointDepartureOrganizer);
-		assignJointDeparture(passenger, 1, jointDeparture, jointDepartureOrganizer);
+		qSim.addQueueSimulationListeners(new MobsimInitializedListener() {
+			@Override
+			public void notifyMobsimInitialized(MobsimInitializedEvent e) {	
+				Set<Id<Person>> passengerIds = new LinkedHashSet<>();
+				passengerIds.add(Id.create("p2", Person.class));
+				JointDeparture jointDeparture = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
+				assignJointDeparture(qSim, driver, 1, jointDeparture, jointDepartureOrganizer);
+				assignJointDeparture(qSim, passenger, 1, jointDeparture, jointDepartureOrganizer);
+			}
+		});
 		
 		qSim.run();
 		
@@ -310,21 +339,26 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		eventsManager.addHandler(eventsCounter);
 		
 		makeNetwork(scenario.getNetwork());
-		Person driver = makeDropOffPickupDriver(Id.create("p1", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0, 3650.0);
-		Person passenger = makeDriverThenPassenger(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		final Person driver = makeDropOffPickupDriver(Id.create("p1", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0, 3650.0);
+		final Person passenger = makeDriverThenPassenger(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
 		
 		Tuple<QSim, JointDepartureOrganizer> tuple = makeQSim(scenario, eventsManager); 
-		QSim qSim = tuple.getFirst();
-		JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
+		final QSim qSim = tuple.getFirst();
+		final JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
 		
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v0", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
-		Set<Id<Person>> passengerIds = new LinkedHashSet<>();
-		passengerIds.add(Id.create("p2", Person.class));
-		JointDeparture jointDeparture = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
-		assignJointDeparture(driver, 3, jointDeparture, jointDepartureOrganizer);
-		assignJointDeparture(passenger, 3, jointDeparture, jointDepartureOrganizer);
+		qSim.addQueueSimulationListeners(new MobsimInitializedListener() {
+			@Override
+			public void notifyMobsimInitialized(MobsimInitializedEvent e) {	
+				Set<Id<Person>> passengerIds = new LinkedHashSet<>();
+				passengerIds.add(Id.create("p2", Person.class));
+				JointDeparture jointDeparture = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
+				assignJointDeparture(qSim, driver, 3, jointDeparture, jointDepartureOrganizer);
+				assignJointDeparture(qSim, passenger, 3, jointDeparture, jointDepartureOrganizer);
+			}
+		});
 		
 		qSim.run();
 		
@@ -360,24 +394,29 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		eventsManager.addHandler(eventsCounter);
 		
 		makeNetwork(scenario.getNetwork());
-		Person driver = makeDropOffPickupDriver(Id.create("p1", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0, 3650.0);
-		Person passenger = makePickUpPassenger(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3700.0);
+		final Person driver = makeDropOffPickupDriver(Id.create("p1", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0, 3650.0);
+		final Person passenger = makePickUpPassenger(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3700.0);
 		
 		Tuple<QSim, JointDepartureOrganizer> tuple = makeQSim(scenario, eventsManager); 
-		QSim qSim = tuple.getFirst();
-		JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
+		final QSim qSim = tuple.getFirst();
+		final JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
 		
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
-		Set<Id<Person>> passengerIds = new LinkedHashSet<>();
-		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
-		assignJointDeparture(driver, 1, jointDeparture1, jointDepartureOrganizer);
-		
-		passengerIds = new LinkedHashSet<>();
-		passengerIds.add(Id.create("p2", Person.class));
-		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
-		assignJointDeparture(driver, 3, jointDeparture2, jointDepartureOrganizer);
-		assignJointDeparture(passenger, 1, jointDeparture2, jointDepartureOrganizer);
+		qSim.addQueueSimulationListeners(new MobsimInitializedListener() {
+			@Override
+			public void notifyMobsimInitialized(MobsimInitializedEvent e) {	
+				Set<Id<Person>> passengerIds = new LinkedHashSet<>();
+				JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
+				assignJointDeparture(qSim, driver, 1, jointDeparture1, jointDepartureOrganizer);
+				
+				passengerIds = new LinkedHashSet<>();
+				passengerIds.add(Id.create("p2", Person.class));
+				JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
+				assignJointDeparture(qSim, driver, 3, jointDeparture2, jointDepartureOrganizer);
+				assignJointDeparture(qSim, passenger, 1, jointDeparture2, jointDepartureOrganizer);
+			}
+		});
 		
 		qSim.run();
 		
@@ -413,24 +452,29 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		eventsManager.addHandler(eventsCounter);
 		
 		makeNetwork(scenario.getNetwork());
-		Person driver = makeDropOffPickupDriver(Id.create("p1", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0, 3700.0);
-		Person passenger = makePickUpPassenger(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3650.0);
+		final Person driver = makeDropOffPickupDriver(Id.create("p1", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0, 3700.0);
+		final Person passenger = makePickUpPassenger(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3650.0);
 		
 		Tuple<QSim, JointDepartureOrganizer> tuple = makeQSim(scenario, eventsManager); 
-		QSim qSim = tuple.getFirst();
-		JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
+		final QSim qSim = tuple.getFirst();
+		final JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
 		
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
-		Set<Id<Person>> passengerIds = new LinkedHashSet<>();
-		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
-		assignJointDeparture(driver, 1, jointDeparture1, jointDepartureOrganizer);
-		
-		passengerIds = new LinkedHashSet<>();
-		passengerIds.add(Id.create("p2", Person.class));
-		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
-		assignJointDeparture(driver, 3, jointDeparture2, jointDepartureOrganizer);
-		assignJointDeparture(passenger, 1, jointDeparture2, jointDepartureOrganizer);
+		qSim.addQueueSimulationListeners(new MobsimInitializedListener() {
+			@Override
+			public void notifyMobsimInitialized(MobsimInitializedEvent e) {	
+				Set<Id<Person>> passengerIds = new LinkedHashSet<>();
+				JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
+				assignJointDeparture(qSim, driver, 1, jointDeparture1, jointDepartureOrganizer);
+				
+				passengerIds = new LinkedHashSet<>();
+				passengerIds.add(Id.create("p2", Person.class));
+				JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
+				assignJointDeparture(qSim, driver, 3, jointDeparture2, jointDepartureOrganizer);
+				assignJointDeparture(qSim, passenger, 1, jointDeparture2, jointDepartureOrganizer);
+			}
+		});
 		
 		qSim.run();
 		
@@ -466,28 +510,33 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		eventsManager.addHandler(eventsCounter);
 		
 		makeNetwork(scenario.getNetwork());
-		Person driver = makeDropOffPickupDriver(Id.create("p1", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0, 3650.0);
-		Person passenger1 = makeNonStopPassenger(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
-		Person passenger2 = makePickUpPassenger(Id.create("p3", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3700.0);
+		final Person driver = makeDropOffPickupDriver(Id.create("p1", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0, 3650.0);
+		final Person passenger1 = makeNonStopPassenger(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		final Person passenger2 = makePickUpPassenger(Id.create("p3", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3700.0);
 		
 		Tuple<QSim, JointDepartureOrganizer> tuple = makeQSim(scenario, eventsManager); 
-		QSim qSim = tuple.getFirst();
-		JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
+		final QSim qSim = tuple.getFirst();
+		final JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
 		
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
-		Set<Id<Person>> passengerIds = new LinkedHashSet<>();
-		passengerIds.add(Id.create("p2", Person.class));
-		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
-		assignJointDeparture(driver, 1, jointDeparture1, jointDepartureOrganizer);
-		assignJointDeparture(passenger1, 1, jointDeparture1, jointDepartureOrganizer);
-		
-		passengerIds = new LinkedHashSet<>();
-		passengerIds.add(Id.create("p2", Person.class));
-		passengerIds.add(Id.create("p3", Person.class));
-		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
-		assignJointDeparture(driver, 3, jointDeparture2, jointDepartureOrganizer);
-		assignJointDeparture(passenger2, 1, jointDeparture2, jointDepartureOrganizer);
+		qSim.addQueueSimulationListeners(new MobsimInitializedListener() {
+			@Override
+			public void notifyMobsimInitialized(MobsimInitializedEvent e) {	
+				Set<Id<Person>> passengerIds = new LinkedHashSet<>();
+				passengerIds.add(Id.create("p2", Person.class));
+				JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
+				assignJointDeparture(qSim, driver, 1, jointDeparture1, jointDepartureOrganizer);
+				assignJointDeparture(qSim, passenger1, 1, jointDeparture1, jointDepartureOrganizer);
+				
+				passengerIds = new LinkedHashSet<>();
+				passengerIds.add(Id.create("p2", Person.class));
+				passengerIds.add(Id.create("p3", Person.class));
+				JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
+				assignJointDeparture(qSim, driver, 3, jointDeparture2, jointDepartureOrganizer);
+				assignJointDeparture(qSim, passenger2, 1, jointDeparture2, jointDepartureOrganizer);
+			}
+		});
 		
 		qSim.run();
 		
@@ -526,24 +575,29 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		eventsManager.addHandler(eventsCounter);
 		
 		makeNetwork(scenario.getNetwork());
-		Person driver = makePickupDropOffDriver(Id.create("p1", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0, 3650.0);
-		Person passenger = makePickUpDropOffPassenger(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		final Person driver = makePickupDropOffDriver(Id.create("p1", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0, 3650.0);
+		final Person passenger = makePickUpDropOffPassenger(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
 		
 		Tuple<QSim, JointDepartureOrganizer> tuple = makeQSim(scenario, eventsManager); 
-		QSim qSim = tuple.getFirst();
-		JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
+		final QSim qSim = tuple.getFirst();
+		final JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
 		
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
-		Set<Id<Person>> passengerIds = new LinkedHashSet<>();
-		passengerIds.add(Id.create("p2", Person.class));
-		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
-		assignJointDeparture(driver, 3, jointDeparture1, jointDepartureOrganizer);
-		assignJointDeparture(passenger, 1, jointDeparture1, jointDepartureOrganizer);
-		
-		passengerIds = new LinkedHashSet<>();
-		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
-		assignJointDeparture(driver, 5, jointDeparture2, jointDepartureOrganizer);
+		qSim.addQueueSimulationListeners(new MobsimInitializedListener() {
+			@Override
+			public void notifyMobsimInitialized(MobsimInitializedEvent e) {	
+				Set<Id<Person>> passengerIds = new LinkedHashSet<>();
+				passengerIds.add(Id.create("p2", Person.class));
+				JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
+				assignJointDeparture(qSim, driver, 3, jointDeparture1, jointDepartureOrganizer);
+				assignJointDeparture(qSim, passenger, 1, jointDeparture1, jointDepartureOrganizer);
+				
+				passengerIds = new LinkedHashSet<>();
+				JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
+				assignJointDeparture(qSim, driver, 5, jointDeparture2, jointDepartureOrganizer);
+			}
+		});
 		
 		qSim.run();
 		
@@ -584,24 +638,29 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		eventsManager.addHandler(eventsCounter);
 		
 		makeNetwork(scenario.getNetwork());
-		Person driver = makePickupDropOffDriver(Id.create("p1", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0, 3650.0);
-		Person passenger = makePickUpDropOffPassenger(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3700.0);
+		final Person driver = makePickupDropOffDriver(Id.create("p1", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0, 3650.0);
+		final Person passenger = makePickUpDropOffPassenger(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3700.0);
 		
 		Tuple<QSim, JointDepartureOrganizer> tuple = makeQSim(scenario, eventsManager); 
-		QSim qSim = tuple.getFirst();
-		JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
+		final QSim qSim = tuple.getFirst();
+		final JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
 		
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
-		Set<Id<Person>> passengerIds = new LinkedHashSet<>();
-		passengerIds.add(Id.create("p2", Person.class));
-		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
-		assignJointDeparture(driver, 3, jointDeparture1, jointDepartureOrganizer);
-		assignJointDeparture(passenger, 1, jointDeparture1, jointDepartureOrganizer);
-		
-		passengerIds = new LinkedHashSet<>();
-		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
-		assignJointDeparture(driver, 5, jointDeparture2, jointDepartureOrganizer);
+		qSim.addQueueSimulationListeners(new MobsimInitializedListener() {
+			@Override
+			public void notifyMobsimInitialized(MobsimInitializedEvent e) {	
+				Set<Id<Person>> passengerIds = new LinkedHashSet<>();
+				passengerIds.add(Id.create("p2", Person.class));
+				JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
+				assignJointDeparture(qSim, driver, 3, jointDeparture1, jointDepartureOrganizer);
+				assignJointDeparture(qSim, passenger, 1, jointDeparture1, jointDepartureOrganizer);
+				
+				passengerIds = new LinkedHashSet<>();
+				JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
+				assignJointDeparture(qSim, driver, 5, jointDeparture2, jointDepartureOrganizer);
+			}
+		});
 		
 		qSim.run();
 		
@@ -641,24 +700,29 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		eventsManager.addHandler(eventsCounter);
 		
 		makeNetwork(scenario.getNetwork());
-		Person driver = makeDropOffPickupDriver(Id.create("p1", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0, 3650.0);
-		Person passenger = makeDropOffPassenger(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		final Person driver = makeDropOffPickupDriver(Id.create("p1", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0, 3650.0);
+		final Person passenger = makeDropOffPassenger(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
 		
 		Tuple<QSim, JointDepartureOrganizer> tuple = makeQSim(scenario, eventsManager); 
-		QSim qSim = tuple.getFirst();
-		JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
+		final QSim qSim = tuple.getFirst();
+		final JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
 		
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
-		Set<Id<Person>> passengerIds = new LinkedHashSet<>();
-		passengerIds.add(Id.create("p2", Person.class));
-		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
-		assignJointDeparture(driver, 1, jointDeparture1, jointDepartureOrganizer);
-		assignJointDeparture(passenger, 1, jointDeparture1, jointDepartureOrganizer);
-		
-		passengerIds = new LinkedHashSet<>();
-		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
-		assignJointDeparture(driver, 3, jointDeparture2, jointDepartureOrganizer);
+		qSim.addQueueSimulationListeners(new MobsimInitializedListener() {
+			@Override
+			public void notifyMobsimInitialized(MobsimInitializedEvent e) {	
+				Set<Id<Person>> passengerIds = new LinkedHashSet<>();
+				passengerIds.add(Id.create("p2", Person.class));
+				JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
+				assignJointDeparture(qSim, driver, 1, jointDeparture1, jointDepartureOrganizer);
+				assignJointDeparture(qSim, passenger, 1, jointDeparture1, jointDepartureOrganizer);
+				
+				passengerIds = new LinkedHashSet<>();
+				JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
+				assignJointDeparture(qSim, driver, 3, jointDeparture2, jointDepartureOrganizer);
+			}
+		});
 		
 		qSim.run();
 		
@@ -695,35 +759,40 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		eventsManager.addHandler(eventsCounter);
 		
 		makeNetwork(scenario.getNetwork());
-		Person driver = makeDropOffPickupDriver(Id.create("p1", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0, 3700.0);
-		Person passenger1 = makeNonStopPassenger(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
-		Person passenger2 = makeNonStopPassenger(Id.create("p3", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
-		Person passenger3 = makeDropOffPassenger(Id.create("p4", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
-		Person passenger4 = makePickUpPassenger(Id.create("p5", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3780.0);
+		final Person driver = makeDropOffPickupDriver(Id.create("p1", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0, 3700.0);
+		final Person passenger1 = makeNonStopPassenger(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		final Person passenger2 = makeNonStopPassenger(Id.create("p3", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		final Person passenger3 = makeDropOffPassenger(Id.create("p4", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		final Person passenger4 = makePickUpPassenger(Id.create("p5", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3780.0);
 		
 		Tuple<QSim, JointDepartureOrganizer> tuple = makeQSim(scenario, eventsManager); 
-		QSim qSim = tuple.getFirst();
-		JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
+		final QSim qSim = tuple.getFirst();
+		final JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
 		
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 		
-		Set<Id<Person>> passengerIds = new LinkedHashSet<>();
-		passengerIds.add(Id.create("p2", Person.class));
-		passengerIds.add(Id.create("p3", Person.class));
-		passengerIds.add(Id.create("p4", Person.class));
-		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
-		assignJointDeparture(driver, 1, jointDeparture1, jointDepartureOrganizer);
-		assignJointDeparture(passenger1, 1, jointDeparture1, jointDepartureOrganizer);
-		assignJointDeparture(passenger2, 1, jointDeparture1, jointDepartureOrganizer);
-		assignJointDeparture(passenger3, 1, jointDeparture1, jointDepartureOrganizer);
-		
-		passengerIds = new LinkedHashSet<>();
-		passengerIds.add(Id.create("p2", Person.class));
-		passengerIds.add(Id.create("p3", Person.class));
-		passengerIds.add(Id.create("p5", Person.class));
-		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
-		assignJointDeparture(driver, 3, jointDeparture2, jointDepartureOrganizer);
-		assignJointDeparture(passenger4, 1, jointDeparture2, jointDepartureOrganizer);
+		qSim.addQueueSimulationListeners(new MobsimInitializedListener() {
+			@Override
+			public void notifyMobsimInitialized(MobsimInitializedEvent e) {	
+				Set<Id<Person>> passengerIds = new LinkedHashSet<>();
+				passengerIds.add(Id.create("p2", Person.class));
+				passengerIds.add(Id.create("p3", Person.class));
+				passengerIds.add(Id.create("p4", Person.class));
+				JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
+				assignJointDeparture(qSim, driver, 1, jointDeparture1, jointDepartureOrganizer);
+				assignJointDeparture(qSim, passenger1, 1, jointDeparture1, jointDepartureOrganizer);
+				assignJointDeparture(qSim, passenger2, 1, jointDeparture1, jointDepartureOrganizer);
+				assignJointDeparture(qSim, passenger3, 1, jointDeparture1, jointDepartureOrganizer);
+				
+				passengerIds = new LinkedHashSet<>();
+				passengerIds.add(Id.create("p2", Person.class));
+				passengerIds.add(Id.create("p3", Person.class));
+				passengerIds.add(Id.create("p5", Person.class));
+				JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
+				assignJointDeparture(qSim, driver, 3, jointDeparture2, jointDepartureOrganizer);
+				assignJointDeparture(qSim, passenger4, 1, jointDeparture2, jointDepartureOrganizer);
+			}
+		});
 		
 		qSim.run();
 		
@@ -768,22 +837,27 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		eventsManager.addHandler(eventsCounter);
 		
 		makeNetwork(scenario.getNetwork());
-		Person driverA = makeDriverA(Id.create("p1", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
-		Person driverB = makeDriverB(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		final Person driverA = makeDriverA(Id.create("p1", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		final Person driverB = makeDriverB(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
 		
 		Tuple<QSim, JointDepartureOrganizer> tuple = makeQSim(scenario, eventsManager); 
-		QSim qSim = tuple.getFirst();
-		JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
+		final QSim qSim = tuple.getFirst();
+		final JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
 		
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
-		Set<Id<Person>> passengerIds = new LinkedHashSet<>();
-		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
-		assignJointDeparture(driverA, 1, jointDeparture1, jointDepartureOrganizer);
-		
-		passengerIds = new LinkedHashSet<>();
-		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p2", Person.class), passengerIds);
-		assignJointDeparture(driverB, 1, jointDeparture2, jointDepartureOrganizer);
+		qSim.addQueueSimulationListeners(new MobsimInitializedListener() {
+			@Override
+			public void notifyMobsimInitialized(MobsimInitializedEvent e) {	
+				Set<Id<Person>> passengerIds = new LinkedHashSet<>();
+				JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
+				assignJointDeparture(qSim, driverA, 1, jointDeparture1, jointDepartureOrganizer);
+				
+				passengerIds = new LinkedHashSet<>();
+				JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p2", Person.class), passengerIds);
+				assignJointDeparture(qSim, driverB, 1, jointDeparture2, jointDepartureOrganizer);
+			}
+		});
 		
 		qSim.run();
 		
@@ -821,25 +895,30 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		eventsManager.addHandler(eventsCounter);
 		
 		makeNetwork(scenario.getNetwork());
-		Person driverA = makeDriverA(Id.create("p1", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3650.0);
-		Person driverB = makeDriverB(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3650.0);
-		Person passenger = makePickUpPassenger(Id.create("p3", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		final Person driverA = makeDriverA(Id.create("p1", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3650.0);
+		final Person driverB = makeDriverB(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3650.0);
+		final Person passenger = makePickUpPassenger(Id.create("p3", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
 		
 		Tuple<QSim, JointDepartureOrganizer> tuple = makeQSim(scenario, eventsManager); 
-		QSim qSim = tuple.getFirst();
-		JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
+		final QSim qSim = tuple.getFirst();
+		final JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
 		
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
-
-		Set<Id<Person>> passengerIds = new LinkedHashSet<>();
-		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
-		assignJointDeparture(driverA, 1, jointDeparture1, jointDepartureOrganizer);
 		
-		passengerIds = new LinkedHashSet<>();
-		passengerIds.add(Id.create("p3", Person.class));
-		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p2", Person.class), passengerIds);
-		assignJointDeparture(driverB, 1, jointDeparture2, jointDepartureOrganizer);
-		assignJointDeparture(passenger, 1, jointDeparture2, jointDepartureOrganizer);
+		qSim.addQueueSimulationListeners(new MobsimInitializedListener() {
+			@Override
+			public void notifyMobsimInitialized(MobsimInitializedEvent e) {	
+				Set<Id<Person>> passengerIds = new LinkedHashSet<>();
+				JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
+				assignJointDeparture(qSim, driverA, 1, jointDeparture1, jointDepartureOrganizer);
+				
+				passengerIds = new LinkedHashSet<>();
+				passengerIds.add(Id.create("p3", Person.class));
+				JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p2", Person.class), passengerIds);
+				assignJointDeparture(qSim, driverB, 1, jointDeparture2, jointDepartureOrganizer);
+				assignJointDeparture(qSim, passenger, 1, jointDeparture2, jointDepartureOrganizer);
+			}
+		});
 		
 		qSim.run();
 		
@@ -880,25 +959,30 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		eventsManager.addHandler(eventsCounter);
 		
 		makeNetwork(scenario.getNetwork());
-		Person driverA = makeDriverA(Id.create("p1", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
-		Person driverB = makeDriverB(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3700.0);
-		Person passenger = makePickUpPassenger(Id.create("p3", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3650.0);
+		final Person driverA = makeDriverA(Id.create("p1", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		final Person driverB = makeDriverB(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3700.0);
+		final Person passenger = makePickUpPassenger(Id.create("p3", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3650.0);
 		
 		Tuple<QSim, JointDepartureOrganizer> tuple = makeQSim(scenario, eventsManager); 
-		QSim qSim = tuple.getFirst();
-		JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
+		final QSim qSim = tuple.getFirst();
+		final JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
 		
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
-		Set<Id<Person>> passengerIds = new LinkedHashSet<>();
-		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
-		assignJointDeparture(driverA, 1, jointDeparture1, jointDepartureOrganizer);
-		
-		passengerIds = new LinkedHashSet<>();
-		passengerIds.add(Id.create("p3", Person.class));
-		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p2", Person.class), passengerIds);
-		assignJointDeparture(driverB, 1, jointDeparture2, jointDepartureOrganizer);
-		assignJointDeparture(passenger, 1, jointDeparture2, jointDepartureOrganizer);
+		qSim.addQueueSimulationListeners(new MobsimInitializedListener() {
+			@Override
+			public void notifyMobsimInitialized(MobsimInitializedEvent e) {	
+				Set<Id<Person>> passengerIds = new LinkedHashSet<>();
+				JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
+				assignJointDeparture(qSim, driverA, 1, jointDeparture1, jointDepartureOrganizer);
+				
+				passengerIds = new LinkedHashSet<>();
+				passengerIds.add(Id.create("p3", Person.class));
+				JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p2", Person.class), passengerIds);
+				assignJointDeparture(qSim, driverB, 1, jointDeparture2, jointDepartureOrganizer);
+				assignJointDeparture(qSim, passenger, 1, jointDeparture2, jointDepartureOrganizer);
+			}
+		});
 		
 		qSim.run();
 		
@@ -939,25 +1023,30 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		eventsManager.addHandler(eventsCounter);
 		
 		makeNetwork(scenario.getNetwork());
-		Person driverA = makeDriverA(Id.create("p1", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
-		Person driverB = makeDriverB(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
-		Person passenger = makePickUpPassenger(Id.create("p3", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3650.0);
+		final Person driverA = makeDriverA(Id.create("p1", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		final Person driverB = makeDriverB(Id.create("p2", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		final Person passenger = makePickUpPassenger(Id.create("p3", Person.class), scenario.getPopulation(), scenario.getNetwork(), 3650.0);
 		
 		Tuple<QSim, JointDepartureOrganizer> tuple = makeQSim(scenario, eventsManager); 
-		QSim qSim = tuple.getFirst();
-		JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
+		final QSim qSim = tuple.getFirst();
+		final JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
 		
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
-		Set<Id<Person>> passengerIds = new LinkedHashSet<>();
-		JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
-		assignJointDeparture(driverA, 1, jointDeparture1, jointDepartureOrganizer);
-		
-		passengerIds = new LinkedHashSet<>();
-		passengerIds.add(Id.create("p3", Person.class));
-		JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p2", Person.class), passengerIds);
-		assignJointDeparture(driverB, 1, jointDeparture2, jointDepartureOrganizer);
-		assignJointDeparture(passenger, 1, jointDeparture2, jointDepartureOrganizer);
+		qSim.addQueueSimulationListeners(new MobsimInitializedListener() {
+			@Override
+			public void notifyMobsimInitialized(MobsimInitializedEvent e) {	
+				Set<Id<Person>> passengerIds = new LinkedHashSet<>();
+				JointDeparture jointDeparture1 = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
+				assignJointDeparture(qSim, driverA, 1, jointDeparture1, jointDepartureOrganizer);
+				
+				passengerIds = new LinkedHashSet<>();
+				passengerIds.add(Id.create("p3", Person.class));
+				JointDeparture jointDeparture2 = jointDepartureOrganizer.createJointDeparture(Id.create("jd2", JointDeparture.class), Id.create("1to2", Link.class), Id.create("v1", Vehicle.class), Id.create("p2", Person.class), passengerIds);
+				assignJointDeparture(qSim, driverB, 1, jointDeparture2, jointDepartureOrganizer);
+				assignJointDeparture(qSim, passenger, 1, jointDeparture2, jointDepartureOrganizer);
+			}
+		});
 		
 		qSim.run();
 		
@@ -1036,19 +1125,24 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		eventsManager.addHandler(eventsCounter);
 		
 		makeNetwork(scenario.getNetwork());
-		Person driverA = makeNonStopDriver(Id.create("p1", Person.class), Id.create("v1", Vehicle.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
-		Person driverB = makeNonStopDriver(Id.create("p2", Person.class), Id.create("v2", Vehicle.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		final Person driverA = makeNonStopDriver(Id.create("p1", Person.class), Id.create("v1", Vehicle.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
+		final Person driverB = makeNonStopDriver(Id.create("p2", Person.class), Id.create("v2", Vehicle.class), scenario.getPopulation(), scenario.getNetwork(), 3600.0);
 		
 		Tuple<QSim, JointDepartureOrganizer> tuple = makeQSim(scenario, eventsManager); 
-		QSim qSim = tuple.getFirst();
-		JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
+		final QSim qSim = tuple.getFirst();
+		final JointDepartureOrganizer jointDepartureOrganizer = tuple.getSecond();
 		
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v1", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 		qSim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(Id.create("v2", Vehicle.class), VehicleUtils.getDefaultVehicleType()), Id.create("0to1", Link.class));
 
-		Set<Id<Person>> passengerIds = new LinkedHashSet<>();
-		JointDeparture jointDeparture = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
-		assignJointDeparture(driverA, 1, jointDeparture, jointDepartureOrganizer);
+		qSim.addQueueSimulationListeners(new MobsimInitializedListener() {
+			@Override
+			public void notifyMobsimInitialized(MobsimInitializedEvent e) {	
+				Set<Id<Person>> passengerIds = new LinkedHashSet<>();
+				JointDeparture jointDeparture = jointDepartureOrganizer.createJointDeparture(Id.create("jd1", JointDeparture.class), Id.create("0to1", Link.class), Id.create("v1", Vehicle.class), Id.create("p1", Person.class), passengerIds);
+				assignJointDeparture(qSim, driverA, 1, jointDeparture, jointDepartureOrganizer);
+			}
+		});
 		
 		qSim.run();
 		
@@ -1072,19 +1166,28 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 	}
 
 	/**
-	 * 
 	 * @return true if the agent has still joint departures left, otherwise false.
 	 */
-	private boolean peekJointDeparture(JointDepartureOrganizer jointDepartureOrganizer, Id agentId) {
+	private boolean peekJointDeparture(JointDepartureOrganizer jointDepartureOrganizer, Id<Person> agentId) {
 		Map<Leg, JointDeparture> jointDepartures = jointDepartureOrganizer.scheduledDeparturesMap.get(agentId);
 		if (jointDepartures == null || jointDepartures.size() == 0) return false;
 		else return true;
 	}
 	
-	private static void assignJointDeparture(Person person, int legIndex, JointDeparture jointDeparture,
+	private static void assignJointDeparture(QSim qsim, Person person, int legIndex, JointDeparture jointDeparture,
 			JointDepartureOrganizer jointDepartureOrganizer) {
-		Leg leg = (Leg) person.getSelectedPlan().getPlanElements().get(legIndex);
+		Leg leg = getAgentsLeg(qsim, person, legIndex);
 		jointDepartureOrganizer.assignAgentToJointDeparture(person.getId(), leg, jointDeparture);
+	}
+	
+	// The agent gets an unmodifiable copy of the person's plan. Therefore, we have to use the agent's leg for the lookup map.
+	private static Leg getAgentsLeg(QSim qsim, Person person, int legIndex) {
+		for (MobsimAgent agent : qsim.getAgents()) {
+			if (agent.getId().equals(person.getId())) {
+				return (Leg) ((PlanAgent) agent).getCurrentPlan().getPlanElements().get(legIndex);
+			}
+		}
+		return null;
 	}
 	
 	private static Scenario makeScenario() {
@@ -1140,7 +1243,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		network.addLink(link);
 	}
 
-	private static Person makeNonStopDriver(Id id, Id<Vehicle> vehicleId, Population population, Network network, double activityEndTime) {
+	private static Person makeNonStopDriver(Id<Person> id, Id<Vehicle> vehicleId, Population population, Network network, double activityEndTime) {
 		Person person = population.getFactory().createPerson(id);
 		
 		Plan plan = population.getFactory().createPlan();
@@ -1164,7 +1267,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		return person;
 	}
 	
-	private static Person makeDriverA(Id id, Population population, Network network, double activityEndTime) {
+	private static Person makeDriverA(Id<Person> id, Population population, Network network, double activityEndTime) {
 		Person person = population.getFactory().createPerson(id);
 		
 		Plan plan = population.getFactory().createPlan();
@@ -1187,7 +1290,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		return person;
 	}
 	
-	private static Person makeDriverB(Id id, Population population, Network network, double activityEndTime) {
+	private static Person makeDriverB(Id<Person> id, Population population, Network network, double activityEndTime) {
 		Person person = population.getFactory().createPerson(id);
 		
 		Plan plan = population.getFactory().createPlan();
@@ -1210,7 +1313,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		return person;
 	}
 	
-	private static Person makeDriverThenPassenger(Id id, Population population, Network network, double activityEndTime) {
+	private static Person makeDriverThenPassenger(Id<Person> id, Population population, Network network, double activityEndTime) {
 		Person person = population.getFactory().createPerson(id);
 		
 		Plan plan = population.getFactory().createPlan();
@@ -1244,7 +1347,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		return person;
 	}
 	
-	private static Person makeDropOffPickupDriver(Id id, Population population, Network network, double activityEndTime, double stopEndTime) {
+	private static Person makeDropOffPickupDriver(Id<Person> id, Population population, Network network, double activityEndTime, double stopEndTime) {
 		Person person = population.getFactory().createPerson(id);
 		
 		Plan plan = population.getFactory().createPlan();
@@ -1278,7 +1381,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		return person;
 	}
 	
-	private static Person makePickupDropOffDriver(Id id, Population population, Network network, double activityEndTime, double stopEndTime) {
+	private static Person makePickupDropOffDriver(Id<Person> id, Population population, Network network, double activityEndTime, double stopEndTime) {
 		Person person = population.getFactory().createPerson(id);
 		
 		Plan plan = population.getFactory().createPlan();
@@ -1322,7 +1425,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		return person;
 	}
 	
-	private static Person makeNonStopPassenger(Id id, Population population, Network network, double activityEndTime) {
+	private static Person makeNonStopPassenger(Id<Person> id, Population population, Network network, double activityEndTime) {
 		Person person = population.getFactory().createPerson(id);
 		
 		Plan plan = population.getFactory().createPlan();
@@ -1346,7 +1449,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		return person;
 	}
 
-	private static Person makeDropOffPassenger(Id id, Population population, Network network, double departureTime) {
+	private static Person makeDropOffPassenger(Id<Person> id, Population population, Network network, double departureTime) {
 		Person person = population.getFactory().createPerson(id);
 		
 		Plan plan = population.getFactory().createPlan();
@@ -1369,7 +1472,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		return person;
 	}
 	
-	private static Person makePickUpDropOffPassenger(Id id, Population population, Network network, double activityEndTime) {
+	private static Person makePickUpDropOffPassenger(Id<Person> id, Population population, Network network, double activityEndTime) {
 		Person person = population.getFactory().createPerson(id);
 		
 		Plan plan = population.getFactory().createPlan();
@@ -1402,7 +1505,7 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 		return person;
 	}
 	
-	private static Person makePickUpPassenger(Id id, Population population, Network network, double activityEndTime) {
+	private static Person makePickUpPassenger(Id<Person> id, Population population, Network network, double activityEndTime) {
 		Person person = population.getFactory().createPerson(id);
 		
 		Plan plan = population.getFactory().createPlan();
