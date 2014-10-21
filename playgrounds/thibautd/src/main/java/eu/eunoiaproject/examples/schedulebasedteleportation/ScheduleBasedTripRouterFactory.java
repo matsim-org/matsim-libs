@@ -41,10 +41,24 @@ public class ScheduleBasedTripRouterFactory implements TripRouterFactory {
 
 	public ScheduleBasedTripRouterFactory(
 			final Scenario scenario) {
+		this(
+			null,
+			scenario );
+	}
+
+	public ScheduleBasedTripRouterFactory(
+			final TransitRouterFactory transitRouterFactory,
+			final Scenario scenario) {
 		this.scenario = scenario;
 		final TripRouterFactoryBuilderWithDefaults builder =
 			new TripRouterFactoryBuilderWithDefaults();
-		this.transitRouterFactory = builder.createDefaultTransitRouter( scenario );
+
+		this.transitRouterFactory =
+			transitRouterFactory != null ?
+				transitRouterFactory :
+				builder.createDefaultTransitRouter( scenario );
+
+		builder.setTransitRouterFactory( this.transitRouterFactory );
 		this.defaultFactory = builder.build( scenario );
 	}
 
