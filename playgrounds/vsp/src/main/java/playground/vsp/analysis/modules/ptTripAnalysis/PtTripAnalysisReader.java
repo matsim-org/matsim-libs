@@ -72,86 +72,10 @@ public class PtTripAnalysisReader implements TabularFileHandler {
 		if(!row[0].trim().contains("#")){
 			try {
 				currentLine++;
-				switch (currentLine) {
-				case 0:
-					log.error("Should never get here. This seems to be the header.");
-					break;
-				case 1:
-					this.ptTripAnalysisContainer.setSumTravelTime(row2double(row));
-					break;
-				case 2:
-					this.ptTripAnalysisContainer.setAccesWalkCnt(row2int(row));
-					break;
-				case 3:
-					this.ptTripAnalysisContainer.setAccesWaitCnt(row2int(row));
-					break;
-				case 4:
-					this.ptTripAnalysisContainer.setEgressWalkCnt(row2int(row));
-					break;
-				case 5:
-					this.ptTripAnalysisContainer.setSwitchWalkCnt(row2int(row));
-					break;
-				case 6:
-					this.ptTripAnalysisContainer.setSwitchWaitCnt(row2int(row));
-					break;
-				case 7:
-					this.ptTripAnalysisContainer.setLineCnt(row2int(row));
-					break;
-				case 8:
-					this.ptTripAnalysisContainer.setAccesWalkTTime(row2double(row));
-					break;
-				case 9:
-					this.ptTripAnalysisContainer.setAccesWaitTime(row2double(row));
-					break;
-				case 10:
-					this.ptTripAnalysisContainer.setEgressWalkTTime(row2double(row));
-					break;
-				case 11:
-					this.ptTripAnalysisContainer.setSwitchWalkTTime(row2double(row));
-					break;
-				case 12:
-					this.ptTripAnalysisContainer.setSwitchWaitTime(row2double(row));
-					break;
-				case 13:
-					this.ptTripAnalysisContainer.setLineTTime(row2double(row));
-					break;
-				case 14:
-					this.ptTripAnalysisContainer.setLine1cnt(row2int(row));
-					break;
-				case 15:
-					this.ptTripAnalysisContainer.setLine2cnt(row2int(row));
-					break;
-				case 16:
-					this.ptTripAnalysisContainer.setLine3cnt(row2int(row));
-					break;
-				case 17:
-					this.ptTripAnalysisContainer.setLine4cnt(row2int(row));
-					break;
-				case 18:
-					this.ptTripAnalysisContainer.setLine5cnt(row2int(row));
-					break;
-				case 19:
-					this.ptTripAnalysisContainer.setLine6cnt(row2int(row));
-					break;
-				case 20:
-					this.ptTripAnalysisContainer.setLine7cnt(row2int(row));
-					break;
-				case 21:
-					this.ptTripAnalysisContainer.setLine8cnt(row2int(row));
-					break;
-				case 22:
-					this.ptTripAnalysisContainer.setLine9cnt(row2int(row));
-					break;
-				case 23:
-					this.ptTripAnalysisContainer.setLine10cnt(row2int(row));
-					break;
-				case 24:
-					this.ptTripAnalysisContainer.setLineGt10cnt(row2int(row));
-					break;
-				default:
-					break;
-				}
 				
+				for (int i = 1; i < row.length; i++) {
+					this.ptTripAnalysisContainer.addData(currentLine - 1, i - 1, Double.parseDouble(row[i]));
+				}
 			} catch (NumberFormatException e) {
 				this.linesSkipped++;
 				log.info("Ignoring line : " + Arrays.asList(row));
@@ -168,21 +92,4 @@ public class PtTripAnalysisReader implements TabularFileHandler {
 			log.info("Ignoring: " + tempBuffer);
 		}
 	}
-
-	private double[] row2double(String[] in) {
-		double[] out = new double[in.length - 1];
-		for (int i = 1; i < in.length; i++) {
-			out[i] = Double.parseDouble(in[i]);
-		}
-		return out;
-	}
-	
-	private int[] row2int(String[] in) {
-		int[] out = new int[in.length - 1];
-		for (int i = 1; i < in.length; i++) {
-			out[i] = Integer.parseInt(in[i]);
-		}
-		return out;
-	}
-
 }
