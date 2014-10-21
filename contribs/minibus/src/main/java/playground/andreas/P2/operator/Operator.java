@@ -19,17 +19,18 @@
 
 package playground.andreas.P2.operator;
 
+import java.util.List;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.vehicles.Vehicle;
+
 import playground.andreas.P2.PConstants.OperatorState;
 import playground.andreas.P2.replanning.PStrategy;
 import playground.andreas.P2.replanning.PStrategyManager;
 import playground.andreas.P2.routeProvider.PRouteProvider;
 import playground.andreas.P2.scoring.ScoreContainer;
-
-import java.util.List;
-import java.util.TreeMap;
 
 /**
  * 
@@ -40,7 +41,7 @@ public interface Operator {
 	
 	public boolean init(PRouteProvider pRouteProvider, PStrategy initialStrategy, int iteration, double initialBudget);
 	
-	public void score(TreeMap<Id<Vehicle>, ScoreContainer> driverId2ScoreMap);
+	public void score(Map<Id<Vehicle>, ScoreContainer> driverId2ScoreMap);
 	
 	public void replan(PStrategyManager pStrategyManager, int iteration);
 

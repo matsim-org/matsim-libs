@@ -19,14 +19,16 @@
 
 package playground.andreas.P2.scoring;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.vehicles.Vehicle;
+
 import playground.andreas.P2.fare.StageContainer;
 import playground.andreas.P2.fare.StageContainerHandler;
 import playground.andreas.P2.fare.TicketMachine;
-
-import java.util.TreeMap;
 
 /**
  * Scores paratransit vehicles
@@ -40,13 +42,13 @@ public final class ScorePlansHandler implements StageContainerHandler, OperatorC
 	private final static Logger log = Logger.getLogger(ScorePlansHandler.class);
 	
 	private final TicketMachine ticketMachine;
-	private TreeMap<Id<Vehicle>, ScoreContainer> vehicleId2ScoreMap = new TreeMap<>();
+	private Map<Id<Vehicle>, ScoreContainer> vehicleId2ScoreMap = new ConcurrentHashMap<>();
 
 	public ScorePlansHandler(TicketMachine ticketMachine){
 		this.ticketMachine = ticketMachine;
 	}
 	
-	public TreeMap<Id<Vehicle>, ScoreContainer> getDriverId2ScoreMap() {
+	public Map<Id<Vehicle>, ScoreContainer> getDriverId2ScoreMap() {
 		return this.vehicleId2ScoreMap;
 	}
 
@@ -61,11 +63,11 @@ public final class ScorePlansHandler implements StageContainerHandler, OperatorC
 			this.vehicleId2ScoreMap.get(fareContainer.getVehicleId()).handleStageContainer(fareContainer);
 		} catch (Exception e) {
 			log.warn("Got a null pointer here...");
+			log.warn(e.getMessage());
 			log.warn("FareContainer " + fareContainer);
 			log.warn("vehicleMap " + this.vehicleId2ScoreMap);
+			e.printStackTrace();
 		}
-
-
 	}
 
     @Override
@@ -79,14 +81,16 @@ public final class ScorePlansHandler implements StageContainerHandler, OperatorC
 			this.vehicleId2ScoreMap.get(operatorCostContainer.getVehicleId()).handleOperatorCostContainer(operatorCostContainer);
 		} catch (Exception e) {
 			log.warn("Got a null pointer here...");
+			log.warn(e.getMessage());
 			log.warn("CostContainer " + operatorCostContainer);
 			log.warn("vehicleMap " + this.vehicleId2ScoreMap);
+			e.printStackTrace();
 		}
 			
 	}
 
 	@Override
 	public void reset() {
-		this.vehicleId2ScoreMap = new TreeMap<>();
+		this.vehicleId2ScoreMap = new ConcurrentHashMap<>();
 	}
 }

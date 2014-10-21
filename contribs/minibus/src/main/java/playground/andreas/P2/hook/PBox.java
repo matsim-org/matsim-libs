@@ -19,6 +19,10 @@
 
 package playground.andreas.P2.hook;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -29,6 +33,7 @@ import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
+
 import playground.andreas.P2.PConfigGroup;
 import playground.andreas.P2.PConstants.OperatorState;
 import playground.andreas.P2.fare.StageContainerCreator;
@@ -40,10 +45,6 @@ import playground.andreas.P2.scoring.OperatorCostCollectorHandler;
 import playground.andreas.P2.scoring.ScoreContainer;
 import playground.andreas.P2.scoring.ScorePlansHandler;
 import playground.andreas.P2.scoring.StageContainer2AgentMoneyEvent;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.TreeMap;
 
 /**
  * Black box for paratransit
@@ -159,7 +160,7 @@ final class PBox implements Operators {
     }
 
 	void notifyScoring(ScoringEvent event) {
-		TreeMap<Id<Vehicle>, ScoreContainer> driverId2ScoreMap = this.scorePlansHandler.getDriverId2ScoreMap();
+		Map<Id<Vehicle>, ScoreContainer> driverId2ScoreMap = this.scorePlansHandler.getDriverId2ScoreMap();
 		for (Operator operator : this.operators) {
 			operator.score(driverId2ScoreMap);
 		}
