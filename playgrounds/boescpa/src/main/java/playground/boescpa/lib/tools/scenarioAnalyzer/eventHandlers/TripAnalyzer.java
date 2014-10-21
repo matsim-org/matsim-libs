@@ -142,10 +142,10 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 	}
 
 	private void analyzeEvents(SpatialEventCutter spatialEventCutter) {
-		if (spatialEventCutter.equals(null)) {
-			log.warn("No spatial event cutter provided. Will analyze the full network.");
-		} else {
+		if (spatialEventCutter != null) {
 			this.spatialEventCutter = spatialEventCutter;
+		} else {
+			log.warn("No spatial event cutter provided. Will analyze the full network.");
 		}
 
 		for (Id personId : tripHandler.getStartLink().keySet()) {
@@ -160,7 +160,7 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 
 				// Trip analysis:
 				for (int i = 0; i < startLinks.size(); i++) {
-					if (!endLinks.get(i).equals(null)) {
+					if (endLinks.get(i) != null) {
 						if (considerLink(startLinks.get(i)) || considerLink(endLinks.get(i))) {
 							ModeResult modeVals = getMode(modes.get(i));
 							modeVals.modeDistances.add((double) TripProcessor.calcTravelDistance(pathList.get(i), network, startLinks.get(i), endLinks.get(i)));
@@ -176,12 +176,12 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 					actVals.actDurations.add(startTimes.get(0));
 				}
 				for (int i = 1; i < startTimes.size(); i++) {
-					if (!endLinks.get(i).equals(null) && considerLink(endLinks.get(i))) {
+					if (endLinks.get(i) != null && considerLink(endLinks.get(i))) {
 						actVals = getActivity(purposes.get(i - 1));
 						actVals.actDurations.add(startTimes.get(i) - endTimes.get(i - 1));
 					}
 				}
-				if (!endLinks.get(endLinks.size()-1).equals(null) && endTimes.get(endTimes.size()-1) < 24*60 && considerLink(endLinks.get(endLinks.size()-1))) {
+				if (endLinks.get(endLinks.size()-1) != null && endTimes.get(endTimes.size()-1) < 24*60 && considerLink(endLinks.get(endLinks.size()-1))) {
 					actVals = getActivity("home");
 					actVals.actDurations.add(24*60 - endTimes.get(endTimes.size()-1));
 				}
@@ -190,11 +190,7 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 	}
 
 	private boolean considerLink(Id id) {
-		if (spatialEventCutter.equals(null)) {
-			return true; // if no spatial event cutter provided, always consider link.
-		} else {
-			return spatialEventCutter.spatiallyConsideringLink(network.getLinks().get(id));
-		}
+		return spatialEventCutter == null || spatialEventCutter.spatiallyConsideringLink(network.getLinks().get(id));
 	}
 
 	private ModeResult getMode(String mode) {

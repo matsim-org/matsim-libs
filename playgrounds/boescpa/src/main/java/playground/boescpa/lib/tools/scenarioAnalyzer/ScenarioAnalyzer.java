@@ -81,7 +81,11 @@ public class ScenarioAnalyzer {
 	}
 
 	private String getInitialResultsString(SpatialEventCutter spatialEventCutter) {
-		return spatialEventCutter.toString() + NL;
+		if (spatialEventCutter != null) {
+			return spatialEventCutter.toString() + NL;
+		} else {
+			return "No spatial event cutter loaded. Use full network." + NL;
+		}
 	}
 
 	private void showResultsOnTerminal(String results) {
