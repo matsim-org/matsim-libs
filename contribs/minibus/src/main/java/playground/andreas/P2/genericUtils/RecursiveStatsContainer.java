@@ -20,7 +20,7 @@
 package playground.andreas.P2.genericUtils;
 
 /**
- * Provides arithmetic mean and standard deviation.
+ * Provides arithmetic mean, standard deviation, and Min/Max.
  * 
  * @author aneumann
  *
@@ -29,12 +29,23 @@ public final class RecursiveStatsContainer {
 
 	private double numberOfEntries = Double.NaN;
 	private double arithmeticMean;
+	private double min = Double.POSITIVE_INFINITY;
+	private double max = Double.NEGATIVE_INFINITY;
 	private double tempVar;
 
 	public void handleNewEntry(double entry){
+		
+		if (entry < this.min) {
+			this.min = entry;
+		}
+		
+		if (entry > this.max) {
+			this.max = entry;
+		}
+		
 		// new entries n + 1
-		double meanOperators_n_1;
-		double tempVarOperators_n_1;
+		double meanEntry_n_1;
+		double tempVarEntry_n_1;
 
 		if(Double.isNaN(this.numberOfEntries)){
 			// initialize
@@ -46,19 +57,19 @@ public final class RecursiveStatsContainer {
 		// calculate the exact mean and variance
 
 		// calculate new mean
-		meanOperators_n_1 =  (this.numberOfEntries * this.arithmeticMean + entry) / (this.numberOfEntries + 1);
+		meanEntry_n_1 =  (this.numberOfEntries * this.arithmeticMean + entry) / (this.numberOfEntries + 1);
 
 		if (this.numberOfEntries == 0) {
-			tempVarOperators_n_1 = 0;
+			tempVarEntry_n_1 = 0;
 		} else {
-			tempVarOperators_n_1 = this.tempVar + (this.numberOfEntries + 1) / (this.numberOfEntries) * (meanOperators_n_1 - entry) * (meanOperators_n_1 - entry);
+			tempVarEntry_n_1 = this.tempVar + (this.numberOfEntries + 1) / (this.numberOfEntries) * (meanEntry_n_1 - entry) * (meanEntry_n_1 - entry);
 		}
 
 		this.numberOfEntries++;
 
 		// store em away
-		this.arithmeticMean = meanOperators_n_1;
-		this.tempVar = tempVarOperators_n_1;
+		this.arithmeticMean = meanEntry_n_1;
+		this.tempVar = tempVarEntry_n_1;
 	}
 
 	public double getStdDev() {
@@ -74,5 +85,13 @@ public final class RecursiveStatsContainer {
 	
 	public int getNumberOfEntries(){
 		return (int) this.numberOfEntries;
+	}
+	
+	public double getMin(){
+		return this.min;
+	}
+	
+	public double getMax(){
+		return this.max;
 	}
 }
