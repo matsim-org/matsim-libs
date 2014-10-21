@@ -60,7 +60,11 @@ public class AgentCounter implements ScenarioAnalyzerEventHandler, ActivityEndEv
 	public String createResults(SpatialEventCutter spatialEventCutter, int scaleFactor) {
 		Set<String> agents = new HashSet<>();
 		for (String[] vals : numberOfAgents) {
-			if (spatialEventCutter.spatiallyConsideringLink(network.getLinks().get(Id.createLinkId(vals[1])))) {
+			if (spatialEventCutter != null) {
+				if (spatialEventCutter.spatiallyConsideringLink(network.getLinks().get(Id.createLinkId(vals[1])))) {
+					agents.add(vals[0]);
+				}
+			} else {
 				agents.add(vals[0]);
 			}
 		}
