@@ -20,6 +20,7 @@ import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingLinkInfo;
 import org.matsim.contrib.parking.parkingChoice.carsharing.ParkingModuleWithFreeFloatingCarSharing;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.facilities.Facility;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
@@ -109,7 +110,7 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 		this.parkingModule = parkingModule;
 		
 		beelineFactor = Double.parseDouble(controler.getConfig().getModule("planscalcroute").getParams().get("beelineDistanceFactor"));
-		walkSpeed = Double.parseDouble(controler.getConfig().getModule("planscalcroute").getParams().get("teleportedModeSpeed_walk"));
+		walkSpeed = (((PlansCalcRouteConfigGroup)controler.getConfig().getModule("planscalcroute")).getTeleportedModeSpeeds().get("walk"));
 		
 		
 		List<? extends PlanElement> planElements = this.plan.getPlanElements();
@@ -147,11 +148,7 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 			this.state = MobsimAgent.State.ABORT ;
 		} else {
 			// note that when we are here we don't know if next is another leg, or an activity  Therefore, we go to a general method:
-			
-				/*if (currentLeg.getMode().equals("freefloating")) {
-					
-					vehID = null;
-				}*/
+							
 				advancePlan(now) ;
 		}
 	}
@@ -458,20 +455,13 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 		
 		LegImpl walkLeg = new LegImpl("walk_ff");
 		
-		//ParkingLinkInfo parkingSpot = parkingModule.parkFreeFloatingVehicle(new IdImpl((vehID)), this.scenario.getNetwork().getLinks().get(route.getEndLinkId()).getCoord());
 		vehID = null;
 		GenericRouteImpl walkRoute = new GenericRouteImpl(route.getEndLinkId(), route.getEndLinkId());
-	/*	final double dist = CoordUtils.calcDistance(scenario.getNetwork().getLinks().get(route.getStartLinkId()).getCoord(),
-				scenario.getNetwork().getLinks().get(parkingSpot.getLinkId()).getCoord());
-		final double estimatedNetworkDistance = dist * this.beelineFactor;
-*/
-		//final int travTime = (int) (estimatedNetworkDistance / this.walkSpeed );
+	
 		//for the purposes of consistency setting walking time to 0
 		final int travTime = 0;
 		walkRoute.setTravelTime(travTime);
 		walkRoute.setDistance(distance);
-		
-		
 		
 		walkLeg.setRoute(walkRoute);
 		this.cachedDestinationLinkId = route.getEndLinkId();
@@ -488,13 +478,9 @@ public class FreeFloatingParkingPersonDriverAgentImpl implements MobsimDriverAge
 		return;
 		
 	}
-
-	
 	
 	//the end of added methods
-	
-	
-	
+
 	private void initializeLeg(Leg leg) {
 		this.state = MobsimAgent.State.LEG ;			
 		Route route = leg.getRoute();

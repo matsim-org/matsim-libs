@@ -132,7 +132,8 @@ public class PTTravelTimesFromEvents {
 
 		@Override
 		public void handleEvent(ActivityStartEvent event) {
-			
+			if (event.getPersonId().toString().equals("14344"))
+				System.out.print("");
 			 if (event.getActType().startsWith("leisure")){
 				 mapFix.put(event.getPersonId(), true);
 				 travelTImes.put(event.getPersonId(), event.getTime() - travelTImes.get(event.getPersonId())); 
@@ -150,6 +151,8 @@ public class PTTravelTimesFromEvents {
 		@Override
 		public void handleEvent(PersonEntersVehicleEvent event) {
 			// TODO Auto-generated method stub
+			if (event.getPersonId().toString().equals("14344"))
+				System.out.print("");
 			if (mapFix.get(event.getPersonId()) != null && mapFix.get(event.getPersonId()) == false) {
 			
 				TripInfo ti = new TripInfo();
@@ -171,7 +174,8 @@ public class PTTravelTimesFromEvents {
 		@Override
 		public void handleEvent(ActivityEndEvent event) {
 			// TODO Auto-generated method stub
-			
+			if (event.getPersonId().toString().equals("14344"))
+				System.out.print("");
 			if (travelTImes.get(event.getPersonId()) == null) {
 				
 				if (event.getActType().equals("home")) {

@@ -9,42 +9,31 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.LegRouterWrapper;
 import org.matsim.core.router.TransitRouterWrapper;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.router.old.TeleportationLegRouter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.Time;
-import org.matsim.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
-import org.matsim.population.algorithms.PersonAlgorithm;
-import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.router.TransitRouterNetwork;
+import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.transitSchedule.api.Departure;
 
-import playground.balac.carsharing.preprocess.membership.MyLinkUtils;
+import playground.balac.twowaycarsharingredisigned.scenario.TwoWayCSFacilityImpl;
 
 public class PTTravelTimes {
 	
@@ -56,7 +45,7 @@ public class PTTravelTimes {
 		
 		Config config = ConfigUtils.createConfig();
 		config.global().setNumberOfThreads(16);	// for parallel population reading
-	//	config.network().setInputFile("C:/Users/balacm/Desktop/InputPt/PTWithoutSimulation/network.xml.gz");
+	//	config.network().setInputFile("C:/Users/balacm/Desktop/InputPt/PTWithoutSimulation/network_multimodal.xml.gz");
 	//	config.plans().setInputFile("/data/matsim/cdobler/2030/60.plans_without_pt_routes.xml.gz");
 	//	config.plans().setInputFile("/data/matsim/cdobler/2030/plans_test.xml");
 	//	config.facilities().setInputFile("C:/Users/balacm/Desktop/InputPt/PTWithoutSimulation/facilities.xml.gz");
@@ -78,257 +67,183 @@ public class PTTravelTimes {
 		TransitRouterNetwork routerNetwork = new TransitRouterNetwork();
 	    new TransitRouterNetworkReaderMatsimV1(scenario, routerNetwork).parse("./transitRouterNetwork_thinned.xml.gz");
 
-	//	new TransitRouterNetworkReaderMatsimV1(scenario, routerNetwork).parse("C:/Users/balacm/Desktop/InputPt/PTWithoutSimulation/transitRouterNetwork_thinned.xml.gz");
+	//new TransitRouterNetworkReaderMatsimV1(scenario, routerNetwork).parse("C:/Users/balacm/Desktop/InputPt/PTWithoutSimulation/transitRouterNetwork_thinned.xml.gz");
 		//config.planCalcScore().setUtilityOfLineSwitch(0.0);
 		TransitRouterConfig transitRouterConfig = new TransitRouterConfig(config.planCalcScore(),
 				config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
 		
 	//	transitRouterFactory = new FastTransitRouterImplFactory(scenario.getTransitSchedule(), transitRouterConfig, routerNetwork);
 		transitRouterFactory = new TransitRouterImplFactory(scenario.getTransitSchedule(), transitRouterConfig, routerNetwork);
-		 BufferedReader readLink = IOUtils.getBufferedReader("./coord_"+args[0] +".txt");
+		 BufferedReader readLink = IOUtils.getBufferedReader("./"+args[0] +".txt");
 
-		    BufferedWriter outLink = IOUtils.getBufferedWriter("./travelTimesPT_"+args[0] +".txt");
+		//    BufferedWriter outLink = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/InputPt/PTWithoutSimulation/travelTimesPT_"+args[0] +".txt");
 	//	final BufferedReader readLink = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/InputPt/PTWithoutSimulation/coord_"+args[0]+".txt");
 		
-	//final BufferedWriter outLink = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/InputPt/PTWithoutSimulation/travelTimesPT_"+args[0]+".txt");
+	final BufferedWriter outLink = IOUtils.getBufferedWriter("./travelTimesPT_"+args[0]+".txt");
 
 		
 		
 		String s = readLink.readLine();
+
+		//s = readLink.readLine();
+		//int i = 0;
+
 		s = readLink.readLine();
-		int i = 0;
+					
+		NetworkLinkUtils lUtils = new NetworkLinkUtils(scenario.getNetwork());
+		
+		PlansCalcRouteConfigGroup routeConfigGroup = scenario.getConfig().plansCalcRoute();
+
+		TransitRouterWrapper routingModule = new TransitRouterWrapper(
+        		transitRouterFactory.createTransitRouter(),
+                scenario.getTransitSchedule(),
+                scenario.getNetwork(), // use a walk router in case no PT path is found
+                new LegRouterWrapper(
+                        TransportMode.transit_walk,
+                        scenario.getPopulation().getFactory(),
+                        new TeleportationLegRouter(
+                                ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory(),
+                                routeConfigGroup.getTeleportedModeSpeeds().get(TransportMode.walk),
+                                routeConfigGroup.getBeelineDistanceFactor())));
+		
+		//final BufferedWriter outLink = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/InputPt/StatisticsPt.txt");
+		int i = 1;
 		while(s != null) {
 			String[] arr = s.split("\\s");
-			CoordImpl coordStart = new CoordImpl(arr[3], arr[4]);
-			Link lStart = MyLinkUtils.getClosestLink(scenario.getNetwork(), coordStart);
-			CoordImpl coordEnd = new CoordImpl(arr[5], arr[6]);
-			Link lEnd = MyLinkUtils.getClosestLink(scenario.getNetwork(), coordEnd);
-			
-			PersonImpl person = new PersonImpl(Id.create(arr[0], Person.class));
-		//	i++;
-			PlanImpl plan = (PlanImpl) scenario.getPopulation().getFactory().createPlan();
-			ActivityImpl act = new ActivityImpl("home", lStart.getId());
-			act.setCoord(coordStart);
-			//String[] arr2 = arr[6].split(":");
-			//double h = Double.parseDouble(arr2[0]);
-			double m = Double.parseDouble(arr[2]);
-			act.setEndTime(m * 60);
-			plan.addActivity(act);
-			
-			LegImpl leg = new LegImpl("pt");
-			plan.addLeg(leg);
-			
-			act = new ActivityImpl("leisure", lEnd.getId());
-			act.setCoord(coordEnd);
-			act.setEndTime(48800);
-			plan.addActivity(act);
-			leg = new LegImpl("pt");
-			plan.addLeg(leg);
-			act = new ActivityImpl("home", lStart.getId());
-			act.setCoord(coordStart);
-			plan.addActivity(act);
-			person.addPlan(plan);
-			
-			scenario.getPopulation().addPerson(person);
+			if (arr[2].equals("1")) {
+				CoordImpl coordStart = new CoordImpl(arr[4], arr[5]);
+				Link lStart = lUtils.getClosestLink(coordStart);
+				CoordImpl coordEnd = new CoordImpl(arr[6], arr[7]);
+				Link lEnd = lUtils.getClosestLink(coordEnd);
+				
+				outLink.write(Integer.toString(i) + " "); // writing the ID of the person routed
+				
+				Person person = scenario.getPopulation().getFactory().createPerson(Id.createPersonId(Integer.toString(i)));
+				i++;
+				//PersonImpl person = new PersonImpl(new IdImpl(arr[0]));
+			//	i++;
+				PlanImpl plan = (PlanImpl) scenario.getPopulation().getFactory().createPlan();
+				ActivityImpl act = new ActivityImpl("home", lStart.getId());
+				act.setCoord(coordStart);
+				//String[] arr2 = arr[6].split(":");
+				//double h = Double.parseDouble(arr2[0]);
+				double m = Double.parseDouble(arr[3]);
+				act.setEndTime(m * 60);
+				plan.addActivity(act);
+				
+				LegImpl leg = new LegImpl("pt");
+				
+				TwoWayCSFacilityImpl startFacility = new TwoWayCSFacilityImpl(Id.create("100", Facility.class), coordStart, lStart.getId());
+						
+				TwoWayCSFacilityImpl endFacility = new TwoWayCSFacilityImpl(Id.create("101", Facility.class), coordEnd, lEnd.getId());
+				List<? extends PlanElement> route =  routingModule.calcRoute(startFacility, endFacility, m * 60, person);
+
+				//TransitScheduleImpl tr = ((TransitScheduleImpl)(scenario.getTransitSchedule()));
+				double lastArrival = m * 60.0;
+				
+				int countTransfers = -1;
+				
+				double transferTime = 0.0;
+				
+				boolean writtenAccessTime = false;
+				
+				double egressTime = 0.0;
+				
+				double distance = 0.0;
+				for(PlanElement pe1: route) {
+			    	
+					if (pe1 instanceof Leg && ((Leg) pe1).getMode().equals("pt")) {
+						countTransfers++;
+						plan.addLeg((Leg)pe1);
+						distance += ((Leg) pe1).getRoute().getDistance();
+						ExperimentalTransitRoute tr1 = ((ExperimentalTransitRoute)(((Leg)pe1).getRoute()));
+						double temp = Double.MAX_VALUE;
+						//scenario.getTransitSchedule().getTransitLines().get(tr1.getLineId()).getRoutes().get(tr1.getRouteId()).getDepartures()
+						for (Departure d: scenario.getTransitSchedule().getTransitLines().get(tr1.getLineId()).getRoutes().get(tr1.getRouteId()).getDepartures().values()) {
+							
+							double fromStopArrivalOffset = scenario.getTransitSchedule().getTransitLines().get(tr1.getLineId()).getRoutes().get(tr1.getRouteId()).getStop(scenario.getTransitSchedule().getFacilities().get(tr1.getAccessStopId())).getDepartureOffset();
+														
+							if (d.getDepartureTime() + fromStopArrivalOffset >= lastArrival && d.getDepartureTime() + fromStopArrivalOffset < temp) {
+								
+								temp = d.getDepartureTime() + fromStopArrivalOffset;
+								
+							}
+						}
+						
+						
+						double transfertTimePart = temp - lastArrival;
+						
+						if (countTransfers == 0)
+							outLink.write(Double.toString(transfertTimePart) + " "); //writing first waiting time
+						else
+						transferTime += transfertTimePart;
+							
+						lastArrival +=  ((Leg) pe1).getTravelTime();
+					}
+					else if (pe1 instanceof Leg) {
+						plan.addLeg((Leg)pe1);
+						lastArrival += ((Leg) pe1).getTravelTime();
+						
+						if (!writtenAccessTime) {
+							
+							if (route.size() == 1) 
+								
+								outLink.write(Double.toString(0.0) + " "); //writing access time
+														
+							else
+								outLink.write(Double.toString(((Leg) pe1).getTravelTime()) + " "); //writing access time
+							writtenAccessTime = true;
+						}
+						
+						egressTime = ((Leg) pe1).getTravelTime();
+						
+					}
+					
+				}
+				if (route.size() == 1)
+					outLink.write(Double.toString(0.0) + " "); //
+				outLink.write(Double.toString(transferTime) + " "); //writing transfer times not including first wait time
+				
+				outLink.write(Integer.toString(countTransfers) + " "); //writing the number of transfers (-1 means pure walk trip)
+				if (route.size() == 1)
+					outLink.write(Double.toString(0.0) + " "); //writing egress time
+
+				else
+					outLink.write(Double.toString(egressTime) + " ");  //writing egress time
+				
+				outLink.write(Double.toString(lastArrival - m * 60.0) + " "); //writing the total travel time from door to door
+				
+				outLink.write(Double.toString(distance));
+				outLink.newLine();
+				act = new ActivityImpl("leisure", lEnd.getId());
+				act.setCoord(coordEnd);
+				act.setEndTime(48800);
+				plan.addActivity(act);
+				leg = new LegImpl("pt");
+				plan.addLeg(leg);
+				act = new ActivityImpl("home", lStart.getId());
+				act.setCoord(coordStart);
+				plan.addActivity(act);
+				person.addPlan(plan);
+				
+				scenario.getPopulation().addPerson(person);
+					
+				System.out.println(arr[0]); 
+			}
 			s = readLink.readLine();
 			
-			
 		}
 		
 		
-		// keep only one plan per person
-		//for (Person person : scenario.getPopulation().getPersons().values()) {
-	//		((PersonImpl) person).removeUnselectedPlans();
-	//	}
-		
-		// create pt routes
-		int numThreads = 8;
-		ParallelPersonAlgorithmRunner.run(scenario.getPopulation(), numThreads, new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
-			@Override
-			public AbstractPersonAlgorithm getPersonAlgorithm() {
-				return new PrepareForSimOnlyPT(createRoutingAlgorithm(scenario));
-			}
-		});
-		
-		for(Person per: scenario.getPopulation().getPersons().values()) {
-			double time = 0.0;
-			Plan p = per.getPlans().get(0);
-			
-			for(PlanElement pe: p.getPlanElements()) {
-				
-				if (pe instanceof Activity) {
-					if (((Activity) pe).getType().equals("leisure")) {
-						
-						break;
-					}
-				}
-				else if (pe instanceof Leg) {
-					
-					time += ((Leg) pe).getTravelTime();
-					
-				}
-				
-			}
-			
-			outLink.write(per.getId() + " ");
-			outLink.write(Double.toString(time));
-			outLink.newLine();
-			
-			
-		}
 		outLink.flush();
 		outLink.close();
 		
 		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()
 //				((ScenarioImpl) scenario).getKnowledges()).writeFileV4("/data/matsim/cdobler/2030/60.plans_with_pt_routes.xml.gz");
 		//		((ScenarioImpl) scenario).getKnowledges()).writeFileV4("C:/Users/balacm/Desktop/InputPt/PTWithoutSimulation/plans_with_pt_routes_single_plan_"+args[0]+".xml.gz");
-        ).writeFileV4("./plans_with_pt_routes_"+args[0]+".xml.gz");
+        ).writeFileV4("./plans_pt_trips_"+args[0]+".xml.gz");
 
 	}
 		
-private static final PersonAlgorithm createRoutingAlgorithm(Scenario scenario) {
-		
-		PlansCalcRouteConfigGroup routeConfigGroup = scenario.getConfig().plansCalcRoute();
-
-		TripRouter tripRouter = new TripRouter();
-        if ( scenario.getConfig().scenario().isUseTransit() ) {
-            TransitRouterWrapper routingModule = new TransitRouterWrapper(
-            		transitRouterFactory.createTransitRouter(),
-                    scenario.getTransitSchedule(),
-                    scenario.getNetwork(), // use a walk router in case no PT path is found
-                    new LegRouterWrapper(
-                            TransportMode.transit_walk,
-                            scenario.getPopulation().getFactory(),
-                            new TeleportationLegRouter(
-                                    ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory(),
-                                    routeConfigGroup.getTeleportedModeSpeeds().get(TransportMode.walk),
-                                    routeConfigGroup.getBeelineDistanceFactor())));
-            for (String mode : scenario.getConfig().transit().getTransitModes()) {
-                // XXX one can't check for inconsistent setting here...
-                // because the setting is inconsistent by default (defaults
-                // set a teleportation setting for pt routing, which is overriden
-                // here) (td, may 2013)
-                tripRouter.setRoutingModule(mode, routingModule);
-            }
-        }
-		return new OnlyPTPlanRouter(tripRouter, scenario.getActivityFacilities()); 
-	}
-	
-	private static final class PrepareForSimOnlyPT extends AbstractPersonAlgorithm {
-
-		private final PersonAlgorithm personAlgorithm;
-		
-		public PrepareForSimOnlyPT(PersonAlgorithm personAlgorithm) {
-			this.personAlgorithm = personAlgorithm;
-		}
-		
-		@Override
-		public void run(Person person) {
-			this.personAlgorithm.run(person);
-		}
-	}
-	
-	private static class OnlyPTPlanRouter implements PlanAlgorithm, PersonAlgorithm {
-
-		private final TripRouter tripRouter;
-		private final ActivityFacilities facilities;
-		
-		public OnlyPTPlanRouter(TripRouter tripRouter, ActivityFacilities facilities) {
-			this.tripRouter = tripRouter;
-			this.facilities = facilities;
-		}
-
-		@Override
-		public void run(Person person) {
-			for (Plan plan : person.getPlans()) {
-				run(plan);
-			}
-		}	
-		
-		@Override
-		public void run(final Plan plan) {
-			final List<Trip> trips = TripStructureUtils.getTrips(plan, this.tripRouter.getStageActivityTypes());
-
-			for (Trip trip : trips) {
-				// handle only pt trips - other trips are up-to-date
-				String mainMode = this.tripRouter.getMainModeIdentifier().identifyMainMode(trip.getTripElements());
-				if (mainMode.equals(TransportMode.pt)) {
-					final List<? extends PlanElement> newTrip =
-							this.tripRouter.calcRoute(mainMode,
-									toFacility(trip.getOriginActivity()),
-									toFacility(trip.getDestinationActivity()),
-									calcEndOfActivity(trip.getOriginActivity(), plan),
-									plan.getPerson());
-					
-					TripRouter.insertTrip(plan, 
-							trip.getOriginActivity(),
-							newTrip,
-							trip.getDestinationActivity());					
-				}
-			}
-		}
-		
-		// /////////////////////////////////////////////////////////////////////////
-		// helpers
-		// /////////////////////////////////////////////////////////////////////////
-		private Facility toFacility(final Activity act) {
-			if ((act.getLinkId() == null || act.getCoord() == null)
-					&& facilities != null
-					&& !facilities.getFacilities().isEmpty()) {
-				// use facilities only if the activity does not provides the required fields.
-				return facilities.getFacilities().get( act.getFacilityId() );
-			}
-			return new ActivityWrapperFacility( act );
-		}
-
-		private static double calcEndOfActivity(
-				final Activity activity,
-				final Plan plan) {
-			if (activity.getEndTime() != Time.UNDEFINED_TIME) return activity.getEndTime();
-
-			// no sufficient information in the activity...
-			// do it the long way.
-			// XXX This is inefficient! Using a cache for each plan may be an option
-			// (knowing that plan elements are iterated in proper sequence,
-			// no need to re-examine the parts of the plan already known)
-			double now = 0;
-
-			for (PlanElement pe : plan.getPlanElements()) {
-				now = updateNow( now , pe );
-				if (pe == activity) return now;
-			}
-
-			throw new RuntimeException( "activity "+activity+" not found in "+plan.getPlanElements() );
-		}
-		
-		private static double updateNow(
-				final double now,
-				final PlanElement pe) {
-			if (pe instanceof Activity) {
-				Activity act = (Activity) pe;
-				double endTime = act.getEndTime();
-				double startTime = act.getStartTime();
-				double dur = (act instanceof ActivityImpl ? act.getMaximumDuration() : Time.UNDEFINED_TIME);
-				if (endTime != Time.UNDEFINED_TIME) {
-					// use fromAct.endTime as time for routing
-					return endTime;
-				}
-				else if ((startTime != Time.UNDEFINED_TIME) && (dur != Time.UNDEFINED_TIME)) {
-					// use fromAct.startTime + fromAct.duration as time for routing
-					return startTime + dur;
-				}
-				else if (dur != Time.UNDEFINED_TIME) {
-					// use last used time + fromAct.duration as time for routing
-					return now + dur;
-				}
-				else {
-					throw new RuntimeException("activity has neither end-time nor duration." + act);
-				}
-			}
-			double tt = ((Leg) pe).getTravelTime();
-			return now + (tt != Time.UNDEFINED_TIME ? tt : 0);
-		}
-	}
-	
 
 }

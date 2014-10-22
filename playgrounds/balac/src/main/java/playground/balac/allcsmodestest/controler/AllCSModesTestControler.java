@@ -69,6 +69,7 @@ public class AllCSModesTestControler extends Controler{
 	    		Integer.parseInt(this.getConfig().getModule("AllCSModes").getValue("statsWriterFrequency"))));
 	  }
 	public static void main(final String[] args) {
+		//Logger.getLogger( "org.matsim.core.reader..." ).setLevel( Level.OFF );
 		
     	final Config config = ConfigUtils.loadConfig(args[0]);
     	OneWayCarsharingRDConfigGroup configGroup = new OneWayCarsharingRDConfigGroup();

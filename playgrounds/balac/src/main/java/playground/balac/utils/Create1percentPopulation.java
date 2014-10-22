@@ -28,12 +28,12 @@ public class Create1percentPopulation {
 		Object[] arr = scenario.getPopulation().getPersons().values().toArray();
 		
 		for (int i = 1; i < size; i++) {
-			if (i % 10 != 0) {				
+			if (i % 2 != 0) {				
 				scenario.getPopulation().getPersons().remove(((Person)arr[i]).getId());
 			}			
 		}
 		
-		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFileV4(outputFilePath + "/plans_1p_herbie.xml");		
+		new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).writeFileV4(outputFilePath + "/plans_5perc.xml.gz");		
 		
 	}
 	

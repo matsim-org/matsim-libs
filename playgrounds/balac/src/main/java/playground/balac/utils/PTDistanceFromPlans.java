@@ -24,7 +24,7 @@ public class PTDistanceFromPlans {
 		networkReader.readFile(args[0]);
 		populationReader.readFile(args[1]);
 		
-		final BufferedWriter outLink = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/pt_stage_vartime_distance.txt");
+		final BufferedWriter outLink = IOUtils.getBufferedWriter("P:/_TEMP/sschmutz/routing_matsim/20141009_trip_pt_timevar/output/pt_trip_vartime_distance_10.txt");
 
 		
 		for (Person p: sc.getPopulation().getPersons().values()) {

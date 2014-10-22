@@ -12,11 +12,11 @@ public class UsersAnalysis {
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
 		
-		final BufferedReader readLink1 = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/STRC_Temp/CSTW_Stats_1.txt");
+		final BufferedReader readLink1 = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/STRC_Temp/FF_Stats_1.txt");
 
-		final BufferedReader readLink2 = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/STRC_Temp/CSTW_Stats_2.txt");
+		final BufferedReader readLink2 = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/STRC_Temp/FF_Stats_2.txt");
 		
-		final BufferedReader readLink3 = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/STRC_Temp/FF_Stats.txt");
+		final BufferedReader readLink3 = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/STRC_Temp/FF_Stats_1.txt");
 
 		Set<String> bla = new HashSet<String>();
 		Set<String> bla1 = new HashSet<String>();
