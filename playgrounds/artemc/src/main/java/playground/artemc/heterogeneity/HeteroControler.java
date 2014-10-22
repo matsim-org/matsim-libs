@@ -50,7 +50,7 @@ public class HeteroControler {
 				heteroSwitch=true;
 		}
 
-		HeteroControler runner = new HeteroControler();
+		HeteroControler  runner = new HeteroControler();
 		runner.run();
 	}
 
@@ -61,6 +61,9 @@ public class HeteroControler {
 		System.setProperty("matsim.preferLocalDtds", "true");
 		controler = new Controler(scenario);
 		
+
+		Initializer initializer = new Initializer();
+		controler.addControlerListener(initializer);
 		//controler.setMobsimFactory(new QSimFactory());
 
 		log.info("Adding Simple Annealer...");
@@ -96,7 +99,6 @@ public class HeteroControler {
 		// Additional analysis
 		controler.addControlerListener(new DisaggregatedScoreAnalyzer((ScenarioImpl) controler.getScenario()));
 		controler.addControlerListener(new WelfareAnalysisControlerListener((ScenarioImpl) controler.getScenario()));
-		addMeanTravelTimeCalculator(controler);
 		
 		controler.run();
 
@@ -122,8 +124,13 @@ public class HeteroControler {
 		return scenario;
 	}
 
+	private static class Initializer implements StartupListener {
 
-	private void addMeanTravelTimeCalculator(Controler controler){
+		@Override
+		public void notifyStartup(StartupEvent event) {
+
+			Controler controler = event.getControler();
+
 			// create a plot containing the mean travel times
 			Set<String> transportModes = new HashSet<String>();
 			transportModes.add(TransportMode.car);
@@ -132,6 +139,7 @@ public class HeteroControler {
 			MeanTravelTimeCalculator mttc = new MeanTravelTimeCalculator(controler.getScenario(), transportModes);
 			controler.addControlerListener(mttc);
 			controler.getEvents().addHandler(mttc);
+
 		}
-	
+	}
 }
