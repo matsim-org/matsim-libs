@@ -21,6 +21,7 @@ package org.matsim.core.basic.v01;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 
 /**
  * 
@@ -64,6 +65,25 @@ public class IdImplTest {
 		
 		IdImpl id3 = new IdImpl("1234");
 		Assert.assertEquals("Id1 is the same as Id3", 0, id1.compareTo(id3));
+	}
+	
+	class MyIdImpl extends Id {
+		final String str ;
+		MyIdImpl(String str) {
+			this.str = str ;
+		}
+		@Override
+		public String toString() {
+			return str ;
+		}
+	}
+	
+	@Test
+	public void testDifferentImplementations() {
+		Id id1 = new IdImpl("1234") ;
+		Id id2 = new MyIdImpl("1234") ;
+		System.out.println( "compare: " + id1.compareTo( id2 ) ) ;
+		System.out.println( "equals: " + id1.equals( id2 ) );
 	}
 
 }
