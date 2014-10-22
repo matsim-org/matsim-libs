@@ -47,6 +47,7 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
+@Deprecated // needs to be re-designed with delegation instead of inheritance. kai, oct'14
 public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 	static final Logger log = Logger.getLogger(DCActivityScoringFunction.class);
 	private DestinationScoring destinationChoiceScoring;	
@@ -60,12 +61,13 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 	private DestinationChoiceBestResponseContext dcContext;
 	private List<ScoringPenalty> penalty = null;
 	
+	@Deprecated // needs to be re-designed with delegation instead of inheritance. kai, oct'14
 	public DCActivityScoringFunction(Plan plan, DestinationChoiceBestResponseContext dcContext) {
 		this(plan, null, dcContext);
 	}
 	
 	// argument facilityPenalties is never used
-	@Deprecated
+	@Deprecated // needs to be re-designed with delegation instead of inheritance. kai, oct'14
 	public DCActivityScoringFunction(Plan plan, final TreeMap<Id, FacilityPenalty> facilityPenalties, DestinationChoiceBestResponseContext dcContext) {
 		super(dcContext.getParams());
 		this.destinationChoiceScoring = new DestinationScoring(dcContext);
@@ -79,6 +81,7 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 	}
 	
 	@Override
+	@Deprecated // needs to be re-designed with delegation instead of inheritance. kai, oct'14
 	public void finish() {				
 		super.finish();	
 		int activityIndex = -1 ;
@@ -98,7 +101,8 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 		this.penalty.clear();
 	}
 	
-	protected double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
+	@Deprecated // needs to be re-designed with delegation instead of inheritance. kai, oct'14
+	protected final double calcActScore(final double arrivalTime, final double departureTime, final Activity act) {
 		
 		if (act.getType().equals("pt interaction")) return 0.0;
 
@@ -224,6 +228,7 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 	
 	
 	@Override
+	@Deprecated // needs to be re-designed with delegation instead of inheritance. kai, oct'14
 	protected double[] getOpeningInterval(Activity act) {
 		// openInterval has two values
 		// openInterval[0] will be the opening time

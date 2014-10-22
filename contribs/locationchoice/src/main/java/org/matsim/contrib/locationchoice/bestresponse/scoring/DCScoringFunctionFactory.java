@@ -65,6 +65,7 @@ public class DCScoringFunctionFactory extends org.matsim.core.scoring.functions.
 		if ( usingConfigParamsForScoring ) {
 			scoringFunction = new DCActivityWOFacilitiesScoringFunction( person, this.lcContext);
 			scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring( this.lcContext.getParams() ) ) ;
+			// forgetting the previous line (which we did at some point) is not picked up by any test within the locationchoice contrib. kai, oct'14
 		} else {
 			scoringFunction = new DCActivityScoringFunction(person.getSelectedPlan(), this.lcContext);
 		}
