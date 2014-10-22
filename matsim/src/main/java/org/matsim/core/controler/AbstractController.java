@@ -300,7 +300,7 @@ public abstract class AbstractController {
      * @param config  TODO
      * @param message the message that is written just before the config dump
      */
-    protected static final void checkConfigConsistencyAndWriteToLog(Config config,
+    public static final void checkConfigConsistencyAndWriteToLog(Config config,
                                                                     final String message) {
         log.info(message);
         String newline = System.getProperty("line.separator");// use native line endings for logfile
