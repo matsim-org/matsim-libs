@@ -65,6 +65,9 @@ public class IdImpl extends Id implements Serializable {
 		 * This does not seem to be true anymore (jwjoubert Dec'13). I added a
 		 * test trying to duplicate the above inconsistency, and could not 
 		 * recreate it anymore.
+		 * 
+		 * This used to be "instanceof IdImpl", in which case another implementation might indeed have caused trouble.  Would probably have failed later,
+		 * in what used to be ((IdImpl)other).toString() .   Now it is probably ok.   (I also added a test.)  kai, oct'14
 		 */
 		if (!(other instanceof Id)) return false;
 		if (other == this) return true;
