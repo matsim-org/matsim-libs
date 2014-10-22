@@ -19,17 +19,23 @@
 
 package eu.eunoiaproject.examples.thinnedtransitrouternetwork;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.experimental.ReflectiveModule;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.router.TransitRouterNetwork;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 import playground.ivt.matsim2030.router.TransitRouterNetworkReader;
 import playground.ivt.matsim2030.router.TransitRouterWithThinnedNetworkFactory;
@@ -37,6 +43,9 @@ import playground.ivt.matsim2030.router.TransitRouterWithThinnedNetworkFactory;
 import eu.eunoiaproject.examples.schedulebasedteleportation.ScheduleBasedTripRouterFactory;
 
 public class RunSimulationWithThinnedRouterNetwork {
+	private static final Logger log =
+		Logger.getLogger(RunSimulationWithThinnedRouterNetwork.class);
+
 
 	public static void main( final String[] args ) {
 		final String configFile = args[ 0 ];
@@ -51,8 +60,10 @@ public class RunSimulationWithThinnedRouterNetwork {
 			ConfigUtils.loadConfig(
 				configFile,
 				thinnedNetworkConfigGroup );
+		setupTransitActivityParams( config );
 
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
+		loadTransitInScenario( scenario );
 
 		final Controler controler = new Controler( scenario );
 
@@ -111,6 +122,46 @@ public class RunSimulationWithThinnedRouterNetwork {
 					scenario ),
 				scenario );
 	}
+
+	private static final void loadTransitInScenario( final Scenario scenario ) {
+		final Config config = scenario.getConfig();
+		// if actual simulation of transit is disabled, the transit schedule
+		// is not loaded automatically: we need to do it by hand
+		if ( !config.scenario().isUseTransit() ) {
+			((ScenarioImpl) scenario).createTransitSchedule();
+			log.info( "read schedule from "+config.transit().getTransitScheduleFile() );
+			new TransitScheduleReader( scenario ).readFile( config.transit().getTransitScheduleFile() );
+
+			// this is not necessary in the vast majority of applications.
+			if ( config.transit().getTransitLinesAttributesFile() != null ) {
+				log.info("loading transit lines attributes from " + config.transit().getTransitLinesAttributesFile());
+				new ObjectAttributesXmlReader( scenario.getTransitSchedule().getTransitLinesAttributes() ).parse(
+						config.transit().getTransitLinesAttributesFile() );
+			}
+			if ( config.transit().getTransitStopsAttributesFile() != null ) {
+				log.info("loading transit stop facilities attributes from " + config.transit().getTransitStopsAttributesFile() );
+				new ObjectAttributesXmlReader( scenario.getTransitSchedule().getTransitStopsAttributes() ).parse(
+						config.transit().getTransitStopsAttributesFile() );
+			}
+		}
+		else {
+			log.info( "Transit will be simulated." );
+		}
+	}
+
+	private static void setupTransitActivityParams( final Config config ) {
+		if ( config.planCalcScore().getActivityTypes().contains( PtConstants.TRANSIT_ACTIVITY_TYPE ) ) return;
+
+		// this is normally done in the Controler if transit is enabled
+		final ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
+		transitActivityParams.setTypicalDuration(120.0);
+
+		transitActivityParams.setOpeningTime(0.) ;
+		transitActivityParams.setClosingTime(0.) ;
+
+		config.planCalcScore().addActivityParams(transitActivityParams);
+	}
+	
 
 	private static class ThinnedNetworkConfigGroup extends ReflectiveModule {
 		private static final String GROUP_NAME = "customPtRouting";
