@@ -18,6 +18,8 @@
  * *********************************************************************** */
 package playground.southafrica.kai.freight;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Collection;
 
 import jsprit.core.algorithm.VehicleRoutingAlgorithm;
@@ -52,8 +54,11 @@ import org.matsim.contrib.freight.scoring.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.scoring.FreightActivity;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
+import org.matsim.core.controler.AbstractController;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.network.NetworkChangeEvent;
@@ -99,18 +104,18 @@ public class KNFreight4 {
 	private static final String NETFILENAME = QVH_FREIGHT + "network/merged-network-simplified.xml.gz" ;
 	
 //	private static final String VEHTYPES = QVH_FREIGHT + "myGridSim/vehicleTypes.xml" ;
-	private static final String VEHTYPES = "/Users/nagel/freight-kairuns/inputs/kai/vehicleTypes.xml" ;
+	private static final String VEHTYPES = "/Users/nagel/kairuns/nmbm-freight/inputs/kai/vehicleTypes.xml" ;
 
 //	private static final String CARRIERS = QVH_FREIGHT + "myGridSim/carrier.xml" ;
 //	private static final String CARRIERS = "/Users/nagel/freight-kairuns/one-truck/carriers.xml.gz" ;
 //	private static final String CARRIERS = "/Users/nagel/freight-kairuns/inputs/2013-11-30-08h54/carrier.xml" ;
-	private static final String CARRIERS = "/Users/nagel/freight-kairuns/inputs/kai/carrier.xml" ;
+	private static final String CARRIERS = "/Users/nagel/kairuns/nmbm-freight/inputs/kai/carrier.xml" ;
 
 
 	private static final String ALGORITHM = QVH_FREIGHT + "myGridSim/initialPlanAlgorithm.xml" ;
 	//	private static final String ALGORITHM = QVANHEERDEN_FREIGHT + "myGridSim/algorithm.xml" ;
 	
-	private static final boolean generatingDemandFromModel = false ;
+	private static final boolean generatingDemandFromModel = false ; // template only; not filled with "meaning"
 	
 	private static final boolean generatingCarrierPlansFromScratch = true ;
 	
@@ -120,10 +125,18 @@ public class KNFreight4 {
 
 	public static void main(String[] args) {
 		
+		for ( int ii=0 ; ii<args.length ; ii++ ) {
+			System.out.println( args[ii] ) ;
+		}
+//		System.exit(-1);;
+		
 		// ### config stuff: ###	
 
 		Config config = createConfig(args);
-
+		config.addConfigConsistencyChecker(new VspConfigConsistencyCheckerImpl());
+		AbstractController.checkConfigConsistencyAndWriteToLog(config, "dump");
+//		System.exit(-1);
+		
 		// ### scenario stuff: ###
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -185,7 +198,7 @@ public class KNFreight4 {
 		Config config = ConfigUtils.createConfig() ;
 		
 		if ((args == null) || (args.length == 0)) {
-			config.controler().setOutputDirectory("/Users/nagel/freight-kairuns/output/");
+			config.controler().setOutputDirectory("/Users/nagel/kairuns/nmbm-freight/output/");
 		} else {
 			System.out.println( "args[0]:" + args[0] );
 			config.controler().setOutputDirectory( args[0]+"/" );

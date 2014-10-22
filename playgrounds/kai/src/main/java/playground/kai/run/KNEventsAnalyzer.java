@@ -56,17 +56,17 @@ public class KNEventsAnalyzer {
 		String networkFilename = args[2] ;
 		
 		String popAttrFilename = null ;
-		if ( args.length >= 3 && args[3]!=null ) {
+		if ( args.length > 3 && args[3]!=null ) {
 			popAttrFilename = args[3] ;
 		}
 		
 		String tollFilename = null ;
-		if ( args.length >= 4 && args[4]!=null ) {
+		if ( args.length > 4 && args[4]!=null ) {
 			tollFilename = args[4] ;
 		}
 		
 		String otherLinksFilename = null ;
-		if ( args.length >= 5 && args[5]!=null ) {
+		if ( args.length > 5 && args[5]!=null ) {
 			otherLinksFilename = args[5] ;
 		}
 		

@@ -176,7 +176,7 @@ public class GautengControler_subpopulations {
 		if ( user==User.kai ) {
 			config.parallelEventHandling().setNumberOfThreads(1); // I don't think that it helps to have more than one here.  
 			config.qsim().setNumberOfThreads(6);
-			config.qsim().setTrafficDynamics(QSimConfigGroup.TRAFF_DYN_W_HOLES);
+//			config.qsim().setTrafficDynamics(QSimConfigGroup.TRAFF_DYN_W_HOLES);
 			
 			config.controler().setSnapshotFormat( Arrays.asList( "otfvis" ) );
 			config.controler().setWriteSnapshotsInterval(100);
@@ -184,9 +184,9 @@ public class GautengControler_subpopulations {
 			config.qsim().setSnapshotPeriod(900);
 			config.qsim().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_EQUI_DIST);
 			
-			config.global().setRandomSeed(4713);
+//			config.global().setRandomSeed(4713);
 			
-//			config.vspExperimental().setFractionOfIterationsToStartScoreMSA(0.8);
+			config.vspExperimental().setFractionOfIterationsToStartScoreMSA(0.8);
 		} else if(user == User.johan){
 			config.parallelEventHandling().setNumberOfThreads(1); 
 		}
