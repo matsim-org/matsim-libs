@@ -4,17 +4,19 @@ import playground.southafrica.gauteng.GautengControler_subpopulations.User;
 
 public class KNGautengController {
 	
-	final static String GAUTENG_PATH = "/Users/nagel/southafrica/MATSim-SA/data/areas/gauteng/" ;
-
 	public static void main(String[] args) {
 		
+		String homedir = System.getProperty("user.home") ;
+		
+		String GAUTENG_PATH = homedir + "/southafrica/MATSim-SA/data/areas/gauteng/" ;
+
 		String[] args2 = {
 				GAUTENG_PATH + "config/basicConfig.xml" // config
 				
 //				, GAUTENG_PATH + "population/20140124/gauteng.xml.gz" // pop
 //				, "/Users/nagel/gauteng-kairuns/much_simplified_plans.xml.gz"
 //				, "/Users/nagel/southafrica/gautengRuns/output_base/ITERS/it.600/600.plans.xml.gz"
-				,"/Users/nagel/kairuns/new-gauteng/output_base_vot020_3/100.plans.xml.gz"
+				,homedir+"/kairuns/new-gauteng/output_base_vot020_3/100.plans.xml.gz"
 //				,"/Users/nagel/kairuns/new-gauteng/output_base_vot110_3/100.plans.xml.gz"
 				
 //				, GAUTENG_PATH + "population/20140208/gautengAttr.xml.gz" // pop attribs 
@@ -32,7 +34,7 @@ public class KNGautengController {
 				, User.kai.toString()
 				, "./output"
 				, GAUTENG_PATH + "counts/2009/Counts_Thursday_Total.xml.gz"
-				,"/Users/nagel/kairuns/gauteng/additional_config.xml"
+				,homedir + "/kairuns/gauteng/additional_config.xml"
 				} ;
 		GautengControler_subpopulations.main(args2);
 	}

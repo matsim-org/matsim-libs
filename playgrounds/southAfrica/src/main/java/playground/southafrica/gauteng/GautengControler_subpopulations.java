@@ -184,7 +184,7 @@ public class GautengControler_subpopulations {
 			config.qsim().setSnapshotPeriod(900);
 			config.qsim().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_EQUI_DIST);
 			
-//			config.global().setRandomSeed(4713);
+			config.global().setRandomSeed(4713);
 			
 //			config.vspExperimental().setFractionOfIterationsToStartScoreMSA(0.8);
 		} else if(user == User.johan){
