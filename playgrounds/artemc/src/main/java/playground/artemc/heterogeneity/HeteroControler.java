@@ -50,7 +50,7 @@ public class HeteroControler {
 				heteroSwitch=true;
 		}
 
-		HeteroControler  runner = new HeteroControler();
+		HeteroControler runner = new HeteroControler();
 		runner.run();
 	}
 
@@ -61,9 +61,6 @@ public class HeteroControler {
 		System.setProperty("matsim.preferLocalDtds", "true");
 		controler = new Controler(scenario);
 		
-
-		Initializer initializer = new Initializer();
-		controler.addControlerListener(initializer);
 		//controler.setMobsimFactory(new QSimFactory());
 
 		log.info("Adding Simple Annealer...");
@@ -95,6 +92,12 @@ public class HeteroControler {
 		//Scoring
 		controler.setScoringFunctionFactory(new DisaggregatedCharyparNagelScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getNetwork(), heterogeneityConfig));
 		controler.setOverwriteFiles(true);
+		
+		// Additional analysis
+		controler.addControlerListener(new DisaggregatedScoreAnalyzer((ScenarioImpl) controler.getScenario()));
+		controler.addControlerListener(new WelfareAnalysisControlerListener((ScenarioImpl) controler.getScenario()));
+		addMeanTravelTimeCalculator(controler);
+		
 		controler.run();
 
 		//Logger root = Logger.getRootLogger();
@@ -119,14 +122,8 @@ public class HeteroControler {
 		return scenario;
 	}
 
-	private static class Initializer implements StartupListener {
 
-		@Override
-		public void notifyStartup(StartupEvent event) {
-
-			Controler controler = event.getControler();
-			ScenarioImpl scenarioImpl = (ScenarioImpl) controler.getScenario();
-
+	private void addMeanTravelTimeCalculator(Controler controler){
 			// create a plot containing the mean travel times
 			Set<String> transportModes = new HashSet<String>();
 			transportModes.add(TransportMode.car);
@@ -135,11 +132,6 @@ public class HeteroControler {
 			MeanTravelTimeCalculator mttc = new MeanTravelTimeCalculator(controler.getScenario(), transportModes);
 			controler.addControlerListener(mttc);
 			controler.getEvents().addHandler(mttc);
-
-			// Additional analysis
-			controler.addControlerListener(new DisaggregatedScoreAnalyzer(scenarioImpl));
-			controler.addControlerListener(new WelfareAnalysisControlerListener((ScenarioImpl) controler.getScenario()));
-
 		}
-	}
+	
 }
