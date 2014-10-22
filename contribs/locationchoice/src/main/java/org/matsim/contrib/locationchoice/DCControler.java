@@ -25,15 +25,18 @@ import org.matsim.contrib.locationchoice.bestresponse.scoring.DCScoringFunctionF
 import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.core.controler.Controler;
 
+@Deprecated // very old syntax; loot at LocationChoiceIntegrationTest instead. kai/mz, oct'14
 public class DCControler extends Controler {
 	
 	private DestinationChoiceBestResponseContext dcContext;
 	
 				
+	@Deprecated // very old syntax; loot at LocationChoiceIntegrationTest instead. kai/mz, oct'14
 	public DCControler(final String[] args) {
 		super(args);	
 	}
 	
+	@Deprecated // very old syntax; loot at LocationChoiceIntegrationTest instead. kai/mz, oct'14
 	public static void main (final String[] args) { 
 		DCControler controler = new DCControler(args);
 		controler.setOverwriteFiles(true);
@@ -41,6 +44,7 @@ public class DCControler extends Controler {
     	controler.run();
     }  
 	
+	@Deprecated // very old syntax; loot at LocationChoiceIntegrationTest instead. kai/mz, oct'14
 	private void init() {
 		/*
 		 * would be muuuuch nicer to have this in DestinationChoiceInitializer, but startupListeners are called after corelisteners are called
@@ -63,6 +67,7 @@ public class DCControler extends Controler {
 		}		
 	}
 	
+	@Deprecated // very old syntax; loot at LocationChoiceIntegrationTest instead. kai/mz, oct'14
 	protected void loadControlerListeners() {
 		this.dcContext.init(); // this is an ugly hack, but I somehow need to get the scoring function + context into the controler
 

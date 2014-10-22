@@ -62,15 +62,19 @@ public class DestinationEspilonScoring implements ActivityScoring, LegScoring,
 		return score;
 	}
 
+	private int activityIndex = 0 ;
 	@Override
 	public void handleFirstActivity(final Activity act) {
+		activityIndex = 0 ;
 		handleActivity( act );
 	}
 
 	@Override
 	public void handleActivity(final Activity act) {
+		activityIndex ++;
 		// XXX this is because location choice uses the index of the activity in the
 		// plan to change the epsilon (which is wrong, but anyway).
+		// Thibaut, we now changed this to counting internally via activityIndex, but we recognize that this is still far from optimal. kai/mz, oct'14
 		currentPlan.addActivity( act );
 		if ( !context.getScaleEpsilon().isFlexibleType( act.getType() ) ) return;
 
@@ -80,14 +84,18 @@ public class DestinationEspilonScoring implements ActivityScoring, LegScoring,
 				context.getScaleEpsilon().getEpsilonFactor( act.getType() ) :
 				BestReplyDestinationChoice.useScaleEpsilonFromConfig;
 
-		score += scoring.getDestinationScore(
-				currentPlan,
-				(ActivityImpl) act, // XXX Activity would be sufficient...
-				fVar );
+//				score += scoring.getDestinationScore(
+//						currentPlan,
+//						(ActivityImpl) act, // XXX Activity would be sufficient...
+//						fVar );
+				score += scoring.getDestinationScore(
+						act,
+						fVar, activityIndex, currentPlan.getPerson().getId() );
 	}
 
 	@Override
 	public void handleLastActivity(final Activity act) {
+		activityIndex ++;
 		// should be the same as the first => already done
 	}
 

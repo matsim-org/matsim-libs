@@ -360,9 +360,11 @@ public class AgentInteractionScoringFunction extends CharyparNagelActivityScorin
 		}
 		 */		
 		for (PlanElement pe : this.plan.getPlanElements()) {
+			int activityIndex = -1 ;
 			if (pe instanceof Activity) {
-				this.score += destinationChoiceScoring.getDestinationScore((PlanImpl)plan, (ActivityImpl)pe, 
-						BestReplyDestinationChoice.useScaleEpsilonFromConfig);
+				activityIndex++ ;
+				this.score += destinationChoiceScoring.getDestinationScore( (Activity)pe, 
+						BestReplyDestinationChoice.useScaleEpsilonFromConfig, activityIndex, this.plan.getPerson().getId() );
 			}
 		}
 	}

@@ -36,13 +36,13 @@ import org.matsim.core.scenario.ScenarioUtils;
 /**
  * @author kn
  */
-class MyPlansToPlans {
+class KNPlansToPlans {
 
 	static void run(final String[] args) {
 		
 		Config config = ConfigUtils.createConfig() ;
-		config.plans().setInputFile( "/Users/nagel/kairuns/tampa/inputs/plans.xml.gz") ;
-		config.network().setInputFile( "/Users/nagel/kairuns/tampa/inputs/tbrpmcarbus.xml.gz") ;
+		config.plans().setInputFile( "/Users/nagel/kairuns/new-gauteng/output_base_vot110_3/100.plans.xml.gz") ;
+		config.network().setInputFile( "/Users/nagel/kairuns/new-gauteng/3sep-wo-toll-vot110_3-output/output_network.xml.gz") ;
 
 		Scenario sc = ScenarioUtils.loadScenario(config) ;
 		
@@ -68,7 +68,7 @@ class MyPlansToPlans {
 //					accept = false ;
 //				}
 //			}
-			if ( Math.random() < 0.99 ) accept = false ;
+			if ( Math.random() < 0.9 ) accept = false ;
 			if ( accept ) {
 				System.out.println("adding person...");
 				newPop.addPerson(person);
@@ -83,7 +83,7 @@ class MyPlansToPlans {
 	}
 
 	public static void main(final String[] args) {
-		MyPlansToPlans app = new MyPlansToPlans();
+		KNPlansToPlans app = new KNPlansToPlans();
 		app.run(args);
 	}
 

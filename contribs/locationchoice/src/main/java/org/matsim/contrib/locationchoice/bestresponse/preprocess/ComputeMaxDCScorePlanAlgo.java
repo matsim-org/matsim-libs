@@ -33,7 +33,6 @@ import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DestinationScoring;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class ComputeMaxDCScorePlanAlgo implements PlanAlgorithm {
@@ -63,8 +62,10 @@ public class ComputeMaxDCScorePlanAlgo implements PlanAlgorithm {
 		 * Different activities in a plan have now different epsilons!
 		 * TODO: Future improvement: store max dc score *per* activity -> computational gain 
 		 */			
+		int activityIndex = -1 ;
 		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Activity) {					
+			if (pe instanceof Activity) {
+				activityIndex++ ;
 				if (this.lcContext.getConverter().convertType(((Activity) pe).getType()).equals(type)) {
 			
 					for (ActivityFacilityWithIndex f : typedFacilities.values()) {
@@ -76,7 +77,7 @@ public class ComputeMaxDCScorePlanAlgo implements PlanAlgorithm {
 						act.setFacilityId(f.getId());
 						
 						double epsilonScaleFactor = 1.0; // no scaling back needed here anymore
-						double dcScore = scorer.getDestinationScore((PlanImpl) p.getSelectedPlan(), act, epsilonScaleFactor);
+						double dcScore = scorer.getDestinationScore(act, epsilonScaleFactor, activityIndex, p.getId());
 										
 						if (dcScore > maxDCScore) {
 							maxDCScore = dcScore;

@@ -23,12 +23,11 @@ import java.util.Collection;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.utils.objectattributes.ObjectAttributesUtils;
 
@@ -49,21 +48,18 @@ public class DestinationScoring {
 		this.lcContext = lcContext;
 	}
 	
-	public double getDestinationScore(PlanImpl plan, ActivityImpl act, double fVar) {
+	public double getDestinationScore(Activity act, double fVar, int activityIndex, Id<Person> personId) {
 		double score = 0.0;
 		if (this.scaleEpsilon.isFlexibleType(act.getType())) {
 			/*
-			 * Different epsilon for every discretionary activity. Use plan index for that for now. 
-			 * TODO: Use a different unique identifier as plan elements index is not supported by api to be 
-			 * necessarily stable, I think (?)
-			 * But at this time I do not see another possibility. Every other element of Activity changes also.
-			 * java Object ID?
+			 * The following will not work if activities are inserted or removed during replanning (e.g. ptInteractionActivities).  kai/mz, oct'14
 			 */
-			int actIndex = plan.getActLegIndex(act);
+			int actIndex =  2*activityIndex ; // "2": retrofitting; this used to be the PlanElementIndex.  One could probably remove the "2",
+			// but then the test fail because this is equivalent to a different random seed.  So more diligent checking would be needed.
 			
 			if (fVar < 0.0) fVar = this.scaleEpsilon.getEpsilonFactor(act.getType());
-			score += (fVar * this.getEpsilonAlternative(act.getFacilityId(), plan.getPerson(), actIndex));
-			score += this.getAttributesScore(act.getFacilityId(), plan.getPerson().getId());
+			score += (fVar * this.getEpsilonAlternative(act.getFacilityId(), personId, actIndex));
+			score += this.getAttributesScore(act.getFacilityId(), personId );
 		}
 		return score;
 	}
@@ -89,12 +85,12 @@ public class DestinationScoring {
 		return accumulatedScore;
 	}
 	
-	private double getEpsilonAlternative(Id<ActivityFacility> facilityId, PersonImpl person, int actIndex) {
+	private double getEpsilonAlternative(Id facilityId, Id<Person> personId, int actIndex) {
 		/*
 		 * k values are uniform in [0..1[, see class ReadOrCreateKVals.
 		 */		
 		double kf = this.facilitiesKValuesArray[this.lcContext.getFacilityIndex(facilityId)];
-		double kp = this.personsKValuesArray[this.lcContext.getPersonIndex(person.getId())]; 
+		double kp = this.personsKValuesArray[this.lcContext.getPersonIndex(personId)]; 
 		
 		/* generate another stable random number for the activity
 		 * TODO: check if there is enough randomness with this seed

@@ -16,7 +16,7 @@ public class KNGautengController {
 //				, GAUTENG_PATH + "population/20140124/gauteng.xml.gz" // pop
 //				, "/Users/nagel/gauteng-kairuns/much_simplified_plans.xml.gz"
 //				, "/Users/nagel/southafrica/gautengRuns/output_base/ITERS/it.600/600.plans.xml.gz"
-				,homedir+"/kairuns/new-gauteng/output_base_vot020_3/100.plans.xml.gz"
+				,homedir+"/kairuns/new-gauteng/output_base_vot020_3/100.plans-reduced.xml.gz"
 //				,"/Users/nagel/kairuns/new-gauteng/output_base_vot110_3/100.plans.xml.gz"
 				
 //				, GAUTENG_PATH + "population/20140208/gautengAttr.xml.gz" // pop attribs 

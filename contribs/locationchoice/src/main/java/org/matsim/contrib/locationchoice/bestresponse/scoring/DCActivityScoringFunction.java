@@ -81,10 +81,12 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 	@Override
 	public void finish() {				
 		super.finish();	
+		int activityIndex = -1 ;
 		for (PlanElement pe : this.plan.getPlanElements()) {
 			if (pe instanceof Activity) {
-				this.score += destinationChoiceScoring.getDestinationScore((PlanImpl)plan, (ActivityImpl)pe, 
-						BestReplyDestinationChoice.useScaleEpsilonFromConfig);
+				activityIndex++ ;
+				this.score += destinationChoiceScoring.getDestinationScore(  (Activity)pe, 
+						BestReplyDestinationChoice.useScaleEpsilonFromConfig, activityIndex, this.plan.getPerson().getId() );
 			}
 		}
 		// reduce score by penalty from capacity restraints

@@ -39,6 +39,7 @@ import org.matsim.core.scoring.SumScoringFunction;
  * @author rashid_waraich
  */
 public class CharyparNagelScoringFunctionFactory implements ScoringFunctionFactory {
+	// yy should be final.
 
 	protected Network network;
 	private final PlanCalcScoreConfigGroup config;

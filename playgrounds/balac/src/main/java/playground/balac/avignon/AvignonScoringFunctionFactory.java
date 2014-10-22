@@ -10,6 +10,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
+import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
@@ -37,15 +38,34 @@ public class AvignonScoringFunctionFactory extends org.matsim.core.scoring.funct
 		usingConfigParamsForScoring = val ;
 	}
 
+//	@Override
+//	public ScoringFunction createNewScoringFunction(Person person) {		
+//ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator(); // TODO: replace this now by SumScore 
+//		
+//		CharyparNagelActivityScoring scoringFunction ;
+//		if ( usingConfigParamsForScoring ) {
+//			scoringFunction = new DCActivityWOFacilitiesScoringFunction(
+//					person.getSelectedPlan(), 
+//					this.lcContext);
+//		} else {
+//			scoringFunction = new DCActivityScoringFunction(
+//					person.getSelectedPlan(), 
+//					this.lcContext.getFacilityPenalties(), 
+//					lcContext);
+//		}
+//		scoringFunctionAccumulator.addScoringFunction(scoringFunction);		
+//		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(new CharyparNagelScoringParameters(config.planCalcScore()), controler.getNetwork()));
+//		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(new CharyparNagelScoringParameters(config.planCalcScore())));
+//		return scoringFunctionAccumulator;
+//	}
 	@Override
 	public ScoringFunction createNewScoringFunction(Person person) {		
-ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator(); // TODO: replace this now by SumScore 
+		SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 		
-		CharyparNagelActivityScoring scoringFunction ;
+		SumScoringFunction.BasicScoring scoringFunction ;
 		if ( usingConfigParamsForScoring ) {
-			scoringFunction = new DCActivityWOFacilitiesScoringFunction(
-					person.getSelectedPlan(), 
-					this.lcContext);
+			scoringFunction = new DCActivityWOFacilitiesScoringFunction( person, this.lcContext);
+			scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring( this.lcContext.getParams() ) ) ;
 		} else {
 			scoringFunction = new DCActivityScoringFunction(
 					person.getSelectedPlan(), 

@@ -22,34 +22,48 @@ package org.matsim.contrib.locationchoice.bestresponse.scoring;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.BestReplyDestinationChoice;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
+import org.matsim.core.scoring.SumScoringFunction;
 
-public class DCActivityWOFacilitiesScoringFunction extends CharyparNagelActivityScoring {
+public class DCActivityWOFacilitiesScoringFunction implements SumScoringFunction.ActivityScoring {
 	static final Logger log = Logger.getLogger(DCActivityWOFacilitiesScoringFunction.class);	
 	private DestinationScoring destinationChoiceScoring;	
-	private Plan plan ;
+	private double score = 0. ;
+	private final Person person;
 	
-	public DCActivityWOFacilitiesScoringFunction(Plan plan, DestinationChoiceBestResponseContext lcContext) {
-		super(lcContext.getParams());
+	public DCActivityWOFacilitiesScoringFunction(Person person, DestinationChoiceBestResponseContext lcContext) {
 		this.destinationChoiceScoring = new DestinationScoring(lcContext);
-		this.plan = plan ;
+		this.person = person ; 
 	}
 	
 	@Override
 	public void finish() {		
-		
-		super.finish();
+	}
 
-		for (PlanElement pe : plan.getPlanElements()) {
-			if (pe instanceof Activity) {
-				this.score += destinationChoiceScoring.getDestinationScore((PlanImpl)plan, (ActivityImpl)pe, BestReplyDestinationChoice.useScaleEpsilonFromConfig);
-			}
-		}
+	@Override
+	public double getScore() {
+		return this.score ;
+	}
+	
+	private int activityIndex = 0 ;
+
+	@Override
+	public void handleFirstActivity(Activity act) {
+		activityIndex = 0 ;
+		this.score += destinationChoiceScoring.getDestinationScore(act, BestReplyDestinationChoice.useScaleEpsilonFromConfig, activityIndex, person.getId());
+	}
+
+	@Override
+	public void handleActivity(Activity act) {
+		activityIndex++ ;
+		this.score += destinationChoiceScoring.getDestinationScore(act, BestReplyDestinationChoice.useScaleEpsilonFromConfig, activityIndex, person.getId());
+	}
+
+	@Override
+	public void handleLastActivity(Activity act) {
+		activityIndex++ ;
+		this.score += destinationChoiceScoring.getDestinationScore(act, BestReplyDestinationChoice.useScaleEpsilonFromConfig, activityIndex, person.getId());
 	}
 }

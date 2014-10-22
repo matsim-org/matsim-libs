@@ -26,7 +26,7 @@ import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestRespo
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionAccumulator;
+import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
@@ -59,13 +59,12 @@ public class DCScoringFunctionFactory extends org.matsim.core.scoring.functions.
 
 	@Override
 	public ScoringFunction createNewScoringFunction(Person person) {		
-		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator(); // TODO: replace this now by SumScore 
+		SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 		
-		CharyparNagelActivityScoring scoringFunction ;
+		SumScoringFunction.BasicScoring scoringFunction ;
 		if ( usingConfigParamsForScoring ) {
-			scoringFunction = new DCActivityWOFacilitiesScoringFunction(
-					person.getSelectedPlan(), 
-					this.lcContext);
+			scoringFunction = new DCActivityWOFacilitiesScoringFunction( person, this.lcContext);
+			scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring( this.lcContext.getParams() ) ) ;
 		} else {
 			scoringFunction = new DCActivityScoringFunction(person.getSelectedPlan(), this.lcContext);
 		}

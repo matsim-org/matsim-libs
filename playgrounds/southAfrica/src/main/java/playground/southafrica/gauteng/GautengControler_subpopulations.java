@@ -161,9 +161,9 @@ public class GautengControler_subpopulations {
 		}
 		
 		double sampleFactor = 0.01 ;
-		if ( user==User.kai ) {
-			sampleFactor = 0.1 ;
-		}
+//		if ( user==User.kai ) {
+//			sampleFactor = 0.1 ;
+//		}
 		config.qsim().setFlowCapFactor(sampleFactor);
 		config.qsim().setStorageCapFactor(sampleFactor * Math.pow(sampleFactor, -0.25)); // interpolates between 0.03 @ 0.01 and 1 @ 1
 		config.counts().setCountsScaleFactor(1./sampleFactor);

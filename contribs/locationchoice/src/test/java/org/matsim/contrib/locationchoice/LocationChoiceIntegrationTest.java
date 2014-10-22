@@ -65,6 +65,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.SumScoringFunction;
+import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -85,7 +87,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		config.locationchoice().setRandomSeed("4711") ;
 
 		// SCENARIO:
-		final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		final Scenario scenario = ScenarioUtils.createScenario(config);
 
 		final double scale = 1000. ;
 		final double speed = 10. ;
@@ -111,11 +113,12 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		controler.setScoringFunctionFactory( new ScoringFunctionFactory(){
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
-				ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
-				scoringFunctionAccumulator.addScoringFunction(new DCActivityWOFacilitiesScoringFunction(person.getSelectedPlan(), lcContext ) );
-				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(lcContext.getParams(), scenario.getNetwork()));
-				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(lcContext.getParams()));
-				return scoringFunctionAccumulator;
+				SumScoringFunction sum = new SumScoringFunction() ;
+				sum.addScoringFunction(new CharyparNagelActivityScoring(lcContext.getParams()));
+				sum.addScoringFunction(new CharyparNagelLegScoring(lcContext.getParams(), scenario.getNetwork() ) ) ;
+				sum.addScoringFunction( new CharyparNagelAgentStuckScoring(lcContext.getParams() ) );
+				sum.addScoringFunction( new DCActivityWOFacilitiesScoringFunction(person, lcContext) ) ;
+				return sum ;
 			}
 		}) ;
 
@@ -129,9 +132,10 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager eventsManager) {
 				return new BestReplyLocationChoicePlanStrategy(scenario) ;
-				// yy MZ argues that this is not so great since the factory now has context that goes beyond Scenario and EventsManager.
+				// MZ argues that this is not so great since the factory now has context that goes beyond Scenario and EventsManager.
 				// As an alternative, one could add the context to Scenario as scenario element.  I find the present version easier to read, and
 				// as long as the factories remain anonymous classes, this is most probably ok. kai, feb'13
+				// We do not see this as a problem any more.  kai/mz, oct'14
 			}
 		});
 
@@ -216,7 +220,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		System.err.println("shouldn't this change anyways??") ;
 	}
 
-	private void createExampleNetwork(final ScenarioImpl scenario, final double scale, final double speed) {
+	private void createExampleNetwork(final Scenario scenario, final double scale, final double speed) {
 		Network network = scenario.getNetwork() ;
 
 		Node node0 = network.getFactory().createNode(Id.create(0, Node.class), new CoordImpl(-scale,0) ) ;
@@ -317,7 +321,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 	 * setup population with one person
 	 * @param workActEndTime TODO
 	 */
-	private static Person localCreatePopWOnePerson(ScenarioImpl scenario, Link link, ActivityFacility facility1, double workActEndTime) {
+	private static Person localCreatePopWOnePerson(Scenario scenario, Link link, ActivityFacility facility1, double workActEndTime) {
 
 		Population population = scenario.getPopulation();
 
