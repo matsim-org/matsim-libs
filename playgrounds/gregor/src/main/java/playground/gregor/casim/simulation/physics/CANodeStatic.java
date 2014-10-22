@@ -307,4 +307,9 @@ public class CANodeStatic implements NetsimNode, CANode{
 		return null;
 	}
 
+	@Override
+	public List<CALinkDynamic> getLinks() {
+		throw new RuntimeException("won't be implemented!");
+	}
+
 }

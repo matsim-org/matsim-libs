@@ -72,8 +72,6 @@ LinkLeaveEventHandler {
 
 		if (event.getLinkId() == this.ds){
 			LinkEnterEvent enter = this.dsQ.poll();
-			
-			
 			Measure oldM = this.measures.getLast();
 			Measure newM = new Measure(event.getTime()+this.timeOffset);
 			newM.usTT = oldM.usTT;
@@ -142,6 +140,8 @@ LinkLeaveEventHandler {
 		if (sigma > 0.15 || sigmaRev > 0.15) {
 			log.warn("no stationarity! simga=" + sigma + " sigmaRev=" + sigmaRev);
 			return this.timeOffset;
+		} else {
+			log.info("stationarity! simga=" + sigma + " sigmaRev=" + sigmaRev);
 		}
 		
 		int cnt = 0;
@@ -149,7 +149,7 @@ LinkLeaveEventHandler {
 			if (cnt++ < from || cnt > from+20) {
 				continue;
 			}
-//			
+			
 			double dsRho = m.dsCnt/this.area;
 			double usRho = m.usCnt/this.area;
 

@@ -39,6 +39,7 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 	private final CASimpleDynamicAgent [] particles;
 	private final double [] dsLastLeftTimes;
 	private final double [] usLastLeftTimes;
+	private final double [] densities;
 	
 	private final int size;
 
@@ -51,14 +52,16 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 
 	private final double cellLength;
 
-	private final double width;
+	private double width;
 
 	private final double tFree;
 
-	private final double ratio;
+	private double ratio;
 
 	public CALinkDynamic(Link dsl, Link usl, CANodeDynamic ds, CANodeDynamic us, CANetworkDynamic net) {
 
+		
+		
 		this.width = dsl.getCapacity();//TODO this is a misuse of the link's capacity attribute. Needs to be fixed!
 		this.ratio = CANetworkDynamic.PED_WIDTH/this.width;
 		this.cellLength = this.ratio/(CANetworkDynamic.RHO_HAT*CANetworkDynamic.PED_WIDTH);
@@ -68,6 +71,7 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 		this.particles = new CASimpleDynamicAgent[this.size];
 		this.usLastLeftTimes = new double[this.size];
 		this.dsLastLeftTimes = new double[this.size];
+		this.densities = new double[this.size];
 		this.ds = ds;
 		this.us = us;
 		this.tFree = this.cellLength/CANetworkDynamic.V_HAT;
@@ -77,16 +81,23 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 //		this.ratio = 1;
 	}
 
-	/*package*/ double getD() {
-		final double rho = this.net.getRho(this);
+	//bottleneck experiment
+	public void changeWidth(double width) {
+		this.width = width; 
+		this.ratio = CANetworkDynamic.PED_WIDTH/this.width;
+	}
+
+	/*package*/ double getD(CAAgent a) {
+		final double rho = this.net.getRho(a);
 		final double tmp = Math.pow(rho*CANetworkDynamic.PED_WIDTH, CANetworkDynamic.GAMMA);
 		final double d = CANetworkDynamic.ALPHA + CANetworkDynamic.BETA*tmp;
 		return d;
 	}
 	
-	/*package*/ double getZ() {
-		double d = getD();
+	/*package*/ double getZ(CAAgent a) {
+		double d = getD(a);
 		double z = 1/(CANetworkDynamic.RHO_HAT+CANetworkDynamic.V_HAT)+d;
+//		double z = this.tFree + d;
 		return z;
 	}
 
@@ -146,7 +157,7 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 
 		//check pre-condition
 		if (this.particles[idx+1] == null) {
-			double z = getZ();
+			double z = getZ(a);
 			z *= this.ratio;
 			if (this.dsLastLeftTimes[idx+1] <= (time-z)){
 				handleTTAOnLinkDownStreamOnPreCondition1(a,time,idx);
@@ -185,7 +196,7 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 			CAAgent toBeTriggered = this.us.peekForAgent();
 			if (toBeTriggered != null) {
 				if (toBeTriggered.getNextLinkId().equals(this.dsl.getId())) {
-					double z = getZ();
+					double z = getZ(toBeTriggered);
 					z *= this.ratio;
 					triggerTTA(toBeTriggered,this.us,time+z);
 				}
@@ -194,7 +205,7 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 			CAAgent toBeTriggered = this.particles[idx-1];
 			if (toBeTriggered != null) {
 				if (toBeTriggered.getDir() == 1) {
-					double z = getZ();
+					double z = getZ(toBeTriggered);
 					z *= this.ratio;
 					triggerTTA(toBeTriggered,this,time+z);
 				}
@@ -211,7 +222,7 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 			CAAgent inFrontOfMe = this.ds.peekForAgent();
 			if (inFrontOfMe != null) {
 				if (inFrontOfMe.getNextLinkId().equals(this.dsl.getId())) { //oncoming
-					double d = getD();
+					double d = getD(a);
 					d *= this.ratio;
 					triggerSWAP(a,this,time+d+this.tFree);
 				} else {
@@ -224,7 +235,7 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 			CAAgent inFrontOfMe = this.particles[idx+2];
 			if (inFrontOfMe != null) {
 				if (inFrontOfMe.getDir() == -1) { //oncoming
-					double d = getD();
+					double d = getD(a);
 					d *= this.ratio;
 					triggerSWAP(a,this,time+d+this.tFree);
 				} else {
@@ -243,7 +254,7 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 	private void handleTTAOnLinkDownStreamOnPreCondition2(
 			CASimpleDynamicAgent a, double time, int idx) {
 		
-		double z = getZ();
+		double z = getZ(a);
 		z *= this.ratio;
 		double zStar = z - (time - this.dsLastLeftTimes[idx+1]);//FIXME should not work!!!
 		double nextTime = time + zStar;
@@ -265,7 +276,7 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 
 		//check pre-condition
 		if (this.particles[idx-1] == null) {
-			double z = getZ();
+			double z = getZ(a);
 			z *= this.ratio;
 			if (this.usLastLeftTimes[idx-1] <= (time-z)){
 				handleTTAOnLinkUpStreamOnPreCondition1(a,time,idx);
@@ -302,7 +313,7 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 			CAAgent toBeTriggered = this.ds.peekForAgent();
 			if (toBeTriggered != null) {
 				if (toBeTriggered.getNextLinkId().equals(this.dsl.getId())) {
-					double z = getZ();
+					double z = getZ(toBeTriggered);
 					z *= this.ratio;
 					triggerTTA(toBeTriggered,this.ds,time+z);
 				}
@@ -311,7 +322,7 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 			CAAgent toBeTriggered = this.particles[idx+1];
 			if (toBeTriggered != null) {
 				if (toBeTriggered.getDir() == -1) {
-					double z = getZ();
+					double z = getZ(toBeTriggered);
 					z *= this.ratio;
 					triggerTTA(toBeTriggered,this,time+z);
 				}
@@ -326,7 +337,7 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 			if (inFrontOfMe != null) {
 				if (inFrontOfMe.getNextLinkId().equals(this.dsl.getId())) { //oncoming
 					
-					double d = getD();
+					double d = getD(a);
 					d *= this.ratio;
 					triggerSWAP(a,this,time+d+this.tFree);
 				} else {
@@ -339,7 +350,7 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 			CAAgent inFrontOfMe = this.particles[idx-2];
 			if (inFrontOfMe != null) {
 				if (inFrontOfMe.getDir() == 1) { //oncoming
-					double d = getD();
+					double d = getD(a);
 					d *= this.ratio;
 					triggerSWAP(a,this,time+d+this.tFree);
 				} else {
@@ -354,7 +365,7 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 
 	private void handleTTAOnLinkUpStreamOnPreCondition2(
 			CASimpleDynamicAgent a, double time, int idx) {
-		double z = getZ();
+		double z = getZ(a);
 		z *= this.ratio;
 		double zStar = z - (time - this.usLastLeftTimes[idx-1]);//FIXME should not work!!!
 		double nextTime = time + zStar;
@@ -394,7 +405,7 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 		
 		//check pre-condition
 		if (this.ds.peekForAgent() == null) {
-			double z = getZ();
+			double z = getZ(a);
 			z *= this.ratio;
 			if (this.ds.getLastNodeExitTimeForAgent(a) <= (time-z)){
 				handleTTADownStreamNodeOnPreCondition1(a,time);
@@ -446,7 +457,7 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 		CAAgent inFrontOfMe = nextCALink.getParticles()[nextNextA];
 		if (inFrontOfMe != null) {
 			if (inFrontOfMe.getDir() == nextRevDir) { //oncoming
-				double d = getD();
+				double d = getD(a);
 				d *= this.ratio;
 				triggerSWAP(a,n,time+d+this.tFree);
 			} else {
@@ -462,7 +473,7 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 	private void handleTTANodeOnPreCondition2(CASimpleDynamicAgent a,
 			double time, CANodeDynamic n) {
 		
-		double z = getZ();
+		double z = getZ(a);
 		z *= this.ratio;
 		
 		double zStar = z - (time - n.getLastNodeExitTimeForAgent(a));
@@ -490,7 +501,7 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 		}
 		//check pre-condition
 		if (this.us.peekForAgent() == null) {
-			double z = getZ();
+			double z = getZ(a);
 			z *= this.ratio;
 			if (this.us.getLastNodeExitTimeForAgent(a) <= (time-z)){
 				handleTTAUpStreamNodeOnPreCondition1(a,time);
@@ -742,5 +753,10 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 
 	public double getCellLength() {
 		return this.cellLength;
+	}
+
+	@Override
+	public double[] getDensities() {
+		return this.densities;
 	}
 }

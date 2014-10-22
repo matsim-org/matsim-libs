@@ -581,4 +581,11 @@ public class CALinkStatic implements CANetworkEntity, CALink{
 			this.net.pushEvent(e);
 		} 
 	}
+
+
+	@Override
+	public double[] getDensities() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

@@ -54,6 +54,106 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 
 	private static final Logger log = Logger.getLogger(TestCANetworkDynamic.class);
 
+	@Test
+	public void testCANetoworkDynamicSpacingsComputation(){
+		Scenario sc = createScenario(10,10);
+		Network net = sc.getNetwork();
+		for (Link l : net.getLinks().values()) {
+			l.setCapacity(.61);
+		}
+		EventsManager em = new EventsManagerImpl();
+		CANetworkDynamic caNet = new CANetworkDynamic(net, em);
+		
+		CALink caLink = caNet.getCALink(Id.createLinkId("2"));
+		CAAgent[] parts = caLink.getParticles();
+		// test: uni dir 50% load
+		//			x <--
+		//			o -->
+		//			* --> (particle under investigation
+		//			_ empty cell
+		// ... o_o_o_o_o_*_o_o_o_o_o_o ...
+		//
+		int pos = (parts.length-1)/2;
+		int dir = 1;
+		parts[pos] = createAgent("0",pos,dir,caLink);
+		parts[pos-2] = createAgent("1",pos,dir,caLink);
+		parts[pos-4] = createAgent("2",pos,dir,caLink);
+		parts[pos-6] = createAgent("3",pos,dir,caLink);
+		parts[pos-8] = createAgent("4",pos,dir,caLink);
+		parts[pos-10] = createAgent("5",pos,dir,caLink);
+		parts[pos+2] = createAgent("1",pos,dir,caLink);
+		parts[pos+4] = createAgent("2",pos,dir,caLink);
+		parts[pos+6] = createAgent("3",pos,dir,caLink);
+		parts[pos+8] = createAgent("4",pos,dir,caLink);
+		parts[pos+10] = createAgent("5",pos,dir,caLink);
+		for (int i = 0; i < parts.length; i++) {
+			if (parts[i] != null) {
+				caNet.registerAgent(parts[i]);
+			}
+		}
+		caNet.updateRho();
+		
+		double rho50 = caNet.getRho(parts[pos]);
+		assertEquals(rho50, CANetworkDynamic.RHO_HAT/2);
+		reset(parts);
+		// test: uni dir 100% load
+		//			x <--
+		//			o -->
+		//			* --> (particle under investigation
+		//			_ empty cell
+		// ... ooooo*oooooo ...
+		//
+		parts[pos] = createAgent("0",pos,dir,caLink);
+		parts[pos-1] = createAgent("1",pos,dir,caLink);
+		parts[pos-2] = createAgent("2",pos,dir,caLink);
+		parts[pos-3] = createAgent("3",pos,dir,caLink);
+		parts[pos-4] = createAgent("4",pos,dir,caLink);
+		parts[pos-5] = createAgent("5",pos,dir,caLink);
+		parts[pos+1] = createAgent("1",pos,dir,caLink);
+		parts[pos+2] = createAgent("2",pos,dir,caLink);
+		parts[pos+3] = createAgent("3",pos,dir,caLink);
+		parts[pos+4] = createAgent("4",pos,dir,caLink);
+		parts[pos+5] = createAgent("5",pos,dir,caLink);
+		double rho100 = caNet.getRho(parts[pos]);
+		assertEquals(rho100, CANetworkDynamic.RHO_HAT);
+		reset(parts);
+		
+		// test: uni dir 4/6 load (when looking ahead until the 3rd agent (excluding) and 1 back (including)) 
+		//			x <--
+		//			o -->
+		//			* --> (particle under investigation
+		//			_ empty cell
+		// ...o*_oo_o ...
+		//
+		parts[pos] = createAgent("0",pos,dir,caLink);
+		parts[pos-1] = createAgent("1",pos,dir,caLink);
+		parts[pos-2] = createAgent("2",pos,dir,caLink);
+		parts[pos-3] = createAgent("3",pos,dir,caLink);
+		parts[pos-4] = createAgent("4",pos,dir,caLink);
+		parts[pos-5] = createAgent("5",pos,dir,caLink);
+		parts[pos+2] = createAgent("1",pos,dir,caLink);
+		parts[pos+3] = createAgent("2",pos,dir,caLink);
+		parts[pos+5] = createAgent("3",pos,dir,caLink);
+		parts[pos+6] = createAgent("4",pos,dir,caLink);
+		parts[pos+7] = createAgent("5",pos,dir,caLink);
+		double rho4_6 = caNet.getRho(parts[pos]);
+		assertEquals(rho4_6, CANetworkDynamic.RHO_HAT *(4./6.));
+		reset(parts);
+		
+	}
+
+	private void reset(CAAgent[] parts) {
+		for (int i = 0; i < parts.length-1;i++) {
+			parts[i] = null;
+		}
+		
+	}
+
+	private CAAgent createAgent(String string, int pos, int dir, CALink caLink) {
+		CAAgent a = new CASimpleDynamicAgent(null, 1, Id.create(string, CASimpleDynamicAgent.class), caLink);
+		a.materialize(pos, dir);
+		return a;
+	}
 
 	@Test
 	public void testCANetworkDynamicTTForOncomingAgentsForDifferentLinkWidths(){
@@ -181,7 +281,7 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 		CAAgent[] particles = caLink.getParticles();
 
 		for (int i = 0; i < 10; i++) {
-			CAAgent a = new CASimpleDynamicAgent(links, 1, Id.create(i, CAAgent.class), caLink);
+			CAAgent a = new CASimpleDynamicAgent(links, 1, Id.create(i, CASimpleDynamicAgent.class), caLink);
 			CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a);
 			em.processEvent(ee);
 			a.materialize(particles.length-1-i, -1);
@@ -190,7 +290,7 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 			caNet.pushEvent(e);
 		}
 
-		caNet.runUntil(3*linkLength);
+		caNet.run();
 
 		Link ll = links.get(1);
 		Link llRev = null;
@@ -206,7 +306,7 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 
 		for (int i = 0; i < 10; i++) {
 
-			tt[i] = m.getAgentTravelTimeOnLink(Id.create(i, CAAgent.class), llRev.getId());
+			tt[i] = m.getAgentTravelTimeOnLink(Id.create(i, CASimpleDynamicAgent.class), llRev.getId());
 			log.info("Travel time for agent:" + i + " was \t" + tt[i]);
 		}
 
@@ -262,7 +362,7 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 			CAAgent[] particles = caLink.getParticles();
 			log.info(particles.length);
 			for (int i = 0; i < numEachSide; i++) {
-				CAAgent a = new CASimpleDynamicAgent(linksDS, 1, Id.create(i, CAAgent.class), caLink);
+				CAAgent a = new CASimpleDynamicAgent(linksDS, 1, Id.create(i, CASimpleDynamicAgent.class), caLink);
 				CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a);
 				em.processEvent(ee);
 				a.materialize(i, 1);
@@ -276,7 +376,7 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 			CAAgent[] particles = caLink.getParticles();
 
 			for (int i = numEachSide; i < 2*numEachSide; i++) {
-				CAAgent a = new CASimpleDynamicAgent(linksUS, 1, Id.create(i, CAAgent.class), caLink);
+				CAAgent a = new CASimpleDynamicAgent(linksUS, 1, Id.create(i, CASimpleDynamicAgent.class), caLink);
 				CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a);
 				em.processEvent(ee);
 				a.materialize(particles.length-1-i+numEachSide, -1);
@@ -299,12 +399,12 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 			}
 		}
 		for (int i = 0; i < numEachSide; i++) {
-			tt[i] = m.getAgentTravelTimeOnLink(Id.create(i, CAAgent.class), linksDS.get(1).getId());
+			tt[i] = m.getAgentTravelTimeOnLink(Id.create(i, CASimpleDynamicAgent.class), linksDS.get(1).getId());
 			log.info("Travel time for agent:" + i + " was \t" + tt[i]);
 		}
 
 		for (int i = numEachSide; i < 2*numEachSide; i++) {
-			tt[i] = m.getAgentTravelTimeOnLink(Id.create(i, CAAgent.class), llRev.getId());
+			tt[i] = m.getAgentTravelTimeOnLink(Id.create(i, CASimpleDynamicAgent.class), llRev.getId());
 			log.info("Travel time for agent:" + i + " was \t" + tt[i]);
 		}
 
@@ -330,7 +430,7 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 		CAAgent[] particles = caLink.getParticles();
 
 		for (int i = 0; i < 10; i++) {
-			CAAgent a = new CASimpleDynamicAgent(links, 1, Id.create(i, CAAgent.class), caLink);
+			CAAgent a = new CASimpleDynamicAgent(links, 1, Id.create(i, CASimpleDynamicAgent.class), caLink);
 			CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a);
 			em.processEvent(ee);
 			a.materialize(i, 1);
@@ -339,12 +439,12 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 			caNet.pushEvent(e);
 		}
 
-		caNet.runUntil(3*linkLength);
+		caNet.run();
 		double [] tt = new double [10];
 
 		for (int i = 0; i < 10; i++) {
 
-			tt[i] = m.getAgentTravelTimeOnLink(Id.create(i, CAAgent.class), links.get(1).getId());
+			tt[i] = m.getAgentTravelTimeOnLink(Id.create(i, CASimpleDynamicAgent.class), links.get(1).getId());
 			log.info("Travel time for agent:" + i + " was \t" + tt[i]);
 		}
 
@@ -367,14 +467,14 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 
 		CALink caLink = caNet.getCALink(links.get(0).getId());
 		CAAgent[] particles = caLink.getParticles();
-		CAAgent a = new CASimpleDynamicAgent(links, 1, Id.create("0", CAAgent.class), caLink);
+		CAAgent a = new CASimpleDynamicAgent(links, 1, Id.create("0", CASimpleDynamicAgent.class), caLink);
 		CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a);
 		em.processEvent(ee);
 		a.materialize(0, 1);
 		particles[0] = a;
 		CAEvent e = new CAEvent(0, a,caLink, CAEventType.TTA);
 		caNet.pushEvent(e);
-		caNet.runUntil(3*linkLength);
+		caNet.run();
 
 		double tt = m.getAgentTravelTimeOnLink(a.getId(), links.get(1).getId());
 		return tt;
@@ -398,14 +498,14 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 
 		CALink caLink = caNet.getCALink(links.get(0).getId());
 		CAAgent[] particles = caLink.getParticles();
-		CAAgent a = new CASimpleDynamicAgent(links, 1, Id.create("0", CAAgent.class), caLink);
+		CAAgent a = new CASimpleDynamicAgent(links, 1, Id.create("0", CASimpleDynamicAgent.class), caLink);
 		CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a);
 		em.processEvent(ee);
 		a.materialize(particles.length-1, -1);
 		particles[particles.length-1] = a;
 		CAEvent e = new CAEvent(0, a,caLink, CAEventType.TTA);
 		caNet.pushEvent(e);
-		caNet.runUntil(3*linkLength);
+		caNet.run();
 
 
 		Link ll = links.get(1);
@@ -507,7 +607,7 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 			ai.enterTime = event.getTime();
 		}
 
-		public double getAgentTravelTimeOnLink(Id agentId, Id linkId) {
+		public double getAgentTravelTimeOnLink(Id<CASimpleDynamicAgent> agentId, Id linkId) {
 			Map<Id, AI> map = this.infos.get(linkId);
 			if (map != null) {
 				AI ai = map.get(agentId);
@@ -518,7 +618,7 @@ public class TestCANetworkDynamic extends MatsimTestCase {
 			return Double.NaN;
 		}
 
-		public double getAgentLinkExitTime(Id agentId, Id linkId) {
+		public double getAgentLinkExitTime(Id<CASimpleDynamicAgent> agentId, Id linkId) {
 			Map<Id, AI> map = this.infos.get(linkId);
 			if (map != null) {
 				AI ai = map.get(agentId);

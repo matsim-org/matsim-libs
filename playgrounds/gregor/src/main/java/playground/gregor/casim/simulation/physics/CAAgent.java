@@ -21,6 +21,7 @@
 package playground.gregor.casim.simulation.physics;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 
 public abstract class CAAgent {
 
@@ -31,6 +32,9 @@ public abstract class CAAgent {
 	private final Id id;
 	private CAEvent currentEvent;
 	private double cumWaitTime;
+	private double rho;
+	
+	private AgentInfo ai = new AgentInfo(this);
 	
 	
 	public CAAgent(Id id) {
@@ -38,6 +42,9 @@ public abstract class CAAgent {
 		this.id = id;
 	}
 	
+	public AgentInfo getAgentInfo(){
+		return this.ai;
+	}
 	public void proceed() {
 		this.pos += this.dir;
 		
@@ -67,7 +74,7 @@ public abstract class CAAgent {
 //		this.l = l;
 	}
 	
-	abstract Id getNextLinkId();
+	abstract Id<Link> getNextLinkId();
 	
 	abstract void moveOverNode(CALink nextLink,double time);
 
@@ -92,7 +99,20 @@ public abstract class CAAgent {
 	
 	@Override
 	public String toString() {
-		return "agent: " + getId() + " next event:" + this.currentEvent;
+		String a = "agent: " + getId() + " next event:" + this.currentEvent + "\n";
+		return a;
+//		String myFront = "\t\tmy sp front: " + this.ai.getMySpacingsFront()[0] + " nr front:" + this.ai.getMySpacingsFront()[1] +"\n";
+//		String myBehind = "\t\tmy sp behind: " + this.ai.getMySpacingsBehind()[0] + " nr behind:" + this.ai.getMySpacingsBehind()[1] + "\n";
+//		String theirFront = "\t\tth sp front: " + this.ai.getTheirSpacingsFront()[0] + " nr front:" + this.ai.getTheirSpacingsFront()[1] +"\n";
+//		String theirBehind = "\t\tth sp behind: " + this.ai.getTheirSpacingsBehind()[0] + " nr behind:" + this.ai.getTheirSpacingsBehind()[1] + "\n";
+//		return a + myFront + myBehind + theirFront + theirBehind + ai.getScene();
+	}
+
+	public double getRho() {
+		return this.rho;
+	}
+	public void setRho(double rho) {
+		this.rho = rho;
 	}
 	
 }

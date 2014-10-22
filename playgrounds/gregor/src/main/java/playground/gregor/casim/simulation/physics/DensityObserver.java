@@ -58,6 +58,10 @@ public class DensityObserver implements LinkEnterEventHandler, LinkLeaveEventHan
 		LinkInfo li = this.lis.get(event.getLinkId());
 		if (li != null) {
 			li.onLink++;
+			if (!li.connected ) {
+				li.connect();
+				li.connected = true;
+			}
 		}
 	}
 	
@@ -68,12 +72,37 @@ public class DensityObserver implements LinkEnterEventHandler, LinkLeaveEventHan
 		}
 		double rho = li.onLink/li.area;
 		
+//		if (l.toString().equals("1")) {
+//			return 0.5*rho+0.5*getRho(Id.createLinkId("2"));
+//		}
+//		if (l.toString().equals("3")) {
+//			return 0.5*rho+0.5*getRho(Id.createLinkId("2"));
+//		}
+		
+//		double denom = 1;
+//		
+//		LinkInfo dsLi = this.lis.get(li.dsId);
+//		if (dsLi != null && dsLi.onLink > 0) {
+//			double dsRho = dsLi.onLink/dsLi.area;
+//			rho += dsRho;
+//			denom++;
+//		}		
+//
+//		LinkInfo usLi = this.lis.get(li.usId);
+//		if (usLi != null && usLi.onLink > 0) {
+//			double usRho = usLi.onLink/usLi.area;
+//			rho += usRho;
+//			denom++;
+//		}		
+//		
+//		rho /= denom;
+		
 		return rho;
 	}
 	
 
 	public void registerCALink(CALinkDynamic caL) {
-		LinkInfo li = new LinkInfo(caL.getWidth()*caL.getLink().getLength());
+		LinkInfo li = new LinkInfo(caL.getWidth()*caL.getLink().getLength(),caL.getLink());
 		this.lis.put(caL.getDownstreamLink().getId(), li);
 		if (caL.getUpstreamLink() != null) {
 			this.lis.put(caL.getUpstreamLink().getId(), li);
@@ -82,14 +111,44 @@ public class DensityObserver implements LinkEnterEventHandler, LinkLeaveEventHan
 	
 	private static final class LinkInfo {
 
+		public boolean connected = false;
+
 		private final double area;
 
 		int onLink = 0;
+
+		private Link link;
+
+		private Id<Link> dsId;
+
+		private Id<Link> usId;
 		
-		public LinkInfo(double area) {
+		public LinkInfo(double area, Link link) {
 			this.area = area;
+			this.link = link;
 		}
 		
+		//experimental
+		public void connect(){
+			for (Link l : link.getToNode().getOutLinks().values()) {
+				if (l.getToNode() == link.getFromNode()) {
+					continue;
+				}
+				if (l.getId().toString().contains("ex")) {
+					continue;
+				}
+				this.dsId = l.getId();
+			}
+			for (Link l : link.getFromNode().getOutLinks().values()) {
+				if (l.getToNode() == link.getToNode()) {
+					continue;
+				}
+				if (l.getId().toString().contains("ex")) {
+					continue;
+				}
+				this.usId = l.getId();
+			}
+		}
 		
 		
 	}

@@ -20,6 +20,8 @@
 
 package playground.gregor.casim.simulation.physics;
 
+import java.util.List;
+
 import org.matsim.api.core.v01.network.Node;
 
 public interface CANode extends CANetworkEntity{
@@ -33,6 +35,8 @@ public interface CANode extends CANetworkEntity{
 	public abstract CAAgent pollAgent(double time);
 	
 	public abstract Node getNode();
+	
+	public abstract List<CALinkDynamic> getLinks();
 	
 
 }

@@ -52,4 +52,6 @@ public interface CALink extends CANetworkEntity{
 	//MATSim integration
 	public abstract void letAgentDepart(CAVehicle veh);
 
+	public abstract double[] getDensities();
+
 }

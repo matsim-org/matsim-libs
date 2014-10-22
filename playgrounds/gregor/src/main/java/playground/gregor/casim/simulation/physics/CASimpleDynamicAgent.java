@@ -31,11 +31,11 @@ public class CASimpleDynamicAgent extends CAAgent {
 
 	private final List<Link> links;
 	private int next;
-	private final Id id;
+	private final Id<CASimpleDynamicAgent> id;
 	private CALink link;
 
 
-	public CASimpleDynamicAgent(List<Link> links, int i, Id id, CALink caLink) {
+	public CASimpleDynamicAgent(List<Link> links, int i, Id<CASimpleDynamicAgent> id, CALink caLink) {
 		super(id);
 		this.links = links;
 		this.next = i;
@@ -45,7 +45,7 @@ public class CASimpleDynamicAgent extends CAAgent {
 	}
 
 	@Override
-	Id getNextLinkId() {
+	Id<Link> getNextLinkId() {
 
 		return this.links.get(this.next).getId();
 	}

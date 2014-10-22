@@ -136,6 +136,7 @@ public class CASimDynamicExperiment_ZhangJ2011 {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		settings.add(new Setting(3.,2,0.4));
 		int i = 0;
 		while ( i < 500) {
 			double r0 = MatsimRandom.getRandom().nextGaussian()+2;
@@ -185,34 +186,34 @@ public class CASimDynamicExperiment_ZhangJ2011 {
 				
 				
 				
-				settings.add(new Setting(3.,3.,0.5));
-				settings.add(new Setting(3.6,3.6,1.6));
-				settings.add(new Setting(1.8,1.8,.7));
-				settings.add(new Setting(3.,3.,1.5));
-				settings.add(new Setting(1.8,1.8,.7));
-				settings.add(new Setting(2.4,2.4,1.0));
-				settings.add(new Setting(.5,1.8,1.8));
-				settings.add(new Setting(.6,1.8,1.8));
-				settings.add(new Setting(.7,1.8,1.8));
-				settings.add(new Setting(1.,1.8,1.8));
-				settings.add(new Setting(1.45,1.8,1.8));
-				settings.add(new Setting(1.8,1.8,1.8));
-				settings.add(new Setting(1.8,1.8,1.2));
-				settings.add(new Setting(.65,2.4,2.4));
-				settings.add(new Setting(.8,2.4,2.4));
-				settings.add(new Setting(.95,2.4,2.4));
-				settings.add(new Setting(1.45,2.4,2.4));
-				settings.add(new Setting(1.9,2.4,2.4));
-				settings.add(new Setting(2.4,2.4,2.4));
-				settings.add(new Setting(2.4,2.4,1.6));
-				settings.add(new Setting(2.4,2.4,1.3));
-				settings.add(new Setting(.8,3.,3.));
-				settings.add(new Setting(1.,3.,3.));
-				settings.add(new Setting(1.8,3.,3.));
-				settings.add(new Setting(2.4,3.,3.));
-				settings.add(new Setting(3.,3.,3.));
-				settings.add(new Setting(3.,3.,1.6));
-				settings.add(new Setting(3.,3.,1.2));
+				
+//				settings.add(new Setting(3.6,3.6,1.6));
+//				settings.add(new Setting(1.8,1.8,.7));
+//				settings.add(new Setting(3.,3.,1.5));
+//				settings.add(new Setting(1.8,1.8,.7));
+//				settings.add(new Setting(2.4,2.4,1.0));
+//				settings.add(new Setting(.5,1.8,1.8));
+//				settings.add(new Setting(.6,1.8,1.8));
+//				settings.add(new Setting(.7,1.8,1.8));
+//				settings.add(new Setting(1.,1.8,1.8));
+//				settings.add(new Setting(1.45,1.8,1.8));
+//				settings.add(new Setting(1.8,1.8,1.8));
+//				settings.add(new Setting(1.8,1.8,1.2));
+//				settings.add(new Setting(.65,2.4,2.4));
+//				settings.add(new Setting(.8,2.4,2.4));
+//				settings.add(new Setting(.95,2.4,2.4));
+//				settings.add(new Setting(1.45,2.4,2.4));
+//				settings.add(new Setting(1.9,2.4,2.4));
+//				settings.add(new Setting(2.4,2.4,2.4));
+//				settings.add(new Setting(2.4,2.4,1.6));
+//				settings.add(new Setting(2.4,2.4,1.3));
+//				settings.add(new Setting(.8,3.,3.));
+//				settings.add(new Setting(1.,3.,3.));
+//				settings.add(new Setting(1.8,3.,3.));
+//				settings.add(new Setting(2.4,3.,3.));
+//				settings.add(new Setting(3.,3.,3.));
+//				settings.add(new Setting(3.,3.,1.6));
+//				settings.add(new Setting(3.,3.,1.2));
 
 
 	}
@@ -470,6 +471,7 @@ public class CASimDynamicExperiment_ZhangJ2011 {
 //				em.processEvent(eee);
 				CAEvent e = new CAEvent(1/(CANetworkDynamic.V_HAT*CANetworkDynamic.RHO_HAT), a,caLink, CAEventType.TTA);
 				caNet.pushEvent(e);
+				caNet.registerAgent(a);
 			}
 
 		}
