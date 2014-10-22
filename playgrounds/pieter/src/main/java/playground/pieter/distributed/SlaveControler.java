@@ -13,9 +13,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -40,54 +38,16 @@ import java.util.*;
 
 //IMPORTANT: PSim produces events that are not in chronological order. This controler
 // will require serious overhaul if chronological order is enforced in all event manager implementations
-public class RepeatableSlaveControler implements IterationStartsListener {
+public class SlaveControler implements IterationStartsListener {
     private final boolean initialRouting;
+    private final boolean isloadBalancing;
+    private final Logger slaveLogger = Logger.getLogger(this.getClass());
+    private final int myNumber;
     private int numberOfPSimIterations;
     private int numberOfIterations = -1;
     private Config config;
     private double averageIterationTime;
-
-    class PlansSender implements Runnable {
-        final Logger timesLogger = Logger.getLogger(this.getClass());
-
-        @Override
-        public void run() {
-//            while (true) {
-//                boolean res = false;
-//                try {
-//                    timesLogger.warn("trying to read boolean from master");
-//                    res = reader.readBoolean();
-//                } catch (IOException e) {
-//                    System.out.println("Master terminated. Exiting.");
-//                    System.exit(0);
-//                }
-            try {
-//                    if (res) {
-//                        timesLogger.warn("Receiving travel times.");
-//                        linkTravelTimes = (SerializableLinkTravelTimes) reader.readObject();
-//                        stopStopTimes = (StopStopTime) reader.readObject();
-//                        waitTimes = (WaitTime) reader.readObject();
-//                        timesLogger.warn("Checking to see if plans are ready to be sent");
-//                        while (!readyToSendPlans){
-//                            Thread.sleep(10);
-//                        }
-                timesLogger.warn("SENDING plans...");
-                writer.writeObject(plansCopyForSending);
-                timesLogger.warn("SENDING completed.");
-//                    } else {
-//                        System.out.println("Master terminated. Exiting.");
-//                        System.exit(0);
-//                    }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-//            }
-        }
-
-    }
-
     private Controler matsimControler;
-    private final Logger slaveLogger = Logger.getLogger(this.getClass());
     private SerializableLinkTravelTimes linkTravelTimes;
     private WaitTime waitTimes;
     private StopStopTime stopStopTimes;
@@ -99,8 +59,8 @@ public class RepeatableSlaveControler implements IterationStartsListener {
     private List<Long> iterationTimes = new ArrayList<>();
     private long lastIterationStartTime;
 
-
-    private RepeatableSlaveControler(String[] args) throws IOException, ClassNotFoundException, ParseException {
+    private SlaveControler(String[] args) throws IOException, ClassNotFoundException, ParseException {
+        lastIterationStartTime = System.currentTimeMillis();
         System.setProperty("matsim.preferLocalDtds", "true");
         Options options = new Options();
         options.addOption("c", true, "Config file location");
@@ -127,7 +87,8 @@ public class RepeatableSlaveControler implements IterationStartsListener {
             System.exit(1);
         }
 
-        Socket socket;
+        Socket readSocket;
+        Socket writeSocket;
         int socketNumber = 12345;
         String hostname = "localhost";
         if (commandLine.hasOption("h")) {
@@ -145,11 +106,13 @@ public class RepeatableSlaveControler implements IterationStartsListener {
         else {
             System.err.println("Will accept connections on default port number 12345");
         }
-        socket = new Socket(hostname, socketNumber);
-        this.reader = new ObjectInputStream(socket.getInputStream());
-        this.writer = new ObjectOutputStream(socket.getOutputStream());
-        int myNumber = reader.readInt();
+        readSocket = new Socket(hostname, socketNumber);
+        writeSocket = new Socket(hostname, socketNumber + 1);
+        this.reader = new ObjectInputStream(readSocket.getInputStream());
+        this.writer = new ObjectOutputStream(writeSocket.getOutputStream());
+        myNumber = reader.readInt();
         numberOfPSimIterations = reader.readInt();
+        isloadBalancing = reader.readBoolean();
         slaveLogger.warn("Running " + numberOfPSimIterations + " PSim iterations for every QSim iter");
         List<String> idStrings = (List<String>) reader.readObject();
         slaveLogger.warn("RECEIVED agent ids for removal from master.");
@@ -220,9 +183,8 @@ public class RepeatableSlaveControler implements IterationStartsListener {
         }
     }
 
-
     public static void main(String[] args) throws IOException, ClassNotFoundException, ParseException {
-        RepeatableSlaveControler slave = new RepeatableSlaveControler(args);
+        SlaveControler slave = new SlaveControler(args);
         slave.run();
     }
 
@@ -239,13 +201,12 @@ public class RepeatableSlaveControler implements IterationStartsListener {
 
     @Override
     public void notifyIterationStarts(IterationStartsEvent event) {
-        if (numberOfIterations >= 0)
+        if (numberOfIterations >= 0 || initialRouting)
             iterationTimes.add(System.currentTimeMillis() - lastIterationStartTime);
 
         if (initialRouting || (numberOfIterations > 0 && numberOfIterations % numberOfPSimIterations == 0)) {
             this.averageIterationTime = getAverageIterationTime();
-            updateTravelTimesAndSendPlans();
-            loadBalance();
+            communications();
             iterationTimes = new ArrayList<>();
             iterationTimes.add(System.currentTimeMillis() - lastIterationStartTime);
         }
@@ -274,7 +235,6 @@ public class RepeatableSlaveControler implements IterationStartsListener {
 
     }
 
-
     private void removeNonSimulatedAgents(List<String> idStrings) {
         Set<Id<Person>> noIds = new HashSet<>(matsimControler.getPopulation().getPersons().keySet());
         Set<String> noIdStrings = new HashSet<>();
@@ -287,60 +247,36 @@ public class RepeatableSlaveControler implements IterationStartsListener {
         }
 
     }
-    public double getAverageIterationTime(){
-        double sumTimes=0;
-        for(long t:iterationTimes){
+
+    public double getAverageIterationTime() {
+        double sumTimes = 0;
+        for (long t : iterationTimes) {
             sumTimes += t;
         }
-        return sumTimes/iterationTimes.size();
-    }
-    private void loadBalance() {
-//read an integer from the master. if it's positive, yous hould send the master that number of plans
-        //if negative, thene receive that number of plans
-//        if zero, then do notthing
-        int diff=0;
-        try {
-            slaveLogger.warn("Load balancing...");
-            diff= reader.readInt();
-        } catch (IOException e) {
-            slaveLogger.error("Master terminated. Exiting.");
-            System.exit(0);
-        }
-        try {
-            if (diff > 0) {
-                List<PersonSerializable> personsToSend = getPersonsToSend(diff);
-                writer.writeObject(personsToSend);
-            }
-            if (diff < 0){
-                addPersons((List<PersonSerializable>)reader.readObject());
-            }
-            //nothing else to do
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
+        return sumTimes / iterationTimes.size();
     }
 
+
     private void addPersons(List<PersonSerializable> persons) {
-        for(PersonSerializable person:persons){
+        for (PersonSerializable person : persons) {
             matsimControler.getPopulation().addPerson(person.getPerson());
         }
     }
 
     private List<PersonSerializable> getPersonsToSend(int diff) {
-        int i=0;
+        int i = 0;
         List<PersonSerializable> personsToSend = new ArrayList<>();
-        Set<Id<Person>> personIdsToRemove  =new HashSet<>();
+        Set<Id<Person>> personIdsToRemove = new HashSet<>();
         for (Id<Person> personId : matsimControler.getPopulation().getPersons().keySet()) {
-            if(i++>=diff) break;
+            if (i++ >= diff) break;
             personsToSend.add(new PersonSerializable((PersonImpl) matsimControler.getPopulation().getPersons().get(personId)));
             personIdsToRemove.add(personId);
         }
-        for (Id<Person> personId:personIdsToRemove) matsimControler.getPopulation().getPersons().remove(personId);
+        for (Id<Person> personId : personIdsToRemove) matsimControler.getPopulation().getPersons().remove(personId);
         return personsToSend;
     }
 
-    public void updateTravelTimesAndSendPlans() {
+    public void communications() {
 
         Map<String, PlanSerializable> tempPlansCopyForSending = new HashMap<>();
         for (Person person : matsimControler.getPopulation().getPersons().values())
@@ -356,30 +292,87 @@ public class RepeatableSlaveControler implements IterationStartsListener {
         }
         try {
             if (res) {
-                slaveLogger.warn("Spent an average of " +averageIterationTime+
-                        " running " +plansCopyForSending.size()+
-                        " person plans for " + numberOfPSimIterations+
+                slaveLogger.warn("Spent an average of " + averageIterationTime +
+                        " running " + plansCopyForSending.size() +
+                        " person plans for " + numberOfPSimIterations +
                         " PSim iterations.");
-                writer.writeDouble(averageIterationTime);
                 slaveLogger.warn("RECEIVING travel times.");
                 linkTravelTimes = (SerializableLinkTravelTimes) reader.readObject();
                 if (config.scenario().isUseTransit()) {
                     stopStopTimes = (StopStopTime) reader.readObject();
                     waitTimes = (WaitTime) reader.readObject();
                 }
+                writer.writeDouble(averageIterationTime);
+                writer.writeInt(matsimControler.getPopulation().getPersons().size());
+                writer.flush();
                 slaveLogger.warn("RECEIVING completed.");
-//                slaveLogger.warn("Sending plans...");
-//                writer.writeObject(plansCopyForSending);
-//                slaveLogger.warn("Sending completed.");
-                new Thread(new PlansSender()).start();
+                slaveLogger.warn("Sending plans...");
+                writer.writeObject(plansCopyForSending);
+                writer.flush();
+                slaveLogger.warn("Sending completed.");
             } else {
                 System.out.println("Master terminated. Exiting.");
                 System.exit(0);
             }
+
+            if (isloadBalancing) {
+                slaveLogger.warn("Load balancing...");
+                int diff = reader.readInt();
+
+
+                List<PersonSerializable> personsToSend = new ArrayList<>();
+                if (diff > 0) {
+                    personsToSend = getPersonsToSend(diff);
+                }
+                writer.writeObject(personsToSend);
+                writer.flush();
+
+                addPersons((List<PersonSerializable>) reader.readObject());
+            }
+
         } catch (ClassNotFoundException | IOException e) {
             e.printStackTrace();
         }
 
     }
 
- }
+    class PlansSender implements Runnable {
+        final Logger timesLogger = Logger.getLogger(this.getClass());
+
+        @Override
+        public void run() {
+//            while (true) {
+//                boolean res = false;
+//                try {
+//                    timesLogger.warn("trying to read boolean from master");
+//                    res = reader.readBoolean();
+//                } catch (IOException e) {
+//                    System.out.println("Master terminated. Exiting.");
+//                    System.exit(0);
+//                }
+            try {
+//                    if (res) {
+//                        timesLogger.warn("Receiving travel times.");
+//                        linkTravelTimes = (SerializableLinkTravelTimes) reader.readObject();
+//                        stopStopTimes = (StopStopTime) reader.readObject();
+//                        waitTimes = (WaitTime) reader.readObject();
+//                        timesLogger.warn("Checking to see if plans are ready to be sent");
+//                        while (!readyToSendPlans){
+//                            Thread.sleep(10);
+//                        }
+                timesLogger.warn("SENDING plans...");
+                writer.writeObject(plansCopyForSending);
+                timesLogger.warn("SENDING completed.");
+//                    } else {
+//                        System.out.println("Master terminated. Exiting.");
+//                        System.exit(0);
+//                    }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+//            }
+        }
+
+    }
+
+}

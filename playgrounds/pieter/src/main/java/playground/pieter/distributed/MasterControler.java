@@ -31,7 +31,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class RepeatableMasterControler implements AfterMobsimListener, ShutdownListener {
+public class MasterControler implements AfterMobsimListener, ShutdownListener {
     private int numberOfPSimIterations = 5;
     private Config config;
     private final Logger masterLogger = Logger.getLogger(this.getClass());
@@ -42,9 +42,9 @@ public class RepeatableMasterControler implements AfterMobsimListener, ShutdownL
     private SerializableLinkTravelTimes linkTravelTimes;
     private AtomicInteger numThreads;
     private final HashMap<String, Plan> newPlans = new HashMap<>();
-    private LoadBalancer loadBalancer;
+    private List<PersonSerializable> personPool;
 
-    private RepeatableMasterControler(String[] args) throws NumberFormatException, IOException, ParseException {
+    private MasterControler(String[] args) throws NumberFormatException, IOException, ParseException {
         System.setProperty("matsim.preferLocalDtds", "true");
         Options options = new Options();
         options.addOption("c", true, "Config file location");
@@ -83,19 +83,21 @@ public class RepeatableMasterControler implements AfterMobsimListener, ShutdownL
         else {
             masterLogger.warn("Will accept connections on default port number 12345");
         }
-        loadBalancer = new LoadBalancer();
-        ServerSocket server = new ServerSocket(socketNumber);
+        ServerSocket writeServer = new ServerSocket(socketNumber);
+        ServerSocket readServer = new ServerSocket(socketNumber + 1);
         for (int i = 0; i < numSlaves; i++) {
-            Socket s = server.accept();
+            Socket writeSocket = writeServer.accept();
+            Socket readSocket = readServer.accept();
             masterLogger.warn("Slave " + i + " out of " + numSlaves + " accepted.");
-            slaves[i] = new Slave(s, i);
+            slaves[i] = new Slave(writeSocket, readSocket, i);
 
             //order is important
             slaves[i].sendNumber(i);
             slaves[i].sendNumber(numberOfPSimIterations);
-            loadBalancer.addSlave(slaves[i]);
+            slaves[i].notifyIfLoadBalancing(numSlaves > 1);
         }
-        server.close();
+        writeServer.close();
+        readServer.close();
         if (commandLine.hasOption("c")) {
             config = ConfigUtils.loadConfig(commandLine.getOptionValue("c"));
             matsimControler = new Controler(ScenarioUtils.loadScenario(config));
@@ -152,13 +154,12 @@ public class RepeatableMasterControler implements AfterMobsimListener, ShutdownL
             mergePlansFromSlaves();
         }
         masterLogger.warn("master inited");
-
     }
 
     public static void main(String[] args) {
-        RepeatableMasterControler master = null;
+        MasterControler master = null;
         try {
-            master = new RepeatableMasterControler(args);
+            master = new MasterControler(args);
         } catch (IOException | ParseException e) {
             e.printStackTrace();
             System.exit(1);
@@ -180,18 +181,53 @@ public class RepeatableMasterControler implements AfterMobsimListener, ShutdownL
                 .travelTimeCalculator().getTraveltimeBinSize(), config.qsim().getEndTime(), matsimControler
                 .getNetwork().getLinks().values());
         numThreads = new AtomicInteger(slaves.length);
-        for (Slave slave : slaves) new Thread(slave).start();
+        Thread[] myThreads = new Thread[slaves.length];
+        for (int i = 0; i < slaves.length; i++) {
+            myThreads[i] = new Thread(slaves[i]);
+            myThreads[i].start();
+        }
         while (numThreads.get() > 0)
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+
         mergePlansFromSlaves();
-        masterLogger.warn("Plans from al slaves merged together. About to start load balancing.");
-        List<Integer> loadBalanceNumbers = loadBalanceNumbers();
-        masterLogger.warn("loadbalanceNumbers() returns: \n" + loadBalanceNumbers.toString());
-        loadBalancer.balance(loadBalanceNumbers);
+        if (slaves.length > 1) {
+            personPool = new ArrayList<>();
+            masterLogger.warn("Plans from al slaves merged together. About to start load balancing.");
+            List<Integer> loadBalanceNumbers = loadBalanceNumbers();
+            masterLogger.warn("loadbalanceNumbers() returns: \n" + loadBalanceNumbers.toString());
+            numThreads = new AtomicInteger(slaves.length);
+            for (int i = 0; i < slaves.length; i++) {
+                slaves[i].target = loadBalanceNumbers.get(i);
+                slaves[i].state = SimulationState.PoolPersons;
+                new Thread(slaves[i]).start();
+            }
+            while (numThreads.get() > 0)
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            mergePersonsFromSlaves();
+            masterLogger.warn("Distributing persons between  slaves");
+            numThreads = new AtomicInteger(slaves.length);
+            for (int i = 0; i < slaves.length; i++) {
+                slaves[i].state = SimulationState.DistributePersons;
+                new Thread(slaves[i]).start();
+            }
+            while (numThreads.get() > 0)
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            for (Slave slave : slaves)
+                slave.state = SimulationState.TransmitTravelTimes;
+        }
+
 
     }
 
@@ -201,6 +237,25 @@ public class RepeatableMasterControler implements AfterMobsimListener, ShutdownL
             newPlans.putAll(slave.plans);
         }
 
+    }
+
+    private synchronized List<PersonSerializable> getPersonsFromPool(int diff) {
+        List<PersonSerializable> outList = new ArrayList<>();
+        if (diff < 0) {
+            for (int i = 0; i > diff; i--) {
+                outList.add(personPool.get(0));
+                personPool.remove(0);
+            }
+        }
+        return outList;
+
+    }
+
+    private void mergePersonsFromSlaves() {
+        personPool.clear();
+        for (Slave loadBalanceThread : slaves) {
+            personPool.addAll(loadBalanceThread.getPersons());
+        }
     }
 
     private List<Integer> loadBalanceNumbers() {
@@ -213,9 +268,9 @@ public class RepeatableMasterControler implements AfterMobsimListener, ShutdownL
         int largestAllocationIndex = 0;
 
         for (Slave slave : slaves) {
-            timesPerPlan.add(slave.averageIterationTime / slave.plans.size());
-            personsPerSlave.add(slave.plans.size());
-            sumOfReciprocals += slave.averageIterationTime / slave.plans.size();
+            timesPerPlan.add(slave.averageIterationTime / slave.myPopulationSize);
+            personsPerSlave.add(slave.myPopulationSize);
+            sumOfReciprocals += 1 / (slave.averageIterationTime / slave.myPopulationSize);
         }
 //        find number of plans that should be allocated to each slave
         for (int i = 0; i < timesPerPlan.size(); i++) {
@@ -256,165 +311,105 @@ public class RepeatableMasterControler implements AfterMobsimListener, ShutdownL
         ObjectOutputStream writer;
         final Map<String, Plan> plans = new HashMap<>();
         private int myNumber;
+        private int myPopulationSize;
         double averageIterationTime;
+        List<PersonSerializable> slavePersonPool;
+        int target = 0;
+        SimulationState state = SimulationState.TransmitTravelTimes;
 
-        public Slave(Socket socket, int i) throws IOException {
+        public Slave(Socket writeSocket, Socket readSocket, int i) throws IOException {
             super();
             myNumber = i;
-            this.writer = new ObjectOutputStream(socket.getOutputStream());
-            this.reader = new ObjectInputStream(socket.getInputStream());
+            this.writer = new ObjectOutputStream(writeSocket.getOutputStream());
+            this.reader = new ObjectInputStream(readSocket.getInputStream());
         }
 
         @Override
         public void run() {
-            try {
-                writer.writeBoolean(true);
-                averageIterationTime = this.reader.readDouble();
-                slaveLogger.warn("About to send travel times to slave number " + myNumber);
-                writer.writeObject(linkTravelTimes);
-                if (config.scenario().isUseTransit()) {
-                    writer.writeObject(stopStopTimeCalculator.getStopStopTimes());
-                    writer.writeObject(waitTimeCalculator.getWaitTimes());
+            if (state.equals(SimulationState.TransmitTravelTimes)) {
+                try {
+                    plans.clear();
+                    writer.writeBoolean(true);
+                    slaveLogger.warn("About to send travel times to slave number " + myNumber);
+                    writer.writeObject(linkTravelTimes);
+                    if (config.scenario().isUseTransit()) {
+                        writer.writeObject(stopStopTimeCalculator.getStopStopTimes());
+                        writer.writeObject(waitTimeCalculator.getWaitTimes());
+                    }
+                    writer.flush();
+                    slaveLogger.warn("SENT travel times to slave number " + myNumber);
+                    averageIterationTime = this.reader.readDouble();
+                    myPopulationSize = this.reader.readInt();
+                    slaveLogger.warn("waiting to receive plans from slave number " + myNumber);
+                    Map<String, PlanSerializable> serialPlans = (Map<String, PlanSerializable>) reader.readObject();
+                    slaveLogger.warn("RECEIVED plans from slave number " + myNumber);
+                    for (Entry<String, PlanSerializable> entry : serialPlans.entrySet()) {
+                        plans.put(entry.getKey(), entry.getValue().getPlan(matsimControler.getPopulation()));
+                    }
+                    numThreads.decrementAndGet();
+                } catch (IOException | ClassNotFoundException e) {
+                    e.printStackTrace();
+                    System.exit(0);
                 }
-                slaveLogger.warn("SENT travel times to slave number " + myNumber);
-                slaveLogger.warn("waiting to receive plans from slave number " + myNumber);
-                Map<String, PlanSerializable> serialPlans = (Map<String, PlanSerializable>) reader.readObject();
-                slaveLogger.warn("RECEIVED plans from slave number " + myNumber);
-                for (Entry<String, PlanSerializable> entry : serialPlans.entrySet()) {
-                    plans.put(entry.getKey(), entry.getValue().getPlan(matsimControler.getPopulation()));
-                }
-                numThreads.decrementAndGet();
-            } catch (IOException | ClassNotFoundException e) {
-                e.printStackTrace();
-                System.exit(0);
             }
+
+            if (state.equals(SimulationState.PoolPersons)) {
+                slaveLogger.warn("Trying to receive persons from slave " + myNumber);
+                slaveLogger.warn("Target is " + target);
+                slavePersonPool = new ArrayList<>();
+                try {
+                    writer.writeInt(target);
+                    writer.flush();
+
+                    slavePersonPool = (List<PersonSerializable>) reader.readObject();
+                    numThreads.decrementAndGet();
+                } catch (ClassNotFoundException | IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (state.equals(SimulationState.DistributePersons)) {
+                slaveLogger.warn("Distributing persons to slave" + myNumber);
+                slavePersonPool = new ArrayList<>();
+                try {
+                    writer.writeObject(getPersonsFromPool(target));
+                    writer.flush();
+                    numThreads.decrementAndGet();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+
         }
 
         public void sendIds(Collection<String> idStrings) throws IOException {
             slaveLogger.warn("Sending ids.");
             writer.writeObject(idStrings);
+            writer.flush();
         }
 
         public void shutdown() throws IOException {
             // kills the slave
             writer.writeBoolean(false);
+            writer.flush();
         }
 
         public void sendNumber(int i) throws IOException {
             writer.writeInt(i);
+            writer.flush();
         }
 
-    }
-
-    private class LoadBalancer {
-
-        private List<PersonSerializable> personPool = new LinkedList<>();
-        private List<LoadBalancingThread> loadBalanceThreads = new ArrayList<>();
-        private AtomicInteger loadBalanceNumThreads;
-        Logger loadBalanceLogger = Logger.getLogger(this.getClass());
-
-        public LoadBalancer() {
-            loadBalanceThreads = new ArrayList<>();
+        public void notifyIfLoadBalancing(boolean isBalancing) throws IOException {
+            writer.writeBoolean(isBalancing);
+            writer.flush();
         }
 
-        public void addSlave(Slave slave) {
-            loadBalanceThreads.add(new LoadBalancingThread(slave));
-        }
-
-        public void balance(List<Integer> loadBalanceNumbers) {
-            loadBalanceLogger.warn("Starting load balancing...");
-            loadBalanceNumThreads = new AtomicInteger(loadBalanceThreads.size());
-            for (int i = 0; i < loadBalanceThreads.size(); i++) {
-                loadBalanceThreads.get(i).sendTarget=true;
-                loadBalanceThreads.get(i).setPool(null);
-                loadBalanceThreads.get(i).target = loadBalanceNumbers.get(i);
-                new Thread(loadBalanceThreads.get(i)).start();
-            }
-            while (numThreads.get() > 0)
-                try {
-                    Thread.sleep(10);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            mergePersonsFromSlaves();
-            //run again to distribute to slaves
-            for (int i = 0; i < loadBalanceThreads.size(); i++) {
-                loadBalanceThreads.get(i).sendTarget=false;
-                loadBalanceThreads.get(i).setPool(this.getFromPool(loadBalanceNumbers.get(i)));
-                new Thread(loadBalanceThreads.get(i)).start();
-            }
-            while (numThreads.get() > 0)
-                try {
-                    Thread.sleep(10);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
-        }
-
-        private List<PersonSerializable> getFromPool(int diff) {
-            List<PersonSerializable> outList = new ArrayList<>();
-            if (diff < 0) {
-                for (int i = 0; i > diff; i--) {
-                    outList.add(personPool.get(0));
-                    personPool.remove(0);
-                }
-                return outList;
-            } else {
-                return null;
-            }
-
-        }
-
-        private void mergePersonsFromSlaves() {
-            personPool.clear();
-            for (LoadBalancingThread loadBalanceThread : loadBalanceThreads) {
-                personPool.addAll(loadBalanceThread.getPersons());
-            }
-
-
+        public Collection<? extends PersonSerializable> getPersons() {
+            return slavePersonPool;
         }
     }
 
-
-    class LoadBalancingThread implements Runnable {
-        Slave mySlave;
-        Integer target = 0;
-        List<PersonSerializable> personPool = null;
-        public boolean sendTarget =false;
-        Logger lbtLogger = Logger.getLogger(this.getClass());
-        public LoadBalancingThread(Slave slave) {
-            mySlave = slave;
-        }
-
-        @Override
-        public void run() {
-            lbtLogger.warn("Starting load balancing on thread " + mySlave.myNumber);
-                    lbtLogger.warn("Target is " + target);
-            try {
-                if(sendTarget)
-                mySlave.writer.writeInt(target);
-            if (target > 0) {
-               //getr persons
-                personPool = (List<PersonSerializable>) mySlave.reader.readObject();
-            }
-            if(target <0 && !sendTarget){
-                mySlave.writer.writeObject(personPool);
-            }
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
-
-        public List<PersonSerializable> getPersons() {
-            return personPool;
-        }
-
-        public void setPool(List<PersonSerializable> personPool) {
-            this.personPool=personPool;
-        }
-    }
 
 }

@@ -18,7 +18,7 @@ public class PersonSerializable implements Serializable {
     protected List<PlanSerializable> plans = new ArrayList<>(5);
 
     public PersonSerializable(PersonImpl person) {
-        this.id = person.getId();
+        this.id = person.getId().toString();
         this.sex = person.getSex();
         this.age = person.getAge();
         this.hasLicense = person.getLicense();
@@ -32,7 +32,7 @@ public class PersonSerializable implements Serializable {
 
     }
 
-    protected Id<Person> id;
+    protected String id;
     private String sex;
     private int age = Integer.MIN_VALUE;
     private String hasLicense;
@@ -58,6 +58,6 @@ public class PersonSerializable implements Serializable {
                 person.setSelectedPlan(plan);
 
         }
-        return null;
+        return person;
     }
 }
