@@ -35,7 +35,7 @@ import playground.dgrether.signalsystems.DgSensorManager;
  * @author dgrether
  *
  */
-public class LaemmerSignalModelFactory implements SignalModelFactory {
+public final class LaemmerSignalModelFactory implements SignalModelFactory {
 
 	private DgSensorManager sensorManager;
 	private DefaultSignalModelFactory delegate;

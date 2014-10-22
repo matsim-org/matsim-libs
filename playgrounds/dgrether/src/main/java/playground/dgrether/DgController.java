@@ -74,7 +74,11 @@ public class DgController {
 		Controler c = new Controler( scenario );
 		c.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		DgSylviaConfig sylviaConfig = new DgSylviaConfig();
+
 		final DgSylviaControlerListenerFactory signalsFactory = new DgSylviaControlerListenerFactory(sylviaConfig);
+		// note: This will check (in DefaultSignalModelFactory) if the controllerIdentifier equals sylvia..., otherwise the default
+		// (fixed time) signal controller will be used.  kai & theresa, oct'14
+		
 		signalsFactory.setAlwaysSameMobsimSeed(false);
 		c.setSignalsControllerListenerFactory(signalsFactory);
 		c.setOverwriteFiles(true);

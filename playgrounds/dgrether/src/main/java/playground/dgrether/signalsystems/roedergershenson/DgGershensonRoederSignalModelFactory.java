@@ -33,7 +33,7 @@ import org.matsim.signalsystems.model.SignalSystemsManager;
  * @author dgrether
  *
  */
-public class DgGershensonRoederSignalModelFactory implements SignalModelFactory {
+public final class DgGershensonRoederSignalModelFactory implements SignalModelFactory {
 	
 	private static final Logger log = Logger.getLogger(DgGershensonRoederSignalModelFactory.class);
 	

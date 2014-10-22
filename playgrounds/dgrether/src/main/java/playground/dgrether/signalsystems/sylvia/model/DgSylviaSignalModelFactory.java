@@ -39,18 +39,18 @@ import playground.dgrether.signalsystems.sylvia.data.DgSylviaPreprocessData;
  * @author dgrether
  *
  */
-public class DgSylviaSignalModelFactory implements SignalModelFactory {
+public final class DgSylviaSignalModelFactory implements SignalModelFactory {
 
 	
 	private static final Logger log = Logger.getLogger(DgSylviaSignalModelFactory.class);
 	
-	private DefaultSignalModelFactory delegate;
+	private SignalModelFactory delegate;
 
 	private DgSensorManager sensorManager;
 
 	private DgSylviaConfig sylviaConfig;
 	
-	public DgSylviaSignalModelFactory(DefaultSignalModelFactory delegate, DgSensorManager sensorManager, DgSylviaConfig sylviaConfig) {
+	public DgSylviaSignalModelFactory(SignalModelFactory delegate, DgSensorManager sensorManager, DgSylviaConfig sylviaConfig) {
 		this.delegate = delegate;
 		this.sensorManager = sensorManager;
 		this.sylviaConfig = sylviaConfig;

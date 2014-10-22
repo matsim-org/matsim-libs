@@ -36,7 +36,7 @@ import org.matsim.signalsystems.model.SignalSystemsManagerImpl;
  * 
  * @author dgrether
  */
-public class DefaultSignalModelFactory implements SignalModelFactory {
+public final class DefaultSignalModelFactory implements SignalModelFactory {
 	
 	private static final Logger log = Logger.getLogger(DefaultSignalModelFactory.class);
 	
