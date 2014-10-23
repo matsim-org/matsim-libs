@@ -29,6 +29,19 @@ package org.matsim.core.scoring.functions;
 public class CharyparNagelScoringUtils {
 	private CharyparNagelScoringUtils() {} // container for static methods, should not be instantiated
 
+	/**
+	 * This came about as the solution to <br>
+	 * <code>
+	 *    beta[perf] * t[typ] * ln( t[typ] / t0 ) = beta[perf] * 36000 , <br>
+	 * </code>
+	 * i.e. the all activities at their typical durations should have the same value of beta[perf] * 36000.     
+	 * <p/>
+	 * This looks a bit nicer when you put in the typical beta[perf] = 6/h = 6 / (3600 sec), since then the right-hand side becomes 60, i.e. all
+	 * activities at their typical durations should have the same value of 60.
+	 * <p/>
+	 * Given our current understanding, this is not the best of all formulations, but their is no completely easy fix (see documentation) and so we leave it
+	 * like this for backwards compatibility.
+	 */
 	public static double computeZeroUtilityDuration(final double priority,
 			final double typicalDuration_s) {
 		final double zeroUtilityDuration = typicalDuration_s * Math.exp( -10.0 / (typicalDuration_s / 3600.0) / priority );
