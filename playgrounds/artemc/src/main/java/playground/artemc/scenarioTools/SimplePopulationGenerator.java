@@ -79,7 +79,7 @@ public class SimplePopulationGenerator {
 				do{
 					x = (corridorLength/6*generator.nextGaussian() + corridorLength /3);
 				}while(x<0 || x>corridorLength );
-				y = (generator.nextDouble()-0.5)*2000 + 1010;	
+				y = (generator.nextDouble()-0.5)*1000 + 1000;	
 
 				homeLocation = new CoordImpl(x,y);
 
@@ -87,7 +87,7 @@ public class SimplePopulationGenerator {
 				do{
 					x = (corridorLength /6*generator.nextGaussian() + 2*corridorLength/3);
 				}while(x<0 || x>corridorLength);
-				y = (generator.nextDouble()-0.5)*2000 + 1010;	
+				y = (generator.nextDouble()-0.5)*1000 + 1000;	
 
 				workLocation = new CoordImpl(x,y);
 			}while(homeLocation.getX() > workLocation.getX());

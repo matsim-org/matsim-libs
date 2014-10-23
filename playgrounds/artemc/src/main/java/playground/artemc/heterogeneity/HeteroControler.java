@@ -2,6 +2,7 @@ package playground.artemc.heterogeneity;
 
 
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -110,7 +111,14 @@ public class HeteroControler {
 
 		Config config = ConfigUtils.loadConfig(input+"config.xml");
 		config.network().setInputFile(input+"network.xml");
-		config.plans().setInputFile(input+"population.xml");
+		
+		boolean isPopulationZipped = new File(input+"population.xml.gz").isFile();
+		if(isPopulationZipped){
+			config.plans().setInputFile(input+"population.xml.gz");
+		}else{
+			config.plans().setInputFile(input+"population.xml");
+		}
+		
 		config.transit().setTransitScheduleFile(input+"transitSchedule.xml");
 		config.transit().setVehiclesFile(input+"vehicles.xml");
 
