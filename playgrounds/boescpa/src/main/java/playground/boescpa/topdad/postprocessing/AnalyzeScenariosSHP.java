@@ -27,7 +27,6 @@ import playground.boescpa.lib.tools.scenarioAnalyzer.ScenarioAnalyzer;
 import playground.boescpa.lib.tools.scenarioAnalyzer.eventHandlers.AgentCounter;
 import playground.boescpa.lib.tools.scenarioAnalyzer.eventHandlers.ScenarioAnalyzerEventHandler;
 import playground.boescpa.lib.tools.scenarioAnalyzer.eventHandlers.TripAnalyzer;
-import playground.boescpa.lib.tools.scenarioAnalyzer.spatialEventCutters.CirclePointCutter;
 import playground.boescpa.lib.tools.scenarioAnalyzer.spatialEventCutters.SHPFileCutter;
 import playground.boescpa.lib.tools.scenarioAnalyzer.spatialEventCutters.SpatialEventCutter;
 
@@ -90,10 +89,10 @@ public class AnalyzeScenariosSHP {
 				scenarioAnalyzer.createResults(path2EventFile + "_analysisResults_Luzern.csv", luzernCutter);
 				//	Lugano
 				scenarioAnalyzer.createResults(path2EventFile + "_analysisResults_Lugano.csv", luganoCutter);
+
 			} catch (Exception e){
 				e.printStackTrace();
 			}
 		}
 	}
-
 }
