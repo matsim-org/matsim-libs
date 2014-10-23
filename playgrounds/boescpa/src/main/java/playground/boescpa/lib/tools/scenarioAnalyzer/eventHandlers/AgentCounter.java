@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import playground.boescpa.lib.tools.scenarioAnalyzer.ScenarioAnalyzer;
 import playground.boescpa.lib.tools.scenarioAnalyzer.spatialEventCutters.SpatialEventCutter;
 
@@ -41,7 +40,7 @@ import java.util.Set;
  */
 public class AgentCounter implements ScenarioAnalyzerEventHandler, ActivityEndEventHandler {
 
-	private final List<String[]> numberOfAgents = new ArrayList<>();
+	private final List<String[]> agentsAndLinks = new ArrayList<>();
 	private final Network network;
 
 	public AgentCounter(Network network) {
@@ -52,14 +51,14 @@ public class AgentCounter implements ScenarioAnalyzerEventHandler, ActivityEndEv
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
 		if (!event.getPersonId().toString().contains("pt")) {
-			numberOfAgents.add(new String[]{event.getPersonId().toString(),event.getLinkId().toString()});
+			agentsAndLinks.add(new String[]{event.getPersonId().toString(), event.getLinkId().toString()});
 		}
 	}
 
 	@Override
 	public String createResults(SpatialEventCutter spatialEventCutter, int scaleFactor) {
 		Set<String> agents = new HashSet<>();
-		for (String[] vals : numberOfAgents) {
+		for (String[] vals : agentsAndLinks) {
 			if (spatialEventCutter != null) {
 				if (spatialEventCutter.spatiallyConsideringLink(network.getLinks().get(Id.createLinkId(vals[1])))) {
 					agents.add(vals[0]);
@@ -68,11 +67,11 @@ public class AgentCounter implements ScenarioAnalyzerEventHandler, ActivityEndEv
 				agents.add(vals[0]);
 			}
 		}
-		return "Number of Agents: " + (scaleFactor * this.numberOfAgents.size()) + ScenarioAnalyzer.NL;
+		return "Number of Agents: " + (scaleFactor * agents.size()) + ScenarioAnalyzer.NL;
 	}
 
 	@Override
 	public void reset(int iteration) {
-		numberOfAgents.clear();
+		agentsAndLinks.clear();
 	}
 }
