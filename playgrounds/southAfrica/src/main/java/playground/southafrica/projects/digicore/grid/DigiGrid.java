@@ -19,8 +19,6 @@
 
 package playground.southafrica.projects.digicore.grid;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.RenderedImage;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -32,8 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
-import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
 import org.jzy3d.analysis.AbstractAnalysis;
@@ -71,11 +67,16 @@ public class DigiGrid  extends AbstractAnalysis {
 
 	private List<Double> riskThresholds;
 	
+	private String snapshotfolder = "./snapshots/";
+	
 	private final double scale;
 	private double pointsConsidered;
 	private Visual visual = Visual.NONE;
 	private boolean isPopulated = false;
 	private boolean isRanked = false;
+	
+	private boolean visualiseOnScreen = true;
+	private double sliceDepth = 1009.0;
 	
 	/* Specify colours */
 	final static Color DIGI_GREEN = new Color(147, 214, 83, 255);
@@ -334,6 +335,15 @@ public class DigiGrid  extends AbstractAnalysis {
 	
 	
 	private void printPolyhedra(){
+		/* Get snapshots folder ready. */
+		LOG.info("Snapshots will be written to " + this.getSnapshotsFolder());
+		File folder = new File(snapshotfolder);
+		if(!folder.exists()){
+			folder.mkdirs();
+		}
+		String snapshotFilename = snapshotfolder + (snapshotfolder.endsWith("/") ? "" : "/") + "polyhedra.csv";
+		BufferedWriter bw = IOUtils.getBufferedWriter(snapshotFilename);
+		
 		/* Set up the chart. */
 		chart = AWTChartComponentFactory.chart(Quality.Nicest, "awt");
 		Light light = chart.addLight(new Coord3d(-1000f, -300f, 12000f));
@@ -353,136 +363,218 @@ public class DigiGrid  extends AbstractAnalysis {
 		chart.getView().setBoundManual(new BoundingBox3d(-800f, 800f, -800f, 800f, 600f, 1500f));
 		chart.getView().updateBounds();
 		
-		for(Coord3d c : map.keySet()){
-			/* Set up polyhedra shapes. */
-			ArrayList<org.jzy3d.plot3d.primitives.Polygon> body = new ArrayList<org.jzy3d.plot3d.primitives.Polygon>();
+		
+		
+		/* Process the polygon faces. */
+		try{
+			bw.write("x,y,z,poly,class");
+			bw.newLine();
 			
-			/* Change colour based on rating zone. */
-			Color fillColor = null;
-			int zone = mapRating.get(c);
-			switch (zone) {
-			case 0:
-				fillColor = DIGI_GREEN;
-				break;
-			case 1:
-				fillColor = DIGI_YELLOW;
-				break;
-			case 2:
-				fillColor = DIGI_ORANGE;
-				break;
-			case 3:
-				fillColor = DIGI_RED;
-				break;
-			default:
-			}
-			if(fillColor == null){
-				LOG.error("Something wrong!!");
-			}
-			
-			/* TODO Change this as required. Limit faces to certain colours. */
-			int highestRiskZoneToDraw = 3;
-			if(zone <= highestRiskZoneToDraw){
-				/* Create faces. */
-				FCCPolyhedron poly = new FCCPolyhedron(c.x, c.y, c.z, scale);
-				for(NDPolygon face : poly.getFcPolyhedron()){
-					Quad q = new Quad();
-					for(GridPoint point : face.getPolyFace()){
-						q.add(new Point(new Coord3d(point.getX(), point.getY(), point.getZ())));
+			/* Work your way through each grid cell. */
+			int polyCounter = 1;
+			for(Coord3d c : map.keySet()){
+				
+				/* Clean up a bit. There seems to be a few outliers... this is
+				 * for now where I take them out. */
+				if(c.x > -1000 & c.z > 500){
+					
+					
+					/* Set up polyhedra shapes. */
+					ArrayList<org.jzy3d.plot3d.primitives.Polygon> body = new ArrayList<org.jzy3d.plot3d.primitives.Polygon>();
+					
+					/* Change colour based on rating zone. */
+					Color fillColor = null;
+					int zone = mapRating.get(c);
+					switch (zone) {
+					case 0:
+						fillColor = DIGI_GREEN;
+						break;
+					case 1:
+						fillColor = DIGI_YELLOW;
+						break;
+					case 2:
+						fillColor = DIGI_ORANGE;
+						break;
+					case 3:
+						fillColor = DIGI_RED;
+						break;
+					default:
 					}
-					body.add((org.jzy3d.plot3d.primitives.Polygon)q);
+					if(fillColor == null){
+						LOG.error("Something wrong!!");
+					}
+					
+					/* TODO Change this as required. Limit faces to certain colours. */
+					int highestRiskZoneToDraw = 3;
+					if(zone <= highestRiskZoneToDraw){
+						/* Create faces. */
+						FCCPolyhedron poly = new FCCPolyhedron(c.x, c.y, c.z, scale);
+						for(NDPolygon face : poly.getFcPolyhedron()){
+							Quad q = new Quad();
+							for(GridPoint point : face.getPolyFace()){
+								double x = point.getX();
+								double y = point.getY();
+								double z = point.getZ();
+								
+								/* Add to 3D view. */
+								q.add(new Point(new Coord3d(point.getX(), point.getY(), point.getZ())));
+								
+								/* Write point to csv file. */
+								bw.write(String.format("%.2f,%.2f,%.2f,%d,%d\n", x, y, z, polyCounter, zone));
+							}
+							bw.write("NA,NA,NA,NA,NA");
+							bw.newLine();
+							
+							body.add((org.jzy3d.plot3d.primitives.Polygon)q);
+							polyCounter++;
+						}
+						
+						Shape shape = new Shape(body);
+						shape.setFaceDisplayed(true);
+						shape.setColor(fillColor);
+						shape.setFaceDisplayed(true);
+						shape.setWireframeColor(DIGI_GRAY);
+						chart.getScene().add(shape);
+					}
 				}
 				
-				Shape shape = new Shape(body);
-				shape.setFaceDisplayed(true);
-				shape.setColor(fillColor);
-				shape.setFaceDisplayed(true);
-				shape.setWireframeColor(DIGI_GRAY);
-				chart.getScene().add(shape);
 			}
 
 			chart.getView().shoot();
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Cannot write to " + snapshotFilename);
+		} finally{
+			try {
+				bw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Cannot close " + snapshotFilename);
+			}
 		}
 	}
 	
 	
 	private void printPolyhedraSlice(){
+		/* Get snapshots folder ready. */
+		LOG.info("Snapshots will be written to " + this.getSnapshotsFolder());
+		File folder = new File(snapshotfolder);
+		if(!folder.exists()){
+			folder.mkdirs();
+		}
+		String snapshotFilename = String.format("%s%sslice_%04.0f.csv",snapshotfolder, (snapshotfolder.endsWith("/") ? "" : "/"), sliceDepth);
+		BufferedWriter bw = IOUtils.getBufferedWriter(snapshotFilename);
+
 		/* Set up the chart. */
 		chart = AWTChartComponentFactory.chart(Quality.Advanced, "awt");
-		Light light = chart.addLight(new Coord3d(-1000f, -300f, 12000f));
-		light.setRepresentationRadius(100);
-		light.setEnabled(false);
-		
-		chart.addKeyController();
-		Coord3d viewPoint = new Coord3d(2*Math.PI/2, Math.PI/2, 2000);
-		
-		chart.getView().setSquared(false);
-		chart.getView().setSquared(true);
-		chart.getView().setMaximized(true);
-		chart.getView().setViewPoint(viewPoint, true);
-		chart.getView().setViewPositionMode(ViewPositionMode.FREE);
-		chart.getView().setBoundManual(new BoundingBox3d(-600f, 600f, -700f, 700f, 600f, 1500f));
-		chart.getView().updateBounds();
-		
-		for(Coord3d c : map.keySet()){
-			/* Change colour based on rating zone. */
-			Color fillColor = null;
-			int zone = mapRating.get(c);
-			switch (zone) {
-			case 0:
-				fillColor = DIGI_GREEN;
-				break;
-			case 1:
-				fillColor = DIGI_YELLOW;
-				break;
-			case 2:
-				fillColor = DIGI_ORANGE;
-				break;
-			case 3:
-				fillColor = DIGI_RED;
-				break;
-			default:
-			}
-			if(fillColor == null){
-				LOG.error("Something wrong!!");
-			}
+		if(visualiseOnScreen){
+			Light light = chart.addLight(new Coord3d(-1000f, -300f, 12000f));
+			light.setRepresentationRadius(100);
+			light.setEnabled(false);
 			
+			chart.addKeyController();
+			Coord3d viewPoint = new Coord3d(2*Math.PI/2, Math.PI/2, 1000);
 			
-			/* Create slice face. */
-//			for(double depth = 800; depth <= 1200; depth+=10){
-			{double depth = 1009.0;
-				FCCPlanePolygon fccPoly = new FCCPlanePolygon(c.x, c.y, c.z, 3, depth, scale);
-				Polygon poly = new Polygon();
+			chart.getView().setSquared(false);
+			chart.getView().setSquared(true);
+			chart.getView().setMaximized(true);
+			chart.getView().setViewPoint(viewPoint, true);
+			chart.getView().setViewPositionMode(ViewPositionMode.FREE);
+			chart.getView().setBoundManual(new BoundingBox3d(-700f, 700f, -800f, 800f, 600f, 1500f));
+			chart.getView().updateBounds();
+		}
+		
+		/* Process the polygon faces. */
+		try{
+			bw.write("x,y,poly,class");
+			bw.newLine();
+			
+			/* Work your way through each grid cell. */
+			int polyCounter = 1;
+			for(Coord3d c : map.keySet()){
 				
-				for(GridPoint point : fccPoly.getFcPlanePolygon().getPolyFace()){
-					poly.add(new Point(new Coord3d(point.getX(), point.getY(), 0)));
+				/* Change colour based on rating zone. */
+				Color fillColor = null;
+				int zone = mapRating.get(c);
+				switch (zone) {
+				case 0:
+					fillColor = DIGI_GREEN;
+					break;
+				case 1:
+					fillColor = DIGI_YELLOW;
+					break;
+				case 2:
+					fillColor = DIGI_ORANGE;
+					break;
+				case 3:
+					fillColor = DIGI_RED;
+					break;
+				default:
 				}
-				
+				if(fillColor == null){
+					LOG.error("Something wrong!!");
+				}
+
+				/* Create slice face. */
+				FCCPlanePolygon fccPoly = new FCCPlanePolygon(c.x, c.y, c.z, 3, sliceDepth, scale);
+				Polygon poly = new Polygon();
+
+				for(GridPoint point : fccPoly.getFcPlanePolygon().getPolyFace()){
+					double x = point.getX();
+					double y = point.getY();
+					double z = point.getZ();
+
+					/* Add to 3D view. */
+					poly.add(new Point(new Coord3d(x, y, 0)));
+					
+					/* Write point to csv file. Currently (Oct 2014) the 
+					 * implementation is such that we should filter (0,0,0)
+					 * values as they are returned, but are not meaningful. */
+					if(x == 0.0 && y == 0.0 && z == 0.0){
+						/* Ignore the point. */
+					} else{
+						bw.write(String.format("%.2f,%.2f,%d,%d\n", x, y, polyCounter, zone));
+					}
+					
+				}
+
 				poly.setFaceDisplayed(true);
 				poly.setColor(fillColor);
 				poly.setWireframeColor(DIGI_GRAY);
-				chart.getScene().add(poly);
-				
-				/* FIXME Get a screenshot working!! */
-				try {
-					File temp = File.createTempFile("myTempImage", ".tmp");
-					chart.screenshot(temp);
-					BufferedImage img = ImageIO.read(temp);
-					ImageIO.write( img, "png", new File("/User/jwjoubert/Desktop/png.png"));
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				if(visualiseOnScreen){
+					chart.getScene().add(poly);
 				}
+				polyCounter++;
+
+				/* FIXME Get a screenshot working!! */
+				//				try {
+				//					File temp = File.createTempFile("myTempImage", ".tmp");
+				//					chart.screenshot(temp);
+				//					BufferedImage img = ImageIO.read(temp);
+				//					ImageIO.write( img, "png", new File("/User/jwjoubert/Desktop/png.png"));
+				//				} catch (IOException e) {
+				//					// TODO Auto-generated catch block
+				//					e.printStackTrace();
+				//				}
+
+			}
+			
+			if(visualiseOnScreen){
 				chart.getView().shoot();
-//				try {
-//					chart.screenshot(new File("/Users/jwjoubert/Pictures/Digicore/Slice_" + depth + ".png"));
-//				} catch (IOException e) {
-//					e.printStackTrace();
-//					LOG.error("Could not write image for depth " + depth);
-//				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Cannot write to " + snapshotFilename);
+		} finally{
+			try {
+				bw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Cannot close " + snapshotFilename);
 			}
 		}
 	}
-	
+
 	/**
 	 * Writes the accelerometer 'blob' results: the number of observations in
 	 * each cell (only those with a value greater than zero), and the risk class
@@ -534,6 +626,30 @@ public class DigiGrid  extends AbstractAnalysis {
 	
 	public boolean isPopulated(){
 		return this.isPopulated;
+	}
+	
+	public String getSnapshotsFolder(){
+		return this.snapshotfolder;
+	}
+	
+	public void setSnapshotsFolder(String folder){
+		this.snapshotfolder = folder;
+	}
+	
+	public boolean isVisualisedOnScreen(){
+		return this.visualiseOnScreen;
+	}
+	
+	public void setVisualiseOnScreen(boolean onScreen){
+		this.visualiseOnScreen = onScreen;
+	}
+	
+	public double getSliceDepth(){
+		return this.sliceDepth;
+	}
+	
+	public void setSliceDepth(double depth){
+		this.sliceDepth = depth;
 	}
 	
 	public void populateFromGridFile(String filename){

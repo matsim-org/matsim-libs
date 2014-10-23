@@ -20,12 +20,13 @@ public class GridVisualiser {
 	 * </ol>
 	 */
 	public static void main(String[] args) {
-		String gridFile = args[0];
+		String gridFolder = args[0];
 		double scale = Double.parseDouble(args[1]);
 		Visual visual = Visual.valueOf(args[2]);
 		
 		DigiGrid grid = new DigiGrid(scale);
-		grid.populateFromGridFile(gridFile);
+		grid.populateFromGridFile(gridFolder + (gridFolder.endsWith("/") ? "" : "/") + "cellValuesAndRiskClasses.csv");
+		grid.setSnapshotsFolder(gridFolder);
 		grid.setVisual(visual);
 		grid.visualiseGrid();
 	}
