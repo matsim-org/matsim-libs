@@ -73,10 +73,13 @@ public class TaxiDemandGenerator
     private void generateDemand(String start, String end, double i)
     {
         String currentHr = start;
+        int dayOffset = 0;
         do {
             Matrix matrix = this.matrices.getMatrix(currentHr);
-            double startTime = getHour(currentHr)*3600;
+            int currentHour = getHour(currentHr);
+            double startTime = dayOffset*24*3600 + currentHour*3600; 
             odd.generateSinglePeriod(matrix, "departure", "arrival", "taxi", startTime, 3600, i);
+            if (currentHour == 23) dayOffset = 1; 
             currentHr = getNextTimeString(currentHr);
         }
 

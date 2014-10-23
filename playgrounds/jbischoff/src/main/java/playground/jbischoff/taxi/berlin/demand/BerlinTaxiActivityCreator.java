@@ -25,6 +25,13 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 
 import playground.michalm.demand.DefaultActivityCreator;
 import playground.michalm.zone.Zone;
@@ -35,7 +42,8 @@ public class BerlinTaxiActivityCreator
 {
     private final static Id<Zone> TXLLORID = Id.create("12214125", Zone.class);
     private final static Id<Zone> SXFLORID = Id.create("12061433", Zone.class);
-
+    private CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(
+            "EPSG:25833", TransformationFactory.DHDN_GK4);
 
     public BerlinTaxiActivityCreator(Scenario scenario)
     {
@@ -82,7 +90,34 @@ public class BerlinTaxiActivityCreator
             }
         }
         else {
-            return super.createActivity(zone, actType);
+            return createActivityWithCoordinateTransformation(zone, actType);
         }
+    }
+    
+    public Activity createActivityWithCoordinateTransformation(Zone zone, String actType)
+    {
+        Geometry geometry = geometryProvider.getGeometry(zone, actType);
+        Envelope envelope = geometry.getEnvelopeInternal();
+        double minX = envelope.getMinX();
+        double maxX = envelope.getMaxX();
+        double minY = envelope.getMinY();
+        double maxY = envelope.getMaxY();
+
+        Point p = null;
+
+        do {
+            double x = uniform.nextDouble(minX, maxX);
+            double y = uniform.nextDouble(minY, maxY);
+            p = MGC.xy2Point(x, y);
+        }
+        while (!geometry.contains(p) || !pointAcceptor.acceptPoint(zone, actType, p));
+
+        Coord coord = scenario.createCoord(p.getX(), p.getY());
+        Coord coordt = ct.transform(coord);
+        Link link = network.getNearestLink(coordt);
+
+        ActivityImpl activity = (ActivityImpl)pf.createActivityFromCoord(actType, coordt);
+        activity.setLinkId(link.getId());
+        return activity;
     }
 }

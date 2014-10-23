@@ -73,15 +73,15 @@ public class BerlinTaxiVehicleCreatorV3
         String dir = "C:/local_jb/data/";
         String taxisOverTimeFile = dir + "taxi_berlin/2013/vehicles/taxisweekly.csv";
         String statusMatrixFile = dir + "taxi_berlin/2013/status/statusMatrixAvg.xml";
-        String networkFile = dir + "scenarios/2014_05_basic_scenario_v3/berlin_brb.xml";
+        String networkFile = dir + "scenarios/2014_10_basic_scenario_v4/berlin_brb.xml";
         String zoneShpFile = dir + "shp_merged/zones.shp";
         String zoneXmlFile = dir + "shp_merged/zones.xml";
-        String vehicleFile = dir + "scenarios/2014_05_basic_scenario_v3/taxis4to4_EV";
+        String vehicleFile = dir + "scenarios/2014_10_basic_scenario_v4/taxis4to4_EV";
 
         BerlinTaxiVehicleCreatorV3 btv = new BerlinTaxiVehicleCreatorV3();
-        btv.evShare = 1.0;
-        btv.maxTime = 20.0 * 3600;
-        btv.minTime = 15.0 * 3600;
+        btv.evShare = 0.0;
+        btv.minTime = 14.0 * 3600;
+        btv.maxTime = 17.0 * 3600;
         btv.readTaxisOverTime(taxisOverTimeFile);
         btv.createAverages(SDF.parse("2013-04-16 04:00:00"), 1);
         btv.prepareNetwork(networkFile, zoneShpFile, zoneXmlFile);
