@@ -110,8 +110,12 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 	@Override
 	public String createResults(SpatialEventCutter spatialEventCutter, int scaleFactor) {
 		this.scaleFactor = scaleFactor;
-
+		// reset the analysis
+		this.modes.clear();
+		this.activities.clear();
+		// analyze
 		analyzeEvents(spatialEventCutter);
+		// create results
 		String results = getTripResults();
 		results += ScenarioAnalyzer.NL;
 		results += getActivityResults();
