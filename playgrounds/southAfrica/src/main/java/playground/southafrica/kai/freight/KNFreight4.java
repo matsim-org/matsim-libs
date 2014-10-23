@@ -56,6 +56,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.AbstractController;
@@ -176,6 +177,10 @@ public class KNFreight4 {
 		CarrierScoringFunctionFactory scoringFunctionFactory = KNFreight4.createMyScoringFunction(scenario);
 		
 		final Controler ctrl = new Controler( scenario ) ;
+		
+		PlanCalcScoreConfigGroup cnScoringGroup = ctrl.getConfig().planCalcScore() ;
+		TravelTime timeCalculator = ctrl.getLinkTravelTimes() ;
+		TravelDisutility trDisutil = ctrl.getTravelDisutilityFactory().createTravelDisutility(timeCalculator, cnScoringGroup) ;
 
         CarrierPlanStrategyManagerFactory strategyManagerFactory  = KNFreight4.createMyStrategyManager(scenario, ctrl) ;
 		ctrl.setOverwriteFiles(true);
