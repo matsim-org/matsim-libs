@@ -21,12 +21,10 @@ package playground.michalm.util.matrices;
 
 import java.util.Map;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.matrices.*;
-
-import playground.michalm.zone.Zone;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
@@ -43,24 +41,23 @@ public class MatrixUtils
     }
 
 
-    public static Matrix createDenseMatrix(String id, Iterable<Id<Zone>> ids, double[][] values)
+    public static Matrix createDenseMatrix(String id, Iterable<?> ids, double[][] values)
     {
         return createMatrix(id, ids, values, true);
     }
 
 
-    public static Matrix createSparseMatrix(String id, Iterable<Id<Zone>> ids, double[][] values)
+    public static Matrix createSparseMatrix(String id, Iterable<?> ids, double[][] values)
     {
         return createMatrix(id, ids, values, false);
     }
 
 
-    public static Matrix createMatrix(String id, Iterable<Id<Zone>> ids, double[][] values,
+    public static Matrix createMatrix(String id, Iterable<?> ids, double[][] values,
             boolean denseMatrix)
     {
         Matrix matrix = new Matrix(id, null);
-        @SuppressWarnings("unchecked")
-        Id<Zone>[] idArray = Iterables.toArray(ids, Id.class);
+        Object[] idArray = Iterables.toArray(ids, Object.class);
 
         for (int i = 0; i < idArray.length; i++) {
             for (int j = 0; j < idArray.length; j++) {
