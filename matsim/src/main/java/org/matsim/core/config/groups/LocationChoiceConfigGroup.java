@@ -76,8 +76,8 @@ public class LocationChoiceConfigGroup extends Module {
 	private String radius = "null";
 	private String flexible_types = "null";
 		
-	private Algotype algorithm = Algotype.random ;
-	private String tt_approximationLevel = "0";
+	private Algotype algorithm = Algotype.bestResponse ;
+	private String tt_approximationLevel = "1";
 	private String maxDistanceDCScore = "-1.0";
 	private String planSelector = "SelectExpBeta";
 	
@@ -92,8 +92,8 @@ public class LocationChoiceConfigGroup extends Module {
 	private String maxDCScoreFile = "null";
 	private String prefsFile = "null";
 	
-	private String analysisBoundary = "200000.0";
-	private String analysisBinSize = "20000.0";
+	private String analysisBoundary = "200000";
+	private String analysisBinSize = "20000";
 	private String idExclusion = Integer.toString(Integer.MAX_VALUE);
 	
 	private String destinationSamplePercent = "100.0";
@@ -275,7 +275,7 @@ public class LocationChoiceConfigGroup extends Module {
 //			}
 		} else if (TT_APPROX_LEVEL.equals(key)) {
 			if (!(value.equals("0") || value.equals("1") || value.equals("2"))) {
-				log.warn("set travel time approximation level to 0, 1 or 2. Set to default value '0' now (no approximation)");
+				log.warn("set travel time approximation level to 0, 1 or 2. Set to default value '1' now");
 			}
 			else {
 				setTravelTimeApproximationLevel(value);
