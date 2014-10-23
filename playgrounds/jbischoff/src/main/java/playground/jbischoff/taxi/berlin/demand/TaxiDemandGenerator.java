@@ -44,7 +44,7 @@ public class TaxiDemandGenerator
     private static final String ZONESSHP = DATADIR+"/shp_merged/zones.shp";
     private static final String ZONESXML = DATADIR+"/shp_merged/zones.xml";
     private static final String ODMATRIX = DATADIR+"taxi_berlin/2013/OD/demandMatrices.xml";
-    private static final String PLANSFILE = DATADIR+"scenarios/2014_05_basic_scenario_v3/plans4to3.xml";
+    private static final String PLANSFILE = DATADIR+"scenarios/2014_10_basic_scenario_v4/plans4to3";
     private ODDemandGenerator odd;
     private Map<Id<Zone>, Zone> zones;
     private Scenario scenario;
@@ -54,25 +54,29 @@ public class TaxiDemandGenerator
     public static void main(String[] args)
     {
 
+        for (double i = 1.0; i<3.1; i = i+0.1){
         TaxiDemandGenerator tdg = new TaxiDemandGenerator();
-        tdg.generateDemand("20130416040000", "20130417030000");
-        tdg.writeDemand();
+        tdg.generateDemand("20130416040000", "20130417030000",i);
+        tdg.writeDemand(i);
+        }
     }
 
 
-    private void writeDemand()
+    private void writeDemand(double i)
     {
-        new PopulationWriter(scenario.getPopulation()).write(PLANSFILE);
+        double iPretty = Math.round(i*10)/10.0;
+        String outfile = PLANSFILE+"_"+iPretty+".xml.gz";
+        new PopulationWriter(scenario.getPopulation()).write(outfile);
     }
 
 
-    private void generateDemand(String start, String end)
+    private void generateDemand(String start, String end, double i)
     {
         String currentHr = start;
         do {
             Matrix matrix = this.matrices.getMatrix(currentHr);
             double startTime = getHour(currentHr)*3600;
-            odd.generateSinglePeriod(matrix, "departure", "arrival", "taxi", startTime, 3600, 1.0);
+            odd.generateSinglePeriod(matrix, "departure", "arrival", "taxi", startTime, 3600, i);
             currentHr = getNextTimeString(currentHr);
         }
 

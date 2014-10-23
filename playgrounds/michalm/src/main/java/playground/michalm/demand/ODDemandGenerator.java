@@ -68,8 +68,10 @@ public class ODDemandGenerator
         Iterable<Entry> entryIter = MatrixUtils.createEntryIterable(matrix);
 
         for (Entry e : entryIter) {
-            Zone fromZone = zones.get(e.getFromLocation());
-            Zone toZone = zones.get(e.getToLocation());
+            Id<Zone> fromLoc = Id.create(e.getFromLocation(), Zone.class);
+            Id<Zone> toLoc = Id.create(e.getToLocation(), Zone.class);
+            Zone fromZone = zones.get(fromLoc);
+            Zone toZone = zones.get(toLoc);
             int trips = (int)uniform.floorOrCeil(flowCoeff * e.getValue());
 
             for (int k = 0; k < trips; k++) {
