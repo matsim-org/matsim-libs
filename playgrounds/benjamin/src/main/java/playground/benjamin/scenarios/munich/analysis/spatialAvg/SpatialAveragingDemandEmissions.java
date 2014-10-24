@@ -20,11 +20,13 @@
 package playground.benjamin.scenarios.munich.analysis.spatialAvg;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.emissions.events.EmissionEventsReader;
 import org.matsim.contrib.emissions.types.WarmPollutant;
@@ -56,7 +58,7 @@ public class SpatialAveragingDemandEmissions {
 	
 	final String pollutant2analyze = WarmPollutant.NO2.toString();
 	final boolean compareToBaseCase = true;
-	final boolean useLineMethod = true;
+	final boolean useLineMethod = false;
 	private boolean writeRoutput = true;
 	private boolean writeGisOutput = false;
 	final private boolean useVisBoundary = false;
@@ -70,6 +72,8 @@ public class SpatialAveragingDemandEmissions {
 	private SpatialGrid[] timeInterval2GridBaseCase;
 
 	private SpatialAveragingInputData inputData;
+
+	private boolean useCellMethod =true;
 	
 	/*
 	 * process first emission file: calculate weighted emissions per cell
@@ -92,6 +96,7 @@ public class SpatialAveragingDemandEmissions {
 		}else{
 			linkWeightUtil = new LinkPointWeightUtil(inputData, noOfXbins, noOfYbins, smoothingRadius_m);
 		}
+
 		this.saWriter = new SpatialAveragingWriter(inputData, noOfXbins, noOfYbins, smoothingRadius_m, useVisBoundary);
 		
 		this.simulationEndTime = inputData.getEndTime();
@@ -120,6 +125,10 @@ public class SpatialAveragingDemandEmissions {
 		for(int timeInterval:timeInterval2Link2Pollutant.keySet()){
 			logger.info("Calculating grid values for time interval " + (timeInterval+1) + " of " + noOfTimeBins + " time intervals.");
 			SpatialGrid sGrid = new SpatialGrid(inputData, noOfXbins, noOfYbins);
+			
+			if(useCellMethod){
+				linkWeightUtil = new CellWeightUtil((Collection<Link>) network.getLinks().values(), sGrid);
+			}
 			
 			for(Id linkId: timeInterval2Link2Pollutant.get(timeInterval).keySet()){
 				sGrid.addLinkValue(network.getLinks().get(linkId), timeInterval2Link2Pollutant.get(timeInterval).get(linkId), linkWeightUtil);

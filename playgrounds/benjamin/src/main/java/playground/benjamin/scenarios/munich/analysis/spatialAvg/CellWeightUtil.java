@@ -48,14 +48,19 @@ public class CellWeightUtil implements LinkWeightUtil {
 			Cell cCell = grid.getCellForCoordinate(link.getCoord());
 			links2Cells.put(link, cCell);
 		}
+		System.out.println("Mapped " + links2Cells.size() + " links to grid");
 		return links2Cells;
 	}
 
 	@Override
 	public Double getWeightFromLink(Link link, Coord cellCentroid) {
 		Cell cellOfLink = links2Cells.get(link);
-		Cell receivingCell = grid.getCellForCoordinate(cellCentroid);
-		return calcDistanceFactorFromCells(cellOfLink, receivingCell);
+		if(cellOfLink==null){
+			return 0.0;
+		}else{
+			Cell receivingCell = grid.getCellForCoordinate(cellCentroid);
+			return calcDistanceFactorFromCells(cellOfLink, receivingCell);
+		}
 	}
 
 	private Double calcDistanceFactorFromCells(Cell cellOfLink,
@@ -63,6 +68,7 @@ public class CellWeightUtil implements LinkWeightUtil {
 		int xDistance = Math.abs(cellOfLink.getXNumber()-receivingCell.getXNumber());
 		int yDistance = Math.abs(cellOfLink.getYNumber()-receivingCell.getYNumber());
 		int dist = xDistance + yDistance;
+		if(dist >= 4) return 0.0;
 		switch(dist){
 		case 0: return dist0factor;
 		case 1: return dist1factor;

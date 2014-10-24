@@ -137,13 +137,13 @@ public class SpatialGrid {
 	}
 
 	private int mapYCoordToGrid(double y) {
-		int yGrid = (int) Math.floor((y-gridMinY)/gridHeight);
+		int yGrid = (int) Math.floor((y-gridMinY)/cellHeight);
 		if(yGrid>=0 && yGrid<numberOfCellsY) return yGrid;
 		return -1;
 	}
 
 	private int mapXCoordToGrid(double x) {
-		int xGrid = (int) Math.floor((x-gridMinX)/gridWidth);
+		int xGrid = (int) Math.floor((x-gridMinX)/cellWidth);
 		if(xGrid>=0 && xGrid<numberOfCellsX) return xGrid;
 		return -1;
 	}
