@@ -261,7 +261,23 @@ public abstract class AbstractController {
                     runMobSim(iteration);
                 }
             });
-        } finally {
+        }
+        catch ( Throwable t ) {
+			// I had problems with an exception being thrown in my MobsimFactory: when the after mobsim
+			// listeners were called from the finally block, the finishProcessing() method of the events
+			// manager also resulted in an exception (because the mobsim crashed before initProcessing() was
+			// ever called), "hidding" the actual source of the problem.
+			// To avoid this, we log anything thrown during mobsim before executing after mobsim listeners.
+			// td, oct'14
+			log.error(  "Mobsim did not completed normally! afterMobsimListeners will be called anyway." , t  );
+
+			// Java 7 seems able to detect which throwables this can be, thus no
+			// need to wrap or anything... Nice!
+			// If an exception occurs in the finally bloc, this exception will be
+			// suppressed, but at least we logged it.
+			throw t;
+        }
+        finally {
             iterationStep("afterMobsimListeners", new Runnable() {
                 @Override
                 public void run() {
