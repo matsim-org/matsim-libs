@@ -38,7 +38,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.LoadMyScenarios;
-import playground.agarwalamit.siouxFalls.userBenefits.UserBenefitsAnalyzerAA;
+import playground.agarwalamit.siouxFalls.userBenefits.MyUserBenefitsAnalyzer;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 import playground.vsp.analysis.modules.monetaryTransferPayments.MonetaryPaymentsAnalyzer;
@@ -121,7 +121,7 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 	private double totalUserWelfare_money ;
 	private void getAllUserBenefits(ScenarioImpl scenarioImpl){
 		this.logger.info("User welfare will be calculated using welfare measure as "+wm.toString());
-		UserBenefitsAnalyzerAA userBenefitsAnalyzer = new UserBenefitsAnalyzerAA();
+		MyUserBenefitsAnalyzer userBenefitsAnalyzer = new MyUserBenefitsAnalyzer();
 		userBenefitsAnalyzer.init(scenarioImpl, this.wm,false);
 		userBenefitsAnalyzer.preProcessData();
 		userBenefitsAnalyzer.postProcessData();
