@@ -162,14 +162,6 @@ public class TravelDisutilityIncludingToll implements TravelDisutility {
 		// end randomize
 
 		double normalTravelDisutilityForLink = this.normalTravelDisutility.getLinkTravelDisutility(link, time, person, vehicle);
-		Id <Person>personId = null ;
-		if ( person != null ) {
-			personId = person.getId();
-		}
-		Id<Vehicle> vehicleId = null ;
-		if ( vehicle != null ) {
-			vehicleId = vehicle.getId();
-		}
 		double tollCost = this.tollCostHandler.getTypicalTollCost(link, time );
 		return normalTravelDisutilityForLink + tollCost*this.marginalUtilityOfMoney*logNormalRnd ;
 		// sign convention: these are all costs (= disutilities), so they are all normally positive.  tollCost is positive, marginalUtilityOfMoney as well.
