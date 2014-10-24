@@ -44,7 +44,7 @@ import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
  * @author amit after ikaddoura, benjamin
  *
  */
-public class UserBenefitsAnalyzerAA extends AbstractAnalyisModule{
+public class MyUserBenefitsAnalyzer extends AbstractAnalyisModule{
 	
 	private final Logger log = Logger.getLogger(UserBenefitsAnalyzer.class);
 	private ScenarioImpl scenario;
@@ -56,8 +56,8 @@ public class UserBenefitsAnalyzerAA extends AbstractAnalyisModule{
 	private Map<Id, Double> personId2MonetarizedUserWelfare;
 	private WelfareMeasure welfareMeasure;
 	
-	public UserBenefitsAnalyzerAA() {
-		super(UserBenefitsAnalyzerAA.class.getSimpleName());
+	public MyUserBenefitsAnalyzer() {
+		super(MyUserBenefitsAnalyzer.class.getSimpleName());
 	}
 	
 	

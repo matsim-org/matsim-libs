@@ -95,7 +95,7 @@ public class UserBenefitsAndTotalWelfare {
 	}
 
 	public double getAllUserBenefits(String runCase, WelfareMeasure welfareMeasure){
-		UserBenefitsAnalyzerAA userBenefitsAnalyzer = new UserBenefitsAnalyzerAA();
+		MyUserBenefitsAnalyzer userBenefitsAnalyzer = new MyUserBenefitsAnalyzer();
 		userBenefitsAnalyzer.init(sc, welfareMeasure, false);
 		userBenefitsAnalyzer.preProcessData();
 		userBenefitsAnalyzer.postProcessData();
