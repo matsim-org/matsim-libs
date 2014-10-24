@@ -109,6 +109,8 @@ public class PseudoSimConfigGroup extends ReflectiveModule {
 
 	public boolean isDumpingIter(
 			final int iteration ) {
+		if ( getNPSimIters() <= 0 ) return iteration % getWriteEventsAndPlansIntervalInMobsim() == 0;
+
 		final int cycleNr = iteration - (iteration % (getPeriod() + getNPSimIters()));
 		final int cycleLength = isPSimIter( iteration ) ? getNPSimIters() : getPeriod();
 
