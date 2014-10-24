@@ -278,7 +278,7 @@ public class CharyparNagelActivityScoring implements ActivityScoring, org.matsim
 
 
 		if (lastActivity.getType().equals(this.firstActivity.getType())) {
-			// the first Act and the last Act have the same type
+			// the first Act and the last Act have the same type:
 			if (firstLastActOpeningTimesWarning <= 10) {
 				double[] openInterval = this.getOpeningInterval(lastActivity);
 				if (openInterval[0] >= 0 || openInterval[1] >= 0){
@@ -295,6 +295,7 @@ public class CharyparNagelActivityScoring implements ActivityScoring, org.matsim
 			double calcActScore = calcActScore(this.currentActivityStartTime, this.firstActivityEndTime + 24*3600, lastActivity);
 			this.score += calcActScore; // SCENARIO_DURATION
 		} else {
+			// the first Act and the last Act have NOT the same type:
 			if (this.params.scoreActs) {
 				if (firstLastActWarning <= 10) {
 					log.warn("The first and the last activity do not have the same type. "
