@@ -104,7 +104,7 @@ public class PseudoSimConfigGroup extends ReflectiveModule {
 
 	public boolean isPSimIter(
 			final int iteration ) {
-		return iteration % (getPeriod() + getNPSimIters()) < getNPSimIters();
+		return getNPSimIters() > 0 && iteration % (getPeriod() + getNPSimIters()) < getNPSimIters();
 	}
 
 	public boolean isDumpingIter(
