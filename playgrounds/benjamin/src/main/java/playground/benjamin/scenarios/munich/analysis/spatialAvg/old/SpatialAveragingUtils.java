@@ -57,6 +57,7 @@ public class SpatialAveragingUtils {
 	
 	double smoothinRadiusSquared_m;
 	double area_in_smoothing_circle_sqkm;
+	double cellArea_sqkm;
 	Collection<SimpleFeature> featuresInVisBoundary;
 	CoordinateReferenceSystem targetCRS;
 	
@@ -70,6 +71,7 @@ public class SpatialAveragingUtils {
 		
 		this.smoothinRadiusSquared_m = smoothingRadius_m * smoothingRadius_m;
 		this.area_in_smoothing_circle_sqkm = (Math.PI * smoothingRadius_m * smoothingRadius_m) / (1000. * 1000.);
+		this.cellArea_sqkm = ( (xMax - xMin) * (yMax - yMin) ) / ( ( noOfXbins * noOfYbins ) * ( 1000. * 1000. ) );
 		this.featuresInVisBoundary = ShapeFileReader.getAllFeatures(visBoundaryShapeFile);
 		this.targetCRS = targetCRS;
 	}
@@ -151,7 +153,7 @@ public class SpatialAveragingUtils {
 		double [][] normalizedArray = new double[noOfXbins][noOfYbins];
 		for(int xIndex = 0; xIndex<noOfXbins; xIndex++){
 			for(int yIndex = 0; yIndex<noOfYbins; yIndex++){
-				normalizedArray[xIndex][yIndex] = array[xIndex][yIndex] / this.area_in_smoothing_circle_sqkm;
+				normalizedArray[xIndex][yIndex] = array[xIndex][yIndex] * ( this.cellArea_sqkm / this.area_in_smoothing_circle_sqkm );
 			}
 		}
 		return normalizedArray;
