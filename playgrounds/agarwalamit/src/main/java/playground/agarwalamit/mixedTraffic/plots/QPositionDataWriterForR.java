@@ -35,6 +35,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.LoadMyScenarios;
 import playground.agarwalamit.mixedTraffic.MixedTrafficVehiclesUtils;
+import playground.agarwalamit.mixedTraffic.seepage.LastMile.SeepageControler;
 
 /**
  * @author amit
@@ -46,7 +47,7 @@ public class QPositionDataWriterForR {
 //		private static String eventFile = outputDir+"ITERS/data_Patna_3modes_withoutPassing_alternativeSpeed_events.xml";//outputDir+"/ITERS/it.10/10.events.xml.gz";//
 //		private static String networkFile="../../patnaIndiaSim/input/dreieck_network.xml";
 //	private static String configFile ="../../patnaIndiaSim/outputSS/2modesNoStuck/config.xml";
-	private static String outputDir ="./outputSeepage/";//"../../patnaIndiaSim/outputSS/2modesNoStuck/";
+	private static String outputDir =SeepageControler.outputDir;//"./outputSeepage/";//"../../patnaIndiaSim/outputSS/2modesNoStuck/";
 	private static String eventFile = outputDir+"/events.xml";
 	private static String networkFile=outputDir+"/network.xml";//"../../patnaIndiaSim/outputSS/2modesNoStuck/dreieck_network.xml";
 	
@@ -60,7 +61,7 @@ public class QPositionDataWriterForR {
 
 	private final static Logger logger = Logger.getLogger(QPositionDataWriterForR.class);
 
-	public static void main(String[] args) {
+	public void run(){
 		scenario  = LoadMyScenarios.loadScenarioFromNetwork(networkFile);
 
 		calculationHandler = new QueuePositionCalculationHandler(scenario);
@@ -72,6 +73,10 @@ public class QPositionDataWriterForR {
 		writeLinkEnterLeaveQueuePosDataForR();
 		writeLinkEnterLeaveTimeForR();
 		logger.info("Writing file(s) is finished.");
+	}
+	
+	public static void main(String[] args) {
+		new QPositionDataWriterForR().run();
 	}
 
 	private static void writeLinkEnterLeaveQueuePosDataForR(){

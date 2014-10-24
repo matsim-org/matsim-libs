@@ -17,6 +17,7 @@ public class WriteConfig {
 	/**
 	 * @param args
 	 */
+	private final String outputDir = MyFirstControler.outputDir;
 	public static void main(String[] args) {
 		WriteConfig configFile = new WriteConfig();
 		configFile.configRun();
@@ -26,25 +27,25 @@ public class WriteConfig {
 		Config config = ConfigUtils.createConfig();
 		Collection <String> mainModes = Arrays.asList("car","motorbike","bike");
 
-		config.plans().setInputFile("./patnaOutput/plans.xml");
+		config.plans().setInputFile(outputDir+"/plans.xml");
 		//		config.plans().setInputFile("./patnaOutput/modeChoice/selectedPlansOnly/plans.xml");
-		config.network().setInputFile("./patnaOutput/network.xml");
+		config.network().setInputFile(outputDir+"/network.xml");
 		config.counts().setCountsFileName("../../patnaIndiaSim/input/counts/countsCarMotorbikeBike.xml");
 		config.counts().setOutputFormat("all");
 		config.counts().setWriteCountsInterval(100);
 		config.counts().setCountsScaleFactor(94.52); 
-		config.controler().setOutputDirectory("./patnaOutput/");
+		config.controler().setOutputDirectory(outputDir);
 
 		//===
-		VehiclesConfigGroup vehiclesCnfGrp = new VehiclesConfigGroup();
-		vehiclesCnfGrp.setInputFile("./patnaoutput/vehiclesPatna.xml");
-		vehiclesCnfGrp.setMainModes(mainModes);
-		config.addModule(vehiclesCnfGrp);
+//		VehiclesConfigGroup vehiclesCnfGrp = new VehiclesConfigGroup();
+//		vehiclesCnfGrp.setInputFile(outputDir+"/vehiclesPatna.xml");
+//		vehiclesCnfGrp.setMainModes(mainModes);
+//		config.addModule(vehiclesCnfGrp);
 		//===
 
 
 		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(0);
+		config.controler().setLastIteration(200);
 		config.controler().setMobsim("qsim");
 		config.controler().setWriteEventsInterval(100);
 		config.controler().setWritePlansInterval(100);
@@ -79,22 +80,20 @@ public class WriteConfig {
 		reRoute.setModuleName("ReRoute");
 		reRoute.setProbability(0.1);
 
-		StrategySettings modeChoice = new StrategySettings(Id.create("4",StrategySettings.class));
-		modeChoice.setModuleName("ChangeLegMode");
-		modeChoice.setProbability(0.05);
+//		StrategySettings modeChoice = new StrategySettings(Id.create("4",StrategySettings.class));
+//		modeChoice.setModuleName("ChangeLegMode");
+//		modeChoice.setProbability(0.05);
 
 		StrategySettings timeAllocationMutator	= new StrategySettings(Id.create("3",StrategySettings.class));
 		timeAllocationMutator.setModuleName("TimeAllocationMutator");
 		timeAllocationMutator.setProbability(0.05);
 
-		//		reRoute.setDisableAfter(300); 	//number of iteration is set to 300 in case of two step simulation, else agents will not move on new links, they will not change the route
-
-		config.setParam("changeLegMode", "modes", "car,bike,motorbike,pt,walk");
+//		config.setParam("changeLegMode", "modes", "car,bike,motorbike,pt,walk");
 
 		config.strategy().setMaxAgentPlanMemorySize(5);
 		config.strategy().addStrategySettings(expChangeBeta);
 		config.strategy().addStrategySettings(reRoute);
-		config.strategy().addStrategySettings(modeChoice);
+//		config.strategy().addStrategySettings(modeChoice);
 		config.strategy().addStrategySettings(timeAllocationMutator);
 
 		config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
@@ -124,11 +123,11 @@ public class WriteConfig {
 		config.planCalcScore().setTravelingWalk_utils_hr(0);
 
 
-		config.planCalcScore().setConstantCar(-3.50);
-		config.planCalcScore().setConstantOther(-2.2);
-		config.planCalcScore().setConstantBike(0);
-		config.planCalcScore().setConstantPt(-3.4);
-		config.planCalcScore().setConstantWalk(-0.0);
+//		config.planCalcScore().setConstantCar(-3.50);
+//		config.planCalcScore().setConstantOther(-2.2);
+//		config.planCalcScore().setConstantBike(0);
+//		config.planCalcScore().setConstantPt(-3.4);
+//		config.planCalcScore().setConstantWalk(-0.0);
 
 		//config.planCalcScore().getOrCreateModeParams("bike").setMarginalUtilityOfDistance(-0.01);
 
@@ -148,6 +147,6 @@ public class WriteConfig {
 		//		config.plansCalcRoute().setTeleportedModeSpeed("car", 20/3.6);
 		//		config.plansCalcRoute().setTeleportedModeSpeed("bike",10/3.6);
 
-		new ConfigWriter(config).write(config.controler().getOutputDirectory()+"/configMixTrfc.xml");
+		new ConfigWriter(config).write(outputDir+"/configPatnaSeepage_true.xml");
 	}
 }

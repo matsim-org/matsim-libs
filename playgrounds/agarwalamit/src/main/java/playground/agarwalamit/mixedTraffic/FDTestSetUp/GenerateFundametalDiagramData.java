@@ -69,7 +69,7 @@ public class GenerateFundametalDiagramData {
 	//CONFIGURATION: static variables used for aggregating configuration options
 
 	public static final boolean PASSING_ALLOWED = true;
-	private static final String OUTPUT_FOLDER = "seepage/carBike/";
+	private static final String OUTPUT_FOLDER = "seepage/carBikeSeepTrue/";
 	public static final boolean WITH_HOLES = false;
 	private static final String RUN_DIR = "../../runs-svn/mixedTraffic/";
 	private static final String OUTPUT_FILE = RUN_DIR+OUTPUT_FOLDER+"/data.txt"; //"pathto\\data.txt";
@@ -82,7 +82,7 @@ public class GenerateFundametalDiagramData {
 	private final static Integer[] STARTING_POINT = {0,0,0};
 	//	private final static Integer [] MIN_STEPS_POINTS = {4,1};
 
-	private final int reduceDataPointsByFactor = 100;
+	private final int reduceDataPointsByFactor = 1;
 
 	private int flowUnstableWarnCount [] = new int [TRAVELMODES.length];
 	private int speedUnstableWarnCount [] = new int [TRAVELMODES.length];
@@ -165,8 +165,8 @@ public class GenerateFundametalDiagramData {
 		// for a faster simulation or to have less points on FD, minSteps is increased
 		if(reduceDataPointsByFactor!=1) {
 			log.info("===============");
-			log.warn("Data points for FD will be reduced by a factor of "+reduceDataPointsByFactor+". ");
-			log.warn( "Make sure this is what you want because it will be more likely to have less or no points in congested regime.");
+			log.warn("Data points for FD will be reduced by a factor of "+reduceDataPointsByFactor+". "+
+			"Make sure this is what you want because it will be more likely to have less or no points in congested regime.");
 			log.info("===============");
 			for(int index=0;index<minSteps.size();index++){
 				minSteps.set(index, minSteps.get(index)*reduceDataPointsByFactor);

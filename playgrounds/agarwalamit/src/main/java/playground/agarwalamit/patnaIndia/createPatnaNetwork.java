@@ -170,7 +170,7 @@ public class createPatnaNetwork {
 		simplifier.setNodesToMerge(nodeTypesToMerge);
 		simplifier.run(network);
 
-		new NetworkWriter(network).write("./patnaOutput/network.xml");
+		new NetworkWriter(network).write(MyFirstControler.outputDir+"/network.xml");
 	}    
 
 	private static double capacityOfLink (String roadwidth) {

@@ -79,7 +79,7 @@ public class createPlans4Patna {
 		filesReader(planFile3, zoneFile, scenario, ID3);
 
 		MatsimWriter populationwriter = new PopulationWriter(population, network); 
-		populationwriter.write("./patnaOutput/plans.xml");
+		populationwriter.write(MyFirstControler.outputDir+"/plans.xml");
 		logger.info("Writing Plan file is finished.");
 
 	}
@@ -172,7 +172,6 @@ Oct 11, 2013 4:04:22 PM org.geotools.data.shapefile.ShpFiles logCurrentLockers
 			}
 			//			for (int j=0; j<1; j++){ //run with 1% sample
 			Person person = factory.createPerson(Id.create(Integer.toString(startId++),Person.class));
-			System.out.println(person.getId().toString());
 			population.addPerson(person);
 			Plan plan = factory.createPlan();
 			person.addPlan(plan);

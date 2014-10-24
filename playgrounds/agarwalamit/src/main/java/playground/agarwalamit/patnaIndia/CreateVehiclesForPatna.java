@@ -22,8 +22,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehicleWriterV1;
@@ -34,13 +32,9 @@ import org.matsim.vehicles.Vehicles;
  */
 public class CreateVehiclesForPatna {
 
-	private final static String inputPlans = "./patnaOutput/plans.xml";
 
 	public static void main(String[] args) {
 
-		Config config = ConfigUtils.createConfig();
-		config.plans().setInputFile(inputPlans);
-//		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		Vehicles vehicles = VehicleUtils.createVehiclesContainer();
 
@@ -91,6 +85,6 @@ public class CreateVehiclesForPatna {
 //				}
 //			}
 //		}
-		new VehicleWriterV1(vehicles).writeFile("./patnaoutput/vehiclesPatna.xml");
+		new VehicleWriterV1(vehicles).writeFile(MyFirstControler.outputDir+"/vehiclesPatna.xml");
 	}
 }
