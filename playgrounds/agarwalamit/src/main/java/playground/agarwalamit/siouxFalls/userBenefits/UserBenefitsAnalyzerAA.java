@@ -41,10 +41,11 @@ import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
  * This module calculates the logsum for each user and the sum of all user logsums in monetary units.
  * Furthermore, it analyzes users with no valid plan, that are not considered for the logsum calculation.
  * 
- * @author ikaddoura, benjamin
+ * @author amit after ikaddoura, benjamin
  *
  */
 public class UserBenefitsAnalyzerAA extends AbstractAnalyisModule{
+	
 	private final Logger log = Logger.getLogger(UserBenefitsAnalyzer.class);
 	private ScenarioImpl scenario;
 	private UserBenefitsCalculator userWelfareCalculator;
@@ -59,16 +60,21 @@ public class UserBenefitsAnalyzerAA extends AbstractAnalyisModule{
 		super(UserBenefitsAnalyzerAA.class.getSimpleName());
 	}
 	
-	public void init(ScenarioImpl scenario, WelfareMeasure welfareMeasure) {
+	
+	/**
+	 * @param scenario
+	 * @param welfareMeasure user welfare or logsum
+	 * @param considerAllPlans include plans with negative or null score or not
+	 */
+	public void init(ScenarioImpl scenario, WelfareMeasure welfareMeasure, boolean considerAllPlans) {
 		this.scenario = scenario;
 		this.welfareMeasure = welfareMeasure;
-		this.userWelfareCalculator = new UserBenefitsCalculator(this.scenario.getConfig(), this.welfareMeasure, false);
+		this.userWelfareCalculator = new UserBenefitsCalculator(this.scenario.getConfig(), this.welfareMeasure, considerAllPlans);
 		this.userWelfareCalculator.reset();
 	}
 	
 	@Override
 	public List<EventHandler> getEventHandler() {
-		// nothing to return
 		return new LinkedList<EventHandler>();
 	}
 
@@ -76,14 +82,15 @@ public class UserBenefitsAnalyzerAA extends AbstractAnalyisModule{
 	public void preProcessData() {
 		this.allUsersLogSum = this.userWelfareCalculator.calculateUtility_money(this.scenario.getPopulation());
 		this.personWithNoValidPlanCnt = this.userWelfareCalculator.getPersonsWithoutValidPlanCnt();
+		
 		this.log.warn("users with no valid plan (all scores ``== null'' or ``<= 0.0''): " + this.personWithNoValidPlanCnt);
+		
 		this.personId2MonetarizedUserWelfare = this.userWelfareCalculator.getPersonId2MonetizedUtility();
 		this.personId2UserWelfare = this.userWelfareCalculator.getPersonId2Utility();
 	}
 
 	@Override
 	public void postProcessData() {
-		// nothing to do
 	}
 
 	@Override
@@ -99,11 +106,11 @@ public class UserBenefitsAnalyzerAA extends AbstractAnalyisModule{
 			bw.newLine();
 			
 			bw.newLine();
-			bw.write("userID \t monetary user logsum");
+			bw.write("userID \t userWelfare_utils \t monetary user logsum");
 			bw.newLine();
 			
 			for (Id id : this.personId2UserWelfare.keySet()){
-				String row = id + "\t" + this.personId2UserWelfare.get(id);
+				String row = id + "\t" + this.personId2UserWelfare.get(id)+"\t"+this.personId2MonetarizedUserWelfare.get(id);
 				bw.write(row);
 				bw.newLine();
 			}
@@ -116,7 +123,7 @@ public class UserBenefitsAnalyzerAA extends AbstractAnalyisModule{
 		}
 	}
 
-	public double getAllUsersLogSum() {
+	public double getTotalUserWelfare_money() {
 		return this.allUsersLogSum;
 	}
 
