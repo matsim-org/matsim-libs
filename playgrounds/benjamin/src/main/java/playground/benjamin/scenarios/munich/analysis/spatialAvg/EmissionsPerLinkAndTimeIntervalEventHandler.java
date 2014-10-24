@@ -67,14 +67,13 @@ public class EmissionsPerLinkAndTimeIntervalEventHandler implements ColdEmission
 		Double emissionValue = event.getWarmEmissions().get(warmPollutant);
 		Double linkLenghtKm = links.get(linkId).getLength()/1000.;
 		int timeInterval = (int) Math.floor(event.getTime()/simulationEndTime*noOfTimeBins);
+		if(timeInterval!=0)System.out.println(timeInterval);
 		Map<Id, EmissionsAndVehicleKm> currentInterval = intervals2links2emissions.get(timeInterval);
 		if(!currentInterval.containsKey(linkId)){
 			currentInterval.put(linkId, new EmissionsAndVehicleKm(emissionValue, linkLenghtKm));
 		}else{
 			EmissionsAndVehicleKm eavk = currentInterval.get(linkId);
-//			System.out.println("em value " + emissionValue + " old value " + eavk.emissionValue);
 			eavk.add(emissionValue, linkLenghtKm);
-//			System.out.println("new value " + eavk.emissionValue);
 			currentInterval.put(linkId, eavk);
 			
 		}
@@ -84,11 +83,9 @@ public class EmissionsPerLinkAndTimeIntervalEventHandler implements ColdEmission
 	public void handleEvent(ColdEmissionEvent event) {
 		Id linkId = event.getLinkId();
 		Double emissionValue = event.getColdEmissions().get(coldPollutant);
-//		Double linkLenghtKm = links.get(linkId).getLength()/1000.;
 		int timeInterval = (int) Math.floor(event.getTime()/simulationEndTime*noOfTimeBins);
 		Map<Id, EmissionsAndVehicleKm> currentInterval = intervals2links2emissions.get(timeInterval);
 		if(!currentInterval.containsKey(linkId)){
-			//TODO check with Benjamin
 			currentInterval.put(linkId, new EmissionsAndVehicleKm(emissionValue, 0.0));
 		}else{
 			EmissionsAndVehicleKm eavk = currentInterval.get(linkId);

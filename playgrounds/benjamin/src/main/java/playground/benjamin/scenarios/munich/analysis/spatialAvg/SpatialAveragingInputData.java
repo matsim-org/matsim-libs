@@ -186,4 +186,8 @@ public class SpatialAveragingInputData {
 		return this.targetCRS;
 	}
 
+	public double getBoundingboxSizeSquareMeter() {
+		return ((xMax-xMin)*(yMax-yMin));
+	}
+
 }

@@ -142,13 +142,11 @@ public class SpatialAveragingWriter {
 
 	private double findBinCenterY(int yIndex) {
 		double yBinCenter = yMin + ((yIndex + .5) / noOfYbins) * (yMax - yMin);
-		//Assert.equals(mapYCoordToBin(yBinCenter), yIndex);
 		return yBinCenter ;
 	}
 
 	private double findBinCenterX(int xIndex) {
 		double xBinCenter = xMin + ((xIndex + .5) / noOfXbins) * (xMax - xMin);
-		//Assert.equals(mapXCoordToBin(xBinCenter), xIndex);
 		return xBinCenter ;
 	}
 	
@@ -165,18 +163,6 @@ public class SpatialAveragingWriter {
 		}
 		return isInMunichShape;
 	}
-	
-//	private Integer mapYCoordToBin(double yCoord) {
-//		if (yCoord <= yMin || yCoord >= yMax) return null; // yCoord is not in area of interest
-//		double relativePositionY = ((yCoord - yMin) / (yMax - yMin) * noOfYbins); // gives the relative position along the y-range
-//		return (int) relativePositionY; // returns the number of the bin [0..n-1]
-//	}
-//
-//	private Integer mapXCoordToBin(double xCoord) {
-//		if (xCoord <= xMin || xCoord >= xMax) return null; // xCorrd is not in area of interest
-//		double relativePositionX = ((xCoord - xMin) / (xMax - xMin) * noOfXbins); // gives the relative position along the x-range
-//		return (int) relativePositionX; // returns the number of the bin [0..n-1]
-//	}
 	
 	public Coord findCellCentroid(int xIndex, int yIndex) {
 		double xCentroid = findBinCenterX(xIndex);

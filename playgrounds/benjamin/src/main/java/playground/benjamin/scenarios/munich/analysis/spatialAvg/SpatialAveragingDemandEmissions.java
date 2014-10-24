@@ -45,7 +45,7 @@ public class SpatialAveragingDemandEmissions {
 	private static final Logger logger = Logger.getLogger(SpatialAveragingDemandEmissions.class);
 
 	private String baseCase = "exposureInternalization"; // exposureInternalization, latsis, 981
-	private String compareCase = "exposurePricing"; // zone30, pricing, exposurePricing, 983
+	private String compareCase = "zone30"; // zone30, pricing, exposurePricing, 983
 	
 	final int noOfXbins = 160;
 	final int noOfYbins = 120; 
@@ -87,7 +87,8 @@ public class SpatialAveragingDemandEmissions {
 		inputData = new SpatialAveragingInputData(baseCase, compareCase);
 		
 		if(useLineMethod){
-			linkWeightUtil = new LinkLineWeightUtil(smoothingRadius_m);
+			double cellSize_squareMeter = inputData.getBoundingboxSizeSquareMeter()/noOfXbins/noOfYbins;
+			linkWeightUtil = new LinkLineWeightUtil(smoothingRadius_m, cellSize_squareMeter);
 		}else{
 			linkWeightUtil = new LinkPointWeightUtil(inputData, noOfXbins, noOfYbins, smoothingRadius_m);
 		}
@@ -124,8 +125,8 @@ public class SpatialAveragingDemandEmissions {
 				sGrid.addLinkValue(network.getLinks().get(linkId), timeInterval2Link2Pollutant.get(timeInterval).get(linkId), linkWeightUtil);
 			}
 			Double factor = linkWeightUtil.getNormalizationFactor()*inputData.scalingFactor;
-			
 			sGrid.multiplyAllCells(factor);
+			
 			// store base case results for comparison
 			timeInterval2GridBaseCase[timeInterval] = sGrid;
 			Double endOfTimeInterval = simulationEndTime/noOfTimeBins*(timeInterval+1);
@@ -175,7 +176,7 @@ public class SpatialAveragingDemandEmissions {
 			throws IOException {
 		if(writeRoutput){
 			logger.info("Starting to write R output.");
-			this.saWriter.writeRoutput(sGrid.getAverageValuesOfGrid(), outPathStub + ".Routput." + pollutant2analyze.toString() + ".g." + endOfTimeInterval + ".txt");
+			this.saWriter.writeRoutput(sGrid.getWeightedValuesOfGrid(), outPathStub + ".Routput." + pollutant2analyze.toString() + ".g." + endOfTimeInterval + ".txt");
 			this.saWriter.writeRoutput(sGrid.getWeightsOfGrid(), outPathStub + ".Routput.Demand.vkm." + endOfTimeInterval + ".txt");
 			this.saWriter.writeRoutput(sGrid.getAverageValuesOfGrid(), outPathStub+ ".Routput." + pollutant2analyze + ".gPerVkm." + endOfTimeInterval + ".txt");
 			}

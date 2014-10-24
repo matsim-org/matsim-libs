@@ -29,10 +29,12 @@ public class LinkLineWeightUtil implements LinkWeightUtil {
 	private final Logger logger = Logger.getLogger(LinkLineWeightUtil.class);
 	private double smoothingRadiusSquared_m;
 	private double smoothingRadius_m;
+	private double cellsize_m;
 	
-	public LinkLineWeightUtil(double smoothingRadius_m) {
+	public LinkLineWeightUtil(double smoothingRadius_m, double cellSizeSquareMeter) {
 		this.smoothingRadius_m = smoothingRadius_m;
 		this.smoothingRadiusSquared_m = smoothingRadius_m * smoothingRadius_m;
+		this.cellsize_m = cellSizeSquareMeter;
 	}
 	@Override
 	public Double getWeightFromLink(Link link, Coord cellCentroid) {
@@ -92,7 +94,7 @@ public class LinkLineWeightUtil implements LinkWeightUtil {
 
 	@Override
 	public Double getNormalizationFactor() {
-		if(smoothingRadius_m>0.0)return (1/smoothingRadius_m);
+		if(smoothingRadius_m>0.0) return (cellsize_m/smoothingRadiusSquared_m);
 		return 1.0;
 	}
 

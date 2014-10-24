@@ -44,6 +44,8 @@ public class LinkPointWeightUtil implements LinkWeightUtil {
 	double area_in_smoothing_circle_sqkm;
 	Collection<SimpleFeature> featuresInVisBoundary;
 	CoordinateReferenceSystem targetCRS;
+
+	private double cellSizeSquareKm;
 	
 	public LinkPointWeightUtil(double xMin, double xMax, double yMin,	double yMax, int noOfXbins, int noOfYbins, double smoothingRadius_m, String visBoundaryShapeFile, CoordinateReferenceSystem targetCRS) {
 		this.xMin = xMin;
@@ -57,6 +59,8 @@ public class LinkPointWeightUtil implements LinkWeightUtil {
 		this.area_in_smoothing_circle_sqkm = (Math.PI * smoothingRadius_m * smoothingRadius_m) / (1000. * 1000.);
 		this.featuresInVisBoundary = ShapeFileReader.getAllFeatures(visBoundaryShapeFile);
 		this.targetCRS = targetCRS;
+		this.cellSizeSquareKm = (xMax-xMin)/noOfXbins*(yMax-yMin)/noOfYbins / (1000.*1000.);
+		System.out.println("cell size square km" + this.cellSizeSquareKm);
 	}
 	
 
@@ -71,8 +75,6 @@ public class LinkPointWeightUtil implements LinkWeightUtil {
 
 	@Override
 	public Double getWeightFromLink(Link link, Coord cellCentroid) {
-//		double linkcenterx = 0.5 * link.getFromNode().getCoord().getX() + 0.5 * link.getToNode().getCoord().getX();
-//		double linkcentery = 0.5 * link.getFromNode().getCoord().getY() + 0.5 * link.getToNode().getCoord().getY();
 		double linkcenterx = link.getCoord().getX();
 		double linkcentery = link.getCoord().getY();
 		double cellCentroidX = cellCentroid.getX();
@@ -82,13 +84,11 @@ public class LinkPointWeightUtil implements LinkWeightUtil {
 
 	@Override
 	public Double getNormalizationFactor() {
-		return (1/this.area_in_smoothing_circle_sqkm);
+		return (cellSizeSquareKm/this.area_in_smoothing_circle_sqkm);
 	}
 	
 	private double calculateWeightOfPointForCell(double x1, double y1, double x2, double y2) {
 		double distanceSquared = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
-//		System.out.println("distance squared" + distanceSquared);
-//		if(distanceSquared < 125000.)System.out.println("small distance");
 		return Math.exp((-distanceSquared) / (smoothinRadiusSquared_m));
 	}
 
