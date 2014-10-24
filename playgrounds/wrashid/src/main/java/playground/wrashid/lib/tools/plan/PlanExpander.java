@@ -22,11 +22,13 @@ public class PlanExpander {
 	public static void main(String[] args) {
 		
 		String inputPlansFile = "H:/data/cvs/ivt/studies/switzerland/plans/teleatlas-ivtcheu/census2000v2_dilZh30km_10pct/plans.xml.gz";
-		String inputNetworkFile = "H:/data/cvs/ivt/studies/switzerland/networks/teleatlas-ivtcheu/network.xml.gz";
-		String inputFacilitiesFile = "H:/data/cvs/ivt/studies/switzerland/facilities/facilities.xml.gz";
-		int populationExpansionFactor = 2;
+		//String inputPlansFile = "H:/data/cvs/ivt/studies/switzerland/plans/teleatlas-ivtcheu/census2000v2_dilZh30km_10pct/plans.xml/plans.xml";
+		
+		String inputNetworkFile = "H:/data/cvs/ivt/studies/switzerland/network/teleatlas-ivtcheu/network.xml";
+		String inputFacilitiesFile = "H:/data/cvs/ivt/studies/switzerland/facilities/facilities.xml";
+		int populationExpansionFactor = 8;
 
-		String outputPlansFile = "H:/data/experiments/msimoni/13Aug2013/plans_zurich_20pct.xml.gz";
+		String outputPlansFile = "H:/data/experiments/msimoni/24Oct2014/plans_zurich_80pct.xml.gz";
 		Scenario scenario = GeneralLib.readScenario(inputPlansFile,
 				inputNetworkFile,inputFacilitiesFile);
 
@@ -54,9 +56,9 @@ public class PlanExpander {
 				Person newPerson = factory.createPerson(Id.create(String.valueOf(pCounter++), Person.class));
 				newPerson.addPlan(originPersonImpl.createCopyOfSelectedPlanAndMakeSelected());
 				
-				Desires newDesires = ((PersonImpl) newPerson).createDesires(originDesires.getDesc());
-				Map<String, Double> map = originDesires.getActivityDurations();
-				for (Entry<String, Double> entry : map.entrySet()) newDesires.putActivityDuration(entry.getKey(), entry.getValue());
+				//Desires newDesires = ((PersonImpl) newPerson).createDesires(originDesires.getDesc());
+				//Map<String, Double> map = originDesires.getActivityDurations();
+				//for (Entry<String, Double> entry : map.entrySet()) newDesires.putActivityDuration(entry.getKey(), entry.getValue());
 				
 				scenario.getPopulation().addPerson(newPerson);
 			}
