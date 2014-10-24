@@ -40,8 +40,7 @@ import java.util.*;
 // will require serious overhaul if chronological order is enforced in all event manager implementations
 public class SlaveControler implements IterationStartsListener {
     private final boolean initialRouting;
-    private final boolean isloadBalancing;
-    private final Logger slaveLogger = Logger.getLogger(this.getClass());
+    private final Logger slaveLogger;
     private final int myNumber;
     private int numberOfPSimIterations;
     private int numberOfIterations = -1;
@@ -58,6 +57,7 @@ public class SlaveControler implements IterationStartsListener {
     private boolean readyToSendPlans = false;
     private List<Long> iterationTimes = new ArrayList<>();
     private long lastIterationStartTime;
+    private boolean loadBalance;
 
     private SlaveControler(String[] args) throws IOException, ClassNotFoundException, ParseException {
         lastIterationStartTime = System.currentTimeMillis();
@@ -111,8 +111,9 @@ public class SlaveControler implements IterationStartsListener {
         this.reader = new ObjectInputStream(readSocket.getInputStream());
         this.writer = new ObjectOutputStream(writeSocket.getOutputStream());
         myNumber = reader.readInt();
+        slaveLogger = Logger.getLogger("SLAVE_" + myNumber);
+
         numberOfPSimIterations = reader.readInt();
-        isloadBalancing = reader.readBoolean();
         slaveLogger.warn("Running " + numberOfPSimIterations + " PSim iterations for every QSim iter");
         List<String> idStrings = (List<String>) reader.readObject();
         slaveLogger.warn("RECEIVED agent ids for removal from master.");
@@ -205,10 +206,12 @@ public class SlaveControler implements IterationStartsListener {
             iterationTimes.add(System.currentTimeMillis() - lastIterationStartTime);
 
         if (initialRouting || (numberOfIterations > 0 && numberOfIterations % numberOfPSimIterations == 0)) {
-            this.averageIterationTime = getAverageIterationTime();
+            this.averageIterationTime = getTotalIterationTime();
             communications();
-            iterationTimes = new ArrayList<>();
-            iterationTimes.add(System.currentTimeMillis() - lastIterationStartTime);
+            if (loadBalance) {
+                slaveLogger.warn("Load balancing complete on all slaves.");
+                iterationTimes = new ArrayList<>();
+            }
         }
         lastIterationStartTime = System.currentTimeMillis();
         // the time calculators are null until the master sends them, need
@@ -248,12 +251,12 @@ public class SlaveControler implements IterationStartsListener {
 
     }
 
-    public double getAverageIterationTime() {
+    public double getTotalIterationTime() {
         double sumTimes = 0;
         for (long t : iterationTimes) {
             sumTimes += t;
         }
-        return sumTimes / iterationTimes.size();
+        return sumTimes;
     }
 
 
@@ -261,6 +264,7 @@ public class SlaveControler implements IterationStartsListener {
         for (PersonSerializable person : persons) {
             matsimControler.getPopulation().addPerson(person.getPerson());
         }
+        slaveLogger.warn("Added " + persons.size() + " pax to my population.");
     }
 
     private List<PersonSerializable> getPersonsToSend(int diff) {
@@ -310,15 +314,19 @@ public class SlaveControler implements IterationStartsListener {
                 writer.writeObject(plansCopyForSending);
                 writer.flush();
                 slaveLogger.warn("Sending completed.");
+                //prevent memory leaks, see http://stackoverflow.com/questions/1281549/memory-leak-traps-in-the-java-standard-api
+                reader.reset();
+                writer.reset();
             } else {
                 System.out.println("Master terminated. Exiting.");
                 System.exit(0);
             }
-
-            if (isloadBalancing) {
+            loadBalance = reader.readBoolean();
+            if (loadBalance) {
                 slaveLogger.warn("Load balancing...");
-                int diff = reader.readInt();
 
+                int diff = reader.readInt();
+                slaveLogger.warn("Received " + diff + " as lb instr from master");
 
                 List<PersonSerializable> personsToSend = new ArrayList<>();
                 if (diff > 0) {
@@ -326,8 +334,15 @@ public class SlaveControler implements IterationStartsListener {
                 }
                 writer.writeObject(personsToSend);
                 writer.flush();
+                slaveLogger.warn("Sent " + diff + " pax to master");
 
                 addPersons((List<PersonSerializable>) reader.readObject());
+                slaveLogger.warn("Load balancing done. waiting for others to finish...");
+                //this line is only there tto ensure that slave timing is synchronized, otherwise system becomes chaotic
+                reader.readBoolean();
+                //prevent memory leaks, see http://stackoverflow.com/questions/1281549/memory-leak-traps-in-the-java-standard-api
+                reader.reset();
+                writer.reset();
             }
 
         } catch (ClassNotFoundException | IOException e) {

@@ -32,17 +32,19 @@ import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class MasterControler implements AfterMobsimListener, ShutdownListener {
+    private final Logger masterLogger = Logger.getLogger(this.getClass());
+    private final HashMap<String, Plan> newPlans = new HashMap<>();
     private int numberOfPSimIterations = 5;
     private Config config;
-    private final Logger masterLogger = Logger.getLogger(this.getClass());
     private Controler matsimControler;
     private Slave[] slaves;
     private WaitTimeCalculatorSerializable waitTimeCalculator;
     private StopStopTimeCalculatorSerializable stopStopTimeCalculator;
     private SerializableLinkTravelTimes linkTravelTimes;
     private AtomicInteger numThreads;
-    private final HashMap<String, Plan> newPlans = new HashMap<>();
     private List<PersonSerializable> personPool;
+    private int loadBalanceInterval;
+    private boolean isLoadBalanceIteration;
 
     private MasterControler(String[] args) throws NumberFormatException, IOException, ParseException {
         System.setProperty("matsim.preferLocalDtds", "true");
@@ -53,6 +55,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
         options.addOption("n", true, "Number of slaves to distribute to.");
         options.addOption("i", true, "Number of PSim iterations for every QSim iteration.");
         options.addOption("r", false, "Perform initial routing of plans on slaves.");
+        options.addOption("l", false, "Number of iterations between load balancing. Default = 5");
         CommandLineParser parser = new BasicParser();
         CommandLine commandLine = parser.parse(options, args);
         int numSlaves = 0;
@@ -83,6 +86,18 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
         else {
             masterLogger.warn("Will accept connections on default port number 12345");
         }
+        loadBalanceInterval = 5;
+        if (commandLine.hasOption("l"))
+            try {
+                loadBalanceInterval = Integer.parseInt(commandLine.getOptionValue("l"));
+            } catch (NumberFormatException e) {
+                masterLogger.warn("loadBalanceInterval number should be integer");
+                System.out.println(options.toString());
+                System.exit(1);
+            }
+        else {
+            masterLogger.warn("Will perform load Balancing every 5 iterations as per default");
+        }
         ServerSocket writeServer = new ServerSocket(socketNumber);
         ServerSocket readServer = new ServerSocket(socketNumber + 1);
         for (int i = 0; i < numSlaves; i++) {
@@ -94,7 +109,6 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
             //order is important
             slaves[i].sendNumber(i);
             slaves[i].sendNumber(numberOfPSimIterations);
-            slaves[i].notifyIfLoadBalancing(numSlaves > 1);
         }
         writeServer.close();
         readServer.close();
@@ -177,6 +191,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
 
     @Override
     public void notifyAfterMobsim(AfterMobsimEvent event) {
+        isLoadBalanceIteration = slaves.length > 1 && event.getIteration() % loadBalanceInterval == 0;
         linkTravelTimes = new SerializableLinkTravelTimes(event.getControler().getLinkTravelTimes(), config
                 .travelTimeCalculator().getTraveltimeBinSize(), config.qsim().getEndTime(), matsimControler
                 .getNetwork().getLinks().values());
@@ -194,11 +209,11 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
             }
 
         mergePlansFromSlaves();
-        if (slaves.length > 1) {
+        //do load balancing, if necessary
+        if (isLoadBalanceIteration ) {
             personPool = new ArrayList<>();
             masterLogger.warn("Plans from al slaves merged together. About to start load balancing.");
             List<Integer> loadBalanceNumbers = loadBalanceNumbers();
-            masterLogger.warn("loadbalanceNumbers() returns: \n" + loadBalanceNumbers.toString());
             numThreads = new AtomicInteger(slaves.length);
             for (int i = 0; i < slaves.length; i++) {
                 slaves[i].target = loadBalanceNumbers.get(i);
@@ -227,7 +242,8 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
             for (Slave slave : slaves)
                 slave.state = SimulationState.TransmitTravelTimes;
         }
-
+        isLoadBalanceIteration = false;
+        personPool.clear();
 
     }
 
@@ -288,7 +304,32 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
         List<Integer> differences = new ArrayList<>();
         for (int i = 0; i < optimalNumberPerSlave.size(); i++) {
             differences.add(personsPerSlave.get(i) - optimalNumberPerSlave.get(i));
+
         }
+        StringBuffer sb = new StringBuffer();
+        String[] lines = {"slave", "time per plan", "pax per slave", "optimum", "diff"};
+        for (int j = 0; j < 5; j++) {
+
+            sb.append("\t\t\t" + lines[j] + "\t");
+            for (int i = 0; i < optimalNumberPerSlave.size(); i++) {
+                switch (j) {
+                    case 0:
+                        sb.append("slave_" + i + "\t");break;
+                    case 1:
+                        sb.append(timesPerPlan.get(i)+"\t");break;
+                    case 2:
+                        sb.append(personsPerSlave.get(i)+"\t");break;
+                    case 3:
+                        sb.append(optimalNumberPerSlave.get(i)+"\t");break;
+                    case 4:
+                        sb.append(differences.get(i)+"\t");break;
+
+                }
+
+            }
+            sb.append("\n");
+        }
+        masterLogger.warn(sb.toString());
         return differences;
     }
 
@@ -307,15 +348,15 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
 
     private class Slave implements Runnable {
         final Logger slaveLogger = Logger.getLogger(this.getClass());
+        final Map<String, Plan> plans = new HashMap<>();
         ObjectInputStream reader;
         ObjectOutputStream writer;
-        final Map<String, Plan> plans = new HashMap<>();
-        private int myNumber;
-        private int myPopulationSize;
         double averageIterationTime;
         List<PersonSerializable> slavePersonPool;
         int target = 0;
         SimulationState state = SimulationState.TransmitTravelTimes;
+        private int myNumber;
+        private int myPopulationSize;
 
         public Slave(Socket writeSocket, Socket readSocket, int i) throws IOException {
             super();
@@ -346,6 +387,11 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
                     for (Entry<String, PlanSerializable> entry : serialPlans.entrySet()) {
                         plans.put(entry.getKey(), entry.getValue().getPlan(matsimControler.getPopulation()));
                     }
+                    writer.writeBoolean(isLoadBalanceIteration);
+                    writer.flush();
+//                    prevent memory leaks, see http://stackoverflow.com/questions/1281549/memory-leak-traps-in-the-java-standard-api
+                    reader.reset();
+                    writer.reset();
                     numThreads.decrementAndGet();
                 } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();
@@ -360,8 +406,10 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
                 try {
                     writer.writeInt(target);
                     writer.flush();
-
                     slavePersonPool = (List<PersonSerializable>) reader.readObject();
+//                    prevent memory leaks, see http://stackoverflow.com/questions/1281549/memory-leak-traps-in-the-java-standard-api
+                    reader.reset();
+                    writer.reset();
                     numThreads.decrementAndGet();
                 } catch (ClassNotFoundException | IOException e) {
                     e.printStackTrace();
@@ -375,7 +423,16 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
                     writer.writeObject(getPersonsFromPool(target));
                     writer.flush();
                     numThreads.decrementAndGet();
+                    //ensure that slaves start at approximately the same time after load balancing
+                    while (numThreads.get() > 0)
+                        Thread.sleep(10);
+                    writer.writeBoolean(true);
+                    writer.flush();
+//                    prevent memory leaks, see http://stackoverflow.com/questions/1281549/memory-leak-traps-in-the-java-standard-api
+                    writer.reset();
                 } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
 
@@ -401,10 +458,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
             writer.flush();
         }
 
-        public void notifyIfLoadBalancing(boolean isBalancing) throws IOException {
-            writer.writeBoolean(isBalancing);
-            writer.flush();
-        }
+
 
         public Collection<? extends PersonSerializable> getPersons() {
             return slavePersonPool;
