@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -101,6 +103,7 @@ public class InitialPlansConsistencyCheck {
 
 	private void equalityCheckFor1stAndLastActivity(){
 		log.info("Consistency check for equality of first and last activity in a plan.");
+		SortedMap<String, Integer> actSeq2Count = new TreeMap<>();
 		int warnCount =0;
 		int urbanPersons =0;
 		for(Person p:person2ActivityType.keySet()){
@@ -108,11 +111,27 @@ public class InitialPlansConsistencyCheck {
 			if(!acts.get(0).equals(acts.get(acts.size()-1))){
 				warnCount++;
 				if(pf.isPersonFromMID(p.getId())) urbanPersons++;
+				
+				if(actSeq2Count.containsKey(acts.toString())){
+					int countSoFar = actSeq2Count.get(acts.toString());
+					actSeq2Count.put(acts.toString(), countSoFar+1);
+				}
+				else {
+					actSeq2Count.put(acts.toString(),1);
+				}
 			}
 		}
 		try {
 			writer.write("Number of persons not having first and last activity same \t "+warnCount+"\n");
 			writer.write("Number of such persons from Urban population \t "+urbanPersons+"\n");
+			
+			writer.write("\n \n \n");
+			
+			writer.write("act Sequence \t count \n");
+			for(String str : actSeq2Count.keySet()){
+				writer.write(str+"\t"+actSeq2Count.get(str)+"\n");
+			}
+			
 			writer.close();
 		} catch (Exception e) {
 			throw new RuntimeException("Data is not written to file. Reason "+e);
