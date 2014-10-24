@@ -51,7 +51,7 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 
 	private final Logger logger = Logger.getLogger(UserBenefitsAndTotalWelfarePerUserGroup.class);
 	private int lastIteration;
-	private  String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct_rSeed/eci/";/*"./output/run2/";*/
+	private  String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/ei/";/*"./output/run2/";*/
 	private  String populationFile =outputDir+ "/output_plans.xml.gz";//"/network.xml";
 	private  String networkFile =outputDir+ "/output_network.xml.gz";//"/network.xml";
 	private  String configFile = outputDir+"/output_config.xml";//"/config.xml";//
@@ -78,14 +78,21 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 		SortedMap<UserGroup, Double> userGroupToUserWelfare_utils = getParametersPerUserGroup(this.personId2UserWelfare_utils);
 		SortedMap<UserGroup, Double> userGroupToUserWelfare_money = getParametersPerUserGroup(this.personId2MonetarizedUserWelfare);
 		SortedMap<UserGroup, Double> userGroupToTotalPayment = getParametersPerUserGroup(this.personId2MonetaryPayments);
-
+		System.out.println(totalUserWelfare_money);
 		String outputFile = this.outputDir+"/analysis/userGrpWelfareAndTollPayments.txt";
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
+		double sumUtils =0;
+		double sumUtils_money =0;
+		double sumToll =0;
 		try {
 			writer.write("UserGroup \t userWelfareUtils \t userWelfareMoney \t tollPayments \n");
 			for(UserGroup ug : userGroupToTotalPayment.keySet()){
 				writer.write(ug+"\t"+userGroupToUserWelfare_utils.get(ug)+"\t"+userGroupToUserWelfare_money.get(ug)+"\t"+userGroupToTotalPayment.get(ug)+"\n");
+				sumUtils += userGroupToUserWelfare_utils.get(ug);
+				sumUtils_money += userGroupToUserWelfare_money.get(ug);
+				sumToll += userGroupToTotalPayment.get(ug);
 			}
+			writer.write("total \t"+sumUtils+"\t"+sumUtils_money+"\n"+sumToll+"\n");
 			writer.close();
 		} catch (IOException e) {
 			throw new RuntimeException("Data is not written into a File. Reason : "+e);
@@ -93,31 +100,35 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 		this.logger.info("Finished Writing data to file "+outputFile);		
 	}
 
-	private SortedMap<UserGroup, Double> getParametersPerUserGroup(Map<Id, Double> inputMap){
+	private SortedMap<UserGroup, Double> getParametersPerUserGroup(Map<Id, Double> inputMap){ 
 		SortedMap<UserGroup, Double> outMap = new TreeMap<UserGroup, Double>();
-
 		for(UserGroup ug : UserGroup.values()){
 			outMap.put(ug, 0.0);
 		}
-		
+		double sum =0;
 		for(Id id:inputMap.keySet()){
 			UserGroup ug = getUserGroupFromPersonId(id);
 			double valueSoFar = outMap.get(ug);
-			double newValue = inputMap.get(id)+valueSoFar;
+			double value2add = inputMap.get(id) ;
+			double newValue = value2add+valueSoFar;
 			outMap.put(ug, newValue);
+			sum+=value2add;
 		}
+		System.out.println("required sum \t "+sum +"\t from persons "+ inputMap.size());
 		return outMap;
 	}
-
+	
+	private double totalUserWelfare_money ;
 	private void getAllUserBenefits(ScenarioImpl scenarioImpl){
 		this.logger.info("User welfare will be calculated using welfare measure as "+wm.toString());
 		UserBenefitsAnalyzerAA userBenefitsAnalyzer = new UserBenefitsAnalyzerAA();
-		userBenefitsAnalyzer.init(scenarioImpl, this.wm);
+		userBenefitsAnalyzer.init(scenarioImpl, this.wm,false);
 		userBenefitsAnalyzer.preProcessData();
 		userBenefitsAnalyzer.postProcessData();
 		userBenefitsAnalyzer.writeResults(this.outputDir+"/analysis/");
 		this.personId2UserWelfare_utils = userBenefitsAnalyzer.getPersonId2UserWelfare_utils();
 		this.personId2MonetarizedUserWelfare = userBenefitsAnalyzer.getPersonId2MonetarizedUserWelfare();
+		this.totalUserWelfare_money = userBenefitsAnalyzer.getTotalUserWelfare_money();
 	}
 
 	private void getMonetaryPayment(ScenarioImpl scenarioImpl){
@@ -151,7 +162,7 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 	private UserGroup getUserGroupFromPersonId(Id personId){
 		UserGroup usrgrp = null;
 		for(UserGroup ug:this.userGrpToPopulation.keySet()){
-			if(this.userGrpToPopulation.get(ug).getPersons().get(personId)!=null) {
+			if(this.userGrpToPopulation.get(ug).getPersons().containsKey(personId)) {
 				usrgrp = ug;
 				break;
 			}
