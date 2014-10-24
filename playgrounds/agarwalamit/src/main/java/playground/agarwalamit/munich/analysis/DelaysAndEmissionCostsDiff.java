@@ -103,7 +103,7 @@ public class DelaysAndEmissionCostsDiff {
 		String plansFileBAU = outputDir+BAU+"/output_plans.xml.gz";
 		String networkFileBAU = outputDir+BAU+"/output_network.xml.gz";
 
-		Scenario scBAU = LoadMyScenarios.loadScenarioFromNetworkPlansAndConfig(plansFileBAU, networkFileBAU, configFileBAU);
+		Scenario scBAU = LoadMyScenarios.loadScenarioFromPlansNetworkAndConfig(plansFileBAU, networkFileBAU, configFileBAU);
 		Map<Id<Person>, Double> delaysCostsBAU = getDelaysPerPerson(configFileBAU, eventsFileBAU, scBAU);
 		Map<String, Map<Id<Person>, Double>> runCase2PersonId2DelaysCostDiff = new HashMap<String, Map<Id<Person>,Double>>();
 
@@ -112,7 +112,7 @@ public class DelaysAndEmissionCostsDiff {
 			String eventsFile = outputDir+run+"/ITERS/it.1500/1500.events.xml.gz";
 			String plansFile = outputDir+run+"/output_plans.xml.gz";
 			String networkFile = outputDir+run+"/output_network.xml.gz";
-			Scenario sc = LoadMyScenarios.loadScenarioFromNetworkPlansAndConfig(plansFile,networkFile,configFile);
+			Scenario sc = LoadMyScenarios.loadScenarioFromPlansNetworkAndConfig(plansFile,networkFile,configFile);
 
 			Map<Id<Person>, Double> delaysCostsRun = getDelaysPerPerson(configFile, eventsFile, sc); 
 
@@ -127,7 +127,7 @@ public class DelaysAndEmissionCostsDiff {
 		String plansFileBAU = outputDir+BAU+"/output_plans.xml.gz";
 		String networkFileBAU = outputDir+BAU+"/output_network.xml.gz";
 
-		Scenario scBAU = LoadMyScenarios.loadScenarioFromNetworkPlansAndConfig(plansFileBAU, networkFileBAU, configFileBAU);
+		Scenario scBAU = LoadMyScenarios.loadScenarioFromPlansNetworkAndConfig(plansFileBAU, networkFileBAU, configFileBAU);
 		Map<Id<Person>, Double> emissionsCostsBAU = getEmissionsPerPerson(emissionEventsFileBAU, scBAU);
 		Map<String, Map<Id<Person>, Double>> runCase2PersonId2EmissionsCostDiff = new HashMap<String, Map<Id<Person>,Double>>();
 
@@ -136,7 +136,7 @@ public class DelaysAndEmissionCostsDiff {
 			String emissionEventsFile = outputDir+run+"/ITERS/it.1500/1500.emission.events.xml.gz";
 			String plansFile = outputDir+run+"/output_plans.xml.gz";
 			String networkFile = outputDir+run+"/output_network.xml.gz";
-			Scenario sc = LoadMyScenarios.loadScenarioFromNetworkPlansAndConfig(plansFile,networkFile,configFile);
+			Scenario sc = LoadMyScenarios.loadScenarioFromPlansNetworkAndConfig(plansFile,networkFile,configFile);
 
 			Map<Id<Person>, Double> emissionsCostsRun = getEmissionsPerPerson(emissionEventsFile, sc);
 

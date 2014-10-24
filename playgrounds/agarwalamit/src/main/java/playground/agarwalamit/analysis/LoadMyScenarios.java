@@ -34,7 +34,7 @@ public class LoadMyScenarios {
 	/**
 	 * Returns scenario by reading input config file and inserting location of plans and network file.
 	 */
-	public static Scenario loadScenarioFromNetworkPlansAndConfig(String populationFile, String networkFile, String configFile) {
+	public static Scenario loadScenarioFromPlansNetworkAndConfig(String populationFile, String networkFile, String configFile) {
 		Config config = new Config();
 		config.addCoreModules();
 		MatsimConfigReader configReader = new MatsimConfigReader(config);

@@ -47,7 +47,7 @@ public class RouteDistancePerUserGroup {
 
 	public RouteDistancePerUserGroup() {
 		super();
-		this.sc = LoadMyScenarios.loadScenarioFromNetworkPlansAndConfig(plansFile, networkFile, configFile);
+		this.sc = LoadMyScenarios.loadScenarioFromPlansNetworkAndConfig(plansFile, networkFile, configFile);
 		this.usrGrpExtended = new UserGroupUtilsExtended();
 		userGrpToBoxPlotData = new TreeMap<UserGroup, List<Double>>();
 	}

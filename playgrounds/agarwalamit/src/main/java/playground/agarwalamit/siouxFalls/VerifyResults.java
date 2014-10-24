@@ -42,16 +42,16 @@ import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
 public class VerifyResults {
 	private static final Logger log = Logger.getLogger(VerifyResults.class);
 
-	private static final double marginal_Utl_money=/*0.0789942;//*/0.062; //(for SiouxFalls =0.062 and for Munich =0.0789942);
+	private static final double marginal_Utl_money=0.0789942;//*/0.062; //(for SiouxFalls =0.062 and for Munich =0.0789942);
 	private static final double marginal_Utl_performing_sec=0.96/3600;
 	private static final double marginal_Utl_traveling_car_sec=-0.0/3600;
 	private static final double marginalUtlOfTravelTime = marginal_Utl_traveling_car_sec+marginal_Utl_performing_sec;
 	private static final double vtts_car = marginalUtlOfTravelTime/marginal_Utl_money;
 
-	private final  static String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/outputMCOff/";
-	private  final static String [] runNr = /*{"baseCaseCtd","ei","ci","eci"};//*/{"run205"};
+	private final  static String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct_rSeed/";
+	private  final static String [] runNr = {"baseCaseCtd","ei","ci","eci"};//*/{"run205"};
 
-	private  static Scenario scenario ;
+	private  static Scenario scenario;
 
 	private static final boolean considerCO2Costs=true;
 	private static final double emissionCostFacotr=1.0;
@@ -62,16 +62,16 @@ public class VerifyResults {
 			String inputConfigFile = runDir+runNr[i]+"/output_config.xml";
 			String networkFile = runDir+runNr[i]+"/output_network.xml.gz";
 			
-			int lastItenation = 400;//LoadMyScenarios.getLastIteration(inputConfigFile);
+			int lastItenation = LoadMyScenarios.getLastIteration(inputConfigFile);
 			String emissionsEventsFile = runDir+runNr[i]+"/ITERS/it."+lastItenation+"/"+lastItenation+".emission.events.xml.gz";
 			String plansFile = runDir+runNr[i]+"/ITERS/it."+lastItenation+"/"+lastItenation+".plans.xml.gz";
 			scenario = LoadMyScenarios.loadScenarioFromPlansAndNetwork(plansFile, networkFile);
 			//			scenario = ScenarioUtils.loadScenario(config);
 			String eventsFile=runDir+runNr[i]+"/ITERS/it."+lastItenation+"/"+lastItenation+".events.xml.gz";
 
-//			calculateEmissionCosts(emissionsEventsFile, scenario,runNr[i]);
+			calculateEmissionCosts(emissionsEventsFile, scenario,runNr[i]);
 			calculateDelaysCosts(eventsFile,scenario,runNr[i]);
-//			calculateUserBenefits(scenario, runNr[i]);
+			calculateUserBenefits(scenario, runNr[i]);
 		}
 		Logger.getLogger(VerifyResults.class).info("Writing files is finsished.");
 	}
@@ -110,7 +110,7 @@ public class VerifyResults {
 		MatsimEventsReader eventsReader = new MatsimEventsReader(em);
 		em.addHandler(congestionHandler);
 		eventsReader.readFile(eventsFile);
-		BufferedWriter writer = IOUtils.getBufferedWriter(runDir+runNr+"/analysis/400.verifyTotalDelayCost.txt");
+		BufferedWriter writer = IOUtils.getBufferedWriter(runDir+runNr+"/analysis/verifyTotalDelayCost.txt");
 		try{
 			writer.write("Total delays in sec are \t"+congestionHandler.getTotalDelay()+"\t"+"and total payment due to delays is \t"+vtts_car*congestionHandler.getTotalDelay());
 			writer.close();

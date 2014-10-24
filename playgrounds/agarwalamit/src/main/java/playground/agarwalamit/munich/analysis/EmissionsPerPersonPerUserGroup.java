@@ -50,7 +50,7 @@ public class EmissionsPerPersonPerUserGroup {
 	private final Logger logger = Logger.getLogger(EmissionsPerPersonPerUserGroup.class);
 
 	public EmissionsPerPersonPerUserGroup() {
-		this.scenario = LoadMyScenarios.loadScenarioFromNetworkPlansAndConfig(this.networkFile, this.populationFile, this.configFile);
+		this.scenario = LoadMyScenarios.loadScenarioFromPlansNetworkAndConfig(this.populationFile, this.networkFile, this.configFile);
 
 		for(UserGroup ug:UserGroup.values()){
 			SortedMap<String, Double> pollutantToValue = new TreeMap<String, Double>();
@@ -63,7 +63,7 @@ public class EmissionsPerPersonPerUserGroup {
 	}
 
 	private  int lastIteration;
-	private  String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/ci/";/*"./output/run2/";*/
+	private  String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct_rSeed/eci/";/*"./output/run2/";*/
 	private  String populationFile =outputDir+ "/output_plans.xml.gz";//"/network.xml";
 	private  String networkFile =outputDir+ "/output_network.xml.gz";//"/network.xml";
 	private  String configFile = outputDir+"/output_config.xml";

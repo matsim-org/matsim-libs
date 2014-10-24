@@ -55,14 +55,14 @@ public class DelaysUserGroup {
 		for (UserGroup ug:UserGroup.values()) {
 			this.userGroupToDelays.put(ug, 0.0);
 		}
-		this.scenario = LoadMyScenarios.loadScenarioFromNetworkPlansAndConfig(this.populationFile, this.networkFile, this.configFile);
+		this.scenario = LoadMyScenarios.loadScenarioFromPlansNetworkAndConfig(this.populationFile, this.networkFile, this.configFile);
 		this.userGrpToPopulation = new TreeMap<UserGroup, Population>();
 		this.lastIteration = scenario.getConfig().controler().getLastIteration();
 	}
 
 	private int lastIteration;
 	private Logger logger = Logger.getLogger(DelaysUserGroup.class);
-	private String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/ei/";/*"./output/run2/";*/
+	private String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct_rSeed/eci/";/*"./output/run2/";*/
 	private String populationFile =outputDir+ "/output_plans.xml.gz";//"/network.xml";
 	private String networkFile =outputDir+ "/output_network.xml.gz";//"/network.xml";
 	private String configFile = outputDir+"/output_config.xml";//"/config.xml";//

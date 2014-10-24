@@ -29,7 +29,6 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
@@ -52,7 +51,7 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 
 	private final Logger logger = Logger.getLogger(UserBenefitsAndTotalWelfarePerUserGroup.class);
 	private int lastIteration;
-	private  String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/ci/";/*"./output/run2/";*/
+	private  String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct_rSeed/eci/";/*"./output/run2/";*/
 	private  String populationFile =outputDir+ "/output_plans.xml.gz";//"/network.xml";
 	private  String networkFile =outputDir+ "/output_network.xml.gz";//"/network.xml";
 	private  String configFile = outputDir+"/output_config.xml";//"/config.xml";//
@@ -71,7 +70,7 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 	}
 
 	private void run(){
-		this.scenario = LoadMyScenarios.loadScenarioFromNetworkPlansAndConfig(this.populationFile, this.networkFile,this.configFile);
+		this.scenario = LoadMyScenarios.loadScenarioFromPlansNetworkAndConfig(this.populationFile, this.networkFile,this.configFile);
 		this.lastIteration = LoadMyScenarios.getLastIteration(this.configFile);
 		getPopulationPerUserGroup();
 		getAllUserBenefits((ScenarioImpl)this.scenario);

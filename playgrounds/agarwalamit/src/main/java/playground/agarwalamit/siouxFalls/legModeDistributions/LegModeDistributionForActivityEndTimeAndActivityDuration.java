@@ -72,8 +72,8 @@ public class LegModeDistributionForActivityEndTimeAndActivityDuration extends Ab
 	}
 
 	public static void main(String[] args) {
-		String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/output/mcd/";
-		String [] runs = {"baseCaseCtd",  "ci",  "eci",  "ei"};
+		String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/siouxFalls/output//";
+		String [] runs = {"run22"};
 
 		for(String run:runs){
 			String configFile = runDir+run+"/output_config.xml.gz";
@@ -120,7 +120,7 @@ public class LegModeDistributionForActivityEndTimeAndActivityDuration extends Ab
 			for(Integer i:this.timeStepClasses){
 				timeClasses2LegCount.put(i, 0);
 			}
-			mode2ActEndTime2LegCount.put(mode, timeClasses2LegCount);
+			mode2ActEndTime2LegCount.put(mode, timeClasses2LegCount); 
 
 			for(Id<Person> personId:mode2PersonId2ActEndTimes2.get(mode).keySet()){
 				List<Double> actTimes = mode2PersonId2ActEndTimes2.get(mode).get(personId);
