@@ -26,6 +26,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.roadpricing.TravelDisutilityIncludingToll;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.agarwalamit.InternalizationEmissionAndCongestion.EmissionCongestionTravelDisutilityCalculatorFactory;
@@ -107,9 +108,23 @@ public class MunichControler {
 		if(internalizeEmission)
 		{
 			//===internalization of emissions
+			
+			// this is needed by *both* following modules:
 			EmissionCostModule emissionCostModule = new EmissionCostModule(Double.parseDouble(emissionCostFactor), Boolean.parseBoolean(considerCO2Costs));
+
+			// this affects the router by overwriting its generalized cost function (TravelDisutility):
 			EmissionTravelDisutilityCalculatorFactory emissionTducf = new EmissionTravelDisutilityCalculatorFactory(emissionModule, emissionCostModule);
 			controler.setTravelDisutilityFactory(emissionTducf);
+			
+			// this is essentially the syntax to use the randomizing router instead; needs "scheme" (which implements RoadPricingScheme); needs
+			// a way to insert a new scheme in every iteration (because emissions costs change by iteration).
+//			TravelDisutilityIncludingToll.Builder travelDisutilityFactory = new TravelDisutilityIncludingToll.Builder(
+//					controler.getTravelDisutilityFactory(), scheme, controler.getConfig().planCalcScore().getMarginalUtilityOfMoney()
+//					) ;
+//			travelDisutilityFactory.setSigma( 3. );
+//			controler.setTravelDisutilityFactory(travelDisutilityFactory);
+
+			// this generates money events and thus affects the scoring:
 			controler.addControlerListener(new InternalizeEmissionsControlerListener(emissionModule, emissionCostModule));
 		}
 
