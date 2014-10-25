@@ -32,7 +32,7 @@ public class LoadMyScenarios {
 	private final static Logger logger = Logger.getLogger(LoadMyScenarios.class);
 	
 	/**
-	 * Returns scenario by reading input config file and inserting location of plans and network file.
+	 * Returns scenario specified plans, network and config file.
 	 */
 	public static Scenario loadScenarioFromPlansNetworkAndConfig(String populationFile, String networkFile, String configFile) {
 		Config config = new Config();
@@ -46,7 +46,7 @@ public class LoadMyScenarios {
 	}
 	
 	/**
-	 * Returns scenario by creating new config and inserting location of plans and network file.
+	 * Returns scenario from specified plans and network file.
 	 */
 	public static Scenario loadScenarioFromPlansAndNetwork(String populationFile, String networkFile) {
 		Config config = new Config();
@@ -58,7 +58,7 @@ public class LoadMyScenarios {
 	}
 	
 	/**
-	 * Returns scenario by reading input config file and network file.
+	 * Returns scenario from specified network and config file.
 	 */
 	public static Scenario loadScenarioFromNetworkAndConfig(String networkFile, String configFile) {
 		Config config = new Config();
@@ -73,7 +73,7 @@ public class LoadMyScenarios {
 	
 	
 	/**
-	 * Returns last iterations (int) by reading input config file only  and without loading scenario.
+	 * Returns last iterations (int) by reading input config file only and without loading scenario.
 	 */
 	public static int getLastIteration(String configFile) {
 		Config config = new Config();
@@ -106,7 +106,7 @@ public class LoadMyScenarios {
 	}
 	
 	/**
-	 * Returns scenario from config and contains only plans.
+	 * Returns scenario from plans and config.
 	 */
 	public static Scenario loadScenarioFromPlansAndConfig(String plansFile, String configFile) {
 		Config config = new Config();
