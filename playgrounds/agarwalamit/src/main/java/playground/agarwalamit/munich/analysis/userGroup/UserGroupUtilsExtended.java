@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.munich.analysis;
+package playground.agarwalamit.munich.analysis.userGroup;
 
 import java.util.ArrayList;
 import java.util.Collections;

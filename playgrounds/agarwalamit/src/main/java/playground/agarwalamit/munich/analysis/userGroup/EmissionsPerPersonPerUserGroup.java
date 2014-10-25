@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.munich.analysis;
+package playground.agarwalamit.munich.analysis.userGroup;
 
 import java.io.BufferedWriter;
 import java.util.HashMap;
