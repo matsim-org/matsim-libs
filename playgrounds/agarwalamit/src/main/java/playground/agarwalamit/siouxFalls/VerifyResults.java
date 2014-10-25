@@ -48,8 +48,8 @@ public class VerifyResults {
 	private static final double marginalUtlOfTravelTime = marginal_Utl_traveling_car_sec+marginal_Utl_performing_sec;
 	private static final double vtts_car = marginalUtlOfTravelTime/marginal_Utl_money;
 
-	private final  static String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct_rSeed/";
-	private  final static String [] runNr = {"baseCaseCtd","ei","ci","eci"};//*/{"run205"};
+	private final  static String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/";
+	private  final static String [] runNr = /*{"baseCaseCtd","ei","ci","eci"};//*/{"ci"};
 
 	private  static Scenario scenario;
 
@@ -64,13 +64,13 @@ public class VerifyResults {
 			
 			int lastItenation = LoadMyScenarios.getLastIteration(inputConfigFile);
 			String emissionsEventsFile = runDir+runNr[i]+"/ITERS/it."+lastItenation+"/"+lastItenation+".emission.events.xml.gz";
-			String plansFile = runDir+runNr[i]+"/ITERS/it."+lastItenation+"/"+lastItenation+".plans.xml.gz";
+			String plansFile = runDir+runNr[i]+"/output_plans.xml.gz";
 			scenario = LoadMyScenarios.loadScenarioFromPlansAndNetwork(plansFile, networkFile);
 			//			scenario = ScenarioUtils.loadScenario(config);
 			String eventsFile=runDir+runNr[i]+"/ITERS/it."+lastItenation+"/"+lastItenation+".events.xml.gz";
 
-			calculateEmissionCosts(emissionsEventsFile, scenario,runNr[i]);
-			calculateDelaysCosts(eventsFile,scenario,runNr[i]);
+//			calculateEmissionCosts(emissionsEventsFile, scenario,runNr[i]);
+//			calculateDelaysCosts(eventsFile,scenario,runNr[i]);
 			calculateUserBenefits(scenario, runNr[i]);
 		}
 		Logger.getLogger(VerifyResults.class).info("Writing files is finsished.");
