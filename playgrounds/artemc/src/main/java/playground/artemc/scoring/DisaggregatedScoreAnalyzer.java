@@ -91,8 +91,10 @@ public class DisaggregatedScoreAnalyzer implements IterationEndsListener{
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 			String header = "Iteration;Activity utility;Leg Utility";
+			ArrayList<String> modeList = new ArrayList<String>();
 			for(String mode:scenario.getConfig().planCalcScore().getModes().keySet()){
 				header = header + ";"+mode+" utility";
+				modeList.add(mode);
 			};	
 			header = header + ";Transit walk;Money utility;Stuck Utility;Total utility";
 			bw.write(header);
@@ -100,7 +102,7 @@ public class DisaggregatedScoreAnalyzer implements IterationEndsListener{
 
 			for (Integer it : this.activityUtility2it.keySet()){
 				String legsScores = "";
-				for(String mode:legUtility2it.keySet()){
+				for(String mode:modeList){
 					legsScores = legsScores + (double)legUtility2it.get(mode).get(it)/persons+";";
 				};	
 				bw.write(it + ";" + (double)this.activityUtility2it.get(it)/persons + ";" + (double)this.legUtilityTotal2it.get(it)/persons + ";" + legsScores 

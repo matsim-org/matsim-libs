@@ -91,7 +91,7 @@ public class DisaggIncomeScoreAnalyzer implements IterationEndsListener{
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 			String header = "Iteration;Activity utility;Leg Utility";
-			for(String mode:scenario.getConfig().planCalcScore().getModes().keySet()){
+			for(String mode:legUtility2it.keySet()){
 				header = header + ";"+mode+" utility";
 			};	
 			header = header + ";Transit walk;Money utility;Stuck Utility;Total utility";
