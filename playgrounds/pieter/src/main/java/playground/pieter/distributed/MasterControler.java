@@ -341,8 +341,10 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, I
 
     @Override
     public void notifyIterationStarts(IterationStartsEvent event) {
-        if(initialRouing)
-            notifyAfterMobsim(new AfterMobsimEvent(matsimControler,0));
+        if(initialRouing) {
+            notifyAfterMobsim(new AfterMobsimEvent(matsimControler, 0));
+            initialRouing = false;
+        }
     }
 
     private class Slave implements Runnable {
