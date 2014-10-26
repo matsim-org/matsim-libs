@@ -29,7 +29,7 @@ import playground.agarwalamit.analysis.congestion.CongestionLinkAnalyzer;
 
 /**
  * Simplified class to get the absolute delays for all the specified run cases
- *  and write them to file.
+ * and write them to file.
  * @author amit
  */
 public class AbsoluteDelays  {

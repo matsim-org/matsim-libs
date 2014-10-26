@@ -44,23 +44,26 @@ import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
 public class UserBenefitsAndTotalWelfare {
 
 	public static final Logger logger = Logger.getLogger(UserBenefitsAndTotalWelfare.class);
-
-	private String clusterPathDesktop = "/Users/aagarwal/Desktop/ils4/agarwal/munich/";
-	private final String outputFolder = "/output/1pct_rSeed/";
-
-	private String [] runCases = new String [] {"baseCaseCtd", "ei", "ci", "eci"};
+	private String outputDir;
 	private final WelfareMeasure welfareMeasure = WelfareMeasure.SELECTED;
 	private ScenarioImpl sc;
-	double monetaryPayments[] = new double [runCases.length];
-	double userBenefits_money [] = new double [runCases.length];
-	double excludedToll[] = new double [runCases.length];
-
-	public static void main(String[] args) {
-		new UserBenefitsAndTotalWelfare().run();
+	
+	public UserBenefitsAndTotalWelfare(String outputDir) {
+		this.outputDir = outputDir;
 	}
 
-	private void run(){
+	public static void main(String[] args) {
+		 String clusterPathDesktop = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct_msa_rSeed/";
+		 String [] runCases = new String [] {"baseCaseCtd", "ei", "ci", "eci"};
+		new UserBenefitsAndTotalWelfare(clusterPathDesktop).runAndWrite(runCases);
+	}
 
+	private void runAndWrite(String [] runCases){
+
+		double [] userBenefits_money = new double [runCases.length];
+		double [] monetaryPayments = new double [runCases.length];
+		double [] excludedToll = new double [runCases.length];
+		
 		for(int i=0; i< runCases.length;i++){
 			loadScenario(runCases[i]);
 			userBenefits_money[i] = getAllUserBenefits(runCases[i], welfareMeasure);
@@ -68,11 +71,8 @@ public class UserBenefitsAndTotalWelfare {
 			monetaryPayments[i] = tollInfo[0];
 			excludedToll[i] = tollInfo[1];
 		}
-		writeUserWelfareAndTollData();
-	}
-
-	private void writeUserWelfareAndTollData(){
-		String fileName = clusterPathDesktop+outputFolder+"/analysis/r/rAbsoluteUserBenefits"+welfareMeasure+".txt";
+		
+		String fileName = outputDir+"/analysis/absoluteUserBenefits"+welfareMeasure+".txt";
 		BufferedWriter writer = IOUtils.getBufferedWriter(fileName);
 		try {
 			writer.write("runCase \t userBenefits_money \t tollPayments \t excludedTollIfAny \n");
@@ -86,10 +86,10 @@ public class UserBenefitsAndTotalWelfare {
 		logger.info("Data is written to "+fileName);
 	}
 
-	private void loadScenario(String runNumber) {
-		String runPath = clusterPathDesktop + outputFolder + runNumber;
+	private void loadScenario(String runCase) {
+		String runPath = outputDir + runCase;
 		String configFile = runPath+"/output_config.xml";
-		String plansFile = clusterPathDesktop+outputFolder+runNumber+"/output_plans.xml.gz";
+		String plansFile = outputDir+runCase+"/output_plans.xml.gz";
 		Scenario scenario = LoadMyScenarios.loadScenarioFromPlansAndConfig(plansFile, configFile);
 		sc = (ScenarioImpl) scenario;
 	}
@@ -99,7 +99,7 @@ public class UserBenefitsAndTotalWelfare {
 		userBenefitsAnalyzer.init(sc, welfareMeasure, false);
 		userBenefitsAnalyzer.preProcessData();
 		userBenefitsAnalyzer.postProcessData();
-		userBenefitsAnalyzer.writeResults(clusterPathDesktop+outputFolder+runCase+"/analysis/");
+		userBenefitsAnalyzer.writeResults(outputDir+runCase+"/analysis/");
 		return userBenefitsAnalyzer.getTotalUserWelfare_money();
 	}
 
@@ -125,10 +125,10 @@ public class UserBenefitsAndTotalWelfare {
 
 		int lastIteration = sc.getConfig().controler().getLastIteration();
 		MatsimEventsReader reader = new MatsimEventsReader(events);
-		reader.readFile(clusterPathDesktop+outputFolder+runCase+"/ITERS/it."+lastIteration+"/"+lastIteration+".events.xml.gz");
+		reader.readFile(outputDir+runCase+"/ITERS/it."+lastIteration+"/"+lastIteration+".events.xml.gz");
 
 		paymentsAnalyzer.postProcessData();
-		paymentsAnalyzer.writeResults(clusterPathDesktop+outputFolder+runCase+"/analysis/");
+		paymentsAnalyzer.writeResults(outputDir+runCase+"/analysis/");
 
 		Map<Id, Double> personId2amount = paymentsAnalyzer.getPersonId2amount();
 
@@ -142,7 +142,7 @@ public class UserBenefitsAndTotalWelfare {
 		} else totalToll = paymentsAnalyzer.getAllUsersAmount();
 
 		if(!considerAllPersonsInSumOfTolls) logger.warn("Person having negative score in their executed plans are excluded in the calculation."
-				+ " and thus toll payments which is excluded is " +excludedToll);
+				+ " \n and thus toll payments which is excluded is " +excludedToll);
 		double [] tollInfo = new double [] {totalToll, excludedToll};
 		return tollInfo;
 	}
