@@ -45,25 +45,19 @@ import playground.vsp.analysis.modules.monetaryTransferPayments.MonetaryPayments
 import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
 
 /**
+ * A class to get user benefits and user welfare_money for each user group.
  * @author amit
  */
 public class UserBenefitsAndTotalWelfarePerUserGroup {
 
 	public static final Logger logger = Logger.getLogger(UserBenefitsAndTotalWelfarePerUserGroup.class);
 
+	/**
+	 * @param outputDir
+	 * @param considerAllPersonsInSumOfTolls if set to false, tolls for person having negative score will be reported separately.
+	 */
 	public UserBenefitsAndTotalWelfarePerUserGroup(String outputDir, boolean considerAllPersonsInSumOfTolls) {
-		personId2UserWelfare_utils = new HashMap<>();
-		personId2MonetarizedUserWelfare= new HashMap<>();
-		personId2MonetaryPayments = new HashMap<>();
-		userGrp2ExcludedToll = new TreeMap<>();
 		this.outputDir = outputDir;
-
-		String populationFile = this.outputDir  + "/output_plans.xml.gz";
-		String networkFile = this.outputDir  +  "/output_network.xml.gz";
-		String configFile =  this.outputDir  + "/output_config.xml";
-
-		this.scenario = LoadMyScenarios.loadScenarioFromPlansNetworkAndConfig(populationFile, networkFile,configFile);
-		this.lastIteration = LoadMyScenarios.getLastIteration(configFile);
 		this.considerAllPersonsInSumOfTolls = considerAllPersonsInSumOfTolls;
 	}
 
@@ -79,50 +73,63 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 	private final WelfareMeasure wm = WelfareMeasure.SELECTED;
 
 	public static void main(String[] args) {
-		String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/";
+		String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct_msa_rSeed/";
 		String [] runCases = { "baseCaseCtd","ei","ci","eci"};
-
-		for(String runCase : runCases){
-			UserBenefitsAndTotalWelfarePerUserGroup ubtwug = new  UserBenefitsAndTotalWelfarePerUserGroup(outputDir+runCase+"/",false);
-			ubtwug.run();
-		}
+		new UserBenefitsAndTotalWelfarePerUserGroup(outputDir, false).runAndWrite(runCases);
 	}
 
-	private void run(){
+	private void init(String runCase){
+		personId2UserWelfare_utils = new HashMap<>();
+		personId2MonetarizedUserWelfare= new HashMap<>();
+		personId2MonetaryPayments = new HashMap<>();
+		userGrp2ExcludedToll = new TreeMap<>();
 
-		storeUserBenefitsMaps();
-		getPersonId2MonetaryPayment();
+		String populationFile = this.outputDir+runCase + "/output_plans.xml.gz";
+		String networkFile = this.outputDir  +  runCase+"/output_network.xml.gz";
+		String configFile =  this.outputDir  + runCase+"/output_config.xml";
 
-		SortedMap<UserGroup, Double> userGroupToUserWelfare_utils = getParametersPerUserGroup(this.personId2UserWelfare_utils);
-		SortedMap<UserGroup, Double> userGroupToUserWelfare_money = getParametersPerUserGroup(this.personId2MonetarizedUserWelfare);
-		SortedMap<UserGroup, Double> userGroupToTotalPayment = getTollsPerUserGroup(this.personId2MonetaryPayments);
+		this.scenario = LoadMyScenarios.loadScenarioFromPlansNetworkAndConfig(populationFile, networkFile,configFile);
+		this.lastIteration = LoadMyScenarios.getLastIteration(configFile);
+	}
 
-		String outputFile = this.outputDir+"/analysis/userGrpWelfareAndTollPayments.txt";
-		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
-		
-		double sumUtils =0;
-		double sumUtils_money =0;
-		double sumToll =0;
-		double excludeTollSum =0;
-		
-		try {
-			writer.write("UserGroup \t userWelfareUtils \t userWelfareMoney \t tollPayments \t excludedTollIfAny \n");
-			for(UserGroup ug : userGroupToTotalPayment.keySet()){
-				writer.write(ug+"\t"+userGroupToUserWelfare_utils.get(ug)+"\t"
-						+userGroupToUserWelfare_money.get(ug)+"\t"
-						+userGroupToTotalPayment.get(ug)+"\t"
-						+userGrp2ExcludedToll.get(ug)+"\n");
-				sumUtils += userGroupToUserWelfare_utils.get(ug);
-				sumUtils_money += userGroupToUserWelfare_money.get(ug);
-				sumToll += userGroupToTotalPayment.get(ug);
-				excludeTollSum += userGrp2ExcludedToll.get(ug);
+	public void runAndWrite(String [] runCases){
+
+		for(String runCase:runCases){
+			init(runCase);
+			storeUserBenefitsMaps(runCase);
+			getPersonId2MonetaryPayment(runCase);
+
+			SortedMap<UserGroup, Double> userGroupToUserWelfare_utils = getParametersPerUserGroup(this.personId2UserWelfare_utils);
+			SortedMap<UserGroup, Double> userGroupToUserWelfare_money = getParametersPerUserGroup(this.personId2MonetarizedUserWelfare);
+			SortedMap<UserGroup, Double> userGroupToTotalPayment = getTollsPerUserGroup(this.personId2MonetaryPayments);
+
+			String outputFile = this.outputDir+runCase+"/analysis/userGrpWelfareAndTollPayments.txt";
+			BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
+
+			double sumUtils =0;
+			double sumUtils_money =0;
+			double sumToll =0;
+			double excludeTollSum =0;
+
+			try {
+				writer.write("UserGroup \t userWelfareUtils \t userWelfareMoney \t tollPayments \t excludedTollIfAny \n");
+				for(UserGroup ug : userGroupToTotalPayment.keySet()){
+					writer.write(ug+"\t"+userGroupToUserWelfare_utils.get(ug)+"\t"
+							+userGroupToUserWelfare_money.get(ug)+"\t"
+							+userGroupToTotalPayment.get(ug)+"\t"
+							+userGrp2ExcludedToll.get(ug)+"\n");
+					sumUtils += userGroupToUserWelfare_utils.get(ug);
+					sumUtils_money += userGroupToUserWelfare_money.get(ug);
+					sumToll += userGroupToTotalPayment.get(ug);
+					excludeTollSum += userGrp2ExcludedToll.get(ug);
+				}
+				writer.write("total \t"+sumUtils+"\t"+sumUtils_money+"\n"+sumToll+"\t"+excludeTollSum+"\n");
+				writer.close();
+			} catch (IOException e) {
+				throw new RuntimeException("Data is not written into a File. Reason : "+e);
 			}
-			writer.write("total \t"+sumUtils+"\t"+sumUtils_money+"\n"+sumToll+"\t"+excludeTollSum+"\n");
-			writer.close();
-		} catch (IOException e) {
-			throw new RuntimeException("Data is not written into a File. Reason : "+e);
+			logger.info("Finished Writing data to file "+outputFile);	
 		}
-		logger.info("Finished Writing data to file "+outputFile);		
 	}
 
 	private SortedMap<UserGroup, Double> getParametersPerUserGroup(Map<Id, Double> inputMap) { 
@@ -165,7 +172,7 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 		return outMap;
 	}
 
-	private void storeUserBenefitsMaps(){
+	private void storeUserBenefitsMaps(String runCase){
 		logger.info("User welfare will be calculated using welfare measure as "+ wm.toString());
 
 		MyUserBenefitsAnalyzer userBenefitsAnalyzer = new MyUserBenefitsAnalyzer();
@@ -173,13 +180,13 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 		userBenefitsAnalyzer.preProcessData();
 		userBenefitsAnalyzer.postProcessData();
 
-		userBenefitsAnalyzer.writeResults(this.outputDir+"/analysis/");
+		userBenefitsAnalyzer.writeResults(this.outputDir+runCase+"/analysis/");
 
 		this.personId2UserWelfare_utils = userBenefitsAnalyzer.getPersonId2UserWelfare_utils();
 		this.personId2MonetarizedUserWelfare = userBenefitsAnalyzer.getPersonId2MonetarizedUserWelfare();
 	}
 
-	private void getPersonId2MonetaryPayment(){
+	private void getPersonId2MonetaryPayment(String runCase){
 		MonetaryPaymentsAnalyzer paymentsAnalyzer = new MonetaryPaymentsAnalyzer();
 		paymentsAnalyzer.init((ScenarioImpl)scenario);
 		paymentsAnalyzer.preProcessData();
@@ -192,10 +199,10 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 		}
 
 		MatsimEventsReader reader = new MatsimEventsReader(events);
-		reader.readFile(this.outputDir+"/ITERS/it."+this.lastIteration+"/"+this.lastIteration+".events.xml.gz");
+		reader.readFile(this.outputDir+runCase+"/ITERS/it."+this.lastIteration+"/"+this.lastIteration+".events.xml.gz");
 
 		paymentsAnalyzer.postProcessData();
-		paymentsAnalyzer.writeResults(this.outputDir+"/analysis/");
+		paymentsAnalyzer.writeResults(this.outputDir+runCase+"/analysis/");
 		this.personId2MonetaryPayments = paymentsAnalyzer.getPersonId2amount();
 	}
 
@@ -217,5 +224,5 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 		if (score < 0 ) return false;
 		else return true;
 	}
-	
+
 }

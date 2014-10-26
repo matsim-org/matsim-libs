@@ -53,7 +53,7 @@ public class UserBenefitsAndTotalWelfare {
 	}
 
 	public static void main(String[] args) {
-		 String clusterPathDesktop = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct_msa_rSeed/";
+		 String clusterPathDesktop = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct_msa/";
 		 String [] runCases = new String [] {"baseCaseCtd", "ei", "ci", "eci"};
 		new UserBenefitsAndTotalWelfare(clusterPathDesktop).runAndWrite(runCases);
 	}

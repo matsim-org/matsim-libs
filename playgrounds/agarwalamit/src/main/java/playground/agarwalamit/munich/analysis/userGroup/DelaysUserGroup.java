@@ -29,7 +29,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.LoadMyScenarios;
@@ -37,61 +36,74 @@ import playground.agarwalamit.analysis.congestion.CongestionPersonAnalyzer;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 
-
 /**
+ * A class to get absolute delays and delays costs per user group.
  * @author amit
  */
 public class DelaysUserGroup {
 
-	private final double marginal_Utl_money=0.0789942;//0.062 //(for SiouxFalls =0.062 and for Munich =0.0789942);
-	private final double marginal_Utl_performing_sec=0.96/3600;
-	private final double marginal_Utl_traveling_car_sec=-0.0/3600;
-	private final double marginalUtlOfTravelTime = marginal_Utl_traveling_car_sec+marginal_Utl_performing_sec;
-	private final double vtts_car = marginalUtlOfTravelTime/marginal_Utl_money;
-	
-	
-	public DelaysUserGroup() {
-		this.userGroupToDelays  = new TreeMap<UserGroup, Double>();
-		for (UserGroup ug:UserGroup.values()) {
-			this.userGroupToDelays.put(ug, 0.0);
-		}
-		this.scenario = LoadMyScenarios.loadScenarioFromPlansNetworkAndConfig(this.populationFile, this.networkFile, this.configFile);
-		this.userGrpToPopulation = new TreeMap<UserGroup, Population>();
-		this.lastIteration = scenario.getConfig().controler().getLastIteration();
+	private  double marginal_Utl_money;
+	private  double marginal_Utl_performing_sec;
+	private  double marginal_Utl_traveling_car_sec;
+	private  double marginalUtlOfTravelTime ;
+	private  double vtts_car ;
+
+	public DelaysUserGroup(String outputDir) {
+		this.outputDir = outputDir;
 	}
 
 	private int lastIteration;
-	private Logger logger = Logger.getLogger(DelaysUserGroup.class);
-	private String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct_rSeed/eci/";/*"./output/run2/";*/
-	private String populationFile =outputDir+ "/output_plans.xml.gz";//"/network.xml";
-	private String networkFile =outputDir+ "/output_network.xml.gz";//"/network.xml";
-	private String configFile = outputDir+"/output_config.xml";//"/config.xml";//
+	public static Logger logger = Logger.getLogger(DelaysUserGroup.class);
+	private String outputDir;
+
 	private SortedMap<UserGroup, Double> userGroupToDelays;
-	private SortedMap<UserGroup, Population> userGrpToPopulation;
-	private Map<Double, Map<Id<Person>, Double>> time2linkIdDelays = new HashMap<Double, Map<Id<Person>,Double>>();
+	private Map<Double, Map<Id<Person>, Double>> time2linkIdDelays;
 	private Scenario scenario;
+	private String configFile;
 
 	public static void main(String[] args) throws IOException {
-		DelaysUserGroup data = new DelaysUserGroup();
-		data.run();
+		String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct_msa_rSeed/eci/";/*"./output/run2/";*/
+		String [] runCases = { "baseCaseCtd","ei","ci","eci"};
+
+		new DelaysUserGroup(outputDir).run(runCases);
 	}
 
-	private void run(){
-		String eventFile = this.outputDir+"/ITERS/it."+this.lastIteration+"/"+this.lastIteration+".events.xml.gz";//"/events.xml";//
-		CongestionPersonAnalyzer personAnalyzer = new CongestionPersonAnalyzer(this.configFile, eventFile,1);
-		personAnalyzer.init(this.scenario);
-		personAnalyzer.preProcessData();
-		personAnalyzer.postProcessData();
-		personAnalyzer.checkTotalDelayUsingAlternativeMethod();
-		this.time2linkIdDelays = personAnalyzer.getCongestionPerPersonTimeInterval();
-		
-		getPopulationPerUserGroup();
-		getTotalDelayPerUserGroup(this.time2linkIdDelays);
-		writeTotalDelaysPerUserGroup(this.outputDir+"/analysis/userGrpDelays.txt");
+	private void init(String runCase){
+		String populationFile =outputDir+runCase+ "/output_plans.xml.gz";//"/network.xml";
+		String networkFile =outputDir+runCase +"/output_network.xml.gz";//"/network.xml";
+		this.configFile = outputDir+runCase+"/output_config.xml";//"/config.xml";//
+		this.userGroupToDelays  = new TreeMap<UserGroup, Double>();
+		this.time2linkIdDelays = new HashMap<Double, Map<Id<Person>,Double>>();
+		for (UserGroup ug:UserGroup.values()) {
+			this.userGroupToDelays.put(ug, 0.0);
+		}
+		this.scenario = LoadMyScenarios.loadScenarioFromPlansNetworkAndConfig(populationFile, networkFile, configFile);
+		this.lastIteration = scenario.getConfig().controler().getLastIteration();
+
+		this.marginal_Utl_money = scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney();
+		this.marginal_Utl_performing_sec = scenario.getConfig().planCalcScore().getPerforming_utils_hr()/3600;
+		this.marginal_Utl_traveling_car_sec = scenario.getConfig().planCalcScore().getTraveling_utils_hr()/3600;
+		this.marginalUtlOfTravelTime = this.marginal_Utl_traveling_car_sec + this.marginal_Utl_performing_sec;
+		this.vtts_car = this.marginalUtlOfTravelTime / this.marginal_Utl_money;
+	}
+
+	public void run(String [] runCases){
+		for(String runCase:runCases){
+			init(runCase);
+			String eventFile = this.outputDir+runCase+"/ITERS/it."+this.lastIteration+"/"+this.lastIteration+".events.xml.gz";//"/events.xml";//
+			CongestionPersonAnalyzer personAnalyzer = new CongestionPersonAnalyzer(configFile, eventFile,1);
+			personAnalyzer.init(this.scenario);
+			personAnalyzer.preProcessData();
+			personAnalyzer.postProcessData();
+			personAnalyzer.checkTotalDelayUsingAlternativeMethod();
+			this.time2linkIdDelays = personAnalyzer.getCongestionPerPersonTimeInterval();
+
+			getTotalDelayPerUserGroup(this.time2linkIdDelays);
+			writeTotalDelaysPerUserGroup(this.outputDir+runCase+"/analysis/userGrpDelays.txt");
+		}
 	}
 
 	private void writeTotalDelaysPerUserGroup(String outputFile){
-		
 		BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
 		try{
 			writer.write("userGroup \t delaySeconds \t delaysMoney \n");
@@ -102,32 +114,25 @@ public class DelaysUserGroup {
 		} catch (Exception e){
 			throw new RuntimeException("Data is not written in the file. Reason - "+e);
 		}
-		this.logger.info("Finished Writing data to file "+outputFile);
+		logger.info("Finished Writing data to file "+outputFile);
 	}
 
-	private SortedMap<UserGroup, Population> getPopulationPerUserGroup(){
+	private UserGroup getUserGrpFromPersonId(Id<Person> personId){
 		PersonFilter pf = new PersonFilter();
+		UserGroup outUG = UserGroup.URBAN;
 		for(UserGroup ug : UserGroup.values()){
-			this.userGrpToPopulation.put(ug, pf.getPopulation(this.scenario.getPopulation(), ug));
-		}
-		return this.userGrpToPopulation;
-	}
-
-	private UserGroup getUserGroupFromPersonId(Id<Person> personId){
-		UserGroup usrgrp = null;
-		for(UserGroup ug:this.userGrpToPopulation.keySet()){
-			if(this.userGrpToPopulation.get(ug).getPersons().get(personId)!=null) {
-				usrgrp = ug;
+			if(pf.isPersonIdFromUserGroup(personId, ug)) {
+				outUG =ug;
 				break;
 			}
 		}
-		return usrgrp;
+		return outUG;
 	}
 
 	private void getTotalDelayPerUserGroup(Map<Double, Map<Id<Person>, Double>> delaysPerPersonPerTimeBin){
 		for(double d:delaysPerPersonPerTimeBin.keySet()){
 			for(Id<Person> personId : delaysPerPersonPerTimeBin.get(d).keySet()){
-				UserGroup ug = getUserGroupFromPersonId(personId);
+				UserGroup ug = getUserGrpFromPersonId(personId);
 				double delaySoFar = this.userGroupToDelays.get(ug);
 				double newDelays = delaySoFar+delaysPerPersonPerTimeBin.get(d).get(personId);
 				this.userGroupToDelays.put(ug, newDelays);

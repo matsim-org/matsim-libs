@@ -29,7 +29,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.emissions.types.WarmPollutant;
 import org.matsim.contrib.emissions.utils.EmissionUtils;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -42,16 +41,40 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
 
 /**
+ * A class to get emissions and emissions cost for each user group.
  * @author amit
  *
  */
 public class EmissionsPerPersonPerUserGroup {
 
-	private final Logger logger = Logger.getLogger(EmissionsPerPersonPerUserGroup.class);
+	public static final Logger logger = Logger.getLogger(EmissionsPerPersonPerUserGroup.class);
+	private int lastIteration;
+	private String outputDir;
+	private SortedMap<UserGroup, SortedMap<String, Double>> userGroupToEmissions;
+	private Scenario scenario;
+	private Map<Id<Person>, SortedMap<String, Double>> emissionsPerPerson;
+	
+	public EmissionsPerPersonPerUserGroup(String outputDir) {
 
-	public EmissionsPerPersonPerUserGroup() {
-		this.scenario = LoadMyScenarios.loadScenarioFromPlansNetworkAndConfig(this.populationFile, this.networkFile, this.configFile);
+		this.outputDir = outputDir;
+	}
 
+	public static void main(String[] args) {
+		String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct_msa_rSeed/";/*"./output/run2/";*/
+		String [] runCases = {"baseCaseCtd","ei","ci","eci"};
+		EmissionsPerPersonPerUserGroup eppa = new EmissionsPerPersonPerUserGroup(outputDir);
+		eppa.run(runCases);
+	}
+	
+	private void init(String runCase){
+		String populationFile =outputDir+runCase+ "/output_plans.xml.gz";//"/network.xml";
+		String networkFile =outputDir+runCase+ "/output_network.xml.gz";//"/network.xml";
+		String configFile = outputDir+runCase+"/output_config.xml";
+		this.scenario = LoadMyScenarios.loadScenarioFromPlansNetworkAndConfig(populationFile, networkFile, configFile);
+		this.lastIteration = LoadMyScenarios.getLastIteration(configFile);
+		userGroupToEmissions = new TreeMap<UserGroup, SortedMap<String,Double>>();
+		emissionsPerPerson = new HashMap<>();
+		
 		for(UserGroup ug:UserGroup.values()){
 			SortedMap<String, Double> pollutantToValue = new TreeMap<String, Double>();
 			for(WarmPollutant wm:WarmPollutant.values()){ //because ('warmPollutants' U 'coldPollutants') = 'warmPollutants'
@@ -59,39 +82,26 @@ public class EmissionsPerPersonPerUserGroup {
 			}
 			this.userGroupToEmissions.put(ug, pollutantToValue);
 		}
-		this.lastIteration = LoadMyScenarios.getLastIteration(this.configFile);
 	}
 
-	private  int lastIteration;
-	private  String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct_rSeed/eci/";/*"./output/run2/";*/
-	private  String populationFile =outputDir+ "/output_plans.xml.gz";//"/network.xml";
-	private  String networkFile =outputDir+ "/output_network.xml.gz";//"/network.xml";
-	private  String configFile = outputDir+"/output_config.xml";
-	private SortedMap<UserGroup, SortedMap<String, Double>> userGroupToEmissions = new TreeMap<UserGroup, SortedMap<String,Double>>();
-	private SortedMap<UserGroup, Population> userGrpToPopulation = new TreeMap<UserGroup, Population>();
-	private Scenario scenario;
-	private Map<Id<Person>, SortedMap<String, Double>> emissionsPerPerson = new HashMap<>();
-	
-	public static void main(String[] args) {
-		EmissionsPerPersonPerUserGroup eppa = new EmissionsPerPersonPerUserGroup();
-		eppa.run();
-	}
+	public void run(String [] runCases) {
+		for(String runCase:runCases){
+			init(runCase);
+			
+			String emissionEventFile = this.outputDir+runCase+"/ITERS/it."+this.lastIteration+"/"+this.lastIteration+".emission.events.xml.gz";//"/events.xml";//
+			EmissionsAnalyzer ema = new EmissionsAnalyzer(emissionEventFile);
+			ema.init((ScenarioImpl) this.scenario);
+			ema.preProcessData();
+			ema.postProcessData();
 
-	private void run() {
-		String emissionEventFile = this.outputDir+"/ITERS/it."+this.lastIteration+"/"+this.lastIteration+".emission.events.xml.gz";//"/events.xml";//
-		EmissionsAnalyzer ema = new EmissionsAnalyzer(emissionEventFile);
-		ema.init((ScenarioImpl) this.scenario);
-		ema.preProcessData();
-		ema.postProcessData();
+			EmissionUtils emu = new EmissionUtils();
+			Map<Id<Person>, SortedMap<String, Double>> totalEmissions = ema.getPerson2totalEmissions();
+			emissionsPerPerson = emu.setNonCalculatedEmissionsForPopulation(scenario.getPopulation(), totalEmissions);
 
-		EmissionUtils emu = new EmissionUtils();
-		Map<Id<Person>, SortedMap<String, Double>> totalEmissions = ema.getPerson2totalEmissions();
-		emissionsPerPerson = emu.setNonCalculatedEmissionsForPopulation(scenario.getPopulation(), totalEmissions);
-
-		getPopulationPerUserGroup();
-		getTotalEmissionsPerUserGroup(this.emissionsPerPerson);
-		writeTotalEmissionsPerUserGroup(this.outputDir+"/analysis/userGrpEmissions.txt");
-		writeTotalEmissionsCostsPerUserGroup(this.outputDir+"/analysis/userGrpEmissionsCosts.txt");
+			getTotalEmissionsPerUserGroup(this.emissionsPerPerson);
+			writeTotalEmissionsPerUserGroup(this.outputDir+runCase+"/analysis/userGrpEmissions.txt");
+			writeTotalEmissionsCostsPerUserGroup(this.outputDir+runCase+"/analysis/userGrpEmissionsCosts.txt");
+		}
 	}
 
 	private void writeTotalEmissionsCostsPerUserGroup(String outputFile){
@@ -116,7 +126,7 @@ public class EmissionsPerPersonPerUserGroup {
 		} catch (Exception e){
 			throw new RuntimeException("Data is not written in the file. Reason - "+e);
 		}
-		this.logger.info("Finished Writing data to file "+outputFile);		
+		logger.info("Finished Writing data to file "+outputFile);		
 	}
 
 	private void writeTotalEmissionsPerUserGroup(String outputFile) {
@@ -139,13 +149,13 @@ public class EmissionsPerPersonPerUserGroup {
 		} catch (Exception e){
 			throw new RuntimeException("Data is not written in the file. Reason - "+e);
 		}
-		this.logger.info("Finished Writing files to file "+outputFile);		
+		logger.info("Finished Writing files to file "+outputFile);		
 	}
 
 	private void getTotalEmissionsPerUserGroup(
 			Map<Id<Person>, SortedMap<String, Double>> emissionsPerPerson) {
 		for(Id<Person> personId: scenario.getPopulation().getPersons().keySet()){
-			UserGroup ug = getUserGroupFromPersonId(personId);
+			UserGroup ug = getUserGrpFromPersonId(personId);
 			SortedMap<String, Double> emissionsNewValue = new TreeMap<String, Double>();
 			for(String str: emissionsPerPerson.get(personId).keySet()){
 				double emissionSoFar = this.userGroupToEmissions.get(ug).get(str);
@@ -156,22 +166,15 @@ public class EmissionsPerPersonPerUserGroup {
 		}
 	}
 
-	private SortedMap<UserGroup, Population> getPopulationPerUserGroup(){
+	private UserGroup getUserGrpFromPersonId(Id<Person> personId){
 		PersonFilter pf = new PersonFilter();
+		UserGroup outUG = UserGroup.URBAN;
 		for(UserGroup ug : UserGroup.values()){
-			this.userGrpToPopulation.put(ug, pf.getPopulation(this.scenario.getPopulation(), ug));
-		}
-		return this.userGrpToPopulation;
-	}
-
-	private UserGroup getUserGroupFromPersonId(Id<Person> personId){
-		UserGroup usrgrp = null;
-		for(UserGroup ug:this.userGrpToPopulation.keySet()){
-			if(this.userGrpToPopulation.get(ug).getPersons().get(personId)!=null) {
-				usrgrp = ug;
+			if(pf.isPersonIdFromUserGroup(personId, ug)) {
+				outUG =ug;
 				break;
 			}
 		}
-		return usrgrp;
+		return outUG;
 	}
 }
