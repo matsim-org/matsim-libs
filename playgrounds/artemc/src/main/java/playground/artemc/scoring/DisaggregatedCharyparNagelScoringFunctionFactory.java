@@ -108,7 +108,6 @@ public class DisaggregatedCharyparNagelScoringFunctionFactory implements Scoring
 			this.params = new PersonalScoringParameters(this.config);
 			
 			if(incomeFactors!=null){
-				this.params.marginalUtilityOfMoney = this.params.marginalUtilityOfMoney * incomeFactors.get(person.getId());
 				this.params.marginalUtilityOfPerforming_s = this.params.marginalUtilityOfPerforming_s * (1.0/incomeFactors.get(person.getId()));
 
 				for (Entry<String, Mode> mode : this.params.modeParams.entrySet()) {
