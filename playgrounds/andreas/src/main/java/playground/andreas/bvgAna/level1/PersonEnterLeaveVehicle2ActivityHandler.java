@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.pt.PtConstants;
 
 /**
@@ -50,14 +51,14 @@ public class PersonEnterLeaveVehicle2ActivityHandler implements PersonEntersVehi
 
 	private final Logger log = Logger.getLogger(PersonEnterLeaveVehicle2ActivityHandler.class);
 	private final Level logLevel = Level.DEBUG;
-	private Set<Id> agentIds;
+	private Set<Id<Person>> agentIds;
 	private TreeMap<Id, ActivityEndEvent> agentId2ActEndEvent = new TreeMap<Id, ActivityEndEvent>();
 	private TreeMap<Id, List<PersonLeavesVehicleEvent>> agentId2LeaveVehEvent = new TreeMap<Id, List<PersonLeavesVehicleEvent>>();
 
 	private HashMap<PersonEntersVehicleEvent, ActivityEndEvent> personsEntersVehicleEvent2ActivityEndEvent = new HashMap<PersonEntersVehicleEvent, ActivityEndEvent>();
 	private HashMap<PersonLeavesVehicleEvent, ActivityStartEvent> personLeavesVehicleEvent2ActivityStartEvent = new HashMap<PersonLeavesVehicleEvent, ActivityStartEvent>();
 
-	public PersonEnterLeaveVehicle2ActivityHandler(Set<Id> agentIds){
+	public PersonEnterLeaveVehicle2ActivityHandler(Set<Id<Person>> agentIds){
 		this.log.setLevel(this.logLevel);
 		this.agentIds = agentIds;
 	}
@@ -79,7 +80,7 @@ public class PersonEnterLeaveVehicle2ActivityHandler implements PersonEntersVehi
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		// pair the events
-		Id personId = event.getPersonId();
+		Id<Person> personId = event.getPersonId();
 		ActivityEndEvent endEvent = this.agentId2ActEndEvent.get(personId);
 		if (endEvent != null) {
 			this.personsEntersVehicleEvent2ActivityEndEvent.put(event, endEvent);
@@ -103,7 +104,7 @@ public class PersonEnterLeaveVehicle2ActivityHandler implements PersonEntersVehi
 	public void handleEvent(ActivityStartEvent event) {
 		if(!event.getActType().equalsIgnoreCase(PtConstants.TRANSIT_ACTIVITY_TYPE)){
 			// pair the events
-			Id personId = event.getPersonId();
+			Id<Person> personId = event.getPersonId();
 			if(this.agentIds.contains(personId)){
 				this.agentId2ActEndEvent.remove(personId); // should not be necessary if we trust the events
 				List<PersonLeavesVehicleEvent> events = this.agentId2LeaveVehEvent.remove(event.getPersonId());

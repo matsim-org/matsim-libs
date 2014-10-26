@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
@@ -63,7 +64,7 @@ public class AgentId2StopDifferenceMap implements TransitDriverStartsEventHandle
 	private final Level logLevel = Level.OFF;
 
 	private Population pop;
-	private Set<Id> agentIds;
+	private Set<Id<Person>> agentIds;
 	private Map<Id, List<Tuple<Id, AgentId2PlannedDepartureTimeMapData>>> plannedDepartureTimeMap;
 	private StopId2RouteId2DelayAtStopMap vehDelayHandler;
 	private VehiclePlannedRealizedMissedDepartures vehDelayAnalyzer;
@@ -71,7 +72,7 @@ public class AgentId2StopDifferenceMap implements TransitDriverStartsEventHandle
 	private Map<Id,List<Tuple<Id,Double>>> agentId2StopDifferenceMap = null;
 	private Map<Id,List<Tuple<Id,Integer>>> agentIds2MissedVehMap = null;
 
-	public AgentId2StopDifferenceMap(Population pop, Set<Id> agentIds){
+	public AgentId2StopDifferenceMap(Population pop, Set<Id<Person>> agentIds){
 		this.log.setLevel(this.logLevel);
 		this.pop = pop;
 		this.agentIds = agentIds;

@@ -13,7 +13,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -22,7 +22,6 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.misc.Time;
 
 
@@ -48,12 +47,12 @@ public class BlnPlansGenerator {
 		try {
 			BlnPlansGenerator myBlnPlanGenerator = new BlnPlansGenerator();
 
-			HashMap<Id, PersonImpl> personMap;
+			HashMap<Id<Person>, PersonImpl> personMap;
 			// Create a person for everyone in file and store them in a map
 			personMap = myBlnPlanGenerator.generatePersons("Z:/population/input/PERSONEN.csv");
 
 			// Same here, but trips
-			HashMap<Id, ArrayList<String[]>> tripMap = myBlnPlanGenerator.readTrips("Z:/population/input/WEGE.csv");
+			HashMap<Id<Person>, ArrayList<String[]>> tripMap = myBlnPlanGenerator.readTrips("Z:/population/input/WEGE.csv");
 
 			// Print statistics for raw data
 			myBlnPlanGenerator.countPersonsPlans(personMap, tripMap);
@@ -85,9 +84,9 @@ public class BlnPlansGenerator {
 		}
 	}
 
-	private HashMap<Id,PersonImpl> generatePersons(String personsFileName) throws IOException{
+	private HashMap<Id<Person>,PersonImpl> generatePersons(String personsFileName) throws IOException{
 
-		HashMap<Id, PersonImpl> personList = new HashMap<Id, PersonImpl>();
+		HashMap<Id<Person>, PersonImpl> personList = new HashMap<>();
 
 		log.info("setAllLegsToCar is set to " + setAllLegsToCar);
 
@@ -98,7 +97,7 @@ public class BlnPlansGenerator {
 //			log.info("Start generating persons...");
 		for (String[] data : personData) {
 
-			PersonImpl person = new PersonImpl(new IdImpl(data[0]));
+			PersonImpl person = new PersonImpl(Id.create(data[0], Person.class));
 			personList.put(person.getId(), person);
 
 			// approximation: yearOfSurvey - yearOfBirth
@@ -118,7 +117,7 @@ public class BlnPlansGenerator {
 				person.setEmployed(Boolean.TRUE);
 			}
 
-			// person.setHousehold(hh)(new IdImpl(data[1]));
+			// person.setHousehold(hh)(Id.create(data[1]));
 
 			if(Integer.parseInt(data[18]) == 2){
 				person.setLicence("yes");
@@ -140,16 +139,16 @@ public class BlnPlansGenerator {
 		return personList;
 	}
 
-	private HashMap<Id,ArrayList<String[]>> readTrips(String filename) throws IOException{
+	private HashMap<Id<Person>,ArrayList<String[]>> readTrips(String filename) throws IOException{
 
-		HashMap<Id, ArrayList<String[]>> tripData = new HashMap<Id, ArrayList<String[]>>();
+		HashMap<Id<Person>, ArrayList<String[]>> tripData = new HashMap<>();
 
 		log.info("Start reading file " + filename);
 		ArrayList<String[]> unsortedTripData = TabReader.readFile(filename);
 		log.info("...finished reading " + unsortedTripData.size() + " entries in trip file.");
 
 		for (String[] tripDataString : unsortedTripData) {
-			IdImpl personId = new IdImpl(tripDataString[1]);
+			Id<Person> personId = Id.create(tripDataString[1], Person.class);
 			if(tripData.get(personId) != null){
 				tripData.get(personId).add(tripDataString);
 			} else {
@@ -162,20 +161,20 @@ public class BlnPlansGenerator {
 		return tripData;
 	}
 
-	private void countPersonsPlans(HashMap<Id,PersonImpl> personList, HashMap<Id,ArrayList<String[]>> tripData){
+	private void countPersonsPlans(HashMap<Id<Person>,PersonImpl> personList, HashMap<Id<Person>,ArrayList<String[]>> tripData){
 
 		int numberOfPersonsWithoutTrip = 0;
 		int numberOfTripsWithoutPerson = 0;
 
 		// check if every person has at least one trip
-		for (Id personId : personList.keySet()) {
+		for (Id<Person> personId : personList.keySet()) {
 			if(tripData.get(personId) == null){
 				numberOfPersonsWithoutTrip++;
 			}
 		}
 
 		// check if every trip has a person
-		for (Id personId : tripData.keySet()){
+		for (Id<Person> personId : tripData.keySet()){
 			if(personList.get(personId) == null){
 				numberOfTripsWithoutPerson++;
 			}
@@ -185,11 +184,11 @@ public class BlnPlansGenerator {
 		log.info(numberOfTripsWithoutPerson + " trips have no correspnding person in raw data.");
 	}
 
-	private HashMap<Id,ArrayList<String[]>> filterPersonsWithOneTrip(HashMap<Id,ArrayList<String[]>> unfilteredTripData){
-		HashMap<Id,ArrayList<String[]>> filteredTripData = new HashMap<Id,ArrayList<String[]>>();
+	private HashMap<Id<Person>,ArrayList<String[]>> filterPersonsWithOneTrip(HashMap<Id<Person>,ArrayList<String[]>> unfilteredTripData){
+		HashMap<Id<Person>,ArrayList<String[]>> filteredTripData = new HashMap<>();
 		int numberOfPersonsWithOnlyOneTrip = 0;
 
-		for (Entry<Id, ArrayList<String[]>> entry : unfilteredTripData.entrySet()) {
+		for (Entry<Id<Person>, ArrayList<String[]>> entry : unfilteredTripData.entrySet()) {
 			if(entry.getValue().size() > 1){
 				filteredTripData.put(entry.getKey(), entry.getValue());
 			} else {
@@ -201,11 +200,11 @@ public class BlnPlansGenerator {
 		return filteredTripData;
 	}
 
-	private HashMap<Id, ArrayList<String[]>> filterTripsWithoutCoord(HashMap<Id, ArrayList<String[]>> unfilteredTripData) {
-		HashMap<Id, ArrayList<String[]>> filteredTripData = new HashMap<Id, ArrayList<String[]>>();
+	private HashMap<Id<Person>, ArrayList<String[]>> filterTripsWithoutCoord(HashMap<Id<Person>, ArrayList<String[]>> unfilteredTripData) {
+		HashMap<Id<Person>, ArrayList<String[]>> filteredTripData = new HashMap<>();
 		int numberOfTripsWithInvalidCoord = 0;
 
-		for (Entry<Id, ArrayList<String[]>> entry : unfilteredTripData.entrySet()) {
+		for (Entry<Id<Person>, ArrayList<String[]>> entry : unfilteredTripData.entrySet()) {
 			ArrayList<String[]> filteredArrayList = new ArrayList<String[]>();
 
 			for (String[] dataString : entry.getValue()) {
@@ -224,8 +223,8 @@ public class BlnPlansGenerator {
 		return filteredTripData;
 	}
 
-	private HashMap<Id, ArrayList<String[]>> filterTripsWithoutCoordButEntryInCoordMap(HashMap<Id, ArrayList<String[]>> unfilteredTripData, String filename) throws IOException {
-		HashMap<Id, ArrayList<String[]>> filteredTripData = new HashMap<Id, ArrayList<String[]>>();
+	private HashMap<Id<Person>, ArrayList<String[]>> filterTripsWithoutCoordButEntryInCoordMap(HashMap<Id<Person>, ArrayList<String[]>> unfilteredTripData, String filename) throws IOException {
+		HashMap<Id<Person>, ArrayList<String[]>> filteredTripData = new HashMap<>();
 		int numberOfTripsWithInvalidCoord = 0;
 		int numberOfReplacedCoords = 0;
 
@@ -233,9 +232,9 @@ public class BlnPlansGenerator {
 		ArrayList<String[]> unsortedCoordMapData = TabReader.readFile(filename);
 		log.info("...finished reading " + unsortedCoordMapData.size() + " entries in " + filename + " file.");
 
-		HashMap<Id, ArrayList<String[]>> sortedCoordMapData = new HashMap<Id, ArrayList<String[]>>();
+		HashMap<Id<Person>, ArrayList<String[]>> sortedCoordMapData = new HashMap<Id<Person>, ArrayList<String[]>>();
 		for (String[] coordMapEntry : unsortedCoordMapData) {
-			IdImpl personId = new IdImpl(coordMapEntry[0]);
+			Id<Person> personId = Id.create(coordMapEntry[0], Person.class);
 			if(sortedCoordMapData.get(personId) != null){
 				sortedCoordMapData.get(personId).add(coordMapEntry);
 			} else {
@@ -245,7 +244,7 @@ public class BlnPlansGenerator {
 			}
 		}
 
-		for (Entry<Id, ArrayList<String[]>> entry : unfilteredTripData.entrySet()) {
+		for (Entry<Id<Person>, ArrayList<String[]>> entry : unfilteredTripData.entrySet()) {
 			ArrayList<String[]> filteredArrayList = new ArrayList<String[]>();
 
 			for (String[] dataString : entry.getValue()) {
@@ -280,12 +279,12 @@ public class BlnPlansGenerator {
 		return filteredTripData;
 	}
 
-	private void addPlansToPersons(HashMap<Id,PersonImpl> personList, HashMap<Id,ArrayList<String[]>> tripData) {
+	private void addPlansToPersons(HashMap<Id<Person>,PersonImpl> personList, HashMap<Id<Person>,ArrayList<String[]>> tripData) {
 
 		double numberOfPlansFound = 0;
 
 		log.info("Adding Plans to Person, spreading time is " + BlnPlansGenerator.spreadingTime + "s");
-		for (Entry<Id, ArrayList<String[]>> entry : tripData.entrySet()) {
+		for (Entry<Id<Person>, ArrayList<String[]>> entry : tripData.entrySet()) {
 
 			ArrayList<String[]> curTripList = entry.getValue();
 			Person curPerson = personList.get(entry.getKey());
@@ -357,10 +356,10 @@ public class BlnPlansGenerator {
 		}
 	}
 
-	private HashMap<Id, PersonImpl> removePersonsWithoutPlan(HashMap<Id, PersonImpl> personMap, HashMap<Id, ArrayList<String[]>> tripMap) {
+	private HashMap<Id<Person>, PersonImpl> removePersonsWithoutPlan(HashMap<Id<Person>, PersonImpl> personMap, HashMap<Id<Person>, ArrayList<String[]>> tripMap) {
 
-		HashMap<Id, PersonImpl> filteredPersonMap = new HashMap<Id, PersonImpl>();
-		for (Id personId : tripMap.keySet()) {
+		HashMap<Id<Person>, PersonImpl> filteredPersonMap = new HashMap<Id<Person>, PersonImpl>();
+		for (Id<Person> personId : tripMap.keySet()) {
 			filteredPersonMap.put(personId, personMap.get(personId));
 		}
 

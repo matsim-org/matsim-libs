@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
@@ -20,7 +20,7 @@ public class ReadNce implements TabularFileHandler {
 
 	private TabularFileParserConfig tabFileParserConfig;
 	private LinkedList<NceContainer> nceContainterList = new LinkedList<NceContainer>();
-	private HashMap<String, Id> nceNodeStringNodeId2nodeId = new HashMap<String, Id>();
+	private HashMap<String, Id<Node>> nceNodeStringNodeId2nodeId = new HashMap<>();
 	private NceContainterSink sink = new ListAdder();
 	private int linesRejected = 0;
 
@@ -69,7 +69,7 @@ public class ReadNce implements TabularFileHandler {
 			try {
 				String fromNodeIdString = row[0].trim();
 				if (this.nceNodeStringNodeId2nodeId.get(fromNodeIdString) == null) {
-					this.nceNodeStringNodeId2nodeId.put(fromNodeIdString, new IdImpl(fromNodeIdString));
+					this.nceNodeStringNodeId2nodeId.put(fromNodeIdString, Id.create(fromNodeIdString, Node.class));
 				}
 				
 				double fromX = Double.parseDouble(row[1].trim());
@@ -78,7 +78,7 @@ public class ReadNce implements TabularFileHandler {
 				
 				String toNodeStringId = row[3].trim();
 				if (this.nceNodeStringNodeId2nodeId.get(toNodeStringId) == null) {
-					this.nceNodeStringNodeId2nodeId.put(toNodeStringId, new IdImpl(toNodeStringId));
+					this.nceNodeStringNodeId2nodeId.put(toNodeStringId, Id.create(toNodeStringId, Node.class));
 				}
 				
 				double toX = Double.parseDouble(row[4].trim());
@@ -105,7 +105,7 @@ public class ReadNce implements TabularFileHandler {
 		return nceContainterList;
 	}
 
-	public HashMap<String, Id> getNceNodeStringNodeId2nodeId() {
+	public HashMap<String, Id<Node>> getNceNodeStringNodeId2nodeId() {
 		return nceNodeStringNodeId2nodeId;
 	}	
 }

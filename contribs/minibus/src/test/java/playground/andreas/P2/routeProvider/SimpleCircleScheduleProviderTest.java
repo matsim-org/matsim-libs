@@ -19,22 +19,27 @@
 
 package playground.andreas.P2.routeProvider;
 
+import java.util.ArrayList;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.andreas.P2.PConfigGroup;
 import playground.andreas.P2.PConstants;
+import playground.andreas.P2.operator.Operator;
 import playground.andreas.P2.operator.PPlan;
 import playground.andreas.P2.schedule.CreateStopsForAllCarLinks;
-
-import java.util.ArrayList;
 
 public class SimpleCircleScheduleProviderTest {
 	
@@ -51,38 +56,38 @@ public class SimpleCircleScheduleProviderTest {
 		
 		SimpleCircleScheduleProvider prov = new SimpleCircleScheduleProvider(pC.getPIdentifier(), tS, scenario.getNetwork(), null, pC.getVehicleMaximumVelocity(), pC.getMode());
 		
-		Id lineId = new IdImpl("line1");
-		Id routeId = new IdImpl("route1");
+		Id<PPlan> lineId = Id.create("line1", PPlan.class);
+		Id<PPlan> routeId = Id.create("route1", PPlan.class);
 		
 		PPlan plan = new PPlan(routeId, "noCreator", PConstants.founderPlanId);
 		plan.setStartTime(7.0 * 3600.0);
 		plan.setEndTime(9.0 * 3600.0);
 		plan.setNVehicles(2);
-		TransitStopFacility startStop = tS.getFacilities().get(new IdImpl(pC.getPIdentifier() + "1424"));
-		TransitStopFacility endStop = tS.getFacilities().get(new IdImpl(pC.getPIdentifier() + "4434"));
+		TransitStopFacility startStop = tS.getFacilities().get(Id.create(pC.getPIdentifier() + "1424", TransitStopFacility.class));
+		TransitStopFacility endStop = tS.getFacilities().get(Id.create(pC.getPIdentifier() + "4434", TransitStopFacility.class));
 		ArrayList<TransitStopFacility> stopsToBeServed = new ArrayList<>();
 		stopsToBeServed.add(startStop);
 		stopsToBeServed.add(endStop);
 		plan.setStopsToBeServed(stopsToBeServed);
 		
-		ArrayList<Id> refIds = new ArrayList<>();
-		refIds.add(new IdImpl("1424")); refIds.add(new IdImpl("2434"));
-		refIds.add(new IdImpl("3444")); refIds.add(new IdImpl("4434"));
-		refIds.add(new IdImpl("3424")); refIds.add(new IdImpl("2414"));
-		refIds.add(new IdImpl("1424"));
+		ArrayList<Id<Link>> refIds = new ArrayList<>();
+		refIds.add(Id.create("1424", Link.class)); refIds.add(Id.create("2434", Link.class));
+		refIds.add(Id.create("3444", Link.class)); refIds.add(Id.create("4434", Link.class));
+		refIds.add(Id.create("3424", Link.class)); refIds.add(Id.create("2414", Link.class));
+		refIds.add(Id.create("1424", Link.class));
 		
-		TransitLine line = prov.createTransitLineFromOperatorPlan(lineId, plan);
+		TransitLine line = prov.createTransitLineFromOperatorPlan(Id.create(lineId, Operator.class), plan);
 		
 		Assert.assertEquals("Transit line ids have to be the same", lineId, line.getId());
 		
 		for (TransitRoute route : line.getRoutes().values()) {
-			Assert.assertEquals("Route id have to be the same", new IdImpl(lineId + "-" + routeId), route.getId());
+			Assert.assertEquals("Route id have to be the same", Id.create(lineId + "-" + routeId, TransitRoute.class), route.getId());
 			Assert.assertEquals("Number of departures", 14.0, route.getDepartures().size(), MatsimTestUtils.EPSILON);
 			
 			// check stops
 			int i = 0;
 			for (TransitRouteStop stop : route.getStops()) {
-				Assert.assertEquals("Route stop ids have to be the same", new IdImpl(pC.getPIdentifier() + refIds.get(i)), stop.getStopFacility().getId());
+				Assert.assertEquals("Route stop ids have to be the same", Id.create(pC.getPIdentifier() + refIds.get(i), TransitStopFacility.class), stop.getStopFacility().getId());
 				i++;
 			}
 			
@@ -90,7 +95,7 @@ public class SimpleCircleScheduleProviderTest {
 			Assert.assertEquals("Start link id has to be the same", refIds.get(0), route.getRoute().getStartLinkId());
 			
 			i = 1;
-			for (Id linkId : route.getRoute().getLinkIds()) {
+			for (Id<Link> linkId : route.getRoute().getLinkIds()) {
 				Assert.assertEquals("Route link ids have to be the same", refIds.get(i), linkId);
 				i++;
 			}
@@ -121,7 +126,7 @@ public class SimpleCircleScheduleProviderTest {
 		ScenarioImpl scenario = (ScenarioImpl) PScenarioHelper.createTestNetwork();
 		PConfigGroup pC = new PConfigGroup();
 		
-		Id lineId = new IdImpl("1");
+		Id<Operator> lineId = Id.create("1", Operator.class);
 		
 		SimpleCircleScheduleProvider prov = new SimpleCircleScheduleProvider(pC.getPIdentifier(), scenario.getTransitSchedule(), scenario.getNetwork(), null, pC.getVehicleMaximumVelocity(), pC.getMode());
 		TransitLine line = prov.createEmptyLineFromOperator(lineId);

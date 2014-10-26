@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * Collects the <code>AgentDepartureEventHandler</code> and the corresponding <code>PersonEntersVehicleEventHandler</code> for a given set of agent ids.
@@ -42,10 +43,10 @@ public class AgentId2DepartureDelayAtStopMap implements PersonDepartureEventHand
 	private final Logger log = Logger.getLogger(AgentId2DepartureDelayAtStopMap.class);
 	private final Level logLevel = Level.OFF;
 
-	private final Set<Id> agentIds;
-	private TreeMap<Id, AgentId2DepartureDelayAtStopMapData> stopId2DelayAtStopMap = new TreeMap<Id, AgentId2DepartureDelayAtStopMapData>();
+	private final Set<Id<Person>> agentIds;
+	private TreeMap<Id<Person>, AgentId2DepartureDelayAtStopMapData> stopId2DelayAtStopMap = new TreeMap<>();
 
-	public AgentId2DepartureDelayAtStopMap(Set<Id> agentIds){
+	public AgentId2DepartureDelayAtStopMap(Set<Id<Person>> agentIds){
 		this.log.setLevel(this.logLevel);
 		this.agentIds = agentIds;
 	}
@@ -88,7 +89,7 @@ public class AgentId2DepartureDelayAtStopMap implements PersonDepartureEventHand
 	 *
 	 * @return A map containing a <code>AgentDelayAtStopContainer</code> for each agent id
 	 */
-	public TreeMap<Id, AgentId2DepartureDelayAtStopMapData> getStopId2DelayAtStopMap() {
+	public TreeMap<Id<Person>, AgentId2DepartureDelayAtStopMapData> getStopId2DelayAtStopMap() {
 		return this.stopId2DelayAtStopMap;
 	}
 

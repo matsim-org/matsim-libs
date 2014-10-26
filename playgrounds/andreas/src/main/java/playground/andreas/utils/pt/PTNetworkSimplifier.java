@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
@@ -145,9 +144,9 @@ public class PTNetworkSimplifier {
 
 										// Try to merge both links by guessing the resulting links attributes
 										link = this.network.getFactory().createLink(
-												new IdImpl(inLink.getId() + "-" + outLink.getId()),
-												inLink.getFromNode().getId(),
-												outLink.getToNode().getId());
+												Id.create(inLink.getId() + "-" + outLink.getId(), Link.class),
+												inLink.getFromNode(),
+												outLink.getToNode());
 
 										// length can be summed up
 										link.setLength(inLink.getLength() + outLink.getLength());
@@ -175,9 +174,9 @@ public class PTNetworkSimplifier {
 										// Only merge links with same attributes
 										if(bothLinksHaveSameLinkStats(inLink, outLink)){
 											link = this.network.getFactory().createLink(
-													new IdImpl(inLink.getId() + "-" + outLink.getId()),
-													inLink.getFromNode().getId(),
-													outLink.getToNode().getId());
+													Id.create(inLink.getId() + "-" + outLink.getId(), Link.class),
+													inLink.getFromNode(),
+													outLink.getToNode());
 
 											link.setLength(inLink.getLength() + outLink.getLength());
 
@@ -249,17 +248,17 @@ public class PTNetworkSimplifier {
 
 				if(transitRoute.getRoute().getLinkIds().contains(inLink.getId()) || transitRoute.getRoute().getLinkIds().contains(inLink.getId())){
 
-					LinkedList<Id> routeLinkIds = new LinkedList<Id>();
+					LinkedList<Id<Link>> routeLinkIds = new LinkedList<Id<Link>>();
 					routeLinkIds.add(transitRoute.getRoute().getStartLinkId());
-					for (Id id : transitRoute.getRoute().getLinkIds()) {
+					for (Id<Link> id : transitRoute.getRoute().getLinkIds()) {
 						routeLinkIds.add(id);
 					}
 					routeLinkIds.add(transitRoute.getRoute().getEndLinkId());
 
-					for (Iterator<Id> iterator = routeLinkIds.iterator(); iterator.hasNext();) {
-						Id id = iterator.next();
+					for (Iterator<Id<Link>> iterator = routeLinkIds.iterator(); iterator.hasNext();) {
+						Id<Link> id = iterator.next();
 						if(id.toString().equalsIgnoreCase(inLink.getId().toString())){
-							Id nextId = iterator.next();
+							Id<Link> nextId = iterator.next();
 							if(nextId.toString().equalsIgnoreCase(outLink.getId().toString())){
 								// everything okay
 								break;
@@ -283,7 +282,7 @@ public class PTNetworkSimplifier {
 
 					LinkedList<Id<Link>> routeLinkIds = new LinkedList<Id<Link>>();
 					routeLinkIds.add(transitRoute.getRoute().getStartLinkId());
-					for (Id id : transitRoute.getRoute().getLinkIds()) {
+					for (Id<Link> id : transitRoute.getRoute().getLinkIds()) {
 						routeLinkIds.add(id);
 					}
 					routeLinkIds.add(transitRoute.getRoute().getEndLinkId());
@@ -295,8 +294,8 @@ public class PTNetworkSimplifier {
 					}
 
 					NetworkRoute newRoute = (NetworkRoute) new LinkNetworkRouteFactory().createRoute(routeLinkIds.getFirst(), routeLinkIds.getLast());
-					Id startLink = routeLinkIds.pollFirst();
-					Id endLink = routeLinkIds.pollLast();
+					Id<Link> startLink = routeLinkIds.pollFirst();
+					Id<Link> endLink = routeLinkIds.pollLast();
 					newRoute.setLinkIds(startLink, routeLinkIds, endLink);
 					transitRoute.setRoute(newRoute);
 				}
@@ -391,7 +390,7 @@ public class PTNetworkSimplifier {
 		osmLoader.loadScenario();
 
 		log.info("Reading " + this.scheduleInFile);
-		new TransitScheduleReaderV1(osmScenario.getTransitSchedule(), osmScenario.getNetwork()).readFile(this.scheduleInFile);
+		new TransitScheduleReaderV1(osmScenario).readFile(this.scheduleInFile);
 
 		log.info("Running simplifier...");
 		run(this.network, osmScenario.getTransitSchedule());

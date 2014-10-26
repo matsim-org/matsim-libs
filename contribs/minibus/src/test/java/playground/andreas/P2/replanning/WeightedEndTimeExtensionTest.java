@@ -19,22 +19,25 @@
 
 package playground.andreas.P2.replanning;
 
+import java.io.File;
+import java.util.ArrayList;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestUtils;
+
 import playground.andreas.P2.PConfigGroup;
 import playground.andreas.P2.PConstants;
 import playground.andreas.P2.operator.Operator;
 import playground.andreas.P2.operator.PPlan;
 import playground.andreas.P2.operator.TimeProvider;
 import playground.andreas.P2.routeProvider.PScenarioHelper;
-
-import java.io.File;
-import java.util.ArrayList;
 
 
 public class WeightedEndTimeExtensionTest {
@@ -85,9 +88,12 @@ public class WeightedEndTimeExtensionTest {
 		Assert.assertEquals("Compare start time", 24300.0, testPlan.getEndTime(), MatsimTestUtils.EPSILON);
 		
 		// Now same with acts
-		Id id = new IdImpl("id");
+		Id<Person> agentId = Id.create("id", Person.class);
+		Id<Link> linkId = Id.create("id", Link.class);
+		Id<ActivityFacility> facilityId = Id.create("id", ActivityFacility.class);
+
 		for (int i = 0; i < 100; i++) {
-			tP.handleEvent(new ActivityEndEvent(36600.0, id, id, id, "type"));
+			tP.handleEvent(new ActivityEndEvent(36600.0, agentId, linkId, facilityId, "type"));
 		}
 		
 		testPlan = strat.run(coop);

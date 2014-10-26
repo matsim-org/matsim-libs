@@ -1,13 +1,23 @@
 package playground.andreas.bln.counts;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map.Entry;
+import java.util.Random;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.*;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
@@ -19,11 +29,7 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map.Entry;
-import java.util.Random;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * Generates population from counts data for specified lines. Additional group of agents can be added as an option.
@@ -41,7 +47,7 @@ public class Counts2Plans {
 	private Counts egress = new Counts();
 	private TransitSchedule transitSchedule;
 
-	private HashMap<String, LinkedList<Id>> lines = new HashMap<String, LinkedList<Id>>();
+	private HashMap<String, LinkedList<Id<TransitStopFacility>>> lines = new HashMap<>();
 
 	private int runningID = 1;
 	private int numberOfPersonsWithValidPlan = 0;
@@ -71,14 +77,14 @@ public class Counts2Plans {
 
 		counts2plans.createPlans();
 		counts2plans.printLog();
-		counts2plans.addTouristGroup(100, Time.parseTime("08:30:00"), new IdImpl("812030.1"), new IdImpl("806520.1"));
+		counts2plans.addTouristGroup(100, Time.parseTime("08:30:00"), Id.create("812030.1", TransitStopFacility.class), Id.create("806520.1", TransitStopFacility.class));
 		counts2plans.createPopulation("d:/Berlin/intervalltakt/simulation/plans_neu.xml.gz");
 
 		Counts2Plans.log.info("Finished");
 
 	}
 
-	private void addTouristGroup(int number, double time, Id from, Id to) {
+	private void addTouristGroup(int number, double time, Id<TransitStopFacility> from, Id<TransitStopFacility> to) {
 
 		for (int i = 1; i <= number; i++) {
 
@@ -113,14 +119,14 @@ public class Counts2Plans {
 			log.info("Hour: " + hour);
 			LinkedList<PersonImpl> passengersInVehicle = new LinkedList<PersonImpl>();
 
-			for (Entry<String, LinkedList<Id>> entry : this.lines.entrySet()) {
+			for (Entry<String, LinkedList<Id<TransitStopFacility>>> entry : this.lines.entrySet()) {
 
-				for (Id stopID : entry.getValue()) {
+				for (Id<TransitStopFacility> stopID : entry.getValue()) {
+					Id<Link> stopIdAsLink = Id.create(stopID, Link.class);
+					if (this.egress.getCount(stopIdAsLink) != null) {
+						if (this.egress.getCount(stopIdAsLink).getVolume(hour) != null) {
 
-					if (this.egress.getCount(stopID) != null) {
-						if (this.egress.getCount(stopID).getVolume(hour) != null) {
-
-							for (int i = 0; i < this.egress.getCount(stopID).getVolume(hour).getValue(); i++) {
+							for (int i = 0; i < this.egress.getCount(stopIdAsLink).getVolume(hour).getValue(); i++) {
 
 								PersonImpl person = passengersInVehicle.pollFirst();
 
@@ -138,10 +144,10 @@ public class Counts2Plans {
 						}
 					}
 
-					if (this.access.getCount(stopID) != null) {
-						if (this.access.getCount(stopID).getVolume(hour) != null) {
+					if (this.access.getCount(stopIdAsLink) != null) {
+						if (this.access.getCount(stopIdAsLink).getVolume(hour) != null) {
 
-							for (int i = 0; i < this.access.getCount(stopID).getVolume(hour).getValue(); i++) {
+							for (int i = 0; i < this.access.getCount(stopIdAsLink).getVolume(hour).getValue(); i++) {
 								PersonImpl person = createPerson();
 								ActivityImpl a = ((PlanImpl) person.getSelectedPlan()).createAndAddActivity("start", this.transitSchedule.getFacilities().get(stopID).getLinkId());
 								a.setCoord(this.transitSchedule.getFacilities().get(stopID).getCoord());
@@ -173,7 +179,7 @@ public class Counts2Plans {
 	}
 
 	private PersonImpl createPerson(){
-		PersonImpl person = new PersonImpl(new IdImpl(this.runningID));
+		PersonImpl person = new PersonImpl(Id.create(this.runningID, Person.class));
 		person.createAndAddPlan(true);
 		this.runningID++;
 		return person;
@@ -217,88 +223,88 @@ public class Counts2Plans {
 	}
 
 	private void add344_H() {
-		LinkedList<Id> b344_H = new LinkedList<Id>();
+		LinkedList<Id<TransitStopFacility>> b344_H = new LinkedList<>();
 		this.lines.put("344_H", b344_H);
 
-		b344_H.add(new IdImpl("792040.1"));
-		b344_H.add(new IdImpl("792200.1"));
-		b344_H.add(new IdImpl("792013.1"));
-		b344_H.add(new IdImpl("792030.1"));
-		b344_H.add(new IdImpl("792023.1"));
-		b344_H.add(new IdImpl("792910.1"));
-		b344_H.add(new IdImpl("781060.1"));
-		b344_H.add(new IdImpl("781040.1"));
+		b344_H.add(Id.create("792040.1", TransitStopFacility.class));
+		b344_H.add(Id.create("792200.1", TransitStopFacility.class));
+		b344_H.add(Id.create("792013.1", TransitStopFacility.class));
+		b344_H.add(Id.create("792030.1", TransitStopFacility.class));
+		b344_H.add(Id.create("792023.1", TransitStopFacility.class));
+		b344_H.add(Id.create("792910.1", TransitStopFacility.class));
+		b344_H.add(Id.create("781060.1", TransitStopFacility.class));
+		b344_H.add(Id.create("781040.1", TransitStopFacility.class));
 	}
 
 	private void add344_R() {
-		LinkedList<Id> b344_R = new LinkedList<Id>();
+		LinkedList<Id<TransitStopFacility>> b344_R = new LinkedList<>();
 		this.lines.put("344_R", b344_R);
 
-		b344_R.add(new IdImpl("781015.2"));
-		b344_R.add(new IdImpl("792910.2"));
-		b344_R.add(new IdImpl("792023.2"));
-		b344_R.add(new IdImpl("792030.2"));
-		b344_R.add(new IdImpl("792013.2"));
-		b344_R.add(new IdImpl("792200.2"));
-		b344_R.add(new IdImpl("792040.2"));
+		b344_R.add(Id.create("781015.2", TransitStopFacility.class));
+		b344_R.add(Id.create("792910.2", TransitStopFacility.class));
+		b344_R.add(Id.create("792023.2", TransitStopFacility.class));
+		b344_R.add(Id.create("792030.2", TransitStopFacility.class));
+		b344_R.add(Id.create("792013.2", TransitStopFacility.class));
+		b344_R.add(Id.create("792200.2", TransitStopFacility.class));
+		b344_R.add(Id.create("792040.2", TransitStopFacility.class));
 	}
 
 	private void addM44_H() {
-		LinkedList<Id> m44_H = new LinkedList<Id>();
+		LinkedList<Id<TransitStopFacility>> m44_H = new LinkedList<>();
 		this.lines.put("m44_H", m44_H);
 
-		m44_H.add(new IdImpl("812020.1"));
-		m44_H.add(new IdImpl("812550.1"));
-		m44_H.add(new IdImpl("812030.1"));
-		m44_H.add(new IdImpl("812560.1"));
-		m44_H.add(new IdImpl("812570.1"));
-		m44_H.add(new IdImpl("812013.1"));
-		m44_H.add(new IdImpl("806520.1"));
-		m44_H.add(new IdImpl("806030.1"));
-		m44_H.add(new IdImpl("806010.1"));
-		m44_H.add(new IdImpl("806540.1"));
-		m44_H.add(new IdImpl("804070.1"));
-		m44_H.add(new IdImpl("804060.1"));
-		m44_H.add(new IdImpl("801020.1"));
-		m44_H.add(new IdImpl("801030.1"));
-		m44_H.add(new IdImpl("801530.1"));
-		m44_H.add(new IdImpl("801040.1"));
-		m44_H.add(new IdImpl("792050.1"));
-		m44_H.add(new IdImpl("792200.3"));
+		m44_H.add(Id.create("812020.1", TransitStopFacility.class));
+		m44_H.add(Id.create("812550.1", TransitStopFacility.class));
+		m44_H.add(Id.create("812030.1", TransitStopFacility.class));
+		m44_H.add(Id.create("812560.1", TransitStopFacility.class));
+		m44_H.add(Id.create("812570.1", TransitStopFacility.class));
+		m44_H.add(Id.create("812013.1", TransitStopFacility.class));
+		m44_H.add(Id.create("806520.1", TransitStopFacility.class));
+		m44_H.add(Id.create("806030.1", TransitStopFacility.class));
+		m44_H.add(Id.create("806010.1", TransitStopFacility.class));
+		m44_H.add(Id.create("806540.1", TransitStopFacility.class));
+		m44_H.add(Id.create("804070.1", TransitStopFacility.class));
+		m44_H.add(Id.create("804060.1", TransitStopFacility.class));
+		m44_H.add(Id.create("801020.1", TransitStopFacility.class));
+		m44_H.add(Id.create("801030.1", TransitStopFacility.class));
+		m44_H.add(Id.create("801530.1", TransitStopFacility.class));
+		m44_H.add(Id.create("801040.1", TransitStopFacility.class));
+		m44_H.add(Id.create("792050.1", TransitStopFacility.class));
+		m44_H.add(Id.create("792200.3", TransitStopFacility.class));
 	}
 
 	private void addM44_R() {
-		LinkedList<Id> m44_R = new LinkedList<Id>();
+		LinkedList<Id<TransitStopFacility>> m44_R = new LinkedList<>();
 		this.lines.put("m44_R", m44_R);
 
-		m44_R.add(new IdImpl("792200.4"));
-		m44_R.add(new IdImpl("792050.2"));
-		m44_R.add(new IdImpl("801040.2"));
-		m44_R.add(new IdImpl("801530.2"));
-		m44_R.add(new IdImpl("801030.2"));
-		m44_R.add(new IdImpl("801020.2"));
-		m44_R.add(new IdImpl("804060.2"));
-		m44_R.add(new IdImpl("804070.2"));
-		m44_R.add(new IdImpl("806540.2"));
-		m44_R.add(new IdImpl("806010.2"));
-		m44_R.add(new IdImpl("806030.2"));
-		m44_R.add(new IdImpl("806520.2"));
-		m44_R.add(new IdImpl("812013.2"));
-		m44_R.add(new IdImpl("812570.2"));
-		m44_R.add(new IdImpl("812560.2"));
-		m44_R.add(new IdImpl("812030.2"));
-		m44_R.add(new IdImpl("812550.2"));
-		m44_R.add(new IdImpl("812020.2"));
+		m44_R.add(Id.create("792200.4", TransitStopFacility.class));
+		m44_R.add(Id.create("792050.2", TransitStopFacility.class));
+		m44_R.add(Id.create("801040.2", TransitStopFacility.class));
+		m44_R.add(Id.create("801530.2", TransitStopFacility.class));
+		m44_R.add(Id.create("801030.2", TransitStopFacility.class));
+		m44_R.add(Id.create("801020.2", TransitStopFacility.class));
+		m44_R.add(Id.create("804060.2", TransitStopFacility.class));
+		m44_R.add(Id.create("804070.2", TransitStopFacility.class));
+		m44_R.add(Id.create("806540.2", TransitStopFacility.class));
+		m44_R.add(Id.create("806010.2", TransitStopFacility.class));
+		m44_R.add(Id.create("806030.2", TransitStopFacility.class));
+		m44_R.add(Id.create("806520.2", TransitStopFacility.class));
+		m44_R.add(Id.create("812013.2", TransitStopFacility.class));
+		m44_R.add(Id.create("812570.2", TransitStopFacility.class));
+		m44_R.add(Id.create("812560.2", TransitStopFacility.class));
+		m44_R.add(Id.create("812030.2", TransitStopFacility.class));
+		m44_R.add(Id.create("812550.2", TransitStopFacility.class));
+		m44_R.add(Id.create("812020.2", TransitStopFacility.class));
 	}
 
 	private void addLine(String lineID) {
 
-		TransitLine transitLine = this.transitSchedule.getTransitLines().get(new IdImpl(lineID));
-		LinkedList<Id> routeStops = new LinkedList<Id>();
+		TransitLine transitLine = this.transitSchedule.getTransitLines().get(Id.create(lineID, TransitLine.class));
+		LinkedList<Id<TransitStopFacility>> routeStops = new LinkedList<>();
 
 		for (TransitRoute transitRoute : transitLine.getRoutes().values()) {
 			if(transitRoute.getStops().size() > routeStops.size()){
-				routeStops = new LinkedList<Id>();
+				routeStops = new LinkedList<>();
 				for (TransitRouteStop stop : transitRoute.getStops()) {
 					routeStops.add(stop.getStopFacility().getId());
 				}

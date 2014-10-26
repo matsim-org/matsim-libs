@@ -25,7 +25,6 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -33,6 +32,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
+import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 
@@ -47,19 +47,19 @@ public class SpandauSchedule {
 		final String NO_SPANDAU_SCHEDULE_FILE = "e:/_shared-svn/andreas/paratransit/input/trb_2012/transitSchedules/noSpandauBusLines.xml.gz";
 		final String SPANDAU_BUS_LINES = "e:/_shared-svn/andreas/paratransit/input/trb_2012/transitSchedules/onlySpandauBusLines.xml.gz";
 		
-		Set<Id> linesToRemove = new TreeSet<Id>();
-		linesToRemove.add(new IdImpl("130-B-130"));
-		linesToRemove.add(new IdImpl("131-B-131"));
-		linesToRemove.add(new IdImpl("134-B-134"));
-		linesToRemove.add(new IdImpl("135-B-135"));
-		linesToRemove.add(new IdImpl("136-B-136"));
-		linesToRemove.add(new IdImpl("234-B-234"));
-		linesToRemove.add(new IdImpl("236-B-236"));
-		linesToRemove.add(new IdImpl("237-B-237"));
-		linesToRemove.add(new IdImpl("334-B-334"));
-		linesToRemove.add(new IdImpl("337-B-337"));
-		linesToRemove.add(new IdImpl("M32-B-832"));
-		linesToRemove.add(new IdImpl("M37-B-837"));
+		Set<Id<TransitLine>> linesToRemove = new TreeSet<Id<TransitLine>>();
+		linesToRemove.add(Id.create("130-B-130", TransitLine.class));
+		linesToRemove.add(Id.create("131-B-131", TransitLine.class));
+		linesToRemove.add(Id.create("134-B-134", TransitLine.class));
+		linesToRemove.add(Id.create("135-B-135", TransitLine.class));
+		linesToRemove.add(Id.create("136-B-136", TransitLine.class));
+		linesToRemove.add(Id.create("234-B-234", TransitLine.class));
+		linesToRemove.add(Id.create("236-B-236", TransitLine.class));
+		linesToRemove.add(Id.create("237-B-237", TransitLine.class));
+		linesToRemove.add(Id.create("334-B-334", TransitLine.class));
+		linesToRemove.add(Id.create("337-B-337", TransitLine.class));
+		linesToRemove.add(Id.create("M32-B-832", TransitLine.class));
+		linesToRemove.add(Id.create("M37-B-837", TransitLine.class));
 		
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitSchedule baseCaseTransitSchedule = builder.createTransitSchedule();
@@ -73,8 +73,8 @@ public class SpandauSchedule {
 		new TransitScheduleWriterV1(noSpandauTransitSchedule).write(NO_SPANDAU_SCHEDULE_FILE);
 		
 
-		Set<Id> linesToKeep = new TreeSet<Id>();
-		for (Id lineId : noSpandauTransitSchedule.getTransitLines().keySet()) {
+		Set<Id<TransitLine>> linesToKeep = new TreeSet<>();
+		for (Id<TransitLine> lineId : noSpandauTransitSchedule.getTransitLines().keySet()) {
 			linesToKeep.add(lineId);
 		}
 		

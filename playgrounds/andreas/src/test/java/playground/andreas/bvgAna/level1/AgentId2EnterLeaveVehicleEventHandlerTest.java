@@ -8,7 +8,8 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.vehicles.Vehicle;
 
 public class AgentId2EnterLeaveVehicleEventHandlerTest {
 
@@ -19,21 +20,19 @@ public class AgentId2EnterLeaveVehicleEventHandlerTest {
     
     public void testAgentId2EnterLeaveVehicleEventHandler() {
     	       
-        Id[] ida= new Id[9];
-    	Set<Id> idSet = new TreeSet<Id>();
-        for (int ii=0; ii<9; ii++){
-        	ida[ii] = new IdImpl(ii); 
-            idSet.add(ida[ii]);
-        }
+    	Set<Id<Person>> idSet = new TreeSet<>();
+    	for (int ii=0; ii<9; ii++){
+    		idSet.add(Id.create(ii, Person.class));
+    	}
         
 //        assign Ids to routes, vehicles and agents to be used in Test
         
-        Id vehId1 = ida[4];
-        Id vehId2 = ida[1];
-        Id vehId3 = ida[6];
-        Id persId1 = ida[0];
-        Id persId2 = ida[5];
-        Id persId3 = ida[8];
+        Id<Vehicle> vehId1 = Id.create(4, Vehicle.class);
+        Id<Vehicle> vehId2 = Id.create(1, Vehicle.class);
+        Id<Vehicle> vehId3 = Id.create(6, Vehicle.class);
+        Id<Person> persId1 = Id.create(0, Person.class);
+        Id<Person> persId2 = Id.create(5, Person.class);
+        Id<Person> persId3 = Id.create(8, Person.class);
         
         AgentId2EnterLeaveVehicleEventHandler handler = new AgentId2EnterLeaveVehicleEventHandler(idSet);
         

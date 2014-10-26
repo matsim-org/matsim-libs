@@ -7,7 +7,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -63,21 +62,21 @@ public class TransitLineRemover {
 //		}
 		
 		
-		Set<Id> stopsInArea = TransitLineRemover.getStopIdsWithinArea(baseCaseTransitSchedule, minCoord, maxCoord);
-		Set<Id> linesToRemove = TransitLineRemover.getLinesServingTheseStops(baseCaseTransitSchedule, stopsInArea);
+		Set<Id<TransitStopFacility>> stopsInArea = TransitLineRemover.getStopIdsWithinArea(baseCaseTransitSchedule, minCoord, maxCoord);
+		Set<Id<TransitLine>> linesToRemove = TransitLineRemover.getLinesServingTheseStops(baseCaseTransitSchedule, stopsInArea);
 		
 		TransitSchedule noTxlTransitSchedule = TransitLineRemover.removeTransitLinesFromTransitSchedule(baseCaseTransitSchedule, linesToRemove);
 		new TransitScheduleWriterV1(noTxlTransitSchedule).write(NO_TXL_SCHEDULE_FILE);
 		
-		Set<Id> linesToKeep = new TreeSet<Id>();
-		for (Id lineId : noTxlTransitSchedule.getTransitLines().keySet()) {
+		Set<Id<TransitLine>> linesToKeep = new TreeSet<>();
+		for (Id<TransitLine> lineId : noTxlTransitSchedule.getTransitLines().keySet()) {
 			linesToKeep.add(lineId);
 		}
 		TransitSchedule txlBusLinesTransitSchedule = TransitLineRemover.removeTransitLinesFromTransitSchedule(baseCaseTransitSchedule, linesToKeep);
 		new TransitScheduleWriterV1(txlBusLinesTransitSchedule).write(TXL_BUS_LINES);
 		
-		Set<Id> buslines = new TreeSet<Id>();
-		for (Id lineId : baseCaseTransitSchedule.getTransitLines().keySet()) {
+		Set<Id<TransitLine>> buslines = new TreeSet<>();
+		for (Id<TransitLine> lineId : baseCaseTransitSchedule.getTransitLines().keySet()) {
 			if (lineId.toString().contains("-B-")) {
 				buslines.add(lineId);
 			}
@@ -85,8 +84,8 @@ public class TransitLineRemover {
 		TransitSchedule noBvgBusLinesSchedule = TransitLineRemover.removeTransitLinesFromTransitSchedule(baseCaseTransitSchedule, buslines);
 		new TransitScheduleWriterV1(noBvgBusLinesSchedule).write(NO_BVG_BUSES);
 		
-		Set<Id> noBuslines = new TreeSet<Id>();
-		for (Id lineId : baseCaseTransitSchedule.getTransitLines().keySet()) {
+		Set<Id<TransitLine>> noBuslines = new TreeSet<Id<TransitLine>>();
+		for (Id<TransitLine> lineId : baseCaseTransitSchedule.getTransitLines().keySet()) {
 			if (!lineId.toString().contains("-B-")) {
 				noBuslines.add(lineId);
 			}
@@ -95,9 +94,9 @@ public class TransitLineRemover {
 		new TransitScheduleWriterV1(onlyBvgBusLinesSchedule).write(ONLY_BVG_BUSES);
 	}
 	
-	public static Set<Id> getLinesServingTheseStops(TransitSchedule transitSchedule, Set<Id> stopIds){
+	public static Set<Id<TransitLine>> getLinesServingTheseStops(TransitSchedule transitSchedule, Set<Id<TransitStopFacility>> stopIds){
 		log.info("Searching for lines serving one of the following stops:" + stopIds);
-		Set<Id> linesServingOneOfThoseStops = new TreeSet<Id>();
+		Set<Id<TransitLine>> linesServingOneOfThoseStops = new TreeSet<>();
 		
 		for (TransitLine line : transitSchedule.getTransitLines().values()) {
 			for (TransitRoute route : line.getRoutes().values()) {
@@ -113,10 +112,10 @@ public class TransitLineRemover {
 		return linesServingOneOfThoseStops;
 	}
 	
-	public static Set<Id> getStopIdsWithinArea(TransitSchedule transitSchedule, Coord minCoord, Coord maxCoord){
+	public static Set<Id<TransitStopFacility>> getStopIdsWithinArea(TransitSchedule transitSchedule, Coord minCoord, Coord maxCoord){
 		log.info("Searching for stops within the area of " + minCoord.toString() + " - " + maxCoord.toString());
 
-		Set<Id> stopsInArea = new TreeSet<Id>();
+		Set<Id<TransitStopFacility>> stopsInArea = new TreeSet<>();
 		
 		for (TransitStopFacility stop : transitSchedule.getFacilities().values()) {
 			if (minCoord.getX() < stop.getCoord().getX() && maxCoord.getX() > stop.getCoord().getX()) {
@@ -130,7 +129,7 @@ public class TransitLineRemover {
 		return stopsInArea;
 	}
 
-	public static TransitSchedule removeTransitLinesFromTransitSchedule(TransitSchedule transitSchedule, Set<Id> linesToRemove){
+	public static TransitSchedule removeTransitLinesFromTransitSchedule(TransitSchedule transitSchedule, Set<Id<TransitLine>> linesToRemove){
 		log.info("Removing " + linesToRemove + " lines from transit schedule...");
 		
 		TransitSchedule tS = new TransitScheduleFactoryImpl().createTransitSchedule();

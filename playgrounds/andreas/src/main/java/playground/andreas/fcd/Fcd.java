@@ -19,6 +19,16 @@
 
 package playground.andreas.fcd;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -27,13 +37,17 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkTransform;
-import org.matsim.core.population.*;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -41,13 +55,11 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.utils.gis.matsim2esri.network.*;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.*;
+import org.matsim.utils.gis.matsim2esri.network.FeatureGenerator;
+import org.matsim.utils.gis.matsim2esri.network.FeatureGeneratorBuilder;
+import org.matsim.utils.gis.matsim2esri.network.LineStringBasedFeatureGenerator;
+import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
+import org.matsim.utils.gis.matsim2esri.network.WidthCalculator;
 
 public class Fcd {
 	
@@ -140,7 +152,7 @@ public class Fcd {
 			
 			if(lastEvent == null){
 				lastEvent = currentEvent;
-				currentPerson = new PersonImpl(new IdImpl(numberOfPlans + "-" + currentEvent.getVehId().toString()));
+				currentPerson = new PersonImpl(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
 				pop.addPerson(currentPerson);
 				numberOfPlans++;
 				currentPerson.addPlan(new PlanImpl());
@@ -155,7 +167,7 @@ public class Fcd {
 				
 			} else {
 				// different one, new person
-				currentPerson = new PersonImpl(new IdImpl(numberOfPlans + "-" + currentEvent.getVehId().toString()));
+				currentPerson = new PersonImpl(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
 				pop.addPerson(currentPerson);
 				numberOfPlans++;
 				currentPerson.addPlan(new PlanImpl());
@@ -208,7 +220,7 @@ public class Fcd {
 			
 			if(lastEvent == null){
 				lastEvent = currentEvent;
-				currentPerson = new PersonImpl(new IdImpl(numberOfPlans + "-" + currentEvent.getVehId().toString()));
+				currentPerson = new PersonImpl(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
 				pop.addPerson(currentPerson);
 				numberOfPlans++;
 				currentPerson.addPlan(new PlanImpl());
@@ -225,7 +237,7 @@ public class Fcd {
 				
 			} else {
 				// different one, new person
-				currentPerson = new PersonImpl(new IdImpl(numberOfPlans + "-" + currentEvent.getVehId().toString()));
+				currentPerson = new PersonImpl(Id.create(numberOfPlans + "-" + currentEvent.getVehId().toString(), Person.class));
 				pop.addPerson(currentPerson);
 				numberOfPlans++;
 				currentPerson.addPlan(new PlanImpl());
@@ -265,7 +277,7 @@ public class Fcd {
 					net.createAndAddNode(lastEvent.getLinkId(), this.coordTransform.transform(this.networkMap.get(lastEvent.getLinkId()).getCoord()));
 				}
 				
-				Id newLinkId = new IdImpl(lastEvent.getLinkId().toString() + "-" + currentEvent.getLinkId().toString());
+				Id<Link> newLinkId = Id.create(lastEvent.getLinkId().toString() + "-" + currentEvent.getLinkId().toString(), Link.class);
 				if(net.getLinks().get(newLinkId) == null){
 					net.createAndAddLink(newLinkId, net.getNodes().get(lastEvent.getLinkId()), net.getNodes().get(currentEvent.getLinkId()), 999.9, 9.9, 9999.9, 9.9);
 				}

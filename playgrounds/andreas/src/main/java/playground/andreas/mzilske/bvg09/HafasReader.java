@@ -16,7 +16,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
@@ -41,15 +40,15 @@ public class HafasReader {
 	private String filename;
 	private Collection<TransitRoute> routes = new ArrayList<TransitRoute>();
 	private List<TransitRouteStop> currentStops = new ArrayList<TransitRouteStop>();
-	private Id currentLineId;
-	private Id currentDepartureId;
+	private Id<TransitLine> currentLineId;
+	private Id<Departure> currentDepartureId;
 	private Double currentDepartureTime;
 	private TransitScheduleFactory transitScheduleFactory = new TransitScheduleFactoryImpl();;
 	private TransitSchedule transitSchedule = transitScheduleFactory.createTransitSchedule();
-	private Map<Id, TransitStopFacility> facilities = new HashMap<Id, TransitStopFacility>();
+	private Map<Id<TransitStopFacility>, TransitStopFacility> facilities = new HashMap<>();
 	
-	private HashMap<Id, Coord> stopCoordMap;
-	private HashMap<Id, String> stopNameMap;
+	private HashMap<Id<TransitStopFacility>, Coord> stopCoordMap;
+	private HashMap<Id<TransitStopFacility>, String> stopNameMap;
 	
 	public static void main(String[] args) {
 		HafasReader hafasReader = new HafasReader();
@@ -126,9 +125,9 @@ public class HafasReader {
 				enterRoute();
 			}
 			String idString = nextLine.substring(3, 8);
-			currentDepartureId = new IdImpl(idString);
+			currentDepartureId = Id.create(idString, Departure.class);
 		} else if ("*L".equals(nextLine.substring(0, 2))) {
-			Id newLineId = new IdImpl(nextLine.substring(3, 8).trim());
+			Id<TransitLine> newLineId = Id.create(nextLine.substring(3, 8).trim(), TransitLine.class);
 			if (!newLineId.equals(currentLineId)) {
 				if (currentLineId != null) {
 					addLine();
@@ -159,7 +158,7 @@ public class HafasReader {
 			if (currentDepartureTime == null) {
 				currentDepartureTime = Time.convertHHMMInteger(departureTime);
 			}
-			TransitStopFacility stopPost = getOrCreateTransitStopFacility(new IdImpl(stopPostString));
+			TransitStopFacility stopPost = getOrCreateTransitStopFacility(Id.create(stopPostString, TransitStopFacility.class));
 			TransitRouteStop stop = transitScheduleFactory.createTransitRouteStop(stopPost, Time.convertHHMMInteger(arrivalTime) - currentDepartureTime, Time.convertHHMMInteger(departureTime) - currentDepartureTime);
 			stop.setAwaitDepartureTime(true);
 			currentStops.add(stop);
@@ -169,7 +168,7 @@ public class HafasReader {
 	private void enterRoute() {
 		TransitRoute route = lookForRoute();
 		if (route == null) {
-			route = transitScheduleFactory.createTransitRoute(currentDepartureId, null, new ArrayList<TransitRouteStop>(currentStops), TransportMode.pt);
+			route = transitScheduleFactory.createTransitRoute(Id.create(currentDepartureId, TransitRoute.class), null, new ArrayList<TransitRouteStop>(currentStops), TransportMode.pt);
 			routes.add(route);
 		}
 		Departure departure = transitScheduleFactory.createDeparture(currentDepartureId, currentDepartureTime);
@@ -188,7 +187,7 @@ public class HafasReader {
 		return null;
 	}
 
-	private TransitStopFacility getOrCreateTransitStopFacility(IdImpl idImpl) {
+	private TransitStopFacility getOrCreateTransitStopFacility(Id<TransitStopFacility> idImpl) {
 		TransitStopFacility facility = facilities.get(idImpl);
 		if (facility == null) {
 			if(this.stopCoordMap.get(idImpl) != null){

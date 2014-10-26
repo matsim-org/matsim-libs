@@ -6,11 +6,13 @@ import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.vehicles.Vehicle;
 
 public class ReadRBLfahrt implements TabularFileHandler {
 	
@@ -61,9 +63,9 @@ public class ReadRBLfahrt implements TabularFileHandler {
 				String departureDateIst = row[2].split(" ")[0].trim();
 				double departureTimeIst = Time.parseTime(row[2].split(" ")[1].trim());
 				String zeitBasis = row[3].trim();
-				Id vehId = new IdImpl(row[4].trim());
-				Id lineId = new IdImpl(row[5].trim());
-				Id routeId = new IdImpl(row[6].trim());
+				Id<Vehicle> vehId = Id.create(row[4].trim(), Vehicle.class);
+				Id<TransitLine> lineId = Id.create(row[5].trim(), TransitLine.class);
+				Id<TransitRoute> routeId = Id.create(row[6].trim(), TransitRoute.class);
 				int distanceRouteIst = Integer.parseInt(row[7].trim());
 				int travelTimeIst = Integer.parseInt(row[8].trim());
 				

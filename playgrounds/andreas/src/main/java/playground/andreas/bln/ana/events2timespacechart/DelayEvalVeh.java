@@ -17,6 +17,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 public class DelayEvalVeh {
 	
@@ -26,7 +27,7 @@ public class DelayEvalVeh {
 	
 	private Network network;
 	private TransitSchedule transitSchedule;
-	HashMap<Id, String> stopIDNameMap;
+	HashMap<Id<TransitStopFacility>, String> stopIDNameMap;
 	
 	private LinkedList<DelayHandler> handler = new LinkedList<DelayHandler>();
 	

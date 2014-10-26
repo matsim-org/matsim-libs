@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
@@ -13,6 +13,9 @@ import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlDataImpl;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalGroupSettingsData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalSystemControllerData;
+import org.matsim.signalsystems.model.SignalGroup;
+import org.matsim.signalsystems.model.SignalPlan;
+import org.matsim.signalsystems.model.SignalSystem;
 
 
 public class GreenTimeReader implements TabularFileHandler {
@@ -29,6 +32,7 @@ public class GreenTimeReader implements TabularFileHandler {
 
 	private SignalControlData lsaConfigs = new SignalControlDataImpl();
 	
+	@Override
 	public void startRow(String[] row) throws IllegalArgumentException {
 				
 		if(row[0].contains("LSAID")){
@@ -37,10 +41,10 @@ public class GreenTimeReader implements TabularFileHandler {
 //			log.info("Added: " + row.toString());
 			
 			SignalSystemControllerData lsa = this.lsaConfigMap.get(Integer.valueOf(row[0]));
-			SignalPlanData plan = lsaConfigs.getFactory().createSignalPlanData(new IdImpl("1"));
+			SignalPlanData plan = lsaConfigs.getFactory().createSignalPlanData(Id.create("1", SignalPlan.class));
 			
 			if(lsa == null){
-				lsa = lsaConfigs.getFactory().createSignalSystemControllerData(new IdImpl(Integer.parseInt(row[0])));
+				lsa = lsaConfigs.getFactory().createSignalSystemControllerData(Id.create(Integer.parseInt(row[0]), SignalSystem.class));
 				plan.setCycleTime(new Integer(99));
 				plan.setStartTime(0.0);
 				plan.setEndTime(86399.);
@@ -50,7 +54,7 @@ public class GreenTimeReader implements TabularFileHandler {
 				this.lsaConfigMap.put(Integer.valueOf(row[0]), lsa);
 			}
 			
-			SignalGroupSettingsData sgConfig = this.lsaConfigs.getFactory().createSignalGroupSettingsData(new IdImpl(row[1]));
+			SignalGroupSettingsData sgConfig = this.lsaConfigs.getFactory().createSignalGroupSettingsData(Id.create(row[1], SignalGroup.class));
 			sgConfig.setOnset(0);
 			sgConfig.setDropping(Integer.parseInt(row[2]));
 			plan.addSignalGroupSettings(sgConfig);

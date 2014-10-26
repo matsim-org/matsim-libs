@@ -38,6 +38,7 @@ import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
@@ -61,7 +62,7 @@ public class StopId2MissedVehMap implements TransitDriverStartsEventHandler, Veh
 
 	public StopId2MissedVehMap(Population pop){
 		this.log.setLevel(this.logLevel);
-		Set<Id> agentIds = new TreeSet<Id>(pop.getPersons().keySet());
+		Set<Id<Person>> agentIds = new TreeSet<>(pop.getPersons().keySet());
 		this.agentId2StopDifferenceMap = new AgentId2StopDifferenceMap(pop, agentIds);
 	}
 

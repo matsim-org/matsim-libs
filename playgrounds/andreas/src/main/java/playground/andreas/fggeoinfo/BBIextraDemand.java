@@ -1,23 +1,28 @@
 package playground.andreas.fggeoinfo;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.*;
+import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import playground.andreas.fggeoinfo.ReadBBIDemand.DemandBox;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import playground.andreas.fggeoinfo.ReadBBIDemand.DemandBox;
 
 
 public class BBIextraDemand {
@@ -81,7 +86,7 @@ public class BBIextraDemand {
 				// create agents heading for BBI
 				for (int i = 1; i < demandBox.numberOfPassengers() * this.scaleFactor; i++) {
 
-					PersonImpl person =  new PersonImpl(new IdImpl("BBI_" + demandBox.getNameBySourceAndDescription() + "_" + (i)));
+					PersonImpl person =  new PersonImpl(Id.create("BBI_" + demandBox.getNameBySourceAndDescription() + "_" + (i), Person.class));
 
 					PlanImpl plan = new PlanImpl();
 					ActivityImpl act = new ActivityImpl("home", demandBox.getCoord());
@@ -107,7 +112,7 @@ public class BBIextraDemand {
 				// create agents heading for TXL
 				for (int i = 1; i < demandBox.numberOfPassengers() * this.scaleFactor * demandBox.getShareTXL(); i++) {
 
-					PersonImpl person =  new PersonImpl(new IdImpl("TXL_" + demandBox.getNameBySourceAndDescription() + "_" + (i)));
+					PersonImpl person =  new PersonImpl(Id.create("TXL_" + demandBox.getNameBySourceAndDescription() + "_" + (i), Person.class));
 
 					PlanImpl plan = new PlanImpl();
 					ActivityImpl act = new ActivityImpl("home", demandBox.getCoord());
@@ -126,7 +131,7 @@ public class BBIextraDemand {
 				// create agents heading for SXF
 				for (int i = 1; i < demandBox.numberOfPassengers() * this.scaleFactor * (1 - demandBox.getShareTXL()); i++) {
 
-					PersonImpl person =  new PersonImpl(new IdImpl("SXF_" + demandBox.getNameBySourceAndDescription() + "_" + (i)));
+					PersonImpl person =  new PersonImpl(Id.create("SXF_" + demandBox.getNameBySourceAndDescription() + "_" + (i), Person.class));
 
 					PlanImpl plan = new PlanImpl();
 					ActivityImpl act = new ActivityImpl("home", demandBox.getCoord());

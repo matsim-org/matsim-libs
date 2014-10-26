@@ -21,7 +21,6 @@ package playground.andreas.utils.pt.transitSchedule2Tikz;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
@@ -34,12 +33,12 @@ public class TikzNode {
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(TikzNode.class);
 	private Coord coord;
-	private Id id;
+	private Id<TikzNode> id;
 
 	public TikzNode(TransitStopFacility f, int i) {
 		this.coord = f.getCoord();
 //		this.id = new IdImpl(f.getId().toString().replaceAll("_", ""));
-		this.id = new IdImpl(i);
+		this.id = Id.create(i, TikzNode.class);
 	}
 	
 	public Coord getCoord(){
@@ -51,10 +50,7 @@ public class TikzNode {
 				") at (" + this.coord.getX() + "," + this.coord.getY() +") {};");	
 	}
 
-	/**
-	 * @return
-	 */
-	public Id getId() {
+	public Id<TikzNode> getId() {
 		return this.id;
 	}
 

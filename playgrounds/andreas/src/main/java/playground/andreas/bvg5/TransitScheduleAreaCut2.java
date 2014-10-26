@@ -18,12 +18,18 @@
  * *********************************************************************** */
 package playground.andreas.bvg5;
 
-import com.vividsolutions.jts.geom.Geometry;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -33,9 +39,22 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.pt.transitSchedule.api.*;
-import org.matsim.vehicles.*;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleReaderV1;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleWriterV1;
+import org.matsim.vehicles.Vehicles;
 import org.opengis.feature.simple.SimpleFeature;
+
 import playground.andreas.P2.stats.abtractPAnalysisModules.BVGLines2PtModes;
 import playground.andreas.P2.stats.abtractPAnalysisModules.PtMode2LineSetter;
 import playground.andreas.utils.pt.transitSchedule2shape.DaShapeWriter;
@@ -43,7 +62,7 @@ import playground.andreas.utils.pt.transitSchedule2shape.TransitSchedule2Shape;
 import playground.vsp.analysis.VspAnalyzer;
 import playground.vsp.analysis.modules.transitSchedule2Shp.TransitSchedule2Shp;
 
-import java.util.*;
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * @author droeder
@@ -221,19 +240,19 @@ public class TransitScheduleAreaCut2 {
 		int routecnt = 0;
 		List<TransitRoute> newRoutes = new ArrayList<TransitRoute>();
 		//copy the old Routes link sequence
-		List<Id> oldLinkIds = new ArrayList<Id>();
+		List<Id<Link>> oldLinkIds = new ArrayList<>();
 		oldLinkIds.add(oldRoute.getRoute().getStartLinkId());
 		oldLinkIds.addAll(oldRoute.getRoute().getLinkIds());
 		oldLinkIds.add(oldRoute.getRoute().getEndLinkId());
-		ListIterator<Id> linkIdIterator = oldLinkIds.listIterator();
+		ListIterator<Id<Link>> linkIdIterator = oldLinkIds.listIterator();
 		// ####
 		
 		TransitRoute transitRoute;
 		NetworkRoute networkRoute;
 		List<TransitRouteStop> stops;
-		Id startLinkId, endLinkId;
+		Id<Link> startLinkId, endLinkId;
 		List<Id<Link>> linkIds;
-		Id tempId;
+		Id<Link> tempId;
 		Double initialDepartureOffset = oldRoute.getStops().get(0).getDepartureOffset();
 		Double departureOffset;
 		
@@ -267,7 +286,7 @@ public class TransitScheduleAreaCut2 {
 			// copy and process the necessary stops. Thus, keep the, the facilities and awaitDeparture but shift the departureOffsets
 			stops.addAll(copyStops(s, factory, departureOffset));
 			// create the new departures
-			transitRoute = factory.createTransitRoute(new IdImpl(oldRoute.getId().toString() + "_" + routecnt), 
+			transitRoute = factory.createTransitRoute(Id.create(oldRoute.getId().toString() + "_" + routecnt, TransitRoute.class), 
 						networkRoute, stops, oldRoute.getTransportMode());
 			// copy and shift the departures according to the calculated offset
 			for(Departure departure : copyDepartures(oldRoute.getDepartures(), factory, departureOffset)){
@@ -291,9 +310,9 @@ public class TransitScheduleAreaCut2 {
 		List<Departure> newDepartures = new ArrayList<Departure>();
 		for(Departure dep: departures.values()){
 			// create a new vehicle of the same type
-			Vehicle v = newVehicles.getFactory().createVehicle(new IdImpl("cutOff_" + vehicleCnt), this.vehicles.getVehicles().get(dep.getVehicleId()).getType());
+			Vehicle v = newVehicles.getFactory().createVehicle(Id.create("cutOff_" + vehicleCnt, Vehicle.class), this.vehicles.getVehicles().get(dep.getVehicleId()).getType());
 			// copy the departures but shift the departures
-			Departure newDep = factory.createDeparture(new IdImpl(this.vehicleCnt), dep.getDepartureTime() + departureOffset);
+			Departure newDep = factory.createDeparture(Id.create(this.vehicleCnt, Departure.class), dep.getDepartureTime() + departureOffset);
 			// set the vehicle for the departure
 			newDep.setVehicleId(v.getId());
 			// store the new vehicle
@@ -489,42 +508,42 @@ public class TransitScheduleAreaCut2 {
 //		schedule.addStopFacility(facility);
 //		
 //		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-//		stops.add(f.createTransitRouteStop(schedule.getFacilities().get(new IdImpl("1")), 0, 1));
-//		stops.add(f.createTransitRouteStop(schedule.getFacilities().get(new IdImpl("2")), 2, 3));
-//		stops.add(f.createTransitRouteStop(schedule.getFacilities().get(new IdImpl("3")), 4, 5));
-//		stops.add(f.createTransitRouteStop(schedule.getFacilities().get(new IdImpl("4")), 6, 7));
-//		stops.add(f.createTransitRouteStop(schedule.getFacilities().get(new IdImpl("5")), 8, 9));
-//		stops.add(f.createTransitRouteStop(schedule.getFacilities().get(new IdImpl("6")), 10, 11));
-//		stops.add(f.createTransitRouteStop(schedule.getFacilities().get(new IdImpl("7")), 12, 13));
-//		stops.add(f.createTransitRouteStop(schedule.getFacilities().get(new IdImpl("8")), 14, 15));
-//		stops.add(f.createTransitRouteStop(schedule.getFacilities().get(new IdImpl("9")), 16, 17));
-//		stops.add(f.createTransitRouteStop(schedule.getFacilities().get(new IdImpl("10")), 18, 19));
-//		stops.add(f.createTransitRouteStop(schedule.getFacilities().get(new IdImpl("11")), 20, 21));
-//		stops.add(f.createTransitRouteStop(schedule.getFacilities().get(new IdImpl("12")), 22, 23));
-//		stops.add(f.createTransitRouteStop(schedule.getFacilities().get(new IdImpl("13")), 24, 25));
-//		stops.add(f.createTransitRouteStop(schedule.getFacilities().get(new IdImpl("14")), 26, 27));
-//		stops.add(f.createTransitRouteStop(schedule.getFacilities().get(new IdImpl("15")), 28, 29));
+//		stops.add(f.createTransitRouteStop(schedule.getFacilities().get(Id.create("1")), 0, 1));
+//		stops.add(f.createTransitRouteStop(schedule.getFacilities().get(Id.create("2")), 2, 3));
+//		stops.add(f.createTransitRouteStop(schedule.getFacilities().get(Id.create("3")), 4, 5));
+//		stops.add(f.createTransitRouteStop(schedule.getFacilities().get(Id.create("4")), 6, 7));
+//		stops.add(f.createTransitRouteStop(schedule.getFacilities().get(Id.create("5")), 8, 9));
+//		stops.add(f.createTransitRouteStop(schedule.getFacilities().get(Id.create("6")), 10, 11));
+//		stops.add(f.createTransitRouteStop(schedule.getFacilities().get(Id.create("7")), 12, 13));
+//		stops.add(f.createTransitRouteStop(schedule.getFacilities().get(Id.create("8")), 14, 15));
+//		stops.add(f.createTransitRouteStop(schedule.getFacilities().get(Id.create("9")), 16, 17));
+//		stops.add(f.createTransitRouteStop(schedule.getFacilities().get(Id.create("10")), 18, 19));
+//		stops.add(f.createTransitRouteStop(schedule.getFacilities().get(Id.create("11")), 20, 21));
+//		stops.add(f.createTransitRouteStop(schedule.getFacilities().get(Id.create("12")), 22, 23));
+//		stops.add(f.createTransitRouteStop(schedule.getFacilities().get(Id.create("13")), 24, 25));
+//		stops.add(f.createTransitRouteStop(schedule.getFacilities().get(Id.create("14")), 26, 27));
+//		stops.add(f.createTransitRouteStop(schedule.getFacilities().get(Id.create("15")), 28, 29));
 //		
 //		List<Id> links = new ArrayList<Id>();
-//		links.add(new IdImpl("2"));
-//		links.add(new IdImpl("3"));
-//		links.add(new IdImpl("4"));
-//		links.add(new IdImpl("5"));
-//		links.add(new IdImpl("6"));
-//		links.add(new IdImpl("5"));
-//		links.add(new IdImpl("6"));
-//		links.add(new IdImpl("7"));
-//		links.add(new IdImpl("8"));
-//		links.add(new IdImpl("9"));
-//		links.add(new IdImpl("10"));
-//		links.add(new IdImpl("11"));
-//		links.add(new IdImpl("12"));
-//		links.add(new IdImpl("13"));
-//		links.add(new IdImpl("14"));
-//		NetworkRoute netRoute = new LinkNetworkRouteImpl(new IdImpl("1"), links, new IdImpl("15"));
+//		links.add(Id.create("2"));
+//		links.add(Id.create("3"));
+//		links.add(Id.create("4"));
+//		links.add(Id.create("5"));
+//		links.add(Id.create("6"));
+//		links.add(Id.create("5"));
+//		links.add(Id.create("6"));
+//		links.add(Id.create("7"));
+//		links.add(Id.create("8"));
+//		links.add(Id.create("9"));
+//		links.add(Id.create("10"));
+//		links.add(Id.create("11"));
+//		links.add(Id.create("12"));
+//		links.add(Id.create("13"));
+//		links.add(Id.create("14"));
+//		NetworkRoute netRoute = new LinkNetworkRouteImpl(Id.create("1"), links, Id.create("15"));
 //		TransitRoute route = f.createTransitRoute(sc.createId("r1"), netRoute, stops, TransportMode.pt);
 //		Departure dep = f.createDeparture(sc.createId("d1"), 3600);
-//		dep.setVehicleId(new IdImpl("bus1"));
+//		dep.setVehicleId(Id.create("bus1"));
 //		route.addDeparture(dep);
 //		TransitLine line = f.createTransitLine(sc.createId("-B-1"));
 //		line.addRoute(route);
@@ -604,8 +623,8 @@ public class TransitScheduleAreaCut2 {
 		System.out.println(oldRoute.getRoute().getEndLinkId() +" \n");
 		System.out.println("\n");
 		System.out.println("new Schedule");
-//		System.out.println("lines: " + newSchedule.getTransitLines().size() + "\troutes: " + newSchedule.getTransitLines().get(new IdImpl("-B-1")).getRoutes().size());
-		for(TransitRoute r: newSchedule.getTransitLines().get(new IdImpl("-B-1")).getRoutes().values()){
+//		System.out.println("lines: " + newSchedule.getTransitLines().size() + "\troutes: " + newSchedule.getTransitLines().get(Id.create("-B-1")).getRoutes().size());
+		for(TransitRoute r: newSchedule.getTransitLines().get(Id.create("-B-1", TransitLine.class)).getRoutes().values()){
 			for(Departure d: r.getDepartures().values()){
 				System.out.println("routeId: " + r.getId().toString() + "\ttime: " + d.getDepartureTime() + 
 						"\t vehId: " + d.getVehicleId() + 

@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
@@ -31,19 +32,18 @@ import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.andreas.utils.pt.DelayTracker;
 
 public class DelayEvalStop {
 	
-	private final static Logger log = Logger.getLogger(DelayEvalStop.class);
 	private int treshold = 0;
 	private final TransitSchedule schedule;
 
@@ -93,7 +93,7 @@ public class DelayEvalStop {
 		HashMap<Integer, DelayCountBox> delayMapTerm = new HashMap<Integer, DelayCountBox>();
 		HashMap<Integer, DelayCountBox> delayMapTreshold =  new HashMap<Integer, DelayCountBox>();
 		HashMap<Integer, DelayCountBox> delayMapTermTreshold  =  new HashMap<Integer, DelayCountBox>();
-		LinkedList<IdImpl> termList = new LinkedList<IdImpl>();
+		LinkedList<Id<TransitStopFacility>> termList = new LinkedList<>();
 		
 		private int treshold;
 		private DelayTracker delayTracker;
@@ -122,7 +122,7 @@ public class DelayEvalStop {
 		}
 		
 		public void addTermStop(String stop){
-			this.termList.add(new IdImpl(stop));
+			this.termList.add(Id.create(stop, TransitStopFacility.class));
 		}
 
 		@Override

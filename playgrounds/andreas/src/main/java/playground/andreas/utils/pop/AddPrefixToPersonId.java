@@ -1,9 +1,9 @@
 package playground.andreas.utils.pop;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -30,7 +30,7 @@ public class AddPrefixToPersonId extends NewPopulation {
 
 	@Override
 	public void run(Person person) {
-        ((PersonImpl) person).setId(new IdImpl(this.preFix + person.getId().toString()));
+        ((PersonImpl) person).setId(Id.create(this.preFix + person.getId().toString(), Person.class));
         this.popWriter.writePerson(person);
 	}
 

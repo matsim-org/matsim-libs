@@ -18,10 +18,17 @@
  * *********************************************************************** */
 package playground.andreas.utils.pop;
 
+import java.util.HashMap;
+import java.util.Map.Entry;
+
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.*;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -33,10 +40,8 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.GK4toWGS84;
-import playground.andreas.utils.ana.acts2kml.KMLActsWriter;
 
-import java.util.HashMap;
-import java.util.Map.Entry;
+import playground.andreas.utils.ana.acts2kml.KMLActsWriter;
 
 /**
  * Move all acts from a given area to a given coordinate
@@ -89,7 +94,7 @@ public class MoveAllPersonActsFromAreaToCoord extends NewPopulation {
 						this.kmlWriter.addActivity(new ActivityImpl(act));
 					}
 					act.getCoord().setXY(this.targetCoord.getX(), this.targetCoord.getY());
-                    ((PersonImpl) person).setId(new IdImpl(person.getId().toString() + "_source-target"));
+                    ((PersonImpl) person).setId(Id.create(person.getId().toString() + "_source-target", Person.class));
                 }
 			}
 		}

@@ -5,10 +5,10 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 
 public class ReadStopIDNamesMap implements TabularFileHandler {
@@ -16,8 +16,9 @@ public class ReadStopIDNamesMap implements TabularFileHandler {
 	private static final Logger log = Logger.getLogger(ReadStopIDNamesMap.class);
 	
 	private TabularFileParserConfig tabFileParserConfig;
-	private HashMap<Id, String> stopIDNameMap = new HashMap<Id, String>();
+	private HashMap<Id<TransitStopFacility>, String> stopIDNameMap = new HashMap<>();
 
+	@Override
 	public void startRow(String[] row) throws IllegalArgumentException {
 				
 		if(row[0].contains("$")){
@@ -29,7 +30,7 @@ public class ReadStopIDNamesMap implements TabularFileHandler {
 			}
 			log.info("Ignoring: " + tempBuffer);
 		} else if(row.length == 12){			
-			this.stopIDNameMap.put(new IdImpl(row[0]), row[3]);			
+			this.stopIDNameMap.put(Id.create(row[0], TransitStopFacility.class), row[3]);			
 		} else {
 			StringBuffer tempBuffer = new StringBuffer();
 			for (String string : row) {
@@ -41,7 +42,7 @@ public class ReadStopIDNamesMap implements TabularFileHandler {
 		
 	}
 	
-	public static HashMap<Id, String> readFile(String filename) throws IOException {
+	public static HashMap<Id<TransitStopFacility>, String> readFile(String filename) throws IOException {
 		
 		ReadStopIDNamesMap stopNameMapReader = new ReadStopIDNamesMap();
 		

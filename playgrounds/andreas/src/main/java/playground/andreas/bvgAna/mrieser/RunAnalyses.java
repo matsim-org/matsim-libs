@@ -49,7 +49,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -74,6 +73,7 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 
 import playground.andreas.bvgAna.level1.PersonEnterLeaveVehicle2ActivityHandler;
 import playground.andreas.bvgAna.level1.StopId2PersonEnterLeaveVehicleHandler;
@@ -184,13 +184,13 @@ public class RunAnalyses {
 		}
 	}
 
-	public Set<Id> readIdSet(final String filename) {
-		Set<Id> set = new HashSet<Id>(500);
+	public <T> Set<Id<T>> readIdSet(final String filename, Class<T> idType) {
+		Set<Id<T>> set = new HashSet<>(500);
 		try {
 			BufferedReader reader = IOUtils.getBufferedReader(filename);
 			String line = null;
 			while ((line = reader.readLine()) != null) {
-				set.add(new IdImpl(line));
+				set.add(Id.create(line, idType));
 			}
 		} catch (IOException e) {
 			throw new RuntimeException(e);
@@ -309,13 +309,13 @@ public class RunAnalyses {
 
 	}
 
-	private Id getBaseId(final Id stopId) {
+	private Id<TransitStopFacility> getBaseId(final Id<TransitStopFacility> stopId) {
 		String s = stopId.toString();
 		int pos = s.indexOf('.');
 		if (pos < 0) {
 			return stopId;
 		}
-		return new IdImpl(s.substring(0, pos));
+		return Id.create(s.substring(0, pos), TransitStopFacility.class);
 	}
 
 	private int getTimeSlot(final double time) {
@@ -326,7 +326,7 @@ public class RunAnalyses {
 		return slot;
 	}
 
-	public void createMissedConnectionStats(Set<Id> agentIds) {
+	public void createMissedConnectionStats(Set<Id<Person>> agentIds) {
 		AgentId2StopDifferenceMap missedConnections = new AgentId2StopDifferenceMap(this.scenario.getPopulation(), agentIds);
 
 		EventsManager em = EventsUtils.createEventsManager();
@@ -397,12 +397,12 @@ public class RunAnalyses {
 		}
 	}
 
-	public void createCatchmentAreaStats(Set<Id> agentIds, Id lineId, Id[] routeIds) {
+	public void createCatchmentAreaStats(Set<Id<Person>> agentIds, Id<TransitLine> lineId, Id<TransitRoute>[] routeIds) {
 		TransitSchedule ts = ((ScenarioImpl) this.scenario).getTransitSchedule();
-		Set<Id> stopIds = new HashSet<Id>();
-		Set<Id> vehicleIds = new HashSet<Id>();
+		Set<Id<TransitStopFacility>> stopIds = new HashSet<>();
+		Set<Id<Vehicle>> vehicleIds = new HashSet<>();
 		TransitLine line = ts.getTransitLines().get(lineId);
-		for (Id routeId : routeIds) {
+		for (Id<TransitRoute> routeId : routeIds) {
 			TransitRoute route = line.getRoutes().get(routeId);
 			for (TransitRouteStop stop : route.getStops()) {
 				stopIds.add(stop.getStopFacility().getId());
@@ -629,12 +629,12 @@ public class RunAnalyses {
 //		app.extractSelectedPlansOnly();
 		app.readSelectedPlansOnly();
 //		app.createPersonAttributeTable("personAttributes.txt", "allPersonIds.txt");
-		Set<Id> allPersonIds = app.readIdSet("allPersonIds.txt");
+		Set<Id<Person>> allPersonIds = app.readIdSet("allPersonIds.txt", Person.class);
 //		System.out.println(allPersonIds.size());
 		app.readTransitSchedule();
 //		app.createRemainSeatedStats();
 //		app.createMissedConnectionStats(allPersonIds);
-		app.createCatchmentAreaStats(allPersonIds, new IdImpl("BVB----145"),
-				new Id[] {new IdImpl("BVB----145.10.GEN12.R"), new IdImpl("BVB----145.10.GEN5.R"), new IdImpl("BVB----145.10.GEN8.R")});
+		app.createCatchmentAreaStats(allPersonIds, Id.create("BVB----145", TransitLine.class),
+				new Id[] {Id.create("BVB----145.10.GEN12.R", TransitRoute.class), Id.create("BVB----145.10.GEN5.R", TransitRoute.class), Id.create("BVB----145.10.GEN8.R", TransitRoute.class)});
 	}
 }

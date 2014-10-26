@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
@@ -60,10 +60,10 @@ public class ReadNewStops implements TabularFileHandler {
 	public void startRow(String[] row) {
 		if(!row[0].trim().startsWith("#")){
 			try {
-				Id stopId = new IdImpl(row[0].trim());
+				Id<TransitStopFacility> stopId = Id.create(row[0].trim(), TransitStopFacility.class);
 				double xCoord = Double.valueOf(row[1].trim());
 				double yCoord = Double.valueOf(row[2].trim());
-				Id linkId = new IdImpl(row[3].trim());
+				Id<Link> linkId = Id.create(row[3].trim(), Link.class);
 				String stopName = row[4].trim();
 				
 				TransitStopFacility stop = fac.createTransitStopFacility(stopId, new CoordImpl(xCoord, yCoord), false);

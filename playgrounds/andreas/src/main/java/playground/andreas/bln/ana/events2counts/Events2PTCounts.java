@@ -22,12 +22,14 @@ import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 
 import playground.andreas.bln.ana.events2timespacechart.ReadStopIDNamesMap;
 
@@ -38,25 +40,25 @@ public class Events2PTCounts implements VehicleArrivesAtFacilityEventHandler, Ve
 	String outDir;
 	String countsOutFile;
 	String eventsInFile;
-	HashMap<Id, String>  stopID2NameMap;
-	Map<Id, Id> vehID2LineMap;
-	Map<String, Id> string2LineIDMap;
+	HashMap<Id<TransitStopFacility>, String>  stopID2NameMap;
+	Map<Id<Vehicle>, Id<TransitLine>> vehID2LineMap;
+	Map<String, Id<TransitLine>> string2LineIDMap;
 	
 	TransitSchedule transitSchedule;
 	
-	Map<Id, Map<Id, StopCountBox>> line2StopCountMap;
-	public Map<Id, Map<Id, StopCountBox>> getLine2StopCountMap() {
+	Map<Id<TransitLine>, Map<Id<TransitStopFacility>, StopCountBox>> line2StopCountMap;
+	public Map<Id<TransitLine>, Map<Id<TransitStopFacility>, StopCountBox>> getLine2StopCountMap() {
 		return this.line2StopCountMap;
 	}
 
-	Map<Id, Id> veh2CurrentStopMap = new HashMap<Id, Id>();
-	Map<Id, List<List<Id>>> line2MainLinesMap;
+	Map<Id<Vehicle>, Id<TransitStopFacility>> veh2CurrentStopMap = new HashMap<>();
+	Map<Id<TransitLine>, List<List<Id>>> line2MainLinesMap;
 
 	public Events2PTCounts(String outDir, String eventsInFile, String stopIDMapFile, String networkFile, String transitScheduleFile) throws IOException {
 		this(outDir, eventsInFile, ReadStopIDNamesMap.readFile(stopIDMapFile), ReadTransitSchedule.readTransitSchedule(networkFile, transitScheduleFile));
 	}
 	
-	public Events2PTCounts(String outDir, String eventsInFile, HashMap<Id, String> stopIDMap, TransitSchedule transitSchedule){
+	public Events2PTCounts(String outDir, String eventsInFile, HashMap<Id<TransitStopFacility>, String> stopIDMap, TransitSchedule transitSchedule){
 		this.eventsInFile = eventsInFile;
 		this.stopID2NameMap = stopIDMap;
 		this.transitSchedule = transitSchedule;
@@ -64,7 +66,7 @@ public class Events2PTCounts implements VehicleArrivesAtFacilityEventHandler, Ve
 	}
 
 	public void run() {
-		this.line2StopCountMap = new HashMap<Id, Map<Id,StopCountBox>>();
+		this.line2StopCountMap = new HashMap<>();
 		this.vehID2LineMap = CreateVehID2LineMap.createVehID2LineMap(this.transitSchedule);
 		this.string2LineIDMap = CreateString2LineIDMap.createString2LineIDMap(this.transitSchedule);
 		this.line2MainLinesMap = TransitSchedule2MainLine.createMainLinesFromTransitSchedule(this.transitSchedule);
@@ -79,7 +81,7 @@ public class Events2PTCounts implements VehicleArrivesAtFacilityEventHandler, Ve
 	}
 	
 	protected void check() {
-		for (Entry<Id, Map<Id, StopCountBox>> line2StopEntry : this.line2StopCountMap.entrySet()) {
+		for (Entry<Id<TransitLine>, Map<Id<TransitStopFacility>, StopCountBox>> line2StopEntry : this.line2StopCountMap.entrySet()) {
 			
 			int inOutBalance = 0;
 			
@@ -101,7 +103,7 @@ public class Events2PTCounts implements VehicleArrivesAtFacilityEventHandler, Ve
 		try {
 			BufferedWriter writer;
 		
-			for (Id lineId : this.line2StopCountMap.keySet()) {
+			for (Id<TransitLine> lineId : this.line2StopCountMap.keySet()) {
 
 				if(this.transitSchedule.getTransitLines().get(lineId) != null){
 
@@ -109,7 +111,7 @@ public class Events2PTCounts implements VehicleArrivesAtFacilityEventHandler, Ve
 
 						// prepare occupancy
 
-						TreeMap<Id, ArrayList<Integer>> stop2OccuMap = new TreeMap<Id, ArrayList<Integer>>();
+						TreeMap<Id<TransitStopFacility>, ArrayList<Integer>> stop2OccuMap = new TreeMap<>();
 
 						for (int i = 0; i < new StopCountBox(null, null).accessCount.length; i++) {
 							for (TransitRouteStop routeStop : transitRoute.getStops()) {
@@ -140,7 +142,7 @@ public class Events2PTCounts implements VehicleArrivesAtFacilityEventHandler, Ve
 						int occupancy = 0;
 						for (TransitRouteStop routeStop : transitRoute.getStops()) {							
 
-							writer.write(this.stopID2NameMap.get(new IdImpl(routeStop.getStopFacility().getId().toString().split("\\.")[0])) + "; ");
+							writer.write(this.stopID2NameMap.get(Id.create(routeStop.getStopFacility().getId().toString().split("\\.")[0], TransitStopFacility.class)) + "; ");
 
 							StopCountBox stopCountBox = this.line2StopCountMap.get(lineId).get(routeStop.getStopFacility().getId());
 							occupancy += stopCountBox.getTotalAccessSum() - stopCountBox.getTotalEgressSum();
@@ -176,26 +178,26 @@ public class Events2PTCounts implements VehicleArrivesAtFacilityEventHandler, Ve
 
 	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-		Id vehId = event.getVehicleId();
-		Id stopId = event.getFacilityId();
-		Id lineId = this.vehID2LineMap.get(vehId);
+		Id<Vehicle> vehId = event.getVehicleId();
+		Id<TransitStopFacility> stopId = event.getFacilityId();
+		Id<TransitLine> lineId = this.vehID2LineMap.get(vehId);
 		
 		if(lineId == null){
 			log.error("Veh id == null");
 		}
 		
 		if(this.line2StopCountMap.get(lineId) == null){
-			this.line2StopCountMap.put(lineId, new HashMap<Id, StopCountBox>());
+			this.line2StopCountMap.put(lineId, new HashMap<Id<TransitStopFacility>, StopCountBox>());
 		}
 		
 		if(this.line2StopCountMap.get(lineId).get(stopId) == null){
-			this.line2StopCountMap.get(lineId).put(stopId, new StopCountBox(stopId, this.stopID2NameMap.get(new IdImpl(stopId.toString().split("\\.")[0]))));
+			this.line2StopCountMap.get(lineId).put(stopId, new StopCountBox(stopId, this.stopID2NameMap.get(Id.create(stopId.toString().split("\\.")[0], TransitStopFacility.class))));
 		}
 		
 		this.veh2CurrentStopMap.put(vehId, stopId);		
 	}
 	
-	private Id getLineIDFromRoute(Id routeID){
+	private Id<TransitLine> getLineIDFromRoute(Id<TransitRoute> routeID){
 		return this.string2LineIDMap.get(routeID.toString().split("\\.")[0]);
 	}
 

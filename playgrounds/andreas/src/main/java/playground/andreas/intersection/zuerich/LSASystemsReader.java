@@ -4,12 +4,12 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
+import org.matsim.signalsystems.model.SignalSystem;
 
 public class LSASystemsReader implements TabularFileHandler {
 
@@ -23,6 +23,7 @@ public class LSASystemsReader implements TabularFileHandler {
 		this.signals = signalSystems;
 	}
 
+	@Override
 	public void startRow(String[] row) throws IllegalArgumentException {
 
 		if (row[0].contains("LSAID")) {
@@ -30,7 +31,7 @@ public class LSASystemsReader implements TabularFileHandler {
 		}
 		else {
 			// log.info("Added: " + row.toString());
-			Id signalSystemId = new IdImpl(row[0]);
+			Id<SignalSystem> signalSystemId = Id.create(row[0], SignalSystem.class);
 
 			if (this.signals.getSignalSystemData().containsKey(signalSystemId)) {
 				log.error("Cannot create signal system definition id " + signalSystemId + " twice!");

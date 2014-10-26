@@ -19,11 +19,14 @@
 
 package playground.andreas.bvgAna;
 
+import java.util.TreeMap;
+import java.util.TreeSet;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
@@ -34,8 +37,18 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.VehicleReaderV1;
-import playground.andreas.bvgAna.level1.*;
+
+import playground.andreas.bvgAna.level1.AgentId2EnterLeaveVehicleEventHandler;
+import playground.andreas.bvgAna.level1.AgentId2PtTripTravelTimeMap;
+import playground.andreas.bvgAna.level1.PersonEnterLeaveVehicle2ActivityHandler;
+import playground.andreas.bvgAna.level1.StopId2LineId2Pulk;
+import playground.andreas.bvgAna.level1.StopId2PersonEnterLeaveVehicleHandler;
+import playground.andreas.bvgAna.level1.VehDelayAtStopHistogram;
+import playground.andreas.bvgAna.level1.VehId2DelayAtStopMap;
+import playground.andreas.bvgAna.level1.VehId2OccupancyHandler;
+import playground.andreas.bvgAna.level1.VehId2PersonEnterLeaveVehicleMap;
 import playground.andreas.bvgAna.level2.StopId2DelayOfLine24hMap;
 import playground.andreas.bvgAna.level2.StopId2RemainSeatedDataMap;
 import playground.andreas.bvgAna.level2.VehId2AgentIds;
@@ -43,9 +56,6 @@ import playground.andreas.bvgAna.level2.VehId2LoadMap;
 import playground.andreas.bvgAna.level3.AgentId2StopDifferenceMap;
 import playground.andreas.bvgAna.level4.StopId2MissedVehMap;
 import playground.andreas.bvgAna.level4.StopId2MissedVehMapData;
-
-import java.util.TreeMap;
-import java.util.TreeSet;
 
 /**
  * Simple test class
@@ -90,22 +100,22 @@ public class TestMain {
 
 		new VehicleReaderV1(sc.getVehicles()).readFile(vehDefinitionFile);
 
-		TreeSet<Id> agentIds = new TreeSet<Id>();
-		agentIds.add(new IdImpl("1000"));
-		agentIds.add(new IdImpl("10001"));
-		agentIds.add(new IdImpl("10002"));
-		agentIds.add(new IdImpl("2176"));
-		agentIds.add(new IdImpl("182"));
+		TreeSet<Id<Person>> agentIds = new TreeSet<>();
+		agentIds.add(Id.create("1000", Person.class));
+		agentIds.add(Id.create("10001", Person.class));
+		agentIds.add(Id.create("10002", Person.class));
+		agentIds.add(Id.create("2176", Person.class));
+		agentIds.add(Id.create("182", Person.class));
 
 		AgentId2StopDifferenceMap comp = new AgentId2StopDifferenceMap(plans, agentIds);
 		eventsManager.addHandler(comp);
 
-		TreeSet<Id> stopIds = new TreeSet<Id>();
-		stopIds.add(new IdImpl("812013.1"));
-		stopIds.add(new IdImpl("792200.4"));
-		stopIds.add(new IdImpl("792050.2"));
-		stopIds.add(new IdImpl("801040.1"));
-		stopIds.add(new IdImpl("804070.2"));
+		TreeSet<Id<TransitStopFacility>> stopIds = new TreeSet<>();
+		stopIds.add(Id.create("812013.1", TransitStopFacility.class));
+		stopIds.add(Id.create("792200.4", TransitStopFacility.class));
+		stopIds.add(Id.create("792050.2", TransitStopFacility.class));
+		stopIds.add(Id.create("801040.1", TransitStopFacility.class));
+		stopIds.add(Id.create("804070.2", TransitStopFacility.class));
 
 		StopId2PersonEnterLeaveVehicleHandler stophandler = new StopId2PersonEnterLeaveVehicleHandler(stopIds);
 //		eventsManager.addHandler(stophandler);
@@ -167,12 +177,12 @@ public class TestMain {
 //
 //		TreeMap<Id, PersonImpl> map10 = AgentId2PersonMap.getAgentId2PersonMap(plans, agentIds);
 //
-//		int occu = veh2occu.getVehicleLoad(new IdImpl("veh_8"), 46127.0);
-//		double load = veh2load.getVehLoadByTime(new IdImpl("veh_8"), 46127.0);
+//		int occu = veh2occu.getVehicleLoad(Id.create("veh_8"), 46127.0);
+//		double load = veh2load.getVehLoadByTime(Id.create("veh_8"), 46127.0);
 //
 //		Map<Id, List<StopId2RemainSeatedDataMapData>> remSeat = remainSeated.getStopId2RemainSeatedDataMap();
-//		int rS = remSeat.get(new IdImpl("812013.1")).get(68).getNumberOfAgentsRemainedSeated();
-//		double fS = remSeat.get(new IdImpl("812013.1")).get(68).getFractionRemainedSeated();
+//		int rS = remSeat.get(Id.create("812013.1")).get(68).getNumberOfAgentsRemainedSeated();
+//		double fS = remSeat.get(Id.create("812013.1")).get(68).getFractionRemainedSeated();
 //
 //		TreeMap<Id, LinkedList<VehId2DelayAtStopMapData>> vdelay = v2delay.getVehId2DelayAtStopMap();
 //
@@ -182,7 +192,7 @@ public class TestMain {
 //		TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>> v2lm = v2ELM.getVehId2PersonLeaveEventMap();
 //
 //		@SuppressWarnings("unused")
-//		Set<Id> v2agidr = v2agid.getAgentIdsInVehicle(new IdImpl("veh_8"), 46127.0);
+//		Set<Id> v2agidr = v2agid.getAgentIdsInVehicle(Id.create("veh_8"), 46127.0);
 //
 //		TreeMap<Id, TreeMap<Id, List<StopId2LineId2PulkData>>> s2pulkR = s2pulk.getStopId2LineId2PulkDataList();
 

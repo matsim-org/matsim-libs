@@ -26,19 +26,17 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -88,7 +86,7 @@ public class NetworkSimplifier {
 
 									// Try to merge both links by guessing the resulting links attributes
 									Link link = network.getFactory().createLink(
-											new IdImpl(inLink.getId() + "-" + outLink.getId()),
+											Id.create(inLink.getId() + "-" + outLink.getId(), Link.class),
 											inLink.getFromNode().getId(),
 											outLink.getToNode().getId());
 
@@ -120,7 +118,7 @@ public class NetworkSimplifier {
 									// Only merge links with same attributes
 									if(bothLinksHaveSameLinkStats(inLink, outLink)){
 										LinkImpl newLink = ((NetworkImpl) network).createAndAddLink(
-												new IdImpl(inLink.getId() + "-" + outLink.getId()),
+												Id.create(inLink.getId() + "-" + outLink.getId(), Link.class),
 												inLink.getFromNode(),
 												outLink.getToNode(),
 												inLink.getLength() + outLink.getLength(),
@@ -202,7 +200,7 @@ public class NetworkSimplifier {
 		nodeTypesToMerge.add(new Integer(4));
 		nodeTypesToMerge.add(new Integer(5));
 
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile("./bb_5.xml.gz");
 

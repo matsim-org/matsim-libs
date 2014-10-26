@@ -1,15 +1,14 @@
 package playground.andreas.bvgAna.level1;
 
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.vehicles.Vehicle;
 
 public class AgentId2DepartureDelayAtStopMapDataTest {
 	
@@ -18,18 +17,11 @@ public class AgentId2DepartureDelayAtStopMapDataTest {
 	@Test
 	public void testAgentId2DepartureDelayAtStopMapData() {
 		
-        Id[] ida= new Id[15];
-    	Set<Id> idSet = new TreeSet<Id>();
-        for (int ii=0; ii<15; ii++){
-        	ida[ii] = new IdImpl(ii); 
-            idSet.add(ida[ii]);
-        }
-        
 //        assign Ids to routes, vehicles and agents to be used in Test
         
-        Id vehId1 = ida[4];
-        Id persId1 = ida[0];
-        Id linkId3 = ida[13];
+        Id<Vehicle> vehId1 = Id.create(4, Vehicle.class);
+        Id<Person> persId1 = Id.create(0, Person.class);
+        Id<Link> linkId3 = Id.create(13, Link.class);
 
         AgentId2DepartureDelayAtStopMapData data = new AgentId2DepartureDelayAtStopMapData(persId1);
         

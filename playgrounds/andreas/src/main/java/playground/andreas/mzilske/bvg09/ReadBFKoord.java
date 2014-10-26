@@ -6,11 +6,11 @@ import java.util.HashMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * Reads a HAFAS transit stop coordinates from Hafas BFKoord file 
@@ -24,8 +24,8 @@ public class ReadBFKoord implements TabularFileHandler{
 	
 	private TabularFileParserConfig tabFileParserConfig;
 	
-	private HashMap<Id, Coord> stopCoords = new HashMap<Id, Coord>();
-	private HashMap<Id, String> stopNames = new HashMap<Id, String>();
+	private HashMap<Id<TransitStopFacility>, Coord> stopCoords = new HashMap<>();
+	private HashMap<Id<TransitStopFacility>, String> stopNames = new HashMap<>();
 	
 	public void readBFKoord(String filename) throws IOException {
 		
@@ -38,11 +38,11 @@ public class ReadBFKoord implements TabularFileHandler{
 				
 	}
 	
-	public HashMap<Id, Coord> getStopCoords(){
+	public HashMap<Id<TransitStopFacility>, Coord> getStopCoords(){
 		return this.stopCoords;
 	}
 	
-	public HashMap<Id, String> getStopNames(){
+	public HashMap<Id<TransitStopFacility>, String> getStopNames(){
 		return this.stopNames;
 	}
 
@@ -56,13 +56,13 @@ public class ReadBFKoord implements TabularFileHandler{
 			}
 			log.info("Ignoring: " + tempBuffer);
 		} else {
-			this.stopCoords.put(new IdImpl(row[0]), new CoordImpl(row[1], row[2]));
+			this.stopCoords.put(Id.create(row[0], TransitStopFacility.class), new CoordImpl(row[1], row[2]));
 			StringBuffer sB = new StringBuffer();
 			for (int i = 3; i < row.length; i++) {
 				sB.append(row[i]);
 				sB.append(" ");
 			}
-			this.stopNames.put(new IdImpl(row[0]), sB.toString().trim());			
+			this.stopNames.put(Id.create(row[0], TransitStopFacility.class), sB.toString().trim());			
 		}
 		
 	}

@@ -19,14 +19,18 @@
 
 package playground.andreas.bvg5;
 
-import com.vividsolutions.jts.geom.*;
-import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.apache.log4j.Logger;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -42,11 +46,18 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.opengis.feature.simple.SimpleFeature;
+
 import playground.andreas.P2.stats.abtractPAnalysisModules.BVGLines2PtModes;
 import playground.andreas.utils.pop.FilterPopulationByShape;
 import playground.andreas.utils.pt.TransitLineRemover;
 
-import java.util.*;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
 /**
  * 
@@ -101,9 +112,9 @@ public class ScenarioGenerator {
 //		String scenarioAreaFilename = "e:/_shared-svn/andreas/paratransit/txl/run/output_medium/scenarioArea.shp";
 //		String scenarioAreaFilename = "e:/_shared-svn/andreas/paratransit/txl/run/output_huge/scenarioArea.shp";
 		
-		Set<Id> linesToSimulatePara = new TreeSet<Id>();
+		Set<Id<TransitLine>> linesToSimulatePara = new TreeSet<>();
 		// B285
-		linesToSimulatePara.add(new IdImpl("285-B-285"));
+		linesToSimulatePara.add(Id.create("285-B-285", TransitLine.class));
 
 		// 100/200
 //		linesToSimulatePara.add(new IdImpl("100-B-100"));
@@ -140,7 +151,7 @@ public class ScenarioGenerator {
 		log.info("Lines in para schedule: " + paraSchedule.getTransitLines().keySet());
 		
 		// get all link ids
-		Set<Id> linksToConvert = new TreeSet<Id>();
+		Set<Id<Link>> linksToConvert = new TreeSet<>();
 		for (TransitLine line : paraSchedule.getTransitLines().values()) {
 			for (TransitRoute route : line.getRoutes().values()) {
 				linksToConvert.add(route.getRoute().getStartLinkId());
@@ -159,7 +170,7 @@ public class ScenarioGenerator {
 		
 		List<Geometry> polygons = new ArrayList<Geometry>();
 		
-		for(Id linkId: linksToConvert){
+		for(Id<Link> linkId: linksToConvert){
 			List<Coordinate> coords = new ArrayList<Coordinate>();
 			
 			Coord fromNode = this.baseScenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord();
@@ -231,14 +242,14 @@ public class ScenarioGenerator {
 		return filename;
 	}
 
-	private TransitSchedule createParaSchedule(Set<Id> linesToSimulateAsPara, String targetCoordinateSystem) {
+	private TransitSchedule createParaSchedule(Set<Id<TransitLine>> linesToSimulateAsPara, String targetCoordinateSystem) {
 		log.info("Extracting the following lines from schedule: " + linesToSimulateAsPara);
 		log.info("Target coord system: " + targetCoordinateSystem);
 		TransitSchedule remainingSchedule = TransitLineRemover.removeTransitLinesFromTransitSchedule(this.baseScenario.getTransitSchedule(), linesToSimulateAsPara);
 		new TransitScheduleWriterV1(remainingSchedule).write(this.outputDir + "remainingSchedule.xml.gz");
 
-		Set<Id> linesToRemove = new TreeSet<Id>();
-		for (Id lineId : remainingSchedule.getTransitLines().keySet()) {
+		Set<Id<TransitLine>> linesToRemove = new TreeSet<>();
+		for (Id<TransitLine> lineId : remainingSchedule.getTransitLines().keySet()) {
 			linesToRemove.add(lineId);
 		}
 		

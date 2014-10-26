@@ -1,42 +1,37 @@
 package playground.andreas.bvgAna.level1;
 
-import java.util.Set;
-import java.util.TreeSet;
-
 import junit.framework.Assert;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 
 public class StopId2RouteId2DelayAtStopMapTest {
 	
 	@Test
 	public void testStopId2RouteId2DelayAtStopMap() {
 	    
-		Id[] ida= new Id[15];
-		Set<Id> idSet = new TreeSet<Id>();
-	    for (int ii=0; ii<15; ii++){
-	    	ida[ii] = new IdImpl(ii); 
-	        idSet.add(ida[ii]);
-	    }
-	    
 //	    assign Ids to routes, vehicles and agents to be used in Test
 		
-		Id vehId1 = ida[1];
-	    Id vehId2 = ida[2];
-	    Id driverId1 = ida[4];
-	    Id driverId2 = ida[5];
-	    Id departureId1 = ida[6];
-	    Id departureId2 = ida[7];
-	    Id transitRouteId1 = ida[14];
-	    Id transitRouteId2 = ida[2];
-	    Id transitLineId1 = ida[4];
-	    Id transitLineId2 = ida[6];
-	    Id facilityId1 = ida[8];
-	    Id facilityId2 = ida[9];
+			Id<Vehicle> vehId1 = Id.create(1, Vehicle.class);
+	    Id<Vehicle> vehId2 = Id.create(2, Vehicle.class);
+	    Id<Person> driverId1 = Id.create(4, Person.class);
+	    Id<Person> driverId2 = Id.create(5, Person.class);
+	    Id<Departure> departureId1 = Id.create(6, Departure.class);
+	    Id<Departure> departureId2 = Id.create(7, Departure.class);
+	    Id<TransitRoute> transitRouteId1 = Id.create(14, TransitRoute.class);
+	    Id<TransitRoute> transitRouteId2 = Id.create(2, TransitRoute.class);
+	    Id<TransitLine> transitLineId1 = Id.create(4, TransitLine.class);
+	    Id<TransitLine> transitLineId2 = Id.create(6, TransitLine.class);
+	    Id<TransitStopFacility> facilityId1 = Id.create(8, TransitStopFacility.class);
+	    Id<TransitStopFacility> facilityId2 = Id.create(9, TransitStopFacility.class);
 	    
 //	    create events
 	    

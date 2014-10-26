@@ -26,7 +26,7 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.counts.Counts;
 import org.matsim.counts.CountsWriter;
 
@@ -63,10 +63,10 @@ public class ConvertTSV2Counts {
 
 
 		for (CountStationDataBox countStation : countStationsMap.values()) {
-			counts.createAndAddCount(new IdImpl(countStation.getShortName()), countStation.getShortName());
-			counts.getCount(new IdImpl(countStation.getShortName())).setCoord(countStation.getCoord());
+			counts.createAndAddCount(Id.create(countStation.getShortName(), Link.class), countStation.getShortName());
+			counts.getCount(Id.create(countStation.getShortName(), Link.class)).setCoord(countStation.getCoord());
 			String filename = workingDir + "Wochenübersicht_" + countStation.getShortName() + ".tsv";
-			ReadCountDataForWeek.readCountDataForWeek(filename, counts.getCount(new IdImpl(countStation.getShortName())), startTag);
+			ReadCountDataForWeek.readCountDataForWeek(filename, counts.getCount(Id.create(countStation.getShortName(), Link.class)), startTag);
 		}
 
 		Set<Id> countIds = new TreeSet<Id>(counts.getCounts().keySet());

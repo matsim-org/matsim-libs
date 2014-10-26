@@ -11,13 +11,15 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.CountSimComparisonImpl;
 import org.matsim.counts.Counts;
 import org.matsim.pt.counts.PtCountSimComparisonKMLWriter;
+import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 
 /**
@@ -62,7 +64,7 @@ public class Compare2PTCounts extends Events2PTCounts{
 			this.outDir = parentDir + Compare2PTCounts.run1 + "/";
 			(new File(this.outDir)).mkdir();
 			this.run();
-			Map<Id, Map<Id, StopCountBox>> countsMap1 = this.getLine2StopCountMap();
+			Map<Id<TransitLine>, Map<Id<TransitStopFacility>, StopCountBox>> countsMap1 = this.getLine2StopCountMap();
 
 			reset();
 			this.eventsInFile = Compare2PTCounts.inDir + Compare2PTCounts.run2 + "." + Compare2PTCounts.iteration + ".events.xml.gz";
@@ -70,21 +72,21 @@ public class Compare2PTCounts extends Events2PTCounts{
 			this.outDir = parentDir + Compare2PTCounts.run2 + "/";
 			(new File(this.outDir)).mkdir();
 			this.run();
-			Map<Id, Map<Id, StopCountBox>> countsMap2 = this.getLine2StopCountMap();
-//			countsMap2.put(new IdImpl("344  "), null);
+			Map<Id<TransitLine>, Map<Id<TransitStopFacility>, StopCountBox>> countsMap2 = this.getLine2StopCountMap();
+//			countsMap2.put(Id.create("344  "), null);
 
 			this.outDir = parentDir + Compare2PTCounts.run2 + "-" + Compare2PTCounts.run1 + "/";
 			(new File(this.outDir)).mkdir();
 
 			createSimpleKMZ(countsMap1, countsMap2, this.transitSchedule);
 
-			TreeSet<Id> unionOfLineIds = new TreeSet<Id>();
+			TreeSet<Id<TransitLine>> unionOfLineIds = new TreeSet<>();
 			unionOfLineIds.addAll(countsMap1.keySet());
 			unionOfLineIds.addAll(countsMap2.keySet());
 
-			Map<Id, Map<Id, StopCountBox>> mergedMap = new HashMap<Id, Map<Id,StopCountBox>>();
+			Map<Id<TransitLine>, Map<Id<TransitStopFacility>, StopCountBox>> mergedMap = new HashMap<>();
 
-			for (Id lineId : unionOfLineIds) {
+			for (Id<TransitLine> lineId : unionOfLineIds) {
 
 				if(countsMap1.get(lineId) != null){
 					if(countsMap2.get(lineId) != null){
@@ -115,19 +117,19 @@ public class Compare2PTCounts extends Events2PTCounts{
 
 	}
 
-	private void createSimpleKMZ(Map<Id, Map<Id, StopCountBox>> line2StopCountMap1, Map<Id, Map<Id, StopCountBox>> line2StopCountMap2, TransitSchedule transitSchedule) {
+	private void createSimpleKMZ(Map<Id<TransitLine>, Map<Id<TransitStopFacility>, StopCountBox>> line2StopCountMap1, Map<Id<TransitLine>, Map<Id<TransitStopFacility>, StopCountBox>> line2StopCountMap2, TransitSchedule transitSchedule) {
 
 		HashMap<String, String> stringStopNameMap = new HashMap<String, String>();
-		for (Entry<Id, String> stopEntry : this.stopID2NameMap.entrySet()) {
+		for (Entry<Id<TransitStopFacility>, String> stopEntry : this.stopID2NameMap.entrySet()) {
 			stringStopNameMap.put(stopEntry.getKey().toString(), stopEntry.getValue());
 		}
 
 		Map<String, TreeSet<String>> stopID2lineIdMap = new HashMap<String, TreeSet<String>>();
 
-		Map<Id, StopCountBox> stopCounts1 = new HashMap<Id, StopCountBox>();
-		for (Id lineId : line2StopCountMap1.keySet()) {
-			for (Entry<Id, StopCountBox> stopBox : line2StopCountMap1.get(lineId).entrySet()) {
-				Id stopId = new IdImpl(stopBox.getKey().toString().split("\\.")[0]);
+		Map<Id<TransitStopFacility>, StopCountBox> stopCounts1 = new HashMap<>();
+		for (Id<TransitLine> lineId : line2StopCountMap1.keySet()) {
+			for (Entry<Id<TransitStopFacility>, StopCountBox> stopBox : line2StopCountMap1.get(lineId).entrySet()) {
+				Id<TransitStopFacility> stopId = Id.create(stopBox.getKey().toString().split("\\.")[0], TransitStopFacility.class);
 				if(stopCounts1.get(stopId) == null){
 					stopCounts1.put(stopId, stopBox.getValue());
 				} else {
@@ -145,10 +147,10 @@ public class Compare2PTCounts extends Events2PTCounts{
 			}
 		}
 
-		Map<Id, StopCountBox> stopCounts2 = new HashMap<Id, StopCountBox>();
-		for (Id lineId : line2StopCountMap2.keySet()) {
-			for (Entry<Id, StopCountBox> stopBox : line2StopCountMap2.get(lineId).entrySet()) {
-				Id stopId = new IdImpl(stopBox.getKey().toString().split("\\.")[0]);
+		Map<Id<TransitStopFacility>, StopCountBox> stopCounts2 = new HashMap<>();
+		for (Id<TransitLine> lineId : line2StopCountMap2.keySet()) {
+			for (Entry<Id<TransitStopFacility>, StopCountBox> stopBox : line2StopCountMap2.get(lineId).entrySet()) {
+				Id<TransitStopFacility> stopId = Id.create(stopBox.getKey().toString().split("\\.")[0], TransitStopFacility.class);
 				if(stopCounts2.get(stopId) == null){
 					stopCounts2.put(stopId, stopBox.getValue());
 				} else {
@@ -171,32 +173,33 @@ public class Compare2PTCounts extends Events2PTCounts{
 
 		for (StopCountBox stopCountBox : stopCounts1.values()) {
 
-			Id stopId = new IdImpl(stopCountBox.stopId.toString().split("\\.")[0]);
-			alightCounts.createAndAddCount(stopId, stopCountBox.realName);
-			boardCounts.createAndAddCount(stopId, stopCountBox.realName);
+			Id<TransitStopFacility> stopId = Id.create(stopCountBox.stopId.toString().split("\\.")[0], TransitStopFacility.class);
+			alightCounts.createAndAddCount(Id.create(stopId, Link.class), stopCountBox.realName);
+			boardCounts.createAndAddCount(Id.create(stopId, Link.class), stopCountBox.realName);
 
-			alightCounts.getCount(stopId).setCoord(transitSchedule.getFacilities().get(stopCountBox.stopId).getCoord());
-			boardCounts.getCount(stopId).setCoord(transitSchedule.getFacilities().get(stopCountBox.stopId).getCoord());
+			alightCounts.getCount(Id.create(stopId, Link.class)).setCoord(transitSchedule.getFacilities().get(stopCountBox.stopId).getCoord());
+			boardCounts.getCount(Id.create(stopId, Link.class)).setCoord(transitSchedule.getFacilities().get(stopCountBox.stopId).getCoord());
 
 			for (int i = 0; i < 24; i++) {
-				alightCounts.getCount(stopId).createVolume(i, stopCountBox.egressCount[i]);
-				boardCounts.getCount(stopId).createVolume(i, stopCountBox.accessCount[i]);
+				alightCounts.getCount(Id.create(stopId, Link.class)).createVolume(i, stopCountBox.egressCount[i]);
+				boardCounts.getCount(Id.create(stopId, Link.class)).createVolume(i, stopCountBox.accessCount[i]);
 			}
 
 		}
 
 		for (StopCountBox stopCountBox : stopCounts2.values()) {
 
-			Id stopId = new IdImpl(stopCountBox.stopId.toString().split("\\.")[0]);
-			alightCounts.createAndAddCount(stopId, stopCountBox.realName);
-			boardCounts.createAndAddCount(stopId, stopCountBox.realName);
+			Id<TransitStopFacility> stopId = Id.create(stopCountBox.stopId.toString().split("\\.")[0], TransitStopFacility.class);
+			Id<Link> stopIdAsLink = Id.create(stopId, Link.class);
+			alightCounts.createAndAddCount(stopIdAsLink, stopCountBox.realName);
+			boardCounts.createAndAddCount(stopIdAsLink, stopCountBox.realName);
 
-			alightCounts.getCount(stopId).setCoord(transitSchedule.getFacilities().get(stopCountBox.stopId).getCoord());
-			boardCounts.getCount(stopId).setCoord(transitSchedule.getFacilities().get(stopCountBox.stopId).getCoord());
+			alightCounts.getCount(stopIdAsLink).setCoord(transitSchedule.getFacilities().get(stopCountBox.stopId).getCoord());
+			boardCounts.getCount(stopIdAsLink).setCoord(transitSchedule.getFacilities().get(stopCountBox.stopId).getCoord());
 
 			for (int i = 0; i < 24; i++) {
-				alightCounts.getCount(stopId).createVolume(i, stopCountBox.egressCount[i]);
-				boardCounts.getCount(stopId).createVolume(i, stopCountBox.accessCount[i]);
+				alightCounts.getCount(stopIdAsLink).createVolume(i, stopCountBox.egressCount[i]);
+				boardCounts.getCount(stopIdAsLink).createVolume(i, stopCountBox.accessCount[i]);
 			}
 
 		}
@@ -205,7 +208,7 @@ public class Compare2PTCounts extends Events2PTCounts{
 		List<CountSimComparison> boardCountSimCompList = new LinkedList<CountSimComparison>();
 		List<CountSimComparison> alightCountSimCompList = new LinkedList<CountSimComparison>();
 		List<CountSimComparison> occupancyCountSimCompList = new LinkedList<CountSimComparison>();
-		for (Entry<Id, StopCountBox> stopEntry : stopCounts2.entrySet()) {
+		for (Entry<Id<TransitStopFacility>, StopCountBox> stopEntry : stopCounts2.entrySet()) {
 
 			StopCountBox stopCountBox1 = stopCounts1.get(stopEntry.getKey());
 			if(stopCountBox1 == null){
@@ -218,11 +221,12 @@ public class Compare2PTCounts extends Events2PTCounts{
 			double occupancy1 = 0.0;
 			double occupancy2 = 0.0;
 			for (int i = 0; i < 24; i++) {
-				boardCountSimCompList.add(new CountSimComparisonImpl(stopEntry.getKey(), i + 1, stopCountBox1.accessCount[i], stopCountBox2.accessCount[i]));
-				alightCountSimCompList.add(new CountSimComparisonImpl(stopEntry.getKey(), i + 1, stopCountBox1.egressCount[i], stopCountBox2.egressCount[i]));
+				Id<Link> stopIdAsLink = Id.create(stopEntry.getKey(), Link.class);
+				boardCountSimCompList.add(new CountSimComparisonImpl(stopIdAsLink, i + 1, stopCountBox1.accessCount[i], stopCountBox2.accessCount[i]));
+				alightCountSimCompList.add(new CountSimComparisonImpl(stopIdAsLink, i + 1, stopCountBox1.egressCount[i], stopCountBox2.egressCount[i]));
 				occupancy1 += stopCountBox1.accessCount[i] - stopCountBox1.egressCount[i];
 				occupancy2 += stopCountBox2.accessCount[i] - stopCountBox2.egressCount[i];
-				occupancyCountSimCompList.add(new CountSimComparisonImpl(stopEntry.getKey(), i + 1, occupancy1, occupancy2));
+				occupancyCountSimCompList.add(new CountSimComparisonImpl(stopIdAsLink, i + 1, occupancy1, occupancy2));
 			}
 
 		}
@@ -277,7 +281,7 @@ public class Compare2PTCounts extends Events2PTCounts{
 					stopCountBox2 = new StopCountBox(stopCountBoxEntry.getKey(), stopCountBoxEntry.getValue().realName);
 				}
 				for (int i = 0; i < 24; i++) {
-//					Id tempId = new IdImpl(lineId + " - " + stopCountBox.stopId + " - " + stopCountBox.realName);
+//					Id tempId = Id.create(lineId + " - " + stopCountBox.stopId + " - " + stopCountBox.realName);
 //					Id tempId = stopCountBox2.stopId;
 //					if(stopCountBox1.accessCount[i] != 0){
 //						log.info("");
@@ -299,19 +303,19 @@ public class Compare2PTCounts extends Events2PTCounts{
 
 	private void reset() {
 		this.line2MainLinesMap = null;
-		this.line2StopCountMap = new HashMap<Id, Map<Id,StopCountBox>>();
+		this.line2StopCountMap = new HashMap<>();
 		this.vehID2LineMap = null;
 
 	}
 
-	private Map<Id, StopCountBox> compareMapEntries(Map<Id, StopCountBox> countsMap1, Map<Id, StopCountBox> countsMap2) {
-		TreeSet<Id> unionOfStopIds = new TreeSet<Id>();
+	private Map<Id<TransitStopFacility>, StopCountBox> compareMapEntries(Map<Id<TransitStopFacility>, StopCountBox> countsMap1, Map<Id<TransitStopFacility>, StopCountBox> countsMap2) {
+		TreeSet<Id<TransitStopFacility>> unionOfStopIds = new TreeSet<Id<TransitStopFacility>>();
 		unionOfStopIds.addAll(countsMap1.keySet());
 		unionOfStopIds.addAll(countsMap2.keySet());
 
-		Map<Id, StopCountBox> mergedMap = new HashMap<Id,StopCountBox>();
+		Map<Id<TransitStopFacility>, StopCountBox> mergedMap = new HashMap<>();
 
-		for (Id stopId : unionOfStopIds) {
+		for (Id<TransitStopFacility> stopId : unionOfStopIds) {
 
 			if(countsMap1.get(stopId) != null){
 				if(countsMap2.get(stopId) != null){
@@ -345,9 +349,9 @@ public class Compare2PTCounts extends Events2PTCounts{
 
 	}
 
-	private void invertMapEntries(Map<Id, StopCountBox> routeMap){
+	private void invertMapEntries(Map<Id<TransitStopFacility>, StopCountBox> routeMap){
 
-		for (Entry<Id, StopCountBox> routeEntry : routeMap.entrySet()) {
+		for (Entry<Id<TransitStopFacility>, StopCountBox> routeEntry : routeMap.entrySet()) {
 			for (int i = 0; i < StopCountBox.slots; i++) {
 				routeEntry.getValue().accessCount[i] *= -1;
 				routeEntry.getValue().egressCount[i] *= -1;

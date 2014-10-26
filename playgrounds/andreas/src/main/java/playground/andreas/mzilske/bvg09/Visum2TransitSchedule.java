@@ -11,7 +11,6 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.misc.Time;
@@ -45,7 +44,7 @@ public class Visum2TransitSchedule {
 	private final Map<String, String> transportModes = new HashMap<String, String>();
 	private final VehicleType defaultVehicleType;
 	private final TransitScheduleFactory builder;
-	private Map<Id, TransitStopFacility> stopFacilities;
+	private Map<Id<TransitStopFacility>, TransitStopFacility> stopFacilities;
 	private long nextVehicleId;
 	private Collection<String> transitLineFilter = null;
 
@@ -118,7 +117,7 @@ public class Visum2TransitSchedule {
 		}
 		if (vehCombination == null) {
 			log.warn("Could not find vehicle combination with id=" + timeProfile.vehCombNr + " used in line " + line.id.toString() + ". Using default type " + line.tCode + " vehicle.");
-			vehType = this.vehicles.getVehicleTypes().get(new IdImpl(line.tCode));
+			vehType = this.vehicles.getVehicleTypes().get(Id.create(line.tCode, VehicleType.class));
 
 			if(vehType == null){
 				vehType = defaultVehicleType;
@@ -126,7 +125,7 @@ public class Visum2TransitSchedule {
 			}
 
 		} else {
-			vehType = this.vehicles.getVehicleTypes().get(new IdImpl(vehCombination.id));
+			vehType = this.vehicles.getVehicleTypes().get(Id.create(vehCombination.id, VehicleType.class));
 		}
 		return vehType;
 	}
@@ -136,8 +135,8 @@ public class Visum2TransitSchedule {
 			TransitRoute tRoute) {
 		for (VisumNetwork.Departure d : this.visum.departures.values()){
 			if (d.lineName.equals(line.id.toString()) && d.lineRouteName.equals(timeProfile.lineRouteName.toString()) && d.TRI.equals(timeProfile.index.toString())) {
-				Departure departure = builder.createDeparture(new IdImpl(d.index), Time.parseTime(d.dep));
-				Vehicle veh = this.vehicles.getFactory().createVehicle(new IdImpl("tr_" + nextVehicleId++), vehType);
+				Departure departure = builder.createDeparture(Id.create(d.index, Departure.class), Time.parseTime(d.dep));
+				Vehicle veh = this.vehicles.getFactory().createVehicle(Id.create("tr_" + nextVehicleId++, Vehicle.class), vehType);
 				this.vehicles.addVehicle( veh);
 				departure.setVehicleId(veh.getId());
 				tRoute.addDeparture(departure);
@@ -152,7 +151,7 @@ public class Visum2TransitSchedule {
 			if (tpi.lineName.equals(line.id.toString()) && tpi.lineRouteName.equals(timeProfile.lineRouteName.toString()) && tpi.timeProfileName.equals(timeProfile.index.toString()) && tpi.dirCode.equals(timeProfile.dirCode.toString())){
 				String lineRouteItemKey = line.id.toString() +"/"+ timeProfile.lineRouteName.toString()+"/"+ tpi.lRIIndex.toString()+"/"+tpi.dirCode;
 				LineRouteItem lineRouteItem = this.visum.lineRouteItems.get(lineRouteItemKey);
-				Id stopFacilityId = lineRouteItem.stopPointNo;
+				Id<TransitStopFacility> stopFacilityId = Id.create(lineRouteItem.stopPointNo, TransitStopFacility.class);
 				if (stopFacilityId != null) {
 					TransitStopFacility stopFacility = stopFacilities.get(stopFacilityId);
 					if (stopFacility == null) {
@@ -168,20 +167,20 @@ public class Visum2TransitSchedule {
 		if (mode == null) {
 			log.error("Could not find TransportMode for " + line.tCode + ", more info: " + line.id);
 		}
-		TransitRouteImpl tRoute = (TransitRouteImpl) builder.createTransitRoute(new IdImpl(timeProfile.lineName.toString()+"."+timeProfile.lineRouteName.toString()+"."+ timeProfile.index.toString()+"."+timeProfile.dirCode.toString()),null,stops,mode);
+		TransitRouteImpl tRoute = (TransitRouteImpl) builder.createTransitRoute(Id.create(timeProfile.lineName.toString()+"."+timeProfile.lineRouteName.toString()+"."+ timeProfile.index.toString()+"."+timeProfile.dirCode.toString(), TransitRoute.class),null,stops,mode);
 		tRoute.setLineRouteName(timeProfile.lineRouteName.toString());
 		tRoute.setDirection(timeProfile.dirCode.toString());
 		return tRoute;
 	}
 
-	private Map<Id, TransitStopFacility> convertStopPoints(
+	private Map<Id<TransitStopFacility>, TransitStopFacility> convertStopPoints(
 			TransitScheduleFactory builder) {
-		final Map<Id, TransitStopFacility> stopFacilities = new TreeMap<Id, TransitStopFacility>();
+		final Map<Id<TransitStopFacility>, TransitStopFacility> stopFacilities = new TreeMap<>();
 
 		for (VisumNetwork.StopPoint stopPoint : this.visum.stopPoints.values()){
 			Coord coord = this.coordinateTransformation.transform(this.visum.stops.get(this.visum.stopAreas.get(stopPoint.stopAreaId).StopId).coord);
 			TransitStopFacility stop = builder.createTransitStopFacility(Id.create(stopPoint.id, TransitStopFacility.class), coord, false);
-			stopFacilities.put(stopPoint.id, stop);
+			stopFacilities.put(Id.create(stopPoint.id, TransitStopFacility.class), stop);
 			this.schedule.addStopFacility(stop);
 		}
 		return stopFacilities;

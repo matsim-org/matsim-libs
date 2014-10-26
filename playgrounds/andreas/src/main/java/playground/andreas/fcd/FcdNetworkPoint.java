@@ -24,17 +24,17 @@ import org.matsim.api.core.v01.Id;
 
 public class FcdNetworkPoint {
 	
-	private final Id id;
+	private final Id<FcdNetworkPoint> id;
 	private final Coord coord;
 	private final double direction;
 	
-	public FcdNetworkPoint(Id id, Coord coord, double direction){
+	public FcdNetworkPoint(Id<FcdNetworkPoint> id, Coord coord, double direction){
 		this.id = id;
 		this.coord = coord;
 		this.direction = direction;
 	}
 
-	public Id getId() {
+	public Id<FcdNetworkPoint> getId() {
 		return this.id;
 	}
 

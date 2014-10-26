@@ -1,9 +1,7 @@
 package playground.andreas.bvgAna.level1;
 
 import java.util.ArrayList;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import junit.framework.Assert;
 
@@ -11,7 +9,8 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.vehicles.Vehicle;
 
 public class VehId2PersonEnterLeaveVehicleMapTest {
 
@@ -21,21 +20,14 @@ public class VehId2PersonEnterLeaveVehicleMapTest {
 	@Test
 	public void testVehId2PersonEnterLeaveVehicleMap() {
 		
-		Id[] ida= new Id[15];
-		Set<Id> idSet = new TreeSet<Id>();
-	    for (int ii=0; ii<15; ii++){
-	    	ida[ii] = new IdImpl(ii); 
-	        idSet.add(ida[ii]);
-	    }
-	    
 //	    assign Ids to routes, vehicles and agents to be used in Test
 	    
-	    Id vehId1 = ida[1];
-	    Id vehId2 = ida[2];
-	    Id persId1 = ida[4];
-	    Id persId2 = ida[5];
-	    Id persId3 = ida[6];
-	    Id persId4 = ida[7];
+	    Id<Vehicle> vehId1 = Id.create(1, Vehicle.class);
+	    Id<Vehicle> vehId2 = Id.create(2, Vehicle.class);
+	    Id<Person> persId1 = Id.create(4, Person.class);
+	    Id<Person> persId2 = Id.create(5, Person.class);
+	    Id<Person> persId3 = Id.create(6, Person.class);
+	    Id<Person> persId4 = Id.create(7, Person.class);
 
 //	    create events
 	    

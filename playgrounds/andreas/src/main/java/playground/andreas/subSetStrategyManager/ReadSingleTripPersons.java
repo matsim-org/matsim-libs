@@ -25,7 +25,7 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
@@ -80,7 +80,7 @@ public class ReadSingleTripPersons implements TabularFileHandler {
 		if(!row[0].trim().startsWith("#")){
 			try {
 				String personIdString = row[0].trim();
-				Id personId = new IdImpl(personIdString);
+				Id<Person> personId = Id.create(personIdString, Person.class);
 
 				sink.process(personId);
 			} catch (NumberFormatException e) {

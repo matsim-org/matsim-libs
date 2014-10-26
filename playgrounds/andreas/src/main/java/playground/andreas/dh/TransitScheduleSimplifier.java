@@ -12,7 +12,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
@@ -142,7 +141,7 @@ public class TransitScheduleSimplifier{
 				List<TransitRouteStop> newStops = computeNewRouteProfile(factory, refTransitRoute, transitRoutes, listOfRoutes, newRoute, null);
 				compareRouteProfiles(refTransitRoute.getStops(), newStops);
 				
-				mergedTransitRoute = factory.createTransitRoute(new IdImpl(id),
+				mergedTransitRoute = factory.createTransitRoute(Id.create(id, TransitRoute.class),
 					newRoute, newStops, TransportMode.pt);
 				
 				mergeDepartures(factory, transitRoutes, mergedTransitRoute.getStops().get(0), mergedTransitRoute, listOfRoutes);
@@ -278,7 +277,7 @@ public class TransitScheduleSimplifier{
 					
 						TransitRouteStop start = newStops.get(0);
 					
-						mergedTransitRoute = factory.createTransitRoute(new IdImpl("merged_" + mergedRoutesCounter), networkRoute, newStops, TransportMode.pt);
+						mergedTransitRoute = factory.createTransitRoute(Id.create("merged_" + mergedRoutesCounter, TransitRoute.class), networkRoute, newStops, TransportMode.pt);
 					
 						mergedRoutesCounter++;
 					
@@ -292,7 +291,7 @@ public class TransitScheduleSimplifier{
 			
 				//remove transit routes that have been merged from the transit schedule
 				for(int i = 0; i < listOfRoutes.length; i++)
-					transitLine.removeRoute(transitRoutes.get(new IdImpl(listOfRoutes[i])));
+					transitLine.removeRoute(transitRoutes.get(Id.create(listOfRoutes[i], TransitRoute.class)));
 			
 			}
 		
@@ -403,7 +402,7 @@ public class TransitScheduleSimplifier{
 		PriorityQueue<Id<TransitRoute>> uncheckedTransitRoutes = new PriorityQueue<Id<TransitRoute>>();
 		
 		for(int i=0;i<listOfRoutes.length;i++){
-			uncheckedTransitRoutes.add(new IdImpl(listOfRoutes[i]));
+			uncheckedTransitRoutes.add(Id.create(listOfRoutes[i], TransitRoute.class));
 		}
 		
 		List<TransitRouteStop> checkedTransitRouteStops = new ArrayList<TransitRouteStop>();
@@ -538,7 +537,7 @@ public class TransitScheduleSimplifier{
 			
 			for(int j = 0; j < listOfRoutes.length; j++){
 				
-				TransitRouteStop stop = transitRoutes.get(new IdImpl(listOfRoutes[j])).getStops().get(i);
+				TransitRouteStop stop = transitRoutes.get(Id.create(listOfRoutes[j], TransitRoute.class)).getStops().get(i);
 				arrivalOffset += stop.getArrivalOffset();
 				arrCounter++;
 				departureOffset += stop.getDepartureOffset();
@@ -570,7 +569,7 @@ public class TransitScheduleSimplifier{
 
 		for(int i = 0; i < listOfTransitRoutes.length; i++){
 
-			TransitRoute transitRoute = transitRoutes.get(new IdImpl(listOfTransitRoutes[i]));
+			TransitRoute transitRoute = transitRoutes.get(Id.create(listOfTransitRoutes[i], TransitRoute.class));
 			
 			if(mergedTransitRouteContainsTransitRouteStops(mergedTransitRoute, transitRoute, startTransitRouteStop)){
 //			if(transitRoute.getStops().contains(transitRoute.getStop(startTransitRouteStop.getStopFacility()))&&!transitRoute.getId().toString().contains("merged")){
@@ -585,7 +584,7 @@ public class TransitScheduleSimplifier{
 							"0"+Integer.toString(mergedTransitRoute.getDepartures().size()) :
 							Integer.toString(mergedTransitRoute.getDepartures().size());
 					
-					Departure dep = factory.createDeparture(new IdImpl(departureId),
+					Departure dep = factory.createDeparture(Id.create(departureId, Departure.class),
 							departure.getDepartureTime() + transitRoute.getStop(startTransitRouteStop.getStopFacility()).getDepartureOffset());
 					dep.setVehicleId(departure.getVehicleId());
 					

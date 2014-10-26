@@ -1,9 +1,16 @@
 package playground.andreas.fggeoinfo;
 
+import java.util.HashMap;
+import java.util.Map.Entry;
+
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.*;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -14,11 +21,9 @@ import org.matsim.core.population.PopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.GK4toWGS84;
+
 import playground.andreas.utils.ana.acts2kml.KMLActsWriter;
 import playground.andreas.utils.pop.NewPopulation;
-
-import java.util.HashMap;
-import java.util.Map.Entry;
 
 /**
  * Move acts from TXL and SXF to BBI coords
@@ -79,7 +84,7 @@ public class FilterPersonActs extends NewPopulation {
 						this.kmlWriter.addActivity(new ActivityImpl(act));
 					}
 					act.getCoord().setXY(this.coordBBI.getX(), this.coordBBI.getY());
-                    ((PersonImpl) person).setId(new IdImpl(person.getId().toString() + "_SXF-BBI"));
+                    ((PersonImpl) person).setId(Id.create(person.getId().toString() + "_SXF-BBI", Person.class));
                 }
 				
 				if(checkIsTXL(act)){
@@ -92,7 +97,7 @@ public class FilterPersonActs extends NewPopulation {
 						this.kmlWriter.addActivity(new ActivityImpl(act));
 					}
 					act.getCoord().setXY(this.coordBBI.getX(), this.coordBBI.getY());
-                    ((PersonImpl) person).setId(new IdImpl(person.getId().toString() + "_TXL-BBI"));
+                    ((PersonImpl) person).setId(Id.create(person.getId().toString() + "_TXL-BBI", Person.class));
                 }
 			}
 		}

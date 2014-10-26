@@ -33,24 +33,25 @@ import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 class DelayHandler implements VehicleDepartsAtFacilityEventHandler, VehicleArrivesAtFacilityEventHandler{
 	
 	private final static Logger log = Logger.getLogger(DelayHandler.class);
 	private HashMap<Id, BufferedWriter> writerMap = new HashMap<Id, BufferedWriter>();
-	HashMap<Id,Double> stopIdDistanceMap;
+	HashMap<Id<TransitStopFacility>,Double> stopIdDistanceMap;
 	
 	private final String outputDir;
-	private final Id line;
+	private final Id<TransitLine> line;
 	
-	public DelayHandler(String outputDir, String line){
-		this.line = new IdImpl(line);
+	public DelayHandler(String outputDir, String line) {
+		this.line = Id.create(line, TransitLine.class);
 		this.outputDir = outputDir + line.trim() + "/";
 		new File(this.outputDir).mkdir();
 	}
@@ -64,7 +65,7 @@ class DelayHandler implements VehicleDepartsAtFacilityEventHandler, VehicleArriv
 			}
 		}
 		
-		HashMap<Id, Double> resultingStopDistanceMap = new HashMap<Id, Double>();			
+		HashMap<Id<TransitStopFacility>, Double> resultingStopDistanceMap = new HashMap<>();			
 						
 		// Annahme: Es gibt maximal zwei Ketten, z.B. Hin- und Rueckrichtung
 
@@ -238,7 +239,7 @@ class DelayHandler implements VehicleDepartsAtFacilityEventHandler, VehicleArriv
 		return newList;
 	}
 	
-	protected void writeGnuPlot(HashMap<Id, String> stopIdNameMap) {
+	protected void writeGnuPlot(HashMap<Id<TransitStopFacility>, String> stopIdNameMap) {
 		GnuFileWriter gnuFileWriter = new GnuFileWriter(this.outputDir);		
 		gnuFileWriter.write(this.stopIdDistanceMap, this.line.toString(), stopIdNameMap);		
 	}

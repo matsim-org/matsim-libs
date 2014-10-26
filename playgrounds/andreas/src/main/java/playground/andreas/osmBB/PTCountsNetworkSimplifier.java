@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.LinkImpl;
@@ -246,9 +245,9 @@ public class PTCountsNetworkSimplifier {
 
 										// Try to merge both links by guessing the resulting links attributes
 										link = this.network.getFactory().createLink(
-												new IdImpl(inLink.getId() + "-" + outLink.getId()),
-												inLink.getFromNode().getId(),
-												outLink.getToNode().getId());
+												Id.create(inLink.getId() + "-" + outLink.getId(), Link.class),
+												inLink.getFromNode(),
+												outLink.getToNode());
 
 										// length can be summed up
 										link.setLength(inLink.getLength() + outLink.getLength());
@@ -278,9 +277,9 @@ public class PTCountsNetworkSimplifier {
 										// Only merge links with same attributes
 										if(bothLinksHaveSameLinkStats(inLink, outLink)){
 											link = this.network.getFactory().createLink(
-													new IdImpl(inLink.getId() + "-" + outLink.getId()),
-													inLink.getFromNode().getId(),
-													outLink.getToNode().getId());
+													Id.create(inLink.getId() + "-" + outLink.getId(), Link.class),
+													inLink.getFromNode(),
+													outLink.getToNode());
 
 											link.setLength(inLink.getLength() + outLink.getLength());
 											link.setFreespeed(inLink.getFreespeed());
@@ -378,7 +377,7 @@ public class PTCountsNetworkSimplifier {
 				}
 
 				// check, if count data is present
-				Id shortNameId = new IdImpl(this.shortNameMap.get(node.getId().toString()));
+				Id<Link> shortNameId = Id.create(this.shortNameMap.get(node.getId().toString()), Link.class);
 				if(this.outCounts.getCount(shortNameId) == null){
 					// Count station wasn't added to outCounts, yet
 					Count oldCount = this.inCounts.getCount(shortNameId);

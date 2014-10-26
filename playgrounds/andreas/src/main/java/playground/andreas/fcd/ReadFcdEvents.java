@@ -25,11 +25,12 @@ import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.vehicles.Vehicle;
 
 
 public class ReadFcdEvents implements TabularFileHandler {
@@ -85,10 +86,10 @@ public class ReadFcdEvents implements TabularFileHandler {
 		} else {
 			try {
 				double time = Time.parseTime(row[0].split(" ")[1]);
-				Id linkId = new IdImpl(row[1]);
+				Id<Link> linkId = Id.create(row[1], Link.class);
 				double aveSpeed = Double.parseDouble(row[2]);
 				double cover = Double.parseDouble(row[3]);
-				Id vehId = new IdImpl(row[4]);
+				Id<Vehicle> vehId = Id.create(row[4], Vehicle.class);
 				int minuteOfWeek = Integer.parseInt(row[5]);
 
 				FcdEvent fcdEvent = new FcdEvent(time, linkId, aveSpeed, cover, vehId, minuteOfWeek);

@@ -23,13 +23,14 @@ package playground.andreas.itsumo;
 import java.io.File;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -48,7 +49,6 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.run.Events2Snapshot;
@@ -114,10 +114,10 @@ public class MyControler1 extends Controler {
 
 		log.info("  generating plans... ");
 
-		Link link9 = network.getLinks().get(new IdImpl("9"));
-		Link link15 = network.getLinks().get(new IdImpl("15"));
+		Link link9 = network.getLinks().get(Id.create("9", Link.class));
+		Link link15 = network.getLinks().get(Id.create("15", Link.class));
 		for (int i=0; i<100; i++) {
-			PersonImpl p = new PersonImpl(new IdImpl(i+1));
+			PersonImpl p = new PersonImpl(Id.create(i+1, Person.class));
 
 			try {
 				PlanImpl plan1 = new PlanImpl(p);
@@ -315,7 +315,7 @@ public class MyControler1 extends Controler {
 	}
 
 	private void generatePerson(final int ii, final Link sourceLink, final Link destLink, final Population population){
-		PersonImpl p = new PersonImpl(new IdImpl(ii));
+		PersonImpl p = new PersonImpl(Id.create(ii, Person.class));
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(p);
 		try {
 			ActivityImpl act1 = plan.createAndAddActivity("h", new CoordImpl(100., 100.));

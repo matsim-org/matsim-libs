@@ -26,9 +26,11 @@ import java.util.TreeSet;
 import junit.framework.Assert;
 
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -72,8 +74,8 @@ public class PTCountsNetworkSimplifierTest extends MatsimTestCase{
 		Assert.assertEquals(21, network.getLinks().size());
 		Assert.assertEquals(10, network.getNodes().size());
 		
-		Assert.assertNull(network.getLinks().get(new IdImpl("1201_1202")));
-		Assert.assertNull(network.getNodes().get(new IdImpl("1101")));
+		Assert.assertNull(network.getLinks().get(Id.create("1201_1202", Link.class)));
+		Assert.assertNull(network.getNodes().get(Id.create("1101", Node.class)));
 	}
 	
 	/**
@@ -111,12 +113,12 @@ public class PTCountsNetworkSimplifierTest extends MatsimTestCase{
 		Assert.assertEquals(26, network.getLinks().size());
 		Assert.assertEquals(14, network.getNodes().size());
 		
-		Assert.assertNotNull(network.getLinks().get(new IdImpl("1103_1104")));
-		Assert.assertNotNull(network.getLinks().get(new IdImpl("1203_1204")));
-		Assert.assertNotNull(network.getLinks().get(new IdImpl("1303_1304")));
+		Assert.assertNotNull(network.getLinks().get(Id.create("1103_1104", Link.class)));
+		Assert.assertNotNull(network.getLinks().get(Id.create("1203_1204", Link.class)));
+		Assert.assertNotNull(network.getLinks().get(Id.create("1303_1304", Link.class)));
 		
-		Assert.assertNull(network.getLinks().get(new IdImpl("1201_1202")));
-		Assert.assertNull(network.getNodes().get(new IdImpl("1101")));
+		Assert.assertNull(network.getLinks().get(Id.create("1201_1202", Link.class)));
+		Assert.assertNull(network.getNodes().get(Id.create("1101", Node.class)));
 	}
 	
 	/**
@@ -158,10 +160,10 @@ public class PTCountsNetworkSimplifierTest extends MatsimTestCase{
 		Assert.assertEquals(23, network.getLinks().size());
 		Assert.assertEquals(12, network.getNodes().size());
 		
-		Assert.assertNotNull(network.getLinks().get(new IdImpl("1101_1102")));
+		Assert.assertNotNull(network.getLinks().get(Id.create("1101_1102", Link.class)));
 		
-		Assert.assertNull(network.getLinks().get(new IdImpl("1103_1104")));
-		Assert.assertNull(network.getNodes().get(new IdImpl("1103")));
+		Assert.assertNull(network.getLinks().get(Id.create("1103_1104", Link.class)));
+		Assert.assertNull(network.getNodes().get(Id.create("1103", Node.class)));
 	}
 	
 	/** 
@@ -203,13 +205,13 @@ public class PTCountsNetworkSimplifierTest extends MatsimTestCase{
 		Assert.assertEquals(28, network.getLinks().size());
 		Assert.assertEquals(16, network.getNodes().size());
 		
-		Assert.assertNotNull(network.getLinks().get(new IdImpl("1101_1102")));
-		Assert.assertNotNull(network.getLinks().get(new IdImpl("1103_1104")));
-		Assert.assertNotNull(network.getLinks().get(new IdImpl("1203_1204")));
-		Assert.assertNotNull(network.getLinks().get(new IdImpl("1303_1304")));
+		Assert.assertNotNull(network.getLinks().get(Id.create("1101_1102", Link.class)));
+		Assert.assertNotNull(network.getLinks().get(Id.create("1103_1104", Link.class)));
+		Assert.assertNotNull(network.getLinks().get(Id.create("1203_1204", Link.class)));
+		Assert.assertNotNull(network.getLinks().get(Id.create("1303_1304", Link.class)));
 		
-		Assert.assertNull(network.getLinks().get(new IdImpl("1201_1202")));
-		Assert.assertNull(network.getNodes().get(new IdImpl("1201")));
+		Assert.assertNull(network.getLinks().get(Id.create("1201_1202", Link.class)));
+		Assert.assertNull(network.getNodes().get(Id.create("1201", Node.class)));
 	}
 	
 	/**
@@ -253,14 +255,14 @@ public class PTCountsNetworkSimplifierTest extends MatsimTestCase{
 		Assert.assertEquals(29, network.getLinks().size());
 		Assert.assertEquals(16, network.getNodes().size());
 		
-		Assert.assertNotNull(network.getLinks().get(new IdImpl("1101_1102")));
-		Assert.assertNotNull(network.getLinks().get(new IdImpl("1201_1202")));
-		Assert.assertNotNull(network.getLinks().get(new IdImpl("1301_1302")));
-		Assert.assertNotNull(network.getLinks().get(new IdImpl("1204_1203")));
-		Assert.assertNotNull(network.getLinks().get(new IdImpl("1314_1313")));
+		Assert.assertNotNull(network.getLinks().get(Id.create("1101_1102", Link.class)));
+		Assert.assertNotNull(network.getLinks().get(Id.create("1201_1202", Link.class)));
+		Assert.assertNotNull(network.getLinks().get(Id.create("1301_1302", Link.class)));
+		Assert.assertNotNull(network.getLinks().get(Id.create("1204_1203", Link.class)));
+		Assert.assertNotNull(network.getLinks().get(Id.create("1314_1313", Link.class)));
 		
-		Assert.assertNull(network.getLinks().get(new IdImpl("1103_1104")));
-		Assert.assertNull(network.getNodes().get(new IdImpl("1103")));
+		Assert.assertNull(network.getLinks().get(Id.create("1103_1104", Link.class)));
+		Assert.assertNull(network.getNodes().get(Id.create("1103", Node.class)));
 	}
 	
 
@@ -308,18 +310,18 @@ public class PTCountsNetworkSimplifierTest extends MatsimTestCase{
 		Assert.assertEquals(32, network.getLinks().size());
 		Assert.assertEquals(18, network.getNodes().size());
 		
-		Assert.assertNotNull(network.getLinks().get(new IdImpl("1101_1102")));
-		Assert.assertNotNull(network.getLinks().get(new IdImpl("1103_1104")));
-		Assert.assertNotNull(network.getLinks().get(new IdImpl("1203_1204")));
-		Assert.assertNotNull(network.getLinks().get(new IdImpl("1303_1304")));
+		Assert.assertNotNull(network.getLinks().get(Id.create("1101_1102", Link.class)));
+		Assert.assertNotNull(network.getLinks().get(Id.create("1103_1104", Link.class)));
+		Assert.assertNotNull(network.getLinks().get(Id.create("1203_1204", Link.class)));
+		Assert.assertNotNull(network.getLinks().get(Id.create("1303_1304", Link.class)));
 		
-		Assert.assertNotNull(network.getLinks().get(new IdImpl("1101_1102")));
-		Assert.assertNotNull(network.getLinks().get(new IdImpl("1201_1202")));
-		Assert.assertNotNull(network.getLinks().get(new IdImpl("1301_1302")));
-		Assert.assertNotNull(network.getLinks().get(new IdImpl("1204_1203")));
-		Assert.assertNotNull(network.getLinks().get(new IdImpl("1314_1313")));
+		Assert.assertNotNull(network.getLinks().get(Id.create("1101_1102", Link.class)));
+		Assert.assertNotNull(network.getLinks().get(Id.create("1201_1202", Link.class)));
+		Assert.assertNotNull(network.getLinks().get(Id.create("1301_1302", Link.class)));
+		Assert.assertNotNull(network.getLinks().get(Id.create("1204_1203", Link.class)));
+		Assert.assertNotNull(network.getLinks().get(Id.create("1314_1313", Link.class)));
 		
-		Assert.assertNull(network.getLinks().get(new IdImpl("1202_1201")));
+		Assert.assertNull(network.getLinks().get(Id.create("1202_1201", Link.class)));
 	}
 	
 }

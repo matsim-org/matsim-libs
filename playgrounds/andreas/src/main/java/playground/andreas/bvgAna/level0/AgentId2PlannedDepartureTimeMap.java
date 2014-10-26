@@ -56,7 +56,7 @@ public class AgentId2PlannedDepartureTimeMap {
 	 * @param agentIds The Set of agents to be analyzed
 	 * @return A map sorted first by agentId, second by StopId-Time tuples
 	 */
-	public static Map<Id,List<Tuple<Id,AgentId2PlannedDepartureTimeMapData>>> getAgentId2PlannedPTDepartureTimeMap(Population pop, Set<Id> agentIds){
+	public static Map<Id,List<Tuple<Id,AgentId2PlannedDepartureTimeMapData>>> getAgentId2PlannedPTDepartureTimeMap(Population pop, Set<Id<Person>> agentIds){
 
 		AgentId2PlannedDepartureTimeMap.log.setLevel(AgentId2PlannedDepartureTimeMap.logLevel);
 		Map<Id, List<Tuple<Id, AgentId2PlannedDepartureTimeMapData>>> agentId2PlannedDepartureMap = new TreeMap<Id, List<Tuple<Id, AgentId2PlannedDepartureTimeMapData>>>();

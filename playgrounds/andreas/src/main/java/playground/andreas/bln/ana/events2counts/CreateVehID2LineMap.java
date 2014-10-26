@@ -10,14 +10,15 @@ import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.vehicles.Vehicle;
 
 public class CreateVehID2LineMap {
 	
 	private final static Logger log = Logger.getLogger(CreateVehID2LineMap.class);
 	
-	public static Map<Id, Id> createVehID2LineMap(TransitSchedule transitSchedule){
+	public static Map<Id<Vehicle>, Id<TransitLine>> createVehID2LineMap(TransitSchedule transitSchedule){
 		
-		Map<Id, Id> veh2LineMap = new HashMap<Id, Id>();
+		Map<Id<Vehicle>, Id<TransitLine>> veh2LineMap = new HashMap<>();
 		
 		for (Entry<Id<TransitLine>, TransitLine> lineEntry : transitSchedule.getTransitLines().entrySet()) {
 			for (Entry<Id<TransitRoute>, TransitRoute> routeEntry : lineEntry.getValue().getRoutes().entrySet()) {

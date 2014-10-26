@@ -19,18 +19,21 @@
 
 package playground.andreas.P2.replanning;
 
+import java.io.File;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.testcases.MatsimTestUtils;
+
 import playground.andreas.P2.PConfigGroup;
 import playground.andreas.P2.PConstants;
 import playground.andreas.P2.operator.TimeProvider;
-
-import java.io.File;
 
 
 public class TimeProviderTest {
@@ -87,9 +90,11 @@ public class TimeProviderTest {
 		Assert.assertEquals("Check time", 7200.0, tP.getRandomTimeInInterval(startTime, endTime), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("Check time", 11700.0, tP.getRandomTimeInInterval(startTime, endTime), MatsimTestUtils.EPSILON);
 		
-		Id id = new IdImpl("id");
+		Id<Person> agentId = Id.create("id", Person.class);
+		Id<Link> linkId = Id.create("id", Link.class);
+		Id<ActivityFacility> facilityId = Id.create("id", ActivityFacility.class);
 		for (int i = 0; i < 100; i++) {
-			tP.handleEvent(new ActivityEndEvent(500.0 * i, id, id, id, "type"));
+			tP.handleEvent(new ActivityEndEvent(500.0 * i, agentId, linkId, facilityId, "type"));
 		}
 		
 		Assert.assertEquals("Check time", 9000.0, tP.getRandomTimeInInterval(startTime, endTime), MatsimTestUtils.EPSILON);

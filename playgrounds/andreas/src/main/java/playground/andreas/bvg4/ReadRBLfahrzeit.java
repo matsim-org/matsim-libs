@@ -6,11 +6,12 @@ import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 
 public class ReadRBLfahrzeit implements TabularFileHandler {
 	
@@ -61,9 +62,9 @@ public class ReadRBLfahrzeit implements TabularFileHandler {
 				String departureDateIst = row[2].split(" ")[0].trim();
 				double departureTimeIst = Time.parseTime(row[2].split(" ")[1].trim());
 				String zeitBasis = row[3].trim();
-				Id vehId = new IdImpl(row[4].trim());
+				Id<Vehicle> vehId = Id.create(row[4].trim(), Vehicle.class);
 				int runningNumber = Integer.parseInt(row[5].trim());
-				Id stopId = new IdImpl(row[6].trim());
+				Id<TransitStopFacility> stopId = Id.create(row[6].trim(), TransitStopFacility.class);
 				String stopNameShort = row[7].trim();
 				String stopName = row[8].trim();
 				String departureDateIstAtStop = row[9].split(" ")[0].trim();

@@ -20,6 +20,9 @@
 package playground.andreas.bvg4;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Corresponds to Golden Spool File fahrt_ist
@@ -43,13 +46,13 @@ public class FahrtEvent {
 	private final String zeitBasis;
 	
 	// Tagged FAHRZEUGNUMMER
-	private final Id vehId;
+	private final Id<Vehicle> vehId;
 	
 	// Tagged LINIE
-	private final Id lineId;
+	private final Id<TransitLine> lineId;
 	
 	// Tagged ROUTE
-	private final Id routeId;
+	private final Id<TransitRoute> routeId;
 	
 	// Tagged DISTANZ_ROUTE_IST
 	private final int distanceRouteIst;
@@ -70,7 +73,7 @@ public class FahrtEvent {
 	private final boolean transmissionError;
 	
 	public FahrtEvent(int rblDate, int kurs, String departureDateIst, double departureTimeIst, String zeitBasis,
-			Id vehId, Id lineId, Id routeId, int distanceRouteIst, int travelTimeIst,
+			Id<Vehicle> vehId, Id<TransitLine> lineId, Id<TransitRoute> routeId, int distanceRouteIst, int travelTimeIst,
 			boolean fahrtArtDispo, boolean statusLokalisierung, boolean statusErfasst, boolean transmissionError){
 		
 		this.rblDate = rblDate;
@@ -109,15 +112,15 @@ public class FahrtEvent {
 		return zeitBasis;
 	}
 
-	public Id getVehId() {
+	public Id<Vehicle> getVehId() {
 		return vehId;
 	}
 
-	public Id getLineId() {
+	public Id<TransitLine> getLineId() {
 		return lineId;
 	}
 
-	public Id getRouteId() {
+	public Id<TransitRoute> getRouteId() {
 		return routeId;
 	}
 

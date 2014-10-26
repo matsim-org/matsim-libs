@@ -10,28 +10,28 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.vehicles.Vehicle;
 
 public class AgentId2DepartureDelayAtStopMapTest {
 
 	@Test
 	public void testAgentId2DepartureDelayAtStopMap() {
 		
-        Id[] ida= new Id[15];
-    	Set<Id> idSet = new TreeSet<Id>();
-        for (int ii=0; ii<15; ii++){
-        	ida[ii] = new IdImpl(ii); 
-            idSet.add(ida[ii]);
-        }
+		Set<Id<Person>> idSet = new TreeSet<>();
+		for (int ii=0; ii<15; ii++){
+			idSet.add(Id.create(ii, Person.class));
+		}
         
 //        assign Ids to routes, vehicles and agents to be used in Test
         
-        Id vehId1 = ida[4];
-        Id vehId2 = ida[1];
-        Id persId1 = ida[0];
-        Id persId2 = ida[5];
-        Id linkId1 = ida[14];
-        Id linkId3 = ida[13];
+        Id<Vehicle> vehId1 = Id.create(4, Vehicle.class);
+        Id<Vehicle> vehId2 = Id.create(1, Vehicle.class);
+        Id<Person> persId1 = Id.create(0, Person.class);
+        Id<Person> persId2 = Id.create(5, Person.class);
+        Id<Link> linkId1 = Id.create(14, Link.class);
+        Id<Link> linkId3 = Id.create(13, Link.class);
 
         
         AgentId2DepartureDelayAtStopMap handler = new AgentId2DepartureDelayAtStopMap(idSet);

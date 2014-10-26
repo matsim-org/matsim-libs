@@ -17,10 +17,10 @@ import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.vehicles.Vehicle;
 
 class VehEventFilter implements VehicleDepartsAtFacilityEventHandler, VehicleArrivesAtFacilityEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
 	
@@ -35,9 +35,9 @@ class VehEventFilter implements VehicleDepartsAtFacilityEventHandler, VehicleArr
 	
 	public static void main(String[] args) {
 		VehEventFilter vehEventFilter = new VehEventFilter("E:/_out/veh/");
-		vehEventFilter.addVehToEvaluate(new IdImpl("veh_14"));
-		vehEventFilter.addVehToEvaluate(new IdImpl("veh_15"));
-		vehEventFilter.addVehToEvaluate(new IdImpl("veh_17"));
+		vehEventFilter.addVehToEvaluate(Id.create("veh_14", Vehicle.class));
+		vehEventFilter.addVehToEvaluate(Id.create("veh_15", Vehicle.class));
+		vehEventFilter.addVehToEvaluate(Id.create("veh_17", Vehicle.class));
 		vehEventFilter.readEvents("E:/_out/veh/0.events.xml.gz");
 	}
 	

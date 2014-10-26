@@ -18,9 +18,9 @@ public class TransitSchedule2MainLine {
 
 	private final static Logger log = Logger.getLogger(TransitSchedule2MainLine.class);
 	
-	public static Map<Id, List<List<Id>>> createMainLinesFromTransitSchedule(TransitSchedule transitSchedule) {
+	public static Map<Id<TransitLine>, List<List<Id>>> createMainLinesFromTransitSchedule(TransitSchedule transitSchedule) {
 		
-		Map<Id, List<List<Id>>> line2MainLinesMap = new HashMap<Id, List<List<Id>>>();
+		Map<Id<TransitLine>, List<List<Id>>> line2MainLinesMap = new HashMap<>();
 		
 		for (Entry<Id<TransitLine>, TransitLine> transitLineEntry : transitSchedule.getTransitLines().entrySet()) {
 			// Annahme: Es gibt maximal zwei Ketten, z.B. Hin- und Rueckrichtung, andere Routen sind Untermengen

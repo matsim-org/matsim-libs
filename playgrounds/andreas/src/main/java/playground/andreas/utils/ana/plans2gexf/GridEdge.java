@@ -25,7 +25,6 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.basic.v01.IdImpl;
 
 /**
  * Stores all information linked to that edge
@@ -37,7 +36,7 @@ public class GridEdge {
 	
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(GridEdge.class);
-	private Id id;
+	private Id<GridEdge> id;
 	private GridNode fromNode;
 	private GridNode toNode;
 	
@@ -46,7 +45,7 @@ public class GridEdge {
 	
 	
 	public GridEdge(GridNode fromNode, GridNode toNode){
-		this.id = new IdImpl(fromNode.getId() + "-" + toNode.getId());
+		this.id = Id.create(fromNode.getId() + "-" + toNode.getId(), GridEdge.class);
 		this.fromNode = fromNode;
 		this.toNode = toNode;
 	}
@@ -70,7 +69,7 @@ public class GridEdge {
 		return toNode;
 	}
 
-	public Id getId() {
+	public Id<GridEdge> getId() {
 		return id;
 	}
 	

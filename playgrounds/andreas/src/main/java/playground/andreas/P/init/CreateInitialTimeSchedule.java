@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -75,7 +74,7 @@ public class CreateInitialTimeSchedule {
 		cITS.writeVehicles(pConfig.getCurrentOutputBase() + "transitVehicles.xml");
 	}
 	
-	public static TransitLine createSingleTransitLine(NetworkImpl net, TransitSchedule transitSchedule, Id driverId){
+	public static TransitLine createSingleTransitLine(NetworkImpl net, TransitSchedule transitSchedule, Id<Vehicle> driverId){
 		CreateInitialTimeSchedule cITS = new CreateInitialTimeSchedule(net, transitSchedule);
 		return cITS.createSingleTransitLine(driverId);
 	}
@@ -100,19 +99,19 @@ public class CreateInitialTimeSchedule {
 		for (int i = 0; i < this.numberOfAgents; i++) {
 			
 			// initialize
-			Id driverId = new IdImpl("free_" + i);
+			Id<Vehicle> driverId = Id.create("free_" + i, Vehicle.class);
 			this.tS.addTransitLine(createSingleTransitLine(driverId));
 		}
 	}
 
-	public TransitLine createSingleTransitLine(Id driverId){
+	public TransitLine createSingleTransitLine(Id<Vehicle> driverId){
 		// initialize
-		TransitLine line = this.tS.getFactory().createTransitLine(driverId);			
+		TransitLine line = this.tS.getFactory().createTransitLine(Id.create(driverId, TransitLine.class));			
 		TransitStopFacility startStop = getRandomTransitStop();			
 		TransitStopFacility endStop = getRandomTransitStop();
 		
-		TransitRoute transitRoute_H = createRoute(new IdImpl(driverId + "_H"), startStop, endStop);
-		TransitRoute transitRoute_R = createRoute(new IdImpl(driverId + "_R"), endStop, startStop);
+		TransitRoute transitRoute_H = createRoute(Id.create(driverId + "_H", TransitRoute.class), startStop, endStop);
+		TransitRoute transitRoute_R = createRoute(Id.create(driverId + "_R", TransitRoute.class), endStop, startStop);
 		
 		// register route
 		line.addRoute(transitRoute_H);
@@ -121,13 +120,13 @@ public class CreateInitialTimeSchedule {
 		// add departures
 		int n = 0;
 		for (double j = 0.0; j < 24 * 3600; ) {
-			Departure departure = this.tS.getFactory().createDeparture(new IdImpl(n), j);
+			Departure departure = this.tS.getFactory().createDeparture(Id.create(n, Departure.class), j);
 			departure.setVehicleId(driverId);
 			transitRoute_H.addDeparture(departure);
 			j += transitRoute_H.getStop(endStop).getDepartureOffset() + 5 *60;
 			n++;
 			
-			departure = this.tS.getFactory().createDeparture(new IdImpl(n), j);
+			departure = this.tS.getFactory().createDeparture(Id.create(n, Departure.class), j);
 			departure.setVehicleId(driverId);
 			transitRoute_R.addDeparture(departure);
 			j += transitRoute_R.getStop(startStop).getDepartureOffset() + 5 *60;
@@ -137,7 +136,7 @@ public class CreateInitialTimeSchedule {
 		return line;
 	}
 
-	private TransitRoute createRoute(Id routeID, TransitStopFacility startStop, TransitStopFacility endStop){
+	private TransitRoute createRoute(Id<TransitRoute> routeID, TransitStopFacility startStop, TransitStopFacility endStop){
 		
 		FreespeedTravelTimeAndDisutility tC = new FreespeedTravelTimeAndDisutility(-6.0, 0.0, 0.0);
 		LeastCostPathCalculator routingAlgo = new Dijkstra(this.net, tC, tC);
@@ -184,7 +183,7 @@ public class CreateInitialTimeSchedule {
 	
 	private void writeVehicles(String vehiclesOutFile) {
 		VehiclesFactory vehFactory = this.veh.getFactory();
-		VehicleType vehType = vehFactory.createVehicleType(new IdImpl("defaultTransitVehicleType"));
+		VehicleType vehType = vehFactory.createVehicleType(Id.create("defaultTransitVehicleType", VehicleType.class));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(8));
 		capacity.setStandingRoom(Integer.valueOf(0));

@@ -2,9 +2,9 @@ package playground.andreas.aas.modules.cellBasedAccessibility.utils.network;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -341,15 +341,15 @@ public class NetworkUtil {
 		 */
 		
 		NetworkImpl network = NetworkImpl.createNetwork();
-		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
-		Node node2 = network.createAndAddNode(new IdImpl("2"), new CoordImpl(0, 1000));
-		Node node3 = network.createAndAddNode(new IdImpl("3"), new CoordImpl(1000, 2000));
-		Node node4 = network.createAndAddNode(new IdImpl("4"), new CoordImpl(2000, 2000));
-		Node node5 = network.createAndAddNode(new IdImpl("5"), new CoordImpl(1000, 0));
-		LinkImpl link1 = (LinkImpl) network.createAndAddLink(new IdImpl("1"), node1, node2, 1000, 1, 3600, 1);
-		LinkImpl link2 = (LinkImpl) network.createAndAddLink(new IdImpl("2"), node2, node3, 1500, 1, 3600, 1);
-		LinkImpl link3 = (LinkImpl) network.createAndAddLink(new IdImpl("3"), node3, node4, 1000, 1, 3600, 1);
-		LinkImpl link4 = (LinkImpl) network.createAndAddLink(new IdImpl("4"), node4, node5, 2800, 1, 3600, 1);
+		Node node1 = network.createAndAddNode(Id.create("1", Node.class), new CoordImpl(0, 0));
+		Node node2 = network.createAndAddNode(Id.create("2", Node.class), new CoordImpl(0, 1000));
+		Node node3 = network.createAndAddNode(Id.create("3", Node.class), new CoordImpl(1000, 2000));
+		Node node4 = network.createAndAddNode(Id.create("4", Node.class), new CoordImpl(2000, 2000));
+		Node node5 = network.createAndAddNode(Id.create("5", Node.class), new CoordImpl(1000, 0));
+		LinkImpl link1 = (LinkImpl) network.createAndAddLink(Id.create("1", Link.class), node1, node2, 1000, 1, 3600, 1);
+		LinkImpl link2 = (LinkImpl) network.createAndAddLink(Id.create("2", Link.class), node2, node3, 1500, 1, 3600, 1);
+		LinkImpl link3 = (LinkImpl) network.createAndAddLink(Id.create("3", Link.class), node3, node4, 1000, 1, 3600, 1);
+		LinkImpl link4 = (LinkImpl) network.createAndAddLink(Id.create("4", Link.class), node4, node5, 2800, 1, 3600, 1);
 
 		Distances distance1 = NetworkUtil.getDistance2NodeV2(link1, new CoordImpl(100, 0), node1);
 		log.info(distance1.getDisatancePoint2Road() + distance1.getDistanceRoad2Node() + " distance1");

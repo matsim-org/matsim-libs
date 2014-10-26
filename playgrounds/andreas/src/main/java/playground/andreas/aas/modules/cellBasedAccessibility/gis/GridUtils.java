@@ -31,7 +31,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -128,7 +127,7 @@ public class GridUtils {
 					polygon.setSRID( srid ); 
 					
 					Zone<Id> zone = new Zone<Id>(polygon);
-					zone.setAttribute( new IdImpl( setPoints ) );
+					zone.setAttribute( Id.create( setPoints , Zone.class) );
 					zones.add(zone);
 					
 					setPoints++;
@@ -200,7 +199,7 @@ public class GridUtils {
 					polygon.setSRID( srid ); 
 					
 					Zone<Id> zone = new Zone<Id>(polygon);
-					zone.setAttribute( new IdImpl( setPoints ) );
+					zone.setAttribute( Id.create( setPoints , Zone.class) );
 					zones.add(zone);
 					
 					setPoints++;

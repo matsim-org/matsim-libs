@@ -28,13 +28,13 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.lanes.data.v11.LaneData11;
 import org.matsim.lanes.data.v11.LaneData11Impl;
 import org.matsim.lanes.data.v11.LaneDefinitions11;
 import org.matsim.lanes.data.v11.LaneDefinitions11Impl;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
+import org.matsim.lanes.data.v20.Lane;
 
 
 /**
@@ -197,7 +197,7 @@ public class LanesGenerator {
 					continue;
 				}
 				
-				Id linkId = new IdImpl(linkIdString);
+				Id<Link> linkId = Id.create(linkIdString, Link.class);
 				//create the assignment
 				LanesToLinkAssignment11 assignment = laneDefs.getLanesToLinkAssignments().get(linkId);
 				if (assignment == null){
@@ -235,7 +235,7 @@ public class LanesGenerator {
 							continue;
 						}
 						
-						Id toLinkId = new IdImpl(toLinkIdString);
+						Id<Link> toLinkId = Id.create(toLinkIdString, Link.class);
 						if (this.network != null){
 							Link link = this.network.getLinks().get(linkId);
 							if (!link.getToNode().getOutLinks().containsKey(toLinkId)){
@@ -266,7 +266,7 @@ public class LanesGenerator {
 
 
 	private LaneData11 createLaneWithDefaults(Integer fromLaneId) {
-		Id laneId = new IdImpl(fromLaneId);
+		Id<Lane> laneId = Id.create(fromLaneId, Lane.class);
 		LaneData11 lane = new LaneData11Impl(laneId);
 		lane.setStartsAtMeterFromLinkEnd(45.0);
 		lane.setNumberOfRepresentedLanes(1);

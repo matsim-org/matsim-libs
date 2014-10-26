@@ -22,6 +22,7 @@ package playground.andreas.mzilske.bvg09;
 import java.util.Collection;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -31,7 +32,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -232,8 +232,8 @@ public class DataPrepare {
 		Collection<Umlauf> umlaeufe = greedyUmlaufBuilder.build();
 
 		VehiclesFactory vb = this.scenario.getVehicles().getFactory();
-		VehicleType vehicleType = vb.createVehicleType(new IdImpl(
-				"defaultTransitVehicleType"));
+		VehicleType vehicleType = vb.createVehicleType(Id.create(
+				"defaultTransitVehicleType", VehicleType.class));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(101));
 		capacity.setStandingRoom(Integer.valueOf(0));
@@ -243,7 +243,7 @@ public class DataPrepare {
 
 		long vehId = 0;
 		for (Umlauf umlauf : umlaeufe) {
-			Vehicle veh = vb.createVehicle(new IdImpl("veh_"+ Long.toString(vehId++)), vehicleType);
+			Vehicle veh = vb.createVehicle(Id.create("veh_"+ Long.toString(vehId++), Vehicle.class), vehicleType);
 			this.scenario.getVehicles().addVehicle( veh);
 			umlauf.setVehicleId(veh.getId());
 		}

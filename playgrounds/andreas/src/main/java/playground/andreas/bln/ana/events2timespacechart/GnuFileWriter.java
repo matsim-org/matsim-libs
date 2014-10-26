@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 
 public class GnuFileWriter {
@@ -25,7 +25,7 @@ public class GnuFileWriter {
 		}
 	}
 
-	void write(HashMap<Id, Double> stopIdDistanceMap, String line, HashMap<Id, String> stopIdNameMap) {
+	void write(HashMap<Id<TransitStopFacility>, Double> stopIdDistanceMap, String line, HashMap<Id<TransitStopFacility>, String> stopIdNameMap) {
 		try {
 			this.writer.write("set loadpath \"E:/Tools/gnuplot/bin/share/postscript/\""); this.writer.newLine();
 			this.writer.write("set encoding utf8"); this.writer.newLine();
@@ -63,11 +63,11 @@ public class GnuFileWriter {
 		}
 	}
 
-	private String writeYTics(HashMap<Id, Double> stopIdDistanceMap, HashMap<Id, String> stopIdNameMap) {
+	private String writeYTics(HashMap<Id<TransitStopFacility>, Double> stopIdDistanceMap, HashMap<Id<TransitStopFacility>, String> stopIdNameMap) {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("set ytics (");
 		boolean first = true;
-		for (Entry<Id, Double> entry : stopIdDistanceMap.entrySet()) {
+		for (Entry<Id<TransitStopFacility>, Double> entry : stopIdDistanceMap.entrySet()) {
 
 			if(first){
 				first = false;
@@ -79,7 +79,7 @@ public class GnuFileWriter {
 			if(stopIdNameMap == null){
 				buffer.append(entry.getKey().toString().split("\\.")[0]);
 			}else{
-				buffer.append(stopIdNameMap.get(new IdImpl(entry.getKey().toString().split("\\.")[0])).toString().trim());
+				buffer.append(stopIdNameMap.get(Id.create(entry.getKey().toString().split("\\.")[0], TransitStopFacility.class)).toString().trim());
 			}
 			buffer.append("\" ");
 			buffer.append(entry.getValue());

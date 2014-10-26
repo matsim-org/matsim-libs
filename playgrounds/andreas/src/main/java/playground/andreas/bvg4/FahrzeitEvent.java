@@ -20,7 +20,8 @@
 package playground.andreas.bvg4;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * Corresponds to Golden Spool File fahrzeit_ist
@@ -44,13 +45,13 @@ public class FahrzeitEvent {
 	private final String zeitBasis;
 	
 	// Tagged FAHRZEUGNUMMER
-	private final Id vehId;
+	private final Id<Vehicle> vehId;
 	
 	// Tagged LFD_NR
 	private final int runningNumber;
 	
 	// Tagged PUNKT_NR
-	private Id stopId;
+	private Id<TransitStopFacility> stopId;
 	
 	// Tagged KUERZEL
 	private final String stopNameShort;
@@ -78,7 +79,7 @@ public class FahrzeitEvent {
 	private FahrtEvent fahrtEvent;
 	
 	public FahrzeitEvent(int rblDate, int kurs, String departureDateIst, double departureTimeIst,
-			String zeitBasis, Id vehId, int runningNumber, Id stopId, String stopNameShort,
+			String zeitBasis, Id<Vehicle> vehId, int runningNumber, Id<TransitStopFacility> stopId, String stopNameShort,
 			String stopName, String departureDateIstAtStop, double departureTimeIstAtStop,
 			String arrivalDateIstAtStop, double arrivalTimeIstAtStop, int distanceStreckeIst,
 			boolean statusOfDoor, boolean statusLokalisierung){
@@ -103,7 +104,7 @@ public class FahrzeitEvent {
 	}
 
 	public void setNewStopId(String newStopName){
-		this.stopId = new IdImpl(newStopName);
+		this.stopId = Id.create(newStopName, TransitStopFacility.class);
 	}
 
 	public int getRblDate() {
@@ -126,7 +127,7 @@ public class FahrzeitEvent {
 		return zeitBasis;
 	}
 
-	public Id getVehId() {
+	public Id<Vehicle> getVehId() {
 		return vehId;
 	}
 
@@ -134,7 +135,7 @@ public class FahrzeitEvent {
 		return runningNumber;
 	}
 
-	public Id getStopId() {
+	public Id<TransitStopFacility> getStopId() {
 		return stopId;
 	}
 

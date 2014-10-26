@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * Collects all <code>PersonEntersVehicleEvent</code> and <code>PersonLeavesVehicleEvent</code> for a given set of agents.
@@ -42,11 +43,11 @@ public class AgentId2EnterLeaveVehicleEventHandler implements PersonEntersVehicl
 	private final Logger log = Logger.getLogger(AgentId2EnterLeaveVehicleEventHandler.class);
 	private final Level logLevel = Level.DEBUG;
 	
-	private Set<Id> agentIds;
+	private Set<Id<Person>> agentIds;
 	private TreeMap<Id, ArrayList<PersonEntersVehicleEvent>> agentId2EnterEventMap = new TreeMap<Id, ArrayList<PersonEntersVehicleEvent>>();
 	private TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>> agentId2LeaveEventMap = new TreeMap<Id, ArrayList<PersonLeavesVehicleEvent>>();
 	
-	public AgentId2EnterLeaveVehicleEventHandler(Set<Id> agentIds){
+	public AgentId2EnterLeaveVehicleEventHandler(Set<Id<Person>> agentIds){
 		this.log.setLevel(this.logLevel);
 		this.agentIds = agentIds;
 	}	
@@ -67,7 +68,7 @@ public class AgentId2EnterLeaveVehicleEventHandler implements PersonEntersVehicl
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		Id agentId = event.getPersonId();
+		Id<Person> agentId = event.getPersonId();
 		if(this.agentIds.contains(agentId)){
 			if(this.agentId2EnterEventMap.get(agentId) == null){
 				this.agentId2EnterEventMap.put(agentId, new ArrayList<PersonEntersVehicleEvent>());
@@ -78,7 +79,7 @@ public class AgentId2EnterLeaveVehicleEventHandler implements PersonEntersVehicl
 
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
-		Id agentId = event.getPersonId();
+		Id<Person> agentId = event.getPersonId();
 		if(this.agentIds.contains(agentId)){
 			if(this.agentId2LeaveEventMap.get(agentId) == null){
 				this.agentId2LeaveEventMap.put(agentId, new ArrayList<PersonLeavesVehicleEvent>());
