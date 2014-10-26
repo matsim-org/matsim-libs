@@ -62,7 +62,7 @@ public class DelaysUserGroup {
 	private String configFile;
 
 	public static void main(String[] args) throws IOException {
-		String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct_msa_rSeed/eci/";/*"./output/run2/";*/
+		String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct_msa_rSeed/";/*"./output/run2/";*/
 		String [] runCases = { "baseCaseCtd","ei","ci","eci"};
 
 		new DelaysUserGroup(outputDir).run(runCases);
