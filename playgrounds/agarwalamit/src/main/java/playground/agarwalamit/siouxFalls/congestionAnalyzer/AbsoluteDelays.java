@@ -22,62 +22,57 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.LoadMyScenarios;
-import playground.ikaddoura.internalizationCar.MarginalCongestionHandlerImplV3;
+import playground.agarwalamit.analysis.congestion.CongestionLinkAnalyzer;
 
 /**
+ * Simplified class to get the absolute delays for all the specified run cases
+ *  and write them to file.
  * @author amit
  */
-public class AbsoluteDelays {
+public class AbsoluteDelays  {
 
-	private static String clusterPathDesktop = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/";
-	private static String [] runCase =  {"baseCaseCtd","ei","ci","eci"};//{"run201","run202","run203","run204"};
-//	private final static String networkFile = "/Users/aagarwal/Desktop/ils4/agarwal/munich/input/network-86-85-87-84_simplifiedWithStrongLinkMerge---withLanes.xml";
+	private String outputDir;
+
+	public AbsoluteDelays(String outputDir) {
+		this.outputDir = outputDir;
+	}
 
 	public static void main(String[] args) {
+		String clusterPathDesktop = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct_msa_rSeed/";
+		String [] runCases =  {"baseCaseCtd","ei","ci","eci"};
 		
-		BufferedWriter writer =IOUtils.getBufferedWriter(clusterPathDesktop+"/analysis/r/rAbsoluteDelays.txt");
-		
-		double [] delays = new double [runCase.length];
-		
-		for (int i=0; i<delays.length;i++){
-			delays[i] = totalDelayInHoursFromEventsFile(runCase[i]);
-		}
-		
+		new AbsoluteDelays(clusterPathDesktop).runAndWrite(runCases);
+	}
+
+	public void runAndWrite(String [] runCases){
+		BufferedWriter writer =IOUtils.getBufferedWriter(outputDir+"/analysis/absoluteDelays.txt");
+
 		try {
-			writer.write("BAU \t EI \t CI \t ECI \n");
-			for(double d:delays){
-			writer.write(d+"\t");
+			for(String runCase : runCases){
+				writer.write(runCase+"\t"+totalDelayInHoursFromEventsFile(runCase)+"\n");
 			}
-			writer.newLine();
 			writer.close();
 		} catch (IOException e) {
 			throw new RuntimeException("Data is not written into File. Reason : "+e);
 		}
-		
 	}
 
-	private static double totalDelayInHoursFromEventsFile(String runNumber) {
-		EventsManager eventManager = EventsUtils.createEventsManager();
-		String configFile = runNumber+"output_config.xml";
-		int lastIteration = LoadMyScenarios.getLastIteration(configFile);
-		String networkFile = runNumber+"output_network.xml.gz";
-		Scenario sc =  LoadMyScenarios.loadScenarioFromNetwork(networkFile);
-		MarginalCongestionHandlerImplV3 congestionHandlerImplV3= new MarginalCongestionHandlerImplV3(eventManager,(ScenarioImpl) sc);
+	private  double totalDelayInHoursFromEventsFile(String runCase) {
 
-		eventManager.addHandler(congestionHandlerImplV3);
+		String configFile = outputDir+runCase+"/output_config.xml";
+		String networkFile = outputDir+runCase+"/output_network.xml.gz";
+		double simEndTime = LoadMyScenarios.getSimulationEndTime(configFile);
+		int lastIt = LoadMyScenarios.getLastIteration(configFile);
+		String eventFile = outputDir+runCase+"/ITERS/it."+lastIt+"/"+lastIt+".events.xml.gz";		
 
-		MatsimEventsReader eventsReader = new MatsimEventsReader(eventManager);
-		String eventFileLocation = runNumber+"/ITERS/it."+lastIteration+"/"+lastIteration+".events.xml.gz";
-		String inputEventsFile = clusterPathDesktop+eventFileLocation;
-		eventsReader.readFile(inputEventsFile);
+		Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(networkFile);
 
-		return congestionHandlerImplV3.getTotalDelay()/3600;
+		CongestionLinkAnalyzer congestionHandler = new CongestionLinkAnalyzer(simEndTime, eventFile, 1);
+		congestionHandler.run(sc);
+
+		return congestionHandler.getTotalDelaysInHours();
 	}
 }

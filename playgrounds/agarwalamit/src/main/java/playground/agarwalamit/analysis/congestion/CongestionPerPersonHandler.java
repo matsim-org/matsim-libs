@@ -41,7 +41,7 @@ import org.matsim.api.core.v01.population.Person;
  */
 public class CongestionPerPersonHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, 
 PersonDepartureEventHandler, PersonArrivalEventHandler {
-	private final Logger logger = Logger.getLogger(CongestionPerPersonHandler.class);
+	public static final Logger logger = Logger.getLogger(CongestionPerPersonHandler.class);
 
 	private Map<Double, Map<Id<Person>, Double>> personId2DelaysPerTimeBin = new HashMap<Double, Map<Id<Person>, Double>>();
 	private Map<Id<Link>, Map<Id<Person>, Double>> linkId2PersonIdLinkEnterTime = new HashMap<Id<Link>, Map<Id<Person>,Double>>();
@@ -51,6 +51,11 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 
 	private final double timeBinSize;
 
+	/**
+	 * @param noOfTimeBins
+	 * @param simulationEndTime
+	 * @param scenario must have minimally network and plans file.
+	 */
 	public CongestionPerPersonHandler(int noOfTimeBins, double simulationEndTime, Scenario scenario){
 
 		this.timeBinSize = simulationEndTime / noOfTimeBins;
@@ -158,6 +163,7 @@ PersonDepartureEventHandler, PersonArrivalEventHandler {
 	public double getTotalDelayInHours(){
 		return totalDelay/3600;
 	}
+	
 	public Map<Double, Map<Id<Link>, Double>> getTime2linkIdLeaveCount() {
 		return this.time2linkIdLeaveCount;
 	}

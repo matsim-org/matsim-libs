@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.gbl.Gbl;
 
 /**
  * @author amit
@@ -45,9 +46,15 @@ public class CongestionPerLinkHandler implements LinkEnterEventHandler, LinkLeav
 	private Map<Id, Double> linkId2FreeSpeedLinkTravelTime = new HashMap<Id, Double>();
 	private Map<Double, Map<Id, Double>> time2linkIdLeaveCount = new HashMap<Double, Map<Id,Double>>();
 	private double totalDelay;
+	private double warnCount=0;
 
 	private final double timeBinSize;
 
+	/**
+	 * @param noOfTimeBins
+	 * @param simulationEndTime
+	 * @param scenario must have minimally network file.
+	 */
 	public CongestionPerLinkHandler(int noOfTimeBins, double simulationEndTime, Scenario scenario){
 
 		this.timeBinSize = simulationEndTime / noOfTimeBins;
@@ -77,6 +84,7 @@ public class CongestionPerLinkHandler implements LinkEnterEventHandler, LinkLeav
 		this.linkId2PersonIdLinkEnterTime.clear();
 		this.linkId2FreeSpeedLinkTravelTime.clear();
 		this.time2linkIdLeaveCount.clear();
+		this.warnCount=0;
 		this.logger.info("Resetting linkLeave counter to " + this.time2linkIdLeaveCount);
 	}
 
@@ -136,12 +144,14 @@ public class CongestionPerLinkHandler implements LinkEnterEventHandler, LinkLeav
 		Id personId = event.getPersonId();
 
 		if(this.linkId2PersonIdLinkEnterTime.get(linkId).containsKey(personId)){
-//			logger.info("Person "+personId+" is entering on link "+linkId+" two times without leaving from the same. Link enter times are "+
-//					this.linkId2PersonIdLinkEnterTime.get(linkId).get(personId)+" and "+time+ "\n Reason might be :"+
-//							" \n There is at least one teleport activity departing on a link ( and thus derived link enter time)"
-//							+ " and later person is entering the link with main mode."+
-//					"\n Replacing the old value. ");
-//			throw new RuntimeException();
+			if(warnCount==0){
+				warnCount++;
+				logger.warn("Person "+personId+" is entering on link "+linkId+" two times without leaving from the same. "
+						+ "Link enter times are "+this.linkId2PersonIdLinkEnterTime.get(linkId).get(personId)+" and "+time);
+				logger.warn("Reason might be : There is at least one teleport activity departing on the link (and thus derived link "
+						+ "enter time) and later person is entering the link with main congested mode. In such cases, the old time will be replaced.");
+				Gbl.ONLYONCE.toString();
+			}
 		}
 
 		Map<Id, Double> personId2LinkEnterTime = this.linkId2PersonIdLinkEnterTime.get(linkId);
@@ -161,6 +171,7 @@ public class CongestionPerLinkHandler implements LinkEnterEventHandler, LinkLeav
 	public double getTotalDelayInHours(){
 		return this.totalDelay/3600;
 	}
+	
 	public Map<Double, Map<Id, Double>> getTime2linkIdLeaveCount() {
 		return this.time2linkIdLeaveCount;
 	}

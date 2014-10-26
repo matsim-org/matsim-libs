@@ -94,6 +94,10 @@ public class CongestionPersonAnalyzer extends AbstractAnalyisModule {
 		return endTime;
 	}
 
+	public double getTotalDelaysInHours (){
+		return this.congestionPerPersonHandler.getTotalDelayInHours();
+	}
+	
 	public Map<Double, Map<Id<Person>, Double>> getCongestionPerPersonTimeInterval() {
 		return this.congestionPerPersonTimeInterval;
 	}

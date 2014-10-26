@@ -51,6 +51,14 @@ public class CongestionLinkAnalyzer extends AbstractAnalyisModule {
 		this.noOfTimeBins = noOfTimeBins;
 		this.simulationEndTime = simulationEndTime;
 	}
+	
+	public void run(Scenario scenario){
+		init(scenario);
+		preProcessData();
+		postProcessData();
+		checkTotalDelayUsingAlternativeMethod();
+	}
+	
 	public void init(Scenario scenario){
 		this.scenario = scenario;
 		this.congestionPerLinkHandler = new CongestionPerLinkHandler(this.noOfTimeBins, this.simulationEndTime , this.scenario);
@@ -76,9 +84,13 @@ public class CongestionLinkAnalyzer extends AbstractAnalyisModule {
 
 	@Override
 	public void writeResults(String outputFolder) {
-
+		
 	}
 
+	public double getTotalDelaysInHours (){
+		return this.congestionPerLinkHandler.getTotalDelayInHours();
+	}
+	
 	public Map<Double, Map<Id, Double>> getCongestionPerLinkTimeInterval() {
 		return this.congestionPerLinkTimeInterval;
 	}
