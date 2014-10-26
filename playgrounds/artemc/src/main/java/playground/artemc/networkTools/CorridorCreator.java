@@ -3,9 +3,10 @@ package playground.artemc.networkTools;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -40,31 +41,31 @@ public class CorridorCreator {
 		int restLength = totalLength;
 		int newLinkId = 1;
 		int newNodeId = 1;
-		IdImpl fromNode = new IdImpl(newNodeId);
+		Id<Node> fromNode = Id.create(newNodeId, Node.class);
 		network.createAndAddNode(fromNode, new CoordImpl(10.0, 10.0));
 
 		while (restLength > 0) {
 			newNodeId++;
-			IdImpl toNode = new IdImpl(newNodeId);
+			Id<Node> toNode = Id.create(newNodeId, Node.class);
 
 			if (restLength > linkLength) {
 				network.createAndAddNode(toNode, new CoordImpl(10.0 + totalLength - restLength + linkLength, 10.0));
-				network.createAndAddLink(new IdImpl(newLinkId), network.getNodes().get(fromNode), network.getNodes().get(toNode),
+				network.createAndAddLink(Id.create(newLinkId, Link.class), network.getNodes().get(fromNode), network.getNodes().get(toNode),
 						linkLength, freespeed, capacity * numLanes, numLanes);
-				network.createAndAddLink(new IdImpl(newLinkId + "r"), network.getNodes().get(toNode),
+				network.createAndAddLink(Id.create(newLinkId + "r", Link.class), network.getNodes().get(toNode),
 						network.getNodes().get(fromNode), linkLength, freespeed, capacity * numLanes, numLanes);
 
 			} else {
 				network.createAndAddNode(toNode, new CoordImpl(totalLength, 10.0));
-				network.createAndAddLink(new IdImpl(newLinkId), network.getNodes().get(fromNode), network.getNodes().get(toNode),
+				network.createAndAddLink(Id.create(newLinkId, Link.class), network.getNodes().get(fromNode), network.getNodes().get(toNode),
 						restLength, freespeed, capacity * numLanes, numLanes);
-				network.createAndAddLink(new IdImpl(newLinkId + "r"), network.getNodes().get(toNode),
+				network.createAndAddLink(Id.create(newLinkId + "r", Link.class), network.getNodes().get(toNode),
 						network.getNodes().get(fromNode), restLength, freespeed, capacity * numLanes, numLanes);
 
 			}
 			
-			network.getLinks().get(new IdImpl(newLinkId)).setAllowedModes(allowedModesAll);
-			network.getLinks().get(new IdImpl(newLinkId + "r")).setAllowedModes(allowedModesAll);
+			network.getLinks().get(Id.create(newLinkId, Link.class)).setAllowedModes(allowedModesAll);
+			network.getLinks().get(Id.create(newLinkId + "r", Link.class)).setAllowedModes(allowedModesAll);
 
 
 

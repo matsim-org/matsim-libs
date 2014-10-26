@@ -8,7 +8,7 @@ import java.util.Set;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
@@ -51,12 +51,12 @@ public class BuslaneGenerator_fullPriority {
 			for (Id route : transitSchedule.getTransitLines().get(line).getRoutes().keySet()) {
 				System.out.println("  Route: " + route.toString());
 				System.out.println("Links: ");
-				Id fromNodeId = new IdImpl("");
+				Id<Node> fromNodeId = Id.create("", Node.class);
 				Integer lastLinkId = Integer.parseInt(transitSchedule.getTransitLines().get(line).getRoutes().get(route)
 						.getRoute().getEndLinkId().toString()) - 1;
 				for (Id link : transitSchedule.getTransitLines().get(line).getRoutes().get(route).getRoute().getLinkIds()) {
 					System.out.print(link.toString() + ",");
-					Id newLinkId = new IdImpl(link.toString() + "_bus");
+					Id<Link> newLinkId = Id.create(link.toString() + "_bus", Link.class);
 					if (!network.getLinks().containsKey(newLinkId)) {
 						double length = network.getLinks().get(link).getLength();
 						double numLanes = network.getLinks().get(link).getNumberOfLanes();
@@ -71,7 +71,7 @@ public class BuslaneGenerator_fullPriority {
 						network.getLinks().get(link).setNumberOfLanes(numLanes - 1);
 						network.getLinks().get(link).setAllowedModes(allowedModesPrivate);
 
-						Id newNodeId = new IdImpl(network.getLinks().get(link).getToNode().getId().toString() + "b");
+						Id<Node> newNodeId = Id.create(network.getLinks().get(link).getToNode().getId().toString() + "b", Node.class);
 						Coord newBusNodeCoord = new CoordImpl(network.getLinks().get(link).getToNode().getCoord().getX() + 0.1,
 								network.getLinks().get(link).getToNode().getCoord().getY() + 0.1);
 

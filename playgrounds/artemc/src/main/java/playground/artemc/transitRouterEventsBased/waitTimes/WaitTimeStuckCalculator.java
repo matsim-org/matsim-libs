@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.utils.collections.Tuple;
@@ -44,6 +43,7 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 
 /**
@@ -59,8 +59,8 @@ public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, Per
 
 	//Attributes
 	private final double timeSlot;
-	private final Map<Tuple<Id, Id>, Map<Id, WaitTimeData>> waitTimes = new HashMap<Tuple<Id, Id>, Map<Id, WaitTimeData>>(1000);
-	private final Map<Tuple<Id, Id>, Map<Id, double[]>> scheduledWaitTimes = new HashMap<Tuple<Id, Id>, Map<Id, double[]>>(1000);
+	private final Map<Tuple<Id<TransitLine>, Id<TransitRoute>>, Map<Id<TransitStopFacility>, WaitTimeData>> waitTimes = new HashMap<>(1000);
+	private final Map<Tuple<Id<TransitLine>, Id<TransitRoute>>, Map<Id<TransitStopFacility>, double[]>> scheduledWaitTimes = new HashMap<>(1000);
 	private final Map<Id, Double> agentsWaitingData = new HashMap<Id, Double>();
 	private final Map<Id, Integer> agentsCurrentLeg = new HashMap<Id, Integer>();
 	private final Population population;
@@ -79,11 +79,11 @@ public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, Per
 				for(Departure departure:route.getDepartures().values())
 					sortedDepartures[d++] = departure.getDepartureTime();
 				Arrays.sort(sortedDepartures);
-				Map<Id, WaitTimeData> stopsMap = new HashMap<Id, WaitTimeData>(100);
-				Map<Id, double[]> stopsScheduledMap = new HashMap<Id, double[]>(100);
+				Map<Id<TransitStopFacility>, WaitTimeData> stopsMap = new HashMap<>(100);
+				Map<Id<TransitStopFacility>, double[]> stopsScheduledMap = new HashMap<>(100);
 				for(TransitRouteStop stop:route.getStops()) {
-					stopsMap.put(stop.getStopFacility().getId(), new WaitTimeDataArray((int) (totalTime/timeSlot)+1));
-					double[] cacheWaitTimes = new double[(int) (totalTime/timeSlot)+1];
+					stopsMap.put(stop.getStopFacility().getId(), new WaitTimeDataArray(totalTime/timeSlot+1));
+					double[] cacheWaitTimes = new double[totalTime/timeSlot+1];
 					for(int i=0; i<cacheWaitTimes.length; i++) {
 						double endTime = timeSlot*(i+1);
 						if(endTime>24*3600)
@@ -102,7 +102,7 @@ public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, Per
 					}
 					stopsScheduledMap.put(stop.getStopFacility().getId(), cacheWaitTimes);
 				}
-				Tuple<Id, Id> key = new Tuple<Id, Id>(line.getId(), route.getId());
+				Tuple<Id<TransitLine>, Id<TransitRoute>> key = new Tuple<>(line.getId(), route.getId());
 				waitTimes.put(key, stopsMap);
 				scheduledWaitTimes.put(key, stopsScheduledMap);
 			}
@@ -131,7 +131,7 @@ public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, Per
 	}
 	@Override
 	public void reset(int iteration) {
-		for(Map<Id, WaitTimeData> routeData:waitTimes.values())
+		for(Map<Id<TransitStopFacility>, WaitTimeData> routeData:waitTimes.values())
 			for(WaitTimeData waitTimeData:routeData.values())
 				waitTimeData.resetWaitTimes();
 		agentsWaitingData.clear();
@@ -160,7 +160,7 @@ public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, Per
 				if(planElement instanceof Leg) {
 					if(currentLeg==legs) {
 						String[] leg = ((GenericRoute)((Leg)planElement).getRoute()).getRouteDescription().split(SEPARATOR);
-						WaitTimeData data = waitTimes.get(new Tuple<Id, Id>(new IdImpl(leg[2]), new IdImpl(leg[3]))).get(new IdImpl(leg[1]));
+						WaitTimeData data = waitTimes.get(new Tuple<Id<TransitLine>, Id<TransitRoute>>(Id.create(leg[2], TransitLine.class), Id.create(leg[3], TransitRoute.class))).get(Id.create(leg[1], TransitStopFacility.class));
 						data.addWaitTime((int) (startWaitingTime/timeSlot), event.getTime()-startWaitingTime);
 						agentsWaitingData.remove(event.getPersonId());
 						break PLAN_ELEMENTS;
@@ -181,7 +181,7 @@ public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, Per
 				if(planElement instanceof Leg) {
 					if(currentLeg==legs) {
 						String[] leg = ((GenericRoute)((Leg)planElement).getRoute()).getRouteDescription().split(SEPARATOR);
-						WaitTimeData data = waitTimes.get(new Tuple<Id, Id>(new IdImpl(leg[2]), new IdImpl(leg[3]))).get(new IdImpl(leg[1]));
+						WaitTimeData data = waitTimes.get(new Tuple<Id<TransitLine>, Id<TransitRoute>>(Id.create(leg[2], TransitLine.class), Id.create(leg[3], TransitRoute.class))).get(Id.create(leg[1], TransitStopFacility.class));
 						if(data!=null)
 							data.addWaitTime((int) (startWaitingTime/timeSlot), event.getTime()-startWaitingTime);
 						agentsWaitingData.remove(event.getPersonId());

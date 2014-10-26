@@ -5,42 +5,31 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Map.Entry;
+import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.population.algorithms.XY2Links;
 
 import playground.artemc.utils.CSVReader;
 import playground.artemc.utils.SortEntriesByValueDesc;
@@ -89,7 +78,7 @@ public class PopulationGeneratorV2 {
 		HashMap<Id, Integer> facilityIncomeMap = new HashMap<Id, Integer>(); 
 
 		for(String[] entry:facilityIncome){
-			facilityIncomeMap.put(new IdImpl(entry[0]), Integer.valueOf(entry[1]));
+			facilityIncomeMap.put(Id.create(entry[0], ActivityFacility.class), Integer.valueOf(entry[1]));
 		}
 		
 		for(Integer i=1;i<25;i++){
@@ -200,7 +189,7 @@ public class PopulationGeneratorV2 {
 		
 		/*Assign random home zone*/
 		for(Integer i=0;i<populationSize;i++){	
-			PersonImpl person = (PersonImpl) pf.createPerson(new IdImpl(i));
+			PersonImpl person = (PersonImpl) pf.createPerson(Id.create(i, Person.class));
 			Plan plan = pf.createPlan();
 					
 			System.out.println("Agent: "+i+" from "+populationSize);
@@ -290,7 +279,7 @@ public class PopulationGeneratorV2 {
 			System.out.println("   Looking for home facility...");
 			do{
 				
-				Integer randomFacilityInZone = generator.nextInt((int) (zoneHomeFacilities.get(zoneCounter).size()));
+				Integer randomFacilityInZone = generator.nextInt((zoneHomeFacilities.get(zoneCounter).size()));
 				homeFacilityId = zoneHomeFacilities.get(zoneCounter).get(randomFacilityInZone);
 				
 				/*
@@ -322,7 +311,7 @@ public class PopulationGeneratorV2 {
 			Id workFacilityId = null ;
 			
 			while(workAtSameLinkFromHome){
-				Integer randomWorkFacility = generator.nextInt((int) (zoneWorkFacilities.get(workZone).size()));
+				Integer randomWorkFacility = generator.nextInt((zoneWorkFacilities.get(workZone).size()));
 				workFacilityId = zoneWorkFacilities.get(workZone).get(randomWorkFacility);
 				Link workLink = network.getNearestLink(facilities.get(workFacilityId).getCoord());
 				Link homeLink = network.getNearestLink(facilities.get(homeFacilityId).getCoord());

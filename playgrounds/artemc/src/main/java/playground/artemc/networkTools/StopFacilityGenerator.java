@@ -12,7 +12,6 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -174,7 +173,7 @@ public class StopFacilityGenerator {
 	private void createVehicles(TransitSchedule ts) {
 		Vehicles vehicles = this.sc.getVehicles();
 		VehiclesFactory vehicleFactory = vehicles.getFactory();
-		VehicleType standardBus = vehicleFactory.createVehicleType(new IdImpl("Bus MAN NL323F"));
+		VehicleType standardBus = vehicleFactory.createVehicleType(Id.create("Bus MAN NL323F", VehicleType.class));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(38));
 		capacity.setStandingRoom(Integer.valueOf(52));

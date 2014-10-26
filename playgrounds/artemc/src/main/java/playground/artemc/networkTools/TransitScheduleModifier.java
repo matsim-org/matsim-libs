@@ -5,7 +5,6 @@ import java.util.ArrayList;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -24,7 +23,6 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleCapacityImpl;
-import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
@@ -96,8 +94,8 @@ public class TransitScheduleModifier {
 				
 				int id = 1;
 				for(Double time = startTime; time<endTime; time=time+frequency){
-					Departure vehicleDeparture = transitScheduleFactory.createDeparture(new IdImpl(id), time);
-					vehicleDeparture.setVehicleId(new IdImpl(mode+"_"+transitLineName+"_"+id));
+					Departure vehicleDeparture = transitScheduleFactory.createDeparture(Id.create(id, Departure.class), time);
+					vehicleDeparture.setVehicleId(Id.create(mode+"_"+transitLineName+"_"+id, Vehicle.class));
 					route.addDeparture(vehicleDeparture);
 					id++;
 				}
@@ -131,7 +129,7 @@ public class TransitScheduleModifier {
 	private void createVehicles(TransitSchedule ts) {
 		Vehicles vehicles = this.sc.getVehicles();
 		VehiclesFactory vehicleFactory = vehicles.getFactory();
-		VehicleType standardBus = vehicleFactory.createVehicleType(new IdImpl("Bus MAN NL323F"));
+		VehicleType standardBus = vehicleFactory.createVehicleType(Id.create("Bus MAN NL323F", VehicleType.class));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
 		capacity.setSeats(Integer.valueOf(38));
 		capacity.setStandingRoom(Integer.valueOf(52));

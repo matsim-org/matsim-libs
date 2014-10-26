@@ -2,15 +2,18 @@ package playground.artemc.transitRouterEventsBased;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.LegScoring;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 public class SingaporeFareScoring implements LegScoring {
 
@@ -56,9 +59,9 @@ public class SingaporeFareScoring implements LegScoring {
 			if(planElement instanceof Leg && ((Leg)planElement).getMode().equals(TransportMode.pt))
 				if(num==0) {
 					String[] parts = ((GenericRoute)((Leg)planElement).getRoute()).getRouteDescription().split("===");
-					Id fromLinkId = transitSchedule.getFacilities().get(new IdImpl(parts[1])).getLinkId();
-					Id toLinkId = transitSchedule.getFacilities().get(new IdImpl(parts[4])).getLinkId();
-					return RouteUtils.calcDistance(transitSchedule.getTransitLines().get(new IdImpl(parts[2])).getRoutes().get(new IdImpl(parts[3])).getRoute().getSubRoute(fromLinkId, toLinkId), network);
+					Id<Link> fromLinkId = transitSchedule.getFacilities().get(Id.create(parts[1], TransitStopFacility.class)).getLinkId();
+					Id<Link> toLinkId = transitSchedule.getFacilities().get(Id.create(parts[4], TransitStopFacility.class)).getLinkId();
+					return RouteUtils.calcDistance(transitSchedule.getTransitLines().get(Id.create(parts[2], TransitLine.class)).getRoutes().get(Id.create(parts[3], TransitRoute.class)).getRoute().getSubRoute(fromLinkId, toLinkId), network);
 				}
 				else
 					num--;

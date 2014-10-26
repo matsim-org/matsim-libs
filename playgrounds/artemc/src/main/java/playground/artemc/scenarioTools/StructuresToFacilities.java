@@ -12,7 +12,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -22,7 +22,6 @@ import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -66,7 +65,7 @@ public class StructuresToFacilities {
 		//BufferedWriter incomeWriter = new BufferedWriter( new FileWriter("../roadpricingSingapore/scenarios/siouxFalls/hh_incomes.csv"));
 		dba = new DataBaseAdmin(new File("./data/dataBases/SiouxFalls_DataBase.properties"));
 
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new NetworkReaderMatsimV1(scenario).parse(networkPath); 
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 
@@ -165,7 +164,7 @@ public class StructuresToFacilities {
 			System.out.println();
 			System.out.println();
 
-			Id facilityID = new IdImpl(facilityNumber+"_"+nodeZoneId);
+			Id<ActivityFacility> facilityID = Id.create(facilityNumber+"_"+nodeZoneId, ActivityFacility.class);
 
 			generatedHouseholdIncome = (int) Math.round(marginError*generator.nextGaussian() + meanIncome);
 

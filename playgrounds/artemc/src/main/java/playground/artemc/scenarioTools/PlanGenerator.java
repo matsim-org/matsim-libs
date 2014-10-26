@@ -9,10 +9,10 @@ import java.util.Map;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.population.ActivityImpl;
@@ -78,10 +78,10 @@ public class PlanGenerator {
 		ResultSet workers = dba.executeQuery("SELECT * FROM u_artemc.sf_home_work");
 		while(workers.next()){
 			String personId = workers.getString("synth_person_id");
-			Id homeFacilityId = new IdImpl(workers.getString("homeFacility"));
-			Id workFacilityId = new IdImpl(workers.getString("workFacility"));
+			Id<ActivityFacility> homeFacilityId = Id.create(workers.getString("homeFacility"), ActivityFacility.class);
+			Id<ActivityFacility> workFacilityId = Id.create(workers.getString("workFacility"), ActivityFacility.class);
 
-			PersonImpl person = (PersonImpl) pf.createPerson(new IdImpl(personId));
+			PersonImpl person = (PersonImpl) pf.createPerson(Id.create(personId, Person.class));
 			Plan plan = pf.createPlan();
 
 			String mode = "";
@@ -138,10 +138,10 @@ public class PlanGenerator {
 		ResultSet housewives = dba.executeQuery("SELECT * FROM u_artemc.sf_home_secondary");
 		while(housewives.next()){
 			String personId = housewives.getString("synth_person_id");
-			Id homeFacilityId = new IdImpl(housewives.getString("homeFacility"));
-			Id secondaryFacilityId = new IdImpl(housewives.getString("secondaryFacility"));
+			Id<ActivityFacility> homeFacilityId = Id.create(housewives.getString("homeFacility"), ActivityFacility.class);
+			Id<ActivityFacility> secondaryFacilityId = Id.create(housewives.getString("secondaryFacility"), ActivityFacility.class);
 
-			PersonImpl person = (PersonImpl) pf.createPerson(new IdImpl(personId));
+			PersonImpl person = (PersonImpl) pf.createPerson(Id.create(personId, Person.class));
 			Plan plan = pf.createPlan();
 
 			String mode="";

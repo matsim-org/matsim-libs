@@ -6,7 +6,7 @@ import java.util.Set;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkReaderMatsimV1;
@@ -45,12 +45,12 @@ public class CopyOfBuslaneGenerator_fullPriority {
 			for (Id route : transitSchedule.getTransitLines().get(line).getRoutes().keySet()) {
 				System.out.println("  Route: " + route.toString());
 				System.out.println("Links: ");
-				Id fromNodeId = new IdImpl("");
+				Id<Node> fromNodeId = Id.create("", Node.class);
 				Integer lastLinkId = Integer.parseInt(transitSchedule.getTransitLines().get(line).getRoutes().get(route)
 						.getRoute().getEndLinkId().toString()) - 1;
 				for (Id link : transitSchedule.getTransitLines().get(line).getRoutes().get(route).getRoute().getLinkIds()) {
 					System.out.print(link.toString() + ",");
-					Id newLinkId = new IdImpl(link.toString() + "_car");
+					Id<Link> newLinkId = Id.create(link.toString() + "_car", Link.class);
 					if (!network.getLinks().containsKey(newLinkId)) {
 						double length = network.getLinks().get(link).getLength();
 						double numLanes = network.getLinks().get(link).getNumberOfLanes();
@@ -61,13 +61,13 @@ public class CopyOfBuslaneGenerator_fullPriority {
 							fromNodeId = network.getLinks().get(link).getFromNode().getId();
 						}
 
-						Id reverseLinkId = new IdImpl(network.getLinks().get(link).getId().toString() + "r");
+						Id<Link> reverseLinkId = Id.create(network.getLinks().get(link).getId().toString() + "r", Link.class);
 						network.removeLink(reverseLinkId);
 
 						network.getLinks().get(link).setCapacity(laneCapacity);
 						network.getLinks().get(link).setNumberOfLanes(1.0);
 						network.getLinks().get(link).setAllowedModes(allowedModesPT);
-						Id newNodeId = new IdImpl(network.getLinks().get(link).getToNode().getId().toString() + "c");
+						Id<Node> newNodeId = Id.create(network.getLinks().get(link).getToNode().getId().toString() + "c", Node.class);
 						Coord newBusNodeCoord = new CoordImpl(network.getLinks().get(link).getToNode().getCoord().getX() + 0.1,
 								network.getLinks().get(link).getToNode().getCoord().getY() + 0.1);
 

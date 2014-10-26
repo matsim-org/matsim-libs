@@ -9,7 +9,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.network.NetworkWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -69,7 +68,7 @@ public class UpdateNodesFromShape {
 			
 		    for (Property p :properties) {
 		    	System.out.println("Value: "+p.getValue().toString());
-		    	Node node = nodes.get(new IdImpl(p.getValue().toString()));
+		    	Node node = nodes.get(Id.create(p.getValue().toString(), Node.class));
 		    	node.getCoord().setXY(x, y);
 		    	System.out.println("Name: "+p.getName().toString());
 		    	System.out.println("Descriptor: "+p.getDescriptor().toString());

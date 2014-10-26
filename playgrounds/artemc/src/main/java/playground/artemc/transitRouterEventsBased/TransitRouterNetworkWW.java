@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -66,11 +65,11 @@ public final class TransitRouterNetworkWW implements Network {
 		public final TransitRouteStop stop;
 		public final TransitRoute route;
 		public final TransitLine line;
-		final Id id;
+		final Id<Node> id;
 		final Map<Id<Link>, TransitRouterNetworkLink> ingoingLinks = new LinkedHashMap<Id<Link>, TransitRouterNetworkLink>();
 		final Map<Id<Link>, TransitRouterNetworkLink> outgoingLinks = new LinkedHashMap<Id<Link>, TransitRouterNetworkLink>();
 
-		public TransitRouterNetworkNode(final Id id, final TransitRouteStop stop, final TransitRoute route, final TransitLine line) {
+		public TransitRouterNetworkNode(final Id<Node> id, final TransitRouteStop stop, final TransitRoute route, final TransitLine line) {
 			this.id = id;
 			this.stop = stop;
 			this.route = route;
@@ -103,7 +102,7 @@ public final class TransitRouterNetworkWW implements Network {
 		}
 
 		@Override
-		public Id getId() {
+		public Id<Node> getId() {
 			return this.id;
 		}
 
@@ -255,11 +254,11 @@ public final class TransitRouterNetworkWW implements Network {
 
 	}
 	public TransitRouterNetworkNode createNode(final TransitRouteStop stop, final TransitRoute route, final TransitLine line) {
-		Id id = null;
+		Id<Node> id = null;
 		if(line==null && route==null)
-			id = stop.getStopFacility().getId();
+			id = Id.create(stop.getStopFacility().getId(), Node.class);
 		else
-			id = new IdImpl("number:"+nextNodeId++);
+			id = Id.create("number:"+nextNodeId++, Node.class);
 		final TransitRouterNetworkNode node = new TransitRouterNetworkNode(id, stop, route, line);
 		if(this.nodes.get(node.getId())!=null)
 			throw new RuntimeException();
@@ -268,14 +267,14 @@ public final class TransitRouterNetworkWW implements Network {
 	}
 
 	public TransitRouterNetworkLink createLink(final Network network, final TransitRouterNetworkNode fromNode, final TransitRouterNetworkNode toNode) {
-		final TransitRouterNetworkLink link = new TransitRouterNetworkLink(new IdImpl(this.nextLinkId++), fromNode, toNode, null, null, network);
+		final TransitRouterNetworkLink link = new TransitRouterNetworkLink(Id.create(this.nextLinkId++, Link.class), fromNode, toNode, null, null, network);
 		this.links.put(link.getId(), link);
 		fromNode.outgoingLinks.put(link.getId(), link);
 		toNode.ingoingLinks.put(link.getId(), link);
 		return link;
 	}
 	public TransitRouterNetworkLink createLink(final Network network, final TransitRouterNetworkNode fromNode, final TransitRouterNetworkNode toNode, final TransitRoute route, final TransitLine line) {
-		final TransitRouterNetworkLink link = new TransitRouterNetworkLink(new IdImpl(this.nextLinkId++), fromNode, toNode, route, line, network);
+		final TransitRouterNetworkLink link = new TransitRouterNetworkLink(Id.create(this.nextLinkId++, Link.class), fromNode, toNode, route, line, network);
 		this.getLinks().put(link.getId(), link);
 		fromNode.outgoingLinks.put(link.getId(), link);
 		toNode.ingoingLinks.put(link.getId(), link);
