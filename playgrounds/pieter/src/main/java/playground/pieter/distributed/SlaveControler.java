@@ -68,10 +68,8 @@ public class SlaveControler implements IterationStartsListener {
         options.addOption("p", true, "Port number of MasterControler");
         options.addOption("s", false, "Switch to indicate if this is the Singapore scenario, i.e. events-based routing");
         options.addOption("t", true, "Number of threads for parallel events handling.");
-        options.addOption("r", false, "Perform slave-based initial routing of plans.");
         CommandLineParser parser = new BasicParser();
         CommandLine commandLine = parser.parse(options, args);
-        initialRouting = commandLine.hasOption("r");
         if (commandLine.hasOption("c")) {
             try {
                 config = ConfigUtils.loadConfig(commandLine.getOptionValue("c"));
@@ -110,11 +108,20 @@ public class SlaveControler implements IterationStartsListener {
         writeSocket = new Socket(hostname, socketNumber + 1);
         this.reader = new ObjectInputStream(readSocket.getInputStream());
         this.writer = new ObjectOutputStream(writeSocket.getOutputStream());
+
+
+        /*
+        * INITIALIZING COMMS
+        * */
         myNumber = reader.readInt();
-        slaveLogger = Logger.getLogger("SLAVE_" + myNumber);
+        slaveLogger = Logger.getLogger(("SLAVE_" + myNumber));
 
         numberOfPSimIterations = reader.readInt();
         slaveLogger.warn("Running " + numberOfPSimIterations + " PSim iterations for every QSim iter");
+
+        initialRouting = reader.readBoolean();
+        slaveLogger.warn("Performing initial routing.");
+
         List<String> idStrings = (List<String>) reader.readObject();
         slaveLogger.warn("RECEIVED agent ids for removal from master.");
 //      The following line will make the controler use the events manager that doesn't check for event order
@@ -296,6 +303,9 @@ public class SlaveControler implements IterationStartsListener {
         }
         try {
             if (res) {
+                //prevent memory leaks, see http://stackoverflow.com/questions/1281549/memory-leak-traps-in-the-java-standard-api
+//                reader.reset();
+                writer.reset();
                 slaveLogger.warn("Spent an average of " + averageIterationTime +
                         " running " + plansCopyForSending.size() +
                         " person plans for " + numberOfPSimIterations +
@@ -314,9 +324,6 @@ public class SlaveControler implements IterationStartsListener {
                 writer.writeObject(plansCopyForSending);
                 writer.flush();
                 slaveLogger.warn("Sending completed.");
-                //prevent memory leaks, see http://stackoverflow.com/questions/1281549/memory-leak-traps-in-the-java-standard-api
-                reader.reset();
-                writer.reset();
             } else {
                 System.out.println("Master terminated. Exiting.");
                 System.exit(0);
@@ -340,9 +347,6 @@ public class SlaveControler implements IterationStartsListener {
                 slaveLogger.warn("Load balancing done. waiting for others to finish...");
                 //this line is only there tto ensure that slave timing is synchronized, otherwise system becomes chaotic
                 reader.readBoolean();
-                //prevent memory leaks, see http://stackoverflow.com/questions/1281549/memory-leak-traps-in-the-java-standard-api
-                reader.reset();
-                writer.reset();
             }
 
         } catch (ClassNotFoundException | IOException e) {

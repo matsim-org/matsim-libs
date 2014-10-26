@@ -10,8 +10,10 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
@@ -31,9 +33,10 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class MasterControler implements AfterMobsimListener, ShutdownListener {
+public class MasterControler implements AfterMobsimListener, ShutdownListener, IterationStartsListener {
     private final Logger masterLogger = Logger.getLogger(this.getClass());
     private final HashMap<String, Plan> newPlans = new HashMap<>();
+    private boolean initialRouing=false;
     private int numberOfPSimIterations = 5;
     private Config config;
     private Controler matsimControler;
@@ -98,6 +101,18 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
         else {
             masterLogger.warn("Will perform load Balancing every 5 iterations as per default");
         }
+        if (commandLine.hasOption("r")) {
+            masterLogger.warn("ROUTING initial plans on slaves.");
+            initialRouing=true;
+        }
+        if (commandLine.hasOption("c")) {
+            config = ConfigUtils.loadConfig(commandLine.getOptionValue("c"));
+        } else {
+            masterLogger.warn("Config file not specified");
+            System.out.println(options.toString());
+            System.exit(1);
+        }
+
         ServerSocket writeServer = new ServerSocket(socketNumber);
         ServerSocket readServer = new ServerSocket(socketNumber + 1);
         for (int i = 0; i < numSlaves; i++) {
@@ -109,18 +124,12 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
             //order is important
             slaves[i].sendNumber(i);
             slaves[i].sendNumber(numberOfPSimIterations);
+            slaves[i].sendBoolean(initialRouing);
         }
         writeServer.close();
         readServer.close();
-        if (commandLine.hasOption("c")) {
-            config = ConfigUtils.loadConfig(commandLine.getOptionValue("c"));
-            matsimControler = new Controler(ScenarioUtils.loadScenario(config));
-        } else {
-            masterLogger.warn("Config file not specified");
-            System.out.println(options.toString());
-            System.exit(1);
-        }
 
+        matsimControler = new Controler(ScenarioUtils.loadScenario(config));
         matsimControler.setOverwriteFiles(true);
         matsimControler.setMobsimFactory(new QSimFactory());
         Set<Id<Person>> ids = matsimControler.getScenario().getPopulation().getPersons().keySet();
@@ -132,6 +141,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
             slaves[i].sendIds(idStrings);
         }
         if (config.scenario().isUseTransit()) {
+//            linkTimeCalculator =
             waitTimeCalculator = new WaitTimeCalculatorSerializable(matsimControler.getScenario().getTransitSchedule(), config.travelTimeCalculator().getTraveltimeBinSize(),
                     (int) (config.qsim().getEndTime() - config.qsim().getStartTime()));
             matsimControler.getEvents().addHandler(waitTimeCalculator);
@@ -149,23 +159,6 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
             matsimControler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(config.planCalcScore(), matsimControler.getScenario()));
             //this qsim engine uses our boarding and alighting model, derived from smart card data
             matsimControler.setMobsimFactory(new PTQSimFactory());
-        }
-        if (commandLine.hasOption("r")) {
-            //initialize link travel times if you want to do remote routing
-            masterLogger.warn("ROUTING initial plans on slaves.");
-            FreespeedTravelTimeAndDisutility disutility = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
-            linkTravelTimes = new SerializableLinkTravelTimes(disutility, config
-                    .travelTimeCalculator().getTraveltimeBinSize(), config.qsim().getEndTime(), matsimControler
-                    .getNetwork().getLinks().values());
-            numThreads = new AtomicInteger(slaves.length);
-            for (Slave slave : slaves) new Thread(slave).start();
-            while (numThreads.get() > 0)
-                try {
-                    Thread.sleep(10);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            mergePlansFromSlaves();
         }
         masterLogger.warn("master inited");
     }
@@ -192,7 +185,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
     @Override
     public void notifyAfterMobsim(AfterMobsimEvent event) {
         isLoadBalanceIteration = slaves.length > 1 && event.getIteration() % loadBalanceInterval == 0;
-        linkTravelTimes = new SerializableLinkTravelTimes(event.getControler().getLinkTravelTimes(), config
+        linkTravelTimes = new SerializableLinkTravelTimes(matsimControler.getLinkTravelTimes(), config
                 .travelTimeCalculator().getTraveltimeBinSize(), config.qsim().getEndTime(), matsimControler
                 .getNetwork().getLinks().values());
         numThreads = new AtomicInteger(slaves.length);
@@ -243,7 +236,8 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
                 slave.state = SimulationState.TransmitTravelTimes;
         }
         isLoadBalanceIteration = false;
-        personPool.clear();
+        if (personPool != null)
+            personPool.clear();
 
     }
 
@@ -343,7 +337,12 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
                 e.printStackTrace();
             }
         }
+    }
 
+    @Override
+    public void notifyIterationStarts(IterationStartsEvent event) {
+        if(initialRouing)
+            notifyAfterMobsim(new AfterMobsimEvent(matsimControler,0));
     }
 
     private class Slave implements Runnable {
@@ -369,6 +368,9 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
         public void run() {
             if (state.equals(SimulationState.TransmitTravelTimes)) {
                 try {
+//                    prevent memory leaks, see http://stackoverflow.com/questions/1281549/memory-leak-traps-in-the-java-standard-api
+//                    reader.reset();
+                    writer.reset();
                     plans.clear();
                     writer.writeBoolean(true);
                     slaveLogger.warn("About to send travel times to slave number " + myNumber);
@@ -389,9 +391,6 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
                     }
                     writer.writeBoolean(isLoadBalanceIteration);
                     writer.flush();
-//                    prevent memory leaks, see http://stackoverflow.com/questions/1281549/memory-leak-traps-in-the-java-standard-api
-                    reader.reset();
-                    writer.reset();
                     numThreads.decrementAndGet();
                 } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();
@@ -407,9 +406,6 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
                     writer.writeInt(target);
                     writer.flush();
                     slavePersonPool = (List<PersonSerializable>) reader.readObject();
-//                    prevent memory leaks, see http://stackoverflow.com/questions/1281549/memory-leak-traps-in-the-java-standard-api
-                    reader.reset();
-                    writer.reset();
                     numThreads.decrementAndGet();
                 } catch (ClassNotFoundException | IOException e) {
                     e.printStackTrace();
@@ -428,8 +424,6 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
                         Thread.sleep(10);
                     writer.writeBoolean(true);
                     writer.flush();
-//                    prevent memory leaks, see http://stackoverflow.com/questions/1281549/memory-leak-traps-in-the-java-standard-api
-                    writer.reset();
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (InterruptedException e) {
@@ -462,6 +456,11 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener {
 
         public Collection<? extends PersonSerializable> getPersons() {
             return slavePersonPool;
+        }
+
+        public void sendBoolean(boolean initialRouing) throws IOException {
+            writer.writeBoolean(initialRouing);
+            writer.flush();
         }
     }
 
