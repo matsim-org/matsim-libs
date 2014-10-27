@@ -57,16 +57,22 @@ ActivityEndEventHandler, ActivityStartEventHandler, PersonStuckEventHandler {
 	private Set<Id<Person>> stuckPersons;
 	private Map<Id<Person>, String> personId2LegModes;
 	private Scenario sc;
-	private final int maxStuckAndAbortWarnCount=5;
-	private int warnCount = 0;
+	private final int maxStuckAndAbortWarnCount;
+	private int warnCount;
 	private double simEndTime;
 
 	/**
 	 * @param scenario should contain config details and population file.
 	 */
 	public LegModeActivityEndTimeAndActDurationHandler(Scenario scenario) {
-		this.logger.warn("Leg mode 2 person id 2 activity endTime/StartTime/duration will work fine if all trips of a person are made by same travel mode. "
+		
+		this.logger.warn("Although legs are not assigned to activities still for comparison purpose"
+				+ "leg mode distribution for activities could be plotted using arrival legs.");
+		
+		this.logger.warn("This class to get leg mode 2 person id 2 activity endTime/StartTime/duration will work fine "
+				+ "if all trips of a person are made by same travel mode. "
 				+ "Because, travel mode is linked with departure events not with activity end or start events.");
+		
 		this.sc = scenario;
 		this.simEndTime = sc.getConfig().qsim().getEndTime();
 		this.mode2PersonId2ActEndTimes = new TreeMap<String, Map<Id<Person>,List<Double>>>();
@@ -75,6 +81,7 @@ ActivityEndEventHandler, ActivityStartEventHandler, PersonStuckEventHandler {
 		this.personId2LegModes = new HashMap<Id<Person>, String>();
 		this.personId2ActStartTimes = new HashMap<Id<Person>, SortedMap<String,Double>>();
 		this.stuckPersons = new HashSet<Id<Person>>();
+		this.maxStuckAndAbortWarnCount=5;
 
 		for(Person p:this.sc.getPopulation().getPersons().values()){
 			Id<Person> id = p.getId();
@@ -86,11 +93,12 @@ ActivityEndEventHandler, ActivityStartEventHandler, PersonStuckEventHandler {
 	@Override
 	public void reset(int iteration) {
 		this.mode2PersonId2ActEndTimes.clear();
+		this.mode2PersonId2ActDurations.clear();
 		this.personId2ActEndTimes.clear();
 		this.personId2LegModes.clear();
 		this.personId2ActStartTimes.clear();
-		this.mode2PersonId2ActDurations.clear();
 		this.stuckPersons.clear();
+		this.warnCount = 0;
 	}
 
 	@Override
