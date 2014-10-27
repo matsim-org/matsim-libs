@@ -38,7 +38,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.LoadMyScenarios;
-import playground.agarwalamit.siouxFalls.userBenefits.MyUserBenefitsAnalyzer;
+import playground.agarwalamit.analysis.userBenefits.MyUserBenefitsAnalyzer;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 import playground.vsp.analysis.modules.monetaryTransferPayments.MonetaryPaymentsAnalyzer;
@@ -73,7 +73,7 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 	private final WelfareMeasure wm = WelfareMeasure.SELECTED;
 
 	public static void main(String[] args) {
-		String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct_msa_rSeed/";
+		String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct_rSeed/";
 		String [] runCases = { "baseCaseCtd","ei","ci","eci"};
 		new UserBenefitsAndTotalWelfarePerUserGroup(outputDir, false).runAndWrite(runCases);
 	}
