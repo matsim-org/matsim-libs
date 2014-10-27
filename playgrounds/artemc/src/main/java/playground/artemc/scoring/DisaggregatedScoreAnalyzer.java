@@ -21,6 +21,8 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.charts.XYLineChart;
 
+import playground.artemc.analysis.TripAnalysisHandler;
+
 
 public class DisaggregatedScoreAnalyzer implements IterationEndsListener{
 	private static final Logger log = Logger.getLogger(DisaggregatedScoreAnalyzer.class);
@@ -33,16 +35,18 @@ public class DisaggregatedScoreAnalyzer implements IterationEndsListener{
 	private Map<Integer, Double> moneyUtility2it = new TreeMap<Integer, Double>();
 	private Map<Integer, Double> stuckUtility2it = new TreeMap<Integer, Double>();
 	private Map<Integer, Double> sumUtility2it = new TreeMap<Integer, Double>();
+	private TripAnalysisHandler tripAnalysisHandler;
 
-	public DisaggregatedScoreAnalyzer(ScenarioImpl scenario) {
+	public DisaggregatedScoreAnalyzer(ScenarioImpl scenario,TripAnalysisHandler tripAnalysisHandler) {
 		super();
 		this.scenario = scenario;
+		this.tripAnalysisHandler = tripAnalysisHandler;
 
 		for(String mode:scenario.getConfig().planCalcScore().getModes().keySet()){
 			legUtility2it.put(mode, new TreeMap<Integer, Double>());
 		};	
 		legUtility2it.put("transit_walk", new TreeMap<Integer, Double>());
-		
+
 	}
 
 
@@ -52,7 +56,7 @@ public class DisaggregatedScoreAnalyzer implements IterationEndsListener{
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		
+
 		this.activityUtility2it.put(event.getIteration(),0.0);
 		this.legUtilityTotal2it.put(event.getIteration(),0.0);
 		for(String mode:legUtility2it.keySet()){
@@ -66,7 +70,7 @@ public class DisaggregatedScoreAnalyzer implements IterationEndsListener{
 			//DisaggregatedSumScoringFunction sf = (DisaggregatedSumScoringFunction) event.getControler().getPlansScoring().getScoringFunctionForAgent(person.getId());
 			DisaggregatedCharyparNagelScoringFunctionFactory disScoringFactory = (DisaggregatedCharyparNagelScoringFunctionFactory) event.getControler().getScoringFunctionFactory();
 			DisaggregatedSumScoringFunction sf = (DisaggregatedSumScoringFunction) disScoringFactory.getPersonScoringFunctions().get(person.getId());
-			
+
 			disaggregatedScores.put(person.getId(), new DisaggregatedScore(sf.getActivityTotalScore(), sf.getLegScores(), sf.getMoneyTotalScore(), sf.getStuckScore()));
 			this.activityUtility2it.put(event.getIteration(),activityUtility2it.get(event.getIteration())+sf.getActivityTotalScore());
 			this.legUtilityTotal2it.put(event.getIteration(),legUtilityTotal2it.get(event.getIteration())+sf.getLegTotalScore( ));
@@ -77,8 +81,8 @@ public class DisaggregatedScoreAnalyzer implements IterationEndsListener{
 			};	
 			this.sumUtility2it.put(event.getIteration(), sumUtility2it.get(event.getIteration())+sf.getScore());
 		}
-		
-		
+
+
 		writeAnalysis(event);
 	}
 
@@ -103,10 +107,16 @@ public class DisaggregatedScoreAnalyzer implements IterationEndsListener{
 			for (Integer it : this.activityUtility2it.keySet()){
 				String legsScores = "";
 				for(String mode:modeList){
-					legsScores = legsScores + (double)legUtility2it.get(mode).get(it)/persons+";";
+					if(tripAnalysisHandler.getModeLegCount().get(mode)>0){
+						legsScores = legsScores + (double)legUtility2it.get(mode).get(it)/tripAnalysisHandler.getModeLegCount().get(mode)+";";
+					}
 				};	
+				if(tripAnalysisHandler.getModeLegCount().get("transit_walk")>0){
+					legsScores = legsScores + (double)legUtility2it.get("transit_walk").get(it)/tripAnalysisHandler.getModeLegCount().get("transit_walk")+";";
+				}
+				
 				bw.write(it + ";" + (double)this.activityUtility2it.get(it)/persons + ";" + (double)this.legUtilityTotal2it.get(it)/persons + ";" + legsScores 
-						+ (double)this.moneyUtility2it.get(it)/persons + ";" + (double)this.stuckUtility2it.get(it)/persons + ";" + this.sumUtility2it.get(it)/persons
+						+  + (double)this.moneyUtility2it.get(it)/persons + ";" + (double)this.stuckUtility2it.get(it)/persons + ";" + this.sumUtility2it.get(it)/persons
 						);
 				bw.newLine();
 			}
@@ -126,13 +136,13 @@ public class DisaggregatedScoreAnalyzer implements IterationEndsListener{
 		data.add(legUtilityTotal2it);
 		data.add(moneyUtility2it);
 		data.add(stuckUtility2it);
-	//	data.add(sumUtility2it);
+		//	data.add(sumUtility2it);
 
 		String[] names = {"Activity Utility", "Leg Utility", "Money Utility", "Stuck Utility","Total Utility"};
 		writeGraphs("scoreBreakdown", names, "Utility", data, persons);
 
-		
-		
+
+
 	}
 
 	private void writeGraphs(String chartName, String[] names, String yLabel, ArrayList<Map> data, Integer persons) {

@@ -20,6 +20,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
+import playground.artemc.analysis.AnalysisControlerListener;
 import playground.artemc.annealing.SimpleAnnealer;
 import playground.artemc.dwellTimeModel.QSimFactory;
 import playground.artemc.scoring.DisaggIncomeCharyparNagelScoringFunctionFactory;
@@ -29,7 +30,6 @@ import playground.artemc.scoring.DisaggregatedScoreAnalyzer;
 import playground.artemc.scoring.TravelTimeAndDistanceBasedIncomeTravelDisutility;
 import playground.artemc.scoring.TravelTimeAndDistanceBasedIncomeTravelDisutilityFactory;
 import playground.artemc.socialCost.MeanTravelTimeCalculator;
-import playground.artemc.socialCost.WelfareAnalysisControlerListener;
 import playground.artemc.socialCost.vehicleOccupancy.VehicleOccupancy;
 import playground.artemc.transitRouterEventsBased.TransitRouterWSImplFactory;
 import playground.artemc.transitRouterEventsBased.TransitRouterWSVImplFactory;
@@ -85,12 +85,14 @@ public class CorridorRun {
 
 		// Additional analysis
 		ScenarioImpl scenarioImpl = (ScenarioImpl) controler.getScenario();
-		//controler.setScoringFunctionFactory(new DisaggIncomeCharyparNagelScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getNetwork(), factorMap));
 		controler.setScoringFunctionFactory(new DisaggregatedCharyparNagelScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getNetwork()));
-		//controler.addControlerListener(new DisaggIncomeScoreAnalyzer(scenarioImpl));
-		controler.addControlerListener(new DisaggregatedScoreAnalyzer(scenarioImpl));
 		controler.addControlerListener(new SimpleAnnealer());
-		controler.addControlerListener(new WelfareAnalysisControlerListener((ScenarioImpl) controler.getScenario()));
+		
+		// Additional analysis
+		AnalysisControlerListener analysisControlerListener = new AnalysisControlerListener((ScenarioImpl) controler.getScenario());
+		controler.addControlerListener(analysisControlerListener);
+		controler.addControlerListener(new DisaggregatedScoreAnalyzer((ScenarioImpl) controler.getScenario(),analysisControlerListener.getTripAnalysisHandler()));
+		controler.run();
 		
 		controler.setMobsimFactory(new QSimFactory());
 		

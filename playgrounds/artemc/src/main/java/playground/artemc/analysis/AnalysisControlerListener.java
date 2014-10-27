@@ -22,7 +22,7 @@
  * 
  */
 
-package playground.artemc.socialCost;
+package playground.artemc.analysis;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -49,16 +49,21 @@ import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
 
 /**
  * @author Ihab
+ * @author artemc
  *
  */
 
-public class WelfareAnalysisControlerListener implements StartupListener, IterationEndsListener {
-	private static final Logger log = Logger.getLogger(WelfareAnalysisControlerListener.class);
+public class AnalysisControlerListener implements StartupListener, IterationEndsListener {
+	private static final Logger log = Logger.getLogger(AnalysisControlerListener.class);
 
 	private final ScenarioImpl scenario;
 	private MoneyEventHandler moneyHandler = new MoneyEventHandler();
-	private TripAnalysisHandler tripAnalysisHandler = new TripAnalysisHandler();
-	
+	private TripAnalysisHandler tripAnalysisHandler;
+
+	public TripAnalysisHandler getTripAnalysisHandler() {
+		return tripAnalysisHandler;
+	}
+
 	private Map<Integer, Double> it2userBenefits_logsum = new TreeMap<Integer, Double>();
 	private Map<Integer, Integer> it2invalidPersons_logsum = new TreeMap<Integer, Integer>();
 	private Map<Integer, Integer> it2invalidPlans_logsum = new TreeMap<Integer, Integer>();
@@ -66,23 +71,24 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 	private Map<Integer, Double> it2userBenefits_selected = new TreeMap<Integer, Double>();
 	private Map<Integer, Integer> it2invalidPersons_selected = new TreeMap<Integer, Integer>();
 	private Map<Integer, Integer> it2invalidPlans_selected = new TreeMap<Integer, Integer>();
-	
+
 	private Map<Integer, Double> it2tollSum = new TreeMap<Integer, Double>();
 	private Map<Integer, Integer> it2stuckEvents = new TreeMap<Integer, Integer>();
 	private Map<Integer, Double> it2totalTravelTimeAllModes = new TreeMap<Integer, Double>();
 	private Map<Integer, Double> it2totalTravelTimeCarMode = new TreeMap<Integer, Double>();
-		
+
 	private Map<Integer, Double> it2carLegs = new TreeMap<Integer, Double>();
 	private Map<Integer, Double> it2ptLegs = new TreeMap<Integer, Double>();
 	private Map<Integer, Double> it2walkLegs = new TreeMap<Integer, Double>();
 	private Map<Integer, Double> it2transitWalkLegs = new TreeMap<Integer, Double>();
 	private Map<Integer, Double> it2busLegs = new TreeMap<Integer, Double>();
 
-	
-	public WelfareAnalysisControlerListener(ScenarioImpl scenario){
+
+	public AnalysisControlerListener(ScenarioImpl scenario){
 		this.scenario = scenario;
+		this.tripAnalysisHandler = new TripAnalysisHandler(scenario);
 	}
-	
+
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		event.getControler().getEvents().addHandler(moneyHandler);
@@ -95,7 +101,7 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 	}
 
 	private void writeAnalysis(IterationEndsEvent event) {
-		
+
 		UserBenefitsCalculator userBenefitsCalculator_logsum = new UserBenefitsCalculator(this.scenario.getConfig(), WelfareMeasure.LOGSUM, false);
 		this.it2userBenefits_logsum.put(event.getIteration(), userBenefitsCalculator_logsum.calculateUtility_money(event.getControler().getPopulation()));
 		this.it2invalidPersons_logsum.put(event.getIteration(), userBenefitsCalculator_logsum.getPersonsWithoutValidPlanCnt());
@@ -111,25 +117,35 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 		this.it2stuckEvents.put(event.getIteration(), this.tripAnalysisHandler.getAgentStuckEvents());
 		this.it2totalTravelTimeAllModes.put(event.getIteration(), this.tripAnalysisHandler.getTotalTravelTimeAllModes());
 		this.it2totalTravelTimeCarMode.put(event.getIteration(), this.tripAnalysisHandler.getTotalTravelTimeCarMode());
-		this.it2carLegs.put(event.getIteration(), (double) this.tripAnalysisHandler.getCarLegs());
-		this.it2ptLegs.put(event.getIteration(), (double) this.tripAnalysisHandler.getPtLegs());
-		this.it2walkLegs.put(event.getIteration(), (double) this.tripAnalysisHandler.getWalkLegs());
-		this.it2transitWalkLegs.put(event.getIteration(), (double) this.tripAnalysisHandler.getTransitWalkLegs());
-		this.it2busLegs.put(event.getIteration(), (double) this.tripAnalysisHandler.getBusLegs());
-		
-		String fileName = this.scenario.getConfig().controler().getOutputDirectory() + "/welfareAnalysis.csv";
-		File file = new File(fileName);
-			
+		this.it2carLegs.put(event.getIteration(), (double) this.tripAnalysisHandler.getModeLegCount().get("car"));
+		this.it2ptLegs.put(event.getIteration(), (double) this.tripAnalysisHandler.getModeLegCount().get("pt"));
+		this.it2walkLegs.put(event.getIteration(), (double) this.tripAnalysisHandler.getModeLegCount().get("walk"));
+		this.it2transitWalkLegs.put(event.getIteration(), (double) this.tripAnalysisHandler.getModeLegCount().get("transit_walk"));
+		//		this.it2carLegs.put(event.getIteration(), (double) this.tripAnalysisHandler.getCarLegs());
+		//		this.it2ptLegs.put(event.getIteration(), (double) this.tripAnalysisHandler.getPtLegs());
+		//		this.it2walkLegs.put(event.getIteration(), (double) this.tripAnalysisHandler.getWalkLegs());
+		//		this.it2transitWalkLegs.put(event.getIteration(), (double) this.tripAnalysisHandler.getTransitWalkLegs());
+		//		this.it2busLegs.put(event.getIteration(), (double) this.tripAnalysisHandler.getBusLegs());
+		//		
+		String welfareFilePath = this.scenario.getConfig().controler().getOutputDirectory() + "/welfareAnalysis.csv";
+		File welfareFile = new File(welfareFilePath);
+
+		String tripsFilePath = this.scenario.getConfig().controler().getOutputDirectory() + "/tripsAnalysis.csv";
+		File tripsFile = new File(tripsFilePath);
+
+
 		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-			bw.write("Iteration;" +
+			BufferedWriter welfareWriter = new BufferedWriter(new FileWriter(welfareFile));
+			BufferedWriter tripsWriter = new BufferedWriter(new FileWriter(tripsFile));
+			welfareWriter.write("Iteration;" +
 					"User Benefits (LogSum);Number of Invalid Persons (LogSum);Number of Invalid Plans (LogSum);" +
 					"User Benefits (Selected);Number of Invalid Persons (Selected);Number of Invalid Plans (Selected);" +
-					"Total Monetary Payments;Welfare (LogSum);Welfare (Selected);Total Travel Time All Modes (sec);Total Travel Time Car Mode (sec);Avg Travel Time Per Car Trip (sec);Number of Agent Stuck Events;" +
-					"Car Trips;Pt Trips;Walk Trips; TrasitWalk Legs");
-			bw.newLine();
+					"Total Monetary Payments;Welfare (LogSum);Welfare (Selected);Total Travel Time All Modes (sec);Total Travel Time Car Mode (sec);Avg Travel Time Per Car Trip (sec);Number of Agent Stuck Events;");
+			tripsWriter.write("Car Trips;Pt Trips;Walk Trips; TrasitWalk Legs");
+			welfareWriter.newLine();
+			tripsWriter.newLine();
 			for (Integer it : this.it2userBenefits_selected.keySet()){
-				bw.write(it + ";" + this.it2userBenefits_logsum.get(it) + ";" + this.it2invalidPersons_logsum.get(it) + ";" + this.it2invalidPlans_logsum.get(it)
+				welfareWriter.write(it + ";" + this.it2userBenefits_logsum.get(it) + ";" + this.it2invalidPersons_logsum.get(it) + ";" + this.it2invalidPlans_logsum.get(it)
 						+ ";" + this.it2userBenefits_selected.get(it) + ";" + this.it2invalidPersons_selected.get(it) + ";" + this.it2invalidPlans_selected.get(it)
 						+ ";" + this.it2tollSum.get(it)
 						+ ";" + (this.it2userBenefits_logsum.get(it) + this.it2tollSum.get(it))
@@ -138,23 +154,30 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 						+ ";" + this.it2totalTravelTimeCarMode.get(it)
 						+ ";" + (this.it2totalTravelTimeCarMode.get(it) / this.it2carLegs.get(it))
 						+ ";" + this.it2stuckEvents.get(it)
+						);
+				tripsWriter.write(it 
 						+ ";" + this.it2carLegs.get(it)
 						+ ";" + this.it2ptLegs.get(it)
 						+ ";" + this.it2walkLegs.get(it)
 						+ ";" + this.it2transitWalkLegs.get(it)
 						);
-				bw.newLine();
+				welfareWriter.newLine();
+				tripsWriter.newLine();
 			}
+
+			welfareWriter.close();
+			tripsWriter.close();
 			
-			bw.close();
-			log.info("Output written to " + fileName);
-			
+			log.info("Welfare analysis Output written to " + welfareFilePath);
+			log.info("Trip analysis Output written to " + tripsFilePath);
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
+
 		// ##################################################
-		
+
 		writeGraph("userBenefits_selected", "Monetary Units", it2userBenefits_selected);
 		writeGraph("userBenefits_logsum", "Monetary Units", it2userBenefits_logsum);
 		writeGraph("tollSum", "Monetary Units", it2tollSum);
@@ -168,12 +191,12 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 
 		writeGraphSum("welfare_logsum", "Monetary Units", it2userBenefits_logsum, it2tollSum);
 		writeGraphSum("welfare_selected", "Monetary Units", it2userBenefits_selected, it2tollSum);
-		
+
 		writeGraphDiv("avgTripTravelTimeCar", "Seconds", it2totalTravelTimeCarMode, it2carLegs);
 	}
 
 	private void writeGraphSum(String name, String yLabel, Map<Integer, Double> it2Double1, Map<Integer, Double> it2Double2) {
-		
+
 		XYLineChart chart = new XYLineChart(name, "Iteration", yLabel);
 
 		double[] xValues = new double[it2Double1.size()];
@@ -184,20 +207,20 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 			yValues[counter] = (it2Double1.get(iteration)) + (it2Double2.get(iteration));
 			counter++;
 		}
-		
+
 		chart.addSeries(name, xValues, yValues);
-		
+
 		XYPlot plot = chart.getChart().getXYPlot(); 
 		NumberAxis axis = (NumberAxis) plot.getRangeAxis();
 		axis.setAutoRange(true);
 		axis.setAutoRangeIncludesZero(false);
-		
+
 		String outputFile = this.scenario.getConfig().controler().getOutputDirectory() + "/" + name + ".png";
 		chart.saveAsPng(outputFile, 1000, 800); // File Export
 	}
-	
+
 	private void writeGraphDiv(String name, String yLabel, Map<Integer, Double> it2Double1, Map<Integer, Double> it2Double2) {
-		
+
 		XYLineChart chart = new XYLineChart(name, "Iteration", yLabel);
 
 		double[] xValues = new double[it2Double1.size()];
@@ -208,14 +231,14 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 			yValues[counter] = (it2Double1.get(iteration)) / (it2Double2.get(iteration));
 			counter++;
 		}
-		
+
 		chart.addSeries(name, xValues, yValues);
-		
+
 		XYPlot plot = chart.getChart().getXYPlot(); 
 		NumberAxis axis = (NumberAxis) plot.getRangeAxis();
 		axis.setAutoRange(true);
 		axis.setAutoRangeIncludesZero(false);
-		
+
 		String outputFile = this.scenario.getConfig().controler().getOutputDirectory() + "/" + name + ".png";
 		chart.saveAsPng(outputFile, 1000, 800); // File Export
 	}
@@ -232,14 +255,14 @@ public class WelfareAnalysisControlerListener implements StartupListener, Iterat
 			yValues[counter] = it2Double.get(iteration);
 			counter++;
 		}
-		
+
 		chart.addSeries(name, xValues, yValues);
-		
+
 		XYPlot plot = chart.getChart().getXYPlot(); 
 		NumberAxis axis = (NumberAxis) plot.getRangeAxis();
 		axis.setAutoRange(true);
 		axis.setAutoRangeIncludesZero(false);
-		
+
 		String outputFile = this.scenario.getConfig().controler().getOutputDirectory() + "/" + name + ".png";
 		chart.saveAsPng(outputFile, 1000, 800); // File Export
 	}

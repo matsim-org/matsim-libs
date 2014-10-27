@@ -14,6 +14,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.artemc.analysis.AnalysisControlerListener;
 import playground.artemc.annealing.SimpleAnnealer;
 import playground.artemc.scoring.DisaggregatedCharyparNagelScoringFunctionFactory;
 import playground.artemc.scoring.DisaggregatedScoreAnalyzer;
@@ -47,9 +48,12 @@ public class BaseControler {
 		// Additional analysis
 		ScenarioImpl scnearioImpl = (ScenarioImpl) controler.getScenario();
 		controler.setScoringFunctionFactory(new DisaggregatedCharyparNagelScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getNetwork()));
-		controler.addControlerListener(new DisaggregatedScoreAnalyzer(scnearioImpl));
 		controler.addControlerListener(new SimpleAnnealer());
-		controler.addControlerListener(new WelfareAnalysisControlerListener((ScenarioImpl) controler.getScenario()));
+		// Additional analysis
+		AnalysisControlerListener analysisControlerListener = new AnalysisControlerListener((ScenarioImpl) controler.getScenario());
+		controler.addControlerListener(analysisControlerListener);
+		controler.addControlerListener(new DisaggregatedScoreAnalyzer((ScenarioImpl) controler.getScenario(),analysisControlerListener.getTripAnalysisHandler()));
+		controler.run();
 		controler.setOverwriteFiles(true);
 		controler.run();
 	}

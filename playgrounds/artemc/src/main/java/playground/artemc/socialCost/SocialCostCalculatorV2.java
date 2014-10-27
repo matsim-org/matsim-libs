@@ -56,6 +56,8 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
 
+import playground.artemc.analysis.IterationTableWriter;
+
 
 /**
  * TODO Analysis: - performed Trips (Duration and Distance) - Trip Duration vs.

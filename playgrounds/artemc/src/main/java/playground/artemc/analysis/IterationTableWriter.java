@@ -1,4 +1,4 @@
-package playground.artemc.socialCost;
+package playground.artemc.analysis;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

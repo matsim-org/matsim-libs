@@ -34,13 +34,13 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
+import playground.artemc.analysis.AnalysisControlerListener;
 import playground.artemc.scoring.functions.CharyparNagelActivityScoring;
 import playground.artemc.scoring.functions.CharyparNagelAgentStuckScoring;
 import playground.artemc.scoring.functions.CharyparNagelLegScoring;
 import playground.artemc.scoring.functions.CharyparNagelMoneyScoring;
 import playground.artemc.scoring.functions.PersonalScoringParameters;
 import playground.artemc.scoring.functions.PersonalScoringParameters.Mode;
-import playground.artemc.socialCost.WelfareAnalysisControlerListener;
 /**
  * A factory to create scoring functions as described by D. Charypar and K. Nagel.
  * 
