@@ -18,13 +18,6 @@
  * *********************************************************************** */
 package playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -40,7 +33,6 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.EditRoute;
@@ -50,6 +42,8 @@ import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.analysis.
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.random.RandomNumbers;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.scoring.ParkingActivityAttributes;
+
+import java.util.*;
 
 public class RandomParkingSearch implements ParkingSearchStrategy {
 
@@ -710,7 +704,7 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		return aem.getCurrentLink();
 	}
 
-	protected Id getCurrentLinkId(AgentWithParking aem) {
+	protected Id<Link> getCurrentLinkId(AgentWithParking aem) {
 		return aem.getCurrentLinkId();
 	}
 

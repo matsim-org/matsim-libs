@@ -18,8 +18,6 @@
  * *********************************************************************** */
 package playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.axhausenPolak1989;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -30,7 +28,6 @@ import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
-
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.AgentWithParking;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.Message;
@@ -38,6 +35,8 @@ import playground.wrashid.parkingSearch.ppSim.jdepSim.routing.EditRoute;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.RandomParkingSearch;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.scoring.ParkingActivityAttributes;
+
+import java.util.List;
 
 // TODO: start considering search time, when agent passes destination link for first time!
 
@@ -208,12 +207,13 @@ public class AxPo1989_Strategy3 extends RandomParkingSearch {
 			//System.out.println(AgentWithParking.parkingManager);
 			//System.out.println(getCurrentLinkId(aem));
 			//System.out.println(AgentWithParking.parkingManager.getParkingsOnLink(getCurrentLinkId(aem)));
-			for (Id parkingId : AgentWithParking.parkingManager.getParkingsOnLink(getCurrentLinkId(aem))) {
+            Id<Link> currentLinkId = getCurrentLinkId(aem);
+            for (Id parkingId : AgentWithParking.parkingManager.getParkingsOnLink(currentLinkId)) {
 				Parking parking = AgentWithParking.parkingManager.getParkingsHashMap().get(parkingId);
 				int freeCapacity = AgentWithParking.parkingManager.getFreeCapacity(parkingId);
 
 				if (freeCapacity > 0 && parking.getId().toString().contains("gp")) {
-					parkVehicle(aem, getCurrentLinkId(aem));
+					parkVehicle(aem, currentLinkId);
 					return true;
 				}
 			}
