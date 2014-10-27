@@ -10,14 +10,15 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
+import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.qsim.QSimFactory;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import playground.pieter.pseudosimulation.util.CollectionUtils;
 import playground.singapore.ptsim.qnetsimengine.PTQSimFactory;
 import playground.singapore.scoring.CharyparNagelOpenTimesScoringFunctionFactory;
@@ -29,14 +30,15 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class MasterControler implements AfterMobsimListener, ShutdownListener, IterationStartsListener {
+public class MasterControler implements AfterMobsimListener, ShutdownListener, StartupListener {
     private final Logger masterLogger = Logger.getLogger(this.getClass());
     private final HashMap<String, Plan> newPlans = new HashMap<>();
-    private boolean initialRouing=false;
+    private boolean initialRouing = false;
     private int numberOfPSimIterations = 5;
     private Config config;
     private Controler matsimControler;
@@ -48,6 +50,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, I
     private List<PersonSerializable> personPool;
     private int loadBalanceInterval;
     private boolean isLoadBalanceIteration;
+    private boolean somethingWentWrong = false;
 
     private MasterControler(String[] args) throws NumberFormatException, IOException, ParseException {
         System.setProperty("matsim.preferLocalDtds", "true");
@@ -103,7 +106,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, I
         }
         if (commandLine.hasOption("r")) {
             masterLogger.warn("ROUTING initial plans on slaves.");
-            initialRouing=true;
+            initialRouing = true;
         }
         if (commandLine.hasOption("c")) {
             config = ConfigUtils.loadConfig(commandLine.getOptionValue("c"));
@@ -182,10 +185,19 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, I
         matsimControler.run();
     }
 
+
+
     @Override
     public void notifyAfterMobsim(AfterMobsimEvent event) {
         isLoadBalanceIteration = slaves.length > 1 && event.getIteration() % loadBalanceInterval == 0;
-        linkTravelTimes = new SerializableLinkTravelTimes(matsimControler.getLinkTravelTimes(), config
+        TravelTime linkTravelTimesUnserialized;
+        try {
+            linkTravelTimesUnserialized = matsimControler.getLinkTravelTimes();
+        } catch (NullPointerException e) {
+            linkTravelTimesUnserialized = new TravelTimeCalculatorFactoryImpl().createTravelTimeCalculator(matsimControler.getNetwork(),
+                    this.config.travelTimeCalculator()).getLinkTravelTimes();
+        }
+        linkTravelTimes = new SerializableLinkTravelTimes(linkTravelTimesUnserialized, config
                 .travelTimeCalculator().getTraveltimeBinSize(), config.qsim().getEndTime(), matsimControler
                 .getNetwork().getLinks().values());
         numThreads = new AtomicInteger(slaves.length);
@@ -199,11 +211,12 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, I
                 Thread.sleep(10);
             } catch (InterruptedException e) {
                 e.printStackTrace();
+
             }
 
         mergePlansFromSlaves();
         //do load balancing, if necessary
-        if (isLoadBalanceIteration ) {
+        if (isLoadBalanceIteration) {
             personPool = new ArrayList<>();
             masterLogger.warn("Plans from al slaves merged together. About to start load balancing.");
             List<Integer> loadBalanceNumbers = loadBalanceNumbers();
@@ -218,6 +231,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, I
                     Thread.sleep(10);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                    throw new RuntimeException();
                 }
             mergePersonsFromSlaves();
             masterLogger.warn("Distributing persons between  slaves");
@@ -231,6 +245,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, I
                     Thread.sleep(10);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                    throw new RuntimeException();
                 }
             for (Slave slave : slaves)
                 slave.state = SimulationState.TransmitTravelTimes;
@@ -238,6 +253,10 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, I
         isLoadBalanceIteration = false;
         if (personPool != null)
             personPool.clear();
+        if(somethingWentWrong){
+            masterLogger.error("Something went wrong. Exiting.");
+            throw new RuntimeException();
+        }
 
     }
 
@@ -249,7 +268,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, I
 
     }
 
-    private synchronized List<PersonSerializable> getPersonsFromPool(int diff) {
+    private synchronized List<PersonSerializable> getPersonsFromPool(int diff) throws IndexOutOfBoundsException {
         List<PersonSerializable> outList = new ArrayList<>();
         if (diff < 0) {
             for (int i = 0; i > diff; i--) {
@@ -308,15 +327,20 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, I
             for (int i = 0; i < optimalNumberPerSlave.size(); i++) {
                 switch (j) {
                     case 0:
-                        sb.append("slave_" + i + "\t");break;
+                        sb.append("slave_" + i + "\t");
+                        break;
                     case 1:
-                        sb.append(timesPerPlan.get(i)+"\t");break;
+                        sb.append(timesPerPlan.get(i) + "\t");
+                        break;
                     case 2:
-                        sb.append(personsPerSlave.get(i)+"\t");break;
+                        sb.append(personsPerSlave.get(i) + "\t");
+                        break;
                     case 3:
-                        sb.append(optimalNumberPerSlave.get(i)+"\t");break;
+                        sb.append(optimalNumberPerSlave.get(i) + "\t");
+                        break;
                     case 4:
-                        sb.append(differences.get(i)+"\t");break;
+                        sb.append(differences.get(i) + "\t");
+                        break;
 
                 }
 
@@ -340,10 +364,16 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, I
     }
 
     @Override
-    public void notifyIterationStarts(IterationStartsEvent event) {
-        if(initialRouing) {
+    public void notifyStartup(StartupEvent event) {
+        if (initialRouing) {
             notifyAfterMobsim(new AfterMobsimEvent(matsimControler, 0));
-            initialRouing = false;
+        }
+        for(Person person:matsimControler.getPopulation().getPersons().values()){
+            person.removePlan(person.getSelectedPlan());
+            Plan plan = newPlans.get(person.getId().toString());
+            person.addPlan(plan);
+            person.setSelectedPlan(plan);
+
         }
     }
 
@@ -396,7 +426,8 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, I
                     numThreads.decrementAndGet();
                 } catch (IOException | ClassNotFoundException e) {
                     e.printStackTrace();
-                    System.exit(0);
+                    somethingWentWrong  = true;
+                    numThreads.decrementAndGet();
                 }
             }
 
@@ -411,6 +442,8 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, I
                     numThreads.decrementAndGet();
                 } catch (ClassNotFoundException | IOException e) {
                     e.printStackTrace();
+                    somethingWentWrong  = true;
+                    numThreads.decrementAndGet();
                 }
             }
 
@@ -426,10 +459,10 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, I
                         Thread.sleep(10);
                     writer.writeBoolean(true);
                     writer.flush();
-                } catch (IOException e) {
+                } catch (IOException | InterruptedException | IndexOutOfBoundsException e) {
                     e.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    somethingWentWrong  = true;
+                    numThreads.decrementAndGet();
                 }
 
             }
@@ -455,7 +488,6 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, I
         }
 
 
-
         public Collection<? extends PersonSerializable> getPersons() {
             return slavePersonPool;
         }
@@ -465,6 +497,8 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, I
             writer.flush();
         }
     }
+
+
 
 
 }

@@ -39,13 +39,13 @@ import java.util.*;
 //IMPORTANT: PSim produces events that are not in chronological order. This controler
 // will require serious overhaul if chronological order is enforced in all event manager implementations
 public class SlaveControler implements IterationStartsListener {
-    private final boolean initialRouting;
+    private  boolean initialRouting;
     private final Logger slaveLogger;
     private final int myNumber;
     private int numberOfPSimIterations;
     private int numberOfIterations = -1;
     private Config config;
-    private double averageIterationTime;
+    private double totalIterationTime;
     private Controler matsimControler;
     private SerializableLinkTravelTimes linkTravelTimes;
     private WaitTime waitTimes;
@@ -199,11 +199,6 @@ public class SlaveControler implements IterationStartsListener {
     private void run() {
         pSimFactory = new PSimFactory();
         matsimControler.setMobsimFactory(pSimFactory);
-        // Collection<Plan> plans = new ArrayList<>();
-        // for (Person person :
-        // matsimControler.getPopulation().getPersons().values())
-        // plans.add(person.getSelectedPlan());
-        // // pSimFactory.setPlans(plans);
         matsimControler.run();
     }
 
@@ -213,12 +208,13 @@ public class SlaveControler implements IterationStartsListener {
             iterationTimes.add(System.currentTimeMillis() - lastIterationStartTime);
 
         if (initialRouting || (numberOfIterations > 0 && numberOfIterations % numberOfPSimIterations == 0)) {
-            this.averageIterationTime = getTotalIterationTime();
+            this.totalIterationTime = getTotalIterationTime();
             communications();
             if (loadBalance) {
                 slaveLogger.warn("Load balancing complete on all slaves.");
                 iterationTimes = new ArrayList<>();
             }
+            initialRouting = false;
         }
         lastIterationStartTime = System.currentTimeMillis();
         // the time calculators are null until the master sends them, need
@@ -299,14 +295,14 @@ public class SlaveControler implements IterationStartsListener {
             res = reader.readBoolean();
         } catch (IOException e) {
             slaveLogger.error("Master terminated. Exiting.");
-            System.exit(0);
+            throw new RuntimeException();
         }
         try {
             if (res) {
                 //prevent memory leaks, see http://stackoverflow.com/questions/1281549/memory-leak-traps-in-the-java-standard-api
 //                reader.reset();
                 writer.reset();
-                slaveLogger.warn("Spent an average of " + averageIterationTime +
+                slaveLogger.warn("Spent a total of " + totalIterationTime +
                         " running " + plansCopyForSending.size() +
                         " person plans for " + numberOfPSimIterations +
                         " PSim iterations.");
@@ -316,7 +312,7 @@ public class SlaveControler implements IterationStartsListener {
                     stopStopTimes = (StopStopTime) reader.readObject();
                     waitTimes = (WaitTime) reader.readObject();
                 }
-                writer.writeDouble(averageIterationTime);
+                writer.writeDouble(totalIterationTime);
                 writer.writeInt(matsimControler.getPopulation().getPersons().size());
                 writer.flush();
                 slaveLogger.warn("RECEIVING completed.");
@@ -325,8 +321,8 @@ public class SlaveControler implements IterationStartsListener {
                 writer.flush();
                 slaveLogger.warn("Sending completed.");
             } else {
-                System.out.println("Master terminated. Exiting.");
-                System.exit(0);
+                slaveLogger.error("Master terminated. Exiting.");
+                throw new RuntimeException();
             }
             loadBalance = reader.readBoolean();
             if (loadBalance) {
@@ -351,6 +347,8 @@ public class SlaveControler implements IterationStartsListener {
 
         } catch (ClassNotFoundException | IOException e) {
             e.printStackTrace();
+            slaveLogger.error("Something went wrong. Exiting.");
+            throw new RuntimeException();
         }
 
     }
