@@ -119,7 +119,6 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 		this.iteration = iter;
 		this.allModesData = new ModeData(this.nofBins + 1);
 		this.data.clear();
-        getDataForMode("car");
 	}
 
 	/* output methods */
