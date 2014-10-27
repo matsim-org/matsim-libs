@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.Population;
 class CountWorkers {
 
     public static void main(String[] args) {
-        final ExperimentResource experiment = new ExperimentResource("/Users/michaelzilske/runs-svn/synthetic-cdr/transportation/");
+        final ExperimentResource experiment = new ExperimentResource("/Users/michaelzilske/runs-svn/synthetic-cdr/transportation/berlin/");
         final RegimeResource uncongested = experiment.getRegime("uncongested");
         RunResource baseRun = uncongested.getBaseRun();
         Population population = baseRun.getOutputScenario().getPopulation();

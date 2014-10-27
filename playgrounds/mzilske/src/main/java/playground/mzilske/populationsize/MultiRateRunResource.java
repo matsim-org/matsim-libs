@@ -94,7 +94,7 @@ class MultiRateRunResource {
             rates.add("90-10");
             rates.add("100-0");
             return rates;
-        } else if (alternative.equals("wurst")) {
+        } else if (alternative.equals("random") || alternative.equals("brute")) {
             final List<String> rates = new ArrayList<>();
             rates.add("0");
             rates.add("5");
@@ -163,7 +163,7 @@ class MultiRateRunResource {
         new CountsWriter(someCounts).write(rateDir + "/calibration_counts.xml.gz");
     }
 
-    public void simulateRate(String rate, final int cloneFactor) {
+    public void simulateRate(String rate, final int cloneFactor, final double cadytsWeight) {
         final Config config = phoneConfig(cloneFactor);
 
         config.controler().setOutputDirectory(WD + "/rates/" + rate + "/" + cloneFactor);
@@ -172,8 +172,7 @@ class MultiRateRunResource {
         final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
         scenario.setNetwork(baseScenario.getNetwork());
 
-        final Sightings allSightings = new SightingsImpl(new HashMap<Id, List<Sighting>>());
-        new SightingsReader(allSightings).read(IOUtils.getInputStream(WD + "/rates/" + rate + "/sightings.txt"));
+        final Sightings allSightings = getSightings(rate);
         ZoneTracker.LinkToZoneResolver linkToZoneResolver = new LinkIsZone();
 
         PopulationFromSightings.createPopulationWithRandomRealization(scenario, allSightings, linkToZoneResolver);
@@ -199,6 +198,7 @@ class MultiRateRunResource {
                 bind(Counts.class).annotatedWith(Names.named("allCounts")).toInstance(allCounts);
                 bind(Counts.class).annotatedWith(Names.named("calibrationCounts")).toInstance(someCounts);
                 bind(Double.class).annotatedWith(Names.named("clonefactor")).toInstance((double) cloneFactor);
+                bind(Double.class).annotatedWith(Names.named("cadytsweight")).toInstance(cadytsWeight);
                 MapBinder<String, PlanStrategyFactory> planStrategyFactoryBinder
                         = MapBinder.newMapBinder(binder(), String.class, PlanStrategyFactory.class);
                 planStrategyFactoryBinder.addBinding("ReRealize").to(TrajectoryReRealizerFactory.class);
@@ -208,6 +208,12 @@ class MultiRateRunResource {
         Injector injector2 = Guice.createInjector(modules);
         Controller controler2 = injector2.getInstance(Controller.class);
         controler2.run();
+    }
+
+    public Sightings getSightings(String rate) {
+        final Sightings allSightings = new SightingsImpl(new HashMap<Id, List<Sighting>>());
+        new SightingsReader(allSightings).read(IOUtils.getInputStream(WD + "/rates/" + rate + "/sightings.txt"));
+        return allSightings;
     }
 
     static Counts filterCounts(Counts allCounts) {
@@ -528,4 +534,62 @@ class MultiRateRunResource {
         new CountsWriter(someCounts).write(rateDir + "/calibration_counts.xml.gz");
     }
 
+    public void twoRatesRandom(String string) {
+        final Scenario baseScenario = getBaseRun().getLastIteration().getExperiencedPlansAndNetwork();
+        final int rate = Integer.parseInt(string);
+        List<Person> persons = new ArrayList<>(baseScenario.getPopulation().getPersons().values());
+        Collections.shuffle(persons, new Random(42));
+        int i = 0;
+        for (Person person : persons) {
+            if (i < 9523) { // number of workers
+                person.getCustomAttributes().put("phonerate", 50);
+            } else {
+                person.getCustomAttributes().put("phonerate", rate);
+            }
+            i++;
+        }
+        EventsManager events = EventsUtils.createEventsManager();
+        ZoneTracker.LinkToZoneResolver linkToZoneResolver = new LinkIsZone();
+        final CompareMain compareMain = new CompareMain(baseScenario, events, new CallBehavior() {
+
+            @Override
+            public boolean makeACall(ActivityEndEvent event) {
+                return false;
+            }
+
+            @Override
+            public boolean makeACall(ActivityStartEvent event) {
+                return false;
+            }
+
+            @Override
+            public boolean makeACall(Id id, double time) {
+                Person person = baseScenario.getPopulation().getPersons().get(id);
+                double secondlyProbability = (Integer) person.getCustomAttributes().get("phonerate") / (double) (24*60*60);
+                return Math.random() < secondlyProbability;
+            }
+
+            @Override
+            public boolean makeACallAtMorningAndNight(Id<Person> id) {
+                return false;
+            }
+
+        }, linkToZoneResolver);
+        new MatsimEventsReader(events).readFile(getBaseRun().getLastIteration().getEventsFileName());
+        compareMain.close();
+
+
+        final Sightings allSightings = new SightingsImpl(compareMain.getSightingsPerPerson());
+
+        String rateDir = WD + "/rates/" + rate;
+        new File(rateDir).mkdirs();
+
+        new SightingsWriter(allSightings).write(rateDir + "/sightings.txt");
+        final Counts allCounts = CompareMain.volumesToCounts(baseScenario.getNetwork(), compareMain.getGroundTruthVolumes());
+        allCounts.setYear(2012);
+        new CountsWriter(allCounts).write(rateDir + "/all_counts.xml.gz");
+        final Counts someCounts = filterCounts(allCounts);
+        someCounts.setYear(2012);
+        new CountsWriter(someCounts).write(rateDir + "/calibration_counts.xml.gz");
+    }
 }

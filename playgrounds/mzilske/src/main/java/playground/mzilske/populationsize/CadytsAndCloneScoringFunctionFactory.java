@@ -23,6 +23,7 @@
 package playground.mzilske.populationsize;
 
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
+import com.google.inject.name.Named;
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -55,11 +56,15 @@ class CadytsAndCloneScoringFunctionFactory implements ScoringFunctionFactory {
     @Inject
     CloneService cloneService;
 
+    @Inject @Named("cadytsweight")
+    double cadytsweight;
+
     @Override
     public ScoringFunction createNewScoringFunction(final Person person) {
 
         SumScoringFunction sumScoringFunction = new SumScoringFunction();
         CadytsScoring<Link> scoringFunction = new CadytsScoring<>(person.getSelectedPlan(), config, ptStep, cadyts);
+        scoringFunction.setWeight(cadytsweight);
         sumScoringFunction.addScoringFunction(scoringFunction);
 
         // prior

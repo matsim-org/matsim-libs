@@ -40,23 +40,30 @@ public class Main2 {
 //        uncongested.getMultiRateRun("cutoff").simulateRate("90-10", 10);
 
 
-//        uncongested.getMultiRateRun("wurst").persodisthisto();
-//        uncongested.getMultiRateRun("wurst").summary();
+//        uncongested.getMultiRateRun("brute-corrected-prior").simulateRate("0", 3, 100.0);
+//        uncongested.getMultiRateRun("brute-corrected-prior").simulateRate("0", 3, 100.0);
+//        uncongested.getMultiRateRun("brute").simulateRate("5", 3, 100.0);
+
+
+//        uncongested.getMultiRateRun("random").persodisthisto();
+        uncongested.getMultiRateRun("random").summary();
 
 
 //
-//        uncongested.getMultiRateRun("cutoff").cutoffRate(0.9, 0.1);
-//        uncongested.getMultiRateRun("cutoff").simulateRate("90-10", 3);
+//        uncongested.getMultiRateRun("cutoff").cutoffRate(1.0, 0.5);
+//        uncongested.getMultiRateRun("cutoff").simulateRate("100-50", 3);
 //        uncongested.getMultiRateRun("cutoff").simulateRate("90-10", 10);
 
 
 
-//        uncongested.getMultiRateRun("wurst").twoRates("0");
+//        uncongested.getMultiRateRun("random").twoRatesRandom("5");
+//        uncongested.getMultiRateRun("random").twoRatesRandom("0");
+
 //        uncongested.getMultiRateRun("wurst").simulateRate("0", 10);
-        uncongested.getMultiRateRun("wurst").simulateRate("0", 3);
+//        uncongested.getMultiRateRun("random").simulateRate("0", 3, 100.0);
 //        uncongested.getMultiRateRun("wurst").twoRates("5");
 //        uncongested.getMultiRateRun("wurst").simulateRate("5", 10);
-        uncongested.getMultiRateRun("wurst").simulateRate("5", 3);
+//        uncongested.getMultiRateRun("random").simulateRate("5", 3, 100.0);
 
 //        uncongested.getMultiRateRun("wurst").twoRates("0");
 //        uncongested.getMultiRateRun("wurst").simulateRate("0", 10);

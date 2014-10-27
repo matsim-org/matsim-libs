@@ -20,17 +20,6 @@
 
 package org.matsim.analysis;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Font;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
@@ -47,6 +36,15 @@ import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.core.utils.misc.Time;
+
+import java.awt.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * @author mrieser
@@ -121,6 +119,7 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 		this.iteration = iter;
 		this.allModesData = new ModeData(this.nofBins + 1);
 		this.data.clear();
+        getDataForMode("car");
 	}
 
 	/* output methods */
