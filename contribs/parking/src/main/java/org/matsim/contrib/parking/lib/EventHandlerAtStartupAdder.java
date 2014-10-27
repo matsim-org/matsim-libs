@@ -29,6 +29,14 @@ public class EventHandlerAtStartupAdder implements StartupListener {
 
 	LinkedList<EventHandler> eventHandler = new LinkedList<EventHandler>();
 
+	public EventHandlerAtStartupAdder(){
+		
+	}
+	
+	public EventHandlerAtStartupAdder(EventHandler eventHandler){
+		addEventHandler(eventHandler);
+	}
+	
 	public void addEventHandler(EventHandler eventHandler) {
 		this.eventHandler.add(eventHandler);
 	}
