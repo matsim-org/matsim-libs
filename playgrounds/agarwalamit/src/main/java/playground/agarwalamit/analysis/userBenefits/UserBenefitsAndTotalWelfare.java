@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.siouxFalls.userBenefits;
+package playground.agarwalamit.analysis.userBenefits;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

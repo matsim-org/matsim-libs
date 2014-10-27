@@ -16,63 +16,78 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.siouxFalls.congestionAnalyzer;
+package playground.agarwalamit.analysis.emission;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.LoadMyScenarios;
-import playground.agarwalamit.analysis.congestion.CongestionLinkAnalyzer;
+import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
 
 /**
- * Simplified class to get the absolute delays for all the specified run cases
- * and write them to file.
  * @author amit
  */
-public class AbsoluteDelays  {
+public class AbsoluteEmissions {
 
 	private String outputDir;
 
-	public AbsoluteDelays(String outputDir) {
+	public AbsoluteEmissions(String outputDir) {
 		this.outputDir = outputDir;
 	}
 
 	public static void main(String[] args) {
 		String clusterPathDesktop = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct_msa_rSeed/";
-		String [] runCases =  {"baseCaseCtd","ei","ci","eci"};
+		String [] runCases =  {"baseCaseCtd","ei","ci","eci"};//{"run201","run202","run203","run204"};
 		
-		new AbsoluteDelays(clusterPathDesktop).runAndWrite(runCases);
+		new AbsoluteEmissions(clusterPathDesktop).runAndWrite(runCases);
 	}
 
 	public void runAndWrite(String [] runCases){
-		BufferedWriter writer =IOUtils.getBufferedWriter(outputDir+"/analysis/absoluteDelays.txt");
+		BufferedWriter writer = IOUtils.getBufferedWriter(outputDir+"/analysis/absoluteEmissions.txt");
 
+		SortedMap<String, SortedMap<String, Double>> emissions = new TreeMap<>();
+		Set<String> pollutants = new HashSet<String>();
+
+		for(String runCase:runCases){
+			SortedMap<String, Double> em = calculateTotalEmissions(runCase);
+			emissions.put(runCase, em);
+			pollutants.addAll(em.keySet());
+		}
 		try {
-			for(String runCase : runCases){
-				writer.write(runCase+"\t"+totalDelayInHoursFromEventsFile(runCase)+"\n");
+			writer.write("runCase"+"\t");
+			for(String runCase:pollutants){
+				writer.write(runCase+"\t");
+			}
+			writer.newLine();
+
+			for(String runCase:emissions.keySet()){
+				writer.write(runCase+"\t");
+				for(String pollutant : pollutants){
+					writer.write(emissions.get(runCase).get(pollutant)+"\t");
+				}
+				writer.newLine();
 			}
 			writer.close();
-		} catch (IOException e) {
-			throw new RuntimeException("Data is not written into File. Reason : "+e);
+		} catch (IOException e1) {
+			throw new RuntimeException("Data is not written in file. Reason : "+e1);
 		}
 	}
 
-	private  double totalDelayInHoursFromEventsFile(String runCase) {
-
+	private SortedMap<String,Double> calculateTotalEmissions (String runCase){
 		String configFile = outputDir+runCase+"/output_config.xml";
-		String networkFile = outputDir+runCase+"/output_network.xml.gz";
-		double simEndTime = LoadMyScenarios.getSimulationEndTime(configFile);
 		int lastIt = LoadMyScenarios.getLastIteration(configFile);
-		String eventFile = outputDir+runCase+"/ITERS/it."+lastIt+"/"+lastIt+".events.xml.gz";		
+		String emissionEventFile = outputDir+runCase+"/ITERS/it."+lastIt+"/"+lastIt+".emission.events.xml.gz";	
 
-		Scenario sc = LoadMyScenarios.loadScenarioFromNetwork(networkFile);
-
-		CongestionLinkAnalyzer congestionHandler = new CongestionLinkAnalyzer(simEndTime, eventFile, 1);
-		congestionHandler.run(sc);
-
-		return congestionHandler.getTotalDelaysInHours();
+		EmissionsAnalyzer analyzer = new EmissionsAnalyzer(emissionEventFile);
+		analyzer.init(null);
+		analyzer.preProcessData();
+		analyzer.postProcessData();
+		return analyzer.getTotalEmissions();
 	}
 }

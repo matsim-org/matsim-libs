@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.agarwalamit.siouxFalls;
+package playground.agarwalamit.analysis;
 
 import java.io.BufferedWriter;
 import java.util.SortedMap;
@@ -31,7 +31,6 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.agarwalamit.analysis.LoadMyScenarios;
 import playground.agarwalamit.analysis.emission.EmissionCostFactors;
 import playground.ikaddoura.internalizationCar.MarginalCongestionHandlerImplV3;
 import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsAnalyzer;
@@ -48,8 +47,8 @@ public class VerifyResults {
 	private static final double marginalUtlOfTravelTime = marginal_Utl_traveling_car_sec+marginal_Utl_performing_sec;
 	private static final double vtts_car = marginalUtlOfTravelTime/marginal_Utl_money;
 
-	private final  static String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/";
-	private  final static String [] runNr = /*{"baseCaseCtd","ei","ci","eci"};//*/{"ci"};
+	private final  static String runDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct_msa_rSeed/";
+	private  final static String [] runNr = {"baseCaseCtd","ei","ci","eci"};
 
 	private  static Scenario scenario;
 
@@ -69,8 +68,8 @@ public class VerifyResults {
 			//			scenario = ScenarioUtils.loadScenario(config);
 			String eventsFile=runDir+runNr[i]+"/ITERS/it."+lastItenation+"/"+lastItenation+".events.xml.gz";
 
-//			calculateEmissionCosts(emissionsEventsFile, scenario,runNr[i]);
-//			calculateDelaysCosts(eventsFile,scenario,runNr[i]);
+			calculateEmissionCosts(emissionsEventsFile, scenario,runNr[i]);
+			calculateDelaysCosts(eventsFile,scenario,runNr[i]);
 			calculateUserBenefits(scenario, runNr[i]);
 		}
 		Logger.getLogger(VerifyResults.class).info("Writing files is finsished.");
