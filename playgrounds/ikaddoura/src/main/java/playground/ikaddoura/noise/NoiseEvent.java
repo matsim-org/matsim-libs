@@ -105,7 +105,7 @@ public final class NoiseEvent extends Event {
 		return EVENT_TYPE;
 	}
 	
-	public enum CarOrHdv {
+	protected enum CarOrHdv {
 		car , hdv
 	}
 
