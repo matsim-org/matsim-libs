@@ -81,6 +81,7 @@ public class CourtesyEventsGenerator implements ActivityStartEventHandler, Activ
 			final Id<Person> ego,
 			final Id<ActivityFacility> facility,
 			final double time) {
+		// TODO: handle wraparound (done improperly because we track people from their second act...)
 		final Set< Id<Person> > alters = socialNetwork.getAlters( ego );
 		for ( Id<Person> present : MapUtils.getSet( facility , personsAtFacility ) ) {
 			if ( alters.contains( present ) ) {
