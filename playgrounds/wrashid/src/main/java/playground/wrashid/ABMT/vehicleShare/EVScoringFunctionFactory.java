@@ -9,6 +9,11 @@ import org.matsim.core.scoring.SumScoringFunction;
 
 import playground.ivt.matsim2030.scoring.MATSim2010ScoringFunctionFactory;
 
+/**
+ * 
+ * @author wrashid
+ *
+ */
 public class EVScoringFunctionFactory extends MATSim2010ScoringFunctionFactory {
 
 	private StageActivityTypes typesNotToScore;
