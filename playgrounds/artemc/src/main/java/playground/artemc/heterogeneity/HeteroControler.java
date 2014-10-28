@@ -35,6 +35,7 @@ public class HeteroControler {
 	private static String input;
 	private static String output;
 	private static boolean heteroSwitch = false;
+	private static String  simulationType = null;
 
 
 	public static void main(String[] args){
@@ -47,7 +48,8 @@ public class HeteroControler {
 
 
 		if(args.length>2){
-			if(args[2].equals("hetero"))
+			simulationType = args[2];
+			if(args[2].equals("hetero") || args[2].equals("homo"))
 				heteroSwitch=true;
 		}
 
@@ -70,7 +72,7 @@ public class HeteroControler {
 		log.info("Adding Simple Annealer...");
 		controler.addControlerListener(new SimpleAnnealer());
 
-		HeterogeneityConfig heterogeneityConfig = new HeterogeneityConfig(input, scenario);
+		HeterogeneityConfig heterogeneityConfig = new HeterogeneityConfig(input, scenario, simulationType);
 		if(heteroSwitch)
 		{
 			log.info("Adding Heterogeneity Config...");

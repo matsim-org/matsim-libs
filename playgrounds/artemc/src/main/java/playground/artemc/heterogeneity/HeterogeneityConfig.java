@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -29,31 +30,36 @@ ControlerListener {
 	static double lambda_income = 1.0;
 	static double lambda_dist = 1.0;
 	static boolean heterogeneitySwitch = false;
+	static boolean homogeneousIncomeFactorSwitch = false;
+
 
 	private Controler controler;
 	private Config config;
 	private Scenario scenario;
 
 	private String inputPath;
-	private static HashMap<Id<Person>, Double> incomeFactors;
+	private String simulationType;
 
-	public HeterogeneityConfig(String inputPath, Scenario scenario){
+	private HashMap<Id<Person>, Double> incomeFactors;
+
+	public HeterogeneityConfig(String inputPath, Scenario scenario, String simulationType){
 		this.inputPath = inputPath;
 		this.scenario = scenario;
-		
+		this.simulationType = simulationType;
+
 		//Initialize all maps
 		this.incomeFactors = new HashMap<Id<Person>, Double>();
 		for(Id<Person> personId:this.scenario.getPopulation().getPersons().keySet()){
 			this.incomeFactors.put(personId, 1.0);
 		}
-		
+
 	}
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-	
+
 		this.config = event.getControler().getConfig();
-		
+
 		//Initialize parameters
 		String l_inc = config.getParam(modName, LAMBDA_INCOME);
 		String l_dist = config.getParam(modName, LAMBDA_DISTANCE);
@@ -77,7 +83,7 @@ ControlerListener {
 		}else{
 			log.info("Heterogeneous user preferences successfully enabled!");
 		}
-		
+
 	}
 
 	private void loadIncomes() {
@@ -93,11 +99,24 @@ ControlerListener {
 			mean = (double) sum / (double) this.scenario.getPopulation().getPersons().size();
 		}
 
+		
 		/*Create map of personal income factors*/
+		Double factorSum=0.0;
+		Double factoreMean = 0.0;
 		for(Id<Person> personId:this.scenario.getPopulation().getPersons().keySet()){
 			Integer personIncome = (int) this.scenario.getPopulation().getPersonAttributes().getAttribute(personId.toString(), "income");
-			//log.info(personId+","+Math.pow((double) personIncome/mean,this.getLambda_income()));
-			incomeFactors.put(personId, Math.pow((double) personIncome/mean,this.getLambda_income()));
+			double incomeFactor = Math.pow((double) personIncome/mean,this.getLambda_income());
+			incomeFactors.put(personId, incomeFactor);
+			factorSum = factorSum + incomeFactor;
+		}
+		
+		/*For simulation with homogeneous parameters but adjusted for income factor mean*/
+		if(simulationType.equals("homo")){
+			log.info("Homogeneuos simulation with parameter adjustments for income factor mean is enabled...");
+			factoreMean = factorSum / (double) incomeFactors.size();
+			for(Id<Person> personId:incomeFactors.keySet()){
+				incomeFactors.put(personId, factoreMean);
+			}
 		}
 	}
 

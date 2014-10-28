@@ -47,12 +47,10 @@ public class TripAnalysisHandler implements PersonDepartureEventHandler, PersonA
 	private final static Logger log = Logger.getLogger(TripAnalysisHandler.class);
 
 	private Map<Id, Double> personId2departureTime = new HashMap<Id, Double>();
+	private Map<String, Integer> modeLegCount = new HashMap<String, Integer>();
 	private double totalTravelTimeAllModes = 0.;
 	private double totalTravelTimeCarMode = 0.;
 	private int agentStuckEvents = 0;
-
-	private Map<String, Integer> modeLegCount = new HashMap<String, Integer>();
-
 
 	//	private int carLegs = 0;
 	//	private int ptLegs = 0;
@@ -60,6 +58,12 @@ public class TripAnalysisHandler implements PersonDepartureEventHandler, PersonA
 	//	private int transitWalkLegs = 0;
 	//	private int busLegs=0;
 
+	public TripAnalysisHandler(Scenario scenario) {
+		for(String mode:scenario.getConfig().planCalcScore().getModes().keySet()){
+			modeLegCount.put(mode, 0);
+		};	
+		modeLegCount.put("transit_walk",0);
+	}
 
 	public Map<Id, Double> getPersonId2departureTime() {
 		return personId2departureTime;
@@ -87,13 +91,6 @@ public class TripAnalysisHandler implements PersonDepartureEventHandler, PersonA
 
 	public void setAgentStuckEvents(int agentStuckEvents) {
 		this.agentStuckEvents = agentStuckEvents;
-	}
-
-	public TripAnalysisHandler(Scenario scenario) {
-		for(String mode:scenario.getConfig().planCalcScore().getModes().keySet()){
-			modeLegCount.put(mode, 0);
-		};	
-		modeLegCount.put("transit_walk",0);
 	}
 
 	@Override
