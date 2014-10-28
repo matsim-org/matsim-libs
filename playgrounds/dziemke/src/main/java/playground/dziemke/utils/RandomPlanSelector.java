@@ -21,21 +21,25 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class RandomPlanSelector {
 	// Parameters
-	static double selectionProbability = 0.01;
+	static double selectionProbability = 1.;
 	static boolean onlyTransferSelectedPlan = false;
 	static boolean considerHomeStayingAgents = true;
 	static boolean includeStayHomePlans = true;
-	static int limitNumberOfAgents = 10000000;
+	static int maxNumberOfAgentsConsidered = 100;
 	static String runId = "run_145";
 	static int iteration = 150;
 	
 	
 	// Input and output files
 	static String inputPlansFile = "D:/Workspace/runs-svn/cemdapCadyts/" + runId + "/ITERS/it." + iteration
-			+ "/" + runId + "." + iteration + ".plans.xml.gz";
+			+ "/" + runId + "." + iteration + ".plans_selected.xml.gz";
+//	static String inputPlansFile = "D:/Workspace/runs-svn/cemdapCadyts/" + runId + "/ITERS/it." + iteration
+//			+ "/" + runId + "." + iteration + ".plansWithZonesAsFacilities.xml.gz";
 	//static String inputPlansFile = "D:/Workspace/container/demand/output/" + runId + "/" + runId + ".output_plans.xml.gz";
 	static String outputPlansFile = "D:/Workspace/runs-svn/cemdapCadyts/" + runId + "/ITERS/it." + iteration
-			+ "/" + runId + "." + iteration + ".plans_modified.xml.gz";
+			+ "/" + runId + "." + iteration + ".plans_selected_reduced.xml.gz";
+//	static String outputPlansFile = "D:/Workspace/runs-svn/cemdapCadyts/" + runId + "/ITERS/it." + iteration
+//			+ "/" + runId + "." + iteration + ".plansWithZonesAsFacilities_reduced.xml.gz";
 	//static String outputPlansFile = "D:/Workspace/container/demand/output/" + runId + "/" + runId + ".output_plans_modified.xml.gz";
 	
 	
@@ -55,7 +59,7 @@ public class RandomPlanSelector {
 		
 		for (Person person : population.getPersons().values()) {
 			
-			if (counter < limitNumberOfAgents) {
+			if (counter < maxNumberOfAgentsConsidered) {
 				Random random = new Random();
 				double randomNumber = random.nextDouble();
 				
@@ -71,7 +75,7 @@ public class RandomPlanSelector {
 				
 				if (randomNumber <= selectionProbability) {
 					if (considerPerson == true) {
-						Id id = person.getId();
+						Id<Person> id = person.getId();
 						
 						if (onlyTransferSelectedPlan == true) {
 							Person person2 = population.getFactory().createPerson(id);

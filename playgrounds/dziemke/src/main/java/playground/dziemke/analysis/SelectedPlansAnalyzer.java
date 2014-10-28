@@ -23,13 +23,15 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class SelectedPlansAnalyzer {
 	// Parameters
-	static String runId = "run_157";
-	static int numberOfIterations = 150;
-	static int plansFileInterval = 50;
+	static String runId = "run_163";
+	static int numberOfIterations = 100;
+	//static int plansFileInterval = 50;
+	static int plansFileInterval = 100;
 	static boolean useInterimPlans = true;
+	static boolean useOutputPlans = false;
 	
 	// Output file
-	static String outputDirectory = "D:/Workspace/container/demand/output/" + runId + "/analysis/";
+	static String outputDirectory = "D:/Workspace/data/cemdapMatsimCadyts/output/" + runId + "/analysis/";
 
 	static Map<Integer, Integer> stayHomePlansMap = new HashMap<Integer, Integer>();
 	static Map<Integer, Integer> otherPlansMap = new HashMap<Integer, Integer>();
@@ -37,7 +39,7 @@ public class SelectedPlansAnalyzer {
 	public static void main(String[] args) {
 		if (useInterimPlans == true) {
 			for (int i = 1; i<= numberOfIterations/plansFileInterval; i++) {
-				String plansFile = "D:/Workspace/container/demand/output/" + runId + "/ITERS/it." + i * plansFileInterval
+				String plansFile = "D:/Workspace/data/cemdapMatsimCadyts/output/" + runId + "/ITERS/it." + i * plansFileInterval
 						+ "/" + runId + "." + i * plansFileInterval + ".plans.xml.gz";
 				
 				Config config = ConfigUtils.createConfig();
@@ -50,15 +52,17 @@ public class SelectedPlansAnalyzer {
 			}
 		}
 		
-		String plansFileOutput = "D:/Workspace/container/demand/output/" + runId + "/" + runId + ".output_plans.xml.gz";
-		
-		Config config = ConfigUtils.createConfig();
-		Scenario scenario = ScenarioUtils.createScenario(config);
-		PopulationReaderMatsimV5 reader = new PopulationReaderMatsimV5(scenario);
-		reader.readFile(plansFileOutput);
-		Population population = scenario.getPopulation();
-
-		countSelectedPlanTypes (population, 99999);
+		if (useOutputPlans == true) {
+			String plansFileOutput = "D:/Workspace/container/demand/output/" + runId + "/" + runId + ".output_plans.xml.gz";
+			
+			Config config = ConfigUtils.createConfig();
+			Scenario scenario = ScenarioUtils.createScenario(config);
+			PopulationReaderMatsimV5 reader = new PopulationReaderMatsimV5(scenario);
+			reader.readFile(plansFileOutput);
+			Population population = scenario.getPopulation();
+	
+			countSelectedPlanTypes (population, 99999);
+		}
 		
 		writeFile();
 	}

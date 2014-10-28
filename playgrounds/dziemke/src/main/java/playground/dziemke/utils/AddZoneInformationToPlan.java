@@ -43,7 +43,7 @@ public class AddZoneInformationToPlan {
 	private final static GeometryFactory geometryFactory = new GeometryFactory();
 	
 	// parameters
-	static String runId = "run_145";
+	static String runId = "run_145f";
 	static int iteration = 150;
 	
 	// input and output files
@@ -86,7 +86,7 @@ public class AddZoneInformationToPlan {
 			Person modifiedPerson = population.getFactory().createPerson(personId);
 						
 			for(int i=0; i<person.getPlans().size(); i++) {
-				Plan plan = person.getPlans().get(0);
+				Plan plan = person.getPlans().get(i);
 				Plan modifiedPlan = population.getFactory().createPlan();
 									
 				for (int j=0; j<plan.getPlanElements().size(); j++) {

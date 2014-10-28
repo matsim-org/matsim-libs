@@ -56,6 +56,7 @@ public class AnalysisFileWriter {
 	}
 	
 	
+	// New: For cummulative Plots
 	//-----------------------------------------------------------------------------------------------------------------------
 	public void writeToFileIntegerKeyCumulative(Map<Integer, Double> map, String outputFile, int binWidth, double aggregateWeight, double average) {
 		BufferedWriter bufferedWriter = null;
@@ -72,7 +73,7 @@ public class AnalysisFileWriter {
     			int binCaption = key * binWidth;
     			double value = map.get(key);
     			cumulativeValue = cumulativeValue + value;
-    			bufferedWriter.write(binCaption + "+" + "\t" + cumulativeValue + "\t" + cumulativeValue/aggregateWeight);
+    			bufferedWriter.write(binCaption + "\t" + cumulativeValue + "\t" + cumulativeValue/aggregateWeight);
     			writeCounter = writeCounter + value;
     			bufferedWriter.newLine();
     		}
@@ -104,6 +105,41 @@ public class AnalysisFileWriter {
 	//-----------------------------------------------------------------------------------------------------------------------
 	
 	
+	// New: Other information
+	//-----------------------------------------------------------------------------------------------------------------------
+	public void writeToFileOther(Map<String, Integer> map, String outputFile) {
+		BufferedWriter bufferedWriter = null;
+			
+		try {
+			File output = new File(outputFile);
+	    	FileWriter fileWriter = new FileWriter(output);
+	    	bufferedWriter = new BufferedWriter(fileWriter);
+	    		
+	    	for (String key : map.keySet()) {
+    			int value = map.get(key);
+    			bufferedWriter.write(key + "\t" + value);
+    			bufferedWriter.newLine();
+	    	}
+    		
+		} catch (FileNotFoundException ex) {
+			ex.printStackTrace();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			} finally {
+				try {
+	                if (bufferedWriter != null) {
+	                    bufferedWriter.flush();
+	                    bufferedWriter.close();
+	                }
+	            } catch (IOException ex) {
+	                ex.printStackTrace();
+	            }
+	        }
+			System.out.println("Analysis file " + outputFile + " written.");
+		}
+		//-----------------------------------------------------------------------------------------------------------------------
+	
+	
 	// file writer for data that has a string (e.g. an activity name) as key
 	public void writeToFileStringKey(Map<String, Double> map, String outputFile, double aggregateWeight) {
 		BufferedWriter bufferedWriter = null;
@@ -113,12 +149,14 @@ public class AnalysisFileWriter {
 			FileWriter fileWriter = new FileWriter(output);
 			bufferedWriter = new BufferedWriter(fileWriter);
 		
-			int writeCounter = 0;
+			//int writeCounter = 0;
+			double writeCounter = 0;
     		
     		for (String key : map.keySet()) {
     			double value = map.get(key);
     			bufferedWriter.write(key + "\t" + value + "\t" + value/aggregateWeight);
-    			writeCounter++;
+    			// writeCounter++;
+    			writeCounter = writeCounter + value;
     			bufferedWriter.newLine();
     		}
     		//bufferedWriter.write("Sum = " + writeCounter);
@@ -147,7 +185,7 @@ public class AnalysisFileWriter {
 	
 	
 	// file writer for comparison file routed distance vs. beeline distance
-	public void writeComparisonFile(Map<Id, Double> mapRouted, Map<Id, Double> mapBeeline, String outputFile, int tripCounter) {
+	public void writeComparisonFile(Map<Id<Trip>, Double> mapRouted, Map<Id<Trip>, Double> mapBeeline, String outputFile, int tripCounter) {
 		BufferedWriter bufferedWriter = null;
 		
 		try {
@@ -165,7 +203,7 @@ public class AnalysisFileWriter {
 			double maxRatioBeeline = Double.NEGATIVE_INFINITY;
 			double aggregateRatioRoutedBeeline = 0.;
     		
-    		for (Id tripId : mapRouted.keySet()) {
+    		for (Id<Trip> tripId : mapRouted.keySet()) {
     			if (mapBeeline.containsKey(tripId)) {
 	    			double distanceRouted = mapRouted.get(tripId);
 	    			double distanceBeeline = mapBeeline.get(tripId);

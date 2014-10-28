@@ -51,7 +51,7 @@ public class SrVTripAnalyzer {
 		boolean onlyCarAndCarPool = true;	//carp
 		boolean onlyHomeAndWork = true;		//hw
 		boolean distanceFilter = true;		//dist
-		double minDistance = 0;
+		//double minDistance = 0;
 		double maxDistance = 100;
 	    
 		int maxBinDuration = 120;
@@ -148,8 +148,8 @@ public class SrVTripAnalyzer {
 
 	    int numberOfTripsWithNoCalculableSpeed = 0;
 	    
-	    Map <Id, Double> distanceRoutedMap = new TreeMap <Id, Double>();
-	    Map <Id, Double> distanceBeelineMap = new TreeMap <Id, Double>();
+	    Map <Id<Trip>, Double> distanceRoutedMap = new TreeMap <Id<Trip>, Double>();
+	    Map <Id<Trip>, Double> distanceBeelineMap = new TreeMap <Id<Trip>, Double>();
 	    
 	    
 	    // do calculations
