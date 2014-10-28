@@ -103,11 +103,14 @@ public class NoiseTest {
 		// 3)
 		Assert.assertEquals("wrong immission angle correction for receiver point 14 and link1", -0.8913405699036482, noiseSpatialInfo.getReceiverPointId2relevantLinkId2correctionTermAngle().get(new IdImpl("14")).get(new IdImpl("link1")), MatsimTestUtils.EPSILON);		
 		
-		double angle = 180 - 114.60777973814005;
+		double angle = 65.39222026185993;
 		double immissionCorrection = 10 * Math.log10((angle) / (180));
 		Assert.assertEquals("wrong immission angle correction for receiver point 9 and link5", immissionCorrection, noiseSpatialInfo.getReceiverPointId2relevantLinkId2correctionTermAngle().get(new IdImpl("9")).get(new IdImpl("link5")), MatsimTestUtils.EPSILON);		
 
-//		System.out.println(noiseSpatialInfo.getReceiverPointId2relevantLinkId2correctionTermAngle().get(new IdImpl("8")));
+		// for a visualization of the receiver point and the relevant links, see network file
+		double angle2 = 0.0000000001;
+		double immissionCorrection2 = 10 * Math.log10((angle2) / (180));
+		Assert.assertEquals("wrong immission angle correction for receiver point 9 and link5", immissionCorrection2, noiseSpatialInfo.getReceiverPointId2relevantLinkId2correctionTermAngle().get(new IdImpl("8")).get(new IdImpl("link5")), MatsimTestUtils.EPSILON);		
 	}
 	
 }
