@@ -54,7 +54,7 @@ public class TollsManager implements LinkEnterEventHandler, PersonArrivalEventHa
 			Person person=controler.getPopulation().getPersons().get(event.getPersonId());
 			
 			if (!VehicleInitializer.hasElectricVehicle.containsKey(person.getSelectedPlan())){
-				System.out.println();
+				VehicleInitializer.initialize(person.getSelectedPlan());
 			}
 			
 			if (VehicleInitializer.hasElectricVehicle.get(person.getSelectedPlan())) {
