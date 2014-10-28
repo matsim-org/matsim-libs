@@ -13,7 +13,7 @@ public class ScalingOfStations {
 		
 		final BufferedReader readLink1 = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/Stations_GreaterZurich.txt");
 
-		final BufferedWriter outLink = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/Stations_GreaterZurich_25%.txt");
+		final BufferedWriter outLink = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/Stations_GreaterZurich_10%.txt");
 		String para = readLink1.readLine();
 		outLink.write(para);
 		outLink.newLine();
@@ -27,7 +27,7 @@ public class ScalingOfStations {
 			outLink.write(arr1[0] + "\t" + arr1[1] + "\t" +arr1[2] + "\t" +arr1[3] + "\t" +arr1[4] + "\t" +arr1[5] + "\t");
 			
 			int number = Integer.parseInt(arr1[6]);
-			number /= 4;
+			number /= 10;
 			number++;
 			total += number;
 			//if (number < 5) 

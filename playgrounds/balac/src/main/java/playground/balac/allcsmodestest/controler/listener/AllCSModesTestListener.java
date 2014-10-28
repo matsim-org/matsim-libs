@@ -15,6 +15,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 import playground.balac.allcsmodestest.controler.listener.CSEventsHandler.RentalInfo;
 import playground.balac.allcsmodestest.controler.listener.FFEventsHandler.RentalInfoFF;
+import playground.balac.allcsmodestest.controler.listener.NoParkingEventHandler.NoParkingInfo;
 import playground.balac.allcsmodestest.controler.listener.NoVehicleEventHandler.NoVehicleInfo;
 
 public class AllCSModesTestListener implements StartupListener, IterationEndsListener, IterationStartsListener{
@@ -22,6 +23,7 @@ public class AllCSModesTestListener implements StartupListener, IterationEndsLis
 	FFEventsHandler ffhandler;
 	OWEventsHandler owhandler;
 	NoVehicleEventHandler noVehicleHandler;
+	NoParkingEventHandler noParkingHandler;
 	Controler controler;
 	int frequency = 0;
 	
@@ -117,12 +119,31 @@ public class AllCSModesTestListener implements StartupListener, IterationEndsLis
 			e.printStackTrace();
 		}
 		
+		ArrayList<NoParkingInfo> infoNoParking = noParkingHandler.info();
+		
+		final BufferedWriter outNoParking = IOUtils.getBufferedWriter(this.controler.getControlerIO().getIterationFilename(event.getIteration(), "No_Parking_Stats.txt"));
+		try {
+			outNoParking.write("linkID	CSType");
+			outNoParking.newLine();
+		for(NoParkingInfo i: infoNoParking) {
+			
+			
+			outNoParking.write(i.toString());
+			outNoParking.newLine();
+			
+		}
+		outNoParking.flush();
+		outNoParking.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		event.getControler().getEvents().removeHandler(this.cshandler);
 		event.getControler().getEvents().removeHandler(this.ffhandler);
 		event.getControler().getEvents().removeHandler(this.owhandler);
 		event.getControler().getEvents().removeHandler(this.noVehicleHandler);
-		
+		event.getControler().getEvents().removeHandler(this.noParkingHandler);
 		}
 		
 	}
@@ -138,7 +159,8 @@ public class AllCSModesTestListener implements StartupListener, IterationEndsLis
 		this.owhandler = new OWEventsHandler(event.getControler().getNetwork());
 		
 		this.noVehicleHandler = new NoVehicleEventHandler();	
-
+		
+		this.noParkingHandler = new NoParkingEventHandler();
 		
 	}
 
@@ -150,7 +172,7 @@ public class AllCSModesTestListener implements StartupListener, IterationEndsLis
 			event.getControler().getEvents().addHandler(this.ffhandler);
 			event.getControler().getEvents().addHandler(this.owhandler);
 			event.getControler().getEvents().addHandler(this.noVehicleHandler);
-			
+			event.getControler().getEvents().addHandler(this.noParkingHandler);
 		}
 		
 	}

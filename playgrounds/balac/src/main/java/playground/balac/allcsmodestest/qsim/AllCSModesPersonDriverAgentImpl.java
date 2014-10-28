@@ -54,6 +54,7 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
+import playground.balac.allcsmodestest.events.NoParkingSpaceEvent;
 import playground.balac.allcsmodestest.events.NoVehicleCarSharingEvent;
 import playground.balac.freefloating.qsim.FreeFloatingStation;
 import playground.balac.freefloating.qsim.FreeFloatingVehiclesLocation;
@@ -677,7 +678,10 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 		endStationOW = findClosestAvailableParkingSpace(network.getLinks().get(leg.getRoute().getEndLinkId()));
 		
 		if (endStationOW == null) {
+			
 			this.state = MobsimAgent.State.ABORT ;
+			this.simulation.getEventsManager().processEvent(new NoParkingSpaceEvent(now, leg.getRoute().getEndLinkId(), "ow"));
+
 			return;
 		}
 		else {
@@ -718,9 +722,7 @@ public class AllCSModesPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 				distanceSearch = CoordUtils.calcDistance(link.getCoord(), station.getLink().getCoord());
 			}			
 			
-		}
-		
-			
+		}			
 		//owvehiclesLocation.removeVehicle(closest.getLink());
 		return closest;
 		
