@@ -26,13 +26,16 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.pt.PtConstants;
 
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
@@ -74,6 +77,8 @@ public class RunZurichScenario {
 		final Controler controler = new Controler( scenario );
 		controler.setOverwriteFiles( true );
 
+		connectFacilitiesWithNetwork( controler );
+
 		initializeLocationChoice( controler );
 
 		// We use a specific scoring function, that uses individual preferences
@@ -85,6 +90,16 @@ public class RunZurichScenario {
 						PtConstants.TRANSIT_ACTIVITY_TYPE ) ) ); 	
 
 		controler.run();
+	}
+
+	private static void connectFacilitiesWithNetwork(Controler controler) {
+		ActivityFacilities facilities = controler.getFacilities();
+		//log.warn("number of facilities: " +facilities.getFacilities().size());
+		NetworkImpl network = (NetworkImpl) controler.getNetwork();
+		//log.warn("number of links: " +network.getLinks().size());
+
+		WorldConnectLocations wcl = new WorldConnectLocations(controler.getConfig());
+		wcl.connectFacilitiesWithLinks(facilities, network);
 	}
 
 	private static void initializeLocationChoice( final Controler controler ) {
