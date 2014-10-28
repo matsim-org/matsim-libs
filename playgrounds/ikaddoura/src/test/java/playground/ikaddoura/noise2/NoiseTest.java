@@ -99,9 +99,15 @@ public class NoiseTest {
 		Assert.assertEquals("wrong relevant link for receiver point Id '15'", new IdImpl("linkB1"), noiseSpatialInfo.getReceiverPointId2relevantLinkIds().get(new IdImpl("15")).get(2));
 		Assert.assertEquals("wrong relevant link for receiver point Id '15'", 3, noiseSpatialInfo.getReceiverPointId2relevantLinkIds().get(new IdImpl("15")).size());
 		// 2)
-		Assert.assertEquals("wrong distance between receiver point Id '8' and link Id '1'", 8.749854822140838, noiseSpatialInfo.getReceiverPointId2relevantLinkId2correctionTermDs().get(new IdImpl("8")).get(new IdImpl("1")), MatsimTestUtils.EPSILON);		
+		Assert.assertEquals("wrong distance between receiver point Id '8' and link Id '1'", 8.749854822140838, noiseSpatialInfo.getReceiverPointId2relevantLinkId2correctionTermDs().get(new IdImpl("8")).get(new IdImpl("link0")), MatsimTestUtils.EPSILON);		
 		// 3)
-//		System.out.println(noiseSpatialInfo.getReceiverPointId2relevantLinkId2correctionTermAngle());
+		Assert.assertEquals("wrong immission angle correction for receiver point 14 and link1", -0.8913405699036482, noiseSpatialInfo.getReceiverPointId2relevantLinkId2correctionTermAngle().get(new IdImpl("14")).get(new IdImpl("link1")), MatsimTestUtils.EPSILON);		
+		
+		double angle = 180 - 114.60777973814005;
+		double immissionCorrection = 10 * Math.log10((angle) / (180));
+		Assert.assertEquals("wrong immission angle correction for receiver point 9 and link5", immissionCorrection, noiseSpatialInfo.getReceiverPointId2relevantLinkId2correctionTermAngle().get(new IdImpl("9")).get(new IdImpl("link5")), MatsimTestUtils.EPSILON);		
+
+//		System.out.println(noiseSpatialInfo.getReceiverPointId2relevantLinkId2correctionTermAngle().get(new IdImpl("8")));
 	}
 	
 }
