@@ -539,7 +539,6 @@ public class NoiseSpatialInfo {
 		
 
 		double sc = (fromCoordX - pointCoordX) * (toCoordX - pointCoordX) + (fromCoordY - pointCoordY) * (toCoordY - pointCoordY);
-		
 		double cosAngle = sc / (
 				Math.sqrt(
 						Math.pow(fromCoordX - pointCoordX, 2) + Math.pow(fromCoordY - pointCoordY, 2)
@@ -549,40 +548,31 @@ public class NoiseSpatialInfo {
 						Math.pow(toCoordX - pointCoordX, 2) + Math.pow(toCoordY - pointCoordY, 2)
 						)
 				);
-		System.out.println("Skalarprodukt: " + sc);
-		System.out.println("Angle alternativ Berechnung: " + Math.toDegrees(Math.acos(cosAngle)));
+		angle = Math.toDegrees(Math.acos(cosAngle));
 		
 		if (sc > 0) {
 			// spitzer winkel
-			double m1 = (pointCoordY - fromCoordY) / x1;
-			System.out.println("m1: " + m1 );
-			double m2 = (pointCoordY - toCoordY) / x2;
-			System.out.println("m2: " + m2 );
-			
-			double angleRad = Math.atan( Math.abs( (m1 - m2) / (1 + (m1 * m2)) ) );
-			angle = Math.toDegrees(angleRad);
-						
+					
 			if (angle > 90) {
 				angle = 180 - angle;
 			}
 			
 		} else if (sc < 0) {
 			// stumpfer winkel
-			double m1 = (pointCoordY - fromCoordY) / x1;
-			System.out.println("m1: " + m1 );
-			double m2 = (pointCoordY - toCoordY) / x2;
-			System.out.println("m2: " + m2 );
-			
-			double angleRad = Math.atan( Math.abs( (m1 - m2) / (1 + (m1 * m2)) ) );
-			angle = Math.toDegrees(angleRad);
 			
 			if (angle < 90) {
 				angle = 180 - angle;
 			}
 			
 		} else {
-			// 90 degrees
 			angle = 90;
+		}
+		
+		// since zero is not defined
+		if (angle == 0.) {
+			// this situation is not clear
+			log.warn("A zero angle is set to 0.0000000001 because the angle immission correction does not account for a zero angle.");
+			angle = 0.0000000001;
 		}
 		
 //		double lotPointX = 0.;
