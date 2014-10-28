@@ -31,7 +31,7 @@ import org.matsim.core.api.internal.HasPersonId;
  */
 public class CourtesyEvent extends Event implements HasPersonId {
 	public static enum Type {
-		HELLO, GOODBYE;
+		sayHelloEvent, sayGoodbyeEvent;
 	}
 
 	private final Type type;
@@ -51,14 +51,7 @@ public class CourtesyEvent extends Event implements HasPersonId {
 
 	@Override
 	public String getEventType() {
-		switch ( type ) {
-			case GOODBYE:
-				return "sayGoodbyeEvent";
-			case HELLO:
-				return "sayHelloEvent";
-			default:
-				throw new RuntimeException( type+"?" );
-		}
+		return type.toString();
 	}
 
 	@Override

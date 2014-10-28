@@ -61,7 +61,7 @@ public class CourtesyEventsGenerator implements ActivityStartEventHandler, Activ
 	@Override
 	public void handleEvent(final ActivityStartEvent event) {
 		handleEvent(
-				CourtesyEvent.Type.HELLO,
+				CourtesyEvent.Type.sayHelloEvent,
 				event.getPersonId(),
 				event.getFacilityId(),
 				event.getTime() );
@@ -70,7 +70,7 @@ public class CourtesyEventsGenerator implements ActivityStartEventHandler, Activ
 	@Override
 	public void handleEvent(final ActivityEndEvent event) {
 		handleEvent(
-				CourtesyEvent.Type.GOODBYE,
+				CourtesyEvent.Type.sayGoodbyeEvent,
 				event.getPersonId(),
 				event.getFacilityId(),
 				event.getTime() );
@@ -100,10 +100,10 @@ public class CourtesyEventsGenerator implements ActivityStartEventHandler, Activ
 		}
 
 		switch ( type ) {
-			case GOODBYE:
+			case sayGoodbyeEvent:
 				MapUtils.getSet( facility , personsAtFacility ).remove( ego );
 				break;
-			case HELLO:
+			case sayHelloEvent:
 				MapUtils.getSet( facility , personsAtFacility ).add( ego );
 				break;
 			default:
