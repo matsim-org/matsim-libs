@@ -30,7 +30,6 @@ import playground.thibautd.socnetsim.GroupReplanningConfigGroup;
 import playground.thibautd.socnetsim.SocialNetworkConfigGroup;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.controller.ImmutableJointController;
-import playground.thibautd.socnetsim.events.CourtesyEventsGenerator;
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.population.SocialNetworkReader;
 import playground.thibautd.socnetsim.replanning.GroupStrategyManager;
@@ -67,10 +66,6 @@ public class RunGenericSocialNetwork {
 							scenario ) )
 				.build();
 
-		controllerRegistry.getEvents().addHandler(
-				new CourtesyEventsGenerator(
-					controllerRegistry.getEvents(),
-					sn ) );
 		final ImmutableJointController controller = RunUtils.initializeController( controllerRegistry );
 
 		RunUtils.loadBeingTogetherListenner( controller );

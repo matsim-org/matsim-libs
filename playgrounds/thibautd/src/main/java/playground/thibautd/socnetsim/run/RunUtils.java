@@ -75,6 +75,7 @@ import playground.thibautd.socnetsim.analysis.JointTripsStats;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.controller.ControllerRegistryBuilder;
 import playground.thibautd.socnetsim.controller.ImmutableJointController;
+import playground.thibautd.socnetsim.events.CourtesyEventsGenerator;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlans;
@@ -95,13 +96,13 @@ import playground.thibautd.socnetsim.replanning.modules.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.selectors.AnnealingCoalitionExpBetaFactory;
 import playground.thibautd.socnetsim.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.router.JointPlanRouterFactory;
+import playground.thibautd.socnetsim.scoring.BeingTogetherScoring.LinearOverlapScorer;
+import playground.thibautd.socnetsim.scoring.BeingTogetherScoring.LogOverlapScorer;
+import playground.thibautd.socnetsim.scoring.BeingTogetherScoring.PersonOverlapScorer;
 import playground.thibautd.socnetsim.scoring.FireMoneyEventsForUtilityOfBeingTogether;
 import playground.thibautd.socnetsim.scoring.GroupSizePreferencesConfigGroup;
 import playground.thibautd.socnetsim.scoring.KtiScoringFunctionFactoryWithJointModes;
 import playground.thibautd.socnetsim.scoring.UniformlyInternalizingPlansScoring;
-import playground.thibautd.socnetsim.scoring.BeingTogetherScoring.LinearOverlapScorer;
-import playground.thibautd.socnetsim.scoring.BeingTogetherScoring.LogOverlapScorer;
-import playground.thibautd.socnetsim.scoring.BeingTogetherScoring.PersonOverlapScorer;
 import playground.thibautd.socnetsim.sharedvehicles.HouseholdBasedVehicleRessources;
 import playground.thibautd.socnetsim.sharedvehicles.PlanRouterWithVehicleRessourcesFactory;
 import playground.thibautd.socnetsim.sharedvehicles.PrepareVehicleAllocationForSimAlgorithm;
@@ -534,6 +535,19 @@ public class RunUtils {
 		builder.withMobsimFactory(
 				new SwitchingJointQSimFactory(
 						builder.getTravelTime() ) );
+
+		if ( scenario.getScenarioElement( SocialNetwork.ELEMENT_NAME ) != null ) {
+			final SocialNetwork sn = (SocialNetwork)
+				scenario.getScenarioElement(
+						SocialNetwork.ELEMENT_NAME );
+			builder.getEvents().addHandler(
+					new CourtesyEventsGenerator(
+						builder.getEvents(),
+						sn ) );
+		}
+		else {
+			log.warn( "NO COURTESY EVENTS WILL BE GENERATED!" );
+		}
 
 		return builder;
 	}
