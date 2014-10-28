@@ -20,6 +20,7 @@
 package playground.ivt.matsim2030.scoring;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -63,6 +64,9 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 	private final Scenario scenario;
 	private final StageActivityTypes blackList;
 	private final TreeMap<Id, FacilityPenalty> facilityPenalties;
+
+	// very expensive to initialize:only do once!
+	private final Map<Id, CharyparNagelScoringParameters> individualParameters = new HashMap< >();
 
 	// /////////////////////////////////////////////////////////////////////////
 	// constructors
@@ -162,6 +166,10 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 			final Person person,
 			final PlanCalcScoreConfigGroup config,
 			final ObjectAttributes personAttributes) {
+		if ( individualParameters.containsKey( person.getId() ) ) {
+			return individualParameters.get( person.getId() );
+		}
+
 		// this is ugly, but otherwise there are warnings logged for each
 		// scoring function creation about the (default) non-null PathSizeBeta...
 		Logger.getLogger( PlanCalcScoreConfigGroup.class ).setLevel( Level.ERROR );
@@ -237,7 +245,10 @@ public class MATSim2010ScoringFunctionFactory implements ScoringFunctionFactory 
 			}
 		}
 
-		return new CharyparNagelScoringParameters( dummyGroup );
+		final CharyparNagelScoringParameters params =
+			new CharyparNagelScoringParameters( dummyGroup );
+		individualParameters.put( person.getId() , params );
+		return params;
 	}
 }
 
