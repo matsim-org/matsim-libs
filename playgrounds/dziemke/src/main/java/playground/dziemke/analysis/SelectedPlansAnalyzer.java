@@ -23,7 +23,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class SelectedPlansAnalyzer {
 	// Parameters
-	static String runId = "run_163";
+	static String runId = "run_145d";
 	static int numberOfIterations = 100;
 	//static int plansFileInterval = 50;
 	static int plansFileInterval = 100;
@@ -31,6 +31,7 @@ public class SelectedPlansAnalyzer {
 	static boolean useOutputPlans = false;
 	
 	// Output file
+	//static String outputDirectory = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/analysis/";
 	static String outputDirectory = "D:/Workspace/data/cemdapMatsimCadyts/output/" + runId + "/analysis/";
 
 	static Map<Integer, Integer> stayHomePlansMap = new HashMap<Integer, Integer>();
@@ -40,6 +41,7 @@ public class SelectedPlansAnalyzer {
 		if (useInterimPlans == true) {
 			for (int i = 1; i<= numberOfIterations/plansFileInterval; i++) {
 				String plansFile = "D:/Workspace/data/cemdapMatsimCadyts/output/" + runId + "/ITERS/it." + i * plansFileInterval
+				// String plansFile = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + i * plansFileInterval
 						+ "/" + runId + "." + i * plansFileInterval + ".plans.xml.gz";
 				
 				Config config = ConfigUtils.createConfig();
@@ -53,7 +55,8 @@ public class SelectedPlansAnalyzer {
 		}
 		
 		if (useOutputPlans == true) {
-			String plansFileOutput = "D:/Workspace/container/demand/output/" + runId + "/" + runId + ".output_plans.xml.gz";
+			//String plansFileOutput = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/" + runId + ".output_plans.xml.gz";
+			String plansFileOutput = "D:/Workspace/data/cemdapMatsimCadyts/output/" + runId + "/" + runId + ".output_plans.xml.gz";
 			
 			Config config = ConfigUtils.createConfig();
 			Scenario scenario = ScenarioUtils.createScenario(config);

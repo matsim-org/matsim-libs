@@ -42,7 +42,8 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 
 /**
- * @author balmermi
+ * @author dziemke
+ * based on balmermi
  *
  */
 public class Feature2Coord {

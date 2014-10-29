@@ -30,13 +30,13 @@ public class TripAnalyzer {
 	public static void main(String[] args) {
 	    // Parameters
 		boolean onlyInterior = false; // int
-		boolean onlyBerlinBased = false; // ber	usually varied for analysis
-		boolean distanceFilter = false; // dist	usually varied for analysis
+		boolean onlyBerlinBased = true; // ber	usually varied for analysis
+		boolean distanceFilter = true; // dist	usually varied for analysis
 		//double minDistance = 0;
 		double maxDistance = 100;
 		Integer planningAreaId = 11000000;
 		
-		String runId = "run_164";
+		String runId = "run_145d";
 		String usedIteration = "100"; // most frequently used value: 150
 	    
 	    int maxBinDuration = 120;
@@ -57,9 +57,11 @@ public class TripAnalyzer {
 	    
 	    // Input and output files
 	    String networkFile = "D:/Workspace/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
-	    String eventsFile = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + usedIteration + "/" 
+	    String eventsFile = "D:/Workspace/data/cemdapMatsimCadyts/output/" + runId + "/ITERS/it." + usedIteration + "/" 
+	    //String eventsFile = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + usedIteration + "/" 
 				+ runId + "." + usedIteration + ".events.xml.gz";	    
-	    String outputDirectory = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/analysis";
+	    String outputDirectory = "D:/Workspace/data/cemdapMatsimCadyts/output/" + runId + "/analysis";
+	    //String outputDirectory = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/analysis";
 	    
 	    String shapeFileBerlin = "D:/Workspace/data/cemdapMatsimCadyts/input/shapefiles/Berlin_DHDN_GK4.shp";
 	    Map<Integer, Geometry> zoneGeometries = ShapeReader.read(shapeFileBerlin, "NR");
