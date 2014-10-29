@@ -30,7 +30,7 @@ import org.matsim.core.gbl.MatsimRandom;
  *
  * @author kn based on mrieser
  */
-public class ExpBetaPlanChanger<T extends BasicPlan, I> implements GenericPlanSelector<T, I> {
+public final class ExpBetaPlanChanger<T extends BasicPlan, I> implements GenericPlanSelector<T, I> {
 	private static final Logger log = Logger.getLogger(ExpBetaPlanChanger.class);
 
 	private final double beta;
