@@ -42,9 +42,9 @@ import java.util.Map;
  * Returns for every mode:
  *	o	Number of trips []
  *	o	Total distance travelled [km]
- *	o	Mean and variance of distances travelled [km]
+ *	o	Mean and standard deviation of distances travelled [km]
  *	o	Total duration [min]
- *	o	Mean and variance of durations [min]
+ *	o	Mean and standard deviation of durations [min]
  *
  * @author boescpa
  */
@@ -100,9 +100,9 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 	 * * Returns for every mode:
 	 *	o	Number of trips []
 	 *	o	Total distance travelled [km]
-	 *	o	Mean and variance of distances travelled [km]
+	 *	o	Mean and standard deviation of distances travelled [km]
 	 *	o	Total duration [min]
-	 *	o	Mean and variance of durations [min]
+	 *	o	Mean and standard deviation of durations [min]
 	 *
 	 * @param spatialEventCutter
 	 * @return A multiline String containing the above listed results.
@@ -123,7 +123,7 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 	}
 
 	private String getTripResults() {
-		String results = "Mode; NumberOfTrips; TotalDuration; MeanDuration; Variance Duration; TotalDistance; MeanDistance; VarianceDistance" + ScenarioAnalyzer.NL;
+		String results = "Mode; NumberOfTrips; TotalDuration; MeanDuration; StdDevDuration; TotalDistance; MeanDistance; StdDevDistance" + ScenarioAnalyzer.NL;
 		for (String mode : modes.keySet()) {
 			Double[] modeVals = modes.get(mode).getModeVals();
 			if (mode.contains("pt")) {
@@ -145,7 +145,7 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 	}
 
 	private String getActivityResults() {
-		String results = "Activity; NumberOfExecutions; TotalDuration; MeanDuration; Variance Duration" + ScenarioAnalyzer.NL;
+		String results = "Activity; NumberOfExecutions; TotalDuration; MeanDuration; StdDevDuration" + ScenarioAnalyzer.NL;
 		for (String activity : activities.keySet()) {
 			Double[] actVals = activities.get(activity).getActVals();
 			results += activity + ScenarioAnalyzer.DEL;
@@ -188,7 +188,7 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 				// Activity analysis:
 				ActivityResult actVals;
 				if (considerLink(startLinks.get(0))) {
-					actVals = getActivity("home");
+					actVals = getActivity("h");
 					actVals.actDurations.add(startTimes.get(0));
 				}
 				for (int i = 1; i < startTimes.size(); i++) {
@@ -198,7 +198,7 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 					}
 				}
 				if (endLinks.get(endLinks.size()-1) != null && endTimes.get(endTimes.size()-1) < 24*60 && considerLink(endLinks.get(endLinks.size()-1))) {
-					actVals = getActivity("home");
+					actVals = getActivity("h");
 					actVals.actDurations.add(24*60 - endTimes.get(endTimes.size()-1));
 				}
 			}
@@ -223,7 +223,7 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 		public ArrayList<Double> modeDurations = new ArrayList<>();
 
 		/**
-		 * @return NumberOfTrips; TotalDuration; MeanDuration; Variance Duration; TotalDistance; MeanDistance; VarianceDistance
+		 * @return NumberOfTrips; TotalDuration; MeanDuration; StdDevDuration; TotalDistance; MeanDistance; StdDevDistance
 		 */
 		public Double[] getModeVals() {
 			Double[] modeVals = new Double[7];
@@ -231,18 +231,18 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 			// Number of Trips:
 			modeVals[0] = (double)modeDistances.size();
 
-			// Duration [min]: Total, Mean and Variance
+			// Duration [min]: Total, Mean and StdDev
 			modeVals[1] = total(modeDurations);
 			modeVals[2] = modeVals[1]/modeVals[0];
-			modeVals[3] = var(modeDurations, modeVals[2]);
+			modeVals[3] = stddev(modeDurations, modeVals[2]);
 			for (int i = 1; i < 4; i++) {
 				modeVals[i] /= 60;
 			}
 
-			// Distance [km]: Total, Mean and Variance
+			// Distance [km]: Total, Mean and StdDev
 			modeVals[4] = total(modeDistances);
 			modeVals[5] = modeVals[4]/modeVals[0];
-			modeVals[6] = var(modeDistances, modeVals[5]);
+			modeVals[6] = stddev(modeDistances, modeVals[5]);
 			for (int i = 4; i < 7; i++) {
 				modeVals[i] /= 1000;
 			}
@@ -257,10 +257,11 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 	}
 
 	private ActivityResult getActivity(String activity) {
-		ActivityResult activityResult = this.activities.get(activity);
+		String act = activity.substring(0,1);
+		ActivityResult activityResult = this.activities.get(act);
 		if (activityResult == null) {
 			activityResult = new ActivityResult();
-			this.activities.put(activity, activityResult);
+			this.activities.put(act, activityResult);
 		}
 		return activityResult;
 	}
@@ -269,7 +270,7 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 		public ArrayList<Double> actDurations = new ArrayList<>();
 
 		/**
-		 * @return NumberOfExecutions; TotalDuration; MeanDuration; Variance Duration
+		 * @return NumberOfExecutions; TotalDuration; MeanDuration; StdDev Duration
 		 */
 		public Double[] getActVals() {
 			Double[] actVals = new Double[4];
@@ -277,10 +278,10 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 			// Number of Trips:
 			actVals[0] = (double)actDurations.size();
 
-			// Duration [min]: Total, Mean and Variance
+			// Duration [min]: Total, Mean and StdDev
 			actVals[1] = total(actDurations);
 			actVals[2] = actVals[1]/actVals[0];
-			actVals[3] = var(actDurations, actVals[2]);
+			actVals[3] = stddev(actDurations, actVals[2]);
 			for (int i = 1; i < 4; i++) {
 				actVals[i] /= 60;
 			}
@@ -293,12 +294,12 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 		}
 	}
 
-	private double var(ArrayList<Double> allVals, double mean) {
+	private double stddev(ArrayList<Double> allVals, double mean) {
 		double var = 0;
 		for (double val : allVals) {
 			var += (val-mean)*(val-mean);
 		}
-		return var/allVals.size();
+		return Math.sqrt(var/allVals.size());
 	}
 
 	private double total(ArrayList<Double> allVals) {
