@@ -39,6 +39,7 @@ import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.analysis.ActivityType2DurationHandler;
 import playground.agarwalamit.analysis.LoadMyScenarios;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
+import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
 
 /**
@@ -79,7 +80,7 @@ public class ActivityType2ActivityDurationDistribution extends AbstractAnalyisMo
 	private SortedMap<String, SortedMap<Integer, Integer>> actType2ActDuration2LegCount;
 	private String outputDir;
 	private String eventsFile;
-
+	private final String userGrp = "URBAN";
 
 	public static void main(String[] args) {
 		String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/";
@@ -107,7 +108,7 @@ public class ActivityType2ActivityDurationDistribution extends AbstractAnalyisMo
 		personId2ActDurations = new HashMap<Id<Person>, Map<String,List<Double>>>();
 		actDurHandler = new ActivityType2DurationHandler(this.simEndTime);
 		timeClasses = new ArrayList<Integer>();
-	
+
 		preProcessData();
 		postProcessData();
 	}
@@ -124,19 +125,19 @@ public class ActivityType2ActivityDurationDistribution extends AbstractAnalyisMo
 
 		SortedMap<String, Double> act2TypDur = new TreeMap<>();
 		SortedMap<String, Double> act2MinDur = new TreeMap<>();
-		
+
 		for (String actTyp :config.planCalcScore().getActivityTypes()){
 			act2TypDur.put(actTyp, config.planCalcScore().getActivityParams(actTyp).getTypicalDuration());
 			act2MinDur.put(actTyp, config.planCalcScore().getActivityParams(actTyp).getMinimalDuration());
 		}
-		
+
 		String fileName = outputDir+"/analysis/actTyp2TypicalAndMinimumActDurations.txt";
 		BufferedWriter writer = IOUtils.getBufferedWriter(fileName);
 		try {
 			writer.write("actType \t typicalActDuration \t minimumActDuration \n");
 			for (String actTyp :act2MinDur.keySet()){
 				writer.write(actTyp+"\t"+act2TypDur.get(actTyp)+"\t"
-			+act2MinDur.get(actTyp)+"\n");
+						+act2MinDur.get(actTyp)+"\n");
 			}
 			writer.close();
 		} catch (Exception e) {
@@ -167,7 +168,7 @@ public class ActivityType2ActivityDurationDistribution extends AbstractAnalyisMo
 
 	@Override
 	public void writeResults(String outputFolder) {
-		String fileName = outputFolder+"/actTyp2ActDurDistributionDuration.txt";
+		String fileName = outputFolder+"/"+userGrp+"actTyp2ActDurDistributionDuration.txt";
 		BufferedWriter writer = IOUtils.getBufferedWriter(fileName);
 		try {
 			writer.write("timeIndex \t ");
@@ -204,25 +205,30 @@ public class ActivityType2ActivityDurationDistribution extends AbstractAnalyisMo
 
 		PersonFilter pf = new PersonFilter();
 		for(Id<Person> id : personId2ActDurations.keySet()){
-//			if(pf.isPersonFromMID(id)){
-				Map<String, List<Double>> actTyp2Dur = personId2ActDurations.get(id);
-				for(String actTyp : actTyp2Dur.keySet()){
-					List<Double> durs = actTyp2Dur.get(actTyp);
-					for(double d :durs){
-						for(int i=0;i<timeClasses.size();i++){
-							if(d> timeClasses.get(i)&& d<=timeClasses.get(i+1)){
-								SortedMap<Integer,Integer> time2LegCount = actType2ActDuration2LegCount.get(actTyp);
-								int countSoFar = time2LegCount.get(timeClasses.get(i+1));
-								int newCount = countSoFar+1;
-								time2LegCount.put(timeClasses.get(i+1), newCount);
-							}
-						}
-					}
-				}
-//			}//
+			if(pf.isPersonFromMID(id) && userGrp.equalsIgnoreCase(UserGroup.URBAN.toString())){
+				storeData(id);
+			} else {
+				storeData(id);
+			}
 		}
 	}
 
+	private void storeData(Id<Person> id){
+		Map<String, List<Double>> actTyp2Dur = personId2ActDurations.get(id);
+		for(String actTyp : actTyp2Dur.keySet()){
+			List<Double> durs = actTyp2Dur.get(actTyp);
+			for(double d :durs){
+				for(int i=0;i<timeClasses.size();i++){
+					if(d> timeClasses.get(i)&& d<=timeClasses.get(i+1)){
+						SortedMap<Integer,Integer> time2LegCount = actType2ActDuration2LegCount.get(actTyp);
+						int countSoFar = time2LegCount.get(timeClasses.get(i+1));
+						int newCount = countSoFar+1;
+						time2LegCount.put(timeClasses.get(i+1), newCount);
+					}
+				}
+			}
+		}
+	}
 	private void initializeTimeClasses(){
 		int endOfTimeClass =0;
 		int classCounter = 0;
