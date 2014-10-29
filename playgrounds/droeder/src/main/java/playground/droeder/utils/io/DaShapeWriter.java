@@ -59,7 +59,7 @@ public class DaShapeWriter {
 	private static SimpleFeatureBuilder builder;
 	private static GeometryFactory geometryFactory = new GeometryFactory();
 	
-	public static void writeLinks2Shape(String fileName, Map<Id, ? extends Link> links, Map<Id, SortedMap<String, Object>> attributes){
+	public static void writeLinks2Shape(String fileName, Map<Id<Link>, ? extends Link> links, Map<Id<Link>, SortedMap<String, Object>> attributes){
 		if(attributes == null){
 			initLineFeatureType("links", null, true);
 		}else{
@@ -238,7 +238,7 @@ public class DaShapeWriter {
 		return features;
 	}
 	
-	private static Collection<SimpleFeature> createLinkFeatures(Map<Id, ? extends Link> links, Map<Id, SortedMap<String, Object>> attributes) {
+	private static Collection<SimpleFeature> createLinkFeatures(Map<Id<Link>, ? extends Link> links, Map<Id<Link>, SortedMap<String, Object>> attributes) {
 		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		SimpleFeature feature;
 		Coordinate[] coord;
