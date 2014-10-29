@@ -22,17 +22,24 @@
  */
 package playground.ikaddoura.noise2;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -46,6 +53,7 @@ public class NoiseTest {
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 	
 	// Tests the NoisSpatialInfo functionality separately for each function
+	@Ignore
 	@Test
 	public final void test1(){
 		
@@ -109,8 +117,7 @@ public class NoiseTest {
 		Assert.assertEquals("wrong immission angle correction for receiver point 8 and link0", immissionCorrection4, noiseSpatialInfo.getReceiverPointId2relevantLinkId2correctionTermAngle().get(new IdImpl("8")).get(new IdImpl("link0")), MatsimTestUtils.EPSILON);
 	}
 	
-	// ...
-	@Ignore
+	// tests the noise emission and immission
 	@Test
 	public final void test2(){
 		
@@ -123,21 +130,73 @@ public class NoiseTest {
 		controler.setOverwriteFiles(true);
 		controler.run();
 		
-		noiseControlerListener.getNoiseEmissionHandler().getLinkId2timeInterval2noiseEmission();
-		System.out.println(noiseControlerListener.getNoiseEmissionHandler().getLinkId2timeInterval2noiseEmission());
+		// +++++++++++++++++++++++++++++++++++++++++ emission ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		
+		Id linkId = new IdImpl("linkA2");
+		double timeInterval = 11 * 3600.;
+				
+		// test the number of linkEnterEvents for linkA2 in time interval 10-11
+		List<LinkEnterEvent> linkEnterEvents = noiseControlerListener.getNoiseEmissionHandler().getLinkId2timeInterval2linkEnterEvents().get(linkId).get(timeInterval);
+		Assert.assertEquals("wrong number of linkEnterEvents on linkA2 at time interval 10-11", 2, linkEnterEvents.size());
 		
+		// test the noise emission for linkA2 in time interval 10-11
+		// first calculate the mittelungspegel
+		double hdvShare = 0.;
+		double carsAndHdv = 2;
+		double pInPercentagePoints = hdvShare * 100.;	
+		double mittelungspegel = 37.3 + 10 * Math.log10(carsAndHdv * (1 + (0.082 * pInPercentagePoints)));
+		// then calculate the speed correction term Dv
+		double vCar = (controler.getScenario().getNetwork().getLinks().get(linkId).getFreespeed()) * 3.6;
+		double vHdv = vCar;
+		double lCar = 27.7 + (10.0 * Math.log10(1.0 + Math.pow(0.02 * vCar, 3.0)));
+		double lHdv = 23.1 + (12.5 * Math.log10(vHdv));
+		double d = lHdv - lCar; 
+		double geschwindigkeitskorrekturDv = lCar - 37.3 + 10 * Math.log10((100.0 + (Math.pow(10.0, (0.1 * d)) - 1) * pInPercentagePoints ) / (100 + 8.23 * pInPercentagePoints));
+		// and then calculate the corrected emission level
+		double emission = mittelungspegel + geschwindigkeitskorrekturDv;
+		Assert.assertEquals("wrong emission level on linkA2 in timeInterval 10-11", emission, noiseControlerListener.getNoiseEmissionHandler().getLinkId2timeInterval2noiseEmission().get(linkId).get(timeInterval), MatsimTestUtils.EPSILON);
+				
+		// +++++++++++++++++++++++++++++++++++++++++ person tracker ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		
+		// test the right allocation to the nearest receiver point
+		// homeCoord: x="500.0" y="5.0" --> nearest receiver point: 0 (400/105)
+		// workCoord: x="4500" y="5.0" --> nearest receiver point: 16 (4400/105)
 		noiseControlerListener.getPersonActivityTracker().getReceiverPointId2ListOfHomeAgents();
-		noiseControlerListener.getPersonActivityTracker().getReceiverPointId2personId2actNumber2activityStartAndActivityEnd();
-		noiseControlerListener.getPersonActivityTracker().getReceiverPointId2timeInterval2affectedAgentUnits();
-		noiseControlerListener.getPersonActivityTracker().getReceiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType();
+		Assert.assertEquals("wrong allocation of home activity location to receiver point", 1, noiseControlerListener.getPersonActivityTracker().getReceiverPointId2ListOfHomeAgents().size());
+		Assert.assertEquals("wrong allocation of home activity location to receiver point", 3, noiseControlerListener.getPersonActivityTracker().getReceiverPointId2ListOfHomeAgents().get(new IdImpl("0")).size());
 		
-		noiseControlerListener.getNoiseImmission().getNoiseEvents();
-		noiseControlerListener.getNoiseImmission().getNoiseEventsAffected();
-		noiseControlerListener.getNoiseImmission().getReceiverPointId2timeInterval2noiseImmission();
-		noiseControlerListener.getNoiseImmission().getReceiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType();
+		// test the right tracking of person, activity number, start and end time
+		noiseControlerListener.getPersonActivityTracker().getReceiverPointId2personId2actNumber2activityStartAndActivityEnd();
+		Assert.assertEquals("wrong activity performing time", 0., noiseControlerListener.getPersonActivityTracker().getReceiverPointId2personId2actNumber2activityStartAndActivityEnd().get(new IdImpl("0")).get(new IdImpl("person_car_test2")).get(1).getFirst(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong activity performing time", Time.parseTime("10:17:54") , noiseControlerListener.getPersonActivityTracker().getReceiverPointId2personId2actNumber2activityStartAndActivityEnd().get(new IdImpl("0")).get(new IdImpl("person_car_test2")).get(1).getSecond(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong activity performing time", 37506. , noiseControlerListener.getPersonActivityTracker().getReceiverPointId2personId2actNumber2activityStartAndActivityEnd().get(new IdImpl("16")).get(new IdImpl("person_car_test2")).get(2).getFirst(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong activity performing time", null , noiseControlerListener.getPersonActivityTracker().getReceiverPointId2personId2actNumber2activityStartAndActivityEnd().get(new IdImpl("16")).get(new IdImpl("person_car_test2")).get(1));
+
+		// between 11 and 12 only one agent is at receiver point 0
+		Assert.assertEquals("wrong agent units per receiver point and time interval", 1. , noiseControlerListener.getPersonActivityTracker().getReceiverPointId2timeInterval2affectedAgentUnits().get(new IdImpl("0")).get(12 * 3600.), MatsimTestUtils.EPSILON);
+		// between 9 and 10 three agents are at receiver point 0
+		Assert.assertEquals("wrong agent units per receiver point and time interval", 3. , noiseControlerListener.getPersonActivityTracker().getReceiverPointId2timeInterval2affectedAgentUnits().get(new IdImpl("0")).get(10 * 3600.), MatsimTestUtils.EPSILON);
+		// between 10 and 11 both testAgent1 and testAgent2 are partly at receiver point 0 and partly at receiver point 16, testAgent1 is over the entire time interval at receiver point 0
+		double partTimeTestAgent3 = 1.;
+		double partTimeTestAgent2 = (Time.parseTime("10:17:54") - (10. * 3600)) / 3600.;
+		double partTimeTestAgent1 = (Time.parseTime("10:10:53") - (10. * 3600)) / 3600.;
+		double affectedAgentUnits = partTimeTestAgent2 + partTimeTestAgent1 + partTimeTestAgent3;
+		Assert.assertEquals("wrong agent units per receiver point and time interval", affectedAgentUnits, noiseControlerListener.getPersonActivityTracker().getReceiverPointId2timeInterval2affectedAgentUnits().get(new IdImpl("0")).get(11 * 3600.), MatsimTestUtils.EPSILON);
+
+		Assert.assertEquals("wrong affected agent units and activity type per receiver point, time interval and person", partTimeTestAgent2, noiseControlerListener.getPersonActivityTracker().getReceiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType().get(new IdImpl("0")).get(11 * 3600.).get(new IdImpl("person_car_test2")).get(1).getFirst(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong affected agent units and activity type per receiver point, time interval and person", "home", noiseControlerListener.getPersonActivityTracker().getReceiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType().get(new IdImpl("0")).get(11 * 3600.).get(new IdImpl("person_car_test2")).get(1).getSecond());
+		Assert.assertEquals("wrong affected agent units and activity type per receiver point, time interval and person", 1., noiseControlerListener.getPersonActivityTracker().getReceiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType().get(new IdImpl("16")).get(12 * 3600.).get(new IdImpl("person_car_test2")).get(2).getFirst(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong affected agent units and activity type per receiver point, time interval and person", "work", noiseControlerListener.getPersonActivityTracker().getReceiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType().get(new IdImpl("16")).get(12 * 3600.).get(new IdImpl("person_car_test2")).get(2).getSecond());
+
+		// ++++++++++++++++++++++++++++++++++++++++++ immission +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+		
+		// testing the noise immission at receiver point 0
+		System.out.println(noiseControlerListener.getNoiseImmission().getReceiverPointId2timeInterval2noiseImmission().get(new IdImpl("0")).get(11 * 3600.));
 		noiseControlerListener.getNoiseImmission().getReceiverPointIds2timeIntervals2noiseLinks2isolatedImmission();
 
+		noiseControlerListener.getNoiseImmission().getNoiseEvents();
+		noiseControlerListener.getNoiseImmission().getNoiseEventsAffected();
+		
 	 }
 	
 	
