@@ -6,11 +6,11 @@
 						(nodeA1) ===linkA2==> (nodeA2) ===linkA3==> (nodeA3) ===linkA4==> (nodeA4)
 							A																 |
 							|																 |
-							|																 |
-						  linkA1														   linkA5
-							|																 |
-							|																 |
-							|																 V
+	(node0) 				|																 |
+       A				  linkA1														   linkA5
+       |     				|																 |
+     link0 					|																 |
+       |					|																 V
 	(node1)	===link1==> (node2)) 														  (node3) ===link2==> (node4)
 	   A					|																 A					 |		
 	   |					|																 |					 |

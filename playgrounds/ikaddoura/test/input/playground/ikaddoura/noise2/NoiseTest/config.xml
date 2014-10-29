@@ -3,11 +3,11 @@
 <config>
 
 	<module name="network" >
-		<param name="inputNetworkFile" value="test/input/playground/ikaddoura/noise2/NoiseTest/network.xml" />
+		<param name="inputNetworkFile" value="test/input/playground/ikaddoura/noise2/NoiseTest/network2.xml" />
 	</module>
 	
 	<module name="plans" >
-		 <param name="inputPlansFile" value="test/input/playground/ikaddoura/noise2/NoiseTest/population1.xml" />
+		 <param name="inputPlansFile" value="test/input/playground/ikaddoura/noise2/NoiseTest/population2.xml" />
 	</module>
 	
 	<module name="controler">
@@ -45,10 +45,10 @@
 		<param name="ModuleProbability_1" value="0.0" />
 		<param name="Module_1" value="BestScore" />
 		
-		<param name="ModuleProbability_2" value="0.9" />
+		<param name="ModuleProbability_2" value="1." />
 		<param name="Module_2" value="ChangeExpBeta" />
 		
-		<param name="ModuleProbability_3" value="0.1" />
+		<param name="ModuleProbability_3" value="0." />
 		<param name="Module_3" value="ReRoute" />
 		<param name="ModuleDisableAfterIteration_3" value="90" />
 		
