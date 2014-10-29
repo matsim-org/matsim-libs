@@ -289,7 +289,6 @@ public class NoiseSpatialInfo {
 		int counter = 0;
 		
 		for (Id pointId : receiverPointId2Coord.keySet()) {
-			System.out.println("Id: " + pointId);
 			counter++;
 			if (counter % 1000. == 0.) {
 				log.info("receiver point ... " + counter);
@@ -542,7 +541,7 @@ public class NoiseSpatialInfo {
 							)
 					);
 			angle = Math.toDegrees(Math.acos(cosAngle));
-			System.out.println(sc + " - " + angle);
+
 			if (sc > 0) {
 				// spitzer winkel
 						
@@ -568,8 +567,7 @@ public class NoiseSpatialInfo {
 			angle = 0.0000000001;
 		}
 					
-		System.out.println(receiverPointCoord + " // " + link.getId() + "(" + link.getFromNode().getCoord() + "-->" + link.getToNode().getCoord() + " // " + angle);
-		
+//		System.out.println(receiverPointCoord + " // " + link.getId() + "(" + link.getFromNode().getCoord() + "-->" + link.getToNode().getCoord() + " // " + angle);
 		double immissionCorrection = 10 * Math.log10((angle) / (180));
 		return immissionCorrection;
 	}

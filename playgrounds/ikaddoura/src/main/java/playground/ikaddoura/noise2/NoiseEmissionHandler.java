@@ -145,7 +145,6 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 	}
 	
 	public Map<Id, Map<Double, Double>> getLinkId2timeInterval2noiseEmission() {
-		
 		return linkId2timeInterval2noiseEmission;
 	}
 	
