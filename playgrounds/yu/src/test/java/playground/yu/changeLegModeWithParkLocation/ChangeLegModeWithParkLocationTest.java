@@ -283,31 +283,32 @@ public class ChangeLegModeWithParkLocationTest extends MatsimTestCase {
 			Controler {
 		public ChangeLegModeWithParkLocationControler(final Config config) {
 			super(config);
+			throw new RuntimeException("overriding loadStrategyManager is deprecated; for that reason, this class does not work any more. kai, oct'14") ;
 		}
 
-		@Override
-		protected StrategyManager loadStrategyManager() {
-			StrategyManager manager = new StrategyManager();
-			StrategyManagerConfigLoader.load(this, manager);
-			manager.setMaxPlansPerAgent(5);
-			//
-			// PlanStrategy strategy1 = new PlanStrategy(new
-			// ExpBetaPlanChanger());
-			// manager.addStrategy(strategy1, 0.1);
-
-			PlanStrategyImpl strategy2 = new PlanStrategyImpl(
-					new RandomPlanSelector());
-			strategy2.addStrategyModule(new ChangeLegModeWithParkLocation(
-					config, network));
-			strategy2.addStrategyModule(new ReRoute(getScenario()));
-			manager.addStrategyForDefaultSubpopulation(strategy2, 0.5);
-
-			// PlanStrategy strategy3 = new PlanStrategy(new
-			// RandomPlanSelector());
-			// strategy3.addStrategyModule(new ReRoute(this));
-			// manager.addStrategy(strategy3, 0.4);
-
-			return manager;
-		}
+//		@Override
+//		protected StrategyManager loadStrategyManager() {
+//			StrategyManager manager = new StrategyManager();
+//			StrategyManagerConfigLoader.load(this, manager);
+//			manager.setMaxPlansPerAgent(5);
+//			//
+//			// PlanStrategy strategy1 = new PlanStrategy(new
+//			// ExpBetaPlanChanger());
+//			// manager.addStrategy(strategy1, 0.1);
+//
+//			PlanStrategyImpl strategy2 = new PlanStrategyImpl(
+//					new RandomPlanSelector());
+//			strategy2.addStrategyModule(new ChangeLegModeWithParkLocation(
+//					config, network));
+//			strategy2.addStrategyModule(new ReRoute(getScenario()));
+//			manager.addStrategyForDefaultSubpopulation(strategy2, 0.5);
+//
+//			// PlanStrategy strategy3 = new PlanStrategy(new
+//			// RandomPlanSelector());
+//			// strategy3.addStrategyModule(new ReRoute(this));
+//			// manager.addStrategy(strategy3, 0.4);
+//
+//			return manager;
+//		}
 	}
 }

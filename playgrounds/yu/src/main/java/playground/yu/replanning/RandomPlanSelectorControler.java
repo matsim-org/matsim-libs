@@ -30,19 +30,20 @@ public class RandomPlanSelectorControler extends Controler {
 
 	public RandomPlanSelectorControler(String[] args) {
 		super(args);
+		throw new RuntimeException("overriding loadStrategyManager no longer possible; thus this class no longer working.  kai, oct'14") ;
 	}
 
-	@Override
-	protected StrategyManager loadStrategyManager() {
-		StrategyManager manager = new StrategyManager();
-		StrategyManagerConfigLoader.load(this, manager);
-
-		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
-		manager.addStrategyForDefaultSubpopulation(strategy, 0.0);
-		manager.addChangeRequestForDefaultSubpopulation(601, strategy, 1.0);
-
-		return manager;
-	}
+//	@Override
+//	protected StrategyManager loadStrategyManager() {
+//		StrategyManager manager = new StrategyManager();
+//		StrategyManagerConfigLoader.load(this, manager);
+//
+//		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
+//		manager.addStrategyForDefaultSubpopulation(strategy, 0.0);
+//		manager.addChangeRequestForDefaultSubpopulation(601, strategy, 1.0);
+//
+//		return manager;
+//	}
 
 	public static void main(final String args[]) {
 		Controler controler = new RandomPlanSelectorControler(args);

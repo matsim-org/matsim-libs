@@ -667,38 +667,39 @@ public class ChangeLegModeWithParkLocation extends AbstractMultithreadedModule {
 			Controler {
 		public ChangeLegModeWithParkLocationControler(final String[] args) {
 			super(args);
+			throw new RuntimeException("Overriding loadStrategyManager is no longer permitted; for that reason, this class does not work any longer.  kai, oct'14") ;
 		}
 
-		@Override
-		protected StrategyManager loadStrategyManager() {
-			StrategyManager manager = new StrategyManager();
-			StrategyManagerConfigLoader.load(this, manager);
-
-			manager.setMaxPlansPerAgent(4);
-
-			// ChangeExpBeta
-			PlanStrategyImpl strategy1 = new PlanStrategyImpl(new ExpBetaPlanChanger(config.planCalcScore().getBrainExpBeta()));
-			manager.addStrategyForDefaultSubpopulation(strategy1, 0.7);
-
-			// ChangeLegModeWithParkLocation
-			PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector());
-			strategy2.addStrategyModule(new ChangeLegModeWithParkLocation(
-					config, network));
-			strategy2.addStrategyModule(new ReRoute(getScenario()));
-			manager.addStrategyForDefaultSubpopulation(strategy2, 0.1);
-
-			// ReRoute
-			PlanStrategyImpl strategy3 = new PlanStrategyImpl(new RandomPlanSelector());
-			strategy3.addStrategyModule(new ReRoute(getScenario()));
-			manager.addStrategyForDefaultSubpopulation(strategy3, 0.1);
-
-			// TimeAllocationMutator
-			PlanStrategyImpl strategy4 = new PlanStrategyImpl(new RandomPlanSelector());
-			strategy4.addStrategyModule(new TimeAllocationMutator(config));
-			manager.addStrategyForDefaultSubpopulation(strategy4, 0.1);
-
-			return manager;
-		}
+//		@Override
+//		protected StrategyManager loadStrategyManager() {
+//			StrategyManager manager = new StrategyManager();
+//			StrategyManagerConfigLoader.load(this, manager);
+//
+//			manager.setMaxPlansPerAgent(4);
+//
+//			// ChangeExpBeta
+//			PlanStrategyImpl strategy1 = new PlanStrategyImpl(new ExpBetaPlanChanger(config.planCalcScore().getBrainExpBeta()));
+//			manager.addStrategyForDefaultSubpopulation(strategy1, 0.7);
+//
+//			// ChangeLegModeWithParkLocation
+//			PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector());
+//			strategy2.addStrategyModule(new ChangeLegModeWithParkLocation(
+//					config, network));
+//			strategy2.addStrategyModule(new ReRoute(getScenario()));
+//			manager.addStrategyForDefaultSubpopulation(strategy2, 0.1);
+//
+//			// ReRoute
+//			PlanStrategyImpl strategy3 = new PlanStrategyImpl(new RandomPlanSelector());
+//			strategy3.addStrategyModule(new ReRoute(getScenario()));
+//			manager.addStrategyForDefaultSubpopulation(strategy3, 0.1);
+//
+//			// TimeAllocationMutator
+//			PlanStrategyImpl strategy4 = new PlanStrategyImpl(new RandomPlanSelector());
+//			strategy4.addStrategyModule(new TimeAllocationMutator(config));
+//			manager.addStrategyForDefaultSubpopulation(strategy4, 0.1);
+//
+//			return manager;
+//		}
 	}
 
 	public static class LegChainModesListener implements StartupListener,

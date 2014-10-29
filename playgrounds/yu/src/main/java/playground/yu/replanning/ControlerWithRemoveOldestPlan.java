@@ -40,18 +40,19 @@ public class ControlerWithRemoveOldestPlan extends Controler {
 	 */
 	public ControlerWithRemoveOldestPlan(String[] args) {
 		super(args);
-	}
+		throw new RuntimeException("overriding loadStrategyManager no longer possible; thus this class is no longer working.  kai, oct'14") ;
+}
 
 	public ControlerWithRemoveOldestPlan(String configFilename) {
 		super(configFilename);
 	}
 
-	@Override
-	protected StrategyManager loadStrategyManager() {
-		StrategyManager manager = new StrategyManagerWithRemoveOldestPlan();
-		StrategyManagerConfigLoader.load(this, manager);
-		return manager;
-	}
+//	@Override
+//	protected StrategyManager loadStrategyManager() {
+//		StrategyManager manager = new StrategyManagerWithRemoveOldestPlan();
+//		StrategyManagerConfigLoader.load(this, manager);
+//		return manager;
+//	}
 
 	/**
 	 * @param args

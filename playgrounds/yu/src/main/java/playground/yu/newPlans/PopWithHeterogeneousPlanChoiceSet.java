@@ -51,6 +51,7 @@ public class PopWithHeterogeneousPlanChoiceSet extends Controler {
 	 */
 	public PopWithHeterogeneousPlanChoiceSet(String args) {
 		super(args);
+		throw new RuntimeException("overriding loadStrategyManager no longer possible; thus this class no longer working.  kai, oct'14") ;
 	}
 
 	/**
@@ -61,24 +62,24 @@ public class PopWithHeterogeneousPlanChoiceSet extends Controler {
 		this.strategyChangerIteration = strategyChangerIteration;
 	}
 
-	protected StrategyManager loadStrategyManager() {
-		StrategyManager manager = new StrategyManager();
-		StrategyManagerConfigLoader.load(this, manager);
-		manager.setPlanSelectorForRemoval(new RandomPlanSelectorWithPlanType()
-		// RandomPlanSelector()
-				);
-
-		if (this.strategyChangerIteration > 0) {
-			PlanStrategyImpl expBetaPlanChanger = new PlanStrategyImpl(
-					new ExpBetaPlanChanger(config.planCalcScore()
-							.getBrainExpBeta()));
-			manager.addStrategyForDefaultSubpopulation(expBetaPlanChanger, 0.0);
-			manager.addChangeRequestForDefaultSubpopulation(this.strategyChangerIteration,
-					expBetaPlanChanger, 1.0);
-		}
-
-		return manager;
-	}
+//	protected StrategyManager loadStrategyManager() {
+//		StrategyManager manager = new StrategyManager();
+//		StrategyManagerConfigLoader.load(this, manager);
+//		manager.setPlanSelectorForRemoval(new RandomPlanSelectorWithPlanType()
+//		// RandomPlanSelector()
+//				);
+//
+//		if (this.strategyChangerIteration > 0) {
+//			PlanStrategyImpl expBetaPlanChanger = new PlanStrategyImpl(
+//					new ExpBetaPlanChanger(config.planCalcScore()
+//							.getBrainExpBeta()));
+//			manager.addStrategyForDefaultSubpopulation(expBetaPlanChanger, 0.0);
+//			manager.addChangeRequestForDefaultSubpopulation(this.strategyChangerIteration,
+//					expBetaPlanChanger, 1.0);
+//		}
+//
+//		return manager;
+//	}
 
 	/**
 	 * @param args

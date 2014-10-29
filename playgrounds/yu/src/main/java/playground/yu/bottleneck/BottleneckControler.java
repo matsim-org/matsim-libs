@@ -38,21 +38,22 @@ public class BottleneckControler extends Controler {
 
 	public BottleneckControler(final String[] args) {
 		super(args);
+		throw new RuntimeException("overriding loadStrategyManager no longer possible; thus this class no longer working.  kai, oct'14") ;
 	}
 
-	@Override
-	protected StrategyManager loadStrategyManager() {
-		StrategyManager manager = new StrategyManager();
-		manager.setMaxPlansPerAgent(5);
-		//
-		PlanStrategyImpl strategy1 = new PlanStrategyImpl(new ExpBetaPlanSelector(this.config.planCalcScore()));
-		manager.addStrategyForDefaultSubpopulation(strategy1, 0.95);
-
-		PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector());
-		strategy2.addStrategyModule(new TimeAllocationMutatorBottleneck(this.config));
-		manager.addStrategyForDefaultSubpopulation(strategy2, 0.05);
-		return manager;
-	}
+//	@Override
+//	protected StrategyManager loadStrategyManager() {
+//		StrategyManager manager = new StrategyManager();
+//		manager.setMaxPlansPerAgent(5);
+//		//
+//		PlanStrategyImpl strategy1 = new PlanStrategyImpl(new ExpBetaPlanSelector(this.config.planCalcScore()));
+//		manager.addStrategyForDefaultSubpopulation(strategy1, 0.95);
+//
+//		PlanStrategyImpl strategy2 = new PlanStrategyImpl(new RandomPlanSelector());
+//		strategy2.addStrategyModule(new TimeAllocationMutatorBottleneck(this.config));
+//		manager.addStrategyForDefaultSubpopulation(strategy2, 0.05);
+//		return manager;
+//	}
 
 	public static class BottleneckControlerListener implements ShutdownListener, IterationStartsListener {
 		private final TimeWriter timeWriter = new TimeWriter("./test/yu/Bottleneck/outputbottleneckTime.txt");

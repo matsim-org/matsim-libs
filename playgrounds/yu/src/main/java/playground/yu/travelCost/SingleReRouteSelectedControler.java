@@ -41,18 +41,18 @@ public class SingleReRouteSelectedControler extends Controler {
 	 */
 	public SingleReRouteSelectedControler(String arg) {
 		super(arg);
-
+		throw new RuntimeException("Overriding loadStrategyManager is no longer permitted; for that reason, this class does not work any longer.  kai, oct'14") ;
 	}
 
-	@Override
-	protected StrategyManager loadStrategyManager() {
-		// return super.loadStrategyManager();
-		StrategyManager manager = new StrategyManagerWithRouteComparison(
-				network, getControlerIO().getOutputFilename(
-						"pathSizeDistribution."));
-		StrategyManagerConfigLoader.load(this, manager);
-		return manager;
-	}
+//	@Override
+//	protected StrategyManager loadStrategyManager() {
+//		// return super.loadStrategyManager();
+//		StrategyManager manager = new StrategyManagerWithRouteComparison(
+//				network, getControlerIO().getOutputFilename(
+//						"pathSizeDistribution."));
+//		StrategyManagerConfigLoader.load(this, manager);
+//		return manager;
+//	}
 
 	/*
 	 * program arguments: ../matsimTests/diverseRoutes/A1B0.xml

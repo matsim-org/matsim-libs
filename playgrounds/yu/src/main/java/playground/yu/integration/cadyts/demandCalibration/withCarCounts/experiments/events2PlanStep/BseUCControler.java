@@ -42,15 +42,16 @@ public class BseUCControler extends Controler {
 		extension = new BseUCControlerListener();
 		extension.setWriteQGISFile(writeQGISFile);
 		addControlerListener(extension);
+		throw new RuntimeException("overriding loadStrategyManager no longer possible; thus this class no longer working.  kai, oct'14") ;
 	}
 
-	@Override
-	protected StrategyManager loadStrategyManager() {
-		// StrategyManager Constructor
-		StrategyManager manager = new BseUCStrategyManager(network);
-		StrategyManagerConfigLoader.load(this, manager);
-		return manager;
-	}
+//	@Override
+//	protected StrategyManager loadStrategyManager() {
+//		// StrategyManager Constructor
+//		StrategyManager manager = new BseUCStrategyManager(network);
+//		StrategyManagerConfigLoader.load(this, manager);
+//		return manager;
+//	}
 
 	public void setWriteQGISFile(final boolean writeQGISFile) {
 		this.writeQGISFile = writeQGISFile;

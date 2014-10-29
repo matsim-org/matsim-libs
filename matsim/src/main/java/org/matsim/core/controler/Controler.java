@@ -492,6 +492,7 @@ public class Controler extends AbstractController {
 	protected StrategyManager loadStrategyManager() {
 		// yyyy cannot make this final: overridden at about 40 locations.  kai, jan'2013
 		// now about 20 locations.  kai, may'2013
+		// now about 15 locations.  kai, oct'14
 		StrategyManager manager = new StrategyManager();
 		StrategyManagerConfigLoader.load(getScenario(), getControlerIO(), getEvents(), manager, this.planStrategyFactoryRegister, this.planSelectorFactoryRegister);
 		return manager;
