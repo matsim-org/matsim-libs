@@ -20,7 +20,6 @@ package playground.agarwalamit.munich.analysis;
 
 import java.io.BufferedWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -28,89 +27,81 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.agarwalamit.analysis.ActivityType2ActDurationsAnalyzer;
 import playground.agarwalamit.analysis.ActivityType2DurationHandler;
 import playground.agarwalamit.analysis.LoadMyScenarios;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
-import playground.vsp.analysis.modules.AbstractAnalyisModule;
 
 /**
  * A class to get activity duration distribution for each activity type. 
  * If a person repeats same activity again, it will be counted as second leg.
- * Just use desired constructor with run(...) method.
  * @author amit
  */
-public class ActivityType2ActivityDurationDistribution extends AbstractAnalyisModule {
+public class ActivityType2ActivityDurationDistribution {
 
 	/**
-	 * default simulation start and end times are taken as 00:00:00 and 30:00:00
+	 * @param outputDir
+	 * Use this to get distribution for whole population
 	 */
 	public ActivityType2ActivityDurationDistribution(String outputDir) {
-		super(ActivityType2ActivityDurationDistribution.class.getSimpleName());
-		simStartTime = 0;
-		simEndTime = 30*3600;
-		ActivityType2DurationHandler.log.warn("Simulation start time is " +simStartTime+ " and simulation end time is "+simEndTime);
 		this.outputDir = outputDir;
+		this.sortPersons = false;
+		this.userGroup = "";
 	}
 
 	/**
-	 * @param simStartTime simulation start time
-	 * @param simEndTime simulation end time
+	 * @param outputDir
+	 * @param userGroup for which distribution is required
 	 */
-	public ActivityType2ActivityDurationDistribution(double simStartTime, double simEndTime, String outputDir) {
-		super(ActivityType2ActivityDurationDistribution.class.getSimpleName());
-		this.simStartTime = simStartTime;
-		this.simEndTime = simEndTime;
+	public ActivityType2ActivityDurationDistribution(String outputDir, UserGroup userGroup) {
 		this.outputDir = outputDir;
+		this.sortPersons = true;
+		this.userGroup = userGroup.toString();
 	}
-
-	private ActivityType2DurationHandler actDurHandler;
-	private double simStartTime;
-	private double simEndTime;
+	
+	private ActivityType2ActDurationsAnalyzer actDurAnalyzer;
 	private List<Integer> timeClasses;
 	private Map<Id<Person>, Map<String, List<Double>>> personId2ActDurations;
 	private SortedMap<String, SortedMap<Integer, Integer>> actType2ActDuration2LegCount;
 	private String outputDir;
-	private String eventsFile;
-	private final String userGrp = "URBAN";
+	private double simEndTime;
+	private boolean sortPersons;
+	private String userGroup;
 
 	public static void main(String[] args) {
 		String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/";
 		String [] runCases = { "baseCaseCtd","ei","ci","eci"};
-		new ActivityType2ActivityDurationDistribution(outputDir).run(runCases);
+		new ActivityType2ActivityDurationDistribution(outputDir,UserGroup.URBAN).run(runCases);
 	}
-
 
 	public void run(String [] runCases){
 		for(String runCase:runCases){
-			initializeTimeClasses();
 			init(runCase);
-			String outputConfig = outputDir+runCase+"/output_config.xml";
-			getActType2ActDurationDistributionData();
-			writeResults(outputDir+runCase+"/analysis/");
-			writeTypicalAndMinimumActivityDurations(outputConfig, runCase);
 		}
 	}
 
 	public void init(String runCase){
+		
+		actDurAnalyzer = new ActivityType2ActDurationsAnalyzer(outputDir+runCase);
+		actDurAnalyzer.preProcessData();
+		actDurAnalyzer.postProcessData();
+		personId2ActDurations = actDurAnalyzer.getPersonId2ActivityType2ActivityDurations();
+		
 		String outputConfig = outputDir+runCase+"/output_config.xml";
-		int lastIt = LoadMyScenarios.getLastIteration(outputConfig);
-		this.eventsFile = outputDir+runCase+"/ITERS/it."+lastIt+"/"+lastIt+".events.xml.gz";
-
-		personId2ActDurations = new HashMap<Id<Person>, Map<String,List<Double>>>();
-		actDurHandler = new ActivityType2DurationHandler(this.simEndTime);
+		simEndTime = LoadMyScenarios.getSimulationEndTime(outputConfig);
+		
 		timeClasses = new ArrayList<Integer>();
-
-		preProcessData();
-		postProcessData();
+		initializeTimeClasses();
+		
+		getActType2ActDurationDistributionData();
+		
+		writeResults(outputDir+runCase+"/analysis/");
+		writeTypicalAndMinimumActivityDurations(outputConfig, runCase);
 	}
 
 	/**
@@ -146,29 +137,8 @@ public class ActivityType2ActivityDurationDistribution extends AbstractAnalyisMo
 		ActivityType2DurationHandler.log.info("Data is written to file "+fileName);
 	}
 
-	@Override
-	public void preProcessData() {
-		EventsManager manager = EventsUtils.createEventsManager();
-		MatsimEventsReader reader = new MatsimEventsReader(manager);
-		manager.addHandler(actDurHandler);
-		reader.readFile(eventsFile);
-	}
-
-	@Override
-	public List<EventHandler> getEventHandler() {
-		List<EventHandler> eh =  new ArrayList<EventHandler>();
-		eh.add(actDurHandler);
-		return eh;
-	}
-
-	@Override
-	public void postProcessData() {
-		personId2ActDurations = actDurHandler.getPersonId2ActDurations();
-	}
-
-	@Override
 	public void writeResults(String outputFolder) {
-		String fileName = outputFolder+"/"+userGrp+"actTyp2ActDurDistributionDuration.txt";
+		String fileName = outputFolder+"/"+userGroup+"actTyp2ActDurDistributionDuration.txt";
 		BufferedWriter writer = IOUtils.getBufferedWriter(fileName);
 		try {
 			writer.write("timeIndex \t ");
@@ -195,7 +165,7 @@ public class ActivityType2ActivityDurationDistribution extends AbstractAnalyisMo
 		actType2ActDuration2LegCount = new TreeMap<>();
 
 		//initialize
-		for(String actTyp : actDurHandler.getActivityTypes()){
+		for(String actTyp : actDurAnalyzer.getActivityTypes()){
 			SortedMap<Integer,Integer> time2LegCount = new TreeMap<>();
 			for(int i:timeClasses){
 				time2LegCount.put(i, 0);
@@ -205,7 +175,7 @@ public class ActivityType2ActivityDurationDistribution extends AbstractAnalyisMo
 
 		PersonFilter pf = new PersonFilter();
 		for(Id<Person> id : personId2ActDurations.keySet()){
-			if(pf.isPersonFromMID(id) && userGrp.equalsIgnoreCase(UserGroup.URBAN.toString())){
+			if(sortPersons && pf.isPersonIdFromUserGroup(id, UserGroup.valueOf(userGroup))){
 				storeData(id);
 			} else {
 				storeData(id);
@@ -218,7 +188,7 @@ public class ActivityType2ActivityDurationDistribution extends AbstractAnalyisMo
 		for(String actTyp : actTyp2Dur.keySet()){
 			List<Double> durs = actTyp2Dur.get(actTyp);
 			for(double d :durs){
-				for(int i=0;i<timeClasses.size();i++){
+				for(int i=0;i<timeClasses.size()-1;i++){
 					if(d> timeClasses.get(i)&& d<=timeClasses.get(i+1)){
 						SortedMap<Integer,Integer> time2LegCount = actType2ActDuration2LegCount.get(actTyp);
 						int countSoFar = time2LegCount.get(timeClasses.get(i+1));
