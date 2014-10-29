@@ -51,15 +51,28 @@ public class NoiseTest {
 	@Test
 	public final void test1(){
 		
-		String configFile = testUtils.getPackageInputDirectory()+"NoiseTest/config.xml";
+		String configFile = testUtils.getPackageInputDirectory()+"NoiseTest/config2.xml";
 
-		Controler controler = new Controler(configFile);	
-		controler.addControlerListener(new NoiseControlerListener());
-			
+		Controler controler = new Controler(configFile);
+		NoiseControlerListener noiseControlerListener = new NoiseControlerListener();
+		controler.addControlerListener(noiseControlerListener);
+		
 		controler.setOverwriteFiles(true);
 		controler.run();
-
 		
+		noiseControlerListener.getNoiseEmissionHandler().getLinkId2timeInterval2noiseEmission();
+		
+		noiseControlerListener.getPersonActivityTracker().getReceiverPointId2ListOfHomeAgents();
+		noiseControlerListener.getPersonActivityTracker().getReceiverPointId2personId2actNumber2activityStartAndActivityEnd();
+		noiseControlerListener.getPersonActivityTracker().getReceiverPointId2timeInterval2affectedAgentUnits();
+		noiseControlerListener.getPersonActivityTracker().getReceiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType();
+		
+		noiseControlerListener.getNoiseImmission().getNoiseEvents();
+		noiseControlerListener.getNoiseImmission().getNoiseEventsAffected();
+		noiseControlerListener.getNoiseImmission().getReceiverPointId2timeInterval2noiseImmission();
+		noiseControlerListener.getNoiseImmission().getReceiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType();
+		noiseControlerListener.getNoiseImmission().getReceiverPointIds2timeIntervals2noiseLinks2isolatedImmission();
+
 	 }
 	
 	@Test
@@ -102,6 +115,10 @@ public class NoiseTest {
 		Assert.assertEquals("wrong distance between receiver point Id '8' and link Id '1'", 8.749854822140838, noiseSpatialInfo.getReceiverPointId2relevantLinkId2correctionTermDs().get(new IdImpl("8")).get(new IdImpl("link0")), MatsimTestUtils.EPSILON);		
 		// 3)
 		Assert.assertEquals("wrong immission angle correction for receiver point 14 and link1", -0.8913405699036482, noiseSpatialInfo.getReceiverPointId2relevantLinkId2correctionTermAngle().get(new IdImpl("14")).get(new IdImpl("link1")), MatsimTestUtils.EPSILON);		
+
+		double angle0 = 180.;
+		double immissionCorrection0 = 10 * Math.log10((angle0) / (180));
+		Assert.assertEquals("wrong immission angle correction for receiver point 12 and link5", immissionCorrection0, noiseSpatialInfo.getReceiverPointId2relevantLinkId2correctionTermAngle().get(new IdImpl("12")).get(new IdImpl("link5")), MatsimTestUtils.EPSILON);		
 		
 		double angle = 65.39222026185993;
 		double immissionCorrection = 10 * Math.log10((angle) / (180));
@@ -110,7 +127,14 @@ public class NoiseTest {
 		// for a visualization of the receiver point and the relevant links, see network file
 		double angle2 = 0.0000000001;
 		double immissionCorrection2 = 10 * Math.log10((angle2) / (180));
-		Assert.assertEquals("wrong immission angle correction for receiver point 9 and link5", immissionCorrection2, noiseSpatialInfo.getReceiverPointId2relevantLinkId2correctionTermAngle().get(new IdImpl("8")).get(new IdImpl("link5")), MatsimTestUtils.EPSILON);		
-	}
+		Assert.assertEquals("wrong immission angle correction for receiver point 8 and link5", immissionCorrection2, noiseSpatialInfo.getReceiverPointId2relevantLinkId2correctionTermAngle().get(new IdImpl("8")).get(new IdImpl("link5")), MatsimTestUtils.EPSILON);
+		
+		double angle3 = 84.28940686250034;
+		double immissionCorrection3 = 10 * Math.log10((angle3) / (180));
+		Assert.assertEquals("wrong immission angle correction for receiver point 8 and link1", immissionCorrection3, noiseSpatialInfo.getReceiverPointId2relevantLinkId2correctionTermAngle().get(new IdImpl("8")).get(new IdImpl("link1")), MatsimTestUtils.EPSILON);
 	
+		double angle4 = 180;
+		double immissionCorrection4 = 10 * Math.log10((angle4) / (180));
+		Assert.assertEquals("wrong immission angle correction for receiver point 8 and link0", immissionCorrection4, noiseSpatialInfo.getReceiverPointId2relevantLinkId2correctionTermAngle().get(new IdImpl("8")).get(new IdImpl("link0")), MatsimTestUtils.EPSILON);
+	}
 }

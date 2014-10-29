@@ -48,6 +48,7 @@ public class NoiseControlerListener implements AfterMobsimListener , IterationEn
 	private NoiseSpatialInfo spatialInfo;
 	private NoiseEmissionHandler noiseEmissionHandler;
 	private PersonActivityHandler personActivityTracker;
+	private NoiseImmission noiseImmission;
 	
 	@Override
 	public void notifyStartup(StartupEvent event) {
@@ -88,7 +89,7 @@ public class NoiseControlerListener implements AfterMobsimListener , IterationEn
 		this.personActivityTracker.calculateDurationOfStay();
 		// TODO: test
 		
-		NoiseImmission noiseImmission = new NoiseImmission(event.getControler().getScenario(), event.getControler().getEvents(), this.spatialInfo, this.annualCostRate, this.noiseEmissionHandler, this.personActivityTracker);
+		this.noiseImmission = new NoiseImmission(event.getControler().getScenario(), event.getControler().getEvents(), this.spatialInfo, this.annualCostRate, this.noiseEmissionHandler, this.personActivityTracker);
 		noiseImmission.setTunnelLinks(null);
 		noiseImmission.setNoiseBarrierLinks(null);
 		// calculate the noise immission for each receiver point and time interval and save for each receiver point and for each time interval the contribution (immission) of each link's noise level
@@ -149,4 +150,19 @@ public class NoiseControlerListener implements AfterMobsimListener , IterationEn
 //		noiseImmissionHandler.writeNoiseImmissionStats(event.getControler().getConfig().controler().getOutputDirectory()+"/it."+event.getIteration()+"."+filenameNoiseImmission);
 
 	}
+	
+	// for testing purposes
+	
+	public NoiseEmissionHandler getNoiseEmissionHandler() {
+		return noiseEmissionHandler;
+	}
+
+	public PersonActivityHandler getPersonActivityTracker() {
+		return personActivityTracker;
+	}
+
+	public NoiseImmission getNoiseImmission() {
+		return noiseImmission;
+	}
+	
 }

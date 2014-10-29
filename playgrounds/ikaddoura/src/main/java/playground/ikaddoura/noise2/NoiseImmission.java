@@ -526,4 +526,26 @@ public class NoiseImmission {
 			personId2homeBasedDamageSum.put(personId, homeBasedDamageSum);
 		}
 	}
+	
+	// for testing purposes
+	public Map<Id, Map<Double, Map<Id, Map<Integer, Tuple<Double, String>>>>> getReceiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType() {
+		return receiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType;
+	}
+
+	public Map<Id, Map<Double, Double>> getReceiverPointId2timeInterval2noiseImmission() {
+		return receiverPointId2timeInterval2noiseImmission;
+	}
+
+	public Map<Id, Map<Double, Map<Id, Double>>> getReceiverPointIds2timeIntervals2noiseLinks2isolatedImmission() {
+		return receiverPointIds2timeIntervals2noiseLinks2isolatedImmission;
+	}
+
+	public List<NoiseEvent> getNoiseEvents() {
+		return noiseEvents;
+	}
+
+	public List<NoiseEventAffected> getNoiseEventsAffected() {
+		return noiseEventsAffected;
+	}
+	
 }

@@ -289,6 +289,7 @@ public class NoiseSpatialInfo {
 		int counter = 0;
 		
 		for (Id pointId : receiverPointId2Coord.keySet()) {
+			System.out.println("Id: " + pointId);
 			counter++;
 			if (counter % 1000. == 0.) {
 				log.info("receiver point ... " + counter);
@@ -296,7 +297,6 @@ public class NoiseSpatialInfo {
 			
 			double pointCoordX = receiverPointId2Coord.get(pointId).getX();
 			double pointCoordY = receiverPointId2Coord.get(pointId).getY();
-			System.out.println(" >>>>>>> Receiver Point: " + pointId + ": " + pointCoordX + "/" + pointCoordY);
 
 			Map<Id,Double> relevantLinkIds2Ds = new HashMap<Id, Double>();
 			Map<Id,Double> relevantLinkIds2angleImmissionCorrection = new HashMap<Id, Double>();
@@ -508,9 +508,7 @@ public class NoiseSpatialInfo {
 	}
 	
 	private double calculateAngleImmissionCorrection(Coord receiverPointCoord, Link link) {
-		System.out.println("Link: " + link.getId().toString() + ": from " + link.getFromNode().getCoord() + " to " + link.getToNode().getCoord());
 
-		double immissionCorrection = 0.;
 		double angle = 0;
 		
 		double pointCoordX = receiverPointCoord.getX();
@@ -521,145 +519,58 @@ public class NoiseSpatialInfo {
 		double toCoordX = link.getToNode().getCoord().getX();
 		double toCoordY = link.getToNode().getCoord().getY();
 
-		double x1 = (pointCoordX - fromCoordX);
-		double x2 = (pointCoordX - toCoordX);
-		
-		if (x1 == 0) {
-			x1 = 0.00000001;
-		}
-		if (x2 == 0) {
-			x2 = 0.00000001;
-		}
-//		
-//		if (x1 == 0 && x2 == 0) {
-//			x1 = 0.00000001;
-//			x2 = 0.00000001;
-//		}
-		
-		
-
-		double sc = (fromCoordX - pointCoordX) * (toCoordX - pointCoordX) + (fromCoordY - pointCoordY) * (toCoordY - pointCoordY);
-		double cosAngle = sc / (
-				Math.sqrt(
-						Math.pow(fromCoordX - pointCoordX, 2) + Math.pow(fromCoordY - pointCoordY, 2)
-						)
-						*
-				Math.sqrt(
-						Math.pow(toCoordX - pointCoordX, 2) + Math.pow(toCoordY - pointCoordY, 2)
-						)
-				);
-		angle = Math.toDegrees(Math.acos(cosAngle));
-		
-		if (sc > 0) {
-			// spitzer winkel
-					
-			if (angle > 90) {
-				angle = 180 - angle;
-			}
+		if (pointCoordX == fromCoordX && pointCoordY == fromCoordY) {
+			// receiver point is situated on the link (fromNode)
+			// assume a maximum angle immission correction for this case
+			angle = 0;
 			
-		} else if (sc < 0) {
-			// stumpfer winkel
-			
-			if (angle < 90) {
-				angle = 180 - angle;
-			}
+		} else if (pointCoordX == toCoordX && pointCoordY == toCoordY) {
+			// receiver point is situated on the link (toNode)
+			// assume a zero angle immission correction for this case
+			angle = 180;		
 			
 		} else {
-			angle = 90;
+			// all other cases
+			double sc = (fromCoordX - pointCoordX) * (toCoordX - pointCoordX) + (fromCoordY - pointCoordY) * (toCoordY - pointCoordY);
+			double cosAngle = sc / (
+					Math.sqrt(
+							Math.pow(fromCoordX - pointCoordX, 2) + Math.pow(fromCoordY - pointCoordY, 2)
+							)
+							*
+					Math.sqrt(
+							Math.pow(toCoordX - pointCoordX, 2) + Math.pow(toCoordY - pointCoordY, 2)
+							)
+					);
+			angle = Math.toDegrees(Math.acos(cosAngle));
+			System.out.println(sc + " - " + angle);
+			if (sc > 0) {
+				// spitzer winkel
+						
+				if (angle > 90) {
+					angle = 180 - angle;
+				}
+				
+			} else if (sc < 0) {
+				// stumpfer winkel
+				
+				if (angle < 90) {
+					angle = 180 - angle;
+				}
+				
+			} else {
+				angle = 0.;
+			}
 		}
-		
+			
 		// since zero is not defined
 		if (angle == 0.) {
-			// this situation is not clear
-			log.warn("A zero angle is set to 0.0000000001 because the angle immission correction does not account for a zero angle.");
+			// zero degrees is not defined
 			angle = 0.0000000001;
 		}
+					
+		System.out.println(receiverPointCoord + " // " + link.getId() + "(" + link.getFromNode().getCoord() + "-->" + link.getToNode().getCoord() + " // " + angle);
 		
-//		double lotPointX = 0.;
-//		double lotPointY = 0.;
-//		
-//		double vectorX = toCoordX - fromCoordX;
-//		if (vectorX == 0.) {
-//			vectorX = 0.00000000001;
-//			// dividing by zero is not possible
-//		}
-//
-//		double vectorY = toCoordY - fromCoordY;
-//
-//		double vector = vectorY / vectorX;
-//		if (vector == 0.) {
-//			vector = 0.00000000001;
-//			// dividing by zero is not possible
-//		}
-//		
-//		double vector2 = (-1) * (1/vector);
-//
-//		double yAbschnitt = fromCoordY - (fromCoordX * vector);
-//		double yAbschnittOriginal = fromCoordY - (fromCoordX * vector);
-//		
-//		double yAbschnitt2 = pointCoordY - (pointCoordX * vector2);
-//		
-//		double xValue = 0.;
-//		double yValue = 0.;
-//		
-//		if(yAbschnitt < yAbschnitt2) {
-//			yAbschnitt2 = yAbschnitt2 - yAbschnitt;
-//			yAbschnitt = 0;
-//			xValue = yAbschnitt2 / (vector - vector2);
-//			yValue = yAbschnittOriginal + (xValue * vector);
-//		} else if (yAbschnitt2 < yAbschnitt) {
-//			yAbschnitt = yAbschnitt - yAbschnitt2;
-//			yAbschnitt2 = 0;
-//			xValue = yAbschnitt / (vector2 - vector);
-//			yValue = yAbschnittOriginal + (xValue * vector);
-//		}
-//		
-//		lotPointX = xValue;
-//		lotPointY = yValue;
-//		
-//		double angle1 = 0.;
-//		double angle2 = 0.;
-//		
-//		double kath1 = Math.abs(Math.sqrt(Math.pow(lotPointX - fromCoordX, 2) + Math.pow(lotPointY - fromCoordY, 2)));
-//		double hypo1 = Math.abs(Math.sqrt(Math.pow(pointCoordX - fromCoordX, 2) + Math.pow(pointCoordY - fromCoordY, 2)));
-//		double kath2 = Math.abs(Math.sqrt(Math.pow(lotPointX - toCoordX, 2) + Math.pow(lotPointY - toCoordY, 2)));
-//		double hypo2 = Math.abs(Math.sqrt(Math.pow(pointCoordX - toCoordX, 2) + Math.pow(pointCoordY - toCoordY, 2)));
-//		
-//		if (kath1 == 0) {
-//			kath1 = 0.0000001;
-//		}
-//		if (kath2 == 0) {
-//			kath2 = 0.0000001;
-//		}
-//		if (hypo1 == 0) {
-//			hypo1 = 0.0000001;
-//		}
-//		if (hypo2 == 0) {
-//			hypo2 = 0.0000001;
-//		}
-//		
-//		if (kath1 > hypo1) {
-//			kath1 = hypo1;
-//		}
-//		if (kath2 > hypo2) {
-//			kath2 = hypo2;
-//		}
-//		
-//		angle1 = Math.asin(kath1 / hypo1);
-//		angle2 = Math.asin(kath2 / hypo2);
-//		
-//		angle1 = Math.toDegrees(angle1);
-//		angle2 = Math.toDegrees(angle2);
-//		
-//		if((((fromCoordX < lotPointX) && (toCoordX > lotPointX)) || ((fromCoordX > lotPointX) && (toCoordX < lotPointX))) || (((fromCoordY < lotPointY) && (toCoordY > lotPointY)) || ((fromCoordY > lotPointY) && (toCoordY < lotPointY)))) {
-//			angle = Math.abs(angle1 + angle2);
-//		} else {
-//			angle = Math.abs(angle1 - angle2);
-//		}
-		
-		System.out.println("Resulting angle: " + angle);
-		immissionCorrection = 10 * Math.log10((angle) / (180));
-		System.out.println("Immission correction: " + immissionCorrection);
+		double immissionCorrection = 10 * Math.log10((angle) / (180));
 		return immissionCorrection;
 	}
 	
