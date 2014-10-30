@@ -145,7 +145,7 @@ public class SpatialAveragingInputData {
 	}
 
 	public String getAnalysisOutPathForBaseCase() {
-		return (runDirectory1 + "analysis/spatialAveraging/" + runNumber1 + "." + lastIteration1);
+		return (runDirectory1 + "analysis/spatialAveraging/data/" + runNumber1 + "." + lastIteration1);
 	}
 	
 
@@ -155,7 +155,7 @@ public class SpatialAveragingInputData {
 	
 
 	public String getAnalysisOutPathForCompareCase() {
-		return (runDirectory1 + "analysis/spatialAveraging/" + runNumber2 + "." + lastIteration1 + "-" + runNumber1 + "." + lastIteration1 + ".absoluteDelta");
+		return (runDirectory1 + "analysis/spatialAveraging/data/" + runNumber2 + "." + lastIteration1 + "-" + runNumber1 + "." + lastIteration1 + ".absoluteDelta");
 	}
 
 	public String getEmissionFileForCompareCase() {
