@@ -62,6 +62,7 @@ public class ActivityType2ActivityDurationDistribution {
 		this.outputDir = outputDir;
 		this.sortPersons = true;
 		this.userGroup = userGroup.toString();
+		ActivityType2DurationHandler.log.warn("Result will consider persons from "+this.userGroup+" sub population group.");
 	}
 	
 	private ActivityType2ActDurationsAnalyzer actDurAnalyzer;
