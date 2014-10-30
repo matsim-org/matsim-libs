@@ -25,22 +25,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.matsim.api.core.v01.Id;
-
 public class OSMWay implements OSMElement {
 
 	private final Map<String,String> tags = new HashMap<String,String>();
 	
-	private final Id id;
+	private final long id;
 	
-	private final List<Id> nodeRefs = new ArrayList<Id>();
+	private final List<Long> nodeRefs = new ArrayList<>();
 
-	public OSMWay(Id id) {
+	public OSMWay(long id) {
 		this.id = id;
 	}
 	
 	@Override
-	public Id getId(){
+	public long getId(){
 		return this.id;
 	}
 	
@@ -54,11 +52,11 @@ public class OSMWay implements OSMElement {
 		return this.tags;
 	}
 	
-	public void addNodeRef(Id id) {
+	public void addNodeRef(long id) {
 		this.nodeRefs.add(id);
 	}
 	
-	public List<Id> getNodeRefs() {
+	public List<Long> getNodeRefs() {
 		return this.nodeRefs;
 	}
 }

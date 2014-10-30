@@ -27,13 +27,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
@@ -250,57 +250,57 @@ public class CASimDynamicExperiment_ZhangJ2011 {
 			((NetworkImpl)net).setCapacityPeriod(1);
 			NetworkFactory fac = net.getFactory();
 
-			Node n0 = fac.createNode(new IdImpl("0"), new CoordImpl(-100,0));
-			Node n1 = fac.createNode(new IdImpl("1"), new CoordImpl(0,0));
-			Node n2 = fac.createNode(new IdImpl("2"), new CoordImpl(4,0));
-			Node n2a = fac.createNode(new IdImpl("2a"), new CoordImpl(4+3,0));
-			Node n2b = fac.createNode(new IdImpl("2b"), new CoordImpl(4+3+2,0));
-			Node n2ex = fac.createNode(new IdImpl("2ex"), new CoordImpl(4,100));
+			Node n0 = fac.createNode(Id.create("0", Node.class), new CoordImpl(-100,0));
+			Node n1 = fac.createNode(Id.create("1", Node.class), new CoordImpl(0,0));
+			Node n2 = fac.createNode(Id.create("2", Node.class), new CoordImpl(4,0));
+			Node n2a = fac.createNode(Id.create("2a", Node.class), new CoordImpl(4+3,0));
+			Node n2b = fac.createNode(Id.create("2b", Node.class), new CoordImpl(4+3+2,0));
+			Node n2ex = fac.createNode(Id.create("2ex", Node.class), new CoordImpl(4,100));
 
-			//		Node n2a = fac.createNode(new IdImpl("2a"), new CoordImpl(4+3,0));
-			//		Node n2b = fac.createNode(new IdImpl("2b"), new CoordImpl(4+3+2,0));
+			//		Node n2a = fac.createNode(Id.create("2a"), new CoordImpl(4+3,0));
+			//		Node n2b = fac.createNode(Id.create("2b"), new CoordImpl(4+3+2,0));
 
-			Node n3 = fac.createNode(new IdImpl("3"), new CoordImpl(12,0));
+			Node n3 = fac.createNode(Id.create("3", Node.class), new CoordImpl(12,0));
 			
 			
 			
-			Node n3ex1 = fac.createNode(new IdImpl("3ex1"), new CoordImpl(12,-1));
-			Node n3ex2 = fac.createNode(new IdImpl("3ex2"), new CoordImpl(12,-2));
-			Node n3ex3 = fac.createNode(new IdImpl("3ex3"), new CoordImpl(12,-3));
-			Node n3ex4 = fac.createNode(new IdImpl("3ex4"), new CoordImpl(12,-100));
+			Node n3ex1 = fac.createNode(Id.create("3ex1", Node.class), new CoordImpl(12,-1));
+			Node n3ex2 = fac.createNode(Id.create("3ex2", Node.class), new CoordImpl(12,-2));
+			Node n3ex3 = fac.createNode(Id.create("3ex3", Node.class), new CoordImpl(12,-3));
+			Node n3ex4 = fac.createNode(Id.create("3ex4", Node.class), new CoordImpl(12,-100));
 
-			Node n4 = fac.createNode(new IdImpl("4"), new CoordImpl(16,0));
-			Node n5 = fac.createNode(new IdImpl("5"), new CoordImpl(116,0));
+			Node n4 = fac.createNode(Id.create("4", Node.class), new CoordImpl(16,0));
+			Node n5 = fac.createNode(Id.create("5", Node.class), new CoordImpl(116,0));
 
 			net.addNode(n2b);net.addNode(n2a);net.addNode(n3ex1);net.addNode(n3ex2);net.addNode(n3ex3);net.addNode(n3ex4);net.addNode(n2ex);net.addNode(n5);net.addNode(n4);net.addNode(n3);net.addNode(n2);net.addNode(n1);net.addNode(n0);
 			//		net.addNode(n2a); net.addNode(n2b);
 
-			Link l0 = fac.createLink(new IdImpl("0"), n0, n1);
-			Link l0rev = fac.createLink(new IdImpl("0rev"), n1, n0);
-			Link l1 = fac.createLink(new IdImpl("1"), n1, n2);
-			Link l1rev = fac.createLink(new IdImpl("1rev"), n2, n1);
-			Link l2 = fac.createLink(new IdImpl("2"), n2, n2a);
-			Link l2a = fac.createLink(new IdImpl("2a"), n2a, n2b);
-			Link l2b = fac.createLink(new IdImpl("2b"), n2b, n3);
-			Link l2rev = fac.createLink(new IdImpl("2rev"), n3, n2b);
-			Link l2reva = fac.createLink(new IdImpl("2reva"), n2b, n2a);
-			Link l2revb = fac.createLink(new IdImpl("2revb"), n2a, n2);
+			Link l0 = fac.createLink(Id.create("0", Link.class), n0, n1);
+			Link l0rev = fac.createLink(Id.create("0rev", Link.class), n1, n0);
+			Link l1 = fac.createLink(Id.create("1", Link.class), n1, n2);
+			Link l1rev = fac.createLink(Id.create("1rev", Link.class), n2, n1);
+			Link l2 = fac.createLink(Id.create("2", Link.class), n2, n2a);
+			Link l2a = fac.createLink(Id.create("2a", Link.class), n2a, n2b);
+			Link l2b = fac.createLink(Id.create("2b", Link.class), n2b, n3);
+			Link l2rev = fac.createLink(Id.create("2rev", Link.class), n3, n2b);
+			Link l2reva = fac.createLink(Id.create("2reva", Link.class), n2b, n2a);
+			Link l2revb = fac.createLink(Id.create("2revb", Link.class), n2a, n2);
 
-			//		Link l2a = fac.createLink(new IdImpl("2a"), n2a, n2b);
-			//		Link l2arev = fac.createLink(new IdImpl("2arev"), n2b, n2a);
+			//		Link l2a = fac.createLink(Id.create("2a"), n2a, n2b);
+			//		Link l2arev = fac.createLink(Id.create("2arev"), n2b, n2a);
 			//
-			//		Link l2b = fac.createLink(new IdImpl("2b"), n2b, n3);
-			//		Link l2brev = fac.createLink(new IdImpl("2brev"), n3, n2b);
+			//		Link l2b = fac.createLink(Id.create("2b"), n2b, n3);
+			//		Link l2brev = fac.createLink(Id.create("2brev"), n3, n2b);
 
-			Link l2ex = fac.createLink(new IdImpl("2ex"), n2, n2ex);
-			Link l3 = fac.createLink(new IdImpl("3"), n3, n4);
-			Link l3ex1 = fac.createLink(new IdImpl("3ex1"), n3, n3ex1);
-			Link l3ex2 = fac.createLink(new IdImpl("3ex2"), n3ex1, n3ex2);
-			Link l3ex3 = fac.createLink(new IdImpl("3ex3"), n3ex2, n3ex3);
-			Link l3ex4 = fac.createLink(new IdImpl("3ex4"), n3ex3, n3ex4);
-			Link l3rev = fac.createLink(new IdImpl("3rev"), n4, n3);
-			Link l4 = fac.createLink(new IdImpl("4"), n4, n5);
-			Link l4rev = fac.createLink(new IdImpl("4rev"), n5, n4);
+			Link l2ex = fac.createLink(Id.create("2ex", Link.class), n2, n2ex);
+			Link l3 = fac.createLink(Id.create("3", Link.class), n3, n4);
+			Link l3ex1 = fac.createLink(Id.create("3ex1", Link.class), n3, n3ex1);
+			Link l3ex2 = fac.createLink(Id.create("3ex2", Link.class), n3ex1, n3ex2);
+			Link l3ex3 = fac.createLink(Id.create("3ex3", Link.class), n3ex2, n3ex3);
+			Link l3ex4 = fac.createLink(Id.create("3ex4", Link.class), n3ex3, n3ex4);
+			Link l3rev = fac.createLink(Id.create("3rev", Link.class), n4, n3);
+			Link l4 = fac.createLink(Id.create("4", Link.class), n4, n5);
+			Link l4rev = fac.createLink(Id.create("4rev", Link.class), n5, n4);
 
 
 
@@ -461,7 +461,7 @@ public class CASimDynamicExperiment_ZhangJ2011 {
 					continue;
 				}
 				//				agents++;
-				CAAgent a = new CASimpleDynamicAgent(linksLR, 1, new IdImpl(agents++), caLink);
+				CAAgent a = new CASimpleDynamicAgent(linksLR, 1, Id.create(agents++, CASimpleDynamicAgent.class), caLink);
 				a.materialize(i, 1);
 				particles[i] = a;
 				CASimAgentConstructEvent ee = new CASimAgentConstructEvent(0, a);
@@ -477,7 +477,7 @@ public class CASimDynamicExperiment_ZhangJ2011 {
 		}
 
 		//		em.addHandler(monitor);
-		//		monitor.setCALinkDynamic((CALinkDynamic)caNet.getCALink(new IdImpl("2")));
+		//		monitor.setCALinkDynamic((CALinkDynamic)caNet.getCALink(Id.create("2")));
 		caNet.run();
 	}
 

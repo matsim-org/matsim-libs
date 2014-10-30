@@ -39,7 +39,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -184,14 +183,14 @@ double f2 = flowCap;
 
 
 			NetworkChangeEvent e = fac.createNetworkChangeEvent(time);
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l0")));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("l0", Link.class)));
 			ChangeValue cv = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, f1);
 			e.setFlowCapacityChange(cv);
 			events.add(e);
 			//			flowCap += incr;
 
 			NetworkChangeEvent ee = fac.createNetworkChangeEvent(time);
-			ee.addLink(sc.getNetwork().getLinks().get(new IdImpl("l3_rev")));
+			ee.addLink(sc.getNetwork().getLinks().get(Id.create("l3_rev", Link.class)));
 			ChangeValue cve = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, f2);
 			ee.setFlowCapacityChange(cve);
 			events.add(ee);
@@ -215,16 +214,16 @@ double f2 = flowCap;
 		PopulationFactory fac = pop.getFactory();
 		double t = 0;
 		for (int i = 0; i < nrAgents; i++) {
-			Person pers = fac.createPerson(new IdImpl("b"+i));
+			Person pers = fac.createPerson(Id.create("b"+i, Person.class));
 			Plan plan = fac.createPlan();
 			pers.addPlan(plan);
 			Activity act0;
-			act0 = fac.createActivityFromLinkId("origin", new IdImpl("l0"));
+			act0 = fac.createActivityFromLinkId("origin", Id.create("l0", Link.class));
 			act0.setEndTime(t);
 			plan.addActivity(act0);
 			Leg leg = fac.createLeg("car");
 			plan.addLeg(leg);
-			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("l3"));
+			Activity act1 = fac.createActivityFromLinkId("destination", Id.create("l3", Link.class));
 			plan.addActivity(act1);
 			pop.addPerson(pers);
 		}
@@ -232,7 +231,7 @@ double f2 = flowCap;
 
 	private static void create2DWorld(Sim2DScenario sc2) {
 		Sim2DEnvironment env = new Sim2DEnvironment();
-		env.setId(new IdImpl("env0"));
+		env.setId(Id.create("env0", Sim2DEnvironment.class));
 		env.setEnvelope(new Envelope(0,30,0,-10-DPETH));
 		try {
 			env.setCRS(CRS.decode("EPSG:3395"));
@@ -267,8 +266,8 @@ double f2 = flowCap;
 			Coordinate[] coords = {c0,c1,c2,c3,c4};
 			LinearRing lr = geofac.createLinearRing(coords );
 			Polygon p = geofac.createPolygon(lr , null);
-			Id[] nb = new Id[]{new IdImpl("s1")};
-			s0 = env.createAndAddSection(new IdImpl("s0"), p, open, nb , 0);//FIXME make neighbors
+			Id<Section>[] nb = new Id[]{Id.create("s1", Section.class)};
+			s0 = env.createAndAddSection(Id.create("s0", Section.class), p, open, nb , 0);//FIXME make neighbors
 		}
 		{
 			double x0 = 6;
@@ -291,9 +290,9 @@ double f2 = flowCap;
 			Coordinate[] coords = {c0,c1,c2,c3,c31,c4,c41};
 			LinearRing lr = geofac.createLinearRing(coords );
 			Polygon p = geofac.createPolygon(lr , null);
-			Id[] nb = new Id[]{new IdImpl("s0"),new IdImpl("s2"),new IdImpl("s5")};
-//			Id[] nb = new Id[]{new IdImpl("s0"),new IdImpl("s2")};
-			s1 = env.createAndAddSection(new IdImpl("s1"), p, open, nb , 0);//FIXME make neighbors
+			Id<Section>[] nb = new Id[]{Id.create("s0", Section.class),Id.create("s2", Section.class),Id.create("s5", Section.class)};
+//			Id[] nb = new Id[]{Id.create("s0"),Id.create("s2", Section.class)};
+			s1 = env.createAndAddSection(Id.create("s1", Section.class), p, open, nb , 0);//FIXME make neighbors
 		}
 		{
 
@@ -320,8 +319,8 @@ double f2 = flowCap;
 			Coordinate[] coords = {c0,c1,c2,c3,c4,c5,c6};
 			LinearRing lr = geofac.createLinearRing(coords );
 			Polygon p = geofac.createPolygon(lr , null);
-			Id[] nb = new Id[]{new IdImpl("s1"),new IdImpl("s3")};
-			s2 = env.createAndAddSection(new IdImpl("s2"), p, open, nb , 0);//FIXME make neighbors
+			Id<Section>[] nb = new Id[]{Id.create("s1", Section.class),Id.create("s3", Section.class)};
+			s2 = env.createAndAddSection(Id.create("s2", Section.class), p, open, nb , 0);//FIXME make neighbors
 		}
 		{
 
@@ -346,8 +345,8 @@ double f2 = flowCap;
 			Coordinate[] coords = {c0,c1,c2,c3,c4,c5,c6};
 			LinearRing lr = geofac.createLinearRing(coords );
 			Polygon p = geofac.createPolygon(lr , null);
-			Id[] nb = new Id[]{new IdImpl("s2"),new IdImpl("s4"),new IdImpl("s7")};
-			s3 = env.createAndAddSection(new IdImpl("s3"), p, open, nb , 0);//FIXME make neighbors
+			Id[] nb = new Id[]{Id.create("s2", Section.class),Id.create("s4", Section.class),Id.create("s7", Section.class)};
+			s3 = env.createAndAddSection(Id.create("s3", Section.class), p, open, nb , 0);//FIXME make neighbors
 		}
 		{
 			double x0 = 24;
@@ -366,8 +365,8 @@ double f2 = flowCap;
 			Coordinate[] coords = {c0,c1,c2,c3,c4};
 			LinearRing lr = geofac.createLinearRing(coords );
 			Polygon p = geofac.createPolygon(lr , null);
-			Id[] nb = new Id[]{new IdImpl("s3")};
-			s4 = env.createAndAddSection(new IdImpl("s4"), p, open, nb , 0);//FIXME make neighbors
+			Id[] nb = new Id[]{Id.create("s3", Section.class)};
+			s4 = env.createAndAddSection(Id.create("s4", Section.class), p, open, nb , 0);//FIXME make neighbors
 		}
 		{
 			double x0 = 6;
@@ -392,8 +391,8 @@ double f2 = flowCap;
 			Coordinate[] coords = {c0,c01,c02,c1,c2,c3,c4,c5};
 			LinearRing lr = geofac.createLinearRing(coords );
 			Polygon p = geofac.createPolygon(lr , null);
-			Id[] nb = new Id[]{new IdImpl("s1"),new IdImpl("s6")};
-			s5 = env.createAndAddSection(new IdImpl("s5"), p, open, nb , 0);//FIXME make neighbors
+			Id[] nb = new Id[]{Id.create("s1", Section.class),Id.create("s6", Section.class)};
+			s5 = env.createAndAddSection(Id.create("s5", Section.class), p, open, nb , 0);//FIXME make neighbors
 		}
 		{
 			double x0 = 10;
@@ -412,9 +411,9 @@ double f2 = flowCap;
 			Coordinate[] coords = {c0,c1,c2,c3,c4};
 			LinearRing lr = geofac.createLinearRing(coords );
 			Polygon p = geofac.createPolygon(lr , null);
-			Id[] nb = new Id[]{new IdImpl("s5"),new IdImpl("s7")};
-//			Id[] nb = new Id[]{new IdImpl("s7")};
-			s6 = env.createAndAddSection(new IdImpl("s6"), p, open, nb , 0);//FIXME make neighbors
+			Id[] nb = new Id[]{Id.create("s5", Section.class),Id.create("s7", Section.class)};
+//			Id[] nb = new Id[]{Id.create("s7", Section.class)};
+			s6 = env.createAndAddSection(Id.create("s6", Section.class), p, open, nb , 0);//FIXME make neighbors
 		}
 		{
 			double x0 = 20;
@@ -435,20 +434,20 @@ double f2 = flowCap;
 			Coordinate[] coords = {c0,c1,c2,c3,c4,c5};
 			LinearRing lr = geofac.createLinearRing(coords );
 			Polygon p = geofac.createPolygon(lr , null);
-			Id[] nb = new Id[]{new IdImpl("s6"),new IdImpl("s3")};
-			s7 = env.createAndAddSection(new IdImpl("s7"), p, open, nb , 0);//FIXME make neighbors
+			Id[] nb = new Id[]{Id.create("s6", Section.class),Id.create("s3", Section.class)};
+			s7 = env.createAndAddSection(Id.create("s7", Section.class), p, open, nb , 0);//FIXME make neighbors
 		}
 
-		NodeImpl n2 = fac.createNode(new IdImpl("n2"), new CoordImpl(0,-2));
-		NodeImpl n6 = fac.createNode(new IdImpl("n6"), new CoordImpl(6,-2));
-		NodeImpl n7 = fac.createNode(new IdImpl("n7"), new CoordImpl(10,-2));
-		NodeImpl n8 = fac.createNode(new IdImpl("n8"), new CoordImpl(20,-2));
-		NodeImpl n9 = fac.createNode(new IdImpl("n9"), new CoordImpl(24,-2));
-		NodeImpl n10 = fac.createNode(new IdImpl("n10"), new CoordImpl(8,-4));
-		NodeImpl n11 = fac.createNode(new IdImpl("n11"), new CoordImpl(10,-8));
-		NodeImpl n12 = fac.createNode(new IdImpl("n12"), new CoordImpl(20,-8));
-		NodeImpl n13 = fac.createNode(new IdImpl("n13"), new CoordImpl(22,-4));
-		NodeImpl n3 = fac.createNode(new IdImpl("n3"), new CoordImpl(30,-2));
+		NodeImpl n2 = fac.createNode(Id.create("n2", Node.class), new CoordImpl(0,-2));
+		NodeImpl n6 = fac.createNode(Id.create("n6", Node.class), new CoordImpl(6,-2));
+		NodeImpl n7 = fac.createNode(Id.create("n7", Node.class), new CoordImpl(10,-2));
+		NodeImpl n8 = fac.createNode(Id.create("n8", Node.class), new CoordImpl(20,-2));
+		NodeImpl n9 = fac.createNode(Id.create("n9", Node.class), new CoordImpl(24,-2));
+		NodeImpl n10 = fac.createNode(Id.create("n10", Node.class), new CoordImpl(8,-4));
+		NodeImpl n11 = fac.createNode(Id.create("n11", Node.class), new CoordImpl(10,-8));
+		NodeImpl n12 = fac.createNode(Id.create("n12", Node.class), new CoordImpl(20,-8));
+		NodeImpl n13 = fac.createNode(Id.create("n13", Node.class), new CoordImpl(22,-4));
+		NodeImpl n3 = fac.createNode(Id.create("n3", Node.class), new CoordImpl(30,-2));
 
 		net.addNode(n2);
 		net.addNode(n6);
@@ -461,7 +460,7 @@ double f2 = flowCap;
 		net.addNode(n13);
 		net.addNode(n3);
 		{
-			Link l = fac.createLink(new IdImpl("l4"), n2, n6);
+			Link l = fac.createLink(Id.create("l4", Link.class), n2, n6);
 			double flow = WIDTH *MAX_FLOW;
 			l.setFreespeed(1.34);
 			l.setLength(6);
@@ -473,7 +472,7 @@ double f2 = flowCap;
 			s0.addRelatedLinkId(l.getId());
 		}
 		{
-			Link l = fac.createLink(new IdImpl("l5"), n6, n7);
+			Link l = fac.createLink(Id.create("l5", Link.class), n6, n7);
 			double flow = WIDTH *MAX_FLOW;
 			l.setFreespeed(1.34);
 			l.setLength(4);
@@ -485,7 +484,7 @@ double f2 = flowCap;
 			s1.addRelatedLinkId(l.getId());
 		}
 		{
-			Link l = fac.createLink(new IdImpl("l6"), n7, n8);
+			Link l = fac.createLink(Id.create("l6", Link.class), n7, n8);
 			double flow = WIDTH *MAX_FLOW;
 			l.setFreespeed(1.34);
 			l.setLength(10);
@@ -497,7 +496,7 @@ double f2 = flowCap;
 			s2.addRelatedLinkId(l.getId());
 		}
 		{
-			Link l = fac.createLink(new IdImpl("l7"), n8, n9);
+			Link l = fac.createLink(Id.create("l7", Link.class), n8, n9);
 			double flow = WIDTH *MAX_FLOW;
 			l.setFreespeed(1.34);
 			l.setLength(4);
@@ -509,7 +508,7 @@ double f2 = flowCap;
 			s3.addRelatedLinkId(l.getId());
 		}
 		{
-			Link l = fac.createLink(new IdImpl("l8"), n9, n3);
+			Link l = fac.createLink(Id.create("l8", Link.class), n9, n3);
 			double flow = WIDTH *MAX_FLOW;
 			l.setFreespeed(1.34);
 			l.setLength(6);
@@ -521,7 +520,7 @@ double f2 = flowCap;
 			s4.addRelatedLinkId(l.getId());
 		}
 		{
-			Link l = fac.createLink(new IdImpl("l9"), n6, n10);
+			Link l = fac.createLink(Id.create("l9", Link.class), n6, n10);
 			double flow = WIDTH *MAX_FLOW;
 			l.setFreespeed(1.34);
 			double dist = ((CoordImpl)n6.getCoord()).calcDistance(n10.getCoord());
@@ -534,7 +533,7 @@ double f2 = flowCap;
 			s1.addRelatedLinkId(l.getId());
 		}
 		{
-			Link l = fac.createLink(new IdImpl("l10"), n10, n11);
+			Link l = fac.createLink(Id.create("l10", Link.class), n10, n11);
 			double flow = WIDTH *MAX_FLOW;
 			l.setFreespeed(1.34);
 			double dist = ((CoordImpl)n11.getCoord()).calcDistance(n10.getCoord());
@@ -547,7 +546,7 @@ double f2 = flowCap;
 			s5.addRelatedLinkId(l.getId());
 		}
 		{
-			Link l = fac.createLink(new IdImpl("l12"), n11, n12);
+			Link l = fac.createLink(Id.create("l12", Link.class), n11, n12);
 			double flow = WIDTH *MAX_FLOW;
 			l.setFreespeed(1.34);
 			l.setLength(10);
@@ -559,7 +558,7 @@ double f2 = flowCap;
 			s6.addRelatedLinkId(l.getId());
 		}
 		{
-			Link l = fac.createLink(new IdImpl("l13"), n12, n13);
+			Link l = fac.createLink(Id.create("l13", Link.class), n12, n13);
 			double flow = WIDTH *MAX_FLOW;
 			l.setFreespeed(1.34);
 			double dist = ((CoordImpl)n12.getCoord()).calcDistance(n13.getCoord());
@@ -572,7 +571,7 @@ double f2 = flowCap;
 			s7.addRelatedLinkId(l.getId());
 		}
 		{
-			Link l = fac.createLink(new IdImpl("l14"), n13, n9);
+			Link l = fac.createLink(Id.create("l14", Link.class), n13, n9);
 			double flow = WIDTH *MAX_FLOW;
 			l.setFreespeed(1.34);
 			double dist = ((CoordImpl)n9.getCoord()).calcDistance(n13.getCoord());
@@ -589,12 +588,12 @@ double f2 = flowCap;
 	private static void createNetwork(Scenario sc) {
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
-		Node n0 = fac.createNode(new IdImpl("n0"), new CoordImpl(-20,-2));
-		Node n1 = fac.createNode(new IdImpl("n1"), new CoordImpl(-10,-2));
-		Node n2 = fac.createNode(new IdImpl("n2"), new CoordImpl(0,-2));
-		Node n3 = fac.createNode(new IdImpl("n3"), new CoordImpl(30,-2));
-		Node n4 = fac.createNode(new IdImpl("n4"), new CoordImpl(40,-2));
-		Node n5 = fac.createNode(new IdImpl("n5"), new CoordImpl(50,-2));
+		Node n0 = fac.createNode(Id.create("n0", Node.class), new CoordImpl(-20,-2));
+		Node n1 = fac.createNode(Id.create("n1", Node.class), new CoordImpl(-10,-2));
+		Node n2 = fac.createNode(Id.create("n2", Node.class), new CoordImpl(0,-2));
+		Node n3 = fac.createNode(Id.create("n3", Node.class), new CoordImpl(30,-2));
+		Node n4 = fac.createNode(Id.create("n4", Node.class), new CoordImpl(40,-2));
+		Node n5 = fac.createNode(Id.create("n5", Node.class), new CoordImpl(50,-2));
 		net.addNode(n0);
 		net.addNode(n1);
 		net.addNode(n2);
@@ -602,15 +601,15 @@ double f2 = flowCap;
 		net.addNode(n4);
 		net.addNode(n5);
 		double flow = MAX_FLOW * WIDTH;
-		Link l0 = fac.createLink(new IdImpl("l0"), n0, n1);
-		Link l1 = fac.createLink(new IdImpl("l1"), n1, n2);
-		Link l2 = fac.createLink(new IdImpl("l2"), n3, n4);
-		Link l3 = fac.createLink(new IdImpl("l3"), n4, n5);
+		Link l0 = fac.createLink(Id.create("l0", Link.class), n0, n1);
+		Link l1 = fac.createLink(Id.create("l1", Link.class), n1, n2);
+		Link l2 = fac.createLink(Id.create("l2", Link.class), n3, n4);
+		Link l3 = fac.createLink(Id.create("l3", Link.class), n4, n5);
 
-		Link l0Rev = fac.createLink(new IdImpl("l0_rev"), n1, n0);
-		Link l1Rev = fac.createLink(new IdImpl("l1_rev"), n2, n1);
-		Link l2Rev = fac.createLink(new IdImpl("l2_rev"), n4, n3);
-		Link l3Rev = fac.createLink(new IdImpl("l3_rev"), n5, n4);
+		Link l0Rev = fac.createLink(Id.create("l0_rev", Link.class), n1, n0);
+		Link l1Rev = fac.createLink(Id.create("l1_rev", Link.class), n2, n1);
+		Link l2Rev = fac.createLink(Id.create("l2_rev", Link.class), n4, n3);
+		Link l3Rev = fac.createLink(Id.create("l3_rev", Link.class), n5, n4);
 
 		Set<String> modes = new HashSet<String>();
 		modes.add("walk");modes.add("car");

@@ -20,7 +20,9 @@
 
 package playground.gregor.scenariogen.burgdorf;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -28,7 +30,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
@@ -45,18 +46,18 @@ public class SimplePopulationGenerator_ {
 		PopulationFactory fac = pop.getFactory();
 		double t = 5*3600+30*60;
 		for (int i = 0; i < nrAgents/2; i++) {
-			Person pers = fac.createPerson(new IdImpl("b"+i));
+			Person pers = fac.createPerson(Id.create("b"+i, Person.class));
 			Plan plan = fac.createPlan();
 			pers.addPlan(plan);
 			Activity act0;
 			int mod = i % 11;
 			String rev = MatsimRandom.getRandom().nextBoolean() ? "rev_" : "";
-			act0 = fac.createActivityFromLinkId("origin", new IdImpl("sim2d_"+ mod + "_" + rev + "-11014"));
+			act0 = fac.createActivityFromLinkId("origin", Id.create("sim2d_"+ mod + "_" + rev + "-11014", Link.class));
 			act0.setEndTime(t);
 			plan.addActivity(act0);
 			Leg leg = fac.createLeg("car");
 			plan.addLeg(leg);
-			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("sim2d_0_rev_-11026"));
+			Activity act1 = fac.createActivityFromLinkId("destination", Id.create("sim2d_0_rev_-11026", Link.class));
 			plan.addActivity(act1);
 			pop.addPerson(pers);
 //			t += .5;
@@ -67,7 +68,7 @@ public class SimplePopulationGenerator_ {
 		}
 		t = 5*3600+32*60+30;
 		for (int i = nrAgents/2; i < nrAgents; i++) {
-			Person pers = fac.createPerson(new IdImpl("b"+i));
+			Person pers = fac.createPerson(Id.create("b"+i, Person.class));
 			Plan plan = fac.createPlan();
 			pers.addPlan(plan);
 			Activity act0;
@@ -75,16 +76,16 @@ public class SimplePopulationGenerator_ {
 			int mod = i % 11;
 			String rev = MatsimRandom.getRandom().nextBoolean() ? "rev_" : "";
 //			if (mod <= 5) {
-				act0 = fac.createActivityFromLinkId("origin", new IdImpl("sim2d_"+ mod + "_" + rev + "-11012"));
+				act0 = fac.createActivityFromLinkId("origin", Id.create("sim2d_"+ mod + "_" + rev + "-11012", Link.class));
 //			} else {
 //				mod -= 6;
-//				act0 = fac.createActivityFromLinkId("origin", new IdImpl("sim2d_"+ mod + "_" + rev + "-51481"));
+//				act0 = fac.createActivityFromLinkId("origin", Id.create("sim2d_"+ mod + "_" + rev + "-51481"));
 //			}
 			act0.setEndTime(t);
 			plan.addActivity(act0);
 			Leg leg = fac.createLeg("car");
 			plan.addLeg(leg);
-			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("sim2d_0_rev_-11026"));
+			Activity act1 = fac.createActivityFromLinkId("destination", Id.create("sim2d_0_rev_-11026", Link.class));
 			plan.addActivity(act1);
 			pop.addPerson(pers);
 //			t += .5;

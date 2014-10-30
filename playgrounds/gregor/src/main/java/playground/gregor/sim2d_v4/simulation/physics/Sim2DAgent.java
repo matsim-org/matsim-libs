@@ -24,6 +24,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
@@ -79,13 +81,13 @@ public class Sim2DAgent implements VoronoiCenter, TwoDObject {
 
 	private VoronoiCell voronoiCell;
 
-	private final Id id;
+	private final Id<Person> id;
 
 	private PhysicalSim2DSection currentPSec;
 	
 	
 	//Dummy
-	public Sim2DAgent(Id id) {
+	public Sim2DAgent(Id<Person> id) {
 		this.id = id;
 		this.r = 0.2;
 		this.veh = null;
@@ -154,7 +156,7 @@ public class Sim2DAgent implements VoronoiCenter, TwoDObject {
 
 	public boolean move(double dx, double dy, double time) {
 		if (this.ls.isSwitchLink(this.pos, dx, dy, this.getCurrentLinkId())) {
-			Id nextLinkId = this.chooseNextLinkId();
+			Id<Link> nextLinkId = this.chooseNextLinkId();
 			Sim2DQAdapterLink loResLink = this.pEnv.getLowResLink(nextLinkId);
 			if (loResLink != null) { //HACK? we are in the agent's mental model but perform a physical sim2D --> qSim transition 
 				// this should be handled in the link's corresponding PhysicalSim2DSection [gl April '13]
@@ -202,7 +204,7 @@ public class Sim2DAgent implements VoronoiCenter, TwoDObject {
 		return this.v;
 	}
 
-	public Id getCurrentLinkId() {
+	public Id<Link> getCurrentLinkId() {
 		return this.driver.getCurrentLinkId();
 	}
 
@@ -210,16 +212,16 @@ public class Sim2DAgent implements VoronoiCenter, TwoDObject {
 		return this.pos;
 	}
 
-	public Id chooseNextLinkId() {
-		Id id = this.driver.chooseNextLinkId();
+	public Id<Link> chooseNextLinkId() {
+		Id<Link> id = this.driver.chooseNextLinkId();
 		return id;
 	}
 
-	public Id getId() {
+	public Id<Person> getId() {
 		return this.id;
 	}
 
-	public void notifyMoveOverNode(Id nextLinkId) {
+	public void notifyMoveOverNode(Id<Link> nextLinkId) {
 		this.driver.notifyMoveOverNode(nextLinkId);
 //		this.v0 = this.sc.getNetwork().getLinks().get(nextLinkId).getFreespeed()+(MatsimRandom.getRandom().nextDouble()*.1)-.05;
 		this.setDesiredSpeed(this.sc.getNetwork().getLinks().get(nextLinkId).getFreespeed());

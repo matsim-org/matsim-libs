@@ -37,7 +37,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -166,17 +165,17 @@ public class L {
 		PopulationFactory fac = pop.getFactory();
 		double t = 0;
 		for (int i = 0; i < nrAgents; i++) {
-			Person pers = fac.createPerson(new IdImpl("b"+i));
+			Person pers = fac.createPerson(Id.create("b"+i, Person.class));
 			Plan plan = fac.createPlan();
 			pers.addPlan(plan);
 			Activity act0;
-			act0 = fac.createActivityFromLinkId("origin", new IdImpl("k0"));
+			act0 = fac.createActivityFromLinkId("origin", Id.create("k0", Link.class));
 			act0.setEndTime(t);
 			plan.addActivity(act0);
 			Leg leg = fac.createLeg("car");
 			plan.addLeg(leg);
 //			String dest = MatsimRandom.getRandom().nextBoolean() ? "k3_rev" : "k3_rev";
-			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("k3"));
+			Activity act1 = fac.createActivityFromLinkId("destination", Id.create("k3", Link.class));
 			plan.addActivity(act1);
 			pop.addPerson(pers);
 		}
@@ -186,7 +185,7 @@ public class L {
 
 	private static void create2DWorld(Sim2DScenario sc2) {
 		Sim2DEnvironment env = new Sim2DEnvironment();
-		env.setId(new IdImpl("env0"));
+		env.setId(Id.create("env0", Sim2DEnvironment.class));
 		env.setEnvelope(new Envelope(0,36,0,36));
 		try {
 			env.setCRS(CRS.decode("EPSG:3395"));
@@ -202,7 +201,7 @@ public class L {
 		
 		{
 			int[] open = {0,2};
-			Id [] openingIds = new Id[]{new IdImpl("n0"),new IdImpl("n1")};
+			Id<Node> [] openingIds = new Id[]{Id.create("n0", Node.class),Id.create("n1", Node.class)};
 			GeometryFactory geofac = new GeometryFactory();
 			Coordinate c0 = new Coordinate(0,0);
 			Coordinate c1 = new Coordinate(0,4);
@@ -212,11 +211,11 @@ public class L {
 			Coordinate[] coords = {c0,c1,c2,c3,c4};
 			LinearRing lr = geofac.createLinearRing(coords );
 			Polygon p = geofac.createPolygon(lr , null);
-			Section sec = env.createAndAddSection(new IdImpl("sec0"), p, open, new Id[]{new IdImpl("sec1")} , 0,openingIds);
+			Section sec = env.createAndAddSection(Id.create("sec0", Section.class), p, open, new Id[]{Id.create("sec1", Section.class)} , 0,openingIds);
 		}
 		{
 			int[] open = {0,2};
-			Id [] openingIds = new Id[]{new IdImpl("n1"),new IdImpl("n2")};
+			Id<Node> [] openingIds = new Id[]{Id.create("n1", Node.class),Id.create("n2", Node.class)};
 			GeometryFactory geofac = new GeometryFactory();
 			Coordinate c0 = new Coordinate(8,0);
 			Coordinate c1 = new Coordinate(12,4);
@@ -226,7 +225,7 @@ public class L {
 			Coordinate[] coords = {c0,c1,c2,c3,c4};
 			LinearRing lr = geofac.createLinearRing(coords );
 			Polygon p = geofac.createPolygon(lr , null);
-			Section sec = env.createAndAddSection(new IdImpl("sec1"), p, open, new Id[]{new IdImpl("sec0")} , 0,openingIds);
+			Section sec = env.createAndAddSection(Id.create("sec1", Section.class), p, open, new Id[]{Id.create("sec0", Section.class)} , 0,openingIds);
 		}		
 
 	}
@@ -235,13 +234,13 @@ public class L {
 	private static void createNetwork(Scenario sc) {
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
-		Node m0 = fac.createNode(new IdImpl("m0"), new CoordImpl(-40,2));
-		Node m1 = fac.createNode(new IdImpl("m1"), new CoordImpl(-20,2.001));
-		Node n0 = fac.createNode(new IdImpl("n0"), new CoordImpl(0,2));
+		Node m0 = fac.createNode(Id.create("m0", Node.class), new CoordImpl(-40,2));
+		Node m1 = fac.createNode(Id.create("m1", Node.class), new CoordImpl(-20,2.001));
+		Node n0 = fac.createNode(Id.create("n0", Node.class), new CoordImpl(0,2));
 		
-		Node n2 = fac.createNode(new IdImpl("n2"), new CoordImpl(10,-8));
-		Node m2 = fac.createNode(new IdImpl("m2"), new CoordImpl(10.001,-28));
-		Node m3 = fac.createNode(new IdImpl("m3"), new CoordImpl(10,-48));
+		Node n2 = fac.createNode(Id.create("n2", Node.class), new CoordImpl(10,-8));
+		Node m2 = fac.createNode(Id.create("m2", Node.class), new CoordImpl(10.001,-28));
+		Node m3 = fac.createNode(Id.create("m3", Node.class), new CoordImpl(10,-48));
 		
 		
 		net.addNode(m0);
@@ -253,17 +252,17 @@ public class L {
 		double flow = SEPC_FLOW * 4;
 		
 		
-		Link k0 = fac.createLink(new IdImpl("k0"), m0, m1);
-		Link k1 = fac.createLink(new IdImpl("k1"), m1, n0);
+		Link k0 = fac.createLink(Id.create("k0", Link.class), m0, m1);
+		Link k1 = fac.createLink(Id.create("k1", Link.class), m1, n0);
 
-		Link k0Rev = fac.createLink(new IdImpl("k0_rev"), m1, m0);
-		Link k1Rev = fac.createLink(new IdImpl("k1_rev"), n0, m1);
+		Link k0Rev = fac.createLink(Id.create("k0_rev", Link.class), m1, m0);
+		Link k1Rev = fac.createLink(Id.create("k1_rev", Link.class), n0, m1);
 		
-		Link k2 = fac.createLink(new IdImpl("k2"), n2, m2);
-		Link k3 = fac.createLink(new IdImpl("k3"), m2, m3);
+		Link k2 = fac.createLink(Id.create("k2", Link.class), n2, m2);
+		Link k3 = fac.createLink(Id.create("k3", Link.class), m2, m3);
 
-		Link k2Rev = fac.createLink(new IdImpl("k2_rev"), m2, n2);
-		Link k3Rev = fac.createLink(new IdImpl("k3_rev"), m3, m2);
+		Link k2Rev = fac.createLink(Id.create("k2_rev", Link.class), m2, n2);
+		Link k3Rev = fac.createLink(Id.create("k3_rev", Link.class), m3, m2);
 		
 		
 		

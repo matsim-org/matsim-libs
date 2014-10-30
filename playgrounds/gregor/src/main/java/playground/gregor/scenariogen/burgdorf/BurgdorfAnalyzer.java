@@ -26,12 +26,12 @@ import java.io.IOException;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 
@@ -41,8 +41,8 @@ public class BurgdorfAnalyzer implements PersonDepartureEventHandler, LinkLeaveE
 	private final TreeMap<Double,Integer> festplatz = new TreeMap<Double, Integer>();
 	private final TreeMap<Double,Integer> onRoad = new TreeMap<Double, Integer>();
 
-	private final Id bex = new IdImpl("198");
-	private final Id fen = new IdImpl("200");
+	private final Id<Link> bex = Id.create("198", Link.class);
+	private final Id<Link> fen = Id.create("200", Link.class);
 	
 	private int dep = 0;
 	private int bLeft = 0;

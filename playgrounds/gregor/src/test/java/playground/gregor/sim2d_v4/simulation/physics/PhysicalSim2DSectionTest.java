@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
@@ -65,7 +65,7 @@ public class PhysicalSim2DSectionTest {
 		QVehicle qveh = new QVehicle(new Vehicle() {
 			
 			@Override
-			public Id getId() {
+			public Id<Vehicle> getId() {
 				// TODO Auto-generated method stub
 				return null;
 			}
@@ -127,12 +127,12 @@ public class PhysicalSim2DSectionTest {
 		Sim2DConfig conf = Sim2DConfigUtils.createConfig();
 		Sim2DScenario sc = Sim2DScenarioUtils.createSim2dScenario(conf);
 		Sim2DEnvironment env = new Sim2DEnvironment();
-		env.setId(new IdImpl("env0"));
+		env.setId(Id.create("env0", Sim2DEnvironment.class));
 		sc.addSim2DEnvironment(env);
 
-		Id id0 = new IdImpl(0);
-		Id id1 = new IdImpl(1);
-		Id id2 = new IdImpl(2);
+		Id<Section> id0 = Id.create(0, Section.class);
+		Id<Section> id1 = Id.create(1, Section.class);
+		Id<Section> id2 = Id.create(2, Section.class);
 
 
 		Coordinate c00 = new Coordinate(0,0);
@@ -172,19 +172,19 @@ public class PhysicalSim2DSectionTest {
 		Config mc = ConfigUtils.createConfig();
 		Scenario msc = ScenarioUtils.createScenario(mc );
 		NetworkImpl net = (NetworkImpl) msc.getNetwork();
-		Node n0 = net.createAndAddNode(new IdImpl(0), new CoordImpl(1,1));
-		Node n1 = net.createAndAddNode(new IdImpl(1), new CoordImpl(4.5,5));
-		Node n2 = net.createAndAddNode(new IdImpl(2), new CoordImpl(4.5,6.5));
-		Node n3 = net.createAndAddNode(new IdImpl(3), new CoordImpl(0,6.5));
-		Node n4 = net.createAndAddNode(new IdImpl(4), new CoordImpl(-3,5));
-		Link l0a = net.createAndAddLink(new IdImpl("0a"), n0, n1, 0, 0, 0, 0);
-		Link l0b = net.createAndAddLink(new IdImpl("0b"), n1, n0, 0, 0, 0, 0);
-		Link l1a = net.createAndAddLink(new IdImpl("1a"), n1, n2, 0, 0, 0, 0);
-		Link l1b = net.createAndAddLink(new IdImpl("1b"), n2, n1, 0, 0, 0, 0);
-		Link l2a = net.createAndAddLink(new IdImpl("2a"), n2, n3, 0, 0, 0, 0);
-		Link l2b = net.createAndAddLink(new IdImpl("2b"), n3, n2, 0, 0, 0, 0);
-		Link l3a = net.createAndAddLink(new IdImpl("3a"), n3, n4, 0, 0, 0, 0);
-		Link l3b = net.createAndAddLink(new IdImpl("3b"), n4, n3, 0, 0, 0, 0);
+		Node n0 = net.createAndAddNode(Id.create(0, Node.class), new CoordImpl(1,1));
+		Node n1 = net.createAndAddNode(Id.create(1, Node.class), new CoordImpl(4.5,5));
+		Node n2 = net.createAndAddNode(Id.create(2, Node.class), new CoordImpl(4.5,6.5));
+		Node n3 = net.createAndAddNode(Id.create(3, Node.class), new CoordImpl(0,6.5));
+		Node n4 = net.createAndAddNode(Id.create(4, Node.class), new CoordImpl(-3,5));
+		Link l0a = net.createAndAddLink(Id.create("0a", Link.class), n0, n1, 0, 0, 0, 0);
+		Link l0b = net.createAndAddLink(Id.create("0b", Link.class), n1, n0, 0, 0, 0, 0);
+		Link l1a = net.createAndAddLink(Id.create("1a", Link.class), n1, n2, 0, 0, 0, 0);
+		Link l1b = net.createAndAddLink(Id.create("1b", Link.class), n2, n1, 0, 0, 0, 0);
+		Link l2a = net.createAndAddLink(Id.create("2a", Link.class), n2, n3, 0, 0, 0, 0);
+		Link l2b = net.createAndAddLink(Id.create("2b", Link.class), n3, n2, 0, 0, 0, 0);
+		Link l3a = net.createAndAddLink(Id.create("3a", Link.class), n3, n4, 0, 0, 0, 0);
+		Link l3b = net.createAndAddLink(Id.create("3b", Link.class), n4, n3, 0, 0, 0, 0);
 		sec0.addRelatedLinkId(l0a.getId());
 		sec0.addRelatedLinkId(l0b.getId());
 		sec1.addRelatedLinkId(l1a.getId());
@@ -244,7 +244,7 @@ public class PhysicalSim2DSectionTest {
 		}
 
 		@Override
-		public Id getCurrentLinkId() {
+		public Id<Link> getCurrentLinkId() {
 			throw new RuntimeException("don't call this method!");
 		}
 
@@ -254,17 +254,17 @@ public class PhysicalSim2DSectionTest {
 		}
 
 		@Override
-		public Id chooseNextLinkId() {
+		public Id<Link> chooseNextLinkId() {
 			throw new RuntimeException("don't call this method!");
 		}
 
 		@Override
-		public Id getId() {
+		public Id<Person> getId() {
 			throw new RuntimeException("don't call this method!");
 		}
 
 		@Override
-		public void notifyMoveOverNode(Id nextLinkId) {
+		public void notifyMoveOverNode(Id<Link> nextLinkId) {
 			throw new RuntimeException("don't call this method!");
 		}
 

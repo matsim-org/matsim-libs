@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -67,8 +66,8 @@ import com.vividsolutions.jts.geom.Polygon;
 public class PopulationGenerator {
 
 
-	private final static Id tt0 = new IdImpl("sim2d_0_rev_-941555");
-	private final static Id tt1 = new IdImpl("sim2d_0_-941546");
+//	private final static Id tt0 = Id.create("sim2d_0_rev_-941555");
+//	private final static Id tt1 = Id.create("sim2d_0_-941546");
 	private final static double CUTOFF_DIST = 1000;
 	
 	static Polygon t1;
@@ -144,7 +143,7 @@ public class PopulationGenerator {
 			for (int i = 0; i < persons; i++) {
 
 
-				Person pers = fac.createPerson(new IdImpl(id++));
+				Person pers = fac.createPerson(Id.create(id++, Person.class));
 				pop.addPerson(pers);
 
 				Plan plan = fac.createPlan();
@@ -169,7 +168,7 @@ public class PopulationGenerator {
 
 
 //				Id d = MatsimRandom.getRandom().nextBoolean() ? tt0 : tt1; 
-				Id d = new IdImpl("1622");
+				Id<Link> d = Id.create("1622", Link.class);
 				Activity act1 = fac.createActivityFromLinkId("destination", d);
 				plan.addActivity(act1);
 			}

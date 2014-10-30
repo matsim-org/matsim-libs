@@ -28,20 +28,21 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Polygon;
 
 
-public class Sim2DEnvironment implements Identifiable{
+public class Sim2DEnvironment implements Identifiable<Sim2DEnvironment> {
 
 	private Envelope envelope;
 	private CoordinateReferenceSystem crs;
-	private final Map<Id, Section> sections = new HashMap<Id,Section>();
+	private final Map<Id<Section>, Section> sections = new HashMap<>();
 	private final Map<Link,Section> linkSectionMapping = new HashMap<Link,Section>();
 	private Network net;
-	private  Id id = null;
+	private Id<Sim2DEnvironment> id = null;
 
 
 
@@ -50,7 +51,7 @@ public class Sim2DEnvironment implements Identifiable{
 	}
 
 	public Section createSection(Id<Section> id, Polygon p, int[] openings,
-			Id[] neighbors, int level) {
+			Id<Section>[] neighbors, int level) {
 		//Hack: having openings in ascending order makes things much easier, so wie do it here [gl Jan' 13]
 		if (openings != null)
 			Arrays.sort(openings);
@@ -60,21 +61,21 @@ public class Sim2DEnvironment implements Identifiable{
 	}
 
 	private Section createSection(Id<Section> id2, Polygon p, int[] openings,
-			Id[] neighbors, int level, Id[] neighborsIds) {
+			Id<Section>[] neighbors, int level, Id<Node>[] neighborsIds) {
 		Section s = new Section(id2,p,openings,neighbors,neighborsIds,level);
 
 		return s;
 	}
 
 	public Section createAndAddSection(Id<Section> id, Polygon p, int[] openings,
-			Id[] neighbors, int level) {
+			Id<Section>[] neighbors, int level) {
 		Section s = createSection(id, p, openings, neighbors, level);
 		this.sections.put(id, s);
 		return s;
 	}
 
 	public Section createAndAddSection(Id<Section> id, Polygon p, int[] openings,
-			Id[] neighbors, int level, Id[] neighborsIds) {
+			Id<Section>[] neighbors, int level, Id<Node>[] neighborsIds) {
 		Section s = createSection(id, p, openings, neighbors, level, neighborsIds);
 		this.sections.put(id, s);
 		return s;
@@ -95,7 +96,7 @@ public class Sim2DEnvironment implements Identifiable{
 		return this.crs;
 	}
 
-	public Map<Id,Section> getSections() {
+	public Map<Id<Section>,Section> getSections() {
 		return this.sections ;
 	}
 
@@ -120,11 +121,11 @@ public class Sim2DEnvironment implements Identifiable{
 	}
 
 	@Override
-	public Id getId() {
+	public Id<Sim2DEnvironment> getId() {
 		return this.id;
 	}
 
-	public void setId(Id id) {
+	public void setId(Id<Sim2DEnvironment> id) {
 		this.id = id;
 	}
 

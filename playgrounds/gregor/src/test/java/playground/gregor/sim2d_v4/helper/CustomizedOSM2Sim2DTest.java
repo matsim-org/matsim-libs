@@ -77,7 +77,7 @@ public class CustomizedOSM2Sim2DTest extends MatsimTestCase{
 		assertEquals(e1.getMaxX(),e2.getMaxX(),0.0000001);
 		assertEquals(e1.getMaxY(),e2.getMaxY(),0.0000001);
 
-		for (Entry<Id, Section> entry : env2.getSections().entrySet()) {
+		for (Entry<Id<Section>, Section> entry : env2.getSections().entrySet()) {
 			Section sec2 = entry.getValue();
 			Section sec = env.getSections().get(sec2.getId());
 
@@ -87,8 +87,8 @@ public class CustomizedOSM2Sim2DTest extends MatsimTestCase{
 				assertEquals(sec2.getNeighbors().length,sec.getNeighbors().length);
 
 				for (int i = 0; i < sec2.getNeighbors().length; i++) {
-					Id id2 = sec2.getNeighbors()[i];
-					Id id =  sec.getNeighbors()[i];
+					Id<Section> id2 = sec2.getNeighbors()[i];
+					Id<Section> id =  sec.getNeighbors()[i];
 					assertEquals(id2,id);
 				} 
 			}

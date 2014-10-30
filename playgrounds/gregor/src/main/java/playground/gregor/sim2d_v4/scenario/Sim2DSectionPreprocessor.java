@@ -81,7 +81,7 @@ public abstract class Sim2DSectionPreprocessor {
 
 	private static void connectToNeighbors(Section sec, Sim2DEnvironment env) {
 		for (LineSegment opening : sec.getOpeningSegments()) {
-			for (Id n : sec.getNeighbors()) {
+			for (Id<Section> n : sec.getNeighbors()) {
 				Section nSec = env.getSections().get(n);
 				if (isConnectedViaOpening(opening,nSec)){
 					sec.addOpeningNeighborMapping(opening, nSec);

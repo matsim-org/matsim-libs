@@ -4,6 +4,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Node;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -15,11 +16,11 @@ public class SkeletonNode {
 
 	private final Set<SkeletonLink> linkedLinks = new LinkedHashSet<SkeletonLink>();
 
-	private final Id id;
+	private final Id<Node> id;
 
 
 
-	public SkeletonNode(Point from, Id id) {
+	public SkeletonNode(Point from, Id<Node> id) {
 		this.location = from;
 		this.id = id;
 	}
@@ -51,7 +52,7 @@ public class SkeletonNode {
 		return this.linkedLinks.remove(link);
 	}
 
-	public Id getId() {
+	public Id<Node> getId() {
 		return this.id;
 	}
 }

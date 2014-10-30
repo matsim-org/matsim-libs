@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
@@ -54,7 +53,7 @@ public class BlowUp {
 		PopulationFactory fac = sc.getPopulation().getFactory();
 		for (Person p : sc.getPopulation().getPersons().values()) {
 			for (int i = 0; i < 9; i++) {
-				Person p2 = fac.createPerson(new IdImpl("blowup"+(idc++)));
+				Person p2 = fac.createPerson(Id.create("blowup"+(idc++), Person.class));
 				blowups.add(p2);
 				for (Plan pl : p.getPlans()) {
 					Plan pl2 = fac.createPlan();
@@ -62,8 +61,8 @@ public class BlowUp {
 					for (PlanElement al : pl.getPlanElements()) {
 						if (al instanceof ActivityImpl) {
 							ActivityImpl act = (ActivityImpl)al;
-							//						ActivityImpl al2 = new ActivityImpl(act.getType(), new IdImpl("car"+act.getLinkId().toString()));
-							Activity al2 = fac.createActivityFromLinkId(act.getType(), new IdImpl(act.getLinkId().toString()));
+							//						ActivityImpl al2 = new ActivityImpl(act.getType(), Id.create("car"+act.getLinkId().toString()));
+							Activity al2 = fac.createActivityFromLinkId(act.getType(), Id.create(act.getLinkId().toString(), Link.class));
 							al2.setEndTime(act.getEndTime());
 							al2.setMaximumDuration(act.getMaximumDuration());
 							al2.setStartTime(act.getStartTime());
@@ -75,18 +74,18 @@ public class BlowUp {
 							leg2.setTravelTime(leg.getTravelTime());
 							LinkNetworkRouteImpl r = (LinkNetworkRouteImpl) leg.getRoute();
 							List<Id<Link>>ids = new ArrayList<Id<Link>>();
-							ids.add(new IdImpl(r.getStartLinkId().toString()));
-							for (Id id : r.getLinkIds()) {
-								ids.add(new IdImpl(id.toString()));
+							ids.add(Id.create(r.getStartLinkId().toString(), Link.class));
+							for (Id<Link> id : r.getLinkIds()) {
+								ids.add(Id.create(id.toString(), Link.class));
 							}
 							//						
-							ids.add(new IdImpl(r.getEndLinkId().toString()));
+							ids.add(Id.create(r.getEndLinkId().toString(), Link.class));
 							LinkNetworkRouteImpl r2 = (LinkNetworkRouteImpl) RouteUtils.createNetworkRoute(ids, sc.getNetwork());
 
 							r2.setDistance(r.getDistance());
 							r2.setTravelCost(r.getTravelCost());
 							r2.setTravelTime(r.getTravelTime());
-							//						r2.setVehicleId(new IdImpl("car"+r.getVehicleId().toString()));
+							//						r2.setVehicleId(Id.create("car"+r.getVehicleId().toString()));
 							leg2.setRoute(r2);
 
 							pl2.addLeg(leg2);

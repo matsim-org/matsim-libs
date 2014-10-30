@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.network.NetworkWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
@@ -57,11 +56,11 @@ public class RenameId {
 		{
 			NetworkFactory fac = sc2.getNetwork().getFactory();
 			for (Node n : sc.getNetwork().getNodes().values()){
-				Node n2 = fac.createNode(new IdImpl("car"+n.getId().toString()), n.getCoord());
+				Node n2 = fac.createNode(Id.create("car"+n.getId().toString(), Node.class), n.getCoord());
 				sc2.getNetwork().addNode(n2);
 			}
 			for (Link l : sc.getNetwork().getLinks().values()) {
-				Link l2 = fac.createLink(new IdImpl("car"+l.getId()), new IdImpl("car"+l.getFromNode().getId().toString()), new IdImpl("car"+l.getToNode().getId().toString()));
+				Link l2 = fac.createLink(Id.create("car"+l.getId(), Link.class), Id.create("car"+l.getFromNode().getId().toString(), Node.class), Id.create("car"+l.getToNode().getId().toString(), Node.class));
 				sc2.getNetwork().addLink(l2);
 				l2.setAllowedModes(l.getAllowedModes());
 				l2.setCapacity(l.getCapacity());
@@ -75,7 +74,7 @@ public class RenameId {
 		{
 			PopulationFactory fac = sc2.getPopulation().getFactory();
 			for (Person p : sc.getPopulation().getPersons().values()) {
-				Person p2 = fac.createPerson(new IdImpl("car"+p.getId().toString()));
+				Person p2 = fac.createPerson(Id.create("car"+p.getId().toString(), Person.class));
 				sc2.getPopulation().addPerson(p2);
 				for (Plan pl : p.getPlans()) {
 					Plan pl2 = fac.createPlan();
@@ -83,8 +82,8 @@ public class RenameId {
 					for (PlanElement al : pl.getPlanElements()) {
 						if (al instanceof ActivityImpl) {
 							ActivityImpl act = (ActivityImpl)al;
-//							ActivityImpl al2 = new ActivityImpl(act.getType(), new IdImpl("car"+act.getLinkId().toString()));
-							Activity al2 = fac.createActivityFromLinkId(act.getType(), new IdImpl("car"+act.getLinkId().toString()));
+//							ActivityImpl al2 = new ActivityImpl(act.getType(), Id.create("car"+act.getLinkId().toString()));
+							Activity al2 = fac.createActivityFromLinkId(act.getType(), Id.create("car"+act.getLinkId().toString(), Link.class));
 							al2.setEndTime(act.getEndTime());
 							al2.setMaximumDuration(act.getMaximumDuration());
 							al2.setStartTime(act.getStartTime());
@@ -96,18 +95,18 @@ public class RenameId {
 							leg2.setTravelTime(leg.getTravelTime());
 							LinkNetworkRouteImpl r = (LinkNetworkRouteImpl) leg.getRoute();
 							List<Id<Link>>ids = new ArrayList<Id<Link>>();
-							ids.add(new IdImpl("car"+r.getStartLinkId().toString()));
-							for (Id id : r.getLinkIds()) {
-								ids.add(new IdImpl("car"+id.toString()));
+							ids.add(Id.create("car"+r.getStartLinkId().toString(), Link.class));
+							for (Id<Link> id : r.getLinkIds()) {
+								ids.add(Id.create("car"+id.toString(), Link.class));
 							}
 //							
-							ids.add(new IdImpl("car"+r.getEndLinkId().toString()));
+							ids.add(Id.create("car"+r.getEndLinkId().toString(), Link.class));
 							LinkNetworkRouteImpl r2 = (LinkNetworkRouteImpl) RouteUtils.createNetworkRoute(ids, sc2.getNetwork());
 							
 							r2.setDistance(r.getDistance());
 							r2.setTravelCost(r.getTravelCost());
 							r2.setTravelTime(r.getTravelTime());
-//							r2.setVehicleId(new IdImpl("car"+r.getVehicleId().toString()));
+//							r2.setVehicleId(Id.create("car"+r.getVehicleId().toString()));
 							leg2.setRoute(r2);
 							
 							pl2.addLeg(leg2);

@@ -30,7 +30,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsReaderXMLv1;
 
@@ -39,7 +39,7 @@ public class GainsAnalysis implements LinkLeaveEventHandler{
 	public Map<Id,AgentInfo> infos = new HashMap<Id,AgentInfo>();
 	private Strategy strategy;
 	
-	private final Id link = new IdImpl("car141205");
+	private final Id<Link> link = Id.create("car141205", Link.class);
 	
 	private enum Strategy {sp,ne,so};
 	

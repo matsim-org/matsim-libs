@@ -37,6 +37,8 @@ import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
 import org.matsim.core.api.experimental.events.BoardingDeniedEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -44,9 +46,16 @@ import org.matsim.core.api.experimental.events.SignalGroupStateChangedEvent;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.signalsystems.model.SignalGroup;
 import org.matsim.signalsystems.model.SignalGroupState;
+import org.matsim.signalsystems.model.SignalSystem;
+import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -87,68 +96,68 @@ public class EventsReaderXMLv1ExtendedSim2DVersion extends MatsimXmlParser {
 		String eventType = atts.getValue("type");
 
 		if (XYVxVyEventImpl.EVENT_TYPE.equals(eventType)) {
-			this.events.processEvent(new XYVxVyEventImpl(new IdImpl(atts.getValue(XYVxVyEventImpl.ATTRIBUTE_PERSON)), Double.parseDouble(atts.getValue(XYVxVyEventImpl.ATTRIBUTE_X)), Double.parseDouble(atts.getValue(XYVxVyEventImpl.ATTRIBUTE_Y)), Double.parseDouble(atts.getValue(XYVxVyEventImpl.ATTRIBUTE_VX)), Double.parseDouble(atts.getValue(XYVxVyEventImpl.ATTRIBUTE_VY)), time));
+			this.events.processEvent(new XYVxVyEventImpl(Id.create(atts.getValue(XYVxVyEventImpl.ATTRIBUTE_PERSON), Person.class), Double.parseDouble(atts.getValue(XYVxVyEventImpl.ATTRIBUTE_X)), Double.parseDouble(atts.getValue(XYVxVyEventImpl.ATTRIBUTE_Y)), Double.parseDouble(atts.getValue(XYVxVyEventImpl.ATTRIBUTE_VX)), Double.parseDouble(atts.getValue(XYVxVyEventImpl.ATTRIBUTE_VY)), time));
 		}else if (LinkLeaveEvent.EVENT_TYPE.equals(eventType)) {
-			this.events.processEvent(new LinkLeaveEvent(time, new IdImpl(atts.getValue(LinkLeaveEvent.ATTRIBUTE_PERSON)), new IdImpl(atts.getValue(LinkLeaveEvent.ATTRIBUTE_LINK)), atts.getValue(LinkLeaveEvent.ATTRIBUTE_VEHICLE) == null ? null : new IdImpl(atts.getValue(LinkLeaveEvent.ATTRIBUTE_VEHICLE))));
+			this.events.processEvent(new LinkLeaveEvent(time, Id.create(atts.getValue(LinkLeaveEvent.ATTRIBUTE_PERSON), Person.class), Id.create(atts.getValue(LinkLeaveEvent.ATTRIBUTE_LINK), Link.class), atts.getValue(LinkLeaveEvent.ATTRIBUTE_VEHICLE) == null ? null : Id.create(atts.getValue(LinkLeaveEvent.ATTRIBUTE_VEHICLE), Vehicle.class)));
 		} else if (LinkEnterEvent.EVENT_TYPE.equals(eventType)) {
-			this.events.processEvent(new LinkEnterEvent(time, new IdImpl(atts.getValue(LinkEnterEvent.ATTRIBUTE_PERSON)), new IdImpl(atts.getValue(LinkEnterEvent.ATTRIBUTE_LINK)), atts.getValue(LinkEnterEvent.ATTRIBUTE_VEHICLE) == null ? null : new IdImpl(atts.getValue(LinkEnterEvent.ATTRIBUTE_VEHICLE))));
+			this.events.processEvent(new LinkEnterEvent(time, Id.create(atts.getValue(LinkEnterEvent.ATTRIBUTE_PERSON), Person.class), Id.create(atts.getValue(LinkEnterEvent.ATTRIBUTE_LINK), Link.class), atts.getValue(LinkEnterEvent.ATTRIBUTE_VEHICLE) == null ? null : Id.create(atts.getValue(LinkEnterEvent.ATTRIBUTE_VEHICLE), Vehicle.class)));
 		} else if (ActivityEndEvent.EVENT_TYPE.equals(eventType)) {
-			this.events.processEvent(new ActivityEndEvent(time, new IdImpl(atts.getValue(ActivityEndEvent.ATTRIBUTE_PERSON)), new IdImpl(atts.getValue(ActivityEndEvent.ATTRIBUTE_LINK)), atts.getValue(ActivityEndEvent.ATTRIBUTE_FACILITY) == null ? null : new IdImpl(atts.getValue(ActivityEndEvent.ATTRIBUTE_FACILITY)), atts.getValue(ActivityEndEvent.ATTRIBUTE_ACTTYPE)));
+			this.events.processEvent(new ActivityEndEvent(time, Id.create(atts.getValue(ActivityEndEvent.ATTRIBUTE_PERSON), Person.class), Id.create(atts.getValue(ActivityEndEvent.ATTRIBUTE_LINK), Link.class), atts.getValue(ActivityEndEvent.ATTRIBUTE_FACILITY) == null ? null : Id.create(atts.getValue(ActivityEndEvent.ATTRIBUTE_FACILITY), ActivityFacility.class), atts.getValue(ActivityEndEvent.ATTRIBUTE_ACTTYPE)));
 		} else if (ActivityStartEvent.EVENT_TYPE.equals(eventType)) {
-			this.events.processEvent(new ActivityStartEvent(time, new IdImpl(atts.getValue(ActivityStartEvent.ATTRIBUTE_PERSON)), new IdImpl(atts.getValue(ActivityStartEvent.ATTRIBUTE_LINK)), atts.getValue(ActivityStartEvent.ATTRIBUTE_FACILITY) == null ? null : new IdImpl(atts.getValue(ActivityStartEvent.ATTRIBUTE_FACILITY)), atts.getValue(ActivityStartEvent.ATTRIBUTE_ACTTYPE)));
+			this.events.processEvent(new ActivityStartEvent(time, Id.create(atts.getValue(ActivityStartEvent.ATTRIBUTE_PERSON), Person.class), Id.create(atts.getValue(ActivityStartEvent.ATTRIBUTE_LINK), Link.class), atts.getValue(ActivityStartEvent.ATTRIBUTE_FACILITY) == null ? null : Id.create(atts.getValue(ActivityStartEvent.ATTRIBUTE_FACILITY), ActivityFacility.class), atts.getValue(ActivityStartEvent.ATTRIBUTE_ACTTYPE)));
 		} else if (PersonArrivalEvent.EVENT_TYPE.equals(eventType)) {
 			String legMode = atts.getValue(PersonArrivalEvent.ATTRIBUTE_LEGMODE);
 			String mode = legMode == null ? null : legMode.intern();
-			this.events.processEvent(new PersonArrivalEvent(time, new IdImpl(atts.getValue(PersonArrivalEvent.ATTRIBUTE_PERSON)), new IdImpl(atts.getValue(PersonArrivalEvent.ATTRIBUTE_LINK)), mode));
+			this.events.processEvent(new PersonArrivalEvent(time, Id.create(atts.getValue(PersonArrivalEvent.ATTRIBUTE_PERSON), Person.class), Id.create(atts.getValue(PersonArrivalEvent.ATTRIBUTE_LINK), Link.class), mode));
 		} else if (PersonDepartureEvent.EVENT_TYPE.equals(eventType)) {
 			String legMode = atts.getValue(PersonDepartureEvent.ATTRIBUTE_LEGMODE);
 			String mode = legMode == null ? null : legMode.intern();
-			this.events.processEvent(new PersonDepartureEvent(time, new IdImpl(atts.getValue(PersonDepartureEvent.ATTRIBUTE_PERSON)), new IdImpl(atts.getValue(PersonDepartureEvent.ATTRIBUTE_LINK)), mode));
+			this.events.processEvent(new PersonDepartureEvent(time, Id.create(atts.getValue(PersonDepartureEvent.ATTRIBUTE_PERSON), Person.class), Id.create(atts.getValue(PersonDepartureEvent.ATTRIBUTE_LINK), Link.class), mode));
 		} else if (Wait2LinkEvent.EVENT_TYPE.equals(eventType)) {
-			this.events.processEvent(new Wait2LinkEvent(time, new IdImpl(atts.getValue(Wait2LinkEvent.ATTRIBUTE_PERSON)), new IdImpl(atts.getValue(Wait2LinkEvent.ATTRIBUTE_LINK)), atts.getValue(Wait2LinkEvent.ATTRIBUTE_VEHICLE) == null ? null : new IdImpl(atts.getValue(Wait2LinkEvent.ATTRIBUTE_VEHICLE))));
+			this.events.processEvent(new Wait2LinkEvent(time, Id.create(atts.getValue(Wait2LinkEvent.ATTRIBUTE_PERSON), Person.class), Id.create(atts.getValue(Wait2LinkEvent.ATTRIBUTE_LINK), Link.class), atts.getValue(Wait2LinkEvent.ATTRIBUTE_VEHICLE) == null ? null : Id.create(atts.getValue(Wait2LinkEvent.ATTRIBUTE_VEHICLE), Vehicle.class)));
 		} else if (PersonStuckEvent.EVENT_TYPE.equals(eventType)) {
 			String legMode = atts.getValue(PersonStuckEvent.ATTRIBUTE_LEGMODE);
 			String mode = legMode == null ? null : legMode.intern();
 			String linkIdString = atts.getValue(PersonStuckEvent.ATTRIBUTE_LINK);
-			IdImpl linkId = linkIdString == null ? null : new IdImpl(linkIdString); // linkId is optional
-			this.events.processEvent(new PersonStuckEvent(time, new IdImpl(atts.getValue(PersonStuckEvent.ATTRIBUTE_PERSON)), linkId, mode));
+			Id<Link> linkId = linkIdString == null ? null : Id.create(linkIdString, Link.class); // linkId is optional
+			this.events.processEvent(new PersonStuckEvent(time, Id.create(atts.getValue(PersonStuckEvent.ATTRIBUTE_PERSON), Person.class), linkId, mode));
 		} else if (PersonMoneyEvent.EVENT_TYPE.equals(eventType) || "agentMoney".equals(eventType)) {
-			this.events.processEvent(new PersonMoneyEvent(time, new IdImpl(atts.getValue(PersonMoneyEvent.ATTRIBUTE_PERSON)), Double.parseDouble(atts.getValue(PersonMoneyEvent.ATTRIBUTE_AMOUNT))));
+			this.events.processEvent(new PersonMoneyEvent(time, Id.create(atts.getValue(PersonMoneyEvent.ATTRIBUTE_PERSON), Person.class), Double.parseDouble(atts.getValue(PersonMoneyEvent.ATTRIBUTE_AMOUNT))));
 		} else if (PersonEntersVehicleEvent.EVENT_TYPE.equals(eventType)) {
 			String personString = atts.getValue(PersonEntersVehicleEvent.ATTRIBUTE_PERSON);
 			String vehicleString = atts.getValue(PersonEntersVehicleEvent.ATTRIBUTE_VEHICLE);
-			this.events.processEvent(new PersonEntersVehicleEvent(time, new IdImpl(personString), new IdImpl(vehicleString)));
+			this.events.processEvent(new PersonEntersVehicleEvent(time, Id.create(personString, Person.class), Id.create(vehicleString, Vehicle.class)));
 		} else if (PersonLeavesVehicleEvent.EVENT_TYPE.equals(eventType)) {
-			IdImpl pId = new IdImpl(atts.getValue(PersonLeavesVehicleEvent.ATTRIBUTE_PERSON));
-			IdImpl vId = new IdImpl(atts.getValue(PersonLeavesVehicleEvent.ATTRIBUTE_VEHICLE));
+			Id<Person> pId = Id.create(atts.getValue(PersonLeavesVehicleEvent.ATTRIBUTE_PERSON), Person.class);
+			Id<Vehicle> vId = Id.create(atts.getValue(PersonLeavesVehicleEvent.ATTRIBUTE_VEHICLE), Vehicle.class);
 			this.events.processEvent(new PersonLeavesVehicleEvent(time, pId, vId));
 		} else if (TeleportationArrivalEvent.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(new TeleportationArrivalEvent(
 					time, 
-					new IdImpl(atts.getValue(TeleportationArrivalEvent.ATTRIBUTE_PERSON)), 
+					Id.create(atts.getValue(TeleportationArrivalEvent.ATTRIBUTE_PERSON), Person.class), 
 					Double.parseDouble(atts.getValue(TeleportationArrivalEvent.ATTRIBUT_DISTANCE))));
 		} else if (VehicleArrivesAtFacilityEvent.EVENT_TYPE.equals(eventType)) {
 			String delay = atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_DELAY);
-			this.events.processEvent(new VehicleArrivesAtFacilityEvent(time, new IdImpl(atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_VEHICLE)), new IdImpl(atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_FACILITY)), delay == null ? 0.0 : Double.parseDouble(delay)));
+			this.events.processEvent(new VehicleArrivesAtFacilityEvent(time, Id.create(atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_VEHICLE), Vehicle.class), Id.create(atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_FACILITY), TransitStopFacility.class), delay == null ? 0.0 : Double.parseDouble(delay)));
 		} else if (VehicleDepartsAtFacilityEvent.EVENT_TYPE.equals(eventType)) {
 			String delay = atts.getValue(VehicleDepartsAtFacilityEvent.ATTRIBUTE_DELAY);
-			this.events.processEvent(new VehicleDepartsAtFacilityEvent(time, new IdImpl(atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_VEHICLE)), new IdImpl(atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_FACILITY)), delay == null ? 0.0 : Double.parseDouble(delay)));
+			this.events.processEvent(new VehicleDepartsAtFacilityEvent(time, Id.create(atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_VEHICLE), Vehicle.class), Id.create(atts.getValue(VehicleArrivesAtFacilityEvent.ATTRIBUTE_FACILITY), TransitStopFacility.class), delay == null ? 0.0 : Double.parseDouble(delay)));
 		} else if (TransitDriverStartsEvent.EVENT_TYPE.equals(eventType)) {
-			this.events.processEvent(new TransitDriverStartsEvent(time, new IdImpl(atts.getValue(TransitDriverStartsEvent.ATTRIBUTE_DRIVER_ID)), new IdImpl(atts.getValue(TransitDriverStartsEvent.ATTRIBUTE_VEHICLE_ID)), new IdImpl(atts.getValue(TransitDriverStartsEvent.ATTRIBUTE_TRANSIT_LINE_ID)), new IdImpl(atts.getValue(TransitDriverStartsEvent.ATTRIBUTE_TRANSIT_ROUTE_ID)), new IdImpl(atts.getValue(TransitDriverStartsEvent.ATTRIBUTE_DEPARTURE_ID))));
+			this.events.processEvent(new TransitDriverStartsEvent(time, Id.create(atts.getValue(TransitDriverStartsEvent.ATTRIBUTE_DRIVER_ID), Person.class), Id.create(atts.getValue(TransitDriverStartsEvent.ATTRIBUTE_VEHICLE_ID), Vehicle.class), Id.create(atts.getValue(TransitDriverStartsEvent.ATTRIBUTE_TRANSIT_LINE_ID), TransitLine.class), Id.create(atts.getValue(TransitDriverStartsEvent.ATTRIBUTE_TRANSIT_ROUTE_ID), TransitRoute.class), Id.create(atts.getValue(TransitDriverStartsEvent.ATTRIBUTE_DEPARTURE_ID), Departure.class)));
 		} else if (SignalGroupStateChangedEvent.EVENT_TYPE.equals(eventType)){
-			Id systemId = new IdImpl(atts.getValue(SignalGroupStateChangedEvent.ATTRIBUTE_SIGNALSYSTEM_ID));
-			Id groupId = new IdImpl(atts.getValue(SignalGroupStateChangedEvent.ATTRIBUTE_SIGNALGROUP_ID));
+			Id<SignalSystem> systemId = Id.create(atts.getValue(SignalGroupStateChangedEvent.ATTRIBUTE_SIGNALSYSTEM_ID), SignalSystem.class);
+			Id<SignalGroup> groupId = Id.create(atts.getValue(SignalGroupStateChangedEvent.ATTRIBUTE_SIGNALGROUP_ID), SignalGroup.class);
 			String state = atts.getValue(SignalGroupStateChangedEvent.ATTRIBUTE_SIGNALGROUP_STATE);
 			SignalGroupState newState = SignalGroupState.valueOf(state);
 			this.events.processEvent(new SignalGroupStateChangedEvent(time, systemId, groupId, newState));
 		} else if (BoardingDeniedEvent.EVENT_TYPE.equals(eventType)){
-			Id personId = new IdImpl(atts.getValue(BoardingDeniedEvent.ATTRIBUTE_PERSON_ID));
-			Id vehicleId = new  IdImpl(atts.getValue(BoardingDeniedEvent.ATTRIBUTE_VEHICLE_ID));
+			Id<Person> personId = Id.create(atts.getValue(BoardingDeniedEvent.ATTRIBUTE_PERSON_ID), Person.class);
+			Id<Vehicle> vehicleId = Id.create(atts.getValue(BoardingDeniedEvent.ATTRIBUTE_VEHICLE_ID), Vehicle.class);
 			this.events.processEvent(new BoardingDeniedEvent(time, personId, vehicleId));
 		} else if (AgentWaitingForPtEvent.EVENT_TYPE.equals(eventType)){
-			Id agentId = new IdImpl(atts.getValue(AgentWaitingForPtEvent.ATTRIBUTE_AGENT));
-			Id waitStopId = new  IdImpl(atts.getValue(AgentWaitingForPtEvent.ATTRIBUTE_WAITSTOP));
-			Id destinationStopId = new  IdImpl(atts.getValue(AgentWaitingForPtEvent.ATTRIBUTE_DESTINATIONSTOP));
+			Id<Person> agentId = Id.create(atts.getValue(AgentWaitingForPtEvent.ATTRIBUTE_AGENT), Person.class);
+			Id<TransitStopFacility> waitStopId = Id.create(atts.getValue(AgentWaitingForPtEvent.ATTRIBUTE_WAITSTOP), TransitStopFacility.class);
+			Id<TransitStopFacility> destinationStopId = Id.create(atts.getValue(AgentWaitingForPtEvent.ATTRIBUTE_DESTINATIONSTOP), TransitStopFacility.class);
 			this.events.processEvent(new AgentWaitingForPtEvent(time, agentId, waitStopId, destinationStopId));
 		} else {
 			Event event = new GenericEvent(eventType, time);

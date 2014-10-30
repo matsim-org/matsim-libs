@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.geotools.referencing.CRS;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -36,7 +37,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -161,16 +161,16 @@ public class SoloRefG {
 		PopulationFactory fac = pop.getFactory();
 		double t = 0;
 		for (int i = 0; i < nrAgents; i++) {
-			Person pers = fac.createPerson(new IdImpl("b"+i));
+			Person pers = fac.createPerson(Id.create("b"+i, Person.class));
 			Plan plan = fac.createPlan();
 			pers.addPlan(plan);
 			Activity act0;
-			act0 = fac.createActivityFromLinkId("origin", new IdImpl("l1"));
+			act0 = fac.createActivityFromLinkId("origin", Id.create("l1", Link.class));
 			act0.setEndTime(t);
 			plan.addActivity(act0);
 			Leg leg = fac.createLeg("car");
 			plan.addLeg(leg);
-			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("l3"));
+			Activity act1 = fac.createActivityFromLinkId("destination", Id.create("l3", Link.class));
 			plan.addActivity(act1);
 			pop.addPerson(pers);
 ////			t += .5;
@@ -183,7 +183,7 @@ public class SoloRefG {
 
 	private static void create2DWorld(Sim2DScenario sc2) {
 		Sim2DEnvironment env = new Sim2DEnvironment();
-		env.setId(new IdImpl("env0"));
+		env.setId(Id.create("env0", Sim2DEnvironment.class));
 		
 		sc2.addSim2DEnvironment(env);
 		
@@ -205,15 +205,15 @@ public class SoloRefG {
 		Coordinate[] coords = {c0,c1,c2,c3,c4};
 		LinearRing lr = geofac.createLinearRing(coords );
 		Polygon p = geofac.createPolygon(lr , null);
-		Section sec = env.createAndAddSection(new IdImpl("sec0"), p, open, null, 0);
+		Section sec = env.createAndAddSection(Id.create("sec0", Section.class), p, open, null, 0);
 		
 		NetworkImpl net = NetworkImpl.createNetwork();
 		NetworkFactoryImpl fac = net.getFactory();
-		NodeImpl n0 = fac.createNode(new IdImpl(2), new CoordImpl(5,0));
-		NodeImpl n1 = fac.createNode(new IdImpl(3), new CoordImpl(35,0));
+		NodeImpl n0 = fac.createNode(Id.create(2, Node.class), new CoordImpl(5,0));
+		NodeImpl n1 = fac.createNode(Id.create(3, Node.class), new CoordImpl(35,0));
 		net.addNode(n0);
 		net.addNode(n1);
-		IdImpl id = new IdImpl("l2d0");
+		Id<Link> id = Id.create("l2d0", Link.class);
 		Link l = fac.createLink(id, n0, n1);
 		l.setFreespeed(1.34);
 		l.setLength(10);
@@ -230,12 +230,12 @@ public class SoloRefG {
 	private static void createNetwork(Scenario sc) {
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
-		Node n0 = fac.createNode(new IdImpl(0), new CoordImpl(0,0));
-		Node n1 = fac.createNode(new IdImpl(1), new CoordImpl(1,0));
-		Node n2 = fac.createNode(new IdImpl(2), new CoordImpl(5,0));
-		Node n3 = fac.createNode(new IdImpl(3), new CoordImpl(35,0));
-		Node n4 = fac.createNode(new IdImpl(4), new CoordImpl(40,0));
-		Node n5 = fac.createNode(new IdImpl(5), new CoordImpl(41,0));
+		Node n0 = fac.createNode(Id.create(0, Node.class), new CoordImpl(0,0));
+		Node n1 = fac.createNode(Id.create(1, Node.class), new CoordImpl(1,0));
+		Node n2 = fac.createNode(Id.create(2, Node.class), new CoordImpl(5,0));
+		Node n3 = fac.createNode(Id.create(3, Node.class), new CoordImpl(35,0));
+		Node n4 = fac.createNode(Id.create(4, Node.class), new CoordImpl(40,0));
+		Node n5 = fac.createNode(Id.create(5, Node.class), new CoordImpl(41,0));
 		net.addNode(n0);
 		net.addNode(n1);
 		net.addNode(n2);
@@ -243,10 +243,10 @@ public class SoloRefG {
 		net.addNode(n4);
 		net.addNode(n5);
 		double flow = 1.3 * 4;
-		Link l0 = fac.createLink(new IdImpl("l0"), n0, n1);
-		Link l1 = fac.createLink(new IdImpl("l1"), n1, n2);
-		Link l2 = fac.createLink(new IdImpl("l2"), n3, n4);
-		Link l3 = fac.createLink(new IdImpl("l3"), n4, n5);
+		Link l0 = fac.createLink(Id.create("l0", Link.class), n0, n1);
+		Link l1 = fac.createLink(Id.create("l1", Link.class), n1, n2);
+		Link l2 = fac.createLink(Id.create("l2", Link.class), n3, n4);
+		Link l3 = fac.createLink(Id.create("l3", Link.class), n4, n5);
 		Set<String> modes = new HashSet<String>();
 		 modes.add("walk");modes.add("car");
 		l0.setLength(1);

@@ -38,7 +38,7 @@ import org.apache.log4j.Logger;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -130,7 +130,7 @@ public class Sim2DEnvironmentReader03  extends MatsimJaxbXmlParser{
 
 		//convert from Jaxb types to sim2d conform types
 
-		this.env.setId(new IdImpl(xmlcoll.getValue().getFid()));
+		this.env.setId(Id.create(xmlcoll.getValue().getFid(), Sim2DEnvironment.class));
 		
 		//envelope
 		XMLBoundingShapeType bounds = xmlcoll.getValue().getBoundedBy();
@@ -167,12 +167,12 @@ public class Sim2DEnvironmentReader03  extends MatsimJaxbXmlParser{
 		for (XMLFeatureAssociationType m : xmlcoll.getValue().getFeatureMember()) {
 			JAXBElement<? extends XMLAbstractFeatureType> f = m.getFeature();
 			XMLSectionPropertyType ff = ((XMLSim2DEnvironmentSectionType) f.getValue()).getGeometryProperty();
-			Id id = new IdImpl(f.getValue().getFid());
+			Id<Section> id = Id.create(f.getValue().getFid(), Section.class);
 			Polygon p = getPolygon(ff);
 			int [] openings = getOpenings(ff);
-			Id[] neighbors = getNeighbors(ff);
+			Id<Section>[] neighbors = getNeighbors(ff);
 			BigInteger LEVEL = ff.getLevel();
-			Id[] openingsMATSimIds = getOpeningsMATSimIds(ff);
+			Id<Node>[] openingsMATSimIds = getOpeningsMATSimIds(ff);
 			Section s = this.env.createAndAddSection(id,p,openings,neighbors, LEVEL.intValue(),openingsMATSimIds);
 			
 		}
@@ -182,21 +182,21 @@ public class Sim2DEnvironmentReader03  extends MatsimJaxbXmlParser{
 
 
 
-	private Id[] getNeighbors(XMLSectionPropertyType ff) {
+	private Id<Section>[] getNeighbors(XMLSectionPropertyType ff) {
 		XMLNeighborsType xmlNeighbors = ff.getNeighbors();
 		if (xmlNeighbors == null) {
 			return new Id[0];
 		}
-		Id [] ret = new Id[xmlNeighbors.getFidrefs().size()];
+		Id<Section> [] ret = new Id[xmlNeighbors.getFidrefs().size()];
 		int idx = 0;
 		for (Object  o : xmlNeighbors.getFidrefs()) {
-			Id id = new IdImpl(((XMLSim2DEnvironmentSectionType)o).getFid());
+			Id<Section> id = Id.create(((XMLSim2DEnvironmentSectionType)o).getFid(), Section.class);
 			ret[idx++] = id;
 		}
 		return ret;
 	}
 	
-	private Id[] getOpeningsMATSimIds(XMLSectionPropertyType ff) {
+	private Id<Node>[] getOpeningsMATSimIds(XMLSectionPropertyType ff) {
 		JAXBElement<XMLOpeningsIdsType> oooo = ff.getOpeningsIds();
 		if (oooo == null) {
 			return null;
@@ -208,10 +208,10 @@ public class Sim2DEnvironmentReader03  extends MatsimJaxbXmlParser{
 			throw new RuntimeException("Can not tokenize String:" + val);
 		}
 		String[] toks = StringUtils.explode(val, vs.charAt(0));
-		Id [] ret = new Id [toks.length];
+		Id<Node> [] ret = new Id [toks.length];
 		int i = 0;
 		for (String tok : toks) {
-			ret[i++] = new IdImpl(tok);
+			ret[i++] = Id.create(tok, Node.class);
 		}
 		return ret;
 	}

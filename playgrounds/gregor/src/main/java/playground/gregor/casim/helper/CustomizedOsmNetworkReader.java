@@ -39,7 +39,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimSomeReader;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -402,7 +401,7 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 		// create the required nodes
 		for (OsmNode node : this.nodes.values()) {
 			if (node.used) {
-				Node nn = this.network.getFactory().createNode(new IdImpl(node.id), node.coord);
+				Node nn = this.network.getFactory().createNode(Id.create(node.id, Node.class), node.coord);
 				this.network.addNode(nn);
 			}
 		}
@@ -585,13 +584,13 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 		
 
 		// only create link, if both nodes were found, node could be null, since nodes outside a layer were dropped
-		Id fromId = new IdImpl(fromNode.id);
-		Id toId = new IdImpl(toNode.id);
+		Id<Node> fromId = Id.create(fromNode.id, Node.class);
+		Id<Node> toId = Id.create(toNode.id, Node.class);
 		if(network.getNodes().get(fromId) != null && network.getNodes().get(toId) != null){
 			String origId = Long.toString(way.id);
 
 			if (!onewayReverse) {
-				Link l = network.getFactory().createLink(new IdImpl(this.id), network.getNodes().get(fromId), network.getNodes().get(toId));
+				Link l = network.getFactory().createLink(Id.create(this.id, Link.class), network.getNodes().get(fromId), network.getNodes().get(toId));
 				l.setLength(length);
 				l.setFreespeed(freespeed);
 				l.setCapacity(capacity);
@@ -604,7 +603,7 @@ public class CustomizedOsmNetworkReader implements MatsimSomeReader {
 				this.id++;
 			}
 			if (!oneway) {
-				Link l = network.getFactory().createLink(new IdImpl(this.id), network.getNodes().get(toId), network.getNodes().get(fromId));
+				Link l = network.getFactory().createLink(Id.create(this.id, Link.class), network.getNodes().get(toId), network.getNodes().get(fromId));
 				l.setLength(length);
 				l.setFreespeed(freespeed);
 				l.setCapacity(capacity);

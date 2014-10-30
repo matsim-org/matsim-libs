@@ -30,7 +30,6 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -55,8 +54,8 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class SectionUnion {
 
-	private Map<Id, Id> mapping;
-	private final Map<Id, Id> rmIdMapping = new HashMap<Id,Id>();
+	private Map<Long, Id<Section>> mapping;
+	private final Map<Id<Section>, Id<Section>> rmIdMapping = new HashMap<>();
 	private final Scenario sc;
 	private Sim2DEnvironment env;
 
@@ -79,12 +78,12 @@ public class SectionUnion {
 		
 		//		System.out.println(osm);
 		//build osm_id --> matsim_id mapping
-		this.mapping = new HashMap<Id,Id>();
+		this.mapping = new HashMap<>();
 		for (OSMWay way : osm.getWays()) {
-			Id osmId = way.getId();
+			long osmId = way.getId();
 			String matsimId = way.getTags().get("id");
 			if (matsimId != null) {
-				this.mapping.put(osmId, new IdImpl(matsimId));
+				this.mapping.put(osmId, Id.create(matsimId, Section.class));
 			}
 		}
 		for (OSMRelation rel : osm.getRelations()) {
@@ -104,11 +103,11 @@ public class SectionUnion {
 		}
 		for (Section sec : secs) {
 
-			Id [] n = null;
+			Id<Section> [] n = null;
 			if (sec.getNeighbors() != null) {
-				Set<Id> neighbors = new HashSet<Id>();
-				for (Id id : sec.getNeighbors()) {
-					Id mappedId = this.rmIdMapping.get(id);
+				Set<Id<Section>> neighbors = new HashSet<>();
+				for (Id<Section> id : sec.getNeighbors()) {
+					Id<Section> mappedId = this.rmIdMapping.get(id);
 					if (mappedId == null) {
 						neighbors.add(id);
 					} else if (!(mappedId.equals(sec.getId()))){
@@ -125,13 +124,13 @@ public class SectionUnion {
 
 	private void handleRelation(OSMRelation rel) {
 		Set<Opening> potentialOpenings = new HashSet<Opening>();
-		Set<Id> potentialNeighbors = new HashSet<Id>();
+		Set<Id<Section>> potentialNeighbors = new HashSet<>();
 		Iterator<Member> it = rel.getMembers().iterator();
 		Member m = it.next();
-		Id id = this.mapping.get(m.getRefId());
+		Id<Section> id = this.mapping.get(m.getRefId());
 		Section sec = this.env.getSections().remove(id);
 		Geometry geo = sec.getPolygon();
-		for (Id n : sec.getNeighbors()) {
+		for (Id<Section> n : sec.getNeighbors()) {
 			potentialNeighbors.add(n);
 		}
 		Coordinate[] coords = sec.getPolygon().getExteriorRing().getCoordinates();
@@ -144,7 +143,7 @@ public class SectionUnion {
 			potentialOpenings.add(oo);
 		}
 
-		IdImpl newId = new IdImpl(id.toString()+"union");
+		Id<Section> newId = Id.create(id.toString()+"union", Section.class);
 		this.rmIdMapping.put(id, newId);
 
 
@@ -152,7 +151,7 @@ public class SectionUnion {
 			m = it.next();
 			id = this.mapping.get(m.getRefId());
 			sec = this.env.getSections().remove(id);
-			for (Id n : sec.getNeighbors()) {
+			for (Id<Section> n : sec.getNeighbors()) {
 				potentialNeighbors.add(n);
 			}
 			coords = sec.getPolygon().getExteriorRing().getCoordinates();
@@ -191,7 +190,7 @@ public class SectionUnion {
 			openingsA[i] = openingsList.get(i);
 		}
 
-		Id[] neighborsA = potentialNeighbors.toArray(new Id[0]);
+		Id<Section>[] neighborsA = potentialNeighbors.toArray(new Id[0]);
 		this.env.createAndAddSection(newId, p, openingsA,neighborsA, sec.getLevel());
 	}
 

@@ -22,9 +22,8 @@ import net.opengis.gml.v_3_2_1.ReferenceType;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.io.IOUtils;
@@ -66,16 +65,16 @@ public class NetworkDeserializer {
 	private void createNetwork(NetworkImpl net, ProtoNetwork protoNet) {
 
 		for (ProtoNode n : protoNet.getProtoNodes().values()) {
-			Id id = new IdImpl(n.getId());
+			Id<Node> id = Id.create(n.getId(), Node.class);
 			Coord c = MGC.coordinate2Coord(n.getCoord());
 			net.createAndAddNode(id, c);
 		}
 
 		for (ProtoLink l : protoNet.getProtoLinks().values()) {
 
-			Id id = new IdImpl(l.getId());
-			Id fromId = new IdImpl(l.getFromNodeId());
-			Id toId = new IdImpl(l.getToNodeId());
+			Id<Link> id = Id.create(l.getId(), Link.class);
+			Id<Node> fromId = Id.create(l.getFromNodeId(), Node.class);
+			Id<Node> toId = Id.create(l.getToNodeId(), Node.class);
 			Node fromNode = net.getNodes().get(fromId);
 			Node toNode = net.getNodes().get(toId);
 			double length = l.getLength();

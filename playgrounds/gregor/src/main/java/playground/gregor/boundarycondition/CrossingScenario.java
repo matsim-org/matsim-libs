@@ -39,7 +39,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -52,7 +51,6 @@ import org.matsim.core.network.NetworkChangeEventsWriter;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.opengis.referencing.FactoryException;
@@ -183,9 +181,9 @@ public class CrossingScenario {
 
 
 		//		NetworkChangeEvent ee = fac.createNetworkChangeEvent(0);
-		//		ee.addLink(sc.getNetwork().getLinks().get(new IdImpl("l2")));
-		////		ee.addLink(sc.getNetwork().getLinks().get(new IdImpl("l6")));
-		////		ee.addLink(sc.getNetwork().getLinks().get(new IdImpl("t_l6")));
+		//		ee.addLink(sc.getNetwork().getLinks().get(Id.create("l2")));
+		////		ee.addLink(sc.getNetwork().getLinks().get(Id.create("l6")));
+		////		ee.addLink(sc.getNetwork().getLinks().get(Id.create("t_l6")));
 		//		ChangeValue ccv = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE,0.01);
 		//		ee.setFlowCapacityChange(ccv);
 		//		events.add(ee);
@@ -194,31 +192,31 @@ public class CrossingScenario {
 		for (double time = 0; time < 120*60; time += 240) {
 
 			NetworkChangeEvent e = fac.createNetworkChangeEvent(time);
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l0")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l1")));
-			//			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l2")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l3")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l4")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l5")));
-			//			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l6")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l7")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("t_l4")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("t_l5")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("t_l6")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("t_l7")));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("l0", Link.class)));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("l1", Link.class)));
+			//			e.addLink(sc.getNetwork().getLinks().get(Id.create("l2", Link.class)));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("l3", Link.class)));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("l4", Link.class)));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("l5", Link.class)));
+			//			e.addLink(sc.getNetwork().getLinks().get(Id.create("l6", Link.class)));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("l7", Link.class)));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("t_l4", Link.class)));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("t_l5", Link.class)));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("t_l6", Link.class)));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("t_l7", Link.class)));
 
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l0_rev")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l1_rev")));
-			//			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l2_rev")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l3_rev")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l4_rev")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l5_rev")));
-			//			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l6_rev")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l7_rev")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("t_l4_rev")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("t_l5_rev")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("t_l6_rev")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("t_l7_rev")));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("l0_rev", Link.class)));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("l1_rev", Link.class)));
+			//			e.addLink(sc.getNetwork().getLinks().get(Id.create("l2_rev", Link.class)));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("l3_rev", Link.class)));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("l4_rev", Link.class)));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("l5_rev", Link.class)));
+			//			e.addLink(sc.getNetwork().getLinks().get(Id.create("l6_rev", Link.class)));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("l7_rev", Link.class)));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("t_l4_rev", Link.class)));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("t_l5_rev", Link.class)));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("t_l6_rev", Link.class)));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("t_l7_rev", Link.class)));
 
 			System.out.println(time/60 + " flow" + flowCap/4); 
 
@@ -227,10 +225,10 @@ public class CrossingScenario {
 			events.add(e);
 
 			NetworkChangeEvent ee1 = fac.createNetworkChangeEvent(time);
-			ee1.addLink(sc.getNetwork().getLinks().get(new IdImpl("l2")));
-			ee1.addLink(sc.getNetwork().getLinks().get(new IdImpl("l6")));
-			//			ee.addLink(sc.getNetwork().getLinks().get(new IdImpl("l6")));
-			//			ee.addLink(sc.getNetwork().getLinks().get(new IdImpl("t_l6")));
+			ee1.addLink(sc.getNetwork().getLinks().get(Id.create("l2", Link.class)));
+			ee1.addLink(sc.getNetwork().getLinks().get(Id.create("l6", Link.class)));
+			//			ee.addLink(sc.getNetwork().getLinks().get(Id.create("l6", Link.class)));
+			//			ee.addLink(sc.getNetwork().getLinks().get(Id.create("t_l6", Link.class)));
 			if (time < 35*60) {
 				ChangeValue ccv1 = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE,0.95*flowCap);
 
@@ -256,14 +254,14 @@ public class CrossingScenario {
 		//		flowCap -= incr;
 		//		for (double time = 20*60; time < 40*60; time += 120) {
 		//			NetworkChangeEvent e = fac.createNetworkChangeEvent(time);
-		//			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l0")));
-		//			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l4")));
-		//			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("t_l4")));
-		////			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("mt_l4")));
-		//			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("t_l7_rev")));
-		////			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("mt_l7_rev")));
-		//			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l3_rev")));
-		//			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l7_rev")));
+		//			e.addLink(sc.getNetwork().getLinks().get(Id.create("l0")));
+		//			e.addLink(sc.getNetwork().getLinks().get(Id.create("l4")));
+		//			e.addLink(sc.getNetwork().getLinks().get(Id.create("t_l4")));
+		////			e.addLink(sc.getNetwork().getLinks().get(Id.create("mt_l4")));
+		//			e.addLink(sc.getNetwork().getLinks().get(Id.create("t_l7_rev")));
+		////			e.addLink(sc.getNetwork().getLinks().get(Id.create("mt_l7_rev")));
+		//			e.addLink(sc.getNetwork().getLinks().get(Id.create("l3_rev")));
+		//			e.addLink(sc.getNetwork().getLinks().get(Id.create("l7_rev")));
 		//			ChangeValue cv = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, flowCap);
 		//			e.setFlowCapacityChange(cv);
 		//			events.add(e);
@@ -282,31 +280,31 @@ public class CrossingScenario {
 		PopulationFactory fac = pop.getFactory();
 		double t = 0;
 		for (int i = 0; i < nrAgents; i++) {
-			Person pers = fac.createPerson(new IdImpl("b"+i));
+			Person pers = fac.createPerson(Id.create("b"+i, Person.class));
 			Plan plan = fac.createPlan();
 			pers.addPlan(plan);
 			Activity act0;
-			act0 = fac.createActivityFromLinkId("origin", new IdImpl("k0"));
+			act0 = fac.createActivityFromLinkId("origin", Id.create("k0", Link.class));
 			act0.setEndTime(t);
 			plan.addActivity(act0);
 			Leg leg = fac.createLeg("car");
 			plan.addLeg(leg);
-			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("k3"));
+			Activity act1 = fac.createActivityFromLinkId("destination", Id.create("k3", Link.class));
 			plan.addActivity(act1);
 			pop.addPerson(pers);
 		}
 
 		for (int i = nrAgents; i < 2*nrAgents; i++) {
-			Person pers = fac.createPerson(new IdImpl("d"+i));
+			Person pers = fac.createPerson(Id.create("d"+i, Person.class));
 			Plan plan = fac.createPlan();
 			pers.addPlan(plan);
 			Activity act0;
-			act0 = fac.createActivityFromLinkId("origin", new IdImpl("k4"));
+			act0 = fac.createActivityFromLinkId("origin", Id.create("k4", Link.class));
 			act0.setEndTime(t);
 			plan.addActivity(act0);
 			Leg leg = fac.createLeg("car");
 			plan.addLeg(leg);
-			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("k7"));
+			Activity act1 = fac.createActivityFromLinkId("destination", Id.create("k7", Link.class));
 			plan.addActivity(act1);
 			pop.addPerson(pers);
 		}
@@ -316,7 +314,7 @@ public class CrossingScenario {
 
 	private static void create2DWorld(Sim2DScenario sc2) {
 		Sim2DEnvironment env = new Sim2DEnvironment();
-		env.setId(new IdImpl("env0"));
+		env.setId(Id.create("env0", Sim2DEnvironment.class));
 		env.setEnvelope(new Envelope(0,36,0,36));
 		try {
 			env.setCRS(CRS.decode("EPSG:3395"));
@@ -331,11 +329,11 @@ public class CrossingScenario {
 
 		NetworkImpl net = NetworkImpl.createNetwork();
 		NetworkFactoryImpl fac = net.getFactory();
-		NodeImpl n0 = fac.createNode(new IdImpl("n0"), new CoordImpl(8,18));
-		NodeImpl n1 = fac.createNode(new IdImpl("n1"), new CoordImpl(18,18));
-		NodeImpl n2 = fac.createNode(new IdImpl("n2"), new CoordImpl(28,18));
-		NodeImpl n3 = fac.createNode(new IdImpl("n3"), new CoordImpl(18,8));
-		NodeImpl n4 = fac.createNode(new IdImpl("n4"), new CoordImpl(18,28));
+		Node n0 = fac.createNode(Id.create("n0", Node.class), new CoordImpl(8,18));
+		Node n1 = fac.createNode(Id.create("n1", Node.class), new CoordImpl(18,18));
+		Node n2 = fac.createNode(Id.create("n2", Node.class), new CoordImpl(28,18));
+		Node n3 = fac.createNode(Id.create("n3", Node.class), new CoordImpl(18,8));
+		Node n4 = fac.createNode(Id.create("n4", Node.class), new CoordImpl(18,28));
 		net.addNode(n0);
 		net.addNode(n1);
 		net.addNode(n2);
@@ -343,7 +341,7 @@ public class CrossingScenario {
 		net.addNode(n4);
 
 		
-		IdImpl id0 = new IdImpl("l0");
+		Id<Link> id0 = Id.create("l0", Link.class);
 		{
 		Link l = fac.createLink(id0, n0, n1);
 		double flow = 4 *SEPC_FLOW;
@@ -355,7 +353,7 @@ public class CrossingScenario {
 		l.setAllowedModes(modes);
 		net.addLink(l);
 		}
-		IdImpl id0Rev = new IdImpl("l0_rev");
+		Id<Link> id0Rev = Id.create("l0_rev", Link.class);
 		{
 		Link l = fac.createLink(id0Rev, n1, n0);
 		double flow = 4 *SEPC_FLOW;
@@ -369,7 +367,7 @@ public class CrossingScenario {
 		}
 		
 		
-		IdImpl id1 = new IdImpl("l1");
+		Id<Link> id1 = Id.create("l1", Link.class);
 		{
 		Link l = fac.createLink(id1, n1, n2);
 		double flow = 4 *SEPC_FLOW;
@@ -381,7 +379,7 @@ public class CrossingScenario {
 		l.setAllowedModes(modes);
 		net.addLink(l);
 		}
-		IdImpl id1Rev = new IdImpl("l1_rev");
+		Id<Link> id1Rev = Id.create("l1_rev", Link.class);
 		{
 		Link l = fac.createLink(id1Rev, n2, n1);
 		double flow = 4 *SEPC_FLOW;
@@ -394,7 +392,7 @@ public class CrossingScenario {
 		net.addLink(l);
 		}
 		
-		IdImpl id2 = new IdImpl("l2");
+		Id<Link> id2 = Id.create("l2", Link.class);
 		{
 			Link l = fac.createLink(id2, n3, n1);
 			double flow = 4 *SEPC_FLOW;
@@ -406,7 +404,7 @@ public class CrossingScenario {
 			l.setAllowedModes(modes);
 			net.addLink(l);
 		}
-		IdImpl id2Rev = new IdImpl("l2_rev");
+		Id<Link> id2Rev = Id.create("l2_rev", Link.class);
 		{
 			Link l = fac.createLink(id2Rev, n1, n3);
 			double flow = 4 *SEPC_FLOW;
@@ -419,7 +417,7 @@ public class CrossingScenario {
 			net.addLink(l);
 		}
 		
-		IdImpl id3 = new IdImpl("l3");
+		Id<Link> id3 = Id.create("l3", Link.class);
 		{
 			Link l = fac.createLink(id3, n1, n4);
 			double flow = 4 *SEPC_FLOW;
@@ -431,7 +429,7 @@ public class CrossingScenario {
 			l.setAllowedModes(modes);
 			net.addLink(l);
 		}
-		IdImpl id3Rev = new IdImpl("l3_rev");
+		Id<Link> id3Rev = Id.create("l3_rev", Link.class);
 		{
 			Link l = fac.createLink(id3Rev, n4, n1);
 			double flow = 4 *SEPC_FLOW;
@@ -458,8 +456,8 @@ public class CrossingScenario {
 			Coordinate[] coords = {c0,c1,c2,c3,c4};
 			LinearRing lr = geofac.createLinearRing(coords );
 			Polygon p = geofac.createPolygon(lr , null);
-			Id[] nb01 = {new IdImpl("sec4")};
-			Section sec = env.createAndAddSection(new IdImpl("sec0"), p, open, nb01 , 0);
+			Id[] nb01 = {Id.create("sec4", Section.class)};
+			Section sec = env.createAndAddSection(Id.create("sec0", Section.class), p, open, nb01 , 0);
 			sec.addRelatedLinkId(id0);
 			sec.addRelatedLinkId(id0Rev);
 		}
@@ -475,8 +473,8 @@ public class CrossingScenario {
 			Coordinate[] coords = {c0,c1,c2,c3,c4};
 			LinearRing lr = geofac.createLinearRing(coords );
 			Polygon p = geofac.createPolygon(lr , null);
-			Id[] nb01 = {new IdImpl("sec4")};
-			Section sec = env.createAndAddSection(new IdImpl("sec1"), p, open, nb01 , 0);
+			Id[] nb01 = {Id.create("sec4", Section.class)};
+			Section sec = env.createAndAddSection(Id.create("sec1", Section.class), p, open, nb01 , 0);
 			sec.addRelatedLinkId(id2);
 			sec.addRelatedLinkId(id2Rev);
 		}
@@ -491,8 +489,8 @@ public class CrossingScenario {
 			Coordinate[] coords = {c0,c1,c2,c3,c4};
 			LinearRing lr = geofac.createLinearRing(coords );
 			Polygon p = geofac.createPolygon(lr , null);
-			Id[] nb01 = {new IdImpl("sec4")};
-			Section sec = env.createAndAddSection(new IdImpl("sec2"), p, open, nb01 , 0);
+			Id[] nb01 = {Id.create("sec4", Section.class)};
+			Section sec = env.createAndAddSection(Id.create("sec2", Section.class), p, open, nb01 , 0);
 			sec.addRelatedLinkId(id1);
 			sec.addRelatedLinkId(id1Rev);
 		}
@@ -507,8 +505,8 @@ public class CrossingScenario {
 			Coordinate[] coords = {c0,c1,c2,c3,c4};
 			LinearRing lr = geofac.createLinearRing(coords );
 			Polygon p = geofac.createPolygon(lr , null);
-			Id[] nb01 = {new IdImpl("sec4")};
-			Section sec = env.createAndAddSection(new IdImpl("sec3"), p, open, nb01 , 0);
+			Id[] nb01 = {Id.create("sec4", Section.class)};
+			Section sec = env.createAndAddSection(Id.create("sec3", Section.class), p, open, nb01 , 0);
 			sec.addRelatedLinkId(id3);
 			sec.addRelatedLinkId(id3Rev);
 		}
@@ -523,8 +521,8 @@ public class CrossingScenario {
 			Coordinate[] coords = {c0,c1,c2,c3,c4};
 			LinearRing lr = geofac.createLinearRing(coords );
 			Polygon p = geofac.createPolygon(lr , null);
-			Id[] nb01 = {new IdImpl("sec0"),new IdImpl("sec1"),new IdImpl("sec2"),new IdImpl("sec3")};
-			Section sec = env.createAndAddSection(new IdImpl("sec4"), p, open, nb01 , 0);
+			Id[] nb01 = {Id.create("sec0", Section.class),Id.create("sec1", Section.class),Id.create("sec2", Section.class),Id.create("sec3", Section.class)};
+			Section sec = env.createAndAddSection(Id.create("sec4", Section.class), p, open, nb01 , 0);
 //			sec.addRelatedLinkId(id0);
 //			sec.addRelatedLinkId(id0Rev);
 //			sec.addRelatedLinkId(id1);
@@ -542,25 +540,25 @@ public class CrossingScenario {
 	private static void createNetwork(Scenario sc) {
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
-		Node m0 = fac.createNode(new IdImpl("m0"), new CoordImpl(0,18));
-		Node m1 = fac.createNode(new IdImpl("m1"), new CoordImpl(4,18));
+		Node m0 = fac.createNode(Id.create("m0", Node.class), new CoordImpl(0,18));
+		Node m1 = fac.createNode(Id.create("m1", Node.class), new CoordImpl(4,18));
 		
-		Node n0 = fac.createNode(new IdImpl("n0"), new CoordImpl(8,18));
+		Node n0 = fac.createNode(Id.create("n0", Node.class), new CoordImpl(8,18));
 		
-		Node n2 = fac.createNode(new IdImpl("n2"), new CoordImpl(28,18));
+		Node n2 = fac.createNode(Id.create("n2", Node.class), new CoordImpl(28,18));
 		
-		Node m2 = fac.createNode(new IdImpl("m2"), new CoordImpl(32,18));
-		Node m3 = fac.createNode(new IdImpl("m3"), new CoordImpl(36,18));
+		Node m2 = fac.createNode(Id.create("m2", Node.class), new CoordImpl(32,18));
+		Node m3 = fac.createNode(Id.create("m3", Node.class), new CoordImpl(36,18));
 		
-		Node m4 = fac.createNode(new IdImpl("m4"), new CoordImpl(18,0));
-		Node m5 = fac.createNode(new IdImpl("m5"), new CoordImpl(18,4));
+		Node m4 = fac.createNode(Id.create("m4", Node.class), new CoordImpl(18,0));
+		Node m5 = fac.createNode(Id.create("m5", Node.class), new CoordImpl(18,4));
 		
-		Node n3 = fac.createNode(new IdImpl("n3"), new CoordImpl(18,8));
+		Node n3 = fac.createNode(Id.create("n3", Node.class), new CoordImpl(18,8));
 		
-		Node n4 = fac.createNode(new IdImpl("n4"), new CoordImpl(18,28));
+		Node n4 = fac.createNode(Id.create("n4", Node.class), new CoordImpl(18,28));
 		
-		Node m6 = fac.createNode(new IdImpl("m6"), new CoordImpl(18,32));
-		Node m7 = fac.createNode(new IdImpl("m7"), new CoordImpl(18,36));
+		Node m6 = fac.createNode(Id.create("m6", Node.class), new CoordImpl(18,32));
+		Node m7 = fac.createNode(Id.create("m7", Node.class), new CoordImpl(18,36));
 		
 		net.addNode(m0);
 		net.addNode(m1);
@@ -577,29 +575,29 @@ public class CrossingScenario {
 		double flow = SEPC_FLOW * 4;
 		
 		
-		Link k0 = fac.createLink(new IdImpl("k0"), m0, m1);
-		Link k1 = fac.createLink(new IdImpl("k1"), m1, n0);
+		Link k0 = fac.createLink(Id.create("k0", Link.class), m0, m1);
+		Link k1 = fac.createLink(Id.create("k1", Link.class), m1, n0);
 
-		Link k0Rev = fac.createLink(new IdImpl("k0_rev"), m1, m0);
-		Link k1Rev = fac.createLink(new IdImpl("k1_rev"), n0, m1);
+		Link k0Rev = fac.createLink(Id.create("k0_rev", Link.class), m1, m0);
+		Link k1Rev = fac.createLink(Id.create("k1_rev", Link.class), n0, m1);
 		
-		Link k2 = fac.createLink(new IdImpl("k2"), n2, m2);
-		Link k3 = fac.createLink(new IdImpl("k3"), m2, m3);
+		Link k2 = fac.createLink(Id.create("k2", Link.class), n2, m2);
+		Link k3 = fac.createLink(Id.create("k3", Link.class), m2, m3);
 
-		Link k2Rev = fac.createLink(new IdImpl("k2_rev"), m2, n2);
-		Link k3Rev = fac.createLink(new IdImpl("k3_rev"), m3, m2);
+		Link k2Rev = fac.createLink(Id.create("k2_rev", Link.class), m2, n2);
+		Link k3Rev = fac.createLink(Id.create("k3_rev", Link.class), m3, m2);
 		
-		Link k4 = fac.createLink(new IdImpl("k4"), m4, m5);
-		Link k5 = fac.createLink(new IdImpl("k5"), m5, n3);
+		Link k4 = fac.createLink(Id.create("k4", Link.class), m4, m5);
+		Link k5 = fac.createLink(Id.create("k5", Link.class), m5, n3);
 
-		Link k4Rev = fac.createLink(new IdImpl("k4_rev"), m5, m4);
-		Link k5Rev = fac.createLink(new IdImpl("k5_rev"), n3, m5);
+		Link k4Rev = fac.createLink(Id.create("k4_rev", Link.class), m5, m4);
+		Link k5Rev = fac.createLink(Id.create("k5_rev", Link.class), n3, m5);
 		
-		Link k6 = fac.createLink(new IdImpl("k6"), n4, m6);
-		Link k7 = fac.createLink(new IdImpl("k7"), m6, m7);
+		Link k6 = fac.createLink(Id.create("k6", Link.class), n4, m6);
+		Link k7 = fac.createLink(Id.create("k7", Link.class), m6, m7);
 		
-		Link k6Rev = fac.createLink(new IdImpl("k6_rev"), m6, n4);
-		Link k7Rev = fac.createLink(new IdImpl("k7_rev"), m7, m6);
+		Link k6Rev = fac.createLink(Id.create("k6_rev", Link.class), m6, n4);
+		Link k7Rev = fac.createLink(Id.create("k7_rev", Link.class), m7, m6);
 		
 		Set<String> modes = new HashSet<String>();
 		modes.add("walk");modes.add("car");

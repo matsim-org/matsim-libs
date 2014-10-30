@@ -33,8 +33,8 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.misc.StringUtils;
 
 import playground.gregor.sim2d_v4.events.Sim2DAgentConstructEvent;
@@ -61,19 +61,18 @@ public class HermesTrajectoryToEventsParser {
 		try {
 			line = r.readLine();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		EventsComparator ecomp = new EventsComparator();
 		Queue<Event> q = new PriorityQueue<Event>(100,ecomp);
 		
-		Set<Id> a = new HashSet<Id>();
+		Set<Id<Person>> a = new HashSet<>();
 		while (line != null) {
 			String[] expl = StringUtils.explode(line, ' ');
 			
 			int frame = Integer.parseInt(expl[1]);
 			double time = frame/16.;
-			Id id = new IdImpl(expl[0]);
+			Id<Person> id = Id.create(expl[0], Person.class);
 			if (!a.contains(id)){
 				Sim2DAgentConstructEvent ac = new Sim2DAgentConstructEvent(time, new Sim2DAgent(id));
 				q.add(ac);

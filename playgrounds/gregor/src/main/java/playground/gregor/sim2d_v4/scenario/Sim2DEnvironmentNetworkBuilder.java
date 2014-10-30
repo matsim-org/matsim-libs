@@ -26,7 +26,6 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -53,7 +52,7 @@ public abstract class Sim2DEnvironmentNetworkBuilder {
 		
 		for (Section s : env.getSections().values()) {
 			for (int i = 0; i < s.getOpeningSegments().size(); i++) {
-				Id id = s.getOpeningsIds()[i];
+				Id<Node> id = s.getOpeningsIds()[i];
 				Node node = net.getNodes().get(id);
 				if (node == null) {
 					LineSegment seg = s.getOpeningSegments().get(i);
@@ -67,15 +66,15 @@ public abstract class Sim2DEnvironmentNetworkBuilder {
 		
 		for (Section s : env.getSections().values()) {
 			for (int i = 0; i < s.getOpeningSegments().size(); i++) {
-				Id fromId = s.getOpeningsIds()[i];
+				Id<Node> fromId = s.getOpeningsIds()[i];
 				for (int j = 0; j < s.getOpeningSegments().size(); j++) {
 					if (j == i) {
 						continue;
 					}
-					Id toId = s.getOpeningsIds()[j];
+					Id<Node> toId = s.getOpeningsIds()[j];
 					Node from = net.getNodes().get(fromId);
 					Node to = net.getNodes().get(toId);
-					Id lId = new IdImpl(fromId.toString() + "-->"+toId.toString());
+					Id<Link> lId = Id.create(fromId.toString() + "-->"+toId.toString(), Link.class);
 					Link l = fac.createLink(lId, from, to);
 					double dist = ((CoordImpl)from.getCoord()).calcDistance(to.getCoord());
 					l.setLength(dist);

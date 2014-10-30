@@ -31,7 +31,7 @@ import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -47,6 +47,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import playground.gregor.sim2d_v4.io.Sim2DConfigWriter01;
 import playground.gregor.sim2d_v4.io.Sim2DEnvironmentReader02;
 import playground.gregor.sim2d_v4.io.Sim2DEnvironmentWriter02;
+import playground.gregor.sim2d_v4.scenario.Section;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
 import playground.gregor.sim2d_v4.scenario.Sim2DEnvironment;
@@ -185,17 +186,17 @@ public class Test {
 						continue;
 					}
 					if (hasOpenEdge(c0,c1,pi)){
-						neighborsIds.add(new IdImpl("sec"+pi.hashCode()));
+						neighborsIds.add(Id.create("sec"+pi.hashCode(), Node.class));
 					}
 
 					
 				}
 			}
 			Id[] n = neighborsIds.toArray(new Id[0]);			
-			env.createAndAddSection(new IdImpl("sec" + dec.hashCode()), dec.p, os , n, 0);
+			env.createAndAddSection(Id.create("sec" + dec.hashCode(), Section.class), dec.p, os , n, 0);
 		}
 
-		env.setId(new IdImpl(baseName));
+		env.setId(Id.create(baseName, Sim2DEnvironment.class));
 		new Sim2DEnvironmentWriter02(env).write(output);
 
 		System.out.println(decomposed.size() + " == 105?");

@@ -26,6 +26,7 @@ import java.util.LinkedList;
 import java.util.Set;
 
 import org.geotools.referencing.CRS;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -38,7 +39,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -51,7 +51,6 @@ import org.matsim.core.network.NetworkChangeEventsWriter;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.network.NodeImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.opengis.referencing.FactoryException;
@@ -187,9 +186,9 @@ public class RingRoadBiPedExperiments {
 		for (double time = 0; time < 120*10; time += 120) {
 
 			NetworkChangeEvent e = fac.createNetworkChangeEvent(time);
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l0")));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("l0", Link.class)));
 
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l3_rev")));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("l3_rev", Link.class)));
 			ChangeValue cv = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, flowCap);
 			e.setFlowCapacityChange(cv);
 			events.add(e);
@@ -208,16 +207,16 @@ public class RingRoadBiPedExperiments {
 		PopulationFactory fac = pop.getFactory();
 		double t = 0;
 		for (int i = 0; i < nrAgents; i++) {
-			Person pers = fac.createPerson(new IdImpl("b"+i));
+			Person pers = fac.createPerson(Id.create("b"+i, Person.class));
 			Plan plan = fac.createPlan();
 			pers.addPlan(plan);
 			Activity act0;
-			act0 = fac.createActivityFromLinkId("origin", new IdImpl("l0"));
+			act0 = fac.createActivityFromLinkId("origin", Id.create("l0", Link.class));
 			act0.setEndTime(t);
 			plan.addActivity(act0);
 			Leg leg = fac.createLeg("car");
 			plan.addLeg(leg);
-			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("l3"));
+			Activity act1 = fac.createActivityFromLinkId("destination", Id.create("l3", Link.class));
 			plan.addActivity(act1);
 			pop.addPerson(pers);
 		}
@@ -226,16 +225,16 @@ public class RingRoadBiPedExperiments {
 			return;
 		}
 		for (int i = nrAgents; i < 2*nrAgents; i++) {
-			Person pers = fac.createPerson(new IdImpl("d"+i));
+			Person pers = fac.createPerson(Id.create("d"+i, Person.class));
 			Plan plan = fac.createPlan();
 			pers.addPlan(plan);
 			Activity act0;
-			act0 = fac.createActivityFromLinkId("origin", new IdImpl("l3_rev"));
+			act0 = fac.createActivityFromLinkId("origin", Id.create("l3_rev", Link.class));
 			act0.setEndTime(t);
 			plan.addActivity(act0);
 			Leg leg = fac.createLeg("car");
 			plan.addLeg(leg);
-			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("l0_rev"));
+			Activity act1 = fac.createActivityFromLinkId("destination", Id.create("l0_rev", Link.class));
 			plan.addActivity(act1);
 			pop.addPerson(pers);
 		}
@@ -246,7 +245,7 @@ public class RingRoadBiPedExperiments {
 
 	private static void create2DWorld(Sim2DScenario sc2) {
 		Sim2DEnvironment env = new Sim2DEnvironment();
-		env.setId(new IdImpl("env0"));
+		env.setId(Id.create("env0", Sim2DEnvironment.class));
 
 		sc2.addSim2DEnvironment(env);
 
@@ -268,15 +267,15 @@ public class RingRoadBiPedExperiments {
 		Coordinate[] coords = {c0,c1,c2,c3,c4};
 		LinearRing lr = geofac.createLinearRing(coords );
 		Polygon p = geofac.createPolygon(lr , null);
-		Section sec = env.createAndAddSection(new IdImpl("sec0"), p, open, null, 0);
+		Section sec = env.createAndAddSection(Id.create("sec0", Section.class), p, open, null, 0);
 
 		NetworkImpl net = NetworkImpl.createNetwork();
 		NetworkFactoryImpl fac = net.getFactory();
-		NodeImpl n0 = fac.createNode(new IdImpl(2), new CoordImpl(0,WIDTH/2));
-		NodeImpl n1 = fac.createNode(new IdImpl(3), new CoordImpl(LENGTH,WIDTH/2));
+		Node n0 = fac.createNode(Id.create(2, Node.class), new CoordImpl(0,WIDTH/2));
+		Node n1 = fac.createNode(Id.create(3, Node.class), new CoordImpl(LENGTH,WIDTH/2));
 		net.addNode(n0);
 		net.addNode(n1);
-		IdImpl id = new IdImpl("l2d0");
+		Id<Link> id = Id.create("l2d0", Link.class);
 		Link l = fac.createLink(id, n0, n1);
 
 		double flow = WIDTH *MAX_FLOW;
@@ -288,7 +287,7 @@ public class RingRoadBiPedExperiments {
 		l.setAllowedModes(modes);
 		net.addLink(l);
 
-		IdImpl idRev = new IdImpl("l2d0_rev");
+		Id<Link> idRev = Id.create("l2d0_rev", Link.class);
 		Link lRev = fac.createLink(idRev, n1, n0);
 		lRev.setFreespeed(1.34);
 		lRev.setLength(LENGTH);
@@ -305,12 +304,12 @@ public class RingRoadBiPedExperiments {
 	private static void createNetwork(Scenario sc) {
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
-		Node n0 = fac.createNode(new IdImpl(0), new CoordImpl(-25,WIDTH/2));
-		Node n1 = fac.createNode(new IdImpl(1), new CoordImpl(-15,WIDTH/2+0.001));
-		Node n2 = fac.createNode(new IdImpl(2), new CoordImpl(0,WIDTH/2));
-		Node n3 = fac.createNode(new IdImpl(3), new CoordImpl(LENGTH,WIDTH/2));
-		Node n4 = fac.createNode(new IdImpl(4), new CoordImpl(LENGTH+15,WIDTH/2+0.001));
-		Node n5 = fac.createNode(new IdImpl(5), new CoordImpl(LENGTH+25,WIDTH/2));
+		Node n0 = fac.createNode(Id.create(0, Node.class), new CoordImpl(-25,WIDTH/2));
+		Node n1 = fac.createNode(Id.create(1, Node.class), new CoordImpl(-15,WIDTH/2+0.001));
+		Node n2 = fac.createNode(Id.create(2, Node.class), new CoordImpl(0,WIDTH/2));
+		Node n3 = fac.createNode(Id.create(3, Node.class), new CoordImpl(LENGTH,WIDTH/2));
+		Node n4 = fac.createNode(Id.create(4, Node.class), new CoordImpl(LENGTH+15,WIDTH/2+0.001));
+		Node n5 = fac.createNode(Id.create(5, Node.class), new CoordImpl(LENGTH+25,WIDTH/2));
 		net.addNode(n0);
 		net.addNode(n1);
 		net.addNode(n2);
@@ -318,15 +317,15 @@ public class RingRoadBiPedExperiments {
 		net.addNode(n4);
 		net.addNode(n5);
 		double flow = MAX_FLOW * WIDTH;
-		Link l0 = fac.createLink(new IdImpl("l0"), n0, n1);
-		Link l1 = fac.createLink(new IdImpl("l1"), n1, n2);
-		Link l2 = fac.createLink(new IdImpl("l2"), n3, n4);
-		Link l3 = fac.createLink(new IdImpl("l3"), n4, n5);
+		Link l0 = fac.createLink(Id.create("l0", Link.class), n0, n1);
+		Link l1 = fac.createLink(Id.create("l1", Link.class), n1, n2);
+		Link l2 = fac.createLink(Id.create("l2", Link.class), n3, n4);
+		Link l3 = fac.createLink(Id.create("l3", Link.class), n4, n5);
 
-		Link l0Rev = fac.createLink(new IdImpl("l0_rev"), n1, n0);
-		Link l1Rev = fac.createLink(new IdImpl("l1_rev"), n2, n1);
-		Link l2Rev = fac.createLink(new IdImpl("l2_rev"), n4, n3);
-		Link l3Rev = fac.createLink(new IdImpl("l3_rev"), n5, n4);
+		Link l0Rev = fac.createLink(Id.create("l0_rev", Link.class), n1, n0);
+		Link l1Rev = fac.createLink(Id.create("l1_rev", Link.class), n2, n1);
+		Link l2Rev = fac.createLink(Id.create("l2_rev", Link.class), n4, n3);
+		Link l3Rev = fac.createLink(Id.create("l3_rev", Link.class), n5, n4);
 
 		Set<String> modes = new HashSet<String>();
 		modes.add("walk");modes.add("car");

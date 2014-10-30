@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -62,7 +61,7 @@ public class Sim2DEnvironmentV02ToV03 {
 			Envelope e = env.getEnvelope();
 			QuadTree<Opening> qt = new QuadTree<Opening>(e.getMinX(), e.getMinY(), e.getMaxX(), e.getMaxY());
 			for (Section s : env.getSections().values()) {
-				Id [] ids = new Id [s.getOpeningSegments().size()];
+				Id<Node> [] ids = new Id [s.getOpeningSegments().size()];
 				s.setOpeningMATSimIds(ids);
 				for (int i = 0; i < s.getOpeningSegments().size(); i++) {
 					LineSegment l = s.getOpeningSegments().get(i);
@@ -82,9 +81,9 @@ public class Sim2DEnvironmentV02ToV03 {
 					o.x = x;
 					o.y = y;
 					qt.put(x, y, o);
-					o.id = new IdImpl("gen_opening_ID_"+s.getId()+"."+i);
+					o.id = Id.create("gen_opening_ID_"+s.getId()+"."+i, Node.class);
 					ids[i] = o.id;
-					for (Id lid : s.getRelatedLinkIds()) {
+					for (Id<Link> lid : s.getRelatedLinkIds()) {
 						Link link = env.getEnvironmentNetwork().getLinks().get(lid);
 						if (touches(l,link.getFromNode())) {
 							ids[i] = link.getFromNode().getId();
@@ -166,7 +165,7 @@ public class Sim2DEnvironmentV02ToV03 {
 	}
 
 	private static class Opening {
-		Id id;
+		Id<Node> id;
 		double x;
 		double y;
 	}

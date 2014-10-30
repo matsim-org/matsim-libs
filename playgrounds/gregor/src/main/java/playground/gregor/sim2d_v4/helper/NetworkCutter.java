@@ -37,7 +37,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.grips.control.helper.Algorithms;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.QuadTree.Rect;
@@ -153,15 +152,15 @@ public class NetworkCutter {
 //				net.removeLink(rev.getId());
 //				rm.add(rev);
 				
-				Id id0 = new IdImpl(l.getId()+"a");
-				Id id1 = new IdImpl(l.getId()+"b");
+				Id<Link> id0 = Id.create(l.getId()+"a", Link.class);
+				Id<Link> id1 = Id.create(l.getId()+"b", Link.class);
 //				Id id0r = new IdImpl(rev.getId()+"a");
 //				Id id1r = new IdImpl(rev.getId()+"b");
 				Coordinate c = new Coordinate();
 				Algorithms.computeLineIntersection(MGC.coord2Coordinate(l.getFromNode().getCoord()), MGC.coord2Coordinate(l.getToNode().getCoord()), intersection.sec.getPolygon().getCoordinates()[intersection.edge], intersection.sec.getPolygon().getCoordinates()[intersection.edge+1], c);
 				double len0 = c.distance(MGC.coord2Coordinate(l.getFromNode().getCoord()));
 				double len1 = c.distance(MGC.coord2Coordinate(l.getToNode().getCoord()));
-				Id nid = new IdImpl("a"+id++);
+				Id<Node> nid = Id.create("a"+id++, Node.class);
 				
 				Node n = fac.createNode(nid, MGC.coordinate2Coord(c));
 				net.addNode(n);

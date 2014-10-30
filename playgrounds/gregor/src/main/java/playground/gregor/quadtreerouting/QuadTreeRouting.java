@@ -24,12 +24,13 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsManagerImpl;
@@ -73,10 +74,10 @@ public class QuadTreeRouting {
 		sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME,sc2d);
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
-		Node n0 = fac.createNode(new IdImpl("0"), new CoordImpl(minX,minY));
-		Node n1 = fac.createNode(new IdImpl("1"), new CoordImpl(minX,maxY));
-		Node n2 = fac.createNode(new IdImpl("2"), new CoordImpl(maxX,maxY));
-		Node n3 = fac.createNode(new IdImpl("3"), new CoordImpl(maxX,minY));
+		Node n0 = fac.createNode(Id.create("0", Node.class), new CoordImpl(minX,minY));
+		Node n1 = fac.createNode(Id.create("1", Node.class), new CoordImpl(minX,maxY));
+		Node n2 = fac.createNode(Id.create("2", Node.class), new CoordImpl(maxX,maxY));
+		Node n3 = fac.createNode(Id.create("3", Node.class), new CoordImpl(maxX,minY));
 		net.addNode(n0);net.addNode(n1);net.addNode(n2);net.addNode(n3);
 
 		//visualization stuff
@@ -160,7 +161,7 @@ public class QuadTreeRouting {
 			double y = minY + MatsimRandom.getRandom().nextDouble() * height;
 			double vx = 0;
 			double vy = 0;
-			XYVxVyEventImpl e = new XYVxVyEventImpl(new IdImpl(i), x, y, vx, vy, time);
+			XYVxVyEventImpl e = new XYVxVyEventImpl(Id.create(i, Person.class), x, y, vx, vy, time);
 			ret.add(e);
 		}
 		return ret;

@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
@@ -52,20 +50,20 @@ public class OSMXMLParser extends MatsimXmlParser {
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		if (name.equals("node")) {
-			Id id = new IdImpl(atts.getValue("id"));
+			long id = Long.parseLong(atts.getValue("id"));
 			double lat = Double.parseDouble(atts.getValue("lat"));
 			double lon = Double.parseDouble(atts.getValue("lon"));
 			OSMNode node = new OSMNode(lat, lon, id);
 			this.currentNode = node;
 		} else if (name.equals("relation")){
-			Id id = new IdImpl(atts.getValue("id"));
+			long id = Long.parseLong(atts.getValue("id"));
 			this.currentRelation = new OSMRelation(id);
 		} else if (name.equals("way")) {
-			Id id = new IdImpl(atts.getValue("id"));
+			long id = Long.parseLong(atts.getValue("id"));
 			OSMWay way = new OSMWay(id);
 			this.currentWay = way;
 		} else if (name.equals("nd")) {
-			Id ref = new IdImpl(atts.getValue("ref"));
+			long ref = Long.parseLong(atts.getValue("ref"));
 			this.currentWay.addNodeRef(ref);
 		} else if (name.equals("tag")) {
 			String key = atts.getValue("k");
@@ -79,7 +77,7 @@ public class OSMXMLParser extends MatsimXmlParser {
 			}
 		} else if (name.equals("member")) {
 			String type = atts.getValue("type");
-			Id refId = new IdImpl(atts.getValue("ref"));
+			long refId = Long.parseLong(atts.getValue("ref"));
 			String role = atts.getValue("role");
 			this.currentRelation.addMember(new Member(type,refId,role));
 		}
@@ -92,7 +90,7 @@ public class OSMXMLParser extends MatsimXmlParser {
 			for (String key : this.keys) {
 				if (this.currentWay.getTags().get(key) != null) {
 					this.osm.getWays().add(this.currentWay);
-					for (Id id : this.currentWay.getNodeRefs()) {
+					for (long id : this.currentWay.getNodeRefs()) {
 						this.osm.getRefNodes().add(id);
 					}
 					break;

@@ -22,11 +22,9 @@ package playground.gregor.sim2d_v4.io.osmparser;
 
 import java.util.Map;
 
-import org.matsim.api.core.v01.Id;
-
 public interface OSMElement {
 
-	public abstract Id getId();
+	public abstract long getId();
 
 	public abstract void addTag(String key, String val);
 

@@ -27,6 +27,8 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 
 import playground.gregor.sim2d_v4.cgal.LineSegment;
 
@@ -37,23 +39,23 @@ public class Section implements Identifiable<Section> {
 	private final Id<Section> id;
 	private final Polygon p;
 	private int[] openingsIDs = null;
-	private Id[] neighborsIDs = null;
+	private Id<Section>[] neighborsIDs = null;
 	private final int level;
-	private final List<Id> relatedLinks = new ArrayList<Id>();
+	private final List<Id<Link>> relatedLinks = new ArrayList<>();
 	
 	private List<LineSegment> obstacles;
 	private List<LineSegment> openings;
 	
 	private final Map<LineSegment,Section> neighbors = new HashMap<LineSegment,Section>();
 	private final Map<Section,LineSegment> neighborsInvMapping = new HashMap<Section, LineSegment>();
-	private final Map<Id,LineSegment> openingsMappings = new HashMap<Id,LineSegment>(); 
-	private Id[] openingMATSimIds;
+	private final Map<Id<Node>,LineSegment> openingsMappings = new HashMap<>(); 
+	private Id<Node>[] openingMATSimIds;
 
-	/*package*/ Section(Id<Section> id, Polygon p, int[] openings, Id[] neighbors, int level) {
+	/*package*/ Section(Id<Section> id, Polygon p, int[] openings, Id<Section>[] neighbors, int level) {
 		this(id,p,openings,neighbors,null,level);
 	}
 	
-	/*package*/ Section(Id<Section> id, Polygon p, int[] openings, Id[] neighbors, Id[] openingsMATSimIds, int level) {
+	/*package*/ Section(Id<Section> id, Polygon p, int[] openings, Id<Section>[] neighbors, Id<Node>[] openingsMATSimIds, int level) {
 		this.id = id;
 		this.p = p; //maybe we can sparse the polygon here and take the coordinate array of its exterior ring instead [gl Jan' 2013]
 		this.openingsIDs = openings;
@@ -64,7 +66,7 @@ public class Section implements Identifiable<Section> {
 	}
 	
 	@Deprecated //for transition period only
-	public void setOpeningMATSimIds(Id [] ids) {
+	public void setOpeningMATSimIds(Id<Node> [] ids) {
 		this.openingMATSimIds = ids;
 	}
 
@@ -80,25 +82,25 @@ public class Section implements Identifiable<Section> {
 		return this.openingsIDs;
 	}
 	
-	public Id[] getOpeningsIds() {
+	public Id<Node>[] getOpeningsIds() {
 		return this.openingMATSimIds;
 	}
 	
-	public Id[] getNeighbors() {
+	public Id<Section>[] getNeighbors() {
 		return this.neighborsIDs;
 	}
 	
 	@Override
-	public Id getId() {
+	public Id<Section> getId() {
 		return this.id;
 	}
 
-	public void addRelatedLinkId(Id id2) {
+	public void addRelatedLinkId(Id<Link> id2) {
 //		throw new RuntimeException("not longer supported!");
 		this.relatedLinks.add(id2);
 	}
 	
-	public List<Id> getRelatedLinkIds() {
+	public List<Id<Link>> getRelatedLinkIds() {
 //		throw new RuntimeException("not longer supported!");
 		return this.relatedLinks;
 	}

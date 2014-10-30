@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.population.Person;
 
 import playground.gregor.sim2d_v4.cgal.TwoDObject;
 import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
@@ -41,10 +42,10 @@ public class XYVxVyEventImpl extends Event implements TwoDObject {
 	private final double y;
 	private final double vx;
 	private final double vy;
-	private final Id personId;
+	private final Id<Person> personId;
 	private Sim2DAgent agent;
 
-	public XYVxVyEventImpl(Id id, double x, double y, double vx, double vy, double time) {
+	public XYVxVyEventImpl(Id<Person> id, double x, double y, double vx, double vy, double time) {
 		super(time);
 		this.personId = id;
 		this.x = x;
@@ -53,7 +54,7 @@ public class XYVxVyEventImpl extends Event implements TwoDObject {
 		this.vy = vy;
 	}
 	
-	public XYVxVyEventImpl(Id id, double x, double y, double vx, double vy, double time,Sim2DAgent agent) {
+	public XYVxVyEventImpl(Id<Person> id, double x, double y, double vx, double vy, double time,Sim2DAgent agent) {
 		super(time);
 		this.personId = id;
 		this.x = x;
@@ -97,7 +98,7 @@ public class XYVxVyEventImpl extends Event implements TwoDObject {
 		return this.vy;
 	}
 	
-	public Id getPersonId() {
+	public Id<Person> getPersonId() {
 		return this.personId;
 	}
 

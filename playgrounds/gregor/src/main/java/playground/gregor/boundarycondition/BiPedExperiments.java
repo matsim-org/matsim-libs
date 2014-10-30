@@ -41,7 +41,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -234,16 +233,16 @@ public class BiPedExperiments {
 		PopulationFactory fac = pop.getFactory();
 		double t = 0;
 		for (int i = 0; i < nrAgents *SPLITTING; i++) {
-			Person pers = fac.createPerson(new IdImpl("b"+i));
+			Person pers = fac.createPerson(Id.create("b"+i, Person.class));
 			Plan plan = fac.createPlan();
 			pers.addPlan(plan);
 			Activity act0;
-			act0 = fac.createActivityFromLinkId("origin", new IdImpl("l0"));
+			act0 = fac.createActivityFromLinkId("origin", Id.create("l0", Link.class));
 			act0.setEndTime(t);
 			plan.addActivity(act0);
 			Leg leg = fac.createLeg("car");
 			plan.addLeg(leg);
-			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("l3"));
+			Activity act1 = fac.createActivityFromLinkId("destination", Id.create("l3", Link.class));
 			plan.addActivity(act1);
 			pop.addPerson(pers);
 		}
@@ -252,16 +251,16 @@ public class BiPedExperiments {
 			return;
 		}
 		for (int i = (int)(nrAgents*SPLITTING+0.5); i < nrAgents; i++) {
-			Person pers = fac.createPerson(new IdImpl("d"+i));
+			Person pers = fac.createPerson(Id.create("d"+i, Person.class));
 			Plan plan = fac.createPlan();
 			pers.addPlan(plan);
 			Activity act0;
-			act0 = fac.createActivityFromLinkId("origin", new IdImpl("l3_rev"));
+			act0 = fac.createActivityFromLinkId("origin", Id.create("l3_rev", Link.class));
 			act0.setEndTime(t);
 			plan.addActivity(act0);
 			Leg leg = fac.createLeg("car");
 			plan.addLeg(leg);
-			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("l0_rev"));
+			Activity act1 = fac.createActivityFromLinkId("destination", Id.create("l0_rev", Link.class));
 			plan.addActivity(act1);
 			pop.addPerson(pers);
 		}
@@ -272,7 +271,7 @@ public class BiPedExperiments {
 
 	private static int create2DWorld(Sim2DScenario sc2) {
 		Sim2DEnvironment env = new Sim2DEnvironment();
-		env.setId(new IdImpl("env0"));
+		env.setId(Id.create("env0", Sim2DEnvironment.class));
 		env.setEnvelope(new Envelope(-OUTER_RADIUS,OUTER_RADIUS,-OUTER_RADIUS,OUTER_RADIUS));
 		try {
 			env.setCRS(CRS.decode("EPSG:3395"));
@@ -293,9 +292,9 @@ public class BiPedExperiments {
 		env.setNetwork(net);
 		NetworkFactoryImpl fac = net.getFactory();
 		int secId = 0;
-		List<Id> secIds = new ArrayList<Id>();
+		List<Id<Section>> secIds = new ArrayList<>();
 		for (double alpha = ALPHA_INCR; alpha <= 2*Math.PI+ALPHA_INCR-0.001; alpha+=ALPHA_INCR) {
-			secIds.add(new IdImpl("sec_angle"+alpha+"_nr"+secId++));
+			secIds.add(Id.create("sec_angle"+alpha+"_nr"+secId++, Section.class));
 		}
 		secId = 0;
 		for (double alpha = ALPHA_INCR; alpha <= 2*Math.PI+ALPHA_INCR-0.001; alpha+=ALPHA_INCR) {
@@ -318,7 +317,7 @@ public class BiPedExperiments {
 			Coordinate[] coords = {c0,c1,c2,c3,c4};
 			LinearRing lr = geofac.createLinearRing(coords );
 			Polygon p = geofac.createPolygon(lr , null);
-			Id[] nb = new Id[2];
+			Id<Section>[] nb = new Id[2];
 			if (secId == 0) {
 				nb[0]=secIds.get(secIds.size()-1);
 				nb[1]=secIds.get(secId+1);
@@ -343,7 +342,7 @@ public class BiPedExperiments {
 		double y = OUTER_RADIUS-WIDTH/2;
 		double xx = x*Math.cos(-ALPHA_INCR/10) - y*Math.sin(-ALPHA_INCR/10);
 		double yy = x*Math.sin(-ALPHA_INCR/10) + y*Math.cos(-ALPHA_INCR/10);
-		NodeImpl n0 = fac.createNode(new IdImpl(nodeId++), new CoordImpl(xx,yy));
+		NodeImpl n0 = fac.createNode(Id.create(nodeId++, Node.class), new CoordImpl(xx,yy));
 		net.addNode(n0);
 		for (int round = 0; round < MAX_ROUNDS; round++) {
 			x = 0;
@@ -361,12 +360,12 @@ public class BiPedExperiments {
 				double dy = y2-y;
 				double length = Math.sqrt(dx*dx+dy*dy);
 				
-				NodeImpl n1 = fac.createNode(new IdImpl(nodeId++), new CoordImpl(x2,y2));
+				NodeImpl n1 = fac.createNode(Id.create(nodeId++, Node.class), new CoordImpl(x2,y2));
 				System.err.println(n1.getId());
 				net.addNode(n1);
 				
-				Id secIdId = secIds.get(secId++);
-				IdImpl id = new IdImpl("l_round"+round+"_"+secIdId);
+				Id<Section> secIdId = secIds.get(secId++);
+				Id<Link> id = Id.create("l_round"+round+"_"+secIdId, Link.class);
 				Link l = fac.createLink(id, n0, n1);
 		
 				double flow = WIDTH *MAX_FLOW;
@@ -381,7 +380,7 @@ public class BiPedExperiments {
 				l.setAllowedModes(modes);
 				net.addLink(l);
 		
-				IdImpl idRev = new IdImpl("l_rev_round"+round+"_"+secIdId);
+				Id<Link> idRev = Id.create("l_rev_round"+round+"_"+secIdId, Link.class);
 				Link lRev = fac.createLink(idRev, n1, n0);
 				lRev.setFreespeed(1.34);
 				lRev.setLength(length);
@@ -406,12 +405,12 @@ public class BiPedExperiments {
 	private static void createNetwork(Scenario sc,int lastNode) {
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
-		Node n0 = fac.createNode(new IdImpl(-2), new CoordImpl(-25,OUTER_RADIUS-WIDTH/2));
-		Node n1 = fac.createNode(new IdImpl(-1), new CoordImpl(0.1,OUTER_RADIUS-WIDTH/2+0.001));
-		Node n2 = fac.createNode(new IdImpl(0), new CoordImpl(0.5,OUTER_RADIUS-WIDTH/2));
-		Node n3 = fac.createNode(new IdImpl(lastNode), new CoordImpl(-.5,OUTER_RADIUS-WIDTH/2));
-		Node n4 = fac.createNode(new IdImpl(lastNode+1), new CoordImpl(-0.1,OUTER_RADIUS-WIDTH/2+0.001));
-		Node n5 = fac.createNode(new IdImpl(lastNode+2), new CoordImpl(25,OUTER_RADIUS-WIDTH/2));
+		Node n0 = fac.createNode(Id.create(-2, Node.class), new CoordImpl(-25,OUTER_RADIUS-WIDTH/2));
+		Node n1 = fac.createNode(Id.create(-1, Node.class), new CoordImpl(0.1,OUTER_RADIUS-WIDTH/2+0.001));
+		Node n2 = fac.createNode(Id.create(0, Node.class), new CoordImpl(0.5,OUTER_RADIUS-WIDTH/2));
+		Node n3 = fac.createNode(Id.create(lastNode, Node.class), new CoordImpl(-.5,OUTER_RADIUS-WIDTH/2));
+		Node n4 = fac.createNode(Id.create(lastNode+1, Node.class), new CoordImpl(-0.1,OUTER_RADIUS-WIDTH/2+0.001));
+		Node n5 = fac.createNode(Id.create(lastNode+2, Node.class), new CoordImpl(25,OUTER_RADIUS-WIDTH/2));
 		net.addNode(n0);
 		net.addNode(n1);
 		net.addNode(n2);
@@ -419,15 +418,15 @@ public class BiPedExperiments {
 		net.addNode(n4);
 		net.addNode(n5);
 		double flow = MAX_FLOW * WIDTH;
-		Link l0 = fac.createLink(new IdImpl("l0"), n0, n1);
-		Link l1 = fac.createLink(new IdImpl("l1"), n1, n2);
-		Link l2 = fac.createLink(new IdImpl("l2"), n3, n4);
-		Link l3 = fac.createLink(new IdImpl("l3"), n4, n5);
+		Link l0 = fac.createLink(Id.create("l0", Link.class), n0, n1);
+		Link l1 = fac.createLink(Id.create("l1", Link.class), n1, n2);
+		Link l2 = fac.createLink(Id.create("l2", Link.class), n3, n4);
+		Link l3 = fac.createLink(Id.create("l3", Link.class), n4, n5);
 
-		Link l0Rev = fac.createLink(new IdImpl("l0_rev"), n1, n0);
-		Link l1Rev = fac.createLink(new IdImpl("l1_rev"), n2, n1);
-		Link l2Rev = fac.createLink(new IdImpl("l2_rev"), n4, n3);
-		Link l3Rev = fac.createLink(new IdImpl("l3_rev"), n5, n4);
+		Link l0Rev = fac.createLink(Id.create("l0_rev", Link.class), n1, n0);
+		Link l1Rev = fac.createLink(Id.create("l1_rev", Link.class), n2, n1);
+		Link l2Rev = fac.createLink(Id.create("l2_rev", Link.class), n4, n3);
+		Link l3Rev = fac.createLink(Id.create("l3_rev", Link.class), n5, n4);
 
 		Set<String> modes = new HashSet<String>();
 		modes.add("walk");modes.add("car");

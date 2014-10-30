@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.misc.Time;
 import org.opengis.feature.simple.SimpleFeature;
@@ -50,12 +50,12 @@ public class SeeCasino implements VisDebuggerAdditionalDrawer, LinkEnterEventHan
 	private final double ty = 6571899.87+15;
 
 	
-	private final Id enter0 = new IdImpl("sim2d_4_rev_-12468");
-	private final Id enter1 = new IdImpl("sim2d_0_rev_-12724");
-	private final Id leave = new IdImpl("sim2d_0_-12622");
+	private final Id<Link> enter0 = Id.create("sim2d_4_rev_-12468", Link.class);
+	private final Id<Link> enter1 = Id.create("sim2d_0_rev_-12724", Link.class);
+	private final Id<Link> leave = Id.create("sim2d_0_-12622", Link.class);
 	
-	private final Id leave1 = new IdImpl("sim2d_4_-12468");
-	private final Id leave2 = new IdImpl("sim2d_0_-12724");
+	private final Id<Link> leave1 = Id.create("sim2d_4_-12468", Link.class);
+	private final Id<Link> leave2 = Id.create("sim2d_0_-12724", Link.class);
 	double avgQueueTime = 0;
 	int count = 0;
 	

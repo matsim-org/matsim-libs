@@ -26,7 +26,7 @@ import java.util.List;
 import org.geotools.referencing.CRS;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.testcases.MatsimTestCase;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
@@ -88,7 +88,7 @@ public class SerializerDeserializerTest extends MatsimTestCase {
 		Envelope e = new Envelope(c0,c1);
 		
 		Sim2DEnvironment env = new Sim2DEnvironment();
-		env.setId(new IdImpl("env0"));		
+		env.setId(Id.create("env0", Sim2DEnvironment.class));		
 		env.setEnvelope(e);
 		CoordinateReferenceSystem crs = null;
 		try {
@@ -99,8 +99,8 @@ public class SerializerDeserializerTest extends MatsimTestCase {
 			throw new IllegalArgumentException(e1);
 		}
 		env.setCRS(crs);
-		Section sec = env.createAndAddSection(new IdImpl("sec0"), p, new int[]{0,2}, new Id[]{new IdImpl("sec0")}, level);
-		sec.addRelatedLinkId(new IdImpl("666"));
+		Section sec = env.createAndAddSection(Id.create("sec0", Section.class), p, new int[]{0,2}, new Id[]{Id.create("sec0", Section.class)}, level);
+		sec.addRelatedLinkId(Id.create("666", Link.class));
 
 		new Sim2DEnvironmentWriter02(env).write(outDir + "/test.gml");
 
@@ -122,8 +122,8 @@ public class SerializerDeserializerTest extends MatsimTestCase {
 		assertEquals(sec.getLevel(), testSec.getLevel());
 		assertEquals(sec.getNeighbors().length,testSec.getNeighbors().length);
 		for (int i = 0; i < sec.getNeighbors().length; i++) {
-			Id id = sec.getNeighbors()[i];
-			Id testId = testSec.getNeighbors()[i];
+			Id<Section> id = sec.getNeighbors()[i];
+			Id<Section> testId = testSec.getNeighbors()[i];
 			assertEquals(id,testId);
 		}
 		assertEquals(sec.getOpenings().length, testSec.getOpenings().length);

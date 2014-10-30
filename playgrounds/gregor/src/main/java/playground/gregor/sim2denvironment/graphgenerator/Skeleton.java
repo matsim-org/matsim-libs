@@ -6,7 +6,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.collections.QuadTree;
 
 import playground.gregor.sim2denvironment.GisDebugger;
@@ -45,7 +46,7 @@ public class Skeleton {
 			return neighbors.iterator().next();
 		}
 
-		SkeletonNode ret = new SkeletonNode(from, new IdImpl(this.nodeNums++));
+		SkeletonNode ret = new SkeletonNode(from, Id.create(this.nodeNums++, Node.class));
 		addNode(ret);
 		return ret;
 	}

@@ -26,14 +26,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.Tuple;
 
 public class OSM {
 	
 	private final List<OSMNode> nodes = new ArrayList<OSMNode>();
 	private final List<OSMWay> ways = new ArrayList<OSMWay>();
-	private final Set<Id> refNodes = new HashSet<Id>();
+	private final Set<Long> refNodes = new HashSet<>();
 	private final List<OSMRelation> relations = new ArrayList<OSMRelation>();
 
 	
@@ -73,7 +72,7 @@ public class OSM {
 		return this.nodes;
 	}
 	
-	/*package*/ Set<Id> getRefNodes() {
+	/*package*/ Set<Long> getRefNodes() {
 		return this.refNodes;
 	}
 	

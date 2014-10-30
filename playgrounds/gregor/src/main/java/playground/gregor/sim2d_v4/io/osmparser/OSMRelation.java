@@ -25,22 +25,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.matsim.api.core.v01.Id;
-
 public class OSMRelation implements OSMElement{
 
 	private final Map<String,String> tags = new HashMap<String,String>();
 	
 	private final List<Member> members = new ArrayList<Member>();
 	
-	private final Id id;
+	private final long id;
 
-	public OSMRelation(Id id) {
+	public OSMRelation(long id) {
 		this.id = id;
 	}
 
 	@Override
-	public Id getId() {
+	public long getId() {
 		return this.id;
 	}
 
@@ -66,10 +64,10 @@ public class OSMRelation implements OSMElement{
 	public static final class Member {
 		
 		private final String type;
-		private final Id ref;
+		private final long ref;
 		private final String role;
 		
-		public Member(String type, Id ref, String role) {
+		public Member(String type, long ref, String role) {
 			this.type = type;
 			this.ref = ref;
 			this.role = role;
@@ -79,7 +77,7 @@ public class OSMRelation implements OSMElement{
 			return this.type;
 		}
 		
-		public Id getRefId() {
+		public long getRefId() {
 			return this.ref;
 		}
 		

@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -65,7 +64,7 @@ public class SimplePopulationGenerator {
 		Sim2DConfig s2dc = Sim2DConfigUtils.loadConfig("/Users/laemmel/devel/burgdorf2d/input/s2d_config.xml");
 		Sim2DScenario s2dsc = Sim2DScenarioUtils.loadSim2DScenario(s2dc);
 		
-		Id target = new IdImpl("sim2d_0_174673140");
+		Id<Link> target = Id.create("sim2d_0_174673140", Link.class);
 		Population pop = sc.getPopulation();
 		pop.getPersons().clear();
 		PopulationFactory fac = pop.getFactory();
@@ -90,7 +89,7 @@ public class SimplePopulationGenerator {
 					if (a == 192) {
 						time = 11.5;
 					}
-					Person pers = fac.createPerson(new IdImpl("b"+a++));
+					Person pers = fac.createPerson(Id.create("b"+a++, Person.class));
 					Plan plan = fac.createPlan();
 					pers.addPlan(plan);
 					Activity act0;

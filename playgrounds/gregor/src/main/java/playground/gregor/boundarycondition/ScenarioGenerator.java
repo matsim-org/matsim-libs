@@ -26,6 +26,7 @@ import java.util.LinkedList;
 import java.util.Set;
 
 import org.geotools.referencing.CRS;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -38,7 +39,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -191,9 +191,9 @@ public class ScenarioGenerator {
 
 
 		//		NetworkChangeEvent ee = fac.createNetworkChangeEvent(0);
-		//		ee.addLink(sc.getNetwork().getLinks().get(new IdImpl("l2")));
-		////		ee.addLink(sc.getNetwork().getLinks().get(new IdImpl("l6")));
-		////		ee.addLink(sc.getNetwork().getLinks().get(new IdImpl("t_l6")));
+		//		ee.addLink(sc.getNetwork().getLinks().get(Id.create("l2")));
+		////		ee.addLink(sc.getNetwork().getLinks().get(Id.create("l6")));
+		////		ee.addLink(sc.getNetwork().getLinks().get(Id.create("t_l6")));
 		//		ChangeValue ccv = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE,0.01);
 		//		ee.setFlowCapacityChange(ccv);
 		//		events.add(ee);
@@ -202,31 +202,31 @@ public class ScenarioGenerator {
 		for (double time = 0; time < 120*60; time += 240) {
 
 			NetworkChangeEvent e = fac.createNetworkChangeEvent(time);
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l0")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l1")));
-//			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l2")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l3")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l4")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l5")));
-//			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l6")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l7")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("t_l4")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("t_l5")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("t_l6")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("t_l7")));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("l0", Link.class)));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("l1", Link.class)));
+//			e.addLink(sc.getNetwork().getLinks().get(Id.create("l2", Link.class)));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("l3", Link.class)));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("l4", Link.class)));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("l5", Link.class)));
+//			e.addLink(sc.getNetwork().getLinks().get(Id.create("l6", Link.class)));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("l7", Link.class)));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("t_l4", Link.class)));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("t_l5", Link.class)));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("t_l6", Link.class)));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("t_l7", Link.class)));
 
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l0_rev")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l1_rev")));
-//			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l2_rev")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l3_rev")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l4_rev")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l5_rev")));
-//			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l6_rev")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l7_rev")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("t_l4_rev")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("t_l5_rev")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("t_l6_rev")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("t_l7_rev")));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("l0_rev", Link.class)));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("l1_rev", Link.class)));
+//			e.addLink(sc.getNetwork().getLinks().get(Id.create("l2_rev", Link.class)));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("l3_rev", Link.class)));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("l4_rev", Link.class)));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("l5_rev", Link.class)));
+//			e.addLink(sc.getNetwork().getLinks().get(Id.create("l6_rev", Link.class)));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("l7_rev", Link.class)));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("t_l4_rev", Link.class)));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("t_l5_rev", Link.class)));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("t_l6_rev", Link.class)));
+			e.addLink(sc.getNetwork().getLinks().get(Id.create("t_l7_rev", Link.class)));
 
 			System.out.println(time/60 + " flow" + flowCap/4); 
 
@@ -235,10 +235,10 @@ public class ScenarioGenerator {
 			events.add(e);
 
 			NetworkChangeEvent ee1 = fac.createNetworkChangeEvent(time);
-			ee1.addLink(sc.getNetwork().getLinks().get(new IdImpl("l2")));
-			ee1.addLink(sc.getNetwork().getLinks().get(new IdImpl("l6")));
-			//			ee.addLink(sc.getNetwork().getLinks().get(new IdImpl("l6")));
-			//			ee.addLink(sc.getNetwork().getLinks().get(new IdImpl("t_l6")));
+			ee1.addLink(sc.getNetwork().getLinks().get(Id.create("l2", Link.class)));
+			ee1.addLink(sc.getNetwork().getLinks().get(Id.create("l6", Link.class)));
+			//			ee.addLink(sc.getNetwork().getLinks().get(Id.create("l6")));
+			//			ee.addLink(sc.getNetwork().getLinks().get(Id.create("t_l6")));
 			if (time < 35*60) {
 				ChangeValue ccv1 = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE,0.95*flowCap);
 
@@ -264,14 +264,14 @@ public class ScenarioGenerator {
 		//		flowCap -= incr;
 		//		for (double time = 20*60; time < 40*60; time += 120) {
 		//			NetworkChangeEvent e = fac.createNetworkChangeEvent(time);
-		//			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l0")));
-		//			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l4")));
-		//			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("t_l4")));
-		////			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("mt_l4")));
-		//			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("t_l7_rev")));
-		////			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("mt_l7_rev")));
-		//			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l3_rev")));
-		//			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l7_rev")));
+		//			e.addLink(sc.getNetwork().getLinks().get(Id.create("l0")));
+		//			e.addLink(sc.getNetwork().getLinks().get(Id.create("l4")));
+		//			e.addLink(sc.getNetwork().getLinks().get(Id.create("t_l4")));
+		////			e.addLink(sc.getNetwork().getLinks().get(Id.create("mt_l4")));
+		//			e.addLink(sc.getNetwork().getLinks().get(Id.create("t_l7_rev")));
+		////			e.addLink(sc.getNetwork().getLinks().get(Id.create("mt_l7_rev")));
+		//			e.addLink(sc.getNetwork().getLinks().get(Id.create("l3_rev")));
+		//			e.addLink(sc.getNetwork().getLinks().get(Id.create("l7_rev")));
 		//			ChangeValue cv = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, flowCap);
 		//			e.setFlowCapacityChange(cv);
 		//			events.add(e);
@@ -290,16 +290,16 @@ public class ScenarioGenerator {
 		PopulationFactory fac = pop.getFactory();
 		double t = 0;
 		for (int i = 0; i < nrAgents; i++) {
-			Person pers = fac.createPerson(new IdImpl("d"+i));
+			Person pers = fac.createPerson(Id.create("d"+i, Person.class));
 			Plan plan = fac.createPlan();
 			pers.addPlan(plan);
 			Activity act0;
-			act0 = fac.createActivityFromLinkId("origin", new IdImpl("l0"));
+			act0 = fac.createActivityFromLinkId("origin", Id.create("l0", Link.class));
 			act0.setEndTime(t);
 			plan.addActivity(act0);
 			Leg leg = fac.createLeg("car");
 			plan.addLeg(leg);
-			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("l3"));
+			Activity act1 = fac.createActivityFromLinkId("destination", Id.create("l3", Link.class));
 			plan.addActivity(act1);
 			pop.addPerson(pers);
 			//			t += 2;
@@ -312,16 +312,16 @@ public class ScenarioGenerator {
 			return;
 		}
 		for (int i = nrAgents; i < 2*nrAgents; i++) {
-			Person pers = fac.createPerson(new IdImpl("d"+i));
+			Person pers = fac.createPerson(Id.create("d"+i, Person.class));
 			Plan plan = fac.createPlan();
 			pers.addPlan(plan);
 			Activity act0;
-			act0 = fac.createActivityFromLinkId("origin", new IdImpl("l3_rev"));
+			act0 = fac.createActivityFromLinkId("origin", Id.create("l3_rev", Link.class));
 			act0.setEndTime(t);
 			plan.addActivity(act0);
 			Leg leg = fac.createLeg("car");
 			plan.addLeg(leg);
-			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("l0_rev"));
+			Activity act1 = fac.createActivityFromLinkId("destination", Id.create("l0_rev", Link.class));
 			plan.addActivity(act1);
 			pop.addPerson(pers);
 			////			t += .5;
@@ -338,16 +338,16 @@ public class ScenarioGenerator {
 		PopulationFactory fac = pop.getFactory();
 		double t = 0;
 		for (int i = 0; i < nrAgents; i++) {
-			Person pers = fac.createPerson(new IdImpl("c"+i));
+			Person pers = fac.createPerson(Id.create("c"+i, Person.class));
 			Plan plan = fac.createPlan();
 			pers.addPlan(plan);
 			Activity act0;
-			act0 = fac.createActivityFromLinkId("origin", new IdImpl("l4"));
+			act0 = fac.createActivityFromLinkId("origin", Id.create("l4", Link.class));
 			act0.setEndTime(t);
 			plan.addActivity(act0);
 			Leg leg = fac.createLeg("car");
 			plan.addLeg(leg);
-			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("l7"));
+			Activity act1 = fac.createActivityFromLinkId("destination", Id.create("l7", Link.class));
 			plan.addActivity(act1);
 			pop.addPerson(pers);
 			////			t += .5;
@@ -361,16 +361,16 @@ public class ScenarioGenerator {
 		}
 
 		for (int i = nrAgents; i < 2*nrAgents; i++) {
-			Person pers = fac.createPerson(new IdImpl("e"+i));
+			Person pers = fac.createPerson(Id.create("e"+i, Person.class));
 			Plan plan = fac.createPlan();
 			pers.addPlan(plan);
 			Activity act0;
-			act0 = fac.createActivityFromLinkId("origin", new IdImpl("l7_rev"));
+			act0 = fac.createActivityFromLinkId("origin", Id.create("l7_rev", Link.class));
 			act0.setEndTime(t);
 			plan.addActivity(act0);
 			Leg leg = fac.createLeg("car");
 			plan.addLeg(leg);
-			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("l4_rev"));
+			Activity act1 = fac.createActivityFromLinkId("destination", Id.create("l4_rev", Link.class));
 			plan.addActivity(act1);
 			pop.addPerson(pers);
 			////			t += .5;
@@ -387,16 +387,16 @@ public class ScenarioGenerator {
 		PopulationFactory fac = pop.getFactory();
 		double t = 0;
 		for (int i = 0; i < nrAgents; i++) {
-			Person pers = fac.createPerson(new IdImpl("t_c"+i));
+			Person pers = fac.createPerson(Id.create("t_c"+i, Person.class));
 			Plan plan = fac.createPlan();
 			pers.addPlan(plan);
 			Activity act0;
-			act0 = fac.createActivityFromLinkId("origin", new IdImpl("t_l4"));
+			act0 = fac.createActivityFromLinkId("origin", Id.create("t_l4", Link.class));
 			act0.setEndTime(t);
 			plan.addActivity(act0);
 			Leg leg = fac.createLeg("car");
 			plan.addLeg(leg);
-			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("t_l7"));
+			Activity act1 = fac.createActivityFromLinkId("destination", Id.create("t_l7", Link.class));
 			plan.addActivity(act1);
 			pop.addPerson(pers);
 			////			t += .5;
@@ -410,16 +410,16 @@ public class ScenarioGenerator {
 		}
 
 		for (int i = nrAgents; i < 2*nrAgents; i++) {
-			Person pers = fac.createPerson(new IdImpl("t_e"+i));
+			Person pers = fac.createPerson(Id.create("t_e"+i, Person.class));
 			Plan plan = fac.createPlan();
 			pers.addPlan(plan);
 			Activity act0;
-			act0 = fac.createActivityFromLinkId("origin", new IdImpl("t_l7_rev"));
+			act0 = fac.createActivityFromLinkId("origin", Id.create("t_l7_rev", Link.class));
 			act0.setEndTime(t);
 			plan.addActivity(act0);
 			Leg leg = fac.createLeg("car");
 			plan.addLeg(leg);
-			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("t_l4_rev"));
+			Activity act1 = fac.createActivityFromLinkId("destination", Id.create("t_l4_rev", Link.class));
 			plan.addActivity(act1);
 			pop.addPerson(pers);
 			////			t += .5;
@@ -437,16 +437,16 @@ public class ScenarioGenerator {
 		PopulationFactory fac = pop.getFactory();
 		double t = 0;
 		for (int i = 0; i < nrAgents; i++) {
-			Person pers = fac.createPerson(new IdImpl("mt_c"+i));
+			Person pers = fac.createPerson(Id.create("mt_c"+i, Person.class));
 			Plan plan = fac.createPlan();
 			pers.addPlan(plan);
 			Activity act0;
-			act0 = fac.createActivityFromLinkId("origin", new IdImpl("mt_l4"));
+			act0 = fac.createActivityFromLinkId("origin", Id.create("mt_l4", Link.class));
 			act0.setEndTime(t);
 			plan.addActivity(act0);
 			Leg leg = fac.createLeg("car");
 			plan.addLeg(leg);
-			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("mt_l7"));
+			Activity act1 = fac.createActivityFromLinkId("destination", Id.create("mt_l7", Link.class));
 			plan.addActivity(act1);
 			pop.addPerson(pers);
 			////			t += .5;
@@ -460,16 +460,16 @@ public class ScenarioGenerator {
 		}
 
 		for (int i = nrAgents; i < 2*nrAgents; i++) {
-			Person pers = fac.createPerson(new IdImpl("mt_e"+i));
+			Person pers = fac.createPerson(Id.create("mt_e"+i, Person.class));
 			Plan plan = fac.createPlan();
 			pers.addPlan(plan);
 			Activity act0;
-			act0 = fac.createActivityFromLinkId("origin", new IdImpl("mt_l7_rev"));
+			act0 = fac.createActivityFromLinkId("origin", Id.create("mt_l7_rev", Link.class));
 			act0.setEndTime(t);
 			plan.addActivity(act0);
 			Leg leg = fac.createLeg("car");
 			plan.addLeg(leg);
-			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("mt_l4_rev"));
+			Activity act1 = fac.createActivityFromLinkId("destination", Id.create("mt_l4_rev", Link.class));
 			plan.addActivity(act1);
 			pop.addPerson(pers);
 			////			t += .5;
@@ -482,7 +482,7 @@ public class ScenarioGenerator {
 
 	private static void create2DWorld(Sim2DScenario sc2) {
 		Sim2DEnvironment env = new Sim2DEnvironment();
-		env.setId(new IdImpl("env0"));
+		env.setId(Id.create("env0", Sim2DEnvironment.class));
 
 		sc2.addSim2DEnvironment(env);
 
@@ -511,15 +511,15 @@ public class ScenarioGenerator {
 		Coordinate[] coords = {c0,c1,c2,c3,c4};
 		LinearRing lr = geofac.createLinearRing(coords );
 		Polygon p = geofac.createPolygon(lr , null);
-		Section sec = env.createAndAddSection(new IdImpl("sec0"), p, open, null, 0);
+		Section sec = env.createAndAddSection(Id.create("sec0", Section.class), p, open, null, 0);
 
 		NetworkImpl net = NetworkImpl.createNetwork();
 		NetworkFactoryImpl fac = net.getFactory();
-		NodeImpl n0 = fac.createNode(new IdImpl(2), new CoordImpl(5,-.001));
-		NodeImpl n1 = fac.createNode(new IdImpl(3), new CoordImpl(35,0));
+		NodeImpl n0 = fac.createNode(Id.create(2, Node.class), new CoordImpl(5,-.001));
+		NodeImpl n1 = fac.createNode(Id.create(3, Node.class), new CoordImpl(35,0));
 		net.addNode(n0);
 		net.addNode(n1);
-		IdImpl id = new IdImpl("l2d0");
+		Id<Link> id = Id.create("l2d0", Link.class);
 		Link l = fac.createLink(id, n0, n1);
 
 		double flow = 4 *SEPC_FLOW;
@@ -531,7 +531,7 @@ public class ScenarioGenerator {
 		l.setAllowedModes(modes);
 		net.addLink(l);
 
-		IdImpl idRev = new IdImpl("l2d0_rev");
+		Id<Link> idRev = Id.create("l2d0_rev", Link.class);
 		Link lRev = fac.createLink(idRev, n1, n0);
 		lRev.setFreespeed(1.34);
 		lRev.setLength(30);
@@ -548,7 +548,7 @@ public class ScenarioGenerator {
 
 	private static void create2DWorldII(Sim2DScenario sc2) {
 		Sim2DEnvironment env = new Sim2DEnvironment();
-		env.setId(new IdImpl("env1"));
+		env.setId(Id.create("env1", Sim2DEnvironment.class));
 
 		sc2.addSim2DEnvironment(env);
 
@@ -577,15 +577,15 @@ public class ScenarioGenerator {
 		Coordinate[] coords = {c0,c1,c2,c3,c4};
 		LinearRing lr = geofac.createLinearRing(coords );
 		Polygon p = geofac.createPolygon(lr , null);
-		Section sec = env.createAndAddSection(new IdImpl("sec0"), p, open, null, 0);
+		Section sec = env.createAndAddSection(Id.create("sec0", Section.class), p, open, null, 0);
 
 		NetworkImpl net = NetworkImpl.createNetwork();
 		NetworkFactoryImpl fac = net.getFactory();
-		NodeImpl n0 = fac.createNode(new IdImpl(8), new CoordImpl(5,10-.001));
-		NodeImpl n1 = fac.createNode(new IdImpl(9), new CoordImpl(35,10));
+		NodeImpl n0 = fac.createNode(Id.create(8, Node.class), new CoordImpl(5,10-.001));
+		NodeImpl n1 = fac.createNode(Id.create(9, Node.class), new CoordImpl(35,10));
 		net.addNode(n0);
 		net.addNode(n1);
-		IdImpl id = new IdImpl("l5d0");
+		Id<Link> id = Id.create("l5d0", Link.class);
 		Link l = fac.createLink(id, n0, n1);
 
 		double flow = 4 *SEPC_FLOW;
@@ -597,7 +597,7 @@ public class ScenarioGenerator {
 		l.setAllowedModes(modes);
 		net.addLink(l);
 
-		IdImpl idRev = new IdImpl("l5d0_rev");
+		Id<Link> idRev = Id.create("l5d0_rev", Link.class);
 		Link lRev = fac.createLink(idRev, n1, n0);
 		lRev.setFreespeed(1.34);
 		lRev.setLength(30);
@@ -615,12 +615,12 @@ public class ScenarioGenerator {
 	private static void createNetwork(Scenario sc) {
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
-		Node n0 = fac.createNode(new IdImpl(0), new CoordImpl(-23,0));
-		Node n1 = fac.createNode(new IdImpl(1), new CoordImpl(-9,0.01));
-		Node n2 = fac.createNode(new IdImpl(2), new CoordImpl(5,-.001));
-		Node n3 = fac.createNode(new IdImpl(3), new CoordImpl(35,0));
-		Node n4 = fac.createNode(new IdImpl(4), new CoordImpl(49,0.01));
-		Node n5 = fac.createNode(new IdImpl(5), new CoordImpl(63,0.02));
+		Node n0 = fac.createNode(Id.create(0, Node.class), new CoordImpl(-23,0));
+		Node n1 = fac.createNode(Id.create(1, Node.class), new CoordImpl(-9,0.01));
+		Node n2 = fac.createNode(Id.create(2, Node.class), new CoordImpl(5,-.001));
+		Node n3 = fac.createNode(Id.create(3, Node.class), new CoordImpl(35,0));
+		Node n4 = fac.createNode(Id.create(4, Node.class), new CoordImpl(49,0.01));
+		Node n5 = fac.createNode(Id.create(5, Node.class), new CoordImpl(63,0.02));
 		net.addNode(n0);
 		net.addNode(n1);
 		net.addNode(n2);
@@ -628,15 +628,15 @@ public class ScenarioGenerator {
 		net.addNode(n4);
 		net.addNode(n5);
 		double flow = SEPC_FLOW * 4;
-		Link l0 = fac.createLink(new IdImpl("l0"), n0, n1);
-		Link l1 = fac.createLink(new IdImpl("l1"), n1, n2);
-		Link l2 = fac.createLink(new IdImpl("l2"), n3, n4);
-		Link l3 = fac.createLink(new IdImpl("l3"), n4, n5);
+		Link l0 = fac.createLink(Id.create("l0", Link.class), n0, n1);
+		Link l1 = fac.createLink(Id.create("l1", Link.class), n1, n2);
+		Link l2 = fac.createLink(Id.create("l2", Link.class), n3, n4);
+		Link l3 = fac.createLink(Id.create("l3", Link.class), n4, n5);
 
-		Link l0Rev = fac.createLink(new IdImpl("l0_rev"), n1, n0);
-		Link l1Rev = fac.createLink(new IdImpl("l1_rev"), n2, n1);
-		Link l2Rev = fac.createLink(new IdImpl("l2_rev"), n4, n3);
-		Link l3Rev = fac.createLink(new IdImpl("l3_rev"), n5, n4);
+		Link l0Rev = fac.createLink(Id.create("l0_rev", Link.class), n1, n0);
+		Link l1Rev = fac.createLink(Id.create("l1_rev", Link.class), n2, n1);
+		Link l2Rev = fac.createLink(Id.create("l2_rev", Link.class), n4, n3);
+		Link l3Rev = fac.createLink(Id.create("l3_rev", Link.class), n5, n4);
 
 		Set<String> modes = new HashSet<String>();
 		modes.add("walk");modes.add("car");
@@ -709,12 +709,12 @@ public class ScenarioGenerator {
 	private static void createNetworkII(Scenario sc) {
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
-		Node n0 = fac.createNode(new IdImpl(6), new CoordImpl(-20,10));
-		Node n1 = fac.createNode(new IdImpl(7), new CoordImpl(-9,10.01));
-		Node n2 = fac.createNode(new IdImpl(8), new CoordImpl(5,9.999));
-		Node n3 = fac.createNode(new IdImpl(9), new CoordImpl(35,10));
-		Node n4 = fac.createNode(new IdImpl(10), new CoordImpl(42,10.01));
-		Node n5 = fac.createNode(new IdImpl(11), new CoordImpl(43,10));
+		Node n0 = fac.createNode(Id.create(6, Node.class), new CoordImpl(-20,10));
+		Node n1 = fac.createNode(Id.create(7, Node.class), new CoordImpl(-9,10.01));
+		Node n2 = fac.createNode(Id.create(8, Node.class), new CoordImpl(5,9.999));
+		Node n3 = fac.createNode(Id.create(9, Node.class), new CoordImpl(35,10));
+		Node n4 = fac.createNode(Id.create(10, Node.class), new CoordImpl(42,10.01));
+		Node n5 = fac.createNode(Id.create(11, Node.class), new CoordImpl(43,10));
 		net.addNode(n0);
 		net.addNode(n1);
 		net.addNode(n2);
@@ -722,10 +722,10 @@ public class ScenarioGenerator {
 		net.addNode(n4);
 		net.addNode(n5);
 		double flow = SEPC_FLOW * 4;
-		Link l0 = fac.createLink(new IdImpl("l4"), n0, n1);
-		Link l1 = fac.createLink(new IdImpl("l5"), n1, n2);
-		Link l2 = fac.createLink(new IdImpl("l6"), n3, n4);
-		Link l3 = fac.createLink(new IdImpl("l7"), n4, n5);
+		Link l0 = fac.createLink(Id.create("l4", Link.class), n0, n1);
+		Link l1 = fac.createLink(Id.create("l5", Link.class), n1, n2);
+		Link l2 = fac.createLink(Id.create("l6", Link.class), n3, n4);
+		Link l3 = fac.createLink(Id.create("l7", Link.class), n4, n5);
 		Set<String> modes = new HashSet<String>();
 		modes.add("walk");modes.add("car");
 		l0.setLength(6);
@@ -763,12 +763,12 @@ public class ScenarioGenerator {
 	private static void createNetworkIII(Scenario sc) {
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
-		Node n0 = fac.createNode(new IdImpl(6), new CoordImpl(-23,10));
-		Node n1 = fac.createNode(new IdImpl(7), new CoordImpl(-9,10.01));
-		Node n2 = fac.createNode(new IdImpl(8), new CoordImpl(5,9.999));
-		Node n3 = fac.createNode(new IdImpl(9), new CoordImpl(35,10));
-		Node n4 = fac.createNode(new IdImpl(10), new CoordImpl(49,10.01));
-		Node n5 = fac.createNode(new IdImpl(11), new CoordImpl(63,10));
+		Node n0 = fac.createNode(Id.create( 6, Node.class), new CoordImpl(-23,10));
+		Node n1 = fac.createNode(Id.create( 7, Node.class), new CoordImpl(-9,10.01));
+		Node n2 = fac.createNode(Id.create( 8, Node.class), new CoordImpl(5,9.999));
+		Node n3 = fac.createNode(Id.create( 9, Node.class), new CoordImpl(35,10));
+		Node n4 = fac.createNode(Id.create(10, Node.class), new CoordImpl(49,10.01));
+		Node n5 = fac.createNode(Id.create(11, Node.class), new CoordImpl(63,10));
 		net.addNode(n0);
 		net.addNode(n1);
 		net.addNode(n2);
@@ -776,17 +776,17 @@ public class ScenarioGenerator {
 		net.addNode(n4);
 		net.addNode(n5);
 		double flow = SEPC_FLOW * 4;
-		Link l0 = fac.createLink(new IdImpl("l4"), n0, n1);
-		Link l1 = fac.createLink(new IdImpl("l5"), n1, n2);
-//		Link l1b = fac.createLink(new IdImpl("l5b"), n2, n3);
-		Link l2 = fac.createLink(new IdImpl("l6"), n3, n4);
-		Link l3 = fac.createLink(new IdImpl("l7"), n4, n5);
+		Link l0 = fac.createLink(Id.create("l4", Link.class), n0, n1);
+		Link l1 = fac.createLink(Id.create("l5", Link.class), n1, n2);
+//		Link l1b = fac.createLink(Id.create("l5b", Link.class), n2, n3);
+		Link l2 = fac.createLink(Id.create("l6", Link.class), n3, n4);
+		Link l3 = fac.createLink(Id.create("l7", Link.class), n4, n5);
 
-		Link l0Rev = fac.createLink(new IdImpl("l4_rev"), n1, n0);
-		Link l1Rev = fac.createLink(new IdImpl("l5_rev"), n2, n1);
-//		Link l1bRev = fac.createLink(new IdImpl("l5b_rev"), n3, n2);
-		Link l2Rev = fac.createLink(new IdImpl("l6_rev"), n4, n3);
-		Link l3Rev = fac.createLink(new IdImpl("l7_rev"), n5, n4);
+		Link l0Rev = fac.createLink(Id.create("l4_rev", Link.class), n1, n0);
+		Link l1Rev = fac.createLink(Id.create("l5_rev", Link.class), n2, n1);
+//		Link l1bRev = fac.createLink(Id.create("l5b_rev", Link.class), n3, n2);
+		Link l2Rev = fac.createLink(Id.create("l6_rev", Link.class), n4, n3);
+		Link l3Rev = fac.createLink(Id.create("l7_rev", Link.class), n5, n4);
 
 		Set<String> modes = new HashSet<String>();
 		modes.add("walk");modes.add("car");
@@ -873,12 +873,12 @@ public class ScenarioGenerator {
 	private static void createNetworkIV(Scenario sc) {
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
-		Node n0 = fac.createNode(new IdImpl(12), new CoordImpl(-23,20));
-		Node n1 = fac.createNode(new IdImpl(13), new CoordImpl(-9,20.01));
-		Node n2 = fac.createNode(new IdImpl(14), new CoordImpl(5,19.999));
-		Node n3 = fac.createNode(new IdImpl(15), new CoordImpl(35,20));
-		Node n4 = fac.createNode(new IdImpl(16), new CoordImpl(49,20.01));
-		Node n5 = fac.createNode(new IdImpl(17), new CoordImpl(63,20));
+		Node n0 = fac.createNode(Id.create(12, Node.class), new CoordImpl(-23,20));
+		Node n1 = fac.createNode(Id.create(13, Node.class), new CoordImpl(-9,20.01));
+		Node n2 = fac.createNode(Id.create(14, Node.class), new CoordImpl(5,19.999));
+		Node n3 = fac.createNode(Id.create(15, Node.class), new CoordImpl(35,20));
+		Node n4 = fac.createNode(Id.create(16, Node.class), new CoordImpl(49,20.01));
+		Node n5 = fac.createNode(Id.create(17, Node.class), new CoordImpl(63,20));
 		net.addNode(n0);
 		net.addNode(n1);
 		net.addNode(n2);
@@ -886,17 +886,17 @@ public class ScenarioGenerator {
 		net.addNode(n4);
 		net.addNode(n5);
 		double flow = SEPC_FLOW * 4;
-		Link l0 = fac.createLink(new IdImpl("t_l4"), n0, n1);
-		Link l1 = fac.createLink(new IdImpl("t_l5"), n1, n2);
-		Link l1b = fac.createLink(new IdImpl("t_l5b"), n2, n3);
-		Link l2 = fac.createLink(new IdImpl("t_l6"), n3, n4);
-		Link l3 = fac.createLink(new IdImpl("t_l7"), n4, n5);
+		Link l0 = fac.createLink(Id.create("t_l4", Link.class), n0, n1);
+		Link l1 = fac.createLink(Id.create("t_l5", Link.class), n1, n2);
+		Link l1b = fac.createLink(Id.create("t_l5b", Link.class), n2, n3);
+		Link l2 = fac.createLink(Id.create("t_l6", Link.class), n3, n4);
+		Link l3 = fac.createLink(Id.create("t_l7", Link.class), n4, n5);
 
-		Link l0Rev = fac.createLink(new IdImpl("t_l4_rev"), n1, n0);
-		Link l1Rev = fac.createLink(new IdImpl("t_l5_rev"), n2, n1);
-		Link l1bRev = fac.createLink(new IdImpl("t_l5b_rev"), n3, n2);
-		Link l2Rev = fac.createLink(new IdImpl("t_l6_rev"), n4, n3);
-		Link l3Rev = fac.createLink(new IdImpl("t_l7_rev"), n5, n4);
+		Link l0Rev = fac.createLink(Id.create("t_l4_rev", Link.class), n1, n0);
+		Link l1Rev = fac.createLink(Id.create("t_l5_rev", Link.class), n2, n1);
+		Link l1bRev = fac.createLink(Id.create("t_l5b_rev", Link.class), n3, n2);
+		Link l2Rev = fac.createLink(Id.create("t_l6_rev", Link.class), n4, n3);
+		Link l3Rev = fac.createLink(Id.create("t_l7_rev", Link.class), n5, n4);
 
 		Set<String> modes = new HashSet<String>();
 		modes.add("walk");modes.add("car");
@@ -983,12 +983,12 @@ public class ScenarioGenerator {
 	private static void createNetworkV(Scenario sc) {
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
-		Node n0 = fac.createNode(new IdImpl(18), new CoordImpl(-23,30));
-		Node n1 = fac.createNode(new IdImpl(19), new CoordImpl(-9,30.01));
-		Node n2 = fac.createNode(new IdImpl(20), new CoordImpl(5,29.999));
-		Node n3 = fac.createNode(new IdImpl(21), new CoordImpl(35,30));
-		Node n4 = fac.createNode(new IdImpl(22), new CoordImpl(49,30.01));
-		Node n5 = fac.createNode(new IdImpl(23), new CoordImpl(63,30));
+		Node n0 = fac.createNode(Id.create(18, Node.class), new CoordImpl(-23,30));
+		Node n1 = fac.createNode(Id.create(19, Node.class), new CoordImpl(-9,30.01));
+		Node n2 = fac.createNode(Id.create(20, Node.class), new CoordImpl(5,29.999));
+		Node n3 = fac.createNode(Id.create(21, Node.class), new CoordImpl(35,30));
+		Node n4 = fac.createNode(Id.create(22, Node.class), new CoordImpl(49,30.01));
+		Node n5 = fac.createNode(Id.create(23, Node.class), new CoordImpl(63,30));
 		net.addNode(n0);
 		net.addNode(n1);
 		net.addNode(n2);
@@ -996,17 +996,17 @@ public class ScenarioGenerator {
 		net.addNode(n4);
 		net.addNode(n5);
 		double flow = SEPC_FLOW * 4;
-		Link l0 = fac.createLink(new IdImpl("mt_l4"), n0, n1);
-		Link l1 = fac.createLink(new IdImpl("mt_l5"), n1, n2);
-		Link l1b = fac.createLink(new IdImpl("mt_l5b"), n2, n3);
-		Link l2 = fac.createLink(new IdImpl("mt_l6"), n3, n4);
-		Link l3 = fac.createLink(new IdImpl("mt_l7"), n4, n5);
+		Link l0 = fac.createLink(Id.create("mt_l4", Link.class), n0, n1);
+		Link l1 = fac.createLink(Id.create("mt_l5", Link.class), n1, n2);
+		Link l1b = fac.createLink(Id.create("mt_l5b", Link.class), n2, n3);
+		Link l2 = fac.createLink(Id.create("mt_l6", Link.class), n3, n4);
+		Link l3 = fac.createLink(Id.create("mt_l7", Link.class), n4, n5);
 
-		Link l0Rev = fac.createLink(new IdImpl("mt_l4_rev"), n1, n0);
-		Link l1Rev = fac.createLink(new IdImpl("mt_l5_rev"), n2, n1);
-		Link l1bRev = fac.createLink(new IdImpl("mt_l5b_rev"), n3, n2);
-		Link l2Rev = fac.createLink(new IdImpl("mt_l6_rev"), n4, n3);
-		Link l3Rev = fac.createLink(new IdImpl("mt_l7_rev"), n5, n4);
+		Link l0Rev = fac.createLink(Id.create("mt_l4_rev", Link.class), n1, n0);
+		Link l1Rev = fac.createLink(Id.create("mt_l5_rev", Link.class), n2, n1);
+		Link l1bRev = fac.createLink(Id.create("mt_l5b_rev", Link.class), n3, n2);
+		Link l2Rev = fac.createLink(Id.create("mt_l6_rev", Link.class), n4, n3);
+		Link l3Rev = fac.createLink(Id.create("mt_l7_rev", Link.class), n5, n4);
 
 		Set<String> modes = new HashSet<String>();
 		modes.add("walk");modes.add("car");

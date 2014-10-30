@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -120,7 +119,7 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 
 	private static final double THRESHOLD = 1;
 
-	private HashMap<Id, OSMNode> nodes;
+	private HashMap<Long, OSMNode> nodes;
 	private final Map<CoordinateReferenceSystem,MathTransform> transforms = new HashMap<CoordinateReferenceSystem,MathTransform>();
 	private final OSM osm;
 	private final Sim2DScenario s2dsc;
@@ -154,7 +153,7 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 
 
 	private void buildEnvironment(OSM osm) {
-		this.nodes = new HashMap<Id,OSMNode>();
+		this.nodes = new HashMap<>();
 		for (OSMNode node : osm.getNodes()) {
 			this.nodes.put(node.getId(), node);
 
@@ -183,7 +182,7 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 			String v = way.getTags().get(K_M_TYPE);
 			if (v != null) { //sim2d 
 				String strEnvId = way.getTags().get(ENV_ID);
-				Sim2DEnvironment env = getOrCreateSim2DEnvironment(new IdImpl(strEnvId));
+				Sim2DEnvironment env = getOrCreateSim2DEnvironment(Id.create(strEnvId, Sim2DEnvironment.class));
 				if (v.equals(V_M_TYPE_ENV)) {
 					createSection(way,env);
 				} else if (v.equals(V_M_TYPE_NET)) {
@@ -279,15 +278,15 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 		double cellSize = ((NetworkImpl)net).getEffectiveCellSize();
 		double nofLanes = mw * MAX_DENSITY * cellSize/2;
 
-		String IdSuffix = way.getId().toString();
+		String IdSuffix = Long.toString(way.getId());
 		for (int i = 0; i < way.getNodeRefs().size()-1; i++) {
 
-			Id nid1 = way.getNodeRefs().get(i);
-			Id nid2 = way.getNodeRefs().get(i+1);
+			Id<Node> nid1 = Id.create(way.getNodeRefs().get(i), Node.class);
+			Id<Node> nid2 = Id.create(way.getNodeRefs().get(i+1), Node.class);
 			Node n1 = getOrCreateNode(nid1,env);
 			Node n2 = getOrCreateNode(nid2,env);
 
-			Id id0 = new IdImpl(LINK_ID_PREFIX+i+"_"+ IdSuffix);
+			Id<Link> id0 = Id.create(LINK_ID_PREFIX+i+"_"+ IdSuffix, Link.class);
 			Link l0 = fac.createLink(id0, n1, n2);
 			l0.setCapacity(capacity);
 			l0.setFreespeed(fs);
@@ -297,7 +296,7 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 			l0.setAllowedModes(modes);
 			net.addLink(l0);
 			if (way.getTags().get(K_M_ONEWAY) == null || !way.getTags().get(K_M_ONEWAY).equals("true")) {
-				Id id1 = new IdImpl(LINK_ID_PREFIX+i+"_rev_"+ IdSuffix);
+				Id<Link> id1 = Id.create(LINK_ID_PREFIX+i+"_rev_"+ IdSuffix, Link.class);
 				Link l1 = fac.createLink(id1, n2, n1);
 				l1.setCapacity(capacity);
 				l1.setFreespeed(fs);
@@ -310,7 +309,7 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 
 	}
 
-	private Sim2DEnvironment getOrCreateSim2DEnvironment(Id id) {
+	private Sim2DEnvironment getOrCreateSim2DEnvironment(Id<Sim2DEnvironment> id) {
 		Sim2DEnvironment env = this.s2dsc.getSim2DEnvironment(id);
 		if (env == null) {
 			env = new Sim2DEnvironment();
@@ -330,7 +329,7 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 	}
 
 
-	private Node getOrCreateNode(Id nid1, Sim2DEnvironment env) {
+	private Node getOrCreateNode(Id<Node> nid1, Sim2DEnvironment env) {
 		Node n1 = env.getEnvironmentNetwork().getNodes().get(nid1);
 		MathTransform transform = this.transforms.get(env.getCRS());
 		if (transform == null) {
@@ -369,7 +368,7 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 
 		Coordinate[] coords = new Coordinate[way.getNodeRefs().size()];
 		for (int i = 0; i < way.getNodeRefs().size(); i++) {
-			Id ref = way.getNodeRefs().get(i);
+			long ref = way.getNodeRefs().get(i);
 			OSMNode node = this.nodes.get(ref);
 			coords[i] = new Coordinate(node.getLon(),node.getLat());
 		}
@@ -381,7 +380,7 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 			throw new RuntimeException(e);
 		}
 
-		Id id = new IdImpl(way.getTags().get(K_ID));
+		Id<Section> id = Id.create(way.getTags().get(K_ID), Section.class);
 		Polygon p = geofac.createPolygon(lr, null);
 		for (Coordinate bc : p.getBoundary().getCoordinates()) {
 			env.getEnvelope().expandToInclude(bc);
@@ -396,12 +395,12 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 			}
 		}
 		String nString = way.getTags().get(K_NEIGHBORS);
-		Id[] n = null;
+		Id<Section>[] n = null;
 		if (nString != null) {
 			String[] nStringA = StringUtils.explode(nString, ' ');
 			n = new Id[nStringA.length];
 			for (int i = 0; i < nStringA.length; i++) {
-				n[i] = new IdImpl(nStringA[i]);
+				n[i] = Id.create(nStringA[i], Section.class);
 			}
 		}
 
