@@ -33,8 +33,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import playground.boescpa.lib.tools.scenarioAnalyzer.eventHandlers.AgentCounter;
 import playground.boescpa.lib.tools.scenarioAnalyzer.eventHandlers.ScenarioAnalyzerEventHandler;
+import playground.boescpa.lib.tools.scenarioAnalyzer.eventHandlers.TripActivityCrosscorrelator;
 import playground.boescpa.lib.tools.scenarioAnalyzer.eventHandlers.TripAnalyzer;
-import playground.boescpa.lib.tools.scenarioAnalyzer.spatialEventCutters.SpatialEventCutter;
 
 /**
  * @author boescpa
@@ -62,7 +62,8 @@ public class TestScenarioAnalyzer {
 		// Analyze the events:
 		ScenarioAnalyzerEventHandler[] handlers = {
 				new AgentCounter(network),
-				new TripAnalyzer(network)
+				new TripAnalyzer(network),
+				new TripActivityCrosscorrelator(network)
 		};
 		scenarioAnalyzer = new ScenarioAnalyzer(eventFile, 1, handlers);
 		scenarioAnalyzer.analyzeScenario();
