@@ -22,6 +22,7 @@ package playground.sergioo.weeklySimulation.analysis;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.LegHistogram;
+import org.matsim.analysis.LegHistogramChart;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -59,9 +60,9 @@ public class LegHistogramListener implements IterationEndsListener, IterationSta
 		this.histogram.write(controlerIO.getIterationFilename(event.getIteration(), "legHistogram.txt"));
 		this.printStats();
 		if (event.getControler().getConfig().controler().isCreateGraphs()) {
-			this.histogram.writeGraphic(controlerIO.getIterationFilename(event.getIteration(), "legHistogram_all.png"));
+			LegHistogramChart.writeGraphic(this.histogram, controlerIO.getIterationFilename(event.getIteration(), "legHistogram_all.png"));
 			for (String legMode : this.histogram.getLegModes()) {
-				this.histogram.writeGraphic(controlerIO.getIterationFilename(event.getIteration(), "legHistogram_" + legMode + ".png"), legMode);
+				LegHistogramChart.writeGraphic(this.histogram, controlerIO.getIterationFilename(event.getIteration(), "legHistogram_" + legMode + ".png"), legMode);
 			}
 		}
 

@@ -21,6 +21,7 @@ package playground.thibautd.analysis.listeners;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.LegHistogram;
+import org.matsim.analysis.LegHistogramChart;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -60,9 +61,9 @@ public class LegHistogramListenerWithoutControler implements IterationEndsListen
 		this.printStats();
 
 		if ( writeGraphicInterval < 1 || event.getIteration() % writeGraphicInterval == 0 ) {
-			this.histogram.writeGraphic( controlerIO.getIterationFilename(event.getIteration(), "legHistogram_all.png"));
+			LegHistogramChart.writeGraphic(this.histogram, controlerIO.getIterationFilename(event.getIteration(), "legHistogram_all.png"));
 			for (String legMode : this.histogram.getLegModes()) {
-				this.histogram.writeGraphic(controlerIO.getIterationFilename(event.getIteration(), "legHistogram_" + legMode + ".png"), legMode);
+				LegHistogramChart.writeGraphic(this.histogram, controlerIO.getIterationFilename(event.getIteration(), "legHistogram_" + legMode + ".png"), legMode);
 			}
 		}
 	}

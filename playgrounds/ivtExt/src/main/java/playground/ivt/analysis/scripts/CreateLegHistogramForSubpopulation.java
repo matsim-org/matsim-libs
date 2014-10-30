@@ -19,25 +19,20 @@
  * *********************************************************************** */
 package playground.ivt.analysis.scripts;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
-
 import org.matsim.analysis.LegHistogram;
+import org.matsim.analysis.LegHistogramChart;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -46,10 +41,12 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
-
 import playground.ivt.utils.ArgParser;
 import playground.ivt.utils.ArgParser.Args;
 import playground.ivt.utils.SubpopulationFilteringEventsManager;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author thibautd
@@ -106,7 +103,7 @@ public class CreateLegHistogramForSubpopulation {
 		new EventsReaderXMLv1( events ).parse( inputEventsFile );
 
 		if ( outputDataFile != null ) histogram.write( outputDataFile );
-		if ( outputFigure != null ) histogram.writeGraphic( outputFigure );
+		if ( outputFigure != null ) LegHistogramChart.writeGraphic(histogram, outputFigure);
 	}
 
 	private static Network readNetwork(final String f) {

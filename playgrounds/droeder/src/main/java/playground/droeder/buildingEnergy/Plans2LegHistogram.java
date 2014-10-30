@@ -18,12 +18,9 @@
  * *********************************************************************** */
 package playground.droeder.buildingEnergy;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.analysis.LegHistogram;
+import org.matsim.analysis.LegHistogramChart;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -38,6 +35,9 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.population.algorithms.PersonAlgorithm;
+
+import java.io.File;
+import java.util.List;
 
 /**
  * @author droeder
@@ -81,11 +81,11 @@ public abstract class Plans2LegHistogram {
 		
 		new MatsimPopulationReader(sc).readFile(plansfile);
 		
-		histo.writeGraphic(outputpath + "legHistogram_all.png");
+		LegHistogramChart.writeGraphic(histo, outputpath + "legHistogram_all.png");
 		log.info(outputpath + "legHistogram_all.png written.");
 		for(String mode : histo.getLegModes()){
 			String name = new String(mode).replace(System.getProperty("file.separator"), "");
-			histo.writeGraphic(outputpath + "legHistogram_" + name + ".png", mode);
+			LegHistogramChart.writeGraphic(histo, outputpath + "legHistogram_" + name + ".png", mode);
 			log.info(outputpath + "legHistogram_" + name + ".png written.");
 		}
 		OutputDirectoryLogging.closeOutputDirLogging();

@@ -42,11 +42,11 @@ public class Main2 {
 
 //        uncongested.getMultiRateRun("brute-corrected-prior").simulateRate("0", 3, 100.0);
 //        uncongested.getMultiRateRun("brute-corrected-prior").simulateRate("0", 3, 100.0);
-//        uncongested.getMultiRateRun("brute").simulateRate("5", 3, 100.0);
+        uncongested.getMultiRateRun("brute").simulateRate("5", 2, 100.0);
 
 
 //        uncongested.getMultiRateRun("random").persodisthisto();
-        uncongested.getMultiRateRun("random").summary();
+//        uncongested.getMultiRateRun("random").summary();
 
 
 //

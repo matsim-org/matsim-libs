@@ -20,15 +20,6 @@
 
 package org.matsim.analysis;
 
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartUtilities;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.CategoryAxis;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
@@ -37,10 +28,8 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.core.utils.misc.Time;
 
-import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Map;
 import java.util.Set;
@@ -51,14 +40,17 @@ import java.util.TreeMap;
  *
  * Counts the number of vehicles departed, arrived or got stuck per time bin
  * based on events.
+ *
+ * The chart plotting was moved to its own class.
+ * This class could be moved to trafficmonitoring.
+ *
  */
 public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler {
 
-	private int iteration = 0;
+    private int iteration = 0;
 	private final int binSize;
 	private final int nofBins;
-	private final Map<String, ModeData> data = new TreeMap<String, ModeData>();
-	private ModeData allModesData = null;
+	private final Map<String, DataFrame> data = new TreeMap<>();
 
 	/**
 	 * Creates a new LegHistogram with the specified binSize and the specified number of bins.
@@ -87,41 +79,35 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 	@Override
 	public void handleEvent(final PersonDepartureEvent event) {
 		int index = getBinIndex(event.getTime());
-		this.allModesData.countsDep[index]++;
 		if (event.getLegMode() != null) {
-			ModeData modeData = getDataForMode(event.getLegMode());
-			modeData.countsDep[index]++;
+			DataFrame dataFrame = getDataForMode(event.getLegMode());
+			dataFrame.countsDep[index]++;
 		}
 	}
 
 	@Override
 	public void handleEvent(final PersonArrivalEvent event) {
 		int index = getBinIndex(event.getTime());
-		this.allModesData.countsArr[index]++;
 		if (event.getLegMode() != null) {
-			ModeData modeData = getDataForMode(event.getLegMode());
-			modeData.countsArr[index]++;
+			DataFrame dataFrame = getDataForMode(event.getLegMode());
+			dataFrame.countsArr[index]++;
 		}
 	}
 
 	@Override
 	public void handleEvent(final PersonStuckEvent event) {
 		int index = getBinIndex(event.getTime());
-		this.allModesData.countsStuck[index]++;
 		if (event.getLegMode() != null) {
-			ModeData modeData = getDataForMode(event.getLegMode());
-			modeData.countsStuck[index]++;
+			DataFrame dataFrame = getDataForMode(event.getLegMode());
+			dataFrame.countsStuck[index]++;
 		}
 	}
 
 	@Override
 	public void reset(final int iter) {
 		this.iteration = iter;
-		this.allModesData = new ModeData(this.nofBins + 1);
 		this.data.clear();
 	}
-
-	/* output methods */
 
 	/**
 	 * Writes the gathered data tab-separated into a text file.
@@ -149,17 +135,18 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 		stream.print("\n");
 		int allEnRoute = 0;
 		int[] modeEnRoute = new int[this.data.size()];
-		for (int i = 0; i < this.allModesData.countsDep.length; i++) {
+        DataFrame allModesData = getAllModesData();
+        for (int i = 0; i < allModesData.countsDep.length; i++) {
 			// data about all modes
-			allEnRoute = allEnRoute + this.allModesData.countsDep[i] - this.allModesData.countsArr[i] - this.allModesData.countsStuck[i];
+			allEnRoute = allEnRoute + allModesData.countsDep[i] - allModesData.countsArr[i] - allModesData.countsStuck[i];
 			stream.print(Time.writeTime(i*this.binSize) + "\t" + i*this.binSize);
-			stream.print("\t" + this.allModesData.countsDep[i] + "\t" + this.allModesData.countsArr[i] + "\t" + this.allModesData.countsStuck[i] + "\t" + allEnRoute);
+			stream.print("\t" + allModesData.countsDep[i] + "\t" + allModesData.countsArr[i] + "\t" + allModesData.countsStuck[i] + "\t" + allEnRoute);
 
 			// data about single modes
 			int mode = 0;
-			for (ModeData modeData : this.data.values()) {
-				modeEnRoute[mode] = modeEnRoute[mode] + modeData.countsDep[i] - modeData.countsArr[i] - modeData.countsStuck[i];
-				stream.print("\t" + modeData.countsDep[i] + "\t" + modeData.countsArr[i] + "\t" + modeData.countsStuck[i] + "\t" + modeEnRoute[mode]);
+			for (DataFrame dataFrame : this.data.values()) {
+				modeEnRoute[mode] = modeEnRoute[mode] + dataFrame.countsDep[i] - dataFrame.countsArr[i] - dataFrame.countsStuck[i];
+				stream.print("\t" + dataFrame.countsDep[i] + "\t" + dataFrame.countsArr[i] + "\t" + dataFrame.countsStuck[i] + "\t" + modeEnRoute[mode]);
 				mode++;
 			}
 
@@ -168,86 +155,25 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 		}
 	}
 
-	/**
-	 * @return a graphic showing the number of departures, arrivals and vehicles
-	 * en route of all legs/trips
-	 */
-	public JFreeChart getGraphic() {
-		return getGraphic(this.allModesData, "all");
-	}
-
-	/**
-	 * @param legMode
-	 * @return a graphic showing the number of departures, arrivals and vehicles
-	 * en route for all legs with the specified transportation mode
-	 */
-	public JFreeChart getGraphic(final String legMode) {
-		return getGraphic(this.data.get(legMode), legMode);
-	}
-
-	private JFreeChart getGraphic(final ModeData modeData, final String modeName) {
-		final XYSeriesCollection xyData = new XYSeriesCollection();
-		final XYSeries departuresSerie = new XYSeries("departures", false, true);
-		final XYSeries arrivalsSerie = new XYSeries("arrivals", false, true);
-		final XYSeries onRouteSerie = new XYSeries("en route", false, true);
-		int onRoute = 0;
-		for (int i = 0; i < modeData.countsDep.length; i++) {
-			onRoute = onRoute + modeData.countsDep[i] - modeData.countsArr[i] - modeData.countsStuck[i];
-			double hour = i*this.binSize / 60.0 / 60.0;
-			departuresSerie.add(hour, modeData.countsDep[i]);
-			arrivalsSerie.add(hour, modeData.countsArr[i]);
-			onRouteSerie.add(hour, onRoute);
-		}
-
-		xyData.addSeries(departuresSerie);
-		xyData.addSeries(arrivalsSerie);
-		xyData.addSeries(onRouteSerie);
-
-		final JFreeChart chart = ChartFactory.createXYStepChart(
-        "Leg Histogram, " + modeName + ", it." + this.iteration,
-        "time", "# vehicles",
-        xyData,
-        PlotOrientation.VERTICAL,
-        true,   // legend
-        false,   // tooltips
-        false   // urls
-    );
-
-		XYPlot plot = chart.getXYPlot();
-
-		final CategoryAxis axis1 = new CategoryAxis("hour");
-		axis1.setTickLabelFont(new Font("SansSerif", Font.PLAIN, 7));
-		plot.setDomainAxis(new NumberAxis("time"));
-		
-		plot.getRenderer().setSeriesStroke(0, new BasicStroke(2.0f));
-		plot.getRenderer().setSeriesStroke(1, new BasicStroke(2.0f));
-		plot.getRenderer().setSeriesStroke(2, new BasicStroke(2.0f));
-		plot.setBackgroundPaint(Color.white);
-		plot.setRangeGridlinePaint(Color.gray);  
-		plot.setDomainGridlinePaint(Color.gray);  
-		
-		return chart;
-	}
-
-	/**
+    /**
 	 * @return number of departures per time-bin, for all legs
 	 */
 	public int[] getDepartures() {
-		return this.allModesData.countsDep.clone();
+		return this.getAllModesData().countsDep;
 	}
 
 	/**
 	 * @return number of all arrivals per time-bin, for all legs
 	 */
 	public int[] getArrivals() {
-		return this.allModesData.countsArr.clone();
+		return this.getAllModesData().countsArr;
 	}
 
 	/**
 	 * @return number of all vehicles that got stuck in a time-bin, for all legs
 	 */
 	public int[] getStuck() {
-		return this.allModesData.countsStuck.clone();
+		return this.getAllModesData().countsStuck;
 	}
 
 	/**
@@ -262,11 +188,11 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 	 * @return number of departures per time-bin, for all legs with the specified mode
 	 */
 	public int[] getDepartures(final String legMode) {
-		ModeData modeData = this.data.get(legMode);
-		if (modeData == null) {
+		DataFrame dataFrame = this.data.get(legMode);
+		if (dataFrame == null) {
 			return new int[0];
 		}
-		return modeData.countsDep.clone();
+		return dataFrame.countsDep.clone();
 	}
 
 	/**
@@ -274,11 +200,11 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 	 * @return number of all arrivals per time-bin, for all legs with the specified mode
 	 */
 	public int[] getArrivals(final String legMode) {
-		ModeData modeData = this.data.get(legMode);
-		if (modeData == null) {
+		DataFrame dataFrame = this.data.get(legMode);
+		if (dataFrame == null) {
 			return new int[0];
 		}
-		return modeData.countsArr.clone();
+		return dataFrame.countsArr.clone();
 	}
 
 	/**
@@ -286,48 +212,32 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 	 * @return number of vehicles that got stuck in a time-bin, for all legs with the specified mode
 	 */
 	public int[] getStuck(final String legMode) {
-		ModeData modeData = this.data.get(legMode);
-		if (modeData == null) {
+		DataFrame dataFrame = this.data.get(legMode);
+		if (dataFrame == null) {
 			return new int[0];
 		}
-		return modeData.countsStuck.clone();
+		return dataFrame.countsStuck.clone();
 	}
 
-	/**
-	 * Writes a graphic showing the number of departures, arrivals and vehicles
-	 * en route of all legs/trips to the specified file.
-	 *
-	 * @param filename
-	 *
-	 * @see #getGraphic()
-	 */
-	public void writeGraphic(final String filename) {
-		try {
-			ChartUtilities.saveChartAsPNG(new File(filename), getGraphic(), 1024, 768);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+    int getIteration() {
+        return iteration;
+    }
 
-	/**
-	 * Writes a graphic showing the number of departures, arrivals and vehicles
-	 * en route of all legs/trips with the specified transportation mode to the
-	 * specified file.
-	 *
-	 * @param filename
-	 * @param legMode
-	 *
-	 * @see #getGraphic(String)
-	 */
-	public void writeGraphic(final String filename, final String legMode) {
-		try {
-			ChartUtilities.saveChartAsPNG(new File(filename), getGraphic(legMode), 1024, 768);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	/* private methods */
+    DataFrame getAllModesData() {
+        DataFrame result = new DataFrame(this.binSize, this.nofBins + 1);
+        for (DataFrame byMode : data.values()) {
+            for (int i=0;i<result.countsDep.length;++i) {
+                result.countsDep[i] += byMode.countsDep[i];
+            }
+            for (int i=0;i<result.countsArr.length;++i) {
+                result.countsArr[i] += byMode.countsArr[i];
+            }
+            for (int i=0;i<result.countsStuck.length;++i) {
+                result.countsStuck[i] += byMode.countsStuck[i];
+            }
+        }
+        return result;
+    }
 
 	private int getBinIndex(final double time) {
 		int bin = (int)(time / this.binSize);
@@ -337,24 +247,26 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 		return bin;
 	}
 
-	private ModeData getDataForMode(final String legMode) {
-		ModeData modeData = this.data.get(legMode);
-		if (modeData == null) {
-			modeData = new ModeData(this.nofBins + 1); // +1 for all times out of our range
-			this.data.put(legMode, modeData);
+	DataFrame getDataForMode(final String legMode) {
+		DataFrame dataFrame = this.data.get(legMode);
+		if (dataFrame == null) {
+			dataFrame = new DataFrame(this.binSize, this.nofBins + 1); // +1 for all times out of our range
+			this.data.put(legMode, dataFrame);
 		}
-		return modeData;
+		return dataFrame;
 	}
 
-	private static class ModeData {
-		public final int[] countsDep;
-		public final int[] countsArr;
-		public final int[] countsStuck;
+	static class DataFrame {
+		final int[] countsDep;
+		final int[] countsArr;
+		final int[] countsStuck;
+        final int binSize;
 
-		public ModeData(final int nofBins) {
+        public DataFrame(final int binSize, final int nofBins) {
 			this.countsDep = new int[nofBins];
 			this.countsArr = new int[nofBins];
 			this.countsStuck = new int[nofBins];
+            this.binSize = binSize;
 		}
 	}
 

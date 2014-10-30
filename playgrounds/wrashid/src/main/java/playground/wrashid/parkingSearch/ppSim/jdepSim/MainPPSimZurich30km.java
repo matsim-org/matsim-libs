@@ -18,22 +18,14 @@
  * *********************************************************************** */
 package playground.wrashid.parkingSearch.ppSim.jdepSim;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.analysis.LegHistogram;
+import org.matsim.analysis.LegHistogramChart;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.IntegerValueHashMap;
@@ -50,7 +42,6 @@ import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
-
 import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
 import playground.wrashid.parkingChoice.infrastructure.ActInfo;
 import playground.wrashid.parkingChoice.infrastructure.PrivateParking;
@@ -64,14 +55,13 @@ import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.ParkingSe
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.manager.ParkingStrategyManager;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.random.RandomNumbers;
 import playground.wrashid.parkingSearch.ppSim.jdepSim.searchStrategies.score.ParkingScoreEvaluator;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.HouseHoldIncomeZH;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingCostCalculatorZH;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingLoader;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingManagerZH;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ParkingStrategyScenarios;
-import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.ZHScenarioGlobal;
+import playground.wrashid.parkingSearch.ppSim.jdepSim.zurich.*;
 import playground.wrashid.parkingSearch.ppSim.ttmatrix.TTMatrixFromStoredTable;
 import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
+
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 public class MainPPSimZurich30km {
 
@@ -186,16 +176,16 @@ public class MainPPSimZurich30km {
 			log.info("simulation-" + iter + " ended");
 
 			if (ZHScenarioGlobal.writeOutputInCurrentIteration() && ZHScenarioGlobal.loadBooleanParam("doWriteEvents")) {
-				lh.writeGraphic(ZHScenarioGlobal.getItersFolderPath() + "it." + iter + ".legHistogram_all.png");
-				lh.writeGraphic(ZHScenarioGlobal.getItersFolderPath() + "it." + iter + ".legHistogram_car.png", TransportMode.car);
-				lh.writeGraphic(ZHScenarioGlobal.getItersFolderPath() + "it." + iter + ".legHistogram_pt.png", TransportMode.pt);
+				LegHistogramChart.writeGraphic(lh, ZHScenarioGlobal.getItersFolderPath() + "it." + iter + ".legHistogram_all.png");
+				LegHistogramChart.writeGraphic(lh, ZHScenarioGlobal.getItersFolderPath() + "it." + iter + ".legHistogram_car.png", TransportMode.car);
+				LegHistogramChart.writeGraphic(lh, ZHScenarioGlobal.getItersFolderPath() + "it." + iter + ".legHistogram_pt.png", TransportMode.pt);
 				try {
-					lh.writeGraphic(ZHScenarioGlobal.getItersFolderPath() + "it." + iter + ".legHistogram_ride.png",
-							TransportMode.ride);
+					LegHistogramChart.writeGraphic(lh, ZHScenarioGlobal.getItersFolderPath() + "it." + iter + ".legHistogram_ride.png",
+                            TransportMode.ride);
 				} catch (Exception e) {
 
 				}
-				lh.writeGraphic(ZHScenarioGlobal.getItersFolderPath() + "it." + iter + ".legHistogram_walk.png", TransportMode.walk);
+				LegHistogramChart.writeGraphic(lh, ZHScenarioGlobal.getItersFolderPath() + "it." + iter + ".legHistogram_walk.png", TransportMode.walk);
 
 				eventsWriter.reset(0);
 			}

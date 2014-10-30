@@ -19,14 +19,13 @@
 package playground.wrashid.parkingSearch.ppSim.jdepSim;
 
 import org.matsim.analysis.LegHistogram;
+import org.matsim.analysis.LegHistogramChart;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.framework.Mobsim;
-
-import playground.wrashid.parkingSearch.ppSim.ttmatrix.DummyTTMatrix;
 import playground.wrashid.parkingSearch.ppSim.ttmatrix.TTMatrixFromStoredTable;
 
 public class MainJDEPSimZurich8km {
@@ -62,7 +61,7 @@ public class MainJDEPSimZurich8km {
 		Message.ttMatrix=new TTMatrixFromStoredTable("c:/tmp2/table3.txt", scenario.getNetwork());
 		sim.run();
 		eventsManager.finishProcessing();
-		lh.writeGraphic("legHistogram.png");
+		LegHistogramChart.writeGraphic(lh, "legHistogram.png");
 		lh.write("legHistogram.txt");
 		eventsWriter.reset(0);
 	}
