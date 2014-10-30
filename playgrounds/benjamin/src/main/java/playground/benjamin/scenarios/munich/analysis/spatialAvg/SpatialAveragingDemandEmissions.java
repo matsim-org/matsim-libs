@@ -47,22 +47,27 @@ public class SpatialAveragingDemandEmissions {
 	private static final Logger logger = Logger.getLogger(SpatialAveragingDemandEmissions.class);
 
 	private String baseCase = "exposureInternalization"; // exposureInternalization, latsis, 981
-	private String compareCase = "zone30"; // zone30, pricing, exposurePricing, 983
+	private String compareCase = "exposurePricing"; // zone30, pricing, exposurePricing, 983
 	
 	final int noOfXbins = 160;
 	final int noOfYbins = 120; 
 	
 	final int noOfTimeBins = 1;
-	
 	final double smoothingRadius_m = 500.;
 	
-	final String pollutant2analyze = WarmPollutant.NO2.toString();
+	final String pollutant2analyze = WarmPollutant.NOX.toString();
 	final boolean compareToBaseCase = true;
-	final boolean useLineMethod = false;
 	private boolean writeRoutput = true;
 	private boolean writeGisOutput = false;
 	final private boolean useVisBoundary = false;
 	
+	/* If both of the following booleans are false, the fallback solution
+	 * is to use the "pointMethod", i.e. mapping emissions to the center
+	 * of each link.
+	 */
+	final boolean useLineMethod = true;
+	private boolean useCellMethod = false;
+
 	private SpatialAveragingWriter saWriter;
 	private double simulationEndTime;
 	private Network network;
@@ -72,19 +77,6 @@ public class SpatialAveragingDemandEmissions {
 	private SpatialGrid[] timeInterval2GridBaseCase;
 
 	private SpatialAveragingInputData inputData;
-
-	private boolean useCellMethod =true;
-	
-	/*
-	 * process first emission file: calculate weighted emissions per cell
-	 * write R or GIS output files (weighted emissions, weighted demand, specific emissions)
-	 * 
-	 * if comparision to base case is selected: 
-	 * process second emission file: calculate weighted emissions per cell
-	 * calculate differences to base case
-	 * write R or GIS output files
-	 * 
-	 */
 	
 	private void run() throws IOException{
 		

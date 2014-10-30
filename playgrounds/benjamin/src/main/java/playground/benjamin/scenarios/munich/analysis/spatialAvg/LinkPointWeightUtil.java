@@ -47,7 +47,7 @@ public class LinkPointWeightUtil implements LinkWeightUtil {
 
 	private double cellSizeSquareKm;
 	
-	public LinkPointWeightUtil(double xMin, double xMax, double yMin,	double yMax, int noOfXbins, int noOfYbins, double smoothingRadius_m, String visBoundaryShapeFile, CoordinateReferenceSystem targetCRS) {
+	public LinkPointWeightUtil(double xMin, double xMax, double yMin, double yMax, int noOfXbins, int noOfYbins, double smoothingRadius_m, String visBoundaryShapeFile, CoordinateReferenceSystem targetCRS) {
 		this.xMin = xMin;
 		this.xMax = xMax;
 		this.yMin = yMin;
@@ -60,7 +60,7 @@ public class LinkPointWeightUtil implements LinkWeightUtil {
 		this.featuresInVisBoundary = ShapeFileReader.getAllFeatures(visBoundaryShapeFile);
 		this.targetCRS = targetCRS;
 		this.cellSizeSquareKm = (xMax-xMin)/noOfXbins*(yMax-yMin)/noOfYbins / (1000.*1000.);
-		System.out.println("cell size square km" + this.cellSizeSquareKm);
+		logger.info("Cell size in sqkm is " + this.cellSizeSquareKm);
 	}
 	
 
