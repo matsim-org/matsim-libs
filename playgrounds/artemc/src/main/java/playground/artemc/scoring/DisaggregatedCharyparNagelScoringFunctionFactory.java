@@ -62,19 +62,21 @@ public class DisaggregatedCharyparNagelScoringFunctionFactory implements Scoring
 	private PersonalScoringParameters params = null;
 	private HashMap<Id, ScoringFunction> personScoringFunctions;
 	private HashMap<Id<Person>, Double> incomeFactors = null;
+	private String simulationType;
 
-	
+
 	public DisaggregatedCharyparNagelScoringFunctionFactory(final PlanCalcScoreConfigGroup config, Network network) {
 		this.config = config;
 		this.network = network;
 		this.personScoringFunctions = new HashMap<Id, ScoringFunction>();
 	}
-	
+
 	public DisaggregatedCharyparNagelScoringFunctionFactory(final PlanCalcScoreConfigGroup config, Network network, HeterogeneityConfig heterogeneityConfig) {
 		this.config = config;
 		this.network = network;
 		this.personScoringFunctions = new HashMap<Id, ScoringFunction>();
 		this.incomeFactors = heterogeneityConfig.getIncomeFactors();
+		this.simulationType = heterogeneityConfig.getSimulationType();
 	}
 
 	/**
@@ -106,13 +108,23 @@ public class DisaggregatedCharyparNagelScoringFunctionFactory implements Scoring
 			 * point of view than giving each ScoringFunction its own copy of the params.
 			 */
 			this.params = new PersonalScoringParameters(this.config);
-			
-			if(incomeFactors!=null){
-				this.params.marginalUtilityOfPerforming_s = this.params.marginalUtilityOfPerforming_s * (1.0/incomeFactors.get(person.getId()));
 
-				for (Entry<String, Mode> mode : this.params.modeParams.entrySet()) {
-					mode.getValue().marginalUtilityOfTraveling_s = mode.getValue().marginalUtilityOfTraveling_s  * (1.0/incomeFactors.get(person.getId()));
+			if(this.simulationType.equals("hetero") || this.simulationType.equals("homo")){
+				if(incomeFactors!=null){
+					this.params.marginalUtilityOfPerforming_s = this.params.marginalUtilityOfPerforming_s * (1.0/incomeFactors.get(person.getId()));
+					
+					this.params.marginalUtilityOfLateArrival_s =  this.params.marginalUtilityOfLateArrival_s * this.params.marginalUtilityOfPerforming_s;
+					this.params.marginalUtilityOfEarlyDeparture_s= this.params.marginalUtilityOfEarlyDeparture_s * this.params.marginalUtilityOfPerforming_s;
+
+					for (Entry<String, Mode> mode : this.params.modeParams.entrySet()) {
+						mode.getValue().marginalUtilityOfTraveling_s = mode.getValue().marginalUtilityOfTraveling_s  * (1.0/incomeFactors.get(person.getId()));
+					}
 				}
+			}
+			else if(this.simulationType.equals("heteroAlpha") ){
+				this.params.marginalUtilityOfLateArrival_s = this.params.marginalUtilityOfPerforming_s;
+				this.params.marginalUtilityOfEarlyDeparture_s= 0.0;
+				
 			}
 		}
 

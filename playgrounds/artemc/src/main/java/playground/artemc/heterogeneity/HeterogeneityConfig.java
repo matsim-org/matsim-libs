@@ -37,8 +37,10 @@ ControlerListener {
 	private Config config;
 	private Scenario scenario;
 
-	private String inputPath;
-	private String simulationType;
+	private final String inputPath;
+	private final String simulationType;
+
+
 
 	private HashMap<Id<Person>, Double> incomeFactors;
 
@@ -130,6 +132,10 @@ ControlerListener {
 
 	public HashMap<Id<Person>, Double> getIncomeFactors() {
 		return incomeFactors;
+	}
+	
+	public String getSimulationType() {
+		return simulationType;
 	}
 
 }
