@@ -274,8 +274,8 @@ public class NoiseSpatialInfo {
 		double xCoord = coord.getX();
 		double yCoord = coord.getY();
 		
-		int xDirection = (int) ((xCoord-xCoordMinLinkNodes) / (relevantRadius/1.));	
-		int yDirection = (int) ((yCoordMaxLinkNodes-yCoord) / relevantRadius/1.);
+		int xDirection = (int) ((xCoord - xCoordMinLinkNodes) / (relevantRadius / 1.));	
+		int yDirection = (int) ((yCoordMaxLinkNodes - yCoord) / relevantRadius / 1.);
 		
 		Tuple<Integer,Integer> zoneDefinition = new Tuple<Integer, Integer>(xDirection, yDirection);
 		return zoneDefinition;
@@ -501,9 +501,9 @@ public class NoiseSpatialInfo {
 	}
 	
 	private double calculateDs (double distanceToRoad){
-		double Ds = 0.;
-		Ds = 15.8 - (10 * Math.log10(distanceToRoad)) - (0.0142*(Math.pow(distanceToRoad,0.9)));
-		return Ds;
+		double correctionTermDs = 0.;
+		correctionTermDs = 15.8 - (10 * Math.log10(distanceToRoad)) - (0.0142*(Math.pow(distanceToRoad,0.9)));
+		return correctionTermDs;
 	}
 	
 	private double calculateAngleImmissionCorrection(Coord receiverPointCoord, Link link) {

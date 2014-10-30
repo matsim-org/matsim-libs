@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE network SYSTEM "http://matsim.org/files/dtd/network_v1.dtd">
 
-<network name="network for test scenario 2">
+<network name="network for test scenario">
 <!--
 						(nodeA1) ===linkA2==> (nodeA2) ===linkA3==> (nodeA3) ===linkA4==> (nodeA4)
 							A																 |
@@ -66,7 +66,7 @@
 	<link id="linkA2" from="nodeA1" to="nodeA2" length="1000.00" capacity="7200" freespeed="13.89" modes="car" permlanes="1" />
 	<link id="linkA3" from="nodeA2" to="nodeA3" length="1000.00" capacity="600" freespeed="13.89" modes="car" permlanes="1" />
 	<link id="linkA4" from="nodeA3" to="nodeA4" length="1000.00" capacity="7200" freespeed="13.89" modes="car" permlanes="1" />
-	<link id="linkA5" from="nodeA4" to="node3" length="1000.00" capacity="7200" freespeed="13.89" modes="car" permlanes="1" />
+	<link id="linkA5" from="nodeA4" to="node3" length="1000.00" capacity="7200" freespeed="1000." modes="car" permlanes="1" />
 	
 	<link id="linkB1" from="node2" to="nodeB1" length="1000.00" capacity="7200" freespeed="13.89" modes="car" permlanes="1" />
 	<link id="linkB2" from="nodeB1" to="nodeB2" length="1000.00" capacity="7200" freespeed="13.89" modes="car" permlanes="1" />

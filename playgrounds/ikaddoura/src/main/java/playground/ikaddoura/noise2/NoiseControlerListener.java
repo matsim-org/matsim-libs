@@ -164,5 +164,9 @@ public class NoiseControlerListener implements AfterMobsimListener , IterationEn
 	public NoiseImmission getNoiseImmission() {
 		return noiseImmission;
 	}
-	
+
+	public NoiseSpatialInfo getSpatialInfo() {
+		return spatialInfo;
+	}
+		
 }

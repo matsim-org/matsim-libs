@@ -317,7 +317,6 @@ public class NoiseEmissionHandler implements LinkEnterEventHandler {
 		double d = lHdv - lCar; 
 		
 		geschwindigkeitskorrekturDv = lCar - 37.3 + 10* Math.log10((100.0 + (Math.pow(10.0, (0.1 * d)) - 1) * pInPercentagePoints ) / (100 + 8.23 * pInPercentagePoints));
-		
 		return geschwindigkeitskorrekturDv;
 	}
 	

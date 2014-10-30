@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE network SYSTEM "http://matsim.org/files/dtd/network_v1.dtd">
 
-<network name="network for test scenario 2">
+<network name="network for test scenario">
 <!--
 						(nodeA1) ===linkA2==> (nodeA2) ===linkA3==> (nodeA3) ===linkA4==> (nodeA4)
 							A																 |
