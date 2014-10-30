@@ -32,6 +32,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
@@ -73,7 +74,7 @@ public class MergingTest {
 		List<JointPlan> plans = new ArrayList<JointPlan>();
 
 		for (int i=0; i<10; i++) {
-			final Map<Id, Plan> indivPlans = new HashMap<Id, Plan>();
+			final Map<Id<Person>, Plan> indivPlans = new HashMap< >();
 			for (int j=0; j<1000; j+=100) {
 				Id id = new IdImpl( i + j );
 				indivPlans.put(

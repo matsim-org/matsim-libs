@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.replanning.ReplanningContext;
@@ -68,7 +69,7 @@ public class JointPlanBasedGroupStrategyModule implements GenericStrategyModule<
 			if (!wrapIndividualPlansAndActOnThem) return;
 	
 			for (Plan p : groupPlan.getIndividualPlans()) {
-				Map<Id, Plan> fakeJointPlanMap = new HashMap<Id, Plan>();
+				Map<Id<Person>, Plan> fakeJointPlanMap = new HashMap< >();
 				fakeJointPlanMap.put( p.getPerson().getId() , p );
 				JointPlan jp = jointPlanFactory.createJointPlan( fakeJointPlanMap , false );
 				jointPlans.add( jp );

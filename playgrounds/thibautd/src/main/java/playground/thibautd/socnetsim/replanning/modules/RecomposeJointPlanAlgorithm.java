@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 
 import playground.thibautd.socnetsim.population.JointPlan;
@@ -49,12 +50,12 @@ public class RecomposeJointPlanAlgorithm implements GenericPlanAlgorithm<GroupPl
 
 	@Override
 	public void run(final GroupPlans groupPlans) {
-		final Map<Id, Plan> plansMap = getPlansMap( groupPlans );
+		final Map<Id<Person>, Plan> plansMap = getPlansMap( groupPlans );
 
 		groupPlans.clear();
 		while (plansMap.size() > 0) {
 			final Plan plan = plansMap.remove( plansMap.keySet().iterator().next() );
-			final Map<Id, Plan> jpMap = new HashMap<Id, Plan>();
+			final Map<Id<Person>, Plan> jpMap = new HashMap< >();
 			jpMap.put( plan.getPerson().getId() , plan );
 
 			findDependentPlans( plan , jpMap , plansMap );
@@ -69,8 +70,8 @@ public class RecomposeJointPlanAlgorithm implements GenericPlanAlgorithm<GroupPl
 		}
 	}
 
-	private Map<Id, Plan> getPlansMap(final GroupPlans groupPlans) {
-		final Map<Id, Plan> map = new HashMap<Id, Plan>();
+	private Map<Id<Person>, Plan> getPlansMap(final GroupPlans groupPlans) {
+		final Map<Id<Person>, Plan> map = new HashMap< >();
 
 		for (Plan p : groupPlans.getIndividualPlans()) {
 			map.put( p.getPerson().getId() , p );
@@ -85,8 +86,8 @@ public class RecomposeJointPlanAlgorithm implements GenericPlanAlgorithm<GroupPl
 	// DFS
 	private void findDependentPlans(
 			final Plan plan,
-			final Map<Id, Plan> dependantPlans,
-			final Map<Id, Plan> plansToLook) {
+			final Map<Id<Person>, Plan> dependantPlans,
+			final Map<Id<Person>, Plan> plansToLook) {
 		final List<Plan> dependentPlansList = new ArrayList<Plan>();
 
 		final Iterator<Plan> toLookIt = plansToLook.values().iterator();

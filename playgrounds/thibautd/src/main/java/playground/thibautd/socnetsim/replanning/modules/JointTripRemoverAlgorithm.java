@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
@@ -79,10 +80,10 @@ public class JointTripRemoverAlgorithm implements GenericPlanAlgorithm<JointPlan
 
 	@Override
 	public void run(final JointPlan plan) {
-		run( plan , Collections.<Id>emptyList() );
+		run( plan , Collections.<Id<Person>>emptyList() );
 	}
 
-	public ActedUponInformation run( final JointPlan plan , final Collection<Id> agentsToIgnore ) {
+	public ActedUponInformation run( final JointPlan plan , final Collection<Id<Person>> agentsToIgnore ) {
 		final JointTravelStructure structure = JointPlanUtils.analyseJointTravel( plan );
 
 		if (structure.getJointTrips().size() == 0) {
@@ -105,7 +106,7 @@ public class JointTripRemoverAlgorithm implements GenericPlanAlgorithm<JointPlan
 
 	private static List<JointTrip> getChoiceSet(
 			final JointTravelStructure structure,
-			final Collection<Id> agentsToIgnore) {
+			final Collection<Id<Person>> agentsToIgnore) {
 		if (agentsToIgnore.isEmpty()) return structure.getJointTrips();
 
 		final List<JointTrip> choiceSet = new ArrayList<JointTrip>();

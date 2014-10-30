@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 
 final class KnownBranches {
 	private final boolean prune;
@@ -33,11 +34,11 @@ final class KnownBranches {
 		this.prune = prune;
 	}
 
-	public void tagAsExplored(final Set<Id> cotravs, final Set<Id> incomp) {
+	public void tagAsExplored(final Set<Id<Person>> cotravs, final Set<Id> incomp) {
 		if (prune) branches.add( new Branch( cotravs , incomp ) );
 	}
 
-	public boolean isExplored(final Set<Id> cotravs, final Set<Id> incomp) {
+	public boolean isExplored(final Set<Id<Person>> cotravs, final Set<Id> incomp) {
 		return prune && branches.contains( new Branch( cotravs , incomp ) );
 	}
 }

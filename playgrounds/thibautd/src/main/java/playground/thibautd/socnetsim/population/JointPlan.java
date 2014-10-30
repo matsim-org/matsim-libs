@@ -23,6 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 
 /**
@@ -30,17 +31,17 @@ import org.matsim.api.core.v01.population.Plan;
  * @author thibautd
  */
 public class JointPlan {
-	private final Map<Id,Plan> individualPlans = new LinkedHashMap<Id,Plan>();
+	private final Map<Id<Person>,Plan> individualPlans = new LinkedHashMap< >();
 
-	JointPlan( final Map<Id, ? extends Plan> plans ) {
+	JointPlan( final Map<Id<Person>, ? extends Plan> plans ) {
 		this.individualPlans.putAll( plans );
 	}
 
-	public Plan getIndividualPlan(final Id id) {
+	public Plan getIndividualPlan(final Id<Person> id) {
 		return this.individualPlans.get(id);
 	}
 
-	public Map<Id,Plan> getIndividualPlans() {
+	public Map<Id<Person>,Plan> getIndividualPlans() {
 		return this.individualPlans;
 	}
 

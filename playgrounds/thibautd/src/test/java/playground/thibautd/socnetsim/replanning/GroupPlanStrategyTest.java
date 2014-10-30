@@ -34,7 +34,6 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
@@ -180,7 +179,7 @@ public class GroupPlanStrategyTest {
 	private ReplanningGroup createTestGroup(final JointPlans jointPlans) {
 		final ReplanningGroup group = new ReplanningGroup();
 
-		final Map<Id, Plan> jointPlan = new LinkedHashMap<Id, Plan>();
+		final Map<Id<Person>, Plan> jointPlan = new LinkedHashMap< >();
 
 		int i=0;
 		for (int j=0; j < N_INITIALLY_JOINT_PLANS; j++) {
@@ -207,8 +206,8 @@ public class GroupPlanStrategyTest {
 	private static Person createPerson(
 			final int count,
 			final boolean joint,
-			final Map<Id, Plan> jointPlan) {
-		Id id = new IdImpl( count );
+			final Map<Id<Person>, Plan> jointPlan) {
+		Id<Person> id = Id.createPersonId( count );
 		Person person = new PersonImpl( id );
 		PlanImpl plan = new PlanImpl( person );
 		person.addPlan( plan );
@@ -241,7 +240,7 @@ public class GroupPlanStrategyTest {
 		}
 
 		private void handlePlans(final GroupPlans plans) {
-			final Map<Id, Plan> newJointPlan = new LinkedHashMap<Id, Plan>();
+			final Map<Id<Person>, Plan> newJointPlan = new LinkedHashMap<Id<Person>, Plan>();
 			final List<Plan> newIndividualPlans = new ArrayList<Plan>();
 
 			for (JointPlan jp : plans.getJointPlans()) {

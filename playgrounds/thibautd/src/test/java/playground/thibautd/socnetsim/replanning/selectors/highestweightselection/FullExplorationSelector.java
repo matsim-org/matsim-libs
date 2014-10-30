@@ -246,7 +246,7 @@ public final class FullExplorationSelector implements GroupLevelPlanSelector {
 				personRecords,
 				new ArrayList<PersonRecord>( personRecords.values() ),
 				Collections.<Id> emptySet(),
-				Collections.<Id> emptySet());
+				Collections.<Id<Person>> emptySet());
 	}
 
 	private boolean searchForCombinationsWithoutForbiddenPlans(
@@ -255,7 +255,7 @@ public final class FullExplorationSelector implements GroupLevelPlanSelector {
 			final Map<Id, PersonRecord> allPersonsRecord,
 			final List<PersonRecord> personsStillToAllocate,
 			final Set<Id> allocatedIncompatibilityGroups,
-			final Set<Id> alreadyAllocatedPersons) {
+			final Set<Id<Person>> alreadyAllocatedPersons) {
 		final PersonRecord currentPerson = personsStillToAllocate.get(0);
 
 		// do one step forward: "point" to the next person
@@ -285,8 +285,8 @@ public final class FullExplorationSelector implements GroupLevelPlanSelector {
 				continue;
 			}
 
-			final Set<Id> cotravelers = r.jointPlan == null ?
-				Collections.<Id>emptySet() :
+			final Set<Id<Person>> cotravelers = r.jointPlan == null ?
+				Collections.<Id<Person>>emptySet() :
 				r.jointPlan.getIndividualPlans().keySet();
 			if ( knownBranches.isExplored( cotravelers , incomp ) ) continue;
 			// if we do not find anything here, it is impossible to find allowed
@@ -294,7 +294,7 @@ public final class FullExplorationSelector implements GroupLevelPlanSelector {
 			knownBranches.tagAsExplored( cotravelers , incomp );
 
 			List<PersonRecord> actuallyRemainingPersons = remainingPersons;
-			Set<Id> actuallyAllocatedPersons = new HashSet<Id>(alreadyAllocatedPersons);
+			Set<Id<Person>> actuallyAllocatedPersons = new HashSet< >(alreadyAllocatedPersons);
 			actuallyAllocatedPersons.add( currentPerson.person.getId() );
 			if (r.jointPlan != null) {
 				if ( intersect( r.jointPlan.getIndividualPlans().keySet(), alreadyAllocatedPersons ) ) continue;
@@ -388,8 +388,8 @@ public final class FullExplorationSelector implements GroupLevelPlanSelector {
 				continue;
 			}
 
-			final Set<Id> cotravelers = r.jointPlan == null ?
-				Collections.<Id>emptySet() :
+			final Set<Id<Person>> cotravelers = r.jointPlan == null ?
+				Collections.<Id<Person>>emptySet() :
 				r.jointPlan.getIndividualPlans().keySet();
 			if ( knownBranches.isExplored( cotravelers , incomp ) ) continue;
 			// if we find something, it is the best given the joint structure
@@ -509,19 +509,19 @@ public final class FullExplorationSelector implements GroupLevelPlanSelector {
 		return str;
 	}
 
-	private static boolean intersect(
-			final Collection<Id> ids1,
-			final Collection<Id> ids2) {
+	private static <T> boolean intersect(
+			final Collection<T> ids1,
+			final Collection<T> ids2) {
 		final boolean moreIn1 = ids1.size() > ids2.size();
 
 		// iterate over the smaller of the collections.
 		// normally, the collections are HashSets, so that
 		// contains is O(1): this can improve running time a lot
 		// (from several minutes to a few seconds for plan removal!).
-		final Collection<Id> iterated = moreIn1 ? ids2 : ids1;
-		final Collection<Id> tested = moreIn1 ? ids1 : ids2;
+		final Collection<T> iterated = moreIn1 ? ids2 : ids1;
+		final Collection<T> tested = moreIn1 ? ids1 : ids2;
 
-		for (Id id : iterated) {
+		for (T id : iterated) {
 			if ( tested.contains( id ) ) return true;
 		}
 
@@ -529,7 +529,7 @@ public final class FullExplorationSelector implements GroupLevelPlanSelector {
 	}
 
 	private static boolean intersect(
-			final Set<Id> set,
+			final Set<Id<Person>> set,
 			final PlanString string) {
 		if ( string == null ) return false;
 		for ( Id id : set ) {

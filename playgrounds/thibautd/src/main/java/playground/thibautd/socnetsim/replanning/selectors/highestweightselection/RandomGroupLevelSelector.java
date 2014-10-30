@@ -159,8 +159,8 @@ public class RandomGroupLevelSelector implements GroupLevelPlanSelector {
 				continue;
 			}
 
-			final Set<Id> cotravs = r.jointPlan == null ?
-				Collections.<Id>emptySet() :
+			final Set<Id<Person>> cotravs = r.jointPlan == null ?
+				Collections.<Id<Person>>emptySet() :
 				r.jointPlan.getIndividualPlans().keySet();
 
 			if ( !exploredBranches.add(

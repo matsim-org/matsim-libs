@@ -68,9 +68,9 @@ public class GroupPlansTest {
 		final List<JointPlan> plans = new ArrayList<JointPlan>();
 
 		for (int i=0; i < 5; i++) {
-			final Map<Id, Plan> planMap = new HashMap<Id, Plan>();
+			final Map<Id<Person>, Plan> planMap = new HashMap< >();
 			for (int j=0; j < 5; j++) {
-				Id id = new IdImpl( i + (1000 * j) );
+				Id id = Id.createPersonId( i + (1000 * j) );
 				planMap.put(
 						id,
 						new PlanImpl(
@@ -105,7 +105,7 @@ public class GroupPlansTest {
 		int nIndivInJoints = 0;
 		final JointPlanFactory jpFact = new JointPlanFactory();
 		for ( int i = 1; i < 5; i++ ) {
-			final Map<Id, Plan> plans = new HashMap<Id, Plan>();
+			final Map<Id<Person>, Plan> plans = new HashMap< >();
 			for ( int j = 0; j < i; j++ ) {
 				nIndivInJoints++;
 				final Person person = popFact.createPerson( new IdImpl( "joint-"+i+"-"+j ) );

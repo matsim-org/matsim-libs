@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 
 import playground.ivt.utils.MapUtils;
 
@@ -47,7 +48,7 @@ final class PersonRecordsPlansPruner {
 	private static void pruneAtIndividualLevel(
 			final IncompatiblePlanRecords incompatiblePlans,
 			final PersonRecord person) {
-		final Map<Set<Id>, Set<Set<Id>>> knownBranches = new HashMap<Set<Id>, Set<Set<Id>>>();
+		final Map<Set<Id<Person>>, Set<Set<Id>>> knownBranches = new HashMap< >();
 		double lastRecordWeight = Double.POSITIVE_INFINITY;
 		final Iterator<PlanRecord> iterator = person.prunedPlans.iterator();
 		while ( iterator.hasNext() ) {
@@ -55,8 +56,8 @@ final class PersonRecordsPlansPruner {
 			assert r.individualPlanWeight <= lastRecordWeight : person.plans;
 			lastRecordWeight = r.individualPlanWeight;
 
-			final Set<Id> cotravs = r.jointPlan == null ?
-				Collections.<Id>emptySet() :
+			final Set<Id<Person>> cotravs = r.jointPlan == null ?
+				Collections.<Id<Person>>emptySet() :
 				r.jointPlan.getIndividualPlans().keySet();
 			// only consider the best plan of each structure for each set of
 			// incompatible plans.

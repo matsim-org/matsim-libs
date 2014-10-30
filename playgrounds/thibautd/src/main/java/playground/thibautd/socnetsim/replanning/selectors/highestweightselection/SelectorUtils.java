@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 
 import playground.thibautd.socnetsim.population.JointPlan;
@@ -134,8 +135,8 @@ final class SelectorUtils {
 				continue;
 			}
 
-			final Set<Id> cotravs = r.jointPlan == null ?
-				Collections.<Id>emptySet() :
+			final Set<Id<Person>> cotravs = r.jointPlan == null ?
+				Collections.<Id<Person>>emptySet() :
 				r.jointPlan.getIndividualPlans().keySet();
 
 			if ( !exploredBranches.add(
@@ -220,7 +221,7 @@ final class SelectorUtils {
 	}
 
 	public static boolean intersects(
-			final Collection<Id> ids1,
+			final Collection<Id<Person>> ids1,
 			final PlanAllocation alloc) {
 		for ( PlanRecord p : alloc.getPlans() ) {
 			if ( ids1.contains( p.person.person.getId() ) ) return true;
@@ -239,8 +240,8 @@ final class SelectorUtils {
 
 	public static boolean containsAllIds(
 			final List<PersonRecord> persons,
-			final Set<Id> ids) {
-		final Collection<Id> remainingIds = new HashSet<Id>( ids );
+			final Set<Id<Person>> ids) {
+		final Collection<Id<Person>> remainingIds = new HashSet< >( ids );
 
 		for ( PersonRecord p : persons ) {
 			remainingIds.remove( p.person.getId() );

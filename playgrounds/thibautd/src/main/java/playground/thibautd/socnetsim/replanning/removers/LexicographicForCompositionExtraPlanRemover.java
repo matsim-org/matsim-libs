@@ -264,7 +264,7 @@ public class LexicographicForCompositionExtraPlanRemover implements ExtraPlanRem
 
 	private static class PlansPerComposition {
 		private final Collection<Plan> individualPlans = new ArrayList<Plan>();
-		private final Map< Set<Id> , Collection<JointPlan> > jointPlans = new LinkedHashMap< Set<Id> , Collection<JointPlan> >();
+		private final Map< Set<Id<Person>> , Collection<JointPlan> > jointPlans = new LinkedHashMap< >();
 
 		public void addPlan( final Plan p ) {
 			individualPlans.add( p );

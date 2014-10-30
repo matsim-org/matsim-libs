@@ -98,11 +98,11 @@ public class WeakSelector implements GroupLevelPlanSelector {
 			final JointPlans weakPlans,
 			final Collection<JointPlan> jointPlans) {
 		for ( JointPlan fullJointPlan : jointPlans ) {
-			final Map<Id, Plan> plansMap = new HashMap<Id, Plan>( fullJointPlan.getIndividualPlans() );
+			final Map<Id<Person>, Plan> plansMap = new HashMap< >( fullJointPlan.getIndividualPlans() );
 
 			while ( ! plansMap.isEmpty() ) {
 				final Plan plan = plansMap.remove( plansMap.keySet().iterator().next() );
-				final Map<Id, Plan> jpMap = new HashMap<Id, Plan>();
+				final Map<Id<Person>, Plan> jpMap = new HashMap< >();
 				jpMap.put( plan.getPerson().getId() , plan );
 
 				findDependentPlans( plan , jpMap , plansMap );
@@ -118,8 +118,8 @@ public class WeakSelector implements GroupLevelPlanSelector {
 	// DFS
 	private void findDependentPlans(
 			final Plan plan,
-			final Map<Id, Plan> dependantPlans,
-			final Map<Id, Plan> plansToLook) {
+			final Map<Id<Person>, Plan> dependantPlans,
+			final Map<Id<Person>, Plan> plansToLook) {
 		final List<Plan> dependentPlansList = new ArrayList<Plan>();
 
 		final Iterator<Plan> toLookIt = plansToLook.values().iterator();

@@ -197,8 +197,8 @@ public class FullyExploredPlansProvider {
 		log.info( nTries+" random test plans" );
 		final Counter counter = new Counter( "Create test instance # " );
 		final Random random = new Random( 1234 );
-		final Iterator<Id> ids =
-				new Iterator<Id> () {
+		final Iterator<Id<Person>> ids =
+				new Iterator<Id<Person>> () {
 						@Override
 						public boolean hasNext() {
 							return true;
@@ -206,8 +206,8 @@ public class FullyExploredPlansProvider {
 
 						int currentId=0;
 						@Override
-						public Id next() {
-							return new IdImpl( currentId++ );
+						public Id<Person> next() {
+							return Id.createPersonId( currentId++ );
 						}
 
 						@Override
@@ -234,7 +234,7 @@ public class FullyExploredPlansProvider {
 	}
 
 	private static ReplanningGroup createNextTestClique(
-			final Iterator<Id> idsIterator,
+			final Iterator<Id<Person>> idsIterator,
 			final JointPlans jointPlans,
 			final Random random) {
 		// attempt to get a high diversity of joint structures.
@@ -246,11 +246,11 @@ public class FullyExploredPlansProvider {
 		final ReplanningGroup group = new ReplanningGroup();
 		final PopulationFactory factory = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getPopulation().getFactory();
 
-		final Map<Id, Queue<Plan>> plansPerPerson = new LinkedHashMap<Id, Queue<Plan>>();
+		final Map<Id<Person>, Queue<Plan>> plansPerPerson = new LinkedHashMap<Id<Person>, Queue<Plan>>();
 
 		// create plans
 		for (int j=0; j < nMembers; j++) {
-			final Id id = idsIterator.next();
+			final Id<Person> id = idsIterator.next();
 			final Person person = factory.createPerson( id );
 			group.addPerson( person );
 			for (int k=0; k < nPlans; k++) {
@@ -265,7 +265,7 @@ public class FullyExploredPlansProvider {
 		// join plans randomly
 		final int nJointPlans = random.nextInt( maxJointPlans );
 		for (int p=0; p < nJointPlans; p++) {
-			final Map<Id, Plan> jointPlan = new LinkedHashMap<Id, Plan>();
+			final Map<Id<Person>, Plan> jointPlan = new LinkedHashMap< >();
 			for (Queue<Plan> plans : plansPerPerson.values()) {
 				if ( random.nextDouble() > pJoin ) continue;
 				final Plan plan = plans.poll();

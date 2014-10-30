@@ -31,6 +31,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
@@ -102,11 +103,11 @@ public class RandomSelectorsTest {
 		ReplanningGroup group = new ReplanningGroup();
 		testGroups.add( group );
 
-		Map<Id, Plan> jp1 = new HashMap<Id, Plan>();
-		Map<Id, Plan> jp2 = new HashMap<Id, Plan>();
-		Map<Id, Plan> jp3 = new HashMap<Id, Plan>();
+		Map<Id<Person>, Plan> jp1 = new HashMap< >();
+		Map<Id<Person>, Plan> jp2 = new HashMap< >();
+		Map<Id<Person>, Plan> jp3 = new HashMap< >();
 
-		Id id = new IdImpl( "tintin" );
+		Id<Person> id = Id.createPersonId( "tintin" );
 		PersonImpl person = new PersonImpl( id );
 		group.addPerson( person );
 		PlanImpl plan = person.createAndAddPlan( false );
@@ -119,7 +120,7 @@ public class RandomSelectorsTest {
 		plan.setScore( 5000d );
 		jp3.put( id , plan );
 
-		id = new IdImpl( "milou" );
+		id = Id.createPersonId( "milou" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
@@ -132,7 +133,7 @@ public class RandomSelectorsTest {
 		plan.setScore( 5000d );
 		jp3.put( id , plan );
 
-		id = new IdImpl( "tim" );
+		id = Id.createPersonId( "tim" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
@@ -145,7 +146,7 @@ public class RandomSelectorsTest {
 		plan.setScore( -5000d );
 		jp3.put( id , plan );
 
-		id = new IdImpl( "struppy" );
+		id = Id.createPersonId( "struppy" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
@@ -171,16 +172,16 @@ public class RandomSelectorsTest {
 		ReplanningGroup group = new ReplanningGroup();
 		testGroups.add( group );
 
-		Map<Id, Plan> jp1 = new HashMap<Id, Plan>();
-		Map<Id, Plan> jp2 = new HashMap<Id, Plan>();
-		Map<Id, Plan> jp3 = new HashMap<Id, Plan>();
-		Map<Id, Plan> jp4 = new HashMap<Id, Plan>();
-		Map<Id, Plan> jp5 = new HashMap<Id, Plan>();
-		Map<Id, Plan> jp6 = new HashMap<Id, Plan>();
-		Map<Id, Plan> jp7 = new HashMap<Id, Plan>();
-		Map<Id, Plan> jp8 = new HashMap<Id, Plan>();
+		Map<Id<Person>, Plan> jp1 = new HashMap< >();
+		Map<Id<Person>, Plan> jp2 = new HashMap< >();
+		Map<Id<Person>, Plan> jp3 = new HashMap< >();
+		Map<Id<Person>, Plan> jp4 = new HashMap< >();
+		Map<Id<Person>, Plan> jp5 = new HashMap< >();
+		Map<Id<Person>, Plan> jp6 = new HashMap< >();
+		Map<Id<Person>, Plan> jp7 = new HashMap< >();
+		Map<Id<Person>, Plan> jp8 = new HashMap< >();
 
-		Id id = new IdImpl( "tintin" );
+		Id<Person> id = Id.createPersonId( "tintin" );
 		PersonImpl person = new PersonImpl( id );
 		group.addPerson( person );
 		PlanImpl plan = person.createAndAddPlan( false );
@@ -196,7 +197,7 @@ public class RandomSelectorsTest {
 		plan.setScore( 40d );
 		jp7.put( id , plan );
 
-		id = new IdImpl( "milou" );
+		id = Id.createPersonId( "milou" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
@@ -212,7 +213,7 @@ public class RandomSelectorsTest {
 		plan.setScore( 200d );
 		jp8.put( id , plan );
 
-		id = new IdImpl( "tim" );
+		id = Id.createPersonId( "tim" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
@@ -227,7 +228,7 @@ public class RandomSelectorsTest {
 		plan.setScore( 101d );
 		jp7.put( id , plan );
 
-		id = new IdImpl( "struppy" );
+		id = Id.createPersonId( "struppy" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
@@ -241,7 +242,7 @@ public class RandomSelectorsTest {
 		plan.setScore( 444d );
 		jp8.put( id , plan );
 
-		id = new IdImpl( "haddock" );
+		id = Id.createPersonId( "haddock" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );

@@ -179,11 +179,11 @@ public class HighestWeightSelectorTest {
 		final JointPlans jointPlans = new JointPlans();
 		ReplanningGroup group = new ReplanningGroup();
 
-		Map<Id, Plan> jp1 = new HashMap<Id, Plan>();
-		Map<Id, Plan> jp2 = new HashMap<Id, Plan>();
-		Map<Id, Plan> jp3 = new HashMap<Id, Plan>();
+		Map<Id<Person>, Plan> jp1 = new HashMap< >();
+		Map<Id<Person>, Plan> jp2 = new HashMap< >();
+		Map<Id<Person>, Plan> jp3 = new HashMap< >();
 
-		Id id = new IdImpl( "tintin" );
+		Id<Person> id = Id.createPersonId( "tintin" );
 		PersonImpl person = new PersonImpl( id );
 		group.addPerson( person );
 		PlanImpl plan = person.createAndAddPlan( false );
@@ -196,7 +196,7 @@ public class HighestWeightSelectorTest {
 		plan.setScore( 5000d );
 		jp3.put( id , plan );
 
-		id = new IdImpl( "milou" );
+		id = Id.createPersonId( "milou" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
@@ -209,7 +209,7 @@ public class HighestWeightSelectorTest {
 		plan.setScore( 5000d );
 		jp3.put( id , plan );
 
-		id = new IdImpl( "tim" );
+		id = Id.createPersonId( "tim" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
@@ -222,7 +222,7 @@ public class HighestWeightSelectorTest {
 		plan.setScore( -5000d );
 		jp3.put( id , plan );
 
-		id = new IdImpl( "struppy" );
+		id = Id.createPersonId( "struppy" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
@@ -265,11 +265,11 @@ public class HighestWeightSelectorTest {
 
 		List<Plan> toBeSelected = new ArrayList<Plan>();
 
-		Map<Id, Plan> jp1 = new HashMap<Id, Plan>();
-		Map<Id, Plan> jp2 = new HashMap<Id, Plan>();
-		Map<Id, Plan> jp3 = new HashMap<Id, Plan>();
+		Map<Id<Person>, Plan> jp1 = new HashMap< >();
+		Map<Id<Person>, Plan> jp2 = new HashMap< >();
+		Map<Id<Person>, Plan> jp3 = new HashMap< >();
 
-		Id id = new IdImpl( "tintin" );
+		Id id = Id.createPersonId( "tintin" );
 		PersonImpl person = new PersonImpl( id );
 		group.addPerson( person );
 		PlanImpl plan = person.createAndAddPlan( false );
@@ -282,7 +282,7 @@ public class HighestWeightSelectorTest {
 		plan.setScore( 5000d );
 		jp3.put( id , plan );
 
-		id = new IdImpl( "milou" );
+		id = Id.createPersonId( "milou" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
@@ -295,7 +295,7 @@ public class HighestWeightSelectorTest {
 		plan.setScore( 5000d );
 		jp3.put( id , plan );
 
-		id = new IdImpl( "tim" );
+		id = Id.createPersonId( "tim" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
@@ -307,7 +307,7 @@ public class HighestWeightSelectorTest {
 		plan.setScore( -5000d );
 		jp3.put( id , plan );
 
-		id = new IdImpl( "struppy" );
+		id = Id.createPersonId( "struppy" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
@@ -351,12 +351,12 @@ public class HighestWeightSelectorTest {
 		final JointPlans jointPlans = new JointPlans();
 		ReplanningGroup group = new ReplanningGroup();
 
-		Map<Id, Plan> jp1 = new HashMap<Id, Plan>();
-		Map<Id, Plan> jp2 = new HashMap<Id, Plan>();
-		Map<Id, Plan> jp3 = new HashMap<Id, Plan>();
-		Map<Id, Plan> jp4 = new HashMap<Id, Plan>();
+		Map<Id<Person>, Plan> jp1 = new HashMap< >();
+		Map<Id<Person>, Plan> jp2 = new HashMap< >();
+		Map<Id<Person>, Plan> jp3 = new HashMap< >();
+		Map<Id<Person>, Plan> jp4 = new HashMap< >();
 
-		Id id = new IdImpl( "tintin" );
+		Id id = Id.createPersonId( "tintin" );
 		PersonImpl person = new PersonImpl( id );
 		group.addPerson( person );
 		PlanImpl plan = person.createAndAddPlan( false );
@@ -369,7 +369,7 @@ public class HighestWeightSelectorTest {
 		plan.setScore( 5000d );
 		jp3.put( id , plan );
 
-		id = new IdImpl( "milou" );
+		id = Id.createPersonId( "milou" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
@@ -382,7 +382,7 @@ public class HighestWeightSelectorTest {
 		plan.setScore( 5000d );
 		jp3.put( id , plan );
 
-		id = new IdImpl( "tim" );
+		id = Id.createPersonId( "tim" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
@@ -394,7 +394,7 @@ public class HighestWeightSelectorTest {
 		plan.setScore( -5000d );
 		jp3.put( id , plan );
 
-		id = new IdImpl( "struppy" );
+		id = Id.createPersonId( "struppy" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
@@ -438,16 +438,16 @@ public class HighestWeightSelectorTest {
 		final JointPlans jointPlans = new JointPlans();
 		ReplanningGroup group = new ReplanningGroup();
 
-		Map<Id, Plan> jp1 = new HashMap<Id, Plan>();
-		Map<Id, Plan> jp2 = new HashMap<Id, Plan>();
-		Map<Id, Plan> jp3 = new HashMap<Id, Plan>();
-		Map<Id, Plan> jp4 = new HashMap<Id, Plan>();
-		Map<Id, Plan> jp5 = new HashMap<Id, Plan>();
-		Map<Id, Plan> jp6 = new HashMap<Id, Plan>();
-		Map<Id, Plan> jp7 = new HashMap<Id, Plan>();
-		Map<Id, Plan> jp8 = new HashMap<Id, Plan>();
+		Map<Id<Person>, Plan> jp1 = new HashMap< >();
+		Map<Id<Person>, Plan> jp2 = new HashMap< >();
+		Map<Id<Person>, Plan> jp3 = new HashMap< >();
+		Map<Id<Person>, Plan> jp4 = new HashMap< >();
+		Map<Id<Person>, Plan> jp5 = new HashMap< >();
+		Map<Id<Person>, Plan> jp6 = new HashMap< >();
+		Map<Id<Person>, Plan> jp7 = new HashMap< >();
+		Map<Id<Person>, Plan> jp8 = new HashMap< >();
 
-		Id id = new IdImpl( "tintin" );
+		Id id = Id.createPersonId( "tintin" );
 		PersonImpl person = new PersonImpl( id );
 		group.addPerson( person );
 		PlanImpl plan = person.createAndAddPlan( false );
@@ -463,7 +463,7 @@ public class HighestWeightSelectorTest {
 		plan.setScore( 40d );
 		jp7.put( id , plan );
 
-		id = new IdImpl( "milou" );
+		id = Id.createPersonId( "milou" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
@@ -479,7 +479,7 @@ public class HighestWeightSelectorTest {
 		plan.setScore( 200d );
 		jp8.put( id , plan );
 
-		id = new IdImpl( "tim" );
+		id = Id.createPersonId( "tim" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
@@ -494,7 +494,7 @@ public class HighestWeightSelectorTest {
 		plan.setScore( 101d );
 		jp7.put( id , plan );
 
-		id = new IdImpl( "struppy" );
+		id = Id.createPersonId( "struppy" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
@@ -508,7 +508,7 @@ public class HighestWeightSelectorTest {
 		plan.setScore( 444d );
 		jp8.put( id , plan );
 
-		id = new IdImpl( "haddock" );
+		id = Id.createPersonId( "haddock" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
@@ -562,16 +562,16 @@ public class HighestWeightSelectorTest {
 		final JointPlans jointPlans = new JointPlans();
 		ReplanningGroup group = new ReplanningGroup();
 
-		Map<Id, Plan> jp = new HashMap<Id, Plan>();
+		Map<Id<Person>, Plan> jp = new HashMap< >();
 
-		Id id = new IdImpl( "tintin" );
+		Id<Person> id = Id.createPersonId( "tintin" );
 		PersonImpl person = new PersonImpl( id );
 		group.addPerson( person );
 		PlanImpl plan = person.createAndAddPlan( false );
 		plan.setScore( 1d );
 		jp.put( id , plan );
 
-		id = new IdImpl( "milou" );
+		id = Id.createPersonId( "milou" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
@@ -580,14 +580,14 @@ public class HighestWeightSelectorTest {
 		plan = person.createAndAddPlan( false );
 		plan.setScore( 5000d );
 
-		id = new IdImpl( "tim" );
+		id = Id.createPersonId( "tim" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
 		plan.setScore( 10d );
 		jp.put( id , plan );
 
-		id = new IdImpl( "struppy" );
+		id = Id.createPersonId( "struppy" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
@@ -624,12 +624,12 @@ public class HighestWeightSelectorTest {
 
 		List<Plan> toBeSelected = new ArrayList<Plan>();
 
-		Map<Id, Plan> jp1 = new HashMap<Id, Plan>();
-		Map<Id, Plan> jp2 = new HashMap<Id, Plan>();
-		Map<Id, Plan> jp3 = new HashMap<Id, Plan>();
-		Map<Id, Plan> jp4 = new HashMap<Id, Plan>();
+		Map<Id<Person>, Plan> jp1 = new HashMap< >();
+		Map<Id<Person>, Plan> jp2 = new HashMap< >();
+		Map<Id<Person>, Plan> jp3 = new HashMap< >();
+		Map<Id<Person>, Plan> jp4 = new HashMap< >();
 
-		Id id = new IdImpl( "tintin" );
+		Id<Person> id = Id.createPersonId( "tintin" );
 		PersonImpl person = new PersonImpl( id );
 		group.addPerson( person );
 		PlanImpl plan = person.createAndAddPlan( false );
@@ -643,7 +643,7 @@ public class HighestWeightSelectorTest {
 		plan = person.createAndAddPlan( false );
 		plan.setScore( 5d );
 
-		id = new IdImpl( "milou" );
+		id = Id.createPersonId( "milou" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
@@ -658,7 +658,7 @@ public class HighestWeightSelectorTest {
 		plan = person.createAndAddPlan( false );
 		plan.setScore( 5d );
 
-		id = new IdImpl( "tim" );
+		id = Id.createPersonId( "tim" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
@@ -673,7 +673,7 @@ public class HighestWeightSelectorTest {
 		plan = person.createAndAddPlan( false );
 		plan.setScore( 5d );
 
-		id = new IdImpl( "struppy" );
+		id = Id.createPersonId( "struppy" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
@@ -688,7 +688,7 @@ public class HighestWeightSelectorTest {
 		plan = person.createAndAddPlan( false );
 		plan.setScore( 5d );
 
-		id = new IdImpl( "haddock" );
+		id = Id.createPersonId( "haddock" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
@@ -733,16 +733,16 @@ public class HighestWeightSelectorTest {
 		final JointPlans jointPlans = new JointPlans();
 		ReplanningGroup group = new ReplanningGroup();
 
-		Map<Id, Plan> jp = new HashMap<Id, Plan>();
+		Map<Id<Person>, Plan> jp = new HashMap< >();
 
-		Id id = new IdImpl( "milou" );
+		Id<Person> id = Id.createPersonId( "milou" );
 		PersonImpl person = new PersonImpl( id );
 		group.addPerson( person );
 		PlanImpl plan = person.createAndAddPlan( false );
 		plan.setScore( 1d );
 		jp.put( id , plan );
 
-		id = new IdImpl( "tintin" );
+		id = Id.createPersonId( "tintin" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
@@ -751,14 +751,14 @@ public class HighestWeightSelectorTest {
 		plan = person.createAndAddPlan( false );
 		plan.setScore( 5000d );
 
-		id = new IdImpl( "struppy" );
+		id = Id.createPersonId( "struppy" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
 		plan.setScore( 10d );
 		jp.put( id , plan );
 
-		id = new IdImpl( "tim" );
+		id = Id.createPersonId( "tim" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
@@ -794,16 +794,16 @@ public class HighestWeightSelectorTest {
 		final JointPlans jointPlans = new JointPlans();
 		ReplanningGroup group = new ReplanningGroup();
 
-		Map<Id, Plan> jp = new HashMap<Id, Plan>();
+		Map<Id<Person>, Plan> jp = new HashMap< >();
 
-		Id id = new IdImpl( "tintin" );
+		Id<Person> id = Id.createPersonId( "tintin" );
 		PersonImpl person = new PersonImpl( id );
 		group.addPerson( person );
 		PlanImpl plan = person.createAndAddPlan( false );
 		plan.setScore( -1295836d );
 		jp.put( id , plan );
 
-		id = new IdImpl( "milou" );
+		id = Id.createPersonId( "milou" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
@@ -812,7 +812,7 @@ public class HighestWeightSelectorTest {
 		plan = person.createAndAddPlan( false );
 		plan.setScore( null );
 
-		id = new IdImpl( "tim" );
+		id = Id.createPersonId( "tim" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
@@ -821,7 +821,7 @@ public class HighestWeightSelectorTest {
 		plan = person.createAndAddPlan( false );
 		plan.setScore( null );
 
-		id = new IdImpl( "struppy" );
+		id = Id.createPersonId( "struppy" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
@@ -857,12 +857,12 @@ public class HighestWeightSelectorTest {
 		final JointPlans jointPlans = new JointPlans();
 		ReplanningGroup group = new ReplanningGroup();
 
-		Map<Id, Plan> jp1 = new HashMap<Id, Plan>();
-		Map<Id, Plan> jp2 = new HashMap<Id, Plan>();
-		Map<Id, Plan> jp3 = new HashMap<Id, Plan>();
+		Map<Id<Person>, Plan> jp1 = new HashMap< >();
+		Map<Id<Person>, Plan> jp2 = new HashMap< >();
+		Map<Id<Person>, Plan> jp3 = new HashMap< >();
 
 
-		Id id = new IdImpl( "tintin" );
+		Id<Person> id = Id.createPersonId( "tintin" );
 		PersonImpl person = new PersonImpl( id );
 		group.addPerson( person );
 		PlanImpl plan = person.createAndAddPlan( false );
@@ -875,7 +875,7 @@ public class HighestWeightSelectorTest {
 		plan.setScore( -1295836d );
 		jp3.put( id , plan );
 
-		id = new IdImpl( "milou" );
+		id = Id.createPersonId( "milou" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
@@ -888,7 +888,7 @@ public class HighestWeightSelectorTest {
 		plan.setScore( 1000d );
 		Plan p2 = plan;
 
-		id = new IdImpl( "tim" );
+		id = Id.createPersonId( "tim" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
@@ -901,7 +901,7 @@ public class HighestWeightSelectorTest {
 		plan.setScore( -1295836d );
 		jp3.put( id , plan );
 
-		id = new IdImpl( "struppy" );
+		id = Id.createPersonId( "struppy" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
@@ -944,17 +944,17 @@ public class HighestWeightSelectorTest {
 		final JointPlans jointPlans = new JointPlans();
 		ReplanningGroup group = new ReplanningGroup();
 
-		Map<Id, Plan> jp1 = new HashMap<Id, Plan>();
-		Map<Id, Plan> jp2 = new HashMap<Id, Plan>();
+		Map<Id<Person>, Plan> jp1 = new HashMap< >();
+		Map<Id<Person>, Plan> jp2 = new HashMap< >();
 
-		Id id = new IdImpl( "tintin" );
+		Id<Person> id = Id.createPersonId( "tintin" );
 		PersonImpl person = new PersonImpl( id );
 		group.addPerson( person );
 		PlanImpl plan = person.createAndAddPlan( false );
 		plan.setScore( 10000d );
 		Plan p1 = plan;
 
-		id = new IdImpl( "milou" );
+		id = Id.createPersonId( "milou" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
@@ -964,7 +964,7 @@ public class HighestWeightSelectorTest {
 		plan.setScore( 100000d );
 		Plan p2 = plan;
 
-		id = new IdImpl( "tim" );
+		id = Id.createPersonId( "tim" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
@@ -977,7 +977,7 @@ public class HighestWeightSelectorTest {
 		plan.setScore( 10000d );
 		Plan p3 = plan;
 
-		id = new IdImpl( "struppy" );
+		id = Id.createPersonId( "struppy" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		plan = person.createAndAddPlan( false );
@@ -1085,12 +1085,12 @@ public class HighestWeightSelectorTest {
 		final JointPlans jointPlans = new JointPlans();
 		ReplanningGroup group = new ReplanningGroup();
 
-		final Map<Id, Plan> jp1 = new HashMap<Id, Plan>();
-		final Map<Id, Plan> jp2 = new HashMap<Id, Plan>();
-		final Map<Id, Plan> jp3 = new HashMap<Id, Plan>();
-		final Map<Id, Plan> jp4 = new HashMap<Id, Plan>();
+		final Map<Id<Person>, Plan> jp1 = new HashMap< >();
+		final Map<Id<Person>, Plan> jp2 = new HashMap< >();
+		final Map<Id<Person>, Plan> jp3 = new HashMap< >();
+		final Map<Id<Person>, Plan> jp4 = new HashMap< >();
 
-		Id id = new IdImpl( "tintin" );
+		Id<Person> id = Id.createPersonId( "tintin" );
 		PersonImpl person = new PersonImpl( id );
 		group.addPerson( person );
 		final PlanImpl p11 = person.createAndAddPlan( false );
@@ -1100,7 +1100,7 @@ public class HighestWeightSelectorTest {
 		p12.setScore( 1d );
 		jp2.put( id , p12 );
 
-		id = new IdImpl( "milou" );
+		id = Id.createPersonId( "milou" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		final PlanImpl p21 = person.createAndAddPlan( false );
@@ -1110,7 +1110,7 @@ public class HighestWeightSelectorTest {
 		p22.setScore( 10d );
 		jp2.put( id , p22 );
 
-		id = new IdImpl( "tim" );
+		id = Id.createPersonId( "tim" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		final PlanImpl p31 = person.createAndAddPlan( false );
@@ -1120,7 +1120,7 @@ public class HighestWeightSelectorTest {
 		p32.setScore( 1d );
 		jp4.put( id , p32 );
 
-		id = new IdImpl( "struppy" );
+		id = Id.createPersonId( "struppy" );
 		person = new PersonImpl( id );
 		group.addPerson( person );
 		final PlanImpl p41 = person.createAndAddPlan( false );

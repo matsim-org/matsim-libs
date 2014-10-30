@@ -50,14 +50,14 @@ import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 public class RecomposeJointPlanAlgorithmTest {
 	private static class Fixture {
 		public final GroupPlans groupPlans;
-		public final Collection<Set<Id>> expectedJointPlanStructure;
+		public final Collection<Set<Id<Person>>> expectedJointPlanStructure;
 		public final int expectedNJointPlans;
 		public final int expectedNIndivPlans;
 		public final PlanLinkIdentifier identifier;
 
 		public Fixture(
 				final GroupPlans groupPlans,
-				final Collection<Set<Id>> expectedJointPlanStructure) {
+				final Collection<Set<Id<Person>>> expectedJointPlanStructure) {
 			this( groupPlans,
 					expectedJointPlanStructure,
 					new PlanLinkIdentifier() {
@@ -68,7 +68,7 @@ public class RecomposeJointPlanAlgorithmTest {
 							final Id id1 = p1.getPerson().getId();
 							final Id id2 = p2.getPerson().getId();
 
-							for (Set<Id> ids : expectedJointPlanStructure) {
+							for (Set<Id<Person>> ids : expectedJointPlanStructure) {
 								if (ids.contains( id1 )) return ids.contains( id2 );
 							}
 
@@ -79,7 +79,7 @@ public class RecomposeJointPlanAlgorithmTest {
 
 		public Fixture(
 				final GroupPlans groupPlans,
-				final Collection<Set<Id>> expectedJointPlanStructure,
+				final Collection<Set<Id<Person>>> expectedJointPlanStructure,
 				final PlanLinkIdentifier identifier) {
 			this.groupPlans = groupPlans;
 			this.expectedJointPlanStructure = expectedJointPlanStructure;
@@ -87,7 +87,7 @@ public class RecomposeJointPlanAlgorithmTest {
 
 			int jps = 0;
 			int indps = 0;
-			for (Set<Id> jp : expectedJointPlanStructure) {
+			for (Set<Id<Person>> jp : expectedJointPlanStructure) {
 				assert jp.size() > 0;
 				if (jp.size() > 1) jps++;
 				else indps++;
@@ -100,8 +100,8 @@ public class RecomposeJointPlanAlgorithmTest {
 	private Fixture createRandomFixtureWithIndividualPlans(final Random random) {
 		final List<Plan> plans = new ArrayList<Plan>();
 
-		Set<Id> currentJointPlan = new HashSet<Id>();
-		final List<Set<Id>> jointPlansToExpect = new ArrayList<Set<Id>>();
+		Set<Id<Person>> currentJointPlan = new HashSet< >();
+		final List<Set<Id<Person>>> jointPlansToExpect = new ArrayList< >();
 		jointPlansToExpect.add( currentJointPlan );
 
 		for (int i=0; i < 100; i++) {
@@ -111,7 +111,7 @@ public class RecomposeJointPlanAlgorithmTest {
 			plans.add( plan );
 
 			if (random.nextDouble() < 0.2) {
-				currentJointPlan = new HashSet<Id>();
+				currentJointPlan = new HashSet< >();
 				jointPlansToExpect.add( currentJointPlan );
 			}
 
@@ -129,19 +129,19 @@ public class RecomposeJointPlanAlgorithmTest {
 	private Fixture createRandomFixtureWithOneBigJointPlan(final Random random) {
 		final List<Plan> plans = new ArrayList<Plan>();
 
-		final Map<Id, Plan> jointPlan = new HashMap<Id, Plan>();
-		Set<Id> currentJointPlan = new HashSet<Id>();
-		final List<Set<Id>> jointPlansToExpect = new ArrayList<Set<Id>>();
+		final Map<Id<Person>, Plan> jointPlan = new HashMap< >();
+		Set<Id<Person>> currentJointPlan = new HashSet< >();
+		final List<Set<Id<Person>>> jointPlansToExpect = new ArrayList< >();
 		jointPlansToExpect.add( currentJointPlan );
 
 		for (int i=0; i < 100; i++) {
-			final Id id = new IdImpl( i );
+			final Id<Person> id = Id.createPersonId( i );
 			final Person person = new PersonImpl( id );
 			final Plan plan = new PlanImpl( person );
 			jointPlan.put( id , plan );
 
 			if (random.nextDouble() < 0.2) {
-				currentJointPlan = new HashSet<Id>();
+				currentJointPlan = new HashSet< >();
 				jointPlansToExpect.add( currentJointPlan );
 			}
 
@@ -159,15 +159,15 @@ public class RecomposeJointPlanAlgorithmTest {
 
 	private Fixture createRandomFixtureWithJointAndIndividualPlans(final Random random) {
 		final JointPlanFactory factory = new JointPlanFactory();
-		Map<Id, Plan> currentJointPlan = new HashMap<Id, Plan>();
+		Map<Id<Person>, Plan> currentJointPlan = new HashMap< >();
 		final List<JointPlan> jointPlans = new ArrayList<JointPlan>();
 		final List<Plan> plans = new ArrayList<Plan>();
-		Set<Id> currentExpectedJointPlan = new HashSet<Id>();
-		final List<Set<Id>> jointPlansToExpect = new ArrayList<Set<Id>>();
+		Set<Id<Person>> currentExpectedJointPlan = new HashSet< >();
+		final List<Set<Id<Person>>> jointPlansToExpect = new ArrayList< >();
 		jointPlansToExpect.add( currentExpectedJointPlan );
 
 		for (int i=0; i < 100; i++) {
-			final Id id = new IdImpl( i );
+			final Id<Person> id = Id.createPersonId( i );
 			final Person person = new PersonImpl( id );
 			final Plan plan = new PlanImpl( person );
 			if ( random.nextDouble() < 0.2 ) {
@@ -177,13 +177,13 @@ public class RecomposeJointPlanAlgorithmTest {
 				if ( random.nextDouble() < 0.4 ) {
 					final JointPlan jp = factory.createJointPlan( currentJointPlan );
 					jointPlans.add( jp );
-					currentJointPlan = new HashMap<Id, Plan>();
+					currentJointPlan = new HashMap< >();
 				}
 				currentJointPlan.put( id , plan );
 			}
 
 			if (random.nextDouble() < 0.2) {
-				currentExpectedJointPlan = new HashSet<Id>();
+				currentExpectedJointPlan = new HashSet< >();
 				jointPlansToExpect.add( currentExpectedJointPlan );
 			}
 
@@ -204,11 +204,11 @@ public class RecomposeJointPlanAlgorithmTest {
 
 	private Fixture createRandomFixtureWithIncompleteLinks(final Random random) {
 		final JointPlanFactory factory = new JointPlanFactory();
-		Map<Id, Plan> currentJointPlan = new HashMap<Id, Plan>();
+		Map<Id<Person>, Plan> currentJointPlan = new HashMap< >();
 		final List<JointPlan> jointPlans = new ArrayList<JointPlan>();
 		final List<Plan> plans = new ArrayList<Plan>();
-		Set<Id> currentExpectedJointPlan = new HashSet<Id>();
-		final List<Set<Id>> jointPlansToExpect = new ArrayList<Set<Id>>();
+		Set<Id<Person>> currentExpectedJointPlan = new HashSet< >();
+		final List<Set<Id<Person>>> jointPlansToExpect = new ArrayList< >();
 		jointPlansToExpect.add( currentExpectedJointPlan );
 		final Collection<PlanPair> links = new ArrayList<PlanPair>();
 
@@ -224,13 +224,13 @@ public class RecomposeJointPlanAlgorithmTest {
 				if ( random.nextDouble() < 0.4 ) {
 					final JointPlan jp = factory.createJointPlan( currentJointPlan );
 					jointPlans.add( jp );
-					currentJointPlan = new HashMap<Id, Plan>();
+					currentJointPlan = new HashMap< >();
 				}
 				currentJointPlan.put( id , plan );
 			}
 
 			if (random.nextDouble() < 0.2) {
-				currentExpectedJointPlan = new HashSet<Id>();
+				currentExpectedJointPlan = new HashSet< >();
 				jointPlansToExpect.add( currentExpectedJointPlan );
 			}
 
@@ -297,7 +297,7 @@ public class RecomposeJointPlanAlgorithmTest {
 				fixture.groupPlans.getJointPlans().size());
 
 		for (JointPlan jp : fixture.groupPlans.getJointPlans()) {
-			final Set<Id> ids = jp.getIndividualPlans().keySet();
+			final Set<Id<Person>> ids = jp.getIndividualPlans().keySet();
 			assertTrue(
 					"unexpected joint plan "+ids+": not in "+fixture.expectedJointPlanStructure,
 					fixture.expectedJointPlanStructure.contains( ids ));

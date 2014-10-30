@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
@@ -85,12 +86,12 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 
 	@Override
 	public void run(final JointPlan plan) {
-		run( plan , Collections.<Id>emptyList() );
+		run( plan , Collections.<Id<Person>>emptyList() );
 	}
 
 	public ActedUponInformation run(
 			final JointPlan jointPlan,
-			final Collection<Id> agentsToIgnore) {
+			final Collection<Id<Person>> agentsToIgnore) {
 		final ClassifiedTrips trips = extractClassifiedTrips( jointPlan , agentsToIgnore );
 		final List<Match> matches =
 			extractMatches(
@@ -105,10 +106,10 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 
 	private ClassifiedTrips extractClassifiedTrips(
 			final JointPlan jointPlan,
-			final Collection<Id> agentsToIgnore) {
+			final Collection<Id<Person>> agentsToIgnore) {
 		final ClassifiedTrips trips = new ClassifiedTrips();
 
-		for (Map.Entry<Id, Plan> entry : jointPlan.getIndividualPlans().entrySet()) {
+		for (Map.Entry<Id<Person>, Plan> entry : jointPlan.getIndividualPlans().entrySet()) {
 			final Id id = entry.getKey();
 			if ( agentsToIgnore.contains( id ) ) continue;
 			final Plan plan = entry.getValue();
@@ -157,10 +158,10 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 		final List<Match> matches = new ArrayList<Match>();
 		final JointTravelStructure structure = JointPlanUtils.analyseJointTravel( jointPlan );
 
-		for ( Map.Entry<Id, List<Trip>> eDriver : trips.carTrips.entrySet() ) {
-			final Id driverId = eDriver.getKey();
-			for ( Map.Entry<Id, List<Trip>> ePass : trips.nonChainBasedModeTrips.entrySet() ) {
-				final Id passengerId = ePass.getKey();
+		for ( Map.Entry<Id<Person>, List<Trip>> eDriver : trips.carTrips.entrySet() ) {
+			final Id<Person> driverId = eDriver.getKey();
+			for ( Map.Entry<Id<Person>, List<Trip>> ePass : trips.nonChainBasedModeTrips.entrySet() ) {
+				final Id<Person> passengerId = ePass.getKey();
 				if ( acceptAgentMatch( driverId , passengerId ) ) {
 					addMatches( matches , jointPlan , structure , eDriver.getValue() , ePass.getValue() );
 				}
@@ -390,8 +391,8 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 	// helper classes
 	// /////////////////////////////////////////////////////////////////////////
 	private static class ClassifiedTrips {
-		public final Map<Id, List<Trip>> carTrips = new HashMap<Id, List<Trip>>();
-		public final Map<Id, List<Trip>> nonChainBasedModeTrips = new HashMap<Id, List<Trip>>();
+		public final Map<Id<Person>, List<Trip>> carTrips = new HashMap< >();
+		public final Map<Id<Person>, List<Trip>> nonChainBasedModeTrips = new HashMap< >();
 
 		public void addCarTrip( final Trip t ) {
 			MapUtils.getList( t.agentId , carTrips ).add( t );
@@ -407,13 +408,13 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 		final Activity arrival;
 		final double departureTime;
 		final double length;
-		final Id agentId;
+		final Id<Person> agentId;
 
 		public Trip(
 				final Activity departure,
 				final Activity arrival,
 				final double departureTime,
-				final Id agentId) {
+				final Id<Person> agentId) {
 			this.departure = departure;
 			this.arrival = arrival;
 			this.departureTime = departureTime;

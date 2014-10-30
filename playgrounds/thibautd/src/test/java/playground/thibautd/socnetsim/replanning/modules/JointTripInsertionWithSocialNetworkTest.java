@@ -79,7 +79,7 @@ public class JointTripInsertionWithSocialNetworkTest {
 			final JointPlan jp = groupAllPlansInJointPlan( scenario.getPopulation() );
 
 
-			final Set<Id> agentsToIgnore = new HashSet<Id>();
+			final Set<Id<Person>> agentsToIgnore = new HashSet< >();
 			while ( true ) {
 				final ActedUponInformation actedUpon =
 							algo.run( jp , agentsToIgnore );
@@ -98,7 +98,7 @@ public class JointTripInsertionWithSocialNetworkTest {
 	}
 
 	private JointPlan groupAllPlansInJointPlan(final Population population) {
-		final Map<Id, Plan> plans = new HashMap<Id, Plan>();
+		final Map<Id<Person>, Plan> plans = new HashMap< >();
 
 		for ( Person person : population.getPersons().values() ) {
 			plans.put(

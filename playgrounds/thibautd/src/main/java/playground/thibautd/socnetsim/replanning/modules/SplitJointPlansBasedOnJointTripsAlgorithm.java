@@ -77,11 +77,11 @@ public class SplitJointPlansBasedOnJointTripsAlgorithm implements GenericPlanAlg
 
 	private GroupPlans splitPlan(final JointPlan jp) {
 		final GroupPlans groupPlans = new GroupPlans();
-		final Map<Id, Plan> plansMap = new HashMap<Id, Plan>( jp.getIndividualPlans() );
+		final Map<Id<Person>, Plan> plansMap = new HashMap< >( jp.getIndividualPlans() );
 
 		while (plansMap.size() > 0) {
 			final Plan plan = plansMap.remove( plansMap.keySet().iterator().next() );
-			final Map<Id, Plan> jpMap = new HashMap<Id, Plan>();
+			final Map<Id<Person>, Plan> jpMap = new HashMap< >();
 			jpMap.put( plan.getPerson().getId() , plan );
 
 			findDependentPlans( plan , jpMap , plansMap );
@@ -102,8 +102,8 @@ public class SplitJointPlansBasedOnJointTripsAlgorithm implements GenericPlanAlg
 	// DFS
 	private static void findDependentPlans(
 			final Plan plan,
-			final Map<Id, Plan> dependantPlans,
-			final Map<Id, Plan> plansToLook) {
+			final Map<Id<Person>, Plan> dependantPlans,
+			final Map<Id<Person>, Plan> plansToLook) {
 		for (PlanElement pe : plan.getPlanElements()) {
 			if ( !(pe instanceof Leg) ) continue;
 			final Leg leg = (Leg) pe;

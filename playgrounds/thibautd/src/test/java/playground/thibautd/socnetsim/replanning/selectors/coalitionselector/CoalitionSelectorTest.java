@@ -31,8 +31,8 @@ import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.Test;
-
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
@@ -140,11 +140,11 @@ public class CoalitionSelectorTest {
 						final JointPlans jointPlans = new JointPlans();
 						final ReplanningGroup group = new ReplanningGroup();
 
-						final Map<Id, Plan> jp1 = new HashMap<Id, Plan>();
-						final Map<Id, Plan> jp2 = new HashMap<Id, Plan>();
-						final Map<Id, Plan> jp3 = new HashMap<Id, Plan>();
+						final Map<Id<Person>, Plan> jp1 = new HashMap< >();
+						final Map<Id<Person>, Plan> jp2 = new HashMap< >();
+						final Map<Id<Person>, Plan> jp3 = new HashMap< >();
 
-						PersonImpl person = new PersonImpl( new IdImpl( "tintin" ) );
+						PersonImpl person = new PersonImpl( Id.createPersonId( "tintin" ) );
 						group.addPerson( person );
 						PlanImpl plan = person.createAndAddPlan( false );
 						plan.setScore( 1d );
@@ -152,7 +152,7 @@ public class CoalitionSelectorTest {
 						plan = person.createAndAddPlan( false );
 						plan.setScore( -1d );
 
-						person = new PersonImpl( new IdImpl( "milou" ) );
+						person = new PersonImpl( Id.createPersonId( "milou" ) );
 						group.addPerson( person );
 						plan = person.createAndAddPlan( false );
 						plan.setScore( -10d );
@@ -161,7 +161,7 @@ public class CoalitionSelectorTest {
 						plan.setScore( 5000000000d );
 						jp2.put( person.getId() , plan );
 
-						person = new PersonImpl( new IdImpl( "tim" ) );
+						person = new PersonImpl( Id.createPersonId( "tim" ) );
 						group.addPerson( person );
 						plan = person.createAndAddPlan( false );
 						plan.setScore( 10d );
@@ -170,7 +170,7 @@ public class CoalitionSelectorTest {
 						plan.setScore( 5d );
 						jp2.put( person.getId() , plan );
 
-						person = new PersonImpl( new IdImpl( "struppy" ) );
+						person = new PersonImpl( Id.createPersonId( "struppy" ) );
 						group.addPerson( person );
 						plan = person.createAndAddPlan( false );
 						plan.setScore( -10d );

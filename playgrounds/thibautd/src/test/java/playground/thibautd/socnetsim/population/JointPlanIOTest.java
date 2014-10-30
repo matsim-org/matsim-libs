@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -134,12 +133,12 @@ public class JointPlanIOTest {
 		final Population population =  scenario.getPopulation();
 		final PopulationFactory factory = population.getFactory();
 
-		final Map<Id, Queue<Plan>> plansPerPerson = new LinkedHashMap<Id, Queue<Plan>>();
+		final Map<Id<Person>, Queue<Plan>> plansPerPerson = new LinkedHashMap<Id<Person>, Queue<Plan>>();
 
 		// create plans
 		int idCount = 0;
 		for (int j=0; j < nMembers; j++) {
-			final Id id = new IdImpl( idCount++ );
+			final Id<Person> id = Id.createPersonId( idCount++ );
 			final Person person = factory.createPerson( id );
 			population.addPerson( person );
 			for (int k=0; k < nPlans; k++) {
@@ -155,7 +154,7 @@ public class JointPlanIOTest {
 		final Random random = new Random( 1234 );
 		final int nJointPlans = nMembers;
 		for (int p=0; p < nJointPlans; p++) {
-			final Map<Id, Plan> jointPlan = new LinkedHashMap<Id, Plan>();
+			final Map<Id<Person>, Plan> jointPlan = new LinkedHashMap< >();
 			for (Queue<Plan> plans : plansPerPerson.values()) {
 				if ( random.nextDouble() > pJoin ) continue;
 				final Plan plan = plans.poll();

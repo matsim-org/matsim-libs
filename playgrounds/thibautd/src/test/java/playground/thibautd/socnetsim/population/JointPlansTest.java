@@ -27,7 +27,6 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 
@@ -46,15 +45,15 @@ public class JointPlansTest {
 	}
 
 	private static void testExceptionAdd( final boolean withCache ) throws Exception {
-		Plan p1 = createPlan( new PersonImpl( new IdImpl( 1 ) ) , withCache );
-		Plan p2 = createPlan( new PersonImpl( new IdImpl( 2 ) ) , withCache );
-		Plan p3 = createPlan( new PersonImpl( new IdImpl( 3 ) ) , withCache );
+		Plan p1 = createPlan( new PersonImpl( Id.createPersonId( 1 ) ) , withCache );
+		Plan p2 = createPlan( new PersonImpl( Id.createPersonId( 2 ) ) , withCache );
+		Plan p3 = createPlan( new PersonImpl( Id.createPersonId( 3 ) ) , withCache );
 
-		Map<Id, Plan> jp1 = new HashMap<Id, Plan>();
+		Map<Id<Person>, Plan> jp1 = new HashMap< >();
 		jp1.put( p1.getPerson().getId() , p1 );
 		jp1.put( p2.getPerson().getId() , p2 );
 
-		Map<Id, Plan> jp2 = new HashMap<Id, Plan>();
+		Map<Id<Person>, Plan> jp2 = new HashMap< >();
 		jp2.put( p1.getPerson().getId() , p1 );
 		jp2.put( p3.getPerson().getId() , p3 );
 
@@ -86,10 +85,10 @@ public class JointPlansTest {
 	}
 
 	private static void testExceptionRemove( final boolean withCache ) throws Exception {
-		Plan p1 = createPlan( new PersonImpl( new IdImpl( 1 ) ) , withCache );
-		Plan p2 = createPlan( new PersonImpl( new IdImpl( 2 ) ) , withCache );
+		Plan p1 = createPlan( new PersonImpl( Id.createPersonId( 1 ) ) , withCache );
+		Plan p2 = createPlan( new PersonImpl( Id.createPersonId( 2 ) ) , withCache );
 
-		Map<Id, Plan> jp1 = new HashMap<Id, Plan>();
+		Map<Id<Person>, Plan> jp1 = new HashMap< >();
 		jp1.put( p1.getPerson().getId() , p1 );
 		jp1.put( p2.getPerson().getId() , p2 );
 
@@ -127,10 +126,10 @@ public class JointPlansTest {
 	}
 
 	private static void testAddAndGetSeveralInstances( final boolean withCache ) {
-		final Plan p1 = createPlan( new PersonImpl( new IdImpl( 1 ) ) , withCache );
-		final Plan p2 = createPlan( new PersonImpl( new IdImpl( 2 ) ) , withCache );
+		final Plan p1 = createPlan( new PersonImpl( Id.createPersonId( 1 ) ) , withCache );
+		final Plan p2 = createPlan( new PersonImpl( Id.createPersonId( 2 ) ) , withCache );
 
-		final Map<Id, Plan> jp = new HashMap<Id, Plan>();
+		final Map<Id<Person>, Plan> jp = new HashMap< >();
 		jp.put( p1.getPerson().getId() , p1 );
 		jp.put( p2.getPerson().getId() , p2 );
 
@@ -212,10 +211,10 @@ public class JointPlansTest {
 	}
 
 	private static void testClear( final boolean withCache ) {
-		Plan p1 = createPlan( new PersonImpl( new IdImpl( 1 ) ) , withCache );
-		Plan p2 = createPlan( new PersonImpl( new IdImpl( 2 ) ) , withCache );
+		Plan p1 = createPlan( new PersonImpl( Id.createPersonId( 1 ) ) , withCache );
+		Plan p2 = createPlan( new PersonImpl( Id.createPersonId( 2 ) ) , withCache );
 
-		Map<Id, Plan> jp1 = new HashMap<Id, Plan>();
+		Map<Id<Person>, Plan> jp1 = new HashMap< >();
 		jp1.put( p1.getPerson().getId() , p1 );
 		jp1.put( p2.getPerson().getId() , p2 );
 

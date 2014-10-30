@@ -32,6 +32,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
@@ -78,10 +79,10 @@ public class SplittingTest {
 
 	@Before
 	public void fromOneToNone() {
-		Map<Id, Plan> plans = new HashMap<Id, Plan>();
+		Map<Id<Person>, Plan> plans = new HashMap< >();
 
 		for (int i=0; i < 10; i++) {
-			Id id = new IdImpl( i );
+			Id<Person> id = Id.createPersonId( i );
 			plans.put( id , new PlanImpl( new PersonImpl( id ) ) );
 		}
 
@@ -97,7 +98,7 @@ public class SplittingTest {
 
 	@Before
 	public void fromOneToNoneNotEmpty() {
-		Map<Id, Plan> plans = new HashMap<Id, Plan>();
+		Map<Id<Person>, Plan> plans = new HashMap< >();
 
 		final Id origin = new IdImpl( "origin" );
 		final Id destination = new IdImpl( "destination" );
@@ -123,15 +124,15 @@ public class SplittingTest {
 
 	@Before
 	public void fromOneToOne() {
-		Map<Id, Plan> plans = new HashMap<Id, Plan>();
+		Map<Id<Person>, Plan> plans = new HashMap< >();
 
 		final Id origin = new IdImpl( "origin" );
 		final Id destination = new IdImpl( "destination" );
 
-		final Id driverId = new IdImpl( "driver" );
+		final Id<Person> driverId = Id.createPersonId( "driver" );
 		final DriverRoute driverRoute = new DriverRoute( origin , destination );
 		for (int i=0; i < 10; i++) {
-			Id id = new IdImpl( i );
+			Id<Person> id = Id.createPersonId( i );
 			driverRoute.addPassenger( id );
 			PlanImpl p = new PlanImpl( new PersonImpl( id ) );
 			plans.put( id , p );
@@ -162,15 +163,15 @@ public class SplittingTest {
 
 	@Before
 	public void fromOneToOneTwoJointTrips() {
-		Map<Id, Plan> plans = new HashMap<Id, Plan>();
+		Map<Id<Person>, Plan> plans = new HashMap< >();
 
 		final Id origin = new IdImpl( "origin" );
 		final Id destination = new IdImpl( "destination" );
 
-		final Id driverId = new IdImpl( "driver" );
+		final Id<Person> driverId = Id.createPersonId( "driver" );
 		final DriverRoute driverRoute1 = new DriverRoute( origin , destination );
 		for (int i=0; i < 10; i++) {
-			Id id = new IdImpl( i );
+			Id<Person> id = Id.createPersonId( i );
 			driverRoute1.addPassenger( id );
 			PlanImpl p = new PlanImpl( new PersonImpl( id ) );
 			plans.put( id , p );
@@ -184,7 +185,7 @@ public class SplittingTest {
 
 		final DriverRoute driverRoute2 = new DriverRoute( destination , origin );
 		for (int i=100; i < 110; i++) {
-			Id id = new IdImpl( i );
+			Id<Person> id = Id.createPersonId( i );
 			driverRoute2.addPassenger( id );
 			PlanImpl p = new PlanImpl( new PersonImpl( id ) );
 			plans.put( id , p );

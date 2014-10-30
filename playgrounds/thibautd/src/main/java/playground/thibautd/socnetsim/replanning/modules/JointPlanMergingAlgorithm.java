@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 
 import playground.thibautd.socnetsim.population.JointPlan;
@@ -115,7 +116,7 @@ class JointPlanMergingAlgorithm implements GenericPlanAlgorithm<GroupPlans> {
 	//}
 
 	private class JointPlanBuilder {
-		private final Map<Id, Plan> plans = new HashMap<Id, Plan>();
+		private final Map<Id<Person>, Plan> plans = new HashMap<Id<Person>, Plan>();
 
 		public void addJointPlan(final JointPlan jp) {
 			plans.putAll( jp.getIndividualPlans() );

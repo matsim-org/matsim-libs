@@ -27,6 +27,7 @@ import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.router.CompositeStageActivityTypes;
@@ -71,7 +72,7 @@ public class JointTripInsertorAndRemoverAlgorithm implements GenericPlanAlgorith
 
 	@Override
 	public void run(final JointPlan plan) {
-		final List<Id> agentsToIgnore = new ArrayList<Id>();
+		final List<Id<Person>> agentsToIgnore = new ArrayList< >();
 
 		do {
 			final ActedUponInformation actedUpon =
@@ -90,7 +91,7 @@ public class JointTripInsertorAndRemoverAlgorithm implements GenericPlanAlgorith
 
 	private double getProbRemoval(
 			final JointPlan plan,
-			final Collection<Id> agentsToIgnore) {
+			final List<Id<Person>> agentsToIgnore) {
 		int countPassengers = 0;
 		int countEgoists = 0;
 

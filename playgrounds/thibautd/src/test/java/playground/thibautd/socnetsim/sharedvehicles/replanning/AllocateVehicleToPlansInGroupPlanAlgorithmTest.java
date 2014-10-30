@@ -71,7 +71,7 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithmTest {
 
 		final PopulationFactory popFact = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getPopulation().getFactory();
 		for ( int i = 0; i < 5; i++ ) {
-			final Person person = popFact.createPerson( new IdImpl( "indiv-"+i ) );
+			final Person person = popFact.createPerson( Id.createPersonId( "indiv-"+i ) );
 			final Plan plan = popFact.createPlan();
 			person.addPlan( plan );
 			plan.setPerson( person );
@@ -83,17 +83,17 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithmTest {
 			}
 			else {
 				final Leg l = popFact.createLeg( MODE );
-				l.setRoute( new LinkNetworkRouteImpl( new IdImpl( 1 ) , new IdImpl( 12 ) ) );
+				l.setRoute( new LinkNetworkRouteImpl( Id.createLinkId( 1 ) , Id.createLinkId( 12 ) ) );
 				plan.addLeg( l );
 			}
-			plan.addActivity( popFact.createActivityFromLinkId( "h" , new IdImpl( 42 ) ) );
+			plan.addActivity( popFact.createActivityFromLinkId( "h" , Id.createLinkId( 42 ) ) );
 		}
 
 		final JointPlanFactory jpFact = new JointPlanFactory();
 		for ( int i = 1; i < 5; i++ ) {
-			final Map<Id, Plan> plans = new HashMap<Id, Plan>();
+			final Map<Id<Person>, Plan> plans = new HashMap< >();
 			for ( int j = 0; j < i; j++ ) {
-				final Person person = popFact.createPerson( new IdImpl( "joint-"+i+"-"+j ) );
+				final Person person = popFact.createPerson( Id.createPersonId( "joint-"+i+"-"+j ) );
 				final Plan plan = popFact.createPlan();
 				person.addPlan( plan );
 				plan.setPerson( person );
@@ -105,10 +105,10 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithmTest {
 				}
 				else {
 					final Leg l = popFact.createLeg( MODE );
-					l.setRoute( new LinkNetworkRouteImpl( new IdImpl( 1 ) , new IdImpl( 12 ) ) );
+					l.setRoute( new LinkNetworkRouteImpl( Id.createLinkId( 1 ) , Id.createLinkId( 12 ) ) );
 					plan.addLeg( l );
 				}
-				plan.addActivity( popFact.createActivityFromLinkId( "h" , new IdImpl( 42 ) ) );
+				plan.addActivity( popFact.createActivityFromLinkId( "h" , Id.createLinkId( 42 ) ) );
 			}
 			jointPlans.add( jpFact.createJointPlan( plans ) );
 		}

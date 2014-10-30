@@ -103,7 +103,7 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 	}
 
 	private JointPlan createPlanWithoutJointTrips() {
-		final Map<Id, Plan> individualPlans = new HashMap<Id, Plan>();
+		final Map<Id<Person>, Plan> individualPlans = new HashMap< >();
 
 		for (int i=0; i < 100; i++) {
 			Id driverId = new IdImpl( "driver"+i );
@@ -127,7 +127,7 @@ public class InsertionRemovalIgnoranceBehaviorTest {
 	}
 
 	private JointPlan createPlanWithJointTrips() {
-		final Map<Id, Plan> individualPlans = new HashMap<Id, Plan>();
+		final Map<Id<Person>, Plan> individualPlans = new HashMap< >();
 
 		Id puLink = new IdImpl( "pu" );
 		Id doLink = new IdImpl( "do" );

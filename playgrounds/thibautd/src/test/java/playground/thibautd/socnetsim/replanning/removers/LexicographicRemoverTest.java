@@ -45,7 +45,7 @@ public class LexicographicRemoverTest {
 
 	@Test
 	public void testOnlyIndividualPlans() {
-		final Map<Id, Plan> toRemove = new LinkedHashMap<Id, Plan>();
+		final Map<Id<Person>, Plan> toRemove = new LinkedHashMap< >();
 		final ReplanningGroup group = new ReplanningGroup();
 		final JointPlans jointPlans = new JointPlans();
 
@@ -147,7 +147,7 @@ public class LexicographicRemoverTest {
 			final JointPlanFactory factory,
 			final List<Person> persons,
 			final double... scores) {
-		final Map<Id, Plan> plans = new LinkedHashMap<Id, Plan>();
+		final Map<Id<Person>, Plan> plans = new LinkedHashMap< >();
 
 		if ( scores.length != persons.size() ) throw new IllegalArgumentException();
 
@@ -191,14 +191,14 @@ public class LexicographicRemoverTest {
 		public final int maxPerAgent;
 		public final JointPlans jointPlans;
 		public final ReplanningGroup group;
-		public final Map<Id, Plan> expectedRemovedPlans;
+		public final Map<Id<Person>, Plan> expectedRemovedPlans;
 
 		public Fixture(
 				final int maxPerComposition,
 				final int maxPerAgent,
 				final JointPlans jointPlans,
 				final ReplanningGroup group,
-				final Map<Id, Plan> expectedRemovedPlans) {
+				final Map<Id<Person>, Plan> expectedRemovedPlans) {
 			this.maxPerComposition = maxPerComposition;
 			this.maxPerAgent = maxPerAgent;
 			this.jointPlans = jointPlans;

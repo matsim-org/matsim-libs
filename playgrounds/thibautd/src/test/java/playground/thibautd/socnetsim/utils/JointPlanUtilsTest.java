@@ -61,14 +61,14 @@ public class JointPlanUtilsTest {
 
 	@Before
 	public void initOnePassengerFixture() {
-		final Person driver = new PersonImpl( new IdImpl( "Alain Prost" ) );
-		final Person passenger1 = new PersonImpl( new IdImpl( "Tintin" ) );
+		final Person driver = new PersonImpl( Id.createPersonId( "Alain Prost" ) );
+		final Person passenger1 = new PersonImpl( Id.createPersonId( "Tintin" ) );
 
 		final Id link1 = new IdImpl( 1 );
 		final Id link2 = new IdImpl( 2 );
 		final Id link3 = new IdImpl( 3 );
 
-		final Map<Id, Plan> plans = new HashMap<Id, Plan>();
+		final Map<Id<Person>, Plan> plans = new HashMap< >();
 
 		// plan 1
 		// just one passenger
@@ -132,7 +132,7 @@ public class JointPlanUtilsTest {
 
 		// plan 2
 		// two passenger, two ODs
-		final Map<Id, Plan> plans = new HashMap<Id, Plan>();
+		final Map<Id<Person>, Plan> plans = new HashMap< >();
 		PlanImpl plan = new PlanImpl( driver );
 		plan.createAndAddActivity( "home" , link1 );
 		plan.createAndAddLeg( TransportMode.walk );
@@ -212,16 +212,16 @@ public class JointPlanUtilsTest {
 
 	@Before
 	public void initTwoPassengersTwoOdsTwoJtFixture() {
-		final Person driver = new PersonImpl( new IdImpl( "Alain Prost" ) );
-		final Person passenger1 = new PersonImpl( new IdImpl( "Tintin" ) );
-		final Person passenger2 = new PersonImpl( new IdImpl( "Milou" ) );
+		final Person driver = new PersonImpl( Id.createPersonId( "Alain Prost" ) );
+		final Person passenger1 = new PersonImpl( Id.createPersonId( "Tintin" ) );
+		final Person passenger2 = new PersonImpl( Id.createPersonId( "Milou" ) );
 
 		final Id link1 = new IdImpl( 1 );
 		final Id link2 = new IdImpl( 2 );
 		final Id link3 = new IdImpl( 3 );
 		final Id link4 = new IdImpl( 4 );
 
-		final Map<Id, Plan> plans = new HashMap<Id, Plan>();
+		final Map<Id<Person>, Plan> plans = new HashMap< >();
 
 		// plan 3
 		// two passenger, two ODs, two JT for one passenger
@@ -333,16 +333,16 @@ public class JointPlanUtilsTest {
 
 	@Before
 	public void initTwoPassengersMiddleTripFixture() {
-		final Person driver = new PersonImpl( new IdImpl( "Alain Prost" ) );
-		final Person passenger1 = new PersonImpl( new IdImpl( "Tintin" ) );
-		final Person passenger2 = new PersonImpl( new IdImpl( "Milou" ) );
+		final Person driver = new PersonImpl( Id.createPersonId( "Alain Prost" ) );
+		final Person passenger1 = new PersonImpl( Id.createPersonId( "Tintin" ) );
+		final Person passenger2 = new PersonImpl( Id.createPersonId( "Milou" ) );
 
 		final Id link1 = new IdImpl( 1 );
 		final Id link2 = new IdImpl( 2 );
 		final Id link3 = new IdImpl( 3 );
 		final Id link4 = new IdImpl( 4 );
 
-		final Map<Id, Plan> plans = new HashMap<Id, Plan>();
+		final Map<Id<Person>, Plan> plans = new HashMap<Id<Person>, Plan>();
 
 		// plan 4
 		// two passengers, "midle trip"
@@ -432,14 +432,14 @@ public class JointPlanUtilsTest {
 
 	@Before
 	public void initOnePassengerTwoTripsFixture() {
-		final Person driver = new PersonImpl( new IdImpl( "Alain Prost" ) );
-		final Person passenger1 = new PersonImpl( new IdImpl( "Tintin" ) );
+		final Person driver = new PersonImpl( Id.createPersonId( "Alain Prost" ) );
+		final Person passenger1 = new PersonImpl( Id.createPersonId( "Tintin" ) );
 
 		final Id link1 = new IdImpl( 1 );
 		final Id link2 = new IdImpl( 2 );
 		final Id link3 = new IdImpl( 3 );
 
-		final Map<Id, Plan> plans = new HashMap<Id, Plan>();
+		final Map<Id<Person>, Plan> plans = new HashMap< >();
 
 		final PlanImpl dPlan = new PlanImpl( driver );
 		dPlan.createAndAddActivity( "home" , link1 );
@@ -521,15 +521,15 @@ public class JointPlanUtilsTest {
 
 	@Before
 	public void initOnePassengerTwoTripsWithDifferentDriversFixture() {
-		final Person driver1 = new PersonImpl( new IdImpl( "Alain Prost" ) );
-		final Person driver2 = new PersonImpl( new IdImpl( "Michel Vaillant" ) );
-		final Person passenger1 = new PersonImpl( new IdImpl( "Tintin" ) );
+		final Person driver1 = new PersonImpl( Id.createPersonId( "Alain Prost" ) );
+		final Person driver2 = new PersonImpl( Id.createPersonId( "Michel Vaillant" ) );
+		final Person passenger1 = new PersonImpl( Id.createPersonId( "Tintin" ) );
 
 		final Id link1 = new IdImpl( 1 );
 		final Id link2 = new IdImpl( 2 );
 		final Id link3 = new IdImpl( 3 );
 
-		final Map<Id, Plan> plans = new HashMap<Id, Plan>();
+		final Map<Id<Person>, Plan> plans = new HashMap< >();
 
 		final PlanImpl d1Plan = new PlanImpl( driver1 );
 		d1Plan.createAndAddActivity( "home" , link1 );
@@ -617,15 +617,15 @@ public class JointPlanUtilsTest {
 	// bugs may depend on iteration order...
 	@Before
 	public void initOnePassengerTwoTripsWithDifferentDriversSecondDriverFirstFixture() {
-		final Person driver1 = new PersonImpl( new IdImpl( "Alain Prost" ) );
-		final Person driver2 = new PersonImpl( new IdImpl( "Michel Vaillant" ) );
-		final Person passenger1 = new PersonImpl( new IdImpl( "Tintin" ) );
+		final Person driver1 = new PersonImpl( Id.createPersonId( "Alain Prost" ) );
+		final Person driver2 = new PersonImpl( Id.createPersonId( "Michel Vaillant" ) );
+		final Person passenger1 = new PersonImpl( Id.createPersonId( "Tintin" ) );
 
 		final Id link1 = new IdImpl( 1 );
 		final Id link2 = new IdImpl( 2 );
 		final Id link3 = new IdImpl( 3 );
 
-		final Map<Id, Plan> plans = new HashMap<Id, Plan>();
+		final Map<Id<Person>, Plan> plans = new HashMap< >();
 
 		final PlanImpl d1Plan = new PlanImpl( driver1 );
 		d1Plan.createAndAddActivity( "home" , link1 );
@@ -718,14 +718,14 @@ public class JointPlanUtilsTest {
 	 */
 	@Before
 	public void initOnePassengerTwoTripsInconsistentSequenceFixture() {
-		final Person driver = new PersonImpl( new IdImpl( "Alain Prost" ) );
-		final Person passenger1 = new PersonImpl( new IdImpl( "Tintin" ) );
+		final Person driver = new PersonImpl( Id.createPersonId( "Alain Prost" ) );
+		final Person passenger1 = new PersonImpl( Id.createPersonId( "Tintin" ) );
 
 		final Id link1 = new IdImpl( 1 );
 		final Id link2 = new IdImpl( 2 );
 		final Id link3 = new IdImpl( 3 );
 
-		final Map<Id, Plan> plans = new HashMap<Id, Plan>();
+		final Map<Id<Person>, Plan> plans = new HashMap< >();
 
 		final PlanImpl dPlan = new PlanImpl( driver );
 		dPlan.createAndAddActivity( "home" , link1 );

@@ -265,7 +265,7 @@ public class SynchronizeCoTravelerPlansAlgorithmTest {
 	// to help creation of fixtures
 	private static class FixtureBuilder {
 		final PopulationFactory popFact = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getPopulation().getFactory();
-		private final Map<Id, Plan> plans = new HashMap<Id, Plan>();
+		private final Map<Id<Person>, Plan> plans = new HashMap< >();
 		private Plan currentPlan = null;
 		private Activity currentActivity = null;
 		private Leg currentLeg = null;

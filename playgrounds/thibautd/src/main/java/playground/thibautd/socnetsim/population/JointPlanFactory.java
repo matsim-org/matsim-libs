@@ -37,7 +37,7 @@ import org.matsim.core.population.PlanImpl;
  */
 public class JointPlanFactory implements MatsimFactory {
 	public JointPlan createJointPlan(
-			final Map<Id, ? extends Plan> plans) {
+			final Map<Id<Person>, ? extends Plan> plans) {
 		return createJointPlan( plans, true );
 	}
 
@@ -51,7 +51,7 @@ public class JointPlanFactory implements MatsimFactory {
 	 * set to false for a temporary plan (in a replaning for example).
 	 */
 	public JointPlan createJointPlan(
-			final Map<Id, ? extends Plan> plans,
+			final Map<Id<Person>, ? extends Plan> plans,
 			final boolean addAtIndividualLevel) {
 		JointPlan jointPlan = new JointPlan( plans );
 
@@ -83,10 +83,10 @@ public class JointPlanFactory implements MatsimFactory {
 				addAtIndividualLevel );
 	}
 
-	private Map<Id, Plan> cloneIndividualPlans(final JointPlan plan) {
-		final Map<Id , Plan> plans = new LinkedHashMap<Id, Plan>();
+	private Map<Id<Person>, Plan> cloneIndividualPlans(final JointPlan plan) {
+		final Map<Id<Person> , Plan> plans = new LinkedHashMap< >();
 
-		for (Map.Entry<Id, Plan> indiv : plan.getIndividualPlans().entrySet()) {
+		for (Map.Entry<Id<Person>, Plan> indiv : plan.getIndividualPlans().entrySet()) {
 			final PlanImpl newPlan = createIndividualPlan( indiv.getValue().getPerson() );
 			newPlan.copyFrom( indiv.getValue() );
 			plans.put( indiv.getKey() , newPlan );

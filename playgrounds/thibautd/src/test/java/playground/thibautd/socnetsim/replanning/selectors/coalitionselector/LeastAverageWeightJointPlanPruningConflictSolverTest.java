@@ -46,8 +46,8 @@ public class LeastAverageWeightJointPlanPruningConflictSolverTest {
 
 		// two joint plans, biggest has a higher total weight,
 		// but a lower average
-		final Map<Id, Plan> smallJp = new HashMap<Id, Plan>();
-		final Map<Id, Plan> bigJp = new HashMap<Id, Plan>();
+		final Map<Id<Person>, Plan> smallJp = new HashMap< >();
+		final Map<Id<Person>, Plan> bigJp = new HashMap< >();
 
 		final ReplanningGroup group = new ReplanningGroup();
 

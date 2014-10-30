@@ -127,7 +127,7 @@ public class AnalysePerformanceOfCoalitionSelection {
 							personsWithCapacity,
 							size );
 
-				final Map<Id, Plan> jp = new HashMap<Id, Plan>();
+				final Map<Id<Person>, Plan> jp = new HashMap< >();
 				for ( Person person : personInJp ) {
 					for ( int i = 0; i < maxPlansPerSize; i++ ) {
 						final Plan plan = jps.getFactory().createIndividualPlan( person );

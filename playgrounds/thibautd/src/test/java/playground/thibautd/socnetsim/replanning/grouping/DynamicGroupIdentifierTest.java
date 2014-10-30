@@ -110,7 +110,7 @@ public class DynamicGroupIdentifierTest {
 		for ( int i=0; i < nGroups; i++ ) {
 			final Person[] persons = new Person[ nPersonsPerGroup ];
 			for ( int j=0; j < nPersonsPerGroup; j++ ) {
-				final Person p = scenario.getPopulation().getFactory().createPerson( new IdImpl( "person-"+i+"."+j ) );
+				final Person p = scenario.getPopulation().getFactory().createPerson( Id.createPersonId( "person-"+i+"."+j ) );
 				persons[ j ] = p;
 				scenario.getPopulation().addPerson( p );
 			}
@@ -125,7 +125,7 @@ public class DynamicGroupIdentifierTest {
 				person1.addPlan( plan1 );
 				person2.addPlan( plan2 );
 
-				final Map<Id, Plan> jointPlan = new HashMap<Id, Plan>();
+				final Map<Id<Person>, Plan> jointPlan = new HashMap< >();
 				jointPlan.put( person1.getId() , plan1 );
 				jointPlan.put( person2.getId() , plan2 );
 
@@ -157,7 +157,7 @@ public class DynamicGroupIdentifierTest {
 		for ( int i=0; i < nGroups; i++ ) {
 			final Person[] persons = new Person[ nPersonsPerGroup ];
 			for ( int j=0; j < nPersonsPerGroup; j++ ) {
-				final Person p = scenario.getPopulation().getFactory().createPerson( new IdImpl( "person-"+i+"."+j ) );
+				final Person p = scenario.getPopulation().getFactory().createPerson( Id.createPersonId( "person-"+i+"."+j ) );
 				persons[ j ] = p;
 				scenario.getPopulation().addPerson( p );
 			}
@@ -172,7 +172,7 @@ public class DynamicGroupIdentifierTest {
 				person1.addPlan( plan1 );
 				person2.addPlan( plan2 );
 
-				final Map<Id, Plan> jointPlan = new HashMap<Id, Plan>();
+				final Map<Id<Person>, Plan> jointPlan = new HashMap< >();
 				jointPlan.put( person1.getId() , plan1 );
 				jointPlan.put( person2.getId() , plan2 );
 

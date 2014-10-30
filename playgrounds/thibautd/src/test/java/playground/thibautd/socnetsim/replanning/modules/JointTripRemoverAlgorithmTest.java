@@ -87,15 +87,15 @@ public class JointTripRemoverAlgorithmTest {
 	}
 
 	private Fixture createSimplisticFixture() {
-		Person driver = new PersonImpl( new IdImpl( "Schumacher" ) );
-		Person passenger = new PersonImpl( new IdImpl( "Asterix" ) );
+		Person driver = new PersonImpl( Id.createPersonId( "Schumacher" ) );
+		Person passenger = new PersonImpl( Id.createPersonId( "Asterix" ) );
 
-		Id link1 = new IdImpl( 1 );
-		Id link2 = new IdImpl( 2 );
-		Id link3 = new IdImpl( 3 );
+		Id link1 = Id.createLinkId( 1 );
+		Id link2 = Id.createLinkId( 2 );
+		Id link3 = Id.createLinkId( 3 );
 
-		Map<Id, Plan> plans = new HashMap<Id, Plan>();
-		Map<Id, List<PlanElement>> expectedAfterRemoval = new HashMap<Id, List<PlanElement>>();
+		Map<Id<Person>, Plan> plans = new HashMap< >();
+		Map<Id<Person>, List<PlanElement>> expectedAfterRemoval = new HashMap< >();
 
 		PlanImpl driverPlan = new PlanImpl( driver );
 		plans.put( driver.getId() , driverPlan );
@@ -152,16 +152,16 @@ public class JointTripRemoverAlgorithmTest {
 	}
 
 	private Fixture createTwoPassengersFixture() {
-		Person driver = new PersonImpl( new IdImpl( "Alonso" ) );
-		Person passenger1 = new PersonImpl( new IdImpl( "Boule" ) );
-		Person passenger2 = new PersonImpl( new IdImpl( "Bill" ) );
+		Person driver = new PersonImpl( Id.createPersonId( "Alonso" ) );
+		Person passenger1 = new PersonImpl( Id.createPersonId( "Boule" ) );
+		Person passenger2 = new PersonImpl( Id.createPersonId( "Bill" ) );
 
 		Id link1 = new IdImpl( 1 );
 		Id link2 = new IdImpl( 2 );
 		Id link3 = new IdImpl( 3 );
 
-		Map<Id, Plan> plans = new HashMap<Id, Plan>();
-		Map<Id, List<PlanElement>> expectedAfterRemoval = new HashMap<Id, List<PlanElement>>();
+		Map<Id<Person>, Plan> plans = new HashMap< >();
+		Map<Id<Person>, List<PlanElement>> expectedAfterRemoval = new HashMap< >();
 
 		PlanImpl driverPlan = new PlanImpl( driver );
 		plans.put( driver.getId() , driverPlan );
@@ -237,9 +237,9 @@ public class JointTripRemoverAlgorithmTest {
 	}
 
 	private Fixture createTwoPassengersFixtureWithInternOverlap() {
-		Person driver = new PersonImpl( new IdImpl( "Prost" ) );
-		Person passenger1 = new PersonImpl( new IdImpl( "Joe" ) );
-		Person passenger2 = new PersonImpl( new IdImpl( "Avrell" ) );
+		Person driver = new PersonImpl( Id.createPersonId( "Prost" ) );
+		Person passenger1 = new PersonImpl( Id.createPersonId( "Joe" ) );
+		Person passenger2 = new PersonImpl( Id.createPersonId( "Avrell" ) );
 
 		Id link1 = new IdImpl( 1 );
 		Id link2 = new IdImpl( 2 );
@@ -247,8 +247,8 @@ public class JointTripRemoverAlgorithmTest {
 		Id link4 = new IdImpl( 4 );
 		Id link5 = new IdImpl( 5 );
 
-		Map<Id, Plan> plans = new HashMap<Id, Plan>();
-		Map<Id, List<PlanElement>> expectedAfterRemoval = new HashMap<Id, List<PlanElement>>();
+		Map<Id<Person>, Plan> plans = new HashMap< >();
+		Map<Id<Person>, List<PlanElement>> expectedAfterRemoval = new HashMap< >();
 
 		PlanImpl driverPlan = new PlanImpl( driver );
 		plans.put( driver.getId() , driverPlan );
@@ -337,9 +337,9 @@ public class JointTripRemoverAlgorithmTest {
 	}
 
 	private Fixture createTwoPassengersFixtureWithExternOverlap() {
-		Person driver = new PersonImpl( new IdImpl( "Kowalski" ) );
-		Person passenger1 = new PersonImpl( new IdImpl( "Pif" ) );
-		Person passenger2 = new PersonImpl( new IdImpl( "Paf" ) );
+		Person driver = new PersonImpl( Id.createPersonId( "Kowalski" ) );
+		Person passenger1 = new PersonImpl( Id.createPersonId( "Pif" ) );
+		Person passenger2 = new PersonImpl( Id.createPersonId( "Paf" ) );
 
 		Id link1 = new IdImpl( 1 );
 		Id link2 = new IdImpl( 2 );
@@ -347,8 +347,8 @@ public class JointTripRemoverAlgorithmTest {
 		Id link4 = new IdImpl( 4 );
 		Id link5 = new IdImpl( 5 );
 
-		Map<Id, Plan> plans = new HashMap<Id, Plan>();
-		Map<Id, List<PlanElement>> expectedAfterRemoval = new HashMap<Id, List<PlanElement>>();
+		Map<Id<Person>, Plan> plans = new HashMap< >();
+		Map<Id<Person>, List<PlanElement>> expectedAfterRemoval = new HashMap< >();
 
 		PlanImpl driverPlan = new PlanImpl( driver );
 		plans.put( driver.getId() , driverPlan );
@@ -437,16 +437,16 @@ public class JointTripRemoverAlgorithmTest {
 	}
 
 	private Fixture createMultiDriverStageFixture() {
-		final Person driver = new PersonImpl( new IdImpl( "Schumacher" ) );
-		final Person passenger = new PersonImpl( new IdImpl( "Asterix" ) );
+		final Person driver = new PersonImpl( Id.createPersonId( "Schumacher" ) );
+		final Person passenger = new PersonImpl( Id.createPersonId( "Asterix" ) );
 		final String stageType = "drinkACoffee";
 
 		final Id link1 = new IdImpl( 1 );
 		final Id link2 = new IdImpl( 2 );
 		final Id link3 = new IdImpl( 3 );
 
-		final Map<Id, Plan> plans = new HashMap<Id, Plan>();
-		final Map<Id, List<PlanElement>> expectedAfterRemoval = new HashMap<Id, List<PlanElement>>();
+		final Map<Id<Person>, Plan> plans = new HashMap< >();
+		final Map<Id<Person>, List<PlanElement>> expectedAfterRemoval = new HashMap< >();
 
 		final PlanImpl driverPlan = new PlanImpl( driver );
 		plans.put( driver.getId() , driverPlan );
@@ -508,16 +508,16 @@ public class JointTripRemoverAlgorithmTest {
 	}
 
 	private Fixture createMultiPassengerStageFixture() {
-		final Person driver = new PersonImpl( new IdImpl( "Schumacher" ) );
-		final Person passenger = new PersonImpl( new IdImpl( "Asterix" ) );
+		final Person driver = new PersonImpl( Id.createPersonId( "Schumacher" ) );
+		final Person passenger = new PersonImpl( Id.createPersonId( "Asterix" ) );
 		final String stageType = "drinkACoffee";
 
 		final Id link1 = new IdImpl( 1 );
 		final Id link2 = new IdImpl( 2 );
 		final Id link3 = new IdImpl( 3 );
 
-		final Map<Id, Plan> plans = new HashMap<Id, Plan>();
-		final Map<Id, List<PlanElement>> expectedAfterRemoval = new HashMap<Id, List<PlanElement>>();
+		final Map<Id<Person>, Plan> plans = new HashMap< >();
+		final Map<Id<Person>, List<PlanElement>> expectedAfterRemoval = new HashMap< >();
 
 		final PlanImpl driverPlan = new PlanImpl( driver );
 		plans.put( driver.getId() , driverPlan );
@@ -579,16 +579,16 @@ public class JointTripRemoverAlgorithmTest {
 	}
 
 	private Fixture createTwoPassengersInDifferentTripsRemoveFirstFixture() {
-		final Person driver = new PersonImpl( new IdImpl( "Alonso" ) );
-		final Person passenger1 = new PersonImpl( new IdImpl( "Boule" ) );
-		final Person passenger2 = new PersonImpl( new IdImpl( "Bill" ) );
+		final Person driver = new PersonImpl( Id.createPersonId( "Alonso" ) );
+		final Person passenger1 = new PersonImpl( Id.createPersonId( "Boule" ) );
+		final Person passenger2 = new PersonImpl( Id.createPersonId( "Bill" ) );
 
 		final Id link1 = new IdImpl( 1 );
 		final Id link2 = new IdImpl( 2 );
 		final Id link3 = new IdImpl( 3 );
 
-		final Map<Id, Plan> plans = new HashMap<Id, Plan>();
-		final Map<Id, List<PlanElement>> expectedAfterRemoval = new HashMap<Id, List<PlanElement>>();
+		final Map<Id<Person>, Plan> plans = new HashMap< >();
+		final Map<Id<Person>, List<PlanElement>> expectedAfterRemoval = new HashMap< >();
 
 		final PlanImpl driverPlan = new PlanImpl( driver );
 		plans.put( driver.getId() , driverPlan );
@@ -668,16 +668,16 @@ public class JointTripRemoverAlgorithmTest {
 	}
 
 	private Fixture createTwoPassengersInDifferentTripsRemoveSecondFixture() {
-		final Person driver = new PersonImpl( new IdImpl( "Alonso" ) );
-		final Person passenger1 = new PersonImpl( new IdImpl( "Boule" ) );
-		final Person passenger2 = new PersonImpl( new IdImpl( "Bill" ) );
+		final Person driver = new PersonImpl( Id.createPersonId( "Alonso" ) );
+		final Person passenger1 = new PersonImpl( Id.createPersonId( "Boule" ) );
+		final Person passenger2 = new PersonImpl( Id.createPersonId( "Bill" ) );
 
-		final Id link1 = new IdImpl( 1 );
-		final Id link2 = new IdImpl( 2 );
-		final Id link3 = new IdImpl( 3 );
+		final Id link1 = Id.createLinkId( 1 );
+		final Id link2 = Id.createLinkId( 2 );
+		final Id link3 = Id.createLinkId( 3 );
 
-		final Map<Id, Plan> plans = new HashMap<Id, Plan>();
-		final Map<Id, List<PlanElement>> expectedAfterRemoval = new HashMap<Id, List<PlanElement>>();
+		final Map<Id<Person>, Plan> plans = new HashMap< >();
+		final Map<Id<Person>, List<PlanElement>> expectedAfterRemoval = new HashMap< >();
 
 		final PlanImpl driverPlan = new PlanImpl( driver );
 		plans.put( driver.getId() , driverPlan );
@@ -758,16 +758,16 @@ public class JointTripRemoverAlgorithmTest {
 	}
 
 	private Fixture createTwoDriversFixture(final boolean removeFirst) {
-		final Person driver1 = new PersonImpl( new IdImpl( "Alonso" ) );
-		final Person driver2 = new PersonImpl( new IdImpl( "Schumacher" ) );
-		final Person passenger = new PersonImpl( new IdImpl( "Rantanplan" ) );
+		final Person driver1 = new PersonImpl( Id.createPersonId( "Alonso" ) );
+		final Person driver2 = new PersonImpl( Id.createPersonId( "Schumacher" ) );
+		final Person passenger = new PersonImpl( Id.createPersonId( "Rantanplan" ) );
 
-		final Id link1 = new IdImpl( 1 );
-		final Id link2 = new IdImpl( 2 );
-		final Id link3 = new IdImpl( 3 );
+		final Id link1 = Id.createLinkId( 1 );
+		final Id link2 = Id.createLinkId( 2 );
+		final Id link3 = Id.createLinkId( 3 );
 
-		final Map<Id, Plan> plans = new HashMap<Id, Plan>();
-		final Map<Id, List<PlanElement>> expectedAfterRemoval = new HashMap<Id, List<PlanElement>>();
+		final Map<Id<Person>, Plan> plans = new HashMap< >();
+		final Map<Id<Person>, List<PlanElement>> expectedAfterRemoval = new HashMap< >();
 
 		final PlanImpl driverPlan1 = new PlanImpl( driver1 );
 		plans.put( driver1.getId() , driverPlan1 );
@@ -992,14 +992,14 @@ public class JointTripRemoverAlgorithmTest {
 	private static class Fixture {
 		public final String name;
 		public final JointPlan jointPlan;
-		public final Map<Id, List<PlanElement>> expectedPlanAfterRemoval;
+		public final Map<Id<Person>, List<PlanElement>> expectedPlanAfterRemoval;
 		public final JointTrip toRemove;
 		public final StageActivityTypes stageActivities;
 
 		public Fixture(
 				final String name,
 				final JointPlan jointPlan,
-				final Map<Id, List<PlanElement>> expectedPlanAfterRemoval,
+				final Map<Id<Person>, List<PlanElement>> expectedPlanAfterRemoval,
 				final JointTrip toRemove,
 				final StageActivityTypes stageActivities) {
 			if ( expectedPlanAfterRemoval.size() != jointPlan.getIndividualPlans().size() ) {

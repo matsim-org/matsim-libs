@@ -38,7 +38,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -67,7 +66,7 @@ public class WhoIsTheBossSelectorTest {
 					new EmptyIncompatiblePlansIdentifierFactory(),
 					new ScoreWeight() );
 
-		final Iterator<Id> ids = new IdIterator();
+		final Iterator<Id<Person>> ids = new IdIterator();
 		final Random random = new Random( 2314 );
 		final JointPlans jointPlans = new JointPlans();
 		int countNull = 0;
@@ -131,7 +130,7 @@ public class WhoIsTheBossSelectorTest {
 	}
 
 	private static ReplanningGroup createNextTestClique(
-			final Iterator<Id> idsIterator,
+			final Iterator<Id<Person>> idsIterator,
 			final JointPlans jointPlans,
 			final Random random) {
 		// attempt to get a high diversity of joint structures.
@@ -143,11 +142,11 @@ public class WhoIsTheBossSelectorTest {
 		final ReplanningGroup group = new ReplanningGroup();
 		final PopulationFactory factory = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getPopulation().getFactory();
 
-		final Map<Id, Queue<Plan>> plansPerPerson = new LinkedHashMap<Id, Queue<Plan>>();
+		final Map<Id<Person>, Queue<Plan>> plansPerPerson = new LinkedHashMap< >();
 
 		// create plans
 		for (int j=0; j < nMembers; j++) {
-			final Id id = idsIterator.next();
+			final Id<Person> id = idsIterator.next();
 			final Person person = factory.createPerson( id );
 			group.addPerson( person );
 			for (int k=0; k < nPlans; k++) {
@@ -162,7 +161,7 @@ public class WhoIsTheBossSelectorTest {
 		// join plans randomly
 		final int nJointPlans = random.nextInt( maxJointPlans );
 		for (int p=0; p < nJointPlans; p++) {
-			final Map<Id, Plan> jointPlan = new LinkedHashMap<Id, Plan>();
+			final Map<Id<Person>, Plan> jointPlan = new LinkedHashMap< >();
 			for (Queue<Plan> plans : plansPerPerson.values()) {
 				if ( random.nextDouble() > pJoin ) continue;
 				final Plan plan = plans.poll();
@@ -175,7 +174,7 @@ public class WhoIsTheBossSelectorTest {
 		return group;
 	}
 
-	private static class IdIterator implements Iterator<Id> {
+	private static class IdIterator implements Iterator<Id<Person>> {
 			@Override
 			public boolean hasNext() {
 				return true;
@@ -183,8 +182,8 @@ public class WhoIsTheBossSelectorTest {
 
 			int currentId=0;
 			@Override
-			public Id next() {
-				return new IdImpl( currentId++ );
+			public Id<Person> next() {
+				return Id.createPersonId( currentId++ );
 			}
 
 			@Override

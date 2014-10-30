@@ -22,17 +22,19 @@ package playground.thibautd.socnetsim.replanning.selectors.highestweightselectio
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author thibautd
  */
 final class Branch {
-	private final Set<Id> cotravelers, incompatibilityGroups;
+	private final Set<Id<Person>> cotravelers;
+	private final Set<Id> incompatibilityGroups;
 
 	public Branch(
-			final Set<Id> cotravelers,
+			final Set<Id<Person>> cotravs,
 			final Set<Id> incompatibilityGroups) {
-		this.cotravelers = cotravelers;
+		this.cotravelers = cotravs;
 		this.incompatibilityGroups = incompatibilityGroups;
 	}
 

@@ -277,7 +277,7 @@ public class InsertionRemovalIterativeActionTest {
 
 
 	private JointPlan createPlanWithJointTrips() {
-		final Map<Id, Plan> individualPlans = new HashMap<Id, Plan>();
+		final Map<Id<Person>, Plan> individualPlans = new HashMap< >();
 
 		Id puLink = new IdImpl( "pu" );
 		Id doLink = new IdImpl( "do" );
@@ -320,7 +320,7 @@ public class InsertionRemovalIterativeActionTest {
 	}
 
 	private JointPlan createPlanWithoutJointTrips() {
-		final Map<Id, Plan> individualPlans = new HashMap<Id, Plan>();
+		final Map<Id<Person>, Plan> individualPlans = new HashMap< >();
 
 		Coord coord1 = new CoordImpl( 0 , 0 );
 		Coord coord2 = new CoordImpl( 3600 , 21122012 );

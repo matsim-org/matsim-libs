@@ -47,7 +47,7 @@ public class JointPlansXmlReader extends MatsimXmlParser {
 	private final Scenario scenario;
 	private final JointPlans jointPlans;
 
-	private Map<Id, Plan> currentJointPlan;
+	private Map<Id<Person>, Plan> currentJointPlan;
 
 	public JointPlansXmlReader(
 			final Scenario scenario) {
@@ -62,7 +62,7 @@ public class JointPlansXmlReader extends MatsimXmlParser {
 			final Attributes atts,
 			final Stack<String> context) {
 		if ( name.equals( JOINT_PLAN_TAG ) ) {
-			currentJointPlan = new LinkedHashMap<Id, Plan>();
+			currentJointPlan = new LinkedHashMap< >();
 			counter.incCounter();
 		}
 		if ( name.equals( PLAN_TAG ) ) {

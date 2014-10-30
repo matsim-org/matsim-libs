@@ -27,7 +27,6 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
 
 import playground.thibautd.socnetsim.population.JointPlans;
@@ -42,12 +41,12 @@ public class LeastPointedPlanPruningConflictSolverTest {
 	@Test
 	public void testPruneSmallestJointPlan() {
 		final JointPlans jointPlans = new JointPlans();
-		final Map<Id, Plan> smallJp = new HashMap<Id, Plan>();
-		final Map<Id, Plan> bigJp = new HashMap<Id, Plan>();
+		final Map<Id<Person>, Plan> smallJp = new HashMap< >();
+		final Map<Id<Person>, Plan> bigJp = new HashMap< >();
 
 		final ReplanningGroup group = new ReplanningGroup();
 
-		Id id = new IdImpl( 1 );
+		Id<Person> id = Id.createPersonId( 1 );
 		{
 			final Person person = new PersonImpl( id );
 			group.addPerson( person );
@@ -65,7 +64,7 @@ public class LeastPointedPlanPruningConflictSolverTest {
 			}
 		}
 
-		id = new IdImpl( 2 );
+		id = Id.createPersonId( 2 );
 		{
 			final Person person = new PersonImpl( id );
 			group.addPerson( person );
@@ -83,7 +82,7 @@ public class LeastPointedPlanPruningConflictSolverTest {
 			}
 		}
 
-		id = new IdImpl( 3 );
+		id = Id.createPersonId( 3 );
 		{
 			final Person person = new PersonImpl( id );
 			group.addPerson( person );
