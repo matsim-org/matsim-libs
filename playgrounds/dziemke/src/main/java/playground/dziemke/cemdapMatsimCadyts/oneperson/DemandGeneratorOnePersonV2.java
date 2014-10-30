@@ -54,9 +54,9 @@ public class DemandGeneratorOnePersonV2 {
 		// create storage objects
 		Map<Integer, String> lors = new HashMap<Integer, String>();
 		Map<Integer, Household> households = new HashMap<Integer, Household>();
-		Map<Integer, Map<String, Person>> mapOfPersonsMaps = new HashMap<Integer, Map<String, Person>>();
+		Map<Integer, Map<String, SimplePerson>> mapOfPersonsMaps = new HashMap<Integer, Map<String, SimplePerson>>();
 		for (int i=1; i<=numberOfPlansPerPerson; i++) {
-			Map<String, Person> persons = new HashMap<String, Person>();
+			Map<String, SimplePerson> persons = new HashMap<String, SimplePerson>();
 			mapOfPersonsMaps.put(i, persons);
 		}
 		
@@ -141,7 +141,7 @@ public class DemandGeneratorOnePersonV2 {
 					// #################################################################################################
 					
 					//Person person = new Person(personId, householdId, employed, locationOfWork, age);
-					Person person = new Person(personId, householdId, employed, student, locationOfWork, locationOfSchool, sex, age);
+					SimplePerson person = new SimplePerson(personId, householdId, employed, student, locationOfWork, locationOfSchool, sex, age);
 					mapOfPersonsMaps.get(k).put(personId, person);
 				}	
 				householdIdCounter++;
@@ -270,7 +270,7 @@ public class DemandGeneratorOnePersonV2 {
 	}
 	
 		
-	public static void writeToPersonsFile(Map <String, Person> persons, String fileName) {
+	public static void writeToPersonsFile(Map <String, SimplePerson> persons, String fileName) {
 		BufferedWriter bufferedWriterPersons = null;
 		
 		try {
@@ -322,7 +322,7 @@ public class DemandGeneratorOnePersonV2 {
     }
 	
 
-	public static void writeToHouseholdsFile(Map <String, Person> persons, Map<Integer, Household> households, String fileName) {
+	public static void writeToHouseholdsFile(Map <String, SimplePerson> persons, Map<Integer, Household> households, String fileName) {
 		BufferedWriter bufferedWriterHouseholds = null;
 		
 		try {

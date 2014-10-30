@@ -76,12 +76,12 @@ public class SrVTripParser {
 	}
 	
 	
-	public final void parse(String cemdapStopsFile) {
+	public final void parse(String srvTripFile) {
 		
 		int lineCount = 0;
 		
 		try {
-			BufferedReader bufferedReader = IOUtils.getBufferedReader(cemdapStopsFile);
+			BufferedReader bufferedReader = IOUtils.getBufferedReader(srvTripFile);
 
 			// header
 			String currentLine = bufferedReader.readLine();

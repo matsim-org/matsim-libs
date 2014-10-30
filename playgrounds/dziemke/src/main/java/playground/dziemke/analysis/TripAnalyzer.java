@@ -36,8 +36,13 @@ public class TripAnalyzer {
 		double maxDistance = 100;
 		Integer planningAreaId = 11000000;
 		
-		String runId = "run_145d";
-		String usedIteration = "100"; // most frequently used value: 150
+		// --------------------------------------------------------------------------------------------------
+		Integer minAge = 80;
+		Integer maxAge = 119;	
+		// --------------------------------------------------------------------------------------------------
+		
+		String runId = "run_145";
+		String usedIteration = "150"; // most frequently used value: 150
 	    
 	    int maxBinDuration = 120;
 	    int binWidthDuration = 1;
@@ -57,11 +62,13 @@ public class TripAnalyzer {
 	    
 	    // Input and output files
 	    String networkFile = "D:/Workspace/shared-svn/studies/countries/de/berlin/counts/iv_counts/network.xml";
-	    String eventsFile = "D:/Workspace/data/cemdapMatsimCadyts/output/" + runId + "/ITERS/it." + usedIteration + "/" 
-	    //String eventsFile = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + usedIteration + "/" 
-				+ runId + "." + usedIteration + ".events.xml.gz";	    
-	    String outputDirectory = "D:/Workspace/data/cemdapMatsimCadyts/output/" + runId + "/analysis";
-	    //String outputDirectory = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/analysis";
+	    //String eventsFile = "D:/Workspace/data/cemdapMatsimCadyts/output/" + runId + "/ITERS/it." + usedIteration + "/" 
+	    String eventsFile = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/ITERS/it." + usedIteration + "/" 
+				+ runId + "." + usedIteration + ".events.xml.gz";
+	    String cemdapPersonFile = "D:/Workspace/data/cemdapMatsimCadyts/input/cemdap_berlin/19/persons1.dat";
+	    
+	    //String outputDirectory = "D:/Workspace/data/cemdapMatsimCadyts/output/" + runId + "/analysis";
+	    String outputDirectory = "D:/Workspace/runs-svn/cemdapMatsimCadyts/" + runId + "/analysis";
 	    
 	    String shapeFileBerlin = "D:/Workspace/data/cemdapMatsimCadyts/input/shapefiles/Berlin_DHDN_GK4.shp";
 	    Map<Integer, Geometry> zoneGeometries = ShapeReader.read(shapeFileBerlin, "NR");
@@ -81,6 +88,11 @@ public class TripAnalyzer {
 			outputDirectory = outputDirectory + "_dist";
 		}
 		
+		// --------------------------------------------------------------------------------------------------
+		outputDirectory = outputDirectory + "_" + minAge.toString();
+		outputDirectory = outputDirectory + "_" + maxAge.toString();
+		// --------------------------------------------------------------------------------------------------
+		
 		
 		// Create an EventsManager instance (MATSim infrastructure)
 	    EventsManager eventsManager = EventsUtils.createEventsManager();
@@ -98,6 +110,13 @@ public class TripAnalyzer {
 	    	if(!trip.getTripComplete()) { numberOfIncompleteTrips++; }
 	    }
 	    System.out.println(numberOfIncompleteTrips + " trips are incomplete.");
+	    
+	    
+	    // --------------------------------------------------------------------------------------------------
+	 	// parse person file
+	 	CemdapPersonFileReader cemdapPersonFileReader = new CemdapPersonFileReader();
+	 	cemdapPersonFileReader.parse(cemdapPersonFile);
+	 	// --------------------------------------------------------------------------------------------------
 	    
 	    	    	    
 	    // get network, which is needed to calculate distances
@@ -194,6 +213,17 @@ public class TripAnalyzer {
 //	    			considerTrip = false;
 //	    		}
 	    		
+	    		// --------------------------------------------------------------------------------------------------
+				String personId = trip.getPersonId().toString();
+			    int age = (int) cemdapPersonFileReader.getPersonAttributes().getAttribute(personId, "age");
+			    
+			    if (age < minAge) {
+					considerTrip = false;
+				}
+			    if (age > maxAge) {
+					considerTrip = false;
+				}
+			    // --------------------------------------------------------------------------------------------------
 	    		
 	    		if (considerTrip == true) {
 		    		tripCounter++;
@@ -206,13 +236,13 @@ public class TripAnalyzer {
 		    		double tripDurationInMinutes = tripDurationInSeconds / 60.;
 		    		double tripDurationInHours = tripDurationInMinutes / 60.;
 		    		//addToMapIntegerKey(tripDurationMap, tripDurationInMinutes, 5, 120);
-		    		addToMapIntegerKey(tripDurationMap, tripDurationInMinutes, binWidthDuration, maxBinDuration);
+		    		addToMapIntegerKey(tripDurationMap, tripDurationInMinutes, binWidthDuration, maxBinDuration, 1.);
 		    		aggregateTripDuration = aggregateTripDuration + tripDurationInMinutes;	 
 	
 		    		
 		    		// store departure times in a map
 		    		double departureTimeInHours = departureTimeInSeconds / 3600.;
-		    		addToMapIntegerKey(departureTimeMap, departureTimeInHours, binWidthTime, maxBinTime);
+		    		addToMapIntegerKey(departureTimeMap, departureTimeInHours, binWidthTime, maxBinTime, 1.);
 		    		
 		    		
 		    		// store activities in a map
@@ -232,13 +262,13 @@ public class TripAnalyzer {
 					
 					
 					// store (routed) distances  in a map
-					addToMapIntegerKey(tripDistanceRoutedMap, tripDistanceRouted, binWidthDistance, maxBinDistance);
+					addToMapIntegerKey(tripDistanceRoutedMap, tripDistanceRouted, binWidthDistance, maxBinDistance, 1.);
 		    		aggregateTripDistanceRouted = aggregateTripDistanceRouted + tripDistanceRouted;
 		    		distanceRoutedMap.put(trip.getTripId(), tripDistanceRouted);
 	
 		    		
 		    		// store (beeline) distances in a map
-		    		addToMapIntegerKey(tripDistanceBeelineMap, tripDistanceBeeline, binWidthDistance, maxBinDistance);
+		    		addToMapIntegerKey(tripDistanceBeelineMap, tripDistanceBeeline, binWidthDistance, maxBinDistance, 1.);
 		    		aggregateTripDistanceBeeline = aggregateTripDistanceBeeline + tripDistanceBeeline;
 		    		distanceBeelineMap.put(trip.getTripId(), tripDistanceBeeline);
 	
@@ -247,11 +277,11 @@ public class TripAnalyzer {
 		    		if (tripDurationInHours > 0.) {
 		    			//System.out.println("trip distance is " + tripDistance + " and time is " + timeInHours);
 			    		double averageTripSpeedRouted = tripDistanceRouted / tripDurationInHours;
-			    		addToMapIntegerKey(averageTripSpeedRoutedMap, averageTripSpeedRouted, binWidthSpeed, maxBinSpeed);
+			    		addToMapIntegerKey(averageTripSpeedRoutedMap, averageTripSpeedRouted, binWidthSpeed, maxBinSpeed, 1.);
 			    		aggregateOfAverageTripSpeedsRouted = aggregateOfAverageTripSpeedsRouted + averageTripSpeedRouted;
 			    		
 			    		double averageTripSpeedBeeline = tripDistanceBeeline / tripDurationInHours;
-			    		addToMapIntegerKey(averageTripSpeedBeelineMap, averageTripSpeedBeeline, binWidthSpeed, maxBinSpeed);
+			    		addToMapIntegerKey(averageTripSpeedBeelineMap, averageTripSpeedBeeline, binWidthSpeed, maxBinSpeed, 1.);
 			    		aggregateOfAverageTripSpeedsBeeline = aggregateOfAverageTripSpeedsBeeline + averageTripSpeedBeeline;
 			    		
 			    		tripCounterSpeed++;
@@ -324,7 +354,7 @@ public class TripAnalyzer {
 //	}
 
 	
-	private static void addToMapIntegerKey(Map <Integer, Double> map, double inputValue, int binWidth, int limitOfLastBin) {
+	private static void addToMapIntegerKey(Map <Integer, Double> map, double inputValue, int binWidth, int limitOfLastBin, double weight) {
 		double inputValueBin = inputValue / binWidth;
 		int ceilOfLastBin = limitOfLastBin / binWidth;		
 		// Math.ceil returns the higher integer number (but as a double value)
@@ -338,10 +368,10 @@ public class TripAnalyzer {
 		}
 						
 		if (!map.containsKey(ceilOfValue)) {
-			map.put(ceilOfValue, 1.);
+			map.put(ceilOfValue, weight);
 		} else {
 			double value = map.get(ceilOfValue);
-			value++;
+			value = value + weight;
 			map.put(ceilOfValue, value);
 		}			
 	}

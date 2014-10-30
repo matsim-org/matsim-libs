@@ -1,7 +1,7 @@
 package playground.dziemke.cemdapMatsimCadyts.oneperson;
 
 
-public class Person {
+public class SimplePerson {
 
 	private int householdId;
 	// private int personId;
@@ -22,7 +22,7 @@ public class Person {
 			
 	
 	// public Person(int personId, int householdId, int locationOfWork, int age) {
-	public Person(String personId, int householdId, int employed, int student, int locationOfWork, int locationOfSchool, int sex, int age) {
+	public SimplePerson(String personId, int householdId, int employed, int student, int locationOfWork, int locationOfSchool, int sex, int age) {
 		this.personId = personId;
 		this.householdId = householdId;
 		this.employed = employed;
