@@ -40,9 +40,9 @@ public class Analyzer {
 	 */
 	public static void main(String[] args) throws IOException {
 //		String output = args[2];
-		String output = "/home/johannes/gsv/invermo/analysis/pop.mob/";
+		String output = "/home/johannes/gsv/invermo/analysis/de.car.3M/";
 //		String personFile = args[0];
-		String personFile = "/home/johannes/gsv/invermo/pop.mob.xml";
+		String personFile = "/home/johannes/gsv/invermo/pop.de.car.3M.xml";
 		
 		XMLParser parser = new XMLParser();
 		parser.setValidating(false);
@@ -65,7 +65,7 @@ public class Analyzer {
 	
 		AnalyzerTaskComposite task = new AnalyzerTaskComposite();
 		task.addTask(new ActivityChainTask());
-//		task.addTask(new LegTargetDistanceTask("car"));
+		task.addTask(new LegTargetDistanceTask("car"));
 ////		task.addTask(new ActivityDistanceTask(facilities));
 //		task.addTask(new SpeedFactorAnalyzer());
 //		task.addTask(new SeasonsTask());

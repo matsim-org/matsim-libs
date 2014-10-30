@@ -46,7 +46,7 @@ public class FixedSampleSizeDiscretizer {
 	 */
 	public static FixedBordersDiscretizer create(double[] samples, int size) {
 		TDoubleArrayList borders;
-		Arrays.sort(samples);
+		Arrays.sort(samples); // I think it is sufficient to get the min and max value.
 		TDoubleIntHashMap hist = new TDoubleIntHashMap(samples.length);
 		for (int i = 0; i < samples.length; i++) {
 			hist.adjustOrPutValue(samples[i], 1, 1);
@@ -59,11 +59,16 @@ public class FixedSampleSizeDiscretizer {
 		borders.add(samples[0] - 1E-10);
 
 		int binsize = 0;
+		int n = 0;
 		for (int i = 0; i < keys.length; i++) {
-			binsize += hist.get(keys[i]);
-			if (binsize >= size && i > 0) {
-				borders.add(keys[i]);
-				binsize = 0;
+			int nBin = hist.get(keys[i]);
+			binsize += nBin;
+			n += nBin;
+			if (binsize >= size && i > 0) { // sufficient samples for the current bin
+				if (samples.length - n >= binsize) { // sufficient remaining samples to fill the next bin
+					borders.add(keys[i]);
+					binsize = 0;
+				}
 			}
 		}
 
@@ -87,7 +92,7 @@ public class FixedSampleSizeDiscretizer {
 	 * @return a new discretizer.
 	 */
 	public static FixedBordersDiscretizer create(double[] samples, int size, int bins) {
-		int newsize = (int) Math.ceil(samples.length / (double)bins);
+		int newsize = (int) Math.ceil(samples.length / (double) bins);
 		newsize = Math.max(newsize, size);
 		return create(samples, newsize);
 	}

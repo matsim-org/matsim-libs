@@ -36,6 +36,7 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.johannes.gsv.synPop.io.XMLParser;
+import playground.johannes.gsv.synPop.mid.run.ProxyTaskRunner;
 import playground.johannes.sna.util.ProgressLogger;
 
 /**
@@ -62,6 +63,8 @@ public class Proxy2Matsim {
 		parser.setValidating(false);
 		parser.parse(args[0]);
 		
+		ProxyTaskRunner.run(new Convert2MatsimModes(), parser.getPersons());
+		
 		ProgressLogger.init(parser.getPersons().size(), 1, 10);
 		
 		for(ProxyPerson proxyPerson : parser.getPersons()) {
@@ -77,15 +80,6 @@ public class Proxy2Matsim {
 				ActivityImpl act = null;
 				
 				String type = proxyAct.getAttribute(CommonKeys.ACTIVITY_TYPE);
-//				if(type.equalsIgnoreCase("home")) {
-//					double x = Double.parseDouble(proxyPerson.getAttribute(CommonKeys.PERSON_HOME_COORD_X));
-//					double y = Double.parseDouble(proxyPerson.getAttribute(CommonKeys.PERSON_HOME_COORD_Y));
-//					act = (ActivityImpl) factory.createActivityFromCoord(type, new CoordImpl(x, y));
-//					
-//				} else {
-//					ActivityFacility facility = facilities.getFacilities().get(Id.create(proxyAct.getAttribute(CommonKeys.ACTIVITY_FACILITY)));
-//					act = factory.createActivityFromCoord(type, facility.getCoord());
-//				}
 				ActivityFacility facility = facilities.getFacilities().get(Id.create(proxyAct.getAttribute(CommonKeys.ACTIVITY_FACILITY), ActivityFacility.class));
 				act = (ActivityImpl) factory.createActivityFromCoord(type, facility.getCoord());
 				act.setFacilityId(facility.getId());

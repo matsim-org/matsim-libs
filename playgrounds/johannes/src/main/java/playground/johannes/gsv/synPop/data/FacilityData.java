@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
@@ -40,22 +41,12 @@ import playground.johannes.gsv.misc.QuadTree;
  */
 public class FacilityData {
 
-	private static FacilityData instance;
-
-	/**
-	 * @deprecated
-	 */
-	public static synchronized FacilityData getInstance(ActivityFacilities facilities, Random random) {
-		if (instance == null)
-			instance = new FacilityData(facilities, random);
-
-		return instance;
-	}
+	private static final Logger logger = Logger.getLogger(FacilityData.class);
 
 	private Map<String, QuadTree<ActivityFacility>> quadTrees = new HashMap<>();
 
 	private final Map<String, List<ActivityFacility>> facilitiesMap;
-	
+
 	private final ActivityFacilities facilities;
 
 	private final Random random;
@@ -74,11 +65,7 @@ public class FacilityData {
 					facilitiesMap.put(option.getType(), list);
 				}
 
-				// int cap = (int) option.getCapacity();
-				// cap = Math.max(1, cap/10);
-				// for(int i = 0; i < cap; i++) {
 				list.add(facility);
-				// }
 			}
 		}
 
@@ -91,7 +78,7 @@ public class FacilityData {
 	public ActivityFacilities getAll() {
 		return facilities;
 	}
-	
+
 	public ActivityFacility randomFacility(String type) {
 		List<ActivityFacility> list = facilitiesMap.get(type);
 		if (list != null) {
@@ -106,26 +93,29 @@ public class FacilityData {
 	}
 
 	public ActivityFacility getClosest(Coord coord, String type) {
-		initQuadTree(type);
+		QuadTree<ActivityFacility> quadtree = quadTrees.get(type);
+		if (quadtree == null) {
+			initQuadTree(type);
+		}
 
 		QuadTree<ActivityFacility> quadTree = quadTrees.get(type);
 		return quadTree.get(coord.getX(), coord.getY());
 	}
 
 	public QuadTree<ActivityFacility> getQuadTree(String type) {
-		initQuadTree(type);
+		QuadTree<ActivityFacility> quadtree = quadTrees.get(type);
+		if (quadtree == null) {
+			initQuadTree(type);
+		}
+
 		return quadTrees.get(type);
 	}
 
-	private void initQuadTree(String type) {
-		// if(quadTrees == null) {
-		// quadTrees = new HashMap<>();
-
-		// for(Entry<String, List<ActivityFacility>> entry :
-		// facilitiesMap.entrySet()) {
-
+	private synchronized void initQuadTree(String type) {
 		QuadTree<ActivityFacility> quadtree = quadTrees.get(type);
 		if (quadtree == null) {
+			logger.debug(String.format("Initializing quad tree for facilities of type %s.", type));
+
 			List<ActivityFacility> facilities = facilitiesMap.get(type);
 			double minx = Double.MAX_VALUE;
 			double miny = Double.MAX_VALUE;
@@ -146,7 +136,8 @@ public class FacilityData {
 			}
 
 			quadTrees.put(type, quadtree);
+			
+			logger.debug("Done.");
 		}
 	}
-	// }
 }

@@ -17,52 +17,44 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.data;
+package playground.johannes.gsv.sim.cadyts;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.matsim.api.core.v01.network.Link;
 
-import org.apache.log4j.Logger;
+import playground.johannes.gsv.sim.LinkOccupancyCalculator;
+import cadyts.measurements.SingleLinkMeasurement.TYPE;
+import cadyts.supply.SimResults;
 
-public class DataPool {
+/**
+ * @author johannes
+ *
+ */
+public class SimResultsAdaptor implements SimResults<Link> {
 
-	private static final Logger logger = Logger.getLogger(DataPool.class);
+	private static final long serialVersionUID = -2999625283320618974L;
+
+	private final LinkOccupancyCalculator occupancy;
 	
-	private final Map<String, Object> dataObjects;
+	private final double scale;
 	
-	private final Map<String, DataLoader> dataLoaders;
-	
-	public DataPool() {
-		dataObjects = new HashMap<>();
-		dataLoaders = new HashMap<>();
+	public SimResultsAdaptor(LinkOccupancyCalculator occupancy, double scale) {
+		this.occupancy = occupancy;
+		this.scale = scale;
 	}
 	
-	public void register(DataLoader loader, String key) {
-		if(dataLoaders.containsKey(key)) {
-			logger.warn(String.format("Cannot override the data loader for key \"%s\"", key));
+	@Override
+	public double getSimValue(Link link, int startTime_s, int endTime_s, TYPE type) {
+	
+		double val = occupancy.getOccupancy(link.getId());
+	
+		if(type == TYPE.COUNT_VEH) {
+			return val * scale;
+		} else if(type == TYPE.FLOW_VEH_H) {
+			return val * scale / 86400.0;
 		} else {
-			dataLoaders.put(key, loader);
-		}
-	}
-	
-	public Object get(String key) {
-		Object data = dataObjects.get(key);
-
-		if(data == null) {
-			loadData(key);
-			data = dataObjects.get(key);
+			throw new RuntimeException();
 		}
 		
-		return data;
 	}
-	
-	private synchronized void loadData(String key) {
-		DataLoader loader = dataLoaders.get(key);
-		if(loader == null) {
-			logger.warn(String.format("No data loader for key \"%s\" found. Register the corresponding data loader first.", key));
-		} else {
-			Object data = loader.load();
-			dataObjects.put(key, data);
-		}
-	}
+
 }

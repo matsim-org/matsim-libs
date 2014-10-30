@@ -1,9 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,53 +16,33 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.johannes.gsv.sim.cadyts;
 
-package playground.johannes.gsv.synPop.data;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.cadyts.general.LookUp;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.log4j.Logger;
-
-public class DataPool {
-
-	private static final Logger logger = Logger.getLogger(DataPool.class);
+/**
+ * @author nagel
+ *
+ */
+class LinkLookUp implements LookUp<Link>{
 	
-	private final Map<String, Object> dataObjects;
-	
-	private final Map<String, DataLoader> dataLoaders;
-	
-	public DataPool() {
-		dataObjects = new HashMap<>();
-		dataLoaders = new HashMap<>();
+	private Network network;
+
+	LinkLookUp( Scenario sc ) {
+		this.network = sc.getNetwork();
 	}
 	
-	public void register(DataLoader loader, String key) {
-		if(dataLoaders.containsKey(key)) {
-			logger.warn(String.format("Cannot override the data loader for key \"%s\"", key));
-		} else {
-			dataLoaders.put(key, loader);
-		}
+	LinkLookUp( Network net ) {
+		this.network = net ;
 	}
 	
-	public Object get(String key) {
-		Object data = dataObjects.get(key);
+	@Override
+	public Link lookUp( Id id ) {
+		return this.network.getLinks().get( id ) ;
+	}
 
-		if(data == null) {
-			loadData(key);
-			data = dataObjects.get(key);
-		}
-		
-		return data;
-	}
-	
-	private synchronized void loadData(String key) {
-		DataLoader loader = dataLoaders.get(key);
-		if(loader == null) {
-			logger.warn(String.format("No data loader for key \"%s\" found. Register the corresponding data loader first.", key));
-		} else {
-			Object data = loader.load();
-			dataObjects.put(key, data);
-		}
-	}
 }

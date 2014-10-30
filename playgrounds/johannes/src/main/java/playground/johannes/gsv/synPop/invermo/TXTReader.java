@@ -43,11 +43,13 @@ import playground.johannes.gsv.synPop.ProxyPlanTaskComposite;
 import playground.johannes.gsv.synPop.SetActivityTimeTask;
 import playground.johannes.gsv.synPop.SetLegTimes;
 import playground.johannes.gsv.synPop.ValidateActTimesTask;
+import playground.johannes.gsv.synPop.invermo.sim.InitializeTargetDistance;
 import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.gsv.synPop.mid.PersonAttributeHandler;
 import playground.johannes.gsv.synPop.mid.PersonCloner;
 import playground.johannes.gsv.synPop.mid.RowHandler;
 import playground.johannes.gsv.synPop.mid.run.ProxyTaskRunner;
+import playground.johannes.gsv.synPop.sim3.TargetDistanceHamiltonian;
 import playground.johannes.socialnetworks.gis.io.FeatureSHP;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 
@@ -264,12 +266,14 @@ public class TXTReader {
 		
 		geoTask.writeCache();
 		
+		new DeleteNoWeight().apply(persons);
+		
 		ProxyTaskRunner.run(plans2Persons, persons);
 		for(ProxyPerson person : plans2Persons.getNewPersons()) {
 			persons.add(person);
 		}
 		
-		new DeleteNoWeight().apply(persons);
+		
 //		new ApplySampleProbas(82000000).apply(persons);
 //		
 //		double wsum = 0;
@@ -313,6 +317,9 @@ public class TXTReader {
 		persons = ProxyTaskRunner.runAndDelete(new DeleteModes("car"), persons);
 		logger.info("Population size = " + persons.size());
 		
-		writer.write("/home/johannes/gsv/invermo/pop.de.car.xml", persons);
+		logger.info("Initializing target distances...");
+		ProxyTaskRunner.run(new InitializeTargetDistance(TargetDistanceHamiltonian.DEFAULT_DETOUR_FACTOR), persons);
+		
+		writer.write("/home/johannes/gsv/invermo/pop.de.car.3M.xml", persons);
 	}
 }

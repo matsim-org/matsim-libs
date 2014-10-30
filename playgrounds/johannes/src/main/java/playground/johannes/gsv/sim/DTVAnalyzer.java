@@ -125,10 +125,10 @@ public class DTVAnalyzer implements IterationEndsListener, IterationStartsListen
 
 			writer.close();
 			
-			writeShape(countsMap, outdir + "/counts.relerror.shp");
+//			writeShape(countsMap, outdir + "/counts.relerror.shp");
 			
-			LinkSHPWriter shpWriter = new LinkSHPWriter();
-			shpWriter.write(event.getControler().getNetwork().getLinks().values(), simCounts, outdir + "/linkflow.shp", factor);
+//			LinkSHPWriter shpWriter = new LinkSHPWriter();
+//			shpWriter.write(event.getControler().getNetwork().getLinks().values(), simCounts, outdir + "/linkflow.shp", factor);
 			
 			simCounts.writeValues(outdir + "/linkoccup.txt");
 		} catch (IOException e) {

@@ -47,6 +47,8 @@ public class Plans2PersonsTask implements ProxyPersonTask {
 	@Override
 	public void apply(ProxyPerson person) {
 		int counter = 0;
+		double w = Double.parseDouble(person.getAttribute(CommonKeys.PERSON_WEIGHT));
+
 		if (person.getPlans().size() > 1) {
 			for (int i = 1; i < person.getPlans().size(); i++) {
 				ProxyPerson newPerson = new ProxyPerson(String.format("%s.%s", person.getId(), counter++));
@@ -56,9 +58,8 @@ public class Plans2PersonsTask implements ProxyPersonTask {
 
 				newPerson.addPlan(person.getPlans().get(i));
 
-				double w = Double.parseDouble(newPerson.getAttribute(CommonKeys.PERSON_WEIGHT));
-				w = w * 1 / 365.0;
-				newPerson.setAttribute(CommonKeys.PERSON_WEIGHT, String.valueOf(w));
+				double newW = w * 1 / 365.0;
+				newPerson.setAttribute(CommonKeys.PERSON_WEIGHT, String.valueOf(newW));
 
 				newPersons.add(newPerson);
 			}
@@ -70,27 +71,21 @@ public class Plans2PersonsTask implements ProxyPersonTask {
 		/*
 		 * adjust the weight of the original person
 		 */
-		if (counter > 0) {
-			double w = Double.parseDouble(person.getAttribute(CommonKeys.PERSON_WEIGHT));
-			w = w * 1 / 365.0;
-			person.setAttribute(CommonKeys.PERSON_WEIGHT, String.valueOf(w));
-			/*
-			 * add one person with an empty plan
-			 */
-			ProxyPerson newPerson = new ProxyPerson(String.format("%s.%s", person.getId(), counter++));
-			for (Entry<String, String> entry : person.getAttributes().entrySet()) {
-				newPerson.setAttribute(entry.getKey(), entry.getValue());
-			}
-			newPerson.addPlan(new ProxyPlan());
-			
-			w = Double.parseDouble(newPerson.getAttribute(CommonKeys.PERSON_WEIGHT));
-			w = w * (365 - counter)/365.0;
-			newPerson.setAttribute(CommonKeys.PERSON_WEIGHT, String.valueOf(w));
-			
-			newPersons.add(newPerson);
+		double newW = w * 1 / 365.0;
+		person.setAttribute(CommonKeys.PERSON_WEIGHT, String.valueOf(newW));
+		/*
+		 * add one person with an empty plan
+		 */
+		ProxyPerson newPerson = new ProxyPerson(String.format("%s.%s", person.getId(), counter++));
+		for (Entry<String, String> entry : person.getAttributes().entrySet()) {
+			newPerson.setAttribute(entry.getKey(), entry.getValue());
 		}
-		
+		newPerson.addPlan(new ProxyPlan());
 
+		newW = w * (365 - counter) / 365.0;
+		newPerson.setAttribute(CommonKeys.PERSON_WEIGHT, String.valueOf(newW));
+
+		newPersons.add(newPerson);
 	}
 
 }

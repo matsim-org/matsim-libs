@@ -33,6 +33,7 @@ import playground.johannes.gsv.synPop.data.DataPool;
 import playground.johannes.gsv.synPop.data.FacilityDataLoader;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.mid.PersonCloner;
+import playground.johannes.gsv.synPop.mid.run.ConcurrentProxyTaskRunner;
 import playground.johannes.gsv.synPop.mid.run.ProxyTaskRunner;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 
@@ -94,7 +95,10 @@ public class SetActivityLocations {
 		 * Assign random facilities to acts
 		 */
 		logger.info("Initializing activities...");
-		ProxyTaskRunner.run(new InitActivitLocations(dataPool), persons);
+//		ProxyTaskRunner.run(new InitActivitLocations(dataPool), persons);
+//		ProxyTaskRunner.run(new InitHomeBasedActLocations(dataPool, random), persons);
+		int numThreads = Integer.parseInt(config.findParam(MODULE_NAME, "numThreads"));
+		ConcurrentProxyTaskRunner.run(new InitHomeBasedActLocsFactory(dataPool, random), persons, numThreads);
 		
 		logger.info("Setting up sampler...");
 		/*
@@ -114,26 +118,26 @@ public class SetActivityLocations {
 		 * Build the listener
 		 */
 		SamplerListenerComposite lComposite = new SamplerListenerComposite();
+		String outputDir = config.getParam(MODULE_NAME, "outputDir");
+		
+		long dumpInterval = (long) Double.parseDouble(config.getParam(MODULE_NAME, "dumpInterval"));
+		long logInterval = (long) Double.parseDouble(config.getParam(MODULE_NAME, "logInterval"));
 		/*
-		 * need to copy activity location user key to activity attributes
+		 * add loggers
 		 */
-		int dumpInterval = (int) Double.parseDouble(config.getParam(MODULE_NAME, "dumpInterval"));
-		int logInterval = (int) Double.parseDouble(config.getParam(MODULE_NAME, "logInterval"));
-		lComposite.addComponent(new BlockingSamplerListener(new CopyFacilityUserData(), dumpInterval));
+		lComposite.addComponent(new HamiltonianLogger(distance, logInterval, outputDir));
+		lComposite.addComponent(new HamiltonianLogger(new TargetDistanceAbsolute(), logInterval, outputDir));
 //		lComposite.addComponent(new BlockingSamplerListener(new CopyFacilityUserData(), logInterval));
 		/*
 		 * add a population writer
 		 */
-		String outputDir = config.getParam(MODULE_NAME, "outputDir");
 		PopulationWriter popWriter = new PopulationWriter(outputDir);
 		popWriter.setDumpInterval(1);
-		lComposite.addComponent(new BlockingSamplerListener(popWriter, dumpInterval));
 		/*
-		 * add loggers
+		 * need to copy activity location user key to activity attributes
 		 */
-		
-		lComposite.addComponent(new HamiltonianLogger(distance, logInterval, outputDir));
-		lComposite.addComponent(new HamiltonianLogger(new TargetDistanceAbsolute(), logInterval, outputDir));
+		lComposite.addComponent(new BlockingSamplerListener(new CopyFacilityUserData(), dumpInterval));
+		lComposite.addComponent(new BlockingSamplerListener(popWriter, dumpInterval));
 		lComposite.addComponent(new BlockingSamplerListener(new AnalyzerListener(dataPool, outputDir), dumpInterval));
 		
 		SamplerLogger slogger = new SamplerLogger();
@@ -143,7 +147,7 @@ public class SetActivityLocations {
 
 		logger.info("Running sampler...");
 		long iters = (long) Double.parseDouble(config.getParam(MODULE_NAME, "iterations"));
-		int numThreads = Integer.parseInt(config.findParam(MODULE_NAME, "numThreads"));
+		
 		sampler.run(iters, numThreads);
 		slogger.stop();
 		logger.info("Done.");

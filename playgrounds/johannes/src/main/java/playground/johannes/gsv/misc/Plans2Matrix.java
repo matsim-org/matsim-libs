@@ -131,12 +131,12 @@ public class Plans2Matrix {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
 		MatsimPopulationReader popReader = new MatsimPopulationReader(scenario);
-		popReader.readFile("/home/johannes/sge/prj/matsim/run/198/output/plans.xml.gz");
+		popReader.readFile(args[0]);
 
 		MatsimFacilitiesReader facReader = new MatsimFacilitiesReader(scenario);
-		facReader.readFile("/home/johannes/gsv/osm/facilities/facilities.all.xml");
+		facReader.readFile(args[1]);
 
-		ZoneLayer<Map<String, Object>> zones = ZoneLayerSHP.read("/home/johannes/gsv/osm/kreisCompare/zones_zone.SHP");
+		ZoneLayer<Map<String, Object>> zones = ZoneLayerSHP.read(args[2]);
 
 		Set<Plan> plans = new HashSet<>();
 		for (Person person : scenario.getPopulation().getPersons().values()) {
@@ -146,6 +146,6 @@ public class Plans2Matrix {
 		Matrix m = new Plans2Matrix().run(plans, zones, scenario.getActivityFacilities());
 
 		VisumMatrixWriter writer = new VisumMatrixWriter(m);
-		writer.writeFile("/home/johannes/gsv/matrices/miv.fma");
+		writer.writeFile(args[3]);
 	}
 }

@@ -78,11 +78,11 @@ public class SetHomeLocations {
 		persons = PersonCloner.weightedClones(persons, Integer.parseInt(config.getParam(MODULE_NAME, "targetSize")), random);
 		logger.info(String.format("Generated %s persons.", persons.size()));
 		
-		logger.info("Loading data...");
+//		logger.info("Loading data...");
 		DataPool dataPool = new DataPool();
 		dataPool.register(new FacilityDataLoader(config.getParam(MODULE_NAME, "facilities"), random), FacilityDataLoader.KEY);
 		dataPool.register(new LandUseDataLoader(config.getModule(MODULE_NAME)), LandUseDataLoader.KEY);
-		logger.info("Done.");
+//		logger.info("Done.");
 		
 		logger.info("Validation data...");
 		FacilityZoneValidator.validate(dataPool, ActivityType.HOME, 3);

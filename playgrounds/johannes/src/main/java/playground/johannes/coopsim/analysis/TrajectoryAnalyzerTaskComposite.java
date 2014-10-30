@@ -19,15 +19,21 @@
  * *********************************************************************** */
 package playground.johannes.coopsim.analysis;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 
 import playground.johannes.coopsim.pysical.Trajectory;
+import playground.johannes.sna.util.MultiThreading;
 
 /**
  * @author illenberger
@@ -38,6 +44,8 @@ public class TrajectoryAnalyzerTaskComposite extends TrajectoryAnalyzerTask {
 	private static final Logger logger = Logger.getLogger(TrajectoryAnalyzerTaskComposite.class);
 	
 	private List<TrajectoryAnalyzerTask> tasks;
+	
+	private int numThreads = MultiThreading.getNumAllowedThreads();
 	
 	public TrajectoryAnalyzerTaskComposite() {
 		tasks = new LinkedList<TrajectoryAnalyzerTask>();
@@ -53,13 +61,38 @@ public class TrajectoryAnalyzerTaskComposite extends TrajectoryAnalyzerTask {
 		}
 	}
 	
+	public void setNumThreads(int n) {
+		this.numThreads = n;
+	}
+	
 	@Override
-	public void analyze(Set<Trajectory> trajectories, Map<String, DescriptiveStatistics> results) {
+	public void analyze(final Set<Trajectory> trajectories, final Map<String, DescriptiveStatistics> results) {
+		ExecutorService executor = Executors.newFixedThreadPool(numThreads);
+		
+		List<Future<?>> futures = new ArrayList<>(tasks.size());
+		
 		for(TrajectoryAnalyzerTask task : tasks) {
-			logger.debug(String.format("Running task %1$s...", task.getClass().getSimpleName()));
-			task.analyze(trajectories, results);
+			final TrajectoryAnalyzerTask task2 = task;
+			Runnable runnable = new Runnable() {
+				@Override
+				public void run() {
+					logger.debug(String.format("Running task %1$s...", task2.getClass().getSimpleName()));
+					task2.analyze(trajectories, results);
+				}
+			};
+			
+			futures.add(executor.submit(runnable));
 		}
 
+		for(Future<?> future : futures) {
+			try {
+				future.get();
+			} catch (InterruptedException | ExecutionException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		executor.shutdown();
 	}
 
 }

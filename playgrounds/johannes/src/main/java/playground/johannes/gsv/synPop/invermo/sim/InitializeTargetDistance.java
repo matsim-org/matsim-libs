@@ -33,6 +33,7 @@ import playground.johannes.gsv.synPop.invermo.InvermoKeys;
 import playground.johannes.gsv.synPop.io.XMLParser;
 import playground.johannes.gsv.synPop.io.XMLWriter;
 import playground.johannes.gsv.synPop.mid.run.ProxyTaskRunner;
+import playground.johannes.gsv.synPop.sim3.TargetDistanceHamiltonian;
 import playground.johannes.socialnetworks.gis.DistanceCalculator;
 import playground.johannes.socialnetworks.gis.OrthodromicDistanceCalculator;
 
@@ -50,6 +51,12 @@ public class InitializeTargetDistance implements ProxyPlanTask {
 	
 	private final DistanceCalculator dCalc = OrthodromicDistanceCalculator.getInstance();
 	
+	private final double detourFactor;
+	
+	public InitializeTargetDistance(double detourFactor) {
+		this.detourFactor = detourFactor;
+	}
+	
 	@Override
 	public void apply(ProxyPlan plan) {
 		for(int i = 0; i < plan.getLegs().size(); i++) {
@@ -65,6 +72,7 @@ public class InitializeTargetDistance implements ProxyPlanTask {
 				Point dest = string2Coord(destStr);
 				
 				double d = dCalc.distance(source, dest);
+				d = d * detourFactor;
 				
 				leg.setAttribute(CommonKeys.LEG_DISTANCE, String.valueOf(d));
 			}
@@ -106,7 +114,7 @@ public class InitializeTargetDistance implements ProxyPlanTask {
 		Set<ProxyPerson> persons = parser.getPersons();
 		logger.info(String.format("Loaded %s persons.", persons.size()));
 		
-		ProxyTaskRunner.run(new InitializeTargetDistance(), persons);
+		ProxyTaskRunner.run(new InitializeTargetDistance(TargetDistanceHamiltonian.DEFAULT_DETOUR_FACTOR), persons);
 		
 		XMLWriter writer = new XMLWriter();
 		writer.write("/home/johannes/gsv/invermo/5.pop.dist.xml", persons);

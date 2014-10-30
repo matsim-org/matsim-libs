@@ -20,57 +20,62 @@
 package playground.johannes.gsv.synPop.mid.run;
 
 import java.util.Collection;
+import java.util.List;
 
-import org.apache.log4j.Logger;
-
-import playground.johannes.gsv.synPop.DeleteRandom;
 import playground.johannes.gsv.synPop.ProxyPerson;
-import playground.johannes.gsv.synPop.ProxyPersonTaskComposite;
-import playground.johannes.gsv.synPop.io.XMLParser;
-import playground.johannes.gsv.synPop.io.XMLWriter;
+import playground.johannes.gsv.synPop.ProxyPlan;
+import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.gsv.synPop.ProxyPlanTaskFactory;
+import playground.johannes.sna.util.ProgressLogger;
+import playground.johannes.socialnetworks.utils.CollectionUtils;
 
 /**
  * @author johannes
  *
  */
-public class SubSample {
+public class ConcurrentProxyTaskRunner {
 
-	private static final Logger logger = Logger.getLogger(SubSample.class);
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		XMLParser parser = new XMLParser();
-		parser.setValidating(false);
+	public static void run(ProxyPlanTaskFactory factory, Collection<ProxyPerson> persons, int numThreads) {
+		/*
+		 * split collection in approx even segments
+		 */
+		int n = Math.min(persons.size(), numThreads);
+		final List<ProxyPerson>[] segments = CollectionUtils.split(persons, n);
+		/*
+		 * create threads
+		 */
+		ProgressLogger.init(persons.size(), 1, 10);
+		Thread[] threads = new Thread[numThreads];
+		for(int i = 0; i < numThreads; i++) {
+			final ProxyPlanTask task = factory.getInstance();
+			final List<ProxyPerson> subPersons = segments[i];
+			threads[i] = new Thread(new Runnable() {
+				
+				@Override
+				public void run() {
+					for(ProxyPerson p : subPersons) {
+						for(ProxyPlan plan : p.getPlans())
+							task.apply(plan);
+						
+						ProgressLogger.step();
+					}
+					
+				}
+			});
+			
+			threads[i].start();
+		}
+		/*
+		 * wait for threads
+		 */
+		for(int i = 0; i < numThreads; i++) {
+			try {
+				threads[i].join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 		
-		parser.addToBlacklist("workLoc");
-		parser.addToBlacklist("homeLoc");
-		parser.addToBlacklist("homeCoord");
-		parser.addToBlacklist("location");
-		parser.addToBlacklist("coord");
-		parser.addToBlacklist("state");
-		parser.addToBlacklist("inhabClass");
-		parser.addToBlacklist("index");
-		parser.addToBlacklist("roundTrip");
-		parser.addToBlacklist("origin");
-		parser.addToBlacklist("purpose");
-		parser.addToBlacklist("delete");
-		
-		parser.parse(args[0]);
-		logger.info(String.format("Loaded %s persons.", parser.getPersons().size()));
-		
-		double proba = Double.parseDouble(args[1]);
-		ProxyPersonTaskComposite tasks = new ProxyPersonTaskComposite();
-		tasks.addComponent(new DeleteRandom(1-proba));
-		
-		Collection<ProxyPerson> subset = ProxyTaskRunner.runAndDelete(tasks, parser.getPersons());
-		logger.info(String.format("New population: %s persons.", subset.size()));
-		
-		logger.info("Writing population...");
-		XMLWriter writer = new XMLWriter();
-		writer.write(args[2], subset);
-		logger.info("Done.");
-		
+		ProgressLogger.termiante();
 	}
-
 }

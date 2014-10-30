@@ -50,12 +50,12 @@ public class MatchFromOrigId {
 
 		Counts counts = new Counts();
 		CountsReaderMatsimV1 cReader = new CountsReaderMatsimV1(counts);
-		cReader.parse("/home/johannes/gsv/counts/counts.2009.osm.xml");
+		cReader.parse("/home/johannes/sge/prj/osm/run/248/output/counts.2009.osm20140909.xml");
 
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		NetworkReaderMatsimV1 nReader = new NetworkReaderMatsimV1(scenario);
-		nReader.parse("/home/johannes/gsv/osm/network/germany-network-cat5.simpl2.xml");
+		nReader.parse("/home/johannes/gsv/osm/network/germany-20140909.5.xml");
 
 		Network network = scenario.getNetwork();
 
@@ -96,7 +96,7 @@ public class MatchFromOrigId {
 		System.out.println(String.format("Number of new counts: %s", newCounts.getCounts().size()));
 		
 		CountsWriter writer = new CountsWriter(newCounts);
-		writer.write("/home/johannes/gsv/counts/counts.2009.xml");
+		writer.write("/home/johannes/gsv/counts/counts.2009.net20140909.5.xml");
 	}
 
 }

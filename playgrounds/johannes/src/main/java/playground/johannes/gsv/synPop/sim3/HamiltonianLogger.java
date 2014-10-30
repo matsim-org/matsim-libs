@@ -48,7 +48,7 @@ public class HamiltonianLogger implements SamplerListener {
 	
 	private final Hamiltonian h;
 	
-	private final int logInterval;
+	private final long logInterval;
 	
 	private long iter;
 	
@@ -62,7 +62,7 @@ public class HamiltonianLogger implements SamplerListener {
 		this(h, logInterval, null);
 	}
 	
-	public HamiltonianLogger(Hamiltonian h, int logInterval, String outdir) {
+	public HamiltonianLogger(Hamiltonian h, long logInterval, String outdir) {
 		this.h = h;
 		this.logInterval = logInterval;
 		this.outdir = outdir;

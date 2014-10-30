@@ -33,7 +33,7 @@ import org.matsim.visum.VisumMatrixReader;
  * @author johannes
  * 
  */
-public class MatrixCompare {
+public class MatrixCompareNorm {
 
 	/**
 	 * @param args
@@ -42,16 +42,15 @@ public class MatrixCompare {
 		Matrix m1 = new Matrix("1", null);
 		VisumMatrixReader reader = new VisumMatrixReader(m1);
 		reader.readFile("/home/johannes/gsv/matrices/IV_gesamt.O.fma");
-
+		normMatrix(m1);
+		
 		Matrix m2 = new Matrix("2", null);
 		reader = new VisumMatrixReader(m2);
 		reader.readFile("/home/johannes/gsv/matrices/miv.277.fma");
+		normMatrix(m2);
 
 		int notfound = 0;
-		
-		double factor = 40;
-		
-		DescriptiveStatistics oRelErrs = new DescriptiveStatistics();
+				DescriptiveStatistics oRelErrs = new DescriptiveStatistics();
 		Set<String> origs = m1.getFromLocations().keySet();
 		for (String origId : origs) {
 			List<Entry> entries1 = m1.getFromLocEntries(origId);
@@ -59,18 +58,18 @@ public class MatrixCompare {
 
 			double sum1 = 0;
 			for (Entry entry : entries1) {
-				sum1 += entry.getValue() / 365.0;
+				sum1 += entry.getValue();
 			}
 
 			if(entries2 == null) {
-				oRelErrs.addValue(1);
+				oRelErrs.addValue(-1);
 			} else if (entries2 != null && sum1 > 0) {
 				double sum2 = 0;
 				for (Entry entry : entries2) {
-					sum2 += entry.getValue() * factor;
+					sum2 += entry.getValue();
 				}
 				
-				oRelErrs.addValue(Math.abs(sum1 - sum2) / sum1);
+				oRelErrs.addValue((sum2 - sum1)/sum1);
 			} else {
 				notfound++;
 			}
@@ -90,16 +89,16 @@ public class MatrixCompare {
 
 			double sum1 = 0;
 			for (Entry entry : entries1) {
-				sum1 += entry.getValue() / 365.0;
+				sum1 += entry.getValue();
 			}
 
 			if (entries2 != null && sum1 > 0) {
 				double sum2 = 0;
 				for (Entry entry : entries2) {
-					sum2 += entry.getValue() * factor;
+					sum2 += entry.getValue();
 				}
 				
-				dRelErrs.addValue(Math.abs(sum1 - sum2) / sum1);
+				dRelErrs.addValue((sum2 - sum1)/sum1);
 			}
 
 			
@@ -123,10 +122,10 @@ public class MatrixCompare {
 				if(!id1.equalsIgnoreCase(id2)) {
 					
 					Entry e1 = m1.getEntry(id1, id2);
-					double val1 = e1.getValue()/365.0;
+					double val1 = e1.getValue();
 					
 					Entry e2 = m2.getEntry(id1, id2);
-					double val2 = e2.getValue() * factor;
+					double val2 = e2.getValue();
 					
 					double err = (val2 - val1)/val1;
 				
@@ -143,4 +142,24 @@ public class MatrixCompare {
 		
 	}
 
+	private static void normMatrix(Matrix m) {
+		double sum = 0;
+		for(String from : m.getFromLocations().keySet()) {
+			for(String to : m.getToLocations().keySet()) {
+				Entry e = m.getEntry(from, to);
+				if(e != null) {
+					sum += e.getValue();
+				}
+			}
+		}
+		
+		for(String from : m.getFromLocations().keySet()) {
+			for(String to : m.getToLocations().keySet()) {
+				Entry e = m.getEntry(from, to);
+				if(e != null) {
+					e.setValue(e.getValue()/sum);
+				}
+			}
+		}
+	}
 }

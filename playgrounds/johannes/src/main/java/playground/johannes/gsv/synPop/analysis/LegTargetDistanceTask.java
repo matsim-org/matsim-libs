@@ -32,6 +32,7 @@ import playground.johannes.gsv.synPop.CommonKeys;
 import playground.johannes.gsv.synPop.ProxyObject;
 import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPlan;
+import playground.johannes.sna.math.LinearDiscretizer;
 
 /**
  * @author johannes
@@ -54,15 +55,16 @@ public class LegTargetDistanceTask extends AnalyzerTask {
 
 		int cntNoVal = 0;
 
+		LinearDiscretizer disc = new LinearDiscretizer(100);
 		for (ProxyPerson person : persons) {
 			ProxyPlan plan = person.getPlan();
 			for (ProxyObject leg : plan.getLegs()) {
 				if (mode == null || mode.equalsIgnoreCase(leg.getAttribute(CommonKeys.LEG_MODE))) {
-					if (purpose == null || ((String) leg.getAttribute(CommonKeys.LEG_PURPOSE)).equalsIgnoreCase(purpose)) {
+					if (purpose == null || purpose.equalsIgnoreCase((String) leg.getAttribute(CommonKeys.LEG_PURPOSE))) {
 						String distStr = leg.getAttribute(CommonKeys.LEG_DISTANCE);
 						if (distStr != null) {
 							double d = Double.parseDouble(distStr);
-							stats.addValue(d);
+							stats.addValue(d);//disc.discretize(d));
 						} else {
 							cntNoVal++;
 						}
@@ -100,7 +102,8 @@ public class LegTargetDistanceTask extends AnalyzerTask {
 
 			if (outputDirectoryNotNull()) {
 				try {
-					writeHistograms(stats, key, 2000, 50);
+					writeHistograms(stats, key, 1000, 50);
+					writeHistograms(stats, new LinearDiscretizer(500), key, false);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

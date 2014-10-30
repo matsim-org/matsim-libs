@@ -73,11 +73,11 @@ public class InitHomeLocations implements ProxyPersonsTask {
 		
 		double sum = 0;
 		for(Zone<Map<String, Object>> zone : zoneLayer.getZones()) {
-			sum += (Integer)zone.getAttribute().get(LandUseData.POPULATION_KEY);
+			sum += (Double)zone.getAttribute().get(LandUseData.POPULATION_KEY);
 		}
 		
 		for(Zone<Map<String, Object>> zone : zoneLayer.getZones()) {
-			double inhabs = (Integer)zone.getAttribute().get(LandUseData.POPULATION_KEY);
+			double inhabs = (Double)zone.getAttribute().get(LandUseData.POPULATION_KEY);
 			double p = inhabs/sum;
 			zoneProba.put(zone, p);
 		}

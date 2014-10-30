@@ -17,52 +17,33 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.data;
+package playground.johannes.gsv.synPop.sim3;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Random;
 
-import org.apache.log4j.Logger;
+import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.gsv.synPop.ProxyPlanTaskFactory;
+import playground.johannes.gsv.synPop.data.DataPool;
+import playground.johannes.socialnetworks.utils.XORShiftRandom;
 
-public class DataPool {
+/**
+ * @author johannes
+ *
+ */
+public class InitHomeBasedActLocsFactory implements ProxyPlanTaskFactory {
 
-	private static final Logger logger = Logger.getLogger(DataPool.class);
+	private final Random random;
 	
-	private final Map<String, Object> dataObjects;
+	private final DataPool pool;
 	
-	private final Map<String, DataLoader> dataLoaders;
-	
-	public DataPool() {
-		dataObjects = new HashMap<>();
-		dataLoaders = new HashMap<>();
+	public InitHomeBasedActLocsFactory(DataPool pool, Random random) {
+		this.pool = pool;
+		this.random = random;
 	}
 	
-	public void register(DataLoader loader, String key) {
-		if(dataLoaders.containsKey(key)) {
-			logger.warn(String.format("Cannot override the data loader for key \"%s\"", key));
-		} else {
-			dataLoaders.put(key, loader);
-		}
+	@Override
+	public ProxyPlanTask getInstance() {
+		return new InitHomeBasedActLocations(pool, new XORShiftRandom(random.nextLong()));
 	}
-	
-	public Object get(String key) {
-		Object data = dataObjects.get(key);
 
-		if(data == null) {
-			loadData(key);
-			data = dataObjects.get(key);
-		}
-		
-		return data;
-	}
-	
-	private synchronized void loadData(String key) {
-		DataLoader loader = dataLoaders.get(key);
-		if(loader == null) {
-			logger.warn(String.format("No data loader for key \"%s\" found. Register the corresponding data loader first.", key));
-		} else {
-			Object data = loader.load();
-			dataObjects.put(key, data);
-		}
-	}
 }

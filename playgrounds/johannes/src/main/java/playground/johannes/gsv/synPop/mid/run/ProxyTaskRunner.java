@@ -30,6 +30,7 @@ import playground.johannes.gsv.synPop.ProxyPerson;
 import playground.johannes.gsv.synPop.ProxyPersonTask;
 import playground.johannes.gsv.synPop.ProxyPlan;
 import playground.johannes.gsv.synPop.ProxyPlanTask;
+import playground.johannes.sna.util.ProgressLogger;
 
 /**
  * @author johannes
@@ -43,10 +44,24 @@ public class ProxyTaskRunner {
 	}
 	
 	public static void run(ProxyPlanTask task, Collection<ProxyPerson> persons) {
+		run(task, persons, false);
+	}
+	
+	public static void run(ProxyPlanTask task, Collection<ProxyPerson> persons, boolean verbose) {
+		if(verbose) {
+			ProgressLogger.init(persons.size(), 2, 10);
+		}
+		
 		for(ProxyPerson person : persons) {
 			for(ProxyPlan plan : person.getPlans())
 				task.apply(plan);
+			
+			if(verbose)
+				ProgressLogger.step();
 		}
+		
+		if(verbose)
+			ProgressLogger.termiante();
 	}
 	
 	public static Set<ProxyPerson> runAndDelete(ProxyPersonTask task, Collection<ProxyPerson> persons) {

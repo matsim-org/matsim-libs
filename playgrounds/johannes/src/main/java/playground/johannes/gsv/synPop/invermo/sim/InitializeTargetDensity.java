@@ -58,7 +58,7 @@ public class InitializeTargetDensity implements ProxyPersonTask {
 			logger.debug("Zone not found. Drawing random zone.");
 		}
 	
-		Double inhabs = (Double)zone.getAttribute().get(LandUseData.POPULATION_KEY);
+		Double inhabs = (Double) zone.getAttribute().get(LandUseData.POPULATION_KEY);
 		double area = zone.getGeometry().getArea();
 		
 		person.setUserData(PersonPopulationDenstiy.TARGET_DENSITY, inhabs/area);

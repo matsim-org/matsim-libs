@@ -17,52 +17,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.johannes.gsv.synPop.data;
+package playground.johannes.gsv.synPop;
 
-import java.util.HashMap;
-import java.util.Map;
+/**
+ * @author johannes
+ *
+ */
+public interface ProxyPlanTaskFactory {
 
-import org.apache.log4j.Logger;
-
-public class DataPool {
-
-	private static final Logger logger = Logger.getLogger(DataPool.class);
+	public ProxyPlanTask getInstance();
 	
-	private final Map<String, Object> dataObjects;
-	
-	private final Map<String, DataLoader> dataLoaders;
-	
-	public DataPool() {
-		dataObjects = new HashMap<>();
-		dataLoaders = new HashMap<>();
-	}
-	
-	public void register(DataLoader loader, String key) {
-		if(dataLoaders.containsKey(key)) {
-			logger.warn(String.format("Cannot override the data loader for key \"%s\"", key));
-		} else {
-			dataLoaders.put(key, loader);
-		}
-	}
-	
-	public Object get(String key) {
-		Object data = dataObjects.get(key);
-
-		if(data == null) {
-			loadData(key);
-			data = dataObjects.get(key);
-		}
-		
-		return data;
-	}
-	
-	private synchronized void loadData(String key) {
-		DataLoader loader = dataLoaders.get(key);
-		if(loader == null) {
-			logger.warn(String.format("No data loader for key \"%s\" found. Register the corresponding data loader first.", key));
-		} else {
-			Object data = loader.load();
-			dataObjects.put(key, data);
-		}
-	}
 }

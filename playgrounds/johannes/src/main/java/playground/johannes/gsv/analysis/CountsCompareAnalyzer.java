@@ -19,6 +19,8 @@
 
 package playground.johannes.gsv.analysis;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 
 import gnu.trove.TDoubleArrayList;
@@ -97,5 +99,35 @@ public class CountsCompareAnalyzer implements IterationEndsListener {
 			e.printStackTrace();
 		}
 
+		String rootOutDir = event.getControler().getControlerIO().getOutputPath();
+		boolean append = false;
+		if(event.getIteration() > 0) {
+			append = true;
+		}
+		
+		try {
+			BufferedWriter writer = new BufferedWriter(new FileWriter(String.format("%s/counts-err.stats.txt", rootOutDir), append));
+			if(!append) {
+				// write header
+				writer.write("mean\tvar\tstderr\tmin\tmax");
+				writer.newLine();
+			}
+			
+			writer.write(String.valueOf(stats.getMean()));
+			writer.write("\t");
+			writer.write(String.valueOf(stats.getVariance()));
+			writer.write("\t");
+			writer.write(String.valueOf(stats.getStandardDeviation()));
+			writer.write("\t");
+			writer.write(String.valueOf(stats.getMin()));
+			writer.write("\t");
+			writer.write(String.valueOf(stats.getMax()));
+			writer.newLine();
+			
+			writer.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

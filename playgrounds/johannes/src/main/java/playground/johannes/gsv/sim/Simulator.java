@@ -27,40 +27,40 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.cadyts.car.CadytsContext;
-import org.matsim.contrib.cadyts.general.CadytsScoring;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.BeforeMobsimEvent;
+import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.BeforeMobsimListener;
+import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
-import org.matsim.core.replanning.selectors.GenericPlanSelector;
-import org.matsim.core.replanning.selectors.PlanSelectorFactory;
+import org.matsim.core.replanning.PlanStrategy;
+import org.matsim.core.replanning.PlanStrategyFactory;
+import org.matsim.core.replanning.ReplanningContext;
+import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
-import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 
 import playground.johannes.coopsim.analysis.ActivityDurationTask;
 import playground.johannes.coopsim.analysis.ActivityLoadTask;
@@ -79,6 +79,8 @@ import playground.johannes.gsv.analysis.CountsCompareAnalyzer;
 import playground.johannes.gsv.analysis.PkmTask;
 import playground.johannes.gsv.analysis.ScoreTask;
 import playground.johannes.gsv.analysis.SpeedFactorTask;
+import playground.johannes.gsv.sim.cadyts.CadytsContext;
+import playground.johannes.gsv.sim.cadyts.CadytsScoring;
 import playground.johannes.socialnetworks.utils.XORShiftRandom;
 
 /**
@@ -104,30 +106,86 @@ public class Simulator {
 		
 		StrategySettings settings = new StrategySettings(Id.create(1, StrategySettings.class));
 		settings.setModuleName("activityLocations");
-		settings.setProbability(1.0);
+		settings.setProbability(0.1);
 		int numThreads = controler.getConfig().global().getNumberOfThreads();
 		controler.addPlanStrategyFactory("activityLocations", new ActivityLocationStrategyFactory(random, numThreads, "home"));
 		
-		controler.addPlanSelectorFactory("mySelector", new SelectorFactory());
+		settings = new StrategySettings(Id.create(2, StrategySettings.class));
+		settings.setModuleName("doNothing");
+		settings.setProbability(0.9);
+		
+		controler.addPlanStrategyFactory("doNothing", new PlanStrategyFactory() {
+			
+			@Override
+			public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
+				return new PlanStrategy() {
+					
+					@Override
+					public void run(HasPlansAndId<Plan, Person> person) {
+					}
+					
+					@Override
+					public void init(ReplanningContext replanningContext) {
+					}
+					
+					@Override
+					public void finish() {
+					}
+				};
+			}
+		});
+		
+//		controler.addPlanSelectorFactory("mySelector", new SelectorFactory());
+		
+		/*
+		 * setup scoring and cadyts integration
+		 */
+		boolean disableCadyts = Boolean.parseBoolean(controler.getConfig().getModule("gsv").getValue("disableCadyts"));
+		LinkOccupancyCalculator calculator = new LinkOccupancyCalculator(controler.getPopulation());
+		controler.getEvents().addHandler(calculator);
+		if (!disableCadyts) {
+			CadytsContext context = new CadytsContext(controler.getScenario().getConfig(), null, calculator);
+//			controler.addControlerListener(context);
+			controler.setScoringFunctionFactory(new ScoringFactory(context, controler.getConfig(), controler.getNetwork()));
+
+			controler.addControlerListener(context);
+//			Logger.getRootLogger().setLevel(org.apache.log4j.Level.FATAL);
+//			context.notifyStartup(event);
+//			Logger.getRootLogger().setLevel(org.apache.log4j.Level.DEBUG);
+			controler.addControlerListener(new CadytsRegistration(context));
+//			controler.addPlanSelectorFactory("mySelector", new SelectorFactory());
+		}
+		Config config = controler.getConfig();
+		String countsFile = config.findParam("gsv", "countsfile");
+		double factor = Double.parseDouble(config.findParam("counts", "countsScaleFactor"));
+		
+		DTVAnalyzer dtv = new DTVAnalyzer(controler.getNetwork(), controler, controler.getEvents(), countsFile, calculator, factor);
+		controler.addControlerListener(dtv);
+		
+		controler.addControlerListener(new CountsCompareAnalyzer(calculator, countsFile, factor));
+		
+		
 		controler.run();
 		
 	}
 	
-	private static class SelectorFactory implements PlanSelectorFactory<Plan, Person> {
-
-		private ExpBetaPlanSelector<Plan, Person> instance;
-		/* (non-Javadoc)
-		 * @see org.matsim.core.replanning.selectors.PlanSelectorFactory#createPlanSelector(org.matsim.api.core.v01.Scenario)
-		 */
-		@Override
-		public GenericPlanSelector<Plan, Person> createPlanSelector(Scenario scenario) {
-			if(instance == null)
-				instance = new ExpBetaPlanSelector<Plan, Person>(1.0);
-			
-			return instance;
-		}
-		
-	}
+//	private static class SelectorFactory implements PlanSelectorFactory<Plan, Person> {
+//
+//		private CadytsContext context;
+//		
+//		private GenericPlanSelector<Plan, Person> instance;
+//		
+//		@Override
+//		public GenericPlanSelector<Plan, Person> createPlanSelector(Scenario scenario) {
+//			if(instance == null) {
+////				instance = new ExpBetaPlanSelector<Plan, Person>(1.0);
+//				instance = new ExpBetaPlanSelectorWithCadytsPlanRegistration(1.0, context);
+//			}
+//			
+//			return instance;
+//		}
+//		
+//	}
 	
 	private static class ControllerSetup implements StartupListener {
 
@@ -145,32 +203,12 @@ public class Simulator {
 				Link link = network.getNearestLink(coord);
 				((ActivityFacilityImpl)facility).setLinkId(link.getId());
 			}
-			/*
-			 * setup scoring and cadyts integration
-			 */
-			boolean disableCadyts = Boolean.parseBoolean(config.getModule("gsv").getValue("disableCadyts"));
-			if (!disableCadyts) {
-				CadytsContext context = new CadytsContext(controler.getScenario().getConfig());
-				controler.setScoringFunctionFactory(new ScoringFactory(context, controler.getConfig(), controler.getNetwork()));
-
-				controler.addControlerListener(context);
-				Logger.getRootLogger().setLevel(org.apache.log4j.Level.FATAL);
-				context.notifyStartup(event);
-				Logger.getRootLogger().setLevel(org.apache.log4j.Level.DEBUG);
-				controler.addControlerListener(new CadytsRegistration(context));
-			}
+			
 			/*
 			 * setup analysis modules
 			 */
-			LinkOccupancyCalculator calculator = new LinkOccupancyCalculator(controler.getPopulation());
-			controler.getEvents().addHandler(calculator);
-			String countsFile = config.findParam("gsv", "countsfile");
-			double factor = Double.parseDouble(config.findParam("counts", "countsScaleFactor"));
 			
-			DTVAnalyzer dtv = new DTVAnalyzer(controler.getNetwork(), controler, controler.getEvents(), countsFile, calculator, factor);
-			controler.addControlerListener(dtv);
 			
-			controler.addControlerListener(new CountsCompareAnalyzer(calculator, countsFile, factor));
 			
 			TrajectoryAnalyzerTaskComposite task = new TrajectoryAnalyzerTaskComposite();
 			task.addTask(new TripDistanceTask(controler.getFacilities()));
@@ -202,7 +240,7 @@ public class Simulator {
 		
 	}
 
-	private static class CadytsRegistration implements BeforeMobsimListener {
+	private static class CadytsRegistration implements AfterMobsimListener {
 
 		private CadytsContext context;
 		
@@ -211,7 +249,7 @@ public class Simulator {
 		}
 		
 		@Override
-		public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+		public void notifyAfterMobsim(AfterMobsimEvent event) {
 			Population population = event.getControler().getPopulation();
 			for(Person person : population.getPersons().values()) {
 				context.getCalibrator().addToDemand(context.getPlansTranslator().getPlanSteps(person.getSelectedPlan()));
@@ -223,7 +261,7 @@ public class Simulator {
 	
 	private static class ScoringFactory implements ScoringFunctionFactory {
 
-		private ScoringFunction function;
+//		private ScoringFunction function;
 		
 		private CadytsContext context;
 		
@@ -238,20 +276,22 @@ public class Simulator {
 		
 		@Override
 		public ScoringFunction createNewScoringFunction(Person person) {
-			if(function == null) {
-				CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(config.planCalcScore());
+//			if(function == null) {
+//				CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(config.planCalcScore());
 				SumScoringFunction sum = new SumScoringFunction();
-				sum.addScoringFunction(new CharyparNagelLegScoring(params, network));
-				sum.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
+//				sum.addScoringFunction(new CharyparNagelLegScoring(params, network));
+//				sum.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
 			
 				CadytsScoring scoringFunction = new CadytsScoring(person.getSelectedPlan(), config, context);
 //				final double cadytsScoringWeight = 10.0;
 //				//final double cadytsScoringWeight = 0.0;
 //				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
 				sum.addScoringFunction(scoringFunction );
-			}
+				return sum;
+//				function = sum;
+//			}
 			
-			return function;
+//			return function;
 		}
 		
 	}
@@ -289,6 +329,7 @@ public class Simulator {
 			controler.getEvents().addHandler(builder);
 		}
 	}
+	
 	
 //	private class DummyTravelTimeCalculatorFactory implements TravelTimeCalculatorFactory {
 //

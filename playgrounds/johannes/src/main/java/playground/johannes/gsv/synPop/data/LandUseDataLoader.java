@@ -73,7 +73,7 @@ public class LandUseDataLoader implements DataLoader {
 					Object value = zone.getAttribute().get(popKey);
 					if(value != null) {
 						double d = Double.parseDouble(value.toString());
-						zone.getAttribute().put(LandUseData.POPULATION_KEY, (int)d);
+						zone.getAttribute().put(LandUseData.POPULATION_KEY, d);
 					}
 				}
 
