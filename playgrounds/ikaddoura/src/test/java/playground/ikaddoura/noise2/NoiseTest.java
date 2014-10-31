@@ -261,8 +261,23 @@ public class NoiseTest {
 		double damageCostsAffectedAgentUnit = (annualCostRate * laermEinwohnerGleichwertAffectedAgentUnit/(365))*(1.0/24.0);		
 		Assert.assertEquals("wrong damage cost  per affected agent unit", damageCostsAffectedAgentUnit, noiseControlerListener.getNoiseImmission().getReceiverPointId2timeInterval2damageCostPerAffectedAgentUnit().get(new IdImpl("16")).get(11 * 3600.), MatsimTestUtils.EPSILON);
 
-		noiseControlerListener.getNoiseImmission().getNoiseEvents();
+		
+		for (NoiseEventAffected event : noiseControlerListener.getNoiseImmission().getNoiseEventsAffected()){
+			System.out.println(event);
+		}
 		noiseControlerListener.getNoiseImmission().getNoiseEventsAffected();
+
+		noiseControlerListener.getNoiseImmission().getLinkId2timeInterval2damageCost();
+		noiseControlerListener.getNoiseImmission().getLinkId2timeInterval2damageCostPerCar();
+		noiseControlerListener.getNoiseImmission().getLinkId2timeInterval2damageCostPerHdvVehicle();
+
+		
+		for (NoiseEventCaused event : noiseControlerListener.getNoiseImmission().getNoiseEvents()){
+			System.out.println(event);
+		}
+		noiseControlerListener.getNoiseImmission().getNoiseEvents();
+		
+		
 		
 	 }
 	

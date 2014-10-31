@@ -30,5 +30,5 @@ import org.matsim.core.events.handler.EventHandler;
  */
 
 public interface NoiseEventHandler extends EventHandler{
-	public void handleEvent (NoiseEvent event);
+	public void handleEvent (NoiseEventCaused event);
 }

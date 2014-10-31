@@ -22,11 +22,13 @@
  */
 package playground.ikaddoura.noise2;
 
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 
 /**
- * @author lkroeger
+ * @author lkroeger, ikaddoura
  *
  */
 
@@ -34,10 +36,10 @@ public final class NoiseEventAffected extends Event {
 
 	public final static String EVENT_TYPE = "noiseEventAffected";
 	
-	public final static String ATTRIBUTE_LINK_ID = "linkId";
-	public final static String ATTRIBUTE_VEHICLE_ID = "vehicleId";
-	public final static String ATTRIBUTE_AGENT_ID = "agentId";
+	public final static String ATTRIBUTE_AGENT_ID = "affectedAgentId";
 	public final static String ATTRIBUTE_AMOUNT_DOUBLE = "amount";
+	public final static String ATTRIBUTE_RECEIVERPOINT_ID = "receiverPointId";
+	public final static String ATTRIBUTE_ACTIVTITY_TYPE = "activityType";
 	
 	private final Id affectedAgentId;
 	private double amount;
@@ -70,6 +72,16 @@ public final class NoiseEventAffected extends Event {
 	
 	public String getActType() {
 		return actType;
+	}
+	
+	@Override
+	public Map<String, String> getAttributes() {
+		Map<String, String> attrs = super.getAttributes();
+		attrs.put(ATTRIBUTE_AGENT_ID, this.affectedAgentId.toString());
+		attrs.put(ATTRIBUTE_AMOUNT_DOUBLE, Double.toString(this.amount));
+		attrs.put(ATTRIBUTE_RECEIVERPOINT_ID , this.receiverPointId.toString());
+		attrs.put(ATTRIBUTE_ACTIVTITY_TYPE , this.actType.toString());
+		return attrs;
 	}
 	
 	@Override

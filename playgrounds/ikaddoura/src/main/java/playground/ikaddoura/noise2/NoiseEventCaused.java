@@ -32,26 +32,26 @@ import org.matsim.api.core.v01.events.Event;
  *
  */
 
-public final class NoiseEvent extends Event {
+public final class NoiseEventCaused extends Event {
 
-	public final static String EVENT_TYPE = "noiseEvent";
+	public final static String EVENT_TYPE = "noiseEventCaused";
 	
 	public final static String ATTRIBUTE_LINK_ID = "linkId";
-	public final static String ATTRIBUTE_VEHICLE_ID = "vehicleId";
-	public final static String ATTRIBUTE_AGENT_ID = "agentId";
+	public final static String ATTRIBUTE_VEHICLE_ID = "causingVehicleId";
+	public final static String ATTRIBUTE_AGENT_ID = "causingAgentId";
 	public final static String ATTRIBUTE_AMOUNT_DOUBLE = "amount";
 	public final static String ATTRIBUTE_CARORHDV_ENUM = "vehicleType";
 	
-	private final Id agentId;
-	private final Id vehicleId;
+	private final Id causingAgentId;
+	private final Id causingVehicleId;
 	private double amount;
 	private final Id linkId;
 	private NoiseVehicleType carOrHdv;
 	
-	public NoiseEvent(double time , Id agentId , Id vehicleId , double amount , Id linkId , NoiseVehicleType carOrHdv) {
+	public NoiseEventCaused(double time , Id causingAgentId , Id causingVehicleId , double amount , Id linkId , NoiseVehicleType carOrHdv) {
 		super(time);
-		this.agentId = agentId;
-		this.vehicleId = vehicleId;
+		this.causingAgentId = causingAgentId;
+		this.causingVehicleId = causingVehicleId;
 		this.amount = amount;
 		this.linkId = linkId;
 		this.carOrHdv = carOrHdv;
@@ -61,12 +61,12 @@ public final class NoiseEvent extends Event {
 		return linkId;
 	}
 	
-	public Id getVehicleId() {
-		return vehicleId;
+	public Id getCausingVehicleId() {
+		return causingVehicleId;
 	}
 	
-	public Id getAgentId() {
-		return agentId;
+	public Id getCausingAgentId() {
+		return causingAgentId;
 	}
 	
 	public double getAmount() {
@@ -88,8 +88,8 @@ public final class NoiseEvent extends Event {
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attrs = super.getAttributes();
-		attrs.put(ATTRIBUTE_AGENT_ID, this.agentId.toString());
-		attrs.put(ATTRIBUTE_VEHICLE_ID, this.vehicleId.toString());
+		attrs.put(ATTRIBUTE_AGENT_ID, this.causingAgentId.toString());
+		attrs.put(ATTRIBUTE_VEHICLE_ID, this.causingVehicleId.toString());
 		attrs.put(ATTRIBUTE_AMOUNT_DOUBLE, Double.toString(this.amount));
 		attrs.put(ATTRIBUTE_LINK_ID , this.linkId.toString());
 		attrs.put(ATTRIBUTE_CARORHDV_ENUM, this.carOrHdv.toString());

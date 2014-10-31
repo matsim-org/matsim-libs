@@ -90,9 +90,9 @@ public class NoiseImmission {
 	private double totalTollAffected = 0.;
 	
 	// to be filled during the computation of noise events
-	private List<NoiseEvent> noiseEvents = new ArrayList<NoiseEvent>();
-	private List<NoiseEvent> noiseEventsCar = new ArrayList<NoiseEvent>();
-	private List<NoiseEvent> noiseEventsHdv = new ArrayList<NoiseEvent>();
+	private List<NoiseEventCaused> noiseEvents = new ArrayList<NoiseEventCaused>();
+	private List<NoiseEventCaused> noiseEventsCar = new ArrayList<NoiseEventCaused>();
+	private List<NoiseEventCaused> noiseEventsHdv = new ArrayList<NoiseEventCaused>();
 	private List<NoiseEventAffected> noiseEventsAffected = new ArrayList<NoiseEventAffected>();
 	
 	public NoiseImmission (Scenario scenario , EventsManager events, NoiseSpatialInfo spatialInfo, double annualCostRate, NoiseEmissionHandler noiseEmissionHandler, PersonActivityHandler activityTracker) {
@@ -152,7 +152,7 @@ public class NoiseImmission {
 		log.info("calculateCostsPerVehiclePerLinkPerTimeInterval...");
 		calculateCostsPerVehiclePerLinkPerTimeInterval();
 		
-		throwNoiseEvents();
+		throwNoiseEventsCaused();
 		throwNoiseEventsAffected();
 	}
 
@@ -412,10 +412,10 @@ public class NoiseImmission {
 		}
 	}
 
-	private void throwNoiseEvents() {
+	private void throwNoiseEventsCaused() {
 		
 		for(Id linkId : scenario.getNetwork().getLinks().keySet()) {
-			for(double timeInterval = NoiseConfigParameters.getIntervalLength() ; timeInterval <= 30*3600 ; timeInterval = timeInterval + NoiseConfigParameters.getIntervalLength()) {
+			for(double timeInterval = NoiseConfigParameters.getIntervalLength() ; timeInterval <= 30 * 3600 ; timeInterval = timeInterval + NoiseConfigParameters.getIntervalLength()) {
 				double amountCar = (linkId2timeInterval2damageCostPerCar.get(linkId).get(timeInterval))/(NoiseConfigParameters.getScaleFactor());
 				double amountHdv = (linkId2timeInterval2damageCostPerHdvVehicle.get(linkId).get(timeInterval))/(NoiseConfigParameters.getScaleFactor());
 				
@@ -443,7 +443,7 @@ public class NoiseImmission {
 						carOrHdv = NoiseVehicleType.hdv;
 					}
 
-					NoiseEvent noiseEvent = new NoiseEvent(time,agentId,vehicleId,amount,linkId,carOrHdv);
+					NoiseEventCaused noiseEvent = new NoiseEventCaused(time,agentId,vehicleId,amount,linkId,carOrHdv);
 					events.processEvent(noiseEvent);
 					this.noiseEvents.add(noiseEvent);
 					if(isHdv == true) {
@@ -540,12 +540,23 @@ public class NoiseImmission {
 		return receiverPointId2timeInterval2damageCostPerAffectedAgentUnit;
 	}
 
-	public List<NoiseEvent> getNoiseEvents() {
-		return noiseEvents;
-	}
-
 	public List<NoiseEventAffected> getNoiseEventsAffected() {
 		return noiseEventsAffected;
 	}
 	
+	public Map<Id, Map<Double, Double>> getLinkId2timeInterval2damageCost() {
+		return linkId2timeInterval2damageCost;
+	}
+
+	public Map<Id, Map<Double, Double>> getLinkId2timeInterval2damageCostPerCar() {
+		return linkId2timeInterval2damageCostPerCar;
+	}
+
+	public Map<Id, Map<Double, Double>> getLinkId2timeInterval2damageCostPerHdvVehicle() {
+		return linkId2timeInterval2damageCostPerHdvVehicle;
+	}
+
+	public List<NoiseEventCaused> getNoiseEvents() {
+		return noiseEvents;
+	}
 }
