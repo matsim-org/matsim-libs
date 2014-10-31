@@ -337,6 +337,7 @@ public class CANetworkDynamic {
 		return this.caLinks.get(nextLinkId);
 	}
 
+
 	public EventsManager getEventsManager() {
 		return this.em;
 	}

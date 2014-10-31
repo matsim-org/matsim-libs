@@ -64,7 +64,8 @@ public class CANodeDynamic implements CANode{
 
 
 
-	private static int EXP_WARN_CNT;
+	private final double epsilon;
+
 
 	public CANodeDynamic(Node node, CANetworkDynamic net){
 		double width = 0;
@@ -79,13 +80,7 @@ public class CANodeDynamic implements CANode{
 		this.ratio = CANetworkDynamic.PED_WIDTH/this.width;
 		this.cellLength = this.ratio/(CANetworkDynamic.RHO_HAT*CANetworkDynamic.PED_WIDTH);
 		this.tFree = this.cellLength/CANetworkDynamic.V_HAT;
-//		this.tFree = 0.0001;
-//		this.ratio = 0.0001;
-		
-//		double bwCellLength = 1/(CANetworkDynamic.RHO_HAT*CANetworkDynamic.PED_WIDTH);
-		
-		
-//		this.ratio = 1;
+		this.epsilon = tFree/1000;
 		
 	}
 
@@ -120,12 +115,6 @@ public class CANodeDynamic implements CANode{
 		this.agentLeft = time;
 		return a;
 	}
-
-//	public double getTime() {
-//		//		return this.agentLeft;
-//		throw new RuntimeException("this method must return last enter time and not exit time!");
-//
-//	}
 
 	@Override
 	public void handleEvent(CAEvent e) {
@@ -166,11 +155,9 @@ public class CANodeDynamic implements CANode{
 
 		//check pre-condition
 		if (nextLink.getParticles()[0] == null) {
-//			if (nextLink.getDsLastLeftTimes()[0] <= (time - a.getZ()/nextLink.getWidth())){
 			double z = nextLink.getZ(a);
-//			z *= CANetworkDynamic.PED_WIDTH;
 			z *= this.ratio;
-			if (nextLink.getDsLastLeftTimes()[0] <= (time - z)){
+			if (nextLink.getLastLeftTimes()[0] <= (time - z+epsilon)){
 				handleTTAEnterNextLinkFromUpstreamEndOnPrecondition1(nextLink,a,time);
 			} else {
 				handleTTAEnterNextLinkFromUpstreamEndOnPrecondition2(nextLink,a,time);
@@ -178,7 +165,6 @@ public class CANodeDynamic implements CANode{
 		} else {
 			handleTTAOnPrecondition3(a,time);
 		}
-		//		
 
 	}
 
@@ -186,11 +172,6 @@ public class CANodeDynamic implements CANode{
 	private void handleTTAEnterNextLinkFromUpstreamEndOnPrecondition1(
 			CALinkDynamic nextLink, CASimpleDynamicAgent a, double time) {
 		
-//		//HACK break condition agent is at the end of its last link
-//		if (nextLink.getLink().getId() == a.getCurrentLink().getLink().getId()) {
-//			this.pollAgent(Double.NaN);	
-//			return;
-//		}
 
 		this.towardsLinkLastExitTimes.put(nextLink, time);
 		this.towardsLinkLastExitAgents.put(nextLink, a);
@@ -218,13 +199,9 @@ public class CANodeDynamic implements CANode{
 		if (inFrontOfMe != null) {
 			if (inFrontOfMe.getDir() == -1) { //oncoming
 				double d = nextLink.getD(a);
-//				d *= CANetworkDynamic.PED_WIDTH;
 				d *= this.ratio;
-//				triggerSWAP(a,nextLink,time+d/nextLink.getWidth()+nextLink.getTFree());
 				triggerSWAP(a,nextLink,time+d+nextLink.getTFree());
-			} else {
-				triggerTTA(a,nextLink,time+nextLink.getTFree());
-			}
+			} 
 		} else {
 			triggerTTA(a,nextLink,time+nextLink.getTFree());
 		}
@@ -233,16 +210,10 @@ public class CANodeDynamic implements CANode{
 
 	private void handleTTAEnterNextLinkFromUpstreamEndOnPrecondition2(
 			CALinkDynamic nextLink, CASimpleDynamicAgent a, double time) {
-//		double zStar = a.getZ()/this.width - (time - nextLink.getDsLastLeftTimes()[0]);
 		double z = nextLink.getZ(a);
-//		z *= CANetworkDynamic.PED_WIDTH;
 		z *= this.ratio;
-		double zStar = z - (time - nextLink.getDsLastLeftTimes()[0]);
+		double zStar = z - (time - nextLink.getLastLeftTimes()[0]);
 		double nextTime = time + zStar;
-		if (!(nextTime > time)) {
-			nextTime += 0.0001;
-		}
-		
 		
 		CAEvent e = new CAEvent(nextTime, a, this, CAEventType.TTA);
 		this.net.pushEvent(e);
@@ -259,11 +230,9 @@ public class CANodeDynamic implements CANode{
 
 		//check pre-condition
 		if (nextLink.getParticles()[nextLink.getNumOfCells()-1] == null) {
-//			if (nextLink.getUsLastLeftTimes()[nextLink.getNumOfCells()-1] <= (time - a.getZ()/nextLink.getWidth())){
 			double z = nextLink.getZ(a);
-//			z *= CANetworkDynamic.PED_WIDTH;
 			z *= this.ratio;
-			if (nextLink.getUsLastLeftTimes()[nextLink.getNumOfCells()-1] <= (time - z)){
+			if (nextLink.getLastLeftTimes()[nextLink.getNumOfCells()-1] <= (time - z+epsilon)){
 				handleTTAEnterNextLinkFromDownstreamEndOnPrecondition1(nextLink,a,time);
 			} else {
 				handleTTAEnterNextLinkFromDownstreamEndOnPrecondition2(nextLink,a,time);
@@ -271,20 +240,12 @@ public class CANodeDynamic implements CANode{
 		} else {
 			handleTTAOnPrecondition3(a,time);
 		}
-		//		
-
 	}
 
 
 	private void handleTTAEnterNextLinkFromDownstreamEndOnPrecondition1(
 			CALinkDynamic nextLink, CASimpleDynamicAgent a, double time) {
 		
-//		//HACK break condition agent is at the end of its last link
-//		if (nextLink.getLink().getId() == a.getCurrentLink().getLink().getId()) {
-//			this.pollAgent(Double.NaN);	
-//			return;
-//		}
-
 		this.towardsLinkLastExitTimes.put(nextLink, time);
 		this.towardsLinkLastExitAgents.put(nextLink, a);
 
@@ -312,13 +273,9 @@ public class CANodeDynamic implements CANode{
 		if (inFrontOfMe != null) {
 			if (inFrontOfMe.getDir() == 1) { //oncoming
 				double d = nextLink.getD(a);
-//				d *= CANetworkDynamic.PED_WIDTH;
 				d *= this.ratio;
-//				triggerSWAP(a,nextLink,time+d/nextLink.getWidth()+nextLink.getTFree());
 				triggerSWAP(a,nextLink,time+d+nextLink.getTFree());
-			} else {
-				triggerTTA(a,nextLink,time+nextLink.getTFree());
-			}
+			} 
 		} else {
 			triggerTTA(a,nextLink,time+nextLink.getTFree());
 		}
@@ -327,15 +284,10 @@ public class CANodeDynamic implements CANode{
 
 	private void handleTTAEnterNextLinkFromDownstreamEndOnPrecondition2(
 			CALinkDynamic nextLink, CASimpleDynamicAgent a, double time) {
-//		double zStar = a.getZ()/this.width - (time - nextLink.getUsLastLeftTimes()[nextLink.getNumOfCells()-1]);
 		double z = nextLink.getZ(a);
-//		z *= CANetworkDynamic.PED_WIDTH;
 		z *= this.ratio;
-		double zStar = z - (time - nextLink.getUsLastLeftTimes()[nextLink.getNumOfCells()-1]);
+		double zStar = z - (time - nextLink.getLastLeftTimes()[nextLink.getNumOfCells()-1]);
 		double nextTime = time + zStar;
-		if (!(nextTime > time)) {
-			nextTime += 0.0001;
-		}
 		CAEvent e = new CAEvent(nextTime, a, this, CAEventType.TTA);
 		this.net.pushEvent(e);
 	}
@@ -382,14 +334,8 @@ public class CANodeDynamic implements CANode{
 		double comp = incr;
 		for (Tuple<CALinkDynamic, CAAgent> t : cands) {
 			if (rnd <= comp) {
-				//				CAEvent e = new CAEvent(time + this.z +  1/(this.vHat*this.rhoHat), t.getSecond(), t.getFirst(), CAEventType.TTA);
-//				double z = a.getZ();
-//				double z = t.getSecond().getZ();
 				double z = t.getFirst().getZ(t.getSecond());
-//				z *= CANetworkDynamic.PED_WIDTH;
 				z *= this.ratio;
-//				double width = t.getFirst().getWidth();
-//				CAEvent e = new CAEvent(time + z/width, t.getSecond(), t.getFirst(), CAEventType.TTA);
 				CAEvent e = new CAEvent(time + z, t.getSecond(), t.getFirst(), CAEventType.TTA);
 				this.net.pushEvent(e);
 				return;
@@ -431,10 +377,9 @@ public class CANodeDynamic implements CANode{
 		nextLink.fireUpstreamEntered(a, time);
 		a.moveOverNode(nextLink,time);
 
-		nextLink.getDsLastLeftTimes()[0]=time;
+		nextLink.getLastLeftTimes()[0]=time;
 		this.towardsLinkLastExitTimes.put(nextLink, time);
 
-		//TODO check post-conditions & new events
 		checkPostConditionForAgentEnteredLinkFromUpstreamEnd(nextLink, a, time);
 		checkPostConditionForAgentSwapedToNode(swapA,time);
 
@@ -459,12 +404,8 @@ public class CANodeDynamic implements CANode{
 		if ( inFrontOfMe != null) {
 			if (inFrontOfMe.getDir() == -1) {
 				double d = nextLink.getD(swapA);
-//				d *= CANetworkDynamic.PED_WIDTH;
 				d *= this.ratio;
-//				triggerSWAP(swapA, this, time+d/this.width+this.tFree);
 				triggerSWAP(swapA, this, time+d+this.tFree);
-			} else {
-				triggerTTA(swapA,this,time+this.tFree);
 			}
 		} else  {
 			triggerTTA(swapA,this,time+this.tFree);
@@ -478,13 +419,9 @@ public class CANodeDynamic implements CANode{
 		if ( inFrontOfMe != null) {
 			if (inFrontOfMe.getDir() == 1) {
 				double d = nextLink.getD(swapA);
-//				d *= CANetworkDynamic.PED_WIDTH;
 				d *= this.ratio;
-//				triggerSWAP(swapA, this, time+d/this.width+this.tFree);
 				triggerSWAP(swapA, this, time+d+this.tFree);
-			} else {
-				triggerTTA(swapA,this,time+this.tFree);
-			}
+			} 
 		} else  {
 			triggerTTA(swapA,this,time+this.tFree);
 		}
@@ -502,7 +439,7 @@ public class CANodeDynamic implements CANode{
 		nextLink.fireDownstreamEntered(a, time);
 		a.moveOverNode(nextLink,time);
 
-		nextLink.getDsLastLeftTimes()[nextLink.getNumOfCells()-1]=time;
+		nextLink.getLastLeftTimes()[nextLink.getNumOfCells()-1]=time;
 		this.towardsLinkLastExitTimes.put(nextLink, time);
 		
 		// check post-conditions & new events
