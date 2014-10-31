@@ -51,6 +51,7 @@ import playground.thibautd.socnetsim.replanning.strategies.GroupTourVehicleAlloc
 import playground.thibautd.socnetsim.replanning.strategies.GroupWeightedSelectExpBetaFactory;
 import playground.thibautd.socnetsim.replanning.strategies.GroupWhoIsTheBossSelectExpBetaFactory;
 import playground.thibautd.socnetsim.replanning.strategies.JointPrismLocationChoiceStrategyFactory;
+import playground.thibautd.socnetsim.replanning.strategies.JointPrismLocationChoiceWithJointTripInsertionStrategyFactory;
 import playground.thibautd.socnetsim.replanning.strategies.JointTripMutatorFactory;
 import playground.thibautd.socnetsim.replanning.strategies.ParetoExpBetaFactory;
 import playground.thibautd.socnetsim.replanning.strategies.RandomGroupPlanSelectorStrategyFactory;
@@ -105,6 +106,9 @@ public class GroupPlanStrategyFactoryRegistry {
 		addFactory(
 				"JointPrismLocationChoice",
 				new JointPrismLocationChoiceStrategyFactory( this ) );
+		addFactory(
+				"JointPrismLocationChoiceWithJointTrips",
+				new JointPrismLocationChoiceWithJointTripInsertionStrategyFactory( this ) );
 
 		// selectors
 		// ---------------------------------------------------------------------
