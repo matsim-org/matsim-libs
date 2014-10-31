@@ -37,6 +37,11 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 	private final Link dsl;
 	private final Link usl;
 
+	//Particles and dsLeftTimes are backed by arrays, thus for every cell on a link it consumes an additional 2*64bit. 
+	//The number of cells are in the range of RHO_HAT*length*width. For a 100m Link with 10m with this makes roughly
+	//7000 cells ~ 100KB for a network of 10k links this corresponds to about 1GB.
+	//So, for large networks it would make sense to replace particles[] by a linked list and dsLeftTimes[] by something like a HashMap or 
+	//we put lastLeftTimes directly in a queue exclusive for the succeeding agent (as long as one exist) ... need to think about this [GL Oct '14] 
 	private final CASimpleDynamicAgent [] particles;
 	private final double [] lastLeftTimes;
 	
