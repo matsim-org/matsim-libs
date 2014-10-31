@@ -175,8 +175,9 @@ public class NoiseTest {
 		// test the right tracking of person, activity number, start and end time
 		Assert.assertEquals("wrong activity performing time", 0., noiseControlerListener.getPersonActivityTracker().getReceiverPointId2personId2actNumber2activityStartAndActivityEnd().get(new IdImpl("0")).get(new IdImpl("person_car_test2")).get(1).getFirst(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("wrong activity performing time", Time.parseTime("10:17:54") , noiseControlerListener.getPersonActivityTracker().getReceiverPointId2personId2actNumber2activityStartAndActivityEnd().get(new IdImpl("0")).get(new IdImpl("person_car_test2")).get(1).getSecond(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("wrong activity performing time", 37436. , noiseControlerListener.getPersonActivityTracker().getReceiverPointId2personId2actNumber2activityStartAndActivityEnd().get(new IdImpl("16")).get(new IdImpl("person_car_test2")).get(2).getFirst(), MatsimTestUtils.EPSILON);
+
+		Assert.assertEquals("wrong activity performing time", 37375. , noiseControlerListener.getPersonActivityTracker().getReceiverPointId2personId2actNumber2activityStartAndActivityEnd().get(new IdImpl("16")).get(new IdImpl("person_car_test2")).get(2).getFirst(), MatsimTestUtils.EPSILON);
+//		Assert.assertEquals("wrong activity performing time", 37436. , noiseControlerListener.getPersonActivityTracker().getReceiverPointId2personId2actNumber2activityStartAndActivityEnd().get(new IdImpl("16")).get(new IdImpl("person_car_test2")).get(2).getFirst(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("wrong activity performing time", null , noiseControlerListener.getPersonActivityTracker().getReceiverPointId2personId2actNumber2activityStartAndActivityEnd().get(new IdImpl("16")).get(new IdImpl("person_car_test2")).get(1));
 
 		// between 11 and 12 there is no agent at receiver point 0
@@ -201,8 +202,9 @@ public class NoiseTest {
 		
 		// testing the noise immission at receiver point 16 where testAgent3 performs the activity "home"
 		// relevant links for receiver point 16 (4400/105): linkA5, link2, linkB5
-		// linkA5 has a speed of 1000 m/s, hence the noise emission is very high, the other links are not relevant
-		//
+		// linkA5 has a speed of 1000 m/s, hence the noise emission is very high,
+		// link2 has a speed of 100 m/s, hence, also here the noise emission is very high,
+		// linkB2 doesn't play a role.
 		//
 		//			(nodeA4: 4000/1000)
 		//				|
@@ -214,9 +216,6 @@ public class NoiseTest {
 		//				V
 		//			(node3: 4000/0)
 		//
-		//
-		//
-		
 
 		// before and after time interval '10 - 11' the noise immission should be zero.
 		Assert.assertEquals("wrong immission at receiver point 16", 0., noiseControlerListener.getNoiseImmission().getReceiverPointId2timeInterval2noiseImmission().get(new IdImpl("16")).get(10 * 3600.), MatsimTestUtils.EPSILON);
@@ -229,22 +228,38 @@ public class NoiseTest {
 		// test the distance correction term
 		double lotA52receiverPoint16 = 400.;
 		double correctionTermDs = 15.8 - (10 * Math.log10(lotA52receiverPoint16)) - (0.0142*(Math.pow(lotA52receiverPoint16,0.9)));
-//		Assert.assertEquals("wrong distance between receiver point Id '16' and link Id 'linkA5'", correctionTermDs, noiseControlerListener.getSpatialInfo().getReceiverPointId2relevantLinkId2correctionTermDs().get(new IdImpl("16")).get(new IdImpl("linkA5")), MatsimTestUtils.EPSILON);		
-		Assert.assertEquals("wrong distance between receiver point Id '16' and link Id 'linkA5'", correctionTermDs, noiseControlerListener.getSpatialInfo().getReceiverPointId2relevantLinkId2correctionTermDs().get(new IdImpl("16")).get(new IdImpl("linkA5")), 0.000001);		
+		Assert.assertEquals("wrong distance between receiver point Id '16' and link Id 'linkA5'", correctionTermDs, noiseControlerListener.getSpatialInfo().getReceiverPointId2relevantLinkId2correctionTermDs().get(new IdImpl("16")).get(new IdImpl("linkA5")), 0.0000001); 
+		
+		double correctionTermAngle = 10 * Math.log10((80.6271289) / (180));
+		Assert.assertEquals("wrong angle correction for receiver point Id '16' and link Id 'linkA5'", correctionTermAngle, noiseControlerListener.getSpatialInfo().getReceiverPointId2relevantLinkId2correctionTermAngle().get(new IdImpl("16")).get(new IdImpl("linkA5")), 0.0000001);
 
-		// now test the relevant time interval '10 - 11', compute the noise immission based on the noise emission on linkA5
-//		Assert.assertEquals("wrong immission at receiver point 16", 0., noiseControlerListener.getNoiseImmission().getReceiverPointId2timeInterval2noiseImmission().get(new IdImpl("16")).get(11 * 3600.), MatsimTestUtils.EPSILON);
-				
+		// now test for the relevant time interval '10 - 11' the isolated noise immission that results from each link
+		double immissionFromLinkA5 = emissionLinkA5 + correctionTermDs + correctionTermAngle;		
+		Assert.assertEquals("wrong immission at receiver point 16", immissionFromLinkA5, noiseControlerListener.getNoiseImmission().getReceiverPointIds2timeIntervals2noiseLinks2isolatedImmission().get(new IdImpl("16")).get(11 * 3600.).get(new IdImpl("linkA5")), 0.0000001);
+		Assert.assertEquals("wrong immission at receiver point 16", 0., noiseControlerListener.getNoiseImmission().getReceiverPointIds2timeIntervals2noiseLinks2isolatedImmission().get(new IdImpl("16")).get(11 * 3600.).get(new IdImpl("linkB5")), MatsimTestUtils.EPSILON);
+
+		// now test for the relevant time interval '10 - 11' the noise immission resulting from all (relevant) links
+		double immissionRP16 = 10 * Math.log10((
+				Math.pow(10,(0.1 * noiseControlerListener.getNoiseImmission().getReceiverPointIds2timeIntervals2noiseLinks2isolatedImmission().get(new IdImpl("16")).get(11 * 3600.).get(new IdImpl("linkA5"))))
+						+ (Math.pow(10,(0.1 * noiseControlerListener.getNoiseImmission().getReceiverPointIds2timeIntervals2noiseLinks2isolatedImmission().get(new IdImpl("16")).get(11 * 3600.).get(new IdImpl("link2")))))
+				));		
+		Assert.assertEquals("wrong immission at receiver point 16", immissionRP16, noiseControlerListener.getNoiseImmission().getReceiverPointId2timeInterval2noiseImmission().get(new IdImpl("16")).get(11 * 3600.), MatsimTestUtils.EPSILON);
+			
+		// ++++++++++++++++++++++++++++++++++++++++++ exposures ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		
-//		System.out.println(noiseControlerListener.getNoiseImmission().getReceiverPointId2timeInterval2noiseImmission());
-		
-		
-		
-		
-		
-		
-		
-		noiseControlerListener.getNoiseImmission().getReceiverPointIds2timeIntervals2noiseLinks2isolatedImmission();
+		// translate immission into costs taking into account the number of affected agents
+		double lautheitsgewicht = Math.pow(2.0 , 0.1 * (immissionRP16 - 50));
+		double laermEinwohnerGleichwert = lautheitsgewicht * noiseControlerListener.getPersonActivityTracker().getReceiverPointId2timeInterval2affectedAgentUnits().get(new IdImpl("16")).get(11 * 3600.);
+		double annualCostRate = (85.0/(1.95583)) * (Math.pow(1.02, (2014-1995)));
+		double damageCosts = (annualCostRate * laermEinwohnerGleichwert/(365))*(1.0/24.0);
+		Assert.assertEquals("wrong damage costs", damageCosts, noiseControlerListener.getNoiseImmission().getReceiverPointId2timeInterval2damageCost().get(new IdImpl("16")).get(11 * 3600.), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong damage costs", 0., noiseControlerListener.getNoiseImmission().getReceiverPointId2timeInterval2damageCost().get(new IdImpl("0")).get(11 * 3600.), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong damage costs", 0., noiseControlerListener.getNoiseImmission().getReceiverPointId2timeInterval2damageCost().get(new IdImpl("16")).get(12 * 3600.), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong damage costs", 0., noiseControlerListener.getNoiseImmission().getReceiverPointId2timeInterval2damageCost().get(new IdImpl("16")).get(10 * 3600.), MatsimTestUtils.EPSILON);
+
+		double laermEinwohnerGleichwertAffectedAgentUnit = lautheitsgewicht * 1.;
+		double damageCostsAffectedAgentUnit = (annualCostRate * laermEinwohnerGleichwertAffectedAgentUnit/(365))*(1.0/24.0);		
+		Assert.assertEquals("wrong damage cost  per affected agent unit", damageCostsAffectedAgentUnit, noiseControlerListener.getNoiseImmission().getReceiverPointId2timeInterval2damageCostPerAffectedAgentUnit().get(new IdImpl("16")).get(11 * 3600.), MatsimTestUtils.EPSILON);
 
 		noiseControlerListener.getNoiseImmission().getNoiseEvents();
 		noiseControlerListener.getNoiseImmission().getNoiseEventsAffected();

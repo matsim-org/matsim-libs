@@ -144,10 +144,7 @@ public class NoiseImmission {
 		calculateImmissionSharesPerReceiverPointPerTimeInterval();
 		calculateFinalNoiseImmissions();
 		
-		// calculate the duration of stay for each agent at each receiver point and sum up for each time interval (Map<Id,Map<Double,Double>> receiverPointId2timeInterval2affectedAgentUnits)
 		// calculate noise exposure (damage) for each receiver point (Map<Id,Map<Double,Double>> receiverPointId2timeInterval2damageCost)
-
-		log.info("calculateDamagePerReceiverPoint...");
 		calculateDamagePerReceiverPoint();
 		
 		calculateCostSharesPerLinkPerTimeInterval();
@@ -232,8 +229,8 @@ public class NoiseImmission {
 						affectedAgentUnits = receiverPointId2timeInterval2affectedAgentUnits.get(receiverPointId).get(timeInterval);
 					} 	
 				}
-				double damageCost = calculateDamageCosts(noiseImmission,affectedAgentUnits,timeInterval);
-				double damageCostPerAffectedAgentUnit = calculateDamageCosts(noiseImmission,1.,timeInterval);
+				double damageCost = calculateDamageCosts(noiseImmission, affectedAgentUnits, timeInterval);
+				double damageCostPerAffectedAgentUnit = calculateDamageCosts(noiseImmission, 1., timeInterval);
 				if(receiverPointId2timeInterval2damageCost.containsKey(receiverPointId)) {
 					Map<Double,Double> timeInterval2damageCost = receiverPointId2timeInterval2damageCost.get(receiverPointId);
 					Map<Double,Double> timeInterval2damageCostPerAffectedAgentUnit = receiverPointId2timeInterval2damageCostPerAffectedAgentUnit.get(receiverPointId);
@@ -254,26 +251,28 @@ public class NoiseImmission {
 	}
 	
 	private double calculateDamageCosts(double noiseImmission, double affectedAgentUnits , double timeInterval) {
+		
 		String dayOrNight = "NIGHT";
-		if (timeInterval>6*3600 && timeInterval<=22*3600) {
+		
+		if (timeInterval > 6 * 3600 && timeInterval <= 22 * 3600) {
 			dayOrNight = "DAY";
-		} else if(timeInterval>18*3600 && timeInterval<=22*3600) {
+		} else if (timeInterval > 18 * 3600 && timeInterval <= 22 * 3600) {
 			dayOrNight = "EVENING";
 		}
 		
 		double lautheitsgewicht = calculateLautheitsgewicht(noiseImmission, dayOrNight);  
 		
-		double laermEinwohnerGleichwert = lautheitsgewicht*affectedAgentUnits;
+		double laermEinwohnerGleichwert = lautheitsgewicht * affectedAgentUnits;
 		
 		double damageCosts = 0.;
-		if(dayOrNight == "DAY"){
-			damageCosts = (annualCostRate*laermEinwohnerGleichwert/(365))*(1.0/24.0);
-		} else if(dayOrNight == "EVENING"){
-			damageCosts = (annualCostRate*laermEinwohnerGleichwert/(365))*(1.0/24.0);
-		} else if(dayOrNight == "NIGHT"){
-			damageCosts = (annualCostRate*laermEinwohnerGleichwert/(365))*(1.0/24.0);
-		} else{
-			throw new RuntimeException("Neither day nor night!");
+		if (dayOrNight == "DAY"){
+			damageCosts = (annualCostRate * laermEinwohnerGleichwert/(365))*(1.0/24.0);
+		} else if (dayOrNight == "EVENING"){
+			damageCosts = (annualCostRate * laermEinwohnerGleichwert/(365))*(1.0/24.0);
+		} else if (dayOrNight == "NIGHT"){
+			damageCosts = (annualCostRate * laermEinwohnerGleichwert/(365))*(1.0/24.0);
+		} else {
+			throw new RuntimeException("Neither day nor night. Aborting...");
 		}
 		return damageCosts;	
 	}
@@ -281,19 +280,19 @@ public class NoiseImmission {
 	private double calculateLautheitsgewicht (double noiseImmission , String dayOrNight){
 		double lautheitsgewicht = 0;
 		
-		if(dayOrNight == "DAY"){
-			if (noiseImmission<50){
-			} else{
+		if (dayOrNight == "DAY"){
+			if (noiseImmission < 50){
+			} else {
 				lautheitsgewicht = Math.pow(2.0 , 0.1 * (noiseImmission - 50));
 			}
 		} else if(dayOrNight == "EVENING"){
-			if(noiseImmission<45){
-			}else{
+			if (noiseImmission < 45){
+			} else {
 				lautheitsgewicht = Math.pow(2.0 , 0.1 * (noiseImmission - 45));
 			}
 		} else if(dayOrNight == "NIGHT"){
-			if(noiseImmission<40){
-			}else{
+			if (noiseImmission < 40){
+			} else {
 				lautheitsgewicht = Math.pow(2.0 , 0.1 * (noiseImmission - 40));
 			}
 		} else{
@@ -301,7 +300,6 @@ public class NoiseImmission {
 		}
 		
 		return lautheitsgewicht;
-		
 	}
 
 	private void calculateCostSharesPerLinkPerTimeInterval() {
@@ -362,10 +360,8 @@ public class NoiseImmission {
 
 	private void calculateCostsPerVehiclePerLinkPerTimeInterval() {
 		for(Id linkId : scenario.getNetwork().getLinks().keySet()) {
-//		for(Id linkId : linkId2timeInterval2damageCost.keySet()) {
 			Map<Double,Double> timeInterval2damageCostPerCar = new HashMap<Double, Double>();
 			Map<Double,Double> timeInterval2damageCostPerHdvVehicle = new HashMap<Double, Double>();
-//			for(double timeInterval : linkId2timeInterval2damageCost.get(linkId).keySet()) {
 			for(double timeInterval = NoiseConfigParameters.getIntervalLength() ; timeInterval<=30*3600 ; timeInterval = timeInterval + NoiseConfigParameters.getIntervalLength()) {
 				double damageCostSum = 0.;
 				if(linkId2timeInterval2damageCost.containsKey(linkId)) {
@@ -377,9 +373,9 @@ public class NoiseImmission {
 				int nCar = linkId2timeInterval2linkEnterEventsCar.get(linkId).get(timeInterval).size();
 				int nHdv = linkId2timeInterval2linkEnterEventsHdv.get(linkId).get(timeInterval).size();
 			
-				double vCar = (scenario.getNetwork().getLinks().get(linkId).getFreespeed())*3.6;
+				double vCar = (scenario.getNetwork().getLinks().get(linkId).getFreespeed()) * 3.6;
 				double vHdv = vCar;
-				// TODO: If different speeds for different vehicle types have to be considered, adapt the calculation here.
+				// If different speeds for different vehicle types have to be considered, adapt the calculation here.
 				// For example, a maximum speed for hdv-vehicles could be set here (for instance for German highways) 
 				
 				double lCar = 27.7 + (10 * Math.log10(1.0 + Math.pow(0.02 * vCar, 3.0)));
@@ -456,7 +452,7 @@ public class NoiseImmission {
 						this.noiseEventsCar.add(noiseEvent);
 					}
 //					
-					totalToll = totalToll+amount;
+					totalToll = totalToll + amount;
 					
 					if(personId2tollSum.containsKey(agentId)) {
 						double newTollSum = personId2tollSum.get(agentId) + amount;
@@ -474,7 +470,7 @@ public class NoiseImmission {
 			for (Id personId : receiverPointId2personId2actNumber2activityStartAndActivityEnd.get(receiverPointId).keySet()) {
 				for (int actNumber : receiverPointId2personId2actNumber2activityStartAndActivityEnd.get(receiverPointId).get(personId).keySet()) {
 					
-					for (double timeInterval = NoiseConfigParameters.getIntervalLength() ; timeInterval <= 30*3600 ; timeInterval = timeInterval + NoiseConfigParameters.getIntervalLength()) {
+					for (double timeInterval = NoiseConfigParameters.getIntervalLength() ; timeInterval <= 30 * 3600. ; timeInterval = timeInterval + NoiseConfigParameters.getIntervalLength()) {
 						double factor = receiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType.get(receiverPointId).get(timeInterval).get(personId).get(actNumber).getFirst();
 						
 						if (!(factor==0.)) {
@@ -514,7 +510,7 @@ public class NoiseImmission {
 		for (Id personId : scenario.getPopulation().getPersons().keySet()) {
 			Id receiverPointId = personId2homeReceiverPointId.get(personId);
 			double homeBasedDamageSum = 0.;
-			for(double timeInterval = NoiseConfigParameters.getIntervalLength() ; timeInterval <= 30*3600 ; timeInterval = timeInterval + NoiseConfigParameters.getIntervalLength()) {
+			for(double timeInterval = NoiseConfigParameters.getIntervalLength() ; timeInterval <= 30 * 3600. ; timeInterval = timeInterval + NoiseConfigParameters.getIntervalLength()) {
 				double cost = 0.;
 				if (receiverPointId2timeInterval2damageCostPerAffectedAgentUnit.get(receiverPointId).containsKey(timeInterval)) {
 					cost = receiverPointId2timeInterval2damageCostPerAffectedAgentUnit.get(receiverPointId).get(timeInterval);
@@ -528,16 +524,20 @@ public class NoiseImmission {
 	}
 	
 	// for testing purposes
-	public Map<Id, Map<Double, Map<Id, Map<Integer, Tuple<Double, String>>>>> getReceiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType() {
-		return receiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType;
+	public Map<Id, Map<Double, Map<Id, Double>>> getReceiverPointIds2timeIntervals2noiseLinks2isolatedImmission() {
+		return receiverPointIds2timeIntervals2noiseLinks2isolatedImmission;
 	}
-
+	
 	public Map<Id, Map<Double, Double>> getReceiverPointId2timeInterval2noiseImmission() {
 		return receiverPointId2timeInterval2noiseImmission;
 	}
+	
+	public Map<Id, Map<Double, Double>> getReceiverPointId2timeInterval2damageCost() {
+		return receiverPointId2timeInterval2damageCost;
+	}
 
-	public Map<Id, Map<Double, Map<Id, Double>>> getReceiverPointIds2timeIntervals2noiseLinks2isolatedImmission() {
-		return receiverPointIds2timeIntervals2noiseLinks2isolatedImmission;
+	public Map<Id, Map<Double, Double>> getReceiverPointId2timeInterval2damageCostPerAffectedAgentUnit() {
+		return receiverPointId2timeInterval2damageCostPerAffectedAgentUnit;
 	}
 
 	public List<NoiseEvent> getNoiseEvents() {

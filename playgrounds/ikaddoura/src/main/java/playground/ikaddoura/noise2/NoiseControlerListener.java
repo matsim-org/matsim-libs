@@ -76,31 +76,26 @@ public class NoiseControlerListener implements AfterMobsimListener , IterationEn
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 
-		log.info("Calculating noise emissions and immissions...");
-		
 		// calculate noise emission for each link and time interval
+		log.info("Calculating noise emission...");
 		this.noiseEmissionHandler.calculateNoiseEmission();
 		this.noiseEmissionHandler.writeNoiseEmissionStats(event.getControler().getConfig().controler().getOutputDirectory() + "/it." + event.getIteration() + ".analysis_emissionStats.csv");
 		this.noiseEmissionHandler.writeNoiseEmissionStatsPerHour(event.getControler().getConfig().controler().getOutputDirectory() + "/it." + event.getIteration() + ".analysis_emissionStatsPerHour.csv");
-		// TODO: test
-//		Map<Id, Map<Double, Double>> linkId2timeInterval2noiseEmission = this.noiseEmissionHandler.getLinkId2timeInterval2noiseEmission();
+		log.info("Calculating noise emission... Done.");
 		
 		// calculate activity durations for each agent
+		log.info("Calculating each agents activity durations...");
 		this.personActivityTracker.calculateDurationOfStay();
-		// TODO: test
+		log.info("Calculating each agents activity durations... Done.");
 		
+		// calculate the noise immission for each receiver point and time interval
+		log.info("Calculating noise immission...");
 		this.noiseImmission = new NoiseImmission(event.getControler().getScenario(), event.getControler().getEvents(), this.spatialInfo, this.annualCostRate, this.noiseEmissionHandler, this.personActivityTracker);
 		noiseImmission.setTunnelLinks(null);
 		noiseImmission.setNoiseBarrierLinks(null);
-		// calculate the noise immission for each receiver point and time interval and save for each receiver point and for each time interval the contribution (immission) of each link's noise level
-		log.info("calculating noise immission...");
 		noiseImmission.calculateNoiseImmission();
-		
-		log.info("Calculating noise emissions and immissions... Done.");
-		
-		// test
-//		Map<Id,Map<Double,Double>> receiverPointId2timeInterval2noiseImmission = noiseImmissionHandler.getReceiverPointId2timeInterval2noiseImmission();
-//		Map<Id,Map<Double,Map<Id,Double>>> receiverPointId2timeIntervals2noiseLinks2isolatedImmission = noiseImmissionHandler.getReceiverPointIds2timeIntervals2noiseLinks2isolatedImmission();
+		log.info("Calculating noise immission... Done.");
+	
 	}
 	
 	@Override
