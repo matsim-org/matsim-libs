@@ -264,15 +264,15 @@ public class PersonActivityHandler implements ActivityEndEventHandler , Activity
 						actEnd = actStartAndActEnd.getSecond();
 					}
 					// now calculation for the time shares of the intervals
-					for(double intervalEnd = NoiseConfigParameters.getIntervalLength() ; intervalEnd <= 30*3600 ; intervalEnd = intervalEnd + NoiseConfigParameters.getIntervalLength()) {
-						double intervalStart = intervalEnd - NoiseConfigParameters.getIntervalLength();
+					for(double intervalEnd = NoiseConfigParameters.getTimeBinSizeNoiseComputation() ; intervalEnd <= 30*3600 ; intervalEnd = intervalEnd + NoiseConfigParameters.getTimeBinSizeNoiseComputation()) {
+						double intervalStart = intervalEnd - NoiseConfigParameters.getTimeBinSizeNoiseComputation();
 //						
 						double durationOfStay = 0.;
 //						
 						if(actEnd <= intervalStart || actStart >= intervalEnd) {
 							durationOfStay = 0.;
 						} else if(actStart <= intervalStart && actEnd >= intervalEnd) {
-							durationOfStay = NoiseConfigParameters.getIntervalLength();
+							durationOfStay = NoiseConfigParameters.getTimeBinSizeNoiseComputation();
 						} else if(actStart <= intervalStart && actEnd <= intervalEnd) {
 							durationOfStay = actEnd - intervalStart;
 						} else if(actStart >= intervalStart && actEnd >= intervalEnd) {
@@ -361,15 +361,15 @@ public class PersonActivityHandler implements ActivityEndEventHandler , Activity
 					}
 					
 					// now calculation for the time shares of the intervals
-					for(double intervalEnd = NoiseConfigParameters.getIntervalLength() ; intervalEnd <= 30*3600 ; intervalEnd = intervalEnd + NoiseConfigParameters.getIntervalLength()) {
-						double intervalStart = intervalEnd - NoiseConfigParameters.getIntervalLength();
+					for(double intervalEnd = NoiseConfigParameters.getTimeBinSizeNoiseComputation() ; intervalEnd <= 30*3600 ; intervalEnd = intervalEnd + NoiseConfigParameters.getTimeBinSizeNoiseComputation()) {
+						double intervalStart = intervalEnd - NoiseConfigParameters.getTimeBinSizeNoiseComputation();
 					
 						double durationOfStay = 0.;
 					
 						if(actEnd <= intervalStart || actStart >= intervalEnd) {
 							durationOfStay = 0.;
 						} else if(actStart <= intervalStart && actEnd >= intervalEnd) {
-							durationOfStay = NoiseConfigParameters.getIntervalLength();
+							durationOfStay = NoiseConfigParameters.getTimeBinSizeNoiseComputation();
 						} else if(actStart <= intervalStart && actEnd <= intervalEnd) {
 							durationOfStay = actEnd - intervalStart;
 						} else if(actStart >= intervalStart && actEnd >= intervalEnd) {

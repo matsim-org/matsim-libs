@@ -20,20 +20,18 @@
 package playground.ikaddoura.noise2;
 
 /**
- * @author lkroeger
+ * @author lkroeger, ikaddoura
  *
  */
 
 public class NoiseConfigParameters {
 	
-	public static double getIntervalLength(){
-		// 7200. should be a multiple of the interval length,
-		// otherwise the calculation of the day and night values is not correct
-		double intervalLength = 3600.0;
-		return intervalLength;
+	public static double getTimeBinSizeNoiseComputation(){
+		double timeBinSize = 3600.0;
+		return timeBinSize;
 	}
 	
-	public static double getTimeBinSize(){
+	public static double getTimeBinSizeRouter(){
 		double timeBinSize = 3600.0;
 		return timeBinSize;
 	}
@@ -42,4 +40,5 @@ public class NoiseConfigParameters {
 		double scaleFactor = 1.;
 		return scaleFactor;
 	}
+	
 }

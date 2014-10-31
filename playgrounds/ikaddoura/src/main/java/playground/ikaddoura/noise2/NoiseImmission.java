@@ -161,7 +161,7 @@ public class NoiseImmission {
 		for (Id coordId : spatialInfo.getReceiverPointId2Coord().keySet()) {
 			Map<Double,Map<Id,Double>> timeIntervals2noiseLinks2isolatedImmission = new HashMap<Double, Map<Id,Double>>();
 		
-			for (double timeInterval = NoiseConfigParameters.getIntervalLength() ; timeInterval <= 30 * 3600 ; timeInterval = timeInterval + NoiseConfigParameters.getIntervalLength()) {
+			for (double timeInterval = NoiseConfigParameters.getTimeBinSizeNoiseComputation() ; timeInterval <= 30 * 3600 ; timeInterval = timeInterval + NoiseConfigParameters.getTimeBinSizeNoiseComputation()) {
 			 	Map<Id,Double> noiseLinks2isolatedImmission = new HashMap<Id, Double>();
 			
 			 	for(Id linkId : spatialInfo.getReceiverPointId2relevantLinkIds().get(coordId)) {
@@ -200,7 +200,7 @@ public class NoiseImmission {
 	private void calculateFinalNoiseImmissions() {
 		for(Id coordId : spatialInfo.getReceiverPointId2Coord().keySet()) {
 			Map<Double,Double> timeInterval2noiseImmission = new HashMap<Double, Double>();
-			for(double timeInterval = NoiseConfigParameters.getIntervalLength() ; timeInterval<=30*3600 ; timeInterval = timeInterval + NoiseConfigParameters.getIntervalLength()) {
+			for(double timeInterval = NoiseConfigParameters.getTimeBinSizeNoiseComputation() ; timeInterval<=30*3600 ; timeInterval = timeInterval + NoiseConfigParameters.getTimeBinSizeNoiseComputation()) {
 				List<Double> noiseImmissions = new ArrayList<Double>();
 				if(!(receiverPointIds2timeIntervals2noiseLinks2isolatedImmission.get(coordId).get(timeInterval)==null)) {
 					for(Id linkId : receiverPointIds2timeIntervals2noiseLinks2isolatedImmission.get(coordId).get(timeInterval).keySet()) {
@@ -311,7 +311,7 @@ public class NoiseImmission {
 			
 			Map<Double,Map<Id,Double>> timeIntervals2noiseLinks2costShare = new HashMap<Double, Map<Id,Double>>();
 			
-			for (double timeInterval = NoiseConfigParameters.getIntervalLength() ; timeInterval <= 30 * 3600 ; timeInterval = timeInterval + NoiseConfigParameters.getIntervalLength()) {
+			for (double timeInterval = NoiseConfigParameters.getTimeBinSizeNoiseComputation() ; timeInterval <= 30 * 3600 ; timeInterval = timeInterval + NoiseConfigParameters.getTimeBinSizeNoiseComputation()) {
 				Map<Id,Double> noiseLinks2isolatedImmission = receiverPointIds2timeIntervals2noiseLinks2isolatedImmission.get(coordId).get(timeInterval);
 				Map<Id,Double> noiseLinks2costShare = new HashMap<Id, Double>();
 				double resultingNoiseImmission = receiverPointId2timeInterval2noiseImmission.get(coordId).get(timeInterval);
@@ -336,7 +336,7 @@ public class NoiseImmission {
 		//initializing the map:
 		for(Id linkId : scenario.getNetwork().getLinks().keySet()) {
 			Map<Double,Double> timeInterval2damageCost = new HashMap<Double, Double>();
-			for(double timeInterval = NoiseConfigParameters.getIntervalLength() ; timeInterval<=30*3600 ; timeInterval = timeInterval + NoiseConfigParameters.getIntervalLength()) {
+			for(double timeInterval = NoiseConfigParameters.getTimeBinSizeNoiseComputation() ; timeInterval<=30*3600 ; timeInterval = timeInterval + NoiseConfigParameters.getTimeBinSizeNoiseComputation()) {
 				timeInterval2damageCost.put(timeInterval, 0.);
 			}
 			linkId2timeInterval2damageCost.put(linkId, timeInterval2damageCost);
@@ -344,7 +344,7 @@ public class NoiseImmission {
 
 		for(Id coordId : spatialInfo.getReceiverPointId2Coord().keySet()) {
 			for(Id linkId : spatialInfo.getReceiverPointId2relevantLinkIds().get(coordId)) {
-				for(double timeInterval = NoiseConfigParameters.getIntervalLength() ; timeInterval <= 30 * 3600 ; timeInterval = timeInterval + NoiseConfigParameters.getIntervalLength()) {
+				for(double timeInterval = NoiseConfigParameters.getTimeBinSizeNoiseComputation() ; timeInterval <= 30 * 3600 ; timeInterval = timeInterval + NoiseConfigParameters.getTimeBinSizeNoiseComputation()) {
 					if(!((receiverPointId2timeInterval2damageCost.get(coordId).get(timeInterval)) == 0.)) {
 						double sumNew = linkId2timeInterval2damageCost.get(linkId).get(timeInterval) + receiverPointIds2timeIntervals2noiseLinks2costShare.get(coordId).get(timeInterval).get(linkId);
 						linkId2timeInterval2damageCost.get(linkId).put(timeInterval, sumNew);
@@ -358,7 +358,7 @@ public class NoiseImmission {
 		for(Id linkId : scenario.getNetwork().getLinks().keySet()) {
 			Map<Double,Double> timeInterval2damageCostPerCar = new HashMap<Double, Double>();
 			Map<Double,Double> timeInterval2damageCostPerHdvVehicle = new HashMap<Double, Double>();
-			for(double timeInterval = NoiseConfigParameters.getIntervalLength() ; timeInterval<=30*3600 ; timeInterval = timeInterval + NoiseConfigParameters.getIntervalLength()) {
+			for(double timeInterval = NoiseConfigParameters.getTimeBinSizeNoiseComputation() ; timeInterval<=30*3600 ; timeInterval = timeInterval + NoiseConfigParameters.getTimeBinSizeNoiseComputation()) {
 				double damageCostSum = 0.;
 				if(linkId2timeInterval2damageCost.containsKey(linkId)) {
 					if(linkId2timeInterval2damageCost.get(linkId).containsKey(timeInterval)) {
@@ -412,7 +412,7 @@ public class NoiseImmission {
 	private void throwNoiseEventsCaused() {
 		
 		for(Id linkId : scenario.getNetwork().getLinks().keySet()) {
-			for(double timeInterval = NoiseConfigParameters.getIntervalLength() ; timeInterval <= 30 * 3600 ; timeInterval = timeInterval + NoiseConfigParameters.getIntervalLength()) {
+			for(double timeInterval = NoiseConfigParameters.getTimeBinSizeNoiseComputation() ; timeInterval <= 30 * 3600 ; timeInterval = timeInterval + NoiseConfigParameters.getTimeBinSizeNoiseComputation()) {
 				double amountCar = (linkId2timeInterval2damageCostPerCar.get(linkId).get(timeInterval))/(NoiseConfigParameters.getScaleFactor());
 				double amountHdv = (linkId2timeInterval2damageCostPerHdvVehicle.get(linkId).get(timeInterval))/(NoiseConfigParameters.getScaleFactor());
 				
@@ -467,7 +467,7 @@ public class NoiseImmission {
 			for (Id personId : receiverPointId2personId2actNumber2activityStartAndActivityEnd.get(receiverPointId).keySet()) {
 				for (int actNumber : receiverPointId2personId2actNumber2activityStartAndActivityEnd.get(receiverPointId).get(personId).keySet()) {
 					
-					for (double timeInterval = NoiseConfigParameters.getIntervalLength() ; timeInterval <= 30 * 3600. ; timeInterval = timeInterval + NoiseConfigParameters.getIntervalLength()) {
+					for (double timeInterval = NoiseConfigParameters.getTimeBinSizeNoiseComputation() ; timeInterval <= 30 * 3600. ; timeInterval = timeInterval + NoiseConfigParameters.getTimeBinSizeNoiseComputation()) {
 						double factor = receiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType.get(receiverPointId).get(timeInterval).get(personId).get(actNumber).getFirst();
 						if (!(factor == 0.)) {
 							
@@ -505,7 +505,7 @@ public class NoiseImmission {
 		for (Id personId : scenario.getPopulation().getPersons().keySet()) {
 			Id receiverPointId = personId2homeReceiverPointId.get(personId);
 			double homeBasedDamageSum = 0.;
-			for(double timeInterval = NoiseConfigParameters.getIntervalLength() ; timeInterval <= 30 * 3600. ; timeInterval = timeInterval + NoiseConfigParameters.getIntervalLength()) {
+			for(double timeInterval = NoiseConfigParameters.getTimeBinSizeNoiseComputation() ; timeInterval <= 30 * 3600. ; timeInterval = timeInterval + NoiseConfigParameters.getTimeBinSizeNoiseComputation()) {
 				double cost = 0.;
 				if (receiverPointId2timeInterval2damageCostPerAffectedAgentUnit.get(receiverPointId).containsKey(timeInterval)) {
 					cost = receiverPointId2timeInterval2damageCostPerAffectedAgentUnit.get(receiverPointId).get(timeInterval);
