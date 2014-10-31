@@ -31,7 +31,6 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
-import playground.gregor.casim.simulation.physics.CANetwork;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DEnvironment;
 //import org.matsim.core.mobsim.qsim.qnetsimengine.QSim
 
@@ -49,7 +48,6 @@ public class CAEngine implements MobsimEngine {
 	private final double qSimStepSize;
 
 
-	private CANetwork caNet;
 
 	private final DepartureHandler dpHandler;
 
@@ -65,13 +63,13 @@ public class CAEngine implements MobsimEngine {
 
 	@Override
 	public void doSimStep(double time) {
-		this.caNet.runUntil(time + this.qSimStepSize);
+//		this.caNet.runUntil(time + this.qSimStepSize);
 	}
 
 	@Override
 	public void onPrepareSim() {
 		log.info("prepare");
-		this.caNet = new CANetwork(this.scenario.getNetwork(), this.sim.getEventsManager());
+//		this.caNet = new CANetwork(this.scenario.getNetwork(), this.sim.getEventsManager());
 		
 //		for (Sim2DEnvironment  env: this.sim2dsc.getSim2DEnvironments()) {
 //			PhysicalSim2DEnvironment e = new PhysicalSim2DEnvironment(env, this.sim2dsc, this.sim.getEventsManager());
@@ -113,9 +111,6 @@ public class CAEngine implements MobsimEngine {
 //		this.lowResLinks.put(lowResLink.getLink().getId(),lowResLink);
 //	}
 	
-	public CANetwork getCANetwork(){
-		return this.caNet;
-	}
 
 
 }

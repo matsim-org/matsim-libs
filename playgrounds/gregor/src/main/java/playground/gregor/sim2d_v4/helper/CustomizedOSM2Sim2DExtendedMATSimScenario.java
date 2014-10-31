@@ -340,7 +340,8 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 			}
 		}
 		if (n1 == null) {
-			OSMNode node = this.nodes.get(nid1);
+			long longNid1 = Long.parseLong(nid1.toString());
+			OSMNode node = this.nodes.get(longNid1);
 			Coordinate c = new Coordinate(node.getLon(),node.getLat());
 			try {
 				JTS.transform(c, c, transform);

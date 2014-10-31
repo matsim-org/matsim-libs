@@ -71,15 +71,20 @@ public class CASimDynamicExperiment_ZhangJ2012aIII {
 
 		CASimDynamicExperiment_ZhangJ2011.VIS = VIS;
 
-		try {
-			bw2 =  new BufferedWriter(new FileWriter(new File("/Users/laemmel/devel/bipedca/plot_dynamicII/bi_flow")));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-//		settings.add(new Setting(.61,.61,.61));
-		for (double w = .61; w < 2; w *=3) {
-			settings.add(new Setting(w,w,w));
 
+		//		settings.add(new Setting(.61,.61,.61));
+//		for (double w = 0.61; w <= 1; w +=10) {
+//			settings.add(new Setting(w,w,w));
+//
+//		}
+		int i = 0;
+		while (i < 10) {
+			double r0 = MatsimRandom.getRandom().nextGaussian()+2;
+			if (r0 > 1 || r0 < 0.61) {
+				continue;
+			}
+			i++;
+			settings.add(new Setting(r0,r0,r0));
 		}
 
 
@@ -101,91 +106,102 @@ public class CASimDynamicExperiment_ZhangJ2012aIII {
 
 		double timeOffset = 0;
 
-		for (int skip = 1; skip < 10; skip++ ) {
-			for (Setting s : settings){
-
-				Config c = ConfigUtils.createConfig();
-				c.global().setCoordinateSystem("EPSG:3395");
-				Scenario sc = ScenarioUtils.createScenario(c);
-
-
-				//VIS only
-				Sim2DConfig conf2d = Sim2DConfigUtils.createConfig();
-				Sim2DScenario sc2d = Sim2DScenarioUtils.createSim2dScenario(conf2d);
-				sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME,sc2d);
-
-				Network net = sc.getNetwork();
-				((NetworkImpl)net).setCapacityPeriod(1);
-				NetworkFactory fac = net.getFactory();
-
-
-				Node n0 = fac.createNode(Id.createNodeId("0"), new CoordImpl(-100,0));
-				Node n2ex = fac.createNode(Id.createNodeId("2ex"), new CoordImpl(-100,100));
-
-
-				Node n3ex = fac.createNode(Id.createNodeId("3ex"), new CoordImpl(100,-100));
-				Node n5 = fac.createNode(Id.createNodeId("5"), new CoordImpl(100,0));
-
-				net.addNode(n2ex);net.addNode(n3ex);net.addNode(n5);net.addNode(n0);
-
-				Link l0 = fac.createLink(Id.createLinkId("0"), n0, n5);
-				Link l0rev = fac.createLink(Id.createLinkId("0rev"), n5, n0);
-				Link l2ex = fac.createLink(Id.createLinkId("2ex"), n0, n2ex);
-
-				Link l3ex = fac.createLink(Id.createLinkId("3ex"), n5, n3ex);
-
-
-
-				l0.setLength(200);
-				l0rev.setLength(200);
-				l2ex.setLength(100);
-				l3ex.setLength(100);
-
-
-
-				net.addLink(l0);
-				net.addLink(l0rev);
-				net.addLink(l2ex);
-				net.addLink(l3ex);
-
-
-
-
-
-				double bL = s.bL;
-				double bCor = s.bCor;
-				double bR = s.bR;
-
-
-
-
-				l0.setCapacity(bCor);
-				l0rev.setCapacity(bCor);
-				l2ex.setCapacity(bCor);
-				l3ex.setCapacity(bCor);
-
-				List<Link> linksLR = new ArrayList<Link>();
-				linksLR.add(l0);
-				linksLR.add(l3ex);
-
-
-
-				List<Link> linksRL = new ArrayList<Link>();
-				linksRL.add(l0);
-				linksRL.add(l2ex);
-
-				System.out.println(" " + bL + " " + bCor + " " + bR +"\n");
-
-				CALinkMonitorII mon = new CALinkMonitorII(l0.getId(), l0rev.getId(), l0.getLength(), l0.getCapacity(),timeOffset);
-
-				runIt(net,linksLR,linksRL,sc,s,mon,skip);
-
+		for (int R = 6; R <= 6; R++) {
+			CANetworkDynamic.LOOK_AHEAD = R;
+			try {
+				bw2 =  new BufferedWriter(new FileWriter(new File("/Users/laemmel/devel/bipedca/plot_dynamicIII/sp_avg_zhangJ2012"+R)));
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
+			for (int mskip = 1; mskip <= 11; mskip++) {
+				for (int skip = 1; skip < 20; skip++ ) {
+					for (Setting s : settings){
+
+						Config c = ConfigUtils.createConfig();
+						c.global().setCoordinateSystem("EPSG:3395");
+						Scenario sc = ScenarioUtils.createScenario(c);
+
+
+						//VIS only
+						Sim2DConfig conf2d = Sim2DConfigUtils.createConfig();
+						Sim2DScenario sc2d = Sim2DScenarioUtils.createSim2dScenario(conf2d);
+						sc.addScenarioElement(Sim2DScenario.ELEMENT_NAME,sc2d);
+
+						Network net = sc.getNetwork();
+						((NetworkImpl)net).setCapacityPeriod(1);
+						NetworkFactory fac = net.getFactory();
+
+
+						Node n0 = fac.createNode(Id.createNodeId("0"), new CoordImpl(-100,0));
+						Node n2ex = fac.createNode(Id.createNodeId("2ex"), new CoordImpl(-100,100));
+
+
+						Node n3ex = fac.createNode(Id.createNodeId("3ex"), new CoordImpl(100,-100));
+						Node n5 = fac.createNode(Id.createNodeId("5"), new CoordImpl(100,0));
+
+						net.addNode(n2ex);net.addNode(n3ex);net.addNode(n5);net.addNode(n0);
+
+						Link l0 = fac.createLink(Id.createLinkId("0"), n0, n5);
+						Link l0rev = fac.createLink(Id.createLinkId("0rev"), n5, n0);
+						Link l2ex = fac.createLink(Id.createLinkId("2ex"), n0, n2ex);
+
+						Link l3ex = fac.createLink(Id.createLinkId("3ex"), n5, n3ex);
+
+
+
+						l0.setLength(200);
+						l0rev.setLength(200);
+						l2ex.setLength(100);
+						l3ex.setLength(100);
+
+
+
+						net.addLink(l0);
+						net.addLink(l0rev);
+						net.addLink(l2ex);
+						net.addLink(l3ex);
+
+
+
+
+
+						double bL = s.bL;
+						double bCor = s.bCor;
+						double bR = s.bR;
+
+
+
+
+						l0.setCapacity(bCor);
+						l0rev.setCapacity(bCor);
+						l2ex.setCapacity(bCor);
+						l3ex.setCapacity(bCor);
+
+						List<Link> linksLR = new ArrayList<Link>();
+						linksLR.add(l0);
+						linksLR.add(l3ex);
+
+
+
+						List<Link> linksRL = new ArrayList<Link>();
+						linksRL.add(l0);
+						linksRL.add(l2ex);
+
+						System.out.println(" " + bL + " " + bCor + " " + bR +"\n");
+
+						CALinkMonitorII mon = new CALinkMonitorII(l0.getId(), l0rev.getId(), l0.getLength(), l0.getCapacity(),timeOffset);
+
+						runIt(net,linksLR,linksRL,sc,s,mon,skip,mskip);
+
+					}
+				}
+			}
+
+			bw2.close();
 		}
-		bw2.close();
 	}
 
-	private static void runIt(Network net,List<Link>linksLR, List<Link> linksRL, Scenario sc, Setting s, CALinkMonitorII mon, int skip){
+	private static void runIt(Network net,List<Link>linksLR, List<Link> linksRL, Scenario sc, Setting s, CALinkMonitorII mon, int skip, int mskip){
 		//visualization stuff
 		EventsManager em = new EventsManagerImpl();
 		em.addHandler(mon);
@@ -208,12 +224,19 @@ public class CASimDynamicExperiment_ZhangJ2012aIII {
 			CALink caLinkLR = caNet.getCALink(linksLR.get(0).getId());
 			CAAgent[] particles = caLinkLR.getParticles();
 			System.out.println("part left:" + particles.length);
+
+
 			for (int i = 1; i < particles.length; i+=skip) {
-				//				if (MatsimRandom.getRandom().nextDouble() < 0.5) {
-				//					continue;
-				//				}
-				//				
-				if (agents % 2 == 0){ //(MatsimRandom.getRandom().nextBoolean()) {
+				if (mskip < 11 && i % mskip == 0) {
+					i++;
+					if (i > particles.length-1) {
+						break;
+					}
+				}
+
+
+				if (agents % 2 == 0) 
+				{
 					CAAgent a = new CASimpleDynamicAgent(linksLR, 1, Id.create("g"+agents++, CASimpleDynamicAgent.class), caLinkLR);
 					a.materialize(i, 1);
 					particles[i] = a;
@@ -225,7 +248,13 @@ public class CASimDynamicExperiment_ZhangJ2012aIII {
 					CAEvent e = new CAEvent(0, a,caLinkLR, CAEventType.TTA);
 					caNet.pushEvent(e);
 					caNet.registerAgent(a);
-				} else {
+				}
+				else
+					//				i++;
+					//				if (i > particles.length-1) {
+					//					break;
+					//				}
+				{
 					CAAgent a = new CASimpleDynamicAgent(linksRL, 1, Id.create("r"+-(agents++), CASimpleDynamicAgent.class), caLinkLR);
 					a.materialize(i, -1);
 					particles[i] = a;
@@ -257,7 +286,7 @@ public class CASimDynamicExperiment_ZhangJ2012aIII {
 		//		em.addHandler(monitor);
 		//		monitor.setCALinkDynamic((CALinkDynamic)caNet.getCALink(new IdImpl("2")));
 
-		CALinkMonitorExact monitor = new CALinkMonitorExact(caNet.getCALink(Id.createLinkId("0")));
+		CALinkMonitorExact monitor = new CALinkMonitorExact(caNet.getCALink(Id.createLinkId("0")),10.);
 		caNet.addMonitor(monitor);
 		monitor.init();
 		caNet.run();

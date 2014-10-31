@@ -53,10 +53,10 @@ public class CAWalkerDepatureHandler implements DepartureHandler {
 
 	private void handleCarDeparture(double now, MobsimDriverAgent agent,
 			Id linkId) {
-		CALink link = this.engine.getCANetwork().getCALink(linkId);
-		Id vehicleId = agent.getPlannedVehicleId() ;
-		CAVehicle veh = new CAVehicle(vehicleId,agent,linkId,link);
-		link.letAgentDepart(veh);
+//		CALink link = this.engine.getCANetwork().getCALink(linkId);
+//		Id vehicleId = agent.getPlannedVehicleId() ;
+//		CAVehicle veh = new CAVehicle(vehicleId,agent,linkId,link);
+//		link.letAgentDepart(veh);
 		
 	}
 

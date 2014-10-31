@@ -51,42 +51,33 @@ public class CANetworkDynamic {
 	//Floetteroed Laemmel parameters
 	public static final double RHO_HAT = 6.69;
 	public static final double V_HAT = 1.27;
-	//		public static final double RHO_HAT = 5.09;
-	//		public static final double V_HAT = 1.26;
 
 	public static final double ALPHA = 0.;
 	public static final double BETA = 0.39;
 	public static final double GAMMA = 1.43;
 
 	public static final double PED_WIDTH = .61;
-	//Laemmel constants
-	private static final int LOOK_AHEAD = 4;
-	private static final int MX_TRAVERSE = 20;
+	//Laemmel Floetteroed constants
+	/*package*/ static int LOOK_AHEAD = 7;
+	/*package*/ static final int MX_TRAVERSE = 20;
 
+	public static int H = 13;
+	private static final int CUTTOFF_DIST = 2*H;
+	private static final boolean USE_SPH = false ;
 
-
-	public static final double MAX_Z = ALPHA + BETA * Math.pow(RHO_HAT,GAMMA) + 1/(RHO_HAT*V_HAT);;
 
 	private static final Logger log = Logger.getLogger(CANetworkDynamic.class);
 
 	private final PriorityQueue<CAEvent> events = new PriorityQueue<CAEvent>();
 	private final Network net;
 
-	private final Map<Id,CANode> caNodes = new HashMap<Id,CANode>();
-	private final Map<Id,CALink> caLinks = new HashMap<Id,CALink>();
+	private final Map<Id<Node>,CANode> caNodes = new HashMap<Id<Node>,CANode>();
+	private final Map<Id<Link>,CALink> caLinks = new HashMap<Id<Link>,CALink>();
 	private final EventsManager em;
 
 	private double globalTime = 0;
 
-	private final long eventCnt = 0;
-
-
-	private final DensityObserver densityObserver;
-
-
-
 	private CALinkMonitorExact monitor;
-
 
 	private Set<CAAgent> agents = new HashSet<CAAgent>();
 
@@ -95,7 +86,6 @@ public class CANetworkDynamic {
 	public CANetworkDynamic(Network net, EventsManager em) {
 		this.net = net;
 		this.em = em;
-		this.densityObserver = new DensityObserver(em);
 		init();
 	}
 
@@ -122,7 +112,6 @@ public class CANetworkDynamic {
 				}
 			}
 			CALinkDynamic caL = new CALinkDynamic(l,rev, ds, us, this);
-			this.densityObserver.registerCALink(caL);
 			us.addLink(caL);
 			ds.addLink(caL);
 			this.caLinks.put(l.getId(), caL);
@@ -145,13 +134,6 @@ public class CANetworkDynamic {
 
 
 	public double getRho(CAAgent a) {
-
-		//experimental 
-		String currents = a.getCurrentLink().getLink().getId().toString();
-//		if (currents.contains("0")) {
-//			//			CALink l = a.getCurrentLink();
-//			return 0;			
-//		}
 		return a.getAgentInfo().getRho();
 	}
 
@@ -159,12 +141,6 @@ public class CANetworkDynamic {
 	/*package*/ void updateRho() {
 
 		for (CAAgent a : this.agents){
-			//experimental 
-			String currents = a.getCurrentLink().getLink().getId().toString();
-//			if (currents.contains("0") || currents.contains("4")) {
-//				//			CALink l = a.getCurrentLink();
-//				continue;			
-//			}
 			double rho = (estRho(a)+a.getAgentInfo().getRho())/2;
 			a.getAgentInfo().setRho(rho);
 		}
@@ -179,14 +155,17 @@ public class CANetworkDynamic {
 		int [] spacings;// = new int []{0,0};
 		if (currentParts[pos] != a) {
 			//agent on node
-//			log.warn("not yet implemented!!");
+			//			log.warn("not yet implemented!!");
 			return a.getAgentInfo().getRho();
 		} else {
 
+			double rho = bSplinesKernel(0);
 			spacings = new int[]{0,0};
-			traverseLink(currentParts, dir, pos+dir, spacings);
+			rho+=traverseLink(currentParts, dir, pos+dir, spacings,rho);
 			//check next node
-			if (spacings[0] < LOOK_AHEAD && spacings[1] < MX_TRAVERSE){
+
+			if (USE_SPH && spacings[1] < CUTTOFF_DIST || !USE_SPH && spacings[0] < LOOK_AHEAD && spacings[1] < MX_TRAVERSE){
+				//			if (spacings[1] < MX_TRAVERSE){
 				CANode n;
 				if (dir == 1) {
 					n = current.getDownstreamCANode();
@@ -198,7 +177,8 @@ public class CANetworkDynamic {
 					spacings[0]++;
 				}
 				//check next link(s)? TODO it would make sense to check all outgoing links not only the next one ...
-				if (spacings[0] < LOOK_AHEAD && spacings[1] < MX_TRAVERSE){
+				if (USE_SPH && spacings[1] < CUTTOFF_DIST || !USE_SPH && spacings[0] < LOOK_AHEAD && spacings[1] < MX_TRAVERSE){
+					//				if (spacings[1] < MX_TRAVERSE){
 					CALink next = this.caLinks.get(a.getNextLinkId());
 					CANode nn = next.getUpstreamCANode();
 					int nextDir;
@@ -211,31 +191,39 @@ public class CANetworkDynamic {
 						nextDir = -1;
 						nextPos = nextParts.length-1;
 					}
-					traverseLink(nextParts,nextDir,nextPos,spacings);
+					rho += traverseLink(nextParts,nextDir,nextPos,spacings,rho);
 				}
 			} 
 			double coeff = (double)spacings[0]/(double)spacings[1];
-			return RHO_HAT*coeff;
+			double cmp = RHO_HAT*coeff;
+			//			rho *= RHO_HAT;
+			if (USE_SPH) {
+				return rho;
+			} else {
+				return cmp;
+			}
 		}
 	}
 
-	private void traverseLink(CAAgent[] parts, int dir, int idx,int[] spacings) {
+	private double traverseLink(CAAgent[] parts, int dir, int idx,int[] spacings, double rho) {
 		if (idx < 0 || idx >= parts.length) {
-			return;
+			return rho;
 		}
 		int toMx = dir == -1 ? 0 : parts.length-1;
 		for (;idx != toMx; idx += dir) {
 			spacings[1]++;
 			if (parts[idx] != null) {
 				spacings[0]++;
-				if (spacings[0] >= LOOK_AHEAD) {
-					return;
+				rho += bSplinesKernel(spacings[1]);
+				if (!USE_SPH && spacings[0] >= LOOK_AHEAD) {
+					return rho;
 				}
 			}
-			if (spacings[1] >= MX_TRAVERSE) {
-				return;
+			if (USE_SPH && spacings[1] >= CUTTOFF_DIST || !USE_SPH && spacings[1] >= MX_TRAVERSE) {
+				return rho;
 			}
 		}
+		return rho;
 	}
 
 
@@ -243,10 +231,12 @@ public class CANetworkDynamic {
 		this.globalTime = this.events.peek().getEventExcexutionTime();
 		double simTime = 0;
 		updateRho();
-//		draw2();
+		//		draw2();
 		while (this.events.size() > 0) {
 			CAEvent e = this.events.poll();
-//						this.monitor.trigger(e.getEventExcexutionTime());
+			if (this.monitor != null){
+				this.monitor.trigger(e.getEventExcexutionTime());
+			}
 
 			if (e.getEventExcexutionTime() > simTime+1) {
 				this.globalTime = e.getEventExcexutionTime();
@@ -343,12 +333,8 @@ public class CANetworkDynamic {
 		return this.events.peek();
 	}
 
-	public CALink getCALink(Id nextLinkId) {
+	public CALink getCALink(Id<Link> nextLinkId) {
 		return this.caLinks.get(nextLinkId);
-	}
-
-	public CANode getCANode(Id id) {
-		return this.caNodes.get(id);
 	}
 
 	public EventsManager getEventsManager() {
@@ -357,5 +343,29 @@ public class CANetworkDynamic {
 
 	public void addMonitor(CALinkMonitorExact m) {
 		this.monitor = m;
+	}
+
+	private double bSplinesKernel(double r) {
+//		r = H-r;
+		final double v = r/H;
+		final double hCube = Math.pow(H, 3);
+		if (v < 0) {
+			return 0;
+		}
+		if (v <= 1) {
+			final double term1 = 3./(4.*Math.PI*Math.pow(H, 3.));
+			//			final double term1 = 1./6.;
+			final double term2 = 10./3.-7*Math.pow(v, 2)+4*Math.pow(v, 3.);
+			//			final double term2 = 3*Math.pow(v, 3) - 6*Math.pow(v, 2) + 4;
+			return term1*term2*hCube;
+		} else if (v <= 2) {
+			final double term1 = 3./(4.*Math.PI*Math.pow(H, 3.));
+			//			final double term1 = 1./6.;
+			final double term2 = Math.pow(2-v,2)*((5.-4.*v)/3.);
+			//			final double term2 = - Math.pow(v, 3) + 6.*Math.pow(v, 2) - 12*v +8;
+			return term1*term2*hCube;
+		}
+
+		return 0.;
 	}
 }

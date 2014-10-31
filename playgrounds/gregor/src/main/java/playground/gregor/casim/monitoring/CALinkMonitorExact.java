@@ -35,12 +35,11 @@ public class CALinkMonitorExact {
 	
 	private double lastTriggered = -1;
 
-	public CALinkMonitorExact(CALink l) {
+	public CALinkMonitorExact(CALink l, double range) {
 		this.l = l;
 		this.parts = l.getParticles();
 		int num = l.getNumOfCells();
 		double cellWidth = l.getLink().getLength()/num;
-		double range = 10;
 		double cells = range/cellWidth;
 		this.from = (int) (num/2.-cells/2 +.5);
 		this.to = (int) (num/2.+cells/2 +.5);
@@ -168,7 +167,7 @@ public class CALinkMonitorExact {
 		int from = 0;
 		int to = 0;
 		double mxDiff = 0.05;
-		int mnRange = 20;
+		int mnRange = 40;
 		for (Measure m : this.ms){
 			double usRhoDiff = Math.abs(usRho-m.usRho);
 			double dsRhoDiff = Math.abs(dsRho-m.dsRho);
@@ -191,11 +190,19 @@ public class CALinkMonitorExact {
 			to++;
 		}
 		for (Tuple<Integer, Integer> t : ranges) {
+			
+			double range = t.getSecond()-t.getFirst();
+			Measure m = new Measure(0);
 			for (int i = t.getFirst(); i < t.getSecond(); i++) {
-				Measure m = this.ms.get(i);
-				bw.append(m.time + " " + m.dsRho + " " + m.dsSpd + " " + m.usRho + " " + m.usSpd +"\n");
+				Measure c = this.ms.get(i);
+				m.dsRho += c.dsRho/range;
+				m.dsSpd += c.dsSpd/range;
+				m.usRho += c.usRho/range;
+				m.usSpd += c.usSpd/range;
 			}
+			bw.append(m.time + " " + m.dsRho + " " + m.dsSpd + " " + m.usRho + " " + m.usSpd +"\n");
 		}
+		bw.flush();
 //		for (Measure m : this.ms){
 ////			if (m.time<20 || m.time >100) {
 //////				return;

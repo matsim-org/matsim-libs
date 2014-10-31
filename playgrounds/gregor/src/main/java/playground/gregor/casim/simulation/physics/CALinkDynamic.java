@@ -33,13 +33,15 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 
 	private static final Logger log = Logger.getLogger(CALinkDynamic.class);
 
+	private static final double EPSILON = 0;
+
 	private final Link dsl;
 	private final Link usl;
 
 	private final CASimpleDynamicAgent [] particles;
 	private final double [] dsLastLeftTimes;
 	private final double [] usLastLeftTimes;
-	private final double [] densities;
+//	private final double [] densities;
 	
 	private final int size;
 
@@ -71,7 +73,7 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 		this.particles = new CASimpleDynamicAgent[this.size];
 		this.usLastLeftTimes = new double[this.size];
 		this.dsLastLeftTimes = new double[this.size];
-		this.densities = new double[this.size];
+//		this.densities = new double[this.size];
 		this.ds = ds;
 		this.us = us;
 		this.tFree = this.cellLength/CANetworkDynamic.V_HAT;
@@ -159,7 +161,7 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 		if (this.particles[idx+1] == null) {
 			double z = getZ(a);
 			z *= this.ratio;
-			if (this.dsLastLeftTimes[idx+1] <= (time-z)){
+			if (this.dsLastLeftTimes[idx+1] <= (time-z+EPSILON)){
 				handleTTAOnLinkDownStreamOnPreCondition1(a,time,idx);
 			} else {
 				handleTTAOnLinkDownStreamOnPreCondition2(a,time,idx);
@@ -260,6 +262,7 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 		double nextTime = time + zStar;
 		if (!(nextTime > time)) {
 			nextTime += 0.0001;
+//			log.warn("zStar eq. zero");
 		}
 		
 		CAEvent e = new CAEvent(nextTime, a, this, CAEventType.TTA);
@@ -755,8 +758,18 @@ public class CALinkDynamic implements CANetworkEntity, CALink{
 		return this.cellLength;
 	}
 
+
 	@Override
-	public double[] getDensities() {
-		return this.densities;
+	public void reset() {
+		for (int i = 0; i < particles.length; i++) {
+			dsLastLeftTimes[i] = 0;
+			usLastLeftTimes[i] = 0;
+			if (particles[i] != null) {
+				CASimpleDynamicAgent part = particles[i];
+				this.net.unregisterAgent(part);
+				particles[i] = null;
+			}
+		}
+		
 	}
 }
