@@ -42,6 +42,7 @@ import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDuration
 import org.matsim.core.controler.corelisteners.*;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.external.ExternalMobsim;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
@@ -53,16 +54,10 @@ import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.replanning.selectors.PlanSelectorFactory;
 import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.counts.CountControlerListener;
 import org.matsim.counts.Counts;
 import org.matsim.population.VspPlansCleaner;
@@ -78,10 +73,7 @@ import org.matsim.vis.snapshotwriters.SnapshotWriter;
 import org.matsim.vis.snapshotwriters.SnapshotWriterFactory;
 import org.matsim.vis.snapshotwriters.SnapshotWriterManager;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * The Controler is responsible for complete simulation runs, including the
@@ -120,6 +112,7 @@ public class Controler extends AbstractController {
 
     protected Network network = null;
 	protected Population population = null;
+    private Injector injector;
 
     public static interface TerminationCriterion {
 		boolean continueIterations( int iteration ) ;
@@ -133,20 +126,23 @@ public class Controler extends AbstractController {
 		}
 
 	};
-	protected TravelTimeCalculator travelTimeCalculator = null;
-	protected ScoringFunctionFactory scoringFunctionFactory = null;
+
+    // The modules to load.
+    // DefaultControlerModule contains submodules. If you want less than what the Controler does
+    // by default, you can leave DefaultControlerModule out, look at what DefaultControlerModule does,
+    // and only put in what you want.
+    private List<AbstractModule> modules = Arrays.<AbstractModule>asList(new ControlerDefaultsModule());
+
+    protected ScoringFunctionFactory scoringFunctionFactory = null;
 	protected StrategyManager strategyManager = null;
 
 	private CalcLinkStats linkStats = null;
-	private CalcLegTimes legTimes = null;
-	private VolumesAnalyzer volumes = null;
+    private VolumesAnalyzer volumes = null;
 
 	protected boolean scenarioLoaded = false;
     private ScoreStatsControlerListener scoreStats = null;
 
-	private final List<MobsimListener> simulationListeners = new ArrayList<MobsimListener>();
-
-	private TravelTimeCalculatorFactory travelTimeCalculatorFactory;
+	private final List<MobsimListener> simulationListeners = new ArrayList<>();
 
 	private TravelDisutilityFactory travelCostCalculatorFactory ; 
 
@@ -240,9 +236,6 @@ public class Controler extends AbstractController {
 		
 		this.events = EventsUtils.createEventsManager(this.config);
 
-		// yy is it really so practical to do this in this way?  People might (re)set this factory between constructor and run()--???  kai, may'13
-		this.travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
-		
 		this.travelCostCalculatorFactory = ControlerDefaults.createDefaultTravelDisutilityFactory(scenario);
 
 		this.config.parallelEventHandling().makeLocked();
@@ -358,9 +351,9 @@ public class Controler extends AbstractController {
 		this.volumes = new VolumesAnalyzer(3600, 24 * 3600 - 1, this.network);
 		this.events.addHandler(this.volumes);
 
-		this.legTimes = new CalcLegTimes();
-		this.events.addHandler(this.legTimes);
-		this.addCoreControlerListener(new LegTimesListener(this.legTimes, getControlerIO()));
+        CalcLegTimes legTimes = new CalcLegTimes();
+		this.events.addHandler(legTimes);
+		this.addCoreControlerListener(new LegTimesListener(legTimes, getControlerIO()));
 
 		this.addCoreControlerListener(new EventsHandling(this.events, this.getConfig().controler().getWriteEventsInterval(),
 				this.getConfig().controler().getEventsFileFormats(), this.getControlerIO() ));
@@ -459,8 +452,25 @@ public class Controler extends AbstractController {
 	protected void setUp() {
 		// yyyy cannot make this final since it is overridden at about 25 locations.  kai, jan'13
 
-		this.travelTimeCalculator = this.travelTimeCalculatorFactory.createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
-		this.events.addHandler(this.travelTimeCalculator);
+        // Set up the Injector, which is the dependency injection container for the Controler I have been talking about.
+        // The TravelTimeCalculator is my first customer. I moved it into a Module.
+        // As other things become modules, too, their interfaces and their dependencies and their getters can disappear
+        // from the Controler.
+        this.injector = Injector.createInjector(
+                new AbstractModule() {
+                    @Override
+                    public void install() {
+                        for (AbstractModule module : modules) {
+                            include(module);
+                        }
+                        // Bootstrap it with the Scenario.
+                        bindToInstance(Scenario.class, scenarioData);
+                    }
+                });
+        Set<EventHandler> eventHandlersDeclaredByModules = this.injector.getEventHandlersDeclaredByModules();
+        for (EventHandler eventHandler : eventHandlersDeclaredByModules) {
+            this.events.addHandler(eventHandler);
+        }
 
 		if ( tripRouterFactory == null ) {
 			// This builder is just for compatibility, in case somebody
@@ -473,11 +483,11 @@ public class Controler extends AbstractController {
 			* during construction of the graph used for routing seems to be conceptually straight forward to be used with 
 			* shortest path algorithms. */
 			if (this.getScenario().getConfig().controler().isLinkToLinkRoutingEnabled()) {
-				tripRouterFactory = new LinkToLinkTripRouterFactory(
+                tripRouterFactory = new LinkToLinkTripRouterFactory(
 						getScenario(),
 						new DijkstraFactory(),
 						getTravelDisutilityFactory(),
-						travelTimeCalculator.getLinkToLinkTravelTimes(),
+                        injector.getInstance(LinkToLinkTravelTime.class),
 						getPopulation().getFactory(),
 						(DefaultTripRouterFactoryImpl) tripRouterFactory);
 			}
@@ -486,7 +496,7 @@ public class Controler extends AbstractController {
 
 	}
 
-	/**
+    /**
 	 * @return A fully initialized StrategyManager for the plans replanning.
 	 */
 	protected StrategyManager loadStrategyManager() {
@@ -575,10 +585,10 @@ public class Controler extends AbstractController {
 	// ******** --------- *******
 
 	public final TravelTime getLinkTravelTimes() {
-		return this.travelTimeCalculator.getLinkTravelTimes();
+        return injector.getInstance(TravelTime.class);
 	}
 
-	public final TripRouterFactoryInternal getTripRouterFactory() {
+    public final TripRouterFactoryInternal getTripRouterFactory() {
 		return new TripRouterFactoryInternal() {
 
 			@Override
@@ -592,7 +602,7 @@ public class Controler extends AbstractController {
 
 					@Override
 					public TravelTime getTravelTime() {
-						return travelTimeCalculator.getLinkTravelTimes();
+						return getLinkTravelTimes();
 					}
 
 				});
@@ -602,8 +612,8 @@ public class Controler extends AbstractController {
 	}
 	
 	public final TravelDisutility createTravelDisutilityCalculator() {
-		return this.travelCostCalculatorFactory.createTravelDisutility(
-				this.travelTimeCalculator.getLinkTravelTimes(), this.config.planCalcScore());
+        return this.travelCostCalculatorFactory.createTravelDisutility(
+                getLinkTravelTimes(), this.config.planCalcScore());
 	}
 
 	public final LeastCostPathCalculatorFactory getLeastCostPathCalculatorFactory() {
@@ -627,7 +637,7 @@ public class Controler extends AbstractController {
 	}
 
 	public final ActivityFacilities getFacilities() {
-		return this.scenarioData .getActivityFacilities();
+		return this.scenarioData.getActivityFacilities();
 	}
 
 	public final Network getNetwork() {
@@ -656,11 +666,7 @@ public class Controler extends AbstractController {
 		return this.linkStats;
 	}
 
-	public final CalcLegTimes getLegTimes() {
-		return this.legTimes;
-	}
-
-	public final VolumesAnalyzer getVolumes() {
+    public final VolumesAnalyzer getVolumes() {
 		return this.volumes;
 	}
 
@@ -722,11 +728,6 @@ public class Controler extends AbstractController {
 	public final void setTravelDisutilityFactory(
 			final TravelDisutilityFactory travelCostCalculatorFactory) {
 		this.travelCostCalculatorFactory = travelCostCalculatorFactory;
-	}
-
-	public final void setTravelTimeCalculatorFactory(
-			final TravelTimeCalculatorFactory travelTimeCalculatorFactory) {
-		this.travelTimeCalculatorFactory = travelTimeCalculatorFactory;
 	}
 
 	public final void setMobsimFactory(final MobsimFactory mobsimFactory) {
@@ -835,6 +836,10 @@ public class Controler extends AbstractController {
 	// something, which then creates and configures a Controler based on the config,
 	// using the methods above.
 	// ******** --------- *******
+
+    public void setModules(AbstractModule... modules) {
+        this.modules = Arrays.asList(modules);
+    }
 
 	/**
 	 * Register a {@link MobsimFactory} with a given name.
