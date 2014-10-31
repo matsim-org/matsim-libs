@@ -97,7 +97,7 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 	}
 
 	/**
-	 * * Returns for every mode:
+	 * * Returns for every mode and activity:
 	 *	o	Number of trips []
 	 *	o	Total distance travelled [km]
 	 *	o	Mean and standard deviation of distances travelled [km]
@@ -123,7 +123,7 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 	}
 
 	private String getTripResults() {
-		String results = "Mode; NumberOfTrips; TotalDuration; MeanDuration; StdDevDuration; TotalDistance; MeanDistance; StdDevDistance" + ScenarioAnalyzer.NL;
+		/*String results = "Mode; NumberOfTrips; TotalDuration; MeanDuration; StdDevDuration; TotalDistance; MeanDistance; StdDevDistance" + ScenarioAnalyzer.NL;
 		for (String mode : modes.keySet()) {
 			Double[] modeVals = modes.get(mode).getModeVals();
 			if (mode.contains("pt")) {
@@ -135,6 +135,18 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 			}
 			results += modeVals[modeVals.length - 1] + ScenarioAnalyzer.NL;
 		}
+		return results;*/
+		String results = "Mode; NumberOfTrips; MeanDuration [min]; MeanDistance [km];" + ScenarioAnalyzer.NL;
+		for (String mode : modes.keySet()) {
+			Double[] modeVals = modes.get(mode).getModeVals();
+			if (mode.contains("pt")) {
+				correctForAdditionalDistancePT(modeVals);
+			}
+			results += mode + ScenarioAnalyzer.DEL;
+			results += modeVals[0] + ScenarioAnalyzer.DEL;
+			results += modeVals[2] + ScenarioAnalyzer.DEL;
+			results += modeVals[5] + ScenarioAnalyzer.NL;
+		}
 		return results;
 	}
 
@@ -145,7 +157,7 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 	}
 
 	private String getActivityResults() {
-		String results = "Activity; NumberOfExecutions; TotalDuration; MeanDuration; StdDevDuration" + ScenarioAnalyzer.NL;
+		/*String results = "Activity; NumberOfExecutions; TotalDuration; MeanDuration; StdDevDuration" + ScenarioAnalyzer.NL;
 		for (String activity : activities.keySet()) {
 			Double[] actVals = activities.get(activity).getActVals();
 			results += activity + ScenarioAnalyzer.DEL;
@@ -153,6 +165,14 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 				results += actVals[i] + ScenarioAnalyzer.DEL;
 			}
 			results += actVals[actVals.length - 1] + ScenarioAnalyzer.NL;
+		}
+		return results;*/
+		String results = "Activity; NumberOfExecutions; MeanDuration [hr];" + ScenarioAnalyzer.NL;
+		for (String activity : activities.keySet()) {
+			Double[] actVals = activities.get(activity).getActVals();
+			results += activity + ScenarioAnalyzer.DEL;
+			results += actVals[0] + ScenarioAnalyzer.DEL;
+			results += (actVals[2]/60) + ScenarioAnalyzer.NL;
 		}
 		return results;
 	}
