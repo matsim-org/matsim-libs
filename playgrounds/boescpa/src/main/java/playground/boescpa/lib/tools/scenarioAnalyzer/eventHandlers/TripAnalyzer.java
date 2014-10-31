@@ -195,10 +195,27 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 				ArrayList<LinkedList<Id>> pathList = tripHandler.getPath().getValues(personId);
 
 				// Trip analysis:
-				for (int i = 0; i < startLinks.size(); i++) {
+				/*for (int i = 0; i < startLinks.size(); i++) {
 					if (endLinks.get(i) != null) {
 						if (considerLink(startLinks.get(i)) || considerLink(endLinks.get(i))) {
 							ModeResult modeVals = getMode(modes.get(i));
+							modeVals.numberOfTrips++;
+							modeVals.modeDistances.add((double) TripProcessor.calcTravelDistance(pathList.get(i), network, startLinks.get(i), endLinks.get(i)));
+							modeVals.modeDurations.add(TripProcessor.calcTravelTime(startTimes.get(i), endTimes.get(i)));
+						}
+					}
+				}*/
+				for (int i = 0; i < startLinks.size(); i++) {
+					if (endLinks.get(i) != null) {
+						if ((considerLink(startLinks.get(i)) || considerLink(endLinks.get(i))) && startTimes.get(i) < 86400) {
+							String mode = modes.get(i);
+							if (mode.equals("bike") || mode.equals("walk")) {
+								mode = "slow_mode";
+							} else if (mode.equals("transit_walk")) {
+								mode = "pt";
+							}
+							ModeResult modeVals = getMode(mode);
+							modeVals.numberOfTrips++;
 							modeVals.modeDistances.add((double) TripProcessor.calcTravelDistance(pathList.get(i), network, startLinks.get(i), endLinks.get(i)));
 							modeVals.modeDurations.add(TripProcessor.calcTravelTime(startTimes.get(i), endTimes.get(i)));
 						}
@@ -206,20 +223,45 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 				}
 
 				// Activity analysis:
-				ActivityResult actVals;
+				/*ActivityResult actVals;
 				if (considerLink(startLinks.get(0))) {
 					actVals = getActivity("h");
+					actVals.numberOfActivities++;
 					actVals.actDurations.add(startTimes.get(0));
 				}
 				for (int i = 1; i < startTimes.size(); i++) {
 					if (endLinks.get(i) != null && considerLink(endLinks.get(i))) {
 						actVals = getActivity(purposes.get(i - 1));
+						actVals.numberOfActivities++;
 						actVals.actDurations.add(startTimes.get(i) - endTimes.get(i - 1));
 					}
 				}
-				if (endLinks.get(endLinks.size()-1) != null && endTimes.get(endTimes.size()-1) < 24*60 && considerLink(endLinks.get(endLinks.size()-1))) {
+				if (endLinks.get(endLinks.size()-1) != null && endTimes.get(endTimes.size()-1) < 24*60*60 && considerLink(endLinks.get(endLinks.size()-1))) {
 					actVals = getActivity("h");
-					actVals.actDurations.add(24*60 - endTimes.get(endTimes.size()-1));
+					actVals.numberOfActivities++;
+					actVals.actDurations.add(24*60*60 - endTimes.get(endTimes.size()-1));
+				}*/
+				ActivityResult actVals;
+				if (considerLink(startLinks.get(0))) {
+					actVals = getActivity("h");
+					actVals.numberOfActivities++;
+					actVals.actDurations.add(startTimes.get(0));
+				}
+				int i = 1;
+				while (i < startTimes.size() && startTimes.get(i) < 86400) {
+					if (endLinks.get(i-1) != null && considerLink(endLinks.get(i-1))) {
+						actVals = getActivity(purposes.get(i-1));
+						actVals.numberOfActivities++;
+						actVals.actDurations.add(startTimes.get(i) - endTimes.get(i-1));
+					}
+					i++;
+				}
+				if (i == startTimes.size() || endTimes.get(i-1) < 86400) {
+					if (endLinks.get(i-1) != null && considerLink(endLinks.get(i-1))) {
+						actVals = getActivity(purposes.get(i-1));
+						actVals.numberOfActivities++;
+						actVals.actDurations.add(86400 - endTimes.get(i-1));
+					}
 				}
 			}
 		}
@@ -241,6 +283,7 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 	private class ModeResult {
 		public ArrayList<Double> modeDistances = new ArrayList<>();
 		public ArrayList<Double> modeDurations = new ArrayList<>();
+		public double numberOfTrips = 0;
 
 		/**
 		 * @return NumberOfTrips; TotalDuration; MeanDuration; StdDevDuration; TotalDistance; MeanDistance; StdDevDistance
@@ -249,7 +292,7 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 			Double[] modeVals = new Double[7];
 
 			// Number of Trips:
-			modeVals[0] = (double)modeDistances.size();
+			modeVals[0] = numberOfTrips;
 
 			// Duration [min]: Total, Mean and StdDev
 			modeVals[1] = total(modeDurations);
@@ -288,6 +331,7 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 
 	private class ActivityResult {
 		public ArrayList<Double> actDurations = new ArrayList<>();
+		public double numberOfActivities = 0;
 
 		/**
 		 * @return NumberOfExecutions; TotalDuration; MeanDuration; StdDev Duration
@@ -296,7 +340,7 @@ public class TripAnalyzer implements ScenarioAnalyzerEventHandler, PersonDepartu
 			Double[] actVals = new Double[4];
 
 			// Number of Trips:
-			actVals[0] = (double)actDurations.size();
+			actVals[0] = numberOfActivities;
 
 			// Duration [min]: Total, Mean and StdDev
 			actVals[1] = total(actDurations);
