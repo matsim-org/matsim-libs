@@ -307,24 +307,22 @@ public class NoiseImmission {
 		Map<Id,Map<Double,Map<Id,Double>>> receiverPointIds2timeIntervals2noiseLinks2costShare = new HashMap<Id, Map<Double,Map<Id,Double>>>();
 
 		// preparation
-		for(Id coordId : receiverPointIds2timeIntervals2noiseLinks2isolatedImmission.keySet()) {
-			Map<Double,Map<Id,Double>> timeIntervals2noiseLinks2isolatedImmission = receiverPointIds2timeIntervals2noiseLinks2isolatedImmission.get(coordId);
+		for (Id coordId : receiverPointIds2timeIntervals2noiseLinks2isolatedImmission.keySet()) {
+			
 			Map<Double,Map<Id,Double>> timeIntervals2noiseLinks2costShare = new HashMap<Double, Map<Id,Double>>();
-			for(double timeInterval = NoiseConfigParameters.getIntervalLength() ; timeInterval<=30*3600 ; timeInterval = timeInterval + NoiseConfigParameters.getIntervalLength()) {
-				Map<Id,Double> noiseLinks2isolatedImmission = timeIntervals2noiseLinks2isolatedImmission.get(timeInterval);
+			
+			for (double timeInterval = NoiseConfigParameters.getIntervalLength() ; timeInterval <= 30 * 3600 ; timeInterval = timeInterval + NoiseConfigParameters.getIntervalLength()) {
+				Map<Id,Double> noiseLinks2isolatedImmission = receiverPointIds2timeIntervals2noiseLinks2isolatedImmission.get(coordId).get(timeInterval);
 				Map<Id,Double> noiseLinks2costShare = new HashMap<Id, Double>();
 				double resultingNoiseImmission = receiverPointId2timeInterval2noiseImmission.get(coordId).get(timeInterval);
-//				System.out.println(coordId);
-//				System.out.println(timeInterval);
-//				System.out.println(receiverPointId2timeInterval2damageCost.toString());
-				if(!((receiverPointId2timeInterval2damageCost.get(coordId).get(timeInterval)) == 0.)) {
-					for(Id linkId : noiseLinks2isolatedImmission.keySet()) {
+				
+				if (!((receiverPointId2timeInterval2damageCost.get(coordId).get(timeInterval)) == 0.)) {
+					for (Id linkId : noiseLinks2isolatedImmission.keySet()) {
 						double noiseImmission = noiseLinks2isolatedImmission.get(linkId);
 						double costs = 0.;
-						if(!(noiseImmission==0.)) {
+						if (!(noiseImmission == 0.)) {
 							double costShare = noiseImmissionCalculator.calculateShareOfResultingNoiseImmission(noiseImmission, resultingNoiseImmission);
-							costs = costShare * receiverPointId2timeInterval2damageCost.get(coordId).get(timeInterval);
-							
+							costs = costShare * receiverPointId2timeInterval2damageCost.get(coordId).get(timeInterval);	
 						}
 						noiseLinks2costShare.put(linkId, costs);
 					}
@@ -341,16 +339,14 @@ public class NoiseImmission {
 			for(double timeInterval = NoiseConfigParameters.getIntervalLength() ; timeInterval<=30*3600 ; timeInterval = timeInterval + NoiseConfigParameters.getIntervalLength()) {
 				timeInterval2damageCost.put(timeInterval, 0.);
 			}
-			linkId2timeInterval2damageCost.put(linkId,timeInterval2damageCost);
+			linkId2timeInterval2damageCost.put(linkId, timeInterval2damageCost);
 		}
 
 		for(Id coordId : spatialInfo.getReceiverPointId2Coord().keySet()) {
 			for(Id linkId : spatialInfo.getReceiverPointId2relevantLinkIds().get(coordId)) {
-				for(double timeInterval = NoiseConfigParameters.getIntervalLength() ; timeInterval<=30*3600 ; timeInterval = timeInterval + NoiseConfigParameters.getIntervalLength()) {
-					if(!((receiverPointId2timeInterval2damageCost.get(coordId).get(timeInterval))==0.)) {
-						double costs = receiverPointIds2timeIntervals2noiseLinks2costShare.get(coordId).get(timeInterval).get(linkId);
-						double sumBefore = linkId2timeInterval2damageCost.get(linkId).get(timeInterval);
-						double sumNew = sumBefore + costs;
+				for(double timeInterval = NoiseConfigParameters.getIntervalLength() ; timeInterval <= 30 * 3600 ; timeInterval = timeInterval + NoiseConfigParameters.getIntervalLength()) {
+					if(!((receiverPointId2timeInterval2damageCost.get(coordId).get(timeInterval)) == 0.)) {
+						double sumNew = linkId2timeInterval2damageCost.get(linkId).get(timeInterval) + receiverPointIds2timeIntervals2noiseLinks2costShare.get(coordId).get(timeInterval).get(linkId);
 						linkId2timeInterval2damageCost.get(linkId).put(timeInterval, sumNew);
 					}
 				}
@@ -384,12 +380,13 @@ public class NoiseImmission {
 				double shareCar = 0.;
 				double shareHdv = 0.;
 				
-				if((nCar>0)||(nHdv>0)) {
-					shareCar = ((nCar * Math.pow(10, 0.1*lCar)) / ((nCar * Math.pow(10, 0.1*lCar))+(nHdv * Math.pow(10, 0.1*lHdv))));
-					shareHdv = ((nHdv * Math.pow(10, 0.1*lHdv)) / ((nCar * Math.pow(10, 0.1*lCar))+(nHdv * Math.pow(10, 0.1*lHdv))));
-					if((!(((shareCar+shareHdv)>0.999)&&((shareCar+shareHdv)<1.001)))) {
-						
-						log.warn("The sum of shareCar and shareHdv is not equal to 1.0! The value is "+(shareCar+shareHdv));
+				if ((nCar > 0) || (nHdv > 0)) {
+					
+					shareCar = ((nCar * Math.pow(10, 0.1 * lCar)) / ((nCar * Math.pow(10, 0.1 * lCar)) + (nHdv * Math.pow(10, 0.1 * lHdv))));
+					shareHdv = ((nHdv * Math.pow(10, 0.1 * lHdv)) / ((nCar * Math.pow(10, 0.1 * lCar)) + (nHdv * Math.pow(10, 0.1 * lHdv))));
+					
+					if ((!(((shareCar + shareHdv) > 0.999) && ((shareCar + shareHdv) < 1.001)))) {
+						log.warn("The sum of the car share and hdv share is not equal to 1.0! The value is " + (shareCar + shareHdv));
 					}
 				}
 				double damageCostSumCar = shareCar * damageCostSum;
@@ -472,16 +469,14 @@ public class NoiseImmission {
 					
 					for (double timeInterval = NoiseConfigParameters.getIntervalLength() ; timeInterval <= 30 * 3600. ; timeInterval = timeInterval + NoiseConfigParameters.getIntervalLength()) {
 						double factor = receiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType.get(receiverPointId).get(timeInterval).get(personId).get(actNumber).getFirst();
-						
-						if (!(factor==0.)) {
-							double time = timeInterval;
-							Id agentId = personId;
+						if (!(factor == 0.)) {
+							
 							String actType = receiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType.get(receiverPointId).get(timeInterval).get(personId).get(actNumber).getSecond();
 							
 							double costPerUnit = receiverPointId2timeInterval2damageCostPerAffectedAgentUnit.get(receiverPointId).get(timeInterval);
 							double amount = factor * costPerUnit;
 							
-							NoiseEventAffected noiseEventAffected = new NoiseEventAffected(time,agentId,amount,receiverPointId,actType);
+							NoiseEventAffected noiseEventAffected = new NoiseEventAffected(timeInterval,personId,amount,receiverPointId,actType);
 							events.processEvent(noiseEventAffected);
 							this.noiseEventsAffected.add(noiseEventAffected);
 							totalTollAffected = totalTollAffected + amount;

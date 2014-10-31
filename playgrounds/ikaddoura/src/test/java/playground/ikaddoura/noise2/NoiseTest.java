@@ -53,7 +53,6 @@ public class NoiseTest {
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 	
 	// Tests the NoisSpatialInfo functionality separately for each function
-	@Ignore
 	@Test
 	public final void test1(){
 		
@@ -125,7 +124,7 @@ public class NoiseTest {
 		Assert.assertEquals("wrong immission angle correction for receiver point 8 and link0", immissionCorrection4, noiseSpatialInfo.getReceiverPointId2relevantLinkId2correctionTermAngle().get(new IdImpl("8")).get(new IdImpl("link0")), MatsimTestUtils.EPSILON);
 	}
 	
-	// tests the noise emission and immission
+	// tests the noise emission, immission and exposures
 	@Test
 	public final void test2(){
 		
@@ -247,39 +246,62 @@ public class NoiseTest {
 			
 		// ++++++++++++++++++++++++++++++++++++++++++ exposures ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 		
-		// translate immission into costs taking into account the number of affected agents
+		// test the translation of immission into total damage costs for all affected agents per receiver point
 		double lautheitsgewicht = Math.pow(2.0 , 0.1 * (immissionRP16 - 50));
 		double laermEinwohnerGleichwert = lautheitsgewicht * noiseControlerListener.getPersonActivityTracker().getReceiverPointId2timeInterval2affectedAgentUnits().get(new IdImpl("16")).get(11 * 3600.);
 		double annualCostRate = (85.0/(1.95583)) * (Math.pow(1.02, (2014-1995)));
-		double damageCosts = (annualCostRate * laermEinwohnerGleichwert/(365))*(1.0/24.0);
-		Assert.assertEquals("wrong damage costs", damageCosts, noiseControlerListener.getNoiseImmission().getReceiverPointId2timeInterval2damageCost().get(new IdImpl("16")).get(11 * 3600.), MatsimTestUtils.EPSILON);
+		double damageCostsRP16 = (annualCostRate * laermEinwohnerGleichwert/(365))*(1.0/24.0); // = 0.0664164095284536
+		Assert.assertEquals("wrong damage costs", damageCostsRP16, noiseControlerListener.getNoiseImmission().getReceiverPointId2timeInterval2damageCost().get(new IdImpl("16")).get(11 * 3600.), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("wrong damage costs", 0., noiseControlerListener.getNoiseImmission().getReceiverPointId2timeInterval2damageCost().get(new IdImpl("0")).get(11 * 3600.), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("wrong damage costs", 0., noiseControlerListener.getNoiseImmission().getReceiverPointId2timeInterval2damageCost().get(new IdImpl("16")).get(12 * 3600.), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("wrong damage costs", 0., noiseControlerListener.getNoiseImmission().getReceiverPointId2timeInterval2damageCost().get(new IdImpl("16")).get(10 * 3600.), MatsimTestUtils.EPSILON);
-
-		double laermEinwohnerGleichwertAffectedAgentUnit = lautheitsgewicht * 1.;
-		double damageCostsAffectedAgentUnit = (annualCostRate * laermEinwohnerGleichwertAffectedAgentUnit/(365))*(1.0/24.0);		
-		Assert.assertEquals("wrong damage cost  per affected agent unit", damageCostsAffectedAgentUnit, noiseControlerListener.getNoiseImmission().getReceiverPointId2timeInterval2damageCostPerAffectedAgentUnit().get(new IdImpl("16")).get(11 * 3600.), MatsimTestUtils.EPSILON);
-
 		
-		for (NoiseEventAffected event : noiseControlerListener.getNoiseImmission().getNoiseEventsAffected()){
-			System.out.println(event);
+		double laermEinwohnerGleichwertAffectedAgentUnit = lautheitsgewicht * 1.;
+		double damageCostsPerAffectedAgentUnitRP16 = (annualCostRate * laermEinwohnerGleichwertAffectedAgentUnit/(365))*(1.0/24.0);		
+		Assert.assertEquals("wrong damage cost per affected agent unit", damageCostsPerAffectedAgentUnitRP16, noiseControlerListener.getNoiseImmission().getReceiverPointId2timeInterval2damageCostPerAffectedAgentUnit().get(new IdImpl("16")).get(11 * 3600.), MatsimTestUtils.EPSILON);
+	
+		// test the right allocation of total damage cost per receiver point to affected person
+		double allocatedExposuresAffectedPersons = 0.;
+		for (NoiseEventAffected event : noiseControlerListener.getNoiseImmission().getNoiseEventsAffected()) {
+			
+			if (event.getrReceiverPointId().toString().equals("16")) {
+				allocatedExposuresAffectedPersons = allocatedExposuresAffectedPersons + event.getAmount();
+
+				if (event.getTime() == 11. * 3600. && event.getAffectedAgentId().toString().equals("person_car_test3")) {
+					// this agent is affected the entire time interval
+					Assert.assertEquals("wrong noise exposure allocation to affected agents", damageCostsPerAffectedAgentUnitRP16 * 1., event.getAmount(), MatsimTestUtils.EPSILON);
+				}
+				if (event.getTime() == 11. * 3600. && event.getAffectedAgentId().toString().equals("person_car_test1")) {
+					// this agent is not affected for the duration of the entire time interval
+					Assert.assertEquals("wrong noise exposure allocation to affected agents", damageCostsPerAffectedAgentUnitRP16 * noiseControlerListener.getPersonActivityTracker().getReceiverPointId2timeInterval2personId2actNumber2affectedAgentUnitsAndActType().get(new IdImpl("16")).get(11 * 3600.).get(new IdImpl("person_car_test1")).get(2).getFirst(), event.getAmount(), MatsimTestUtils.EPSILON);
+				}
+			}
 		}
-		noiseControlerListener.getNoiseImmission().getNoiseEventsAffected();
+		Assert.assertEquals("difference between total damage costs (per receiver point) and sum of allocated damage (per person)", damageCostsRP16, allocatedExposuresAffectedPersons, MatsimTestUtils.EPSILON);
 
-		noiseControlerListener.getNoiseImmission().getLinkId2timeInterval2damageCost();
-		noiseControlerListener.getNoiseImmission().getLinkId2timeInterval2damageCostPerCar();
-		noiseControlerListener.getNoiseImmission().getLinkId2timeInterval2damageCostPerHdvVehicle();
+		// test the right allocation of total damage cost per receiver point to the relevant links
+		// linkB5 should be zero
+		Assert.assertEquals("wrong allocation of total damage cost at the receiver point to links", 0., noiseControlerListener.getNoiseImmission().getLinkId2timeInterval2damageCost().get(new IdImpl("linkB5")).get(11 * 3600.), MatsimTestUtils.EPSILON);
+		// linkA5
+		Assert.assertEquals("wrong allocation of total damage cost at the receiver point to links", Math.pow(((Math.pow(10, (0.05 * immissionFromLinkA5))) / (Math.pow(10, (0.05 * immissionRP16)))), 2)  * damageCostsRP16, noiseControlerListener.getNoiseImmission().getLinkId2timeInterval2damageCost().get(new IdImpl("linkA5")).get(11 * 3600.), MatsimTestUtils.EPSILON);
+		// link2
+		Assert.assertEquals("wrong allocation of total damage cost at the receiver point to links", Math.pow(((Math.pow(10, (0.05 * noiseControlerListener.getNoiseImmission().getReceiverPointIds2timeIntervals2noiseLinks2isolatedImmission().get(new IdImpl("16")).get(11 * 3600.).get(new IdImpl("link2"))))) / (Math.pow(10, (0.05 * immissionRP16)))), 2)  * damageCostsRP16, noiseControlerListener.getNoiseImmission().getLinkId2timeInterval2damageCost().get(new IdImpl("link2")).get(11 * 3600.), MatsimTestUtils.EPSILON);
 
+		double allocatedExposuresLinks = noiseControlerListener.getNoiseImmission().getLinkId2timeInterval2damageCost().get(new IdImpl("linkB5")).get(11 * 3600.)
+				+ noiseControlerListener.getNoiseImmission().getLinkId2timeInterval2damageCost().get(new IdImpl("linkA5")).get(11 * 3600.)
+				+ noiseControlerListener.getNoiseImmission().getLinkId2timeInterval2damageCost().get(new IdImpl("link2")).get(11 * 3600.);
+		Assert.assertEquals("wrong noise exposure allocation to links", allocatedExposuresLinks, damageCostsRP16, MatsimTestUtils.EPSILON);
+	
+		// test the right allocation of link damage costs to vehicle types
+		// here there are no hdv, that is, the damage costs are allocated among all cars, here agent 1 and agent 2
+		Assert.assertEquals("wrong cost per car for the given link and time interval", noiseControlerListener.getNoiseImmission().getLinkId2timeInterval2damageCost().get(new IdImpl("linkA5")).get(11 * 3600.) / 2., noiseControlerListener.getNoiseImmission().getLinkId2timeInterval2damageCostPerCar().get(new IdImpl("linkA5")).get(11 * 3600.), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("wrong cost per hdv for the given link and time interval", 0., noiseControlerListener.getNoiseImmission().getLinkId2timeInterval2damageCostPerHdvVehicle().get(new IdImpl("linkA5")).get(11 * 3600.), MatsimTestUtils.EPSILON);
 		
 		for (NoiseEventCaused event : noiseControlerListener.getNoiseImmission().getNoiseEvents()){
-			System.out.println(event);
-		}
-		noiseControlerListener.getNoiseImmission().getNoiseEvents();
-		
-		
+			if (event.getTime() == 11 * 3600. && event.getLinkId().toString().equals(new IdImpl("linkA5"))) {
+				Assert.assertEquals("wrong cost per car for the given link and time interval", noiseControlerListener.getNoiseImmission().getLinkId2timeInterval2damageCost().get(new IdImpl("linkA5")).get(11 * 3600.) / 2., event.getAmount(), MatsimTestUtils.EPSILON);
+			}
+		}		
 		
 	 }
-	
-	
 }
