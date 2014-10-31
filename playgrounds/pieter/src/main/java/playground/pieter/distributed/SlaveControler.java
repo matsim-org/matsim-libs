@@ -39,6 +39,7 @@ import java.util.*;
 //IMPORTANT: PSim produces events that are not in chronological order. This controler
 // will require serious overhaul if chronological order is enforced in all event manager implementations
 public class SlaveControler implements IterationStartsListener {
+    private final FastDijkstraFactoryWithCustomTravelTimes refreshableDijkstra;
     private  boolean initialRouting;
     private final Logger slaveLogger;
     private final int myNumber;
@@ -58,6 +59,7 @@ public class SlaveControler implements IterationStartsListener {
     private List<Long> iterationTimes = new ArrayList<>();
     private long lastIterationStartTime;
     private boolean loadBalance;
+    private boolean somethingWentWrong = false;
 
     private SlaveControler(String[] args) throws IOException, ClassNotFoundException, ParseException {
         lastIterationStartTime = System.currentTimeMillis();
@@ -122,11 +124,6 @@ public class SlaveControler implements IterationStartsListener {
         initialRouting = reader.readBoolean();
         slaveLogger.warn("Performing initial routing.");
 
-        List<String> idStrings = (List<String>) reader.readObject();
-        slaveLogger.warn("RECEIVED agent ids for removal from master.");
-//      The following line will make the controler use the events manager that doesn't check for event order
-        config.parallelEventHandling().setSynchronizeOnSimSteps(false);
-        //if you don't set the number of threads, org.matsim.core.events.EventsUtils will just use the simstepmanager
         int numThreadsForEventsHandling = 1;
         if (commandLine.hasOption("t"))
             try {
@@ -142,11 +139,22 @@ public class SlaveControler implements IterationStartsListener {
         config.parallelEventHandling().setNumberOfThreads(numThreadsForEventsHandling);
         config.controler().setOutputDirectory(config.controler().getOutputDirectory() + "_" + myNumber);
         Scenario scenario = ScenarioUtils.loadScenario(config);
+
+        List<String> idStrings = (List<String>) reader.readObject();
+        slaveLogger.warn("RECEIVED agent ids for removal from master.");
+//      The following line will make the controler use the events manager that doesn't check for event order
+        config.parallelEventHandling().setSynchronizeOnSimSteps(false);
+        //if you don't set the number of threads, org.matsim.core.events.EventsUtils will just use the simstepmanager
         matsimControler = new Controler(scenario);
         removeNonSimulatedAgents(idStrings);
         matsimControler.setOverwriteFiles(true);
         matsimControler.setCreateGraphs(false);
         matsimControler.addControlerListener(this);
+
+        //override the LeastCostPathCalculatorFactory set in the config with one that can be customized
+        //with travel times from the master
+        refreshableDijkstra = new FastDijkstraFactoryWithCustomTravelTimes();
+        matsimControler.setLeastCostPathCalculatorFactory(refreshableDijkstra);
 //        new Thread(new TimesReceiver()).start();
         if (config.scenario().isUseTransit()) {
 
@@ -158,6 +166,8 @@ public class SlaveControler implements IterationStartsListener {
                     config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config
                     .qsim().getEndTime() - config.qsim().getStartTime())).getWaitTimes();
 
+            //tell PlanSerializable to record transit routes
+            PlanSerializable.isUseTransit=true;
         }
         if (commandLine.hasOption("s")) {
             slaveLogger.warn("Singapore scenario: Doing events-based transit routing.");
@@ -189,6 +199,9 @@ public class SlaveControler implements IterationStartsListener {
             //the singapore scoring function
             matsimControler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(config.planCalcScore(), scenario));
         }
+        //no use for this, if you don't exactly know the state of population when something goes wrong.
+        // better to have plans written out every n successful iterations, specified in the config
+        matsimControler.setDumpDataAtEnd(false);
     }
 
     public static void main(String[] args) throws IOException, ClassNotFoundException, ParseException {
@@ -210,6 +223,8 @@ public class SlaveControler implements IterationStartsListener {
         if (initialRouting || (numberOfIterations > 0 && numberOfIterations % numberOfPSimIterations == 0)) {
             this.totalIterationTime = getTotalIterationTime();
             communications();
+            if(somethingWentWrong)
+                Runtime.getRuntime().halt(0);
             if (loadBalance) {
                 slaveLogger.warn("Load balancing complete on all slaves.");
                 iterationTimes = new ArrayList<>();
@@ -222,8 +237,10 @@ public class SlaveControler implements IterationStartsListener {
 //        pSimFactory = new PSimFactory();
         if (linkTravelTimes == null)
             pSimFactory.setTravelTime(matsimControler.getLinkTravelTimes());
-        else
+        else {
             pSimFactory.setTravelTime(linkTravelTimes);
+            refreshableDijkstra.setTravelTime(linkTravelTimes);
+        }
         if (config.scenario().isUseTransit()) {
             pSimFactory.setStopStopTime(stopStopTimes);
             pSimFactory.setWaitTime(waitTimes);
@@ -295,7 +312,8 @@ public class SlaveControler implements IterationStartsListener {
             res = reader.readBoolean();
         } catch (IOException e) {
             slaveLogger.error("Master terminated. Exiting.");
-            throw new RuntimeException();
+            somethingWentWrong = true;
+            return;
         }
         try {
             if (res) {
@@ -322,7 +340,8 @@ public class SlaveControler implements IterationStartsListener {
                 slaveLogger.warn("Sending completed.");
             } else {
                 slaveLogger.error("Master terminated. Exiting.");
-                throw new RuntimeException();
+                somethingWentWrong=true;
+                return;
             }
             loadBalance = reader.readBoolean();
             if (loadBalance) {
@@ -348,7 +367,7 @@ public class SlaveControler implements IterationStartsListener {
         } catch (ClassNotFoundException | IOException e) {
             e.printStackTrace();
             slaveLogger.error("Something went wrong. Exiting.");
-            throw new RuntimeException();
+            somethingWentWrong=true;
         }
 
     }

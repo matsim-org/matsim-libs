@@ -152,6 +152,8 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
                     config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.qsim()
                     .getEndTime() - config.qsim().getStartTime()));
             matsimControler.getEvents().addHandler(stopStopTimeCalculator);
+            //tell PlanSerializable to record transit routes
+            PlanSerializable.isUseTransit=true;
         }
 
         matsimControler.addPlanStrategyFactory("ReplacePlanFromSlave", new ReplacePlanFromSlaveFactory(newPlans));
@@ -367,13 +369,13 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     public void notifyStartup(StartupEvent event) {
         if (initialRouing) {
             notifyAfterMobsim(new AfterMobsimEvent(matsimControler, 0));
-        }
-        for(Person person:matsimControler.getPopulation().getPersons().values()){
-            person.removePlan(person.getSelectedPlan());
-            Plan plan = newPlans.get(person.getId().toString());
-            person.addPlan(plan);
-            person.setSelectedPlan(plan);
-
+            //this code is a copy of the replanning strategy
+            for(Person person:matsimControler.getPopulation().getPersons().values()){
+                person.removePlan(person.getSelectedPlan());
+                Plan plan = newPlans.get(person.getId().toString());
+                person.addPlan(plan);
+                person.setSelectedPlan(plan);
+            }
         }
     }
 

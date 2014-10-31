@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 class PlanSerializable implements Serializable {
+    public static boolean isUseTransit=false;
 	private interface PlanElementSerializable extends Serializable {
 
 	}
@@ -165,10 +166,10 @@ class PlanSerializable implements Serializable {
 			GenericRoute route;
             Id<Link> startLinkId = Id.createLinkId(startLinkIdString);
             Id<Link> endLinkId = Id.createLinkId(endLinkIdString);
-            if(!mode.equals(TransportMode.pt)){
-				route = new GenericRouteImpl(startLinkId, endLinkId);
-			}else{
+            if(mode.equals(TransportMode.pt) && isUseTransit){
 				route = (GenericRoute) new ExperimentalTransitRouteFactory().createRoute(startLinkId, endLinkId);
+			}else{
+				route = new GenericRouteImpl(startLinkId, endLinkId);
 			}
 			route.setDistance(distance);
 			route.setTravelTime(travelTime);
