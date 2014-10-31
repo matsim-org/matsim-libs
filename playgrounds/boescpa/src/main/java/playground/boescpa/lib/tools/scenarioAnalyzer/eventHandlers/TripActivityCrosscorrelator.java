@@ -169,36 +169,46 @@ public class TripActivityCrosscorrelator implements ScenarioAnalyzerEventHandler
 	}
 
 	private void addCount(int mode, int act) {
-		int counter = this.counts.get(mode).get(act);
-		counter += scaleFactor; // = oneOccurence * scaleFactor = 1 * scaleFactor
-		this.counts.get(mode).set(act, counter);
+		if (mode >= 0 && act >= 0) {
+			int counter = this.counts.get(mode).get(act);
+			counter += scaleFactor; // = oneOccurence * scaleFactor = 1 * scaleFactor
+			this.counts.get(mode).set(act, counter);
+		}
 	}
 
 	private int getMode(String mode) {
-		int modeResult = this.modes.indexOf(mode);
-		if (modeResult == -1) {
-			this.modes.add(mode);
-			modeResult = this.modes.indexOf(mode);
-			// add the new mode to the count fields:
-			this.counts.add(new ArrayList<Integer>());
-			for (int i = 0; i < this.activities.size(); i++) {
-				this.counts.get(this.modes.size()-1).add(0);
+		if (mode != null) {
+			int modeResult = this.modes.indexOf(mode);
+			if (modeResult == -1) {
+				this.modes.add(mode);
+				modeResult = this.modes.indexOf(mode);
+				// add the new mode to the count fields:
+				this.counts.add(new ArrayList<Integer>());
+				for (int i = 0; i < this.activities.size(); i++) {
+					this.counts.get(this.modes.size() - 1).add(0);
+				}
 			}
+			return modeResult;
+		} else {
+			return -1;
 		}
-		return modeResult;
 	}
 
 	private int getActivity(String activity) {
-		String act = activity.substring(0,1);
-		int activityResult = this.activities.indexOf(act);
-		if (activityResult == -1) {
-			this.activities.add(act);
-			activityResult = this.activities.indexOf(act);
-			// add the new activity to the count fields:
-			for (List<Integer> l : this.counts) {
-				l.add(0);
+		if (activity != null) {
+			String act = activity.substring(0,1);
+			int activityResult = this.activities.indexOf(act);
+			if (activityResult == -1) {
+				this.activities.add(act);
+				activityResult = this.activities.indexOf(act);
+				// add the new activity to the count fields:
+				for (List<Integer> l : this.counts) {
+					l.add(0);
+				}
 			}
+			return activityResult;
+		} else {
+			return -1;
 		}
-		return activityResult;
 	}
 }
