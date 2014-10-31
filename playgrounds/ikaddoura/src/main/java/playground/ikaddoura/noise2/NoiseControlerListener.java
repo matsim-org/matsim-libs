@@ -41,7 +41,7 @@ public class NoiseControlerListener implements AfterMobsimListener , IterationEn
 
 	// ##############################################################################
 	
-	final double annualCostRate = (85.0/(1.95583)) * (Math.pow(1.02, (2014-1995)));
+	final double annualCostRate = NoiseConfigParameters.getAnnualCostRate();
 
 	// ##############################################################################
 

@@ -26,18 +26,23 @@ package playground.ikaddoura.noise2;
 
 public class NoiseConfigParameters {
 	
+	public static double getAnnualCostRate(){
+		final double annualCostRate = (85.0/(1.95583)) * (Math.pow(1.02, (2014-1995)));
+		return annualCostRate;
+	}
+	
 	public static double getTimeBinSizeNoiseComputation(){
-		double timeBinSize = 3600.0;
+		final double timeBinSize = 3600.0;
 		return timeBinSize;
 	}
 	
 	public static double getTimeBinSizeRouter(){
-		double timeBinSize = 3600.0;
+		final double timeBinSize = 3600.0;
 		return timeBinSize;
 	}
 	
 	public static double getScaleFactor(){
-		double scaleFactor = 1.;
+		final double scaleFactor = 1.;
 		return scaleFactor;
 	}
 	
