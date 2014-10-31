@@ -64,7 +64,7 @@ public class ActivityType2ActivityDurationDistribution {
 		this.userGroup = userGroup.toString();
 		ActivityType2DurationHandler.log.warn("Result will consider persons from "+this.userGroup+" sub population group.");
 	}
-	
+
 	private ActivityType2ActDurationsAnalyzer actDurAnalyzer;
 	private List<Integer> timeClasses;
 	private Map<Id<Person>, Map<String, List<Double>>> personId2ActDurations;
@@ -87,20 +87,20 @@ public class ActivityType2ActivityDurationDistribution {
 	}
 
 	public void init(String runCase){
-		
+
 		actDurAnalyzer = new ActivityType2ActDurationsAnalyzer(outputDir+runCase);
 		actDurAnalyzer.preProcessData();
 		actDurAnalyzer.postProcessData();
 		personId2ActDurations = actDurAnalyzer.getPersonId2ActivityType2ActivityDurations();
-		
+
 		String outputConfig = outputDir+runCase+"/output_config.xml";
 		simEndTime = LoadMyScenarios.getSimulationEndTime(outputConfig);
-		
+
 		timeClasses = new ArrayList<Integer>();
 		initializeTimeClasses();
-		
+
 		getActType2ActDurationDistributionData();
-		
+
 		writeResults(outputDir+runCase+"/analysis/");
 		writeTypicalAndMinimumActivityDurations(outputConfig, runCase);
 	}
@@ -176,8 +176,10 @@ public class ActivityType2ActivityDurationDistribution {
 
 		PersonFilter pf = new PersonFilter();
 		for(Id<Person> id : personId2ActDurations.keySet()){
-			if(sortPersons && pf.isPersonIdFromUserGroup(id, UserGroup.valueOf(userGroup))){
-				storeData(id);
+			if(sortPersons ){
+				if(pf.isPersonIdFromUserGroup(id, UserGroup.valueOf(userGroup))){
+					storeData(id);
+				}
 			} else {
 				storeData(id);
 			}

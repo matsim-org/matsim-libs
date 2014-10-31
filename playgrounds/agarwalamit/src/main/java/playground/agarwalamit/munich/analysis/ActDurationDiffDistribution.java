@@ -88,7 +88,7 @@ public class ActDurationDiffDistribution {
 		String bau = "baseCaseCtd";
 		String runCases [] = {"ei","ci","eci"};
 		for(String runCase:runCases){
-			new ActDurationDiffDistribution(outputDir,bau,UserGroup.URBAN).run(runCase);
+			new ActDurationDiffDistribution(outputDir,bau).run(runCase);
 		}
 	}
 
@@ -214,8 +214,10 @@ public class ActDurationDiffDistribution {
 
 		PersonFilter pf = new PersonFilter();
 		for(Id<Person> id : personId2ActDurationDiff.keySet()){
-			if(sortPersons && pf.isPersonIdFromUserGroup(id, UserGroup.valueOf(userGroup))){
-				storeData(id);
+			if(sortPersons ){
+				if(pf.isPersonIdFromUserGroup(id, UserGroup.valueOf(userGroup))){
+					storeData(id);
+				}
 			} else {
 				storeData(id);
 			}

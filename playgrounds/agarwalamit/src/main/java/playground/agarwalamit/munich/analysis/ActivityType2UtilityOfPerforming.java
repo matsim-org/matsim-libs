@@ -78,7 +78,7 @@ public class ActivityType2UtilityOfPerforming {
 	public static void main(String[] args) {
 		String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/";
 		String [] runCases = { "baseCaseCtd","ei","ci","eci"};
-		new ActivityType2UtilityOfPerforming(outputDir).run(runCases);
+		new ActivityType2UtilityOfPerforming(outputDir,UserGroup.URBAN).run(runCases);
 	}
 
 	public void run(String [] runCases){
@@ -182,16 +182,18 @@ public class ActivityType2UtilityOfPerforming {
 		personId2Act2UtilPerfor = new HashMap<>();
 		PersonFilter pf = new PersonFilter();
 		for(Id<Person> id :personId2ActDurations.keySet()){
-			if(sortPersons && pf.isPersonIdFromUserGroup(id, UserGroup.valueOf(userGroup))){
-				StoreData(id);
+			if(sortPersons ){
+				if(pf.isPersonIdFromUserGroup(id, UserGroup.valueOf(userGroup))){
+					storeData(id);
+				}
 			} else {
-				StoreData(id);
+				storeData(id);
 			}
 		}
 		return personId2Act2UtilPerfor;
 	}
 
-	private void StoreData(Id<Person> id) {
+	private void storeData(Id<Person> id) {
 		Map<String, Double> act2UtilPerform = new HashMap<>();
 		for (String act :personId2ActDurations.get(id).keySet()){
 			double sum =0;
