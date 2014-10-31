@@ -322,14 +322,14 @@ public class Matsim2030Utils {
 
 			// use links of activities to locate facilities
 			for ( Activity act : TripStructureUtils.getActivities( person.getSelectedPlan(), stages ) ) {
-				final Id linkId = act.getLinkId();
+				final Id<Link> linkId = act.getLinkId();
 				if ( !sc.getNetwork().getLinks().containsKey( linkId ) ) {
 					throw new RuntimeException( "There is no link "+linkId+
 							" in the car part of the network, but activity "+act+
 							" for "+person+
 							" is there. Might be a PT link, which is wrong. Check your initial plans!" );
 				}
-				final Id facilityId = act.getFacilityId();
+				final Id<ActivityFacility> facilityId = act.getFacilityId();
 
 				final ActivityFacility fac = sc.getActivityFacilities().getFacilities().get( facilityId );
 				if ( fac.getLinkId() == null ) ((ActivityFacilityImpl) fac).setLinkId( linkId );
@@ -355,8 +355,8 @@ public class Matsim2030Utils {
 
 		for (Link link : fullNetwork.getLinks().values()) {
 			if ( link.getAllowedModes().containsAll( modes ) ) {
-				final Id fromId = link.getFromNode().getId();
-				final Id toId = link.getToNode().getId();
+				final Id<Node> fromId = link.getFromNode().getId();
+				final Id<Node> toId = link.getToNode().getId();
 
 				Node fromNode2 = subNetwork.getNodes().get(fromId);
 				Node toNode2 = subNetwork.getNodes().get(toId);
