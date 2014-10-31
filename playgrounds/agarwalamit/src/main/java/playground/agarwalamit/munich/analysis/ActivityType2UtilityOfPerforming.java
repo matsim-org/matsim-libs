@@ -29,6 +29,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.scoring.functions.CharyparNagelScoringUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.agarwalamit.analysis.ActivityType2ActDurationsAnalyzer;
@@ -48,7 +50,6 @@ public class ActivityType2UtilityOfPerforming {
 	 * Use this to get distribution for whole population
 	 */
 	public ActivityType2UtilityOfPerforming(String outputDir) {
-		ActivityType2DurationHandler.log.warn("This will return correct results only if priorities for all activities are same.");
 		this.outputDir = outputDir;
 		this.sortPersons = false;
 		this.userGroup = "";
@@ -59,7 +60,6 @@ public class ActivityType2UtilityOfPerforming {
 	 * @param userGroup for which distribution is required
 	 */
 	public ActivityType2UtilityOfPerforming(String outputDir, UserGroup userGroup) {
-		ActivityType2DurationHandler.log.warn("This will return correct results only if priorities for all activities are same.");
 		this.outputDir = outputDir;
 		this.sortPersons = true;
 		this.userGroup = userGroup.toString();
@@ -73,7 +73,9 @@ public class ActivityType2UtilityOfPerforming {
 	private String userGroup;
 	private double marginalUtil_performing;
 	private SortedMap<String, Double> act2TypDur;
+	private SortedMap<String, Double> act2Priority;
 	private Map<Id<Person>,Map<String, Double>> personId2Act2UtilPerfor;
+	private int wrnCnt =0;
 
 	public static void main(String[] args) {
 		String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/";
@@ -109,9 +111,11 @@ public class ActivityType2UtilityOfPerforming {
 
 		marginalUtil_performing = config.planCalcScore().getPerforming_utils_hr()/3600;
 		act2TypDur = new TreeMap<>();
+		act2Priority = new TreeMap<>();
 
 		for (String actTyp :config.planCalcScore().getActivityTypes()){
 			act2TypDur.put(actTyp, config.planCalcScore().getActivityParams(actTyp).getTypicalDuration());
+			act2Priority.put(actTyp, config.planCalcScore().getActivityParams(actTyp).getPriority());
 		}
 	}
 
@@ -198,9 +202,10 @@ public class ActivityType2UtilityOfPerforming {
 		for (String act :personId2ActDurations.get(id).keySet()){
 			double sum =0;
 			double typDur = act2TypDur.get(act);
+			double actPriority = act2Priority.get(act);
 			for(double dur:personId2ActDurations.get(id).get(act)){
 				if(dur!=0){
-					double util = getUtilityOfPerforming(typDur, dur);
+					double util = getUtilityOfPerforming(typDur, dur, actPriority);
 					sum = sum+util;
 				}
 			}
@@ -216,14 +221,40 @@ public class ActivityType2UtilityOfPerforming {
 	/**
 	 * @param typDuration
 	 * @param actualDuration
-	 * @return util_performing; true value only if all activities have same priorities
+	 * @return util_performing; 
 	 */
-	private double getUtilityOfPerforming(double typDuration, double actualDuration){
-		if(typDuration==0) throw new RuntimeException("Typical duration is zero. Aborting...");
-		double util = 10 *marginalUtil_performing + marginalUtil_performing*typDuration*Math.log((actualDuration/typDuration));
-		if(!(util > Double.NEGATIVE_INFINITY && util<Double.POSITIVE_INFINITY))
-			throw new RuntimeException("Utility of performing is "+util+". Aborting ...");
-		return util;
+	private double getUtilityOfPerforming(double typicalDuration_s, double duration_s, double priority){
+		double utilPerf;
+		double zeroUtilDuration_s = CharyparNagelScoringUtils.computeZeroUtilityDuration(priority, typicalDuration_s);
+		
+		if ( duration_s >= zeroUtilDuration_s ) {
+			 utilPerf = marginalUtil_performing * typicalDuration_s
+					* Math.log((duration_s/zeroUtilDuration_s));
+		} else {
+			if ( wrnCnt < 1 ) {
+				wrnCnt++ ;
+				ActivityType2DurationHandler.log.warn("encountering duration < zeroUtilityDuration; the logic for this was changed around mid-nov 2013.") ;
+				ActivityType2DurationHandler.log.warn( "your final score thus will be different from earlier runs; set usingOldScoringBelowZeroUtilityDuration to true if you "
+						+ "absolutely need the old version.  See https://matsim.atlassian.net/browse/MATSIM-191." );
+				ActivityType2DurationHandler.log.warn( Gbl.ONLYONCE ) ;
+			}
+			
+			// below zeroUtilityDuration, we linearly extend the slope ...:
+			double slopeAtZeroUtility =marginalUtil_performing* typicalDuration_s / ( zeroUtilDuration_s ) ;
+			if ( slopeAtZeroUtility < 0. ) {
+				// (beta_perf might be = 0)
+				System.err.println("beta_perf: " + marginalUtil_performing);
+				System.err.println("typicalDuration: " + typicalDuration_s );
+				System.err.println( "zero utl duration in sec: " + zeroUtilDuration_s );
+				throw new RuntimeException( "slope at zero utility < 0.; this should not happen ...");
+			}
+			double durationUnderrun = zeroUtilDuration_s - duration_s ;
+			if ( durationUnderrun < 0. ) {
+				throw new RuntimeException( "durationUnderrun < 0; this should not happen ...") ;
+			}
+			utilPerf = - slopeAtZeroUtility * durationUnderrun ;
+		}
+		return utilPerf;
 	}
 
 }
