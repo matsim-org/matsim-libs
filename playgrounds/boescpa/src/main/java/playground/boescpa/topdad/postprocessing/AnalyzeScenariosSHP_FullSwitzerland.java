@@ -22,27 +22,46 @@
 package playground.boescpa.topdad.postprocessing;
 
 import org.matsim.api.core.v01.network.Network;
+import playground.boescpa.lib.tools.networkModification.NetworkUtils;
 import playground.boescpa.lib.tools.scenarioAnalyzer.ScenarioAnalyzer;
 import playground.boescpa.lib.tools.scenarioAnalyzer.eventHandlers.AgentCounter;
 import playground.boescpa.lib.tools.scenarioAnalyzer.eventHandlers.ScenarioAnalyzerEventHandler;
 import playground.boescpa.lib.tools.scenarioAnalyzer.eventHandlers.TripActivityCrosscorrelator;
 import playground.boescpa.lib.tools.scenarioAnalyzer.eventHandlers.TripAnalyzer;
-import playground.boescpa.lib.tools.scenarioAnalyzer.spatialEventCutters.CirclePointCutter;
+import playground.boescpa.lib.tools.scenarioAnalyzer.spatialEventCutters.SHPFileCutter;
 import playground.boescpa.lib.tools.scenarioAnalyzer.spatialEventCutters.SpatialEventCutter;
-import playground.boescpa.lib.tools.networkModification.NetworkUtils;
 
 /**
  * Analyzes events file from ToPDAd-Simulations...
  *
  * @author boescpa
  */
-public class AnalyzeScenarios {
+public class AnalyzeScenariosSHP_FullSwitzerland {
 
 	public static void main(String[] args) {
-		Network network = NetworkUtils.readNetwork(args[0]);
+
 		int scaleFactor = 10;
 
-		for (int i = 1; i < args.length; i++) {
+		Network network = NetworkUtils.readNetwork(args[0]);
+
+		String shpZurichPath = args[1];
+		String shpGenevaPath = args[2];
+		String shpLausannePath = args[3];
+		String shpBernPath = args[4];
+		String shpBaselPath = args[5];
+		String shpStGallenPath = args[6];
+		String shpLuzernPath = args[7];
+		String shpLuganoPath = args[8];
+		SpatialEventCutter zurichCutter = new SHPFileCutter(shpZurichPath);
+		SpatialEventCutter genevaCutter = new SHPFileCutter(shpGenevaPath);
+		SpatialEventCutter lausanneCutter = new SHPFileCutter(shpLausannePath);
+		SpatialEventCutter bernCutter = new SHPFileCutter(shpBernPath);
+		SpatialEventCutter baselCutter = new SHPFileCutter(shpBaselPath);
+		SpatialEventCutter stGallenCutter = new SHPFileCutter(shpStGallenPath);
+		SpatialEventCutter luzernCutter = new SHPFileCutter(shpLuzernPath);
+		SpatialEventCutter luganoCutter = new SHPFileCutter(shpLuganoPath);
+
+		for (int i = 9; i < args.length; i++) {
 			try {
 				String path2EventFile = args[i];
 
@@ -57,35 +76,25 @@ public class AnalyzeScenarios {
 
 				// Return the results:
 				//	Zurich
-				SpatialEventCutter circlePointCutter = new CirclePointCutter(30000, 683518.0, 246836.0); // 30km around Zurich, Bellevue
-				scenarioAnalyzer.createResults(path2EventFile + "_analysisResults_Zurich.csv", circlePointCutter);
-				/*
+				scenarioAnalyzer.createResults(path2EventFile + "_analysisResults_Zurich.csv", zurichCutter);
 				//	Geneva
-				SpatialEventCutter circlePointCutter = new CirclePointCutter(30000, 683518.0, 246836.0); // 30km around Zurich, Bellevue
-				scenarioAnalyzer.createResults(path2EventFile + "_analysisResults_Geneva.csv", circlePointCutter);
+				scenarioAnalyzer.createResults(path2EventFile + "_analysisResults_Geneva.csv", genevaCutter);
 				//	Lausanne
-				SpatialEventCutter circlePointCutter = new CirclePointCutter(30000, 683518.0, 246836.0); // 30km around Zurich, Bellevue
-				scenarioAnalyzer.createResults(path2EventFile + "_analysisResults_Lausanne.csv", circlePointCutter);
+				scenarioAnalyzer.createResults(path2EventFile + "_analysisResults_Lausanne.csv", lausanneCutter);
 				//	Bern
-				SpatialEventCutter circlePointCutter = new CirclePointCutter(30000, 683518.0, 246836.0); // 30km around Zurich, Bellevue
-				scenarioAnalyzer.createResults(path2EventFile + "_analysisResults_Bern.csv", circlePointCutter);
+				scenarioAnalyzer.createResults(path2EventFile + "_analysisResults_Bern.csv", bernCutter);
 				//	Basel
-				SpatialEventCutter circlePointCutter = new CirclePointCutter(30000, 683518.0, 246836.0); // 30km around Zurich, Bellevue
-				scenarioAnalyzer.createResults(path2EventFile + "_analysisResults_Basel.csv", circlePointCutter);
+				scenarioAnalyzer.createResults(path2EventFile + "_analysisResults_Basel.csv", baselCutter);
 				//	StGallen
-				SpatialEventCutter circlePointCutter = new CirclePointCutter(30000, 683518.0, 246836.0); // 30km around Zurich, Bellevue
-				scenarioAnalyzer.createResults(path2EventFile + "_analysisResults_StGallen.csv", circlePointCutter);
+				scenarioAnalyzer.createResults(path2EventFile + "_analysisResults_StGallen.csv", stGallenCutter);
 				//	Luzern
-				SpatialEventCutter circlePointCutter = new CirclePointCutter(30000, 683518.0, 246836.0); // 30km around Zurich, Bellevue
-				scenarioAnalyzer.createResults(path2EventFile + "_analysisResults_Luzern.csv", circlePointCutter);
+				scenarioAnalyzer.createResults(path2EventFile + "_analysisResults_Luzern.csv", luzernCutter);
 				//	Lugano
-				SpatialEventCutter circlePointCutter = new CirclePointCutter(30000, 683518.0, 246836.0); // 30km around Zurich, Bellevue
-				scenarioAnalyzer.createResults(path2EventFile + "_analysisResults_Lugano.csv", circlePointCutter);
-				*/
+				scenarioAnalyzer.createResults(path2EventFile + "_analysisResults_Lugano.csv", luganoCutter);
+
 			} catch (Exception e){
 				e.printStackTrace();
 			}
 		}
 	}
-
 }
