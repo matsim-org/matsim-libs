@@ -72,7 +72,6 @@ public class GfipLinkSpeedCalculator implements LinkSpeedCalculator {
 	public double getMaximumVelocity(QVehicle vehicle, Link link, double time) {
 		Id<VehicleType> vehicleType = vehicle.getVehicle().getType().getId();
 		
-		
 		int numberOfVehiclesAhead = this.qsim.getNetsimNetwork().getNetsimLink(link.getId()).getAllDrivingVehicles().size();
 		
 		/* Get the current consumed capacity of the link (in pcu equivalents) */
@@ -80,8 +79,8 @@ public class GfipLinkSpeedCalculator implements LinkSpeedCalculator {
 		double pcuEquivalents = (double) thisLink.getCustomAttributes().get("pcu");
 		
 		/* Get link's actual capacity (in pcu equivalents) */
-		double pcuCapacity = link.getLength()*link.getNumberOfLanes()/
-				((NetworkImpl)this.qsim.getNetsimNetwork().getNetwork()).getEffectiveCellSize();;
+		double pcuCapacity = 1.1*(link.getLength()*link.getNumberOfLanes()/
+				((NetworkImpl)this.qsim.getNetsimNetwork().getNetwork()).getEffectiveCellSize());
 		double density = pcuEquivalents / pcuCapacity;
 		
 		if(infoCount < 5){

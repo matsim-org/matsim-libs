@@ -28,7 +28,6 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.JJExperimentalQSimNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -57,7 +56,7 @@ public class JJExperimentalQSimMain {
 				}
 				// ===
 				QSim simulation = (QSim) new QSimFactory().createMobsim( sc, eventsManager );
-				simulation.addMobsimEngine(new QNetsimEngine(simulation, new JJExperimentalQSimNetworkFactory() ) );
+//				simulation.addMobsimEngine(new QNetsimEngine(simulation, new JJExperimentalQSimNetworkFactory() ) );
 				return simulation ;
 				// note: this is called before "enrichSimulation" so we do not need to worry about that.
 			}
