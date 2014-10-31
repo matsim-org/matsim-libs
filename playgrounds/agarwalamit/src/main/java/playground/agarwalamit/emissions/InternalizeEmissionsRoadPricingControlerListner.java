@@ -53,6 +53,7 @@ public class InternalizeEmissionsRoadPricingControlerListner implements StartupL
 	String emissionEventOutputFile;
 	EventWriterXML emissionEventWriter;
 	EmissionInternalizationHandler emissionInternalizationHandler;
+	TravelDisutilityIncludingToll.Builder travelDisutilityFactory;
 	Set<Id<Link>> hotspotLinks;
 	EmissionRoadPricing emissionPricingScheme;
 
@@ -71,7 +72,12 @@ public class InternalizeEmissionsRoadPricingControlerListner implements StartupL
 
 		this.emissionPricingScheme = new EmissionRoadPricing(15*60, controler.getScenario(),this.emissionModule, this.emissionCostModule);
 		this.emissionPricingScheme.run();
-
+		travelDisutilityFactory = new TravelDisutilityIncludingToll.Builder(
+					controler.getTravelDisutilityFactory(), emissionPricingScheme.getScheme(), controler.getConfig().planCalcScore().getMarginalUtilityOfMoney()
+					) ;
+		travelDisutilityFactory.setSigma(3.);
+		controler.setTravelDisutilityFactory(travelDisutilityFactory);
+		
 		EventsManager eventsManager = controler.getEvents();
 		eventsManager.addHandler(emissionModule.getWarmEmissionHandler());
 		eventsManager.addHandler(emissionModule.getColdEmissionHandler());
@@ -83,12 +89,6 @@ public class InternalizeEmissionsRoadPricingControlerListner implements StartupL
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
 		iteration = event.getIteration();
-
-		TravelDisutilityIncludingToll.Builder travelDisutilityFactory = new TravelDisutilityIncludingToll.Builder(
-				controler.getTravelDisutilityFactory(), emissionPricingScheme.getScheme(), controler.getConfig().planCalcScore().getMarginalUtilityOfMoney()
-				) ;
-		travelDisutilityFactory.setSigma(3.);
-		controler.setTravelDisutilityFactory(travelDisutilityFactory);
 		
 		logger.info("creating new emission internalization handler...");
 		emissionInternalizationHandler = new EmissionInternalizationHandler(controler, emissionCostModule, hotspotLinks);
