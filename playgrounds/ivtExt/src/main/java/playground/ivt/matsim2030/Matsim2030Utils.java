@@ -341,7 +341,7 @@ public class Matsim2030Utils {
 		// there might still be some facilities without a link (ie facilities not used by anybody):
 		// allocate a link here (before loading the PT part of the network)
 		for ( ActivityFacility fac : sc.getActivityFacilities().getFacilities().values() ) {
-			if ( fac.getLinkId() != null ) {
+			if ( fac.getLinkId() == null ) {
 				final NetworkImpl net = (NetworkImpl) sc.getNetwork();
 				((ActivityFacilityImpl) fac).setLinkId( net.getNearestLink( fac.getCoord() ).getId() );
 			}
