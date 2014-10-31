@@ -54,6 +54,7 @@ import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
@@ -350,7 +351,7 @@ public class Matsim2030Utils {
 	}
 
 	public static Network filterLinksWithAllModes(final Network fullNetwork, final Set<String> modes) {
-		final Network subNetwork = NetworkImpl.createNetwork();
+		final Network subNetwork = NetworkUtils.createNetwork();
 		final NetworkFactory factory = subNetwork.getFactory();
 
 		for (Link link : fullNetwork.getLinks().values()) {
