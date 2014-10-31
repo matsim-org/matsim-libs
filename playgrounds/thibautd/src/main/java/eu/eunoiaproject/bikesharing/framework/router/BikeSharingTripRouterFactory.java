@@ -52,7 +52,9 @@ public class BikeSharingTripRouterFactory implements TripRouterFactory {
 			final Scenario scenario ) {
 		this.delegate = delegate;
 		this.scenario = scenario;
-		this.data = new TransitMultiModalAccessRoutingModule.RoutingData( scenario );
+		this.data = scenario.getConfig().scenario().isUseTransit() ?
+					new TransitMultiModalAccessRoutingModule.RoutingData( scenario ) :
+					null;
 	}
 
 	public BikeSharingTripRouterFactory(
@@ -75,31 +77,33 @@ public class BikeSharingTripRouterFactory implements TripRouterFactory {
 					configGroup.getSearchRadius(),
 					router) );
 
-		// XXX should be person-dependent
-		final CharyparNagelScoringParameters scoringParams =
-			new CharyparNagelScoringParameters(
-				scenario.getConfig().planCalcScore() );
-		final Collection<InitialNodeRouter> initialNodeRouters = new ArrayList<InitialNodeRouter>( 2 );
-		initialNodeRouters.add( 
-				new InitialNodeRouter(
-					router.getRoutingModule( TransportMode.walk ),
-					scenario.getConfig().transitRouter().getSearchRadius(),
-					1,
-					scoringParams ) );
-		if ( contains( scenario.getConfig().subtourModeChoice().getModes() , BikeSharingConstants.MODE ) ) {
-			initialNodeRouters.add(
+		if ( scenario.getConfig().scenario().isUseTransit() ) {
+			// XXX should be person-dependent
+			final CharyparNagelScoringParameters scoringParams =
+					new CharyparNagelScoringParameters(
+							scenario.getConfig().planCalcScore() );
+			final Collection<InitialNodeRouter> initialNodeRouters = new ArrayList<InitialNodeRouter>( 2 );
+			initialNodeRouters.add( 
 					new InitialNodeRouter(
-						router.getRoutingModule( BikeSharingConstants.MODE ),
-						configGroup.getPtSearchRadius(),
-						3, // there is randomness: keep the "best" of a few draws
-						scoringParams ) );
+							router.getRoutingModule( TransportMode.walk ),
+							scenario.getConfig().transitRouter().getSearchRadius(),
+							1,
+							scoringParams ) );
+			if ( contains( scenario.getConfig().subtourModeChoice().getModes() , BikeSharingConstants.MODE ) ) {
+				initialNodeRouters.add(
+						new InitialNodeRouter(
+								router.getRoutingModule( BikeSharingConstants.MODE ),
+								configGroup.getPtSearchRadius(),
+								3, // there is randomness: keep the "best" of a few draws
+								scoringParams ) );
+			}
+			router.setRoutingModule(
+					TransportMode.pt,
+					new TransitMultiModalAccessRoutingModule(
+							0.75,
+							data,
+							initialNodeRouters ) );
 		}
-		router.setRoutingModule(
-				TransportMode.pt,
-				new TransitMultiModalAccessRoutingModule(
-						0.75,
-						data,
-						initialNodeRouters ) );
 
 		router.setMainModeIdentifier(
 				new MainModeIdentifierForMultiModalAccessPt(
