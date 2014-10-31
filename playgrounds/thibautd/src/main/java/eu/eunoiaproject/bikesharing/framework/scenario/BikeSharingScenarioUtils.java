@@ -82,6 +82,7 @@ public class BikeSharingScenarioUtils {
 		final Scenario sc = ScenarioUtils.createScenario( config );
 		configurePopulationFactory( sc );
 		ScenarioUtils.loadScenario( sc );
+		loadBikeSharingPart( sc );
 		return sc;
 	}
 
