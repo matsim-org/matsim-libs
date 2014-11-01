@@ -26,6 +26,7 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.misc.Time;
 
 import playground.agarwalamit.analysis.LoadMyScenarios;
 
@@ -50,10 +51,11 @@ public class ReadAndAddSubActivities {
 		String initialPlans = "/Users/aagarwal/Desktop/ils4/agarwal/munich/input/mergedPopulation_All_1pct_scaledAndMode_workStartingTimePeakAllCommuter0800Var2h_gk4.xml.gz";
 		String initialConfig = "/Users/aagarwal/Desktop/ils4/agarwal/munich/input/config_munich_1pct_baseCase.xml";
 		Scenario sc = LoadMyScenarios.loadScenarioFromPlansAndConfig(initialPlans,initialConfig);
-		String outConfig = "/Users/aagarwal/Desktop/ils4/agarwal/munich/input/config_subActivities.xml";
+		String outConfig = "/Users/aagarwal/Desktop/ils4/agarwal/munich/input/config_subActivities_baseCase.xml";
+		String outPlans = "../../munich/input/plans_1pct_subActivities.xml.gz";
 		ReadAndAddSubActivities add2Config =  new ReadAndAddSubActivities(initialConfig,sc);
 		add2Config.readConfig();
-		add2Config.addDataAndWriteConfig(outConfig);
+		add2Config.addDataAndWriteConfig(outConfig,outPlans);
 
 	}
 	
@@ -64,17 +66,26 @@ public class ReadAndAddSubActivities {
 		reader.readFile(inputConfig);
 	}
 	
-	private void addDataAndWriteConfig(String outConfig){
+	private void addDataAndWriteConfig(String outConfig, String inputPlans){
 		AddingActivitiesInPlans newPlans= new AddingActivitiesInPlans(sc);
 		newPlans.run();
 		SortedMap<String, Tuple<Double, Double>> acts = newPlans.getActivityType2TypicalAndMinimalDuration();
 		
 		for(String act :acts.keySet()){
-			ActivityParams params = new ActivityParams(act);
+			ActivityParams params = new ActivityParams();
+			params.setActivityType(act);
 			params.setTypicalDuration(acts.get(act).getFirst());
 			params.setMinimalDuration(acts.get(act).getSecond());
+			params.setClosingTime(Time.UNDEFINED_TIME);
+			params.setEarliestEndTime(Time.UNDEFINED_TIME);
+			params.setLatestStartTime(Time.UNDEFINED_TIME);
+			params.setOpeningTime(Time.UNDEFINED_TIME);
 			config.planCalcScore().addActivityParams(params);
 		}
+		
+		config.controler().setOutputDirectory(null);
+		config.plans().setInputFile(inputPlans);
+		
 		new ConfigWriter(config).write(outConfig);
 	}
 

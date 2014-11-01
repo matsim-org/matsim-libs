@@ -93,10 +93,9 @@ public class AddingActivitiesInPlans {
 			pOut.addPlan(planOut);
 
 			List<PlanElement> pes = p.getSelectedPlan().getPlanElements();
+			double timeShift=0;
+			
 			for(PlanElement pe : pes){ 
-				
-				double timeShift=0;
-				
 				if(pe instanceof Activity){
 					String currentAct = ((Activity)pe).getType();
 					Coord cord = ((Activity)pe).getCoord();
@@ -138,7 +137,28 @@ public class AddingActivitiesInPlans {
 						Tuple<Double, Double> typMinDur = new Tuple<Double, Double>(typDur, minDur);
 						actType2TypDurMinDur.put(actTyp, typMinDur);
 
-					} else {
+					} else if(  ((Activity)pe).getStartTime() > Double.NEGATIVE_INFINITY && ((Activity)pe).getStartTime() < Double.POSITIVE_INFINITY  ){
+						dur = 30*3600-((Activity)pe).getStartTime();
+						
+						double typDur = Math.floor(dur/3600);
+						
+						if(typDur< 1) typDur = 1800;
+						else typDur =typDur*3600;
+						
+						double minDur = Math.min(params.getActivityParams(currentAct).getMinimalDuration(), typDur/2);
+						
+						String actTyp = currentAct.substring(0, 4).concat(typDur/3600+"H");
+						Activity a2 = popFactory.createActivityFromCoord(actTyp, cord);
+						a2.setStartTime( ((Activity)pe).getStartTime()+timeShift);
+						a2.setEndTime( ((Activity)pe).getEndTime()+timeShift);
+						planOut.addActivity(a2);
+
+						Tuple<Double, Double> typMinDur = new Tuple<Double, Double>(typDur, minDur);
+						actType2TypDurMinDur.put(actTyp, typMinDur);
+						
+					}
+					
+					else {
 						planOut.addActivity((Activity)pe);
 					}
 				} else if(pe instanceof Leg){
