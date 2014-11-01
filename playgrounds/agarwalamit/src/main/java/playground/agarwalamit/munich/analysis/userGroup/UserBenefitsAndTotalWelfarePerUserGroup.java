@@ -73,7 +73,7 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 	private final WelfareMeasure wm = WelfareMeasure.SELECTED;
 
 	public static void main(String[] args) {
-		String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct_rSeed/";
+		String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct_msa_rSeed/";
 		String [] runCases = { "baseCaseCtd","ei","ci","eci"};
 		new UserBenefitsAndTotalWelfarePerUserGroup(outputDir, false).runAndWrite(runCases);
 	}
@@ -103,7 +103,7 @@ public class UserBenefitsAndTotalWelfarePerUserGroup {
 			SortedMap<UserGroup, Double> userGroupToUserWelfare_money = getParametersPerUserGroup(this.personId2MonetarizedUserWelfare);
 			SortedMap<UserGroup, Double> userGroupToTotalPayment = getTollsPerUserGroup(this.personId2MonetaryPayments);
 
-			String outputFile = this.outputDir+runCase+"/analysis/userGrpWelfareAndTollPayments.txt";
+			String outputFile = this.outputDir+runCase+"/analysis/userGrpWelfareAndTollPayments_"+this.wm+".txt";
 			BufferedWriter writer = IOUtils.getBufferedWriter(outputFile);
 
 			double sumUtils =0;

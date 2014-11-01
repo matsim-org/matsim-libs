@@ -36,7 +36,7 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
  */
 public class ModalSplitUserGroup {
 
-	private  String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/output/1pct/ei/";/*"./output/run2/";*/
+	private  String outputDir = "/Users/aagarwal/Desktop/ils4/agarwal/munich/outputTest/run1/ei/";/*"./output/run2/";*/
 	private  String populationFile =outputDir+ "/output_plans.xml.gz";//"/network.xml";
 	private  String networkFile =outputDir+ "/output_network.xml.gz";//"/network.xml";
 	private SortedMap<UserGroup, SortedMap<String, double[]>> userGrp2ModalSplit = new TreeMap<UserGroup, SortedMap<String,double[]>>();
@@ -44,7 +44,7 @@ public class ModalSplitUserGroup {
 	private void run(){
 		ModalShareGenerator msg = new ModalShareGenerator();
 		PersonFilter pf = new PersonFilter();
-		Scenario sc = LoadMyScenarios.loadScenarioFromPlansAndNetwork(this.networkFile, this.populationFile);
+		Scenario sc = LoadMyScenarios.loadScenarioFromPlansAndNetwork( this.populationFile, this.networkFile);
 		
 		SortedMap<String, double[]> modalSplit = msg.getModalShareFromPlans(sc.getPopulation());
 		
