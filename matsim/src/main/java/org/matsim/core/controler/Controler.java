@@ -413,6 +413,25 @@ public class Controler extends AbstractController {
 			addControlerListener(new VspPlansCleaner(this.scenarioData ));
 		}
 
+        // Set up the Injector, which is the dependency injection container for the Controler I have been talking about.
+        // The TravelTimeCalculator is my first customer. I moved it into a Module.
+        // As other things become modules, too, their interfaces and their dependencies and their getters can disappear
+        // from the Controler.
+        this.injector = Injector.createInjector(
+                new AbstractModule() {
+                    @Override
+                    public void install() {
+                        for (AbstractModule module : modules) {
+                            include(module);
+                        }
+                        // Bootstrap it with the Scenario.
+                        bindToInstance(Scenario.class, scenarioData);
+                    }
+                });
+        Set<EventHandler> eventHandlersDeclaredByModules = this.injector.getEventHandlersDeclaredByModules();
+        for (EventHandler eventHandler : eventHandlersDeclaredByModules) {
+            this.events.addHandler(eventHandler);
+        }
 	}
 
 	@Override
@@ -451,28 +470,7 @@ public class Controler extends AbstractController {
 	 */
 	protected void setUp() {
 		// yyyy cannot make this final since it is overridden at about 25 locations.  kai, jan'13
-
-        // Set up the Injector, which is the dependency injection container for the Controler I have been talking about.
-        // The TravelTimeCalculator is my first customer. I moved it into a Module.
-        // As other things become modules, too, their interfaces and their dependencies and their getters can disappear
-        // from the Controler.
-        this.injector = Injector.createInjector(
-                new AbstractModule() {
-                    @Override
-                    public void install() {
-                        for (AbstractModule module : modules) {
-                            include(module);
-                        }
-                        // Bootstrap it with the Scenario.
-                        bindToInstance(Scenario.class, scenarioData);
-                    }
-                });
-        Set<EventHandler> eventHandlersDeclaredByModules = this.injector.getEventHandlersDeclaredByModules();
-        for (EventHandler eventHandler : eventHandlersDeclaredByModules) {
-            this.events.addHandler(eventHandler);
-        }
-
-		if ( tripRouterFactory == null ) {
+        if ( tripRouterFactory == null ) {
 			// This builder is just for compatibility, in case somebody
 			// uses setTransitRouter or setLeastCostPathCalculatorFactory.
 			tripRouterFactory = tripRouterFactoryBuilder.build(scenarioData );
